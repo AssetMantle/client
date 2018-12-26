@@ -13,15 +13,15 @@ CREATE SCHEMA IF NOT EXISTS MASTER
 CREATE SCHEMA IF NOT EXISTS BUSINESSTXN
   AUTHORIZATION comdex;
 
-CREATE TABLE IF NOT EXISTS master.Login (
-  UserName       VARCHAR      NOT NULL,
-  Address        varchar      NOT NULL UNIQUE,
-  ZoneID         INT          NOT NULL,
-  OrganizationID varchar      NOT NULL,
-  PasswordHash   varchar      NOT NULL,
-  Phone          varchar      NOT NULL UNIQUE,
-  Email          varchar      NOT NULL UNIQUE,
-  PRIMARY KEY (UserName)
+CREATE TABLE IF NOT EXISTS master.login (
+  userName       VARCHAR      NOT NULL,
+  address        varchar      NOT NULL UNIQUE,
+  zoneID         INT          NOT NULL,
+  organizationID varchar      NOT NULL,
+  passwordHash   varchar      NOT NULL,
+  phone          varchar      NOT NULL UNIQUE,
+  email          varchar      NOT NULL UNIQUE,
+  PRIMARY KEY (userName)
 );
 
 CREATE TABLE IF NOT EXISTS master.Zone (
@@ -105,7 +105,7 @@ CREATE TABLE IF NOT EXISTS master.OrganizationKYC (
 );
 
 CREATE TABLE IF NOT EXISTS master.UserKYC (
-  UserName        varchar      NOT NULL UNIQUE ,
+  userName        varchar      NOT NULL UNIQUE ,
   UserKYCPath     VARCHAR NOT NULL,
   Url             VARCHAR NOT NULL,
   DocStatus       VARCHAR NOT NULL,
@@ -155,15 +155,15 @@ CREATE TABLE IF NOT EXISTS blockchain.Negotiation (
   NegotiationTime        INT     NOT NULL,
   PRIMARY KEY (NegotiationReferenceID)
 );
-
-ALTER TABLE master.Login
-  ADD CONSTRAINT Login_fk0 FOREIGN KEY (ZoneID) REFERENCES master.Zone (ZoneID);
-
-ALTER TABLE master.Login
-  ADD CONSTRAINT Login_fk1 FOREIGN KEY (OrganizationID) REFERENCES master.Organization (OrganizationID);
+--
+-- ALTER TABLE master.login
+--   ADD CONSTRAINT Login_fk0 FOREIGN KEY (ZoneID) REFERENCES master.Zone (zoneID);
+--
+-- ALTER TABLE master.login
+--   ADD CONSTRAINT Login_fk1 FOREIGN KEY (OrganizationID) REFERENCES master.Organization (organizationID);
 
 ALTER TABLE blockchain.Account
-  ADD CONSTRAINT Account_fk0 FOREIGN KEY (Address) REFERENCES master.Login (Address);
+  ADD CONSTRAINT Account_fk0 FOREIGN KEY (Address) REFERENCES master.login (address);
 
 ALTER TABLE blockchain.Account
   ADD CONSTRAINT Account_fk1 FOREIGN KEY (FiatPegHash) REFERENCES blockchain.Fiat (PegHash);
@@ -181,7 +181,7 @@ ALTER TABLE master.OrganizationKYC
   ADD CONSTRAINT OrganizationKYC_fk0 FOREIGN KEY (OrganizationID) REFERENCES master.Organization (OrganizationID);
 
 ALTER TABLE master.UserKYC
-  ADD CONSTRAINT UserKYC_fk0 FOREIGN KEY (UserName) REFERENCES master.Login (UserName);
+  ADD CONSTRAINT UserKYC_fk0 FOREIGN KEY (userName) REFERENCES master.Login (userName);
 
 ALTER TABLE blockchain.Owners
   ADD CONSTRAINT Owners_fk0 FOREIGN KEY (PegHash) REFERENCES blockchain.Fiat (PegHash);

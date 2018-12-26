@@ -1,8 +1,8 @@
 package controllers
 
 import javax.inject._
-
 import akka.actor.ActorSystem
+import models.{Login, Logins}
 import play.api.mvc._
 
 import scala.concurrent.duration._
@@ -24,7 +24,7 @@ import scala.concurrent.{ExecutionContext, Future, Promise}
  * a blocking API.
  */
 @Singleton
-class AsyncController @Inject()(cc: ControllerComponents, actorSystem: ActorSystem)(implicit exec: ExecutionContext) extends AbstractController(cc) {
+class AsyncController @Inject()(cc: ControllerComponents, actorSystem: ActorSystem,logins:Logins)(implicit exec: ExecutionContext) extends AbstractController(cc) {
 
   /**
    * Creates an Action that returns a plain text message after a delay
@@ -35,7 +35,8 @@ class AsyncController @Inject()(cc: ControllerComponents, actorSystem: ActorSyst
    * a path of `/message`.
    */
   def message = Action.async {
-    getFutureMessage(1.second).map { msg => Ok(msg) }
+    logins.add(Login("a", "b", 1, "d", "e", "s", "s")).map(x => Ok(s"$x"))
+    //getFutureMessage(1.second).map { msg => Ok(msg) }
   }
 
   private def getFutureMessage(delayTime: FiniteDuration): Future[String] = {
