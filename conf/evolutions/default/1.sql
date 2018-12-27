@@ -1,242 +1,192 @@
 # --- !Ups
 
+CREATE SCHEMA IF NOT EXISTS BLOCKCHAIN  AUTHORIZATION comdex;
+CREATE SCHEMA IF NOT EXISTS BUSINESSTXN AUTHORIZATION comdex;
+CREATE SCHEMA IF NOT EXISTS FACTORY     AUTHORIZATION comdex;
+CREATE SCHEMA IF NOT EXISTS MASTER      AUTHORIZATION comdex;
 
-CREATE SCHEMA IF NOT EXISTS BLOCKCHAIN
-  AUTHORIZATION comdex;
+-- MASTER
 
-CREATE SCHEMA IF NOT EXISTS FACTORY
-  AUTHORIZATION comdex;
-
-CREATE SCHEMA IF NOT EXISTS MASTER
-  AUTHORIZATION comdex;
-
-CREATE SCHEMA IF NOT EXISTS BUSINESSTXN
-  AUTHORIZATION comdex;
-
-CREATE TABLE IF NOT EXISTS master.login (
-  userName       VARCHAR      NOT NULL,
-  address        varchar      NOT NULL UNIQUE,
-  zoneID         INT          NOT NULL,
-  organizationID varchar      NOT NULL,
-  passwordHash   varchar      NOT NULL,
-  phone          varchar      NOT NULL UNIQUE,
-  email          varchar      NOT NULL UNIQUE,
-  PRIMARY KEY (userName)
+CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Zone" (
+  "id"      VARCHAR NOT NULL,
+  "address" VARCHAR NOT NULL,
+  PRIMARY KEY ("id")
 );
 
-CREATE TABLE IF NOT EXISTS master.Zone (
-  ZoneID   INT          NOT NULL,
-  ZoneName VARCHAR NOT NULL,
-  Country  VARCHAR NOT NULL,
-  City     VARCHAR NOT NULL,
-  PRIMARY KEY (ZoneID)
+CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Organization" (
+  "id"      VARCHAR NOT NULL,
+  "address" VARCHAR NOT NULL,
+  PRIMARY KEY ("id")
 );
 
-CREATE TABLE IF NOT EXISTS blockchain.Account (
-  Address      varchar NOT NULL,
-  PublicKey    varchar NOT NULL,
-  Coins        INT     NOT NULL,
-  FiatPegHash  varchar NOT NULL,
-  AssetPegHash varchar NOT NULL,
-  PRIMARY KEY (Address)
+CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Account"(
+  "address"       VARCHAR NOT NULL,
+  "coins"         VARCHAR NOT NULL,
+  "publicKey"     VARCHAR NOT NULL,
+  "accountNumber" VARCHAR NOT NULL,
+  "sequence"      VARCHAR NOT NULL,
+  PRIMARY KEY ("address" )
 );
 
-CREATE TABLE IF NOT EXISTS blockchain.Asset (
-  PegHash       varchar      NOT NULL,
-  DocumentHash  varchar      NOT NULL,
-  AssetType     VARCHAR NOT NULL,
-  AssetPrice    INT          NOT NULL,
-  AssetQuantity INT          NOT NULL,
-  QuantityUnit  VARCHAR NOT NULL,
-  Address       varchar      NOT NULL,
-  AssetLocked   BOOLEAN      NOT NULL,
-  PRIMARY KEY (PegHash)
+CREATE TABLE IF NOT EXISTS BLOCKCHAIN."ACL"(
+  "address"        VARCHAR NOT NULL,
+  "zoneID"         VARCHAR NOT NULL,
+  "organizationID" VARCHAR NOT NULL,
+  "transactions"   VARCHAR NOT NULL,
+  PRIMARY KEY ("address" )
+);
+ALTER TABLE BLOCKCHAIN."ACL" ADD CONSTRAINT ACL_Account_address             FOREIGN KEY ("address")        REFERENCES BLOCKCHAIN."Account" ("address");
+ALTER TABLE BLOCKCHAIN."ACL" ADD CONSTRAINT ACL_Zone_zoneID                 FOREIGN KEY ("zoneID")         REFERENCES BLOCKCHAIN."Zone" ("id");
+ALTER TABLE BLOCKCHAIN."ACL" ADD CONSTRAINT ACL_Organization_organizationID FOREIGN KEY ("organizationID") REFERENCES BLOCKCHAIN."Organization" ("id");
+
+CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Fiat"(
+  "pegHash"           VARCHAR NOT NULL,
+  "transactionID"     VARCHAR NOT NULL,
+  "transactionAmount" INT     NOT NULL,
+  "redeemedAmount"    INT     NOT NULL,
+  PRIMARY KEY ("pegHash")
 );
 
-CREATE TABLE IF NOT EXISTS blockchain.Fiat (
-  PegHash           varchar NOT NULL,
-  TransactionID     varchar NOT NULL,
-  TransactionAmount INT     NOT NULL,
-  RedeemedAmount    INT     NOT NULL,
-  PRIMARY KEY (PegHash)
+CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Owner"(
+  "pegHash"      VARCHAR NOT NULL,
+  "ownerAddress" VARCHAR NOT NULL,
+  "amount"       INT     NOT NULL,
+  PRIMARY KEY ("ownerAddress","pegHash")
 );
+ALTER TABLE BLOCKCHAIN."Owner" ADD CONSTRAINT Owners_Account_ownerAddress FOREIGN KEY ("ownerAddress" ) REFERENCES BLOCKCHAIN."Account" ("address");
+ALTER TABLE BLOCKCHAIN."Owner" ADD CONSTRAINT Owners_Fiat_pegHash         FOREIGN KEY ("pegHash")       REFERENCES BLOCKCHAIN."Fiat" ("pegHash");
 
-CREATE TABLE IF NOT EXISTS master.Organization (
-  OrganizationID   varchar      NOT NULL,
-  OrganizationName VARCHAR NOT NULL,
-  Address          VARCHAR NOT NULL,
-  Zipcode          INT          NOT NULL,
-  Phone            varchar      NOT NULL,
-  Email            varchar      NOT NULL,
-  IsComdexUser     BOOLEAN      NOT NULL,
-  CreatedAt        TIMESTAMP    NOT NULL,
-  Abbreviation     VARCHAR NOT NULL,
-  PRIMARY KEY (OrganizationID)
+CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Asset"(
+  "pegHash"       VARCHAR NOT NULL,
+  "documentHash"  VARCHAR NOT NULL,
+  "assetType"     VARCHAR NOT NULL,
+  "assetQuantity" INT     NOT NULL,
+  "assetPrice"    INT     NOT NULL,
+  "quantityUnit"  VARCHAR NOT NULL,
+  "ownerAddress"  VARCHAR NOT NULL,
+  "locked"        BOOLEAN NOT NULL,
+  PRIMARY KEY ("pegHash")
 );
+ALTER TABLE BLOCKCHAIN."Asset"ADD CONSTRAINT Asset_Account_ownerAddress FOREIGN KEY ("ownerAddress" ) REFERENCES BLOCKCHAIN."Account" ("address");
 
-CREATE TABLE IF NOT EXISTS master.BankDetails (
-  OrganizationID varchar NOT NULL UNIQUE,
-  BankAccNumber  VARCHAR NOT NULL,
-  AccountHolder  VARCHAR NOT NULL,
-  BankName       VARCHAR NOT NULL,
-  NickName       VARCHAR NOT NULL,
-  Country        VARCHAR NOT NULL,
-  Swift          VARCHAR NOT NULL,
-  Address        VARCHAR NOT NULL,
-  ZIP            VARCHAR NOT NULL,
-  Status         VARCHAR NOT NULL
+CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Negotiation" (
+  "id"              VARCHAR NOT NULL,
+  "buyerAddress"    VARCHAR NOT NULL,
+  "sellerAddress"   VARCHAR NOT NULL,
+  "assetPegHash"    VARCHAR NOT NULL,
+  "bid"             INT     NOT NULL,
+  "time"            INT     NOT NULL,
+  "buyerSignature"  VARCHAR NOT NULL,
+  "sellerSignature" VARCHAR NOT NULL,
+  PRIMARY KEY ("id")
 );
+ALTER TABLE BLOCKCHAIN."Negotiation" ADD CONSTRAINT Negotiation_Account_buyerAddress  FOREIGN KEY ("buyerAddress")  REFERENCES BLOCKCHAIN."Account"("address");
+ALTER TABLE BLOCKCHAIN."Negotiation" ADD CONSTRAINT Negotiation_Account_sellerAddress FOREIGN KEY ("sellerAddress") REFERENCES BLOCKCHAIN."Account"("address");
+ALTER TABLE BLOCKCHAIN."Negotiation" ADD CONSTRAINT Negotiation_Asset_pegHash         FOREIGN KEY ("assetPegHash")  REFERENCES BLOCKCHAIN."Asset"("pegHash");
 
-CREATE TABLE IF NOT EXISTS master.OrganizationKYC (
-  OrganizationID          varchar NOT NULL UNIQUE ,
-  OrganizationKYCPath     VARCHAR NOT NULL,
-  Url                     VARCHAR NOT NULL,
-  DocStatus               VARCHAR NOT NULL,
-  OrganizationKYCComments VARCHAR NOT NULL,
-  DocType                 VARCHAR NOT NULL,
-  Status                  BOOLEAN      NOT NULL,
-  ApprovedBy              VARCHAR NOT NULL,
-  ApprovedAt              TIMESTAMP    NOT NULL,
-  FileType                VARCHAR NOT NULL,
-  FileName                VARCHAR NOT NULL,
-  CreatedAt               TIMESTAMP    NOT NULL,
-  UpdatedAt               TIMESTAMP    NOT NULL,
-  DeletedAt               TIMESTAMP    NOT NULL
+CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Order" (
+  "id"            VARCHAR      NOT NULL,
+  "fiatProofHash" VARCHAR      NOT NULL,
+  "awbProofHash"  VARCHAR      NOT NULL,
+  "executed"      BOOLEAN      NOT NULL,
+  PRIMARY KEY ("id")
 );
+ALTER TABLE BLOCKCHAIN."Order" ADD CONSTRAINT Order_Negotiation_id FOREIGN KEY ("id") REFERENCES BLOCKCHAIN."Negotiation"("id");
 
-CREATE TABLE IF NOT EXISTS master.UserKYC (
-  userName        varchar      NOT NULL UNIQUE ,
-  UserKYCPath     VARCHAR NOT NULL,
-  Url             VARCHAR NOT NULL,
-  DocStatus       VARCHAR NOT NULL,
-  UserKYCComments VARCHAR NOT NULL,
-  DocType         VARCHAR NOT NULL,
-  Status          BOOLEAN      NOT NULL,
-  ApprovedBy      VARCHAR NOT NULL,
-  ApprovedAt      TIMESTAMP    NOT NULL,
-  FileType        VARCHAR NOT NULL,
-  FileName        VARCHAR NOT NULL,
-  CreatedAt       TIMESTAMP    NOT NULL,
-  UpdatedAt       TIMESTAMP    NOT NULL,
-  DeletedAt       TIMESTAMP    NOT NULL
+-- MASTER
+
+CREATE TABLE IF NOT EXISTS MASTER."Zone" (
+  "id"          VARCHAR NOT NULL,
+  "secreteHash" VARCHAR NOT NULL,
+  "name"        VARCHAR NOT NULL,
+  "currency"    VARCHAR NOT NULL,
+  PRIMARY KEY ("id")
 );
+ALTER TABLE MASTER."Zone" ADD CONSTRAINT Zone_BCZone_id FOREIGN KEY ("id") REFERENCES BLOCKCHAIN."Zone" ("id");
 
-CREATE TABLE IF NOT EXISTS blockchain.Owners (
-  PegHash      varchar NOT NULL UNIQUE,
-  OwnerAddress varchar NOT NULL,
-  Amount       INT     NOT NULL,
-  PRIMARY KEY (OwnerAddress)
+CREATE TABLE IF NOT EXISTS MASTER."Organization" (
+  "id"          VARCHAR NOT NULL,
+  "secreteHash" VARCHAR NOT NULL,
+  "name"        VARCHAR NOT NULL,
+  "address"     VARCHAR NOT NULL,
+  "phone"       VARCHAR NOT NULL,
+  "email"       VARCHAR NOT NULL,
+  PRIMARY KEY ("id")
 );
+ALTER TABLE MASTER."Organization" ADD CONSTRAINT Organization_BCOrganization_id FOREIGN KEY ("id") REFERENCES BLOCKCHAIN."Organization" ("id");
 
-CREATE TABLE IF NOT EXISTS blockchain.Order (
-  OrderReferenceID varchar      NOT NULL,
-  NegotiationID   varchar      NOT NULL,
-  BuyerAddress    varchar      NOT NULL,
-  SellerAddress   varchar      NOT NULL,
-  AssetPegHash    varchar      NOT NULL,
-  Amount          INT          NOT NULL,
-  FiatProofHash   VARCHAR NOT NULL,
-  AWBProofHash    VARCHAR NOT NULL,
-  ApprovedAt      TIMESTAMP    NOT NULL,
-  ApprovedBy      VARCHAR NOT NULL,
-  PaymentReceipt  varchar      NOT NULL,
-  Executed        BOOLEAN      NOT NULL,
-  OrderComments   varchar      NOT NULL,
-  PRIMARY KEY (OrderReferenceID)
+CREATE TABLE IF NOT EXISTS MASTER."Account" (
+  "id"             VARCHAR NOT NULL,
+  "secreteHash"    VARCHAR NOT NULL,
+  "accountAddress" VARCHAR NOT NULL,
+  PRIMARY KEY ("id")
 );
+ALTER TABLE MASTER."Account" ADD CONSTRAINT Account_BCAccount_address FOREIGN KEY ("accountAddress") REFERENCES BLOCKCHAIN."Account" ("address");
 
-CREATE TABLE IF NOT EXISTS blockchain.Negotiation (
-  NegotiationReferenceID varchar NOT NULL,
-  NegotiationID          varchar NOT NULL,
-  BuyerAddress           varchar NOT NULL,
-  SellerAddress          varchar NOT NULL,
-  AssetPegHash           varchar NOT NULL,
-  Bid                    INT     NOT NULL,
-  NegotiationTime        INT     NOT NULL,
-  PRIMARY KEY (NegotiationReferenceID)
+CREATE TABLE IF NOT EXISTS MASTER."ZoneKYC" (
+  "id"       VARCHAR NOT NULL,
+  "type"     VARCHAR NOT NULL,
+  "status"   BOOLEAN NOT NULL,
+  "fileName" VARCHAR NOT NULL,
+  "file"     BYTEA   NOT NULL,
+  PRIMARY KEY ("id", "type")
 );
---
--- ALTER TABLE master.login
---   ADD CONSTRAINT Login_fk0 FOREIGN KEY (ZoneID) REFERENCES master.Zone (zoneID);
---
--- ALTER TABLE master.login
---   ADD CONSTRAINT Login_fk1 FOREIGN KEY (OrganizationID) REFERENCES master.Organization (organizationID);
+ALTER TABLE MASTER."ZoneKYC" ADD CONSTRAINT ZoneKYC_Zone_id FOREIGN KEY ("id") REFERENCES MASTER."Zone"("id");
 
-ALTER TABLE blockchain.Account
-  ADD CONSTRAINT Account_fk0 FOREIGN KEY (Address) REFERENCES master.login (address);
+CREATE TABLE IF NOT EXISTS MASTER."OrganizationKYC" (
+  "id"       VARCHAR NOT NULL,
+  "type"     VARCHAR NOT NULL,
+  "status"   BOOLEAN NOT NULL,
+  "fileName" VARCHAR NOT NULL,
+  "file"     BYTEA   NOT NULL,
+  PRIMARY KEY ("id", "type")
+);
+ALTER TABLE MASTER."OrganizationKYC" ADD CONSTRAINT OrganizationKYC_Organization_id FOREIGN KEY ("id") REFERENCES MASTER."Organization" ("id");
 
-ALTER TABLE blockchain.Account
-  ADD CONSTRAINT Account_fk1 FOREIGN KEY (FiatPegHash) REFERENCES blockchain.Fiat (PegHash);
+CREATE TABLE IF NOT EXISTS MASTER."AccountKYC" (
+  "id"       VARCHAR NOT NULL,
+  "type"     VARCHAR NOT NULL,
+  "status"   BOOLEAN NOT NULL,
+  "fileName" VARCHAR NOT NULL,
+  "file"     BYTEA   NOT NULL,
+  PRIMARY KEY ("id", "type")
+);
+ALTER TABLE MASTER."AccountKYC" ADD CONSTRAINT AccountKYC_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account"("id");
 
-ALTER TABLE blockchain.Account
-  ADD CONSTRAINT Account_fk2 FOREIGN KEY (AssetPegHash) REFERENCES blockchain.Asset (PegHash);
-
-ALTER TABLE blockchain.Asset
-  ADD CONSTRAINT Asset_fk0 FOREIGN KEY (Address) REFERENCES blockchain.Account (Address);
-
-ALTER TABLE master.BankDetails
-  ADD CONSTRAINT BankDetails_fk0 FOREIGN KEY (OrganizationID) REFERENCES master.Organization (OrganizationID);
-
-ALTER TABLE master.OrganizationKYC
-  ADD CONSTRAINT OrganizationKYC_fk0 FOREIGN KEY (OrganizationID) REFERENCES master.Organization (OrganizationID);
-
-ALTER TABLE master.UserKYC
-  ADD CONSTRAINT UserKYC_fk0 FOREIGN KEY (userName) REFERENCES master.Login (userName);
-
-ALTER TABLE blockchain.Owners
-  ADD CONSTRAINT Owners_fk0 FOREIGN KEY (PegHash) REFERENCES blockchain.Fiat (PegHash);
-
-ALTER TABLE blockchain.Order
-  ADD CONSTRAINT Order_fk1 FOREIGN KEY (BuyerAddress) REFERENCES blockchain.Account (Address);
-
-ALTER TABLE blockchain.Order
-  ADD CONSTRAINT Order_fk2 FOREIGN KEY (SellerAddress) REFERENCES blockchain.Account (Address);
-
-ALTER TABLE blockchain.Order
-  ADD CONSTRAINT Order_fk3 FOREIGN KEY (AssetPegHash) REFERENCES blockchain.Asset (PegHash);
-
-ALTER TABLE blockchain.Negotiation
-  ADD CONSTRAINT Negotiation_fk0 FOREIGN KEY (BuyerAddress) REFERENCES blockchain.Account (Address);
-
-ALTER TABLE blockchain.Negotiation
-  ADD CONSTRAINT Negotiation_fk1 FOREIGN KEY (SellerAddress) REFERENCES blockchain.Account (Address);
+CREATE TABLE IF NOT EXISTS MASTER."OrgBankAccount" (
+  "id"            VARCHAR NOT NULL,
+  "accountHolder" VARCHAR NOT NULL,
+  "bankName"      VARCHAR NOT NULL,
+  "nickName"      VARCHAR NOT NULL,
+  "country"       VARCHAR NOT NULL,
+  "swift"         VARCHAR NOT NULL,
+  "address"       VARCHAR NOT NULL,
+  "zipcode"       VARCHAR NOT NULL,
+  "status"        VARCHAR NOT NULL,
+  PRIMARY KEY ("id")
+);
+ALTER TABLE MASTER."OrgBankAccount" ADD CONSTRAINT OrgBankAccount_Organization_id FOREIGN KEY ("id") REFERENCES MASTER."Organization" ("id");
 
 # --- !Downs
 
-DROP TABLE IF EXISTS master.Login CASCADE;
+DROP TABLE IF EXISTS BLOCKCHAIN."Zone" CASCADE;
+DROP TABLE IF EXISTS BLOCKCHAIN."Organization" CASCADE;
+DROP TABLE IF EXISTS BLOCKCHAIN."ACL" CASCADE;
+DROP TABLE IF EXISTS BLOCKCHAIN."Fiat" CASCADE;
+DROP TABLE IF EXISTS BLOCKCHAIN."Owner" CASCADE;
+DROP TABLE IF EXISTS BLOCKCHAIN."Asset" CASCADE;
+DROP TABLE IF EXISTS BLOCKCHAIN."Negotiation" CASCADE;
+DROP TABLE IF EXISTS BLOCKCHAIN."Order" CASCADE;
 
-DROP TABLE IF EXISTS master.Zone CASCADE;
-
-DROP TABLE IF EXISTS blockchain.Account CASCADE;
-
-DROP TABLE IF EXISTS blockchain.Asset CASCADE;
-
-DROP TABLE IF EXISTS blockchain.Fiat CASCADE;
-
-DROP TABLE IF EXISTS master.Organization CASCADE;
-
-DROP TABLE IF EXISTS master.BankDetails CASCADE;
-
-DROP TABLE IF EXISTS master.OrganizationKYC CASCADE;
-
-DROP TABLE IF EXISTS master.UserKYC CASCADE;
-
-DROP TABLE IF EXISTS blockchain.Owners CASCADE;
-
-DROP TABLE IF EXISTS blockchain.Order CASCADE;
-
-DROP TABLE IF EXISTS blockchain.Negotiation CASCADE;
-
+DROP TABLE IF EXISTS MASTER."Zone" CASCADE;
+DROP TABLE IF EXISTS MASTER."Organization" CASCADE;
+DROP TABLE IF EXISTS MASTER."Account" CASCADE;
+DROP TABLE IF EXISTS MASTER."ZoneKYC" CASCADE;
+DROP TABLE IF EXISTS MASTER."OrganizationKYC" CASCADE;
+DROP TABLE IF EXISTS MASTER."AccountKYC" CASCADE;
+DROP TABLE IF EXISTS MASTER."BankAccount" CASCADE;
 
 DROP SCHEMA IF EXISTS BLOCKCHAIN CASCADE;
-
-DROP SCHEMA IF EXISTS FACTORY CASCADE;
-
-DROP SCHEMA IF EXISTS MASTER CASCADE;
-
 DROP SCHEMA IF EXISTS BUSINESSTXN CASCADE;
-
-
-DROP TABLE IF EXISTS testmaster.logindata CASCADE;
-DROP SCHEMA IF EXISTS TESTMASTER CASCADE;
-
+DROP SCHEMA IF EXISTS FACTORY CASCADE;
+DROP SCHEMA IF EXISTS MASTER CASCADE;
