@@ -1,1 +1,18 @@
-@()
+@import helper._
+@import views.forms.Login
+@(loginForm: Form[Login])(implicit messagesRequestHeader: MessagesRequestHeader)
+
+@form(action = routes.LoginController.login){
+    @CSRF.formField
+    @inputText(loginForm("Username"))
+    @inputText(loginForm("Password"))
+
+    @if(loginForm.hasGlobalErrors){
+        <ul>
+            @for(error <- loginForm.globalErrors){
+                <li>@error.format</li>
+            }
+        </ul>
+    }
+    <button type="submit">Login</button>>
+}
