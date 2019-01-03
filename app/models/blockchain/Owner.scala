@@ -25,7 +25,7 @@ class Owners @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
   def deleteByPegHashOwnerAddress(pegHash: String, ownerAddress: String) = db.run(ownerTable.filter(_.pegHash === pegHash).filter(_.ownerAddress === ownerAddress).delete)
 
 
-  private[models] class OwnerTable(tag: Tag) extends Table[Owner](tag, "Owner") {
+  private[models] class OwnerTable(tag: Tag) extends Table[Owner](tag, "Owner_BC") {
 
     def * = (pegHash, ownerAddress, amount) <> (Owner.tupled, Owner.unapply)
 

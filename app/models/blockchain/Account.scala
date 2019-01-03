@@ -23,7 +23,7 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   def deleteByAddress(address: String) = db.run(accountTable.filter(_.address === address).delete)
 
-  private[models] class AccountTable(tag: Tag) extends Table[Account](tag, "Account") {
+  private[models] class AccountTable(tag: Tag) extends Table[Account](tag, "Account_BC") {
 
     def * = (address, coins, publicKey, accountNumber, sequence) <> (Account.tupled, Account.unapply)
 

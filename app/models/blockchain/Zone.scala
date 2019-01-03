@@ -23,7 +23,7 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
   def deleteById(id: String) = db.run(zoneTable.filter(_.id === id).delete)
 
-  private[models] class ZoneTable(tag: Tag) extends Table[Zone](tag, "Zone") {
+  private[models] class ZoneTable(tag: Tag) extends Table[Zone](tag, "Zone_BC") {
 
     def * = (id, address) <> (Zone.tupled, Zone.unapply)
 

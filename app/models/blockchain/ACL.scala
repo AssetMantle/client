@@ -23,7 +23,7 @@ class ACLs @Inject()(protected val databaseConfigProvider: DatabaseConfigProvide
 
   def deleteByAddress(address: String) = db.run(aclTable.filter(_.address === address).delete)
 
-  private[models] class ACLTable(tag: Tag) extends Table[ACL](tag, "ACL") {
+  private[models] class ACLTable(tag: Tag) extends Table[ACL](tag, "ACL_BC") {
 
     def * = (address, zoneID, organizationID, transactions) <> (ACL.tupled, ACL.unapply)
 

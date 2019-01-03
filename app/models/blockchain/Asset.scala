@@ -23,7 +23,7 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
 
   def deleteByPegHash(pegHash: String) = db.run(assetTable.filter(_.pegHash === pegHash).delete)
 
-  private[models] class AssetTable(tag: Tag) extends Table[Asset](tag, "Asset") {
+  private[models] class AssetTable(tag: Tag) extends Table[Asset](tag, "Asset_BC") {
 
     def * = (pegHash, documentHash, assetType, assetQuantity, assetPrice, quantityUnit, ownerAddress, locked) <> (Asset.tupled, Asset.unapply)
 

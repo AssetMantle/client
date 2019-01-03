@@ -23,7 +23,7 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
 
   def deleteById(id: String) = db.run(organizationTable.filter(_.id === id).delete)
 
-  private[models] class OrganizationTable(tag: Tag) extends Table[Organization](tag, "Organization") {
+  private[models] class OrganizationTable(tag: Tag) extends Table[Organization](tag, "Organization_BC") {
 
     def * = (id, address) <> (Organization.tupled, Organization.unapply)
 
