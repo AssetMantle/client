@@ -30,7 +30,6 @@ class OrganizationKYCs @Inject()(protected val databaseConfigProvider: DatabaseC
 
     def ? = (id.?, documentType.?, status.?, fileName.?, file.?).shaped.<>({ r => import r._; _1.map(_ => OrganizationKYC.tupled((_1.get, _2.get, _3.get, _4.get, _5.get))) }, (_: Any) => throw new Exception("Inserting into ? projection not supported."))
 
-
     def id = column[String]("id", O.PrimaryKey)
 
     def documentType = column[String]("documentType")

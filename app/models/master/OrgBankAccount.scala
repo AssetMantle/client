@@ -29,7 +29,6 @@ class OrgBankAccounts @Inject()(protected val databaseConfigProvider: DatabaseCo
 
     def ? = (id.?, accountHolder.?, bankName.?, nickName.?, country.?, swift.?, address.?, zipcode.?, status.?).shaped.<>({ r => import r._; _1.map(_ => OrgBankAccount.tupled((_1.get, _2.get, _3.get, _4.get, _5.get, _6.get, _7.get, _8.get, _9.get))) }, (_: Any) => throw new Exception("Inserting into ? projection not supported."))
 
-
     def id = column[String]("id", O.PrimaryKey)
 
     def accountHolder = column[String]("accountHolder")

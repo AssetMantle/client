@@ -27,6 +27,8 @@ class ZoneKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
     def * = (id, documentType, status, fileName, file) <> (ZoneKYC.tupled, ZoneKYC.unapply)
 
+    def ? = (id.?, documentType.?, status.?, fileName.?, file.?).shaped.<>({ r => import r._; _1.map(_ => ZoneKYC.tupled((_1.get, _2.get, _3.get, _4.get, _5.get))) }, (_: Any) => throw new Exception("Inserting into ? projection not supported."))
+
     def id = column[String]("id", O.PrimaryKey)
 
     def documentType = column[String]("documentType", O.PrimaryKey)
@@ -36,8 +38,6 @@ class ZoneKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     def fileName = column[String]("fileName")
 
     def file = column[Array[Byte]]("file")
-
-    def ? = (id.?, documentType.?, status.?, fileName.?, file.?).shaped.<>({ r => import r._; _1.map(_ => ZoneKYC.tupled((_1.get, _2.get, _3.get, _4.get, _5.get))) }, (_: Any) => throw new Exception("Inserting into ? projection not supported."))
 
 
   }
