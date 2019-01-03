@@ -23,19 +23,17 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   def deleteById(id: String) = db.run(accountTable.filter(_.id === id).delete)
 
-  private[models] class AccountTable(tag: Tag) extends Table[Account](tag, Some("MASTER"),"Account") {
+  private[models] class AccountTable(tag: Tag) extends Table[Account](tag,"Account") {
 
     def * = (id, secretHash, accountAddress) <> (Account.tupled, Account.unapply)
 
     def ? = (id.?, secretHash.?, accountAddress.?).shaped.<>({ r => import r._; _1.map(_ => Account.tupled((_1.get, _2.get, _3.get))) }, (_: Any) => throw new Exception("Inserting into ? projection not supported."))
-
 
     def id = column[String]("id", O.PrimaryKey)
 
     def secretHash = column[String]("secretHash")
 
     def accountAddress = column[String]("accountAddress")
-
 
   }
 

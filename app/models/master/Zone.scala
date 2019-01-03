@@ -27,6 +27,8 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
     def * = (id, secretHash, name, currency) <> (Zone.tupled, Zone.unapply)
 
+    def ? = (id.?, secretHash.?, name.?, currency.?).shaped.<>({ r => import r._; _1.map(_ => Zone.tupled((_1.get, _2.get, _3.get, _4.get))) }, (_: Any) => throw new Exception("Inserting into ? projection not supported."))
+
     def id = column[String]("id", O.PrimaryKey)
 
     def secretHash = column[String]("secretHash")
@@ -34,8 +36,6 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
     def name = column[String]("name")
 
     def currency = column[String]("currency")
-
-    def ? = (id.?, secretHash.?, name.?, currency.?).shaped.<>({ r => import r._; _1.map(_ => Zone.tupled((_1.get, _2.get, _3.get, _4.get))) }, (_: Any) => throw new Exception("Inserting into ? projection not supported."))
 
 
   }

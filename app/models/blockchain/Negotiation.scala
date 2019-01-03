@@ -27,6 +27,8 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
 
     def * = (id, buyerAddress, sellerAddress, assetPegHash, bid, time, buyerSignature, sellerSignature) <> (Negotiation.tupled, Negotiation.unapply)
 
+    def ? = (id.?, buyerAddress.?, sellerAddress.?, assetPegHash.?, bid.?, time.?, buyerSignature.?, sellerSignature.?).shaped.<>({ r => import r._; _1.map(_ => Negotiation.tupled((_1.get, _2.get, _3.get, _4.get, _5.get, _6.get, _7.get, _8.get))) }, (_: Any) => throw new Exception("Inserting into ? projection not supported."))
+
     def id = column[String]("id", O.PrimaryKey)
 
     def buyerAddress = column[String]("buyerAddress")
@@ -42,8 +44,6 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
     def buyerSignature = column[String]("buyerSignature")
 
     def sellerSignature = column[String]("sellerSignature")
-
-    def ? = (id.?, buyerAddress.?, sellerAddress.?, assetPegHash.?, bid.?, time.?, buyerSignature.?, sellerSignature.?).shaped.<>({ r => import r._; _1.map(_ => Negotiation.tupled((_1.get, _2.get, _3.get, _4.get, _5.get, _6.get, _7.get, _8.get))) }, (_: Any) => throw new Exception("Inserting into ? projection not supported."))
 
 
   }

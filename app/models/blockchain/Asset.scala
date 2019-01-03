@@ -19,16 +19,15 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
 
   def add(asset: Asset): Future[String] = db.run(assetTable returning assetTable.map(_.pegHash) += asset)
 
-  def findBypegHash(pegHash: String): Future[Asset] = db.run(assetTable.filter(_.pegHash === pegHash).result.head)
+  def findByPegHash(pegHash: String): Future[Asset] = db.run(assetTable.filter(_.pegHash === pegHash).result.head)
 
-  def deleteBypegHash(pegHash: String) = db.run(assetTable.filter(_.pegHash === pegHash).delete)
+  def deleteByPegHash(pegHash: String) = db.run(assetTable.filter(_.pegHash === pegHash).delete)
 
   private[models] class AssetTable(tag: Tag) extends Table[Asset](tag, "Asset") {
 
     def * = (pegHash, documentHash, assetType, assetQuantity, assetPrice, quantityUnit, ownerAddress, locked) <> (Asset.tupled, Asset.unapply)
 
     def ? = (pegHash.?, documentHash.?, assetType.?, assetQuantity.?, assetPrice.?, quantityUnit.?, ownerAddress.?, locked.?).shaped.<>({ r => import r._; _1.map(_ => Asset.tupled((_1.get, _2.get, _3.get, _4.get, _5.get, _6.get, _7.get, _8.get))) }, (_: Any) => throw new Exception("Inserting into ? projection not supported."))
-
 
     def pegHash = column[String]("pegHash", O.PrimaryKey)
 

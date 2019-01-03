@@ -19,13 +19,15 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
   def add(fiat: Fiat): Future[String] = db.run(fiatTable returning fiatTable.map(_.pegHash) += fiat)
 
-  def findBypegHash(pegHash: String): Future[Fiat] = db.run(fiatTable.filter(_.pegHash === pegHash).result.head)
+  def findByPegHash(pegHash: String): Future[Fiat] = db.run(fiatTable.filter(_.pegHash === pegHash).result.head)
 
-  def deleteBypegHash(pegHash: String) = db.run(fiatTable.filter(_.pegHash === pegHash).delete)
+  def deleteByPegHash(pegHash: String) = db.run(fiatTable.filter(_.pegHash === pegHash).delete)
 
   private[models] class FiatTable(tag: Tag) extends Table[Fiat](tag, "Fiat") {
 
     def * = (pegHash, transactionID, transactionAmount, redeemedAmount) <> (Fiat.tupled, Fiat.unapply)
+
+    def ? = (pegHash.?, transactionID.?, transactionAmount.?, redeemedAmount.?).shaped.<>({ r => import r._; _1.map(_ => Fiat.tupled((_1.get, _2.get, _3.get, _4.get))) }, (_: Any) => throw new Exception("Inserting into ? projection not supported."))
 
     def pegHash = column[String]("pegHash", O.PrimaryKey)
 
@@ -34,8 +36,6 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
     def transactionAmount = column[Int]("transactionAmount")
 
     def redeemedAmount = column[Int]("redeemedAmount")
-
-    def ? = (pegHash.?, transactionID.?, transactionAmount.?, redeemedAmount.?).shaped.<>({ r => import r._; _1.map(_ => Fiat.tupled((_1.get, _2.get, _3.get, _4.get))) }, (_: Any) => throw new Exception("Inserting into ? projection not supported."))
   }
 
 }

@@ -27,6 +27,8 @@ class Orders @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
 
     def * = (id, fiatProofHash, awbProofHash, executed) <> (Order.tupled, Order.unapply)
 
+    def ? = (id.?, fiatProofHash.?, awbProofHash.?, executed.?).shaped.<>({ r => import r._; _1.map(_ => Order.tupled((_1.get, _2.get, _3.get, _4.get))) }, (_: Any) => throw new Exception("Inserting into ? projection not supported."))
+
     def id = column[String]("id", O.PrimaryKey)
 
     def fiatProofHash = column[String]("fiatProofHash")
@@ -34,8 +36,6 @@ class Orders @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
     def awbProofHash = column[String]("awbProofHash")
 
     def executed = column[Boolean]("executed")
-
-    def ? = (id.?, fiatProofHash.?, awbProofHash.?, executed.?).shaped.<>({ r => import r._; _1.map(_ => Order.tupled((_1.get, _2.get, _3.get, _4.get))) }, (_: Any) => throw new Exception("Inserting into ? projection not supported."))
 
 
   }
