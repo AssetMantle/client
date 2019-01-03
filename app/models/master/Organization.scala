@@ -29,7 +29,6 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
 
     def ? = (id.?, secretHash.?, name.?, address.?, phone.?, email.?).shaped.<>({ r => import r._; _1.map(_ => Organization.tupled((_1.get, _2.get, _3.get, _4.get, _5.get, _6.get))) }, (_: Any) => throw new Exception("Inserting into ? projection not supported."))
 
-
     def id = column[String]("id", O.PrimaryKey)
 
     def secretHash = column[String]("secretHash")

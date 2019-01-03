@@ -9,6 +9,7 @@ import play.api.mvc._
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future, Promise}
 
+
 /**
   * This controller creates an `Action` that demonstrates how to write
   * simple asynchronous code in a controller. It uses a timer to
@@ -25,7 +26,7 @@ import scala.concurrent.{ExecutionContext, Future, Promise}
   *                    a blocking API.
   */
 @Singleton
-class AsyncController @Inject()(cc: ControllerComponents, actorSystem: ActorSystem, accounts: Accounts, owners: Owners, fiats: Fiats)(implicit exec: ExecutionContext) extends AbstractController(cc) {
+class AsyncController @Inject()(cc: ControllerComponents, actorSystem: ActorSystem, accounts:Accounts ,owners: Owners, fiats: Fiats)(implicit exec: ExecutionContext) extends AbstractController(cc) {
 
   /**
     * Creates an Action that returns a plain text message after a delay
@@ -53,12 +54,13 @@ class AsyncController @Inject()(cc: ControllerComponents, actorSystem: ActorSyst
 
   def addOwner = Action.async {
 
-    owners.add(Owner("mm", "a", 123)).map(x => Ok(s"$x"))
+    owners.add(Owner("mm", "b", 123)).map(x => Ok(s"$x"))
   }
 
   def delOwner = Action.async {
 
-    owners.deleteBypegHashOwnerAddress("mm", "a").map(x => Ok("Deleted"))
+    owners.deleteByPegHashOwnerAddress("mm", "a").map(x => Ok("Deleted"))
+
   }
 
 
@@ -67,6 +69,9 @@ class AsyncController @Inject()(cc: ControllerComponents, actorSystem: ActorSyst
     fiats.add(Fiat("mm", "mck", 11, 11)).map(x => Ok(s"$x"))
   }
 
+ // def newMasterAccount = Action.async {
+  //  maccounts.add(master.Account("bb","qsa","ssf")).map(x => Ok(s"$x"))
+  //}
 
 
   private def getFutureMessage(delayTime: FiniteDuration): Future[String] = {

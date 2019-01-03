@@ -27,11 +27,11 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
 
     def * = (id, address) <> (Organization.tupled, Organization.unapply)
 
+    def ? = (id.?, address.?).shaped.<>({ r => import r._; _1.map(_ => Organization.tupled((_1.get, _2.get))) }, (_: Any) => throw new Exception("Inserting into ? projection not supported."))
+
     def id = column[String]("id", O.PrimaryKey)
 
     def address = column[String]("address")
-
-    def ? = (id.?, address.?).shaped.<>({ r => import r._; _1.map(_ => Organization.tupled((_1.get, _2.get))) }, (_: Any) => throw new Exception("Inserting into ? projection not supported."))
 
   }
 
