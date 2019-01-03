@@ -1,3 +1,13 @@
-GET         /             controllers.IndexController.index
+GET         /                controllers.IndexController.index
 
-POST        /login        controllers.LoginController.login
+POST        /login           controllers.LoginController.login
+
+GET         /find            controllers.AsyncController.find
+
+GET         /delete          controllers.AsyncController.delete
+
+GET         /addowner        controllers.AsyncController.addOwner
+
+GET         /addfiat         controllers.AsyncController.addFiat
+
+GET         /delowner        controllers.AsyncController.delOwner

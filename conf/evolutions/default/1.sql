@@ -97,7 +97,7 @@ ALTER TABLE BLOCKCHAIN."Order" ADD CONSTRAINT Order_Negotiation_id FOREIGN KEY (
 
 CREATE TABLE IF NOT EXISTS MASTER."Zone" (
   "id"          VARCHAR NOT NULL,
-  "secreteHash" VARCHAR NOT NULL,
+  "secretHash" VARCHAR NOT NULL,
   "name"        VARCHAR NOT NULL,
   "currency"    VARCHAR NOT NULL,
   PRIMARY KEY ("id")
@@ -106,7 +106,7 @@ ALTER TABLE MASTER."Zone" ADD CONSTRAINT Zone_BCZone_id FOREIGN KEY ("id") REFER
 
 CREATE TABLE IF NOT EXISTS MASTER."Organization" (
   "id"          VARCHAR NOT NULL,
-  "secreteHash" VARCHAR NOT NULL,
+  "secretHash" VARCHAR NOT NULL,
   "name"        VARCHAR NOT NULL,
   "address"     VARCHAR NOT NULL,
   "phone"       VARCHAR NOT NULL,
@@ -117,7 +117,7 @@ ALTER TABLE MASTER."Organization" ADD CONSTRAINT Organization_BCOrganization_id 
 
 CREATE TABLE IF NOT EXISTS MASTER."Account" (
   "id"             VARCHAR NOT NULL,
-  "secreteHash"    VARCHAR NOT NULL,
+  "secretHash"    VARCHAR NOT NULL,
   "accountAddress" VARCHAR NOT NULL,
   PRIMARY KEY ("id")
 );
@@ -125,31 +125,31 @@ ALTER TABLE MASTER."Account" ADD CONSTRAINT Account_BCAccount_address FOREIGN KE
 
 CREATE TABLE IF NOT EXISTS MASTER."ZoneKYC" (
   "id"       VARCHAR NOT NULL,
-  "type"     VARCHAR NOT NULL,
+  "documentType"  VARCHAR NOT NULL,
   "status"   BOOLEAN NOT NULL,
   "fileName" VARCHAR NOT NULL,
   "file"     BYTEA   NOT NULL,
-  PRIMARY KEY ("id", "type")
+  PRIMARY KEY ("id", "documentType")
 );
 ALTER TABLE MASTER."ZoneKYC" ADD CONSTRAINT ZoneKYC_Zone_id FOREIGN KEY ("id") REFERENCES MASTER."Zone"("id");
 
 CREATE TABLE IF NOT EXISTS MASTER."OrganizationKYC" (
   "id"       VARCHAR NOT NULL,
-  "type"     VARCHAR NOT NULL,
+  "documentType"     VARCHAR NOT NULL,
   "status"   BOOLEAN NOT NULL,
   "fileName" VARCHAR NOT NULL,
   "file"     BYTEA   NOT NULL,
-  PRIMARY KEY ("id", "type")
+  PRIMARY KEY ("id", "documentType")
 );
 ALTER TABLE MASTER."OrganizationKYC" ADD CONSTRAINT OrganizationKYC_Organization_id FOREIGN KEY ("id") REFERENCES MASTER."Organization" ("id");
 
 CREATE TABLE IF NOT EXISTS MASTER."AccountKYC" (
   "id"       VARCHAR NOT NULL,
-  "type"     VARCHAR NOT NULL,
+  "documentType"     VARCHAR NOT NULL,
   "status"   BOOLEAN NOT NULL,
   "fileName" VARCHAR NOT NULL,
   "file"     BYTEA   NOT NULL,
-  PRIMARY KEY ("id", "type")
+  PRIMARY KEY ("id", "documentType")
 );
 ALTER TABLE MASTER."AccountKYC" ADD CONSTRAINT AccountKYC_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account"("id");
 
@@ -177,6 +177,7 @@ DROP TABLE IF EXISTS BLOCKCHAIN."Owner" CASCADE;
 DROP TABLE IF EXISTS BLOCKCHAIN."Asset" CASCADE;
 DROP TABLE IF EXISTS BLOCKCHAIN."Negotiation" CASCADE;
 DROP TABLE IF EXISTS BLOCKCHAIN."Order" CASCADE;
+DROP TABLE IF EXISTS BLOCKCHAIN."Account" CASCADE;
 
 DROP TABLE IF EXISTS MASTER."Zone" CASCADE;
 DROP TABLE IF EXISTS MASTER."Organization" CASCADE;
