@@ -1,24 +1,13 @@
+GET         /                controllers.IndexController.index
 
-# Routes
-# This file defines all application routes (Higher priority routes first)
-# ~~~~
+POST        /login           controllers.LoginController.login
 
-# An example controller showing a sample home page
-GET        /                    controllers.HomeController.index
-# An example controller showing how to use dependency injection
-GET        /count               controllers.CountController.count
-# An example controller showing how to write asynchronous code
-GET        /message             controllers.AsyncController.message
+GET         /find            controllers.AsyncController.find
 
-# Map static resources from the /public folder to the /assets URL path
-GET        /assets/*file        controllers.Assets.versioned(path="/public", file: Asset)
+GET         /delete          controllers.AsyncController.delete
 
-GET        /find                controllers.AsyncController.find
+GET         /addowner        controllers.AsyncController.addOwner
 
-GET        /delete              controllers.AsyncController.delete
+GET         /addfiat         controllers.AsyncController.addFiat
 
-GET        /addowner            controllers.AsyncController.addOwner
-
-GET        /addfiat             controllers.AsyncController.addFiat
-
-GET        /delowner            controllers.AsyncController.delOwner
+GET         /delowner        controllers.AsyncController.delOwner
