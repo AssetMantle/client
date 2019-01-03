@@ -23,7 +23,7 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
   def deleteBypegHash(pegHash: String) = db.run(fiatTable.filter(_.pegHash === pegHash).delete)
 
-  private[models] class FiatTable(tag: Tag) extends Table[Fiat](tag, "Fiat") {
+  private[models] class FiatTable(tag: Tag) extends Table[Fiat](tag, "Fiat_BC") {
 
     def * = (pegHash, transactionID, transactionAmount, redeemedAmount) <> (Fiat.tupled, Fiat.unapply)
 

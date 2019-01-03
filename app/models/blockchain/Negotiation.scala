@@ -23,7 +23,7 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
 
   def deleteById(id: String) = db.run(negotiationTable.filter(_.id === id).delete)
 
-  private[models] class NegotiationTable(tag: Tag) extends Table[Negotiation](tag, "Negotiation") {
+  private[models] class NegotiationTable(tag: Tag) extends Table[Negotiation](tag, "Negotiation_BC") {
 
     def * = (id, buyerAddress, sellerAddress, assetPegHash, bid, time, buyerSignature, sellerSignature) <> (Negotiation.tupled, Negotiation.unapply)
 

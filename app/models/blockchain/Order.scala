@@ -23,7 +23,7 @@ class Orders @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
 
   def deleteById(id: String) = db.run(orderTable.filter(_.id === id).delete)
 
-  private[models] class OrderTable(tag: Tag) extends Table[Order](tag, "Order") {
+  private[models] class OrderTable(tag: Tag) extends Table[Order](tag, "Order_BC") {
 
     def * = (id, fiatProofHash, awbProofHash, executed) <> (Order.tupled, Order.unapply)
 
