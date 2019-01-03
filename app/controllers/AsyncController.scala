@@ -1,7 +1,7 @@
 package controllers
 
-import javax.inject._
 import akka.actor.ActorSystem
+import javax.inject._
 import models.{Account, Accounts}
 import play.api.mvc._
 
@@ -24,7 +24,7 @@ import scala.concurrent.{ExecutionContext, Future, Promise}
  * a blocking API.
  */
 @Singleton
-class AsyncController @Inject()(cc: ControllerComponents, actorSystem: ActorSystem,accounts:Accounts)(implicit exec: ExecutionContext) extends AbstractController(cc) {
+class AsyncController @Inject()(cc: ControllerComponents, actorSystem: ActorSystem, accounts:Accounts)(implicit exec: ExecutionContext) extends AbstractController(cc) {
 
   /**
    * Creates an Action that returns a plain text message after a delay
