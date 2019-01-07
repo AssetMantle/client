@@ -1,11 +1,11 @@
 @import helper._
 @import views.forms.Login
-@(loginForm: Form[Login.Data])(implicit messagesRequestHeader: MessagesRequestHeader)
 
+@(loginForm: Form[Login.Data])(implicit messagesRequestHeader: MessagesRequestHeader)
 @form(action = routes.LoginController.login){
     @CSRF.formField
-    @inputText(loginForm("Username"))
-    @inputText(loginForm("Password"))
+    @inputText(loginForm(Messages("Username")))
+    @inputText(loginForm(Messages("Password")))
 
     @if(loginForm.hasGlobalErrors){
         <ul>
@@ -14,5 +14,5 @@
             }
         </ul>
     }
-    <button type="submit">Login</button>>
+    <button type="submit">@Messages("Login")</button>
 }
