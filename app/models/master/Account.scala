@@ -28,18 +28,24 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
     def * = (id, secretHash, accountAddress) <> (Account.tupled, Account.unapply)
 
+    def ? = (id.?, secretHash.?, accountAddress.?).shaped.<>({ r => import r._; _1.map(_ => Account.tupled((_1.get, _2.get, _3.get))) }, (_: Any) => throw new Exception("Inserting into ? projection not supported."))
+
     def id = column[String]("id", O.PrimaryKey)
 
     def secretHash = column[String]("secretHash")
 
     def accountAddress = column[String]("accountAddress")
 
-    def ? = (id.?, secretHash.?, accountAddress.?).shaped.<>({ r => import r._; _1.map(_ => Account.tupled((_1.get, _2.get, _3.get))) }, (_: Any) => throw new Exception("Inserting into ? projection not supported."))
-
   }
 
   object Service {
-    def validateLogin(username: String, password: String)(implicit ExecutionContext: ExecutionContext): Boolean = Await.result(findById(username), 1.seconds).secretHash == util.hashing.MurmurHash3.stringHash(password)
+
+    def validateLogin(username: String, password: String)(implicit ExecutionContext: ExecutionContext): Boolean = Await.result(findById(username), 1.seconds).secretHash == util.hashing.MurmurHash3.stringHash(password).toString
+
+    def addLogin(username: String, password: String, accountAddress: String): String = {
+      Await.result(add(new Account(username, util.hashing.MurmurHash3.stringHash(password).toString, accountAddress)), 1.seconds)
+      return accountAddress
+    }
 
   }
 

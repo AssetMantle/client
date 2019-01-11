@@ -2,17 +2,16 @@
 @import views.forms.SignUp
 
 @(signUpForm: Form[SignUp.Data])(implicit messagesRequestHeader: MessagesRequestHeader)
-
-@form(action = routes.LoginController.login){
+@form(action = routes.SignUpController.signUp) {
     @CSRF.formField
     @inputText(signUpForm(Messages("Username")))
-    @inputText(signUpForm(Messages("Password")))
+    @inputPassword(signUpForm(Messages("Password")))
 
-    @if(signUpForm.hasGlobalErrors){
+    @if(signUpForm.hasGlobalErrors) {
         <ul>
-        @for(error <- signUpForm.globalErrors){
-            <li>@error.format</li>
-        }
+            @for(error <- signUpForm.globalErrors) {
+                <li>@error.format</li>
+            }
         </ul>
     }
     <button type="submit">@Messages("SignUp")</button>

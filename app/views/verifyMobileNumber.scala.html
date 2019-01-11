@@ -1,0 +1,19 @@
+@import helper._
+@import views.forms.VerifyMobileNumber
+
+@(verifyMobileNumberForm: Form[VerifyMobileNumber.Data])(implicit messagesRequestHeader: MessagesRequestHeader)
+@form(action = routes.UpdateContactController.updateContact) {
+    @CSRF.formField
+    @inputText(verifyMobileNumberForm(Messages("Username")))
+    @inputText(verifyMobileNumberForm(Messages("MobileNumber")))
+    @inputText(verifyMobileNumberForm(Messages("EmailAddress")))
+
+    @if(verifyMobileNumberForm.hasGlobalErrors) {
+        <ul>
+        @for(error <- verifyMobileNumberForm.globalErrors) {
+            <li>@error.format</li>
+        }
+        </ul>
+    }
+    <button type="submit">@Messages("UpdateContact")</button>
+}

@@ -1,0 +1,19 @@
+@import helper._
+@import views.forms.VerifyEmailAddress
+
+@(verifyEmailAddressForm: Form[VerifyEmailAddress.Data])(implicit messagesRequestHeader: MessagesRequestHeader)
+@form(action = routes.UpdateContactController.updateContact) {
+    @CSRF.formField
+    @inputText(verifyEmailAddressForm(Messages("Username")))
+    @inputText(verifyEmailAddressForm(Messages("MobileNumber")))
+    @inputText(verifyEmailAddressForm(Messages("EmailAddress")))
+
+    @if(verifyEmailAddressForm.hasGlobalErrors) {
+        <ul>
+        @for(error <- verifyEmailAddressForm.globalErrors) {
+            <li>@error.format</li>
+        }
+        </ul>
+    }
+    <button type="submit">@Messages("UpdateContact")</button>
+}

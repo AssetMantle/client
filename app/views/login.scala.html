@@ -5,7 +5,7 @@
 @form(action = routes.LoginController.login){
     @CSRF.formField
     @inputText(loginForm(Messages("Username")))
-    @inputText(loginForm(Messages("Password")))
+    @inputPassword(loginForm(Messages("Password")))
 
     @if(loginForm.hasGlobalErrors){
         <ul>

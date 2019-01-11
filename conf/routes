@@ -1,16 +1,26 @@
-GET         /                controllers.IndexController.index
+GET         /                          controllers.IndexController.index
 
-POST        /login           controllers.LoginController.login
+POST        /login                     controllers.LoginController.login
 
-GET         /message         controllers.AsyncController.message
+POST        /signUp                    controllers.SignUpController.signUp
 
-GET         /find            controllers.AsyncController.find
+POST        /updateContact             controllers.UpdateContactController.updateContact
 
-GET         /delete          controllers.AsyncController.delete
+POST        /verifyMobileNumber        controllers.VerifyMobileNumberController.verifyMobileNumber
 
-GET         /addowner        controllers.AsyncController.addOwner
+POST        /verifyEmailAddress        controllers.VerifyEmailAddressController.verifyEmailAddress
 
-GET         /addfiat         controllers.AsyncController.addFiat
+GET         /assets/*file              controllers.Assets.versioned(path="/public", file: Asset)
 
-GET         /delowner        controllers.AsyncController.delOwner
+GET         /message                   controllers.AsyncController.message
+
+GET         /find                      controllers.AsyncController.find
+
+GET         /delete                    controllers.AsyncController.delete
+
+GET         /addowner                  controllers.AsyncController.addOwner
+
+GET         /addfiat                   controllers.AsyncController.addFiat
+
+GET         /delowner                  controllers.AsyncController.delOwner
 

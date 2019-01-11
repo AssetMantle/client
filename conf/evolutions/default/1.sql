@@ -117,11 +117,21 @@ ALTER TABLE MASTER."Organization" ADD CONSTRAINT Organization_BCOrganization_id 
 
 CREATE TABLE IF NOT EXISTS MASTER."Account" (
   "id"             VARCHAR NOT NULL,
-  "secretHash"    VARCHAR NOT NULL,
+  "secretHash"     VARCHAR NOT NULL,
   "accountAddress" VARCHAR NOT NULL,
   PRIMARY KEY ("id")
 );
 ALTER TABLE MASTER."Account" ADD CONSTRAINT Account_BCAccount_address FOREIGN KEY ("accountAddress") REFERENCES BLOCKCHAIN."Account_BC" ("address");
+
+CREATE TABLE IF NOT EXISTS MASTER."Contact" (
+  "id"                    VARCHAR NOT NULL,
+  "mobileNumber"          VARCHAR NOT NULL,
+  "mobileNumberVerified"  BOOLEAN NOT NULL,
+  "emailAddress"          VARCHAR NOT NULL,
+  "emailAddressVerified"  BOOLEAN NOT NULL,
+  PRIMARY KEY ("id")
+);
+ALTER TABLE MASTER."Contact" ADD CONSTRAINT Contact_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
 
 CREATE TABLE IF NOT EXISTS MASTER."ZoneKYC" (
   "id"       VARCHAR NOT NULL,
@@ -144,11 +154,11 @@ CREATE TABLE IF NOT EXISTS MASTER."OrganizationKYC" (
 ALTER TABLE MASTER."OrganizationKYC" ADD CONSTRAINT OrganizationKYC_Organization_id FOREIGN KEY ("id") REFERENCES MASTER."Organization" ("id");
 
 CREATE TABLE IF NOT EXISTS MASTER."AccountKYC" (
-  "id"       VARCHAR NOT NULL,
-  "documentType"     VARCHAR NOT NULL,
-  "status"   BOOLEAN NOT NULL,
-  "fileName" VARCHAR NOT NULL,
-  "file"     BYTEA   NOT NULL,
+  "id"            VARCHAR NOT NULL,
+  "documentType"  VARCHAR NOT NULL,
+  "status"        BOOLEAN NOT NULL,
+  "fileName"      VARCHAR NOT NULL,
+  "file"          BYTEA   NOT NULL,
   PRIMARY KEY ("id", "documentType")
 );
 ALTER TABLE MASTER."AccountKYC" ADD CONSTRAINT AccountKYC_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account"("id");
@@ -167,6 +177,20 @@ CREATE TABLE IF NOT EXISTS MASTER."OrgBankAccount" (
 );
 ALTER TABLE MASTER."OrgBankAccount" ADD CONSTRAINT OrgBankAccount_Organization_id FOREIGN KEY ("id") REFERENCES MASTER."Organization" ("id");
 
+CREATE TABLE IF NOT EXISTS BUSINESSTXN."SMSOTP" {
+  "id"          VARCHAR NOT NULL,
+  "secretHash"  VARCHAR NOT NULL,
+  PRIMARY KEY ("id")
+}
+ALTER TABLE BUSINESSTXN."SMSOTP" ADD CONSTRAINT SMSOTP_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account"("id");
+
+CREATE TABLE IF NOT EXISTS BUSINESSTXN."EmailOTP" {
+  "id"          VARCHAR NOT NULL,
+  "secretHash"  VARCHAR NOT NULL,
+  PRIMARY KEY ("id")
+}
+ALTER TABLE BUSINESSTXN."EmailOTP" ADD CONSTRAINT EmailOTP_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account"("id");
+
 # --- !Downs
 
 DROP TABLE IF EXISTS BLOCKCHAIN."Zone_BC" CASCADE;
@@ -182,6 +206,7 @@ DROP TABLE IF EXISTS BLOCKCHAIN."Account_BC" CASCADE;
 DROP TABLE IF EXISTS MASTER."Zone" CASCADE;
 DROP TABLE IF EXISTS MASTER."Organization" CASCADE;
 DROP TABLE IF EXISTS MASTER."Account" CASCADE;
+DROP TABLE IF EXISTS MASTER."Contact" CASCADE;
 DROP TABLE IF EXISTS MASTER."ZoneKYC" CASCADE;
 DROP TABLE IF EXISTS MASTER."OrganizationKYC" CASCADE;
 DROP TABLE IF EXISTS MASTER."AccountKYC" CASCADE;
