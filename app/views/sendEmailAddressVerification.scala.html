@@ -1,0 +1,17 @@
+@import helper._
+@import views.forms.SendEmailAddressVerification
+
+@(sendEmailAddressVerificationForm: Form[SendEmailAddressVerification.Data])(implicit messagesRequestHeader: MessagesRequestHeader)
+@form(action = routes.VerifyEmailAddressController.sendEmailAddressVerification) {
+    @CSRF.formField
+    @inputText(sendEmailAddressVerificationForm(Messages("Username")))
+
+    @if(sendEmailAddressVerificationForm.hasGlobalErrors) {
+        <ul>
+        @for(error <- sendEmailAddressVerificationForm.globalErrors) {
+            <li>@error.format</li>
+        }
+        </ul>
+    }
+    <button type="submit">@Messages("VerifyEmailAddress")</button>
+}

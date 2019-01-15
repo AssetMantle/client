@@ -3,8 +3,10 @@
 @import views.forms.UpdateContact
 @import views.forms.VerifyEmailAddress
 @import views.forms.VerifyMobileNumber
+@import views.forms.SendEmailAddressVerification
+@import views.forms.SendMobileNumberVerification
 
-@(signUpForm: Form[SignUp.Data], loginForm: Form[Login.Data], updateContactForm: Form[UpdateContact.Data], verifyEmailAddressForm: Form[VerifyEmailAddress.Data], verifyMobileNumberForm: Form[VerifyMobileNumber.Data])(implicit messagesRequestHeader: MessagesRequestHeader)
+@(signUpForm: Form[SignUp.Data], loginForm: Form[Login.Data], updateContactForm: Form[UpdateContact.Data], verifyEmailAddressForm: Form[VerifyEmailAddress.Data], verifyMobileNumberForm: Form[VerifyMobileNumber.Data], sendEmailAddressVerificationForm: Form[SendEmailAddressVerification.Data], sendMobileNumberVerificationForm: Form[SendMobileNumberVerification.Data])(implicit messagesRequestHeader: MessagesRequestHeader)
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -19,5 +21,7 @@
         @login(loginForm)
         @updateContact(updateContactForm)
         @verifyEmailAddress(verifyEmailAddressForm)
+        @sendEmailAddressVerification(sendEmailAddressVerificationForm)
+        @sendMobileNumberVerification(sendMobileNumberVerificationForm)
     </body>
 </html>

@@ -8,11 +8,10 @@ object VerifyEmailAddress {
   val form = Form(
     mapping(
       "Username" -> nonEmptyText(minLength = 4, maxLength = 20),
-      "EmailAddress" -> email,
-      "MobileNumber" -> nonEmptyText(minLength = 10, maxLength = 10)
+      "OTP" -> nonEmptyText(minLength = 6, maxLength = 6),
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(username: String, emailAddress: String, mobileNumber: String)
+  case class Data(username: String, otp: String)
 
 }

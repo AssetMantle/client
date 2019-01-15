@@ -13,7 +13,7 @@ class SignUpController @Inject()(messagesControllerComponents: MessagesControlle
   def signUp = Action { implicit request =>
     SignUp.form.bindFromRequest().fold(
       formWithErrors => {
-        BadRequest(views.html.index(formWithErrors, Login.form, UpdateContact.form, VerifyEmailAddress.form, VerifyMobileNumber.form))
+        BadRequest(views.html.index(formWithErrors, Login.form, UpdateContact.form, VerifyEmailAddress.form, VerifyMobileNumber.form, SendEmailAddressVerification.form, SendMobileNumberVerification.form))
       },
       signUpData => {
         val x = accounts.Service.addLogin(signUpData.username, signUpData.password, accounts_bc.Service.addAccount())

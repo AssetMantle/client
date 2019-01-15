@@ -8,6 +8,6 @@ import views.forms._
 class IndexController @Inject()(messagesControllerComponents: MessagesControllerComponents) extends MessagesAbstractController(messagesControllerComponents) with I18nSupport {
 
   def index = Action { implicit request =>
-    Ok(views.html.index(SignUp.form, Login.form, UpdateContact.form, VerifyEmailAddress.form, VerifyMobileNumber.form))
+    Ok(views.html.index(SignUp.form, Login.form, UpdateContact.form, VerifyEmailAddress.form, VerifyMobileNumber.form, SendEmailAddressVerification.form, SendMobileNumberVerification.form))
   }
 }

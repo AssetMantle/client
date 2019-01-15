@@ -2,11 +2,10 @@
 @import views.forms.VerifyEmailAddress
 
 @(verifyEmailAddressForm: Form[VerifyEmailAddress.Data])(implicit messagesRequestHeader: MessagesRequestHeader)
-@form(action = routes.UpdateContactController.updateContact) {
+@form(action = routes.VerifyEmailAddressController.verifyEmailAddress) {
     @CSRF.formField
     @inputText(verifyEmailAddressForm(Messages("Username")))
-    @inputText(verifyEmailAddressForm(Messages("MobileNumber")))
-    @inputText(verifyEmailAddressForm(Messages("EmailAddress")))
+    @inputText(verifyEmailAddressForm(Messages("OTP")))
 
     @if(verifyEmailAddressForm.hasGlobalErrors) {
         <ul>
@@ -15,5 +14,5 @@
         }
         </ul>
     }
-    <button type="submit">@Messages("UpdateContact")</button>
+    <button type="submit">@Messages("VerifyEmailAddress")</button>
 }

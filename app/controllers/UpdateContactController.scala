@@ -13,7 +13,7 @@ class UpdateContactController @Inject()(messagesControllerComponents: MessagesCo
   def updateContact = Action { implicit request =>
     UpdateContact.form.bindFromRequest().fold(
       formWithErrors => {
-        BadRequest(views.html.index(SignUp.form, Login.form, formWithErrors, VerifyEmailAddress.form, VerifyMobileNumber.form))
+        BadRequest(views.html.index(SignUp.form, Login.form, formWithErrors, VerifyEmailAddress.form, VerifyMobileNumber.form, SendEmailAddressVerification.form, SendMobileNumberVerification.form))
       },
       signUpData => {
         if (contacts.Service.updateEmailAndMobile(signUpData.username, signUpData.mobileNumber, signUpData.emailAddress)) Ok("Updated") else Ok("Problem")

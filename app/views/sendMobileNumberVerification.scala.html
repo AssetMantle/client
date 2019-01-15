@@ -1,0 +1,17 @@
+@import helper._
+@import views.forms.SendMobileNumberVerification
+
+@(sendMobileNumberVerificationForm: Form[SendMobileNumberVerification.Data])(implicit messagesRequestHeader: MessagesRequestHeader)
+@form(action = routes.VerifyMobileNumberController.sendMobileNumberVerification) {
+    @CSRF.formField
+    @inputText(sendMobileNumberVerificationForm(Messages("Username")))
+
+    @if(sendMobileNumberVerificationForm.hasGlobalErrors) {
+        <ul>
+        @for(error <- sendMobileNumberVerificationForm.globalErrors) {
+            <li>@error.format</li>
+        }
+        </ul>
+    }
+    <button type="submit">@Messages("VerifyMobileNumber")</button>
+}

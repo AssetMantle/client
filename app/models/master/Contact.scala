@@ -27,11 +27,13 @@ class Contacts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   private def update(contact: Contact): Future[Int] = db.run(contactTable.insertOrUpdate(contact))
 
+  private def verifyMobileNumberOnId(id: String): Future[Int] = db.run(contactTable.filter(_.id === id).map(_.mobileNumberVerified).update(true))
+
+  private def verifyEmailAddressOnId(id: String): Future[Int] = db.run(contactTable.filter(_.id === id).map(_.emailAddressVerified).update(true))
+
   private[models] class ContactTable(tag: Tag) extends Table[Contact](tag, "Contact") {
 
     def * = (id, mobileNumber, mobileNumberVerified, emailAddress, emailAddressVerified) <> (Contact.tupled, Contact.unapply)
-
-    def ? = (id.?, mobileNumber.?, mobileNumberVerified.?, emailAddress.?, emailAddressVerified.?).shaped.<>({ r => import r._; _1.map(_ => Contact.tupled((_1.get, _2.get, _3.get, _4.get, _5.get))) }, (_: Any) => throw new Exception("Inserting into ? projection not supported."))
 
     def id = column[String]("id", O.PrimaryKey)
 
@@ -43,11 +45,17 @@ class Contacts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
     def emailAddressVerified = column[Boolean]("emailAddressVerified")
 
+    def ? = (id.?, mobileNumber.?, mobileNumberVerified.?, emailAddress.?, emailAddressVerified.?).shaped.<>({ r => import r._; _1.map(_ => Contact.tupled((_1.get, _2.get, _3.get, _4.get, _5.get))) }, (_: Any) => throw new Exception("Inserting into ? projection not supported."))
+
   }
 
   object Service {
 
     def updateEmailAndMobile(id: String, mobileNumber: String, emailAddress: String): Boolean = if (0 < Await.result(update(new Contact(id, mobileNumber, false, emailAddress, false)), 1.seconds)) true else false
+
+    def verifyMobileNumber(id: String): Int = Await.result(verifyMobileNumberOnId(id), 1.seconds)
+
+    def verifyEmailAddress(id: String): Int = Await.result(verifyEmailAddressOnId(id), 1.seconds)
   }
 
 }

@@ -13,7 +13,7 @@ class LoginController @Inject()(messagesControllerComponents: MessagesController
   def login = Action { implicit request =>
     Login.form.bindFromRequest().fold(
       formWithErrors => {
-        BadRequest(views.html.index(SignUp.form, formWithErrors, UpdateContact.form, VerifyEmailAddress.form, VerifyMobileNumber.form))
+        BadRequest(views.html.index(SignUp.form, formWithErrors, UpdateContact.form, VerifyEmailAddress.form, VerifyMobileNumber.form, SendEmailAddressVerification.form, SendMobileNumberVerification.form))
       },
       loginData => {
         if (accounts.Service.validateLogin(loginData.username, loginData.password)) Ok("Login") else Ok("Incorrect  Password")

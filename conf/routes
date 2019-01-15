@@ -1,26 +1,30 @@
-GET         /                          controllers.IndexController.index
+GET         /                                    controllers.IndexController.index
 
-POST        /login                     controllers.LoginController.login
+POST        /login                               controllers.LoginController.login
 
-POST        /signUp                    controllers.SignUpController.signUp
+POST        /signUp                              controllers.SignUpController.signUp
 
-POST        /updateContact             controllers.UpdateContactController.updateContact
+POST        /updateContact                       controllers.UpdateContactController.updateContact
 
-POST        /verifyMobileNumber        controllers.VerifyMobileNumberController.verifyMobileNumber
+POST        /verifyMobileNumber                  controllers.VerifyMobileNumberController.verifyMobileNumber
 
-POST        /verifyEmailAddress        controllers.VerifyEmailAddressController.verifyEmailAddress
+POST        /verifyEmailAddress                  controllers.VerifyEmailAddressController.verifyEmailAddress
 
-GET         /assets/*file              controllers.Assets.versioned(path="/public", file: Asset)
+POST        /sendMobileNumberVerification        controllers.VerifyMobileNumberController.sendMobileNumberVerification
 
-GET         /message                   controllers.AsyncController.message
+POST        /sendEmailAddressVerification        controllers.VerifyEmailAddressController.sendEmailAddressVerification
 
-GET         /find                      controllers.AsyncController.find
+GET         /assets/*file                        controllers.Assets.versioned(path="/public", file: Asset)
 
-GET         /delete                    controllers.AsyncController.delete
+GET         /message                             controllers.AsyncController.message
 
-GET         /addowner                  controllers.AsyncController.addOwner
+GET         /find                                controllers.AsyncController.find
 
-GET         /addfiat                   controllers.AsyncController.addFiat
+GET         /delete                              controllers.AsyncController.delete
 
-GET         /delowner                  controllers.AsyncController.delOwner
+GET         /addowner                            controllers.AsyncController.addOwner
+
+GET         /addfiat                             controllers.AsyncController.addFiat
+
+GET         /delowner                            controllers.AsyncController.delOwner
 
