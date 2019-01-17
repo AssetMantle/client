@@ -21,10 +21,10 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Organization_BC" (
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Account_BC"(
   "address"       VARCHAR NOT NULL,
-  "coins"         VARCHAR NOT NULL,
+  "coins"         INT     NOT NULL,
   "publicKey"     VARCHAR NOT NULL,
-  "accountNumber" VARCHAR NOT NULL,
-  "sequence"      VARCHAR NOT NULL,
+  "accountNumber" INT     NOT NULL,
+  "sequence"      INT     NOT NULL,
   PRIMARY KEY ("address" )
 );
 

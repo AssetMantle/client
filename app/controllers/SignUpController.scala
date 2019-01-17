@@ -16,7 +16,7 @@ class SignUpController @Inject()(messagesControllerComponents: MessagesControlle
         BadRequest(views.html.index(formWithErrors, Login.form, UpdateContact.form, VerifyEmailAddress.form, VerifyMobileNumber.form, SendEmailAddressVerification.form, SendMobileNumberVerification.form))
       },
       signUpData => {
-        val x = accounts.Service.addLogin(signUpData.username, signUpData.password, accounts_bc.Service.addAccount())
+        val x = accounts.Service.addLogin(signUpData.username, signUpData.password, accounts_bc.Service.addAccount(signUpData.username, signUpData.password))
         Ok(s"Sign up $x")
       })
   }

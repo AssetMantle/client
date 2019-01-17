@@ -2,10 +2,9 @@ package controllers
 
 import akka.actor.ActorSystem
 import javax.inject._
-import models.blockchain.{Account,Accounts}
-import models.blockchain.{Owner,Owners}
-import models.blockchain.{Fiat,Fiats}
+import models.blockchain._
 import play.api.mvc._
+
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future, Promise}
 
@@ -26,7 +25,7 @@ import scala.concurrent.{ExecutionContext, Future, Promise}
   *                    a blocking API.
   */
 @Singleton
-class AsyncController @Inject()(cc: ControllerComponents, actorSystem: ActorSystem, accounts:Accounts ,owners: Owners, fiats: Fiats)(implicit exec: ExecutionContext) extends AbstractController(cc) {
+class AsyncController @Inject()(cc: ControllerComponents, actorSystem: ActorSystem, accounts: Accounts, owners: Owners, fiats: Fiats)(implicit exec: ExecutionContext) extends AbstractController(cc) {
 
   /**
     * Creates an Action that returns a plain text message after a delay
@@ -37,7 +36,7 @@ class AsyncController @Inject()(cc: ControllerComponents, actorSystem: ActorSyst
     * a path of `/message`.
     */
   def message = Action.async {
-    accounts.add(Account("bb", 12, "z3", "y3", "x3")).map(x => Ok(s"$x"))
+    accounts.add(Account("bb", 12, "z3", 1, 1)).map(x => Ok(s"$x"))
     //getFutureMessage(1.second).map { msg => Ok(msg) }
   }
 
@@ -69,7 +68,7 @@ class AsyncController @Inject()(cc: ControllerComponents, actorSystem: ActorSyst
     fiats.add(Fiat("mm", "mck", 11, 11)).map(x => Ok(s"$x"))
   }
 
- // def newMasterAccount = Action.async {
+  // def newMasterAccount = Action.async {
   //  maccounts.add(master.Account("bb","qsa","ssf")).map(x => Ok(s"$x"))
   //}
 
