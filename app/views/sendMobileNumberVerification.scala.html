@@ -1,7 +1,7 @@
 @import helper._
 @import views.forms.SendMobileNumberVerification
 
-@(sendMobileNumberVerificationForm: Form[SendMobileNumberVerification.Data])(implicit messagesRequestHeader: MessagesRequestHeader)
+@(sendMobileNumberVerificationForm: Form[SendMobileNumberVerification.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 @form(action = routes.VerifyMobileNumberController.sendMobileNumberVerification) {
     @CSRF.formField
     @inputText(sendMobileNumberVerificationForm(Messages("Username")))

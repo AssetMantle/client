@@ -6,8 +6,9 @@ import slick.jdbc.JdbcProfile
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.util.Random
 
-case class Account(id: String, secretHash: String, accountAddress: String)
+case class Account(id: String, secretHash: String, accountAddress: String, tokenHash: Option[String])
 
 class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider) {
 
@@ -24,17 +25,19 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   private def deleteById(id: String) = db.run(accountTable.filter(_.id === id).delete)
 
+  private def refreshTokenOnId(id: String, tokenHash: Option[String]) = db.run(accountTable.filter(_.id === id).map(_.tokenHash.?).update(tokenHash))
+
   private[models] class AccountTable(tag: Tag) extends Table[Account](tag, "Account") {
 
-    def * = (id, secretHash, accountAddress) <> (Account.tupled, Account.unapply)
-
-    def ? = (id.?, secretHash.?, accountAddress.?).shaped.<>({ r => import r._; _1.map(_ => Account.tupled((_1.get, _2.get, _3.get))) }, (_: Any) => throw new Exception("Inserting into ? projection not supported."))
+    def * = (id, secretHash, accountAddress, tokenHash.?) <> (Account.tupled, Account.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
     def secretHash = column[String]("secretHash")
 
     def accountAddress = column[String]("accountAddress")
+
+    def tokenHash = column[String]("tokenHash")
 
   }
 
@@ -43,10 +46,19 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     def validateLogin(username: String, password: String)(implicit ExecutionContext: ExecutionContext): Boolean = Await.result(findById(username), 1.seconds).secretHash == util.hashing.MurmurHash3.stringHash(password).toString
 
     def addLogin(username: String, password: String, accountAddress: String): String = {
-      Await.result(add(new Account(username, util.hashing.MurmurHash3.stringHash(password).toString, accountAddress)), 1.seconds)
-      return accountAddress
+      Await.result(add(Account(username, util.hashing.MurmurHash3.stringHash(password).toString, accountAddress, null)), 5.seconds)
+      accountAddress
     }
 
+    def refreshToken(username: String): String = {
+      val token: String = (Random.nextInt(899999999) + 100000000).toString
+      Await.result(refreshTokenOnId(username, Some(util.hashing.MurmurHash3.stringHash(token).toString)), 1.seconds)
+      token
+    }
+
+    def verifySession(username: Option[String], token: Option[String]): Boolean = {
+      Await.result(findById(username.getOrElse("")), 1.seconds).secretHash == util.hashing.MurmurHash3.stringHash(token.getOrElse("aaa")).toString
+    }
   }
 
 }

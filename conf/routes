@@ -16,15 +16,3 @@ POST        /sendEmailAddressVerification        controllers.VerifyEmailAddressC
 
 GET         /assets/*file                        controllers.Assets.versioned(path="/public", file: Asset)
 
-GET         /message                             controllers.AsyncController.message
-
-GET         /find                                controllers.AsyncController.find
-
-GET         /delete                              controllers.AsyncController.delete
-
-GET         /addowner                            controllers.AsyncController.addOwner
-
-GET         /addfiat                             controllers.AsyncController.addFiat
-
-GET         /delowner                            controllers.AsyncController.delOwner
-

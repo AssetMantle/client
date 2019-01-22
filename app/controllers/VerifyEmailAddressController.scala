@@ -4,12 +4,12 @@ import javax.inject.Inject
 import models.businesstxn.EmailOTPs
 import models.master.Contacts
 import play.api.i18n.I18nSupport
-import play.api.mvc.{MessagesAbstractController, MessagesControllerComponents}
+import play.api.mvc.{AbstractController, MessagesControllerComponents}
 import views.forms.{SendEmailAddressVerification, _}
 
 import scala.concurrent.ExecutionContext
 
-class VerifyEmailAddressController @Inject()(messagesControllerComponents: MessagesControllerComponents, emailOTPs: EmailOTPs, contacts: Contacts)(implicit exec: ExecutionContext) extends MessagesAbstractController(messagesControllerComponents) with I18nSupport {
+class VerifyEmailAddressController @Inject()(messagesControllerComponents: MessagesControllerComponents, emailOTPs: EmailOTPs, contacts: Contacts)(implicit exec: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   def sendEmailAddressVerification = Action { implicit request =>
     SendEmailAddressVerification.form.bindFromRequest().fold(

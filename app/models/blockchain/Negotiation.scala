@@ -17,11 +17,11 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
 
   private[models] val negotiationTable = TableQuery[NegotiationTable]
 
-  def add(negotiation: Negotiation): Future[String] = db.run(negotiationTable returning negotiationTable.map(_.id) += negotiation)
+  private def add(negotiation: Negotiation): Future[String] = db.run(negotiationTable returning negotiationTable.map(_.id) += negotiation)
 
-  def findById(id: String): Future[Negotiation] = db.run(negotiationTable.filter(_.id === id).result.head)
+  private def findById(id: String): Future[Negotiation] = db.run(negotiationTable.filter(_.id === id).result.head)
 
-  def deleteById(id: String) = db.run(negotiationTable.filter(_.id === id).delete)
+  private def deleteById(id: String) = db.run(negotiationTable.filter(_.id === id).delete)
 
   private[models] class NegotiationTable(tag: Tag) extends Table[Negotiation](tag, "Negotiation_BC") {
 

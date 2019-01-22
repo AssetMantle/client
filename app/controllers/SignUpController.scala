@@ -3,12 +3,12 @@ package controllers
 import javax.inject.Inject
 import models.{blockchain, master}
 import play.api.i18n.I18nSupport
-import play.api.mvc.{MessagesAbstractController, MessagesControllerComponents}
+import play.api.mvc.{AbstractController, MessagesControllerComponents}
 import views.forms._
 
 import scala.concurrent.ExecutionContext
 
-class SignUpController @Inject()(messagesControllerComponents: MessagesControllerComponents, accounts: master.Accounts, accounts_bc: blockchain.Accounts)(implicit exec: ExecutionContext) extends MessagesAbstractController(messagesControllerComponents) with I18nSupport {
+class SignUpController @Inject()(messagesControllerComponents: MessagesControllerComponents, accounts: master.Accounts, accounts_bc: blockchain.Accounts)(implicit exec: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   def signUp = Action { implicit request =>
     SignUp.form.bindFromRequest().fold(

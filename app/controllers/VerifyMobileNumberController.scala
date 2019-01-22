@@ -4,12 +4,12 @@ import javax.inject.Inject
 import models.businesstxn.SMSOTPs
 import models.master.Contacts
 import play.api.i18n.I18nSupport
-import play.api.mvc.{MessagesAbstractController, MessagesControllerComponents}
+import play.api.mvc.{AbstractController, MessagesControllerComponents}
 import views.forms.{SendMobileNumberVerification, _}
 
 import scala.concurrent.ExecutionContext
 
-class VerifyMobileNumberController @Inject()(messagesControllerComponents: MessagesControllerComponents, smsOTPs: SMSOTPs, contacts: Contacts)(implicit exec: ExecutionContext) extends MessagesAbstractController(messagesControllerComponents) with I18nSupport {
+class VerifyMobileNumberController @Inject()(messagesControllerComponents: MessagesControllerComponents, smsOTPs: SMSOTPs, contacts: Contacts)(implicit exec: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   def sendMobileNumberVerification = Action { implicit request =>
     SendMobileNumberVerification.form.bindFromRequest().fold(

@@ -17,11 +17,11 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
   private[models] val fiatTable = TableQuery[FiatTable]
 
-  def add(fiat: Fiat): Future[String] = db.run(fiatTable returning fiatTable.map(_.pegHash) += fiat)
+  private def add(fiat: Fiat): Future[String] = db.run(fiatTable returning fiatTable.map(_.pegHash) += fiat)
 
-  def findByPegHash(pegHash: String): Future[Fiat] = db.run(fiatTable.filter(_.pegHash === pegHash).result.head)
+  private def findByPegHash(pegHash: String): Future[Fiat] = db.run(fiatTable.filter(_.pegHash === pegHash).result.head)
 
-  def deleteByPegHash(pegHash: String) = db.run(fiatTable.filter(_.pegHash === pegHash).delete)
+  private def deleteByPegHash(pegHash: String) = db.run(fiatTable.filter(_.pegHash === pegHash).delete)
 
   private[models] class FiatTable(tag: Tag) extends Table[Fiat](tag, "Fiat_BC") {
 

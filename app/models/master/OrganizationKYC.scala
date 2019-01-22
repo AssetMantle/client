@@ -17,12 +17,11 @@ class OrganizationKYCs @Inject()(protected val databaseConfigProvider: DatabaseC
 
   private[models] val organizationKYCTable = TableQuery[OrganizationKYCTable]
 
-  def add(organizationKYC: OrganizationKYC): Future[String] = db.run(organizationKYCTable returning organizationKYCTable.map(_.id) += organizationKYC)
+  private def add(organizationKYC: OrganizationKYC): Future[String] = db.run(organizationKYCTable returning organizationKYCTable.map(_.id) += organizationKYC)
 
-  def findByIdDocumentType(id: String, documentType: String): Future[OrganizationKYC] = db.run(organizationKYCTable.filter(_.id === id).filter(_.documentType === documentType).result.head)
+  private def findByIdDocumentType(id: String, documentType: String): Future[OrganizationKYC] = db.run(organizationKYCTable.filter(_.id === id).filter(_.documentType === documentType).result.head)
 
-  def deleteByIdDocumentType(id: String, documentType: String) = db.run(organizationKYCTable.filter(_.id === id).filter(_.documentType === documentType).delete)
-
+  private def deleteByIdDocumentType(id: String, documentType: String) = db.run(organizationKYCTable.filter(_.id === id).filter(_.documentType === documentType).delete)
 
   private[models] class OrganizationKYCTable(tag: Tag) extends Table[OrganizationKYC](tag, "OrganizationKYC") {
 

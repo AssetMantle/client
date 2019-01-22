@@ -19,11 +19,11 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   private[models] val accountTable = TableQuery[AccountTable]
 
-  def add(account: Account): Future[String] = db.run(accountTable returning accountTable.map(_.address) += account)
+  private def add(account: Account): Future[String] = db.run(accountTable returning accountTable.map(_.address) += account)
 
-  def findByAddress(address: String): Future[Account] = db.run(accountTable.filter(_.address === address).result.head)
+  private def findByAddress(address: String): Future[Account] = db.run(accountTable.filter(_.address === address).result.head)
 
-  def deleteByAddress(address: String) = db.run(accountTable.filter(_.address === address).delete)
+  private def deleteByAddress(address: String) = db.run(accountTable.filter(_.address === address).delete)
 
   private[models] class AccountTable(tag: Tag) extends Table[Account](tag, "Account_BC") {
 

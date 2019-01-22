@@ -17,12 +17,11 @@ class Owners @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
 
   private[models] val ownerTable = TableQuery[OwnerTable]
 
-  def add(owner: Owner): Future[String] = db.run(ownerTable returning ownerTable.map(_.pegHash) += owner)
+  private def add(owner: Owner): Future[String] = db.run(ownerTable returning ownerTable.map(_.pegHash) += owner)
 
-  def findByPegHashOwnerAddress(pegHash: String, ownerAddress: String): Future[Owner] = db.run(ownerTable.filter(_.pegHash === pegHash).filter(_.ownerAddress === ownerAddress).result.head)
+  private def findByPegHashOwnerAddress(pegHash: String, ownerAddress: String): Future[Owner] = db.run(ownerTable.filter(_.pegHash === pegHash).filter(_.ownerAddress === ownerAddress).result.head)
 
-
-  def deleteByPegHashOwnerAddress(pegHash: String, ownerAddress: String) = db.run(ownerTable.filter(_.pegHash === pegHash).filter(_.ownerAddress === ownerAddress).delete)
+  private def deleteByPegHashOwnerAddress(pegHash: String, ownerAddress: String) = db.run(ownerTable.filter(_.pegHash === pegHash).filter(_.ownerAddress === ownerAddress).delete)
 
 
   private[models] class OwnerTable(tag: Tag) extends Table[Owner](tag, "Owner_BC") {

@@ -17,11 +17,11 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
 
   private[models] val organizationTable = TableQuery[OrganizationTable]
 
-  def add(organization: Organization): Future[String] = db.run(organizationTable returning organizationTable.map(_.id) += organization)
+  private def add(organization: Organization): Future[String] = db.run(organizationTable returning organizationTable.map(_.id) += organization)
 
-  def findById(id: String): Future[Organization] = db.run(organizationTable.filter(_.id === id).result.head)
+  private def findById(id: String): Future[Organization] = db.run(organizationTable.filter(_.id === id).result.head)
 
-  def deleteById(id: String) = db.run(organizationTable.filter(_.id === id).delete)
+  private def deleteById(id: String) = db.run(organizationTable.filter(_.id === id).delete)
 
   private[models] class OrganizationTable(tag: Tag) extends Table[Organization](tag, "Organization") {
 

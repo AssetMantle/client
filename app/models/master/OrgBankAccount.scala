@@ -17,11 +17,11 @@ class OrgBankAccounts @Inject()(protected val databaseConfigProvider: DatabaseCo
 
   private[models] val orgBankAccountTable = TableQuery[OrgBankAccountTable]
 
-  def add(orgBankAccount: OrgBankAccount): Future[String] = db.run(orgBankAccountTable returning orgBankAccountTable.map(_.id) += orgBankAccount)
+  private def add(orgBankAccount: OrgBankAccount): Future[String] = db.run(orgBankAccountTable returning orgBankAccountTable.map(_.id) += orgBankAccount)
 
-  def findById(id: String): Future[OrgBankAccount] = db.run(orgBankAccountTable.filter(_.id === id).result.head)
+  private def findById(id: String): Future[OrgBankAccount] = db.run(orgBankAccountTable.filter(_.id === id).result.head)
 
-  def deleteById(id: String) = db.run(orgBankAccountTable.filter(_.id === id).delete)
+  private def deleteById(id: String) = db.run(orgBankAccountTable.filter(_.id === id).delete)
 
   private[models] class OrgBankAccountTable(tag: Tag) extends Table[OrgBankAccount](tag, "OrgBankAccount") {
 

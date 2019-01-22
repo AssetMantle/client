@@ -17,11 +17,11 @@ class ACLs @Inject()(protected val databaseConfigProvider: DatabaseConfigProvide
 
   private[models] val aclTable = TableQuery[ACLTable]
 
-  def add(acl: ACL): Future[String] = db.run(aclTable returning aclTable.map(_.address) += acl)
+  private def add(acl: ACL): Future[String] = db.run(aclTable returning aclTable.map(_.address) += acl)
 
-  def findByAddress(address: String): Future[ACL] = db.run(aclTable.filter(_.address === address).result.head)
+  private def findByAddress(address: String): Future[ACL] = db.run(aclTable.filter(_.address === address).result.head)
 
-  def deleteByAddress(address: String) = db.run(aclTable.filter(_.address === address).delete)
+  private def deleteByAddress(address: String) = db.run(aclTable.filter(_.address === address).delete)
 
   private[models] class ACLTable(tag: Tag) extends Table[ACL](tag, "ACL_BC") {
 

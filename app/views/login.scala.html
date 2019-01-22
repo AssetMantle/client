@@ -1,7 +1,7 @@
 @import helper._
 @import views.forms.Login
 
-@(loginForm: Form[Login.Data])(implicit messagesRequestHeader: MessagesRequestHeader)
+@(loginForm: Form[Login.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 @form(action = routes.LoginController.login){
     @CSRF.formField
     @inputText(loginForm(Messages("Username")))

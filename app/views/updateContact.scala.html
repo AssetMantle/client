@@ -1,7 +1,7 @@
 @import helper._
 @import views.forms.UpdateContact
 
-@(updateContactForm: Form[UpdateContact.Data])(implicit messagesRequestHeader: MessagesRequestHeader)
+@(updateContactForm: Form[UpdateContact.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 @form(action = routes.UpdateContactController.updateContact) {
     @CSRF.formField
     @inputText(updateContactForm(Messages("Username")))

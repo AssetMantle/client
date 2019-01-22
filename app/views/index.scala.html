@@ -1,12 +1,7 @@
-@import views.forms.SignUp
-@import views.forms.Login
-@import views.forms.UpdateContact
-@import views.forms.VerifyEmailAddress
-@import views.forms.VerifyMobileNumber
-@import views.forms.SendEmailAddressVerification
-@import views.forms.SendMobileNumberVerification
+@
+import views.forms.{Login, SendEmailAddressVerification, SendMobileNumberVerification, SignUp, UpdateContact, VerifyEmailAddress, VerifyMobileNumber}
 
-@(signUpForm: Form[SignUp.Data], loginForm: Form[Login.Data], updateContactForm: Form[UpdateContact.Data], verifyEmailAddressForm: Form[VerifyEmailAddress.Data], verifyMobileNumberForm: Form[VerifyMobileNumber.Data], sendEmailAddressVerificationForm: Form[SendEmailAddressVerification.Data], sendMobileNumberVerificationForm: Form[SendMobileNumberVerification.Data])(implicit messagesRequestHeader: MessagesRequestHeader)
+@(signUpForm: Form[SignUp.Data], loginForm: Form[Login.Data], updateContactForm: Form[UpdateContact.Data], verifyEmailAddressForm: Form[VerifyEmailAddress.Data], verifyMobileNumberForm: Form[VerifyMobileNumber.Data], sendEmailAddressVerificationForm: Form[SendEmailAddressVerification.Data], sendMobileNumberVerificationForm: Form[SendMobileNumberVerification.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 <!DOCTYPE html>
 <html lang="en">
     <head>

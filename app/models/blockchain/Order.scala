@@ -17,11 +17,11 @@ class Orders @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
 
   private[models] val orderTable = TableQuery[OrderTable]
 
-  def add(order: Order): Future[String] = db.run(orderTable returning orderTable.map(_.id) += order)
+  private def add(order: Order): Future[String] = db.run(orderTable returning orderTable.map(_.id) += order)
 
-  def findById(id: String): Future[Order] = db.run(orderTable.filter(_.id === id).result.head)
+  private def findById(id: String): Future[Order] = db.run(orderTable.filter(_.id === id).result.head)
 
-  def deleteById(id: String) = db.run(orderTable.filter(_.id === id).delete)
+  private def deleteById(id: String) = db.run(orderTable.filter(_.id === id).delete)
 
   private[models] class OrderTable(tag: Tag) extends Table[Order](tag, "Order_BC") {
 

@@ -1,7 +1,7 @@
 @import helper._
 @import views.forms.SendEmailAddressVerification
 
-@(sendEmailAddressVerificationForm: Form[SendEmailAddressVerification.Data])(implicit messagesRequestHeader: MessagesRequestHeader)
+@(sendEmailAddressVerificationForm: Form[SendEmailAddressVerification.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 @form(action = routes.VerifyEmailAddressController.sendEmailAddressVerification) {
     @CSRF.formField
     @inputText(sendEmailAddressVerificationForm(Messages("Username")))

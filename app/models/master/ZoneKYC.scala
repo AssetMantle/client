@@ -17,11 +17,11 @@ class ZoneKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   private[models] val zoneKYCTable = TableQuery[ZoneKYCTable]
 
-  def add(zoneKYC: ZoneKYC): Future[String] = db.run(zoneKYCTable returning zoneKYCTable.map(_.id) += zoneKYC)
+  private def add(zoneKYC: ZoneKYC): Future[String] = db.run(zoneKYCTable returning zoneKYCTable.map(_.id) += zoneKYC)
 
-  def findByIdDocumentType(id: String, documentType: String): Future[ZoneKYC] = db.run(zoneKYCTable.filter(_.id === id).filter(_.documentType === documentType).result.head)
+  private def findByIdDocumentType(id: String, documentType: String): Future[ZoneKYC] = db.run(zoneKYCTable.filter(_.id === id).filter(_.documentType === documentType).result.head)
 
-  def deleteByIdDocumentType(id: String, documentType: String) = db.run(zoneKYCTable.filter(_.id === id).filter(_.documentType === documentType).delete)
+  private def deleteByIdDocumentType(id: String, documentType: String) = db.run(zoneKYCTable.filter(_.id === id).filter(_.documentType === documentType).delete)
 
   private[models] class ZoneKYCTable(tag: Tag) extends Table[ZoneKYC](tag, "ZoneKYC") {
 

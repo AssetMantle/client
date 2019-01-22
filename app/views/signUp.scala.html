@@ -1,7 +1,7 @@
 @import helper._
 @import views.forms.SignUp
 
-@(signUpForm: Form[SignUp.Data])(implicit messagesRequestHeader: MessagesRequestHeader)
+@(signUpForm: Form[SignUp.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 @form(action = routes.SignUpController.signUp) {
     @CSRF.formField
     @inputText(signUpForm(Messages("Username")))

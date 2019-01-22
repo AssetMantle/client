@@ -17,11 +17,11 @@ class AccountKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfig
 
   private[models] val accountKYCTable = TableQuery[AccountKYCTable]
 
-  def add(accountKYC: AccountKYC): Future[String] = db.run(accountKYCTable returning accountKYCTable.map(_.id) += accountKYC)
+  private def add(accountKYC: AccountKYC): Future[String] = db.run(accountKYCTable returning accountKYCTable.map(_.id) += accountKYC)
 
-  def findByIdDocumentType(id: String, documentType: String): Future[AccountKYC] = db.run(accountKYCTable.filter(_.id === id).filter(_.documentType === documentType).result.head)
+  private def findByIdDocumentType(id: String, documentType: String): Future[AccountKYC] = db.run(accountKYCTable.filter(_.id === id).filter(_.documentType === documentType).result.head)
 
-  def deleteByIdDocumenttype(id: String, documentType: String) = db.run(accountKYCTable.filter(_.id === id).filter(_.documentType === documentType).delete)
+  private def deleteByIdDocumenttype(id: String, documentType: String) = db.run(accountKYCTable.filter(_.id === id).filter(_.documentType === documentType).delete)
 
   private[models] class AccountKYCTable(tag: Tag) extends Table[AccountKYC](tag, "AccountKYC") {
 

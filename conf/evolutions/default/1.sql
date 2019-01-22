@@ -116,9 +116,10 @@ CREATE TABLE IF NOT EXISTS MASTER."Organization" (
 ALTER TABLE MASTER."Organization" ADD CONSTRAINT Organization_BCOrganization_id FOREIGN KEY ("id") REFERENCES BLOCKCHAIN."Organization_BC" ("id");
 
 CREATE TABLE IF NOT EXISTS MASTER."Account" (
-  "id"             VARCHAR NOT NULL,
-  "secretHash"     VARCHAR NOT NULL,
-  "accountAddress" VARCHAR NOT NULL,
+  "id"              VARCHAR NOT NULL,
+  "secretHash"      VARCHAR NOT NULL,
+  "accountAddress"  VARCHAR NOT NULL,
+  "tokenHash"       VARCHAR ,
   PRIMARY KEY ("id")
 );
 ALTER TABLE MASTER."Account" ADD CONSTRAINT Account_BCAccount_address FOREIGN KEY ("accountAddress") REFERENCES BLOCKCHAIN."Account_BC" ("address");

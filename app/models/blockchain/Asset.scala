@@ -17,11 +17,11 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
 
   private[models] val assetTable = TableQuery[AssetTable]
 
-  def add(asset: Asset): Future[String] = db.run(assetTable returning assetTable.map(_.pegHash) += asset)
+  private def add(asset: Asset): Future[String] = db.run(assetTable returning assetTable.map(_.pegHash) += asset)
 
-  def findByPegHash(pegHash: String): Future[Asset] = db.run(assetTable.filter(_.pegHash === pegHash).result.head)
+  private def findByPegHash(pegHash: String): Future[Asset] = db.run(assetTable.filter(_.pegHash === pegHash).result.head)
 
-  def deleteByPegHash(pegHash: String) = db.run(assetTable.filter(_.pegHash === pegHash).delete)
+  private def deleteByPegHash(pegHash: String) = db.run(assetTable.filter(_.pegHash === pegHash).delete)
 
   private[models] class AssetTable(tag: Tag) extends Table[Asset](tag, "Asset_BC") {
 

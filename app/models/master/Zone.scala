@@ -17,11 +17,11 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
   private[models] val zoneTable = TableQuery[ZoneTable]
 
-  def add(zone: Zone): Future[String] = db.run(zoneTable returning zoneTable.map(_.id) += zone)
+  private def add(zone: Zone): Future[String] = db.run(zoneTable returning zoneTable.map(_.id) += zone)
 
-  def findById(id: String): Future[Zone] = db.run(zoneTable.filter(_.id === id).result.head)
+  private def findById(id: String): Future[Zone] = db.run(zoneTable.filter(_.id === id).result.head)
 
-  def deleteById(id: String) = db.run(zoneTable.filter(_.id === id).delete)
+  private def deleteById(id: String) = db.run(zoneTable.filter(_.id === id).delete)
 
   private[models] class ZoneTable(tag: Tag) extends Table[Zone](tag, "Zone") {
 
