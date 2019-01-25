@@ -1,23 +1,27 @@
 package controllers
 
-import controllers.results.WithToken
+import controllers.results.WithUsernameToken
 import javax.inject.Inject
 import models.master
 import play.api.i18n.I18nSupport
-import play.api.mvc.{AbstractController, MessagesControllerComponents}
+import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import views.forms._
 
 import scala.concurrent.ExecutionContext
 
-class LoginController @Inject()(messagesControllerComponents: MessagesControllerComponents, accounts: master.Accounts, withToken: WithToken)(implicit exec: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class LoginController @Inject()(messagesControllerComponents: MessagesControllerComponents, accounts: master.Accounts, withUsernameToken: WithUsernameToken)(implicit exec: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
-  def login = Action { implicit request =>
+  def loginForm: Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.login(Login.form))
+  }
+
+  def login: Action[AnyContent] = Action { implicit request =>
     Login.form.bindFromRequest().fold(
       formWithErrors => {
-        BadRequest(views.html.index(SignUp.form, formWithErrors, UpdateContact.form, VerifyEmailAddress.form, VerifyMobileNumber.form, SendEmailAddressVerification.form, SendMobileNumberVerification.form))
+        BadRequest(views.html.login(formWithErrors))
       },
       loginData => {
-        if (accounts.Service.validateLogin(loginData.username, loginData.password)) withToken.Ok("Login") else Ok("Incorrect  Password")
+        if (accounts.Service.validateLogin(loginData.username, loginData.password)) withUsernameToken.Ok(views.html.index(success = "Logged In!"), loginData.username) else Ok(views.html.index(failure = "Invalid Login!"))
       })
   }
 }

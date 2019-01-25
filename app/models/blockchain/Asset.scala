@@ -27,8 +27,6 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
 
     def * = (pegHash, documentHash, assetType, assetQuantity, assetPrice, quantityUnit, ownerAddress, locked) <> (Asset.tupled, Asset.unapply)
 
-    def ? = (pegHash.?, documentHash.?, assetType.?, assetQuantity.?, assetPrice.?, quantityUnit.?, ownerAddress.?, locked.?).shaped.<>({ r => import r._; _1.map(_ => Asset.tupled((_1.get, _2.get, _3.get, _4.get, _5.get, _6.get, _7.get, _8.get))) }, (_: Any) => throw new Exception("Inserting into ? projection not supported."))
-
     def pegHash = column[String]("pegHash", O.PrimaryKey)
 
     def documentHash = column[String]("documentHash")
@@ -44,6 +42,8 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
     def ownerAddress = column[String]("ownerAddress")
 
     def locked = column[Boolean]("locked")
+
+    def ? = (pegHash.?, documentHash.?, assetType.?, assetQuantity.?, assetPrice.?, quantityUnit.?, ownerAddress.?, locked.?).shaped.<>({ r => import r._; _1.map(_ => Asset.tupled((_1.get, _2.get, _3.get, _4.get, _5.get, _6.get, _7.get, _8.get))) }, (_: Any) => throw new Exception("Inserting into ? projection not supported."))
   }
 
 }

@@ -1,18 +1,20 @@
-@import helper._
+@ @
+import helper._
 @import views.forms.VerifyEmailAddress
 
-@(verifyEmailAddressForm: Form[VerifyEmailAddress.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
-@form(action = routes.VerifyEmailAddressController.verifyEmailAddress) {
-    @CSRF.formField
-    @inputText(verifyEmailAddressForm(Messages("Username")))
-    @inputText(verifyEmailAddressForm(Messages("OTP")))
+@(verifyEmailAddressForm: Form[VerifyEmailAddress.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+    @common(Messages("Welcome")) {
+        @form(action = routes.VerifyEmailAddressController.verifyEmailAddress) {
+            @CSRF.formField
+            @inputText(verifyEmailAddressForm(Messages("OTP")))
 
-    @if(verifyEmailAddressForm.hasGlobalErrors) {
-        <ul>
-        @for(error <- verifyEmailAddressForm.globalErrors) {
-            <li>@error.format</li>
+            @if(verifyEmailAddressForm.hasGlobalErrors) {
+                <ul>
+                @for(error <- verifyEmailAddressForm.globalErrors) {
+                    <li>@error.format</li>
+                }
+                </ul>
+            }
+            <button type="submit">@Messages("VerifyEmailAddress")</button>
         }
-        </ul>
     }
-    <button type="submit">@Messages("VerifyEmailAddress")</button>
-}

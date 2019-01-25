@@ -1,18 +1,21 @@
-@import helper._
+@ @
+import helper._
 @import views.forms.Login
 
-@(loginForm: Form[Login.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
-@form(action = routes.LoginController.login){
-    @CSRF.formField
-    @inputText(loginForm(Messages("Username")))
-    @inputPassword(loginForm(Messages("Password")))
+@(loginForm: Form[Login.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+    @common(Messages("Welcome")) {
+        @form(action = routes.LoginController.login) {
+            @CSRF.formField
+            @inputText(loginForm(Messages("Username")))
+            @inputPassword(loginForm(Messages("Password")))
 
-    @if(loginForm.hasGlobalErrors){
-        <ul>
-            @for(error <- loginForm.globalErrors){
-                <li>@error.format</li>
+            @if(loginForm.hasGlobalErrors) {
+                <ul>
+                @for(error <- loginForm.globalErrors) {
+                    <li>@error.format</li>
+                }
+                </ul>
             }
-        </ul>
+            <button type="submit">@Messages("Login")</button>
+        }
     }
-    <button type="submit">@Messages("Login")</button>
-}

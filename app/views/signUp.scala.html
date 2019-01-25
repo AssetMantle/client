@@ -1,18 +1,21 @@
-@import helper._
+@ @
+import helper._
 @import views.forms.SignUp
 
-@(signUpForm: Form[SignUp.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
-@form(action = routes.SignUpController.signUp) {
-    @CSRF.formField
-    @inputText(signUpForm(Messages("Username")))
-    @inputPassword(signUpForm(Messages("Password")))
+@(signUpForm: Form[SignUp.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+    @common(Messages("Welcome")) {
+        @form(action = routes.SignUpController.signUp) {
+            @CSRF.formField
+            @inputText(signUpForm(Messages("Username")))
+            @inputPassword(signUpForm(Messages("Password")))
 
-    @if(signUpForm.hasGlobalErrors) {
-        <ul>
-            @for(error <- signUpForm.globalErrors) {
-                <li>@error.format</li>
+            @if(signUpForm.hasGlobalErrors) {
+                <ul>
+                @for(error <- signUpForm.globalErrors) {
+                    <li>@error.format</li>
+                }
+                </ul>
             }
-        </ul>
+            <button type="submit">@Messages("SignUp")</button>
+        }
     }
-    <button type="submit">@Messages("SignUp")</button>
-}

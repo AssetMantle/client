@@ -1,22 +1,9 @@
-@
-import views.forms.{Login, SendEmailAddressVerification, SendMobileNumberVerification, SignUp, UpdateContact, VerifyEmailAddress, VerifyMobileNumber}
+@(success: String = "", failure: String = "")(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 
-@(signUpForm: Form[SignUp.Data], loginForm: Form[Login.Data], updateContactForm: Form[UpdateContact.Data], verifyEmailAddressForm: Form[VerifyEmailAddress.Data], verifyMobileNumberForm: Form[VerifyMobileNumber.Data], sendEmailAddressVerificationForm: Form[SendEmailAddressVerification.Data], sendMobileNumberVerificationForm: Form[SendMobileNumberVerification.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        @* Here's where we render the page title `String`. *@
-        <title>@Messages("Index")</title>
-        <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/main.css")">
-        <link rel="shortcut icon" type="image/png" href="@routes.Assets.versioned("images/favicon.png")">
-        <script src="@routes.Assets.versioned("javascripts/hello.js")" type="text/javascript"></script>
-    </head>
-    <body>
-        @signUp(signUpForm)
-        @login(loginForm)
-        @updateContact(updateContactForm)
-        @verifyEmailAddress(verifyEmailAddressForm)
-        @sendEmailAddressVerification(sendEmailAddressVerificationForm)
-        @sendMobileNumberVerification(sendMobileNumberVerificationForm)
-    </body>
-</html>
+@common(Messages("Welcome"), success, failure) {
+    <a href="@routes.LoginController.loginForm">@Messages("Login")</a>
+    <a href="@routes.SignUpController.signUpForm">@Messages("SignUp")</a>
+    <a href="@routes.UpdateContactController.updateContactForm">@Messages("UpdateContact")</a>
+    <a href="@routes.VerifyMobileNumberController.verifyMobileNumberForm">@Messages("VerifyMobileNumber")</a>
+    <a href="@routes.VerifyEmailAddressController.verifyEmailAddressForm">@Messages("VerifyEmailAddress")</a>
+}

@@ -1,19 +1,21 @@
-@import helper._
+@ @
+import helper._
 @import views.forms.UpdateContact
 
-@(updateContactForm: Form[UpdateContact.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
-@form(action = routes.UpdateContactController.updateContact) {
-    @CSRF.formField
-    @inputText(updateContactForm(Messages("Username")))
-    @inputText(updateContactForm(Messages("MobileNumber")))
-    @inputText(updateContactForm(Messages("EmailAddress")))
+@(updateContactForm: Form[UpdateContact.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+    @common(Messages("Welcome")) {
+        @form(action = routes.UpdateContactController.updateContact) {
+            @CSRF.formField
+            @inputText(updateContactForm(Messages("MobileNumber")))
+            @inputText(updateContactForm(Messages("EmailAddress")))
 
-    @if(updateContactForm.hasGlobalErrors) {
-        <ul>
-        @for(error <- updateContactForm.globalErrors) {
-            <li>@error.format</li>
+            @if(updateContactForm.hasGlobalErrors) {
+                <ul>
+                @for(error <- updateContactForm.globalErrors) {
+                    <li>@error.format</li>
+                }
+                </ul>
+            }
+            <button type="submit">@Messages("UpdateContact")</button>
         }
-        </ul>
-    }
-    <button type="submit">@Messages("UpdateContact")</button>
 }

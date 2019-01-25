@@ -57,7 +57,7 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     }
 
     def verifySession(username: Option[String], token: Option[String]): Boolean = {
-      Await.result(findById(username.getOrElse("")), 1.seconds).secretHash == util.hashing.MurmurHash3.stringHash(token.getOrElse("aaa")).toString
+      Await.result(findById(username.getOrElse(return false)), 1.seconds).tokenHash.getOrElse(return false) == util.hashing.MurmurHash3.stringHash(token.getOrElse(return false)).toString
     }
   }
 

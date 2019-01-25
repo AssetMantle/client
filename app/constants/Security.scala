@@ -1,6 +1,6 @@
 package constants
 
 object Security {
-  val username = "USERNAME"
-  val token = "TOKEN"
+  val USERNAME = "USERNAME"
+  val TOKEN = "TOKEN"
 }

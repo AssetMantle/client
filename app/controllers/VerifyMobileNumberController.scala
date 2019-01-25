@@ -1,38 +1,35 @@
 package controllers
 
+import constants.Security
+import controllers.actions.WithLoginAction
 import javax.inject.Inject
 import models.businesstxn.SMSOTPs
 import models.master.Contacts
 import play.api.i18n.I18nSupport
-import play.api.mvc.{AbstractController, MessagesControllerComponents}
-import views.forms.{SendMobileNumberVerification, _}
+import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
+import views.forms._
 
 import scala.concurrent.ExecutionContext
 
-class VerifyMobileNumberController @Inject()(messagesControllerComponents: MessagesControllerComponents, smsOTPs: SMSOTPs, contacts: Contacts)(implicit exec: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class VerifyMobileNumberController @Inject()(messagesControllerComponents: MessagesControllerComponents, smsOTPs: SMSOTPs, contacts: Contacts, withLoginAction: WithLoginAction)(implicit exec: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
-  def sendMobileNumberVerification = Action { implicit request =>
-    SendMobileNumberVerification.form.bindFromRequest().fold(
-      formWithErrors => {
-        BadRequest(views.html.index(SignUp.form, Login.form, UpdateContact.form, VerifyEmailAddress.form, VerifyMobileNumber.form, SendEmailAddressVerification.form, formWithErrors))
-      },
-      sendMobileNumberVerificationData => {
-        if (smsOTPs.Service.sendOTP(sendMobileNumberVerificationData.username) == 1) Ok(views.html.verifyMobileNumber(VerifyMobileNumber.form)) else Ok("Problem")
-      })
+  def verifyMobileNumberForm: Action[AnyContent] = withLoginAction { implicit request =>
+    if (smsOTPs.Service.sendOTP(request.session.get(Security.USERNAME).get) == 1)
+      Ok(views.html.verifyMobileNumber(VerifyMobileNumber.form))
+    else
+      Ok(views.html.index(failure = "Send Otp Failed!"))
   }
 
-  def verifyMobileNumber = Action { implicit request =>
+  def verifyMobileNumber: Action[AnyContent] = withLoginAction { implicit request =>
     VerifyMobileNumber.form.bindFromRequest().fold(
       formWithErrors => {
-        BadRequest(views.html.index(SignUp.form, Login.form, UpdateContact.form, VerifyEmailAddress.form, formWithErrors, SendEmailAddressVerification.form, SendMobileNumberVerification.form))
+        BadRequest(views.html.verifyMobileNumber(formWithErrors))
       },
       verifyMobileNumberData => {
-        if (smsOTPs.Service.verifyOTP(verifyMobileNumberData.username, verifyMobileNumberData.otp))
-          if (contacts.Service.verifyMobileNumber(verifyMobileNumberData.username) == 1)
-            Ok("Verified")
-          else
-            Ok("Err Verifying")
-        else Ok("Err Sending")
+        if (smsOTPs.Service.verifyOTP(request.session.get(Security.USERNAME).get, verifyMobileNumberData.otp))
+          if (contacts.Service.verifyMobileNumber(request.session.get(Security.USERNAME).get) == 1)
+            Ok(views.html.index(success = "MobileUpdated"))
+        Ok(views.html.index(failure = "Failed"))
       })
   }
 }

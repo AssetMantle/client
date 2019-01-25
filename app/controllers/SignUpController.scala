@@ -3,22 +3,25 @@ package controllers
 import javax.inject.Inject
 import models.{blockchain, master}
 import play.api.i18n.I18nSupport
-import play.api.mvc.{AbstractController, MessagesControllerComponents}
+import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import views.forms._
 
 import scala.concurrent.ExecutionContext
 
 class SignUpController @Inject()(messagesControllerComponents: MessagesControllerComponents, accounts: master.Accounts, accounts_bc: blockchain.Accounts)(implicit exec: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
-  def signUp = Action { implicit request =>
+  def signUpForm: Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.signUp(SignUp.form))
+  }
+
+  def signUp: Action[AnyContent] = Action { implicit request =>
     SignUp.form.bindFromRequest().fold(
       formWithErrors => {
-        BadRequest(views.html.index(formWithErrors, Login.form, UpdateContact.form, VerifyEmailAddress.form, VerifyMobileNumber.form, SendEmailAddressVerification.form, SendMobileNumberVerification.form))
+        BadRequest(views.html.signUp(formWithErrors))
       },
       signUpData => {
         val x = accounts.Service.addLogin(signUpData.username, signUpData.password, accounts_bc.Service.addAccount(signUpData.username, signUpData.password))
-        Ok(s"Sign up $x")
+        Ok(views.html.index(success = s"Signed Up! Address: $x"))
       })
   }
-
 }

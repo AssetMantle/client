@@ -1,18 +1,19 @@
-GET         /                                    controllers.IndexController.index
+GET         /                          controllers.IndexController.index
 
-POST        /login                               controllers.LoginController.login
+GET         /login                     controllers.LoginController.loginForm
+POST        /login                     controllers.LoginController.login
 
-POST        /signUp                              controllers.SignUpController.signUp
+GET         /signUp                    controllers.SignUpController.signUpForm
+POST        /signUp                    controllers.SignUpController.signUp
 
-POST        /updateContact                       controllers.UpdateContactController.updateContact
+GET         /updateContact             controllers.UpdateContactController.updateContactForm
+POST        /updateContact             controllers.UpdateContactController.updateContact
 
-POST        /verifyMobileNumber                  controllers.VerifyMobileNumberController.verifyMobileNumber
+GET         /verifyMobileNumber        controllers.VerifyMobileNumberController.verifyMobileNumberForm
+POST        /verifyMobileNumber        controllers.VerifyMobileNumberController.verifyMobileNumber
 
-POST        /verifyEmailAddress                  controllers.VerifyEmailAddressController.verifyEmailAddress
+GET         /verifyEmailAddress        controllers.VerifyEmailAddressController.verifyEmailAddressForm
+POST        /verifyEmailAddress        controllers.VerifyEmailAddressController.verifyEmailAddress
 
-POST        /sendMobileNumberVerification        controllers.VerifyMobileNumberController.sendMobileNumberVerification
-
-POST        /sendEmailAddressVerification        controllers.VerifyEmailAddressController.sendEmailAddressVerification
-
-GET         /assets/*file                        controllers.Assets.versioned(path="/public", file: Asset)
+GET         /assets/*file              controllers.Assets.versioned(path="/public", file: Asset)
 
