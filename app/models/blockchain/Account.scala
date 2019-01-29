@@ -45,8 +45,8 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
   object Service {
 
     def addAccount(username: String, password: String): String = {
-      val addKeyResponse = addKey.Service.post(username, password, getSeed.Service.get.body)
-      Await.result(add(new Account(addKeyResponse.accountAddress, 0, addKeyResponse.publicKey, -1, 0)), Duration.Inf)
+      val addKeyResponse = addKey.Service.post(username, password, getSeed.Service.get().body)
+      Await.result(add(Account(addKeyResponse.accountAddress, 0, addKeyResponse.publicKey, -1, 0)), Duration.Inf)
     }
   }
 

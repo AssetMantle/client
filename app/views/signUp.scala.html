@@ -5,7 +5,7 @@
     @common(Messages("Welcome")) {
         @form(action = routes.SignUpController.signUp) {
             @CSRF.formField
-            @inputText(signUpForm(Messages("Username")))
+            @inputText(signUpForm(Messages("Username")),'id->"username")<label id="result"></label>
             @inputPassword(signUpForm(Messages("Password")))
 
             @if(signUpForm.hasGlobalErrors) {
@@ -18,3 +18,4 @@
             <button type="submit">@Messages("SignUp")</button>
         }
     }
+<script src="@routes.Assets.versioned("javascripts/checkUsername.js")" type="text/javascript"></script>

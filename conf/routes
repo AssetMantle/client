@@ -1,19 +1,21 @@
-GET         /                          controllers.IndexController.index
+GET         /                              controllers.IndexController.index
 
-GET         /login                     controllers.LoginController.loginForm
-POST        /login                     controllers.LoginController.login
+GET         /login                         controllers.LoginController.loginForm
+POST        /login                         controllers.LoginController.login
 
-GET         /signUp                    controllers.SignUpController.signUpForm
-POST        /signUp                    controllers.SignUpController.signUp
+GET         /checkUsernameAvailable        controllers.SignUpController.checkUsernameAvailable(username: String)
 
-GET         /updateContact             controllers.UpdateContactController.updateContactForm
-POST        /updateContact             controllers.UpdateContactController.updateContact
+GET         /signUp                        controllers.SignUpController.signUpForm
+POST        /signUp                        controllers.SignUpController.signUp
 
-GET         /verifyMobileNumber        controllers.VerifyMobileNumberController.verifyMobileNumberForm
-POST        /verifyMobileNumber        controllers.VerifyMobileNumberController.verifyMobileNumber
+GET         /updateContact                 controllers.UpdateContactController.updateContactForm
+POST        /updateContact                 controllers.UpdateContactController.updateContact
 
-GET         /verifyEmailAddress        controllers.VerifyEmailAddressController.verifyEmailAddressForm
-POST        /verifyEmailAddress        controllers.VerifyEmailAddressController.verifyEmailAddress
+GET         /verifyMobileNumber            controllers.VerifyMobileNumberController.verifyMobileNumberForm
+POST        /verifyMobileNumber            controllers.VerifyMobileNumberController.verifyMobileNumber
 
-GET         /assets/*file              controllers.Assets.versioned(path="/public", file: Asset)
+GET         /verifyEmailAddress            controllers.VerifyEmailAddressController.verifyEmailAddressForm
+POST        /verifyEmailAddress            controllers.VerifyEmailAddressController.verifyEmailAddress
+
+GET         /assets/*file                  controllers.Assets.versioned(path="/public", file: Asset)
 

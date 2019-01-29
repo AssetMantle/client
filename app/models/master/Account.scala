@@ -23,6 +23,8 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   private def findById(id: String): Future[Account] = db.run(accountTable.filter(_.id === id).result.head)
 
+  private def checkById(id: String): Future[Boolean] = db.run(accountTable.filter(_.id === id).exists.result)
+
   private def deleteById(id: String) = db.run(accountTable.filter(_.id === id).delete)
 
   private def refreshTokenOnId(id: String, tokenHash: Option[String]) = db.run(accountTable.filter(_.id === id).map(_.tokenHash.?).update(tokenHash))
@@ -45,6 +47,10 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
     def validateLogin(username: String, password: String)(implicit ExecutionContext: ExecutionContext): Boolean = Await.result(findById(username), Duration.Inf).secretHash == util.hashing.MurmurHash3.stringHash(password).toString
 
+    def checkUsernameAvailable(username: String): Boolean = {
+      !Await.result(checkById(username), 1.seconds)
+    }
+
     def addLogin(username: String, password: String, accountAddress: String): String = {
       Await.result(add(Account(username, util.hashing.MurmurHash3.stringHash(password).toString, accountAddress, null)), Duration.Inf)
       accountAddress
@@ -59,6 +65,7 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     def verifySession(username: Option[String], token: Option[String]): Boolean = {
       Await.result(findById(username.getOrElse(return false)), Duration.Inf).tokenHash.getOrElse(return false) == util.hashing.MurmurHash3.stringHash(token.getOrElse(return false)).toString
     }
+
   }
 
 }
