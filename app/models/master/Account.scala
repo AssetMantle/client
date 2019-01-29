@@ -4,7 +4,7 @@ import javax.inject.Inject
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.JdbcProfile
 
-import scala.concurrent.duration._
+import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.Random
 
@@ -45,25 +45,25 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   object Service {
 
-    def validateLogin(username: String, password: String)(implicit ExecutionContext: ExecutionContext): Boolean = Await.result(findById(username), 1.seconds).secretHash == util.hashing.MurmurHash3.stringHash(password).toString
+    def validateLogin(username: String, password: String)(implicit ExecutionContext: ExecutionContext): Boolean = Await.result(findById(username), Duration.Inf).secretHash == util.hashing.MurmurHash3.stringHash(password).toString
 
     def checkUsernameAvailable(username: String): Boolean = {
       !Await.result(checkById(username), 1.seconds)
     }
 
     def addLogin(username: String, password: String, accountAddress: String): String = {
-      Await.result(add(Account(username, util.hashing.MurmurHash3.stringHash(password).toString, accountAddress, null)), 5.seconds)
+      Await.result(add(Account(username, util.hashing.MurmurHash3.stringHash(password).toString, accountAddress, null)), Duration.Inf)
       accountAddress
     }
 
     def refreshToken(username: String): String = {
       val token: String = (Random.nextInt(899999999) + 100000000).toString
-      Await.result(refreshTokenOnId(username, Some(util.hashing.MurmurHash3.stringHash(token).toString)), 1.seconds)
+      Await.result(refreshTokenOnId(username, Some(util.hashing.MurmurHash3.stringHash(token).toString)), Duration.Inf)
       token
     }
 
     def verifySession(username: Option[String], token: Option[String]): Boolean = {
-      Await.result(findById(username.getOrElse(return false)), 1.seconds).tokenHash.getOrElse(return false) == util.hashing.MurmurHash3.stringHash(token.getOrElse(return false)).toString
+      Await.result(findById(username.getOrElse(return false)), Duration.Inf).tokenHash.getOrElse(return false) == util.hashing.MurmurHash3.stringHash(token.getOrElse(return false)).toString
     }
 
   }

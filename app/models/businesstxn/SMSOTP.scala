@@ -4,7 +4,7 @@ import javax.inject.Inject
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.JdbcProfile
 
-import scala.concurrent.duration._
+import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
 import scala.util.Random
 
@@ -40,9 +40,9 @@ class SMSOTPs @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
 
   object Service {
 
-    def sendOTP(id: String): Int = Await.result(update(new SMSOTP(id, util.hashing.MurmurHash3.stringHash((Random.nextInt(899999)+100000).toString).toString)), 1.seconds)
+    def sendOTP(id: String): Int = Await.result(update(new SMSOTP(id, util.hashing.MurmurHash3.stringHash((Random.nextInt(899999) + 100000).toString).toString)), Duration.Inf)
 
-    def verifyOTP(id: String, otp: String): Boolean = Await.result(findById(id), 1.seconds).secretHash == util.hashing.MurmurHash3.stringHash(otp).toString
+    def verifyOTP(id: String, otp: String): Boolean = Await.result(findById(id), Duration.Inf).secretHash == util.hashing.MurmurHash3.stringHash(otp).toString
   }
 
 }

@@ -5,7 +5,7 @@ import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.JdbcProfile
 import transactions.{AddKey, GetSeed}
 
-import scala.concurrent.duration._
+import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
 
 case class Account(address: String, coins: Int, publicKey: String, accountNumber: Int, sequence: Int)

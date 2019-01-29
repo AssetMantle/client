@@ -5,7 +5,7 @@ import javax.inject.Inject
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.JdbcProfile
 
-import scala.concurrent.duration._
+import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
 
 case class Contact(id: String, mobileNumber: String, mobileNumberVerified: Boolean, emailAddress: String, emailAddressVerified: Boolean)
@@ -35,6 +35,8 @@ class Contacts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
     def * = (id, mobileNumber, mobileNumberVerified, emailAddress, emailAddressVerified) <> (Contact.tupled, Contact.unapply)
 
+    def ? = (id.?, mobileNumber.?, mobileNumberVerified.?, emailAddress.?, emailAddressVerified.?).shaped.<>({ r => import r._; _1.map(_ => Contact.tupled((_1.get, _2.get, _3.get, _4.get, _5.get))) }, (_: Any) => throw new Exception("Inserting into ? projection not supported."))
+
     def id = column[String]("id", O.PrimaryKey)
 
     def mobileNumber = column[String]("mobileNumber")
@@ -45,17 +47,15 @@ class Contacts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
     def emailAddressVerified = column[Boolean]("emailAddressVerified")
 
-    def ? = (id.?, mobileNumber.?, mobileNumberVerified.?, emailAddress.?, emailAddressVerified.?).shaped.<>({ r => import r._; _1.map(_ => Contact.tupled((_1.get, _2.get, _3.get, _4.get, _5.get))) }, (_: Any) => throw new Exception("Inserting into ? projection not supported."))
-
   }
 
   object Service {
 
-    def updateEmailAndMobile(id: String, mobileNumber: String, emailAddress: String): Boolean = if (0 < Await.result(update(new Contact(id, mobileNumber, false, emailAddress, false)), 1.seconds)) true else false
+    def updateEmailAndMobile(id: String, mobileNumber: String, emailAddress: String): Boolean = if (0 < Await.result(update(new Contact(id, mobileNumber, false, emailAddress, false)), Duration.Inf)) true else false
 
-    def verifyMobileNumber(id: String): Int = Await.result(verifyMobileNumberOnId(id), 1.seconds)
+    def verifyMobileNumber(id: String): Int = Await.result(verifyMobileNumberOnId(id), Duration.Inf)
 
-    def verifyEmailAddress(id: String): Int = Await.result(verifyEmailAddressOnId(id), 1.seconds)
+    def verifyEmailAddress(id: String): Int = Await.result(verifyEmailAddressOnId(id), Duration.Inf)
   }
 
 }
