@@ -29,8 +29,6 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
     def * = (address, coins, publicKey, accountNumber, sequence) <> (Account.tupled, Account.unapply)
 
-    def ? = (address.?, coins.?, publicKey.?, accountNumber.?, sequence.?).shaped.<>({ r => import r._; _1.map(_ => Account.tupled((_1.get, _2.get, _3.get, _4.get, _5.get))) }, (_: Any) => throw new Exception("Inserting into ? projection not supported."))
-
     def address = column[String]("address", O.PrimaryKey)
 
     def coins = column[Int]("coins")
@@ -40,13 +38,15 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     def accountNumber = column[Int]("accountNumber")
 
     def sequence = column[Int]("sequence")
+
+    def ? = (address.?, coins.?, publicKey.?, accountNumber.?, sequence.?).shaped.<>({ r => import r._; _1.map(_ => Account.tupled((_1.get, _2.get, _3.get, _4.get, _5.get))) }, (_: Any) => throw new Exception("Inserting into ? projection not supported."))
   }
 
   object Service {
 
     def addAccount(username: String, password: String): String = {
-      val addKeyResponse = addKey.Service.post(username, password, getSeed.Service.get.body)
-      Await.result(add(new Account(addKeyResponse.accountAddress, 0, addKeyResponse.publicKey, -1, 0)), 1.seconds)
+      val addKeyResponse = addKey.Service.post(username, password, getSeed.Service.get().body)
+      Await.result(add(Account(addKeyResponse.accountAddress, 0, addKeyResponse.publicKey, -1, 0)), Duration.Inf)
     }
   }
 

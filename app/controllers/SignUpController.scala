@@ -14,6 +14,10 @@ class SignUpController @Inject()(messagesControllerComponents: MessagesControlle
     Ok(views.html.signUp(SignUp.form))
   }
 
+  def checkUsernameAvailable(username:String): Action[AnyContent] = Action{ implicit request =>
+   if (accounts.Service.checkUsernameAvailable(username)) Ok else NoContent
+  }
+
   def signUp: Action[AnyContent] = Action { implicit request =>
     SignUp.form.bindFromRequest().fold(
       formWithErrors => {
