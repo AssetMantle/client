@@ -5,7 +5,7 @@ import play.api.Configuration
 import play.api.libs.json.{JsObject, Json}
 import play.api.libs.ws.{WSClient, WSResponse}
 
-import scala.concurrent.duration._
+import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 
 @Singleton
@@ -35,7 +35,7 @@ class AddKey @Inject()(configuration: Configuration, wsClient: WSClient, executi
   }
 
   object Service {
-    def post(name: String, password: String, seed: String): Response = Await.result(action(new Request(name, password, seed)), 1.seconds)
+    def post(name: String, password: String, seed: String): Response = Await.result(action(new Request(name, password, seed)), Duration.Inf)
   }
 
 }

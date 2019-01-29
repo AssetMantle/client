@@ -4,7 +4,7 @@ import javax.inject.{Inject, Singleton}
 import play.api.Configuration
 import play.api.libs.ws.{WSClient, WSResponse}
 
-import scala.concurrent.duration._
+import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 
 @Singleton
@@ -25,7 +25,7 @@ class GetSeed @Inject()(configuration: Configuration, wsClient: WSClient, execut
   }
 
   object Service {
-    def get(): Response = Await.result(action(), 1.seconds)
+    def get(): Response = Await.result(action(), Duration.Inf)
   }
 
 }
