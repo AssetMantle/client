@@ -1,9 +1,10 @@
 package controllers
 
 import controllers.results.WithUsernameToken
+import exceptions.BaseException
 import javax.inject.Inject
 import models.master
-import play.api.i18n.I18nSupport
+import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import views.forms._
 
@@ -21,7 +22,12 @@ class LoginController @Inject()(messagesControllerComponents: MessagesController
         BadRequest(views.html.login(formWithErrors))
       },
       loginData => {
-        if (accounts.Service.validateLogin(loginData.username, loginData.password)) withUsernameToken.Ok(views.html.index(success = "Logged In!"), loginData.username) else Ok(views.html.index(failure = "Invalid Login!"))
+        try {
+          if (accounts.Service.validateLogin(loginData.username, loginData.password)) withUsernameToken.Ok(views.html.index(success = "Logged In!"), loginData.username) else Ok(views.html.index(failure = "Invalid Login!"))
+        }
+        catch {
+          case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))
+        }
       })
   }
 }

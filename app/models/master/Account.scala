@@ -1,6 +1,8 @@
 package models.master
 
+import exceptions.BaseException
 import javax.inject.Inject
+import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.JdbcProfile
 
@@ -12,8 +14,13 @@ case class Account(id: String, secretHash: String, accountAddress: String, token
 
 class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider) {
 
+  private implicit val module: String = constants.Module.DATABASE
+
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
+
   val db = databaseConfig.db
+
+  private val logger: Logger = Logger(this.getClass)
 
   import databaseConfig.profile.api._
 
@@ -21,7 +28,10 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   private def add(account: Account): Future[String] = db.run(accountTable returning accountTable.map(_.id) += account)
 
-  private def findById(id: String): Future[Account] = db.run(accountTable.filter(_.id === id).result.head)
+  private def findById(id: String)(implicit executionContext: ExecutionContext): Future[Account] = db.run(accountTable.filter(_.id === id).result.head.failed).map {
+    case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+      throw new BaseException(constants.Error.NO_SUCH_ELEMENT_EXCEPTION)
+  }
 
   private def checkById(id: String): Future[Boolean] = db.run(accountTable.filter(_.id === id).exists.result)
 
@@ -45,10 +55,11 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   object Service {
 
-    def validateLogin(username: String, password: String)(implicit ExecutionContext: ExecutionContext): Boolean = Await.result(findById(username), Duration.Inf).secretHash == util.hashing.MurmurHash3.stringHash(password).toString
+    def validateLogin(username: String, password: String)(implicit executionContext: ExecutionContext): Boolean = Await.result(findById(username), Duration.Inf).secretHash == util.hashing.MurmurHash3.stringHash(password).toString
+
 
     def checkUsernameAvailable(username: String): Boolean = {
-      !Await.result(checkById(username), 1.seconds)
+      !Await.result(checkById(username), Duration.Inf)
     }
 
     def addLogin(username: String, password: String, accountAddress: String): String = {
@@ -62,7 +73,7 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
       token
     }
 
-    def verifySession(username: Option[String], token: Option[String]): Boolean = {
+    def verifySession(username: Option[String], token: Option[String])(implicit executionContext: ExecutionContext): Boolean = {
       Await.result(findById(username.getOrElse(return false)), Duration.Inf).tokenHash.getOrElse(return false) == util.hashing.MurmurHash3.stringHash(token.getOrElse(return false)).toString
     }
 

@@ -3,7 +3,7 @@ package transactions
 import java.net.ConnectException
 
 import exceptions.BaseException
-import javax.inject.{Inject, Singleton}
+import javax.inject.Inject
 import play.api.libs.json.{JsObject, Json}
 import play.api.libs.ws.{WSClient, WSResponse}
 import play.api.{Configuration, Logger}
@@ -11,12 +11,11 @@ import play.api.{Configuration, Logger}
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 
-@Singleton
 class AddKey @Inject()(configuration: Configuration, wsClient: WSClient, executionContext: ExecutionContext) {
 
-  implicit val module: String = constants.Module.BLOCKCHAIN
+  private implicit val module: String = constants.Module.BLOCKCHAIN
 
-  private val logger: Logger = Logger(this.getClass())
+  private val logger: Logger = Logger(this.getClass)
 
   private val ip = configuration.get[String]("blockchain.main.ip")
 
@@ -43,7 +42,7 @@ class AddKey @Inject()(configuration: Configuration, wsClient: WSClient, executi
 
   object Service {
     def post(name: String, password: String, seed: String): Response = try {
-      Await.result(action(new Request(name, password, seed)), 1.seconds)
+      Await.result(action(new Request(name, password, seed)), Duration.Inf)
     } catch {
       case connectException: ConnectException =>
         logger.error(constants.Error.CONNECT_EXCEPTION, connectException)

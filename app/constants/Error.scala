@@ -2,4 +2,5 @@ package constants
 
 object Error {
   val CONNECT_EXCEPTION = "CONNECT_EXCEPTION"
+  val NO_SUCH_ELEMENT_EXCEPTION = "NO_SUCH_ELEMENT_EXCEPTION"
 }
