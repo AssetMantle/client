@@ -11,7 +11,7 @@ import scala.concurrent.ExecutionContext
 
 class SignUpController @Inject()(messagesControllerComponents: MessagesControllerComponents, accounts: master.Accounts, accounts_bc: blockchain.Accounts)(implicit exec: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
-  private val module: String = constants.Module.BLOCKCHAIN
+  private val module: String = constants.Module.CONTROLLER_SIGN_UP
 
   def signUpForm: Action[AnyContent] = Action { implicit request =>
     Ok(views.html.signUp(SignUp.form))
