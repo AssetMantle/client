@@ -6,7 +6,7 @@ import play.api.Logger
 import play.api.libs.ws.WSResponse
 
 object JSON {
-  def getJSONString(key: String)(implicit response: WSResponse, logger: Logger): String = {
+  def getBCStringResponse(key: String)(implicit response: WSResponse, logger: Logger): String = {
     try {
       response.json(key).as[String]
     } catch {

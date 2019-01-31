@@ -29,8 +29,8 @@ class AddKey @Inject()(configuration: Configuration, wsClient: WSClient, executi
 
   class Response(implicit response: WSResponse) {
 
-    val accountAddress: String = utilities.JSON.getJSONString("address")
-    val publicKey: String = utilities.JSON.getJSONString("pub_key")
+    val accountAddress: String = utilities.JSON.getBCStringResponse("address")
+    val publicKey: String = utilities.JSON.getBCStringResponse("pub_key")
   }
 
 

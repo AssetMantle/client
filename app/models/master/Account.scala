@@ -8,7 +8,7 @@ import slick.jdbc.JdbcProfile
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
-import scala.util.Random
+import scala.util.{Failure, Random, Success}
 
 case class Account(id: String, secretHash: String, accountAddress: String, tokenHash: Option[String])
 
@@ -28,9 +28,12 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   private def add(account: Account): Future[String] = db.run(accountTable returning accountTable.map(_.id) += account)
 
-  private def findById(id: String)(implicit executionContext: ExecutionContext): Future[Account] = db.run(accountTable.filter(_.id === id).result.head.failed).map {
-    case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
-      throw new BaseException(constants.Error.NO_SUCH_ELEMENT_EXCEPTION)
+  private def findById(id: String)(implicit executionContext: ExecutionContext): Future[Account] = db.run(accountTable.filter(_.id === id).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+        throw new BaseException(constants.Error.NO_SUCH_ELEMENT_EXCEPTION)
+    }
   }
 
   private def checkById(id: String): Future[Boolean] = db.run(accountTable.filter(_.id === id).exists.result)
