@@ -1,6 +1,6 @@
 package controllers
 
-import exceptions.BaseException
+import exceptions.{BaseException, BlockChainException}
 import javax.inject.Inject
 import models.{blockchain, master}
 import play.api.i18n.{I18nSupport, Messages}
@@ -33,6 +33,8 @@ class SignUpController @Inject()(messagesControllerComponents: MessagesControlle
         } catch {
           case baseException: BaseException =>
             Ok(views.html.index(failure = Messages(baseException.message)))
+          case blockChainException: BlockChainException =>
+            Ok(views.html.index(failure = blockChainException.message))
         }
       })
   }

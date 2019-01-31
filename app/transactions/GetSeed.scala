@@ -14,7 +14,7 @@ class GetSeed @Inject()(configuration: Configuration, wsClient: WSClient, execut
 
   private implicit val module: String = constants.Module.BLOCKCHAIN
 
-  private val logger: Logger = Logger(this.getClass)
+  private implicit val logger: Logger = Logger(this.getClass)
 
   private val ip = configuration.get[String]("blockchain.main.ip")
 

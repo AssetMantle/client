@@ -15,7 +15,7 @@ class AddKey @Inject()(configuration: Configuration, wsClient: WSClient, executi
 
   private implicit val module: String = constants.Module.BLOCKCHAIN
 
-  private val logger: Logger = Logger(this.getClass)
+  private implicit val logger: Logger = Logger(this.getClass)
 
   private val ip = configuration.get[String]("blockchain.main.ip")
 
@@ -25,13 +25,14 @@ class AddKey @Inject()(configuration: Configuration, wsClient: WSClient, executi
 
   private val url = ip + ":" + port + "/" + path
 
-  private def action(request: Request): Future[Response] = wsClient.url(url).post(request.json).map { response => new Response(response) }(executionContext)
+  private def action(request: Request): Future[Response] = wsClient.url(url).post(request.json).map { implicit response => new Response() }(executionContext)
 
-  class Response(response: WSResponse) {
-    val accountAddress: String = response.json("address").as[String]
-    val publicKey: String = response.json("pub_key").as[String]
-    val body: String = response.body.toString
+  class Response(implicit response: WSResponse) {
+
+    val accountAddress: String = utilities.JSON.getJSONString("address")
+    val publicKey: String = utilities.JSON.getJSONString("pub_key")
   }
+
 
   private class Request(name: String, password: String, seed: String) {
     val json: JsObject = Json.obj(
