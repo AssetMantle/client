@@ -14,7 +14,7 @@ case class Account(id: String, secretHash: String, accountAddress: String, token
 
 class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider) {
 
-  private implicit val module: String = constants.Module.DATABASE
+  private implicit val module: String = constants.Module.MASTER_ACCOUNT
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 

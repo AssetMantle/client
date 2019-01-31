@@ -13,7 +13,7 @@ import scala.concurrent.{Await, ExecutionContext, Future}
 
 class AddKey @Inject()(configuration: Configuration, wsClient: WSClient, executionContext: ExecutionContext) {
 
-  private implicit val module: String = constants.Module.BLOCKCHAIN
+  private implicit val module: String = constants.Module.TRANSACTIONS_ADD_KEY
 
   private implicit val logger: Logger = Logger(this.getClass)
 

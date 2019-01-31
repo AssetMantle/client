@@ -12,7 +12,7 @@ import scala.concurrent.{Await, ExecutionContext, Future}
 
 class GetSeed @Inject()(configuration: Configuration, wsClient: WSClient, executionContext: ExecutionContext) {
 
-  private implicit val module: String = constants.Module.BLOCKCHAIN
+  private implicit val module: String = constants.Module.TRANSACTIONS_GET_SEED
 
   private implicit val logger: Logger = Logger(this.getClass)
 
