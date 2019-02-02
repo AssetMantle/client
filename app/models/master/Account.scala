@@ -2,6 +2,7 @@ package models.master
 
 import exceptions.BaseException
 import javax.inject.Inject
+import org.postgresql.util.PSQLException
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.JdbcProfile
@@ -26,7 +27,13 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   private[models] val accountTable = TableQuery[AccountTable]
 
-  private def add(account: Account): Future[String] = db.run(accountTable returning accountTable.map(_.id) += account)
+  private def add(account: Account)(implicit executionContext: ExecutionContext): Future[String] = db.run((accountTable returning accountTable.map(_.id) += account).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+        throw new BaseException(constants.Error.PSQL_EXCEPTION)
+    }
+  }
 
   private def findById(id: String)(implicit executionContext: ExecutionContext): Future[Account] = db.run(accountTable.filter(_.id === id).result.head.asTry).map {
     case Success(result) => result
@@ -65,7 +72,7 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
       !Await.result(checkById(username), Duration.Inf)
     }
 
-    def addLogin(username: String, password: String, accountAddress: String): String = {
+    def addLogin(username: String, password: String, accountAddress: String)(implicit executionContext: ExecutionContext): String = {
       Await.result(add(Account(username, util.hashing.MurmurHash3.stringHash(password).toString, accountAddress, null)), Duration.Inf)
       accountAddress
     }

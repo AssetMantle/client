@@ -11,7 +11,7 @@ import play.api.{Configuration, Logger}
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 
-class AddKey @Inject()(configuration: Configuration, wsClient: WSClient, executionContext: ExecutionContext) {
+class IssueFiat @Inject()(configuration: Configuration, wsClient: WSClient, executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.TRANSACTIONS_ADD_KEY
 
@@ -34,15 +34,19 @@ class AddKey @Inject()(configuration: Configuration, wsClient: WSClient, executi
   }
 
 
-  class Request(name: String, password: String, seed: String) {
+  class Request(from: String, to: String, transactionID: String, transactionAmount: Int, chainID: String, password: String, gas: Int) {
     val json: JsObject = Json.obj(fields =
-      "name" -> name,
+      "from" -> from,
+      "to" -> to,
+      "transactionID" -> transactionID,
+      "transactionAmount" -> transactionAmount,
+      "chainID" -> chainID,
       "password" -> password,
-      "seed" -> seed)
+      "gas" -> gas
+    )
   }
 
   object Service {
-
     def post(request: Request)(implicit executionContext: ExecutionContext): Response = try {
       Await.result(action(request), Duration.Inf)
     } catch {

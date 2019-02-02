@@ -28,7 +28,7 @@ class SignUpController @Inject()(messagesControllerComponents: MessagesControlle
       },
       signUpData => {
         try {
-          val x = accounts.Service.addLogin(signUpData.username, signUpData.password, accounts_bc.Service.addAccount(signUpData.username, signUpData.password))
+          val x = accounts.Service.addLogin(signUpData.username, signUpData.password, "ddd" /*accounts_bc.Service.addAccount(signUpData.username, signUpData.password)*/)
           Ok(views.html.index(success = Messages(module + "." + constants.Success.SIGN_UP) + x))
         } catch {
           case baseException: BaseException =>

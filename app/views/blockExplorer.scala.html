@@ -1,0 +1,11 @@
+@()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@common(Messages("Welcome")) {
+    <div style="
+        width: 400px;
+        float: left;
+    ">
+        <p>@Messages("Blocks")</p>
+        <ul id="blockList"></ul>
+    </div>
+    <script src="@routes.Assets.versioned("javascripts/blockExplorer.js")" type="text/javascript"></script>
+}

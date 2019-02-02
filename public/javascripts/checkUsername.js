@@ -2,8 +2,8 @@ $(document).ready(function () {
 
     $('#username').keyup(function () {
 
-        const username = $(this).val();
-        const result = $('#result');
+        var username = $(this).val();
+        var result = $('#result');
 
         if (username.length > 2) {
             result.html('loading');
@@ -20,7 +20,7 @@ $(document).ready(function () {
                     },
                     204: function () {
                         result.html('taken');
-                    },
+                    }
                 }
             });
         } else {

@@ -6,7 +6,7 @@ import slick.jdbc.JdbcProfile
 import transactions.{AddKey, GetSeed}
 
 import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, Future}
+import scala.concurrent.{Await, ExecutionContext, Future}
 
 case class Account(address: String, coins: Int, publicKey: String, accountNumber: Int, sequence: Int)
 
@@ -44,8 +44,8 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   object Service {
 
-    def addAccount(username: String, password: String): String = {
-      val addKeyResponse = addKey.Service.post(username, password, getSeed.Service.get().body)
+    def addAccount(username: String, password: String)(implicit executionContext: ExecutionContext): String = {
+      val addKeyResponse = addKey.Service.post(new addKey.Request(username, password, getSeed.Service.get().body))
       Await.result(add(Account(addKeyResponse.accountAddress, 0, addKeyResponse.publicKey, -1, 0)), Duration.Inf)
     }
   }
