@@ -1,0 +1,21 @@
+@import helper._
+@import views.companion.blockchain.AddKey
+
+@(addKeyFrom: Form[AddKey.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@common(Messages("Welcome")) {
+    @form(action = routes.SignUpController.signUp) {
+        @CSRF.formField
+        @inputText(addKeyFrom(Messages("Username")), 'id -> "username") <label id="result"></label>
+        @inputPassword(addKeyFrom(Messages("Password")))
+
+        @if(addKeyFrom.hasGlobalErrors) {
+            <ul>
+            @for(error <- addKeyFrom.globalErrors) {
+                <li>@error.format</li>
+            }
+            </ul>
+        }
+        <button type="submit">@Messages("SignUp")</button>
+    }
+}
+<script src="@routes.Assets.versioned("../../public/javascripts/checkUsername.js")" type="text/javascript"></script>

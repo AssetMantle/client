@@ -2,14 +2,14 @@ package controllers
 
 import exceptions.{BaseException, BlockChainException}
 import javax.inject.Inject
-import models.{blockchain, master}
+import models.master.Accounts
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
-import views.forms._
+import views.companion.master.SignUp
 
 import scala.concurrent.ExecutionContext
 
-class SignUpController @Inject()(messagesControllerComponents: MessagesControllerComponents, accounts: master.Accounts, accounts_bc: blockchain.Accounts)(implicit exec: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class SignUpController @Inject()(messagesControllerComponents: MessagesControllerComponents, accounts: Accounts, blockchainAccounts: models.blockchain.Accounts)(implicit exec: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private val module: String = constants.Module.CONTROLLER_SIGN_UP
 
@@ -28,7 +28,7 @@ class SignUpController @Inject()(messagesControllerComponents: MessagesControlle
       },
       signUpData => {
         try {
-          val x = accounts.Service.addLogin(signUpData.username, signUpData.password, "ddd" /*accounts_bc.Service.addAccount(signUpData.username, signUpData.password)*/)
+          val x = accounts.Service.addLogin(signUpData.username, signUpData.password, blockchainAccounts.Service.addAccount(signUpData.username, signUpData.password))
           Ok(views.html.index(success = Messages(module + "." + constants.Success.SIGN_UP) + x))
         } catch {
           case baseException: BaseException =>

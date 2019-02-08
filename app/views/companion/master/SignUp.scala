@@ -1,4 +1,4 @@
-package views.forms
+package views.companion.master
 
 object SignUp {
 

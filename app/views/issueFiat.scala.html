@@ -1,0 +1,21 @@
+@import helper._
+@import views.companion.blockchain.IssueFiat
+
+@(issueFiatForm: Form[IssueFiat.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@common(Messages("Welcome")) {
+    @form(action = routes.SignUpController.signUp) {
+        @CSRF.formField
+        @inputText(issueFiatForm(Messages("Username")), 'id -> "username") <label id="result"></label>
+        @inputPassword(issueFiatForm(Messages("Password")))
+
+        @if(issueFiatForm.hasGlobalErrors) {
+            <ul>
+            @for(error <- issueFiatForm.globalErrors) {
+                <li>@error.format</li>
+            }
+            </ul>
+        }
+        <button type="submit">@Messages("SignUp")</button>
+    }
+}
+<script src="@routes.Assets.versioned("../../public/javascripts/checkUsername.js")" type="text/javascript"></script>

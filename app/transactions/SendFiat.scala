@@ -11,7 +11,7 @@ import play.api.{Configuration, Logger}
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 
-class SendFIat @Inject()(configuration: Configuration, wsClient: WSClient, executionContext: ExecutionContext) {
+class SendFiat @Inject()(configuration: Configuration, wsClient: WSClient, executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.TRANSACTIONS_ADD_KEY
 

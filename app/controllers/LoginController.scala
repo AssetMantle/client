@@ -3,14 +3,14 @@ package controllers
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.Inject
-import models.master
+import models.master.Accounts
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
-import views.forms._
+import views.companion.master.Login
 
 import scala.concurrent.ExecutionContext
 
-class LoginController @Inject()(messagesControllerComponents: MessagesControllerComponents, accounts: master.Accounts, withUsernameToken: WithUsernameToken)(implicit exec: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class LoginController @Inject()(messagesControllerComponents: MessagesControllerComponents, accounts: Accounts, withUsernameToken: WithUsernameToken)(implicit exec: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   def loginForm: Action[AnyContent] = Action { implicit request =>
     Ok(views.html.login(Login.form))

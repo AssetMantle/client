@@ -1,5 +1,5 @@
 @import helper._
-@import views.forms.Login
+@import views.companion.master.Login
 
 @(loginForm: Form[Login.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
     @common(Messages("Welcome")) {

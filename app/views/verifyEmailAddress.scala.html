@@ -1,5 +1,5 @@
 @import helper._
-@import views.forms.VerifyEmailAddress
+@import views.companion.master.VerifyEmailAddress
 
 @(verifyEmailAddressForm: Form[VerifyEmailAddress.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
     @common(Messages("Welcome")) {

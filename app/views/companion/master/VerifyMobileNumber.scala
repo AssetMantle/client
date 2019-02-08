@@ -1,6 +1,6 @@
-package views.forms
+package views.companion.master
 
-object VerifyEmailAddress {
+object VerifyMobileNumber {
 
   import play.api.data.Form
   import play.api.data.Forms._

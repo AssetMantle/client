@@ -1,0 +1,21 @@
+@import helper._
+@import views.companion.blockchain.AddZone
+
+@(addZoneForm: Form[AddZone.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@common(Messages("Welcome")) {
+    @form(action = routes.SignUpController.signUp) {
+        @CSRF.formField
+        @inputText(addZoneForm(Messages("Username")), 'id -> "username") <label id="result"></label>
+        @inputPassword(addZoneForm(Messages("Password")))
+
+        @if(addZoneForm.hasGlobalErrors) {
+            <ul>
+            @for(error <- addZoneForm.globalErrors) {
+                <li>@error.format</li>
+            }
+            </ul>
+        }
+        <button type="submit">@Messages("SignUp")</button>
+    }
+}
+<script src="@routes.Assets.versioned("../../public/javascripts/checkUsername.js")" type="text/javascript"></script>

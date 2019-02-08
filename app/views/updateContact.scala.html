@@ -1,5 +1,5 @@
 @import helper._
-@import views.forms.UpdateContact
+@import views.companion.master.UpdateContact
 
 @(updateContactForm: Form[UpdateContact.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
     @common(Messages("Welcome")) {

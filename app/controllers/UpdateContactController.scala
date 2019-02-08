@@ -5,7 +5,7 @@ import javax.inject.Inject
 import models.master.Contacts
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
-import views.forms._
+import views.companion.master.UpdateContact
 
 import scala.concurrent.ExecutionContext
 

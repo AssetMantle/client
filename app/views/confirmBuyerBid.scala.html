@@ -1,0 +1,21 @@
+@import helper._
+@import views.companion.blockchain.ConfirmBuyerBid
+
+@(confirmBuyerBidForm: Form[ConfirmBuyerBid.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@common(Messages("Welcome")) {
+    @form(action = routes.SignUpController.signUp) {
+        @CSRF.formField
+        @inputText(confirmBuyerBidForm(Messages("Username")), 'id -> "username") <label id="result"></label>
+        @inputPassword(confirmBuyerBidForm(Messages("Password")))
+
+        @if(confirmBuyerBidForm.hasGlobalErrors) {
+            <ul>
+            @for(error <- confirmBuyerBidForm.globalErrors) {
+                <li>@error.format</li>
+            }
+            </ul>
+        }
+        <button type="submit">@Messages("SignUp")</button>
+    }
+}
+<script src="@routes.Assets.versioned("../../public/javascripts/checkUsername.js")" type="text/javascript"></script>
