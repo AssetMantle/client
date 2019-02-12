@@ -22,8 +22,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
       },
       addOrganizationData => {
         try {
-          transactionAddOrganization.Service.post(new transactionAddOrganization.Request(addOrganizationData.from, addOrganizationData.to, addOrganizationData.organizationID))
-          Ok("")
+          Ok(views.html.index(success = transactionAddOrganization.Service.post(new transactionAddOrganization.Request(addOrganizationData.from, addOrganizationData.to, addOrganizationData.organizationID, addOrganizationData.chainID, addOrganizationData.password)).txHash))
         }
         catch {
           case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))

@@ -7,12 +7,14 @@ object AddOrganization {
 
   val form = Form(
     mapping(
-      "from" -> nonEmptyText(),
-      "to" -> nonEmptyText(),
-      "organizationID" -> nonEmptyText()
+      "from" -> nonEmptyText,
+      "to" -> nonEmptyText,
+      "organizationID" -> nonEmptyText,
+      "chainID" -> nonEmptyText,
+      "password" -> nonEmptyText
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(from: String, to: String, organizationID: String)
+  case class Data(from: String, to: String, organizationID: String, chainID: String, password: String)
 
 }

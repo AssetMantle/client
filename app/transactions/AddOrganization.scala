@@ -29,16 +29,19 @@ class AddOrganization @Inject()(configuration: Configuration, wsClient: WSClient
 
   class Response(implicit response: WSResponse) {
 
-    val accountAddress: String = utilities.JSON.getBCStringResponse("address")
-    val publicKey: String = utilities.JSON.getBCStringResponse("pub_key")
+    val txHash: String = utilities.JSON.getBCStringResponse("TxHash")
+
   }
 
 
-  class Request(from: String, to: String, organizationID: String) {
+  class Request(from: String, to: String, organizationID: String, chainID: String, password: String) {
     val json: JsObject = Json.obj(fields =
       "from" -> from,
       "to" -> to,
-      "organizationID" -> organizationID)
+      "organizationID" -> organizationID,
+      "chainID" -> chainID,
+      "password" -> password
+    )
   }
 
   object Service {
