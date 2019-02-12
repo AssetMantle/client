@@ -1,16 +1,15 @@
 package controllers
 
-import controllers.results.WithUsernameToken
-import exceptions.BaseException
+import exceptions.{BaseException, BlockChainException}
 import javax.inject.Inject
-import models.master.Accounts
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
+import transactions.AddKey
 import views.companion.blockchain.AddKey
 
 import scala.concurrent.ExecutionContext
 
-class AddKeyController @Inject()(messagesControllerComponents: MessagesControllerComponents, accounts: Accounts, withUsernameToken: WithUsernameToken)(implicit exec: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class AddKeyController @Inject()(messagesControllerComponents: MessagesControllerComponents, transactionAddKey: AddKey)(implicit exec: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   def addKeyForm: Action[AnyContent] = Action { implicit request =>
     Ok(views.html.addKey(AddKey.form))
@@ -23,10 +22,11 @@ class AddKeyController @Inject()(messagesControllerComponents: MessagesControlle
       },
       addKeyData => {
         try {
-          Ok("") //   if (accounts.Service.validateLogin(addKeyData.username, addKeyData.password)) withUsernameToken.Ok(views.html.index(success = "Logged In!"), addKeyData.username) else Ok(views.html.index(failure = "Invalid Login!"))
+          Ok(views.html.index(success = Messages(constants.Success.ADD_KEY) + transactionAddKey.Service.post(new transactionAddKey.Request(addKeyData.name, addKeyData.password, addKeyData.seed)).accountAddress))
         }
         catch {
           case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))
+          case blockChainException: BlockChainException => Ok(views.html.index(failure = blockChainException.message))
         }
       })
   }

@@ -21,7 +21,7 @@ class IssueFiat @Inject()(configuration: Configuration, wsClient: WSClient, exec
 
   private val port = configuration.get[String]("blockchain.main.port")
 
-  private val path = "keys"
+  private val path = "issueFiat"
 
   private val url = ip + ":" + port + "/" + path
 

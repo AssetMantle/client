@@ -2,11 +2,15 @@
 @import views.companion.blockchain.ReleaseAsset
 
 @(releaseAssetForm: Form[ReleaseAsset.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages("Welcome")) {
-    @form(action = routes.SignUpController.signUp) {
+@common(Messages("ReleaseAsset")) {
+    @form(action = routes.ReleaseAssetController.releaseAsset) {
         @CSRF.formField
-        @inputText(releaseAssetForm(Messages("Username")), 'id -> "username") <label id="result"></label>
-        @inputPassword(releaseAssetForm(Messages("Password")))
+        @inputText(releaseAssetForm(Messages("from")))
+        @inputText(releaseAssetForm(Messages("to")))
+        @inputText(releaseAssetForm(Messages("pegHash")))
+        @inputText(releaseAssetForm(Messages("chainID")))
+        @inputText(releaseAssetForm(Messages("password")))
+        @inputText(releaseAssetForm(Messages("gas")))
 
         @if(releaseAssetForm.hasGlobalErrors) {
             <ul>
@@ -15,7 +19,6 @@
             }
             </ul>
         }
-        <button type="submit">@Messages("SignUp")</button>
+        <button type="submit">@Messages("ReleaseAsset")</button>
     }
 }
-<script src="@routes.Assets.versioned("../../public/javascripts/checkUsername.js")" type="text/javascript"></script>

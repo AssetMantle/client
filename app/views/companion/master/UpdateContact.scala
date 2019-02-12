@@ -7,8 +7,8 @@ object UpdateContact {
 
   val form = Form(
     mapping(
-      "EmailAddress" -> email,
-      "MobileNumber" -> nonEmptyText(minLength = 10, maxLength = 10)
+      "emailAddress" -> email,
+      "mobileNumber" -> nonEmptyText(minLength = 10, maxLength = 10)
     )(Data.apply)(Data.unapply)
   )
 

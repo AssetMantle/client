@@ -35,8 +35,6 @@ class Contacts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
     def * = (id, mobileNumber, mobileNumberVerified, emailAddress, emailAddressVerified) <> (Contact.tupled, Contact.unapply)
 
-    def ? = (id.?, mobileNumber.?, mobileNumberVerified.?, emailAddress.?, emailAddressVerified.?).shaped.<>({ r => import r._; _1.map(_ => Contact.tupled((_1.get, _2.get, _3.get, _4.get, _5.get))) }, (_: Any) => throw new Exception("Inserting into ? projection not supported."))
-
     def id = column[String]("id", O.PrimaryKey)
 
     def mobileNumber = column[String]("mobileNumber")
@@ -46,6 +44,8 @@ class Contacts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     def emailAddress = column[String]("emailAddress")
 
     def emailAddressVerified = column[Boolean]("emailAddressVerified")
+
+    def ? = (id.?, mobileNumber.?, mobileNumberVerified.?, emailAddress.?, emailAddressVerified.?).shaped.<>({ r => import r._; _1.map(_ => Contact.tupled((_1.get, _2.get, _3.get, _4.get, _5.get))) }, (_: Any) => throw new Exception("Inserting into ? projection not supported."))
 
   }
 

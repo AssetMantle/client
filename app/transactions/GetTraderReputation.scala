@@ -20,7 +20,7 @@ class GetTraderReputation @Inject()(configuration: Configuration, wsClient: WSCl
 
   private val port = configuration.get[String]("blockchain.main.port")
 
-  private val path = "keys/seed"
+  private val path = "reputation"
 
   private val url = ip + ":" + port + "/" + path
 

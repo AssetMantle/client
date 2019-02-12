@@ -21,7 +21,7 @@ class ConfirmSellerBid @Inject()(configuration: Configuration, wsClient: WSClien
 
   private val port = configuration.get[String]("blockchain.main.port")
 
-  private val path = "keys"
+  private val path = "confirmSellerBid"
 
   private val url = ip + ":" + port + "/" + path
 

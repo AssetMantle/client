@@ -1,16 +1,15 @@
 package controllers
 
-import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.Inject
-import models.master.Accounts
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
+import transactions.ChangeSellerBid
 import views.companion.blockchain.ChangeSellerBid
 
 import scala.concurrent.ExecutionContext
 
-class ChangeSellerBidController @Inject()(messagesControllerComponents: MessagesControllerComponents, accounts: Accounts, withUsernameToken: WithUsernameToken)(implicit exec: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class ChangeSellerBidController @Inject()(messagesControllerComponents: MessagesControllerComponents, transactionChangeSellerBid: ChangeSellerBid)(implicit exec: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   def changeSellerBidForm: Action[AnyContent] = Action { implicit request =>
     Ok(views.html.changeSellerBid(ChangeSellerBid.form))
@@ -23,7 +22,8 @@ class ChangeSellerBidController @Inject()(messagesControllerComponents: Messages
       },
       changeSellerBidData => {
         try {
-          Ok("") //if (accounts.Service.validateLogin(loginData.username, loginData.password)) withUsernameToken.Ok(views.html.index(success = "Logged In!"), loginData.username) else Ok(views.html.index(failure = "Invalid Login!"))
+          transactionChangeSellerBid.Service.post(new transactionChangeSellerBid.Request(changeSellerBidData.from, changeSellerBidData.password, changeSellerBidData.to, changeSellerBidData.bid, changeSellerBidData.time, changeSellerBidData.pegHash, changeSellerBidData.chainID, changeSellerBidData.gas))
+          Ok("")
         }
         catch {
           case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))

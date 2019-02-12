@@ -1,16 +1,15 @@
 package controllers
 
-import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.Inject
-import models.master.Accounts
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
+import transactions.RedeemFiat
 import views.companion.blockchain.RedeemFiat
 
 import scala.concurrent.ExecutionContext
 
-class RedeemFiatController @Inject()(messagesControllerComponents: MessagesControllerComponents, accounts: Accounts, withUsernameToken: WithUsernameToken)(implicit exec: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class RedeemFiatController @Inject()(messagesControllerComponents: MessagesControllerComponents, transactionRedeemFiat: RedeemFiat)(implicit exec: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   def redeemFiatForm: Action[AnyContent] = Action { implicit request =>
     Ok(views.html.redeemFiat(RedeemFiat.form))
@@ -23,7 +22,8 @@ class RedeemFiatController @Inject()(messagesControllerComponents: MessagesContr
       },
       redeemFiatData => {
         try {
-          Ok("") //if (accounts.Service.validateLogin(loginData.username, loginData.password)) withUsernameToken.Ok(views.html.index(success = "Logged In!"), loginData.username) else Ok(views.html.index(failure = "Invalid Login!"))
+          transactionRedeemFiat.Service.post(new transactionRedeemFiat.Request(redeemFiatData.from, redeemFiatData.password, redeemFiatData.to, redeemFiatData.redeemAmount, redeemFiatData.chainID, redeemFiatData.gas))
+          Ok("")
         }
         catch {
           case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))

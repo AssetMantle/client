@@ -20,7 +20,7 @@ class GetZone @Inject()(configuration: Configuration, wsClient: WSClient, execut
 
   private val port = configuration.get[String]("blockchain.main.port")
 
-  private val path = "keys/seed"
+  private val path = "zone"
 
   private val url = ip + ":" + port + "/" + path
 

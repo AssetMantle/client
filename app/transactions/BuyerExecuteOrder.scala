@@ -21,7 +21,7 @@ class BuyerExecuteOrder @Inject()(configuration: Configuration, wsClient: WSClie
 
   private val port = configuration.get[String]("blockchain.main.port")
 
-  private val path = "keys"
+  private val path = "buyerExecuteOrder"
 
   private val url = ip + ":" + port + "/" + path
 

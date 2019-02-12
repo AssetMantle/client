@@ -7,7 +7,7 @@ object VerifyEmailAddress {
 
   val form = Form(
     mapping(
-      "OTP" -> nonEmptyText(minLength = 6, maxLength = 6),
+      "otp" -> nonEmptyText(minLength = 6, maxLength = 6),
     )(Data.apply)(Data.unapply)
   )
 

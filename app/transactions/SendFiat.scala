@@ -21,7 +21,7 @@ class SendFiat @Inject()(configuration: Configuration, wsClient: WSClient, execu
 
   private val port = configuration.get[String]("blockchain.main.port")
 
-  private val path = "keys"
+  private val path = "sendFiat"
 
   private val url = ip + ":" + port + "/" + path
 

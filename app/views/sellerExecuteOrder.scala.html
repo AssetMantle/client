@@ -2,11 +2,17 @@
 @import views.companion.blockchain.SellerExecuteOrder
 
 @(sellerExecuteOrderForm: Form[SellerExecuteOrder.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages("Welcome")) {
-    @form(action = routes.SignUpController.signUp) {
+@common(Messages("SellerExecuteOrder")) {
+    @form(action = routes.SellerExecuteOrderController.sellerExecuteOrder) {
         @CSRF.formField
-        @inputText(sellerExecuteOrderForm(Messages("Username")), 'id -> "username") <label id="result"></label>
-        @inputPassword(sellerExecuteOrderForm(Messages("Password")))
+        @inputPassword(sellerExecuteOrderForm(Messages("from")))
+        @inputPassword(sellerExecuteOrderForm(Messages("password")))
+        @inputPassword(sellerExecuteOrderForm(Messages("buyerAddress")))
+        @inputPassword(sellerExecuteOrderForm(Messages("sellerAddress")))
+        @inputPassword(sellerExecuteOrderForm(Messages("awbProofHash")))
+        @inputPassword(sellerExecuteOrderForm(Messages("pegHash")))
+        @inputPassword(sellerExecuteOrderForm(Messages("chainID")))
+        @inputPassword(sellerExecuteOrderForm(Messages("gas")))
 
         @if(sellerExecuteOrderForm.hasGlobalErrors) {
             <ul>
@@ -15,7 +21,6 @@
             }
             </ul>
         }
-        <button type="submit">@Messages("SignUp")</button>
+        <button type="submit">@Messages("SellerExecuteOrder")</button>
     }
 }
-<script src="@routes.Assets.versioned("../../public/javascripts/checkUsername.js")" type="text/javascript"></script>

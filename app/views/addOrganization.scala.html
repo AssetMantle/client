@@ -2,11 +2,13 @@
 @import views.companion.blockchain.AddOrganization
 
 @(addOrganizationForm: Form[AddOrganization.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages("Welcome")) {
-    @form(action = routes.SignUpController.signUp) {
+@common(Messages("AddOrganization")) {
+    @form(action = routes.AddOrganizationController.addOrganization) {
         @CSRF.formField
-        @inputText(addOrganizationForm(Messages("Username")), 'id -> "username") <label id="result"></label>
-        @inputPassword(addOrganizationForm(Messages("Password")))
+        @inputText(addOrganizationForm(Messages("from")))
+        @inputText(addOrganizationForm(Messages("to")))
+        @inputText(addOrganizationForm(Messages("organizationID")))
+
 
         @if(addOrganizationForm.hasGlobalErrors) {
             <ul>
@@ -15,7 +17,6 @@
             }
             </ul>
         }
-        <button type="submit">@Messages("SignUp")</button>
+        <button type="submit">@Messages("AddOrganization")</button>
     }
 }
-<script src="@routes.Assets.versioned("../../public/javascripts/checkUsername.js")" type="text/javascript"></script>

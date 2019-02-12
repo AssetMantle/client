@@ -1,16 +1,15 @@
 package controllers
 
-import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.Inject
-import models.master.Accounts
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
+import transactions.IssueFiat
 import views.companion.blockchain.IssueFiat
 
 import scala.concurrent.ExecutionContext
 
-class IssueFiatController @Inject()(messagesControllerComponents: MessagesControllerComponents, accounts: Accounts, withUsernameToken: WithUsernameToken)(implicit exec: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class IssueFiatController @Inject()(messagesControllerComponents: MessagesControllerComponents, transactionIssueFiat: IssueFiat)(implicit exec: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   def issueFiatForm: Action[AnyContent] = Action { implicit request =>
     Ok(views.html.issueFiat(IssueFiat.form))
@@ -21,9 +20,11 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
       formWithErrors => {
         BadRequest(views.html.issueFiat(formWithErrors))
       },
-      loginData => {
+      issueFiatData => {
         try {
-          Ok("") //if (accounts.Service.validateLogin(loginData.username, loginData.password)) withUsernameToken.Ok(views.html.index(success = "Logged In!"), loginData.username) else Ok(views.html.index(failure = "Invalid Login!"))
+          transactionIssueFiat.Service.post(new transactionIssueFiat.Request(issueFiatData.from, issueFiatData.to, issueFiatData.transactionID, issueFiatData.transactionAmount, issueFiatData.chainID, issueFiatData.password, issueFiatData.gas))
+
+          Ok("")
         }
         catch {
           case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))

@@ -1,16 +1,15 @@
 package controllers
 
-import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.Inject
-import models.master.Accounts
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
+import transactions.ConfirmBuyerBid
 import views.companion.blockchain.ConfirmBuyerBid
 
 import scala.concurrent.ExecutionContext
 
-class ConfirmBuyerBidController @Inject()(messagesControllerComponents: MessagesControllerComponents, accounts: Accounts, withUsernameToken: WithUsernameToken)(implicit exec: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class ConfirmBuyerBidController @Inject()(messagesControllerComponents: MessagesControllerComponents, transactionConfirmBuyerBid: ConfirmBuyerBid)(implicit exec: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   def confirmBuyerBidForm: Action[AnyContent] = Action { implicit request =>
     Ok(views.html.confirmBuyerBid(ConfirmBuyerBid.form))
@@ -23,7 +22,8 @@ class ConfirmBuyerBidController @Inject()(messagesControllerComponents: Messages
       },
       confirmBuyerBidData => {
         try {
-          Ok("") //if (accounts.Service.validateLogin(loginData.username, loginData.password)) withUsernameToken.Ok(views.html.index(success = "Logged In!"), loginData.username) else Ok(views.html.index(failure = "Invalid Login!"))
+          transactionConfirmBuyerBid.Service.post(new transactionConfirmBuyerBid.Request(confirmBuyerBidData.from, confirmBuyerBidData.password, confirmBuyerBidData.to, confirmBuyerBidData.bid, confirmBuyerBidData.time, confirmBuyerBidData.pegHash, confirmBuyerBidData.chainID, confirmBuyerBidData.gas))
+          Ok("")
         }
         catch {
           case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))

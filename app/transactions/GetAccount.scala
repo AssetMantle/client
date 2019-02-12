@@ -20,7 +20,7 @@ class GetAccount @Inject()(configuration: Configuration, wsClient: WSClient, exe
 
   private val port = configuration.get[String]("blockchain.main.port")
 
-  private val path = "keys/seed"
+  private val path = "accounts"
 
   private val url = ip + ":" + port + "/" + path
 

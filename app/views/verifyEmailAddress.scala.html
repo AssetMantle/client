@@ -2,10 +2,10 @@
 @import views.companion.master.VerifyEmailAddress
 
 @(verifyEmailAddressForm: Form[VerifyEmailAddress.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-    @common(Messages("Welcome")) {
+    @common(Messages("VerifyEmailAddress")) {
         @form(action = routes.VerifyEmailAddressController.verifyEmailAddress) {
             @CSRF.formField
-            @inputText(verifyEmailAddressForm(Messages("OTP")))
+            @inputText(verifyEmailAddressForm(Messages("otp")))
 
             @if(verifyEmailAddressForm.hasGlobalErrors) {
                 <ul>

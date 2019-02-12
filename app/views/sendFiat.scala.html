@@ -2,11 +2,16 @@
 @import views.companion.blockchain.SendFiat
 
 @(sendFiatForm: Form[SendFiat.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages("Welcome")) {
-    @form(action = routes.SignUpController.signUp) {
+@common(Messages("SendFiat")) {
+    @form(action = routes.SendFiatController.sendFiat) {
         @CSRF.formField
-        @inputText(sendFiatForm(Messages("Username")), 'id -> "username") <label id="result"></label>
-        @inputPassword(sendFiatForm(Messages("Password")))
+        @inputText(sendFiatForm(Messages("from")))
+        @inputText(sendFiatForm(Messages("password")))
+        @inputText(sendFiatForm(Messages("Tto")))
+        @inputText(sendFiatForm(Messages("amount")))
+        @inputText(sendFiatForm(Messages("pegHash")))
+        @inputText(sendFiatForm(Messages("chainID")))
+        @inputText(sendFiatForm(Messages("gas")))
 
         @if(sendFiatForm.hasGlobalErrors) {
             <ul>
@@ -15,7 +20,6 @@
             }
             </ul>
         }
-        <button type="submit">@Messages("SignUp")</button>
+        <button type="submit">@Messages("SendFiat")</button>
     }
 }
-<script src="@routes.Assets.versioned("../../public/javascripts/checkUsername.js")" type="text/javascript"></script>

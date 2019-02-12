@@ -2,11 +2,17 @@
 @import views.companion.blockchain.ConfirmSellerBid
 
 @(confirmSellerBidForm: Form[ConfirmSellerBid.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages("Welcome")) {
-    @form(action = routes.SignUpController.signUp) {
+@common(Messages("ConfirmSellerBid")) {
+    @form(action = routes.ConfirmSellerBidController.confirmSellerBid) {
         @CSRF.formField
-        @inputText(confirmSellerBidForm(Messages("Username")), 'id -> "username") <label id="result"></label>
-        @inputPassword(confirmSellerBidForm(Messages("Password")))
+        @inputText(confirmSellerBidForm(Messages("from")))
+        @inputText(confirmSellerBidForm(Messages("password")))
+        @inputText(confirmSellerBidForm(Messages("to")))
+        @inputText(confirmSellerBidForm(Messages("bid")))
+        @inputText(confirmSellerBidForm(Messages("time")))
+        @inputText(confirmSellerBidForm(Messages("pegHash")))
+        @inputText(confirmSellerBidForm(Messages("chainID")))
+        @inputText(confirmSellerBidForm(Messages("gas")))
 
         @if(confirmSellerBidForm.hasGlobalErrors) {
             <ul>
@@ -15,7 +21,6 @@
             }
             </ul>
         }
-        <button type="submit">@Messages("SignUp")</button>
+        <button type="submit">@Messages("ConfirmSellerBid")</button>
     }
 }
-<script src="@routes.Assets.versioned("../../public/javascripts/checkUsername.js")" type="text/javascript"></script>

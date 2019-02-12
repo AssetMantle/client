@@ -21,7 +21,7 @@ class RedeemAsset @Inject()(configuration: Configuration, wsClient: WSClient, ex
 
   private val port = configuration.get[String]("blockchain.main.port")
 
-  private val path = "keys"
+  private val path = "redeemAsset"
 
   private val url = ip + ":" + port + "/" + path
 

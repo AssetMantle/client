@@ -20,7 +20,7 @@ class GetOrganization @Inject()(configuration: Configuration, wsClient: WSClient
 
   private val port = configuration.get[String]("blockchain.main.port")
 
-  private val path = "keys/seed"
+  private val path = "organization"
 
   private val url = ip + ":" + port + "/" + path
 

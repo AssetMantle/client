@@ -21,7 +21,7 @@ class ReleaseAsset @Inject()(configuration: Configuration, wsClient: WSClient, e
 
   private val port = configuration.get[String]("blockchain.main.port")
 
-  private val path = "keys"
+  private val path = "releaseAsset"
 
   private val url = ip + ":" + port + "/" + path
 

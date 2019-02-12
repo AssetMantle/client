@@ -1,16 +1,15 @@
 package controllers
 
-import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.Inject
-import models.master.Accounts
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
+import transactions.SetBuyerFeedback
 import views.companion.blockchain.SetBuyerFeedback
 
 import scala.concurrent.ExecutionContext
 
-class SetBuyerFeedbackController @Inject()(messagesControllerComponents: MessagesControllerComponents, accounts: Accounts, withUsernameToken: WithUsernameToken)(implicit exec: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class SetBuyerFeedbackController @Inject()(messagesControllerComponents: MessagesControllerComponents, transactionSetBuyerFeedback: SetBuyerFeedback)(implicit exec: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   def setBuyerFeedbackForm: Action[AnyContent] = Action { implicit request =>
     Ok(views.html.setBuyerFeedback(SetBuyerFeedback.form))
@@ -23,7 +22,8 @@ class SetBuyerFeedbackController @Inject()(messagesControllerComponents: Message
       },
       setBuyerFeedbackData => {
         try {
-          Ok("") //if (accounts.Service.validateLogin(loginData.username, loginData.password)) withUsernameToken.Ok(views.html.index(success = "Logged In!"), loginData.username) else Ok(views.html.index(failure = "Invalid Login!"))
+          transactionSetBuyerFeedback.Service.post(new transactionSetBuyerFeedback.Request(setBuyerFeedbackData.from, setBuyerFeedbackData.password, setBuyerFeedbackData.to, setBuyerFeedbackData.pegHash, setBuyerFeedbackData.rating, setBuyerFeedbackData.chainID, setBuyerFeedbackData.gas))
+          Ok("")
         }
         catch {
           case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))

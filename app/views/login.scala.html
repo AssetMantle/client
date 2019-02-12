@@ -2,11 +2,11 @@
 @import views.companion.master.Login
 
 @(loginForm: Form[Login.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-    @common(Messages("Welcome")) {
+    @common(Messages("Login")) {
         @form(action = routes.LoginController.login) {
             @CSRF.formField
-            @inputText(loginForm(Messages("Username")))
-            @inputPassword(loginForm(Messages("Password")))
+            @inputText(loginForm(Messages("username")))
+            @inputPassword(loginForm(Messages("password")))
 
             @if(loginForm.hasGlobalErrors) {
                 <ul>

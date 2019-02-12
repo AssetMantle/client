@@ -1,16 +1,15 @@
 package controllers
 
-import controllers.results.WithUsernameToken
-import exceptions.BaseException
+import exceptions.{BaseException, BlockChainException}
 import javax.inject.Inject
-import models.master.Accounts
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
+import transactions.AddZone
 import views.companion.blockchain.AddZone
 
 import scala.concurrent.ExecutionContext
 
-class AddZoneController @Inject()(messagesControllerComponents: MessagesControllerComponents, accounts: Accounts, withUsernameToken: WithUsernameToken)(implicit exec: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class AddZoneController @Inject()(messagesControllerComponents: MessagesControllerComponents, transactionAddZone: AddZone)(implicit exec: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   def addZoneForm: Action[AnyContent] = Action { implicit request =>
     Ok(views.html.addZone(AddZone.form))
@@ -23,10 +22,12 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
       },
       addZoneData => {
         try {
-          Ok("") //if (accounts.Service.validateLogin(loginData.username, loginData.password)) withUsernameToken.Ok(views.html.index(success = "Logged In!"), loginData.username) else Ok(views.html.index(failure = "Invalid Login!"))
+          transactionAddZone.Service.post(new transactionAddZone.Request(addZoneData.from, addZoneData.to, addZoneData.zoneID, addZoneData.chainID, addZoneData.password))
+          Ok("")
         }
         catch {
           case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))
+          case blockChainException: BlockChainException => Ok(views.html.index(failure = blockChainException.message))
         }
       })
   }

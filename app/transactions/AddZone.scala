@@ -21,7 +21,7 @@ class AddZone @Inject()(configuration: Configuration, wsClient: WSClient, execut
 
   private val port = configuration.get[String]("blockchain.main.port")
 
-  private val path = "keys"
+  private val path = "defineZone"
 
   private val url = ip + ":" + port + "/" + path
 
