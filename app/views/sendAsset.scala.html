@@ -6,11 +6,11 @@
     @form(action = routes.SendAssetController.sendAsset) {
         @CSRF.formField
         @inputText(sendAssetForm(Messages("from")))
-        @inputText(sendAssetForm(Messages("password")))
         @inputText(sendAssetForm(Messages("to")))
         @inputText(sendAssetForm(Messages("pegHash")))
         @inputText(sendAssetForm(Messages("chainID")))
         @inputText(sendAssetForm(Messages("gas")))
+        @inputPassword(sendAssetForm(Messages("password")))
 
         @if(sendAssetForm.hasGlobalErrors) {
             <ul>

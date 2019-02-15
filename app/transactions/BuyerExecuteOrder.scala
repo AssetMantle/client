@@ -29,8 +29,8 @@ class BuyerExecuteOrder @Inject()(configuration: Configuration, wsClient: WSClie
 
   class Response(implicit response: WSResponse) {
 
-    val accountAddress: String = utilities.JSON.getBCStringResponse("address")
-    val publicKey: String = utilities.JSON.getBCStringResponse("pub_key")
+    val txHash: String = utilities.JSON.getBCStringResponse("TxHash")
+
   }
 
 

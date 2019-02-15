@@ -9,7 +9,7 @@
         @inputText(addZoneForm(Messages("to")))
         @inputText(addZoneForm(Messages("zoneID")))
         @inputText(addZoneForm(Messages("chainID")))
-        @inputText(addZoneForm(Messages("password")))
+        @inputPassword(addZoneForm(Messages("password")))
 
         @if(addZoneForm.hasGlobalErrors) {
             <ul>

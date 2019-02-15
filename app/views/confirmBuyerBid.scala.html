@@ -5,14 +5,14 @@
 @common(Messages("ConfirmBuyerBid")) {
     @form(action = routes.ConfirmBuyerBidController.confirmBuyerBid) {
         @CSRF.formField
-        @inputPassword(confirmBuyerBidForm(Messages("from")))
+        @inputText(confirmBuyerBidForm(Messages("from")))
+        @inputText(confirmBuyerBidForm(Messages("to")))
+        @inputText(confirmBuyerBidForm(Messages("bid")))
+        @inputText(confirmBuyerBidForm(Messages("time")))
+        @inputText(confirmBuyerBidForm(Messages("pegHash")))
+        @inputText(confirmBuyerBidForm(Messages("chainID")))
+        @inputText(confirmBuyerBidForm(Messages("gas")))
         @inputPassword(confirmBuyerBidForm(Messages("password")))
-        @inputPassword(confirmBuyerBidForm(Messages("to")))
-        @inputPassword(confirmBuyerBidForm(Messages("bid")))
-        @inputPassword(confirmBuyerBidForm(Messages("time")))
-        @inputPassword(confirmBuyerBidForm(Messages("pegHash")))
-        @inputPassword(confirmBuyerBidForm(Messages("chainID")))
-        @inputPassword(confirmBuyerBidForm(Messages("gas")))
 
         @if(confirmBuyerBidForm.hasGlobalErrors) {
             <ul>

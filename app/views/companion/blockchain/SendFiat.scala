@@ -6,13 +6,13 @@ import play.api.data.Forms._
 object SendFiat {
   val form = Form(
     mapping(
-      "from" -> nonEmptyText,
-      "password" -> nonEmptyText,
-      "to" -> nonEmptyText,
-      "amount" -> number,
-      "pegHash" -> nonEmptyText,
-      "chainID" -> nonEmptyText,
-      "gas" -> number
+      "from" -> nonEmptyText(minLength = 1, maxLength = 20),
+      "password" -> nonEmptyText(minLength = 1, maxLength = 20),
+      "to" -> nonEmptyText(minLength = 1, maxLength = 45),
+      "amount" -> number(min = 1, max = 10000),
+      "pegHash" -> nonEmptyText(minLength = 1, maxLength = 20),
+      "chainID" -> nonEmptyText(minLength = 1, maxLength = 20),
+      "gas" -> number(min = 1, max = 10000)
     )(Data.apply)(Data.unapply)
   )
 

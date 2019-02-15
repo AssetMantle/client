@@ -5,13 +5,13 @@
 @common(Messages("SetBuyerFeedback")) {
     @form(action = routes.SetBuyerFeedbackController.setBuyerFeedback) {
         @CSRF.formField
-        @inputPassword(setBuyerFeedbackForm(Messages("from")))
+        @inputText(setBuyerFeedbackForm(Messages("from")))
+        @inputText(setBuyerFeedbackForm(Messages("to")))
+        @inputText(setBuyerFeedbackForm(Messages("pegHash")))
+        @inputText(setBuyerFeedbackForm(Messages("rating")))
+        @inputText(setBuyerFeedbackForm(Messages("chainID")))
+        @inputText(setBuyerFeedbackForm(Messages("gas")))
         @inputPassword(setBuyerFeedbackForm(Messages("password")))
-        @inputPassword(setBuyerFeedbackForm(Messages("to")))
-        @inputPassword(setBuyerFeedbackForm(Messages("pegHash")))
-        @inputPassword(setBuyerFeedbackForm(Messages("rating")))
-        @inputPassword(setBuyerFeedbackForm(Messages("chainID")))
-        @inputPassword(setBuyerFeedbackForm(Messages("gas")))
 
         @if(setBuyerFeedbackForm.hasGlobalErrors) {
             <ul>

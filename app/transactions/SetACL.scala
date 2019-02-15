@@ -11,7 +11,7 @@ import play.api.{Configuration, Logger}
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 
-class ChangeBuyerBid @Inject()(configuration: Configuration, wsClient: WSClient, executionContext: ExecutionContext) {
+class SetACL @Inject()(configuration: Configuration, wsClient: WSClient, executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.TRANSACTIONS_ADD_KEY
 
@@ -21,7 +21,7 @@ class ChangeBuyerBid @Inject()(configuration: Configuration, wsClient: WSClient,
 
   private val port = configuration.get[String]("blockchain.main.port")
 
-  private val path = "changeBuyerBid"
+  private val path = "defineACL"
 
   private val url = ip + ":" + port + "/" + path
 
@@ -34,16 +34,30 @@ class ChangeBuyerBid @Inject()(configuration: Configuration, wsClient: WSClient,
   }
 
 
-  class Request(from: String, password: String, to: String, bid: Int, time: Int, pegHash: String, chainID: String, gas: Int) {
+  class Request(from: String, password: String, aclAddress: String, organizationID: String, zoneID: String, chainID: String, issueAsset: String, issueFiat: String, sendAsset: String, sendFiat: String, redeemAsset: String, redeemFiat: String, sellerExecuteOrder: String, buyerExecuteOrder: String, changeBuyerBid: String, changeSellerBid: String, confirmBuyerBid: String, confirmSellerBid: String, negotiation: String, releaseAssets: String) {
     val json: JsObject = Json.obj(fields =
       "from" -> from,
       "password" -> password,
-      "to" -> to,
-      "bid" -> bid,
-      "time" -> time,
-      "pegHash" -> pegHash,
+      "aclAddress" -> aclAddress,
+      "organizationID" -> organizationID,
+      "zoneID" -> zoneID,
       "chainID" -> chainID,
-      "gas" -> gas
+      "issueAsset" -> issueAsset,
+      "issueFiat" -> issueFiat,
+      "sendAsset" -> sendAsset,
+      "sendFiat" -> sendFiat,
+      "redeemAssets" -> redeemAsset,
+      "redeemFiats" -> redeemFiat,
+      "sellerExecuteOrder" -> sellerExecuteOrder,
+      "buyerExecuteOrder" -> buyerExecuteOrder,
+      "changeBuyerBid" -> changeBuyerBid,
+      "changeSellerBid" -> changeSellerBid,
+      "confirmBuyerBid" -> confirmBuyerBid,
+      "confirmSellerBid" -> confirmSellerBid,
+      "negotiation" -> negotiation,
+      "releaseAssets" -> releaseAssets
+
+
     )
   }
 

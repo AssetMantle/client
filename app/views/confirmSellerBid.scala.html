@@ -6,13 +6,13 @@
     @form(action = routes.ConfirmSellerBidController.confirmSellerBid) {
         @CSRF.formField
         @inputText(confirmSellerBidForm(Messages("from")))
-        @inputText(confirmSellerBidForm(Messages("password")))
         @inputText(confirmSellerBidForm(Messages("to")))
         @inputText(confirmSellerBidForm(Messages("bid")))
         @inputText(confirmSellerBidForm(Messages("time")))
         @inputText(confirmSellerBidForm(Messages("pegHash")))
         @inputText(confirmSellerBidForm(Messages("chainID")))
         @inputText(confirmSellerBidForm(Messages("gas")))
+        @inputPassword(confirmSellerBidForm(Messages("password")))
 
         @if(confirmSellerBidForm.hasGlobalErrors) {
             <ul>

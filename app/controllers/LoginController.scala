@@ -1,7 +1,7 @@
 package controllers
 
 import controllers.results.WithUsernameToken
-import exceptions.BaseException
+import exceptions.{BaseException, BlockChainException}
 import javax.inject.Inject
 import models.master.Accounts
 import play.api.i18n.{I18nSupport, Messages}
@@ -27,6 +27,7 @@ class LoginController @Inject()(messagesControllerComponents: MessagesController
         }
         catch {
           case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))
+          case blockChainException: BlockChainException => Ok(views.html.index(failure = blockChainException.message))
         }
       })
   }

@@ -6,12 +6,12 @@
     @form(action = routes.SetSellerFeedbackController.setSellerFeedback) {
         @CSRF.formField
         @inputText(setSellerFeedbackForm(Messages("from")))
-        @inputText(setSellerFeedbackForm(Messages("password")))
         @inputText(setSellerFeedbackForm(Messages("to")))
         @inputText(setSellerFeedbackForm(Messages("pegHash")))
         @inputText(setSellerFeedbackForm(Messages("rating")))
         @inputText(setSellerFeedbackForm(Messages("chainID")))
         @inputText(setSellerFeedbackForm(Messages("gas")))
+        @inputPassword(setSellerFeedbackForm(Messages("password")))
 
         @if(setSellerFeedbackForm.hasGlobalErrors) {
             <ul>

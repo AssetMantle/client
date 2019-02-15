@@ -10,8 +10,8 @@
         @inputText(issueFiatForm(Messages("transactionID")))
         @inputText(issueFiatForm(Messages("transactionAmount")))
         @inputText(issueFiatForm(Messages("chainID")))
-        @inputText(issueFiatForm(Messages("password")))
         @inputText(issueFiatForm(Messages("gas")))
+        @inputPassword(issueFiatForm(Messages("password")))
 
         @if(issueFiatForm.hasGlobalErrors) {
             <ul>

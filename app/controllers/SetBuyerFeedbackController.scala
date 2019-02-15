@@ -1,6 +1,6 @@
 package controllers
 
-import exceptions.BaseException
+import exceptions.{BaseException, BlockChainException}
 import javax.inject.Inject
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
@@ -22,11 +22,12 @@ class SetBuyerFeedbackController @Inject()(messagesControllerComponents: Message
       },
       setBuyerFeedbackData => {
         try {
-          transactionSetBuyerFeedback.Service.post(new transactionSetBuyerFeedback.Request(setBuyerFeedbackData.from, setBuyerFeedbackData.password, setBuyerFeedbackData.to, setBuyerFeedbackData.pegHash, setBuyerFeedbackData.rating, setBuyerFeedbackData.chainID, setBuyerFeedbackData.gas))
-          Ok("")
+          Ok(views.html.index(transactionSetBuyerFeedback.Service.post(new transactionSetBuyerFeedback.Request(setBuyerFeedbackData.from, setBuyerFeedbackData.password, setBuyerFeedbackData.to, setBuyerFeedbackData.pegHash, setBuyerFeedbackData.rating, setBuyerFeedbackData.chainID, setBuyerFeedbackData.gas)).txHash))
         }
         catch {
           case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))
+          case blockChainException: BlockChainException => Ok(views.html.index(failure = blockChainException.message))
+
         }
       })
   }

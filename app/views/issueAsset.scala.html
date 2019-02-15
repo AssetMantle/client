@@ -5,16 +5,16 @@
 @common(Messages("IssueAsset")) {
     @form(action = routes.IssueAssetController.issueAsset) {
         @CSRF.formField
-        @inputPassword(issueAssetForm(Messages("from")))
-        @inputPassword(issueAssetForm(Messages("to")))
-        @inputPassword(issueAssetForm(Messages("documentHash")))
-        @inputPassword(issueAssetForm(Messages("assetType")))
-        @inputPassword(issueAssetForm(Messages("assetPrice")))
-        @inputPassword(issueAssetForm(Messages("quantityUnit")))
-        @inputPassword(issueAssetForm(Messages("assetQuantity")))
-        @inputPassword(issueAssetForm(Messages("chainID")))
+        @inputText(issueAssetForm(Messages("from")))
+        @inputText(issueAssetForm(Messages("to")))
+        @inputText(issueAssetForm(Messages("documentHash")))
+        @inputText(issueAssetForm(Messages("assetType")))
+        @inputText(issueAssetForm(Messages("assetPrice")))
+        @inputText(issueAssetForm(Messages("quantityUnit")))
+        @inputText(issueAssetForm(Messages("assetQuantity")))
+        @inputText(issueAssetForm(Messages("chainID")))
+        @inputText(issueAssetForm(Messages("gas")))
         @inputPassword(issueAssetForm(Messages("password")))
-        @inputPassword(issueAssetForm(Messages("gas")))
 
         @if(issueAssetForm.hasGlobalErrors) {
             <ul>

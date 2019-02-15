@@ -21,7 +21,7 @@ class SetSellerFeedback @Inject()(configuration: Configuration, wsClient: WSClie
 
   private val port = configuration.get[String]("blockchain.main.port")
 
-  private val path = "setSellerFeedback"
+  private val path = "submitSellerFeedback"
 
   private val url = ip + ":" + port + "/" + path
 
@@ -29,8 +29,8 @@ class SetSellerFeedback @Inject()(configuration: Configuration, wsClient: WSClie
 
   class Response(implicit response: WSResponse) {
 
-    val accountAddress: String = utilities.JSON.getBCStringResponse("address")
-    val publicKey: String = utilities.JSON.getBCStringResponse("pub_key")
+    val txHash: String = utilities.JSON.getBCStringResponse("TxHash")
+
   }
 
 

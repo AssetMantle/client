@@ -1,6 +1,6 @@
 package controllers
 
-import exceptions.BaseException
+import exceptions.{BaseException, BlockChainException}
 import javax.inject.Inject
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
@@ -22,12 +22,12 @@ class ReleaseAssetController @Inject()(messagesControllerComponents: MessagesCon
       },
       releaseAssetData => {
         try {
-          transactionReleaseAsset.Service.post(new transactionReleaseAsset.Request(releaseAssetData.from, releaseAssetData.to, releaseAssetData.pegHash, releaseAssetData.chainID, releaseAssetData.password, releaseAssetData.gas))
-
-          Ok("")
+          Ok(views.html.index(transactionReleaseAsset.Service.post(new transactionReleaseAsset.Request(releaseAssetData.from, releaseAssetData.to, releaseAssetData.pegHash, releaseAssetData.chainID, releaseAssetData.password, releaseAssetData.gas)).txHash))
         }
         catch {
           case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))
+          case blockChainException: BlockChainException => Ok(views.html.index(failure = blockChainException.message))
+
         }
       })
   }

@@ -1,0 +1,40 @@
+@
+import helper._
+@
+import views.companion.blockchain.SetACL
+
+@(setACLForm: Form[SetACL.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@common(Messages("SetACL")) {
+    @form(action = routes.SetACLController.setACL) {
+        @CSRF.formField
+        @inputText(setACLForm(Messages("from")))
+        @inputText(setACLForm(Messages("aclAddress")))
+        @inputText(setACLForm(Messages("organizationID")))
+        @inputText(setACLForm(Messages("zoneID")))
+        @inputText(setACLForm(Messages("chainID")))
+        @inputText(setACLForm(Messages("issueAsset")))
+        @inputText(setACLForm(Messages("issueFiat")))
+        @inputText(setACLForm(Messages("sendAsset")))
+        @inputText(setACLForm(Messages("sendFiat")))
+        @inputText(setACLForm(Messages("redeemAssets")))
+        @inputText(setACLForm(Messages("redeemFiats")))
+        @inputText(setACLForm(Messages("sellerExecuteOrder")))
+        @inputText(setACLForm(Messages("buyerExecuteOrder")))
+        @inputText(setACLForm(Messages("changeBuyerBid")))
+        @inputText(setACLForm(Messages("changeSellerBid")))
+        @inputText(setACLForm(Messages("confirmBuyerBid")))
+        @inputText(setACLForm(Messages("confirmSellerBid")))
+        @inputText(setACLForm(Messages("negotiation")))
+        @inputText(setACLForm(Messages("releaseAssets")))
+        @inputPassword(setACLForm(Messages("password")))
+
+        @if(setACLForm.hasGlobalErrors) {
+            <ul>
+            @for(error <- setACLForm.globalErrors) {
+                <li>@error.format</li>
+            }
+            </ul>
+        }
+        <button type="submit">@Messages("SetACL")</button>
+    }
+}

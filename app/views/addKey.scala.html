@@ -6,8 +6,8 @@
     @form(action = routes.AddKeyController.addKey) {
         @CSRF.formField
         @inputText(addKeyFrom(Messages("name")))
-        @inputText(addKeyFrom(Messages("password")))
         @inputText(addKeyFrom(Messages("seed")))
+        @inputPassword(addKeyFrom(Messages("password")))
 
         @if(addKeyFrom.hasGlobalErrors) {
             <ul>

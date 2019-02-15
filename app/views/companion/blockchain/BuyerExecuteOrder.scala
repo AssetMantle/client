@@ -6,14 +6,14 @@ import play.api.data.Forms._
 object BuyerExecuteOrder {
   val form = Form(
     mapping(
-      "from" -> nonEmptyText,
-      "password" -> nonEmptyText,
-      "buyerAddress" -> nonEmptyText,
-      "sellerAddress" -> nonEmptyText,
-      "fiatProofHash" -> nonEmptyText,
-      "pegHash" -> nonEmptyText,
-      "chainID" -> nonEmptyText,
-      "gas" -> number
+      "from" -> nonEmptyText(minLength = 1, maxLength = 20),
+      "password" -> nonEmptyText(minLength = 1, maxLength = 20),
+      "buyerAddress" -> nonEmptyText(minLength = 1, maxLength = 45),
+      "sellerAddress" -> nonEmptyText(minLength = 1, maxLength = 45),
+      "fiatProofHash" -> nonEmptyText(minLength = 1, maxLength = 20),
+      "pegHash" -> nonEmptyText(minLength = 1, maxLength = 20),
+      "chainID" -> nonEmptyText(minLength = 1, maxLength = 20),
+      "gas" -> number(min = 1, max = 10000)
     )(Data.apply)(Data.unapply)
   )
 

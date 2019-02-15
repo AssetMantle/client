@@ -6,11 +6,11 @@
     @form(action = routes.RedeemFiatController.redeemFiat) {
         @CSRF.formField
         @inputText(redeemFiatForm(Messages("from")))
-        @inputText(redeemFiatForm(Messages("password")))
         @inputText(redeemFiatForm(Messages("to")))
         @inputText(redeemFiatForm(Messages("redeemAmount")))
         @inputText(redeemFiatForm(Messages("chainID")))
         @inputText(redeemFiatForm(Messages("gas")))
+        @inputPassword(redeemFiatForm(Messages("password")))
 
         @if(redeemFiatForm.hasGlobalErrors) {
             <ul>

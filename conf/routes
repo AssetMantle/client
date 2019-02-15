@@ -72,6 +72,9 @@ POST        /blockchain/sendAsset                 controllers.SendAssetControlle
 GET         /blockchian/sendFiat                  controllers.SendFiatController.sendFiatForm
 POST        /blockchain/sendFiat                  controllers.SendFiatController.sendFiat
 
+GET         /blockchian/setACL                    controllers.SetACLController.setACLForm
+POST        /blockchain/setACL                    controllers.SetACLController.setACL
+
 GET         /blockchian/setBuyerFeedback          controllers.SetBuyerFeedbackController.setBuyerFeedbackForm
 POST        /blockchain/setBuyerFeedback          controllers.SetBuyerFeedbackController.setBuyerFeedback
 

@@ -29,12 +29,12 @@ class IssueAsset @Inject()(configuration: Configuration, wsClient: WSClient, exe
 
   class Response(implicit response: WSResponse) {
 
-    val accountAddress: String = utilities.JSON.getBCStringResponse("address")
-    val publicKey: String = utilities.JSON.getBCStringResponse("pub_key")
+    val txHash: String = utilities.JSON.getBCStringResponse("TxHash")
+
   }
 
 
-  class Request(from: String, to: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: Int, assetQuantity: String, chainID: String, password: String, gas: Int) {
+  class Request(from: String, to: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, chainID: String, password: String, gas: Int) {
     val json: JsObject = Json.obj(fields =
       "from" -> from,
       "to" -> to,

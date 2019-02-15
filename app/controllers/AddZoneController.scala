@@ -22,8 +22,7 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
       },
       addZoneData => {
         try {
-          transactionAddZone.Service.post(new transactionAddZone.Request(addZoneData.from, addZoneData.to, addZoneData.zoneID, addZoneData.chainID, addZoneData.password))
-          Ok("")
+          Ok(views.html.index(transactionAddZone.Service.post(new transactionAddZone.Request(addZoneData.from, addZoneData.to, addZoneData.zoneID, addZoneData.chainID, addZoneData.password)).txHash))
         }
         catch {
           case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))

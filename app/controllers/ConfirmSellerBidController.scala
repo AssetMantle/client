@@ -1,6 +1,6 @@
 package controllers
 
-import exceptions.BaseException
+import exceptions.{BaseException, BlockChainException}
 import javax.inject.Inject
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
@@ -22,11 +22,12 @@ class ConfirmSellerBidController @Inject()(messagesControllerComponents: Message
       },
       confirmSellerBidData => {
         try {
-          transactionConfirmSellerBid.Service.post(new transactionConfirmSellerBid.Request(confirmSellerBidData.from, confirmSellerBidData.password, confirmSellerBidData.to, confirmSellerBidData.bid, confirmSellerBidData.time, confirmSellerBidData.pegHash, confirmSellerBidData.chainID, confirmSellerBidData.gas))
-          Ok("")
+          Ok(views.html.index(transactionConfirmSellerBid.Service.post(new transactionConfirmSellerBid.Request(confirmSellerBidData.from, confirmSellerBidData.password, confirmSellerBidData.to, confirmSellerBidData.bid, confirmSellerBidData.time, confirmSellerBidData.pegHash, confirmSellerBidData.chainID, confirmSellerBidData.gas)).txHash))
         }
         catch {
           case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))
+          case blockChainException: BlockChainException => Ok(views.html.index(failure = blockChainException.message))
+
         }
       })
   }

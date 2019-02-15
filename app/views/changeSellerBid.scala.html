@@ -6,13 +6,13 @@
     @form(action = routes.ChangeSellerBidController.changeSellerBid) {
         @CSRF.formField
         @inputText(changeSellerBidForm(Messages("from")))
-        @inputText(changeSellerBidForm(Messages("password")))
         @inputText(changeSellerBidForm(Messages("to")))
         @inputText(changeSellerBidForm(Messages("bid")))
         @inputText(changeSellerBidForm(Messages("time")))
         @inputText(changeSellerBidForm(Messages("pegHash")))
         @inputText(changeSellerBidForm(Messages("chainID")))
         @inputText(changeSellerBidForm(Messages("gas")))
+        @inputPassword(changeSellerBidForm(Messages("password")))
 
         @if(changeSellerBidForm.hasGlobalErrors) {
             <ul>

@@ -6,13 +6,13 @@
     @form(action = routes.BuyerExecuteOrderController.buyerExecuteOrder) {
         @CSRF.formField
         @inputText(buyerExecuteOrderForm(Messages("from")))
-        @inputText(buyerExecuteOrderForm(Messages("password")))
         @inputText(buyerExecuteOrderForm(Messages("buyerAddress")))
         @inputText(buyerExecuteOrderForm(Messages("sellerAddress")))
         @inputText(buyerExecuteOrderForm(Messages("fiatProofHash")))
         @inputText(buyerExecuteOrderForm(Messages("pegHash")))
         @inputText(buyerExecuteOrderForm(Messages("chainID")))
         @inputText(buyerExecuteOrderForm(Messages("gas")))
+        @inputPassword(buyerExecuteOrderForm(Messages("password")))
 
         @if(buyerExecuteOrderForm.hasGlobalErrors) {
             <ul>

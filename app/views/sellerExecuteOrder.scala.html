@@ -5,14 +5,14 @@
 @common(Messages("SellerExecuteOrder")) {
     @form(action = routes.SellerExecuteOrderController.sellerExecuteOrder) {
         @CSRF.formField
-        @inputPassword(sellerExecuteOrderForm(Messages("from")))
+        @inputText(sellerExecuteOrderForm(Messages("from")))
+        @inputText(sellerExecuteOrderForm(Messages("buyerAddress")))
+        @inputText(sellerExecuteOrderForm(Messages("sellerAddress")))
+        @inputText(sellerExecuteOrderForm(Messages("awbProofHash")))
+        @inputText(sellerExecuteOrderForm(Messages("pegHash")))
+        @inputText(sellerExecuteOrderForm(Messages("chainID")))
+        @inputText(sellerExecuteOrderForm(Messages("gas")))
         @inputPassword(sellerExecuteOrderForm(Messages("password")))
-        @inputPassword(sellerExecuteOrderForm(Messages("buyerAddress")))
-        @inputPassword(sellerExecuteOrderForm(Messages("sellerAddress")))
-        @inputPassword(sellerExecuteOrderForm(Messages("awbProofHash")))
-        @inputPassword(sellerExecuteOrderForm(Messages("pegHash")))
-        @inputPassword(sellerExecuteOrderForm(Messages("chainID")))
-        @inputPassword(sellerExecuteOrderForm(Messages("gas")))
 
         @if(sellerExecuteOrderForm.hasGlobalErrors) {
             <ul>
