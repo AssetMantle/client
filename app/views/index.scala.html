@@ -1,34 +1,36 @@
+@
+import views.html.component.blockchain.{blockExplorer, transactionExplorer}
 @(success: String = "", failure: String = "")(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 
-    @common(Messages("Welcome"), success, failure) {
-        <a href="@routes.LoginController.loginForm">@Messages("Login")</a>
-        <a href="@routes.SignUpController.signUpForm">@Messages("SignUp")</a>
-        <a href="@routes.UpdateContactController.updateContactForm">@Messages("UpdateContact")</a>
-        <a href="@routes.VerifyMobileNumberController.verifyMobileNumberForm">@Messages("VerifyMobileNumber")</a>
-        <a href="@routes.VerifyEmailAddressController.verifyEmailAddressForm">@Messages("VerifyEmailAddress")</a>
-        <br/>
-        <a href="@routes.AddKeyController.addKeyForm">@Messages("AddKey")</a>
-        <a href="@routes.AddOrganizationController.addOrganizationForm">@Messages("AddOrganization")</a>
-        <a href="@routes.AddZoneController.addZoneForm">@Messages("AddZone")</a>
-        <a href="@routes.BuyerExecuteOrderController.buyerExecuteOrderForm">@Messages("BuyerExecuteOrder")</a>
-        <a href="@routes.ChangeBuyerBidController.changeBuyerBidForm">@Messages("ChangeBuyerBid")</a>
-        <a href="@routes.ChangeSellerBidController.changeSellerBidForm">@Messages("ChangeSellerBid")</a>
-        <a href="@routes.ConfirmBuyerBidController.confirmBuyerBidForm">@Messages("ConfirmBuyerBid")</a>
-        <a href="@routes.ConfirmSellerBidController.confirmSellerBidForm">@Messages("ConfirmSellerBid")</a>
-        <a href="@routes.IssueAssetController.issueAssetForm">@Messages("IssueAsset")</a>
-        <a href="@routes.IssueFiatController.issueFiatForm">@Messages("IssueFiat")</a>
-        <a href="@routes.RedeemAssetController.redeemAssetForm">@Messages("RedeemAsset")</a>
-        <a href="@routes.RedeemFiatController.redeemFiatForm">@Messages("RedeemFiat")</a>
-        <a href="@routes.ReleaseAssetController.releaseAssetForm">@Messages("ReleaseAsset")</a>
-        <a href="@routes.SellerExecuteOrderController.sellerExecuteOrderForm">@Messages("SellerExecuteOrder")</a>
-        <a href="@routes.SendAssetController.sendAssetForm">@Messages("SendAsset")</a>
-        <a href="@routes.SendFiatController.sendFiatForm">@Messages("SendFiat")</a>
-        <a href="@routes.SetACLController.setACLForm">@Messages("SetACL")</a>
-        <a href="@routes.SetBuyerFeedbackController.setBuyerFeedbackForm">@Messages("SetBuyerFeedback")</a>
-        <a href="@routes.SetSellerFeedbackController.setSellerFeedbackForm">@Messages("SetSellerFeedback")</a>
+@common(Messages("Welcome"), success, failure) {
+    <a href="@routes.LoginController.loginForm">@Messages("Login")</a>
+    <a href="@routes.SignUpController.signUpForm">@Messages("SignUp")</a>
+    <a href="@routes.UpdateContactController.updateContactForm">@Messages("UpdateContact")</a>
+    <a href="@routes.VerifyMobileNumberController.verifyMobileNumberForm">@Messages("VerifyMobileNumber")</a>
+    <a href="@routes.VerifyEmailAddressController.verifyEmailAddressForm">@Messages("VerifyEmailAddress")</a>
+    <br/>
+    <a href="@routes.AddKeyController.addKeyForm">@Messages("AddKey")</a>
+    <a href="@routes.AddOrganizationController.addOrganizationForm">@Messages("AddOrganization")</a>
+    <a href="@routes.AddZoneController.addZoneForm">@Messages("AddZone")</a>
+    <a href="@routes.BuyerExecuteOrderController.buyerExecuteOrderForm">@Messages("BuyerExecuteOrder")</a>
+    <a href="@routes.ChangeBuyerBidController.changeBuyerBidForm">@Messages("ChangeBuyerBid")</a>
+    <a href="@routes.ChangeSellerBidController.changeSellerBidForm">@Messages("ChangeSellerBid")</a>
+    <a href="@routes.ConfirmBuyerBidController.confirmBuyerBidForm">@Messages("ConfirmBuyerBid")</a>
+    <a href="@routes.ConfirmSellerBidController.confirmSellerBidForm">@Messages("ConfirmSellerBid")</a>
+    <a href="@routes.IssueAssetController.issueAssetForm">@Messages("IssueAsset")</a>
+    <a href="@routes.IssueFiatController.issueFiatForm">@Messages("IssueFiat")</a>
+    <a href="@routes.RedeemAssetController.redeemAssetForm">@Messages("RedeemAsset")</a>
+    <a href="@routes.RedeemFiatController.redeemFiatForm">@Messages("RedeemFiat")</a>
+    <a href="@routes.ReleaseAssetController.releaseAssetForm">@Messages("ReleaseAsset")</a>
+    <a href="@routes.SellerExecuteOrderController.sellerExecuteOrderForm">@Messages("SellerExecuteOrder")</a>
+    <a href="@routes.SendAssetController.sendAssetForm">@Messages("SendAsset")</a>
+    <a href="@routes.SendFiatController.sendFiatForm">@Messages("SendFiat")</a>
+    <a href="@routes.SetACLController.setACLForm">@Messages("SetACL")</a>
+    <a href="@routes.SetBuyerFeedbackController.setBuyerFeedbackForm">@Messages("SetBuyerFeedback")</a>
+    <a href="@routes.SetSellerFeedbackController.setSellerFeedbackForm">@Messages("SetSellerFeedback")</a>
 
-        <div>
-            @blockExplorer()
-            @transactionExplorer()
-        </div>
-    }
+    <div>
+        @blockExplorer()
+        @transactionExplorer()
+    </div>
+}

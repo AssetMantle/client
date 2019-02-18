@@ -1,9 +1,10 @@
 package views.companion.master
 
+import play.api.data.Form
+import play.api.data.Forms._
+
 object VerifyMobileNumber {
 
-  import play.api.data.Form
-  import play.api.data.Forms._
 
   val form = Form(
     mapping(
