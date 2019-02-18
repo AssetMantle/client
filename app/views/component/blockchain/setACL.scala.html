@@ -1,7 +1,5 @@
-@
-import helper._
-@
-import views.companion.blockchain.SetACL
+@import helper._
+@import views.companion.blockchain.SetACL
 
 @(setACLForm: Form[SetACL.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @common(Messages("SetACL")) {

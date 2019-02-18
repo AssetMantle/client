@@ -1,5 +1,4 @@
-@
-import views.html.component.blockchain.{blockExplorer, transactionExplorer}
+@import views.html.component.blockchain.{blockExplorer, transactionExplorer}
 @(success: String = "", failure: String = "")(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 
 @common(Messages("Welcome"), success, failure) {
