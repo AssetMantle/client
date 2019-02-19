@@ -4,7 +4,7 @@ GET         /assets/*file                         controllers.Assets.versioned(p
 
 
 
-GET         /login                                controllers.LoginController.loginForm
+GET         /master/login                         controllers.LoginController.loginForm
 POST        /master/login                         controllers.LoginController.login
 
 GET         /master/checkUsernameAvailable        controllers.SignUpController.checkUsernameAvailable(username: String)

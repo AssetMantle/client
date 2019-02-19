@@ -12,13 +12,13 @@ import scala.concurrent.ExecutionContext
 class SellerExecuteOrderController @Inject()(messagesControllerComponents: MessagesControllerComponents, transactionSellerExecuteOrder: SellerExecuteOrder)(implicit exec: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   def sellerExecuteOrderForm: Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.sellerExecuteOrder(SellerExecuteOrder.form))
+    Ok(views.html.component.blockchain.sellerExecuteOrder(SellerExecuteOrder.form))
   }
 
   def sellerExecuteOrder: Action[AnyContent] = Action { implicit request =>
     SellerExecuteOrder.form.bindFromRequest().fold(
       formWithErrors => {
-        BadRequest(views.html.sellerExecuteOrder(formWithErrors))
+        BadRequest(views.html.component.blockchain.sellerExecuteOrder(formWithErrors))
       },
       sellerExecuteOrderData => {
         try {

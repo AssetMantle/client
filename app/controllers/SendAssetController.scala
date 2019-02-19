@@ -12,13 +12,13 @@ import scala.concurrent.ExecutionContext
 class SendAssetController @Inject()(messagesControllerComponents: MessagesControllerComponents, transactionSendAsset: SendAsset)(implicit exec: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   def sendAssetForm: Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.sendAsset(SendAsset.form))
+    Ok(views.html.component.blockchain.sendAsset(SendAsset.form))
   }
 
   def sendAsset: Action[AnyContent] = Action { implicit request =>
     SendAsset.form.bindFromRequest().fold(
       formWithErrors => {
-        BadRequest(views.html.sendAsset(formWithErrors))
+        BadRequest(views.html.component.blockchain.sendAsset(formWithErrors))
       },
       sendAssetData => {
         try {

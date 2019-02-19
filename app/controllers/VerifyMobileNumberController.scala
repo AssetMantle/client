@@ -15,7 +15,7 @@ class VerifyMobileNumberController @Inject()(messagesControllerComponents: Messa
 
   def verifyMobileNumberForm: Action[AnyContent] = withLoginAction { implicit request =>
     if (smsOTPs.Service.sendOTP(request.session.get(Security.USERNAME).get) == 1)
-      Ok(views.html.verifyMobileNumber(VerifyMobileNumber.form))
+      Ok(views.html.component.master.verifyMobileNumber(VerifyMobileNumber.form))
     else
       Ok(views.html.index(failure = "Send Otp Failed!"))
   }
@@ -23,7 +23,7 @@ class VerifyMobileNumberController @Inject()(messagesControllerComponents: Messa
   def verifyMobileNumber: Action[AnyContent] = withLoginAction { implicit request =>
     VerifyMobileNumber.form.bindFromRequest().fold(
       formWithErrors => {
-        BadRequest(views.html.verifyMobileNumber(formWithErrors))
+        BadRequest(views.html.component.master.verifyMobileNumber(formWithErrors))
       },
       verifyMobileNumberData => {
         if (smsOTPs.Service.verifyOTP(request.session.get(Security.USERNAME).get, verifyMobileNumberData.otp))

@@ -14,7 +14,7 @@ class SignUpController @Inject()(messagesControllerComponents: MessagesControlle
   private val module: String = constants.Module.CONTROLLER_SIGN_UP
 
   def signUpForm: Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.signUp(SignUp.form))
+    Ok(views.html.component.master.signUp(SignUp.form))
   }
 
   def checkUsernameAvailable(username: String): Action[AnyContent] = Action { implicit request =>
@@ -24,7 +24,7 @@ class SignUpController @Inject()(messagesControllerComponents: MessagesControlle
   def signUp: Action[AnyContent] = Action { implicit request =>
     SignUp.form.bindFromRequest().fold(
       formWithErrors => {
-        BadRequest(views.html.signUp(formWithErrors))
+        BadRequest(views.html.component.master.signUp(formWithErrors))
       },
       signUpData => {
         try {

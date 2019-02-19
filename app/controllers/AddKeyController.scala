@@ -12,13 +12,13 @@ import scala.concurrent.ExecutionContext
 class AddKeyController @Inject()(messagesControllerComponents: MessagesControllerComponents, transactionAddKey: AddKey)(implicit exec: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   def addKeyForm: Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.addKey(AddKey.form))
+    Ok(views.html.component.blockchain.addKey(AddKey.form))
   }
 
   def addKey: Action[AnyContent] = Action { implicit request =>
     AddKey.form.bindFromRequest().fold(
       formWithErrors => {
-        BadRequest(views.html.addKey(formWithErrors))
+        BadRequest(views.html.component.blockchain.addKey(formWithErrors))
       },
       addKeyData => {
         try {

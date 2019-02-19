@@ -12,13 +12,13 @@ import scala.concurrent.ExecutionContext
 class SetACLController @Inject()(messagesControllerComponents: MessagesControllerComponents, transactionSetACL: SetACL)(implicit exec: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   def setACLForm: Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.setACL(SetACL.form))
+    Ok(views.html.component.blockchain.setACL(SetACL.form))
   }
 
   def setACL: Action[AnyContent] = Action { implicit request =>
     SetACL.form.bindFromRequest().fold(
       formWithErrors => {
-        BadRequest(views.html.setACL(formWithErrors))
+        BadRequest(views.html.component.blockchain.setACL(formWithErrors))
       },
       setACLData => {
         try {

@@ -15,7 +15,7 @@ class VerifyEmailAddressController @Inject()(messagesControllerComponents: Messa
 
   def verifyEmailAddressForm: Action[AnyContent] = withLoginAction { implicit request =>
     if (emailOTPs.Service.sendOTP(request.session.get(Security.USERNAME).get) == 1)
-      Ok(views.html.verifyEmailAddress(VerifyEmailAddress.form))
+      Ok(views.html.component.master.verifyEmailAddress(VerifyEmailAddress.form))
     else
       Ok(views.html.index(failure = "Send Otp Failed!"))
   }
@@ -23,7 +23,7 @@ class VerifyEmailAddressController @Inject()(messagesControllerComponents: Messa
   def verifyEmailAddress: Action[AnyContent] = withLoginAction { implicit request =>
     VerifyEmailAddress.form.bindFromRequest().fold(
       formWithErrors => {
-        BadRequest(views.html.verifyEmailAddress(formWithErrors))
+        BadRequest(views.html.component.master.verifyEmailAddress(formWithErrors))
       },
       verifyEmailAddressData => {
         if (emailOTPs.Service.verifyOTP(request.session.get(Security.USERNAME).get, verifyEmailAddressData.otp))

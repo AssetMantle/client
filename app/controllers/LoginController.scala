@@ -13,13 +13,13 @@ import scala.concurrent.ExecutionContext
 class LoginController @Inject()(messagesControllerComponents: MessagesControllerComponents, accounts: Accounts, withUsernameToken: WithUsernameToken)(implicit exec: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   def loginForm: Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.login(Login.form))
+    Ok(views.html.component.master.login(Login.form))
   }
 
   def login: Action[AnyContent] = Action { implicit request =>
     Login.form.bindFromRequest().fold(
       formWithErrors => {
-        BadRequest(views.html.login(formWithErrors))
+        BadRequest(views.html.component.master.login(formWithErrors))
       },
       loginData => {
         try {

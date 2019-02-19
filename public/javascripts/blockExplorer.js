@@ -1,7 +1,7 @@
 window.addEventListener("load", function (evt) {
 
-    var blockHeightUrl = "http://192.168.0.107:36657/block?height=";
-    var ws = new WebSocket("ws://192.168.0.107:8080/block");
+    var blockHeightUrl = "http://localhost:36657/block?height=";
+    var ws = new WebSocket("ws://localhost:8080/block");
 
     ws.onmessage = function (evt) {
 

@@ -12,13 +12,13 @@ import scala.concurrent.ExecutionContext
 class UpdateContactController @Inject()(messagesControllerComponents: MessagesControllerComponents, contacts: Contacts, withLoginAction: WithLoginAction)(implicit exec: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   def updateContactForm: Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.updateContact(UpdateContact.form))
+    Ok(views.html.component.master.updateContact(UpdateContact.form))
   }
 
   def updateContact: Action[AnyContent] = withLoginAction { implicit request =>
     UpdateContact.form.bindFromRequest().fold(
       formWithErrors => {
-        BadRequest(views.html.updateContact(formWithErrors))
+        BadRequest(views.html.component.master.updateContact(formWithErrors))
       },
       signUpData => {
         if (contacts.Service.updateEmailAndMobile(request.session.get(constants.Security.USERNAME).get, signUpData.mobileNumber, signUpData.emailAddress)) Ok(views.html.index(success = "Contact Updated!")) else Ok(views.html.index(failure = "Signup Failed!"))

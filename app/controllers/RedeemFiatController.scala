@@ -12,13 +12,13 @@ import scala.concurrent.ExecutionContext
 class RedeemFiatController @Inject()(messagesControllerComponents: MessagesControllerComponents, transactionRedeemFiat: RedeemFiat)(implicit exec: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   def redeemFiatForm: Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.redeemFiat(RedeemFiat.form))
+    Ok(views.html.component.blockchain.redeemFiat(RedeemFiat.form))
   }
 
   def redeemFiat: Action[AnyContent] = Action { implicit request =>
     RedeemFiat.form.bindFromRequest().fold(
       formWithErrors => {
-        BadRequest(views.html.redeemFiat(formWithErrors))
+        BadRequest(views.html.component.blockchain.redeemFiat(formWithErrors))
       },
       redeemFiatData => {
         try {

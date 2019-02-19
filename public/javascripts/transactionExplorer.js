@@ -1,7 +1,7 @@
 window.addEventListener("load", function (evt) {
 
-    var txHashUrl = "http://192.168.0.107:31118/txs/";
-    var ws = new WebSocket("ws://192.168.0.107:8080/tx");
+    var txHashUrl = "http://localhost:31118/txs/";
+    var ws = new WebSocket("ws://localhost:8080/tx");
 
     ws.onmessage = function (evt) {
 

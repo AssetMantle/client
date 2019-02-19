@@ -12,13 +12,13 @@ import scala.concurrent.ExecutionContext
 class ReleaseAssetController @Inject()(messagesControllerComponents: MessagesControllerComponents, transactionReleaseAsset: ReleaseAsset)(implicit exec: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   def releaseAssetForm: Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.releaseAsset(ReleaseAsset.form))
+    Ok(views.html.component.blockchain.releaseAsset(ReleaseAsset.form))
   }
 
   def releaseAsset: Action[AnyContent] = Action { implicit request =>
     ReleaseAsset.form.bindFromRequest().fold(
       formWithErrors => {
-        BadRequest(views.html.releaseAsset(formWithErrors))
+        BadRequest(views.html.component.blockchain.releaseAsset(formWithErrors))
       },
       releaseAssetData => {
         try {

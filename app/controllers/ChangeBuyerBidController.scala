@@ -12,13 +12,13 @@ import scala.concurrent.ExecutionContext
 class ChangeBuyerBidController @Inject()(messagesControllerComponents: MessagesControllerComponents, transactionChangeBuyerBid: ChangeBuyerBid)(implicit exec: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   def changeBuyerBidForm: Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.changeBuyerBid(ChangeBuyerBid.form))
+    Ok(views.html.component.blockchain.changeBuyerBid(ChangeBuyerBid.form))
   }
 
   def changeBuyerBid: Action[AnyContent] = Action { implicit request =>
     ChangeBuyerBid.form.bindFromRequest().fold(
       formWithErrors => {
-        BadRequest(views.html.changeBuyerBid(formWithErrors))
+        BadRequest(views.html.component.blockchain.changeBuyerBid(formWithErrors))
       },
       changeBuyerBidData => {
         try {

@@ -12,13 +12,13 @@ import scala.concurrent.ExecutionContext
 class AddZoneController @Inject()(messagesControllerComponents: MessagesControllerComponents, transactionAddZone: AddZone)(implicit exec: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   def addZoneForm: Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.addZone(AddZone.form))
+    Ok(views.html.component.blockchain.addZone(AddZone.form))
   }
 
   def addZone: Action[AnyContent] = Action { implicit request =>
     AddZone.form.bindFromRequest().fold(
       formWithErrors => {
-        BadRequest(views.html.addZone(formWithErrors))
+        BadRequest(views.html.component.blockchain.addZone(formWithErrors))
       },
       addZoneData => {
         try {

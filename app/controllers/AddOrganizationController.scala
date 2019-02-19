@@ -12,13 +12,13 @@ import scala.concurrent.ExecutionContext
 class AddOrganizationController @Inject()(messagesControllerComponents: MessagesControllerComponents, transactionAddOrganization: AddOrganization)(implicit exec: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   def addOrganizationForm: Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.addOrganization(AddOrganization.form))
+    Ok(views.html.component.blockchain.addOrganization(AddOrganization.form))
   }
 
   def addOrganization: Action[AnyContent] = Action { implicit request =>
     AddOrganization.form.bindFromRequest().fold(
       formWithErrors => {
-        BadRequest(views.html.addOrganization(formWithErrors))
+        BadRequest(views.html.component.blockchain.addOrganization(formWithErrors))
       },
       addOrganizationData => {
         try {

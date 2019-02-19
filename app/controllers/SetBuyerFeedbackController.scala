@@ -12,13 +12,13 @@ import scala.concurrent.ExecutionContext
 class SetBuyerFeedbackController @Inject()(messagesControllerComponents: MessagesControllerComponents, transactionSetBuyerFeedback: SetBuyerFeedback)(implicit exec: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   def setBuyerFeedbackForm: Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.setBuyerFeedback(SetBuyerFeedback.form))
+    Ok(views.html.component.blockchain.setBuyerFeedback(SetBuyerFeedback.form))
   }
 
   def setBuyerFeedback: Action[AnyContent] = Action { implicit request =>
     SetBuyerFeedback.form.bindFromRequest().fold(
       formWithErrors => {
-        BadRequest(views.html.setBuyerFeedback(formWithErrors))
+        BadRequest(views.html.component.blockchain.setBuyerFeedback(formWithErrors))
       },
       setBuyerFeedbackData => {
         try {

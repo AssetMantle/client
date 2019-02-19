@@ -12,13 +12,13 @@ import scala.concurrent.ExecutionContext
 class IssueFiatController @Inject()(messagesControllerComponents: MessagesControllerComponents, transactionIssueFiat: IssueFiat)(implicit exec: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   def issueFiatForm: Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.issueFiat(IssueFiat.form))
+    Ok(views.html.component.blockchain.issueFiat(IssueFiat.form))
   }
 
   def issueFiat: Action[AnyContent] = Action { implicit request =>
     IssueFiat.form.bindFromRequest().fold(
       formWithErrors => {
-        BadRequest(views.html.issueFiat(formWithErrors))
+        BadRequest(views.html.component.blockchain.issueFiat(formWithErrors))
       },
       issueFiatData => {
         try {
