@@ -1,7 +1,7 @@
 @import views.html.component.blockchain.{blockExplorer, transactionExplorer}
 @(success: String = "", failure: String = "")(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 
-@common(Messages("Welcome"), success, failure) {
+@common(Messages("Index"), success, failure) {
     <a href="@routes.LoginController.loginForm">@Messages("Login")</a>
     <a href="@routes.SignUpController.signUpForm">@Messages("SignUp")</a>
     <a href="@routes.UpdateContactController.updateContactForm">@Messages("UpdateContact")</a>

@@ -1,0 +1,24 @@
+@import helper._
+@import views.companion.master.AddOrganization
+
+@(addOrganizationForm: Form[AddOrganization.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@common(Messages("AddOrganization")) {
+    @form(action = routes.LoginController.login) {
+        @CSRF.formField
+        @inputText(addOrganizationForm(Messages("id")))
+        @inputPassword(addOrganizationForm(Messages("password")))
+        @inputText(addOrganizationForm(Messages("name")))
+        @inputText(addOrganizationForm(Messages("address")))
+        @inputText(addOrganizationForm(Messages("phone")))
+        @inputText(addOrganizationForm(Messages("email")))
+
+        @if(addOrganizationForm.hasGlobalErrors) {
+            <ul>
+            @for(error <- addOrganizationForm.globalErrors) {
+                <li>@error.format</li>
+            }
+            </ul>
+        }
+        <button type="submit">@Messages("AddOrganization")</button>
+    }
+}
