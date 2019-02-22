@@ -1,0 +1,23 @@
+@import helper._
+@import views.companion.master.AddZone
+
+@(addZoneForm: Form[AddZone.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@common(Messages("AddZone")) {
+    @form(action = routes.LoginController.login) {
+        @CSRF.formField
+        @inputText(addZoneForm(Messages("id")))
+        @inputPassword(addZoneForm(Messages("password")))
+        @inputText(addZoneForm(Messages("password")))
+        @inputText(addZoneForm(Messages("name")))
+        @inputText(addZoneForm(Messages("currency")))
+
+        @if(addZoneForm.hasGlobalErrors) {
+            <ul>
+            @for(error <- addZoneForm.globalErrors) {
+                <li>@error.format</li>
+            }
+            </ul>
+        }
+        <button type="submit">@Messages("AddZone")</button>
+    }
+}

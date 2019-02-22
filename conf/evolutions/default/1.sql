@@ -1,45 +1,47 @@
 # --- !Ups
 
-CREATE SCHEMA IF NOT EXISTS BLOCKCHAIN  AUTHORIZATION comdex;
-CREATE SCHEMA IF NOT EXISTS BUSINESSTXN AUTHORIZATION comdex;
-CREATE SCHEMA IF NOT EXISTS FACTORY     AUTHORIZATION comdex;
-CREATE SCHEMA IF NOT EXISTS MASTER      AUTHORIZATION comdex;
+CREATE SCHEMA IF NOT EXISTS BLOCKCHAIN AUTHORIZATION comdex;
+CREATE SCHEMA IF NOT EXISTS BLOCKCHAIN_TRANSACTION AUTHORIZATION comdex;
+CREATE SCHEMA IF NOT EXISTS MASTER AUTHORIZATION comdex;
+CREATE SCHEMA IF NOT EXISTS MASTER_TRANSACTION AUTHORIZATION comdex;
 
--- MASTER
 
-CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Zone_BC" (
+CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Zone_BC"
+(
   "id"      VARCHAR NOT NULL,
   "address" VARCHAR NOT NULL,
   PRIMARY KEY ("id")
 );
 
-CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Organization_BC" (
+CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Organization_BC"
+(
   "id"      VARCHAR NOT NULL,
   "address" VARCHAR NOT NULL,
   PRIMARY KEY ("id")
 );
 
-CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Account_BC"(
+CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Account_BC"
+(
   "address"       VARCHAR NOT NULL,
   "coins"         INT     NOT NULL,
   "publicKey"     VARCHAR NOT NULL,
   "accountNumber" INT     NOT NULL,
   "sequence"      INT     NOT NULL,
-  PRIMARY KEY ("address" )
+  PRIMARY KEY ("address")
 );
 
-CREATE TABLE IF NOT EXISTS BLOCKCHAIN."ACL_BC"(
+CREATE TABLE IF NOT EXISTS BLOCKCHAIN."ACL_BC"
+(
   "address"        VARCHAR NOT NULL,
   "zoneID"         VARCHAR NOT NULL,
   "organizationID" VARCHAR NOT NULL,
   "transactions"   VARCHAR NOT NULL,
-  PRIMARY KEY ("address" )
+  PRIMARY KEY ("address")
 );
-ALTER TABLE BLOCKCHAIN."ACL_BC" ADD CONSTRAINT ACL_Account_address             FOREIGN KEY ("address")        REFERENCES BLOCKCHAIN."Account_BC" ("address");
-ALTER TABLE BLOCKCHAIN."ACL_BC" ADD CONSTRAINT ACL_Zone_zoneID                 FOREIGN KEY ("zoneID")         REFERENCES BLOCKCHAIN."Zone_BC" ("id");
-ALTER TABLE BLOCKCHAIN."ACL_BC" ADD CONSTRAINT ACL_Organization_organizationID FOREIGN KEY ("organizationID") REFERENCES BLOCKCHAIN."Organization_BC" ("id");
 
-CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Fiat_BC"(
+
+CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Fiat_BC"
+(
   "pegHash"           VARCHAR NOT NULL,
   "transactionID"     VARCHAR NOT NULL,
   "transactionAmount" INT     NOT NULL,
@@ -47,16 +49,16 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Fiat_BC"(
   PRIMARY KEY ("pegHash")
 );
 
-CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Owner_BC"(
+CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Owner_BC"
+(
   "pegHash"      VARCHAR NOT NULL,
   "ownerAddress" VARCHAR NOT NULL,
   "amount"       INT     NOT NULL,
-  PRIMARY KEY ("ownerAddress","pegHash")
+  PRIMARY KEY ("ownerAddress", "pegHash")
 );
-ALTER TABLE BLOCKCHAIN."Owner_BC" ADD CONSTRAINT Owners_Account_ownerAddress FOREIGN KEY ("ownerAddress" ) REFERENCES BLOCKCHAIN."Account_BC" ("address");
-ALTER TABLE BLOCKCHAIN."Owner_BC" ADD CONSTRAINT Owners_Fiat_pegHash         FOREIGN KEY ("pegHash")       REFERENCES BLOCKCHAIN."Fiat_BC" ("pegHash");
 
-CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Asset_BC"(
+CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Asset_BC"
+(
   "pegHash"       VARCHAR NOT NULL,
   "documentHash"  VARCHAR NOT NULL,
   "assetType"     VARCHAR NOT NULL,
@@ -67,9 +69,9 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Asset_BC"(
   "locked"        BOOLEAN NOT NULL,
   PRIMARY KEY ("pegHash")
 );
-ALTER TABLE BLOCKCHAIN."Asset_BC"ADD CONSTRAINT Asset_Account_ownerAddress FOREIGN KEY ("ownerAddress" ) REFERENCES BLOCKCHAIN."Account_BC" ("address");
 
-CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Negotiation_BC" (
+CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Negotiation_BC"
+(
   "id"              VARCHAR NOT NULL,
   "buyerAddress"    VARCHAR NOT NULL,
   "sellerAddress"   VARCHAR NOT NULL,
@@ -80,91 +82,88 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Negotiation_BC" (
   "sellerSignature" VARCHAR NOT NULL,
   PRIMARY KEY ("id")
 );
-ALTER TABLE BLOCKCHAIN."Negotiation_BC" ADD CONSTRAINT Negotiation_Account_buyerAddress  FOREIGN KEY ("buyerAddress")  REFERENCES BLOCKCHAIN."Account_BC"("address");
-ALTER TABLE BLOCKCHAIN."Negotiation_BC" ADD CONSTRAINT Negotiation_Account_sellerAddress FOREIGN KEY ("sellerAddress") REFERENCES BLOCKCHAIN."Account_BC"("address");
-ALTER TABLE BLOCKCHAIN."Negotiation_BC" ADD CONSTRAINT Negotiation_Asset_pegHash         FOREIGN KEY ("assetPegHash")  REFERENCES BLOCKCHAIN."Asset_BC"("pegHash");
 
-CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Order_BC" (
-  "id"            VARCHAR      NOT NULL,
-  "fiatProofHash" VARCHAR      NOT NULL,
-  "awbProofHash"  VARCHAR      NOT NULL,
-  "executed"      BOOLEAN      NOT NULL,
-  PRIMARY KEY ("id")
-);
-ALTER TABLE BLOCKCHAIN."Order_BC" ADD CONSTRAINT Order_Negotiation_id FOREIGN KEY ("id") REFERENCES BLOCKCHAIN."Negotiation_BC"("id");
-
--- MASTER
-
-CREATE TABLE IF NOT EXISTS MASTER."Zone" (
-  "id"          VARCHAR NOT NULL,
-  "secretHash" VARCHAR NOT NULL,
-  "name"        VARCHAR NOT NULL,
-  "currency"    VARCHAR NOT NULL,
-  PRIMARY KEY ("id")
-);
-ALTER TABLE MASTER."Zone" ADD CONSTRAINT Zone_BCZone_id FOREIGN KEY ("id") REFERENCES BLOCKCHAIN."Zone_BC" ("id");
-
-CREATE TABLE IF NOT EXISTS MASTER."Organization" (
-  "id"          VARCHAR NOT NULL,
-  "secretHash" VARCHAR NOT NULL,
-  "name"        VARCHAR NOT NULL,
-  "address"     VARCHAR NOT NULL,
-  "phone"       VARCHAR NOT NULL,
-  "email"       VARCHAR NOT NULL,
-  PRIMARY KEY ("id")
-);
-ALTER TABLE MASTER."Organization" ADD CONSTRAINT Organization_BCOrganization_id FOREIGN KEY ("id") REFERENCES BLOCKCHAIN."Organization_BC" ("id");
-
-CREATE TABLE IF NOT EXISTS MASTER."Account" (
-  "id"              VARCHAR NOT NULL,
-  "secretHash"      VARCHAR NOT NULL,
-  "accountAddress"  VARCHAR NOT NULL,
-  "tokenHash"       VARCHAR ,
-  PRIMARY KEY ("id")
-);
-ALTER TABLE MASTER."Account" ADD CONSTRAINT Account_BCAccount_address FOREIGN KEY ("accountAddress") REFERENCES BLOCKCHAIN."Account_BC" ("address");
-
-CREATE TABLE IF NOT EXISTS MASTER."Contact" (
-  "id"                    VARCHAR NOT NULL,
-  "mobileNumber"          VARCHAR NOT NULL,
-  "mobileNumberVerified"  BOOLEAN NOT NULL,
-  "emailAddress"          VARCHAR NOT NULL,
-  "emailAddressVerified"  BOOLEAN NOT NULL,
-  PRIMARY KEY ("id")
-);
-ALTER TABLE MASTER."Contact" ADD CONSTRAINT Contact_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
-
-CREATE TABLE IF NOT EXISTS MASTER."ZoneKYC" (
-  "id"       VARCHAR NOT NULL,
-  "documentType"  VARCHAR NOT NULL,
-  "status"   BOOLEAN NOT NULL,
-  "fileName" VARCHAR NOT NULL,
-  "file"     BYTEA   NOT NULL,
-  PRIMARY KEY ("id", "documentType")
-);
-ALTER TABLE MASTER."ZoneKYC" ADD CONSTRAINT ZoneKYC_Zone_id FOREIGN KEY ("id") REFERENCES MASTER."Zone"("id");
-
-CREATE TABLE IF NOT EXISTS MASTER."OrganizationKYC" (
-  "id"       VARCHAR NOT NULL,
-  "documentType"     VARCHAR NOT NULL,
-  "status"   BOOLEAN NOT NULL,
-  "fileName" VARCHAR NOT NULL,
-  "file"     BYTEA   NOT NULL,
-  PRIMARY KEY ("id", "documentType")
-);
-ALTER TABLE MASTER."OrganizationKYC" ADD CONSTRAINT OrganizationKYC_Organization_id FOREIGN KEY ("id") REFERENCES MASTER."Organization" ("id");
-
-CREATE TABLE IF NOT EXISTS MASTER."AccountKYC" (
+CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Order_BC"
+(
   "id"            VARCHAR NOT NULL,
-  "documentType"  VARCHAR NOT NULL,
-  "status"        BOOLEAN NOT NULL,
-  "fileName"      VARCHAR NOT NULL,
-  "file"          BYTEA   NOT NULL,
+  "fiatProofHash" VARCHAR NOT NULL,
+  "awbProofHash"  VARCHAR NOT NULL,
+  "executed"      BOOLEAN NOT NULL,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE IF NOT EXISTS MASTER."Zone"
+(
+  "id"         VARCHAR NOT NULL,
+  "secretHash" VARCHAR NOT NULL,
+  "name"       VARCHAR NOT NULL,
+  "currency"   VARCHAR NOT NULL,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE IF NOT EXISTS MASTER."Organization"
+(
+  "id"         VARCHAR NOT NULL,
+  "accountID"  VARCHAR NOT NULL UNIQUE,
+  "name"       VARCHAR NOT NULL,
+  "address"    VARCHAR NOT NULL,
+  "phone"      VARCHAR NOT NULL,
+  "email"      VARCHAR NOT NULL,
+  "status"     BOOLEAN,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE IF NOT EXISTS MASTER."Account"
+(
+  "id"             VARCHAR NOT NULL,
+  "secretHash"     VARCHAR NOT NULL,
+  "accountAddress" VARCHAR NOT NULL,
+  "tokenHash"      VARCHAR,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE IF NOT EXISTS MASTER."Contact"
+(
+  "id"                   VARCHAR NOT NULL,
+  "mobileNumber"         VARCHAR NOT NULL,
+  "mobileNumberVerified" BOOLEAN NOT NULL,
+  "emailAddress"         VARCHAR NOT NULL,
+  "emailAddressVerified" BOOLEAN NOT NULL,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE IF NOT EXISTS MASTER."ZoneKYC"
+(
+  "id"           VARCHAR NOT NULL,
+  "documentType" VARCHAR NOT NULL,
+  "status"       BOOLEAN NOT NULL,
+  "fileName"     VARCHAR NOT NULL,
+  "file"         BYTEA   NOT NULL,
   PRIMARY KEY ("id", "documentType")
 );
-ALTER TABLE MASTER."AccountKYC" ADD CONSTRAINT AccountKYC_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account"("id");
 
-CREATE TABLE IF NOT EXISTS MASTER."OrgBankAccount" (
+CREATE TABLE IF NOT EXISTS MASTER."OrganizationKYC"
+(
+  "id"           VARCHAR NOT NULL,
+  "documentType" VARCHAR NOT NULL,
+  "status"       BOOLEAN NOT NULL,
+  "fileName"     VARCHAR NOT NULL,
+  "file"         BYTEA   NOT NULL,
+  PRIMARY KEY ("id", "documentType")
+);
+
+CREATE TABLE IF NOT EXISTS MASTER."AccountKYC"
+(
+  "id"           VARCHAR NOT NULL,
+  "documentType" VARCHAR NOT NULL,
+  "status"       BOOLEAN NOT NULL,
+  "fileName"     VARCHAR NOT NULL,
+  "file"         BYTEA   NOT NULL,
+  PRIMARY KEY ("id", "documentType")
+);
+
+CREATE TABLE IF NOT EXISTS MASTER."OrgBankAccount"
+(
   "id"            VARCHAR NOT NULL,
   "accountHolder" VARCHAR NOT NULL,
   "bankName"      VARCHAR NOT NULL,
@@ -176,21 +175,64 @@ CREATE TABLE IF NOT EXISTS MASTER."OrgBankAccount" (
   "status"        VARCHAR NOT NULL,
   PRIMARY KEY ("id")
 );
-ALTER TABLE MASTER."OrgBankAccount" ADD CONSTRAINT OrgBankAccount_Organization_id FOREIGN KEY ("id") REFERENCES MASTER."Organization" ("id");
 
-CREATE TABLE IF NOT EXISTS BUSINESSTXN."SMSOTP" (
-  "id"          VARCHAR NOT NULL,
-  "secretHash"  VARCHAR NOT NULL,
+CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."SMSOTP"
+(
+  "id"         VARCHAR NOT NULL,
+  "secretHash" VARCHAR NOT NULL,
   PRIMARY KEY ("id")
 );
-ALTER TABLE BUSINESSTXN."SMSOTP" ADD CONSTRAINT SMSOTP_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account"("id");
 
-CREATE TABLE IF NOT EXISTS BUSINESSTXN."EmailOTP" (
-  "id"          VARCHAR NOT NULL,
-  "secretHash"  VARCHAR NOT NULL,
+CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."EmailOTP"
+(
+  "id"         VARCHAR NOT NULL,
+  "secretHash" VARCHAR NOT NULL,
   PRIMARY KEY ("id")
 );
-ALTER TABLE BUSINESSTXN."EmailOTP" ADD CONSTRAINT EmailOTP_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account"("id");
+
+ALTER TABLE BLOCKCHAIN."ACL_BC"
+  ADD CONSTRAINT ACL_Account_address FOREIGN KEY ("address") REFERENCES BLOCKCHAIN."Account_BC" ("address");
+ALTER TABLE BLOCKCHAIN."ACL_BC"
+  ADD CONSTRAINT ACL_Zone_zoneID FOREIGN KEY ("zoneID") REFERENCES BLOCKCHAIN."Zone_BC" ("id");
+ALTER TABLE BLOCKCHAIN."ACL_BC"
+  ADD CONSTRAINT ACL_Organization_organizationID FOREIGN KEY ("organizationID") REFERENCES BLOCKCHAIN."Organization_BC" ("id");
+ALTER TABLE BLOCKCHAIN."Owner_BC"
+  ADD CONSTRAINT Owners_Account_ownerAddress FOREIGN KEY ("ownerAddress") REFERENCES BLOCKCHAIN."Account_BC" ("address");
+ALTER TABLE BLOCKCHAIN."Owner_BC"
+  ADD CONSTRAINT Owners_Fiat_pegHash FOREIGN KEY ("pegHash") REFERENCES BLOCKCHAIN."Fiat_BC" ("pegHash");
+ALTER TABLE BLOCKCHAIN."Asset_BC"
+  ADD CONSTRAINT Asset_Account_ownerAddress FOREIGN KEY ("ownerAddress") REFERENCES BLOCKCHAIN."Account_BC" ("address");
+ALTER TABLE BLOCKCHAIN."Negotiation_BC"
+  ADD CONSTRAINT Negotiation_Account_buyerAddress FOREIGN KEY ("buyerAddress") REFERENCES BLOCKCHAIN."Account_BC" ("address");
+ALTER TABLE BLOCKCHAIN."Negotiation_BC"
+  ADD CONSTRAINT Negotiation_Account_sellerAddress FOREIGN KEY ("sellerAddress") REFERENCES BLOCKCHAIN."Account_BC" ("address");
+ALTER TABLE BLOCKCHAIN."Negotiation_BC"
+  ADD CONSTRAINT Negotiation_Asset_pegHash FOREIGN KEY ("assetPegHash") REFERENCES BLOCKCHAIN."Asset_BC" ("pegHash");
+ALTER TABLE BLOCKCHAIN."Order_BC"
+  ADD CONSTRAINT Order_Negotiation_id FOREIGN KEY ("id") REFERENCES BLOCKCHAIN."Negotiation_BC" ("id");
+ALTER TABLE BLOCKCHAIN."Organization_BC"
+  ADD CONSTRAINT Organization_BC_Organization_id FOREIGN KEY ("id") REFERENCES Master."Organization" ("id");
+
+ALTER TABLE MASTER."Zone"
+  ADD CONSTRAINT Zone_BCZone_id FOREIGN KEY ("id") REFERENCES BLOCKCHAIN."Zone_BC" ("id");
+ALTER TABLE MASTER."Organization"
+  ADD CONSTRAINT Organization_Account_accountID FOREIGN KEY ("id") REFERENCES BLOCKCHAIN."Zone_BC" ("id");accountID
+ALTER TABLE MASTER."Account"
+  ADD CONSTRAINT Account_BCAccount_address FOREIGN KEY ("accountAddress") REFERENCES BLOCKCHAIN."Account_BC" ("address");
+ALTER TABLE MASTER."Contact"
+  ADD CONSTRAINT Contact_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
+ALTER TABLE MASTER."ZoneKYC"
+  ADD CONSTRAINT ZoneKYC_Zone_id FOREIGN KEY ("id") REFERENCES MASTER."Zone" ("id");
+ALTER TABLE MASTER."OrganizationKYC"
+  ADD CONSTRAINT OrganizationKYC_Organization_id FOREIGN KEY ("id") REFERENCES MASTER."Organization" ("id");
+ALTER TABLE MASTER."AccountKYC"
+  ADD CONSTRAINT AccountKYC_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
+ALTER TABLE MASTER."OrgBankAccount"
+  ADD CONSTRAINT OrgBankAccount_Organization_id FOREIGN KEY ("id") REFERENCES MASTER."Organization" ("id");
+ALTER TABLE MASTER_TRANSACTION."SMSOTP"
+  ADD CONSTRAINT SMSOTP_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
+ALTER TABLE MASTER_TRANSACTION."EmailOTP"
+  ADD CONSTRAINT EmailOTP_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
 
 # --- !Downs
 
@@ -213,7 +255,10 @@ DROP TABLE IF EXISTS MASTER."OrganizationKYC" CASCADE;
 DROP TABLE IF EXISTS MASTER."AccountKYC" CASCADE;
 DROP TABLE IF EXISTS MASTER."BankAccount" CASCADE;
 
+DROP TABLE IF EXISTS MASTER_TRANSACTION."SMSOTP" CASCADE;
+DROP TABLE IF EXISTS MASTER_TRANSACTION."EmailOTP" CASCADE;
+
 DROP SCHEMA IF EXISTS BLOCKCHAIN CASCADE;
-DROP SCHEMA IF EXISTS BUSINESSTXN CASCADE;
-DROP SCHEMA IF EXISTS FACTORY CASCADE;
+DROP SCHEMA IF EXISTS BLOCKCHAIN_TRANSACTION CASCADE;
 DROP SCHEMA IF EXISTS MASTER CASCADE;
+DROP SCHEMA IF EXISTS MASTER_TRANSACTION CASCADE;

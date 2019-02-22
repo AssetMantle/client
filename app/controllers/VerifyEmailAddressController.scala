@@ -3,7 +3,7 @@ package controllers
 import constants.Security
 import controllers.actions.WithLoginAction
 import javax.inject.Inject
-import models.businesstxn.EmailOTPs
+import models.masterTransaction.EmailOTPs
 import models.master.Contacts
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}

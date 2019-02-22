@@ -1,15 +1,18 @@
 @import views.html.component.blockchain.{blockExplorer, transactionExplorer}
 @(success: String = "", failure: String = "")(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 
-@common(Messages("Welcome"), success, failure) {
+@common(Messages("Index"), success, failure) {
     <a href="@routes.LoginController.loginForm">@Messages("Login")</a>
     <a href="@routes.SignUpController.signUpForm">@Messages("SignUp")</a>
     <a href="@routes.UpdateContactController.updateContactForm">@Messages("UpdateContact")</a>
     <a href="@routes.VerifyMobileNumberController.verifyMobileNumberForm">@Messages("VerifyMobileNumber")</a>
     <a href="@routes.VerifyEmailAddressController.verifyEmailAddressForm">@Messages("VerifyEmailAddress")</a>
+    <a href="@routes.AddOrganizationController.addOrganizationForm()">@Messages("AddOrganization")</a>
+
     <br/>
+
     <a href="@routes.AddKeyController.addKeyForm">@Messages("AddKey")</a>
-    <a href="@routes.AddOrganizationController.addOrganizationForm">@Messages("AddOrganization")</a>
+    <a href="@routes.AddOrganizationController.addOrganizationFormBC">@Messages("AddOrganization")</a>
     <a href="@routes.AddZoneController.addZoneForm">@Messages("AddZone")</a>
     <a href="@routes.BuyerExecuteOrderController.buyerExecuteOrderForm">@Messages("BuyerExecuteOrder")</a>
     <a href="@routes.ChangeBuyerBidController.changeBuyerBidForm">@Messages("ChangeBuyerBid")</a>

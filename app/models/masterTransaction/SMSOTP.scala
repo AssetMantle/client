@@ -1,4 +1,4 @@
-package models.businesstxn
+package models.masterTransaction
 
 import javax.inject.Inject
 import play.api.db.slick.DatabaseConfigProvider

@@ -1,15 +1,14 @@
 @import helper._
-@import views.companion.blockchain.AddOrganization
+@import views.companion.master.AddOrganization
 
 @(addOrganizationForm: Form[AddOrganization.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @common(Messages("AddOrganization")) {
-    @form(action = routes.AddOrganizationController.addOrganizationBC) {
+    @form(action = routes.AddOrganizationController.addOrganization) {
         @CSRF.formField
-        @inputText(addOrganizationForm(Messages("from")))
-        @inputText(addOrganizationForm(Messages("to")))
-        @inputText(addOrganizationForm(Messages("organizationID")))
-        @inputText(addOrganizationForm(Messages("chainID")))
-        @inputPassword(addOrganizationForm(Messages("password")))
+        @inputText(addOrganizationForm(Messages("name")))
+        @inputText(addOrganizationForm(Messages("address")))
+        @inputText(addOrganizationForm(Messages("phone")))
+        @inputText(addOrganizationForm(Messages("email")))
 
         @if(addOrganizationForm.hasGlobalErrors) {
             <ul>

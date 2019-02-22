@@ -21,14 +21,17 @@ POST        /master/verifyMobileNumber            controllers.VerifyMobileNumber
 GET         /master/verifyEmailAddress            controllers.VerifyEmailAddressController.verifyEmailAddressForm
 POST        /master/verifyEmailAddress            controllers.VerifyEmailAddressController.verifyEmailAddress
 
+GET         /master/addOrganization               controllers.AddOrganizationController.addOrganizationForm
+POST        /master/addOrganization               controllers.AddOrganizationController.addOrganization
+
 
 
 
 GET         /blockchian/addKey                    controllers.AddKeyController.addKeyForm
 POST        /blockchain/addKey                    controllers.AddKeyController.addKey
 
-GET         /blockchian/addOrganization           controllers.AddOrganizationController.addOrganizationForm
-POST        /blockchain/addOrganization           controllers.AddOrganizationController.addOrganization
+GET         /blockchian/addOrganization           controllers.AddOrganizationController.addOrganizationFormBC
+POST        /blockchain/addOrganization           controllers.AddOrganizationController.addOrganizationBC
 
 GET         /blockchian/addZone                   controllers.AddZoneController.addZoneForm
 POST        /blockchain/addZone                   controllers.AddZoneController.addZone
