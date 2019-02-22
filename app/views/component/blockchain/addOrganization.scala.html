@@ -3,14 +3,13 @@
 
 @(addOrganizationForm: Form[AddOrganization.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @common(Messages("AddOrganization")) {
-    @form(action = routes.AddOrganizationController.addOrganization) {
+    @form(action = routes.AddOrganizationController.addOrganizationBC) {
         @CSRF.formField
         @inputText(addOrganizationForm(Messages("from")))
         @inputText(addOrganizationForm(Messages("to")))
         @inputText(addOrganizationForm(Messages("organizationID")))
         @inputText(addOrganizationForm(Messages("chainID")))
         @inputPassword(addOrganizationForm(Messages("password")))
-
 
         @if(addOrganizationForm.hasGlobalErrors) {
             <ul>
