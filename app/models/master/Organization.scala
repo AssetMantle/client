@@ -4,9 +4,11 @@ import javax.inject.Inject
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.JdbcProfile
 
-import scala.concurrent.Future
+import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, Future}
+import scala.util.Random
 
-case class Organization(id: String, secretHash: String, name: String, address: String, phone: String, email: String)
+case class Organization(id: String, accountID: String, name: String, address: String, phone: String, email: String, status: Option[Boolean])
 
 class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider) {
 
@@ -25,13 +27,11 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
 
   private[models] class OrganizationTable(tag: Tag) extends Table[Organization](tag, "Organization") {
 
-    def * = (id, secretHash, name, address, phone, email) <> (Organization.tupled, Organization.unapply)
-
-    def ? = (id.?, secretHash.?, name.?, address.?, phone.?, email.?).shaped.<>({ r => import r._; _1.map(_ => Organization.tupled((_1.get, _2.get, _3.get, _4.get, _5.get, _6.get))) }, (_: Any) => throw new Exception("Inserting into ? projection not supported."))
+    def * = (id, accountID, name, address, phone, email, status.?) <> (Organization.tupled, Organization.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
-    def secretHash = column[String]("secretHash")
+    def accountID = column[String]("accountID")
 
     def name = column[String]("name")
 
@@ -41,6 +41,12 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
 
     def email = column[String]("email")
 
+    def status = column[Boolean]("status")
+
+  }
+
+  object Service {
+    def addOrganization(accountID: String, name: String, address: String, phone: String, email: String): String = Await.result(add(Organization(Random.nextInt.toHexString.toUpperCase, accountID, name, address, phone, email, null)), Duration.Inf)
   }
 
 }
