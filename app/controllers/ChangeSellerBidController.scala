@@ -9,7 +9,7 @@ import views.companion.blockchain.ChangeSellerBid
 
 import scala.concurrent.ExecutionContext
 
-class ChangeSellerBidController @Inject()(messagesControllerComponents: MessagesControllerComponents, transactionChangeSellerBid: ChangeSellerBid)(implicit exec: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class ChangeSellerBidController @Inject()(messagesControllerComponents: MessagesControllerComponents, transactionChangeSellerBid: ChangeSellerBid)(implicit exec: ExecutionContext,configuration: play.api.Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   def changeSellerBidForm: Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.blockchain.changeSellerBid(ChangeSellerBid.form))

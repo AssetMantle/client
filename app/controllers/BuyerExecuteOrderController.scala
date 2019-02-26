@@ -9,7 +9,7 @@ import views.companion.blockchain.BuyerExecuteOrder
 
 import scala.concurrent.ExecutionContext
 
-class BuyerExecuteOrderController @Inject()(messagesControllerComponents: MessagesControllerComponents, transactionBuyerExecuteOrder: BuyerExecuteOrder)(implicit exec: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class BuyerExecuteOrderController @Inject()(messagesControllerComponents: MessagesControllerComponents, transactionBuyerExecuteOrder: BuyerExecuteOrder)(implicit exec: ExecutionContext,configuration: play.api.Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   def buyerExecuteOrderForm: Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.blockchain.buyerExecuteOrder(BuyerExecuteOrder.form))

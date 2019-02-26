@@ -9,7 +9,7 @@ import views.companion.blockchain.RedeemFiat
 
 import scala.concurrent.ExecutionContext
 
-class RedeemFiatController @Inject()(messagesControllerComponents: MessagesControllerComponents, transactionRedeemFiat: RedeemFiat)(implicit exec: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class RedeemFiatController @Inject()(messagesControllerComponents: MessagesControllerComponents, transactionRedeemFiat: RedeemFiat)(implicit exec: ExecutionContext, configuration: play.api.Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   def redeemFiatForm: Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.blockchain.redeemFiat(RedeemFiat.form))

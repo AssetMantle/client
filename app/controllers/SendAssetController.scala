@@ -9,7 +9,7 @@ import views.companion.blockchain.SendAsset
 
 import scala.concurrent.ExecutionContext
 
-class SendAssetController @Inject()(messagesControllerComponents: MessagesControllerComponents, transactionSendAsset: SendAsset)(implicit exec: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class SendAssetController @Inject()(messagesControllerComponents: MessagesControllerComponents, transactionSendAsset: SendAsset)(implicit exec: ExecutionContext, configuration: play.api.Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   def sendAssetForm: Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.blockchain.sendAsset(SendAsset.form))

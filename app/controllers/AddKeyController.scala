@@ -9,7 +9,7 @@ import views.companion.blockchain.AddKey
 
 import scala.concurrent.ExecutionContext
 
-class AddKeyController @Inject()(messagesControllerComponents: MessagesControllerComponents, transactionAddKey: AddKey)(implicit exec: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class AddKeyController @Inject()(messagesControllerComponents: MessagesControllerComponents, transactionAddKey: AddKey)(implicit exec: ExecutionContext,configuration: play.api.Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   def addKeyForm: Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.blockchain.addKey(AddKey.form))

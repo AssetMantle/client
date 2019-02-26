@@ -9,7 +9,7 @@ import views.companion.blockchain.SetBuyerFeedback
 
 import scala.concurrent.ExecutionContext
 
-class SetBuyerFeedbackController @Inject()(messagesControllerComponents: MessagesControllerComponents, transactionSetBuyerFeedback: SetBuyerFeedback)(implicit exec: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class SetBuyerFeedbackController @Inject()(messagesControllerComponents: MessagesControllerComponents, transactionSetBuyerFeedback: SetBuyerFeedback)(implicit exec: ExecutionContext, configuration: play.api.Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   def setBuyerFeedbackForm: Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.blockchain.setBuyerFeedback(SetBuyerFeedback.form))

@@ -9,7 +9,7 @@ import views.companion.blockchain.ConfirmSellerBid
 
 import scala.concurrent.ExecutionContext
 
-class ConfirmSellerBidController @Inject()(messagesControllerComponents: MessagesControllerComponents, transactionConfirmSellerBid: ConfirmSellerBid)(implicit exec: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class ConfirmSellerBidController @Inject()(messagesControllerComponents: MessagesControllerComponents, transactionConfirmSellerBid: ConfirmSellerBid)(implicit exec: ExecutionContext,configuration: play.api.Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   def confirmSellerBidForm: Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.blockchain.confirmSellerBid(ConfirmSellerBid.form))

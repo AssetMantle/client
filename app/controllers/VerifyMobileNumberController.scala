@@ -11,7 +11,7 @@ import views.companion.master.VerifyMobileNumber
 
 import scala.concurrent.ExecutionContext
 
-class VerifyMobileNumberController @Inject()(messagesControllerComponents: MessagesControllerComponents, smsOTPs: SMSOTPs, contacts: Contacts, withLoginAction: WithLoginAction)(implicit exec: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class VerifyMobileNumberController @Inject()(messagesControllerComponents: MessagesControllerComponents, smsOTPs: SMSOTPs, contacts: Contacts, withLoginAction: WithLoginAction)(implicit exec: ExecutionContext, configuration: play.api.Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   def verifyMobileNumberForm: Action[AnyContent] = withLoginAction { implicit request =>
     if (smsOTPs.Service.sendOTP(request.session.get(Security.USERNAME).get) == 1)
