@@ -9,7 +9,7 @@ import views.companion.blockchain.RedeemAsset
 
 import scala.concurrent.ExecutionContext
 
-class RedeemAssetController @Inject()(messagesControllerComponents: MessagesControllerComponents, transactionRedeemAsset: RedeemAsset)(implicit exec: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class RedeemAssetController @Inject()(messagesControllerComponents: MessagesControllerComponents, transactionRedeemAsset: RedeemAsset)(implicit exec: ExecutionContext, configuration: play.api.Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   def redeemAssetForm: Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.blockchain.redeemAsset(RedeemAsset.form))

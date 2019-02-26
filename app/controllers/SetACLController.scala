@@ -9,7 +9,7 @@ import views.companion.blockchain.SetACL
 
 import scala.concurrent.ExecutionContext
 
-class SetACLController @Inject()(messagesControllerComponents: MessagesControllerComponents, transactionSetACL: SetACL)(implicit exec: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class SetACLController @Inject()(messagesControllerComponents: MessagesControllerComponents, transactionSetACL: SetACL)(implicit exec: ExecutionContext, configuration: play.api.Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   def setACLForm: Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.blockchain.setACL(SetACL.form))

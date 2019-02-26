@@ -9,7 +9,7 @@ import views.companion.blockchain.AddZone
 
 import scala.concurrent.ExecutionContext
 
-class AddZoneController @Inject()(messagesControllerComponents: MessagesControllerComponents, transactionAddZone: AddZone)(implicit exec: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class AddZoneController @Inject()(messagesControllerComponents: MessagesControllerComponents, transactionAddZone: AddZone)(implicit exec: ExecutionContext,configuration: play.api.Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   def addZoneForm: Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.blockchain.addZone(AddZone.form))

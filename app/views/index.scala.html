@@ -1,5 +1,5 @@
 @import views.html.component.blockchain.{blockExplorer, transactionExplorer}
-@(success: String = "", failure: String = "")(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@(success: String = "", failure: String = "")(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
 
 @common(Messages("Index"), success, failure) {
     <a href="@routes.LoginController.loginForm">@Messages("Login")</a>

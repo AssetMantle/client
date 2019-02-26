@@ -11,7 +11,7 @@ import views.companion.{blockchain, master}
 
 import scala.concurrent.ExecutionContext
 
-class AddOrganizationController @Inject()(messagesControllerComponents: MessagesControllerComponents, transactionAddOrganization: AddOrganization, organizations: Organizations, withLoginAction: WithLoginAction)(implicit exec: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class AddOrganizationController @Inject()(messagesControllerComponents: MessagesControllerComponents, transactionAddOrganization: AddOrganization, organizations: Organizations, withLoginAction: WithLoginAction)(implicit exec: ExecutionContext,configuration: play.api.Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   def addOrganizationForm: Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.master.addOrganization(master.AddOrganization.form))

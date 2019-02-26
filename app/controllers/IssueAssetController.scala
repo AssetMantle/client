@@ -9,7 +9,7 @@ import views.companion.blockchain.IssueAsset
 
 import scala.concurrent.ExecutionContext
 
-class IssueAssetController @Inject()(messagesControllerComponents: MessagesControllerComponents, transactionIssueAsset: IssueAsset)(implicit exec: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class IssueAssetController @Inject()(messagesControllerComponents: MessagesControllerComponents, transactionIssueAsset: IssueAsset)(implicit exec: ExecutionContext, configuration: play.api.Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   def issueAssetForm: Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.blockchain.issueAsset(IssueAsset.form))
