@@ -5,13 +5,14 @@ import controllers.actions.WithLoginAction
 import javax.inject.Inject
 import models.masterTransaction.EmailOTPs
 import models.master.Contacts
+import play.api.Configuration
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import views.companion.master.VerifyEmailAddress
 
 import scala.concurrent.ExecutionContext
 
-class VerifyEmailAddressController @Inject()(messagesControllerComponents: MessagesControllerComponents, emailOTPs: EmailOTPs, contacts: Contacts, withLoginAction: WithLoginAction)(implicit exec: ExecutionContext, configuration: play.api.Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class VerifyEmailAddressController @Inject()(messagesControllerComponents: MessagesControllerComponents, emailOTPs: EmailOTPs, contacts: Contacts, withLoginAction: WithLoginAction)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   def verifyEmailAddressForm: Action[AnyContent] = withLoginAction { implicit request =>
     if (emailOTPs.Service.sendOTP(request.session.get(Security.USERNAME).get) == 1)
