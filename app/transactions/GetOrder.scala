@@ -10,7 +10,7 @@ import play.api.{Configuration, Logger}
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 
-class GetOrder @Inject()(configuration: Configuration, wsClient: WSClient, executionContext: ExecutionContext) {
+class GetOrder @Inject()(wsClient: WSClient)(implicit configuration: Configuration, executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.TRANSACTIONS_GET_SEED
 

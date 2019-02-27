@@ -2,6 +2,7 @@ package controllers
 
 import exceptions.{BaseException, BlockChainException}
 import javax.inject.Inject
+import play.api.Configuration
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import transactions.AddZone
@@ -9,7 +10,7 @@ import views.companion.blockchain.AddZone
 
 import scala.concurrent.ExecutionContext
 
-class AddZoneController @Inject()(messagesControllerComponents: MessagesControllerComponents, transactionAddZone: AddZone)(implicit exec: ExecutionContext,configuration: play.api.Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class AddZoneController @Inject()(messagesControllerComponents: MessagesControllerComponents, transactionAddZone: AddZone)(implicit exec: ExecutionContext,configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   def addZoneForm: Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.blockchain.addZone(AddZone.form))
