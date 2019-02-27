@@ -4,16 +4,13 @@ $(document).ready(function () {
 
         var username = $(this).val();
         var result = $('#result');
+        var route = jsRoutes.controllers.SignUpController.checkUsernameAvailable(username);
 
         if (username.length > 2) {
             result.html('loading');
             $.ajax({
-                url: 'checkUsernameAvailable',
-                type: 'GET',
-                data: {
-                    username: username//,
-                    //csrfToken: $('[name="csrfToken"]').attr('value')
-                },
+                url: route.url,
+                type: route.type,
                 statusCode: {
                     200: function () {
                         result.html('available');
