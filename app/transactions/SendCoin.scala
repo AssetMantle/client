@@ -11,7 +11,7 @@ import play.api.{Configuration, Logger}
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 
-class AddOrganization @Inject()(configuration: Configuration, wsClient: WSClient, executionContext: ExecutionContext) {
+class SendCoin @Inject()(configuration: Configuration, wsClient: WSClient, executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.TRANSACTIONS_ADD_KEY
 
@@ -23,7 +23,7 @@ class AddOrganization @Inject()(configuration: Configuration, wsClient: WSClient
 
   private val chainID = configuration.get[String]("blockchain.main.chainID")
 
-  private val path = "defineOrganization"
+  private val path = "sendCoin"
 
   private val url = ip + ":" + port + "/" + path
 
@@ -35,14 +35,18 @@ class AddOrganization @Inject()(configuration: Configuration, wsClient: WSClient
 
   }
 
+  case class Amount(val denom: String, val amount: String)
 
-  class Request(from: String, to: String, organizationID: String, password: String) {
+  implicit val amountWrites = Json.writes[Amount]
+
+  class Request(from: String, password: String, to: String, amount: Int, pegHash: String, gas: Int) {
     val json: JsObject = Json.obj(fields =
       "from" -> from,
+      "password" -> password,
       "to" -> to,
-      "organizationID" -> organizationID,
+      "amount" -> Json.toJson(Seq(Amount("comdex", amount.toString))),
       "chainID" -> chainID,
-      "password" -> password
+      "gas" -> gas
     )
   }
 

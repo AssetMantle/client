@@ -1,0 +1,20 @@
+@import helper._
+@import views.companion.master.VerifyOrganization
+
+@(verifyOrganizationForm: Form[VerifyOrganization.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@common(Messages("VerifyOrganization")) {
+    @form(action = routes.AddOrganizationController.verifyOrganization) {
+        @CSRF.formField
+        @inputText(verifyOrganizationForm(Messages("id")))
+        @inputPassword(verifyOrganizationForm(Messages("password")))
+
+        @if(verifyOrganizationForm.hasGlobalErrors) {
+            <ul>
+            @for(error <- verifyOrganizationForm.globalErrors) {
+                <li>@error.format</li>
+            }
+            </ul>
+        }
+        <button type="submit">@Messages("VerifyOrganization")</button>
+    }
+}

@@ -216,7 +216,7 @@ ALTER TABLE BLOCKCHAIN."Organization_BC"
 ALTER TABLE MASTER."Zone"
   ADD CONSTRAINT Zone_BCZone_id FOREIGN KEY ("id") REFERENCES BLOCKCHAIN."Zone_BC" ("id");
 ALTER TABLE MASTER."Organization"
-  ADD CONSTRAINT Organization_Account_accountID FOREIGN KEY ("id") REFERENCES BLOCKCHAIN."Zone_BC" ("id");accountID
+  ADD CONSTRAINT Organization_Account_accountID FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER."Account"
   ADD CONSTRAINT Account_BCAccount_address FOREIGN KEY ("accountAddress") REFERENCES BLOCKCHAIN."Account_BC" ("address");
 ALTER TABLE MASTER."Contact"

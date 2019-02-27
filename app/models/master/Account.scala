@@ -87,6 +87,8 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
       Await.result(findById(username.getOrElse(return false)), Duration.Inf).tokenHash.getOrElse(return false) == util.hashing.MurmurHash3.stringHash(token.getOrElse(return false)).toString
     }
 
+    def getAccount(username: String)(implicit executionContext: ExecutionContext) = Await.result(findById(username), Duration.Inf)
+
   }
 
 }

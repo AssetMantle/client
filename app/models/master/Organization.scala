@@ -25,6 +25,8 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
 
   private def deleteById(id: String) = db.run(organizationTable.filter(_.id === id).delete)
 
+  private def verifyOrganizationOnID(id: String, status: Boolean) = db.run(organizationTable.filter(_.id === id).map(_.status.?).update(Option(status)))
+
   private[models] class OrganizationTable(tag: Tag) extends Table[Organization](tag, "Organization") {
 
     def * = (id, accountID, name, address, phone, email, status.?) <> (Organization.tupled, Organization.unapply)
@@ -46,7 +48,13 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
   }
 
   object Service {
+
     def addOrganization(accountID: String, name: String, address: String, phone: String, email: String): String = Await.result(add(Organization(Random.nextInt.toHexString.toUpperCase, accountID, name, address, phone, email, null)), Duration.Inf)
+
+    def getOrganization(id: String): Organization = Await.result(findById(id), Duration.Inf)
+
+    def verifyOrganization(id: String, status: Boolean): Boolean = if (Await.result(verifyOrganizationOnID(id, status), Duration.Inf) == 1) true else false
+
   }
 
 }
