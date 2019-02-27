@@ -11,7 +11,7 @@ import play.api.{Configuration, Logger}
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 
-class RedeemFiat @Inject()(configuration: Configuration, wsClient: WSClient, executionContext: ExecutionContext) {
+class RedeemFiat @Inject()(wsClient: WSClient)(implicit configuration: Configuration, executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.TRANSACTIONS_ADD_KEY
 

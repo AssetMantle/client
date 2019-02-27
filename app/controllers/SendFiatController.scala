@@ -2,6 +2,7 @@ package controllers
 
 import exceptions.{BaseException, BlockChainException}
 import javax.inject.Inject
+import play.api.Configuration
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import transactions.SendFiat
@@ -9,7 +10,7 @@ import views.companion.blockchain.SendFiat
 
 import scala.concurrent.ExecutionContext
 
-class SendFiatController @Inject()(messagesControllerComponents: MessagesControllerComponents, transactionSendFiat: SendFiat)(implicit exec: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class SendFiatController @Inject()(messagesControllerComponents: MessagesControllerComponents, transactionSendFiat: SendFiat)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   def sendFiatForm: Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.blockchain.sendFiat(SendFiat.form))

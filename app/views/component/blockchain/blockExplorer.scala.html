@@ -1,6 +1,9 @@
-@()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
 <div style="float: left;">
     <p>@Messages("Blocks")</p>
     <ul id="blockList"></ul>
 </div>
 <script src="@routes.Assets.versioned("javascripts/blockExplorer.js")" type="text/javascript"></script>
+<script>
+blockExplorer("@configuration.get[String]("blockExplorer.main.ip")" +  ":" + "@configuration.get[String]("blockExplorer.main.port")" + "/block", "@configuration.get[String]("blockchain.main.ip")" + ":" + "@configuration.get[String]("blockchain.main.abciPort")" + "/block?height=");
+</script>
