@@ -19,7 +19,7 @@ class SendCoin @Inject()(configuration: Configuration, wsClient: WSClient, execu
 
   private val ip = configuration.get[String]("blockchain.main.ip")
 
-  private val port = configuration.get[String]("blockchain.main.port")
+  private val port = configuration.get[String]("blockchain.main.restPort")
 
   private val chainID = configuration.get[String]("blockchain.main.chainID")
 

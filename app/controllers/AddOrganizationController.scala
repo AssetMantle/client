@@ -4,6 +4,7 @@ import controllers.actions.WithLoginAction
 import exceptions.{BaseException, BlockChainException}
 import javax.inject.Inject
 import models.master.{Accounts, Organizations}
+import play.api.Configuration
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import transactions.AddOrganization
@@ -11,7 +12,7 @@ import views.companion.{blockchain, master}
 
 import scala.concurrent.ExecutionContext
 
-class AddOrganizationController @Inject()(messagesControllerComponents: MessagesControllerComponents, transactionAddOrganization: AddOrganization, organizations: Organizations, accounts: Accounts, withLoginAction: WithLoginAction)(implicit exec: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class AddOrganizationController @Inject()(messagesControllerComponents: MessagesControllerComponents, transactionAddOrganization: AddOrganization, organizations: Organizations, accounts: Accounts, withLoginAction: WithLoginAction)(implicit exec: ExecutionContext, configuration:Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private val module: String = constants.Module.CONTROLLERS_ADD_ORGANIZATION
 

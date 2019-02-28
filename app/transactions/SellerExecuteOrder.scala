@@ -19,7 +19,7 @@ class SellerExecuteOrder @Inject()(wsClient: WSClient)(implicit configuration: C
 
   private val ip = configuration.get[String]("blockchain.main.ip")
 
-  private val port = configuration.get[String]("blockchain.main.port")
+  private val port = configuration.get[String]("blockchain.main.restPort")
 
   private val path = "sellerExecuteOrder"
 
