@@ -11,7 +11,7 @@ import play.api.{Configuration, Logger}
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 
-class IssueFiat @Inject()( wsClient: WSClient)(implicit configuration: Configuration, executionContext: ExecutionContext) {
+class SendCoin @Inject()(configuration: Configuration, wsClient: WSClient, executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.TRANSACTIONS_ADD_KEY
 
@@ -21,7 +21,9 @@ class IssueFiat @Inject()( wsClient: WSClient)(implicit configuration: Configura
 
   private val port = configuration.get[String]("blockchain.main.restPort")
 
-  private val path = "issueFiat"
+  private val chainID = configuration.get[String]("blockchain.main.chainID")
+
+  private val path = "sendCoin"
 
   private val url = ip + ":" + port + "/" + path
 
@@ -33,15 +35,17 @@ class IssueFiat @Inject()( wsClient: WSClient)(implicit configuration: Configura
 
   }
 
+  case class Amount(val denom: String, val amount: String)
 
-  class Request(from: String, to: String, transactionID: String, transactionAmount: Int, chainID: String, password: String, gas: Int) {
+  implicit val amountWrites = Json.writes[Amount]
+
+  class Request(from: String, password: String, to: String, amount: Int, pegHash: String, gas: Int) {
     val json: JsObject = Json.obj(fields =
       "from" -> from,
-      "to" -> to,
-      "transactionID" -> transactionID,
-      "transactionAmount" -> transactionAmount,
-      "chainID" -> chainID,
       "password" -> password,
+      "to" -> to,
+      "amount" -> Json.toJson(Seq(Amount("comdex", amount.toString))),
+      "chainID" -> chainID,
       "gas" -> gas
     )
   }

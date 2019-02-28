@@ -19,7 +19,7 @@ class SetBuyerFeedback @Inject()(wsClient: WSClient)(implicit configuration: Con
 
   private val ip = configuration.get[String]("blockchain.main.ip")
 
-  private val port = configuration.get[String]("blockchain.main.port")
+  private val port = configuration.get[String]("blockchain.main.restPort")
 
   private val path = "submitBuyerFeedback"
 

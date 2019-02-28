@@ -18,7 +18,7 @@ class GetFiat @Inject()(wsClient: WSClient)(implicit configuration: Configuratio
 
   private val ip = configuration.get[String]("blockchain.main.ip")
 
-  private val port = configuration.get[String]("blockchain.main.port")
+  private val port = configuration.get[String]("blockchain.main.restPort")
 
   private val path = "fiat"
 

@@ -19,7 +19,9 @@ class AddOrganization @Inject()(wsClient: WSClient)(implicit configuration: Conf
 
   private val ip = configuration.get[String]("blockchain.main.ip")
 
-  private val port = configuration.get[String]("blockchain.main.port")
+  private val port = configuration.get[String]("blockchain.main.restPort")
+
+  private val chainID = configuration.get[String]("blockchain.main.chainID")
 
   private val path = "defineOrganization"
 
@@ -34,7 +36,7 @@ class AddOrganization @Inject()(wsClient: WSClient)(implicit configuration: Conf
   }
 
 
-  class Request(from: String, to: String, organizationID: String, chainID: String, password: String) {
+  class Request(from: String, to: String, organizationID: String, password: String) {
     val json: JsObject = Json.obj(fields =
       "from" -> from,
       "to" -> to,

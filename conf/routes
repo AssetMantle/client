@@ -24,6 +24,9 @@ POST        /master/verifyEmailAddress            controllers.VerifyEmailAddress
 GET         /master/addOrganization               controllers.AddOrganizationController.addOrganizationForm
 POST        /master/addOrganization               controllers.AddOrganizationController.addOrganization
 
+GET         /master/verifyOrganization            controllers.AddOrganizationController.verifyOrganizationForm
+POST        /master/verifyOrganization            controllers.AddOrganizationController.verifyOrganization
+
 
 
 
