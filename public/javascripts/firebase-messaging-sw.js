@@ -11,13 +11,22 @@ const messaging = firebase.messaging();
 
 messaging.setBackgroundMessageHandler(function (payload) {
     console.log('[firebase-messaging-sw.js] Received background message ', payload);
-    // Customize notification here
-    const notificationTitle = 'Answer to some things';
-    const notificationOptions = {
-        body: 'This is not the answer to life, universe and everything that comes in the middle.',
-        icon: 'notificationImage.png'
-    };
+    if (JSON.parse(payload.data.notification).title === "Login"){
+        const notificationTitle = 'Login';
+        const notificationOptions = {
+            body: 'Login executed',
+            icon: 'notificationImage.png'
+        };
+        return self.registration.showNotification(notificationTitle,
+            notificationOptions);
+    }else{
+        const notificationTitle = 'Default Notification';
+        const notificationOptions = {
+            body: 'Did not redirect from anywhere.',
+            icon: 'notificationImage.png'
+        };
 
-    return self.registration.showNotification(notificationTitle,
-        notificationOptions);
+        return self.registration.showNotification(notificationTitle,
+            notificationOptions);
+    }
 });

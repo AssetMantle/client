@@ -5,7 +5,7 @@
 @common(Messages("SendNotification")) {
     @form(action = routes.NotificationController.sendNotification) {
         @CSRF.formField
-        @inputText(notificationTokenForm(Messages("token")), 'id -> "token") <label id="result"></label>
+        @inputText(notificationTokenForm(Messages("token")), 'id -> "submitToken") <label id="result"></label>
         <button type="submit" id="submitButton">@Messages("Send Token")</button>
     }
 }

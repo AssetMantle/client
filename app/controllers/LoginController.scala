@@ -6,12 +6,14 @@ import javax.inject.Inject
 import models.master.Accounts
 import play.api.Configuration
 import play.api.i18n.{I18nSupport, Messages}
+import play.api.libs.ws.WSClient
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import views.companion.master.Login
+import utilities.PushNotifications._
 
 import scala.concurrent.ExecutionContext
 
-class LoginController @Inject()(messagesControllerComponents: MessagesControllerComponents, accounts: Accounts, withUsernameToken: WithUsernameToken)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class LoginController @Inject()(messagesControllerComponents: MessagesControllerComponents, accounts: Accounts, withUsernameToken: WithUsernameToken, ws: WSClient)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   def loginForm: Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.master.login(Login.form))
@@ -24,6 +26,7 @@ class LoginController @Inject()(messagesControllerComponents: MessagesController
       },
       loginData => {
         try {
+          sendNotification(request.body.asFormUrlEncoded.get("token").headOption.get)(ws)
           if (accounts.Service.validateLogin(loginData.username, loginData.password)) withUsernameToken.Ok(views.html.index(success = "Logged In!"), loginData.username) else Ok(views.html.index(failure = "Invalid Login!"))
         }
         catch {

@@ -23,12 +23,11 @@ $(document).ready(function () {
             return messaging.getToken()
         })
         .then(function (token) {
-            document.getElementById('token').value = token
+            document.getElementById('submitToken').value = token
             TokenElem.innerHTML = token;
         })
 
         .catch(function (err) {
-            ErrElem.innerHTML = ErrElem.innerHTML + "; " + err
             console.log("Unable to get permission to notify.", err);
         });
     messaging.onMessage(function (payload) {
