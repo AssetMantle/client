@@ -36,7 +36,7 @@ class NotificationController @Inject()(cc: ControllerComponents, ws: WSClient)(i
             ),
             "to" -> loginData.token
           )
-          Thread.sleep(3000) // wait for 1000 millisecond
+          Thread.sleep(3000)
           val reqPost: WSRequest = ws.url("https://fcm.googleapis.com/fcm/send")
             .withHttpHeaders("Content-Type" -> "application/json")
             .withHttpHeaders("Authorization" -> "key=AAAAwSmfGOo:APA91bGSaXARMCGOFGuEB-wJM2tyLQU3HhTRxb1SZiWefjDq3gGiXuVogs9n7jA-MafSK5cJQ4YS8b_9LvlxQUqzTa5jGDHXVd6l9zp8xeXT30gUUDOGmR5Z_-QnFUNQC1xifiyzUKqd")

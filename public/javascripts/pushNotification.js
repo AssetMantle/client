@@ -20,7 +20,6 @@ $(document).ready(function () {
             MsgElem.innerHTML = "Notification permission granted."
             console.log("Notification permission granted.");
 
-            // get the token in the form of promise
             return messaging.getToken()
         })
         .then(function (token) {
