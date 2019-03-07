@@ -1,0 +1,30 @@
+@import helper._
+@import views.companion.master.NotificationToken
+
+@(notificationTokenForm: Form[NotificationToken.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@common(Messages("SendNotification")) {
+    @form(action = routes.NotificationController.sendNotification) {
+        @CSRF.formField
+        @inputText(notificationTokenForm(Messages("token")), 'id -> "submitToken") <label id="result"></label>
+        <button type="submit" id="submitButton">@Messages("Send Token")</button>
+    }
+}
+<html>
+    @CSRF.formField
+    <title>Firebase Messaging Demo</title>
+    <style>
+            div {
+                margin-bottom: 15px;
+            }
+    </style>
+    <body>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/5.8.5/firebase.js"></script>
+        <script src="@routes.Assets.versioned("/javascripts/pushNotification.js")"></script>
+
+        <div id="msg"></div>
+        <div id="notis"></div>
+        <div id="err"></div>
+
+    </body>
+</html>
