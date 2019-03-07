@@ -10,7 +10,7 @@ import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerC
 import transactions.SetACL
 import views.companion.blockchain.SetACL
 
-import scala.concurrent.{ExecutionContext, ExecutionException}
+import scala.concurrent.{ExecutionContext}
 
 class SetACLController @Inject()(messagesControllerComponents: MessagesControllerComponents, transactionSetACL: SetACL, aclAccounts: ACLAccounts, setACLs: SetACLs, aclHashs: ACLHashs)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 

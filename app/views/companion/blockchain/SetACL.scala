@@ -1,7 +1,7 @@
 package views.companion.blockchain
 
 import play.api.data.Form
-import play.api.data.Forms.{mapping, nonEmptyText, checked, boolean}
+import play.api.data.Forms.{mapping, nonEmptyText, boolean}
 
 object SetACL {
   val form = Form(
