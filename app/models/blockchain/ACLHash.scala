@@ -1,6 +1,5 @@
 package models.blockchain
 
-import exceptions.BaseException
 import javax.inject.Inject
 import org.postgresql.util.PSQLException
 import play.api.Logger
@@ -14,8 +13,6 @@ import scala.util.{Failure, Success}
 case class ACLHash(issueAsset: Boolean, issueFiat: Boolean, sendAsset: Boolean, sendFiat: Boolean, redeemAsset: Boolean, redeemFiat: Boolean, sellerExecuteOrder: Boolean, buyerExecuteOrder: Boolean, changeBuyerBid: Boolean, changeSellerBid: Boolean, confirmBuyerBid: Boolean, confirmSellerBid: Boolean, negotiation: Boolean, releaseAssets: Boolean, hash: String)
 
 class ACLHashs @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider) {
-
-  private implicit val module: String = constants.Module.BLOCKCHAIN_ACLHASH
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
