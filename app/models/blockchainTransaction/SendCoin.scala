@@ -4,7 +4,8 @@ import javax.inject.Inject
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.JdbcProfile
 
-import scala.concurrent.Future
+import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, ExecutionContext, Future}
 
 case class SendCoin(from: String, to: String, amount: Int, chainID: String, gas: Int,  status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])
 
@@ -47,5 +48,12 @@ class SendCoins @Inject()(protected val databaseConfigProvider: DatabaseConfigPr
     def ticketID = column[String]("ticketID", O.PrimaryKey)
 
     def responseCode = column[String]("responseCode")
+  }
+
+  object Service {
+
+    def addSendCoin(from: String, to: String, amount: Int, chainID: String, gas: Int, status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String]) (implicit executionContext: ExecutionContext): String = {
+      Await.result(add(SendCoin(from = from, to = to, amount = amount, chainID = chainID, gas = gas, status = status, txHash = txHash, ticketID = ticketID, responseCode = responseCode)), Duration.Inf)
+    }
   }
 }

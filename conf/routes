@@ -75,6 +75,9 @@ POST        /blockchain/sellerExecuteOrder        controllers.SellerExecuteOrder
 GET         /blockchian/sendAsset                 controllers.SendAssetController.sendAssetForm
 POST        /blockchain/sendAsset                 controllers.SendAssetController.sendAsset
 
+GET         /blockchain/sendCoin                  controllers.SendCoinController.sendCoinForm
+POST        /blockchain/sendCoin                  controllers.SendCoinController.sendCoin
+
 GET         /blockchian/sendFiat                  controllers.SendFiatController.sendFiatForm
 POST        /blockchain/sendFiat                  controllers.SendFiatController.sendFiat
 
