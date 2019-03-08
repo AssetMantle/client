@@ -9,11 +9,12 @@ import play.api.i18n.{I18nSupport, Messages}
 import play.api.libs.ws.WSClient
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import views.companion.master.Login
-import utilities.PushNotifications._
+import models.master.Notifications
+import utilities.PushNotifications
 
 import scala.concurrent.ExecutionContext
 
-class LoginController @Inject()(messagesControllerComponents: MessagesControllerComponents, accounts: Accounts, withUsernameToken: WithUsernameToken, ws: WSClient)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class LoginController @Inject()(messagesControllerComponents: MessagesControllerComponents, accounts: Accounts, withUsernameToken: WithUsernameToken, pushNotifications: PushNotifications)(implicit exec: ExecutionContext, configuration: Configuration, wsClient: WSClient, notifications: Notifications) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   def loginForm: Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.master.login(Login.form))
@@ -26,8 +27,12 @@ class LoginController @Inject()(messagesControllerComponents: MessagesController
       },
       loginData => {
         try {
-          sendNotification(request.body.asFormUrlEncoded.get("token").headOption.get)(ws)
-          if (accounts.Service.validateLogin(loginData.username, loginData.password)) withUsernameToken.Ok(views.html.index(success = "Logged In!"), loginData.username) else Ok(views.html.index(failure = "Invalid Login!"))
+          if (accounts.Service.validateLogin(loginData.username, loginData.password)){
+            pushNotifications.Push.registerNotificationToken(loginData.username, request.body.asFormUrlEncoded.get("token").headOption.get)
+            pushNotifications.Push.sendNotification(loginData.username, "Login")
+            withUsernameToken.Ok(views.html.index(success = "Logged In!"), loginData.username)
+          }
+          else Ok(views.html.index(failure = "Invalid Login!"))
         }
         catch {
           case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))

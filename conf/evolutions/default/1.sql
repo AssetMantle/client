@@ -103,13 +103,13 @@ CREATE TABLE IF NOT EXISTS MASTER."Zone"
 
 CREATE TABLE IF NOT EXISTS MASTER."Organization"
 (
-  "id"         VARCHAR NOT NULL,
-  "accountID"  VARCHAR NOT NULL UNIQUE,
-  "name"       VARCHAR NOT NULL,
-  "address"    VARCHAR NOT NULL,
-  "phone"      VARCHAR NOT NULL,
-  "email"      VARCHAR NOT NULL,
-  "status"     BOOLEAN,
+  "id"        VARCHAR NOT NULL,
+  "accountID" VARCHAR NOT NULL UNIQUE,
+  "name"      VARCHAR NOT NULL,
+  "address"   VARCHAR NOT NULL,
+  "phone"     VARCHAR NOT NULL,
+  "email"     VARCHAR NOT NULL,
+  "status"    BOOLEAN,
   PRIMARY KEY ("id")
 );
 
@@ -119,6 +119,15 @@ CREATE TABLE IF NOT EXISTS MASTER."Account"
   "secretHash"     VARCHAR NOT NULL,
   "accountAddress" VARCHAR NOT NULL,
   "tokenHash"      VARCHAR,
+  PRIMARY KEY ("id")
+);
+
+
+CREATE TABLE IF NOT EXISTS MASTER."Notification"
+(
+  "id"                VARCHAR NOT NULL,
+  "registrationToken" VARCHAR NOT NULL,
+
   PRIMARY KEY ("id")
 );
 
@@ -219,6 +228,8 @@ ALTER TABLE MASTER."Organization"
   ADD CONSTRAINT Organization_Account_accountID FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER."Account"
   ADD CONSTRAINT Account_BCAccount_address FOREIGN KEY ("accountAddress") REFERENCES BLOCKCHAIN."Account_BC" ("address");
+ALTER TABLE MASTER."Notification"
+  ADD CONSTRAINT Notification_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER."Contact"
   ADD CONSTRAINT Contact_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER."ZoneKYC"
@@ -249,6 +260,7 @@ DROP TABLE IF EXISTS BLOCKCHAIN."Account_BC" CASCADE;
 DROP TABLE IF EXISTS MASTER."Zone" CASCADE;
 DROP TABLE IF EXISTS MASTER."Organization" CASCADE;
 DROP TABLE IF EXISTS MASTER."Account" CASCADE;
+DROP TABLE IF EXISTS MASTER."Notification" CASCADE;
 DROP TABLE IF EXISTS MASTER."Contact" CASCADE;
 DROP TABLE IF EXISTS MASTER."ZoneKYC" CASCADE;
 DROP TABLE IF EXISTS MASTER."OrganizationKYC" CASCADE;

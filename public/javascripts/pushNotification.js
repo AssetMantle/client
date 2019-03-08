@@ -1,9 +1,6 @@
 $(document).ready(function () {
 
-    MsgElem = document.getElementById("msg");
     TokenElem = document.getElementById("token");
-    NotisElem = document.getElementById("notis");
-    ErrElem = document.getElementById("err");
     var config = {
         apiKey: "AIzaSyA1N73fWM03Vb1CnEUF1YTbZUj16IxMvdg",
         authDomain: "corp-play-scala.firebaseapp.com",
@@ -17,14 +14,12 @@ $(document).ready(function () {
     messaging
         .requestPermission()
         .then(function () {
-            MsgElem.innerHTML = "Notification permission granted."
             console.log("Notification permission granted.");
 
             return messaging.getToken()
         })
         .then(function (token) {
             document.getElementById('submitToken').value = token
-            TokenElem.innerHTML = token;
         })
 
         .catch(function (err) {
@@ -32,7 +27,6 @@ $(document).ready(function () {
         });
     messaging.onMessage(function (payload) {
         console.log("Message received. ", payload);
-        NotisElem.innerHTML = NotisElem.innerHTML + JSON.stringify(payload)
     });
 
 });
