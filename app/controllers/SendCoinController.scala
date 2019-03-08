@@ -10,6 +10,7 @@ import transactions.SendCoin
 import views.companion.blockchain.SendCoin
 
 import scala.concurrent.ExecutionContext
+import scala.util.Random
 
 class SendCoinController @Inject()(messagesControllerComponents: MessagesControllerComponents, transactionSendCoin: SendCoin, sendCoins: SendCoins)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
   def sendCoinForm: Action[AnyContent] = Action { implicit request =>
@@ -23,8 +24,10 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
       },
       sendCoinData => {
         try {
-          val sendCoinsResponse = sendCoins.Service.addSendCoin(sendCoinData.from, sendCoinData.to, sendCoinData.amount,sendCoinData.chainID, sendCoinData.gas, null, null, utilities.RandomString.randomStringArray(10), null)
-          Ok(views.html.index(transactionSendCoin.Service.post(new transactionSendCoin.Request(sendCoinData.from, sendCoinData.password, sendCoinData.to, sendCoinData.amount, sendCoinData.chainID, sendCoinData.gas)).txHash))
+          val sendCoinsResponse = transactionSendCoin.Service.post(new transactionSendCoin.Request(sendCoinData.from, sendCoinData.password, sendCoinData.to, sendCoinData.amount, sendCoinData.chainID, sendCoinData.gas)).txHash
+          val txHashTicketID  = if (configuration.get[Boolean]("blockchain.kafkaEnabled")) (null, sendCoinsResponse) else (Option(sendCoinsResponse), (Random.nextInt(899999999) + 100000000).toString)
+          sendCoins.Service.addSendCoin(sendCoinData.from, sendCoinData.to, sendCoinData.amount,sendCoinData.chainID, sendCoinData.gas, null, txHashTicketID._1, txHashTicketID._2, null)
+          Ok(views.html.index(sendCoinsResponse))
         }
         catch {
           case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))

@@ -42,12 +42,8 @@ class ACLAccounts @Inject()(protected val databaseConfigProvider: DatabaseConfig
 
   object Service {
 
-    def addACLAccount(from: String, address: String, zoneID: String, organizationID: String, chainID: String, acl: ACL)(implicit executionContext: ExecutionContext): String = {
-      Await.result(add(ACLAccount(address, zoneID, organizationID, util.hashing.MurmurHash3.stringHash(acl.toString).toString)), Duration.Inf)
-    }
+    def addACLAccount(from: String, address: String, zoneID: String, organizationID: String, chainID: String, acl: ACL)(implicit executionContext: ExecutionContext): String = Await.result(add(ACLAccount(address, zoneID, organizationID, util.hashing.MurmurHash3.stringHash(acl.toString).toString)), Duration.Inf)
 
-    def getACLAccount(address: String): ACLAccount = {
-      Await.result(findByAddress(address), Duration.Inf)
-    }
+    def getACLAccount(address: String): ACLAccount = Await.result(findByAddress(address), Duration.Inf)
   }
 }

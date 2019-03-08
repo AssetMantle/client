@@ -23,6 +23,12 @@ class SendCoins @Inject()(protected val databaseConfigProvider: DatabaseConfigPr
 
   private def update(sendCoin: SendCoin): Future[Int] = db.run(sendCoinTable.insertOrUpdate(sendCoin))
 
+  private def updateTxHash(ticketID: String, txHash: Option[String]) = db.run(sendCoinTable.filter(_.ticketID === ticketID).map(_.txHash.?).update(txHash))
+
+  private def updateResponseCode(ticketID: String, responseCode: String) = db.run(sendCoinTable.filter(_.ticketID === ticketID).map(_.responseCode.?).update(Option(responseCode)))
+
+  private def updateStatus(ticketID: String, status: Boolean) = db.run(sendCoinTable.filter(_.ticketID === ticketID).map(_.status.?).update(Option(status)))
+
   private def findByTicketID(ticketID: String): Future[SendCoin] = db.run(sendCoinTable.filter(_.ticketID === ticketID).result.head)
 
   private def deleteByTicketID(ticketID: String) = db.run(sendCoinTable.filter(_.ticketID === ticketID).delete)
@@ -52,8 +58,13 @@ class SendCoins @Inject()(protected val databaseConfigProvider: DatabaseConfigPr
 
   object Service {
 
-    def addSendCoin(from: String, to: String, amount: Int, chainID: String, gas: Int, status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String]) (implicit executionContext: ExecutionContext): String = {
-      Await.result(add(SendCoin(from = from, to = to, amount = amount, chainID = chainID, gas = gas, status = status, txHash = txHash, ticketID = ticketID, responseCode = responseCode)), Duration.Inf)
-    }
+    def addSendCoin(from: String, to: String, amount: Int, chainID: String, gas: Int, status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String]) (implicit executionContext: ExecutionContext): String = Await.result(add(SendCoin(from = from, to = to, amount = amount, chainID = chainID, gas = gas, status = status, txHash = txHash, ticketID = ticketID, responseCode = responseCode)), Duration.Inf)
+
+    def updateTxHashSendCoin(ticketID: String, txHash: String) (implicit executionContext: ExecutionContext): Int = Await.result(updateTxHash(ticketID, Option(txHash)),Duration.Inf)
+
+    def updateResponseCodeSendCoin(ticketID: String, responseCode: String) (implicit executionContext: ExecutionContext): Int = Await.result(updateResponseCode(ticketID, responseCode), Duration.Inf)
+
+    def updateStatusSendCoin(ticketID: String, status: Boolean) (implicit executionContext: ExecutionContext): Int = Await.result(updateStatus(ticketID, status), Duration.Inf)
+
   }
 }

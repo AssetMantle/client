@@ -56,12 +56,8 @@ class SetACLs @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
 
   object Service {
 
-    def addSetACL(from: String, aclAddress: String, organizationID: String, zoneID: String, chainID: String, acl: ACL,  status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])(implicit executionContext: ExecutionContext): String = {
-      Await.result(add(SetACL(from, aclAddress, organizationID, zoneID, chainID, util.hashing.MurmurHash3.stringHash(acl.toString).toString, status, txHash, ticketID, responseCode)), Duration.Inf)
-    }
+    def addSetACL(from: String, aclAddress: String, organizationID: String, zoneID: String, chainID: String, acl: ACL,  status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])(implicit executionContext: ExecutionContext): String = Await.result(add(SetACL(from, aclAddress, organizationID, zoneID, chainID, util.hashing.MurmurHash3.stringHash(acl.toString).toString, status, txHash, ticketID, responseCode)), Duration.Inf)
 
-    def getSetACL(ticketID: String) (implicit executionContext: ExecutionContext): SetACL = {
-      Await.result(findByTicketID(ticketID), Duration.Inf)
-    }
+    def getSetACL(ticketID: String) (implicit executionContext: ExecutionContext): SetACL = Await.result(findByTicketID(ticketID), Duration.Inf)
   }
 }
