@@ -1,19 +1,25 @@
 package models.masterTransaction
 
+import exceptions.BaseException
 import javax.inject.Inject
+import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.JdbcProfile
 
 import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, Future}
-import scala.util.Random
+import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.util.{Failure, Random, Success}
 
 case class EmailOTP(id: String, secretHash: String)
 
 class EmailOTPs @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider) {
 
+  private implicit val module: String = constants.Module.MASTER_ACCOUNT
+
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
   val db = databaseConfig.db
+
+  private val logger: Logger = Logger(this.getClass)
 
   import databaseConfig.profile.api._
 
@@ -23,7 +29,13 @@ class EmailOTPs @Inject()(protected val databaseConfigProvider: DatabaseConfigPr
 
   private def update(emailOTP: EmailOTP): Future[Int] = db.run(emailOTPTable.insertOrUpdate(emailOTP))
 
-  private def findById(id: String): Future[EmailOTP] = db.run(emailOTPTable.filter(_.id === id).result.head)
+  private def findById(id: String)(implicit executionContext: ExecutionContext): Future[EmailOTP] = db.run(emailOTPTable.filter(_.id === id).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+        throw new BaseException(constants.Error.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
 
   private def deleteById(id: String) = db.run(emailOTPTable.filter(_.id === id).delete)
 
@@ -31,21 +43,21 @@ class EmailOTPs @Inject()(protected val databaseConfigProvider: DatabaseConfigPr
 
     def * = (id, secretHash) <> (EmailOTP.tupled, EmailOTP.unapply)
 
-    def ? = (id.?, secretHash.?).shaped.<>({ r => import r._; _1.map(_ => EmailOTP.tupled((_1.get, _2.get))) }, (_: Any) => throw new Exception("Inserting into ? projection not supported."))
-
     def id = column[String]("id", O.PrimaryKey)
 
     def secretHash = column[String]("secretHash")
+
+    def ? = (id.?, secretHash.?).shaped.<>({ r => import r._; _1.map(_ => EmailOTP.tupled((_1.get, _2.get))) }, (_: Any) => throw new Exception("Inserting into ? projection not supported."))
   }
 
   object Service {
 
-    def sendOTP(id: String): Int = {
-      val a = (Random.nextInt(899999) + 100000);
-      Await.result(update(new EmailOTP(id, util.hashing.MurmurHash3.stringHash(a.toString).toString)), Duration.Inf)
+    def sendOTP(id: String) = {
+      val otp = (Random.nextInt(899999) + 100000).toString;
+      (Await.result(update(new EmailOTP(id, util.hashing.MurmurHash3.stringHash(otp).toString)), Duration.Inf), otp)
     }
 
-    def verifyOTP(id: String, otp: String): Boolean = Await.result(findById(id), Duration.Inf).secretHash == util.hashing.MurmurHash3.stringHash(otp).toString
+    def verifyOTP(id: String, otp: String)(implicit executionContext: ExecutionContext): Boolean = Await.result(findById(id), Duration.Inf).secretHash == util.hashing.MurmurHash3.stringHash(otp).toString
   }
 
 }

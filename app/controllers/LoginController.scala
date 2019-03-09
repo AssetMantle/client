@@ -3,14 +3,13 @@ package controllers
 import controllers.results.WithUsernameToken
 import exceptions.{BaseException, BlockChainException}
 import javax.inject.Inject
-import models.master.Accounts
+import models.master.{Accounts, Notifications}
 import play.api.Configuration
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.libs.ws.WSClient
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
-import views.companion.master.Login
-import models.master.Notifications
 import utilities.PushNotifications
+import views.companion.master.Login
 
 import scala.concurrent.ExecutionContext
 
@@ -27,9 +26,9 @@ class LoginController @Inject()(messagesControllerComponents: MessagesController
       },
       loginData => {
         try {
-          if (accounts.Service.validateLogin(loginData.username, loginData.password)){
+          if (accounts.Service.validateLogin(loginData.username, loginData.password)) {
             pushNotifications.Push.registerNotificationToken(loginData.username, request.body.asFormUrlEncoded.get("token").headOption.get)
-            pushNotifications.Push.sendNotification(loginData.username, "Login")
+            pushNotifications.Push.sendNotification(loginData.username, "Login", "")
             withUsernameToken.Ok(views.html.index(success = "Logged In!"), loginData.username)
           }
           else Ok(views.html.index(failure = "Invalid Login!"))

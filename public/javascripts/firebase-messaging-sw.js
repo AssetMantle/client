@@ -11,7 +11,8 @@ const messaging = firebase.messaging();
 
 messaging.setBackgroundMessageHandler(function (payload) {
     console.log('[firebase-messaging-sw.js] Received background message ', payload);
-    if (JSON.parse(payload.data.notification).title === "Login"){
+
+    if(JSON.parse(payload.data.notification).title === "Login") {
         const notificationTitle = 'Login';
         const notificationOptions = {
             body: 'Login executed',
@@ -19,7 +20,18 @@ messaging.setBackgroundMessageHandler(function (payload) {
         };
         return self.registration.showNotification(notificationTitle,
             notificationOptions);
-    }else{
+    }
+    else if(JSON.parse(payload.data.notification).title === "sendOTP") {
+        const notificationTitle = 'OTP Verification';
+        const notificationOptions = {
+            body: 'Your OTP is ' + JSON.parse(payload.data.notification).passedData,
+            icon: 'notificationImage.png'
+        };
+
+        return self.registration.showNotification(notificationTitle,
+            notificationOptions);
+    }
+    else {
         const notificationTitle = 'Default Notification';
         const notificationOptions = {
             body: 'Did not redirect from anywhere.',
