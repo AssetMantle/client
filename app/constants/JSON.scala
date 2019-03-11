@@ -1,6 +1,6 @@
 package constants
 
-object Notification {
+object JSON {
   val CONTENT_TYPE = "Content-Type"
   val AUTHORIZATION = "Authorization"
 }

@@ -4,7 +4,6 @@ import javax.inject.Inject
 import models.master.Notifications
 import play.api.Configuration
 import scala.concurrent.ExecutionContext
-import constants._
 import play.api.libs.json.{JsValue, Json}
 import play.api.libs.ws.{WSClient, WSRequest}
 
@@ -22,8 +21,8 @@ class PushNotifications @Inject()(wsClient: WSClient, notifications: Notificatio
       )
       Thread.sleep(3000)
       val reqPost: WSRequest = wsClient.url(configuration.get[String]("notification.url"))
-        .withHttpHeaders(Notification.CONTENT_TYPE -> configuration.get[String]("notification.contentType"))
-        .withHttpHeaders(Notification.AUTHORIZATION -> configuration.get[String]("notification.authorizationKey"))
+        .withHttpHeaders(constants.JSON.CONTENT_TYPE -> configuration.get[String]("notification.contentType"))
+        .withHttpHeaders(constants.JSON.CONTENT_TYPE -> configuration.get[String]("notification.authorizationKey"))
       reqPost.post(data)
     }
 

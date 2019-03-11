@@ -20,12 +20,14 @@ class VerifyEmailAddressController @Inject()(messagesControllerComponents: Messa
 
   def verifyEmailAddressForm: Action[AnyContent] = withLoginAction { implicit request =>
     val sendOTPRequest = emailOTPs.Service.sendOTP(request.session.get(Security.USERNAME).get)
-    if (sendOTPRequest._1 == 1) {
-      pushNotifications.Push.sendNotification(request.session.get(Security.USERNAME).get, "sendOTP", sendOTPRequest._2)
+    try {
+      pushNotifications.Push.sendNotification(request.session.get(Security.USERNAME).get, "sendOTP", sendOTPRequest)
       Ok(views.html.component.master.verifyEmailAddress(VerifyEmailAddress.form))
     }
-    else
-      Ok(views.html.index(failure = "Send Otp Failed!"))
+    catch {
+      case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))
+      case blockChainException: BlockChainException => Ok(views.html.index(failure = blockChainException.message))
+    }
   }
 
   def verifyEmailAddress: Action[AnyContent] = withLoginAction { implicit request =>

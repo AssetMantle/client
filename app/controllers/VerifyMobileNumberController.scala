@@ -20,12 +20,14 @@ class VerifyMobileNumberController @Inject()(messagesControllerComponents: Messa
 
   def verifyMobileNumberForm: Action[AnyContent] = withLoginAction { implicit request =>
     val sendOTPRequest = smsOTPs.Service.sendOTP(request.session.get(Security.USERNAME).get)
-    if (sendOTPRequest._1 == 1) {
-      pushNotifications.Push.sendNotification(request.session.get(Security.USERNAME).get, "sendOTP", sendOTPRequest._2)
+    try {
+      pushNotifications.Push.sendNotification(request.session.get(Security.USERNAME).get, "sendOTP", sendOTPRequest)
       Ok(views.html.component.master.verifyMobileNumber(VerifyMobileNumber.form))
     }
-    else
-      Ok(views.html.index(failure = "Send Otp Failed!"))
+    catch {
+      case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))
+      case blockChainException: BlockChainException => Ok(views.html.index(failure = blockChainException.message))
+    }
   }
 
   def verifyMobileNumber: Action[AnyContent] = withLoginAction { implicit request =>

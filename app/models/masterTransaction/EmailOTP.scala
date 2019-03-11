@@ -54,7 +54,8 @@ class EmailOTPs @Inject()(protected val databaseConfigProvider: DatabaseConfigPr
 
     def sendOTP(id: String) = {
       val otp = (Random.nextInt(899999) + 100000).toString;
-      (Await.result(update(new EmailOTP(id, util.hashing.MurmurHash3.stringHash(otp).toString)), Duration.Inf), otp)
+      if(Await.result(update(new EmailOTP(id, util.hashing.MurmurHash3.stringHash(otp).toString)), Duration.Inf)==0) throw new BaseException(constants.Error.NO_SUCH_ELEMENT_EXCEPTION)
+      otp
     }
 
     def verifyOTP(id: String, otp: String)(implicit executionContext: ExecutionContext): Boolean = Await.result(findById(id), Duration.Inf).secretHash == util.hashing.MurmurHash3.stringHash(otp).toString
