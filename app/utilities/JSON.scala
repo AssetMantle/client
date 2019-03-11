@@ -15,6 +15,8 @@ object JSON {
           response.json(constants.JSON.TICKET_ID).as[String]
         }
         catch {
+          case noSuchElementException: NoSuchElementException => logger.info(response.body.toString, noSuchElementException)
+            throw new BlockChainException(response.body.toString)
           case jsonParseException: JsonParseException => logger.error(response.body.toString, jsonParseException)
             throw new BlockChainException(response.body.toString)
         }

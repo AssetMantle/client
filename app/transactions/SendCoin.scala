@@ -10,8 +10,9 @@ import play.api.{Configuration, Logger}
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.util.Random
 
-class SendCoin @Inject()(configuration: Configuration, wsClient: WSClient, executionContext: ExecutionContext) {
+class SendCoin @Inject()(wsClient: WSClient)(implicit configuration: Configuration, executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.TRANSACTIONS_ADD_KEY
 
@@ -58,6 +59,8 @@ class SendCoin @Inject()(configuration: Configuration, wsClient: WSClient, execu
         logger.error(constants.Error.CONNECT_EXCEPTION, connectException)
         throw new BaseException(constants.Error.CONNECT_EXCEPTION)
     }
+
+    def getTxHashFromWSResponse(wsResponse: WSResponse): String  = new Response()(wsResponse).txHash
   }
 
 }
