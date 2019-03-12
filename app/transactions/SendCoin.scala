@@ -4,13 +4,12 @@ import java.net.ConnectException
 
 import exceptions.BaseException
 import javax.inject.Inject
-import play.api.libs.json.{JsObject, Json}
+import play.api.libs.json.{JsObject, Json, OWrites}
 import play.api.libs.ws.{WSClient, WSResponse}
 import play.api.{Configuration, Logger}
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
-import scala.util.Random
 
 class SendCoin @Inject()(wsClient: WSClient)(implicit configuration: Configuration, executionContext: ExecutionContext) {
 
@@ -36,9 +35,9 @@ class SendCoin @Inject()(wsClient: WSClient)(implicit configuration: Configurati
 
   }
 
-  case class Amount(val denom: String, val amount: String)
+  case class Amount(denom: String, amount: String)
 
-  implicit val amountWrites = Json.writes[Amount]
+  implicit val amountWrites: OWrites[Amount] = Json.writes[Amount]
 
   class Request(from: String, password: String, to: String, amount: Int, pegHash: String, gas: Int) {
     val json: JsObject = Json.obj(fields =

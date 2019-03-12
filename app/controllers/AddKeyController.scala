@@ -23,7 +23,7 @@ class AddKeyController @Inject()(messagesControllerComponents: MessagesControlle
       },
       addKeyData => {
         try {
-          Ok(views.html.index(success = Messages(constants.Success.ADD_KEY) + transactionAddKey.Service.post(new transactionAddKey.Request(addKeyData.name, addKeyData.password, addKeyData.seed)).accountAddress))
+          Ok(views.html.index(success = Messages(constants.Success.ADD_KEY) + transactionAddKey.Service.post(transactionAddKey.Request(addKeyData.name, addKeyData.password, addKeyData.seed)).address))
         }
         catch {
           case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))

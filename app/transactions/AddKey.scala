@@ -1,11 +1,10 @@
 package transactions
 
 import java.net.ConnectException
-
 import exceptions.BaseException
 import javax.inject.Inject
-import play.api.libs.json.{JsObject, Json}
-import play.api.libs.ws.{WSClient, WSResponse}
+import play.api.libs.json._
+import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
 
 import scala.concurrent.duration.Duration
@@ -25,21 +24,15 @@ class AddKey @Inject()(wsClient: WSClient)(implicit configuration: Configuration
 
   private val url = ip + ":" + port + "/" + path
 
-  private def action(request: Request)(implicit executionContext: ExecutionContext): Future[Response] = wsClient.url(url).post(request.json).map { implicit response => new Response() }
+  case class Request(name: String, password: String, seed: String)
 
-  class Response(implicit response: WSResponse) {
+  private implicit val requestWrites: OWrites[Request] =  Json.writes[Request]
 
-    val accountAddress: String = utilities.JSON.getBCStringResponse("address")
-    val publicKey: String = utilities.JSON.getBCStringResponse("pub_key")
-  }
+  case class Response(name: String, address: String, pub_key: String, seed: String)
 
+  private implicit val responseReads: Reads[Response] = Json.reads[Response]
 
-  class Request(name: String, password: String, seed: String) {
-    val json: JsObject = Json.obj(fields =
-      "name" -> name,
-      "password" -> password,
-      "seed" -> seed)
-  }
+  private def action(request: Request)(implicit executionContext: ExecutionContext): Future[Response] = wsClient.url(url).post(Json.toJson(request)).map { response => utilities.JSON.getResponseFromJson[Response](response) }
 
   object Service {
 

@@ -3,6 +3,7 @@ package utilities
 import com.fasterxml.jackson.core.JsonParseException
 import exceptions.BlockChainException
 import play.api.Logger
+import play.api.libs.json._
 import play.api.libs.ws.WSResponse
 
 object JSON {
@@ -20,7 +21,26 @@ object JSON {
           case jsonParseException: JsonParseException => logger.error(response.body.toString, jsonParseException)
             throw new BlockChainException(response.body.toString)
         }
+      case jsonParseException: JsonParseException => logger.error(response.body.toString, jsonParseException)
+        throw new BlockChainException(response.body.toString)
 
+    }
+  }
+
+  def getResponseFromJson[T](response: WSResponse)(implicit logger: Logger, reads: Reads[T]): T = {
+    try {
+      val responseFromJson: JsResult[T] = Json.fromJson[T](response.json)
+      responseFromJson match {
+        case JsSuccess(value: T, path: JsPath) => value
+        case errors: JsError => logger.error(errors.toString)
+          throw new BlockChainException(response.body.toString)
+      }
+    }
+    catch {
+      case noSuchElementException: NoSuchElementException => logger.info(response.toString, noSuchElementException)
+        throw new BlockChainException(response.body.toString)
+      case jsonParseException: JsonParseException => logger.error(response.toString, jsonParseException)
+        throw new BlockChainException(response.body.toString)
     }
   }
 }
