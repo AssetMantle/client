@@ -27,8 +27,8 @@ class LoginController @Inject()(messagesControllerComponents: MessagesController
       loginData => {
         try {
           if (accounts.Service.validateLogin(loginData.username, loginData.password)) {
-            pushNotifications.Push.registerNotificationToken(loginData.username, request.body.asFormUrlEncoded.get("token").headOption.get)
-            pushNotifications.Push.sendNotification(loginData.username, "Login", "")
+            pushNotifications.registerNotificationToken(loginData.username, request.body.asFormUrlEncoded.get("token").headOption.get)
+            pushNotifications.sendNotification(loginData.username, constants.NotificationType.LOGIN)
             withUsernameToken.Ok(views.html.index(success = "Logged In!"), loginData.username)
           }
           else Ok(views.html.index(failure = "Invalid Login!"))

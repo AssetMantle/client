@@ -1,6 +1,5 @@
 $(document).ready(function () {
 
-    TokenElem = document.getElementById("token");
     var config = {
         apiKey: "AIzaSyA1N73fWM03Vb1CnEUF1YTbZUj16IxMvdg",
         authDomain: "corp-play-scala.firebaseapp.com",
@@ -14,8 +13,6 @@ $(document).ready(function () {
     messaging
         .requestPermission()
         .then(function () {
-            console.log("Notification permission granted.");
-
             return messaging.getToken()
         })
         .then(function (token) {

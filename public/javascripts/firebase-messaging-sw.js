@@ -21,7 +21,7 @@ messaging.setBackgroundMessageHandler(function (payload) {
         return self.registration.showNotification(notificationTitle,
             notificationOptions);
     }
-    else if(JSON.parse(payload.data.notification).title === "sendOTP") {
+    else if(JSON.parse(payload.data.notification).title === "SendOTP") {
         const notificationTitle = 'OTP Verification';
         const notificationOptions = {
             body: 'Your OTP is ' + JSON.parse(payload.data.notification).passedData,

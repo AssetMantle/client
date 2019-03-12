@@ -19,9 +19,9 @@ class VerifyEmailAddressController @Inject()(messagesControllerComponents: Messa
   private implicit val module: String = constants.Module.MASTER_ACCOUNT
 
   def verifyEmailAddressForm: Action[AnyContent] = withLoginAction { implicit request =>
-    val sendOTPRequest = emailOTPs.Service.sendOTP(request.session.get(Security.USERNAME).get)
+    val otp = emailOTPs.Service.sendOTP(request.session.get(Security.USERNAME).get)
     try {
-      pushNotifications.Push.sendNotification(request.session.get(Security.USERNAME).get, "sendOTP", sendOTPRequest)
+      pushNotifications.sendNotification(request.session.get(Security.USERNAME).get, constants.NotificationType.SEND_OTP , Seq(otp))
       Ok(views.html.component.master.verifyEmailAddress(VerifyEmailAddress.form))
     }
     catch {
