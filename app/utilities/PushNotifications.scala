@@ -1,22 +1,30 @@
 package utilities
 
+import javax.inject.Inject
+import models.master.Notifications
+import play.api.Configuration
 import play.api.libs.json.{JsValue, Json}
 import play.api.libs.ws.{WSClient, WSRequest}
 
-object PushNotifications {
-  def sendNotification(token: String)(implicit ws: WSClient) = {
+import scala.concurrent.ExecutionContext
+
+class PushNotifications @Inject()(wsClient: WSClient, notifications: Notifications)(implicit exec: ExecutionContext, configuration: Configuration) {
+  def sendNotification(id: String, messageType: String, passedData: Seq[String] = Seq("")) = {
     val data: JsValue = Json.obj(
       "data" -> Json.obj(
         "notification" -> Json.obj(
-          "title" -> "Login"
+          "title" -> messageType,
+          "passedData" -> passedData
         )
       ),
-      "to" -> token
+      "to" -> notifications.Service.getTokenById(id)
     )
     Thread.sleep(3000)
-    val reqPost: WSRequest = ws.url("https://fcm.googleapis.com/fcm/send")
-      .withHttpHeaders("Content-Type" -> "application/json")
-      .withHttpHeaders("Authorization" -> "key=AAAAwSmfGOo:APA91bGSaXARMCGOFGuEB-wJM2tyLQU3HhTRxb1SZiWefjDq3gGiXuVogs9n7jA-MafSK5cJQ4YS8b_9LvlxQUqzTa5jGDHXVd6l9zp8xeXT30gUUDOGmR5Z_-QnFUNQC1xifiyzUKqd")
+    val reqPost: WSRequest = wsClient.url(configuration.get[String]("notification.url"))
+      .withHttpHeaders(constants.JSON.CONTENT_TYPE -> configuration.get[String]("notification.contentType"))
+      .withHttpHeaders(constants.JSON.AUTHORIZATION -> configuration.get[String]("notification.authorizationKey"))
     reqPost.post(data)
   }
+
+  def registerNotificationToken(id: String, notificationToken: String): Int = notifications.Service.updateToken(id, notificationToken)
 }

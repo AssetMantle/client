@@ -32,12 +32,6 @@ POST        /master/addOrganization               controllers.AddOrganizationCon
 GET         /master/verifyOrganization            controllers.AddOrganizationController.verifyOrganizationForm
 POST        /master/verifyOrganization            controllers.AddOrganizationController.verifyOrganization
 
-GET         /master/notificationPermission        controllers.NotificationController.webpush
-POST        /master/notificationPermission        controllers.NotificationController.sendNotification
-
-
-
-
 GET         /blockchian/addKey                    controllers.AddKeyController.addKeyForm
 POST        /blockchain/addKey                    controllers.AddKeyController.addKey
 
