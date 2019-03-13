@@ -1,0 +1,24 @@
+@import helper._
+@import views.companion.blockchain.SendCoin
+
+@(sendCoinForm: Form[SendCoin.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@common(Messages("SendCoin")) {
+    @form(action = routes.SendCoinController.sendCoin) {
+        @CSRF.formField
+        @inputText(sendCoinForm(Messages("from")))
+        @inputText(sendCoinForm(Messages("to")))
+        @inputText(sendCoinForm(Messages("amount")))
+        @inputText(sendCoinForm(Messages("chainID")))
+        @inputText(sendCoinForm(Messages("gas")))
+        @inputPassword(sendCoinForm(Messages("password")))
+
+        @if(sendCoinForm.hasGlobalErrors) {
+            <ul>
+            @for(error <- sendCoinForm.globalErrors) {
+                <li>@error.format</li>
+            }
+            </ul>
+        }
+        <button type="submit">@Messages("SendCoin")</button>
+    }
+}

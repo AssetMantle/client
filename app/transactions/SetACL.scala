@@ -34,7 +34,7 @@ class SetACL @Inject()(wsClient: WSClient)(implicit configuration: Configuration
   }
 
 
-  class Request(from: String, password: String, aclAddress: String, organizationID: String, zoneID: String, chainID: String, issueAsset: String, issueFiat: String, sendAsset: String, sendFiat: String, redeemAsset: String, redeemFiat: String, sellerExecuteOrder: String, buyerExecuteOrder: String, changeBuyerBid: String, changeSellerBid: String, confirmBuyerBid: String, confirmSellerBid: String, negotiation: String, releaseAssets: String) {
+  class Request(from: String, password: String, aclAddress: String, organizationID: String, zoneID: String, chainID: String, issueAsset: Boolean, issueFiat: Boolean, sendAsset: Boolean, sendFiat: Boolean, redeemAsset: Boolean, redeemFiat: Boolean, sellerExecuteOrder: Boolean, buyerExecuteOrder: Boolean, changeBuyerBid: Boolean, changeSellerBid: Boolean, confirmBuyerBid: Boolean, confirmSellerBid: Boolean, negotiation: Boolean, releaseAssets: Boolean) {
     val json: JsObject = Json.obj(fields =
       "from" -> from,
       "password" -> password,
@@ -46,8 +46,8 @@ class SetACL @Inject()(wsClient: WSClient)(implicit configuration: Configuration
       "issueFiat" -> issueFiat,
       "sendAsset" -> sendAsset,
       "sendFiat" -> sendFiat,
-      "redeemAssets" -> redeemAsset,
-      "redeemFiats" -> redeemFiat,
+      "redeemAsset" -> redeemAsset,
+      "redeemFiat" -> redeemFiat,
       "sellerExecuteOrder" -> sellerExecuteOrder,
       "buyerExecuteOrder" -> buyerExecuteOrder,
       "changeBuyerBid" -> changeBuyerBid,
@@ -55,7 +55,7 @@ class SetACL @Inject()(wsClient: WSClient)(implicit configuration: Configuration
       "confirmBuyerBid" -> confirmBuyerBid,
       "confirmSellerBid" -> confirmSellerBid,
       "negotiation" -> negotiation,
-      "releaseAssets" -> releaseAssets
+      "releaseAsset" -> releaseAssets
 
 
     )
