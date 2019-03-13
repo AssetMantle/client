@@ -338,7 +338,6 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."SendCoin"
   "from"                VARCHAR NOT NULL,
   "to"                  VARCHAR NOT NULL,
   "amount"              INT NOT NULL,
-  "chainID"             VARCHAR NOT NULL,
   "gas"                 INT NOT NULL,
   "status"              BOOLEAN,
   "txHash"              VARCHAR,

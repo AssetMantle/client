@@ -27,27 +27,20 @@ class SendCoin @Inject()(wsClient: WSClient)(implicit configuration: Configurati
 
   private val url = ip + ":" + port + "/" + path
 
-  private def action(request: Request)(implicit executionContext: ExecutionContext): Future[Response] = wsClient.url(url).post(request.json).map { implicit response => new Response() }
+  case class Amount(denom: String, amount: String)
+
+  private implicit val amountWrites: OWrites[Amount] = Json.writes[Amount]
+
+  case class Request(from: String, password: String, to: String, amount: Seq[Amount], gas: Int)
+
+  private implicit val requestWrites: OWrites[Request] = Json.writes[Request]
+
+  private def action(request: Request)(implicit executionContext: ExecutionContext): Future[Response] = wsClient.url(url).post(Json.toJson(request)).map { implicit response => new Response() }
 
   class Response(implicit response: WSResponse) {
 
     val txHash: String = utilities.JSON.getBCStringResponse("TxHash")
 
-  }
-
-  case class Amount(denom: String, amount: String)
-
-  implicit val amountWrites: OWrites[Amount] = Json.writes[Amount]
-
-  class Request(from: String, password: String, to: String, amount: Int, pegHash: String, gas: Int) {
-    val json: JsObject = Json.obj(fields =
-      "from" -> from,
-      "password" -> password,
-      "to" -> to,
-      "amount" -> Json.toJson(Seq(Amount("comdex", amount.toString))),
-      "chainID" -> chainID,
-      "gas" -> gas
-    )
   }
 
   object Service {

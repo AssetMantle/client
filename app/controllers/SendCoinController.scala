@@ -24,9 +24,9 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
       },
       sendCoinData => {
         try {
-          val sendCoinsResponse = transactionSendCoin.Service.post(new transactionSendCoin.Request(sendCoinData.from, sendCoinData.password, sendCoinData.to, sendCoinData.amount, sendCoinData.chainID, sendCoinData.gas)).txHash
+          val sendCoinsResponse = transactionSendCoin.Service.post(transactionSendCoin.Request(from = sendCoinData.from, password = sendCoinData.password, to = sendCoinData.to, amount = Seq(transactionSendCoin.Amount("comdex", sendCoinData.amount.toString)), gas = sendCoinData.gas)).txHash
           val txHashTicketID  = if (configuration.get[Boolean]("blockchain.kafkaEnabled")) (null, sendCoinsResponse) else (Option(sendCoinsResponse), (Random.nextInt(899999999) + 100000000).toString)
-          sendCoins.Service.addSendCoin(sendCoinData.from, sendCoinData.to, sendCoinData.amount,sendCoinData.chainID, sendCoinData.gas, null, txHashTicketID._1, txHashTicketID._2, null)
+          sendCoins.Service.addSendCoin(sendCoinData.from, sendCoinData.to, sendCoinData.amount, sendCoinData.gas, null, txHashTicketID._1, txHashTicketID._2, null)
           Ok(views.html.index(sendCoinsResponse))
         }
         catch {
