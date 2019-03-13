@@ -1,5 +1,10 @@
 $(document).ready(function () {
-
+    const apiKey= getConfiguration("notification.apiKey");
+    const authDomain= getConfiguration("notification.authDomain");
+    const databaseURL= getConfiguration("notification.databaseURL");
+    const projectId= getConfiguration("notification.projectId");
+    const storageBucket= getConfiguration("notification.storageBucket");
+    const messagingSenderId = getConfiguration("notification.senderID")
     var config = {
         apiKey: "AIzaSyA1N73fWM03Vb1CnEUF1YTbZUj16IxMvdg",
         authDomain: "corp-play-scala.firebaseapp.com",
@@ -25,5 +30,18 @@ $(document).ready(function () {
     messaging.onMessage(function (payload) {
         console.log("Message received. ", payload);
     });
+    function getConfiguration(configuration) {
+        var route = jsRoutes.controllers.ConfigurationController.queryConfigurationVariable(configuration);
 
+        $.ajax({
+            url: route.url,
+            type: route.type,
+            statusCode: {
+                200: function (result) {
+                    console.log(result)
+                    return result;
+                }
+            }
+        });
+    }
 });

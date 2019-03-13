@@ -15,6 +15,8 @@ import scala.concurrent.ExecutionContext
 
 class LoginController @Inject()(messagesControllerComponents: MessagesControllerComponents, accounts: Accounts, withUsernameToken: WithUsernameToken, pushNotifications: PushNotifications)(implicit exec: ExecutionContext, configuration: Configuration, wsClient: WSClient, notifications: Notifications) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
+  private implicit val module: String = constants.Module.CONTROLLERS_LOGIN
+
   def loginForm: Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.master.login(Login.form))
   }
@@ -28,7 +30,7 @@ class LoginController @Inject()(messagesControllerComponents: MessagesController
         try {
           if (accounts.Service.validateLogin(loginData.username, loginData.password)) {
             pushNotifications.registerNotificationToken(loginData.username, request.body.asFormUrlEncoded.get("token").headOption.get)
-            pushNotifications.sendNotification(loginData.username, constants.NotificationType.LOGIN)
+            pushNotifications.sendNotification(loginData.username, constants.Notification.LOGIN)
             withUsernameToken.Ok(views.html.index(success = "Logged In!"), loginData.username)
           }
           else Ok(views.html.index(failure = "Invalid Login!"))

@@ -9,7 +9,8 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
   def javascriptRoutes = Action { implicit request =>
     Ok(
       JavaScriptReverseRouter("jsRoutes")(
-        routes.javascript.SignUpController.checkUsernameAvailable
+        routes.javascript.SignUpController.checkUsernameAvailable,
+        routes.javascript.ConfigurationController.queryConfigurationVariable
       )
     ).as("text/javascript")
   }
