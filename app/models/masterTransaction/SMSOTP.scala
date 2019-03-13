@@ -1,19 +1,25 @@
 package models.masterTransaction
 
+import exceptions.BaseException
 import javax.inject.Inject
+import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.JdbcProfile
 
 import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, Future}
-import scala.util.Random
+import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.util.{Failure, Random, Success}
 
 case class SMSOTP(id: String, secretHash: String)
 
 class SMSOTPs @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider) {
 
+  private implicit val module: String = constants.Module.MASTER_ACCOUNT
+
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
   val db = databaseConfig.db
+
+  private val logger: Logger = Logger(this.getClass)
 
   import databaseConfig.profile.api._
 
@@ -23,7 +29,14 @@ class SMSOTPs @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
 
   private def update(smsOTP: SMSOTP): Future[Int] = db.run(smsOTPTable.insertOrUpdate(smsOTP))
 
-  private def findById(id: String): Future[SMSOTP] = db.run(smsOTPTable.filter(_.id === id).result.head)
+
+  private def findById(id: String)(implicit executionContext: ExecutionContext): Future[SMSOTP] = db.run(smsOTPTable.filter(_.id === id).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+        throw new BaseException(constants.Error.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
 
   private def deleteById(id: String) = db.run(smsOTPTable.filter(_.id === id).delete)
 
@@ -40,9 +53,14 @@ class SMSOTPs @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
 
   object Service {
 
-    def sendOTP(id: String): Int = Await.result(update(new SMSOTP(id, util.hashing.MurmurHash3.stringHash((Random.nextInt(899999) + 100000).toString).toString)), Duration.Inf)
+    def sendOTP(id: String) = {
+      val otp = (Random.nextInt(899999) + 100000).toString
+      if(Await.result(update(new SMSOTP(id, util.hashing.MurmurHash3.stringHash(otp).toString)), Duration.Inf)==0) throw new BaseException(constants.Error.NO_SUCH_ELEMENT_EXCEPTION)
+      otp
+    }
 
-    def verifyOTP(id: String, otp: String): Boolean = Await.result(findById(id), Duration.Inf).secretHash == util.hashing.MurmurHash3.stringHash(otp).toString
+    def verifyOTP(id: String, otp: String)(implicit executionContext: ExecutionContext): Boolean = Await.result(findById(id), Duration.Inf).secretHash == util.hashing.MurmurHash3.stringHash(otp).toString
+
   }
 
 }

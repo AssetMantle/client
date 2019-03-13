@@ -2,23 +2,32 @@ package controllers
 
 import constants.Security
 import controllers.actions.WithLoginAction
+import exceptions.{BaseException, BlockChainException}
 import javax.inject.Inject
-import models.masterTransaction.EmailOTPs
 import models.master.Contacts
+import models.masterTransaction.EmailOTPs
 import play.api.Configuration
-import play.api.i18n.I18nSupport
+import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
+import utilities.PushNotifications
 import views.companion.master.VerifyEmailAddress
 
 import scala.concurrent.ExecutionContext
 
-class VerifyEmailAddressController @Inject()(messagesControllerComponents: MessagesControllerComponents, emailOTPs: EmailOTPs, contacts: Contacts, withLoginAction: WithLoginAction)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class VerifyEmailAddressController @Inject()(messagesControllerComponents: MessagesControllerComponents, emailOTPs: EmailOTPs, contacts: Contacts, withLoginAction: WithLoginAction, pushNotifications: PushNotifications)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+
+  private implicit val module: String = constants.Module.MASTER_ACCOUNT
 
   def verifyEmailAddressForm: Action[AnyContent] = withLoginAction { implicit request =>
-    if (emailOTPs.Service.sendOTP(request.session.get(Security.USERNAME).get) == 1)
+    val otp = emailOTPs.Service.sendOTP(request.session.get(Security.USERNAME).get)
+    try {
+      pushNotifications.sendNotification(request.session.get(Security.USERNAME).get, constants.NotificationType.SEND_OTP , Seq(otp))
       Ok(views.html.component.master.verifyEmailAddress(VerifyEmailAddress.form))
-    else
-      Ok(views.html.index(failure = "Send Otp Failed!"))
+    }
+    catch {
+      case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))
+      case blockChainException: BlockChainException => Ok(views.html.index(failure = blockChainException.message))
+    }
   }
 
   def verifyEmailAddress: Action[AnyContent] = withLoginAction { implicit request =>
@@ -27,10 +36,15 @@ class VerifyEmailAddressController @Inject()(messagesControllerComponents: Messa
         BadRequest(views.html.component.master.verifyEmailAddress(formWithErrors))
       },
       verifyEmailAddressData => {
-        if (emailOTPs.Service.verifyOTP(request.session.get(Security.USERNAME).get, verifyEmailAddressData.otp))
-          if (contacts.Service.verifyEmailAddress(request.session.get(Security.USERNAME).get) == 1)
-            Ok(views.html.index(success = "EmailUpdated"))
-        Ok(views.html.index(failure = "Failed"))
+        try {
+          if (!emailOTPs.Service.verifyOTP(request.session.get(Security.USERNAME).get, verifyEmailAddressData.otp)) throw new BaseException(constants.Error.INVALID_OTP)
+          if (contacts.Service.verifyEmailAddress(request.session.get(Security.USERNAME).get) != 1) throw new BaseException(constants.Error.EMAIL_NOT_FOUND)
+          Ok(views.html.index(success = "Email Updated"))
+        }
+        catch {
+          case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))
+          case blockChainException: BlockChainException => Ok(views.html.index(failure = blockChainException.message))
+        }
       })
   }
 }
