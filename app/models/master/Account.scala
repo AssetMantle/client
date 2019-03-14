@@ -11,7 +11,7 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Account(id: String, secretHash: String, accountAddress: String)
+case class Account(id: String, secretHash: String, accountAddress: String, language: String)
 
 class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider) {
 
@@ -49,13 +49,15 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   private[models] class AccountTable(tag: Tag) extends Table[Account](tag, "Account") {
 
-    def * = (id, secretHash, accountAddress) <> (Account.tupled, Account.unapply)
+    def * = (id, secretHash, accountAddress, language) <> (Account.tupled, Account.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
     def secretHash = column[String]("secretHash")
 
     def accountAddress = column[String]("accountAddress")
+
+    def language = column[String]("language")
 
   }
 
@@ -68,12 +70,14 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
       !Await.result(checkById(username), Duration.Inf)
     }
 
-    def addLogin(username: String, password: String, accountAddress: String)(implicit executionContext: ExecutionContext): String = {
-      Await.result(add(Account(username, util.hashing.MurmurHash3.stringHash(password).toString, accountAddress)), Duration.Inf)
+    def addLogin(username: String, password: String, accountAddress: String, language: String)(implicit executionContext: ExecutionContext): String = {
+      Await.result(add(Account(username, util.hashing.MurmurHash3.stringHash(password).toString, accountAddress, language)), Duration.Inf)
       accountAddress
     }
 
     def getAccount(username: String)(implicit executionContext: ExecutionContext) = Await.result(findById(username), Duration.Inf)
+
+    def getLangById(id: String)(implicit executionContext: ExecutionContext): String = Await.result(findById(id), Duration.Inf).language
 
   }
 

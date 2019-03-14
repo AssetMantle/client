@@ -3,3 +3,8 @@ NotificationTitle.Login= S'identifier
 NotificationMessage.OTP= Votre OTP est {0}
 NotificationTitle.OTP= Vérifier OTP
 
+Index=Indexio
+Login= S'identifier
+
+VerifyEmailAddress= Vérifier l'adresse e-mail
+otp= otp

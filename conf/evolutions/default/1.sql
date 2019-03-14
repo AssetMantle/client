@@ -433,6 +433,7 @@ CREATE TABLE IF NOT EXISTS MASTER."Account"
   "id"             VARCHAR NOT NULL,
   "secretHash"     VARCHAR NOT NULL,
   "accountAddress" VARCHAR NOT NULL,
+  "language"       VARCHAR NOT NULL,
   PRIMARY KEY ("id")
 );
 
