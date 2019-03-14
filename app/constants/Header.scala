@@ -1,10 +1,7 @@
 package constants
 
-object JSON {
-
-  //Kafka
-  val TICKET_ID = "TicketID"
-
+object Header {
   val CONTENT_TYPE = "Content-Type"
   val AUTHORIZATION = "Authorization"
+  val APPLICATION_JSON = "application/json"
 }

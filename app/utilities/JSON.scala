@@ -13,7 +13,7 @@ object JSON {
     } catch {
       case noSuchElementException: NoSuchElementException => logger.info(response.body.toString, noSuchElementException)
         try {
-          response.json(constants.JSON.TICKET_ID).as[String]
+          response.json("TICKET_ID").as[String]
         }
         catch {
           case noSuchElementException: NoSuchElementException => logger.info(response.body.toString, noSuchElementException)

@@ -1,81 +1,82 @@
-GET         /                                     controllers.IndexController.index
+GET         /                                               controllers.IndexController.index
 
 
-GET         /assets/*file                         controllers.Assets.versioned(path="/public", file: Asset)
+GET         /assets/*file                                   controllers.Assets.versioned(path="/public", file: Asset)
 
-GET         /firebase-messaging-sw.js             controllers.Assets.at(path="/public/javascripts", file="firebase-messaging-sw.js")
-GET         /notificationImage.png                controllers.Assets.at(path="/public/images", file="notificationImage.png")
+GET         /firebase-messaging-sw.js                       controllers.Assets.at(path="/public/javascripts", file="firebase-messaging-sw.js")
+GET         /notificationImage.png                          controllers.Assets.at(path="/public/images", file="notificationImage.png")
 
 
-GET         /javascriptRoutes                     controllers.JavaScriptRoutesController.javascriptRoutes
+GET         /javascriptRoutes                               controllers.JavaScriptRoutesController.javascriptRoutes
 
-GET         /master/login                         controllers.LoginController.loginForm
-POST        /master/login                         controllers.LoginController.login
+GET         /master/login                                   controllers.LoginController.loginForm
+POST        /master/login                                   controllers.LoginController.login
 
-GET         /master/checkUsernameAvailable        controllers.SignUpController.checkUsernameAvailable(username: String)
+GET         /master/checkUsernameAvailable                  controllers.SignUpController.checkUsernameAvailable(username: String)
+GET         /master/queryConfigurationVariable:query        controllers.ConfigurationController.queryConfigurationVariable(query: String)
 
-GET         /master/signUp                        controllers.SignUpController.signUpForm
-POST        /master/signUp                        controllers.SignUpController.signUp
+GET         /master/signUp                                  controllers.SignUpController.signUpForm
+POST        /master/signUp                                  controllers.SignUpController.signUp
 
 GET         /master/updateContact                 controllers.UpdateContactController.updateContactForm
 POST        /master/updateContact                 controllers.UpdateContactController.updateContact
 
-GET         /master/verifyMobileNumber            controllers.VerifyMobileNumberController.verifyMobileNumberForm
-POST        /master/verifyMobileNumber            controllers.VerifyMobileNumberController.verifyMobileNumber
+GET         /master/verifyMobileNumber                      controllers.VerifyMobileNumberController.verifyMobileNumberForm
+POST        /master/verifyMobileNumber                      controllers.VerifyMobileNumberController.verifyMobileNumber
 
-GET         /master/verifyEmailAddress            controllers.VerifyEmailAddressController.verifyEmailAddressForm
-POST        /master/verifyEmailAddress            controllers.VerifyEmailAddressController.verifyEmailAddress
+GET         /master/verifyEmailAddress                      controllers.VerifyEmailAddressController.verifyEmailAddressForm
+POST        /master/verifyEmailAddress                      controllers.VerifyEmailAddressController.verifyEmailAddress
 
-GET         /master/addOrganization               controllers.AddOrganizationController.addOrganizationForm
-POST        /master/addOrganization               controllers.AddOrganizationController.addOrganization
+GET         /master/addOrganization                         controllers.AddOrganizationController.addOrganizationForm
+POST        /master/addOrganization                         controllers.AddOrganizationController.addOrganization
 
-GET         /master/verifyOrganization            controllers.AddOrganizationController.verifyOrganizationForm
-POST        /master/verifyOrganization            controllers.AddOrganizationController.verifyOrganization
+GET         /master/verifyOrganization                      controllers.AddOrganizationController.verifyOrganizationForm
+POST        /master/verifyOrganization                      controllers.AddOrganizationController.verifyOrganization
 
-GET         /blockchian/addKey                    controllers.AddKeyController.addKeyForm
-POST        /blockchain/addKey                    controllers.AddKeyController.addKey
+GET         /blockchian/addKey                              controllers.AddKeyController.addKeyForm
+POST        /blockchain/addKey                              controllers.AddKeyController.addKey
 
-GET         /blockchian/addOrganization           controllers.AddOrganizationController.addOrganizationFormBC
-POST        /blockchain/addOrganization           controllers.AddOrganizationController.addOrganizationBC
+GET         /blockchian/addOrganization                     controllers.AddOrganizationController.addOrganizationFormBC
+POST        /blockchain/addOrganization                     controllers.AddOrganizationController.addOrganizationBC
 
-GET         /blockchian/addZone                   controllers.AddZoneController.addZoneForm
-POST        /blockchain/addZone                   controllers.AddZoneController.addZone
+GET         /blockchian/addZone                             controllers.AddZoneController.addZoneForm
+POST        /blockchain/addZone                             controllers.AddZoneController.addZone
 
-GET         /blockchian/buyerExecuteOrder         controllers.BuyerExecuteOrderController.buyerExecuteOrderForm
-POST        /blockchain/buyerExecuteOrder         controllers.BuyerExecuteOrderController.buyerExecuteOrder
+GET         /blockchian/buyerExecuteOrder                   controllers.BuyerExecuteOrderController.buyerExecuteOrderForm
+POST        /blockchain/buyerExecuteOrder                   controllers.BuyerExecuteOrderController.buyerExecuteOrder
 
-GET         /blockchian/changeBuyerBid            controllers.ChangeBuyerBidController.changeBuyerBidForm
-POST        /blockchain/changeBuyerBid            controllers.ChangeBuyerBidController.changeBuyerBid
+GET         /blockchian/changeBuyerBid                      controllers.ChangeBuyerBidController.changeBuyerBidForm
+POST        /blockchain/changeBuyerBid                      controllers.ChangeBuyerBidController.changeBuyerBid
 
-GET         /blockchian/changeSellerBid           controllers.ChangeSellerBidController.changeSellerBidForm
-POST        /blockchain/changeSellerBid           controllers.ChangeSellerBidController.changeSellerBid
+GET         /blockchian/changeSellerBid                     controllers.ChangeSellerBidController.changeSellerBidForm
+POST        /blockchain/changeSellerBid                     controllers.ChangeSellerBidController.changeSellerBid
 
-GET         /blockchian/confirmBuyerBid           controllers.ConfirmBuyerBidController.confirmBuyerBidForm
-POST        /blockchain/confirmBuyerBid           controllers.ConfirmBuyerBidController.confirmBuyerBid
+GET         /blockchian/confirmBuyerBid                     controllers.ConfirmBuyerBidController.confirmBuyerBidForm
+POST        /blockchain/confirmBuyerBid                     controllers.ConfirmBuyerBidController.confirmBuyerBid
 
-GET         /blockchian/confirmSellerBid          controllers.ConfirmSellerBidController.confirmSellerBidForm
-POST        /blockchain/confirmSellerBid          controllers.ConfirmSellerBidController.confirmSellerBid
+GET         /blockchian/confirmSellerBid                    controllers.ConfirmSellerBidController.confirmSellerBidForm
+POST        /blockchain/confirmSellerBid                    controllers.ConfirmSellerBidController.confirmSellerBid
 
-GET         /blockchian/issueAsset                controllers.IssueAssetController.issueAssetForm
-POST        /blockchain/issueAsset                controllers.IssueAssetController.issueAsset
+GET         /blockchian/issueAsset                          controllers.IssueAssetController.issueAssetForm
+POST        /blockchain/issueAsset                          controllers.IssueAssetController.issueAsset
 
-GET         /blockchian/issueFiat                 controllers.IssueFiatController.issueFiatForm
-POST        /blockchain/issueFiat                 controllers.IssueFiatController.issueFiat
+GET         /blockchian/issueFiat                           controllers.IssueFiatController.issueFiatForm
+POST        /blockchain/issueFiat                           controllers.IssueFiatController.issueFiat
 
-GET         /blockchian/redeemAsset               controllers.RedeemAssetController.redeemAssetForm
-POST        /blockchain/redeemAsset               controllers.RedeemAssetController.redeemAsset
+GET         /blockchian/redeemAsset                         controllers.RedeemAssetController.redeemAssetForm
+POST        /blockchain/redeemAsset                         controllers.RedeemAssetController.redeemAsset
 
-GET         /blockchian/redeemFiat                controllers.RedeemFiatController.redeemFiatForm
-POST        /blockchain/redeemFiat                controllers.RedeemFiatController.redeemFiat
+GET         /blockchian/redeemFiat                          controllers.RedeemFiatController.redeemFiatForm
+POST        /blockchain/redeemFiat                          controllers.RedeemFiatController.redeemFiat
 
-GET         /blockchian/releaseAsset              controllers.ReleaseAssetController.releaseAssetForm
-POST        /blockchain/releaseAsset              controllers.ReleaseAssetController.releaseAsset
+GET         /blockchian/releaseAsset                        controllers.ReleaseAssetController.releaseAssetForm
+POST        /blockchain/releaseAsset                        controllers.ReleaseAssetController.releaseAsset
 
-GET         /blockchian/sellerExecuteOrder        controllers.SellerExecuteOrderController.sellerExecuteOrderForm
-POST        /blockchain/sellerExecuteOrder        controllers.SellerExecuteOrderController.sellerExecuteOrder
+GET         /blockchian/sellerExecuteOrder                  controllers.SellerExecuteOrderController.sellerExecuteOrderForm
+POST        /blockchain/sellerExecuteOrder                  controllers.SellerExecuteOrderController.sellerExecuteOrder
 
-GET         /blockchian/sendAsset                 controllers.SendAssetController.sendAssetForm
-POST        /blockchain/sendAsset                 controllers.SendAssetController.sendAsset
+GET         /blockchian/sendAsset                           controllers.SendAssetController.sendAssetForm
+POST        /blockchain/sendAsset                           controllers.SendAssetController.sendAsset
 
 GET         /blockchain/sendCoin                  controllers.SendCoinController.sendCoinForm
 POST        /blockchain/sendCoin                  controllers.SendCoinController.sendCoin
@@ -83,11 +84,11 @@ POST        /blockchain/sendCoin                  controllers.SendCoinController
 GET         /blockchian/sendFiat                  controllers.SendFiatController.sendFiatForm
 POST        /blockchain/sendFiat                  controllers.SendFiatController.sendFiat
 
-GET         /blockchian/setACL                    controllers.SetACLController.setACLForm
-POST        /blockchain/setACL                    controllers.SetACLController.setACL
+GET         /blockchian/setACL                              controllers.SetACLController.setACLForm
+POST        /blockchain/setACL                              controllers.SetACLController.setACL
 
-GET         /blockchian/setBuyerFeedback          controllers.SetBuyerFeedbackController.setBuyerFeedbackForm
-POST        /blockchain/setBuyerFeedback          controllers.SetBuyerFeedbackController.setBuyerFeedback
+GET         /blockchian/setBuyerFeedback                    controllers.SetBuyerFeedbackController.setBuyerFeedbackForm
+POST        /blockchain/setBuyerFeedback                    controllers.SetBuyerFeedbackController.setBuyerFeedback
 
-GET         /blockchian/setSellerFeedback         controllers.SetSellerFeedbackController.setSellerFeedbackForm
-POST        /blockchain/setSellerFeedback         controllers.SetSellerFeedbackController.setSellerFeedback
+GET         /blockchian/setSellerFeedback                   controllers.SetSellerFeedbackController.setSellerFeedbackForm
+POST        /blockchain/setSellerFeedback                   controllers.SetSellerFeedbackController.setSellerFeedback
