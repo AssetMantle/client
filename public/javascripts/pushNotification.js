@@ -22,6 +22,7 @@ $(document).ready(function () {
         })
         .then(function (token) {
             document.getElementById('submitToken').value = token
+            console.log(token)
         })
 
         .catch(function (err) {
@@ -38,7 +39,6 @@ $(document).ready(function () {
             type: route.type,
             statusCode: {
                 200: function (result) {
-                    console.log(result)
                     return result;
                 }
             }

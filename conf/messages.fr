@@ -1,0 +1,5 @@
+NotificationMessage.Login= Vous êtes authentifié {0}
+NotificationTitle.Login= S'identifier
+NotificationMessage.OTP= Votre OTP est {0}
+NotificationTitle.OTP= Vérifier OTP
+

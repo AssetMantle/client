@@ -1,16 +1,20 @@
 package utilities
 
 import javax.inject.Inject
-import models.master.Notifications
+import models.masterTransaction.AccountTokens
 import play.api.Configuration
+import play.api.i18n.{Lang, Langs, MessagesApi}
 import play.api.libs.json.{Json, OWrites}
 import play.api.libs.ws.{WSClient, WSResponse}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class PushNotifications @Inject()(wsClient: WSClient, notifications: Notifications)(implicit exec: ExecutionContext, configuration: Configuration) {
+class PushNotifications @Inject()(wsClient: WSClient, accountTokens: AccountTokens, langs: Langs, messagesApi: MessagesApi)(implicit exec: ExecutionContext, configuration: Configuration) {
 
   private val url = configuration.get[String]("notification.url")
+
+  implicit private val lang: Lang = langs.availables.head
+  //implicit private val lang: Lang = Lang("fr")
 
   private val authorizationKey = configuration.get[String]("notification.authorizationKey")
 
@@ -20,13 +24,13 @@ class PushNotifications @Inject()(wsClient: WSClient, notifications: Notificatio
   private case class Data(to: String, notification: Notification)
   private implicit val dataWrites: OWrites[Data] = Json.writes[Data]
 
-  def sendNotification(id: String, messageType: String, passedData: Seq[String] = Seq("Executed"))(implicit currentModule: String)= {
+  def sendNotification(id: String, messageType: String, passedData: Seq[String] = Seq(""))(implicit currentModule: String)= {
     Thread.sleep(3000)
     wsClient.url(url).withHttpHeaders(constants.Header.CONTENT_TYPE -> constants.Header.APPLICATION_JSON).withHttpHeaders(constants.Header.AUTHORIZATION -> authorizationKey)
-      .post(Json.toJson(Data(notifications.Service.getTokenById(id), Notification(messageType, passedData(0)))))
+      .post(Json.toJson(Data(accountTokens.Service.getTokenById(id), Notification(messagesApi("NotificationTitle"+"."+messageType), messagesApi("NotificationMessage"+"."+messageType, passedData(0))))))
   }
 
-  def registerNotificationToken(id: String, notificationToken: String): Int = notifications.Service.updateToken(id, notificationToken)
+  def registerNotificationToken(id: String, notificationToken: String): Int = accountTokens.Service.updateToken(id, notificationToken)
 
 }
 

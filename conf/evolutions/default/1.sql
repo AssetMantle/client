@@ -41,22 +41,22 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."ACLAccount_BC"
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN."ACLHash_BC"
 (
-    "issueAsset"          BOOLEAN NOT NULL,
-    "issueFiat"           BOOLEAN NOT NULL,
-    "sendAsset"           BOOLEAN NOT NULL,
-    "sendFiat"            BOOLEAN NOT NULL,
-    "redeemAsset"        BOOLEAN NOT NULL,
-    "redeemFiat"         BOOLEAN NOT NULL,
-    "sellerExecuteOrder"  BOOLEAN NOT NULL,
-    "buyerExecuteOrder"   BOOLEAN NOT NULL,
-    "changeBuyerBid"      BOOLEAN NOT NULL,
-    "changeSellerBid"     BOOLEAN NOT NULL,
-    "confirmBuyerBid"     BOOLEAN NOT NULL,
-    "confirmSellerBid"    BOOLEAN NOT NULL,
-    "negotiation"         BOOLEAN NOT NULL,
-    "releaseAsset"       BOOLEAN NOT NULL,
-    "hash"                VARCHAR NOT NULL,
-    PRIMARY KEY ("hash")
+  "issueAsset"         BOOLEAN NOT NULL,
+  "issueFiat"          BOOLEAN NOT NULL,
+  "sendAsset"          BOOLEAN NOT NULL,
+  "sendFiat"           BOOLEAN NOT NULL,
+  "redeemAsset"        BOOLEAN NOT NULL,
+  "redeemFiat"         BOOLEAN NOT NULL,
+  "sellerExecuteOrder" BOOLEAN NOT NULL,
+  "buyerExecuteOrder"  BOOLEAN NOT NULL,
+  "changeBuyerBid"     BOOLEAN NOT NULL,
+  "changeSellerBid"    BOOLEAN NOT NULL,
+  "confirmBuyerBid"    BOOLEAN NOT NULL,
+  "confirmSellerBid"   BOOLEAN NOT NULL,
+  "negotiation"        BOOLEAN NOT NULL,
+  "releaseAsset"       BOOLEAN NOT NULL,
+  "hash"               VARCHAR NOT NULL,
+  PRIMARY KEY ("hash")
 );
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Fiat_BC"
@@ -113,8 +113,50 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Order_BC"
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."AddKey"
 (
-  "name"          VARCHAR NOT NULL,
-  "seed"          VARCHAR NOT NULL,
+  "name"         VARCHAR NOT NULL,
+  "seed"         VARCHAR NOT NULL,
+  "status"       BOOLEAN,
+  "txHash"       VARCHAR,
+  "ticketID"     VARCHAR NOT NULL,
+  "responseCode" VARCHAR,
+  PRIMARY KEY ("ticketID")
+);
+
+CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."AddOrganization"
+(
+  "from"           VARCHAR NOT NULL,
+  "to"             VARCHAR NOT NULL,
+  "organizationID" VARCHAR NOT NULL,
+  "chainID"        VARCHAR NOT NULL,
+  "status"         BOOLEAN,
+  "txHash"         VARCHAR,
+  "ticketID"       VARCHAR NOT NULL,
+  "responseCode"   VARCHAR,
+  PRIMARY KEY ("ticketID")
+);
+
+CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."AddZone"
+(
+  "from"         VARCHAR NOT NULL,
+  "to"           VARCHAR NOT NULL,
+  "zoneID"       VARCHAR NOT NULL,
+  "chainID"      VARCHAR NOT NULL,
+  "status"       BOOLEAN,
+  "txHash"       VARCHAR,
+  "ticketID"     VARCHAR NOT NULL,
+  "responseCode" VARCHAR,
+  PRIMARY KEY ("ticketID")
+);
+
+CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."BuyerExecuteOrder"
+(
+  "from"          VARCHAR NOT NULL,
+  "buyerAddress"  VARCHAR NOT NULL,
+  "sellerAddress" VARCHAR NOT NULL,
+  "fiatProofHash" VARCHAR NOT NULL,
+  "pegHash"       VARCHAR NOT NULL,
+  "chainID"       VARCHAR NOT NULL,
+  "gas"           INT     NOT NULL,
   "status"        BOOLEAN,
   "txHash"        VARCHAR,
   "ticketID"      VARCHAR NOT NULL,
@@ -122,288 +164,246 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."AddKey"
   PRIMARY KEY ("ticketID")
 );
 
-CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."AddOrganization"
-(
-  "from"            VARCHAR NOT NULL,
-  "to"              VARCHAR NOT NULL,
-  "organizationID"  VARCHAR NOT NULL,
-  "chainID"         VARCHAR NOT NULL,
-  "status"          BOOLEAN,
-  "txHash"          VARCHAR ,
-  "ticketID"        VARCHAR NOT NULL,
-  "responseCode"    VARCHAR,
-  PRIMARY KEY ("ticketID")
-);
-
-CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."AddZone"
-(
-  "from"            VARCHAR NOT NULL,
-  "to"              VARCHAR NOT NULL,
-  "zoneID"          VARCHAR NOT NULL,
-  "chainID"         VARCHAR NOT NULL,
-  "status"          BOOLEAN,
-  "txHash"          VARCHAR,
-  "ticketID"        VARCHAR NOT NULL,
-  "responseCode"    VARCHAR,
-  PRIMARY KEY ("ticketID")
-);
-
-CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."BuyerExecuteOrder"
-(
-  "from"            VARCHAR NOT NULL,
-  "buyerAddress"    VARCHAR NOT NULL,
-  "sellerAddress"   VARCHAR NOT NULL,
-  "fiatProofHash"   VARCHAR NOT NULL,
-  "pegHash"         VARCHAR NOT NULL,
-  "chainID"         VARCHAR NOT NULL,
-  "gas"             INT NOT NULL,
-  "status"          BOOLEAN,
-  "txHash"          VARCHAR,
-  "ticketID"        VARCHAR NOT NULL,
-  "responseCode"    VARCHAR,
-  PRIMARY KEY ("ticketID")
-);
-
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."ChangeBuyerBid"
 (
-  "from"            VARCHAR NOT NULL,
-  "to"              VARCHAR NOT NULL,
-  "bid"             INT NOT NULL,
-  "time"            INT NOT NULL,
-  "pegHash"         VARCHAR NOT NULL,
-  "chainID"         VARCHAR NOT NULL,
-  "gas"             INT NOT NULL,
-  "status"          BOOLEAN,
-  "txHash"          VARCHAR,
-  "ticketID"        VARCHAR NOT NULL,
-  "responseCode"    VARCHAR,
+  "from"         VARCHAR NOT NULL,
+  "to"           VARCHAR NOT NULL,
+  "bid"          INT     NOT NULL,
+  "time"         INT     NOT NULL,
+  "pegHash"      VARCHAR NOT NULL,
+  "chainID"      VARCHAR NOT NULL,
+  "gas"          INT     NOT NULL,
+  "status"       BOOLEAN,
+  "txHash"       VARCHAR,
+  "ticketID"     VARCHAR NOT NULL,
+  "responseCode" VARCHAR,
   PRIMARY KEY ("ticketID")
 );
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."ChangeSellerBid"
 (
-  "from"            VARCHAR NOT NULL,
-  "to"              VARCHAR NOT NULL,
-  "bid"             INT NOT NULL,
-  "time"            INT NOT NULL,
-  "pegHash"         VARCHAR NOT NULL,
-  "chainID"         VARCHAR NOT NULL,
-  "gas"             INT NOT NULL,
-  "status"          BOOLEAN,
-  "txHash"          VARCHAR,
-  "ticketID"        VARCHAR NOT NULL,
-  "responseCode"    VARCHAR,
+  "from"         VARCHAR NOT NULL,
+  "to"           VARCHAR NOT NULL,
+  "bid"          INT     NOT NULL,
+  "time"         INT     NOT NULL,
+  "pegHash"      VARCHAR NOT NULL,
+  "chainID"      VARCHAR NOT NULL,
+  "gas"          INT     NOT NULL,
+  "status"       BOOLEAN,
+  "txHash"       VARCHAR,
+  "ticketID"     VARCHAR NOT NULL,
+  "responseCode" VARCHAR,
   PRIMARY KEY ("ticketID")
 );
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."ConfirmBuyerBid"
 (
-  "from"            VARCHAR NOT NULL,
-  "to"              VARCHAR NOT NULL,
-  "bid"             INT NOT NULL,
-  "time"            INT NOT NULL,
-  "pegHash"         VARCHAR NOT NULL,
-  "chainID"         VARCHAR NOT NULL,
-  "gas"             INT NOT NULL,
-  "status"          BOOLEAN,
-  "txHash"          VARCHAR,
-  "ticketID"        VARCHAR NOT NULL,
-  "responseCode"    VARCHAR,
+  "from"         VARCHAR NOT NULL,
+  "to"           VARCHAR NOT NULL,
+  "bid"          INT     NOT NULL,
+  "time"         INT     NOT NULL,
+  "pegHash"      VARCHAR NOT NULL,
+  "chainID"      VARCHAR NOT NULL,
+  "gas"          INT     NOT NULL,
+  "status"       BOOLEAN,
+  "txHash"       VARCHAR,
+  "ticketID"     VARCHAR NOT NULL,
+  "responseCode" VARCHAR,
   PRIMARY KEY ("ticketID")
 );
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."ConfirmSellerBid"
 (
-  "from"            VARCHAR NOT NULL,
-  "to"              VARCHAR NOT NULL,
-  "bid"             INT NOT NULL,
-  "time"            INT NOT NULL,
-  "pegHash"         VARCHAR NOT NULL,
-  "chainID"         VARCHAR NOT NULL,
-  "gas"             INT NOT NULL,
-  "status"          BOOLEAN,
-  "txHash"          VARCHAR,
-  "ticketID"        VARCHAR NOT NULL,
-  "responseCode"    VARCHAR,
+  "from"         VARCHAR NOT NULL,
+  "to"           VARCHAR NOT NULL,
+  "bid"          INT     NOT NULL,
+  "time"         INT     NOT NULL,
+  "pegHash"      VARCHAR NOT NULL,
+  "chainID"      VARCHAR NOT NULL,
+  "gas"          INT     NOT NULL,
+  "status"       BOOLEAN,
+  "txHash"       VARCHAR,
+  "ticketID"     VARCHAR NOT NULL,
+  "responseCode" VARCHAR,
   PRIMARY KEY ("ticketID")
 );
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."IssueAsset"
 (
-  "from"            VARCHAR NOT NULL,
-  "to"              VARCHAR NOT NULL,
-  "documentHash"    VARCHAR NOT NULL,
-  "assetType"       VARCHAR NOT NULL,
-  "assetPrice"      INT NOT NULL,
-  "quantityUnit"    VARCHAR NOT NULL,
-  "assetQuantity"   INT NOT NULL,
-  "chainID"         VARCHAR NOT NULL,
-  "gas"             INT NOT NULL,
-  "status"          BOOLEAN,
-  "txHash"          VARCHAR,
-  "ticketID"        VARCHAR NOT NULL,
-  "responseCode"    VARCHAR,
+  "from"          VARCHAR NOT NULL,
+  "to"            VARCHAR NOT NULL,
+  "documentHash"  VARCHAR NOT NULL,
+  "assetType"     VARCHAR NOT NULL,
+  "assetPrice"    INT     NOT NULL,
+  "quantityUnit"  VARCHAR NOT NULL,
+  "assetQuantity" INT     NOT NULL,
+  "chainID"       VARCHAR NOT NULL,
+  "gas"           INT     NOT NULL,
+  "status"        BOOLEAN,
+  "txHash"        VARCHAR,
+  "ticketID"      VARCHAR NOT NULL,
+  "responseCode"  VARCHAR,
   PRIMARY KEY ("ticketID")
 );
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."IssueFiat"
 (
-  "from"                VARCHAR NOT NULL,
-  "to"                  VARCHAR NOT NULL,
-  "transactionID"       VARCHAR NOT NULL,
-  "transactionAmount"   INT NOT NULL,
-  "chainID"             VARCHAR NOT NULL,
-  "gas"                 INT NOT NULL,
-  "status"              BOOLEAN,
-  "txHash"              VARCHAR,
-  "ticketID"            VARCHAR NOT NULL,
-  "responseCode"        VARCHAR,
+  "from"              VARCHAR NOT NULL,
+  "to"                VARCHAR NOT NULL,
+  "transactionID"     VARCHAR NOT NULL,
+  "transactionAmount" INT     NOT NULL,
+  "chainID"           VARCHAR NOT NULL,
+  "gas"               INT     NOT NULL,
+  "status"            BOOLEAN,
+  "txHash"            VARCHAR,
+  "ticketID"          VARCHAR NOT NULL,
+  "responseCode"      VARCHAR,
   PRIMARY KEY ("ticketID")
 );
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."RedeemAsset"
 (
-  "from"                VARCHAR NOT NULL,
-  "to"                  VARCHAR NOT NULL,
-  "pegHash"             VARCHAR NOT NULL,
-  "chainID"             VARCHAR NOT NULL,
-  "gas"                 INT NOT NULL,
-  "status"              BOOLEAN,
-  "txHash"              VARCHAR,
-  "ticketID"            VARCHAR NOT NULL,
-  "responseCode"        VARCHAR,
+  "from"         VARCHAR NOT NULL,
+  "to"           VARCHAR NOT NULL,
+  "pegHash"      VARCHAR NOT NULL,
+  "chainID"      VARCHAR NOT NULL,
+  "gas"          INT     NOT NULL,
+  "status"       BOOLEAN,
+  "txHash"       VARCHAR,
+  "ticketID"     VARCHAR NOT NULL,
+  "responseCode" VARCHAR,
   PRIMARY KEY ("ticketID")
 );
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."RedeemFiat"
 (
-  "from"                VARCHAR NOT NULL,
-  "to"                  VARCHAR NOT NULL,
-  "redeemAmount"        INT NOT NULL,
-  "chainID"             VARCHAR NOT NULL,
-  "gas"                 INT NOT NULL,
-  "status"              BOOLEAN,
-  "txHash"              VARCHAR,
-  "ticketID"            VARCHAR NOT NULL,
-  "responseCode"        VARCHAR,
+  "from"         VARCHAR NOT NULL,
+  "to"           VARCHAR NOT NULL,
+  "redeemAmount" INT     NOT NULL,
+  "chainID"      VARCHAR NOT NULL,
+  "gas"          INT     NOT NULL,
+  "status"       BOOLEAN,
+  "txHash"       VARCHAR,
+  "ticketID"     VARCHAR NOT NULL,
+  "responseCode" VARCHAR,
   PRIMARY KEY ("ticketID")
 );
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."ReleaseAsset"
 (
-  "from"                VARCHAR NOT NULL,
-  "to"                  VARCHAR NOT NULL,
-  "pegHash"             VARCHAR NOT NULL,
-  "chainID"             VARCHAR NOT NULL,
-  "gas"                 INT NOT NULL,
-  "status"              BOOLEAN,
-  "txHash"              VARCHAR,
-  "ticketID"            VARCHAR NOT NULL,
-  "responseCode"        VARCHAR,
+  "from"         VARCHAR NOT NULL,
+  "to"           VARCHAR NOT NULL,
+  "pegHash"      VARCHAR NOT NULL,
+  "chainID"      VARCHAR NOT NULL,
+  "gas"          INT     NOT NULL,
+  "status"       BOOLEAN,
+  "txHash"       VARCHAR,
+  "ticketID"     VARCHAR NOT NULL,
+  "responseCode" VARCHAR,
   PRIMARY KEY ("ticketID")
 );
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."SellerExecuteOrder"
 (
-  "from"            VARCHAR NOT NULL,
-  "buyerAddress"    VARCHAR NOT NULL,
-  "sellerAddress"   VARCHAR NOT NULL,
-  "awbProofHash"    VARCHAR NOT NULL,
-  "pegHash"         VARCHAR NOT NULL,
-  "chainID"         VARCHAR NOT NULL,
-  "gas"             INT NOT NULL,
-  "status"          BOOLEAN,
-  "txHash"          VARCHAR,
-  "ticketID"        VARCHAR NOT NULL ,
-  "responseCode"    VARCHAR,
+  "from"          VARCHAR NOT NULL,
+  "buyerAddress"  VARCHAR NOT NULL,
+  "sellerAddress" VARCHAR NOT NULL,
+  "awbProofHash"  VARCHAR NOT NULL,
+  "pegHash"       VARCHAR NOT NULL,
+  "chainID"       VARCHAR NOT NULL,
+  "gas"           INT     NOT NULL,
+  "status"        BOOLEAN,
+  "txHash"        VARCHAR,
+  "ticketID"      VARCHAR NOT NULL,
+  "responseCode"  VARCHAR,
   PRIMARY KEY ("ticketID")
 );
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."SendAsset"
 (
-  "from"                VARCHAR NOT NULL,
-  "to"                  VARCHAR NOT NULL,
-  "pegHash"             VARCHAR NOT NULL,
-  "chainID"             VARCHAR NOT NULL,
-  "gas"                 INT NOT NULL,
-  "status"              BOOLEAN,
-  "txHash"              VARCHAR,
-  "ticketID"            VARCHAR NOT NULL,
-  "responseCode"        VARCHAR,
+  "from"         VARCHAR NOT NULL,
+  "to"           VARCHAR NOT NULL,
+  "pegHash"      VARCHAR NOT NULL,
+  "chainID"      VARCHAR NOT NULL,
+  "gas"          INT     NOT NULL,
+  "status"       BOOLEAN,
+  "txHash"       VARCHAR,
+  "ticketID"     VARCHAR NOT NULL,
+  "responseCode" VARCHAR,
   PRIMARY KEY ("ticketID")
 );
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."SendCoin"
 (
-  "from"                VARCHAR NOT NULL,
-  "to"                  VARCHAR NOT NULL,
-  "amount"              INT NOT NULL,
-  "chainID"             VARCHAR NOT NULL,
-  "gas"                 INT NOT NULL,
-  "status"              BOOLEAN,
-  "txHash"              VARCHAR,
-  "ticketID"            VARCHAR NOT NULL,
-  "responseCode"        VARCHAR,
+  "from"         VARCHAR NOT NULL,
+  "to"           VARCHAR NOT NULL,
+  "amount"       INT     NOT NULL,
+  "chainID"      VARCHAR NOT NULL,
+  "gas"          INT     NOT NULL,
+  "status"       BOOLEAN,
+  "txHash"       VARCHAR,
+  "ticketID"     VARCHAR NOT NULL,
+  "responseCode" VARCHAR,
   PRIMARY KEY ("ticketID")
 );
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."SendFiat"
 (
-  "from"                VARCHAR NOT NULL,
-  "to"                  VARCHAR NOT NULL,
-  "amount"              INT NOT NULL,
-  "pegHash"             VARCHAR NOT NULL,
-  "chainID"             VARCHAR NOT NULL,
-  "gas"                 INT NOT NULL,
-  "status"              BOOLEAN,
-  "txHash"              VARCHAR,
-  "ticketID"            VARCHAR NOT NULL,
-  "responseCode"        VARCHAR,
+  "from"         VARCHAR NOT NULL,
+  "to"           VARCHAR NOT NULL,
+  "amount"       INT     NOT NULL,
+  "pegHash"      VARCHAR NOT NULL,
+  "chainID"      VARCHAR NOT NULL,
+  "gas"          INT     NOT NULL,
+  "status"       BOOLEAN,
+  "txHash"       VARCHAR,
+  "ticketID"     VARCHAR NOT NULL,
+  "responseCode" VARCHAR,
   PRIMARY KEY ("ticketID")
 );
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."SetACL"
 (
-  "from"                VARCHAR NOT NULL,
-  "aclAddress"          VARCHAR NOT NULL,
-  "organizationID"      VARCHAR NOT NULL,
-  "zoneID"              VARCHAR NOT NULL,
-  "chainID"             VARCHAR NOT NULL,
-  "aclHash"                 VARCHAR NOT NULL,
-  "status"              BOOLEAN,
-  "txHash"              VARCHAR,
-  "ticketID"            VARCHAR NOT NULL,
-  "responseCode"        VARCHAR,
+  "from"           VARCHAR NOT NULL,
+  "aclAddress"     VARCHAR NOT NULL,
+  "organizationID" VARCHAR NOT NULL,
+  "zoneID"         VARCHAR NOT NULL,
+  "chainID"        VARCHAR NOT NULL,
+  "aclHash"        VARCHAR NOT NULL,
+  "status"         BOOLEAN,
+  "txHash"         VARCHAR,
+  "ticketID"       VARCHAR NOT NULL,
+  "responseCode"   VARCHAR,
   PRIMARY KEY ("ticketID")
 );
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."SetBuyerFeedback"
 (
-  "from"                VARCHAR NOT NULL,
-  "to"                  VARCHAR NOT NULL,
-  "pegHash"             VARCHAR NOT NULL,
-  "rating"              INT NOT NULL,
-  "chainID"             VARCHAR NOT NULL,
-  "gas"                 INT NOT NULL,
-  "status"              BOOLEAN,
-  "txHash"              VARCHAR,
-  "ticketID"            VARCHAR NOT NULL,
-  "responseCode"        VARCHAR,
+  "from"         VARCHAR NOT NULL,
+  "to"           VARCHAR NOT NULL,
+  "pegHash"      VARCHAR NOT NULL,
+  "rating"       INT     NOT NULL,
+  "chainID"      VARCHAR NOT NULL,
+  "gas"          INT     NOT NULL,
+  "status"       BOOLEAN,
+  "txHash"       VARCHAR,
+  "ticketID"     VARCHAR NOT NULL,
+  "responseCode" VARCHAR,
   PRIMARY KEY ("ticketID")
 );
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."SetSellerFeedback"
 (
-  "from"                VARCHAR NOT NULL,
-  "to"                  VARCHAR NOT NULL,
-  "pegHash"             VARCHAR NOT NULL,
-  "rating"              INT NOT NULL,
-  "chainID"             VARCHAR NOT NULL,
-  "gas"                 INT NOT NULL,
-  "status"              BOOLEAN,
-  "txHash"              VARCHAR,
-  "ticketID"            VARCHAR NOT NULL,
-  "responseCode"        VARCHAR,
+  "from"         VARCHAR NOT NULL,
+  "to"           VARCHAR NOT NULL,
+  "pegHash"      VARCHAR NOT NULL,
+  "rating"       INT     NOT NULL,
+  "chainID"      VARCHAR NOT NULL,
+  "gas"          INT     NOT NULL,
+  "status"       BOOLEAN,
+  "txHash"       VARCHAR,
+  "ticketID"     VARCHAR NOT NULL,
+  "responseCode" VARCHAR,
   PRIMARY KEY ("ticketID")
 );
 
@@ -433,16 +433,6 @@ CREATE TABLE IF NOT EXISTS MASTER."Account"
   "id"             VARCHAR NOT NULL,
   "secretHash"     VARCHAR NOT NULL,
   "accountAddress" VARCHAR NOT NULL,
-  "tokenHash"      VARCHAR,
-  PRIMARY KEY ("id")
-);
-
-
-CREATE TABLE IF NOT EXISTS MASTER."Notification"
-(
-  "id"                VARCHAR NOT NULL,
-  "registrationToken" VARCHAR NOT NULL,
-
   PRIMARY KEY ("id")
 );
 
@@ -500,6 +490,16 @@ CREATE TABLE IF NOT EXISTS MASTER."OrgBankAccount"
   PRIMARY KEY ("id")
 );
 
+
+CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."AccountToken"
+(
+  "id"                VARCHAR NOT NULL,
+  "registrationToken" VARCHAR NOT NULL,
+  "sessionTokenHash"  VARCHAR,
+  PRIMARY KEY ("id")
+);
+
+
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."SMSOTP"
 (
   "id"         VARCHAR NOT NULL,
@@ -548,8 +548,6 @@ ALTER TABLE MASTER."Organization"
   ADD CONSTRAINT Organization_Account_accountID FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER."Account"
   ADD CONSTRAINT Account_BCAccount_address FOREIGN KEY ("accountAddress") REFERENCES BLOCKCHAIN."Account_BC" ("address");
-ALTER TABLE MASTER."Notification"
-  ADD CONSTRAINT Notification_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER."Contact"
   ADD CONSTRAINT Contact_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER."ZoneKYC"
@@ -560,6 +558,8 @@ ALTER TABLE MASTER."AccountKYC"
   ADD CONSTRAINT AccountKYC_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER."OrgBankAccount"
   ADD CONSTRAINT OrgBankAccount_Organization_id FOREIGN KEY ("id") REFERENCES MASTER."Organization" ("id");
+ALTER TABLE MASTER_TRANSACTION."AccountToken"
+  ADD CONSTRAINT AccountToken_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER_TRANSACTION."SMSOTP"
   ADD CONSTRAINT SMSOTP_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER_TRANSACTION."EmailOTP"
@@ -602,13 +602,13 @@ DROP TABLE IF EXISTS BLOCKCHAIN_TRANSACTION."SetSellerFeedback" CASCADE;
 DROP TABLE IF EXISTS MASTER."Zone" CASCADE;
 DROP TABLE IF EXISTS MASTER."Organization" CASCADE;
 DROP TABLE IF EXISTS MASTER."Account" CASCADE;
-DROP TABLE IF EXISTS MASTER."Notification" CASCADE;
 DROP TABLE IF EXISTS MASTER."Contact" CASCADE;
 DROP TABLE IF EXISTS MASTER."ZoneKYC" CASCADE;
 DROP TABLE IF EXISTS MASTER."OrganizationKYC" CASCADE;
 DROP TABLE IF EXISTS MASTER."AccountKYC" CASCADE;
 DROP TABLE IF EXISTS MASTER."BankAccount" CASCADE;
 
+DROP TABLE IF EXISTS MASTER_TRANSACTION."AccountToken" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."SMSOTP" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."EmailOTP" CASCADE;
 
