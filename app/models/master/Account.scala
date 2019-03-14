@@ -43,6 +43,14 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     }
   }
 
+  private def findLanguageById(id: String)(implicit executionContext: ExecutionContext): Future[String] = db.run(accountTable.filter(_.id === id).result.head.asTry).map {
+    case Success(result) => result.language
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+        throw new BaseException(constants.Error.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
   private def checkById(id: String): Future[Boolean] = db.run(accountTable.filter(_.id === id).exists.result)
 
   private def deleteById(id: String) = db.run(accountTable.filter(_.id === id).delete)
@@ -77,7 +85,7 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
     def getAccount(username: String)(implicit executionContext: ExecutionContext) = Await.result(findById(username), Duration.Inf)
 
-    def getLangById(id: String)(implicit executionContext: ExecutionContext): String = Await.result(findById(id), Duration.Inf).language
+    def getLanguageById(id: String)(implicit executionContext: ExecutionContext) = Await.result(findLanguageById(id), Duration.Inf)
 
   }
 

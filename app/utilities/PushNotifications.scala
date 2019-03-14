@@ -22,7 +22,7 @@ class PushNotifications @Inject()(wsClient: WSClient,accounts: Accounts, account
   private case class Data(to: String, notification: Notification)
   private implicit val dataWrites: OWrites[Data] = Json.writes[Data]
 
-  def sendNotification(id: String, messageType: String, passedData: Seq[String] = Seq(""))(implicit currentModule: String, lang: Lang = Lang(accounts.Service.getLangById(id)))= {
+  def sendNotification(id: String, messageType: String, passedData: Seq[String] = Seq(""))(implicit currentModule: String, lang: Lang = Lang(accounts.Service.getLanguageById(id)))= {
     Thread.sleep(3000)
     wsClient.url(url).withHttpHeaders(constants.Header.CONTENT_TYPE -> constants.Header.APPLICATION_JSON).withHttpHeaders(constants.Header.AUTHORIZATION -> authorizationKey)
       .post(Json.toJson(Data(accountTokens.Service.getTokenById(id), Notification(messagesApi("NotificationTitle"+"."+messageType), messagesApi("NotificationMessage"+"."+messageType, passedData(0))))))
