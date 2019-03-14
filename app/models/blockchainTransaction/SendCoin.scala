@@ -23,7 +23,7 @@ class SendCoins @Inject()(protected val databaseConfigProvider: DatabaseConfigPr
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private implicit val module: String = constants.Module.BC_TRANSACTION_SEND_COIN
+  private implicit val module: String = constants.Module.Blockchain_TRANSACTION_SEND_COIN
 
   val db = databaseConfig.db
 

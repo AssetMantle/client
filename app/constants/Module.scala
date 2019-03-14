@@ -5,7 +5,8 @@ object Module {
   val MASTER_ACCOUNT = "MASTER_ACCOUNT"
 
   //BlockchainTransaction model
-  val BC_TRANSACTION_SEND_COIN = "BC_TRANSACTION_SEND_COIN"
+  val Blockchain_TRANSACTION_ADD_ORGANIZATION = "Blockchain_TRANSACTION_ADD_ORGANIZATION"
+  val Blockchain_TRANSACTION_SEND_COIN = "Blockchain_TRANSACTION_SEND_COIN"
 
   //Transactions
   val TRANSACTIONS_ADD_KEY                  = "TRANSACTIONS_ADD_KEY"

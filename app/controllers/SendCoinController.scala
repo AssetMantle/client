@@ -27,17 +27,17 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
           if (configuration.get[Boolean]("blockchain.kafka.enabled")) {
             val response = transactionSendCoin.Service.kafkaPost(transactionSendCoin.Request(from = sendCoinData.from, password = sendCoinData.password, to = sendCoinData.to, amount = Seq(transactionSendCoin.Amount("comdex", sendCoinData.amount.toString)), gas = sendCoinData.gas))
             sendCoins.Service.addSendCoinKafka(sendCoinData.from, sendCoinData.to, sendCoinData.amount, sendCoinData.gas, null, null, response.ticketID, null)
-            Ok(views.html.index(response.ticketID))
+            Ok(views.html.index(success = response.ticketID))
           }
           else {
             val response = transactionSendCoin.Service.post(transactionSendCoin.Request(from = sendCoinData.from, password = sendCoinData.password, to = sendCoinData.to, amount = Seq(transactionSendCoin.Amount("comdex", sendCoinData.amount.toString)), gas = sendCoinData.gas))
             sendCoins.Service.addSendCoin(sendCoinData.from, sendCoinData.to, sendCoinData.amount, sendCoinData.gas, null, Option(response.TxHash), (Random.nextInt(899999999) + 100000000).toString, null)
-            Ok(views.html.index(response.TxHash))
+            Ok(views.html.index(success = response.TxHash))
           }
         }
         catch {
           case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))
-          case blockChainException: BlockChainException => Ok(views.html.index(failure = blockChainException.message))
+          case blockChainException: BlockChainException => Ok(views.html.index(failure = Messages(blockChainException.message)))
         }
       })
   }
