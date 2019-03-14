@@ -10,7 +10,7 @@ object TransactionResponse {
 
   case class KeyValue(Key: String, Value: String)
 
-  case class Response(GasUsed: String, GasWanted: String, Height: String, Tags: Seq[KeyValue], TxHash: String, hello: String)
+  case class Response(GasUsed: String, GasWanted: String, Height: String, Tags: Seq[KeyValue], TxHash: String)
 
   implicit val kafkaResponseReads: Reads[KafkaResponse] = Json.reads[KafkaResponse]
 
