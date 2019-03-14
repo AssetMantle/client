@@ -9,9 +9,9 @@ import slick.jdbc.JdbcProfile
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
-import scala.util.{Failure, Random, Success}
+import scala.util.{Failure, Success}
 
-case class Account(id: String, secretHash: String, accountAddress: String, tokenHash: Option[String])
+case class Account(id: String, secretHash: String, accountAddress: String, language: String)
 
 class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider) {
 
@@ -43,15 +43,21 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     }
   }
 
+  private def findLanguageById(id: String)(implicit executionContext: ExecutionContext): Future[String] = db.run(accountTable.filter(_.id === id).result.head.asTry).map {
+    case Success(result) => result.language
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+        throw new BaseException(constants.Error.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
   private def checkById(id: String): Future[Boolean] = db.run(accountTable.filter(_.id === id).exists.result)
 
   private def deleteById(id: String) = db.run(accountTable.filter(_.id === id).delete)
 
-  private def refreshTokenOnId(id: String, tokenHash: Option[String]) = db.run(accountTable.filter(_.id === id).map(_.tokenHash.?).update(tokenHash))
-
   private[models] class AccountTable(tag: Tag) extends Table[Account](tag, "Account") {
 
-    def * = (id, secretHash, accountAddress, tokenHash.?) <> (Account.tupled, Account.unapply)
+    def * = (id, secretHash, accountAddress, language) <> (Account.tupled, Account.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
@@ -59,7 +65,7 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
     def accountAddress = column[String]("accountAddress")
 
-    def tokenHash = column[String]("tokenHash")
+    def language = column[String]("language")
 
   }
 
@@ -72,22 +78,14 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
       !Await.result(checkById(username), Duration.Inf)
     }
 
-    def addLogin(username: String, password: String, accountAddress: String)(implicit executionContext: ExecutionContext): String = {
-      Await.result(add(Account(username, util.hashing.MurmurHash3.stringHash(password).toString, accountAddress, null)), Duration.Inf)
+    def addLogin(username: String, password: String, accountAddress: String, language: String)(implicit executionContext: ExecutionContext): String = {
+      Await.result(add(Account(username, util.hashing.MurmurHash3.stringHash(password).toString, accountAddress, language)), Duration.Inf)
       accountAddress
     }
 
-    def refreshToken(username: String): String = {
-      val token: String = (Random.nextInt(899999999) + 100000000).toString
-      Await.result(refreshTokenOnId(username, Some(util.hashing.MurmurHash3.stringHash(token).toString)), Duration.Inf)
-      token
-    }
-
-    def verifySession(username: Option[String], token: Option[String])(implicit executionContext: ExecutionContext): Boolean = {
-      Await.result(findById(username.getOrElse(return false)), Duration.Inf).tokenHash.getOrElse(return false) == util.hashing.MurmurHash3.stringHash(token.getOrElse(return false)).toString
-    }
-
     def getAccount(username: String)(implicit executionContext: ExecutionContext) = Await.result(findById(username), Duration.Inf)
+
+    def getLanguageById(id: String)(implicit executionContext: ExecutionContext) = Await.result(findLanguageById(id), Duration.Inf)
 
   }
 
