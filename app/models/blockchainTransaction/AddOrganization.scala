@@ -19,7 +19,7 @@ case class AddOrganization(from: String, to: String, organizationID: String, sta
 
 class AddOrganizations @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, transactionAddOrganization: transactions.AddOrganization, getResponse: GetResponse, actorSystem: ActorSystem)(implicit  wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
-  private implicit val module: String = constants.Module.Blockchain_TRANSACTION_ADD_ORGANIZATION
+  private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_ADD_ORGANIZATION
 
   private implicit val logger: Logger = Logger(this.getClass)
 
