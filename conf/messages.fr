@@ -1,10 +1,11 @@
-NotificationMessage.Login= Vous êtes authentifié {0}
-NotificationTitle.Login= S'identifier
-NotificationMessage.OTP= Votre OTP est {0}
-NotificationTitle.OTP= Vérifier OTP
-
 Index=Indexio
 Login= S'identifier
-
 VerifyEmailAddress= Vérifier l'adresse e-mail
-otp= otp
+otp= Mot de passe à usage unique
+
+NotificationMessage.Login= Vous êtes authentifié {0}
+NotificationTitle.Login= S'identifier
+NotificationMessage.OTP= Votre Mot de passe à usage unique est {0}
+NotificationTitle.OTP= Vérifier Mot de passe à usage unique
+NotificationTitle.Success = Transaction réussie
+NotificationMessage.Success = La transaction avec hash {0} est terminée

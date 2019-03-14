@@ -1,6 +1,6 @@
 package utilities
 
-import exceptions.BlockChainException
+import exceptions.{BaseException, BlockChainException}
 import models.master.Accounts
 import play.api.{Configuration, Logger}
 import play.api.libs.ws.{WSClient, WSResponse}
@@ -23,6 +23,7 @@ object TicketIterator   {
         }
         catch {
           case blockChainException: BlockChainException  => logger.info(blockChainException.message, blockChainException)
+          case baseException: BaseException => logger.info(baseException.message, baseException)
         }
       }
     }
