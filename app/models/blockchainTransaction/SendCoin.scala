@@ -67,15 +67,17 @@ class SendCoins @Inject()(protected val databaseConfigProvider: DatabaseConfigPr
     def responseCode = column[String]("responseCode")
   }
 
-  if (configuration.get[Boolean]("blockchain.kafkaEnabled")) {
-    actorSystem.scheduler.schedule(initialDelay = 0.seconds, interval = 1.second) {
-      utilities.TransactionHashIterator.start(Service.geTicketIDsWithEmptyTxHash, transactionSendCoin.Service.getTxHashFromWSResponse, Service.updateTxHash)(wsClient, configuration, executionContext, logger)
+  if (configuration.get[Boolean]("blockchain.kafka.enabled")) {
+    actorSystem.scheduler.schedule(initialDelay = configuration.get[Int]("blockchain.kafka.ticketIterator.initialDelay").seconds, interval = configuration.get[Int]("blockchain.kafka.ticketIterator.interval").second) {
+      utilities.TicketIterator.start(Service.geTicketIDsWithEmptyTxHash, transactionSendCoin.Service.getTxHashFromWSResponse, Service.updateTxHash)
     }
   }
 
   object Service {
 
     def addSendCoin(from: String, to: String, amount: Int, gas: Int, status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String]) (implicit executionContext: ExecutionContext): String = Await.result(add(SendCoin(from = from, to = to, amount = amount, gas = gas, status = status, txHash = txHash, ticketID = ticketID, responseCode = responseCode)), Duration.Inf)
+
+    def addSendCoinKafka(from: String, to: String, amount: Int, gas: Int, status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String]) (implicit executionContext: ExecutionContext): String = Await.result(add(SendCoin(from = from, to = to, amount = amount, gas = gas, status = status, txHash = txHash, ticketID = ticketID, responseCode = responseCode)), Duration.Inf)
 
     def updateTxHash(ticketID: String, txHash: String) (implicit executionContext: ExecutionContext): Int = Await.result(updateTxHashOnTicketID(ticketID, Option(txHash)),Duration.Inf)
 

@@ -31,15 +31,15 @@ object JSON {
     try {
       val responseFromJson: JsResult[T] = Json.fromJson[T](response.json)
       responseFromJson match {
-        case JsSuccess(value: T, path: JsPath) => value
-        case errors: JsError => logger.error(errors.toString)
+        case JsSuccess(value: T, _: JsPath) => value
+        case errors: JsError => logger.info(errors.toString)
           throw new BlockChainException(response.body.toString)
       }
     }
     catch {
       case noSuchElementException: NoSuchElementException => logger.info(response.toString, noSuchElementException)
         throw new BlockChainException(response.body.toString)
-      case jsonParseException: JsonParseException => logger.error(response.toString, jsonParseException)
+      case jsonParseException: JsonParseException => logger.info(response.toString, jsonParseException)
         throw new BlockChainException(response.body.toString)
     }
   }
