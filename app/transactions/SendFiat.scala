@@ -13,7 +13,7 @@ import scala.concurrent.{Await, ExecutionContext, Future}
 
 class SendFiat @Inject()(wsClient: WSClient)(implicit configuration: Configuration, executionContext: ExecutionContext) {
 
-  private implicit val module: String = constants.Module.TRANSACTIONS_ADD_KEY
+  private implicit val module: String = constants.Module.TRANSACTIONS_SEND_FIAT
 
   private implicit val logger: Logger = Logger(this.getClass)
 

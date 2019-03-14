@@ -37,8 +37,6 @@ object JSON {
       }
     }
     catch {
-      case noSuchElementException: NoSuchElementException => logger.info(response.toString, noSuchElementException)
-        throw new BlockChainException(response.body.toString)
       case jsonParseException: JsonParseException => logger.info(response.toString, jsonParseException)
         throw new BlockChainException(response.body.toString)
     }

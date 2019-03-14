@@ -12,7 +12,7 @@ import scala.concurrent.{Await, ExecutionContext, Future}
 
 class GetResponse @Inject()()(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
-  private implicit val module: String = constants.Module.TICKET_ID_RESPONSE
+  private implicit val module: String = constants.Module.TRANSACTIONS_GET_RESPONSE
 
   private implicit val logger: Logger = Logger(this.getClass)
 
