@@ -8,6 +8,7 @@ import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerC
 class IndexController @Inject()(messagesControllerComponents: MessagesControllerComponents)(implicit configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   def index: Action[AnyContent] = Action { implicit request =>
+    Console.println(request.lang)
     Ok(views.html.index())
   }
 }

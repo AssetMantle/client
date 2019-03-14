@@ -8,7 +8,9 @@ import transactions.GetResponse
 import javax.inject.Inject
 import akka.actor.ActorSystem
 import exceptions.BaseException
+import models.master.Accounts
 import org.postgresql.util.PSQLException
+import utilities.PushNotifications
 
 import scala.concurrent.duration._
 import scala.concurrent.duration.Duration
@@ -17,7 +19,7 @@ import scala.util.{Failure, Success}
 
 case class SendCoin(from: String, to: String, amount: Int, gas: Int,  status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])
 
-class SendCoins @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, transactionSendCoin: transactions.SendCoin, getResponse: GetResponse, actorSystem: ActorSystem)(implicit  wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
+class SendCoins @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, transactionSendCoin: transactions.SendCoin, getResponse: GetResponse, actorSystem: ActorSystem, implicit val pushNotifications: PushNotifications, implicit val accounts: Accounts)(implicit  wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -61,6 +63,8 @@ class SendCoins @Inject()(protected val databaseConfigProvider: DatabaseConfigPr
     }
   }
 
+  private def getAddressByTicketID(ticketID: String)(implicit executionContext: ExecutionContext): Future[String] = db.run(sendCoinTable.filter(_.ticketID === ticketID).map(_.to).result.head)
+
   private def getTicketIDsWithEmptyTxHash()(implicit executionContext: ExecutionContext):Future[Seq[String]] = db.run(sendCoinTable.filter(_.txHash.?.isEmpty).map(_.ticketID).result)
 
   private def deleteByTicketID(ticketID: String)(implicit executionContext: ExecutionContext) = db.run(sendCoinTable.filter(_.ticketID === ticketID).delete)
@@ -88,7 +92,7 @@ class SendCoins @Inject()(protected val databaseConfigProvider: DatabaseConfigPr
 
   if (configuration.get[Boolean]("blockchain.kafka.enabled")) {
     actorSystem.scheduler.schedule(initialDelay = configuration.get[Int]("blockchain.kafka.ticketIterator.initialDelay").seconds, interval = configuration.get[Int]("blockchain.kafka.ticketIterator.interval").second) {
-      utilities.TicketIterator.start(Service.geTicketIDsWithEmptyTxHash, transactionSendCoin.Service.getTxHashFromWSResponse, Service.updateTxHash)
+      utilities.TicketIterator.start(Service.getTicketIDs, transactionSendCoin.Service.getTxHashFromWSResponse, Service.updateTxHash, Service.getAddress)
     }
   }
 
@@ -104,7 +108,9 @@ class SendCoins @Inject()(protected val databaseConfigProvider: DatabaseConfigPr
 
     def updateStatus(ticketID: String, status: Boolean) (implicit executionContext: ExecutionContext): Int = Await.result(updateStatusOnTicketID(ticketID, status), Duration.Inf)
 
-    def geTicketIDsWithEmptyTxHash()(implicit executionContext: ExecutionContext): Seq[String] = Await.result(getTicketIDsWithEmptyTxHash(), Duration.Inf)
+    def getTicketIDs()(implicit executionContext: ExecutionContext): Seq[String] = Await.result(getTicketIDsWithEmptyTxHash(), Duration.Inf)
+
+    def getAddress(ticketID: String)(implicit executionContext: ExecutionContext): String = Await.result(getAddressByTicketID(ticketID), Duration.Inf)
 
   }
 }

@@ -7,8 +7,10 @@ import play.api.{Configuration, Logger}
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.JdbcProfile
 import akka.actor.ActorSystem
+import models.master.Accounts
 import play.api.libs.ws.WSClient
 import transactions.GetResponse
+import utilities.PushNotifications
 
 import scala.concurrent.duration._
 import scala.concurrent.duration.Duration
@@ -17,7 +19,7 @@ import scala.util.{Failure, Success}
 
 case class AddOrganization(from: String, to: String, organizationID: String, status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])
 
-class AddOrganizations @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, transactionAddOrganization: transactions.AddOrganization, getResponse: GetResponse, actorSystem: ActorSystem)(implicit  wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
+class AddOrganizations @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, transactionAddOrganization: transactions.AddOrganization, getResponse: GetResponse, actorSystem: ActorSystem, implicit val pushNotifications: PushNotifications, implicit val accounts: Accounts)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_ADD_ORGANIZATION
 
@@ -63,6 +65,8 @@ class AddOrganizations @Inject()(protected val databaseConfigProvider: DatabaseC
 
   private def getTicketIDsWithEmptyTxHash()(implicit executionContext: ExecutionContext):Future[Seq[String]] = db.run(addOrganizationTable.filter(_.txHash.?.isEmpty).map(_.ticketID).result)
 
+  private def getAddressByTicketID(ticketID: String)(implicit executionContext: ExecutionContext): Future[String] = db.run(addOrganizationTable.filter(_.ticketID === ticketID).map(_.to).result.head)
+
   private def deleteByTicketID(ticketID: String) = db.run(addOrganizationTable.filter(_.ticketID === ticketID).delete)
 
   private[models] class AddOrganizationTable(tag: Tag) extends Table[AddOrganization](tag, "AddOrganization") {
@@ -86,7 +90,7 @@ class AddOrganizations @Inject()(protected val databaseConfigProvider: DatabaseC
 
   if (configuration.get[Boolean]("blockchain.kafka.enabled")) {
     actorSystem.scheduler.schedule(initialDelay = configuration.get[Int]("blockchain.kafka.ticketIterator.initialDelay").seconds, interval = configuration.get[Int]("blockchain.kafka.ticketIterator.interval").second) {
-      utilities.TicketIterator.start(Service.geTicketIDsWithEmptyTxHash, transactionAddOrganization.Service.getTxHashFromWSResponse, Service.updateTxHash)
+      utilities.TicketIterator.start(Service.getTicketIDs, transactionAddOrganization.Service.getTxHashFromWSResponse, Service.updateTxHash, Service.getAddress)
     }
   }
 
@@ -102,7 +106,9 @@ class AddOrganizations @Inject()(protected val databaseConfigProvider: DatabaseC
 
     def updateStatus(ticketID: String, status: Boolean) (implicit executionContext: ExecutionContext): Int = Await.result(updateStatusOnTicketID(ticketID, status), Duration.Inf)
 
-    def geTicketIDsWithEmptyTxHash()(implicit executionContext: ExecutionContext): Seq[String] = Await.result(getTicketIDsWithEmptyTxHash(), Duration.Inf)
+    def getTicketIDs()(implicit executionContext: ExecutionContext): Seq[String] = Await.result(getTicketIDsWithEmptyTxHash(), Duration.Inf)
+
+    def getAddress(ticketID: String)(implicit executionContext: ExecutionContext): String = Await.result(getAddressByTicketID(ticketID), Duration.Inf)
 
   }
 }

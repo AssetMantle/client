@@ -43,8 +43,16 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     }
   }
 
-  private def findLanguageById(id: String)(implicit executionContext: ExecutionContext): Future[String] = db.run(accountTable.filter(_.id === id).result.head.asTry).map {
+  private def getLanguageById(id: String)(implicit executionContext: ExecutionContext): Future[String] = db.run(accountTable.filter(_.id === id).result.head.asTry).map {
     case Success(result) => result.language
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+        throw new BaseException(constants.Error.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def getIdByAddress(accountAddress: String)(implicit executionContext: ExecutionContext): Future[String] = db.run(accountTable.filter(_.accountAddress === accountAddress).result.head.asTry).map {
+    case Success(result) => result.id
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
         throw new BaseException(constants.Error.NO_SUCH_ELEMENT_EXCEPTION)
@@ -83,9 +91,11 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
       accountAddress
     }
 
-    def getAccount(username: String)(implicit executionContext: ExecutionContext) = Await.result(findById(username), Duration.Inf)
+    def getAccount(username: String)(implicit executionContext: ExecutionContext):Account = Await.result(findById(username), Duration.Inf)
 
-    def getLanguageById(id: String)(implicit executionContext: ExecutionContext) = Await.result(findLanguageById(id), Duration.Inf)
+    def getLanguage(id: String)(implicit executionContext: ExecutionContext):String = Await.result(getLanguageById(id), Duration.Inf)
+
+    def getId(accountAddress: String)(implicit executionContext: ExecutionContext):String = Await.result(getIdByAddress(accountAddress), Duration.Inf)
 
   }
 
