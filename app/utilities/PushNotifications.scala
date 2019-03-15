@@ -1,15 +1,17 @@
 package utilities
 
 import javax.inject.Inject
-import models.masterTransaction.AccountTokens
+import models.masterTransaction.{AccountTokens, Notifications}
 import models.master.Accounts
+import org.joda.time.{DateTime, DateTimeZone}
 import play.api.Configuration
 import play.api.i18n.{Lang, Langs, MessagesApi}
 import play.api.libs.json.{Json, OWrites}
 import play.api.libs.ws.WSClient
+
 import scala.concurrent.ExecutionContext
 
-class PushNotifications @Inject()(wsClient: WSClient,accounts: Accounts, accountTokens: AccountTokens, langs: Langs, messagesApi: MessagesApi)(implicit exec: ExecutionContext, configuration: Configuration) {
+class PushNotifications @Inject()(wsClient: WSClient,notifications: Notifications, accounts: Accounts, accountTokens: AccountTokens, langs: Langs, messagesApi: MessagesApi)(implicit exec: ExecutionContext, configuration: Configuration) {
 
   private val url = configuration.get[String]("notification.url")
 
@@ -23,6 +25,7 @@ class PushNotifications @Inject()(wsClient: WSClient,accounts: Accounts, account
 
   def sendNotification(id: String, messageType: String, passedData: Seq[String] = Seq(""))(implicit currentModule: String, lang: Lang = Lang(accounts.Service.getLanguageById(id)))= {
     Thread.sleep(3000)
+    notifications.Service.addNotification(id, messagesApi("NotificationTitle"+"."+messageType), messagesApi("NotificationMessage"+"."+messageType, passedData(0)), DateTime.now(DateTimeZone.UTC).getMillis())
     wsClient.url(url).withHttpHeaders(constants.Header.CONTENT_TYPE -> constants.Header.APPLICATION_JSON).withHttpHeaders(constants.Header.AUTHORIZATION -> authorizationKey)
       .post(Json.toJson(Data(accountTokens.Service.getTokenById(id), Notification(messagesApi("NotificationTitle"+"."+messageType), messagesApi("NotificationMessage"+"."+messageType, passedData(0))))))
   }
