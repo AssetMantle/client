@@ -1,10 +1,12 @@
-NotificationMessage.Login= Vous êtes authentifié {0}
-NotificationTitle.Login= S'identifier
-NotificationMessage.OTP= Votre OTP est {0}
-NotificationTitle.OTP= Vérifier OTP
-
 Index=Indexio
-Login= S'identifier
+Login=S'identifier
 
-VerifyEmailAddress= Vérifier l'adresse e-mail
-otp= otp
+NotificationMessage.Login=Vous êtes authentifié {0}
+NotificationTitle.Login=S'identifier
+NotificationMessage.OTP=Votre OTP est {0}
+NotificationTitle.OTP=Vérifier OTP
+
+EmailMessage.OTP=Votre OTP est {0}
+EmailSubject.OTP=Vérifier OTP
+
+

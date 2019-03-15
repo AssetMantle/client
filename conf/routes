@@ -4,8 +4,6 @@ GET         /                                               controllers.IndexCon
 GET         /assets/*file                                   controllers.Assets.versioned(path="/public", file: Asset)
 
 GET         /firebase-messaging-sw.js                       controllers.Assets.at(path="/public/javascripts", file="firebase-messaging-sw.js")
-GET         /notificationImage.png                          controllers.Assets.at(path="/public/images", file="notificationImage.png")
-
 
 GET         /javascriptRoutes                               controllers.JavaScriptRoutesController.javascriptRoutes
 
@@ -18,8 +16,8 @@ GET         /master/queryConfigurationVariable:query        controllers.Configur
 GET         /master/signUp                                  controllers.SignUpController.signUpForm
 POST        /master/signUp                                  controllers.SignUpController.signUp
 
-GET         /master/updateContact                 controllers.UpdateContactController.updateContactForm
-POST        /master/updateContact                 controllers.UpdateContactController.updateContact
+GET         /master/updateContact                           controllers.UpdateContactController.updateContactForm
+POST        /master/updateContact                           controllers.UpdateContactController.updateContact
 
 GET         /master/verifyMobileNumber                      controllers.VerifyMobileNumberController.verifyMobileNumberForm
 POST        /master/verifyMobileNumber                      controllers.VerifyMobileNumberController.verifyMobileNumber
@@ -78,11 +76,11 @@ POST        /blockchain/sellerExecuteOrder                  controllers.SellerEx
 GET         /blockchian/sendAsset                           controllers.SendAssetController.sendAssetForm
 POST        /blockchain/sendAsset                           controllers.SendAssetController.sendAsset
 
-GET         /blockchain/sendCoin                  controllers.SendCoinController.sendCoinForm
-POST        /blockchain/sendCoin                  controllers.SendCoinController.sendCoin
+GET         /blockchain/sendCoin                            controllers.SendCoinController.sendCoinForm
+POST        /blockchain/sendCoin                            controllers.SendCoinController.sendCoin
 
-GET         /blockchian/sendFiat                  controllers.SendFiatController.sendFiatForm
-POST        /blockchain/sendFiat                  controllers.SendFiatController.sendFiat
+GET         /blockchian/sendFiat                            controllers.SendFiatController.sendFiatForm
+POST        /blockchain/sendFiat                            controllers.SendFiatController.sendFiat
 
 GET         /blockchian/setACL                              controllers.SetACLController.setACLForm
 POST        /blockchain/setACL                              controllers.SetACLController.setACL

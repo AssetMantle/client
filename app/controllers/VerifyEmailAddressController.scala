@@ -10,11 +10,12 @@ import play.api.Configuration
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import utilities.PushNotifications
+import utilities.Email
 import views.companion.master.VerifyEmailAddress
 
 import scala.concurrent.ExecutionContext
 
-class VerifyEmailAddressController @Inject()(messagesControllerComponents: MessagesControllerComponents, emailOTPs: EmailOTPs, contacts: Contacts, withLoginAction: WithLoginAction, pushNotifications: PushNotifications)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class VerifyEmailAddressController @Inject()(messagesControllerComponents: MessagesControllerComponents, emailOTPs: EmailOTPs, contacts: Contacts, withLoginAction: WithLoginAction, pushNotifications: PushNotifications, email: Email)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val module: String = constants.Module.MASTER_ACCOUNT
 
@@ -22,6 +23,7 @@ class VerifyEmailAddressController @Inject()(messagesControllerComponents: Messa
     val otp = emailOTPs.Service.sendOTP(request.session.get(Security.USERNAME).get)
     try {
       pushNotifications.sendNotification(request.session.get(Security.USERNAME).get, constants.Notification.OTP , Seq(otp))
+      email.sendEmail(request.session.get(Security.USERNAME).get, constants.Email.OTP, Seq(otp))
       Ok(views.html.component.master.verifyEmailAddress(VerifyEmailAddress.form))
     }
     catch {

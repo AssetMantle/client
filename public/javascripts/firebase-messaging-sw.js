@@ -15,7 +15,6 @@ messaging.setBackgroundMessageHandler(function (payload) {
     const notificationTitle = JSON.parse(payload.data.notification.title);
     const notificationOptions = {
         body: JSON.parse(payload.notification.body),
-        icon: 'notificationImage.png'
     };
     return self.registration.showNotification(notificationTitle, notificationOptions);
 

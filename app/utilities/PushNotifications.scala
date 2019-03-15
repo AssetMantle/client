@@ -6,9 +6,8 @@ import models.master.Accounts
 import play.api.Configuration
 import play.api.i18n.{Lang, Langs, MessagesApi}
 import play.api.libs.json.{Json, OWrites}
-import play.api.libs.ws.{WSClient, WSResponse}
-
-import scala.concurrent.{ExecutionContext, Future}
+import play.api.libs.ws.WSClient
+import scala.concurrent.ExecutionContext
 
 class PushNotifications @Inject()(wsClient: WSClient,accounts: Accounts, accountTokens: AccountTokens, langs: Langs, messagesApi: MessagesApi)(implicit exec: ExecutionContext, configuration: Configuration) {
 

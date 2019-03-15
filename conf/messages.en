@@ -8,3 +8,6 @@ NotificationMessage.Login= You are Logged In. {0}
 NotificationTitle.Login= Login
 NotificationMessage.OTP= Your OTP is {0}
 NotificationTitle.OTP= Verify OTP
+
+EmailMessage.OTP= Your OTP is {0}
+EmailSubject.OTP= Verify OTP
