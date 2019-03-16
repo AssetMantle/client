@@ -2,15 +2,15 @@
 @import views.companion.blockchain.SendFiat
 
 @(sendFiatForm: Form[SendFiat.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages(constants.Forms.SendFiat)) {
+@common(Messages(constants.Forms.SEND_FIAT_TITLE)) {
     @form(action = routes.SendFiatController.sendFiat) {
         @CSRF.formField
-        @inputText(sendFiatForm(constants.Forms.from),'_label-> Messages(constants.Forms.from))
-        @inputText(sendFiatForm(constants.Forms.to),'_label-> Messages(constants.Forms.to))
-        @inputText(sendFiatForm(constants.Forms.amount),'_label-> Messages(constants.Forms.amount))
-        @inputText(sendFiatForm(constants.Forms.pegHash),'_label-> Messages(constants.Forms.pegHash))
-        @inputText(sendFiatForm(constants.Forms.gas),'_label-> Messages(constants.Forms.gas))
-        @inputPassword(sendFiatForm(constants.Forms.password),'_label-> Messages(constants.Forms.password))
+        @inputText(sendFiatForm(constants.Forms.FROM),'_label-> Messages(constants.Forms.FROM))
+        @inputText(sendFiatForm(constants.Forms.TO),'_label-> Messages(constants.Forms.TO))
+        @inputText(sendFiatForm(constants.Forms.AMOUNT),'_label-> Messages(constants.Forms.AMOUNT))
+        @inputText(sendFiatForm(constants.Forms.PEG_HASH),'_label-> Messages(constants.Forms.PEG_HASH))
+        @inputText(sendFiatForm(constants.Forms.GAS),'_label-> Messages(constants.Forms.GAS))
+        @inputPassword(sendFiatForm(constants.Forms.PASSWORD),'_label-> Messages(constants.Forms.PASSWORD))
 
         @if(sendFiatForm.hasGlobalErrors) {
             <ul>
@@ -19,6 +19,6 @@
             }
             </ul>
         }
-        <button type="submit">@Messages(constants.Forms.SendFiat)</button>
+        <button type="submit">@Messages(constants.Forms.SEND_FIAT_TITLE)</button>
     }
 }

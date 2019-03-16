@@ -2,16 +2,16 @@
 @import views.companion.blockchain.BuyerExecuteOrder
 
 @(buyerExecuteOrderForm: Form[BuyerExecuteOrder.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages(constants.Forms.BuyerExecuteOrder)) {
+@common(Messages(constants.Forms.BUYER_EXECUTE_ORDER_TITLE)) {
     @form(action = routes.BuyerExecuteOrderController.buyerExecuteOrder) {
         @CSRF.formField
-        @inputText(buyerExecuteOrderForm(constants.Forms.from),'_label-> Messages(constants.Forms.from))
-        @inputText(buyerExecuteOrderForm(constants.Forms.buyerAddress),'_label-> Messages(constants.Forms.buyerAddress))
-        @inputText(buyerExecuteOrderForm(constants.Forms.sellerAddress),'_label-> Messages(constants.Forms.sellerAddress))
-        @inputText(buyerExecuteOrderForm(constants.Forms.fiatProofHash),'_label-> Messages(constants.Forms.fiatProofHash))
-        @inputText(buyerExecuteOrderForm(constants.Forms.pegHash),'_label-> Messages(constants.Forms.pegHash))
-        @inputText(buyerExecuteOrderForm(constants.Forms.gas),'_label-> Messages(constants.Forms.gas))
-        @inputPassword(buyerExecuteOrderForm(constants.Forms.password),'_label-> Messages(constants.Forms.password))
+        @inputText(buyerExecuteOrderForm(constants.Forms.FROM),'_label-> Messages(constants.Forms.FROM))
+        @inputText(buyerExecuteOrderForm(constants.Forms.BUYER_ADDRESS),'_label-> Messages(constants.Forms.BUYER_ADDRESS))
+        @inputText(buyerExecuteOrderForm(constants.Forms.SELLER_ADDRESS),'_label-> Messages(constants.Forms.SELLER_ADDRESS))
+        @inputText(buyerExecuteOrderForm(constants.Forms.FIAT_PROOF_HASH),'_label-> Messages(constants.Forms.FIAT_PROOF_HASH))
+        @inputText(buyerExecuteOrderForm(constants.Forms.PEG_HASH),'_label-> Messages(constants.Forms.PEG_HASH))
+        @inputText(buyerExecuteOrderForm(constants.Forms.GAS),'_label-> Messages(constants.Forms.GAS))
+        @inputPassword(buyerExecuteOrderForm(constants.Forms.PASSWORD),'_label-> Messages(constants.Forms.PASSWORD))
 
         @if(buyerExecuteOrderForm.hasGlobalErrors) {
             <ul>
@@ -20,6 +20,6 @@
             }
             </ul>
         }
-        <button type="submit">@Messages(constants.Forms.BuyerExecuteOrder)</button>
+        <button type="submit">@Messages(constants.Forms.BUYER_EXECUTE_ORDER_TITLE)</button>
     }
 }

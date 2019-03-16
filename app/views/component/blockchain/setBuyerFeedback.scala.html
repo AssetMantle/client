@@ -2,15 +2,15 @@
 @import views.companion.blockchain.SetBuyerFeedback
 
 @(setBuyerFeedbackForm: Form[SetBuyerFeedback.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages(constants.Forms.SetBuyerFeedback)) {
+@common(Messages(constants.Forms.SET_BUYER_FEEDBACK_TITLE)) {
     @form(action = routes.SetBuyerFeedbackController.setBuyerFeedback) {
         @CSRF.formField
-        @inputText(setBuyerFeedbackForm(constants.Forms.from),'_label-> Messages(constants.Forms.from))
-        @inputText(setBuyerFeedbackForm(constants.Forms.to),'_label-> Messages(constants.Forms.to))
-        @inputText(setBuyerFeedbackForm(constants.Forms.pegHash),'_label-> Messages(constants.Forms.pegHash))
-        @inputText(setBuyerFeedbackForm(constants.Forms.rating),'_label-> Messages(constants.Forms.rating))
-        @inputText(setBuyerFeedbackForm(constants.Forms.gas),'_label-> Messages(constants.Forms.gas))
-        @inputPassword(setBuyerFeedbackForm(constants.Forms.password),'_label-> Messages(constants.Forms.password))
+        @inputText(setBuyerFeedbackForm(constants.Forms.FROM),'_label-> Messages(constants.Forms.FROM))
+        @inputText(setBuyerFeedbackForm(constants.Forms.TO),'_label-> Messages(constants.Forms.TO))
+        @inputText(setBuyerFeedbackForm(constants.Forms.PEG_HASH),'_label-> Messages(constants.Forms.PEG_HASH))
+        @inputText(setBuyerFeedbackForm(constants.Forms.RATING),'_label-> Messages(constants.Forms.RATING))
+        @inputText(setBuyerFeedbackForm(constants.Forms.GAS),'_label-> Messages(constants.Forms.GAS))
+        @inputPassword(setBuyerFeedbackForm(constants.Forms.PASSWORD),'_label-> Messages(constants.Forms.PASSWORD))
 
         @if(setBuyerFeedbackForm.hasGlobalErrors) {
             <ul>
@@ -19,6 +19,6 @@
             }
             </ul>
         }
-        <button type="submit">@Messages(constants.Forms.SetBuyerFeedback)</button>
+        <button type="submit">@Messages(constants.Forms.SET_BUYER_FEEDBACK_TITLE)</button>
     }
 }

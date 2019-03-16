@@ -2,14 +2,14 @@
 @import views.companion.blockchain.SendCoin
 
 @(sendCoinForm: Form[SendCoin.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages(constants.Forms.SendCoin)) {
+@common(Messages(constants.Forms.SEND_COIN_TITLE)) {
     @form(action = routes.SendCoinController.sendCoin) {
         @CSRF.formField
-        @inputText(sendCoinForm(constants.Forms.from),'_label-> Messages(constants.Forms.from))
-        @inputText(sendCoinForm(constants.Forms.to),'_label-> Messages(constants.Forms.to))
-        @inputText(sendCoinForm(constants.Forms.amount),'_label-> Messages(constants.Forms.amount))
-        @inputText(sendCoinForm(constants.Forms.gas),'_label-> Messages(constants.Forms.gas))
-        @inputPassword(sendCoinForm(constants.Forms.password),'_label-> Messages(constants.Forms.password))
+        @inputText(sendCoinForm(constants.Forms.FROM),'_label-> Messages(constants.Forms.FROM))
+        @inputText(sendCoinForm(constants.Forms.TO),'_label-> Messages(constants.Forms.TO))
+        @inputText(sendCoinForm(constants.Forms.AMOUNT),'_label-> Messages(constants.Forms.AMOUNT))
+        @inputText(sendCoinForm(constants.Forms.GAS),'_label-> Messages(constants.Forms.GAS))
+        @inputPassword(sendCoinForm(constants.Forms.PASSWORD),'_label-> Messages(constants.Forms.PASSWORD))
 
         @if(sendCoinForm.hasGlobalErrors) {
             <ul>
@@ -18,6 +18,6 @@
             }
             </ul>
         }
-        <button type="submit">@Messages(constants.Forms.SendCoin)</button>
+        <button type="submit">@Messages(constants.Forms.SEND_COIN_TITLE)</button>
     }
 }

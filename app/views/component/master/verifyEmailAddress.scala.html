@@ -2,10 +2,10 @@
 @import views.companion.master.VerifyEmailAddress
 
 @(verifyEmailAddressForm: Form[VerifyEmailAddress.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-    @common(Messages(constants.Forms.VerifyEmailAddress)) {
+    @common(Messages(constants.Forms.VERIFY_EMAIL_ADDRESS)) {
         @form(action = routes.VerifyEmailAddressController.verifyEmailAddress) {
             @CSRF.formField
-            @inputText(verifyEmailAddressForm(constants.Forms.otp),'_label-> Messages(constants.Forms.otp))
+            @inputText(verifyEmailAddressForm(constants.Forms.OTP),'_label-> Messages(constants.Forms.OTP))
 
             @if(verifyEmailAddressForm.hasGlobalErrors) {
                 <ul>
@@ -14,6 +14,6 @@
                 }
                 </ul>
             }
-            <button type="submit">@Messages(constants.Forms.VerifyEmailAddress)</button>
+            <button type="submit">@Messages(constants.Forms.VERIFY_EMAIL_ADDRESS)</button>
         }
     }

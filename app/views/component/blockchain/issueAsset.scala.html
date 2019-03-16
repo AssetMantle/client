@@ -2,18 +2,18 @@
 @import views.companion.blockchain.IssueAsset
 
 @(issueAssetForm: Form[IssueAsset.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages(constants.Forms.IssueAsset)) {
+@common(Messages(constants.Forms.ISSUE_ASSET_TITLE)) {
     @form(action = routes.IssueAssetController.issueAsset) {
         @CSRF.formField
-        @inputText(issueAssetForm(constants.Forms.from),'_label-> Messages(constants.Forms.from))
-        @inputText(issueAssetForm(constants.Forms.to),'_label-> Messages(constants.Forms.to))
-        @inputText(issueAssetForm(constants.Forms.documentHash),'_label-> Messages(constants.Forms.documentHash))
-        @inputText(issueAssetForm(constants.Forms.assetType),'_label-> Messages(constants.Forms.assetType))
-        @inputText(issueAssetForm(constants.Forms.assetPrice),'_label-> Messages(constants.Forms.assetPrice))
-        @inputText(issueAssetForm(constants.Forms.quantityUnit),'_label-> Messages(constants.Forms.quantityUnit))
-        @inputText(issueAssetForm(constants.Forms.assetQuantity),'_label-> Messages(constants.Forms.assetQuantity))
-        @inputText(issueAssetForm(constants.Forms.gas),'_label-> Messages(constants.Forms.gas))
-        @inputPassword(issueAssetForm(constants.Forms.password),'_label-> Messages(constants.Forms.password))
+        @inputText(issueAssetForm(constants.Forms.FROM),'_label-> Messages(constants.Forms.FROM))
+        @inputText(issueAssetForm(constants.Forms.TO),'_label-> Messages(constants.Forms.TO))
+        @inputText(issueAssetForm(constants.Forms.DOCUMENT_HASH),'_label-> Messages(constants.Forms.DOCUMENT_HASH))
+        @inputText(issueAssetForm(constants.Forms.ASSET_TYPE),'_label-> Messages(constants.Forms.ASSET_TYPE))
+        @inputText(issueAssetForm(constants.Forms.ASSET_PRICE),'_label-> Messages(constants.Forms.ASSET_PRICE))
+        @inputText(issueAssetForm(constants.Forms.QUANTITY_UNIT),'_label-> Messages(constants.Forms.QUANTITY_UNIT))
+        @inputText(issueAssetForm(constants.Forms.ASSET_QUANTITY),'_label-> Messages(constants.Forms.ASSET_QUANTITY))
+        @inputText(issueAssetForm(constants.Forms.GAS),'_label-> Messages(constants.Forms.GAS))
+        @inputPassword(issueAssetForm(constants.Forms.PASSWORD),'_label-> Messages(constants.Forms.PASSWORD))
 
         @if(issueAssetForm.hasGlobalErrors) {
             <ul>
@@ -22,6 +22,6 @@
             }
             </ul>
         }
-        <button type="submit">@Messages(constants.Forms.IssueAsset)</button>
+        <button type="submit">@Messages(constants.Forms.ISSUE_ASSET_TITLE)</button>
     }
 }

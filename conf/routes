@@ -78,11 +78,11 @@ POST        /blockchain/sellerExecuteOrder                  controllers.SellerEx
 GET         /blockchian/sendAsset                           controllers.SendAssetController.sendAssetForm
 POST        /blockchain/sendAsset                           controllers.SendAssetController.sendAsset
 
-GET         /blockchain/sendCoin                  controllers.SendCoinController.sendCoinForm
-POST        /blockchain/sendCoin                  controllers.SendCoinController.sendCoin
+GET         /blockchain/sendCoin                            controllers.SendCoinController.sendCoinForm
+POST        /blockchain/sendCoin                            controllers.SendCoinController.sendCoin
 
-GET         /blockchian/sendFiat                  controllers.SendFiatController.sendFiatForm
-POST        /blockchain/sendFiat                  controllers.SendFiatController.sendFiat
+GET         /blockchian/sendFiat                            controllers.SendFiatController.sendFiatForm
+POST        /blockchain/sendFiat                            controllers.SendFiatController.sendFiat
 
 GET         /blockchian/setACL                              controllers.SetACLController.setACLForm
 POST        /blockchain/setACL                              controllers.SetACLController.setACL

@@ -2,14 +2,14 @@
 @import views.companion.master.AddZone
 
 @(addZoneForm: Form[AddZone.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages(constants.Forms.AddZone)) {
+@common(Messages(constants.Forms.ADD_ZONE_TITLE)) {
     @form(action = routes.LoginController.login) {
         @CSRF.formField
-        @inputText(addZoneForm(constants.Forms.id),'_label-> Messages(constants.Forms.id))
-        @inputPassword(addZoneForm(constants.Forms.password),'_label-> Messages(constants.Forms.password))
-        @inputText(addZoneForm(constants.Forms.password),'_label-> Messages(constants.Forms.password))
-        @inputText(addZoneForm(constants.Forms.name),'_label-> Messages(constants.Forms.name))
-        @inputText(addZoneForm(constants.Forms.currency),'_label-> Messages(constants.Forms.currency))
+        @inputText(addZoneForm(constants.Forms.ID),'_label-> Messages(constants.Forms.ID))
+        @inputPassword(addZoneForm(constants.Forms.PASSWORD),'_label-> Messages(constants.Forms.PASSWORD))
+        @inputText(addZoneForm(constants.Forms.PASSWORD),'_label-> Messages(constants.Forms.PASSWORD))
+        @inputText(addZoneForm(constants.Forms.NAME),'_label-> Messages(constants.Forms.NAME))
+        @inputText(addZoneForm(constants.Forms.CURRENCY),'_label-> Messages(constants.Forms.CURRENCY))
 
         @if(addZoneForm.hasGlobalErrors) {
             <ul>
@@ -18,6 +18,6 @@
             }
             </ul>
         }
-        <button type="submit">@Messages(constants.Forms.AddZone)</button>
+        <button type="submit">@Messages(constants.Forms.ADD_ZONE_TITLE)</button>
     }
 }

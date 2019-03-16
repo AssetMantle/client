@@ -2,15 +2,15 @@
 @import views.companion.blockchain.SetSellerFeedback
 
 @(setSellerFeedbackForm: Form[SetSellerFeedback.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages(constants.Forms.SetSellerFeedback)) {
+@common(Messages(constants.Forms.SET_SELLER_FEEDBACK_TITLE)) {
     @form(action = routes.SetSellerFeedbackController.setSellerFeedback) {
         @CSRF.formField
-        @inputText(setSellerFeedbackForm(constants.Forms.from),'_label-> Messages(constants.Forms.from))
-        @inputText(setSellerFeedbackForm(constants.Forms.to),'_label-> Messages(constants.Forms.to))
-        @inputText(setSellerFeedbackForm(constants.Forms.pegHash),'_label-> Messages(constants.Forms.pegHash))
-        @inputText(setSellerFeedbackForm(constants.Forms.rating),'_label-> Messages(constants.Forms.rating))
-        @inputText(setSellerFeedbackForm(constants.Forms.gas),'_label-> Messages(constants.Forms.gas))
-        @inputPassword(setSellerFeedbackForm(constants.Forms.password),'_label-> Messages(constants.Forms.password))
+        @inputText(setSellerFeedbackForm(constants.Forms.FROM),'_label-> Messages(constants.Forms.FROM))
+        @inputText(setSellerFeedbackForm(constants.Forms.TO),'_label-> Messages(constants.Forms.TO))
+        @inputText(setSellerFeedbackForm(constants.Forms.PEG_HASH),'_label-> Messages(constants.Forms.PEG_HASH))
+        @inputText(setSellerFeedbackForm(constants.Forms.RATING),'_label-> Messages(constants.Forms.RATING))
+        @inputText(setSellerFeedbackForm(constants.Forms.GAS),'_label-> Messages(constants.Forms.GAS))
+        @inputPassword(setSellerFeedbackForm(constants.Forms.PASSWORD),'_label-> Messages(constants.Forms.PASSWORD))
 
         @if(setSellerFeedbackForm.hasGlobalErrors) {
             <ul>
@@ -19,6 +19,6 @@
             }
             </ul>
         }
-        <button type="submit">@Messages(constants.Forms.SetSellerFeedback)</button>
+        <button type="submit">@Messages(constants.Forms.SET_SELLER_FEEDBACK_TITLE)</button>
     }
 }
