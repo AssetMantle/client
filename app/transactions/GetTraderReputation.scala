@@ -12,7 +12,7 @@ import scala.concurrent.{Await, ExecutionContext, Future}
 
 class GetTraderReputation @Inject()(wsClient: WSClient)(implicit configuration: Configuration, executionContext: ExecutionContext) {
 
-  private implicit val module: String = constants.Module.TRANSACTIONS_GET_SEED
+  private implicit val module: String = constants.Module.TRANSACTIONS_GET_TRADER_REPUTATION
 
   private implicit val logger: Logger = Logger(this.getClass)
 

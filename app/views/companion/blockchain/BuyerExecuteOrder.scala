@@ -12,11 +12,10 @@ object BuyerExecuteOrder {
       "sellerAddress" -> nonEmptyText(minLength = 1, maxLength = 45),
       "fiatProofHash" -> nonEmptyText(minLength = 1, maxLength = 20),
       "pegHash" -> nonEmptyText(minLength = 1, maxLength = 20),
-      "chainID" -> nonEmptyText(minLength = 1, maxLength = 20),
       "gas" -> number(min = 1, max = 10000)
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(from: String, password: String, buyerAddress: String, sellerAddress: String, fiatProofHash: String, pegHash: String, chainID: String, gas: Int)
+  case class Data(from: String, password: String, buyerAddress: String, sellerAddress: String, fiatProofHash: String, pegHash: String, gas: Int)
 
 }

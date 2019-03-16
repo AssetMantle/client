@@ -10,6 +10,7 @@ import transactions.SendCoin
 import views.companion.blockchain.SendCoin
 
 import scala.concurrent.ExecutionContext
+import scala.util.Random
 
 class SendCoinController @Inject()(messagesControllerComponents: MessagesControllerComponents, transactionSendCoin: SendCoin, sendCoins: SendCoins)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
   def sendCoinForm: Action[AnyContent] = Action { implicit request =>
@@ -23,13 +24,22 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
       },
       sendCoinData => {
         try {
-          val sendCoinsResponse = sendCoins.Service.addSendCoin(sendCoinData.from, sendCoinData.to, sendCoinData.amount,sendCoinData.chainID, sendCoinData.gas, null, null, utilities.RandomString.randomStringArray(10), null)
-          Ok(views.html.index(transactionSendCoin.Service.post(new transactionSendCoin.Request(sendCoinData.from, sendCoinData.password, sendCoinData.to, sendCoinData.amount, sendCoinData.chainID, sendCoinData.gas)).txHash))
+          if (configuration.get[Boolean]("blockchain.kafka.enabled")) {
+            val response = transactionSendCoin.Service.kafkaPost(transactionSendCoin.Request(from = sendCoinData.from, password = sendCoinData.password, to = sendCoinData.to, amount = Seq(transactionSendCoin.Amount("comdex", sendCoinData.amount.toString)), gas = sendCoinData.gas))
+            sendCoins.Service.addSendCoinKafka(sendCoinData.from, sendCoinData.to, sendCoinData.amount, sendCoinData.gas, null, null, response.ticketID, null)
+            Ok(views.html.index(success = response.ticketID))
+          }
+          else {
+            val response = transactionSendCoin.Service.post(transactionSendCoin.Request(from = sendCoinData.from, password = sendCoinData.password, to = sendCoinData.to, amount = Seq(transactionSendCoin.Amount("comdex", sendCoinData.amount.toString)), gas = sendCoinData.gas))
+            sendCoins.Service.addSendCoin(sendCoinData.from, sendCoinData.to, sendCoinData.amount, sendCoinData.gas, null, Option(response.TxHash), (Random.nextInt(899999999) + 100000000).toString, null)
+            Ok(views.html.index(success = response.TxHash))
+          }
         }
         catch {
           case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))
           case blockChainException: BlockChainException => Ok(views.html.index(failure = blockChainException.message))
         }
-      })
+      }
+    )
   }
 }
