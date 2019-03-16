@@ -1,11 +1,10 @@
 @import helper._
-@import views.companion.blockchain.SendCoin
+@import views.companion.master.SendCoin
 
 @(sendCoinForm: Form[SendCoin.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @common(Messages(constants.Forms.SEND_COIN_TITLE)) {
-    @form(action = routes.SendCoinController.sendCoinBC) {
+    @form(action = routes.SendCoinController.sendCoin) {
         @CSRF.formField
-        @inputText(sendCoinForm(constants.Forms.FROM),'_label-> Messages(constants.Forms.FROM))
         @inputText(sendCoinForm(constants.Forms.TO),'_label-> Messages(constants.Forms.TO))
         @inputText(sendCoinForm(constants.Forms.AMOUNT),'_label-> Messages(constants.Forms.AMOUNT))
         @inputText(sendCoinForm(constants.Forms.GAS),'_label-> Messages(constants.Forms.GAS))
