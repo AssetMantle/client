@@ -10,7 +10,7 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class ACLHash(issueAsset: Boolean, issueFiat: Boolean, sendAsset: Boolean, sendFiat: Boolean, redeemAsset: Boolean, redeemFiat: Boolean, sellerExecuteOrder: Boolean, buyerExecuteOrder: Boolean, changeBuyerBid: Boolean, changeSellerBid: Boolean, confirmBuyerBid: Boolean, confirmSellerBid: Boolean, negotiation: Boolean, releaseAssets: Boolean, hash: String)
+case class ACLHash(issueAssets: Boolean, issueFiats: Boolean, sendAssets: Boolean, sendFiats: Boolean, redeemAssets: Boolean, redeemFiats: Boolean, sellerExecuteOrder: Boolean, buyerExecuteOrder: Boolean, changeBuyerBid: Boolean, changeSellerBid: Boolean, confirmBuyerBid: Boolean, confirmSellerBid: Boolean, negotiation: Boolean, releaseAssetss: Boolean, hash: String)
 
 class ACLHashs @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider) {
 
@@ -27,7 +27,7 @@ class ACLHashs @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
   private def add(aclHash: ACLHash)(implicit executionContext: ExecutionContext): Future[String] = db.run((aclTable returning aclTable.map(_.hash) += aclHash).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+      case psqlException: PSQLException => logger.info(constants.Error.PSQL_EXCEPTION, psqlException)
         aclHash.hash
     }
   }
@@ -38,19 +38,19 @@ class ACLHashs @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   private[models] class ACLHashTable(tag: Tag) extends Table[ACLHash](tag, "ACLHash_BC") {
 
-    def * = (issueAsset, issueFiat, sendAsset, sendFiat, redeemAsset, redeemFiat, sellerExecuteOrder, buyerExecuteOrder, changeBuyerBid, changeSellerBid, confirmBuyerBid, confirmSellerBid, negotiation, releaseAsset, hash) <> (ACLHash.tupled, ACLHash.unapply)
+    def * = (issueAssets, issueFiats, sendAssets, sendFiats, redeemAssets, redeemFiats, sellerExecuteOrder, buyerExecuteOrder, changeBuyerBid, changeSellerBid, confirmBuyerBid, confirmSellerBid, negotiation, releaseAssets, hash) <> (ACLHash.tupled, ACLHash.unapply)
 
-    def issueAsset = column[Boolean]("issueAsset")
+    def issueAssets = column[Boolean]("issueAssets")
 
-    def issueFiat = column[Boolean]("issueFiat")
+    def issueFiats = column[Boolean]("issueFiats")
 
-    def sendAsset = column[Boolean]("sendAsset")
+    def sendAssets = column[Boolean]("sendAssets")
 
-    def sendFiat = column[Boolean]("sendFiat")
+    def sendFiats = column[Boolean]("sendFiats")
 
-    def redeemAsset = column[Boolean]("redeemAsset")
+    def redeemAssets = column[Boolean]("redeemAssets")
 
-    def redeemFiat = column[Boolean]("redeemFiat")
+    def redeemFiats = column[Boolean]("redeemFiats")
 
     def sellerExecuteOrder = column[Boolean]("sellerExecuteOrder")
 
@@ -66,13 +66,13 @@ class ACLHashs @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
     def negotiation = column[Boolean]("negotiation")
 
-    def releaseAsset = column[Boolean]("releaseAsset")
+    def releaseAssets = column[Boolean]("releaseAssets")
 
     def hash = column[String]("hash", O.PrimaryKey)
 
   }
 
   object Service {
-    def addACLHash(acl: ACL)(implicit executionContext: ExecutionContext): String = Await.result(add(ACLHash(acl.issueAsset, acl.issueFiat, acl.sendAsset, acl.sendFiat, acl.redeemAsset, acl.redeemFiat, acl.sellerExecuteOrder, acl.buyerExecuteOrder, acl.changeBuyerBid, acl.changeSellerBid, acl.confirmBuyerBid, acl.confirmSellerBid, acl.negotiation, acl.releaseAsset, util.hashing.MurmurHash3.stringHash(acl.toString).toString)), Duration.Inf)
+    def addACLHash(acl: ACL)(implicit executionContext: ExecutionContext): String = Await.result(add(ACLHash(acl.issueAssets, acl.issueFiats, acl.sendAssets, acl.sendFiats, acl.redeemAssets, acl.redeemFiats, acl.sellerExecuteOrder, acl.buyerExecuteOrder, acl.changeBuyerBid, acl.changeSellerBid, acl.confirmBuyerBid, acl.confirmSellerBid, acl.negotiation, acl.releaseAssets, util.hashing.MurmurHash3.stringHash(acl.toString).toString)), Duration.Inf)
   }
 }

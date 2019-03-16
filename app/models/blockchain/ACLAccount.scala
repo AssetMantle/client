@@ -10,7 +10,7 @@ import scala.concurrent.{Await, ExecutionContext, Future}
 
 case class ACLAccount(address: String, zoneID: String, organizationID: String, aclHash: String)
 
-case class ACL(issueAsset: Boolean, issueFiat: Boolean, sendAsset: Boolean, sendFiat: Boolean, redeemAsset: Boolean, redeemFiat: Boolean, sellerExecuteOrder: Boolean, buyerExecuteOrder: Boolean, changeBuyerBid: Boolean, changeSellerBid: Boolean, confirmBuyerBid: Boolean, confirmSellerBid: Boolean, negotiation: Boolean, releaseAsset: Boolean)
+case class ACL(issueAssets: Boolean, issueFiats: Boolean, sendAssets: Boolean, sendFiats: Boolean, redeemAssets: Boolean, redeemFiats: Boolean, sellerExecuteOrder: Boolean, buyerExecuteOrder: Boolean, changeBuyerBid: Boolean, changeSellerBid: Boolean, confirmBuyerBid: Boolean, confirmSellerBid: Boolean, negotiation: Boolean, releaseAssets: Boolean)
 
 class ACLAccounts @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, aclHashs: ACLHashs) {
 
@@ -42,7 +42,7 @@ class ACLAccounts @Inject()(protected val databaseConfigProvider: DatabaseConfig
 
   object Service {
 
-    def addACLAccount(from: String, address: String, zoneID: String, organizationID: String, chainID: String, acl: ACL)(implicit executionContext: ExecutionContext): String = Await.result(add(ACLAccount(address, zoneID, organizationID, util.hashing.MurmurHash3.stringHash(acl.toString).toString)), Duration.Inf)
+    def addACLAccount(from: String, address: String, zoneID: String, organizationID: String, acl: ACL)(implicit executionContext: ExecutionContext): String = Await.result(add(ACLAccount(address, zoneID, organizationID, util.hashing.MurmurHash3.stringHash(acl.toString).toString)), Duration.Inf)
 
     def getACLAccount(address: String): ACLAccount = Await.result(findByAddress(address), Duration.Inf)
   }

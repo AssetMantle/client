@@ -1,14 +1,28 @@
 package models.blockchainTransaction
 
+import akka.actor.ActorSystem
+import exceptions.BaseException
 import javax.inject.Inject
+import models.master.Accounts
+import org.postgresql.util.PSQLException
+import play.api.{Configuration, Logger}
 import play.api.db.slick.DatabaseConfigProvider
+import play.api.libs.ws.WSClient
 import slick.jdbc.JdbcProfile
+import transactions.GetResponse
+import utilities.PushNotifications
 
-import scala.concurrent.Future
+import scala.concurrent.duration._
+import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.util.{Failure, Success}
 
-case class RedeemFiat(from: String, to: String, redeemAmount: Int, chainID: String, gas: Int,  status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])
+case class RedeemFiat(from: String, to: String, redeemAmount: Int, gas: Int,  status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])
 
-class RedeemFiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider) {
+class RedeemFiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, transactionRedeemFiat: transactions.RedeemFiat, getResponse: GetResponse, actorSystem: ActorSystem, implicit val pushNotifications: PushNotifications, implicit val accounts: Accounts)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext)  {
+
+  private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_REDEEM_ASSET
+
+  private implicit val logger: Logger = Logger(this.getClass)
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -18,25 +32,51 @@ class RedeemFiats @Inject()(protected val databaseConfigProvider: DatabaseConfig
 
   private[models] val redeemFiatTable = TableQuery[RedeemFiatTable]
 
-  private def add(redeemFiat: RedeemFiat): Future[String] = db.run(redeemFiatTable returning redeemFiatTable.map(_.ticketID) += redeemFiat)
+  private def add(redeemFiat: RedeemFiat)(implicit executionContext: ExecutionContext): Future[String] = db.run((redeemFiatTable returning redeemFiatTable.map(_.ticketID) += redeemFiat).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+        throw new BaseException(constants.Error.PSQL_EXCEPTION)
+    }
+  }
 
-  private def update(redeemFiat: RedeemFiat): Future[Int] = db.run(redeemFiatTable.insertOrUpdate(redeemFiat))
+  private def update(redeemFiat: RedeemFiat)(implicit executionContext: ExecutionContext): Future[Int] = db.run(redeemFiatTable.insertOrUpdate(redeemFiat).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+        throw new BaseException(constants.Error.PSQL_EXCEPTION)
+    }
+  }
 
-  private def findByTicketID(ticketID: String): Future[RedeemFiat] = db.run(redeemFiatTable.filter(_.ticketID === ticketID).result.head)
+  private def findByTicketID(ticketID: String)(implicit executionContext: ExecutionContext): Future[RedeemFiat] = db.run(redeemFiatTable.filter(_.ticketID === ticketID).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+        throw new BaseException(constants.Error.PSQL_EXCEPTION)
+    }
+  }
 
-  private def deleteByTicketID(ticketID: String) = db.run(redeemFiatTable.filter(_.ticketID === ticketID).delete)
+  private def updateTxHashOnTicketID(ticketID: String, txHash: Option[String])(implicit executionContext: ExecutionContext) = db.run(redeemFiatTable.filter(_.ticketID === ticketID).map(_.txHash.?).update(txHash))
+
+  private def updateResponseCodeOnTicketID(ticketID: String, responseCode: String)(implicit executionContext: ExecutionContext) = db.run(redeemFiatTable.filter(_.ticketID === ticketID).map(_.responseCode.?).update(Option(responseCode)))
+
+  private def updateStatusOnTicketID(ticketID: String, status: Boolean)(implicit executionContext: ExecutionContext) = db.run(redeemFiatTable.filter(_.ticketID === ticketID).map(_.status.?).update(Option(status)))
+
+  private def getTicketIDsWithEmptyTxHash()(implicit executionContext: ExecutionContext):Future[Seq[String]] = db.run(redeemFiatTable.filter(_.txHash.?.isEmpty).map(_.ticketID).result)
+
+  private def getAddressByTicketID(ticketID: String)(implicit executionContext: ExecutionContext): Future[String] = db.run(redeemFiatTable.filter(_.ticketID === ticketID).map(_.to).result.head)
+
+  private def deleteByTicketID(ticketID: String)(implicit executionContext: ExecutionContext) = db.run(redeemFiatTable.filter(_.ticketID === ticketID).delete)
 
   private[models] class RedeemFiatTable(tag: Tag) extends Table[RedeemFiat](tag, "RedeemFiat") {
 
-    def * = (from, to, redeemAmount, chainID, gas, status.?, txHash.?, ticketID, responseCode.?) <> (RedeemFiat.tupled, RedeemFiat.unapply)
+    def * = (from, to, redeemAmount, gas, status.?, txHash.?, ticketID, responseCode.?) <> (RedeemFiat.tupled, RedeemFiat.unapply)
 
     def from = column[String]("from")
 
     def to = column[String]("to")
 
     def redeemAmount = column[Int]("redeemAmount")
-
-    def chainID = column[String]("chainID")
 
     def gas = column[Int]("gas")
 
@@ -47,5 +87,29 @@ class RedeemFiats @Inject()(protected val databaseConfigProvider: DatabaseConfig
     def ticketID = column[String]("ticketID", O.PrimaryKey)
 
     def responseCode = column[String]("responseCode")
+  }
+
+  if (configuration.get[Boolean]("blockchain.kafka.enabled")) {
+    actorSystem.scheduler.schedule(initialDelay = configuration.get[Int]("blockchain.kafka.ticketIterator.initialDelay").seconds, interval = configuration.get[Int]("blockchain.kafka.ticketIterator.interval").second) {
+      utilities.TicketIterator.start(Service.getTicketIDs, transactionRedeemFiat.Service.getTxHashFromWSResponse, Service.updateTxHash, Service.getAddress)
+    }
+  }
+
+  object Service {
+
+    def addRedeemFiat(from: String, to: String, redeemAmount: Int, gas: Int,  status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String]) (implicit executionContext: ExecutionContext): String = Await.result(add(RedeemFiat(from = from , to = to, redeemAmount = redeemAmount, gas = gas, status = status, txHash = txHash, ticketID = ticketID, responseCode = responseCode)), Duration.Inf)
+
+    def addRedeemFiatKafka(from: String, to: String, redeemAmount: Int, gas: Int,  status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String]) (implicit executionContext: ExecutionContext): String = Await.result(add(RedeemFiat(from = from , to = to, redeemAmount = redeemAmount, gas = gas, status = status, txHash = txHash, ticketID = ticketID, responseCode = responseCode)), Duration.Inf)
+
+    def updateTxHash(ticketID: String, txHash: String) (implicit executionContext: ExecutionContext): Int = Await.result(updateTxHashOnTicketID(ticketID, Option(txHash)),Duration.Inf)
+
+    def updateResponseCode(ticketID: String, responseCode: String) (implicit executionContext: ExecutionContext): Int = Await.result(updateResponseCodeOnTicketID(ticketID, responseCode), Duration.Inf)
+
+    def updateStatus(ticketID: String, status: Boolean) (implicit executionContext: ExecutionContext): Int = Await.result(updateStatusOnTicketID(ticketID, status), Duration.Inf)
+
+    def getTicketIDs()(implicit executionContext: ExecutionContext): Seq[String] = Await.result(getTicketIDsWithEmptyTxHash(), Duration.Inf)
+
+    def getAddress(ticketID: String)(implicit executionContext: ExecutionContext): String = Await.result(getAddressByTicketID(ticketID), Duration.Inf)
+
   }
 }

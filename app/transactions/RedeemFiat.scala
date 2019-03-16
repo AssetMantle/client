@@ -4,9 +4,10 @@ import java.net.ConnectException
 
 import exceptions.BaseException
 import javax.inject.Inject
-import play.api.libs.json.{JsObject, Json}
+import play.api.libs.json.{JsObject, Json, OWrites}
 import play.api.libs.ws.{WSClient, WSResponse}
 import play.api.{Configuration, Logger}
+import transactions.Response.TransactionResponse.{KafkaResponse, Response}
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
@@ -25,25 +26,15 @@ class RedeemFiat @Inject()(wsClient: WSClient)(implicit configuration: Configura
 
   private val url = ip + ":" + port + "/" + path
 
-  private def action(request: Request)(implicit executionContext: ExecutionContext): Future[Response] = wsClient.url(url).post(request.json).map { implicit response => new Response() }
+  private val chainID = configuration.get[String]("blockchain.main.chainID")
 
-  class Response(implicit response: WSResponse) {
+  case class Request(from: String, password: String, to: String, redeemAmount: Int, chainID: String = chainID, gas: Int)
 
-    val txHash: String = utilities.JSON.getBCStringResponse("TxHash")
+  private implicit val requestWrites: OWrites[Request] = Json.writes[Request]
 
-  }
+  private def action(request: Request)(implicit executionContext: ExecutionContext): Future[Response] = wsClient.url(url).post(Json.toJson(request)).map { response => utilities.JSON.getResponseFromJson[Response](response) }
 
-
-  class Request(from: String, password: String, to: String, redeemAmount: Int, chainID: String, gas: Int) {
-    val json: JsObject = Json.obj(fields =
-      "from" -> from,
-      "password" -> password,
-      "to" -> to,
-      "redeemAmount" -> redeemAmount,
-      "chainID" -> chainID,
-      "gas" -> gas
-    )
-  }
+  private def kafkaAction(request: Request)(implicit executionContext: ExecutionContext): Future[KafkaResponse] = wsClient.url(url).post(Json.toJson(request)).map { response => utilities.JSON.getResponseFromJson[KafkaResponse](response) }
 
   object Service {
     def post(request: Request)(implicit executionContext: ExecutionContext): Response = try {
@@ -53,6 +44,16 @@ class RedeemFiat @Inject()(wsClient: WSClient)(implicit configuration: Configura
         logger.error(constants.Error.CONNECT_EXCEPTION, connectException)
         throw new BaseException(constants.Error.CONNECT_EXCEPTION)
     }
+
+    def kafkaPost(request: Request)(implicit executionContext: ExecutionContext): KafkaResponse = try {
+      Await.result(kafkaAction(request), Duration.Inf)
+    } catch {
+      case connectException: ConnectException =>
+        logger.error(constants.Error.CONNECT_EXCEPTION, connectException)
+        throw new BaseException(constants.Error.CONNECT_EXCEPTION)
+    }
+
+    def getTxHashFromWSResponse(wsResponse: WSResponse): String = utilities.JSON.getResponseFromJson[Response](wsResponse).TxHash
   }
 
 }

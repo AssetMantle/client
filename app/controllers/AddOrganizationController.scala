@@ -82,14 +82,15 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
             Ok(views.html.index(success = response.ticketID))
           } else {
             val response = transactionAddOrganization.Service.post(transactionAddOrganization.Request(from = addOrganizationData.from, to = addOrganizationData.to, organizationID = addOrganizationData.organizationID, password = addOrganizationData.password))
-            addOrganizations.Service.addOrganizationKafka(addOrganizationData.from, addOrganizationData.to, addOrganizationData.organizationID, null, Option(response.TxHash), (Random.nextInt(899999999) + 100000000).toString, null)
+            addOrganizations.Service.addOrganization(addOrganizationData.from, addOrganizationData.to, addOrganizationData.organizationID, null, Option(response.TxHash), (Random.nextInt(899999999) + 100000000).toString, null)
             Ok(views.html.index(success = response.TxHash))
           }
         }
         catch {
           case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))
-          case blockChainException: BlockChainException => Ok(views.html.index(failure = Messages(blockChainException.message)))
+          case blockChainException: BlockChainException => Ok(views.html.index(failure = blockChainException.message))
         }
-      })
+      }
+    )
   }
 }

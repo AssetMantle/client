@@ -32,7 +32,7 @@ class AddOrganization @Inject()(wsClient: WSClient)(implicit configuration: Conf
 
   private implicit val requestWrites: OWrites[Request] = Json.writes[Request]
 
-  private def action(request: Request)(implicit executionContext: ExecutionContext): Future[Response] = wsClient.url(url).post(Json.toJson(request)).map { implicit response => utilities.JSON.getResponseFromJson[Response](response) }
+  private def action(request: Request)(implicit executionContext: ExecutionContext): Future[Response] = wsClient.url(url).post(Json.toJson(request)).map { response => utilities.JSON.getResponseFromJson[Response](response) }
 
   private def kafkaAction(request: Request)(implicit executionContext: ExecutionContext): Future[KafkaResponse] = wsClient.url(url).post(Json.toJson(request)).map { response => utilities.JSON.getResponseFromJson[KafkaResponse](response)}
 

@@ -37,8 +37,9 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
         }
         catch {
           case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))
-          case blockChainException: BlockChainException => Ok(views.html.index(failure = Messages(blockChainException.message)))
+          case blockChainException: BlockChainException => Ok(views.html.index(failure = blockChainException.message))
         }
-      })
+      }
+    )
   }
 }

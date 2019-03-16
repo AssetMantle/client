@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Account_BC"
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN."ACLAccount_BC"
 (
   "address"        VARCHAR NOT NULL,
-  "zoneID"         VARCHAR NOT NULL,
+  "zoneID" VARCHAR NOT NULL,
   "organizationID" VARCHAR NOT NULL,
   "aclHash"        VARCHAR NOT NULL,
   PRIMARY KEY ("address")
@@ -41,12 +41,12 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."ACLAccount_BC"
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN."ACLHash_BC"
 (
-  "issueAsset"         BOOLEAN NOT NULL,
-  "issueFiat"          BOOLEAN NOT NULL,
-  "sendAsset"          BOOLEAN NOT NULL,
-  "sendFiat"           BOOLEAN NOT NULL,
-  "redeemAsset"        BOOLEAN NOT NULL,
-  "redeemFiat"         BOOLEAN NOT NULL,
+  "issueAssets"        BOOLEAN NOT NULL,
+  "issueFiats"         BOOLEAN NOT NULL,
+  "sendAssets"         BOOLEAN NOT NULL,
+  "sendFiats"          BOOLEAN NOT NULL,
+  "redeemAssets"       BOOLEAN NOT NULL,
+  "redeemFiats"        BOOLEAN NOT NULL,
   "sellerExecuteOrder" BOOLEAN NOT NULL,
   "buyerExecuteOrder"  BOOLEAN NOT NULL,
   "changeBuyerBid"     BOOLEAN NOT NULL,
@@ -54,7 +54,7 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."ACLHash_BC"
   "confirmBuyerBid"    BOOLEAN NOT NULL,
   "confirmSellerBid"   BOOLEAN NOT NULL,
   "negotiation"        BOOLEAN NOT NULL,
-  "releaseAsset"       BOOLEAN NOT NULL,
+  "releaseAssets"      BOOLEAN NOT NULL,
   "hash"               VARCHAR NOT NULL,
   PRIMARY KEY ("hash")
 );
