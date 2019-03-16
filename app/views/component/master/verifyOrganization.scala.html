@@ -2,11 +2,11 @@
 @import views.companion.master.VerifyOrganization
 
 @(verifyOrganizationForm: Form[VerifyOrganization.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages("VerifyOrganization")) {
+@common(Messages(constants.Forms.VerifyOrganization)) {
     @form(action = routes.AddOrganizationController.verifyOrganization) {
         @CSRF.formField
-        @inputText(verifyOrganizationForm(Messages("id")))
-        @inputPassword(verifyOrganizationForm(Messages("password")))
+        @inputText(verifyOrganizationForm(constants.Forms.id),'_label-> Messages(constants.Forms.id))
+        @inputPassword(verifyOrganizationForm(constants.Forms.password),'_label-> Messages(constants.Forms.password))
 
         @if(verifyOrganizationForm.hasGlobalErrors) {
             <ul>
@@ -15,6 +15,6 @@
             }
             </ul>
         }
-        <button type="submit">@Messages("VerifyOrganization")</button>
+        <button type="submit">@Messages(constants.Forms.VerifyOrganization)</button>
     }
 }

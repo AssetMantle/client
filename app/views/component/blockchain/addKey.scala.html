@@ -2,12 +2,12 @@
 @import views.companion.blockchain.AddKey
 
 @(addKeyFrom: Form[AddKey.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages("AddKey")) {
+@common(Messages(constants.Forms.AddKey)) {
     @form(action = routes.AddKeyController.addKey) {
         @CSRF.formField
-        @inputText(addKeyFrom(Messages("name")))
-        @inputText(addKeyFrom(Messages("seed")))
-        @inputPassword(addKeyFrom(Messages("password")))
+        @inputText(addKeyFrom(constants.Forms.name),'_label-> Messages(constants.Forms.name))
+        @inputText(addKeyFrom(constants.Forms.seed),'_label-> Messages(constants.Forms.seed))
+        @inputPassword(addKeyFrom(constants.Forms.password),'_label-> Messages(constants.Forms.password))
 
         @if(addKeyFrom.hasGlobalErrors) {
             <ul>
@@ -16,6 +16,6 @@
             }
             </ul>
         }
-        <button type="submit">@Messages("AddKey")</button>
+        <button type="submit">@Messages(constants.Forms.AddKey)</button>
     }
 }

@@ -2,11 +2,11 @@
 @import views.companion.master.SignUp
 
 @(signUpForm: Form[SignUp.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-    @common(Messages("SignUp")) {
+    @common(Messages(constants.Forms.SignUp)) {
         @form(action = routes.SignUpController.signUp) {
             @CSRF.formField
-            @inputText(signUpForm(Messages("username")),'id->"username")<label id="result"></label>
-            @inputPassword(signUpForm(Messages("password")))
+            @inputText(signUpForm(constants.Forms.username),'_label-> Messages(constants.Forms.username),'id->"username")<label id="result"></label>
+            @inputPassword(signUpForm(constants.Forms.password),'_label-> Messages(constants.Forms.password))
 
             @if(signUpForm.hasGlobalErrors) {
                 <ul>
@@ -15,7 +15,7 @@
                 }
                 </ul>
             }
-            <button type="submit">@Messages("SignUp")</button>
+            <button type="submit">@Messages(constants.Forms.SignUp)</button>
         }
     }
 <script src="@routes.Assets.versioned("javascripts/checkUsername.js")" type="text/javascript"></script>

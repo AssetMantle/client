@@ -2,15 +2,15 @@
 @import views.companion.blockchain.IssueFiat
 
 @(issueFiatForm: Form[IssueFiat.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages("IssueFiat")) {
+@common(Messages(constants.Forms.IssueFiat)) {
     @form(action = routes.IssueFiatController.issueFiat) {
         @CSRF.formField
-        @inputText(issueFiatForm(Messages("from")))
-        @inputText(issueFiatForm(Messages("to")))
-        @inputText(issueFiatForm(Messages("transactionID")))
-        @inputText(issueFiatForm(Messages("transactionAmount")))
-        @inputText(issueFiatForm(Messages("gas")))
-        @inputPassword(issueFiatForm(Messages("password")))
+        @inputText(issueFiatForm(constants.Forms.from),'_label-> Messages(constants.Forms.from))
+        @inputText(issueFiatForm(constants.Forms.to),'_label-> Messages(constants.Forms.to))
+        @inputText(issueFiatForm(constants.Forms.transactionID),'_label-> Messages(constants.Forms.transactionID))
+        @inputText(issueFiatForm(constants.Forms.transactionAmount),'_label-> Messages(constants.Forms.transactionAmount))
+        @inputText(issueFiatForm(constants.Forms.gas),'_label-> Messages(constants.Forms.gas))
+        @inputPassword(issueFiatForm(constants.Forms.password),'_label-> Messages(constants.Forms.password))
 
         @if(issueFiatForm.hasGlobalErrors) {
             <ul>
@@ -19,6 +19,6 @@
             }
             </ul>
         }
-        <button type="submit">@Messages("IssueFiat")</button>
+        <button type="submit">@Messages(constants.Forms.IssueFiat)</button>
     }
 }

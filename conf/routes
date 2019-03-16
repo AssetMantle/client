@@ -18,8 +18,8 @@ GET         /master/queryConfigurationVariable:query        controllers.Configur
 GET         /master/signUp                                  controllers.SignUpController.signUpForm
 POST        /master/signUp                                  controllers.SignUpController.signUp
 
-GET         /master/updateContact                 controllers.UpdateContactController.updateContactForm
-POST        /master/updateContact                 controllers.UpdateContactController.updateContact
+GET         /master/updateContact                           controllers.UpdateContactController.updateContactForm
+POST        /master/updateContact                           controllers.UpdateContactController.updateContact
 
 GET         /master/verifyMobileNumber                      controllers.VerifyMobileNumberController.verifyMobileNumberForm
 POST        /master/verifyMobileNumber                      controllers.VerifyMobileNumberController.verifyMobileNumber

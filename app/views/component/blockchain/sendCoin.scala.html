@@ -2,14 +2,14 @@
 @import views.companion.blockchain.SendCoin
 
 @(sendCoinForm: Form[SendCoin.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages("SendCoin")) {
+@common(Messages(constants.Forms.SendCoin)) {
     @form(action = routes.SendCoinController.sendCoin) {
         @CSRF.formField
-        @inputText(sendCoinForm(Messages("from")))
-        @inputText(sendCoinForm(Messages("to")))
-        @inputText(sendCoinForm(Messages("amount")))
-        @inputText(sendCoinForm(Messages("gas")))
-        @inputPassword(sendCoinForm(Messages("password")))
+        @inputText(sendCoinForm(constants.Forms.from),'_label-> Messages(constants.Forms.from))
+        @inputText(sendCoinForm(constants.Forms.to),'_label-> Messages(constants.Forms.to))
+        @inputText(sendCoinForm(constants.Forms.amount),'_label-> Messages(constants.Forms.amount))
+        @inputText(sendCoinForm(constants.Forms.gas),'_label-> Messages(constants.Forms.gas))
+        @inputPassword(sendCoinForm(constants.Forms.password),'_label-> Messages(constants.Forms.password))
 
         @if(sendCoinForm.hasGlobalErrors) {
             <ul>
@@ -18,6 +18,6 @@
             }
             </ul>
         }
-        <button type="submit">@Messages("SendCoin")</button>
+        <button type="submit">@Messages(constants.Forms.SendCoin)</button>
     }
 }

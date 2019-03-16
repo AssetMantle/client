@@ -2,11 +2,11 @@
 @import views.companion.master.UpdateContact
 
 @(updateContactForm: Form[UpdateContact.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-    @common(Messages("UpdateContact")) {
+    @common(Messages(constants.Forms.UpdateContact)) {
         @form(action = routes.UpdateContactController.updateContact) {
             @CSRF.formField
-            @inputText(updateContactForm(Messages("mobileNumber")))
-            @inputText(updateContactForm(Messages("emailAddress")))
+            @inputText(updateContactForm(constants.Forms.mobileNumber),'_label-> Messages(constants.Forms.mobileNumber))
+            @inputText(updateContactForm(constants.Forms.emailAddress),'_label-> Messages(constants.Forms.emailAddress))
 
             @if(updateContactForm.hasGlobalErrors) {
                 <ul>
@@ -15,6 +15,6 @@
                 }
                 </ul>
             }
-            <button type="submit">@Messages("UpdateContact")</button>
+            <button type="submit">@Messages(constants.Forms.UpdateContact)</button>
         }
 }

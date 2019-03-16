@@ -2,15 +2,15 @@
 @import views.companion.blockchain.SetBuyerFeedback
 
 @(setBuyerFeedbackForm: Form[SetBuyerFeedback.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages("SetBuyerFeedback")) {
+@common(Messages(constants.Forms.SetBuyerFeedback)) {
     @form(action = routes.SetBuyerFeedbackController.setBuyerFeedback) {
         @CSRF.formField
-        @inputText(setBuyerFeedbackForm(Messages("from")))
-        @inputText(setBuyerFeedbackForm(Messages("to")))
-        @inputText(setBuyerFeedbackForm(Messages("pegHash")))
-        @inputText(setBuyerFeedbackForm(Messages("rating")))
-        @inputText(setBuyerFeedbackForm(Messages("gas")))
-        @inputPassword(setBuyerFeedbackForm(Messages("password")))
+        @inputText(setBuyerFeedbackForm(constants.Forms.from),'_label-> Messages(constants.Forms.from))
+        @inputText(setBuyerFeedbackForm(constants.Forms.to),'_label-> Messages(constants.Forms.to))
+        @inputText(setBuyerFeedbackForm(constants.Forms.pegHash),'_label-> Messages(constants.Forms.pegHash))
+        @inputText(setBuyerFeedbackForm(constants.Forms.rating),'_label-> Messages(constants.Forms.rating))
+        @inputText(setBuyerFeedbackForm(constants.Forms.gas),'_label-> Messages(constants.Forms.gas))
+        @inputPassword(setBuyerFeedbackForm(constants.Forms.password),'_label-> Messages(constants.Forms.password))
 
         @if(setBuyerFeedbackForm.hasGlobalErrors) {
             <ul>
@@ -19,6 +19,6 @@
             }
             </ul>
         }
-        <button type="submit">@Messages("SetBuyerFeedback")</button>
+        <button type="submit">@Messages(constants.Forms.SetBuyerFeedback)</button>
     }
 }

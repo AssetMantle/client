@@ -2,13 +2,13 @@
 @import views.companion.master.AddOrganization
 
 @(addOrganizationForm: Form[AddOrganization.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages("AddOrganization")) {
+@common(Messages(constants.Forms.AddOrganization)) {
     @form(action = routes.AddOrganizationController.addOrganization) {
         @CSRF.formField
-        @inputText(addOrganizationForm(Messages("name")))
-        @inputText(addOrganizationForm(Messages("address")))
-        @inputText(addOrganizationForm(Messages("phone")))
-        @inputText(addOrganizationForm(Messages("email")))
+        @inputText(addOrganizationForm(constants.Forms.name),'_label-> Messages(constants.Forms.name))
+        @inputText(addOrganizationForm(constants.Forms.address),'_label-> Messages(constants.Forms.address))
+        @inputText(addOrganizationForm(constants.Forms.phone),'_label-> Messages(constants.Forms.phone))
+        @inputText(addOrganizationForm(constants.Forms.email),'_label-> Messages(constants.Forms.email))
 
         @if(addOrganizationForm.hasGlobalErrors) {
             <ul>
@@ -17,6 +17,6 @@
             }
             </ul>
         }
-        <button type="submit">@Messages("AddOrganization")</button>
+        <button type="submit">@Messages(constants.Forms.AddOrganization)</button>
     }
 }

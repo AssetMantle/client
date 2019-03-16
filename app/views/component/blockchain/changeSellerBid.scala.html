@@ -2,16 +2,16 @@
 @import views.companion.blockchain.ChangeSellerBid
 
 @(changeSellerBidForm: Form[ChangeSellerBid.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages("ChangeSellerBid")) {
+@common(Messages(constants.Forms.ChangeSellerBid)) {
     @form(action = routes.ChangeSellerBidController.changeSellerBid) {
         @CSRF.formField
-        @inputText(changeSellerBidForm(Messages("from")))
-        @inputText(changeSellerBidForm(Messages("to")))
-        @inputText(changeSellerBidForm(Messages("bid")))
-        @inputText(changeSellerBidForm(Messages("time")))
-        @inputText(changeSellerBidForm(Messages("pegHash")))
-        @inputText(changeSellerBidForm(Messages("gas")))
-        @inputPassword(changeSellerBidForm(Messages("password")))
+        @inputText(changeSellerBidForm(constants.Forms.from),'_label-> Messages(constants.Forms.from))
+        @inputText(changeSellerBidForm(constants.Forms.to),'_label-> Messages(constants.Forms.to))
+        @inputText(changeSellerBidForm(constants.Forms.bid),'_label-> Messages(constants.Forms.bid))
+        @inputText(changeSellerBidForm(constants.Forms.time),'_label-> Messages(constants.Forms.time))
+        @inputText(changeSellerBidForm(constants.Forms.pegHash),'_label-> Messages(constants.Forms.pegHash))
+        @inputText(changeSellerBidForm(constants.Forms.gas),'_label-> Messages(constants.Forms.gas))
+        @inputPassword(changeSellerBidForm(constants.Forms.password),'_label-> Messages(constants.Forms.password))
 
         @if(changeSellerBidForm.hasGlobalErrors) {
             <ul>
@@ -20,6 +20,6 @@
             }
             </ul>
         }
-        <button type="submit">@Messages("ChangeSellerBid")</button>
+        <button type="submit">@Messages(constants.Forms.ChangeSellerBid)</button>
     }
 }

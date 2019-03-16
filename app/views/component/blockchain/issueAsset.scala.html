@@ -2,18 +2,18 @@
 @import views.companion.blockchain.IssueAsset
 
 @(issueAssetForm: Form[IssueAsset.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages("IssueAsset")) {
+@common(Messages(constants.Forms.IssueAsset)) {
     @form(action = routes.IssueAssetController.issueAsset) {
         @CSRF.formField
-        @inputText(issueAssetForm(Messages("from")))
-        @inputText(issueAssetForm(Messages("to")))
-        @inputText(issueAssetForm(Messages("documentHash")))
-        @inputText(issueAssetForm(Messages("assetType")))
-        @inputText(issueAssetForm(Messages("assetPrice")))
-        @inputText(issueAssetForm(Messages("quantityUnit")))
-        @inputText(issueAssetForm(Messages("assetQuantity")))
-        @inputText(issueAssetForm(Messages("gas")))
-        @inputPassword(issueAssetForm(Messages("password")))
+        @inputText(issueAssetForm(constants.Forms.from),'_label-> Messages(constants.Forms.from))
+        @inputText(issueAssetForm(constants.Forms.to),'_label-> Messages(constants.Forms.to))
+        @inputText(issueAssetForm(constants.Forms.documentHash),'_label-> Messages(constants.Forms.documentHash))
+        @inputText(issueAssetForm(constants.Forms.assetType),'_label-> Messages(constants.Forms.assetType))
+        @inputText(issueAssetForm(constants.Forms.assetPrice),'_label-> Messages(constants.Forms.assetPrice))
+        @inputText(issueAssetForm(constants.Forms.quantityUnit),'_label-> Messages(constants.Forms.quantityUnit))
+        @inputText(issueAssetForm(constants.Forms.assetQuantity),'_label-> Messages(constants.Forms.assetQuantity))
+        @inputText(issueAssetForm(constants.Forms.gas),'_label-> Messages(constants.Forms.gas))
+        @inputPassword(issueAssetForm(constants.Forms.password),'_label-> Messages(constants.Forms.password))
 
         @if(issueAssetForm.hasGlobalErrors) {
             <ul>
@@ -22,6 +22,6 @@
             }
             </ul>
         }
-        <button type="submit">@Messages("IssueAsset")</button>
+        <button type="submit">@Messages(constants.Forms.IssueAsset)</button>
     }
 }

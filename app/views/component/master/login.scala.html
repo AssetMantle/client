@@ -2,11 +2,11 @@
 @import views.companion.master.Login
 
 @(loginForm: Form[Login.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-    @common(Messages("Login")) {
+    @common(Messages(constants.Forms.Login)) {
         @form(action = routes.LoginController.login) {
             @CSRF.formField
-            @inputText(loginForm(Messages("username")))
-            @inputPassword(loginForm(Messages("password")))
+            @inputText(loginForm(constants.Forms.username),'_label-> Messages(constants.Forms.username))
+            @inputPassword(loginForm(constants.Forms.password),'_label-> Messages(constants.Forms.password))
 
             @if(loginForm.hasGlobalErrors) {
                 <ul>
@@ -15,7 +15,7 @@
                 }
                 </ul>
             }
-            <button id="submitToken" type="submit" name="token">@Messages("Login")</button>
+            <button id="submitToken" type="submit" name="token">@Messages(constants.Forms.Login)</button>
         }
         <script src="@routes.Assets.versioned("/javascripts/firebase.js")"></script>
         <script src="@routes.Assets.versioned("/javascripts/pushNotification.js")"></script>

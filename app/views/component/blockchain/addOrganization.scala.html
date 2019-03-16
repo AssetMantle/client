@@ -2,13 +2,13 @@
 @import views.companion.blockchain.AddOrganization
 
 @(addOrganizationForm: Form[AddOrganization.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages("AddOrganization")) {
+@common(Messages(constants.Forms.AddOrganization)) {
     @form(action = routes.AddOrganizationController.addOrganizationBC) {
         @CSRF.formField
-        @inputText(addOrganizationForm(Messages("from")))
-        @inputText(addOrganizationForm(Messages("to")))
-        @inputText(addOrganizationForm(Messages("organizationID")))
-        @inputPassword(addOrganizationForm(Messages("password")))
+        @inputText(addOrganizationForm(constants.Forms.from),'_label-> Messages(constants.Forms.from))
+        @inputText(addOrganizationForm(constants.Forms.to),'_label-> Messages(constants.Forms.to))
+        @inputText(addOrganizationForm(constants.Forms.organizationID),'_label-> Messages(constants.Forms.organizationID))
+        @inputPassword(addOrganizationForm(constants.Forms.password),'_label-> Messages(constants.Forms.password))
 
         @if(addOrganizationForm.hasGlobalErrors) {
             <ul>
@@ -17,6 +17,6 @@
             }
             </ul>
         }
-        <button type="submit">@Messages("AddOrganization")</button>
+        <button type="submit">@Messages(constants.Forms.AddOrganization)</button>
     }
 }

@@ -2,15 +2,15 @@
 @import views.companion.blockchain.SendFiat
 
 @(sendFiatForm: Form[SendFiat.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages("SendFiat")) {
+@common(Messages(constants.Forms.SendFiat)) {
     @form(action = routes.SendFiatController.sendFiat) {
         @CSRF.formField
-        @inputText(sendFiatForm(Messages("from")))
-        @inputText(sendFiatForm(Messages("to")))
-        @inputText(sendFiatForm(Messages("amount")))
-        @inputText(sendFiatForm(Messages("pegHash")))
-        @inputText(sendFiatForm(Messages("gas")))
-        @inputPassword(sendFiatForm(Messages("password")))
+        @inputText(sendFiatForm(constants.Forms.from),'_label-> Messages(constants.Forms.from))
+        @inputText(sendFiatForm(constants.Forms.to),'_label-> Messages(constants.Forms.to))
+        @inputText(sendFiatForm(constants.Forms.amount),'_label-> Messages(constants.Forms.amount))
+        @inputText(sendFiatForm(constants.Forms.pegHash),'_label-> Messages(constants.Forms.pegHash))
+        @inputText(sendFiatForm(constants.Forms.gas),'_label-> Messages(constants.Forms.gas))
+        @inputPassword(sendFiatForm(constants.Forms.password),'_label-> Messages(constants.Forms.password))
 
         @if(sendFiatForm.hasGlobalErrors) {
             <ul>
@@ -19,6 +19,6 @@
             }
             </ul>
         }
-        <button type="submit">@Messages("SendFiat")</button>
+        <button type="submit">@Messages(constants.Forms.SendFiat)</button>
     }
 }
