@@ -1,0 +1,23 @@
+@import helper._
+@import views.companion.master.SetSellerFeedback
+
+@(setSellerFeedbackForm: Form[SetSellerFeedback.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@common(Messages(constants.Forms.SET_SELLER_FEEDBACK_TITLE)) {
+    @form(action = routes.SetSellerFeedbackController.setSellerFeedback) {
+        @CSRF.formField
+        @inputText(setSellerFeedbackForm(constants.Forms.TO),'_label-> Messages(constants.Forms.TO))
+        @inputText(setSellerFeedbackForm(constants.Forms.PEG_HASH),'_label-> Messages(constants.Forms.PEG_HASH))
+        @inputText(setSellerFeedbackForm(constants.Forms.RATING),'_label-> Messages(constants.Forms.RATING))
+        @inputText(setSellerFeedbackForm(constants.Forms.GAS),'_label-> Messages(constants.Forms.GAS))
+        @inputPassword(setSellerFeedbackForm(constants.Forms.PASSWORD),'_label-> Messages(constants.Forms.PASSWORD))
+
+        @if(setSellerFeedbackForm.hasGlobalErrors) {
+            <ul>
+            @for(error <- setSellerFeedbackForm.globalErrors) {
+                <li>@error.format</li>
+            }
+            </ul>
+        }
+        <button type="submit">@Messages(constants.Forms.SET_SELLER_FEEDBACK_TITLE)</button>
+    }
+}
