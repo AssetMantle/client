@@ -3,7 +3,7 @@
 
 @(sendCoinForm: Form[SendCoin.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @common(Messages(constants.Forms.SEND_COIN_TITLE)) {
-    @form(action = routes.SendCoinController.sendCoinBC) {
+    @form(action = routes.SendCoinController.blockchainSendCoin) {
         @CSRF.formField
         @inputText(sendCoinForm(constants.Forms.FROM),'_label-> Messages(constants.Forms.FROM))
         @inputText(sendCoinForm(constants.Forms.TO),'_label-> Messages(constants.Forms.TO))

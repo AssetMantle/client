@@ -15,7 +15,7 @@ import scala.util.Random
 
 class BuyerExecuteOrderController @Inject()(messagesControllerComponents: MessagesControllerComponents, withLoginAction: WithLoginAction, transactionBuyerExecuteOrder: transactions.BuyerExecuteOrder, buyerExecuteOrders: BuyerExecuteOrders)(implicit exec: ExecutionContext,configuration: Configuration, accounts: Accounts) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
-  def buyerExecuteOrderForm: Action[AnyContent] = Action { implicit request =>
+  def buyerExecuteOrderForm: Action[AnyContent] = withLoginAction { implicit request =>
     Ok(views.html.component.master.buyerExecuteOrder(master.BuyerExecuteOrder.form))
   }
 
@@ -45,11 +45,11 @@ class BuyerExecuteOrderController @Inject()(messagesControllerComponents: Messag
     )
   }
 
-  def buyerExecuteOrderFormBC: Action[AnyContent] = Action { implicit request =>
+  def blockchainBuyerExecuteOrderForm: Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.blockchain.buyerExecuteOrder(blockchain.BuyerExecuteOrder.form))
   }
 
-  def buyerExecuteOrderBC: Action[AnyContent] = Action { implicit request =>
+  def blockchainBuyerExecuteOrder: Action[AnyContent] = Action { implicit request =>
     blockchain.BuyerExecuteOrder.form.bindFromRequest().fold(
       formWithErrors => {
         BadRequest(views.html.component.blockchain.buyerExecuteOrder(formWithErrors))

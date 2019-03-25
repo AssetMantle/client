@@ -3,7 +3,7 @@
 
 @(buyerExecuteOrderForm: Form[BuyerExecuteOrder.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @common(Messages(constants.Forms.BUYER_EXECUTE_ORDER_TITLE)) {
-    @form(action = routes.BuyerExecuteOrderController.buyerExecuteOrderBC) {
+    @form(action = routes.BuyerExecuteOrderController.blockchainBuyerExecuteOrder) {
         @CSRF.formField
         @inputText(buyerExecuteOrderForm(constants.Forms.FROM),'_label-> Messages(constants.Forms.FROM))
         @inputText(buyerExecuteOrderForm(constants.Forms.BUYER_ADDRESS),'_label-> Messages(constants.Forms.BUYER_ADDRESS))

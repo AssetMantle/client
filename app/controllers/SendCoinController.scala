@@ -45,11 +45,11 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
     )
   }
 
-  def sendCoinFormBC: Action[AnyContent] = Action { implicit request =>
+  def blockchainSendCoinForm: Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.blockchain.sendCoin(blockchain.SendCoin.form))
   }
 
-  def sendCoinBC: Action[AnyContent] = Action { implicit request =>
+  def blockchainSendCoin: Action[AnyContent] = Action { implicit request =>
     blockchain.SendCoin.form.bindFromRequest().fold(
       formWithErrors => {
         BadRequest(views.html.component.blockchain.sendCoin(formWithErrors))

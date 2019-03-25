@@ -3,7 +3,7 @@
 
 @(addOrganizationForm: Form[AddOrganization.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @common(Messages(constants.Forms.ADD_ORGANIZATION_TITLE)) {
-    @form(action = routes.AddOrganizationController.addOrganizationBC) {
+    @form(action = routes.AddOrganizationController.blockchainAddOrganization) {
         @CSRF.formField
         @inputText(addOrganizationForm(constants.Forms.FROM),'_label-> Messages(constants.Forms.FROM))
         @inputText(addOrganizationForm(constants.Forms.TO),'_label-> Messages(constants.Forms.TO))
