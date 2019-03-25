@@ -14,11 +14,11 @@ import scala.util.Random
 
 class SellerExecuteOrderController @Inject()(messagesControllerComponents: MessagesControllerComponents, transactionSellerExecuteOrder: transactions.SellerExecuteOrder, sellerExecuteOrders: SellerExecuteOrders)(implicit exec: ExecutionContext,configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
-  def sellerExecuteOrderForm: Action[AnyContent] = Action { implicit request =>
+  def blockchainSellerExecuteOrderForm: Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.blockchain.sellerExecuteOrder(SellerExecuteOrder.form))
   }
 
-  def sellerExecuteOrder: Action[AnyContent] = Action { implicit request =>
+  def blockchainSellerExecuteOrder: Action[AnyContent] = Action { implicit request =>
     SellerExecuteOrder.form.bindFromRequest().fold(
       formWithErrors => {
         BadRequest(views.html.component.blockchain.sellerExecuteOrder(formWithErrors))

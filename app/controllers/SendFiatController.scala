@@ -14,11 +14,11 @@ import scala.util.Random
 
 class SendFiatController @Inject()(messagesControllerComponents: MessagesControllerComponents, transactionSendFiat: transactions.SendFiat, sendFiats: SendFiats)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
-  def sendFiatForm: Action[AnyContent] = Action { implicit request =>
+  def blockchainSendFiatForm: Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.blockchain.sendFiat(SendFiat.form))
   }
 
-  def sendFiat: Action[AnyContent] = Action { implicit request =>
+  def blockchainSendFiat: Action[AnyContent] = Action { implicit request =>
     SendFiat.form.bindFromRequest().fold(
       formWithErrors => {
         BadRequest(views.html.component.blockchain.sendFiat(formWithErrors))

@@ -13,11 +13,11 @@ import scala.util.Random
 
 class AddZoneController @Inject()(messagesControllerComponents: MessagesControllerComponents, transactionAddZone: transactions.AddZone, addZones: AddZones)(implicit exec: ExecutionContext,configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
-  def addZoneForm: Action[AnyContent] = Action { implicit request =>
+  def blockchainAddZoneForm: Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.blockchain.addZone(AddZone.form))
   }
 
-  def addZone: Action[AnyContent] = Action { implicit request =>
+  def blockchainAddZone: Action[AnyContent] = Action { implicit request =>
     AddZone.form.bindFromRequest().fold(
       formWithErrors => {
         BadRequest(views.html.component.blockchain.addZone(formWithErrors))

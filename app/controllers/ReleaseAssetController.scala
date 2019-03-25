@@ -14,11 +14,11 @@ import scala.util.Random
 
 class ReleaseAssetController @Inject()(messagesControllerComponents: MessagesControllerComponents, transactionReleaseAsset: transactions.ReleaseAsset, releaseAssets: ReleaseAssets)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
-  def releaseAssetForm: Action[AnyContent] = Action { implicit request =>
+  def blockchainReleaseAssetForm: Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.blockchain.releaseAsset(ReleaseAsset.form))
   }
 
-  def releaseAsset: Action[AnyContent] = Action { implicit request =>
+  def blockchainReleaseAsset: Action[AnyContent] = Action { implicit request =>
     ReleaseAsset.form.bindFromRequest().fold(
       formWithErrors => {
         BadRequest(views.html.component.blockchain.releaseAsset(formWithErrors))

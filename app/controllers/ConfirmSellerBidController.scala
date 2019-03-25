@@ -13,11 +13,11 @@ import scala.util.Random
 
 class ConfirmSellerBidController @Inject()(messagesControllerComponents: MessagesControllerComponents, transactionConfirmSellerBid: transactions.ConfirmSellerBid, confirmSellerBids: ConfirmSellerBids)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
-  def confirmSellerBidForm: Action[AnyContent] = Action { implicit request =>
+  def blockchainConfirmSellerBidForm: Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.blockchain.confirmSellerBid(ConfirmSellerBid.form))
   }
 
-  def confirmSellerBid: Action[AnyContent] = Action { implicit request =>
+  def blockchainConfirmSellerBid: Action[AnyContent] = Action { implicit request =>
     ConfirmSellerBid.form.bindFromRequest().fold(
       formWithErrors => {
         BadRequest(views.html.component.blockchain.confirmSellerBid(formWithErrors))

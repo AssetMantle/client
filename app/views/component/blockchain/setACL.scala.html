@@ -3,7 +3,7 @@
 
 @(setACLForm: Form[SetACL.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @common(Messages(constants.Forms.SET_ACL_TITLE)) {
-    @form(action = routes.SetACLController.setACL) {
+    @form(action = routes.SetACLController.blockchainSetACL) {
         @CSRF.formField
         @inputText(setACLForm(constants.Forms.FROM),'_label-> Messages(constants.Forms.FROM))
         @inputText(setACLForm(constants.Forms.ACL_ADDRESS),'_label-> Messages(constants.Forms.ACL_ADDRESS))

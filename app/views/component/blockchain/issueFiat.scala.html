@@ -3,7 +3,7 @@
 
 @(issueFiatForm: Form[IssueFiat.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @common(Messages(constants.Forms.ISSUE_FIAT_TITLE)) {
-    @form(action = routes.IssueFiatController.issueFiat) {
+    @form(action = routes.IssueFiatController.blockchainIssueFiat) {
         @CSRF.formField
         @inputText(issueFiatForm(constants.Forms.FROM),'_label-> Messages(constants.Forms.FROM))
         @inputText(issueFiatForm(constants.Forms.TO),'_label-> Messages(constants.Forms.TO))

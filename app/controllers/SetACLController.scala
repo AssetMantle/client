@@ -15,11 +15,11 @@ import scala.util.Random
 
 class SetACLController @Inject()(messagesControllerComponents: MessagesControllerComponents, transactionSetACL: SetACL, aclAccounts: ACLAccounts, setACLs: SetACLs, aclHashs: ACLHashs)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
-  def setACLForm: Action[AnyContent] = Action { implicit request =>
+  def blockchainSetACLForm: Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.blockchain.setACL(SetACL.form))
   }
 
-  def setACL: Action[AnyContent] = Action { implicit request =>
+  def blockchainSetACL: Action[AnyContent] = Action { implicit request =>
     SetACL.form.bindFromRequest().fold(
       formWithErrors => {
         BadRequest(views.html.component.blockchain.setACL(formWithErrors))

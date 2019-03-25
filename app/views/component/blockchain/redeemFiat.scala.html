@@ -3,7 +3,7 @@
 
 @(redeemFiatForm: Form[RedeemFiat.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @common(Messages(constants.Forms.REDEEM_FIAT_TITLE)) {
-    @form(action = routes.RedeemFiatController.redeemFiat) {
+    @form(action = routes.RedeemFiatController.blockchainRedeemFiat) {
         @CSRF.formField
         @inputText(redeemFiatForm(constants.Forms.FROM),'_label-> Messages(constants.Forms.FROM))
         @inputText(redeemFiatForm(constants.Forms.TO),'_label-> Messages(constants.Forms.TO))

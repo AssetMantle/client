@@ -13,11 +13,11 @@ import scala.util.Random
 
 class SetSellerFeedbackController @Inject()(messagesControllerComponents: MessagesControllerComponents, transactionSetSellerFeedback: transactions.SetSellerFeedback, setSellerFeedbacks: SetSellerFeedbacks)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
-  def setSellerFeedbackForm: Action[AnyContent] = Action { implicit request =>
+  def blockchainSetSellerFeedbackForm: Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.blockchain.setSellerFeedback(SetSellerFeedback.form))
   }
 
-  def setSellerFeedback: Action[AnyContent] = Action { implicit request =>
+  def blockchainSetSellerFeedback: Action[AnyContent] = Action { implicit request =>
     SetSellerFeedback.form.bindFromRequest().fold(
       formWithErrors => {
         BadRequest(views.html.component.blockchain.setSellerFeedback(formWithErrors))
