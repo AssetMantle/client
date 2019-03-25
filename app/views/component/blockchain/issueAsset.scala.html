@@ -2,18 +2,18 @@
 @import views.companion.blockchain.IssueAsset
 
 @(issueAssetForm: Form[IssueAsset.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages("IssueAsset")) {
+@common(Messages(constants.Forms.ISSUE_ASSET_TITLE)) {
     @form(action = routes.IssueAssetController.issueAsset) {
         @CSRF.formField
-        @inputText(issueAssetForm(Messages("from")))
-        @inputText(issueAssetForm(Messages("to")))
-        @inputText(issueAssetForm(Messages("documentHash")))
-        @inputText(issueAssetForm(Messages("assetType")))
-        @inputText(issueAssetForm(Messages("assetPrice")))
-        @inputText(issueAssetForm(Messages("quantityUnit")))
-        @inputText(issueAssetForm(Messages("assetQuantity")))
-        @inputText(issueAssetForm(Messages("gas")))
-        @inputPassword(issueAssetForm(Messages("password")))
+        @inputText(issueAssetForm(constants.Forms.FROM),'_label-> Messages(constants.Forms.FROM))
+        @inputText(issueAssetForm(constants.Forms.TO),'_label-> Messages(constants.Forms.TO))
+        @inputText(issueAssetForm(constants.Forms.DOCUMENT_HASH),'_label-> Messages(constants.Forms.DOCUMENT_HASH))
+        @inputText(issueAssetForm(constants.Forms.ASSET_TYPE),'_label-> Messages(constants.Forms.ASSET_TYPE))
+        @inputText(issueAssetForm(constants.Forms.ASSET_PRICE),'_label-> Messages(constants.Forms.ASSET_PRICE))
+        @inputText(issueAssetForm(constants.Forms.QUANTITY_UNIT),'_label-> Messages(constants.Forms.QUANTITY_UNIT))
+        @inputText(issueAssetForm(constants.Forms.ASSET_QUANTITY),'_label-> Messages(constants.Forms.ASSET_QUANTITY))
+        @inputText(issueAssetForm(constants.Forms.GAS),'_label-> Messages(constants.Forms.GAS))
+        @inputPassword(issueAssetForm(constants.Forms.PASSWORD),'_label-> Messages(constants.Forms.PASSWORD))
 
         @if(issueAssetForm.hasGlobalErrors) {
             <ul>
@@ -22,6 +22,6 @@
             }
             </ul>
         }
-        <button type="submit">@Messages("IssueAsset")</button>
+        <button type="submit">@Messages(constants.Forms.ISSUE_ASSET_TITLE)</button>
     }
 }

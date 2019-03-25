@@ -2,16 +2,16 @@
 @import views.companion.blockchain.SellerExecuteOrder
 
 @(sellerExecuteOrderForm: Form[SellerExecuteOrder.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages("SellerExecuteOrder")) {
+@common(Messages(constants.Forms.SELLER_EXECUTE_ORDER_TITLE)) {
     @form(action = routes.SellerExecuteOrderController.sellerExecuteOrder) {
         @CSRF.formField
-        @inputText(sellerExecuteOrderForm(Messages("from")))
-        @inputText(sellerExecuteOrderForm(Messages("buyerAddress")))
-        @inputText(sellerExecuteOrderForm(Messages("sellerAddress")))
-        @inputText(sellerExecuteOrderForm(Messages("awbProofHash")))
-        @inputText(sellerExecuteOrderForm(Messages("pegHash")))
-        @inputText(sellerExecuteOrderForm(Messages("gas")))
-        @inputPassword(sellerExecuteOrderForm(Messages("password")))
+        @inputText(sellerExecuteOrderForm(constants.Forms.FROM),'_label-> Messages(constants.Forms.FROM))
+        @inputText(sellerExecuteOrderForm(constants.Forms.BUYER_ADDRESS),'_label-> Messages(constants.Forms.BUYER_ADDRESS))
+        @inputText(sellerExecuteOrderForm(constants.Forms.SELLER_ADDRESS),'_label-> Messages(constants.Forms.SELLER_ADDRESS))
+        @inputText(sellerExecuteOrderForm(constants.Forms.AWB_PROOF_HASH),'_label-> Messages(constants.Forms.AWB_PROOF_HASH))
+        @inputText(sellerExecuteOrderForm(constants.Forms.PEG_HASH),'_label-> Messages(constants.Forms.PEG_HASH))
+        @inputText(sellerExecuteOrderForm(constants.Forms.GAS),'_label-> Messages(constants.Forms.GAS))
+        @inputPassword(sellerExecuteOrderForm(constants.Forms.PASSWORD),'_label-> Messages(constants.Forms.PASSWORD))
 
         @if(sellerExecuteOrderForm.hasGlobalErrors) {
             <ul>
@@ -20,6 +20,6 @@
             }
             </ul>
         }
-        <button type="submit">@Messages("SellerExecuteOrder")</button>
+        <button type="submit">@Messages(constants.Forms.SELLER_EXECUTE_ORDER_TITLE)</button>
     }
 }

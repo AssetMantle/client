@@ -5,7 +5,6 @@ import models.master.Accounts
 import play.api.{Configuration, Logger}
 import play.api.libs.ws.{WSClient, WSResponse}
 import transactions.GetResponse
-import utilities.PushNotifications
 
 import scala.concurrent.ExecutionContext
 

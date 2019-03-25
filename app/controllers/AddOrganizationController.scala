@@ -65,11 +65,11 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
   }
 
 
-  def addOrganizationFormBC: Action[AnyContent] = Action { implicit request =>
+  def blockchainAddOrganizationForm: Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.blockchain.addOrganization(blockchain.AddOrganization.form))
   }
 
-  def addOrganizationBC: Action[AnyContent] = Action { implicit request =>
+  def blockchainAddOrganization: Action[AnyContent] = Action { implicit request =>
     blockchain.AddOrganization.form.bindFromRequest().fold(
       formWithErrors => {
         BadRequest(views.html.component.blockchain.addOrganization(formWithErrors))

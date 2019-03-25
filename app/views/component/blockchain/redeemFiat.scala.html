@@ -2,14 +2,14 @@
 @import views.companion.blockchain.RedeemFiat
 
 @(redeemFiatForm: Form[RedeemFiat.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages("RedeemFiat")) {
+@common(Messages(constants.Forms.REDEEM_FIAT_TITLE)) {
     @form(action = routes.RedeemFiatController.redeemFiat) {
         @CSRF.formField
-        @inputText(redeemFiatForm(Messages("from")))
-        @inputText(redeemFiatForm(Messages("to")))
-        @inputText(redeemFiatForm(Messages("redeemAmount")))
-        @inputText(redeemFiatForm(Messages("gas")))
-        @inputPassword(redeemFiatForm(Messages("password")))
+        @inputText(redeemFiatForm(constants.Forms.FROM),'_label-> Messages(constants.Forms.FROM))
+        @inputText(redeemFiatForm(constants.Forms.TO),'_label-> Messages(constants.Forms.TO))
+        @inputText(redeemFiatForm(constants.Forms.REDEEM_AMOUNT),'_label-> Messages(constants.Forms.REDEEM_AMOUNT))
+        @inputText(redeemFiatForm(constants.Forms.GAS),'_label-> Messages(constants.Forms.GAS))
+        @inputPassword(redeemFiatForm(constants.Forms.PASSWORD),'_label-> Messages(constants.Forms.PASSWORD))
 
         @if(redeemFiatForm.hasGlobalErrors) {
             <ul>
@@ -18,6 +18,6 @@
             }
             </ul>
         }
-        <button type="submit">@Messages("RedeemFiat")</button>
+        <button type="submit">@Messages(constants.Forms.REDEEM_FIAT_TITLE)</button>
     }
 }

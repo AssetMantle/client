@@ -2,14 +2,14 @@
 @import views.companion.blockchain.SendAsset
 
 @(sendAssetForm: Form[SendAsset.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages("SendAsset")) {
+@common(Messages(constants.Forms.SEND_ASSET_TITLE)) {
     @form(action = routes.SendAssetController.sendAsset) {
         @CSRF.formField
-        @inputText(sendAssetForm(Messages("from")))
-        @inputText(sendAssetForm(Messages("to")))
-        @inputText(sendAssetForm(Messages("pegHash")))
-        @inputText(sendAssetForm(Messages("gas")))
-        @inputPassword(sendAssetForm(Messages("password")))
+        @inputText(sendAssetForm(constants.Forms.FROM),'_label-> Messages(constants.Forms.FROM))
+        @inputText(sendAssetForm(constants.Forms.TO),'_label-> Messages(constants.Forms.TO))
+        @inputText(sendAssetForm(constants.Forms.PEG_HASH),'_label-> Messages(constants.Forms.PEG_HASH))
+        @inputText(sendAssetForm(constants.Forms.GAS),'_label-> Messages(constants.Forms.GAS))
+        @inputPassword(sendAssetForm(constants.Forms.PASSWORD),'_label-> Messages(constants.Forms.PASSWORD))
 
         @if(sendAssetForm.hasGlobalErrors) {
             <ul>
@@ -18,6 +18,6 @@
             }
             </ul>
         }
-        <button type="submit">@Messages("SendAsset")</button>
+        <button type="submit">@Messages(constants.Forms.SEND_ASSET_TITLE)</button>
     }
 }
