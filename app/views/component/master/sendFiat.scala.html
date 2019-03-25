@@ -1,0 +1,23 @@
+@import helper._
+@import views.companion.master.SendFiat
+
+@(sendFiatForm: Form[SendFiat.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@common(Messages(constants.Forms.SEND_FIAT_TITLE)) {
+    @form(action = routes.SendFiatController.sendFiat) {
+        @CSRF.formField
+        @inputText(sendFiatForm(constants.Forms.TO),'_label-> Messages(constants.Forms.TO))
+        @inputText(sendFiatForm(constants.Forms.AMOUNT),'_label-> Messages(constants.Forms.AMOUNT))
+        @inputText(sendFiatForm(constants.Forms.PEG_HASH),'_label-> Messages(constants.Forms.PEG_HASH))
+        @inputText(sendFiatForm(constants.Forms.GAS),'_label-> Messages(constants.Forms.GAS))
+        @inputPassword(sendFiatForm(constants.Forms.PASSWORD),'_label-> Messages(constants.Forms.PASSWORD))
+
+        @if(sendFiatForm.hasGlobalErrors) {
+            <ul>
+            @for(error <- sendFiatForm.globalErrors) {
+                <li>@error.format</li>
+            }
+            </ul>
+        }
+        <button type="submit">@Messages(constants.Forms.SEND_FIAT_TITLE)</button>
+    }
+}
