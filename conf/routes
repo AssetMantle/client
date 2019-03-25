@@ -45,8 +45,11 @@ POST        /master/changeSellerBid                         controllers.ChangeSe
 GET         /master/confirmBuyerBid                         controllers.ConfirmBuyerBidController.confirmBuyerBidForm
 POST        /master/confirmBuyerBid                         controllers.ConfirmBuyerBidController.confirmBuyerBid
 
-GET         /master/confirmSellerBid                         controllers.ConfirmSellerBidController.confirmSellerBidForm
-POST        /master/confirmSellerBid                         controllers.ConfirmSellerBidController.confirmSellerBid
+GET         /master/confirmSellerBid                        controllers.ConfirmSellerBidController.confirmSellerBidForm
+POST        /master/confirmSellerBid                        controllers.ConfirmSellerBidController.confirmSellerBid
+
+GET         /master/sellerExecuteOrder                      controllers.SellerExecuteOrderController.sellerExecuteOrderForm
+POST        /master/sellerExecuteOrder                      controllers.SellerExecuteOrderController.sellerExecuteOrder
 
 GET         /master/sendCoin                                controllers.SendCoinController.sendCoinForm
 POST        /master/sendCoin                                controllers.SendCoinController.sendCoin
