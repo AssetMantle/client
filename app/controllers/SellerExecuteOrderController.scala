@@ -8,7 +8,6 @@ import models.master.Accounts
 import play.api.Configuration
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
-import transactions.SellerExecuteOrder
 import views.companion.blockchain.SellerExecuteOrder
 import views.companion.master
 

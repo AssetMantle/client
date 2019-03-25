@@ -51,6 +51,9 @@ POST        /master/confirmSellerBid                        controllers.ConfirmS
 GET         /master/sellerExecuteOrder                      controllers.SellerExecuteOrderController.sellerExecuteOrderForm
 POST        /master/sellerExecuteOrder                      controllers.SellerExecuteOrderController.sellerExecuteOrder
 
+GET         /master/sendAsset                               controllers.SendAssetController.sendAssetForm
+POST        /master/sendAsset                               controllers.SendAssetController.sendAsset
+
 GET         /master/sendCoin                                controllers.SendCoinController.sendCoinForm
 POST        /master/sendCoin                                controllers.SendCoinController.sendCoin
 
