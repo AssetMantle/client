@@ -21,7 +21,6 @@ class VerifyMobileNumberController @Inject()(messagesControllerComponents: Messa
   def verifyMobileNumberForm: Action[AnyContent] = withLoginAction { implicit request =>
     val otp = smsOTPs.Service.sendOTP(request.session.get(Security.USERNAME).get)
     try {
-      pushNotifications.sendNotification(request.session.get(Security.USERNAME).get, constants.Notification.OTP, Seq(otp))
       SMS.sendSMS(request.session.get(Security.USERNAME).get, constants.SMS.OTP, Seq(otp))
       Ok(views.html.component.master.verifyMobileNumber(VerifyMobileNumber.form))
     }
