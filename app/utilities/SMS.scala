@@ -20,6 +20,6 @@ class SMS @Inject()(contacts: Contacts, accounts: Accounts, messagesApi: Message
 
   def sendSMS(id: String, messageType: String, passedData: Seq[String] = Seq(""))(implicit lang: Lang = Lang(accounts.Service.getLanguageById(id))) {
     Twilio.init(accountSID, authToken)
-    Message.creator(new PhoneNumber("+91" + contacts.Service.getMobileNumber(id)), from, messagesApi("SMSMessage" + "." + messageType, passedData(0))).create()
+    Message.creator(new PhoneNumber(constants.SMS.COUNTRY_CODE_INDIA + contacts.Service.getMobileNumber(id)), from, messagesApi("SMSMessage" + "." + messageType, passedData(0))).create()
   }
 }
