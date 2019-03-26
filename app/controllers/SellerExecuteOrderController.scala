@@ -16,7 +16,7 @@ import scala.util.Random
 
 class SellerExecuteOrderController @Inject()(messagesControllerComponents: MessagesControllerComponents, withLoginAction: WithLoginAction, transactionSellerExecuteOrder: transactions.SellerExecuteOrder, sellerExecuteOrders: SellerExecuteOrders)(implicit exec: ExecutionContext,configuration: Configuration, accounts: Accounts) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
-  def sellerExecuteOrderForm: Action[AnyContent] = withLoginAction { implicit request =>
+  def sellerExecuteOrderForm: Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.master.sellerExecuteOrder(master.SellerExecuteOrder.form))
   }
 

@@ -15,7 +15,7 @@ import scala.util.Random
 
 class SetBuyerFeedbackController @Inject()(messagesControllerComponents: MessagesControllerComponents, withLoginAction: WithLoginAction, transactionSetBuyerFeedback: transactions.SetBuyerFeedback, setBuyerFeedbacks: SetBuyerFeedbacks)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
-  def setBuyerFeedbackForm: Action[AnyContent] = withLoginAction { implicit request =>
+  def setBuyerFeedbackForm: Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.master.setBuyerFeedback(master.SetBuyerFeedback.form))
   }
 

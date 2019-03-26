@@ -15,7 +15,7 @@ import scala.util.Random
 
 class SendCoinController @Inject()(messagesControllerComponents: MessagesControllerComponents, withLoginAction: WithLoginAction, transactionSendCoin: SendCoin, sendCoins: SendCoins)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
-  def sendCoinForm: Action[AnyContent] = withLoginAction { implicit request =>
+  def sendCoinForm: Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.master.sendCoin(master.SendCoin.form))
   }
 

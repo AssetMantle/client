@@ -15,7 +15,7 @@ import scala.util.Random
 
 class SendFiatController @Inject()(messagesControllerComponents: MessagesControllerComponents, withLoginAction: WithLoginAction, transactionSendFiat: transactions.SendFiat, sendFiats: SendFiats)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
-  def sendFiatForm: Action[AnyContent] = withLoginAction { implicit request =>
+  def sendFiatForm: Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.master.sendFiat(master.SendFiat.form))
   }
 

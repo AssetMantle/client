@@ -54,8 +54,20 @@ POST        /master/confirmBuyerBid                         controllers.ConfirmB
 GET         /master/confirmSellerBid                        controllers.ConfirmSellerBidController.confirmSellerBidForm
 POST        /master/confirmSellerBid                        controllers.ConfirmSellerBidController.confirmSellerBid
 
+GET         /master/issueAsset                              controllers.IssueAssetController.issueAssetForm
+POST        /master/issueAsset                              controllers.IssueAssetController.issueAsset
+
+GET         /master/issueFiat                               controllers.IssueFiatController.issueFiatForm
+POST        /master/issueFiat                               controllers.IssueFiatController.issueFiat
+
 GET         /master/redeemAsset                             controllers.RedeemAssetController.redeemAssetForm
 POST        /master/redeemAsset                             controllers.RedeemAssetController.redeemAsset
+
+GET         /master/redeemFiat                              controllers.RedeemFiatController.redeemFiatForm
+POST        /master/redeemFiat                              controllers.RedeemFiatController.redeemFiat
+
+GET         /master/releaseAsset                            controllers.ReleaseAssetController.releaseAssetForm
+POST        /master/releaseAsset                            controllers.ReleaseAssetController.releaseAsset
 
 GET         /master/sellerExecuteOrder                      controllers.SellerExecuteOrderController.sellerExecuteOrderForm
 POST        /master/sellerExecuteOrder                      controllers.SellerExecuteOrderController.sellerExecuteOrder

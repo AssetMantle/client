@@ -15,7 +15,7 @@ import scala.util.Random
 
 class ConfirmBuyerBidController @Inject()(messagesControllerComponents: MessagesControllerComponents, withLoginAction: WithLoginAction, transactionConfirmBuyerBid: transactions.ConfirmBuyerBid, confirmBuyerBids: ConfirmBuyerBids)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
-  def confirmBuyerBidForm: Action[AnyContent] = withLoginAction { implicit request =>
+  def confirmBuyerBidForm: Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.master.confirmBuyerBid(master.ConfirmBuyerBid.form))
   }
 
