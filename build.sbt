@@ -22,6 +22,8 @@ libraryDependencies += "com.typesafe.play" %% "play-mailer" % "6.0.1"
 
 libraryDependencies += "com.typesafe.play" %% "play-mailer-guice" % "6.0.1"
 
+libraryDependencies += "com.twilio.sdk" % "twilio" % "7.15.5"
+
 unmanagedResourceDirectories in Test += (baseDirectory.value / "target/web/public/test")
 
       

@@ -38,6 +38,14 @@ class Contacts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     }
   }
 
+  private def findMobileNumberById(id: String)(implicit executionContext: ExecutionContext): Future[String] = db.run(contactTable.filter(_.id === id).result.head.asTry).map {
+    case Success(result) => result.mobileNumber
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+        throw new BaseException(constants.Error.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
   private def deleteById(id: String) = db.run(contactTable.filter(_.id === id).delete)
 
   private def update(contact: Contact): Future[Int] = db.run(contactTable.insertOrUpdate(contact))
@@ -73,6 +81,9 @@ class Contacts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     def verifyEmailAddress(id: String): Int = Await.result(verifyEmailAddressOnId(id), Duration.Inf)
 
     def getEmail(id: String)(implicit executionContext: ExecutionContext): String = Await.result(findEmailById(id), Duration.Inf)
+
+    def getMobileNumber(id: String)(implicit executionContext: ExecutionContext): String = Await.result(findMobileNumberById(id), Duration.Inf)
+
   }
 
 }

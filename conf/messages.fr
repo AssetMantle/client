@@ -9,4 +9,5 @@ NotificationTitle.OTP=Vérifier OTP
 EmailMessage.OTP=Votre OTP est {0}
 EmailSubject.OTP=Vérifier OTP
 
-
+SMSMessage.OTP= Votre OTP est {0}
+SMSSubject.OTP= Vérifier OTP

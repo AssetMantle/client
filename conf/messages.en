@@ -11,3 +11,6 @@ NotificationTitle.OTP= Verify OTP
 
 EmailMessage.OTP= Your OTP is {0}
 EmailSubject.OTP= Verify OTP
+
+SMSMessage.OTP= Your OTP is {0}
+SMSSubject.OTP= Verify OTP

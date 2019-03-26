@@ -10,11 +10,12 @@ import play.api.Configuration
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import utilities.PushNotifications
+import utilities.SMS
 import views.companion.master.VerifyMobileNumber
 
 import scala.concurrent.ExecutionContext
 
-class VerifyMobileNumberController @Inject()(messagesControllerComponents: MessagesControllerComponents, smsOTPs: SMSOTPs, contacts: Contacts, withLoginAction: WithLoginAction, pushNotifications: PushNotifications)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class VerifyMobileNumberController @Inject()(messagesControllerComponents: MessagesControllerComponents, smsOTPs: SMSOTPs, contacts: Contacts, withLoginAction: WithLoginAction, pushNotifications: PushNotifications, SMS: SMS)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val module: String = constants.Module.MASTER_ACCOUNT
 
@@ -22,6 +23,7 @@ class VerifyMobileNumberController @Inject()(messagesControllerComponents: Messa
     val otp = smsOTPs.Service.sendOTP(request.session.get(Security.USERNAME).get)
     try {
       pushNotifications.sendNotification(request.session.get(Security.USERNAME).get, constants.Notification.OTP, Seq(otp))
+      SMS.sendSMS(request.session.get(Security.USERNAME).get, constants.SMS.OTP, Seq(otp))
       Ok(views.html.component.master.verifyMobileNumber(VerifyMobileNumber.form))
     }
     catch {
