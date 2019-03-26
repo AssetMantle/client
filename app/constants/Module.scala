@@ -61,5 +61,6 @@ object Module {
   //Controllers
   val CONTROLLERS_SIGN_UP                   = "CONTROLLERS_SIGN_UP"
   val CONTROLLERS_ADD_ORGANIZATION          = "CONTROLLERS_ADD_ORGANIZATION"
+  val CONTROLLERS_ADD_ZONE                  = "CONTROLLERS_ADD_ZONE"
   val CONTROLLERS_LOGIN                     = "CONTROLLERS_LOGIN"
 }

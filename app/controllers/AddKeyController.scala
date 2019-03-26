@@ -29,6 +29,7 @@ class AddKeyController @Inject()(messagesControllerComponents: MessagesControlle
           case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))
           case blockChainException: BlockChainException => Ok(views.html.index(failure = blockChainException.message))
         }
-      })
+      }
+    )
   }
 }

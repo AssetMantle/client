@@ -15,11 +15,11 @@ import scala.util.Random
 
 class SetSellerFeedbackController @Inject()(messagesControllerComponents: MessagesControllerComponents, withLoginAction: WithLoginAction, transactionSetSellerFeedback: transactions.SetSellerFeedback, setSellerFeedbacks: SetSellerFeedbacks)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
-  def setSellerFeedbackForm: Action[AnyContent] = Action { implicit request =>
+  def setSellerFeedbackForm: Action[AnyContent] = withLoginAction { implicit request =>
     Ok(views.html.component.master.setSellerFeedback(master.SetSellerFeedback.form))
   }
 
-  def setSellerFeedback: Action[AnyContent] = Action { implicit request =>
+  def setSellerFeedback: Action[AnyContent] = withLoginAction { implicit request =>
     master.SetSellerFeedback.form.bindFromRequest().fold(
       formWithErrors => {
         BadRequest(views.html.component.master.setSellerFeedback(formWithErrors))
