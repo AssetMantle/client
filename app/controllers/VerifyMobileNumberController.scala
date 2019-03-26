@@ -9,8 +9,7 @@ import models.masterTransaction.SMSOTPs
 import play.api.Configuration
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
-import utilities.PushNotifications
-import utilities.SMS
+import utilities.{PushNotifications, SMS}
 import views.companion.master.VerifyMobileNumber
 
 import scala.concurrent.ExecutionContext
