@@ -2,17 +2,16 @@
 @import views.companion.blockchain.ConfirmSellerBid
 
 @(confirmSellerBidForm: Form[ConfirmSellerBid.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages("ConfirmSellerBid")) {
+@common(Messages(constants.Forms.CONFIRM_SELLER_BID_TITLE)) {
     @form(action = routes.ConfirmSellerBidController.confirmSellerBid) {
         @CSRF.formField
-        @inputText(confirmSellerBidForm(Messages("from")))
-        @inputText(confirmSellerBidForm(Messages("to")))
-        @inputText(confirmSellerBidForm(Messages("bid")))
-        @inputText(confirmSellerBidForm(Messages("time")))
-        @inputText(confirmSellerBidForm(Messages("pegHash")))
-        @inputText(confirmSellerBidForm(Messages("chainID")))
-        @inputText(confirmSellerBidForm(Messages("gas")))
-        @inputPassword(confirmSellerBidForm(Messages("password")))
+        @inputText(confirmSellerBidForm(constants.Forms.FROM),'_label-> Messages(constants.Forms.FROM))
+        @inputText(confirmSellerBidForm(constants.Forms.TO),'_label-> Messages(constants.Forms.TO))
+        @inputText(confirmSellerBidForm(constants.Forms.BID),'_label-> Messages(constants.Forms.BID))
+        @inputText(confirmSellerBidForm(constants.Forms.TIME),'_label-> Messages(constants.Forms.TIME))
+        @inputText(confirmSellerBidForm(constants.Forms.PEG_HASH),'_label-> Messages(constants.Forms.PEG_HASH))
+        @inputText(confirmSellerBidForm(constants.Forms.GAS),'_label-> Messages(constants.Forms.GAS))
+        @inputPassword(confirmSellerBidForm(constants.Forms.PASSWORD),'_label-> Messages(constants.Forms.PASSWORD))
 
         @if(confirmSellerBidForm.hasGlobalErrors) {
             <ul>
@@ -21,6 +20,6 @@
             }
             </ul>
         }
-        <button type="submit">@Messages("ConfirmSellerBid")</button>
+        <button type="submit">@Messages(constants.Forms.CONFIRM_SELLER_BID_TITLE)</button>
     }
 }

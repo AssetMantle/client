@@ -2,15 +2,14 @@
 @import views.companion.blockchain.RedeemAsset
 
 @(redeemAssetForm: Form[RedeemAsset.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages("RedeemAsset")) {
+@common(Messages(constants.Forms.REDEEM_ASSET_TITLE)) {
     @form(action = routes.RedeemAssetController.redeemAsset) {
         @CSRF.formField
-        @inputText(redeemAssetForm(Messages("from")))
-        @inputText(redeemAssetForm(Messages("to")))
-        @inputText(redeemAssetForm(Messages("pegHash")))
-        @inputText(redeemAssetForm(Messages("chainID")))
-        @inputText(redeemAssetForm(Messages("gas")))
-        @inputPassword(redeemAssetForm(Messages("password")))
+        @inputText(redeemAssetForm(constants.Forms.FROM),'_label-> Messages(constants.Forms.FROM))
+        @inputText(redeemAssetForm(constants.Forms.TO),'_label-> Messages(constants.Forms.TO))
+        @inputText(redeemAssetForm(constants.Forms.PEG_HASH),'_label-> Messages(constants.Forms.PEG_HASH))
+        @inputText(redeemAssetForm(constants.Forms.GAS),'_label-> Messages(constants.Forms.GAS))
+        @inputPassword(redeemAssetForm(constants.Forms.PASSWORD),'_label-> Messages(constants.Forms.PASSWORD))
 
         @if(redeemAssetForm.hasGlobalErrors) {
             <ul>
@@ -19,6 +18,6 @@
             }
             </ul>
         }
-        <button type="submit">@Messages("RedeemAsset")</button>
+        <button type="submit">@Messages(constants.Forms.REDEEM_ASSET_TITLE)</button>
     }
 }

@@ -11,11 +11,10 @@ object SetSellerFeedback {
       "to" -> nonEmptyText(minLength = 1, maxLength = 45),
       "pegHash" -> nonEmptyText(minLength = 1, maxLength = 20),
       "rating" -> number(min = 1, max = 10000),
-      "chainID" -> nonEmptyText(minLength = 1, maxLength = 20),
       "gas" -> number(min = 1, max = 10000)
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(from: String, password: String, to: String, pegHash: String, rating: Int, chainID: String, gas: Int)
+  case class Data(from: String, password: String, to: String, pegHash: String, rating: Int, gas: Int)
 
 }

@@ -10,12 +10,11 @@ object IssueFiat {
       "to" -> nonEmptyText(minLength = 1, maxLength = 45),
       "transactionID" -> nonEmptyText(minLength = 1, maxLength = 20),
       "transactionAmount" -> number(min = 1, max = 10000),
-      "chainID" -> nonEmptyText(minLength = 1, maxLength = 20),
       "password" -> nonEmptyText(minLength = 1, maxLength = 20),
       "gas" -> number(min = 1, max = 10000)
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(from: String, to: String, transactionID: String, transactionAmount: Int, chainID: String, password: String, gas: Int)
+  case class Data(from: String, to: String, transactionID: String, transactionAmount: Int, password: String, gas: Int)
 
 }

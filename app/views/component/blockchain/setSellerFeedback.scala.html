@@ -2,16 +2,15 @@
 @import views.companion.blockchain.SetSellerFeedback
 
 @(setSellerFeedbackForm: Form[SetSellerFeedback.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages("SetSellerFeedback")) {
+@common(Messages(constants.Forms.SET_SELLER_FEEDBACK_TITLE)) {
     @form(action = routes.SetSellerFeedbackController.setSellerFeedback) {
         @CSRF.formField
-        @inputText(setSellerFeedbackForm(Messages("from")))
-        @inputText(setSellerFeedbackForm(Messages("to")))
-        @inputText(setSellerFeedbackForm(Messages("pegHash")))
-        @inputText(setSellerFeedbackForm(Messages("rating")))
-        @inputText(setSellerFeedbackForm(Messages("chainID")))
-        @inputText(setSellerFeedbackForm(Messages("gas")))
-        @inputPassword(setSellerFeedbackForm(Messages("password")))
+        @inputText(setSellerFeedbackForm(constants.Forms.FROM),'_label-> Messages(constants.Forms.FROM))
+        @inputText(setSellerFeedbackForm(constants.Forms.TO),'_label-> Messages(constants.Forms.TO))
+        @inputText(setSellerFeedbackForm(constants.Forms.PEG_HASH),'_label-> Messages(constants.Forms.PEG_HASH))
+        @inputText(setSellerFeedbackForm(constants.Forms.RATING),'_label-> Messages(constants.Forms.RATING))
+        @inputText(setSellerFeedbackForm(constants.Forms.GAS),'_label-> Messages(constants.Forms.GAS))
+        @inputPassword(setSellerFeedbackForm(constants.Forms.PASSWORD),'_label-> Messages(constants.Forms.PASSWORD))
 
         @if(setSellerFeedbackForm.hasGlobalErrors) {
             <ul>
@@ -20,6 +19,6 @@
             }
             </ul>
         }
-        <button type="submit">@Messages("SetSellerFeedback")</button>
+        <button type="submit">@Messages(constants.Forms.SET_SELLER_FEEDBACK_TITLE)</button>
     }
 }

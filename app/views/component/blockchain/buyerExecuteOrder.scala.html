@@ -2,17 +2,16 @@
 @import views.companion.blockchain.BuyerExecuteOrder
 
 @(buyerExecuteOrderForm: Form[BuyerExecuteOrder.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages("BuyerExecuteOrder")) {
-    @form(action = routes.BuyerExecuteOrderController.buyerExecuteOrder) {
+@common(Messages(constants.Forms.BUYER_EXECUTE_ORDER_TITLE)) {
+    @form(action = routes.BuyerExecuteOrderController.blockchainBuyerExecuteOrder) {
         @CSRF.formField
-        @inputText(buyerExecuteOrderForm(Messages("from")))
-        @inputText(buyerExecuteOrderForm(Messages("buyerAddress")))
-        @inputText(buyerExecuteOrderForm(Messages("sellerAddress")))
-        @inputText(buyerExecuteOrderForm(Messages("fiatProofHash")))
-        @inputText(buyerExecuteOrderForm(Messages("pegHash")))
-        @inputText(buyerExecuteOrderForm(Messages("chainID")))
-        @inputText(buyerExecuteOrderForm(Messages("gas")))
-        @inputPassword(buyerExecuteOrderForm(Messages("password")))
+        @inputText(buyerExecuteOrderForm(constants.Forms.FROM),'_label-> Messages(constants.Forms.FROM))
+        @inputText(buyerExecuteOrderForm(constants.Forms.BUYER_ADDRESS),'_label-> Messages(constants.Forms.BUYER_ADDRESS))
+        @inputText(buyerExecuteOrderForm(constants.Forms.SELLER_ADDRESS),'_label-> Messages(constants.Forms.SELLER_ADDRESS))
+        @inputText(buyerExecuteOrderForm(constants.Forms.FIAT_PROOF_HASH),'_label-> Messages(constants.Forms.FIAT_PROOF_HASH))
+        @inputText(buyerExecuteOrderForm(constants.Forms.PEG_HASH),'_label-> Messages(constants.Forms.PEG_HASH))
+        @inputText(buyerExecuteOrderForm(constants.Forms.GAS),'_label-> Messages(constants.Forms.GAS))
+        @inputPassword(buyerExecuteOrderForm(constants.Forms.PASSWORD),'_label-> Messages(constants.Forms.PASSWORD))
 
         @if(buyerExecuteOrderForm.hasGlobalErrors) {
             <ul>
@@ -21,6 +20,6 @@
             }
             </ul>
         }
-        <button type="submit">@Messages("BuyerExecuteOrder")</button>
+        <button type="submit">@Messages(constants.Forms.BUYER_EXECUTE_ORDER_TITLE)</button>
     }
 }

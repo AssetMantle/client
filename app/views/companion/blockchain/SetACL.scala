@@ -11,7 +11,6 @@ object SetACL {
       "aclAddress" -> nonEmptyText(minLength = 1, maxLength = 45),
       "organizationID" -> nonEmptyText(minLength = 1, maxLength = 20),
       "zoneID" -> nonEmptyText(minLength = 1, maxLength = 20),
-      "chainID" -> nonEmptyText(minLength = 1, maxLength = 20),
       "issueAsset" -> boolean,
       "issueFiat" -> boolean,
       "sendAsset" -> boolean,
@@ -30,6 +29,6 @@ object SetACL {
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(from: String, password: String, aclAddress: String, organizationID: String, zoneID: String, chainID: String, issueAsset: Boolean, issueFiat: Boolean, sendAsset: Boolean, sendFiat: Boolean, redeemAsset: Boolean, redeemFiat: Boolean, sellerExecuteOrder: Boolean, buyerExecuteOrder: Boolean, changeBuyerBid: Boolean, changeSellerBid: Boolean, confirmBuyerBid: Boolean, confirmSellerBid: Boolean, negotiation: Boolean, releaseAsset: Boolean)
+  case class Data(from: String, password: String, aclAddress: String, organizationID: String, zoneID: String, issueAsset: Boolean, issueFiat: Boolean, sendAsset: Boolean, sendFiat: Boolean, redeemAsset: Boolean, redeemFiat: Boolean, sellerExecuteOrder: Boolean, buyerExecuteOrder: Boolean, changeBuyerBid: Boolean, changeSellerBid: Boolean, confirmBuyerBid: Boolean, confirmSellerBid: Boolean, negotiation: Boolean, releaseAsset: Boolean)
 
 }

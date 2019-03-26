@@ -2,15 +2,16 @@ package controllers
 
 import exceptions.{BaseException, BlockChainException}
 import javax.inject.Inject
+import models.blockchainTransaction.ConfirmBuyerBids
 import play.api.Configuration
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
-import transactions.ConfirmBuyerBid
 import views.companion.blockchain.ConfirmBuyerBid
 
 import scala.concurrent.ExecutionContext
+import scala.util.Random
 
-class ConfirmBuyerBidController @Inject()(messagesControllerComponents: MessagesControllerComponents, transactionConfirmBuyerBid: ConfirmBuyerBid)(implicit exec: ExecutionContext,configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class ConfirmBuyerBidController @Inject()(messagesControllerComponents: MessagesControllerComponents, transactionConfirmBuyerBid: transactions.ConfirmBuyerBid, confirmBuyerBids: ConfirmBuyerBids)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   def confirmBuyerBidForm: Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.blockchain.confirmBuyerBid(ConfirmBuyerBid.form))
@@ -23,7 +24,15 @@ class ConfirmBuyerBidController @Inject()(messagesControllerComponents: Messages
       },
       confirmBuyerBidData => {
         try {
-          Ok(views.html.index(transactionConfirmBuyerBid.Service.post(new transactionConfirmBuyerBid.Request(confirmBuyerBidData.from, confirmBuyerBidData.password, confirmBuyerBidData.to, confirmBuyerBidData.bid, confirmBuyerBidData.time, confirmBuyerBidData.pegHash, confirmBuyerBidData.chainID, confirmBuyerBidData.gas)).txHash))
+          if (configuration.get[Boolean]("blockchain.kafka.enabled")) {
+            val response = transactionConfirmBuyerBid.Service.kafkaPost( transactionConfirmBuyerBid.Request(from = confirmBuyerBidData.from, to = confirmBuyerBidData.to, password = confirmBuyerBidData.password, bid = confirmBuyerBidData.bid, time = confirmBuyerBidData.time, pegHash = confirmBuyerBidData.pegHash, gas = confirmBuyerBidData.gas))
+            confirmBuyerBids.Service.addConfirmBuyerBidKafka(from = confirmBuyerBidData.from, to = confirmBuyerBidData.to, bid = confirmBuyerBidData.bid, time = confirmBuyerBidData.time, pegHash = confirmBuyerBidData.pegHash, gas = confirmBuyerBidData.gas, null, null, ticketID = response.ticketID, null)
+            Ok(views.html.index(success = response.ticketID))
+          } else {
+            val response = transactionConfirmBuyerBid.Service.post( transactionConfirmBuyerBid.Request(from = confirmBuyerBidData.from,to = confirmBuyerBidData.to, password = confirmBuyerBidData.password,  bid = confirmBuyerBidData.bid, time = confirmBuyerBidData.time, pegHash = confirmBuyerBidData.pegHash, gas = confirmBuyerBidData.gas))
+            confirmBuyerBids.Service.addConfirmBuyerBid(from = confirmBuyerBidData.from, to = confirmBuyerBidData.to, bid = confirmBuyerBidData.bid, time = confirmBuyerBidData.time, pegHash = confirmBuyerBidData.pegHash, gas = confirmBuyerBidData.gas, null, txHash = Option(response.TxHash), ticketID = (Random.nextInt(899999999) + 100000000).toString, null)
+            Ok(views.html.index(success = response.TxHash))
+          }
         }
         catch {
           case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))

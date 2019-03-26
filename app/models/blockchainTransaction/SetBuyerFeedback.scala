@@ -1,14 +1,28 @@
 package models.blockchainTransaction
 
+import akka.actor.ActorSystem
+import exceptions.BaseException
 import javax.inject.Inject
+import models.master.Accounts
+import org.postgresql.util.PSQLException
+import play.api.{Configuration, Logger}
 import play.api.db.slick.DatabaseConfigProvider
+import play.api.libs.ws.WSClient
 import slick.jdbc.JdbcProfile
+import transactions.GetResponse
+import utilities.PushNotifications
 
-import scala.concurrent.Future
+import scala.concurrent.duration._
+import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.util.{Failure, Success}
 
-case class SetBuyerFeedback(from: String, to: String, pegHash: String, rating: Int,  chainID: String, gas: Int,  status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])
+case class SetBuyerFeedback(from: String, to: String, pegHash: String, rating: Int, gas: Int,  status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])
 
-class SetBuyerFeedbacks @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider) {
+class SetBuyerFeedbacks @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, transactionSetBuyerFeedback: transactions.SetBuyerFeedback, getResponse: GetResponse, actorSystem: ActorSystem, implicit val pushNotifications: PushNotifications, implicit val accounts: Accounts)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext)  {
+
+  private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_SET_BUYER_FEEDBACK
+
+  private implicit val logger: Logger = Logger(this.getClass)
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -18,17 +32,45 @@ class SetBuyerFeedbacks @Inject()(protected val databaseConfigProvider: Database
 
   private[models] val setBuyerFeedbackTable = TableQuery[SetBuyerFeedbackTable]
 
-  private def add(setBuyerFeedback: SetBuyerFeedback): Future[String] = db.run(setBuyerFeedbackTable returning setBuyerFeedbackTable.map(_.ticketID) += setBuyerFeedback)
+  private def add(setBuyerFeedback: SetBuyerFeedback)(implicit executionContext: ExecutionContext): Future[String] = db.run((setBuyerFeedbackTable returning setBuyerFeedbackTable.map(_.ticketID) += setBuyerFeedback).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+        throw new BaseException(constants.Error.PSQL_EXCEPTION)
+    }
+  }
 
-  private def update(setBuyerFeedback: SetBuyerFeedback): Future[Int] = db.run(setBuyerFeedbackTable.insertOrUpdate(setBuyerFeedback))
+  private def update(setBuyerFeedback: SetBuyerFeedback)(implicit executionContext: ExecutionContext): Future[Int] = db.run(setBuyerFeedbackTable.insertOrUpdate(setBuyerFeedback).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+        throw new BaseException(constants.Error.PSQL_EXCEPTION)
+    }
+  }
 
-  private def findByTicketID(ticketID: String): Future[SetBuyerFeedback] = db.run(setBuyerFeedbackTable.filter(_.ticketID === ticketID).result.head)
+  private def findByTicketID(ticketID: String)(implicit executionContext: ExecutionContext): Future[SetBuyerFeedback] = db.run(setBuyerFeedbackTable.filter(_.ticketID === ticketID).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+        throw new BaseException(constants.Error.PSQL_EXCEPTION)
+    }
+  }
 
-  private def deleteByTicketID(ticketID: String) = db.run(setBuyerFeedbackTable.filter(_.ticketID === ticketID).delete)
+  private def updateTxHashOnTicketID(ticketID: String, txHash: Option[String])(implicit executionContext: ExecutionContext) = db.run(setBuyerFeedbackTable.filter(_.ticketID === ticketID).map(_.txHash.?).update(txHash))
+
+  private def updateResponseCodeOnTicketID(ticketID: String, responseCode: String)(implicit executionContext: ExecutionContext) = db.run(setBuyerFeedbackTable.filter(_.ticketID === ticketID).map(_.responseCode.?).update(Option(responseCode)))
+
+  private def updateStatusOnTicketID(ticketID: String, status: Boolean)(implicit executionContext: ExecutionContext) = db.run(setBuyerFeedbackTable.filter(_.ticketID === ticketID).map(_.status.?).update(Option(status)))
+
+  private def getTicketIDsWithEmptyTxHash()(implicit executionContext: ExecutionContext):Future[Seq[String]] = db.run(setBuyerFeedbackTable.filter(_.txHash.?.isEmpty).map(_.ticketID).result)
+
+  private def getAddressByTicketID(ticketID: String)(implicit executionContext: ExecutionContext): Future[String] = db.run(setBuyerFeedbackTable.filter(_.ticketID === ticketID).map(_.to).result.head)
+
+  private def deleteByTicketID(ticketID: String)(implicit executionContext: ExecutionContext) = db.run(setBuyerFeedbackTable.filter(_.ticketID === ticketID).delete)
 
   private[models] class SetBuyerFeedbackTable(tag: Tag) extends Table[SetBuyerFeedback](tag, "SetBuyerFeedback") {
 
-    def * = (from, to, pegHash, rating, chainID, gas, status.?, txHash.?, ticketID, responseCode.?) <> (SetBuyerFeedback.tupled, SetBuyerFeedback.unapply)
+    def * = (from, to, pegHash, rating, gas, status.?, txHash.?, ticketID, responseCode.?) <> (SetBuyerFeedback.tupled, SetBuyerFeedback.unapply)
 
     def from = column[String]("from")
 
@@ -37,8 +79,6 @@ class SetBuyerFeedbacks @Inject()(protected val databaseConfigProvider: Database
     def pegHash = column[String]("pegHash")
 
     def rating = column[Int]("rating")
-
-    def chainID = column[String]("chainID")
 
     def gas = column[Int]("gas")
 
@@ -50,4 +90,29 @@ class SetBuyerFeedbacks @Inject()(protected val databaseConfigProvider: Database
 
     def responseCode = column[String]("responseCode")
   }
+
+  if (configuration.get[Boolean]("blockchain.kafka.enabled")) {
+    actorSystem.scheduler.schedule(initialDelay = configuration.get[Int]("blockchain.kafka.ticketIterator.initialDelay").seconds, interval = configuration.get[Int]("blockchain.kafka.ticketIterator.interval").second) {
+      utilities.TicketIterator.start(Service.getTicketIDs, transactionSetBuyerFeedback.Service.getTxHashFromWSResponse, Service.updateTxHash, Service.getAddress)
+    }
+  }
+
+  object Service {
+
+    def addSetBuyerFeedback(from: String, to: String, pegHash: String, rating: Int, gas: Int,  status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String]) (implicit executionContext: ExecutionContext): String = Await.result(add(SetBuyerFeedback(from = from , to = to, pegHash = pegHash, rating = rating, gas = gas, status = status, txHash = txHash, ticketID = ticketID, responseCode = responseCode)), Duration.Inf)
+
+    def addSetBuyerFeedbackKafka(from: String, to: String, pegHash: String, rating: Int, gas: Int,  status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String]) (implicit executionContext: ExecutionContext): String = Await.result(add(SetBuyerFeedback(from = from , to = to, pegHash = pegHash, rating = rating, gas = gas, status = status, txHash = txHash, ticketID = ticketID, responseCode = responseCode)), Duration.Inf)
+
+    def updateTxHash(ticketID: String, txHash: String) (implicit executionContext: ExecutionContext): Int = Await.result(updateTxHashOnTicketID(ticketID, Option(txHash)),Duration.Inf)
+
+    def updateResponseCode(ticketID: String, responseCode: String) (implicit executionContext: ExecutionContext): Int = Await.result(updateResponseCodeOnTicketID(ticketID, responseCode), Duration.Inf)
+
+    def updateStatus(ticketID: String, status: Boolean) (implicit executionContext: ExecutionContext): Int = Await.result(updateStatusOnTicketID(ticketID, status), Duration.Inf)
+
+    def getTicketIDs()(implicit executionContext: ExecutionContext): Seq[String] = Await.result(getTicketIDsWithEmptyTxHash(), Duration.Inf)
+
+    def getAddress(ticketID: String)(implicit executionContext: ExecutionContext): String = Await.result(getAddressByTicketID(ticketID), Duration.Inf)
+
+  }
+  
 }
