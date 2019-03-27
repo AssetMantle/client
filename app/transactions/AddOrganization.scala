@@ -28,7 +28,7 @@ class AddOrganization @Inject()(wsClient: WSClient)(implicit configuration: Conf
 
   private val url = ip + ":" + port + "/" + path
 
-  case class Request(from: String, to: String, organizationID: String, chainID: String = chainID, password: String)
+  case class Request(from: String, to: String, organizationID: String, zoneID: String, chainID: String = chainID, password: String)
 
   private implicit val requestWrites: OWrites[Request] = Json.writes[Request]
 

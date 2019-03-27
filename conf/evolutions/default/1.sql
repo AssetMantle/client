@@ -116,6 +116,7 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."AddOrganization"
   "from"           VARCHAR NOT NULL,
   "to"             VARCHAR NOT NULL,
   "organizationID" VARCHAR NOT NULL,
+  "zoneID"         VARCHAR NOT NULL,
   "status"         BOOLEAN,
   "txHash"         VARCHAR,
   "ticketID"       VARCHAR NOT NULL,

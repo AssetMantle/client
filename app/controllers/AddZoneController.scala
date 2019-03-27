@@ -50,10 +50,10 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
         try {
           zones.Service.verifyZone(verifyZoneData.id, true)
           if (configuration.get[Boolean]("blockchain.kafka.enabled")) {
-            val response = transactionAddZone.Service.kafkaPost(transactionAddZone.Request(from = "main", to = accounts.Service.getAccount(zones.Service.getZone(verifyZoneData.id).name).accountAddress, zoneID = verifyZoneData.id, password =  verifyZoneData.password))
+            val response = transactionAddZone.Service.kafkaPost(transactionAddZone.Request(from = request.session.get(constants.Security.USERNAME).get, to = accounts.Service.getAccount(zones.Service.getZone(verifyZoneData.id).name).accountAddress, zoneID = verifyZoneData.id, password =  verifyZoneData.password))
             Ok(views.html.index(success = Messages(module + "." + constants.Success.VERIFY_ZONE) + verifyZoneData.id + response.ticketID))
           } else {
-            val response = transactionAddZone.Service.post(transactionAddZone.Request(from = "main", to = accounts.Service.getAccount(zones.Service.getZone(verifyZoneData.id).name).accountAddress, zoneID = verifyZoneData.id, password =  verifyZoneData.password))
+            val response = transactionAddZone.Service.post(transactionAddZone.Request(from = request.session.get(constants.Security.USERNAME).get, to = accounts.Service.getAccount(zones.Service.getZone(verifyZoneData.id).name).accountAddress, zoneID = verifyZoneData.id, password =  verifyZoneData.password))
             Ok(views.html.index(success = Messages(module + "." + constants.Success.VERIFY_ZONE) + verifyZoneData.id + response.TxHash))
           }
         }
