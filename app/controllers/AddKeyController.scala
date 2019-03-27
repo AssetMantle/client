@@ -12,11 +12,11 @@ import scala.concurrent.ExecutionContext
 
 class AddKeyController @Inject()(messagesControllerComponents: MessagesControllerComponents, transactionAddKey: AddKey)(implicit exec: ExecutionContext,configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
-  def addKeyForm: Action[AnyContent] = Action { implicit request =>
+  def blockchainAddKeyForm: Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.blockchain.addKey(AddKey.form))
   }
 
-  def addKey: Action[AnyContent] = Action { implicit request =>
+  def blockchainAddKey: Action[AnyContent] = Action { implicit request =>
     AddKey.form.bindFromRequest().fold(
       formWithErrors => {
         BadRequest(views.html.component.blockchain.addKey(formWithErrors))
@@ -29,6 +29,7 @@ class AddKeyController @Inject()(messagesControllerComponents: MessagesControlle
           case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))
           case blockChainException: BlockChainException => Ok(views.html.index(failure = blockChainException.message))
         }
-      })
+      }
+    )
   }
 }

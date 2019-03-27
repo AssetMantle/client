@@ -1,0 +1,22 @@
+@import helper._
+@import views.companion.master.RedeemAsset
+
+@(redeemAssetForm: Form[RedeemAsset.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@common(Messages(constants.Forms.REDEEM_ASSET_TITLE)) {
+    @form(action = routes.RedeemAssetController.redeemAsset) {
+        @CSRF.formField
+        @inputText(redeemAssetForm(constants.Forms.TO),'_label-> Messages(constants.Forms.TO))
+        @inputText(redeemAssetForm(constants.Forms.PEG_HASH),'_label-> Messages(constants.Forms.PEG_HASH))
+        @inputText(redeemAssetForm(constants.Forms.GAS),'_label-> Messages(constants.Forms.GAS))
+        @inputPassword(redeemAssetForm(constants.Forms.PASSWORD),'_label-> Messages(constants.Forms.PASSWORD))
+
+        @if(redeemAssetForm.hasGlobalErrors) {
+            <ul>
+            @for(error <- redeemAssetForm.globalErrors) {
+                <li>@error.format</li>
+            }
+            </ul>
+        }
+        <button type="submit">@Messages(constants.Forms.REDEEM_ASSET_TITLE)</button>
+    }
+}

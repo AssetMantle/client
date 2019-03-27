@@ -8,11 +8,12 @@ object VerifyOrganization {
 
   val form = Form(
     mapping(
-      "id" -> nonEmptyText(minLength = 4, maxLength = 20),
+      "organizationID" -> nonEmptyText(minLength = 1, maxLength = 20),
+      "zoneID" -> nonEmptyText(minLength = 1, maxLength = 20),
       "password" -> nonEmptyText(minLength = 4, maxLength = 20),
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(id: String, password: String)
+  case class Data(organizationID: String, zoneID: String, password: String)
 
 }

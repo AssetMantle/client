@@ -1,0 +1,24 @@
+@import helper._
+@import views.companion.master.BuyerExecuteOrder
+
+@(buyerExecuteOrderForm: Form[BuyerExecuteOrder.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@common(Messages(constants.Forms.BUYER_EXECUTE_ORDER_TITLE)) {
+    @form(action = routes.BuyerExecuteOrderController.buyerExecuteOrder) {
+        @CSRF.formField
+        @inputText(buyerExecuteOrderForm(constants.Forms.BUYER_ADDRESS),'_label-> Messages(constants.Forms.BUYER_ADDRESS))
+        @inputText(buyerExecuteOrderForm(constants.Forms.SELLER_ADDRESS),'_label-> Messages(constants.Forms.SELLER_ADDRESS))
+        @inputText(buyerExecuteOrderForm(constants.Forms.FIAT_PROOF_HASH),'_label-> Messages(constants.Forms.FIAT_PROOF_HASH))
+        @inputText(buyerExecuteOrderForm(constants.Forms.PEG_HASH),'_label-> Messages(constants.Forms.PEG_HASH))
+        @inputText(buyerExecuteOrderForm(constants.Forms.GAS),'_label-> Messages(constants.Forms.GAS))
+        @inputPassword(buyerExecuteOrderForm(constants.Forms.PASSWORD),'_label-> Messages(constants.Forms.PASSWORD))
+
+        @if(buyerExecuteOrderForm.hasGlobalErrors) {
+            <ul>
+            @for(error <- buyerExecuteOrderForm.globalErrors) {
+                <li>@error.format</li>
+            }
+            </ul>
+        }
+        <button type="submit">@Messages(constants.Forms.BUYER_EXECUTE_ORDER_TITLE)</button>
+    }
+}
