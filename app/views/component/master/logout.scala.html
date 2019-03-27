@@ -1,0 +1,21 @@
+@import helper._
+@import views.companion.master.Logout
+
+@(logoutForm: Form[Logout.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+    @common(Messages("Logout")) {
+        @form(action = routes.LogoutController.logout) {
+            @CSRF.formField
+            @checkbox(logoutForm(Messages("issueFiat")))
+
+            @if(logoutForm.hasGlobalErrors) {
+                <ul>
+                @for(error <- logoutForm.globalErrors) {
+                    <li>@error.format</li>
+                }
+                </ul>
+            }
+            <button id="submitToken" type="submit" name="token">@Messages("Logout")</button>
+        }
+        <script src="@routes.Assets.versioned("/javascripts/firebase.js")"></script>
+        <script src="@routes.Assets.versioned("/javascripts/pushNotification.js")"></script>
+    }
