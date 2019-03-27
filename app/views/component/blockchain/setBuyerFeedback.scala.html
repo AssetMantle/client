@@ -3,7 +3,7 @@
 
 @(setBuyerFeedbackForm: Form[SetBuyerFeedback.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @common(Messages(constants.Forms.SET_BUYER_FEEDBACK_TITLE)) {
-    @form(action = routes.SetBuyerFeedbackController.setBuyerFeedback) {
+    @form(action = routes.SetBuyerFeedbackController.blockchainSetBuyerFeedback) {
         @CSRF.formField
         @inputText(setBuyerFeedbackForm(constants.Forms.FROM),'_label-> Messages(constants.Forms.FROM))
         @inputText(setBuyerFeedbackForm(constants.Forms.TO),'_label-> Messages(constants.Forms.TO))

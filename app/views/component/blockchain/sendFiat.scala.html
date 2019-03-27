@@ -3,7 +3,7 @@
 
 @(sendFiatForm: Form[SendFiat.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @common(Messages(constants.Forms.SEND_FIAT_TITLE)) {
-    @form(action = routes.SendFiatController.sendFiat) {
+    @form(action = routes.SendFiatController.blockchainSendFiat) {
         @CSRF.formField
         @inputText(sendFiatForm(constants.Forms.FROM),'_label-> Messages(constants.Forms.FROM))
         @inputText(sendFiatForm(constants.Forms.TO),'_label-> Messages(constants.Forms.TO))

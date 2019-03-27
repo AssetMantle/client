@@ -3,7 +3,7 @@
 
 @(confirmSellerBidForm: Form[ConfirmSellerBid.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @common(Messages(constants.Forms.CONFIRM_SELLER_BID_TITLE)) {
-    @form(action = routes.ConfirmSellerBidController.confirmSellerBid) {
+    @form(action = routes.ConfirmSellerBidController.blockchainConfirmSellerBid) {
         @CSRF.formField
         @inputText(confirmSellerBidForm(constants.Forms.FROM),'_label-> Messages(constants.Forms.FROM))
         @inputText(confirmSellerBidForm(constants.Forms.TO),'_label-> Messages(constants.Forms.TO))

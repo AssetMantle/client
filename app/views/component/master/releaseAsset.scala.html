@@ -1,0 +1,22 @@
+@import helper._
+@import views.companion.master.ReleaseAsset
+
+@(releaseAssetForm: Form[ReleaseAsset.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@common(Messages(constants.Forms.RELEASE_ASSET_TITLE)) {
+    @form(action = routes.ReleaseAssetController.releaseAsset) {
+        @CSRF.formField
+        @inputText(releaseAssetForm(constants.Forms.TO),'_label-> Messages(constants.Forms.TO))
+        @inputText(releaseAssetForm(constants.Forms.PEG_HASH),'_label-> Messages(constants.Forms.PEG_HASH))
+        @inputText(releaseAssetForm(constants.Forms.GAS),'_label-> Messages(constants.Forms.GAS))
+        @inputPassword(releaseAssetForm(constants.Forms.PASSWORD),'_label-> Messages(constants.Forms.PASSWORD))
+
+        @if(releaseAssetForm.hasGlobalErrors) {
+            <ul>
+            @for(error <- releaseAssetForm.globalErrors) {
+                <li>@error.format</li>
+            }
+            </ul>
+        }
+        <button type="submit">@Messages(constants.Forms.RELEASE_ASSET_TITLE)</button>
+    }
+}

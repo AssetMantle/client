@@ -5,7 +5,8 @@
 @common(Messages(constants.Forms.VERIFY_ORGANIZATION)) {
     @form(action = routes.AddOrganizationController.verifyOrganization) {
         @CSRF.formField
-        @inputText(verifyOrganizationForm(constants.Forms.ID),'_label-> Messages(constants.Forms.ID))
+        @inputText(verifyOrganizationForm(constants.Forms.ORGANIZATION_ID),'_label-> Messages(constants.Forms.ORGANIZATION_ID))
+        @inputText(verifyOrganizationForm(constants.Forms.ZONE_ID),'_label-> Messages(constants.Forms.ZONE_ID))
         @inputPassword(verifyOrganizationForm(constants.Forms.PASSWORD),'_label-> Messages(constants.Forms.PASSWORD))
 
         @if(verifyOrganizationForm.hasGlobalErrors) {

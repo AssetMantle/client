@@ -83,4 +83,5 @@ object Forms {
   val OTP = "otp"
   val VERIFY_MOBILE_NUMBER = "VerifyMobileNumber"
   val VERIFY_ORGANIZATION = "VerifyOrganization"
+  val VERIFY_ZONE = "VerifyZone"
 }

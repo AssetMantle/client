@@ -15,7 +15,7 @@ import scala.util.Random
 
 class SendCoinController @Inject()(messagesControllerComponents: MessagesControllerComponents, withLoginAction: WithLoginAction, transactionSendCoin: SendCoin, sendCoins: SendCoins)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
-  def sendCoinForm: Action[AnyContent] = withLoginAction { implicit request =>
+  def sendCoinForm: Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.master.sendCoin(master.SendCoin.form))
   }
 
@@ -28,12 +28,12 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
         try {
           if (configuration.get[Boolean]("blockchain.kafka.enabled")) {
             val response = transactionSendCoin.Service.kafkaPost(transactionSendCoin.Request(from = request.session.get(constants.Security.USERNAME).get, password = sendCoinData.password, to = sendCoinData.to, amount = Seq(transactionSendCoin.Amount("comdex", sendCoinData.amount.toString)), gas = sendCoinData.gas))
-            sendCoins.Service.addSendCoinKafka(request.session.get(constants.Security.USERNAME).get, sendCoinData.to, sendCoinData.amount, sendCoinData.gas, null, null, response.ticketID, null)
+            sendCoins.Service.addSendCoinKafka(from = request.session.get(constants.Security.USERNAME).get, to = sendCoinData.to, amount = sendCoinData.amount, gas = sendCoinData.gas, null, null, ticketID = response.ticketID, null)
             Ok(views.html.index(success = response.ticketID))
           }
           else {
             val response = transactionSendCoin.Service.post(transactionSendCoin.Request(from = request.session.get(constants.Security.USERNAME).get, password = sendCoinData.password, to = sendCoinData.to, amount = Seq(transactionSendCoin.Amount("comdex", sendCoinData.amount.toString)), gas = sendCoinData.gas))
-            sendCoins.Service.addSendCoin(request.session.get(constants.Security.USERNAME).get, sendCoinData.to, sendCoinData.amount, sendCoinData.gas, null, Option(response.TxHash), (Random.nextInt(899999999) + 100000000).toString, null)
+            sendCoins.Service.addSendCoin(from = request.session.get(constants.Security.USERNAME).get, to = sendCoinData.to, amount = sendCoinData.amount, gas = sendCoinData.gas, null,txHash = Option(response.TxHash), ticketID = (Random.nextInt(899999999) + 100000000).toString, null)
             Ok(views.html.index(success = response.TxHash))
           }
         }

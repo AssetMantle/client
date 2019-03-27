@@ -3,7 +3,7 @@
 
 @(sendAssetForm: Form[SendAsset.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @common(Messages(constants.Forms.SEND_ASSET_TITLE)) {
-    @form(action = routes.SendAssetController.sendAsset) {
+    @form(action = routes.SendAssetController.blockchainSendAsset) {
         @CSRF.formField
         @inputText(sendAssetForm(constants.Forms.FROM),'_label-> Messages(constants.Forms.FROM))
         @inputText(sendAssetForm(constants.Forms.TO),'_label-> Messages(constants.Forms.TO))

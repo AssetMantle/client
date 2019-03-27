@@ -3,11 +3,9 @@
 
 @(addZoneForm: Form[AddZone.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @common(Messages(constants.Forms.ADD_ZONE_TITLE)) {
-    @form(action = routes.LoginController.login) {
+    @form(action = routes.AddZoneController.addZone) {
         @CSRF.formField
-        @inputText(addZoneForm(constants.Forms.ID),'_label-> Messages(constants.Forms.ID))
         @inputPassword(addZoneForm(constants.Forms.PASSWORD),'_label-> Messages(constants.Forms.PASSWORD))
-        @inputText(addZoneForm(constants.Forms.PASSWORD),'_label-> Messages(constants.Forms.PASSWORD))
         @inputText(addZoneForm(constants.Forms.NAME),'_label-> Messages(constants.Forms.NAME))
         @inputText(addZoneForm(constants.Forms.CURRENCY),'_label-> Messages(constants.Forms.CURRENCY))
 

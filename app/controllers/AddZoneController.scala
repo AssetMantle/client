@@ -1,5 +1,6 @@
 package controllers
 
+import controllers.actions.WithLoginAction
 import exceptions.{BaseException, BlockChainException}
 import javax.inject.Inject
 import models.blockchainTransaction.AddZones
@@ -7,17 +8,68 @@ import play.api.Configuration
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import views.companion.blockchain.AddZone
-
+import views.companion.master
+import models.master.{Accounts, Zones}
 import scala.concurrent.ExecutionContext
 import scala.util.Random
 
-class AddZoneController @Inject()(messagesControllerComponents: MessagesControllerComponents, transactionAddZone: transactions.AddZone, addZones: AddZones)(implicit exec: ExecutionContext,configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class AddZoneController @Inject()(messagesControllerComponents: MessagesControllerComponents, transactionAddZone: transactions.AddZone, addZones: AddZones, accounts: Accounts, zones: Zones)(implicit exec: ExecutionContext,configuration: Configuration, withLoginAction: WithLoginAction) extends AbstractController(messagesControllerComponents) with I18nSupport {
+
+  private val module: String = constants.Module.CONTROLLERS_ADD_ZONE
 
   def addZoneForm: Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.addZone(master.AddZone.form))
+  }
+
+  def addZone: Action[AnyContent] = withLoginAction { implicit request =>
+    master.AddZone.form.bindFromRequest().fold(
+      formWithErrors => {
+        BadRequest(views.html.component.master.addZone(formWithErrors))
+      },
+      addZoneData => {
+        try {
+          Ok(views.html.index(success = zones.Service.addZone(secretHash = util.hashing.MurmurHash3.stringHash(addZoneData.password).toString, name = addZoneData.name, currency = addZoneData.currency)))
+        }
+        catch {
+          case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))
+        }
+      }
+    )
+  }
+
+  def verifyZoneForm: Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.verifyZone(master.VerifyZone.form))
+  }
+
+  def verifyZone: Action[AnyContent] = withLoginAction { implicit request =>
+    master.VerifyZone.form.bindFromRequest().fold(
+      formWithErrors => {
+        BadRequest(views.html.component.master.verifyZone(formWithErrors))
+      },
+      verifyZoneData => {
+        try {
+          zones.Service.verifyZone(verifyZoneData.id, true)
+          if (configuration.get[Boolean]("blockchain.kafka.enabled")) {
+            val response = transactionAddZone.Service.kafkaPost(transactionAddZone.Request(from = request.session.get(constants.Security.USERNAME).get, to = accounts.Service.getAccount(zones.Service.getZone(verifyZoneData.id).name).accountAddress, zoneID = verifyZoneData.id, password =  verifyZoneData.password))
+            Ok(views.html.index(success = Messages(module + "." + constants.Success.VERIFY_ZONE) + verifyZoneData.id + response.ticketID))
+          } else {
+            val response = transactionAddZone.Service.post(transactionAddZone.Request(from = request.session.get(constants.Security.USERNAME).get, to = accounts.Service.getAccount(zones.Service.getZone(verifyZoneData.id).name).accountAddress, zoneID = verifyZoneData.id, password =  verifyZoneData.password))
+            Ok(views.html.index(success = Messages(module + "." + constants.Success.VERIFY_ZONE) + verifyZoneData.id + response.TxHash))
+          }
+        }
+        catch {
+          case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))
+          case blockChainException: BlockChainException =>  Ok(views.html.index(failure = Messages(blockChainException.message)))
+        }
+      }
+    )
+  }
+
+  def blockchainAddZoneForm: Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.blockchain.addZone(AddZone.form))
   }
 
-  def addZone: Action[AnyContent] = Action { implicit request =>
+  def blockchainAddZone: Action[AnyContent] = Action { implicit request =>
     AddZone.form.bindFromRequest().fold(
       formWithErrors => {
         BadRequest(views.html.component.blockchain.addZone(formWithErrors))
@@ -26,7 +78,7 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
         try {
           if (configuration.get[Boolean]("blockchain.kafka.enabled")) {
             val response = transactionAddZone.Service.kafkaPost( transactionAddZone.Request(from = addZoneData.from, to = addZoneData.to, zoneID = addZoneData.zoneID, password = addZoneData.password))
-            addZones .Service.addZoneKafka(addZoneData.from, addZoneData.to, addZoneData.zoneID, null, null, response.ticketID, null)
+            addZones.Service.addZoneKafka(addZoneData.from, addZoneData.to, addZoneData.zoneID, null, null, response.ticketID, null)
             Ok(views.html.index(success = response.ticketID))
           } else {
             val response = transactionAddZone.Service.post( transactionAddZone.Request(from = addZoneData.from, to = addZoneData.to, zoneID = addZoneData.zoneID, password = addZoneData.password))

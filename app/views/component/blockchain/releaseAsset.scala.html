@@ -3,7 +3,7 @@
 
 @(releaseAssetForm: Form[ReleaseAsset.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @common(Messages(constants.Forms.RELEASE_ASSET_TITLE)) {
-    @form(action = routes.ReleaseAssetController.releaseAsset) {
+    @form(action = routes.ReleaseAssetController.blockchainReleaseAsset) {
         @CSRF.formField
         @inputText(releaseAssetForm(constants.Forms.FROM),'_label-> Messages(constants.Forms.FROM))
         @inputText(releaseAssetForm(constants.Forms.TO),'_label-> Messages(constants.Forms.TO))
