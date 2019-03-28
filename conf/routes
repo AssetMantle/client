@@ -9,11 +9,15 @@ GET         /notificationImage.png                          controllers.Assets.a
 
 GET         /javascriptRoutes                               controllers.JavaScriptRoutesController.javascriptRoutes
 
+GET         /master/queryConfigurationVariable:query        controllers.ConfigurationController.queryConfigurationVariable(query: String)
+
+GET         /master/checkUsernameAvailable                  controllers.SignUpController.checkUsernameAvailable(username: String)
+
 GET         /master/login                                   controllers.LoginController.loginForm
 POST        /master/login                                   controllers.LoginController.login
 
-GET         /master/checkUsernameAvailable                  controllers.SignUpController.checkUsernameAvailable(username: String)
-GET         /master/queryConfigurationVariable:query        controllers.ConfigurationController.queryConfigurationVariable(query: String)
+GET         /master/logout                                  controllers.LogoutController.logoutForm
+POST        /master/logout                                  controllers.LogoutController.logout
 
 GET         /master/signUp                                  controllers.SignUpController.signUpForm
 POST        /master/signUp                                  controllers.SignUpController.signUp

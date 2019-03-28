@@ -11,7 +11,7 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Random, Success}
 
-case class AccountToken(id: String, registrationToken: String, sessionTokenHash : Option[String])
+case class AccountToken(id: String, registrationToken: String, sessionTokenHash: Option[String])
 
 class AccountTokens @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider) {
 
@@ -33,6 +33,7 @@ class AccountTokens @Inject()(protected val databaseConfigProvider: DatabaseConf
         throw new BaseException(constants.Error.PSQL_EXCEPTION)
     }
   }
+
   private def findById(id: String)(implicit executionContext: ExecutionContext): Future[AccountToken] = db.run(accountTokenTable.filter(_.id === id).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -40,6 +41,7 @@ class AccountTokens @Inject()(protected val databaseConfigProvider: DatabaseConf
         throw new BaseException(constants.Error.NO_SUCH_ELEMENT_EXCEPTION)
     }
   }
+
   private def update(accountToken: AccountToken) = db.run(accountTokenTable.insertOrUpdate(accountToken))
 
   private def refreshSessionTokenOnId(id: String, tokenHash: Option[String]) = db.run(accountTokenTable.filter(_.id === id).map(_.sessionTokenHash.?).update(tokenHash))
@@ -61,9 +63,12 @@ class AccountTokens @Inject()(protected val databaseConfigProvider: DatabaseConf
   }
 
   object Service {
-    def addToken(id: String, registrationToken: String)(implicit executionContext: ExecutionContext) : String = Await.result(add(models.masterTransaction.AccountToken(id, registrationToken, null)),Duration.Inf)
-    def updateToken(id: String, registrationToken: String):Int= Await.result(update(new AccountToken(id,registrationToken, null)), Duration.Inf)
+    def addToken(id: String, registrationToken: String)(implicit executionContext: ExecutionContext): String = Await.result(add(models.masterTransaction.AccountToken(id, registrationToken, null)), Duration.Inf)
+
+    def updateToken(id: String, registrationToken: String): Int = Await.result(update(new AccountToken(id, registrationToken, null)), Duration.Inf)
+
     def getTokenById(id: String)(implicit executionContext: ExecutionContext): String = Await.result(findById(id), Duration.Inf).registrationToken
+
     def ifExists(id: String): Boolean = Await.result(checkById(id), Duration.Inf)
 
 
@@ -76,6 +81,8 @@ class AccountTokens @Inject()(protected val databaseConfigProvider: DatabaseConf
       Await.result(refreshSessionTokenOnId(username, Some(util.hashing.MurmurHash3.stringHash(sessionToken).toString)), Duration.Inf)
       sessionToken
     }
+
+    def deleteToken(username: String)(implicit executionContext: ExecutionContext): Boolean = if (Await.result(deleteById(username), Duration.Inf) == 1) true else false
   }
 
 }
