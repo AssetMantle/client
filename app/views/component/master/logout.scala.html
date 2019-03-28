@@ -2,7 +2,7 @@
 @import views.companion.master.Logout
 
 @(logoutForm: Form[Logout.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-    @common(Messages("Logout")) {
+@common(Messages(constants.Forms.LOGOUT)) {
         @form(action = routes.LogoutController.logout) {
             @CSRF.formField
             @checkbox(logoutForm(constants.Forms.RECEIVE_NOTIFICATIONS), '_label -> Messages(constants.Forms.RECEIVE_NOTIFICATIONS))
