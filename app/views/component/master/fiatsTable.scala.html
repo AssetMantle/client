@@ -1,0 +1,21 @@
+@import transactions.Response.AccountResponse.Fiat
+
+@(fiatPegWallet: Option[Seq[Fiat]])
+
+<table id="fiatPegWallet">
+    <tr>
+        <th>PegHash</th>
+        <th>TransactionID</th>
+        <th>Transaction Amount</th>
+        <th>Redeemed Amount</th>
+    </tr>
+    @for(fiat <- fiatPegWallet.getOrElse(Seq(transactions.Response.AccountResponse.Fiat("", "", "", "")))) {
+        <tr>
+            <td>@fiat.pegHash</td>
+            <td>@fiat.transactionID</td>
+            <td>@fiat.transactionAmount</td>
+            <td>@fiat.redeemedAmount</td>
+        </tr>
+    }
+</table>
+<br>

@@ -1,0 +1,67 @@
+@(username: String, account: transactions.Response.AccountResponse.Response, zone: models.master.Zone, organization: models.master.Organization, acl: models.blockchain.ACLHash)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
+
+@common("Home"){
+    <a href="@routes.SendCoinController.sendCoinForm">@Messages(constants.Forms.SEND_COIN_TITLE)</a>
+    <h1>@username</h1>
+    Address: @account.value.address <br>
+    Coins: @account.value.coins  <br> <br>
+
+    <h2>Zone:</h2>
+    Name: @zone.name<br>
+    ZoneID: @zone.id<br>
+    Currency: @zone.currency<br>
+    Verified Status: @zone.status<br><br>
+
+    <h2>Organization:</h2>
+    Organization Name: @organization.name<br>
+    OrganizationID: @organization.id<br>
+    Organization Username: @organization.accountID<br>
+    Address: @organization.address<br>
+    Phone: @organization.phone<br>
+    Email: @organization.email<br>
+    Verified Status: @organization.status<br><br>
+
+    <h2>Assets You Own: </h2><br>
+        <table id="assetPegWallet">
+                <tr>
+                    <th>PegHash</th>
+                    <th>Document Hash</th>
+                    <th>Asset Type</th>
+                    <th>Asset Quantity</th>
+                    <th>Asset Price</th>
+                    <th>Quantity Unit</th>
+                    <th>Locked</th>
+                </tr>
+                @for(asset <- account.value.assetPegWallet.getOrElse(Seq(transactions.Response.AccountResponse.Asset("", "", "", "", "", "", "", false)))) {
+                    <tr>
+                        <td>@asset.pegHash</td>
+                        <td>@asset.documentHash</td>
+                        <td>@asset.assetType</td>
+                        <td>@asset.assetQuantity</td>
+                        <td>@asset.assetPrice</td>
+                        <td>@asset.quantityUnit</td>
+                        <td>@asset.locked</td>
+                    </tr>
+                }
+            </table>
+        <br><br>
+
+    <h2>Your Fiats:</h2> <br>
+        <table id="fiatPegWallet">
+            <tr>
+                <th>PegHash</th>
+                <th>TransactionID</th>
+                <th>Transaction Amount</th>
+                <th>Redeemed Amount</th>
+            </tr>
+            @for(fiat <- account.value.fiatPegWallet.getOrElse(Seq(transactions.Response.AccountResponse.Fiat("", "", "", "")))) {
+                <tr>
+                    <td>@fiat.pegHash</td>
+                    <td>@fiat.transactionID</td>
+                    <td>@fiat.transactionAmount</td>
+                    <td>@fiat.redeemedAmount</td>
+                </tr>
+            }
+        </table>
+    <br>
+}

@@ -1,0 +1,28 @@
+@import transactions.Response.AccountResponse.Asset
+
+@(assetPegWallet: Option[Seq[Asset]])
+
+<table id="assetPegWallet">
+    <tr>
+        <th>PegHash</th>
+        <th>Document Hash</th>
+        <th>Asset Type</th>
+        <th>Asset Quantity</th>
+        <th>Asset Price</th>
+        <th>Quantity Unit</th>
+        <th>Locked</th>
+    </tr>
+    @for(asset <- assetPegWallet.getOrElse(Seq(Asset("", "", "", "", "", "", "", false)))) {
+        <tr>
+            <td>@asset.pegHash</td>
+            <td>@asset.documentHash</td>
+            <td>@asset.assetType</td>
+            <td>@asset.assetQuantity</td>
+            <td>@asset.assetPrice</td>
+            <td>@asset.quantityUnit</td>
+            <td>@asset.locked</td>
+        </tr>
+    }
+</table>
+<br>
+<br>

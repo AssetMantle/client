@@ -1,0 +1,13 @@
+@import models.master.Organization
+
+@(organization: Organization)
+
+<h2>Organization:</h2>
+Organization Name: @organization.name <br>
+    OrganizationID: @organization.id <br>
+    Organization Username: @organization.accountID <br>
+    Address: @organization.address <br>
+    Phone: @organization.phone <br>
+    Email: @organization.email <br>
+    Verified Status: @organization.status <br>
+<br>

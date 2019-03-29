@@ -1,0 +1,30 @@
+@import models.master.Zone
+@import models.master.Organization
+@import transactions.Response.AccountResponse.{Asset, Fiat}
+
+@(zone: Zone, organization: Organization, assetPegWallet: Option[Seq[Asset]], fiatPegWallet: Option[Seq[Fiat]])
+
+<h2>Zone:</h2>
+Name: @zone.name <br>
+    ZoneID: @zone.id <br>
+    Currency: @zone.currency <br>
+    Verified Status: @zone.status <br>
+<br>
+
+<h2>Organization:</h2>
+    Organization Name: @organization.name <br>
+    OrganizationID: @organization.id <br>
+    Organization Username: @organization.accountID <br>
+    Address: @organization.address <br>
+    Phone: @organization.phone <br>
+    Email: @organization.email <br>
+    Verified Status: @organization.status <br>
+<br>
+
+<h2>Assets You Own: </h2>
+@component.master.assetsTable(assetPegWallet)
+
+<h2>Your Fiats:</h2>
+@component.master.fiatsTable(fiatPegWallet)
+
+<br>
