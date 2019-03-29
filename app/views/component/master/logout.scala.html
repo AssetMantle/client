@@ -1,0 +1,19 @@
+@import helper._
+@import views.companion.master.Logout
+
+@(logoutForm: Form[Logout.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@common(Messages(constants.Forms.LOGOUT)) {
+        @form(action = routes.LogoutController.logout) {
+            @CSRF.formField
+            @checkbox(logoutForm(constants.Forms.RECEIVE_NOTIFICATIONS), '_label -> Messages(constants.Forms.RECEIVE_NOTIFICATIONS))
+
+            @if(logoutForm.hasGlobalErrors) {
+                <ul>
+                @for(error <- logoutForm.globalErrors) {
+                    <li>@error.format</li>
+                }
+                </ul>
+            }
+            <button type="submit">@Messages(constants.Forms.LOGOUT)</button>
+        }
+    }
