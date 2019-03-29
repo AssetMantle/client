@@ -2,7 +2,7 @@ package transactions.Response
 
 import play.api.libs.json.{Json, Reads}
 
-object Account {
+object AccountResponse {
 
   case class Coins(denom: String, amount: String)
 

@@ -11,7 +11,7 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Account(id: String, secretHash: String, accountAddress: String, language: String)
+case class Account(id: String, secretHash: String, accountAddress: String, language: String, userType: Option[String])
 
 class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider) {
 
@@ -38,6 +38,8 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
   private def findById(id: String)(implicit executionContext: ExecutionContext): Future[Account] = db.run(accountTable.filter(_.id === id).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+        throw new BaseException(constants.Error.PSQL_EXCEPTION)
       case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
         throw new BaseException(constants.Error.NO_SUCH_ELEMENT_EXCEPTION)
     }
@@ -46,6 +48,28 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
   private def getLanguageById(id: String)(implicit executionContext: ExecutionContext): Future[String] = db.run(accountTable.filter(_.id === id).result.head.asTry).map {
     case Success(result) => result.language
     case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+        throw new BaseException(constants.Error.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+        throw new BaseException(constants.Error.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def getAddressById(id: String)(implicit executionContext: ExecutionContext): Future[String] = db.run(accountTable.filter(_.id === id).map(_.accountAddress).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+        throw new BaseException(constants.Error.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+        throw new BaseException(constants.Error.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def getUserTypeById(id: String)(implicit executionContext: ExecutionContext): Future[Option[String]] = db.run(accountTable.filter(_.id === id).map(_.userType).result.head.asTry).map {
+    case Success(result) => Option(result)
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+        throw new BaseException(constants.Error.PSQL_EXCEPTION)
       case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
         throw new BaseException(constants.Error.NO_SUCH_ELEMENT_EXCEPTION)
     }
@@ -54,6 +78,18 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
   private def getIdByAddress(accountAddress: String)(implicit executionContext: ExecutionContext): Future[String] = db.run(accountTable.filter(_.accountAddress === accountAddress).result.head.asTry).map {
     case Success(result) => result.id
     case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+        throw new BaseException(constants.Error.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+        throw new BaseException(constants.Error.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def updateUserTypeById(id: String, userType: Option[String])(implicit executionContext: ExecutionContext):Future[Int] = db.run(accountTable.filter(_.id === id).map(_.userType.?).update(userType).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+        throw new BaseException(constants.Error.PSQL_EXCEPTION)
       case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
         throw new BaseException(constants.Error.NO_SUCH_ELEMENT_EXCEPTION)
     }
@@ -61,11 +97,19 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   private def checkById(id: String): Future[Boolean] = db.run(accountTable.filter(_.id === id).exists.result)
 
-  private def deleteById(id: String) = db.run(accountTable.filter(_.id === id).delete)
+  private def deleteById(id: String)(implicit executionContext: ExecutionContext) = db.run(accountTable.filter(_.id === id).delete.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+        throw new BaseException(constants.Error.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+        throw new BaseException(constants.Error.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
 
   private[models] class AccountTable(tag: Tag) extends Table[Account](tag, "Account") {
 
-    def * = (id, secretHash, accountAddress, language) <> (Account.tupled, Account.unapply)
+    def * = (id, secretHash, accountAddress, language, userType.?) <> (Account.tupled, Account.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
@@ -75,19 +119,20 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
     def language = column[String]("language")
 
+    def userType = column[String]("userType")
+
   }
 
   object Service {
 
     def validateLogin(username: String, password: String)(implicit executionContext: ExecutionContext): Boolean = Await.result(findById(username), Duration.Inf).secretHash == util.hashing.MurmurHash3.stringHash(password).toString
 
-
     def checkUsernameAvailable(username: String): Boolean = {
       !Await.result(checkById(username), Duration.Inf)
     }
 
     def addLogin(username: String, password: String, accountAddress: String, language: String)(implicit executionContext: ExecutionContext): String = {
-      Await.result(add(Account(username, util.hashing.MurmurHash3.stringHash(password).toString, accountAddress, language)), Duration.Inf)
+      Await.result(add(Account(username, util.hashing.MurmurHash3.stringHash(password).toString, accountAddress, language, null)), Duration.Inf)
       accountAddress
     }
 
@@ -97,6 +142,11 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
     def getId(accountAddress: String)(implicit executionContext: ExecutionContext):String = Await.result(getIdByAddress(accountAddress), Duration.Inf)
 
+    def getAddress(id: String)(implicit executionContext: ExecutionContext):String = Await.result(getAddressById(id), Duration.Inf)
+
+    def updateUserType(id: String, userType: String)(implicit executionContext: ExecutionContext):Int = Await.result(updateUserTypeById(id, Option(userType)), Duration.Inf)
+
+    def getUserType(id: String)(implicit executionContext: ExecutionContext):Option[String] = Await.result(getUserTypeById(id), Duration.Inf)
   }
 
 }

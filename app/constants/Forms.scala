@@ -2,7 +2,7 @@ package constants
 
 object Forms {
 
-  val INDEX = "Index"
+  val INDEX                 = "Index"
 
   //Blockchain
   val ADD_KEY_TITLE = "Add Key"

@@ -1,5 +1,6 @@
 package models.blockchain
 
+import exceptions.BaseException
 import javax.inject.Inject
 import org.postgresql.util.PSQLException
 import play.api.Logger
@@ -10,9 +11,9 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class ACLHash(issueAssets: Boolean, issueFiats: Boolean, sendAssets: Boolean, sendFiats: Boolean, redeemAssets: Boolean, redeemFiats: Boolean, sellerExecuteOrder: Boolean, buyerExecuteOrder: Boolean, changeBuyerBid: Boolean, changeSellerBid: Boolean, confirmBuyerBid: Boolean, confirmSellerBid: Boolean, negotiation: Boolean, releaseAssetss: Boolean, hash: String)
+case class ACLHash(issueAssets: Boolean, issueFiats: Boolean, sendAssets: Boolean, sendFiats: Boolean, redeemAssets: Boolean, redeemFiats: Boolean, sellerExecuteOrder: Boolean, buyerExecuteOrder: Boolean, changeBuyerBid: Boolean, changeSellerBid: Boolean, confirmBuyerBid: Boolean, confirmSellerBid: Boolean, negotiation: Boolean, releaseAssets: Boolean, hash: String)
 
-class ACLHashs @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider) {
+class ACLHashes @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -20,7 +21,9 @@ class ACLHashs @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   import databaseConfig.profile.api._
 
-  private val logger: Logger = Logger(this.getClass)
+  private implicit val logger: Logger = Logger(this.getClass)
+
+  private implicit val module: String = constants.Module.BLOCKCHAIN_ACL_HASH
 
   private[models] val aclTable = TableQuery[ACLHashTable]
 
@@ -32,9 +35,25 @@ class ACLHashs @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     }
   }
 
-  private def findByAddress(hash: String): Future[ACLHash] = db.run(aclTable.filter(_.hash === hash).result.head)
+  private def findByHash(hash: String)(implicit executionContext: ExecutionContext): Future[ACLHash] = db.run(aclTable.filter(_.hash === hash).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+        throw new BaseException(constants.Error.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+        throw new BaseException(constants.Error.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
 
-  private def deleteByAddress(hash: String) = db.run(aclTable.filter(_.hash === hash).delete)
+  private def deleteByHash(hash: String)(implicit executionContext: ExecutionContext) = db.run(aclTable.filter(_.hash === hash).delete.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+        throw new BaseException(constants.Error.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+        throw new BaseException(constants.Error.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
 
   private[models] class ACLHashTable(tag: Tag) extends Table[ACLHash](tag, "ACLHash_BC") {
 
@@ -74,5 +93,8 @@ class ACLHashs @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   object Service {
     def addACLHash(acl: ACL)(implicit executionContext: ExecutionContext): String = Await.result(add(ACLHash(acl.issueAssets, acl.issueFiats, acl.sendAssets, acl.sendFiats, acl.redeemAssets, acl.redeemFiats, acl.sellerExecuteOrder, acl.buyerExecuteOrder, acl.changeBuyerBid, acl.changeSellerBid, acl.confirmBuyerBid, acl.confirmSellerBid, acl.negotiation, acl.releaseAssets, util.hashing.MurmurHash3.stringHash(acl.toString).toString)), Duration.Inf)
+
+    def getACL(hash: String)(implicit executionContext: ExecutionContext): ACLHash = Await.result(findByHash(hash), Duration.Inf)
+
   }
 }
