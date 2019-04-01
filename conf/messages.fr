@@ -1,13 +1,13 @@
 Index=Indexio
 Login=S'identifier
 
-NotificationMessage.Login=Vous êtes authentifié {0}
-NotificationTitle.Login=S'identifier
-NotificationMessage.OTP=Votre OTP est {0}
-NotificationTitle.OTP=Vérifier OTP
+NOTIFICATIONMessage.Login=Vous êtes authentifié {0}
+NOTIFICATIONTitle.Login=S'identifier
+NOTIFICATIONMessage.OTP=Votre OTP est {0}
+NOTIFICATIONTitle.OTP=Vérifier OTP
 
-EmailMessage.OTP=Votre OTP est {0}
-EmailSubject.OTP=Vérifier OTP
+EMAILMessage.OTP=Votre OTP est {0}
+EMAILSubject.OTP=Vérifier OTP
 
 SMSMessage.OTP= Votre OTP est {0}
 SMSSubject.OTP= Vérifier OTP

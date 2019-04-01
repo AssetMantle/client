@@ -62,4 +62,8 @@ object Module {
   val CONTROLLERS_SIGN_UP                   = "CONTROLLERS_SIGN_UP"
   val CONTROLLERS_ADD_ORGANIZATION          = "CONTROLLERS_ADD_ORGANIZATION"
   val CONTROLLERS_LOGIN                     = "CONTROLLERS_LOGIN"
+  val EMAIL                                 = "EMAIL"
+  val SMS                                   = "SMS"
+  val NOTIFICATION                          = "NOTIFICATION"
+
 }

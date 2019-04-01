@@ -1,5 +1,6 @@
 package utilities
 
+import exceptions.BaseException
 import javax.inject.Inject
 import models.master.Accounts
 import models.masterTransaction.{AccountTokens, Notifications}
@@ -13,15 +14,20 @@ import scala.concurrent.ExecutionContext
 
 class PushNotifications @Inject()(wsClient: WSClient, notifications: Notifications, accounts: Accounts, accountTokens: AccountTokens, langs: Langs, messagesApi: MessagesApi)(implicit exec: ExecutionContext, configuration: Configuration) {
 
+  private implicit val module: String = constants.Module.NOTIFICATION
+
   private val url = configuration.get[String]("notification.url")
 
   private val authorizationKey = configuration.get[String]("notification.authorizationKey")
 
   def sendNotification(accountID: String, messageType: String, passedData: Seq[String] = Seq(""))(implicit lang: Lang = Lang(accounts.Service.getLanguage(accountID))) = {
-    Thread.sleep(3000)
-    notifications.Service.addNotification(accountID, messagesApi("NotificationTitle" + "." + messageType), messagesApi("NotificationMessage" + "." + messageType, passedData(0)), DateTime.now(DateTimeZone.UTC).getMillis())
-    wsClient.url(url).withHttpHeaders(constants.Header.CONTENT_TYPE -> constants.Header.APPLICATION_JSON).withHttpHeaders(constants.Header.AUTHORIZATION -> authorizationKey)
-      .post(Json.toJson(Data(accountTokens.Service.getTokenById(accountID), Notification(messagesApi("NotificationTitle" + "." + messageType), messagesApi("NotificationMessage" + "." + messageType, passedData(0))))))
+    try{
+      Thread.sleep(3000)
+      notifications.Service.addNotification(accountID, messagesApi(module + "Title" + "." + messageType), messagesApi(module + "Message" + "." + messageType, passedData(0)), DateTime.now(DateTimeZone.UTC).getMillis())
+      wsClient.url(url).withHttpHeaders(constants.Header.CONTENT_TYPE -> constants.Header.APPLICATION_JSON).withHttpHeaders(constants.Header.AUTHORIZATION -> authorizationKey)
+        .post(Json.toJson(Data(accountTokens.Service.getTokenById(accountID), Notification(messagesApi(module + "Title" + "." + messageType), messagesApi(module + "Message" + "." + messageType, passedData(0))))))
+    }
+      catch{case baseException: BaseException => throw new BaseException(baseException.message)}
   }
 
   private implicit val notificationWrites: OWrites[Notification] = Json.writes[Notification]

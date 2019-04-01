@@ -66,13 +66,13 @@ changeBuyerBid=changeBuyerBid
 changeSellerBid=changeSellerBid
 confirmBuyerBid=confirmBuyerBid
 
-NotificationMessage.Login= You are Logged In. {0}
-NotificationTitle.Login= Login
-NotificationMessage.OTP= Your OTP is {0}
-NotificationTitle.OTP= Verify OTP
+NOTIFICATIONMessage.Login= You are Logged In. {0}
+NOTIFICATIONTitle.Login= Login
+NOTIFICATIONMessage.OTP= Your OTP is {0}
+NOTIFICATIONTitle.OTP= Verify OTP
 
-EmailMessage.OTP= Your OTP is {0}
-EmailSubject.OTP= Verify OTP
+EMAILMessage.OTP= Your OTP is {0}
+EMAILSubject.OTP= Verify OTP
 
 SMSMessage.OTP= Your OTP is {0}
 SMSSubject.OTP= Verify OTP
