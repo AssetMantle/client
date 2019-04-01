@@ -18,22 +18,14 @@ class NotificationController @Inject()(messagesControllerComponents: MessagesCon
 
   private val limit = configuration.get[Int]("notification.notificationsPerPage")
 
-  def showNotificationsForm: Action[AnyContent] = withLoginAction { implicit request =>
-    Ok(views.html.component.master.notificationBox(NotificationBox.form, notifications.Service.getNotifications(request.session.get(Security.USERNAME).get, 0, limit), 1, limit, notifications.Service.getNumberOfUnread(request.session.get(Security.USERNAME).get)))
-      }
+  def showNotificationsForm: Action[AnyContent] = withLoginAction {implicit request => Ok(views.html.component.master.notificationBox(NotificationBox.form, notifications.Service.getNotifications(request.session.get(Security.USERNAME).get, 0, limit), 1, limit, notifications.Service.getNumberOfUnread(request.session.get(Security.USERNAME).get)))}
 
   def showNotifications: Action[AnyContent] = withLoginAction { implicit request =>
     NotificationBox.form.bindFromRequest().fold(
-      formWithErrors => {
-        print("kkk")
-        BadRequest(views.html.component.master.notificationBox(formWithErrors, notifications.Service.getNotifications(request.session.get(Security.USERNAME).get, 0, limit), 1, limit,notifications.Service.getNumberOfUnread(request.session.get(Security.USERNAME).get)))
-      },
+      formWithErrors => BadRequest(views.html.component.master.notificationBox(formWithErrors, notifications.Service.getNotifications(request.session.get(Security.USERNAME).get, 0, limit), 1, limit,notifications.Service.getNumberOfUnread(request.session.get(Security.USERNAME).get))),
       notificationBoxData => {
         try {
-          if (notificationBoxData.notificationID!="nil") {
-            notifications.Service.markAsRead(notificationBoxData.notificationID)
-          }
-          println(notificationBoxData.pageNumber)
+          if (notificationBoxData.notificationID!="nil") notifications.Service.markAsRead(notificationBoxData.notificationID)
           Ok(views.html.component.master.notificationBox(NotificationBox.form, notifications.Service.getNotifications(request.session.get(Security.USERNAME).get, (notificationBoxData.pageNumber - 1) * limit, limit), notificationBoxData.pageNumber, limit, notifications.Service.getNumberOfUnread(request.session.get(Security.USERNAME).get)))
         }
         catch {
