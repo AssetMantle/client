@@ -116,6 +116,7 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."AddOrganization"
   "from"           VARCHAR NOT NULL,
   "to"             VARCHAR NOT NULL,
   "organizationID" VARCHAR NOT NULL,
+  "zoneID"         VARCHAR NOT NULL,
   "status"         BOOLEAN,
   "txHash"         VARCHAR,
   "ticketID"       VARCHAR NOT NULL,
@@ -383,6 +384,7 @@ CREATE TABLE IF NOT EXISTS MASTER."Zone"
   "secretHash" VARCHAR NOT NULL,
   "name"       VARCHAR NOT NULL,
   "currency"   VARCHAR NOT NULL,
+  "status"     BOOLEAN,
   PRIMARY KEY ("id")
 );
 
@@ -519,12 +521,12 @@ ALTER TABLE BLOCKCHAIN."Order_BC"
   ADD CONSTRAINT Order_Negotiation_id FOREIGN KEY ("id") REFERENCES BLOCKCHAIN."Negotiation_BC" ("id");
 ALTER TABLE BLOCKCHAIN."Organization_BC"
   ADD CONSTRAINT Organization_BC_Organization_id FOREIGN KEY ("id") REFERENCES Master."Organization" ("id");
+ALTER TABLE BLOCKCHAIN."Zone_BC"
+  ADD CONSTRAINT Zone_BC_Zone_id FOREIGN KEY ("id") REFERENCES Master."Zone" ("id");
 
 ALTER TABLE BLOCKCHAIN_TRANSACTION."SetACL"
   ADD CONSTRAINT SetACL_ACL_hash FOREIGN KEY ("aclHash") REFERENCES BLOCKCHAIN."ACLHash_BC" ("hash");
 
-ALTER TABLE MASTER."Zone"
-  ADD CONSTRAINT Zone_BCZone_id FOREIGN KEY ("id") REFERENCES BLOCKCHAIN."Zone_BC" ("id");
 ALTER TABLE MASTER."Organization"
   ADD CONSTRAINT Organization_Account_accountID FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER."Account"

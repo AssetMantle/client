@@ -14,7 +14,7 @@ import scala.concurrent.ExecutionContext
 
 class PushNotifications @Inject()(wsClient: WSClient, notifications: Notifications, accounts: Accounts, accountTokens: AccountTokens, langs: Langs, messagesApi: MessagesApi)(implicit exec: ExecutionContext, configuration: Configuration) {
 
-  private implicit val module: String = constants.Module.NOTIFICATION
+  private implicit val module: String = constants.Module.CONTROLLERS_NOTIFICATION
 
   private val url = configuration.get[String]("notification.url")
 

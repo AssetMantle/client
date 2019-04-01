@@ -1,0 +1,20 @@
+@import helper._
+@import views.companion.master.VerifyZone
+
+@(verifyZoneForm: Form[VerifyZone.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@common(Messages(constants.Forms.VERIFY_ZONE)) {
+    @form(action = routes.AddZoneController.verifyZone) {
+        @CSRF.formField
+        @inputText(verifyZoneForm(constants.Forms.ID),'_label-> Messages(constants.Forms.ID))
+        @inputPassword(verifyZoneForm(constants.Forms.PASSWORD),'_label-> Messages(constants.Forms.PASSWORD))
+
+        @if(verifyZoneForm.hasGlobalErrors) {
+            <ul>
+            @for(error <- verifyZoneForm.globalErrors) {
+                <li>@error.format</li>
+            }
+            </ul>
+        }
+        <button type="submit">@Messages(constants.Forms.VERIFY_ZONE)</button>
+    }
+}

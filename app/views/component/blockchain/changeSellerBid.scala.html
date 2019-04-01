@@ -3,7 +3,7 @@
 
 @(changeSellerBidForm: Form[ChangeSellerBid.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @common(Messages(constants.Forms.CHANGE_SELLER_BID_TITLE)) {
-    @form(action = routes.ChangeSellerBidController.changeSellerBid) {
+    @form(action = routes.ChangeSellerBidController.blockchainChangeSellerBid) {
         @CSRF.formField
         @inputText(changeSellerBidForm(constants.Forms.FROM),'_label-> Messages(constants.Forms.FROM))
         @inputText(changeSellerBidForm(constants.Forms.TO),'_label-> Messages(constants.Forms.TO))

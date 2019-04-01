@@ -3,7 +3,7 @@
 
 @(addZoneForm: Form[AddZone.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @common(Messages(constants.Forms.ADD_ZONE_TITLE)) {
-    @form(action = routes.AddZoneController.addZone) {
+    @form(action = routes.AddZoneController.blockchainAddZone) {
         @CSRF.formField
         @inputText(addZoneForm(constants.Forms.FROM),'_label-> Messages(constants.Forms.FROM))
         @inputText(addZoneForm(constants.Forms.TO),'_label-> Messages(constants.Forms.TO))

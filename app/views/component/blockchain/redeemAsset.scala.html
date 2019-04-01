@@ -3,7 +3,7 @@
 
 @(redeemAssetForm: Form[RedeemAsset.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @common(Messages(constants.Forms.REDEEM_ASSET_TITLE)) {
-    @form(action = routes.RedeemAssetController.redeemAsset) {
+    @form(action = routes.RedeemAssetController.blockchainRedeemAsset) {
         @CSRF.formField
         @inputText(redeemAssetForm(constants.Forms.FROM),'_label-> Messages(constants.Forms.FROM))
         @inputText(redeemAssetForm(constants.Forms.TO),'_label-> Messages(constants.Forms.TO))
