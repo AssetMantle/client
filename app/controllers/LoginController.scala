@@ -29,7 +29,7 @@ class LoginController @Inject()(messagesControllerComponents: MessagesController
       loginData => {
         try {
           if (accounts.Service.validateLogin(loginData.username, loginData.password)) {
-            pushNotifications.registerNotificationToken(loginData.username, request.body.asFormUrlEncoded.get("token").headOption.get)
+            pushNotifications.registerNotificationToken(loginData.username, loginData.notificationToken)
             pushNotifications.sendNotification(loginData.username, constants.Notification.LOGIN)
             withUsernameToken.Ok(views.html.index(success = "Logged In!"), loginData.username)
           }

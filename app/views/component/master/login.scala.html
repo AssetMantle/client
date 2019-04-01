@@ -7,6 +7,7 @@
             @CSRF.formField
             @inputText(loginForm(constants.Forms.USERNAME),'_label-> Messages(constants.Forms.USERNAME))
             @inputPassword(loginForm(constants.Forms.PASSWORD),'_label-> Messages(constants.Forms.PASSWORD))
+            <div style="display:none">@inputText(loginForm(constants.Forms.NOTIFICATION_TOKEN),'id -> constants.Forms.NOTIFICATION_TOKEN, 'readonly -> true)</div>
 
             @if(loginForm.hasGlobalErrors) {
                 <ul>
@@ -15,7 +16,7 @@
                 }
                 </ul>
             }
-            <button id="submitToken" type="submit" name="token">@Messages(constants.Forms.LOGIN)</button>
+            <button type="submit">@Messages(constants.Forms.LOGIN)</button>
         }
         <script src="@routes.Assets.versioned("/javascripts/firebase.js")"></script>
         <script src="@routes.Assets.versioned("/javascripts/pushNotification.js")"></script>

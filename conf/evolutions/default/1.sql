@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Account_BC"
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN."ACLAccount_BC"
 (
   "address"        VARCHAR NOT NULL,
-  "zoneID" VARCHAR NOT NULL,
+  "zoneID"         VARCHAR NOT NULL,
   "organizationID" VARCHAR NOT NULL,
   "aclHash"        VARCHAR NOT NULL,
   PRIMARY KEY ("address")
@@ -472,11 +472,13 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."AccountToken"
 
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."Notification"
 (
-  "id"                  VARCHAR NOT NULL,
+  "accountID"           VARCHAR NOT NULL,
   "notificationTitle"   VARCHAR NOT NULL,
   "notificationMessage" VARCHAR NOT NULL,
   "time"                BIGINT  NOT NULL,
-  PRIMARY KEY ("id", "time")
+  "read"                BOOLEAN NOT NULL,
+  "id"                  VARCHAR NOT NULL UNIQUE,
+  PRIMARY KEY ("id")
 );
 
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."SMSOTP"
@@ -540,7 +542,7 @@ ALTER TABLE MASTER."OrgBankAccount"
 ALTER TABLE MASTER_TRANSACTION."AccountToken"
   ADD CONSTRAINT AccountToken_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER_TRANSACTION."Notification"
-  ADD CONSTRAINT Notification_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
+  ADD CONSTRAINT Notification_Account_id FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER_TRANSACTION."SMSOTP"
   ADD CONSTRAINT SMSOTP_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER_TRANSACTION."EmailOTP"

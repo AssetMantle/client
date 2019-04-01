@@ -30,7 +30,7 @@ class Contacts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   private def findById(id: String): Future[Contact] = db.run(contactTable.filter(_.id === id).result.head)
 
-  private def findEmailById(id: String)(implicit executionContext: ExecutionContext): Future[String] = db.run(contactTable.filter(_.id === id).result.head.asTry).map {
+  private def findEmailAddressById(id: String)(implicit executionContext: ExecutionContext): Future[String] = db.run(contactTable.filter(_.id === id).result.head.asTry).map {
     case Success(result) => result.emailAddress
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
@@ -80,9 +80,9 @@ class Contacts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
     def verifyEmailAddress(id: String): Int = Await.result(verifyEmailAddressOnId(id), Duration.Inf)
 
-    def getEmail(id: String)(implicit executionContext: ExecutionContext): String = Await.result(findEmailById(id), Duration.Inf)
+    def findEmailAddress(id: String)(implicit executionContext: ExecutionContext): String = Await.result(findEmailAddressById(id), Duration.Inf)
 
-    def getMobileNumber(id: String)(implicit executionContext: ExecutionContext): String = Await.result(findMobileNumberById(id), Duration.Inf)
+    def findMobileNumber(id: String)(implicit executionContext: ExecutionContext): String = Await.result(findMobileNumberById(id), Duration.Inf)
 
   }
 

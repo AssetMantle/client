@@ -9,10 +9,11 @@ object UpdateContact {
   val form = Form(
     mapping(
       "emailAddress" -> email,
-      "mobileNumber" -> nonEmptyText(minLength = 10, maxLength = 10)
+      "mobileNumber" -> nonEmptyText(minLength = 10, maxLength = 10),
+      "countryCode" -> nonEmptyText(minLength = 1, maxLength = 5)
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(emailAddress: String, mobileNumber: String)
+  case class Data(emailAddress: String, mobileNumber: String, countryCode: String)
 
 }

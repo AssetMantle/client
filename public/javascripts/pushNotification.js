@@ -1,17 +1,11 @@
 $(document).ready(function () {
-    const apiKey= getConfiguration("notification.apiKey");
-    const authDomain= getConfiguration("notification.authDomain");
-    const databaseURL= getConfiguration("notification.databaseURL");
-    const projectId= getConfiguration("notification.projectId");
-    const storageBucket= getConfiguration("notification.storageBucket");
-    const messagingSenderId = getConfiguration("notification.senderID")
     var config = {
-        apiKey: "AIzaSyA1N73fWM03Vb1CnEUF1YTbZUj16IxMvdg",
-        authDomain: "corp-play-scala.firebaseapp.com",
-        databaseURL: "https://corp-play-scala.firebaseio.com",
-        projectId: "corp-play-scala",
-        storageBucket: "corp-play-scala.appspot.com",
-        messagingSenderId: "829626980586"
+        apiKey: getConfiguration("notification.apiKey"),
+        authDomain: getConfiguration("notification.authDomain"),
+        databaseURL: getConfiguration("notification.databaseURL"),
+        projectId: getConfiguration("notification.projectId"),
+        storageBucket: getConfiguration("notification.storageBucket"),
+        messagingSenderId: getConfiguration("notification.senderID")
     };
     firebase.initializeApp(config);
     const messaging = firebase.messaging();
@@ -21,8 +15,7 @@ $(document).ready(function () {
             return messaging.getToken()
         })
         .then(function (token) {
-            document.getElementById('submitToken').value = token
-            console.log(token)
+            document.getElementById('notificationToken').value = token
         })
 
         .catch(function (err) {
@@ -33,15 +26,17 @@ $(document).ready(function () {
     });
     function getConfiguration(configuration) {
         var route = jsRoutes.controllers.ConfigurationController.queryConfigurationVariable(configuration);
-
+        var response = null;
         $.ajax({
             url: route.url,
             type: route.type,
+            async: false,
             statusCode: {
                 200: function (result) {
-                    return result;
+                    response= result;
                 }
             }
         });
+        return response;
     }
 });

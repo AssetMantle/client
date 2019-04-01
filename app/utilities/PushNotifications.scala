@@ -17,11 +17,11 @@ class PushNotifications @Inject()(wsClient: WSClient, notifications: Notificatio
 
   private val authorizationKey = configuration.get[String]("notification.authorizationKey")
 
-  def sendNotification(id: String, messageType: String, passedData: Seq[String] = Seq(""))(implicit lang: Lang = Lang(accounts.Service.getLanguage(id))) = {
+  def sendNotification(accountID: String, messageType: String, passedData: Seq[String] = Seq(""))(implicit lang: Lang = Lang(accounts.Service.getLanguage(accountID))) = {
     Thread.sleep(3000)
-    notifications.Service.addNotification(id, messagesApi("NotificationTitle" + "." + messageType), messagesApi("NotificationMessage" + "." + messageType, passedData(0)), DateTime.now(DateTimeZone.UTC).getMillis())
+    notifications.Service.addNotification(accountID, messagesApi("NotificationTitle" + "." + messageType), messagesApi("NotificationMessage" + "." + messageType, passedData(0)), DateTime.now(DateTimeZone.UTC).getMillis())
     wsClient.url(url).withHttpHeaders(constants.Header.CONTENT_TYPE -> constants.Header.APPLICATION_JSON).withHttpHeaders(constants.Header.AUTHORIZATION -> authorizationKey)
-      .post(Json.toJson(Data(accountTokens.Service.getTokenById(id), Notification(messagesApi("NotificationTitle" + "." + messageType), messagesApi("NotificationMessage" + "." + messageType, passedData(0))))))
+      .post(Json.toJson(Data(accountTokens.Service.getTokenById(accountID), Notification(messagesApi("NotificationTitle" + "." + messageType), messagesApi("NotificationMessage" + "." + messageType, passedData(0))))))
   }
 
   private implicit val notificationWrites: OWrites[Notification] = Json.writes[Notification]

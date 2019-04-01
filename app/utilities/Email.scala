@@ -12,11 +12,11 @@ class Email @Inject()(mailerClient: MailerClient, contacts: Contacts, accounts: 
 
   private val fromAddress = configuration.get[String]("play.mailer.user")
 
-  def sendEmail(id: String, messageType: String, passedData: Seq[String] = Seq(""))(implicit lang: Lang = Lang(accounts.Service.getLanguage(id))) {
+  def sendEmail(accountID: String, messageType: String, passedData: Seq[String] = Seq(""))(implicit lang: Lang = Lang(accounts.Service.getLanguage(accountID))) {
     val email = Email(
       subject = messagesApi("EmailSubject" + "." + messageType),
       from = fromAddress,
-      to = Seq(contacts.Service.getEmail(id)),
+      to = Seq(contacts.Service.findEmailAddress(accountID)),
       attachments = Seq(),
       bodyText = Some(messagesApi("EmailMessage" + "." + messageType, passedData(0))),
     )

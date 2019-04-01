@@ -9,9 +9,9 @@ import slick.jdbc.JdbcProfile
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
-import scala.util.{Failure, Success}
+import scala.util.{Failure, Random, Success}
 
-case class Notification(id: String, notificationTitle: String, notificationMessage: String, time: Long)
+case class Notification(accountID: String, notificationTitle: String, notificationMessage: String, time: Long, read: Boolean, id: String)
 
 class Notifications @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider) {
 
@@ -27,7 +27,7 @@ class Notifications @Inject()(protected val databaseConfigProvider: DatabaseConf
 
   private[models] val notificationTable = TableQuery[NotificationTable]
 
-  private def add(notification: Notification)(implicit executionContext: ExecutionContext): Future[String] = db.run((notificationTable returning notificationTable.map(_.id) += notification).asTry).map {
+  private def add(notification: Notification)(implicit executionContext: ExecutionContext): Future[String] = db.run((notificationTable returning notificationTable.map(_.accountID) += notification).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
@@ -35,49 +35,45 @@ class Notifications @Inject()(protected val databaseConfigProvider: DatabaseConf
     }
   }
 
-  private def findById(id: String)(implicit executionContext: ExecutionContext): Future[Notification] = db.run(notificationTable.filter(_.id === id).result.head.asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
-        throw new BaseException(constants.Error.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
+  private def findNotificationsByAccountId(accountID: String, offset: Int, limit: Int)(implicit executionContext: ExecutionContext): Future[Seq[models.masterTransaction.Notification]] = db.run(notificationTable.filter(_.accountID === accountID).sortBy(_.time.desc).drop(offset).take(limit).result)
 
-  private def findTimeById(id: String)(implicit executionContext: ExecutionContext): Future[Long] = db.run(notificationTable.filter(_.id === id).result.head.asTry).map {
-    case Success(result) => result.time
-    case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
-        throw new BaseException(constants.Error.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
+  private def findNumberOfUnreadByAccountId(accountID: String)(implicit executionContext: ExecutionContext): Future[Int] = db.run(notificationTable.filter(_.accountID === accountID).filter( _.read === false).length.result)
 
-  private def checkById(id: String): Future[Boolean] = db.run(notificationTable.filter(_.id === id).exists.result)
+  private def markReadById(id: String): Future[Int] = db.run(notificationTable.filter(_.id === id).map(_.read).update(true))
 
-  private def deleteById(id: String) = db.run(notificationTable.filter(_.id === id).delete)
+  private def checkById(accountID: String): Future[Boolean] = db.run(notificationTable.filter(_.accountID === accountID).exists.result)
+
+  private def deleteById(accountID: String) = db.run(notificationTable.filter(_.accountID === accountID).delete)
 
   private[models] class NotificationTable(tag: Tag) extends Table[Notification](tag, "Notification") {
 
-    def * = (id, notificationTitle, notificationMessage, time) <> (Notification.tupled, Notification.unapply)
+    def * = (accountID, notificationTitle, notificationMessage, time, read, id) <> (Notification.tupled, Notification.unapply)
 
-    def id = column[String]("id", O.PrimaryKey)
+    def accountID = column[String]("accountID")
 
     def notificationTitle = column[String]("notificationTitle")
 
     def notificationMessage = column[String]("notificationMessage")
 
-    def time = column[Long]("time", O.PrimaryKey)
+    def read = column[Boolean]("read")
+
+    def time = column[Long]("time")
+
+    def id = column[String]("id", O.PrimaryKey)
 
   }
 
   object Service {
 
-    def addNotification(id: String, notificationTitle: String, notificationMessage: String, time: Long)(implicit executionContext: ExecutionContext)= {
-      Await.result(add(Notification(id, notificationTitle, notificationMessage, time)), Duration.Inf)
+    def addNotification(accountID: String, notificationTitle: String, notificationMessage: String, time: Long)(implicit executionContext: ExecutionContext): String= {
+      Await.result(add(Notification(accountID, notificationTitle, notificationMessage, time, false, Random.nextString(32))), Duration.Inf)
     }
 
-    def getNotification(username: String)(implicit executionContext: ExecutionContext) = Await.result(findById(username), Duration.Inf)
+    def getNotifications(accountID: String, offset: Int, limit: Int)(implicit executionContext: ExecutionContext) = Await.result(findNotificationsByAccountId(accountID, offset, limit), Duration.Inf)
 
-    def getTimeById(id: String)(implicit executionContext: ExecutionContext) = Await.result(findTimeById(id), Duration.Inf)
+    def markAsRead(id: String): Int = Await.result(markReadById(id), Duration.Inf)
+
+    def getNumberOfUnread(accountID: String)(implicit executionContext: ExecutionContext): Int = Await.result(findNumberOfUnreadByAccountId(accountID), Duration.Inf)
 
   }
 
