@@ -15,7 +15,9 @@ $(document).ready(function () {
             return messaging.getToken()
         })
         .then(function (token) {
-            document.getElementById('notificationToken').value = token
+            if($("#" + "notificationToken").length !=0) {
+                document.getElementById('notificationToken').value = token
+            }
         })
 
         .catch(function (err) {
@@ -23,6 +25,17 @@ $(document).ready(function () {
         });
     messaging.onMessage(function (payload) {
         console.log("Message received. ", payload);
+        if($("#" + "notificationBox").length !=0) {
+            var newNotification = document.createElement('div');
+            newNotification.append(document.createElement("BR"));
+            newNotification.innerHTML = JSON.parse(JSON.stringify(payload)).notification.title+"+"+JSON.parse(JSON.stringify(payload)).notification.body;
+            newNotification.append(document.createElement("BR"));
+            newNotification.style.backgroundColor="#8bc812";
+            newNotification.setAttribute("onclick","location.reload()");
+            document.getElementById("notificationBox").insertBefore(newNotification,document.getElementById("notificationBox").firstElementChild);
+            $('#notificationBox').children().last().remove();
+            $('#noti_Counter').text("!!");
+        }
     });
     function getConfiguration(configuration) {
         var route = jsRoutes.controllers.ConfigurationController.queryConfigurationVariable(configuration);

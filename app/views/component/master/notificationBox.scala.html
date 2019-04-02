@@ -32,21 +32,21 @@
                     <div id="notifications">
                         <div id = "unread" style="display: none" data-value = @unread.toString()></div>
                         <h3>Notifications</h3>
-                        <div style="height:300px;">
+                        <div id="notificationBox" style="height:300px;">
                             @for(i <- 0 to (notificatonList.length - 1)) {
                                 @if(notificatonList(i).read){
-                                    <div class="element">
+                                    <div id=@i class="element">
                                         <div onclick="submitRequest(@pageNumber, '@notificatonList(i).id')" >
                                         </br>
-                                            @notificatonList(i).accountID + @notificatonList(i).notificationTitle + @notificatonList(i).notificationMessage + @notificatonList(i).time
+                                            @notificatonList(i).notificationTitle + @notificatonList(i).notificationMessage
                                         </br>
                                         </div>
                                     </div>
                                 }else{
-                                    <div class="element" style="background-color:#80c846" >
+                                    <div id=@i class="element" style="background-color:#80c846" >
                                         <div onclick="submitRequest(@pageNumber,'@notificatonList(i).id')">
                                             </br>
-                                            @notificatonList(i).accountID + @notificatonList(i).notificationTitle + @notificatonList(i).notificationMessage + @notificatonList(i).time
+                                            @notificatonList(i).notificationTitle + @notificatonList(i).notificationMessage
                                             </br>
                                         </div>
                                     </div>
@@ -71,6 +71,8 @@
         document.getElementById("button").click();
     }
 </script>
-<script src="@routes.Assets.versioned("javascripts/jQuery.min.js")" type="text/javascript"></script>
+    <script src="@routes.Assets.versioned("/javascripts/firebase.js")"></script>
+    <script src="@routes.Assets.versioned("/javascripts/pushNotification.js")"></script>
+    <script src="@routes.Assets.versioned("javascripts/jQuery.min.js")" type="text/javascript"></script>
 <script src="@routes.Assets.versioned("javascripts/notificationBox.js")" type="text/javascript"></script>
 }

@@ -8,9 +8,9 @@ import org.joda.time.{DateTime, DateTimeZone}
 import play.api.Configuration
 import play.api.i18n.{Lang, Langs, MessagesApi}
 import play.api.libs.json.{Json, OWrites}
-import play.api.libs.ws.WSClient
+import play.api.libs.ws.{WSClient, WSResponse}
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 class PushNotifications @Inject()(wsClient: WSClient, notifications: Notifications, accounts: Accounts, accountTokens: AccountTokens, langs: Langs, messagesApi: MessagesApi)(implicit exec: ExecutionContext, configuration: Configuration) {
 
@@ -20,7 +20,7 @@ class PushNotifications @Inject()(wsClient: WSClient, notifications: Notificatio
 
   private val authorizationKey = configuration.get[String]("notification.authorizationKey")
 
-  def sendNotification(accountID: String, messageType: String, passedData: Seq[String] = Seq(""))(implicit lang: Lang = Lang(accounts.Service.getLanguage(accountID))) = {
+  def sendNotification(accountID: String, messageType: String, passedData: Seq[String] = Seq(""))(implicit lang: Lang = Lang(accounts.Service.getLanguage(accountID))): Future[WSResponse] = {
     try{
       Thread.sleep(3000)
       notifications.Service.addNotification(accountID, messagesApi(module + "Title" + "." + messageType), messagesApi(module + "Message" + "." + messageType, passedData(0)), DateTime.now(DateTimeZone.UTC).getMillis())
