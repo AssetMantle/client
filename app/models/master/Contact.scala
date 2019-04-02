@@ -1,27 +1,50 @@
 package models.master
 
 
+import exceptions.BaseException
 import javax.inject.Inject
+import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.JdbcProfile
 
 import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, Future}
+import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.util.{Failure, Success}
 
 case class Contact(id: String, mobileNumber: String, mobileNumberVerified: Boolean, emailAddress: String, emailAddressVerified: Boolean)
 
 class Contacts @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider) {
+
+  private implicit val module: String = constants.Module.MASTER_ACCOUNT
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
   val db = databaseConfig.db
 
   import databaseConfig.profile.api._
 
+  private val logger: Logger = Logger(this.getClass)
+
   private[models] val contactTable = TableQuery[ContactTable]
 
   private def add(contact: Contact): Future[String] = db.run(contactTable returning contactTable.map(_.id) += contact)
 
   private def findById(id: String): Future[Contact] = db.run(contactTable.filter(_.id === id).result.head)
+
+  private def findEmailAddressById(id: String)(implicit executionContext: ExecutionContext): Future[String] = db.run(contactTable.filter(_.id === id).result.head.asTry).map {
+    case Success(result) => result.emailAddress
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+        throw new BaseException(constants.Error.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def findMobileNumberById(id: String)(implicit executionContext: ExecutionContext): Future[String] = db.run(contactTable.filter(_.id === id).result.head.asTry).map {
+    case Success(result) => result.mobileNumber
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+        throw new BaseException(constants.Error.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
 
   private def deleteById(id: String) = db.run(contactTable.filter(_.id === id).delete)
 
@@ -56,6 +79,11 @@ class Contacts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     def verifyMobileNumber(id: String): Int = Await.result(verifyMobileNumberOnId(id), Duration.Inf)
 
     def verifyEmailAddress(id: String): Int = Await.result(verifyEmailAddressOnId(id), Duration.Inf)
+
+    def findEmailAddress(id: String)(implicit executionContext: ExecutionContext): String = Await.result(findEmailAddressById(id), Duration.Inf)
+
+    def findMobileNumber(id: String)(implicit executionContext: ExecutionContext): String = Await.result(findMobileNumberById(id), Duration.Inf)
+
   }
 
 }

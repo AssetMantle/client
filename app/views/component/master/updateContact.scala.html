@@ -1,13 +1,14 @@
 @import helper._
 @import views.companion.master.UpdateContact
 
-@(updateContactForm: Form[UpdateContact.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+
+@(updateContactForm: Form[UpdateContact.Data], countryCallingCodes: Seq[(String,String)])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
     @common(Messages(constants.Forms.UPDATE_CONTACT)) {
         @form(action = routes.UpdateContactController.updateContact) {
             @CSRF.formField
             @inputText(updateContactForm(constants.Forms.MOBILE_NUMBER),'_label-> Messages(constants.Forms.MOBILE_NUMBER))
             @inputText(updateContactForm(constants.Forms.EMAIL_ADDRESS),'_label-> Messages(constants.Forms.EMAIL_ADDRESS))
-
+            @select(updateContactForm(constants.Forms.COUNTRY_CODE),options = countryCallingCodes,'_label-> Messages(constants.Forms.COUNTRY_CODE))
             @if(updateContactForm.hasGlobalErrors) {
                 <ul>
                 @for(error <- updateContactForm.globalErrors) {

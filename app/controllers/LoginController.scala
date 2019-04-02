@@ -4,7 +4,7 @@ import controllers.results.WithUsernameToken
 import exceptions.{BaseException, BlockChainException}
 import javax.inject.Inject
 import models.blockchain
-import models.blockchain.{ACLAccounts, ACLHash, Asset, Fiat}
+import models.blockchain.ACLAccounts
 import models.master.{Accounts, Organizations, Zones}
 import play.api.Configuration
 import play.api.i18n.{I18nSupport, Messages}

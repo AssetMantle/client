@@ -66,9 +66,13 @@ changeBuyerBid=changeBuyerBid
 changeSellerBid=changeSellerBid
 confirmBuyerBid=confirmBuyerBid
 
-NotificationMessage.Login= You are Logged In. {0}
-NotificationTitle.Login= Login
-NotificationMessage.OTP= Your OTP is {0}
-NotificationTitle.OTP= Verify OTP
-NotificationTitle.Success = Successful Transaction
-NotificationMessage.Success = Transaction with hash {0} is done.
+CONTROLLERS_NOTIFICATIONMessage.Login= You are Logged In. {0}
+CONTROLLERS_NOTIFICATIONTitle.Login= Login
+CONTROLLERS_NOTIFICATIONMessage.OTP= Your OTP is {0}
+CONTROLLERS_NOTIFICATIONTitle.OTP= Verify OTP
+
+CONTROLLERS_EMAILMessage.OTP= Your OTP is {0}
+CONTROLLERS_EMAILSubject.OTP= Verify OTP
+
+CONTROLLERS_SMSMessage.OTP= Your OTP is {0}
+CONTROLLERS_SMSSubject.OTP= Verify OTP

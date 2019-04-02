@@ -9,6 +9,9 @@ GET         /notificationImage.png                          controllers.Assets.a
 
 GET         /javascriptRoutes                               controllers.JavaScriptRoutesController.javascriptRoutes
 
+GET         /master/notifications                          controllers.NotificationController.showNotificationsForm
+POST         /master/notifications                          controllers.NotificationController.showNotifications
+
 GET         /master/queryConfigurationVariable:query        controllers.ConfigurationController.queryConfigurationVariable(query: String)
 
 GET         /master/checkUsernameAvailable                  controllers.SignUpController.checkUsernameAvailable(username: String)
