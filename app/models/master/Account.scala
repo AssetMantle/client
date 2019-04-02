@@ -11,7 +11,7 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Account(id: String, secretHash: String, accountAddress: String, language: String, userType: Option[String])
+case class Account(id: String, secretHash: String, accountAddress: String, language: String, userType: String)
 
 class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider) {
 
@@ -65,8 +65,8 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     }
   }
 
-  private def getUserTypeById(id: String)(implicit executionContext: ExecutionContext): Future[Option[String]] = db.run(accountTable.filter(_.id === id).map(_.userType).result.head.asTry).map {
-    case Success(result) => Option(result)
+  private def getUserTypeById(id: String)(implicit executionContext: ExecutionContext): Future[String] = db.run(accountTable.filter(_.id === id).map(_.userType).result.head.asTry).map {
+    case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
         throw new BaseException(constants.Error.PSQL_EXCEPTION)
@@ -74,6 +74,17 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
         throw new BaseException(constants.Error.NO_SUCH_ELEMENT_EXCEPTION)
     }
   }
+
+  private def getUserTypeByAddress(address: String)(implicit executionContext: ExecutionContext): Future[String] = db.run(accountTable.filter(_.accountAddress === address).map(_.userType).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+        throw new BaseException(constants.Error.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+        throw new BaseException(constants.Error.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
 
   private def getIdByAddress(accountAddress: String)(implicit executionContext: ExecutionContext): Future[String] = db.run(accountTable.filter(_.accountAddress === accountAddress).result.head.asTry).map {
     case Success(result) => result.id
@@ -85,7 +96,17 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     }
   }
 
-  private def updateUserTypeById(id: String, userType: Option[String])(implicit executionContext: ExecutionContext):Future[Int] = db.run(accountTable.filter(_.id === id).map(_.userType.?).update(userType).asTry).map {
+  private def updateUserTypeById(id: String, userType: String)(implicit executionContext: ExecutionContext):Future[Int] = db.run(accountTable.filter(_.id === id).map(_.userType).update(userType).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+        throw new BaseException(constants.Error.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+        throw new BaseException(constants.Error.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def updateUserTypeByAddress(address: String, userType: String)(implicit executionContext: ExecutionContext):Future[Int] = db.run(accountTable.filter(_.accountAddress === address).map(_.userType).update(userType).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
@@ -109,7 +130,7 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   private[models] class AccountTable(tag: Tag) extends Table[Account](tag, "Account") {
 
-    def * = (id, secretHash, accountAddress, language, userType.?) <> (Account.tupled, Account.unapply)
+    def * = (id, secretHash, accountAddress, language, userType) <> (Account.tupled, Account.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
@@ -132,7 +153,7 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     }
 
     def addLogin(username: String, password: String, accountAddress: String, language: String)(implicit executionContext: ExecutionContext): String = {
-      Await.result(add(Account(username, util.hashing.MurmurHash3.stringHash(password).toString, accountAddress, language, null)), Duration.Inf)
+      Await.result(add(Account(username, util.hashing.MurmurHash3.stringHash(password).toString, accountAddress, language, constants.User.WITHOUT_LOGIN)), Duration.Inf)
       accountAddress
     }
 
@@ -144,9 +165,13 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
     def getAddress(id: String)(implicit executionContext: ExecutionContext):String = Await.result(getAddressById(id), Duration.Inf)
 
-    def updateUserType(id: String, userType: String)(implicit executionContext: ExecutionContext):Int = Await.result(updateUserTypeById(id, Option(userType)), Duration.Inf)
+    def updateUserType(id: String, userType: String)(implicit executionContext: ExecutionContext): Int = Await.result(updateUserTypeById(id, userType), Duration.Inf)
 
-    def getUserType(id: String)(implicit executionContext: ExecutionContext):Option[String] = Await.result(getUserTypeById(id), Duration.Inf)
+    def updateUserTypeOnAddress(address: String, userType: String)(implicit executionContext: ExecutionContext): Int = Await.result(updateUserTypeByAddress(address, userType), Duration.Inf)
+
+    def getUserType(id: String)(implicit executionContext: ExecutionContext):String = Await.result(getUserTypeById(id), Duration.Inf)
+
+    def getUserTypeOnAddress(address: String)(implicit executionContext: ExecutionContext):String = Await.result(getUserTypeByAddress(address), Duration.Inf)
   }
 
 }

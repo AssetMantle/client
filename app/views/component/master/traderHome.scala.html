@@ -1,30 +1,77 @@
-@import models.master.Zone
-@import models.master.Organization
-@import transactions.Response.AccountResponse.{Asset, Fiat}
+@import models.blockchain.{ACLHash, Asset, Fiat}
+@import models.master.{Organization, Zone}
 
-@(zone: Zone, organization: Organization, assetPegWallet: Option[Seq[Asset]], fiatPegWallet: Option[Seq[Fiat]])
+@(username: String, userType: String, address: String, coins: Int = 0, assetPegWallet: Seq[Asset], fiatPegWallet: Seq[Fiat], totalFiat: Int, zone: Zone, organization: Organization, aclHash: ACLHash)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
 
-<h2>Zone:</h2>
-Name: @zone.name <br>
-    ZoneID: @zone.id <br>
-    Currency: @zone.currency <br>
-    Verified Status: @zone.status <br>
-<br>
+    @common(Messages(constants.User.HOME)) {
+        @if(aclHash.buyerExecuteOrder) {
+            <a href="@routes.BuyerExecuteOrderController.buyerExecuteOrderForm()">@Messages(constants.Forms.BUYER_EXECUTE_ORDER_TITLE)</a>
+        }
+        @if(aclHash.changeBuyerBid) {
+            <a href="@routes.ChangeBuyerBidController.changeBuyerBidForm">@Messages(constants.Forms.CHANGE_BUYER_BID_TITLE)</a>
+        }
+        @if(aclHash.changeSellerBid) {
+            <a href="@routes.ChangeSellerBidController.changeSellerBidForm">@Messages(constants.Forms.CHANGE_SELLER_BID_TITLE)</a>
+        }
+        @if(aclHash.confirmBuyerBid) {
+            <a href="@routes.ConfirmBuyerBidController.confirmBuyerBidForm">@Messages(constants.Forms.CONFIRM_BUYER_BID_TITLE)</a>
+        }
+        @if(aclHash.confirmSellerBid) {
+            <a href="@routes.ConfirmSellerBidController.confirmSellerBidForm">@Messages(constants.Forms.CONFIRM_SELLER_BID_TITLE)</a>
+        }
+        @if(aclHash.issueAssets) {
+            <a href="@routes.IssueAssetController.issueAssetForm">@Messages(constants.Forms.ISSUE_ASSET_TITLE)</a>
+        }
+        @if(aclHash.issueFiats) {
+            <a href="@routes.IssueFiatController.issueFiatForm">@Messages(constants.Forms.ISSUE_FIAT_TITLE)</a>
+        }
+        @if(aclHash.redeemAssets) {
+            <a href="@routes.RedeemAssetController.redeemAssetForm">@Messages(constants.Forms.REDEEM_ASSET_TITLE)</a>
+        }
+        @if(aclHash.redeemFiats) {
+            <a href="@routes.RedeemFiatController.redeemFiatForm">@Messages(constants.Forms.REDEEM_FIAT_TITLE)</a>
+        }
+        @if(aclHash.releaseAssets) {
+            <a href="@routes.ReleaseAssetController.releaseAssetForm">@Messages(constants.Forms.RELEASE_ASSET_TITLE)</a>
+        }
+        @if(aclHash.sellerExecuteOrder) {
+            <a href="@routes.SellerExecuteOrderController.sellerExecuteOrderForm()">@Messages(constants.Forms.SELLER_EXECUTE_ORDER_TITLE)</a>
+        }
+        @if(aclHash.sendAssets) {
+            <a href="@routes.SendAssetController.sendAssetForm">@Messages(constants.Forms.SEND_ASSET_TITLE)</a>
+        }
+        @if(aclHash.sendFiats) {
+            <a href="@routes.SendFiatController.sendFiatForm">@Messages(constants.Forms.SEND_FIAT_TITLE)</a>
+        }
 
-<h2>Organization:</h2>
-    Organization Name: @organization.name <br>
-    OrganizationID: @organization.id <br>
-    Organization Username: @organization.accountID <br>
-    Address: @organization.address <br>
-    Phone: @organization.phone <br>
-    Email: @organization.email <br>
-    Verified Status: @organization.status <br>
-<br>
+        <a href="@routes.SetBuyerFeedbackController.setBuyerFeedbackForm">@Messages(constants.Forms.SET_BUYER_FEEDBACK_TITLE)</a>
+        <a href="@routes.SetSellerFeedbackController.setSellerFeedbackForm">@Messages(constants.Forms.SET_SELLER_FEEDBACK_TITLE)</a>
 
-<h2>Assets You Own: </h2>
-@component.master.assetsTable(assetPegWallet)
+        @component.master.commonHome(username = username, userType = userType, address = address, coins = coins)
 
-<h2>Your Fiats:</h2>
-@component.master.fiatsTable(fiatPegWallet)
+        <h2>@Messages(constants.User.ZONE):</h2>
+        @Messages(constants.User.NAME): @zone.name <br>
+        @Messages(constants.User.ZONE_ID): @zone.id <br>
+        @Messages(constants.User.CURRENCY): @zone.currency <br>
+        @Messages(constants.User.VERIFIED_STATUS): @zone.status <br>
+        <br>
 
-<br>
+        <h2>>@Messages(constants.User.ORGANIZATION):</h2>
+        @Messages(constants.User.ORGANIZATION_NAME): @organization.name <br>
+        @Messages(constants.User.ORGANIZATION_ID): @organization.id <br>
+        @Messages(constants.User.ORGANIZATION_USERNAME): @organization.accountID <br>
+        @Messages(constants.User.ADDRESS): @organization.address <br>
+        @Messages(constants.User.PHONE): @organization.phone <br>
+        @Messages(constants.User.EMAIL): @organization.email <br>
+        @Messages(constants.User.VERIFIED_STATUS): @organization.status <br>
+        <br>L
+
+        <h2>@Messages(constants.User.ASSETS_OWNED) </h2>
+        @component.master.assetsTable(assetPegWallet)
+
+        <h2>@Messages(constants.User.FIATS_OWNED) </h2>
+        @Messages(constants.User.FIATS_TOTAL_VALUE): @totalFiat <br>
+        @component.master.fiatsTable(fiatPegWallet)
+
+        <br>
+    }

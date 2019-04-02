@@ -1,18 +1,18 @@
-@import transactions.Response.AccountResponse.Asset
+@import models.blockchain.Asset
 
-@(assetPegWallet: Option[Seq[Asset]])
+@(assetPegWallet: Seq[Asset])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
 
 <table id="assetPegWallet">
     <tr>
-        <th>PegHash</th>
-        <th>Document Hash</th>
-        <th>Asset Type</th>
-        <th>Asset Quantity</th>
-        <th>Asset Price</th>
-        <th>Quantity Unit</th>
-        <th>Locked</th>
+        <th>>@Messages(constants.User.PEGHASH)</th>
+        <th>@Messages(constants.User.DOCUMENT_HASH)</th>
+        <th>@Messages(constants.User.ASSET_TYPE)</th>
+        <th>@Messages(constants.User.ASSET_QUANTITY)</th>
+        <th>@Messages(constants.User.ASSET_UNIT)</th>
+        <th>@Messages(constants.User.QUANTITY_UNIT)</th>
+        <th>@Messages(constants.User.LOCKED)</th>
     </tr>
-    @for(asset <- assetPegWallet.getOrElse(Seq(Asset("", "", "", "", "", "", "", false)))) {
+    @for(asset <- assetPegWallet) {
         <tr>
             <td>@asset.pegHash</td>
             <td>@asset.documentHash</td>

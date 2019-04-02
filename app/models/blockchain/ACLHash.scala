@@ -94,7 +94,7 @@ class ACLHashes @Inject()(protected val databaseConfigProvider: DatabaseConfigPr
   object Service {
     def addACLHash(acl: ACL)(implicit executionContext: ExecutionContext): String = Await.result(add(ACLHash(acl.issueAssets, acl.issueFiats, acl.sendAssets, acl.sendFiats, acl.redeemAssets, acl.redeemFiats, acl.sellerExecuteOrder, acl.buyerExecuteOrder, acl.changeBuyerBid, acl.changeSellerBid, acl.confirmBuyerBid, acl.confirmSellerBid, acl.negotiation, acl.releaseAssets, util.hashing.MurmurHash3.stringHash(acl.toString).toString)), Duration.Inf)
 
-    def getACL(hash: String)(implicit executionContext: ExecutionContext): ACLHash = Await.result(findByHash(hash), Duration.Inf)
+    def getACLHash(hash: String)(implicit executionContext: ExecutionContext): ACLHash = Await.result(findByHash(hash), Duration.Inf)
 
   }
 }

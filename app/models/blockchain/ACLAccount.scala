@@ -47,6 +47,8 @@ class ACLAccounts @Inject()(protected val databaseConfigProvider: DatabaseConfig
     }
   }
 
+  private def addOrUpdate(aclAccount: ACLAccount)(implicit executionContext: ExecutionContext): Future[Int] = db.run(aclTable.insertOrUpdate(aclAccount))
+
   private def deleteByAddress(address: String)(implicit executionContext: ExecutionContext) = db.run(aclTable.filter(_.address === address).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -73,6 +75,8 @@ class ACLAccounts @Inject()(protected val databaseConfigProvider: DatabaseConfig
   object Service {
 
     def addACLAccount(from: String, address: String, zoneID: String, organizationID: String, acl: ACL)(implicit executionContext: ExecutionContext): String = Await.result(add(ACLAccount(address, zoneID, organizationID, util.hashing.MurmurHash3.stringHash(acl.toString).toString)), Duration.Inf)
+
+    def addOrUpdateACLAccount(from: String, address: String, zoneID: String, organizationID: String, acl: ACL)(implicit executionContext: ExecutionContext) = Await.result(addOrUpdate(ACLAccount(address, zoneID, organizationID, util.hashing.MurmurHash3.stringHash(acl.toString).toString)), Duration.Inf)
 
     def getACLAccount(address: String)(implicit executionContext: ExecutionContext): ACLAccount = Await.result(findByAddress(address), Duration.Inf)
 

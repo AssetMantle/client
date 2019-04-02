@@ -28,7 +28,11 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
       },
       addZoneData => {
         try {
-          Ok(views.html.index(success = masterZones.Service.addZone(secretHash = util.hashing.MurmurHash3.stringHash(addZoneData.password).toString, name = addZoneData.name, currency = addZoneData.currency)))
+          if (masterAccounts.Service.getUserType(request.session.get(constants.Security.USERNAME).get) == constants.User.UNKNOWN) {
+            Ok(views.html.index(success = masterZones.Service.addZone(accountID = request.session.get(constants.Security.USERNAME).get, name = addZoneData.name, currency = addZoneData.currency)))
+          } else {
+            Ok(views.html.index(failure = Messages(constants.User.UNAUTHORIZED_TRANSACTION)))
+          }
         }
         catch {
           case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))
@@ -53,10 +57,11 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
             val response = transactionAddZone.Service.kafkaPost(transactionAddZone.Request(from = request.session.get(constants.Security.USERNAME).get, to = masterAccounts.Service.getAccount(masterZones.Service.getZone(verifyZoneData.id).name).accountAddress, zoneID = verifyZoneData.id, password =  verifyZoneData.password))
             Ok(views.html.index(success = Messages(module + "." + constants.Success.VERIFY_ZONE) + verifyZoneData.id + response.ticketID))
           } else {
-            val accountAddress = masterAccounts.Service.getAccount(masterZones.Service.getZone(verifyZoneData.id).name).accountAddress
-            val response = transactionAddZone.Service.post(transactionAddZone.Request(from = request.session.get(constants.Security.USERNAME).get, to = accountAddress, zoneID = verifyZoneData.id, password =  verifyZoneData.password))
-            blockchainZones.Service.addZone(request.session.get(constants.Security.USERNAME).get, accountAddress)
-            masterAccounts.Service.updateUserType(request.session.get(constants.Security.USERNAME).get, constants.User.ZONE)
+            val zoneAccountID = masterZones.Service.getAccountId(verifyZoneData.id)
+            val zoneAccountAddress = masterAccounts.Service.getAddress(zoneAccountID)
+            val response = transactionAddZone.Service.post(transactionAddZone.Request(from = request.session.get(constants.Security.USERNAME).get, to = zoneAccountAddress, zoneID = verifyZoneData.id, password =  verifyZoneData.password))
+            blockchainZones.Service.addZone(verifyZoneData.id, zoneAccountAddress)
+            masterAccounts.Service.updateUserType(zoneAccountID, constants.User.ZONE)
             Ok(views.html.index(success = Messages(module + "." + constants.Success.VERIFY_ZONE) + verifyZoneData.id + response.TxHash))
           }
         }

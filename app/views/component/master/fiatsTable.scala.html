@@ -1,15 +1,15 @@
-@import transactions.Response.AccountResponse.Fiat
+@import models.blockchain.Fiat
 
-@(fiatPegWallet: Option[Seq[Fiat]])
+@(fiatPegWallet: Seq[Fiat])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
 
 <table id="fiatPegWallet">
     <tr>
-        <th>PegHash</th>
-        <th>TransactionID</th>
-        <th>Transaction Amount</th>
-        <th>Redeemed Amount</th>
+        <th>@Messages(constants.User.PEGHASH)</th>
+        <th>@Messages(constants.User.TRANSACTION_ID)</th>
+        <th>@Messages(constants.User.TRANSACTION_AMOUNT)</th>
+        <th>@Messages(constants.User.REDEEMED_AMOUNT)</th>
     </tr>
-    @for(fiat <- fiatPegWallet.getOrElse(Seq(transactions.Response.AccountResponse.Fiat("", "", "", "")))) {
+    @for(fiat <- fiatPegWallet) {
         <tr>
             <td>@fiat.pegHash</td>
             <td>@fiat.transactionID</td>

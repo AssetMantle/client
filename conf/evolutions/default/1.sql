@@ -381,7 +381,7 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."SetSellerFeedback"
 CREATE TABLE IF NOT EXISTS MASTER."Zone"
 (
   "id"         VARCHAR NOT NULL,
-  "secretHash" VARCHAR NOT NULL,
+  "accountID"  VARCHAR NOT NULL,
   "name"       VARCHAR NOT NULL,
   "currency"   VARCHAR NOT NULL,
   "status"     BOOLEAN,
@@ -406,7 +406,7 @@ CREATE TABLE IF NOT EXISTS MASTER."Account"
   "secretHash"     VARCHAR NOT NULL,
   "accountAddress" VARCHAR NOT NULL,
   "language"       VARCHAR NOT NULL,
-  "userType"       VARCHAR,
+  "userType"       VARCHAR NOT NULL,
   PRIMARY KEY ("id")
 );
 
@@ -538,6 +538,16 @@ ALTER TABLE MASTER_TRANSACTION."SMSOTP"
   ADD CONSTRAINT SMSOTP_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER_TRANSACTION."EmailOTP"
   ADD CONSTRAINT EmailOTP_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
+
+/*Initial State*/
+
+INSERT INTO blockchain."Account_BC"("address", "coins", "publicKey", "accountNumber", "sequence")
+VALUES
+('cosmos14375p72aunmu3vuwevu5e4vgegekd0n0sj9czh', 1000, 'VMzqh7vxmb/7W4w+1DQxAuISeI1dbCYPdcdIEh/HhRg=', 0, 0);
+
+INSERT INTO master."Account"("id", "secretHash", "accountAddress", "language", "userType")
+VALUES
+('main', '-1886325765', 'cosmos14375p72aunmu3vuwevu5e4vgegekd0n0sj9czh', 'en', 'GENESIS');
 
 # --- !Downs
 

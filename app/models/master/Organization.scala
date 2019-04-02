@@ -45,6 +45,16 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
     }
   }
 
+  private def getAccountIdById(id: String)(implicit executionContext: ExecutionContext): Future[String] = db.run(organizationTable.filter(_.id === id).map(_.accountID).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+        throw new BaseException(constants.Error.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+        throw new BaseException(constants.Error.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
   private def deleteById(id: String)(implicit executionContext: ExecutionContext) = db.run(organizationTable.filter(_.id === id).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -93,6 +103,7 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
 
     def verifyOrganization(id: String, status: Boolean)(implicit executionContext: ExecutionContext): Boolean = if (Await.result(verifyOrganizationOnID(id, status), Duration.Inf) == 1) true else false
 
+    def getAccountId(id: String)(implicit executionContext: ExecutionContext): String = Await.result(getAccountIdById(id), Duration.Inf)
   }
 
 }

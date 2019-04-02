@@ -31,9 +31,11 @@ object Module {
   val BLOCKCHAIN_ACCOUNT              = "BLOCKCHAIN_ACCOUNT"
   val BLOCKCHAIN_ACL_ACCOUNT          = "BLOCKCHAIN_ACL_ACCOUNT"
   val BLOCKCHAIN_ACL_HASH             = "BLOCKCHAIN_ACL_HASH"
+  val BLOCKCHAIN_ASSET                = "BLOCKCHAIN_ASSET"
+  val BLOCKCHAIN_FIAT                 = "BLOCKCHAIN_FIAT"
+  val BLOCKCHAIN_OWNER                = "BLOCKCHAIN_OWNER"
   val BLOCKCHAIN_ORGANIZATION         = "BLOCKCHAIN_ORGANIZATION"
   val BLOCKCHAIN_ZONE                 = "BLOCKCHAIN_ZONE"
-
 
 
   //Transactions

@@ -1,13 +1,21 @@
 @import models.master.Organization
 
-@(organization: Organization)
+@(username: String, userType: String, address: String, coins: Int = 0, organization: Organization)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
 
-<h2>Organization:</h2>
-Organization Name: @organization.name <br>
-    OrganizationID: @organization.id <br>
-    Organization Username: @organization.accountID <br>
-    Address: @organization.address <br>
-    Phone: @organization.phone <br>
-    Email: @organization.email <br>
-    Verified Status: @organization.status <br>
-<br>
+@common(Messages(constants.User.HOME)) {
+
+    <a href="@routes.SetACLController.setACLForm">@Messages(constants.Forms.SET_ACL_TITLE)</a>
+
+    @component.master.commonHome(username = username, userType = userType, address = address, coins = coins)
+
+    <h2>>@Messages(constants.User.ORGANIZATION):</h2>
+    @Messages(constants.User.ORGANIZATION_NAME): @organization.name <br>
+    @Messages(constants.User.ORGANIZATION_ID): @organization.id <br>
+    @Messages(constants.User.ORGANIZATION_USERNAME): @organization.accountID <br>
+    @Messages(constants.User.ADDRESS): @organization.address <br>
+    @Messages(constants.User.PHONE): @organization.phone <br>
+    @Messages(constants.User.EMAIL): @organization.email <br>
+    @Messages(constants.User.VERIFIED_STATUS): @organization.status <br>
+    <br>
+
+}

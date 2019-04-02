@@ -29,7 +29,11 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
       },
       addOrganizationData => {
         try {
-          Ok(views.html.index(success = organizations.Service.addOrganization(request.session.get(constants.Security.USERNAME).get, addOrganizationData.name, addOrganizationData.address, addOrganizationData.phone, addOrganizationData.email)))
+          if (masterAccounts.Service.getUserType(request.session.get(constants.Security.USERNAME).get) == constants.User.UNKNOWN) {
+            Ok(views.html.index(success = organizations.Service.addOrganization(accountID = request.session.get(constants.Security.USERNAME).get, name = addOrganizationData.name,address =  addOrganizationData.address, phone = addOrganizationData.phone, email = addOrganizationData.email)))
+          } else {
+            Ok(views.html.index(failure = Messages(constants.User.UNAUTHORIZED_TRANSACTION)))
+          }
         }
         catch {
           case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))
@@ -54,10 +58,11 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
             val response = transactionAddOrganization.Service.kafkaPost(transactionAddOrganization.Request(from = request.session.get(constants.Security.USERNAME).get, to = masterAccounts.Service.getAccount(organizations.Service.getOrganization(verifyOrganizationData.organizationID).accountID).accountAddress, organizationID = verifyOrganizationData.organizationID, zoneID = verifyOrganizationData.zoneID, password =  verifyOrganizationData.password))
             Ok(views.html.index(success = Messages(module + "." + constants.Success.VERIFY_ORGANIZATION) + verifyOrganizationData.organizationID + response.ticketID))
           } else {
-            val accountAddress = masterAccounts.Service.getAccount(organizations.Service.getOrganization(verifyOrganizationData.organizationID).accountID).accountAddress
-            val response = transactionAddOrganization.Service.post(transactionAddOrganization.Request(from = request.session.get(constants.Security.USERNAME).get, to = accountAddress, organizationID = verifyOrganizationData.organizationID, zoneID = verifyOrganizationData.zoneID, password =  verifyOrganizationData.password))
-            blockchainOrganizations.Service.addOrganization(request.session.get(constants.Security.USERNAME).get, accountAddress)
-            masterAccounts.Service.updateUserType(request.session.get(constants.Security.USERNAME).get, constants.User.ORGANIZATION)
+            val organizationAccountID = organizations.Service.getAccountId(verifyOrganizationData.organizationID)
+            val organizationAccountAddress = masterAccounts.Service.getAddress(organizationAccountID)
+            val response = transactionAddOrganization.Service.post(transactionAddOrganization.Request(from = request.session.get(constants.Security.USERNAME).get, to = organizationAccountAddress, organizationID = verifyOrganizationData.organizationID, zoneID = verifyOrganizationData.zoneID, password =  verifyOrganizationData.password))
+            blockchainOrganizations.Service.addOrganization(verifyOrganizationData.organizationID, organizationAccountAddress)
+            masterAccounts.Service.updateUserType(organizationAccountID, constants.User.ORGANIZATION)
             Ok(views.html.index(success = Messages(module + "." + constants.Success.VERIFY_ORGANIZATION) + verifyOrganizationData.organizationID + response.TxHash))
           }
         }

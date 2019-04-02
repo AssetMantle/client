@@ -82,6 +82,9 @@ POST        /master/sendAsset                               controllers.SendAsse
 GET         /master/sendCoin                                controllers.SendCoinController.sendCoinForm
 POST        /master/sendCoin                                controllers.SendCoinController.sendCoin
 
+GET         /master/requestCoins                            controllers.SendCoinController.requestCoinsForm
+POST        /master/requestCoins                            controllers.SendCoinController.requestCoins
+
 GET         /master/sendFiat                                controllers.SendFiatController.sendFiatForm
 POST        /master/sendFiat                                controllers.SendFiatController.sendFiat
 
