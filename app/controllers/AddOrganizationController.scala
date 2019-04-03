@@ -29,7 +29,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
       },
       addOrganizationData => {
         try {
-          if (masterAccounts.Service.getUserType(request.session.get(constants.Security.USERNAME).get) == constants.User.UNKNOWN) {
+          if (masterAccounts.Service.getUserType(request.session.get(constants.Security.USERNAME).get) == constants.User.USER) {
             Ok(views.html.index(success = organizations.Service.addOrganization(accountID = request.session.get(constants.Security.USERNAME).get, name = addOrganizationData.name,address =  addOrganizationData.address, phone = addOrganizationData.phone, email = addOrganizationData.email)))
           } else {
             Ok(views.html.index(failure = Messages(constants.User.UNAUTHORIZED_TRANSACTION)))

@@ -28,7 +28,7 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
       },
       addZoneData => {
         try {
-          if (masterAccounts.Service.getUserType(request.session.get(constants.Security.USERNAME).get) == constants.User.UNKNOWN) {
+          if (masterAccounts.Service.getUserType(request.session.get(constants.Security.USERNAME).get) == constants.User.USER) {
             Ok(views.html.index(success = masterZones.Service.addZone(accountID = request.session.get(constants.Security.USERNAME).get, name = addZoneData.name, currency = addZoneData.currency)))
           } else {
             Ok(views.html.index(failure = Messages(constants.User.UNAUTHORIZED_TRANSACTION)))
