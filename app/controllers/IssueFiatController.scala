@@ -14,7 +14,7 @@ import views.companion.master
 import scala.concurrent.ExecutionContext
 import scala.util.Random
 
-class IssueFiatController @Inject()(messagesControllerComponents: MessagesControllerComponents, withLoginAction: WithLoginAction, blockchainFiats: models.blockchain.Fiats, blockchainOwners: models.blockchain.Owners, transactionIssueFiat: transactions.IssueFiat, issueFiats: IssueFiats)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class IssueFiatController @Inject()(messagesControllerComponents: MessagesControllerComponents, masterAccounts: models.master.Accounts, withLoginAction: WithLoginAction, blockchainFiats: models.blockchain.Fiats, blockchainOwners: models.blockchain.Owners, transactionIssueFiat: transactions.IssueFiat, issueFiats: IssueFiats)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   def issueFiatForm: Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.master.issueFiat(master.IssueFiat.form))
@@ -32,14 +32,18 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
             issueFiats.Service.addIssueFiatKafka(from = request.session.get(constants.Security.USERNAME).get, to = issueFiatData.to, transactionID = issueFiatData.transactionID, transactionAmount= issueFiatData.transactionAmount, gas = issueFiatData.gas, null, null, ticketID = response.ticketID, null)
             Ok(views.html.index(success = response.ticketID))
           } else {
-            val response = transactionIssueFiat.Service.post( transactionIssueFiat.Request(from = request.session.get(constants.Security.USERNAME).get, to = issueFiatData.to, password = issueFiatData.password, transactionID = issueFiatData.transactionID, transactionAmount= issueFiatData.transactionAmount, gas = issueFiatData.gas))
-            for (tag <- response.Tags) {
-              if (tag.Key == constants.Response.KEY_FIAT) {
-                blockchainFiats.Service.addFiat(pegHash = tag.Value, transactionID = issueFiatData.transactionID, transactionAmount = issueFiatData.transactionAmount, redeemedAmount = 0)
-                blockchainOwners.Service.addOwner(pegHash = tag.Value, ownerAddress = issueFiatData.to, amount = issueFiatData.transactionAmount)
+            if (masterAccounts.Service.getUserTypeOnAddress(issueFiatData.to) == constants.User.TRADER) {
+              val response = transactionIssueFiat.Service.post(transactionIssueFiat.Request(from = request.session.get(constants.Security.USERNAME).get, to = issueFiatData.to, password = issueFiatData.password, transactionID = issueFiatData.transactionID, transactionAmount = issueFiatData.transactionAmount, gas = issueFiatData.gas))
+              for (tag <- response.Tags) {
+                if (tag.Key == constants.Response.KEY_FIAT) {
+                  blockchainFiats.Service.addFiat(pegHash = tag.Value, transactionID = issueFiatData.transactionID, transactionAmount = issueFiatData.transactionAmount, redeemedAmount = 0)
+                  blockchainOwners.Service.addOwner(pegHash = tag.Value, ownerAddress = issueFiatData.to, amount = issueFiatData.transactionAmount)
+                }
               }
+              Ok(views.html.index(success = response.TxHash))
+            } else {
+              Ok(views.html.index(failure = Messages(constants.User.NOT_TRADER)))
             }
-            Ok(views.html.index(success = response.TxHash))
           }
         }
         catch {
