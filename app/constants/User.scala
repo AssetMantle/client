@@ -3,7 +3,7 @@ package constants
 object User {
 
   //common
-  val UNAUTHORIZED_TRANSACTION  = "UNAUTHORIZED TRANSACTION!!"
+  val UNAUTHORIZED_TRANSACTION  = "UNAUTHORIZED TRANSACTION"
   val COMDEX                    = "COMDEX"
   val HOME                      = "HOME"
   val USER_TYPE                 = "USER TYPE"
