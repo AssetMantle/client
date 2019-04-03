@@ -33,7 +33,7 @@ class LoginController @Inject()(messagesControllerComponents: MessagesController
         try {
           if (masterAccounts.Service.validateLogin(loginData.username, loginData.password)) {
             val address = masterAccounts.Service.getAddress(loginData.username)
-            pushNotifications.registerNotificationToken(loginData.username, request.body.asFormUrlEncoded.get("token").headOption.get)
+            pushNotifications.registerNotificationToken(loginData.username, loginData.notificationToken)
             pushNotifications.sendNotification(loginData.username, constants.Notification.LOGIN)
             masterAccounts.Service.getUserType(loginData.username) match {
               case constants.User.GENESIS =>
