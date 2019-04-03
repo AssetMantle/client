@@ -27,10 +27,8 @@ $(document).ready(function () {
         console.log("Message received. ", payload);
         if($("#" + "notificationBox").length !=0) {
             var newNotification = document.createElement('div');
-            newNotification.append(document.createElement("BR"));
-            newNotification.innerHTML = JSON.parse(JSON.stringify(payload)).notification.title+"+"+JSON.parse(JSON.stringify(payload)).notification.body;
-            newNotification.append(document.createElement("BR"));
-            newNotification.style.backgroundColor="#8bc812";
+            newNotification.innerHTML ='</br>' +" (New) " +JSON.parse(JSON.stringify(payload)).notification.title+" + "+JSON.parse(JSON.stringify(payload)).notification.body+ '</br>';
+            newNotification.style.backgroundColor="#09c866";
             newNotification.setAttribute("onclick","location.reload()");
             document.getElementById("notificationBox").insertBefore(newNotification,document.getElementById("notificationBox").firstElementChild);
             $('#notificationBox').children().last().remove();
