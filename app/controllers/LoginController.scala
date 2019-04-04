@@ -37,34 +37,28 @@ class LoginController @Inject()(messagesControllerComponents: MessagesController
             pushNotifications.sendNotification(loginData.username, constants.Notification.LOGIN)
             masterAccounts.Service.getUserType(loginData.username) match {
               case constants.User.GENESIS =>
-                val account = blockchainAccounts.Service.getAccount(address)
-                withUsernameToken.Ok(views.html.component.master.genesisHome(username = loginData.username, userType = constants.User.GENESIS, address = account.address, coins = account.coins), loginData.username)
+                withUsernameToken.Ok(views.html.component.master.genesisHome(username = loginData.username, userType = constants.User.GENESIS, address = address, coins = blockchainAccounts.Service.getCoins(address)), loginData.username)
               case constants.User.ZONE =>
-                val account = blockchainAccounts.Service.getAccount(address)
-                withUsernameToken.Ok(views.html.component.master.zoneHome(username = loginData.username, userType = constants.User.ZONE, address = account.address, coins = account.coins, zone = masterZones.Service.getZone(blockchainZones.Service.getID(address))), loginData.username)
+                withUsernameToken.Ok(views.html.component.master.zoneHome(username = loginData.username, userType = constants.User.ZONE, address = address, coins = blockchainAccounts.Service.getCoins(address), zone = masterZones.Service.getZone(blockchainZones.Service.getID(address))), loginData.username)
               case constants.User.ORGANIZATION =>
-                val account = blockchainAccounts.Service.getAccount(address)
-                withUsernameToken.Ok(views.html.component.master.organizationHome(username = loginData.username, userType = constants.User.ORGANIZATION, address = account.address, coins = account.coins, organization = masterOrganizations.Service.getOrganization(blockchainOrganizations.Service.getID(address))), loginData.username)
+                withUsernameToken.Ok(views.html.component.master.organizationHome(username = loginData.username, userType = constants.User.ORGANIZATION, address = address, coins = blockchainAccounts.Service.getCoins(address), organization = masterOrganizations.Service.getOrganization(blockchainOrganizations.Service.getID(address))), loginData.username)
               case constants.User.TRADER =>
-                val account = blockchainAccounts.Service.getAccount(address)
                 val aclAccount = blockchainAclAccounts.Service.getACLAccount(address)
-                val owners = blockchainOwners.Service.getOwners(account.address)
-                withUsernameToken.Ok(views.html.component.master.traderHome(username = loginData.username, userType = constants.User.TRADER, address = account.address, coins = account.coins, assetPegWallet = blockchainAssets.Service.getAssetPegWallet(account.address), fiatPegWallet = blockchainFiats.Service.getFiatPegWallet(owners.map(_.pegHash).seq), totalFiat = owners.map(_.amount).sum, zone = masterZones.Service.getZone(aclAccount.zoneID), organization = masterOrganizations.Service.getOrganization(aclAccount.organizationID), aclHash = blockchainAclHashes.Service.getACLHash(aclAccount.aclHash)), loginData.username)
+                val owners = blockchainOwners.Service.getOwners(address)
+                withUsernameToken.Ok(views.html.component.master.traderHome(username = loginData.username, userType = constants.User.TRADER, address = address, coins = blockchainAccounts.Service.getCoins(address), assetPegWallet = blockchainAssets.Service.getAssetPegWallet(address), fiatPegWallet = blockchainFiats.Service.getFiatPegWallet(owners.map(_.pegHash).seq), totalFiat = owners.map(_.amount).sum, zone = masterZones.Service.getZone(aclAccount.zoneID), organization = masterOrganizations.Service.getOrganization(aclAccount.organizationID), aclHash = blockchainAclHashes.Service.getACLHash(aclAccount.aclHash)), loginData.username)
               case constants.User.USER =>
-                val account = blockchainAccounts.Service.getAccount(address)
-                withUsernameToken.Ok(views.html.component.master.userHome(username = loginData.username, userType = constants.User.USER, address = account.address, coins = account.coins), loginData.username)
+                withUsernameToken.Ok(views.html.component.master.userHome(username = loginData.username, userType = constants.User.USER, address = address, coins = blockchainAccounts.Service.getCoins(address)), loginData.username)
               case constants.User.UNKNOWN =>
                 withUsernameToken.Ok(views.html.component.master.unknownHome(username = loginData.username, userType = constants.User.UNKNOWN, address = address), loginData.username)
               case constants.User.WITHOUT_LOGIN =>
-                masterAccounts.Service.updateUserTypeOnAddress(address, constants.User.UNKNOWN)
+                masterAccounts.Service.updateUserType(loginData.username, constants.User.UNKNOWN)
                 withUsernameToken.Ok(views.html.component.master.unknownHome(username = loginData.username, userType = constants.User.UNKNOWN, address = address), loginData.username)
             }
           }
-          else Ok(views.html.index(failure = "Invalid Login!"))
+          else Ok(views.html.index(failure = Messages(constants.Security.INVALID_LOG_IN)))
         }
         catch {
           case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))
-          case blockChainException: BlockChainException => Ok(views.html.index(failure = blockChainException.message))
         }
       }
     )

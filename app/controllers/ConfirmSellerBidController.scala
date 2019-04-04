@@ -15,6 +15,8 @@ import scala.util.Random
 
 class ConfirmSellerBidController @Inject()(messagesControllerComponents: MessagesControllerComponents, withLoginAction: WithLoginAction, transactionConfirmSellerBid: transactions.ConfirmSellerBid, confirmSellerBids: ConfirmSellerBids)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
+  private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
+
   def confirmSellerBidForm: Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.master.confirmSellerBid(master.ConfirmSellerBid.form))
   }
@@ -26,7 +28,7 @@ class ConfirmSellerBidController @Inject()(messagesControllerComponents: Message
       },
       confirmSellerBidData => {
         try {
-          if (configuration.get[Boolean]("blockchain.kafka.enabled")) {
+          if (kafkaEnabled) {
             val response = transactionConfirmSellerBid.Service.kafkaPost( transactionConfirmSellerBid.Request(from = request.session.get(constants.Security.USERNAME).get, to = confirmSellerBidData.to, password = confirmSellerBidData.password, bid = confirmSellerBidData.bid, time = confirmSellerBidData.time, pegHash = confirmSellerBidData.pegHash, gas = confirmSellerBidData.gas))
             confirmSellerBids.Service.addConfirmSellerBidKafka(from = request.session.get(constants.Security.USERNAME).get, to = confirmSellerBidData.to, bid = confirmSellerBidData.bid, time = confirmSellerBidData.time, pegHash = confirmSellerBidData.pegHash, gas = confirmSellerBidData.gas, null, null, ticketID = response.ticketID, null)
             Ok(views.html.index(success = response.ticketID))
@@ -56,7 +58,7 @@ class ConfirmSellerBidController @Inject()(messagesControllerComponents: Message
       },
       confirmSellerBidData => {
         try {
-          if (configuration.get[Boolean]("blockchain.kafka.enabled")) {
+          if (kafkaEnabled) {
             val response = transactionConfirmSellerBid.Service.kafkaPost( transactionConfirmSellerBid.Request(from = confirmSellerBidData.from, to = confirmSellerBidData.to, password = confirmSellerBidData.password, bid = confirmSellerBidData.bid, time = confirmSellerBidData.time, pegHash = confirmSellerBidData.pegHash, gas = confirmSellerBidData.gas))
             confirmSellerBids.Service.addConfirmSellerBidKafka(from = confirmSellerBidData.from, to = confirmSellerBidData.to, bid = confirmSellerBidData.bid, time = confirmSellerBidData.time, pegHash = confirmSellerBidData.pegHash, gas = confirmSellerBidData.gas, null, null, ticketID = response.ticketID, null)
             Ok(views.html.index(success = response.ticketID))

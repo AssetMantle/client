@@ -4,7 +4,7 @@ import controllers.actions.WithLoginAction
 import javax.inject.Inject
 import models.master.Contacts
 import play.api.Configuration
-import play.api.i18n.I18nSupport
+import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import views.companion.master.UpdateContact
 
@@ -22,7 +22,7 @@ class UpdateContactController @Inject()(messagesControllerComponents: MessagesCo
         BadRequest(views.html.component.master.updateContact(formWithErrors, constants.CountryCallingCode.COUNTRY_CODES))
       },
       signUpData => {
-        if (contacts.Service.updateEmailAndMobile(request.session.get(constants.Security.USERNAME).get, signUpData.countryCode+signUpData.mobileNumber, signUpData.emailAddress)) Ok(views.html.index(success = "Contact Updated!")) else Ok(views.html.index(failure = "Signup Failed!"))
+        if (contacts.Service.updateEmailAndMobile(request.session.get(constants.Security.USERNAME).get, signUpData.countryCode+signUpData.mobileNumber, signUpData.emailAddress)) Ok(views.html.index(success = Messages(constants.Flash.SUCCESS))) else Ok(views.html.index(failure = Messages(constants.Flash.FAILURE)))
       }
     )
   }

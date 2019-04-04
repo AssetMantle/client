@@ -13,7 +13,9 @@ import views.companion.master
 import scala.concurrent.ExecutionContext
 import scala.util.Random
 
-class ChangeBuyerBidController @Inject()(messagesControllerComponents: MessagesControllerComponents, withLoginAction: WithLoginAction,  transactionChangeBuyerBid: transactions.ChangeBuyerBid, changeBuyerBids: ChangeBuyerBids)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class ChangeBuyerBidController @Inject()(messagesControllerComponents: MessagesControllerComponents, withLoginAction: WithLoginAction, transactionChangeBuyerBid: transactions.ChangeBuyerBid, changeBuyerBids: ChangeBuyerBids)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+
+  private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
 
   def changeBuyerBidForm: Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.master.changeBuyerBid(master.ChangeBuyerBid.form))
@@ -26,7 +28,7 @@ class ChangeBuyerBidController @Inject()(messagesControllerComponents: MessagesC
       },
       changeBuyerBidData => {
         try {
-          if (configuration.get[Boolean]("blockchain.kafka.enabled")) {
+          if (kafkaEnabled) {
             val response = transactionChangeBuyerBid.Service.kafkaPost( transactionChangeBuyerBid.Request(from = request.session.get(constants.Security.USERNAME).get, to = changeBuyerBidData.to, password = changeBuyerBidData.password, bid = changeBuyerBidData.bid, time = changeBuyerBidData.time, pegHash = changeBuyerBidData.pegHash, gas = changeBuyerBidData.gas))
             changeBuyerBids.Service.addChangeBuyerBidKafka(from = request.session.get(constants.Security.USERNAME).get, to = changeBuyerBidData.to, bid = changeBuyerBidData.bid, time = changeBuyerBidData.time, pegHash = changeBuyerBidData.pegHash, gas = changeBuyerBidData.gas, null, null, ticketID = response.ticketID, null)
             Ok(views.html.index(success = response.ticketID))
@@ -55,7 +57,7 @@ class ChangeBuyerBidController @Inject()(messagesControllerComponents: MessagesC
       },
       changeBuyerBidData => {
         try {
-          if (configuration.get[Boolean]("blockchain.kafka.enabled")) {
+          if (kafkaEnabled) {
             val response = transactionChangeBuyerBid.Service.kafkaPost( transactionChangeBuyerBid.Request(from = changeBuyerBidData.from, to = changeBuyerBidData.to, password = changeBuyerBidData.password, bid = changeBuyerBidData.bid, time = changeBuyerBidData.time, pegHash = changeBuyerBidData.pegHash, gas = changeBuyerBidData.gas))
             changeBuyerBids.Service.addChangeBuyerBidKafka(from = changeBuyerBidData.from, to = changeBuyerBidData.to, bid = changeBuyerBidData.bid, time = changeBuyerBidData.time, pegHash = changeBuyerBidData.pegHash, gas = changeBuyerBidData.gas, null, null, ticketID = response.ticketID, null)
             Ok(views.html.index(success = response.ticketID))

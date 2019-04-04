@@ -65,6 +65,16 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     }
   }
 
+  private def getSecretHashById(id: String)(implicit executionContext: ExecutionContext): Future[String] = db.run(accountTable.filter(_.id === id).map(_.secretHash).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+        throw new BaseException(constants.Error.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+        throw new BaseException(constants.Error.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
   private def getUserTypeById(id: String)(implicit executionContext: ExecutionContext): Future[String] = db.run(accountTable.filter(_.id === id).map(_.userType).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -146,7 +156,7 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   object Service {
 
-    def validateLogin(username: String, password: String)(implicit executionContext: ExecutionContext): Boolean = Await.result(findById(username), Duration.Inf).secretHash == util.hashing.MurmurHash3.stringHash(password).toString
+    def validateLogin(username: String, password: String)(implicit executionContext: ExecutionContext): Boolean = Await.result(getSecretHashById(username), Duration.Inf) == util.hashing.MurmurHash3.stringHash(password).toString
 
     def checkUsernameAvailable(username: String): Boolean = {
       !Await.result(checkById(username), Duration.Inf)

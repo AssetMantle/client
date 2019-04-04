@@ -1,6 +1,6 @@
 package constants
 
 object Email {
-  val LOGIN = "Login"
+  val LOGIN = "LOGIN"
   val OTP = "OTP"
 }

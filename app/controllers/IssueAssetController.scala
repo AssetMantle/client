@@ -1,48 +1,44 @@
 package controllers
 
-import controllers.actions.WithLoginAction
+import controllers.actions.WithTraderLoginAction
 import exceptions.{BaseException, BlockChainException}
 import javax.inject.Inject
-import models.blockchain
-import models.blockchainTransaction.IssueAssets
+import models.{blockchain, blockchainTransaction, master}
 import play.api.Configuration
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
-import views.companion.blockchain.IssueAsset
-import views.companion.master
 
 import scala.concurrent.ExecutionContext
 import scala.util.Random
 
-class IssueAssetController @Inject()(messagesControllerComponents: MessagesControllerComponents, masterAccounts: models.master.Accounts, withLoginAction: WithLoginAction, blockchainAssets: blockchain.Assets, transactionIssueAsset: transactions.IssueAsset, issueAssets: IssueAssets)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class IssueAssetController @Inject()(messagesControllerComponents: MessagesControllerComponents, masterAccounts: master.Accounts, withTraderLoginAction: WithTraderLoginAction, blockchainAssets: blockchain.Assets, transactionIssueAsset: transactions.IssueAsset, blockchainTransactionIssueAssets: blockchainTransaction.IssueAssets)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+
+  private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
 
   def issueAssetForm: Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.issueAsset(master.IssueAsset.form))
+    Ok(views.html.component.master.issueAsset(views.companion.master.IssueAsset.form))
   }
 
-  def issueAsset: Action[AnyContent] = withLoginAction { implicit request =>
-    master.IssueAsset.form.bindFromRequest().fold(
+  def issueAsset: Action[AnyContent] = withTraderLoginAction { implicit request =>
+    views.companion.master.IssueAsset.form.bindFromRequest().fold(
       formWithErrors => {
         BadRequest(views.html.component.master.issueAsset(formWithErrors))
       },
       issueAssetData => {
         try {
-          if (configuration.get[Boolean]("blockchain.kafka.enabled")) {
+          if (kafkaEnabled) {
             val response = transactionIssueAsset.Service.kafkaPost(transactionIssueAsset.Request(from = request.session.get(constants.Security.USERNAME).get, to = issueAssetData.to, password = issueAssetData.password, documentHash = issueAssetData.documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.assetPrice, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.assetQuantity, gas = issueAssetData.gas))
-            issueAssets.Service.addIssueAssetKafka(from = request.session.get(constants.Security.USERNAME).get, to = issueAssetData.to, documentHash = issueAssetData.documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.assetPrice, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.assetQuantity, gas = issueAssetData.gas, null, null, ticketID = response.ticketID, null)
+            blockchainTransactionIssueAssets.Service.addIssueAssetKafka(from = request.session.get(constants.Security.USERNAME).get, to = issueAssetData.to, documentHash = issueAssetData.documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.assetPrice, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.assetQuantity, gas = issueAssetData.gas, null, null, ticketID = response.ticketID, null)
             Ok(views.html.index(success = response.ticketID))
           } else {
-            if (masterAccounts.Service.getUserTypeOnAddress(issueAssetData.to) == constants.User.TRADER) {
-              val response = transactionIssueAsset.Service.post(transactionIssueAsset.Request(from = request.session.get(constants.Security.USERNAME).get, to = issueAssetData.to, password = issueAssetData.password, documentHash = issueAssetData.documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.assetPrice, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.assetQuantity, gas = issueAssetData.gas))
-              for (tag <- response.Tags) {
-                if (tag.Key == constants.Response.KEY_ASSET) {
-                  blockchainAssets.Service.addAsset(pegHash = tag.Value, documentHash = issueAssetData.documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.assetPrice, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.assetQuantity, ownerAddress = issueAssetData.to)
-                }
+            val response = transactionIssueAsset.Service.post(transactionIssueAsset.Request(from = request.session.get(constants.Security.USERNAME).get, to = issueAssetData.to, password = issueAssetData.password, documentHash = issueAssetData.documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.assetPrice, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.assetQuantity, gas = issueAssetData.gas))
+            blockchainTransactionIssueAssets.Service.addIssueAsset(from = request.session.get(constants.Security.USERNAME).get, to = issueAssetData.to, documentHash = issueAssetData.documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.assetPrice, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.assetQuantity, gas = issueAssetData.gas, null, txHash = Option(response.TxHash), ticketID = (Random.nextInt(899999999) + 100000000).toString, null)
+            for (tag <- response.Tags) {
+              if (tag.Key == constants.Response.KEY_ASSET) {
+                blockchainAssets.Service.addAsset(pegHash = tag.Value, documentHash = issueAssetData.documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.assetPrice, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.assetQuantity, ownerAddress = issueAssetData.to)
               }
-              Ok(views.html.index(success = response.TxHash))
-            } else {
-              Ok(views.html.index(failure = Messages(constants.User.NOT_TRADER)))
             }
+            Ok(views.html.index(success = response.TxHash))
           }
         }
         catch {
@@ -54,23 +50,23 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
   }
 
   def blockchainIssueAssetForm: Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.blockchain.issueAsset(IssueAsset.form))
+    Ok(views.html.component.blockchain.issueAsset(views.companion.blockchain.IssueAsset.form))
   }
 
   def blockchainIssueAsset: Action[AnyContent] = Action { implicit request =>
-    IssueAsset.form.bindFromRequest().fold(
+    views.companion.blockchain.IssueAsset.form.bindFromRequest().fold(
       formWithErrors => {
         BadRequest(views.html.component.blockchain.issueAsset(formWithErrors))
       },
       issueAssetData => {
         try {
-          if (configuration.get[Boolean]("blockchain.kafka.enabled")) {
+          if (kafkaEnabled) {
             val response = transactionIssueAsset.Service.kafkaPost(transactionIssueAsset.Request(from = issueAssetData.from, to = issueAssetData.to, password = issueAssetData.password, documentHash = issueAssetData.documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.assetPrice, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.assetQuantity, gas = issueAssetData.gas))
-            issueAssets.Service.addIssueAssetKafka(from = issueAssetData.from, to = issueAssetData.to, documentHash = issueAssetData.documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.assetPrice, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.assetQuantity, gas = issueAssetData.gas, null, null, ticketID = response.ticketID, null)
+            blockchainTransactionIssueAssets.Service.addIssueAssetKafka(from = issueAssetData.from, to = issueAssetData.to, documentHash = issueAssetData.documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.assetPrice, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.assetQuantity, gas = issueAssetData.gas, null, null, ticketID = response.ticketID, null)
             Ok(views.html.index(success = response.ticketID))
           } else {
             val response = transactionIssueAsset.Service.post(transactionIssueAsset.Request(from = issueAssetData.from, to = issueAssetData.to, password = issueAssetData.password, documentHash = issueAssetData.documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.assetPrice, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.assetQuantity, gas = issueAssetData.gas))
-            issueAssets.Service.addIssueAsset(from = issueAssetData.from, to = issueAssetData.to, documentHash = issueAssetData.documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.assetPrice, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.assetQuantity, gas = issueAssetData.gas, null, txHash = Option(response.TxHash), ticketID = (Random.nextInt(899999999) + 100000000).toString, null)
+            blockchainTransactionIssueAssets.Service.addIssueAsset(from = issueAssetData.from, to = issueAssetData.to, documentHash = issueAssetData.documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.assetPrice, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.assetQuantity, gas = issueAssetData.gas, null, txHash = Option(response.TxHash), ticketID = (Random.nextInt(899999999) + 100000000).toString, null)
             Ok(views.html.index(success = response.TxHash))
           }
         }

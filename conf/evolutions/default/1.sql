@@ -534,6 +534,8 @@ ALTER TABLE MASTER."Account"
   ADD CONSTRAINT Account_BCAccount_address FOREIGN KEY ("accountAddress") REFERENCES BLOCKCHAIN."Account_BC" ("address");
 ALTER TABLE MASTER."Contact"
   ADD CONSTRAINT Contact_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
+ALTER TABLE MASTER."Zone"
+  ADD CONSTRAINT Zone_Account_accountID FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER."ZoneKYC"
   ADD CONSTRAINT ZoneKYC_Zone_id FOREIGN KEY ("id") REFERENCES MASTER."Zone" ("id");
 ALTER TABLE MASTER."OrganizationKYC"
