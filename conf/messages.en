@@ -66,8 +66,8 @@ changeBuyerBid=changeBuyerBid
 changeSellerBid=changeSellerBid
 confirmBuyerBid=confirmBuyerBid
 
-CONTROLLERS_NOTIFICATIONMessage.Login= You are Logged In. {0}
-CONTROLLERS_NOTIFICATIONTitle.Login= Login
+CONTROLLERS_NOTIFICATIONMessage.LOGIN= You are Logged In. {0}
+CONTROLLERS_NOTIFICATIONTitle.LOGIN= Login
 CONTROLLERS_NOTIFICATIONMessage.OTP= Your OTP is {0}
 CONTROLLERS_NOTIFICATIONTitle.OTP= Verify OTP
 

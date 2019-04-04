@@ -1,161 +1,163 @@
-GET         /                                               controllers.IndexController.index
+GET         /                                                     controllers.IndexController.index
 
 
-GET         /assets/*file                                   controllers.Assets.versioned(path="/public", file: Asset)
+GET         /assets/*file                                         controllers.Assets.versioned(path="/public", file: Asset)
 
-GET         /firebase-messaging-sw.js                       controllers.Assets.at(path="/public/javascripts", file="firebase-messaging-sw.js")
-GET         /notificationImage.png                          controllers.Assets.at(path="/public/images", file="notificationImage.png")
+GET         /firebase-messaging-sw.js                             controllers.Assets.at(path="/public/javascripts", file="firebase-messaging-sw.js")
+GET         /notificationImage.png                                controllers.Assets.at(path="/public/images", file="notificationImage.png")
 
 
-GET         /javascriptRoutes                               controllers.JavaScriptRoutesController.javascriptRoutes
+GET         /javascriptRoutes                                     controllers.JavaScriptRoutesController.javascriptRoutes
 
-GET         /master/notifications                          controllers.NotificationController.showNotificationsForm
-POST         /master/notifications                          controllers.NotificationController.showNotifications
+GET         /master/notifications                                 controllers.NotificationController.showNotifications
+GET         /markNotificationAsRead/:notificationID               controllers.NotificationController.markNotificationAsRead(notificationID: String)
+GET         /changeNotificationPage                                controllers.NotificationController.changeNotificationPage(pageNumber: Int)
 
-GET         /master/queryConfigurationVariable:query        controllers.ConfigurationController.queryConfigurationVariable(query: String)
 
-GET         /master/checkUsernameAvailable                  controllers.SignUpController.checkUsernameAvailable(username: String)
+GET         /master/queryConfigurationVariable:query              controllers.ConfigurationController.queryConfigurationVariable(query: String)
 
-GET         /master/login                                   controllers.LoginController.loginForm
-POST        /master/login                                   controllers.LoginController.login
+GET         /master/checkUsernameAvailable                        controllers.SignUpController.checkUsernameAvailable(username: String)
 
-GET         /master/logout                                  controllers.LogoutController.logoutForm
-POST        /master/logout                                  controllers.LogoutController.logout
+GET         /master/login                                         controllers.LoginController.loginForm
+POST        /master/login                                         controllers.LoginController.login
 
-GET         /master/signUp                                  controllers.SignUpController.signUpForm
-POST        /master/signUp                                  controllers.SignUpController.signUp
+GET         /master/logout                                        controllers.LogoutController.logoutForm
+POST        /master/logout                                        controllers.LogoutController.logout
 
-GET         /master/updateContact                           controllers.UpdateContactController.updateContactForm
-POST        /master/updateContact                           controllers.UpdateContactController.updateContact
+GET         /master/signUp                                        controllers.SignUpController.signUpForm
+POST        /master/signUp                                        controllers.SignUpController.signUp
 
-GET         /master/verifyMobileNumber                      controllers.VerifyMobileNumberController.verifyMobileNumberForm
-POST        /master/verifyMobileNumber                      controllers.VerifyMobileNumberController.verifyMobileNumber
+GET         /master/updateContact                                 controllers.UpdateContactController.updateContactForm
+POST        /master/updateContact                                 controllers.UpdateContactController.updateContact
 
-GET         /master/verifyEmailAddress                      controllers.VerifyEmailAddressController.verifyEmailAddressForm
-POST        /master/verifyEmailAddress                      controllers.VerifyEmailAddressController.verifyEmailAddress
+GET         /master/verifyMobileNumber                            controllers.VerifyMobileNumberController.verifyMobileNumberForm
+POST        /master/verifyMobileNumber                            controllers.VerifyMobileNumberController.verifyMobileNumber
 
-GET         /master/addOrganization                         controllers.AddOrganizationController.addOrganizationForm
-POST        /master/addOrganization                         controllers.AddOrganizationController.addOrganization
+GET         /master/verifyEmailAddress                            controllers.VerifyEmailAddressController.verifyEmailAddressForm
+POST        /master/verifyEmailAddress                            controllers.VerifyEmailAddressController.verifyEmailAddress
 
-GET         /master/addZone                                 controllers.AddZoneController.addZoneForm
-POST        /master/addZone                                 controllers.AddZoneController.addZone
+GET         /master/addOrganization                               controllers.AddOrganizationController.addOrganizationForm
+POST        /master/addOrganization                               controllers.AddOrganizationController.addOrganization
 
-GET         /master/verifyZone                              controllers.AddZoneController.verifyZoneForm
-POST        /master/verifyZone                              controllers.AddZoneController.verifyZone
+GET         /master/addZone                                       controllers.AddZoneController.addZoneForm
+POST        /master/addZone                                       controllers.AddZoneController.addZone
 
-GET         /master/verifyOrganization                      controllers.AddOrganizationController.verifyOrganizationForm
-POST        /master/verifyOrganization                      controllers.AddOrganizationController.verifyOrganization
+GET         /master/verifyZone                                    controllers.AddZoneController.verifyZoneForm
+POST        /master/verifyZone                                    controllers.AddZoneController.verifyZone
 
-GET         /master/buyerExecuteOrder                       controllers.BuyerExecuteOrderController.buyerExecuteOrderForm
-POST        /master/buyerExecuteOrder                       controllers.BuyerExecuteOrderController.buyerExecuteOrder
+GET         /master/verifyOrganization                            controllers.AddOrganizationController.verifyOrganizationForm
+POST        /master/verifyOrganization                            controllers.AddOrganizationController.verifyOrganization
 
-GET         /master/changeBuyerBid                          controllers.ChangeBuyerBidController.changeBuyerBidForm
-POST        /master/changeBuyerBid                          controllers.ChangeBuyerBidController.changeBuyerBid
+GET         /master/buyerExecuteOrder                             controllers.BuyerExecuteOrderController.buyerExecuteOrderForm
+POST        /master/buyerExecuteOrder                             controllers.BuyerExecuteOrderController.buyerExecuteOrder
 
-GET         /master/changeSellerBid                         controllers.ChangeSellerBidController.changeSellerBidForm
-POST        /master/changeSellerBid                         controllers.ChangeSellerBidController.changeSellerBid
+GET         /master/changeBuyerBid                                controllers.ChangeBuyerBidController.changeBuyerBidForm
+POST        /master/changeBuyerBid                                controllers.ChangeBuyerBidController.changeBuyerBid
 
-GET         /master/confirmBuyerBid                         controllers.ConfirmBuyerBidController.confirmBuyerBidForm
-POST        /master/confirmBuyerBid                         controllers.ConfirmBuyerBidController.confirmBuyerBid
+GET         /master/changeSellerBid                               controllers.ChangeSellerBidController.changeSellerBidForm
+POST        /master/changeSellerBid                               controllers.ChangeSellerBidController.changeSellerBid
 
-GET         /master/confirmSellerBid                        controllers.ConfirmSellerBidController.confirmSellerBidForm
-POST        /master/confirmSellerBid                        controllers.ConfirmSellerBidController.confirmSellerBid
+GET         /master/confirmBuyerBid                               controllers.ConfirmBuyerBidController.confirmBuyerBidForm
+POST        /master/confirmBuyerBid                               controllers.ConfirmBuyerBidController.confirmBuyerBid
 
-GET         /master/issueAsset                              controllers.IssueAssetController.issueAssetForm
-POST        /master/issueAsset                              controllers.IssueAssetController.issueAsset
+GET         /master/confirmSellerBid                              controllers.ConfirmSellerBidController.confirmSellerBidForm
+POST        /master/confirmSellerBid                              controllers.ConfirmSellerBidController.confirmSellerBid
 
-GET         /master/issueFiat                               controllers.IssueFiatController.issueFiatForm
-POST        /master/issueFiat                               controllers.IssueFiatController.issueFiat
+GET         /master/issueAsset                                    controllers.IssueAssetController.issueAssetForm
+POST        /master/issueAsset                                    controllers.IssueAssetController.issueAsset
 
-GET         /master/redeemAsset                             controllers.RedeemAssetController.redeemAssetForm
-POST        /master/redeemAsset                             controllers.RedeemAssetController.redeemAsset
+GET         /master/issueFiat                                     controllers.IssueFiatController.issueFiatForm
+POST        /master/issueFiat                                     controllers.IssueFiatController.issueFiat
 
-GET         /master/redeemFiat                              controllers.RedeemFiatController.redeemFiatForm
-POST        /master/redeemFiat                              controllers.RedeemFiatController.redeemFiat
+GET         /master/redeemAsset                                   controllers.RedeemAssetController.redeemAssetForm
+POST        /master/redeemAsset                                   controllers.RedeemAssetController.redeemAsset
 
-GET         /master/releaseAsset                            controllers.ReleaseAssetController.releaseAssetForm
-POST        /master/releaseAsset                            controllers.ReleaseAssetController.releaseAsset
+GET         /master/redeemFiat                                    controllers.RedeemFiatController.redeemFiatForm
+POST        /master/redeemFiat                                    controllers.RedeemFiatController.redeemFiat
 
-GET         /master/sellerExecuteOrder                      controllers.SellerExecuteOrderController.sellerExecuteOrderForm
-POST        /master/sellerExecuteOrder                      controllers.SellerExecuteOrderController.sellerExecuteOrder
+GET         /master/releaseAsset                                  controllers.ReleaseAssetController.releaseAssetForm
+POST        /master/releaseAsset                                  controllers.ReleaseAssetController.releaseAsset
 
-GET         /master/sendAsset                               controllers.SendAssetController.sendAssetForm
-POST        /master/sendAsset                               controllers.SendAssetController.sendAsset
+GET         /master/sellerExecuteOrder                            controllers.SellerExecuteOrderController.sellerExecuteOrderForm
+POST        /master/sellerExecuteOrder                            controllers.SellerExecuteOrderController.sellerExecuteOrder
 
-GET         /master/sendCoin                                controllers.SendCoinController.sendCoinForm
-POST        /master/sendCoin                                controllers.SendCoinController.sendCoin
+GET         /master/sendAsset                                     controllers.SendAssetController.sendAssetForm
+POST        /master/sendAsset                                     controllers.SendAssetController.sendAsset
 
-GET         /master/requestCoins                            controllers.SendCoinController.requestCoinsForm
-POST        /master/requestCoins                            controllers.SendCoinController.requestCoins
+GET         /master/sendCoin                                      controllers.SendCoinController.sendCoinForm
+POST        /master/sendCoin                                      controllers.SendCoinController.sendCoin
 
-GET         /master/sendFiat                                controllers.SendFiatController.sendFiatForm
-POST        /master/sendFiat                                controllers.SendFiatController.sendFiat
+GET         /master/requestCoins                                  controllers.SendCoinController.requestCoinsForm
+POST        /master/requestCoins                                  controllers.SendCoinController.requestCoins
 
-GET         /master/setACL                                  controllers.SetACLController.setACLForm
-POST        /master/setACL                                  controllers.SetACLController.setACL
+GET         /master/sendFiat                                      controllers.SendFiatController.sendFiatForm
+POST        /master/sendFiat                                      controllers.SendFiatController.sendFiat
 
-GET         /master/setBuyerFeedback                        controllers.SetBuyerFeedbackController.setBuyerFeedbackForm
-POST        /master/setBuyerFeedback                        controllers.SetBuyerFeedbackController.setBuyerFeedback
+GET         /master/setACL                                        controllers.SetACLController.setACLForm
+POST        /master/setACL                                        controllers.SetACLController.setACL
 
-GET         /master/setSellerFeedback                       controllers.SetSellerFeedbackController.setSellerFeedbackForm
-POST        /master/setSellerFeedback                       controllers.SetSellerFeedbackController.setSellerFeedback
+GET         /master/setBuyerFeedback                              controllers.SetBuyerFeedbackController.setBuyerFeedbackForm
+POST        /master/setBuyerFeedback                              controllers.SetBuyerFeedbackController.setBuyerFeedback
 
-GET         /blockchain/addKey                              controllers.AddKeyController.blockchainAddKeyForm
-POST        /blockchain/addKey                              controllers.AddKeyController.blockchainAddKey
+GET         /master/setSellerFeedback                             controllers.SetSellerFeedbackController.setSellerFeedbackForm
+POST        /master/setSellerFeedback                             controllers.SetSellerFeedbackController.setSellerFeedback
 
-GET         /blockchain/addOrganization                     controllers.AddOrganizationController.blockchainAddOrganizationForm
-POST        /blockchain/addOrganization                     controllers.AddOrganizationController.blockchainAddOrganization
+GET         /blockchain/addKey                                    controllers.AddKeyController.blockchainAddKeyForm
+POST        /blockchain/addKey                                    controllers.AddKeyController.blockchainAddKey
 
-GET         /blockchain/addZone                             controllers.AddZoneController.blockchainAddZoneForm
-POST        /blockchain/addZone                             controllers.AddZoneController.blockchainAddZone
+GET         /blockchain/addOrganization                           controllers.AddOrganizationController.blockchainAddOrganizationForm
+POST        /blockchain/addOrganization                           controllers.AddOrganizationController.blockchainAddOrganization
 
-GET         /blockchain/buyerExecuteOrder                   controllers.BuyerExecuteOrderController.blockchainBuyerExecuteOrderForm
-POST        /blockchain/buyerExecuteOrder                   controllers.BuyerExecuteOrderController.blockchainBuyerExecuteOrder
+GET         /blockchain/addZone                                   controllers.AddZoneController.blockchainAddZoneForm
+POST        /blockchain/addZone                                   controllers.AddZoneController.blockchainAddZone
 
-GET         /blockchain/changeBuyerBid                      controllers.ChangeBuyerBidController.blockchainChangeBuyerBidForm
-POST        /blockchain/changeBuyerBid                      controllers.ChangeBuyerBidController.blockchainChangeBuyerBid
+GET         /blockchain/buyerExecuteOrder                         controllers.BuyerExecuteOrderController.blockchainBuyerExecuteOrderForm
+POST        /blockchain/buyerExecuteOrder                         controllers.BuyerExecuteOrderController.blockchainBuyerExecuteOrder
 
-GET         /blockchain/changeSellerBid                     controllers.ChangeSellerBidController.blockchainChangeSellerBidForm
-POST        /blockchain/changeSellerBid                     controllers.ChangeSellerBidController.blockchainChangeSellerBid
+GET         /blockchain/changeBuyerBid                            controllers.ChangeBuyerBidController.blockchainChangeBuyerBidForm
+POST        /blockchain/changeBuyerBid                            controllers.ChangeBuyerBidController.blockchainChangeBuyerBid
 
-GET         /blockchain/confirmBuyerBid                     controllers.ConfirmBuyerBidController.blockchainConfirmBuyerBidForm
-POST        /blockchain/confirmBuyerBid                     controllers.ConfirmBuyerBidController.blockchainConfirmBuyerBid
+GET         /blockchain/changeSellerBid                           controllers.ChangeSellerBidController.blockchainChangeSellerBidForm
+POST        /blockchain/changeSellerBid                           controllers.ChangeSellerBidController.blockchainChangeSellerBid
 
-GET         /blockchain/confirmSellerBid                    controllers.ConfirmSellerBidController.blockchainConfirmSellerBidForm
-POST        /blockchain/confirmSellerBid                    controllers.ConfirmSellerBidController.blockchainConfirmSellerBid
+GET         /blockchain/confirmBuyerBid                           controllers.ConfirmBuyerBidController.blockchainConfirmBuyerBidForm
+POST        /blockchain/confirmBuyerBid                           controllers.ConfirmBuyerBidController.blockchainConfirmBuyerBid
 
-GET         /blockchain/issueAsset                          controllers.IssueAssetController.blockchainIssueAssetForm
-POST        /blockchain/issueAsset                          controllers.IssueAssetController.blockchainIssueAsset
+GET         /blockchain/confirmSellerBid                          controllers.ConfirmSellerBidController.blockchainConfirmSellerBidForm
+POST        /blockchain/confirmSellerBid                          controllers.ConfirmSellerBidController.blockchainConfirmSellerBid
 
-GET         /blockchain/issueFiat                           controllers.IssueFiatController.blockchainIssueFiatForm
-POST        /blockchain/issueFiat                           controllers.IssueFiatController.blockchainIssueFiat
+GET         /blockchain/issueAsset                                controllers.IssueAssetController.blockchainIssueAssetForm
+POST        /blockchain/issueAsset                                controllers.IssueAssetController.blockchainIssueAsset
 
-GET         /blockchain/redeemAsset                         controllers.RedeemAssetController.blockchainRedeemAssetForm
-POST        /blockchain/redeemAsset                         controllers.RedeemAssetController.blockchainRedeemAsset
+GET         /blockchain/issueFiat                                 controllers.IssueFiatController.blockchainIssueFiatForm
+POST        /blockchain/issueFiat                                 controllers.IssueFiatController.blockchainIssueFiat
 
-GET         /blockchain/redeemFiat                          controllers.RedeemFiatController.blockchainRedeemFiatForm
-POST        /blockchain/redeemFiat                          controllers.RedeemFiatController.blockchainRedeemFiat
+GET         /blockchain/redeemAsset                               controllers.RedeemAssetController.blockchainRedeemAssetForm
+POST        /blockchain/redeemAsset                               controllers.RedeemAssetController.blockchainRedeemAsset
 
-GET         /blockchain/releaseAsset                        controllers.ReleaseAssetController.blockchainReleaseAssetForm
-POST        /blockchain/releaseAsset                        controllers.ReleaseAssetController.blockchainReleaseAsset
+GET         /blockchain/redeemFiat                                controllers.RedeemFiatController.blockchainRedeemFiatForm
+POST        /blockchain/redeemFiat                                controllers.RedeemFiatController.blockchainRedeemFiat
 
-GET         /blockchain/sellerExecuteOrder                  controllers.SellerExecuteOrderController.blockchainSellerExecuteOrderForm
-POST        /blockchain/sellerExecuteOrder                  controllers.SellerExecuteOrderController.blockchainSellerExecuteOrder
+GET         /blockchain/releaseAsset                              controllers.ReleaseAssetController.blockchainReleaseAssetForm
+POST        /blockchain/releaseAsset                              controllers.ReleaseAssetController.blockchainReleaseAsset
 
-GET         /blockchain/sendAsset                           controllers.SendAssetController.blockchainSendAssetForm
-POST        /blockchain/sendAsset                           controllers.SendAssetController.blockchainSendAsset
+GET         /blockchain/sellerExecuteOrder                        controllers.SellerExecuteOrderController.blockchainSellerExecuteOrderForm
+POST        /blockchain/sellerExecuteOrder                        controllers.SellerExecuteOrderController.blockchainSellerExecuteOrder
 
-GET         /blockchain/sendCoin                            controllers.SendCoinController.blockchainSendCoinForm
-POST        /blockchain/sendCoin                            controllers.SendCoinController.blockchainSendCoin
+GET         /blockchain/sendAsset                                 controllers.SendAssetController.blockchainSendAssetForm
+POST        /blockchain/sendAsset                                 controllers.SendAssetController.blockchainSendAsset
 
-GET         /blockchain/sendFiat                            controllers.SendFiatController.blockchainSendFiatForm
-POST        /blockchain/sendFiat                            controllers.SendFiatController.blockchainSendFiat
+GET         /blockchain/sendCoin                                  controllers.SendCoinController.blockchainSendCoinForm
+POST        /blockchain/sendCoin                                  controllers.SendCoinController.blockchainSendCoin
 
-GET         /blockchain/setACL                              controllers.SetACLController.blockchainSetACLForm
-POST        /blockchain/setACL                              controllers.SetACLController.blockchainSetACL
+GET         /blockchain/sendFiat                                  controllers.SendFiatController.blockchainSendFiatForm
+POST        /blockchain/sendFiat                                  controllers.SendFiatController.blockchainSendFiat
 
-GET         /blockchain/setBuyerFeedback                    controllers.SetBuyerFeedbackController.blockchainSetBuyerFeedbackForm
-POST        /blockchain/setBuyerFeedback                    controllers.SetBuyerFeedbackController.blockchainSetBuyerFeedback
+GET         /blockchain/setACL                                    controllers.SetACLController.blockchainSetACLForm
+POST        /blockchain/setACL                                    controllers.SetACLController.blockchainSetACL
 
-GET         /blockchain/setSellerFeedback                   controllers.SetSellerFeedbackController.blockchainSetSellerFeedbackForm
-POST        /blockchain/setSellerFeedback                   controllers.SetSellerFeedbackController.blockchainSetSellerFeedback
+GET         /blockchain/setBuyerFeedback                          controllers.SetBuyerFeedbackController.blockchainSetBuyerFeedbackForm
+POST        /blockchain/setBuyerFeedback                          controllers.SetBuyerFeedbackController.blockchainSetBuyerFeedback
+
+GET         /blockchain/setSellerFeedback                         controllers.SetSellerFeedbackController.blockchainSetSellerFeedbackForm
+POST        /blockchain/setSellerFeedback                         controllers.SetSellerFeedbackController.blockchainSetSellerFeedback

@@ -31,4 +31,24 @@ $(document).ready(function () {
     });
 });
 
-function toggle(pageNumber){if (pageNumber!=1) document.getElementById("noti_Button").click()}
+function toggle(page){if (page!=1) document.getElementById("noti_Button").click()}
+
+function changeNotificationPage(page){
+    window.open(jsRoutes.controllers.NotificationController.changeNotificationPage(page).url,"_self")
+}
+function markNotificationAsRead(i,notificationID){
+    document.getElementById(i).style.backgroundColor="#FFF";
+
+    $.ajax({
+        url: "/markNotificationAsRead/"+notificationID,
+        type: "GET",
+        statusCode: {
+            200: function (data) {
+                console.log(data)
+            },
+            204: function (data) {
+                console.log(data)
+            }
+        }
+    });
+}

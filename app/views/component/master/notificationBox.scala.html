@@ -1,25 +1,8 @@
 @import helper._
 @import views.companion.master.NotificationBox
 
-@( notificationBoxForm: Form[NotificationBox.Data], notificatonList : Seq[models.masterTransaction.Notification]=null, pageNumber: Int, limit : Int, unread: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@(notificatonList : Seq[models.masterTransaction.Notification]=null, pageNumber: Int, limit : Int, unread: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @common(Messages(constants.Forms.NOTIFICATION_BOX)) {
-    <div style="height:10px;display:none" >
-    @form(action = routes.NotificationController.showNotifications) {
-        @CSRF.formField
-        @inputText(notificationBoxForm(constants.Forms.PAGE_NUMBER),'id -> constants.Forms.PAGE_NUMBER,'_label-> Messages(constants.Forms.PAGE_NUMBER))
-        @inputText(notificationBoxForm(constants.Forms.NOTIFICATION_ID),'id -> constants.Forms.NOTIFICATION_ID,'_label-> Messages(constants.Forms.NOTIFICATION_ID))
-        @if(notificationBoxForm.hasGlobalErrors) {
-            <ul>
-            @for(error <- notificationBoxForm.globalErrors) {
-                <li>@error.format</li>
-            }
-            </ul>
-        }
-        <button type="submit" id="button">@Messages(constants.Forms.LOGIN)</button>
-    }
-    </div>
-
-
     <head>
         <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/notifications.css")">
     </head>
@@ -36,7 +19,7 @@
                             @for(i <- 0 to (notificatonList.length - 1)) {
                                 @if(notificatonList(i).read){
                                     <div id=@i class="element">
-                                        <div onclick="submitRequest(@pageNumber, '@notificatonList(i).id')" >
+                                        <div onclick="markNotificationAsRead(@i,'@notificatonList(i).id')" >
                                         </br>
                                             @notificatonList(i).notificationTitle + @notificatonList(i).notificationMessage
                                         </br>
@@ -44,7 +27,7 @@
                                     </div>
                                 }else{
                                     <div id=@i class="element" style="background-color:#80c846" >
-                                        <div onclick="submitRequest(@pageNumber,'@notificatonList(i).id')">
+                                        <div onclick="markNotificationAsRead(@i,'@notificatonList(i).id')">
                                             </br>
                                             @notificatonList(i).notificationTitle + @notificatonList(i).notificationMessage
                                             </br>
@@ -55,8 +38,8 @@
 
                         </div>
                         <div class="seeAll">
-                             @if(pageNumber!=1) { <div  onclick="submitRequest(@pageNumber-1,'nil')" class="previous">&laquo; Previous || </div> }
-                             @if(notificatonList.length == limit) {<div onclick="submitRequest(@pageNumber+1,'nil')" class="next">Next &raquo;</div> }
+                             @if(pageNumber!=1) { <div  onclick="changeNotificationPage(@pageNumber-1)" class="previous">&laquo; Previous || </div> }
+                             @if(notificatonList.length == limit) {<div onclick="changeNotificationPage(@pageNumber+1)" class="next">Next &raquo;</div> }
                         </div>
                     </div>
                 </li>
@@ -65,11 +48,6 @@
         <div style="font-size:90%;font-style:italic;color:#CCC;border:none;text-align:left;margin:20px 10px;">Click the Circle to show the Notification Window</div>
     </body>
 <script>
-    function submitRequest(pageNumber, notificationID){
-        document.getElementById('@constants.Forms.PAGE_NUMBER').value= pageNumber;
-        document.getElementById('@constants.Forms.NOTIFICATION_ID').value= notificationID;
-        document.getElementById("button").click();
-    }
 </script>
     <script src="@routes.Assets.versioned("/javascripts/firebase.js")"></script>
     <script src="@routes.Assets.versioned("/javascripts/pushNotification.js")"></script>

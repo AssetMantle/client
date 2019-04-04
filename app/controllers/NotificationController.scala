@@ -12,20 +12,20 @@ import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerC
 
 import scala.concurrent.ExecutionContext
 
-class NotificationController @Inject()(messagesControllerComponents: MessagesControllerComponents, notifications: Notifications, withLoginAction: WithLoginAction)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport{
+class NotificationController @Inject()(messagesControllerComponents: MessagesControllerComponents, notifications: Notifications, withLoginAction: WithLoginAction)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val module: String = constants.Module.MASTER_ACCOUNT
 
   private val limit = configuration.get[Int]("notification.notificationsPerPage")
 
-  def showNotificationsForm: Action[AnyContent] = withLoginAction {implicit request => Ok(views.html.component.master.notificationBox(NotificationBox.form, notifications.Service.getNotifications(request.session.get(Security.USERNAME).get, 0, limit), 1, limit, notifications.Service.getNumberOfUnread(request.session.get(Security.USERNAME).get)))}
-
-  def showNotifications: Action[AnyContent] = withLoginAction { implicit request =>
+  def showNotifications: Action[AnyContent] = withLoginAction { implicit request => Ok(views.html.component.master.notificationBox(notifications.Service.getNotifications(request.session.get(Security.USERNAME).get, 0, limit), 1, limit, notifications.Service.getNumberOfUnread(request.session.get(Security.USERNAME).get))) }
+/*
+  def showNotificationsa: Action[AnyContent] = withLoginAction { implicit request =>
     NotificationBox.form.bindFromRequest().fold(
-      formWithErrors => BadRequest(views.html.component.master.notificationBox(formWithErrors, notifications.Service.getNotifications(request.session.get(Security.USERNAME).get, 0, limit), 1, limit,notifications.Service.getNumberOfUnread(request.session.get(Security.USERNAME).get))),
+      formWithErrors => BadRequest(views.html.component.master.notificationBox(formWithErrors, notifications.Service.getNotifications(request.session.get(Security.USERNAME).get, 0, limit), 1, limit, notifications.Service.getNumberOfUnread(request.session.get(Security.USERNAME).get))),
       notificationBoxData => {
         try {
-          if (notificationBoxData.notificationID!="nil") notifications.Service.markAsRead(notificationBoxData.notificationID)
+          if (notificationBoxData.notificationID != "nil") notifications.Service.markAsRead(notificationBoxData.notificationID)
           Ok(views.html.component.master.notificationBox(NotificationBox.form, notifications.Service.getNotifications(request.session.get(Security.USERNAME).get, (notificationBoxData.pageNumber - 1) * limit, limit), notificationBoxData.pageNumber, limit, notifications.Service.getNumberOfUnread(request.session.get(Security.USERNAME).get)))
         }
         catch {
@@ -33,5 +33,19 @@ class NotificationController @Inject()(messagesControllerComponents: MessagesCon
           case blockChainException: BlockChainException => Ok(views.html.index(failure = blockChainException.message))
         }
       })
+  }
+*/
+  def changeNotificationPage(pageNumber: Int) = withLoginAction { implicit request=>
+    Ok(views.html.component.master.notificationBox(notifications.Service.getNotifications(request.session.get(Security.USERNAME).get, (pageNumber - 1) * limit, limit), pageNumber, limit, notifications.Service.getNumberOfUnread(request.session.get(Security.USERNAME).get)))
+  }
+
+  def markNotificationAsRead(notificationID: String) = withLoginAction { implicit request =>
+    try {
+      notifications.Service.markAsRead(notificationID)
+      Ok("changed")
+    }
+    catch {
+      case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))
+    }
   }
 }
