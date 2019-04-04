@@ -1,6 +1,6 @@
 package constants
 
 object SMS {
-  val LOGIN = "Login"
+  val LOGIN = "LOGIN"
   val OTP = "OTP"
 }

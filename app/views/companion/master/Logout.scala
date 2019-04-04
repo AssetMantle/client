@@ -6,7 +6,7 @@ import play.api.data.Forms.{boolean, mapping}
 object Logout {
   val form = Form(
     mapping(
-      "receiveNotifications" -> boolean,
+      constants.Forms.RECEIVE_NOTIFICATIONS -> boolean,
     )(Data.apply)(Data.unapply)
   )
 

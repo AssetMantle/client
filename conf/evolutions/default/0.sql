@@ -1,5 +1,6 @@
 -- Create database and user scripts. To be run before evolutions are started.
 
+
 CREATE USER comdex WITH PASSWORD 'comdex';
 
 CREATE DATABASE comdex WITH OWNER = comdex;

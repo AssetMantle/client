@@ -22,9 +22,9 @@ class GetOrganization @Inject()(wsClient: WSClient)(implicit configuration: Conf
 
   private val path = "organization"
 
-  private val url = ip + ":" + port + "/" + path
+  private val url = ip + ":" + port + "/" + path + "/"
 
-  private def action()(implicit executionContext: ExecutionContext): Future[Response] = wsClient.url(url).get.map { response => new Response(response) }
+  private def action(request: String)(implicit executionContext: ExecutionContext): Future[Response] = wsClient.url(url + request).get.map { response => new Response(response) }
 
   class Response(response: WSResponse) {
     val body: String = response.body
@@ -32,13 +32,12 @@ class GetOrganization @Inject()(wsClient: WSClient)(implicit configuration: Conf
 
   object Service {
 
-    def get()(implicit executionContext: ExecutionContext): Response = try {
-      Await.result(action(), Duration.Inf)
+    def get(organizationID: String)(implicit executionContext: ExecutionContext): Response = try {
+      Await.result(action(organizationID), Duration.Inf)
     } catch {
       case connectException: ConnectException =>
         logger.error(constants.Error.CONNECT_EXCEPTION, connectException)
         throw new BaseException(constants.Error.CONNECT_EXCEPTION)
     }
   }
-
 }

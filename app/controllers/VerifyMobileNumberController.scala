@@ -39,7 +39,7 @@ class VerifyMobileNumberController @Inject()(messagesControllerComponents: Messa
         try {
           if (!smsOTPs.Service.verifyOTP(request.session.get(Security.USERNAME).get, verifyMobileNumberData.otp)) throw new BaseException(constants.Error.INVALID_OTP)
           if (contacts.Service.verifyMobileNumber(request.session.get(Security.USERNAME).get) != 1) throw new BaseException(constants.Error.MOBILE_NUMBER_NOT_FOUND)
-          Ok(views.html.index(success = "Mobile Number Updated"))
+          Ok(views.html.index(success = Messages(constants.Flash.SUCCESS)))
         }
         catch {
           case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))

@@ -15,6 +15,8 @@ import scala.util.Random
 
 class SendAssetController @Inject()(messagesControllerComponents: MessagesControllerComponents, withLoginAction: WithLoginAction, transactionSendAsset: transactions.SendAsset, sendAssets: SendAssets)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
+  private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
+
   def sendAssetForm: Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.master.sendAsset(master.SendAsset.form))
   }
@@ -26,7 +28,7 @@ class SendAssetController @Inject()(messagesControllerComponents: MessagesContro
       },
       sendAssetData => {
         try {
-          if (configuration.get[Boolean]("blockchain.kafka.enabled")) {
+          if (kafkaEnabled) {
             val response = transactionSendAsset.Service.kafkaPost( transactionSendAsset.Request(from = request.session.get(constants.Security.USERNAME).get, to = sendAssetData.to, password = sendAssetData.password, pegHash = sendAssetData.pegHash, gas = sendAssetData.gas))
             sendAssets.Service.addSendAssetKafka(from = request.session.get(constants.Security.USERNAME).get, to = sendAssetData.to, pegHash = sendAssetData.pegHash, gas = sendAssetData.gas, null, null, ticketID = response.ticketID, null)
             Ok(views.html.index(success = response.ticketID))
@@ -55,7 +57,7 @@ class SendAssetController @Inject()(messagesControllerComponents: MessagesContro
       },
       sendAssetData => {
         try {
-          if (configuration.get[Boolean]("blockchain.kafka.enabled")) {
+          if (kafkaEnabled) {
             val response = transactionSendAsset.Service.kafkaPost( transactionSendAsset.Request(from = sendAssetData.from, to = sendAssetData.to, password = sendAssetData.password, pegHash = sendAssetData.pegHash, gas = sendAssetData.gas))
             sendAssets.Service.addSendAssetKafka(from = sendAssetData.from, to = sendAssetData.to, pegHash = sendAssetData.pegHash, gas = sendAssetData.gas, null, null, ticketID = response.ticketID, null)
             Ok(views.html.index(success = response.ticketID))

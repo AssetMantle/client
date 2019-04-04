@@ -15,6 +15,8 @@ import scala.util.Random
 
 class SetSellerFeedbackController @Inject()(messagesControllerComponents: MessagesControllerComponents, withLoginAction: WithLoginAction, transactionSetSellerFeedback: transactions.SetSellerFeedback, setSellerFeedbacks: SetSellerFeedbacks)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
+  private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
+
   def setSellerFeedbackForm: Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.master.setSellerFeedback(master.SetSellerFeedback.form))
   }
@@ -26,7 +28,7 @@ class SetSellerFeedbackController @Inject()(messagesControllerComponents: Messag
       },
       setSellerFeedbackData => {
         try {
-          if (configuration.get[Boolean]("blockchain.kafka.enabled")) {
+          if (kafkaEnabled) {
             val response = transactionSetSellerFeedback.Service.kafkaPost( transactionSetSellerFeedback.Request(from = request.session.get(constants.Security.USERNAME).get, to = setSellerFeedbackData.to, password = setSellerFeedbackData.password, pegHash = setSellerFeedbackData.pegHash, rating = setSellerFeedbackData.rating, gas = setSellerFeedbackData.gas))
             setSellerFeedbacks.Service.addSetSellerFeedbackKafka(from = request.session.get(constants.Security.USERNAME).get, to = setSellerFeedbackData.to, pegHash = setSellerFeedbackData.pegHash, rating = setSellerFeedbackData.rating, gas = setSellerFeedbackData.gas, null, null, ticketID = response.ticketID, null)
             Ok(views.html.index(success = response.ticketID))
@@ -55,7 +57,7 @@ class SetSellerFeedbackController @Inject()(messagesControllerComponents: Messag
       },
       setSellerFeedbackData => {
         try {
-          if (configuration.get[Boolean]("blockchain.kafka.enabled")) {
+          if (kafkaEnabled) {
             val response = transactionSetSellerFeedback.Service.kafkaPost( transactionSetSellerFeedback.Request(from = setSellerFeedbackData.from, to = setSellerFeedbackData.to, password = setSellerFeedbackData.password, pegHash = setSellerFeedbackData.pegHash, rating = setSellerFeedbackData.rating, gas = setSellerFeedbackData.gas))
             setSellerFeedbacks.Service.addSetSellerFeedbackKafka(from = setSellerFeedbackData.from, to = setSellerFeedbackData.to, pegHash = setSellerFeedbackData.pegHash, rating = setSellerFeedbackData.rating, gas = setSellerFeedbackData.gas, null, null, ticketID = response.ticketID, null)
             Ok(views.html.index(success = response.ticketID))

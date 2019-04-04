@@ -15,6 +15,8 @@ import scala.util.Random
 
 class ReleaseAssetController @Inject()(messagesControllerComponents: MessagesControllerComponents, withLoginAction: WithLoginAction, transactionReleaseAsset: transactions.ReleaseAsset, releaseAssets: ReleaseAssets)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
+  private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
+
   def releaseAssetForm: Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.master.releaseAsset(master.ReleaseAsset.form))
   }
@@ -26,7 +28,7 @@ class ReleaseAssetController @Inject()(messagesControllerComponents: MessagesCon
       },
       releaseAssetData => {
         try {
-          if (configuration.get[Boolean]("blockchain.kafka.enabled")) {
+          if (kafkaEnabled) {
             val response = transactionReleaseAsset.Service.kafkaPost( transactionReleaseAsset.Request(from = request.session.get(constants.Security.USERNAME).get, to = releaseAssetData.to, password = releaseAssetData.password, pegHash = releaseAssetData.pegHash, gas = releaseAssetData.gas))
             releaseAssets.Service.addReleaseAssetKafka(from = request.session.get(constants.Security.USERNAME).get, to = releaseAssetData.to, pegHash = releaseAssetData.pegHash, gas = releaseAssetData.gas, null, null, ticketID = response.ticketID, null)
             Ok(views.html.index(success = response.ticketID))
@@ -56,7 +58,7 @@ class ReleaseAssetController @Inject()(messagesControllerComponents: MessagesCon
       },
       releaseAssetData => {
         try {
-          if (configuration.get[Boolean]("blockchain.kafka.enabled")) {
+          if (kafkaEnabled) {
             val response = transactionReleaseAsset.Service.kafkaPost( transactionReleaseAsset.Request(from = releaseAssetData.from, to = releaseAssetData.to, password = releaseAssetData.password, pegHash = releaseAssetData.pegHash, gas = releaseAssetData.gas))
             releaseAssets.Service.addReleaseAssetKafka(from = releaseAssetData.from, to = releaseAssetData.to, pegHash = releaseAssetData.pegHash, gas = releaseAssetData.gas, null, null, ticketID = response.ticketID, null)
             Ok(views.html.index(success = response.ticketID))

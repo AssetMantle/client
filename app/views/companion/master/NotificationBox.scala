@@ -6,8 +6,8 @@ import play.api.data.Forms._
 object NotificationBox {
   val form = Form(
     mapping(
-      "pageNumber" -> number,
-      "notificationID" -> nonEmptyText
+      constants.Forms.PAGE_NUMBER -> number,
+      constants.Forms.NOTIFICATION_ID -> nonEmptyText
 
     )(Data.apply)(Data.unapply)
   )

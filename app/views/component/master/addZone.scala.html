@@ -5,7 +5,6 @@
 @common(Messages(constants.Forms.ADD_ZONE_TITLE)) {
     @form(action = routes.AddZoneController.addZone) {
         @CSRF.formField
-        @inputPassword(addZoneForm(constants.Forms.PASSWORD),'_label-> Messages(constants.Forms.PASSWORD))
         @inputText(addZoneForm(constants.Forms.NAME),'_label-> Messages(constants.Forms.NAME))
         @inputText(addZoneForm(constants.Forms.CURRENCY),'_label-> Messages(constants.Forms.CURRENCY))
 

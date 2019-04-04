@@ -6,15 +6,15 @@ import play.api.data.Forms._
 object IssueAsset {
   val form = Form(
     mapping(
-      "from" -> nonEmptyText(minLength = 1, maxLength = 20),
-      "to" -> nonEmptyText(minLength = 1, maxLength = 45),
-      "documentHash" -> nonEmptyText(minLength = 1, maxLength = 20),
-      "assetType" -> nonEmptyText(minLength = 1, maxLength = 20),
-      "assetPrice" -> number(min = 1, max = 10000),
-      "quantityUnit" -> nonEmptyText(minLength = 1, maxLength = 20),
-      "assetQuantity" -> number(min = 1, max = 10000),
-      "password" -> nonEmptyText(minLength = 1, maxLength = 20),
-      "gas" -> number(min = 1, max = 10000)
+      constants.Forms.FROM -> nonEmptyText(minLength = 1, maxLength = 20),
+      constants.Forms.TO -> nonEmptyText(minLength = 1, maxLength = 45),
+      constants.Forms.DOCUMENT_HASH -> nonEmptyText(minLength = 1, maxLength = 20),
+      constants.Forms.ASSET_TYPE -> nonEmptyText(minLength = 1, maxLength = 20),
+      constants.Forms.ASSET_PRICE -> number(min = 1, max = 10000),
+      constants.Forms.QUANTITY_UNIT -> nonEmptyText(minLength = 1, maxLength = 20),
+      constants.Forms.ASSET_QUANTITY -> number(min = 1, max = 10000),
+      constants.Forms.PASSWORD -> nonEmptyText(minLength = 1, maxLength = 20),
+      constants.Forms.GAS -> number(min = 1, max = 10000)
     )(Data.apply)(Data.unapply)
   )
 

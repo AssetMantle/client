@@ -32,11 +32,10 @@ class SignUpController @Inject()(messagesControllerComponents: MessagesControlle
           val x = accounts.Service.addLogin(signUpData.username, signUpData.password, blockchainAccounts.Service.addAccount(signUpData.username, signUpData.password), request.lang.toString.stripPrefix("Lang(").stripSuffix(")").trim.split("_")(0))
           Ok(views.html.index(success = Messages(module + "." + constants.Success.SIGN_UP) + x))
         } catch {
-          case baseException: BaseException =>
-            Ok(views.html.index(failure = Messages(baseException.message)))
-          case blockChainException: BlockChainException =>
-            Ok(views.html.index(failure = blockChainException.message))
+          case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))
+          case blockChainException: BlockChainException => Ok(views.html.index(failure = blockChainException.message))
         }
-      })
+      }
+    )
   }
 }

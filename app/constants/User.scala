@@ -1,0 +1,52 @@
+package constants
+
+object User {
+
+  //common
+  val UNAUTHORIZED_TRANSACTION = "UNAUTHORIZED_TRANSACTION"
+  val COMDEX = "COMDEX"
+  val HOME = "HOME"
+  val USER_TYPE = "USER_TYPE"
+  val ADDRESS = "ADDRESS"
+  val COINS = "COINS"
+  val NAME = "NAME"
+
+  //genesis
+  val GENESIS = "GENESIS"
+  val MAIN_ACCOUNT = "main"
+  val NOT_GENESIS = "NOT_GENESIS"
+
+  //trader
+  val TRADER = "TRADER"
+  val NOT_TRADER = "NOT_TRADER"
+
+  //user
+  val USER = "USER"
+  val ASSETS_OWNED = "ASSETS OWNED"
+  val FIATS_OWNED = "FIATS OWNED"
+  val FIATS_TOTAL_VALUE = "FIATS TOTAL VALUE"
+  val NOT_USER = "NOT_USER"
+
+  //organization
+  val ORGANIZATION = "ORGANIZATION"
+  val ORGANIZATION_ID = "ORGANIZATION_ID"
+  val ORGANIZATION_NAME = "ORGANIZATION_NAME"
+  val ORGANIZATION_USERNAME = "ORGANIZATION_USERNAME"
+  val PHONE = "PHONE"
+  val EMAIL = "EMAIL"
+  val VERIFIED_STATUS = "VERIFIED_STATUS"
+  val NOT_ORGANIZATION = "NOT_ORGANIZATION"
+
+  //zone
+  val ZONE = "ZONE"
+  val ZONE_ID = "ZONE_ID"
+  val CURRENCY = "CURRENCY"
+  val NOT_ZONE = "NOT_ZONE"
+
+  //zone
+  val UNKNOWN = "UNKNOWN"
+
+  //unknownWithoutLogin
+  val WITHOUT_LOGIN = "WITHOUT_LOGIN"
+
+}
