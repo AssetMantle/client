@@ -1,7 +1,7 @@
 package constants
 
 object Notification {
-  val LOGIN = "Login"
+  val LOGIN = "LOGIN"
   val OTP = "OTP"
-  val SUCCESS = "Success"
+  val SUCCESS = "SUCCESS"
 }

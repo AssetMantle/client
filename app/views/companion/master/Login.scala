@@ -6,9 +6,9 @@ import play.api.data.Forms._
 object Login {
   val form = Form(
     mapping(
-      "username" -> nonEmptyText(minLength = 4, maxLength = 20),
-      "password" -> nonEmptyText(minLength = 8, maxLength = 50),
-      "notificationToken" -> nonEmptyText(minLength = 1, maxLength = 180)
+      constants.Forms.USERNAME -> nonEmptyText(minLength = 4, maxLength = 20),
+      constants.Forms.PASSWORD -> nonEmptyText(minLength = 8, maxLength = 50),
+      constants.Forms.NOTIFICATION_TOKEN -> nonEmptyText(minLength = 1, maxLength = 180)
     )(Data.apply)(Data.unapply)
   )
 

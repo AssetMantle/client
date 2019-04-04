@@ -24,14 +24,13 @@ class GetResponse @Inject()()(implicit wsClient: WSClient, configuration: Config
 
   private val url = ip + ":" + port + "/" + path + "/"
 
-  private def action(request: String)(implicit executionContext: ExecutionContext):Future[WSResponse] = wsClient.url(request).get
+  private def action(request: String)(implicit executionContext: ExecutionContext):Future[WSResponse] = wsClient.url(url + request).get
 
   object Service {
 
     def get(ticketID: String): WSResponse = {
       try{
-        val request = url + ticketID
-        Await.result(action(request), Duration.Inf)
+        Await.result(action(ticketID), Duration.Inf)
       } catch {
         case connectException: ConnectException => logger.error(constants.Error.CONNECT_EXCEPTION, connectException)
           throw new BlockChainException(constants.Error.CONNECT_EXCEPTION)

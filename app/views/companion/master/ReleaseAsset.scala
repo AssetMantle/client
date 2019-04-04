@@ -6,10 +6,10 @@ import play.api.data.Forms._
 object ReleaseAsset {
   val form = Form(
     mapping(
-      "to" -> nonEmptyText(minLength = 1, maxLength = 45),
-      "pegHash" -> nonEmptyText(minLength = 1, maxLength = 20),
-      "password" -> nonEmptyText(minLength = 1, maxLength = 20),
-      "gas" -> number(min = 1, max = 10000)
+      constants.Forms.TO -> nonEmptyText(minLength = 1, maxLength = 45),
+      constants.Forms.PEG_HASH -> nonEmptyText(minLength = 1, maxLength = 20),
+      constants.Forms.PASSWORD -> nonEmptyText(minLength = 1, maxLength = 20),
+      constants.Forms.GAS -> number(min = 1, max = 10000)
     )(Data.apply)(Data.unapply)
   )
 

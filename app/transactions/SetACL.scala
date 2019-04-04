@@ -28,7 +28,7 @@ class SetACL @Inject()(wsClient: WSClient)(implicit configuration: Configuration
 
   private val chainID = configuration.get[String]("blockchain.main.chainID")
 
-  case class Request(from: String, password: String, aclAddress: String, organizationID: String, zoneID: String, chainID: String = chainID, issueAsset: String, issueFiat: String, sendAsset: String, sendFiat: String, redeemAssets: String, redeemFiats: String, buyerExecuteOrder: String, sellerExecuteOrder: String, changeBuyerBid: String, changeSellerBid: String, confirmBuyerBid: String, confirmSellerBid: String, negotiation: String, releaseAssets: String)
+  case class Request(from: String, password: String, aclAddress: String, organizationID: String, zoneID: String, chainID: String = chainID, issueAsset: String, issueFiat: String, sendAsset: String, sendFiat: String, redeemAsset: String, redeemFiat: String, buyerExecuteOrder: String, sellerExecuteOrder: String, changeBuyerBid: String, changeSellerBid: String, confirmBuyerBid: String, confirmSellerBid: String, negotiation: String, releaseAsset: String)
 
   private implicit val requestWrites: OWrites[Request] = Json.writes[Request]
 

@@ -4,7 +4,8 @@ import java.net.ConnectException
 
 import exceptions.BaseException
 import javax.inject.Inject
-import play.api.libs.ws.{WSClient, WSResponse}
+import transactions.Response.AccountResponse.Response
+import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
 
 import scala.concurrent.duration.Duration
@@ -22,23 +23,18 @@ class GetAccount @Inject()(wsClient: WSClient)(implicit configuration: Configura
 
   private val path = "accounts"
 
-  private val url = ip + ":" + port + "/" + path
+  private val url = ip + ":" + port + "/" + path + "/"
 
-  private def action()(implicit executionContext: ExecutionContext): Future[Response] = wsClient.url(url).get.map { response => new Response(response) }
-
-  class Response(response: WSResponse) {
-    val body: String = response.body
-  }
+  private def action(request: String)(implicit executionContext: ExecutionContext): Future[Response] = wsClient.url(url + request).get.map { response => utilities.JSON.getResponseFromJson[Response](response)}
 
   object Service {
 
-    def get()(implicit executionContext: ExecutionContext): Response = try {
-      Await.result(action(), Duration.Inf)
+    def get(address: String)(implicit executionContext: ExecutionContext): Response = try {
+      Await.result(action(address), Duration.Inf)
     } catch {
       case connectException: ConnectException =>
         logger.error(constants.Error.CONNECT_EXCEPTION, connectException)
         throw new BaseException(constants.Error.CONNECT_EXCEPTION)
     }
   }
-
 }

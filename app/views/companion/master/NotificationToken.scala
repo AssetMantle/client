@@ -8,7 +8,7 @@ object NotificationToken {
 
   val form = Form(
     mapping(
-      "token" -> nonEmptyText(minLength = 1, maxLength = 200)
+      constants.Forms.TOKEN -> nonEmptyText(minLength = 1, maxLength = 200)
     )(Data.apply)(Data.unapply)
   )
 

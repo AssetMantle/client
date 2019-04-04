@@ -8,8 +8,8 @@ object VerifyZone {
 
   val form = Form(
     mapping(
-      "id" -> nonEmptyText(minLength = 4, maxLength = 20),
-      "password" -> nonEmptyText(minLength = 4, maxLength = 20),
+      constants.Forms.ID -> nonEmptyText(minLength = 4, maxLength = 20),
+      constants.Forms.PASSWORD -> nonEmptyText(minLength = 4, maxLength = 20),
     )(Data.apply)(Data.unapply)
   )
 

@@ -15,6 +15,8 @@ import scala.util.Random
 
 class RedeemFiatController @Inject()(messagesControllerComponents: MessagesControllerComponents, withLoginAction: WithLoginAction, transactionRedeemFiat: transactions.RedeemFiat, redeemFiats: RedeemFiats)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
+  private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
+
   def redeemFiatForm: Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.master.redeemFiat(master.RedeemFiat.form))
   }
@@ -26,7 +28,7 @@ class RedeemFiatController @Inject()(messagesControllerComponents: MessagesContr
       },
       redeemFiatData => {
         try {
-          if (configuration.get[Boolean]("blockchain.kafka.enabled")) {
+          if (kafkaEnabled) {
             val response = transactionRedeemFiat.Service.kafkaPost( transactionRedeemFiat.Request(from = request.session.get(constants.Security.USERNAME).get, to = redeemFiatData.to, password = redeemFiatData.password, redeemAmount = redeemFiatData.redeemAmount, gas = redeemFiatData.gas))
             redeemFiats.Service.addRedeemFiatKafka(from = request.session.get(constants.Security.USERNAME).get, to = redeemFiatData.to, redeemAmount = redeemFiatData.redeemAmount, gas = redeemFiatData.gas, null, null, ticketID = response.ticketID, null)
             Ok(views.html.index(success = response.ticketID))
@@ -56,7 +58,7 @@ class RedeemFiatController @Inject()(messagesControllerComponents: MessagesContr
       },
       redeemFiatData => {
         try {
-          if (configuration.get[Boolean]("blockchain.kafka.enabled")) {
+          if (kafkaEnabled) {
             val response = transactionRedeemFiat.Service.kafkaPost( transactionRedeemFiat.Request(from = redeemFiatData.from, to = redeemFiatData.to, password = redeemFiatData.password, redeemAmount = redeemFiatData.redeemAmount, gas = redeemFiatData.gas))
             redeemFiats.Service.addRedeemFiatKafka(from = redeemFiatData.from, to = redeemFiatData.to, redeemAmount = redeemFiatData.redeemAmount, gas = redeemFiatData.gas, null, null, ticketID = response.ticketID, null)
             Ok(views.html.index(success = response.ticketID))

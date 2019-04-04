@@ -13,7 +13,9 @@ import views.companion.{blockchain, master}
 import scala.concurrent.ExecutionContext
 import scala.util.Random
 
-class BuyerExecuteOrderController @Inject()(messagesControllerComponents: MessagesControllerComponents, withLoginAction: WithLoginAction, transactionBuyerExecuteOrder: transactions.BuyerExecuteOrder, buyerExecuteOrders: BuyerExecuteOrders)(implicit exec: ExecutionContext,configuration: Configuration, accounts: Accounts) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class BuyerExecuteOrderController @Inject()(messagesControllerComponents: MessagesControllerComponents, withLoginAction: WithLoginAction, transactionBuyerExecuteOrder: transactions.BuyerExecuteOrder, buyerExecuteOrders: BuyerExecuteOrders)(implicit exec: ExecutionContext, configuration: Configuration, accounts: Accounts) extends AbstractController(messagesControllerComponents) with I18nSupport {
+
+  private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
 
   def buyerExecuteOrderForm: Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.master.buyerExecuteOrder(master.BuyerExecuteOrder.form))
@@ -26,7 +28,7 @@ class BuyerExecuteOrderController @Inject()(messagesControllerComponents: Messag
       },
       buyerExecuteOrderData => {
         try {
-          if (configuration.get[Boolean]("blockchain.kafka.enabled")) {
+          if (kafkaEnabled) {
             val response = transactionBuyerExecuteOrder.Service.kafkaPost( transactionBuyerExecuteOrder.Request(from = request.session.get(constants.Security.USERNAME).get, password = buyerExecuteOrderData.password, buyerAddress = buyerExecuteOrderData.buyerAddress, sellerAddress = buyerExecuteOrderData.sellerAddress, fiatProofHash = buyerExecuteOrderData.fiatProofHash, pegHash = buyerExecuteOrderData.pegHash, gas = buyerExecuteOrderData.gas))
             buyerExecuteOrders.Service.addBuyerExecuteOrderKafka(from = request.session.get(constants.Security.USERNAME).get, buyerAddress = buyerExecuteOrderData.buyerAddress, sellerAddress = buyerExecuteOrderData.sellerAddress, fiatProofHash = buyerExecuteOrderData.fiatProofHash, pegHash = buyerExecuteOrderData.pegHash, gas = buyerExecuteOrderData.gas, null, null, ticketID = response.ticketID, null)
             Ok(views.html.index(success = response.ticketID))
@@ -56,7 +58,7 @@ class BuyerExecuteOrderController @Inject()(messagesControllerComponents: Messag
       },
       buyerExecuteOrderData => {
         try {
-          if (configuration.get[Boolean]("blockchain.kafka.enabled")) {
+          if (kafkaEnabled) {
             val response = transactionBuyerExecuteOrder.Service.kafkaPost( transactionBuyerExecuteOrder.Request(from = buyerExecuteOrderData.from, password = buyerExecuteOrderData.password, buyerAddress = buyerExecuteOrderData.buyerAddress, sellerAddress = buyerExecuteOrderData.sellerAddress, fiatProofHash = buyerExecuteOrderData.fiatProofHash, pegHash = buyerExecuteOrderData.pegHash, gas = buyerExecuteOrderData.gas))
             buyerExecuteOrders.Service.addBuyerExecuteOrderKafka(from = buyerExecuteOrderData.from, buyerAddress = buyerExecuteOrderData.buyerAddress, sellerAddress = buyerExecuteOrderData.sellerAddress, fiatProofHash = buyerExecuteOrderData.fiatProofHash, pegHash = buyerExecuteOrderData.pegHash, gas = buyerExecuteOrderData.gas, null, null, ticketID = response.ticketID, null)
             Ok(views.html.index(success = response.ticketID))

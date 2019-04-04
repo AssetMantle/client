@@ -15,6 +15,8 @@ import scala.util.Random
 
 class SetBuyerFeedbackController @Inject()(messagesControllerComponents: MessagesControllerComponents, withLoginAction: WithLoginAction, transactionSetBuyerFeedback: transactions.SetBuyerFeedback, setBuyerFeedbacks: SetBuyerFeedbacks)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
+  private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
+
   def setBuyerFeedbackForm: Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.master.setBuyerFeedback(master.SetBuyerFeedback.form))
   }
@@ -26,7 +28,7 @@ class SetBuyerFeedbackController @Inject()(messagesControllerComponents: Message
       },
       setBuyerFeedbackData => {
         try {
-          if (configuration.get[Boolean]("blockchain.kafka.enabled")) {
+          if (kafkaEnabled) {
             val response = transactionSetBuyerFeedback.Service.kafkaPost( transactionSetBuyerFeedback.Request(from = request.session.get(constants.Security.USERNAME).get, to = setBuyerFeedbackData.to, password = setBuyerFeedbackData.password, pegHash = setBuyerFeedbackData.pegHash, rating = setBuyerFeedbackData.rating, gas = setBuyerFeedbackData.gas))
             setBuyerFeedbacks.Service.addSetBuyerFeedbackKafka(from = request.session.get(constants.Security.USERNAME).get, to = setBuyerFeedbackData.to, pegHash = setBuyerFeedbackData.pegHash, rating = setBuyerFeedbackData.rating, gas = setBuyerFeedbackData.gas, null, null, ticketID = response.ticketID, null)
             Ok(views.html.index(success = response.ticketID))
@@ -56,7 +58,7 @@ class SetBuyerFeedbackController @Inject()(messagesControllerComponents: Message
       },
       setBuyerFeedbackData => {
         try {
-          if (configuration.get[Boolean]("blockchain.kafka.enabled")) {
+          if (kafkaEnabled) {
             val response = transactionSetBuyerFeedback.Service.kafkaPost( transactionSetBuyerFeedback.Request(from = setBuyerFeedbackData.from, to = setBuyerFeedbackData.to, password = setBuyerFeedbackData.password, pegHash = setBuyerFeedbackData.pegHash, rating = setBuyerFeedbackData.rating, gas = setBuyerFeedbackData.gas))
             setBuyerFeedbacks.Service.addSetBuyerFeedbackKafka(from = setBuyerFeedbackData.from, to = setBuyerFeedbackData.to, pegHash = setBuyerFeedbackData.pegHash, rating = setBuyerFeedbackData.rating, gas = setBuyerFeedbackData.gas, null, null, ticketID = response.ticketID, null)
             Ok(views.html.index(success = response.ticketID))

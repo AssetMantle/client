@@ -6,12 +6,12 @@ import play.api.data.Forms.{mapping, nonEmptyText, _}
 object IssueFiat {
   val form = Form(
     mapping(
-      "from" -> nonEmptyText(minLength = 1, maxLength = 20),
-      "to" -> nonEmptyText(minLength = 1, maxLength = 45),
-      "transactionID" -> nonEmptyText(minLength = 1, maxLength = 20),
-      "transactionAmount" -> number(min = 1, max = 10000),
-      "password" -> nonEmptyText(minLength = 1, maxLength = 20),
-      "gas" -> number(min = 1, max = 10000)
+      constants.Forms.FROM -> nonEmptyText(minLength = 1, maxLength = 20),
+      constants.Forms.TO -> nonEmptyText(minLength = 1, maxLength = 45),
+      constants.Forms.TRANSACTION_ID -> nonEmptyText(minLength = 1, maxLength = 20),
+      constants.Forms.TRANSACTION_AMOUNT -> number(min = 1, max = 10000),
+      constants.Forms.PASSWORD -> nonEmptyText(minLength = 1, maxLength = 20),
+      constants.Forms.GAS -> number(min = 1, max = 10000)
     )(Data.apply)(Data.unapply)
   )
 

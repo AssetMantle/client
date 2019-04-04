@@ -15,6 +15,8 @@ import scala.util.Random
 
 class RedeemAssetController @Inject()(messagesControllerComponents: MessagesControllerComponents, withLoginAction: WithLoginAction, transactionRedeemAsset: transactions.RedeemAsset, redeemAssets: RedeemAssets)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
+  private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
+
   def redeemAssetForm: Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.master.redeemAsset(master.RedeemAsset.form))
   }
@@ -26,7 +28,7 @@ class RedeemAssetController @Inject()(messagesControllerComponents: MessagesCont
       },
       redeemAssetData => {
         try {
-          if (configuration.get[Boolean]("blockchain.kafka.enabled")) {
+          if (kafkaEnabled) {
             val response = transactionRedeemAsset.Service.kafkaPost( transactionRedeemAsset.Request(from = request.session.get(constants.Security.USERNAME).get, to = redeemAssetData.to, password = redeemAssetData.password, pegHash = redeemAssetData.pegHash, gas = redeemAssetData.gas))
             redeemAssets.Service.addRedeemAssetKafka(from = request.session.get(constants.Security.USERNAME).get, to = redeemAssetData.to, pegHash = redeemAssetData.pegHash, gas = redeemAssetData.gas, null, null, ticketID = response.ticketID, null)
             Ok(views.html.index(success = response.ticketID))
@@ -55,7 +57,7 @@ class RedeemAssetController @Inject()(messagesControllerComponents: MessagesCont
       },
       redeemAssetData => {
         try {
-          if (configuration.get[Boolean]("blockchain.kafka.enabled")) {
+          if (kafkaEnabled) {
             val response = transactionRedeemAsset.Service.kafkaPost( transactionRedeemAsset.Request(from = redeemAssetData.from, to = redeemAssetData.to, password = redeemAssetData.password, pegHash = redeemAssetData.pegHash, gas = redeemAssetData.gas))
             redeemAssets.Service.addRedeemAssetKafka(from = redeemAssetData.from, to = redeemAssetData.to, pegHash = redeemAssetData.pegHash, gas = redeemAssetData.gas, null, null, ticketID = response.ticketID, null)
             Ok(views.html.index(success = response.ticketID))
