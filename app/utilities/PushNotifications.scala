@@ -22,7 +22,6 @@ class PushNotifications @Inject()(wsClient: WSClient, notifications: Notificatio
 
   def sendNotification(accountID: String, messageType: String, passedData: Seq[String] = Seq(""))(implicit lang: Lang = Lang(accounts.Service.getLanguage(accountID))): Future[WSResponse] = {
     try{
-      Thread.sleep(3000)
       notifications.Service.addNotification(accountID, messagesApi(module + "Title" + "." + messageType), messagesApi(module + "Message" + "." + messageType, passedData(0)), DateTime.now(DateTimeZone.UTC).getMillis())
       wsClient.url(url).withHttpHeaders(constants.Header.CONTENT_TYPE -> constants.Header.APPLICATION_JSON).withHttpHeaders(constants.Header.AUTHORIZATION -> authorizationKey)
         .post(Json.toJson(Data(accountTokens.Service.getTokenById(accountID), Notification(messagesApi(module + "Title" + "." + messageType), messagesApi(module + "Message" + "." + messageType, passedData(0))))))
