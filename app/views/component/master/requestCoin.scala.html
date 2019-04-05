@@ -1,0 +1,20 @@
+@import helper._
+@import views.companion.master.RequestCoin
+
+@(requestCoinFormForm: Form[RequestCoin.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+
+@common(Messages(constants.Forms.REQUEST_COIN)) {
+    @form(action = routes.SendCoinController.requestCoins) {
+        @CSRF.formField
+        @inputText(requestCoinFormForm(constants.Forms.COUPON), '_label -> Messages(constants.Forms.ID))
+
+        @if(requestCoinFormForm.hasGlobalErrors) {
+            <ul>
+            @for(error <- requestCoinFormForm.globalErrors) {
+                <li>@error.format</li>
+            }
+            </ul>
+        }
+        <button type="submit">@Messages(constants.Forms.REQUEST_COIN)</button>
+    }
+}

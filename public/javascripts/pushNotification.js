@@ -15,7 +15,7 @@ $(document).ready(function () {
             return messaging.getToken()
         })
         .then(function (token) {
-            document.getElementById('notificationToken').value = token
+            document.getElementById('NOTIFICATION_TOKEN').value = token
         })
 
         .catch(function (err) {

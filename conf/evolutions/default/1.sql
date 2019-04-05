@@ -380,11 +380,11 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."SetSellerFeedback"
 
 CREATE TABLE IF NOT EXISTS MASTER."Zone"
 (
-  "id"         VARCHAR NOT NULL,
-  "accountID"  VARCHAR NOT NULL,
-  "name"       VARCHAR NOT NULL,
-  "currency"   VARCHAR NOT NULL,
-  "status"     BOOLEAN,
+  "id"        VARCHAR NOT NULL,
+  "accountID" VARCHAR NOT NULL,
+  "name"      VARCHAR NOT NULL,
+  "currency"  VARCHAR NOT NULL,
+  "status"    BOOLEAN,
   PRIMARY KEY ("id")
 );
 
@@ -473,6 +473,15 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."AccountToken"
   PRIMARY KEY ("id")
 );
 
+CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."FaucetRequest"
+(
+  "id"     VARCHAR NOT NULL,
+  "amount" INT     NOT NULL,
+  "gas"    INT,
+  "status" BOOLEAN NOT NULL,
+  PRIMARY KEY ("id")
+);
+
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."Notification"
 (
   "accountID"           VARCHAR NOT NULL,
@@ -544,8 +553,11 @@ ALTER TABLE MASTER."AccountKYC"
   ADD CONSTRAINT AccountKYC_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER."OrgBankAccount"
   ADD CONSTRAINT OrgBankAccount_Organization_id FOREIGN KEY ("id") REFERENCES MASTER."Organization" ("id");
+
 ALTER TABLE MASTER_TRANSACTION."AccountToken"
   ADD CONSTRAINT AccountToken_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
+ALTER TABLE MASTER_TRANSACTION."FaucetRequest"
+  ADD CONSTRAINT FaucetRequest_MasterAccount_AccountID FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER_TRANSACTION."Notification"
   ADD CONSTRAINT Notification_Account_id FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER_TRANSACTION."SMSOTP"
@@ -556,12 +568,10 @@ ALTER TABLE MASTER_TRANSACTION."EmailOTP"
 /*Initial State*/
 
 INSERT INTO blockchain."Account_BC"("address", "coins", "publicKey", "accountNumber", "sequence")
-VALUES
-('cosmos14375p72aunmu3vuwevu5e4vgegekd0n0sj9czh', 1000, 'VMzqh7vxmb/7W4w+1DQxAuISeI1dbCYPdcdIEh/HhRg=', 0, 0);
+VALUES ('cosmos14375p72aunmu3vuwevu5e4vgegekd0n0sj9czh', 1000, 'VMzqh7vxmb/7W4w+1DQxAuISeI1dbCYPdcdIEh/HhRg=', 0, 0);
 
 INSERT INTO master."Account"("id", "secretHash", "accountAddress", "language", "userType")
-VALUES
-('main', '-1886325765', 'cosmos14375p72aunmu3vuwevu5e4vgegekd0n0sj9czh', 'en', 'GENESIS');
+VALUES ('main', '-1886325765', 'cosmos14375p72aunmu3vuwevu5e4vgegekd0n0sj9czh', 'en', 'GENESIS');
 
 # --- !Downs
 
@@ -608,6 +618,7 @@ DROP TABLE IF EXISTS MASTER."OrgBankAccount" CASCADE;
 DROP TABLE IF EXISTS MASTER."BankAccount" CASCADE;
 
 DROP TABLE IF EXISTS MASTER_TRANSACTION."AccountToken" CASCADE;
+DROP TABLE IF EXISTS MASTER_TRANSACTION."FaucetRequest" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."Notification" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."SMSOTP" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."EmailOTP" CASCADE;
