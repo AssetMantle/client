@@ -103,7 +103,7 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
     )
   }
 
-  def viewFaucetRequests: Action[AnyContent] = withGenesisLoginAction { implicit request =>
+  def viewFaucetRequests: Action[AnyContent] = withLoginAction { implicit request =>
     Ok(views.html.component.master.viewFaucetRequests( faucetRequests = masterTransactionFaucetRequests.Service.getStatus(), approveFaucetRequestForm = views.companion.master.ApproveFaucetRequest.form))
   }
 
