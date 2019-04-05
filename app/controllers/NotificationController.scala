@@ -2,12 +2,11 @@ package controllers
 
 import constants.Security
 import controllers.actions.WithLoginAction
-import exceptions.{BaseException, BlockChainException}
+import exceptions.BaseException
 import javax.inject.Inject
 import models.masterTransaction.Notifications
 import play.api.Configuration
 import play.api.i18n.{I18nSupport, Messages}
-import views.companion.master.NotificationBox
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 
 import scala.concurrent.ExecutionContext
@@ -18,31 +17,17 @@ class NotificationController @Inject()(messagesControllerComponents: MessagesCon
 
   private val limit = configuration.get[Int]("notification.notificationsPerPage")
 
-  def showNotifications: Action[AnyContent] = withLoginAction { implicit request => Ok(views.html.component.master.notificationBox(notifications.Service.getNotifications(request.session.get(Security.USERNAME).get, 0, limit), 1, limit, notifications.Service.getNumberOfUnread(request.session.get(Security.USERNAME).get))) }
-/*
-  def showNotificationsa: Action[AnyContent] = withLoginAction { implicit request =>
-    NotificationBox.form.bindFromRequest().fold(
-      formWithErrors => BadRequest(views.html.component.master.notificationBox(formWithErrors, notifications.Service.getNotifications(request.session.get(Security.USERNAME).get, 0, limit), 1, limit, notifications.Service.getNumberOfUnread(request.session.get(Security.USERNAME).get))),
-      notificationBoxData => {
-        try {
-          if (notificationBoxData.notificationID != "nil") notifications.Service.markAsRead(notificationBoxData.notificationID)
-          Ok(views.html.component.master.notificationBox(NotificationBox.form, notifications.Service.getNotifications(request.session.get(Security.USERNAME).get, (notificationBoxData.pageNumber - 1) * limit, limit), notificationBoxData.pageNumber, limit, notifications.Service.getNumberOfUnread(request.session.get(Security.USERNAME).get)))
-        }
-        catch {
-          case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))
-          case blockChainException: BlockChainException => Ok(views.html.index(failure = blockChainException.message))
-        }
-      })
+  def showNotifications: Action[AnyContent] = withLoginAction { implicit request =>
+    Ok(views.html.component.master.notificationBox(notifications.Service.getNotifications(request.session.get(Security.USERNAME).get, 0, limit), 1, limit, notifications.Service.getNumberOfUnread(request.session.get(Security.USERNAME).get)))
   }
-*/
-  def changeNotificationPage(pageNumber: Int) = withLoginAction { implicit request=>
+
+  def changeNotificationPage(pageNumber: Int): Action[AnyContent] = withLoginAction { implicit request =>
     Ok(views.html.component.master.notificationBox(notifications.Service.getNotifications(request.session.get(Security.USERNAME).get, (pageNumber - 1) * limit, limit), pageNumber, limit, notifications.Service.getNumberOfUnread(request.session.get(Security.USERNAME).get)))
   }
 
-  def markNotificationAsRead(notificationID: String) = withLoginAction { implicit request =>
+  def markNotificationAsRead(notificationID: String): Action[AnyContent] = withLoginAction { implicit request =>
     try {
-      notifications.Service.markAsRead(notificationID)
-      Ok("changed")
+      Ok(notifications.Service.markAsRead(notificationID).toString)
     }
     catch {
       case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))
