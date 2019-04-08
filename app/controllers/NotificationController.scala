@@ -18,7 +18,12 @@ class NotificationController @Inject()(messagesControllerComponents: MessagesCon
   private val limit = configuration.get[Int]("notification.notificationsPerPage")
 
   def showNotifications(pageNumber: Int): Action[AnyContent] = withLoginAction { implicit request =>
-    Ok(views.html.component.master.notificationWindow(notifications.Service.getNotifications(request.session.get(Security.USERNAME).get, (pageNumber - 1) * limit, limit), pageNumber, limit, notifications.Service.getNumberOfUnread(request.session.get(Security.USERNAME).get)))
+    try{
+      Ok(views.html.component.master.notificationWindow(notifications.Service.getNotifications(request.session.get(Security.USERNAME).get, (pageNumber - 1) * limit, limit), pageNumber, limit, notifications.Service.getNumberOfUnread(request.session.get(Security.USERNAME).get)))
+    }
+    catch{
+      case baseException: BaseException => Ok(baseException.message)
+    }
   }
 
   def markNotificationAsRead(notificationID: String): Action[AnyContent] = withLoginAction { implicit request =>

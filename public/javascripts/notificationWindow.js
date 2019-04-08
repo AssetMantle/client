@@ -44,7 +44,6 @@ function changeNotificationPage(page) {
 
 function markNotificationAsRead(i, notificationID) {
     document.getElementById(i).style.backgroundColor = "#FFF";
-    console.log("o")
     $.ajax({
         url: jsRoutes.controllers.NotificationController.markNotificationAsRead(notificationID).url,
         type: "GET",

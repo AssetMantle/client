@@ -26,7 +26,6 @@ $(document).ready(function () {
             console.log("Unable to get permission to notify.", err);
         });
     messaging.onMessage(function (payload) {
-        console.log("Message received. ", payload);
         if($("#" + "notificationWindow").length !=0) {
             var newNotification = document.createElement('div');
             newNotification.innerHTML ='</br>' +" (New) " +JSON.parse(JSON.stringify(payload)).notification.title+" + "+JSON.parse(JSON.stringify(payload)).notification.body+ '</br>';
