@@ -7,12 +7,12 @@ object ApproveFaucetRequest {
 
   val form = Form(
     mapping(
-      constants.Forms.ID -> nonEmptyText(minLength = 1, maxLength = 45),
+      constants.Forms.ACCOUNT_ID -> nonEmptyText(minLength = 1, maxLength = 45),
       constants.Forms.PASSWORD -> nonEmptyText(minLength = 1, maxLength = 20),
       constants.Forms.GAS -> number(min = 1, max = 10000)
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(id: String, password: String, gas: Int)
+  case class Data(accountID: String, password: String, gas: Int)
 
 }

@@ -2,7 +2,7 @@
 @import views.companion.blockchain.RedeemAsset
 
 @(redeemAssetForm: Form[RedeemAsset.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages(constants.Forms.REDEEM_ASSET_TITLE)) {
+@common(Messages(constants.Forms.REDEEM_ASSET)) {
     @form(action = routes.RedeemAssetController.blockchainRedeemAsset) {
         @CSRF.formField
         @inputText(redeemAssetForm(constants.Forms.FROM),'_label-> Messages(constants.Forms.FROM))
@@ -18,6 +18,6 @@
             }
             </ul>
         }
-        <button type="submit">@Messages(constants.Forms.REDEEM_ASSET_TITLE)</button>
+        <button type="submit">@Messages(constants.Forms.REDEEM_ASSET)</button>
     }
 }

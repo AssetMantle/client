@@ -2,7 +2,7 @@
 @import views.companion.master.SetACL
 
 @(setACLForm: Form[SetACL.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages(constants.Forms.SET_ACL_TITLE)) {
+@common(Messages(constants.Forms.SET_ACL)) {
     @form(action = routes.SetACLController.setACL) {
         @CSRF.formField
         @inputText(setACLForm(constants.Forms.ACL_ADDRESS),'_label-> Messages(constants.Forms.ACL_ADDRESS))
@@ -31,6 +31,6 @@
             }
             </ul>
         }
-        <button type=submit>@Messages(constants.Forms.SET_ACL_TITLE)</button>
+        <button type=submit>@Messages(constants.Forms.SET_ACL)</button>
     }
 }

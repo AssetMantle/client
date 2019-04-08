@@ -89,7 +89,7 @@ GET         /master/requestCoins                            controllers.SendCoin
 POST        /master/requestCoins                            controllers.SendCoinController.requestCoins
 
 GET         /master/viewFaucetRequests                      controllers.SendCoinController.viewFaucetRequests
-GET         /master/approveFaucetRequests/:id               controllers.SendCoinController.approveFaucetRequestsForm(id: String)
+GET         /master/approveFaucetRequests/:accountID        controllers.SendCoinController.approveFaucetRequestsForm(accountID: String)
 POST        /master/approveFaucetRequests                   controllers.SendCoinController.approveFaucetRequests
 
 GET         /master/sendFiat                                controllers.SendFiatController.sendFiatForm

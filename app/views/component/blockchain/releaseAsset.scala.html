@@ -2,7 +2,7 @@
 @import views.companion.blockchain.ReleaseAsset
 
 @(releaseAssetForm: Form[ReleaseAsset.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages(constants.Forms.RELEASE_ASSET_TITLE)) {
+@common(Messages(constants.Forms.RELEASE_ASSET)) {
     @form(action = routes.ReleaseAssetController.blockchainReleaseAsset) {
         @CSRF.formField
         @inputText(releaseAssetForm(constants.Forms.FROM),'_label-> Messages(constants.Forms.FROM))
@@ -18,6 +18,6 @@
             }
             </ul>
         }
-        <button type="submit">@Messages(constants.Forms.RELEASE_ASSET_TITLE)</button>
+        <button type="submit">@Messages(constants.Forms.RELEASE_ASSET)</button>
     }
 }

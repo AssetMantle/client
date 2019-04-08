@@ -13,7 +13,7 @@ import views.companion.master
 import scala.concurrent.ExecutionContext
 import scala.util.Random
 
-class ConfirmBuyerBidController @Inject()(messagesControllerComponents: MessagesControllerComponents, withTraderLoginAction: WithTraderLoginAction, withLoginAction: WithLoginAction, transactionConfirmBuyerBid: transactions.ConfirmBuyerBid, confirmBuyerBids: ConfirmBuyerBids)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class ConfirmBuyerBidController @Inject()(messagesControllerComponents: MessagesControllerComponents, withTraderLoginAction: WithTraderLoginAction, withLoginAction: WithLoginAction, transactionsConfirmBuyerBid: transactions.ConfirmBuyerBid, confirmBuyerBids: ConfirmBuyerBids)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
 
@@ -29,11 +29,11 @@ class ConfirmBuyerBidController @Inject()(messagesControllerComponents: Messages
       confirmBuyerBidData => {
         try {
           if (kafkaEnabled) {
-            val response = transactionConfirmBuyerBid.Service.kafkaPost( transactionConfirmBuyerBid.Request(from = request.session.get(constants.Security.USERNAME).get, to = confirmBuyerBidData.to, password = confirmBuyerBidData.password, bid = confirmBuyerBidData.bid, time = confirmBuyerBidData.time, pegHash = confirmBuyerBidData.pegHash, gas = confirmBuyerBidData.gas))
+            val response = transactionsConfirmBuyerBid.Service.kafkaPost( transactionsConfirmBuyerBid.Request(from = request.session.get(constants.Security.USERNAME).get, to = confirmBuyerBidData.to, password = confirmBuyerBidData.password, bid = confirmBuyerBidData.bid, time = confirmBuyerBidData.time, pegHash = confirmBuyerBidData.pegHash, gas = confirmBuyerBidData.gas))
             confirmBuyerBids.Service.addConfirmBuyerBidKafka(from = request.session.get(constants.Security.USERNAME).get, to = confirmBuyerBidData.to, bid = confirmBuyerBidData.bid, time = confirmBuyerBidData.time, pegHash = confirmBuyerBidData.pegHash, gas = confirmBuyerBidData.gas, null, null, ticketID = response.ticketID, null)
             Ok(views.html.index(success = response.ticketID))
           } else {
-            val response = transactionConfirmBuyerBid.Service.post( transactionConfirmBuyerBid.Request(from = request.session.get(constants.Security.USERNAME).get, to = confirmBuyerBidData.to, password = confirmBuyerBidData.password,  bid = confirmBuyerBidData.bid, time = confirmBuyerBidData.time, pegHash = confirmBuyerBidData.pegHash, gas = confirmBuyerBidData.gas))
+            val response = transactionsConfirmBuyerBid.Service.post( transactionsConfirmBuyerBid.Request(from = request.session.get(constants.Security.USERNAME).get, to = confirmBuyerBidData.to, password = confirmBuyerBidData.password,  bid = confirmBuyerBidData.bid, time = confirmBuyerBidData.time, pegHash = confirmBuyerBidData.pegHash, gas = confirmBuyerBidData.gas))
             confirmBuyerBids.Service.addConfirmBuyerBid(from = request.session.get(constants.Security.USERNAME).get, to = confirmBuyerBidData.to, bid = confirmBuyerBidData.bid, time = confirmBuyerBidData.time, pegHash = confirmBuyerBidData.pegHash, gas = confirmBuyerBidData.gas, null, txHash = Option(response.TxHash), ticketID = (Random.nextInt(899999999) + 100000000).toString, null)
             Ok(views.html.index(success = response.TxHash))
           }
@@ -59,11 +59,11 @@ class ConfirmBuyerBidController @Inject()(messagesControllerComponents: Messages
       confirmBuyerBidData => {
         try {
           if (kafkaEnabled) {
-            val response = transactionConfirmBuyerBid.Service.kafkaPost( transactionConfirmBuyerBid.Request(from = confirmBuyerBidData.from, to = confirmBuyerBidData.to, password = confirmBuyerBidData.password, bid = confirmBuyerBidData.bid, time = confirmBuyerBidData.time, pegHash = confirmBuyerBidData.pegHash, gas = confirmBuyerBidData.gas))
+            val response = transactionsConfirmBuyerBid.Service.kafkaPost( transactionsConfirmBuyerBid.Request(from = confirmBuyerBidData.from, to = confirmBuyerBidData.to, password = confirmBuyerBidData.password, bid = confirmBuyerBidData.bid, time = confirmBuyerBidData.time, pegHash = confirmBuyerBidData.pegHash, gas = confirmBuyerBidData.gas))
             confirmBuyerBids.Service.addConfirmBuyerBidKafka(from = confirmBuyerBidData.from, to = confirmBuyerBidData.to, bid = confirmBuyerBidData.bid, time = confirmBuyerBidData.time, pegHash = confirmBuyerBidData.pegHash, gas = confirmBuyerBidData.gas, null, null, ticketID = response.ticketID, null)
             Ok(views.html.index(success = response.ticketID))
           } else {
-            val response = transactionConfirmBuyerBid.Service.post( transactionConfirmBuyerBid.Request(from = confirmBuyerBidData.from,to = confirmBuyerBidData.to, password = confirmBuyerBidData.password,  bid = confirmBuyerBidData.bid, time = confirmBuyerBidData.time, pegHash = confirmBuyerBidData.pegHash, gas = confirmBuyerBidData.gas))
+            val response = transactionsConfirmBuyerBid.Service.post( transactionsConfirmBuyerBid.Request(from = confirmBuyerBidData.from,to = confirmBuyerBidData.to, password = confirmBuyerBidData.password,  bid = confirmBuyerBidData.bid, time = confirmBuyerBidData.time, pegHash = confirmBuyerBidData.pegHash, gas = confirmBuyerBidData.gas))
             confirmBuyerBids.Service.addConfirmBuyerBid(from = confirmBuyerBidData.from, to = confirmBuyerBidData.to, bid = confirmBuyerBidData.bid, time = confirmBuyerBidData.time, pegHash = confirmBuyerBidData.pegHash, gas = confirmBuyerBidData.gas, null, txHash = Option(response.TxHash), ticketID = (Random.nextInt(899999999) + 100000000).toString, null)
             Ok(views.html.index(success = response.TxHash))
           }

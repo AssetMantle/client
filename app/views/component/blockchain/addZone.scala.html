@@ -2,7 +2,7 @@
 @import views.companion.blockchain.AddZone
 
 @(addZoneForm: Form[AddZone.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages(constants.Forms.ADD_ZONE_TITLE)) {
+@common(Messages(constants.Forms.ADD_ZONE)) {
     @form(action = routes.AddZoneController.blockchainAddZone) {
         @CSRF.formField
         @inputText(addZoneForm(constants.Forms.FROM),'_label-> Messages(constants.Forms.FROM))
@@ -17,6 +17,6 @@
             }
             </ul>
         }
-        <button type="submit">@Messages(constants.Forms.ADD_ZONE_TITLE)</button>
+        <button type="submit">@Messages(constants.Forms.ADD_ZONE)</button>
     }
 }

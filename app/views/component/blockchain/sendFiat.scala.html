@@ -2,7 +2,7 @@
 @import views.companion.blockchain.SendFiat
 
 @(sendFiatForm: Form[SendFiat.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages(constants.Forms.SEND_FIAT_TITLE)) {
+@common(Messages(constants.Forms.SEND_FIAT)) {
     @form(action = routes.SendFiatController.blockchainSendFiat) {
         @CSRF.formField
         @inputText(sendFiatForm(constants.Forms.FROM),'_label-> Messages(constants.Forms.FROM))
@@ -19,6 +19,6 @@
             }
             </ul>
         }
-        <button type="submit">@Messages(constants.Forms.SEND_FIAT_TITLE)</button>
+        <button type="submit">@Messages(constants.Forms.SEND_FIAT)</button>
     }
 }

@@ -2,7 +2,7 @@
 @import views.companion.master.ConfirmSellerBid
 
 @(confirmSellerBidForm: Form[ConfirmSellerBid.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages(constants.Forms.CONFIRM_SELLER_BID_TITLE)) {
+@common(Messages(constants.Forms.CONFIRM_SELLER_BID)) {
     @form(action = routes.ConfirmSellerBidController.confirmSellerBid) {
         @CSRF.formField
         @inputText(confirmSellerBidForm(constants.Forms.TO),'_label-> Messages(constants.Forms.TO))
@@ -19,6 +19,6 @@
             }
             </ul>
         }
-        <button type="submit">@Messages(constants.Forms.CONFIRM_SELLER_BID_TITLE)</button>
+        <button type="submit">@Messages(constants.Forms.CONFIRM_SELLER_BID)</button>
     }
 }

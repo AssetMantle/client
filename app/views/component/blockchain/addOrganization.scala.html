@@ -2,7 +2,7 @@
 @import views.companion.blockchain.AddOrganization
 
 @(addOrganizationForm: Form[AddOrganization.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages(constants.Forms.ADD_ORGANIZATION_TITLE)) {
+@common(Messages(constants.Forms.ADD_ORGANIZATION)) {
     @form(action = routes.AddOrganizationController.blockchainAddOrganization) {
         @CSRF.formField
         @inputText(addOrganizationForm(constants.Forms.FROM),'_label-> Messages(constants.Forms.FROM))
@@ -18,6 +18,6 @@
             }
             </ul>
         }
-        <button type="submit">@Messages(constants.Forms.ADD_ORGANIZATION_TITLE)</button>
+        <button type="submit">@Messages(constants.Forms.ADD_ORGANIZATION)</button>
     }
 }

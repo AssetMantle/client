@@ -475,10 +475,11 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."AccountToken"
 
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."FaucetRequest"
 (
-  "id"     VARCHAR NOT NULL,
-  "amount" INT     NOT NULL,
-  "gas"    INT,
-  "status" BOOLEAN NOT NULL,
+  "id"        VARCHAR NOT NULL,
+  "accountID" VARCHAR NOT NULL,
+  "amount"    INT     NOT NULL,
+  "gas"       INT,
+  "status"    BOOLEAN NOT NULL,
   PRIMARY KEY ("id")
 );
 
@@ -557,7 +558,7 @@ ALTER TABLE MASTER."OrgBankAccount"
 ALTER TABLE MASTER_TRANSACTION."AccountToken"
   ADD CONSTRAINT AccountToken_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER_TRANSACTION."FaucetRequest"
-  ADD CONSTRAINT FaucetRequest_MasterAccount_AccountID FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
+  ADD CONSTRAINT FaucetRequest_MasterAccount_AccountID FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER_TRANSACTION."Notification"
   ADD CONSTRAINT Notification_Account_id FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER_TRANSACTION."SMSOTP"

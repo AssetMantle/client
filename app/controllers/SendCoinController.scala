@@ -11,7 +11,7 @@ import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerC
 import scala.concurrent.ExecutionContext
 import scala.util.Random
 
-class SendCoinController @Inject()(messagesControllerComponents: MessagesControllerComponents, masterAccounts: master.Accounts, withLoginAction: WithLoginAction, withGenesisLoginAction: WithGenesisLoginAction, blockchainAccounts: blockchain.Accounts, masterTransactionFaucetRequests: masterTransaction.FaucetRequests, withUnknownLoginAction: WithUnknownLoginAction, transactionSendCoin: transactions.SendCoin, blockchainTransactionSendCoins: blockchainTransaction.SendCoins, withUserLoginAction: WithUserLoginAction)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class SendCoinController @Inject()(messagesControllerComponents: MessagesControllerComponents, masterAccounts: master.Accounts, withLoginAction: WithLoginAction, withGenesisLoginAction: WithGenesisLoginAction, blockchainAccounts: blockchain.Accounts, masterTransactionFaucetRequests: masterTransaction.FaucetRequests, withUnknownLoginAction: WithUnknownLoginAction, transactionsSendCoin: transactions.SendCoin, blockchainTransactionSendCoins: blockchainTransaction.SendCoins, withUserLoginAction: WithUserLoginAction)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
 
@@ -31,12 +31,12 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
       sendCoinData => {
         try {
           if (kafkaEnabled) {
-            val response = transactionSendCoin.Service.kafkaPost(transactionSendCoin.Request(from = request.session.get(constants.Security.USERNAME).get, password = sendCoinData.password, to = sendCoinData.to, amount = Seq(transactionSendCoin.Amount("comdex", sendCoinData.amount.toString)), gas = sendCoinData.gas))
+            val response = transactionsSendCoin.Service.kafkaPost(transactionsSendCoin.Request(from = request.session.get(constants.Security.USERNAME).get, password = sendCoinData.password, to = sendCoinData.to, amount = Seq(transactionsSendCoin.Amount("comdex", sendCoinData.amount.toString)), gas = sendCoinData.gas))
             blockchainTransactionSendCoins.Service.addSendCoinKafka(from = request.session.get(constants.Security.USERNAME).get, to = sendCoinData.to, amount = sendCoinData.amount, gas = sendCoinData.gas, null, null, ticketID = response.ticketID, null)
             Ok(views.html.index(success = response.ticketID))
           }
           else {
-            val response = transactionSendCoin.Service.post(transactionSendCoin.Request(from = request.session.get(constants.Security.USERNAME).get, password = sendCoinData.password, to = sendCoinData.to, amount = Seq(transactionSendCoin.Amount("comdex", sendCoinData.amount.toString)), gas = sendCoinData.gas))
+            val response = transactionsSendCoin.Service.post(transactionsSendCoin.Request(from = request.session.get(constants.Security.USERNAME).get, password = sendCoinData.password, to = sendCoinData.to, amount = Seq(transactionsSendCoin.Amount("comdex", sendCoinData.amount.toString)), gas = sendCoinData.gas))
             blockchainTransactionSendCoins.Service.addSendCoin(from = request.session.get(constants.Security.USERNAME).get, to = sendCoinData.to, amount = sendCoinData.amount, gas = sendCoinData.gas, null, txHash = Option(response.TxHash), ticketID = (Random.nextInt(899999999) + 100000000).toString, null)
             blockchainAccounts.Service.updateSequenceAndCoins(sendCoinData.to, blockchainAccounts.Service.getSequence(sendCoinData.to) + 1, defaultFaucetToken)
             blockchainAccounts.Service.updateSequenceAndCoins(mainAddress, blockchainAccounts.Service.getSequence(mainAddress) + 1, blockchainAccounts.Service.getCoins(mainAddress) - defaultFaucetToken)
@@ -63,12 +63,12 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
       sendCoinData => {
         try {
           if (kafkaEnabled) {
-            val response = transactionSendCoin.Service.kafkaPost(transactionSendCoin.Request(from = sendCoinData.from, password = sendCoinData.password, to = sendCoinData.to, amount = Seq(transactionSendCoin.Amount("comdex", sendCoinData.amount.toString)), gas = sendCoinData.gas))
+            val response = transactionsSendCoin.Service.kafkaPost(transactionsSendCoin.Request(from = sendCoinData.from, password = sendCoinData.password, to = sendCoinData.to, amount = Seq(transactionsSendCoin.Amount("comdex", sendCoinData.amount.toString)), gas = sendCoinData.gas))
             blockchainTransactionSendCoins.Service.addSendCoinKafka(sendCoinData.from, sendCoinData.to, sendCoinData.amount, sendCoinData.gas, null, null, response.ticketID, null)
             Ok(views.html.index(success = response.ticketID))
           }
           else {
-            val response = transactionSendCoin.Service.post(transactionSendCoin.Request(from = sendCoinData.from, password = sendCoinData.password, to = sendCoinData.to, amount = Seq(transactionSendCoin.Amount("comdex", sendCoinData.amount.toString)), gas = sendCoinData.gas))
+            val response = transactionsSendCoin.Service.post(transactionsSendCoin.Request(from = sendCoinData.from, password = sendCoinData.password, to = sendCoinData.to, amount = Seq(transactionsSendCoin.Amount("comdex", sendCoinData.amount.toString)), gas = sendCoinData.gas))
             blockchainTransactionSendCoins.Service.addSendCoin(sendCoinData.from, sendCoinData.to, sendCoinData.amount, sendCoinData.gas, null, Option(response.TxHash), (Random.nextInt(899999999) + 100000000).toString, null)
             Ok(views.html.index(success = response.TxHash))
           }
@@ -104,32 +104,33 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
   }
 
   def viewFaucetRequests: Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.viewFaucetRequests( faucetRequests = masterTransactionFaucetRequests.Service.getStatus(), approveFaucetRequestForm = views.companion.master.ApproveFaucetRequest.form))
+    Ok(views.html.component.master.viewUnapprovedFaucetRequests( faucetRequests = masterTransactionFaucetRequests.Service.getStatus(), approveFaucetRequestForm = views.companion.master.ApproveFaucetRequest.form))
   }
 
-  def approveFaucetRequestsForm(id: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.approveFaucetRequests(views.companion.master.ApproveFaucetRequest.form, id))
+  def approveFaucetRequestsForm(accountID: String): Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.approveFaucetRequests(views.companion.master.ApproveFaucetRequest.form, accountID))
   }
 
   def approveFaucetRequests: Action[AnyContent] = withGenesisLoginAction { implicit request =>
     views.companion.master.ApproveFaucetRequest.form.bindFromRequest().fold(
       formWithErrors => {
-        BadRequest(views.html.component.master.approveFaucetRequests(formWithErrors, formWithErrors.data(constants.Forms.ID)))
+        BadRequest(views.html.component.master.approveFaucetRequests(formWithErrors, formWithErrors.get.accountID))
       },
       approveFaucetRequestFormData => {
         try {
           if (kafkaEnabled) {
-            val response = transactionSendCoin.Service.kafkaPost(transactionSendCoin.Request(from = constants.User.MAIN_ACCOUNT, password = approveFaucetRequestFormData.password, to = masterAccounts.Service.getAddress(approveFaucetRequestFormData.id), amount = Seq(transactionSendCoin.Amount("comdex", defaultFaucetToken.toString)), gas = approveFaucetRequestFormData.gas))
-            blockchainTransactionSendCoins.Service.addSendCoinKafka(constants.User.MAIN_ACCOUNT, masterAccounts.Service.getAddress(approveFaucetRequestFormData.id), defaultFaucetToken, approveFaucetRequestFormData.gas, null, null, response.ticketID, null)
+            val response = transactionsSendCoin.Service.kafkaPost(transactionsSendCoin.Request(from = constants.User.MAIN_ACCOUNT, password = approveFaucetRequestFormData.password, to = masterAccounts.Service.getAddress(approveFaucetRequestFormData.accountID), amount = Seq(transactionsSendCoin.Amount("comdex", defaultFaucetToken.toString)), gas = approveFaucetRequestFormData.gas))
+            blockchainTransactionSendCoins.Service.addSendCoinKafka(constants.User.MAIN_ACCOUNT, masterAccounts.Service.getAddress(approveFaucetRequestFormData.accountID), defaultFaucetToken, approveFaucetRequestFormData.gas, null, null, response.ticketID, null)
             Ok(views.html.index(success = response.ticketID))
           }
           else {
-            val response = transactionSendCoin.Service.post(transactionSendCoin.Request(from = constants.User.MAIN_ACCOUNT, password = approveFaucetRequestFormData.password, to = masterAccounts.Service.getAddress(approveFaucetRequestFormData.id), amount = Seq(transactionSendCoin.Amount("comdex", defaultFaucetToken.toString)), gas = approveFaucetRequestFormData.gas))
-            masterTransactionFaucetRequests.Service.updateStatusAndGas(approveFaucetRequestFormData.id, true, approveFaucetRequestFormData.gas)
-            blockchainAccounts.Service.updateSequenceAndCoins(masterAccounts.Service.getAddress(approveFaucetRequestFormData.id), blockchainAccounts.Service.getSequence(masterAccounts.Service.getAddress(approveFaucetRequestFormData.id)) + 1, defaultFaucetToken)
+            val toAddress = masterAccounts.Service.getAddress(approveFaucetRequestFormData.accountID)
+            val response = transactionsSendCoin.Service.post(transactionsSendCoin.Request(from = constants.User.MAIN_ACCOUNT, password = approveFaucetRequestFormData.password, to = toAddress, amount = Seq(transactionsSendCoin.Amount("comdex", defaultFaucetToken.toString)), gas = approveFaucetRequestFormData.gas))
+            masterTransactionFaucetRequests.Service.updateStatusAndGas(approveFaucetRequestFormData.accountID, true, approveFaucetRequestFormData.gas)
+            blockchainAccounts.Service.updateSequenceAndCoins(toAddress, blockchainAccounts.Service.getSequence(toAddress) + 1, defaultFaucetToken)
             blockchainAccounts.Service.updateSequenceAndCoins(mainAddress, blockchainAccounts.Service.getSequence(mainAddress) + 1, blockchainAccounts.Service.getCoins(mainAddress) - defaultFaucetToken)
-            masterAccounts.Service.updateUserType(approveFaucetRequestFormData.id, constants.User.USER)
-            blockchainTransactionSendCoins.Service.addSendCoin(constants.User.MAIN_ACCOUNT, masterAccounts.Service.getAddress(approveFaucetRequestFormData.id), defaultFaucetToken, approveFaucetRequestFormData.gas, null, Option(response.TxHash), (Random.nextInt(899999999) + 100000000).toString, null)
+            masterAccounts.Service.updateUserType(approveFaucetRequestFormData.accountID, constants.User.USER)
+            blockchainTransactionSendCoins.Service.addSendCoin(constants.User.MAIN_ACCOUNT, toAddress, defaultFaucetToken, approveFaucetRequestFormData.gas, null, Option(response.TxHash), (Random.nextInt(899999999) + 100000000).toString, null)
             Ok(views.html.index(success = Messages(constants.Success.APPROVED_FAUCET_REQUEST)))
           }
         }

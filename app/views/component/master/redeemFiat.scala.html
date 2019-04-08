@@ -2,7 +2,7 @@
 @import views.companion.master.RedeemFiat
 
 @(redeemFiatForm: Form[RedeemFiat.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages(constants.Forms.REDEEM_FIAT_TITLE)) {
+@common(Messages(constants.Forms.REDEEM_FIAT)) {
     @form(action = routes.RedeemFiatController.redeemFiat) {
         @CSRF.formField
         @inputText(redeemFiatForm(constants.Forms.TO),'_label-> Messages(constants.Forms.TO))
@@ -17,6 +17,6 @@
             }
             </ul>
         }
-        <button type="submit">@Messages(constants.Forms.REDEEM_FIAT_TITLE)</button>
+        <button type="submit">@Messages(constants.Forms.REDEEM_FIAT)</button>
     }
 }

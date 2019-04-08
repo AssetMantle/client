@@ -2,7 +2,7 @@
 @import views.companion.master.ReleaseAsset
 
 @(releaseAssetForm: Form[ReleaseAsset.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages(constants.Forms.RELEASE_ASSET_TITLE)) {
+@common(Messages(constants.Forms.RELEASE_ASSET)) {
     @form(action = routes.ReleaseAssetController.releaseAsset) {
         @CSRF.formField
         @inputText(releaseAssetForm(constants.Forms.TO),'_label-> Messages(constants.Forms.TO))
@@ -17,6 +17,6 @@
             }
             </ul>
         }
-        <button type="submit">@Messages(constants.Forms.RELEASE_ASSET_TITLE)</button>
+        <button type="submit">@Messages(constants.Forms.RELEASE_ASSET)</button>
     }
 }

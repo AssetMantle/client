@@ -2,7 +2,7 @@
 @import views.companion.master.RedeemAsset
 
 @(redeemAssetForm: Form[RedeemAsset.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages(constants.Forms.REDEEM_ASSET_TITLE)) {
+@common(Messages(constants.Forms.REDEEM_ASSET)) {
     @form(action = routes.RedeemAssetController.redeemAsset) {
         @CSRF.formField
         @inputText(redeemAssetForm(constants.Forms.TO),'_label-> Messages(constants.Forms.TO))
@@ -17,6 +17,6 @@
             }
             </ul>
         }
-        <button type="submit">@Messages(constants.Forms.REDEEM_ASSET_TITLE)</button>
+        <button type="submit">@Messages(constants.Forms.REDEEM_ASSET)</button>
     }
 }

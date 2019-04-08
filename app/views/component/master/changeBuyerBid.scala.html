@@ -2,7 +2,7 @@
 @import views.companion.master.ChangeBuyerBid
 
 @(changeBuyerBidForm: Form[ChangeBuyerBid.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages(constants.Forms.CHANGE_BUYER_BID_TITLE)) {
+@common(Messages(constants.Forms.CHANGE_BUYER_BID)) {
     @form(action = routes.ChangeBuyerBidController.changeBuyerBid) {
         @CSRF.formField
         @inputText(changeBuyerBidForm(constants.Forms.TO),'_label-> Messages(constants.Forms.TO))
@@ -19,6 +19,6 @@
             }
             </ul>
         }
-        <button type="submit">@Messages(constants.Forms.CHANGE_BUYER_BID_TITLE)</button>
+        <button type="submit">@Messages(constants.Forms.CHANGE_BUYER_BID)</button>
     }
 }

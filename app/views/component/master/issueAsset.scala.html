@@ -2,7 +2,7 @@
 @import views.companion.master.IssueAsset
 
 @(issueAssetForm: Form[IssueAsset.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages(constants.Forms.ISSUE_ASSET_TITLE)) {
+@common(Messages(constants.Forms.ISSUE_ASSET)) {
     @form(action = routes.IssueAssetController.issueAsset) {
         @CSRF.formField
         @inputText(issueAssetForm(constants.Forms.TO),'_label-> Messages(constants.Forms.TO))
@@ -21,6 +21,6 @@
             }
             </ul>
         }
-        <button type="submit">@Messages(constants.Forms.ISSUE_ASSET_TITLE)</button>
+        <button type="submit">@Messages(constants.Forms.ISSUE_ASSET)</button>
     }
 }

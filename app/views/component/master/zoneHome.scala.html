@@ -5,12 +5,12 @@
 @common(Messages(constants.User.HOME)) {
 
     <a href="@routes.AddOrganizationController.verifyOrganizationForm()">@Messages(constants.Forms.VERIFY_ORGANIZATION)</a>
-    <a href="@routes.BuyerExecuteOrderController.buyerExecuteOrderForm()">@Messages(constants.Forms.BUYER_EXECUTE_ORDER_TITLE)</a>
-    <a href="@routes.IssueAssetController.issueAssetForm">@Messages(constants.Forms.ISSUE_ASSET_TITLE)</a>
-    <a href="@routes.IssueFiatController.issueFiatForm">@Messages(constants.Forms.ISSUE_FIAT_TITLE)</a>
-    <a href="@routes.ReleaseAssetController.releaseAssetForm">@Messages(constants.Forms.RELEASE_ASSET_TITLE)</a>
-    <a href="@routes.SellerExecuteOrderController.sellerExecuteOrderForm()">@Messages(constants.Forms.SELLER_EXECUTE_ORDER_TITLE)</a>
-    <a href="@routes.SetACLController.setACLForm">@Messages(constants.Forms.SET_ACL_TITLE)</a>
+    <a href="@routes.BuyerExecuteOrderController.buyerExecuteOrderForm()">@Messages(constants.Forms.BUYER_EXECUTE_ORDER)</a>
+    <a href="@routes.IssueAssetController.issueAssetForm">@Messages(constants.Forms.ISSUE_ASSET)</a>
+    <a href="@routes.IssueFiatController.issueFiatForm">@Messages(constants.Forms.ISSUE_FIAT)</a>
+    <a href="@routes.ReleaseAssetController.releaseAssetForm">@Messages(constants.Forms.RELEASE_ASSET)</a>
+    <a href="@routes.SellerExecuteOrderController.sellerExecuteOrderForm()">@Messages(constants.Forms.SELLER_EXECUTE_ORDER)</a>
+    <a href="@routes.SetACLController.setACLForm">@Messages(constants.Forms.SET_ACL)</a>
 
     @component.master.commonHome(username = username, userType = userType, address = address, coins = coins)
 

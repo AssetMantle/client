@@ -1,12 +1,12 @@
 package views.companion.master
 
 import play.api.data.Form
-import play.api.data.Forms.{mapping, nonEmptyText}
+import play.api.data.Forms.{mapping, text}
 
 object RequestCoin {
   val form = Form(
     mapping(
-      constants.Forms.COUPON -> nonEmptyText(minLength = 0, maxLength = 50),
+      constants.Forms.COUPON -> text,
 
     )(Data.apply)(Data.unapply)
   )

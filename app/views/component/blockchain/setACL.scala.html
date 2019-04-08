@@ -2,7 +2,7 @@
 @import views.companion.blockchain.SetACL
 
 @(setACLForm: Form[SetACL.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages(constants.Forms.SET_ACL_TITLE)) {
+@common(Messages(constants.Forms.SET_ACL)) {
     @form(action = routes.SetACLController.blockchainSetACL) {
         @CSRF.formField
         @inputText(setACLForm(constants.Forms.FROM),'_label-> Messages(constants.Forms.FROM))
@@ -32,6 +32,6 @@
             }
             </ul>
         }
-        <button type=submit>@Messages(constants.Forms.SET_ACL_TITLE)</button>
+        <button type=submit>@Messages(constants.Forms.SET_ACL)</button>
     }
 }

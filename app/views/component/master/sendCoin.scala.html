@@ -2,7 +2,7 @@
 @import views.companion.master.SendCoin
 
 @(sendCoinForm: Form[SendCoin.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages(constants.Forms.SEND_COIN_TITLE)) {
+@common(Messages(constants.Forms.SEND_COIN)) {
     @form(action = routes.SendCoinController.sendCoin) {
         @CSRF.formField
         @inputText(sendCoinForm(constants.Forms.TO),'_label-> Messages(constants.Forms.TO))
@@ -17,6 +17,6 @@
             }
             </ul>
         }
-        <button type="submit">@Messages(constants.Forms.SEND_COIN_TITLE)</button>
+        <button type="submit">@Messages(constants.Forms.SEND_COIN)</button>
     }
 }

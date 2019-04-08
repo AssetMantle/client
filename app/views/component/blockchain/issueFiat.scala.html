@@ -2,7 +2,7 @@
 @import views.companion.blockchain.IssueFiat
 
 @(issueFiatForm: Form[IssueFiat.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages(constants.Forms.ISSUE_FIAT_TITLE)) {
+@common(Messages(constants.Forms.ISSUE_FIAT)) {
     @form(action = routes.IssueFiatController.blockchainIssueFiat) {
         @CSRF.formField
         @inputText(issueFiatForm(constants.Forms.FROM),'_label-> Messages(constants.Forms.FROM))
@@ -19,6 +19,6 @@
             }
             </ul>
         }
-        <button type="submit">@Messages(constants.Forms.ISSUE_FIAT_TITLE)</button>
+        <button type="submit">@Messages(constants.Forms.ISSUE_FIAT)</button>
     }
 }

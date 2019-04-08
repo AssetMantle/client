@@ -1,7 +1,7 @@
 @(username: String, userType: String, address: String, coins: Int = 0)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
 
 <br>
-<a href="@routes.SendCoinController.sendCoinForm">@Messages(constants.Forms.SEND_COIN_TITLE)</a>
+<a href="@routes.SendCoinController.sendCoinForm">@Messages(constants.Forms.SEND_COIN)</a>
 <a href="@routes.LogoutController.logoutForm">@Messages(constants.Forms.LOGOUT)</a>
 <br>
 <br>

@@ -2,7 +2,7 @@
 @import views.companion.blockchain.ConfirmBuyerBid
 
 @(confirmBuyerBidForm: Form[ConfirmBuyerBid.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages(constants.Forms.CONFIRM_BUYER_BID_TITLE)) {
+@common(Messages(constants.Forms.CONFIRM_BUYER_BID)) {
     @form(action = routes.ConfirmBuyerBidController.blockchainConfirmBuyerBid) {
         @CSRF.formField
         @inputText(confirmBuyerBidForm(constants.Forms.FROM),'_label-> Messages(constants.Forms.FROM))
@@ -20,6 +20,6 @@
             }
             </ul>
         }
-        <button type="submit">@Messages(constants.Forms.CONFIRM_BUYER_BID_TITLE)</button>
+        <button type="submit">@Messages(constants.Forms.CONFIRM_BUYER_BID)</button>
     }
 }

@@ -6,7 +6,7 @@
 @common(Messages(constants.Forms.REQUEST_COIN)) {
     @form(action = routes.SendCoinController.requestCoins) {
         @CSRF.formField
-        @inputText(requestCoinFormForm(constants.Forms.COUPON), '_label -> Messages(constants.Forms.ID))
+        @inputText(requestCoinFormForm(constants.Forms.COUPON), '_label -> Messages(constants.Forms.COUPON))
 
         @if(requestCoinFormForm.hasGlobalErrors) {
             <ul>
