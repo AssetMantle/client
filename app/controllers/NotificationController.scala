@@ -18,16 +18,17 @@ class NotificationController @Inject()(messagesControllerComponents: MessagesCon
   private val limit = configuration.get[Int]("notification.notificationsPerPage")
 
   def showNotifications: Action[AnyContent] = withLoginAction { implicit request =>
-    Ok(views.html.component.master.notificationBox(notifications.Service.getNotifications(request.session.get(Security.USERNAME).get, 0, limit), 1, limit, notifications.Service.getNumberOfUnread(request.session.get(Security.USERNAME).get)))
+    Ok(views.html.component.master.notificationWindow(notifications.Service.getNotifications(request.session.get(Security.USERNAME).get, 0, limit), 1, limit, notifications.Service.getNumberOfUnread(request.session.get(Security.USERNAME).get)))
   }
 
   def changeNotificationPage(pageNumber: Int): Action[AnyContent] = withLoginAction { implicit request =>
-    Ok(views.html.component.master.notificationBox(notifications.Service.getNotifications(request.session.get(Security.USERNAME).get, (pageNumber - 1) * limit, limit), pageNumber, limit, notifications.Service.getNumberOfUnread(request.session.get(Security.USERNAME).get)))
+    Ok(views.html.component.master.notificationWindow(notifications.Service.getNotifications(request.session.get(Security.USERNAME).get, (pageNumber - 1) * limit, limit), pageNumber, limit, notifications.Service.getNumberOfUnread(request.session.get(Security.USERNAME).get)))
   }
 
   def markNotificationAsRead(notificationID: String): Action[AnyContent] = withLoginAction { implicit request =>
     try {
-      Ok(notifications.Service.markAsRead(notificationID).toString)
+      notifications.Service.markAsRead(notificationID)
+      Ok(notifications.Service.getNumberOfUnread(request.session.get(Security.USERNAME).get).toString)
     }
     catch {
       case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))
