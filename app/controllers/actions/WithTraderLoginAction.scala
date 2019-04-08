@@ -14,7 +14,7 @@ class WithTraderLoginAction  @Inject()(defaultBodyParse: BodyParsers.Default, ma
       block(request)
     }
     else {
-      Future.successful(Results.Forbidden(constants.User.NOT_TRADER))
+      Future.successful(Results.Forbidden(constants.Error.INCORRECT_LOG_IN))
     }
   }
 }

@@ -13,7 +13,7 @@ class WithLoginAction @Inject()(defaultBodyParse: BodyParsers.Default, accountTo
       block(request)
     }
     else {
-      Future.successful(Results.Forbidden(constants.Security.NOT_LOGGED_IN))
+      Future.successful(Results.Forbidden(constants.Error.NOT_LOGGED_IN))
     }
   }
 }

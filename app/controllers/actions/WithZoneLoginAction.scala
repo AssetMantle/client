@@ -14,7 +14,7 @@ class WithZoneLoginAction  @Inject()(defaultBodyParse: BodyParsers.Default, mast
       block(request)
     }
     else {
-      Future.successful(Results.Forbidden(constants.User.NOT_ZONE))
+      Future.successful(Results.Forbidden(constants.Error.INCORRECT_LOG_IN))
     }
   }
 }

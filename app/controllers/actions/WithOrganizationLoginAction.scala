@@ -14,7 +14,7 @@ class WithOrganizationLoginAction @Inject()(defaultBodyParse: BodyParsers.Defaul
       block(request)
     }
     else {
-      Future.successful(Results.Forbidden(constants.User.NOT_ORGANIZATION))
+      Future.successful(Results.Forbidden(constants.Error.INCORRECT_LOG_IN))
     }
   }
 }
