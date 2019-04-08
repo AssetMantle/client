@@ -5,12 +5,11 @@ import javax.inject.Inject
 import play.api.Configuration
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
-import transactions.AddKey
 import views.companion.blockchain.AddKey
 
 import scala.concurrent.ExecutionContext
 
-class AddKeyController @Inject()(messagesControllerComponents: MessagesControllerComponents, transactionAddKey: AddKey)(implicit exec: ExecutionContext,configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class AddKeyController @Inject()(messagesControllerComponents: MessagesControllerComponents, transactionAddKey: transactions.AddKey)(implicit exec: ExecutionContext,configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   def blockchainAddKeyForm: Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.blockchain.addKey(AddKey.form))

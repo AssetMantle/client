@@ -1,6 +1,6 @@
 package controllers
 
-import controllers.actions.WithLoginAction
+import controllers.actions.{WithLoginAction, WithTraderLoginAction}
 import exceptions.{BaseException, BlockChainException}
 import javax.inject.Inject
 import models.blockchainTransaction.SendAssets
@@ -13,7 +13,7 @@ import views.companion.master
 import scala.concurrent.ExecutionContext
 import scala.util.Random
 
-class SendAssetController @Inject()(messagesControllerComponents: MessagesControllerComponents, withLoginAction: WithLoginAction, transactionSendAsset: transactions.SendAsset, sendAssets: SendAssets)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class SendAssetController @Inject()(messagesControllerComponents: MessagesControllerComponents, withTraderLoginAction: WithTraderLoginAction, withLoginAction: WithLoginAction, transactionSendAsset: transactions.SendAsset, sendAssets: SendAssets)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
 
@@ -21,7 +21,7 @@ class SendAssetController @Inject()(messagesControllerComponents: MessagesContro
     Ok(views.html.component.master.sendAsset(master.SendAsset.form))
   }
 
-  def sendAsset: Action[AnyContent] = withLoginAction { implicit request =>
+  def sendAsset: Action[AnyContent] = withTraderLoginAction { implicit request =>
     master.SendAsset.form.bindFromRequest().fold(
       formWithErrors => {
         BadRequest(views.html.component.master.sendAsset(formWithErrors))

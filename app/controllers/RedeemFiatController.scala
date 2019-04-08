@@ -1,6 +1,6 @@
 package controllers
 
-import controllers.actions.WithLoginAction
+import controllers.actions.{WithLoginAction, WithTraderLoginAction}
 import exceptions.{BaseException, BlockChainException}
 import javax.inject.Inject
 import models.blockchainTransaction.RedeemFiats
@@ -13,7 +13,7 @@ import views.companion.master
 import scala.concurrent.ExecutionContext
 import scala.util.Random
 
-class RedeemFiatController @Inject()(messagesControllerComponents: MessagesControllerComponents, withLoginAction: WithLoginAction, transactionRedeemFiat: transactions.RedeemFiat, redeemFiats: RedeemFiats)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class RedeemFiatController @Inject()(messagesControllerComponents: MessagesControllerComponents, withLoginAction: WithLoginAction, withTraderLoginAction: WithTraderLoginAction, transactionRedeemFiat: transactions.RedeemFiat, redeemFiats: RedeemFiats)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
 
@@ -21,7 +21,7 @@ class RedeemFiatController @Inject()(messagesControllerComponents: MessagesContr
     Ok(views.html.component.master.redeemFiat(master.RedeemFiat.form))
   }
 
-  def redeemFiat: Action[AnyContent] = withLoginAction { implicit request =>
+  def redeemFiat: Action[AnyContent] = withTraderLoginAction { implicit request =>
     master.RedeemFiat.form.bindFromRequest().fold(
       formWithErrors => {
         BadRequest(views.html.component.master.redeemFiat(formWithErrors))

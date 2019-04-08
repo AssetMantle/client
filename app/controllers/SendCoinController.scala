@@ -81,7 +81,7 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
     )
   }
 
-  def requestCoinsForm: Action[AnyContent] = withLoginAction { implicit request =>
+  def requestCoinsForm: Action[AnyContent] = Action { implicit request =>
       Ok(views.html.component.master.requestCoin(views.companion.master.RequestCoin.form))
   }
 
@@ -103,11 +103,11 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
     )
   }
 
-  def viewFaucetRequests: Action[AnyContent] = withLoginAction { implicit request =>
+  def viewFaucetRequests: Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.master.viewFaucetRequests( faucetRequests = masterTransactionFaucetRequests.Service.getStatus(), approveFaucetRequestForm = views.companion.master.ApproveFaucetRequest.form))
   }
 
-  def approveFaucetRequestsForm(id: String): Action[AnyContent] = withLoginAction { implicit request =>
+  def approveFaucetRequestsForm(id: String): Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.master.approveFaucetRequests(views.companion.master.ApproveFaucetRequest.form, id))
   }
 

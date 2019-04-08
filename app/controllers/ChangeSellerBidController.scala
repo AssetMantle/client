@@ -1,6 +1,6 @@
 package controllers
 
-import controllers.actions.WithLoginAction
+import controllers.actions.{WithLoginAction, WithTraderLoginAction}
 import exceptions.{BaseException, BlockChainException}
 import javax.inject.Inject
 import models.blockchainTransaction.ChangeSellerBids
@@ -13,7 +13,7 @@ import views.companion.master
 import scala.concurrent.ExecutionContext
 import scala.util.Random
 
-class ChangeSellerBidController @Inject()(messagesControllerComponents: MessagesControllerComponents, withLoginAction: WithLoginAction, transactionChangeSellerBid: transactions.ChangeSellerBid, changeSellerBids: ChangeSellerBids)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class ChangeSellerBidController @Inject()(messagesControllerComponents: MessagesControllerComponents, withTraderLoginAction: WithTraderLoginAction, withLoginAction: WithLoginAction, transactionChangeSellerBid: transactions.ChangeSellerBid, changeSellerBids: ChangeSellerBids)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
 
@@ -21,7 +21,7 @@ class ChangeSellerBidController @Inject()(messagesControllerComponents: Messages
     Ok(views.html.component.master.changeSellerBid(master.ChangeSellerBid.form))
   }
 
-  def changeSellerBid: Action[AnyContent] = withLoginAction { implicit request =>
+  def changeSellerBid: Action[AnyContent] = withTraderLoginAction { implicit request =>
     master.ChangeSellerBid.form.bindFromRequest().fold(
       formWithErrors => {
         BadRequest(views.html.component.master.changeSellerBid(formWithErrors))

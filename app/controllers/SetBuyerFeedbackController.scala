@@ -1,6 +1,6 @@
 package controllers
 
-import controllers.actions.WithLoginAction
+import controllers.actions.{WithLoginAction, WithTraderLoginAction}
 import exceptions.{BaseException, BlockChainException}
 import javax.inject.Inject
 import models.blockchainTransaction.SetBuyerFeedbacks
@@ -13,7 +13,7 @@ import views.companion.master
 import scala.concurrent.ExecutionContext
 import scala.util.Random
 
-class SetBuyerFeedbackController @Inject()(messagesControllerComponents: MessagesControllerComponents, withLoginAction: WithLoginAction, transactionSetBuyerFeedback: transactions.SetBuyerFeedback, setBuyerFeedbacks: SetBuyerFeedbacks)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class SetBuyerFeedbackController @Inject()(messagesControllerComponents: MessagesControllerComponents, withTraderLoginAction: WithTraderLoginAction, withLoginAction: WithLoginAction, transactionSetBuyerFeedback: transactions.SetBuyerFeedback, setBuyerFeedbacks: SetBuyerFeedbacks)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
 
@@ -21,7 +21,7 @@ class SetBuyerFeedbackController @Inject()(messagesControllerComponents: Message
     Ok(views.html.component.master.setBuyerFeedback(master.SetBuyerFeedback.form))
   }
 
-  def setBuyerFeedback: Action[AnyContent] = withLoginAction { implicit request =>
+  def setBuyerFeedback: Action[AnyContent] = withTraderLoginAction { implicit request =>
     master.SetBuyerFeedback.form.bindFromRequest().fold(
       formWithErrors => {
         BadRequest(views.html.component.master.setBuyerFeedback(formWithErrors))

@@ -1,6 +1,6 @@
 package controllers
 
-import controllers.actions.WithLoginAction
+import controllers.actions.{WithLoginAction, WithZoneLoginAction}
 import exceptions.{BaseException, BlockChainException}
 import javax.inject.Inject
 import models.blockchainTransaction.SellerExecuteOrders
@@ -14,7 +14,7 @@ import views.companion.master
 import scala.concurrent.ExecutionContext
 import scala.util.Random
 
-class SellerExecuteOrderController @Inject()(messagesControllerComponents: MessagesControllerComponents, withLoginAction: WithLoginAction, transactionSellerExecuteOrder: transactions.SellerExecuteOrder, sellerExecuteOrders: SellerExecuteOrders)(implicit exec: ExecutionContext,configuration: Configuration, accounts: Accounts) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class SellerExecuteOrderController @Inject()(messagesControllerComponents: MessagesControllerComponents, withZoneLoginAction: WithZoneLoginAction, withLoginAction: WithLoginAction, transactionSellerExecuteOrder: transactions.SellerExecuteOrder, sellerExecuteOrders: SellerExecuteOrders)(implicit exec: ExecutionContext,configuration: Configuration, accounts: Accounts) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
 
@@ -22,7 +22,7 @@ class SellerExecuteOrderController @Inject()(messagesControllerComponents: Messa
     Ok(views.html.component.master.sellerExecuteOrder(master.SellerExecuteOrder.form))
   }
 
-  def sellerExecuteOrder: Action[AnyContent] = withLoginAction { implicit request =>
+  def sellerExecuteOrder: Action[AnyContent] = withZoneLoginAction { implicit request =>
     master.SellerExecuteOrder.form.bindFromRequest().fold(
       formWithErrors => {
         BadRequest(views.html.component.master.sellerExecuteOrder(formWithErrors))
