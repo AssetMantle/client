@@ -14,7 +14,7 @@ class WithUnknownLoginAction  @Inject()(defaultBodyParse: BodyParsers.Default, m
       block(request)
     }
     else {
-      Future.successful(Results.Forbidden(constants.User.WITHOUT_LOGIN))
+      Future.successful(Results.Forbidden(constants.User.NOT_UNKNOWN))
     }
   }
 }

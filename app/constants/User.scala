@@ -39,6 +39,7 @@ object User {
   val UNKNOWN = "UNKNOWN"
 
   //unknownWithoutLogin
+  val NOT_UNKNOWN = "NOT_UNKNOWN"
   val WITHOUT_LOGIN = "WITHOUT_LOGIN"
 
 }
