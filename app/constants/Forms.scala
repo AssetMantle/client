@@ -96,8 +96,4 @@ object Forms {
   val VERIFY_ORGANIZATION = "VerifyOrganization"
   val VERIFIED_STATUS = "VERIFIED_STATUS"
   val VERIFY_ZONE = "VerifyZone"
-  val SHOW_NOTIFICATIONS = "ShowNotifications"
-  val NOTIFICATION_BOX = "NotificationBox"
-  val PAGE_NUMBER= "pageNumber"
-  val NOTIFICATION_ID= "notificationID"
 }

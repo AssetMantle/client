@@ -9,8 +9,8 @@ GET         /notificationImage.png                          controllers.Assets.a
 
 GET         /javascriptRoutes                               controllers.JavaScriptRoutesController.javascriptRoutes
 
-GET         /master/notifications                          controllers.NotificationController.showNotificationsForm
-POST         /master/notifications                          controllers.NotificationController.showNotifications
+GET         /master/notifications                           controllers.NotificationController.showNotifications(pageNumber:Int)
+GET         /master/markNotificationAsRead                  controllers.NotificationController.markNotificationAsRead(notificationID: String)
 
 GET         /master/queryConfigurationVariable:query        controllers.ConfigurationController.queryConfigurationVariable(query: String)
 

@@ -4,7 +4,7 @@ import exceptions.BaseException
 import javax.inject.Inject
 import models.master.{Accounts, Contacts}
 import play.api.Configuration
-import play.api.i18n.{Lang, Messages, MessagesApi}
+import play.api.i18n.{Lang, MessagesApi}
 import play.api.libs.mailer._
 
 import scala.concurrent.ExecutionContext

@@ -1,7 +1,7 @@
 package controllers
 
 import controllers.results.WithUsernameToken
-import exceptions.{BaseException, BlockChainException}
+import exceptions.BaseException
 import javax.inject.Inject
 import models.blockchain
 import models.blockchain.ACLAccounts
