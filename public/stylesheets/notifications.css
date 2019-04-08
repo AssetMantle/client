@@ -91,6 +91,7 @@ h3 {
 }
 
 .element:hover {
+    cursor: pointer;
     background-color: #80c846;
     color: white;
 }
