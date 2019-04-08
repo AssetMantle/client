@@ -10,7 +10,8 @@ import play.api.i18n.{Lang, Langs, MessagesApi}
 import play.api.libs.json.{Json, OWrites}
 import play.api.libs.ws.{WSClient, WSResponse}
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{Await, ExecutionContext}
+import scala.concurrent.duration.Duration
 
 class PushNotifications @Inject()(wsClient: WSClient, notifications: Notifications, accounts: Accounts, accountTokens: AccountTokens, langs: Langs, messagesApi: MessagesApi)(implicit exec: ExecutionContext, configuration: Configuration) {
 
@@ -20,13 +21,15 @@ class PushNotifications @Inject()(wsClient: WSClient, notifications: Notificatio
 
   private val authorizationKey = configuration.get[String]("notification.authorizationKey")
 
-  def sendNotification(accountID: String, messageType: String, passedData: Seq[String] = Seq(""))(implicit lang: Lang = Lang(accounts.Service.getLanguage(accountID))): Future[WSResponse] = {
-    try{
+  def sendNotification(accountID: String, messageType: String, passedData: Seq[String] = Seq(""))(implicit lang: Lang = Lang(accounts.Service.getLanguage(accountID))): WSResponse = {
+    try {
       notifications.Service.addNotification(accountID, messagesApi(module + "Title" + "." + messageType), messagesApi(module + "Message" + "." + messageType, passedData(0)), DateTime.now(DateTimeZone.UTC).getMillis())
-      wsClient.url(url).withHttpHeaders(constants.Header.CONTENT_TYPE -> constants.Header.APPLICATION_JSON).withHttpHeaders(constants.Header.AUTHORIZATION -> authorizationKey)
-        .post(Json.toJson(Data(accountTokens.Service.getTokenById(accountID), Notification(messagesApi(module + "Title" + "." + messageType), messagesApi(module + "Message" + "." + messageType, passedData(0))))))
+      Await.result(wsClient.url(url).withHttpHeaders(constants.Header.CONTENT_TYPE -> constants.Header.APPLICATION_JSON).withHttpHeaders(constants.Header.AUTHORIZATION -> authorizationKey)
+        .post(Json.toJson(Data(accountTokens.Service.getTokenById(accountID), Notification(messagesApi(module + "Title" + "." + messageType), messagesApi(module + "Message" + "." + messageType, passedData(0)))))), Duration.Inf)
     }
-      catch{case baseException: BaseException => throw new BaseException(baseException.message)}
+    catch {
+      case baseException: BaseException => throw new BaseException(baseException.message)
+    }
   }
 
   private implicit val notificationWrites: OWrites[Notification] = Json.writes[Notification]

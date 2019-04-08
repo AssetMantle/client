@@ -14,8 +14,7 @@ import transactions.GetAccount
 import utilities.PushNotifications
 import views.companion.master.Login
 
-import scala.concurrent.{Await, ExecutionContext}
-import scala.concurrent.duration.Duration
+import scala.concurrent.ExecutionContext
 
 class LoginController @Inject()(messagesControllerComponents: MessagesControllerComponents, masterAccounts: Accounts, blockchainAclAccounts: ACLAccounts, blockchainZones: blockchain.Zones, blockchainOrganizations: blockchain.Organizations, blockchainAssets: blockchain.Assets, blockchainFiats: blockchain.Fiats, blockchainOwners: blockchain.Owners, masterOrganizations: Organizations, masterZones: Zones, blockchainAclHashes: blockchain.ACLHashes, getAccount: GetAccount, blockchainAccounts: blockchain.Accounts, withUsernameToken: WithUsernameToken, pushNotifications: PushNotifications)(implicit exec: ExecutionContext, configuration: Configuration, wsClient: WSClient) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
@@ -35,7 +34,7 @@ class LoginController @Inject()(messagesControllerComponents: MessagesController
           if (masterAccounts.Service.validateLogin(loginData.username, loginData.password)) {
             val address = masterAccounts.Service.getAddress(loginData.username)
             pushNotifications.registerNotificationToken(loginData.username, loginData.notificationToken)
-            Await.result(pushNotifications.sendNotification(loginData.username, constants.Notification.LOGIN), Duration.Inf)
+            pushNotifications.sendNotification(loginData.username, constants.Notification.LOGIN)
             masterAccounts.Service.getUserType(loginData.username) match {
               case constants.User.GENESIS =>
                 withUsernameToken.Ok(views.html.component.master.genesisHome(username = loginData.username, userType = constants.User.GENESIS, address = address, coins = blockchainAccounts.Service.getCoins(address)), loginData.username)

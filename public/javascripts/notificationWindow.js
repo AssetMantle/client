@@ -25,7 +25,7 @@ $(document).ready(function () {
 });
 
 function changeNotificationPage(page) {
-    var route = jsRoutes.controllers.NotificationController.changeNotificationPage(page);
+    var route = jsRoutes.controllers.NotificationController.showNotifications(page);
     document.getElementById("notificationWindowCommons").innerHTML = "loading";
 
     $.ajax({
@@ -44,6 +44,7 @@ function changeNotificationPage(page) {
 
 function markNotificationAsRead(i, notificationID) {
     document.getElementById(i).style.backgroundColor = "#FFF";
+    console.log("o")
     $.ajax({
         url: jsRoutes.controllers.NotificationController.markNotificationAsRead(notificationID).url,
         type: "GET",
