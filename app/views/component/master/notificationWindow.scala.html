@@ -1,5 +1,4 @@
 @import helper._
-@import views.companion.master.NotificationBox
 
 @(notificationList : Seq[models.masterTransaction.Notification]=null, pageNumber: Int, limit : Int, unread: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
     <head>
