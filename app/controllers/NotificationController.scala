@@ -22,7 +22,7 @@ class NotificationController @Inject()(messagesControllerComponents: MessagesCon
       Ok(views.html.component.master.notificationWindow(notifications.Service.getNotifications(request.session.get(Security.USERNAME).get, (pageNumber - 1) * limit, limit), pageNumber, limit, notifications.Service.getNumberOfUnread(request.session.get(Security.USERNAME).get)))
     }
     catch{
-      case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))
+      case baseException: BaseException => Ok(baseException.message)
     }
   }
 
