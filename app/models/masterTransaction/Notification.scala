@@ -69,7 +69,7 @@ class Notifications @Inject()(protected val databaseConfigProvider: DatabaseConf
       Await.result(add(Notification(accountID, notificationTitle, notificationMessage, time, false, Random.nextString(32))), Duration.Inf)
     }
 
-    def getNotifications(accountID: String, offset: Int, limit: Int)(implicit executionContext: ExecutionContext) = Await.result(findNotificationsByAccountId(accountID, offset, limit), Duration.Inf)
+    def getNotifications(accountID: String, offset: Int, limit: Int)(implicit executionContext: ExecutionContext): Seq[Notification] = Await.result(findNotificationsByAccountId(accountID, offset, limit), Duration.Inf)
 
     def markAsRead(id: String): Int = Await.result(markReadById(id), Duration.Inf)
 
