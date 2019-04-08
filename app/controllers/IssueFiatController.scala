@@ -11,7 +11,7 @@ import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerC
 import scala.concurrent.ExecutionContext
 import scala.util.Random
 
-class IssueFiatController @Inject()(messagesControllerComponents: MessagesControllerComponents, withTraderLoginAction: WithTraderLoginAction, masterAccounts: master.Accounts, blockchainFiats: models.blockchain.Fiats, blockchainOwners: models.blockchain.Owners, transactionIssueFiat: transactions.IssueFiat, blockchainTransactionIssueFiats: blockchainTransaction.IssueFiats)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class IssueFiatController @Inject()(messagesControllerComponents: MessagesControllerComponents, withTraderLoginAction: WithTraderLoginAction, masterAccounts: master.Accounts, blockchainFiats: models.blockchain.Fiats, blockchainOwners: models.blockchain.Owners, transactionsIssueFiat: transactions.IssueFiat, blockchainTransactionIssueFiats: blockchainTransaction.IssueFiats)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
 
@@ -27,11 +27,11 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
       issueFiatData => {
         try {
           if (kafkaEnabled) {
-            val response = transactionIssueFiat.Service.kafkaPost(transactionIssueFiat.Request(from = request.session.get(constants.Security.USERNAME).get, to = issueFiatData.to, password = issueFiatData.password, transactionID = issueFiatData.transactionID, transactionAmount = issueFiatData.transactionAmount, gas = issueFiatData.gas))
+            val response = transactionsIssueFiat.Service.kafkaPost(transactionsIssueFiat.Request(from = request.session.get(constants.Security.USERNAME).get, to = issueFiatData.to, password = issueFiatData.password, transactionID = issueFiatData.transactionID, transactionAmount = issueFiatData.transactionAmount, gas = issueFiatData.gas))
             blockchainTransactionIssueFiats.Service.addIssueFiatKafka(from = request.session.get(constants.Security.USERNAME).get, to = issueFiatData.to, transactionID = issueFiatData.transactionID, transactionAmount = issueFiatData.transactionAmount, gas = issueFiatData.gas, null, null, ticketID = response.ticketID, null)
             Ok(views.html.index(success = response.ticketID))
           } else {
-            val response = transactionIssueFiat.Service.post(transactionIssueFiat.Request(from = request.session.get(constants.Security.USERNAME).get, to = issueFiatData.to, password = issueFiatData.password, transactionID = issueFiatData.transactionID, transactionAmount = issueFiatData.transactionAmount, gas = issueFiatData.gas))
+            val response = transactionsIssueFiat.Service.post(transactionsIssueFiat.Request(from = request.session.get(constants.Security.USERNAME).get, to = issueFiatData.to, password = issueFiatData.password, transactionID = issueFiatData.transactionID, transactionAmount = issueFiatData.transactionAmount, gas = issueFiatData.gas))
             blockchainTransactionIssueFiats.Service.addIssueFiat(from = request.session.get(constants.Security.USERNAME).get, to = issueFiatData.to, transactionID = issueFiatData.transactionID, transactionAmount = issueFiatData.transactionAmount, gas = issueFiatData.gas, null, txHash = Option(response.TxHash), ticketID = (Random.nextInt(899999999) + 100000000).toString, null)
             for (tag <- response.Tags) {
               if (tag.Key == constants.Response.KEY_FIAT) {
@@ -62,11 +62,11 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
       issueFiatData => {
         try {
           if (kafkaEnabled) {
-            val response = transactionIssueFiat.Service.kafkaPost(transactionIssueFiat.Request(from = issueFiatData.from, to = issueFiatData.to, password = issueFiatData.password, transactionID = issueFiatData.transactionID, transactionAmount = issueFiatData.transactionAmount, gas = issueFiatData.gas))
+            val response = transactionsIssueFiat.Service.kafkaPost(transactionsIssueFiat.Request(from = issueFiatData.from, to = issueFiatData.to, password = issueFiatData.password, transactionID = issueFiatData.transactionID, transactionAmount = issueFiatData.transactionAmount, gas = issueFiatData.gas))
             blockchainTransactionIssueFiats.Service.addIssueFiatKafka(from = issueFiatData.from, to = issueFiatData.to, transactionID = issueFiatData.transactionID, transactionAmount = issueFiatData.transactionAmount, gas = issueFiatData.gas, null, null, ticketID = response.ticketID, null)
             Ok(views.html.index(success = response.ticketID))
           } else {
-            val response = transactionIssueFiat.Service.post(transactionIssueFiat.Request(from = issueFiatData.from, to = issueFiatData.to, password = issueFiatData.password, transactionID = issueFiatData.transactionID, transactionAmount = issueFiatData.transactionAmount, gas = issueFiatData.gas))
+            val response = transactionsIssueFiat.Service.post(transactionsIssueFiat.Request(from = issueFiatData.from, to = issueFiatData.to, password = issueFiatData.password, transactionID = issueFiatData.transactionID, transactionAmount = issueFiatData.transactionAmount, gas = issueFiatData.gas))
             blockchainTransactionIssueFiats.Service.addIssueFiat(from = issueFiatData.from, to = issueFiatData.to, transactionID = issueFiatData.transactionID, transactionAmount = issueFiatData.transactionAmount, gas = issueFiatData.gas, null, txHash = Option(response.TxHash), ticketID = (Random.nextInt(899999999) + 100000000).toString, null)
             Ok(views.html.index(success = response.TxHash))
           }

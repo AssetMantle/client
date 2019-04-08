@@ -1,6 +1,6 @@
 package controllers
 
-import controllers.actions.WithLoginAction
+import controllers.actions.{WithLoginAction, WithTraderLoginAction}
 import exceptions.{BaseException, BlockChainException}
 import javax.inject.Inject
 import models.blockchainTransaction.RedeemFiats
@@ -13,7 +13,7 @@ import views.companion.master
 import scala.concurrent.ExecutionContext
 import scala.util.Random
 
-class RedeemFiatController @Inject()(messagesControllerComponents: MessagesControllerComponents, withLoginAction: WithLoginAction, transactionRedeemFiat: transactions.RedeemFiat, redeemFiats: RedeemFiats)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class RedeemFiatController @Inject()(messagesControllerComponents: MessagesControllerComponents, withLoginAction: WithLoginAction, withTraderLoginAction: WithTraderLoginAction, transactionsRedeemFiat: transactions.RedeemFiat, redeemFiats: RedeemFiats)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
 
@@ -21,7 +21,7 @@ class RedeemFiatController @Inject()(messagesControllerComponents: MessagesContr
     Ok(views.html.component.master.redeemFiat(master.RedeemFiat.form))
   }
 
-  def redeemFiat: Action[AnyContent] = withLoginAction { implicit request =>
+  def redeemFiat: Action[AnyContent] = withTraderLoginAction { implicit request =>
     master.RedeemFiat.form.bindFromRequest().fold(
       formWithErrors => {
         BadRequest(views.html.component.master.redeemFiat(formWithErrors))
@@ -29,11 +29,11 @@ class RedeemFiatController @Inject()(messagesControllerComponents: MessagesContr
       redeemFiatData => {
         try {
           if (kafkaEnabled) {
-            val response = transactionRedeemFiat.Service.kafkaPost( transactionRedeemFiat.Request(from = request.session.get(constants.Security.USERNAME).get, to = redeemFiatData.to, password = redeemFiatData.password, redeemAmount = redeemFiatData.redeemAmount, gas = redeemFiatData.gas))
+            val response = transactionsRedeemFiat.Service.kafkaPost( transactionsRedeemFiat.Request(from = request.session.get(constants.Security.USERNAME).get, to = redeemFiatData.to, password = redeemFiatData.password, redeemAmount = redeemFiatData.redeemAmount, gas = redeemFiatData.gas))
             redeemFiats.Service.addRedeemFiatKafka(from = request.session.get(constants.Security.USERNAME).get, to = redeemFiatData.to, redeemAmount = redeemFiatData.redeemAmount, gas = redeemFiatData.gas, null, null, ticketID = response.ticketID, null)
             Ok(views.html.index(success = response.ticketID))
           } else {
-            val response = transactionRedeemFiat.Service.post( transactionRedeemFiat.Request(from = request.session.get(constants.Security.USERNAME).get, to = redeemFiatData.to, password = redeemFiatData.password, redeemAmount = redeemFiatData.redeemAmount, gas = redeemFiatData.gas))
+            val response = transactionsRedeemFiat.Service.post( transactionsRedeemFiat.Request(from = request.session.get(constants.Security.USERNAME).get, to = redeemFiatData.to, password = redeemFiatData.password, redeemAmount = redeemFiatData.redeemAmount, gas = redeemFiatData.gas))
             redeemFiats.Service.addRedeemFiat(from = request.session.get(constants.Security.USERNAME).get, to = redeemFiatData.to, redeemAmount = redeemFiatData.redeemAmount, gas = redeemFiatData.gas, null, txHash = Option(response.TxHash), ticketID = (Random.nextInt(899999999) + 100000000).toString, null)
             Ok(views.html.index(success = response.TxHash))
           }
@@ -59,11 +59,11 @@ class RedeemFiatController @Inject()(messagesControllerComponents: MessagesContr
       redeemFiatData => {
         try {
           if (kafkaEnabled) {
-            val response = transactionRedeemFiat.Service.kafkaPost( transactionRedeemFiat.Request(from = redeemFiatData.from, to = redeemFiatData.to, password = redeemFiatData.password, redeemAmount = redeemFiatData.redeemAmount, gas = redeemFiatData.gas))
+            val response = transactionsRedeemFiat.Service.kafkaPost( transactionsRedeemFiat.Request(from = redeemFiatData.from, to = redeemFiatData.to, password = redeemFiatData.password, redeemAmount = redeemFiatData.redeemAmount, gas = redeemFiatData.gas))
             redeemFiats.Service.addRedeemFiatKafka(from = redeemFiatData.from, to = redeemFiatData.to, redeemAmount = redeemFiatData.redeemAmount, gas = redeemFiatData.gas, null, null, ticketID = response.ticketID, null)
             Ok(views.html.index(success = response.ticketID))
           } else {
-            val response = transactionRedeemFiat.Service.post( transactionRedeemFiat.Request(from = redeemFiatData.from, to = redeemFiatData.to, password = redeemFiatData.password, redeemAmount = redeemFiatData.redeemAmount, gas = redeemFiatData.gas))
+            val response = transactionsRedeemFiat.Service.post( transactionsRedeemFiat.Request(from = redeemFiatData.from, to = redeemFiatData.to, password = redeemFiatData.password, redeemAmount = redeemFiatData.redeemAmount, gas = redeemFiatData.gas))
             redeemFiats.Service.addRedeemFiat(from = redeemFiatData.from, to = redeemFiatData.to, redeemAmount = redeemFiatData.redeemAmount, gas = redeemFiatData.gas, null, txHash = Option(response.TxHash), ticketID = (Random.nextInt(899999999) + 100000000).toString, null)
             Ok(views.html.index(success = response.TxHash))
           }

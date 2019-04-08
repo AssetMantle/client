@@ -1,3 +1,6 @@
+@import models.masterTransaction.FaucetRequest
+@import views.companion.master.ApproveFaucetRequest
+
 @(username: String, userType: String, address: String, coins: Int = 0)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
 
 
@@ -6,5 +9,7 @@
         @component.master.commonHome(username = username, userType = userType, address = address, coins = coins)
 
         <a href="@routes.AddZoneController.verifyZoneForm">@Messages(constants.Forms.VERIFY_ZONE)</a>
-        <a href="@routes.SetACLController.setACLForm">@Messages(constants.Forms.SET_ACL_TITLE)</a>
+        <a href="@routes.SetACLController.setACLForm">@Messages(constants.Forms.SET_ACL)</a>
+        <a href="@routes.SendCoinController.viewFaucetRequests">@Messages(constants.Forms.APPROVE_FAUCET_REQUEST)</a>
+
     }

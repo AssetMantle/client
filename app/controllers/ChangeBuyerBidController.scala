@@ -1,6 +1,6 @@
 package controllers
 
-import controllers.actions.WithLoginAction
+import controllers.actions.{WithLoginAction, WithTraderLoginAction}
 import exceptions.{BaseException, BlockChainException}
 import javax.inject.Inject
 import models.blockchainTransaction.ChangeBuyerBids
@@ -13,7 +13,7 @@ import views.companion.master
 import scala.concurrent.ExecutionContext
 import scala.util.Random
 
-class ChangeBuyerBidController @Inject()(messagesControllerComponents: MessagesControllerComponents, withLoginAction: WithLoginAction, transactionChangeBuyerBid: transactions.ChangeBuyerBid, changeBuyerBids: ChangeBuyerBids)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class ChangeBuyerBidController @Inject()(messagesControllerComponents: MessagesControllerComponents, withTraderLoginAction: WithTraderLoginAction, withLoginAction: WithLoginAction, transactionsChangeBuyerBid: transactions.ChangeBuyerBid, changeBuyerBids: ChangeBuyerBids)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
 
@@ -21,7 +21,7 @@ class ChangeBuyerBidController @Inject()(messagesControllerComponents: MessagesC
     Ok(views.html.component.master.changeBuyerBid(master.ChangeBuyerBid.form))
   }
 
-  def changeBuyerBid: Action[AnyContent] = withLoginAction { implicit request =>
+  def changeBuyerBid: Action[AnyContent] = withTraderLoginAction { implicit request =>
     master.ChangeBuyerBid.form.bindFromRequest().fold(
       formWithErrors => {
         BadRequest(views.html.component.master.changeBuyerBid(formWithErrors))
@@ -29,11 +29,11 @@ class ChangeBuyerBidController @Inject()(messagesControllerComponents: MessagesC
       changeBuyerBidData => {
         try {
           if (kafkaEnabled) {
-            val response = transactionChangeBuyerBid.Service.kafkaPost( transactionChangeBuyerBid.Request(from = request.session.get(constants.Security.USERNAME).get, to = changeBuyerBidData.to, password = changeBuyerBidData.password, bid = changeBuyerBidData.bid, time = changeBuyerBidData.time, pegHash = changeBuyerBidData.pegHash, gas = changeBuyerBidData.gas))
+            val response = transactionsChangeBuyerBid.Service.kafkaPost( transactionsChangeBuyerBid.Request(from = request.session.get(constants.Security.USERNAME).get, to = changeBuyerBidData.to, password = changeBuyerBidData.password, bid = changeBuyerBidData.bid, time = changeBuyerBidData.time, pegHash = changeBuyerBidData.pegHash, gas = changeBuyerBidData.gas))
             changeBuyerBids.Service.addChangeBuyerBidKafka(from = request.session.get(constants.Security.USERNAME).get, to = changeBuyerBidData.to, bid = changeBuyerBidData.bid, time = changeBuyerBidData.time, pegHash = changeBuyerBidData.pegHash, gas = changeBuyerBidData.gas, null, null, ticketID = response.ticketID, null)
             Ok(views.html.index(success = response.ticketID))
           } else {
-            val response = transactionChangeBuyerBid.Service.post( transactionChangeBuyerBid.Request(from = request.session.get(constants.Security.USERNAME).get,to = changeBuyerBidData.to, password = changeBuyerBidData.password,  bid = changeBuyerBidData.bid, time = changeBuyerBidData.time, pegHash = changeBuyerBidData.pegHash, gas = changeBuyerBidData.gas))
+            val response = transactionsChangeBuyerBid.Service.post( transactionsChangeBuyerBid.Request(from = request.session.get(constants.Security.USERNAME).get,to = changeBuyerBidData.to, password = changeBuyerBidData.password,  bid = changeBuyerBidData.bid, time = changeBuyerBidData.time, pegHash = changeBuyerBidData.pegHash, gas = changeBuyerBidData.gas))
             changeBuyerBids.Service.addChangeBuyerBid(from = request.session.get(constants.Security.USERNAME).get, to = changeBuyerBidData.to, bid = changeBuyerBidData.bid, time = changeBuyerBidData.time, pegHash = changeBuyerBidData.pegHash, gas = changeBuyerBidData.gas, null, txHash = Option(response.TxHash), ticketID = (Random.nextInt(899999999) + 100000000).toString, null)
             Ok(views.html.index(success = response.TxHash))
           }
@@ -58,11 +58,11 @@ class ChangeBuyerBidController @Inject()(messagesControllerComponents: MessagesC
       changeBuyerBidData => {
         try {
           if (kafkaEnabled) {
-            val response = transactionChangeBuyerBid.Service.kafkaPost( transactionChangeBuyerBid.Request(from = changeBuyerBidData.from, to = changeBuyerBidData.to, password = changeBuyerBidData.password, bid = changeBuyerBidData.bid, time = changeBuyerBidData.time, pegHash = changeBuyerBidData.pegHash, gas = changeBuyerBidData.gas))
+            val response = transactionsChangeBuyerBid.Service.kafkaPost( transactionsChangeBuyerBid.Request(from = changeBuyerBidData.from, to = changeBuyerBidData.to, password = changeBuyerBidData.password, bid = changeBuyerBidData.bid, time = changeBuyerBidData.time, pegHash = changeBuyerBidData.pegHash, gas = changeBuyerBidData.gas))
             changeBuyerBids.Service.addChangeBuyerBidKafka(from = changeBuyerBidData.from, to = changeBuyerBidData.to, bid = changeBuyerBidData.bid, time = changeBuyerBidData.time, pegHash = changeBuyerBidData.pegHash, gas = changeBuyerBidData.gas, null, null, ticketID = response.ticketID, null)
             Ok(views.html.index(success = response.ticketID))
           } else {
-            val response = transactionChangeBuyerBid.Service.post( transactionChangeBuyerBid.Request(from = changeBuyerBidData.from,to = changeBuyerBidData.to, password = changeBuyerBidData.password,  bid = changeBuyerBidData.bid, time = changeBuyerBidData.time, pegHash = changeBuyerBidData.pegHash, gas = changeBuyerBidData.gas))
+            val response = transactionsChangeBuyerBid.Service.post( transactionsChangeBuyerBid.Request(from = changeBuyerBidData.from,to = changeBuyerBidData.to, password = changeBuyerBidData.password,  bid = changeBuyerBidData.bid, time = changeBuyerBidData.time, pegHash = changeBuyerBidData.pegHash, gas = changeBuyerBidData.gas))
             changeBuyerBids.Service.addChangeBuyerBid(from = changeBuyerBidData.from, to = changeBuyerBidData.to, bid = changeBuyerBidData.bid, time = changeBuyerBidData.time, pegHash = changeBuyerBidData.pegHash, gas = changeBuyerBidData.gas, null, txHash = Option(response.TxHash), ticketID = (Random.nextInt(899999999) + 100000000).toString, null)
             Ok(views.html.index(success = response.TxHash))
           }

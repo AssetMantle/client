@@ -2,7 +2,7 @@
 @import views.companion.blockchain.AddKey
 
 @(addKeyFrom: Form[AddKey.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages(constants.Forms.ADD_KEY_TITLE)) {
+@common(Messages(constants.Forms.ADD_KEY)) {
     @form(action = routes.AddKeyController.blockchainAddKey) {
         @CSRF.formField
         @inputText(addKeyFrom(constants.Forms.NAME),'_label-> Messages(constants.Forms.NAME))
@@ -16,6 +16,6 @@
             }
             </ul>
         }
-        <button type="submit">@Messages(constants.Forms.ADD_KEY_TITLE)</button>
+        <button type="submit">@Messages(constants.Forms.ADD_KEY)</button>
     }
 }

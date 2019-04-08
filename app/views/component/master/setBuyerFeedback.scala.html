@@ -2,7 +2,7 @@
 @import views.companion.master.SetBuyerFeedback
 
 @(setBuyerFeedbackForm: Form[SetBuyerFeedback.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages(constants.Forms.SET_BUYER_FEEDBACK_TITLE)) {
+@common(Messages(constants.Forms.SET_BUYER_FEEDBACK)) {
     @form(action = routes.SetBuyerFeedbackController.setBuyerFeedback) {
         @CSRF.formField
         @inputText(setBuyerFeedbackForm(constants.Forms.TO),'_label-> Messages(constants.Forms.TO))
@@ -18,6 +18,6 @@
             }
             </ul>
         }
-        <button type="submit">@Messages(constants.Forms.SET_BUYER_FEEDBACK_TITLE)</button>
+        <button type="submit">@Messages(constants.Forms.SET_BUYER_FEEDBACK)</button>
     }
 }

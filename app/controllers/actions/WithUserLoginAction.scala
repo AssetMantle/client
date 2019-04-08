@@ -14,7 +14,7 @@ class WithUserLoginAction  @Inject()(defaultBodyParse: BodyParsers.Default, mast
       block(request)
     }
     else {
-      Future.successful(Results.Forbidden(constants.User.NOT_USER))
+      Future.successful(Results.Forbidden(constants.Error.INCORRECT_LOG_IN))
     }
   }
 }

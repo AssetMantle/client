@@ -2,7 +2,7 @@
 @import views.companion.blockchain.ChangeBuyerBid
 
 @(changeBuyerBidForm: Form[ChangeBuyerBid.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages(constants.Forms.CHANGE_BUYER_BID_TITLE)) {
+@common(Messages(constants.Forms.CHANGE_BUYER_BID)) {
     @form(action = routes.ChangeBuyerBidController.blockchainChangeBuyerBid) {
         @CSRF.formField
         @inputText(changeBuyerBidForm(constants.Forms.FROM),'_label-> Messages(constants.Forms.FROM))
@@ -20,6 +20,6 @@
             }
             </ul>
         }
-        <button type="submit">@Messages(constants.Forms.CHANGE_BUYER_BID_TITLE)</button>
+        <button type="submit">@Messages(constants.Forms.CHANGE_BUYER_BID)</button>
     }
 }

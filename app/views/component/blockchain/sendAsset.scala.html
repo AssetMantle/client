@@ -2,7 +2,7 @@
 @import views.companion.blockchain.SendAsset
 
 @(sendAssetForm: Form[SendAsset.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages(constants.Forms.SEND_ASSET_TITLE)) {
+@common(Messages(constants.Forms.SEND_ASSET)) {
     @form(action = routes.SendAssetController.blockchainSendAsset) {
         @CSRF.formField
         @inputText(sendAssetForm(constants.Forms.FROM),'_label-> Messages(constants.Forms.FROM))
@@ -18,6 +18,6 @@
             }
             </ul>
         }
-        <button type="submit">@Messages(constants.Forms.SEND_ASSET_TITLE)</button>
+        <button type="submit">@Messages(constants.Forms.SEND_ASSET)</button>
     }
 }

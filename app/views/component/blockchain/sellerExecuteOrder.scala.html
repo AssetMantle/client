@@ -2,7 +2,7 @@
 @import views.companion.blockchain.SellerExecuteOrder
 
 @(sellerExecuteOrderForm: Form[SellerExecuteOrder.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages(constants.Forms.SELLER_EXECUTE_ORDER_TITLE)) {
+@common(Messages(constants.Forms.SELLER_EXECUTE_ORDER)) {
     @form(action = routes.SellerExecuteOrderController.blockchainSellerExecuteOrder) {
         @CSRF.formField
         @inputText(sellerExecuteOrderForm(constants.Forms.FROM),'_label-> Messages(constants.Forms.FROM))
@@ -20,6 +20,6 @@
             }
             </ul>
         }
-        <button type="submit">@Messages(constants.Forms.SELLER_EXECUTE_ORDER_TITLE)</button>
+        <button type="submit">@Messages(constants.Forms.SELLER_EXECUTE_ORDER)</button>
     }
 }

@@ -2,7 +2,7 @@
 @import views.companion.master.IssueFiat
 
 @(issueFiatForm: Form[IssueFiat.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages(constants.Forms.ISSUE_FIAT_TITLE)) {
+@common(Messages(constants.Forms.ISSUE_FIAT)) {
     @form(action = routes.IssueFiatController.issueFiat) {
         @CSRF.formField
         @inputText(issueFiatForm(constants.Forms.TO),'_label-> Messages(constants.Forms.TO))
@@ -18,6 +18,6 @@
             }
             </ul>
         }
-        <button type="submit">@Messages(constants.Forms.ISSUE_FIAT_TITLE)</button>
+        <button type="submit">@Messages(constants.Forms.ISSUE_FIAT)</button>
     }
 }

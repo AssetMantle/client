@@ -2,7 +2,7 @@
 @import views.companion.master.AddZone
 
 @(addZoneForm: Form[AddZone.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages(constants.Forms.ADD_ZONE_TITLE)) {
+@common(Messages(constants.Forms.ADD_ZONE)) {
     @form(action = routes.AddZoneController.addZone) {
         @CSRF.formField
         @inputText(addZoneForm(constants.Forms.NAME),'_label-> Messages(constants.Forms.NAME))
@@ -15,6 +15,6 @@
             }
             </ul>
         }
-        <button type="submit">@Messages(constants.Forms.ADD_ZONE_TITLE)</button>
+        <button type="submit">@Messages(constants.Forms.ADD_ZONE)</button>
     }
 }

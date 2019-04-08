@@ -2,7 +2,7 @@
 @import views.companion.blockchain.SetSellerFeedback
 
 @(setSellerFeedbackForm: Form[SetSellerFeedback.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages(constants.Forms.SET_SELLER_FEEDBACK_TITLE)) {
+@common(Messages(constants.Forms.SET_SELLER_FEEDBACK)) {
     @form(action = routes.SetSellerFeedbackController.blockchainSetSellerFeedback) {
         @CSRF.formField
         @inputText(setSellerFeedbackForm(constants.Forms.FROM),'_label-> Messages(constants.Forms.FROM))
@@ -19,6 +19,6 @@
             }
             </ul>
         }
-        <button type="submit">@Messages(constants.Forms.SET_SELLER_FEEDBACK_TITLE)</button>
+        <button type="submit">@Messages(constants.Forms.SET_SELLER_FEEDBACK)</button>
     }
 }

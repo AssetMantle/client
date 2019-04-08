@@ -10,11 +10,11 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class WithUnknownLoginAction  @Inject()(defaultBodyParse: BodyParsers.Default, masterAccounts: master.Accounts, accountTokens: AccountTokens)(implicit executionContext: ExecutionContext) extends ActionBuilderImpl(defaultBodyParse)  {
   override def invokeBlock[T](request: Request[T], block: Request[T] => Future[Result]): Future[Result] = {
-    if (accountTokens.Service.verifySession(request.session.get(Security.USERNAME), request.session.get(Security.TOKEN)) && masterAccounts.Service.getUserType(request.session.get(Security.USERNAME).getOrElse("")) == "") {
+    if (accountTokens.Service.verifySession(request.session.get(Security.USERNAME), request.session.get(Security.TOKEN)) && masterAccounts.Service.getUserType(request.session.get(Security.USERNAME).getOrElse("")) == constants.User.UNKNOWN) {
       block(request)
     }
     else {
-      Future.successful(Results.Forbidden(constants.User.WITHOUT_LOGIN))
+      Future.successful(Results.Forbidden(constants.Error.INCORRECT_LOG_IN))
     }
   }
 }

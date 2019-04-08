@@ -15,7 +15,7 @@ class WithGenesisLoginAction  @Inject()(defaultBodyParse: BodyParsers.Default, m
       block(request)
     }
     else {
-      Future.successful(Results.Forbidden(constants.User.NOT_GENESIS))
+      Future.successful(Results.Forbidden(constants.Error.INCORRECT_LOG_IN))
     }
   }
 }
