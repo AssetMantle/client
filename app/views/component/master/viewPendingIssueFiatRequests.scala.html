@@ -14,11 +14,11 @@
         </tr>
         @for(issueFiatRequest <- issueFiatRequests) {
             <tr>
-                <td><a href="@routes.IssueFiatController.issueFiatForm(issueFiatRequest.accountID, issueFiatRequest.transactionID, issueFiatRequest.transactionAmount)">@issueFiatRequest.id</a></td>
+                <td>@issueFiatRequest.id</td>
                 <td>@issueFiatRequest.accountID</td>
                 <td>@issueFiatRequest.transactionID</td>
                 <td>@issueFiatRequest.transactionAmount</td>
-                <td>@issueFiatRequest.status</td>
+                <td><a href="@routes.IssueFiatController.issueFiatForm(issueFiatRequest.accountID, issueFiatRequest.transactionID, issueFiatRequest.transactionAmount)">@Messages(constants.Forms.ACCEPT)</a>/<a href="@routes.IssueFiatController.rejectIssueFiatRequestForm(issueFiatRequest.id, issueFiatRequest.accountID)">@Messages(constants.Forms.REJECT)</a></td>
             </tr>
         }
     </table>
