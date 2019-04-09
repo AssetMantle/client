@@ -34,7 +34,7 @@ class SetSellerFeedbackController @Inject()(messagesControllerComponents: Messag
             Ok(views.html.index(success = response.ticketID))
           } else {
             val response = transactionsSetSellerFeedback.Service.post( transactionsSetSellerFeedback.Request(from = request.session.get(constants.Security.USERNAME).get, to = setSellerFeedbackData.to, password = setSellerFeedbackData.password, pegHash = setSellerFeedbackData.pegHash, rating = setSellerFeedbackData.rating, gas = setSellerFeedbackData.gas))
-            setSellerFeedbacks.Service.addSetSellerFeedback(from = request.session.get(constants.Security.USERNAME).get, to = setSellerFeedbackData.to, pegHash = setSellerFeedbackData.pegHash, rating = setSellerFeedbackData.rating, gas = setSellerFeedbackData.gas, null, txHash = Option(response.TxHash), ticketID = (Random.nextInt(899999999) + 100000000).toString, null)
+            setSellerFeedbacks.Service.addSetSellerFeedback(from = request.session.get(constants.Security.USERNAME).get, to = setSellerFeedbackData.to, pegHash = setSellerFeedbackData.pegHash, rating = setSellerFeedbackData.rating, gas = setSellerFeedbackData.gas, null, txHash = Option(response.TxHash), ticketID = Random.nextString(32), null)
             Ok(views.html.index(success = response.TxHash))
           }
         }
@@ -63,7 +63,7 @@ class SetSellerFeedbackController @Inject()(messagesControllerComponents: Messag
             Ok(views.html.index(success = response.ticketID))
           } else {
             val response = transactionsSetSellerFeedback.Service.post( transactionsSetSellerFeedback.Request(from = setSellerFeedbackData.from, to = setSellerFeedbackData.to, password = setSellerFeedbackData.password, pegHash = setSellerFeedbackData.pegHash, rating = setSellerFeedbackData.rating, gas = setSellerFeedbackData.gas))
-            setSellerFeedbacks.Service.addSetSellerFeedback(from = setSellerFeedbackData.from, to = setSellerFeedbackData.to, pegHash = setSellerFeedbackData.pegHash, rating = setSellerFeedbackData.rating, gas = setSellerFeedbackData.gas, null, txHash = Option(response.TxHash), ticketID = (Random.nextInt(899999999) + 100000000).toString, null)
+            setSellerFeedbacks.Service.addSetSellerFeedback(from = setSellerFeedbackData.from, to = setSellerFeedbackData.to, pegHash = setSellerFeedbackData.pegHash, rating = setSellerFeedbackData.rating, gas = setSellerFeedbackData.gas, null, txHash = Option(response.TxHash), ticketID = Random.nextString(32), null)
             Ok(views.html.index(success = response.TxHash))
           }
         }

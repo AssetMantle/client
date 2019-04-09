@@ -1,9 +1,8 @@
 @import models.masterTransaction.FaucetRequest
-@import views.companion.master.ApproveFaucetRequest
 
-@(faucetRequests: Seq[FaucetRequest], approveFaucetRequestForm: Form[ApproveFaucetRequest.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
+@(faucetRequests: Seq[FaucetRequest])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
 
-@common(Messages(constants.Forms.FAUCET_REQUESTS)) {
+@common(Messages(constants.Forms.PENDING_FAUCET_REQUESTS)) {
     <table>
         <tr>
             <th>@Messages(constants.Forms.ID)</th>

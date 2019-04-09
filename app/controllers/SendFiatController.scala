@@ -34,7 +34,7 @@ class SendFiatController @Inject()(messagesControllerComponents: MessagesControl
             Ok(views.html.index(success = response.ticketID))
           } else {
             val response = transactionsSendFiat.Service.post( transactionsSendFiat.Request(from = request.session.get(constants.Security.USERNAME).get, to = sendFiatData.to, password = sendFiatData.password, amount = sendFiatData.amount, pegHash = sendFiatData.pegHash, gas = sendFiatData.gas))
-            sendFiats.Service.addSendFiat(from = request.session.get(constants.Security.USERNAME).get, to = sendFiatData.to, amount = sendFiatData.amount, pegHash = sendFiatData.pegHash, gas = sendFiatData.gas, null, txHash = Option(response.TxHash), ticketID = (Random.nextInt(899999999) + 100000000).toString, null)
+            sendFiats.Service.addSendFiat(from = request.session.get(constants.Security.USERNAME).get, to = sendFiatData.to, amount = sendFiatData.amount, pegHash = sendFiatData.pegHash, gas = sendFiatData.gas, null, txHash = Option(response.TxHash), ticketID = Random.nextString(32), null)
             Ok(views.html.index(success = response.TxHash))
           }
         }
@@ -63,7 +63,7 @@ class SendFiatController @Inject()(messagesControllerComponents: MessagesControl
             Ok(views.html.index(success = response.ticketID))
           } else {
             val response = transactionsSendFiat.Service.post( transactionsSendFiat.Request(from = sendFiatData.from, to = sendFiatData.to, password = sendFiatData.password, amount = sendFiatData.amount, pegHash = sendFiatData.pegHash, gas = sendFiatData.gas))
-            sendFiats.Service.addSendFiat(from = sendFiatData.from, to = sendFiatData.to, amount = sendFiatData.amount, pegHash = sendFiatData.pegHash, gas = sendFiatData.gas, null, txHash = Option(response.TxHash), ticketID = (Random.nextInt(899999999) + 100000000).toString, null)
+            sendFiats.Service.addSendFiat(from = sendFiatData.from, to = sendFiatData.to, amount = sendFiatData.amount, pegHash = sendFiatData.pegHash, gas = sendFiatData.gas, null, txHash = Option(response.TxHash), ticketID = Random.nextString(32), null)
             Ok(views.html.index(success = response.TxHash))
           }
         }

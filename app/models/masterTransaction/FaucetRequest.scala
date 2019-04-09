@@ -93,7 +93,7 @@ class FaucetRequests @Inject()(protected val databaseConfigProvider: DatabaseCon
 
   object Service {
 
-    def addFaucetRequest(accountID: String, amount: Int)(implicit executionContext: ExecutionContext):String = Await.result(add(FaucetRequest((Random.nextInt(899999999) + 100000000).toString, accountID, amount, null, null)), Duration.Inf)
+    def addFaucetRequest(accountID: String, amount: Int)(implicit executionContext: ExecutionContext):String = Await.result(add(FaucetRequest(Random.nextString(32), accountID, amount, null, null)), Duration.Inf)
 
     def getFaucetRequest(accountID: String)(implicit executionContext: ExecutionContext):FaucetRequest = Await.result(findByAccountID(accountID), Duration.Inf)
 

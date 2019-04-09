@@ -20,10 +20,10 @@
             <a href="@routes.ConfirmSellerBidController.confirmSellerBidForm">@Messages(constants.Forms.CONFIRM_SELLER_BID)</a>
         }
         @if(aclHash.issueAssets) {
-            <a href="@routes.IssueAssetController.issueAssetForm">@Messages(constants.Forms.ISSUE_ASSET)</a>
+            <a href="@routes.IssueAssetController.issueAssetRequestForm">@Messages(constants.Forms.ISSUE_ASSET_REQUEST)</a>
         }
         @if(aclHash.issueFiats) {
-            <a href="@routes.IssueFiatController.issueFiatForm">@Messages(constants.Forms.ISSUE_FIAT)</a>
+            <a href="@routes.IssueFiatController.issueFiatRequestForm">@Messages(constants.Forms.ISSUE_FIAT_REQUEST)</a>
         }
         @if(aclHash.redeemAssets) {
             <a href="@routes.RedeemAssetController.redeemAssetForm">@Messages(constants.Forms.REDEEM_ASSET)</a>
@@ -56,7 +56,7 @@
         @Messages(constants.Forms.VERIFIED_STATUS): @zone.status <br>
         <br>
 
-        <h2>>@Messages(constants.Forms.ORGANIZATION):</h2>
+        <h2>@Messages(constants.Forms.ORGANIZATION):</h2>
         @Messages(constants.Forms.ORGANIZATION_NAME): @organization.name <br>
         @Messages(constants.Forms.ORGANIZATION_ID): @organization.id <br>
         @Messages(constants.Forms.ORGANIZATION_USERNAME): @organization.accountID <br>
@@ -64,7 +64,7 @@
         @Messages(constants.Forms.PHONE): @organization.phone <br>
         @Messages(constants.Forms.EMAIL): @organization.email <br>
         @Messages(constants.Forms.VERIFIED_STATUS): @organization.status <br>
-        <br>L
+        <br>
 
         <h2>@Messages(constants.User.ASSETS_OWNED) </h2>
         @component.master.assetsTable(assetPegWallet)

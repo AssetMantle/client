@@ -34,7 +34,7 @@ class ChangeBuyerBidController @Inject()(messagesControllerComponents: MessagesC
             Ok(views.html.index(success = response.ticketID))
           } else {
             val response = transactionsChangeBuyerBid.Service.post( transactionsChangeBuyerBid.Request(from = request.session.get(constants.Security.USERNAME).get,to = changeBuyerBidData.to, password = changeBuyerBidData.password,  bid = changeBuyerBidData.bid, time = changeBuyerBidData.time, pegHash = changeBuyerBidData.pegHash, gas = changeBuyerBidData.gas))
-            changeBuyerBids.Service.addChangeBuyerBid(from = request.session.get(constants.Security.USERNAME).get, to = changeBuyerBidData.to, bid = changeBuyerBidData.bid, time = changeBuyerBidData.time, pegHash = changeBuyerBidData.pegHash, gas = changeBuyerBidData.gas, null, txHash = Option(response.TxHash), ticketID = (Random.nextInt(899999999) + 100000000).toString, null)
+            changeBuyerBids.Service.addChangeBuyerBid(from = request.session.get(constants.Security.USERNAME).get, to = changeBuyerBidData.to, bid = changeBuyerBidData.bid, time = changeBuyerBidData.time, pegHash = changeBuyerBidData.pegHash, gas = changeBuyerBidData.gas, null, txHash = Option(response.TxHash), ticketID = Random.nextString(32), null)
             Ok(views.html.index(success = response.TxHash))
           }
         }
@@ -63,7 +63,7 @@ class ChangeBuyerBidController @Inject()(messagesControllerComponents: MessagesC
             Ok(views.html.index(success = response.ticketID))
           } else {
             val response = transactionsChangeBuyerBid.Service.post( transactionsChangeBuyerBid.Request(from = changeBuyerBidData.from,to = changeBuyerBidData.to, password = changeBuyerBidData.password,  bid = changeBuyerBidData.bid, time = changeBuyerBidData.time, pegHash = changeBuyerBidData.pegHash, gas = changeBuyerBidData.gas))
-            changeBuyerBids.Service.addChangeBuyerBid(from = changeBuyerBidData.from, to = changeBuyerBidData.to, bid = changeBuyerBidData.bid, time = changeBuyerBidData.time, pegHash = changeBuyerBidData.pegHash, gas = changeBuyerBidData.gas, null, txHash = Option(response.TxHash), ticketID = (Random.nextInt(899999999) + 100000000).toString, null)
+            changeBuyerBids.Service.addChangeBuyerBid(from = changeBuyerBidData.from, to = changeBuyerBidData.to, bid = changeBuyerBidData.bid, time = changeBuyerBidData.time, pegHash = changeBuyerBidData.pegHash, gas = changeBuyerBidData.gas, null, txHash = Option(response.TxHash), ticketID = Random.nextString(32), null)
             Ok(views.html.index(success = response.TxHash))
           }
         }

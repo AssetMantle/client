@@ -56,7 +56,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
             val organizationAccountAddress = masterAccounts.Service.getAddress(organizationAccountID)
             val response = transactionsAddOrganization.Service.post(transactionsAddOrganization.Request(from = request.session.get(constants.Security.USERNAME).get, to = organizationAccountAddress, organizationID = verifyOrganizationData.organizationID, zoneID = verifyOrganizationData.zoneID, password = verifyOrganizationData.password))
             blockchainOrganizations.Service.addOrganization(verifyOrganizationData.organizationID, organizationAccountAddress)
-            blockchainTransactionAddOrganizations.Service.addOrganization(from = request.session.get(constants.Security.USERNAME).get, to = organizationAccountAddress, organizationID = verifyOrganizationData.organizationID, zoneID = verifyOrganizationData.zoneID, null, txHash = Option(response.TxHash), ticketID = (Random.nextInt(899999999) + 100000000).toString, null)
+            blockchainTransactionAddOrganizations.Service.addOrganization(from = request.session.get(constants.Security.USERNAME).get, to = organizationAccountAddress, organizationID = verifyOrganizationData.organizationID, zoneID = verifyOrganizationData.zoneID, null, txHash = Option(response.TxHash), ticketID = Random.nextString(32), null)
             masterAccounts.Service.updateUserType(organizationAccountID, constants.User.ORGANIZATION)
             Ok(views.html.index(success = Messages(constants.Success.VERIFY_ORGANIZATION) + verifyOrganizationData.organizationID + response.TxHash))
           }
@@ -87,7 +87,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
             Ok(views.html.index(success = response.ticketID))
           } else {
             val response = transactionsAddOrganization.Service.post(transactionsAddOrganization.Request(from = addOrganizationData.from, to = addOrganizationData.to, organizationID = addOrganizationData.organizationID, zoneID = addOrganizationData.zoneID, password = addOrganizationData.password))
-            blockchainTransactionAddOrganizations.Service.addOrganization(from = addOrganizationData.from, to = addOrganizationData.to, organizationID = addOrganizationData.organizationID, zoneID = addOrganizationData.zoneID, null, txHash = Option(response.TxHash), ticketID = (Random.nextInt(899999999) + 100000000).toString, null)
+            blockchainTransactionAddOrganizations.Service.addOrganization(from = addOrganizationData.from, to = addOrganizationData.to, organizationID = addOrganizationData.organizationID, zoneID = addOrganizationData.zoneID, null, txHash = Option(response.TxHash), ticketID = Random.nextString(32), null)
             Ok(views.html.index(success = response.TxHash))
           }
         }
