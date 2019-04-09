@@ -65,7 +65,17 @@ class IssueFiatRequests  @Inject()(protected val databaseConfigProvider: Databas
     }
   }
 
-  private def getAllWithNullStatus()(implicit executionContext: ExecutionContext): Future[Seq[IssueFiatRequest]] = db.run(issueFiatRequestTable.filter(_.status.?.isEmpty).result.asTry).map {
+  private def updateStatusByID(id: String, status: Boolean)(implicit executionContext: ExecutionContext) = db.run(issueFiatRequestTable.filter(_.id === id).map(_.status).update(status).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+        throw new BaseException(constants.Error.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+        throw new BaseException(constants.Error.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def getIssueFiatRequestsWithNullStatus(accountIDs: Seq[String])(implicit executionContext: ExecutionContext): Future[Seq[IssueFiatRequest]] = db.run(issueFiatRequestTable.filter(_.accountID.inSet(accountIDs)).filter(_.status.?.isEmpty).result.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
@@ -111,7 +121,9 @@ class IssueFiatRequests  @Inject()(protected val databaseConfigProvider: Databas
 
     def updateStatusAndGas(accountID: String, status: Boolean, gas: Int)(implicit executionContext: ExecutionContext): Int = Await.result(updateStatusAndGasByAccountID(accountID, status, gas), Duration.Inf)
 
-    def getStatus()(implicit executionContext: ExecutionContext): Seq[IssueFiatRequest] = Await.result(getAllWithNullStatus(), Duration.Inf)
+    def updateStatus(id: String, status: Boolean)(implicit executionContext: ExecutionContext): Int = Await.result(updateStatusByID(id, status), Duration.Inf)
+
+    def getPendingIssueFiatRequests(accountIDs: Seq[String])(implicit executionContext: ExecutionContext): Seq[IssueFiatRequest] = Await.result(getIssueFiatRequestsWithNullStatus(accountIDs), Duration.Inf)
 
     def deleteIssueFiatRequest(id: String)(implicit executionContext: ExecutionContext): Int = Await.result(deleteByID(id), Duration.Inf)
   }

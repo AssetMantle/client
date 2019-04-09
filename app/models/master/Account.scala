@@ -85,6 +85,16 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     }
   }
 
+  private def getIDsByAddresses(addresses: Seq[String])(implicit executionContext: ExecutionContext): Future[Seq[String]] = db.run(accountTable.filter(_.accountAddress.inSet(addresses)).map(_.id).result.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+        throw new BaseException(constants.Error.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+        throw new BaseException(constants.Error.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
   private def getUserTypeByAddress(address: String)(implicit executionContext: ExecutionContext): Future[String] = db.run(accountTable.filter(_.accountAddress === address).map(_.userType).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -182,6 +192,8 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     def getUserType(id: String)(implicit executionContext: ExecutionContext):String = Await.result(getUserTypeById(id), Duration.Inf)
 
     def getUserTypeOnAddress(address: String)(implicit executionContext: ExecutionContext):String = Await.result(getUserTypeByAddress(address), Duration.Inf)
+
+    def getIDsForAddresses(addresses: Seq[String])(implicit executionContext: ExecutionContext): Seq[String] = Await.result(getIDsByAddresses(addresses), Duration.Inf)
   }
 
 }

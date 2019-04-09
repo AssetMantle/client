@@ -97,14 +97,13 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
         }
         catch {
           case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))
-          case blockChainException: BlockChainException => Ok(views.html.index(failure = blockChainException.message))
         }
       }
     )
   }
 
-  def viewPendingFaucetRequests: Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.viewPendingFaucetRequests(masterTransactionFaucetRequests.Service.getStatus()))
+  def viewPendingFaucetRequests: Action[AnyContent] = withGenesisLoginAction { implicit request =>
+    Ok(views.html.component.master.viewPendingFaucetRequests(masterTransactionFaucetRequests.Service.getPendingFaucetRequests()))
   }
 
   def approveFaucetRequestsForm(accountID: String): Action[AnyContent] = Action { implicit request =>

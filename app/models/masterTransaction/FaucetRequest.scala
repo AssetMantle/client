@@ -99,7 +99,7 @@ class FaucetRequests @Inject()(protected val databaseConfigProvider: DatabaseCon
 
     def updateStatusAndGas(accountID: String, status: Boolean, gas: Int)(implicit executionContext: ExecutionContext) = Await.result(updateStatusAndGasByAccountID(accountID, status, gas), Duration.Inf)
 
-    def getStatus()(implicit executionContext: ExecutionContext): Seq[FaucetRequest] = Await.result(getAllWithNullStatus(), Duration.Inf)
+    def getPendingFaucetRequests()(implicit executionContext: ExecutionContext): Seq[FaucetRequest] = Await.result(getAllWithNullStatus(), Duration.Inf)
 
     def deleteFaucetRequest(id: String)(implicit executionContext: ExecutionContext) = Await.result(deleteByID(id), Duration.Inf)
   }

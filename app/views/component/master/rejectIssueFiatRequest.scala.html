@@ -1,0 +1,19 @@
+@import helper._
+@import views.companion.master.RejectIssueFiatRequest
+
+@(rejectIssueFiatRequestForm: Form[RejectIssueFiatRequest.Data], requestID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@common(Messages(constants.Forms.REJECT_ISSUE_FIAT_REQUEST)) {
+    @form(action = routes.IssueFiatController.rejectIssueFiatRequest) {
+        @CSRF.formField
+        @inputText(rejectIssueFiatRequestForm(constants.Forms.REQUEST_ID).copy(value = Some(requestID)), '_label -> Messages(constants.Forms.REQUEST_ID))
+
+        @if(rejectIssueFiatRequestForm.hasGlobalErrors) {
+            <ul>
+            @for(error <- rejectIssueFiatRequestForm.globalErrors) {
+                <li>@error.format</li>
+            }
+            </ul>
+        }
+        <button type="submit">@Messages(constants.Forms.REJECT_ISSUE_FIAT_REQUEST)</button>
+    }
+}

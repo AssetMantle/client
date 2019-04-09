@@ -11,7 +11,7 @@ import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerC
 import scala.concurrent.ExecutionContext
 import scala.util.Random
 
-class IssueFiatController @Inject()(messagesControllerComponents: MessagesControllerComponents, withZoneLoginAction: WithZoneLoginAction, masterTransactionIssueFiatRequests: masterTransaction.IssueFiatRequests, blockchainAccounts: blockchain.Accounts, withTraderLoginAction: WithTraderLoginAction, masterAccounts: master.Accounts, blockchainFiats: models.blockchain.Fiats, blockchainOwners: models.blockchain.Owners, transactionsIssueFiat: transactions.IssueFiat, blockchainTransactionIssueFiats: blockchainTransaction.IssueFiats)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class IssueFiatController @Inject()(messagesControllerComponents: MessagesControllerComponents, withZoneLoginAction: WithZoneLoginAction, masterTransactionIssueFiatRequests: masterTransaction.IssueFiatRequests, blockchainAclAccounts: blockchain.ACLAccounts, masterZones: master.Zones, blockchainAccounts: blockchain.Accounts, withTraderLoginAction: WithTraderLoginAction, masterAccounts: master.Accounts, blockchainFiats: models.blockchain.Fiats, blockchainOwners: models.blockchain.Owners, transactionsIssueFiat: transactions.IssueFiat, blockchainTransactionIssueFiats: blockchainTransaction.IssueFiats)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
 
@@ -31,14 +31,39 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
         }
         catch {
           case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))
-          case blockChainException: BlockChainException => Ok(views.html.index(failure = blockChainException.message))
         }
       }
     )
   }
-  
-  def viewPendingIssueFiatRequests: Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.viewPendingIssueFiatRequests(masterTransactionIssueFiatRequests.Service.getStatus()))
+
+  def viewPendingIssueFiatRequests: Action[AnyContent] = withZoneLoginAction { implicit request =>
+    try {
+      Ok(views.html.component.master.viewPendingIssueFiatRequests(masterTransactionIssueFiatRequests.Service.getPendingIssueFiatRequests(masterAccounts.Service.getIDsForAddresses(blockchainAclAccounts.Service.getAddressesUnderZone(masterZones.Service.getZoneId(request.session.get(constants.Security.USERNAME).get))))))
+    }
+    catch {
+      case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))
+    }
+  }
+
+  def rejectIssueFiatRequestForm(requestID: String): Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.rejectIssueFiatRequest(views.companion.master.RejectIssueFiatRequest.form, requestID))
+  }
+
+  def rejectIssueFiatRequest: Action[AnyContent] = withZoneLoginAction { implicit request =>
+    views.companion.master.RejectIssueFiatRequest.form.bindFromRequest().fold(
+      formWithErrors => {
+        BadRequest(views.html.component.master.rejectIssueFiatRequest(formWithErrors, formWithErrors.data(constants.Forms.REQUEST_ID)))
+      },
+      rejectIssueFiatRequestData => {
+        try {
+          masterTransactionIssueFiatRequests.Service.updateStatus(rejectIssueFiatRequestData.requestID, false)
+          Ok(views.html.index(success = Messages(constants.Success.ISSUE_FIAT_REQUEST_REJECTED)))
+        }
+        catch {
+          case blockChainException: BlockChainException => Ok(views.html.index(failure = blockChainException.message))
+        }
+      }
+    )
   }
 
   def issueFiatForm(accountID: String, transactionID: String, transactionAmount: Int): Action[AnyContent] = Action { implicit request =>

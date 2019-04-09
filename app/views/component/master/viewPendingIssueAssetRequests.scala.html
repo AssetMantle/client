@@ -17,14 +17,14 @@
         </tr>
         @for(issueAssetRequest <- issueAssetRequests) {
             <tr>
-                <td><a href="@routes.IssueAssetController.issueAssetForm(issueAssetRequest.accountID, issueAssetRequest.documentHash, issueAssetRequest.assetType, issueAssetRequest.assetPrice, issueAssetRequest.quantityUnit, issueAssetRequest.assetQuantity)">@issueAssetRequest.id</a></td>
+                <td>@issueAssetRequest.id</td>
                 <td>@issueAssetRequest.accountID</td>
                 <td>@issueAssetRequest.documentHash</td>
                 <td>@issueAssetRequest.assetType</td>
                 <td>@issueAssetRequest.assetQuantity</td>
                 <td>@issueAssetRequest.assetPrice</td>
                 <td>@issueAssetRequest.quantityUnit</td>
-                <td>@issueAssetRequest.status</td>
+                <td><a href="@routes.IssueAssetController.issueAssetForm(issueAssetRequest.accountID, issueAssetRequest.documentHash, issueAssetRequest.assetType, issueAssetRequest.assetPrice, issueAssetRequest.quantityUnit, issueAssetRequest.assetQuantity)">@Messages(constants.Forms.ACCEPT)</a>/<a href="@routes.IssueAssetController.rejectIssueAssetRequestForm(issueAssetRequest.id)">@Messages(constants.Forms.REJECT)</a></td>
             </tr>
         }
     </table>
