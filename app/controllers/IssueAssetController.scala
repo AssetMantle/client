@@ -66,16 +66,16 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
     )
   }
 
-  def issueAssetForm(accountID: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int): Action[AnyContent] = Action {
+  def issueAssetForm(requestID: String, accountID: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int): Action[AnyContent] = Action {
     implicit request =>
-      Ok(views.html.component.master.issueAsset(views.companion.master.IssueAsset.form, accountID, documentHash, assetType, assetPrice, quantityUnit, assetQuantity))
+      Ok(views.html.component.master.issueAsset(views.companion.master.IssueAsset.form, requestID, accountID, documentHash, assetType, assetPrice, quantityUnit, assetQuantity))
   }
 
   def issueAsset: Action[AnyContent] = withZoneLoginAction {
     implicit request =>
       views.companion.master.IssueAsset.form.bindFromRequest().fold(
         formWithErrors => {
-          BadRequest(views.html.component.master.issueAsset(formWithErrors, formWithErrors.data(constants.Forms.ACCOUNT_ID), formWithErrors.data(constants.Forms.DOCUMENT_HASH), formWithErrors.data(constants.Forms.ASSET_TYPE), formWithErrors.data(constants.Forms.ASSET_PRICE).toInt, formWithErrors.data(constants.Forms.QUANTITY_UNIT), formWithErrors.data(constants.Forms.ASSET_QUANTITY).toInt))
+          BadRequest(views.html.component.master.issueAsset(formWithErrors, formWithErrors.data(constants.Forms.REQUEST_ID), formWithErrors.data(constants.Forms.ACCOUNT_ID), formWithErrors.data(constants.Forms.DOCUMENT_HASH), formWithErrors.data(constants.Forms.ASSET_TYPE), formWithErrors.data(constants.Forms.ASSET_PRICE).toInt, formWithErrors.data(constants.Forms.QUANTITY_UNIT), formWithErrors.data(constants.Forms.ASSET_QUANTITY).toInt))
         },
         issueAssetData => {
           try {
@@ -89,7 +89,7 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
               val zoneAddress = masterAccounts.Service.getAddress(request.session.get(constants.Security.USERNAME).get)
               val response = transactionsIssueAsset.Service.post(transactionsIssueAsset.Request(from = request.session.get(constants.Security.USERNAME).get, to = toAddress, password = issueAssetData.password, documentHash = issueAssetData.documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.assetPrice, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.assetQuantity, gas = issueAssetData.gas))
               blockchainTransactionIssueAssets.Service.addIssueAsset(from = request.session.get(constants.Security.USERNAME).get, to = toAddress, documentHash = issueAssetData.documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.assetPrice, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.assetQuantity, gas = issueAssetData.gas, null, txHash = Option(response.TxHash), ticketID = Random.nextString(32), null)
-              masterTransactionIssueAssetRequests.Service.updateStatusAndGas(issueAssetData.accountID, true, issueAssetData.gas)
+              masterTransactionIssueAssetRequests.Service.updateStatusAndGas(issueAssetData.requestID, true, issueAssetData.gas)
               blockchainAccounts.Service.updateSequence(toAddress, blockchainAccounts.Service.getSequence(toAddress) + 1)
               blockchainAccounts.Service.updateSequence(zoneAddress, blockchainAccounts.Service.getSequence(zoneAddress) + 1)
               for (tag <- response.Tags) {

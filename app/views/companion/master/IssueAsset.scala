@@ -6,6 +6,7 @@ import play.api.data.Forms._
 object IssueAsset {
   val form = Form(
     mapping(
+      constants.Forms.REQUEST_ID -> nonEmptyText(minLength = 1, maxLength = 45),
       constants.Forms.ACCOUNT_ID -> nonEmptyText(minLength = 1, maxLength = 45),
       constants.Forms.DOCUMENT_HASH -> nonEmptyText(minLength = 1, maxLength = 20),
       constants.Forms.ASSET_TYPE -> nonEmptyText(minLength = 1, maxLength = 20),
@@ -17,6 +18,6 @@ object IssueAsset {
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(accountID: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, password: String, gas: Int)
+  case class Data(requestID: String, accountID: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, password: String, gas: Int)
 
 }

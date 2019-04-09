@@ -109,7 +109,7 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
     def getZone(id: String)(implicit executionContext: ExecutionContext): Zone = Await.result(findById(id), Duration.Inf)
 
-    def verifyZone(id: String, status: Boolean)(implicit executionContext: ExecutionContext): Boolean = if (Await.result(verifyZoneOnID(id, status), Duration.Inf) == 1) true else false
+    def verifyZone(id: String, status: Boolean)(implicit executionContext: ExecutionContext): Int = Await.result(verifyZoneOnID(id, status), Duration.Inf)
 
     def getAccountId(id: String)(implicit executionContext: ExecutionContext): String = Await.result(getAccountIdById(id), Duration.Inf)
 

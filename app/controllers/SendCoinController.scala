@@ -82,7 +82,7 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
   }
 
   def requestCoinsForm: Action[AnyContent] = Action { implicit request =>
-      Ok(views.html.component.master.requestCoin(views.companion.master.RequestCoin.form))
+    Ok(views.html.component.master.requestCoin(views.companion.master.RequestCoin.form))
   }
 
   def requestCoins: Action[AnyContent] = withUnknownLoginAction { implicit request =>
@@ -106,14 +106,35 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
     Ok(views.html.component.master.viewPendingFaucetRequests(masterTransactionFaucetRequests.Service.getPendingFaucetRequests()))
   }
 
-  def approveFaucetRequestsForm(accountID: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.approveFaucetRequests(views.companion.master.ApproveFaucetRequest.form, accountID))
+  def rejectFaucetRequestForm(requestID: String): Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.rejectFaucetRequest(views.companion.master.RejectFaucetRequest.form, requestID))
+  }
+
+  def rejectFaucetRequest: Action[AnyContent] = withGenesisLoginAction { implicit request =>
+    views.companion.master.RejectFaucetRequest.form.bindFromRequest().fold(
+      formWithErrors => {
+        BadRequest(views.html.component.master.rejectFaucetRequest(formWithErrors, formWithErrors.data(constants.Forms.REQUEST_ID)))
+      },
+      rejectFaucetRequestData => {
+        try {
+          masterTransactionFaucetRequests.Service.updateStatus(rejectFaucetRequestData.requestID, false)
+          Ok(views.html.index(success = Messages(constants.Success.ISSUE_FIAT_REQUEST_REJECTED)))
+        }
+        catch {
+          case blockChainException: BlockChainException => Ok(views.html.index(failure = blockChainException.message))
+        }
+      }
+    )
+  }
+
+  def approveFaucetRequestsForm(requestID: String,accountID: String): Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.approveFaucetRequests(views.companion.master.ApproveFaucetRequest.form, requestID, accountID))
   }
 
   def approveFaucetRequests: Action[AnyContent] = withGenesisLoginAction { implicit request =>
     views.companion.master.ApproveFaucetRequest.form.bindFromRequest().fold(
       formWithErrors => {
-        BadRequest(views.html.component.master.approveFaucetRequests(formWithErrors, formWithErrors.data(constants.Forms.ACCOUNT_ID)))
+        BadRequest(views.html.component.master.approveFaucetRequests(formWithErrors, formWithErrors.data(constants.Forms.REQUEST_ID), formWithErrors.data(constants.Forms.ACCOUNT_ID)))
       },
       approveFaucetRequestFormData => {
         try {
@@ -125,7 +146,7 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
           else {
             val toAddress = masterAccounts.Service.getAddress(approveFaucetRequestFormData.accountID)
             val response = transactionsSendCoin.Service.post(transactionsSendCoin.Request(from = constants.User.MAIN_ACCOUNT, password = approveFaucetRequestFormData.password, to = toAddress, amount = Seq(transactionsSendCoin.Amount("comdex", defaultFaucetToken.toString)), gas = approveFaucetRequestFormData.gas))
-            masterTransactionFaucetRequests.Service.updateStatusAndGas(approveFaucetRequestFormData.accountID, true, approveFaucetRequestFormData.gas)
+            masterTransactionFaucetRequests.Service.updateStatusAndGas(approveFaucetRequestFormData.requestID, true, approveFaucetRequestFormData.gas)
             blockchainAccounts.Service.updateSequenceAndCoins(toAddress, blockchainAccounts.Service.getSequence(toAddress) + 1, defaultFaucetToken)
             blockchainAccounts.Service.updateSequenceAndCoins(mainAddress, blockchainAccounts.Service.getSequence(mainAddress) + 1, blockchainAccounts.Service.getCoins(mainAddress) - defaultFaucetToken)
             masterAccounts.Service.updateUserType(approveFaucetRequestFormData.accountID, constants.User.USER)

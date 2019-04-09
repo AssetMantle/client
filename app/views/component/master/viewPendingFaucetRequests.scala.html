@@ -13,10 +13,10 @@
         </tr>
         @for(faucetRequest <- faucetRequests) {
             <tr>
-                <td><a href="@routes.SendCoinController.approveFaucetRequestsForm(faucetRequest.accountID)">@faucetRequest.id</a></td>
+                <td>@faucetRequest.id</td>
                 <td>@faucetRequest.accountID</td>
                 <td>@faucetRequest.amount</td>
-                <td>@faucetRequest.status</td>
+                <td><a href="@routes.SendCoinController.approveFaucetRequestsForm(faucetRequest.id, faucetRequest.accountID)">@Messages(constants.Forms.APPROVE)</a>/<a href="@routes.SendCoinController.rejectFaucetRequestForm(faucetRequest.id)">@Messages(constants.Forms.REJECT)</a></td>
             </tr>
         }
     </table>

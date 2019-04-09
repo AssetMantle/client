@@ -18,7 +18,7 @@
                 <td>@issueFiatRequest.accountID</td>
                 <td>@issueFiatRequest.transactionID</td>
                 <td>@issueFiatRequest.transactionAmount</td>
-                <td><a href="@routes.IssueFiatController.issueFiatForm(issueFiatRequest.accountID, issueFiatRequest.transactionID, issueFiatRequest.transactionAmount)">@Messages(constants.Forms.ACCEPT)</a>/<a href="@routes.IssueFiatController.rejectIssueFiatRequestForm(issueFiatRequest.id)">@Messages(constants.Forms.REJECT)</a></td>
+                <td><a href="@routes.IssueFiatController.issueFiatForm(issueFiatRequest.id, issueFiatRequest.accountID, issueFiatRequest.transactionID, issueFiatRequest.transactionAmount)">@Messages(constants.Forms.APPROVE)</a>/<a href="@routes.IssueFiatController.rejectIssueFiatRequestForm(issueFiatRequest.id)">@Messages(constants.Forms.REJECT)</a></td>
             </tr>
         }
     </table>

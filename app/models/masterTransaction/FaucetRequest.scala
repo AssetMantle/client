@@ -55,7 +55,17 @@ class FaucetRequests @Inject()(protected val databaseConfigProvider: DatabaseCon
     }
   }
 
-  private def updateStatusAndGasByAccountID(accountID: String, status: Boolean, gas: Int)(implicit executionContext: ExecutionContext) = db.run(faucetRequestTable.filter(_.accountID === accountID).map(faucet => (faucet.status, faucet.gas)).update((status, gas)).asTry).map {
+  private def updateStatusAndGasByID(id: String, status: Boolean, gas: Int)(implicit executionContext: ExecutionContext) = db.run(faucetRequestTable.filter(_.id === id).map(faucet => (faucet.status, faucet.gas)).update((status, gas)).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+        throw new BaseException(constants.Error.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+        throw new BaseException(constants.Error.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def updateStatusByID(id: String, status: Boolean)(implicit executionContext: ExecutionContext) = db.run(faucetRequestTable.filter(_.id === id).map(_.status).update(status).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
@@ -97,7 +107,9 @@ class FaucetRequests @Inject()(protected val databaseConfigProvider: DatabaseCon
 
     def getFaucetRequest(accountID: String)(implicit executionContext: ExecutionContext):FaucetRequest = Await.result(findByAccountID(accountID), Duration.Inf)
 
-    def updateStatusAndGas(accountID: String, status: Boolean, gas: Int)(implicit executionContext: ExecutionContext) = Await.result(updateStatusAndGasByAccountID(accountID, status, gas), Duration.Inf)
+    def updateStatusAndGas(id: String, status: Boolean, gas: Int)(implicit executionContext: ExecutionContext) = Await.result(updateStatusAndGasByID(id, status, gas), Duration.Inf)
+
+    def updateStatus(id: String, status: Boolean)(implicit executionContext: ExecutionContext): Int = Await.result(updateStatusByID(id, status), Duration.Inf)
 
     def getPendingFaucetRequests()(implicit executionContext: ExecutionContext): Seq[FaucetRequest] = Await.result(getAllWithNullStatus(), Duration.Inf)
 
