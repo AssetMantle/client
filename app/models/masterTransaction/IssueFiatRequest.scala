@@ -105,7 +105,7 @@ class IssueFiatRequests  @Inject()(protected val databaseConfigProvider: Databas
 
   object Service {
 
-    def addIssueFiatRequest(accountID: String, transactionID: String, transactionAmount: Int)(implicit executionContext: ExecutionContext): String = Await.result(add(IssueFiatRequest(id = (Random.nextInt(899999999) + 100000000).toString, accountID = accountID, transactionID = transactionID, transactionAmount = transactionAmount, null, null)), Duration.Inf)
+    def addIssueFiatRequest(accountID: String, transactionID: String, transactionAmount: Int)(implicit executionContext: ExecutionContext): String = Await.result(add(IssueFiatRequest(id = Random.nextString(32), accountID = accountID, transactionID = transactionID, transactionAmount = transactionAmount, null, null)), Duration.Inf)
 
     def getIssueFiatRequest(accountID: String)(implicit executionContext: ExecutionContext): IssueFiatRequest = Await.result(findByAccountID(accountID), Duration.Inf)
 

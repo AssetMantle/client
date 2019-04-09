@@ -37,7 +37,7 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
           }
           else {
             val response = transactionsSendCoin.Service.post(transactionsSendCoin.Request(from = request.session.get(constants.Security.USERNAME).get, password = sendCoinData.password, to = sendCoinData.to, amount = Seq(transactionsSendCoin.Amount("comdex", sendCoinData.amount.toString)), gas = sendCoinData.gas))
-            blockchainTransactionSendCoins.Service.addSendCoin(from = request.session.get(constants.Security.USERNAME).get, to = sendCoinData.to, amount = sendCoinData.amount, gas = sendCoinData.gas, null, txHash = Option(response.TxHash), ticketID = (Random.nextInt(899999999) + 100000000).toString, null)
+            blockchainTransactionSendCoins.Service.addSendCoin(from = request.session.get(constants.Security.USERNAME).get, to = sendCoinData.to, amount = sendCoinData.amount, gas = sendCoinData.gas, null, txHash = Option(response.TxHash), ticketID = Random.nextString(32), null)
             blockchainAccounts.Service.updateSequenceAndCoins(sendCoinData.to, blockchainAccounts.Service.getSequence(sendCoinData.to) + 1, defaultFaucetToken)
             blockchainAccounts.Service.updateSequenceAndCoins(mainAddress, blockchainAccounts.Service.getSequence(mainAddress) + 1, blockchainAccounts.Service.getCoins(mainAddress) - defaultFaucetToken)
             Ok(views.html.index(success = response.TxHash))
@@ -69,7 +69,7 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
           }
           else {
             val response = transactionsSendCoin.Service.post(transactionsSendCoin.Request(from = sendCoinData.from, password = sendCoinData.password, to = sendCoinData.to, amount = Seq(transactionsSendCoin.Amount("comdex", sendCoinData.amount.toString)), gas = sendCoinData.gas))
-            blockchainTransactionSendCoins.Service.addSendCoin(sendCoinData.from, sendCoinData.to, sendCoinData.amount, sendCoinData.gas, null, Option(response.TxHash), (Random.nextInt(899999999) + 100000000).toString, null)
+            blockchainTransactionSendCoins.Service.addSendCoin(sendCoinData.from, sendCoinData.to, sendCoinData.amount, sendCoinData.gas, null, Option(response.TxHash), Random.nextString(32), null)
             Ok(views.html.index(success = response.TxHash))
           }
         }
@@ -130,7 +130,7 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
             blockchainAccounts.Service.updateSequenceAndCoins(toAddress, blockchainAccounts.Service.getSequence(toAddress) + 1, defaultFaucetToken)
             blockchainAccounts.Service.updateSequenceAndCoins(mainAddress, blockchainAccounts.Service.getSequence(mainAddress) + 1, blockchainAccounts.Service.getCoins(mainAddress) - defaultFaucetToken)
             masterAccounts.Service.updateUserType(approveFaucetRequestFormData.accountID, constants.User.USER)
-            blockchainTransactionSendCoins.Service.addSendCoin(constants.User.MAIN_ACCOUNT, toAddress, defaultFaucetToken, approveFaucetRequestFormData.gas, null, Option(response.TxHash), (Random.nextInt(899999999) + 100000000).toString, null)
+            blockchainTransactionSendCoins.Service.addSendCoin(constants.User.MAIN_ACCOUNT, toAddress, defaultFaucetToken, approveFaucetRequestFormData.gas, null, Option(response.TxHash), Random.nextString(32), null)
             Ok(views.html.index(success = Messages(constants.Success.APPROVED_FAUCET_REQUEST)))
           }
         }

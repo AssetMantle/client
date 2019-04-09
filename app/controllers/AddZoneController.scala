@@ -56,7 +56,7 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
             val zoneAccountAddress = masterAccounts.Service.getAddress(zoneAccountID)
             val response = transactionsAddZone.Service.post(transactionsAddZone.Request(from = request.session.get(constants.Security.USERNAME).get, to = zoneAccountAddress, zoneID = verifyZoneData.id, password = verifyZoneData.password))
             blockchainZones.Service.addZone(verifyZoneData.id, zoneAccountAddress)
-            blockchainTransactionAddZones.Service.addZone(request.session.get(constants.Security.USERNAME).get, zoneAccountAddress, verifyZoneData.id, null, Option(response.TxHash), (Random.nextInt(899999999) + 100000000).toString, null)
+            blockchainTransactionAddZones.Service.addZone(request.session.get(constants.Security.USERNAME).get, zoneAccountAddress, verifyZoneData.id, null, Option(response.TxHash), Random.nextString(32), null)
             masterAccounts.Service.updateUserType(zoneAccountID, constants.User.ZONE)
             Ok(views.html.index(success = Messages(constants.Success.VERIFY_ZONE) + verifyZoneData.id + response.TxHash))
           }
@@ -86,7 +86,7 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
             Ok(views.html.index(success = response.ticketID))
           } else {
             val response = transactionsAddZone.Service.post(transactionsAddZone.Request(from = addZoneData.from, to = addZoneData.to, zoneID = addZoneData.zoneID, password = addZoneData.password))
-            blockchainTransactionAddZones.Service.addZone(addZoneData.from, addZoneData.to, addZoneData.zoneID, null, Option(response.TxHash), (Random.nextInt(899999999) + 100000000).toString, null)
+            blockchainTransactionAddZones.Service.addZone(addZoneData.from, addZoneData.to, addZoneData.zoneID, null, Option(response.TxHash), Random.nextString(32), null)
             Ok(views.html.index(success = response.TxHash))
           }
         }

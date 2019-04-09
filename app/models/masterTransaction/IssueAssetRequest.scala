@@ -111,7 +111,7 @@ class IssueAssetRequests @Inject()(protected val databaseConfigProvider: Databas
 
   object Service {
 
-    def addIssueAssetRequest(accountID: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int)(implicit executionContext: ExecutionContext):String = Await.result(add(IssueAssetRequest(id = (Random.nextInt(899999999) + 100000000).toString, accountID = accountID, documentHash = documentHash, assetType = assetType, assetPrice = assetPrice, quantityUnit = quantityUnit, assetQuantity = assetQuantity, null, null)), Duration.Inf)
+    def addIssueAssetRequest(accountID: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int)(implicit executionContext: ExecutionContext):String = Await.result(add(IssueAssetRequest(id = Random.nextString(32), accountID = accountID, documentHash = documentHash, assetType = assetType, assetPrice = assetPrice, quantityUnit = quantityUnit, assetQuantity = assetQuantity, null, null)), Duration.Inf)
 
     def getIssueAssetRequest(accountID: String)(implicit executionContext: ExecutionContext): IssueAssetRequest = Await.result(findByAccountID(accountID), Duration.Inf)
 

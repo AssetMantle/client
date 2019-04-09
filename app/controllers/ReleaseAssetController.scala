@@ -34,7 +34,7 @@ class ReleaseAssetController @Inject()(messagesControllerComponents: MessagesCon
             Ok(views.html.index(success = response.ticketID))
           } else {
             val response = transactionsReleaseAsset.Service.post( transactionsReleaseAsset.Request(from = request.session.get(constants.Security.USERNAME).get, to = releaseAssetData.to, password = releaseAssetData.password, pegHash = releaseAssetData.pegHash, gas = releaseAssetData.gas))
-            releaseAssets.Service.addReleaseAsset(from = request.session.get(constants.Security.USERNAME).get, to = releaseAssetData.to, pegHash = releaseAssetData.pegHash, gas = releaseAssetData.gas, null, txHash = Option(response.TxHash), ticketID = (Random.nextInt(899999999) + 100000000).toString, null)
+            releaseAssets.Service.addReleaseAsset(from = request.session.get(constants.Security.USERNAME).get, to = releaseAssetData.to, pegHash = releaseAssetData.pegHash, gas = releaseAssetData.gas, null, txHash = Option(response.TxHash), ticketID = Random.nextString(32), null)
             Ok(views.html.index(success = response.TxHash))
           }
         }
@@ -64,7 +64,7 @@ class ReleaseAssetController @Inject()(messagesControllerComponents: MessagesCon
             Ok(views.html.index(success = response.ticketID))
           } else {
             val response = transactionsReleaseAsset.Service.post( transactionsReleaseAsset.Request(from = releaseAssetData.from, to = releaseAssetData.to, password = releaseAssetData.password, pegHash = releaseAssetData.pegHash, gas = releaseAssetData.gas))
-            releaseAssets.Service.addReleaseAsset(from = releaseAssetData.from, to = releaseAssetData.to, pegHash = releaseAssetData.pegHash, gas = releaseAssetData.gas, null, txHash = Option(response.TxHash), ticketID = (Random.nextInt(899999999) + 100000000).toString, null)
+            releaseAssets.Service.addReleaseAsset(from = releaseAssetData.from, to = releaseAssetData.to, pegHash = releaseAssetData.pegHash, gas = releaseAssetData.gas, null, txHash = Option(response.TxHash), ticketID = Random.nextString(32), null)
             Ok(views.html.index(success = response.TxHash))
           }
         }

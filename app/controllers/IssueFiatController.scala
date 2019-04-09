@@ -61,7 +61,7 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
             val toAddress = masterAccounts.Service.getAddress(issueFiatData.accountID)
             val zoneAddress = masterAccounts.Service.getAddress(request.session.get(constants.Security.USERNAME).get)
             val response = transactionsIssueFiat.Service.post(transactionsIssueFiat.Request(from = request.session.get(constants.Security.USERNAME).get, to = toAddress, password = issueFiatData.password, transactionID = issueFiatData.transactionID, transactionAmount = issueFiatData.transactionAmount, gas = issueFiatData.gas))
-            blockchainTransactionIssueFiats.Service.addIssueFiat(from = request.session.get(constants.Security.USERNAME).get, to = toAddress, transactionID = issueFiatData.transactionID, transactionAmount = issueFiatData.transactionAmount, gas = issueFiatData.gas, null, txHash = Option(response.TxHash), ticketID = (Random.nextInt(899999999) + 100000000).toString, null)
+            blockchainTransactionIssueFiats.Service.addIssueFiat(from = request.session.get(constants.Security.USERNAME).get, to = toAddress, transactionID = issueFiatData.transactionID, transactionAmount = issueFiatData.transactionAmount, gas = issueFiatData.gas, null, txHash = Option(response.TxHash), ticketID = Random.nextString(32), null)
             masterTransactionIssueFiatRequests.Service.updateStatusAndGas(issueFiatData.accountID, true, issueFiatData.gas)
             blockchainAccounts.Service.updateSequence(toAddress, blockchainAccounts.Service.getSequence(toAddress) + 1)
             blockchainAccounts.Service.updateSequence(zoneAddress, blockchainAccounts.Service.getSequence(zoneAddress) + 1)
@@ -99,7 +99,7 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
             Ok(views.html.index(success = response.ticketID))
           } else {
             val response = transactionsIssueFiat.Service.post(transactionsIssueFiat.Request(from = issueFiatData.from, to = issueFiatData.to, password = issueFiatData.password, transactionID = issueFiatData.transactionID, transactionAmount = issueFiatData.transactionAmount, gas = issueFiatData.gas))
-            blockchainTransactionIssueFiats.Service.addIssueFiat(from = issueFiatData.from, to = issueFiatData.to, transactionID = issueFiatData.transactionID, transactionAmount = issueFiatData.transactionAmount, gas = issueFiatData.gas, null, txHash = Option(response.TxHash), ticketID = (Random.nextInt(899999999) + 100000000).toString, null)
+            blockchainTransactionIssueFiats.Service.addIssueFiat(from = issueFiatData.from, to = issueFiatData.to, transactionID = issueFiatData.transactionID, transactionAmount = issueFiatData.transactionAmount, gas = issueFiatData.gas, null, txHash = Option(response.TxHash), ticketID = Random.nextString(32), null)
             Ok(views.html.index(success = response.TxHash))
           }
         }

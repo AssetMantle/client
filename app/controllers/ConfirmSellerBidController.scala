@@ -34,7 +34,7 @@ class ConfirmSellerBidController @Inject()(messagesControllerComponents: Message
             Ok(views.html.index(success = response.ticketID))
           } else {
             val response = transactionsConfirmSellerBid.Service.post( transactionsConfirmSellerBid.Request(from = request.session.get(constants.Security.USERNAME).get,to = confirmSellerBidData.to, password = confirmSellerBidData.password,  bid = confirmSellerBidData.bid, time = confirmSellerBidData.time, pegHash = confirmSellerBidData.pegHash, gas = confirmSellerBidData.gas))
-            confirmSellerBids.Service.addConfirmSellerBid(from = request.session.get(constants.Security.USERNAME).get, to = confirmSellerBidData.to, bid = confirmSellerBidData.bid, time = confirmSellerBidData.time, pegHash = confirmSellerBidData.pegHash, gas = confirmSellerBidData.gas, null, txHash = Option(response.TxHash), ticketID = (Random.nextInt(899999999) + 100000000).toString, null)
+            confirmSellerBids.Service.addConfirmSellerBid(from = request.session.get(constants.Security.USERNAME).get, to = confirmSellerBidData.to, bid = confirmSellerBidData.bid, time = confirmSellerBidData.time, pegHash = confirmSellerBidData.pegHash, gas = confirmSellerBidData.gas, null, txHash = Option(response.TxHash), ticketID = Random.nextString(32), null)
             Ok(views.html.index(success = response.TxHash))
           }
         }
@@ -64,7 +64,7 @@ class ConfirmSellerBidController @Inject()(messagesControllerComponents: Message
             Ok(views.html.index(success = response.ticketID))
           } else {
             val response = transactionsConfirmSellerBid.Service.post( transactionsConfirmSellerBid.Request(from = confirmSellerBidData.from,to = confirmSellerBidData.to, password = confirmSellerBidData.password,  bid = confirmSellerBidData.bid, time = confirmSellerBidData.time, pegHash = confirmSellerBidData.pegHash, gas = confirmSellerBidData.gas))
-            confirmSellerBids.Service.addConfirmSellerBid(from = confirmSellerBidData.from, to = confirmSellerBidData.to, bid = confirmSellerBidData.bid, time = confirmSellerBidData.time, pegHash = confirmSellerBidData.pegHash, gas = confirmSellerBidData.gas, null, txHash = Option(response.TxHash), ticketID = (Random.nextInt(899999999) + 100000000).toString, null)
+            confirmSellerBids.Service.addConfirmSellerBid(from = confirmSellerBidData.from, to = confirmSellerBidData.to, bid = confirmSellerBidData.bid, time = confirmSellerBidData.time, pegHash = confirmSellerBidData.pegHash, gas = confirmSellerBidData.gas, null, txHash = Option(response.TxHash), ticketID = Random.nextString(32), null)
             Ok(views.html.index(success = response.TxHash))
           }
         }
