@@ -479,7 +479,32 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."FaucetRequest"
   "accountID" VARCHAR NOT NULL,
   "amount"    INT     NOT NULL,
   "gas"       INT,
-  "status"    BOOLEAN NOT NULL,
+  "status"    BOOLEAN,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."IssueAssetRequest"
+(
+  "id"            VARCHAR NOT NULL,
+  "accountID"     VARCHAR NOT NULL,
+  "documentHash"  VARCHAR NOT NULL,
+  "assetType"     VARCHAR NOT NULL,
+  "assetPrice"    INT     NOT NULL,
+  "quantityUnit"  VARCHAR NOT NULL,
+  "assetQuantity" INT     NOT NULL,
+  "gas"           INT,
+  "status"        BOOLEAN,
+  PRIMARY KEY ("id")
+);
+
+CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."IssueFiatRequest"
+(
+  "id"                VARCHAR NOT NULL,
+  "accountID"         VARCHAR NOT NULL,
+  "transactionID"     VARCHAR NOT NULL,
+  "transactionAmount" INT     NOT NULL,
+  "gas"               INT,
+  "status"            BOOLEAN,
   PRIMARY KEY ("id")
 );
 
@@ -559,6 +584,10 @@ ALTER TABLE MASTER_TRANSACTION."AccountToken"
   ADD CONSTRAINT AccountToken_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER_TRANSACTION."FaucetRequest"
   ADD CONSTRAINT FaucetRequest_MasterAccount_AccountID FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");
+ALTER TABLE MASTER_TRANSACTION."IssueAssetRequest"
+  ADD CONSTRAINT IssueAssetRequest_MasterAccount_AccountID FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");
+ALTER TABLE MASTER_TRANSACTION."IssueFiatRequest"
+  ADD CONSTRAINT IssueFiatRequest_MasterAccount_AccountID FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER_TRANSACTION."Notification"
   ADD CONSTRAINT Notification_Account_id FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER_TRANSACTION."SMSOTP"
@@ -620,6 +649,8 @@ DROP TABLE IF EXISTS MASTER."BankAccount" CASCADE;
 
 DROP TABLE IF EXISTS MASTER_TRANSACTION."AccountToken" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."FaucetRequest" CASCADE;
+DROP TABLE IF EXISTS MASTER_TRANSACTION."IssueAssetRequest" CASCADE;
+DROP TABLE IF EXISTS MASTER_TRANSACTION."IssueFiatRequest" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."Notification" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."SMSOTP" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."EmailOTP" CASCADE;

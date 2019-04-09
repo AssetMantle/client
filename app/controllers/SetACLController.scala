@@ -1,6 +1,6 @@
 package controllers
 
-import controllers.actions.WithOrganizationLoginAction
+import controllers.actions.{WithOrganizationLoginAction, WithZoneLoginAction}
 import exceptions.{BaseException, BlockChainException}
 import javax.inject.Inject
 import models.{blockchain, master}
@@ -12,7 +12,7 @@ import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerC
 import scala.concurrent.ExecutionContext
 import scala.util.Random
 
-class SetACLController @Inject()(messagesControllerComponents: MessagesControllerComponents, withOrganizationLoginAction: WithOrganizationLoginAction, masterAccounts: master.Accounts, transactionsSetACL: transactions.SetACL, blockchainAclAccounts: blockchain.ACLAccounts, blockchainTransactionSetACLs: blockchainTransaction.SetACLs, blockchainAclHashes: blockchain.ACLHashes)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class SetACLController @Inject()(messagesControllerComponents: MessagesControllerComponents, withZoneLoginAction: WithZoneLoginAction, masterAccounts: master.Accounts, transactionsSetACL: transactions.SetACL, blockchainAclAccounts: blockchain.ACLAccounts, blockchainTransactionSetACLs: blockchainTransaction.SetACLs, blockchainAclHashes: blockchain.ACLHashes)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
 
@@ -20,7 +20,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
     Ok(views.html.component.master.setACL(views.companion.master.SetACL.form))
   }
 
-  def setACL: Action[AnyContent] = withOrganizationLoginAction { implicit request =>
+  def setACL: Action[AnyContent] = withZoneLoginAction { implicit request =>
     views.companion.master.SetACL.form.bindFromRequest().fold(
       formWithErrors => {
         BadRequest(views.html.component.master.setACL(formWithErrors))

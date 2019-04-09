@@ -103,8 +103,8 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
     )
   }
 
-  def viewFaucetRequests: Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.viewUnapprovedFaucetRequests( faucetRequests = masterTransactionFaucetRequests.Service.getStatus(), approveFaucetRequestForm = views.companion.master.ApproveFaucetRequest.form))
+  def viewPendingFaucetRequests: Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.viewPendingFaucetRequests(masterTransactionFaucetRequests.Service.getStatus()))
   }
 
   def approveFaucetRequestsForm(accountID: String): Action[AnyContent] = Action { implicit request =>
@@ -114,7 +114,7 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
   def approveFaucetRequests: Action[AnyContent] = withGenesisLoginAction { implicit request =>
     views.companion.master.ApproveFaucetRequest.form.bindFromRequest().fold(
       formWithErrors => {
-        BadRequest(views.html.component.master.approveFaucetRequests(formWithErrors, formWithErrors.get.accountID))
+        BadRequest(views.html.component.master.approveFaucetRequests(formWithErrors, formWithErrors.data(constants.Forms.ACCOUNT_ID)))
       },
       approveFaucetRequestFormData => {
         try {
