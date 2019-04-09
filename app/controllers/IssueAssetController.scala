@@ -45,14 +45,14 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
     }
   }
 
-  def rejectIssueAssetRequestForm(requestID: String, accountID: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.rejectIssueAssetRequest(views.companion.master.RejectIssueAssetRequest.form, requestID, accountID))
+  def rejectIssueAssetRequestForm(requestID: String): Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.rejectIssueAssetRequest(views.companion.master.RejectIssueAssetRequest.form, requestID))
   }
 
   def rejectIssueAssetRequest: Action[AnyContent] = withZoneLoginAction { implicit request =>
     views.companion.master.RejectIssueAssetRequest.form.bindFromRequest().fold(
       formWithErrors => {
-        BadRequest(views.html.component.master.rejectIssueAssetRequest(formWithErrors, formWithErrors.data(constants.Forms.REQUEST_ID), formWithErrors.data(constants.Forms.ACCOUNT_ID)))
+        BadRequest(views.html.component.master.rejectIssueAssetRequest(formWithErrors, formWithErrors.data(constants.Forms.REQUEST_ID)))
       },
       rejectIssueAssetRequestData => {
         try {

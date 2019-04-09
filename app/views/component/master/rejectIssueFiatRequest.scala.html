@@ -1,12 +1,11 @@
 @import helper._
 @import views.companion.master.RejectIssueFiatRequest
 
-@(rejectIssueFiatRequestForm: Form[RejectIssueFiatRequest.Data], requestID: String, accountID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@(rejectIssueFiatRequestForm: Form[RejectIssueFiatRequest.Data], requestID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @common(Messages(constants.Forms.REJECT_ISSUE_FIAT_REQUEST)) {
     @form(action = routes.IssueFiatController.rejectIssueFiatRequest) {
         @CSRF.formField
         @inputText(rejectIssueFiatRequestForm(constants.Forms.REQUEST_ID).copy(value = Some(requestID)), '_label -> Messages(constants.Forms.REQUEST_ID))
-        @inputText(rejectIssueFiatRequestForm(constants.Forms.ACCOUNT_ID).copy(value = Some(accountID)), '_label -> Messages(constants.Forms.ACCOUNT_ID))
 
         @if(rejectIssueFiatRequestForm.hasGlobalErrors) {
             <ul>

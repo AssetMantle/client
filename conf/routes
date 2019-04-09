@@ -65,7 +65,7 @@ GET         /master/issueAssetRequest                                           
 POST        /master/issueAssetRequest                                                                              controllers.IssueAssetController.issueAssetRequest
 
 GET         /master/viewPendingIssueAssetRequests                                                                  controllers.IssueAssetController.viewPendingIssueAssetRequests
-GET         /master/rejectIssueAssetRequest/:requestID/:accountID                                                  controllers.IssueAssetController.rejectIssueAssetRequestForm(requestID: String, accountID: String)
+GET         /master/rejectIssueAssetRequest/:requestID                                                             controllers.IssueAssetController.rejectIssueAssetRequestForm(requestID: String)
 POST        /master/rejectIssueAssetRequest                                                                        controllers.IssueAssetController.rejectIssueAssetRequest
 
 GET         /master/issueAsset/:accountID/:documentHash/:assetType/:assetPrice/:quantityUnit/:assetQuantity        controllers.IssueAssetController.issueAssetForm(accountID: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int)
@@ -75,7 +75,7 @@ GET         /master/issueFiatRequest                                            
 POST        /master/issueFiatRequest                                                                               controllers.IssueFiatController.issueFiatRequest
 
 GET         /master/viewPendingIssueFiatRequests                                                                   controllers.IssueFiatController.viewPendingIssueFiatRequests
-GET         /master/rejectIssueFiatRequest/:requestID/:accountID                                                   controllers.IssueFiatController.rejectIssueFiatRequestForm(requestID: String, accountID: String)
+GET         /master/rejectIssueFiatRequest/:requestID                                                              controllers.IssueFiatController.rejectIssueFiatRequestForm(requestID: String)
 POST        /master/rejectIssueFiatRequest                                                                         controllers.IssueFiatController.rejectIssueFiatRequest
 
 GET         /master/issueFiat/:accountID/:transactionID/:transactionAmount                                         controllers.IssueFiatController.issueFiatForm(accountID: String, transactionID: String, transactionAmount: Int)

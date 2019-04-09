@@ -8,10 +8,9 @@ object RejectIssueAssetRequest {
   val form = Form(
     mapping(
       constants.Forms.REQUEST_ID -> nonEmptyText(minLength = 4, maxLength = 45),
-      constants.Forms.ACCOUNT_ID -> nonEmptyText(minLength = 4, maxLength = 45),
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(requestID: String, accountID: String)
+  case class Data(requestID: String)
 
 }

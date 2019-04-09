@@ -24,7 +24,7 @@
                 <td>@issueAssetRequest.assetQuantity</td>
                 <td>@issueAssetRequest.assetPrice</td>
                 <td>@issueAssetRequest.quantityUnit</td>
-                <td><a href="@routes.IssueAssetController.issueAssetForm(issueAssetRequest.accountID, issueAssetRequest.documentHash, issueAssetRequest.assetType, issueAssetRequest.assetPrice, issueAssetRequest.quantityUnit, issueAssetRequest.assetQuantity)">@Messages(constants.Forms.ACCEPT)</a>/<a href="@routes.IssueAssetController.rejectIssueAssetRequestForm(issueAssetRequest.id, issueAssetRequest.accountID)">@Messages(constants.Forms.REJECT)</a></td>
+                <td><a href="@routes.IssueAssetController.issueAssetForm(issueAssetRequest.accountID, issueAssetRequest.documentHash, issueAssetRequest.assetType, issueAssetRequest.assetPrice, issueAssetRequest.quantityUnit, issueAssetRequest.assetQuantity)">@Messages(constants.Forms.ACCEPT)</a>/<a href="@routes.IssueAssetController.rejectIssueAssetRequestForm(issueAssetRequest.id)">@Messages(constants.Forms.REJECT)</a></td>
             </tr>
         }
     </table>

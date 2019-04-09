@@ -45,14 +45,14 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
     }
   }
 
-  def rejectIssueFiatRequestForm(requestID: String, accountID: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.rejectIssueFiatRequest(views.companion.master.RejectIssueFiatRequest.form, requestID, accountID))
+  def rejectIssueFiatRequestForm(requestID: String): Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.rejectIssueFiatRequest(views.companion.master.RejectIssueFiatRequest.form, requestID))
   }
 
   def rejectIssueFiatRequest: Action[AnyContent] = withZoneLoginAction { implicit request =>
     views.companion.master.RejectIssueFiatRequest.form.bindFromRequest().fold(
       formWithErrors => {
-        BadRequest(views.html.component.master.rejectIssueFiatRequest(formWithErrors, formWithErrors.data(constants.Forms.REQUEST_ID), formWithErrors.data(constants.Forms.ACCOUNT_ID)))
+        BadRequest(views.html.component.master.rejectIssueFiatRequest(formWithErrors, formWithErrors.data(constants.Forms.REQUEST_ID)))
       },
       rejectIssueFiatRequestData => {
         try {
