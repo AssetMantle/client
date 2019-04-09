@@ -1,6 +1,6 @@
 package controllers
 
-import controllers.actions.{WithLoginAction, WithUserLoginAction, WithZoneLoginAction}
+import controllers.actions.{WithUserLoginAction, WithZoneLoginAction}
 import exceptions.{BaseException, BlockChainException}
 import javax.inject.Inject
 import models.{blockchain, blockchainTransaction, master}
@@ -46,19 +46,23 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
       },
       verifyOrganizationData => {
         try {
-          masterOrganizations.Service.verifyOrganization(verifyOrganizationData.organizationID, true)
-          if (kafkaEnabled) {
-            val response = transactionsAddOrganization.Service.kafkaPost(transactionsAddOrganization.Request(from = request.session.get(constants.Security.USERNAME).get, to = masterAccounts.Service.getAccount(masterOrganizations.Service.getOrganization(verifyOrganizationData.organizationID).accountID).accountAddress, organizationID = verifyOrganizationData.organizationID, zoneID = verifyOrganizationData.zoneID, password = verifyOrganizationData.password))
-            blockchainTransactionAddOrganizations.Service.addOrganizationKafka(from = request.session.get(constants.Security.USERNAME).get, to = masterAccounts.Service.getAddress(masterOrganizations.Service.getAccountId(verifyOrganizationData.organizationID)), organizationID = verifyOrganizationData.organizationID, zoneID = verifyOrganizationData.zoneID, null, null, ticketID = response.ticketID, null)
-            Ok(views.html.index(success = Messages(constants.Success.VERIFY_ORGANIZATION) + verifyOrganizationData.organizationID + response.ticketID))
+          masterOrganizations.Service.verifyOrganization(verifyOrganizationData.organizationID, verifyOrganizationData.status)
+          if (verifyOrganizationData.status) {
+            if (kafkaEnabled) {
+              val response = transactionsAddOrganization.Service.kafkaPost(transactionsAddOrganization.Request(from = request.session.get(constants.Security.USERNAME).get, to = masterAccounts.Service.getAccount(masterOrganizations.Service.getOrganization(verifyOrganizationData.organizationID).accountID).accountAddress, organizationID = verifyOrganizationData.organizationID, zoneID = verifyOrganizationData.zoneID, password = verifyOrganizationData.password))
+              blockchainTransactionAddOrganizations.Service.addOrganizationKafka(from = request.session.get(constants.Security.USERNAME).get, to = masterAccounts.Service.getAddress(masterOrganizations.Service.getAccountId(verifyOrganizationData.organizationID)), organizationID = verifyOrganizationData.organizationID, zoneID = verifyOrganizationData.zoneID, null, null, ticketID = response.ticketID, null)
+              Ok(views.html.index(success = Messages(constants.Success.VERIFY_ORGANIZATION) + verifyOrganizationData.organizationID + response.ticketID))
+            } else {
+              val organizationAccountID = masterOrganizations.Service.getAccountId(verifyOrganizationData.organizationID)
+              val organizationAccountAddress = masterAccounts.Service.getAddress(organizationAccountID)
+              val response = transactionsAddOrganization.Service.post(transactionsAddOrganization.Request(from = request.session.get(constants.Security.USERNAME).get, to = organizationAccountAddress, organizationID = verifyOrganizationData.organizationID, zoneID = verifyOrganizationData.zoneID, password = verifyOrganizationData.password))
+              blockchainOrganizations.Service.addOrganization(verifyOrganizationData.organizationID, organizationAccountAddress)
+              blockchainTransactionAddOrganizations.Service.addOrganization(from = request.session.get(constants.Security.USERNAME).get, to = organizationAccountAddress, organizationID = verifyOrganizationData.organizationID, zoneID = verifyOrganizationData.zoneID, null, txHash = Option(response.TxHash), ticketID = Random.nextString(32), null)
+              masterAccounts.Service.updateUserType(organizationAccountID, constants.User.ORGANIZATION)
+              Ok(views.html.index(success = Messages(constants.Success.VERIFY_ORGANIZATION) + verifyOrganizationData.organizationID + response.TxHash))
+            }
           } else {
-            val organizationAccountID = masterOrganizations.Service.getAccountId(verifyOrganizationData.organizationID)
-            val organizationAccountAddress = masterAccounts.Service.getAddress(organizationAccountID)
-            val response = transactionsAddOrganization.Service.post(transactionsAddOrganization.Request(from = request.session.get(constants.Security.USERNAME).get, to = organizationAccountAddress, organizationID = verifyOrganizationData.organizationID, zoneID = verifyOrganizationData.zoneID, password = verifyOrganizationData.password))
-            blockchainOrganizations.Service.addOrganization(verifyOrganizationData.organizationID, organizationAccountAddress)
-            blockchainTransactionAddOrganizations.Service.addOrganization(from = request.session.get(constants.Security.USERNAME).get, to = organizationAccountAddress, organizationID = verifyOrganizationData.organizationID, zoneID = verifyOrganizationData.zoneID, null, txHash = Option(response.TxHash), ticketID = Random.nextString(32), null)
-            masterAccounts.Service.updateUserType(organizationAccountID, constants.User.ORGANIZATION)
-            Ok(views.html.index(success = Messages(constants.Success.VERIFY_ORGANIZATION) + verifyOrganizationData.organizationID + response.TxHash))
+            Ok(views.html.index(success = Messages(constants.Success.VERIFY_ORGANIZATION_REJECTED)))
           }
         }
         catch {

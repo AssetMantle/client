@@ -46,19 +46,23 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
       },
       verifyZoneData => {
         try {
-          masterZones.Service.verifyZone(verifyZoneData.id, true)
-          if (kafkaEnabled) {
-            val response = transactionsAddZone.Service.kafkaPost(transactionsAddZone.Request(from = request.session.get(constants.Security.USERNAME).get, to = masterAccounts.Service.getAccount(masterZones.Service.getZone(verifyZoneData.id).name).accountAddress, zoneID = verifyZoneData.id, password = verifyZoneData.password))
-            blockchainTransactionAddZones.Service.addZoneKafka(request.session.get(constants.Security.USERNAME).get, masterAccounts.Service.getAddress(masterZones.Service.getAccountId(verifyZoneData.id)), verifyZoneData.id, null, null, response.ticketID, null)
-            Ok(views.html.index(success = Messages(constants.Success.VERIFY_ZONE) + verifyZoneData.id + response.ticketID))
+          masterZones.Service.verifyZone(verifyZoneData.id, verifyZoneData.status)
+          if (verifyZoneData.status) {
+            if (kafkaEnabled) {
+              val response = transactionsAddZone.Service.kafkaPost(transactionsAddZone.Request(from = request.session.get(constants.Security.USERNAME).get, to = masterAccounts.Service.getAccount(masterZones.Service.getZone(verifyZoneData.id).name).accountAddress, zoneID = verifyZoneData.id, password = verifyZoneData.password))
+              blockchainTransactionAddZones.Service.addZoneKafka(request.session.get(constants.Security.USERNAME).get, masterAccounts.Service.getAddress(masterZones.Service.getAccountId(verifyZoneData.id)), verifyZoneData.id, null, null, response.ticketID, null)
+              Ok(views.html.index(success = Messages(constants.Success.VERIFY_ZONE) + verifyZoneData.id + response.ticketID))
+            } else {
+              val zoneAccountID = masterZones.Service.getAccountId(verifyZoneData.id)
+              val zoneAccountAddress = masterAccounts.Service.getAddress(zoneAccountID)
+              val response = transactionsAddZone.Service.post(transactionsAddZone.Request(from = request.session.get(constants.Security.USERNAME).get, to = zoneAccountAddress, zoneID = verifyZoneData.id, password = verifyZoneData.password))
+              blockchainZones.Service.addZone(verifyZoneData.id, zoneAccountAddress)
+              blockchainTransactionAddZones.Service.addZone(request.session.get(constants.Security.USERNAME).get, zoneAccountAddress, verifyZoneData.id, null, Option(response.TxHash), Random.nextString(32), null)
+              masterAccounts.Service.updateUserType(zoneAccountID, constants.User.ZONE)
+              Ok(views.html.index(success = Messages(constants.Success.VERIFY_ZONE) + verifyZoneData.id + response.TxHash))
+            }
           } else {
-            val zoneAccountID = masterZones.Service.getAccountId(verifyZoneData.id)
-            val zoneAccountAddress = masterAccounts.Service.getAddress(zoneAccountID)
-            val response = transactionsAddZone.Service.post(transactionsAddZone.Request(from = request.session.get(constants.Security.USERNAME).get, to = zoneAccountAddress, zoneID = verifyZoneData.id, password = verifyZoneData.password))
-            blockchainZones.Service.addZone(verifyZoneData.id, zoneAccountAddress)
-            blockchainTransactionAddZones.Service.addZone(request.session.get(constants.Security.USERNAME).get, zoneAccountAddress, verifyZoneData.id, null, Option(response.TxHash), Random.nextString(32), null)
-            masterAccounts.Service.updateUserType(zoneAccountID, constants.User.ZONE)
-            Ok(views.html.index(success = Messages(constants.Success.VERIFY_ZONE) + verifyZoneData.id + response.TxHash))
+            Ok(views.html.index(success = Messages(constants.Success.VERIFY_ZONE_REJECTED)))
           }
         }
         catch {

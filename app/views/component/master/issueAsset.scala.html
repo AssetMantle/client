@@ -1,10 +1,11 @@
 @import helper._
 @import views.companion.master.IssueAsset
 
-@(issueAssetForm: Form[IssueAsset.Data], accountID: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@(issueAssetForm: Form[IssueAsset.Data],requestID: String,  accountID: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @common(Messages(constants.Forms.ISSUE_ASSET)) {
     @form(action = routes.IssueAssetController.issueAsset) {
         @CSRF.formField
+        @inputText(issueAssetForm(constants.Forms.REQUEST_ID).copy(value = Some(requestID)),'_label-> Messages(constants.Forms.REQUEST_ID))
         @inputText(issueAssetForm(constants.Forms.ACCOUNT_ID).copy(value = Some(accountID)),'_label-> Messages(constants.Forms.ACCOUNT_ID))
         @inputText(issueAssetForm(constants.Forms.DOCUMENT_HASH).copy(value = Some(documentHash)),'_label-> Messages(constants.Forms.DOCUMENT_HASH))
         @inputText(issueAssetForm(constants.Forms.ASSET_TYPE).copy(value = Some(assetType)),'_label-> Messages(constants.Forms.ASSET_TYPE))

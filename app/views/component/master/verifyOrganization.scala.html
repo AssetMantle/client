@@ -8,6 +8,7 @@
         @inputText(verifyOrganizationForm(constants.Forms.ORGANIZATION_ID),'_label-> Messages(constants.Forms.ORGANIZATION_ID))
         @inputText(verifyOrganizationForm(constants.Forms.ZONE_ID),'_label-> Messages(constants.Forms.ZONE_ID))
         @inputPassword(verifyOrganizationForm(constants.Forms.PASSWORD),'_label-> Messages(constants.Forms.PASSWORD))
+        @checkbox(verifyOrganizationForm(constants.Forms.STATUS),'_label-> Messages(constants.Forms.STATUS))
 
         @if(verifyOrganizationForm.hasGlobalErrors) {
             <ul>

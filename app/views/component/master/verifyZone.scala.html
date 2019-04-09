@@ -7,7 +7,7 @@
         @CSRF.formField
         @inputText(verifyZoneForm(constants.Forms.ID),'_label-> Messages(constants.Forms.ID))
         @inputPassword(verifyZoneForm(constants.Forms.PASSWORD),'_label-> Messages(constants.Forms.PASSWORD))
-
+        @checkbox(verifyZoneForm(constants.Forms.STATUS),'_label-> Messages(constants.Forms.STATUS))
         @if(verifyZoneForm.hasGlobalErrors) {
             <ul>
             @for(error <- verifyZoneForm.globalErrors) {

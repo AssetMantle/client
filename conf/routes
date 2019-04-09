@@ -68,7 +68,7 @@ GET         /master/viewPendingIssueAssetRequests                               
 GET         /master/rejectIssueAssetRequest/:requestID                                                             controllers.IssueAssetController.rejectIssueAssetRequestForm(requestID: String)
 POST        /master/rejectIssueAssetRequest                                                                        controllers.IssueAssetController.rejectIssueAssetRequest
 
-GET         /master/issueAsset/:accountID/:documentHash/:assetType/:assetPrice/:quantityUnit/:assetQuantity        controllers.IssueAssetController.issueAssetForm(accountID: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int)
+GET         /master/issueAsset/:requestID/:accountID/:documentHash/:assetType/:assetPrice/:quantityUnit/:assetQuantity        controllers.IssueAssetController.issueAssetForm(requestID: String, accountID: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int)
 POST        /master/issueAsset                                                                                     controllers.IssueAssetController.issueAsset
 
 GET         /master/issueFiatRequest                                                                               controllers.IssueFiatController.issueFiatRequestForm
@@ -78,7 +78,7 @@ GET         /master/viewPendingIssueFiatRequests                                
 GET         /master/rejectIssueFiatRequest/:requestID                                                              controllers.IssueFiatController.rejectIssueFiatRequestForm(requestID: String)
 POST        /master/rejectIssueFiatRequest                                                                         controllers.IssueFiatController.rejectIssueFiatRequest
 
-GET         /master/issueFiat/:accountID/:transactionID/:transactionAmount                                         controllers.IssueFiatController.issueFiatForm(accountID: String, transactionID: String, transactionAmount: Int)
+GET         /master/issueFiat/:requestID/:accountID/:transactionID/:transactionAmount                                         controllers.IssueFiatController.issueFiatForm(requestID: String, accountID: String, transactionID: String, transactionAmount: Int)
 POST        /master/issueFiat                                                                                      controllers.IssueFiatController.issueFiat
 
 GET         /master/redeemAsset                                                                                    controllers.RedeemAssetController.redeemAssetForm
@@ -103,8 +103,11 @@ GET         /master/requestCoins                                                
 POST        /master/requestCoins                                                                                   controllers.SendCoinController.requestCoins
 
 GET         /master/viewPendingFaucetRequests                                                                      controllers.SendCoinController.viewPendingFaucetRequests
-GET         /master/approveFaucetRequests/:accountID                                                               controllers.SendCoinController.approveFaucetRequestsForm(accountID: String)
+GET         /master/approveFaucetRequests/:requestID/:accountID                                                               controllers.SendCoinController.approveFaucetRequestsForm(requestID: String, accountID: String)
 POST        /master/approveFaucetRequests                                                                          controllers.SendCoinController.approveFaucetRequests
+
+GET         /master/rejectFaucetRequest/:requestID                                                                 controllers.SendCoinController.rejectFaucetRequestForm(requestID: String)
+POST        /master/rejectFaucetRequest                                                                            controllers.SendCoinController.rejectFaucetRequest
 
 GET         /master/sendFiat                                                                                       controllers.SendFiatController.sendFiatForm
 POST        /master/sendFiat                                                                                       controllers.SendFiatController.sendFiat

@@ -101,7 +101,7 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
 
     def getOrganization(id: String)(implicit executionContext: ExecutionContext): Organization = Await.result(findById(id), Duration.Inf)
 
-    def verifyOrganization(id: String, status: Boolean)(implicit executionContext: ExecutionContext): Boolean = if (Await.result(verifyOrganizationOnID(id, status), Duration.Inf) == 1) true else false
+    def verifyOrganization(id: String, status: Boolean)(implicit executionContext: ExecutionContext): Int = Await.result(verifyOrganizationOnID(id, status), Duration.Inf)
 
     def getAccountId(id: String)(implicit executionContext: ExecutionContext): String = Await.result(getAccountIdById(id), Duration.Inf)
   }
