@@ -143,7 +143,7 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
       },
       approveFaucetRequestFormData => {
         try {
-          if (masterTransactionFaucetRequests.Service.getStatus(approveFaucetRequestFormData.requestID) == null) {
+          if (masterTransactionFaucetRequests.Service.getStatus(approveFaucetRequestFormData.requestID) == None) {
             if (kafkaEnabled) {
             val response = transactionsSendCoin.Service.kafkaPost(transactionsSendCoin.Request(from = constants.User.MAIN_ACCOUNT, password = approveFaucetRequestFormData.password, to = masterAccounts.Service.getAddress(approveFaucetRequestFormData.accountID), amount = Seq(transactionsSendCoin.Amount("comdex", defaultFaucetToken.toString)), gas = approveFaucetRequestFormData.gas))
             blockchainTransactionSendCoins.Service.addSendCoinKafka(constants.User.MAIN_ACCOUNT, masterAccounts.Service.getAddress(approveFaucetRequestFormData.accountID), defaultFaucetToken, approveFaucetRequestFormData.gas, null, null, response.ticketID, null)
