@@ -47,8 +47,9 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
       verifyZoneData => {
         try {
             if (kafkaEnabled) {
-              val response = transactionsAddZone.Service.kafkaPost(transactionsAddZone.Request(from = request.session.get(constants.Security.USERNAME).get, to = masterAccounts.Service.getAccount(masterZones.Service.getZone(verifyZoneData.zoneID).name).accountAddress, zoneID = verifyZoneData.zoneID, password = verifyZoneData.password))
-              blockchainTransactionAddZones.Service.addZoneKafka(request.session.get(constants.Security.USERNAME).get, masterAccounts.Service.getAddress(masterZones.Service.getAccountId(verifyZoneData.zoneID)), verifyZoneData.zoneID, null, null, response.ticketID, null)
+              val toAddress = masterAccounts.Service.getAddress(masterZones.Service.getAccountId(verifyZoneData.zoneID))
+              val response = transactionsAddZone.Service.kafkaPost(transactionsAddZone.Request(from = request.session.get(constants.Security.USERNAME).get, to =  toAddress, zoneID = verifyZoneData.zoneID, password = verifyZoneData.password))
+              blockchainTransactionAddZones.Service.addZoneKafka(request.session.get(constants.Security.USERNAME).get, toAddress, verifyZoneData.zoneID, null, null, response.ticketID, null)
               Ok(views.html.index(success = Messages(constants.Success.VERIFY_ZONE) + verifyZoneData.zoneID + response.ticketID))
             } else {
               val zoneAccountID = masterZones.Service.getAccountId(verifyZoneData.zoneID)
