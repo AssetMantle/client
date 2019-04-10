@@ -79,7 +79,7 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
         },
         issueAssetData => {
           try {
-            if (masterTransactionIssueAssetRequests.Service.getStatus(issueAssetData.requestID) == None) {
+            if (masterTransactionIssueAssetRequests.Service.getStatus(issueAssetData.requestID).isEmpty) {
               if (kafkaEnabled) {
                 val toAddress = masterAccounts.Service.getAddress(request.session.get(constants.Security.USERNAME).get)
                 val response = transactionsIssueAsset.Service.kafkaPost(transactionsIssueAsset.Request(from = request.session.get(constants.Security.USERNAME).get, to = toAddress, password = issueAssetData.password, documentHash = issueAssetData.documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.assetPrice, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.assetQuantity, gas = issueAssetData.gas))

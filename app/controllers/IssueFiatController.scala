@@ -77,7 +77,7 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
       },
       issueFiatData => {
         try {
-          if (masterTransactionIssueFiatRequests.Service.getStatus(issueFiatData.requestID) == None) {
+          if (masterTransactionIssueFiatRequests.Service.getStatus(issueFiatData.requestID).isEmpty) {
             if (kafkaEnabled) {
               val toAddress = masterAccounts.Service.getAddress(issueFiatData.accountID)
               val response = transactionsIssueFiat.Service.kafkaPost(transactionsIssueFiat.Request(from = request.session.get(constants.Security.USERNAME).get, to = toAddress, password = issueFiatData.password, transactionID = issueFiatData.transactionID, transactionAmount = issueFiatData.transactionAmount, gas = issueFiatData.gas))
