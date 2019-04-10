@@ -103,7 +103,12 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
   }
 
   def viewPendingFaucetRequests: Action[AnyContent] = withGenesisLoginAction { implicit request =>
-    Ok(views.html.component.master.viewPendingFaucetRequests(masterTransactionFaucetRequests.Service.getPendingFaucetRequests()))
+    try {
+      Ok(views.html.component.master.viewPendingFaucetRequests(masterTransactionFaucetRequests.Service.getPendingFaucetRequests()))
+    }
+    catch {
+      case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))
+    }
   }
 
   def rejectFaucetRequestForm(requestID: String): Action[AnyContent] = Action { implicit request =>
