@@ -85,6 +85,16 @@ class FaucetRequests @Inject()(protected val databaseConfigProvider: DatabaseCon
     }
   }
 
+  private def updateCommentByID(id: String, comment: String)(implicit executionContext: ExecutionContext) = db.run(faucetRequestTable.filter(_.id === id).map(_.comment).update(comment).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+        throw new BaseException(constants.Error.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+        throw new BaseException(constants.Error.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
   private def deleteByID(id: String)(implicit executionContext: ExecutionContext) = db.run(faucetRequestTable.filter(_.id === id).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -134,6 +144,8 @@ class FaucetRequests @Inject()(protected val databaseConfigProvider: DatabaseCon
     def updateStatusAndComment(id: String, status: Boolean, comment: String)(implicit executionContext: ExecutionContext): Int = Await.result(updateStatusAndCommentByID(id, status, comment), Duration.Inf)
 
     def updateStatus(id: String, status: Boolean)(implicit executionContext: ExecutionContext): Int = Await.result(updateStatusByID(id, status), Duration.Inf)
+
+    def updateComment(id: String, comment: String)(implicit executionContext: ExecutionContext): Int = Await.result(updateCommentByID(id, comment), Duration.Inf)
 
     def getPendingFaucetRequests()(implicit executionContext: ExecutionContext): Seq[FaucetRequest] = Await.result(getFaucetRequestsWithNullStatus(), Duration.Inf)
 

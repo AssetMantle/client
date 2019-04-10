@@ -166,7 +166,7 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
         catch {
           case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))
           case blockChainException: BlockChainException =>
-            masterTransactionFaucetRequests.Service.updateStatusAndComment(approveFaucetRequestFormData.requestID, false, blockChainException.message)
+            masterTransactionFaucetRequests.Service.updateComment(approveFaucetRequestFormData.requestID, blockChainException.message)
             Ok(views.html.index(failure = blockChainException.message))
         }
       }

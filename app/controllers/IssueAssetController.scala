@@ -107,7 +107,7 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
           catch {
             case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))
             case blockChainException: BlockChainException =>
-              masterTransactionIssueAssetRequests.Service.updateStatusAndComment(issueAssetData.requestID, false, blockChainException.message)
+              masterTransactionIssueAssetRequests.Service.updateComment(issueAssetData.requestID, blockChainException.message)
               Ok(views.html.index(failure = blockChainException.message))
           }
         }
