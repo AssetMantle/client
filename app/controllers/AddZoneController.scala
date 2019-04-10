@@ -35,39 +35,65 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
     )
   }
 
-  def verifyZoneForm: Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.verifyZone(views.companion.master.VerifyZone.form))
+  def verifyZoneForm(zoneID: String): Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.verifyZone(views.companion.master.VerifyZone.form, zoneID))
   }
 
   def verifyZone: Action[AnyContent] = withGenesisLoginAction { implicit request =>
     views.companion.master.VerifyZone.form.bindFromRequest().fold(
       formWithErrors => {
-        BadRequest(views.html.component.master.verifyZone(formWithErrors))
+        BadRequest(views.html.component.master.verifyZone(formWithErrors, formWithErrors.data(constants.Forms.ZONE_ID)))
       },
       verifyZoneData => {
         try {
-          masterZones.Service.verifyZone(verifyZoneData.id, verifyZoneData.status)
-          if (verifyZoneData.status) {
             if (kafkaEnabled) {
-              val response = transactionsAddZone.Service.kafkaPost(transactionsAddZone.Request(from = request.session.get(constants.Security.USERNAME).get, to = masterAccounts.Service.getAccount(masterZones.Service.getZone(verifyZoneData.id).name).accountAddress, zoneID = verifyZoneData.id, password = verifyZoneData.password))
-              blockchainTransactionAddZones.Service.addZoneKafka(request.session.get(constants.Security.USERNAME).get, masterAccounts.Service.getAddress(masterZones.Service.getAccountId(verifyZoneData.id)), verifyZoneData.id, null, null, response.ticketID, null)
-              Ok(views.html.index(success = Messages(constants.Success.VERIFY_ZONE) + verifyZoneData.id + response.ticketID))
+              val response = transactionsAddZone.Service.kafkaPost(transactionsAddZone.Request(from = request.session.get(constants.Security.USERNAME).get, to = masterAccounts.Service.getAccount(masterZones.Service.getZone(verifyZoneData.zoneID).name).accountAddress, zoneID = verifyZoneData.zoneID, password = verifyZoneData.password))
+              blockchainTransactionAddZones.Service.addZoneKafka(request.session.get(constants.Security.USERNAME).get, masterAccounts.Service.getAddress(masterZones.Service.getAccountId(verifyZoneData.zoneID)), verifyZoneData.zoneID, null, null, response.ticketID, null)
+              Ok(views.html.index(success = Messages(constants.Success.VERIFY_ZONE) + verifyZoneData.zoneID + response.ticketID))
             } else {
-              val zoneAccountID = masterZones.Service.getAccountId(verifyZoneData.id)
+              val zoneAccountID = masterZones.Service.getAccountId(verifyZoneData.zoneID)
               val zoneAccountAddress = masterAccounts.Service.getAddress(zoneAccountID)
-              val response = transactionsAddZone.Service.post(transactionsAddZone.Request(from = request.session.get(constants.Security.USERNAME).get, to = zoneAccountAddress, zoneID = verifyZoneData.id, password = verifyZoneData.password))
-              blockchainZones.Service.addZone(verifyZoneData.id, zoneAccountAddress)
-              blockchainTransactionAddZones.Service.addZone(request.session.get(constants.Security.USERNAME).get, zoneAccountAddress, verifyZoneData.id, null, Option(response.TxHash), Random.nextString(32), null)
+              val response = transactionsAddZone.Service.post(transactionsAddZone.Request(from = request.session.get(constants.Security.USERNAME).get, to = zoneAccountAddress, zoneID = verifyZoneData.zoneID, password = verifyZoneData.password))
+              blockchainTransactionAddZones.Service.addZone(request.session.get(constants.Security.USERNAME).get, zoneAccountAddress, verifyZoneData.zoneID, null, Option(response.TxHash), Random.nextString(32), null)
+              blockchainZones.Service.addZone(verifyZoneData.zoneID, zoneAccountAddress)
+              masterZones.Service.updateStatus(verifyZoneData.zoneID, true)
               masterAccounts.Service.updateUserType(zoneAccountID, constants.User.ZONE)
-              Ok(views.html.index(success = Messages(constants.Success.VERIFY_ZONE) + verifyZoneData.id + response.TxHash))
+              Ok(views.html.index(success = Messages(constants.Success.VERIFY_ZONE) + verifyZoneData.zoneID + response.TxHash))
             }
-          } else {
-            Ok(views.html.index(success = Messages(constants.Success.VERIFY_ZONE_REJECTED)))
-          }
         }
         catch {
           case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))
           case blockChainException: BlockChainException => Ok(views.html.index(failure = Messages(blockChainException.message)))
+        }
+      }
+    )
+  }
+
+  def viewPendingVerifyZoneRequests: Action[AnyContent] = withGenesisLoginAction { implicit request =>
+    try {
+      Ok(views.html.component.master.viewPendingVerifyZoneRequests(masterZones.Service.getVerifyZoneRequests()))
+    }
+    catch {
+      case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))
+    }
+  }
+
+  def rejectVerifyZoneRequestForm(zoneID: String): Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.rejectVerifyZoneRequest(views.companion.master.RejectVerifyZoneRequest.form, zoneID))
+  }
+
+  def rejectVerifyZoneRequest: Action[AnyContent] = withGenesisLoginAction { implicit request =>
+    views.companion.master.RejectVerifyZoneRequest.form.bindFromRequest().fold(
+      formWithErrors => {
+        BadRequest(views.html.component.master.rejectVerifyZoneRequest(formWithErrors, formWithErrors.data(constants.Forms.ZONE_ID)))
+      },
+      rejectVerifyZoneRequestData => {
+        try {
+          masterZones.Service.updateStatus(rejectVerifyZoneRequestData.zoneID, false)
+          Ok(views.html.index(success = Messages(constants.Success.VERIFY_ZONE_REJECTED)))
+        }
+        catch {
+          case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))
         }
       }
     )

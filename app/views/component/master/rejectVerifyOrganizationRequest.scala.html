@@ -1,0 +1,19 @@
+@import helper._
+@import views.companion.master.RejectVerifyOrganizationRequest
+
+@(rejectVerifyOrganizationRequestForm: Form[RejectVerifyOrganizationRequest.Data], organizationID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@common(Messages(constants.Forms.REJECT_VERIFY_ORGANIZATION_REQUEST)) {
+    @form(action = routes.AddOrganizationController.rejectVerifyOrganizationRequest) {
+        @CSRF.formField
+        @inputText(rejectVerifyOrganizationRequestForm(constants.Forms.ORGANIZATION_ID).copy(value = Some(organizationID)), '_label -> Messages(constants.Forms.ORGANIZATION_ID))
+
+        @if(rejectVerifyOrganizationRequestForm.hasGlobalErrors) {
+            <ul>
+            @for(error <- rejectVerifyOrganizationRequestForm.globalErrors) {
+                <li>@error.format</li>
+            }
+            </ul>
+        }
+        <button type="submit">@Messages(constants.Forms.REJECT_VERIFY_ORGANIZATION_REQUEST)</button>
+    }
+}

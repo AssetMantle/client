@@ -121,7 +121,7 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
           Ok(views.html.index(success = Messages(constants.Success.ISSUE_FIAT_REQUEST_REJECTED)))
         }
         catch {
-          case blockChainException: BlockChainException => Ok(views.html.index(failure = blockChainException.message))
+          case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))
         }
       }
     )
@@ -138,7 +138,8 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
       },
       approveFaucetRequestFormData => {
         try {
-          if (kafkaEnabled) {
+          if (masterTransactionFaucetRequests.Service.getStatus(approveFaucetRequestFormData.requestID) == null) {
+            if (kafkaEnabled) {
             val response = transactionsSendCoin.Service.kafkaPost(transactionsSendCoin.Request(from = constants.User.MAIN_ACCOUNT, password = approveFaucetRequestFormData.password, to = masterAccounts.Service.getAddress(approveFaucetRequestFormData.accountID), amount = Seq(transactionsSendCoin.Amount("comdex", defaultFaucetToken.toString)), gas = approveFaucetRequestFormData.gas))
             blockchainTransactionSendCoins.Service.addSendCoinKafka(constants.User.MAIN_ACCOUNT, masterAccounts.Service.getAddress(approveFaucetRequestFormData.accountID), defaultFaucetToken, approveFaucetRequestFormData.gas, null, null, response.ticketID, null)
             Ok(views.html.index(success = response.ticketID))
@@ -153,10 +154,15 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
             blockchainTransactionSendCoins.Service.addSendCoin(constants.User.MAIN_ACCOUNT, toAddress, defaultFaucetToken, approveFaucetRequestFormData.gas, null, Option(response.TxHash), Random.nextString(32), null)
             Ok(views.html.index(success = Messages(constants.Success.APPROVED_FAUCET_REQUEST)))
           }
+        } else {
+          Ok(views.html.index(failure = Messages(constants.Error.REQUEST_ALREADY_APPROVED_OR_REJECTED)))
+        }
         }
         catch {
           case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))
-          case blockChainException: BlockChainException => Ok(views.html.index(failure = blockChainException.message))
+          case blockChainException: BlockChainException =>
+            masterTransactionFaucetRequests.Service.updateStatusAndComment(approveFaucetRequestFormData.requestID, false, blockChainException.message)
+            Ok(views.html.index(failure = blockChainException.message))
         }
       }
     )

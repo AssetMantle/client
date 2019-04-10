@@ -11,7 +11,7 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Random, Success}
 
-case class Organization(id: String, accountID: String, name: String, address: String, phone: String, email: String, status: Option[Boolean])
+case class Organization(id: String, zoneID: String, accountID: String, name: String, address: String, phone: String, email: String, status: Option[Boolean])
 
 class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider) {
 
@@ -65,7 +65,17 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
     }
   }
 
-  private def verifyOrganizationOnID(id: String, status: Boolean)(implicit executionContext: ExecutionContext) = db.run(organizationTable.filter(_.id === id).map(_.status.?).update(Option(status)).asTry).map {
+  private def getOrganizationsWithNullStatusByZoneID(zoneID: String)(implicit executionContext: ExecutionContext): Future[Seq[Organization]] = db.run(organizationTable.filter(_.zoneID === zoneID).filter(_.status.?.isEmpty).result.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+        throw new BaseException(constants.Error.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+        throw new BaseException(constants.Error.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def updateStatusOnID(id: String, status: Boolean)(implicit executionContext: ExecutionContext) = db.run(organizationTable.filter(_.id === id).map(_.status.?).update(Option(status)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
@@ -77,9 +87,11 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
 
   private[models] class OrganizationTable(tag: Tag) extends Table[Organization](tag, "Organization") {
 
-    def * = (id, accountID, name, address, phone, email, status.?) <> (Organization.tupled, Organization.unapply)
+    def * = (id, zoneID, accountID, name, address, phone, email, status.?) <> (Organization.tupled, Organization.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
+
+    def zoneID = column[String]("zoneID")
 
     def accountID = column[String]("accountID")
 
@@ -97,13 +109,16 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
 
   object Service {
 
-    def addOrganization(accountID: String, name: String, address: String, phone: String, email: String)(implicit executionContext: ExecutionContext): String = Await.result(add(Organization(Random.nextInt.toHexString.toUpperCase, accountID, name, address, phone, email, null)), Duration.Inf)
+    def addOrganization(zoneID: String, accountID: String, name: String, address: String, phone: String, email: String)(implicit executionContext: ExecutionContext): String = Await.result(add(Organization((-Math.abs(Random.nextInt)).toHexString.toUpperCase, zoneID, accountID, name, address, phone, email, null)), Duration.Inf)
 
     def getOrganization(id: String)(implicit executionContext: ExecutionContext): Organization = Await.result(findById(id), Duration.Inf)
 
-    def verifyOrganization(id: String, status: Boolean)(implicit executionContext: ExecutionContext): Int = Await.result(verifyOrganizationOnID(id, status), Duration.Inf)
+    def updateStatus(id: String, status: Boolean)(implicit executionContext: ExecutionContext): Int = Await.result(updateStatusOnID(id, status), Duration.Inf)
 
     def getAccountId(id: String)(implicit executionContext: ExecutionContext): String = Await.result(getAccountIdById(id), Duration.Inf)
+
+    def getVerifyOrganizationRequests(zoneID: String)(implicit executionContext: ExecutionContext): Seq[Organization] = Await.result(getOrganizationsWithNullStatusByZoneID(zoneID), Duration.Inf)
+
   }
 
 }

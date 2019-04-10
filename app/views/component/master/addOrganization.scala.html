@@ -5,6 +5,7 @@
 @common(Messages(constants.Forms.ADD_ORGANIZATION)) {
     @form(action = routes.AddOrganizationController.addOrganization) {
         @CSRF.formField
+        @inputText(addOrganizationForm(constants.Forms.ZONE_ID),'_label-> Messages(constants.Forms.ZONE_ID))
         @inputText(addOrganizationForm(constants.Forms.NAME),'_label-> Messages(constants.Forms.NAME))
         @inputText(addOrganizationForm(constants.Forms.ADDRESS),'_label-> Messages(constants.Forms.ADDRESS))
         @inputText(addOrganizationForm(constants.Forms.PHONE),'_label-> Messages(constants.Forms.PHONE))

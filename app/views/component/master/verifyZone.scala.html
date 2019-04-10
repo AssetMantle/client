@@ -1,13 +1,12 @@
 @import helper._
 @import views.companion.master.VerifyZone
 
-@(verifyZoneForm: Form[VerifyZone.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@(verifyZoneForm: Form[VerifyZone.Data], zoneID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @common(Messages(constants.Forms.VERIFY_ZONE)) {
     @form(action = routes.AddZoneController.verifyZone) {
         @CSRF.formField
-        @inputText(verifyZoneForm(constants.Forms.ID),'_label-> Messages(constants.Forms.ID))
+        @inputText(verifyZoneForm(constants.Forms.ZONE_ID).copy(value = Some(zoneID)),'_label-> Messages(constants.Forms.ZONE_ID))
         @inputPassword(verifyZoneForm(constants.Forms.PASSWORD),'_label-> Messages(constants.Forms.PASSWORD))
-        @checkbox(verifyZoneForm(constants.Forms.STATUS),'_label-> Messages(constants.Forms.STATUS))
         @if(verifyZoneForm.hasGlobalErrors) {
             <ul>
             @for(error <- verifyZoneForm.globalErrors) {
