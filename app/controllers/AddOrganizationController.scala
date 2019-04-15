@@ -50,7 +50,6 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
       },
       verifyOrganizationData => {
         try {
-          //TODO verify zoneID status
             if (kafkaEnabled) {
               val toAddress = masterAccounts.Service.getAddress(masterOrganizations.Service.getAccountId(verifyOrganizationData.organizationID))
               val response = transactionsAddOrganization.Service.kafkaPost(transactionsAddOrganization.Request(from = request.session.get(constants.Security.USERNAME).get, to = toAddress, organizationID = verifyOrganizationData.organizationID, zoneID = verifyOrganizationData.zoneID, password = verifyOrganizationData.password))

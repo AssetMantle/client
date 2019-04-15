@@ -9,7 +9,6 @@ object SetACL {
       constants.Form.PASSWORD -> nonEmptyText(minLength = 1, maxLength = 20),
       constants.Form.ACL_ADDRESS -> nonEmptyText(minLength = 1, maxLength = 45),
       constants.Form.ORGANIZATION_ID -> nonEmptyText(minLength = 1, maxLength = 20),
-      constants.Form.ZONE_ID -> nonEmptyText(minLength = 1, maxLength = 20),
       constants.Form.ISSUE_ASSET -> boolean,
       constants.Form.ISSUE_FIAT -> boolean,
       constants.Form.SEND_ASSET -> boolean,
@@ -28,6 +27,6 @@ object SetACL {
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(password: String, aclAddress: String, organizationID: String, zoneID: String, issueAsset: Boolean, issueFiat: Boolean, sendAsset: Boolean, sendFiat: Boolean, redeemAsset: Boolean, redeemFiat: Boolean, sellerExecuteOrder: Boolean, buyerExecuteOrder: Boolean, changeBuyerBid: Boolean, changeSellerBid: Boolean, confirmBuyerBid: Boolean, confirmSellerBid: Boolean, negotiation: Boolean, releaseAsset: Boolean)
+  case class Data(password: String, aclAddress: String, organizationID: String, issueAsset: Boolean, issueFiat: Boolean, sendAsset: Boolean, sendFiat: Boolean, redeemAsset: Boolean, redeemFiat: Boolean, sellerExecuteOrder: Boolean, buyerExecuteOrder: Boolean, changeBuyerBid: Boolean, changeSellerBid: Boolean, confirmBuyerBid: Boolean, confirmSellerBid: Boolean, negotiation: Boolean, releaseAsset: Boolean)
 
 }
