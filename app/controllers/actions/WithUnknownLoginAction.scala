@@ -22,7 +22,7 @@ class WithUnknownLoginAction  @Inject()(defaultBodyParse: BodyParsers.Default, m
   */
   def getUsername(request: RequestHeader): Option[String] = request.session.get("USERNAME")
 
-  def onUnauthenticated(request: RequestHeader) = Results.Forbidden(constants.Error.INCORRECT_LOG_IN)
+  def onUnauthenticated(request: RequestHeader) = Results.Forbidden(constants.Error.NOT_LOGGED_IN)
 
   def action(f: ⇒ String => Request[AnyContent] => Result) = {
     ResultSecurity.Authenticated(getUsername, onUnauthenticated) { username ⇒
@@ -31,7 +31,7 @@ class WithUnknownLoginAction  @Inject()(defaultBodyParse: BodyParsers.Default, m
           f(username)(request)
         }
         else{
-          Results.Forbidden(constants.Error.INCORRECT_LOG_IN)
+          Results.Forbidden(constants.Error.NOT_LOGGED_IN)
         }
       })
     }
