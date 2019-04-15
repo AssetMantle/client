@@ -16,7 +16,8 @@
                 <td>@faucetRequest.id</td>
                 <td>@faucetRequest.accountID</td>
                 <td>@faucetRequest.amount</td>
-                <td><a href="@routes.SendCoinController.approveFaucetRequestsForm(faucetRequest.id, faucetRequest.accountID)">@Messages(constants.Form.APPROVE)</a>/<a href="@routes.SendCoinController.rejectFaucetRequestForm(faucetRequest.id)">@Messages(constants.Form.REJECT)</a></td>
+                <td><a href="@routes.SendCoinController.approveFaucetRequestsForm(faucetRequest.id, faucetRequest.accountID)">@Messages(constants.Form.APPROVE)</a>
+                    /<a href="@routes.SendCoinController.rejectFaucetRequestForm(faucetRequest.id)">@Messages(constants.Form.REJECT)</a></td>
             </tr>
         }
     </table>

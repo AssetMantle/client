@@ -23,25 +23,25 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
     Ok(views.html.component.master.sendCoin(views.companion.master.SendCoin.form))
   }
 
-  def sendCoin: Action[AnyContent] = withUserLoginAction { implicit request =>
+  def sendCoin: Action[AnyContent] = withLoginAction { implicit request =>
     views.companion.master.SendCoin.form.bindFromRequest().fold(
       formWithErrors => {
         BadRequest(views.html.component.master.sendCoin(formWithErrors))
       },
       sendCoinData => {
         try {
-          if (kafkaEnabled) {
-            val response = transactionsSendCoin.Service.kafkaPost(transactionsSendCoin.Request(from = request.session.get(constants.Security.USERNAME).get, password = sendCoinData.password, to = sendCoinData.to, amount = Seq(transactionsSendCoin.Amount("comdex", sendCoinData.amount.toString)), gas = sendCoinData.gas))
-            blockchainTransactionSendCoins.Service.addSendCoinKafka(from = request.session.get(constants.Security.USERNAME).get, to = sendCoinData.to, amount = sendCoinData.amount, gas = sendCoinData.gas, null, null, ticketID = response.ticketID, null)
-            Ok(views.html.index(success = response.ticketID))
-          }
-          else {
-            val response = transactionsSendCoin.Service.post(transactionsSendCoin.Request(from = request.session.get(constants.Security.USERNAME).get, password = sendCoinData.password, to = sendCoinData.to, amount = Seq(transactionsSendCoin.Amount("comdex", sendCoinData.amount.toString)), gas = sendCoinData.gas))
-            blockchainTransactionSendCoins.Service.addSendCoin(from = request.session.get(constants.Security.USERNAME).get, to = sendCoinData.to, amount = sendCoinData.amount, gas = sendCoinData.gas, null, txHash = Option(response.TxHash), ticketID = Random.nextString(32), null)
-            blockchainAccounts.Service.updateSequenceAndCoins(sendCoinData.to, blockchainAccounts.Service.getSequence(sendCoinData.to) + 1, defaultFaucetToken)
-            blockchainAccounts.Service.updateSequenceAndCoins(mainAddress, blockchainAccounts.Service.getSequence(mainAddress) + 1, blockchainAccounts.Service.getCoins(mainAddress) - defaultFaucetToken)
-            Ok(views.html.index(success = response.TxHash))
-          }
+            if (kafkaEnabled) {
+              val response = transactionsSendCoin.Service.kafkaPost(transactionsSendCoin.Request(from = request.session.get(constants.Security.USERNAME).get, password = sendCoinData.password, to = sendCoinData.to, amount = Seq(transactionsSendCoin.Amount("comdex", sendCoinData.amount.toString)), gas = sendCoinData.gas))
+              blockchainTransactionSendCoins.Service.addSendCoinKafka(from = request.session.get(constants.Security.USERNAME).get, to = sendCoinData.to, amount = sendCoinData.amount, gas = sendCoinData.gas, null, null, ticketID = response.ticketID, null)
+              Ok(views.html.index(success = response.ticketID))
+            }
+            else {
+              val response = transactionsSendCoin.Service.post(transactionsSendCoin.Request(from = request.session.get(constants.Security.USERNAME).get, password = sendCoinData.password, to = sendCoinData.to, amount = Seq(transactionsSendCoin.Amount("comdex", sendCoinData.amount.toString)), gas = sendCoinData.gas))
+              blockchainTransactionSendCoins.Service.addSendCoin(from = request.session.get(constants.Security.USERNAME).get, to = sendCoinData.to, amount = sendCoinData.amount, gas = sendCoinData.gas, null, txHash = Option(response.TxHash), ticketID = Random.nextString(32), null)
+              blockchainAccounts.Service.updateSequenceAndCoins(sendCoinData.to, blockchainAccounts.Service.getSequence(sendCoinData.to) + 1, defaultFaucetToken)
+              blockchainAccounts.Service.updateSequenceAndCoins(mainAddress, blockchainAccounts.Service.getSequence(mainAddress) + 1, blockchainAccounts.Service.getCoins(mainAddress) - defaultFaucetToken)
+              Ok(views.html.index(success = response.TxHash))
+            }
         }
         catch {
           case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))

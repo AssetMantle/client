@@ -1,5 +1,5 @@
 @import models.master.Zone
-    
+
 @(zoneVerificationRequests: Seq[Zone])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
 
 @common(Messages(constants.Form.PENDING_VERIFY_ZONE_REQUESTS)) {
@@ -18,7 +18,8 @@
                 <td>@zoneVerificationRequest.accountID</td>
                 <td>@zoneVerificationRequest.name</td>
                 <td>@zoneVerificationRequest.currency</td>
-                <td><a href="@routes.AddZoneController.verifyZoneForm(zoneVerificationRequest.id)">@Messages(constants.Form.APPROVE)</a>/<a href="@routes.AddZoneController.rejectVerifyZoneRequestForm(zoneVerificationRequest.id)">@Messages(constants.Form.REJECT)</a></td>
+                <td><a href="@routes.AddZoneController.verifyZoneForm(zoneVerificationRequest.id)">@Messages(constants.Form.APPROVE)</a>
+                    /<a href="@routes.AddZoneController.rejectVerifyZoneRequestForm(zoneVerificationRequest.id)">@Messages(constants.Form.REJECT)</a></td>
             </tr>
         }
     </table>

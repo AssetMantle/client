@@ -1,5 +1,5 @@
 @import models.master.Organization
-    
+
 @(organizationVerificationRequests: Seq[Organization])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
 
 @common(Messages(constants.Form.PENDING_VERIFY_ORGANIZATION_REQUESTS)) {
@@ -24,7 +24,8 @@
                 <td>@organizationVerificationRequest.address</td>
                 <td>@organizationVerificationRequest.phone</td>
                 <td>@organizationVerificationRequest.email</td>
-                <td><a href="@routes.AddOrganizationController.verifyOrganizationForm(organizationVerificationRequest.id, organizationVerificationRequest.zoneID)">@Messages(constants.Form.APPROVE)</a>/<a href="@routes.AddOrganizationController.rejectVerifyOrganizationRequestForm(organizationVerificationRequest.id)">@Messages(constants.Form.REJECT)</a></td>
+                <td><a href="@routes.AddOrganizationController.verifyOrganizationForm(organizationVerificationRequest.id, organizationVerificationRequest.zoneID)">@Messages(constants.Form.APPROVE)</a>
+                    /<a href="@routes.AddOrganizationController.rejectVerifyOrganizationRequestForm(organizationVerificationRequest.id)">@Messages(constants.Form.REJECT)</a></td>
             </tr>
         }
     </table>
