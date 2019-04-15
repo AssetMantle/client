@@ -1,13 +1,13 @@
 @(username: String, userType: String, address: String, coins: Int = 0)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
 
 <br>
-<a href="@routes.SendCoinController.sendCoinForm">@Messages(constants.Forms.SEND_COIN)</a>
-<a href="@routes.LogoutController.logoutForm">@Messages(constants.Forms.LOGOUT)</a>
+<a href="@routes.SendCoinController.sendCoinForm">@Messages(constants.Form.SEND_COIN)</a>
+<a href="@routes.LogoutController.logoutForm">@Messages(constants.Form.LOGOUT)</a>
 <br>
 <br>
 
 <h2>@username</h2>
-@Messages(constants.User.USER_TYPE): @userType <br>
-@Messages(constants.User.ADDRESS): @address <br>
-@Messages(constants.User.COINS): @coins <br>
+    @Messages(constants.User.USER_TYPE): @userType <br>
+    @Messages(constants.User.ADDRESS): @address <br>
+    @Messages(constants.User.COINS): @coins <br>
 <br>

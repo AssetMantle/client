@@ -6,7 +6,7 @@ import play.api.data.Forms.{mapping, text}
 object RequestCoin {
   val form = Form(
     mapping(
-      constants.Forms.COUPON -> text,
+      constants.Form.COUPON -> text,
 
     )(Data.apply)(Data.unapply)
   )

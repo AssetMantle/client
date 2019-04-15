@@ -2,13 +2,13 @@
 @import views.companion.master.ApproveFaucetRequest
 
 @(approveFaucetRequestForm: Form[ApproveFaucetRequest.Data], requestID: String, accountID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages(constants.Forms.APPROVE_FAUCET_REQUEST)) {
+@common(Messages(constants.Form.APPROVE_FAUCET_REQUEST)) {
     @form(action = routes.SendCoinController.approveFaucetRequests) {
         @CSRF.formField
-        @inputText(approveFaucetRequestForm(constants.Forms.REQUEST_ID).copy(value = Some(requestID)),'_label-> Messages(constants.Forms.REQUEST_ID))
-        @inputText(approveFaucetRequestForm(constants.Forms.ACCOUNT_ID).copy(value = Some(accountID)), '_label -> Messages(constants.Forms.ACCOUNT_ID))
-        @inputPassword(approveFaucetRequestForm(constants.Forms.PASSWORD), '_label -> Messages(constants.Forms.PASSWORD))
-        @inputText(approveFaucetRequestForm(constants.Forms.GAS), '_label -> Messages(constants.Forms.GAS))
+        @inputText(approveFaucetRequestForm(constants.Form.REQUEST_ID).copy(value = Some(requestID)),'_label-> Messages(constants.Form.REQUEST_ID))
+        @inputText(approveFaucetRequestForm(constants.Form.ACCOUNT_ID).copy(value = Some(accountID)), '_label -> Messages(constants.Form.ACCOUNT_ID))
+        @inputPassword(approveFaucetRequestForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD))
+        @inputText(approveFaucetRequestForm(constants.Form.GAS), '_label -> Messages(constants.Form.GAS))
 
         @if(approveFaucetRequestForm.hasGlobalErrors) {
             <ul>
@@ -17,6 +17,6 @@
             }
             </ul>
         }
-        <button type="submit">@Messages(constants.Forms.SEND_COIN)</button>
+        <button type="submit">@Messages(constants.Form.SEND_COIN)</button>
     }
 }

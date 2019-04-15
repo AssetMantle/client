@@ -8,7 +8,7 @@ object VerifyMobileNumber {
 
   val form = Form(
     mapping(
-      constants.Forms.OTP -> nonEmptyText(minLength = 6, maxLength = 6),
+      constants.Form.OTP -> nonEmptyText(minLength = 6, maxLength = 6),
     )(Data.apply)(Data.unapply)
   )
 

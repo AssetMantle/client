@@ -8,8 +8,8 @@ object SignUp {
 
   val form = Form(
     mapping(
-      constants.Forms.USERNAME -> nonEmptyText(minLength = 4, maxLength = 20),
-      constants.Forms.PASSWORD -> nonEmptyText(minLength = 8, maxLength = 50)
+      constants.Form.USERNAME -> nonEmptyText(minLength = 4, maxLength = 20),
+      constants.Form.PASSWORD -> nonEmptyText(minLength = 8, maxLength = 50)
     )(Data.apply)(Data.unapply)
   )
 

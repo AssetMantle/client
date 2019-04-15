@@ -6,8 +6,8 @@ import play.api.data.Forms._
 object IssueFiatRequest {
   val form = Form(
     mapping(
-      constants.Forms.TRANSACTION_ID -> nonEmptyText(minLength = 1, maxLength = 20),
-      constants.Forms.TRANSACTION_AMOUNT -> number(min = 1, max = 10000),
+      constants.Form.TRANSACTION_ID -> nonEmptyText(minLength = 1, maxLength = 20),
+      constants.Form.TRANSACTION_AMOUNT -> number(min = 1, max = 10000),
     )(Data.apply)(Data.unapply)
   )
 

@@ -4,21 +4,21 @@
 
 @common(Messages(constants.User.HOME)) {
 
-    <a href="@routes.AddOrganizationController.verifyOrganizationForm()">@Messages(constants.Forms.VERIFY_ORGANIZATION)</a>
-    <a href="@routes.BuyerExecuteOrderController.buyerExecuteOrderForm()">@Messages(constants.Forms.BUYER_EXECUTE_ORDER)</a>
-    <a href="@routes.IssueAssetController.viewPendingIssueAssetRequests()">@Messages(constants.Forms.PENDING_ISSUE_ASSET_REQUEST)</a>
-    <a href="@routes.IssueFiatController.viewPendingIssueFiatRequests">@Messages(constants.Forms.PENDING_ISSUE_FIAT_REQUEST)</a>
-    <a href="@routes.ReleaseAssetController.releaseAssetForm">@Messages(constants.Forms.RELEASE_ASSET)</a>
-    <a href="@routes.SellerExecuteOrderController.sellerExecuteOrderForm()">@Messages(constants.Forms.SELLER_EXECUTE_ORDER)</a>
-    <a href="@routes.SetACLController.setACLForm">@Messages(constants.Forms.SET_ACL)</a>
+    <a href="@routes.AddOrganizationController.viewPendingVerifyOrganizationRequests">@Messages(constants.Form.PENDING_VERIFY_ORGANIZATION_REQUESTS)</a>
+    <a href="@routes.BuyerExecuteOrderController.buyerExecuteOrderForm()">@Messages(constants.Form.BUYER_EXECUTE_ORDER)</a>
+    <a href="@routes.IssueAssetController.viewPendingIssueAssetRequests()">@Messages(constants.Form.PENDING_ISSUE_ASSET_REQUESTS)</a>
+    <a href="@routes.IssueFiatController.viewPendingIssueFiatRequests">@Messages(constants.Form.PENDING_ISSUE_FIAT_REQUESTS)</a>
+    <a href="@routes.ReleaseAssetController.releaseAssetForm">@Messages(constants.Form.RELEASE_ASSET)</a>
+    <a href="@routes.SellerExecuteOrderController.sellerExecuteOrderForm()">@Messages(constants.Form.SELLER_EXECUTE_ORDER)</a>
+    <a href="@routes.SetACLController.setACLForm">@Messages(constants.Form.SET_ACL)</a>
 
     @component.master.commonHome(username = username, userType = userType, address = address, coins = coins)
 
     <br>
-    <h2>@Messages(constants.Forms.ZONE):</h2>
-    @Messages(constants.Forms.NAME): @zone.name <br>
-    @Messages(constants.Forms.ZONE_ID): @zone.id <br>
-    @Messages(constants.Forms.CURRENCY): @zone.currency <br>
-    @Messages(constants.Forms.VERIFIED_STATUS): @zone.status <br>
+    <h2>@Messages(constants.Form.ZONE):</h2>
+    @Messages(constants.Form.NAME): @zone.name <br>
+    @Messages(constants.Form.ZONE_ID): @zone.id <br>
+    @Messages(constants.Form.CURRENCY): @zone.currency <br>
+    @Messages(constants.Form.VERIFIED_STATUS): @zone.status <br>
     <br>
 }

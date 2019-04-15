@@ -3,12 +3,12 @@
 
 
 @(updateContactForm: Form[UpdateContact.Data], countryCallingCodes: Seq[(String,String)])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-    @common(Messages(constants.Forms.UPDATE_CONTACT)) {
+    @common(Messages(constants.Form.UPDATE_CONTACT)) {
         @form(action = routes.UpdateContactController.updateContact) {
             @CSRF.formField
-            @inputText(updateContactForm(constants.Forms.MOBILE_NUMBER),'_label-> Messages(constants.Forms.MOBILE_NUMBER))
-            @inputText(updateContactForm(constants.Forms.EMAIL_ADDRESS),'_label-> Messages(constants.Forms.EMAIL_ADDRESS))
-            @select(updateContactForm(constants.Forms.COUNTRY_CODE),options = countryCallingCodes,'_label-> Messages(constants.Forms.COUNTRY_CODE))
+            @inputText(updateContactForm(constants.Form.MOBILE_NUMBER),'_label-> Messages(constants.Form.MOBILE_NUMBER))
+            @inputText(updateContactForm(constants.Form.EMAIL_ADDRESS),'_label-> Messages(constants.Form.EMAIL_ADDRESS))
+            @select(updateContactForm(constants.Form.COUNTRY_CODE),options = countryCallingCodes,'_label-> Messages(constants.Form.COUNTRY_CODE))
             @if(updateContactForm.hasGlobalErrors) {
                 <ul>
                 @for(error <- updateContactForm.globalErrors) {
@@ -16,6 +16,6 @@
                 }
                 </ul>
             }
-            <button type="submit">@Messages(constants.Forms.UPDATE_CONTACT)</button>
+            <button type="submit">@Messages(constants.Form.UPDATE_CONTACT)</button>
         }
 }

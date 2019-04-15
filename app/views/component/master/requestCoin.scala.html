@@ -3,10 +3,10 @@
 
 @(requestCoinFormForm: Form[RequestCoin.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 
-@common(Messages(constants.Forms.REQUEST_COIN)) {
+@common(Messages(constants.Form.REQUEST_COIN)) {
     @form(action = routes.SendCoinController.requestCoins) {
         @CSRF.formField
-        @inputText(requestCoinFormForm(constants.Forms.COUPON), '_label -> Messages(constants.Forms.COUPON))
+        @inputText(requestCoinFormForm(constants.Form.COUPON), '_label -> Messages(constants.Form.COUPON))
 
         @if(requestCoinFormForm.hasGlobalErrors) {
             <ul>
@@ -15,6 +15,6 @@
             }
             </ul>
         }
-        <button type="submit">@Messages(constants.Forms.REQUEST_COIN)</button>
+        <button type="submit">@Messages(constants.Form.REQUEST_COIN)</button>
     }
 }

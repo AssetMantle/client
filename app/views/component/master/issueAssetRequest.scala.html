@@ -2,14 +2,14 @@
 @import views.companion.master.IssueAssetRequest
 
 @(issueAssetRequestForm: Form[IssueAssetRequest.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages(constants.Forms.ISSUE_ASSET_REQUEST)) {
+@common(Messages(constants.Form.ISSUE_ASSET_REQUEST)) {
     @form(action = routes.IssueAssetController.issueAssetRequest) {
         @CSRF.formField
-        @inputText(issueAssetRequestForm(constants.Forms.DOCUMENT_HASH),'_label-> Messages(constants.Forms.DOCUMENT_HASH))
-        @inputText(issueAssetRequestForm(constants.Forms.ASSET_TYPE),'_label-> Messages(constants.Forms.ASSET_TYPE))
-        @inputText(issueAssetRequestForm(constants.Forms.ASSET_PRICE),'_label-> Messages(constants.Forms.ASSET_PRICE))
-        @inputText(issueAssetRequestForm(constants.Forms.QUANTITY_UNIT),'_label-> Messages(constants.Forms.QUANTITY_UNIT))
-        @inputText(issueAssetRequestForm(constants.Forms.ASSET_QUANTITY),'_label-> Messages(constants.Forms.ASSET_QUANTITY))
+        @inputText(issueAssetRequestForm(constants.Form.DOCUMENT_HASH),'_label-> Messages(constants.Form.DOCUMENT_HASH))
+        @inputText(issueAssetRequestForm(constants.Form.ASSET_TYPE),'_label-> Messages(constants.Form.ASSET_TYPE))
+        @inputText(issueAssetRequestForm(constants.Form.ASSET_PRICE),'_label-> Messages(constants.Form.ASSET_PRICE))
+        @inputText(issueAssetRequestForm(constants.Form.QUANTITY_UNIT),'_label-> Messages(constants.Form.QUANTITY_UNIT))
+        @inputText(issueAssetRequestForm(constants.Form.ASSET_QUANTITY),'_label-> Messages(constants.Form.ASSET_QUANTITY))
 
         @if(issueAssetRequestForm.hasGlobalErrors) {
             <ul>
@@ -18,6 +18,6 @@
             }
             </ul>
         }
-        <button type="submit">@Messages(constants.Forms.ISSUE_ASSET_REQUEST)</button>
+        <button type="submit">@Messages(constants.Form.ISSUE_ASSET_REQUEST)</button>
     }
 }

@@ -7,7 +7,7 @@ object RejectFaucetRequest {
 
   val form = Form(
     mapping(
-      constants.Forms.REQUEST_ID -> nonEmptyText(minLength = 4, maxLength = 45),
+      constants.Form.REQUEST_ID -> nonEmptyText(minLength = 4, maxLength = 45),
     )(Data.apply)(Data.unapply)
   )
 

@@ -2,17 +2,17 @@
 
 @(issueAssetRequests: Seq[IssueAssetRequest])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
 
-@common(Messages(constants.Forms.PENDING_ISSUE_ASSET_REQUESTS)) {
+@common(Messages(constants.Form.PENDING_ISSUE_ASSET_REQUESTS)) {
     <table>
         <tr>
-            <th>@Messages(constants.Forms.ID)</th>
-            <th>@Messages(constants.Forms.ACCOUNT_ID)</th>
-            <th>@Messages(constants.Forms.DOCUMENT_HASH)</th>
-            <th>@Messages(constants.Forms.ASSET_TYPE)</th>
-            <th>@Messages(constants.Forms.ASSET_QUANTITY)</th>
-            <th>@Messages(constants.Forms.ASSET_PRICE)</th>
-            <th>@Messages(constants.Forms.QUANTITY_UNIT)</th>
-            <th>@Messages(constants.Forms.STATUS)</th>
+            <th>@Messages(constants.Form.ID)</th>
+            <th>@Messages(constants.Form.ACCOUNT_ID)</th>
+            <th>@Messages(constants.Form.DOCUMENT_HASH)</th>
+            <th>@Messages(constants.Form.ASSET_TYPE)</th>
+            <th>@Messages(constants.Form.ASSET_QUANTITY)</th>
+            <th>@Messages(constants.Form.ASSET_PRICE)</th>
+            <th>@Messages(constants.Form.QUANTITY_UNIT)</th>
+            <th>@Messages(constants.Form.STATUS)</th>
 
         </tr>
         @for(issueAssetRequest <- issueAssetRequests) {
@@ -24,7 +24,8 @@
                 <td>@issueAssetRequest.assetQuantity</td>
                 <td>@issueAssetRequest.assetPrice</td>
                 <td>@issueAssetRequest.quantityUnit</td>
-                <td><a href="@routes.IssueAssetController.issueAssetForm(issueAssetRequest.id, issueAssetRequest.accountID, issueAssetRequest.documentHash, issueAssetRequest.assetType, issueAssetRequest.assetPrice, issueAssetRequest.quantityUnit, issueAssetRequest.assetQuantity)">@Messages(constants.Forms.APPROVE)</a>/<a href="@routes.IssueAssetController.rejectIssueAssetRequestForm(issueAssetRequest.id)">@Messages(constants.Forms.REJECT)</a></td>
+                <td><a href="@routes.IssueAssetController.issueAssetForm(issueAssetRequest.id, issueAssetRequest.accountID, issueAssetRequest.documentHash, issueAssetRequest.assetType, issueAssetRequest.assetPrice, issueAssetRequest.quantityUnit, issueAssetRequest.assetQuantity)">@Messages(constants.Form.APPROVE)</a>
+                    /<a href="@routes.IssueAssetController.rejectIssueAssetRequestForm(issueAssetRequest.id)">@Messages(constants.Form.REJECT)</a></td>
             </tr>
         }
     </table>

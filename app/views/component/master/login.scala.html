@@ -2,12 +2,12 @@
 @import views.companion.master.Login
 
 @(loginForm: Form[Login.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-    @common(Messages(constants.Forms.LOGIN)) {
+    @common(Messages(constants.Form.LOGIN)) {
         @form(action = routes.LoginController.login) {
             @CSRF.formField
-            @inputText(loginForm(constants.Forms.USERNAME),'_label-> Messages(constants.Forms.USERNAME))
-            @inputPassword(loginForm(constants.Forms.PASSWORD),'_label-> Messages(constants.Forms.PASSWORD))
-            <div style="display:none">@inputText(loginForm(constants.Forms.NOTIFICATION_TOKEN),'id -> constants.Forms.NOTIFICATION_TOKEN, 'readonly -> true)</div>
+            @inputText(loginForm(constants.Form.USERNAME),'_label-> Messages(constants.Form.USERNAME))
+            @inputPassword(loginForm(constants.Form.PASSWORD),'_label-> Messages(constants.Form.PASSWORD))
+            <div style="display:none">@inputText(loginForm(constants.Form.NOTIFICATION_TOKEN),'id -> constants.Form.NOTIFICATION_TOKEN, 'readonly -> true)</div>
 
             @if(loginForm.hasGlobalErrors) {
                 <ul>
@@ -16,6 +16,6 @@
                 }
                 </ul>
             }
-            <button type="submit">@Messages(constants.Forms.LOGIN)</button>
+            <button type="submit">@Messages(constants.Form.LOGIN)</button>
         }
     }
