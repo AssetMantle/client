@@ -1,16 +1,17 @@
 @import helper._
 @import views.companion.master.IssueAsset
 
-@(issueAssetForm: Form[IssueAsset.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@(issueAssetForm: Form[IssueAsset.Data],requestID: String,  accountID: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @common(Messages(constants.Forms.ISSUE_ASSET)) {
     @form(action = routes.IssueAssetController.issueAsset) {
         @CSRF.formField
-        @inputText(issueAssetForm(constants.Forms.TO),'_label-> Messages(constants.Forms.TO))
-        @inputText(issueAssetForm(constants.Forms.DOCUMENT_HASH),'_label-> Messages(constants.Forms.DOCUMENT_HASH))
-        @inputText(issueAssetForm(constants.Forms.ASSET_TYPE),'_label-> Messages(constants.Forms.ASSET_TYPE))
-        @inputText(issueAssetForm(constants.Forms.ASSET_PRICE),'_label-> Messages(constants.Forms.ASSET_PRICE))
-        @inputText(issueAssetForm(constants.Forms.QUANTITY_UNIT),'_label-> Messages(constants.Forms.QUANTITY_UNIT))
-        @inputText(issueAssetForm(constants.Forms.ASSET_QUANTITY),'_label-> Messages(constants.Forms.ASSET_QUANTITY))
+        @inputText(issueAssetForm(constants.Forms.REQUEST_ID).copy(value = Some(requestID)),'_label-> Messages(constants.Forms.REQUEST_ID))
+        @inputText(issueAssetForm(constants.Forms.ACCOUNT_ID).copy(value = Some(accountID)),'_label-> Messages(constants.Forms.ACCOUNT_ID))
+        @inputText(issueAssetForm(constants.Forms.DOCUMENT_HASH).copy(value = Some(documentHash)),'_label-> Messages(constants.Forms.DOCUMENT_HASH))
+        @inputText(issueAssetForm(constants.Forms.ASSET_TYPE).copy(value = Some(assetType)),'_label-> Messages(constants.Forms.ASSET_TYPE))
+        @inputText(issueAssetForm(constants.Forms.ASSET_PRICE).copy(value = Some(assetPrice.toString)),'_label-> Messages(constants.Forms.ASSET_PRICE))
+        @inputText(issueAssetForm(constants.Forms.QUANTITY_UNIT).copy(value = Some(quantityUnit)),'_label-> Messages(constants.Forms.QUANTITY_UNIT))
+        @inputText(issueAssetForm(constants.Forms.ASSET_QUANTITY).copy(value = Some(assetQuantity.toString)),'_label-> Messages(constants.Forms.ASSET_QUANTITY))
         @inputText(issueAssetForm(constants.Forms.GAS),'_label-> Messages(constants.Forms.GAS))
         @inputPassword(issueAssetForm(constants.Forms.PASSWORD),'_label-> Messages(constants.Forms.PASSWORD))
 

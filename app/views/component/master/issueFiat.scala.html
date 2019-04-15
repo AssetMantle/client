@@ -1,13 +1,14 @@
 @import helper._
 @import views.companion.master.IssueFiat
 
-@(issueFiatForm: Form[IssueFiat.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@(issueFiatForm: Form[IssueFiat.Data],requestID: String,  accountID: String, transactionID: String, transactionAmount: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @common(Messages(constants.Forms.ISSUE_FIAT)) {
     @form(action = routes.IssueFiatController.issueFiat) {
         @CSRF.formField
-        @inputText(issueFiatForm(constants.Forms.TO),'_label-> Messages(constants.Forms.TO))
-        @inputText(issueFiatForm(constants.Forms.TRANSACTION_ID),'_label-> Messages(constants.Forms.TRANSACTION_ID))
-        @inputText(issueFiatForm(constants.Forms.TRANSACTION_AMOUNT),'_label-> Messages(constants.Forms.TRANSACTION_AMOUNT))
+        @inputText(issueFiatForm(constants.Forms.REQUEST_ID).copy(value = Some(requestID)),'_label-> Messages(constants.Forms.REQUEST_ID))
+        @inputText(issueFiatForm(constants.Forms.ACCOUNT_ID).copy(value = Some(accountID)),'_label-> Messages(constants.Forms.ACCOUNT_ID))
+        @inputText(issueFiatForm(constants.Forms.TRANSACTION_ID).copy(value = Some(transactionID)),'_label-> Messages(constants.Forms.TRANSACTION_ID))
+        @inputText(issueFiatForm(constants.Forms.TRANSACTION_AMOUNT).copy(value = Some(transactionAmount.toString)),'_label-> Messages(constants.Forms.TRANSACTION_AMOUNT))
         @inputText(issueFiatForm(constants.Forms.GAS),'_label-> Messages(constants.Forms.GAS))
         @inputPassword(issueFiatForm(constants.Forms.PASSWORD),'_label-> Messages(constants.Forms.PASSWORD))
 

@@ -34,7 +34,7 @@ class ConfirmBuyerBidController @Inject()(messagesControllerComponents: Messages
             Ok(views.html.index(success = response.ticketID))
           } else {
             val response = transactionsConfirmBuyerBid.Service.post( transactionsConfirmBuyerBid.Request(from = request.session.get(constants.Security.USERNAME).get, to = confirmBuyerBidData.to, password = confirmBuyerBidData.password,  bid = confirmBuyerBidData.bid, time = confirmBuyerBidData.time, pegHash = confirmBuyerBidData.pegHash, gas = confirmBuyerBidData.gas))
-            confirmBuyerBids.Service.addConfirmBuyerBid(from = request.session.get(constants.Security.USERNAME).get, to = confirmBuyerBidData.to, bid = confirmBuyerBidData.bid, time = confirmBuyerBidData.time, pegHash = confirmBuyerBidData.pegHash, gas = confirmBuyerBidData.gas, null, txHash = Option(response.TxHash), ticketID = (Random.nextInt(899999999) + 100000000).toString, null)
+            confirmBuyerBids.Service.addConfirmBuyerBid(from = request.session.get(constants.Security.USERNAME).get, to = confirmBuyerBidData.to, bid = confirmBuyerBidData.bid, time = confirmBuyerBidData.time, pegHash = confirmBuyerBidData.pegHash, gas = confirmBuyerBidData.gas, null, txHash = Option(response.TxHash), ticketID = Random.nextString(32), null)
             Ok(views.html.index(success = response.TxHash))
           }
         }
@@ -64,7 +64,7 @@ class ConfirmBuyerBidController @Inject()(messagesControllerComponents: Messages
             Ok(views.html.index(success = response.ticketID))
           } else {
             val response = transactionsConfirmBuyerBid.Service.post( transactionsConfirmBuyerBid.Request(from = confirmBuyerBidData.from,to = confirmBuyerBidData.to, password = confirmBuyerBidData.password,  bid = confirmBuyerBidData.bid, time = confirmBuyerBidData.time, pegHash = confirmBuyerBidData.pegHash, gas = confirmBuyerBidData.gas))
-            confirmBuyerBids.Service.addConfirmBuyerBid(from = confirmBuyerBidData.from, to = confirmBuyerBidData.to, bid = confirmBuyerBidData.bid, time = confirmBuyerBidData.time, pegHash = confirmBuyerBidData.pegHash, gas = confirmBuyerBidData.gas, null, txHash = Option(response.TxHash), ticketID = (Random.nextInt(899999999) + 100000000).toString, null)
+            confirmBuyerBids.Service.addConfirmBuyerBid(from = confirmBuyerBidData.from, to = confirmBuyerBidData.to, bid = confirmBuyerBidData.bid, time = confirmBuyerBidData.time, pegHash = confirmBuyerBidData.pegHash, gas = confirmBuyerBidData.gas, null, txHash = Option(response.TxHash), ticketID = Random.nextString(32), null)
             Ok(views.html.index(success = response.TxHash))
           }
         }

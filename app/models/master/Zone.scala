@@ -67,6 +67,16 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
     }
   }
 
+  private def getZoneIdByAccountId(accountID: String)(implicit executionContext: ExecutionContext): Future[String] = db.run(zoneTable.filter(_.accountID === accountID).map(_.id).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+        throw new BaseException(constants.Error.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+        throw new BaseException(constants.Error.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
   private def verifyZoneOnID(id: String, status: Boolean)(implicit executionContext: ExecutionContext) = db.run(zoneTable.filter(_.id === id).map(_.status.?).update(Option(status)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -99,9 +109,11 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
     def getZone(id: String)(implicit executionContext: ExecutionContext): Zone = Await.result(findById(id), Duration.Inf)
 
-    def verifyZone(id: String, status: Boolean)(implicit executionContext: ExecutionContext): Boolean = if (Await.result(verifyZoneOnID(id, status), Duration.Inf) == 1) true else false
+    def verifyZone(id: String, status: Boolean)(implicit executionContext: ExecutionContext): Int = Await.result(verifyZoneOnID(id, status), Duration.Inf)
 
     def getAccountId(id: String)(implicit executionContext: ExecutionContext): String = Await.result(getAccountIdById(id), Duration.Inf)
+
+    def getZoneId(accountID: String)(implicit executionContext: ExecutionContext): String = Await.result(getZoneIdByAccountId(accountID), Duration.Inf)
   }
 
 }

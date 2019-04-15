@@ -34,7 +34,7 @@ class RedeemAssetController @Inject()(messagesControllerComponents: MessagesCont
             Ok(views.html.index(success = response.ticketID))
           } else {
             val response = transactionsRedeemAsset.Service.post( transactionsRedeemAsset.Request(from = request.session.get(constants.Security.USERNAME).get, to = redeemAssetData.to, password = redeemAssetData.password, pegHash = redeemAssetData.pegHash, gas = redeemAssetData.gas))
-            redeemAssets.Service.addRedeemAsset(from = request.session.get(constants.Security.USERNAME).get, to = redeemAssetData.to, pegHash = redeemAssetData.pegHash, gas = redeemAssetData.gas, null, txHash = Option(response.TxHash), ticketID = (Random.nextInt(899999999) + 100000000).toString, null)
+            redeemAssets.Service.addRedeemAsset(from = request.session.get(constants.Security.USERNAME).get, to = redeemAssetData.to, pegHash = redeemAssetData.pegHash, gas = redeemAssetData.gas, null, txHash = Option(response.TxHash), ticketID = Random.nextString(32), null)
             Ok(views.html.index(success = response.TxHash))
           }
         }
@@ -63,7 +63,7 @@ class RedeemAssetController @Inject()(messagesControllerComponents: MessagesCont
             Ok(views.html.index(success = response.ticketID))
           } else {
             val response = transactionsRedeemAsset.Service.post( transactionsRedeemAsset.Request(from = redeemAssetData.from, to = redeemAssetData.to, password = redeemAssetData.password, pegHash = redeemAssetData.pegHash, gas = redeemAssetData.gas))
-            redeemAssets.Service.addRedeemAsset(from = redeemAssetData.from, to = redeemAssetData.to, pegHash = redeemAssetData.pegHash, gas = redeemAssetData.gas, null, txHash = Option(response.TxHash), ticketID = (Random.nextInt(899999999) + 100000000).toString, null)
+            redeemAssets.Service.addRedeemAsset(from = redeemAssetData.from, to = redeemAssetData.to, pegHash = redeemAssetData.pegHash, gas = redeemAssetData.gas, null, txHash = Option(response.TxHash), ticketID = Random.nextString(32), null)
             Ok(views.html.index(success = response.TxHash))
           }
         }

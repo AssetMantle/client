@@ -7,6 +7,7 @@ SIGNUP=Sign Up
 UPDATE_CONTACT=Update Contact
 VERIFY_MOBILE_NUMBER=Verify Mobile Number
 VERIFY_EMAIL_ADDRESS=Verify Email Address
+VERIFY_ZONE=Verify Zone
 ADD_ORGANIZATION=Add Organization
 VERIFY_ORGANIZATION=Verify Organization
 
@@ -54,6 +55,19 @@ REDEEM_AMOUNT=Redeem Amount
 AWB_PROOF_HASH=AWB Proof Hash
 AMOUNT=Amount
 ACL_ADDRESS=ACL Address
+ISSUE_ASSET_REQUEST= Issue Asset Request
+ISSUE_FIAT_REQUEST= Issue Fiat Request
+APPROVE_FAUCET_REQUEST=Approve Faucet Request
+REQUEST_COIN=Request Coin
+PENDING_ISSUE_ASSET_REQUEST= Pending Issue Asset Request
+PENDING_ISSUE_FIAT_REQUEST= Pending Issue Fiat Request
+ACCOUNT_ID= Account ID
+VERIFIED_STATUS = Verified Status
+ORGANIZATION_NAME= Organization Name
+USER_TYPE= User Type
+ORGANIZATION_USERNAME = Organization Username
+HOME = Home
+STATUS = Status
 
 CONTROLLERS_NOTIFICATIONMessage.LOGIN= You are Logged In. {0}
 CONTROLLERS_NOTIFICATIONTitle.LOGIN= Login

@@ -1,0 +1,19 @@
+@import helper._
+@import views.companion.master.RejectIssueAssetRequest
+
+@(rejectIssueAssetRequestForm: Form[RejectIssueAssetRequest.Data], requestID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@common(Messages(constants.Forms.REJECT_ISSUE_ASSET_REQUEST)) {
+    @form(action = routes.IssueAssetController.rejectIssueAssetRequest) {
+        @CSRF.formField
+        @inputText(rejectIssueAssetRequestForm(constants.Forms.REQUEST_ID).copy(value = Some(requestID)), '_label -> Messages(constants.Forms.REQUEST_ID))
+
+        @if(rejectIssueAssetRequestForm.hasGlobalErrors) {
+            <ul>
+            @for(error <- rejectIssueAssetRequestForm.globalErrors) {
+                <li>@error.format</li>
+            }
+            </ul>
+        }
+        <button type="submit">@Messages(constants.Forms.REJECT_ISSUE_ASSET_REQUEST)</button>
+    }
+}

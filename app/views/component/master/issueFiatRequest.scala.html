@@ -1,0 +1,20 @@
+@import helper._
+@import views.companion.master.IssueFiatRequest
+
+@(issueFiatRequestForm: Form[IssueFiatRequest.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@common(Messages(constants.Forms.ISSUE_FIAT_REQUEST)) {
+    @form(action = routes.IssueFiatController.issueFiatRequest) {
+        @CSRF.formField
+        @inputText(issueFiatRequestForm(constants.Forms.TRANSACTION_ID),'_label-> Messages(constants.Forms.TRANSACTION_ID))
+        @inputText(issueFiatRequestForm(constants.Forms.TRANSACTION_AMOUNT),'_label-> Messages(constants.Forms.TRANSACTION_AMOUNT))
+
+        @if(issueFiatRequestForm.hasGlobalErrors) {
+            <ul>
+            @for(error <- issueFiatRequestForm.globalErrors) {
+                <li>@error.format</li>
+            }
+            </ul>
+        }
+        <button type="submit">@Messages(constants.Forms.ISSUE_FIAT)</button>
+    }
+}

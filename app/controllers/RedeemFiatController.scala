@@ -34,7 +34,7 @@ class RedeemFiatController @Inject()(messagesControllerComponents: MessagesContr
             Ok(views.html.index(success = response.ticketID))
           } else {
             val response = transactionsRedeemFiat.Service.post( transactionsRedeemFiat.Request(from = request.session.get(constants.Security.USERNAME).get, to = redeemFiatData.to, password = redeemFiatData.password, redeemAmount = redeemFiatData.redeemAmount, gas = redeemFiatData.gas))
-            redeemFiats.Service.addRedeemFiat(from = request.session.get(constants.Security.USERNAME).get, to = redeemFiatData.to, redeemAmount = redeemFiatData.redeemAmount, gas = redeemFiatData.gas, null, txHash = Option(response.TxHash), ticketID = (Random.nextInt(899999999) + 100000000).toString, null)
+            redeemFiats.Service.addRedeemFiat(from = request.session.get(constants.Security.USERNAME).get, to = redeemFiatData.to, redeemAmount = redeemFiatData.redeemAmount, gas = redeemFiatData.gas, null, txHash = Option(response.TxHash), ticketID = Random.nextString(32), null)
             Ok(views.html.index(success = response.TxHash))
           }
         }
@@ -64,7 +64,7 @@ class RedeemFiatController @Inject()(messagesControllerComponents: MessagesContr
             Ok(views.html.index(success = response.ticketID))
           } else {
             val response = transactionsRedeemFiat.Service.post( transactionsRedeemFiat.Request(from = redeemFiatData.from, to = redeemFiatData.to, password = redeemFiatData.password, redeemAmount = redeemFiatData.redeemAmount, gas = redeemFiatData.gas))
-            redeemFiats.Service.addRedeemFiat(from = redeemFiatData.from, to = redeemFiatData.to, redeemAmount = redeemFiatData.redeemAmount, gas = redeemFiatData.gas, null, txHash = Option(response.TxHash), ticketID = (Random.nextInt(899999999) + 100000000).toString, null)
+            redeemFiats.Service.addRedeemFiat(from = redeemFiatData.from, to = redeemFiatData.to, redeemAmount = redeemFiatData.redeemAmount, gas = redeemFiatData.gas, null, txHash = Option(response.TxHash), ticketID = Random.nextString(32), null)
             Ok(views.html.index(success = response.TxHash))
           }
         }
