@@ -18,7 +18,6 @@ $(document).ready(function () {
         })
         .then(function (token) {
             if($("#" + "NOTIFICATION_TOKEN").length !=0) {
-                console.log(token);
                 document.getElementById("NOTIFICATION_TOKEN").value = token
             }
         })
