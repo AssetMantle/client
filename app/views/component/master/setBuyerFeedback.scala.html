@@ -2,14 +2,14 @@
 @import views.companion.master.SetBuyerFeedback
 
 @(setBuyerFeedbackForm: Form[SetBuyerFeedback.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages(constants.Forms.SET_BUYER_FEEDBACK)) {
+@common(Messages(constants.Form.SET_BUYER_FEEDBACK)) {
     @form(action = routes.SetBuyerFeedbackController.setBuyerFeedback) {
         @CSRF.formField
-        @inputText(setBuyerFeedbackForm(constants.Forms.TO),'_label-> Messages(constants.Forms.TO))
-        @inputText(setBuyerFeedbackForm(constants.Forms.PEG_HASH),'_label-> Messages(constants.Forms.PEG_HASH))
-        @inputText(setBuyerFeedbackForm(constants.Forms.RATING),'_label-> Messages(constants.Forms.RATING))
-        @inputText(setBuyerFeedbackForm(constants.Forms.GAS),'_label-> Messages(constants.Forms.GAS))
-        @inputPassword(setBuyerFeedbackForm(constants.Forms.PASSWORD),'_label-> Messages(constants.Forms.PASSWORD))
+        @inputText(setBuyerFeedbackForm(constants.Form.TO),'_label-> Messages(constants.Form.TO))
+        @inputText(setBuyerFeedbackForm(constants.Form.PEG_HASH),'_label-> Messages(constants.Form.PEG_HASH))
+        @inputText(setBuyerFeedbackForm(constants.Form.RATING),'_label-> Messages(constants.Form.RATING))
+        @inputText(setBuyerFeedbackForm(constants.Form.GAS),'_label-> Messages(constants.Form.GAS))
+        @inputPassword(setBuyerFeedbackForm(constants.Form.PASSWORD),'_label-> Messages(constants.Form.PASSWORD))
 
         @if(setBuyerFeedbackForm.hasGlobalErrors) {
             <ul>
@@ -18,6 +18,6 @@
             }
             </ul>
         }
-        <button type="submit">@Messages(constants.Forms.SET_BUYER_FEEDBACK)</button>
+        <button type="submit">@Messages(constants.Form.SET_BUYER_FEEDBACK)</button>
     }
 }

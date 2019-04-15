@@ -2,17 +2,17 @@
     
 @(organizationVerificationRequests: Seq[Organization])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
 
-@common(Messages(constants.Forms.PENDING_VERIFY_ORGANIZATION_REQUESTS)) {
+@common(Messages(constants.Form.PENDING_VERIFY_ORGANIZATION_REQUESTS)) {
     <table>
         <tr>
-            <th>@Messages(constants.Forms.ORGANIZATION_ID)</th>
-            <th>@Messages(constants.Forms.ZONE_ID)</th>
-            <th>@Messages(constants.Forms.ACCOUNT_ID)</th>
-            <th>@Messages(constants.Forms.NAME)</th>
-            <th>@Messages(constants.Forms.ADDRESS)</th>
-            <th>@Messages(constants.Forms.PHONE)</th>
-            <th>@Messages(constants.Forms.EMAIL)</th>
-            <th>@Messages(constants.Forms.STATUS)</th>
+            <th>@Messages(constants.Form.ORGANIZATION_ID)</th>
+            <th>@Messages(constants.Form.ZONE_ID)</th>
+            <th>@Messages(constants.Form.ACCOUNT_ID)</th>
+            <th>@Messages(constants.Form.NAME)</th>
+            <th>@Messages(constants.Form.ADDRESS)</th>
+            <th>@Messages(constants.Form.PHONE)</th>
+            <th>@Messages(constants.Form.EMAIL)</th>
+            <th>@Messages(constants.Form.STATUS)</th>
 
         </tr>
         @for(organizationVerificationRequest <- organizationVerificationRequests) {
@@ -24,7 +24,7 @@
                 <td>@organizationVerificationRequest.address</td>
                 <td>@organizationVerificationRequest.phone</td>
                 <td>@organizationVerificationRequest.email</td>
-                <td><a href="@routes.AddOrganizationController.verifyOrganizationForm(organizationVerificationRequest.id, organizationVerificationRequest.zoneID)">@Messages(constants.Forms.APPROVE)</a>/<a href="@routes.AddOrganizationController.rejectVerifyOrganizationRequestForm(organizationVerificationRequest.id)">@Messages(constants.Forms.REJECT)</a></td>
+                <td><a href="@routes.AddOrganizationController.verifyOrganizationForm(organizationVerificationRequest.id, organizationVerificationRequest.zoneID)">@Messages(constants.Form.APPROVE)</a>/<a href="@routes.AddOrganizationController.rejectVerifyOrganizationRequestForm(organizationVerificationRequest.id)">@Messages(constants.Form.REJECT)</a></td>
             </tr>
         }
     </table>

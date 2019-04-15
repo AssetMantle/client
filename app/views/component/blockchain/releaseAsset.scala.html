@@ -2,14 +2,14 @@
 @import views.companion.blockchain.ReleaseAsset
 
 @(releaseAssetForm: Form[ReleaseAsset.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages(constants.Forms.RELEASE_ASSET)) {
+@common(Messages(constants.Form.RELEASE_ASSET)) {
     @form(action = routes.ReleaseAssetController.blockchainReleaseAsset) {
         @CSRF.formField
-        @inputText(releaseAssetForm(constants.Forms.FROM),'_label-> Messages(constants.Forms.FROM))
-        @inputText(releaseAssetForm(constants.Forms.TO),'_label-> Messages(constants.Forms.TO))
-        @inputText(releaseAssetForm(constants.Forms.PEG_HASH),'_label-> Messages(constants.Forms.PEG_HASH))
-        @inputText(releaseAssetForm(constants.Forms.GAS),'_label-> Messages(constants.Forms.GAS))
-        @inputPassword(releaseAssetForm(constants.Forms.PASSWORD),'_label-> Messages(constants.Forms.PASSWORD))
+        @inputText(releaseAssetForm(constants.Form.FROM),'_label-> Messages(constants.Form.FROM))
+        @inputText(releaseAssetForm(constants.Form.TO),'_label-> Messages(constants.Form.TO))
+        @inputText(releaseAssetForm(constants.Form.PEG_HASH),'_label-> Messages(constants.Form.PEG_HASH))
+        @inputText(releaseAssetForm(constants.Form.GAS),'_label-> Messages(constants.Form.GAS))
+        @inputPassword(releaseAssetForm(constants.Form.PASSWORD),'_label-> Messages(constants.Form.PASSWORD))
 
         @if(releaseAssetForm.hasGlobalErrors) {
             <ul>
@@ -18,6 +18,6 @@
             }
             </ul>
         }
-        <button type="submit">@Messages(constants.Forms.RELEASE_ASSET)</button>
+        <button type="submit">@Messages(constants.Form.RELEASE_ASSET)</button>
     }
 }

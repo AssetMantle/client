@@ -42,7 +42,7 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
   def verifyZone: Action[AnyContent] = withGenesisLoginAction { implicit request =>
     views.companion.master.VerifyZone.form.bindFromRequest().fold(
       formWithErrors => {
-        BadRequest(views.html.component.master.verifyZone(formWithErrors, formWithErrors.data(constants.Forms.ZONE_ID)))
+        BadRequest(views.html.component.master.verifyZone(formWithErrors, formWithErrors.data(constants.Form.ZONE_ID)))
       },
       verifyZoneData => {
         try {
@@ -86,7 +86,7 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
   def rejectVerifyZoneRequest: Action[AnyContent] = withGenesisLoginAction { implicit request =>
     views.companion.master.RejectVerifyZoneRequest.form.bindFromRequest().fold(
       formWithErrors => {
-        BadRequest(views.html.component.master.rejectVerifyZoneRequest(formWithErrors, formWithErrors.data(constants.Forms.ZONE_ID)))
+        BadRequest(views.html.component.master.rejectVerifyZoneRequest(formWithErrors, formWithErrors.data(constants.Form.ZONE_ID)))
       },
       rejectVerifyZoneRequestData => {
         try {

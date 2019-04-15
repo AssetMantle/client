@@ -1,7 +1,7 @@
 @(username: String, userType: String, address: String, coins: Int = 0)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
 
     @common(Messages(constants.User.HOME)) {
-        <a href="@routes.SendCoinController.requestCoinsForm">@Messages(constants.Forms.REQUEST_COIN)</a>
+        <a href="@routes.SendCoinController.requestCoinsForm">@Messages(constants.Form.REQUEST_COIN)</a>
 
         @component.master.commonHome(username = username, userType = userType, address = address, coins = coins)
     }

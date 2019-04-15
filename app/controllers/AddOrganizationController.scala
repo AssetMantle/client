@@ -46,7 +46,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
   def verifyOrganization: Action[AnyContent] = withZoneLoginAction { implicit request =>
     views.companion.master.VerifyOrganization.form.bindFromRequest().fold(
       formWithErrors => {
-        BadRequest(views.html.component.master.verifyOrganization(formWithErrors, formWithErrors.data(constants.Forms.ORGANIZATION_ID), formWithErrors.data(constants.Forms.ZONE_ID)))
+        BadRequest(views.html.component.master.verifyOrganization(formWithErrors, formWithErrors.data(constants.Form.ORGANIZATION_ID), formWithErrors.data(constants.Form.ZONE_ID)))
       },
       verifyOrganizationData => {
         try {
@@ -82,7 +82,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
   def rejectVerifyOrganizationRequest: Action[AnyContent] = withZoneLoginAction { implicit request =>
     views.companion.master.RejectVerifyOrganizationRequest.form.bindFromRequest().fold(
       formWithErrors => {
-        BadRequest(views.html.component.master.rejectVerifyOrganizationRequest(formWithErrors, formWithErrors.data(constants.Forms.ORGANIZATION_ID)))
+        BadRequest(views.html.component.master.rejectVerifyOrganizationRequest(formWithErrors, formWithErrors.data(constants.Form.ORGANIZATION_ID)))
       },
       rejectVerifyOrganizationRequestData => {
         try {

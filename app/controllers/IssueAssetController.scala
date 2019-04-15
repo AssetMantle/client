@@ -52,7 +52,7 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
   def rejectIssueAssetRequest: Action[AnyContent] = withZoneLoginAction { implicit request =>
     views.companion.master.RejectIssueAssetRequest.form.bindFromRequest().fold(
       formWithErrors => {
-        BadRequest(views.html.component.master.rejectIssueAssetRequest(formWithErrors, formWithErrors.data(constants.Forms.REQUEST_ID)))
+        BadRequest(views.html.component.master.rejectIssueAssetRequest(formWithErrors, formWithErrors.data(constants.Form.REQUEST_ID)))
       },
       rejectIssueAssetRequestData => {
         try {
@@ -75,7 +75,7 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
     implicit request =>
       views.companion.master.IssueAsset.form.bindFromRequest().fold(
         formWithErrors => {
-          BadRequest(views.html.component.master.issueAsset(formWithErrors, formWithErrors.data(constants.Forms.REQUEST_ID), formWithErrors.data(constants.Forms.ACCOUNT_ID), formWithErrors.data(constants.Forms.DOCUMENT_HASH), formWithErrors.data(constants.Forms.ASSET_TYPE), formWithErrors.data(constants.Forms.ASSET_PRICE).toInt, formWithErrors.data(constants.Forms.QUANTITY_UNIT), formWithErrors.data(constants.Forms.ASSET_QUANTITY).toInt))
+          BadRequest(views.html.component.master.issueAsset(formWithErrors, formWithErrors.data(constants.Form.REQUEST_ID), formWithErrors.data(constants.Form.ACCOUNT_ID), formWithErrors.data(constants.Form.DOCUMENT_HASH), formWithErrors.data(constants.Form.ASSET_TYPE), formWithErrors.data(constants.Form.ASSET_PRICE).toInt, formWithErrors.data(constants.Form.QUANTITY_UNIT), formWithErrors.data(constants.Form.ASSET_QUANTITY).toInt))
         },
         issueAssetData => {
           try {

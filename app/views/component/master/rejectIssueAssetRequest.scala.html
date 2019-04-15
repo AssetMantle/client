@@ -2,10 +2,10 @@
 @import views.companion.master.RejectIssueAssetRequest
 
 @(rejectIssueAssetRequestForm: Form[RejectIssueAssetRequest.Data], requestID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages(constants.Forms.REJECT_ISSUE_ASSET_REQUEST)) {
+@common(Messages(constants.Form.REJECT_ISSUE_ASSET_REQUEST)) {
     @form(action = routes.IssueAssetController.rejectIssueAssetRequest) {
         @CSRF.formField
-        @inputText(rejectIssueAssetRequestForm(constants.Forms.REQUEST_ID).copy(value = Some(requestID)), '_label -> Messages(constants.Forms.REQUEST_ID))
+        @inputText(rejectIssueAssetRequestForm(constants.Form.REQUEST_ID).copy(value = Some(requestID)), '_label -> Messages(constants.Form.REQUEST_ID))
 
         @if(rejectIssueAssetRequestForm.hasGlobalErrors) {
             <ul>
@@ -14,6 +14,6 @@
             }
             </ul>
         }
-        <button type="submit">@Messages(constants.Forms.REJECT_ISSUE_ASSET_REQUEST)</button>
+        <button type="submit">@Messages(constants.Form.REJECT_ISSUE_ASSET_REQUEST)</button>
     }
 }

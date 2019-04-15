@@ -2,15 +2,15 @@
 
 @(issueFiatRequests: Seq[IssueFiatRequest])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
 
-@common(Messages(constants.Forms.PENDING_ISSUE_FIAT_REQUESTS)) {
+@common(Messages(constants.Form.PENDING_ISSUE_FIAT_REQUESTS)) {
 
     <table>
         <tr>
-            <th>@Messages(constants.Forms.ID)</th>
-            <th>@Messages(constants.Forms.ACCOUNT_ID)</th>
-            <th>@Messages(constants.Forms.TRANSACTION_ID)</th>
-            <th>@Messages(constants.Forms.TRANSACTION_AMOUNT)</th>
-            <th>@Messages(constants.Forms.STATUS)</th>
+            <th>@Messages(constants.Form.ID)</th>
+            <th>@Messages(constants.Form.ACCOUNT_ID)</th>
+            <th>@Messages(constants.Form.TRANSACTION_ID)</th>
+            <th>@Messages(constants.Form.TRANSACTION_AMOUNT)</th>
+            <th>@Messages(constants.Form.STATUS)</th>
         </tr>
         @for(issueFiatRequest <- issueFiatRequests) {
             <tr>
@@ -18,7 +18,7 @@
                 <td>@issueFiatRequest.accountID</td>
                 <td>@issueFiatRequest.transactionID</td>
                 <td>@issueFiatRequest.transactionAmount</td>
-                <td><a href="@routes.IssueFiatController.issueFiatForm(issueFiatRequest.id, issueFiatRequest.accountID, issueFiatRequest.transactionID, issueFiatRequest.transactionAmount)">@Messages(constants.Forms.APPROVE)</a>/<a href="@routes.IssueFiatController.rejectIssueFiatRequestForm(issueFiatRequest.id)">@Messages(constants.Forms.REJECT)</a></td>
+                <td><a href="@routes.IssueFiatController.issueFiatForm(issueFiatRequest.id, issueFiatRequest.accountID, issueFiatRequest.transactionID, issueFiatRequest.transactionAmount)">@Messages(constants.Form.APPROVE)</a>/<a href="@routes.IssueFiatController.rejectIssueFiatRequestForm(issueFiatRequest.id)">@Messages(constants.Form.REJECT)</a></td>
             </tr>
         }
     </table>

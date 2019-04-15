@@ -2,10 +2,10 @@
 @import views.companion.master.RejectVerifyZoneRequest
 
 @(rejectVerifyZoneRequestForm: Form[RejectVerifyZoneRequest.Data], zoneID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages(constants.Forms.REJECT_VERIFY_ZONE_REQUEST)) {
+@common(Messages(constants.Form.REJECT_VERIFY_ZONE_REQUEST)) {
     @form(action = routes.AddZoneController.rejectVerifyZoneRequest) {
         @CSRF.formField
-        @inputText(rejectVerifyZoneRequestForm(constants.Forms.ZONE_ID).copy(value = Some(zoneID)), '_label -> Messages(constants.Forms.ZONE_ID))
+        @inputText(rejectVerifyZoneRequestForm(constants.Form.ZONE_ID).copy(value = Some(zoneID)), '_label -> Messages(constants.Form.ZONE_ID))
 
         @if(rejectVerifyZoneRequestForm.hasGlobalErrors) {
             <ul>
@@ -14,6 +14,6 @@
             }
             </ul>
         }
-        <button type="submit">@Messages(constants.Forms.REJECT_VERIFY_ZONE_REQUEST)</button>
+        <button type="submit">@Messages(constants.Form.REJECT_VERIFY_ZONE_REQUEST)</button>
     }
 }

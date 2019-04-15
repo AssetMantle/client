@@ -1,6 +1,6 @@
 package constants
 
-object Forms {
+object Form {
 
   val INDEX = "INDEX"
 

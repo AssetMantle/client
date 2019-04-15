@@ -52,7 +52,7 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
   def rejectIssueFiatRequest: Action[AnyContent] = withZoneLoginAction { implicit request =>
     views.companion.master.RejectIssueFiatRequest.form.bindFromRequest().fold(
       formWithErrors => {
-        BadRequest(views.html.component.master.rejectIssueFiatRequest(formWithErrors, formWithErrors.data(constants.Forms.REQUEST_ID)))
+        BadRequest(views.html.component.master.rejectIssueFiatRequest(formWithErrors, formWithErrors.data(constants.Form.REQUEST_ID)))
       },
       rejectIssueFiatRequestData => {
         try {
@@ -73,7 +73,7 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
   def issueFiat: Action[AnyContent] = withZoneLoginAction { implicit request =>
     views.companion.master.IssueFiat.form.bindFromRequest().fold(
       formWithErrors => {
-        BadRequest(views.html.component.master.issueFiat(formWithErrors, formWithErrors.data(constants.Forms.REQUEST_ID), formWithErrors.data(constants.Forms.ACCOUNT_ID), formWithErrors.data(constants.Forms.TRANSACTION_ID), formWithErrors.data(constants.Forms.TRANSACTION_AMOUNT).toInt))
+        BadRequest(views.html.component.master.issueFiat(formWithErrors, formWithErrors.data(constants.Form.REQUEST_ID), formWithErrors.data(constants.Form.ACCOUNT_ID), formWithErrors.data(constants.Form.TRANSACTION_ID), formWithErrors.data(constants.Form.TRANSACTION_AMOUNT).toInt))
       },
       issueFiatData => {
         try {

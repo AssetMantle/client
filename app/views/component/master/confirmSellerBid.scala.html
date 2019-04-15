@@ -2,15 +2,15 @@
 @import views.companion.master.ConfirmSellerBid
 
 @(confirmSellerBidForm: Form[ConfirmSellerBid.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages(constants.Forms.CONFIRM_SELLER_BID)) {
+@common(Messages(constants.Form.CONFIRM_SELLER_BID)) {
     @form(action = routes.ConfirmSellerBidController.confirmSellerBid) {
         @CSRF.formField
-        @inputText(confirmSellerBidForm(constants.Forms.TO),'_label-> Messages(constants.Forms.TO))
-        @inputText(confirmSellerBidForm(constants.Forms.BID),'_label-> Messages(constants.Forms.BID))
-        @inputText(confirmSellerBidForm(constants.Forms.TIME),'_label-> Messages(constants.Forms.TIME))
-        @inputText(confirmSellerBidForm(constants.Forms.PEG_HASH),'_label-> Messages(constants.Forms.PEG_HASH))
-        @inputText(confirmSellerBidForm(constants.Forms.GAS),'_label-> Messages(constants.Forms.GAS))
-        @inputPassword(confirmSellerBidForm(constants.Forms.PASSWORD),'_label-> Messages(constants.Forms.PASSWORD))
+        @inputText(confirmSellerBidForm(constants.Form.TO),'_label-> Messages(constants.Form.TO))
+        @inputText(confirmSellerBidForm(constants.Form.BID),'_label-> Messages(constants.Form.BID))
+        @inputText(confirmSellerBidForm(constants.Form.TIME),'_label-> Messages(constants.Form.TIME))
+        @inputText(confirmSellerBidForm(constants.Form.PEG_HASH),'_label-> Messages(constants.Form.PEG_HASH))
+        @inputText(confirmSellerBidForm(constants.Form.GAS),'_label-> Messages(constants.Form.GAS))
+        @inputPassword(confirmSellerBidForm(constants.Form.PASSWORD),'_label-> Messages(constants.Form.PASSWORD))
 
         @if(confirmSellerBidForm.hasGlobalErrors) {
             <ul>
@@ -19,6 +19,6 @@
             }
             </ul>
         }
-        <button type="submit">@Messages(constants.Forms.CONFIRM_SELLER_BID)</button>
+        <button type="submit">@Messages(constants.Form.CONFIRM_SELLER_BID)</button>
     }
 }
