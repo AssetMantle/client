@@ -19,10 +19,10 @@ class VerifyEmailAddressController @Inject()(messagesControllerComponents: Messa
 
   private implicit val module: String = constants.Module.MASTER_ACCOUNT
 
-  def verifyEmailAddressForm: Action[AnyContent] = withLoginAction { implicit request =>
-    val otp = emailOTPs.Service.sendOTP(request.session.get(Security.USERNAME).get)
+  def verifyEmailAddressForm = withLoginAction.action { username => implicit request =>
+    val otp = emailOTPs.Service.sendOTP(username)
     try {
-      email.sendEmail(request.session.get(Security.USERNAME).get, constants.Email.OTP, Seq(otp))
+      email.sendEmail(username, constants.Email.OTP, Seq(otp))
       Ok(views.html.component.master.verifyEmailAddress(VerifyEmailAddress.form))
     }
     catch {

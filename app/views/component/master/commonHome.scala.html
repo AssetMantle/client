@@ -1,5 +1,8 @@
 @(username: String, userType: String, address: String, coins: Int = 0)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
 
+<link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/notifications.css")">
+
+
 <br>
 <a href="@routes.SendCoinController.sendCoinForm">@Messages(constants.Forms.SEND_COIN)</a>
 <a href="@routes.LogoutController.logoutForm">@Messages(constants.Forms.LOGOUT)</a>
@@ -11,3 +14,6 @@
 @Messages(constants.User.ADDRESS): @address <br>
 @Messages(constants.User.COINS): @coins <br>
 <br>
+
+<div id="notificationWindowCommons" style="margin: 0 auto;width: auto;height: auto;"></div>
+

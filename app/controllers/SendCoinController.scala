@@ -85,14 +85,14 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
       Ok(views.html.component.master.requestCoin(views.companion.master.RequestCoin.form))
   }
 
-  def requestCoins: Action[AnyContent] = withUnknownLoginAction { implicit request =>
+  def requestCoins = withUnknownLoginAction.action { username => implicit request =>
     views.companion.master.RequestCoin.form.bindFromRequest().fold(
       formWithErrors => {
         BadRequest(views.html.component.master.requestCoin(formWithErrors))
       },
       requestCoinFormData => {
         try {
-          masterTransactionFaucetRequests.Service.addFaucetRequest(request.session.get(constants.Security.USERNAME).get, defaultFaucetToken)
+          masterTransactionFaucetRequests.Service.addFaucetRequest(username, defaultFaucetToken)
           Ok(views.html.index(success = constants.Success.REQUEST_COINS))
         }
         catch {
