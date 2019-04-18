@@ -2,15 +2,15 @@
 @import views.companion.master.IssueFiat
 
 @(issueFiatForm: Form[IssueFiat.Data],requestID: String,  accountID: String, transactionID: String, transactionAmount: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages(constants.Forms.ISSUE_FIAT)) {
+@common(Messages(constants.Form.ISSUE_FIAT)) {
     @form(action = routes.IssueFiatController.issueFiat) {
         @CSRF.formField
-        @inputText(issueFiatForm(constants.Forms.REQUEST_ID).copy(value = Some(requestID)),'_label-> Messages(constants.Forms.REQUEST_ID))
-        @inputText(issueFiatForm(constants.Forms.ACCOUNT_ID).copy(value = Some(accountID)),'_label-> Messages(constants.Forms.ACCOUNT_ID))
-        @inputText(issueFiatForm(constants.Forms.TRANSACTION_ID).copy(value = Some(transactionID)),'_label-> Messages(constants.Forms.TRANSACTION_ID))
-        @inputText(issueFiatForm(constants.Forms.TRANSACTION_AMOUNT).copy(value = Some(transactionAmount.toString)),'_label-> Messages(constants.Forms.TRANSACTION_AMOUNT))
-        @inputText(issueFiatForm(constants.Forms.GAS),'_label-> Messages(constants.Forms.GAS))
-        @inputPassword(issueFiatForm(constants.Forms.PASSWORD),'_label-> Messages(constants.Forms.PASSWORD))
+        @inputText(issueFiatForm(constants.Form.REQUEST_ID).copy(value = Some(requestID)),'_label-> Messages(constants.Form.REQUEST_ID))
+        @inputText(issueFiatForm(constants.Form.ACCOUNT_ID).copy(value = Some(accountID)),'_label-> Messages(constants.Form.ACCOUNT_ID))
+        @inputText(issueFiatForm(constants.Form.TRANSACTION_ID).copy(value = Some(transactionID)),'_label-> Messages(constants.Form.TRANSACTION_ID))
+        @inputText(issueFiatForm(constants.Form.TRANSACTION_AMOUNT).copy(value = Some(transactionAmount.toString)),'_label-> Messages(constants.Form.TRANSACTION_AMOUNT))
+        @inputText(issueFiatForm(constants.Form.GAS),'_label-> Messages(constants.Form.GAS))
+        @inputPassword(issueFiatForm(constants.Form.PASSWORD),'_label-> Messages(constants.Form.PASSWORD))
 
         @if(issueFiatForm.hasGlobalErrors) {
             <ul>
@@ -19,6 +19,6 @@
             }
             </ul>
         }
-        <button type="submit">@Messages(constants.Forms.ISSUE_FIAT)</button>
+        <button type="submit">@Messages(constants.Form.ISSUE_FIAT)</button>
     }
 }

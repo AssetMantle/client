@@ -2,10 +2,10 @@
 @import views.companion.master.RejectFaucetRequest
 
 @(rejectFaucetRequestForm: Form[RejectFaucetRequest.Data], requestID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages(constants.Forms.FAUCET_FAUCET_REQUEST)) {
+@common(Messages(constants.Form.REJECT_FAUCET_REQUEST)) {
     @form(action = routes.SendCoinController.rejectFaucetRequest) {
         @CSRF.formField
-        @inputText(rejectFaucetRequestForm(constants.Forms.REQUEST_ID).copy(value = Some(requestID)), '_label -> Messages(constants.Forms.REQUEST_ID))
+        @inputText(rejectFaucetRequestForm(constants.Form.REQUEST_ID).copy(value = Some(requestID)), '_label -> Messages(constants.Form.REQUEST_ID))
 
         @if(rejectFaucetRequestForm.hasGlobalErrors) {
             <ul>
@@ -14,6 +14,6 @@
             }
             </ul>
         }
-        <button type="submit">@Messages(constants.Forms.FAUCET_FAUCET_REQUEST)</button>
+        <button type="submit">@Messages(constants.Form.REJECT_FAUCET_REQUEST)</button>
     }
 }

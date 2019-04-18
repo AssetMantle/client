@@ -2,10 +2,10 @@
 @import views.companion.master.VerifyMobileNumber
 
 @(verifyMobileNumberForm: Form[VerifyMobileNumber.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-    @common(Messages(constants.Forms.VERIFY_MOBILE_NUMBER)) {
+    @common(Messages(constants.Form.VERIFY_MOBILE_NUMBER)) {
         @form(action = routes.VerifyMobileNumberController.verifyMobileNumber) {
             @CSRF.formField
-            @inputText(verifyMobileNumberForm(constants.Forms.OTP),'_label-> Messages(constants.Forms.OTP))
+            @inputText(verifyMobileNumberForm(constants.Form.OTP),'_label-> Messages(constants.Form.OTP))
 
             @if(verifyMobileNumberForm.hasGlobalErrors) {
                 <ul>
@@ -14,6 +14,6 @@
                 }
                 </ul>
             }
-            <button type="submit">@Messages(constants.Forms.VERIFY_MOBILE_NUMBER)</button>
+            <button type="submit">@Messages(constants.Form.VERIFY_MOBILE_NUMBER)</button>
         }
     }

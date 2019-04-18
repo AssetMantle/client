@@ -2,16 +2,16 @@
 @import views.companion.blockchain.ConfirmBuyerBid
 
 @(confirmBuyerBidForm: Form[ConfirmBuyerBid.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages(constants.Forms.CONFIRM_BUYER_BID)) {
+@common(Messages(constants.Form.CONFIRM_BUYER_BID)) {
     @form(action = routes.ConfirmBuyerBidController.blockchainConfirmBuyerBid) {
         @CSRF.formField
-        @inputText(confirmBuyerBidForm(constants.Forms.FROM),'_label-> Messages(constants.Forms.FROM))
-        @inputText(confirmBuyerBidForm(constants.Forms.TO),'_label-> Messages(constants.Forms.TO))
-        @inputText(confirmBuyerBidForm(constants.Forms.BID),'_label-> Messages(constants.Forms.BID))
-        @inputText(confirmBuyerBidForm(constants.Forms.TIME),'_label-> Messages(constants.Forms.TIME))
-        @inputText(confirmBuyerBidForm(constants.Forms.PEG_HASH),'_label-> Messages(constants.Forms.PEG_HASH))
-        @inputText(confirmBuyerBidForm(constants.Forms.GAS),'_label-> Messages(constants.Forms.GAS))
-        @inputPassword(confirmBuyerBidForm(constants.Forms.PASSWORD),'_label-> Messages(constants.Forms.PASSWORD))
+        @inputText(confirmBuyerBidForm(constants.Form.FROM),'_label-> Messages(constants.Form.FROM))
+        @inputText(confirmBuyerBidForm(constants.Form.TO),'_label-> Messages(constants.Form.TO))
+        @inputText(confirmBuyerBidForm(constants.Form.BID),'_label-> Messages(constants.Form.BID))
+        @inputText(confirmBuyerBidForm(constants.Form.TIME),'_label-> Messages(constants.Form.TIME))
+        @inputText(confirmBuyerBidForm(constants.Form.PEG_HASH),'_label-> Messages(constants.Form.PEG_HASH))
+        @inputText(confirmBuyerBidForm(constants.Form.GAS),'_label-> Messages(constants.Form.GAS))
+        @inputPassword(confirmBuyerBidForm(constants.Form.PASSWORD),'_label-> Messages(constants.Form.PASSWORD))
 
         @if(confirmBuyerBidForm.hasGlobalErrors) {
             <ul>
@@ -20,6 +20,6 @@
             }
             </ul>
         }
-        <button type="submit">@Messages(constants.Forms.CONFIRM_BUYER_BID)</button>
+        <button type="submit">@Messages(constants.Form.CONFIRM_BUYER_BID)</button>
     }
 }

@@ -52,7 +52,7 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
   def rejectIssueFiatRequest: Action[AnyContent] = withZoneLoginAction { implicit request =>
     views.companion.master.RejectIssueFiatRequest.form.bindFromRequest().fold(
       formWithErrors => {
-        BadRequest(views.html.component.master.rejectIssueFiatRequest(formWithErrors, formWithErrors.data(constants.Forms.REQUEST_ID)))
+        BadRequest(views.html.component.master.rejectIssueFiatRequest(formWithErrors, formWithErrors.data(constants.Form.REQUEST_ID)))
       },
       rejectIssueFiatRequestData => {
         try {
@@ -60,7 +60,7 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
           Ok(views.html.index(success = Messages(constants.Success.ISSUE_FIAT_REQUEST_REJECTED)))
         }
         catch {
-          case blockChainException: BlockChainException => Ok(views.html.index(failure = blockChainException.message))
+          case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))
         }
       }
     )
@@ -73,35 +73,41 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
   def issueFiat: Action[AnyContent] = withZoneLoginAction { implicit request =>
     views.companion.master.IssueFiat.form.bindFromRequest().fold(
       formWithErrors => {
-        BadRequest(views.html.component.master.issueFiat(formWithErrors, formWithErrors.data(constants.Forms.REQUEST_ID), formWithErrors.data(constants.Forms.ACCOUNT_ID), formWithErrors.data(constants.Forms.TRANSACTION_ID), formWithErrors.data(constants.Forms.TRANSACTION_AMOUNT).toInt))
+        BadRequest(views.html.component.master.issueFiat(formWithErrors, formWithErrors.data(constants.Form.REQUEST_ID), formWithErrors.data(constants.Form.ACCOUNT_ID), formWithErrors.data(constants.Form.TRANSACTION_ID), formWithErrors.data(constants.Form.TRANSACTION_AMOUNT).toInt))
       },
       issueFiatData => {
         try {
-          if (kafkaEnabled) {
-            val toAddress = masterAccounts.Service.getAddress(issueFiatData.accountID)
-            val response = transactionsIssueFiat.Service.kafkaPost(transactionsIssueFiat.Request(from = request.session.get(constants.Security.USERNAME).get, to = toAddress, password = issueFiatData.password, transactionID = issueFiatData.transactionID, transactionAmount = issueFiatData.transactionAmount, gas = issueFiatData.gas))
-            blockchainTransactionIssueFiats.Service.addIssueFiatKafka(from = request.session.get(constants.Security.USERNAME).get, to = toAddress, transactionID = issueFiatData.transactionID, transactionAmount = issueFiatData.transactionAmount, gas = issueFiatData.gas, null, null, ticketID = response.ticketID, null)
-            Ok(views.html.index(success = response.ticketID))
-          } else {
-            val toAddress = masterAccounts.Service.getAddress(issueFiatData.accountID)
-            val zoneAddress = masterAccounts.Service.getAddress(request.session.get(constants.Security.USERNAME).get)
-            val response = transactionsIssueFiat.Service.post(transactionsIssueFiat.Request(from = request.session.get(constants.Security.USERNAME).get, to = toAddress, password = issueFiatData.password, transactionID = issueFiatData.transactionID, transactionAmount = issueFiatData.transactionAmount, gas = issueFiatData.gas))
-            blockchainTransactionIssueFiats.Service.addIssueFiat(from = request.session.get(constants.Security.USERNAME).get, to = toAddress, transactionID = issueFiatData.transactionID, transactionAmount = issueFiatData.transactionAmount, gas = issueFiatData.gas, null, txHash = Option(response.TxHash), ticketID = Random.nextString(32), null)
-            masterTransactionIssueFiatRequests.Service.updateStatusAndGas(issueFiatData.requestID, true, issueFiatData.gas)
-            blockchainAccounts.Service.updateSequence(toAddress, blockchainAccounts.Service.getSequence(toAddress) + 1)
-            blockchainAccounts.Service.updateSequence(zoneAddress, blockchainAccounts.Service.getSequence(zoneAddress) + 1)
-            for (tag <- response.Tags) {
-              if (tag.Key == constants.Response.KEY_FIAT) {
-                blockchainFiats.Service.addFiat(pegHash = tag.Value, transactionID = issueFiatData.transactionID, transactionAmount = issueFiatData.transactionAmount, redeemedAmount = 0)
-                blockchainOwners.Service.addOwner(pegHash = tag.Value, ownerAddress = toAddress, amount = issueFiatData.transactionAmount)
+          if (masterTransactionIssueFiatRequests.Service.getStatus(issueFiatData.requestID).isEmpty) {
+            if (kafkaEnabled) {
+              val toAddress = masterAccounts.Service.getAddress(issueFiatData.accountID)
+              val response = transactionsIssueFiat.Service.kafkaPost(transactionsIssueFiat.Request(from = request.session.get(constants.Security.USERNAME).get, to = toAddress, password = issueFiatData.password, transactionID = issueFiatData.transactionID, transactionAmount = issueFiatData.transactionAmount, gas = issueFiatData.gas))
+              blockchainTransactionIssueFiats.Service.addIssueFiatKafka(from = request.session.get(constants.Security.USERNAME).get, to = toAddress, transactionID = issueFiatData.transactionID, transactionAmount = issueFiatData.transactionAmount, gas = issueFiatData.gas, null, null, ticketID = response.ticketID, null)
+              Ok(views.html.index(success = response.ticketID))
+            } else {
+              val toAddress = masterAccounts.Service.getAddress(issueFiatData.accountID)
+              val zoneAddress = masterAccounts.Service.getAddress(request.session.get(constants.Security.USERNAME).get)
+              val response = transactionsIssueFiat.Service.post(transactionsIssueFiat.Request(from = request.session.get(constants.Security.USERNAME).get, to = toAddress, password = issueFiatData.password, transactionID = issueFiatData.transactionID, transactionAmount = issueFiatData.transactionAmount, gas = issueFiatData.gas))
+              blockchainTransactionIssueFiats.Service.addIssueFiat(from = request.session.get(constants.Security.USERNAME).get, to = toAddress, transactionID = issueFiatData.transactionID, transactionAmount = issueFiatData.transactionAmount, gas = issueFiatData.gas, null, txHash = Option(response.TxHash), ticketID = Random.nextString(32), null)
+              masterTransactionIssueFiatRequests.Service.updateStatusAndGas(issueFiatData.requestID, true, issueFiatData.gas)
+              blockchainAccounts.Service.updateSequence(toAddress, blockchainAccounts.Service.getSequence(toAddress) + 1)
+              blockchainAccounts.Service.updateSequence(zoneAddress, blockchainAccounts.Service.getSequence(zoneAddress) + 1)
+              for (tag <- response.Tags) {
+                if (tag.Key == constants.Response.KEY_FIAT) {
+                  blockchainFiats.Service.addFiat(pegHash = tag.Value, transactionID = issueFiatData.transactionID, transactionAmount = issueFiatData.transactionAmount, redeemedAmount = 0)
+                  blockchainOwners.Service.addOwner(pegHash = tag.Value, ownerAddress = toAddress, amount = issueFiatData.transactionAmount)
+                }
               }
+              Ok(views.html.index(success = response.TxHash))
             }
-            Ok(views.html.index(success = response.TxHash))
+          } else {
+            Ok(views.html.index(failure = Messages(constants.Error.REQUEST_ALREADY_APPROVED_OR_REJECTED)))
           }
         }
         catch {
           case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))
-          case blockChainException: BlockChainException => Ok(views.html.index(failure = blockChainException.message))
+          case blockChainException: BlockChainException =>
+            masterTransactionIssueFiatRequests.Service.updateComment(issueFiatData.requestID, blockChainException.message)
+            Ok(views.html.index(failure = blockChainException.message))
         }
       }
     )
@@ -131,7 +137,6 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
         catch {
           case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))
           case blockChainException: BlockChainException => Ok(views.html.index(failure = blockChainException.message))
-
         }
       }
     )

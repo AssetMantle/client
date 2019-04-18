@@ -1,15 +1,10 @@
-@import models.masterTransaction.FaucetRequest
-@import views.companion.master.ApproveFaucetRequest
-
 @(username: String, userType: String, address: String, coins: Int = 0)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
 
+@common(Messages(constants.User.HOME)) {
 
-    @common(Messages(constants.User.HOME)) {
+    @component.master.commonHome(username = username, userType = userType, address = address, coins = coins)
 
-        @component.master.commonHome(username = username, userType = userType, address = address, coins = coins)
+    <a href="@routes.AddZoneController.viewPendingVerifyZoneRequests">@Messages(constants.Form.PENDING_VERIFY_ZONE_REQUESTS)</a>
+    <a href="@routes.SendCoinController.viewPendingFaucetRequests">@Messages(constants.Form.APPROVE_FAUCET_REQUEST)</a>
 
-        <a href="@routes.AddZoneController.verifyZoneForm">@Messages(constants.Forms.VERIFY_ZONE)</a>
-        <a href="@routes.SetACLController.setACLForm">@Messages(constants.Forms.SET_ACL)</a>
-        <a href="@routes.SendCoinController.viewPendingFaucetRequests">@Messages(constants.Forms.APPROVE_FAUCET_REQUEST)</a>
-
-    }
+}

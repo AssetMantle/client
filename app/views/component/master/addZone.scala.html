@@ -2,11 +2,11 @@
 @import views.companion.master.AddZone
 
 @(addZoneForm: Form[AddZone.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages(constants.Forms.ADD_ZONE)) {
+@common(Messages(constants.Form.ADD_ZONE)) {
     @form(action = routes.AddZoneController.addZone) {
         @CSRF.formField
-        @inputText(addZoneForm(constants.Forms.NAME),'_label-> Messages(constants.Forms.NAME))
-        @inputText(addZoneForm(constants.Forms.CURRENCY),'_label-> Messages(constants.Forms.CURRENCY))
+        @inputText(addZoneForm(constants.Form.NAME),'_label-> Messages(constants.Form.NAME))
+        @inputText(addZoneForm(constants.Form.CURRENCY),'_label-> Messages(constants.Form.CURRENCY))
 
         @if(addZoneForm.hasGlobalErrors) {
             <ul>
@@ -15,6 +15,6 @@
             }
             </ul>
         }
-        <button type="submit">@Messages(constants.Forms.ADD_ZONE)</button>
+        <button type="submit">@Messages(constants.Form.ADD_ZONE)</button>
     }
 }

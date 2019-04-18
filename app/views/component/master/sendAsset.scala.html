@@ -2,13 +2,13 @@
 @import views.companion.master.SendAsset
 
 @(sendAssetForm: Form[SendAsset.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages(constants.Forms.SEND_ASSET)) {
+@common(Messages(constants.Form.SEND_ASSET)) {
     @form(action = routes.SendAssetController.sendAsset) {
         @CSRF.formField
-        @inputText(sendAssetForm(constants.Forms.TO),'_label-> Messages(constants.Forms.TO))
-        @inputText(sendAssetForm(constants.Forms.PEG_HASH),'_label-> Messages(constants.Forms.PEG_HASH))
-        @inputText(sendAssetForm(constants.Forms.GAS),'_label-> Messages(constants.Forms.GAS))
-        @inputPassword(sendAssetForm(constants.Forms.PASSWORD),'_label-> Messages(constants.Forms.PASSWORD))
+        @inputText(sendAssetForm(constants.Form.TO),'_label-> Messages(constants.Form.TO))
+        @inputText(sendAssetForm(constants.Form.PEG_HASH),'_label-> Messages(constants.Form.PEG_HASH))
+        @inputText(sendAssetForm(constants.Form.GAS),'_label-> Messages(constants.Form.GAS))
+        @inputPassword(sendAssetForm(constants.Form.PASSWORD),'_label-> Messages(constants.Form.PASSWORD))
 
         @if(sendAssetForm.hasGlobalErrors) {
             <ul>
@@ -17,6 +17,6 @@
             }
             </ul>
         }
-        <button type="submit">@Messages(constants.Forms.SEND_ASSET)</button>
+        <button type="submit">@Messages(constants.Form.SEND_ASSET)</button>
     }
 }

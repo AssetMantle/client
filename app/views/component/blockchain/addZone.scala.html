@@ -2,13 +2,13 @@
 @import views.companion.blockchain.AddZone
 
 @(addZoneForm: Form[AddZone.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages(constants.Forms.ADD_ZONE)) {
+@common(Messages(constants.Form.ADD_ZONE)) {
     @form(action = routes.AddZoneController.blockchainAddZone) {
         @CSRF.formField
-        @inputText(addZoneForm(constants.Forms.FROM),'_label-> Messages(constants.Forms.FROM))
-        @inputText(addZoneForm(constants.Forms.TO),'_label-> Messages(constants.Forms.TO))
-        @inputText(addZoneForm(constants.Forms.ZONE_ID),'_label-> Messages(constants.Forms.ZONE_ID))
-        @inputPassword(addZoneForm(constants.Forms.PASSWORD),'_label-> Messages(constants.Forms.PASSWORD))
+        @inputText(addZoneForm(constants.Form.FROM),'_label-> Messages(constants.Form.FROM))
+        @inputText(addZoneForm(constants.Form.TO),'_label-> Messages(constants.Form.TO))
+        @inputText(addZoneForm(constants.Form.ZONE_ID),'_label-> Messages(constants.Form.ZONE_ID))
+        @inputPassword(addZoneForm(constants.Form.PASSWORD),'_label-> Messages(constants.Form.PASSWORD))
 
         @if(addZoneForm.hasGlobalErrors) {
             <ul>
@@ -17,6 +17,6 @@
             }
             </ul>
         }
-        <button type="submit">@Messages(constants.Forms.ADD_ZONE)</button>
+        <button type="submit">@Messages(constants.Form.ADD_ZONE)</button>
     }
 }

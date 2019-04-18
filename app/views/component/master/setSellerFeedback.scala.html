@@ -2,14 +2,14 @@
 @import views.companion.master.SetSellerFeedback
 
 @(setSellerFeedbackForm: Form[SetSellerFeedback.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages(constants.Forms.SET_SELLER_FEEDBACK)) {
+@common(Messages(constants.Form.SET_SELLER_FEEDBACK)) {
     @form(action = routes.SetSellerFeedbackController.setSellerFeedback) {
         @CSRF.formField
-        @inputText(setSellerFeedbackForm(constants.Forms.TO),'_label-> Messages(constants.Forms.TO))
-        @inputText(setSellerFeedbackForm(constants.Forms.PEG_HASH),'_label-> Messages(constants.Forms.PEG_HASH))
-        @inputText(setSellerFeedbackForm(constants.Forms.RATING),'_label-> Messages(constants.Forms.RATING))
-        @inputText(setSellerFeedbackForm(constants.Forms.GAS),'_label-> Messages(constants.Forms.GAS))
-        @inputPassword(setSellerFeedbackForm(constants.Forms.PASSWORD),'_label-> Messages(constants.Forms.PASSWORD))
+        @inputText(setSellerFeedbackForm(constants.Form.TO),'_label-> Messages(constants.Form.TO))
+        @inputText(setSellerFeedbackForm(constants.Form.PEG_HASH),'_label-> Messages(constants.Form.PEG_HASH))
+        @inputText(setSellerFeedbackForm(constants.Form.RATING),'_label-> Messages(constants.Form.RATING))
+        @inputText(setSellerFeedbackForm(constants.Form.GAS),'_label-> Messages(constants.Form.GAS))
+        @inputPassword(setSellerFeedbackForm(constants.Form.PASSWORD),'_label-> Messages(constants.Form.PASSWORD))
 
         @if(setSellerFeedbackForm.hasGlobalErrors) {
             <ul>
@@ -18,6 +18,6 @@
             }
             </ul>
         }
-        <button type="submit">@Messages(constants.Forms.SET_SELLER_FEEDBACK)</button>
+        <button type="submit">@Messages(constants.Form.SET_SELLER_FEEDBACK)</button>
     }
 }

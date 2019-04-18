@@ -2,27 +2,26 @@
 @import views.companion.master.SetACL
 
 @(setACLForm: Form[SetACL.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages(constants.Forms.SET_ACL)) {
+@common(Messages(constants.Form.SET_ACL)) {
     @form(action = routes.SetACLController.setACL) {
         @CSRF.formField
-        @inputText(setACLForm(constants.Forms.ACL_ADDRESS),'_label-> Messages(constants.Forms.ACL_ADDRESS))
-        @inputText(setACLForm(constants.Forms.ORGANIZATION_ID),'_label-> Messages(constants.Forms.ORGANIZATION_ID))
-        @inputText(setACLForm(constants.Forms.ZONE_ID),'_label-> Messages(constants.Forms.ZONE_ID))
-        @checkbox(setACLForm(constants.Forms.ISSUE_ASSET),'_label-> Messages(constants.Forms.ISSUE_ASSET))
-        @checkbox(setACLForm(constants.Forms.ISSUE_FIAT),'_label-> Messages(constants.Forms.ISSUE_FIAT))
-        @checkbox(setACLForm(constants.Forms.SEND_ASSET),'_label-> Messages(constants.Forms.SEND_ASSET))
-        @checkbox(setACLForm(constants.Forms.SEND_FIAT),'_label-> Messages(constants.Forms.SEND_FIAT))
-        @checkbox(setACLForm(constants.Forms.REDEEM_ASSET),'_label-> Messages(constants.Forms.REDEEM_ASSET))
-        @checkbox(setACLForm(constants.Forms.REDEEM_FIAT),'_label-> Messages(constants.Forms.REDEEM_FIAT))
-        @checkbox(setACLForm(constants.Forms.SELLER_EXECUTE_ORDER),'_label-> Messages(constants.Forms.SELLER_EXECUTE_ORDER))
-        @checkbox(setACLForm(constants.Forms.BUYER_EXECUTE_ORDER),'_label-> Messages(constants.Forms.BUYER_EXECUTE_ORDER))
-        @checkbox(setACLForm(constants.Forms.CHANGE_BUYER_BID),'_label-> Messages(constants.Forms.CHANGE_BUYER_BID))
-        @checkbox(setACLForm(constants.Forms.CHANGE_SELLER_BID),'_label-> Messages(constants.Forms.CHANGE_SELLER_BID))
-        @checkbox(setACLForm(constants.Forms.CONFIRM_BUYER_BID),'_label-> Messages(constants.Forms.CONFIRM_BUYER_BID))
-        @checkbox(setACLForm(constants.Forms.CONFIRM_SELLER_BID),'_label-> Messages(constants.Forms.CONFIRM_SELLER_BID))
-        @checkbox(setACLForm(constants.Forms.NEGOTIATION),'_label-> Messages(constants.Forms.NEGOTIATION))
-        @checkbox(setACLForm(constants.Forms.RELEASE_ASSET),'_label-> Messages(constants.Forms.RELEASE_ASSET))
-        @inputPassword(setACLForm(constants.Forms.PASSWORD),'_label-> Messages(constants.Forms.PASSWORD))
+        @inputText(setACLForm(constants.Form.ACL_ADDRESS),'_label-> Messages(constants.Form.ACL_ADDRESS))
+        @inputText(setACLForm(constants.Form.ORGANIZATION_ID),'_label-> Messages(constants.Form.ORGANIZATION_ID))
+        @checkbox(setACLForm(constants.Form.ISSUE_ASSET),'_label-> Messages(constants.Form.ISSUE_ASSET))
+        @checkbox(setACLForm(constants.Form.ISSUE_FIAT),'_label-> Messages(constants.Form.ISSUE_FIAT))
+        @checkbox(setACLForm(constants.Form.SEND_ASSET),'_label-> Messages(constants.Form.SEND_ASSET))
+        @checkbox(setACLForm(constants.Form.SEND_FIAT),'_label-> Messages(constants.Form.SEND_FIAT))
+        @checkbox(setACLForm(constants.Form.REDEEM_ASSET),'_label-> Messages(constants.Form.REDEEM_ASSET))
+        @checkbox(setACLForm(constants.Form.REDEEM_FIAT),'_label-> Messages(constants.Form.REDEEM_FIAT))
+        @checkbox(setACLForm(constants.Form.SELLER_EXECUTE_ORDER),'_label-> Messages(constants.Form.SELLER_EXECUTE_ORDER))
+        @checkbox(setACLForm(constants.Form.BUYER_EXECUTE_ORDER),'_label-> Messages(constants.Form.BUYER_EXECUTE_ORDER))
+        @checkbox(setACLForm(constants.Form.CHANGE_BUYER_BID),'_label-> Messages(constants.Form.CHANGE_BUYER_BID))
+        @checkbox(setACLForm(constants.Form.CHANGE_SELLER_BID),'_label-> Messages(constants.Form.CHANGE_SELLER_BID))
+        @checkbox(setACLForm(constants.Form.CONFIRM_BUYER_BID),'_label-> Messages(constants.Form.CONFIRM_BUYER_BID))
+        @checkbox(setACLForm(constants.Form.CONFIRM_SELLER_BID),'_label-> Messages(constants.Form.CONFIRM_SELLER_BID))
+        @checkbox(setACLForm(constants.Form.NEGOTIATION),'_label-> Messages(constants.Form.NEGOTIATION))
+        @checkbox(setACLForm(constants.Form.RELEASE_ASSET),'_label-> Messages(constants.Form.RELEASE_ASSET))
+        @inputPassword(setACLForm(constants.Form.PASSWORD),'_label-> Messages(constants.Form.PASSWORD))
 
         @if(setACLForm.hasGlobalErrors) {
             <ul>
@@ -31,6 +30,6 @@
             }
             </ul>
         }
-        <button type=submit>@Messages(constants.Forms.SET_ACL)</button>
+        <button type=submit>@Messages(constants.Form.SET_ACL)</button>
     }
 }

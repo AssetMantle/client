@@ -391,6 +391,7 @@ CREATE TABLE IF NOT EXISTS MASTER."Zone"
 CREATE TABLE IF NOT EXISTS MASTER."Organization"
 (
   "id"        VARCHAR NOT NULL,
+  "zoneID"    VARCHAR NOT NULL,
   "accountID" VARCHAR NOT NULL UNIQUE,
   "name"      VARCHAR NOT NULL,
   "address"   VARCHAR NOT NULL,
@@ -481,6 +482,7 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."FaucetRequest"
   "amount"    INT     NOT NULL,
   "gas"       INT,
   "status"    BOOLEAN,
+  "comment"   VARCHAR,
   PRIMARY KEY ("id")
 );
 
@@ -495,6 +497,7 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."IssueAssetRequest"
   "assetQuantity" INT     NOT NULL,
   "gas"           INT,
   "status"        BOOLEAN,
+  "comment"       VARCHAR,
   PRIMARY KEY ("id")
 );
 
@@ -506,6 +509,7 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."IssueFiatRequest"
   "transactionAmount" INT     NOT NULL,
   "gas"               INT,
   "status"            BOOLEAN,
+  "comment"           VARCHAR,
   PRIMARY KEY ("id")
 );
 
@@ -566,6 +570,8 @@ ALTER TABLE BLOCKCHAIN_TRANSACTION."SetACL"
 
 ALTER TABLE MASTER."Organization"
   ADD CONSTRAINT Organization_Account_accountID FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");
+ALTER TABLE MASTER."Organization"
+  ADD CONSTRAINT Organization_Zone_zoneID FOREIGN KEY ("zoneID") REFERENCES MASTER."Zone" ("id");
 ALTER TABLE MASTER."Account"
   ADD CONSTRAINT Account_BCAccount_address FOREIGN KEY ("accountAddress") REFERENCES BLOCKCHAIN."Account_BC" ("address");
 ALTER TABLE MASTER."Contact"
