@@ -10,7 +10,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class WithOrganizationLoginAction @Inject()(defaultBodyParse: BodyParsers.Default, masterAccounts: master.Accounts, accountTokens: AccountTokens)(implicit executionContext: ExecutionContext) extends ActionBuilderImpl(defaultBodyParse)  {
   override def invokeBlock[T](request: Request[T], block: Request[T] => Future[Result]): Future[Result] = {
-    if (accountTokens.Service.verifySession(request.session.get(Security.USERNAME), request.session.get(Security.TOKEN)) && masterAccounts.Service.getUserType(request.session.get(Security.USERNAME).getOrElse("")) == constants.User.ORGANIZATION) {
+    if (accountTokens.Service.verifySessionToken(request.session.get(Security.USERNAME), request.session.get(Security.TOKEN)) && masterAccounts.Service.getUserType(request.session.get(Security.USERNAME).getOrElse("")) == constants.User.ORGANIZATION) {
       block(request)
     }
     else {
