@@ -1,5 +1,6 @@
 package controllers.actions
 
+import exceptions.BaseException
 import javax.inject.Inject
 import models.master
 import models.masterTransaction.AccountTokens
@@ -11,11 +12,12 @@ import scala.concurrent.ExecutionContext
 
 class WithUnknownLoginActionTest @Inject()(messagesControllerComponents: MessagesControllerComponents, masterAccounts: master.Accounts, accountTokens: AccountTokens)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
-  private val timeout = configuration.get[Long]("sessionToken.timeout")
+  private implicit val module: String = constants.Module.MASTER_ACCOUNT
 
-  def action(f: ⇒ String => Request[AnyContent] => Result) = {
+  def isAuthenticated(f: ⇒ String => Request[AnyContent] => Result) = {
     Action { request ⇒
       getUsername(request).map {
+        case constants.Error.NOT_LOGGED_IN => onUnauthenticated(request)
         case constants.Error.TOKEN_TIMEOUT => onTokenTimeout(request)
         case constants.Error.INVALID_TOKEN => onInvalidToken(request)
         case constants.Error.UNAUTHORIZED => onUnauthorized(request)
@@ -25,14 +27,17 @@ class WithUnknownLoginActionTest @Inject()(messagesControllerComponents: Message
   }
 
   def getUsername(request: RequestHeader): Option[String] = {
-    val username = request.session.get(constants.Security.USERNAME)
-    val sessionToken = request.session.get(constants.Security.USERNAME)
-    if (username.isEmpty) None
-    else if (!accountTokens.Service.verifySessionTokenTime(username)) Some(constants.Error.TOKEN_TIMEOUT)
-    else if (!accountTokens.Service.verifySessionToken(username, sessionToken)) Some(constants.Error.INVALID_TOKEN)
-    else if (accountTokens.Service.verifySessionToken(username, sessionToken) && masterAccounts.Service.getUserType(username.getOrElse("")) != constants.User.UNKNOWN) Some(constants.Error.UNAUTHORIZED)
-    else if (accountTokens.Service.verifySessionToken(username, sessionToken) && masterAccounts.Service.getUserType(username.getOrElse("")) == constants.User.UNKNOWN) username
-    else None
+    try{
+      val username = request.session.get(constants.Security.USERNAME).getOrElse(throw new BaseException(constants.Error.NOT_LOGGED_IN))
+      val sessionToken = request.session.get(constants.Security.TOKEN).getOrElse(throw new BaseException(constants.Error.NOT_LOGGED_IN))
+      accountTokens.Service.tryVerifySessionToken(username, sessionToken)
+      accountTokens.Service.tryVerifySessionTokenTime(username)
+      masterAccounts.Service.tryVerifyUserType(username, constants.User.UNKNOWN)
+      Some(username)
+    }
+    catch{
+      case baseException: BaseException => Some(baseException.message.stripPrefix(module+"."))
+    }
   }
 
   def onUnauthorized(implicit request: RequestHeader) = Results.Unauthorized(views.html.index(failure = Messages(constants.Error.UNAUTHORIZED)))

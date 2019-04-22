@@ -17,7 +17,7 @@ class VerifyEmailAddressController @Inject()(messagesControllerComponents: Messa
 
   private implicit val module: String = constants.Module.MASTER_ACCOUNT
 
-  def verifyEmailAddressForm: Action[AnyContent] = withLoginActionTest.action { username =>
+  def verifyEmailAddressForm: Action[AnyContent] = withLoginActionTest.isAuthenticated { username =>
     implicit request =>
       val otp = emailOTPs.Service.sendOTP(username)
       try {
@@ -30,7 +30,7 @@ class VerifyEmailAddressController @Inject()(messagesControllerComponents: Messa
       }
   }
 
-  def verifyEmailAddress: Action[AnyContent] = withLoginActionTest.action { username =>
+  def verifyEmailAddress: Action[AnyContent] = withLoginActionTest.isAuthenticated { username =>
     implicit request =>
       VerifyEmailAddress.form.bindFromRequest().fold(
         formWithErrors => {

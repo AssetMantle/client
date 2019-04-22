@@ -81,8 +81,18 @@ class AccountTokens @Inject()(protected val databaseConfigProvider: DatabaseConf
       Await.result(findById(username.getOrElse(return false)), Duration.Inf).sessionTokenHash.get == util.hashing.MurmurHash3.stringHash(sessionToken.getOrElse(return false)).toString
     }
 
+    def tryVerifySessionToken(username: String, sessionToken: String)(implicit executionContext: ExecutionContext): Boolean = {
+      if(Await.result(findById(username), Duration.Inf).sessionTokenHash.get == util.hashing.MurmurHash3.stringHash(sessionToken).toString) true
+      else throw new BaseException(constants.Error.INVALID_TOKEN)
+    }
+
     def verifySessionTokenTime(username: Option[String])(implicit executionContext: ExecutionContext): Boolean = {
       (DateTime.now(DateTimeZone.UTC).getMillis - Await.result(findById(username.getOrElse(return false)), Duration.Inf).sessionTokenTime) < configuration.get[Long]("sessionToken.timeout")
+    }
+
+    def tryVerifySessionTokenTime(username: String)(implicit executionContext: ExecutionContext): Boolean = {
+      if((DateTime.now(DateTimeZone.UTC).getMillis - Await.result(findById(username), Duration.Inf).sessionTokenTime) < configuration.get[Long]("sessionToken.timeout")) true
+      else throw new BaseException(constants.Error.TOKEN_TIMEOUT)
     }
 
     def refreshSessionToken(username: String): String = {

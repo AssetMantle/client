@@ -85,7 +85,7 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
     Ok(views.html.component.master.requestCoin(views.companion.master.RequestCoin.form))
   }
 
-  def requestCoins = withUnknownLoginActionTest.action { username => implicit request =>
+  def requestCoins = withUnknownLoginActionTest.isAuthenticated { username => implicit request =>
     views.companion.master.RequestCoin.form.bindFromRequest().fold(
       formWithErrors => {
         BadRequest(views.html.component.master.requestCoin(formWithErrors))
