@@ -5,9 +5,9 @@ import exceptions.{BaseException, BlockChainException}
 import javax.inject.Inject
 import models.blockchainTransaction
 import models.master.Accounts
-import play.api.Configuration
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
+import play.api.{Configuration, Logger}
 import views.companion.{blockchain, master}
 
 import scala.concurrent.ExecutionContext
@@ -17,34 +17,37 @@ class BuyerExecuteOrderController @Inject()(messagesControllerComponents: Messag
 
   private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
 
+  private implicit val logger: Logger = Logger(this.getClass)
+
   def buyerExecuteOrderForm: Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.master.buyerExecuteOrder(master.BuyerExecuteOrder.form))
   }
 
-  def buyerExecuteOrder: Action[AnyContent] = withZoneLoginAction { implicit request =>
-    master.BuyerExecuteOrder.form.bindFromRequest().fold(
-      formWithErrors => {
-        BadRequest(views.html.component.master.buyerExecuteOrder(formWithErrors))
-      },
-      buyerExecuteOrderData => {
-        try {
-          if (kafkaEnabled) {
-            val response = transactionsBuyerExecuteOrder.Service.kafkaPost( transactionsBuyerExecuteOrder.Request(from = request.session.get(constants.Security.USERNAME).get, password = buyerExecuteOrderData.password, buyerAddress = buyerExecuteOrderData.buyerAddress, sellerAddress = buyerExecuteOrderData.sellerAddress, fiatProofHash = buyerExecuteOrderData.fiatProofHash, pegHash = buyerExecuteOrderData.pegHash, gas = buyerExecuteOrderData.gas))
-            blockchainTransactionBuyerExecuteOrders.Service.addBuyerExecuteOrderKafka(from = request.session.get(constants.Security.USERNAME).get, buyerAddress = buyerExecuteOrderData.buyerAddress, sellerAddress = buyerExecuteOrderData.sellerAddress, fiatProofHash = buyerExecuteOrderData.fiatProofHash, pegHash = buyerExecuteOrderData.pegHash, gas = buyerExecuteOrderData.gas, null, null, ticketID = response.ticketID, null)
-            Ok(views.html.index(success = response.ticketID))
-          } else {
-            val response = transactionsBuyerExecuteOrder.Service.post( transactionsBuyerExecuteOrder.Request(from = request.session.get(constants.Security.USERNAME).get, password = buyerExecuteOrderData.password, buyerAddress = buyerExecuteOrderData.buyerAddress, sellerAddress = buyerExecuteOrderData.sellerAddress, fiatProofHash = buyerExecuteOrderData.fiatProofHash, pegHash = buyerExecuteOrderData.pegHash, gas = buyerExecuteOrderData.gas))
-            blockchainTransactionBuyerExecuteOrders.Service.addBuyerExecuteOrder(from = request.session.get(constants.Security.USERNAME).get, buyerAddress = buyerExecuteOrderData.buyerAddress, sellerAddress = buyerExecuteOrderData.sellerAddress, fiatProofHash = buyerExecuteOrderData.fiatProofHash, pegHash = buyerExecuteOrderData.pegHash, gas = buyerExecuteOrderData.gas, null, txHash = Option(response.TxHash), ticketID = Random.nextString(32), null)
-            Ok(views.html.index(success = response.TxHash))
+  def buyerExecuteOrder: Action[AnyContent] = withZoneLoginAction.authenticated { username =>
+    implicit request =>
+      master.BuyerExecuteOrder.form.bindFromRequest().fold(
+        formWithErrors => {
+          BadRequest(views.html.component.master.buyerExecuteOrder(formWithErrors))
+        },
+        buyerExecuteOrderData => {
+          try {
+            if (kafkaEnabled) {
+              val response = transactionsBuyerExecuteOrder.Service.kafkaPost(transactionsBuyerExecuteOrder.Request(from = username, password = buyerExecuteOrderData.password, buyerAddress = buyerExecuteOrderData.buyerAddress, sellerAddress = buyerExecuteOrderData.sellerAddress, fiatProofHash = buyerExecuteOrderData.fiatProofHash, pegHash = buyerExecuteOrderData.pegHash, gas = buyerExecuteOrderData.gas))
+              blockchainTransactionBuyerExecuteOrders.Service.addBuyerExecuteOrderKafka(from = username, buyerAddress = buyerExecuteOrderData.buyerAddress, sellerAddress = buyerExecuteOrderData.sellerAddress, fiatProofHash = buyerExecuteOrderData.fiatProofHash, pegHash = buyerExecuteOrderData.pegHash, gas = buyerExecuteOrderData.gas, null, null, ticketID = response.ticketID, null)
+              Ok(views.html.index(success = response.ticketID))
+            } else {
+              val response = transactionsBuyerExecuteOrder.Service.post(transactionsBuyerExecuteOrder.Request(from = username, password = buyerExecuteOrderData.password, buyerAddress = buyerExecuteOrderData.buyerAddress, sellerAddress = buyerExecuteOrderData.sellerAddress, fiatProofHash = buyerExecuteOrderData.fiatProofHash, pegHash = buyerExecuteOrderData.pegHash, gas = buyerExecuteOrderData.gas))
+              blockchainTransactionBuyerExecuteOrders.Service.addBuyerExecuteOrder(from = username, buyerAddress = buyerExecuteOrderData.buyerAddress, sellerAddress = buyerExecuteOrderData.sellerAddress, fiatProofHash = buyerExecuteOrderData.fiatProofHash, pegHash = buyerExecuteOrderData.pegHash, gas = buyerExecuteOrderData.gas, null, txHash = Option(response.TxHash), ticketID = Random.nextString(32), null)
+              Ok(views.html.index(success = response.TxHash))
+            }
+          }
+          catch {
+            case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))
+            case blockChainException: BlockChainException => Ok(views.html.index(failure = blockChainException.message))
+
           }
         }
-        catch {
-          case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))
-          case blockChainException: BlockChainException => Ok(views.html.index(failure = blockChainException.message))
-
-        }
-      }
-    )
+      )
   }
 
   def blockchainBuyerExecuteOrderForm: Action[AnyContent] = Action { implicit request =>
@@ -59,11 +62,11 @@ class BuyerExecuteOrderController @Inject()(messagesControllerComponents: Messag
       buyerExecuteOrderData => {
         try {
           if (kafkaEnabled) {
-            val response = transactionsBuyerExecuteOrder.Service.kafkaPost( transactionsBuyerExecuteOrder.Request(from = buyerExecuteOrderData.from, password = buyerExecuteOrderData.password, buyerAddress = buyerExecuteOrderData.buyerAddress, sellerAddress = buyerExecuteOrderData.sellerAddress, fiatProofHash = buyerExecuteOrderData.fiatProofHash, pegHash = buyerExecuteOrderData.pegHash, gas = buyerExecuteOrderData.gas))
+            val response = transactionsBuyerExecuteOrder.Service.kafkaPost(transactionsBuyerExecuteOrder.Request(from = buyerExecuteOrderData.from, password = buyerExecuteOrderData.password, buyerAddress = buyerExecuteOrderData.buyerAddress, sellerAddress = buyerExecuteOrderData.sellerAddress, fiatProofHash = buyerExecuteOrderData.fiatProofHash, pegHash = buyerExecuteOrderData.pegHash, gas = buyerExecuteOrderData.gas))
             blockchainTransactionBuyerExecuteOrders.Service.addBuyerExecuteOrderKafka(from = buyerExecuteOrderData.from, buyerAddress = buyerExecuteOrderData.buyerAddress, sellerAddress = buyerExecuteOrderData.sellerAddress, fiatProofHash = buyerExecuteOrderData.fiatProofHash, pegHash = buyerExecuteOrderData.pegHash, gas = buyerExecuteOrderData.gas, null, null, ticketID = response.ticketID, null)
             Ok(views.html.index(success = response.ticketID))
           } else {
-            val response = transactionsBuyerExecuteOrder.Service.post( transactionsBuyerExecuteOrder.Request(from = buyerExecuteOrderData.from, password = buyerExecuteOrderData.password, buyerAddress = buyerExecuteOrderData.buyerAddress, sellerAddress = buyerExecuteOrderData.sellerAddress, fiatProofHash = buyerExecuteOrderData.fiatProofHash, pegHash = buyerExecuteOrderData.pegHash, gas = buyerExecuteOrderData.gas))
+            val response = transactionsBuyerExecuteOrder.Service.post(transactionsBuyerExecuteOrder.Request(from = buyerExecuteOrderData.from, password = buyerExecuteOrderData.password, buyerAddress = buyerExecuteOrderData.buyerAddress, sellerAddress = buyerExecuteOrderData.sellerAddress, fiatProofHash = buyerExecuteOrderData.fiatProofHash, pegHash = buyerExecuteOrderData.pegHash, gas = buyerExecuteOrderData.gas))
             blockchainTransactionBuyerExecuteOrders.Service.addBuyerExecuteOrder(from = buyerExecuteOrderData.from, buyerAddress = buyerExecuteOrderData.buyerAddress, sellerAddress = buyerExecuteOrderData.sellerAddress, fiatProofHash = buyerExecuteOrderData.fiatProofHash, pegHash = buyerExecuteOrderData.pegHash, gas = buyerExecuteOrderData.gas, null, txHash = Option(response.TxHash), ticketID = Random.nextString(32), null)
             Ok(views.html.index(success = response.TxHash))
           }

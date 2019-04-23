@@ -1,25 +1,25 @@
 package controllers
 
-import controllers.actions.WithLoginActionTest
+import controllers.actions.WithLoginAction
 import exceptions.BaseException
 import javax.inject.Inject
 import models.master.Contacts
 import models.masterTransaction.EmailOTPs
-import play.api.{Configuration, Logger}
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
+import play.api.{Configuration, Logger}
 import utilities.{Email, PushNotifications}
 import views.companion.master.VerifyEmailAddress
 
 import scala.concurrent.ExecutionContext
 
-class VerifyEmailAddressController @Inject()(messagesControllerComponents: MessagesControllerComponents, emailOTPs: EmailOTPs, contacts: Contacts, withLoginActionTest: WithLoginActionTest, pushNotifications: PushNotifications, email: Email)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class VerifyEmailAddressController @Inject()(messagesControllerComponents: MessagesControllerComponents, emailOTPs: EmailOTPs, contacts: Contacts, withLoginAction: WithLoginAction, pushNotifications: PushNotifications, email: Email)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val module: String = constants.Module.MASTER_ACCOUNT
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  def verifyEmailAddressForm: Action[AnyContent] = withLoginActionTest.authenticated { username =>
+  def verifyEmailAddressForm: Action[AnyContent] = withLoginAction.authenticated { username =>
     implicit request =>
       try {
         val otp = emailOTPs.Service.sendOTP(username)
@@ -31,7 +31,7 @@ class VerifyEmailAddressController @Inject()(messagesControllerComponents: Messa
       }
   }
 
-  def verifyEmailAddress: Action[AnyContent] = withLoginActionTest.authenticated { username =>
+  def verifyEmailAddress: Action[AnyContent] = withLoginAction.authenticated { username =>
     implicit request =>
       VerifyEmailAddress.form.bindFromRequest().fold(
         formWithErrors => {
