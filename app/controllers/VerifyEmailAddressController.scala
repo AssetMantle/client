@@ -1,11 +1,11 @@
 package controllers
 
 import controllers.actions.WithLoginActionTest
-import exceptions.{BaseException, BlockChainException}
+import exceptions.BaseException
 import javax.inject.Inject
 import models.master.Contacts
 import models.masterTransaction.EmailOTPs
-import play.api.Configuration
+import play.api.{Configuration, Logger}
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import utilities.{Email, PushNotifications}
@@ -17,20 +17,21 @@ class VerifyEmailAddressController @Inject()(messagesControllerComponents: Messa
 
   private implicit val module: String = constants.Module.MASTER_ACCOUNT
 
-  def verifyEmailAddressForm: Action[AnyContent] = withLoginActionTest.isAuthenticated { username =>
+  private implicit val logger: Logger = Logger(this.getClass)
+
+  def verifyEmailAddressForm: Action[AnyContent] = withLoginActionTest.authenticated { username =>
     implicit request =>
-      val otp = emailOTPs.Service.sendOTP(username)
       try {
+        val otp = emailOTPs.Service.sendOTP(username)
         email.sendEmail(username, constants.Email.OTP, Seq(otp))
         Ok(views.html.component.master.verifyEmailAddress(VerifyEmailAddress.form))
       }
       catch {
         case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))
-        case blockChainException: BlockChainException => Ok(views.html.index(failure = blockChainException.message))
       }
   }
 
-  def verifyEmailAddress: Action[AnyContent] = withLoginActionTest.isAuthenticated { username =>
+  def verifyEmailAddress: Action[AnyContent] = withLoginActionTest.authenticated { username =>
     implicit request =>
       VerifyEmailAddress.form.bindFromRequest().fold(
         formWithErrors => {
@@ -44,7 +45,6 @@ class VerifyEmailAddressController @Inject()(messagesControllerComponents: Messa
           }
           catch {
             case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))
-            case blockChainException: BlockChainException => Ok(views.html.index(failure = blockChainException.message))
           }
         })
   }

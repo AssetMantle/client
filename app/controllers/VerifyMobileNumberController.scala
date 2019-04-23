@@ -2,7 +2,7 @@ package controllers
 
 import constants.Security
 import controllers.actions.WithLoginAction
-import exceptions.{BaseException, BlockChainException}
+import exceptions.BaseException
 import javax.inject.Inject
 import models.master.Contacts
 import models.masterTransaction.SMSOTPs
@@ -19,14 +19,13 @@ class VerifyMobileNumberController @Inject()(messagesControllerComponents: Messa
   private implicit val module: String = constants.Module.MASTER_ACCOUNT
 
   def verifyMobileNumberForm: Action[AnyContent] = withLoginAction { implicit request =>
-    val otp = smsOTPs.Service.sendOTP(request.session.get(Security.USERNAME).get)
     try {
+      val otp = smsOTPs.Service.sendOTP(request.session.get(Security.USERNAME).get)
       SMS.sendSMS(request.session.get(Security.USERNAME).get, constants.SMS.OTP, Seq(otp))
       Ok(views.html.component.master.verifyMobileNumber(VerifyMobileNumber.form))
     }
     catch {
       case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))
-      case blockChainException: BlockChainException => Ok(views.html.index(failure = blockChainException.message))
     }
   }
 
@@ -43,7 +42,6 @@ class VerifyMobileNumberController @Inject()(messagesControllerComponents: Messa
         }
         catch {
           case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))
-          case blockChainException: BlockChainException => Ok(views.html.index(failure = blockChainException.message))
         }
       })
   }
