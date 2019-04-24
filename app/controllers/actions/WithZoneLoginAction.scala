@@ -12,7 +12,7 @@ import scala.concurrent.ExecutionContext
 
 class WithZoneLoginAction @Inject()(messagesControllerComponents: MessagesControllerComponents, masterAccounts: master.Accounts, accountTokens: AccountTokens)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
-  private implicit val module: String = constants.Module.ACTIONS_WITH_UNKNOWN_LOGIN_ACTION
+  private implicit val module: String = constants.Module.ACTIONS_WITH_ZONE_LOGIN_ACTION
 
   def authenticated(f: ⇒ String => Request[AnyContent] => Result)(implicit logger: Logger): Action[AnyContent] = {
     Action { implicit request ⇒
