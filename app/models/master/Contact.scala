@@ -30,16 +30,16 @@ class Contacts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   private def findById(id: String): Future[Contact] = db.run(contactTable.filter(_.id === id).result.head)
 
-  private def findEmailAddressById(id: String)(implicit executionContext: ExecutionContext): Future[String] = db.run(contactTable.filter(_.id === id).result.head.asTry).map {
-    case Success(result) => result.emailAddress
+  private def findEmailAddressById(id: String)(implicit executionContext: ExecutionContext): Future[String] = db.run(contactTable.filter(_.id === id).map(_.emailAddress).result.head.asTry).map {
+    case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
         throw new BaseException(constants.Error.NO_SUCH_ELEMENT_EXCEPTION)
     }
   }
 
-  private def findMobileNumberById(id: String)(implicit executionContext: ExecutionContext): Future[String] = db.run(contactTable.filter(_.id === id).result.head.asTry).map {
-    case Success(result) => result.mobileNumber
+  private def findMobileNumberById(id: String)(implicit executionContext: ExecutionContext): Future[String] = db.run(contactTable.filter(_.id === id).map(_.mobileNumber).result.head.asTry).map {
+    case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
         throw new BaseException(constants.Error.NO_SUCH_ELEMENT_EXCEPTION)

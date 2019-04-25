@@ -1,7 +1,6 @@
 package constants
 
 object CountryCallingCode {
-  // format: OFF
   val COUNTRY_CODES: Seq[(String, String)] = Seq(
     "+1" -> "(+1) UNITED STATES, CANADA",
     "+1340" -> "(+1340) US VIRGIN ISLANDS",

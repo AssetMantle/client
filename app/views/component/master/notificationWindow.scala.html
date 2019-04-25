@@ -37,10 +37,10 @@
 
                         </div>
                         <div id="seeAll" class="seeAll">
-                             @if(pageNumber!=1) { <div style="display: inline-block;" onclick="changeNotificationPage(@pageNumber-1)" class="previous"><h3>&laquo; Previous</h3></div> }
+                             @if(pageNumber!=1) { <div style="display: inline-block;cursor: pointer;" onclick="changeNotificationPage(@pageNumber-1)" class="previous"><h3>&laquo; Previous</h3></div> }
                              @if(notificationList != null) {
                                 @if(notificationList.length == limit) {
-                                    <div style="display: inline-block;" onclick="changeNotificationPage(@pageNumber+1)" class="next"><h3>Next &raquo;</h3></div>
+                                    <div style="display: inline-block;cursor: pointer;" onclick="changeNotificationPage(@pageNumber+1)" class="next"><h3>Next &raquo;</h3></div>
                                 }
                             }
                         </div>

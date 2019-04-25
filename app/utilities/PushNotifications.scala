@@ -10,7 +10,7 @@ import play.api.i18n.{Lang, Langs, MessagesApi}
 import play.api.libs.json.{Json, OWrites}
 import play.api.libs.ws.{WSClient, WSResponse}
 
-import scala.concurrent.{Await, ExecutionContext}
+import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.concurrent.duration.Duration
 
 class PushNotifications @Inject()(wsClient: WSClient, notifications: Notifications, accounts: Accounts, accountTokens: AccountTokens, langs: Langs, messagesApi: MessagesApi)(implicit exec: ExecutionContext, configuration: Configuration) {
@@ -34,7 +34,7 @@ class PushNotifications @Inject()(wsClient: WSClient, notifications: Notificatio
 
   private implicit val notificationWrites: OWrites[Notification] = Json.writes[Notification]
 
-  def registerNotificationToken(id: String, notificationToken: String): Int = accountTokens.Service.updateToken(id, notificationToken)
+  def registerNotificationToken(id: String, notificationToken: String) = Future {accountTokens.Service.updateToken(id, notificationToken)}
 
   private implicit val dataWrites: OWrites[Data] = Json.writes[Data]
 
