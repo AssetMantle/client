@@ -1,0 +1,5 @@
+@()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
+<div class="search">
+    <input class="search" id="search_value" placeholder="@Messages(constants.Common.SEARCH_TX_HASH_HEIGHT)"/>
+    <button onclick='searchFunction("@configuration.get[String]("blockchain.main.ip")" + ":" + "@configuration.get[String]("blockchain.main.abciPort")" + "/block?height=", "@configuration.get[String]("blockchain.main.ip")" + ":" + "@configuration.get[String]("blockchain.main.abciPort")" + "/txs/" )' >@Messages(constants.Common.SEARCH)</button>
+</div>

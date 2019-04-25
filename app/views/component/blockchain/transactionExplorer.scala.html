@@ -1,9 +1,23 @@
 @()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
-<div style="float: right;">
-    <p>@Messages("Transactions")</p>
-    <ul id="transactionList"></ul>
+<div class="txs">
+    <p class="heading_text">@Messages(constants.Common.TRANSACTIONS)</p>
+    <div class="blocks_table_head_div">
+        <table class="blocks_table_head" >
+            <thead>
+                <tr>
+                    <th>@Messages(constants.Common.HEIGHT)</th>
+                    <th>@Messages(constants.Common.TRANSACTION_HASH)</th>
+                    <th>@Messages(constants.Common.TYPE)</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+    <div class="inner_table">
+        <table class="blocks_inner_table">
+            <tbody id="transaction_container">
+            </tbody>
+        </table>
+    </div>
 </div>
 <script src="@routes.Assets.versioned("javascripts/transactionExplorer.js")" type="text/javascript"></script>
-<script>
-transactionExplorer("@configuration.get[String]("blockchain.blockExplorer.ip")" +  ":" + "@configuration.get[String]("blockchain.blockExplorer.port")" + "/tx", "@configuration.get[String]("blockchain.main.ip")" + ":" + "@configuration.get[String]("blockchain.main.restPort")" + "/txs/");
-</script>
+<script>transactionExplorer("@configuration.get[String]("blockchain.main.wsIP")" + ":" + "@configuration.get[String]("blockchain.main.abciPort")" + "/websocket", "@configuration.get[String]("blockchain.main.ip")" + ":" + "@configuration.get[String]("blockchain.main.restPort")" + "/txs/", "@configuration.get[String]("blockchain.main.ip")" + ":" + "@configuration.get[String]("blockchain.main.abciPort")" + "/block?height=");</script>

@@ -1,0 +1,31 @@
+@import transactions.Response.BlockHeightResponse.Response
+@(response: Response)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
+
+@common(Messages(constants.Common.BLOCK)) {
+    <div id="main_division">
+        <div class="side_division">
+        </div>
+    <div class="top_division">
+        <div class="blocksHeightPage">
+            @Messages(constants.Common.BLOCK): @response.result.block_meta.header.height <br>
+            @Messages(constants.Common.TIME): @response.result.block_meta.header.time<br>
+            @Messages(constants.Common.NUM_TXS): @response.result.block_meta.header.num_txs
+        </div>
+    </div>
+    <div class="bottom_division">
+        <div class="transaction-block">
+            <h4 class="data-box-sub-header">@Messages(constants.Common.TRANSACTIONS)</h4>
+            <h3 class="data-box-header">@response.result.block_meta.header.data_hash</h3>
+
+        </div>
+        <div class="evidenceBlocks">
+            <h3 class="data-box-header">@Messages(constants.Common.EVIDENCE_HASH)</h3>
+            <p>@response.result.block_meta.header.evidence_hash</p>
+        </div>
+        <div class="validators-hash">
+            <h3 class="data-box-header">@Messages(constants.Common.VALIDATORS_HASH)</h3>
+            <p>@response.result.block_meta.header.validators_hash</p>
+        </div>
+    </div>
+    </div>
+}

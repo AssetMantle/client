@@ -1,0 +1,6 @@
+@()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
+<div class="validators">
+    @Messages(constants.Common.VALIDATORS) <a href="@routes.IndexController.validatorsList">@Messages(constants.Common.SEE_ALL)</a>
+    <p id="validator"><b>12</b></p>
+</div>
+<script>getValidators("@configuration.get[String]("blockchain.main.ip")" + ":" + "@configuration.get[String]("blockchain.main.restPort")" + "/stake/validators", "validator")</script>

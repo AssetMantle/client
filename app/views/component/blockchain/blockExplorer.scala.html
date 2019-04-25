@@ -1,9 +1,23 @@
 @()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
-<div style="float: left;">
-    <p>@Messages("Blocks")</p>
-    <ul id="blockList"></ul>
+<div class="blocks"><script id="seeall_blocks" src="@routes.Assets.versioned("javascripts/blockExplorer.js")" type="text/javascript"></script>
+    <p class="heading_text">@Messages(constants.Common.BLOCKS)</p>
+    <div class="blocks_table_head_div">
+        <table class="blocks_table_head" >
+            <thead>
+                <tr>
+                    <th>@Messages(constants.Common.HEIGHT)</th>
+                    <th>@Messages(constants.Common.NUM_TXS)</th>
+                    <th>@Messages(constants.Common.TIME)</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+    <div class="inner_table">
+        <table class="blocks_inner_table">
+            <tbody id="block_container">
+            </tbody>
+        </table>
+    </div>
+    <a href="@routes.IndexController.showAllBlocks">@Messages(constants.Common.SEE_ALL)</a>
 </div>
-<script src="@routes.Assets.versioned("javascripts/blockExplorer.js")" type="text/javascript"></script>
-<script>
-blockExplorer("@configuration.get[String]("blockchain.blockExplorer.ip")" +  ":" + "@configuration.get[String]("blockchain.blockExplorer.port")" + "/block", "@configuration.get[String]("blockchain.main.ip")" + ":" + "@configuration.get[String]("blockchain.main.abciPort")" + "/block?height=");
-</script>
+<script>blockExplorer("block_container", "@configuration.get[String]("blockchain.main.wsIP")" + ":" + "@configuration.get[String]("blockchain.main.abciPort")" + "/websocket", "./block?blockHeight=", "@configuration.get[String]("blockchain.main.ip")" + ":" + "@configuration.get[String]("blockchain.main.abciPort")" + "/abci_info", "@configuration.get[String]("blockchain.main.ip")" + ":" + "@configuration.get[String]("blockchain.main.abciPort")");</script>

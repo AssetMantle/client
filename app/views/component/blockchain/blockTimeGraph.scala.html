@@ -1,0 +1,5 @@
+@()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
+<div class="chart">
+    <canvas id="blockTimes"></canvas>
+    <script>graph("Block Times", "blockTimes")</script>
+</div>
