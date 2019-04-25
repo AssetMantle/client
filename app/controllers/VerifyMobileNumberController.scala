@@ -1,14 +1,13 @@
 package controllers
 
-import constants.Security
 import controllers.actions.WithLoginAction
-import exceptions.{BaseException, BlockChainException}
+import exceptions.BaseException
 import javax.inject.Inject
 import models.master.Contacts
 import models.masterTransaction.SMSOTPs
-import play.api.Configuration
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
+import play.api.{Configuration, Logger}
 import utilities.{PushNotifications, SMS}
 import views.companion.master.VerifyMobileNumber
 
@@ -18,33 +17,35 @@ class VerifyMobileNumberController @Inject()(messagesControllerComponents: Messa
 
   private implicit val module: String = constants.Module.MASTER_ACCOUNT
 
-  def verifyMobileNumberForm: Action[AnyContent] = withLoginAction { implicit request =>
-    val otp = smsOTPs.Service.sendOTP(request.session.get(Security.USERNAME).get)
-    try {
-      SMS.sendSMS(request.session.get(Security.USERNAME).get, constants.SMS.OTP, Seq(otp))
-      Ok(views.html.component.master.verifyMobileNumber(VerifyMobileNumber.form))
-    }
-    catch {
-      case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))
-      case blockChainException: BlockChainException => Ok(views.html.index(failure = blockChainException.message))
-    }
+  private implicit val logger: Logger = Logger(this.getClass)
+
+  def verifyMobileNumberForm: Action[AnyContent] = withLoginAction.authenticated { username =>
+    implicit request =>
+      try {
+        val otp = smsOTPs.Service.sendOTP(username)
+        SMS.sendSMS(username, constants.SMS.OTP, Seq(otp))
+        Ok(views.html.component.master.verifyMobileNumber(VerifyMobileNumber.form))
+      }
+      catch {
+        case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))
+      }
   }
 
-  def verifyMobileNumber: Action[AnyContent] = withLoginAction { implicit request =>
-    VerifyMobileNumber.form.bindFromRequest().fold(
-      formWithErrors => {
-        BadRequest(views.html.component.master.verifyMobileNumber(formWithErrors))
-      },
-      verifyMobileNumberData => {
-        try {
-          if (!smsOTPs.Service.verifyOTP(request.session.get(Security.USERNAME).get, verifyMobileNumberData.otp)) throw new BaseException(constants.Error.INVALID_OTP)
-          if (contacts.Service.verifyMobileNumber(request.session.get(Security.USERNAME).get) != 1) throw new BaseException(constants.Error.MOBILE_NUMBER_NOT_FOUND)
-          Ok(views.html.index(success = Messages(constants.Flash.SUCCESS)))
-        }
-        catch {
-          case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))
-          case blockChainException: BlockChainException => Ok(views.html.index(failure = blockChainException.message))
-        }
-      })
+  def verifyMobileNumber: Action[AnyContent] = withLoginAction.authenticated { username =>
+    implicit request =>
+      VerifyMobileNumber.form.bindFromRequest().fold(
+        formWithErrors => {
+          BadRequest(views.html.component.master.verifyMobileNumber(formWithErrors))
+        },
+        verifyMobileNumberData => {
+          try {
+            if (!smsOTPs.Service.verifyOTP(username, verifyMobileNumberData.otp)) throw new BaseException(constants.Error.INVALID_OTP)
+            if (contacts.Service.verifyMobileNumber(username) != 1) throw new BaseException(constants.Error.MOBILE_NUMBER_NOT_FOUND)
+            Ok(views.html.index(success = Messages(constants.Flash.SUCCESS)))
+          }
+          catch {
+            case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))
+          }
+        })
   }
 }
