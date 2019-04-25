@@ -1,13 +1,13 @@
 @()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
-@common(Messages(constants.Common.VALIDATORS)){
+@common(Messages(constants.Form.VALIDATORS)){
     <script src="@routes.Assets.versioned("javascripts/validators.js")" type="text/javascript"></script>
     <div>
         <table id="validatorsTable">
             <tr>
-                <th>@Messages(constants.Common.OPERATOR)</th>
-                <th>@Messages(constants.Common.STATUS)</th>
-                <th>@Messages(constants.Common.TOKENS)</th>
-                <th>@Messages(constants.Common.DELEGATOR_SHARES)</th>
+                <th>@Messages(constants.Form.OPERATOR)</th>
+                <th>@Messages(constants.Form.STATUS)</th>
+                <th>@Messages(constants.Form.TOKENS)</th>
+                <th>@Messages(constants.Form.DELEGATOR_SHARES)</th>
             </tr>
             <tbody id="validatorsTableBody"></tbody>
         </table>

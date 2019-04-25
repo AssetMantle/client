@@ -5,7 +5,6 @@
     <script src="@routes.Assets.versioned("javascripts/search.js")" type="text/javascript"></script>
     <script src="@routes.Assets.versioned("javascripts/averageBlockTimeUpdater.js")" type="text/javascript"></script>
     <script src="@routes.Assets.versioned("javascripts/lastBlock.js")" type="text/javascript"></script>
-    <script src="@routes.Assets.versioned("javascripts/utilities/graph.js")" type="text/javascript"></script>
     <script src="@routes.Assets.versioned("javascripts/validators.js")" type="text/javascript"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.js"></script>
@@ -14,7 +13,7 @@
 
     <div id="main_division">
         <div class="side_division">
-            @Messages(constants.Common.MASTER)
+            @Messages(constants.Form.MASTER)
             <a href="@routes.LoginController.loginForm">@Messages(constants.Form.LOGIN)</a>
             <a href="@routes.LogoutController.logoutForm">@Messages(constants.Form.LOGOUT)</a>
             <a href="@routes.SignUpController.signUpForm">@Messages(constants.Form.SIGNUP)</a>
@@ -42,7 +41,7 @@
             <a href="@routes.SetBuyerFeedbackController.setBuyerFeedbackForm">@Messages(constants.Form.SET_BUYER_FEEDBACK)</a>
             <a href="@routes.SetSellerFeedbackController.setSellerFeedbackForm">@Messages(constants.Form.SET_SELLER_FEEDBACK)</a>
                  <br><br><br>
-            @Messages(constants.Common.BLOCKCHAIN)
+            @Messages(constants.Form.BLOCKCHAIN)
 
 
             <a href="@routes.AddKeyController.blockchainAddKeyForm">@Messages(constants.Form.ADD_KEY)</a>
@@ -72,7 +71,7 @@
             @lastBlockHeight()
             @validators()
             <div class="tokens">
-                @Messages(constants.Common.TOKENS)
+                @Messages(constants.Form.TOKENS)
                 <p id="tokens_value"><b>12</b></p>
             </div>
           @averageBlockTime()
