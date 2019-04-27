@@ -91,11 +91,10 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
                 Ok(views.html.index(success = response.ticketID))
               } else {
                 val toAddress = masterAccounts.Service.getAddress(issueAssetData.accountID)
-                val zoneAddress = masterAccounts.Service.getAddress(username)
                 val response = transactionsIssueAsset.Service.post(transactionsIssueAsset.Request(from = username, to = toAddress, password = issueAssetData.password, documentHash = issueAssetData.documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.assetPrice, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.assetQuantity, gas = issueAssetData.gas))
+                val zoneAddress = masterAccounts.Service.getAddress(username)
                 blockchainTransactionIssueAssets.Service.addIssueAsset(from = username, to = toAddress, documentHash = issueAssetData.documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.assetPrice, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.assetQuantity, gas = issueAssetData.gas, null, txHash = Option(response.TxHash), ticketID = Random.nextString(32), null)
                 masterTransactionIssueAssetRequests.Service.updateStatusAndGas(issueAssetData.requestID, true, issueAssetData.gas)
-                blockchainAccounts.Service.updateSequence(toAddress, blockchainAccounts.Service.getSequence(toAddress) + 1)
                 blockchainAccounts.Service.updateSequence(zoneAddress, blockchainAccounts.Service.getSequence(zoneAddress) + 1)
                 for (tag <- response.Tags) {
                   if (tag.Key == constants.Response.KEY_ASSET) {

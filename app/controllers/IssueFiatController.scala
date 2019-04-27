@@ -91,11 +91,10 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
                 Ok(views.html.index(success = response.ticketID))
               } else {
                 val toAddress = masterAccounts.Service.getAddress(issueFiatData.accountID)
-                val zoneAddress = masterAccounts.Service.getAddress(username)
                 val response = transactionsIssueFiat.Service.post(transactionsIssueFiat.Request(from = username, to = toAddress, password = issueFiatData.password, transactionID = issueFiatData.transactionID, transactionAmount = issueFiatData.transactionAmount, gas = issueFiatData.gas))
+                val zoneAddress = masterAccounts.Service.getAddress(username)
                 blockchainTransactionIssueFiats.Service.addIssueFiat(from = username, to = toAddress, transactionID = issueFiatData.transactionID, transactionAmount = issueFiatData.transactionAmount, gas = issueFiatData.gas, null, txHash = Option(response.TxHash), ticketID = Random.nextString(32), null)
                 masterTransactionIssueFiatRequests.Service.updateStatusAndGas(issueFiatData.requestID, true, issueFiatData.gas)
-                blockchainAccounts.Service.updateSequence(toAddress, blockchainAccounts.Service.getSequence(toAddress) + 1)
                 blockchainAccounts.Service.updateSequence(zoneAddress, blockchainAccounts.Service.getSequence(zoneAddress) + 1)
                 for (tag <- response.Tags) {
                   if (tag.Key == constants.Response.KEY_FIAT) {

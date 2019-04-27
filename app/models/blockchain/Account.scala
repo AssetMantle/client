@@ -1,12 +1,14 @@
 package models.blockchain
 
-import exceptions.BaseException
+import exceptions.{BaseException, BlockChainException}
 import javax.inject.Inject
 import org.postgresql.util.PSQLException
-import play.api.Logger
+import play.api.{Configuration, Logger}
 import play.api.db.slick.DatabaseConfigProvider
+import play.api.libs.ws.WSClient
 import slick.jdbc.JdbcProfile
-import transactions.{AddKey, GetSeed}
+import transactions.{AddKey, GetAccount, GetSeed}
+import utilities.PushNotifications
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
@@ -37,6 +39,16 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
   }
 
   private def updateSequenceByAddress(address: String, sequence: Int)(implicit executionContext: ExecutionContext): Future[Int] = db.run(accountTable.filter(_.address === address).map(_.sequence).update(sequence).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+        throw new BaseException(constants.Error.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+        throw new BaseException(constants.Error.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def updateCoinsByAddress(address: String, coins: Int)(implicit executionContext: ExecutionContext): Future[Int] = db.run(accountTable.filter(_.address === address).map(_.coins).update(coins).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
@@ -121,6 +133,8 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     def getSequence(address: String)(implicit executionContext: ExecutionContext): Int = Await.result(getSequenceByAddress(address), Duration.Inf)
 
     def updateSequence(address: String, sequence: Int)(implicit executionContext: ExecutionContext): Int = Await.result(updateSequenceByAddress(address, sequence), Duration.Inf)
+
+    def updateCoins(address: String, coins: Int)(implicit executionContext: ExecutionContext): Int = Await.result(updateCoinsByAddress(address, coins), Duration.Inf)
 
     def updateSequenceAndCoins(address: String, sequence: Int, coins: Int)(implicit executionContext: ExecutionContext): Int = Await.result(updateSequenceAndCoinsByAddress(address, sequence, coins), Duration.Inf)
 

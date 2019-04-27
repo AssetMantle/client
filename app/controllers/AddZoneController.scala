@@ -3,7 +3,7 @@ package controllers
 import controllers.actions.{WithGenesisLoginAction, WithUserLoginAction}
 import exceptions.{BaseException, BlockChainException}
 import javax.inject.Inject
-import models.{blockchainTransaction, master}
+import models.{blockchain, blockchainTransaction, master}
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
@@ -11,7 +11,7 @@ import play.api.{Configuration, Logger}
 import scala.concurrent.ExecutionContext
 import scala.util.Random
 
-class AddZoneController @Inject()(messagesControllerComponents: MessagesControllerComponents, transactionsAddZone: transactions.AddZone, blockchainZones: models.blockchain.Zones, blockchainTransactionAddZones: blockchainTransaction.AddZones, masterAccounts: master.Accounts, masterZones: master.Zones, withUserLoginAction: WithUserLoginAction, withGenesisLoginAction: WithGenesisLoginAction)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class AddZoneController @Inject()(messagesControllerComponents: MessagesControllerComponents, blockchainAccounts: blockchain.Accounts, transactionsAddZone: transactions.AddZone, blockchainZones: models.blockchain.Zones, blockchainTransactionAddZones: blockchainTransaction.AddZones, masterAccounts: master.Accounts, masterZones: master.Zones, withUserLoginAction: WithUserLoginAction, withGenesisLoginAction: WithGenesisLoginAction)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
 
@@ -51,18 +51,20 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
         verifyZoneData => {
           try {
             if (kafkaEnabled) {
-              val toAddress = masterAccounts.Service.getAddress(masterZones.Service.getAccountId(verifyZoneData.zoneID))
-              val response = transactionsAddZone.Service.kafkaPost(transactionsAddZone.Request(from = username, to = toAddress, zoneID = verifyZoneData.zoneID, password = verifyZoneData.password))
-              blockchainTransactionAddZones.Service.addZoneKafka(username, toAddress, verifyZoneData.zoneID, null, null, response.ticketID, null)
+              val zoneAccountAddress = masterAccounts.Service.getAddress(masterZones.Service.getAccountId(verifyZoneData.zoneID))
+              val response = transactionsAddZone.Service.kafkaPost(transactionsAddZone.Request(from = username, to = zoneAccountAddress, zoneID = verifyZoneData.zoneID, password = verifyZoneData.password))
+              blockchainTransactionAddZones.Service.addZoneKafka(username, zoneAccountAddress, verifyZoneData.zoneID, null, null, response.ticketID, null)
               Ok(views.html.index(success = Messages(constants.Success.VERIFY_ZONE) + verifyZoneData.zoneID + response.ticketID))
             } else {
               val zoneAccountID = masterZones.Service.getAccountId(verifyZoneData.zoneID)
               val zoneAccountAddress = masterAccounts.Service.getAddress(zoneAccountID)
               val response = transactionsAddZone.Service.post(transactionsAddZone.Request(from = username, to = zoneAccountAddress, zoneID = verifyZoneData.zoneID, password = verifyZoneData.password))
+              val fromAddress = masterAccounts.Service.getAddress(username)
               blockchainTransactionAddZones.Service.addZone(username, zoneAccountAddress, verifyZoneData.zoneID, null, Option(response.TxHash), Random.nextString(32), null)
               blockchainZones.Service.addZone(verifyZoneData.zoneID, zoneAccountAddress)
               masterZones.Service.updateStatus(verifyZoneData.zoneID, true)
               masterAccounts.Service.updateUserType(zoneAccountID, constants.User.ZONE)
+              blockchainAccounts.Service.updateSequence(fromAddress, blockchainAccounts.Service.getSequence(fromAddress) + 1)
               Ok(views.html.index(success = Messages(constants.Success.VERIFY_ZONE) + verifyZoneData.zoneID + response.TxHash))
             }
           }
