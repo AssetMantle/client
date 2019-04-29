@@ -38,8 +38,8 @@ object TicketIterator {
         onSuccess(ticketID, value)
       }
       catch {
-        case blockChainException: BlockChainException => logger.info(blockChainException.message, blockChainException)
-        case baseException: BaseException => logger.info(baseException.message, baseException)
+        case blockChainException: BlockChainException => logger.error(blockChainException.message, blockChainException)
+        case baseException: BaseException => logger.error(baseException.message, baseException)
       }
     }
   }

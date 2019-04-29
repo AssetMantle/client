@@ -1,7 +1,7 @@
 package models.blockchain
 
 import akka.actor.ActorSystem
-import exceptions.BaseException
+import exceptions.{BaseException, BlockChainException}
 import javax.inject.Inject
 import models.master
 import org.postgresql.util.PSQLException
@@ -60,6 +60,16 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
   }
 
   private def updateSequenceAndCoinsByAddress(address: String, sequence: Int, coins: Int)(implicit executionContext: ExecutionContext): Future[Int] = db.run(accountTable.filter(_.address === address).map(x => (x.sequence, x.coins)).update((sequence, coins)).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+        throw new BaseException(constants.Error.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+        throw new BaseException(constants.Error.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def updateSequenceCoinsAndDirtyBitByAddress(address: String, sequence: Int, coins: Int, dirtyBit: Boolean): Future[Int] = db.run(accountTable.filter(_.address === address).map(x => (x.sequence, x.coins, x.dirtyBit)).update((sequence, coins, dirtyBit)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
@@ -155,6 +165,8 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
     def updateSequenceAndCoins(address: String, sequence: Int, coins: Int)(implicit executionContext: ExecutionContext): Int = Await.result(updateSequenceAndCoinsByAddress(address, sequence, coins), Duration.Inf)
 
+    def updateSequenceCoinsAndDirtyBit(address: String, sequence: Int, coins: Int, dirtyBit: Boolean): Int = Await.result(updateSequenceCoinsAndDirtyBitByAddress(address, sequence, coins, dirtyBit), Duration.Inf)
+
     def getAccount(address: String)(implicit executionContext: ExecutionContext): Account = Await.result(findByAddress(address), Duration.Inf)
 
     def getCoins(address: String)(implicit executionContext: ExecutionContext): Int = Await.result(getCoinsByAddress(address), Duration.Inf)
@@ -166,13 +178,18 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   object Utility {
     def Iterator(): Unit = {
-      val dirtyAccounts = Service.getDirtyBits(dirtyBit = true)
-      Thread.sleep(configuration.get[Long]("blockchain.kafka.entityIterator.threadSleep"))
-      configuration.get[Long]("blockchain.kafka.entityIterator.threadSleep")
-      for (dirtyAccount <- dirtyAccounts) {
-        val responseAccount = getAccount.Service.get(dirtyAccount.address)
-        Service.updateSequenceAndCoins(responseAccount.value.address, responseAccount.value.sequence.toInt, responseAccount.value.coins.get.filter(_.denom == "comdex").map(_.amount.toInt).sum)
-
+      try {
+        val dirtyAccounts = Service.getDirtyBits(dirtyBit = true)
+        Thread.sleep(configuration.get[Long]("blockchain.kafka.entityIterator.threadSleep"))
+        configuration.get[Long]("blockchain.kafka.entityIterator.threadSleep")
+        for (dirtyAccount <- dirtyAccounts) {
+          val responseAccount = getAccount.Service.get(dirtyAccount.address)
+          Service.updateSequenceCoinsAndDirtyBit(responseAccount.value.address, responseAccount.value.sequence.toInt, responseAccount.value.coins.get.filter(_.denom == configuration.get[String]("blockchain.denom.gas")).map(_.amount.toInt).sum, dirtyBit = false)
+        }
+      } catch {
+        case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+        case blockChainException: BlockChainException => logger.error(blockChainException.message, blockChainException)
+        case baseException: BaseException => logger.error(constants.Error.BASE_EXCEPTION, baseException)
       }
     }
   }

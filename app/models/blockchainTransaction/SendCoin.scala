@@ -122,20 +122,25 @@ class SendCoins @Inject()(protected val databaseConfigProvider: DatabaseConfigPr
 
   object Utility {
     def onSuccess(ticketID: String, txHash: String): Unit = {
-      Service.updateTxHash(ticketID, txHash)
-      val sendCoin = Service.getTransaction(ticketID)
-      faucetRequests.Service.updateStatusAndGasOnTicketID(ticketID, status = true, sendCoin.gas)
+      try {
+        Service.updateTxHash(ticketID, txHash)
+        val sendCoin = Service.getTransaction(ticketID)
+        faucetRequests.Service.updateStatusAndGasOnTicketID(ticketID, status = true, sendCoin.gas)
 
-      blockchainAccounts.Service.updateDirtyBit(sendCoin.to, dirtyBit = true)
-      blockchainAccounts.Service.updateDirtyBit(masterAccounts.Service.getAddress(sendCoin.from), dirtyBit = true)
+        blockchainAccounts.Service.updateDirtyBit(sendCoin.to, dirtyBit = true)
+        blockchainAccounts.Service.updateDirtyBit(masterAccounts.Service.getAddress(sendCoin.from), dirtyBit = true)
 
-      val toAccount = masterAccounts.Service.getAccountByAddress(sendCoin.to)
-      if (toAccount.userType == constants.User.UNKNOWN) {
-        masterAccounts.Service.updateUserType(toAccount.id, constants.User.USER)
+        val toAccount = masterAccounts.Service.getAccountByAddress(sendCoin.to)
+        if (toAccount.userType == constants.User.UNKNOWN) {
+          masterAccounts.Service.updateUserType(toAccount.id, constants.User.USER)
+        }
+        pushNotifications.sendNotification(toAccount.id, constants.Notification.SUCCESS, Seq(sendCoin.txHash.get))
+        pushNotifications.sendNotification(sendCoin.from, constants.Notification.SUCCESS, Seq(sendCoin.txHash.get))
       }
-      pushNotifications.sendNotification(toAccount.id, constants.Notification.SUCCESS, Seq(sendCoin.txHash.get))
-      pushNotifications.sendNotification(sendCoin.from, constants.Notification.SUCCESS, Seq(sendCoin.txHash.get))
+      catch {
+        case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+          throw new BaseException(constants.Error.PSQL_EXCEPTION)
+      }
     }
   }
-
 }
