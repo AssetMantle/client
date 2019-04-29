@@ -1,20 +1,23 @@
 package models.blockchain
 
+import akka.actor.ActorSystem
 import exceptions.BaseException
 import javax.inject.Inject
+import models.master
 import org.postgresql.util.PSQLException
-import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
+import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
-import transactions.{AddKey, GetSeed}
+import transactions.{AddKey, GetAccount, GetSeed}
+import utilities.PushNotifications
 
-import scala.concurrent.duration.Duration
+import scala.concurrent.duration.{Duration, _}
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Account(address: String, coins: Int, publicKey: String, accountNumber: Int, sequence: Int)
+case class Account(address: String, coins: Int, publicKey: String, accountNumber: Int, sequence: Int, dirtyBit: Boolean)
 
-class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, getSeed: GetSeed, addKey: AddKey) {
+class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, getSeed: GetSeed, addKey: AddKey, getAccount: GetAccount, masterAccounts: master.Accounts, actorSystem: ActorSystem, implicit val pushNotifications: PushNotifications)(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -37,6 +40,16 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
   }
 
   private def updateSequenceByAddress(address: String, sequence: Int)(implicit executionContext: ExecutionContext): Future[Int] = db.run(accountTable.filter(_.address === address).map(_.sequence).update(sequence).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+        throw new BaseException(constants.Error.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+        throw new BaseException(constants.Error.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def updateDirtyBitByAddress(address: String, dirtyBit: Boolean): Future[Int] = db.run(accountTable.filter(_.address === address).map(_.dirtyBit).update(dirtyBit).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
@@ -76,6 +89,16 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     }
   }
 
+  private def getAccountsByDirtyBit(dirtyBit: Boolean): Future[Seq[Account]] = db.run(accountTable.filter(_.dirtyBit === dirtyBit).result.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+        throw new BaseException(constants.Error.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+        throw new BaseException(constants.Error.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
   private def getSequenceByAddress(address: String)(implicit executionContext: ExecutionContext): Future[Int] = db.run(accountTable.filter(_.address === address).map(_.sequence).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -98,7 +121,7 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   private[models] class AccountTable(tag: Tag) extends Table[Account](tag, "Account_BC") {
 
-    def * = (address, coins, publicKey, accountNumber, sequence) <> (Account.tupled, Account.unapply)
+    def * = (address, coins, publicKey, accountNumber, sequence, dirtyBit) <> (Account.tupled, Account.unapply)
 
     def address = column[String]("address", O.PrimaryKey)
 
@@ -109,13 +132,21 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     def accountNumber = column[Int]("accountNumber")
 
     def sequence = column[Int]("sequence")
+
+    def dirtyBit = column[Boolean]("dirtyBit")
+  }
+
+  if (configuration.get[Boolean]("blockchain.kafka.enabled")) {
+    actorSystem.scheduler.schedule(initialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds, interval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").second) {
+      Utility.Iterator()
+    }
   }
 
   object Service {
 
     def addAccount(username: String, password: String)(implicit executionContext: ExecutionContext): String = {
       val addKeyResponse = addKey.Service.post(addKey.Request(username, password, getSeed.Service.get().body))
-      Await.result(add(Account(addKeyResponse.address, 0, addKeyResponse.pub_key, -1, 0)), Duration.Inf)
+      Await.result(add(Account(addKeyResponse.address, 0, addKeyResponse.pub_key, -1, 0, dirtyBit = false)), Duration.Inf)
     }
 
     def getSequence(address: String)(implicit executionContext: ExecutionContext): Int = Await.result(getSequenceByAddress(address), Duration.Inf)
@@ -128,6 +159,22 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
     def getCoins(address: String)(implicit executionContext: ExecutionContext): Int = Await.result(getCoinsByAddress(address), Duration.Inf)
 
+    def getDirtyBits(dirtyBit: Boolean): Seq[Account] = Await.result(getAccountsByDirtyBit(dirtyBit), Duration.Inf)
+
+    def updateDirtyBit(address: String, dirtyBit: Boolean): Int = Await.result(updateDirtyBitByAddress(address, dirtyBit), Duration.Inf)
+  }
+
+  object Utility {
+    def Iterator(): Unit = {
+      val dirtyAccounts = Service.getDirtyBits(dirtyBit = true)
+      Thread.sleep(configuration.get[Long]("blockchain.kafka.entityIterator.threadSleep"))
+      configuration.get[Long]("blockchain.kafka.entityIterator.threadSleep")
+      for (dirtyAccount <- dirtyAccounts) {
+        val responseAccount = getAccount.Service.get(dirtyAccount.address)
+        Service.updateSequenceAndCoins(responseAccount.value.address, responseAccount.value.sequence.toInt, responseAccount.value.coins.get.filter(_.denom == "comdex").map(_.amount.toInt).sum)
+
+      }
+    }
   }
 
 }

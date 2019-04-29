@@ -5,9 +5,9 @@ import exceptions.BaseException
 import javax.inject.Inject
 import models.master.Accounts
 import org.postgresql.util.PSQLException
-import play.api.{Configuration, Logger}
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.ws.WSClient
+import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
 import transactions.GetResponse
 import utilities.PushNotifications
@@ -91,7 +91,7 @@ class SendFiats @Inject()(protected val databaseConfigProvider: DatabaseConfigPr
   }
 
   if (configuration.get[Boolean]("blockchain.kafka.enabled")) {
-    actorSystem.scheduler.schedule(initialDelay = configuration.get[Int]("blockchain.kafka.ticketIterator.initialDelay").seconds, interval = configuration.get[Int]("blockchain.kafka.ticketIterator.interval").second) {
+    actorSystem.scheduler.schedule(initialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds, interval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").second) {
       utilities.TicketIterator.start(Service.getTicketIDs, transactionSendFiat.Service.getTxHashFromWSResponse, Service.updateTxHash, Service.getAddress)
     }
   }

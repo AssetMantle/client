@@ -27,6 +27,7 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Account_BC"
   "publicKey"     VARCHAR NOT NULL,
   "accountNumber" INT     NOT NULL,
   "sequence"      INT     NOT NULL,
+  "dirtyBit"      BOOLEAN NOT NULL,
   PRIMARY KEY ("address")
 );
 
@@ -477,6 +478,7 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."AccountToken"
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."FaucetRequest"
 (
   "id"        VARCHAR NOT NULL,
+  "ticketID"  VARCHAR,
   "accountID" VARCHAR NOT NULL,
   "amount"    INT     NOT NULL,
   "gas"       INT,
@@ -603,8 +605,9 @@ ALTER TABLE MASTER_TRANSACTION."EmailOTP"
 
 /*Initial State*/
 
-INSERT INTO blockchain."Account_BC"("address", "coins", "publicKey", "accountNumber", "sequence")
-VALUES ('cosmos14375p72aunmu3vuwevu5e4vgegekd0n0sj9czh', 1000, 'VMzqh7vxmb/7W4w+1DQxAuISeI1dbCYPdcdIEh/HhRg=', 0, 0);
+INSERT INTO blockchain."Account_BC"("address", "coins", "publicKey", "accountNumber", "sequence", "dirtyBit")
+VALUES ('cosmos14375p72aunmu3vuwevu5e4vgegekd0n0sj9czh', 1000, 'VMzqh7vxmb/7W4w+1DQxAuISeI1dbCYPdcdIEh/HhRg=', 0, 0,
+        false);
 
 INSERT INTO master."Account"("id", "secretHash", "accountAddress", "language", "userType")
 VALUES ('main', '-1886325765', 'cosmos14375p72aunmu3vuwevu5e4vgegekd0n0sj9czh', 'en', 'GENESIS');

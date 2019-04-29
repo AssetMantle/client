@@ -29,11 +29,11 @@ class SendAssetController @Inject()(messagesControllerComponents: MessagesContro
       sendAssetData => {
         try {
           if (kafkaEnabled) {
-            val response = transactionsSendAsset.Service.kafkaPost( transactionsSendAsset.Request(from = request.session.get(constants.Security.USERNAME).get, to = sendAssetData.to, password = sendAssetData.password, pegHash = sendAssetData.pegHash, gas = sendAssetData.gas))
+            val response = transactionsSendAsset.Service.kafkaPost(transactionsSendAsset.Request(from = request.session.get(constants.Security.USERNAME).get, to = sendAssetData.to, password = sendAssetData.password, pegHash = sendAssetData.pegHash, gas = sendAssetData.gas))
             sendAssets.Service.addSendAssetKafka(from = request.session.get(constants.Security.USERNAME).get, to = sendAssetData.to, pegHash = sendAssetData.pegHash, gas = sendAssetData.gas, null, null, ticketID = response.ticketID, null)
             Ok(views.html.index(success = response.ticketID))
           } else {
-            val response = transactionsSendAsset.Service.post( transactionsSendAsset.Request(from = request.session.get(constants.Security.USERNAME).get, to = sendAssetData.to, password = sendAssetData.password, pegHash = sendAssetData.pegHash, gas = sendAssetData.gas))
+            val response = transactionsSendAsset.Service.post(transactionsSendAsset.Request(from = request.session.get(constants.Security.USERNAME).get, to = sendAssetData.to, password = sendAssetData.password, pegHash = sendAssetData.pegHash, gas = sendAssetData.gas))
             sendAssets.Service.addSendAsset(from = request.session.get(constants.Security.USERNAME).get, to = sendAssetData.to, pegHash = sendAssetData.pegHash, gas = sendAssetData.gas, null, txHash = Option(response.TxHash), ticketID = Random.nextString(32), null)
             Ok(views.html.index(success = response.TxHash))
           }
@@ -58,11 +58,11 @@ class SendAssetController @Inject()(messagesControllerComponents: MessagesContro
       sendAssetData => {
         try {
           if (kafkaEnabled) {
-            val response = transactionsSendAsset.Service.kafkaPost( transactionsSendAsset.Request(from = sendAssetData.from, to = sendAssetData.to, password = sendAssetData.password, pegHash = sendAssetData.pegHash, gas = sendAssetData.gas))
+            val response = transactionsSendAsset.Service.kafkaPost(transactionsSendAsset.Request(from = sendAssetData.from, to = sendAssetData.to, password = sendAssetData.password, pegHash = sendAssetData.pegHash, gas = sendAssetData.gas))
             sendAssets.Service.addSendAssetKafka(from = sendAssetData.from, to = sendAssetData.to, pegHash = sendAssetData.pegHash, gas = sendAssetData.gas, null, null, ticketID = response.ticketID, null)
             Ok(views.html.index(success = response.ticketID))
           } else {
-            val response = transactionsSendAsset.Service.post( transactionsSendAsset.Request(from = sendAssetData.from, to = sendAssetData.to, password = sendAssetData.password, pegHash = sendAssetData.pegHash, gas = sendAssetData.gas))
+            val response = transactionsSendAsset.Service.post(transactionsSendAsset.Request(from = sendAssetData.from, to = sendAssetData.to, password = sendAssetData.password, pegHash = sendAssetData.pegHash, gas = sendAssetData.gas))
             sendAssets.Service.addSendAsset(from = sendAssetData.from, to = sendAssetData.to, pegHash = sendAssetData.pegHash, gas = sendAssetData.gas, null, txHash = Option(response.TxHash), ticketID = Random.nextString(32), null)
             Ok(views.html.index(success = response.TxHash))
           }

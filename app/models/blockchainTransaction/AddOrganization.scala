@@ -1,19 +1,18 @@
 package models.blockchainTransaction
 
+import akka.actor.ActorSystem
 import exceptions.BaseException
 import javax.inject.Inject
-import org.postgresql.util.PSQLException
-import play.api.{Configuration, Logger}
-import play.api.db.slick.DatabaseConfigProvider
-import slick.jdbc.JdbcProfile
-import akka.actor.ActorSystem
 import models.master.Accounts
+import org.postgresql.util.PSQLException
+import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.ws.WSClient
+import play.api.{Configuration, Logger}
+import slick.jdbc.JdbcProfile
 import transactions.GetResponse
 import utilities.PushNotifications
 
-import scala.concurrent.duration._
-import scala.concurrent.duration.Duration
+import scala.concurrent.duration.{Duration, _}
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
@@ -91,7 +90,7 @@ class AddOrganizations @Inject()(protected val databaseConfigProvider: DatabaseC
   }
 
   if (configuration.get[Boolean]("blockchain.kafka.enabled")) {
-    actorSystem.scheduler.schedule(initialDelay = configuration.get[Int]("blockchain.kafka.ticketIterator.initialDelay").seconds, interval = configuration.get[Int]("blockchain.kafka.ticketIterator.interval").second) {
+    actorSystem.scheduler.schedule(initialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds, interval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").second) {
       utilities.TicketIterator.start(Service.getTicketIDs, transactionAddOrganization.Service.getTxHashFromWSResponse, Service.updateTxHash, Service.getAddress)
     }
   }
