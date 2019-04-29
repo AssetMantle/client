@@ -39,11 +39,7 @@ class ChangeBuyerBidController @Inject()(messagesControllerComponents: MessagesC
               val fromAddress = masterAccounts.Service.getAddress(username)
               blockchainTransactionChangeBuyerBids.Service.addChangeBuyerBid(from = username, to = changeBuyerBidData.to, bid = changeBuyerBidData.bid, time = changeBuyerBidData.time, pegHash = changeBuyerBidData.pegHash, gas = changeBuyerBidData.gas, null, txHash = Option(response.TxHash), ticketID = Random.nextString(32), null)
               blockchainAccounts.Service.updateSequence(fromAddress, blockchainAccounts.Service.getSequence(fromAddress) + 1)
-              for (tag <- response.Tags) {
-                if (tag.Key == constants.Response.KEY_NEGOTIATION_ID) {
-                  blockchainNegotiations.Service.insertOrUpdate(id = tag.Value, buyerAddress = fromAddress, sellerAddress = changeBuyerBidData.to, assetPegHash = changeBuyerBidData.pegHash, bid = changeBuyerBidData.bid, time = changeBuyerBidData.time, null, null)
-                }
-              }
+              //TODO: InsertOrUpdate Negotiation Table
               Ok(views.html.index(success = response.TxHash))
             }
           }

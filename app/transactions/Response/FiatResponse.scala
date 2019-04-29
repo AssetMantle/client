@@ -16,5 +16,4 @@ object FiatResponse {
 
   implicit val responseReads: Reads[Response] = Json.reads[Response]
 
-
 }

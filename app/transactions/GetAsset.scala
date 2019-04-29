@@ -11,7 +11,7 @@ import play.api.{Configuration, Logger}
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 
-class GetAsset @Inject()()(implicit configuration: Configuration, executionContext: ExecutionContext, wsClient: WSClient) {
+class GetAsset @Inject()()(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.TRANSACTIONS_GET_ASSET
 

@@ -7,7 +7,7 @@ import models.{blockchainTransaction, master, blockchain}
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
-
+import scala.util.control.Breaks._
 import scala.concurrent.ExecutionContext
 import scala.util.Random
 
@@ -38,11 +38,7 @@ class SendAssetController @Inject()(messagesControllerComponents: MessagesContro
               val fromAddress = masterAccounts.Service.getAddress(username)
               blockchainTransactionSendAssets.Service.addSendAsset(from = username, to = sendAssetData.to, pegHash = sendAssetData.pegHash, gas = sendAssetData.gas, null, txHash = Option(response.TxHash), ticketID = Random.nextString(32), null)
               blockchainAccounts.Service.updateSequence(fromAddress, blockchainAccounts.Service.getSequence(fromAddress) + 1)
-              for (tag <- response.Tags) {
-                if (tag.Key == constants.Response.KEY_ORDER_ID) {
-                  blockchainOrders.Service.insertOrUpdate(id = tag.Value, null, null, false) //TODO
-                }
-              }
+              //TODO: InsertOrUpdate Order Table
               Ok(views.html.index(success = response.TxHash))
             }
           }

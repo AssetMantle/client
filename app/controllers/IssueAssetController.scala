@@ -96,11 +96,7 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
                 blockchainTransactionIssueAssets.Service.addIssueAsset(from = username, to = toAddress, documentHash = issueAssetData.documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.assetPrice, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.assetQuantity, gas = issueAssetData.gas, null, txHash = Option(response.TxHash), ticketID = Random.nextString(32), null)
                 masterTransactionIssueAssetRequests.Service.updateStatusAndGas(issueAssetData.requestID, true, issueAssetData.gas)
                 blockchainAccounts.Service.updateSequence(zoneAddress, blockchainAccounts.Service.getSequence(zoneAddress) + 1)
-                for (tag <- response.Tags) {
-                  if (tag.Key == constants.Response.KEY_ASSET) {
-                    blockchainAssets.Service.addAsset(pegHash = tag.Value, documentHash = issueAssetData.documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.assetPrice, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.assetQuantity, ownerAddress = toAddress)
-                  }
-                }
+                //TODO: Update Asset Table
                 Ok(views.html.index(success = response.TxHash))
               }
             } else {

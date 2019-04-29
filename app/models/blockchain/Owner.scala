@@ -55,7 +55,7 @@ class Owners @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
     }
   }
 
-  private def insertOrUpdateOwner(owner: Owner)(implicit executionContext: ExecutionContext): Future[Int] = db.run(ownerTable.insertOrUpdate(owner).asTry).map {
+  private def insertOrUpdate(owner: Owner)(implicit executionContext: ExecutionContext): Future[Int] = db.run(ownerTable.insertOrUpdate(owner).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
@@ -74,6 +74,16 @@ class Owners @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
   }
 
   private def deleteByPegHashOwnerAddress(pegHash: String, ownerAddress: String)(implicit executionContext: ExecutionContext) = db.run(ownerTable.filter(_.pegHash === pegHash).filter(_.ownerAddress === ownerAddress).delete.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+        throw new BaseException(constants.Error.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+        throw new BaseException(constants.Error.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def deleteByPegHash(pegHash: String)(implicit executionContext: ExecutionContext) = db.run(ownerTable.filter(_.pegHash === pegHash).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
@@ -108,6 +118,8 @@ class Owners @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
 
     def deleteOwner(pegHash: String, ownerAddress: String)(implicit executionContext: ExecutionContext): Int = Await.result(deleteByPegHashOwnerAddress(pegHash, ownerAddress), Duration.Inf)
 
-    def insertOrUpdate(pegHash: String, ownerAddress: String, amount: Int)(implicit executionContext: ExecutionContext): Int = Await.result(insertOrUpdateOwner(Owner(pegHash, ownerAddress, amount)), Duration.Inf)
+    def deleteOwners(pegHash: String)(implicit executionContext: ExecutionContext): Int = Await.result(deleteByPegHash(pegHash), Duration.Inf)
+
+    def insertOrUpdateOwner(pegHash: String, ownerAddress: String, amount: Int)(implicit executionContext: ExecutionContext): Int = Await.result(insertOrUpdate(Owner(pegHash, ownerAddress, amount)), Duration.Inf)
   }
 }
