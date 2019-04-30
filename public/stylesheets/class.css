@@ -133,3 +133,25 @@ body{
     grid-row: 8/10;
     grid-column: 2/13;
 }
+
+/*Notification*/
+.seeAll {
+    background: #F6F7F8;
+    width: auto;
+    padding: 8px;
+    font-size: 12px;
+    font-weight: bold;
+    border-top: solid 1px rgba(100, 100, 100, .30);
+    text-align: center;
+}
+
+.seeAll a {
+    color: #3b5998;
+
+}
+
+.element:hover {
+    cursor: pointer;
+    background-color: #80c846;
+    color: white;
+}
