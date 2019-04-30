@@ -3,29 +3,27 @@ package controllers
 import controllers.actions.{WithLoginAction, WithTraderLoginAction}
 import exceptions.{BaseException, BlockChainException}
 import javax.inject.Inject
-import models.blockchainTransaction.ConfirmSellerBids
+import models.{blockchain, blockchainTransaction, master}
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
-import views.companion.blockchain.ConfirmSellerBid
-import views.companion.master
 
 import scala.concurrent.ExecutionContext
 import scala.util.Random
 
-class ConfirmSellerBidController @Inject()(messagesControllerComponents: MessagesControllerComponents, withTraderLoginAction: WithTraderLoginAction, withLoginAction: WithLoginAction, transactionsConfirmSellerBid: transactions.ConfirmSellerBid, confirmSellerBids: ConfirmSellerBids)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class ConfirmSellerBidController @Inject()(messagesControllerComponents: MessagesControllerComponents, masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts, withTraderLoginAction: WithTraderLoginAction, withLoginAction: WithLoginAction, transactionsConfirmSellerBid: transactions.ConfirmSellerBid, blockchainTransactionConfirmSellerBids: blockchainTransaction.ConfirmSellerBids)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
 
   private implicit val logger: Logger = Logger(this.getClass)
 
   def confirmSellerBidForm: Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.confirmSellerBid(master.ConfirmSellerBid.form))
+    Ok(views.html.component.master.confirmSellerBid(views.companion.master.ConfirmSellerBid.form))
   }
 
   def confirmSellerBid: Action[AnyContent] = withTraderLoginAction.authenticated { username =>
     implicit request =>
-      master.ConfirmSellerBid.form.bindFromRequest().fold(
+      views.companion.master.ConfirmSellerBid.form.bindFromRequest().fold(
         formWithErrors => {
           BadRequest(views.html.component.master.confirmSellerBid(formWithErrors))
         },
@@ -33,11 +31,14 @@ class ConfirmSellerBidController @Inject()(messagesControllerComponents: Message
           try {
             if (kafkaEnabled) {
               val response = transactionsConfirmSellerBid.Service.kafkaPost(transactionsConfirmSellerBid.Request(from = username, to = confirmSellerBidData.to, password = confirmSellerBidData.password, bid = confirmSellerBidData.bid, time = confirmSellerBidData.time, pegHash = confirmSellerBidData.pegHash, gas = confirmSellerBidData.gas))
-              confirmSellerBids.Service.addConfirmSellerBidKafka(from = username, to = confirmSellerBidData.to, bid = confirmSellerBidData.bid, time = confirmSellerBidData.time, pegHash = confirmSellerBidData.pegHash, gas = confirmSellerBidData.gas, null, null, ticketID = response.ticketID, null)
+              blockchainTransactionConfirmSellerBids.Service.addConfirmSellerBidKafka(from = username, to = confirmSellerBidData.to, bid = confirmSellerBidData.bid, time = confirmSellerBidData.time, pegHash = confirmSellerBidData.pegHash, gas = confirmSellerBidData.gas, null, null, ticketID = response.ticketID, null)
               Ok(views.html.index(success = response.ticketID))
             } else {
               val response = transactionsConfirmSellerBid.Service.post(transactionsConfirmSellerBid.Request(from = username, to = confirmSellerBidData.to, password = confirmSellerBidData.password, bid = confirmSellerBidData.bid, time = confirmSellerBidData.time, pegHash = confirmSellerBidData.pegHash, gas = confirmSellerBidData.gas))
-              confirmSellerBids.Service.addConfirmSellerBid(from = username, to = confirmSellerBidData.to, bid = confirmSellerBidData.bid, time = confirmSellerBidData.time, pegHash = confirmSellerBidData.pegHash, gas = confirmSellerBidData.gas, null, txHash = Option(response.TxHash), ticketID = Random.nextString(32), null)
+              val fromAddress = masterAccounts.Service.getAddress(username)
+              blockchainTransactionConfirmSellerBids.Service.addConfirmSellerBid(from = username, to = confirmSellerBidData.to, bid = confirmSellerBidData.bid, time = confirmSellerBidData.time, pegHash = confirmSellerBidData.pegHash, gas = confirmSellerBidData.gas, null, txHash = Option(response.TxHash), ticketID = Random.nextString(32), null)
+              blockchainAccounts.Service.updateSequence(fromAddress, blockchainAccounts.Service.getSequence(fromAddress) + 1)
+              //TODO: Update signatures Async
               Ok(views.html.index(success = response.TxHash))
             }
           }
@@ -51,11 +52,11 @@ class ConfirmSellerBidController @Inject()(messagesControllerComponents: Message
   }
 
   def blockchainConfirmSellerBidForm: Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.blockchain.confirmSellerBid(ConfirmSellerBid.form))
+    Ok(views.html.component.blockchain.confirmSellerBid(views.companion.blockchain.ConfirmSellerBid.form))
   }
 
   def blockchainConfirmSellerBid: Action[AnyContent] = Action { implicit request =>
-    ConfirmSellerBid.form.bindFromRequest().fold(
+    views.companion.blockchain.ConfirmSellerBid.form.bindFromRequest().fold(
       formWithErrors => {
         BadRequest(views.html.component.blockchain.confirmSellerBid(formWithErrors))
       },
@@ -63,11 +64,11 @@ class ConfirmSellerBidController @Inject()(messagesControllerComponents: Message
         try {
           if (kafkaEnabled) {
             val response = transactionsConfirmSellerBid.Service.kafkaPost(transactionsConfirmSellerBid.Request(from = confirmSellerBidData.from, to = confirmSellerBidData.to, password = confirmSellerBidData.password, bid = confirmSellerBidData.bid, time = confirmSellerBidData.time, pegHash = confirmSellerBidData.pegHash, gas = confirmSellerBidData.gas))
-            confirmSellerBids.Service.addConfirmSellerBidKafka(from = confirmSellerBidData.from, to = confirmSellerBidData.to, bid = confirmSellerBidData.bid, time = confirmSellerBidData.time, pegHash = confirmSellerBidData.pegHash, gas = confirmSellerBidData.gas, null, null, ticketID = response.ticketID, null)
+            blockchainTransactionConfirmSellerBids.Service.addConfirmSellerBidKafka(from = confirmSellerBidData.from, to = confirmSellerBidData.to, bid = confirmSellerBidData.bid, time = confirmSellerBidData.time, pegHash = confirmSellerBidData.pegHash, gas = confirmSellerBidData.gas, null, null, ticketID = response.ticketID, null)
             Ok(views.html.index(success = response.ticketID))
           } else {
             val response = transactionsConfirmSellerBid.Service.post(transactionsConfirmSellerBid.Request(from = confirmSellerBidData.from, to = confirmSellerBidData.to, password = confirmSellerBidData.password, bid = confirmSellerBidData.bid, time = confirmSellerBidData.time, pegHash = confirmSellerBidData.pegHash, gas = confirmSellerBidData.gas))
-            confirmSellerBids.Service.addConfirmSellerBid(from = confirmSellerBidData.from, to = confirmSellerBidData.to, bid = confirmSellerBidData.bid, time = confirmSellerBidData.time, pegHash = confirmSellerBidData.pegHash, gas = confirmSellerBidData.gas, null, txHash = Option(response.TxHash), ticketID = Random.nextString(32), null)
+            blockchainTransactionConfirmSellerBids.Service.addConfirmSellerBid(from = confirmSellerBidData.from, to = confirmSellerBidData.to, bid = confirmSellerBidData.bid, time = confirmSellerBidData.time, pegHash = confirmSellerBidData.pegHash, gas = confirmSellerBidData.gas, null, txHash = Option(response.TxHash), ticketID = Random.nextString(32), null)
             Ok(views.html.index(success = response.TxHash))
           }
         }

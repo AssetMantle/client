@@ -11,7 +11,7 @@ import play.api.{Configuration, Logger}
 import scala.concurrent.ExecutionContext
 import scala.util.Random
 
-class SetACLController @Inject()(messagesControllerComponents: MessagesControllerComponents, masterZones: master.Zones, masterOrganizations: master.Organizations, withZoneLoginAction: WithZoneLoginAction, masterAccounts: master.Accounts, transactionsSetACL: transactions.SetACL, blockchainAclAccounts: blockchain.ACLAccounts, blockchainTransactionSetACLs: blockchainTransaction.SetACLs, blockchainAclHashes: blockchain.ACLHashes)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class SetACLController @Inject()(messagesControllerComponents: MessagesControllerComponents, blockchainAccounts: blockchain.Accounts, masterZones: master.Zones, masterOrganizations: master.Organizations, withZoneLoginAction: WithZoneLoginAction, masterAccounts: master.Accounts, transactionsSetACL: transactions.SetACL, blockchainAclAccounts: blockchain.ACLAccounts, blockchainTransactionSetACLs: blockchainTransaction.SetACLs, blockchainAclHashes: blockchain.ACLHashes)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -40,9 +40,11 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
                 Ok(views.html.index(success = response.ticketID))
               } else {
                 val response = transactionsSetACL.Service.post(transactionsSetACL.Request(from = username, password = setACLData.password, aclAddress = setACLData.aclAddress, organizationID = setACLData.organizationID, zoneID = zoneID, issueAsset = setACLData.issueAsset.toString, issueFiat = setACLData.issueFiat.toString, sendAsset = setACLData.sendAsset.toString, sendFiat = setACLData.sendFiat.toString, redeemAsset = setACLData.redeemAsset.toString, redeemFiat = setACLData.redeemFiat.toString, sellerExecuteOrder = setACLData.sellerExecuteOrder.toString, buyerExecuteOrder = setACLData.buyerExecuteOrder.toString, changeBuyerBid = setACLData.changeBuyerBid.toString, changeSellerBid = setACLData.changeSellerBid.toString, confirmBuyerBid = setACLData.confirmBuyerBid.toString, confirmSellerBid = setACLData.confirmSellerBid.toString, negotiation = setACLData.negotiation.toString, releaseAsset = setACLData.releaseAsset.toString))
+                val fromAddress = masterAccounts.Service.getAddress(username)
                 blockchainAclAccounts.Service.addOrUpdateACLAccount(username, setACLData.aclAddress, zoneID, setACLData.organizationID, acl)
                 blockchainTransactionSetACLs.Service.addSetACL(from = username, aclAddress = setACLData.aclAddress, organizationID = setACLData.organizationID, zoneID = zoneID, acl = acl, null, txHash = Option(response.TxHash), ticketID = Random.nextString(32), null)
                 masterAccounts.Service.updateUserTypeOnAddress(setACLData.aclAddress, constants.User.TRADER)
+                blockchainAccounts.Service.updateSequence(fromAddress, blockchainAccounts.Service.getSequence(fromAddress) + 1)
                 Ok(views.html.index(success = response.TxHash))
               }
             } else {
