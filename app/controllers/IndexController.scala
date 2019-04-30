@@ -7,7 +7,7 @@ import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerC
 
 import scala.concurrent.ExecutionContext
 
-class IndexController @Inject()(messagesControllerComponents: MessagesControllerComponents)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class IndexController @Inject()(messagesControllerComponents: MessagesControllerComponents)(implicit configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   def index: Action[AnyContent] = Action { implicit request =>
     Ok(views.html.index())
