@@ -1,31 +1,26 @@
 @import transactions.Response.BlockHeightResponse.Response
 @(response: Response)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
 
-@common(Messages(constants.Form.BLOCK)) {
-    <div id="main_division">
-        <div class="side_division">
-        </div>
-    <div class="top_division">
-        <div class="blocksHeightPage">
-            @Messages(constants.Form.BLOCK): @response.result.block_meta.header.height <br>
-            @Messages(constants.Form.TIME): @response.result.block_meta.header.time<br>
-            @Messages(constants.Form.NUM_TXS): @response.result.block_meta.header.num_txs
-        </div>
-    </div>
-    <div class="bottom_division">
-        <div class="transactionHash-block">
-            <h4 class="data-box-sub-header">@Messages(constants.Form.TRANSACTIONS)</h4>
-            <h3 class="data-box-header">@response.result.block_meta.header.data_hash</h3>
+    @common(Messages(constants.Form.BLOCK)) {
 
-        </div>
-        <div class="evidenceBlocks">
-            <h3 class="data-box-header">@Messages(constants.Form.EVIDENCE_HASH)</h3>
+
+        <div class="main_division">
+            <div class="blocksHeightPage">
+                @Messages(constants.Form.BLOCK): @response.result.block_meta.header.height <br>
+                @Messages(constants.Form.TIME): @response.result.block_meta.header.time <br>
+                @Messages(constants.Form.NUM_TXS): @response.result.block_meta.header.num_txs
+            </div>
+            <div class="transactionHash-block">
+                <h4 class="heading_text">@Messages(constants.Form.TRANSACTIONS)</h4>
+                <p>@response.result.block_meta.header.data_hash</p>
+            </div>
+            <div class="evidenceHash">
+            <h4 class="heading_text">@Messages(constants.Form.EVIDENCE_HASH)</h4>
             <p>@response.result.block_meta.header.evidence_hash</p>
+            </div>
+            <div class="validators-hash">
+                <h4 class="heading_text">@Messages(constants.Form.VALIDATORS_HASH)</h4>
+                <p>@response.result.block_meta.header.validators_hash</p>
+            </div>
         </div>
-        <div class="validators-hash">
-            <h3 class="data-box-header">@Messages(constants.Form.VALIDATORS_HASH)</h3>
-            <p>@response.result.block_meta.header.validators_hash</p>
-        </div>
-    </div>
-    </div>
-}
+    }

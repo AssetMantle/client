@@ -10,7 +10,7 @@ function blockExplorer(){
     var averageBlockTime = 6.0;
 
     let latestBlockHeight = parseInt(JSON.parse(httpGet(abciInfoURL))["result"]["response"]["last_block_height"]);
-    let urlMinMax = mainIpAbciPort + "/blockchain?minHeight=" + (latestBlockHeight - 5).toString(10) + "&maxHeight=" + latestBlockHeight.toString(10);
+    let urlMinMax = mainIpAbciPort + "/blockchain?minHeight=" + (latestBlockHeight - 6).toString(10) + "&maxHeight=" + latestBlockHeight.toString(10);
     let blocksData = JSON.parse(httpGet(urlMinMax));
     let blocks = blocksData["result"]["block_metas"];
     var content = '';
@@ -62,7 +62,7 @@ function blockExplorer(){
             let differenceBetweenBlockTime = (blockTime.getTime() - new Date(lastBlockTime).getTime()) / 1000;
             let blockContainerList = document.getElementById(tableBodyID);
             blockContainerList.removeChild(blockContainerList.childNodes[blockContainerList.childNodes.length - 1]);
-            $('#' + tableBodyID).prepend("<tr><td><a href='" + blockHeightURL + height + "'>" + height + "</a></td><td>" + numTxs + "</td><td ><div class='timer_div' id='" + timerID + "'></div> </td></tr>");
+            $('#' + tableBodyID).prepend("<tr><td><a href='" + blockHeightURL + height + "'>" + height + "</a></td><td>" + numTxs + "</td><td ><div class='timer_div' id='" + timerID + "'></div></td></tr>");
             getBlockTime(time, timerID);
             updateGraph("blockTimes", [blockTime.getHours() + ":" + blockTime.getMinutes() + ":" + blockTime.getSeconds()], [differenceBetweenBlockTime]);
             lastBlockTime = time;

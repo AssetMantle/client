@@ -4,6 +4,11 @@ let blockchainHeightURL = getConfiguration("blockchain.main.ip") + ":" + getConf
 let txHashPage = "./txs?txHash=";
 
 function transactionExplorer(){
+    var content = '';
+    for (var i =0; i <8; i++){
+        content = "<tr><td></td><td></td><td></td></tr>" + content;
+    }
+    $('#transaction_container').prepend(content);
     window.addEventListener("load", function (evt) {
         let wsTx = new WebSocket(wsUrl);
         wsTx.onopen = () => {
@@ -21,7 +26,7 @@ function transactionExplorer(){
 
             var transactionContainerList = document.getElementById("transaction_container");
             let transactionContainerListLength = transactionContainerList.childNodes.length;
-            if (length > 6) {
+            if (transactionContainerListLength > 8) {
                 transactionContainerList.removeChild(transactionContainerList.childNodes[transactionContainerListLength - 1]);
             }
             $('#transaction_container').prepend("<tr><td><a href='" + blockHeightURL + height + "'>" + height + "</a></td><td><a href='" + txHashPage + txHash + "'>" + txHash + "</a></td><td >" + msgType + "</td></tr>");

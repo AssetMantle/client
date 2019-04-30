@@ -1,8 +1,8 @@
 @()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
 <div class="txs">
     <p class="heading_text">@Messages(constants.Form.TRANSACTIONS)</p>
-    <div class="blocks_table_head_div">
-        <table class="blocks_table_head" >
+    <div>
+        <table>
             <thead>
                 <tr>
                     <th>@Messages(constants.Form.HEIGHT)</th>
@@ -10,10 +10,6 @@
                     <th>@Messages(constants.Form.TYPE)</th>
                 </tr>
             </thead>
-        </table>
-    </div>
-    <div class="inner_table">
-        <table class="blocks_inner_table">
             <tbody id="transaction_container">
             </tbody>
         </table>

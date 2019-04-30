@@ -42,7 +42,7 @@ function onClickPrevious() {
     changeTableContent(click)
 }
 
-function changeTableContent(clickValue, bodyID) {
+function changeTableContent(clickValue) {
     let lastBlockHeight = parseInt(JSON.parse(httpGet(abciIpPort + "/abci_info"))["result"]["response"]["last_block_height"]);
     let url = abciIpPort + "/blockchain?minHeight=" + (lastBlockHeight - 10 * (clickValue + 1)).toString(10) + "&maxHeight=" + (lastBlockHeight - 10 * clickValue).toString(10);
     let blocksData = JSON.parse(httpGet(url));

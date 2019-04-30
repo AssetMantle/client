@@ -13,7 +13,7 @@ class BlockExplorerController @Inject()(messagesControllerComponents: MessagesCo
     Ok(views.html.component.blockchain.showAllBlocks())
   }
 
-  def validatorsList: Action[AnyContent] = Action { implicit request =>
+  def validatorList: Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.blockchain.validatorsTable())
   }
 

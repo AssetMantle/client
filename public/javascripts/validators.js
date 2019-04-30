@@ -7,8 +7,8 @@ function getValidators(bodyID){
 
 function validatorsTable(bodyID) {
     var content = "";
-    let validatorsList = JSON.parse(httpGet(urlGetValidators));
-    Array.prototype.forEach.call(validatorsList, validator => {
+    let validatorList = JSON.parse(httpGet(urlGetValidators));
+    Array.prototype.forEach.call(validatorList, validator => {
         content = content + "<tr><td>" + validator["operator"] + "</td><td>" + validator["status"] + "</td><td >" + validator["tokens"] + "</div></td></td><td >" + validator["delegator_shares"] + "</td></tr>";
     });
     $("#" + bodyID).append(content);

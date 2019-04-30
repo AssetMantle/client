@@ -1,6 +1,6 @@
 GET         /                                               controllers.IndexController.index
 GET         /showAllBlocks                                  controllers.BlockExplorerController.showAllBlocks
-GET         /validatorsList                                 controllers.BlockExplorerController.validatorsList
+GET         /validatorList                                  controllers.BlockExplorerController.validatorList
 GET         /block                                          controllers.BlockExplorerController.blockHeight(blockHeight: Int)
 GET         /txs                                            controllers.BlockExplorerController.transactionHash(txHash: String)
 
