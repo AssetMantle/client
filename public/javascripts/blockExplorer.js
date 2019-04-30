@@ -1,11 +1,17 @@
-function blockExplorer(tableBodyID, wsURL, blockHeightURL, abciInfoURL, urlMinMax) {
+let wsURL = getConfiguration("blockchain.main.wsIP") + ":" + getConfiguration("blockchain.main.abciPort") + "/websocket";
+let blockHeightURL = "./block?blockHeight=";
+let mainIpAbciPort = getConfiguration("blockchain.main.ip") + ":" + getConfiguration("blockchain.main.abciPort");
+let abciInfoURL = mainIpAbciPort + "/abci_info";
+
+let tableBodyID = "block_container";
+function blockExplorer(){
     var counter = 0;
     var lastBlockTime = "";
     var averageBlockTime = 6.0;
 
     let latestBlockHeight = parseInt(JSON.parse(httpGet(abciInfoURL))["result"]["response"]["last_block_height"]);
-    let url = urlMinMax + "/blockchain?minHeight=" + (latestBlockHeight - 5).toString(10) + "&maxHeight=" + latestBlockHeight.toString(10);
-    let blocksData = JSON.parse(httpGet(url));
+    let urlMinMax = mainIpAbciPort + "/blockchain?minHeight=" + (latestBlockHeight - 5).toString(10) + "&maxHeight=" + latestBlockHeight.toString(10);
+    let blocksData = JSON.parse(httpGet(urlMinMax));
     let blocks = blocksData["result"]["block_metas"];
     var content = '';
     var initialTimeData = [];
@@ -73,3 +79,5 @@ function blockExplorer(tableBodyID, wsURL, blockHeightURL, abciInfoURL, urlMinMa
         };
     });
 }
+
+window.onload = blockExplorer();

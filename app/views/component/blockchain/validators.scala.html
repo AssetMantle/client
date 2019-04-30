@@ -1,6 +1,7 @@
 @()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
 <div class="validators">
-    @Messages(constants.Form.VALIDATORS) <a href="@routes.IndexController.validatorsList">@Messages(constants.Form.SEE_ALL)</a>
+    @Messages(constants.Form.VALIDATORS) <a href="@routes.BlockExplorerController.validatorsList">@Messages(constants.Form.SEE_ALL)</a>
     <p id="validator"><b>12</b></p>
 </div>
-<script>getValidators("@configuration.get[String]("blockchain.main.ip")" + ":" + "@configuration.get[String]("blockchain.main.restPort")" + "/stake/validators", "validator")</script>
+<script src="@routes.Assets.versioned("javascripts/validators.js")" type="text/javascript"></script>
+<script>getValidators("validator")</script>

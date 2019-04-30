@@ -1,7 +1,11 @@
+let abciIpPort = getConfiguration("blockchain.main.ip") + ":" + getConfiguration("blockchain.main.abciPort");
+let wsURL = getConfiguration("blockchain.main.wsIP") + ":" + getConfiguration("blockchain.main.abciPort") + "/websocket";
+
+let bodyID = "allBlocksTableBody";
 var click = 0;
 
-function showALlBlocks(abciIpPort, wsURL, bodyID) {
-    changeTableContent(abciIpPort, click, bodyID);
+window.onload = function(){
+    changeTableContent(click, bodyID);
 
     window.addEventListener("load", function (evt) {
         let wsNewBlock = new WebSocket(wsURL);
@@ -26,19 +30,19 @@ function showALlBlocks(abciIpPort, wsURL, bodyID) {
             }
         };
     });
-}
+};
 
-function onClickNext(abciIpPort, bodyID) {
+function onClickNext() {
     click += 1;
-    changeTableContent(abciIpPort, click, bodyID);
+    changeTableContent(click);
 }
 
-function onClickPrevious(abciIpPort, bodyID) {
+function onClickPrevious() {
     click -= 1;
-    changeTableContent(abciIpPort, click, bodyID)
+    changeTableContent(click)
 }
 
-function changeTableContent(abciIpPort, clickValue, bodyID) {
+function changeTableContent(clickValue, bodyID) {
     let lastBlockHeight = parseInt(JSON.parse(httpGet(abciIpPort + "/abci_info"))["result"]["response"]["last_block_height"]);
     let url = abciIpPort + "/blockchain?minHeight=" + (lastBlockHeight - 10 * (clickValue + 1)).toString(10) + "&maxHeight=" + (lastBlockHeight - 10 * clickValue).toString(10);
     let blocksData = JSON.parse(httpGet(url));

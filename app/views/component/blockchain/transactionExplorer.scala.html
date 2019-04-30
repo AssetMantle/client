@@ -20,4 +20,3 @@
     </div>
 </div>
 <script src="@routes.Assets.versioned("javascripts/transactionExplorer.js")" type="text/javascript"></script>
-<script>transactionExplorer("@configuration.get[String]("blockchain.main.wsIP")" + ":" + "@configuration.get[String]("blockchain.main.abciPort")" + "/websocket", "@configuration.get[String]("blockchain.main.ip")" + ":" + "@configuration.get[String]("blockchain.main.restPort")" + "/txs/", "@configuration.get[String]("blockchain.main.ip")" + ":" + "@configuration.get[String]("blockchain.main.abciPort")" + "/block?height=");</script>

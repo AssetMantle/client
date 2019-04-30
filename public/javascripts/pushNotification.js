@@ -17,7 +17,7 @@ $(document).ready(function () {
             return messaging.getToken()
         })
         .then(function (token) {
-            if($("#" + "NOTIFICATION_TOKEN").length !=0) {
+            if($("#" + "NOTIFICATION_TOKEN").length !==0) {
                 document.getElementById("NOTIFICATION_TOKEN").value = token
             }
         })
@@ -26,7 +26,7 @@ $(document).ready(function () {
             console.log("Unable to get permission to notify.", err);
         });
     messaging.onMessage(function (payload) {
-        if($("#" + "notificationWindow").length !=0) {
+        if($("#" + "notificationWindow").length !==0) {
             var newNotification = document.createElement('div');
             newNotification.innerHTML ='</br>' +" (New) " +JSON.parse(JSON.stringify(payload)).notification.title+" + "+JSON.parse(JSON.stringify(payload)).notification.body+ '</br>';
             newNotification.style.backgroundColor="#09c866";
@@ -36,20 +36,4 @@ $(document).ready(function () {
             document.getElementById("notificationCounter").textContent = "New"
         }
     });
-
-    function getConfiguration(configuration) {
-        var route = jsRoutes.controllers.ConfigurationController.queryConfigurationVariable(configuration);
-        var response = null;
-        $.ajax({
-            url: route.url,
-            type: route.type,
-            async: false,
-            statusCode: {
-                200: function (result) {
-                    response= result;
-                }
-            }
-        });
-        return response;
-    }
 });

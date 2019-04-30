@@ -9,6 +9,7 @@ object Form {
   val BLOCKS = "BLOCKS"
   val BLOCK = "BLOCK"
   val NEXT = "NEXT"
+  val BLOCK_TIMES = "BLOCK_TIMES"
   val SEARCH = "SEARCH"
   val PREVIOUS = "PREVIOUS"
   val EVIDENCE = "EVIDENCE"
@@ -19,6 +20,7 @@ object Form {
 
   val BLOCK_HASH = "BLOCK_HASH"
   val HEIGHT = "HEIGHT"
+  val FEE = "FEE"
   val DATA_HASH = "DATA_HASH"
   val TRANSACTION_HASH = "TRANSACTION_HASH"
   val TYPE = "TYPE"

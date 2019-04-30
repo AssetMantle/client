@@ -1,69 +1,57 @@
 @import views.html.component.blockchain.{blockExplorer, transactionExplorer, validators, lastBlockHeight, averageBlockTime, search, blockTimeGraph}
 @(success: String = "", failure: String = "")(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
 
-@common(Messages(constants.Form.INDEX), success, failure) {<br>
-    <script src="@routes.Assets.versioned("javascripts/search.js")" type="text/javascript"></script>
-    <script src="@routes.Assets.versioned("javascripts/averageBlockTimeUpdater.js")" type="text/javascript"></script>
-    <script src="@routes.Assets.versioned("javascripts/lastBlock.js")" type="text/javascript"></script>
-    <script src="@routes.Assets.versioned("javascripts/validators.js")" type="text/javascript"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.min.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.js"></script>
+@common(Messages(constants.Form.INDEX), success, failure) {
+    <a href="@routes.LoginController.loginForm">@Messages(constants.Form.LOGIN)</a>
+    <a href="@routes.LogoutController.logoutForm">@Messages(constants.Form.LOGOUT)</a>
+    <a href="@routes.SignUpController.signUpForm">@Messages(constants.Form.SIGNUP)</a>
+    <a href="@routes.UpdateContactController.updateContactForm">@Messages(constants.Form.UPDATE_CONTACT)</a>
+    <a href="@routes.VerifyMobileNumberController.verifyMobileNumberForm">@Messages(constants.Form.VERIFY_MOBILE_NUMBER)</a>
+    <a href="@routes.VerifyEmailAddressController.verifyEmailAddressForm">@Messages(constants.Form.VERIFY_EMAIL_ADDRESS)</a>
+    <a href="@routes.AddOrganizationController.addOrganizationForm()">@Messages(constants.Form.ADD_ORGANIZATION)</a>
+    <a href="@routes.AddOrganizationController.viewPendingVerifyOrganizationRequests">@Messages(constants.Form.PENDING_VERIFY_ORGANIZATION_REQUESTS)</a>
+    <a href="@routes.AddZoneController.viewPendingVerifyZoneRequests">@Messages(constants.Form.PENDING_VERIFY_ZONE_REQUESTS)</a>
+    <a href="@routes.BuyerExecuteOrderController.buyerExecuteOrderForm()">@Messages(constants.Form.BUYER_EXECUTE_ORDER)</a>
+    <a href="@routes.ChangeBuyerBidController.changeBuyerBidForm">@Messages(constants.Form.CHANGE_BUYER_BID)</a>
+    <a href="@routes.ChangeSellerBidController.changeSellerBidForm">@Messages(constants.Form.CHANGE_SELLER_BID)</a>
+    <a href="@routes.ConfirmBuyerBidController.confirmBuyerBidForm">@Messages(constants.Form.CONFIRM_BUYER_BID)</a>
+    <a href="@routes.ConfirmSellerBidController.confirmSellerBidForm">@Messages(constants.Form.CONFIRM_SELLER_BID)</a>
+    <a href="@routes.IssueAssetController.viewPendingIssueAssetRequests">@Messages(constants.Form.ISSUE_ASSET_REQUEST)</a>
+    <a href="@routes.IssueFiatController.viewPendingIssueFiatRequests">@Messages(constants.Form.ISSUE_FIAT_REQUEST)</a>
+    <a href="@routes.RedeemAssetController.redeemAssetForm">@Messages(constants.Form.REDEEM_ASSET)</a>
+    <a href="@routes.RedeemFiatController.redeemFiatForm">@Messages(constants.Form.REDEEM_FIAT)</a>
+    <a href="@routes.ReleaseAssetController.releaseAssetForm">@Messages(constants.Form.RELEASE_ASSET)</a>
+    <a href="@routes.SellerExecuteOrderController.sellerExecuteOrderForm()">@Messages(constants.Form.SELLER_EXECUTE_ORDER)</a>
+    <a href="@routes.SendAssetController.sendAssetForm">@Messages(constants.Form.SEND_ASSET)</a>
+    <a href="@routes.SendCoinController.sendCoinForm">@Messages(constants.Form.SEND_COIN)</a>
+    <a href="@routes.SendFiatController.sendFiatForm">@Messages(constants.Form.SEND_FIAT)</a>
+    <a href="@routes.SetACLController.setACLForm">@Messages(constants.Form.SET_ACL)</a>
+    <a href="@routes.SetBuyerFeedbackController.setBuyerFeedbackForm">@Messages(constants.Form.SET_BUYER_FEEDBACK)</a>
+    <a href="@routes.SetSellerFeedbackController.setSellerFeedbackForm">@Messages(constants.Form.SET_SELLER_FEEDBACK)</a>
+    <br>
+    <a href="@routes.AddKeyController.blockchainAddKeyForm">@Messages(constants.Form.ADD_KEY)</a>
+    <a href="@routes.AddOrganizationController.blockchainAddOrganizationForm">@Messages(constants.Form.ADD_ORGANIZATION)</a>
+    <a href="@routes.AddZoneController.blockchainAddZoneForm">@Messages(constants.Form.ADD_ZONE)</a>
+    <a href="@routes.BuyerExecuteOrderController.blockchainBuyerExecuteOrderForm">@Messages(constants.Form.BUYER_EXECUTE_ORDER)</a>
+    <a href="@routes.ChangeBuyerBidController.blockchainChangeBuyerBidForm">@Messages(constants.Form.CHANGE_BUYER_BID)</a>
+    <a href="@routes.ChangeSellerBidController.blockchainChangeSellerBidForm">@Messages(constants.Form.CHANGE_SELLER_BID)</a>
+    <a href="@routes.ConfirmBuyerBidController.blockchainConfirmBuyerBidForm">@Messages(constants.Form.CONFIRM_BUYER_BID)</a>
+    <a href="@routes.ConfirmSellerBidController.blockchainConfirmSellerBidForm">@Messages(constants.Form.CONFIRM_SELLER_BID)</a>
+    <a href="@routes.IssueAssetController.blockchainIssueAssetForm">@Messages(constants.Form.ISSUE_ASSET)</a>
+    <a href="@routes.IssueFiatController.blockchainIssueFiatForm">@Messages(constants.Form.ISSUE_FIAT)</a>
+    <a href="@routes.RedeemAssetController.blockchainRedeemAssetForm">@Messages(constants.Form.REDEEM_ASSET)</a>
+    <a href="@routes.RedeemFiatController.blockchainRedeemFiatForm">@Messages(constants.Form.REDEEM_FIAT)</a>
+    <a href="@routes.ReleaseAssetController.blockchainReleaseAssetForm">@Messages(constants.Form.RELEASE_ASSET)</a>
+    <a href="@routes.SellerExecuteOrderController.blockchainSellerExecuteOrderForm">@Messages(constants.Form.SELLER_EXECUTE_ORDER)</a>
+    <a href="@routes.SendAssetController.blockchainSendAssetForm">@Messages(constants.Form.SEND_ASSET)</a>
+    <a href="@routes.SendCoinController.blockchainSendCoinForm">@Messages(constants.Form.SEND_COIN)</a>
+    <a href="@routes.SendFiatController.blockchainSendFiatForm">@Messages(constants.Form.SEND_FIAT)</a>
+    <a href="@routes.SetACLController.blockchainSetACLForm">@Messages(constants.Form.SET_ACL)</a>
+    <a href="@routes.SetBuyerFeedbackController.blockchainSetBuyerFeedbackForm">@Messages(constants.Form.SET_BUYER_FEEDBACK)</a>
+    <a href="@routes.SetSellerFeedbackController.blockchainSetSellerFeedbackForm">@Messages(constants.Form.SET_SELLER_FEEDBACK)</a>
 
     <div id="main_division">
         <div class="side_division">
-            @Messages(constants.Form.MASTER)
-            <a href="@routes.LoginController.loginForm">@Messages(constants.Form.LOGIN)</a>
-            <a href="@routes.LogoutController.logoutForm">@Messages(constants.Form.LOGOUT)</a>
-            <a href="@routes.SignUpController.signUpForm">@Messages(constants.Form.SIGNUP)</a>
-            <a href="@routes.UpdateContactController.updateContactForm">@Messages(constants.Form.UPDATE_CONTACT)</a>
-            <a href="@routes.VerifyMobileNumberController.verifyMobileNumberForm">@Messages(constants.Form.VERIFY_MOBILE_NUMBER)</a>
-            <a href="@routes.VerifyEmailAddressController.verifyEmailAddressForm">@Messages(constants.Form.VERIFY_EMAIL_ADDRESS)</a>
-            <a href="@routes.AddOrganizationController.addOrganizationForm()">@Messages(constants.Form.ADD_ORGANIZATION)</a>
-            <a href="@routes.AddOrganizationController.viewPendingVerifyOrganizationRequests">@Messages(constants.Form.PENDING_VERIFY_ORGANIZATION_REQUESTS)</a>
-            <a href="@routes.AddZoneController.viewPendingVerifyZoneRequests">@Messages(constants.Form.PENDING_VERIFY_ZONE_REQUESTS)</a>
-            <a href="@routes.BuyerExecuteOrderController.buyerExecuteOrderForm()">@Messages(constants.Form.BUYER_EXECUTE_ORDER)</a>
-            <a href="@routes.ChangeBuyerBidController.changeBuyerBidForm">@Messages(constants.Form.CHANGE_BUYER_BID)</a>
-            <a href="@routes.ChangeSellerBidController.changeSellerBidForm">@Messages(constants.Form.CHANGE_SELLER_BID)</a>
-            <a href="@routes.ConfirmBuyerBidController.confirmBuyerBidForm">@Messages(constants.Form.CONFIRM_BUYER_BID)</a>
-            <a href="@routes.ConfirmSellerBidController.confirmSellerBidForm">@Messages(constants.Form.CONFIRM_SELLER_BID)</a>
-            <a href="@routes.IssueAssetController.viewPendingIssueAssetRequests">@Messages(constants.Form.ISSUE_ASSET_REQUEST)</a>
-            <a href="@routes.IssueFiatController.viewPendingIssueFiatRequests">@Messages(constants.Form.ISSUE_FIAT_REQUEST)</a>
-            <a href="@routes.RedeemAssetController.redeemAssetForm">@Messages(constants.Form.REDEEM_ASSET)</a>
-            <a href="@routes.RedeemFiatController.redeemFiatForm">@Messages(constants.Form.REDEEM_FIAT)</a>
-            <a href="@routes.ReleaseAssetController.releaseAssetForm">@Messages(constants.Form.RELEASE_ASSET)</a>
-            <a href="@routes.SellerExecuteOrderController.sellerExecuteOrderForm()">@Messages(constants.Form.SELLER_EXECUTE_ORDER)</a>
-            <a href="@routes.SendAssetController.sendAssetForm">@Messages(constants.Form.SEND_ASSET)</a>
-            <a href="@routes.SendCoinController.sendCoinForm">@Messages(constants.Form.SEND_COIN)</a>
-            <a href="@routes.SendFiatController.sendFiatForm">@Messages(constants.Form.SEND_FIAT)</a>
-            <a href="@routes.SetACLController.setACLForm">@Messages(constants.Form.SET_ACL)</a>
-            <a href="@routes.SetBuyerFeedbackController.setBuyerFeedbackForm">@Messages(constants.Form.SET_BUYER_FEEDBACK)</a>
-            <a href="@routes.SetSellerFeedbackController.setSellerFeedbackForm">@Messages(constants.Form.SET_SELLER_FEEDBACK)</a>
-                 <br><br><br>
-            @Messages(constants.Form.BLOCKCHAIN)
-
-
-            <a href="@routes.AddKeyController.blockchainAddKeyForm">@Messages(constants.Form.ADD_KEY)</a>
-            <a href="@routes.AddOrganizationController.blockchainAddOrganizationForm">@Messages(constants.Form.ADD_ORGANIZATION)</a>
-            <a href="@routes.AddZoneController.blockchainAddZoneForm">@Messages(constants.Form.ADD_ZONE)</a>
-            <a href="@routes.BuyerExecuteOrderController.blockchainBuyerExecuteOrderForm">@Messages(constants.Form.BUYER_EXECUTE_ORDER)</a>
-            <a href="@routes.ChangeBuyerBidController.blockchainChangeBuyerBidForm">@Messages(constants.Form.CHANGE_BUYER_BID)</a>
-            <a href="@routes.ChangeSellerBidController.blockchainChangeSellerBidForm">@Messages(constants.Form.CHANGE_SELLER_BID)</a>
-            <a href="@routes.ConfirmBuyerBidController.blockchainConfirmBuyerBidForm">@Messages(constants.Form.CONFIRM_BUYER_BID)</a>
-            <a href="@routes.ConfirmSellerBidController.blockchainConfirmSellerBidForm">@Messages(constants.Form.CONFIRM_SELLER_BID)</a>
-            <a href="@routes.IssueAssetController.blockchainIssueAssetForm">@Messages(constants.Form.ISSUE_ASSET)</a>
-            <a href="@routes.IssueFiatController.blockchainIssueFiatForm">@Messages(constants.Form.ISSUE_FIAT)</a>
-            <a href="@routes.RedeemAssetController.blockchainRedeemAssetForm">@Messages(constants.Form.REDEEM_ASSET)</a>
-            <a href="@routes.RedeemFiatController.blockchainRedeemFiatForm">@Messages(constants.Form.REDEEM_FIAT)</a>
-            <a href="@routes.ReleaseAssetController.blockchainReleaseAssetForm">@Messages(constants.Form.RELEASE_ASSET)</a>
-            <a href="@routes.SellerExecuteOrderController.blockchainSellerExecuteOrderForm">@Messages(constants.Form.SELLER_EXECUTE_ORDER)</a>
-            <a href="@routes.SendAssetController.blockchainSendAssetForm">@Messages(constants.Form.SEND_ASSET)</a>
-            <a href="@routes.SendCoinController.blockchainSendCoinForm">@Messages(constants.Form.SEND_COIN)</a>
-            <a href="@routes.SendFiatController.blockchainSendFiatForm">@Messages(constants.Form.SEND_FIAT)</a>
-            <a href="@routes.SetACLController.blockchainSetACLForm">@Messages(constants.Form.SET_ACL)</a>
-            <a href="@routes.SetBuyerFeedbackController.blockchainSetBuyerFeedbackForm">@Messages(constants.Form.SET_BUYER_FEEDBACK)</a>
-            <a href="@routes.SetSellerFeedbackController.blockchainSetSellerFeedbackForm">@Messages(constants.Form.SET_SELLER_FEEDBACK)</a>
 
         </div>
 

@@ -1,6 +1,5 @@
 @()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
 @common(Messages(constants.Form.VALIDATORS)){
-    <script src="@routes.Assets.versioned("javascripts/validators.js")" type="text/javascript"></script>
     <div>
         <table id="validatorsTable">
             <tr>
@@ -12,6 +11,6 @@
             <tbody id="validatorsTableBody"></tbody>
         </table>
     </div>
-    <script>validatorsTable("@configuration.get[String]("blockchain.main.ip")" + ":" + "@configuration.get[String]("blockchain.main.restPort")", "validatorsTableBody")</script>
-
+    <script src="@routes.Assets.versioned("javascripts/validators.js")" type="text/javascript"></script>
+    <script>validatorsTable("validatorsTableBody")</script>
 }

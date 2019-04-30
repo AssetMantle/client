@@ -1,0 +1,21 @@
+@import transactions.Response.TransactionHashResponse.Response
+@(response: Response)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
+
+    @common(Messages(constants.Form.TRANSACTIONS)) {
+        <div id="main_division">
+            <div class="side_division">
+            </div>
+            <div class="top_division">
+
+            </div>
+            <div class="bottom_division">
+                <div class="transactionHash-block">
+                    <h4 class="data-box-sub-header">@response.hash</h4>
+                    <h3 class="data-box-header">@Messages(constants.Form.HEIGHT) : <a href="@routes.BlockExplorerController.blockHeight(response.height.toInt)">@response.height</a></h3>
+                    <h3 class="data-box-header">@Messages(constants.Form.FEE) : @response.tx.value.fee.gas</h3>
+
+                </div>
+
+            </div>
+        </div>
+    }

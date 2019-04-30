@@ -1,20 +1,24 @@
-function searchFunction(blockHeightURL, urlQueryHash){
-    queryData = {};
-    var seachData = document.getElementById("search_value").value;
+function searchFunction( ){
+    let mainIpAbciPort = getConfiguration("blockchain.main.ip") + ":" + getConfiguration("blockchain.main.abciPort");
+    let blockHeightURL = mainIpAbciPort + "/block?height=";
+    let urlQueryHash = mainIpAbciPort + "/txs/";
+
+    var queryData = {};
+    var searchData = document.getElementById("search_value").value;
     var heightPattern = /^[0-9]*$/;
     var txHashPattern = /^[A-F0-9]{40}$/;
-    var height= heightPattern.exec(seachData);
+    var height= heightPattern.exec(searchData);
     if (height!=null){
-        heightData = JSON.parse(httpGet(blockHeightURL+height.input));
+        var heightData = JSON.parse(httpGet(blockHeightURL+height.input));
         queryData["height"] = heightData.result.block.header.height;
-        let date = new Date(heightData.result.block.header.time);
+        var date = new Date(heightData.result.block.header.time);
         queryData["block_time"] = date.toGMTString();
         queryData["hash"] = heightData.result.block_meta.block_id.hash;
         queryData["num_txs"] = heightData.result.block.header.num_txs;
     }
-    var txHash = txHashPattern.exec(seachData);
+    var txHash = txHashPattern.exec(searchData);
     if (txHash != null){
-        txHashData=JSON.parse(httpGet(urlQueryHash+txHash.input));
+        var txHashData=JSON.parse(httpGet(urlQueryHash+txHash.input));
         queryData["tx_hash"] = txHashData.hash;
         queryData["height"] = txHashData.height;
         queryData["fee"] = txHashData.tx.value.fee.amount[0].amount + " "+txHashData.tx.value.fee.amount[0].denom;
