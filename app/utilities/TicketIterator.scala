@@ -12,7 +12,7 @@ import scala.concurrent.ExecutionContext
 object TicketIterator {
 
   def start(getTickets: () => Seq[String], getValueFromWSResponse: WSResponse => String, updateTicket: (String, String) => Int, getAddress: String => String)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext, logger: Logger, pushNotifications: PushNotifications, accounts: Accounts) {
-    implicit val getResponse = new GetResponse()(wsClient, configuration, executionContext)
+    implicit val getResponse: GetResponse = new GetResponse()(wsClient, configuration, executionContext)
     val ticketIDsSeq: Seq[String] = getTickets()
     for (ticketID <- ticketIDsSeq) {
       val wsResponse = getResponse.Service.get(ticketID)
@@ -28,7 +28,7 @@ object TicketIterator {
     }
   }
 
-  def start_(getTickets: () => Seq[String], getValueFromWSResponse: WSResponse => Response, onSuccess: (String, String, String) => Unit, onFailure: (String, String) => Unit)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext, logger: Logger, pushNotifications: PushNotifications, accounts: Accounts) {
+  def start_(getTickets: () => Seq[String], getValueFromWSResponse: WSResponse => Response, onSuccess: (String, Response) => Unit, onFailure: (String, String) => Unit)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext, logger: Logger, pushNotifications: PushNotifications, accounts: Accounts) {
 
     implicit val getResponse = new GetResponse()(wsClient, configuration, executionContext)
     val ticketIDsSeq: Seq[String] = getTickets()
@@ -36,14 +36,12 @@ object TicketIterator {
       try {
         val value = getValueFromWSResponse(getResponse.Service.get(ticketID))
         //// hash response check to be done here
-        onSuccess(ticketID, value.TxHash, value.Code)
-      }
-      catch {
+        onSuccess(ticketID, value)
+      } catch {
         case blockChainException: BlockChainException => logger.error(blockChainException.message, blockChainException)
           onFailure(ticketID, blockChainException.message)
         case baseException: BaseException => logger.error(baseException.message, baseException)
       }
     }
   }
-
 }

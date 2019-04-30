@@ -4,13 +4,14 @@ import java.net.ConnectException
 
 import exceptions.BaseException
 import javax.inject.Inject
-import play.api.libs.ws.{WSClient, WSResponse}
+import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
+import transactions.Response.FiatResponse.Response
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 
-class GetFiat @Inject()(wsClient: WSClient)(implicit configuration: Configuration, executionContext: ExecutionContext) {
+class GetFiat @Inject()()(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.TRANSACTIONS_GET_FIAT
 
@@ -22,18 +23,13 @@ class GetFiat @Inject()(wsClient: WSClient)(implicit configuration: Configuratio
 
   private val path = "fiat"
 
-  private val url = ip + ":" + port + "/" + path
+  private val url = ip + ":" + port + "/" + path + "/"
 
-  private def action()(implicit executionContext: ExecutionContext): Future[Response] = wsClient.url(url).get.map { response => new Response(response) }
-
-  class Response(response: WSResponse) {
-    val body: String = response.body
-  }
+  private def action(request: String)(implicit executionContext: ExecutionContext): Future[Response] = wsClient.url(url + request).get.map { response => utilities.JSON.getResponseFromJson[Response](response) }
 
   object Service {
-
-    def get()(implicit executionContext: ExecutionContext): Response = try {
-      Await.result(action(), Duration.Inf)
+    def get(fiatPegHash: String)(implicit executionContext: ExecutionContext): Response = try {
+      Await.result(action(fiatPegHash), Duration.Inf)
     } catch {
       case connectException: ConnectException =>
         logger.error(constants.Error.CONNECT_EXCEPTION, connectException)

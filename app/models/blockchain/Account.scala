@@ -59,6 +59,16 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     }
   }
 
+  private def updateCoinsByAddress(address: String, coins: Int)(implicit executionContext: ExecutionContext): Future[Int] = db.run(accountTable.filter(_.address === address).map(_.coins).update(coins).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+        throw new BaseException(constants.Error.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+        throw new BaseException(constants.Error.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
   private def updateSequenceAndCoinsByAddress(address: String, sequence: Int, coins: Int)(implicit executionContext: ExecutionContext): Future[Int] = db.run(accountTable.filter(_.address === address).map(x => (x.sequence, x.coins)).update((sequence, coins)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -163,6 +173,8 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
     def updateSequence(address: String, sequence: Int)(implicit executionContext: ExecutionContext): Int = Await.result(updateSequenceByAddress(address, sequence), Duration.Inf)
 
+    def updateCoins(address: String, coins: Int)(implicit executionContext: ExecutionContext): Int = Await.result(updateCoinsByAddress(address, coins), Duration.Inf)
+
     def updateSequenceAndCoins(address: String, sequence: Int, coins: Int)(implicit executionContext: ExecutionContext): Int = Await.result(updateSequenceAndCoinsByAddress(address, sequence, coins), Duration.Inf)
 
     def updateSequenceCoinsAndDirtyBit(address: String, sequence: Int, coins: Int, dirtyBit: Boolean): Int = Await.result(updateSequenceCoinsAndDirtyBitByAddress(address, sequence, coins, dirtyBit), Duration.Inf)
@@ -181,7 +193,6 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
       try {
         val dirtyAccounts = Service.getDirtyBits(dirtyBit = true)
         Thread.sleep(configuration.get[Long]("blockchain.kafka.entityIterator.threadSleep"))
-        configuration.get[Long]("blockchain.kafka.entityIterator.threadSleep")
         for (dirtyAccount <- dirtyAccounts) {
           val responseAccount = getAccount.Service.get(dirtyAccount.address)
           Service.updateSequenceCoinsAndDirtyBit(responseAccount.value.address, responseAccount.value.sequence.toInt, responseAccount.value.coins.get.filter(_.denom == configuration.get[String]("blockchain.denom.gas")).map(_.amount.toInt).sum, dirtyBit = false)

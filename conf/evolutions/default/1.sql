@@ -92,24 +92,24 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Asset_BC"
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Negotiation_BC"
 (
-  "id"              VARCHAR NOT NULL,
-  "buyerAddress"    VARCHAR NOT NULL,
-  "sellerAddress"   VARCHAR NOT NULL,
-  "assetPegHash"    VARCHAR NOT NULL,
-  "bid"             INT     NOT NULL,
-  "time"            INT     NOT NULL,
-  "buyerSignature"  VARCHAR NOT NULL,
-  "sellerSignature" VARCHAR NOT NULL,
-  PRIMARY KEY ("id")
+    "id"              VARCHAR NOT NULL,
+    "buyerAddress"    VARCHAR NOT NULL,
+    "sellerAddress"   VARCHAR NOT NULL,
+    "assetPegHash"    VARCHAR NOT NULL,
+    "bid"             INT     NOT NULL,
+    "time"            INT     NOT NULL,
+    "buyerSignature"  VARCHAR,
+    "sellerSignature" VARCHAR,
+    PRIMARY KEY ("id")
 );
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Order_BC"
 (
-  "id"            VARCHAR NOT NULL,
-  "fiatProofHash" VARCHAR NOT NULL,
-  "awbProofHash"  VARCHAR NOT NULL,
-  "executed"      BOOLEAN NOT NULL,
-  PRIMARY KEY ("id")
+    "id"            VARCHAR NOT NULL,
+    "fiatProofHash" VARCHAR,
+    "awbProofHash"  VARCHAR,
+    "executed"      BOOLEAN NOT NULL,
+    PRIMARY KEY ("id")
 );
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."AddOrganization"
