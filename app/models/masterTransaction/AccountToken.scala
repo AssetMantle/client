@@ -44,7 +44,7 @@ class AccountTokens @Inject()(protected val databaseConfigProvider: DatabaseConf
     }
   }
 
-  private def update(accountToken: AccountToken) = db.run(accountTokenTable.insertOrUpdate(accountToken))
+  private def insertOrUpdate(accountToken: AccountToken) = db.run(accountTokenTable.insertOrUpdate(accountToken))
 
   private def refreshSessionTokenOnId(id: String, tokenHash: Option[String], tokenTime: Long) = db.run(accountTokenTable.filter(_.id === id).map(accountTokenTable => (accountTokenTable.sessionTokenHash.?, accountTokenTable.sessionTokenTime)).update(tokenHash, tokenTime))
 
@@ -70,12 +70,11 @@ class AccountTokens @Inject()(protected val databaseConfigProvider: DatabaseConf
   object Service {
     def addToken(id: String, registrationToken: String)(implicit executionContext: ExecutionContext): String = Await.result(add(models.masterTransaction.AccountToken(id, registrationToken, null, DateTime.now(DateTimeZone.UTC).getMillis)), Duration.Inf)
 
-    def updateToken(id: String, registrationToken: String): Int = Await.result(update(new AccountToken(id, registrationToken, null, DateTime.now(DateTimeZone.UTC).getMillis)), Duration.Inf)
+    def updateToken(id: String, registrationToken: String): Int = Await.result(insertOrUpdate(AccountToken(id, registrationToken, null, DateTime.now(DateTimeZone.UTC).getMillis)), Duration.Inf)
 
     def getTokenById(id: String)(implicit executionContext: ExecutionContext): String = Await.result(findById(id), Duration.Inf).registrationToken
 
     def ifExists(id: String): Boolean = Await.result(checkById(id), Duration.Inf)
-
 
     def verifySessionToken(username: Option[String], sessionToken: Option[String])(implicit executionContext: ExecutionContext): Boolean = {
       Await.result(findById(username.getOrElse(return false)), Duration.Inf).sessionTokenHash.get == util.hashing.MurmurHash3.stringHash(sessionToken.getOrElse(return false)).toString

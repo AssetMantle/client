@@ -40,9 +40,10 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
             }
             else {
               val response = transactionsSendCoin.Service.post(transactionsSendCoin.Request(from = username, password = sendCoinData.password, to = sendCoinData.to, amount = Seq(transactionsSendCoin.Amount("comdex", sendCoinData.amount.toString)), gas = sendCoinData.gas))
+              val fromAddress = masterAccounts.Service.getAddress(username)
               blockchainTransactionSendCoins.Service.addSendCoin(from = username, to = sendCoinData.to, amount = sendCoinData.amount, gas = sendCoinData.gas, null, txHash = Option(response.TxHash), ticketID = Random.nextString(32), null)
-              blockchainAccounts.Service.updateSequenceAndCoins(sendCoinData.to, blockchainAccounts.Service.getSequence(sendCoinData.to) + 1, defaultFaucetToken)
-              blockchainAccounts.Service.updateSequenceAndCoins(mainAddress, blockchainAccounts.Service.getSequence(mainAddress) + 1, blockchainAccounts.Service.getCoins(mainAddress) - defaultFaucetToken)
+              blockchainAccounts.Service.updateCoins(sendCoinData.to, defaultFaucetToken)
+              blockchainAccounts.Service.updateSequenceAndCoins(fromAddress, blockchainAccounts.Service.getSequence(fromAddress) + 1, blockchainAccounts.Service.getCoins(fromAddress) - defaultFaucetToken)
               Ok(views.html.index(success = response.TxHash))
             }
           }
@@ -88,7 +89,7 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
     Ok(views.html.component.master.requestCoin(views.companion.master.RequestCoin.form))
   }
 
-  def requestCoins = withUnknownLoginAction.authenticated { username =>
+  def requestCoins: Action[AnyContent] = withUnknownLoginAction.authenticated { username =>
     implicit request =>
       views.companion.master.RequestCoin.form.bindFromRequest().fold(
         formWithErrors => {
@@ -160,7 +161,7 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
                 val toAddress = masterAccounts.Service.getAddress(approveFaucetRequestFormData.accountID)
                 val response = transactionsSendCoin.Service.post(transactionsSendCoin.Request(from = constants.User.MAIN_ACCOUNT, password = approveFaucetRequestFormData.password, to = toAddress, amount = Seq(transactionsSendCoin.Amount("comdex", defaultFaucetToken.toString)), gas = approveFaucetRequestFormData.gas))
                 masterTransactionFaucetRequests.Service.updateStatusAndGas(approveFaucetRequestFormData.requestID, true, approveFaucetRequestFormData.gas)
-                blockchainAccounts.Service.updateSequenceAndCoins(toAddress, blockchainAccounts.Service.getSequence(toAddress) + 1, defaultFaucetToken)
+                blockchainAccounts.Service.updateCoins(toAddress, defaultFaucetToken)
                 blockchainAccounts.Service.updateSequenceAndCoins(mainAddress, blockchainAccounts.Service.getSequence(mainAddress) + 1, blockchainAccounts.Service.getCoins(mainAddress) - defaultFaucetToken)
                 masterAccounts.Service.updateUserType(approveFaucetRequestFormData.accountID, constants.User.USER)
                 blockchainTransactionSendCoins.Service.addSendCoin(constants.User.MAIN_ACCOUNT, toAddress, defaultFaucetToken, approveFaucetRequestFormData.gas, null, Option(response.TxHash), Random.nextString(32), null)

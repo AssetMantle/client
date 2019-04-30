@@ -97,16 +97,16 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Negotiation_BC"
   "assetPegHash"    VARCHAR NOT NULL,
   "bid"             INT     NOT NULL,
   "time"            INT     NOT NULL,
-  "buyerSignature"  VARCHAR NOT NULL,
-  "sellerSignature" VARCHAR NOT NULL,
+  "buyerSignature"  VARCHAR,
+  "sellerSignature" VARCHAR,
   PRIMARY KEY ("id")
 );
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Order_BC"
 (
   "id"            VARCHAR NOT NULL,
-  "fiatProofHash" VARCHAR NOT NULL,
-  "awbProofHash"  VARCHAR NOT NULL,
+  "fiatProofHash" VARCHAR,
+  "awbProofHash"  VARCHAR,
   "executed"      BOOLEAN NOT NULL,
   PRIMARY KEY ("id")
 );
