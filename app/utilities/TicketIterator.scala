@@ -5,6 +5,7 @@ import models.master.Accounts
 import play.api.libs.ws.{WSClient, WSResponse}
 import play.api.{Configuration, Logger}
 import transactions.GetResponse
+import transactions.Response.TransactionResponse.Response
 
 import scala.concurrent.ExecutionContext
 
@@ -27,7 +28,7 @@ object TicketIterator {
     }
   }
 
-  def start_(getTickets: () => Seq[String], getValueFromWSResponse: WSResponse => String, onSuccess: (String, String) => Unit)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext, logger: Logger, pushNotifications: PushNotifications, accounts: Accounts) {
+  def start_(getTickets: () => Seq[String], getValueFromWSResponse: WSResponse => Response, onSuccess: (String, String, String) => Unit, onFailure: (String, String) => Unit)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext, logger: Logger, pushNotifications: PushNotifications, accounts: Accounts) {
 
     implicit val getResponse = new GetResponse()(wsClient, configuration, executionContext)
     val ticketIDsSeq: Seq[String] = getTickets()
@@ -35,10 +36,11 @@ object TicketIterator {
       try {
         val value = getValueFromWSResponse(getResponse.Service.get(ticketID))
         //// hash response check to be done here
-        onSuccess(ticketID, value)
+        onSuccess(ticketID, value.TxHash, value.Code)
       }
       catch {
         case blockChainException: BlockChainException => logger.error(blockChainException.message, blockChainException)
+          onFailure(ticketID, blockChainException.message)
         case baseException: BaseException => logger.error(baseException.message, baseException)
       }
     }
