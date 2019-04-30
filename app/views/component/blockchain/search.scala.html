@@ -1,6 +1,6 @@
 @()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
 <div>
-    <input class="search" id="search_value" placeholder="@Messages(constants.Form.SEARCH_TX_HASH_HEIGHT)"/>
+    <input id="search_value" placeholder="@Messages(constants.Form.SEARCH_TX_HASH_HEIGHT)"/>
     <button onclick='searchFunction()' >@Messages(constants.Form.SEARCH)</button>
     <pre type="reset" id="search_result"></pre>
 </div>
