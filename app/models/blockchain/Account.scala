@@ -1,14 +1,12 @@
 package models.blockchain
 
-import exceptions.{BaseException, BlockChainException}
-import javax.inject.Inject
+import exceptions.BaseException
+import javax.inject.{Inject, Singleton}
 import org.postgresql.util.PSQLException
-import play.api.{Configuration, Logger}
+import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
-import play.api.libs.ws.WSClient
 import slick.jdbc.JdbcProfile
-import transactions.{AddKey, GetAccount, GetSeed}
-import utilities.PushNotifications
+import transactions.{AddKey, GetSeed}
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
@@ -16,6 +14,7 @@ import scala.util.{Failure, Success}
 
 case class Account(address: String, coins: Int, publicKey: String, accountNumber: Int, sequence: Int)
 
+@Singleton
 class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, getSeed: GetSeed, addKey: AddKey) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]

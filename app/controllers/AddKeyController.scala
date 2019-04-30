@@ -1,7 +1,7 @@
 package controllers
 
 import exceptions.{BaseException, BlockChainException}
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 import play.api.Configuration
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
@@ -9,6 +9,7 @@ import views.companion.blockchain.AddKey
 
 import scala.concurrent.ExecutionContext
 
+@Singleton
 class AddKeyController @Inject()(messagesControllerComponents: MessagesControllerComponents, transactionsAddKey: transactions.AddKey)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   def blockchainAddKeyForm: Action[AnyContent] = Action { implicit request =>

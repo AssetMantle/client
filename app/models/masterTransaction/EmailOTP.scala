@@ -1,7 +1,7 @@
 package models.masterTransaction
 
 import exceptions.BaseException
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.JdbcProfile
@@ -12,9 +12,10 @@ import scala.util.{Failure, Random, Success}
 
 case class EmailOTP(id: String, secretHash: String)
 
+@Singleton
 class EmailOTPs @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider) {
 
-  private implicit val module: String = constants.Module.MASTER_ACCOUNT
+  private implicit val module: String = constants.Module.MASTER_TRANSACTION_EMAIL_OTP
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
   val db = databaseConfig.db
