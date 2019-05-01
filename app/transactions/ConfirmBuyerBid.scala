@@ -2,7 +2,7 @@ package transactions
 
 import java.net.ConnectException
 
-import exceptions.BaseException
+import exceptions.BlockChainException
 import javax.inject.Inject
 import play.api.libs.json.{JsObject, Json, OWrites}
 import play.api.libs.ws.{WSClient, WSResponse}
@@ -42,7 +42,7 @@ class ConfirmBuyerBid @Inject()(wsClient: WSClient)(implicit configuration: Conf
     } catch {
       case connectException: ConnectException =>
         logger.error(constants.Error.CONNECT_EXCEPTION, connectException)
-        throw new BaseException(constants.Error.CONNECT_EXCEPTION)
+        throw new BlockChainException(constants.Error.CONNECT_EXCEPTION)
     }
 
     def kafkaPost(request: Request)(implicit executionContext: ExecutionContext): KafkaResponse = try {
@@ -50,7 +50,7 @@ class ConfirmBuyerBid @Inject()(wsClient: WSClient)(implicit configuration: Conf
     } catch {
       case connectException: ConnectException =>
         logger.error(constants.Error.CONNECT_EXCEPTION, connectException)
-        throw new BaseException(constants.Error.CONNECT_EXCEPTION)
+        throw new BlockChainException(constants.Error.CONNECT_EXCEPTION)
     }
 
     def getTxHashFromWSResponse(wsResponse: WSResponse): String = utilities.JSON.getResponseFromJson[Response](wsResponse).TxHash

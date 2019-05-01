@@ -2,7 +2,7 @@ package transactions
 
 import java.net.ConnectException
 
-import exceptions.BaseException
+import exceptions.BlockChainException
 import javax.inject.Inject
 import play.api.{Configuration, Logger}
 import play.api.libs.ws.WSClient
@@ -34,7 +34,7 @@ class GetTransactionHash @Inject()(wsClient: WSClient)(implicit configuration: C
     } catch {
       case connectException: ConnectException =>
         logger.error(constants.Error.CONNECT_EXCEPTION, connectException)
-        throw new BaseException(constants.Error.CONNECT_EXCEPTION)
+        throw new BlockChainException(constants.Error.CONNECT_EXCEPTION)
     }
   }
 }
