@@ -2,14 +2,15 @@ package transactions
 
 import java.net.ConnectException
 
-import exceptions.{BaseException, BlockChainException}
-import javax.inject.Inject
-import play.api.{Configuration, Logger}
+import exceptions.BlockChainException
+import javax.inject.{Inject, Singleton}
 import play.api.libs.ws.{WSClient, WSResponse}
+import play.api.{Configuration, Logger}
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 
+@Singleton
 class GetResponse @Inject()()(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.TRANSACTIONS_GET_RESPONSE

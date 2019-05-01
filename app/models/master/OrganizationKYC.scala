@@ -1,6 +1,7 @@
 package models.master
 
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
+import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.JdbcProfile
 
@@ -8,7 +9,12 @@ import scala.concurrent.Future
 
 case class OrganizationKYC(id: String, documentType: String, status: Boolean, fileName: String, file: Array[Byte])
 
+@Singleton
 class OrganizationKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider) {
+
+  private implicit val logger: Logger = Logger(this.getClass)
+
+  private implicit val module: String = constants.Module.MASTER_ORGANIZATION_KYC
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
   val db = databaseConfig.db
