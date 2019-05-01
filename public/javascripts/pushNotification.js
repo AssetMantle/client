@@ -1,3 +1,10 @@
+getConfigurationAsynchronously("notification.apiKey");
+getConfigurationAsynchronously("notification.authDomain");
+getConfigurationAsynchronously("notification.databaseURL");
+getConfigurationAsynchronously("notification.projectId");
+getConfigurationAsynchronously("notification.storageBucket");
+getConfigurationAsynchronously("notification.senderID");
+
 $(document).ready(function () {
     $("#notificationWindowCommons").load(jsRoutes.controllers.NotificationController.showNotifications(1).url);
 

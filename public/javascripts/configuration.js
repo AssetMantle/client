@@ -1,6 +1,7 @@
 function getConfiguration(configuration) {
-    if (getCookie(configuration) !== ""){
-        return getCookie(configuration)
+    let configurationValue = getCookie(configuration);
+    if (configurationValue !== ""){
+        return configurationValue;
     }else {
         let route = jsRoutes.controllers.ConfigurationController.queryConfigurationVariable(configuration);
         $.ajax({

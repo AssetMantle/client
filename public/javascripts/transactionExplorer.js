@@ -1,9 +1,14 @@
-let wsUrl = getConfiguration("blockchain.main.wsIP") + ":" + getConfiguration("blockchain.main.abciPort") + "/websocket";
-let txHashUrl = getConfiguration("blockchain.main.ip") + ":" + getConfiguration("blockchain.main.restPort") + "/txs/";
-let blockchainHeightURL = getConfiguration("blockchain.main.ip") + ":" + getConfiguration("blockchain.main.abciPort") + "/block?height=";
-let txHashPage = "./txs?txHash=";
+getConfigurationAsynchronously("blockchain.main.wsIP");
+getConfigurationAsynchronously("blockchain.main.abciPort");
+getConfigurationAsynchronously("blockchain.main.ip");
+getConfigurationAsynchronously("blockchain.main.restPort")
 
 function transactionExplorer(){
+    let wsUrl = getConfiguration("blockchain.main.wsIP") + ":" + getConfiguration("blockchain.main.abciPort") + "/websocket";
+    let txHashUrl = getConfiguration("blockchain.main.ip") + ":" + getConfiguration("blockchain.main.restPort") + "/txs/";
+    let blockchainHeightURL = getConfiguration("blockchain.main.ip") + ":" + getConfiguration("blockchain.main.abciPort") + "/block?height=";
+    let txHashPage = "./txs?txHash=";
+
     var content = '';
     for (var i =0; i <8; i++){
         content = "<tr><td></td><td></td><td></td></tr>" + content;

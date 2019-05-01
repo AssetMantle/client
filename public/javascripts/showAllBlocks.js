@@ -1,10 +1,12 @@
-let wsURL = getConfiguration("blockchain.main.wsIP") + ":" + getConfiguration("blockchain.main.abciPort") + "/websocket";
-let abciIpPort = getConfiguration("blockchain.main.ip") + ":" + getConfiguration("blockchain.main.abciPort");
+getConfigurationAsynchronously("blockchain.main.wsIP");
+getConfigurationAsynchronously("blockchain.main.abciPort");
+getConfigurationAsynchronously("blockchain.main.ip");
 
 let bodyID = "allBlocksTableBody";
 var click = 0;
 
 function initialTableContent() {
+    let wsURL = getConfiguration("blockchain.main.wsIP") + ":" + getConfiguration("blockchain.main.abciPort") + "/websocket";
     click = 0;
     changeTableContent(click);
 
@@ -50,6 +52,7 @@ function onClickPrevious() {
 }
 
 function changeTableContent(clickValue) {
+    let abciIpPort = getConfiguration("blockchain.main.ip") + ":" + getConfiguration("blockchain.main.abciPort");
     let lastBlockHeight = parseInt(JSON.parse(httpGet(abciIpPort + "/abci_info"))["result"]["response"]["last_block_height"]);
     let url = abciIpPort + "/blockchain?minHeight=" + (lastBlockHeight - 10 * (clickValue + 1)).toString(10) + "&maxHeight=" + (lastBlockHeight - 10 * clickValue).toString(10);
     let blocksData = JSON.parse(httpGet(url));

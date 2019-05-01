@@ -1,10 +1,15 @@
-let wsURL = getConfiguration("blockchain.main.wsIP") + ":" + getConfiguration("blockchain.main.abciPort") + "/websocket";
-let blockHeightURL = "./block?blockHeight=";
-let mainIpAbciPort = getConfiguration("blockchain.main.ip") + ":" + getConfiguration("blockchain.main.abciPort");
-let abciInfoURL = mainIpAbciPort + "/abci_info";
+getConfigurationAsynchronously("blockchain.main.wsIP");
+getConfigurationAsynchronously("blockchain.main.ip");
+getConfigurationAsynchronously("blockchain.main.abciPort");
+
 
 let tableBodyID = "block_container";
 function blockExplorer(){
+    let wsURL = getConfiguration("blockchain.main.wsIP") + ":" + getConfiguration("blockchain.main.abciPort") + "/websocket";
+    let mainIpAbciPort = getConfiguration("blockchain.main.ip") + ":" + getConfiguration("blockchain.main.abciPort");
+    let abciInfoURL = mainIpAbciPort + "/abci_info";
+    let blockHeightURL = "./block?blockHeight=";
+
     var counter = 0;
     var lastBlockTime = "";
     var averageBlockTime = 6.0;
@@ -37,7 +42,7 @@ function blockExplorer(){
         lastBlockHeight = height;
     });
     averageBlockTimeUpdater(averageBlockTime);
-    lastBlockFunc(abciInfoURL, lastBlockHeight, lastBlockTime);
+    updateLastBlock(abciInfoURL, lastBlockHeight, lastBlockTime);
     $('#' + tableBodyID).prepend(content);
     for (var i = 0; i < initialTimeData.length; i++) {
         getBlockTime(initialTimeData[i], "timer" + i.toString(10));
@@ -71,7 +76,7 @@ function blockExplorer(){
             }
             counter += 1;
             averageBlockTimeUpdater(averageBlockTime);
-            lastBlockFunc(abciInfoURL, height, lastBlockTime);
+            updateLastBlock(abciInfoURL, height, lastBlockTime);
         };
 
         wsNewBlock.onerror = function (evt) {
