@@ -50,16 +50,16 @@
     <a href="@routes.SetBuyerFeedbackController.blockchainSetBuyerFeedbackForm">@Messages(constants.Form.SET_BUYER_FEEDBACK)</a>
     <a href="@routes.SetSellerFeedbackController.blockchainSetSellerFeedbackForm">@Messages(constants.Form.SET_SELLER_FEEDBACK)</a>
 
-    <div class="main_division">
-        <div class="top_division">
+    <div class="mainDivision">
+        <div class="topDivision">
             @search()
         </div>
         <div class="box1">@lastBlockHeight()</div>
         <div class="box2">@validators()</div>
         <div class="box3"> @Messages(constants.Form.TOKENS)
-            <p id="tokens_value"><b>12</b></p></div>
+            <p id="tokensValue"></p></div>
         <div class="box4">@averageBlockTime()</div>
-        <div class="bottom_division">
+        <div class="bottomDivision">
             @blockTimeGraph()
             @blockExplorer()
             @transactionExplorer()

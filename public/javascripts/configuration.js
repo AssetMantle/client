@@ -4,7 +4,7 @@ function getConfiguration(configuration) {
     $.ajax({
         url: route.url,
         type: route.type,
-        async: false,
+        async: true,
         statusCode: {
             200: function (result) {
                 response= result;

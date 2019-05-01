@@ -1,25 +1,22 @@
 @import transactions.Response.BlockHeightResponse.Response
 @(response: Response)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
-
     @common(Messages(constants.Form.BLOCK)) {
-
-
-        <div class="main_division">
+        <div class="mainDivision">
             <div class="blocksHeightPage">
                 @Messages(constants.Form.BLOCK): @response.result.block_meta.header.height <br>
                 @Messages(constants.Form.TIME): @response.result.block_meta.header.time <br>
                 @Messages(constants.Form.NUM_TXS): @response.result.block_meta.header.num_txs
             </div>
-            <div class="transactionHash-block">
-                <h4 class="heading_text">@Messages(constants.Form.TRANSACTIONS)</h4>
+            <div class="transactionHashBlock">
+                <h4 class="headingText">@Messages(constants.Form.TRANSACTIONS)</h4>
                 <p>@response.result.block_meta.header.data_hash</p>
             </div>
             <div class="evidenceHash">
-            <h4 class="heading_text">@Messages(constants.Form.EVIDENCE_HASH)</h4>
+            <h4 class="headingText">@Messages(constants.Form.EVIDENCE_HASH)</h4>
             <p>@response.result.block_meta.header.evidence_hash</p>
             </div>
-            <div class="validators-hash">
-                <h4 class="heading_text">@Messages(constants.Form.VALIDATORS_HASH)</h4>
+            <div class="validatorsHash">
+                <h4 class="headingText">@Messages(constants.Form.VALIDATORS_HASH)</h4>
                 <p>@response.result.block_meta.header.validators_hash</p>
             </div>
         </div>

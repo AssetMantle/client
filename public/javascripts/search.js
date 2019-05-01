@@ -1,6 +1,5 @@
 function searchFunction( ){
-    var queryData = {};
-    var searchData = document.getElementById("search_value").value;
+    var searchData = document.getElementById("searchValue").value;
     var heightPattern = /^[0-9]*$/;
     var txHashPattern = /^[A-F0-9]{40}$/;
     var height= heightPattern.exec(searchData);
@@ -11,5 +10,4 @@ function searchFunction( ){
     if (txHash != null){
         window.location= txHashPage + txHash;
     }
-    document.getElementById("search_result").innerHTML= JSON.stringify(queryData);
 }
