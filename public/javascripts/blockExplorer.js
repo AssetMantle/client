@@ -1,14 +1,13 @@
 getConfigurationAsynchronously("blockchain.main.wsIP");
 getConfigurationAsynchronously("blockchain.main.ip");
 getConfigurationAsynchronously("blockchain.main.abciPort");
-
+let blockHeightURL = "./block?blockHeight=";
 
 let tableBodyID = "block_container";
 function blockExplorer(){
     let wsURL = getConfiguration("blockchain.main.wsIP") + ":" + getConfiguration("blockchain.main.abciPort") + "/websocket";
     let mainIpAbciPort = getConfiguration("blockchain.main.ip") + ":" + getConfiguration("blockchain.main.abciPort");
     let abciInfoURL = mainIpAbciPort + "/abci_info";
-    let blockHeightURL = "./block?blockHeight=";
 
     let counter = 0;
     let lastBlockTime = "";
