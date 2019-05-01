@@ -11,7 +11,7 @@ function getValidators(bodyID){
 function validatorsTable(bodyID) {
     let urlGetValidators = getConfiguration("blockchain.main.ip") + ":" + getConfiguration("blockchain.main.restPort") + "/stake/validators";
 
-    var content = "";
+    let content = "";
     let validatorList = JSON.parse(httpGet(urlGetValidators));
     Array.prototype.forEach.call(validatorList, validator => {
         content = content + "<tr><td>" + validator["operator"] + "</td><td>" + validator["status"] + "</td><td >" + validator["tokens"] + "</div></td></td><td >" + validator["delegator_shares"] + "</td></tr>";

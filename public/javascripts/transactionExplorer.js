@@ -9,8 +9,8 @@ function transactionExplorer(){
     let blockchainHeightURL = getConfiguration("blockchain.main.ip") + ":" + getConfiguration("blockchain.main.abciPort") + "/block?height=";
     let txHashPage = "./txs?txHash=";
 
-    var content = '';
-    for (var i =0; i <8; i++){
+    let content = '';
+    for (let i =0; i <8; i++){
         content = "<tr><td></td><td></td><td></td></tr>" + content;
     }
     $('#transaction_container').prepend(content);
@@ -29,7 +29,7 @@ function transactionExplorer(){
             let txHash = data.result.block_meta.header.data_hash;
             let msgType = JSON.parse(httpGet(txHashUrl + txHash)).tx.value.msg[0].type;
 
-            var transactionContainerList = document.getElementById("transaction_container");
+            let transactionContainerList = document.getElementById("transaction_container");
             let transactionContainerListLength = transactionContainerList.childNodes.length;
             if (transactionContainerListLength > 8) {
                 transactionContainerList.removeChild(transactionContainerList.childNodes[transactionContainerListLength - 1]);

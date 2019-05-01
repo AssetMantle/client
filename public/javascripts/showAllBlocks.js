@@ -3,7 +3,7 @@ getConfigurationAsynchronously("blockchain.main.abciPort");
 getConfigurationAsynchronously("blockchain.main.ip");
 
 let bodyID = "allBlocksTableBody";
-var click = 0;
+let click = 0;
 
 function initialTableContent() {
     let wsURL = getConfiguration("blockchain.main.wsIP") + ":" + getConfiguration("blockchain.main.abciPort") + "/websocket";
@@ -58,7 +58,7 @@ function changeTableContent(clickValue) {
     let blocksData = JSON.parse(httpGet(url));
     let blocks = blocksData["result"]["block_metas"];
 
-    var content = '';
+    let content = '';
     Array.prototype.forEach.call(blocks, block => {
         content = content + "<tr><td>" + block["header"]["height"] + "</td><td>" + block["header"]["time"] + "</td><td>" + block["header"]["num_txs"] + "</td></td></tr>";
     });

@@ -8,7 +8,7 @@ getConfigurationAsynchronously("notification.senderID");
 $(document).ready(function () {
     $("#notificationWindowCommons").load(jsRoutes.controllers.NotificationController.showNotifications(1).url);
 
-    var config = {
+    let config = {
         apiKey: getConfiguration("notification.apiKey"),
         authDomain: getConfiguration("notification.authDomain"),
         databaseURL: getConfiguration("notification.databaseURL"),
@@ -34,7 +34,7 @@ $(document).ready(function () {
         });
     messaging.onMessage(function (payload) {
         if($("#" + "notificationWindow").length !==0) {
-            var newNotification = document.createElement('div');
+            let newNotification = document.createElement('div');
             newNotification.innerHTML ='</br>' +" (New) " +JSON.parse(JSON.stringify(payload)).notification.title+" + "+JSON.parse(JSON.stringify(payload)).notification.body+ '</br>';
             newNotification.style.backgroundColor="#09c866";
             newNotification.setAttribute("onclick","location.reload()");

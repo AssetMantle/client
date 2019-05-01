@@ -1,6 +1,6 @@
 function graph(title, chartID) {
-    var ctx = $('#' + chartID);
-    var chart = new Chart(ctx, {
+    let ctx = $('#' + chartID);
+    let chart = new Chart(ctx, {
         type: 'line',
         data: {
             labels: [],
@@ -28,7 +28,7 @@ function updateGraph(chartID, label, data) {
         chart.data.labels.splice(0, 1);
         chart.data.datasets[0].data.splice(0, 1);
     }
-    for (var i = 0; i < data.length; i++) {
+    for (let i = 0; i < data.length; i++) {
         chart.data.labels.push(label[i]);
         chart.data.datasets[0].data.push(data[i]);
     }
