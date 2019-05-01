@@ -1,11 +1,12 @@
-let abciIpPort = getConfiguration("blockchain.main.ip") + ":" + getConfiguration("blockchain.main.abciPort");
 let wsURL = getConfiguration("blockchain.main.wsIP") + ":" + getConfiguration("blockchain.main.abciPort") + "/websocket";
+let abciIpPort = getConfiguration("blockchain.main.ip") + ":" + getConfiguration("blockchain.main.abciPort");
 
 let bodyID = "allBlocksTableBody";
 var click = 0;
 
-window.onload = function(){
-    changeTableContent(click, bodyID);
+function initialTableContent() {
+    click = 0;
+    changeTableContent(click);
 
     window.addEventListener("load", function (evt) {
         let wsNewBlock = new WebSocket(wsURL);
@@ -20,7 +21,7 @@ window.onload = function(){
                 let blockContainerList = document.getElementById(bodyID);
                 let height = parseInt(dataNewBlock["result"]["data"]["value"]["block"]["header"]["height"], 10);
                 blockContainerList.removeChild(blockContainerList.childNodes[blockContainerList.childNodes.length - 1]);
-                $('#' + bodyID).prepend("<tr><td>" + height + "</td><td>" +  dataNewBlock["result"]["data"]["value"]["block"]["header"]["time"] + "</td><td>" + dataNewBlock["result"]["data"]["value"]["block"]["header"]["num_txs"] + "</td></td></tr>");
+                $('#' + bodyID).prepend("<tr><td>" + height + "</td><td>" + dataNewBlock["result"]["data"]["value"]["block"]["header"]["time"] + "</td><td>" + dataNewBlock["result"]["data"]["value"]["block"]["header"]["num_txs"] + "</td></td></tr>");
             }
         };
 
@@ -30,7 +31,9 @@ window.onload = function(){
             }
         };
     });
-};
+}
+
+window.onload = initialTableContent();
 
 function onClickNext() {
     click += 1;
@@ -39,7 +42,11 @@ function onClickNext() {
 
 function onClickPrevious() {
     click -= 1;
-    changeTableContent(click)
+    if (click > 0) {
+        changeTableContent(click);
+    } else {
+        initialTableContent();
+    }
 }
 
 function changeTableContent(clickValue) {
