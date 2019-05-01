@@ -55,8 +55,7 @@ function changeTableContent(clickValue) {
     let abciIpPort = getConfiguration("blockchain.main.ip") + ":" + getConfiguration("blockchain.main.abciPort");
     let lastBlockHeight = parseInt(JSON.parse(httpGet(abciIpPort + "/abci_info"))["result"]["response"]["last_block_height"]);
     let url = abciIpPort + "/blockchain?minHeight=" + (lastBlockHeight - 10 * (clickValue + 1)).toString(10) + "&maxHeight=" + (lastBlockHeight - 10 * clickValue).toString(10);
-    let blocksData = JSON.parse(httpGet(url));
-    let blocks = blocksData["result"]["block_metas"];
+    let blocks = JSON.parse(httpGet(url))["result"]["block_metas"];
 
     let content = '';
     Array.prototype.forEach.call(blocks, block => {
