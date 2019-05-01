@@ -56,7 +56,7 @@ class FaucetRequests @Inject()(protected val databaseConfigProvider: DatabaseCon
     }
   }
 
-  private def updateTicketIDByID(id: String, ticketID: String)(implicit executionContext: ExecutionContext): Future[Int] = db.run(faucetRequestTable.filter(_.id === id).map(_.ticketID).update(ticketID).asTry).map {
+  private def updateTicketIDStatusAndGasByID(id: String, ticketID: String,status:Boolean, gas:Int)(implicit executionContext: ExecutionContext): Future[Int] = db.run(faucetRequestTable.filter(_.id === id).map(faucet =>(faucet.ticketID, faucet.status, faucet.gas)).update(ticketID, status, gas).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
@@ -168,7 +168,7 @@ class FaucetRequests @Inject()(protected val databaseConfigProvider: DatabaseCon
 
     def getFaucetRequest(accountID: String)(implicit executionContext: ExecutionContext):FaucetRequest = Await.result(findByAccountID(accountID), Duration.Inf)
 
-    def updateTicketID(requestID: String, ticketID: String)(implicit executionContext: ExecutionContext): Int = Await.result(updateTicketIDByID(requestID, ticketID), Duration.Inf)
+    def updateTicketIDStatusAndGas(requestID: String, ticketID: String, status:Boolean, gas:Int)(implicit executionContext: ExecutionContext): Int = Await.result(updateTicketIDStatusAndGasByID(requestID, ticketID, status,gas), Duration.Inf)
 
     def updateStatusAndGas(id: String, status: Boolean, gas: Int)(implicit executionContext: ExecutionContext): Int = Await.result(updateStatusAndGasByID(id, status, gas), Duration.Inf)
 

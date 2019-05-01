@@ -157,11 +157,11 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     def dirtyBit = column[Boolean]("dirtyBit")
   }
 
-  if (configuration.get[Boolean]("blockchain.kafka.enabled")) {
+  //if (configuration.get[Boolean]("blockchain.kafka.enabled")) {
     actorSystem.scheduler.schedule(initialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds, interval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").second) {
       Utility.Iterator()
     }
-  }
+  //}
 
   object Service {
 

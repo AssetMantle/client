@@ -39,7 +39,9 @@ object TicketIterator {
         onSuccess(ticketID, value)
       } catch {
         case blockChainException: BlockChainException => logger.error(blockChainException.message, blockChainException)
-          onFailure(ticketID, blockChainException.message)
+          if (blockChainException.message != """{"response":"Request in process, wait and try after some time"}""") {
+            onFailure(ticketID, blockChainException.message)
+          }
         case baseException: BaseException => logger.error(baseException.message, baseException)
       }
     }

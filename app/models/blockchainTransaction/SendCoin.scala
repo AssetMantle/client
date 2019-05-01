@@ -199,8 +199,6 @@ class SendCoins @Inject()(protected val databaseConfigProvider: DatabaseConfigPr
       try {
         Service.updateTxHashStatusResponseCode(ticketID, response.TxHash, status = true, response.Code)
         val sendCoin = Service.getTransaction(ticketID)
-        faucetRequests.Service.updateStatusAndGasOnTicketID(ticketID, status = true, sendCoin.gas)
-
         blockchainAccounts.Service.updateDirtyBit(sendCoin.to, dirtyBit = true)
         blockchainAccounts.Service.updateDirtyBit(masterAccounts.Service.getAddress(sendCoin.from), dirtyBit = true)
 
@@ -208,8 +206,9 @@ class SendCoins @Inject()(protected val databaseConfigProvider: DatabaseConfigPr
         if (toAccount.userType == constants.User.UNKNOWN) {
           masterAccounts.Service.updateUserType(toAccount.id, constants.User.USER)
         }
-        pushNotifications.sendNotification(toAccount.id, constants.Notification.SUCCESS, Seq(sendCoin.txHash.get))
-        pushNotifications.sendNotification(sendCoin.from, constants.Notification.SUCCESS, Seq(sendCoin.txHash.get))
+
+        pushNotifications.sendNotification(toAccount.id, constants.Notification.SUCCESS, Seq(response.TxHash))
+        pushNotifications.sendNotification(sendCoin.from, constants.Notification.SUCCESS, Seq(response.TxHash))
       }
       catch {
         case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
@@ -221,8 +220,8 @@ class SendCoins @Inject()(protected val databaseConfigProvider: DatabaseConfigPr
       try {
         Service.updateStatusAndResponseCode(ticketID, status = false, message)
         val sendCoin = Service.getTransaction(ticketID)
-        pushNotifications.sendNotification(masterAccounts.Service.getId(sendCoin.to), constants.Notification.SUCCESS, Seq(sendCoin.responseCode.get))
-        pushNotifications.sendNotification(sendCoin.from, constants.Notification.SUCCESS, Seq(sendCoin.responseCode.get))
+        pushNotifications.sendNotification(masterAccounts.Service.getId(sendCoin.to), constants.Notification.SUCCESS, Seq(message))
+        pushNotifications.sendNotification(sendCoin.from, constants.Notification.SUCCESS, Seq(message))
       } catch {
         case baseException: BaseException => logger.error(constants.Error.BASE_EXCEPTION, baseException)
       }
