@@ -15,8 +15,7 @@ function blockExplorer(){
 
     let latestBlockHeight = parseInt(JSON.parse(httpGet(abciInfoURL))["result"]["response"]["last_block_height"]);
     let urlMinMax = mainIpAbciPort + "/blockchain?minHeight=" + (latestBlockHeight - 6).toString(10) + "&maxHeight=" + latestBlockHeight.toString(10);
-    let blocksData = JSON.parse(httpGet(urlMinMax));
-    let blocks = blocksData["result"]["block_metas"];
+    let blocks = JSON.parse(httpGet(urlMinMax))["result"]["block_metas"];
     let content = '';
     let initialTimeData = [];
     let initialGraphTime = [];
