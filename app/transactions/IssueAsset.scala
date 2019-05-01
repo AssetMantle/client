@@ -4,6 +4,8 @@ import java.net.ConnectException
 
 import exceptions.BlockChainException
 import javax.inject.Inject
+import exceptions.BaseException
+import javax.inject.{Inject, Singleton}
 import play.api.libs.json.{Json, OWrites}
 import play.api.libs.ws.{WSClient, WSResponse}
 import play.api.{Configuration, Logger}
@@ -12,6 +14,7 @@ import transactions.Response.TransactionResponse.{KafkaResponse, Response}
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 
+@Singleton
 class IssueAsset @Inject()(wsClient: WSClient)(implicit configuration: Configuration, executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.TRANSACTIONS_ISSUE_ASSET

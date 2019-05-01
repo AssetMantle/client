@@ -1,10 +1,11 @@
 package controllers
 
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 import play.api.Configuration
 import play.api.mvc._
 import play.api.routing._
 
+@Singleton
 class JavaScriptRoutesController @Inject()(messagesControllerComponents: MessagesControllerComponents)(implicit configuration: Configuration) extends AbstractController(messagesControllerComponents) {
   def javascriptRoutes = Action { implicit request =>
     Ok(

@@ -5,12 +5,16 @@ import java.net.ConnectException
 import exceptions.BlockChainException
 import javax.inject.Inject
 import transactions.Response.AccountResponse.Response
+import exceptions.BaseException
+import javax.inject.{Inject, Singleton}
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
+import transactions.Response.AccountResponse.Response
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 
+@Singleton
 class GetAccount @Inject()()(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.TRANSACTIONS_GET_ACCOUNT

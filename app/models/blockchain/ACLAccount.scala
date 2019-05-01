@@ -1,7 +1,7 @@
 package models.blockchain
 
 import exceptions.BaseException
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 import org.postgresql.util.PSQLException
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
@@ -15,6 +15,7 @@ case class ACLAccount(address: String, zoneID: String, organizationID: String, a
 
 case class ACL(issueAssets: Boolean, issueFiats: Boolean, sendAssets: Boolean, sendFiats: Boolean, redeemAssets: Boolean, redeemFiats: Boolean, sellerExecuteOrder: Boolean, buyerExecuteOrder: Boolean, changeBuyerBid: Boolean, changeSellerBid: Boolean, confirmBuyerBid: Boolean, confirmSellerBid: Boolean, negotiation: Boolean, releaseAssets: Boolean)
 
+@Singleton
 class ACLAccounts @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, aclHashes: ACLHashes) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]

@@ -1,7 +1,7 @@
 package models.masterTransaction
 
 import exceptions.BaseException
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 import org.postgresql.util.PSQLException
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
@@ -13,6 +13,7 @@ import scala.util.{Failure, Random, Success}
 
 case class IssueAssetRequest(id: String, accountID: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, gas: Option[Int], status: Option[Boolean], comment: Option[String])
 
+@Singleton
 class IssueAssetRequests @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]

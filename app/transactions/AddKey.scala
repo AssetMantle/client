@@ -1,6 +1,9 @@
 package transactions
 
 import java.net.ConnectException
+
+import exceptions.BaseException
+import javax.inject.{Inject, Singleton}
 import exceptions.BlockChainException
 import javax.inject.Inject
 import play.api.libs.json._
@@ -10,6 +13,7 @@ import play.api.{Configuration, Logger}
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 
+@Singleton
 class AddKey @Inject()(wsClient: WSClient)(implicit configuration: Configuration, executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.TRANSACTIONS_ADD_KEY

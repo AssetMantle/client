@@ -2,15 +2,18 @@ package transactions
 
 import java.net.ConnectException
 
+import exceptions.BaseException
+import javax.inject.{Inject, Singleton}
 import exceptions.BlockChainException
 import javax.inject.Inject
 import play.api.libs.ws.WSClient
-import transactions.Response.AssetResponse.Response
 import play.api.{Configuration, Logger}
+import transactions.Response.AssetResponse.Response
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 
+@Singleton
 class GetAsset @Inject()()(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.TRANSACTIONS_GET_ASSET

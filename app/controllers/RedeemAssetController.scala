@@ -2,8 +2,8 @@ package controllers
 
 import controllers.actions.{WithLoginAction, WithTraderLoginAction}
 import exceptions.{BaseException, BlockChainException}
-import javax.inject.Inject
-import models.{blockchainTransaction, blockchain}
+import javax.inject.{Inject, Singleton}
+import models.blockchainTransaction
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
@@ -11,7 +11,8 @@ import play.api.{Configuration, Logger}
 import scala.concurrent.ExecutionContext
 import scala.util.Random
 
-class RedeemAssetController @Inject()(messagesControllerComponents: MessagesControllerComponents, blockchainAssets: blockchain.Assets, withTraderLoginAction: WithTraderLoginAction, withLoginAction: WithLoginAction, transactionsRedeemAsset: transactions.RedeemAsset, blockchainTransactionRedeemAssets: blockchainTransaction.RedeemAssets)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+@Singleton
+class RedeemAssetController @Inject()(messagesControllerComponents: MessagesControllerComponents, withTraderLoginAction: WithTraderLoginAction, withLoginAction: WithLoginAction, transactionsRedeemAsset: transactions.RedeemAsset, blockchainTransactionRedeemAssets: blockchainTransaction.RedeemAssets)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -36,7 +37,6 @@ class RedeemAssetController @Inject()(messagesControllerComponents: MessagesCont
             } else {
               val response = transactionsRedeemAsset.Service.post(transactionsRedeemAsset.Request(from = username, to = redeemAssetData.to, password = redeemAssetData.password, pegHash = redeemAssetData.pegHash, gas = redeemAssetData.gas))
               blockchainTransactionRedeemAssets.Service.addRedeemAsset(from = username, to = redeemAssetData.to, pegHash = redeemAssetData.pegHash, gas = redeemAssetData.gas, null, txHash = Option(response.TxHash), ticketID = Random.nextString(32), null)
-              blockchainAssets.Service.deleteAsset(redeemAssetData.pegHash)
               Ok(views.html.index(success = response.TxHash))
             }
           }

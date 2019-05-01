@@ -2,7 +2,7 @@ package controllers
 
 import controllers.actions.WithLoginAction
 import exceptions.BaseException
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 import models.master.Contacts
 import models.masterTransaction.EmailOTPs
 import play.api.i18n.{I18nSupport, Messages}
@@ -13,6 +13,7 @@ import views.companion.master.VerifyEmailAddress
 
 import scala.concurrent.ExecutionContext
 
+@Singleton
 class VerifyEmailAddressController @Inject()(messagesControllerComponents: MessagesControllerComponents, emailOTPs: EmailOTPs, contacts: Contacts, withLoginAction: WithLoginAction, pushNotifications: PushNotifications, email: Email)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val module: String = constants.Module.MASTER_ACCOUNT
