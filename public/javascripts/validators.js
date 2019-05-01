@@ -3,14 +3,12 @@ getConfigurationAsynchronously("blockchain.main.restPort");
 
 function getValidators(bodyID){
     let urlGetValidators = getConfiguration("blockchain.main.ip") + ":" + getConfiguration("blockchain.main.restPort") + "/stake/validators";
-
     let listValidators =  JSON.parse(httpGet(urlGetValidators));
     document.getElementById(bodyID).innerHTML = "Validators:"+listValidators.length;
 }
 
 function validatorsTable(bodyID) {
     let urlGetValidators = getConfiguration("blockchain.main.ip") + ":" + getConfiguration("blockchain.main.restPort") + "/stake/validators";
-
     let content = "";
     let validatorList = JSON.parse(httpGet(urlGetValidators));
     Array.prototype.forEach.call(validatorList, validator => {
