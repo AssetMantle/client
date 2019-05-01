@@ -8,7 +8,8 @@ import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
-import transactions.{AddKey, GetSeed}
+import transactions.{AddKey, GetAccount, GetSeed}
+import utilities.PushNotifications
 
 import scala.concurrent.duration.{Duration, _}
 import scala.concurrent.{Await, ExecutionContext, Future}
