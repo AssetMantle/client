@@ -2,7 +2,7 @@ package models.blockchainTransaction
 
 import akka.actor.ActorSystem
 import exceptions.BaseException
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 import models.master.Accounts
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
@@ -18,6 +18,7 @@ import scala.util.{Failure, Success}
 
 case class ConfirmSellerBid(from: String, to: String, bid: Int, time: Int, pegHash: String, gas: Int,  status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])
 
+@Singleton
 class ConfirmSellerBids @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, transactionConfirmSellerBid: transactions.ConfirmSellerBid, getResponse: GetResponse, actorSystem: ActorSystem, implicit val pushNotifications: PushNotifications, implicit val accounts: Accounts)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext)  {
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_CONFIRM_SELLER_BID

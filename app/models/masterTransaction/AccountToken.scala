@@ -1,11 +1,11 @@
 package models.masterTransaction
 
 import exceptions.BaseException
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 import org.joda.time.{DateTime, DateTimeZone}
 import org.postgresql.util.PSQLException
-import play.api.db.slick.DatabaseConfigProvider
 import play.api.{Configuration, Logger}
+import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.JdbcProfile
 
 import scala.concurrent.duration.Duration
@@ -14,9 +14,10 @@ import scala.util.{Failure, Random, Success}
 
 case class AccountToken(id: String, registrationToken: String, sessionTokenHash: Option[String], sessionTokenTime: Long)
 
+@Singleton
 class AccountTokens @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit configuration: Configuration) {
 
-  private implicit val module: String = constants.Module.MASTER_ACCOUNT
+  private implicit val module: String = constants.Module.MASTER_TRANSACTION_ACCOUNT_TOKEN
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
   val db = databaseConfig.db
@@ -80,7 +81,7 @@ class AccountTokens @Inject()(protected val databaseConfigProvider: DatabaseConf
     }
 
     def tryVerifySessionToken(username: String, sessionToken: String)(implicit executionContext: ExecutionContext): Boolean = {
-      if (Await.result(findById(username), Duration.Inf).sessionTokenHash.get == util.hashing.MurmurHash3.stringHash(sessionToken).toString) true
+      if(Await.result(findById(username), Duration.Inf).sessionTokenHash.get == util.hashing.MurmurHash3.stringHash(sessionToken).toString) true
       else throw new BaseException(constants.Error.INVALID_TOKEN)
     }
 
@@ -89,7 +90,7 @@ class AccountTokens @Inject()(protected val databaseConfigProvider: DatabaseConf
     }
 
     def tryVerifySessionTokenTime(username: String)(implicit executionContext: ExecutionContext): Boolean = {
-      if ((DateTime.now(DateTimeZone.UTC).getMillis - Await.result(findById(username), Duration.Inf).sessionTokenTime) < configuration.get[Long]("sessionToken.timeout")) true
+      if((DateTime.now(DateTimeZone.UTC).getMillis - Await.result(findById(username), Duration.Inf).sessionTokenTime) < configuration.get[Long]("sessionToken.timeout")) true
       else throw new BaseException(constants.Error.TOKEN_TIMEOUT)
     }
 

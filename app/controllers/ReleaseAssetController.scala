@@ -2,7 +2,7 @@ package controllers
 
 import controllers.actions.{WithLoginAction, WithZoneLoginAction}
 import exceptions.{BaseException, BlockChainException}
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 import models.{blockchain, blockchainTransaction, master}
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
@@ -11,6 +11,7 @@ import play.api.{Configuration, Logger}
 import scala.concurrent.ExecutionContext
 import scala.util.Random
 
+@Singleton
 class ReleaseAssetController @Inject()(messagesControllerComponents: MessagesControllerComponents, masterAccounts: master.Accounts, blockchainAssets: blockchain.Assets, blockchainAccounts: blockchain.Accounts, withLoginAction: WithLoginAction, withZoneLoginAction: WithZoneLoginAction, transactionsReleaseAsset: transactions.ReleaseAsset, blockchainTransactionReleaseAssets: blockchainTransaction.ReleaseAssets)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)

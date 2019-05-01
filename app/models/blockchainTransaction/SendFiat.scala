@@ -2,7 +2,7 @@ package models.blockchainTransaction
 
 import akka.actor.ActorSystem
 import exceptions.BaseException
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 import models.master.Accounts
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
@@ -18,6 +18,7 @@ import scala.util.{Failure, Success}
 
 case class SendFiat(from: String, to: String, amount: Int, pegHash: String, gas: Int,  status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])
 
+@Singleton
 class SendFiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, transactionSendFiat: transactions.SendFiat, getResponse: GetResponse, actorSystem: ActorSystem, implicit val pushNotifications: PushNotifications, implicit val accounts: Accounts)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext)  {
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_SEND_FIAT

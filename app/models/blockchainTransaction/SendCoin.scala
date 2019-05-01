@@ -2,7 +2,7 @@ package models.blockchainTransaction
 
 import akka.actor.ActorSystem
 import exceptions.BaseException
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 import models.masterTransaction.FaucetRequests
 import models.{blockchain, master}
 import org.postgresql.util.PSQLException
@@ -10,8 +10,8 @@ import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
-import transactions.Response.TransactionResponse.Response
 import transactions.{GetAccount, GetResponse}
+import transactions.Response.TransactionResponse.Response
 import utilities.PushNotifications
 
 import scala.concurrent.duration.{Duration, _}
@@ -20,6 +20,7 @@ import scala.util.{Failure, Success}
 
 case class SendCoin(from: String, to: String, amount: Int, gas: Int, status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])
 
+@Singleton
 class SendCoins @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, transactionSendCoin: transactions.SendCoin, getResponse: GetResponse, actorSystem: ActorSystem, implicit val pushNotifications: PushNotifications, implicit val masterAccounts: master.Accounts, implicit val blockchainAccounts: blockchain.Accounts, implicit val faucetRequests: FaucetRequests, implicit val getAccount: GetAccount)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]

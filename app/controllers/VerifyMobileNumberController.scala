@@ -2,7 +2,7 @@ package controllers
 
 import controllers.actions.WithLoginAction
 import exceptions.BaseException
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 import models.master.Contacts
 import models.masterTransaction.SMSOTPs
 import play.api.i18n.{I18nSupport, Messages}
@@ -13,6 +13,7 @@ import views.companion.master.VerifyMobileNumber
 
 import scala.concurrent.ExecutionContext
 
+@Singleton
 class VerifyMobileNumberController @Inject()(messagesControllerComponents: MessagesControllerComponents, smsOTPs: SMSOTPs, contacts: Contacts, withLoginAction: WithLoginAction, pushNotifications: PushNotifications, SMS: SMS)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val module: String = constants.Module.MASTER_ACCOUNT

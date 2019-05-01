@@ -1,7 +1,7 @@
 package models.master
 
 import exceptions.BaseException
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 import org.postgresql.util.PSQLException
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
@@ -13,6 +13,7 @@ import scala.util.{Failure, Success}
 
 case class Account(id: String, secretHash: String, accountAddress: String, language: String, userType: String)
 
+@Singleton
 class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider) {
 
   private implicit val module: String = constants.Module.MASTER_ACCOUNT

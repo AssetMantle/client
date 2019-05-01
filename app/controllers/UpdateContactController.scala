@@ -1,7 +1,7 @@
 package controllers
 
 import controllers.actions.WithLoginAction
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 import models.master.Contacts
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
@@ -10,6 +10,7 @@ import views.companion.master.UpdateContact
 
 import scala.concurrent.ExecutionContext
 
+@Singleton
 class UpdateContactController @Inject()(messagesControllerComponents: MessagesControllerComponents, contacts: Contacts, withLoginAction: WithLoginAction)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)

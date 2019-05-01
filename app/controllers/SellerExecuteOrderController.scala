@@ -2,7 +2,7 @@ package controllers
 
 import controllers.actions.{WithLoginAction, WithZoneLoginAction}
 import exceptions.{BaseException, BlockChainException}
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 import models.blockchainTransaction.SellerExecuteOrders
 import models.master.Accounts
 import models.{blockchain, master}
@@ -13,6 +13,7 @@ import play.api.{Configuration, Logger}
 import scala.concurrent.ExecutionContext
 import scala.util.Random
 
+@Singleton
 class SellerExecuteOrderController @Inject()(messagesControllerComponents: MessagesControllerComponents, masterAccounts: master.Accounts, blockchainOrders: blockchain.Orders, blockchainAccounts: blockchain.Accounts, withZoneLoginAction: WithZoneLoginAction, withLoginAction: WithLoginAction, transactionsSellerExecuteOrder: transactions.SellerExecuteOrder, sellerExecuteOrders: SellerExecuteOrders)(implicit exec: ExecutionContext, configuration: Configuration, accounts: Accounts) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)

@@ -2,7 +2,7 @@ package models.master
 
 
 import exceptions.BaseException
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.JdbcProfile
@@ -13,9 +13,10 @@ import scala.util.{Failure, Success}
 
 case class Contact(id: String, mobileNumber: String, mobileNumberVerified: Boolean, emailAddress: String, emailAddressVerified: Boolean)
 
+@Singleton
 class Contacts @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider) {
 
-  private implicit val module: String = constants.Module.MASTER_ACCOUNT
+  private implicit val module: String = constants.Module.MASTER_CONTACT
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
   val db = databaseConfig.db
