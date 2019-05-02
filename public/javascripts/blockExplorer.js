@@ -49,10 +49,6 @@ function blockExplorer(){
     lastBlockTime = initialTimeData[initialTimeData.length - 1];
 
     window.addEventListener("load", function (evt) {
-        console.log(evt.hasOwnProperty("persisted"));
-        if (evt.persisted) {
-            window.location.reload();
-        }
         let wsNewBlock = new WebSocket(wsURL);
         wsNewBlock.onopen = () => {
             let requestNewBlock = `{"method":"subscribe", "id":"dontcare","jsonrpc":"2.0","params":["tm.event='NewBlock'"]}`;

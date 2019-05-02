@@ -22,22 +22,20 @@ function transactionExplorer(){
         };
 
         wsTx.onmessage = function (evt) {
-            let dataTx = JSON.parse(evt.data);
-            let height = dataTx["result"]["data"]["value"]["TxResult"]["height"];
+            let height = JSON.parse(evt.data)["result"]["data"]["value"]["TxResult"]["height"];
             let urlHeight = blockchainHeightURL + height;
-            let data = JSON.parse(httpGet(urlHeight));
-            let txHash = data.result.block_meta.header.data_hash;
+            let txHash = JSON.parse(httpGet(urlHeight)).result.block_meta.header.data_hash;
             let msgType = JSON.parse(httpGet(txHashUrl + txHash)).tx.value.msg[0].type;
 
-            let transactionContainerList = document.getElementById("transaction_container");
+            let transactionContainerList = document.getElementById("transactionContainer");
             let transactionContainerListLength = transactionContainerList.childNodes.length;
             if (transactionContainerListLength > 8) {
                 transactionContainerList.removeChild(transactionContainerList.childNodes[transactionContainerListLength - 1]);
             }
-            $('#transaction_container').prepend("<tr><td><a href='" + blockHeightURL + height + "'>" + height + "</a></td><td><a href='" + txHashPage + txHash + "'>" + txHash + "</a></td><td >" + msgType + "</td></tr>");
+            $('#transactionContainer').prepend("<tr><td><a href='" + blockHeightURL + height + "'>" + height + "</a></td><td><a href='" + txHashPage + txHash + "'>" + txHash + "</a></td><td >" + msgType + "</td></tr>");
         };
         wsTx.onerror = function (evt) {
-            document.getElementById("transaction_container").appendChild(document.createElement("div").innerHTML = "ERROR: " + evt.data);
+            document.getElementById("transactionContainer").appendChild(document.createElement("div").innerHTML = "ERROR: " + evt.data);
         };
     });
 }

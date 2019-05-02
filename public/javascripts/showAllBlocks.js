@@ -2,7 +2,7 @@ getConfigurationAsynchronously("blockchain.main.wsIP");
 getConfigurationAsynchronously("blockchain.main.abciPort");
 getConfigurationAsynchronously("blockchain.main.ip");
 
-let bodyID = "allBlocksTableBody";
+let showAllBlocksTableBody = "allBlocksTableBody";
 let click = 0;
 
 function initialTableContent() {
@@ -20,16 +20,16 @@ function initialTableContent() {
         wsNewBlock.onmessage = function (message) {
             if (click === 0) {
                 let dataNewBlock = JSON.parse(message.data);
-                let blockContainerList = document.getElementById(bodyID);
+                let blockContainerList = document.getElementById(showAllBlocksTableBody);
                 let height = parseInt(dataNewBlock["result"]["data"]["value"]["block"]["header"]["height"], 10);
                 blockContainerList.removeChild(blockContainerList.childNodes[blockContainerList.childNodes.length - 1]);
-                $('#' + bodyID).prepend("<tr><td>" + height + "</td><td>" + dataNewBlock["result"]["data"]["value"]["block"]["header"]["time"] + "</td><td>" + dataNewBlock["result"]["data"]["value"]["block"]["header"]["num_txs"] + "</td></td></tr>");
+                $('#' + showAllBlocksTableBody).prepend("<tr><td>" + height + "</td><td>" + dataNewBlock["result"]["data"]["value"]["block"]["header"]["time"] + "</td><td>" + dataNewBlock["result"]["data"]["value"]["block"]["header"]["num_txs"] + "</td></td></tr>");
             }
         };
 
         wsNewBlock.onerror = function (evt) {
             if (click === 0) {
-                document.getElementById(bodyID).appendChild(document.createElement("div").innerHTML = "ERROR: " + evt.data);
+                document.getElementById(showAllBlocksTableBody).appendChild(document.createElement("div").innerHTML = "ERROR: " + evt.data);
             }
         };
     });
@@ -61,5 +61,5 @@ function changeTableContent(clickValue) {
     Array.prototype.forEach.call(blocks, block => {
         content = content + "<tr><td>" + block["header"]["height"] + "</td><td>" + block["header"]["time"] + "</td><td>" + block["header"]["num_txs"] + "</td></td></tr>";
     });
-    $('#' + bodyID).empty().append(content);
+    $('#' + showAllBlocksTableBody).empty().append(content);
 }
