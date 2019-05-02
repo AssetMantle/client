@@ -3,7 +3,7 @@ getConfigurationAsynchronously("blockchain.main.ip");
 getConfigurationAsynchronously("blockchain.main.abciPort");
 let blockHeightURL = "./block?blockHeight=";
 
-let tableBodyID = "block_container";
+let blockExplorerTableBody = "blockContainer";
 function blockExplorer(){
     let wsURL = getConfiguration("blockchain.main.wsIP") + ":" + getConfiguration("blockchain.main.abciPort") + "/websocket";
     let mainIpAbciPort = getConfiguration("blockchain.main.ip") + ":" + getConfiguration("blockchain.main.abciPort");
@@ -41,7 +41,7 @@ function blockExplorer(){
     });
     averageBlockTimeUpdater(averageBlockTime);
     updateLastBlock(abciInfoURL, lastBlockHeight, lastBlockTime);
-    $('#' + tableBodyID).prepend(content);
+    $('#' + blockExplorerTableBody).prepend(content);
     for (let i = 0; i < initialTimeData.length; i++) {
         getBlockTime(initialTimeData[i], "timer" + i.toString(10));
     }
@@ -49,6 +49,10 @@ function blockExplorer(){
     lastBlockTime = initialTimeData[initialTimeData.length - 1];
 
     window.addEventListener("load", function (evt) {
+        console.log(evt.hasOwnProperty("persisted"));
+        if (evt.persisted) {
+            window.location.reload();
+        }
         let wsNewBlock = new WebSocket(wsURL);
         wsNewBlock.onopen = () => {
             let requestNewBlock = `{"method":"subscribe", "id":"dontcare","jsonrpc":"2.0","params":["tm.event='NewBlock'"]}`;
@@ -63,9 +67,9 @@ function blockExplorer(){
             let timerID = "timer" + counter.toString(10);
             let blockTime = new Date(time);
             let differenceBetweenBlockTime = (blockTime.getTime() - new Date(lastBlockTime).getTime()) / 1000;
-            let blockContainerList = document.getElementById(tableBodyID);
+            let blockContainerList = document.getElementById(blockExplorerTableBody);
             blockContainerList.removeChild(blockContainerList.childNodes[blockContainerList.childNodes.length - 1]);
-            $('#' + tableBodyID).prepend("<tr><td><a href='" + blockHeightURL + height + "'>" + height + "</a></td><td>" + numTxs + "</td><td ><div class='timer_div' id='" + timerID + "'></div></td></tr>");
+            $('#' + blockExplorerTableBody).prepend("<tr><td><a href='" + blockHeightURL + height + "'>" + height + "</a></td><td>" + numTxs + "</td><td ><div class='timer_div' id='" + timerID + "'></div></td></tr>");
             getBlockTime(time, timerID);
             updateGraph("blockTimes", [blockTime.getHours() + ":" + blockTime.getMinutes() + ":" + blockTime.getSeconds()], [differenceBetweenBlockTime]);
             lastBlockTime = time;
@@ -78,7 +82,7 @@ function blockExplorer(){
         };
 
         wsNewBlock.onerror = function (evt) {
-            document.getElementById(tableBodyID).appendChild(document.createElement("div").innerHTML = "ERROR: " + evt.data);
+            document.getElementById(blockExplorerTableBody).appendChild(document.createElement("div").innerHTML = "ERROR: " + evt.data);
         };
     });
 }

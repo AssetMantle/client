@@ -13,7 +13,7 @@ function transactionExplorer(){
     for (let i =0; i <8; i++){
         content = "<tr><td></td><td></td><td></td></tr>" + content;
     }
-    $('#transaction_container').prepend(content);
+    $('#transactionContainer').prepend(content);
     window.addEventListener("load", function (evt) {
         let wsTx = new WebSocket(wsUrl);
         wsTx.onopen = () => {

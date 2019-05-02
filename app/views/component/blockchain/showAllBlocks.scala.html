@@ -1,10 +1,5 @@
-@import views.html.component.blockchain.{search, validators}
 @(success: String = "", failure: String = "")(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
 @common(Messages(constants.Form.ALL_BLOCKS), success, failure) {
-    <div>
-        @search()
-        @validators()
-    </div>
     <table id="allBlocksTable">
         <tr>
             <th>@Messages(constants.Form.HEIGHT)</th>
