@@ -2,6 +2,10 @@ let invalidBlockHeight = "";
 let invalidTransactionHash = "";
 
 function searchFunction(searchData) {
+    $("#searchForm").submit(function(e) {
+        e.preventDefault();
+    });
+
     let heightPattern = /^[0-9]*$/;
     let txHashPattern = /^[A-F0-9]{40}$/;
     let blockHeightUrl = getConfiguration("blockchain.main.ip") + ":" + getConfiguration("blockchain.main.abciPort") + "/block?height=";
