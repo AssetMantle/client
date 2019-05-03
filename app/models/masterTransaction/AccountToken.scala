@@ -1,11 +1,10 @@
 package models.masterTransaction
 
 import exceptions.BaseException
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 import org.joda.time.{DateTime, DateTimeZone}
 import org.postgresql.util.PSQLException
-import play.api.Logger
-import play.api.Configuration
+import play.api.{Configuration, Logger}
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.JdbcProfile
 
@@ -15,9 +14,10 @@ import scala.util.{Failure, Random, Success}
 
 case class AccountToken(id: String, registrationToken: String, sessionTokenHash: Option[String], sessionTokenTime: Long)
 
+@Singleton
 class AccountTokens @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit configuration: Configuration) {
 
-  private implicit val module: String = constants.Module.MASTER_ACCOUNT
+  private implicit val module: String = constants.Module.MASTER_TRANSACTION_ACCOUNT_TOKEN
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
   val db = databaseConfig.db

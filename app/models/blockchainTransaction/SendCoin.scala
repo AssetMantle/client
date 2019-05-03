@@ -1,25 +1,28 @@
 package models.blockchainTransaction
 
-import play.api.{Configuration, Logger}
-import play.api.db.slick.DatabaseConfigProvider
-import play.api.libs.ws.WSClient
-import slick.jdbc.JdbcProfile
-import transactions.GetResponse
-import javax.inject.Inject
 import akka.actor.ActorSystem
 import exceptions.BaseException
-import models.master.Accounts
+import javax.inject.{Inject, Singleton}
+import models.masterTransaction.FaucetRequests
+import models.{blockchain, master}
 import org.postgresql.util.PSQLException
+import play.api.db.slick.DatabaseConfigProvider
+import play.api.libs.ws.WSClient
+import play.api.{Configuration, Logger}
+import queries.GetAccount
+import slick.jdbc.JdbcProfile
+import transactions.GetResponse
+import transactions.responses.TransactionResponse.Response
 import utilities.PushNotifications
 
-import scala.concurrent.duration._
-import scala.concurrent.duration.Duration
+import scala.concurrent.duration.{Duration, _}
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class SendCoin(from: String, to: String, amount: Int, gas: Int,  status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])
+case class SendCoin(from: String, to: String, amount: Int, gas: Int, status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])
 
-class SendCoins @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, transactionSendCoin: transactions.SendCoin, getResponse: GetResponse, actorSystem: ActorSystem, implicit val pushNotifications: PushNotifications, implicit val accounts: Accounts)(implicit  wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
+@Singleton
+class SendCoins @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, transactionSendCoin: transactions.SendCoin, getResponse: GetResponse, actorSystem: ActorSystem, implicit val pushNotifications: PushNotifications, implicit val masterAccounts: master.Accounts, implicit val blockchainAccounts: blockchain.Accounts, implicit val faucetRequests: FaucetRequests, implicit val getAccount: GetAccount)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -81,6 +84,26 @@ class SendCoins @Inject()(protected val databaseConfigProvider: DatabaseConfigPr
     }
   }
 
+  private def updateStatusAndResponseOnTicketID(ticketID: String, status: Boolean, responseCode: String): Future[Int] = db.run(sendCoinTable.filter(_.ticketID === ticketID).map(x => (x.status, x.responseCode)).update((status, responseCode)).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+        throw new BaseException(constants.Error.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+        throw new BaseException(constants.Error.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def updateTxHashStatusAndResponseOnTicketID(ticketID: String, txHash: String, status: Boolean, responseCode: String): Future[Int] = db.run(sendCoinTable.filter(_.ticketID === ticketID).map(x => (x.txHash, x.status, x.responseCode)).update((txHash, status, responseCode)).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+        throw new BaseException(constants.Error.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+        throw new BaseException(constants.Error.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
   private def findByTicketID(ticketID: String)(implicit executionContext: ExecutionContext): Future[SendCoin] = db.run(sendCoinTable.filter(_.ticketID === ticketID).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -101,7 +124,9 @@ class SendCoins @Inject()(protected val databaseConfigProvider: DatabaseConfigPr
     }
   }
 
-  private def getTicketIDsWithEmptyTxHash()(implicit executionContext: ExecutionContext):Future[Seq[String]] = db.run(sendCoinTable.filter(_.txHash.?.isEmpty).map(_.ticketID).result)
+  private def getTicketIDsWithEmptyTxHash()(implicit executionContext: ExecutionContext): Future[Seq[String]] = db.run(sendCoinTable.filter(_.txHash.?.isEmpty).map(_.ticketID).result)
+
+  private def getTicketIDsWithNullStatus()(implicit executionContext: ExecutionContext): Future[Seq[String]] = db.run(sendCoinTable.filter(_.status.?.isEmpty).map(_.ticketID).result)
 
   private def deleteByTicketID(ticketID: String)(implicit executionContext: ExecutionContext) = db.run(sendCoinTable.filter(_.ticketID === ticketID).delete.asTry).map {
     case Success(result) => result
@@ -134,27 +159,74 @@ class SendCoins @Inject()(protected val databaseConfigProvider: DatabaseConfigPr
     def responseCode = column[String]("responseCode")
   }
 
-  if (configuration.get[Boolean]("blockchain.kafka.enabled")) {
-    actorSystem.scheduler.schedule(initialDelay = configuration.get[Int]("blockchain.kafka.ticketIterator.initialDelay").seconds, interval = configuration.get[Int]("blockchain.kafka.ticketIterator.interval").second) {
-      utilities.TicketIterator.start(Service.getTicketIDs, transactionSendCoin.Service.getTxHashFromWSResponse, Service.updateTxHash, Service.getAddress)
-    }
-  }
-
   object Service {
 
-    def addSendCoin(from: String, to: String, amount: Int, gas: Int, status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String]) (implicit executionContext: ExecutionContext): String = Await.result(add(SendCoin(from = from, to = to, amount = amount, gas = gas, status = status, txHash = txHash, ticketID = ticketID, responseCode = responseCode)), Duration.Inf)
+    def addSendCoin(from: String, to: String, amount: Int, gas: Int, status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])(implicit executionContext: ExecutionContext): String = Await.result(add(SendCoin(from = from, to = to, amount = amount, gas = gas, status = status, txHash = txHash, ticketID = ticketID, responseCode = responseCode)), Duration.Inf)
 
-    def addSendCoinKafka(from: String, to: String, amount: Int, gas: Int, status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String]) (implicit executionContext: ExecutionContext): String = Await.result(add(SendCoin(from = from, to = to, amount = amount, gas = gas, status = status, txHash = txHash, ticketID = ticketID, responseCode = responseCode)), Duration.Inf)
+    def addSendCoinKafka(from: String, to: String, amount: Int, gas: Int, status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])(implicit executionContext: ExecutionContext): String = Await.result(add(SendCoin(from = from, to = to, amount = amount, gas = gas, status = status, txHash = txHash, ticketID = ticketID, responseCode = responseCode)), Duration.Inf)
 
-    def updateTxHash(ticketID: String, txHash: String) (implicit executionContext: ExecutionContext): Int = Await.result(updateTxHashOnTicketID(ticketID, Option(txHash)),Duration.Inf)
+    def updateTxHash(ticketID: String, txHash: String)(implicit executionContext: ExecutionContext): Int = Await.result(updateTxHashOnTicketID(ticketID, Option(txHash)), Duration.Inf)
 
-    def updateResponseCode(ticketID: String, responseCode: String) (implicit executionContext: ExecutionContext): Int = Await.result(updateResponseCodeOnTicketID(ticketID, responseCode), Duration.Inf)
+    def updateResponseCode(ticketID: String, responseCode: String)(implicit executionContext: ExecutionContext): Int = Await.result(updateResponseCodeOnTicketID(ticketID, responseCode), Duration.Inf)
 
-    def updateStatus(ticketID: String, status: Boolean) (implicit executionContext: ExecutionContext): Int = Await.result(updateStatusOnTicketID(ticketID, status), Duration.Inf)
+    def updateStatus(ticketID: String, status: Boolean)(implicit executionContext: ExecutionContext): Int = Await.result(updateStatusOnTicketID(ticketID, status), Duration.Inf)
+
+    def updateStatusAndResponseCode(ticketID: String, status: Boolean, responseCode: String): Int = Await.result(updateStatusAndResponseOnTicketID(ticketID, status, responseCode), Duration.Inf)
+
+    def updateTxHashStatusResponseCode(ticketID: String, txHash: String, status: Boolean, responseCode: String): Int = Await.result(updateTxHashStatusAndResponseOnTicketID(ticketID, txHash, status, responseCode), Duration.Inf)
 
     def getTicketIDs()(implicit executionContext: ExecutionContext): Seq[String] = Await.result(getTicketIDsWithEmptyTxHash(), Duration.Inf)
 
+    def getTicketIDsOnStatus(): Seq[String] = Await.result(getTicketIDsWithNullStatus(), Duration.Inf)
+
     def getAddress(ticketID: String)(implicit executionContext: ExecutionContext): String = Await.result(getAddressByTicketID(ticketID), Duration.Inf)
 
+    def getTransaction(ticketID: String)(implicit executionContext: ExecutionContext): SendCoin = Await.result(findByTicketID(ticketID), Duration.Inf)
+
+  }
+
+  private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
+  private val schedulerInterval =  configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
+  private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
+
+  object Utility {
+    def onSuccess(ticketID: String, response: Response): Future[Unit] = Future {
+      try {
+        Service.updateTxHashStatusResponseCode(ticketID, response.TxHash, status = true, response.Code)
+        val sendCoin = Service.getTransaction(ticketID)
+        blockchainAccounts.Service.updateDirtyBit(sendCoin.to, dirtyBit = true)
+        blockchainAccounts.Service.updateDirtyBit(masterAccounts.Service.getAddress(sendCoin.from), dirtyBit = true)
+
+        val toAccount = masterAccounts.Service.getAccountByAddress(sendCoin.to)
+        if (toAccount.userType == constants.User.UNKNOWN) {
+          masterAccounts.Service.updateUserType(toAccount.id, constants.User.USER)
+        }
+
+        pushNotifications.sendNotification(toAccount.id, constants.Notification.SUCCESS, Seq(response.TxHash))
+        pushNotifications.sendNotification(sendCoin.from, constants.Notification.SUCCESS, Seq(response.TxHash))
+      }
+      catch {
+        case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+          throw new BaseException(constants.Error.PSQL_EXCEPTION)
+      }
+    }
+
+    def onFailure(ticketID: String, message: String): Future[Unit] = Future {
+      try {
+        Service.updateStatusAndResponseCode(ticketID, status = false, message)
+        val sendCoin = Service.getTransaction(ticketID)
+        pushNotifications.sendNotification(masterAccounts.Service.getId(sendCoin.to), constants.Notification.SUCCESS, Seq(message))
+        pushNotifications.sendNotification(sendCoin.from, constants.Notification.SUCCESS, Seq(message))
+      } catch {
+        case baseException: BaseException => logger.error(constants.Error.BASE_EXCEPTION, baseException)
+      }
+    }
+  }
+
+  //scheduler iterates with rows with null as status
+  if (kafkaEnabled) {
+    actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
+      utilities.TicketUpdater.start_(Service.getTicketIDsOnStatus, transactionSendCoin.Service.getTxFromWSResponse, Utility.onSuccess, Utility.onFailure)
+    }
   }
 }

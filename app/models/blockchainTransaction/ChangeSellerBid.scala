@@ -2,12 +2,12 @@ package models.blockchainTransaction
 
 import akka.actor.ActorSystem
 import exceptions.BaseException
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 import models.master.Accounts
 import org.postgresql.util.PSQLException
-import play.api.{Configuration, Logger}
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.ws.WSClient
+import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
 import transactions.GetResponse
 import utilities.PushNotifications
@@ -18,6 +18,7 @@ import scala.util.{Failure, Success}
 
 case class ChangeSellerBid(from: String, to: String, bid: Int, time: Int, pegHash: String, gas: Int,  status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])
 
+@Singleton
 class ChangeSellerBids @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, transactionChangeSellerBid: transactions.ChangeSellerBid, getResponse: GetResponse, actorSystem: ActorSystem, implicit val pushNotifications: PushNotifications, implicit val accounts: Accounts)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext)  {
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_CHANGE_SELLER_BID
@@ -138,8 +139,8 @@ class ChangeSellerBids @Inject()(protected val databaseConfigProvider: DatabaseC
   }
 
   if (configuration.get[Boolean]("blockchain.kafka.enabled")) {
-    actorSystem.scheduler.schedule(initialDelay = configuration.get[Int]("blockchain.kafka.ticketIterator.initialDelay").seconds, interval = configuration.get[Int]("blockchain.kafka.ticketIterator.interval").second) {
-      utilities.TicketIterator.start(Service.getTicketIDs, transactionChangeSellerBid.Service.getTxHashFromWSResponse, Service.updateTxHash, Service.getAddress)
+    actorSystem.scheduler.schedule(initialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds, interval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").second) {
+      utilities.TicketUpdater.start(Service.getTicketIDs, transactionChangeSellerBid.Service.getTxHashFromWSResponse, Service.updateTxHash, Service.getAddress)
     }
   }
 
@@ -159,5 +160,6 @@ class ChangeSellerBids @Inject()(protected val databaseConfigProvider: DatabaseC
 
     def getAddress(ticketID: String)(implicit executionContext: ExecutionContext): String = Await.result(getAddressByTicketID(ticketID), Duration.Inf)
 
+    def getByTicketID(ticketID: String)() = Await.result(findByTicketID(ticketID), Duration.Inf)
   }
 }

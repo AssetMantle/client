@@ -1,6 +1,5 @@
 Index=Indexio
 Login=S'identifier
-
 NOTIFICATIONMessage.LOGIN=Vous êtes authentifié {0}
 NOTIFICATIONTitle.LOGIN=S'identifier
 NOTIFICATIONMessage.OTP=Votre OTP est {0}

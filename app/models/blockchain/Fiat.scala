@@ -1,7 +1,7 @@
 package models.blockchain
 
 import exceptions.BaseException
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 import org.postgresql.util.PSQLException
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
@@ -13,6 +13,7 @@ import scala.util.{Failure, Success}
 
 case class Fiat(pegHash: String, transactionID: String, transactionAmount: Int, redeemedAmount: Int)
 
+@Singleton
 class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
@@ -102,7 +103,7 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
     def getFiat(pegHash: String)(implicit executionContext: ExecutionContext): Fiat = Await.result(findByPegHash(pegHash), Duration.Inf)
 
-    def insertOrUpdateFiat(pegHash: String, transactionID: String, transactionAmount: Int, redeemedAmount: Int)(implicit executionContext: ExecutionContext): Int = Await.result(insertOrUpdate(Fiat(pegHash = pegHash, transactionID = transactionID, transactionAmount = transactionAmount, redeemedAmount = redeemedAmount)),Duration.Inf)
+    def insertOrUpdateFiat(pegHash: String, transactionID: String, transactionAmount: Int, redeemedAmount: Int)(implicit executionContext: ExecutionContext): Int = Await.result(insertOrUpdate(Fiat(pegHash = pegHash, transactionID = transactionID, transactionAmount = transactionAmount, redeemedAmount = redeemedAmount)), Duration.Inf)
 
     def updateRedeemedAmount(pegHash: String, redeemedAmount: Int)(implicit executionContext: ExecutionContext): Int = Await.result(updateRedeemedAmountByPegHash(pegHash, redeemedAmount), Duration.Inf)
 

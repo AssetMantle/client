@@ -1,7 +1,7 @@
 package controllers.actions
 
 import exceptions.BaseException
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 import models.master
 import models.masterTransaction.AccountTokens
 import play.api.i18n.{I18nSupport, Messages}
@@ -10,6 +10,7 @@ import play.api.{Configuration, Logger}
 
 import scala.concurrent.ExecutionContext
 
+@Singleton
 class WithTraderLoginAction @Inject()(messagesControllerComponents: MessagesControllerComponents, masterAccounts: master.Accounts, accountTokens: AccountTokens)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val module: String = constants.Module.ACTIONS_WITH_TRADER_LOGIN_ACTION

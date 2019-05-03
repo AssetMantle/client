@@ -1,7 +1,7 @@
 package models.blockchain
 
 import exceptions.BaseException
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 import org.postgresql.util.PSQLException
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
@@ -13,6 +13,7 @@ import scala.util.{Failure, Success}
 
 case class Negotiation(id: String, buyerAddress: String, sellerAddress: String, assetPegHash: String, bid: Int, time: Int, buyerSignature: Option[String], sellerSignature: Option[String])
 
+@Singleton
 class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
@@ -117,15 +118,15 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
 
   object Service {
 
-    def addNegotiation(id: String, buyerAddress: String, sellerAddress: String, assetPegHash: String, bid: Int, time: Int, buyerSignature: Option[String], sellerSignature: Option[String])(implicit executionContext: ExecutionContext): String = Await.result(add(Negotiation(id = id, buyerAddress = buyerAddress, sellerAddress = sellerAddress, assetPegHash = assetPegHash, bid = bid, time = time, buyerSignature = buyerSignature, sellerSignature = sellerSignature)),Duration.Inf)
+    def addNegotiation(id: String, buyerAddress: String, sellerAddress: String, assetPegHash: String, bid: Int, time: Int, buyerSignature: Option[String], sellerSignature: Option[String])(implicit executionContext: ExecutionContext): String = Await.result(add(Negotiation(id = id, buyerAddress = buyerAddress, sellerAddress = sellerAddress, assetPegHash = assetPegHash, bid = bid, time = time, buyerSignature = buyerSignature, sellerSignature = sellerSignature)), Duration.Inf)
 
-    def insertOrUpdateNegotiation(id: String, buyerAddress: String, sellerAddress: String, assetPegHash: String, bid: Int, time: Int, buyerSignature: Option[String], sellerSignature: Option[String])(implicit executionContext: ExecutionContext): Int = Await.result(insertOrUpdate(Negotiation(id = id, buyerAddress = buyerAddress, sellerAddress = sellerAddress, assetPegHash = assetPegHash, bid = bid, time = time, buyerSignature = buyerSignature, sellerSignature = sellerSignature)),Duration.Inf)
+    def insertOrUpdateNegotiation(id: String, buyerAddress: String, sellerAddress: String, assetPegHash: String, bid: Int, time: Int, buyerSignature: Option[String], sellerSignature: Option[String])(implicit executionContext: ExecutionContext): Int = Await.result(insertOrUpdate(Negotiation(id = id, buyerAddress = buyerAddress, sellerAddress = sellerAddress, assetPegHash = assetPegHash, bid = bid, time = time, buyerSignature = buyerSignature, sellerSignature = sellerSignature)), Duration.Inf)
 
-    def updateBuyerSignature(id: String, buyerSignature: String)(implicit executionContext: ExecutionContext): Int = Await.result(updateBuyerSignatureById(id, buyerSignature),Duration.Inf)
+    def updateBuyerSignature(id: String, buyerSignature: String)(implicit executionContext: ExecutionContext): Int = Await.result(updateBuyerSignatureById(id, buyerSignature), Duration.Inf)
 
-    def updateSellerSignature(id: String, sellerSignature: String)(implicit executionContext: ExecutionContext): Int = Await.result(updateSellerSignatureById(id, sellerSignature),Duration.Inf)
+    def updateSellerSignature(id: String, sellerSignature: String)(implicit executionContext: ExecutionContext): Int = Await.result(updateSellerSignatureById(id, sellerSignature), Duration.Inf)
 
-    def updateBidAndTime(id: String, bid: Int, time: Int)(implicit executionContext: ExecutionContext): Int = Await.result(updateBidAndTimeById(id, bid = bid, time = time),Duration.Inf)
+    def updateBidAndTime(id: String, bid: Int, time: Int)(implicit executionContext: ExecutionContext): Int = Await.result(updateBidAndTimeById(id, bid = bid, time = time), Duration.Inf)
   }
 
 }

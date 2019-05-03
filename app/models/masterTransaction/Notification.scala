@@ -1,7 +1,7 @@
 package models.masterTransaction
 
 import exceptions.BaseException
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 import org.postgresql.util.PSQLException
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
@@ -13,9 +13,10 @@ import scala.util.{Failure, Random, Success}
 
 case class Notification(accountID: String, notificationTitle: String, notificationMessage: String, time: Long, read: Boolean, id: String)
 
+@Singleton
 class Notifications @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider) {
 
-  private implicit val module: String = constants.Module.MASTER_ACCOUNT
+  private implicit val module: String = constants.Module.MASTER_TRANSACTION_NOTIFICATION
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 

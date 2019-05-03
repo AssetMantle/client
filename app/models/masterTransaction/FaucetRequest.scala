@@ -1,7 +1,7 @@
 package models.masterTransaction
 
 import exceptions.BaseException
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 import org.postgresql.util.PSQLException
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
@@ -11,8 +11,9 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Random, Success}
 
-case class FaucetRequest(id: String, accountID: String, amount: Int, gas: Option[Int], status: Option[Boolean], comment: Option[String] )
+case class FaucetRequest(id: String, ticketID: Option[String], accountID: String, amount: Int, gas: Option[Int], status: Option[Boolean], comment: Option[String])
 
+@Singleton
 class FaucetRequests @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
@@ -55,7 +56,27 @@ class FaucetRequests @Inject()(protected val databaseConfigProvider: DatabaseCon
     }
   }
 
+  private def updateTicketIDStatusAndGasByID(id: String, ticketID: String,status:Boolean, gas:Int)(implicit executionContext: ExecutionContext): Future[Int] = db.run(faucetRequestTable.filter(_.id === id).map(faucet =>(faucet.ticketID, faucet.status, faucet.gas)).update(ticketID, status, gas).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+        throw new BaseException(constants.Error.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+        throw new BaseException(constants.Error.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
   private def updateStatusAndGasByID(id: String, status: Boolean, gas: Int)(implicit executionContext: ExecutionContext) = db.run(faucetRequestTable.filter(_.id === id).map(faucet => (faucet.status, faucet.gas)).update((status, gas)).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+        throw new BaseException(constants.Error.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+        throw new BaseException(constants.Error.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def updateStatusAndGasByTicketID(ticketID: String, status: Boolean, gas: Int)(implicit executionContext: ExecutionContext) = db.run(faucetRequestTable.filter(_.ticketID === ticketID).map(faucet => (faucet.status, faucet.gas)).update((status, gas)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
@@ -115,11 +136,15 @@ class FaucetRequests @Inject()(protected val databaseConfigProvider: DatabaseCon
     }
   }
 
+  private def checkByTicketId(ticketID: String): Future[Boolean] = db.run(faucetRequestTable.filter(_.ticketID === ticketID).exists.result)
+
   private[models] class FaucetRequestTable(tag: Tag) extends Table[FaucetRequest](tag, "FaucetRequest") {
 
-    def * = (id, accountID, amount, gas.?, status.?, comment.?) <> (FaucetRequest.tupled, FaucetRequest.unapply)
+    def * = (id, ticketID.?, accountID, amount, gas.?, status.?, comment.?) <> (FaucetRequest.tupled, FaucetRequest.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
+
+    def ticketID = column[String]("ticketID")
 
     def accountID = column[String]("accountID")
 
@@ -135,11 +160,19 @@ class FaucetRequests @Inject()(protected val databaseConfigProvider: DatabaseCon
 
   object Service {
 
-    def addFaucetRequest(accountID: String, amount: Int)(implicit executionContext: ExecutionContext):String = Await.result(add(FaucetRequest(Random.nextString(32), accountID, amount, null, null, null)), Duration.Inf)
+    def checkTicketID(ticketID: String): Boolean = {
+      Await.result(checkByTicketId(ticketID), Duration.Inf)
+    }
+
+    def addFaucetRequest(accountID: String, amount: Int)(implicit executionContext: ExecutionContext): String = Await.result(add(FaucetRequest(Random.nextString(32), null, accountID, amount, null, null, null)), Duration.Inf)
 
     def getFaucetRequest(accountID: String)(implicit executionContext: ExecutionContext):FaucetRequest = Await.result(findByAccountID(accountID), Duration.Inf)
 
+    def updateTicketIDStatusAndGas(requestID: String, ticketID: String, status:Boolean, gas:Int)(implicit executionContext: ExecutionContext): Int = Await.result(updateTicketIDStatusAndGasByID(requestID, ticketID, status,gas), Duration.Inf)
+
     def updateStatusAndGas(id: String, status: Boolean, gas: Int)(implicit executionContext: ExecutionContext): Int = Await.result(updateStatusAndGasByID(id, status, gas), Duration.Inf)
+
+    def updateStatusAndGasOnTicketID(ticketID: String, status: Boolean, gas: Int)(implicit executionContext: ExecutionContext): Int = Await.result(updateStatusAndGasByTicketID(ticketID, status, gas), Duration.Inf)
 
     def updateStatusAndComment(id: String, status: Boolean, comment: String)(implicit executionContext: ExecutionContext): Int = Await.result(updateStatusAndCommentByID(id, status, comment), Duration.Inf)
 

@@ -1,17 +1,19 @@
 package models.blockchain
 
 import exceptions.BaseException
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 import org.postgresql.util.PSQLException
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.JdbcProfile
-import scala.concurrent.{Await, ExecutionContext, Future}
+
 import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 case class Order(id: String, fiatProofHash: Option[String], awbProofHash: Option[String], executed: Boolean)
 
+@Singleton
 class Orders @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
@@ -108,15 +110,15 @@ class Orders @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
 
   object Service {
 
-    def addOrder(id: String, fiatProofHash: Option[String], awbProofHash: Option[String], executed: Boolean)(implicit executionContext: ExecutionContext): String = Await.result(add(Order(id = id, fiatProofHash = fiatProofHash, awbProofHash = awbProofHash, executed = executed)),Duration.Inf)
+    def addOrder(id: String, fiatProofHash: Option[String], awbProofHash: Option[String], executed: Boolean)(implicit executionContext: ExecutionContext): String = Await.result(add(Order(id = id, fiatProofHash = fiatProofHash, awbProofHash = awbProofHash, executed = executed)), Duration.Inf)
 
-    def insertOrUpdateOrder(id: String, fiatProofHash: Option[String], awbProofHash: Option[String], executed: Boolean)(implicit executionContext: ExecutionContext): Int = Await.result(insertOrUpdate(Order(id = id, fiatProofHash = fiatProofHash, awbProofHash = awbProofHash, executed = executed)),Duration.Inf)
+    def insertOrUpdateOrder(id: String, fiatProofHash: Option[String], awbProofHash: Option[String], executed: Boolean)(implicit executionContext: ExecutionContext): Int = Await.result(insertOrUpdate(Order(id = id, fiatProofHash = fiatProofHash, awbProofHash = awbProofHash, executed = executed)), Duration.Inf)
 
-    def updateAwbProofHash(id: String, awbProofHash: String)(implicit executionContext: ExecutionContext): Int = Await.result(updateAwbProofHashById(id, awbProofHash),Duration.Inf)
+    def updateAwbProofHash(id: String, awbProofHash: String)(implicit executionContext: ExecutionContext): Int = Await.result(updateAwbProofHashById(id, awbProofHash), Duration.Inf)
 
-    def updateFiatProofHash(id: String, fiatProofHash: String)(implicit executionContext: ExecutionContext): Int = Await.result(updateFiatProofHashById(id, fiatProofHash),Duration.Inf)
+    def updateFiatProofHash(id: String, fiatProofHash: String)(implicit executionContext: ExecutionContext): Int = Await.result(updateFiatProofHashById(id, fiatProofHash), Duration.Inf)
 
-    def updateExecutedStatus(id: String, executed: Boolean)(implicit executionContext: ExecutionContext): Int = Await.result(updateExecutedById(id, executed),Duration.Inf)
+    def updateExecutedStatus(id: String, executed: Boolean)(implicit executionContext: ExecutionContext): Int = Await.result(updateExecutedById(id, executed), Duration.Inf)
   }
 
 }
