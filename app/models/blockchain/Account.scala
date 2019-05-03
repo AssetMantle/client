@@ -189,7 +189,7 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
   }
 
   object Utility {
-    def dirtyEntityUpdater(): Unit = {
+    def dirtyEntityUpdater(): Future[Unit] = Future {
       try {
         val dirtyAccounts = Service.getDirtyAccounts(dirtyBit = true)
         Thread.sleep(sleepTime)
