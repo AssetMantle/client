@@ -13,7 +13,7 @@ object UsernameFeeder {
     val id: Iterator[Int] = Iterator.from(1)
     Iterator.continually(Map(
       Test.TEST_USERNAME -> Random.alphanumeric.take(8).mkString,
-      "id" -> id.next().toString
+      Test.ID -> id.next().toString
     ))
   }
 }
