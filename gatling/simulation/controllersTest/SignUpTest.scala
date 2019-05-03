@@ -1,7 +1,8 @@
-package gatlingTest
+package controllersTest
 
 import constants.{Form, Test}
 import controllers.routes
+import feeders.{PasswordFeeder, UsernameFeeder}
 import io.gatling.core.Predef._
 import io.gatling.core.structure.ScenarioBuilder
 import io.gatling.http.Predef._
@@ -14,8 +15,15 @@ class SignUpTest extends Simulation {
   val users: Int = 3
 
   val scenarioBuilder: ScenarioBuilder = scenario("SignUp Scenario")
-    .feed(feeders.usernameFeeder.customFeeder(users))
-    .feed(feeders.passwordFeeder.customFeeder(users))
+
+    .feed(UsernameFeeder.apply())
+    .feed(PasswordFeeder.apply())
+
+    .exec { session =>
+      println(session(Test.TEST_USERNAME).as[String], session(Test.ID).as[String])
+      println(session(Test.TEST_PASSWORD).as[String], session(Test.ID).as[String])
+      session
+    }
 
     .exec(http("SignUp_GET")
       .get(routes.SignUpController.signUpForm().url)

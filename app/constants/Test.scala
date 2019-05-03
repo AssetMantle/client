@@ -5,4 +5,6 @@ object Test {
 
   val TEST_USERNAME = "TEST_USERNAME"
   val TEST_PASSWORD = "TEST_PASSWORD"
+  val ID = "ID"
+
 }
