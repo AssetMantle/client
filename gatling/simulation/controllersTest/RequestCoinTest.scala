@@ -9,7 +9,7 @@ import io.gatling.http.Predef._
 
 class RequestCoinTest extends Simulation {
 
-  val scenarioBuilder: ScenarioBuilder = scenario("RequestCoin Scenario")
+  val scenarioBuilder: ScenarioBuilder = scenario("RequestCoin")
     .feed(UsernameFeeder.apply())
     .feed(PasswordFeeder.apply())
     .exec(controllersTest.loginTest.loginAfterSignUpScenario)

@@ -15,7 +15,7 @@ class LoginTest extends Simulation {
 
 object loginTest {
 
-  val loginAfterSignUpScenario: ScenarioBuilder = scenario("Login Scenario")
+  val loginAfterSignUpScenario: ScenarioBuilder = scenario("Login After SignUp")
     .feed(UsernameFeeder.apply())
     .feed(PasswordFeeder.apply())
     .exec(controllersTest.signUpTest.signUpScenario)
@@ -28,7 +28,7 @@ object loginTest {
     .pause(5)
 
 
-  val loginWithoutSignUpScenario: ScenarioBuilder = scenario("Login Scenario")
+  val loginWithoutSignUpScenario: ScenarioBuilder = scenario("Login Before SignUp")
     .feed(UsernameFeeder.apply())
     .feed(PasswordFeeder.apply())
     .exec(http("Login_GET")

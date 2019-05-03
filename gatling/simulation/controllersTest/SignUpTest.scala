@@ -14,7 +14,7 @@ class SignUpTest extends Simulation {
 
 object signUpTest {
 
-  val signUpScenario: ScenarioBuilder = scenario("SignUp Scenario")
+  val signUpScenario: ScenarioBuilder = scenario("SignUp")
     .feed(UsernameFeeder.apply())
     .feed(PasswordFeeder.apply())
     .exec(http("SignUp_GET")
