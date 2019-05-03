@@ -1,9 +1,18 @@
 @()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
-<div style="float: right;">
-    <p>@Messages("Transactions")</p>
-    <ul id="transactionList"></ul>
+<div id="transactionExplorer" class="transactionExplorer">
+    <p class="headingText">@Messages(constants.Form.TRANSACTIONS)</p>
+    <div>
+        <table>
+            <thead>
+                <tr>
+                    <th>@Messages(constants.Form.HEIGHT)</th>
+                    <th>@Messages(constants.Form.TRANSACTION_HASH)</th>
+                    <th>@Messages(constants.Form.TYPE)</th>
+                </tr>
+            </thead>
+            <tbody id="transactionContainer">
+            </tbody>
+        </table>
+    </div>
 </div>
 <script src="@routes.Assets.versioned("javascripts/transactionExplorer.js")" type="text/javascript"></script>
-<script>
-transactionExplorer("@configuration.get[String]("blockchain.blockExplorer.ip")" +  ":" + "@configuration.get[String]("blockchain.blockExplorer.port")" + "/tx", "@configuration.get[String]("blockchain.main.ip")" + ":" + "@configuration.get[String]("blockchain.main.restPort")" + "/txs/");
-</script>

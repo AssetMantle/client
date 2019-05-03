@@ -2,12 +2,13 @@
 
 @(notificationList : Seq[models.masterTransaction.Notification]=null, pageNumber: Int, limit : Int, unread: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
     <head>
-        <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/notifications.css")">
+        <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/main.css")">
+        <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/class.css")">
     </head>
-                <li id="notificationContainer">
-                    <div id="notificationCounter"></div>
-                    <div id="notificationButton">N</div>
-                    <div id="notifications" style="display:none">
+                <li class="notificationContainer" id="notificationContainer">
+                    <div class="notificationCounter" id="notificationCounter"></div>
+                    <div class="notificationButton" id="notificationButton">N</div>
+                    <div class="notifications" id="notifications" style="display:none">
                         <div id = "unread" style="display: none" data-value = @unread.toString()></div>
                         <h3>Notifications</h3>
                         <div id="notificationWindow" style="height:500px;">
@@ -33,7 +34,7 @@
                             }
                             }
                         <br>
-                            <div id="pageNumber"><h3>Page @pageNumber</h3></div>
+                            <div class="pageNumber" id="pageNumber"><h3>Page @pageNumber</h3></div>
 
                         </div>
                         <div id="seeAll" class="seeAll">

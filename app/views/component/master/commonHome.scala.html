@@ -1,7 +1,7 @@
 @(username: String, userType: String, address: String, coins: Int = 0)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
 
-<link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/notifications.css")">
-
+<link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/main.css")">
+<link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/class.css")">
 
 <br>
 <a href="@routes.SendCoinController.sendCoinForm">@Messages(constants.Form.SEND_COIN)</a>

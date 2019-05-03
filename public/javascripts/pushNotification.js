@@ -1,7 +1,14 @@
+getConfigurationAsynchronously("notification.apiKey");
+getConfigurationAsynchronously("notification.authDomain");
+getConfigurationAsynchronously("notification.databaseURL");
+getConfigurationAsynchronously("notification.projectId");
+getConfigurationAsynchronously("notification.storageBucket");
+getConfigurationAsynchronously("notification.senderID");
+
 $(document).ready(function () {
     $("#notificationWindowCommons").load(jsRoutes.controllers.NotificationController.showNotifications(1).url);
 
-    var config = {
+    let config = {
         apiKey: getConfiguration("notification.apiKey"),
         authDomain: getConfiguration("notification.authDomain"),
         databaseURL: getConfiguration("notification.databaseURL"),
@@ -26,8 +33,8 @@ $(document).ready(function () {
             console.log("Unable to get permission to notify.", err);
         });
     messaging.onMessage(function (payload) {
-        if($("#" + "notificationWindow").length !=0) {
-            var newNotification = document.createElement('div');
+        if($("#" + "notificationWindow").length !==0) {
+            let newNotification = document.createElement('div');
             newNotification.innerHTML ='</br>' +" (New) " +JSON.parse(JSON.stringify(payload)).notification.title+" + "+JSON.parse(JSON.stringify(payload)).notification.body+ '</br>';
             newNotification.style.backgroundColor="#09c866";
             newNotification.setAttribute("onclick","location.reload()");
@@ -36,20 +43,4 @@ $(document).ready(function () {
             document.getElementById("notificationCounter").textContent = "New"
         }
     });
-
-    function getConfiguration(configuration) {
-        var route = jsRoutes.controllers.ConfigurationController.queryConfigurationVariable(configuration);
-        var response = null;
-        $.ajax({
-            url: route.url,
-            type: route.type,
-            async: false,
-            statusCode: {
-                200: function (result) {
-                    response= result;
-                }
-            }
-        });
-        return response;
-    }
 });

@@ -2,6 +2,8 @@ package transactions
 
 import java.net.ConnectException
 
+import exceptions.BlockChainException
+import javax.inject.Inject
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import play.api.libs.ws.WSClient
@@ -34,7 +36,7 @@ class GetFiat @Inject()()(implicit wsClient: WSClient, configuration: Configurat
     } catch {
       case connectException: ConnectException =>
         logger.error(constants.Error.CONNECT_EXCEPTION, connectException)
-        throw new BaseException(constants.Error.CONNECT_EXCEPTION)
+        throw new BlockChainException(constants.Error.CONNECT_EXCEPTION)
     }
   }
 
