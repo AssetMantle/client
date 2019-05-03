@@ -1,14 +1,9 @@
-@import transactions.Response.TransactionHashResponse.Response
-@(response: Response)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
-
-    @common(Messages(constants.Form.TRANSACTIONS)) {
-        <div class="mainDivision">
-            <div class="bottomDivision">
-                <div class="transactionHash">
-                    <h4>@response.hash</h4>
-                    <h3>@Messages(constants.Form.HEIGHT) : <a href="@routes.BlockExplorerController.blockHeight(response.height.toInt)">@response.height</a></h3>
-                    <h3>@Messages(constants.Form.FEE) : @response.tx.value.fee.gas</h3>
-                </div>
-            </div>
-        </div>
-    }
+@()(implicit messagesProvider: MessagesProvider)
+<div id="txHashBottomDivision" class="txHashBottomDivision">
+    <div class="transactionHash">
+        <h4><p id="txHashPageHash"></p></h4>
+        <h3>@Messages(constants.Form.HEIGHT) : <p id="txHashPageHeight"></p></h3>
+        <h3>@Messages(constants.Form.FEE) : <p id="txHashPageFee"></p></h3>
+    </div>
+    <button onclick='goBackTransactionHashSearch()' >@Messages(constants.Form.BACK)</button>
+</div>

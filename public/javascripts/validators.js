@@ -1,18 +1,52 @@
 getConfigurationAsynchronously("blockchain.main.ip");
 getConfigurationAsynchronously("blockchain.main.restPort");
 
-function getValidators(bodyID){
+function getValidators(bodyID) {
     let urlGetValidators = getConfiguration("blockchain.main.ip") + ":" + getConfiguration("blockchain.main.restPort") + "/stake/validators";
-    let listValidators =  JSON.parse(httpGet(urlGetValidators));
-    document.getElementById(bodyID).innerHTML = "Validators:"+listValidators.length;
+    $.ajax({
+        url: urlGetValidators,
+        type: "GET",
+        async: true,
+        statusCode: {
+            200: function (data) {
+                document.getElementById(bodyID).innerHTML = "Validators:" + JSON.parse(data).length;
+            }
+        }
+    });
+
 }
 
 function validatorsTable(bodyID) {
     let urlGetValidators = getConfiguration("blockchain.main.ip") + ":" + getConfiguration("blockchain.main.restPort") + "/stake/validators";
     let content = "";
-    let validatorList = JSON.parse(httpGet(urlGetValidators));
-    Array.prototype.forEach.call(validatorList, validator => {
-        content = content + "<tr><td>" + validator["operator"] + "</td><td>" + validator["status"] + "</td><td >" + validator["tokens"] + "</div></td></td><td >" + validator["delegator_shares"] + "</td></tr>";
+    $.ajax({
+        url: urlGetValidators,
+        type: "GET",
+        async: true,
+        statusCode: {
+            200: function (validatorListData) {
+                Array.prototype.forEach.call(JSON.parse(validatorListData), validator => {
+                    content = content + "<tr><td>" + validator["operator"] + "</td><td>" + validator["status"] + "</td><td >" + validator["tokens"] + "</div></td></td><td >" + validator["delegator_shares"] + "</td></tr>";
+                });
+                $("#" + bodyID).append(content);
+            }
+        }
     });
-    $("#" + bodyID).append(content);
+
+}
+
+function seeValidatorsTable() {
+    $('#blockHeightBottomDivision').hide();
+    $('#allBlocksTable').hide();
+    $('#txHashBottomDivision').hide();
+    $('#indexBottomDivision').hide();
+    $('#validatorsTable').show();
+}
+
+function goBackValidatorsTable() {
+    $('#blockHeightBottomDivision').hide();
+    $('#allBlocksTable').hide();
+    $('#validatorsTable').hide();
+    $('#txHashBottomDivision').hide();
+    $('#indexBottomDivision').show();
 }

@@ -35,8 +35,6 @@ function initialTableContent() {
     });
 }
 
-window.onload = initialTableContent();
-
 function onClickNext() {
     click += 1;
     changeTableContent(click);
@@ -53,13 +51,45 @@ function onClickPrevious() {
 
 function changeTableContent(clickValue) {
     let abciIpPort = getConfiguration("blockchain.main.ip") + ":" + getConfiguration("blockchain.main.abciPort");
-    let lastBlockHeight = parseInt(JSON.parse(httpGet(abciIpPort + "/abci_info"))["result"]["response"]["last_block_height"]);
-    let url = abciIpPort + "/blockchain?minHeight=" + (lastBlockHeight - 10 * (clickValue + 1)).toString(10) + "&maxHeight=" + (lastBlockHeight - 10 * clickValue).toString(10);
-    let blocks = JSON.parse(httpGet(url))["result"]["block_metas"];
-
-    let content = '';
-    Array.prototype.forEach.call(blocks, block => {
-        content = content + "<tr><td>" + block["header"]["height"] + "</td><td>" + block["header"]["time"] + "</td><td>" + block["header"]["num_txs"] + "</td></td></tr>";
+    $.ajax({
+        url: abciIpPort + "/abci_info",
+        type: "GET",
+        async: true,
+        statusCode: {
+            200: function (lastBlockHeightData) {
+                let lastBlockHeight = lastBlockHeightData.result.response.last_block_height;
+                $.ajax({
+                    url: abciIpPort + "/blockchain?minHeight=" + (lastBlockHeight - 10 * (clickValue + 1)).toString(10) + "&maxHeight=" + (lastBlockHeight - 10 * clickValue).toString(10),
+                    type: "GET",
+                    async: true,
+                    statusCode: {
+                        200: function (blocksData) {
+                            let blocks = blocksData.result.block_metas;
+                            let content = '';
+                            Array.prototype.forEach.call(blocks, block => {
+                                content = content + "<tr><td>" + block["header"]["height"] + "</td><td>" + block["header"]["time"] + "</td><td>" + block["header"]["num_txs"] + "</td></td></tr>";
+                            });
+                            $('#' + showAllBlocksTableBody).empty().append(content);
+                        }
+                    }
+                });
+            }
+        }
     });
-    $('#' + showAllBlocksTableBody).empty().append(content);
+}
+
+function showAllBlocksTable() {
+    $('#blockHeightBottomDivision').hide();
+    $('#txHashBottomDivision').hide();
+    $('#indexBottomDivision').hide();
+    $('#validatorsTable').hide();
+    $('#allBlocksTable').show();
+}
+
+function goBackAllBlocksTable() {
+    $('#blockHeightBottomDivision').hide();
+    $('#validatorsTable').hide();
+    $('#allBlocksTable').hide();
+    $('#txHashBottomDivision').hide();
+    $('#indexBottomDivision').show();
 }

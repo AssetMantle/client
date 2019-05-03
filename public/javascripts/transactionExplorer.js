@@ -1,16 +1,15 @@
 getConfigurationAsynchronously("blockchain.main.wsIP");
 getConfigurationAsynchronously("blockchain.main.abciPort");
 getConfigurationAsynchronously("blockchain.main.ip");
-getConfigurationAsynchronously("blockchain.main.restPort")
+getConfigurationAsynchronously("blockchain.main.restPort");
 
-function transactionExplorer(){
+function transactionExplorer() {
     let wsUrl = getConfiguration("blockchain.main.wsIP") + ":" + getConfiguration("blockchain.main.abciPort") + "/websocket";
     let txHashUrl = getConfiguration("blockchain.main.ip") + ":" + getConfiguration("blockchain.main.restPort") + "/txs/";
     let blockchainHeightURL = getConfiguration("blockchain.main.ip") + ":" + getConfiguration("blockchain.main.abciPort") + "/block?height=";
-    let txHashPage = "./txs?txHash=";
 
     let content = '';
-    for (let i =0; i <8; i++){
+    for (let i = 0; i < 8; i++) {
         content = "<tr><td></td><td></td><td></td></tr>" + content;
     }
     $('#transactionContainer').prepend(content);
@@ -23,16 +22,33 @@ function transactionExplorer(){
 
         wsTx.onmessage = function (evt) {
             let height = JSON.parse(evt.data)["result"]["data"]["value"]["TxResult"]["height"];
-            let urlHeight = blockchainHeightURL + height;
-            let txHash = JSON.parse(httpGet(urlHeight)).result.block_meta.header.data_hash;
-            let msgType = JSON.parse(httpGet(txHashUrl + txHash)).tx.value.msg[0].type;
+            $.ajax({
+                url: blockchainHeightURL + height,
+                type: "GET",
+                async: true,
+                statusCode: {
+                    200: function (txHashData) {
+                        let txHash = txHashData.result.block_meta.header.data_hash;
+                        $.ajax({
+                            url: txHashUrl + txHash,
+                            type: "GET",
+                            async: true,
+                            statusCode: {
+                                200: function (msgTypeData) {
+                                    let msgType = JSON.parse(msgTypeData);
+                                    let transactionContainerList = document.getElementById("transactionContainer");
+                                    let transactionContainerListLength = transactionContainerList.childNodes.length;
+                                    if (transactionContainerListLength > 8) {
+                                        transactionContainerList.removeChild(transactionContainerList.childNodes[transactionContainerListLength - 1]);
+                                    }
+                                    $('#transactionContainer').prepend("<tr><td><button onclick='searchFunction("+ JSON.stringify(height) +")'>" + height + "</button></td><td><button onclick='searchFunction("+ JSON.stringify(txHash) +")'>" + txHash + "</button></td><td >" + msgType.tx.value.msg[0].type + "</td></tr>");
+                                }
+                            }
+                        });
+                    }
+                }
+            });
 
-            let transactionContainerList = document.getElementById("transactionContainer");
-            let transactionContainerListLength = transactionContainerList.childNodes.length;
-            if (transactionContainerListLength > 8) {
-                transactionContainerList.removeChild(transactionContainerList.childNodes[transactionContainerListLength - 1]);
-            }
-            $('#transactionContainer').prepend("<tr><td><a href='" + blockHeightURL + height + "'>" + height + "</a></td><td><a href='" + txHashPage + txHash + "'>" + txHash + "</a></td><td >" + msgType + "</td></tr>");
         };
         wsTx.onerror = function (evt) {
             document.getElementById("transactionContainer").appendChild(document.createElement("div").innerHTML = "ERROR: " + evt.data);
