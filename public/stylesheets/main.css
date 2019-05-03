@@ -1,9 +1,13 @@
 /*
  * Copyright (C) 2009-2017 Lightbend Inc. <https://www.lightbend.com>
  */
-html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-weight:inherit;font-style:inherit;font-size:100%;font-family:inherit;}
-table{border-collapse:collapse;border-spacing:0;}
-caption,th,td{text-align:left;font-weight:normal;}
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,caption{margin:0;padding:0;border:0;outline:0;font-weight:inherit;font-style:inherit;font-size:100%;font-family:inherit;}
+table,tbody,tfoot,thead,tr{width:100%;margin:1px;padding:1px;border:1px;outline:1px;font-weight:inherit;font-style:inherit;font-size:100%;font-family:inherit;}
+tr{height: 30px}
+th,td{width:44%;margin:1px;padding:1px;border:1px;outline:1px;font-weight:inherit;font-style:inherit;font-size:100%;font-family:inherit;}
+table{border-collapse:collapse;border-spacing:1px;border:1px solid black;}
+caption,td{width:33%;text-align:center;font-weight:normal;}
+caption,th{width:33%;text-align:center;font-weight:bolder;}
 form legend{display:none;}
 blockquote:before,blockquote:after,q:before,q:after{content:"";}
 blockquote,q{quotes:"" "";}
@@ -125,3 +129,13 @@ form dl{padding:10px 0;}
 dd.info{color:#888;font-size:12px;}
 dd.error{color:#c00;}
 aside a[href^="http"]:after,.doc a[href^="http"]:after{content:url(/assets/images/external.png);vertical-align:middle;margin-left:5px;}
+h3 {
+    display: block;
+    color: #333;
+    background: #FFF;
+    font-weight: bold;
+    font-size: 14px;
+    padding: 8px;
+    margin: 0;
+    border-bottom: solid 1px rgba(100, 100, 100, .30);
+}

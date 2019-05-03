@@ -1,0 +1,225 @@
+body{
+    margin:auto;
+}
+
+.mainDivision{
+    display:grid;
+    grid-template-columns:repeat(12,1fr);
+    grid-auto-rows:minmax(50px,50px);
+    max-width:1500px;
+    margin:auto;
+}
+.box1{
+    grid-row: 3/5;
+    grid-column: 2/5;
+}
+.box2{
+    grid-row: 3/5;
+    grid-column: 5/8;
+}
+.box3{
+    grid-row: 3/5;
+    grid-column: 8/10;
+}
+.box4{
+    grid-row: 3/5;
+    grid-column: 10/13;
+}
+
+.topDivision{
+    grid-column:2/13;
+    grid-row:1/1;
+    display:grid;
+    grid-auto-rows:minmax(40px,80px);
+    grid-template-columns:repeat(12,1fr);
+}
+
+.topDivision .search{
+    grid-column:3/10;
+    grid-row:1/1;
+    text-align:center;
+    width:400px;
+    height:20px;
+
+}
+.indexBottomDivision{
+    grid-column:2/13;
+    grid-row:3/13;
+    display:grid;
+    grid-template-columns:repeat(12,1fr);
+    grid-auto-rows:minmax(60px,100px);
+    grid-gap:10px;
+
+}
+.blockHeightBottomDivision{
+    grid-column:3/5;
+    grid-row:5/5;
+    display:grid;
+    grid-template-columns:repeat(12,1fr);
+    grid-auto-rows:minmax(60px,100px);
+    grid-gap:10px;
+}
+.txHashBottomDivision{
+    grid-column:3/5;
+    grid-row:5/5;
+    display:grid;
+    grid-template-columns:repeat(12,1fr);
+    grid-auto-rows:minmax(60px,100px);
+    grid-gap:10px;
+}
+.validatorsTableBottomDivision{
+    grid-column:2/12;
+    grid-row:5/5;
+    display:grid;
+    grid-template-columns:repeat(12,1fr);
+    grid-auto-rows:minmax(60px,100px);
+    grid-gap:10px;
+}
+.allBlocksTableBottomDivision{
+    grid-column:2/12;
+    grid-row:5/5;
+    display:grid;
+    grid-template-columns:repeat(12,1fr);
+    grid-auto-rows:minmax(60px,100px);
+    grid-gap:10px;
+}
+.indexBottomDivision div{
+    border-radius:15px;
+}
+
+.indexBottomDivision .chart{
+    grid-column:1/5;
+    grid-row: 2/5;
+    width: 100%;
+}
+.indexBottomDivision .blocks{
+    grid-column:5/13;
+    grid-row: 2/5;
+    height: 287px;
+    width: 325px;
+}
+.indexBottomDivision .transactionExplorer{
+    grid-row: 8;
+    width: 600px;
+    margin-top:-7px;
+    height: 287px;
+}
+.headingText {
+    text-align: center;
+    margin: 12px;
+    font-size: 20px;
+}
+.blockHeightBottomDivision{
+    display: none;
+}
+.txHashBottomDivision{
+    display: none;
+}
+.validatorsTableBottomDivision{
+    display: none;
+}
+.allBlocksTableBottomDivision{
+    display: none;
+}
+.blocksHeightPage{
+    width: 500px;
+    grid-row: 2/4;
+    grid-column: 2/13;
+}
+.transactionHashBlock{
+    width: 500px;
+    grid-row: 4/8;
+    grid-column: 2/13;
+}
+.evidenceHash{
+    width: 500px;
+    grid-row: 6/8;
+    grid-column: 2/13;
+}
+.validatorsHash{
+    width: 500px;
+    grid-row: 8/10;
+    grid-column: 2/13;
+}
+
+/*Notification*/
+.seeAll {
+    background: #F6F7F8;
+    width: auto;
+    padding: 8px;
+    font-size: 12px;
+    font-weight: bold;
+    border-top: solid 1px rgba(100, 100, 100, .30);
+    text-align: center;
+}
+
+.seeAll a {
+    color: #3b5998;
+
+}
+
+.element:hover {
+    cursor: pointer;
+    background-color: #80c846;
+    color: white;
+}
+.notificationContainer {
+    position: relative;
+}
+.notificationButton {
+    position: absolute;
+    width: 22px;
+    height: 22px;
+    line-height: 22px;
+    border-radius: 50%;
+    -moz-border-radius: 50%;
+    -webkit-border-radius: 50%;
+    background: #6dae38;
+    margin: -3px 10px 0 10px;
+    cursor: pointer;
+    text-align: center;
+    color: #FFF;
+    font-size: 10px;
+}
+.notificationCounter {
+    display: block;
+    position: absolute;
+    background: #E1141E;
+    color: #FFF;
+    font-size: 12px;
+    font-weight: normal;
+    padding: 1px 3px;
+    margin: -8px 0 0 25px;
+    border-radius: 2px;
+    -moz-border-radius: 2px;
+    -webkit-border-radius: 2px;
+    z-index: 1;
+}
+.notifications {
+    display: none;
+    width: auto;
+    position: absolute;
+    height: auto;
+    top: 30px;
+    left: 0;
+    background: #FFF;
+    border: solid 1px rgba(100, 100, 100, .20);
+    -webkit-box-shadow: 0 3px 8px rgba(0, 0, 0, .20);
+    z-index: 0;
+}
+.notifications:before {
+    content: '';
+    display: block;
+    width: 0;
+    height: 0;
+    color: transparent;
+    border: 10px solid #CCC;
+    border-color: transparent transparent #FFF;
+    margin-top: -20px;
+    margin-left: 10px;
+}
+.pageNumber {
+    margin: auto;
+    width: 50%;
+    text-align: center;
+}
