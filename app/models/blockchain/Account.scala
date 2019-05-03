@@ -32,6 +32,10 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
   import databaseConfig.profile.api._
 
   private[models] val accountTable = TableQuery[AccountTable]
+  private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
+  private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
+  private val sleepTime = configuration.get[Long]("blockchain.kafka.entityIterator.threadSleep")
+  private val dominationOfGasToken = configuration.get[String]("blockchain.denom.gas")
 
   private def add(account: Account)(implicit executionContext: ExecutionContext): Future[String] = db.run((accountTable returning accountTable.map(_.address) += account).asTry).map {
     case Success(result) => result
@@ -179,20 +183,15 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
     def getCoins(address: String)(implicit executionContext: ExecutionContext): Int = Await.result(getCoinsByAddress(address), Duration.Inf)
 
-    def getDirtyBits(dirtyBit: Boolean): Seq[Account] = Await.result(getAccountsByDirtyBit(dirtyBit), Duration.Inf)
+    def getDirtyAccounts(dirtyBit: Boolean): Seq[Account] = Await.result(getAccountsByDirtyBit(dirtyBit), Duration.Inf)
 
     def updateDirtyBit(address: String, dirtyBit: Boolean): Int = Await.result(updateDirtyBitByAddress(address, dirtyBit), Duration.Inf)
   }
 
-  private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
-  private val schedulerInterval =  configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
-  private val sleepTime = configuration.get[Long]("blockchain.kafka.entityIterator.threadSleep")
-  private val dominationOfGasToken = configuration.get[String]("blockchain.denom.gas")
-
   object Utility {
     def dirtyEntityUpdater(): Unit = {
       try {
-        val dirtyAccounts = Service.getDirtyBits(dirtyBit = true)
+        val dirtyAccounts = Service.getDirtyAccounts(dirtyBit = true)
         Thread.sleep(sleepTime)
         for (dirtyAccount <- dirtyAccounts) {
           val responseAccount = getAccount.Service.get(dirtyAccount.address)
