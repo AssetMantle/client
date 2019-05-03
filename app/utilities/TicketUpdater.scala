@@ -5,11 +5,11 @@ import models.master.Accounts
 import play.api.libs.ws.{WSClient, WSResponse}
 import play.api.{Configuration, Logger}
 import transactions.GetResponse
-import transactions.Response.TransactionResponse.Response
+import transactions.responses.TransactionResponse.Response
 
 import scala.concurrent.ExecutionContext
 
-object TicketIterator {
+object TicketUpdater {
 
   def start(getTickets: () => Seq[String], getValueFromWSResponse: WSResponse => String, updateTicket: (String, String) => Int, getAddress: String => String)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext, logger: Logger, pushNotifications: PushNotifications, accounts: Accounts) {
     implicit val getResponse: GetResponse = new GetResponse()(wsClient, configuration, executionContext)

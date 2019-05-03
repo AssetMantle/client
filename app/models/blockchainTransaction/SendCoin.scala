@@ -9,9 +9,10 @@ import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
+import queries.GetAccount
 import slick.jdbc.JdbcProfile
-import transactions.{GetAccount, GetResponse}
-import transactions.Response.TransactionResponse.Response
+import transactions.GetResponse
+import transactions.responses.TransactionResponse.Response
 import utilities.PushNotifications
 
 import scala.concurrent.duration.{Duration, _}
@@ -158,16 +159,6 @@ class SendCoins @Inject()(protected val databaseConfigProvider: DatabaseConfigPr
     def responseCode = column[String]("responseCode")
   }
 
-  //object Iterator {
-  if (configuration.get[Boolean]("blockchain.kafka.enabled")) {
-    actorSystem.scheduler.schedule(initialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds, interval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").second) {
-      utilities.TicketIterator.start_(Service.getTicketIDsOnStatus, transactionSendCoin.Service.getTxFromWSResponse, Utility.onSuccess, Utility.onFailure)
-    }
-  }
-
-  //}
-
-
   object Service {
 
     def addSendCoin(from: String, to: String, amount: Int, gas: Int, status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])(implicit executionContext: ExecutionContext): String = Await.result(add(SendCoin(from = from, to = to, amount = amount, gas = gas, status = status, txHash = txHash, ticketID = ticketID, responseCode = responseCode)), Duration.Inf)
@@ -194,8 +185,12 @@ class SendCoins @Inject()(protected val databaseConfigProvider: DatabaseConfigPr
 
   }
 
+  private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
+  private val schedulerInterval =  configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
+  private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
+
   object Utility {
-    def onSuccess(ticketID: String, response: Response): Unit = {
+    def onSuccess(ticketID: String, response: Response): Future[Unit] = Future {
       try {
         Service.updateTxHashStatusResponseCode(ticketID, response.TxHash, status = true, response.Code)
         val sendCoin = Service.getTransaction(ticketID)
@@ -216,7 +211,7 @@ class SendCoins @Inject()(protected val databaseConfigProvider: DatabaseConfigPr
       }
     }
 
-    def onFailure(ticketID: String, message: String): Unit = {
+    def onFailure(ticketID: String, message: String): Future[Unit] = Future {
       try {
         Service.updateStatusAndResponseCode(ticketID, status = false, message)
         val sendCoin = Service.getTransaction(ticketID)
@@ -228,4 +223,10 @@ class SendCoins @Inject()(protected val databaseConfigProvider: DatabaseConfigPr
     }
   }
 
+  //scheduler iterates with rows with null as status
+  if (kafkaEnabled) {
+    actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
+      utilities.TicketUpdater.start_(Service.getTicketIDsOnStatus, transactionSendCoin.Service.getTxFromWSResponse, Utility.onSuccess, Utility.onFailure)
+    }
+  }
 }

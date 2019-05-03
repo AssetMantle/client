@@ -6,7 +6,7 @@ import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
-import transactions.Response.NegotiationResponse.Response
+import queries.responses.NegotiationResponse.Response
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}

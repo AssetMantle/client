@@ -136,7 +136,7 @@ class RedeemAssets @Inject()(protected val databaseConfigProvider: DatabaseConfi
 
   if (configuration.get[Boolean]("blockchain.kafka.enabled")) {
     actorSystem.scheduler.schedule(initialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds, interval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").second) {
-      utilities.TicketIterator.start(Service.getTicketIDs, transactionRedeemAsset.Service.getTxHashFromWSResponse, Service.updateTxHash, Service.getAddress)
+      utilities.TicketUpdater.start(Service.getTicketIDs, transactionRedeemAsset.Service.getTxHashFromWSResponse, Service.updateTxHash, Service.getAddress)
     }
   }
 

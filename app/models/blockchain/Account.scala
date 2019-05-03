@@ -7,8 +7,9 @@ import models.master
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.{Configuration, Logger}
+import queries.GetAccount
 import slick.jdbc.JdbcProfile
-import transactions.{AddKey, GetAccount, GetSeed}
+import transactions.{AddKey, GetSeed}
 import utilities.PushNotifications
 
 import scala.concurrent.duration.{Duration, _}
@@ -157,12 +158,6 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     def dirtyBit = column[Boolean]("dirtyBit")
   }
 
-  //if (configuration.get[Boolean]("blockchain.kafka.enabled")) {
-    actorSystem.scheduler.schedule(initialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds, interval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").second) {
-      Utility.Iterator()
-    }
-  //}
-
   object Service {
 
     def addAccount(username: String, password: String)(implicit executionContext: ExecutionContext): String = {
@@ -189,21 +184,29 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     def updateDirtyBit(address: String, dirtyBit: Boolean): Int = Await.result(updateDirtyBitByAddress(address, dirtyBit), Duration.Inf)
   }
 
+  private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
+  private val schedulerInterval =  configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
+  private val sleepTime = configuration.get[Long]("blockchain.kafka.entityIterator.threadSleep")
+  private val dominationOfGasToken = configuration.get[String]("blockchain.denom.gas")
+
   object Utility {
-    def Iterator(): Unit = {
+    def dirtyEntityUpdater(): Unit = {
       try {
         val dirtyAccounts = Service.getDirtyBits(dirtyBit = true)
-        Thread.sleep(configuration.get[Long]("blockchain.kafka.entityIterator.threadSleep"))
+        Thread.sleep(sleepTime)
         for (dirtyAccount <- dirtyAccounts) {
           val responseAccount = getAccount.Service.get(dirtyAccount.address)
-          Service.updateSequenceCoinsAndDirtyBit(responseAccount.value.address, responseAccount.value.sequence.toInt, responseAccount.value.coins.get.filter(_.denom == configuration.get[String]("blockchain.denom.gas")).map(_.amount.toInt).sum, dirtyBit = false)
+          Service.updateSequenceCoinsAndDirtyBit(responseAccount.value.address, responseAccount.value.sequence.toInt, responseAccount.value.coins.get.filter(_.denom == denominationOfGasToken).map(_.amount.toInt).sum, dirtyBit = false)
         }
       } catch {
-        case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
         case blockChainException: BlockChainException => logger.error(blockChainException.message, blockChainException)
         case baseException: BaseException => logger.error(constants.Error.BASE_EXCEPTION, baseException)
       }
     }
   }
 
+  //Scheduler- iterates accounts with dirty tags
+  actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
+    Utility.dirtyEntityUpdater()
+  }
 }
