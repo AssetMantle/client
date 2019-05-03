@@ -36,19 +36,24 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
         },
         sendCoinData => {
           try {
-            if (kafkaEnabled) {
-              val response = transactionsSendCoin.Service.kafkaPost(transactionsSendCoin.Request(from = username, password = sendCoinData.password, to = sendCoinData.to, amount = Seq(transactionsSendCoin.Amount(denominatonOfGasToken, sendCoinData.amount.toString)), gas = sendCoinData.gas))
-              blockchainTransactionSendCoins.Service.addSendCoinKafka(from = username, to = sendCoinData.to, amount = sendCoinData.amount, gas = sendCoinData.gas, null, null, ticketID = response.ticketID, null)
-              Ok(views.html.index(success = response.ticketID))
+            val ticketID: String = if (kafkaEnabled) transactionsSendCoin.Service.kafkaPost(transactionsSendCoin.Request(from = username, password = sendCoinData.password, to = sendCoinData.to, amount = Seq(transactionsSendCoin.Amount(denominatonOfGasToken, sendCoinData.amount.toString)), gas = sendCoinData.gas)).ticketID else Random.nextString(32)
+            blockchainTransactionSendCoins.Service.addSendCoin(from = username, to = sendCoinData.to, amount = sendCoinData.amount, gas = sendCoinData.gas, null, null, ticketID = ticketID, null)
+            if (!kafkaEnabled) {
+              blockchainTransactionSendCoins.Utility.onSuccess(ticketID, transactionsSendCoin.Service.post(transactionsSendCoin.Request(from = username, password = sendCoinData.password, to = sendCoinData.to, amount = Seq(transactionsSendCoin.Amount(denominatonOfGasToken, sendCoinData.amount.toString)), gas = sendCoinData.gas)))
+              //val response = transactionsSendCoin.Service.kafkaPost(transactionsSendCoin.Request(from = username, password = sendCoinData.password, to = sendCoinData.to, amount = Seq(transactionsSendCoin.Amount(denominatonOfGasToken, sendCoinData.amount.toString)), gas = sendCoinData.gas))
+              //blockchainTransactionSendCoins.Service.addSendCoin(from = username, to = sendCoinData.to, amount = sendCoinData.amount, gas = sendCoinData.gas, null, null, ticketID = ticketID, null)
+              //Ok(views.html.index(success = response.ticketID))
             }
             else {
-              val response = transactionsSendCoin.Service.post(transactionsSendCoin.Request(from = username, password = sendCoinData.password, to = sendCoinData.to, amount = Seq(transactionsSendCoin.Amount(denominatonOfGasToken, sendCoinData.amount.toString)), gas = sendCoinData.gas))
-              val fromAddress = masterAccounts.Service.getAddress(username)
-              blockchainTransactionSendCoins.Service.addSendCoin(from = username, to = sendCoinData.to, amount = sendCoinData.amount, gas = sendCoinData.gas, null, txHash = Option(response.TxHash), ticketID = Random.nextString(32), null)
-              blockchainAccounts.Service.updateCoins(sendCoinData.to, sendCoinData.amount)
-              blockchainAccounts.Service.updateSequenceAndCoins(fromAddress, blockchainAccounts.Service.getSequence(fromAddress) + 1, blockchainAccounts.Service.getCoins(fromAddress) - sendCoinData.amount)
-              Ok(views.html.index(success = response.TxHash))
+
+              //val response = transactionsSendCoin.Service.post(transactionsSendCoin.Request(from = username, password = sendCoinData.password, to = sendCoinData.to, amount = Seq(transactionsSendCoin.Amount(denominatonOfGasToken, sendCoinData.amount.toString)), gas = sendCoinData.gas))
+              //val fromAddress = masterAccounts.Service.getAddress(username)
+              //blockchainTransactionSendCoins.Service.addSendCoin(from = username, to = sendCoinData.to, amount = sendCoinData.amount, gas = sendCoinData.gas, null, txHash = Option(response.TxHash), ticketID = Random.nextString(32), null)
+              //blockchainAccounts.Service.updateCoins(sendCoinData.to, sendCoinData.amount)
+              //blockchainAccounts.Service.updateSequenceAndCoins(fromAddress, blockchainAccounts.Service.getSequence(fromAddress) + 1, blockchainAccounts.Service.getCoins(fromAddress) - sendCoinData.amount)
+              // Ok(views.html.index(success = response.TxHash))
             }
+            Ok(views.html.index(success = ticketID))
           }
           catch {
             case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))

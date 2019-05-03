@@ -32,10 +32,6 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
   import databaseConfig.profile.api._
 
   private[models] val accountTable = TableQuery[AccountTable]
-  private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
-  private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
-  private val sleepTime = configuration.get[Long]("blockchain.kafka.entityIterator.threadSleep")
-  private val dominationOfGasToken = configuration.get[String]("blockchain.denom.gas")
 
   private def add(account: Account)(implicit executionContext: ExecutionContext): Future[String] = db.run((accountTable returning accountTable.map(_.address) += account).asTry).map {
     case Success(result) => result
@@ -187,6 +183,11 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
     def updateDirtyBit(address: String, dirtyBit: Boolean): Int = Await.result(updateDirtyBitByAddress(address, dirtyBit), Duration.Inf)
   }
+
+  private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
+  private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
+  private val sleepTime = configuration.get[Long]("blockchain.kafka.entityIterator.threadSleep")
+  private val denominationOfGasToken = configuration.get[String]("blockchain.denom.gas")
 
   object Utility {
     def dirtyEntityUpdater(): Future[Unit] = Future {
