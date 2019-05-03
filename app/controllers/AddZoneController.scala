@@ -62,8 +62,8 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
               val response = transactionsAddZone.Service.post(transactionsAddZone.Request(from = username, to = zoneAccountAddress, zoneID = verifyZoneData.zoneID, password = verifyZoneData.password))
               val fromAddress = masterAccounts.Service.getAddress(username)
               blockchainTransactionAddZones.Service.addZone(username, zoneAccountAddress, verifyZoneData.zoneID, null, Option(response.TxHash), Random.nextString(32), null)
-              blockchainZones.Service.addZone(verifyZoneData.zoneID, zoneAccountAddress)
-              masterZones.Service.updateStatus(verifyZoneData.zoneID, true)
+              blockchainZones.Service.addZone(verifyZoneData.zoneID, zoneAccountAddress, dirtyBit = false)
+              masterZones.Service.updateStatus(verifyZoneData.zoneID, status = true)
               masterAccounts.Service.updateUserType(zoneAccountID, constants.User.ZONE)
               blockchainAccounts.Service.updateSequence(fromAddress, blockchainAccounts.Service.getSequence(fromAddress) + 1)
               Ok(views.html.index(success = Messages(constants.Success.VERIFY_ZONE) + verifyZoneData.zoneID + response.TxHash))
@@ -80,7 +80,7 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
   def viewPendingVerifyZoneRequests: Action[AnyContent] = withGenesisLoginAction.authenticated { username =>
     implicit request =>
       try {
-        Ok(views.html.component.master.viewPendingVerifyZoneRequests(masterZones.Service.getVerifyZoneRequests()))
+        Ok(views.html.component.master.viewPendingVerifyZoneRequests(masterZones.Service.getVerifyZoneRequests))
       }
       catch {
         case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))
@@ -121,13 +121,9 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
       addZoneData => {
         try {
           if (kafkaEnabled) {
-            val response = transactionsAddZone.Service.kafkaPost(transactionsAddZone.Request(from = addZoneData.from, to = addZoneData.to, zoneID = addZoneData.zoneID, password = addZoneData.password))
-            blockchainTransactionAddZones.Service.addZoneKafka(addZoneData.from, addZoneData.to, addZoneData.zoneID, null, null, response.ticketID, null)
-            Ok(views.html.index(success = response.ticketID))
+            Ok(views.html.index(success = transactionsAddZone.Service.kafkaPost(transactionsAddZone.Request(from = addZoneData.from, to = addZoneData.to, zoneID = addZoneData.zoneID, password = addZoneData.password)).ticketID))
           } else {
-            val response = transactionsAddZone.Service.post(transactionsAddZone.Request(from = addZoneData.from, to = addZoneData.to, zoneID = addZoneData.zoneID, password = addZoneData.password))
-            blockchainTransactionAddZones.Service.addZone(addZoneData.from, addZoneData.to, addZoneData.zoneID, null, Option(response.TxHash), Random.nextString(32), null)
-            Ok(views.html.index(success = response.TxHash))
+            Ok(views.html.index(success = transactionsAddZone.Service.post(transactionsAddZone.Request(from = addZoneData.from, to = addZoneData.to, zoneID = addZoneData.zoneID, password = addZoneData.password)).TxHash))
           }
         }
         catch {

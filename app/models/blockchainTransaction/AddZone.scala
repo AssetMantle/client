@@ -10,6 +10,7 @@ import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
 import transactions.GetResponse
+import transactions.responses.TransactionResponse.Response
 import utilities.PushNotifications
 
 import scala.concurrent.duration.{Duration, _}
@@ -19,7 +20,7 @@ import scala.util.{Failure, Success}
 case class AddZone(from: String, to: String, zoneID: String, status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])
 
 @Singleton
-class AddZones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, transactionAddZone: transactions.AddZone, getResponse: GetResponse, actorSystem: ActorSystem, implicit val pushNotifications: PushNotifications, implicit val accounts: Accounts)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext)  {
+class AddZones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, transactionAddZone: transactions.AddZone, getResponse: GetResponse, actorSystem: ActorSystem, implicit val pushNotifications: PushNotifications, implicit val accounts: Accounts)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_ADD_ZONE
 
@@ -32,6 +33,10 @@ class AddZones @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
   import databaseConfig.profile.api._
 
   private[models] val addZoneTable = TableQuery[AddZoneTable]
+
+  private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
+  private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
+  private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
 
   private def add(addZone: AddZone)(implicit executionContext: ExecutionContext): Future[String] = db.run((addZoneTable returning addZoneTable.map(_.ticketID) += addZone).asTry).map {
     case Success(result) => result
@@ -91,7 +96,9 @@ class AddZones @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     }
   }
 
-  private def getTicketIDsWithEmptyTxHash()(implicit executionContext: ExecutionContext):Future[Seq[String]] = db.run(addZoneTable.filter(_.txHash.?.isEmpty).map(_.ticketID).result)
+  private def getTicketIDsWithEmptyTxHash()(implicit executionContext: ExecutionContext): Future[Seq[String]] = db.run(addZoneTable.filter(_.txHash.?.isEmpty).map(_.ticketID).result)
+
+  private def getTicketIDsWithNullStatus()(implicit executionContext: ExecutionContext): Future[Seq[String]] = db.run(addZoneTable.filter(_.status.?.isEmpty).map(_.ticketID).result)
 
   private def getAddressByTicketID(ticketID: String)(implicit executionContext: ExecutionContext): Future[String] = db.run(addZoneTable.filter(_.ticketID === ticketID).map(_.to).result.head.asTry).map {
     case Success(result) => result
@@ -132,27 +139,38 @@ class AddZones @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     def responseCode = column[String]("responseCode")
   }
 
-  if (configuration.get[Boolean]("blockchain.kafka.enabled")) {
-    actorSystem.scheduler.schedule(initialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds, interval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").second) {
-      utilities.TicketUpdater.start(Service.getTicketIDs, transactionAddZone.Service.getTxHashFromWSResponse, Service.updateTxHash, Service.getAddress)
-    }
-  }
-
   object Service {
 
-    def addZone(from: String, to: String, zoneID: String, status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String]) (implicit executionContext: ExecutionContext): String = Await.result(add(AddZone(from = from, to = to, zoneID = zoneID, status = status, txHash = txHash, ticketID = ticketID, responseCode = responseCode)), Duration.Inf)
+    def addZone(from: String, to: String, zoneID: String, status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])(implicit executionContext: ExecutionContext): String = Await.result(add(AddZone(from = from, to = to, zoneID = zoneID, status = status, txHash = txHash, ticketID = ticketID, responseCode = responseCode)), Duration.Inf)
 
-    def addZoneKafka(from: String, to: String, zoneID: String, status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String]) (implicit executionContext: ExecutionContext): String = Await.result(add(AddZone(from = from, to = to, zoneID = zoneID, status = status, txHash = txHash, ticketID = ticketID, responseCode = responseCode)), Duration.Inf)
+    def addZoneKafka(from: String, to: String, zoneID: String, status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])(implicit executionContext: ExecutionContext): String = Await.result(add(AddZone(from = from, to = to, zoneID = zoneID, status = status, txHash = txHash, ticketID = ticketID, responseCode = responseCode)), Duration.Inf)
 
-    def updateTxHash(ticketID: String, txHash: String) (implicit executionContext: ExecutionContext): Int = Await.result(updateTxHashOnTicketID(ticketID, Option(txHash)),Duration.Inf)
+    def updateTxHash(ticketID: String, txHash: String)(implicit executionContext: ExecutionContext): Int = Await.result(updateTxHashOnTicketID(ticketID, Option(txHash)), Duration.Inf)
 
-    def updateResponseCode(ticketID: String, responseCode: String) (implicit executionContext: ExecutionContext): Int = Await.result(updateResponseCodeOnTicketID(ticketID, responseCode), Duration.Inf)
+    def updateResponseCode(ticketID: String, responseCode: String)(implicit executionContext: ExecutionContext): Int = Await.result(updateResponseCodeOnTicketID(ticketID, responseCode), Duration.Inf)
 
-    def updateStatus(ticketID: String, status: Boolean) (implicit executionContext: ExecutionContext): Int = Await.result(updateStatusOnTicketID(ticketID, status), Duration.Inf)
+    def updateStatus(ticketID: String, status: Boolean)(implicit executionContext: ExecutionContext): Int = Await.result(updateStatusOnTicketID(ticketID, status), Duration.Inf)
 
     def getTicketIDs()(implicit executionContext: ExecutionContext): Seq[String] = Await.result(getTicketIDsWithEmptyTxHash(), Duration.Inf)
 
+    def getTicketIDsOnStatus(): Seq[String] = Await.result(getTicketIDsWithNullStatus(), Duration.Inf)
+
     def getAddress(ticketID: String)(implicit executionContext: ExecutionContext): String = Await.result(getAddressByTicketID(ticketID), Duration.Inf)
 
+  }
+
+  object Utility {
+    def onSuccess(ticketID: String, response: Response): Future[Unit] = Future {
+
+    }
+
+    def onFailure(ticketID: String): Future[Unit] = Future {}
+  }
+
+  //scheduler iterates with rows with null as status
+  if (kafkaEnabled) {
+    actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
+      utilities.TicketUpdater.start_(Service.getTicketIDs, transactionAddZone.Service.getTxHashFromWSResponse, Service.updateTxHash, Service.getAddress)
+    }
   }
 }
