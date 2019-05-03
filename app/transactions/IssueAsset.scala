@@ -9,7 +9,7 @@ import javax.inject.{Inject, Singleton}
 import play.api.libs.json.{Json, OWrites}
 import play.api.libs.ws.{WSClient, WSResponse}
 import play.api.{Configuration, Logger}
-import transactions.Response.TransactionResponse.{KafkaResponse, Response}
+import transactions.responses.TransactionResponse.{KafkaResponse, Response}
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}

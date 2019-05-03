@@ -46,8 +46,19 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     }
   }
 
-  private def getLanguageById(id: String)(implicit executionContext: ExecutionContext): Future[String] = db.run(accountTable.filter(_.id === id).map(_.language).result.head.asTry).map {
+  private def findByAddress(address: String)(implicit executionContext: ExecutionContext): Future[Account] = db.run(accountTable.filter(_.accountAddress === address).result.head.asTry).map {
     case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+        throw new BaseException(constants.Error.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+        throw new BaseException(constants.Error.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+
+  private def getLanguageById(id: String)(implicit executionContext: ExecutionContext): Future[String] = db.run(accountTable.filter(_.id === id).result.head.asTry).map {
+    case Success(result) => result.language
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
         throw new BaseException(constants.Error.PSQL_EXCEPTION)
@@ -189,6 +200,8 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
     def getId(accountAddress: String)(implicit executionContext: ExecutionContext):String = Await.result(getIdByAddress(accountAddress), Duration.Inf)
 
+    def getAccountByAddress(accountAddress: String)(implicit executionContext: ExecutionContext): Account = Await.result(findByAddress(accountAddress), Duration.Inf)
+
     def getAddress(id: String)(implicit executionContext: ExecutionContext):String = Await.result(getAddressById(id), Duration.Inf)
 
     def updateUserType(id: String, userType: String)(implicit executionContext: ExecutionContext): Int = Await.result(updateUserTypeById(id, userType), Duration.Inf)
@@ -197,8 +210,8 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
     def getUserType(id: String)(implicit executionContext: ExecutionContext):String = Await.result(getUserTypeById(id), Duration.Inf)
 
-    def tryVerifyUserType(id: String, userType: String)(implicit executionContext: ExecutionContext): Boolean= {
-      if(Await.result(getUserTypeById(id), Duration.Inf) == userType) true
+    def tryVerifyUserType(id: String, userType: String)(implicit executionContext: ExecutionContext): Boolean = {
+      if (Await.result(getUserTypeById(id), Duration.Inf) == userType) true
       else throw new BaseException(constants.Error.UNAUTHORIZED)
     }
 

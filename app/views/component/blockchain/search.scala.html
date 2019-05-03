@@ -4,6 +4,6 @@
         <input type="text" id="searchValue" placeholder="@Messages(constants.Form.SEARCH_TX_HASH_HEIGHT)"/>
     </form>
     <input type="submit" onclick='searchFunction()' value="@Messages(constants.Form.SEARCH)"/>
-    @*<button onclick='searchFunction()'>@Messages(constants.Form.SEARCH)</button>*@
 </div>
 <script src="@routes.Assets.versioned("javascripts/search.js")" type="text/javascript"></script>
+<script>setSearchErrorValues("@Messages(constants.Form.INVALID_BLOCK_HEIGHT)","@Messages(constants.Form.INVALID_TRANSACTION_HASH)")</script>

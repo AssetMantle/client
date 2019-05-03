@@ -139,8 +139,8 @@ class ChangeSellerBids @Inject()(protected val databaseConfigProvider: DatabaseC
   }
 
   if (configuration.get[Boolean]("blockchain.kafka.enabled")) {
-    actorSystem.scheduler.schedule(initialDelay = configuration.get[Int]("blockchain.kafka.ticketIterator.initialDelay").seconds, interval = configuration.get[Int]("blockchain.kafka.ticketIterator.interval").second) {
-      utilities.TicketIterator.start(Service.getTicketIDs, transactionChangeSellerBid.Service.getTxHashFromWSResponse, Service.updateTxHash, Service.getAddress)
+    actorSystem.scheduler.schedule(initialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds, interval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").second) {
+      utilities.TicketUpdater.start(Service.getTicketIDs, transactionChangeSellerBid.Service.getTxHashFromWSResponse, Service.updateTxHash, Service.getAddress)
     }
   }
 
@@ -160,5 +160,6 @@ class ChangeSellerBids @Inject()(protected val databaseConfigProvider: DatabaseC
 
     def getAddress(ticketID: String)(implicit executionContext: ExecutionContext): String = Await.result(getAddressByTicketID(ticketID), Duration.Inf)
 
+    def getByTicketID(ticketID: String)() = Await.result(findByTicketID(ticketID), Duration.Inf)
   }
 }

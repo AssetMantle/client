@@ -10,7 +10,7 @@ import play.api.Configuration
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.libs.ws.WSClient
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
-import transactions.GetAccount
+import queries.GetAccount
 import utilities.PushNotifications
 import views.companion.master.Login
 

@@ -24,7 +24,7 @@ $(document).ready(function () {
             return messaging.getToken()
         })
         .then(function (token) {
-            if($("#" + "NOTIFICATION_TOKEN").length !==0) {
+            if ($("#" + "NOTIFICATION_TOKEN").length != 0) {
                 document.getElementById("NOTIFICATION_TOKEN").value = token
             }
         })

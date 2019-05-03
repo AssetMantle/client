@@ -1,4 +1,4 @@
-package transactions.Response
+package queries.responses
 
 import play.api.libs.json.{Json, Reads}
 
@@ -9,7 +9,7 @@ object OrderResponse {
   implicit val valueReads: Reads[Value] = Json.reads[Value]
 
   case class Response(value: Value)
-  
+
   implicit val responseReads: Reads[Response] = Json.reads[Response]
 
 }

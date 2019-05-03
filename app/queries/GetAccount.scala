@@ -1,19 +1,20 @@
-package transactions
+package queries
 
 import java.net.ConnectException
 
 import exceptions.BlockChainException
-import javax.inject.Inject
-import play.api.{Configuration, Logger}
+import javax.inject.{Inject, Singleton}
 import play.api.libs.ws.WSClient
-import transactions.Response.TransactionHashResponse.Response
+import play.api.{Configuration, Logger}
+import queries.responses.AccountResponse.Response
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 
-class GetTransactionHash @Inject()(wsClient: WSClient)(implicit configuration: Configuration, executionContext: ExecutionContext) {
+@Singleton
+class GetAccount @Inject()()(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
-  private implicit val module: String = constants.Module.TRANSACTIONS_GET_TRANSACTION_HASH
+  private implicit val module: String = constants.Module.TRANSACTIONS_GET_ACCOUNT
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -21,7 +22,7 @@ class GetTransactionHash @Inject()(wsClient: WSClient)(implicit configuration: C
 
   private val port = configuration.get[String]("blockchain.main.restPort")
 
-  private val path = "txs"
+  private val path = "accounts"
 
   private val url = ip + ":" + port + "/" + path + "/"
 
@@ -29,8 +30,8 @@ class GetTransactionHash @Inject()(wsClient: WSClient)(implicit configuration: C
 
   object Service {
 
-    def get(txHash: String)(implicit executionContext: ExecutionContext): Response = try {
-      Await.result(action(txHash), Duration.Inf)
+    def get(address: String)(implicit executionContext: ExecutionContext): Response = try {
+      Await.result(action(address), Duration.Inf)
     } catch {
       case connectException: ConnectException =>
         logger.error(constants.Error.CONNECT_EXCEPTION, connectException)

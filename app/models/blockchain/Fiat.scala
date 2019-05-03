@@ -103,7 +103,7 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
     def getFiat(pegHash: String)(implicit executionContext: ExecutionContext): Fiat = Await.result(findByPegHash(pegHash), Duration.Inf)
 
-    def insertOrUpdateFiat(pegHash: String, transactionID: String, transactionAmount: Int, redeemedAmount: Int)(implicit executionContext: ExecutionContext): Int = Await.result(insertOrUpdate(Fiat(pegHash = pegHash, transactionID = transactionID, transactionAmount = transactionAmount, redeemedAmount = redeemedAmount)),Duration.Inf)
+    def insertOrUpdateFiat(pegHash: String, transactionID: String, transactionAmount: Int, redeemedAmount: Int)(implicit executionContext: ExecutionContext): Int = Await.result(insertOrUpdate(Fiat(pegHash = pegHash, transactionID = transactionID, transactionAmount = transactionAmount, redeemedAmount = redeemedAmount)), Duration.Inf)
 
     def updateRedeemedAmount(pegHash: String, redeemedAmount: Int)(implicit executionContext: ExecutionContext): Int = Await.result(updateRedeemedAmountByPegHash(pegHash, redeemedAmount), Duration.Inf)
 
