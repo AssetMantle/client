@@ -104,7 +104,7 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
     }
   }
 
-  private def getAllPegHash()(implicit executionContext: ExecutionContext):Future[Seq[String]] = db.run(assetTable.map(_.pegHash).result)
+  private def getAllPegHash()(implicit executionContext: ExecutionContext): Future[Seq[String]] = db.run(assetTable.map(_.pegHash).result)
 
   private[models] class AssetTable(tag: Tag) extends Table[Asset](tag, "Asset_BC") {
 
@@ -136,13 +136,13 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
 
     def getAssetPegWallet(address: String)(implicit executionContext: ExecutionContext): Seq[Asset] = Await.result(getAssetPegWalletByAddress(address), Duration.Inf)
 
-    def insertOrUpdateAsset(pegHash: String, documentHash: String, assetType: String, assetQuantity: Int, assetPrice: Int, quantityUnit: String, ownerAddress: String, locked: Boolean)(implicit executionContext: ExecutionContext): Int = Await.result(insertOrUpdate(Asset(pegHash = pegHash, documentHash = documentHash, assetType = assetType, assetQuantity = assetQuantity, assetPrice = assetPrice, quantityUnit = quantityUnit, ownerAddress = ownerAddress, locked = locked)),Duration.Inf)
+    def insertOrUpdateAsset(pegHash: String, documentHash: String, assetType: String, assetQuantity: Int, assetPrice: Int, quantityUnit: String, ownerAddress: String, locked: Boolean)(implicit executionContext: ExecutionContext): Int = Await.result(insertOrUpdate(Asset(pegHash = pegHash, documentHash = documentHash, assetType = assetType, assetQuantity = assetQuantity, assetPrice = assetPrice, quantityUnit = quantityUnit, ownerAddress = ownerAddress, locked = locked)), Duration.Inf)
 
     def updateOwner(pegHash: String, ownerAddress: String)(implicit executionContext: ExecutionContext): Int = Await.result(updateOwnerByPegHash(pegHash, ownerAddress), Duration.Inf)
 
     def updateLockedStatus(pegHash: String, locked: Boolean)(implicit executionContext: ExecutionContext): Int = Await.result(updateLockedStatusByPegHash(pegHash, locked), Duration.Inf)
 
-    def updateOwnerAddressAndLockedStatus(pegHash: String, locked: Boolean, ownerAddress: String)(implicit executionContext: ExecutionContext): Int  = Await.result(updateOwnerAddressAndLockedStatusByPegHash(pegHash, locked, ownerAddress), Duration.Inf)
+    def updateOwnerAddressAndLockedStatus(pegHash: String, locked: Boolean, ownerAddress: String)(implicit executionContext: ExecutionContext): Int = Await.result(updateOwnerAddressAndLockedStatusByPegHash(pegHash, locked, ownerAddress), Duration.Inf)
 
     def deleteAsset(pegHash: String)(implicit executionContext: ExecutionContext): Int = Await.result(deleteByPegHash(pegHash), Duration.Inf)
   }

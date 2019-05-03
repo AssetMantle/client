@@ -6,7 +6,7 @@ import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
-import transactions.Response.AssetResponse.Response
+import queries.responses.AssetResponse.Response
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
@@ -26,7 +26,7 @@ class GetAsset @Inject()()(implicit wsClient: WSClient, configuration: Configura
 
   private val url = ip + ":" + port + "/" + path + "/"
 
-  private def action(request: String)(implicit executionContext: ExecutionContext): Future[Response] = wsClient.url(url + request).get.map { response => utilities.JSON.getResponseFromJson[Response](response)}
+  private def action(request: String)(implicit executionContext: ExecutionContext): Future[Response] = wsClient.url(url + request).get.map { response => utilities.JSON.getResponseFromJson[Response](response) }
 
   object Service {
 

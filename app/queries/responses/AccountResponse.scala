@@ -1,7 +1,7 @@
-package transactions.Response
+package queries.responses
 
-import play.api.libs.json.{Json, Reads}
 import models.blockchain
+import play.api.libs.json.{Json, Reads}
 
 object AccountResponse {
 

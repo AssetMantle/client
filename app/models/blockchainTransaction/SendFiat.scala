@@ -137,8 +137,8 @@ class SendFiats @Inject()(protected val databaseConfigProvider: DatabaseConfigPr
   }
 
   if (configuration.get[Boolean]("blockchain.kafka.enabled")) {
-    actorSystem.scheduler.schedule(initialDelay = configuration.get[Int]("blockchain.kafka.ticketIterator.initialDelay").seconds, interval = configuration.get[Int]("blockchain.kafka.ticketIterator.interval").second) {
-      utilities.TicketIterator.start(Service.getTicketIDs, transactionSendFiat.Service.getTxHashFromWSResponse, Service.updateTxHash, Service.getAddress)
+    actorSystem.scheduler.schedule(initialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds, interval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").second) {
+      utilities.TicketUpdater.start(Service.getTicketIDs, transactionSendFiat.Service.getTxHashFromWSResponse, Service.updateTxHash, Service.getAddress)
     }
   }
 
