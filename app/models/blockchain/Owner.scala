@@ -70,7 +70,7 @@ class Owners @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
       case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
         throw new BaseException(constants.Error.PSQL_EXCEPTION)
       case noSuchElementException: NoSuchElementException => logger.info(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
-        Seq(Owner("","",0))
+        Nil
     }
   }
 

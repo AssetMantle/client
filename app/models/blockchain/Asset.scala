@@ -11,7 +11,7 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Asset(pegHash: String, documentHash: String, assetType: String, assetQuantity: Int, assetPrice: Int, quantityUnit: String, ownerAddress: String, locked: Boolean)
+case class Asset(pegHash: String, documentHash: String, assetType: String, assetQuantity: Int, assetPrice: Int, quantityUnit: String, ownerAddress: String, locked: Boolean, dirtyBit: Boolean)
 
 @Singleton
 class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider) {
@@ -104,11 +104,29 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
     }
   }
 
-  private def getAllPegHash()(implicit executionContext: ExecutionContext): Future[Seq[String]] = db.run(assetTable.map(_.pegHash).result)
+  private def deleteAssetsByPegHashSeq(pegHashSeq: Seq[String])(implicit executionContext: ExecutionContext) = db.run(assetTable.filter(_.pegHash.inSet(pegHashSeq)).delete.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+        throw new BaseException(constants.Error.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+        throw new BaseException(constants.Error.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def deleteAssetPegWalletByAddress(ownerAddress: String)(implicit executionContext: ExecutionContext) = db.run(assetTable.filter(_.ownerAddress === ownerAddress).delete.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+        throw new BaseException(constants.Error.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.info(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+        0
+    }
+  }
 
   private[models] class AssetTable(tag: Tag) extends Table[Asset](tag, "Asset_BC") {
 
-    def * = (pegHash, documentHash, assetType, assetQuantity, assetPrice, quantityUnit, ownerAddress, locked) <> (Asset.tupled, Asset.unapply)
+    def * = (pegHash, documentHash, assetType, assetQuantity, assetPrice, quantityUnit, ownerAddress, locked, dirtyBit) <> (Asset.tupled, Asset.unapply)
 
     def pegHash = column[String]("pegHash", O.PrimaryKey)
 
@@ -126,17 +144,19 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
 
     def locked = column[Boolean]("locked")
 
+    def dirtyBit = column[Boolean]("dirtyBit")
+
   }
 
   object Service{
 
-    def addAsset(pegHash: String, documentHash: String, assetType: String, assetQuantity: Int, assetPrice: Int, quantityUnit: String, ownerAddress: String)(implicit executionContext: ExecutionContext): String = Await.result(add(Asset(pegHash = pegHash, documentHash = documentHash, assetType = assetType, assetPrice = assetPrice, assetQuantity = assetQuantity, quantityUnit = quantityUnit, ownerAddress = ownerAddress, locked = true)), Duration.Inf)
+    def addAsset(pegHash: String, documentHash: String, assetType: String, assetQuantity: Int, assetPrice: Int, quantityUnit: String, ownerAddress: String, dirtyBit: Boolean)(implicit executionContext: ExecutionContext): String = Await.result(add(Asset(pegHash = pegHash, documentHash = documentHash, assetType = assetType, assetPrice = assetPrice, assetQuantity = assetQuantity, quantityUnit = quantityUnit, ownerAddress = ownerAddress, locked = true, dirtyBit = false)), Duration.Inf)
 
     def getAsset(pegHash: String)(implicit executionContext: ExecutionContext): Asset = Await.result(findByPegHash(pegHash), Duration.Inf)
 
     def getAssetPegWallet(address: String)(implicit executionContext: ExecutionContext): Seq[Asset] = Await.result(getAssetPegWalletByAddress(address), Duration.Inf)
 
-    def insertOrUpdateAsset(pegHash: String, documentHash: String, assetType: String, assetQuantity: Int, assetPrice: Int, quantityUnit: String, ownerAddress: String, locked: Boolean)(implicit executionContext: ExecutionContext): Int = Await.result(insertOrUpdate(Asset(pegHash = pegHash, documentHash = documentHash, assetType = assetType, assetQuantity = assetQuantity, assetPrice = assetPrice, quantityUnit = quantityUnit, ownerAddress = ownerAddress, locked = locked)), Duration.Inf)
+    def insertOrUpdateAsset(pegHash: String, documentHash: String, assetType: String, assetQuantity: Int, assetPrice: Int, quantityUnit: String, ownerAddress: String, locked: Boolean, dirtyBit: Boolean)(implicit executionContext: ExecutionContext): Int = Await.result(insertOrUpdate(Asset(pegHash = pegHash, documentHash = documentHash, assetType = assetType, assetQuantity = assetQuantity, assetPrice = assetPrice, quantityUnit = quantityUnit, ownerAddress = ownerAddress, locked = locked, dirtyBit = dirtyBit)), Duration.Inf)
 
     def updateOwner(pegHash: String, ownerAddress: String)(implicit executionContext: ExecutionContext): Int = Await.result(updateOwnerByPegHash(pegHash, ownerAddress), Duration.Inf)
 
@@ -145,6 +165,11 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
     def updateOwnerAddressAndLockedStatus(pegHash: String, locked: Boolean, ownerAddress: String)(implicit executionContext: ExecutionContext): Int = Await.result(updateOwnerAddressAndLockedStatusByPegHash(pegHash, locked, ownerAddress), Duration.Inf)
 
     def deleteAsset(pegHash: String)(implicit executionContext: ExecutionContext): Int = Await.result(deleteByPegHash(pegHash), Duration.Inf)
+
+    def deleteAssetPegWallet(ownerAddress: String)(implicit executionContext: ExecutionContext): Int = Await.result(deleteAssetPegWalletByAddress(ownerAddress), Duration.Inf)
+
+    def deletePegHashes(pegHashSeq: Seq[String])(implicit executionContext: ExecutionContext): Int = Await.result(deleteAssetsByPegHashSeq(pegHashSeq), Duration.Inf)
+
   }
 
 }

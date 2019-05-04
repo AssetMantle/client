@@ -87,29 +87,30 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Asset_BC"
   "quantityUnit"  VARCHAR NOT NULL,
   "ownerAddress"  VARCHAR NOT NULL,
   "locked"        BOOLEAN NOT NULL,
+  "dirtyBit"      BOOLEAN,
   PRIMARY KEY ("pegHash")
 );
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Negotiation_BC"
 (
-    "id"              VARCHAR NOT NULL,
-    "buyerAddress"    VARCHAR NOT NULL,
-    "sellerAddress"   VARCHAR NOT NULL,
-    "assetPegHash"    VARCHAR NOT NULL,
-    "bid"             INT     NOT NULL,
-    "time"            INT     NOT NULL,
-    "buyerSignature"  VARCHAR,
-    "sellerSignature" VARCHAR,
-    PRIMARY KEY ("id")
+  "id"              VARCHAR NOT NULL,
+  "buyerAddress"    VARCHAR NOT NULL,
+  "sellerAddress"   VARCHAR NOT NULL,
+  "assetPegHash"    VARCHAR NOT NULL,
+  "bid"             INT     NOT NULL,
+  "time"            INT     NOT NULL,
+  "buyerSignature"  VARCHAR,
+  "sellerSignature" VARCHAR,
+  PRIMARY KEY ("id")
 );
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Order_BC"
 (
-    "id"            VARCHAR NOT NULL,
-    "fiatProofHash" VARCHAR,
-    "awbProofHash"  VARCHAR,
-    "executed"      BOOLEAN NOT NULL,
-    PRIMARY KEY ("id")
+  "id"            VARCHAR NOT NULL,
+  "fiatProofHash" VARCHAR,
+  "awbProofHash"  VARCHAR,
+  "executed"      BOOLEAN NOT NULL,
+  PRIMARY KEY ("id")
 );
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."AddOrganization"
@@ -491,6 +492,7 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."FaucetRequest"
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."IssueAssetRequest"
 (
   "id"            VARCHAR NOT NULL,
+  "ticketID"      VARCHAR,
   "accountID"     VARCHAR NOT NULL,
   "documentHash"  VARCHAR NOT NULL,
   "assetType"     VARCHAR NOT NULL,
@@ -506,6 +508,7 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."IssueAssetRequest"
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."IssueFiatRequest"
 (
   "id"                VARCHAR NOT NULL,
+  "ticketID"          VARCHAR,
   "accountID"         VARCHAR NOT NULL,
   "transactionID"     VARCHAR NOT NULL,
   "transactionAmount" INT     NOT NULL,
@@ -587,7 +590,7 @@ ALTER TABLE MASTER."OrganizationKYC"
 ALTER TABLE MASTER."AccountKYC"
   ADD CONSTRAINT AccountKYC_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER."OrganizationBankAccount"
-    ADD CONSTRAINT OrganizationBankAccount_Organization_id FOREIGN KEY ("id") REFERENCES MASTER."Organization" ("id");
+  ADD CONSTRAINT OrganizationBankAccount_Organization_id FOREIGN KEY ("id") REFERENCES MASTER."Organization" ("id");
 
 ALTER TABLE MASTER_TRANSACTION."AccountToken"
   ADD CONSTRAINT AccountToken_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");

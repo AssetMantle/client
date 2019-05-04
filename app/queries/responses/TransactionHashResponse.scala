@@ -1,4 +1,4 @@
-package transactions.Response
+package queries.Response
 
 import play.api.libs.json.{Json, Reads}
 

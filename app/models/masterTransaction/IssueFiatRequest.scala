@@ -11,7 +11,7 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Random, Success}
 
-case class IssueFiatRequest(id: String, accountID: String, transactionID: String, transactionAmount: Int, gas: Option[Int], status: Option[Boolean], comment: Option[String])
+case class IssueFiatRequest(id: String, ticketID: Option[String], accountID: String, transactionID: String, transactionAmount: Int, gas: Option[Int], status: Option[Boolean], comment: Option[String])
 
 @Singleton
 class IssueFiatRequests  @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider) {
@@ -128,9 +128,11 @@ class IssueFiatRequests  @Inject()(protected val databaseConfigProvider: Databas
 
   private[models] class IssueFiatRequestTable(tag: Tag) extends Table[IssueFiatRequest](tag, "IssueFiatRequest") {
 
-    def * = (id, accountID, transactionID, transactionAmount, gas.?, status.?, comment.?) <> (IssueFiatRequest.tupled, IssueFiatRequest.unapply)
+    def * = (id, ticketID.?, accountID, transactionID, transactionAmount, gas.?, status.?, comment.?) <> (IssueFiatRequest.tupled, IssueFiatRequest.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
+
+    def ticketID = column[String]("ticketID")
 
     def accountID = column[String]("accountID")
 
@@ -148,7 +150,7 @@ class IssueFiatRequests  @Inject()(protected val databaseConfigProvider: Databas
 
   object Service {
 
-    def addIssueFiatRequest(accountID: String, transactionID: String, transactionAmount: Int)(implicit executionContext: ExecutionContext): String = Await.result(add(IssueFiatRequest(id = Random.nextString(32), accountID = accountID, transactionID = transactionID, transactionAmount = transactionAmount, null, null, null)), Duration.Inf)
+    def addIssueFiatRequest(accountID: String, transactionID: String, transactionAmount: Int)(implicit executionContext: ExecutionContext): String = Await.result(add(IssueFiatRequest(id = Random.nextString(32), null, accountID = accountID, transactionID = transactionID, transactionAmount = transactionAmount, null, null, null)), Duration.Inf)
 
     def getIssueFiatRequest(accountID: String)(implicit executionContext: ExecutionContext): IssueFiatRequest = Await.result(findByAccountID(accountID), Duration.Inf)
 

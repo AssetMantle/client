@@ -6,7 +6,7 @@
     @form(action = routes.IssueFiatController.rejectIssueFiatRequest) {
         @CSRF.formField
         @inputText(rejectIssueFiatRequestForm(constants.Form.REQUEST_ID).copy(value = Some(requestID)), '_label -> Messages(constants.Form.REQUEST_ID))
-
+        @inputText(rejectIssueFiatRequestForm(constants.Form.COMMENT),'_label-> Messages(constants.Form.COMMENT))
         @if(rejectIssueFiatRequestForm.hasGlobalErrors) {
             <ul>
             @for(error <- rejectIssueFiatRequestForm.globalErrors) {

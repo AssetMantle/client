@@ -19,7 +19,7 @@ import scala.util.{Failure, Success}
 case class Account(address: String, coins: Int, publicKey: String, accountNumber: Int, sequence: Int, dirtyBit: Boolean)
 
 @Singleton
-class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, getSeed: GetSeed, addKey: AddKey, getAccount: GetAccount, masterAccounts: master.Accounts, actorSystem: ActorSystem, implicit val pushNotifications: PushNotifications)(implicit executionContext: ExecutionContext, configuration: Configuration) {
+class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, assets: Assets, getSeed: GetSeed, addKey: AddKey, getAccount: GetAccount, masterAccounts: master.Accounts, actorSystem: ActorSystem, implicit val pushNotifications: PushNotifications)(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -196,6 +196,15 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
         Thread.sleep(sleepTime)
         for (dirtyAccount <- dirtyAccounts) {
           val responseAccount = getAccount.Service.get(dirtyAccount.address)
+
+          if (responseAccount.value.assetPegWallet.isDefined) {
+            for (asset <- responseAccount.value.assetPegWallet.get){
+              assets.Service.insertOrUpdateAsset(pegHash = asset.pegHash, documentHash = asset.documentHash, assetType = asset.assetType, assetQuantity = asset.assetQuantity.toInt, assetPrice = asset.assetPrice.toInt, quantityUnit = asset.quantityUnit, ownerAddress = dirtyAccount.address, locked = asset.locked, dirtyBit = false)
+            }
+          } else {
+              assets.Service.deleteAssetPegWallet(dirtyAccount.address)
+          }
+
           Service.updateSequenceCoinsAndDirtyBit(responseAccount.value.address, responseAccount.value.sequence.toInt, responseAccount.value.coins.get.filter(_.denom == denominationOfGasToken).map(_.amount.toInt).sum, dirtyBit = false)
         }
       } catch {
