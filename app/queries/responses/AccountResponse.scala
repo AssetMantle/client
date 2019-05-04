@@ -1,6 +1,5 @@
 package queries.responses
 
-import models.blockchain
 import play.api.libs.json.{Json, Reads}
 
 object AccountResponse {

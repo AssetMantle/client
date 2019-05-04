@@ -19,7 +19,7 @@ import scala.util.{Failure, Success}
 case class Account(address: String, coins: Int, publicKey: String, accountNumber: Int, sequence: Int, dirtyBit: Boolean)
 
 @Singleton
-class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, assets: Assets, getSeed: GetSeed, addKey: AddKey, getAccount: GetAccount, masterAccounts: master.Accounts, actorSystem: ActorSystem, implicit val pushNotifications: PushNotifications)(implicit executionContext: ExecutionContext, configuration: Configuration) {
+class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, blockchainAssets: Assets, getSeed: GetSeed, addKey: AddKey, getAccount: GetAccount, masterAccounts: master.Accounts, actorSystem: ActorSystem, implicit val pushNotifications: PushNotifications)(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -198,11 +198,13 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
           val responseAccount = getAccount.Service.get(dirtyAccount.address)
 
           if (responseAccount.value.assetPegWallet.isDefined) {
-            for (asset <- responseAccount.value.assetPegWallet.get){
-              assets.Service.insertOrUpdateAsset(pegHash = asset.pegHash, documentHash = asset.documentHash, assetType = asset.assetType, assetQuantity = asset.assetQuantity.toInt, assetPrice = asset.assetPrice.toInt, quantityUnit = asset.quantityUnit, ownerAddress = dirtyAccount.address, locked = asset.locked, dirtyBit = false)
-            }
+            val accountResponseAssetPegWallet: Seq[queries.responses.AccountResponse.Asset] = responseAccount.value.assetPegWallet.get()
+            val accountAssetPegWallet: Seq[Asset] = accountResponseAssetPegWallet.asInstanceOf[Seq[Asset]]
+            val dbAssetPegWallet: Seq[Asset] = blockchainAssets.Service.getAssetPegWallet(dirtyAccount.address)
+            blockchainAssets.Service.addMultipleAsset(accountAssetPegWallet.diff(dbAssetPegWallet))
+            blockchainAssets.Service.deleteAssets(dbAssetPegWallet.diff(accountAssetPegWallet).map(_.pegHash))
           } else {
-              assets.Service.deleteAssetPegWallet(dirtyAccount.address)
+            blockchainAssets.Service.deleteAssetPegWallet(dirtyAccount.address)
           }
 
           Service.updateSequenceCoinsAndDirtyBit(responseAccount.value.address, responseAccount.value.sequence.toInt, responseAccount.value.coins.get.filter(_.denom == denominationOfGasToken).map(_.amount.toInt).sum, dirtyBit = false)
