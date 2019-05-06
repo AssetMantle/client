@@ -160,7 +160,7 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
 
     def addAsset(pegHash: String, documentHash: String, assetType: String, assetQuantity: Int, assetPrice: Int, quantityUnit: String, ownerAddress: String, dirtyBit: Boolean)(implicit executionContext: ExecutionContext): String = Await.result(add(Asset(pegHash = pegHash, documentHash = documentHash, assetType = assetType, assetPrice = assetPrice, assetQuantity = assetQuantity, quantityUnit = quantityUnit, ownerAddress = ownerAddress, locked = true, dirtyBit = false)), Duration.Inf)
 
-    def addMultipleAsset(assets: Seq[Asset])(implicit executionContext: ExecutionContext): Seq[String] = Await.result(addMultiple(assets), Duration.Inf)
+    def addAssets(assets: Seq[Asset])(implicit executionContext: ExecutionContext): Seq[String] = Await.result(addMultiple(assets), Duration.Inf)
 
     def getAsset(pegHash: String)(implicit executionContext: ExecutionContext): Asset = Await.result(findByPegHash(pegHash), Duration.Inf)
 

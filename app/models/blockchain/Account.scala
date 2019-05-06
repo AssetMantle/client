@@ -8,6 +8,7 @@ import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.{Configuration, Logger}
 import queries.GetAccount
+import queries.responses.AccountResponse
 import slick.jdbc.JdbcProfile
 import transactions.{AddKey, GetSeed}
 import utilities.PushNotifications
@@ -198,10 +199,9 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
           val responseAccount = getAccount.Service.get(dirtyAccount.address)
 
           if (responseAccount.value.assetPegWallet.isDefined) {
-            val accountResponseAssetPegWallet: Seq[queries.responses.AccountResponse.Asset] = responseAccount.value.assetPegWallet.get()
-            val accountAssetPegWallet: Seq[Asset] = accountResponseAssetPegWallet.asInstanceOf[Seq[Asset]]
+            val accountAssetPegWallet: Seq[Asset] = responseAccount.value.assetPegWallet.get.map{accountAsset: AccountResponse.Asset => accountAsset.applyToBlockchainAsset(pegHash = accountAsset.pegHash, documentHash = accountAsset.documentHash, assetType = accountAsset.assetType, assetQuantity = accountAsset.assetQuantity, assetPrice = accountAsset.assetPrice, quantityUnit = accountAsset.quantityUnit, ownerAddress = dirtyAccount.address, locked = accountAsset.locked)}
             val dbAssetPegWallet: Seq[Asset] = blockchainAssets.Service.getAssetPegWallet(dirtyAccount.address)
-            blockchainAssets.Service.addMultipleAsset(accountAssetPegWallet.diff(dbAssetPegWallet))
+            blockchainAssets.Service.addAssets(accountAssetPegWallet.diff(dbAssetPegWallet))
             blockchainAssets.Service.deleteAssets(dbAssetPegWallet.diff(accountAssetPegWallet).map(_.pegHash))
           } else {
             blockchainAssets.Service.deleteAssetPegWallet(dirtyAccount.address)
