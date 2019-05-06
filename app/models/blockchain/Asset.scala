@@ -1,20 +1,23 @@
 package models.blockchain
 
-import exceptions.BaseException
+import akka.actor.ActorSystem
+import exceptions.{BaseException, BlockChainException}
 import javax.inject.{Inject, Singleton}
+import models.master
 import org.postgresql.util.PSQLException
-import play.api.Logger
+import play.api.{Configuration, Logger}
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.JdbcProfile
+import utilities.PushNotifications
 
-import scala.concurrent.duration.Duration
+import scala.concurrent.duration.{Duration, _}
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 case class Asset(pegHash: String, documentHash: String, assetType: String, assetQuantity: Int, assetPrice: Int, quantityUnit: String, ownerAddress: String, locked: Boolean, dirtyBit: Boolean)
 
 @Singleton
-class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider) {
+class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, masterAccounts: master.Accounts, actorSystem: ActorSystem, implicit val pushNotifications: PushNotifications)(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -52,27 +55,7 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
     }
   }
 
-  private def updateOwnerByPegHash(pegHash: String, ownerAddress: String)(implicit executionContext: ExecutionContext): Future[Int] = db.run(assetTable.filter(_.pegHash === pegHash).map(_.ownerAddress).update(ownerAddress).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
-        throw new BaseException(constants.Error.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
-        throw new BaseException(constants.Error.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
-
-  private def updateOwnerAddressAndLockedStatusByPegHash(pegHash: String, locked: Boolean, ownerAddress: String)(implicit executionContext: ExecutionContext): Future[Int] = db.run(assetTable.filter(_.pegHash === pegHash).map(x => (x.ownerAddress, x.locked)).update((ownerAddress, locked)).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
-        throw new BaseException(constants.Error.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
-        throw new BaseException(constants.Error.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
-
-  private def updateLockedStatusByPegHash(pegHash: String, locked: Boolean)(implicit executionContext: ExecutionContext): Future[Int] = db.run(assetTable.filter(_.pegHash === pegHash).map(_.locked).update(locked).asTry).map {
+  private def updateLockedAndDirtyBitByPegHash(pegHash: String, locked: Boolean, dirtyBit: Boolean)(implicit executionContext: ExecutionContext): Future[Int] = db.run(assetTable.filter(_.pegHash === pegHash).map(x => (x.locked, x.dirtyBit)).update((locked, dirtyBit)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
@@ -93,6 +76,26 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
   }
 
   private def getAssetPegWalletByAddress(address: String)(implicit executionContext: ExecutionContext): Future[Seq[Asset]] = db.run(assetTable.filter(_.ownerAddress === address).result.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+        throw new BaseException(constants.Error.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.info(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+        Nil
+    }
+  }
+
+  private def updateDirtyBitByPegHash(pegHash: String, dirtyBit: Boolean)(implicit executionContext: ExecutionContext): Future[Int] = db.run(assetTable.filter(_.pegHash === pegHash).map(_.dirtyBit).update(dirtyBit).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+        throw new BaseException(constants.Error.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+        throw new BaseException(constants.Error.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def getAssetsByDirtyBit(dirtyBit: Boolean)(implicit executionContext: ExecutionContext): Future[Seq[Asset]] = db.run(assetTable.filter(_.dirtyBit === dirtyBit).result.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
@@ -168,11 +171,7 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
 
     def insertOrUpdateAsset(pegHash: String, documentHash: String, assetType: String, assetQuantity: Int, assetPrice: Int, quantityUnit: String, ownerAddress: String, locked: Boolean, dirtyBit: Boolean)(implicit executionContext: ExecutionContext): Int = Await.result(insertOrUpdate(Asset(pegHash = pegHash, documentHash = documentHash, assetType = assetType, assetQuantity = assetQuantity, assetPrice = assetPrice, quantityUnit = quantityUnit, ownerAddress = ownerAddress, locked = locked, dirtyBit = dirtyBit)), Duration.Inf)
 
-    def updateOwner(pegHash: String, ownerAddress: String)(implicit executionContext: ExecutionContext): Int = Await.result(updateOwnerByPegHash(pegHash, ownerAddress), Duration.Inf)
-
-    def updateLockedStatus(pegHash: String, locked: Boolean)(implicit executionContext: ExecutionContext): Int = Await.result(updateLockedStatusByPegHash(pegHash, locked), Duration.Inf)
-
-    def updateOwnerAddressAndLockedStatus(pegHash: String, locked: Boolean, ownerAddress: String)(implicit executionContext: ExecutionContext): Int = Await.result(updateOwnerAddressAndLockedStatusByPegHash(pegHash, locked, ownerAddress), Duration.Inf)
+    def updateLockedAndDirtyBit(pegHash: String, locked: Boolean, dirtyBit: Boolean)(implicit executionContext: ExecutionContext): Int = Await.result(updateLockedAndDirtyBitByPegHash(pegHash, locked, dirtyBit), Duration.Inf)
 
     def deleteAsset(pegHash: String)(implicit executionContext: ExecutionContext): Int = Await.result(deleteByPegHash(pegHash), Duration.Inf)
 
@@ -180,6 +179,34 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
 
     def deleteAssets(pegHashSeq: Seq[String])(implicit executionContext: ExecutionContext): Int = Await.result(deleteAssetsByPegHashSeq(pegHashSeq), Duration.Inf)
 
+    def getDirtyAccounts(dirtyBit: Boolean): Seq[Asset] = Await.result(getAssetsByDirtyBit(dirtyBit), Duration.Inf)
+
+    def updateDirtyBit(pegHash: String, dirtyBit: Boolean): Int = Await.result(updateDirtyBitByPegHash(pegHash, dirtyBit), Duration.Inf)
+
+  }
+
+  private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
+  private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
+  private val sleepTime = configuration.get[Long]("blockchain.kafka.entityIterator.threadSleep")
+
+  object Utility {
+    def dirtyEntityUpdater(): Future[Unit] = Future {
+      try {
+        val dirtyAssets = Service.getDirtyAccounts(true)
+        Thread.sleep(sleepTime)
+        for (dirtyAsset <- dirtyAssets) {
+          Service.updateLockedAndDirtyBit(dirtyAsset.pegHash, false, false)
+        }
+      } catch {
+        case blockChainException: BlockChainException => logger.error(blockChainException.message, blockChainException)
+        case baseException: BaseException => logger.error(constants.Error.BASE_EXCEPTION, baseException)
+      }
+    }
+  }
+
+  //Scheduler- iterates accounts with dirty tags
+  actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
+    Utility.dirtyEntityUpdater()
   }
 
 }
