@@ -10,7 +10,6 @@ import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
-import transactions.GetResponse
 import utilities.PushNotifications
 import transactions.responses.TransactionResponse.Response
 

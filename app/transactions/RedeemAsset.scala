@@ -58,6 +58,8 @@ class RedeemAsset @Inject()(wsClient: WSClient)(implicit configuration: Configur
     }
 
     def getTxHashFromWSResponse(wsResponse: WSResponse): String = utilities.JSON.getResponseFromJson[Response](wsResponse).TxHash
+
+    def getTxFromWSResponse(wsResponse: WSResponse): Response = utilities.JSON.getResponseFromJson[Response](wsResponse)
   }
 
 }

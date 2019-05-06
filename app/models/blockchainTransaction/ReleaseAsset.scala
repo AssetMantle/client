@@ -153,9 +153,9 @@ class ReleaseAssets @Inject()(protected val databaseConfigProvider: DatabaseConf
     def onFailure(ticketID: String, message: String): Future[Unit] = Future {
       try {
         Service.updateStatusAndResponseCode(ticketID, status = false, message)
-        val issueAsset = Service.getTransaction(ticketID)
-        pushNotifications.sendNotification(masterAccounts.Service.getId(issueAsset.to), constants.Notification.FAILURE, Seq(message))
-        pushNotifications.sendNotification(issueAsset.from, constants.Notification.FAILURE, Seq(message))
+        val releaseAsset = Service.getTransaction(ticketID)
+        pushNotifications.sendNotification(masterAccounts.Service.getId(releaseAsset.to), constants.Notification.FAILURE, Seq(message))
+        pushNotifications.sendNotification(releaseAsset.from, constants.Notification.FAILURE, Seq(message))
       } catch {
         case baseException: BaseException => logger.error(constants.Error.BASE_EXCEPTION, baseException)
       }
