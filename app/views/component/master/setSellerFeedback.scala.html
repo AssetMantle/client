@@ -5,7 +5,7 @@
 @common(Messages(constants.Form.SET_SELLER_FEEDBACK)) {
     @form(action = routes.SetSellerFeedbackController.setSellerFeedback) {
         @CSRF.formField
-        @inputText(setSellerFeedbackForm(constants.Form.TO),'_label-> Messages(constants.Form.TO))
+        @inputText(setSellerFeedbackForm(constants.Form.ACCOUNT_ID),'_label-> Messages(constants.Form.ACCOUNT_ID))
         @inputText(setSellerFeedbackForm(constants.Form.PEG_HASH),'_label-> Messages(constants.Form.PEG_HASH))
         @inputText(setSellerFeedbackForm(constants.Form.RATING),'_label-> Messages(constants.Form.RATING))
         @inputText(setSellerFeedbackForm(constants.Form.GAS),'_label-> Messages(constants.Form.GAS))

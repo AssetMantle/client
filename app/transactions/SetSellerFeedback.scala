@@ -58,6 +58,8 @@ class SetSellerFeedback @Inject()(wsClient: WSClient)(implicit configuration: Co
     }
 
     def getTxHashFromWSResponse(wsResponse: WSResponse): String = utilities.JSON.getResponseFromJson[Response](wsResponse).TxHash
+
+    def getTxFromWSResponse(wsResponse: WSResponse): Response = utilities.JSON.getResponseFromJson[Response](wsResponse)
   }
 
 }

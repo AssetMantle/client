@@ -113,6 +113,36 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Order_BC"
   PRIMARY KEY ("id")
 );
 
+CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Feedback_BC"
+(
+  "address"                      VARCHAR NOT NULL,
+--   "buyerExecuteOrderNegativeTx"  INT     NOT NULL,
+--   "buyerExecuteOrderPositiveTx"  INT     NOT NULL,
+--   "changeBuyerBidNegativeTx"     INT     NOT NULL,
+--   "changeBuyerBidPositiveTx"     INT     NOT NULL,
+--   "changeSellerBidNegativeTx"    INT     NOT NULL,
+--   "changeSellerBidPositiveTx"    INT     NOT NULL,
+--   "confirmBuyerBidNegativeTx"    INT     NOT NULL,
+--   "confirmBuyerBidPositiveTx"    INT     NOT NULL,
+--   "confirmSellerBidNegativeTx"   INT     NOT NULL,
+--   "confirmSellerBidPositiveTx"   INT     NOT NULL,
+--   "ibcIssueAssetsNegativeTx"     INT     NOT NULL,
+--   "ibcIssueAssetsPositiveTx"     INT     NOT NULL,
+--   "ibcIssueFiatsNegativeTx"      INT     NOT NULL,
+--   "ibcIssueFiatsPositiveTx"      INT     NOT NULL,
+--   "negotiationNegativeTx"        INT     NOT NULL,
+--   "negotiationPositiveTx"        INT     NOT NULL,
+--   "sellerExecuteOrderNegativeTx" INT     NOT NULL,
+--   "sellerExecuteOrderPositiveTx" INT     NOT NULL,
+--   "sendAssetsNegativeTx"         INT     NOT NULL,
+--   "sendAssetsPositiveTx"         INT     NOT NULL,
+--   "sendFiatsNegativeTx"          INT     NOT NULL,
+--   "sendFiatsPositiveTx"          INT     NOT NULL,
+  "rating"                       INT     NOT NULL,
+  "dirtyBit"                     BOOLEAN NOT NULL,
+  PRIMARY KEY ("address")
+);
+
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."AddOrganization"
 (
   "from"           VARCHAR NOT NULL,
@@ -565,6 +595,8 @@ ALTER TABLE BLOCKCHAIN."Negotiation_BC"
   ADD CONSTRAINT Negotiation_Asset_pegHash FOREIGN KEY ("assetPegHash") REFERENCES BLOCKCHAIN."Asset_BC" ("pegHash");
 ALTER TABLE BLOCKCHAIN."Order_BC"
   ADD CONSTRAINT Order_Negotiation_id FOREIGN KEY ("id") REFERENCES BLOCKCHAIN."Negotiation_BC" ("id");
+ALTER TABLE BLOCKCHAIN."Feedback_BC"
+  ADD CONSTRAINT Feedback_Account_address FOREIGN KEY ("address") REFERENCES BLOCKCHAIN."ACLAccount_BC" ("address");
 ALTER TABLE BLOCKCHAIN."Organization_BC"
   ADD CONSTRAINT Organization_BC_Organization_id FOREIGN KEY ("id") REFERENCES Master."Organization" ("id");
 ALTER TABLE BLOCKCHAIN."Zone_BC"
@@ -627,6 +659,7 @@ DROP TABLE IF EXISTS BLOCKCHAIN."Owner_BC" CASCADE;
 DROP TABLE IF EXISTS BLOCKCHAIN."Asset_BC" CASCADE;
 DROP TABLE IF EXISTS BLOCKCHAIN."Negotiation_BC" CASCADE;
 DROP TABLE IF EXISTS BLOCKCHAIN."Order_BC" CASCADE;
+DROP TABLE IF EXISTS BLOCKCHAIN."Feedback_BC" CASCADE;
 DROP TABLE IF EXISTS BLOCKCHAIN."Account_BC" CASCADE;
 
 DROP TABLE IF EXISTS BLOCKCHAIN_TRANSACTION."AddKey" CASCADE;

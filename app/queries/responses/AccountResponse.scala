@@ -10,7 +10,7 @@ object AccountResponse {
   implicit val coinsReads: Reads[Coins] = Json.reads[Coins]
 
   case class Asset(pegHash: String, documentHash: String, assetType: String, assetQuantity: String, assetPrice: String, quantityUnit: String, ownerAddress: String, locked: Boolean){
-    def applyToBlockchainAsset(pegHash: String, documentHash: String, assetType: String, assetQuantity: String, assetPrice: String, quantityUnit: String, ownerAddress: String, locked: Boolean): blockchain.Asset = blockchain.Asset(pegHash = pegHash, documentHash = documentHash, assetType = assetType, assetQuantity = assetQuantity.toInt, assetPrice = assetPrice.toInt, quantityUnit = quantityUnit, ownerAddress = ownerAddress, locked = locked, false )
+    def applyToBlockchainAsset(ownerAddress: String): blockchain.Asset = blockchain.Asset(pegHash = pegHash, documentHash = documentHash, assetType = assetType, assetQuantity = assetQuantity.toInt, assetPrice = assetPrice.toInt, quantityUnit = quantityUnit, ownerAddress = ownerAddress, locked = locked, false )
   }
 
   implicit val assetReads: Reads[Asset] = Json.reads[Asset]

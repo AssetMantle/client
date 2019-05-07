@@ -196,7 +196,7 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
           val responseAccount = getAccount.Service.get(dirtyAccount.address)
 
           if (responseAccount.value.assetPegWallet.isDefined) {
-            val accountAssetPegWallet: Seq[Asset] = responseAccount.value.assetPegWallet.get.map { accountAsset: AccountResponse.Asset => accountAsset.applyToBlockchainAsset(pegHash = accountAsset.pegHash, documentHash = accountAsset.documentHash, assetType = accountAsset.assetType, assetQuantity = accountAsset.assetQuantity, assetPrice = accountAsset.assetPrice, quantityUnit = accountAsset.quantityUnit, ownerAddress = dirtyAccount.address, locked = accountAsset.locked) }
+            val accountAssetPegWallet: Seq[Asset] = responseAccount.value.assetPegWallet.get.map { accountAsset: AccountResponse.Asset => accountAsset.applyToBlockchainAsset(dirtyAccount.address) }
             val dbAssetPegWallet: Seq[Asset] = blockchainAssets.Service.getAssetPegWallet(dirtyAccount.address)
             blockchainAssets.Service.addAssets(accountAssetPegWallet.diff(dbAssetPegWallet))
             blockchainAssets.Service.deleteAssets(dbAssetPegWallet.diff(accountAssetPegWallet).map(_.pegHash))
