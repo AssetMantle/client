@@ -1,13 +1,12 @@
-package transactions
+package queries
 
 import java.net.ConnectException
 
 import exceptions.BlockChainException
-import javax.inject.Inject
-import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import play.api.libs.ws.{WSClient, WSResponse}
+import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
+import queries.responses.ZoneResponse.Response
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
@@ -28,10 +27,6 @@ class GetZone @Inject()(wsClient: WSClient)(implicit configuration: Configuratio
   private val url = ip + ":" + port + "/" + path + "/"
 
   private def action(request: String)(implicit executionContext: ExecutionContext): Future[Response] = wsClient.url(url + request).get.map { response => new Response(response) }
-
-  class Response(response: WSResponse) {
-    val body: String = response.body
-  }
 
   object Service {
 

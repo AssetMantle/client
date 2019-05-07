@@ -205,18 +205,14 @@ class SendCoins @Inject()(protected val databaseConfigProvider: DatabaseConfigPr
         pushNotifications.sendNotification(toAccount.id, constants.Notification.SUCCESS, Seq(response.TxHash))
         pushNotifications.sendNotification(sendCoin.from, constants.Notification.SUCCESS, Seq(response.TxHash))
       }
-      catch {
-        case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
-          throw new BaseException(constants.Error.PSQL_EXCEPTION)
-      }
     }
 
     def onFailure(ticketID: String, message: String): Future[Unit] = Future {
       try {
         Service.updateStatusAndResponseCode(ticketID, status = false, message)
         val sendCoin = Service.getTransaction(ticketID)
-        pushNotifications.sendNotification(masterAccounts.Service.getId(sendCoin.to), constants.Notification.SUCCESS, Seq(message))
-        pushNotifications.sendNotification(sendCoin.from, constants.Notification.SUCCESS, Seq(message))
+        pushNotifications.sendNotification(masterAccounts.Service.getId(sendCoin.to), constants.Notification.FAILURE, Seq(message))
+        pushNotifications.sendNotification(sendCoin.from, constants.Notification.FAILURE, Seq(message))
       } catch {
         case baseException: BaseException => logger.error(constants.Error.BASE_EXCEPTION, baseException)
       }
