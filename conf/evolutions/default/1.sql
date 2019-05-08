@@ -16,8 +16,9 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Zone_BC"
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Organization_BC"
 (
-    "id"      VARCHAR NOT NULL,
-    "address" VARCHAR NOT NULL,
+    "id"       VARCHAR NOT NULL,
+    "address"  VARCHAR NOT NULL,
+    "dirtyBit" BOOLEAN NOT NULL,
     PRIMARY KEY ("id")
 );
 

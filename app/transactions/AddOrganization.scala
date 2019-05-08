@@ -3,8 +3,6 @@ package transactions
 import java.net.ConnectException
 
 import exceptions.BlockChainException
-import javax.inject.Inject
-import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import play.api.libs.json.{Json, OWrites}
 import play.api.libs.ws.{WSClient, WSResponse}
@@ -57,6 +55,8 @@ class AddOrganization @Inject()(wsClient: WSClient)(implicit configuration: Conf
     }
 
     def getTxHashFromWSResponse(wsResponse: WSResponse): String = utilities.JSON.getResponseFromJson[Response](wsResponse).TxHash
+
+    def getTxFromWSResponse(wsResponse: WSResponse): Response = utilities.JSON.getResponseFromJson[Response](wsResponse)
 
   }
 }

@@ -33,7 +33,6 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
   private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
   private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
   private val sleepTime = configuration.get[Long]("blockchain.kafka.entityIterator.threadSleep")
-  private val denominationOfGasToken = configuration.get[String]("blockchain.denom.gas")
 
   private def add(zone: Zone)(implicit executionContext: ExecutionContext): Future[String] = db.run((zoneTable returning zoneTable.map(_.id) += zone).asTry).map {
     case Success(result) => result
@@ -125,7 +124,7 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
     def getDirtyZones(dirtyBit: Boolean): Seq[Zone] = Await.result(getZonesByDirtyBit(dirtyBit), Duration.Inf)
 
-    def updateAddressAndDirtyBit(zoneID: String, address: String, dirtyBit: Boolean) = Await.result(updateAddressAndDirtyBitByID(zoneID, address, dirtyBit), Duration.Inf)
+    def updateAddressAndDirtyBit(zoneID: String, address: String, dirtyBit: Boolean): Int = Await.result(updateAddressAndDirtyBitByID(zoneID, address, dirtyBit), Duration.Inf)
   }
 
   object Utility {
@@ -143,12 +142,10 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
         }
       }
     }
-
-
-    //Scheduler- iterates accounts with dirty tags
-    actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
-      Utility.dirtyEntityUpdater()
-    }
   }
 
+  //Scheduler- iterates accounts with dirty tags
+  actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
+    Utility.dirtyEntityUpdater()
+  }
 }

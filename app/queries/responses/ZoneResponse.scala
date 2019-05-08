@@ -7,5 +7,4 @@ object ZoneResponse {
   class Response(response: WSResponse) {
     val body: String = response.body.split(""""""")(1)
   }
-
 }
