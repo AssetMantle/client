@@ -11,7 +11,7 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Asset(pegHash: String, documentHash: String, assetType: String, assetQuantity: Int, assetPrice: Int, quantityUnit: String, ownerAddress: String, locked: Boolean)
+case class Asset(pegHash: String, documentHash: String, assetType: String, assetQuantity: String, assetPrice: String, quantityUnit: String, ownerAddress: String, locked: Boolean)
 
 @Singleton
 class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider) {
@@ -116,9 +116,9 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
 
     def assetType = column[String]("assetType")
 
-    def assetQuantity = column[Int]("assetQuantity")
+    def assetQuantity = column[String]("assetQuantity")
 
-    def assetPrice = column[Int]("assetPrice")
+    def assetPrice = column[String]("assetPrice")
 
     def quantityUnit = column[String]("quantityUnit")
 
@@ -130,13 +130,13 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
 
   object Service{
 
-    def addAsset(pegHash: String, documentHash: String, assetType: String, assetQuantity: Int, assetPrice: Int, quantityUnit: String, ownerAddress: String)(implicit executionContext: ExecutionContext): String = Await.result(add(Asset(pegHash = pegHash, documentHash = documentHash, assetType = assetType, assetPrice = assetPrice, assetQuantity = assetQuantity, quantityUnit = quantityUnit, ownerAddress = ownerAddress, locked = true)), Duration.Inf)
+    def addAsset(pegHash: String, documentHash: String, assetType: String, assetQuantity: String, assetPrice: String, quantityUnit: String, ownerAddress: String)(implicit executionContext: ExecutionContext): String = Await.result(add(Asset(pegHash = pegHash, documentHash = documentHash, assetType = assetType, assetPrice = assetPrice, assetQuantity = assetQuantity, quantityUnit = quantityUnit, ownerAddress = ownerAddress, locked = true)), Duration.Inf)
 
     def getAsset(pegHash: String)(implicit executionContext: ExecutionContext): Asset = Await.result(findByPegHash(pegHash), Duration.Inf)
 
     def getAssetPegWallet(address: String)(implicit executionContext: ExecutionContext): Seq[Asset] = Await.result(getAssetPegWalletByAddress(address), Duration.Inf)
 
-    def insertOrUpdateAsset(pegHash: String, documentHash: String, assetType: String, assetQuantity: Int, assetPrice: Int, quantityUnit: String, ownerAddress: String, locked: Boolean)(implicit executionContext: ExecutionContext): Int = Await.result(insertOrUpdate(Asset(pegHash = pegHash, documentHash = documentHash, assetType = assetType, assetQuantity = assetQuantity, assetPrice = assetPrice, quantityUnit = quantityUnit, ownerAddress = ownerAddress, locked = locked)), Duration.Inf)
+    def insertOrUpdateAsset(pegHash: String, documentHash: String, assetType: String, assetQuantity: String, assetPrice: String, quantityUnit: String, ownerAddress: String, locked: Boolean)(implicit executionContext: ExecutionContext): Int = Await.result(insertOrUpdate(Asset(pegHash = pegHash, documentHash = documentHash, assetType = assetType, assetQuantity = assetQuantity, assetPrice = assetPrice, quantityUnit = quantityUnit, ownerAddress = ownerAddress, locked = locked)), Duration.Inf)
 
     def updateOwner(pegHash: String, ownerAddress: String)(implicit executionContext: ExecutionContext): Int = Await.result(updateOwnerByPegHash(pegHash, ownerAddress), Duration.Inf)
 

@@ -10,10 +10,14 @@ object AccountResponse {
   implicit val coinsReads: Reads[Coins] = Json.reads[Coins]
 
   implicit val assetReads: Reads[blockchain.Asset] = Json.reads[blockchain.Asset]
+  implicit val ownersReads: Reads[Owners] = Json.reads[Owners]
+  implicit val fiatReads: Reads[Fiat] = Json.reads[Fiat]
 
-  implicit val fiatReads: Reads[blockchain.Fiat] = Json.reads[blockchain.Fiat]
+  case class Owners(ownerAddress: String, amount: String)
 
-  case class Value(address: String, coins: Option[Seq[Coins]], assetPegWallet: Option[Seq[blockchain.Asset]], fiatPegWallet: Option[Seq[blockchain.Fiat]], account_number: String, sequence: String)
+  case class Fiat(pegHash: String, transactionID: String, transactionAmount: String, redeemedAmount: String, owners: Seq[Owners])
+
+  case class Value(address: String, coins: Option[Seq[Coins]], assetPegWallet: Option[Seq[blockchain.Asset]], fiatPegWallet: Option[Seq[Fiat]], account_number: String, sequence: String)
 
   implicit val valueReads: Reads[Value] = Json.reads[Value]
 

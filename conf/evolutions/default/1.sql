@@ -67,8 +67,9 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Fiat_BC"
 (
     "pegHash"           VARCHAR NOT NULL,
     "transactionID"     VARCHAR NOT NULL,
-    "transactionAmount" INT     NOT NULL,
-    "redeemedAmount"    INT     NOT NULL,
+    "transactionAmount" VARCHAR NOT NULL,
+    "redeemedAmount"    VARCHAR NOT NULL,
+    "dirtyBit"          BOOLEAN NOT NULL,
     PRIMARY KEY ("pegHash")
 );
 
@@ -76,7 +77,7 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Owner_BC"
 (
     "pegHash"      VARCHAR NOT NULL,
     "ownerAddress" VARCHAR NOT NULL,
-    "amount"       INT     NOT NULL,
+    "amount"       VARCHAR NOT NULL,
     PRIMARY KEY ("ownerAddress", "pegHash")
 );
 
@@ -85,8 +86,8 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Asset_BC"
     "pegHash"       VARCHAR NOT NULL,
     "documentHash"  VARCHAR NOT NULL,
     "assetType"     VARCHAR NOT NULL,
-    "assetQuantity" INT     NOT NULL,
-    "assetPrice"    INT     NOT NULL,
+    "assetQuantity" VARCHAR NOT NULL,
+    "assetPrice"    VARCHAR NOT NULL,
     "quantityUnit"  VARCHAR NOT NULL,
     "ownerAddress"  VARCHAR NOT NULL,
     "locked"        BOOLEAN NOT NULL,
@@ -482,11 +483,11 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."AccountToken"
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."FaucetRequest"
 (
     "id"        VARCHAR NOT NULL,
-    "ticketID"  VARCHAR,
     "accountID" VARCHAR NOT NULL,
     "amount"    INT     NOT NULL,
     "gas"       INT,
     "status"    BOOLEAN,
+    "ticketID"  VARCHAR,
     "comment"   VARCHAR,
     PRIMARY KEY ("id")
 );
@@ -514,6 +515,7 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."IssueFiatRequest"
     "transactionAmount" INT     NOT NULL,
     "gas"               INT,
     "status"            BOOLEAN,
+    "ticketID"          VARCHAR,
     "comment"           VARCHAR,
     PRIMARY KEY ("id")
 );

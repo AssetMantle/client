@@ -96,16 +96,6 @@ class AddZones @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     }
   }
 
-  def getAddZoneByTicketID(ticketID: String): Future[AddZone] = db.run(addZoneTable.filter(_.ticketID === ticketID).result.head.asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
-        throw new BaseException(constants.Error.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
-        throw new BaseException(constants.Error.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
-
   private def getTicketIDsWithEmptyTxHash()(implicit executionContext: ExecutionContext): Future[Seq[String]] = db.run(addZoneTable.filter(_.txHash.?.isEmpty).map(_.ticketID).result)
 
   private def getTicketIDsWithNullStatus()(implicit executionContext: ExecutionContext): Future[Seq[String]] = db.run(addZoneTable.filter(_.status.?.isEmpty).map(_.ticketID).result)
@@ -177,7 +167,7 @@ class AddZones @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
     def getAddress(ticketID: String)(implicit executionContext: ExecutionContext): String = Await.result(getAddressByTicketID(ticketID), Duration.Inf)
 
-    def getAddZone(ticketID: String): AddZone = Await.result(getAddZoneByTicketID(ticketID), Duration.Inf)
+    def getAddZone(ticketID: String): AddZone = Await.result(findByTicketID(ticketID), Duration.Inf)
   }
 
   object Utility {

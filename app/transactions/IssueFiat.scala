@@ -3,9 +3,6 @@ package transactions
 import java.net.ConnectException
 
 import exceptions.BlockChainException
-import javax.inject.Inject
-import play.api.libs.json.{JsObject, Json, OWrites}
-import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import play.api.libs.json.{Json, OWrites}
 import play.api.libs.ws.{WSClient, WSResponse}
@@ -16,7 +13,7 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 
 @Singleton
-class IssueFiat @Inject()( wsClient: WSClient)(implicit configuration: Configuration, executionContext: ExecutionContext) {
+class IssueFiat @Inject()(wsClient: WSClient)(implicit configuration: Configuration, executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.TRANSACTIONS_ISSUE_FIAT
 
@@ -32,13 +29,13 @@ class IssueFiat @Inject()( wsClient: WSClient)(implicit configuration: Configura
 
   private val chainID = configuration.get[String]("blockchain.main.chainID")
 
-  case class Request(from: String, to: String, transactionID: String, transactionAmount: Int, chainID: String = chainID, password: String, gas: Int)
+  private def action(request: Request)(implicit executionContext: ExecutionContext): Future[Response] = wsClient.url(url).post(Json.toJson(request)).map { response => utilities.JSON.getResponseFromJson[Response](response) }
 
   private implicit val requestWrites: OWrites[Request] = Json.writes[Request]
 
-  private def action(request: Request)(implicit executionContext: ExecutionContext): Future[Response] = wsClient.url(url).post(Json.toJson(request)).map { response => utilities.JSON.getResponseFromJson[Response](response) }
-
   private def kafkaAction(request: Request)(implicit executionContext: ExecutionContext): Future[KafkaResponse] = wsClient.url(url).post(Json.toJson(request)).map { response => utilities.JSON.getResponseFromJson[KafkaResponse](response) }
+
+  case class Request(from: String, to: String, transactionID: String, transactionAmount: Int, chainID: String = chainID, password: String, gas: Int)
 
   object Service {
     def post(request: Request)(implicit executionContext: ExecutionContext): Response = try {
@@ -58,6 +55,9 @@ class IssueFiat @Inject()( wsClient: WSClient)(implicit configuration: Configura
     }
 
     def getTxHashFromWSResponse(wsResponse: WSResponse): String = utilities.JSON.getResponseFromJson[Response](wsResponse).TxHash
+
+    def getTxFromWSResponse(wsResponse: WSResponse): Response = utilities.JSON.getResponseFromJson[Response](wsResponse)
+
   }
 
 }
