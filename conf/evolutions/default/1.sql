@@ -39,6 +39,7 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."ACLAccount_BC"
     "zoneID"         VARCHAR NOT NULL,
     "organizationID" VARCHAR NOT NULL,
     "aclHash"        VARCHAR NOT NULL,
+    "dirtyBit"       BOOLEAN NOT NULL,
     PRIMARY KEY ("address")
 );
 
