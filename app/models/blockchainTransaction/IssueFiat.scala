@@ -8,6 +8,7 @@ import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
+import queries.responses.AccountResponse
 import slick.jdbc.JdbcProfile
 import transactions.GetResponse
 import transactions.responses.TransactionResponse.Response
@@ -20,7 +21,7 @@ import scala.util.{Failure, Success}
 case class IssueFiat(from: String, to: String, transactionID: String, transactionAmount: Int, gas: Int, status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])
 
 @Singleton
-class IssueFiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, transactionIssueFiat: transactions.IssueFiat, getResponse: GetResponse, actorSystem: ActorSystem, implicit val pushNotifications: PushNotifications, implicit val masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts, blockchainFiats: blockchain.Fiats, queryAccount: queries.GetAccount)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
+class IssueFiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, transactionIssueFiat: transactions.IssueFiat, getResponse: GetResponse, actorSystem: ActorSystem, implicit val pushNotifications: PushNotifications, implicit val masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts, blockchainFiats: blockchain.Fiats, getAccount: queries.GetAccount)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_ISSUE_FIAT
 
@@ -121,6 +122,17 @@ class IssueFiats @Inject()(protected val databaseConfigProvider: DatabaseConfigP
     }
   }
 
+  private def getToAddressByTransactionID(transactionID: String): Future[String] = db.run(issueFiatTable.filter(_.transactionID === transactionID).map(_.to).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+        throw new BaseException(constants.Error.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+        throw new BaseException(constants.Error.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+
   private def deleteByTicketID(ticketID: String)(implicit executionContext: ExecutionContext) = db.run(issueFiatTable.filter(_.ticketID === ticketID).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -154,12 +166,6 @@ class IssueFiats @Inject()(protected val databaseConfigProvider: DatabaseConfigP
     def responseCode = column[String]("responseCode")
   }
 
-  if (configuration.get[Boolean]("blockchain.kafka.enabled")) {
-    actorSystem.scheduler.schedule(initialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds, interval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").second) {
-      utilities.TicketUpdater.start(Service.getTicketIDs, transactionIssueFiat.Service.getTxHashFromWSResponse, Service.updateTxHash, Service.getAddress)
-    }
-  }
-
   object Service {
 
     def addIssueFiat(from: String, to: String, transactionID: String, transactionAmount: Int, gas: Int, status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])(implicit executionContext: ExecutionContext): String = Await.result(add(IssueFiat(from = from, to = to, transactionID = transactionID, transactionAmount = transactionAmount, gas = gas, status = status, txHash = txHash, ticketID = ticketID, responseCode = responseCode)), Duration.Inf)
@@ -179,22 +185,21 @@ class IssueFiats @Inject()(protected val databaseConfigProvider: DatabaseConfigP
     def getAddress(ticketID: String)(implicit executionContext: ExecutionContext): String = Await.result(getAddressByTicketID(ticketID), Duration.Inf)
 
     def getIssueFiat(ticketID: String): IssueFiat = Await.result(findByTicketID(ticketID), Duration.Inf)
+
+    def getToAddressOnTransactionID(transactionID: String): String = Await.result(getToAddressByTransactionID(transactionID), Duration.Inf)
   }
 
   object Utility {
     def onSuccess(ticketID: String, response: Response): Future[Unit] = Future {
       Service.updateTxHashStatusResponseCode(ticketID, response.TxHash, status = true, response.Code)
       val issueFiat = Service.getIssueFiat(ticketID)
-      Future {
-        Thread.sleep(sleepTime)
-        val fiatResponse = queryAccount.Service.get(issueFiat.to).value.fiatPegWallet.getOrElse(Seq(queries.responses.AccountResponse.Fiat(null, null, null, null, null)))
-        fiatResponse.foreach(fiatWallet => blockchainFiats.Service.insertOrUpdateFiat(fiatWallet.pegHash, fiatWallet.transactionID, fiatWallet.transactionAmount, fiatWallet.redeemedAmount, dirtyBit = true))
-      }
+
+      Thread.sleep(sleepTime)
+      getAccount.Service.get(issueFiat.to).value.fiatPegWallet.getOrElse(Seq(AccountResponse.Fiat(null, null, null, null, null))).foreach(fiatWallet => {
+        blockchainFiats.Service.insertOrUpdateFiat(fiatWallet.pegHash, issueFiat.to, fiatWallet.transactionID, fiatWallet.transactionAmount, fiatWallet.redeemedAmount, dirtyBit = true)
+      })
+
       blockchainAccounts.Service.updateDirtyBit(masterAccounts.Service.getAddress(issueFiat.from), dirtyBit = true)
-      //      blockchainZones.Service.addZone(addZone.zoneID, addZone.to, dirtyBit = true)
-      //      masterZones.Service.updateStatus(addZone.zoneID, status = true)
-      //      masterAccounts.Service.updateUserTypeOnAddress(addZone.to, constants.User.ZONE)
-      //      blockchainAccounts.Service.updateDirtyBit(masterAccounts.Service.getAddress(addZone.from), dirtyBit = true)
       pushNotifications.sendNotification(masterAccounts.Service.getId(issueFiat.to), constants.Notification.SUCCESS, Seq(response.TxHash))
       pushNotifications.sendNotification(issueFiat.from, constants.Notification.SUCCESS, Seq(response.TxHash))
     }

@@ -154,12 +154,6 @@ class SetACLs @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
     def responseCode = column[String]("responseCode")
   }
 
-  if (configuration.get[Boolean]("blockchain.kafka.enabled")) {
-    actorSystem.scheduler.schedule(initialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds, interval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").second) {
-      utilities.TicketUpdater.start(Service.getTicketIDs, transactionSetACL.Service.getTxHashFromWSResponse, Service.updateTxHash, Service.getAddress)
-    }
-  }
-
   object Service {
 
     def addSetACL(from: String, aclAddress: String, organizationID: String, zoneID: String, acl: ACL, status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])(implicit executionContext: ExecutionContext): String = Await.result(add(SetACL(from, aclAddress, organizationID, zoneID, util.hashing.MurmurHash3.stringHash(acl.toString).toString, status, txHash, ticketID, responseCode)), Duration.Inf)

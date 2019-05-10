@@ -56,6 +56,8 @@ class IssueFiatRequests @Inject()(protected val databaseConfigProvider: Database
     }
   }
 
+  private def checkByTransactionID(transactionID: String): Future[Boolean] = db.run(issueFiatRequestTable.filter(_.transactionID === transactionID).exists.result)
+
   private def updateStatusAndGasByID(id: String, status: Boolean, gas: Int)(implicit executionContext: ExecutionContext): Future[Int] = db.run(issueFiatRequestTable.filter(_.id === id).map(issueFiat => (issueFiat.status, issueFiat.gas)).update((status, gas)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -136,6 +138,7 @@ class IssueFiatRequests @Inject()(protected val databaseConfigProvider: Database
         throw new BaseException(constants.Error.NO_SUCH_ELEMENT_EXCEPTION)
     }
   }
+
 
   private[models] class IssueFiatRequestTable(tag: Tag) extends Table[IssueFiatRequest](tag, "IssueFiatRequest") {
 

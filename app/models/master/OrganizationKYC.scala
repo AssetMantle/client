@@ -37,7 +37,7 @@ class OrganizationKYCs @Inject()(protected val databaseConfigProvider: DatabaseC
 
     def id = column[String]("id", O.PrimaryKey)
 
-    def documentType = column[String]("documentType")
+    def documentType = column[String]("documentType", O.PrimaryKey)
 
     def status = column[Boolean]("status")
 
