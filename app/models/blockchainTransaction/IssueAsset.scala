@@ -2,13 +2,16 @@ package models.blockchainTransaction
 
 import akka.actor.ActorSystem
 import queries.GetAccount
+import queries.responses.AccountResponse
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
+import models.blockchain
 import models.{blockchain, master, masterTransaction}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
+import queries.responses.AccountResponse
 import slick.jdbc.JdbcProfile
 import utilities.PushNotifications
 import transactions.responses.TransactionResponse.Response
@@ -20,7 +23,7 @@ import scala.util.{Failure, Success}
 case class IssueAsset(from: String, to: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, gas: Int,  status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])
 
 @Singleton
-class IssueAssets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, transactionIssueAsset: transactions.IssueAsset, actorSystem: ActorSystem, implicit val pushNotifications: PushNotifications, implicit val masterAccounts: master.Accounts, implicit val blockchainAccounts: blockchain.Accounts)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
+class IssueAssets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, getAccount: GetAccount, blockchainAssets: blockchain.Assets, transactionIssueAsset: transactions.IssueAsset, actorSystem: ActorSystem, implicit val pushNotifications: PushNotifications, implicit val masterAccounts: master.Accounts, implicit val blockchainAccounts: blockchain.Accounts)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_ISSUE_ASSET
 
@@ -140,13 +143,20 @@ class IssueAssets @Inject()(protected val databaseConfigProvider: DatabaseConfig
   private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
   private val schedulerInterval =  configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
   private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
+  private val sleepTime = configuration.get[Long]("blockchain.kafka.entityIterator.threadSleep")
 
   object Utility {
     def onSuccess(ticketID: String, response: Response): Future[Unit] = Future {
       try {
         Service.updateTxHashStatusResponseCode(ticketID, response.TxHash, status = true, response.Code)
         val issueAsset = Service.getTransaction(ticketID)
-        blockchainAccounts.Service.updateDirtyBit(issueAsset.to, dirtyBit = true)
+
+        Thread.sleep(sleepTime + 2000)
+        val responseAccount = getAccount.Service.get(issueAsset.to)
+        if (responseAccount.value.assetPegWallet.isDefined) {
+          blockchainAssets.Service.addAssets(responseAccount.value.assetPegWallet.get.map{responseAsset: AccountResponse.Asset => responseAsset.applyToBlockchainAsset(issueAsset.to)}.diff(blockchainAssets.Service.getAssetPegWallet(issueAsset.to)))
+        }
+
         blockchainAccounts.Service.updateDirtyBit(masterAccounts.Service.getAddress(issueAsset.from), dirtyBit = true)
 
         pushNotifications.sendNotification(masterAccounts.Service.getId(issueAsset.to), constants.Notification.SUCCESS, Seq(response.TxHash))

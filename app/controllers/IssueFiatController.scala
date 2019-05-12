@@ -97,7 +97,12 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
                 blockchainTransactionIssueFiats.Service.addIssueFiat(from = username, to = toAddress, transactionID = issueFiatData.transactionID, transactionAmount = issueFiatData.transactionAmount, gas = issueFiatData.gas, null, txHash = Option(response.TxHash), ticketID = Random.nextString(32), null)
                 masterTransactionIssueFiatRequests.Service.updateStatusAndGas(issueFiatData.requestID, true, issueFiatData.gas)
                 blockchainAccounts.Service.updateSequence(zoneAddress, blockchainAccounts.Service.getSequence(zoneAddress) + 1)
-                //TODO: Update Fiat and Owner Table
+                for(tag <- response.Tags){
+                  if (tag.Key == constants.Response.KEY_FIAT){
+                    blockchainFiats.Service.addFiat(tag.Value, issueFiatData.transactionID, issueFiatData.transactionAmount, 0)
+                    blockchainOwners.Service.addOwner(tag.Value, toAddress, issueFiatData.transactionAmount)
+                  }
+                }
                 Ok(views.html.index(success = response.TxHash))
               }
             } else {

@@ -129,45 +129,5 @@ class SetBuyerFeedbacks @Inject()(protected val databaseConfigProvider: Database
     def getTransaction(ticketID: String)(implicit executionContext: ExecutionContext): SetBuyerFeedback = Await.result(findByTicketID(ticketID), Duration.Inf)
     
   }
-
-  private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
-  private val schedulerInterval =  configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
-  private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
-
-  object Utility {
-    def onSuccess(ticketID: String, response: Response): Future[Unit] = Future {
-      try {
-        Service.updateTxHashStatusResponseCode(ticketID, response.TxHash, status = true, response.Code)
-        val setBuyerFeedback = Service.getTransaction(ticketID)
-        blockchainFeedbacks.Service.updateDirtyBit(setBuyerFeedback.to, dirtyBit = true)
-        blockchainAccounts.Service.updateDirtyBit(masterAccounts.Service.getAddress(setBuyerFeedback.from), dirtyBit = true)
-
-        pushNotifications.sendNotification(masterAccounts.Service.getId(setBuyerFeedback.to), constants.Notification.SUCCESS, Seq(response.TxHash))
-        pushNotifications.sendNotification(setBuyerFeedback.from, constants.Notification.SUCCESS, Seq(response.TxHash))
-      }
-      catch {
-        case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
-          throw new BaseException(constants.Error.PSQL_EXCEPTION)
-      }
-    }
-
-    def onFailure(ticketID: String, message: String): Future[Unit] = Future {
-      try {
-        Service.updateStatusAndResponseCode(ticketID, status = false, message)
-        val setBuyerFeedback = Service.getTransaction(ticketID)
-        pushNotifications.sendNotification(masterAccounts.Service.getId(setBuyerFeedback.to), constants.Notification.FAILURE, Seq(message))
-        pushNotifications.sendNotification(setBuyerFeedback.from, constants.Notification.FAILURE, Seq(message))
-      } catch {
-        case baseException: BaseException => logger.error(constants.Error.BASE_EXCEPTION, baseException)
-      }
-    }
-  }
-
-  //scheduler iterates with rows with null as status
-  if (kafkaEnabled) {
-    actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
-      utilities.TicketUpdater.start_(Service.getTicketIDsOnStatus, transactionSetBuyerFeedback.Service.getTxFromWSResponse, Utility.onSuccess, Utility.onFailure)
-    }
-  }
   
 }

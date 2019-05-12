@@ -3,11 +3,13 @@ package models.blockchainTransaction
 import akka.actor.ActorSystem
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import models.{master, blockchain}
+import models.{blockchain, master}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
+import queries.GetAccount
+import queries.responses.AccountResponse
 import slick.jdbc.JdbcProfile
 import transactions.responses.TransactionResponse.Response
 import utilities.PushNotifications
@@ -19,7 +21,7 @@ import scala.util.{Failure, Success}
 case class RedeemAsset(from: String, to: String, pegHash: String, gas: Int,  status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])
 
 @Singleton
-class RedeemAssets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, transactionRedeemAsset: transactions.RedeemAsset, blockchainAccounts: blockchain.Accounts, actorSystem: ActorSystem, implicit val pushNotifications: PushNotifications, implicit val masterAccounts: master.Accounts)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext)  {
+class RedeemAssets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, getAccount: GetAccount, blockchainAssets: blockchain.Assets, transactionRedeemAsset: transactions.RedeemAsset, blockchainAccounts: blockchain.Accounts, actorSystem: ActorSystem, implicit val pushNotifications: PushNotifications, implicit val masterAccounts: master.Accounts)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext)  {
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_REDEEM_ASSET
 
@@ -130,14 +132,26 @@ class RedeemAssets @Inject()(protected val databaseConfigProvider: DatabaseConfi
   private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
   private val schedulerInterval =  configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
   private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
+  private val sleepTime = configuration.get[Long]("blockchain.kafka.entityIterator.threadSleep")
 
   object Utility {
     def onSuccess(ticketID: String, response: Response): Future[Unit] = Future {
       try {
         Service.updateTxHashStatusResponseCode(ticketID, response.TxHash, status = true, response.Code)
         val redeemAsset = Service.getTransaction(ticketID)
+
+        Thread.sleep(sleepTime + 2000)
+
+        val fromAddress = masterAccounts.Service.getAddress(redeemAsset.from)
+        val responseAccount = getAccount.Service.get(fromAddress)
+
+        if (responseAccount.value.assetPegWallet.isDefined) {
+          blockchainAssets.Service.deleteAssets(blockchainAssets.Service.getAssetPegWallet(fromAddress).map(_.pegHash).diff(responseAccount.value.assetPegWallet.get.map(_.pegHash)))
+        } else {
+          blockchainAssets.Service.deleteAssetPegWallet(fromAddress)
+        }
+
         blockchainAccounts.Service.updateDirtyBit(masterAccounts.Service.getAddress(redeemAsset.from), dirtyBit = true)
-        blockchainAccounts.Service.updateDirtyBit(redeemAsset.to, dirtyBit = true)
 
         pushNotifications.sendNotification(masterAccounts.Service.getId(redeemAsset.to), constants.Notification.SUCCESS, Seq(response.TxHash))
         pushNotifications.sendNotification(redeemAsset.from, constants.Notification.SUCCESS, Seq(response.TxHash))

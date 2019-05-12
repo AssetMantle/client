@@ -47,7 +47,6 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
                 blockchainTransactionSetACLs.Service.addSetACL(from = username, aclAddress = setACLData.aclAddress, organizationID = setACLData.organizationID, zoneID = zoneID, acl = acl, null, txHash = Option(response.TxHash), ticketID = Random.nextString(32), null)
                 masterAccounts.Service.updateUserTypeOnAddress(setACLData.aclAddress, constants.User.TRADER)
                 blockchainAccounts.Service.updateSequence(fromAddress, blockchainAccounts.Service.getSequence(fromAddress) + 1)
-                blockchainFeedbacks.Service.addFeedback(setACLData.aclAddress, 0, false)
                 Ok(views.html.index(success = response.TxHash))
               }
             } else {

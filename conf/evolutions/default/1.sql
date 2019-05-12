@@ -82,8 +82,8 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Asset_BC"
   "pegHash"       VARCHAR NOT NULL,
   "documentHash"  VARCHAR NOT NULL,
   "assetType"     VARCHAR NOT NULL,
-  "assetQuantity" INT     NOT NULL,
-  "assetPrice"    INT     NOT NULL,
+  "assetQuantity" VARCHAR NOT NULL,
+  "assetPrice"    VARCHAR NOT NULL,
   "quantityUnit"  VARCHAR NOT NULL,
   "ownerAddress"  VARCHAR NOT NULL,
   "locked"        BOOLEAN NOT NULL,
@@ -97,10 +97,11 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Negotiation_BC"
   "buyerAddress"    VARCHAR NOT NULL,
   "sellerAddress"   VARCHAR NOT NULL,
   "assetPegHash"    VARCHAR NOT NULL,
-  "bid"             INT     NOT NULL,
-  "time"            INT     NOT NULL,
+  "bid"             VARCHAR NOT NULL,
+  "time"            VARCHAR NOT NULL,
   "buyerSignature"  VARCHAR,
   "sellerSignature" VARCHAR,
+  "dirtyBit"        BOOLEAN NOT NULL,
   PRIMARY KEY ("id")
 );
 
@@ -110,37 +111,8 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Order_BC"
   "fiatProofHash" VARCHAR,
   "awbProofHash"  VARCHAR,
   "executed"      BOOLEAN NOT NULL,
+  "dirtyBit"      BOOLEAN NOT NULL,
   PRIMARY KEY ("id")
-);
-
-CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Feedback_BC"
-(
-  "address"                      VARCHAR NOT NULL,
---   "buyerExecuteOrderNegativeTx"  INT     NOT NULL,
---   "buyerExecuteOrderPositiveTx"  INT     NOT NULL,
---   "changeBuyerBidNegativeTx"     INT     NOT NULL,
---   "changeBuyerBidPositiveTx"     INT     NOT NULL,
---   "changeSellerBidNegativeTx"    INT     NOT NULL,
---   "changeSellerBidPositiveTx"    INT     NOT NULL,
---   "confirmBuyerBidNegativeTx"    INT     NOT NULL,
---   "confirmBuyerBidPositiveTx"    INT     NOT NULL,
---   "confirmSellerBidNegativeTx"   INT     NOT NULL,
---   "confirmSellerBidPositiveTx"   INT     NOT NULL,
---   "ibcIssueAssetsNegativeTx"     INT     NOT NULL,
---   "ibcIssueAssetsPositiveTx"     INT     NOT NULL,
---   "ibcIssueFiatsNegativeTx"      INT     NOT NULL,
---   "ibcIssueFiatsPositiveTx"      INT     NOT NULL,
---   "negotiationNegativeTx"        INT     NOT NULL,
---   "negotiationPositiveTx"        INT     NOT NULL,
---   "sellerExecuteOrderNegativeTx" INT     NOT NULL,
---   "sellerExecuteOrderPositiveTx" INT     NOT NULL,
---   "sendAssetsNegativeTx"         INT     NOT NULL,
---   "sendAssetsPositiveTx"         INT     NOT NULL,
---   "sendFiatsNegativeTx"          INT     NOT NULL,
---   "sendFiatsPositiveTx"          INT     NOT NULL,
-  "rating"                       INT     NOT NULL,
-  "dirtyBit"                     BOOLEAN NOT NULL,
-  PRIMARY KEY ("address")
 );
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."AddOrganization"
@@ -585,8 +557,6 @@ ALTER TABLE BLOCKCHAIN."Owner_BC"
   ADD CONSTRAINT Owners_Account_ownerAddress FOREIGN KEY ("ownerAddress") REFERENCES BLOCKCHAIN."Account_BC" ("address");
 ALTER TABLE BLOCKCHAIN."Owner_BC"
   ADD CONSTRAINT Owners_Fiat_pegHash FOREIGN KEY ("pegHash") REFERENCES BLOCKCHAIN."Fiat_BC" ("pegHash");
-ALTER TABLE BLOCKCHAIN."Asset_BC"
-  ADD CONSTRAINT Asset_Account_ownerAddress FOREIGN KEY ("ownerAddress") REFERENCES BLOCKCHAIN."Account_BC" ("address");
 ALTER TABLE BLOCKCHAIN."Negotiation_BC"
   ADD CONSTRAINT Negotiation_Account_buyerAddress FOREIGN KEY ("buyerAddress") REFERENCES BLOCKCHAIN."Account_BC" ("address");
 ALTER TABLE BLOCKCHAIN."Negotiation_BC"
@@ -595,8 +565,6 @@ ALTER TABLE BLOCKCHAIN."Negotiation_BC"
   ADD CONSTRAINT Negotiation_Asset_pegHash FOREIGN KEY ("assetPegHash") REFERENCES BLOCKCHAIN."Asset_BC" ("pegHash");
 ALTER TABLE BLOCKCHAIN."Order_BC"
   ADD CONSTRAINT Order_Negotiation_id FOREIGN KEY ("id") REFERENCES BLOCKCHAIN."Negotiation_BC" ("id");
-ALTER TABLE BLOCKCHAIN."Feedback_BC"
-  ADD CONSTRAINT Feedback_Account_address FOREIGN KEY ("address") REFERENCES BLOCKCHAIN."ACLAccount_BC" ("address");
 ALTER TABLE BLOCKCHAIN."Organization_BC"
   ADD CONSTRAINT Organization_BC_Organization_id FOREIGN KEY ("id") REFERENCES Master."Organization" ("id");
 ALTER TABLE BLOCKCHAIN."Zone_BC"
@@ -658,8 +626,6 @@ DROP TABLE IF EXISTS BLOCKCHAIN."Fiat_BC" CASCADE;
 DROP TABLE IF EXISTS BLOCKCHAIN."Owner_BC" CASCADE;
 DROP TABLE IF EXISTS BLOCKCHAIN."Asset_BC" CASCADE;
 DROP TABLE IF EXISTS BLOCKCHAIN."Negotiation_BC" CASCADE;
-DROP TABLE IF EXISTS BLOCKCHAIN."Order_BC" CASCADE;
-DROP TABLE IF EXISTS BLOCKCHAIN."Feedback_BC" CASCADE;
 DROP TABLE IF EXISTS BLOCKCHAIN."Account_BC" CASCADE;
 
 DROP TABLE IF EXISTS BLOCKCHAIN_TRANSACTION."AddKey" CASCADE;

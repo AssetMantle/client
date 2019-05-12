@@ -20,7 +20,7 @@ import scala.util.{Failure, Success}
 case class Account(address: String, coins: Int, publicKey: String, accountNumber: Int, sequence: Int, dirtyBit: Boolean)
 
 @Singleton
-class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, blockchainAssets: Assets, getSeed: GetSeed, addKey: AddKey, getAccount: GetAccount, masterAccounts: master.Accounts, actorSystem: ActorSystem, implicit val pushNotifications: PushNotifications)(implicit executionContext: ExecutionContext, configuration: Configuration) {
+class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, getSeed: GetSeed, addKey: AddKey, getAccount: GetAccount, masterAccounts: master.Accounts, actorSystem: ActorSystem, implicit val pushNotifications: PushNotifications)(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -194,16 +194,6 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
       for (dirtyAccount <- dirtyAccounts) {
         try {
           val responseAccount = getAccount.Service.get(dirtyAccount.address)
-
-          if (responseAccount.value.assetPegWallet.isDefined) {
-            val accountAssetPegWallet: Seq[Asset] = responseAccount.value.assetPegWallet.get.map { accountAsset: AccountResponse.Asset => accountAsset.applyToBlockchainAsset(dirtyAccount.address) }
-            val dbAssetPegWallet: Seq[Asset] = blockchainAssets.Service.getAssetPegWallet(dirtyAccount.address)
-            blockchainAssets.Service.addAssets(accountAssetPegWallet.diff(dbAssetPegWallet))
-            blockchainAssets.Service.deleteAssets(dbAssetPegWallet.diff(accountAssetPegWallet).map(_.pegHash))
-          } else {
-            blockchainAssets.Service.deleteAssetPegWallet(dirtyAccount.address)
-          }
-
           Service.updateSequenceCoinsAndDirtyBit(responseAccount.value.address, responseAccount.value.sequence.toInt, responseAccount.value.coins.get.filter(_.denom == denominationOfGasToken).map(_.amount.toInt).sum, dirtyBit = false)
         }
         catch {

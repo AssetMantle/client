@@ -5,7 +5,7 @@
 @common(Messages(constants.Form.CONFIRM_SELLER_BID)) {
     @form(action = routes.ConfirmSellerBidController.confirmSellerBid) {
         @CSRF.formField
-        @inputText(confirmSellerBidForm(constants.Form.TO),'_label-> Messages(constants.Form.TO))
+        @inputText(confirmSellerBidForm(constants.Form.ACCOUNT_ID),'_label-> Messages(constants.Form.ACCOUNT_ID))
         @inputText(confirmSellerBidForm(constants.Form.BID),'_label-> Messages(constants.Form.BID))
         @inputText(confirmSellerBidForm(constants.Form.TIME),'_label-> Messages(constants.Form.TIME))
         @inputText(confirmSellerBidForm(constants.Form.PEG_HASH),'_label-> Messages(constants.Form.PEG_HASH))

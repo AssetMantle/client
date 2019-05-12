@@ -5,7 +5,7 @@
 @common(Messages(constants.Form.CHANGE_SELLER_BID)) {
     @form(action = routes.ChangeSellerBidController.changeSellerBid) {
         @CSRF.formField
-        @inputText(changeSellerBidForm(constants.Form.TO),'_label-> Messages(constants.Form.TO))
+        @inputText(changeSellerBidForm(constants.Form.ACCOUNT_ID),'_label-> Messages(constants.Form.ACCOUNT_ID))
         @inputText(changeSellerBidForm(constants.Form.BID),'_label-> Messages(constants.Form.BID))
         @inputText(changeSellerBidForm(constants.Form.TIME),'_label-> Messages(constants.Form.TIME))
         @inputText(changeSellerBidForm(constants.Form.PEG_HASH),'_label-> Messages(constants.Form.PEG_HASH))
