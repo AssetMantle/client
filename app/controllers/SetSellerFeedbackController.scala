@@ -3,13 +3,12 @@ package controllers
 import controllers.actions.{WithLoginAction, WithTraderLoginAction}
 import exceptions.{BaseException, BlockChainException}
 import javax.inject.{Inject, Singleton}
-import models.blockchainTransaction
-import models.master
+import models.{blockchainTransaction, master}
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 import scala.util.Random
 
 @Singleton
@@ -31,22 +30,7 @@ class SetSellerFeedbackController @Inject()(messagesControllerComponents: Messag
         },
         setSellerFeedbackData => {
           try {
-            val toAddress = masterAccounts.Service.getAddress(setSellerFeedbackData.accountID)
-            val ticketID: String = if (kafkaEnabled) transactionsSetSellerFeedback.Service.kafkaPost(transactionsSetSellerFeedback.Request(from = username, to = toAddress, password = setSellerFeedbackData.password, pegHash = setSellerFeedbackData.pegHash, rating = setSellerFeedbackData.rating, gas = setSellerFeedbackData.gas)).ticketID else Random.nextString(32)
-            blockchainTransactionSetSellerFeedbacks.Service.addSetSellerFeedback(from = username, to = toAddress, pegHash = setSellerFeedbackData.pegHash, rating = setSellerFeedbackData.rating, gas = setSellerFeedbackData.gas, null, null, ticketID = ticketID, null)
-            if(!kafkaEnabled){
-              Future{
-                try {
-                  blockchainTransactionSetSellerFeedbacks.Utility.onSuccess(ticketID, transactionsSetSellerFeedback.Service.post(transactionsSetSellerFeedback.Request(from = username, to = toAddress, password = setSellerFeedbackData.password,  pegHash = setSellerFeedbackData.pegHash, rating = setSellerFeedbackData.rating, gas = setSellerFeedbackData.gas)))
-                } catch {
-                  case baseException: BaseException => logger.error(constants.Error.BASE_EXCEPTION, baseException)
-                    blockchainTransactionSetSellerFeedbacks.Utility.onFailure(ticketID, baseException.message)
-                  case blockChainException: BlockChainException => logger.error(blockChainException.message, blockChainException)
-                    blockchainTransactionSetSellerFeedbacks.Utility.onFailure(ticketID, blockChainException.message)
-                }
-              }
-            }
-            Ok(views.html.index(success = ticketID))
+            Ok(views.html.index(success = ""))
           }
           catch {
             case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))

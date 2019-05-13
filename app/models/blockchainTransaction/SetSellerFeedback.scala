@@ -14,12 +14,11 @@ import utilities.PushNotifications
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
-import transactions.responses.TransactionResponse.Response
 
 case class SetSellerFeedback(from: String, to: String, pegHash: String, rating: Int, gas: Int,  status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])
 
 @Singleton
-class SetSellerFeedbacks @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, blockchainFeedbacks: blockchain.Feedbacks, transactionSetSellerFeedback: transactions.SetSellerFeedback, actorSystem: ActorSystem, implicit val pushNotifications: PushNotifications, implicit val blockchainAccounts: blockchain.Accounts, implicit val masterAccounts: master.Accounts)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext)  {
+class SetSellerFeedbacks @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, transactionSetSellerFeedback: transactions.SetSellerFeedback, actorSystem: ActorSystem, implicit val pushNotifications: PushNotifications, implicit val blockchainAccounts: blockchain.Accounts, implicit val masterAccounts: master.Accounts)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext)  {
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_SET_SELLER_FEEDBACK
 

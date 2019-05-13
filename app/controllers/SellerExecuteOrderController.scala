@@ -1,6 +1,6 @@
 package controllers
 
-import controllers.actions.WithTraderLoginAction
+import controllers.actions.WithZoneLoginAction
 import exceptions.{BaseException, BlockChainException}
 import javax.inject.{Inject, Singleton}
 import models.blockchainTransaction
@@ -14,7 +14,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Random
 
 @Singleton
-class SellerExecuteOrderController @Inject()(messagesControllerComponents: MessagesControllerComponents, masterAccounts: master.Accounts, blockchainOrders: blockchain.Orders, blockchainAccounts: blockchain.Accounts, withTraderLoginAction: WithTraderLoginAction, transactionsSellerExecuteOrder: transactions.SellerExecuteOrder, blockchainTransactionSellerExecuteOrders: blockchainTransaction.SellerExecuteOrders)(implicit exec: ExecutionContext, configuration: Configuration, accounts: Accounts) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class SellerExecuteOrderController @Inject()(messagesControllerComponents: MessagesControllerComponents, masterAccounts: master.Accounts, blockchainOrders: blockchain.Orders, blockchainAccounts: blockchain.Accounts, withZoneLoginAction: WithZoneLoginAction, transactionsSellerExecuteOrder: transactions.SellerExecuteOrder, blockchainTransactionSellerExecuteOrders: blockchainTransaction.SellerExecuteOrders)(implicit exec: ExecutionContext, configuration: Configuration, accounts: Accounts) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -24,7 +24,7 @@ class SellerExecuteOrderController @Inject()(messagesControllerComponents: Messa
     Ok(views.html.component.master.sellerExecuteOrder(views.companion.master.SellerExecuteOrder.form))
   }
 
-  def sellerExecuteOrder: Action[AnyContent] = withTraderLoginAction.authenticated { username =>
+  def sellerExecuteOrder: Action[AnyContent] = withZoneLoginAction.authenticated { username =>
     implicit request =>
       views.companion.master.SellerExecuteOrder.form.bindFromRequest().fold(
         formWithErrors => {
