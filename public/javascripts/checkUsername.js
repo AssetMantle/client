@@ -2,9 +2,9 @@ $(document).ready(function () {
 
     $('#username').keyup(function () {
 
-        var username = $(this).val();
-        var result = $('#result');
-        var route = jsRoutes.controllers.SignUpController.checkUsernameAvailable(username);
+        let username = $(this).val();
+        let result = $('#result');
+        let route = jsRoutes.controllers.SignUpController.checkUsernameAvailable(username);
 
         if (username.length > 2) {
             result.html('loading');

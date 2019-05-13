@@ -24,7 +24,7 @@ $(document).ready(function () {
 });
 
 function changeNotificationPage(page) {
-    var route = jsRoutes.controllers.NotificationController.showNotifications(page);
+    let route = jsRoutes.controllers.NotificationController.showNotifications(page);
     document.getElementById("notificationWindowCommons").innerHTML = "loading";
 
     $.ajax({

@@ -1,9 +1,22 @@
 @()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
-<div style="float: left;">
-    <p>@Messages("Blocks")</p>
-    <ul id="blockList"></ul>
+<div id="blockExplorer" class="blocks">
+    <p class="headingText">@Messages(constants.Form.BLOCKS)</p>
+    <div>
+        <table>
+            <thead>
+                <tr>
+                    <th>@Messages(constants.Form.HEIGHT)</th>
+                    <th>@Messages(constants.Form.NUM_TXS)</th>
+                    <th>@Messages(constants.Form.TIME)</th>
+                </tr>
+            </thead>
+            <tbody id="blockContainer">
+            </tbody>
+        </table>
+    </div>
+    <button onclick='showAllBlocksTable()' >@Messages(constants.Form.SEE_ALL)</button>
 </div>
+<script src="@routes.Assets.versioned("javascripts/lastBlock.js")" type="text/javascript"></script>
+<script src="@routes.Assets.versioned("javascripts/averageBlockTimeUpdater.js")" type="text/javascript"></script>
+<script src="@routes.Assets.versioned("javascripts/blockTime.js")" type="text/javascript"></script>
 <script src="@routes.Assets.versioned("javascripts/blockExplorer.js")" type="text/javascript"></script>
-<script>
-blockExplorer("@configuration.get[String]("blockchain.blockExplorer.ip")" +  ":" + "@configuration.get[String]("blockchain.blockExplorer.port")" + "/block", "@configuration.get[String]("blockchain.main.ip")" + ":" + "@configuration.get[String]("blockchain.main.abciPort")" + "/block?height=");
-</script>

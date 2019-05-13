@@ -188,7 +188,7 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
   private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
   private val sleepTime = configuration.get[Long]("blockchain.kafka.entityIterator.threadSleep")
   private val denominationOfGasToken = configuration.get[String]("blockchain.denom.gas")
-  
+
   object Utility {
     def dirtyEntityUpdater(): Future[Unit] = Future {
       try {

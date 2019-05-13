@@ -4,6 +4,9 @@ import java.net.ConnectException
 
 import exceptions.BlockChainException
 import javax.inject.{Inject, Singleton}
+import exceptions.BlockChainException
+import javax.inject.Inject
+import play.api.{Configuration, Logger}
 import play.api.libs.ws.{WSClient, WSResponse}
 import play.api.{Configuration, Logger}
 

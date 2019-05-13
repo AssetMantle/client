@@ -1,11 +1,9 @@
 GET         /                                               controllers.IndexController.index
 
-
 GET         /assets/*file                                   controllers.Assets.versioned(path="/public", file: Asset)
 
 GET         /firebase-messaging-sw.js                       controllers.Assets.at(path="/public/javascripts", file="firebase-messaging-sw.js")
 GET         /notificationImage.png                          controllers.Assets.at(path="/public/images", file="notificationImage.png")
-
 
 GET         /javascriptRoutes                               controllers.JavaScriptRoutesController.javascriptRoutes
 
