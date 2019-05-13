@@ -470,7 +470,7 @@ CREATE TABLE IF NOT EXISTS MASTER."OrganizationBankAccount"
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."AccountToken"
 (
   "id"                VARCHAR NOT NULL,
-  "registrationToken" VARCHAR NOT NULL,
+  "notificationToken" VARCHAR NOT NULL,
   "sessionTokenHash"  VARCHAR,
   "sessionTokenTime"  BIGINT,
   PRIMARY KEY ("id")

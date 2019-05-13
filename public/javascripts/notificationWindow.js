@@ -8,7 +8,6 @@ $(document).ready(function () {
     $("#seeAll").click(function () {
         $("#all").toggle();
     });
-
     $(document).on('click', function (e) {
         if (e.target.id === 'notificationButton') {
             $('#notifications').fadeToggle('fast', 'linear', function () {

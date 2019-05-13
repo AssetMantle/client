@@ -11,7 +11,7 @@ import scala.concurrent.ExecutionContext
 
 class Email @Inject()(mailerClient: MailerClient, contacts: Contacts, accounts: Accounts, messagesApi: MessagesApi)(implicit exec: ExecutionContext, configuration: Configuration) {
 
-  private implicit val module: String = constants.Module.CONTROLLERS_EMAIL
+  private implicit val module: String = constants.Module.UTILITIES_EMAIL
 
   private val fromAddress = configuration.get[String]("play.mailer.user")
 

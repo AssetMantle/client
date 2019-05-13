@@ -1,19 +1,15 @@
 package feeders
 
 import constants.Test
-import io.gatling.core.feeder.Feeder
-
 import scala.util.Random
 
 object UsernameFeeder {
 
-  val randomPasswordFeeder: Iterator[Map[String, String]] = Iterator.continually(Map(Test.TEST_USERNAME -> Random.alphanumeric.take(8).mkString))
+  val usernameFeed: Array[Map[String, String]] = arrayConstructor(Test.NUMBER_OF_USERS)
 
-  def apply(): Feeder[String] = {
-    val id: Iterator[Int] = Iterator.from(1)
-    Iterator.continually(Map(
-      Test.TEST_USERNAME -> Random.alphanumeric.take(8).mkString,
-      Test.ID -> id.next().toString
-    ))
+  def arrayConstructor(users: Int): Array[Map[String, String]] = {
+    val feed = new Array[Map[String, String]](users)
+    for (id <- 0 until users) feed(id) = Map(Test.TEST_USERNAME -> Random.alphanumeric.take(8).mkString)
+    feed
   }
 }

@@ -1,8 +1,6 @@
-
 #notificationContainer {
     position: relative;
 }
-
 #notificationButton {
     position: absolute;
     width: 22px;
@@ -18,7 +16,6 @@
     color: #FFF;
     font-size: 10px;
 }
-
 #notificationCounter {
     display: block;
     position: absolute;
@@ -33,7 +30,6 @@
     -webkit-border-radius: 2px;
     z-index: 1;
 }
-
 #notifications {
     display: none;
     width: auto;
@@ -46,7 +42,6 @@
     -webkit-box-shadow: 0 3px 8px rgba(0, 0, 0, .20);
     z-index: 0;
 }
-
 #notifications:before {
     content: '';
     display: block;
@@ -63,7 +58,8 @@
     width: 50%;
     text-align: center;
 }
-
+#unread{display: none;}
+#notificationWindow {height: 500px;}
 h3 {
     display: block;
     color: #333;
@@ -74,7 +70,14 @@ h3 {
     margin: 0;
     border-bottom: solid 1px rgba(100, 100, 100, .30);
 }
-
+.previous{
+    display: inline-block;
+    cursor: pointer;
+}
+.next{
+    display: inline-block;
+    cursor: pointer;
+}
 .seeAll {
     background: #F6F7F8;
     width: auto;
@@ -84,12 +87,8 @@ h3 {
     border-top: solid 1px rgba(100, 100, 100, .30);
     text-align: center;
 }
-
-.seeAll a {
-    color: #3b5998;
-
-}
-
+.seeAll a {color: #3b5998;}
+.element{background-color:#80c846}
 .element:hover {
     cursor: pointer;
     background-color: #80c846;

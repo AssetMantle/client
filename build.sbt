@@ -7,7 +7,7 @@ version := "1.0"
 
 lazy val gatlingTest = config("gatling") extend Test
 
-scalaSource in gatlingTest := baseDirectory.value / "/gatling/simulation"
+scalaSource in gatlingTest := baseDirectory.value / "gatling/simulation"
 
 lazy val root = (project in file(".")).enablePlugins(PlayScala)
   .enablePlugins(GatlingPlugin)

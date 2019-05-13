@@ -11,7 +11,7 @@ import scala.concurrent.ExecutionContext
 
 object TicketUpdater {
 
-  def start(getTickets: () => Seq[String], getValueFromWSResponse: WSResponse => String, updateTicket: (String, String) => Int, getAddress: String => String)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext, logger: Logger, pushNotifications: PushNotifications, accounts: Accounts) {
+  def start(getTickets: () => Seq[String], getValueFromWSResponse: WSResponse => String, updateTicket: (String, String) => Int, getAddress: String => String)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext, logger: Logger, pushNotification: PushNotification, accounts: Accounts) {
     implicit val getResponse: GetResponse = new GetResponse()(wsClient, configuration, executionContext)
     val ticketIDsSeq: Seq[String] = getTickets()
     for (ticketID <- ticketIDsSeq) {
@@ -19,7 +19,7 @@ object TicketUpdater {
       try {
         val value = getValueFromWSResponse(wsResponse)
         updateTicket(ticketID, value)
-        pushNotifications.sendNotification(accounts.Service.getId(getAddress(ticketID)), constants.Notification.SUCCESS, Seq(value))
+        pushNotification.sendNotification(accounts.Service.getId(getAddress(ticketID)), constants.Notification.SUCCESS, Seq(value))
       }
       catch {
         case blockChainException: BlockChainException => logger.info(blockChainException.message, blockChainException)
@@ -28,7 +28,7 @@ object TicketUpdater {
     }
   }
 
-  def start_(getTickets: () => Seq[String], getValueFromWSResponse: WSResponse => Response, onSuccess: (String, Response) => Unit, onFailure: (String, String) => Unit)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext, logger: Logger, pushNotifications: PushNotifications, accounts: Accounts) {
+  def start_(getTickets: () => Seq[String], getValueFromWSResponse: WSResponse => Response, onSuccess: (String, Response) => Unit, onFailure: (String, String) => Unit)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext, logger: Logger, pushNotification: PushNotification, accounts: Accounts) {
 
     implicit val getResponse = new GetResponse()(wsClient, configuration, executionContext)
     val ticketIDsSeq: Seq[String] = getTickets()

@@ -75,6 +75,8 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
             Ok(views.html.index(success = response.ticketID))
           }
           else {
+            println("-----------------------------------")
+            println(sendCoinData)
             val response = transactionsSendCoin.Service.post(transactionsSendCoin.Request(from = sendCoinData.from, password = sendCoinData.password, to = sendCoinData.to, amount = Seq(transactionsSendCoin.Amount(denominatonOfGasToken, sendCoinData.amount.toString)), gas = sendCoinData.gas))
             blockchainTransactionSendCoins.Service.addSendCoin(sendCoinData.from, sendCoinData.to, sendCoinData.amount, sendCoinData.gas, null, Option(response.TxHash), Random.nextString(32), null)
             Ok(views.html.index(success = response.TxHash))

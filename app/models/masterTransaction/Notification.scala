@@ -2,6 +2,7 @@ package models.masterTransaction
 
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
+import org.joda.time.{DateTime, DateTimeZone}
 import org.postgresql.util.PSQLException
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
@@ -44,7 +45,7 @@ class Notifications @Inject()(protected val databaseConfigProvider: DatabaseConf
     }
   }
 
-  private def findNumberOfUnreadByAccountId(accountID: String)(implicit executionContext: ExecutionContext): Future[Int] = db.run(notificationTable.filter(_.accountID === accountID).filter( _.read === false).length.result)
+  private def findUnreadNotificationCountByAccountId(accountID: String)(implicit executionContext: ExecutionContext): Future[Int] = db.run(notificationTable.filter(_.accountID === accountID).filter( _.read === false).length.result)
 
   private def markReadById(id: String): Future[Int] = db.run(notificationTable.filter(_.id === id).map(_.read).update(true))
 
@@ -72,15 +73,15 @@ class Notifications @Inject()(protected val databaseConfigProvider: DatabaseConf
 
   object Service {
 
-    def addNotification(accountID: String, notificationTitle: String, notificationMessage: String, time: Long)(implicit executionContext: ExecutionContext): String= {
-      Await.result(add(Notification(accountID, notificationTitle, notificationMessage, time, false, Random.nextString(32))), Duration.Inf)
+    def addNotification(accountID: String, notificationTitle: String, notificationMessage: String)(implicit executionContext: ExecutionContext): String= {
+      Await.result(add(Notification(accountID, notificationTitle, notificationMessage, DateTime.now(DateTimeZone.UTC).getMillis(), false, Random.nextString(32))), Duration.Inf)
     }
 
     def getNotifications(accountID: String, offset: Int, limit: Int)(implicit executionContext: ExecutionContext): Seq[Notification] = Await.result(findNotificationsByAccountId(accountID, offset, limit), Duration.Inf)
 
     def markAsRead(id: String): Int = Await.result(markReadById(id), Duration.Inf)
 
-    def getNumberOfUnread(accountID: String)(implicit executionContext: ExecutionContext): Int = Await.result(findNumberOfUnreadByAccountId(accountID), Duration.Inf)
+    def getUnreadNotificationCount(accountID: String)(implicit executionContext: ExecutionContext): Int = Await.result(findUnreadNotificationCountByAccountId(accountID), Duration.Inf)
 
   }
 
