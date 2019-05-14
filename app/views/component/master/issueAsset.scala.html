@@ -1,7 +1,7 @@
 @import helper._
 @import views.companion.master.IssueAsset
 
-@(issueAssetForm: Form[IssueAsset.Data],requestID: String,  accountID: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@(issueAssetForm: Form[IssueAsset.Data], requestID: String, accountID: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, moderator: Boolean)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @common(Messages(constants.Form.ISSUE_ASSET)) {
     @form(action = routes.IssueAssetController.issueAsset) {
         @CSRF.formField
@@ -12,6 +12,7 @@
         @inputText(issueAssetForm(constants.Form.ASSET_PRICE).copy(value = Some(assetPrice.toString)),'_label-> Messages(constants.Form.ASSET_PRICE))
         @inputText(issueAssetForm(constants.Form.QUANTITY_UNIT).copy(value = Some(quantityUnit)),'_label-> Messages(constants.Form.QUANTITY_UNIT))
         @inputText(issueAssetForm(constants.Form.ASSET_QUANTITY).copy(value = Some(assetQuantity.toString)),'_label-> Messages(constants.Form.ASSET_QUANTITY))
+        @checkbox(issueAssetForm(constants.Form.MODERATOR), 'checked -> moderator, '_label -> Messages(constants.Form.MODERATOR))
         @inputText(issueAssetForm(constants.Form.GAS),'_label-> Messages(constants.Form.GAS))
         @inputPassword(issueAssetForm(constants.Form.PASSWORD),'_label-> Messages(constants.Form.PASSWORD))
 
