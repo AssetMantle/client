@@ -7,10 +7,9 @@ import models.{master, masterTransaction}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.{Configuration, Logger}
-import queries.GetAccount
 import queries.responses.FiatResponse
+import queries.{GetAccount, GetOrder}
 import slick.jdbc.JdbcProfile
-import transactions.GetOrder
 
 import scala.concurrent.duration.{Duration, _}
 import scala.concurrent.{Await, ExecutionContext, Future}
