@@ -34,10 +34,12 @@ class LoginController @Inject()(messagesControllerComponents: MessagesController
         try {
           val userType = masterAccounts.Service.validateLoginAndGetUserType(loginData.username, loginData.password)
           val address = masterAccounts.Service.getAddress(loginData.username)
+          println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"+loginData, userType)
           pushNotification.registerNotificationToken(loginData.username, loginData.notificationToken)
           pushNotification.sendNotification(loginData.username, constants.Notification.LOGIN)
           userType match {
             case constants.User.GENESIS =>
+              println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"+loginData, userType)
               withUsernameToken.Ok(views.html.component.master.genesisHome(username = loginData.username, userType = constants.User.GENESIS, address = address, coins = blockchainAccounts.Service.getCoins(address)), loginData.username)
             case constants.User.ZONE =>
               withUsernameToken.Ok(views.html.component.master.zoneHome(username = loginData.username, userType = constants.User.ZONE, address = address, coins = blockchainAccounts.Service.getCoins(address), zone = masterZones.Service.getZone(blockchainZones.Service.getID(address))), loginData.username)

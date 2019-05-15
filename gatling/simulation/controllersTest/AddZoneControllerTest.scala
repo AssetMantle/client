@@ -6,6 +6,7 @@ import feeders._
 import io.gatling.core.Predef._
 import io.gatling.core.structure.ScenarioBuilder
 import io.gatling.http.Predef._
+import io.gatling.jdbc.Predef.jdbcFeeder
 
 class AddZoneControllerTest extends Simulation {
 
@@ -33,9 +34,8 @@ object addZoneControllerTest {
   val verifyZoneScenario: ScenarioBuilder = scenario("VerifyZone")
     .feed(ZoneIDFeeder.zoneIDFeed)
     .feed(PasswordFeeder.passwordFeed)
-  /*
       .exec(http("VerifyZone_GET")
-        .get(routes.AddZoneController.verifyZoneForm().url)
+        .get(routes.AddZoneController.verifyZoneForm("${%s}".format(Test.TEST_ZONE_ID)).url)
         .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
       .pause(2)
       .exec(http("VerifyZone_POST")
@@ -45,7 +45,6 @@ object addZoneControllerTest {
       Form.PASSWORD ->  "${%s}".format(Test.TEST_PASSWORD),
       Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
      .pause(5)
-  */
 
   val rejectVerifyZoneScenario: ScenarioBuilder = scenario("RejectVerifyZone")
     .feed(ZoneIDFeeder.zoneIDFeed)
@@ -81,5 +80,14 @@ object addZoneControllerTest {
         Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
     .pause(5)
 
-
+  def getZoneID(query: String) = {
+    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://localhost:5432/comdex", "comdex", "comdex",
+      s"""SELECT "id" FROM master."Zone" WHERE "accountID" = '$query';""")
+    sqlQueryFeeder.apply().next()("id")
+  }
+  def getVerifiedZoneID() = {
+    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://localhost:5432/comdex", "comdex", "comdex",
+      s"""SELECT "id" FROM master."Zone" WHERE "status" = true;""")
+    sqlQueryFeeder.apply().next()("id")
+  }
 }

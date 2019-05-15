@@ -12,7 +12,7 @@ class BlockchainTest extends Simulation {
   setUp(
     blockchainTest.blockChainTestSignUp4.inject(atOnceUsers(4)),
     blockchainTest.loginMain.inject(atOnceUsers(1)),
-    blockchainTest.blockChainTestSendCoinFromMainTo4.inject(atOnceUsers(1),nothingFor(8),atOnceUsers(1),nothingFor(8),atOnceUsers(1),nothingFor(8),atOnceUsers(1),nothingFor(8))
+    blockchainTest.blockChainTestSendCoinFromMainTo4.inject(atOnceUsers(1),nothingFor(14),atOnceUsers(1),nothingFor(14),atOnceUsers(1),nothingFor(14),atOnceUsers(1),nothingFor(14))
   ).protocols(http.baseUrl(Test.BASE_URL))
 }
 

@@ -6,6 +6,7 @@ import feeders._
 import io.gatling.core.Predef._
 import io.gatling.core.structure.ScenarioBuilder
 import io.gatling.http.Predef._
+import io.gatling.jdbc.Predef.jdbcFeeder
 
 class AddOrganizationControllerTest extends Simulation {
 
@@ -16,7 +17,6 @@ class AddOrganizationControllerTest extends Simulation {
 object addOrganizationControllerTest {
 
   val addOrganizationScenario: ScenarioBuilder = scenario("AddOrganization")
-    .feed(ZoneIDFeeder.zoneIDFeed)
     .feed(NameFeeder.nameFeed)
     .feed(AddressFeeder.addressFeed)
     .feed(EmailAddressFeeder.emailAddressFeed)
@@ -40,9 +40,8 @@ object addOrganizationControllerTest {
     .feed(ZoneIDFeeder.zoneIDFeed)
     .feed(OrganizationIDFeeder.organizationIDFeed)
     .feed(PasswordFeeder.passwordFeed)
-  /*
       .exec(http("VerifyOrganization_GET")
-        .get(routes.AddOrganizationController.verifyOrganizationForm().url)
+        .get(routes.AddOrganizationController.verifyOrganizationForm("${%s}".format(Test.TEST_ORGANIZATION_ID),"${%s}".format(Test.TEST_ZONE_ID)).url)
         .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
       .pause(2)
       .exec(http("VerifyOrganization_POST")
@@ -53,7 +52,7 @@ object addOrganizationControllerTest {
       Form.PASSWORD ->  "${%s}".format(Test.TEST_ADDRESS),
       Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
     .pause(5)
-  */
+
   val rejectVerifyOrganizationScenario: ScenarioBuilder = scenario("RejectVerifyOrganization")
     .feed(OrganizationIDFeeder.organizationIDFeed)
 
@@ -90,5 +89,15 @@ object addOrganizationControllerTest {
         Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
     .pause(5)
 
+  def getOrganizationID(query: String) = {
+    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://localhost:5432/comdex", "comdex", "comdex",
+      s"""SELECT "id" FROM master."Organization" WHERE "accountID" = '$query';""")
+    sqlQueryFeeder.apply().next()("id")
+  }
 
+  def getUnverifiedOrganizationID(zoneID: String) = {
+    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://localhost:5432/comdex", "comdex", "comdex",
+      s"""SELECT "id" FROM master."Organization" WHERE "zoneID" = '$zoneID';""")
+    sqlQueryFeeder.apply().next()("id")
+  }
 }

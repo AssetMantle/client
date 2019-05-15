@@ -59,6 +59,7 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
             } else {
               val zoneAccountID = masterZones.Service.getAccountId(verifyZoneData.zoneID)
               val zoneAccountAddress = masterAccounts.Service.getAddress(zoneAccountID)
+              println("----------------------------------","from" , username, "to" , zoneAccountAddress, "zoneID", verifyZoneData.zoneID, "passwrod" , verifyZoneData.password)
               val response = transactionsAddZone.Service.post(transactionsAddZone.Request(from = username, to = zoneAccountAddress, zoneID = verifyZoneData.zoneID, password = verifyZoneData.password))
               val fromAddress = masterAccounts.Service.getAddress(username)
               blockchainTransactionAddZones.Service.addZone(username, zoneAccountAddress, verifyZoneData.zoneID, null, Option(response.TxHash), Random.nextString(32), null)
