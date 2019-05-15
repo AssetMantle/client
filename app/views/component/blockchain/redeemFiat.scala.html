@@ -3,7 +3,7 @@
 
 @(redeemFiatForm: Form[RedeemFiat.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @common(Messages(constants.Form.REDEEM_FIAT)) {
-    @form(action = routes.RedeemFiatController.blockchainRedeemFiat) {
+  @form(action = routes.RedeemFiatController.blockchainRedeemFiat, 'onkeypress -> "validateForm(event,this)") {
         @CSRF.formField
         @inputText(redeemFiatForm(constants.Form.FROM),'_label-> Messages(constants.Form.FROM))
         @inputText(redeemFiatForm(constants.Form.TO),'_label-> Messages(constants.Form.TO))
@@ -18,6 +18,6 @@
             }
             </ul>
         }
-        <button type="submit">@Messages(constants.Form.REDEEM_FIAT)</button>
+    <button type="button" onclick="submitForm(this)">@Messages(constants.Form.REDEEM_FIAT)</button>
     }
 }

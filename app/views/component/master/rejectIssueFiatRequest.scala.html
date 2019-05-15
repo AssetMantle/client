@@ -2,18 +2,17 @@
 @import views.companion.master.RejectIssueFiatRequest
 
 @(rejectIssueFiatRequestForm: Form[RejectIssueFiatRequest.Data], requestID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages(constants.Form.REJECT_ISSUE_FIAT_REQUEST)) {
-    @form(action = routes.IssueFiatController.rejectIssueFiatRequest) {
-        @CSRF.formField
-        @inputText(rejectIssueFiatRequestForm(constants.Form.REQUEST_ID).copy(value = Some(requestID)), '_label -> Messages(constants.Form.REQUEST_ID))
+@form(action = routes.IssueFiatController.rejectIssueFiatRequest, 'onkeypress -> "validateForm(event,this)") {
+  @CSRF.formField
+  @inputText(rejectIssueFiatRequestForm(constants.Form.REQUEST_ID).copy(value = Some(requestID)), '_label -> Messages(constants.Form.REQUEST_ID))
 
-        @if(rejectIssueFiatRequestForm.hasGlobalErrors) {
-            <ul>
-            @for(error <- rejectIssueFiatRequestForm.globalErrors) {
-                <li>@error.format</li>
-            }
-            </ul>
-        }
-        <button type="submit">@Messages(constants.Form.REJECT_ISSUE_FIAT_REQUEST)</button>
+  @if(rejectIssueFiatRequestForm.hasGlobalErrors) {
+    <ul>
+    @for(error <- rejectIssueFiatRequestForm.globalErrors) {
+      <li>@error.format</li>
     }
+    </ul>
+  }
+  <button type="button" onclick="submitForm(this)">@Messages(constants.Form.REJECT_ISSUE_FIAT_REQUEST)</button>
 }
+

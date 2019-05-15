@@ -1,24 +1,22 @@
 @import helper._
 @import views.companion.master.IssueFiat
 
-@(issueFiatForm: Form[IssueFiat.Data],requestID: String,  accountID: String, transactionID: String, transactionAmount: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages(constants.Form.ISSUE_FIAT)) {
-    @form(action = routes.IssueFiatController.issueFiat) {
-        @CSRF.formField
-        @inputText(issueFiatForm(constants.Form.REQUEST_ID).copy(value = Some(requestID)),'_label-> Messages(constants.Form.REQUEST_ID))
-        @inputText(issueFiatForm(constants.Form.ACCOUNT_ID).copy(value = Some(accountID)),'_label-> Messages(constants.Form.ACCOUNT_ID))
-        @inputText(issueFiatForm(constants.Form.TRANSACTION_ID).copy(value = Some(transactionID)),'_label-> Messages(constants.Form.TRANSACTION_ID))
-        @inputText(issueFiatForm(constants.Form.TRANSACTION_AMOUNT).copy(value = Some(transactionAmount.toString)),'_label-> Messages(constants.Form.TRANSACTION_AMOUNT))
-        @inputText(issueFiatForm(constants.Form.GAS),'_label-> Messages(constants.Form.GAS))
-        @inputPassword(issueFiatForm(constants.Form.PASSWORD),'_label-> Messages(constants.Form.PASSWORD))
+@(issueFiatForm: Form[IssueFiat.Data], requestID: String, accountID: String, transactionID: String, transactionAmount: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@form(action = routes.IssueFiatController.issueFiat, 'onkeypress -> "validateForm(event,this)") {
+  @CSRF.formField
+  @inputText(issueFiatForm(constants.Form.REQUEST_ID).copy(value = Some(requestID)), '_label -> Messages(constants.Form.REQUEST_ID))
+  @inputText(issueFiatForm(constants.Form.ACCOUNT_ID).copy(value = Some(accountID)), '_label -> Messages(constants.Form.ACCOUNT_ID))
+  @inputText(issueFiatForm(constants.Form.TRANSACTION_ID).copy(value = Some(transactionID)), '_label -> Messages(constants.Form.TRANSACTION_ID))
+  @inputText(issueFiatForm(constants.Form.TRANSACTION_AMOUNT).copy(value = Some(transactionAmount.toString)), '_label -> Messages(constants.Form.TRANSACTION_AMOUNT))
+  @inputText(issueFiatForm(constants.Form.GAS), '_label -> Messages(constants.Form.GAS))
+  @inputPassword(issueFiatForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD))
 
-        @if(issueFiatForm.hasGlobalErrors) {
-            <ul>
-            @for(error <- issueFiatForm.globalErrors) {
-                <li>@error.format</li>
-            }
-            </ul>
-        }
-        <button type="submit">@Messages(constants.Form.ISSUE_FIAT)</button>
+  @if(issueFiatForm.hasGlobalErrors) {
+    <ul>
+    @for(error <- issueFiatForm.globalErrors) {
+      <li>@error.format</li>
     }
+    </ul>
+  }
+  <button type="button" onclick="submitForm(this)">@Messages(constants.Form.ISSUE_FIAT)</button>
 }

@@ -3,7 +3,7 @@
 
 @(setSellerFeedbackForm: Form[SetSellerFeedback.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @common(Messages(constants.Form.SET_SELLER_FEEDBACK)) {
-    @form(action = routes.SetSellerFeedbackController.blockchainSetSellerFeedback) {
+  @form(action = routes.SetSellerFeedbackController.blockchainSetSellerFeedback, 'onkeypress -> "validateForm(event,this)") {
         @CSRF.formField
         @inputText(setSellerFeedbackForm(constants.Form.FROM),'_label-> Messages(constants.Form.FROM))
         @inputText(setSellerFeedbackForm(constants.Form.TO),'_label-> Messages(constants.Form.TO))
@@ -19,6 +19,6 @@
             }
             </ul>
         }
-        <button type="submit">@Messages(constants.Form.SET_SELLER_FEEDBACK)</button>
+    <button type="button" onclick="submitForm(this)">@Messages(constants.Form.SET_SELLER_FEEDBACK)</button>
     }
 }

@@ -3,7 +3,7 @@
 
 @(changeSellerBidForm: Form[ChangeSellerBid.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @common(Messages(constants.Form.CHANGE_SELLER_BID)) {
-    @form(action = routes.ChangeSellerBidController.blockchainChangeSellerBid) {
+  @form(action = routes.ChangeSellerBidController.blockchainChangeSellerBid, 'onkeypress -> "validateForm(event,this)") {
         @CSRF.formField
         @inputText(changeSellerBidForm(constants.Form.FROM),'_label-> Messages(constants.Form.FROM))
         @inputText(changeSellerBidForm(constants.Form.TO),'_label-> Messages(constants.Form.TO))
@@ -20,6 +20,6 @@
             }
             </ul>
         }
-        <button type="submit">@Messages(constants.Form.CHANGE_SELLER_BID)</button>
+    <button type="button" onclick="submitForm(this)">@Messages(constants.Form.CHANGE_SELLER_BID)</button>
     }
 }

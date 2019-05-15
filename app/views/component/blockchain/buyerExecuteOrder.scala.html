@@ -3,7 +3,7 @@
 
 @(buyerExecuteOrderForm: Form[BuyerExecuteOrder.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @common(Messages(constants.Form.BUYER_EXECUTE_ORDER)) {
-    @form(action = routes.BuyerExecuteOrderController.blockchainBuyerExecuteOrder) {
+  @form(action = routes.BuyerExecuteOrderController.blockchainBuyerExecuteOrder, 'onkeypress -> "validateForm(event,this)") {
         @CSRF.formField
         @inputText(buyerExecuteOrderForm(constants.Form.FROM),'_label-> Messages(constants.Form.FROM))
         @inputText(buyerExecuteOrderForm(constants.Form.BUYER_ADDRESS),'_label-> Messages(constants.Form.BUYER_ADDRESS))
@@ -20,6 +20,6 @@
             }
             </ul>
         }
-        <button type="submit">@Messages(constants.Form.BUYER_EXECUTE_ORDER)</button>
+    <button type="button" onclick="submitForm(this)">@Messages(constants.Form.BUYER_EXECUTE_ORDER)</button>
     }
 }

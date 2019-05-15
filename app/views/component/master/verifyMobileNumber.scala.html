@@ -2,18 +2,16 @@
 @import views.companion.master.VerifyMobileNumber
 
 @(verifyMobileNumberForm: Form[VerifyMobileNumber.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-    @common(Messages(constants.Form.VERIFY_MOBILE_NUMBER)) {
-        @form(action = routes.VerifyMobileNumberController.verifyMobileNumber) {
-            @CSRF.formField
-            @inputText(verifyMobileNumberForm(constants.Form.OTP),'_label-> Messages(constants.Form.OTP))
+@form(action = routes.VerifyMobileNumberController.verifyMobileNumber, 'onkeypress -> "validateForm(event,this)") {
+  @CSRF.formField
+  @inputText(verifyMobileNumberForm(constants.Form.OTP), '_label -> Messages(constants.Form.OTP))
 
-            @if(verifyMobileNumberForm.hasGlobalErrors) {
-                <ul>
-                @for(error <- verifyMobileNumberForm.globalErrors) {
-                    <li>@error.format</li>
-                }
-                </ul>
-            }
-            <button type="submit">@Messages(constants.Form.VERIFY_MOBILE_NUMBER)</button>
-        }
+  @if(verifyMobileNumberForm.hasGlobalErrors) {
+    <ul>
+    @for(error <- verifyMobileNumberForm.globalErrors) {
+      <li>@error.format</li>
     }
+    </ul>
+  }
+  <button type="button" onclick="submitForm(this)">@Messages(constants.Form.VERIFY_MOBILE_NUMBER)</button>
+}

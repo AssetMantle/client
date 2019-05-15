@@ -4,8 +4,8 @@
 <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/class.css")">
 
 <br>
-<a href="@routes.SendCoinController.sendCoinForm">@Messages(constants.Form.SEND_COIN)</a>
-<a href="@routes.LogoutController.logoutForm">@Messages(constants.Form.LOGOUT)</a>
+<a onclick="getForm(jsRoutes.controllers.SendCoinController.sendCoinForm())">@Messages(constants.Form.SEND_COIN)</a>
+<a onclick="getForm(jsRoutes.controllers.LogoutController.logoutForm())">@Messages(constants.Form.LOGOUT)</a>
 <br>
 <br>
 

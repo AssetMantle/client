@@ -2,21 +2,19 @@
 @import views.companion.master.SendAsset
 
 @(sendAssetForm: Form[SendAsset.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages(constants.Form.SEND_ASSET)) {
-    @form(action = routes.SendAssetController.sendAsset) {
-        @CSRF.formField
-        @inputText(sendAssetForm(constants.Form.TO),'_label-> Messages(constants.Form.TO))
-        @inputText(sendAssetForm(constants.Form.PEG_HASH),'_label-> Messages(constants.Form.PEG_HASH))
-        @inputText(sendAssetForm(constants.Form.GAS),'_label-> Messages(constants.Form.GAS))
-        @inputPassword(sendAssetForm(constants.Form.PASSWORD),'_label-> Messages(constants.Form.PASSWORD))
+@form(action = routes.SendAssetController.sendAsset, 'onkeypress -> "validateForm(event,this)") {
+  @CSRF.formField
+  @inputText(sendAssetForm(constants.Form.TO), '_label -> Messages(constants.Form.TO))
+  @inputText(sendAssetForm(constants.Form.PEG_HASH), '_label -> Messages(constants.Form.PEG_HASH))
+  @inputText(sendAssetForm(constants.Form.GAS), '_label -> Messages(constants.Form.GAS))
+  @inputPassword(sendAssetForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD))
 
-        @if(sendAssetForm.hasGlobalErrors) {
-            <ul>
-            @for(error <- sendAssetForm.globalErrors) {
-                <li>@error.format</li>
-            }
-            </ul>
-        }
-        <button type="submit">@Messages(constants.Form.SEND_ASSET)</button>
+  @if(sendAssetForm.hasGlobalErrors) {
+    <ul>
+    @for(error <- sendAssetForm.globalErrors) {
+      <li>@error.format</li>
     }
+    </ul>
+  }
+  <button type="button" onclick="submitForm(this)">@Messages(constants.Form.SEND_ASSET)</button>
 }

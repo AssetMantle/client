@@ -27,5 +27,19 @@
             @content
             </li>
         </ul>
+        <div class="modal" id="commonModal">
+            <div class="modal-content " id="commonModalContent"></div>
+        </div>
+        <div class = "modal center-screen" id="loading">
+            <img src="@routes.Assets.versioned("images/loading.gif")" alt = "@Messages(constants.Form.LOADING)"/>
+        </div>
+        <script type="text/javascript" src="@routes.JavaScriptRoutesController.javascriptRoutes"></script>
+        <script src="@routes.Assets.versioned("javascripts/getForm.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.versioned("javascripts/submitForm.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.versioned("javascripts/validateForm.js")" type="text/javascript"></script>
+
+        <script src="@routes.Assets.versioned("javascripts/style/ajaxLoading.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.versioned("javascripts/style/modal.js")" type="text/javascript"></script>
+
     </body>
 </html>

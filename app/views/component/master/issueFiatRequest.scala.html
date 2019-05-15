@@ -2,19 +2,17 @@
 @import views.companion.master.IssueFiatRequest
 
 @(issueFiatRequestForm: Form[IssueFiatRequest.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages(constants.Form.ISSUE_FIAT_REQUEST)) {
-    @form(action = routes.IssueFiatController.issueFiatRequest) {
-        @CSRF.formField
-        @inputText(issueFiatRequestForm(constants.Form.TRANSACTION_ID),'_label-> Messages(constants.Form.TRANSACTION_ID))
-        @inputText(issueFiatRequestForm(constants.Form.TRANSACTION_AMOUNT),'_label-> Messages(constants.Form.TRANSACTION_AMOUNT))
+@form(action = routes.IssueFiatController.issueFiatRequest, 'onkeypress -> "validateForm(event,this)") {
+  @CSRF.formField
+  @inputText(issueFiatRequestForm(constants.Form.TRANSACTION_ID), '_label -> Messages(constants.Form.TRANSACTION_ID))
+  @inputText(issueFiatRequestForm(constants.Form.TRANSACTION_AMOUNT), '_label -> Messages(constants.Form.TRANSACTION_AMOUNT))
 
-        @if(issueFiatRequestForm.hasGlobalErrors) {
-            <ul>
-            @for(error <- issueFiatRequestForm.globalErrors) {
-                <li>@error.format</li>
-            }
-            </ul>
-        }
-        <button type="submit">@Messages(constants.Form.ISSUE_FIAT)</button>
+  @if(issueFiatRequestForm.hasGlobalErrors) {
+    <ul>
+    @for(error <- issueFiatRequestForm.globalErrors) {
+      <li>@error.format</li>
     }
+    </ul>
+  }
+  <button type="button" onclick="submitForm(this)">@Messages(constants.Form.ISSUE_FIAT)</button>
 }

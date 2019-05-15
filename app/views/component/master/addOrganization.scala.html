@@ -2,22 +2,20 @@
 @import views.companion.master.AddOrganization
 
 @(addOrganizationForm: Form[AddOrganization.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages(constants.Form.ADD_ORGANIZATION)) {
-    @form(action = routes.AddOrganizationController.addOrganization) {
-        @CSRF.formField
-        @inputText(addOrganizationForm(constants.Form.ZONE_ID),'_label-> Messages(constants.Form.ZONE_ID))
-        @inputText(addOrganizationForm(constants.Form.NAME),'_label-> Messages(constants.Form.NAME))
-        @inputText(addOrganizationForm(constants.Form.ADDRESS),'_label-> Messages(constants.Form.ADDRESS))
-        @inputText(addOrganizationForm(constants.Form.PHONE),'_label-> Messages(constants.Form.PHONE))
-        @inputText(addOrganizationForm(constants.Form.EMAIL),'_label-> Messages(constants.Form.EMAIL))
+@form(action = routes.AddOrganizationController.addOrganization, 'onkeypress -> "validateForm(event,this)") {
+  @CSRF.formField
+  @inputText(addOrganizationForm(constants.Form.ZONE_ID), '_label -> Messages(constants.Form.ZONE_ID))
+  @inputText(addOrganizationForm(constants.Form.NAME), '_label -> Messages(constants.Form.NAME))
+  @inputText(addOrganizationForm(constants.Form.ADDRESS), '_label -> Messages(constants.Form.ADDRESS))
+  @inputText(addOrganizationForm(constants.Form.PHONE), '_label -> Messages(constants.Form.PHONE))
+  @inputText(addOrganizationForm(constants.Form.EMAIL), '_label -> Messages(constants.Form.EMAIL))
 
-        @if(addOrganizationForm.hasGlobalErrors) {
-            <ul>
-            @for(error <- addOrganizationForm.globalErrors) {
-                <li>@error.format</li>
-            }
-            </ul>
-        }
-        <button type="submit">@Messages(constants.Form.ADD_ORGANIZATION)</button>
+  @if(addOrganizationForm.hasGlobalErrors) {
+    <ul>
+    @for(error <- addOrganizationForm.globalErrors) {
+      <li>@error.format</li>
     }
+    </ul>
+  }
+  <button type="button" onclick="submitForm(this)">@Messages(constants.Form.ADD_ORGANIZATION)</button>
 }

@@ -3,7 +3,7 @@
 
 @(issueFiatForm: Form[IssueFiat.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @common(Messages(constants.Form.ISSUE_FIAT)) {
-    @form(action = routes.IssueFiatController.blockchainIssueFiat) {
+  @form(action = routes.IssueFiatController.blockchainIssueFiat, 'onkeypress -> "validateForm(event,this)") {
         @CSRF.formField
         @inputText(issueFiatForm(constants.Form.FROM),'_label-> Messages(constants.Form.FROM))
         @inputText(issueFiatForm(constants.Form.TO),'_label-> Messages(constants.Form.TO))
@@ -19,6 +19,6 @@
             }
             </ul>
         }
-        <button type="submit">@Messages(constants.Form.ISSUE_FIAT)</button>
+    <button type="button" onclick="submitForm(this)">@Messages(constants.Form.ISSUE_FIAT)</button>
     }
 }

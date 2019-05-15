@@ -3,7 +3,7 @@
 
 @(setACLForm: Form[SetACL.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @common(Messages(constants.Form.SET_ACL)) {
-    @form(action = routes.SetACLController.blockchainSetACL) {
+  @form(action = routes.SetACLController.blockchainSetACL, 'onkeypress -> "validateForm(event,this)") {
         @CSRF.formField
         @inputText(setACLForm(constants.Form.FROM),'_label-> Messages(constants.Form.FROM))
         @inputText(setACLForm(constants.Form.ACL_ADDRESS),'_label-> Messages(constants.Form.ACL_ADDRESS))
@@ -32,6 +32,6 @@
             }
             </ul>
         }
-        <button type=submit>@Messages(constants.Form.SET_ACL)</button>
+    <button type="button" onclick="submitForm(this)">@Messages(constants.Form.SET_ACL)</button>
     }
 }

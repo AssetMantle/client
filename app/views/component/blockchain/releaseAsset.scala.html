@@ -3,7 +3,7 @@
 
 @(releaseAssetForm: Form[ReleaseAsset.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @common(Messages(constants.Form.RELEASE_ASSET)) {
-    @form(action = routes.ReleaseAssetController.blockchainReleaseAsset) {
+  @form(action = routes.ReleaseAssetController.blockchainReleaseAsset, 'onkeypress -> "validateForm(event,this)") {
         @CSRF.formField
         @inputText(releaseAssetForm(constants.Form.FROM),'_label-> Messages(constants.Form.FROM))
         @inputText(releaseAssetForm(constants.Form.TO),'_label-> Messages(constants.Form.TO))
@@ -18,6 +18,6 @@
             }
             </ul>
         }
-        <button type="submit">@Messages(constants.Form.RELEASE_ASSET)</button>
+    <button type="button" onclick="submitForm(this)">@Messages(constants.Form.RELEASE_ASSET)</button>
     }
 }

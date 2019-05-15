@@ -3,7 +3,7 @@
 
 @(addZoneForm: Form[AddZone.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @common(Messages(constants.Form.ADD_ZONE)) {
-    @form(action = routes.AddZoneController.blockchainAddZone) {
+  @form(action = routes.AddZoneController.blockchainAddZone, 'onkeypress -> "validateForm(event,this)") {
         @CSRF.formField
         @inputText(addZoneForm(constants.Form.FROM),'_label-> Messages(constants.Form.FROM))
         @inputText(addZoneForm(constants.Form.TO),'_label-> Messages(constants.Form.TO))
@@ -17,6 +17,6 @@
             }
             </ul>
         }
-        <button type="submit">@Messages(constants.Form.ADD_ZONE)</button>
+    <button type="button" onclick="submitForm(this)">@Messages(constants.Form.ADD_ZONE)</button>
     }
 }

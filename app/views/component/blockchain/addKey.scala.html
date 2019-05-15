@@ -3,7 +3,7 @@
 
 @(addKeyFrom: Form[AddKey.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @common(Messages(constants.Form.ADD_KEY)) {
-    @form(action = routes.AddKeyController.blockchainAddKey) {
+  @form(action = routes.AddKeyController.blockchainAddKey, 'onkeypress -> "validateForm(event,this)") {
         @CSRF.formField
         @inputText(addKeyFrom(constants.Form.NAME),'_label-> Messages(constants.Form.NAME))
         @inputText(addKeyFrom(constants.Form.SEED),'_label-> Messages(constants.Form.SEED))
@@ -16,6 +16,6 @@
             }
             </ul>
         }
-        <button type="submit">@Messages(constants.Form.ADD_KEY)</button>
+    <button type="button" onclick="submitForm(this)">@Messages(constants.Form.ADD_KEY)</button>
     }
 }
