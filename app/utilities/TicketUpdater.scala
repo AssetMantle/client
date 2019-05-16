@@ -29,7 +29,7 @@ object TicketUpdater {
     }
   }
 
-  def start_(getTickets: () => Seq[String], getValueFromWSResponse: WSResponse => Response, onSuccess: (String, Response) => Unit, onFailure: (String, String) => Unit)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext, logger: Logger, pushNotifications: PushNotifications, accounts: Accounts) {
+  def start_(getTickets: () => Seq[String], getValueFromWSResponse: WSResponse => Response, onSuccess: (String, Response) => Unit, onFailure: (String, String) => Unit)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext, logger: Logger) {
 
     implicit val getResponse = new GetResponse()(wsClient, configuration, executionContext)
     val ticketIDsSeq: Seq[String] = getTickets()

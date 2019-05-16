@@ -21,7 +21,7 @@ import scala.util.{Failure, Success}
 case class SetACL(from: String, aclAddress: String, organizationID: String, zoneID: String, aclHash: String, status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])
 
 @Singleton
-class SetACLs @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, transactionSetACL: transactions.SetACL, getResponse: GetResponse, actorSystem: ActorSystem, blockchainAccounts: blockchain.Accounts, blockchainAclHashes: blockchain.ACLHashes, blockchainAclAccounts: blockchain.ACLAccounts, implicit val pushNotifications: PushNotifications, implicit val masterAccounts: master.Accounts)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
+class SetACLs @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, transactionSetACL: transactions.SetACL, getResponse: GetResponse, actorSystem: ActorSystem, blockchainAccounts: blockchain.Accounts, blockchainAclHashes: blockchain.ACLHashes, blockchainAclAccounts: blockchain.ACLAccounts, pushNotifications: PushNotifications,masterAccounts: master.Accounts)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_SET_ACL
 

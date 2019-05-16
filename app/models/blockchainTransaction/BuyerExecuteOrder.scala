@@ -19,7 +19,7 @@ import scala.util.{Failure, Success}
 case class BuyerExecuteOrder(from: String, buyerAddress: String, sellerAddress: String, fiatProofHash: String, pegHash: String, gas: Int,  status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])
 
 @Singleton
-class BuyerExecuteOrders @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, blockchainNegotiations: blockchain.Negotiations, blockchainOrders: blockchain.Orders, transactionBuyerExecuteOrder: transactions.BuyerExecuteOrder, actorSystem: ActorSystem, implicit val pushNotifications: PushNotifications, implicit val masterAccounts: master.Accounts, implicit val blockchainAccounts: blockchain.Accounts)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext)  {
+class BuyerExecuteOrders @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, blockchainNegotiations: blockchain.Negotiations, blockchainOrders: blockchain.Orders, transactionBuyerExecuteOrder: transactions.BuyerExecuteOrder, actorSystem: ActorSystem, pushNotifications: PushNotifications,masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext)  {
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_BUYER_EXECUTE_ORDER
 

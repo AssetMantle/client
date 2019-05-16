@@ -19,7 +19,7 @@ import scala.util.{Failure, Success}
 case class SendAsset(from: String, to: String, pegHash: String, gas: Int,  status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])
 
 @Singleton
-class SendAssets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, blockchainAssets: blockchain.Assets, blockchainOrders: blockchain.Orders, blockchainNegotiations: blockchain.Negotiations, transactionSendAsset: transactions.SendAsset, actorSystem: ActorSystem, implicit val pushNotifications: PushNotifications, implicit val masterAccounts: master.Accounts, implicit val blockchainAccounts: blockchain.Accounts)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext)  {
+class SendAssets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, blockchainAssets: blockchain.Assets, blockchainOrders: blockchain.Orders, blockchainNegotiations: blockchain.Negotiations, transactionSendAsset: transactions.SendAsset, actorSystem: ActorSystem, pushNotifications: PushNotifications,masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext)  {
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_SEND_ASSET
 

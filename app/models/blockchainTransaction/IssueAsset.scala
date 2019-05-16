@@ -18,10 +18,10 @@ import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class IssueAsset(from: String, to: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, gas: Int,  status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])
+case class IssueAsset(from: String, to: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, moderator: Boolean, gas: Int,  status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])
 
 @Singleton
-class IssueAssets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, getAccount: GetAccount, blockchainAssets: blockchain.Assets, transactionIssueAsset: transactions.IssueAsset, actorSystem: ActorSystem, implicit val pushNotifications: PushNotifications, implicit val masterAccounts: master.Accounts, implicit val blockchainAccounts: blockchain.Accounts)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
+class IssueAssets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, getAccount: GetAccount, blockchainAssets: blockchain.Assets, transactionIssueAsset: transactions.IssueAsset, actorSystem: ActorSystem, pushNotifications: PushNotifications,masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_ISSUE_ASSET
 
@@ -97,7 +97,7 @@ class IssueAssets @Inject()(protected val databaseConfigProvider: DatabaseConfig
 
   private[models] class IssueAssetTable(tag: Tag) extends Table[IssueAsset](tag, "IssueAsset") {
 
-    def * = (from, to, documentHash, assetType, assetPrice, quantityUnit, assetQuantity, gas, status.?, txHash.?, ticketID, responseCode.?) <> (IssueAsset.tupled, IssueAsset.unapply)
+    def * = (from, to, documentHash, assetType, assetPrice, quantityUnit, assetQuantity, moderator, gas, status.?, txHash.?, ticketID, responseCode.?) <> (IssueAsset.tupled, IssueAsset.unapply)
 
     def from = column[String]("from")
 
@@ -113,6 +113,8 @@ class IssueAssets @Inject()(protected val databaseConfigProvider: DatabaseConfig
 
     def assetQuantity = column[Int]("assetQuantity")
 
+    def moderator = column[Boolean]("moderator")
+
     def gas = column[Int]("gas")
 
     def status = column[Boolean]("status")
@@ -126,7 +128,7 @@ class IssueAssets @Inject()(protected val databaseConfigProvider: DatabaseConfig
 
   object Service {
 
-    def addIssueAsset(from: String, to: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, gas: Int,  status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String]) (implicit executionContext: ExecutionContext): String = Await.result(add(IssueAsset(from = from , to = to, documentHash = documentHash, assetType = assetType, assetPrice = assetPrice, quantityUnit = quantityUnit, assetQuantity = assetQuantity, gas = gas, status = status, txHash = txHash, ticketID = ticketID, responseCode = responseCode)), Duration.Inf)
+    def addIssueAsset(from: String, to: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, moderator: Boolean, gas: Int,  status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String]) (implicit executionContext: ExecutionContext): String = Await.result(add(IssueAsset(from = from , to = to, documentHash = documentHash, assetType = assetType, assetPrice = assetPrice, quantityUnit = quantityUnit, assetQuantity = assetQuantity, gas = gas, status = status, txHash = txHash, ticketID = ticketID, responseCode = responseCode, moderator = moderator)), Duration.Inf)
 
     def updateTxHashStatusResponseCode(ticketID: String, txHash: String, status: Boolean, responseCode: String): Int = Await.result(updateTxHashStatusAndResponseOnTicketID(ticketID, txHash, status, responseCode), Duration.Inf)
 

@@ -20,7 +20,7 @@ import scala.util.{Failure, Success}
 case class ConfirmSellerBid(from: String, to: String, bid: Int, time: Int, pegHash: String, gas: Int,  status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])
 
 @Singleton
-class ConfirmSellerBids @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, getNegotiationID: GetNegotiationID, getNegotiation: GetNegotiation, blockchainNegotiations: blockchain.Negotiations, transactionConfirmSellerBid: transactions.ConfirmSellerBid, actorSystem: ActorSystem, implicit val pushNotifications: PushNotifications, implicit val masterAccounts: master.Accounts, implicit val blockchainAccounts: blockchain.Accounts)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext)  {
+class ConfirmSellerBids @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, getNegotiationID: GetNegotiationID, getNegotiation: GetNegotiation, blockchainNegotiations: blockchain.Negotiations, transactionConfirmSellerBid: transactions.ConfirmSellerBid, actorSystem: ActorSystem, pushNotifications: PushNotifications,masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext)  {
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_CONFIRM_SELLER_BID
 

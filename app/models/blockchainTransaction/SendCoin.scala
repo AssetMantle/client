@@ -22,7 +22,7 @@ import scala.util.{Failure, Success}
 case class SendCoin(from: String, to: String, amount: Int, gas: Int, status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])
 
 @Singleton
-class SendCoins @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, transactionSendCoin: transactions.SendCoin, getResponse: GetResponse, actorSystem: ActorSystem, implicit val pushNotifications: PushNotifications, implicit val masterAccounts: master.Accounts, implicit val blockchainAccounts: blockchain.Accounts, implicit val faucetRequests: FaucetRequests, implicit val getAccount: GetAccount)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
+class SendCoins @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, transactionSendCoin: transactions.SendCoin, getResponse: GetResponse, actorSystem: ActorSystem, pushNotifications: PushNotifications,masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts, implicit val faucetRequests: FaucetRequests, implicit val getAccount: GetAccount)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
