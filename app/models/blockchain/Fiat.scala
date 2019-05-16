@@ -190,6 +190,9 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
         }
         catch {
           case baseException: BaseException => logger.info(constants.Error.BASE_EXCEPTION, baseException)
+            if (baseException.message == module + "." + constants.Error.NO_RESPONSE) {
+              Service.deleteFiat(dirtyFiat.pegHash, dirtyFiat.ownerAddress)
+            }
           case blockChainException: BlockChainException => logger.error(blockChainException.message, blockChainException)
         }
       }

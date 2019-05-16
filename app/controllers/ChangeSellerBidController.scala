@@ -30,13 +30,12 @@ class ChangeSellerBidController @Inject()(messagesControllerComponents: Messages
         },
         changeSellerBidData => {
           try {
-            val toAddress = masterAccounts.Service.getAddress(changeSellerBidData.accountID)
-            val ticketID: String = if (kafkaEnabled) transactionsChangeSellerBid.Service.kafkaPost(transactionsChangeSellerBid.Request(from = username, to = toAddress, password = changeSellerBidData.password, bid = changeSellerBidData.bid, time = changeSellerBidData.time, pegHash = changeSellerBidData.pegHash, gas = changeSellerBidData.gas)).ticketID else Random.nextString(32)
-            blockchainTransactionChangeSellerBids.Service.addChangeSellerBid(from = username, to = toAddress, bid = changeSellerBidData.bid, time = changeSellerBidData.time, pegHash = changeSellerBidData.pegHash, gas = changeSellerBidData.gas, null, null, ticketID = ticketID, null)
+            val ticketID: String = if (kafkaEnabled) transactionsChangeSellerBid.Service.kafkaPost(transactionsChangeSellerBid.Request(from = username, to = changeSellerBidData.buyerAddress, password = changeSellerBidData.password, bid = changeSellerBidData.bid, time = changeSellerBidData.time, pegHash = changeSellerBidData.pegHash, gas = changeSellerBidData.gas)).ticketID else Random.nextString(32)
+            blockchainTransactionChangeSellerBids.Service.addChangeSellerBid(from = username, to = changeSellerBidData.buyerAddress, bid = changeSellerBidData.bid, time = changeSellerBidData.time, pegHash = changeSellerBidData.pegHash, gas = changeSellerBidData.gas, null, null, ticketID = ticketID, null)
             if(!kafkaEnabled){
               Future{
                 try {
-                  blockchainTransactionChangeSellerBids.Utility.onSuccess(ticketID, transactionsChangeSellerBid.Service.post(transactionsChangeSellerBid.Request(from = username, to = toAddress, password = changeSellerBidData.password, bid = changeSellerBidData.bid, time = changeSellerBidData.time, pegHash = changeSellerBidData.pegHash, gas = changeSellerBidData.gas)))
+                  blockchainTransactionChangeSellerBids.Utility.onSuccess(ticketID, transactionsChangeSellerBid.Service.post(transactionsChangeSellerBid.Request(from = username, to = changeSellerBidData.buyerAddress, password = changeSellerBidData.password, bid = changeSellerBidData.bid, time = changeSellerBidData.time, pegHash = changeSellerBidData.pegHash, gas = changeSellerBidData.gas)))
                 } catch {
                   case baseException: BaseException => logger.error(constants.Error.BASE_EXCEPTION, baseException)
                     blockchainTransactionChangeSellerBids.Utility.onFailure(ticketID, baseException.message)

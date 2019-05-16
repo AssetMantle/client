@@ -4,8 +4,8 @@ import akka.actor.ActorSystem
 import exceptions.{BaseException, BlockChainException}
 import javax.inject.{Inject, Singleton}
 import org.postgresql.util.PSQLException
-import play.api.{Configuration, Logger}
 import play.api.db.slick.DatabaseConfigProvider
+import play.api.{Configuration, Logger}
 import queries.responses.AccountResponse
 import slick.jdbc.JdbcProfile
 import utilities.PushNotifications
@@ -17,7 +17,7 @@ import scala.util.{Failure, Success}
 case class Order(id: String, fiatProofHash: Option[String], awbProofHash: Option[String], executed: Boolean, dirtyBit: Boolean)
 
 @Singleton
-class Orders @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, blockchainNegotiations: Negotiations, blockchainAssets: Assets, blockchainFiats: Fiats, getOrder: queries.GetOrder, actorSystem: ActorSystem, implicit val pushNotifications: PushNotifications)(implicit executionContext: ExecutionContext, configuration: Configuration) {
+class Orders @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, getAccount: queries.GetAccount, blockchainNegotiations: Negotiations, blockchainAssets: Assets, blockchainFiats: Fiats, getOrder: queries.GetOrder, actorSystem: ActorSystem, implicit val pushNotifications: PushNotifications)(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -30,6 +30,9 @@ class Orders @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
   private implicit val module: String = constants.Module.BLOCKCHAIN_ORDER
 
   private[models] val orderTable = TableQuery[OrderTable]
+  private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
+  private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
+  private val sleepTime = configuration.get[Long]("blockchain.kafka.entityIterator.threadSleep")
 
   private def add(order: Order)(implicit executionContext: ExecutionContext): Future[String] = db.run((orderTable returning orderTable.map(_.id) += order).asTry).map {
     case Success(result) => result
@@ -112,10 +115,6 @@ class Orders @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
     def updateDirtyBit(id: String, dirtyBit: Boolean): Int = Await.result(updateDirtyBitById(id, dirtyBit), Duration.Inf)
   }
 
-  private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
-  private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
-  private val sleepTime = configuration.get[Long]("blockchain.kafka.entityIterator.threadSleep")
-
   object Utility {
     def dirtyEntityUpdater(): Future[Unit] = Future {
       val dirtyOrders = Service.getDirtyOrders(true)
@@ -124,13 +123,14 @@ class Orders @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
         try {
           val orderResponse = getOrder.Service.get(dirtyOrder.id)
           val negotiation = blockchainNegotiations.Service.getNegotiation(dirtyOrder.id)
-          if (orderResponse.value.awbProofHash != "" && orderResponse.value.fiatProofHash != ""){
+          if (orderResponse.value.awbProofHash != "" && orderResponse.value.fiatProofHash != "") {
             Service.insertOrUpdateOrder(dirtyOrder.id, awbProofHash = Option(orderResponse.value.awbProofHash), fiatProofHash = Option(orderResponse.value.fiatProofHash), executed = true, dirtyBit = false)
-            val assetPegWallet: Seq[Asset] = orderResponse.value.assetPegWallet.get.map{responseAsset: AccountResponse.Asset => responseAsset.applyToBlockchainAsset(negotiation.buyerAddress)}
-            assetPegWallet.foreach{asset: Asset => blockchainAssets.Service.updateOwnerAddress(pegHash = asset.pegHash, ownerAddress = negotiation.buyerAddress)}
 
-            val fiatPegWallet = orderResponse.value.fiatPegWallet.get.map{fiat: AccountResponse.Fiat => fiat.applyToBlockchainFiat(negotiation.id)}
-            fiatPegWallet.foreach{fiat: Fiat => blockchainFiats.Service.updateOwnerAddress(fiat.pegHash, previousOwnerAddress = negotiation.id, ownerAddress = negotiation.sellerAddress)}
+            blockchainAssets.Service.updateOwnerAddress(pegHash = negotiation.assetPegHash, ownerAddress = negotiation.buyerAddress)
+
+            getAccount.Service.get(negotiation.sellerAddress).value.fiatPegWallet.getOrElse(Seq(AccountResponse.Fiat(null, null, null, null, null))).foreach(fiatWallet => {
+              blockchainFiats.Service.insertOrUpdateFiat(fiatWallet.pegHash, negotiation.sellerAddress, fiatWallet.transactionID, fiatWallet.transactionAmount, fiatWallet.redeemedAmount, dirtyBit = true)
+            })
 
           } else {
             Service.insertOrUpdateOrder(dirtyOrder.id, awbProofHash = Option(orderResponse.value.awbProofHash), fiatProofHash = Option(orderResponse.value.fiatProofHash), executed = false, dirtyBit = false)

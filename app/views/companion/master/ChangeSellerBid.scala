@@ -7,7 +7,7 @@ object ChangeSellerBid {
   val form = Form(
     mapping(
       constants.Form.PASSWORD -> nonEmptyText(minLength = 1, maxLength = 20),
-      constants.Form.ACCOUNT_ID -> nonEmptyText(minLength = 1, maxLength = 45),
+      constants.Form.BUYER_ADDRESS -> nonEmptyText(minLength = 1, maxLength = 45),
       constants.Form.BID -> number(min = 1, max = 10000),
       constants.Form.TIME -> number(min = 1, max = 10000),
       constants.Form.PEG_HASH -> nonEmptyText(minLength = 1, maxLength = 20),
@@ -15,6 +15,6 @@ object ChangeSellerBid {
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(password: String, accountID: String, bid: Int, time: Int, pegHash: String, gas: Int)
+  case class Data(password: String, buyerAddress: String, bid: Int, time: Int, pegHash: String, gas: Int)
 
 }
