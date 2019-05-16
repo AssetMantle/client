@@ -421,7 +421,7 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."SetSellerFeedback"
 CREATE TABLE IF NOT EXISTS MASTER."Zone"
 (
     "id"        VARCHAR NOT NULL,
-    "accountID" VARCHAR NOT NULL,
+    "accountID" VARCHAR NOT NULL UNIQUE,
     "name"      VARCHAR NOT NULL,
     "currency"  VARCHAR NOT NULL,
     "status"    BOOLEAN,
@@ -590,8 +590,6 @@ ALTER TABLE BLOCKCHAIN."ACLAccount_BC"
   ADD CONSTRAINT ACLAccount_ACL_hash FOREIGN KEY ("aclHash") REFERENCES BLOCKCHAIN."ACLHash_BC" ("hash");
 ALTER TABLE BLOCKCHAIN."ACLAccount_BC"
     ADD CONSTRAINT ACLAccount_Organization_organizationID FOREIGN KEY ("organizationID") REFERENCES BLOCKCHAIN."Organization_BC" ("id");
-ALTER TABLE BLOCKCHAIN."Asset_BC"
-    ADD CONSTRAINT Asset_Account_ownerAddress FOREIGN KEY ("ownerAddress") REFERENCES BLOCKCHAIN."Account_BC" ("address");
 ALTER TABLE BLOCKCHAIN."Negotiation_BC"
     ADD CONSTRAINT Negotiation_Account_buyerAddress FOREIGN KEY ("buyerAddress") REFERENCES BLOCKCHAIN."Account_BC" ("address");
 ALTER TABLE BLOCKCHAIN."Negotiation_BC"

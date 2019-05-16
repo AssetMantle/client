@@ -4,16 +4,14 @@ import akka.actor.ActorSystem
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.{blockchain, master}
-import models.master.Accounts
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
-import queries.GetNegotiationID
-import queries.GetNegotiation
+import queries.{GetNegotiation, GetNegotiationID}
 import slick.jdbc.JdbcProfile
-import utilities.PushNotifications
 import transactions.responses.TransactionResponse.Response
+import utilities.PushNotifications
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
@@ -148,15 +146,11 @@ class ChangeBuyerBids @Inject()(protected val databaseConfigProvider: DatabaseCo
 
         val fromAddress = masterAccounts.Service.getAddress(changeBuyerBid.from)
         val toID = masterAccounts.Service.getId(changeBuyerBid.to)
-        Thread.sleep(sleepTime + 2000)
+        Thread.sleep(sleepTime)
 
         val negotiationID = blockchainNegotiations.Service.getNegotiationID(buyerAddress = fromAddress, sellerAddress = changeBuyerBid.to, pegHash = changeBuyerBid.pegHash)
-        if (negotiationID == "") {
-          val negotiationResponse = getNegotiation.Service.get(getNegotiationID.Service.get(buyerAccount = changeBuyerBid.from, sellerAccount = toID, pegHash = changeBuyerBid.pegHash).negotiationID)
-          blockchainNegotiations.Service.addNegotiation(id = negotiationResponse.value.negotiationID, buyerAddress = negotiationResponse.value.buyerAddress, sellerAddress = negotiationResponse.value.sellerAddress, assetPegHash = negotiationResponse.value.pegHash, bid = negotiationResponse.value.bid, time = negotiationResponse.value.time, null, null)
-        } else {
-          blockchainNegotiations.Service.updateDirtyBit(negotiationID, true)
-        }
+        val negotiationResponse = if (negotiationID == "") getNegotiation.Service.get(getNegotiationID.Service.get(buyerAccount = changeBuyerBid.from, sellerAccount = toID, pegHash = changeBuyerBid.pegHash).negotiationID) else getNegotiation.Service.get(negotiationID)
+        blockchainNegotiations.Service.insertOrUpdateNegotiation(id = negotiationResponse.value.negotiationID, buyerAddress = negotiationResponse.value.buyerAddress, sellerAddress = negotiationResponse.value.sellerAddress, assetPegHash = negotiationResponse.value.pegHash, bid = negotiationResponse.value.bid, time = negotiationResponse.value.time, buyerSignature = negotiationResponse.value.buyerSignature, sellerSignature = negotiationResponse.value.sellerSignature, true)
 
         blockchainAccounts.Service.updateDirtyBit(fromAddress, dirtyBit = true)
 

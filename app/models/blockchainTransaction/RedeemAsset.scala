@@ -140,7 +140,7 @@ class RedeemAssets @Inject()(protected val databaseConfigProvider: DatabaseConfi
         Service.updateTxHashStatusResponseCode(ticketID, response.TxHash, status = true, response.Code)
         val redeemAsset = Service.getTransaction(ticketID)
 
-        Thread.sleep(sleepTime + 2000)
+        Thread.sleep(sleepTime)
 
         val fromAddress = masterAccounts.Service.getAddress(redeemAsset.from)
         val responseAccount = getAccount.Service.get(fromAddress)

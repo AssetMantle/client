@@ -1,13 +1,12 @@
 package models.blockchain
 
 import akka.actor.ActorSystem
-import exceptions.BaseException
+import exceptions.{BaseException, BlockChainException}
 import javax.inject.{Inject, Singleton}
 import models.{master, masterTransaction}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.{Configuration, Logger}
-import queries.responses.FiatResponse
 import queries.{GetAccount, GetOrder}
 import slick.jdbc.JdbcProfile
 
@@ -18,7 +17,7 @@ import scala.util.{Failure, Success}
 case class Fiat(pegHash: String, ownerAddress: String, transactionID: String, transactionAmount: String, redeemedAmount: String, dirtyBit: Boolean)
 
 @Singleton
-class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, actorSystem: ActorSystem, getAccount: GetAccount, masterTransactionIssueFiatRequests: masterTransaction.IssueFiatRequests, masterAccounts: master.Accounts, getOrder: GetOrder)(implicit executionContext: ExecutionContext, configuration: Configuration) {
+class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, blockchainNegotiations: Negotiations, actorSystem: ActorSystem, getAccount: GetAccount, masterTransactionIssueFiatRequests: masterTransaction.IssueFiatRequests, masterAccounts: master.Accounts, getOrder: GetOrder)(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -37,6 +36,14 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
   private val sleepTime = configuration.get[Long]("blockchain.kafka.entityIterator.threadSleep")
 
   private def add(fiat: Fiat)(implicit executionContext: ExecutionContext): Future[String] = db.run((fiatTable returning fiatTable.map(_.pegHash) += fiat).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+        throw new BaseException(constants.Error.PSQL_EXCEPTION)
+    }
+  }
+
+  private def addMultiple(fiats: Seq[Fiat])(implicit executionContext: ExecutionContext): Future[Seq[String]] = db.run((fiatTable returning fiatTable.map(_.pegHash) ++= fiats).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
@@ -100,6 +107,16 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
     }
   }
 
+  private def updateOwnerAddressByPegHashAndPreviousOwnerAddress(pegHash: String, ownerAddress: String, previousOwnerAddress: String)(implicit executionContext: ExecutionContext): Future[Int] = db.run(fiatTable.filter(_.pegHash === pegHash).filter(_.ownerAddress === previousOwnerAddress).map(_.ownerAddress).update(ownerAddress).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+        throw new BaseException(constants.Error.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+        throw new BaseException(constants.Error.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
   private def updateRedeemedAmountByPegHash(pegHash: String, redeemedAmount: String)(implicit executionContext: ExecutionContext): Future[Int] = db.run(fiatTable.filter(_.pegHash === pegHash).map(_.redeemedAmount).update(redeemedAmount).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -141,6 +158,8 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
     def addFiat(pegHash: String, ownerAddress: String, transactionID: String, transactionAmount: String, redeemedAmount: String, dirtyBit: Boolean)(implicit executionContext: ExecutionContext): String = Await.result(add(Fiat(pegHash, ownerAddress, transactionID, transactionAmount, redeemedAmount, dirtyBit)), Duration.Inf)
 
+    def addFiats(fiats: Seq[Fiat])(implicit executionContext: ExecutionContext): Seq[String] = Await.result(addMultiple(fiats), Duration.Inf)
+
     def getFiat(pegHash: String)(implicit executionContext: ExecutionContext): Seq[Fiat] = Await.result(findByPegHash(pegHash), Duration.Inf)
 
     def getFiatsOnAddress(address: String)(implicit executionContext: ExecutionContext): Seq[Fiat] = Await.result(findByAddress(address), Duration.Inf)
@@ -148,6 +167,8 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
     def insertOrUpdateFiat(pegHash: String, ownerAddress: String, transactionID: String, transactionAmount: String, redeemedAmount: String, dirtyBit: Boolean)(implicit executionContext: ExecutionContext): Int = Await.result(insertOrUpdate(Fiat(pegHash = pegHash, ownerAddress, transactionID = transactionID, transactionAmount = transactionAmount, redeemedAmount = redeemedAmount, dirtyBit)), Duration.Inf)
 
     def updateRedeemedAmount(pegHash: String, redeemedAmount: String)(implicit executionContext: ExecutionContext): Int = Await.result(updateRedeemedAmountByPegHash(pegHash, redeemedAmount), Duration.Inf)
+
+    def updateOwnerAddress(pegHash: String, ownerAddress: String, previousOwnerAddress: String)(implicit executionContext: ExecutionContext): Int = Await.result(updateOwnerAddressByPegHashAndPreviousOwnerAddress(pegHash = pegHash, ownerAddress = ownerAddress, previousOwnerAddress = previousOwnerAddress), Duration.Inf)
 
     def getFiatPegWallet(pegHashSeq: Seq[String])(implicit executionContext: ExecutionContext): Seq[Fiat] = Await.result(getFiatPegWalletByPegHashSeq(pegHashSeq), Duration.Inf)
 
@@ -168,11 +189,8 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
           fiatWallets.foreach(fiatPegWallet => if (fiatWallets.map(_.pegHash) contains dirtyFiat.pegHash) Service.insertOrUpdateFiat(fiatPegWallet.pegHash, dirtyFiat.ownerAddress, fiatPegWallet.transactionID, fiatPegWallet.transactionAmount, fiatPegWallet.redeemedAmount, dirtyBit = false) else Service.deleteFiat(dirtyFiat.pegHash, dirtyFiat.ownerAddress))
         }
         catch {
-          case baseException: BaseException => logger.info(baseException.message, baseException)
-            if (baseException.message == constants.Error.NO_RESPONSE) {
-              val fiatWallets = getOrder.Service.get(dirtyFiat.ownerAddress).value.fiatPegWallet.getOrElse(Seq(FiatResponse.Value(null, null, null, null, null)))
-              fiatWallets.foreach(fiatPegWallet => if (fiatWallets.map(_.pegHash) contains dirtyFiat.pegHash) Service.insertOrUpdateFiat(fiatPegWallet.pegHash, dirtyFiat.ownerAddress, fiatPegWallet.transactionID, fiatPegWallet.transactionAmount, fiatPegWallet.redeemedAmount, dirtyBit = false) else Service.deleteFiat(dirtyFiat.pegHash, dirtyFiat.ownerAddress))
-            }
+          case baseException: BaseException => logger.info(constants.Error.BASE_EXCEPTION, baseException)
+          case blockChainException: BlockChainException => logger.error(blockChainException.message, blockChainException)
         }
       }
     }

@@ -1,20 +1,18 @@
 package models.blockchainTransaction
 
 import akka.actor.ActorSystem
-import queries.GetAccount
-import queries.responses.AccountResponse
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import models.blockchain
-import models.{blockchain, master, masterTransaction}
+import models.{blockchain, master}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
+import queries.GetAccount
 import queries.responses.AccountResponse
 import slick.jdbc.JdbcProfile
-import utilities.PushNotifications
 import transactions.responses.TransactionResponse.Response
+import utilities.PushNotifications
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
@@ -151,7 +149,7 @@ class IssueAssets @Inject()(protected val databaseConfigProvider: DatabaseConfig
         Service.updateTxHashStatusResponseCode(ticketID, response.TxHash, status = true, response.Code)
         val issueAsset = Service.getTransaction(ticketID)
 
-        Thread.sleep(sleepTime + 2000)
+        Thread.sleep(sleepTime)
         val responseAccount = getAccount.Service.get(issueAsset.to)
         if (responseAccount.value.assetPegWallet.isDefined) {
           blockchainAssets.Service.addAssets(responseAccount.value.assetPegWallet.get.map{responseAsset: AccountResponse.Asset => responseAsset.applyToBlockchainAsset(issueAsset.to)}.diff(blockchainAssets.Service.getAssetPegWallet(issueAsset.to)))

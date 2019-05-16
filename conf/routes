@@ -74,7 +74,7 @@ GET         /master/viewPendingIssueAssetRequests           controllers.IssueAss
 GET         /master/rejectIssueAssetRequest                 controllers.IssueAssetController.rejectIssueAssetRequestForm(requestID: String)
 POST        /master/rejectIssueAssetRequest                 controllers.IssueAssetController.rejectIssueAssetRequest
 
-GET         /master/issueAsset                              controllers.IssueAssetController.issueAssetForm(requestID: String, accountID: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int)
+GET         /master/issueAsset                              controllers.IssueAssetController.issueAssetForm(requestID: String, accountID: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, moderator: Boolean)
 POST        /master/issueAsset                              controllers.IssueAssetController.issueAsset
 
 GET         /master/issueFiatRequest                        controllers.IssueFiatController.issueFiatRequestForm

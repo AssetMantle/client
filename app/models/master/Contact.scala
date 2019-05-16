@@ -19,6 +19,7 @@ class Contacts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
   private implicit val module: String = constants.Module.MASTER_CONTACT
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
+
   val db = databaseConfig.db
 
   import databaseConfig.profile.api._

@@ -12,7 +12,11 @@
         @inputText(issueAssetForm(constants.Form.ASSET_PRICE).copy(value = Some(assetPrice.toString)),'_label-> Messages(constants.Form.ASSET_PRICE))
         @inputText(issueAssetForm(constants.Form.QUANTITY_UNIT).copy(value = Some(quantityUnit)),'_label-> Messages(constants.Form.QUANTITY_UNIT))
         @inputText(issueAssetForm(constants.Form.ASSET_QUANTITY).copy(value = Some(assetQuantity.toString)),'_label-> Messages(constants.Form.ASSET_QUANTITY))
-        @checkbox(issueAssetForm(constants.Form.MODERATOR), 'checked -> moderator, '_label -> Messages(constants.Form.MODERATOR))
+        @if(moderator){
+            @checkbox(issueAssetForm(constants.Form.MODERATOR), 'checked -> "", '_label -> Messages(constants.Form.MODERATOR))
+        } else {
+            @checkbox(issueAssetForm(constants.Form.MODERATOR), '_label -> Messages(constants.Form.MODERATOR))
+        }
         @inputText(issueAssetForm(constants.Form.GAS),'_label-> Messages(constants.Form.GAS))
         @inputPassword(issueAssetForm(constants.Form.PASSWORD),'_label-> Messages(constants.Form.PASSWORD))
 

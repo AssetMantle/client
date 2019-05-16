@@ -9,7 +9,7 @@ object AccountResponse {
   case class Coins(denom: String, amount: String)
 
   implicit val coinsReads: Reads[Coins] = Json.reads[Coins]
-  //  implicit val assetReads: Reads[Asset] = Json.reads[Asset]
+
   implicit val assetReads: Reads[Asset] = (
     (JsPath \ "pegHash").read[String] and
       (JsPath \ "documentHash").read[String] and
@@ -26,15 +26,17 @@ object AccountResponse {
     def applyToBlockchainAsset(ownerAddress: String): blockchain.Asset = blockchain.Asset(pegHash = pegHash, documentHash = documentHash, assetType = assetType, assetQuantity = assetQuantity, assetPrice = assetPrice, quantityUnit = quantityUnit, ownerAddress = ownerAddress, locked = locked, moderator = moderator, false)
   }
 
-
   case class Owners(ownerAddress: String, amount: String)
 
   implicit val ownersReads: Reads[Owners] = Json.reads[Owners]
+
   implicit val fiatReads: Reads[Fiat] = Json.reads[Fiat]
 
-  case class Fiat(pegHash: String, transactionID: String, transactionAmount: String, redeemedAmount: String, owners: Option[Seq[Owners]])
+  case class Fiat(pegHash: String, transactionID: String, transactionAmount: String, redeemedAmount: String, owners: Option[Seq[Owners]]){
+    def applyToBlockchainFiat(ownerAddress: String): blockchain.Fiat = blockchain.Fiat(pegHash = pegHash, ownerAddress = ownerAddress, transactionID = transactionID, transactionAmount = transactionAmount, redeemedAmount = redeemedAmount, false)
+  }
 
-  case class Value(address: String, coins: Option[Seq[Coins]], assetPegWallet: Option[Seq[blockchain.Asset]], fiatPegWallet: Option[Seq[Fiat]], account_number: String, sequence: String)
+  case class Value(address: String, coins: Option[Seq[Coins]], assetPegWallet: Option[Seq[Asset]], fiatPegWallet: Option[Seq[Fiat]], account_number: String, sequence: String)
 
   implicit val valueReads: Reads[Value] = Json.reads[Value]
 

@@ -30,14 +30,12 @@ class BuyerExecuteOrderController @Inject()(messagesControllerComponents: Messag
         },
         buyerExecuteOrderData => {
           try {
-            val buyerAddress = masterAccounts.Service.getAddress(username)
-            val sellerAddress = masterAccounts.Service.getAddress(buyerExecuteOrderData.accountID)
-            val ticketID: String = if (kafkaEnabled) transactionsBuyerExecuteOrder.Service.kafkaPost(transactionsBuyerExecuteOrder.Request(from = username, password = buyerExecuteOrderData.password, buyerAddress = buyerAddress, sellerAddress = sellerAddress, fiatProofHash = buyerExecuteOrderData.fiatProofHash, pegHash = buyerExecuteOrderData.pegHash, gas = buyerExecuteOrderData.gas)).ticketID else Random.nextString(32)
-            blockchainTransactionBuyerExecuteOrders.Service.addBuyerExecuteOrder(from = username, buyerAddress = buyerAddress, sellerAddress = sellerAddress, fiatProofHash = buyerExecuteOrderData.fiatProofHash, pegHash = buyerExecuteOrderData.pegHash, gas = buyerExecuteOrderData.gas, null, null, ticketID = ticketID, null)
+            val ticketID: String = if (kafkaEnabled) transactionsBuyerExecuteOrder.Service.kafkaPost(transactionsBuyerExecuteOrder.Request(from = username, password = buyerExecuteOrderData.password, buyerAddress = buyerExecuteOrderData.buyerAddress, sellerAddress = buyerExecuteOrderData.sellerAddress, fiatProofHash = buyerExecuteOrderData.fiatProofHash, pegHash = buyerExecuteOrderData.pegHash, gas = buyerExecuteOrderData.gas)).ticketID else Random.nextString(32)
+            blockchainTransactionBuyerExecuteOrders.Service.addBuyerExecuteOrder(from = username, buyerAddress = buyerExecuteOrderData.buyerAddress, sellerAddress = buyerExecuteOrderData.sellerAddress, fiatProofHash = buyerExecuteOrderData.fiatProofHash, pegHash = buyerExecuteOrderData.pegHash, gas = buyerExecuteOrderData.gas, null, null, ticketID = ticketID, null)
             if(!kafkaEnabled){
               Future{
                 try {
-                  blockchainTransactionBuyerExecuteOrders.Utility.onSuccess(ticketID, transactionsBuyerExecuteOrder.Service.post(transactionsBuyerExecuteOrder.Request(from = username, password = buyerExecuteOrderData.password, buyerAddress = buyerAddress, sellerAddress = sellerAddress, fiatProofHash = buyerExecuteOrderData.fiatProofHash, pegHash = buyerExecuteOrderData.pegHash, gas = buyerExecuteOrderData.gas)))
+                  blockchainTransactionBuyerExecuteOrders.Utility.onSuccess(ticketID, transactionsBuyerExecuteOrder.Service.post(transactionsBuyerExecuteOrder.Request(from = username, password = buyerExecuteOrderData.password, buyerAddress = buyerExecuteOrderData.buyerAddress, sellerAddress = buyerExecuteOrderData.sellerAddress, fiatProofHash = buyerExecuteOrderData.fiatProofHash, pegHash = buyerExecuteOrderData.pegHash, gas = buyerExecuteOrderData.gas)))
                 } catch {
                   case baseException: BaseException => logger.error(constants.Error.BASE_EXCEPTION, baseException)
                     blockchainTransactionBuyerExecuteOrders.Utility.onFailure(ticketID, baseException.message)

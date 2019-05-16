@@ -5,7 +5,8 @@
 @common(Messages(constants.Form.SELLER_EXECUTE_ORDER)) {
     @form(action = routes.SellerExecuteOrderController.sellerExecuteOrder) {
         @CSRF.formField
-        @inputText(sellerExecuteOrderForm(constants.Form.ACCOUNT_ID),'_label-> Messages(constants.Form.ACCOUNT_ID))
+        @inputText(sellerExecuteOrderForm(constants.Form.BUYER_ADDRESS),'_label-> Messages(constants.Form.BUYER_ADDRESS))
+        @inputText(sellerExecuteOrderForm(constants.Form.SELLER_ADDRESS),'_label-> Messages(constants.Form.SELLER_ADDRESS))
         @inputText(sellerExecuteOrderForm(constants.Form.AWB_PROOF_HASH),'_label-> Messages(constants.Form.AWB_PROOF_HASH))
         @inputText(sellerExecuteOrderForm(constants.Form.PEG_HASH),'_label-> Messages(constants.Form.PEG_HASH))
         @inputText(sellerExecuteOrderForm(constants.Form.GAS),'_label-> Messages(constants.Form.GAS))

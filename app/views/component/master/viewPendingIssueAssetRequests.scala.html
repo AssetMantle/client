@@ -12,7 +12,7 @@
             <th>@Messages(constants.Form.ASSET_QUANTITY)</th>
             <th>@Messages(constants.Form.ASSET_PRICE)</th>
             <th>@Messages(constants.Form.QUANTITY_UNIT)</th>
-            <th>@Messages(constants.Form.COMMENT)</th>
+            <th>@Messages(constants.Form.MODERATOR)</th>
             <th>@Messages(constants.Form.STATUS)</th>
 
         </tr>
@@ -25,8 +25,8 @@
                 <td>@issueAssetRequest.assetQuantity</td>
                 <td>@issueAssetRequest.assetPrice</td>
                 <td>@issueAssetRequest.quantityUnit</td>
-                <td>@issueAssetRequest.comment</td>
-                <td><a href="@routes.IssueAssetController.issueAssetForm(issueAssetRequest.id, issueAssetRequest.accountID, issueAssetRequest.documentHash, issueAssetRequest.assetType, issueAssetRequest.assetPrice, issueAssetRequest.quantityUnit, issueAssetRequest.assetQuantity)">@Messages(constants.Form.APPROVE)</a>
+                <td>@issueAssetRequest.moderator</td>
+                <td><a href="@routes.IssueAssetController.issueAssetForm(issueAssetRequest.id, issueAssetRequest.accountID, issueAssetRequest.documentHash, issueAssetRequest.assetType, issueAssetRequest.assetPrice, issueAssetRequest.quantityUnit, issueAssetRequest.assetQuantity, issueAssetRequest.moderator)">@Messages(constants.Form.APPROVE)</a>
                     /<a href="@routes.IssueAssetController.rejectIssueAssetRequestForm(issueAssetRequest.id)">@Messages(constants.Form.REJECT)</a></td>
             </tr>
         }

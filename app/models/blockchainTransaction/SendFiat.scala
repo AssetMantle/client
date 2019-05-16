@@ -8,9 +8,12 @@ import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
+import queries.GetOrder
+import queries.responses.AccountResponse
 import slick.jdbc.JdbcProfile
-import utilities.PushNotifications
 import transactions.responses.TransactionResponse.Response
+import utilities.PushNotifications
+
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
@@ -18,7 +21,7 @@ import scala.util.{Failure, Success}
 case class SendFiat(from: String, to: String, amount: Int, pegHash: String, gas: Int,  status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])
 
 @Singleton
-class SendFiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, transactionSendFiat: transactions.SendFiat, blockchainOrders: blockchain.Orders, blockchainNegotiations: blockchain.Negotiations, actorSystem: ActorSystem, implicit val pushNotifications: PushNotifications, implicit val masterAccounts: master.Accounts, implicit val blockchainAccounts: blockchain.Accounts)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext)  {
+class SendFiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, getOrder: GetOrder, transactionSendFiat: transactions.SendFiat, blockchainFiats: blockchain.Fiats, blockchainOrders: blockchain.Orders, blockchainNegotiations: blockchain.Negotiations, actorSystem: ActorSystem, implicit val pushNotifications: PushNotifications, implicit val masterAccounts: master.Accounts, implicit val blockchainAccounts: blockchain.Accounts)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext)  {
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_SEND_FIAT
 
@@ -141,9 +144,13 @@ class SendFiats @Inject()(protected val databaseConfigProvider: DatabaseConfigPr
         val sendFiat = Service.getTransaction(ticketID)
 
         val fromAddress = masterAccounts.Service.getAddress(sendFiat.from)
-        val negotiationID = blockchainNegotiations.Service.getNegotiationID(buyerAddress = sendFiat.to, sellerAddress = fromAddress, pegHash = sendFiat.pegHash)
+        val negotiationID = blockchainNegotiations.Service.getNegotiationID(buyerAddress = fromAddress, sellerAddress = sendFiat.to, pegHash = sendFiat.pegHash)
         blockchainOrders.Service.insertOrUpdateOrder(id = negotiationID, null, null, false, false)
-        //TODO Update Fiat ownerAddress
+
+        blockchainFiats.Service.updateDirtyBit(fromAddress, true)
+
+        val orderResponse = getOrder.Service.get(negotiationID)
+        blockchainFiats.Service.addFiats(orderResponse.value.fiatPegWallet.get.map{responseFiatPeg: AccountResponse.Fiat => responseFiatPeg.applyToBlockchainFiat(negotiationID)})
 
         blockchainAccounts.Service.updateDirtyBit(fromAddress, dirtyBit = true)
 

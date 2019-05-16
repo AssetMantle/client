@@ -1,7 +1,7 @@
 package models.blockchain
 
 import akka.actor.ActorSystem
-import exceptions.{BaseException, BlockChainException}
+import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.master
 import org.postgresql.util.PSQLException
@@ -153,9 +153,9 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
 
     def assetType = column[String]("assetType")
 
-    def assetQuantity = column[Int]("assetQuantity")
+    def assetQuantity = column[String]("assetQuantity")
 
-    def assetPrice = column[Int]("assetPrice")
+    def assetPrice = column[String]("assetPrice")
 
     def quantityUnit = column[String]("quantityUnit")
 
@@ -210,8 +210,7 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
           Service.updateLockedAndDirtyBit(dirtyAsset.pegHash, false, false)
         }
       } catch {
-        case blockChainException: BlockChainException => logger.error(blockChainException.message, blockChainException)
-        case baseException: BaseException => logger.error(constants.Error.BASE_EXCEPTION, baseException)
+        case baseException: BaseException => logger.info(constants.Error.BASE_EXCEPTION, baseException)
       }
     }
   }

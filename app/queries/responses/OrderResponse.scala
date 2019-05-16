@@ -5,11 +5,7 @@ import queries.responses.AccountResponse.{Asset, Fiat}
 
 object OrderResponse {
 
-  implicit val assetReads: Reads[Asset] = Json.reads[Asset]
-
-  implicit val fiatReads: Reads[Fiat] = Json.reads[Fiat]
-
-  case class Value(id: String, fiatProofHash: Option[String], awbProofHash: Option[String], fiatPegWallet: Option[Seq[Fiat]], assetPegWallet: Option[Seq[Asset]])
+  case class Value(negotiationID: String, fiatProofHash: String, awbProofHash: String, fiatPegWallet: Option[Seq[Fiat]], assetPegWallet: Option[Seq[Asset]])
 
   implicit val valueReads: Reads[Value] = Json.reads[Value]
 

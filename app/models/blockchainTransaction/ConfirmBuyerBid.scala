@@ -150,12 +150,9 @@ class ConfirmBuyerBids @Inject()(protected val databaseConfigProvider: DatabaseC
         Thread.sleep(sleepTime)
 
         val negotiationID = blockchainNegotiations.Service.getNegotiationID(buyerAddress = fromAddress, sellerAddress = confirmBuyerBid.to, pegHash = confirmBuyerBid.pegHash)
-        if (negotiationID == "") {
-          val negotiationResponse = getNegotiation.Service.get(getNegotiationID.Service.get(buyerAccount = confirmBuyerBid.from, sellerAccount = toID, pegHash = confirmBuyerBid.pegHash).negotiationID)
-          blockchainNegotiations.Service.addNegotiation(id = negotiationResponse.value.negotiationID, buyerAddress = negotiationResponse.value.buyerAddress, sellerAddress = negotiationResponse.value.sellerAddress, assetPegHash = negotiationResponse.value.pegHash, bid = negotiationResponse.value.bid, time = negotiationResponse.value.time, buyerSignature = negotiationResponse.value.buyerSignature, sellerSignature = negotiationResponse.value.sellerSignature)
-        } else {
-          blockchainNegotiations.Service.updateDirtyBit(negotiationID, true)
-        }
+        val negotiationResponse = if (negotiationID == "") getNegotiation.Service.get(getNegotiationID.Service.get(buyerAccount = confirmBuyerBid.from, sellerAccount = toID, pegHash = confirmBuyerBid.pegHash).negotiationID) else getNegotiation.Service.get(negotiationID)
+        blockchainNegotiations.Service.insertOrUpdateNegotiation(id = negotiationResponse.value.negotiationID, buyerAddress = negotiationResponse.value.buyerAddress, sellerAddress = negotiationResponse.value.sellerAddress, assetPegHash = negotiationResponse.value.pegHash, bid = negotiationResponse.value.bid, time = negotiationResponse.value.time, buyerSignature = negotiationResponse.value.buyerSignature, sellerSignature = negotiationResponse.value.sellerSignature, true)
+
         blockchainAccounts.Service.updateDirtyBit(fromAddress, dirtyBit = true)
 
         pushNotifications.sendNotification(toID, constants.Notification.SUCCESS, Seq(response.TxHash))

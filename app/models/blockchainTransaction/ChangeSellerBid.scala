@@ -148,12 +148,9 @@ class ChangeSellerBids @Inject()(protected val databaseConfigProvider: DatabaseC
         Thread.sleep(sleepTime)
 
         val negotiationID = blockchainNegotiations.Service.getNegotiationID(buyerAddress = changeSellerBid.to, sellerAddress = fromAddress, pegHash = changeSellerBid.pegHash)
-        if (negotiationID == "") {
-          val negotiationResponse = getNegotiation.Service.get(getNegotiationID.Service.get(buyerAccount = toID, sellerAccount = changeSellerBid.from, pegHash = changeSellerBid.pegHash).negotiationID)
-          blockchainNegotiations.Service.addNegotiation(id = negotiationResponse.value.negotiationID, buyerAddress = negotiationResponse.value.buyerAddress, sellerAddress = negotiationResponse.value.sellerAddress, assetPegHash = negotiationResponse.value.pegHash, bid = negotiationResponse.value.bid, time = negotiationResponse.value.time, null, null)
-        } else {
-          blockchainNegotiations.Service.updateDirtyBit(negotiationID, true)
-        }
+        val negotiationResponse = if (negotiationID == "") getNegotiation.Service.get(getNegotiationID.Service.get(buyerAccount = toID, sellerAccount = changeSellerBid.from, pegHash = changeSellerBid.pegHash).negotiationID) else getNegotiation.Service.get(negotiationID)
+        blockchainNegotiations.Service.insertOrUpdateNegotiation(id = negotiationResponse.value.negotiationID, buyerAddress = negotiationResponse.value.buyerAddress, sellerAddress = negotiationResponse.value.sellerAddress, assetPegHash = negotiationResponse.value.pegHash, bid = negotiationResponse.value.bid, time = negotiationResponse.value.time, buyerSignature = negotiationResponse.value.buyerSignature, sellerSignature = negotiationResponse.value.sellerSignature, true)
+
 
         blockchainAccounts.Service.updateDirtyBit(fromAddress, dirtyBit = true)
 

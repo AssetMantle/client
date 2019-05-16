@@ -122,14 +122,18 @@ class Orders @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
       Thread.sleep(sleepTime)
       for (dirtyOrder <- dirtyOrders) {
         try {
-          val responseOrder = getOrder.Service.get(dirtyOrder.id)
+          val orderResponse = getOrder.Service.get(dirtyOrder.id)
           val negotiation = blockchainNegotiations.Service.getNegotiation(dirtyOrder.id)
-          if (responseOrder.value.awbProofHash.isDefined && responseOrder.value.fiatProofHash.isDefined){
-            Service.insertOrUpdateOrder(dirtyOrder.id, awbProofHash = responseOrder.value.awbProofHash, fiatProofHash = responseOrder.value.fiatProofHash, executed = true, dirtyBit = false)
-            blockchainAssets.Service.addAssets(responseOrder.value.assetPegWallet.get.map{responseAsset: AccountResponse.Asset => responseAsset.applyToBlockchainAsset(negotiation.buyerAddress)})
-            //TODO Add to Fiat_BC
+          if (orderResponse.value.awbProofHash != "" && orderResponse.value.fiatProofHash != ""){
+            Service.insertOrUpdateOrder(dirtyOrder.id, awbProofHash = Option(orderResponse.value.awbProofHash), fiatProofHash = Option(orderResponse.value.fiatProofHash), executed = true, dirtyBit = false)
+            val assetPegWallet: Seq[Asset] = orderResponse.value.assetPegWallet.get.map{responseAsset: AccountResponse.Asset => responseAsset.applyToBlockchainAsset(negotiation.buyerAddress)}
+            assetPegWallet.foreach{asset: Asset => blockchainAssets.Service.updateOwnerAddress(pegHash = asset.pegHash, ownerAddress = negotiation.buyerAddress)}
+
+            val fiatPegWallet = orderResponse.value.fiatPegWallet.get.map{fiat: AccountResponse.Fiat => fiat.applyToBlockchainFiat(negotiation.id)}
+            fiatPegWallet.foreach{fiat: Fiat => blockchainFiats.Service.updateOwnerAddress(fiat.pegHash, previousOwnerAddress = negotiation.id, ownerAddress = negotiation.sellerAddress)}
+
           } else {
-            Service.insertOrUpdateOrder(dirtyOrder.id, awbProofHash = responseOrder.value.awbProofHash, fiatProofHash = responseOrder.value.fiatProofHash, executed = false, dirtyBit = false)
+            Service.insertOrUpdateOrder(dirtyOrder.id, awbProofHash = Option(orderResponse.value.awbProofHash), fiatProofHash = Option(orderResponse.value.fiatProofHash), executed = false, dirtyBit = false)
           }
 
         }
