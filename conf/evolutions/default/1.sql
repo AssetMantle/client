@@ -8,15 +8,17 @@ CREATE SCHEMA IF NOT EXISTS MASTER_TRANSACTION AUTHORIZATION comdex;
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Zone_BC"
 (
-    "id"      VARCHAR NOT NULL,
-    "address" VARCHAR NOT NULL,
+    "id"       VARCHAR NOT NULL,
+    "address"  VARCHAR NOT NULL,
+    "dirtyBit" BOOLEAN NOT NULL,
     PRIMARY KEY ("id")
 );
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Organization_BC"
 (
-    "id"      VARCHAR NOT NULL,
-    "address" VARCHAR NOT NULL,
+    "id"       VARCHAR NOT NULL,
+    "address"  VARCHAR NOT NULL,
+    "dirtyBit" BOOLEAN NOT NULL,
     PRIMARY KEY ("id")
 );
 
@@ -37,6 +39,7 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."ACLAccount_BC"
     "zoneID"         VARCHAR NOT NULL,
     "organizationID" VARCHAR NOT NULL,
     "aclHash"        VARCHAR NOT NULL,
+    "dirtyBit"       BOOLEAN NOT NULL,
     PRIMARY KEY ("address")
 );
 
@@ -63,18 +66,12 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."ACLHash_BC"
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Fiat_BC"
 (
     "pegHash"           VARCHAR NOT NULL,
+    "ownerAddress"      VARCHAR NOT NULL,
     "transactionID"     VARCHAR NOT NULL,
-    "transactionAmount" INT     NOT NULL,
-    "redeemedAmount"    INT     NOT NULL,
-    PRIMARY KEY ("pegHash")
-);
-
-CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Owner_BC"
-(
-    "pegHash"      VARCHAR NOT NULL,
-    "ownerAddress" VARCHAR NOT NULL,
-    "amount"       INT     NOT NULL,
-    PRIMARY KEY ("ownerAddress", "pegHash")
+    "transactionAmount" VARCHAR NOT NULL,
+    "redeemedAmount"    VARCHAR NOT NULL,
+    "dirtyBit"          BOOLEAN NOT NULL,
+    PRIMARY KEY ("pegHash", "ownerAddress")
 );
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Asset_BC"
@@ -114,6 +111,44 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Order_BC"
     "executed"      BOOLEAN NOT NULL,
     "dirtyBit"      BOOLEAN NOT NULL,
     PRIMARY KEY ("id")
+);
+
+CREATE TABLE IF NOT EXISTS BLOCKCHAIN."TransactionFeedBack_BC"
+(
+    "address"                      VARCHAR NOT NULL,
+    "sendAssetsPositiveTx"         VARCHAR NOT NULL,
+    "sendAssetsNegativeTx"         VARCHAR NOT NULL,
+    "sendFiatsPositiveTx"          VARCHAR NOT NULL,
+    "sendFiatsNegativeTx"          VARCHAR NOT NULL,
+    "ibcIssueAssetsPositiveTx"     VARCHAR NOT NULL,
+    "ibcIssueAssetsNegativeTx"     VARCHAR NOT NULL,
+    "ibcIssueFiatsPositiveTx"      VARCHAR NOT NULL,
+    "ibcIssueFiatsNegativeTx"      VARCHAR NOT NULL,
+    "buyerExecuteOrderPositiveTx"  VARCHAR NOT NULL,
+    "buyerExecuteOrderNegativeTx"  VARCHAR NOT NULL,
+    "sellerExecuteOrderPositiveTx" VARCHAR NOT NULL,
+    "sellerExecuteOrderNegativeTx" VARCHAR NOT NULL,
+    "changeBuyerBidPositiveTx"     VARCHAR NOT NULL,
+    "changeBuyerBidNegativeTx"     VARCHAR NOT NULL,
+    "changeSellerBidPositiveTx"    VARCHAR NOT NULL,
+    "changeSellerBidNegativeTx"    VARCHAR NOT NULL,
+    "confirmBuyerBidPositiveTx"    VARCHAR NOT NULL,
+    "confirmBuyerBidNegativeTx"    VARCHAR NOT NULL,
+    "confirmSellerBidPositiveTx"   VARCHAR NOT NULL,
+    "confirmSellerBidNegativeTx"   VARCHAR NOT NULL,
+    "negotiationPositiveTx"        VARCHAR NOT NULL,
+    "negotiationNegativeTx"        VARCHAR NOT NULL,
+    PRIMARY KEY ("address")
+);
+
+CREATE TABLE IF NOT EXISTS BLOCKCHAIN."TraderFeedbackHistory_BC"
+(
+    "address"       VARCHAR NOT NULL,
+    "buyerAddress"  VARCHAR NOT NULL,
+    "sellerAddress" VARCHAR NOT NULL,
+    "pegHash"       VARCHAR NOT NULL,
+    "rating"        VARCHAR NOT NULL,
+    PRIMARY KEY ("address", "buyerAddress", "sellerAddress", "pegHash")
 );
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."AddOrganization"
@@ -483,11 +518,11 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."AccountToken"
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."FaucetRequest"
 (
     "id"        VARCHAR NOT NULL,
-    "ticketID"  VARCHAR,
     "accountID" VARCHAR NOT NULL,
     "amount"    INT     NOT NULL,
     "gas"       INT,
     "status"    BOOLEAN,
+    "ticketID"  VARCHAR,
     "comment"   VARCHAR,
     PRIMARY KEY ("id")
 );
@@ -512,12 +547,12 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."IssueAssetRequest"
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."IssueFiatRequest"
 (
     "id"                VARCHAR NOT NULL,
-    "ticketID"          VARCHAR,
     "accountID"         VARCHAR NOT NULL,
     "transactionID"     VARCHAR NOT NULL,
     "transactionAmount" INT     NOT NULL,
     "gas"               INT,
     "status"            BOOLEAN,
+    "ticketID"          VARCHAR,
     "comment"           VARCHAR,
     PRIMARY KEY ("id")
 );
@@ -552,13 +587,11 @@ ALTER TABLE BLOCKCHAIN."ACLAccount_BC"
 ALTER TABLE BLOCKCHAIN."ACLAccount_BC"
     ADD CONSTRAINT ACLAccount_Zone_zoneID FOREIGN KEY ("zoneID") REFERENCES BLOCKCHAIN."Zone_BC" ("id");
 ALTER TABLE BLOCKCHAIN."ACLAccount_BC"
-    ADD CONSTRAINT ACLAccount_ACL_hash FOREIGN KEY ("aclHash") REFERENCES BLOCKCHAIN."ACLHash_BC" ("hash");
+  ADD CONSTRAINT ACLAccount_ACL_hash FOREIGN KEY ("aclHash") REFERENCES BLOCKCHAIN."ACLHash_BC" ("hash");
 ALTER TABLE BLOCKCHAIN."ACLAccount_BC"
     ADD CONSTRAINT ACLAccount_Organization_organizationID FOREIGN KEY ("organizationID") REFERENCES BLOCKCHAIN."Organization_BC" ("id");
-ALTER TABLE BLOCKCHAIN."Owner_BC"
-    ADD CONSTRAINT Owners_Account_ownerAddress FOREIGN KEY ("ownerAddress") REFERENCES BLOCKCHAIN."Account_BC" ("address");
-ALTER TABLE BLOCKCHAIN."Owner_BC"
-    ADD CONSTRAINT Owners_Fiat_pegHash FOREIGN KEY ("pegHash") REFERENCES BLOCKCHAIN."Fiat_BC" ("pegHash");
+ALTER TABLE BLOCKCHAIN."Asset_BC"
+    ADD CONSTRAINT Asset_Account_ownerAddress FOREIGN KEY ("ownerAddress") REFERENCES BLOCKCHAIN."Account_BC" ("address");
 ALTER TABLE BLOCKCHAIN."Negotiation_BC"
     ADD CONSTRAINT Negotiation_Account_buyerAddress FOREIGN KEY ("buyerAddress") REFERENCES BLOCKCHAIN."Account_BC" ("address");
 ALTER TABLE BLOCKCHAIN."Negotiation_BC"
@@ -571,6 +604,18 @@ ALTER TABLE BLOCKCHAIN."Organization_BC"
     ADD CONSTRAINT Organization_BC_Organization_id FOREIGN KEY ("id") REFERENCES Master."Organization" ("id");
 ALTER TABLE BLOCKCHAIN."Zone_BC"
     ADD CONSTRAINT Zone_BC_Zone_id FOREIGN KEY ("id") REFERENCES Master."Zone" ("id");
+ALTER TABLE BLOCKCHAIN."TransactionFeedBack_BC"
+    ADD CONSTRAINT TransactionFeedBack_Account_address FOREIGN KEY ("address") REFERENCES BLOCKCHAIN."Account_BC" ("address");
+ALTER TABLE BLOCKCHAIN."TraderFeedbackHistory_BC"
+    ADD CONSTRAINT TraderFeedbackHistory_TransactionFeedBack_address FOREIGN KEY ("address") REFERENCES BLOCKCHAIN."TransactionFeedBack_BC" ("address");
+ALTER TABLE BLOCKCHAIN."TraderFeedbackHistory_BC"
+    ADD CONSTRAINT TraderFeedbackHistory_Account_address FOREIGN KEY ("address") REFERENCES BLOCKCHAIN."Account_BC" ("address");
+ALTER TABLE BLOCKCHAIN."TraderFeedbackHistory_BC"
+    ADD CONSTRAINT TraderFeedbackHistory_Account_buyerAddress FOREIGN KEY ("buyerAddress") REFERENCES BLOCKCHAIN."Account_BC" ("address");
+ALTER TABLE BLOCKCHAIN."TraderFeedbackHistory_BC"
+    ADD CONSTRAINT TraderFeedbackHistory_Account_sellerAddress FOREIGN KEY ("sellerAddress") REFERENCES BLOCKCHAIN."Account_BC" ("address");
+ALTER TABLE BLOCKCHAIN."TraderFeedbackHistory_BC"
+    ADD CONSTRAINT TraderFeedbackHistory_Asset_pegHash FOREIGN KEY ("pegHash") REFERENCES BLOCKCHAIN."Asset_BC" ("pegHash");
 
 ALTER TABLE BLOCKCHAIN_TRANSACTION."SetACL"
     ADD CONSTRAINT SetACL_ACL_hash FOREIGN KEY ("aclHash") REFERENCES BLOCKCHAIN."ACLHash_BC" ("hash");
@@ -625,10 +670,11 @@ DROP TABLE IF EXISTS BLOCKCHAIN."Organization_BC" CASCADE;
 DROP TABLE IF EXISTS BLOCKCHAIN."ACLAccount_BC" CASCADE;
 DROP TABLE IF EXISTS BLOCKCHAIN."ACLHash_BC" CASCADE;
 DROP TABLE IF EXISTS BLOCKCHAIN."Fiat_BC" CASCADE;
-DROP TABLE IF EXISTS BLOCKCHAIN."Owner_BC" CASCADE;
 DROP TABLE IF EXISTS BLOCKCHAIN."Asset_BC" CASCADE;
 DROP TABLE IF EXISTS BLOCKCHAIN."Negotiation_BC" CASCADE;
 DROP TABLE IF EXISTS BLOCKCHAIN."Account_BC" CASCADE;
+DROP TABLE IF EXISTS BLOCKCHAIN."TransactionFeedBack_BC" CASCADE;
+DROP TABLE IF EXISTS BLOCKCHAIN."TraderFeedbackHistory_BC" CASCADE;
 
 DROP TABLE IF EXISTS BLOCKCHAIN_TRANSACTION."AddKey" CASCADE;
 DROP TABLE IF EXISTS BLOCKCHAIN_TRANSACTION."AddOrganization" CASCADE;

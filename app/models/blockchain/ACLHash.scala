@@ -11,10 +11,10 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class ACLHash(issueAssets: Boolean, issueFiats: Boolean, sendAssets: Boolean, sendFiats: Boolean, redeemAssets: Boolean, redeemFiats: Boolean, sellerExecuteOrder: Boolean, buyerExecuteOrder: Boolean, changeBuyerBid: Boolean, changeSellerBid: Boolean, confirmBuyerBid: Boolean, confirmSellerBid: Boolean, negotiation: Boolean, releaseAssets: Boolean, hash: String)
+case class ACLHash(issueAsset: Boolean, issueFiat: Boolean, sendAsset: Boolean, sendFiat: Boolean, redeemAsset: Boolean, redeemFiat: Boolean, sellerExecuteOrder: Boolean, buyerExecuteOrder: Boolean, changeBuyerBid: Boolean, changeSellerBid: Boolean, confirmBuyerBid: Boolean, confirmSellerBid: Boolean, negotiation: Boolean, releaseAsset: Boolean, hash: String)
 
 @Singleton
-class ACLHashes @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider) {
+class ACLHashes @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -93,9 +93,13 @@ class ACLHashes @Inject()(protected val databaseConfigProvider: DatabaseConfigPr
   }
 
   object Service {
-    def addACLHash(acl: ACL)(implicit executionContext: ExecutionContext): String = Await.result(add(ACLHash(acl.issueAssets, acl.issueFiats, acl.sendAssets, acl.sendFiats, acl.redeemAssets, acl.redeemFiats, acl.sellerExecuteOrder, acl.buyerExecuteOrder, acl.changeBuyerBid, acl.changeSellerBid, acl.confirmBuyerBid, acl.confirmSellerBid, acl.negotiation, acl.releaseAssets, util.hashing.MurmurHash3.stringHash(acl.toString).toString)), Duration.Inf)
+    def addACLHash(acl: ACL)(implicit executionContext: ExecutionContext): String = Await.result(add(ACLHash(acl.issueAsset, acl.issueFiat, acl.sendAsset, acl.sendFiat, acl.redeemAsset, acl.redeemFiat, acl.sellerExecuteOrder, acl.buyerExecuteOrder, acl.changeBuyerBid, acl.changeSellerBid, acl.confirmBuyerBid, acl.confirmSellerBid, acl.negotiation, acl.releaseAsset, util.hashing.MurmurHash3.stringHash(acl.toString).toString)), Duration.Inf)
 
     def getACLHash(hash: String)(implicit executionContext: ExecutionContext): ACLHash = Await.result(findByHash(hash), Duration.Inf)
 
+    def getACL(hash: String): ACL = {
+      val aclHash = Await.result(findByHash(hash), Duration.Inf)
+      ACL(aclHash.issueAsset, aclHash.issueFiat, aclHash.sendAsset, aclHash.sendFiat, aclHash.redeemAsset, aclHash.redeemFiat, aclHash.sellerExecuteOrder, aclHash.buyerExecuteOrder, aclHash.changeBuyerBid, aclHash.changeSellerBid, aclHash.confirmBuyerBid, aclHash.confirmSellerBid, aclHash.negotiation, aclHash.releaseAsset)
+    }
   }
 }

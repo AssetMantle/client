@@ -143,7 +143,7 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
     }
   }
 
-  private[models] class AssetTable(tag: Tag) extends Table[Asset](tag, "Asset_BC") {
+  private[models] class AssetTable(tag: Tag) extends Table[Asset](tag, _tableName = "Asset_BC") {
 
     def * = (pegHash, documentHash, assetType, assetQuantity, assetPrice, quantityUnit, ownerAddress, locked, moderator, dirtyBit) <> (Asset.tupled, Asset.unapply)
 
@@ -153,9 +153,9 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
 
     def assetType = column[String]("assetType")
 
-    def assetQuantity = column[String]("assetQuantity")
+    def assetQuantity = column[Int]("assetQuantity")
 
-    def assetPrice = column[String]("assetPrice")
+    def assetPrice = column[Int]("assetPrice")
 
     def quantityUnit = column[String]("quantityUnit")
 

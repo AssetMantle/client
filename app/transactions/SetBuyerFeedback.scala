@@ -3,9 +3,6 @@ package transactions
 import java.net.ConnectException
 
 import exceptions.BlockChainException
-import javax.inject.Inject
-import play.api.libs.json.{JsObject, Json, OWrites}
-import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import play.api.libs.json.{Json, OWrites}
 import play.api.libs.ws.{WSClient, WSResponse}

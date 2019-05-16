@@ -8,7 +8,6 @@ import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.{Configuration, Logger}
 import queries.GetAccount
-import queries.responses.AccountResponse
 import slick.jdbc.JdbcProfile
 import transactions.{AddKey, GetSeed}
 import utilities.PushNotifications
@@ -33,6 +32,7 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
   import databaseConfig.profile.api._
 
   private[models] val accountTable = TableQuery[AccountTable]
+
   private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
   private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
   private val sleepTime = configuration.get[Long]("blockchain.kafka.entityIterator.threadSleep")
@@ -116,7 +116,7 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     }
   }
 
-  private def getAccountsByDirtyBit(dirtyBit: Boolean): Future[Seq[Account]] = db.run(accountTable.filter(_.dirtyBit === dirtyBit).result.asTry).map {
+  private def getAddressesByDirtyBit(dirtyBit: Boolean): Future[Seq[String]] = db.run(accountTable.filter(_.dirtyBit === dirtyBit).map(_.address).result.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.info(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
@@ -182,24 +182,22 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
     def getCoins(address: String)(implicit executionContext: ExecutionContext): Int = Await.result(getCoinsByAddress(address), Duration.Inf)
 
-    def getDirtyAccounts(dirtyBit: Boolean): Seq[Account] = Await.result(getAccountsByDirtyBit(dirtyBit), Duration.Inf)
+    def getDirtyAddresses(dirtyBit: Boolean): Seq[String] = Await.result(getAddressesByDirtyBit(dirtyBit), Duration.Inf)
 
     def updateDirtyBit(address: String, dirtyBit: Boolean): Int = Await.result(updateDirtyBitByAddress(address, dirtyBit), Duration.Inf)
   }
 
   object Utility {
     def dirtyEntityUpdater(): Future[Unit] = Future {
-      val dirtyAccounts = Service.getDirtyAccounts(dirtyBit = true)
-      Thread.sleep(sleepTime)
-      for (dirtyAccount <- dirtyAccounts) {
-        try {
-          val responseAccount = getAccount.Service.get(dirtyAccount.address)
+      try {
+        val dirtyAddresses = Service.getDirtyAddresses(dirtyBit = true)
+        Thread.sleep(sleepTime)
+        for (dirtyAddress <- dirtyAddresses) {
+          val responseAccount = getAccount.Service.get(dirtyAddress)
           Service.updateSequenceCoinsAndDirtyBit(responseAccount.value.address, responseAccount.value.sequence.toInt, responseAccount.value.coins.get.filter(_.denom == denominationOfGasToken).map(_.amount.toInt).sum, dirtyBit = false)
         }
-        catch {
-          case blockChainException: BlockChainException => logger.error(blockChainException.message, blockChainException)
-          case baseException: BaseException => logger.error(constants.Error.BASE_EXCEPTION, baseException)
-        }
+      } catch {
+        case blockChainException: BlockChainException => logger.error(blockChainException.message, blockChainException)
       }
     }
   }
