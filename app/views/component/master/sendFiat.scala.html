@@ -5,7 +5,7 @@
 @common(Messages(constants.Form.SEND_FIAT)) {
     @form(action = routes.SendFiatController.sendFiat) {
         @CSRF.formField
-        @inputText(sendFiatForm(constants.Form.ACCOUNT_ID),'_label-> Messages(constants.Form.ACCOUNT_ID))
+        @inputText(sendFiatForm(constants.Form.SELLER_ADDRESS),'_label-> Messages(constants.Form.SELLER_ADDRESS))
         @inputText(sendFiatForm(constants.Form.AMOUNT),'_label-> Messages(constants.Form.AMOUNT))
         @inputText(sendFiatForm(constants.Form.PEG_HASH),'_label-> Messages(constants.Form.PEG_HASH))
         @inputText(sendFiatForm(constants.Form.GAS),'_label-> Messages(constants.Form.GAS))
