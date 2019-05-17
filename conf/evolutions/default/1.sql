@@ -141,6 +141,7 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."TransactionFeedBack_BC"
   "confirmSellerBidNegativeTx"   VARCHAR NOT NULL,
   "negotiationPositiveTx"        VARCHAR NOT NULL,
   "negotiationNegativeTx"        VARCHAR NOT NULL,
+  "dirtyBit"                     BOOLEAN NOT NULL,
   PRIMARY KEY ("address")
 );
 
@@ -598,8 +599,6 @@ ALTER TABLE BLOCKCHAIN."Negotiation_BC"
   ADD CONSTRAINT Negotiation_Account_buyerAddress FOREIGN KEY ("buyerAddress") REFERENCES BLOCKCHAIN."Account_BC" ("address");
 ALTER TABLE BLOCKCHAIN."Negotiation_BC"
   ADD CONSTRAINT Negotiation_Account_sellerAddress FOREIGN KEY ("sellerAddress") REFERENCES BLOCKCHAIN."Account_BC" ("address");
-ALTER TABLE BLOCKCHAIN."Negotiation_BC"
-  ADD CONSTRAINT Negotiation_Asset_pegHash FOREIGN KEY ("assetPegHash") REFERENCES BLOCKCHAIN."Asset_BC" ("pegHash");
 ALTER TABLE BLOCKCHAIN."Order_BC"
   ADD CONSTRAINT Order_Negotiation_id FOREIGN KEY ("id") REFERENCES BLOCKCHAIN."Negotiation_BC" ("id");
 ALTER TABLE BLOCKCHAIN."Organization_BC"
