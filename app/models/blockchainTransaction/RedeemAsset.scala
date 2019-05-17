@@ -138,12 +138,8 @@ class RedeemAssets @Inject()(protected val databaseConfigProvider: DatabaseConfi
       try {
         Service.updateTxHashStatusResponseCode(ticketID, response.TxHash, status = true, response.Code)
         val redeemAsset = Service.getTransaction(ticketID)
-
-        Thread.sleep(sleepTime)
-
         blockchainAssets.Service.updateDirtyBit(redeemAsset.pegHash, true)
         blockchainAccounts.Service.updateDirtyBit(masterAccounts.Service.getAddress(redeemAsset.from), dirtyBit = true)
-
         pushNotifications.sendNotification(masterAccounts.Service.getId(redeemAsset.to), constants.Notification.SUCCESS, Seq(response.TxHash))
         pushNotifications.sendNotification(redeemAsset.from, constants.Notification.SUCCESS, Seq(response.TxHash))
       }

@@ -193,12 +193,10 @@ class IssueFiats @Inject()(protected val databaseConfigProvider: DatabaseConfigP
     def onSuccess(ticketID: String, response: Response): Future[Unit] = Future {
       Service.updateTxHashStatusResponseCode(ticketID, response.TxHash, status = true, response.Code)
       val issueFiat = Service.getIssueFiat(ticketID)
-
       Thread.sleep(sleepTime)
       getAccount.Service.get(issueFiat.to).value.fiatPegWallet.getOrElse(Seq(AccountResponse.Fiat(null, null, null, null, null))).foreach(fiatPeg => {
         blockchainFiats.Service.insertOrUpdateFiat(fiatPeg.pegHash, issueFiat.to, fiatPeg.transactionID, fiatPeg.transactionAmount, fiatPeg.redeemedAmount, dirtyBit = true)
       })
-
       blockchainAccounts.Service.updateDirtyBit(masterAccounts.Service.getAddress(issueFiat.from), dirtyBit = true)
       pushNotifications.sendNotification(masterAccounts.Service.getId(issueFiat.to), constants.Notification.SUCCESS, Seq(response.TxHash))
       pushNotifications.sendNotification(issueFiat.from, constants.Notification.SUCCESS, Seq(response.TxHash))

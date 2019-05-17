@@ -196,12 +196,10 @@ class SendCoins @Inject()(protected val databaseConfigProvider: DatabaseConfigPr
         val sendCoin = Service.getTransaction(ticketID)
         blockchainAccounts.Service.updateDirtyBit(sendCoin.to, dirtyBit = true)
         blockchainAccounts.Service.updateDirtyBit(masterAccounts.Service.getAddress(sendCoin.from), dirtyBit = true)
-
         val toAccount = masterAccounts.Service.getAccountByAddress(sendCoin.to)
         if (toAccount.userType == constants.User.UNKNOWN) {
           masterAccounts.Service.updateUserType(toAccount.id, constants.User.USER)
         }
-
         pushNotifications.sendNotification(toAccount.id, constants.Notification.SUCCESS, Seq(response.TxHash))
         pushNotifications.sendNotification(sendCoin.from, constants.Notification.SUCCESS, Seq(response.TxHash))
       }

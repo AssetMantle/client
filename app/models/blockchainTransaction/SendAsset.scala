@@ -142,10 +142,8 @@ class SendAssets @Inject()(protected val databaseConfigProvider: DatabaseConfigP
         val negotiationID = blockchainNegotiations.Service.getNegotiationID(buyerAddress = sendAsset.to, sellerAddress = fromAddress, pegHash = sendAsset.pegHash)
         blockchainOrders.Service.insertOrUpdateOrder(id = negotiationID, null, null, true)
         blockchainAssets.Service.updateOwnerAddress(pegHash = sendAsset.pegHash, ownerAddress = negotiationID)
-
-        blockchainAccounts.Service.updateDirtyBit(fromAddress, dirtyBit = true)
+        blockchainAccounts.Service.updateDirtyBit(fromAddress, true)
         blockchainTransactionFeedbacks.Service.updateDirtyBit(fromAddress, true)
-
         pushNotifications.sendNotification(masterAccounts.Service.getId(sendAsset.to), constants.Notification.SUCCESS, Seq(response.TxHash))
         pushNotifications.sendNotification(sendAsset.from, constants.Notification.SUCCESS, Seq(response.TxHash))
       }

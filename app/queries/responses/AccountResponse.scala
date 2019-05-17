@@ -1,6 +1,5 @@
 package queries.responses
 
-import models.blockchain
 import play.api.libs.functional.syntax._
 import play.api.libs.json.{JsPath, Json, Reads}
 
@@ -22,9 +21,7 @@ object AccountResponse {
       (JsPath \ "private").read[Boolean]
     ) (Asset.apply _)
 
-  case class Asset(pegHash: String, documentHash: String, assetType: String, assetQuantity: String, assetPrice: String, quantityUnit: String, ownerAddress: String, locked: Boolean, moderator: Boolean) {
-    def applyToBlockchainAsset(ownerAddress: String): blockchain.Asset = blockchain.Asset(pegHash = pegHash, documentHash = documentHash, assetType = assetType, assetQuantity = assetQuantity, assetPrice = assetPrice, quantityUnit = quantityUnit, ownerAddress = ownerAddress, locked = locked, moderator = moderator, false)
-  }
+  case class Asset(pegHash: String, documentHash: String, assetType: String, assetQuantity: String, assetPrice: String, quantityUnit: String, ownerAddress: String, locked: Boolean, moderator: Boolean)
 
   case class Owners(ownerAddress: String, amount: String)
 
@@ -32,9 +29,7 @@ object AccountResponse {
 
   implicit val fiatReads: Reads[Fiat] = Json.reads[Fiat]
 
-  case class Fiat(pegHash: String, transactionID: String, transactionAmount: String, redeemedAmount: String, owners: Option[Seq[Owners]]){
-    def applyToBlockchainFiat(ownerAddress: String): blockchain.Fiat = blockchain.Fiat(pegHash = pegHash, ownerAddress = ownerAddress, transactionID = transactionID, transactionAmount = transactionAmount, redeemedAmount = redeemedAmount, false)
-  }
+  case class Fiat(pegHash: String, transactionID: String, transactionAmount: String, redeemedAmount: String, owners: Option[Seq[Owners]])
 
   case class Value(address: String, coins: Option[Seq[Coins]], assetPegWallet: Option[Seq[Asset]], fiatPegWallet: Option[Seq[Fiat]], account_number: String, sequence: String)
 

@@ -142,19 +142,14 @@ class SendFiats @Inject()(protected val databaseConfigProvider: DatabaseConfigPr
       try {
         Service.updateTxHashStatusResponseCode(ticketID, response.TxHash, status = true, response.Code)
         val sendFiat = Service.getTransaction(ticketID)
-
         val fromAddress = masterAccounts.Service.getAddress(sendFiat.from)
         val negotiationID = blockchainNegotiations.Service.getNegotiationID(buyerAddress = fromAddress, sellerAddress = sendFiat.to, pegHash = sendFiat.pegHash)
         blockchainOrders.Service.insertOrUpdateOrder(id = negotiationID, null, null, true)
-
         blockchainFiats.Service.updateDirtyBit(fromAddress, true)
         blockchainTransactionFeedbacks.Service.updateDirtyBit(fromAddress, true)
-
         val orderResponse = getOrder.Service.get(negotiationID)
-        blockchainFiats.Service.addFiats(orderResponse.value.fiatPegWallet.get.map{responseFiatPeg: AccountResponse.Fiat => responseFiatPeg.applyToBlockchainFiat(negotiationID)})
-
+        blockchainFiats.Service.addFiats(orderResponse.value.fiatPegWallet.get.map{responseFiatPeg: AccountResponse.Fiat => blockchain.Fiat(pegHash = responseFiatPeg.pegHash, ownerAddress = negotiationID, transactionID = responseFiatPeg.transactionID, transactionAmount = responseFiatPeg.transactionAmount, redeemedAmount = responseFiatPeg.redeemedAmount, dirtyBit = false)})
         blockchainAccounts.Service.updateDirtyBit(fromAddress, dirtyBit = true)
-
         pushNotifications.sendNotification(masterAccounts.Service.getId(sendFiat.to), constants.Notification.SUCCESS, Seq(response.TxHash))
         pushNotifications.sendNotification(sendFiat.from, constants.Notification.SUCCESS, Seq(response.TxHash))
       }

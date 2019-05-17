@@ -4,19 +4,17 @@ import akka.actor.ActorSystem
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.{blockchain, master}
-import models.master.Accounts
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
-import transactions.GetResponse
+import transactions.responses.TransactionResponse.Response
 import utilities.PushNotifications
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
-import transactions.responses.TransactionResponse.Response
 
 case class ReleaseAsset(from: String, to: String, pegHash: String, gas: Int,  status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])
 
@@ -138,9 +136,8 @@ class ReleaseAssets @Inject()(protected val databaseConfigProvider: DatabaseConf
       try {
         Service.updateTxHashStatusResponseCode(ticketID, response.TxHash, status = true, response.Code)
         val releaseAsset = Service.getTransaction(ticketID)
-        blockchainAssets.Service.updateDirtyBit(releaseAsset.pegHash, dirtyBit = true)
-        blockchainAccounts.Service.updateDirtyBit(masterAccounts.Service.getAddress(releaseAsset.from), dirtyBit = true)
-
+        blockchainAssets.Service.updateDirtyBit(releaseAsset.pegHash, true)
+        blockchainAccounts.Service.updateDirtyBit(masterAccounts.Service.getAddress(releaseAsset.from), true)
         pushNotifications.sendNotification(masterAccounts.Service.getId(releaseAsset.to), constants.Notification.SUCCESS, Seq(response.TxHash))
         pushNotifications.sendNotification(releaseAsset.from, constants.Notification.SUCCESS, Seq(response.TxHash))
       }

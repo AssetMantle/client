@@ -144,19 +144,15 @@ class ConfirmBuyerBids @Inject()(protected val databaseConfigProvider: DatabaseC
       try {
         Service.updateTxHashStatusResponseCode(ticketID, response.TxHash, status = true, response.Code)
         val confirmBuyerBid = Service.getTransaction(ticketID)
-
         val fromAddress = masterAccounts.Service.getAddress(confirmBuyerBid.from)
         val toID = masterAccounts.Service.getId(confirmBuyerBid.to)
         Thread.sleep(sleepTime)
-
         val negotiationID = blockchainNegotiations.Service.getNegotiationID(buyerAddress = fromAddress, sellerAddress = confirmBuyerBid.to, pegHash = confirmBuyerBid.pegHash)
         val negotiationResponse = if (negotiationID == "") getNegotiation.Service.get(getNegotiationID.Service.get(buyerAccount = confirmBuyerBid.from, sellerAccount = toID, pegHash = confirmBuyerBid.pegHash).negotiationID) else getNegotiation.Service.get(negotiationID)
         blockchainNegotiations.Service.insertOrUpdateNegotiation(id = negotiationResponse.value.negotiationID, buyerAddress = negotiationResponse.value.buyerAddress, sellerAddress = negotiationResponse.value.sellerAddress, assetPegHash = negotiationResponse.value.pegHash, bid = negotiationResponse.value.bid, time = negotiationResponse.value.time, buyerSignature = negotiationResponse.value.buyerSignature, sellerSignature = negotiationResponse.value.sellerSignature, true)
-
         blockchainAccounts.Service.updateDirtyBit(fromAddress, dirtyBit = true)
         blockchainTransactionFeedbacks.Service.updateDirtyBit(fromAddress, true)
         blockchainTransactionFeedbacks.Service.updateDirtyBit(confirmBuyerBid.to, true)
-
         pushNotifications.sendNotification(toID, constants.Notification.SUCCESS, Seq(response.TxHash))
         pushNotifications.sendNotification(confirmBuyerBid.from, constants.Notification.SUCCESS, Seq(response.TxHash))
       }
