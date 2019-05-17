@@ -38,7 +38,6 @@ class ReleaseAssetController @Inject()(messagesControllerComponents: MessagesCon
                   blockchainTransactionReleaseAssets.Utility.onSuccess(ticketID, transactionsReleaseAsset.Service.post(transactionsReleaseAsset.Request(from = username, to = releaseAssetData.address, password = releaseAssetData.password, pegHash = releaseAssetData.pegHash, gas = releaseAssetData.gas)))
                 } catch {
                   case baseException: BaseException => logger.error(constants.Error.BASE_EXCEPTION, baseException)
-                    blockchainTransactionReleaseAssets.Utility.onFailure(ticketID, baseException.message)
                   case blockChainException: BlockChainException => logger.error(blockChainException.message, blockChainException)
                     blockchainTransactionReleaseAssets.Utility.onFailure(ticketID, blockChainException.message)
                 }

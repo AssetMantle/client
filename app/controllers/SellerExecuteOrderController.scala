@@ -3,8 +3,8 @@ package controllers
 import controllers.actions.WithZoneLoginAction
 import exceptions.{BaseException, BlockChainException}
 import javax.inject.{Inject, Singleton}
-import models.{blockchain, blockchainTransaction}
 import models.master.Accounts
+import models.{blockchain, blockchainTransaction}
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
@@ -39,7 +39,6 @@ class SellerExecuteOrderController @Inject()(messagesControllerComponents: Messa
                   blockchainTransactionSellerExecuteOrders.Utility.onSuccess(ticketID, transactionsSellerExecuteOrder.Service.post(transactionsSellerExecuteOrder.Request(from = username, password = sellerExecuteOrderData.password, buyerAddress = sellerExecuteOrderData.buyerAddress, sellerAddress = sellerExecuteOrderData.sellerAddress, awbProofHash = sellerExecuteOrderData.awbProofHash, pegHash = sellerExecuteOrderData.pegHash, gas = sellerExecuteOrderData.gas)))
                 } catch {
                   case baseException: BaseException => logger.error(constants.Error.BASE_EXCEPTION, baseException)
-                    blockchainTransactionSellerExecuteOrders.Utility.onFailure(ticketID, baseException.message)
                   case blockChainException: BlockChainException => logger.error(blockChainException.message, blockChainException)
                     blockchainTransactionSellerExecuteOrders.Utility.onFailure(ticketID, blockChainException.message)
                 }

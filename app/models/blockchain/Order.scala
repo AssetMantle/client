@@ -121,9 +121,6 @@ class Orders @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
         try {
           val orderResponse = getOrder.Service.get(dirtyOrder.id)
           val negotiation = blockchainNegotiations.Service.getNegotiation(dirtyOrder.id)
-
-          Service.insertOrUpdateOrder(dirtyOrder.id, awbProofHash = Option(orderResponse.value.awbProofHash), fiatProofHash = Option(orderResponse.value.fiatProofHash), dirtyBit = false)
-
           if (orderResponse.value.awbProofHash != "" && orderResponse.value.fiatProofHash != "") {
             val sellerAccount = getAccount.Service.get(negotiation.sellerAddress)
             if (sellerAccount.value.assetPegWallet.isDefined) {
@@ -147,6 +144,7 @@ class Orders @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
 
             blockchainFiats.Service.deleteFiatPegWallet(dirtyOrder.id)
           }
+          Service.insertOrUpdateOrder(dirtyOrder.id, awbProofHash = Option(orderResponse.value.awbProofHash), fiatProofHash = Option(orderResponse.value.fiatProofHash), dirtyBit = false)
         }
         catch {
           case blockChainException: BlockChainException => logger.error(blockChainException.message, blockChainException)

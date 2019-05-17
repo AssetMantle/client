@@ -38,7 +38,6 @@ class ChangeSellerBidController @Inject()(messagesControllerComponents: Messages
                   blockchainTransactionChangeSellerBids.Utility.onSuccess(ticketID, transactionsChangeSellerBid.Service.post(transactionsChangeSellerBid.Request(from = username, to = changeSellerBidData.buyerAddress, password = changeSellerBidData.password, bid = changeSellerBidData.bid, time = changeSellerBidData.time, pegHash = changeSellerBidData.pegHash, gas = changeSellerBidData.gas)))
                 } catch {
                   case baseException: BaseException => logger.error(constants.Error.BASE_EXCEPTION, baseException)
-                    blockchainTransactionChangeSellerBids.Utility.onFailure(ticketID, baseException.message)
                   case blockChainException: BlockChainException => logger.error(blockChainException.message, blockChainException)
                     blockchainTransactionChangeSellerBids.Utility.onFailure(ticketID, blockChainException.message)
                 }

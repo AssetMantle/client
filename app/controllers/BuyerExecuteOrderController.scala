@@ -38,7 +38,6 @@ class BuyerExecuteOrderController @Inject()(messagesControllerComponents: Messag
                   blockchainTransactionBuyerExecuteOrders.Utility.onSuccess(ticketID, transactionsBuyerExecuteOrder.Service.post(transactionsBuyerExecuteOrder.Request(from = username, password = buyerExecuteOrderData.password, buyerAddress = buyerExecuteOrderData.buyerAddress, sellerAddress = buyerExecuteOrderData.sellerAddress, fiatProofHash = buyerExecuteOrderData.fiatProofHash, pegHash = buyerExecuteOrderData.pegHash, gas = buyerExecuteOrderData.gas)))
                 } catch {
                   case baseException: BaseException => logger.error(constants.Error.BASE_EXCEPTION, baseException)
-                    blockchainTransactionBuyerExecuteOrders.Utility.onFailure(ticketID, baseException.message)
                   case blockChainException: BlockChainException => logger.error(blockChainException.message, blockChainException)
                     blockchainTransactionBuyerExecuteOrders.Utility.onFailure(ticketID, blockChainException.message)
                 }

@@ -21,7 +21,7 @@ import scala.util.{Failure, Success}
 case class SetSellerFeedback(from: String, to: String, pegHash: String, rating: Int, gas: Int, status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])
 
 @Singleton
-class SetSellerFeedbacks @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, transactionSetSellerFeedback: transactions.SetSellerFeedback, getResponse: GetResponse, actorSystem: ActorSystem, pushNotifications: PushNotifications,masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts, traderFeedbackHistories: TraderFeedbackHistories)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
+class SetSellerFeedbacks @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, transactionSetSellerFeedback: transactions.SetSellerFeedback, getResponse: GetResponse, actorSystem: ActorSystem, pushNotifications: PushNotifications, masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts, traderFeedbackHistories: TraderFeedbackHistories)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_SET_SELLER_FEEDBACK
 
@@ -36,7 +36,7 @@ class SetSellerFeedbacks @Inject()(protected val databaseConfigProvider: Databas
   private[models] val setSellerFeedbackTable = TableQuery[SetSellerFeedbackTable]
 
   private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
-  private val schedulerInterval =  configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
+  private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
   private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
   private val sleepTime = configuration.get[Long]("blockchain.kafka.entityIterator.threadSleep")
 
@@ -180,20 +180,29 @@ class SetSellerFeedbacks @Inject()(protected val databaseConfigProvider: Databas
 
   object Utility {
     def onSuccess(ticketID: String, response: Response): Future[Unit] = Future {
-      Service.updateTxHashStatusResponseCode(ticketID, response.TxHash, status = true, response.Code)
-      val setSellerFeedback = Service.getSetSellerFeedbackOnTicketID(ticketID)
-      val fromAddress = masterAccounts.Service.getAddress(setSellerFeedback.from)
-      traderFeedbackHistories.Service.addTraderFeedbackHistory(setSellerFeedback.to, setSellerFeedback.to, fromAddress, setSellerFeedback.pegHash, setSellerFeedback.rating.toString)
-      blockchainAccounts.Service.updateDirtyBit(fromAddress, dirtyBit = true)
-      pushNotifications.sendNotification(masterAccounts.Service.getId(setSellerFeedback.to), constants.Notification.SUCCESS, Seq(response.TxHash))
-      pushNotifications.sendNotification(setSellerFeedback.from, constants.Notification.SUCCESS, Seq(response.TxHash))
+      try {
+        Service.updateTxHashStatusResponseCode(ticketID, response.TxHash, status = true, response.Code)
+        val setSellerFeedback = Service.getSetSellerFeedbackOnTicketID(ticketID)
+        val fromAddress = masterAccounts.Service.getAddress(setSellerFeedback.from)
+        traderFeedbackHistories.Service.addTraderFeedbackHistory(setSellerFeedback.to, setSellerFeedback.to, fromAddress, setSellerFeedback.pegHash, setSellerFeedback.rating.toString)
+        blockchainAccounts.Service.updateDirtyBit(fromAddress, dirtyBit = true)
+        pushNotifications.sendNotification(masterAccounts.Service.getId(setSellerFeedback.to), constants.Notification.SUCCESS, Seq(response.TxHash))
+        pushNotifications.sendNotification(setSellerFeedback.from, constants.Notification.SUCCESS, Seq(response.TxHash))
+      } catch {
+        case baseException: BaseException => logger.error(constants.Error.BASE_EXCEPTION, baseException)
+          throw new BaseException(constants.Error.PSQL_EXCEPTION)
+      }
     }
 
     def onFailure(ticketID: String, message: String): Future[Unit] = Future {
+      try {
       Service.updateTxHashStatusResponseCode(ticketID, txHash = null, status = false, message)
       val setSellerFeedback = Service.getSetSellerFeedbackOnTicketID(ticketID)
       pushNotifications.sendNotification(masterAccounts.Service.getId(setSellerFeedback.to), constants.Notification.FAILURE, Seq(message))
       pushNotifications.sendNotification(setSellerFeedback.from, constants.Notification.FAILURE, Seq(message))
+      } catch {
+        case baseException: BaseException => logger.error(constants.Error.BASE_EXCEPTION, baseException)
+      }
     }
   }
 

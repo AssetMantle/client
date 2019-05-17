@@ -38,7 +38,6 @@ class ConfirmBuyerBidController @Inject()(messagesControllerComponents: Messages
                   blockchainTransactionConfirmBuyerBids.Utility.onSuccess(ticketID, transactionsConfirmBuyerBid.Service.post(transactionsConfirmBuyerBid.Request(from = username, to = confirmBuyerBidData.sellerAddress, password = confirmBuyerBidData.password, bid = confirmBuyerBidData.bid, time = confirmBuyerBidData.time, pegHash = confirmBuyerBidData.pegHash, gas = confirmBuyerBidData.gas)))
                 } catch {
                   case baseException: BaseException => logger.error(constants.Error.BASE_EXCEPTION, baseException)
-                    blockchainTransactionConfirmBuyerBids.Utility.onFailure(ticketID, baseException.message)
                   case blockChainException: BlockChainException => logger.error(blockChainException.message, blockChainException)
                     blockchainTransactionConfirmBuyerBids.Utility.onFailure(ticketID, blockChainException.message)
                 }

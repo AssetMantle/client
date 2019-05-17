@@ -1,5 +1,7 @@
 package models.blockchainTransaction
 
+import java.net.ConnectException
+
 import akka.actor.ActorSystem
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
@@ -21,7 +23,7 @@ import scala.util.{Failure, Success}
 case class IssueFiat(from: String, to: String, transactionID: String, transactionAmount: Int, gas: Int, status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])
 
 @Singleton
-class IssueFiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, transactionIssueFiat: transactions.IssueFiat, getResponse: GetResponse, actorSystem: ActorSystem, pushNotifications: PushNotifications,masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts, blockchainFiats: blockchain.Fiats, getAccount: queries.GetAccount)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
+class IssueFiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, transactionIssueFiat: transactions.IssueFiat, getResponse: GetResponse, actorSystem: ActorSystem, pushNotifications: PushNotifications, masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts, blockchainFiats: blockchain.Fiats, getAccount: queries.GetAccount)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_ISSUE_FIAT
 
@@ -191,22 +193,33 @@ class IssueFiats @Inject()(protected val databaseConfigProvider: DatabaseConfigP
 
   object Utility {
     def onSuccess(ticketID: String, response: Response): Future[Unit] = Future {
-      Service.updateTxHashStatusResponseCode(ticketID, response.TxHash, status = true, response.Code)
-      val issueFiat = Service.getIssueFiat(ticketID)
-      Thread.sleep(sleepTime)
-      getAccount.Service.get(issueFiat.to).value.fiatPegWallet.getOrElse(Seq(AccountResponse.Fiat(null, null, null, null, null))).foreach(fiatPeg => {
-        blockchainFiats.Service.insertOrUpdateFiat(fiatPeg.pegHash, issueFiat.to, fiatPeg.transactionID, fiatPeg.transactionAmount, fiatPeg.redeemedAmount, dirtyBit = true)
-      })
-      blockchainAccounts.Service.updateDirtyBit(masterAccounts.Service.getAddress(issueFiat.from), dirtyBit = true)
-      pushNotifications.sendNotification(masterAccounts.Service.getId(issueFiat.to), constants.Notification.SUCCESS, Seq(response.TxHash))
-      pushNotifications.sendNotification(issueFiat.from, constants.Notification.SUCCESS, Seq(response.TxHash))
+      try {
+        Service.updateTxHashStatusResponseCode(ticketID, response.TxHash, status = true, response.Code)
+        val issueFiat = Service.getIssueFiat(ticketID)
+        Thread.sleep(sleepTime)
+        getAccount.Service.get(issueFiat.to).value.fiatPegWallet.getOrElse(Seq(AccountResponse.Fiat(null, null, null, null, null))).foreach(fiatPeg => {
+          blockchainFiats.Service.insertOrUpdateFiat(fiatPeg.pegHash, issueFiat.to, fiatPeg.transactionID, fiatPeg.transactionAmount, fiatPeg.redeemedAmount, dirtyBit = true)
+        })
+        blockchainAccounts.Service.updateDirtyBit(masterAccounts.Service.getAddress(issueFiat.from), dirtyBit = true)
+        pushNotifications.sendNotification(masterAccounts.Service.getId(issueFiat.to), constants.Notification.SUCCESS, Seq(response.TxHash))
+        pushNotifications.sendNotification(issueFiat.from, constants.Notification.SUCCESS, Seq(response.TxHash))
+      }
+      catch {
+        case baseException: BaseException => logger.error(constants.Error.BASE_EXCEPTION, baseException)
+          throw new BaseException(constants.Error.PSQL_EXCEPTION)
+        case connectException: ConnectException => logger.error(constants.Error.CONNECT_EXCEPTION, connectException)
+      }
     }
 
     def onFailure(ticketID: String, message: String): Future[Unit] = Future {
-      Service.updateTxHashStatusResponseCode(ticketID, txHash = null, status = false, message)
-      val issueFiat = Service.getIssueFiat(ticketID)
-      pushNotifications.sendNotification(masterAccounts.Service.getId(issueFiat.to), constants.Notification.FAILURE, Seq(message))
-      pushNotifications.sendNotification(issueFiat.from, constants.Notification.FAILURE, Seq(message))
+      try {
+        Service.updateTxHashStatusResponseCode(ticketID, txHash = null, status = false, message)
+        val issueFiat = Service.getIssueFiat(ticketID)
+        pushNotifications.sendNotification(masterAccounts.Service.getId(issueFiat.to), constants.Notification.FAILURE, Seq(message))
+        pushNotifications.sendNotification(issueFiat.from, constants.Notification.FAILURE, Seq(message))
+      } catch {
+        case baseException: BaseException => logger.error(constants.Error.BASE_EXCEPTION, baseException)
+      }
     }
   }
 

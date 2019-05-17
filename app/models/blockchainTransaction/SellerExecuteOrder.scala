@@ -149,7 +149,7 @@ class SellerExecuteOrders @Inject()(protected val databaseConfigProvider: Databa
         pushNotifications.sendNotification(sellerExecuteOrder.from, constants.Notification.SUCCESS, Seq(response.TxHash))
       }
       catch {
-        case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+        case baseException: BaseException => logger.error(constants.Error.BASE_EXCEPTION, baseException)
           throw new BaseException(constants.Error.PSQL_EXCEPTION)
       }
     }

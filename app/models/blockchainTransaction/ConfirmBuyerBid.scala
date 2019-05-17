@@ -1,5 +1,7 @@
 package models.blockchainTransaction
 
+import java.net.ConnectException
+
 import akka.actor.ActorSystem
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
@@ -10,8 +12,8 @@ import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
 import queries.{GetNegotiation, GetNegotiationID}
 import slick.jdbc.JdbcProfile
-import utilities.PushNotifications
 import transactions.responses.TransactionResponse.Response
+import utilities.PushNotifications
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
@@ -155,10 +157,10 @@ class ConfirmBuyerBids @Inject()(protected val databaseConfigProvider: DatabaseC
         blockchainTransactionFeedbacks.Service.updateDirtyBit(confirmBuyerBid.to, true)
         pushNotifications.sendNotification(toID, constants.Notification.SUCCESS, Seq(response.TxHash))
         pushNotifications.sendNotification(confirmBuyerBid.from, constants.Notification.SUCCESS, Seq(response.TxHash))
-      }
-      catch {
-        case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+      } catch {
+        case baseException: BaseException => logger.error(constants.Error.BASE_EXCEPTION, baseException)
           throw new BaseException(constants.Error.PSQL_EXCEPTION)
+        case connectException: ConnectException => logger.error(constants.Error.CONNECT_EXCEPTION, connectException)
       }
     }
 

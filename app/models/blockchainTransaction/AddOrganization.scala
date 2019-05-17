@@ -174,21 +174,30 @@ class AddOrganizations @Inject()(protected val databaseConfigProvider: DatabaseC
 
   object Utility {
     def onSuccess(ticketID: String, response: Response): Future[Unit] = Future {
-      Service.updateTxHashStatusResponseCode(ticketID, response.TxHash, status = true, response.Code)
-      val addOrganization = Service.getAddOrganization(ticketID)
-      blockchainOrganizations.Service.addOrganization(addOrganization.organizationID, addOrganization.to, dirtyBit = true)
-      masterOrganizations.Service.updateStatus(addOrganization.organizationID, status = true)
-      masterAccounts.Service.updateUserType(masterOrganizations.Service.getAccountId(addOrganization.organizationID), constants.User.ORGANIZATION)
-      blockchainAccounts.Service.updateDirtyBit(masterAccounts.Service.getAddress(addOrganization.from), dirtyBit = true)
-      pushNotifications.sendNotification(masterAccounts.Service.getId(addOrganization.to), constants.Notification.SUCCESS, Seq(response.TxHash))
-      pushNotifications.sendNotification(addOrganization.from, constants.Notification.SUCCESS, Seq(response.TxHash))
+      try {
+        Service.updateTxHashStatusResponseCode(ticketID, response.TxHash, status = true, response.Code)
+        val addOrganization = Service.getAddOrganization(ticketID)
+        blockchainOrganizations.Service.addOrganization(addOrganization.organizationID, addOrganization.to, dirtyBit = true)
+        masterOrganizations.Service.updateStatus(addOrganization.organizationID, status = true)
+        masterAccounts.Service.updateUserType(masterOrganizations.Service.getAccountId(addOrganization.organizationID), constants.User.ORGANIZATION)
+        blockchainAccounts.Service.updateDirtyBit(masterAccounts.Service.getAddress(addOrganization.from), dirtyBit = true)
+        pushNotifications.sendNotification(masterAccounts.Service.getId(addOrganization.to), constants.Notification.SUCCESS, Seq(response.TxHash))
+        pushNotifications.sendNotification(addOrganization.from, constants.Notification.SUCCESS, Seq(response.TxHash))
+      } catch {
+        case baseException: BaseException => logger.error(constants.Error.BASE_EXCEPTION, baseException)
+          throw new BaseException(constants.Error.PSQL_EXCEPTION)
+      }
     }
 
     def onFailure(ticketID: String, message: String): Future[Unit] = Future {
-      Service.updateTxHashStatusResponseCode(ticketID, txHash = null, status = false, message)
-      val addOrganization = Service.getAddOrganization(ticketID)
-      pushNotifications.sendNotification(masterAccounts.Service.getId(addOrganization.to), constants.Notification.FAILURE, Seq(message))
-      pushNotifications.sendNotification(addOrganization.from, constants.Notification.FAILURE, Seq(message))
+      try {
+        Service.updateTxHashStatusResponseCode(ticketID, txHash = null, status = false, message)
+        val addOrganization = Service.getAddOrganization(ticketID)
+        pushNotifications.sendNotification(masterAccounts.Service.getId(addOrganization.to), constants.Notification.FAILURE, Seq(message))
+        pushNotifications.sendNotification(addOrganization.from, constants.Notification.FAILURE, Seq(message))
+      } catch {
+        case baseException: BaseException => logger.error(constants.Error.BASE_EXCEPTION, baseException)
+      }
     }
   }
 

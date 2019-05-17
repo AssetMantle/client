@@ -1,5 +1,7 @@
 package models.blockchainTransaction
 
+import java.net.ConnectException
+
 import akka.actor.ActorSystem
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
@@ -155,10 +157,10 @@ class IssueAssets @Inject()(protected val databaseConfigProvider: DatabaseConfig
         blockchainAccounts.Service.updateDirtyBit(masterAccounts.Service.getAddress(issueAsset.from), dirtyBit = true)
         pushNotifications.sendNotification(masterAccounts.Service.getId(issueAsset.to), constants.Notification.SUCCESS, Seq(response.TxHash))
         pushNotifications.sendNotification(issueAsset.from, constants.Notification.SUCCESS, Seq(response.TxHash))
-      }
-      catch {
-        case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+      } catch {
+        case baseException: BaseException => logger.error(constants.Error.BASE_EXCEPTION, baseException)
           throw new BaseException(constants.Error.PSQL_EXCEPTION)
+        case connectException: ConnectException => logger.error(constants.Error.CONNECT_EXCEPTION, connectException)
       }
     }
 

@@ -8,7 +8,6 @@ import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.{Configuration, Logger}
 import queries.GetAccount
-import queries.responses.AccountResponse
 import slick.jdbc.JdbcProfile
 import utilities.PushNotifications
 
@@ -208,11 +207,14 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
       Thread.sleep(sleepTime)
       for (dirtyAsset <- dirtyAssets) {
         try {
-          val assetPegWallet = getAccount.Service.get(dirtyAsset.ownerAddress).value.assetPegWallet.getOrElse(Seq(AccountResponse.Asset(null, null, null, null, null, null, null, false, false)))
+          val assetPegWallet = getAccount.Service.get(dirtyAsset.ownerAddress).value.assetPegWallet.getOrElse(throw new BaseException(constants.Error.NO_RESPONSE))
           assetPegWallet.foreach(assetPeg => if (assetPegWallet.map(_.pegHash) contains dirtyAsset.pegHash) Service.insertOrUpdateAsset(pegHash = assetPeg.pegHash, documentHash = assetPeg.documentHash, assetType = assetPeg.assetType, assetPrice = assetPeg.assetPrice, assetQuantity = assetPeg.assetQuantity, quantityUnit = assetPeg.quantityUnit, ownerAddress = dirtyAsset.ownerAddress, locked = assetPeg.locked, moderator = assetPeg.moderator, dirtyBit = false) else Service.deleteAsset(dirtyAsset.pegHash))
         }
         catch {
           case baseException: BaseException => logger.info(constants.Error.BASE_EXCEPTION, baseException)
+            if (baseException.message == module + "." + constants.Error.NO_RESPONSE) {
+              Service.deleteAssetPegWallet(dirtyAsset.ownerAddress)
+            }
           case blockChainException: BlockChainException => logger.error(blockChainException.message, blockChainException)
         }
       }

@@ -203,6 +203,10 @@ class SendCoins @Inject()(protected val databaseConfigProvider: DatabaseConfigPr
         pushNotifications.sendNotification(toAccount.id, constants.Notification.SUCCESS, Seq(response.TxHash))
         pushNotifications.sendNotification(sendCoin.from, constants.Notification.SUCCESS, Seq(response.TxHash))
       }
+      catch {
+        case baseException: BaseException => logger.error(constants.Error.BASE_EXCEPTION, baseException)
+          throw new BaseException(constants.Error.PSQL_EXCEPTION)
+      }
     }
 
     def onFailure(ticketID: String, message: String): Future[Unit] = Future {

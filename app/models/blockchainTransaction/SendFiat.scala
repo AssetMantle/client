@@ -1,5 +1,7 @@
 package models.blockchainTransaction
 
+import java.net.ConnectException
+
 import akka.actor.ActorSystem
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
@@ -154,8 +156,9 @@ class SendFiats @Inject()(protected val databaseConfigProvider: DatabaseConfigPr
         pushNotifications.sendNotification(sendFiat.from, constants.Notification.SUCCESS, Seq(response.TxHash))
       }
       catch {
-        case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+        case baseException: BaseException => logger.error(constants.Error.BASE_EXCEPTION, baseException)
           throw new BaseException(constants.Error.PSQL_EXCEPTION)
+        case connectException: ConnectException => logger.error(constants.Error.CONNECT_EXCEPTION, connectException)
       }
     }
 

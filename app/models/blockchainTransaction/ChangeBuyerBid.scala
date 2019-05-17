@@ -1,5 +1,7 @@
 package models.blockchainTransaction
 
+import java.net.ConnectException
+
 import akka.actor.ActorSystem
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
@@ -143,7 +145,6 @@ class ChangeBuyerBids @Inject()(protected val databaseConfigProvider: DatabaseCo
       try {
         Service.updateTxHashStatusResponseCode(ticketID, response.TxHash, status = true, response.Code)
         val changeBuyerBid = Service.getTransaction(ticketID)
-
         val fromAddress = masterAccounts.Service.getAddress(changeBuyerBid.from)
         val toID = masterAccounts.Service.getId(changeBuyerBid.to)
         Thread.sleep(sleepTime)
@@ -155,10 +156,10 @@ class ChangeBuyerBids @Inject()(protected val databaseConfigProvider: DatabaseCo
         blockchainTransactionFeedbacks.Service.updateDirtyBit(changeBuyerBid.to, true)
         pushNotifications.sendNotification(toID, constants.Notification.SUCCESS, Seq(response.TxHash))
         pushNotifications.sendNotification(changeBuyerBid.from, constants.Notification.SUCCESS, Seq(response.TxHash))
-      }
-      catch {
-        case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+      } catch {
+        case baseException: BaseException => logger.error(constants.Error.BASE_EXCEPTION, baseException)
           throw new BaseException(constants.Error.PSQL_EXCEPTION)
+        case connectException: ConnectException => logger.error(constants.Error.CONNECT_EXCEPTION, connectException)
       }
     }
 

@@ -95,7 +95,6 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
                     blockchainTransactionIssueAssets.Utility.onSuccess(ticketID, transactionsIssueAsset.Service.post(transactionsIssueAsset.Request(from = username, to = toAddress, password = issueAssetData.password, documentHash = issueAssetData.documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.assetPrice, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.assetQuantity, gas = issueAssetData.gas, moderator = false)))
                   } catch {
                     case baseException: BaseException => logger.error(constants.Error.BASE_EXCEPTION, baseException)
-                      blockchainTransactionIssueAssets.Utility.onFailure(ticketID, baseException.message)
                     case blockChainException: BlockChainException => logger.error(blockChainException.message, blockChainException)
                       blockchainTransactionIssueAssets.Utility.onFailure(ticketID, blockChainException.message)
                   }
