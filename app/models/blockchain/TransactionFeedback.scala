@@ -223,7 +223,7 @@ class TransactionFeedbacks @Inject()(protected val databaseConfigProvider: Datab
     }
   }
 
-  //Scheduler- iterates accounts with dirty tags
+
   actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
     Utility.dirtyEntityUpdater()
   }

@@ -197,7 +197,7 @@ class SetSellerFeedbacks @Inject()(protected val databaseConfigProvider: Databas
     }
   }
 
-  //scheduler iterates with rows with null as status
+
   if (kafkaEnabled) {
     actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
       utilities.TicketUpdater.start_(Service.getTicketIDsOnStatus, transactionSetSellerFeedback.Service.getTxFromWSResponse, Utility.onSuccess, Utility.onFailure)

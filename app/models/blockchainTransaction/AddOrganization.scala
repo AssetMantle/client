@@ -192,7 +192,7 @@ class AddOrganizations @Inject()(protected val databaseConfigProvider: DatabaseC
     }
   }
 
-  //scheduler iterates with rows with null as status
+
   if (kafkaEnabled) {
     actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
       utilities.TicketUpdater.start_(Service.getTicketIDsOnStatus, transactionAddOrganization.Service.getTxFromWSResponse, Utility.onSuccess, Utility.onFailure)

@@ -166,7 +166,7 @@ class RedeemAssets @Inject()(protected val databaseConfigProvider: DatabaseConfi
     }
   }
 
-  //scheduler iterates with rows with null as status
+
   if (kafkaEnabled) {
     actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
       utilities.TicketUpdater.start_(Service.getTicketIDsOnStatus, transactionRedeemAsset.Service.getTxFromWSResponse, Utility.onSuccess, Utility.onFailure)

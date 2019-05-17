@@ -169,7 +169,7 @@ class SellerExecuteOrders @Inject()(protected val databaseConfigProvider: Databa
     }
   }
 
-  //scheduler iterates with rows with null as status
+
   if (kafkaEnabled) {
     actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
       utilities.TicketUpdater.start_(Service.getTicketIDsOnStatus, transactionSellerExecuteOrder.Service.getTxFromWSResponse, Utility.onSuccess, Utility.onFailure)

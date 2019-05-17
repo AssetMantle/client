@@ -31,8 +31,6 @@ class IssueAsset @Inject()(wsClient: WSClient)(implicit configuration: Configura
 
   private def action(request: Request)(implicit executionContext: ExecutionContext): Future[Response] = wsClient.url(url).post(Json.toJson(request)).map { response => utilities.JSON.getResponseFromJson[Response](response) }
 
-  //  private implicit val requestWrites: OWrites[Request] = Json.writes[Request]
-
   private implicit val requestWrites: Writes[Request] = new Writes[Request] {
     override def writes(request: Request) = Json.obj(
       "from" -> request.from,

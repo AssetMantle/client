@@ -196,7 +196,7 @@ class SetACLs @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
     }
   }
 
-  //scheduler iterates with rows with null as status
+
   if (kafkaEnabled) {
     actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
       utilities.TicketUpdater.start_(Service.getTicketIDsOnStatus, transactionSetACL.Service.getTxFromWSResponse, Utility.onSuccess, Utility.onFailure)

@@ -219,7 +219,7 @@ class SendCoins @Inject()(protected val databaseConfigProvider: DatabaseConfigPr
     }
   }
 
-  //scheduler iterates with rows with null as status
+
   if (kafkaEnabled) {
     actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
       utilities.TicketUpdater.start_(Service.getTicketIDsOnStatus, transactionSendCoin.Service.getTxFromWSResponse, Utility.onSuccess, Utility.onFailure)
