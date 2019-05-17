@@ -18,10 +18,10 @@ import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class IssueAsset(from: String, to: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, moderator: Boolean, gas: Int,  status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])
+case class IssueAsset(from: String, to: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, moderator: Boolean, gas: Int, status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])
 
 @Singleton
-class IssueAssets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, getAccount: GetAccount, blockchainAssets: blockchain.Assets, transactionIssueAsset: transactions.IssueAsset, actorSystem: ActorSystem, pushNotifications: PushNotifications,masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
+class IssueAssets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, getAccount: GetAccount, blockchainAssets: blockchain.Assets, transactionIssueAsset: transactions.IssueAsset, actorSystem: ActorSystem, pushNotifications: PushNotifications, masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_ISSUE_ASSET
 
@@ -34,6 +34,10 @@ class IssueAssets @Inject()(protected val databaseConfigProvider: DatabaseConfig
   import databaseConfig.profile.api._
 
   private[models] val issueAssetTable = TableQuery[IssueAssetTable]
+  private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
+  private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
+  private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
+  private val sleepTime = configuration.get[Long]("blockchain.kafka.entityIterator.threadSleep")
 
   private def add(issueAsset: IssueAsset)(implicit executionContext: ExecutionContext): Future[String] = db.run((issueAssetTable returning issueAssetTable.map(_.ticketID) += issueAsset).asTry).map {
     case Success(result) => result
@@ -128,7 +132,7 @@ class IssueAssets @Inject()(protected val databaseConfigProvider: DatabaseConfig
 
   object Service {
 
-    def addIssueAsset(from: String, to: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, moderator: Boolean, gas: Int,  status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String]) (implicit executionContext: ExecutionContext): String = Await.result(add(IssueAsset(from = from , to = to, documentHash = documentHash, assetType = assetType, assetPrice = assetPrice, quantityUnit = quantityUnit, assetQuantity = assetQuantity, gas = gas, status = status, txHash = txHash, ticketID = ticketID, responseCode = responseCode, moderator = moderator)), Duration.Inf)
+    def addIssueAsset(from: String, to: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, moderator: Boolean, gas: Int, status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])(implicit executionContext: ExecutionContext): String = Await.result(add(IssueAsset(from = from, to = to, documentHash = documentHash, assetType = assetType, assetPrice = assetPrice, quantityUnit = quantityUnit, assetQuantity = assetQuantity, gas = gas, status = status, txHash = txHash, ticketID = ticketID, responseCode = responseCode, moderator = moderator)), Duration.Inf)
 
     def updateTxHashStatusResponseCode(ticketID: String, txHash: String, status: Boolean, responseCode: String): Int = Await.result(updateTxHashStatusAndResponseOnTicketID(ticketID, txHash, status, responseCode), Duration.Inf)
 
@@ -140,11 +144,6 @@ class IssueAssets @Inject()(protected val databaseConfigProvider: DatabaseConfig
 
   }
 
-  private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
-  private val schedulerInterval =  configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
-  private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
-  private val sleepTime = configuration.get[Long]("blockchain.kafka.entityIterator.threadSleep")
-
   object Utility {
     def onSuccess(ticketID: String, response: Response): Future[Unit] = Future {
       try {
@@ -153,10 +152,8 @@ class IssueAssets @Inject()(protected val databaseConfigProvider: DatabaseConfig
 
         Thread.sleep(sleepTime)
         val responseAccount = getAccount.Service.get(issueAsset.to)
-        if (responseAccount.value.assetPegWallet.isDefined) {
-          blockchainAssets.Service.addAssets(responseAccount.value.assetPegWallet.get.map{responseAsset: AccountResponse.Asset => responseAsset.applyToBlockchainAsset(issueAsset.to)}.diff(blockchainAssets.Service.getAssetPegWallet(issueAsset.to)))
-        }
 
+        blockchainAssets.Service.addAssets(responseAccount.value.assetPegWallet.getOrElse(Seq(AccountResponse.Asset(null,null,null,null,null,null,null,false, false))).map { responseAsset: AccountResponse.Asset => responseAsset.applyToBlockchainAsset(issueAsset.to) }.diff(blockchainAssets.Service.getAssetPegWallet(issueAsset.to)))
         blockchainAccounts.Service.updateDirtyBit(masterAccounts.Service.getAddress(issueAsset.from), dirtyBit = true)
 
         pushNotifications.sendNotification(masterAccounts.Service.getId(issueAsset.to), constants.Notification.SUCCESS, Seq(response.TxHash))
