@@ -20,7 +20,7 @@ import scala.util.{Failure, Success}
 case class ConfirmSellerBid(from: String, to: String, bid: Int, time: Int, pegHash: String, gas: Int,  status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])
 
 @Singleton
-class ConfirmSellerBids @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, getNegotiationID: GetNegotiationID, getNegotiation: GetNegotiation, blockchainNegotiations: blockchain.Negotiations, transactionConfirmSellerBid: transactions.ConfirmSellerBid, actorSystem: ActorSystem, pushNotifications: PushNotifications,masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext)  {
+class ConfirmSellerBids @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, blockchainTransactionFeedbacks: blockchain.TransactionFeedbacks, getNegotiationID: GetNegotiationID, getNegotiation: GetNegotiation, blockchainNegotiations: blockchain.Negotiations, transactionConfirmSellerBid: transactions.ConfirmSellerBid, actorSystem: ActorSystem, pushNotifications: PushNotifications,masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext)  {
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_CONFIRM_SELLER_BID
 
@@ -153,6 +153,8 @@ class ConfirmSellerBids @Inject()(protected val databaseConfigProvider: Database
         blockchainNegotiations.Service.insertOrUpdateNegotiation(id = negotiationResponse.value.negotiationID, buyerAddress = negotiationResponse.value.buyerAddress, sellerAddress = negotiationResponse.value.sellerAddress, assetPegHash = negotiationResponse.value.pegHash, bid = negotiationResponse.value.bid, time = negotiationResponse.value.time, buyerSignature = negotiationResponse.value.buyerSignature, sellerSignature = negotiationResponse.value.sellerSignature, true)
 
         blockchainAccounts.Service.updateDirtyBit(fromAddress, dirtyBit = true)
+        blockchainTransactionFeedbacks.Service.updateDirtyBit(fromAddress, true)
+        blockchainTransactionFeedbacks.Service.updateDirtyBit(confirmSellerBid.to, true)
 
         pushNotifications.sendNotification(toID, constants.Notification.SUCCESS, Seq(response.TxHash))
         pushNotifications.sendNotification(confirmSellerBid.from, constants.Notification.SUCCESS, Seq(response.TxHash))

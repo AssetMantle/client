@@ -11,6 +11,7 @@ import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
 import transactions.GetResponse
+import queries.responses.TraderReputationResponse
 import transactions.responses.TransactionResponse.Response
 import utilities.PushNotifications
 
@@ -21,7 +22,7 @@ import scala.util.{Failure, Success}
 case class SetACL(from: String, aclAddress: String, organizationID: String, zoneID: String, aclHash: String, status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])
 
 @Singleton
-class SetACLs @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, transactionSetACL: transactions.SetACL, getResponse: GetResponse, actorSystem: ActorSystem, blockchainAccounts: blockchain.Accounts, blockchainAclHashes: blockchain.ACLHashes, blockchainAclAccounts: blockchain.ACLAccounts, pushNotifications: PushNotifications,masterAccounts: master.Accounts)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
+class SetACLs @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, blockchainTransactionFeedbacks: blockchain.TransactionFeedbacks, transactionSetACL: transactions.SetACL, getResponse: GetResponse, actorSystem: ActorSystem, blockchainAccounts: blockchain.Accounts, blockchainAclHashes: blockchain.ACLHashes, blockchainAclAccounts: blockchain.ACLAccounts, pushNotifications: PushNotifications,masterAccounts: master.Accounts)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_SET_ACL
 
@@ -182,6 +183,7 @@ class SetACLs @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
       blockchainAclAccounts.Service.addOrUpdateACLAccount(setACL.aclAddress, setACL.zoneID, setACL.organizationID, blockchainAclHashes.Service.getACL(setACL.aclHash), dirtyBit = true)
       masterAccounts.Service.updateUserTypeOnAddress(setACL.aclAddress, constants.User.TRADER)
       blockchainAccounts.Service.updateDirtyBit(masterAccounts.Service.getAddress(setACL.from), dirtyBit = true)
+      blockchainTransactionFeedbacks.Service.addTransactionFeedback(setACL.aclAddress, TraderReputationResponse.TransactionFeedbackResponse("0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"), false)
       pushNotifications.sendNotification(masterAccounts.Service.getId(setACL.aclAddress), constants.Notification.SUCCESS, Seq(response.TxHash))
       pushNotifications.sendNotification(setACL.from, constants.Notification.SUCCESS, Seq(response.TxHash))
     }

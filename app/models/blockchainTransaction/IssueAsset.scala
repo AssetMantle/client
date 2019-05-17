@@ -153,7 +153,7 @@ class IssueAssets @Inject()(protected val databaseConfigProvider: DatabaseConfig
         Thread.sleep(sleepTime)
         val responseAccount = getAccount.Service.get(issueAsset.to)
 
-        blockchainAssets.Service.addAssets(responseAccount.value.assetPegWallet.getOrElse(Seq(AccountResponse.Asset(null,null,null,null,null,null,null,false, false))).map { responseAsset: AccountResponse.Asset => responseAsset.applyToBlockchainAsset(issueAsset.to) }.diff(blockchainAssets.Service.getAssetPegWallet(issueAsset.to)))
+        responseAccount.value.assetPegWallet.getOrElse(Seq(AccountResponse.Asset(null,null,null,null,null,null,null,false, false))).foreach(asset => blockchainAssets.Service.insertOrUpdateAsset(pegHash = asset.pegHash, documentHash = asset.documentHash, assetType = asset.assetType, assetPrice = asset.assetPrice, assetQuantity = asset.assetQuantity, quantityUnit = asset.quantityUnit, locked = asset.locked, moderator = asset.moderator, ownerAddress = issueAsset.to, dirtyBit = true))
         blockchainAccounts.Service.updateDirtyBit(masterAccounts.Service.getAddress(issueAsset.from), dirtyBit = true)
 
         pushNotifications.sendNotification(masterAccounts.Service.getId(issueAsset.to), constants.Notification.SUCCESS, Seq(response.TxHash))

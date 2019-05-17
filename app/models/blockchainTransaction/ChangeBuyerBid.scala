@@ -20,7 +20,7 @@ import scala.util.{Failure, Success}
 case class ChangeBuyerBid(from: String, to: String, bid: Int, time: Int, pegHash: String, gas: Int,  status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])
 
 @Singleton
-class ChangeBuyerBids @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, getNegotiation: GetNegotiation, getNegotiationID: GetNegotiationID, blockchainNegotiations: blockchain.Negotiations, transactionChangeBuyerBid: transactions.ChangeBuyerBid, actorSystem: ActorSystem, pushNotifications: PushNotifications,masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext)  {
+class ChangeBuyerBids @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, blockchainTransactionFeedbacks: blockchain.TransactionFeedbacks, getNegotiation: GetNegotiation, getNegotiationID: GetNegotiationID, blockchainNegotiations: blockchain.Negotiations, transactionChangeBuyerBid: transactions.ChangeBuyerBid, actorSystem: ActorSystem, pushNotifications: PushNotifications,masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext)  {
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_CHANGE_BUYER_BID
 
@@ -153,6 +153,8 @@ class ChangeBuyerBids @Inject()(protected val databaseConfigProvider: DatabaseCo
         blockchainNegotiations.Service.insertOrUpdateNegotiation(id = negotiationResponse.value.negotiationID, buyerAddress = negotiationResponse.value.buyerAddress, sellerAddress = negotiationResponse.value.sellerAddress, assetPegHash = negotiationResponse.value.pegHash, bid = negotiationResponse.value.bid, time = negotiationResponse.value.time, buyerSignature = negotiationResponse.value.buyerSignature, sellerSignature = negotiationResponse.value.sellerSignature, true)
 
         blockchainAccounts.Service.updateDirtyBit(fromAddress, dirtyBit = true)
+        blockchainTransactionFeedbacks.Service.updateDirtyBit(fromAddress, true)
+        blockchainTransactionFeedbacks.Service.updateDirtyBit(changeBuyerBid.to, true)
 
         pushNotifications.sendNotification(toID, constants.Notification.SUCCESS, Seq(response.TxHash))
         pushNotifications.sendNotification(changeBuyerBid.from, constants.Notification.SUCCESS, Seq(response.TxHash))

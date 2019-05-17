@@ -9,7 +9,6 @@ import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
 import queries.GetAccount
-import queries.responses.AccountResponse
 import slick.jdbc.JdbcProfile
 import transactions.responses.TransactionResponse.Response
 import utilities.PushNotifications
@@ -142,15 +141,7 @@ class RedeemAssets @Inject()(protected val databaseConfigProvider: DatabaseConfi
 
         Thread.sleep(sleepTime)
 
-        val fromAddress = masterAccounts.Service.getAddress(redeemAsset.from)
-        val responseAccount = getAccount.Service.get(fromAddress)
-
-        if (responseAccount.value.assetPegWallet.isDefined) {
-          blockchainAssets.Service.deleteAssets(blockchainAssets.Service.getAssetPegWallet(fromAddress).map(_.pegHash).diff(responseAccount.value.assetPegWallet.get.map(_.pegHash)))
-        } else {
-          blockchainAssets.Service.deleteAssetPegWallet(fromAddress)
-        }
-
+        blockchainAssets.Service.updateDirtyBit(redeemAsset.pegHash, true)
         blockchainAccounts.Service.updateDirtyBit(masterAccounts.Service.getAddress(redeemAsset.from), dirtyBit = true)
 
         pushNotifications.sendNotification(masterAccounts.Service.getId(redeemAsset.to), constants.Notification.SUCCESS, Seq(response.TxHash))

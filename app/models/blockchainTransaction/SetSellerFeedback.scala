@@ -36,8 +36,9 @@ class SetSellerFeedbacks @Inject()(protected val databaseConfigProvider: Databas
   private[models] val setSellerFeedbackTable = TableQuery[SetSellerFeedbackTable]
 
   private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
-  private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
+  private val schedulerInterval =  configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
   private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
+  private val sleepTime = configuration.get[Long]("blockchain.kafka.entityIterator.threadSleep")
 
 
   private def add(setSellerFeedback: SetSellerFeedback)(implicit executionContext: ExecutionContext): Future[String] = db.run((setSellerFeedbackTable returning setSellerFeedbackTable.map(_.ticketID) += setSellerFeedback).asTry).map {
