@@ -1,12 +1,14 @@
 package models.blockchain
 
 import akka.actor.ActorSystem
-import exceptions.BaseException
+import exceptions.{BaseException, BlockChainException}
 import javax.inject.{Inject, Singleton}
 import models.master
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.{Configuration, Logger}
+import queries.GetAccount
+import queries.responses.AccountResponse
 import slick.jdbc.JdbcProfile
 import utilities.PushNotifications
 
@@ -17,7 +19,7 @@ import scala.util.{Failure, Success}
 case class Asset(pegHash: String, documentHash: String, assetType: String, assetQuantity: String, assetPrice: String, quantityUnit: String, ownerAddress: String, locked: Boolean, moderator: Boolean, dirtyBit: Boolean)
 
 @Singleton
-class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, masterAccounts: master.Accounts, actorSystem: ActorSystem, implicit val pushNotifications: PushNotifications)(implicit executionContext: ExecutionContext, configuration: Configuration) {
+class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, getAccount: GetAccount, masterAccounts: master.Accounts, actorSystem: ActorSystem, implicit val pushNotifications: PushNotifications)(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -30,6 +32,9 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
   import databaseConfig.profile.api._
 
   private[models] val assetTable = TableQuery[AssetTable]
+  private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
+  private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
+  private val sleepTime = configuration.get[Long]("blockchain.kafka.entityIterator.threadSleep")
 
   private def add(asset: Asset)(implicit executionContext: ExecutionContext): Future[String] = db.run((assetTable returning assetTable.map(_.pegHash) += asset).asTry).map {
     case Success(result) => result
@@ -169,7 +174,7 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
 
   }
 
-  object Service{
+  object Service {
 
     def addAsset(pegHash: String, documentHash: String, assetType: String, assetQuantity: String, assetPrice: String, quantityUnit: String, ownerAddress: String, moderator: Boolean, dirtyBit: Boolean)(implicit executionContext: ExecutionContext): String = Await.result(add(Asset(pegHash = pegHash, documentHash = documentHash, assetType = assetType, assetPrice = assetPrice, assetQuantity = assetQuantity, quantityUnit = quantityUnit, ownerAddress = ownerAddress, moderator = moderator, locked = true, dirtyBit = false)), Duration.Inf)
 
@@ -197,20 +202,19 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
 
   }
 
-  private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
-  private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
-  private val sleepTime = configuration.get[Long]("blockchain.kafka.entityIterator.threadSleep")
-
   object Utility {
     def dirtyEntityUpdater(): Future[Unit] = Future {
-      try {
-        val dirtyAssets = Service.getDirtyAccounts(true)
-        Thread.sleep(sleepTime)
-        for (dirtyAsset <- dirtyAssets) {
-          Service.updateLockedAndDirtyBit(dirtyAsset.pegHash, false, false)
+      val dirtyAssets = Service.getDirtyAccounts(true)
+      Thread.sleep(sleepTime)
+      for (dirtyAsset <- dirtyAssets) {
+        try {
+          val assetPegWallet = getAccount.Service.get(dirtyAsset.ownerAddress).value.assetPegWallet.getOrElse(Seq(AccountResponse.Asset(null, null, null, null, null, null, null, null, null)))
+          assetPegWallet.foreach(assetPeg => if (assetPegWallet.map(_.pegHash) contains dirtyAsset.pegHash) Service.insertOrUpdateAsset(pegHash = assetPeg.pegHash, documentHash = assetPeg.documentHash, assetType = assetPeg.assetType, assetPrice = assetPeg.assetPrice, assetQuantity = assetPeg.assetQuantity, quantityUnit = assetPeg.quantityUnit, ownerAddress = dirtyAsset.ownerAddress, locked = assetPeg.locked, moderator = assetPeg.moderator, dirtyBit = false))
         }
-      } catch {
-        case baseException: BaseException => logger.info(constants.Error.BASE_EXCEPTION, baseException)
+        catch {
+          case baseException: BaseException => logger.info(constants.Error.BASE_EXCEPTION, baseException)
+          case blockChainException: BlockChainException => logger.error(blockChainException.message, blockChainException)
+        }
       }
     }
   }

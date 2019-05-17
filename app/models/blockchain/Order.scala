@@ -126,12 +126,24 @@ class Orders @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
           if (orderResponse.value.awbProofHash != "" && orderResponse.value.fiatProofHash != "") {
             Service.insertOrUpdateOrder(dirtyOrder.id, awbProofHash = Option(orderResponse.value.awbProofHash), fiatProofHash = Option(orderResponse.value.fiatProofHash), executed = true, dirtyBit = false)
 
-            blockchainAssets.Service.updateOwnerAddress(pegHash = negotiation.assetPegHash, ownerAddress = negotiation.buyerAddress)
-
-            getAccount.Service.get(negotiation.sellerAddress).value.fiatPegWallet.getOrElse(Seq(AccountResponse.Fiat(null, null, null, null, null))).foreach(fiatWallet => {
-              blockchainFiats.Service.insertOrUpdateFiat(fiatWallet.pegHash, negotiation.sellerAddress, fiatWallet.transactionID, fiatWallet.transactionAmount, fiatWallet.redeemedAmount, dirtyBit = true)
+            val sellerAccount = getAccount.Service.get(negotiation.sellerAddress)
+            if (sellerAccount.value.assetPegWallet.isDefined) {
+              sellerAccount.value.assetPegWallet.get.map{asset: AccountResponse.Asset => asset.applyToBlockchainAsset(negotiation.sellerAddress)}.diff(blockchainAssets.Service.getAssetPegWallet(negotiation.sellerAddress)).foreach(asset => blockchainAssets.Service.insertOrUpdateAsset(pegHash = asset.pegHash, documentHash = asset.documentHash, assetType = asset.assetType, assetQuantity = asset.assetQuantity, quantityUnit = asset.quantityUnit, assetPrice = asset.assetPrice, ownerAddress = negotiation.sellerAddress, moderator = asset.moderator, locked = asset.locked, dirtyBit = false))
+            }
+            sellerAccount.value.fiatPegWallet.getOrElse(Seq(AccountResponse.Fiat(null, null, null, null, null))).foreach(fiatPeg => {
+              blockchainFiats.Service.insertOrUpdateFiat(fiatPeg.pegHash, negotiation.sellerAddress, fiatPeg.transactionID, fiatPeg.transactionAmount, fiatPeg.redeemedAmount, dirtyBit = true)
             })
 
+
+            val buyerAccount = getAccount.Service.get(negotiation.buyerAddress)
+            if (buyerAccount.value.assetPegWallet.isDefined) {
+              buyerAccount.value.assetPegWallet.get.map{asset: AccountResponse.Asset => asset.applyToBlockchainAsset(negotiation.buyerAddress)}.diff(blockchainAssets.Service.getAssetPegWallet(negotiation.buyerAddress)).foreach(asset => blockchainAssets.Service.insertOrUpdateAsset(pegHash = asset.pegHash, documentHash = asset.documentHash, assetType = asset.assetType, assetQuantity = asset.assetQuantity, quantityUnit = asset.quantityUnit, assetPrice = asset.assetPrice, ownerAddress = negotiation.buyerAddress, moderator = asset.moderator, locked = asset.locked, dirtyBit = false))
+            }
+            buyerAccount.value.fiatPegWallet.getOrElse(Seq(AccountResponse.Fiat(null, null, null, null, null))).foreach(fiatPeg => {
+              blockchainFiats.Service.insertOrUpdateFiat(fiatPeg.pegHash, negotiation.buyerAddress, fiatPeg.transactionID, fiatPeg.transactionAmount, fiatPeg.redeemedAmount, dirtyBit = true)
+            })
+
+            blockchainFiats.Service.deleteFiatPegWallet(dirtyOrder.id)
           } else {
             Service.insertOrUpdateOrder(dirtyOrder.id, awbProofHash = Option(orderResponse.value.awbProofHash), fiatProofHash = Option(orderResponse.value.fiatProofHash), executed = false, dirtyBit = false)
           }

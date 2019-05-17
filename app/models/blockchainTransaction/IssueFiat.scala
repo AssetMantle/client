@@ -195,8 +195,8 @@ class IssueFiats @Inject()(protected val databaseConfigProvider: DatabaseConfigP
       val issueFiat = Service.getIssueFiat(ticketID)
 
       Thread.sleep(sleepTime)
-      getAccount.Service.get(issueFiat.to).value.fiatPegWallet.getOrElse(Seq(AccountResponse.Fiat(null, null, null, null, null))).foreach(fiatWallet => {
-        blockchainFiats.Service.insertOrUpdateFiat(fiatWallet.pegHash, issueFiat.to, fiatWallet.transactionID, fiatWallet.transactionAmount, fiatWallet.redeemedAmount, dirtyBit = true)
+      getAccount.Service.get(issueFiat.to).value.fiatPegWallet.getOrElse(Seq(AccountResponse.Fiat(null, null, null, null, null))).foreach(fiatPeg => {
+        blockchainFiats.Service.insertOrUpdateFiat(fiatPeg.pegHash, issueFiat.to, fiatPeg.transactionID, fiatPeg.transactionAmount, fiatPeg.redeemedAmount, dirtyBit = true)
       })
 
       blockchainAccounts.Service.updateDirtyBit(masterAccounts.Service.getAddress(issueFiat.from), dirtyBit = true)
