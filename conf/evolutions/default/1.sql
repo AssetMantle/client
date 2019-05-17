@@ -112,7 +112,6 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Order_BC"
   "id"            VARCHAR NOT NULL,
   "fiatProofHash" VARCHAR,
   "awbProofHash"  VARCHAR,
-  "executed"      BOOLEAN NOT NULL,
   "dirtyBit"      BOOLEAN NOT NULL,
   PRIMARY KEY ("id")
 );

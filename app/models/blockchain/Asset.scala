@@ -208,7 +208,7 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
       Thread.sleep(sleepTime)
       for (dirtyAsset <- dirtyAssets) {
         try {
-          val assetPegWallet = getAccount.Service.get(dirtyAsset.ownerAddress).value.assetPegWallet.getOrElse(Seq(AccountResponse.Asset(null, null, null, null, null, null, null, null, null)))
+          val assetPegWallet = getAccount.Service.get(dirtyAsset.ownerAddress).value.assetPegWallet.getOrElse(Seq(AccountResponse.Asset(null, null, null, null, null, null, null, false, false)))
           assetPegWallet.foreach(assetPeg => if (assetPegWallet.map(_.pegHash) contains dirtyAsset.pegHash) Service.insertOrUpdateAsset(pegHash = assetPeg.pegHash, documentHash = assetPeg.documentHash, assetType = assetPeg.assetType, assetPrice = assetPeg.assetPrice, assetQuantity = assetPeg.assetQuantity, quantityUnit = assetPeg.quantityUnit, ownerAddress = dirtyAsset.ownerAddress, locked = assetPeg.locked, moderator = assetPeg.moderator, dirtyBit = false))
         }
         catch {

@@ -14,7 +14,7 @@ import scala.concurrent.duration.{Duration, _}
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Order(id: String, fiatProofHash: Option[String], awbProofHash: Option[String], executed: Boolean, dirtyBit: Boolean)
+case class Order(id: String, fiatProofHash: Option[String], awbProofHash: Option[String], dirtyBit: Boolean)
 
 @Singleton
 class Orders @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, getAccount: queries.GetAccount, blockchainNegotiations: Negotiations, blockchainAssets: Assets, blockchainFiats: Fiats, getOrder: queries.GetOrder, actorSystem: ActorSystem, implicit val pushNotifications: PushNotifications)(implicit executionContext: ExecutionContext, configuration: Configuration) {
@@ -90,7 +90,7 @@ class Orders @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
 
   private[models] class OrderTable(tag: Tag) extends Table[Order](tag, "Order_BC") {
 
-    def * = (id, fiatProofHash.?, awbProofHash.?, executed, dirtyBit) <> (Order.tupled, Order.unapply)
+    def * = (id, fiatProofHash.?, awbProofHash.?, dirtyBit) <> (Order.tupled, Order.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
@@ -98,17 +98,15 @@ class Orders @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
 
     def awbProofHash = column[String]("awbProofHash")
 
-    def executed = column[Boolean]("executed")
-
     def dirtyBit = column[Boolean]("dirtyBit")
 
   }
 
   object Service {
 
-    def addOrder(id: String, fiatProofHash: Option[String], awbProofHash: Option[String], executed: Boolean)(implicit executionContext: ExecutionContext): String = Await.result(add(Order(id = id, fiatProofHash = fiatProofHash, awbProofHash = awbProofHash, executed = executed, dirtyBit = false)), Duration.Inf)
+    def addOrder(id: String, fiatProofHash: Option[String], awbProofHash: Option[String])(implicit executionContext: ExecutionContext): String = Await.result(add(Order(id = id, fiatProofHash = fiatProofHash, awbProofHash = awbProofHash, dirtyBit = false)), Duration.Inf)
 
-    def insertOrUpdateOrder(id: String, fiatProofHash: Option[String], awbProofHash: Option[String], executed: Boolean, dirtyBit: Boolean)(implicit executionContext: ExecutionContext): Int = Await.result(insertOrUpdate(Order(id = id, fiatProofHash = fiatProofHash, awbProofHash = awbProofHash, executed = executed, dirtyBit = dirtyBit)), Duration.Inf)
+    def insertOrUpdateOrder(id: String, fiatProofHash: Option[String], awbProofHash: Option[String], dirtyBit: Boolean)(implicit executionContext: ExecutionContext): Int = Await.result(insertOrUpdate(Order(id = id, fiatProofHash = fiatProofHash, awbProofHash = awbProofHash, dirtyBit = dirtyBit)), Duration.Inf)
 
     def getDirtyOrders(dirtyBit: Boolean): Seq[Order] = Await.result(getOrdersByDirtyBit(dirtyBit), Duration.Inf)
 
@@ -123,9 +121,10 @@ class Orders @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
         try {
           val orderResponse = getOrder.Service.get(dirtyOrder.id)
           val negotiation = blockchainNegotiations.Service.getNegotiation(dirtyOrder.id)
-          if (orderResponse.value.awbProofHash != "" && orderResponse.value.fiatProofHash != "") {
-            Service.insertOrUpdateOrder(dirtyOrder.id, awbProofHash = Option(orderResponse.value.awbProofHash), fiatProofHash = Option(orderResponse.value.fiatProofHash), executed = true, dirtyBit = false)
 
+          Service.insertOrUpdateOrder(dirtyOrder.id, awbProofHash = Option(orderResponse.value.awbProofHash), fiatProofHash = Option(orderResponse.value.fiatProofHash), dirtyBit = false)
+
+          if (orderResponse.value.awbProofHash != "" && orderResponse.value.fiatProofHash != "") {
             val sellerAccount = getAccount.Service.get(negotiation.sellerAddress)
             if (sellerAccount.value.assetPegWallet.isDefined) {
               sellerAccount.value.assetPegWallet.get.map{asset: AccountResponse.Asset => asset.applyToBlockchainAsset(negotiation.sellerAddress)}.diff(blockchainAssets.Service.getAssetPegWallet(negotiation.sellerAddress)).foreach(asset => blockchainAssets.Service.insertOrUpdateAsset(pegHash = asset.pegHash, documentHash = asset.documentHash, assetType = asset.assetType, assetQuantity = asset.assetQuantity, quantityUnit = asset.quantityUnit, assetPrice = asset.assetPrice, ownerAddress = negotiation.sellerAddress, moderator = asset.moderator, locked = asset.locked, dirtyBit = false))
@@ -133,7 +132,6 @@ class Orders @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
             sellerAccount.value.fiatPegWallet.getOrElse(Seq(AccountResponse.Fiat(null, null, null, null, null))).foreach(fiatPeg => {
               blockchainFiats.Service.insertOrUpdateFiat(fiatPeg.pegHash, negotiation.sellerAddress, fiatPeg.transactionID, fiatPeg.transactionAmount, fiatPeg.redeemedAmount, dirtyBit = true)
             })
-
 
             val buyerAccount = getAccount.Service.get(negotiation.buyerAddress)
             if (buyerAccount.value.assetPegWallet.isDefined) {
@@ -144,10 +142,7 @@ class Orders @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
             })
 
             blockchainFiats.Service.deleteFiatPegWallet(dirtyOrder.id)
-          } else {
-            Service.insertOrUpdateOrder(dirtyOrder.id, awbProofHash = Option(orderResponse.value.awbProofHash), fiatProofHash = Option(orderResponse.value.fiatProofHash), executed = false, dirtyBit = false)
           }
-
         }
         catch {
           case blockChainException: BlockChainException => logger.error(blockChainException.message, blockChainException)
