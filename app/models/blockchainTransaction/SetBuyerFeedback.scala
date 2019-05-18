@@ -207,7 +207,7 @@ class SetBuyerFeedbacks @Inject()(protected val databaseConfigProvider: Database
 
   if (kafkaEnabled) {
     actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
-      utilities.TicketUpdater.start_(Service.getTicketIDsOnStatus, transactionSetBuyerFeedback.Service.getTxFromWSResponse, Utility.onSuccess, Utility.onFailure)
+      utilities.TicketUpdater.start(Service.getTicketIDsOnStatus, transactionSetBuyerFeedback.Service.getTxFromWSResponse, Utility.onSuccess, Utility.onFailure)
     }
   }
 

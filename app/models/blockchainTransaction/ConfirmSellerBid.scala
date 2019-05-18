@@ -178,7 +178,7 @@ class ConfirmSellerBids @Inject()(protected val databaseConfigProvider: Database
 
   if (kafkaEnabled) {
     actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
-      utilities.TicketUpdater.start_(Service.getTicketIDsOnStatus, transactionConfirmSellerBid.Service.getTxFromWSResponse, Utility.onSuccess, Utility.onFailure)
+      utilities.TicketUpdater.start(Service.getTicketIDsOnStatus, transactionConfirmSellerBid.Service.getTxFromWSResponse, Utility.onSuccess, Utility.onFailure)
     }
   }
 }

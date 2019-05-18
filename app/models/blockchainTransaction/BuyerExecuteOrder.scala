@@ -167,7 +167,7 @@ class BuyerExecuteOrders @Inject()(protected val databaseConfigProvider: Databas
 
   if (kafkaEnabled) {
     actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
-      utilities.TicketUpdater.start_(Service.getTicketIDsOnStatus, transactionBuyerExecuteOrder.Service.getTxFromWSResponse, Utility.onSuccess, Utility.onFailure)
+      utilities.TicketUpdater.start(Service.getTicketIDsOnStatus, transactionBuyerExecuteOrder.Service.getTxFromWSResponse, Utility.onSuccess, Utility.onFailure)
     }
   }
 }

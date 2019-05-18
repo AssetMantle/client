@@ -208,7 +208,7 @@ class SetACLs @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
 
   if (kafkaEnabled) {
     actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
-      utilities.TicketUpdater.start_(Service.getTicketIDsOnStatus, transactionSetACL.Service.getTxFromWSResponse, Utility.onSuccess, Utility.onFailure)
+      utilities.TicketUpdater.start(Service.getTicketIDsOnStatus, transactionSetACL.Service.getTxFromWSResponse, Utility.onSuccess, Utility.onFailure)
     }
   }
 }

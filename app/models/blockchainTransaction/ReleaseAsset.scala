@@ -162,7 +162,7 @@ class ReleaseAssets @Inject()(protected val databaseConfigProvider: DatabaseConf
 
   if (kafkaEnabled) {
     actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
-      utilities.TicketUpdater.start_(Service.getTicketIDsOnStatus, transactionReleaseAsset.Service.getTxFromWSResponse, Utility.onSuccess, Utility.onFailure)
+      utilities.TicketUpdater.start(Service.getTicketIDsOnStatus, transactionReleaseAsset.Service.getTxFromWSResponse, Utility.onSuccess, Utility.onFailure)
     }
   }
 }

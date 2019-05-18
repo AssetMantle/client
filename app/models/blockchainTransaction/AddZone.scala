@@ -202,7 +202,7 @@ class AddZones @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   if (kafkaEnabled) {
     actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
-      utilities.TicketUpdater.start_(Service.getTicketIDsOnStatus, transactionAddZone.Service.getTxFromWSResponse, Utility.onSuccess, Utility.onFailure)
+      utilities.TicketUpdater.start(Service.getTicketIDsOnStatus, transactionAddZone.Service.getTxFromWSResponse, Utility.onSuccess, Utility.onFailure)
     }
   }
 }

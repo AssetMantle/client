@@ -179,7 +179,7 @@ class IssueAssets @Inject()(protected val databaseConfigProvider: DatabaseConfig
 
   if (kafkaEnabled) {
     actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
-      utilities.TicketUpdater.start_(Service.getTicketIDsOnStatus, transactionIssueAsset.Service.getTxFromWSResponse, Utility.onSuccess, Utility.onFailure)
+      utilities.TicketUpdater.start(Service.getTicketIDsOnStatus, transactionIssueAsset.Service.getTxFromWSResponse, Utility.onSuccess, Utility.onFailure)
     }
   }
 }

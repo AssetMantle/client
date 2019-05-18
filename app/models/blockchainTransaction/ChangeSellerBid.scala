@@ -177,7 +177,7 @@ class ChangeSellerBids @Inject()(protected val databaseConfigProvider: DatabaseC
 
   if (kafkaEnabled) {
     actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
-      utilities.TicketUpdater.start_(Service.getTicketIDsOnStatus, transactionChangeSellerBid.Service.getTxFromWSResponse, Utility.onSuccess, Utility.onFailure)
+      utilities.TicketUpdater.start(Service.getTicketIDsOnStatus, transactionChangeSellerBid.Service.getTxFromWSResponse, Utility.onSuccess, Utility.onFailure)
     }
   }
 }
