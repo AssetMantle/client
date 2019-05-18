@@ -1,8 +1,8 @@
 @
 import views.html.component.blockchain._
-@(success: String = "", failure: String = "")(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
+@(failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
 
-@common(Messages(constants.Form.INDEX), success, failure) {
+    @common(Messages(constants.Form.INDEX), failures, warnings, successes, infos) {
     <a onclick="getForm(jsRoutes.controllers.LoginController.loginForm())">@Messages(constants.Form.LOGIN)</a>
     <a onclick="getForm(jsRoutes.controllers.LogoutController.logoutForm())">@Messages(constants.Form.LOGOUT)</a>
     <a onclick="getForm(jsRoutes.controllers.SignUpController.signUpForm())">@Messages(constants.Form.SIGNUP)</a>

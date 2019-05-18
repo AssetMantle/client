@@ -1,4 +1,4 @@
-@(title: String, success: String = "", failure: String = "")(content: Html)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@(title: String, failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(content: Html)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -14,19 +14,41 @@
         <script src="@routes.Assets.versioned("javascripts/pushNotification.js")" type="text/javascript"></script>
     </head>
     <body>
-        <ul>
-            <li>
-                <a>@flash.get(constants.Flash.SUCCESS).getOrElse("")</a></li>
-            <li>
-                <a>@flash.get(constants.Flash.FAILURE).getOrElse("")</a></li>
-            <li>
-                <a>@success</a></li>
-            <li>
-                <a>@failure</a></li>
-            <li>
+        <div class="pageContent">
+            <div class="stickyBar">
+                @for(failure <- failures) {
+                    <div class="alert failure" onclick="getForm(@failure.action)">
+                        <span class="closeButton">x</span>
+                        <strong>@Messages(constants.Form.FAILURE)</strong>
+                        @Messages(failure.message)
+                    </div>
+                }
+                @for(warning <- warnings) {
+                    <div class="alert warning" onclick="getForm(@warning.action)">
+                        <span class="closeButton">x</span>
+                        <strong>@Messages(constants.Form.WARNING)</strong>
+                        @Messages(warning.message)
+                    </div>
+                }
+
+                @for(success <- successes) {
+                    <div class="alert success" onclick="getForm(@success.action)">
+                        <span class="closeButton">x</span>
+                        <strong>@Messages(constants.Form.SUCCESS)</strong>
+                        @Messages(success.message)
+                    </div>
+                }
+                @for(info <- infos) {
+                    <div class="alert information" onclick="getForm(@info.action)">
+                        <span class="closeButton">x</span>
+                        <strong>@Messages(constants.Form.INFORMATION)</strong>
+                        @Messages(info.message)
+                    </div>
+                }
+            </div>
             @content
-            </li>
-        </ul>
+        </div>
+
         <div class="modal" id="commonModal">
             <div class="modal-content " id="commonModalContent"></div>
         </div>
