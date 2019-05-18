@@ -20,7 +20,7 @@ import scala.util.{Failure, Success}
 case class AddZone(from: String, to: String, zoneID: String, status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])
 
 @Singleton
-class AddZones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, transactionAddZone: transactions.AddZone, getResponse: GetResponse, actorSystem: ActorSystem, implicit val pushNotifications: PushNotifications, implicit val masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts, blockchainZones: models.blockchain.Zones, masterZones: master.Zones)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
+class AddZones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, transactionAddZone: transactions.AddZone, getResponse: GetResponse, actorSystem: ActorSystem, pushNotifications: PushNotifications, masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts, blockchainZones: models.blockchain.Zones, masterZones: master.Zones)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_ADD_ZONE
 
@@ -172,28 +172,37 @@ class AddZones @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   object Utility {
     def onSuccess(ticketID: String, response: Response): Future[Unit] = Future {
-      Service.updateTxHashStatusResponseCode(ticketID, response.TxHash, status = true, response.Code)
-      val addZone = Service.getAddZone(ticketID)
-      blockchainZones.Service.addZone(addZone.zoneID, addZone.to, dirtyBit = true)
-      masterZones.Service.updateStatus(addZone.zoneID, status = true)
-      masterAccounts.Service.updateUserTypeOnAddress(addZone.to, constants.User.ZONE)
-      blockchainAccounts.Service.updateDirtyBit(masterAccounts.Service.getAddress(addZone.from), dirtyBit = true)
-      pushNotifications.sendNotification(masterAccounts.Service.getId(addZone.to), constants.Notification.SUCCESS, Seq(response.TxHash))
-      pushNotifications.sendNotification(addZone.from, constants.Notification.SUCCESS, Seq(response.TxHash))
+      try {
+        Service.updateTxHashStatusResponseCode(ticketID, response.TxHash, status = true, response.Code)
+        val addZone = Service.getAddZone(ticketID)
+        blockchainZones.Service.addZone(addZone.zoneID, addZone.to, dirtyBit = true)
+        masterZones.Service.updateStatus(addZone.zoneID, status = true)
+        masterAccounts.Service.updateUserTypeOnAddress(addZone.to, constants.User.ZONE)
+        blockchainAccounts.Service.updateDirtyBit(masterAccounts.Service.getAddress(addZone.from), dirtyBit = true)
+        pushNotifications.sendNotification(masterAccounts.Service.getId(addZone.to), constants.Notification.SUCCESS, Seq(response.TxHash))
+        pushNotifications.sendNotification(addZone.from, constants.Notification.SUCCESS, Seq(response.TxHash))
+      } catch {
+        case baseException: BaseException => logger.error(constants.Error.BASE_EXCEPTION, baseException)
+          throw new BaseException(constants.Error.PSQL_EXCEPTION)
+      }
     }
 
     def onFailure(ticketID: String, message: String): Future[Unit] = Future {
-      Service.updateTxHashStatusResponseCode(ticketID, txHash = null, status = false, message)
-      val addZone = Service.getAddZone(ticketID)
-      pushNotifications.sendNotification(masterAccounts.Service.getId(addZone.to), constants.Notification.FAILURE, Seq(message))
-      pushNotifications.sendNotification(addZone.from, constants.Notification.FAILURE, Seq(message))
+      try {
+        Service.updateTxHashStatusResponseCode(ticketID, txHash = null, status = false, message)
+        val addZone = Service.getAddZone(ticketID)
+        pushNotifications.sendNotification(masterAccounts.Service.getId(addZone.to), constants.Notification.FAILURE, Seq(message))
+        pushNotifications.sendNotification(addZone.from, constants.Notification.FAILURE, Seq(message))
+      } catch {
+        case baseException: BaseException => logger.error(constants.Error.BASE_EXCEPTION, baseException)
+      }
     }
   }
 
-  //scheduler iterates with rows with null as status
+
   if (kafkaEnabled) {
     actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
-      utilities.TicketUpdater.start_(Service.getTicketIDsOnStatus, transactionAddZone.Service.getTxFromWSResponse, Utility.onSuccess, Utility.onFailure)
+      utilities.TicketUpdater.start(Service.getTicketIDsOnStatus, transactionAddZone.Service.getTxFromWSResponse, Utility.onSuccess, Utility.onFailure)
     }
   }
 }

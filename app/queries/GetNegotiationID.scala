@@ -6,15 +6,15 @@ import exceptions.BlockChainException
 import javax.inject.{Inject, Singleton}
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
-import queries.responses.ACLResponse.Response
+import queries.responses.NegotiationIdResponse.Response
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 
 @Singleton
-class GetACL @Inject()(wsClient: WSClient)(implicit configuration: Configuration, executionContext: ExecutionContext) {
+class GetNegotiationID @Inject()()(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
-  private implicit val module: String = constants.Module.TRANSACTIONS_GET_ACL
+  private implicit val module: String = constants.Module.TRANSACTIONS_GET_ACCOUNT
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -22,7 +22,7 @@ class GetACL @Inject()(wsClient: WSClient)(implicit configuration: Configuration
 
   private val port = configuration.get[String]("blockchain.main.restPort")
 
-  private val path = "acl"
+  private val path = "negotiationID"
 
   private val url = ip + ":" + port + "/" + path + "/"
 
@@ -30,10 +30,11 @@ class GetACL @Inject()(wsClient: WSClient)(implicit configuration: Configuration
 
   object Service {
 
-    def get(address: String)(implicit executionContext: ExecutionContext): Response = try {
-      Await.result(action(address), Duration.Inf)
+    def get(buyerAccount: String, sellerAccount: String, pegHash: String)(implicit executionContext: ExecutionContext): Response = try {
+      Await.result(action(buyerAccount + "/" + sellerAccount + "/" + pegHash), Duration.Inf)
     } catch {
-      case connectException: ConnectException => logger.error(constants.Error.CONNECT_EXCEPTION, connectException)
+      case connectException: ConnectException =>
+        logger.error(constants.Error.CONNECT_EXCEPTION, connectException)
         throw new BlockChainException(constants.Error.CONNECT_EXCEPTION)
     }
   }

@@ -21,7 +21,7 @@ import scala.util.{Failure, Success}
 case class SetBuyerFeedback(from: String, to: String, pegHash: String, rating: Int, gas: Int, status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])
 
 @Singleton
-class SetBuyerFeedbacks @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, transactionSetBuyerFeedback: transactions.SetBuyerFeedback, getResponse: GetResponse, actorSystem: ActorSystem, implicit val pushNotifications: PushNotifications, implicit val masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts, traderFeedbackHistories: TraderFeedbackHistories)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
+class SetBuyerFeedbacks @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, transactionSetBuyerFeedback: transactions.SetBuyerFeedback, getResponse: GetResponse, actorSystem: ActorSystem, pushNotifications: PushNotifications, masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts, traderFeedbackHistories: TraderFeedbackHistories)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_SET_BUYER_FEEDBACK
 
@@ -178,27 +178,36 @@ class SetBuyerFeedbacks @Inject()(protected val databaseConfigProvider: Database
 
   object Utility {
     def onSuccess(ticketID: String, response: Response): Future[Unit] = Future {
-      Service.updateTxHashStatusResponseCode(ticketID, response.TxHash, status = true, response.Code)
-      val setBuyerFeedback = Service.getSetBuyerFeedbackOnTicketID(ticketID)
-      val fromAddress = masterAccounts.Service.getAddress(setBuyerFeedback.from)
-      traderFeedbackHistories.Service.addTraderFeedbackHistory(setBuyerFeedback.to, fromAddress, setBuyerFeedback.to, setBuyerFeedback.pegHash, setBuyerFeedback.rating.toString)
-      blockchainAccounts.Service.updateDirtyBit(fromAddress, dirtyBit = true)
-      pushNotifications.sendNotification(masterAccounts.Service.getId(setBuyerFeedback.to), constants.Notification.SUCCESS, Seq(response.TxHash))
-      pushNotifications.sendNotification(setBuyerFeedback.from, constants.Notification.SUCCESS, Seq(response.TxHash))
+      try {
+        Service.updateTxHashStatusResponseCode(ticketID, response.TxHash, status = true, response.Code)
+        val setBuyerFeedback = Service.getSetBuyerFeedbackOnTicketID(ticketID)
+        val fromAddress = masterAccounts.Service.getAddress(setBuyerFeedback.from)
+        traderFeedbackHistories.Service.addTraderFeedbackHistory(setBuyerFeedback.to, fromAddress, setBuyerFeedback.to, setBuyerFeedback.pegHash, setBuyerFeedback.rating.toString)
+        blockchainAccounts.Service.updateDirtyBit(fromAddress, dirtyBit = true)
+        pushNotifications.sendNotification(masterAccounts.Service.getId(setBuyerFeedback.to), constants.Notification.SUCCESS, Seq(response.TxHash))
+        pushNotifications.sendNotification(setBuyerFeedback.from, constants.Notification.SUCCESS, Seq(response.TxHash))
+      } catch {
+        case baseException: BaseException => logger.error(constants.Error.BASE_EXCEPTION, baseException)
+          throw new BaseException(constants.Error.PSQL_EXCEPTION)
+      }
     }
 
     def onFailure(ticketID: String, message: String): Future[Unit] = Future {
+      try {
       Service.updateTxHashStatusResponseCode(ticketID, txHash = null, status = false, message)
       val setBuyerFeedback = Service.getSetBuyerFeedbackOnTicketID(ticketID)
       pushNotifications.sendNotification(masterAccounts.Service.getId(setBuyerFeedback.to), constants.Notification.FAILURE, Seq(message))
       pushNotifications.sendNotification(setBuyerFeedback.from, constants.Notification.FAILURE, Seq(message))
+      } catch {
+        case baseException: BaseException => logger.error(constants.Error.BASE_EXCEPTION, baseException)
+      }
     }
   }
 
-  //scheduler iterates with rows with null as status
+
   if (kafkaEnabled) {
     actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
-      utilities.TicketUpdater.start_(Service.getTicketIDsOnStatus, transactionSetBuyerFeedback.Service.getTxFromWSResponse, Utility.onSuccess, Utility.onFailure)
+      utilities.TicketUpdater.start(Service.getTicketIDsOnStatus, transactionSetBuyerFeedback.Service.getTxFromWSResponse, Utility.onSuccess, Utility.onFailure)
     }
   }
 

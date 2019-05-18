@@ -20,7 +20,7 @@ import scala.util.{Failure, Success}
 case class AddOrganization(from: String, to: String, organizationID: String, zoneID: String, status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])
 
 @Singleton
-class AddOrganizations @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, transactionAddOrganization: transactions.AddOrganization, getResponse: GetResponse, actorSystem: ActorSystem, implicit val pushNotifications: PushNotifications, implicit val masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts, blockchainOrganizations: blockchain.Organizations, masterOrganizations: master.Organizations)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
+class AddOrganizations @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, transactionAddOrganization: transactions.AddOrganization, getResponse: GetResponse, actorSystem: ActorSystem, pushNotifications: PushNotifications, masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts, blockchainOrganizations: blockchain.Organizations, masterOrganizations: master.Organizations)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_ADD_ORGANIZATION
 
@@ -174,28 +174,37 @@ class AddOrganizations @Inject()(protected val databaseConfigProvider: DatabaseC
 
   object Utility {
     def onSuccess(ticketID: String, response: Response): Future[Unit] = Future {
-      Service.updateTxHashStatusResponseCode(ticketID, response.TxHash, status = true, response.Code)
-      val addOrganization = Service.getAddOrganization(ticketID)
-      blockchainOrganizations.Service.addOrganization(addOrganization.organizationID, addOrganization.to, dirtyBit = true)
-      masterOrganizations.Service.updateStatus(addOrganization.organizationID, status = true)
-      masterAccounts.Service.updateUserType(masterOrganizations.Service.getAccountId(addOrganization.organizationID), constants.User.ORGANIZATION)
-      blockchainAccounts.Service.updateDirtyBit(masterAccounts.Service.getAddress(addOrganization.from), dirtyBit = true)
-      pushNotifications.sendNotification(masterAccounts.Service.getId(addOrganization.to), constants.Notification.SUCCESS, Seq(response.TxHash))
-      pushNotifications.sendNotification(addOrganization.from, constants.Notification.SUCCESS, Seq(response.TxHash))
+      try {
+        Service.updateTxHashStatusResponseCode(ticketID, response.TxHash, status = true, response.Code)
+        val addOrganization = Service.getAddOrganization(ticketID)
+        blockchainOrganizations.Service.addOrganization(addOrganization.organizationID, addOrganization.to, dirtyBit = true)
+        masterOrganizations.Service.updateStatus(addOrganization.organizationID, status = true)
+        masterAccounts.Service.updateUserType(masterOrganizations.Service.getAccountId(addOrganization.organizationID), constants.User.ORGANIZATION)
+        blockchainAccounts.Service.updateDirtyBit(masterAccounts.Service.getAddress(addOrganization.from), dirtyBit = true)
+        pushNotifications.sendNotification(masterAccounts.Service.getId(addOrganization.to), constants.Notification.SUCCESS, Seq(response.TxHash))
+        pushNotifications.sendNotification(addOrganization.from, constants.Notification.SUCCESS, Seq(response.TxHash))
+      } catch {
+        case baseException: BaseException => logger.error(constants.Error.BASE_EXCEPTION, baseException)
+          throw new BaseException(constants.Error.PSQL_EXCEPTION)
+      }
     }
 
     def onFailure(ticketID: String, message: String): Future[Unit] = Future {
-      Service.updateTxHashStatusResponseCode(ticketID, txHash = null, status = false, message)
-      val addOrganization = Service.getAddOrganization(ticketID)
-      pushNotifications.sendNotification(masterAccounts.Service.getId(addOrganization.to), constants.Notification.FAILURE, Seq(message))
-      pushNotifications.sendNotification(addOrganization.from, constants.Notification.FAILURE, Seq(message))
+      try {
+        Service.updateTxHashStatusResponseCode(ticketID, txHash = null, status = false, message)
+        val addOrganization = Service.getAddOrganization(ticketID)
+        pushNotifications.sendNotification(masterAccounts.Service.getId(addOrganization.to), constants.Notification.FAILURE, Seq(message))
+        pushNotifications.sendNotification(addOrganization.from, constants.Notification.FAILURE, Seq(message))
+      } catch {
+        case baseException: BaseException => logger.error(constants.Error.BASE_EXCEPTION, baseException)
+      }
     }
   }
 
-  //scheduler iterates with rows with null as status
+
   if (kafkaEnabled) {
     actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
-      utilities.TicketUpdater.start_(Service.getTicketIDsOnStatus, transactionAddOrganization.Service.getTxFromWSResponse, Utility.onSuccess, Utility.onFailure)
+      utilities.TicketUpdater.start(Service.getTicketIDsOnStatus, transactionAddOrganization.Service.getTxFromWSResponse, Utility.onSuccess, Utility.onFailure)
     }
   }
 }

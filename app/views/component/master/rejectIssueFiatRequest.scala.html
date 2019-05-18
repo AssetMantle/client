@@ -3,16 +3,15 @@
 
 @(rejectIssueFiatRequestForm: Form[RejectIssueFiatRequest.Data], requestID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @form(action = routes.IssueFiatController.rejectIssueFiatRequest, 'onkeypress -> "validateForm(event,this)") {
-  @CSRF.formField
-  @inputText(rejectIssueFiatRequestForm(constants.Form.REQUEST_ID).copy(value = Some(requestID)), '_label -> Messages(constants.Form.REQUEST_ID))
-
-  @if(rejectIssueFiatRequestForm.hasGlobalErrors) {
-    <ul>
-    @for(error <- rejectIssueFiatRequestForm.globalErrors) {
-      <li>@error.format</li>
+    @CSRF.formField
+    @inputText(rejectIssueFiatRequestForm(constants.Form.REQUEST_ID).copy(value = Some(requestID)), '_label -> Messages(constants.Form.REQUEST_ID))
+    @inputText(rejectIssueFiatRequestForm(constants.Form.COMMENT), '_label -> Messages(constants.Form.COMMENT))
+    @if(rejectIssueFiatRequestForm.hasGlobalErrors) {
+        <ul>
+        @for(error <- rejectIssueFiatRequestForm.globalErrors) {
+            <li>@error.format</li>
+        }
+        </ul>
     }
-    </ul>
-  }
-  <button type="button" onclick="submitForm(this)">@Messages(constants.Form.REJECT_ISSUE_FIAT_REQUEST)</button>
+    <button type="submit">@Messages(constants.Form.REJECT_ISSUE_FIAT_REQUEST)</button>
 }
-

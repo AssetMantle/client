@@ -3,18 +3,18 @@
 
 @(sendAssetForm: Form[SendAsset.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @form(action = routes.SendAssetController.sendAsset, 'onkeypress -> "validateForm(event,this)") {
-  @CSRF.formField
-  @inputText(sendAssetForm(constants.Form.TO), '_label -> Messages(constants.Form.TO))
-  @inputText(sendAssetForm(constants.Form.PEG_HASH), '_label -> Messages(constants.Form.PEG_HASH))
-  @inputText(sendAssetForm(constants.Form.GAS), '_label -> Messages(constants.Form.GAS))
-  @inputPassword(sendAssetForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD))
+    @CSRF.formField
+    @inputText(sendAssetForm(constants.Form.BUYER_ADDRESS), '_label -> Messages(constants.Form.BUYER_ADDRESS))
+    @inputText(sendAssetForm(constants.Form.PEG_HASH), '_label -> Messages(constants.Form.PEG_HASH))
+    @inputText(sendAssetForm(constants.Form.GAS), '_label -> Messages(constants.Form.GAS))
+    @inputPassword(sendAssetForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD))
 
-  @if(sendAssetForm.hasGlobalErrors) {
-    <ul>
-    @for(error <- sendAssetForm.globalErrors) {
-      <li>@error.format</li>
+    @if(sendAssetForm.hasGlobalErrors) {
+        <ul>
+        @for(error <- sendAssetForm.globalErrors) {
+            <li>@error.format</li>
+        }
+        </ul>
     }
-    </ul>
-  }
-  <button type="button" onclick="submitForm(this)">@Messages(constants.Form.SEND_ASSET)</button>
+    <button type="button" onclick="submitForm(this)">@Messages(constants.Form.SEND_ASSET)</button>
 }

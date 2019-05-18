@@ -1,9 +1,13 @@
 # --- !Ups
 
-CREATE SCHEMA IF NOT EXISTS BLOCKCHAIN AUTHORIZATION comdex;
-CREATE SCHEMA IF NOT EXISTS BLOCKCHAIN_TRANSACTION AUTHORIZATION comdex;
-CREATE SCHEMA IF NOT EXISTS MASTER AUTHORIZATION comdex;
-CREATE SCHEMA IF NOT EXISTS MASTER_TRANSACTION AUTHORIZATION comdex;
+CREATE SCHEMA IF NOT EXISTS BLOCKCHAIN
+    AUTHORIZATION comdex;
+CREATE SCHEMA IF NOT EXISTS BLOCKCHAIN_TRANSACTION
+    AUTHORIZATION comdex;
+CREATE SCHEMA IF NOT EXISTS MASTER
+    AUTHORIZATION comdex;
+CREATE SCHEMA IF NOT EXISTS MASTER_TRANSACTION
+    AUTHORIZATION comdex;
 
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Zone_BC"
@@ -84,6 +88,8 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Asset_BC"
     "quantityUnit"  VARCHAR NOT NULL,
     "ownerAddress"  VARCHAR NOT NULL,
     "locked"        BOOLEAN NOT NULL,
+    "moderator"     BOOLEAN NOT NULL,
+    "dirtyBit"      BOOLEAN,
     PRIMARY KEY ("pegHash")
 );
 
@@ -93,10 +99,11 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Negotiation_BC"
     "buyerAddress"    VARCHAR NOT NULL,
     "sellerAddress"   VARCHAR NOT NULL,
     "assetPegHash"    VARCHAR NOT NULL,
-    "bid"             INT     NOT NULL,
-    "time"            INT     NOT NULL,
+    "bid"             VARCHAR NOT NULL,
+    "time"            VARCHAR NOT NULL,
     "buyerSignature"  VARCHAR,
     "sellerSignature" VARCHAR,
+    "dirtyBit"        BOOLEAN NOT NULL,
     PRIMARY KEY ("id")
 );
 
@@ -105,7 +112,7 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Order_BC"
     "id"            VARCHAR NOT NULL,
     "fiatProofHash" VARCHAR,
     "awbProofHash"  VARCHAR,
-    "executed"      BOOLEAN NOT NULL,
+    "dirtyBit"      BOOLEAN NOT NULL,
     PRIMARY KEY ("id")
 );
 
@@ -134,6 +141,7 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."TransactionFeedBack_BC"
     "confirmSellerBidNegativeTx"   VARCHAR NOT NULL,
     "negotiationPositiveTx"        VARCHAR NOT NULL,
     "negotiationNegativeTx"        VARCHAR NOT NULL,
+    "dirtyBit"                     BOOLEAN NOT NULL,
     PRIMARY KEY ("address")
 );
 
@@ -256,6 +264,7 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."IssueAsset"
     "assetPrice"    INT     NOT NULL,
     "quantityUnit"  VARCHAR NOT NULL,
     "assetQuantity" INT     NOT NULL,
+    "moderator"     BOOLEAN NOT NULL,
     "gas"           INT     NOT NULL,
     "status"        BOOLEAN,
     "txHash"        VARCHAR,
@@ -417,7 +426,7 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."SetSellerFeedback"
 CREATE TABLE IF NOT EXISTS MASTER."Zone"
 (
     "id"        VARCHAR NOT NULL,
-    "accountID" VARCHAR NOT NULL,
+    "accountID" VARCHAR NOT NULL UNIQUE,
     "name"      VARCHAR NOT NULL,
     "currency"  VARCHAR NOT NULL,
     "status"    BOOLEAN,
@@ -526,12 +535,14 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."FaucetRequest"
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."IssueAssetRequest"
 (
     "id"            VARCHAR NOT NULL,
+    "ticketID"      VARCHAR,
     "accountID"     VARCHAR NOT NULL,
     "documentHash"  VARCHAR NOT NULL,
     "assetType"     VARCHAR NOT NULL,
     "assetPrice"    INT     NOT NULL,
     "quantityUnit"  VARCHAR NOT NULL,
     "assetQuantity" INT     NOT NULL,
+    "moderator"     BOOLEAN NOT NULL,
     "gas"           INT,
     "status"        BOOLEAN,
     "comment"       VARCHAR,
@@ -584,14 +595,10 @@ ALTER TABLE BLOCKCHAIN."ACLAccount_BC"
     ADD CONSTRAINT ACLAccount_ACL_hash FOREIGN KEY ("aclHash") REFERENCES BLOCKCHAIN."ACLHash_BC" ("hash");
 ALTER TABLE BLOCKCHAIN."ACLAccount_BC"
     ADD CONSTRAINT ACLAccount_Organization_organizationID FOREIGN KEY ("organizationID") REFERENCES BLOCKCHAIN."Organization_BC" ("id");
-ALTER TABLE BLOCKCHAIN."Asset_BC"
-    ADD CONSTRAINT Asset_Account_ownerAddress FOREIGN KEY ("ownerAddress") REFERENCES BLOCKCHAIN."Account_BC" ("address");
 ALTER TABLE BLOCKCHAIN."Negotiation_BC"
     ADD CONSTRAINT Negotiation_Account_buyerAddress FOREIGN KEY ("buyerAddress") REFERENCES BLOCKCHAIN."Account_BC" ("address");
 ALTER TABLE BLOCKCHAIN."Negotiation_BC"
     ADD CONSTRAINT Negotiation_Account_sellerAddress FOREIGN KEY ("sellerAddress") REFERENCES BLOCKCHAIN."Account_BC" ("address");
-ALTER TABLE BLOCKCHAIN."Negotiation_BC"
-    ADD CONSTRAINT Negotiation_Asset_pegHash FOREIGN KEY ("assetPegHash") REFERENCES BLOCKCHAIN."Asset_BC" ("pegHash");
 ALTER TABLE BLOCKCHAIN."Order_BC"
     ADD CONSTRAINT Order_Negotiation_id FOREIGN KEY ("id") REFERENCES BLOCKCHAIN."Negotiation_BC" ("id");
 ALTER TABLE BLOCKCHAIN."Organization_BC"
@@ -650,11 +657,15 @@ ALTER TABLE MASTER_TRANSACTION."EmailOTP"
 
 /*Initial State*/
 
-INSERT INTO blockchain."Account_BC"("address", "coins", "publicKey", "accountNumber", "sequence", "dirtyBit")
-VALUES ('cosmos14375p72aunmu3vuwevu5e4vgegekd0n0sj9czh', 1000, 'VMzqh7vxmb/7W4w+1DQxAuISeI1dbCYPdcdIEh/HhRg=', 0, 0,
+INSERT INTO blockchain."Account_BC" ("address", "coins", "publicKey", "accountNumber", "sequence", "dirtyBit")
+VALUES ('cosmos14375p72aunmu3vuwevu5e4vgegekd0n0sj9czh',
+        1000,
+        'VMzqh7vxmb/7W4w+1DQxAuISeI1dbCYPdcdIEh/HhRg=',
+        0,
+        0,
         false);
 
-INSERT INTO master."Account"("id", "secretHash", "accountAddress", "language", "userType")
+INSERT INTO master."Account" ("id", "secretHash", "accountAddress", "language", "userType")
 VALUES ('main', '-1886325765', 'cosmos14375p72aunmu3vuwevu5e4vgegekd0n0sj9czh', 'en', 'GENESIS');
 
 # --- !Downs
@@ -666,7 +677,6 @@ DROP TABLE IF EXISTS BLOCKCHAIN."ACLHash_BC" CASCADE;
 DROP TABLE IF EXISTS BLOCKCHAIN."Fiat_BC" CASCADE;
 DROP TABLE IF EXISTS BLOCKCHAIN."Asset_BC" CASCADE;
 DROP TABLE IF EXISTS BLOCKCHAIN."Negotiation_BC" CASCADE;
-DROP TABLE IF EXISTS BLOCKCHAIN."Order_BC" CASCADE;
 DROP TABLE IF EXISTS BLOCKCHAIN."Account_BC" CASCADE;
 DROP TABLE IF EXISTS BLOCKCHAIN."TransactionFeedBack_BC" CASCADE;
 DROP TABLE IF EXISTS BLOCKCHAIN."TraderFeedbackHistory_BC" CASCADE;

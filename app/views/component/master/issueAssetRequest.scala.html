@@ -3,12 +3,13 @@
 
 @(issueAssetRequestForm: Form[IssueAssetRequest.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @form(action = routes.IssueAssetController.issueAssetRequest, 'onkeypress -> "validateForm(event,this)") {
-  @CSRF.formField
-  @inputText(issueAssetRequestForm(constants.Form.DOCUMENT_HASH), '_label -> Messages(constants.Form.DOCUMENT_HASH))
-  @inputText(issueAssetRequestForm(constants.Form.ASSET_TYPE), '_label -> Messages(constants.Form.ASSET_TYPE))
-  @inputText(issueAssetRequestForm(constants.Form.ASSET_PRICE), '_label -> Messages(constants.Form.ASSET_PRICE))
-  @inputText(issueAssetRequestForm(constants.Form.QUANTITY_UNIT), '_label -> Messages(constants.Form.QUANTITY_UNIT))
-  @inputText(issueAssetRequestForm(constants.Form.ASSET_QUANTITY), '_label -> Messages(constants.Form.ASSET_QUANTITY))
+    @CSRF.formField
+    @inputText(issueAssetRequestForm(constants.Form.DOCUMENT_HASH), '_label -> Messages(constants.Form.DOCUMENT_HASH))
+    @inputText(issueAssetRequestForm(constants.Form.ASSET_TYPE), '_label -> Messages(constants.Form.ASSET_TYPE))
+    @inputText(issueAssetRequestForm(constants.Form.ASSET_PRICE), '_label -> Messages(constants.Form.ASSET_PRICE))
+    @inputText(issueAssetRequestForm(constants.Form.QUANTITY_UNIT), '_label -> Messages(constants.Form.QUANTITY_UNIT))
+    @inputText(issueAssetRequestForm(constants.Form.ASSET_QUANTITY), '_label -> Messages(constants.Form.ASSET_QUANTITY))
+    @checkbox(issueAssetRequestForm(constants.Form.MODERATOR), '_label -> Messages(constants.Form.MODERATOR))
 
   @if(issueAssetRequestForm.hasGlobalErrors) {
     <ul>

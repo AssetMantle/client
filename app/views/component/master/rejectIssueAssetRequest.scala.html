@@ -3,15 +3,15 @@
 
 @(rejectIssueAssetRequestForm: Form[RejectIssueAssetRequest.Data], requestID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @form(action = routes.IssueAssetController.rejectIssueAssetRequest, 'onkeypress -> "validateForm(event,this)") {
-  @CSRF.formField
-  @inputText(rejectIssueAssetRequestForm(constants.Form.REQUEST_ID).copy(value = Some(requestID)), '_label -> Messages(constants.Form.REQUEST_ID))
-
-  @if(rejectIssueAssetRequestForm.hasGlobalErrors) {
-    <ul>
-    @for(error <- rejectIssueAssetRequestForm.globalErrors) {
-      <li>@error.format</li>
+    @CSRF.formField
+    @inputText(rejectIssueAssetRequestForm(constants.Form.REQUEST_ID).copy(value = Some(requestID)), '_label -> Messages(constants.Form.REQUEST_ID))
+    @inputText(rejectIssueAssetRequestForm(constants.Form.COMMENT), '_label -> Messages(constants.Form.COMMENT))
+    @if(rejectIssueAssetRequestForm.hasGlobalErrors) {
+        <ul>
+        @for(error <- rejectIssueAssetRequestForm.globalErrors) {
+            <li>@error.format</li>
+        }
+        </ul>
     }
-    </ul>
-  }
-  <button type="button" onclick="submitForm(this)">@Messages(constants.Form.REJECT_ISSUE_ASSET_REQUEST)</button>
+    <button type="button" onclick="submitForm(this)">@Messages(constants.Form.REJECT_ISSUE_ASSET_REQUEST)</button>
 }

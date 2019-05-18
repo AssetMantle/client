@@ -9,6 +9,7 @@ import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
+import queries.responses.TraderReputationResponse
 import slick.jdbc.JdbcProfile
 import transactions.GetResponse
 import transactions.responses.TransactionResponse.Response
@@ -21,7 +22,7 @@ import scala.util.{Failure, Success}
 case class SetACL(from: String, aclAddress: String, organizationID: String, zoneID: String, aclHash: String, status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])
 
 @Singleton
-class SetACLs @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, transactionSetACL: transactions.SetACL, getResponse: GetResponse, actorSystem: ActorSystem, blockchainAccounts: blockchain.Accounts, blockchainAclHashes: blockchain.ACLHashes, blockchainAclAccounts: blockchain.ACLAccounts, implicit val pushNotifications: PushNotifications, implicit val masterAccounts: master.Accounts)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
+class SetACLs @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, blockchainTransactionFeedbacks: blockchain.TransactionFeedbacks, transactionSetACL: transactions.SetACL, getResponse: GetResponse, actorSystem: ActorSystem, blockchainAccounts: blockchain.Accounts, blockchainAclHashes: blockchain.ACLHashes, blockchainAclAccounts: blockchain.ACLAccounts, pushNotifications: PushNotifications, masterAccounts: master.Accounts)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_SET_ACL
 
@@ -177,27 +178,37 @@ class SetACLs @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
 
   object Utility {
     def onSuccess(ticketID: String, response: Response): Future[Unit] = Future {
-      Service.updateTxHashStatusResponseCode(ticketID, response.TxHash, status = true, response.Code)
-      val setACL = Service.getSetACL(ticketID)
-      blockchainAclAccounts.Service.addOrUpdateACLAccount(setACL.aclAddress, setACL.zoneID, setACL.organizationID, blockchainAclHashes.Service.getACL(setACL.aclHash), dirtyBit = true)
-      masterAccounts.Service.updateUserTypeOnAddress(setACL.aclAddress, constants.User.TRADER)
-      blockchainAccounts.Service.updateDirtyBit(masterAccounts.Service.getAddress(setACL.from), dirtyBit = true)
-      pushNotifications.sendNotification(masterAccounts.Service.getId(setACL.aclAddress), constants.Notification.SUCCESS, Seq(response.TxHash))
-      pushNotifications.sendNotification(setACL.from, constants.Notification.SUCCESS, Seq(response.TxHash))
+      try {
+        Service.updateTxHashStatusResponseCode(ticketID, response.TxHash, status = true, response.Code)
+        val setACL = Service.getSetACL(ticketID)
+        blockchainAclAccounts.Service.addOrUpdateACLAccount(setACL.aclAddress, setACL.zoneID, setACL.organizationID, blockchainAclHashes.Service.getACL(setACL.aclHash), dirtyBit = true)
+        masterAccounts.Service.updateUserTypeOnAddress(setACL.aclAddress, constants.User.TRADER)
+        blockchainAccounts.Service.updateDirtyBit(masterAccounts.Service.getAddress(setACL.from), dirtyBit = true)
+        blockchainTransactionFeedbacks.Service.addTransactionFeedback(setACL.aclAddress, TraderReputationResponse.TransactionFeedbackResponse("0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"), false)
+        pushNotifications.sendNotification(masterAccounts.Service.getId(setACL.aclAddress), constants.Notification.SUCCESS, Seq(response.TxHash))
+        pushNotifications.sendNotification(setACL.from, constants.Notification.SUCCESS, Seq(response.TxHash))
+      } catch {
+        case baseException: BaseException => logger.error(constants.Error.BASE_EXCEPTION, baseException)
+          throw new BaseException(constants.Error.PSQL_EXCEPTION)
+      }
     }
 
     def onFailure(ticketID: String, message: String): Future[Unit] = Future {
-      Service.updateTxHashStatusResponseCode(ticketID, txHash = null, status = false, message)
-      val setACL = Service.getSetACL(ticketID)
-      pushNotifications.sendNotification(masterAccounts.Service.getId(setACL.aclAddress), constants.Notification.FAILURE, Seq(message))
-      pushNotifications.sendNotification(setACL.from, constants.Notification.FAILURE, Seq(message))
+      try {
+        Service.updateTxHashStatusResponseCode(ticketID, txHash = null, status = false, message)
+        val setACL = Service.getSetACL(ticketID)
+        pushNotifications.sendNotification(masterAccounts.Service.getId(setACL.aclAddress), constants.Notification.FAILURE, Seq(message))
+        pushNotifications.sendNotification(setACL.from, constants.Notification.FAILURE, Seq(message))
+      } catch {
+        case baseException: BaseException => logger.error(constants.Error.BASE_EXCEPTION, baseException)
+      }
     }
   }
 
-  //scheduler iterates with rows with null as status
+
   if (kafkaEnabled) {
     actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
-      utilities.TicketUpdater.start_(Service.getTicketIDsOnStatus, transactionSetACL.Service.getTxFromWSResponse, Utility.onSuccess, Utility.onFailure)
+      utilities.TicketUpdater.start(Service.getTicketIDsOnStatus, transactionSetACL.Service.getTxFromWSResponse, Utility.onSuccess, Utility.onFailure)
     }
   }
 }

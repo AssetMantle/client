@@ -6,8 +6,18 @@ table,tbody,tfoot,thead,tr{width:100%;margin:1px;padding:1px;border:1px;outline:
 tr{height: 30px}
 th,td{width:44%;margin:1px;padding:1px;border:1px;outline:1px;font-weight:inherit;font-style:inherit;font-size:100%;font-family:inherit;}
 table{border-collapse:collapse;border-spacing:1px;border:1px solid black;}
-caption,td{width:33%;text-align:center;font-weight:normal;}
-caption,th{width:33%;text-align:center;font-weight:bolder;}
+
+caption, td {
+    width: auto;
+    text-align: center;
+    font-weight: normal;
+}
+
+caption, th {
+    width: auto;
+    text-align: center;
+    font-weight: bolder;
+}
 form legend{display:none;}
 blockquote:before,blockquote:after,q:before,q:after{content:"";}
 blockquote,q{quotes:"" "";}
