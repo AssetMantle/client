@@ -34,10 +34,6 @@ class AddOrganizations @Inject()(protected val databaseConfigProvider: DatabaseC
 
   private[models] val addOrganizationTable = TableQuery[AddOrganizationTable]
 
-  private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
-  private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
-  private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
-
   private def add(addOrganization: AddOrganization)(implicit executionContext: ExecutionContext): Future[String] = db.run((addOrganizationTable returning addOrganizationTable.map(_.ticketID) += addOrganization).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -171,6 +167,10 @@ class AddOrganizations @Inject()(protected val databaseConfigProvider: DatabaseC
 
     def getAddOrganization(ticketID: String): AddOrganization = Await.result(findByTicketID(ticketID), Duration.Inf)
   }
+
+  private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
+  private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
+  private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
 
   object Utility {
     def onSuccess(ticketID: String, response: Response): Future[Unit] = Future {

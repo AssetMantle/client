@@ -31,10 +31,6 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
   private[models] val fiatTable = TableQuery[FiatTable]
 
-  private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
-  private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
-  private val sleepTime = configuration.get[Long]("blockchain.kafka.entityIterator.threadSleep")
-
   private def add(fiat: Fiat)(implicit executionContext: ExecutionContext): Future[String] = db.run((fiatTable returning fiatTable.map(_.pegHash) += fiat).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -187,6 +183,10 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
     def updateDirtyBit(address: String, dirtyBit: Boolean): Int = Await.result(updateDirtyBitByAddress(address, dirtyBit), Duration.Inf)
   }
 
+  private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
+  private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
+  private val sleepTime = configuration.get[Long]("blockchain.entityIterator.threadSleep")
+
   object Utility {
     def dirtyEntityUpdater(): Future[Unit] = Future {
       val dirtyFiats = Service.getDirtyFiats(dirtyBit = true)
@@ -206,8 +206,6 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
       }
     }
   }
-
-
 
   actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
     Utility.dirtyEntityUpdater()
