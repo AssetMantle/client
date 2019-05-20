@@ -8,7 +8,7 @@ import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Random
 
 @Singleton
@@ -51,24 +51,22 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
         },
         verifyZoneData => {
           try {
-            if (kafkaEnabled) {
-              val zoneAccountAddress = masterAccounts.Service.getAddress(masterZones.Service.getAccountId(verifyZoneData.zoneID))
-              val response = transactionsAddZone.Service.kafkaPost(transactionsAddZone.Request(from = username, to = zoneAccountAddress, zoneID = verifyZoneData.zoneID, password = verifyZoneData.password))
-              blockchainTransactionAddZones.Service.addZoneKafka(username, zoneAccountAddress, verifyZoneData.zoneID, null, null, response.ticketID, null)
-              Ok(views.html.index(success = Messages(constants.Success.VERIFY_ZONE) + verifyZoneData.zoneID + response.ticketID))
-            } else {
-              val zoneAccountID = masterZones.Service.getAccountId(verifyZoneData.zoneID)
-              val zoneAccountAddress = masterAccounts.Service.getAddress(zoneAccountID)
-              println("----------------------------------","from" , username, "to" , zoneAccountAddress, "zoneID", verifyZoneData.zoneID, "passwrod" , verifyZoneData.password)
-              val response = transactionsAddZone.Service.post(transactionsAddZone.Request(from = username, to = zoneAccountAddress, zoneID = verifyZoneData.zoneID, password = verifyZoneData.password))
-              val fromAddress = masterAccounts.Service.getAddress(username)
-              blockchainTransactionAddZones.Service.addZone(username, zoneAccountAddress, verifyZoneData.zoneID, null, Option(response.TxHash), Random.nextString(32), null)
-              blockchainZones.Service.addZone(verifyZoneData.zoneID, zoneAccountAddress)
-              masterZones.Service.updateStatus(verifyZoneData.zoneID, true)
-              masterAccounts.Service.updateUserType(zoneAccountID, constants.User.ZONE)
-              blockchainAccounts.Service.updateSequence(fromAddress, blockchainAccounts.Service.getSequence(fromAddress) + 1)
-              Ok(views.html.index(success = Messages(constants.Success.VERIFY_ZONE) + verifyZoneData.zoneID + response.TxHash))
+            val zoneAccountAddress = masterAccounts.Service.getAddress(masterZones.Service.getAccountId(verifyZoneData.zoneID))
+            val ticketID: String = if (kafkaEnabled) transactionsAddZone.Service.kafkaPost(transactionsAddZone.Request(from = username, to = zoneAccountAddress, zoneID = verifyZoneData.zoneID, password = verifyZoneData.password)).ticketID else Random.nextString(32)
+            blockchainTransactionAddZones.Service.addZone(username, zoneAccountAddress, verifyZoneData.zoneID, null, null, ticketID, null)
+
+            if (!kafkaEnabled) {
+              Future {
+                try {
+                  blockchainTransactionAddZones.Utility.onSuccess(ticketID, transactionsAddZone.Service.post(transactionsAddZone.Request(from = username, to = zoneAccountAddress, zoneID = verifyZoneData.zoneID, password = verifyZoneData.password)))
+                } catch {
+                  case baseException: BaseException => logger.error(constants.Error.BASE_EXCEPTION, baseException)
+                  case blockChainException: BlockChainException => logger.error(blockChainException.message, blockChainException)
+                    blockchainTransactionAddZones.Utility.onFailure(ticketID, blockChainException.message)
+                }
+              }
             }
+            Ok(views.html.index(success = Messages(constants.Success.VERIFY_ZONE) + verifyZoneData.zoneID + ticketID))
           }
           catch {
             case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))
@@ -81,7 +79,7 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
   def viewPendingVerifyZoneRequests: Action[AnyContent] = withGenesisLoginAction.authenticated { username =>
     implicit request =>
       try {
-        Ok(views.html.component.master.viewPendingVerifyZoneRequests(masterZones.Service.getVerifyZoneRequests()))
+        Ok(views.html.component.master.viewPendingVerifyZoneRequests(masterZones.Service.getVerifyZoneRequests))
       }
       catch {
         case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))
@@ -122,13 +120,9 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
       addZoneData => {
         try {
           if (kafkaEnabled) {
-            val response = transactionsAddZone.Service.kafkaPost(transactionsAddZone.Request(from = addZoneData.from, to = addZoneData.to, zoneID = addZoneData.zoneID, password = addZoneData.password))
-            blockchainTransactionAddZones.Service.addZoneKafka(addZoneData.from, addZoneData.to, addZoneData.zoneID, null, null, response.ticketID, null)
-            Ok(views.html.index(success = response.ticketID))
+            Ok(views.html.index(success = transactionsAddZone.Service.kafkaPost(transactionsAddZone.Request(from = addZoneData.from, to = addZoneData.to, zoneID = addZoneData.zoneID, password = addZoneData.password)).ticketID))
           } else {
-            val response = transactionsAddZone.Service.post(transactionsAddZone.Request(from = addZoneData.from, to = addZoneData.to, zoneID = addZoneData.zoneID, password = addZoneData.password))
-            blockchainTransactionAddZones.Service.addZone(addZoneData.from, addZoneData.to, addZoneData.zoneID, null, Option(response.TxHash), Random.nextString(32), null)
-            Ok(views.html.index(success = response.TxHash))
+            Ok(views.html.index(success = transactionsAddZone.Service.post(transactionsAddZone.Request(from = addZoneData.from, to = addZoneData.to, zoneID = addZoneData.zoneID, password = addZoneData.password)).TxHash))
           }
         }
         catch {

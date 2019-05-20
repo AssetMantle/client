@@ -10,7 +10,7 @@ import play.api.{Configuration, Logger}
 import views.companion.blockchain.RedeemFiat
 import views.companion.master
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Random
 
 @Singleton
@@ -32,15 +32,20 @@ class RedeemFiatController @Inject()(messagesControllerComponents: MessagesContr
         },
         redeemFiatData => {
           try {
-            if (kafkaEnabled) {
-              val response = transactionsRedeemFiat.Service.kafkaPost(transactionsRedeemFiat.Request(from = username, to = redeemFiatData.to, password = redeemFiatData.password, redeemAmount = redeemFiatData.redeemAmount, gas = redeemFiatData.gas))
-              redeemFiats.Service.addRedeemFiatKafka(from = username, to = redeemFiatData.to, redeemAmount = redeemFiatData.redeemAmount, gas = redeemFiatData.gas, null, null, ticketID = response.ticketID, null)
-              Ok(views.html.index(success = response.ticketID))
-            } else {
-              val response = transactionsRedeemFiat.Service.post(transactionsRedeemFiat.Request(from = username, to = redeemFiatData.to, password = redeemFiatData.password, redeemAmount = redeemFiatData.redeemAmount, gas = redeemFiatData.gas))
-              redeemFiats.Service.addRedeemFiat(from = username, to = redeemFiatData.to, redeemAmount = redeemFiatData.redeemAmount, gas = redeemFiatData.gas, null, txHash = Option(response.TxHash), ticketID = Random.nextString(32), null)
-              Ok(views.html.index(success = response.TxHash))
+            val ticketID = if (kafkaEnabled) transactionsRedeemFiat.Service.kafkaPost(transactionsRedeemFiat.Request(from = username, to = redeemFiatData.to, password = redeemFiatData.password, redeemAmount = redeemFiatData.redeemAmount, gas = redeemFiatData.gas)).ticketID else Random.nextString(32)
+            redeemFiats.Service.addRedeemFiat(from = username, to = redeemFiatData.to, redeemAmount = redeemFiatData.redeemAmount, gas = redeemFiatData.gas, null, null, ticketID = ticketID, null)
+            if (!kafkaEnabled) {
+              Future {
+                try {
+                  redeemFiats.Utility.onSuccess(ticketID, transactionsRedeemFiat.Service.post(transactionsRedeemFiat.Request(from = username, to = redeemFiatData.to, password = redeemFiatData.password, redeemAmount = redeemFiatData.redeemAmount, gas = redeemFiatData.gas)))
+                } catch {
+                  case baseException: BaseException => logger.error(constants.Error.BASE_EXCEPTION, baseException)
+                  case blockChainException: BlockChainException => logger.error(blockChainException.message, blockChainException)
+                    redeemFiats.Utility.onFailure(ticketID, blockChainException.message)
+                }
+              }
             }
+            Ok(views.html.index(success = ticketID))
           }
           catch {
             case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))
@@ -63,13 +68,9 @@ class RedeemFiatController @Inject()(messagesControllerComponents: MessagesContr
       redeemFiatData => {
         try {
           if (kafkaEnabled) {
-            val response = transactionsRedeemFiat.Service.kafkaPost(transactionsRedeemFiat.Request(from = redeemFiatData.from, to = redeemFiatData.to, password = redeemFiatData.password, redeemAmount = redeemFiatData.redeemAmount, gas = redeemFiatData.gas))
-            redeemFiats.Service.addRedeemFiatKafka(from = redeemFiatData.from, to = redeemFiatData.to, redeemAmount = redeemFiatData.redeemAmount, gas = redeemFiatData.gas, null, null, ticketID = response.ticketID, null)
-            Ok(views.html.index(success = response.ticketID))
+            Ok(views.html.index(success = transactionsRedeemFiat.Service.kafkaPost(transactionsRedeemFiat.Request(from = redeemFiatData.from, to = redeemFiatData.to, password = redeemFiatData.password, redeemAmount = redeemFiatData.redeemAmount, gas = redeemFiatData.gas)).ticketID))
           } else {
-            val response = transactionsRedeemFiat.Service.post(transactionsRedeemFiat.Request(from = redeemFiatData.from, to = redeemFiatData.to, password = redeemFiatData.password, redeemAmount = redeemFiatData.redeemAmount, gas = redeemFiatData.gas))
-            redeemFiats.Service.addRedeemFiat(from = redeemFiatData.from, to = redeemFiatData.to, redeemAmount = redeemFiatData.redeemAmount, gas = redeemFiatData.gas, null, txHash = Option(response.TxHash), ticketID = Random.nextString(32), null)
-            Ok(views.html.index(success = response.TxHash))
+            Ok(views.html.index(success = transactionsRedeemFiat.Service.post(transactionsRedeemFiat.Request(from = redeemFiatData.from, to = redeemFiatData.to, password = redeemFiatData.password, redeemAmount = redeemFiatData.redeemAmount, gas = redeemFiatData.gas)).TxHash))
           }
         }
         catch {

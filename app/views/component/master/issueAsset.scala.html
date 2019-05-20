@@ -1,7 +1,7 @@
 @import helper._
 @import views.companion.master.IssueAsset
 
-@(issueAssetForm: Form[IssueAsset.Data],requestID: String,  accountID: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@(issueAssetForm: Form[IssueAsset.Data], requestID: String, accountID: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @common(Messages(constants.Form.ISSUE_ASSET)) {
     @form(action = routes.IssueAssetController.issueAsset) {
         @CSRF.formField

@@ -5,7 +5,7 @@
 @common(Messages(constants.Form.RELEASE_ASSET)) {
     @form(action = routes.ReleaseAssetController.releaseAsset) {
         @CSRF.formField
-        @inputText(releaseAssetForm(constants.Form.TO),'_label-> Messages(constants.Form.TO))
+        @inputText(releaseAssetForm(constants.Form.ADDRESS),'_label-> Messages(constants.Form.ADDRESS))
         @inputText(releaseAssetForm(constants.Form.PEG_HASH),'_label-> Messages(constants.Form.PEG_HASH))
         @inputText(releaseAssetForm(constants.Form.GAS),'_label-> Messages(constants.Form.GAS))
         @inputPassword(releaseAssetForm(constants.Form.PASSWORD),'_label-> Messages(constants.Form.PASSWORD))

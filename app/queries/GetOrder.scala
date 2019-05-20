@@ -1,22 +1,20 @@
-package transactions
+package queries
 
 import java.net.ConnectException
 
 import exceptions.BlockChainException
-import javax.inject.Inject
-import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
-import queries.responses.NegotiationResponse.Response
+import queries.responses.OrderResponse.Response
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 
 @Singleton
-class GetNegotiation @Inject()()(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
+class GetOrder @Inject()()(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
-  private implicit val module: String = constants.Module.TRANSACTIONS_GET_NEGOTIATION
+  private implicit val module: String = constants.Module.TRANSACTIONS_GET_ORDER
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -24,11 +22,12 @@ class GetNegotiation @Inject()()(implicit wsClient: WSClient, configuration: Con
 
   private val port = configuration.get[String]("blockchain.main.restPort")
 
-  private val path = "negotiation"
+  private val path = "order"
 
   private val url = ip + ":" + port + "/" + path + "/"
 
   private def action(request: String)(implicit executionContext: ExecutionContext): Future[Response] = wsClient.url(url + request).get.map { response => utilities.JSON.getResponseFromJson[Response](response) }
+
 
   object Service {
 

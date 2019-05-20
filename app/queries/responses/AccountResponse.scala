@@ -1,23 +1,35 @@
 package queries.responses
 
-import models.blockchain
-import play.api.libs.json.{Json, Reads}
+import play.api.libs.functional.syntax._
+import play.api.libs.json.{JsPath, Json, Reads}
 
 object AccountResponse {
 
   case class Coins(denom: String, amount: String)
 
   implicit val coinsReads: Reads[Coins] = Json.reads[Coins]
-  implicit val assetReads: Reads[Asset] = Json.reads[Asset]
 
-  case class Asset(pegHash: String, documentHash: String, assetType: String, assetQuantity: String, assetPrice: String, quantityUnit: String, ownerAddress: String, locked: Boolean) {
-    def applyToBlockchainAsset(ownerAddress: String): blockchain.Asset = blockchain.Asset(pegHash = pegHash, documentHash = documentHash, assetType = assetType, assetQuantity = assetQuantity.toInt, assetPrice = assetPrice.toInt, quantityUnit = quantityUnit, ownerAddress = ownerAddress, locked = locked)
-  }
+  implicit val assetReads: Reads[Asset] = (
+    (JsPath \ "pegHash").read[String] and
+      (JsPath \ "documentHash").read[String] and
+      (JsPath \ "assetType").read[String] and
+      (JsPath \ "assetQuantity").read[String] and
+      (JsPath \ "assetPrice").read[String] and
+      (JsPath \ "quantityUnit").read[String] and
+      (JsPath \ "ownerAddress").read[String] and
+      (JsPath \ "locked").read[Boolean] and
+      (JsPath \ "private").read[Boolean]
+    ) (Asset.apply _)
 
+  case class Asset(pegHash: String, documentHash: String, assetType: String, assetQuantity: String, assetPrice: String, quantityUnit: String, ownerAddress: String, locked: Boolean, moderator: Boolean)
 
-  case class Fiat(pegHash: String, transactionID: String, transactionAmount: String, redeemedAmount: String)
+  case class Owners(ownerAddress: String, amount: String)
+
+  implicit val ownersReads: Reads[Owners] = Json.reads[Owners]
 
   implicit val fiatReads: Reads[Fiat] = Json.reads[Fiat]
+
+  case class Fiat(pegHash: String, transactionID: String, transactionAmount: String, redeemedAmount: String, owners: Option[Seq[Owners]])
 
   case class Value(address: String, coins: Option[Seq[Coins]], assetPegWallet: Option[Seq[Asset]], fiatPegWallet: Option[Seq[Fiat]], account_number: String, sequence: String)
 
