@@ -131,7 +131,7 @@ object sendCoinControllerTest {
     .feed(RequestIDFeeder.requestIDFeed)
     .feed(PasswordFeeder.passwordFeed)
     .feed(GasFeeder.gasFeed)
-    .exec { session => session.set(Test.TEST_REQUEST_ID,getRequestID(session(Test.TEST_ACCOUNT_ID).as[String]))}
+    .exec { session => session.set(Test.TEST_REQUEST_ID,getRequestIDForFaucetRequest(session(Test.TEST_ACCOUNT_ID).as[String]))}
     .exec { session =>
       println(session)
       session
@@ -168,9 +168,9 @@ object sendCoinControllerTest {
     .pause(5)
 */
 
-  def getRequestID(query: String) = {
+  def getRequestIDForFaucetRequest(query: String): String = {
     val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://localhost:5432/comdex", "comdex", "comdex",
       s"""SELECT "id" FROM master_transaction."FaucetRequest" WHERE "accountID" = '$query';""")
-    sqlQueryFeeder.apply().next()("id")
+    sqlQueryFeeder.apply().next()("id").toString
   }
 }

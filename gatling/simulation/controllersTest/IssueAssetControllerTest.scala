@@ -6,6 +6,7 @@ import feeders._
 import io.gatling.core.Predef._
 import io.gatling.core.structure.ScenarioBuilder
 import io.gatling.http.Predef._
+import io.gatling.jdbc.Predef.jdbcFeeder
 
 class IssueAssetControllerTest extends Simulation {
 
@@ -34,7 +35,6 @@ object issueAssetControllerTest {
         Form.QUANTITY_UNIT -> "${%s}".format(Test.TEST_QUANTITY_UNIT),
         Form.ASSET_QUANTITY -> "${%s}".format(Test.TEST_ASSET_QUANTITY),
         Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
-    .pause(5)
 
   val rejectIssueAssetScenario: ScenarioBuilder = scenario("RejectIssueAsset")
     .feed(RequestIDFeeder.requestIDFeed)
@@ -61,26 +61,24 @@ object issueAssetControllerTest {
     .feed(AssetQuantityFeeder.assetQuantityFeed)
     .feed(PasswordFeeder.passwordFeed)
     .feed(GasFeeder.gasFeed)
-  /*
-  .exec(http("IssueAsset_GET")
-    .get(routes.IssueAssetController.issueAssetForm().url)
-    .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
-  .pause(2)
-  .exec(http("IssueAsset_POST")
-    .post(routes.IssueAssetController.issueAsset().url)
-    .formParamMap(Map(
-    Form.REQUEST_ID -> "${%s}".format(Test.TEST_REQUEST_ID),
-     Form.ACCOUNT_ID -> "${%s}".format(Test.TEST_ACCOUNT_ID),
-      Form.DOCUMENT_HASH -> "${%s}".format(Test.TEST_DOCUMENT_HASH),
-       Form.ASSET_TYPE -> "${%s}".format(Test.TEST_ASSET_TYPE),
+    .exec(http("IssueAsset_GET")
+      .get(routes.IssueAssetController.issueAssetForm("l","l","l","l",1,"l",1).url)
+      .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
+    .pause(2)
+    .exec(http("IssueAsset_POST")
+      .post(routes.IssueAssetController.issueAsset().url)
+      .formParamMap(Map(
+        Form.REQUEST_ID -> "${%s}".format(Test.TEST_REQUEST_ID),
+        Form.ACCOUNT_ID -> "${%s}".format(Test.TEST_ACCOUNT_ID),
+        Form.DOCUMENT_HASH -> "${%s}".format(Test.TEST_DOCUMENT_HASH),
+        Form.ASSET_TYPE -> "${%s}".format(Test.TEST_ASSET_TYPE),
         Form.ASSET_PRICE -> "${%s}".format(Test.TEST_ASSET_PRICE),
-         Form.QUANTITY_UNIT -> "${%s}".format(Test.TEST_QUANTITY_UNIT),
-          Form.ASSET_QUANTITY -> "${%s}".format(Test.TEST_ASSET_QUANTITY),
-           Form.PASSWORD -> "${%s}".format(Test.TEST_PASSWORD),
-            Form.GAS -> "${%s}".format(Test.TEST_GAS), Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
-  .pause(5)
+        Form.QUANTITY_UNIT -> "${%s}".format(Test.TEST_QUANTITY_UNIT),
+        Form.ASSET_QUANTITY -> "${%s}".format(Test.TEST_ASSET_QUANTITY),
+        Form.PASSWORD -> "${%s}".format(Test.TEST_PASSWORD),
+        Form.GAS -> "${%s}".format(Test.TEST_GAS), Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
+    .pause(5)
 
-*/
   val blockchainIssueAssetScenario: ScenarioBuilder = scenario("BlockchainIssueAsset")
     .feed(FromFeeder.fromFeed)
     .feed(ToFeeder.toFeed)
@@ -110,4 +108,9 @@ object issueAssetControllerTest {
         Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
     .pause(5)
 
+  def getRequestIDForIssueAsset(query: String): String = {
+    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://localhost:5432/comdex", "comdex", "comdex",
+      s"""SELECT "id" FROM master_transaction."IssueAssetRequest" WHERE "accountID" = '$query';""")
+    sqlQueryFeeder.apply().next()("id").toString
+  }
 }

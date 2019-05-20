@@ -6,6 +6,7 @@ import feeders._
 import io.gatling.core.Predef._
 import io.gatling.core.structure.ScenarioBuilder
 import io.gatling.http.Predef._
+import io.gatling.jdbc.Predef.jdbcFeeder
 
 class SetACLControllerTest extends Simulation {
 
@@ -16,7 +17,6 @@ class SetACLControllerTest extends Simulation {
 object setACLControllerTest {
 
   val setACLScenario: ScenarioBuilder = scenario("SetACL")
-    .feed(ToFeeder.toFeed)
     .feed(ACLAddressFeeder.aclAddressFeed)
     .feed(OrganizationIDFeeder.organizationIDFeed)
     .exec(http("SetACL_GET")
@@ -26,10 +26,10 @@ object setACLControllerTest {
     .exec(http("SetACL_POST")
       .post(routes.SetACLController.setACL().url)
       .formParamMap(Map(
-        Form.TO -> "${%s}".format(Test.TEST_PASSWORD),
+        Form.PASSWORD -> "${%s}".format(Test.TEST_PASSWORD),
         Form.ACL_ADDRESS -> "${%s}".format(Test.TEST_ACL_ADDRESS),
         Form.ORGANIZATION_ID -> "${%s}".format(Test.TEST_ORGANIZATION_ID),
-        Form.ISSUE_ASSET -> "${%s}".format(Test.TEST_ISSUE_ASSET), //TODO: Figure out Boolean Treatment
+        Form.ISSUE_ASSET -> "${%s}".format(Test.TEST_ISSUE_ASSET),
         Form.ISSUE_ASSET -> "${%s}".format(Test.TEST_ISSUE_ASSET),
         Form.ISSUE_FIAT -> "${%s}".format(Test.TEST_ISSUE_FIAT),
         Form.SEND_ASSET -> "${%s}".format(Test.TEST_SEND_ASSET),
@@ -63,7 +63,6 @@ object setACLControllerTest {
         Form.PASSWORD -> "${%s}".format(Test.TEST_PASSWORD),
         Form.ACL_ADDRESS -> "${%s}".format(Test.TEST_ACL_ADDRESS),
         Form.ORGANIZATION_ID -> "${%s}".format(Test.TEST_ORGANIZATION_ID),
-        Form.ZONE_ID -> "${%s}".format(Test.TEST_ZONE_ID),
         Form.ISSUE_ASSET -> "${%s}".format(Test.TEST_ISSUE_ASSET),
         Form.ISSUE_FIAT -> "${%s}".format(Test.TEST_ISSUE_FIAT),
         Form.SEND_ASSET -> "${%s}".format(Test.TEST_SEND_ASSET),
@@ -80,4 +79,10 @@ object setACLControllerTest {
         Form.NEGOTIATION -> "${%s}".format(Test.TEST_NEGOTIATION),
         Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
     .pause(5)
+
+  def getAccountAddressByUsername(query: String): String = {
+    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://localhost:5432/comdex", "comdex", "comdex",
+      s"""SELECT "accountAddress" FROM master."Account" WHERE "id" = '$query';""")
+    sqlQueryFeeder.apply().next()("accountAddress").toString
+  }
 }
