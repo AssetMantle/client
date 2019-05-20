@@ -12,7 +12,7 @@ object TraderReputationResponse {
 
   implicit val traderFeedbackHistoryReads: Reads[TraderFeedbackHistory] = Json.reads[TraderFeedbackHistory]
 
-  case class Value(address: String, transactionFeedback: TransactionFeedbackResponse, traderFeedbackHistory: Option[Seq[TraderFeedbackHistory]])
+  case class Value(address: String, transcationFeedback: TransactionFeedbackResponse, traderFeedbackHistory: Option[Seq[TraderFeedbackHistory]])
 
   implicit val valueReads: Reads[Value] = Json.reads[Value]
 

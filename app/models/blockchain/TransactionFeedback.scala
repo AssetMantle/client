@@ -213,7 +213,7 @@ class TransactionFeedbacks @Inject()(protected val databaseConfigProvider: Datab
       for (dirtyAddress <- dirtyAddresses) {
         try {
           val response = getTraderReputation.Service.get(dirtyAddress)
-          Service.updateTransactionFeedback(response.value.address, response.value.transactionFeedback, dirtyBit = false)
+          Service.updateTransactionFeedback(response.value.address, response.value.transcationFeedback, dirtyBit = false)
         }
         catch {
           case blockChainException: BlockChainException => logger.error(blockChainException.message, blockChainException)
