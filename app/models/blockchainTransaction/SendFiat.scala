@@ -152,8 +152,8 @@ class SendFiats @Inject()(protected val databaseConfigProvider: DatabaseConfigPr
         val orderResponse = getOrder.Service.get(negotiationID)
         blockchainFiats.Service.addFiats(orderResponse.value.fiatPegWallet.get.map{responseFiatPeg: AccountResponse.Fiat => blockchain.Fiat(pegHash = responseFiatPeg.pegHash, ownerAddress = negotiationID, transactionID = responseFiatPeg.transactionID, transactionAmount = responseFiatPeg.transactionAmount, redeemedAmount = responseFiatPeg.redeemedAmount, dirtyBit = false)})
         blockchainAccounts.Service.updateDirtyBit(fromAddress, dirtyBit = true)
-        pushNotifications.sendNotification(masterAccounts.Service.getId(sendFiat.to), constants.Notification.SUCCESS, Seq(response.TxHash))
-        pushNotifications.sendNotification(sendFiat.from, constants.Notification.SUCCESS, Seq(response.TxHash))
+        pushNotifications.sendNotification(masterAccounts.Service.getId(sendFiat.to), constants.Notification.SUCCESS, response.TxHash)
+        pushNotifications.sendNotification(sendFiat.from, constants.Notification.SUCCESS, response.TxHash)
       }
       catch {
         case baseException: BaseException => logger.error(constants.Error.BASE_EXCEPTION, baseException)
@@ -166,8 +166,8 @@ class SendFiats @Inject()(protected val databaseConfigProvider: DatabaseConfigPr
       try {
         Service.updateStatusAndResponseCode(ticketID, status = false, message)
         val sendFiat = Service.getTransaction(ticketID)
-        pushNotifications.sendNotification(masterAccounts.Service.getId(sendFiat.to), constants.Notification.FAILURE, Seq(message))
-        pushNotifications.sendNotification(sendFiat.from, constants.Notification.FAILURE, Seq(message))
+        pushNotifications.sendNotification(masterAccounts.Service.getId(sendFiat.to), constants.Notification.FAILURE, message)
+        pushNotifications.sendNotification(sendFiat.from, constants.Notification.FAILURE, message)
       } catch {
         case baseException: BaseException => logger.error(constants.Error.BASE_EXCEPTION, baseException)
       }

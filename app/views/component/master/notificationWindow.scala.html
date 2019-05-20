@@ -1,6 +1,4 @@
-
-
-@(notificationList : Seq[models.masterTransaction.Notification]=null, pageNumber: Int, limit : Int, unread: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@(notificationList: Seq[models.masterTransaction.Notification] = Seq(), pageNumber: Int, limit: Int, unread: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
     <head>
         <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/main.css")">
         <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/class.css")">
@@ -12,13 +10,12 @@
                         <div id = "unread" style="display: none" data-value = @unread.toString()></div>
                         <h3>Notifications</h3>
                         <div id="notificationWindow" style="height:500px;">
-                            @if(notificationList != null){
                                 @for(i <- 0 to (notificationList.length - 1)) {
                                 @if(notificationList(i).read){
                                     <div id=@i class="element">
                                         <div onclick="markNotificationAsRead(@i,'@notificationList(i).id')" >
                                         </br>
-                                            @notificationList(i).notificationTitle + @notificationList(i).notificationMessage
+                                            @notificationList(i).notificationTitle: @notificationList(i).notificationMessage
                                         </br>
                                         </div>
                                     </div>
@@ -26,12 +23,11 @@
                                     <div id=@i class="element" style="background-color:#80c846" >
                                         <div onclick="markNotificationAsRead(@i,'@notificationList(i).id')">
                                             </br>
-                                            @notificationList(i).notificationTitle + @notificationList(i).notificationMessage
+                                                @notificationList(i).notificationTitle: @notificationList(i).notificationMessage
                                             </br>
                                         </div>
                                     </div>
                                 }
-                            }
                             }
                         <br>
                             <div class="pageNumber" id="pageNumber"><h3>Page @pageNumber</h3></div>

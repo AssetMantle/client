@@ -4,22 +4,25 @@ import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import org.joda.time.{DateTime, DateTimeZone}
 import org.postgresql.util.PSQLException
-import play.api.{Configuration, Logger}
 import play.api.db.slick.DatabaseConfigProvider
+import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Random, Success}
 
-case class AccountToken(id: String, registrationToken: String, sessionTokenHash: Option[String], sessionTokenTime: Long)
+case class AccountToken(id: String, notificationToken: Option[String], sessionTokenHash: Option[String], sessionTokenTime: Long)
 
 @Singleton
 class AccountTokens @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit configuration: Configuration) {
 
   private implicit val module: String = constants.Module.MASTER_TRANSACTION_ACCOUNT_TOKEN
 
+  private val sessionTokenTimeout: Long = configuration.get[Long]("sessionToken.timeout")
+
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
+
   val db = databaseConfig.db
 
   private val logger: Logger = Logger(this.getClass)
@@ -54,11 +57,11 @@ class AccountTokens @Inject()(protected val databaseConfigProvider: DatabaseConf
 
   private[models] class AccountTokenTable(tag: Tag) extends Table[AccountToken](tag, "AccountToken") {
 
-    def * = (id, registrationToken, sessionTokenHash.?, sessionTokenTime) <> (AccountToken.tupled, AccountToken.unapply)
+    def * = (id, notificationToken.?, sessionTokenHash.?, sessionTokenTime) <> (AccountToken.tupled, AccountToken.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
-    def registrationToken = column[String]("registrationToken")
+    def notificationToken = column[String]("notificationToken")
 
     def sessionTokenHash = column[String]("sessionTokenHash")
 
@@ -68,11 +71,11 @@ class AccountTokens @Inject()(protected val databaseConfigProvider: DatabaseConf
   }
 
   object Service {
-    def addToken(id: String, registrationToken: String)(implicit executionContext: ExecutionContext): String = Await.result(add(models.masterTransaction.AccountToken(id, registrationToken, null, DateTime.now(DateTimeZone.UTC).getMillis)), Duration.Inf)
+    def addToken(username: String, notificationToken: String)(implicit executionContext: ExecutionContext): Int = Await.result(insertOrUpdate(AccountToken(username, null, Option(notificationToken), DateTime.now(DateTimeZone.UTC).getMillis)), Duration.Inf)
 
-    def updateToken(id: String, registrationToken: String): Int = Await.result(insertOrUpdate(AccountToken(id, registrationToken, null, DateTime.now(DateTimeZone.UTC).getMillis)), Duration.Inf)
+    def updateToken(id: String, notificationToken: String): Int = Await.result(insertOrUpdate(AccountToken(id, Option(notificationToken), null, DateTime.now(DateTimeZone.UTC).getMillis)), Duration.Inf)
 
-    def getTokenById(id: String)(implicit executionContext: ExecutionContext): String = Await.result(findById(id), Duration.Inf).registrationToken
+    def getTokenById(id: String)(implicit executionContext: ExecutionContext): Option[String] = Await.result(findById(id), Duration.Inf).notificationToken
 
     def ifExists(id: String): Boolean = Await.result(checkById(id), Duration.Inf)
 
@@ -90,7 +93,7 @@ class AccountTokens @Inject()(protected val databaseConfigProvider: DatabaseConf
     }
 
     def tryVerifySessionTokenTime(username: String)(implicit executionContext: ExecutionContext): Boolean = {
-      if((DateTime.now(DateTimeZone.UTC).getMillis - Await.result(findById(username), Duration.Inf).sessionTokenTime) < configuration.get[Long]("sessionToken.timeout")) true
+      if ((DateTime.now(DateTimeZone.UTC).getMillis - Await.result(findById(username), Duration.Inf).sessionTokenTime) < sessionTokenTimeout) true
       else throw new BaseException(constants.Error.TOKEN_TIMEOUT)
     }
 

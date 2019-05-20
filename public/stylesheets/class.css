@@ -163,6 +163,12 @@ body{
     background-color: #80c846;
     color: white;
 }
+
+.notificationWindowCommons {
+    margin: 0 auto;
+    width: auto;
+    height: auto;
+}
 .notificationContainer {
     position: relative;
 }

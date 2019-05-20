@@ -4,7 +4,7 @@ import controllers.actions.WithLoginAction
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.masterTransaction.Notifications
-import play.api.i18n.{I18nSupport, Messages}
+import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
 
@@ -19,10 +19,10 @@ class NotificationController @Inject()(messagesControllerComponents: MessagesCon
 
   private val limit = configuration.get[Int]("notification.notificationsPerPage")
 
-  def showNotifications(pageNumber: Int): Action[AnyContent] = withLoginAction.authenticated { username =>
+  def showNotifications(pageNumber: Int = 0): Action[AnyContent] = withLoginAction.authenticated { username =>
     implicit request =>
       try {
-        Ok(views.html.component.master.notificationWindow(notifications.Service.getNotifications(username, (pageNumber - 1) * limit, limit), pageNumber, limit, notifications.Service.getNumberOfUnread(username)))
+        Ok(views.html.component.master.notificationWindow(notifications.Service.getNotifications(username, pageNumber * limit, limit), pageNumber, limit, notifications.Service.getNumberOfUnread(username)))
       }
       catch {
         case baseException: BaseException => Ok(baseException.message)
@@ -36,7 +36,7 @@ class NotificationController @Inject()(messagesControllerComponents: MessagesCon
         Ok(notifications.Service.getNumberOfUnread(username).toString)
       }
       catch {
-        case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))
+        case _: BaseException => NoContent
       }
   }
 }

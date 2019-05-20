@@ -181,8 +181,8 @@ class RedeemFiats @Inject()(protected val databaseConfigProvider: DatabaseConfig
         val fromAddress = masterAccounts.Service.getAddress(redeemFiat.from)
         blockchainFiats.Service.updateDirtyBit(fromAddress, dirtyBit = true)
         blockchainAccounts.Service.updateDirtyBit(fromAddress, dirtyBit = true)
-        pushNotifications.sendNotification(masterAccounts.Service.getId(redeemFiat.to), constants.Notification.SUCCESS, Seq(response.TxHash))
-        pushNotifications.sendNotification(redeemFiat.from, constants.Notification.SUCCESS, Seq(response.TxHash))
+        pushNotifications.sendNotification(masterAccounts.Service.getId(redeemFiat.to), constants.Notification.SUCCESS, response.TxHash)
+        pushNotifications.sendNotification(redeemFiat.from, constants.Notification.SUCCESS, response.TxHash)
       } catch {
         case baseException: BaseException => logger.error(constants.Error.BASE_EXCEPTION, baseException)
           throw new BaseException(constants.Error.PSQL_EXCEPTION)
@@ -193,8 +193,8 @@ class RedeemFiats @Inject()(protected val databaseConfigProvider: DatabaseConfig
       try {
         Service.updateTxHashStatusResponseCode(ticketID, txHash = null, status = false, message)
         val redeemFiat = Service.getRedeemFiat(ticketID)
-        pushNotifications.sendNotification(masterAccounts.Service.getId(redeemFiat.to), constants.Notification.FAILURE, Seq(message))
-        pushNotifications.sendNotification(redeemFiat.from, constants.Notification.FAILURE, Seq(message))
+        pushNotifications.sendNotification(masterAccounts.Service.getId(redeemFiat.to), constants.Notification.FAILURE, message)
+        pushNotifications.sendNotification(redeemFiat.from, constants.Notification.FAILURE, message)
       } catch {
         case baseException: BaseException => logger.error(constants.Error.BASE_EXCEPTION, baseException)
       }
