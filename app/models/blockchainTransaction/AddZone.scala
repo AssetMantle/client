@@ -34,10 +34,6 @@ class AddZones @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   private[models] val addZoneTable = TableQuery[AddZoneTable]
 
-  private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
-  private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
-  private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
-
   private def add(addZone: AddZone)(implicit executionContext: ExecutionContext): Future[String] = db.run((addZoneTable returning addZoneTable.map(_.ticketID) += addZone).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -169,6 +165,10 @@ class AddZones @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
     def getAddZone(ticketID: String): AddZone = Await.result(findByTicketID(ticketID), Duration.Inf)
   }
+
+  private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
+  private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
+  private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
 
   object Utility {
     def onSuccess(ticketID: String, response: Response): Future[Unit] = Future {

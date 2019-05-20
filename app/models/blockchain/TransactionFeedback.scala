@@ -53,10 +53,6 @@ class TransactionFeedbacks @Inject()(protected val databaseConfigProvider: Datab
 
   private[models] val transactionFeedbackTable = TableQuery[TransactionFeedbackTable]
 
-  private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
-  private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
-  private val sleepTime = configuration.get[Long]("blockchain.kafka.entityIterator.threadSleep")
-
   private def add(transactionFeedback: TransactionFeedback)(implicit executionContext: ExecutionContext): Future[String] = db.run((transactionFeedbackTable returning transactionFeedbackTable.map(_.address) += transactionFeedback).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -192,6 +188,10 @@ class TransactionFeedbacks @Inject()(protected val databaseConfigProvider: Datab
     def dirtyBit = column[Boolean]("dirtyBit")
 
   }
+
+  private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
+  private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
+  private val sleepTime = configuration.get[Long]("blockchain.entityIterator.threadSleep")
 
   object Service {
 
