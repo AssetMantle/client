@@ -11,7 +11,7 @@ import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
 import transactions.GetResponse
 import transactions.responses.TransactionResponse.Response
-import utilities.PushNotifications
+import utilities.PushNotification
 
 import scala.concurrent.duration.{Duration, _}
 import scala.concurrent.{Await, ExecutionContext, Future}
@@ -20,7 +20,7 @@ import scala.util.{Failure, Success}
 case class AddOrganization(from: String, to: String, organizationID: String, zoneID: String, status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])
 
 @Singleton
-class AddOrganizations @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, transactionAddOrganization: transactions.AddOrganization, getResponse: GetResponse, actorSystem: ActorSystem, pushNotifications: PushNotifications,masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts, blockchainOrganizations: blockchain.Organizations, masterOrganizations: master.Organizations)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
+class AddOrganizations @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, transactionAddOrganization: transactions.AddOrganization, getResponse: GetResponse, actorSystem: ActorSystem, pushNotification: PushNotification,masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts, blockchainOrganizations: blockchain.Organizations, masterOrganizations: master.Organizations)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_ADD_ORGANIZATION
 
@@ -181,8 +181,8 @@ class AddOrganizations @Inject()(protected val databaseConfigProvider: DatabaseC
         masterOrganizations.Service.updateStatus(addOrganization.organizationID, status = true)
         masterAccounts.Service.updateUserType(masterOrganizations.Service.getAccountId(addOrganization.organizationID), constants.User.ORGANIZATION)
         blockchainAccounts.Service.updateDirtyBit(masterAccounts.Service.getAddress(addOrganization.from), dirtyBit = true)
-        pushNotifications.sendNotification(masterAccounts.Service.getId(addOrganization.to), constants.Notification.SUCCESS, Seq(response.TxHash))
-        pushNotifications.sendNotification(addOrganization.from, constants.Notification.SUCCESS, Seq(response.TxHash))
+        pushNotification.sendNotification(masterAccounts.Service.getId(addOrganization.to), constants.Notification.SUCCESS, Seq(response.TxHash))
+        pushNotification.sendNotification(addOrganization.from, constants.Notification.SUCCESS, Seq(response.TxHash))
       } catch {
         case baseException: BaseException => logger.error(constants.Error.BASE_EXCEPTION, baseException)
           throw new BaseException(constants.Error.PSQL_EXCEPTION)
@@ -193,8 +193,8 @@ class AddOrganizations @Inject()(protected val databaseConfigProvider: DatabaseC
       try {
         Service.updateTxHashStatusResponseCode(ticketID, txHash = null, status = false, message)
         val addOrganization = Service.getAddOrganization(ticketID)
-        pushNotifications.sendNotification(masterAccounts.Service.getId(addOrganization.to), constants.Notification.FAILURE, Seq(message))
-        pushNotifications.sendNotification(addOrganization.from, constants.Notification.FAILURE, Seq(message))
+        pushNotification.sendNotification(masterAccounts.Service.getId(addOrganization.to), constants.Notification.FAILURE, Seq(message))
+        pushNotification.sendNotification(addOrganization.from, constants.Notification.FAILURE, Seq(message))
       } catch {
         case baseException: BaseException => logger.error(constants.Error.BASE_EXCEPTION, baseException)
       }

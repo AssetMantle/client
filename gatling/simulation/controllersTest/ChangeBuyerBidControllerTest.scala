@@ -6,6 +6,7 @@ import feeders._
 import io.gatling.core.Predef._
 import io.gatling.core.structure.ScenarioBuilder
 import io.gatling.http.Predef._
+import io.gatling.jdbc.Predef.jdbcFeeder
 
 class ChangeBuyerBidControllerTest extends Simulation {
 
@@ -62,4 +63,10 @@ object changeBuyerBidControllerTest {
         Form.GAS -> "${%s}".format(Test.TEST_GAS),
         Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
     .pause(5)
+
+  def getBuyerAddress(buyerUsername: String) = {
+    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://localhost:5432/comdex", "comdex", "comdex",
+      s"""SELECT "accountAddress" FROM master."Account" WHERE "id" = '$buyerUsername';""")
+    sqlQueryFeeder.apply().next()("accountAddress")
+  }
 }

@@ -10,7 +10,7 @@ import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
 import transactions.responses.TransactionResponse.Response
-import utilities.PushNotifications
+import utilities.PushNotification
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
@@ -19,7 +19,7 @@ import scala.util.{Failure, Success}
 case class ReleaseAsset(from: String, to: String, pegHash: String, gas: Int,  status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])
 
 @Singleton
-class ReleaseAssets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, transactionReleaseAsset: transactions.ReleaseAsset, blockchainAssets: blockchain.Assets, blockchainAccounts: blockchain.Accounts, actorSystem: ActorSystem, pushNotifications: PushNotifications,masterAccounts: master.Accounts)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
+class ReleaseAssets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, transactionReleaseAsset: transactions.ReleaseAsset, blockchainAssets: blockchain.Assets, blockchainAccounts: blockchain.Accounts, actorSystem: ActorSystem, pushNotification: PushNotification,masterAccounts: master.Accounts)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_RELEASE_ASSET
 
@@ -138,8 +138,8 @@ class ReleaseAssets @Inject()(protected val databaseConfigProvider: DatabaseConf
         val releaseAsset = Service.getTransaction(ticketID)
         blockchainAssets.Service.updateDirtyBit(releaseAsset.pegHash, true)
         blockchainAccounts.Service.updateDirtyBit(masterAccounts.Service.getAddress(releaseAsset.from), true)
-        pushNotifications.sendNotification(masterAccounts.Service.getId(releaseAsset.to), constants.Notification.SUCCESS, Seq(response.TxHash))
-        pushNotifications.sendNotification(releaseAsset.from, constants.Notification.SUCCESS, Seq(response.TxHash))
+        pushNotification.sendNotification(masterAccounts.Service.getId(releaseAsset.to), constants.Notification.SUCCESS, Seq(response.TxHash))
+        pushNotification.sendNotification(releaseAsset.from, constants.Notification.SUCCESS, Seq(response.TxHash))
       }
       catch {
         case baseException: BaseException => logger.error(constants.Error.BASE_EXCEPTION, baseException)
@@ -151,8 +151,8 @@ class ReleaseAssets @Inject()(protected val databaseConfigProvider: DatabaseConf
       try {
         Service.updateStatusAndResponseCode(ticketID, status = false, message)
         val releaseAsset = Service.getTransaction(ticketID)
-        pushNotifications.sendNotification(masterAccounts.Service.getId(releaseAsset.to), constants.Notification.FAILURE, Seq(message))
-        pushNotifications.sendNotification(releaseAsset.from, constants.Notification.FAILURE, Seq(message))
+        pushNotification.sendNotification(masterAccounts.Service.getId(releaseAsset.to), constants.Notification.FAILURE, Seq(message))
+        pushNotification.sendNotification(releaseAsset.from, constants.Notification.FAILURE, Seq(message))
       } catch {
         case baseException: BaseException => logger.error(constants.Error.BASE_EXCEPTION, baseException)
       }

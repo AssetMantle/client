@@ -14,7 +14,7 @@ import queries.GetAccount
 import queries.responses.AccountResponse
 import slick.jdbc.JdbcProfile
 import transactions.responses.TransactionResponse.Response
-import utilities.PushNotifications
+import utilities.PushNotification
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
@@ -23,7 +23,7 @@ import scala.util.{Failure, Success}
 case class IssueAsset(from: String, to: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, moderator: Boolean, gas: Int, status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])
 
 @Singleton
-class IssueAssets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, getAccount: GetAccount, blockchainAssets: blockchain.Assets, transactionIssueAsset: transactions.IssueAsset, actorSystem: ActorSystem, pushNotifications: PushNotifications, masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
+class IssueAssets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, getAccount: GetAccount, blockchainAssets: blockchain.Assets, transactionIssueAsset: transactions.IssueAsset, actorSystem: ActorSystem, pushNotification: PushNotification, masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_ISSUE_ASSET
 
@@ -155,8 +155,8 @@ class IssueAssets @Inject()(protected val databaseConfigProvider: DatabaseConfig
         val responseAccount = getAccount.Service.get(issueAsset.to)
         responseAccount.value.assetPegWallet.getOrElse(Seq(AccountResponse.Asset(null,null,null,null,null,null,null,false, false))).foreach(asset => blockchainAssets.Service.insertOrUpdateAsset(pegHash = asset.pegHash, documentHash = asset.documentHash, assetType = asset.assetType, assetPrice = asset.assetPrice, assetQuantity = asset.assetQuantity, quantityUnit = asset.quantityUnit, locked = asset.locked, moderator = asset.moderator, ownerAddress = issueAsset.to, dirtyBit = true))
         blockchainAccounts.Service.updateDirtyBit(masterAccounts.Service.getAddress(issueAsset.from), dirtyBit = true)
-        pushNotifications.sendNotification(masterAccounts.Service.getId(issueAsset.to), constants.Notification.SUCCESS, Seq(response.TxHash))
-        pushNotifications.sendNotification(issueAsset.from, constants.Notification.SUCCESS, Seq(response.TxHash))
+        pushNotification.sendNotification(masterAccounts.Service.getId(issueAsset.to), constants.Notification.SUCCESS, Seq(response.TxHash))
+        pushNotification.sendNotification(issueAsset.from, constants.Notification.SUCCESS, Seq(response.TxHash))
       } catch {
         case baseException: BaseException => logger.error(constants.Error.BASE_EXCEPTION, baseException)
           throw new BaseException(constants.Error.PSQL_EXCEPTION)
@@ -168,8 +168,8 @@ class IssueAssets @Inject()(protected val databaseConfigProvider: DatabaseConfig
       try {
         Service.updateStatusAndResponseCode(ticketID, status = false, message)
         val issueAsset = Service.getTransaction(ticketID)
-        pushNotifications.sendNotification(masterAccounts.Service.getId(issueAsset.to), constants.Notification.FAILURE, Seq(message))
-        pushNotifications.sendNotification(issueAsset.from, constants.Notification.FAILURE, Seq(message))
+        pushNotification.sendNotification(masterAccounts.Service.getId(issueAsset.to), constants.Notification.FAILURE, Seq(message))
+        pushNotification.sendNotification(issueAsset.from, constants.Notification.FAILURE, Seq(message))
       } catch {
         case baseException: BaseException => logger.error(constants.Error.BASE_EXCEPTION, baseException)
       }

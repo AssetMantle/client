@@ -113,4 +113,10 @@ object issueAssetControllerTest {
       s"""SELECT "id" FROM master_transaction."IssueAssetRequest" WHERE "accountID" = '$query';""")
     sqlQueryFeeder.apply().next()("id").toString
   }
+
+  def getPegHashByOwnerAddress(ownerAddress: String): String = {
+    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://localhost:5432/comdex", "comdex", "comdex",
+      s"""SELECT "pegHash" FROM blockchain."Asset_BC" WHERE "ownerAddress" = '$ownerAddress';""")
+    sqlQueryFeeder.apply().next()("pegHash").toString
+  }
 }
