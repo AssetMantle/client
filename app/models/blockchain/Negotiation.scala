@@ -145,7 +145,7 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
 
   private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
   private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
-  private val sleepTime = configuration.get[Long]("blockchain.kafka.entityIterator.threadSleep")
+  private val sleepTime = configuration.get[Long]("blockchain.entityIterator.threadSleep")
 
   object Utility {
     def dirtyEntityUpdater(): Future[Unit] = Future {

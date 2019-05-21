@@ -31,9 +31,6 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
   import databaseConfig.profile.api._
 
   private[models] val assetTable = TableQuery[AssetTable]
-  private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
-  private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
-  private val sleepTime = configuration.get[Long]("blockchain.kafka.entityIterator.threadSleep")
 
   private def add(asset: Asset)(implicit executionContext: ExecutionContext): Future[String] = db.run((assetTable returning assetTable.map(_.pegHash) += asset).asTry).map {
     case Success(result) => result
@@ -200,6 +197,10 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
     def updateOwnerAddress(pegHash: String, ownerAddress: String): Int = Await.result(updateOwnerAddressByPegHash(pegHash, ownerAddress), Duration.Inf)
 
   }
+
+  private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
+  private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
+  private val sleepTime = configuration.get[Long]("blockchain.entityIterator.threadSleep")
 
   object Utility {
     def dirtyEntityUpdater(): Future[Unit] = Future {

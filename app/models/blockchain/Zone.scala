@@ -30,10 +30,6 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
   private[models] val zoneTable = TableQuery[ZoneTable]
 
-  private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
-  private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
-  private val sleepTime = configuration.get[Long]("blockchain.kafka.entityIterator.threadSleep")
-
   private def add(zone: Zone)(implicit executionContext: ExecutionContext): Future[String] = db.run((zoneTable returning zoneTable.map(_.id) += zone).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -113,6 +109,10 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
     def dirtyBit = column[Boolean]("dirtyBit")
 
   }
+
+  private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
+  private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
+  private val sleepTime = configuration.get[Long]("blockchain.entityIterator.threadSleep")
 
   object Service {
 

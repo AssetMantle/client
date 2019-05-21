@@ -137,7 +137,7 @@ class SendFiats @Inject()(protected val databaseConfigProvider: DatabaseConfigPr
   private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
   private val schedulerInterval =  configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
   private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
-  private val sleepTime = configuration.get[Long]("blockchain.kafka.entityIterator.threadSleep")
+  private val sleepTime = configuration.get[Long]("blockchain.entityIterator.threadSleep")
 
   object Utility {
     def onSuccess(ticketID: String, response: Response): Future[Unit] = Future {
@@ -149,6 +149,7 @@ class SendFiats @Inject()(protected val databaseConfigProvider: DatabaseConfigPr
         blockchainOrders.Service.insertOrUpdateOrder(id = negotiationID, null, null, true)
         blockchainFiats.Service.updateDirtyBit(fromAddress, true)
         blockchainTransactionFeedbacks.Service.updateDirtyBit(fromAddress, true)
+        Thread.sleep(sleepTime)
         val orderResponse = getOrder.Service.get(negotiationID)
         blockchainFiats.Service.addFiats(orderResponse.value.fiatPegWallet.get.map{responseFiatPeg: AccountResponse.Fiat => blockchain.Fiat(pegHash = responseFiatPeg.pegHash, ownerAddress = negotiationID, transactionID = responseFiatPeg.transactionID, transactionAmount = responseFiatPeg.transactionAmount, redeemedAmount = responseFiatPeg.redeemedAmount, dirtyBit = false)})
         blockchainAccounts.Service.updateDirtyBit(fromAddress, dirtyBit = true)

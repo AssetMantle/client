@@ -554,7 +554,7 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."IssueFiatRequest"
   "id"                VARCHAR NOT NULL,
   "accountID"         VARCHAR NOT NULL,
   "transactionID"     VARCHAR NOT NULL,
-  "transactionAmount" INT     NOT NULL,
+  "transactonAmount" INT     NOT NULL,
   "gas"               INT,
   "status"            BOOLEAN,
   "ticketID"          VARCHAR,
@@ -615,8 +615,6 @@ ALTER TABLE BLOCKCHAIN."TraderFeedbackHistory_BC"
   ADD CONSTRAINT TraderFeedbackHistory_Account_buyerAddress FOREIGN KEY ("buyerAddress") REFERENCES BLOCKCHAIN."Account_BC" ("address");
 ALTER TABLE BLOCKCHAIN."TraderFeedbackHistory_BC"
   ADD CONSTRAINT TraderFeedbackHistory_Account_sellerAddress FOREIGN KEY ("sellerAddress") REFERENCES BLOCKCHAIN."Account_BC" ("address");
-ALTER TABLE BLOCKCHAIN."TraderFeedbackHistory_BC"
-  ADD CONSTRAINT TraderFeedbackHistory_Asset_pegHash FOREIGN KEY ("pegHash") REFERENCES BLOCKCHAIN."Asset_BC" ("pegHash");
 
 ALTER TABLE BLOCKCHAIN_TRANSACTION."SetACL"
   ADD CONSTRAINT SetACL_ACL_hash FOREIGN KEY ("aclHash") REFERENCES BLOCKCHAIN."ACLHash_BC" ("hash");

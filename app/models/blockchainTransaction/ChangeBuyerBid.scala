@@ -138,7 +138,7 @@ class ChangeBuyerBids @Inject()(protected val databaseConfigProvider: DatabaseCo
   private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
   private val schedulerInterval =  configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
   private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
-  private val sleepTime = configuration.get[Long]("blockchain.kafka.entityIterator.threadSleep")
+  private val sleepTime = configuration.get[Long]("blockchain.entityIterator.threadSleep")
 
   object Utility {
     def onSuccess(ticketID: String, response: Response): Future[Unit] = Future {
