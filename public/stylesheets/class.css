@@ -141,73 +141,7 @@ body{
     grid-row: 8/10;
     grid-column: 2/13;
 }
-
 /*Notification*/
-.seeAll {
-    background: #F6F7F8;
-    width: auto;
-    padding: 8px;
-    font-size: 12px;
-    font-weight: bold;
-    border-top: solid 1px rgba(100, 100, 100, .30);
-    text-align: center;
-}
-
-.seeAll a {
-    color: #3b5998;
-
-}
-
-.element:hover {
-    cursor: pointer;
-    background-color: #80c846;
-    color: white;
-}
-
-.notificationContainer {
-    position: relative;
-}
-
-.navbar {
-    overflow: hidden;
-    background-color: #333;
-    margin-bottom: 5px;
-}
-
-.navbar a {
-    float: left;
-    display: block;
-    color: #f2f2f2;
-    text-align: center;
-    padding: 14px 16px;
-    text-decoration: none;
-    font-size: 1em;
-    cursor: pointer;
-}
-
-.navbar a:hover {
-    background-color: #ddd;
-    color: black;
-}
-
-.navbar a.active {
-    background-color: #4CAF50;
-    color: white;
-}
-
-.navbar a.right {
-    float: right;
-}
-
-.sticky {
-    position: fixed;
-    top: 0;
-    width: 100%;
-}
-
-.stickyBar {
-    background-color: rgba(255, 255, 255, 0.9);
-}
 
 .badge {
     padding: 0.2em 0.5em;
@@ -220,3 +154,5 @@ body{
 .read {
     background-color: #aaaaaa;
 }
+
+/* Notification*/

@@ -7,18 +7,9 @@
 <a href="@routes.SendCoinController.sendCoinForm">@Messages(constants.Form.SEND_COIN)</a>
 <a href="@routes.LogoutController.logoutForm">@Messages(constants.Form.LOGOUT)</a>
 <br>
-<br>
-
-<div class="stickyBar">
-    <div class = "navbar">
-        <a class="rightNotification" onclick="getForm(jsRoutes.controllers.NotificationController.notificationPage(0))">@Messages(constants.Form.INBOX)
-            <span class="badge" id="notificationBadge">0</span>
-        </a>
-    </div></div>
-
+<a href="@routes.NotificationController.notificationPage(0)">@Messages(constants.Form.INBOX)</a>
 <h2>@username</h2>
-    @Messages(constants.User.USER_TYPE): @userType <br>
-    @Messages(constants.User.ADDRESS): @address <br>
-    @Messages(constants.User.COINS): @coins <br>
+@Messages(constants.User.USER_TYPE): @userType <br>
+@Messages(constants.User.ADDRESS): @address <br>
+@Messages(constants.User.COINS): @coins <br>
 <br>
-
