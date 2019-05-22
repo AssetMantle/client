@@ -144,7 +144,7 @@ class SendAssets @Inject()(protected val databaseConfigProvider: DatabaseConfigP
         val sendAsset = Service.getTransaction(ticketID)
         val fromAddress = masterAccounts.Service.getAddress(sendAsset.from)
         val negotiationID = blockchainNegotiations.Service.getNegotiationID(buyerAddress = sendAsset.to, sellerAddress = fromAddress, pegHash = sendAsset.pegHash)
-        blockchainOrders.Service.insertOrUpdateOrder(id = negotiationID, null, null, true)
+        blockchainOrders.Service.insertOrUpdateOrder(id = negotiationID, null, null, false)
         Thread.sleep(sleepTime)
         val orderResponse = getOrder.Service.get(negotiationID)
         orderResponse.value.assetPegWallet.get.map { responseAssetPeg: AccountResponse.Asset => blockchainAssets.Service.insertOrUpdateAsset(pegHash = responseAssetPeg.pegHash, documentHash = responseAssetPeg.documentHash, assetType = responseAssetPeg.assetType, assetQuantity = responseAssetPeg.assetQuantity, assetPrice = responseAssetPeg.assetPrice, quantityUnit = responseAssetPeg.quantityUnit, ownerAddress = negotiationID, moderator = responseAssetPeg.moderator, locked = responseAssetPeg.locked, dirtyBit = false) }
