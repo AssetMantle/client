@@ -10,6 +10,7 @@
         @inputText(issueAssetRequestForm(constants.Form.ASSET_PRICE),'_label-> Messages(constants.Form.ASSET_PRICE))
         @inputText(issueAssetRequestForm(constants.Form.QUANTITY_UNIT),'_label-> Messages(constants.Form.QUANTITY_UNIT))
         @inputText(issueAssetRequestForm(constants.Form.ASSET_QUANTITY),'_label-> Messages(constants.Form.ASSET_QUANTITY))
+        @checkbox(issueAssetRequestForm(constants.Form.MODERATOR), '_label -> Messages(constants.Form.MODERATOR))
 
         @if(issueAssetRequestForm.hasGlobalErrors) {
             <ul>

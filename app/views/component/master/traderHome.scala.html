@@ -19,28 +19,28 @@
     @if(aclHash.confirmSellerBid) {
         <a href="@routes.ConfirmSellerBidController.confirmSellerBidForm">@Messages(constants.Form.CONFIRM_SELLER_BID)</a>
     }
-    @if(aclHash.issueAssets) {
+    @if(aclHash.issueAsset) {
         <a href="@routes.IssueAssetController.issueAssetRequestForm">@Messages(constants.Form.ISSUE_ASSET_REQUEST)</a>
     }
-    @if(aclHash.issueFiats) {
+    @if(aclHash.issueFiat) {
         <a href="@routes.IssueFiatController.issueFiatRequestForm">@Messages(constants.Form.ISSUE_FIAT_REQUEST)</a>
     }
-    @if(aclHash.redeemAssets) {
+    @if(aclHash.redeemAsset) {
         <a href="@routes.RedeemAssetController.redeemAssetForm">@Messages(constants.Form.REDEEM_ASSET)</a>
     }
-    @if(aclHash.redeemFiats) {
+    @if(aclHash.redeemFiat) {
         <a href="@routes.RedeemFiatController.redeemFiatForm">@Messages(constants.Form.REDEEM_FIAT)</a>
     }
-    @if(aclHash.releaseAssets) {
+    @if(aclHash.releaseAsset) {
         <a href="@routes.ReleaseAssetController.releaseAssetForm">@Messages(constants.Form.RELEASE_ASSET)</a>
     }
     @if(aclHash.sellerExecuteOrder) {
         <a href="@routes.SellerExecuteOrderController.sellerExecuteOrderForm()">@Messages(constants.Form.SELLER_EXECUTE_ORDER)</a>
     }
-    @if(aclHash.sendAssets) {
+    @if(aclHash.sendAsset) {
         <a href="@routes.SendAssetController.sendAssetForm">@Messages(constants.Form.SEND_ASSET)</a>
     }
-    @if(aclHash.sendFiats) {
+    @if(aclHash.sendFiat) {
         <a href="@routes.SendFiatController.sendFiatForm">@Messages(constants.Form.SEND_FIAT)</a>
     }
 

@@ -17,7 +17,7 @@ import views.companion.master.Login
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class LoginController @Inject()(messagesControllerComponents: MessagesControllerComponents, masterAccounts: Accounts, blockchainAclAccounts: ACLAccounts, blockchainZones: blockchain.Zones, blockchainOrganizations: blockchain.Organizations, blockchainAssets: blockchain.Assets, blockchainFiats: blockchain.Fiats, blockchainOwners: blockchain.Owners, masterOrganizations: Organizations, masterZones: Zones, blockchainAclHashes: blockchain.ACLHashes, getAccount: GetAccount, blockchainAccounts: blockchain.Accounts, withUsernameToken: WithUsernameToken, pushNotifications: PushNotifications)(implicit exec: ExecutionContext, configuration: Configuration, wsClient: WSClient) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class LoginController @Inject()(messagesControllerComponents: MessagesControllerComponents, masterAccounts: Accounts, blockchainAclAccounts: ACLAccounts, blockchainZones: blockchain.Zones, blockchainOrganizations: blockchain.Organizations, blockchainAssets: blockchain.Assets, blockchainFiats: blockchain.Fiats, masterOrganizations: Organizations, masterZones: Zones, blockchainAclHashes: blockchain.ACLHashes, getAccount: GetAccount, blockchainAccounts: blockchain.Accounts, withUsernameToken: WithUsernameToken, pushNotifications: PushNotifications)(implicit exec: ExecutionContext, configuration: Configuration, wsClient: WSClient) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val module: String = constants.Module.CONTROLLERS_LOGIN
 
@@ -45,8 +45,8 @@ class LoginController @Inject()(messagesControllerComponents: MessagesController
               withUsernameToken.Ok(views.html.component.master.organizationHome(username = loginData.username, userType = constants.User.ORGANIZATION, address = address, coins = blockchainAccounts.Service.getCoins(address), organization = masterOrganizations.Service.getOrganization(blockchainOrganizations.Service.getID(address))), loginData.username)
             case constants.User.TRADER =>
               val aclAccount = blockchainAclAccounts.Service.getACLAccount(address)
-              val owners = blockchainOwners.Service.getOwners(address)
-              withUsernameToken.Ok(views.html.component.master.traderHome(username = loginData.username, userType = constants.User.TRADER, address = address, coins = blockchainAccounts.Service.getCoins(address), assetPegWallet = blockchainAssets.Service.getAssetPegWallet(address), fiatPegWallet = blockchainFiats.Service.getFiatPegWallet(owners.map(_.pegHash).seq), totalFiat = owners.map(_.amount).sum, zone = masterZones.Service.getZone(aclAccount.zoneID), organization = masterOrganizations.Service.getOrganization(aclAccount.organizationID), aclHash = blockchainAclHashes.Service.getACLHash(aclAccount.aclHash)), loginData.username)
+              val fiatPegWallet = blockchainFiats.Service.getFiatPegWallet(address)
+              withUsernameToken.Ok(views.html.component.master.traderHome(username = loginData.username, userType = constants.User.TRADER, address = address, coins = blockchainAccounts.Service.getCoins(address), assetPegWallet = blockchainAssets.Service.getAssetPegWallet(address), fiatPegWallet = fiatPegWallet, totalFiat = fiatPegWallet.map(_.transactionAmount.toInt).sum, zone = masterZones.Service.getZone(aclAccount.zoneID), organization = masterOrganizations.Service.getOrganization(aclAccount.organizationID), aclHash = blockchainAclHashes.Service.getACLHash(aclAccount.aclHash)), loginData.username)
             case constants.User.USER =>
               withUsernameToken.Ok(views.html.component.master.userHome(username = loginData.username, userType = constants.User.USER, address = address, coins = blockchainAccounts.Service.getCoins(address)), loginData.username)
             case constants.User.UNKNOWN =>

@@ -4,7 +4,7 @@ import play.api.libs.json.{Json, Reads}
 
 object FiatResponse {
 
-  case class Owners(ownerAddress: String, amount: Int)
+  case class Owners(ownerAddress: String, amount: String)
 
   implicit val ownersReads: Reads[Owners] = Json.reads[Owners]
 

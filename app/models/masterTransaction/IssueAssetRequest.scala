@@ -11,7 +11,7 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Random, Success}
 
-case class IssueAssetRequest(id: String, accountID: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, gas: Option[Int], status: Option[Boolean], comment: Option[String])
+case class IssueAssetRequest(id: String, ticketID: Option[String], accountID: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, moderator: Boolean, gas: Option[Int], status: Option[Boolean], comment: Option[String])
 
 @Singleton
 class IssueAssetRequests @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider) {
@@ -46,7 +46,7 @@ class IssueAssetRequests @Inject()(protected val databaseConfigProvider: Databas
     }
   }
 
-  private def findByAccountID(accountID: String)(implicit executionContext: ExecutionContext): Future[IssueAssetRequest] = db.run(issueAssetRequestTable.filter(_.accountID === accountID).result.head.asTry).map {
+  private def updateTicketIDStatusAndGasByID(id: String, ticketID: String, status: Boolean, gas: Int)(implicit executionContext: ExecutionContext) = db.run(issueAssetRequestTable.filter(_.id === id).map(faucet => (faucet.ticketID, faucet.status, faucet.gas)).update((ticketID, status, gas)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
@@ -56,7 +56,7 @@ class IssueAssetRequests @Inject()(protected val databaseConfigProvider: Databas
     }
   }
 
-  private def updateStatusAndGasByID(id: String, status: Boolean, gas: Int)(implicit executionContext: ExecutionContext) = db.run(issueAssetRequestTable.filter(_.id === id).map(faucet => (faucet.status, faucet.gas)).update((status, gas)).asTry).map {
+  private def updateStatusAndCommentByTicketID(ticketID: String, status: Option[Boolean], comment: String)(implicit executionContext: ExecutionContext) = db.run(issueAssetRequestTable.filter(_.ticketID === ticketID).map(issueAssetRequest => (issueAssetRequest.status.?, issueAssetRequest.comment)).update((status, comment)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
@@ -66,17 +66,7 @@ class IssueAssetRequests @Inject()(protected val databaseConfigProvider: Databas
     }
   }
 
-  private def updateStatusAndCommentByID(id: String, status: Boolean, comment: String)(implicit executionContext: ExecutionContext) = db.run(issueAssetRequestTable.filter(_.id === id).map(issueAssetRequest => (issueAssetRequest.status, issueAssetRequest.comment)).update((status, comment)).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
-        throw new BaseException(constants.Error.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
-        throw new BaseException(constants.Error.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
-
-  private def updateStatusByID(id: String, status: Boolean)(implicit executionContext: ExecutionContext) = db.run(issueAssetRequestTable.filter(_.id === id).map(_.status).update(status).asTry).map {
+  private def updateStatusAndCommentByID(id: String, status: Option[Boolean], comment: String)(implicit executionContext: ExecutionContext) = db.run(issueAssetRequestTable.filter(_.id === id).map(issueAssetRequest => (issueAssetRequest.status.?, issueAssetRequest.comment)).update((status, comment)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
@@ -89,10 +79,8 @@ class IssueAssetRequests @Inject()(protected val databaseConfigProvider: Databas
   private def getIssueAssetRequestsWithNullStatus(accountIDs: Seq[String])(implicit executionContext: ExecutionContext): Future[Seq[IssueAssetRequest]] = db.run(issueAssetRequestTable.filter(_.accountID.inSet(accountIDs)).filter(_.status.?.isEmpty).result.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
-        throw new BaseException(constants.Error.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
-        throw new BaseException(constants.Error.NO_SUCH_ELEMENT_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.info(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+        Nil
     }
   }
 
@@ -106,31 +94,21 @@ class IssueAssetRequests @Inject()(protected val databaseConfigProvider: Databas
     }
   }
 
-  private def updateCommentByID(id: String, comment: String)(implicit executionContext: ExecutionContext) = db.run(issueAssetRequestTable.filter(_.id === id).map(_.comment).update(comment).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
-        throw new BaseException(constants.Error.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
-        throw new BaseException(constants.Error.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
-
   private def getStatusByID(id: String)(implicit executionContext: ExecutionContext): Future[Option[Boolean]] = db.run(issueAssetRequestTable.filter(_.id === id).map(_.status.?).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
-        throw new BaseException(constants.Error.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+      case noSuchElementException: NoSuchElementException => logger.info(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
         throw new BaseException(constants.Error.NO_SUCH_ELEMENT_EXCEPTION)
     }
   }
 
   private[models] class IssueAssetRequestTable(tag: Tag) extends Table[IssueAssetRequest](tag, "IssueAssetRequest") {
 
-    def * = (id, accountID, documentHash, assetType, assetPrice, quantityUnit, assetQuantity, gas.?, status.?, comment.?) <> (IssueAssetRequest.tupled, IssueAssetRequest.unapply)
+    def * = (id, ticketID.?, accountID, documentHash, assetType, assetPrice, quantityUnit, assetQuantity, moderator, gas.?, status.?, comment.?) <> (IssueAssetRequest.tupled, IssueAssetRequest.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
+
+    def ticketID = column[String]("ticketID")
 
     def accountID = column[String]("accountID")
 
@@ -144,6 +122,8 @@ class IssueAssetRequests @Inject()(protected val databaseConfigProvider: Databas
 
     def assetQuantity = column[Int]("assetQuantity")
 
+    def moderator = column[Boolean]("moderator")
+
     def gas = column[Int]("gas")
 
     def status = column[Boolean]("status")
@@ -154,17 +134,13 @@ class IssueAssetRequests @Inject()(protected val databaseConfigProvider: Databas
 
   object Service {
 
-    def addIssueAssetRequest(accountID: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int)(implicit executionContext: ExecutionContext):String = Await.result(add(IssueAssetRequest(id = Random.nextString(32), accountID = accountID, documentHash = documentHash, assetType = assetType, assetPrice = assetPrice, quantityUnit = quantityUnit, assetQuantity = assetQuantity, null, null, null)), Duration.Inf)
+    def addIssueAssetRequest(accountID: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, moderator: Boolean)(implicit executionContext: ExecutionContext):String = Await.result(add(IssueAssetRequest(id = Random.nextString(32), null, accountID = accountID, documentHash = documentHash, assetType = assetType, assetPrice = assetPrice, quantityUnit = quantityUnit, assetQuantity = assetQuantity, moderator = moderator, null, null, null)), Duration.Inf)
 
-    def getIssueAssetRequest(accountID: String)(implicit executionContext: ExecutionContext): IssueAssetRequest = Await.result(findByAccountID(accountID), Duration.Inf)
+    def updateTicketIDStatusAndGas(id: String, ticketID: String,status: Boolean, gas: Int)(implicit executionContext: ExecutionContext): Int = Await.result(updateTicketIDStatusAndGasByID(id, ticketID, status, gas), Duration.Inf)
 
-    def updateStatusAndGas(id: String, status: Boolean, gas: Int)(implicit executionContext: ExecutionContext): Int = Await.result(updateStatusAndGasByID(id, status, gas), Duration.Inf)
+    def updateStatusAndCommentOnTicketID(ticketID: String, status: Option[Boolean], comment: String)(implicit executionContext: ExecutionContext): Int = Await.result(updateStatusAndCommentByTicketID(ticketID, status, comment), Duration.Inf)
 
-    def updateStatusAndComment(id: String, status: Boolean, comment: String)(implicit executionContext: ExecutionContext): Int = Await.result(updateStatusAndCommentByID(id, status, comment), Duration.Inf)
-
-    def updateStatus(id: String, status: Boolean)(implicit executionContext: ExecutionContext): Int = Await.result(updateStatusByID(id, status), Duration.Inf)
-
-    def updateComment(id: String, comment: String)(implicit executionContext: ExecutionContext): Int = Await.result(updateCommentByID(id, comment), Duration.Inf)
+    def updateStatusAndComment(id: String, status: Option[Boolean], comment: String)(implicit executionContext: ExecutionContext): Int = Await.result(updateStatusAndCommentByID(id, status, comment), Duration.Inf)
 
     def getPendingIssueAssetRequests(accountIDs: Seq[String])(implicit executionContext: ExecutionContext): Seq[IssueAssetRequest] = Await.result(getIssueAssetRequestsWithNullStatus(accountIDs), Duration.Inf)
 

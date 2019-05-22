@@ -1,11 +1,13 @@
 package queries.responses
 
+import models.blockchain.ACL
 import play.api.libs.json.{Json, Reads}
-import queries.responses.AccountResponse.{Asset, Fiat}
 
-object OrderResponse {
+object ACLResponse {
 
-  case class Value(negotiationID: String, fiatProofHash: String, awbProofHash: String, fiatPegWallet: Option[Seq[Fiat]], assetPegWallet: Option[Seq[Asset]])
+  implicit val aclReads: Reads[ACL] = Json.reads[ACL]
+
+  case class Value(address: String, zoneID: String, organizationID: String, acl: ACL)
 
   implicit val valueReads: Reads[Value] = Json.reads[Value]
 

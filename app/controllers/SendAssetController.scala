@@ -3,16 +3,16 @@ package controllers
 import controllers.actions.{WithLoginAction, WithTraderLoginAction}
 import exceptions.{BaseException, BlockChainException}
 import javax.inject.{Inject, Singleton}
-import models.{blockchain, blockchainTransaction, master}
+import models.{blockchain, blockchainTransaction}
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Random
 
 @Singleton
-class SendAssetController @Inject()(messagesControllerComponents: MessagesControllerComponents, blockchainAssets: blockchain.Assets, blockchainOrders: blockchain.Orders, masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts, withTraderLoginAction: WithTraderLoginAction, withLoginAction: WithLoginAction, transactionsSendAsset: transactions.SendAsset, blockchainTransactionSendAssets: blockchainTransaction.SendAssets)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class SendAssetController @Inject()(messagesControllerComponents: MessagesControllerComponents, blockchainAssets: blockchain.Assets, blockchainOrders: blockchain.Orders, blockchainAccounts: blockchain.Accounts, withTraderLoginAction: WithTraderLoginAction, withLoginAction: WithLoginAction, transactionsSendAsset: transactions.SendAsset, blockchainTransactionSendAssets: blockchainTransaction.SendAssets)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -30,18 +30,20 @@ class SendAssetController @Inject()(messagesControllerComponents: MessagesContro
         },
         sendAssetData => {
           try {
-            if (kafkaEnabled) {
-              val response = transactionsSendAsset.Service.kafkaPost(transactionsSendAsset.Request(from = username, to = sendAssetData.to, password = sendAssetData.password, pegHash = sendAssetData.pegHash, gas = sendAssetData.gas))
-              blockchainTransactionSendAssets.Service.addSendAssetKafka(from = username, to = sendAssetData.to, pegHash = sendAssetData.pegHash, gas = sendAssetData.gas, null, null, ticketID = response.ticketID, null)
-              Ok(views.html.index(success = response.ticketID))
-            } else {
-              val response = transactionsSendAsset.Service.post(transactionsSendAsset.Request(from = username, to = sendAssetData.to, password = sendAssetData.password, pegHash = sendAssetData.pegHash, gas = sendAssetData.gas))
-              val fromAddress = masterAccounts.Service.getAddress(username)
-              blockchainTransactionSendAssets.Service.addSendAsset(from = username, to = sendAssetData.to, pegHash = sendAssetData.pegHash, gas = sendAssetData.gas, null, txHash = Option(response.TxHash), ticketID = Random.nextString(32), null)
-              blockchainAccounts.Service.updateSequence(fromAddress, blockchainAccounts.Service.getSequence(fromAddress) + 1)
-              //TODO: InsertOrUpdate Order Table
-              Ok(views.html.index(success = response.TxHash))
+            val ticketID: String = if (kafkaEnabled) transactionsSendAsset.Service.kafkaPost(transactionsSendAsset.Request(from = username, to = sendAssetData.buyerAddress, password = sendAssetData.password, pegHash = sendAssetData.pegHash, gas = sendAssetData.gas)).ticketID else Random.nextString(32)
+            blockchainTransactionSendAssets.Service.addSendAsset(from = username, to = sendAssetData.buyerAddress, pegHash = sendAssetData.pegHash, gas = sendAssetData.gas, null, null, ticketID = ticketID, null)
+            if(!kafkaEnabled){
+              Future{
+                try {
+                  blockchainTransactionSendAssets.Utility.onSuccess(ticketID, transactionsSendAsset.Service.post(transactionsSendAsset.Request(from = username, to = sendAssetData.buyerAddress, password = sendAssetData.password, pegHash = sendAssetData.pegHash, gas = sendAssetData.gas)))
+                } catch {
+                  case baseException: BaseException => logger.error(constants.Error.BASE_EXCEPTION, baseException)
+                  case blockChainException: BlockChainException => logger.error(blockChainException.message, blockChainException)
+                    blockchainTransactionSendAssets.Utility.onFailure(ticketID, blockChainException.message)
+                }
+              }
             }
+            Ok(views.html.index(success = ticketID))
           }
           catch {
             case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))
@@ -64,7 +66,7 @@ class SendAssetController @Inject()(messagesControllerComponents: MessagesContro
         try {
           if (kafkaEnabled) {
             val response = transactionsSendAsset.Service.kafkaPost(transactionsSendAsset.Request(from = sendAssetData.from, to = sendAssetData.to, password = sendAssetData.password, pegHash = sendAssetData.pegHash, gas = sendAssetData.gas))
-            blockchainTransactionSendAssets.Service.addSendAssetKafka(from = sendAssetData.from, to = sendAssetData.to, pegHash = sendAssetData.pegHash, gas = sendAssetData.gas, null, null, ticketID = response.ticketID, null)
+            blockchainTransactionSendAssets.Service.addSendAsset(from = sendAssetData.from, to = sendAssetData.to, pegHash = sendAssetData.pegHash, gas = sendAssetData.gas, null, null, ticketID = response.ticketID, null)
             Ok(views.html.index(success = response.ticketID))
           } else {
             val response = transactionsSendAsset.Service.post(transactionsSendAsset.Request(from = sendAssetData.from, to = sendAssetData.to, password = sendAssetData.password, pegHash = sendAssetData.pegHash, gas = sendAssetData.gas))
