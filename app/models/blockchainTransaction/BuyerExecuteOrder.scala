@@ -145,6 +145,8 @@ class BuyerExecuteOrders @Inject()(protected val databaseConfigProvider: Databas
         val negotiationID = blockchainNegotiations.Service.getNegotiationID(buyerAddress = buyerExecuteOrder.buyerAddress, sellerAddress = buyerExecuteOrder.sellerAddress, pegHash = buyerExecuteOrder.pegHash)
         blockchainOrders.Service.updateDirtyBit(id = negotiationID, true)
         blockchainAccounts.Service.updateDirtyBit(buyerExecuteOrder.buyerAddress,true)
+        blockchainTransactionFeedbacks.Service.updateDirtyBit(buyerExecuteOrder.buyerAddress, true)
+        blockchainTransactionFeedbacks.Service.updateDirtyBit(buyerExecuteOrder.sellerAddress, true)
         pushNotifications.sendNotification(masterAccounts.Service.getId(buyerExecuteOrder.sellerAddress), constants.Notification.SUCCESS, Seq(response.TxHash))
         pushNotifications.sendNotification(buyerExecuteOrder.from, constants.Notification.SUCCESS, Seq(response.TxHash))
       } catch {
