@@ -12,8 +12,9 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
       JavaScriptReverseRouter("jsRoutes")(
         routes.javascript.SignUpController.checkUsernameAvailable,
         routes.javascript.ConfigurationController.queryConfigurationVariable,
-        routes.javascript.NotificationController.showNotifications,
-        routes.javascript.NotificationController.markNotificationAsRead
+        routes.javascript.NotificationController.notificationPage,
+        routes.javascript.NotificationController.unreadNotificationCount,
+        routes.javascript.NotificationController.markNotificationRead
       )
     ).as("text/javascript")
   }
