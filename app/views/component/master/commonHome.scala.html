@@ -7,9 +7,10 @@
 <a href="@routes.SendCoinController.sendCoinForm">@Messages(constants.Form.SEND_COIN)</a>
 <a href="@routes.LogoutController.logoutForm">@Messages(constants.Form.LOGOUT)</a>
 <br>
-<a href="@routes.NotificationController.notificationPage(0)">@Messages(constants.Form.INBOX)</a>
+<br>
 <h2>@username</h2>
 @Messages(constants.User.USER_TYPE): @userType <br>
 @Messages(constants.User.ADDRESS): @address <br>
 @Messages(constants.User.COINS): @coins <br>
 <br>
+<a href="@routes.NotificationController.notificationPage(0)">@Messages(constants.Form.INBOX)</a>
