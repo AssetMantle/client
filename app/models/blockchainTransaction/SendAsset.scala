@@ -163,6 +163,7 @@ class SendAssets @Inject()(protected val databaseConfigProvider: DatabaseConfigP
       try {
         Service.updateStatusAndResponseCode(ticketID, status = false, message)
         val sendAsset = Service.getTransaction(ticketID)
+        blockchainTransactionFeedbacks.Service.updateDirtyBit(masterAccounts.Service.getAddress(sendAsset.from), true)
         pushNotifications.sendNotification(masterAccounts.Service.getId(sendAsset.to), constants.Notification.FAILURE, message)
         pushNotifications.sendNotification(sendAsset.from, constants.Notification.FAILURE, message)
       } catch {

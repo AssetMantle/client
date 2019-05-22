@@ -145,6 +145,8 @@ class SellerExecuteOrders @Inject()(protected val databaseConfigProvider: Databa
         val negotiationID = blockchainNegotiations.Service.getNegotiationID(buyerAddress = sellerExecuteOrder.buyerAddress, sellerAddress = sellerExecuteOrder.sellerAddress, pegHash = sellerExecuteOrder.pegHash)
         blockchainOrders.Service.updateDirtyBit(id = negotiationID, true)
         blockchainAccounts.Service.updateDirtyBit(sellerExecuteOrder.sellerAddress, dirtyBit = true)
+        blockchainTransactionFeedbacks.Service.updateDirtyBit(sellerExecuteOrder.buyerAddress, true)
+        blockchainTransactionFeedbacks.Service.updateDirtyBit(sellerExecuteOrder.sellerAddress, true)
         pushNotifications.sendNotification(masterAccounts.Service.getId(sellerExecuteOrder.buyerAddress), constants.Notification.SUCCESS, response.TxHash)
         pushNotifications.sendNotification(sellerExecuteOrder.from, constants.Notification.SUCCESS, response.TxHash)
       }
@@ -158,6 +160,8 @@ class SellerExecuteOrders @Inject()(protected val databaseConfigProvider: Databa
       try {
         Service.updateStatusAndResponseCode(ticketID, status = false, message)
         val sellerExecuteOrder = Service.getTransaction(ticketID)
+        blockchainTransactionFeedbacks.Service.updateDirtyBit(sellerExecuteOrder.buyerAddress, true)
+        blockchainTransactionFeedbacks.Service.updateDirtyBit(sellerExecuteOrder.sellerAddress, true)
         pushNotifications.sendNotification(masterAccounts.Service.getId(sellerExecuteOrder.buyerAddress), constants.Notification.FAILURE, message)
         pushNotifications.sendNotification(sellerExecuteOrder.from, constants.Notification.FAILURE, message)
       } catch {

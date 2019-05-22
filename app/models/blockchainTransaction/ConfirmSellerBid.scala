@@ -167,6 +167,8 @@ class ConfirmSellerBids @Inject()(protected val databaseConfigProvider: Database
       try {
         Service.updateStatusAndResponseCode(ticketID, status = false, message)
         val confirmSellerBid = Service.getTransaction(ticketID)
+        blockchainTransactionFeedbacks.Service.updateDirtyBit(masterAccounts.Service.getAddress(confirmSellerBid.from), true)
+        blockchainTransactionFeedbacks.Service.updateDirtyBit(confirmSellerBid.to, true)
         pushNotifications.sendNotification(masterAccounts.Service.getId(confirmSellerBid.to), constants.Notification.FAILURE, message)
         pushNotifications.sendNotification(confirmSellerBid.from, constants.Notification.FAILURE, message)
       } catch {
