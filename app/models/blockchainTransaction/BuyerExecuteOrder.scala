@@ -159,6 +159,8 @@ class BuyerExecuteOrders @Inject()(protected val databaseConfigProvider: Databas
       try {
         Service.updateStatusAndResponseCode(ticketID, status = false, message)
         val buyerExecuteOrder = Service.getTransaction(ticketID)
+        blockchainTransactionFeedbacks.Service.updateDirtyBit(buyerExecuteOrder.buyerAddress, true)
+        blockchainTransactionFeedbacks.Service.updateDirtyBit(buyerExecuteOrder.sellerAddress, true)
         pushNotifications.sendNotification(masterAccounts.Service.getId(buyerExecuteOrder.sellerAddress), constants.Notification.FAILURE, Seq(message))
         pushNotifications.sendNotification(buyerExecuteOrder.from, constants.Notification.FAILURE, Seq(message))
       } catch {

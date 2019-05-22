@@ -160,6 +160,8 @@ class SellerExecuteOrders @Inject()(protected val databaseConfigProvider: Databa
       try {
         Service.updateStatusAndResponseCode(ticketID, status = false, message)
         val sellerExecuteOrder = Service.getTransaction(ticketID)
+        blockchainTransactionFeedbacks.Service.updateDirtyBit(sellerExecuteOrder.buyerAddress, true)
+        blockchainTransactionFeedbacks.Service.updateDirtyBit(sellerExecuteOrder.sellerAddress, true)
         pushNotifications.sendNotification(masterAccounts.Service.getId(sellerExecuteOrder.buyerAddress), constants.Notification.FAILURE, Seq(message))
         pushNotifications.sendNotification(sellerExecuteOrder.from, constants.Notification.FAILURE, Seq(message))
       } catch {

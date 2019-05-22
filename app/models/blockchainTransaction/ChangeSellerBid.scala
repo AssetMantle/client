@@ -166,6 +166,8 @@ class ChangeSellerBids @Inject()(protected val databaseConfigProvider: DatabaseC
       try {
         Service.updateStatusAndResponseCode(ticketID, status = false, message)
         val changeSellerBid = Service.getTransaction(ticketID)
+        blockchainTransactionFeedbacks.Service.updateDirtyBit(masterAccounts.Service.getAddress(changeSellerBid.from), true)
+        blockchainTransactionFeedbacks.Service.updateDirtyBit(changeSellerBid.to, true)
         pushNotifications.sendNotification(masterAccounts.Service.getId(changeSellerBid.to), constants.Notification.FAILURE, Seq(message))
         pushNotifications.sendNotification(changeSellerBid.from, constants.Notification.FAILURE, Seq(message))
       } catch {
