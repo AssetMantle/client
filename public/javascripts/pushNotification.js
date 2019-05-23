@@ -31,4 +31,7 @@ $(document).ready(function () {
         .catch(function (err) {
             console.log("Unable to get permission to notify.", err);
         });
+    messaging.onMessage(function (payload) {
+        alert(JSON.parse(JSON.stringify(payload)).notification.title + " + " + JSON.parse(JSON.stringify(payload)).notification.body);
+    });
 });
