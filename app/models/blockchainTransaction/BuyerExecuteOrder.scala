@@ -147,8 +147,8 @@ class BuyerExecuteOrders @Inject()(protected val databaseConfigProvider: Databas
         blockchainAccounts.Service.updateDirtyBit(buyerExecuteOrder.buyerAddress,true)
         blockchainTransactionFeedbacks.Service.updateDirtyBit(buyerExecuteOrder.buyerAddress, true)
         blockchainTransactionFeedbacks.Service.updateDirtyBit(buyerExecuteOrder.sellerAddress, true)
-        pushNotifications.sendNotification(masterAccounts.Service.getId(buyerExecuteOrder.sellerAddress), constants.Notification.SUCCESS, Seq(response.TxHash))
-        pushNotifications.sendNotification(buyerExecuteOrder.from, constants.Notification.SUCCESS, Seq(response.TxHash))
+        pushNotifications.sendNotification(masterAccounts.Service.getId(buyerExecuteOrder.sellerAddress), constants.Notification.SUCCESS, response.TxHash)
+        pushNotifications.sendNotification(buyerExecuteOrder.from, constants.Notification.SUCCESS, response.TxHash)
       } catch {
         case baseException: BaseException => logger.error(constants.Response.BASE_EXCEPTION.message, baseException)
           throw new BaseException(constants.Response.PSQL_EXCEPTION)
@@ -161,8 +161,8 @@ class BuyerExecuteOrders @Inject()(protected val databaseConfigProvider: Databas
         val buyerExecuteOrder = Service.getTransaction(ticketID)
         blockchainTransactionFeedbacks.Service.updateDirtyBit(buyerExecuteOrder.buyerAddress, true)
         blockchainTransactionFeedbacks.Service.updateDirtyBit(buyerExecuteOrder.sellerAddress, true)
-        pushNotifications.sendNotification(masterAccounts.Service.getId(buyerExecuteOrder.sellerAddress), constants.Notification.FAILURE, Seq(message))
-        pushNotifications.sendNotification(buyerExecuteOrder.from, constants.Notification.FAILURE, Seq(message))
+        pushNotifications.sendNotification(masterAccounts.Service.getId(buyerExecuteOrder.sellerAddress), constants.Notification.FAILURE, message)
+        pushNotifications.sendNotification(buyerExecuteOrder.from, constants.Notification.FAILURE, message)
       } catch {
         case baseException: BaseException => logger.error(constants.Response.BASE_EXCEPTION.message, baseException)
       }

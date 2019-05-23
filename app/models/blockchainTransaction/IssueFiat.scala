@@ -200,8 +200,8 @@ class IssueFiats @Inject()(protected val databaseConfigProvider: DatabaseConfigP
           blockchainFiats.Service.insertOrUpdateFiat(fiatPeg.pegHash, issueFiat.to, fiatPeg.transactionID, fiatPeg.transactionAmount, fiatPeg.redeemedAmount, dirtyBit = true)
         })
         blockchainAccounts.Service.updateDirtyBit(masterAccounts.Service.getAddress(issueFiat.from), dirtyBit = true)
-        pushNotifications.sendNotification(masterAccounts.Service.getId(issueFiat.to), constants.Notification.SUCCESS, Seq(response.TxHash))
-        pushNotifications.sendNotification(issueFiat.from, constants.Notification.SUCCESS, Seq(response.TxHash))
+        pushNotifications.sendNotification(masterAccounts.Service.getId(issueFiat.to), constants.Notification.SUCCESS, response.TxHash)
+        pushNotifications.sendNotification(issueFiat.from, constants.Notification.SUCCESS, response.TxHash)
       }
       catch {
         case baseException: BaseException => logger.error(constants.Response.BASE_EXCEPTION.message, baseException)
@@ -214,8 +214,8 @@ class IssueFiats @Inject()(protected val databaseConfigProvider: DatabaseConfigP
       try {
         Service.updateTxHashStatusResponseCode(ticketID, txHash = null, status = false, message)
         val issueFiat = Service.getIssueFiat(ticketID)
-        pushNotifications.sendNotification(masterAccounts.Service.getId(issueFiat.to), constants.Notification.FAILURE, Seq(message))
-        pushNotifications.sendNotification(issueFiat.from, constants.Notification.FAILURE, Seq(message))
+        pushNotifications.sendNotification(masterAccounts.Service.getId(issueFiat.to), constants.Notification.FAILURE, message)
+        pushNotifications.sendNotification(issueFiat.from, constants.Notification.FAILURE, message)
       } catch {
         case baseException: BaseException => logger.error(constants.Response.BASE_EXCEPTION.message, baseException)
       }

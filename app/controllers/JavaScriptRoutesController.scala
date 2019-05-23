@@ -12,8 +12,9 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
       JavaScriptReverseRouter("jsRoutes")(
         routes.javascript.SignUpController.checkUsernameAvailable,
         routes.javascript.ConfigurationController.queryConfigurationVariable,
-        routes.javascript.NotificationController.showNotifications,
-        routes.javascript.NotificationController.markNotificationAsRead,
+        routes.javascript.NotificationController.notificationPage,
+        routes.javascript.NotificationController.unreadNotificationCount,
+        routes.javascript.NotificationController.markNotificationRead,
         routes.javascript.LoginController.loginForm,
         routes.javascript.LogoutController.logoutForm,
         routes.javascript.SignUpController.signUpForm,
@@ -76,6 +77,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.SetACLController.blockchainSetACLForm,
         routes.javascript.SetBuyerFeedbackController.blockchainSetBuyerFeedbackForm,
         routes.javascript.SetSellerFeedbackController.blockchainSetSellerFeedbackForm
+
       )
     ).as("text/javascript")
   }

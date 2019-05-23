@@ -138,8 +138,8 @@ class ReleaseAssets @Inject()(protected val databaseConfigProvider: DatabaseConf
         val releaseAsset = Service.getTransaction(ticketID)
         blockchainAssets.Service.updateDirtyBit(releaseAsset.pegHash, true)
         blockchainAccounts.Service.updateDirtyBit(masterAccounts.Service.getAddress(releaseAsset.from), true)
-        pushNotifications.sendNotification(masterAccounts.Service.getId(releaseAsset.to), constants.Notification.SUCCESS, Seq(response.TxHash))
-        pushNotifications.sendNotification(releaseAsset.from, constants.Notification.SUCCESS, Seq(response.TxHash))
+        pushNotifications.sendNotification(masterAccounts.Service.getId(releaseAsset.to), constants.Notification.SUCCESS, response.TxHash)
+        pushNotifications.sendNotification(releaseAsset.from, constants.Notification.SUCCESS, response.TxHash)
       }
       catch {
         case baseException: BaseException => logger.error(constants.Response.BASE_EXCEPTION.message, baseException)
@@ -151,8 +151,8 @@ class ReleaseAssets @Inject()(protected val databaseConfigProvider: DatabaseConf
       try {
         Service.updateStatusAndResponseCode(ticketID, status = false, message)
         val releaseAsset = Service.getTransaction(ticketID)
-        pushNotifications.sendNotification(masterAccounts.Service.getId(releaseAsset.to), constants.Notification.FAILURE, Seq(message))
-        pushNotifications.sendNotification(releaseAsset.from, constants.Notification.FAILURE, Seq(message))
+        pushNotifications.sendNotification(masterAccounts.Service.getId(releaseAsset.to), constants.Notification.FAILURE, message)
+        pushNotifications.sendNotification(releaseAsset.from, constants.Notification.FAILURE, message)
       } catch {
         case baseException: BaseException => logger.error(constants.Response.BASE_EXCEPTION.message, baseException)
       }

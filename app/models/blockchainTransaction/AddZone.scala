@@ -179,8 +179,8 @@ class AddZones @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
         masterZones.Service.updateStatus(addZone.zoneID, status = true)
         masterAccounts.Service.updateUserTypeOnAddress(addZone.to, constants.User.ZONE)
         blockchainAccounts.Service.updateDirtyBit(masterAccounts.Service.getAddress(addZone.from), dirtyBit = true)
-        pushNotifications.sendNotification(masterAccounts.Service.getId(addZone.to), constants.Notification.SUCCESS, Seq(response.TxHash))
-        pushNotifications.sendNotification(addZone.from, constants.Notification.SUCCESS, Seq(response.TxHash))
+        pushNotifications.sendNotification(masterAccounts.Service.getId(addZone.to), constants.Notification.SUCCESS, response.TxHash)
+        pushNotifications.sendNotification(addZone.from, constants.Notification.SUCCESS, response.TxHash)
       } catch {
         case baseException: BaseException => logger.error(constants.Response.BASE_EXCEPTION.message, baseException)
           throw new BaseException(constants.Response.PSQL_EXCEPTION)
@@ -191,8 +191,8 @@ class AddZones @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
       try {
         Service.updateTxHashStatusResponseCode(ticketID, txHash = null, status = false, message)
         val addZone = Service.getAddZone(ticketID)
-        pushNotifications.sendNotification(masterAccounts.Service.getId(addZone.to), constants.Notification.FAILURE, Seq(message))
-        pushNotifications.sendNotification(addZone.from, constants.Notification.FAILURE, Seq(message))
+        pushNotifications.sendNotification(masterAccounts.Service.getId(addZone.to), constants.Notification.FAILURE, message)
+        pushNotifications.sendNotification(addZone.from, constants.Notification.FAILURE, message)
       } catch {
         case baseException: BaseException => logger.error(constants.Response.BASE_EXCEPTION.message, baseException)
       }

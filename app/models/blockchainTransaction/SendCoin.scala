@@ -200,8 +200,8 @@ class SendCoins @Inject()(protected val databaseConfigProvider: DatabaseConfigPr
         if (toAccount.userType == constants.User.UNKNOWN) {
           masterAccounts.Service.updateUserType(toAccount.id, constants.User.USER)
         }
-        pushNotifications.sendNotification(toAccount.id, constants.Notification.SUCCESS, Seq(response.TxHash))
-        pushNotifications.sendNotification(sendCoin.from, constants.Notification.SUCCESS, Seq(response.TxHash))
+        pushNotifications.sendNotification(toAccount.id, constants.Notification.SUCCESS, response.TxHash)
+        pushNotifications.sendNotification(sendCoin.from, constants.Notification.SUCCESS, response.TxHash)
       }
       catch {
         case baseException: BaseException => logger.error(constants.Response.BASE_EXCEPTION.message, baseException)
@@ -213,8 +213,8 @@ class SendCoins @Inject()(protected val databaseConfigProvider: DatabaseConfigPr
       try {
         Service.updateStatusAndResponseCode(ticketID, status = false, message)
         val sendCoin = Service.getTransaction(ticketID)
-        pushNotifications.sendNotification(masterAccounts.Service.getId(sendCoin.to), constants.Notification.FAILURE, Seq(message))
-        pushNotifications.sendNotification(sendCoin.from, constants.Notification.FAILURE, Seq(message))
+        pushNotifications.sendNotification(masterAccounts.Service.getId(sendCoin.to), constants.Notification.FAILURE, message)
+        pushNotifications.sendNotification(sendCoin.from, constants.Notification.FAILURE, message)
       } catch {
         case baseException: BaseException => logger.error(constants.Response.BASE_EXCEPTION.message, baseException)
       }

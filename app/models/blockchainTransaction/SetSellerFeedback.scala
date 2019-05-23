@@ -186,8 +186,8 @@ class SetSellerFeedbacks @Inject()(protected val databaseConfigProvider: Databas
         val fromAddress = masterAccounts.Service.getAddress(setSellerFeedback.from)
         traderFeedbackHistories.Service.addTraderFeedbackHistory(setSellerFeedback.to, setSellerFeedback.to, fromAddress, setSellerFeedback.pegHash, setSellerFeedback.rating.toString)
         blockchainAccounts.Service.updateDirtyBit(fromAddress, dirtyBit = true)
-        pushNotifications.sendNotification(masterAccounts.Service.getId(setSellerFeedback.to), constants.Notification.SUCCESS, Seq(response.TxHash))
-        pushNotifications.sendNotification(setSellerFeedback.from, constants.Notification.SUCCESS, Seq(response.TxHash))
+        pushNotifications.sendNotification(masterAccounts.Service.getId(setSellerFeedback.to), constants.Notification.SUCCESS, response.TxHash)
+        pushNotifications.sendNotification(setSellerFeedback.from, constants.Notification.SUCCESS, response.TxHash)
       } catch {
         case baseException: BaseException => logger.error(constants.Response.BASE_EXCEPTION.message, baseException)
           throw new BaseException(constants.Response.PSQL_EXCEPTION)
@@ -198,8 +198,8 @@ class SetSellerFeedbacks @Inject()(protected val databaseConfigProvider: Databas
       try {
       Service.updateTxHashStatusResponseCode(ticketID, txHash = null, status = false, message)
       val setSellerFeedback = Service.getSetSellerFeedbackOnTicketID(ticketID)
-      pushNotifications.sendNotification(masterAccounts.Service.getId(setSellerFeedback.to), constants.Notification.FAILURE, Seq(message))
-      pushNotifications.sendNotification(setSellerFeedback.from, constants.Notification.FAILURE, Seq(message))
+      pushNotifications.sendNotification(masterAccounts.Service.getId(setSellerFeedback.to), constants.Notification.FAILURE, message)
+      pushNotifications.sendNotification(setSellerFeedback.from, constants.Notification.FAILURE, message)
       } catch {
         case baseException: BaseException => logger.error(constants.Response.BASE_EXCEPTION.message, baseException)
       }

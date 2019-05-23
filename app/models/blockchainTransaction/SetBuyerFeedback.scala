@@ -184,8 +184,8 @@ class SetBuyerFeedbacks @Inject()(protected val databaseConfigProvider: Database
         val fromAddress = masterAccounts.Service.getAddress(setBuyerFeedback.from)
         traderFeedbackHistories.Service.addTraderFeedbackHistory(setBuyerFeedback.to, fromAddress, setBuyerFeedback.to, setBuyerFeedback.pegHash, setBuyerFeedback.rating.toString)
         blockchainAccounts.Service.updateDirtyBit(fromAddress, dirtyBit = true)
-        pushNotifications.sendNotification(masterAccounts.Service.getId(setBuyerFeedback.to), constants.Notification.SUCCESS, Seq(response.TxHash))
-        pushNotifications.sendNotification(setBuyerFeedback.from, constants.Notification.SUCCESS, Seq(response.TxHash))
+        pushNotifications.sendNotification(masterAccounts.Service.getId(setBuyerFeedback.to), constants.Notification.SUCCESS, response.TxHash)
+        pushNotifications.sendNotification(setBuyerFeedback.from, constants.Notification.SUCCESS, response.TxHash)
       } catch {
         case baseException: BaseException => logger.error(constants.Response.BASE_EXCEPTION.message, baseException)
           throw new BaseException(constants.Response.PSQL_EXCEPTION)
@@ -196,8 +196,8 @@ class SetBuyerFeedbacks @Inject()(protected val databaseConfigProvider: Database
       try {
       Service.updateTxHashStatusResponseCode(ticketID, txHash = null, status = false, message)
       val setBuyerFeedback = Service.getSetBuyerFeedbackOnTicketID(ticketID)
-      pushNotifications.sendNotification(masterAccounts.Service.getId(setBuyerFeedback.to), constants.Notification.FAILURE, Seq(message))
-      pushNotifications.sendNotification(setBuyerFeedback.from, constants.Notification.FAILURE, Seq(message))
+      pushNotifications.sendNotification(masterAccounts.Service.getId(setBuyerFeedback.to), constants.Notification.FAILURE, message)
+      pushNotifications.sendNotification(setBuyerFeedback.from, constants.Notification.FAILURE, message)
       } catch {
         case baseException: BaseException => logger.error(constants.Response.BASE_EXCEPTION.message, baseException)
       }

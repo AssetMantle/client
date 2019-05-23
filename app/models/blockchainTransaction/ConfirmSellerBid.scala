@@ -154,8 +154,8 @@ class ConfirmSellerBids @Inject()(protected val databaseConfigProvider: Database
         blockchainAccounts.Service.updateDirtyBit(fromAddress, dirtyBit = true)
         blockchainTransactionFeedbacks.Service.updateDirtyBit(fromAddress, true)
         blockchainTransactionFeedbacks.Service.updateDirtyBit(confirmSellerBid.to, true)
-        pushNotifications.sendNotification(toID, constants.Notification.SUCCESS, Seq(response.TxHash))
-        pushNotifications.sendNotification(confirmSellerBid.from, constants.Notification.SUCCESS, Seq(response.TxHash))
+        pushNotifications.sendNotification(toID, constants.Notification.SUCCESS, response.TxHash)
+        pushNotifications.sendNotification(confirmSellerBid.from, constants.Notification.SUCCESS, response.TxHash)
       } catch {
         case baseException: BaseException => logger.error(constants.Response.BASE_EXCEPTION.message, baseException)
           throw new BaseException(constants.Response.PSQL_EXCEPTION)
@@ -169,8 +169,8 @@ class ConfirmSellerBids @Inject()(protected val databaseConfigProvider: Database
         val confirmSellerBid = Service.getTransaction(ticketID)
         blockchainTransactionFeedbacks.Service.updateDirtyBit(masterAccounts.Service.getAddress(confirmSellerBid.from), true)
         blockchainTransactionFeedbacks.Service.updateDirtyBit(confirmSellerBid.to, true)
-        pushNotifications.sendNotification(masterAccounts.Service.getId(confirmSellerBid.to), constants.Notification.FAILURE, Seq(message))
-        pushNotifications.sendNotification(confirmSellerBid.from, constants.Notification.FAILURE, Seq(message))
+        pushNotifications.sendNotification(masterAccounts.Service.getId(confirmSellerBid.to), constants.Notification.FAILURE, message)
+        pushNotifications.sendNotification(confirmSellerBid.from, constants.Notification.FAILURE, message)
       } catch {
         case baseException: BaseException => logger.error(constants.Response.BASE_EXCEPTION.message, baseException)
       }
