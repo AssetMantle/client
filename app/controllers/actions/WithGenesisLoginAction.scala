@@ -18,7 +18,6 @@ class WithGenesisLoginAction @Inject()(messagesControllerComponents: MessagesCon
   def authenticated(f: ⇒ String => Request[AnyContent] => Result)(implicit logger: Logger): Action[AnyContent] = {
     Action { implicit request ⇒
       try {
-        println("LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL||||||||    "+ request.session.get(constants.Security.USERNAME))
         val username = request.session.get(constants.Security.USERNAME).getOrElse(throw new BaseException(constants.Error.USERNAME_NOT_FOUND))
         val sessionToken = request.session.get(constants.Security.TOKEN).getOrElse(throw new BaseException(constants.Error.TOKEN_NOT_FOUND))
         accountTokens.Service.tryVerifySessionToken(username, sessionToken)
