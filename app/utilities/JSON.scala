@@ -2,6 +2,7 @@ package utilities
 
 import com.fasterxml.jackson.core.JsonParseException
 import com.fasterxml.jackson.databind.JsonMappingException
+import constants.Response.Failure
 import exceptions.BlockChainException
 import play.api.Logger
 import play.api.libs.json._
@@ -15,14 +16,14 @@ object JSON {
       responseFromJson match {
         case JsSuccess(value: T, _: JsPath) => value
         case errors: JsError => logger.info(errors.toString)
-          throw new BlockChainException(response.body.toString)
+          throw new BlockChainException(new Failure(response.body.toString, null))
       }
     }
     catch {
       case jsonParseException: JsonParseException => logger.info(response.toString, jsonParseException)
-        throw new BlockChainException(response.body.toString)
-      case jsonMappingException: JsonMappingException => logger.info(constants.Response.NO_RESPONSE, jsonMappingException)
-        throw new BlockChainException(constants.Error.NO_RESPONSE)
+        throw new BlockChainException(new Failure(response.body.toString,null))
+      case jsonMappingException: JsonMappingException => logger.info(constants.Response.NO_RESPONSE.message, jsonMappingException)
+        throw new BlockChainException(constants.Response.NO_RESPONSE)
     }
   }
 }

@@ -45,7 +45,7 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
   private def getOrganizationsByDirtyBit(dirtyBit: Boolean): Future[Seq[Organization]] = db.run(organizationTable.filter(_.dirtyBit === dirtyBit).result.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => logger.info(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+      case noSuchElementException: NoSuchElementException => logger.info(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
         Nil
     }
   }

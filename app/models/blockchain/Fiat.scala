@@ -193,15 +193,15 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
       Thread.sleep(sleepTime)
       for (dirtyFiat <- dirtyFiats) {
         try {
-          val fiatPegWallet = getAccount.Service.get(dirtyFiat.ownerAddress).value.fiatPegWallet.getOrElse(throw new BaseException(constants.Error.NO_RESPONSE))
+          val fiatPegWallet = getAccount.Service.get(dirtyFiat.ownerAddress).value.fiatPegWallet.getOrElse(throw new BaseException(constants.Response.NO_RESPONSE))
           fiatPegWallet.foreach(fiatPeg => if (fiatPegWallet.map(_.pegHash) contains dirtyFiat.pegHash) Service.insertOrUpdateFiat(fiatPeg.pegHash, dirtyFiat.ownerAddress, fiatPeg.transactionID, fiatPeg.transactionAmount, fiatPeg.redeemedAmount, dirtyBit = false) else Service.deleteFiat(dirtyFiat.pegHash, dirtyFiat.ownerAddress))
         }
         catch {
-          case baseException: BaseException => logger.info(constants.Error.BASE_EXCEPTION, baseException)
-            if (baseException.message == module + "." + constants.Error.NO_RESPONSE) {
+          case baseException: BaseException => logger.info(constants.Response.BASE_EXCEPTION.message, baseException)
+            if (baseException.failure ==  constants.Response.NO_RESPONSE) {
               Service.deleteFiatPegWallet(dirtyFiat.ownerAddress)
             }
-          case blockChainException: BlockChainException => logger.error(blockChainException.message, blockChainException)
+          case blockChainException: BlockChainException => logger.error(blockChainException.failure.message, blockChainException)
         }
       }
     }

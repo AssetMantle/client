@@ -34,7 +34,7 @@ class GetResponse @Inject()()(implicit wsClient: WSClient, configuration: Config
         Await.result(action(ticketID), Duration.Inf)
       } catch {
         case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
-          throw new BlockChainException(constants.Error.CONNECT_EXCEPTION)
+          throw new BlockChainException(constants.Response.CONNECT_EXCEPTION)
       }
     }
   }

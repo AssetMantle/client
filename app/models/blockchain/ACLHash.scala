@@ -31,7 +31,7 @@ class ACLHashes @Inject()(protected val databaseConfigProvider: DatabaseConfigPr
   private def add(aclHash: ACLHash)(implicit executionContext: ExecutionContext): Future[String] = db.run((aclTable returning aclTable.map(_.hash) += aclHash).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.info(constants.Response.PSQL_EXCEPTION, psqlException)
+      case psqlException: PSQLException => logger.info(constants.Response.PSQL_EXCEPTION.message, psqlException)
         aclHash.hash
     }
   }

@@ -83,7 +83,7 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
   private def getAssetsByDirtyBit(dirtyBit: Boolean)(implicit executionContext: ExecutionContext): Future[Seq[Asset]] = db.run(assetTable.filter(_.dirtyBit === dirtyBit).result.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => logger.info(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+      case noSuchElementException: NoSuchElementException => logger.info(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
         Nil
     }
   }
@@ -93,7 +93,7 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
         throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.info(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+      case noSuchElementException: NoSuchElementException => logger.info(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
         Nil
     }
   }
@@ -197,7 +197,7 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
         throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.info(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+      case noSuchElementException: NoSuchElementException => logger.info(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
         0
     }
   }
@@ -213,7 +213,7 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
         }
         catch {
           case baseException: BaseException => logger.info(constants.Response.BASE_EXCEPTION.message, baseException)
-            if (baseException.message == module + "." + constants.Error.NO_RESPONSE) {
+            if (baseException.failure == constants.Response.NO_RESPONSE) {
               Service.deleteAssetPegWallet(dirtyAsset.ownerAddress)
             }
           case blockChainException: BlockChainException => logger.error(blockChainException.failure.message, blockChainException)

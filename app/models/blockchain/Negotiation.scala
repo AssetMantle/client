@@ -157,7 +157,7 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
           Service.updateNegotiation(id = dirtyNegotiation.id, bid = responseNegotiation.value.bid, time = responseNegotiation.value.time, buyerSignature = responseNegotiation.value.buyerSignature, sellerSignature = responseNegotiation.value.sellerSignature, dirtyBit = false)
         }
         catch {
-          case blockChainException: BlockChainException => logger.error(blockChainException.message, blockChainException)
+          case blockChainException: BlockChainException => logger.error(blockChainException.failure.message, blockChainException)
           case baseException: BaseException => logger.error(constants.Response.BASE_EXCEPTION.message, baseException)
         }
       }

@@ -47,7 +47,7 @@ class SendCoin @Inject()(wsClient: WSClient)(implicit configuration: Configurati
     } catch {
       case connectException: ConnectException =>
         logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
-        throw new BlockChainException(constants.Error.CONNECT_EXCEPTION)
+        throw new BlockChainException(constants.Response.CONNECT_EXCEPTION)
     }
 
     def kafkaPost(request: Request)(implicit executionContext: ExecutionContext): KafkaResponse = try {
@@ -55,7 +55,7 @@ class SendCoin @Inject()(wsClient: WSClient)(implicit configuration: Configurati
     } catch {
       case connectException: ConnectException =>
         logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
-        throw new BlockChainException(constants.Error.CONNECT_EXCEPTION)
+        throw new BlockChainException(constants.Response.CONNECT_EXCEPTION)
     }
 
     def getTxHashFromWSResponse(wsResponse: WSResponse): String = utilities.JSON.getResponseFromJson[Response](wsResponse).TxHash
