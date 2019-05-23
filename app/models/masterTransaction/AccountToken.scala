@@ -12,7 +12,7 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Random, Success}
 
-case class AccountToken(id: String, notificationToken: String, sessionTokenHash: Option[String], sessionTokenTime: Long)
+case class AccountToken(id: String, registrationToken: String, sessionTokenHash: Option[String], sessionTokenTime: Long)
 
 @Singleton
 class AccountTokens @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit configuration: Configuration) {
@@ -54,11 +54,11 @@ class AccountTokens @Inject()(protected val databaseConfigProvider: DatabaseConf
 
   private[models] class AccountTokenTable(tag: Tag) extends Table[AccountToken](tag, "AccountToken") {
 
-    def * = (id, notificationToken, sessionTokenHash.?, sessionTokenTime) <> (AccountToken.tupled, AccountToken.unapply)
+    def * = (id, registrationToken, sessionTokenHash.?, sessionTokenTime) <> (AccountToken.tupled, AccountToken.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
-    def notificationToken = column[String]("notificationToken")
+    def registrationToken = column[String]("registrationToken")
 
     def sessionTokenHash = column[String]("sessionTokenHash")
 
@@ -68,11 +68,11 @@ class AccountTokens @Inject()(protected val databaseConfigProvider: DatabaseConf
   }
 
   object Service {
-    def addToken(id: String, notificationToken: String)(implicit executionContext: ExecutionContext): String = Await.result(add(models.masterTransaction.AccountToken(id, notificationToken, null, DateTime.now(DateTimeZone.UTC).getMillis)), Duration.Inf)
+    def addToken(id: String, registrationToken: String)(implicit executionContext: ExecutionContext): String = Await.result(add(models.masterTransaction.AccountToken(id, registrationToken, null, DateTime.now(DateTimeZone.UTC).getMillis)), Duration.Inf)
 
-    def updateNotificationToken(id: String, notificationToken: String): Int = Await.result(insertOrUpdate(AccountToken(id, notificationToken, null, DateTime.now(DateTimeZone.UTC).getMillis)), Duration.Inf)
+    def updateNotificationToken(id: String, registrationToken: String): Int = Await.result(insertOrUpdate(AccountToken(id, registrationToken, null, DateTime.now(DateTimeZone.UTC).getMillis)), Duration.Inf)
 
-    def getTokenById(id: String)(implicit executionContext: ExecutionContext): String = Await.result(findById(id), Duration.Inf).notificationToken
+    def getTokenById(id: String)(implicit executionContext: ExecutionContext): String = Await.result(findById(id), Duration.Inf).registrationToken
 
     def ifExists(id: String): Boolean = Await.result(checkById(id), Duration.Inf)
 
