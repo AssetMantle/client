@@ -11,7 +11,6 @@ import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
 import queries.GetOrder
-import queries.responses.AccountResponse
 import slick.jdbc.JdbcProfile
 import transactions.responses.TransactionResponse.Response
 import utilities.PushNotifications
@@ -147,7 +146,7 @@ class SendAssets @Inject()(protected val databaseConfigProvider: DatabaseConfigP
         blockchainOrders.Service.insertOrUpdateOrder(id = negotiationID, null, null, false)
         Thread.sleep(sleepTime)
         val orderResponse = getOrder.Service.get(negotiationID)
-        orderResponse.value.assetPegWallet.get.map { responseAssetPeg: AccountResponse.Asset => blockchainAssets.Service.insertOrUpdateAsset(pegHash = responseAssetPeg.pegHash, documentHash = responseAssetPeg.documentHash, assetType = responseAssetPeg.assetType, assetQuantity = responseAssetPeg.assetQuantity, assetPrice = responseAssetPeg.assetPrice, quantityUnit = responseAssetPeg.quantityUnit, ownerAddress = negotiationID, moderated = responseAssetPeg.moderated, locked = responseAssetPeg.locked, dirtyBit = false) }
+        orderResponse.value.assetPegWallet.getOrElse(Seq()).foreach(asset => blockchainAssets.Service.insertOrUpdateAsset(pegHash = asset.pegHash, documentHash = asset.documentHash, assetType = asset.assetType, assetPrice = asset.assetPrice, assetQuantity = asset.assetQuantity, quantityUnit = asset.quantityUnit, locked = asset.locked, moderated = asset.moderated, ownerAddress = negotiationID, dirtyBit = false))
         blockchainAccounts.Service.updateDirtyBit(fromAddress, true)
         blockchainTransactionFeedbacks.Service.updateDirtyBit(fromAddress, true)
         pushNotifications.sendNotification(masterAccounts.Service.getId(sendAsset.to), constants.Notification.SUCCESS, response.TxHash)
