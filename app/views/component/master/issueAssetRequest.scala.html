@@ -10,7 +10,11 @@
         @inputText(issueAssetRequestForm(constants.Form.ASSET_PRICE),'_label-> Messages(constants.Form.ASSET_PRICE))
         @inputText(issueAssetRequestForm(constants.Form.QUANTITY_UNIT),'_label-> Messages(constants.Form.QUANTITY_UNIT))
         @inputText(issueAssetRequestForm(constants.Form.ASSET_QUANTITY),'_label-> Messages(constants.Form.ASSET_QUANTITY))
-        @checkbox(issueAssetRequestForm(constants.Form.MODERATOR), '_label -> Messages(constants.Form.MODERATOR))
+        @checkbox(issueAssetRequestForm(constants.Form.MODERATED), '_label -> Messages(constants.Form.MODERATED), 'id -> "moderated")
+        <div class="hiddenFormElements" id="issueAssetRequestForm">
+            @inputText(issueAssetRequestForm(constants.Form.GAS).copy(value = Some("0")), '_label -> Messages(constants.Form.GAS))
+            @inputPassword(issueAssetRequestForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD))
+        </div>
 
         @if(issueAssetRequestForm.hasGlobalErrors) {
             <ul>
@@ -20,5 +24,6 @@
             </ul>
         }
         <button type="submit">@Messages(constants.Form.ISSUE_ASSET_REQUEST)</button>
+        <script src="@routes.Assets.versioned("javascripts/showIssueAssetRequestFormFields.js")" type="text/javascript"></script>
     }
 }

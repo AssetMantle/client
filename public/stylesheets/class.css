@@ -156,3 +156,7 @@ body{
 }
 
 /* Notification*/
+
+.hiddenFormElements {
+    display: None;
+}

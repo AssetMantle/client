@@ -1,0 +1,23 @@
+@import helper._
+@import views.companion.master.ModeratedSellerExecuteOrder
+
+@(moderatedSellerExecuteOrderForm: Form[ModeratedSellerExecuteOrder.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@common(Messages(constants.Form.MODERATED_SELLER_EXECUTE_ORDER)) {
+    @form(action = routes.SellerExecuteOrderController.moderatedSellerExecuteOrder) {
+        @CSRF.formField
+        @inputText(moderatedSellerExecuteOrderForm(constants.Form.BUYER_ADDRESS), '_label -> Messages(constants.Form.BUYER_ADDRESS))
+        @inputText(moderatedSellerExecuteOrderForm(constants.Form.AWB_PROOF_HASH), '_label -> Messages(constants.Form.AWB_PROOF_HASH))
+        @inputText(moderatedSellerExecuteOrderForm(constants.Form.PEG_HASH), '_label -> Messages(constants.Form.PEG_HASH))
+        @inputText(moderatedSellerExecuteOrderForm(constants.Form.GAS), '_label -> Messages(constants.Form.GAS))
+        @inputPassword(moderatedSellerExecuteOrderForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD))
+
+        @if(moderatedSellerExecuteOrderForm.hasGlobalErrors) {
+            <ul>
+            @for(error <- moderatedSellerExecuteOrderForm.globalErrors) {
+                <li>@error.format</li>
+            }
+            </ul>
+        }
+        <button type="submit">@Messages(constants.Form.MODERATED_SELLER_EXECUTE_ORDER)</button>
+    }
+}

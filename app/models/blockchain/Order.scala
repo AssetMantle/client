@@ -123,7 +123,7 @@ class Orders @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
           if ((orderResponse.value.awbProofHash != "" && orderResponse.value.fiatProofHash != "") || (orderResponse.value.awbProofHash == "" && orderResponse.value.fiatProofHash == "")) {
             val sellerAccount = getAccount.Service.get(negotiation.sellerAddress)
             if (sellerAccount.value.assetPegWallet.isDefined) {
-              sellerAccount.value.assetPegWallet.get.foreach(asset => blockchainAssets.Service.insertOrUpdateAsset(pegHash = asset.pegHash, documentHash = asset.documentHash, assetType = asset.assetType, assetQuantity = asset.assetQuantity, quantityUnit = asset.quantityUnit, assetPrice = asset.assetPrice, ownerAddress = negotiation.sellerAddress, moderator = asset.moderator, locked = asset.locked, dirtyBit = false))
+              sellerAccount.value.assetPegWallet.get.foreach(asset => blockchainAssets.Service.insertOrUpdateAsset(pegHash = asset.pegHash, documentHash = asset.documentHash, assetType = asset.assetType, assetQuantity = asset.assetQuantity, quantityUnit = asset.quantityUnit, assetPrice = asset.assetPrice, ownerAddress = negotiation.sellerAddress, moderated = asset.moderated, locked = asset.locked, dirtyBit = false))
             } else {
               blockchainAssets.Service.deleteAssetPegWallet(negotiation.sellerAddress)
             }
@@ -133,7 +133,7 @@ class Orders @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
 
             val buyerAccount = getAccount.Service.get(negotiation.buyerAddress)
             if (buyerAccount.value.assetPegWallet.isDefined) {
-              buyerAccount.value.assetPegWallet.get.foreach(asset => blockchainAssets.Service.insertOrUpdateAsset(pegHash = asset.pegHash, documentHash = asset.documentHash, assetType = asset.assetType, assetQuantity = asset.assetQuantity, quantityUnit = asset.quantityUnit, assetPrice = asset.assetPrice, ownerAddress = negotiation.buyerAddress, moderator = asset.moderator, locked = asset.locked, dirtyBit = false))
+              buyerAccount.value.assetPegWallet.get.foreach(asset => blockchainAssets.Service.insertOrUpdateAsset(pegHash = asset.pegHash, documentHash = asset.documentHash, assetType = asset.assetType, assetQuantity = asset.assetQuantity, quantityUnit = asset.quantityUnit, assetPrice = asset.assetPrice, ownerAddress = negotiation.buyerAddress, moderated = asset.moderated, locked = asset.locked, dirtyBit = false))
             } else {
               blockchainAssets.Service.deleteAssetPegWallet(negotiation.buyerAddress)
             }

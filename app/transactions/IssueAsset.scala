@@ -43,13 +43,13 @@ class IssueAsset @Inject()(wsClient: WSClient)(implicit configuration: Configura
       "chainID" -> request.chainID,
       "password" -> request.password,
       "gas" -> request.gas,
-      "private" -> request.moderator
+      "private" -> request.moderated
     )
   }
 
   private def kafkaAction(request: Request)(implicit executionContext: ExecutionContext): Future[KafkaResponse] = wsClient.url(url).post(Json.toJson(request)).map { response => utilities.JSON.getResponseFromJson[KafkaResponse](response) }
 
-  case class Request(from: String, to: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, chainID: String = chainID, password: String, gas: Int, moderator: Boolean)
+  case class Request(from: String, to: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, chainID: String = chainID, password: String, gas: Int, moderated: Boolean)
 
   object Service {
     def post(request: Request)(implicit executionContext: ExecutionContext): Response = try {
