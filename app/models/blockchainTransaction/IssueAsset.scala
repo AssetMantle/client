@@ -154,8 +154,8 @@ class IssueAssets @Inject()(protected val databaseConfigProvider: DatabaseConfig
         val responseAccount = getAccount.Service.get(issueAsset.to)
         responseAccount.value.assetPegWallet.getOrElse(Seq()).foreach(asset => blockchainAssets.Service.insertOrUpdateAsset(pegHash = asset.pegHash, documentHash = asset.documentHash, assetType = asset.assetType, assetPrice = asset.assetPrice, assetQuantity = asset.assetQuantity, quantityUnit = asset.quantityUnit, locked = asset.locked, moderator = asset.moderator, ownerAddress = issueAsset.to, dirtyBit = true))
         blockchainAccounts.Service.updateDirtyBit(masterAccounts.Service.getAddress(issueAsset.from), dirtyBit = true)
-        pushNotifications.sendNotification(masterAccounts.Service.getId(issueAsset.to), constants.Notification.SUCCESS, Seq(response.TxHash))
-        pushNotifications.sendNotification(issueAsset.from, constants.Notification.SUCCESS, Seq(response.TxHash))
+        pushNotifications.sendNotification(masterAccounts.Service.getId(issueAsset.to), constants.Notification.SUCCESS, response.TxHash)
+        pushNotifications.sendNotification(issueAsset.from, constants.Notification.SUCCESS, response.TxHash)
       } catch {
         case baseException: BaseException => logger.error(constants.Error.BASE_EXCEPTION, baseException)
           throw new BaseException(constants.Error.PSQL_EXCEPTION)
@@ -167,8 +167,8 @@ class IssueAssets @Inject()(protected val databaseConfigProvider: DatabaseConfig
       try {
         Service.updateStatusAndResponseCode(ticketID, status = false, message)
         val issueAsset = Service.getTransaction(ticketID)
-        pushNotifications.sendNotification(masterAccounts.Service.getId(issueAsset.to), constants.Notification.FAILURE, Seq(message))
-        pushNotifications.sendNotification(issueAsset.from, constants.Notification.FAILURE, Seq(message))
+        pushNotifications.sendNotification(masterAccounts.Service.getId(issueAsset.to), constants.Notification.FAILURE, message)
+        pushNotifications.sendNotification(issueAsset.from, constants.Notification.FAILURE, message)
       } catch {
         case baseException: BaseException => logger.error(constants.Error.BASE_EXCEPTION, baseException)
       }

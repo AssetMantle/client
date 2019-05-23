@@ -8,14 +8,9 @@
 <a href="@routes.LogoutController.logoutForm">@Messages(constants.Form.LOGOUT)</a>
 <br>
 <br>
-
 <h2>@username</h2>
-    @Messages(constants.User.USER_TYPE): @userType <br>
-    @Messages(constants.User.ADDRESS): @address <br>
-    @Messages(constants.User.COINS): @coins <br>
+@Messages(constants.User.USER_TYPE): @userType <br>
+@Messages(constants.User.ADDRESS): @address <br>
+@Messages(constants.User.COINS): @coins <br>
 <br>
-
-<div id="notificationWindowCommons" style="margin: 0 auto;
-    width: auto;
-    height: auto;"></div>
-
+<a href="@routes.NotificationController.notificationPage(0)">@Messages(constants.Form.INBOX)</a>

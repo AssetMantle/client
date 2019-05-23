@@ -185,8 +185,8 @@ class SetACLs @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
         masterAccounts.Service.updateUserTypeOnAddress(setACL.aclAddress, constants.User.TRADER)
         blockchainAccounts.Service.updateDirtyBit(masterAccounts.Service.getAddress(setACL.from), dirtyBit = true)
         blockchainTransactionFeedbacks.Service.addTransactionFeedback(setACL.aclAddress, TraderReputationResponse.TransactionFeedbackResponse("0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"), false)
-        pushNotifications.sendNotification(masterAccounts.Service.getId(setACL.aclAddress), constants.Notification.SUCCESS, Seq(response.TxHash))
-        pushNotifications.sendNotification(setACL.from, constants.Notification.SUCCESS, Seq(response.TxHash))
+        pushNotifications.sendNotification(masterAccounts.Service.getId(setACL.aclAddress), constants.Notification.SUCCESS, response.TxHash)
+        pushNotifications.sendNotification(setACL.from, constants.Notification.SUCCESS, response.TxHash)
       } catch {
         case baseException: BaseException => logger.error(constants.Error.BASE_EXCEPTION, baseException)
           throw new BaseException(constants.Error.PSQL_EXCEPTION)
@@ -197,8 +197,8 @@ class SetACLs @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
       try {
         Service.updateTxHashStatusResponseCode(ticketID, txHash = null, status = false, message)
         val setACL = Service.getSetACL(ticketID)
-        pushNotifications.sendNotification(masterAccounts.Service.getId(setACL.aclAddress), constants.Notification.FAILURE, Seq(message))
-        pushNotifications.sendNotification(setACL.from, constants.Notification.FAILURE, Seq(message))
+        pushNotifications.sendNotification(masterAccounts.Service.getId(setACL.aclAddress), constants.Notification.FAILURE, message)
+        pushNotifications.sendNotification(setACL.from, constants.Notification.FAILURE, message)
       } catch {
         case baseException: BaseException => logger.error(constants.Error.BASE_EXCEPTION, baseException)
       }

@@ -35,7 +35,7 @@ class LoginController @Inject()(messagesControllerComponents: MessagesController
           val userType = masterAccounts.Service.validateLoginAndGetUserType(loginData.username, loginData.password)
           val address = masterAccounts.Service.getAddress(loginData.username)
           pushNotifications.registerNotificationToken(loginData.username, loginData.notificationToken)
-          pushNotifications.sendNotification(loginData.username, constants.Notification.LOGIN)
+          pushNotifications.sendNotification(loginData.username, constants.Notification.LOGIN, loginData.username)
           userType match {
             case constants.User.GENESIS =>
               withUsernameToken.Ok(views.html.component.master.genesisHome(username = loginData.username, userType = constants.User.GENESIS, address = address, coins = blockchainAccounts.Service.getCoins(address)), loginData.username)
