@@ -4,7 +4,7 @@ import controllers.actions.WithLoginAction
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.masterTransaction.Notifications
-import play.api.i18n.{I18nSupport, Messages}
+import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
 
@@ -36,7 +36,7 @@ class NotificationController @Inject()(messagesControllerComponents: MessagesCon
         Ok(notifications.Service.getNumberOfUnread(username).toString)
       }
       catch {
-        case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))
+        case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 }

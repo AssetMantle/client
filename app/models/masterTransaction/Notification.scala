@@ -32,7 +32,7 @@ class Notifications @Inject()(protected val databaseConfigProvider: DatabaseConf
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
-        throw new BaseException(constants.Error.PSQL_EXCEPTION)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
     }
   }
 
@@ -40,7 +40,7 @@ class Notifications @Inject()(protected val databaseConfigProvider: DatabaseConf
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
-        throw new BaseException(constants.Error.PSQL_EXCEPTION)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
     }
   }
 

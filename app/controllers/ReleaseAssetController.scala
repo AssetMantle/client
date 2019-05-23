@@ -4,7 +4,7 @@ import controllers.actions.{WithLoginAction, WithZoneLoginAction}
 import exceptions.{BaseException, BlockChainException}
 import javax.inject.{Inject, Singleton}
 import models.{blockchain, blockchainTransaction}
-import play.api.i18n.{I18nSupport, Messages}
+import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
 
@@ -37,17 +37,17 @@ class ReleaseAssetController @Inject()(messagesControllerComponents: MessagesCon
                 try {
                   blockchainTransactionReleaseAssets.Utility.onSuccess(ticketID, transactionsReleaseAsset.Service.post(transactionsReleaseAsset.Request(from = username, to = releaseAssetData.address, password = releaseAssetData.password, pegHash = releaseAssetData.pegHash, gas = releaseAssetData.gas)))
                 } catch {
-                  case baseException: BaseException => logger.error(constants.Error.BASE_EXCEPTION, baseException)
-                  case blockChainException: BlockChainException => logger.error(blockChainException.message, blockChainException)
-                    blockchainTransactionReleaseAssets.Utility.onFailure(ticketID, blockChainException.message)
+                  case baseException: BaseException => logger.error(constants.Response.BASE_EXCEPTION.message, baseException)
+                  case blockChainException: BlockChainException => logger.error(blockChainException.failure.message, blockChainException)
+                    blockchainTransactionReleaseAssets.Utility.onFailure(ticketID, blockChainException.failure.message)
                 }
               }
             }
-            Ok(views.html.index(success = ticketID))
+            Ok(views.html.index(successes = Seq(new Success(ticketID))))
           }
           catch {
-            case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))
-            case blockChainException: BlockChainException => Ok(views.html.index(failure = blockChainException.message))
+            case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
+            case blockChainException: BlockChainException => Ok(views.html.index(failures = Seq(blockChainException.failure)))
           }
         }
       )
@@ -67,16 +67,16 @@ class ReleaseAssetController @Inject()(messagesControllerComponents: MessagesCon
           if (kafkaEnabled) {
             val response = transactionsReleaseAsset.Service.kafkaPost(transactionsReleaseAsset.Request(from = releaseAssetData.from, to = releaseAssetData.to, password = releaseAssetData.password, pegHash = releaseAssetData.pegHash, gas = releaseAssetData.gas))
             blockchainTransactionReleaseAssets.Service.addReleaseAsset(from = releaseAssetData.from, to = releaseAssetData.to, pegHash = releaseAssetData.pegHash, gas = releaseAssetData.gas, null, null, ticketID = response.ticketID, null)
-            Ok(views.html.index(success = response.ticketID))
+            Ok(views.html.index(successes = response.ticketID))
           } else {
             val response = transactionsReleaseAsset.Service.post(transactionsReleaseAsset.Request(from = releaseAssetData.from, to = releaseAssetData.to, password = releaseAssetData.password, pegHash = releaseAssetData.pegHash, gas = releaseAssetData.gas))
             blockchainTransactionReleaseAssets.Service.addReleaseAsset(from = releaseAssetData.from, to = releaseAssetData.to, pegHash = releaseAssetData.pegHash, gas = releaseAssetData.gas, null, txHash = Option(response.TxHash), ticketID = Random.nextString(32), null)
-            Ok(views.html.index(success = response.TxHash))
+            Ok(views.html.index(successes = response.TxHash))
           }
         }
         catch {
-          case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))
-          case blockChainException: BlockChainException => Ok(views.html.index(failure = blockChainException.message))
+          case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
+          case blockChainException: BlockChainException => Ok(views.html.index(failures = Seq(blockChainException.failure)))
 
         }
       }

@@ -1,10 +1,11 @@
 package controllers
 
+import constants.Response.Success
 import controllers.actions.{WithUserLoginAction, WithZoneLoginAction}
 import exceptions.{BaseException, BlockChainException}
 import javax.inject.{Inject, Singleton}
 import models.{blockchain, blockchainTransaction, master}
-import play.api.i18n.{I18nSupport, Messages}
+import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
 
@@ -31,13 +32,13 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
         addOrganizationData => {
           try {
             if (masterZones.Service.getStatus(addOrganizationData.zoneID) == Option(true)) {
-              Ok(views.html.index(success = constants.Success.ADD_ORGANIZATION + ":" + masterOrganizations.Service.addOrganization(zoneID = addOrganizationData.zoneID, accountID = username, name = addOrganizationData.name, address = addOrganizationData.address, phone = addOrganizationData.phone, email = addOrganizationData.email)))
+              Ok(views.html.index(successes = Seq(new Success(constants.Response.ADD_ORGANIZATION.message + ":" + masterOrganizations.Service.addOrganization(zoneID = addOrganizationData.zoneID, accountID = username, name = addOrganizationData.name, address = addOrganizationData.address, phone = addOrganizationData.phone, email = addOrganizationData.email)))))
             } else {
-              Ok(views.html.index(failure = Messages(constants.Error.UNVERIFIED_ZONE)))
+              Ok(views.html.index(failures = Seq(constants.Response.UNVERIFIED_ZONE)))
             }
           }
           catch {
-            case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))
+            case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
           }
         }
       )
@@ -63,17 +64,17 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
                 try {
                   blockchainTransactionAddOrganizations.Utility.onSuccess(ticketID, transactionsAddOrganization.Service.post(transactionsAddOrganization.Request(from = username, to = organizationAccountAddress, organizationID = verifyOrganizationData.organizationID, zoneID = verifyOrganizationData.zoneID, password = verifyOrganizationData.password)))
                 } catch {
-                  case baseException: BaseException => logger.error(constants.Error.BASE_EXCEPTION, baseException)
-                  case blockChainException: BlockChainException => logger.error(blockChainException.message, blockChainException)
-                    blockchainTransactionAddOrganizations.Utility.onFailure(ticketID, blockChainException.message)
+                  case baseException: BaseException => logger.error(constants.Response.BASE_EXCEPTION.message, baseException)
+                  case blockChainException: BlockChainException => logger.error(blockChainException.failure.message, blockChainException)
+                    blockchainTransactionAddOrganizations.Utility.onFailure(ticketID, blockChainException.failure.message)
                 }
               }
             }
-            Ok(views.html.index(success = Messages(constants.Success.VERIFY_ORGANIZATION) + verifyOrganizationData.organizationID + ticketID))
+            Ok(views.html.index(successes = Seq(new Success(constants.Response.VERIFY_ORGANIZATION.message + verifyOrganizationData.organizationID + ticketID))))
           }
           catch {
-            case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))
-            case blockChainException: BlockChainException => Ok(views.html.index(failure = Messages(blockChainException.message)))
+            case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
+            case blockChainException: BlockChainException => Ok(views.html.index(failures =Seq(blockChainException.failure)))
           }
         }
       )
@@ -92,10 +93,10 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
         rejectVerifyOrganizationRequestData => {
           try {
             masterOrganizations.Service.updateStatus(rejectVerifyOrganizationRequestData.organizationID, false)
-            Ok(views.html.index(success = Messages(constants.Success.VERIFY_ORGANIZATION_REQUEST_REJECTED)))
+            Ok(views.html.index(successes = Seq(constants.Response.VERIFY_ORGANIZATION_REQUEST_REJECTED)))
           }
           catch {
-            case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))
+            case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
           }
         }
       )
@@ -107,7 +108,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
         Ok(views.html.component.master.viewPendingVerifyOrgnizationRequests(masterOrganizations.Service.getVerifyOrganizationRequests(masterZones.Service.getZoneId(username))))
       }
       catch {
-        case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))
+        case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
@@ -123,14 +124,14 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
       addOrganizationData => {
         try {
           if (kafkaEnabled) {
-            Ok(views.html.index(success = transactionsAddOrganization.Service.kafkaPost(transactionsAddOrganization.Request(from = addOrganizationData.from, to = addOrganizationData.to, organizationID = addOrganizationData.organizationID, zoneID = addOrganizationData.zoneID, password = addOrganizationData.password)).ticketID))
+            Ok(views.html.index(successes = Seq(new Success(transactionsAddOrganization.Service.kafkaPost(transactionsAddOrganization.Request(from = addOrganizationData.from, to = addOrganizationData.to, organizationID = addOrganizationData.organizationID, zoneID = addOrganizationData.zoneID, password = addOrganizationData.password)).ticketID))))
           } else {
-            Ok(views.html.index(success = transactionsAddOrganization.Service.post(transactionsAddOrganization.Request(from = addOrganizationData.from, to = addOrganizationData.to, organizationID = addOrganizationData.organizationID, zoneID = addOrganizationData.zoneID, password = addOrganizationData.password)).TxHash))
+            Ok(views.html.index(successes = Seq(new Success(transactionsAddOrganization.Service.post(transactionsAddOrganization.Request(from = addOrganizationData.from, to = addOrganizationData.to, organizationID = addOrganizationData.organizationID, zoneID = addOrganizationData.zoneID, password = addOrganizationData.password)).TxHash))))
           }
         }
         catch {
-          case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))
-          case blockChainException: BlockChainException => Ok(views.html.index(failure = blockChainException.message))
+          case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
+          case blockChainException: BlockChainException => Ok(views.html.index(failures = Seq(blockChainException.failure)))
         }
       }
     )

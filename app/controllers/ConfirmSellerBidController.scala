@@ -4,7 +4,7 @@ import controllers.actions.{WithLoginAction, WithTraderLoginAction}
 import exceptions.{BaseException, BlockChainException}
 import javax.inject.{Inject, Singleton}
 import models.{blockchain, blockchainTransaction}
-import play.api.i18n.{I18nSupport, Messages}
+import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
 
@@ -37,17 +37,17 @@ class ConfirmSellerBidController @Inject()(messagesControllerComponents: Message
                 try {
                   blockchainTransactionConfirmSellerBids.Utility.onSuccess(ticketID, transactionsConfirmSellerBid.Service.post(transactionsConfirmSellerBid.Request(from = username, to = confirmSellerBidData.buyerAddress, password = confirmSellerBidData.password, bid = confirmSellerBidData.bid, time = confirmSellerBidData.time, pegHash = confirmSellerBidData.pegHash, gas = confirmSellerBidData.gas)))
                 } catch {
-                  case baseException: BaseException => logger.error(constants.Error.BASE_EXCEPTION, baseException)
-                  case blockChainException: BlockChainException => logger.error(blockChainException.message, blockChainException)
-                    blockchainTransactionConfirmSellerBids.Utility.onFailure(ticketID, blockChainException.message)
+                  case baseException: BaseException => logger.error(constants.Response.BASE_EXCEPTION.message, baseException)
+                  case blockChainException: BlockChainException => logger.error(blockChainException.failure.message, blockChainException)
+                    blockchainTransactionConfirmSellerBids.Utility.onFailure(ticketID, blockChainException.failure.message)
                 }
               }
             }
-            Ok(views.html.index(success = ticketID))
+            Ok(views.html.index(successes = Seq(new Success(ticketID))))
           }
           catch {
-            case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))
-            case blockChainException: BlockChainException => Ok(views.html.index(failure = blockChainException.message))
+            case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
+            case blockChainException: BlockChainException => Ok(views.html.index(failures = Seq(blockChainException.failure)))
 
           }
         }
@@ -68,16 +68,16 @@ class ConfirmSellerBidController @Inject()(messagesControllerComponents: Message
           if (kafkaEnabled) {
             val response = transactionsConfirmSellerBid.Service.kafkaPost(transactionsConfirmSellerBid.Request(from = confirmSellerBidData.from, to = confirmSellerBidData.to, password = confirmSellerBidData.password, bid = confirmSellerBidData.bid, time = confirmSellerBidData.time, pegHash = confirmSellerBidData.pegHash, gas = confirmSellerBidData.gas))
             blockchainTransactionConfirmSellerBids.Service.addConfirmSellerBid(from = confirmSellerBidData.from, to = confirmSellerBidData.to, bid = confirmSellerBidData.bid, time = confirmSellerBidData.time, pegHash = confirmSellerBidData.pegHash, gas = confirmSellerBidData.gas, null, null, ticketID = response.ticketID, null)
-            Ok(views.html.index(success = response.ticketID))
+            Ok(views.html.index(successes = response.ticketID))
           } else {
             val response = transactionsConfirmSellerBid.Service.post(transactionsConfirmSellerBid.Request(from = confirmSellerBidData.from, to = confirmSellerBidData.to, password = confirmSellerBidData.password, bid = confirmSellerBidData.bid, time = confirmSellerBidData.time, pegHash = confirmSellerBidData.pegHash, gas = confirmSellerBidData.gas))
             blockchainTransactionConfirmSellerBids.Service.addConfirmSellerBid(from = confirmSellerBidData.from, to = confirmSellerBidData.to, bid = confirmSellerBidData.bid, time = confirmSellerBidData.time, pegHash = confirmSellerBidData.pegHash, gas = confirmSellerBidData.gas, null, txHash = Option(response.TxHash), ticketID = Random.nextString(32), null)
-            Ok(views.html.index(success = response.TxHash))
+            Ok(views.html.index(successes = response.TxHash))
           }
         }
         catch {
-          case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))
-          case blockChainException: BlockChainException => Ok(views.html.index(failure = blockChainException.message))
+          case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
+          case blockChainException: BlockChainException => Ok(views.html.index(failures = Seq(blockChainException.failure)))
 
         }
       }

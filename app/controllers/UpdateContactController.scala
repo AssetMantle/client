@@ -26,7 +26,7 @@ class UpdateContactController @Inject()(messagesControllerComponents: MessagesCo
           BadRequest(views.html.component.master.updateContact(formWithErrors, constants.CountryCallingCode.COUNTRY_CODES))
         },
         signUpData => {
-          if (contacts.Service.updateEmailAndMobile(username, signUpData.countryCode + signUpData.mobileNumber, signUpData.emailAddress)) Ok(views.html.index(success = Messages(constants.Flash.SUCCESS))) else Ok(views.html.index(failure = Messages(constants.Flash.FAILURE)))
+          if (contacts.Service.updateEmailAndMobile(username, signUpData.countryCode + signUpData.mobileNumber, signUpData.emailAddress)) Ok(views.html.index(successes = Messages(constants.Flash.SUCCESS))) else Ok(views.html.index(failures =Messages(constants.Flash.FAILURE)))
         }
       )
   }

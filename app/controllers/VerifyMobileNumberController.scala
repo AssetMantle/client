@@ -28,7 +28,7 @@ class VerifyMobileNumberController @Inject()(messagesControllerComponents: Messa
         Ok(views.html.component.master.verifyMobileNumber(VerifyMobileNumber.form))
       }
       catch {
-        case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))
+        case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
@@ -40,12 +40,12 @@ class VerifyMobileNumberController @Inject()(messagesControllerComponents: Messa
         },
         verifyMobileNumberData => {
           try {
-            if (!smsOTPs.Service.verifyOTP(username, verifyMobileNumberData.otp)) throw new BaseException(constants.Error.INVALID_OTP)
-            if (contacts.Service.verifyMobileNumber(username) != 1) throw new BaseException(constants.Error.MOBILE_NUMBER_NOT_FOUND)
-            Ok(views.html.index(success = Messages(constants.Flash.SUCCESS)))
+            if (!smsOTPs.Service.verifyOTP(username, verifyMobileNumberData.otp)) throw new BaseException(constants.Response.INVALID_OTP)
+            if (contacts.Service.verifyMobileNumber(username) != 1) throw new BaseException(constants.Response.MOBILE_NUMBER_NOT_FOUND)
+            Ok(views.html.index(successes = Messages(constants.Flash.SUCCESS)))
           }
           catch {
-            case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))
+            case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
           }
         })
   }

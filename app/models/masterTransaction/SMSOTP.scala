@@ -35,7 +35,7 @@ class SMSOTPs @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
-        throw new BaseException(constants.Error.NO_SUCH_ELEMENT_EXCEPTION)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }
   }
 
@@ -56,7 +56,7 @@ class SMSOTPs @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
 
     def sendOTP(id: String) = {
       val otp = (Random.nextInt(899999) + 100000).toString
-      if(Await.result(update(new SMSOTP(id, util.hashing.MurmurHash3.stringHash(otp).toString)), Duration.Inf)==0) throw new BaseException(constants.Error.NO_SUCH_ELEMENT_EXCEPTION)
+      if(Await.result(update(new SMSOTP(id, util.hashing.MurmurHash3.stringHash(otp).toString)), Duration.Inf)==0) throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
       otp
     }
 

@@ -21,7 +21,7 @@ object JSON {
     catch {
       case jsonParseException: JsonParseException => logger.info(response.toString, jsonParseException)
         throw new BlockChainException(response.body.toString)
-      case jsonMappingException: JsonMappingException => logger.info(constants.Error.NO_RESPONSE, jsonMappingException)
+      case jsonMappingException: JsonMappingException => logger.info(constants.Response.NO_RESPONSE, jsonMappingException)
         throw new BlockChainException(constants.Error.NO_RESPONSE)
     }
   }

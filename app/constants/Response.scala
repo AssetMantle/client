@@ -22,6 +22,7 @@ object Response {
   val SIGNED_UP = new Success("SIGNED_UP", routes.javascript.LoginController.loginForm)
   val LOGGED_OUT = new Success("LOGGED_OUT")
   val KEY_ADDED = new Success("KEY_ADDED")
+  val ADD_KEY = new Success("ADD_KEY")
   val MOBILE_NUMBER_VERIFIED = new Success("MOBILE_NUMBER_VERIFIED")
   val EMAIL_ADDRESS_VERIFIED = new Success("EMAIL_ADDRESS_VERIFIED")
   val CONTACT_UPDATED = new Success("CONTACT_UPDATED")

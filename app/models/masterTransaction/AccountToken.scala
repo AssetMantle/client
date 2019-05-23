@@ -4,8 +4,8 @@ import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import org.joda.time.{DateTime, DateTimeZone}
 import org.postgresql.util.PSQLException
-import play.api.{Configuration, Logger}
 import play.api.db.slick.DatabaseConfigProvider
+import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
 
 import scala.concurrent.duration.Duration
@@ -32,7 +32,7 @@ class AccountTokens @Inject()(protected val databaseConfigProvider: DatabaseConf
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
-        throw new BaseException(constants.Error.PSQL_EXCEPTION)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
     }
   }
 
@@ -40,7 +40,7 @@ class AccountTokens @Inject()(protected val databaseConfigProvider: DatabaseConf
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
-        throw new BaseException(constants.Error.NO_SUCH_ELEMENT_EXCEPTION)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }
   }
 
@@ -82,7 +82,7 @@ class AccountTokens @Inject()(protected val databaseConfigProvider: DatabaseConf
 
     def tryVerifySessionToken(username: String, sessionToken: String)(implicit executionContext: ExecutionContext): Boolean = {
       if(Await.result(findById(username), Duration.Inf).sessionTokenHash.get == util.hashing.MurmurHash3.stringHash(sessionToken).toString) true
-      else throw new BaseException(constants.Error.INVALID_TOKEN)
+      else throw new BaseException(constants.Response.INVALID_TOKEN)
     }
 
     def verifySessionTokenTime(username: Option[String])(implicit executionContext: ExecutionContext): Boolean = {
@@ -91,7 +91,7 @@ class AccountTokens @Inject()(protected val databaseConfigProvider: DatabaseConf
 
     def tryVerifySessionTokenTime(username: String)(implicit executionContext: ExecutionContext): Boolean = {
       if((DateTime.now(DateTimeZone.UTC).getMillis - Await.result(findById(username), Duration.Inf).sessionTokenTime) < configuration.get[Long]("sessionToken.timeout")) true
-      else throw new BaseException(constants.Error.TOKEN_TIMEOUT)
+      else throw new BaseException(constants.Response.TOKEN_TIMEOUT)
     }
 
     def refreshSessionToken(username: String): String = {
