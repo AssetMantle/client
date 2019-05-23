@@ -542,7 +542,6 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."IssueAssetRequest"
   "assetPrice"    INT     NOT NULL,
   "quantityUnit"  VARCHAR NOT NULL,
   "assetQuantity" INT     NOT NULL,
-  "moderated"     BOOLEAN NOT NULL,
   "gas"           INT,
   "status"        BOOLEAN,
   "comment"       VARCHAR,

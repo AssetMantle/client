@@ -11,7 +11,7 @@
         @inputText(issueAssetRequestForm(constants.Form.QUANTITY_UNIT),'_label-> Messages(constants.Form.QUANTITY_UNIT))
         @inputText(issueAssetRequestForm(constants.Form.ASSET_QUANTITY),'_label-> Messages(constants.Form.ASSET_QUANTITY))
         @checkbox(issueAssetRequestForm(constants.Form.MODERATED), '_label -> Messages(constants.Form.MODERATED), 'id -> "moderated")
-        <div class="hiddenFormElements" id="issueAssetRequestForm">
+        <div class="hiddenFormElements" id="moderatedIssueAssetRequestFormFields">
             @inputText(issueAssetRequestForm(constants.Form.GAS).copy(value = Some("0")), '_label -> Messages(constants.Form.GAS))
             @inputPassword(issueAssetRequestForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD))
         </div>

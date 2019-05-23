@@ -11,7 +11,7 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Random, Success}
 
-case class IssueAssetRequest(id: String, ticketID: Option[String], accountID: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, moderated: Boolean, gas: Option[Int], status: Option[Boolean], comment: Option[String])
+case class IssueAssetRequest(id: String, ticketID: Option[String], accountID: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, gas: Option[Int], status: Option[Boolean], comment: Option[String])
 
 @Singleton
 class IssueAssetRequests @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider) {
@@ -104,7 +104,7 @@ class IssueAssetRequests @Inject()(protected val databaseConfigProvider: Databas
 
   private[models] class IssueAssetRequestTable(tag: Tag) extends Table[IssueAssetRequest](tag, "IssueAssetRequest") {
 
-    def * = (id, ticketID.?, accountID, documentHash, assetType, assetPrice, quantityUnit, assetQuantity, moderated, gas.?, status.?, comment.?) <> (IssueAssetRequest.tupled, IssueAssetRequest.unapply)
+    def * = (id, ticketID.?, accountID, documentHash, assetType, assetPrice, quantityUnit, assetQuantity, gas.?, status.?, comment.?) <> (IssueAssetRequest.tupled, IssueAssetRequest.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
@@ -122,8 +122,6 @@ class IssueAssetRequests @Inject()(protected val databaseConfigProvider: Databas
 
     def assetQuantity = column[Int]("assetQuantity")
 
-    def moderated = column[Boolean]("moderated")
-
     def gas = column[Int]("gas")
 
     def status = column[Boolean]("status")
@@ -134,7 +132,7 @@ class IssueAssetRequests @Inject()(protected val databaseConfigProvider: Databas
 
   object Service {
 
-    def addIssueAssetRequest(accountID: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, moderated: Boolean)(implicit executionContext: ExecutionContext): String = Await.result(add(IssueAssetRequest(id = Random.nextString(32), null, accountID = accountID, documentHash = documentHash, assetType = assetType, assetPrice = assetPrice, quantityUnit = quantityUnit, assetQuantity = assetQuantity, moderated = moderated, null, null, null)), Duration.Inf)
+    def addIssueAssetRequest(accountID: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int)(implicit executionContext: ExecutionContext): String = Await.result(add(IssueAssetRequest(id = Random.nextString(32), null, accountID = accountID, documentHash = documentHash, assetType = assetType, assetPrice = assetPrice, quantityUnit = quantityUnit, assetQuantity = assetQuantity, null, null, null)), Duration.Inf)
 
     def updateTicketIDStatusAndGas(id: String, ticketID: String,status: Boolean, gas: Int)(implicit executionContext: ExecutionContext): Int = Await.result(updateTicketIDStatusAndGasByID(id, ticketID, status, gas), Duration.Inf)
 

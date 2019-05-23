@@ -47,7 +47,7 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
               }
               Ok(views.html.index(success = ticketID))
             } else {
-              masterTransactionIssueAssetRequests.Service.addIssueAssetRequest(accountID = username, documentHash = issueAssetRequestData.documentHash, assetPrice = issueAssetRequestData.assetPrice, assetType = issueAssetRequestData.assetType, quantityUnit = issueAssetRequestData.quantityUnit, assetQuantity = issueAssetRequestData.assetQuantity, moderated = issueAssetRequestData.moderated)
+              masterTransactionIssueAssetRequests.Service.addIssueAssetRequest(accountID = username, documentHash = issueAssetRequestData.documentHash, assetPrice = issueAssetRequestData.assetPrice, assetType = issueAssetRequestData.assetType, quantityUnit = issueAssetRequestData.quantityUnit, assetQuantity = issueAssetRequestData.assetQuantity)
               Ok(views.html.index(success = constants.Success.ISSUE_ASSET_REQUEST))
             }
           }
@@ -105,13 +105,13 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
           try {
             val toAddress = masterAccounts.Service.getAddress(issueAssetData.accountID)
             if (masterTransactionIssueAssetRequests.Service.getStatus(issueAssetData.requestID).isEmpty) {
-              val ticketID: String = if (kafkaEnabled) transactionsIssueAsset.Service.kafkaPost(transactionsIssueAsset.Request(from = username, to = toAddress, password = issueAssetData.password, documentHash = issueAssetData.documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.assetPrice, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.assetQuantity, gas = issueAssetData.gas, moderated = false)).ticketID else Random.nextString(32)
-              blockchainTransactionIssueAssets.Service.addIssueAsset(from = username, to = toAddress, documentHash = issueAssetData.documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.assetPrice, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.assetQuantity, moderated = false, gas = issueAssetData.gas, null, null, ticketID = ticketID, null)
+              val ticketID: String = if (kafkaEnabled) transactionsIssueAsset.Service.kafkaPost(transactionsIssueAsset.Request(from = username, to = toAddress, password = issueAssetData.password, documentHash = issueAssetData.documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.assetPrice, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.assetQuantity, gas = issueAssetData.gas, moderated = issueAssetData.moderated)).ticketID else Random.nextString(32)
+              blockchainTransactionIssueAssets.Service.addIssueAsset(from = username, to = toAddress, documentHash = issueAssetData.documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.assetPrice, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.assetQuantity, moderated = issueAssetData.moderated, gas = issueAssetData.gas, null, null, ticketID = ticketID, null)
               masterTransactionIssueAssetRequests.Service.updateTicketIDStatusAndGas(issueAssetData.requestID, ticketID, true, issueAssetData.gas)
               if (!kafkaEnabled) {
                 Future {
                   try {
-                    blockchainTransactionIssueAssets.Utility.onSuccess(ticketID, transactionsIssueAsset.Service.post(transactionsIssueAsset.Request(from = username, to = toAddress, password = issueAssetData.password, documentHash = issueAssetData.documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.assetPrice, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.assetQuantity, gas = issueAssetData.gas, moderated = false)))
+                    blockchainTransactionIssueAssets.Utility.onSuccess(ticketID, transactionsIssueAsset.Service.post(transactionsIssueAsset.Request(from = username, to = toAddress, password = issueAssetData.password, documentHash = issueAssetData.documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.assetPrice, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.assetQuantity, gas = issueAssetData.gas, moderated = issueAssetData.moderated)))
                   } catch {
                     case baseException: BaseException => logger.error(constants.Error.BASE_EXCEPTION, baseException)
                     case blockChainException: BlockChainException => logger.error(blockChainException.message, blockChainException)
