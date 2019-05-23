@@ -32,6 +32,12 @@ object setACLPrivileges {
   val releaseAsset = true
 }
 
+object intParameters {
+  val transactionAmount = 10000
+  val assetQuantity = 2
+  val assetPrice = 1000
+}
+
 class MasterTest extends Simulation {
 
   setUp(
@@ -386,7 +392,7 @@ object masterTest {
         .exec { session => session.set(Test.TEST_REQUEST_ID, getRequestIDForIssueAsset(session(Test.TEST_SELLER_USERNAME).as[String])) }
         .exec { session => session.set(Test.TEST_ACCOUNT_ID, session(Test.TEST_SELLER_USERNAME).as[String]) }
         .exec(http("IssueAsset_GET")
-          .get(routes.IssueAssetController.issueAssetForm("${%s}".format(Test.TEST_REQUEST_ID), "${%s}".format(Test.TEST_ACCOUNT_ID), "${%s}".format(Test.TEST_DOCUMENT_HASH), "${%s}".format(Test.TEST_ASSET_TYPE), "${%s}".format(Test.TEST_ASSET_PRICE).toInt, "${%s}".format(Test.TEST_QUANTITY_UNIT), "${%s}".format(Test.TEST_ASSET_QUANTITY).toInt).url)
+          .get(routes.IssueAssetController.issueAssetForm("${%s}".format(Test.TEST_REQUEST_ID), "${%s}".format(Test.TEST_ACCOUNT_ID), "${%s}".format(Test.TEST_DOCUMENT_HASH), "${%s}".format(Test.TEST_ASSET_TYPE), intParameters.assetPrice, "${%s}".format(Test.TEST_QUANTITY_UNIT), intParameters.assetQuantity).url)
           .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
         .pause(2)
         .exec(http("IssueAsset_POST")
@@ -459,7 +465,7 @@ object masterTest {
         .exec { session => session.set(Test.TEST_REQUEST_ID, getRequestIDForIssueFiat(session(Test.TEST_BUYER_USERNAME).as[String])) }
         .exec { session => session.set(Test.TEST_ACCOUNT_ID, session(Test.TEST_BUYER_USERNAME).as[String]) }
         .exec(http("IssueFiat_GET")
-          .get(routes.IssueFiatController.issueFiatForm("${%s}".format(Test.TEST_REQUEST_ID), "${%s}".format(Test.TEST_ACCOUNT_ID), "${%s}".format(Test.TEST_TRANSACTION_ID), "${%s}".format(Test.TEST_TRANSACTION_AMOUNT).toInt).url)
+          .get(routes.IssueFiatController.issueFiatForm("${%s}".format(Test.TEST_REQUEST_ID), "${%s}".format(Test.TEST_ACCOUNT_ID), "${%s}".format(Test.TEST_TRANSACTION_ID), intParameters.transactionAmount).url)
           .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
         .pause(2)
         .exec(http("IssueFiat_POST")
