@@ -32,7 +32,6 @@ object redeemFiatControllerTest {
         Form.REDEEM_AMOUNT -> "${%s}".format(Test.TEST_REDEEM_AMOUNT),
         Form.GAS -> "${%s}".format(Test.TEST_GAS),
         Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
-    .pause(5)
 
   val blockchainRedeemFiatScenario: ScenarioBuilder = scenario("BlockchainRedeemFiat")
     .feed(FromFeeder.fromFeed)
@@ -53,5 +52,4 @@ object redeemFiatControllerTest {
         Form.REDEEM_AMOUNT -> "${%s}".format(Test.TEST_REDEEM_AMOUNT),
         Form.GAS -> "${%s}".format(Test.TEST_GAS),
         Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
-    .pause(5)
 }

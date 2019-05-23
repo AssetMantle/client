@@ -38,7 +38,6 @@ object changeSellerBidControllerTest {
         Form.PEG_HASH -> "${%s}".format(Test.TEST_PEG_HASH),
         Form.GAS -> "${%s}".format(Test.TEST_GAS),
         Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
-    .pause(5)
 
   val blockchainChangeSellerBidScenario: ScenarioBuilder = scenario("BlockchainChangeSellerBid")
     .feed(FromFeeder.fromFeed)
@@ -63,7 +62,6 @@ object changeSellerBidControllerTest {
         Form.PEG_HASH -> "${%s}".format(Test.TEST_PEG_HASH),
         Form.GAS -> "${%s}".format(Test.TEST_GAS),
         Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
-    .pause(5)
 
   def getSellerAddress(sellerUsername: String) = {
     val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://localhost:5432/comdex", "comdex", "comdex",

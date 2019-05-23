@@ -6,7 +6,6 @@ import javax.inject.{Inject, Singleton}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.{Configuration, Logger}
-import queries.responses.AccountResponse
 import slick.jdbc.JdbcProfile
 import utilities.PushNotification
 
@@ -128,7 +127,7 @@ class Orders @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
             } else {
               blockchainAssets.Service.deleteAssetPegWallet(negotiation.sellerAddress)
             }
-            sellerAccount.value.fiatPegWallet.getOrElse(Seq(AccountResponse.Fiat(null, null, null, null, null))).foreach(fiatPeg => {
+            sellerAccount.value.fiatPegWallet.getOrElse(Seq()).foreach(fiatPeg => {
               blockchainFiats.Service.insertOrUpdateFiat(fiatPeg.pegHash, negotiation.sellerAddress, fiatPeg.transactionID, fiatPeg.transactionAmount, fiatPeg.redeemedAmount, dirtyBit = true)
             })
 
@@ -138,7 +137,7 @@ class Orders @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
             } else {
               blockchainAssets.Service.deleteAssetPegWallet(negotiation.buyerAddress)
             }
-            buyerAccount.value.fiatPegWallet.getOrElse(Seq(AccountResponse.Fiat(null, null, null, null, null))).foreach(fiatPeg => {
+            buyerAccount.value.fiatPegWallet.getOrElse(Seq()).foreach(fiatPeg => {
               blockchainFiats.Service.insertOrUpdateFiat(fiatPeg.pegHash, negotiation.buyerAddress, fiatPeg.transactionID, fiatPeg.transactionAmount, fiatPeg.redeemedAmount, dirtyBit = true)
             })
 

@@ -34,7 +34,6 @@ object setSellerFeedbackControllerTest {
         Form.RATING -> "${%s}".format(Test.TEST_RATING),
         Form.GAS -> "${%s}".format(Test.TEST_GAS),
         Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
-    .pause(5)
 
   val blockchainSetSellerFeedbackScenario: ScenarioBuilder = scenario("BlockchainSetSellerFeedback")
     .feed(FromFeeder.fromFeed)
@@ -57,5 +56,4 @@ object setSellerFeedbackControllerTest {
         Form.RATING -> "${%s}".format(Test.TEST_RATING),
         Form.GAS -> "${%s}".format(Test.TEST_GAS),
         Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
-    .pause(5)
 }

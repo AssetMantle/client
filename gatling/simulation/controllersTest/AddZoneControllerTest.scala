@@ -29,37 +29,33 @@ object addZoneControllerTest {
         Form.NAME -> "${%s}".format(Test.TEST_NAME),
         Form.CURRENCY -> "${%s}".format(Test.TEST_CURRENCY),
         Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
-    .pause(5)
 
   val verifyZoneScenario: ScenarioBuilder = scenario("VerifyZone")
     .feed(ZoneIDFeeder.zoneIDFeed)
     .feed(PasswordFeeder.passwordFeed)
-      .exec(http("VerifyZone_GET")
-        .get(routes.AddZoneController.verifyZoneForm("${%s}".format(Test.TEST_ZONE_ID)).url)
-        .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
-      .pause(2)
-      .exec(http("VerifyZone_POST")
-        .post(routes.AddZoneController.verifyZone().url)
-    .formParamMap(Map(
-      Form.ZONE_ID ->  "${%s}".format(Test.TEST_ZONE_ID),
-      Form.PASSWORD ->  "${%s}".format(Test.TEST_PASSWORD),
-      Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
-     .pause(5)
+    .exec(http("VerifyZone_GET")
+      .get(routes.AddZoneController.verifyZoneForm("${%s}".format(Test.TEST_ZONE_ID)).url)
+      .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
+    .pause(2)
+    .exec(http("VerifyZone_POST")
+      .post(routes.AddZoneController.verifyZone().url)
+      .formParamMap(Map(
+        Form.ZONE_ID -> "${%s}".format(Test.TEST_ZONE_ID),
+        Form.PASSWORD -> "${%s}".format(Test.TEST_PASSWORD),
+        Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
 
   val rejectVerifyZoneScenario: ScenarioBuilder = scenario("RejectVerifyZone")
     .feed(ZoneIDFeeder.zoneIDFeed)
-  /*
-  .exec(http("RejectVerifyZone_GET")
-    .get(routes.AddZoneController.rejectVerifyZoneRequestForm().url)
-    .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
-  .pause(2)
-  .exec(http("RejectVerifyZone_POST")
-    .post(routes.AddZoneController.rejectVerifyZoneRequest().url)
-    .formParamMap(Map(
-      Form.ZONE_ID ->  "${%s}".format(Test.TEST_ZONE_ID),
-      Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
+    .exec(http("RejectVerifyZone_GET")
+      .get(routes.AddZoneController.rejectVerifyZoneRequestForm(Test.TEST_ZONE_ID).url)
+      .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
+    .pause(2)
+    .exec(http("RejectVerifyZone_POST")
+      .post(routes.AddZoneController.rejectVerifyZoneRequest().url)
+      .formParamMap(Map(
+        Form.ZONE_ID -> "${%s}".format(Test.TEST_ZONE_ID),
+        Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
     .pause(5)
-*/
 
   val blockchainAddZoneScenario: ScenarioBuilder = scenario("BlockchainAddZone")
     .feed(FromFeeder.fromFeed)
@@ -78,17 +74,17 @@ object addZoneControllerTest {
         Form.ZONE_ID -> "${%s}".format(Test.TEST_ZONE_ID),
         Form.PASSWORD -> "${%s}".format(Test.TEST_PASSWORD),
         Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
-    .pause(5)
 
   def getZoneID(query: String): String = {
     val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://localhost:5432/comdex", "comdex", "comdex",
       s"""SELECT "id" FROM master."Zone" WHERE "accountID" = '$query';""")
     sqlQueryFeeder.apply().next()("id").toString
   }
+
   def getZoneStatus(query: String): Boolean = {
     val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://localhost:5432/comdex", "comdex", "comdex",
       s"""SELECT "status" FROM master."Zone" WHERE "accountID" = '$query';""")
-    if(sqlQueryFeeder.apply().next()("status")==true) true
+    if (sqlQueryFeeder.apply().next()("status") == true) true
     else false
   }
 }

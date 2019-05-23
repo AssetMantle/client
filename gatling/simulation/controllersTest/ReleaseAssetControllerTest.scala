@@ -32,7 +32,6 @@ object releaseAssetControllerTest {
         Form.PASSWORD -> "${%s}".format(Test.TEST_PASSWORD),
         Form.GAS -> "${%s}".format(Test.TEST_GAS),
         Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
-    .pause(5)
 
   val blockchainReleaseAssetScenario: ScenarioBuilder = scenario("blockchainReleaseAsset")
     .feed(FromFeeder.fromFeed)
@@ -53,5 +52,4 @@ object releaseAssetControllerTest {
         Form.PASSWORD -> "${%s}".format(Test.TEST_PASSWORD),
         Form.GAS -> "${%s}".format(Test.TEST_GAS),
         Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
-    .pause(5)
 }

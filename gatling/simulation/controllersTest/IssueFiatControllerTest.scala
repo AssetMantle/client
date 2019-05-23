@@ -29,13 +29,11 @@ object issueFiatControllerTest {
         Form.TRANSACTION_ID -> "${%s}".format(Test.TEST_TRANSACTION_ID),
         Form.TRANSACTION_AMOUNT -> "${%s}".format(Test.TEST_TRANSACTION_AMOUNT),
         Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
-    .pause(5)
 
   val rejectFiatRequestScenario: ScenarioBuilder = scenario("RejectFiatRequest")
     .feed(RequestIDFeeder.requestIDFeed)
-  /*
       .exec(http("RejectIssueFiat_GET")
-        .get(routes.IssueFiatController.rejectIssueFiatRequestForm().url)
+        .get(routes.IssueFiatController.rejectIssueFiatRequestForm(Test.TEST_REQUEST_ID).url)
         .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
       .pause(2)
       .exec(http("RejectIssueFiat_POST")
@@ -43,8 +41,6 @@ object issueFiatControllerTest {
         .formParamMap(Map(
         Form.REQUEST_ID -> "${%s}".format(Test.TEST_REQUEST_ID),
          Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
-      .pause(5)
-  */
 
   val issueFiatScenario: ScenarioBuilder = scenario("IssueFiat")
     .feed(RequestIDFeeder.requestIDFeed)
@@ -67,7 +63,6 @@ object issueFiatControllerTest {
         Form.PASSWORD -> "${%s}".format(Test.TEST_PASSWORD),
         Form.GAS -> "${%s}".format(Test.TEST_GAS),
         Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
-    .pause(5)
 
   val blockchainIssueFiatScenario: ScenarioBuilder = scenario("BlockchainIssueFiat")
     .feed(FromFeeder.fromFeed)
@@ -90,7 +85,6 @@ object issueFiatControllerTest {
         Form.PASSWORD -> "${%s}".format(Test.TEST_PASSWORD),
         Form.GAS -> "${%s}".format(Test.TEST_GAS),
         Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
-    .pause(5)
 
   def getRequestIDForIssueFiat(query: String): String = {
     val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://localhost:5432/comdex", "comdex", "comdex",

@@ -21,7 +21,8 @@ object sendCoinControllerTest {
     .feed(PasswordFeeder.passwordFeed)
     .feed(GasFeeder.gasFeed)
     .exec { session => {
-      session.set(Test.TEST_TO, getAddress(session(Test.TEST_USERNAME).as[String])); session
+      session.set(Test.TEST_TO, getAddress(session(Test.TEST_USERNAME).as[String]));
+      session
     }
     } //toFeed
     .exec(http("SendCoinController_GET")
@@ -36,14 +37,14 @@ object sendCoinControllerTest {
         Form.PASSWORD -> "${%s}".format(Test.TEST_PASSWORD),
         Form.GAS -> "${%s}".format(Test.TEST_GAS),
         Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
-    .pause(5)
 
   val sendCoinMainScenario: ScenarioBuilder = scenario("SendCoinMain")
     .feed(AmountFeeder.amountFeed)
     .feed(PasswordFeeder.passwordFeed)
     .feed(GasFeeder.gasFeed)
     .exec { session => {
-      session.set(Test.TEST_TO, getAddress(session(Test.TEST_MAIN_USERNAME).as[String])); session
+      session.set(Test.TEST_TO, getAddress(session(Test.TEST_MAIN_USERNAME).as[String]));
+      session
     }
     } //toFeed
     .exec(http("SendCoinMainController_GET")
@@ -58,7 +59,6 @@ object sendCoinControllerTest {
         Form.PASSWORD -> "${%s}".format(Test.TEST_PASSWORD),
         Form.GAS -> "${%s}".format(Test.TEST_GAS),
         Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
-    .pause(5)
 
   val blockchainSendCoinScenario: ScenarioBuilder = scenario("BlockchainSendCoin")
     .feed(FromFeeder.fromFeed)
@@ -66,7 +66,8 @@ object sendCoinControllerTest {
     .feed(PasswordFeeder.passwordFeed)
     .feed(GasFeeder.gasFeed)
     .exec { session => {
-      session.set(Test.TEST_TO, getAddress(session(Test.TEST_MAIN_USERNAME).as[String])); session
+      session.set(Test.TEST_TO, getAddress(session(Test.TEST_MAIN_USERNAME).as[String]));
+      session
     }
     } //toFeed
     .exec(http("BlockchainSendCoinController_GET")
@@ -82,7 +83,6 @@ object sendCoinControllerTest {
         Form.PASSWORD -> "${%s}".format(Test.TEST_PASSWORD),
         Form.GAS -> "${%s}".format(Test.TEST_GAS),
         Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
-    .pause(5)
 
   val blockchainSendCoinMainScenario: ScenarioBuilder = scenario("BlockchainSendCoinMain")
     .feed(FromFeeder.fromFeed)
@@ -109,7 +109,6 @@ object sendCoinControllerTest {
         Form.PASSWORD -> "${%s}".format(Test.TEST_PASSWORD),
         Form.GAS -> "${%s}".format(Test.TEST_GAS),
         Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
-    .pause(5)
 
   val requestCoinScenario: ScenarioBuilder = scenario("RequestCoin")
     .feed(CouponFeeder.couponFeed)
@@ -125,19 +124,24 @@ object sendCoinControllerTest {
 
   val rejectFaucetRequestScenario: ScenarioBuilder = scenario("RejectFaucetRequest")
     .feed(RequestIDFeeder.requestIDFeed)
+    .exec(http("RejectFaucetRequest_GET")
+      .get(routes.SendCoinController.rejectFaucetRequestForm(Test.TEST_REQUEST_ID).url)
+      .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
+    .pause(2)
+    .exec(http("RejectFaucetRequest_POST")
+      .post(routes.SendCoinController.rejectFaucetRequest().url)
+      .formParamMap(Map(
+        Form.REQUEST_ID -> "${%s}".format(Test.TEST_REQUEST_ID),
+        Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
 
   val approveFaucetRequestScenario: ScenarioBuilder = scenario("ApproveFaucetRequest")
     .feed(AccountIDFeeder.accountIDFeed)
     .feed(RequestIDFeeder.requestIDFeed)
     .feed(PasswordFeeder.passwordFeed)
     .feed(GasFeeder.gasFeed)
-    .exec { session => session.set(Test.TEST_REQUEST_ID,getRequestIDForFaucetRequest(session(Test.TEST_ACCOUNT_ID).as[String]))}
-    .exec { session =>
-      println(session)
-      session
-    }
+    .exec { session => session.set(Test.TEST_REQUEST_ID, getRequestIDForFaucetRequest(session(Test.TEST_ACCOUNT_ID).as[String])) }
     .exec(http("ApproveFaucetRequest_GET")
-      .get(routes.SendCoinController.approveFaucetRequestsForm("${%s}".format(Test.TEST_REQUEST_ID),"${%s}".format(Test.TEST_ACCOUNT_ID)).url)
+      .get(routes.SendCoinController.approveFaucetRequestsForm("${%s}".format(Test.TEST_REQUEST_ID), "${%s}".format(Test.TEST_ACCOUNT_ID)).url)
       .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
     .pause(2)
     .exec(http("ApproveFaucetRequest_POST")
@@ -148,25 +152,12 @@ object sendCoinControllerTest {
         Form.PASSWORD -> "${%s}".format(Test.TEST_PASSWORD),
         Form.GAS -> "${%s}".format(Test.TEST_GAS),
         Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
-    .pause(5)
 
   def getAddress(query: String) = {
     val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://localhost:5432/comdex", "comdex", "comdex",
       s"""SELECT "accountAddress" FROM master."Account" WHERE id = '$query';""")
     sqlQueryFeeder.apply().next()("accountAddress")
   }
-  /*
-    .exec(http("RejectFaucetRequest_GET")
-      .get(routes.SendCoinController.rejectFaucetRequestForm().url)
-      .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
-    .pause(2)
-    .exec(http("RejectFaucetRequest_POST")
-      .post(routes.SendCoinController.rejectFaucetRequest().url)
-      .formParamMap(Map(
-      Form.REQUEST_ID -> "${%s}".format(Test.TEST_REQUEST_ID),
-       Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
-    .pause(5)
-*/
 
   def getRequestIDForFaucetRequest(query: String): String = {
     val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://localhost:5432/comdex", "comdex", "comdex",

@@ -17,14 +17,6 @@ object signUpControllerTest {
   val signUpScenario: ScenarioBuilder = scenario("SignUp")
     .feed(UsernameFeeder.usernameFeed)
     .feed(PasswordFeeder.passwordFeed)
-
-    .exec { session => {
-      println("*******************************************************************************************************-")
-      println(session(Test.TEST_USERNAME).as[String]+"||")
-      println(session(Test.TEST_PASSWORD).as[String]+"||")
-      println("*******************************************************************************************************-")
-      session
-    }}
     .exec(http("SignUp_GET")
       .get(routes.SignUpController.signUpForm().url)
       .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))

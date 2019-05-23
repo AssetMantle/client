@@ -15,21 +15,47 @@ import io.gatling.core.Predef._
 import io.gatling.core.structure.ScenarioBuilder
 import io.gatling.http.Predef._
 
+object nonStringFeedParameters {
+  val issueAsset = true
+  val issueFiat = true
+  val sendAsset = true
+  val sendFiat = true
+  val redeemAsset = true
+  val redeemFiat = true
+  val sellerExecuteOrder = true
+  val buyerExecuteOrder = true
+  val changeBuyerBid = true
+  val changeSellerBid = true
+  val confirmBuyerBid = true
+  val confirmSellerBid = true
+  val negotiation = true
+  val releaseAsset = true
+
+  val assetPrice = 1000
+  val assetQuantity = 2
+  val transactionAmount = 10000
+  val buyerBid = 900
+  val sellerBid = 950
+  val time = 10000
+}
+
 class MasterTest extends Simulation {
 
   setUp(
-    //    masterTest.masterTestSignUp.inject(atOnceUsers(8)),
-    //    masterTest.masterLoginAndRequestCoin.inject(nothingFor(20), atOnceUsers(8)),
-    //    masterTest.masterLoginMainAndApproveFaucetRequest.inject(nothingFor(40), atOnceUsers(1), nothingFor(15), atOnceUsers(1), nothingFor(15), atOnceUsers(1), nothingFor(15), atOnceUsers(1), nothingFor(15), atOnceUsers(1), nothingFor(15), atOnceUsers(1), nothingFor(15), atOnceUsers(1), nothingFor(15), atOnceUsers(1)),
-    //    masterTest.masterZoneLogin.inject(nothingFor(150), atOnceUsers(2)),
-    //    masterTest.masterLoginMainAndApproveZone.inject(nothingFor(210), atOnceUsers(1), nothingFor(15), atOnceUsers(1)),
-    //    masterTest.masterOrganizationLogin.inject(nothingFor(240), atOnceUsers(2)),
-    //    masterTest.masterLoginZoneAndApproveOrganization.inject(nothingFor(265), atOnceUsers(1), nothingFor(15), atOnceUsers(1)),
-    //    masterTest.masterLoginZoneAndSetACL.inject(nothingFor(295), atOnceUsers(1), nothingFor(20), atOnceUsers(1)),
-    //    masterTest.masterSellerLoginAndIssueAssetRequest.inject(nothingFor(340), atOnceUsers(2)),
-    //    masterTest.masterLoginZoneAndIssueAsset.inject(nothingFor(365), atOnceUsers(2)),
-    //    masterTest.masterBuyerLoginAndIssueFiatRequest.inject(nothingFor(390), atOnceUsers(2)),
-    //    masterTest.masterLoginZoneAndIssueFiat.inject(nothingFor(415), atOnceUsers(2)),
+    /*For Two Users
+        masterTest.masterTestSignUp.inject(atOnceUsers(8)),
+        masterTest.masterLoginAndRequestCoin.inject(nothingFor(20), atOnceUsers(8)),
+        masterTest.masterLoginMainAndApproveFaucetRequest.inject(nothingFor(40), atOnceUsers(1), nothingFor(15), atOnceUsers(1), nothingFor(15), atOnceUsers(1), nothingFor(15), atOnceUsers(1), nothingFor(15), atOnceUsers(1), nothingFor(15), atOnceUsers(1), nothingFor(15), atOnceUsers(1), nothingFor(15), atOnceUsers(1)),
+        masterTest.masterZoneLogin.inject(nothingFor(150), atOnceUsers(2)),
+        masterTest.masterLoginMainAndApproveZone.inject(nothingFor(210), atOnceUsers(1), nothingFor(15), atOnceUsers(1)),
+        masterTest.masterOrganizationLogin.inject(nothingFor(240), atOnceUsers(2)),
+        masterTest.masterLoginZoneAndApproveOrganization.inject(nothingFor(265), atOnceUsers(1), nothingFor(15), atOnceUsers(1)),
+        masterTest.masterLoginZoneAndSetACL.inject(nothingFor(295), atOnceUsers(1), nothingFor(20), atOnceUsers(1)),
+        masterTest.masterSellerLoginAndIssueAssetRequest.inject(nothingFor(340), atOnceUsers(2)),
+        masterTest.masterLoginZoneAndIssueAsset.inject(nothingFor(365), atOnceUsers(2)),
+        masterTest.masterBuyerLoginAndIssueFiatRequest.inject(nothingFor(390), atOnceUsers(2)),
+        masterTest.masterLoginZoneAndIssueFiat.inject(nothingFor(415), atOnceUsers(2)),
+    */
     masterTest.masterTestSignUp.inject(atOnceUsers(4)),
     masterTest.masterLoginAndRequestCoin.inject(nothingFor(15), atOnceUsers(4)),
     masterTest.masterLoginMainAndApproveFaucetRequest.inject(nothingFor(25), atOnceUsers(1), nothingFor(15), atOnceUsers(1), nothingFor(15), atOnceUsers(1), nothingFor(15), atOnceUsers(1)),
@@ -49,21 +75,51 @@ class MasterTest extends Simulation {
     masterTest.masterLoginZoneAndReleaseAsset.inject(nothingFor(390), atOnceUsers(1)),
     masterTest.masterBuyerLoginAndSendFiat.inject(nothingFor(420), atOnceUsers(1)),
     masterTest.masterSellerLoginAndSendAsset.inject(nothingFor(440), atOnceUsers(1)),
-   // masterTest.masterLoginZoneAndExecuteOrder.inject(nothingFor(460), atOnceUsers(1))
+    // masterTest.masterLoginZoneAndExecuteOrder.inject(nothingFor(460), atOnceUsers(1))
   ).protocols(http.baseUrl(Test.BASE_URL))
 }
 
 object masterTest {
 
   val masterTestSignUp: ScenarioBuilder = scenario("masterTestSignUp")
-    .exec(controllersTest.signUpControllerTest.signUpScenario)
+    .feed(UsernameFeeder.usernameFeed)
+    .feed(PasswordFeeder.passwordFeed)
+    .exec(http("SignUp_GET")
+      .get(routes.SignUpController.signUpForm().url)
+      .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
+    .exec(http("SignUp_POST")
+      .post(routes.SignUpController.signUp().url)
+      .formParamMap(Map(
+        Form.USERNAME -> "${%s}".format(Test.TEST_USERNAME),
+        Form.PASSWORD -> "${%s}".format(Test.TEST_PASSWORD),
+        Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
+    .pause(5)
 
   val masterLoginAndRequestCoin: ScenarioBuilder = scenario("masterLoginAndRequestCoin")
     .feed(UsernameFeeder.usernameFeed)
     .feed(PasswordFeeder.passwordFeed)
-    .exec(controllersTest.loginControllerTest.loginWithoutSignUpScenario)
+    .exec(http("Login_GET")
+      .get(routes.LoginController.loginForm().url)
+      .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
+    .exec(http("Login_POST")
+      .post(routes.LoginController.login().url)
+      .formParamMap(Map(
+        Form.USERNAME -> "${%s}".format(Test.TEST_USERNAME),
+        Form.PASSWORD -> "${%s}".format(Test.TEST_PASSWORD),
+        Form.NOTIFICATION_TOKEN -> "",
+        Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
     .pause(2)
-    .exec(controllersTest.sendCoinControllerTest.requestCoinScenario)
+    .feed(CouponFeeder.couponFeed)
+    .exec(http("RequestCoin_GET")
+      .get(routes.SendCoinController.requestCoinsForm().url)
+      .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
+    .pause(2)
+    .exec(http("RequestCoin_POST")
+      .post(routes.SendCoinController.requestCoins().url)
+      .formParamMap(Map(
+        Form.COUPON -> "${%s}".format(Test.TEST_COUPON),
+        Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
+    .pause(5)
 
   val masterLoginMainAndApproveFaucetRequest: ScenarioBuilder = scenario("masterLoginMainAndApproveFaucetRequest")
     .feed(GenesisFeeder.genesisFeed)
@@ -82,7 +138,6 @@ object masterTest {
         Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
     .pause(2)
     .exec { session => session.set(Test.TEST_REQUEST_ID, getRequestIDForFaucetRequest(session(Test.TEST_ACCOUNT_ID).as[String])) }
-    .exec { session => println(session); session }
     .exec(http("ApproveFaucetRequest_GET")
       .get(routes.SendCoinController.approveFaucetRequestsForm("${%s}".format(Test.TEST_REQUEST_ID), "${%s}".format(Test.TEST_ACCOUNT_ID)).url)
       .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
@@ -109,7 +164,19 @@ object masterTest {
         Form.NOTIFICATION_TOKEN -> "",
         Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
     .pause(5)
-    .exec(controllersTest.addZoneControllerTest.addZoneScenario)
+    .feed(NameFeeder.nameFeed)
+    .feed(CurrencyFeeder.currencyFeed)
+    .exec(http("AddZone_GET")
+      .get(routes.AddZoneController.addZoneForm().url)
+      .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
+    .pause(2)
+    .exec(http("AddZone_POST")
+      .post(routes.AddZoneController.addZone().url)
+      .formParamMap(Map(
+        Form.NAME -> "${%s}".format(Test.TEST_NAME),
+        Form.CURRENCY -> "${%s}".format(Test.TEST_CURRENCY),
+        Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
+    .pause(5)
 
   val masterLoginMainAndApproveZone: ScenarioBuilder = scenario("masterLoginMainAndApproveZone")
     .feed(GenesisFeeder.genesisFeed)
@@ -131,7 +198,6 @@ object masterTest {
       .get(routes.AddZoneController.verifyZoneForm("${%s}".format(Test.TEST_ZONE_ID)).url)
       .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
     .pause(2)
-    .exec { session => println(session); session }
     .exec(http("VerifyZone_POST")
       .post(routes.AddZoneController.verifyZone().url)
       .formParamMap(Map(
@@ -143,13 +209,11 @@ object masterTest {
   val masterOrganizationLogin: ScenarioBuilder = scenario("masterOrganizationLogin")
     .feed(OrganizationLoginFeeder.organizationLoginFeed)
     .feed(ZoneLoginFeeder.zoneLoginFeed)
-    .exec { session => println(session); session }
     .exec { session => session.set(Test.TEST_ZONE_ID, getZoneID(session(Test.TEST_ZONE_USERNAME).as[String])) }
     .doIfOrElse(session => getZoneStatus(session(Test.TEST_ZONE_USERNAME).as[String])) {
-      exec { session => println("InsideLogin" + session); session }
-        .exec(http("OrganizationLogin_GET")
-          .get(routes.LoginController.loginForm().url)
-          .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
+      exec(http("OrganizationLogin_GET")
+        .get(routes.LoginController.loginForm().url)
+        .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
         .exec(http("OrganizationLogin_POST")
           .post(routes.LoginController.login().url)
           .formParamMap(Map(
@@ -157,7 +221,25 @@ object masterTest {
             Form.PASSWORD -> "${%s}".format(Test.TEST_ORGANIZATION_PASSWORD),
             Form.NOTIFICATION_TOKEN -> "",
             Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
-        .pause(5).exec(controllersTest.addOrganizationControllerTest.addOrganizationScenario)
+        .pause(5)
+        .feed(NameFeeder.nameFeed)
+        .feed(AddressFeeder.addressFeed)
+        .feed(EmailAddressFeeder.emailAddressFeed)
+        .feed(MobileNumberFeeder.mobileNumberFeed)
+        .exec(http("AddOrganization_GET")
+          .get(routes.AddOrganizationController.addOrganizationForm().url)
+          .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
+        .pause(2)
+        .exec(http("AddOrganization_POST")
+          .post(routes.AddOrganizationController.addOrganizationForm().url)
+          .formParamMap(Map(
+            Form.ZONE_ID -> "${%s}".format(Test.TEST_ZONE_ID),
+            Form.NAME -> "${%s}".format(Test.TEST_NAME),
+            Form.ADDRESS -> "${%s}".format(Test.TEST_ADDRESS),
+            Form.EMAIL -> "${%s}".format(Test.TEST_EMAIL_ADDRESS),
+            Form.PHONE -> "${%s}".format(Test.TEST_MOBILE_NUMBER),
+            Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
+        .pause(5)
     } {
       exec { session => println("OutsideLogin" + session); session }
     }
@@ -169,10 +251,9 @@ object masterTest {
     .feed(OrganizationIDFeeder.organizationIDFeed)
     .exec { session => session.set(Test.TEST_ZONE_ID, getZoneID(session(Test.TEST_ZONE_USERNAME).as[String])) }
     .doIfOrElse(session => getZoneStatus(session(Test.TEST_ZONE_USERNAME).as[String])) {
-      exec { session => println("InsideApprove" + session); session }
-        .exec(http("VerifiedZoneLogin_GET")
-          .get(routes.LoginController.loginForm().url)
-          .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
+      exec(http("VerifiedZoneLogin_GET")
+        .get(routes.LoginController.loginForm().url)
+        .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
         .exec(http("VerifiedZoneLogin_POST")
           .post(routes.LoginController.login().url)
           .formParamMap(Map(
@@ -186,7 +267,6 @@ object masterTest {
           .get(routes.AddOrganizationController.verifyOrganizationForm("${%s}".format(Test.TEST_ORGANIZATION_ID), "${%s}".format(Test.TEST_ZONE_ID)).url)
           .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
         .pause(2)
-        .exec { session => println("InsideVerification" + session); session }
         .exec(http("VerifyOrganization_POST")
           .post(routes.AddOrganizationController.verifyOrganization().url)
           .formParamMap(Map(
@@ -230,8 +310,8 @@ object masterTest {
           .formParamMap(Map(
             Form.PASSWORD -> "${%s}".format(Test.TEST_ZONE_PASSWORD),
             Form.ACL_ADDRESS -> "${%s}".format(Test.TEST_SELLER_ADDRESS),
-            Form.ORGANIZATION_ID -> "${%s}".format(Test.TEST_ORGANIZATION_ID),//TODO: removed hardcoded parameters
-            Form.ISSUE_ASSET -> true, Form.ISSUE_ASSET -> true, Form.ISSUE_FIAT -> true, Form.SEND_ASSET -> true, Form.SEND_FIAT -> true, Form.REDEEM_ASSET -> true, Form.REDEEM_FIAT -> true, Form.SELLER_EXECUTE_ORDER -> true, Form.BUYER_EXECUTE_ORDER -> true, Form.CHANGE_BUYER_BID -> true, Form.CHANGE_SELLER_BID -> true, Form.CONFIRM_BUYER_BID -> true, Form.CONFIRM_SELLER_BID -> true, Form.NEGOTIATION -> true, Form.RELEASE_ASSET -> true,
+            Form.ORGANIZATION_ID -> "${%s}".format(Test.TEST_ORGANIZATION_ID),
+            Form.ISSUE_ASSET -> nonStringFeedParameters.issueAsset, Form.ISSUE_FIAT -> nonStringFeedParameters.issueFiat, Form.SEND_ASSET -> nonStringFeedParameters.sendAsset, Form.SEND_FIAT -> nonStringFeedParameters.sendFiat, Form.REDEEM_ASSET -> nonStringFeedParameters.redeemAsset, Form.REDEEM_FIAT -> nonStringFeedParameters.redeemFiat, Form.SELLER_EXECUTE_ORDER -> nonStringFeedParameters.sellerExecuteOrder, Form.BUYER_EXECUTE_ORDER -> nonStringFeedParameters.buyerExecuteOrder, Form.CHANGE_BUYER_BID -> nonStringFeedParameters.changeBuyerBid, Form.CHANGE_SELLER_BID -> nonStringFeedParameters.changeSellerBid, Form.CONFIRM_BUYER_BID -> nonStringFeedParameters.confirmBuyerBid, Form.CONFIRM_SELLER_BID -> nonStringFeedParameters.confirmSellerBid, Form.NEGOTIATION -> nonStringFeedParameters.negotiation, Form.RELEASE_ASSET -> nonStringFeedParameters.releaseAsset,
             Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
         .pause(10)
         .exec(http("SetACLBuyer_GET")
@@ -244,10 +324,9 @@ object masterTest {
           .formParamMap(Map(
             Form.PASSWORD -> "${%s}".format(Test.TEST_ZONE_PASSWORD),
             Form.ACL_ADDRESS -> "${%s}".format(Test.TEST_BUYER_ADDRESS),
-            Form.ORGANIZATION_ID -> "${%s}".format(Test.TEST_ORGANIZATION_ID),//TODO: removed hardcoded parameters
-            Form.ISSUE_ASSET -> true, Form.ISSUE_ASSET -> true, Form.ISSUE_FIAT -> true, Form.SEND_ASSET -> true, Form.SEND_FIAT -> true, Form.REDEEM_ASSET -> true, Form.REDEEM_FIAT -> true, Form.SELLER_EXECUTE_ORDER -> true, Form.BUYER_EXECUTE_ORDER -> true, Form.CHANGE_BUYER_BID -> true, Form.CHANGE_SELLER_BID -> true, Form.CONFIRM_BUYER_BID -> true, Form.CONFIRM_SELLER_BID -> true, Form.NEGOTIATION -> true, Form.RELEASE_ASSET -> true,
+            Form.ORGANIZATION_ID -> "${%s}".format(Test.TEST_ORGANIZATION_ID),
+            Form.ISSUE_ASSET -> nonStringFeedParameters.issueAsset, Form.ISSUE_FIAT -> nonStringFeedParameters.issueFiat, Form.SEND_ASSET -> nonStringFeedParameters.sendAsset, Form.SEND_FIAT -> nonStringFeedParameters.sendFiat, Form.REDEEM_ASSET -> nonStringFeedParameters.redeemAsset, Form.REDEEM_FIAT -> nonStringFeedParameters.redeemFiat, Form.SELLER_EXECUTE_ORDER -> nonStringFeedParameters.sellerExecuteOrder, Form.BUYER_EXECUTE_ORDER -> nonStringFeedParameters.buyerExecuteOrder, Form.CHANGE_BUYER_BID -> nonStringFeedParameters.changeBuyerBid, Form.CHANGE_SELLER_BID -> nonStringFeedParameters.changeSellerBid, Form.CONFIRM_BUYER_BID -> nonStringFeedParameters.confirmBuyerBid, Form.CONFIRM_SELLER_BID -> nonStringFeedParameters.confirmSellerBid, Form.NEGOTIATION -> nonStringFeedParameters.negotiation, Form.RELEASE_ASSET -> nonStringFeedParameters.releaseAsset,
             Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
-        .exec { session => println("InsideSetACL" + ",ZONE_USERNAME--" + session(Test.TEST_ZONE_USERNAME).as[String] + ",SELLER_USERNAME--" + session(Test.TEST_SELLER_USERNAME).as[String] + ",BUYER_USERNAME--" + session(Test.TEST_BUYER_USERNAME).as[String] + ",ORGANIZATION_USERNAME--" + session(Test.TEST_ORGANIZATION_USERNAME).as[String]); session }
         .pause(5)
     } {
       exec { session => println("OutsideApprove" + session); session }
@@ -266,7 +345,24 @@ object masterTest {
         Form.NOTIFICATION_TOKEN -> "",
         Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
     .pause(2)
-    .exec(controllersTest.issueAssetControllerTest.issueAssetRequestScenario)
+    .feed(DocumentHashFeeder.documentHashFeed)
+    .feed(AssetTypeFeeder.assetTypeFeed)
+    .feed(AssetPriceFeeder.assetPriceFeed)
+    .feed(QuantityUnitFeeder.quantityUnitFeed)
+    .feed(AssetQuantityFeeder.assetQuantityFeed)
+    .exec(http("IssueAssetRequest_GET")
+      .get(routes.IssueAssetController.issueAssetRequestForm().url)
+      .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
+    .pause(2)
+    .exec(http("IssueAssetRequest_POST")
+      .post(routes.IssueAssetController.issueAssetRequest().url)
+      .formParamMap(Map(
+        Form.DOCUMENT_HASH -> "${%s}".format(Test.TEST_DOCUMENT_HASH),
+        Form.ASSET_TYPE -> "${%s}".format(Test.TEST_ASSET_TYPE),
+        Form.ASSET_PRICE -> "${%s}".format(Test.TEST_ASSET_PRICE),
+        Form.QUANTITY_UNIT -> "${%s}".format(Test.TEST_QUANTITY_UNIT),
+        Form.ASSET_QUANTITY -> "${%s}".format(Test.TEST_ASSET_QUANTITY),
+        Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
     .pause(5)
 
   val masterLoginZoneAndIssueAsset: ScenarioBuilder = scenario("masterLoginZoneAndIssueAsset")
@@ -296,9 +392,8 @@ object masterTest {
         .feed(GasFeeder.gasFeed)
         .exec { session => session.set(Test.TEST_REQUEST_ID, getRequestIDForIssueAsset(session(Test.TEST_SELLER_USERNAME).as[String])) }
         .exec { session => session.set(Test.TEST_ACCOUNT_ID, session(Test.TEST_SELLER_USERNAME).as[String]) }
-        .exec { session => println("InsideIssueAsset" + ",ZONE_USERNAME--" + session(Test.TEST_ZONE_USERNAME).as[String] + ",SELLER_USERNAME--" + session(Test.TEST_SELLER_USERNAME).as[String] + ",BUYER_USERNAME--" + session(Test.TEST_BUYER_USERNAME).as[String]); session }
-        .exec(http("IssueAsset_GET")//TODO: removed hardcoded parameters
-          .get(routes.IssueAssetController.issueAssetForm("${%s}".format(Test.TEST_REQUEST_ID), "${%s}".format(Test.TEST_ACCOUNT_ID), "${%s}".format(Test.TEST_DOCUMENT_HASH), "${%s}".format(Test.TEST_ASSET_TYPE), 1000, "${%s}".format(Test.TEST_QUANTITY_UNIT), 2).url)
+        .exec(http("IssueAsset_GET")
+          .get(routes.IssueAssetController.issueAssetForm("${%s}".format(Test.TEST_REQUEST_ID), "${%s}".format(Test.TEST_ACCOUNT_ID), "${%s}".format(Test.TEST_DOCUMENT_HASH), "${%s}".format(Test.TEST_ASSET_TYPE), nonStringFeedParameters.assetPrice, "${%s}".format(Test.TEST_QUANTITY_UNIT), nonStringFeedParameters.assetQuantity).url)
           .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
         .pause(2)
         .exec(http("IssueAsset_POST")
@@ -331,7 +426,18 @@ object masterTest {
         Form.NOTIFICATION_TOKEN -> "",
         Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
     .pause(2)
-    .exec(controllersTest.issueFiatControllerTest.issueFiatRequestScenario)
+    .feed(TransactionIDFeeder.transactionIDFeed)
+    .feed(TransactionAmountFeeder.transactionAmountFeed)
+    .exec(http("IssueFiatRequest_GET")
+      .get(routes.IssueFiatController.issueFiatRequestForm().url)
+      .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
+    .pause(2)
+    .exec(http("IssueFiatRequest_POST")
+      .post(routes.IssueFiatController.issueFiatRequest().url)
+      .formParamMap(Map(
+        Form.TRANSACTION_ID -> "${%s}".format(Test.TEST_TRANSACTION_ID),
+        Form.TRANSACTION_AMOUNT -> "${%s}".format(Test.TEST_TRANSACTION_AMOUNT),
+        Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
     .pause(5)
 
   val masterLoginZoneAndIssueFiat: ScenarioBuilder = scenario("masterLoginZoneAndIssueFiat")
@@ -357,11 +463,10 @@ object masterTest {
         .feed(TransactionAmountFeeder.transactionAmountFeed)
         .feed(PasswordFeeder.passwordFeed)
         .feed(GasFeeder.gasFeed)
-        .exec { session => println("InsideIssueFiat" + ",ZONE_USERNAME" + session(Test.TEST_ZONE_USERNAME).as[String] + ",SELLER_USERNAME--" + session(Test.TEST_SELLER_USERNAME).as[String] + ",BUYER_USERNAME--" + session(Test.TEST_BUYER_USERNAME).as[String]); session }
         .exec { session => session.set(Test.TEST_REQUEST_ID, getRequestIDForIssueFiat(session(Test.TEST_BUYER_USERNAME).as[String])) }
         .exec { session => session.set(Test.TEST_ACCOUNT_ID, session(Test.TEST_BUYER_USERNAME).as[String]) }
-        .exec(http("IssueFiat_GET")//TODO: removed hardcoded parameters
-          .get(routes.IssueFiatController.issueFiatForm("${%s}".format(Test.TEST_REQUEST_ID), "${%s}".format(Test.TEST_ACCOUNT_ID), "${%s}".format(Test.TEST_TRANSACTION_ID), 10000).url)
+        .exec(http("IssueFiat_GET")
+          .get(routes.IssueFiatController.issueFiatForm("${%s}".format(Test.TEST_REQUEST_ID), "${%s}".format(Test.TEST_ACCOUNT_ID), "${%s}".format(Test.TEST_TRANSACTION_ID), nonStringFeedParameters.transactionAmount).url)
           .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
         .pause(2)
         .exec(http("IssueFiat_POST")
@@ -400,10 +505,9 @@ object masterTest {
     .feed(PegHashFeeder.pegHashFeed)
     .feed(GasFeeder.gasFeed)
     .exec { session => session.set(Test.TEST_SELLER_ADDRESS, getSellerAddress(session(Test.TEST_SELLER_USERNAME).as[String])) }
-    .exec { session => session.set(Test.TEST_BID, 900.toString) }//TODO: removed hardcoded parameters
-    .exec { session => session.set(Test.TEST_TIME, 10000.toString) } 
+    .exec { session => session.set(Test.TEST_BID, nonStringFeedParameters.buyerBid.toString) }
+    .exec { session => session.set(Test.TEST_TIME, nonStringFeedParameters.time.toString) }
     .exec { session => session.set(Test.TEST_PEG_HASH, getPegHashByOwnerAddress(session(Test.TEST_SELLER_ADDRESS).as[String])) }
-    .exec { session => println("InsideChangeBuyerBid " + session); session }
     .exec(http("ChangeBuyerBid_GET")
       .get(routes.ChangeBuyerBidController.changeBuyerBidForm().url)
       .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
@@ -443,10 +547,9 @@ object masterTest {
     .feed(FromFeeder.fromFeed)
     .exec { session => session.set(Test.TEST_BUYER_ADDRESS, getBuyerAddress(session(Test.TEST_BUYER_USERNAME).as[String])) }
     .exec { session => session.set(Test.TEST_SELLER_ADDRESS, getSellerAddress(session(Test.TEST_SELLER_USERNAME).as[String])) }
-    .exec { session => session.set(Test.TEST_BID, 950.toString) }
-    .exec { session => session.set(Test.TEST_TIME, 10000.toString) } //TODO: removed hardcoded parameters
+    .exec { session => session.set(Test.TEST_BID, nonStringFeedParameters.sellerBid.toString) }
+    .exec { session => session.set(Test.TEST_TIME, nonStringFeedParameters.time.toString) }
     .exec { session => session.set(Test.TEST_PEG_HASH, getPegHashByOwnerAddress(session(Test.TEST_SELLER_ADDRESS).as[String])) }
-    .exec { session => println("InsideChangeSellerBid " + session); session }
     .exec(http("ChangeSellerBid_GET")
       .get(routes.ChangeSellerBidController.changeSellerBidForm().url)
       .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
@@ -484,10 +587,9 @@ object masterTest {
     .feed(PegHashFeeder.pegHashFeed)
     .feed(GasFeeder.gasFeed)
     .exec { session => session.set(Test.TEST_SELLER_ADDRESS, getSellerAddress(session(Test.TEST_SELLER_USERNAME).as[String])) }
-    .exec { session => session.set(Test.TEST_BID, 950.toString) }
-    .exec { session => session.set(Test.TEST_TIME, 10000.toString) } //TODO: removed hardcoded parameters
+    .exec { session => session.set(Test.TEST_BID, nonStringFeedParameters.sellerBid.toString) }
+    .exec { session => session.set(Test.TEST_TIME, nonStringFeedParameters.time.toString) }
     .exec { session => session.set(Test.TEST_PEG_HASH, getPegHashByOwnerAddress(session(Test.TEST_SELLER_ADDRESS).as[String])) }
-    .exec { session => println("InsideConfirmBuyerBid " + session); session }
     .exec(http("ConfirmBuyerBid_GET")
       .get(routes.ConfirmBuyerBidController.confirmBuyerBidForm().url)
       .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
@@ -527,10 +629,9 @@ object masterTest {
     .feed(FromFeeder.fromFeed)
     .exec { session => session.set(Test.TEST_BUYER_ADDRESS, getBuyerAddress(session(Test.TEST_BUYER_USERNAME).as[String])) }
     .exec { session => session.set(Test.TEST_SELLER_ADDRESS, getSellerAddress(session(Test.TEST_SELLER_USERNAME).as[String])) }
-    .exec { session => session.set(Test.TEST_BID, 950.toString) }
-    .exec { session => session.set(Test.TEST_TIME, 10000.toString) } //TODO: removed hardcoded parameters
+    .exec { session => session.set(Test.TEST_BID, nonStringFeedParameters.sellerBid.toString) }
+    .exec { session => session.set(Test.TEST_TIME, nonStringFeedParameters.time.toString) }
     .exec { session => session.set(Test.TEST_PEG_HASH, getPegHashByOwnerAddress(session(Test.TEST_SELLER_ADDRESS).as[String])) }
-    .exec { session => println("InsideConfirmSellerBid " + session); session }
     .exec(http("ConfirmSellerBid_GET")
       .get(routes.ConfirmSellerBidController.confirmSellerBidForm().url)
       .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
@@ -568,7 +669,6 @@ object masterTest {
         .feed(GasFeeder.gasFeed)
         .exec { session => session.set(Test.TEST_SELLER_ADDRESS, getSellerAddress(session(Test.TEST_SELLER_USERNAME).as[String])) }
         .exec { session => session.set(Test.TEST_PEG_HASH, getPegHashByOwnerAddress(session(Test.TEST_SELLER_ADDRESS).as[String])) }
-        .exec { session => println("InsideReleaseAsset " + session); session }
         .exec(http("ReleaseAsset_GET")
           .post(routes.ReleaseAssetController.releaseAssetForm().url)
           .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
@@ -607,7 +707,6 @@ object masterTest {
     .exec { session => session.set(Test.TEST_BUYER_ADDRESS, getBuyerAddress(session(Test.TEST_BUYER_USERNAME).as[String])) }
     .exec { session => session.set(Test.TEST_SELLER_ADDRESS, getSellerAddress(session(Test.TEST_SELLER_USERNAME).as[String])) }
     .exec { session => session.set(Test.TEST_PEG_HASH, getPegHashByOwnerAddress(session(Test.TEST_SELLER_ADDRESS).as[String])) }
-    .exec { session => println("InsideSendAsset " + session); session }
     .exec(http("SendAsset_GET")
       .get(routes.SendAssetController.sendAssetForm().url)
       .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
@@ -642,8 +741,7 @@ object masterTest {
     .feed(GasFeeder.gasFeed)
     .exec { session => session.set(Test.TEST_SELLER_ADDRESS, getSellerAddress(session(Test.TEST_SELLER_USERNAME).as[String])) }
     .exec { session => session.set(Test.TEST_PEG_HASH, getPegHashByOwnerAddress(session(Test.TEST_SELLER_ADDRESS).as[String])) }
-    .exec { session => session.set(Test.TEST_AMOUNT, 950.toString) } //TODO: removed hardcoded parameters
-    .exec { session => println("InsideSendFiat " + session); session }
+    .exec { session => session.set(Test.TEST_AMOUNT, nonStringFeedParameters.sellerBid.toString) }
     .exec(http("SendFiat_GET")
       .get(routes.SendFiatController.sendFiatForm().url)
       .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
@@ -685,7 +783,6 @@ object masterTest {
         .exec { session => session.set(Test.TEST_BUYER_ADDRESS, getBuyerAddress(session(Test.TEST_BUYER_USERNAME).as[String])) }
         .exec { session => session.set(Test.TEST_SELLER_ADDRESS, getSellerAddress(session(Test.TEST_SELLER_USERNAME).as[String])) }
         .exec { session => session.set(Test.TEST_PEG_HASH, getPegHashByOwnerAddress(session(Test.TEST_SELLER_ADDRESS).as[String])) }
-        .exec { session => println("InsideBuyerExecuteOrder " + session); session }
         .exec(http("BuyerExecuteOrder_GET")
           .get(routes.BuyerExecuteOrderController.buyerExecuteOrderForm().url)
           .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
@@ -702,7 +799,6 @@ object masterTest {
             Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
         .pause(10)
         .feed(SellerLoginFeeder.sellerLoginFeeder)
-        .exec { session => println("InsideSellerExecuteOrder " + session); session }
         .exec(http("SellerExecuteOrder_GET")
           .get(routes.SellerExecuteOrderController.sellerExecuteOrderForm().url)
           .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))

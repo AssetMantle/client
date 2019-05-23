@@ -37,7 +37,6 @@ object buyerExecuteOrderControllerTest {
         Form.PEG_HASH -> "${%s}".format(Test.TEST_PEG_HASH),
         Form.GAS -> "${%s}".format(Test.TEST_GAS),
         Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
-    .pause(5)
 
   val blockchainBuyerExecuteOrderScenario: ScenarioBuilder = scenario("BlockchainBuyerExecuteOrder")
     .feed(FromFeeder.fromFeed)
@@ -62,5 +61,4 @@ object buyerExecuteOrderControllerTest {
         Form.PEG_HASH -> "${%s}".format(Test.TEST_PEG_HASH),
         Form.GAS -> "${%s}".format(Test.TEST_GAS),
         Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
-    .pause(5)
 }

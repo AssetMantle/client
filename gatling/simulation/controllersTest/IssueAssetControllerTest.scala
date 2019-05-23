@@ -38,18 +38,16 @@ object issueAssetControllerTest {
 
   val rejectIssueAssetScenario: ScenarioBuilder = scenario("RejectIssueAsset")
     .feed(RequestIDFeeder.requestIDFeed)
-  /*
-      .exec(http("RejectIssueAsset_GET")
-        .get(routes.IssueAssetController.rejectIssueAssetRequestForm().url)
-        .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
-      .pause(2)
-      .exec(http("RejectIssueAsset_POST")
-        .post(routes.IssueAssetController.issueAssetRequest().url)
-        .formParamMap(Map(
+    .exec(http("RejectIssueAsset_GET")
+      .get(routes.IssueAssetController.rejectIssueAssetRequestForm(Test.TEST_REQUEST_ID).url)
+      .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
+    .pause(2)
+    .exec(http("RejectIssueAsset_POST")
+      .post(routes.IssueAssetController.issueAssetRequest().url)
+      .formParamMap(Map(
         Form.REQUEST_ID -> "${%s}".format(Test.TEST_REQUEST_ID),
-         Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
-      .pause(5)
-  */
+        Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
+    .pause(5)
 
   val issueAssetScenario: ScenarioBuilder = scenario("IssueAsset")
     .feed(RequestIDFeeder.requestIDFeed)
@@ -62,7 +60,7 @@ object issueAssetControllerTest {
     .feed(PasswordFeeder.passwordFeed)
     .feed(GasFeeder.gasFeed)
     .exec(http("IssueAsset_GET")
-      .get(routes.IssueAssetController.issueAssetForm("l","l","l","l",1,"l",1).url)
+      .get(routes.IssueAssetController.issueAssetForm("l", "l", "l", "l", 1, "l", 1).url)
       .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
     .pause(2)
     .exec(http("IssueAsset_POST")
@@ -77,7 +75,6 @@ object issueAssetControllerTest {
         Form.ASSET_QUANTITY -> "${%s}".format(Test.TEST_ASSET_QUANTITY),
         Form.PASSWORD -> "${%s}".format(Test.TEST_PASSWORD),
         Form.GAS -> "${%s}".format(Test.TEST_GAS), Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
-    .pause(5)
 
   val blockchainIssueAssetScenario: ScenarioBuilder = scenario("BlockchainIssueAsset")
     .feed(FromFeeder.fromFeed)
@@ -106,7 +103,6 @@ object issueAssetControllerTest {
         Form.PASSWORD -> "${%s}".format(Test.TEST_PASSWORD),
         Form.GAS -> "${%s}".format(Test.TEST_GAS),
         Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
-    .pause(5)
 
   def getRequestIDForIssueAsset(query: String): String = {
     val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://localhost:5432/comdex", "comdex", "comdex",

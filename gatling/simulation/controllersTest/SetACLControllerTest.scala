@@ -45,7 +45,6 @@ object setACLControllerTest {
         Form.NEGOTIATION -> "${%s}".format(Test.TEST_NEGOTIATION),
         Form.RELEASE_ASSET -> "${%s}".format(Test.TEST_RELEASE_ASSET),
         Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
-    .pause(5)
 
   val blockchainSetACLScenario: ScenarioBuilder = scenario("BlockchainSetACL")
     .feed(FromFeeder.fromFeed)
@@ -78,7 +77,6 @@ object setACLControllerTest {
         Form.RELEASE_ASSET -> "${%s}".format(Test.TEST_RELEASE_ASSET),
         Form.NEGOTIATION -> "${%s}".format(Test.TEST_NEGOTIATION),
         Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
-    .pause(5)
 
   def getAccountAddressByUsername(query: String): String = {
     val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://localhost:5432/comdex", "comdex", "comdex",

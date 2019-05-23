@@ -26,5 +26,4 @@ object verifyEmailAddressControllerTest {
       .formParamMap(Map(
         Form.OTP -> "${%s}".format(Test.TEST_OTP),
         Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
-    .pause(5)
 }

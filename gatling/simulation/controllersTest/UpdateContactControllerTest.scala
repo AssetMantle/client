@@ -30,5 +30,4 @@ object updateContactControllerTest {
         Form.MOBILE_NUMBER -> "${%s}".format(Test.TEST_MOBILE_NUMBER),
         Form.COUNTRY_CODE -> "${%s}".format(Test.TEST_COUNTRY_CODE),
         Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
-    .pause(5)
 }

@@ -30,5 +30,4 @@ object addKeyControllerTest {
         Form.SEED -> "${%s}".format(Test.TEST_SEED),
         Form.PASSWORD -> "${%s}".format(Test.TEST_PASSWORD),
         Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
-    .pause(5)
 }

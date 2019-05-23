@@ -514,7 +514,7 @@ CREATE TABLE IF NOT EXISTS MASTER."OrganizationBankAccount"
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."AccountToken"
 (
   "id"                VARCHAR NOT NULL,
-  "notificationToken" VARCHAR NOT NULL,
+  "registrationToken" VARCHAR NOT NULL,
   "sessionTokenHash"  VARCHAR,
   "sessionTokenTime"  BIGINT,
   PRIMARY KEY ("id")
@@ -554,7 +554,7 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."IssueFiatRequest"
   "id"                VARCHAR NOT NULL,
   "accountID"         VARCHAR NOT NULL,
   "transactionID"     VARCHAR NOT NULL,
-  "transactonAmount" INT     NOT NULL,
+  "transactionAmount" INT     NOT NULL,
   "gas"               INT,
   "status"            BOOLEAN,
   "ticketID"          VARCHAR,

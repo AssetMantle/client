@@ -29,5 +29,4 @@ object logoutControllerTest {
       .formParamMap(Map(
         Form.RECEIVE_NOTIFICATIONS -> "${%s}".format(Test.TEST_RECEIVE_NOTIFICATIONS),
         Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
-    .pause(5)
 }

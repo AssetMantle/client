@@ -24,5 +24,4 @@ object requestCoinTest {
     .exec(http("RequestCoin_POST")
       .post(routes.SendCoinController.requestCoins().url)
       .formParamMap(Map(Form.COUPON -> "", Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
-    .pause(5)
 }

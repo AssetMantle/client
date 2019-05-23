@@ -11,7 +11,6 @@ import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
 import queries.GetAccount
-import queries.responses.AccountResponse
 import slick.jdbc.JdbcProfile
 import transactions.responses.TransactionResponse.Response
 import utilities.PushNotification
@@ -153,7 +152,7 @@ class IssueAssets @Inject()(protected val databaseConfigProvider: DatabaseConfig
         val issueAsset = Service.getTransaction(ticketID)
         Thread.sleep(sleepTime)
         val responseAccount = getAccount.Service.get(issueAsset.to)
-        responseAccount.value.assetPegWallet.getOrElse(Seq(AccountResponse.Asset(null,null,null,null,null,null,null,false, false))).foreach(asset => blockchainAssets.Service.insertOrUpdateAsset(pegHash = asset.pegHash, documentHash = asset.documentHash, assetType = asset.assetType, assetPrice = asset.assetPrice, assetQuantity = asset.assetQuantity, quantityUnit = asset.quantityUnit, locked = asset.locked, moderator = asset.moderator, ownerAddress = issueAsset.to, dirtyBit = true))
+        responseAccount.value.assetPegWallet.getOrElse(Seq()).foreach(asset => blockchainAssets.Service.insertOrUpdateAsset(pegHash = asset.pegHash, documentHash = asset.documentHash, assetType = asset.assetType, assetPrice = asset.assetPrice, assetQuantity = asset.assetQuantity, quantityUnit = asset.quantityUnit, locked = asset.locked, moderator = asset.moderator, ownerAddress = issueAsset.to, dirtyBit = true))
         blockchainAccounts.Service.updateDirtyBit(masterAccounts.Service.getAddress(issueAsset.from), dirtyBit = true)
         pushNotification.sendNotification(masterAccounts.Service.getId(issueAsset.to), constants.Notification.SUCCESS, Seq(response.TxHash))
         pushNotification.sendNotification(issueAsset.from, constants.Notification.SUCCESS, Seq(response.TxHash))
