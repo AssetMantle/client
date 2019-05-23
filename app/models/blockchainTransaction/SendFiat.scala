@@ -14,7 +14,7 @@ import queries.GetOrder
 import queries.responses.AccountResponse
 import slick.jdbc.JdbcProfile
 import transactions.responses.TransactionResponse.Response
-import utilities.PushNotifications
+import utilities.PushNotification
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
@@ -23,7 +23,7 @@ import scala.util.{Failure, Success}
 case class SendFiat(from: String, to: String, amount: Int, pegHash: String, gas: Int,  status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])
 
 @Singleton
-class SendFiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, blockchainTransactionFeedbacks: blockchain.TransactionFeedbacks, getOrder: GetOrder, transactionSendFiat: transactions.SendFiat, blockchainFiats: blockchain.Fiats, blockchainOrders: blockchain.Orders, blockchainNegotiations: blockchain.Negotiations, actorSystem: ActorSystem, pushNotifications: PushNotifications,masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext)  {
+class SendFiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, blockchainTransactionFeedbacks: blockchain.TransactionFeedbacks, getOrder: GetOrder, transactionSendFiat: transactions.SendFiat, blockchainFiats: blockchain.Fiats, blockchainOrders: blockchain.Orders, blockchainNegotiations: blockchain.Negotiations, actorSystem: ActorSystem, pushNotification: PushNotification,masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext)  {
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_SEND_FIAT
 
@@ -153,8 +153,8 @@ class SendFiats @Inject()(protected val databaseConfigProvider: DatabaseConfigPr
         val orderResponse = getOrder.Service.get(negotiationID)
         blockchainFiats.Service.addFiats(orderResponse.value.fiatPegWallet.get.map{responseFiatPeg: AccountResponse.Fiat => blockchain.Fiat(pegHash = responseFiatPeg.pegHash, ownerAddress = negotiationID, transactionID = responseFiatPeg.transactionID, transactionAmount = responseFiatPeg.transactionAmount, redeemedAmount = responseFiatPeg.redeemedAmount, dirtyBit = false)})
         blockchainAccounts.Service.updateDirtyBit(fromAddress, dirtyBit = true)
-        pushNotifications.sendNotification(masterAccounts.Service.getId(sendFiat.to), constants.Notification.SUCCESS, response.TxHash)
-        pushNotifications.sendNotification(sendFiat.from, constants.Notification.SUCCESS, response.TxHash)
+        pushNotification.sendNotification(masterAccounts.Service.getId(sendFiat.to), constants.Notification.SUCCESS, response.TxHash)
+        pushNotification.sendNotification(sendFiat.from, constants.Notification.SUCCESS, response.TxHash)
       }
       catch {
         case baseException: BaseException => logger.error(constants.Error.BASE_EXCEPTION, baseException)
@@ -168,8 +168,8 @@ class SendFiats @Inject()(protected val databaseConfigProvider: DatabaseConfigPr
         Service.updateStatusAndResponseCode(ticketID, status = false, message)
         val sendFiat = Service.getTransaction(ticketID)
         blockchainTransactionFeedbacks.Service.updateDirtyBit(masterAccounts.Service.getAddress(sendFiat.from), true)
-        pushNotifications.sendNotification(masterAccounts.Service.getId(sendFiat.to), constants.Notification.FAILURE, message)
-        pushNotifications.sendNotification(sendFiat.from, constants.Notification.FAILURE, message)
+        pushNotification.sendNotification(masterAccounts.Service.getId(sendFiat.to), constants.Notification.FAILURE, message)
+        pushNotification.sendNotification(sendFiat.from, constants.Notification.FAILURE, message)
       } catch {
         case baseException: BaseException => logger.error(constants.Error.BASE_EXCEPTION, baseException)
       }

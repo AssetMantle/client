@@ -16,7 +16,7 @@ import scala.concurrent.ExecutionContext
 @Singleton
 class VerifyEmailAddressController @Inject()(messagesControllerComponents: MessagesControllerComponents, emailOTPs: EmailOTPs, contacts: Contacts, withLoginAction: WithLoginAction, email: Email)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
-  private implicit val module: String = constants.Module.CONTROLLERS_VERIFY_EMAIL
+  private implicit val module: String = constants.Module.CONTROLLERS_EMAIL
 
   private implicit val logger: Logger = Logger(this.getClass)
 

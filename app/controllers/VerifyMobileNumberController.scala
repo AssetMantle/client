@@ -16,7 +16,7 @@ import scala.concurrent.ExecutionContext
 @Singleton
 class VerifyMobileNumberController @Inject()(messagesControllerComponents: MessagesControllerComponents, smsOTPs: SMSOTPs, contacts: Contacts, withLoginAction: WithLoginAction, SMS: SMS)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
-  private implicit val module: String = constants.Module.CONTROLLERS_VERIFY_MOBILE_NUMBER
+  private implicit val module: String = constants.Module.CONTROLLERS_SMS
 
   private implicit val logger: Logger = Logger(this.getClass)
 
