@@ -41,7 +41,7 @@ class AddZones @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
   private def add(addZone: AddZone)(implicit executionContext: ExecutionContext): Future[String] = db.run((addZoneTable returning addZoneTable.map(_.ticketID) += addZone).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
         throw new BaseException(constants.Response.PSQL_EXCEPTION)
     }
   }
@@ -49,9 +49,9 @@ class AddZones @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
   private def update(addZone: AddZone)(implicit executionContext: ExecutionContext): Future[Int] = db.run(addZoneTable.insertOrUpdate(addZone).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
         throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }
   }
@@ -59,39 +59,9 @@ class AddZones @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
   private def findByTicketID(ticketID: String)(implicit executionContext: ExecutionContext): Future[AddZone] = db.run(addZoneTable.filter(_.ticketID === ticketID).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
         throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
-
-  private def updateTxHashOnTicketID(ticketID: String, txHash: Option[String])(implicit executionContext: ExecutionContext) = db.run(addZoneTable.filter(_.ticketID === ticketID).map(_.txHash.?).update(txHash).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
-
-  private def updateResponseCodeOnTicketID(ticketID: String, responseCode: String)(implicit executionContext: ExecutionContext) = db.run(addZoneTable.filter(_.ticketID === ticketID).map(_.responseCode.?).update(Option(responseCode)).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
-
-  private def updateStatusOnTicketID(ticketID: String, status: Boolean)(implicit executionContext: ExecutionContext) = db.run(addZoneTable.filter(_.ticketID === ticketID).map(_.status.?).update(Option(status)).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }
   }
@@ -100,32 +70,32 @@ class AddZones @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   private def getTicketIDsWithNullStatus()(implicit executionContext: ExecutionContext): Future[Seq[String]] = db.run(addZoneTable.filter(_.status.?.isEmpty).map(_.ticketID).result)
 
-  private def getAddressByTicketID(ticketID: String)(implicit executionContext: ExecutionContext): Future[String] = db.run(addZoneTable.filter(_.ticketID === ticketID).map(_.to).result.head.asTry).map {
+  private def updateTxHashOnTicketID(ticketID: String, txHash: Option[String])(implicit executionContext: ExecutionContext) = db.run(addZoneTable.filter(_.ticketID === ticketID).map(_.txHash.?).update(txHash).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
         throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }
   }
 
-  private def updateTxHashStatusAndResponseCodeOnTicketID(ticketID: String, txHash: String, status: Boolean, responseCode: String)(implicit executionContext: ExecutionContext): Future[Int] = db.run(addZoneTable.filter(_.ticketID === ticketID).map(x => (x.txHash, x.status, x.responseCode)).update(txHash, status, responseCode).asTry).map {
+  private def updateResponseCodeOnTicketID(ticketID: String, responseCode: String)(implicit executionContext: ExecutionContext) = db.run(addZoneTable.filter(_.ticketID === ticketID).map(_.responseCode.?).update(Option(responseCode)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
         throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }
   }
 
-  private def deleteByTicketID(ticketID: String)(implicit executionContext: ExecutionContext): Future[Int] = db.run(addZoneTable.filter(_.ticketID === ticketID).delete.asTry).map {
+  private def updateStatusOnTicketID(ticketID: String, status: Boolean)(implicit executionContext: ExecutionContext) = db.run(addZoneTable.filter(_.ticketID === ticketID).map(_.status.?).update(Option(status)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
         throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }
   }
@@ -168,6 +138,36 @@ class AddZones @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     def getAddress(ticketID: String)(implicit executionContext: ExecutionContext): String = Await.result(getAddressByTicketID(ticketID), Duration.Inf)
 
     def getAddZone(ticketID: String): AddZone = Await.result(findByTicketID(ticketID), Duration.Inf)
+  }
+
+  private def getAddressByTicketID(ticketID: String)(implicit executionContext: ExecutionContext): Future[String] = db.run(addZoneTable.filter(_.ticketID === ticketID).map(_.to).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def updateTxHashStatusAndResponseCodeOnTicketID(ticketID: String, txHash: String, status: Boolean, responseCode: String)(implicit executionContext: ExecutionContext): Future[Int] = db.run(addZoneTable.filter(_.ticketID === ticketID).map(x => (x.txHash, x.status, x.responseCode)).update(txHash, status, responseCode).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def deleteByTicketID(ticketID: String)(implicit executionContext: ExecutionContext): Future[Int] = db.run(addZoneTable.filter(_.ticketID === ticketID).delete.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
   }
 
   object Utility {

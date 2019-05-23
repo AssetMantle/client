@@ -31,7 +31,7 @@ class AccountTokens @Inject()(protected val databaseConfigProvider: DatabaseConf
   private def add(accountToken: AccountToken)(implicit executionContext: ExecutionContext): Future[String] = db.run((accountTokenTable returning accountTokenTable.map(_.id) += accountToken).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
         throw new BaseException(constants.Response.PSQL_EXCEPTION)
     }
   }
@@ -39,7 +39,7 @@ class AccountTokens @Inject()(protected val databaseConfigProvider: DatabaseConf
   private def findById(id: String)(implicit executionContext: ExecutionContext): Future[AccountToken] = db.run(accountTokenTable.filter(_.id === id).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }
   }

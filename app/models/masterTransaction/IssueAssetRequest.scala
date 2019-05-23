@@ -31,7 +31,7 @@ class IssueAssetRequests @Inject()(protected val databaseConfigProvider: Databas
   private def add(issueAssetRequest: IssueAssetRequest)(implicit executionContext: ExecutionContext): Future[String] = db.run((issueAssetRequestTable returning issueAssetRequestTable.map(_.id) += issueAssetRequest).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
         throw new BaseException(constants.Response.PSQL_EXCEPTION)
     }
   }
@@ -39,9 +39,9 @@ class IssueAssetRequests @Inject()(protected val databaseConfigProvider: Databas
   private def findByID(id: String)(implicit executionContext: ExecutionContext): Future[IssueAssetRequest] = db.run(issueAssetRequestTable.filter(_.id === id).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
         throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }
   }
@@ -49,9 +49,9 @@ class IssueAssetRequests @Inject()(protected val databaseConfigProvider: Databas
   private def updateTicketIDStatusAndGasByID(id: String, ticketID: String, status: Boolean, gas: Int)(implicit executionContext: ExecutionContext) = db.run(issueAssetRequestTable.filter(_.id === id).map(faucet => (faucet.ticketID, faucet.status, faucet.gas)).update((ticketID, status, gas)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
         throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }
   }
@@ -59,9 +59,9 @@ class IssueAssetRequests @Inject()(protected val databaseConfigProvider: Databas
   private def updateStatusAndCommentByTicketID(ticketID: String, status: Option[Boolean], comment: String)(implicit executionContext: ExecutionContext) = db.run(issueAssetRequestTable.filter(_.ticketID === ticketID).map(issueAssetRequest => (issueAssetRequest.status.?, issueAssetRequest.comment)).update((status, comment)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
         throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }
   }
@@ -69,9 +69,9 @@ class IssueAssetRequests @Inject()(protected val databaseConfigProvider: Databas
   private def updateStatusAndCommentByID(id: String, status: Option[Boolean], comment: String)(implicit executionContext: ExecutionContext) = db.run(issueAssetRequestTable.filter(_.id === id).map(issueAssetRequest => (issueAssetRequest.status.?, issueAssetRequest.comment)).update((status, comment)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
         throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }
   }
@@ -87,9 +87,9 @@ class IssueAssetRequests @Inject()(protected val databaseConfigProvider: Databas
   private def deleteByID(id: String)(implicit executionContext: ExecutionContext) = db.run(issueAssetRequestTable.filter(_.id === id).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
         throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }
   }

@@ -10,7 +10,6 @@ import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
-import queries.responses.AccountResponse
 import slick.jdbc.JdbcProfile
 import transactions.GetResponse
 import transactions.responses.TransactionResponse.Response
@@ -40,12 +39,12 @@ class IssueFiats @Inject()(protected val databaseConfigProvider: DatabaseConfigP
   private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
   private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
   private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
-  private val sleepTime = configuration.get[Long]("blockchain.kafka.entityIterator.threadSleep")
+  private val sleepTime = configuration.get[Long]("blockchain.entityIterator.threadSleep")
 
   private def add(issueFiat: IssueFiat)(implicit executionContext: ExecutionContext): Future[String] = db.run((issueFiatTable returning issueFiatTable.map(_.ticketID) += issueFiat).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
         throw new BaseException(constants.Response.PSQL_EXCEPTION)
     }
   }
@@ -53,9 +52,9 @@ class IssueFiats @Inject()(protected val databaseConfigProvider: DatabaseConfigP
   private def update(issueFiat: IssueFiat)(implicit executionContext: ExecutionContext): Future[Int] = db.run(issueFiatTable.insertOrUpdate(issueFiat).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
         throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }
   }
@@ -63,9 +62,9 @@ class IssueFiats @Inject()(protected val databaseConfigProvider: DatabaseConfigP
   private def findByTicketID(ticketID: String)(implicit executionContext: ExecutionContext): Future[IssueFiat] = db.run(issueFiatTable.filter(_.ticketID === ticketID).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
         throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }
   }
@@ -73,9 +72,9 @@ class IssueFiats @Inject()(protected val databaseConfigProvider: DatabaseConfigP
   private def updateTxHashOnTicketID(ticketID: String, txHash: Option[String])(implicit executionContext: ExecutionContext) = db.run(issueFiatTable.filter(_.ticketID === ticketID).map(_.txHash.?).update(txHash).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
         throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }
   }
@@ -83,9 +82,9 @@ class IssueFiats @Inject()(protected val databaseConfigProvider: DatabaseConfigP
   private def updateResponseCodeOnTicketID(ticketID: String, responseCode: String)(implicit executionContext: ExecutionContext) = db.run(issueFiatTable.filter(_.ticketID === ticketID).map(_.responseCode.?).update(Option(responseCode)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
         throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }
   }
@@ -93,9 +92,9 @@ class IssueFiats @Inject()(protected val databaseConfigProvider: DatabaseConfigP
   private def updateStatusOnTicketID(ticketID: String, status: Boolean)(implicit executionContext: ExecutionContext) = db.run(issueFiatTable.filter(_.ticketID === ticketID).map(_.status.?).update(Option(status)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
         throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }
   }
@@ -103,9 +102,9 @@ class IssueFiats @Inject()(protected val databaseConfigProvider: DatabaseConfigP
   private def updateTxHashStatusAndResponseCodeOnTicketID(ticketID: String, txHash: String, status: Boolean, responseCode: String): Future[Int] = db.run(issueFiatTable.filter(_.ticketID === ticketID).map(x => (x.txHash, x.status, x.responseCode)).update(txHash, status, responseCode).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
         throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }
   }
@@ -117,9 +116,9 @@ class IssueFiats @Inject()(protected val databaseConfigProvider: DatabaseConfigP
   private def getAddressByTicketID(ticketID: String)(implicit executionContext: ExecutionContext): Future[String] = db.run(issueFiatTable.filter(_.ticketID === ticketID).map(_.to).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
         throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }
   }
@@ -127,9 +126,9 @@ class IssueFiats @Inject()(protected val databaseConfigProvider: DatabaseConfigP
   private def getToAddressByTransactionID(transactionID: String): Future[String] = db.run(issueFiatTable.filter(_.transactionID === transactionID).map(_.to).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
         throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }
   }
@@ -138,9 +137,9 @@ class IssueFiats @Inject()(protected val databaseConfigProvider: DatabaseConfigP
   private def deleteByTicketID(ticketID: String)(implicit executionContext: ExecutionContext) = db.run(issueFiatTable.filter(_.ticketID === ticketID).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
         throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }
   }
@@ -197,7 +196,7 @@ class IssueFiats @Inject()(protected val databaseConfigProvider: DatabaseConfigP
         Service.updateTxHashStatusResponseCode(ticketID, response.TxHash, status = true, response.Code)
         val issueFiat = Service.getIssueFiat(ticketID)
         Thread.sleep(sleepTime)
-        getAccount.Service.get(issueFiat.to).value.fiatPegWallet.getOrElse(Seq(AccountResponse.Fiat(null, null, null, null, null))).foreach(fiatPeg => {
+        getAccount.Service.get(issueFiat.to).value.fiatPegWallet.getOrElse(Seq()).foreach(fiatPeg => {
           blockchainFiats.Service.insertOrUpdateFiat(fiatPeg.pegHash, issueFiat.to, fiatPeg.transactionID, fiatPeg.transactionAmount, fiatPeg.redeemedAmount, dirtyBit = true)
         })
         blockchainAccounts.Service.updateDirtyBit(masterAccounts.Service.getAddress(issueFiat.from), dirtyBit = true)
@@ -207,7 +206,7 @@ class IssueFiats @Inject()(protected val databaseConfigProvider: DatabaseConfigP
       catch {
         case baseException: BaseException => logger.error(constants.Response.BASE_EXCEPTION.message, baseException)
           throw new BaseException(constants.Response.PSQL_EXCEPTION)
-        case connectException: ConnectException => logger.error(constants.Error.CONNECT_EXCEPTION, connectException)
+        case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
       }
     }
 

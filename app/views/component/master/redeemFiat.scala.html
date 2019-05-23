@@ -2,19 +2,21 @@
 @import views.companion.master.RedeemFiat
 
 @(redeemFiatForm: Form[RedeemFiat.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@form(action = routes.RedeemFiatController.redeemFiat, 'onkeypress -> "validateForm(event,this)") {
-  @CSRF.formField
-  @inputText(redeemFiatForm(constants.Form.TO), '_label -> Messages(constants.Form.TO))
-  @inputText(redeemFiatForm(constants.Form.REDEEM_AMOUNT), '_label -> Messages(constants.Form.REDEEM_AMOUNT))
-  @inputText(redeemFiatForm(constants.Form.GAS), '_label -> Messages(constants.Form.GAS))
-  @inputPassword(redeemFiatForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD))
+@common(Messages(constants.Form.REDEEM_FIAT)) {
+    @form(action = routes.RedeemFiatController.redeemFiat) {
+        @CSRF.formField
+        @inputText(redeemFiatForm(constants.Form.ZONE_ID), '_label -> Messages(constants.Form.ZONE_ID))
+        @inputText(redeemFiatForm(constants.Form.REDEEM_AMOUNT),'_label-> Messages(constants.Form.REDEEM_AMOUNT))
+        @inputText(redeemFiatForm(constants.Form.GAS),'_label-> Messages(constants.Form.GAS))
+        @inputPassword(redeemFiatForm(constants.Form.PASSWORD),'_label-> Messages(constants.Form.PASSWORD))
 
-  @if(redeemFiatForm.hasGlobalErrors) {
-    <ul>
-    @for(error <- redeemFiatForm.globalErrors) {
-      <li>@error.format</li>
+        @if(redeemFiatForm.hasGlobalErrors) {
+            <ul>
+            @for(error <- redeemFiatForm.globalErrors) {
+                <li>@error.format</li>
+            }
+            </ul>
+        }
+        <button type="submit">@Messages(constants.Form.REDEEM_FIAT)</button>
     }
-    </ul>
-  }
-  <button type="button" onclick="submitForm(this)">@Messages(constants.Form.REDEEM_FIAT)</button>
 }

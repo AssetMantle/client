@@ -32,13 +32,12 @@ class SetSellerFeedbackController @Inject()(messagesControllerComponents: Messag
         },
         setSellerFeedbackData => {
           try {
-            val ticketID = if (kafkaEnabled) transactionsSetSellerFeedback.Service.kafkaPost(transactionsSetSellerFeedback.Request(from = username, to = setSellerFeedbackData.to, password = setSellerFeedbackData.password, pegHash = setSellerFeedbackData.pegHash, rating = setSellerFeedbackData.rating, gas = setSellerFeedbackData.gas)).ticketID else Random.nextString(32)
-            blockchainTransactionSetSellerFeedbacks.Service.addSetSellerFeedback(from = username, to = setSellerFeedbackData.to, pegHash = setSellerFeedbackData.pegHash, rating = setSellerFeedbackData.rating, gas = setSellerFeedbackData.gas, null, null, ticketID = ticketID, null)
-
+            val ticketID = if (kafkaEnabled) transactionsSetSellerFeedback.Service.kafkaPost(transactionsSetSellerFeedback.Request(from = username, to = setSellerFeedbackData.buyerAddress, password = setSellerFeedbackData.password, pegHash = setSellerFeedbackData.pegHash, rating = setSellerFeedbackData.rating, gas = setSellerFeedbackData.gas)).ticketID else Random.nextString(32)
+            blockchainTransactionSetSellerFeedbacks.Service.addSetSellerFeedback(from = username, to = setSellerFeedbackData.buyerAddress, pegHash = setSellerFeedbackData.pegHash, rating = setSellerFeedbackData.rating, gas = setSellerFeedbackData.gas, null, null, ticketID = ticketID, null)
             if (!kafkaEnabled) {
               Future {
                 try {
-                  blockchainTransactionSetSellerFeedbacks.Utility.onSuccess(ticketID, transactionsSetSellerFeedback.Service.post(transactionsSetSellerFeedback.Request(from = username, to = setSellerFeedbackData.to, password = setSellerFeedbackData.password, pegHash = setSellerFeedbackData.pegHash, rating = setSellerFeedbackData.rating, gas = setSellerFeedbackData.gas)))
+                  blockchainTransactionSetSellerFeedbacks.Utility.onSuccess(ticketID, transactionsSetSellerFeedback.Service.post(transactionsSetSellerFeedback.Request(from = username, to = setSellerFeedbackData.buyerAddress, password = setSellerFeedbackData.password, pegHash = setSellerFeedbackData.pegHash, rating = setSellerFeedbackData.rating, gas = setSellerFeedbackData.gas)))
                 } catch {
                   case baseException: BaseException => logger.error(constants.Response.BASE_EXCEPTION.message, baseException)
                   case blockChainException: BlockChainException => logger.error(blockChainException.failure.message, blockChainException)

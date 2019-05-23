@@ -42,7 +42,7 @@ class SendFiat @Inject()(wsClient: WSClient)(implicit configuration: Configurati
       Await.result(action(request), Duration.Inf)
     } catch {
       case connectException: ConnectException =>
-        logger.error(constants.Error.CONNECT_EXCEPTION, connectException)
+        logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
         throw new BlockChainException(constants.Error.CONNECT_EXCEPTION)
     }
 
@@ -50,7 +50,7 @@ class SendFiat @Inject()(wsClient: WSClient)(implicit configuration: Configurati
       Await.result(kafkaAction(request), Duration.Inf)
     } catch {
       case connectException: ConnectException =>
-        logger.error(constants.Error.CONNECT_EXCEPTION, connectException)
+        logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
         throw new BlockChainException(constants.Error.CONNECT_EXCEPTION)
     }
 

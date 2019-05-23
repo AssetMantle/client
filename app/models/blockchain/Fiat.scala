@@ -33,12 +33,12 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
   private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
   private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
-  private val sleepTime = configuration.get[Long]("blockchain.kafka.entityIterator.threadSleep")
+  private val sleepTime = configuration.get[Long]("blockchain.entityIterator.threadSleep")
 
   private def add(fiat: Fiat)(implicit executionContext: ExecutionContext): Future[String] = db.run((fiatTable returning fiatTable.map(_.pegHash) += fiat).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
         throw new BaseException(constants.Response.PSQL_EXCEPTION)
     }
   }
@@ -46,7 +46,7 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
   private def addMultiple(fiats: Seq[Fiat])(implicit executionContext: ExecutionContext): Future[Seq[String]] = db.run((fiatTable returning fiatTable.map(_.pegHash) ++= fiats).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
         throw new BaseException(constants.Response.PSQL_EXCEPTION)
     }
   }
@@ -54,7 +54,7 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
   private def insertOrUpdate(fiat: Fiat)(implicit executionContext: ExecutionContext): Future[Int] = db.run(fiatTable.insertOrUpdate(fiat).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
         throw new BaseException(constants.Response.PSQL_EXCEPTION)
     }
   }
@@ -62,9 +62,9 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
   private def findByPegHashAndOwnerAddress(pegHash: String, ownerAddress: String)(implicit executionContext: ExecutionContext): Future[Fiat] = db.run(fiatTable.filter(_.pegHash === pegHash).filter(_.ownerAddress === ownerAddress).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
         throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }
   }
@@ -72,7 +72,7 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
   private def getFiatPegWalletByAddress(address: String)(implicit executionContext: ExecutionContext): Future[Seq[Fiat]] = db.run(fiatTable.filter(_.ownerAddress === address).result.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
         Nil
     }
   }
@@ -80,7 +80,7 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
   private def getFiatsByDirtyBit(dirtyBit: Boolean): Future[Seq[Fiat]] = db.run(fiatTable.filter(_.dirtyBit === dirtyBit).result.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => logger.info(constants.Response.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+      case noSuchElementException: NoSuchElementException => logger.info(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
         Nil
     }
   }
@@ -88,9 +88,9 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
   private def updateDirtyBitByAddress(address: String, dirtyBit: Boolean): Future[Int] = db.run(fiatTable.filter(_.ownerAddress === address).map(_.dirtyBit).update(dirtyBit).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
         throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }
   }
@@ -98,9 +98,9 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
   private def updateOwnerAddressByPegHashAndPreviousOwnerAddress(pegHash: String, newOwnerAddress: String, previousOwnerAddress: String)(implicit executionContext: ExecutionContext): Future[Int] = db.run(fiatTable.filter(_.pegHash === pegHash).filter(_.ownerAddress === previousOwnerAddress).map(_.ownerAddress).update(newOwnerAddress).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
         throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }
   }
@@ -108,39 +108,9 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
   private def updateOwnerAddressByPreviousOwnerAddress(newOwnerAddress: String, previousOwnerAddress: String)(implicit executionContext: ExecutionContext): Future[Int] = db.run(fiatTable.filter(_.ownerAddress === previousOwnerAddress).map(_.ownerAddress).update(newOwnerAddress).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
         throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
-
-  private def updateRedeemedAmountByPegHash(pegHash: String, redeemedAmount: String)(implicit executionContext: ExecutionContext): Future[Int] = db.run(fiatTable.filter(_.pegHash === pegHash).map(_.redeemedAmount).update(redeemedAmount).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
-
-  private def deleteByPegHashAndAddress(pegHash: String, address: String)(implicit executionContext: ExecutionContext) = db.run(fiatTable.filter(_.pegHash === pegHash).filter(_.ownerAddress === address).delete.asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
-
-  private def deleteByAddress(address: String)(implicit executionContext: ExecutionContext) = db.run(fiatTable.filter(_.ownerAddress === address).delete.asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }
   }
@@ -187,26 +157,55 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
     def updateDirtyBit(address: String, dirtyBit: Boolean): Int = Await.result(updateDirtyBitByAddress(address, dirtyBit), Duration.Inf)
   }
 
+  private def updateRedeemedAmountByPegHash(pegHash: String, redeemedAmount: String)(implicit executionContext: ExecutionContext): Future[Int] = db.run(fiatTable.filter(_.pegHash === pegHash).map(_.redeemedAmount).update(redeemedAmount).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def deleteByPegHashAndAddress(pegHash: String, address: String)(implicit executionContext: ExecutionContext) = db.run(fiatTable.filter(_.pegHash === pegHash).filter(_.ownerAddress === address).delete.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def deleteByAddress(address: String)(implicit executionContext: ExecutionContext) = db.run(fiatTable.filter(_.ownerAddress === address).delete.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
   object Utility {
     def dirtyEntityUpdater(): Future[Unit] = Future {
       val dirtyFiats = Service.getDirtyFiats(dirtyBit = true)
       Thread.sleep(sleepTime)
       for (dirtyFiat <- dirtyFiats) {
         try {
-          val fiatPegWallet = getAccount.Service.get(dirtyFiat.ownerAddress).value.fiatPegWallet.getOrElse(throw new BaseException(constants.Response.NO_RESPONSE))
+          val fiatPegWallet = getAccount.Service.get(dirtyFiat.ownerAddress).value.fiatPegWallet.getOrElse(throw new BaseException(constants.Error.NO_RESPONSE))
           fiatPegWallet.foreach(fiatPeg => if (fiatPegWallet.map(_.pegHash) contains dirtyFiat.pegHash) Service.insertOrUpdateFiat(fiatPeg.pegHash, dirtyFiat.ownerAddress, fiatPeg.transactionID, fiatPeg.transactionAmount, fiatPeg.redeemedAmount, dirtyBit = false) else Service.deleteFiat(dirtyFiat.pegHash, dirtyFiat.ownerAddress))
         }
         catch {
-          case baseException: BaseException => logger.info(constants.Response.BASE_EXCEPTION.message, baseException)
+          case baseException: BaseException => logger.info(constants.Error.BASE_EXCEPTION, baseException)
             if (baseException.message == module + "." + constants.Error.NO_RESPONSE) {
               Service.deleteFiatPegWallet(dirtyFiat.ownerAddress)
             }
-          case blockChainException: BlockChainException => logger.error(blockChainException.failure.message, blockChainException)
+          case blockChainException: BlockChainException => logger.error(blockChainException.message, blockChainException)
         }
       }
     }
   }
-
 
   actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
     Utility.dirtyEntityUpdater()

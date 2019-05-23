@@ -23,7 +23,7 @@ import scala.util.{Failure, Success}
 case class SendFiat(from: String, to: String, amount: Int, pegHash: String, gas: Int,  status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])
 
 @Singleton
-class SendFiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, blockchainTransactionFeedbacks: blockchain.TransactionFeedbacks, getOrder: GetOrder, transactionSendFiat: transactions.SendFiat, blockchainFiats: blockchain.Fiats, blockchainOrders: blockchain.Orders, blockchainNegotiations: blockchain.Negotiations, actorSystem: ActorSystem, pushNotifications: PushNotifications, masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
+class SendFiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, blockchainTransactionFeedbacks: blockchain.TransactionFeedbacks, getOrder: GetOrder, transactionSendFiat: transactions.SendFiat, blockchainFiats: blockchain.Fiats, blockchainOrders: blockchain.Orders, blockchainNegotiations: blockchain.Negotiations, actorSystem: ActorSystem, pushNotifications: PushNotifications,masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext)  {
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_SEND_FIAT
 
@@ -37,10 +37,15 @@ class SendFiats @Inject()(protected val databaseConfigProvider: DatabaseConfigPr
 
   private[models] val sendFiatTable = TableQuery[SendFiatTable]
 
+  private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
+  private val schedulerInterval =  configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
+  private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
+  private val sleepTime = configuration.get[Long]("blockchain.entityIterator.threadSleep")
+
   private def add(sendFiat: SendFiat)(implicit executionContext: ExecutionContext): Future[String] = db.run((sendFiatTable returning sendFiatTable.map(_.ticketID) += sendFiat).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
         throw new BaseException(constants.Response.PSQL_EXCEPTION)
     }
   }
@@ -48,9 +53,9 @@ class SendFiats @Inject()(protected val databaseConfigProvider: DatabaseConfigPr
   private def update(sendFiat: SendFiat)(implicit executionContext: ExecutionContext): Future[Int] = db.run(sendFiatTable.insertOrUpdate(sendFiat).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
         throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }
   }
@@ -58,23 +63,9 @@ class SendFiats @Inject()(protected val databaseConfigProvider: DatabaseConfigPr
   private def findByTicketID(ticketID: String)(implicit executionContext: ExecutionContext): Future[SendFiat] = db.run(sendFiatTable.filter(_.ticketID === ticketID).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
         throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
-
-  private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
-  private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
-  private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
-
-  private def deleteByTicketID(ticketID: String)(implicit executionContext: ExecutionContext) = db.run(sendFiatTable.filter(_.ticketID === ticketID).delete.asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }
   }
@@ -102,30 +93,6 @@ class SendFiats @Inject()(protected val databaseConfigProvider: DatabaseConfigPr
     def responseCode = column[String]("responseCode")
   }
 
-  private val sleepTime = configuration.get[Long]("blockchain.kafka.entityIterator.threadSleep")
-
-  private def updateStatusAndResponseOnTicketID(ticketID: String, status: Boolean, responseCode: String): Future[Int] = db.run(sendFiatTable.filter(_.ticketID === ticketID).map(x => (x.status, x.responseCode)).update((status, responseCode)).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
-
-  private def getTicketIDsWithNullStatus()(implicit executionContext: ExecutionContext): Future[Seq[String]] = db.run(sendFiatTable.filter(_.status.?.isEmpty).map(_.ticketID).result)
-
-  private def updateTxHashStatusAndResponseOnTicketID(ticketID: String, txHash: String, status: Boolean, responseCode: String): Future[Int] = db.run(sendFiatTable.filter(_.ticketID === ticketID).map(x => (x.txHash, x.status, x.responseCode)).update((txHash, status, responseCode)).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
-
   object Service {
 
     def addSendFiat(from: String, to: String, amount: Int, pegHash: String, gas: Int,  status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String]) (implicit executionContext: ExecutionContext): String = Await.result(add(SendFiat(from = from , to = to, amount = amount, pegHash = pegHash, gas = gas, status = status, txHash = txHash, ticketID = ticketID, responseCode = responseCode)), Duration.Inf)
@@ -140,6 +107,38 @@ class SendFiats @Inject()(protected val databaseConfigProvider: DatabaseConfigPr
 
   }
 
+  private def updateStatusAndResponseOnTicketID(ticketID: String, status: Boolean, responseCode: String): Future[Int] = db.run(sendFiatTable.filter(_.ticketID === ticketID).map(x => (x.status, x.responseCode)).update((status, responseCode)).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def getTicketIDsWithNullStatus()(implicit executionContext: ExecutionContext): Future[Seq[String]] = db.run(sendFiatTable.filter(_.status.?.isEmpty).map(_.ticketID).result)
+
+  private def updateTxHashStatusAndResponseOnTicketID(ticketID: String, txHash: String, status: Boolean, responseCode: String): Future[Int] = db.run(sendFiatTable.filter(_.ticketID === ticketID).map(x => (x.txHash, x.status, x.responseCode)).update((txHash, status, responseCode)).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def deleteByTicketID(ticketID: String)(implicit executionContext: ExecutionContext) = db.run(sendFiatTable.filter(_.ticketID === ticketID).delete.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
   object Utility {
     def onSuccess(ticketID: String, response: Response): Future[Unit] = Future {
       try {
@@ -147,11 +146,12 @@ class SendFiats @Inject()(protected val databaseConfigProvider: DatabaseConfigPr
         val sendFiat = Service.getTransaction(ticketID)
         val fromAddress = masterAccounts.Service.getAddress(sendFiat.from)
         val negotiationID = blockchainNegotiations.Service.getNegotiationID(buyerAddress = fromAddress, sellerAddress = sendFiat.to, pegHash = sendFiat.pegHash)
-        blockchainOrders.Service.insertOrUpdateOrder(id = negotiationID, null, null, true)
+        blockchainOrders.Service.insertOrUpdateOrder(id = negotiationID, null, null, false)
         blockchainFiats.Service.updateDirtyBit(fromAddress, true)
         blockchainTransactionFeedbacks.Service.updateDirtyBit(fromAddress, true)
+        Thread.sleep(sleepTime)
         val orderResponse = getOrder.Service.get(negotiationID)
-        blockchainFiats.Service.addFiats(orderResponse.value.fiatPegWallet.get.map { responseFiatPeg: AccountResponse.Fiat => blockchain.Fiat(pegHash = responseFiatPeg.pegHash, ownerAddress = negotiationID, transactionID = responseFiatPeg.transactionID, transactionAmount = responseFiatPeg.transactionAmount, redeemedAmount = responseFiatPeg.redeemedAmount, dirtyBit = false) })
+        blockchainFiats.Service.addFiats(orderResponse.value.fiatPegWallet.get.map{responseFiatPeg: AccountResponse.Fiat => blockchain.Fiat(pegHash = responseFiatPeg.pegHash, ownerAddress = negotiationID, transactionID = responseFiatPeg.transactionID, transactionAmount = responseFiatPeg.transactionAmount, redeemedAmount = responseFiatPeg.redeemedAmount, dirtyBit = false)})
         blockchainAccounts.Service.updateDirtyBit(fromAddress, dirtyBit = true)
         pushNotifications.sendNotification(masterAccounts.Service.getId(sendFiat.to), constants.Notification.SUCCESS, Seq(response.TxHash))
         pushNotifications.sendNotification(sendFiat.from, constants.Notification.SUCCESS, Seq(response.TxHash))
@@ -159,7 +159,7 @@ class SendFiats @Inject()(protected val databaseConfigProvider: DatabaseConfigPr
       catch {
         case baseException: BaseException => logger.error(constants.Response.BASE_EXCEPTION.message, baseException)
           throw new BaseException(constants.Response.PSQL_EXCEPTION)
-        case connectException: ConnectException => logger.error(constants.Error.CONNECT_EXCEPTION, connectException)
+        case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
       }
     }
 
@@ -167,6 +167,7 @@ class SendFiats @Inject()(protected val databaseConfigProvider: DatabaseConfigPr
       try {
         Service.updateStatusAndResponseCode(ticketID, status = false, message)
         val sendFiat = Service.getTransaction(ticketID)
+        blockchainTransactionFeedbacks.Service.updateDirtyBit(masterAccounts.Service.getAddress(sendFiat.from), true)
         pushNotifications.sendNotification(masterAccounts.Service.getId(sendFiat.to), constants.Notification.FAILURE, Seq(message))
         pushNotifications.sendNotification(sendFiat.from, constants.Notification.FAILURE, Seq(message))
       } catch {

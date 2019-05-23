@@ -34,35 +34,7 @@ class ACLAccounts @Inject()(protected val databaseConfigProvider: DatabaseConfig
 
   private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
   private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
-  private val sleepTime = configuration.get[Long]("blockchain.kafka.entityIterator.threadSleep")
-
-  private def add(aclAccount: ACLAccount)(implicit executionContext: ExecutionContext): Future[String] = db.run((aclTable returning aclTable.map(_.address) += aclAccount).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-    }
-  }
-
-  private def findByAddress(address: String)(implicit executionContext: ExecutionContext): Future[ACLAccount] = db.run(aclTable.filter(_.address === address).result.head.asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
-
-  private def getAddressesByZoneID(zoneID: String)(implicit executionContext: ExecutionContext): Future[Seq[String]] = db.run(aclTable.filter(_.zoneID === zoneID).map(_.address).result.asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
+  private val sleepTime = configuration.get[Long]("blockchain.entityIterator.threadSleep")
 
   private def getAddressesByDirtyBit(dirtyBit: Boolean): Future[Seq[String]] = db.run(aclTable.filter(_.dirtyBit === dirtyBit).map(_.address).result.asTry).map {
     case Success(result) => result
@@ -74,22 +46,20 @@ class ACLAccounts @Inject()(protected val databaseConfigProvider: DatabaseConfig
 
   private def addOrUpdate(aclAccount: ACLAccount)(implicit executionContext: ExecutionContext): Future[Int] = db.run(aclTable.insertOrUpdate(aclAccount))
 
-  private def deleteByAddress(address: String)(implicit executionContext: ExecutionContext) = db.run(aclTable.filter(_.address === address).delete.asTry).map {
+  private def add(aclAccount: ACLAccount)(implicit executionContext: ExecutionContext): Future[String] = db.run((aclTable returning aclTable.map(_.address) += aclAccount).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
         throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }
   }
 
-  private def updateDirtyBitByAddress(address: String, dirtyBit: Boolean): Future[Int] = db.run(aclTable.filter(_.address === address).map(_.dirtyBit).update(dirtyBit).asTry).map {
+  private def findByAddress(address: String)(implicit executionContext: ExecutionContext): Future[ACLAccount] = db.run(aclTable.filter(_.address === address).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
         throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }
   }
@@ -123,6 +93,36 @@ class ACLAccounts @Inject()(protected val databaseConfigProvider: DatabaseConfig
     def getDirtyAddresses(dirtyBit: Boolean): Seq[String] = Await.result(getAddressesByDirtyBit(dirtyBit), Duration.Inf)
 
     def updateDirtyBit(address: String, dirtyBit: Boolean): Int = Await.result(updateDirtyBitByAddress(address, dirtyBit), Duration.Inf)
+  }
+
+  private def getAddressesByZoneID(zoneID: String)(implicit executionContext: ExecutionContext): Future[Seq[String]] = db.run(aclTable.filter(_.zoneID === zoneID).map(_.address).result.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def deleteByAddress(address: String)(implicit executionContext: ExecutionContext) = db.run(aclTable.filter(_.address === address).delete.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def updateDirtyBitByAddress(address: String, dirtyBit: Boolean): Future[Int] = db.run(aclTable.filter(_.address === address).map(_.dirtyBit).update(dirtyBit).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
   }
 
   object Utility {

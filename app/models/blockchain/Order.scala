@@ -6,7 +6,6 @@ import javax.inject.{Inject, Singleton}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.{Configuration, Logger}
-import queries.responses.AccountResponse
 import slick.jdbc.JdbcProfile
 import utilities.PushNotifications
 
@@ -32,12 +31,12 @@ class Orders @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
   private[models] val orderTable = TableQuery[OrderTable]
   private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
   private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
-  private val sleepTime = configuration.get[Long]("blockchain.kafka.entityIterator.threadSleep")
+  private val sleepTime = configuration.get[Long]("blockchain.entityIterator.threadSleep")
 
   private def add(order: Order)(implicit executionContext: ExecutionContext): Future[String] = db.run((orderTable returning orderTable.map(_.id) += order).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
         throw new BaseException(constants.Response.PSQL_EXCEPTION)
     }
   }
@@ -45,7 +44,7 @@ class Orders @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
   private def insertOrUpdate(order: Order)(implicit executionContext: ExecutionContext): Future[Int] = db.run(orderTable.insertOrUpdate(order).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
         throw new BaseException(constants.Response.PSQL_EXCEPTION)
     }
   }
@@ -53,9 +52,9 @@ class Orders @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
   private def findById(id: String)(implicit executionContext: ExecutionContext): Future[Order] = db.run(orderTable.filter(_.id === id).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
         throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }
   }
@@ -71,9 +70,9 @@ class Orders @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
   private def updateDirtyBitById(id: String, dirtyBit: Boolean): Future[Int] = db.run(orderTable.filter(_.id === id).map(_.dirtyBit).update(dirtyBit).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
         throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }
   }
@@ -81,9 +80,9 @@ class Orders @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
   private def deleteById(id: String)(implicit executionContext: ExecutionContext): Future[Int] = db.run(orderTable.filter(_.id === id).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
         throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }
   }
@@ -121,14 +120,14 @@ class Orders @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
         try {
           val orderResponse = getOrder.Service.get(dirtyOrder.id)
           val negotiation = blockchainNegotiations.Service.getNegotiation(dirtyOrder.id)
-          if (orderResponse.value.awbProofHash != "" && orderResponse.value.fiatProofHash != "") {
+          if ((orderResponse.value.awbProofHash != "" && orderResponse.value.fiatProofHash != "") || (orderResponse.value.awbProofHash == "" && orderResponse.value.fiatProofHash == "")) {
             val sellerAccount = getAccount.Service.get(negotiation.sellerAddress)
             if (sellerAccount.value.assetPegWallet.isDefined) {
               sellerAccount.value.assetPegWallet.get.foreach(asset => blockchainAssets.Service.insertOrUpdateAsset(pegHash = asset.pegHash, documentHash = asset.documentHash, assetType = asset.assetType, assetQuantity = asset.assetQuantity, quantityUnit = asset.quantityUnit, assetPrice = asset.assetPrice, ownerAddress = negotiation.sellerAddress, moderator = asset.moderator, locked = asset.locked, dirtyBit = false))
             } else {
               blockchainAssets.Service.deleteAssetPegWallet(negotiation.sellerAddress)
             }
-            sellerAccount.value.fiatPegWallet.getOrElse(Seq(AccountResponse.Fiat(null, null, null, null, null))).foreach(fiatPeg => {
+            sellerAccount.value.fiatPegWallet.getOrElse(Seq()).foreach(fiatPeg => {
               blockchainFiats.Service.insertOrUpdateFiat(fiatPeg.pegHash, negotiation.sellerAddress, fiatPeg.transactionID, fiatPeg.transactionAmount, fiatPeg.redeemedAmount, dirtyBit = true)
             })
 
@@ -138,7 +137,7 @@ class Orders @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
             } else {
               blockchainAssets.Service.deleteAssetPegWallet(negotiation.buyerAddress)
             }
-            buyerAccount.value.fiatPegWallet.getOrElse(Seq(AccountResponse.Fiat(null, null, null, null, null))).foreach(fiatPeg => {
+            buyerAccount.value.fiatPegWallet.getOrElse(Seq()).foreach(fiatPeg => {
               blockchainFiats.Service.insertOrUpdateFiat(fiatPeg.pegHash, negotiation.buyerAddress, fiatPeg.transactionID, fiatPeg.transactionAmount, fiatPeg.redeemedAmount, dirtyBit = true)
             })
 

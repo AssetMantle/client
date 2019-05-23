@@ -34,7 +34,7 @@ class GetNegotiationID @Inject()()(implicit wsClient: WSClient, configuration: C
       Await.result(action(buyerAccount + "/" + sellerAccount + "/" + pegHash), Duration.Inf)
     } catch {
       case connectException: ConnectException =>
-        logger.error(constants.Error.CONNECT_EXCEPTION, connectException)
+        logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
         throw new BlockChainException(constants.Error.CONNECT_EXCEPTION)
     }
   }

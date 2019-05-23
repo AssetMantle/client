@@ -3,8 +3,6 @@ package transactions
 import java.net.ConnectException
 
 import exceptions.BlockChainException
-import javax.inject.Inject
-import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import play.api.libs.json.{Json, OWrites}
 import play.api.libs.ws.{WSClient, WSResponse}
@@ -48,7 +46,7 @@ class SendCoin @Inject()(wsClient: WSClient)(implicit configuration: Configurati
       Await.result(action(request), Duration.Inf)
     } catch {
       case connectException: ConnectException =>
-        logger.error(constants.Error.CONNECT_EXCEPTION, connectException)
+        logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
         throw new BlockChainException(constants.Error.CONNECT_EXCEPTION)
     }
 
@@ -56,7 +54,7 @@ class SendCoin @Inject()(wsClient: WSClient)(implicit configuration: Configurati
       Await.result(kafkaAction(request), Duration.Inf)
     } catch {
       case connectException: ConnectException =>
-        logger.error(constants.Error.CONNECT_EXCEPTION, connectException)
+        logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
         throw new BlockChainException(constants.Error.CONNECT_EXCEPTION)
     }
 

@@ -33,7 +33,7 @@ class EmailOTPs @Inject()(protected val databaseConfigProvider: DatabaseConfigPr
   private def findById(id: String)(implicit executionContext: ExecutionContext): Future[EmailOTP] = db.run(emailOTPTable.filter(_.id === id).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }
   }

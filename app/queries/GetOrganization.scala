@@ -34,7 +34,7 @@ class GetOrganization @Inject()(wsClient: WSClient)(implicit configuration: Conf
       Await.result(action(organizationID), Duration.Inf)
     } catch {
       case connectException: ConnectException =>
-        logger.error(constants.Error.CONNECT_EXCEPTION, connectException)
+        logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
         throw new BlockChainException(constants.Error.CONNECT_EXCEPTION)
     }
   }

@@ -32,43 +32,13 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
 
   private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
   private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
-  private val sleepTime = configuration.get[Long]("blockchain.kafka.entityIterator.threadSleep")
+  private val sleepTime = configuration.get[Long]("blockchain.entityIterator.threadSleep")
 
   private def add(organization: Organization)(implicit executionContext: ExecutionContext): Future[String] = db.run((organizationTable returning organizationTable.map(_.id) += organization).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
         throw new BaseException(constants.Response.PSQL_EXCEPTION)
-    }
-  }
-
-  private def findById(id: String)(implicit executionContext: ExecutionContext): Future[Organization] = db.run(organizationTable.filter(_.id === id).result.head.asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
-
-  private def getAddressById(id: String)(implicit executionContext: ExecutionContext): Future[String] = db.run(organizationTable.filter(_.id === id).map(_.address).result.head.asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
-
-  private def getIdByAddress(address: String)(implicit executionContext: ExecutionContext): Future[String] = db.run(organizationTable.filter(_.address === address).map(_.id).result.head.asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }
   }
 
@@ -80,22 +50,22 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
     }
   }
 
-  private def updateAddressAndDirtyBitByID(organizationID: String, address: String, dirtyBit: Boolean): Future[Int] = db.run(organizationTable.filter(_.id === organizationID).map(x => (x.address, x.dirtyBit)).update((address, dirtyBit)).asTry).map {
+  private def findById(id: String)(implicit executionContext: ExecutionContext): Future[Organization] = db.run(organizationTable.filter(_.id === id).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
         throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }
   }
 
-  private def deleteById(id: String)(implicit executionContext: ExecutionContext): Future[Int] = db.run(organizationTable.filter(_.id === id).delete.asTry).map {
+  private def getAddressById(id: String)(implicit executionContext: ExecutionContext): Future[String] = db.run(organizationTable.filter(_.id === id).map(_.address).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
         throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }
   }
@@ -125,6 +95,36 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
     def getDirtyOrganizations(dirtyBit: Boolean): Seq[Organization] = Await.result(getOrganizationsByDirtyBit(dirtyBit), Duration.Inf)
 
     def updateAddressAndDirtyBit(id: String, address: String, dirtyBit: Boolean): Int = Await.result(updateAddressAndDirtyBitByID(id, address, dirtyBit), Duration.Inf)
+  }
+
+  private def getIdByAddress(address: String)(implicit executionContext: ExecutionContext): Future[String] = db.run(organizationTable.filter(_.address === address).map(_.id).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def updateAddressAndDirtyBitByID(organizationID: String, address: String, dirtyBit: Boolean): Future[Int] = db.run(organizationTable.filter(_.id === organizationID).map(x => (x.address, x.dirtyBit)).update((address, dirtyBit)).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def deleteById(id: String)(implicit executionContext: ExecutionContext): Future[Int] = db.run(organizationTable.filter(_.id === id).delete.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
   }
 
   object Utility {

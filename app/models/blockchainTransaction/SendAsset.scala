@@ -36,14 +36,18 @@ class SendAssets @Inject()(protected val databaseConfigProvider: DatabaseConfigP
   import databaseConfig.profile.api._
 
   private[models] val sendAssetTable = TableQuery[SendAssetTable]
+
   private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
   private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
   private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
+  private val sleepTime = configuration.get[Long]("blockchain.entityIterator.threadSleep")
+
+  private def getTicketIDsWithNullStatus()(implicit executionContext: ExecutionContext): Future[Seq[String]] = db.run(sendAssetTable.filter(_.status.?.isEmpty).map(_.ticketID).result)
 
   private def add(sendAsset: SendAsset)(implicit executionContext: ExecutionContext): Future[String] = db.run((sendAssetTable returning sendAssetTable.map(_.ticketID) += sendAsset).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
         throw new BaseException(constants.Response.PSQL_EXCEPTION)
     }
   }
@@ -51,51 +55,9 @@ class SendAssets @Inject()(protected val databaseConfigProvider: DatabaseConfigP
   private def insertOrUpdate(sendAsset: SendAsset)(implicit executionContext: ExecutionContext): Future[Int] = db.run(sendAssetTable.insertOrUpdate(sendAsset).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
         throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
-
-  private def findByTicketID(ticketID: String)(implicit executionContext: ExecutionContext): Future[SendAsset] = db.run(sendAssetTable.filter(_.ticketID === ticketID).result.head.asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
-
-  private def updateStatusAndResponseOnTicketID(ticketID: String, status: Boolean, responseCode: String): Future[Int] = db.run(sendAssetTable.filter(_.ticketID === ticketID).map(x => (x.status, x.responseCode)).update((status, responseCode)).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
-
-  private def getTicketIDsWithNullStatus()(implicit executionContext: ExecutionContext): Future[Seq[String]] = db.run(sendAssetTable.filter(_.status.?.isEmpty).map(_.ticketID).result)
-
-  private def updateTxHashStatusAndResponseOnTicketID(ticketID: String, txHash: String, status: Boolean, responseCode: String): Future[Int] = db.run(sendAssetTable.filter(_.ticketID === ticketID).map(x => (x.txHash, x.status, x.responseCode)).update((txHash, status, responseCode)).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
-
-  private def deleteByTicketID(ticketID: String)(implicit executionContext: ExecutionContext) = db.run(sendAssetTable.filter(_.ticketID === ticketID).delete.asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }
   }
@@ -135,6 +97,46 @@ class SendAssets @Inject()(protected val databaseConfigProvider: DatabaseConfigP
 
   }
 
+  private def findByTicketID(ticketID: String)(implicit executionContext: ExecutionContext): Future[SendAsset] = db.run(sendAssetTable.filter(_.ticketID === ticketID).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def updateStatusAndResponseOnTicketID(ticketID: String, status: Boolean, responseCode: String): Future[Int] = db.run(sendAssetTable.filter(_.ticketID === ticketID).map(x => (x.status, x.responseCode)).update((status, responseCode)).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def updateTxHashStatusAndResponseOnTicketID(ticketID: String, txHash: String, status: Boolean, responseCode: String): Future[Int] = db.run(sendAssetTable.filter(_.ticketID === ticketID).map(x => (x.txHash, x.status, x.responseCode)).update((txHash, status, responseCode)).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def deleteByTicketID(ticketID: String)(implicit executionContext: ExecutionContext) = db.run(sendAssetTable.filter(_.ticketID === ticketID).delete.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
   object Utility {
     def onSuccess(ticketID: String, response: Response): Future[Unit] = Future {
       try {
@@ -142,7 +144,8 @@ class SendAssets @Inject()(protected val databaseConfigProvider: DatabaseConfigP
         val sendAsset = Service.getTransaction(ticketID)
         val fromAddress = masterAccounts.Service.getAddress(sendAsset.from)
         val negotiationID = blockchainNegotiations.Service.getNegotiationID(buyerAddress = sendAsset.to, sellerAddress = fromAddress, pegHash = sendAsset.pegHash)
-        blockchainOrders.Service.insertOrUpdateOrder(id = negotiationID, null, null, true)
+        blockchainOrders.Service.insertOrUpdateOrder(id = negotiationID, null, null, false)
+        Thread.sleep(sleepTime)
         val orderResponse = getOrder.Service.get(negotiationID)
         orderResponse.value.assetPegWallet.get.map { responseAssetPeg: AccountResponse.Asset => blockchainAssets.Service.insertOrUpdateAsset(pegHash = responseAssetPeg.pegHash, documentHash = responseAssetPeg.documentHash, assetType = responseAssetPeg.assetType, assetQuantity = responseAssetPeg.assetQuantity, assetPrice = responseAssetPeg.assetPrice, quantityUnit = responseAssetPeg.quantityUnit, ownerAddress = negotiationID, moderator = responseAssetPeg.moderator, locked = responseAssetPeg.locked, dirtyBit = false) }
         blockchainAccounts.Service.updateDirtyBit(fromAddress, true)
@@ -152,7 +155,7 @@ class SendAssets @Inject()(protected val databaseConfigProvider: DatabaseConfigP
       } catch {
         case baseException: BaseException => logger.error(constants.Response.BASE_EXCEPTION.message, baseException)
           throw new BaseException(constants.Response.PSQL_EXCEPTION)
-        case connectException: ConnectException => logger.error(constants.Error.CONNECT_EXCEPTION, connectException)
+        case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
       }
     }
 
@@ -160,6 +163,7 @@ class SendAssets @Inject()(protected val databaseConfigProvider: DatabaseConfigP
       try {
         Service.updateStatusAndResponseCode(ticketID, status = false, message)
         val sendAsset = Service.getTransaction(ticketID)
+        blockchainTransactionFeedbacks.Service.updateDirtyBit(masterAccounts.Service.getAddress(sendAsset.from), true)
         pushNotifications.sendNotification(masterAccounts.Service.getId(sendAsset.to), constants.Notification.FAILURE, Seq(message))
         pushNotifications.sendNotification(sendAsset.from, constants.Notification.FAILURE, Seq(message))
       } catch {

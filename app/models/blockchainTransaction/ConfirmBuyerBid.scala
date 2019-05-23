@@ -22,7 +22,7 @@ import scala.util.{Failure, Success}
 case class ConfirmBuyerBid(from: String, to: String, bid: Int, time: Int, pegHash: String, gas: Int,  status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])
 
 @Singleton
-class ConfirmBuyerBids @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, blockchainTransactionFeedbacks: blockchain.TransactionFeedbacks, getNegotiationID: GetNegotiationID, blockchainNegotiations: blockchain.Negotiations, getNegotiation: GetNegotiation, transactionConfirmBuyerBid: transactions.ConfirmBuyerBid, actorSystem: ActorSystem, pushNotifications: PushNotifications, masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
+class ConfirmBuyerBids @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, blockchainTransactionFeedbacks: blockchain.TransactionFeedbacks, getNegotiationID: GetNegotiationID, blockchainNegotiations: blockchain.Negotiations, getNegotiation: GetNegotiation, transactionConfirmBuyerBid: transactions.ConfirmBuyerBid,  actorSystem: ActorSystem, pushNotifications: PushNotifications,masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext)  {
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_CONFIRM_BUYER_BID
 
@@ -36,10 +36,15 @@ class ConfirmBuyerBids @Inject()(protected val databaseConfigProvider: DatabaseC
 
   private[models] val confirmBuyerBidTable = TableQuery[ConfirmBuyerBidTable]
 
+  private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
+  private val schedulerInterval =  configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
+  private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
+  private val sleepTime = configuration.get[Long]("blockchain.entityIterator.threadSleep")
+
   private def add(confirmBuyerBid: ConfirmBuyerBid)(implicit executionContext: ExecutionContext): Future[String] = db.run((confirmBuyerBidTable returning confirmBuyerBidTable.map(_.ticketID) += confirmBuyerBid).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
         throw new BaseException(constants.Response.PSQL_EXCEPTION)
     }
   }
@@ -47,33 +52,19 @@ class ConfirmBuyerBids @Inject()(protected val databaseConfigProvider: DatabaseC
   private def update(confirmBuyerBid: ConfirmBuyerBid)(implicit executionContext: ExecutionContext): Future[Int] = db.run(confirmBuyerBidTable.insertOrUpdate(confirmBuyerBid).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
         throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }
   }
-
+  
   private def findByTicketID(ticketID: String)(implicit executionContext: ExecutionContext): Future[ConfirmBuyerBid] = db.run(confirmBuyerBidTable.filter(_.ticketID === ticketID).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
         throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
-
-  private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
-  private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
-  private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
-  
-  private def deleteByTicketID(ticketID: String)(implicit executionContext: ExecutionContext) = db.run(confirmBuyerBidTable.filter(_.ticketID === ticketID).delete.asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }
   }
@@ -102,30 +93,7 @@ class ConfirmBuyerBids @Inject()(protected val databaseConfigProvider: DatabaseC
 
     def responseCode = column[String]("responseCode")
   }
-
-  private val sleepTime = configuration.get[Long]("blockchain.kafka.entityIterator.threadSleep")
-
-  private def updateStatusAndResponseOnTicketID(ticketID: String, status: Boolean, responseCode: String): Future[Int] = db.run(confirmBuyerBidTable.filter(_.ticketID === ticketID).map(x => (x.status, x.responseCode)).update((status, responseCode)).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
-
-  private def getTicketIDsWithNullStatus()(implicit executionContext: ExecutionContext): Future[Seq[String]] = db.run(confirmBuyerBidTable.filter(_.status.?.isEmpty).map(_.ticketID).result)
-
-  private def updateTxHashStatusAndResponseOnTicketID(ticketID: String, txHash: String, status: Boolean, responseCode: String): Future[Int] = db.run(confirmBuyerBidTable.filter(_.ticketID === ticketID).map(x => (x.txHash, x.status, x.responseCode)).update((txHash, status, responseCode)).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
+  
 
   object Service {
 
@@ -139,6 +107,38 @@ class ConfirmBuyerBids @Inject()(protected val databaseConfigProvider: DatabaseC
 
     def getTransaction(ticketID: String)(implicit executionContext: ExecutionContext): ConfirmBuyerBid = Await.result(findByTicketID(ticketID), Duration.Inf)
 
+  }
+
+  private def updateStatusAndResponseOnTicketID(ticketID: String, status: Boolean, responseCode: String): Future[Int] = db.run(confirmBuyerBidTable.filter(_.ticketID === ticketID).map(x => (x.status, x.responseCode)).update((status, responseCode)).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def getTicketIDsWithNullStatus()(implicit executionContext: ExecutionContext): Future[Seq[String]] = db.run(confirmBuyerBidTable.filter(_.status.?.isEmpty).map(_.ticketID).result)
+
+  private def updateTxHashStatusAndResponseOnTicketID(ticketID: String, txHash: String, status: Boolean, responseCode: String): Future[Int] = db.run(confirmBuyerBidTable.filter(_.ticketID === ticketID).map(x => (x.txHash, x.status, x.responseCode)).update((txHash, status, responseCode)).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def deleteByTicketID(ticketID: String)(implicit executionContext: ExecutionContext) = db.run(confirmBuyerBidTable.filter(_.ticketID === ticketID).delete.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
   }
 
   object Utility {
@@ -160,7 +160,7 @@ class ConfirmBuyerBids @Inject()(protected val databaseConfigProvider: DatabaseC
       } catch {
         case baseException: BaseException => logger.error(constants.Response.BASE_EXCEPTION.message, baseException)
           throw new BaseException(constants.Response.PSQL_EXCEPTION)
-        case connectException: ConnectException => logger.error(constants.Error.CONNECT_EXCEPTION, connectException)
+        case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
       }
     }
 
@@ -168,6 +168,8 @@ class ConfirmBuyerBids @Inject()(protected val databaseConfigProvider: DatabaseC
       try {
         Service.updateStatusAndResponseCode(ticketID, status = false, message)
         val confirmBuyerBid = Service.getTransaction(ticketID)
+        blockchainTransactionFeedbacks.Service.updateDirtyBit(masterAccounts.Service.getAddress(confirmBuyerBid.from), true)
+        blockchainTransactionFeedbacks.Service.updateDirtyBit(confirmBuyerBid.to, true)
         pushNotifications.sendNotification(masterAccounts.Service.getId(confirmBuyerBid.to), constants.Notification.FAILURE, Seq(message))
         pushNotifications.sendNotification(confirmBuyerBid.from, constants.Notification.FAILURE, Seq(message))
       } catch {

@@ -34,7 +34,7 @@ class GetZone @Inject()(wsClient: WSClient)(implicit configuration: Configuratio
       Await.result(action(zoneID), Duration.Inf)
     } catch {
       case connectException: ConnectException =>
-        logger.error(constants.Error.CONNECT_EXCEPTION, connectException)
+        logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
         throw new BlockChainException(constants.Error.CONNECT_EXCEPTION)
     }
   }
