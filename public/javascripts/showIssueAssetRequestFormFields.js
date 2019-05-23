@@ -1,10 +1,10 @@
 $(document).ready(function () {
-    $('input[id="moderated"]').click(function () {
+    $('input[id="unmoderated"]').click(function () {
         if ($(this).prop("checked") === true) {
-            $('#moderatedIssueAssetRequestFormFields').show();
+            $('#unmoderatedIssueAssetRequestFormFields').show();
         }
         else if ($(this).prop("checked") === false) {
-            $('#moderatedIssueAssetRequestFormFields').hide();
+            $('#unmoderatedIssueAssetRequestFormFields').hide();
         }
     });
 });

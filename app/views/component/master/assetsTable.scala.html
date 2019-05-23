@@ -10,7 +10,7 @@
         <th>@Messages(constants.Form.ASSET_QUANTITY)</th>
         <th>@Messages(constants.Form.ASSET_PRICE)</th>
         <th>@Messages(constants.Form.QUANTITY_UNIT)</th>
-        <th>@Messages(constants.Form.MODERATED)</th>
+        <th>@Messages(constants.Form.UNMODERATED)</th>
         <th>@Messages(constants.Form.LOCKED)</th>
     </tr>
     @for(asset <- assetPegWallet) {
@@ -21,7 +21,7 @@
             <td>@asset.assetQuantity</td>
             <td>@asset.assetPrice</td>
             <td>@asset.quantityUnit</td>
-            <td>@asset.moderated</td>
+            <td>@asset.unmoderated</td>
             <td>@asset.locked</td>
         </tr>
     }

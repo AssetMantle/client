@@ -21,7 +21,7 @@ object AccountResponse {
       (JsPath \ "private").read[Boolean]
     ) (Asset.apply _)
 
-  case class Asset(pegHash: String, documentHash: String, assetType: String, assetQuantity: String, assetPrice: String, quantityUnit: String, ownerAddress: String, locked: Boolean, moderated: Boolean)
+  case class Asset(pegHash: String, documentHash: String, assetType: String, assetQuantity: String, assetPrice: String, quantityUnit: String, ownerAddress: String, locked: Boolean, unmoderated: Boolean)
 
   case class Owners(ownerAddress: String, amount: String)
 
