@@ -44,7 +44,7 @@ class ConfirmBuyerBids @Inject()(protected val databaseConfigProvider: DatabaseC
     }
   }
 
-  private def update(confirmBuyerBid: ConfirmBuyerBid)(implicit executionContext: ExecutionContext): Future[Int] = db.run(confirmBuyerBidTable.insertOrUpdate(confirmBuyerBid).asTry).map {
+  private def upsert(confirmBuyerBid: ConfirmBuyerBid)(implicit executionContext: ExecutionContext): Future[Int] = db.run(confirmBuyerBidTable.insertOrUpdate(confirmBuyerBid).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
@@ -76,7 +76,7 @@ class ConfirmBuyerBids @Inject()(protected val databaseConfigProvider: DatabaseC
 
   private def getTicketIDsWithNullStatus()(implicit executionContext: ExecutionContext): Future[Seq[String]] = db.run(confirmBuyerBidTable.filter(_.status.?.isEmpty).map(_.ticketID).result)
 
-  private def updateTxHashStatusAndResponseOnTicketID(ticketID: String, txHash: String, status: Boolean, responseCode: String): Future[Int] = db.run(confirmBuyerBidTable.filter(_.ticketID === ticketID).map(x => (x.txHash, x.status, x.responseCode)).update((txHash, status, responseCode)).asTry).map {
+  private def updateTxHashStatusAndResponseCodeOnTicketID(ticketID: String, txHash: String, status: Boolean, responseCode: String): Future[Int] = db.run(confirmBuyerBidTable.filter(_.ticketID === ticketID).map(x => (x.txHash, x.status, x.responseCode)).update((txHash, status, responseCode)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
@@ -126,9 +126,9 @@ class ConfirmBuyerBids @Inject()(protected val databaseConfigProvider: DatabaseC
 
     def addConfirmBuyerBid(from: String, to: String, bid: Int, time: Int, pegHash: String, gas: Int,  status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String]) (implicit executionContext: ExecutionContext): String = Await.result(add(ConfirmBuyerBid(from = from, to = to, bid = bid, time = time, pegHash = pegHash, gas = gas, status = status, txHash = txHash, ticketID = ticketID, responseCode = responseCode)), Duration.Inf)
 
-    def updateTxHashStatusResponseCode(ticketID: String, txHash: String, status: Boolean, responseCode: String): Int = Await.result(updateTxHashStatusAndResponseOnTicketID(ticketID, txHash, status, responseCode), Duration.Inf)
+    def markTransactionSuccessful(ticketID: String, txHash: String, responseCode: String): Int = Await.result(updateTxHashStatusAndResponseCodeOnTicketID(ticketID, txHash, status = true, responseCode), Duration.Inf)
 
-    def updateStatusAndResponseCode(ticketID: String, status: Boolean, responseCode: String): Int = Await.result(updateStatusAndResponseOnTicketID(ticketID, status, responseCode), Duration.Inf)
+    def markTransactionFailed(ticketID: String, responseCode: String): Int = Await.result(updateStatusAndResponseOnTicketID(ticketID, status = false, responseCode), Duration.Inf)
 
     def getTicketIDsOnStatus(): Seq[String] = Await.result(getTicketIDsWithNullStatus(), Duration.Inf)
 
@@ -144,17 +144,17 @@ class ConfirmBuyerBids @Inject()(protected val databaseConfigProvider: DatabaseC
   object Utility {
     def onSuccess(ticketID: String, response: Response): Future[Unit] = Future {
       try {
-        Service.updateTxHashStatusResponseCode(ticketID, response.TxHash, status = true, response.Code)
+        Service.markTransactionSuccessful(ticketID, response.TxHash, response.Code)
         val confirmBuyerBid = Service.getTransaction(ticketID)
         val fromAddress = masterAccounts.Service.getAddress(confirmBuyerBid.from)
         val toID = masterAccounts.Service.getId(confirmBuyerBid.to)
         Thread.sleep(sleepTime)
         val negotiationID = blockchainNegotiations.Service.getNegotiationID(buyerAddress = fromAddress, sellerAddress = confirmBuyerBid.to, pegHash = confirmBuyerBid.pegHash)
         val negotiationResponse = if (negotiationID == "") getNegotiation.Service.get(getNegotiationID.Service.get(buyerAccount = confirmBuyerBid.from, sellerAccount = toID, pegHash = confirmBuyerBid.pegHash).negotiationID) else getNegotiation.Service.get(negotiationID)
-        blockchainNegotiations.Service.insertOrUpdateNegotiation(id = negotiationResponse.value.negotiationID, buyerAddress = negotiationResponse.value.buyerAddress, sellerAddress = negotiationResponse.value.sellerAddress, assetPegHash = negotiationResponse.value.pegHash, bid = negotiationResponse.value.bid, time = negotiationResponse.value.time, buyerSignature = negotiationResponse.value.buyerSignature, sellerSignature = negotiationResponse.value.sellerSignature, true)
-        blockchainAccounts.Service.updateDirtyBit(fromAddress, dirtyBit = true)
-        blockchainTransactionFeedbacks.Service.updateDirtyBit(fromAddress, true)
-        blockchainTransactionFeedbacks.Service.updateDirtyBit(confirmBuyerBid.to, true)
+        blockchainNegotiations.Service.insertOrUpdate(id = negotiationResponse.value.negotiationID, buyerAddress = negotiationResponse.value.buyerAddress, sellerAddress = negotiationResponse.value.sellerAddress, assetPegHash = negotiationResponse.value.pegHash, bid = negotiationResponse.value.bid, time = negotiationResponse.value.time, buyerSignature = negotiationResponse.value.buyerSignature, sellerSignature = negotiationResponse.value.sellerSignature, true)
+        blockchainAccounts.Service.markDirty(fromAddress)
+        blockchainTransactionFeedbacks.Service.markDirty(fromAddress)
+        blockchainTransactionFeedbacks.Service.markDirty(confirmBuyerBid.to)
         pushNotifications.sendNotification(toID, constants.Notification.SUCCESS, response.TxHash)
         pushNotifications.sendNotification(confirmBuyerBid.from, constants.Notification.SUCCESS, response.TxHash)
       } catch {
@@ -166,10 +166,10 @@ class ConfirmBuyerBids @Inject()(protected val databaseConfigProvider: DatabaseC
 
     def onFailure(ticketID: String, message: String): Future[Unit] = Future {
       try {
-        Service.updateStatusAndResponseCode(ticketID, status = false, message)
+        Service.markTransactionFailed(ticketID, message)
         val confirmBuyerBid = Service.getTransaction(ticketID)
-        blockchainTransactionFeedbacks.Service.updateDirtyBit(masterAccounts.Service.getAddress(confirmBuyerBid.from), true)
-        blockchainTransactionFeedbacks.Service.updateDirtyBit(confirmBuyerBid.to, true)
+        blockchainTransactionFeedbacks.Service.markDirty(masterAccounts.Service.getAddress(confirmBuyerBid.from))
+        blockchainTransactionFeedbacks.Service.markDirty(confirmBuyerBid.to)
         pushNotifications.sendNotification(masterAccounts.Service.getId(confirmBuyerBid.to), constants.Notification.FAILURE, message)
         pushNotifications.sendNotification(confirmBuyerBid.from, constants.Notification.FAILURE, message)
       } catch {

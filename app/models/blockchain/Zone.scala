@@ -48,6 +48,16 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
     }
   }
 
+  private def updateDirtyBitByID(zoneID: String, dirtyBit: Boolean) = db.run(zoneTable.filter(_.id === zoneID).map(_.dirtyBit).update(dirtyBit).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+        throw new BaseException(constants.Error.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
+        throw new BaseException(constants.Error.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
   private def findById(id: String)(implicit executionContext: ExecutionContext): Future[Zone] = db.run(zoneTable.filter(_.id === id).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -122,19 +132,21 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
     def getID(address: String)(implicit executionContext: ExecutionContext): String = Await.result(getIdByAddress(address), Duration.Inf)
 
-    def getDirtyZones(dirtyBit: Boolean): Seq[Zone] = Await.result(getZonesByDirtyBit(dirtyBit), Duration.Inf)
+    def getDirtyZones: Seq[Zone] = Await.result(getZonesByDirtyBit(dirtyBit = true), Duration.Inf)
 
-    def updateAddressAndDirtyBit(zoneID: String, address: String, dirtyBit: Boolean): Int = Await.result(updateAddressAndDirtyBitByID(zoneID, address, dirtyBit), Duration.Inf)
+    def refreshDirty(zoneID: String, address: String, dirtyBit: Boolean): Int = Await.result(updateAddressAndDirtyBitByID(zoneID, address, dirtyBit), Duration.Inf)
+
+    def markDirty(zoneID: String): Int = Await.result(updateDirtyBitByID(zoneID, dirtyBit = true), Duration.Inf)
   }
 
   object Utility {
     def dirtyEntityUpdater(): Future[Unit] = Future {
-      val dirtyZone = Service.getDirtyZones(dirtyBit = true)
+      val dirtyZone = Service.getDirtyZones
       Thread.sleep(sleepTime)
       for (dirtyZone <- dirtyZone) {
         try {
           val responseAddress = getZone.Service.get(dirtyZone.id)
-          Service.updateAddressAndDirtyBit(dirtyZone.id, responseAddress.body, dirtyBit = false)
+          Service.refreshDirty(dirtyZone.id, responseAddress.body, dirtyBit = false)
         }
         catch {
           case blockChainException: BlockChainException => logger.error(blockChainException.message, blockChainException)

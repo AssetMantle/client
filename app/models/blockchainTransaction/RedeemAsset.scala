@@ -42,7 +42,7 @@ class RedeemAssets @Inject()(protected val databaseConfigProvider: DatabaseConfi
     }
   }
 
-  private def update(redeemAsset: RedeemAsset)(implicit executionContext: ExecutionContext): Future[Int] = db.run(redeemAssetTable.insertOrUpdate(redeemAsset).asTry).map {
+  private def upsert(redeemAsset: RedeemAsset)(implicit executionContext: ExecutionContext): Future[Int] = db.run(redeemAssetTable.insertOrUpdate(redeemAsset).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
@@ -74,7 +74,7 @@ class RedeemAssets @Inject()(protected val databaseConfigProvider: DatabaseConfi
   
   private def getTicketIDsWithNullStatus()(implicit executionContext: ExecutionContext): Future[Seq[String]] = db.run(redeemAssetTable.filter(_.status.?.isEmpty).map(_.ticketID).result)
 
-  private def updateTxHashStatusAndResponseOnTicketID(ticketID: String, txHash: String, status: Boolean, responseCode: String): Future[Int] = db.run(redeemAssetTable.filter(_.ticketID === ticketID).map(x => (x.txHash, x.status, x.responseCode)).update((txHash, status, responseCode)).asTry).map {
+  private def updateTxHashStatusAndResponseCodeOnTicketID(ticketID: String, txHash: String, status: Boolean, responseCode: String): Future[Int] = db.run(redeemAssetTable.filter(_.ticketID === ticketID).map(x => (x.txHash, x.status, x.responseCode)).update((txHash, status, responseCode)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
@@ -119,9 +119,9 @@ class RedeemAssets @Inject()(protected val databaseConfigProvider: DatabaseConfi
 
     def addRedeemAsset(from: String, to: String, pegHash: String, gas: Int,  status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String]) (implicit executionContext: ExecutionContext): String = Await.result(add(RedeemAsset(from = from , to = to, pegHash = pegHash, gas = gas, status = status, txHash = txHash, ticketID = ticketID, responseCode = responseCode)), Duration.Inf)
 
-    def updateTxHashStatusResponseCode(ticketID: String, txHash: String, status: Boolean, responseCode: String): Int = Await.result(updateTxHashStatusAndResponseOnTicketID(ticketID, txHash, status, responseCode), Duration.Inf)
+    def markTransactionSuccessful(ticketID: String, txHash: String, responseCode: String): Int = Await.result(updateTxHashStatusAndResponseCodeOnTicketID(ticketID, txHash, status = true, responseCode), Duration.Inf)
 
-    def updateStatusAndResponseCode(ticketID: String, status: Boolean, responseCode: String): Int = Await.result(updateStatusAndResponseOnTicketID(ticketID, status, responseCode), Duration.Inf)
+    def markTransactionFailed(ticketID: String, responseCode: String): Int = Await.result(updateStatusAndResponseOnTicketID(ticketID, status = false, responseCode), Duration.Inf)
 
     def getTicketIDsOnStatus(): Seq[String] = Await.result(getTicketIDsWithNullStatus(), Duration.Inf)
 
@@ -135,10 +135,10 @@ class RedeemAssets @Inject()(protected val databaseConfigProvider: DatabaseConfi
   object Utility {
     def onSuccess(ticketID: String, response: Response): Future[Unit] = Future {
       try {
-        Service.updateTxHashStatusResponseCode(ticketID, response.TxHash, status = true, response.Code)
+        Service.markTransactionSuccessful(ticketID, response.TxHash, response.Code)
         val redeemAsset = Service.getTransaction(ticketID)
-        blockchainAssets.Service.updateDirtyBit(redeemAsset.pegHash, true)
-        blockchainAccounts.Service.updateDirtyBit(masterAccounts.Service.getAddress(redeemAsset.from), dirtyBit = true)
+        blockchainAssets.Service.markDirty(redeemAsset.pegHash)
+        blockchainAccounts.Service.markDirty(masterAccounts.Service.getAddress(redeemAsset.from))
         pushNotifications.sendNotification(masterAccounts.Service.getId(redeemAsset.to), constants.Notification.SUCCESS, response.TxHash)
         pushNotifications.sendNotification(redeemAsset.from, constants.Notification.SUCCESS, response.TxHash)
       } catch {
@@ -149,11 +149,10 @@ class RedeemAssets @Inject()(protected val databaseConfigProvider: DatabaseConfi
 
     def onFailure(ticketID: String, message: String): Future[Unit] = Future {
       try {
-        Service.updateStatusAndResponseCode(ticketID, status = false, message)
+        Service.markTransactionFailed(ticketID, message)
         val redeemAsset = Service.getTransaction(ticketID)
         pushNotifications.sendNotification(redeemAsset.from, constants.Notification.FAILURE, message)
         pushNotifications.sendNotification(masterAccounts.Service.getId(redeemAsset.to), constants.Notification.FAILURE, message)
-
       } catch {
         case baseException: BaseException => logger.error(constants.Error.BASE_EXCEPTION, baseException)
       }

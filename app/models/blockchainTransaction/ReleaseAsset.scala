@@ -41,7 +41,7 @@ class ReleaseAssets @Inject()(protected val databaseConfigProvider: DatabaseConf
     }
   }
 
-  private def update(releaseAsset: ReleaseAsset)(implicit executionContext: ExecutionContext): Future[Int] = db.run(releaseAssetTable.insertOrUpdate(releaseAsset).asTry).map {
+  private def upsert(releaseAsset: ReleaseAsset)(implicit executionContext: ExecutionContext): Future[Int] = db.run(releaseAssetTable.insertOrUpdate(releaseAsset).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
@@ -60,7 +60,7 @@ class ReleaseAssets @Inject()(protected val databaseConfigProvider: DatabaseConf
     }
   }
 
-  private def updateTxHashStatusAndResponseOnTicketID(ticketID: String, txHash: String, status: Boolean, responseCode: String): Future[Int] = db.run(releaseAssetTable.filter(_.ticketID === ticketID).map(x => (x.txHash, x.status, x.responseCode)).update((txHash, status, responseCode)).asTry).map {
+  private def updateTxHashStatusAndResponseCodeOnTicketID(ticketID: String, txHash: String, status: Boolean, responseCode: String): Future[Int] = db.run(releaseAssetTable.filter(_.ticketID === ticketID).map(x => (x.txHash, x.status, x.responseCode)).update((txHash, status, responseCode)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
@@ -119,9 +119,9 @@ class ReleaseAssets @Inject()(protected val databaseConfigProvider: DatabaseConf
 
     def getTicketIDsOnStatus(): Seq[String] = Await.result(getTicketIDsWithNullStatus(), Duration.Inf)
 
-    def updateTxHashStatusResponseCode(ticketID: String, txHash: String, status: Boolean, responseCode: String): Int = Await.result(updateTxHashStatusAndResponseOnTicketID(ticketID, txHash, status, responseCode), Duration.Inf)
+    def markTransactionSuccessful(ticketID: String, txHash: String, responseCode: String): Int = Await.result(updateTxHashStatusAndResponseCodeOnTicketID(ticketID, txHash, status = true, responseCode), Duration.Inf)
 
-    def updateStatusAndResponseCode(ticketID: String, status: Boolean, responseCode: String): Int = Await.result(updateStatusAndResponseOnTicketID(ticketID, status, responseCode), Duration.Inf)
+    def markTransactionFailed(ticketID: String, responseCode: String): Int = Await.result(updateStatusAndResponseOnTicketID(ticketID, status = false, responseCode), Duration.Inf)
 
     def getTransaction(ticketID: String)(implicit executionContext: ExecutionContext): ReleaseAsset = Await.result(findByTicketID(ticketID), Duration.Inf)
 
@@ -134,10 +134,10 @@ class ReleaseAssets @Inject()(protected val databaseConfigProvider: DatabaseConf
   object Utility {
     def onSuccess(ticketID: String, response: Response): Future[Unit] = Future {
       try {
-        Service.updateTxHashStatusResponseCode(ticketID, response.TxHash, status = true, response.Code)
+        Service.markTransactionSuccessful(ticketID, response.TxHash, response.Code)
         val releaseAsset = Service.getTransaction(ticketID)
-        blockchainAssets.Service.updateDirtyBit(releaseAsset.pegHash, true)
-        blockchainAccounts.Service.updateDirtyBit(masterAccounts.Service.getAddress(releaseAsset.from), true)
+        blockchainAssets.Service.markDirty(releaseAsset.pegHash)
+        blockchainAccounts.Service.markDirty(masterAccounts.Service.getAddress(releaseAsset.from))
         pushNotifications.sendNotification(masterAccounts.Service.getId(releaseAsset.to), constants.Notification.SUCCESS, response.TxHash)
         pushNotifications.sendNotification(releaseAsset.from, constants.Notification.SUCCESS, response.TxHash)
       }
@@ -149,7 +149,7 @@ class ReleaseAssets @Inject()(protected val databaseConfigProvider: DatabaseConf
 
     def onFailure(ticketID: String, message: String): Future[Unit] = Future {
       try {
-        Service.updateStatusAndResponseCode(ticketID, status = false, message)
+        Service.markTransactionFailed(ticketID, message)
         val releaseAsset = Service.getTransaction(ticketID)
         pushNotifications.sendNotification(masterAccounts.Service.getId(releaseAsset.to), constants.Notification.FAILURE, message)
         pushNotifications.sendNotification(releaseAsset.from, constants.Notification.FAILURE, message)

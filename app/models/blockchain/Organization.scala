@@ -118,9 +118,9 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
 
     def getID(address: String)(implicit executionContext: ExecutionContext): String = Await.result(getIdByAddress(address), Duration.Inf)
 
-    def getDirtyOrganizations(dirtyBit: Boolean): Seq[Organization] = Await.result(getOrganizationsByDirtyBit(dirtyBit), Duration.Inf)
+    def getDirtyOrganizations: Seq[Organization] = Await.result(getOrganizationsByDirtyBit(dirtyBit = true), Duration.Inf)
 
-    def updateAddressAndDirtyBit(id: String, address: String, dirtyBit: Boolean): Int = Await.result(updateAddressAndDirtyBitByID(id, address, dirtyBit), Duration.Inf)
+    def refreshDirty(id: String, address: String, dirtyBit: Boolean): Int = Await.result(updateAddressAndDirtyBitByID(id, address, dirtyBit), Duration.Inf)
   }
 
   private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
@@ -129,12 +129,12 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
 
   object Utility {
     def dirtyEntityUpdater(): Future[Unit] = Future {
-      val dirtyOrganizations = Service.getDirtyOrganizations(dirtyBit = true)
+      val dirtyOrganizations = Service.getDirtyOrganizations
       Thread.sleep(sleepTime)
       for (dirtyOrganization <- dirtyOrganizations) {
         try {
           val responseAddress = getOrganization.Service.get(dirtyOrganization.id)
-          Service.updateAddressAndDirtyBit(dirtyOrganization.id, responseAddress.address, dirtyBit = false)
+          Service.refreshDirty(dirtyOrganization.id, responseAddress.address, dirtyBit = false)
         }
         catch {
           case blockChainException: BlockChainException => logger.error(blockChainException.message, blockChainException)
