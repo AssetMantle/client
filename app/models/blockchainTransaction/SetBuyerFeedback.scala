@@ -156,8 +156,8 @@ class SetBuyerFeedbacks @Inject()(protected val databaseConfigProvider: Database
       try {
         Service.markTransactionFailed(ticketID, message)
         val setBuyerFeedback = Service.getTransaction(ticketID)
-      pushNotification.sendNotification(masterAccounts.Service.getId(setBuyerFeedback.to), constants.Notification.FAILURE, message)
-      pushNotification.sendNotification(setBuyerFeedback.from, constants.Notification.FAILURE, message)
+        pushNotification.sendNotification(masterAccounts.Service.getId(setBuyerFeedback.to), constants.Notification.FAILURE, message)
+        pushNotification.sendNotification(setBuyerFeedback.from, constants.Notification.FAILURE, message)
       } catch {
         case baseException: BaseException => logger.error(constants.Error.BASE_EXCEPTION, baseException)
       }

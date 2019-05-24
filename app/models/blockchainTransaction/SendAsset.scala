@@ -45,7 +45,7 @@ class SendAssets @Inject()(protected val databaseConfigProvider: DatabaseConfigP
     }
   }
 
-  private def insertOrUpdate(sendAsset: SendAsset)(implicit executionContext: ExecutionContext): Future[Int] = db.run(sendAssetTable.insertOrUpdate(sendAsset).asTry).map {
+  private def upsert(sendAsset: SendAsset)(implicit executionContext: ExecutionContext): Future[Int] = db.run(sendAssetTable.insertOrUpdate(sendAsset).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
