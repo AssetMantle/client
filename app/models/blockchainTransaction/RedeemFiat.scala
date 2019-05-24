@@ -11,7 +11,7 @@ import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
 import transactions.GetResponse
 import transactions.responses.TransactionResponse.Response
-import utilities.PushNotifications
+import utilities.PushNotification
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
@@ -20,7 +20,7 @@ import scala.util.{Failure, Success}
 case class RedeemFiat(from: String, to: String, redeemAmount: Int, gas: Int, status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])
 
 @Singleton
-class RedeemFiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, transactionRedeemFiat: transactions.RedeemFiat, blockchainFiats: blockchain.Fiats, getResponse: GetResponse, actorSystem: ActorSystem, pushNotifications: PushNotifications, masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
+class RedeemFiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, transactionRedeemFiat: transactions.RedeemFiat, blockchainFiats: blockchain.Fiats, getResponse: GetResponse, actorSystem: ActorSystem, pushNotification: PushNotification, masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_REDEEM_ASSET
 
@@ -141,8 +141,8 @@ class RedeemFiats @Inject()(protected val databaseConfigProvider: DatabaseConfig
         val fromAddress = masterAccounts.Service.getAddress(redeemFiat.from)
         blockchainFiats.Service.markDirty(fromAddress)
         blockchainAccounts.Service.markDirty(fromAddress)
-        pushNotifications.sendNotification(masterAccounts.Service.getId(redeemFiat.to), constants.Notification.SUCCESS, response.TxHash)
-        pushNotifications.sendNotification(redeemFiat.from, constants.Notification.SUCCESS, response.TxHash)
+        pushNotification.sendNotification(masterAccounts.Service.getId(redeemFiat.to), constants.Notification.SUCCESS, response.TxHash)
+        pushNotification.sendNotification(redeemFiat.from, constants.Notification.SUCCESS, response.TxHash)
       } catch {
         case baseException: BaseException => logger.error(constants.Error.BASE_EXCEPTION, baseException)
           throw new BaseException(constants.Error.PSQL_EXCEPTION)
@@ -153,8 +153,8 @@ class RedeemFiats @Inject()(protected val databaseConfigProvider: DatabaseConfig
       try {
         Service.markTransactionFailed(ticketID, message)
         val redeemFiat = Service.getTransaction(ticketID)
-        pushNotifications.sendNotification(masterAccounts.Service.getId(redeemFiat.to), constants.Notification.FAILURE, message)
-        pushNotifications.sendNotification(redeemFiat.from, constants.Notification.FAILURE, message)
+        pushNotification.sendNotification(masterAccounts.Service.getId(redeemFiat.to), constants.Notification.FAILURE, message)
+        pushNotification.sendNotification(redeemFiat.from, constants.Notification.FAILURE, message)
       } catch {
         case baseException: BaseException => logger.error(constants.Error.BASE_EXCEPTION, baseException)
       }
