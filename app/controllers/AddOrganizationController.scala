@@ -1,6 +1,5 @@
 package controllers
 
-import constants.Response.Success
 import controllers.actions.{WithUserLoginAction, WithZoneLoginAction}
 import exceptions.{BaseException, BlockChainException}
 import javax.inject.{Inject, Singleton}
@@ -32,7 +31,8 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
         addOrganizationData => {
           try {
             if (masterZones.Service.getStatus(addOrganizationData.zoneID) == Option(true)) {
-              Ok(views.html.index(successes = Seq(new Success(constants.Response.ADD_ORGANIZATION.message + ":" + masterOrganizations.Service.addOrganization(zoneID = addOrganizationData.zoneID, accountID = username, name = addOrganizationData.name, address = addOrganizationData.address, phone = addOrganizationData.phone, email = addOrganizationData.email)))))
+              masterOrganizations.Service.addOrganization(zoneID = addOrganizationData.zoneID, accountID = username, name = addOrganizationData.name, address = addOrganizationData.address, phone = addOrganizationData.phone, email = addOrganizationData.email)
+              Ok(views.html.index(successes = Seq(constants.Response.ORGANIZATION_ADDED)))
             } else {
               Ok(views.html.index(failures = Seq(constants.Response.UNVERIFIED_ZONE)))
             }
@@ -70,7 +70,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
                 }
               }
             }
-            Ok(views.html.index(successes = Seq(new Success(constants.Response.VERIFY_ORGANIZATION.message + verifyOrganizationData.organizationID + ticketID))))
+            Ok(views.html.index(successes = Seq(constants.Response.ORGANIZATION_VERIFIED)))
           }
           catch {
             case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
@@ -124,10 +124,11 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
       addOrganizationData => {
         try {
           if (kafkaEnabled) {
-            Ok(views.html.index(successes = Seq(new Success(transactionsAddOrganization.Service.kafkaPost(transactionsAddOrganization.Request(from = addOrganizationData.from, to = addOrganizationData.to, organizationID = addOrganizationData.organizationID, zoneID = addOrganizationData.zoneID, password = addOrganizationData.password)).ticketID))))
+            transactionsAddOrganization.Service.kafkaPost(transactionsAddOrganization.Request(from = addOrganizationData.from, to = addOrganizationData.to, organizationID = addOrganizationData.organizationID, zoneID = addOrganizationData.zoneID, password = addOrganizationData.password))
           } else {
-            Ok(views.html.index(successes = Seq(new Success(transactionsAddOrganization.Service.post(transactionsAddOrganization.Request(from = addOrganizationData.from, to = addOrganizationData.to, organizationID = addOrganizationData.organizationID, zoneID = addOrganizationData.zoneID, password = addOrganizationData.password)).TxHash))))
+            transactionsAddOrganization.Service.post(transactionsAddOrganization.Request(from = addOrganizationData.from, to = addOrganizationData.to, organizationID = addOrganizationData.organizationID, zoneID = addOrganizationData.zoneID, password = addOrganizationData.password))
           }
+          Ok(views.html.index(successes = Seq(constants.Response.ORGANIZATION_ADDED)))
         }
         catch {
           case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))

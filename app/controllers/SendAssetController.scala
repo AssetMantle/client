@@ -43,7 +43,7 @@ class SendAssetController @Inject()(messagesControllerComponents: MessagesContro
                 }
               }
             }
-            Ok(views.html.index(successes = Seq(new Success(ticketID))))
+            Ok(views.html.index(successes = Seq(constants.Response.ASSET_SENT)))
           }
           catch {
             case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
@@ -65,14 +65,12 @@ class SendAssetController @Inject()(messagesControllerComponents: MessagesContro
       sendAssetData => {
         try {
           if (kafkaEnabled) {
-            val response = transactionsSendAsset.Service.kafkaPost(transactionsSendAsset.Request(from = sendAssetData.from, to = sendAssetData.to, password = sendAssetData.password, pegHash = sendAssetData.pegHash, gas = sendAssetData.gas))
-            blockchainTransactionSendAssets.Service.addSendAsset(from = sendAssetData.from, to = sendAssetData.to, pegHash = sendAssetData.pegHash, gas = sendAssetData.gas, null, null, ticketID = response.ticketID, null)
-            Ok(views.html.index(successes = response.ticketID))
+            transactionsSendAsset.Service.kafkaPost(transactionsSendAsset.Request(from = sendAssetData.from, to = sendAssetData.to, password = sendAssetData.password, pegHash = sendAssetData.pegHash, gas = sendAssetData.gas))
           } else {
-            val response = transactionsSendAsset.Service.post(transactionsSendAsset.Request(from = sendAssetData.from, to = sendAssetData.to, password = sendAssetData.password, pegHash = sendAssetData.pegHash, gas = sendAssetData.gas))
-            blockchainTransactionSendAssets.Service.addSendAsset(from = sendAssetData.from, to = sendAssetData.to, pegHash = sendAssetData.pegHash, gas = sendAssetData.gas, null, txHash = Option(response.TxHash), ticketID = Random.nextString(32), null)
-            Ok(views.html.index(successes = response.TxHash))
+           transactionsSendAsset.Service.post(transactionsSendAsset.Request(from = sendAssetData.from, to = sendAssetData.to, password = sendAssetData.password, pegHash = sendAssetData.pegHash, gas = sendAssetData.gas))
           }
+          Ok(views.html.index(successes = Seq(constants.Response.ASSET_SENT)))
+
         }
         catch {
           case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))

@@ -4,7 +4,7 @@ import controllers.actions.WithLoginAction
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.masterTransaction.AccountTokens
-import play.api.i18n.{I18nSupport, Messages}
+import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
 import views.companion.master.Logout
@@ -33,7 +33,7 @@ class LogoutController @Inject()(messagesControllerComponents: MessagesControlle
             if (!loginData.receiveNotifications) {
               accountTokens.Service.deleteToken(username)
             }
-            Ok(views.html.index(Messages(constants.Success.LOG_OUT))).withNewSession
+            Ok(views.html.index(successes = Seq(constants.Response.LOGGED_OUT))).withNewSession
           }
           catch {
             case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))

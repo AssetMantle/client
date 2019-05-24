@@ -45,7 +45,7 @@ class SetSellerFeedbackController @Inject()(messagesControllerComponents: Messag
                 }
               }
             }
-            Ok(views.html.index(successes = Seq(new Success(ticketID))))
+            Ok(views.html.index(successes = Seq(constants.Response.SELLER_FEEDBACK_SET)))
 
           }
           catch {
@@ -68,10 +68,11 @@ class SetSellerFeedbackController @Inject()(messagesControllerComponents: Messag
       setSellerFeedbackData => {
         try {
           if (kafkaEnabled) {
-            Ok(views.html.index(successes = transactionsSetSellerFeedback.Service.kafkaPost(transactionsSetSellerFeedback.Request(from = setSellerFeedbackData.from, to = setSellerFeedbackData.to, password = setSellerFeedbackData.password, pegHash = setSellerFeedbackData.pegHash, rating = setSellerFeedbackData.rating, gas = setSellerFeedbackData.gas)).ticketID))
+            transactionsSetSellerFeedback.Service.kafkaPost(transactionsSetSellerFeedback.Request(from = setSellerFeedbackData.from, to = setSellerFeedbackData.to, password = setSellerFeedbackData.password, pegHash = setSellerFeedbackData.pegHash, rating = setSellerFeedbackData.rating, gas = setSellerFeedbackData.gas))
           } else {
-            Ok(views.html.index(successes = transactionsSetSellerFeedback.Service.post(transactionsSetSellerFeedback.Request(from = setSellerFeedbackData.from, to = setSellerFeedbackData.to, password = setSellerFeedbackData.password, pegHash = setSellerFeedbackData.pegHash, rating = setSellerFeedbackData.rating, gas = setSellerFeedbackData.gas)).TxHash))
+            transactionsSetSellerFeedback.Service.post(transactionsSetSellerFeedback.Request(from = setSellerFeedbackData.from, to = setSellerFeedbackData.to, password = setSellerFeedbackData.password, pegHash = setSellerFeedbackData.pegHash, rating = setSellerFeedbackData.rating, gas = setSellerFeedbackData.gas))
           }
+          Ok(views.html.index(successes = Seq(constants.Response.SELLER_FEEDBACK_SET)))
         }
         catch {
           case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))

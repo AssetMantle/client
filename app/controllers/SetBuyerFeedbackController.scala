@@ -45,7 +45,7 @@ class SetBuyerFeedbackController @Inject()(messagesControllerComponents: Message
                 }
               }
             }
-            Ok(views.html.index(successes = Seq(new Success(ticketID))))
+            Ok(views.html.index(successes = Seq(constants.Response.BUYER_FEEDBACK_SET)))
           }
           catch {
             case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
@@ -68,10 +68,11 @@ class SetBuyerFeedbackController @Inject()(messagesControllerComponents: Message
       setBuyerFeedbackData => {
         try {
           if (kafkaEnabled) {
-            Ok(views.html.index(successes = transactionsSetBuyerFeedback.Service.kafkaPost(transactionsSetBuyerFeedback.Request(from = setBuyerFeedbackData.from, to = setBuyerFeedbackData.to, password = setBuyerFeedbackData.password, pegHash = setBuyerFeedbackData.pegHash, rating = setBuyerFeedbackData.rating, gas = setBuyerFeedbackData.gas)).ticketID))
+            transactionsSetBuyerFeedback.Service.kafkaPost(transactionsSetBuyerFeedback.Request(from = setBuyerFeedbackData.from, to = setBuyerFeedbackData.to, password = setBuyerFeedbackData.password, pegHash = setBuyerFeedbackData.pegHash, rating = setBuyerFeedbackData.rating, gas = setBuyerFeedbackData.gas))
           } else {
-            Ok(views.html.index(successes = transactionsSetBuyerFeedback.Service.post(transactionsSetBuyerFeedback.Request(from = setBuyerFeedbackData.from, to = setBuyerFeedbackData.to, password = setBuyerFeedbackData.password, pegHash = setBuyerFeedbackData.pegHash, rating = setBuyerFeedbackData.rating, gas = setBuyerFeedbackData.gas)).TxHash))
+            transactionsSetBuyerFeedback.Service.post(transactionsSetBuyerFeedback.Request(from = setBuyerFeedbackData.from, to = setBuyerFeedbackData.to, password = setBuyerFeedbackData.password, pegHash = setBuyerFeedbackData.pegHash, rating = setBuyerFeedbackData.rating, gas = setBuyerFeedbackData.gas))
           }
+          Ok(views.html.index(successes = Seq(constants.Response.BUYER_FEEDBACK_SET)))
         }
         catch {
           case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))

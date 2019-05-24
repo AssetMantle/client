@@ -1,6 +1,5 @@
 package controllers
 
-import constants.Response.Success
 import exceptions.{BaseException, BlockChainException}
 import javax.inject.{Inject, Singleton}
 import play.api.Configuration
@@ -24,7 +23,8 @@ class AddKeyController @Inject()(messagesControllerComponents: MessagesControlle
       },
       addKeyData => {
         try {
-          Ok(views.html.index(successes = Seq(new Success(constants.Response.ADD_KEY.message + transactionsAddKey.Service.post(transactionsAddKey.Request(addKeyData.name, addKeyData.password, addKeyData.seed)).address))))
+          transactionsAddKey.Service.post(transactionsAddKey.Request(addKeyData.name, addKeyData.password, addKeyData.seed))
+          Ok(views.html.index(successes = Seq(constants.Response.KEY_ADDED)))
         }
         catch {
           case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))

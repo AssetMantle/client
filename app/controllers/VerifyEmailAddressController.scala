@@ -42,7 +42,7 @@ class VerifyEmailAddressController @Inject()(messagesControllerComponents: Messa
           try {
             if (!emailOTPs.Service.verifyOTP(username, verifyEmailAddressData.otp)) throw new BaseException(constants.Response.INVALID_OTP)
             if (contacts.Service.verifyEmailAddress(username) != 1) throw new BaseException(constants.Response.EMAIL_NOT_FOUND)
-            Ok(views.html.index(successes = "Email Updated"))
+            Ok(views.html.index(successes = Seq(constants.Response.EMAIL_ADDRESS_VERIFIED)))
           }
           catch {
             case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))

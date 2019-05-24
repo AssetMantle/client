@@ -1,11 +1,10 @@
 package controllers
 
-import constants.Response.Success
 import controllers.actions.{WithGenesisLoginAction, WithUserLoginAction}
 import exceptions.{BaseException, BlockChainException}
 import javax.inject.{Inject, Singleton}
 import models.{blockchain, blockchainTransaction, master}
-import play.api.i18n.{I18nSupport, Messages}
+import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
 
@@ -31,7 +30,8 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
         },
         addZoneData => {
           try {
-            Ok(views.html.index(successes = Seq(new Success(constants.Response.ADD_ZONE.message + ":" + masterZones.Service.addZone(accountID = username, name = addZoneData.name, currency = addZoneData.currency)))))
+            masterZones.Service.addZone(accountID = username, name = addZoneData.name, currency = addZoneData.currency)
+            Ok(views.html.index(successes = Seq(constants.Response.ZONE_REQUEST_SENT)))
           }
           catch {
             case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
@@ -67,11 +67,11 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
                 }
               }
             }
-            Ok(views.html.index(successes = Seq(new Success(constants.Response.VERIFY_ZONE.message + verifyZoneData.zoneID + ticketID))))
+            Ok(views.html.index(successes = Seq(constants.Response.ZONE_VERIFIED)))
           }
           catch {
             case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
-            case blockChainException: BlockChainException => Ok(views.html.index(failures =Messages(blockChainException.message)))
+            case blockChainException: BlockChainException => Ok(views.html.index(failures =Seq(blockChainException.failure)))
           }
         }
       )
@@ -99,7 +99,7 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
         },
         rejectVerifyZoneRequestData => {
           try {
-            masterZones.Service.updateStatus(rejectVerifyZoneRequestData.zoneID, false)
+            masterZones.Service.updateStatus(rejectVerifyZoneRequestData.zoneID, status = false)
             Ok(views.html.index(successes = Seq(constants.Response.VERIFY_ZONE_REJECTED)))
           }
           catch {
@@ -121,10 +121,11 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
       addZoneData => {
         try {
           if (kafkaEnabled) {
-            Ok(views.html.index(successes = transactionsAddZone.Service.kafkaPost(transactionsAddZone.Request(from = addZoneData.from, to = addZoneData.to, zoneID = addZoneData.zoneID, password = addZoneData.password)).ticketID))
+            transactionsAddZone.Service.kafkaPost(transactionsAddZone.Request(from = addZoneData.from, to = addZoneData.to, zoneID = addZoneData.zoneID, password = addZoneData.password)).ticketID
           } else {
-            Ok(views.html.index(successes = transactionsAddZone.Service.post(transactionsAddZone.Request(from = addZoneData.from, to = addZoneData.to, zoneID = addZoneData.zoneID, password = addZoneData.password)).TxHash))
+            transactionsAddZone.Service.post(transactionsAddZone.Request(from = addZoneData.from, to = addZoneData.to, zoneID = addZoneData.zoneID, password = addZoneData.password))
           }
+          Ok(views.html.index(successes = Seq(constants.Response.ZONE_ADDED)))
         }
         catch {
           case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
