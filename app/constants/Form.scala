@@ -110,6 +110,7 @@ object Form {
   val LOGOUT = "LOGOUT"
   val USERNAME = "USERNAME"
   val NOTIFICATION_TOKEN = "NOTIFICATION_TOKEN"
+  val CSRF_TOKEN = "csrfToken"
   val TOKEN = "TOKEN"
   val SIGNUP = "SIGNUP"
   val UPDATE_CONTACT = "UPDATE_CONTACT"

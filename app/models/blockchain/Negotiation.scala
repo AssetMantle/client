@@ -7,7 +7,7 @@ import org.postgresql.util.PSQLException
 import play.api.{Configuration, Logger}
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.JdbcProfile
-import utilities.PushNotifications
+import utilities.PushNotification
 
 import scala.concurrent.duration.{Duration,_}
 import scala.concurrent.{Await, ExecutionContext, Future}
@@ -16,7 +16,7 @@ import scala.util.{Failure, Success}
 case class Negotiation(id: String, buyerAddress: String, sellerAddress: String, assetPegHash: String, bid: String, time: String, buyerSignature: Option[String], sellerSignature: Option[String], dirtyBit: Boolean)
 
 @Singleton
-class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, getNegotiation: queries.GetNegotiation, actorSystem: ActorSystem, implicit val pushNotifications: PushNotifications)(implicit executionContext: ExecutionContext, configuration: Configuration) {
+class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, getNegotiation: queries.GetNegotiation, actorSystem: ActorSystem, implicit val pushNotification: PushNotification)(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
