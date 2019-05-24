@@ -1,8 +1,18 @@
+import _root_.io.gatling.sbt.GatlingPlugin
+import _root_.sbt.Keys._
+
 name := "comdex"
 
 version := "1.0"
 
-lazy val `comdex` = (project in file(".")).enablePlugins(PlayScala)
+lazy val gatlingTest = config("gatling") extend Test
+
+scalaSource in gatlingTest := baseDirectory.value / "gatling/simulation"
+
+lazy val root = (project in file(".")).enablePlugins(PlayScala)
+  .enablePlugins(GatlingPlugin)
+  .configs(gatlingTest)
+  .settings(inConfig(gatlingTest)(Defaults.testSettings): _*)
 
 resolvers += "scalaz-bintray" at "https://dl.bintray.com/scalaz/releases"
 
@@ -23,6 +33,10 @@ libraryDependencies += "com.typesafe.play" %% "play-mailer" % "6.0.1"
 libraryDependencies += "com.typesafe.play" %% "play-mailer-guice" % "6.0.1"
 
 libraryDependencies += "com.twilio.sdk" % "twilio" % "7.15.5"
+
+libraryDependencies +="io.gatling.highcharts" % "gatling-charts-highcharts" % "3.1.1" % "test"
+
+libraryDependencies +=  "io.gatling" % "gatling-test-framework" % "3.1.1" % "test"
 
 unmanagedResourceDirectories in Test += (baseDirectory.value / "target/web/public/test")
 

@@ -8,15 +8,15 @@ import models.masterTransaction.SMSOTPs
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
-import utilities.{PushNotifications, SMS}
+import utilities.SMS
 import views.companion.master.VerifyMobileNumber
 
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class VerifyMobileNumberController @Inject()(messagesControllerComponents: MessagesControllerComponents, smsOTPs: SMSOTPs, contacts: Contacts, withLoginAction: WithLoginAction, pushNotifications: PushNotifications, SMS: SMS)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class VerifyMobileNumberController @Inject()(messagesControllerComponents: MessagesControllerComponents, smsOTPs: SMSOTPs, contacts: Contacts, withLoginAction: WithLoginAction, SMS: SMS)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
-  private implicit val module: String = constants.Module.MASTER_ACCOUNT
+  private implicit val module: String = constants.Module.CONTROLLERS_SMS
 
   private implicit val logger: Logger = Logger(this.getClass)
 

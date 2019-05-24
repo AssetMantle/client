@@ -10,7 +10,7 @@ import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
 import transactions.responses.TransactionResponse.Response
-import utilities.PushNotifications
+import utilities.PushNotification
 
 import scala.concurrent.duration.{Duration, _}
 import scala.concurrent.{Await, ExecutionContext, Future}
@@ -19,7 +19,7 @@ import scala.util.{Failure, Success}
 case class BuyerExecuteOrder(from: String, buyerAddress: String, sellerAddress: String, fiatProofHash: String, pegHash: String, gas: Int,  status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])
 
 @Singleton
-class BuyerExecuteOrders @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, blockchainTransactionFeedbacks: blockchain.TransactionFeedbacks, blockchainNegotiations: blockchain.Negotiations, blockchainOrders: blockchain.Orders, transactionBuyerExecuteOrder: transactions.BuyerExecuteOrder, actorSystem: ActorSystem, pushNotifications: PushNotifications,masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext)  {
+class BuyerExecuteOrders @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, blockchainTransactionFeedbacks: blockchain.TransactionFeedbacks, blockchainNegotiations: blockchain.Negotiations, blockchainOrders: blockchain.Orders, transactionBuyerExecuteOrder: transactions.BuyerExecuteOrder, actorSystem: ActorSystem, pushNotification: PushNotification,masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext)  {
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_BUYER_EXECUTE_ORDER
 
@@ -147,8 +147,8 @@ class BuyerExecuteOrders @Inject()(protected val databaseConfigProvider: Databas
         blockchainAccounts.Service.updateDirtyBit(buyerExecuteOrder.buyerAddress,true)
         blockchainTransactionFeedbacks.Service.updateDirtyBit(buyerExecuteOrder.buyerAddress, true)
         blockchainTransactionFeedbacks.Service.updateDirtyBit(buyerExecuteOrder.sellerAddress, true)
-        pushNotifications.sendNotification(masterAccounts.Service.getId(buyerExecuteOrder.sellerAddress), constants.Notification.SUCCESS, response.TxHash)
-        pushNotifications.sendNotification(buyerExecuteOrder.from, constants.Notification.SUCCESS, response.TxHash)
+        pushNotification.sendNotification(masterAccounts.Service.getId(buyerExecuteOrder.sellerAddress), constants.Notification.SUCCESS, response.TxHash)
+        pushNotification.sendNotification(buyerExecuteOrder.from, constants.Notification.SUCCESS, response.TxHash)
       } catch {
         case baseException: BaseException => logger.error(constants.Error.BASE_EXCEPTION, baseException)
           throw new BaseException(constants.Error.PSQL_EXCEPTION)
@@ -161,8 +161,8 @@ class BuyerExecuteOrders @Inject()(protected val databaseConfigProvider: Databas
         val buyerExecuteOrder = Service.getTransaction(ticketID)
         blockchainTransactionFeedbacks.Service.updateDirtyBit(buyerExecuteOrder.buyerAddress, true)
         blockchainTransactionFeedbacks.Service.updateDirtyBit(buyerExecuteOrder.sellerAddress, true)
-        pushNotifications.sendNotification(masterAccounts.Service.getId(buyerExecuteOrder.sellerAddress), constants.Notification.FAILURE, message)
-        pushNotifications.sendNotification(buyerExecuteOrder.from, constants.Notification.FAILURE, message)
+        pushNotification.sendNotification(masterAccounts.Service.getId(buyerExecuteOrder.sellerAddress), constants.Notification.FAILURE, message)
+        pushNotification.sendNotification(buyerExecuteOrder.from, constants.Notification.FAILURE, message)
       } catch {
         case baseException: BaseException => logger.error(constants.Error.BASE_EXCEPTION, baseException)
       }

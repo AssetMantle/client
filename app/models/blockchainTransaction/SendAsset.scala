@@ -13,7 +13,7 @@ import play.api.{Configuration, Logger}
 import queries.GetOrder
 import slick.jdbc.JdbcProfile
 import transactions.responses.TransactionResponse.Response
-import utilities.PushNotifications
+import utilities.PushNotification
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
@@ -22,7 +22,7 @@ import scala.util.{Failure, Success}
 case class SendAsset(from: String, to: String, pegHash: String, gas: Int, status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])
 
 @Singleton
-class SendAssets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, getOrder: GetOrder, blockchainTransactionFeedbacks: blockchain.TransactionFeedbacks, blockchainAssets: blockchain.Assets, blockchainOrders: blockchain.Orders, blockchainNegotiations: blockchain.Negotiations, transactionSendAsset: transactions.SendAsset, actorSystem: ActorSystem, pushNotifications: PushNotifications, masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
+class SendAssets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, getOrder: GetOrder, blockchainTransactionFeedbacks: blockchain.TransactionFeedbacks, blockchainAssets: blockchain.Assets, blockchainOrders: blockchain.Orders, blockchainNegotiations: blockchain.Negotiations, transactionSendAsset: transactions.SendAsset, actorSystem: ActorSystem, pushNotification: PushNotification, masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_SEND_ASSET
 
@@ -149,8 +149,8 @@ class SendAssets @Inject()(protected val databaseConfigProvider: DatabaseConfigP
         orderResponse.value.assetPegWallet.getOrElse(Seq()).foreach(asset => blockchainAssets.Service.insertOrUpdateAsset(pegHash = asset.pegHash, documentHash = asset.documentHash, assetType = asset.assetType, assetPrice = asset.assetPrice, assetQuantity = asset.assetQuantity, quantityUnit = asset.quantityUnit, locked = asset.locked, unmoderated = asset.unmoderated, ownerAddress = negotiationID, dirtyBit = false))
         blockchainAccounts.Service.updateDirtyBit(fromAddress, true)
         blockchainTransactionFeedbacks.Service.updateDirtyBit(fromAddress, true)
-        pushNotifications.sendNotification(masterAccounts.Service.getId(sendAsset.to), constants.Notification.SUCCESS, response.TxHash)
-        pushNotifications.sendNotification(sendAsset.from, constants.Notification.SUCCESS, response.TxHash)
+        pushNotification.sendNotification(masterAccounts.Service.getId(sendAsset.to), constants.Notification.SUCCESS, response.TxHash)
+        pushNotification.sendNotification(sendAsset.from, constants.Notification.SUCCESS, response.TxHash)
       } catch {
         case baseException: BaseException => logger.error(constants.Error.BASE_EXCEPTION, baseException)
           throw new BaseException(constants.Error.PSQL_EXCEPTION)
@@ -163,8 +163,8 @@ class SendAssets @Inject()(protected val databaseConfigProvider: DatabaseConfigP
         Service.updateStatusAndResponseCode(ticketID, status = false, message)
         val sendAsset = Service.getTransaction(ticketID)
         blockchainTransactionFeedbacks.Service.updateDirtyBit(masterAccounts.Service.getAddress(sendAsset.from), true)
-        pushNotifications.sendNotification(masterAccounts.Service.getId(sendAsset.to), constants.Notification.FAILURE, message)
-        pushNotifications.sendNotification(sendAsset.from, constants.Notification.FAILURE, message)
+        pushNotification.sendNotification(masterAccounts.Service.getId(sendAsset.to), constants.Notification.FAILURE, message)
+        pushNotification.sendNotification(sendAsset.from, constants.Notification.FAILURE, message)
       } catch {
         case baseException: BaseException => logger.error(constants.Error.BASE_EXCEPTION, baseException)
       }
