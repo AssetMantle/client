@@ -30,7 +30,7 @@ class SignUpController @Inject()(messagesControllerComponents: MessagesControlle
       },
       signUpData => {
         try {
-          val x = accounts.Service.addLogin(signUpData.username, signUpData.password, blockchainAccounts.Service.addAccount(signUpData.username, signUpData.password), request.lang.toString.stripPrefix("Lang(").stripSuffix(")").trim.split("_")(0))
+          accounts.Service.addLogin(signUpData.username, signUpData.password, blockchainAccounts.Service.addAccount(signUpData.username, signUpData.password), request.lang.toString.stripPrefix("Lang(").stripSuffix(")").trim.split("_")(0))
           Ok(views.html.index(successes = Seq(constants.Response.SIGNED_UP)))
         } catch {
           case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))

@@ -13,7 +13,7 @@ import scala.concurrent.ExecutionContext
 
 class SMS @Inject()(contacts: Contacts, accounts: Accounts, messagesApi: MessagesApi)(implicit exec: ExecutionContext, configuration: Configuration) {
 
-  private implicit val module: String = constants.Module.CONTROLLERS_SMS
+  private implicit val module: String = constants.Module.UTILITIES_SMS
 
   private val accountSID = configuration.get[String]("twilio.accountSID")
 

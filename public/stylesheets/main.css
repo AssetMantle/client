@@ -132,6 +132,10 @@ ul.contributors img{width:25px;padding:1px;border:1px solid #ddd;margin-right:5p
 ul.contributors a{color:inherit;text-decoration:none;}
 ul.contributors span{font-weight:bold;color:#666;}
 ul.contributors.others li{display:inline-block;width:32.3333%;}
+
+.hidden {
+    display: none;
+}
 div.list{float:left;width:33.3333%;margin-bottom:30px;}
 h2{clear:both;}
 span.by{font-size:14px;font-weight:normal;}
