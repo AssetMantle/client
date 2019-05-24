@@ -80,10 +80,6 @@ class AddOrganizations @Inject()(protected val databaseConfigProvider: DatabaseC
 
   private def getTicketIDsWithNullStatus()(implicit executionContext: ExecutionContext): Future[Seq[String]] = db.run(addOrganizationTable.filter(_.status.?.isEmpty).map(_.ticketID).result)
 
-  private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
-  private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
-  private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
-
   private[models] class AddOrganizationTable(tag: Tag) extends Table[AddOrganization](tag, "AddOrganization") {
 
     def * = (from, to, organizationID, zoneID, status.?, txHash.?, ticketID, responseCode.?) <> (AddOrganization.tupled, AddOrganization.unapply)

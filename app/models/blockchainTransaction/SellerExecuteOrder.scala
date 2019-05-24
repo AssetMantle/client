@@ -37,10 +37,6 @@ class SellerExecuteOrders @Inject()(protected val databaseConfigProvider: Databa
   private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
   private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
   private val sleepTime = configuration.get[Long]("blockchain.entityIterator.threadSleep")
-  private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
-  private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
-  private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
-  private val sleepTime = configuration.get[Long]("blockchain.entityIterator.threadSleep")
 
   private def add(sellerExecuteOrder: SellerExecuteOrder)(implicit executionContext: ExecutionContext): Future[String] = db.run((sellerExecuteOrderTable returning sellerExecuteOrderTable.map(_.ticketID) += sellerExecuteOrder).asTry).map {
     case Success(result) => result
