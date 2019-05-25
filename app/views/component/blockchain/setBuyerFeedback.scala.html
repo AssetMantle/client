@@ -2,23 +2,21 @@
 @import views.companion.blockchain.SetBuyerFeedback
 
 @(setBuyerFeedbackForm: Form[SetBuyerFeedback.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages(constants.Form.SET_BUYER_FEEDBACK)) {
-  @form(action = routes.SetBuyerFeedbackController.blockchainSetBuyerFeedback, 'onkeypress -> "validateForm(event,this)") {
-        @CSRF.formField
-        @inputText(setBuyerFeedbackForm(constants.Form.FROM),'_label-> Messages(constants.Form.FROM))
-        @inputText(setBuyerFeedbackForm(constants.Form.TO),'_label-> Messages(constants.Form.TO))
-        @inputText(setBuyerFeedbackForm(constants.Form.PEG_HASH),'_label-> Messages(constants.Form.PEG_HASH))
-        @inputText(setBuyerFeedbackForm(constants.Form.RATING),'_label-> Messages(constants.Form.RATING))
-        @inputText(setBuyerFeedbackForm(constants.Form.GAS),'_label-> Messages(constants.Form.GAS))
-        @inputPassword(setBuyerFeedbackForm(constants.Form.PASSWORD),'_label-> Messages(constants.Form.PASSWORD))
+@form(action = routes.SetBuyerFeedbackController.blockchainSetBuyerFeedback, 'onkeypress -> "validateForm(event,this)") {
+    @CSRF.formField
+    @inputText(setBuyerFeedbackForm(constants.Form.FROM), '_label -> Messages(constants.Form.FROM))
+    @inputText(setBuyerFeedbackForm(constants.Form.TO), '_label -> Messages(constants.Form.TO))
+    @inputText(setBuyerFeedbackForm(constants.Form.PEG_HASH), '_label -> Messages(constants.Form.PEG_HASH))
+    @inputText(setBuyerFeedbackForm(constants.Form.RATING), '_label -> Messages(constants.Form.RATING))
+    @inputText(setBuyerFeedbackForm(constants.Form.GAS), '_label -> Messages(constants.Form.GAS))
+    @inputPassword(setBuyerFeedbackForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD))
 
-        @if(setBuyerFeedbackForm.hasGlobalErrors) {
-            <ul>
-            @for(error <- setBuyerFeedbackForm.globalErrors) {
-                <li>@error.format</li>
-            }
-            </ul>
+    @if(setBuyerFeedbackForm.hasGlobalErrors) {
+        <ul>
+        @for(error <- setBuyerFeedbackForm.globalErrors) {
+            <li>@error.format</li>
         }
-    <button type="button" onclick="submitForm(this)">@Messages(constants.Form.SET_BUYER_FEEDBACK)</button>
+        </ul>
     }
+    <button type="button" onclick="submitForm(this)">@Messages(constants.Form.SET_BUYER_FEEDBACK)</button>
 }

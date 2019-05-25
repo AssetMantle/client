@@ -2,23 +2,21 @@
 @import views.companion.blockchain.SendFiat
 
 @(sendFiatForm: Form[SendFiat.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages(constants.Form.SEND_FIAT)) {
-  @form(action = routes.SendFiatController.blockchainSendFiat, 'onkeypress -> "validateForm(event,this)") {
-        @CSRF.formField
-        @inputText(sendFiatForm(constants.Form.FROM),'_label-> Messages(constants.Form.FROM))
-        @inputText(sendFiatForm(constants.Form.TO),'_label-> Messages(constants.Form.TO))
-        @inputText(sendFiatForm(constants.Form.AMOUNT),'_label-> Messages(constants.Form.AMOUNT))
-        @inputText(sendFiatForm(constants.Form.PEG_HASH),'_label-> Messages(constants.Form.PEG_HASH))
-        @inputText(sendFiatForm(constants.Form.GAS),'_label-> Messages(constants.Form.GAS))
-        @inputPassword(sendFiatForm(constants.Form.PASSWORD),'_label-> Messages(constants.Form.PASSWORD))
+@form(action = routes.SendFiatController.blockchainSendFiat, 'onkeypress -> "validateForm(event,this)") {
+    @CSRF.formField
+    @inputText(sendFiatForm(constants.Form.FROM), '_label -> Messages(constants.Form.FROM))
+    @inputText(sendFiatForm(constants.Form.TO), '_label -> Messages(constants.Form.TO))
+    @inputText(sendFiatForm(constants.Form.AMOUNT), '_label -> Messages(constants.Form.AMOUNT))
+    @inputText(sendFiatForm(constants.Form.PEG_HASH), '_label -> Messages(constants.Form.PEG_HASH))
+    @inputText(sendFiatForm(constants.Form.GAS), '_label -> Messages(constants.Form.GAS))
+    @inputPassword(sendFiatForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD))
 
-        @if(sendFiatForm.hasGlobalErrors) {
-            <ul>
-            @for(error <- sendFiatForm.globalErrors) {
-                <li>@error.format</li>
-            }
-            </ul>
+    @if(sendFiatForm.hasGlobalErrors) {
+        <ul>
+        @for(error <- sendFiatForm.globalErrors) {
+            <li>@error.format</li>
         }
-    <button type="button" onclick="submitForm(this)">@Messages(constants.Form.SEND_FIAT)</button>
+        </ul>
     }
+    <button type="button" onclick="submitForm(this)">@Messages(constants.Form.SEND_FIAT)</button>
 }

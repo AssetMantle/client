@@ -2,20 +2,18 @@
 @import views.companion.blockchain.AddKey
 
 @(addKeyFrom: Form[AddKey.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages(constants.Form.ADD_KEY)) {
-  @form(action = routes.AddKeyController.blockchainAddKey, 'onkeypress -> "validateForm(event,this)") {
-        @CSRF.formField
-        @inputText(addKeyFrom(constants.Form.NAME),'_label-> Messages(constants.Form.NAME))
-        @inputText(addKeyFrom(constants.Form.SEED),'_label-> Messages(constants.Form.SEED))
-        @inputPassword(addKeyFrom(constants.Form.PASSWORD),'_label-> Messages(constants.Form.PASSWORD))
+@form(action = routes.AddKeyController.blockchainAddKey, 'onkeypress -> "validateForm(event,this)") {
+    @CSRF.formField
+    @inputText(addKeyFrom(constants.Form.NAME), '_label -> Messages(constants.Form.NAME))
+    @inputText(addKeyFrom(constants.Form.SEED), '_label -> Messages(constants.Form.SEED))
+    @inputPassword(addKeyFrom(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD))
 
-        @if(addKeyFrom.hasGlobalErrors) {
-            <ul>
-            @for(error <- addKeyFrom.globalErrors) {
-                <li>@error.format</li>
-            }
-            </ul>
+    @if(addKeyFrom.hasGlobalErrors) {
+        <ul>
+        @for(error <- addKeyFrom.globalErrors) {
+            <li>@error.format</li>
         }
-    <button type="button" onclick="submitForm(this)">@Messages(constants.Form.ADD_KEY)</button>
+        </ul>
     }
+    <button type="button" onclick="submitForm(this)">@Messages(constants.Form.ADD_KEY)</button>
 }

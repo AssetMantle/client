@@ -2,22 +2,20 @@
 @import views.companion.blockchain.RedeemFiat
 
 @(redeemFiatForm: Form[RedeemFiat.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages(constants.Form.REDEEM_FIAT)) {
-  @form(action = routes.RedeemFiatController.blockchainRedeemFiat, 'onkeypress -> "validateForm(event,this)") {
-        @CSRF.formField
-        @inputText(redeemFiatForm(constants.Form.FROM),'_label-> Messages(constants.Form.FROM))
-        @inputText(redeemFiatForm(constants.Form.TO),'_label-> Messages(constants.Form.TO))
-        @inputText(redeemFiatForm(constants.Form.REDEEM_AMOUNT),'_label-> Messages(constants.Form.REDEEM_AMOUNT))
-        @inputText(redeemFiatForm(constants.Form.GAS),'_label-> Messages(constants.Form.GAS))
-        @inputPassword(redeemFiatForm(constants.Form.PASSWORD),'_label-> Messages(constants.Form.PASSWORD))
+@form(action = routes.RedeemFiatController.blockchainRedeemFiat, 'onkeypress -> "validateForm(event,this)") {
+    @CSRF.formField
+    @inputText(redeemFiatForm(constants.Form.FROM), '_label -> Messages(constants.Form.FROM))
+    @inputText(redeemFiatForm(constants.Form.TO), '_label -> Messages(constants.Form.TO))
+    @inputText(redeemFiatForm(constants.Form.REDEEM_AMOUNT), '_label -> Messages(constants.Form.REDEEM_AMOUNT))
+    @inputText(redeemFiatForm(constants.Form.GAS), '_label -> Messages(constants.Form.GAS))
+    @inputPassword(redeemFiatForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD))
 
-        @if(redeemFiatForm.hasGlobalErrors) {
-            <ul>
-            @for(error <- redeemFiatForm.globalErrors) {
-                <li>@error.format</li>
-            }
-            </ul>
+    @if(redeemFiatForm.hasGlobalErrors) {
+        <ul>
+        @for(error <- redeemFiatForm.globalErrors) {
+            <li>@error.format</li>
         }
-    <button type="button" onclick="submitForm(this)">@Messages(constants.Form.REDEEM_FIAT)</button>
+        </ul>
     }
+    <button type="button" onclick="submitForm(this)">@Messages(constants.Form.REDEEM_FIAT)</button>
 }
