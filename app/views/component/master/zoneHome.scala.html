@@ -1,6 +1,6 @@
 @import models.master.Zone
 
-@(username: String, userType: String, address: String, coins: Int = 0, zone: Zone)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
+@(username: String, address: String, coins: Int = 0, zone: Zone)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
 
 @common(Messages(constants.User.HOME)) {
 
@@ -12,7 +12,7 @@
     <a href="@routes.SellerExecuteOrderController.sellerExecuteOrderForm()">@Messages(constants.Form.SELLER_EXECUTE_ORDER)</a>
     <a href="@routes.SetACLController.setACLForm">@Messages(constants.Form.SET_ACL)</a>
 
-    @component.master.commonHome(username = username, userType = userType, address = address, coins = coins)
+    @component.master.commonHome(username = username, userType = constants.User.ZONE, address = address, coins = coins)
 
     <br>
     <h2>@Messages(constants.Form.ZONE):</h2>
