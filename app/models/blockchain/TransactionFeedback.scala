@@ -7,6 +7,7 @@ import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.{Configuration, Logger}
 import queries.GetTraderReputation
+import queries.responses.TraderReputationResponse
 import queries.responses.TraderReputationResponse.TransactionFeedbackResponse
 import slick.jdbc.JdbcProfile
 
@@ -54,6 +55,14 @@ class TransactionFeedbacks @Inject()(protected val databaseConfigProvider: Datab
   private[models] val transactionFeedbackTable = TableQuery[TransactionFeedbackTable]
 
   private def add(transactionFeedback: TransactionFeedback)(implicit executionContext: ExecutionContext): Future[String] = db.run((transactionFeedbackTable returning transactionFeedbackTable.map(_.address) += transactionFeedback).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
+        throw new BaseException(constants.Error.PSQL_EXCEPTION)
+    }
+  }
+
+  private def upsert(transactionFeedback: TransactionFeedback)(implicit executionContext: ExecutionContext): Future[Int] = db.run(transactionFeedbackTable.insertOrUpdate(transactionFeedback).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
@@ -197,6 +206,8 @@ class TransactionFeedbacks @Inject()(protected val databaseConfigProvider: Datab
 
     def addTransactionFeedback(address: String, transactionFeedbackResponse: TransactionFeedbackResponse, dirtyBit: Boolean)(implicit executionContext: ExecutionContext): String = Await.result(add(TransactionFeedback(address = address, SendAssetCounts(transactionFeedbackResponse.sendAssetsPositiveTx, transactionFeedbackResponse.sendAssetsNegativeTx), SendFiatCounts(transactionFeedbackResponse.sendFiatsPositiveTx, transactionFeedbackResponse.sendFiatsNegativeTx), IBCIssueAssetCounts(transactionFeedbackResponse.ibcIssueAssetsPositiveTx, transactionFeedbackResponse.ibcIssueAssetsNegativeTx), IBCIssueFiatCounts(transactionFeedbackResponse.ibcIssueFiatsPositiveTx, transactionFeedbackResponse.ibcIssueFiatsNegativeTx), BuyerExecuteOrderCounts(transactionFeedbackResponse.buyerExecuteOrderPositiveTx, transactionFeedbackResponse.buyerExecuteOrderNegativeTx), SellerExecuteOrderCounts(transactionFeedbackResponse.sellerExecuteOrderPositiveTx, transactionFeedbackResponse.sellerExecuteOrderNegativeTx), ChangeBuyerBidCounts(transactionFeedbackResponse.changeBuyerBidPositiveTx, transactionFeedbackResponse.changeBuyerBidNegativeTx), ChangeSellerBidCounts(transactionFeedbackResponse.changeSellerBidPositiveTx, transactionFeedbackResponse.changeSellerBidNegativeTx), ConfirmBuyerBidCounts(transactionFeedbackResponse.confirmBuyerBidPositiveTx, transactionFeedbackResponse.confirmBuyerBidNegativeTx), ConfirmSellerBidCounts(transactionFeedbackResponse.confirmSellerBidPositiveTx, transactionFeedbackResponse.confirmSellerBidNegativeTx), NegotiationCounts(transactionFeedbackResponse.negotiationPositiveTx, transactionFeedbackResponse.negotiationNegativeTx), dirtyBit = dirtyBit)), Duration.Inf)
 
+    def insertOrUpdate(address: String, transactionFeedbackResponse: TransactionFeedbackResponse, dirtyBit: Boolean)(implicit executionContext: ExecutionContext): Int = Await.result(upsert(TransactionFeedback(address = address, SendAssetCounts(transactionFeedbackResponse.sendAssetsPositiveTx, transactionFeedbackResponse.sendAssetsNegativeTx), SendFiatCounts(transactionFeedbackResponse.sendFiatsPositiveTx, transactionFeedbackResponse.sendFiatsNegativeTx), IBCIssueAssetCounts(transactionFeedbackResponse.ibcIssueAssetsPositiveTx, transactionFeedbackResponse.ibcIssueAssetsNegativeTx), IBCIssueFiatCounts(transactionFeedbackResponse.ibcIssueFiatsPositiveTx, transactionFeedbackResponse.ibcIssueFiatsNegativeTx), BuyerExecuteOrderCounts(transactionFeedbackResponse.buyerExecuteOrderPositiveTx, transactionFeedbackResponse.buyerExecuteOrderNegativeTx), SellerExecuteOrderCounts(transactionFeedbackResponse.sellerExecuteOrderPositiveTx, transactionFeedbackResponse.sellerExecuteOrderNegativeTx), ChangeBuyerBidCounts(transactionFeedbackResponse.changeBuyerBidPositiveTx, transactionFeedbackResponse.changeBuyerBidNegativeTx), ChangeSellerBidCounts(transactionFeedbackResponse.changeSellerBidPositiveTx, transactionFeedbackResponse.changeSellerBidNegativeTx), ConfirmBuyerBidCounts(transactionFeedbackResponse.confirmBuyerBidPositiveTx, transactionFeedbackResponse.confirmBuyerBidNegativeTx), ConfirmSellerBidCounts(transactionFeedbackResponse.confirmSellerBidPositiveTx, transactionFeedbackResponse.confirmSellerBidNegativeTx), NegotiationCounts(transactionFeedbackResponse.negotiationPositiveTx, transactionFeedbackResponse.negotiationNegativeTx), dirtyBit = dirtyBit)), Duration.Inf)
+
     def getAddress(address: String)(implicit executionContext: ExecutionContext): TransactionFeedback = Await.result(findById(address), Duration.Inf)
 
     def getDirtyAddresses(dirtyBit: Boolean): Seq[String] = Await.result(getTransactionFeedbacksByDirtyBit(dirtyBit), Duration.Inf)
@@ -216,7 +227,11 @@ class TransactionFeedbacks @Inject()(protected val databaseConfigProvider: Datab
           Service.updateTransactionFeedback(response.value.address, response.value.transactionFeedback, dirtyBit = false)
         }
         catch {
-          case blockChainException: BlockChainException => logger.error(blockChainException.message, blockChainException)
+          case blockChainException: BlockChainException => if (blockChainException.message == constants.Error.NO_RESPONSE) {
+            Service.updateTransactionFeedback(dirtyAddress, TraderReputationResponse.TransactionFeedbackResponse("0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"), dirtyBit = false)
+          } else {
+            logger.error(blockChainException.message, blockChainException)
+          }
           case baseException: BaseException => logger.error(constants.Error.BASE_EXCEPTION, baseException)
         }
       }

@@ -5,7 +5,7 @@
 
 @common(Messages(constants.User.HOME)) {
     @if(aclHash.buyerExecuteOrder) {
-        <a href="@routes.BuyerExecuteOrderController.buyerExecuteOrderForm()">@Messages(constants.Form.BUYER_EXECUTE_ORDER)</a>
+        <a href="@routes.BuyerExecuteOrderController.unmoderatedBuyerExecuteOrderForm">@Messages(constants.Form.UNMODERATED_BUYER_EXECUTE_ORDER)</a>
     }
     @if(aclHash.changeBuyerBid) {
         <a href="@routes.ChangeBuyerBidController.changeBuyerBidForm">@Messages(constants.Form.CHANGE_BUYER_BID)</a>
@@ -35,7 +35,7 @@
         <a href="@routes.ReleaseAssetController.releaseAssetForm">@Messages(constants.Form.RELEASE_ASSET)</a>
     }
     @if(aclHash.sellerExecuteOrder) {
-        <a href="@routes.SellerExecuteOrderController.sellerExecuteOrderForm()">@Messages(constants.Form.SELLER_EXECUTE_ORDER)</a>
+        <a href="@routes.SellerExecuteOrderController.unmoderatedSellerExecuteOrderForm">@Messages(constants.Form.UNMODERATED_SELLER_EXECUTE_ORDER)</a>
     }
     @if(aclHash.sendAsset) {
         <a href="@routes.SendAssetController.sendAssetForm">@Messages(constants.Form.SEND_ASSET)</a>
