@@ -127,9 +127,7 @@ class Orders @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
             } else {
               blockchainAssets.Service.deleteAssetPegWallet(negotiation.sellerAddress)
             }
-            sellerAccount.value.fiatPegWallet.getOrElse(Seq()).foreach(fiatPeg => {
-              blockchainFiats.Service.insertOrUpdateFiat(fiatPeg.pegHash, negotiation.sellerAddress, fiatPeg.transactionID, fiatPeg.transactionAmount, fiatPeg.redeemedAmount, dirtyBit = true)
-            })
+            sellerAccount.value.fiatPegWallet.foreach(fiats => fiats.foreach(fiatPeg => blockchainFiats.Service.insertOrUpdateFiat(fiatPeg.pegHash, negotiation.sellerAddress, fiatPeg.transactionID, fiatPeg.transactionAmount, fiatPeg.redeemedAmount, dirtyBit = true)))
 
             val buyerAccount = getAccount.Service.get(negotiation.buyerAddress)
             if (buyerAccount.value.assetPegWallet.isDefined) {
@@ -137,9 +135,7 @@ class Orders @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
             } else {
               blockchainAssets.Service.deleteAssetPegWallet(negotiation.buyerAddress)
             }
-            buyerAccount.value.fiatPegWallet.getOrElse(Seq()).foreach(fiatPeg => {
-              blockchainFiats.Service.insertOrUpdateFiat(fiatPeg.pegHash, negotiation.buyerAddress, fiatPeg.transactionID, fiatPeg.transactionAmount, fiatPeg.redeemedAmount, dirtyBit = true)
-            })
+            buyerAccount.value.fiatPegWallet.foreach(fiats => fiats.foreach(fiatPeg => blockchainFiats.Service.insertOrUpdateFiat(fiatPeg.pegHash, negotiation.buyerAddress, fiatPeg.transactionID, fiatPeg.transactionAmount, fiatPeg.redeemedAmount, dirtyBit = true)))
 
             blockchainFiats.Service.deleteFiatPegWallet(dirtyOrder.id)
           }

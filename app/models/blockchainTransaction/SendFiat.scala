@@ -150,7 +150,7 @@ class SendFiats @Inject()(protected val databaseConfigProvider: DatabaseConfigPr
         blockchainTransactionFeedbacks.Service.updateDirtyBit(fromAddress, true)
         Thread.sleep(sleepTime)
         val orderResponse = getOrder.Service.get(negotiationID)
-        orderResponse.value.fiatPegWallet.getOrElse(Seq()).foreach(fiatPeg => blockchainFiats.Service.insertOrUpdateFiat(pegHash = fiatPeg.pegHash, ownerAddress = negotiationID, transactionID = fiatPeg.transactionID, transactionAmount = fiatPeg.transactionAmount, redeemedAmount = fiatPeg.redeemedAmount, dirtyBit = false))
+        orderResponse.value.fiatPegWallet.foreach(fiats => fiats.foreach(fiatPeg => blockchainFiats.Service.insertOrUpdateFiat(pegHash = fiatPeg.pegHash, ownerAddress = negotiationID, transactionID = fiatPeg.transactionID, transactionAmount = fiatPeg.transactionAmount, redeemedAmount = fiatPeg.redeemedAmount, dirtyBit = false)))
         blockchainAccounts.Service.updateDirtyBit(fromAddress, dirtyBit = true)
         pushNotification.sendNotification(masterAccounts.Service.getId(sendFiat.to), constants.Notification.SUCCESS, response.TxHash)
         pushNotification.sendNotification(sendFiat.from, constants.Notification.SUCCESS, response.TxHash)

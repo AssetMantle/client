@@ -1,5 +1,5 @@
 $(document).ready(function () {
-    $('input[id="unmoderated"]').click(function () {
+    $('#unmoderated').click(function () {
         if ($(this).prop("checked") === true) {
             $('#unmoderatedIssueAssetRequestFormFields').show();
         }
