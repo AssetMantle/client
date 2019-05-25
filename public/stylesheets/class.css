@@ -156,3 +156,7 @@ body{
 }
 
 /* Notification*/
+
+.hidden {
+    display: None;
+}
