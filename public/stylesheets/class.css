@@ -343,3 +343,8 @@ blur(5 px);
 }
 
 /*Navbar*/
+
+
+.hidden {
+    display: None;
+}

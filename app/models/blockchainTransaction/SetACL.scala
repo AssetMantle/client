@@ -184,7 +184,7 @@ class SetACLs @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
         blockchainAclAccounts.Service.addOrUpdateACLAccount(setACL.aclAddress, setACL.zoneID, setACL.organizationID, blockchainAclHashes.Service.getACL(setACL.aclHash), dirtyBit = true)
         masterAccounts.Service.updateUserTypeOnAddress(setACL.aclAddress, constants.User.TRADER)
         blockchainAccounts.Service.updateDirtyBit(masterAccounts.Service.getAddress(setACL.from), dirtyBit = true)
-        blockchainTransactionFeedbacks.Service.addTransactionFeedback(setACL.aclAddress, TraderReputationResponse.TransactionFeedbackResponse("0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"), false)
+        blockchainTransactionFeedbacks.Service.insertOrUpdate(setACL.aclAddress, TraderReputationResponse.TransactionFeedbackResponse("0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"), dirtyBit = true)
         pushNotification.sendNotification(masterAccounts.Service.getId(setACL.aclAddress), constants.Notification.SUCCESS, response.TxHash)
         pushNotification.sendNotification(setACL.from, constants.Notification.SUCCESS, response.TxHash)
       } catch {

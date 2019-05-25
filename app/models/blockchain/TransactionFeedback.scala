@@ -7,6 +7,7 @@ import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.{Configuration, Logger}
 import queries.GetTraderReputation
+import queries.responses.TraderReputationResponse
 import queries.responses.TraderReputationResponse.TransactionFeedbackResponse
 import slick.jdbc.JdbcProfile
 
@@ -65,6 +66,23 @@ class TransactionFeedbacks @Inject()(protected val databaseConfigProvider: Datab
     }
   }
 
+  private def upsert(transactionFeedback: TransactionFeedback)(implicit executionContext: ExecutionContext): Future[Int] = db.run(transactionFeedbackTable.insertOrUpdate(transactionFeedback).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+    }
+  }
+  private def findById(address: String)(implicit executionContext: ExecutionContext): Future[TransactionFeedback] = db.run(transactionFeedbackTable.filter(_.address === address).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
   private def getTransactionFeedbacksByDirtyBit(dirtyBit: Boolean): Future[Seq[String]] = db.run(transactionFeedbackTable.filter(_.dirtyBit === dirtyBit).map(_.address).result.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -72,8 +90,27 @@ class TransactionFeedbacks @Inject()(protected val databaseConfigProvider: Datab
         Nil
     }
   }
+  private def updateTransactionFeedbackByAddress(address: String, transactionFeedback: TransactionFeedback): Future[Int] = db.run(transactionFeedbackTable.filter(_.address === address).update(transactionFeedback).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
 
-  private def findById(address: String)(implicit executionContext: ExecutionContext): Future[TransactionFeedback] = db.run(transactionFeedbackTable.filter(_.address === address).result.head.asTry).map {
+  private def updateDirtyBitByAddress(address: String, dirtyBit: Boolean): Future[Int] = db.run(transactionFeedbackTable.filter(_.address === address).map(_.dirtyBit).update(dirtyBit).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def deleteById(address: String)(implicit executionContext: ExecutionContext) = db.run(transactionFeedbackTable.filter(_.address === address).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -163,39 +200,11 @@ class TransactionFeedbacks @Inject()(protected val databaseConfigProvider: Datab
 
   }
 
-  private def updateTransactionFeedbackByAddress(address: String, transactionFeedback: TransactionFeedback): Future[Int] = db.run(transactionFeedbackTable.filter(_.address === address).update(transactionFeedback).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
-
-  private def updateDirtyBitByAddress(address: String, dirtyBit: Boolean): Future[Int] = db.run(transactionFeedbackTable.filter(_.address === address).map(_.dirtyBit).update(dirtyBit).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
-
-  private def deleteById(address: String)(implicit executionContext: ExecutionContext) = db.run(transactionFeedbackTable.filter(_.address === address).delete.asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
-
   object Service {
 
     def addTransactionFeedback(address: String, transactionFeedbackResponse: TransactionFeedbackResponse, dirtyBit: Boolean)(implicit executionContext: ExecutionContext): String = Await.result(add(TransactionFeedback(address = address, SendAssetCounts(transactionFeedbackResponse.sendAssetsPositiveTx, transactionFeedbackResponse.sendAssetsNegativeTx), SendFiatCounts(transactionFeedbackResponse.sendFiatsPositiveTx, transactionFeedbackResponse.sendFiatsNegativeTx), IBCIssueAssetCounts(transactionFeedbackResponse.ibcIssueAssetsPositiveTx, transactionFeedbackResponse.ibcIssueAssetsNegativeTx), IBCIssueFiatCounts(transactionFeedbackResponse.ibcIssueFiatsPositiveTx, transactionFeedbackResponse.ibcIssueFiatsNegativeTx), BuyerExecuteOrderCounts(transactionFeedbackResponse.buyerExecuteOrderPositiveTx, transactionFeedbackResponse.buyerExecuteOrderNegativeTx), SellerExecuteOrderCounts(transactionFeedbackResponse.sellerExecuteOrderPositiveTx, transactionFeedbackResponse.sellerExecuteOrderNegativeTx), ChangeBuyerBidCounts(transactionFeedbackResponse.changeBuyerBidPositiveTx, transactionFeedbackResponse.changeBuyerBidNegativeTx), ChangeSellerBidCounts(transactionFeedbackResponse.changeSellerBidPositiveTx, transactionFeedbackResponse.changeSellerBidNegativeTx), ConfirmBuyerBidCounts(transactionFeedbackResponse.confirmBuyerBidPositiveTx, transactionFeedbackResponse.confirmBuyerBidNegativeTx), ConfirmSellerBidCounts(transactionFeedbackResponse.confirmSellerBidPositiveTx, transactionFeedbackResponse.confirmSellerBidNegativeTx), NegotiationCounts(transactionFeedbackResponse.negotiationPositiveTx, transactionFeedbackResponse.negotiationNegativeTx), dirtyBit = dirtyBit)), Duration.Inf)
+
+    def insertOrUpdate(address: String, transactionFeedbackResponse: TransactionFeedbackResponse, dirtyBit: Boolean)(implicit executionContext: ExecutionContext): Int = Await.result(upsert(TransactionFeedback(address = address, SendAssetCounts(transactionFeedbackResponse.sendAssetsPositiveTx, transactionFeedbackResponse.sendAssetsNegativeTx), SendFiatCounts(transactionFeedbackResponse.sendFiatsPositiveTx, transactionFeedbackResponse.sendFiatsNegativeTx), IBCIssueAssetCounts(transactionFeedbackResponse.ibcIssueAssetsPositiveTx, transactionFeedbackResponse.ibcIssueAssetsNegativeTx), IBCIssueFiatCounts(transactionFeedbackResponse.ibcIssueFiatsPositiveTx, transactionFeedbackResponse.ibcIssueFiatsNegativeTx), BuyerExecuteOrderCounts(transactionFeedbackResponse.buyerExecuteOrderPositiveTx, transactionFeedbackResponse.buyerExecuteOrderNegativeTx), SellerExecuteOrderCounts(transactionFeedbackResponse.sellerExecuteOrderPositiveTx, transactionFeedbackResponse.sellerExecuteOrderNegativeTx), ChangeBuyerBidCounts(transactionFeedbackResponse.changeBuyerBidPositiveTx, transactionFeedbackResponse.changeBuyerBidNegativeTx), ChangeSellerBidCounts(transactionFeedbackResponse.changeSellerBidPositiveTx, transactionFeedbackResponse.changeSellerBidNegativeTx), ConfirmBuyerBidCounts(transactionFeedbackResponse.confirmBuyerBidPositiveTx, transactionFeedbackResponse.confirmBuyerBidNegativeTx), ConfirmSellerBidCounts(transactionFeedbackResponse.confirmSellerBidPositiveTx, transactionFeedbackResponse.confirmSellerBidNegativeTx), NegotiationCounts(transactionFeedbackResponse.negotiationPositiveTx, transactionFeedbackResponse.negotiationNegativeTx), dirtyBit = dirtyBit)), Duration.Inf)
 
     def getAddress(address: String)(implicit executionContext: ExecutionContext): TransactionFeedback = Await.result(findById(address), Duration.Inf)
 
@@ -216,7 +225,11 @@ class TransactionFeedbacks @Inject()(protected val databaseConfigProvider: Datab
           Service.updateTransactionFeedback(response.value.address, response.value.transactionFeedback, dirtyBit = false)
         }
         catch {
-          case blockChainException: BlockChainException => logger.error(blockChainException.failure.message, blockChainException)
+          case blockChainException: BlockChainException => if (blockChainException.failure.message == constants.Response.NO_RESPONSE.message) {
+            Service.updateTransactionFeedback(dirtyAddress, TraderReputationResponse.TransactionFeedbackResponse("0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"), dirtyBit = false)
+          } else {
+            logger.error(blockChainException.failure.message, blockChainException)
+          }
           case baseException: BaseException => logger.error(constants.Response.BASE_EXCEPTION.message, baseException)
         }
       }
