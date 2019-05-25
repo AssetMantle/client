@@ -53,7 +53,7 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
           try {
             val zoneAccountAddress = masterAccounts.Service.getAddress(masterZones.Service.getAccountId(verifyZoneData.zoneID))
             val ticketID: String = if (kafkaEnabled) transactionsAddZone.Service.kafkaPost(transactionsAddZone.Request(from = username, to = zoneAccountAddress, zoneID = verifyZoneData.zoneID, password = verifyZoneData.password)).ticketID else Random.nextString(32)
-            blockchainTransactionAddZones.Service.addZone(username, zoneAccountAddress, verifyZoneData.zoneID, null, null, ticketID, null)
+            blockchainTransactionAddZones.Service.addTransaction(username, zoneAccountAddress, verifyZoneData.zoneID, null, null, ticketID, null)
 
             if (!kafkaEnabled) {
               Future {

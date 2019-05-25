@@ -31,7 +31,7 @@ class ConfirmBuyerBidController @Inject()(messagesControllerComponents: Messages
         confirmBuyerBidData => {
           try {
             val ticketID: String = if (kafkaEnabled) transactionsConfirmBuyerBid.Service.kafkaPost(transactionsConfirmBuyerBid.Request(from = username, to = confirmBuyerBidData.sellerAddress, password = confirmBuyerBidData.password, bid = confirmBuyerBidData.bid, time = confirmBuyerBidData.time, pegHash = confirmBuyerBidData.pegHash, gas = confirmBuyerBidData.gas)).ticketID else Random.nextString(32)
-            blockchainTransactionConfirmBuyerBids.Service.addConfirmBuyerBid(from = username, to = confirmBuyerBidData.sellerAddress, bid = confirmBuyerBidData.bid, time = confirmBuyerBidData.time, pegHash = confirmBuyerBidData.pegHash, gas = confirmBuyerBidData.gas, null, null, ticketID = ticketID, null)
+            blockchainTransactionConfirmBuyerBids.Service.addTransaction(from = username, to = confirmBuyerBidData.sellerAddress, bid = confirmBuyerBidData.bid, time = confirmBuyerBidData.time, pegHash = confirmBuyerBidData.pegHash, gas = confirmBuyerBidData.gas, null, null, ticketID = ticketID, null)
             if(!kafkaEnabled){
               Future{
                 try {
@@ -67,11 +67,11 @@ class ConfirmBuyerBidController @Inject()(messagesControllerComponents: Messages
         try {
           if (kafkaEnabled) {
             val response = transactionsConfirmBuyerBid.Service.kafkaPost(transactionsConfirmBuyerBid.Request(from = confirmBuyerBidData.from, to = confirmBuyerBidData.to, password = confirmBuyerBidData.password, bid = confirmBuyerBidData.bid, time = confirmBuyerBidData.time, pegHash = confirmBuyerBidData.pegHash, gas = confirmBuyerBidData.gas))
-            blockchainTransactionConfirmBuyerBids.Service.addConfirmBuyerBid(from = confirmBuyerBidData.from, to = confirmBuyerBidData.to, bid = confirmBuyerBidData.bid, time = confirmBuyerBidData.time, pegHash = confirmBuyerBidData.pegHash, gas = confirmBuyerBidData.gas, null, null, ticketID = response.ticketID, null)
+            blockchainTransactionConfirmBuyerBids.Service.addTransaction(from = confirmBuyerBidData.from, to = confirmBuyerBidData.to, bid = confirmBuyerBidData.bid, time = confirmBuyerBidData.time, pegHash = confirmBuyerBidData.pegHash, gas = confirmBuyerBidData.gas, null, null, ticketID = response.ticketID, null)
             Ok(views.html.index(success = response.ticketID))
           } else {
             val response = transactionsConfirmBuyerBid.Service.post(transactionsConfirmBuyerBid.Request(from = confirmBuyerBidData.from, to = confirmBuyerBidData.to, password = confirmBuyerBidData.password, bid = confirmBuyerBidData.bid, time = confirmBuyerBidData.time, pegHash = confirmBuyerBidData.pegHash, gas = confirmBuyerBidData.gas))
-            blockchainTransactionConfirmBuyerBids.Service.addConfirmBuyerBid(from = confirmBuyerBidData.from, to = confirmBuyerBidData.to, bid = confirmBuyerBidData.bid, time = confirmBuyerBidData.time, pegHash = confirmBuyerBidData.pegHash, gas = confirmBuyerBidData.gas, null, txHash = Option(response.TxHash), ticketID = Random.nextString(32), null)
+            blockchainTransactionConfirmBuyerBids.Service.addTransaction(from = confirmBuyerBidData.from, to = confirmBuyerBidData.to, bid = confirmBuyerBidData.bid, time = confirmBuyerBidData.time, pegHash = confirmBuyerBidData.pegHash, gas = confirmBuyerBidData.gas, null, txHash = Option(response.TxHash), ticketID = Random.nextString(32), null)
             Ok(views.html.index(success = response.TxHash))
           }
         }

@@ -20,8 +20,8 @@ class WithGenesisLoginAction @Inject()(messagesControllerComponents: MessagesCon
       try {
         val username = request.session.get(constants.Security.USERNAME).getOrElse(throw new BaseException(constants.Error.USERNAME_NOT_FOUND))
         val sessionToken = request.session.get(constants.Security.TOKEN).getOrElse(throw new BaseException(constants.Error.TOKEN_NOT_FOUND))
-        accountTokens.Service.tryVerifySessionToken(username, sessionToken)
-        accountTokens.Service.tryVerifySessionTokenTime(username)
+        accountTokens.Service.tryVerifyingSessionToken(username, sessionToken)
+        accountTokens.Service.tryVerifyingSessionTokenTime(username)
         masterAccounts.Service.tryVerifyUserType(username, constants.User.GENESIS)
         f(username)(request)
       }

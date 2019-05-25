@@ -46,29 +46,7 @@ class IssueFiatRequests @Inject()(protected val databaseConfigProvider: Database
     }
   }
 
-  private def findByAccountID(accountID: String)(implicit executionContext: ExecutionContext): Future[IssueFiatRequest] = db.run(issueFiatRequestTable.filter(_.accountID === accountID).result.head.asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
-        throw new BaseException(constants.Error.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
-        throw new BaseException(constants.Error.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
-
-  private def checkByTransactionID(transactionID: String): Future[Boolean] = db.run(issueFiatRequestTable.filter(_.transactionID === transactionID).exists.result)
-
-  private def updateStatusAndGasByID(id: String, status: Boolean, gas: Int)(implicit executionContext: ExecutionContext): Future[Int] = db.run(issueFiatRequestTable.filter(_.id === id).map(issueFiat => (issueFiat.status, issueFiat.gas)).update((status, gas)).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
-        throw new BaseException(constants.Error.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
-        throw new BaseException(constants.Error.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
-
-  private def updateTicketIDStatusAndGasByID(id: String, ticketID: String, status: Boolean, gas: Int): Future[Int] = db.run(issueFiatRequestTable.filter(_.id === id).map(issueFiat => (issueFiat.ticketID, issueFiat.status, issueFiat.gas)).update(ticketID, status, gas).asTry).map {
+  private def updateTicketIDStatusAndGasByID(id: String, ticketID: String, status: Option[Boolean], gas: Int): Future[Int] = db.run(issueFiatRequestTable.filter(_.id === id).map(issueFiat => (issueFiat.ticketID, issueFiat.status.?, issueFiat.gas)).update(ticketID, status, gas).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
@@ -79,7 +57,7 @@ class IssueFiatRequests @Inject()(protected val databaseConfigProvider: Database
   }
 
 
-  private def updateStatusAndCommentByID(id: String, status: Boolean, comment: String)(implicit executionContext: ExecutionContext) = db.run(issueFiatRequestTable.filter(_.id === id).map(issueFiatRequest => (issueFiatRequest.status, issueFiatRequest.comment)).update((status, comment)).asTry).map {
+  private def updateStatusAndCommentByID(id: String, status: Option[Boolean], comment: String)(implicit executionContext: ExecutionContext) = db.run(issueFiatRequestTable.filter(_.id === id).map(issueFiatRequest => (issueFiatRequest.status.?, issueFiatRequest.comment)).update((status, comment)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
@@ -89,25 +67,7 @@ class IssueFiatRequests @Inject()(protected val databaseConfigProvider: Database
     }
   }
 
-  private def updateStatusByID(id: String, status: Boolean)(implicit executionContext: ExecutionContext) = db.run(issueFiatRequestTable.filter(_.id === id).map(_.status).update(status).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
-        throw new BaseException(constants.Error.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
-        throw new BaseException(constants.Error.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
-
-  private def getIssueFiatRequestsWithNullStatus(accountIDs: Seq[String])(implicit executionContext: ExecutionContext): Future[Seq[IssueFiatRequest]] = db.run(issueFiatRequestTable.filter(_.accountID.inSet(accountIDs)).filter(_.status.?.isEmpty).result.asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
-        throw new BaseException(constants.Error.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
-        throw new BaseException(constants.Error.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
+  private def getIssueFiatRequestsWithNullStatus(accountIDs: Seq[String])(implicit executionContext: ExecutionContext): Future[Seq[IssueFiatRequest]] = db.run(issueFiatRequestTable.filter(_.accountID.inSet(accountIDs)).filter(_.status.?.isEmpty).result)
 
   private def deleteByID(id: String)(implicit executionContext: ExecutionContext) = db.run(issueFiatRequestTable.filter(_.id === id).delete.asTry).map {
     case Success(result) => result
@@ -166,21 +126,15 @@ class IssueFiatRequests @Inject()(protected val databaseConfigProvider: Database
 
     def addIssueFiatRequest(accountID: String, transactionID: String, transactionAmount: Int)(implicit executionContext: ExecutionContext): String = Await.result(add(IssueFiatRequest(id = Random.nextString(32), accountID = accountID, transactionID = transactionID, transactionAmount = transactionAmount, null, null, null, null)), Duration.Inf)
 
-    def getIssueFiatRequest(accountID: String)(implicit executionContext: ExecutionContext): IssueFiatRequest = Await.result(findByAccountID(accountID), Duration.Inf)
+    def reject(id: String, comment: String)(implicit executionContext: ExecutionContext): Int = Await.result(updateStatusAndCommentByID(id = id, status = Option(false), comment = comment), Duration.Inf)
 
-    def updateStatusAndGas(id: String, status: Boolean, gas: Int)(implicit executionContext: ExecutionContext): Int = Await.result(updateStatusAndGasByID(id, status, gas), Duration.Inf)
-
-    def updateStatusAndComment(id: String, status: Boolean, comment: String)(implicit executionContext: ExecutionContext): Int = Await.result(updateStatusAndCommentByID(id, status, comment), Duration.Inf)
-
-    def updateTicketIDStatusAndGas(requestID: String, ticketID: String, status: Boolean, gas: Int)(implicit executionContext: ExecutionContext): Int = Await.result(updateTicketIDStatusAndGasByID(requestID, ticketID, status, gas), Duration.Inf)
-
-    def updateStatus(id: String, status: Boolean)(implicit executionContext: ExecutionContext): Int = Await.result(updateStatusByID(id, status), Duration.Inf)
+    def accept(requestID: String, ticketID: String, gas: Int)(implicit executionContext: ExecutionContext): Int = Await.result(updateTicketIDStatusAndGasByID(requestID, ticketID, status = Option(true), gas), Duration.Inf)
 
     def updateComment(id: String, comment: String)(implicit executionContext: ExecutionContext): Int = Await.result(updateCommentByID(id, comment), Duration.Inf)
 
     def getPendingIssueFiatRequests(accountIDs: Seq[String])(implicit executionContext: ExecutionContext): Seq[IssueFiatRequest] = Await.result(getIssueFiatRequestsWithNullStatus(accountIDs), Duration.Inf)
 
-    def deleteIssueFiatRequest(id: String)(implicit executionContext: ExecutionContext): Int = Await.result(deleteByID(id), Duration.Inf)
+    def delete(id: String)(implicit executionContext: ExecutionContext): Int = Await.result(deleteByID(id), Duration.Inf)
 
     def getStatus(id: String)(implicit executionContext: ExecutionContext): Option[Boolean] = Await.result(getStatusByID(id), Duration.Inf)
 

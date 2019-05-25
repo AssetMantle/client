@@ -6,7 +6,7 @@
     @form(action = routes.SendCoinController.rejectFaucetRequest) {
         @CSRF.formField
         @inputText(rejectFaucetRequestForm(constants.Form.REQUEST_ID).copy(value = Some(requestID)), '_label -> Messages(constants.Form.REQUEST_ID))
-
+        @inputText(rejectFaucetRequestForm(constants.Form.COMMENT), '_label -> Messages(constants.Form.COMMENT))
         @if(rejectFaucetRequestForm.hasGlobalErrors) {
             <ul>
             @for(error <- rejectFaucetRequestForm.globalErrors) {

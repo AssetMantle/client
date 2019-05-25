@@ -78,16 +78,6 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
     }
   }
 
-  private def updateOwnerAddressByPegHash(pegHash: String, ownerAddress: String)(implicit executionContext: ExecutionContext): Future[Int] = db.run(assetTable.filter(_.pegHash === pegHash).map(_.ownerAddress).update(ownerAddress).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
-        throw new BaseException(constants.Error.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
-        throw new BaseException(constants.Error.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
-
   private def getAssetsByDirtyBit(dirtyBit: Boolean)(implicit executionContext: ExecutionContext): Future[Seq[Asset]] = db.run(assetTable.filter(_.dirtyBit === dirtyBit).result.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -144,9 +134,9 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
 
   object Service {
 
-    def addAsset(pegHash: String, documentHash: String, assetType: String, assetQuantity: String, assetPrice: String, quantityUnit: String, ownerAddress: String, unmoderated: Boolean, locked: Boolean, dirtyBit: Boolean)(implicit executionContext: ExecutionContext): String = Await.result(add(Asset(pegHash = pegHash, documentHash = documentHash, assetType = assetType, assetPrice = assetPrice, assetQuantity = assetQuantity, quantityUnit = quantityUnit, ownerAddress = ownerAddress, unmoderated = unmoderated, locked = locked, dirtyBit = dirtyBit)), Duration.Inf)
+    def addEntity(pegHash: String, documentHash: String, assetType: String, assetQuantity: String, assetPrice: String, quantityUnit: String, ownerAddress: String, unmoderated: Boolean, locked: Boolean, dirtyBit: Boolean)(implicit executionContext: ExecutionContext): String = Await.result(add(Asset(pegHash = pegHash, documentHash = documentHash, assetType = assetType, assetPrice = assetPrice, assetQuantity = assetQuantity, quantityUnit = quantityUnit, ownerAddress = ownerAddress, unmoderated = unmoderated, locked = locked, dirtyBit = dirtyBit)), Duration.Inf)
 
-    def getAsset(pegHash: String)(implicit executionContext: ExecutionContext): Asset = Await.result(findByPegHash(pegHash), Duration.Inf)
+    def get(pegHash: String)(implicit executionContext: ExecutionContext): Asset = Await.result(findByPegHash(pegHash), Duration.Inf)
 
     def getAssetPegWallet(address: String)(implicit executionContext: ExecutionContext): Seq[Asset] = Await.result(getAssetPegWalletByAddress(address), Duration.Inf)
 
@@ -159,8 +149,6 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
     def getDirtyAssets: Seq[Asset] = Await.result(getAssetsByDirtyBit(dirtyBit = true), Duration.Inf)
 
     def markDirty(pegHash: String): Int = Await.result(updateDirtyBitByPegHash(pegHash, dirtyBit = true), Duration.Inf)
-
-    def updateOwnerAddress(pegHash: String, ownerAddress: String): Int = Await.result(updateOwnerAddressByPegHash(pegHash, ownerAddress), Duration.Inf)
 
   }
 

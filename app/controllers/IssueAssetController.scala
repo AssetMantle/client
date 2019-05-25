@@ -33,7 +33,7 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
             if (issueAssetRequestData.unmoderated) {
               val fromAddress = masterAccounts.Service.getAddress(username)
               val ticketID: String = if (kafkaEnabled) transactionsIssueAsset.Service.kafkaPost(transactionsIssueAsset.Request(from = username, to = fromAddress, password = issueAssetRequestData.password, documentHash = issueAssetRequestData.documentHash, assetType = issueAssetRequestData.assetType, assetPrice = issueAssetRequestData.assetPrice, quantityUnit = issueAssetRequestData.quantityUnit, assetQuantity = issueAssetRequestData.assetQuantity, gas = issueAssetRequestData.gas, unmoderated = issueAssetRequestData.unmoderated)).ticketID else Random.nextString(32)
-              blockchainTransactionIssueAssets.Service.addIssueAsset(from = username, to = fromAddress, documentHash = issueAssetRequestData.documentHash, assetType = issueAssetRequestData.assetType, assetPrice = issueAssetRequestData.assetPrice, quantityUnit = issueAssetRequestData.quantityUnit, assetQuantity = issueAssetRequestData.assetQuantity, unmoderated = issueAssetRequestData.unmoderated, gas = issueAssetRequestData.gas, null, null, ticketID = ticketID, null)
+              blockchainTransactionIssueAssets.Service.addTransaction(from = username, to = fromAddress, documentHash = issueAssetRequestData.documentHash, assetType = issueAssetRequestData.assetType, assetPrice = issueAssetRequestData.assetPrice, quantityUnit = issueAssetRequestData.quantityUnit, assetQuantity = issueAssetRequestData.assetQuantity, unmoderated = issueAssetRequestData.unmoderated, gas = issueAssetRequestData.gas, null, null, ticketID = ticketID, null)
               if (!kafkaEnabled) {
                 Future {
                   try {
@@ -81,7 +81,7 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
         },
         rejectIssueAssetRequestData => {
           try {
-            masterTransactionIssueAssetRequests.Service.updateStatusAndComment(rejectIssueAssetRequestData.requestID, Option(false), rejectIssueAssetRequestData.comment)
+            masterTransactionIssueAssetRequests.Service.reject(id = rejectIssueAssetRequestData.requestID, comment = rejectIssueAssetRequestData.comment)
             Ok(views.html.index(success = Messages(constants.Success.ISSUE_FIAT_REQUEST_REJECTED)))
           }
           catch {
@@ -106,8 +106,8 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
             val toAddress = masterAccounts.Service.getAddress(issueAssetData.accountID)
             if (masterTransactionIssueAssetRequests.Service.getStatus(issueAssetData.requestID).isEmpty) {
               val ticketID: String = if (kafkaEnabled) transactionsIssueAsset.Service.kafkaPost(transactionsIssueAsset.Request(from = username, to = toAddress, password = issueAssetData.password, documentHash = issueAssetData.documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.assetPrice, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.assetQuantity, gas = issueAssetData.gas, unmoderated = issueAssetData.unmoderated)).ticketID else Random.nextString(32)
-              blockchainTransactionIssueAssets.Service.addIssueAsset(from = username, to = toAddress, documentHash = issueAssetData.documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.assetPrice, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.assetQuantity, unmoderated = issueAssetData.unmoderated, gas = issueAssetData.gas, null, null, ticketID = ticketID, null)
-              masterTransactionIssueAssetRequests.Service.updateTicketIDStatusAndGas(issueAssetData.requestID, ticketID, true, issueAssetData.gas)
+              blockchainTransactionIssueAssets.Service.addTransaction(from = username, to = toAddress, documentHash = issueAssetData.documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.assetPrice, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.assetQuantity, unmoderated = issueAssetData.unmoderated, gas = issueAssetData.gas, null, null, ticketID = ticketID, null)
+              masterTransactionIssueAssetRequests.Service.accept(issueAssetData.requestID, ticketID, issueAssetData.gas)
               if (!kafkaEnabled) {
                 Future {
                   try {
@@ -126,7 +126,8 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
           }
           catch {
             case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))
-            case blockChainException: BlockChainException => Ok(views.html.index(failure = blockChainException.message))
+            case blockChainException: BlockChainException => masterTransactionIssueAssetRequests.Service.updateComment(issueAssetData.requestID, blockChainException.message)
+              Ok(views.html.index(failure = blockChainException.message))
           }
         }
       )
@@ -145,11 +146,11 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
         try {
           if (kafkaEnabled) {
             val response = transactionsIssueAsset.Service.kafkaPost(transactionsIssueAsset.Request(from = issueAssetData.from, to = issueAssetData.to, password = issueAssetData.password, documentHash = issueAssetData.documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.assetPrice, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.assetQuantity, gas = issueAssetData.gas, unmoderated = issueAssetData.unmoderated))
-            blockchainTransactionIssueAssets.Service.addIssueAsset(from = issueAssetData.from, to = issueAssetData.to, documentHash = issueAssetData.documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.assetPrice, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.assetQuantity, unmoderated = issueAssetData.unmoderated, gas = issueAssetData.gas, null, null, ticketID = response.ticketID, null)
+            blockchainTransactionIssueAssets.Service.addTransaction(from = issueAssetData.from, to = issueAssetData.to, documentHash = issueAssetData.documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.assetPrice, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.assetQuantity, unmoderated = issueAssetData.unmoderated, gas = issueAssetData.gas, null, null, ticketID = response.ticketID, null)
             Ok(views.html.index(success = response.ticketID))
           } else {
             val response = transactionsIssueAsset.Service.post(transactionsIssueAsset.Request(from = issueAssetData.from, to = issueAssetData.to, password = issueAssetData.password, documentHash = issueAssetData.documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.assetPrice, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.assetQuantity, gas = issueAssetData.gas, unmoderated = issueAssetData.unmoderated))
-            blockchainTransactionIssueAssets.Service.addIssueAsset(from = issueAssetData.from, to = issueAssetData.to, documentHash = issueAssetData.documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.assetPrice, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.assetQuantity, unmoderated = issueAssetData.unmoderated, gas = issueAssetData.gas, null, txHash = Option(response.TxHash), ticketID = Random.nextString(32), null)
+            blockchainTransactionIssueAssets.Service.addTransaction(from = issueAssetData.from, to = issueAssetData.to, documentHash = issueAssetData.documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.assetPrice, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.assetQuantity, unmoderated = issueAssetData.unmoderated, gas = issueAssetData.gas, null, txHash = Option(response.TxHash), ticketID = Random.nextString(32), null)
             Ok(views.html.index(success = response.TxHash))
           }
         }

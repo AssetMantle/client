@@ -115,7 +115,7 @@ class AddZones @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   object Service {
 
-    def addZone(from: String, to: String, zoneID: String, status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])(implicit executionContext: ExecutionContext): String = Await.result(add(AddZone(from = from, to = to, zoneID = zoneID, status = status, txHash = txHash, ticketID = ticketID, responseCode = responseCode)), Duration.Inf)
+    def addTransaction(from: String, to: String, zoneID: String, status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])(implicit executionContext: ExecutionContext): String = Await.result(add(AddZone(from = from, to = to, zoneID = zoneID, status = status, txHash = txHash, ticketID = ticketID, responseCode = responseCode)), Duration.Inf)
 
     def markTransactionSuccessful(ticketID: String, txHash: String, responseCode: String): Int = Await.result(updateTxHashStatusAndResponseCodeOnTicketID(ticketID, txHash, status = true, responseCode), Duration.Inf)
 
@@ -135,7 +135,7 @@ class AddZones @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
       try {
         Service.markTransactionSuccessful(ticketID, response.TxHash, response.Code)
         val addZone = Service.getTransaction(ticketID)
-        blockchainZones.Service.addZone(addZone.zoneID, addZone.to, dirtyBit = true)
+        blockchainZones.Service.addEntity(addZone.zoneID, addZone.to, dirtyBit = true)
         masterZones.Service.updateStatus(addZone.zoneID, status = true)
         masterAccounts.Service.updateUserTypeOnAddress(addZone.to, constants.User.ZONE)
         blockchainAccounts.Service.markDirty(masterAccounts.Service.getAddress(addZone.from))

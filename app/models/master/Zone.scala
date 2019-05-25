@@ -76,15 +76,7 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
     }
   }
 
-  private def getZonesWithNullStatus()(implicit executionContext: ExecutionContext): Future[Seq[Zone]] = db.run(zoneTable.filter(_.status.?.isEmpty).result.asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
-        throw new BaseException(constants.Error.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
-        throw new BaseException(constants.Error.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
+  private def getZonesWithNullStatus()(implicit executionContext: ExecutionContext): Future[Seq[Zone]] = db.run(zoneTable.filter(_.status.?.isEmpty).result)
   
   private def updateStatusOnID(id: String, status: Boolean)(implicit executionContext: ExecutionContext) = db.run(zoneTable.filter(_.id === id).map(_.status.?).update(Option(status)).asTry).map {
     case Success(result) => result

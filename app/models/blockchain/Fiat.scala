@@ -39,14 +39,6 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
     }
   }
 
-  private def addMultiple(fiats: Seq[Fiat])(implicit executionContext: ExecutionContext): Future[Seq[String]] = db.run((fiatTable returning fiatTable.map(_.pegHash) ++= fiats).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
-        throw new BaseException(constants.Error.PSQL_EXCEPTION)
-    }
-  }
-
   private def upsert(fiat: Fiat)(implicit executionContext: ExecutionContext): Future[Int] = db.run(fiatTable.insertOrUpdate(fiat).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -130,9 +122,7 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
   object Service {
 
-    def addFiat(pegHash: String, ownerAddress: String, transactionID: String, transactionAmount: String, redeemedAmount: String, dirtyBit: Boolean)(implicit executionContext: ExecutionContext): String = Await.result(add(Fiat(pegHash, ownerAddress, transactionID, transactionAmount, redeemedAmount, dirtyBit)), Duration.Inf)
-
-    def addFiats(fiats: Seq[Fiat])(implicit executionContext: ExecutionContext): Seq[String] = Await.result(addMultiple(fiats), Duration.Inf)
+    def addEntity(pegHash: String, ownerAddress: String, transactionID: String, transactionAmount: String, redeemedAmount: String, dirtyBit: Boolean)(implicit executionContext: ExecutionContext): String = Await.result(add(Fiat(pegHash, ownerAddress, transactionID, transactionAmount, redeemedAmount, dirtyBit)), Duration.Inf)
 
     def getFiatPegWallet(address: String)(implicit executionContext: ExecutionContext): Seq[Fiat] = Await.result(getFiatPegWalletByAddress(address), Duration.Inf)
 

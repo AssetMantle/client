@@ -127,14 +127,14 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   object Service {
 
-    def addAccount(username: String, password: String)(implicit executionContext: ExecutionContext): String = {
+    def addEntity(username: String, password: String)(implicit executionContext: ExecutionContext): String = {
       val addKeyResponse = addKey.Service.post(addKey.Request(username, password, getSeed.Service.get().body))
       Await.result(add(Account(addKeyResponse.address, 0, addKeyResponse.pub_key, -1, 0, dirtyBit = false)), Duration.Inf)
     }
 
     def refreshDirty(address: String, sequence: Int, coins: Int, dirtyBit: Boolean): Int = Await.result(updateSequenceCoinsAndDirtyBitByAddress(address, sequence, coins, dirtyBit), Duration.Inf)
 
-    def getAccount(address: String)(implicit executionContext: ExecutionContext): Account = Await.result(findByAddress(address), Duration.Inf)
+    def get(address: String)(implicit executionContext: ExecutionContext): Account = Await.result(findByAddress(address), Duration.Inf)
 
     def getCoins(address: String)(implicit executionContext: ExecutionContext): Int = Await.result(getCoinsByAddress(address), Duration.Inf)
 

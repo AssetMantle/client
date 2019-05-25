@@ -93,13 +93,13 @@ class ACLHashes @Inject()(protected val databaseConfigProvider: DatabaseConfigPr
   }
 
   object Service {
-    def addACLHash(acl: ACL)(implicit executionContext: ExecutionContext): String = Await.result(add(ACLHash(acl.issueAsset, acl.issueFiat, acl.sendAsset, acl.sendFiat, acl.redeemAsset, acl.redeemFiat, acl.sellerExecuteOrder, acl.buyerExecuteOrder, acl.changeBuyerBid, acl.changeSellerBid, acl.confirmBuyerBid, acl.confirmSellerBid, acl.negotiation, acl.releaseAsset, util.hashing.MurmurHash3.stringHash(acl.toString).toString)), Duration.Inf)
+    def addEntity(acl: ACL)(implicit executionContext: ExecutionContext): String = Await.result(add(ACLHash(acl.issueAsset, acl.issueFiat, acl.sendAsset, acl.sendFiat, acl.redeemAsset, acl.redeemFiat, acl.sellerExecuteOrder, acl.buyerExecuteOrder, acl.changeBuyerBid, acl.changeSellerBid, acl.confirmBuyerBid, acl.confirmSellerBid, acl.negotiation, acl.releaseAsset, util.hashing.MurmurHash3.stringHash(acl.toString).toString)), Duration.Inf)
 
-    def getACLHash(hash: String)(implicit executionContext: ExecutionContext): ACLHash = Await.result(findByHash(hash), Duration.Inf)
+    def get(hash: String)(implicit executionContext: ExecutionContext): ACLHash = Await.result(findByHash(hash), Duration.Inf)
 
     def getACL(hash: String): ACL = {
       val aclHash = Await.result(findByHash(hash), Duration.Inf)
-      ACL(aclHash.issueAsset, aclHash.issueFiat, aclHash.sendAsset, aclHash.sendFiat, aclHash.redeemAsset, aclHash.redeemFiat, aclHash.sellerExecuteOrder, aclHash.buyerExecuteOrder, aclHash.changeBuyerBid, aclHash.changeSellerBid, aclHash.confirmBuyerBid, aclHash.confirmSellerBid, aclHash.negotiation, aclHash.releaseAsset)
+      ACL(issueAsset = aclHash.issueAsset, issueFiat = aclHash.issueFiat, sendAsset = aclHash.sendAsset, sendFiat = aclHash.sendFiat, redeemAsset = aclHash.redeemAsset, redeemFiat = aclHash.redeemFiat, sellerExecuteOrder = aclHash.sellerExecuteOrder, buyerExecuteOrder = aclHash.buyerExecuteOrder, changeBuyerBid = aclHash.changeBuyerBid, changeSellerBid = aclHash.changeSellerBid, confirmBuyerBid = aclHash.confirmBuyerBid, confirmSellerBid = aclHash.confirmSellerBid, negotiation = aclHash.negotiation, releaseAsset = aclHash.releaseAsset)
     }
   }
 }

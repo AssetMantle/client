@@ -4,12 +4,12 @@ import akka.actor.ActorSystem
 import exceptions.{BaseException, BlockChainException}
 import javax.inject.{Inject, Singleton}
 import org.postgresql.util.PSQLException
-import play.api.{Configuration, Logger}
 import play.api.db.slick.DatabaseConfigProvider
+import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
 import utilities.PushNotification
 
-import scala.concurrent.duration.{Duration,_}
+import scala.concurrent.duration.{Duration, _}
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
@@ -128,13 +128,13 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
 
   object Service {
 
-    def addNegotiation(id: String, buyerAddress: String, sellerAddress: String, assetPegHash: String, bid: String, time: String, buyerSignature: Option[String], sellerSignature: Option[String])(implicit executionContext: ExecutionContext): String = Await.result(add(Negotiation(id = id, buyerAddress = buyerAddress, sellerAddress = sellerAddress, assetPegHash = assetPegHash, bid = bid, time = time, buyerSignature = buyerSignature, sellerSignature = sellerSignature, false)), Duration.Inf)
+    def addEntity(id: String, buyerAddress: String, sellerAddress: String, assetPegHash: String, bid: String, time: String, buyerSignature: Option[String], sellerSignature: Option[String])(implicit executionContext: ExecutionContext): String = Await.result(add(Negotiation(id = id, buyerAddress = buyerAddress, sellerAddress = sellerAddress, assetPegHash = assetPegHash, bid = bid, time = time, buyerSignature = buyerSignature, sellerSignature = sellerSignature, false)), Duration.Inf)
 
     def insertOrUpdate(id: String, buyerAddress: String, sellerAddress: String, assetPegHash: String, bid: String, time: String, buyerSignature: Option[String], sellerSignature: Option[String], dirtyBit: Boolean)(implicit executionContext: ExecutionContext): Int = Await.result(upsert(Negotiation(id = id, buyerAddress = buyerAddress, sellerAddress = sellerAddress, assetPegHash = assetPegHash, bid = bid, time = time, buyerSignature = buyerSignature, sellerSignature = sellerSignature, dirtyBit = dirtyBit)), Duration.Inf)
 
     def getDirtyNegotiations(dirtyBit: Boolean): Seq[Negotiation] = Await.result(getNegotiationsByDirtyBit(dirtyBit), Duration.Inf)
 
-    def getNegotiation(id: String): Negotiation = Await.result(findById(id), Duration.Inf)
+    def get(id: String): Negotiation = Await.result(findById(id), Duration.Inf)
 
     def markDirty(id: String): Int = Await.result(updateDirtyBitById(id, dirtyBit = true), Duration.Inf)
 

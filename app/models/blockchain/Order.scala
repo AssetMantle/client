@@ -103,7 +103,7 @@ class Orders @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
 
   object Service {
 
-    def addOrder(id: String, fiatProofHash: Option[String], awbProofHash: Option[String])(implicit executionContext: ExecutionContext): String = Await.result(add(Order(id = id, fiatProofHash = fiatProofHash, awbProofHash = awbProofHash, dirtyBit = false)), Duration.Inf)
+    def addEntity(id: String, fiatProofHash: Option[String], awbProofHash: Option[String])(implicit executionContext: ExecutionContext): String = Await.result(add(Order(id = id, fiatProofHash = fiatProofHash, awbProofHash = awbProofHash, dirtyBit = false)), Duration.Inf)
 
     def insertOrUpdate(id: String, fiatProofHash: Option[String], awbProofHash: Option[String], dirtyBit: Boolean)(implicit executionContext: ExecutionContext): Int = Await.result(upsert(Order(id = id, fiatProofHash = fiatProofHash, awbProofHash = awbProofHash, dirtyBit = dirtyBit)), Duration.Inf)
 
@@ -119,7 +119,7 @@ class Orders @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
       for (dirtyOrder <- dirtyOrders) {
         try {
           val orderResponse = getOrder.Service.get(dirtyOrder.id)
-          val negotiation = blockchainNegotiations.Service.getNegotiation(dirtyOrder.id)
+          val negotiation = blockchainNegotiations.Service.get(dirtyOrder.id)
           if ((orderResponse.value.awbProofHash != "" && orderResponse.value.fiatProofHash != "") || (orderResponse.value.awbProofHash == "" && orderResponse.value.fiatProofHash == "")) {
             val sellerAccount = getAccount.Service.get(negotiation.sellerAddress)
             sellerAccount.value.assetPegWallet.foreach(assets => assets.foreach(asset => blockchainAssets.Service.insertOrUpdate(pegHash = asset.pegHash, documentHash = asset.documentHash, assetType = asset.assetType, assetQuantity = asset.assetQuantity, quantityUnit = asset.quantityUnit, assetPrice = asset.assetPrice, ownerAddress = negotiation.sellerAddress, unmoderated = asset.unmoderated, locked = asset.locked, dirtyBit = true)))

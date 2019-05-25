@@ -31,7 +31,7 @@ class SendFiatController @Inject()(messagesControllerComponents: MessagesControl
         sendFiatData => {
           try {
             val ticketID: String = if (kafkaEnabled) transactionsSendFiat.Service.kafkaPost(transactionsSendFiat.Request(from = username, to = sendFiatData.sellerAddress, password = sendFiatData.password, amount = sendFiatData.amount, pegHash = sendFiatData.pegHash, gas = sendFiatData.gas)).ticketID else Random.nextString(32)
-            blockchainTransactionSendFiats.Service.addSendFiat(from = username, to = sendFiatData.sellerAddress, amount = sendFiatData.amount, pegHash = sendFiatData.pegHash, gas = sendFiatData.gas, null, null, ticketID = ticketID, null)
+            blockchainTransactionSendFiats.Service.addTransaction(from = username, to = sendFiatData.sellerAddress, amount = sendFiatData.amount, pegHash = sendFiatData.pegHash, gas = sendFiatData.gas, null, null, ticketID = ticketID, null)
             if(!kafkaEnabled){
               Future{
                 try {
@@ -66,11 +66,11 @@ class SendFiatController @Inject()(messagesControllerComponents: MessagesControl
         try {
           if (kafkaEnabled) {
             val response = transactionsSendFiat.Service.kafkaPost(transactionsSendFiat.Request(from = sendFiatData.from, to = sendFiatData.to, password = sendFiatData.password, amount = sendFiatData.amount, pegHash = sendFiatData.pegHash, gas = sendFiatData.gas))
-            blockchainTransactionSendFiats.Service.addSendFiat(from = sendFiatData.from, to = sendFiatData.to, amount = sendFiatData.amount, pegHash = sendFiatData.pegHash, gas = sendFiatData.gas, null, null, ticketID = response.ticketID, null)
+            blockchainTransactionSendFiats.Service.addTransaction(from = sendFiatData.from, to = sendFiatData.to, amount = sendFiatData.amount, pegHash = sendFiatData.pegHash, gas = sendFiatData.gas, null, null, ticketID = response.ticketID, null)
             Ok(views.html.index(success = response.ticketID))
           } else {
             val response = transactionsSendFiat.Service.post(transactionsSendFiat.Request(from = sendFiatData.from, to = sendFiatData.to, password = sendFiatData.password, amount = sendFiatData.amount, pegHash = sendFiatData.pegHash, gas = sendFiatData.gas))
-            blockchainTransactionSendFiats.Service.addSendFiat(from = sendFiatData.from, to = sendFiatData.to, amount = sendFiatData.amount, pegHash = sendFiatData.pegHash, gas = sendFiatData.gas, null, txHash = Option(response.TxHash), ticketID = Random.nextString(32), null)
+            blockchainTransactionSendFiats.Service.addTransaction(from = sendFiatData.from, to = sendFiatData.to, amount = sendFiatData.amount, pegHash = sendFiatData.pegHash, gas = sendFiatData.gas, null, txHash = Option(response.TxHash), ticketID = Random.nextString(32), null)
             Ok(views.html.index(success = response.TxHash))
           }
         }

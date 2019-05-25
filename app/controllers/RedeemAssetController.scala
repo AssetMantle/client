@@ -32,7 +32,7 @@ class RedeemAssetController @Inject()(messagesControllerComponents: MessagesCont
           try {
             val toAddress = blockchainZones.Service.getAddress(redeemAssetData.zoneID)
             val ticketID: String = if (kafkaEnabled) transactionsRedeemAsset.Service.kafkaPost(transactionsRedeemAsset.Request(from = username, to = toAddress, password = redeemAssetData.password, pegHash = redeemAssetData.pegHash, gas = redeemAssetData.gas)).ticketID else Random.nextString(32)
-            blockchainTransactionRedeemAssets.Service.addRedeemAsset(from = username, to = toAddress, pegHash = redeemAssetData.pegHash, gas = redeemAssetData.gas, null, null, ticketID = ticketID, null)
+            blockchainTransactionRedeemAssets.Service.addTransaction(from = username, to = toAddress, pegHash = redeemAssetData.pegHash, gas = redeemAssetData.gas, null, null, ticketID = ticketID, null)
             if (!kafkaEnabled) {
               Future {
                 try {
@@ -68,11 +68,11 @@ class RedeemAssetController @Inject()(messagesControllerComponents: MessagesCont
         try {
           if (kafkaEnabled) {
             val response = transactionsRedeemAsset.Service.kafkaPost(transactionsRedeemAsset.Request(from = redeemAssetData.from, to = redeemAssetData.to, password = redeemAssetData.password, pegHash = redeemAssetData.pegHash, gas = redeemAssetData.gas))
-            blockchainTransactionRedeemAssets.Service.addRedeemAsset(from = redeemAssetData.from, to = redeemAssetData.to, pegHash = redeemAssetData.pegHash, gas = redeemAssetData.gas, null, null, ticketID = response.ticketID, null)
+            blockchainTransactionRedeemAssets.Service.addTransaction(from = redeemAssetData.from, to = redeemAssetData.to, pegHash = redeemAssetData.pegHash, gas = redeemAssetData.gas, null, null, ticketID = response.ticketID, null)
             Ok(views.html.index(success = response.ticketID))
           } else {
             val response = transactionsRedeemAsset.Service.post(transactionsRedeemAsset.Request(from = redeemAssetData.from, to = redeemAssetData.to, password = redeemAssetData.password, pegHash = redeemAssetData.pegHash, gas = redeemAssetData.gas))
-            blockchainTransactionRedeemAssets.Service.addRedeemAsset(from = redeemAssetData.from, to = redeemAssetData.to, pegHash = redeemAssetData.pegHash, gas = redeemAssetData.gas, null, txHash = Option(response.TxHash), ticketID = Random.nextString(32), null)
+            blockchainTransactionRedeemAssets.Service.addTransaction(from = redeemAssetData.from, to = redeemAssetData.to, pegHash = redeemAssetData.pegHash, gas = redeemAssetData.gas, null, txHash = Option(response.TxHash), ticketID = Random.nextString(32), null)
             Ok(views.html.index(success = response.TxHash))
           }
         }

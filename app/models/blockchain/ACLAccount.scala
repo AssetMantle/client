@@ -114,11 +114,11 @@ class ACLAccounts @Inject()(protected val databaseConfigProvider: DatabaseConfig
 
   object Service {
 
-    def addACLAccount(address: String, zoneID: String, organizationID: String, acl: ACL, dirtyBit: Boolean)(implicit executionContext: ExecutionContext): String = Await.result(add(ACLAccount(address, zoneID, organizationID, util.hashing.MurmurHash3.stringHash(acl.toString).toString, dirtyBit)), Duration.Inf)
+    def addEntity(address: String, zoneID: String, organizationID: String, acl: ACL, dirtyBit: Boolean)(implicit executionContext: ExecutionContext): String = Await.result(add(ACLAccount(address, zoneID, organizationID, util.hashing.MurmurHash3.stringHash(acl.toString).toString, dirtyBit)), Duration.Inf)
 
     def insertOrUpdate(address: String, zoneID: String, organizationID: String, acl: ACL, dirtyBit: Boolean)(implicit executionContext: ExecutionContext): Int = Await.result(upsert(ACLAccount(address, zoneID, organizationID, util.hashing.MurmurHash3.stringHash(acl.toString).toString, dirtyBit)), Duration.Inf)
 
-    def getACLAccount(address: String)(implicit executionContext: ExecutionContext): ACLAccount = Await.result(findByAddress(address), Duration.Inf)
+    def get(address: String)(implicit executionContext: ExecutionContext): ACLAccount = Await.result(findByAddress(address), Duration.Inf)
 
     def getAddressesUnderZone(zoneID: String)(implicit executionContext: ExecutionContext): Seq[String] = Await.result(getAddressesByZoneID(zoneID), Duration.Inf)
 

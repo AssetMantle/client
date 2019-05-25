@@ -31,7 +31,7 @@ class ReleaseAssetController @Inject()(messagesControllerComponents: MessagesCon
         releaseAssetData => {
           try {
             val ticketID: String = if (kafkaEnabled) transactionsReleaseAsset.Service.kafkaPost(transactionsReleaseAsset.Request(from = username, to = releaseAssetData.address, password = releaseAssetData.password, pegHash = releaseAssetData.pegHash, gas = releaseAssetData.gas)).ticketID else Random.nextString(32)
-            blockchainTransactionReleaseAssets.Service.addReleaseAsset(from = username, to = releaseAssetData.address, pegHash = releaseAssetData.pegHash, gas = releaseAssetData.gas, null, txHash = null, ticketID = ticketID, null)
+            blockchainTransactionReleaseAssets.Service.addTransaction(from = username, to = releaseAssetData.address, pegHash = releaseAssetData.pegHash, gas = releaseAssetData.gas, null, txHash = null, ticketID = ticketID, null)
             if(!kafkaEnabled){
               Future{
                 try {
@@ -66,11 +66,11 @@ class ReleaseAssetController @Inject()(messagesControllerComponents: MessagesCon
         try {
           if (kafkaEnabled) {
             val response = transactionsReleaseAsset.Service.kafkaPost(transactionsReleaseAsset.Request(from = releaseAssetData.from, to = releaseAssetData.to, password = releaseAssetData.password, pegHash = releaseAssetData.pegHash, gas = releaseAssetData.gas))
-            blockchainTransactionReleaseAssets.Service.addReleaseAsset(from = releaseAssetData.from, to = releaseAssetData.to, pegHash = releaseAssetData.pegHash, gas = releaseAssetData.gas, null, null, ticketID = response.ticketID, null)
+            blockchainTransactionReleaseAssets.Service.addTransaction(from = releaseAssetData.from, to = releaseAssetData.to, pegHash = releaseAssetData.pegHash, gas = releaseAssetData.gas, null, null, ticketID = response.ticketID, null)
             Ok(views.html.index(success = response.ticketID))
           } else {
             val response = transactionsReleaseAsset.Service.post(transactionsReleaseAsset.Request(from = releaseAssetData.from, to = releaseAssetData.to, password = releaseAssetData.password, pegHash = releaseAssetData.pegHash, gas = releaseAssetData.gas))
-            blockchainTransactionReleaseAssets.Service.addReleaseAsset(from = releaseAssetData.from, to = releaseAssetData.to, pegHash = releaseAssetData.pegHash, gas = releaseAssetData.gas, null, txHash = Option(response.TxHash), ticketID = Random.nextString(32), null)
+            blockchainTransactionReleaseAssets.Service.addTransaction(from = releaseAssetData.from, to = releaseAssetData.to, pegHash = releaseAssetData.pegHash, gas = releaseAssetData.gas, null, txHash = Option(response.TxHash), ticketID = Random.nextString(32), null)
             Ok(views.html.index(success = response.TxHash))
           }
         }

@@ -3,7 +3,6 @@ package models.blockchainTransaction
 import akka.actor.ActorSystem
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import models.blockchain.TraderFeedbackHistories
 import models.{blockchain, master}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
@@ -21,7 +20,7 @@ import scala.util.{Failure, Success}
 case class SetSellerFeedback(from: String, to: String, pegHash: String, rating: Int, gas: Int, status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])
 
 @Singleton
-class SetSellerFeedbacks @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, transactionSetSellerFeedback: transactions.SetSellerFeedback, getResponse: GetResponse, actorSystem: ActorSystem, pushNotification: PushNotification, masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts, traderFeedbackHistories: TraderFeedbackHistories)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
+class SetSellerFeedbacks @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, transactionSetSellerFeedback: transactions.SetSellerFeedback, getResponse: GetResponse, actorSystem: ActorSystem, pushNotification: PushNotification, masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts, blockchainTraderFeedbackHistories: blockchain.TraderFeedbackHistories)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_SET_SELLER_FEEDBACK
 
@@ -126,7 +125,7 @@ class SetSellerFeedbacks @Inject()(protected val databaseConfigProvider: Databas
 
   object Service {
 
-    def addSetSellerFeedback(from: String, to: String, pegHash: String, rating: Int, gas: Int, status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])(implicit executionContext: ExecutionContext): String = Await.result(add(SetSellerFeedback(from = from, to = to, pegHash = pegHash, rating = rating, gas = gas, status = status, txHash = txHash, ticketID = ticketID, responseCode = responseCode)), Duration.Inf)
+    def addTransaction(from: String, to: String, pegHash: String, rating: Int, gas: Int, status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])(implicit executionContext: ExecutionContext): String = Await.result(add(SetSellerFeedback(from = from, to = to, pegHash = pegHash, rating = rating, gas = gas, status = status, txHash = txHash, ticketID = ticketID, responseCode = responseCode)), Duration.Inf)
 
     def getTicketIDsOnStatus(): Seq[String] = Await.result(getTicketIDsWithNullStatus(), Duration.Inf)
 
@@ -144,7 +143,7 @@ class SetSellerFeedbacks @Inject()(protected val databaseConfigProvider: Databas
         Service.markTransactionSuccessful(ticketID, response.TxHash, response.Code)
         val setSellerFeedback = Service.getSetSellerFeedbackOnTicketID(ticketID)
         val fromAddress = masterAccounts.Service.getAddress(setSellerFeedback.from)
-        traderFeedbackHistories.Service.addTraderFeedbackHistory(setSellerFeedback.to, setSellerFeedback.to, fromAddress, setSellerFeedback.pegHash, setSellerFeedback.rating.toString)
+        blockchainTraderFeedbackHistories.Service.addEntity(setSellerFeedback.to, setSellerFeedback.to, fromAddress, setSellerFeedback.pegHash, setSellerFeedback.rating.toString)
         blockchainAccounts.Service.markDirty(fromAddress)
         pushNotification.sendNotification(masterAccounts.Service.getId(setSellerFeedback.to), constants.Notification.SUCCESS, response.TxHash)
         pushNotification.sendNotification(setSellerFeedback.from, constants.Notification.SUCCESS, response.TxHash)
