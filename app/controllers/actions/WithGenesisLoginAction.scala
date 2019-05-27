@@ -2,8 +2,7 @@ package controllers.actions
 
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import models.master
-import models.masterTransaction.AccountTokens
+import models.{master, masterTransaction}
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc._
 import play.api.{Configuration, Logger}
@@ -11,7 +10,7 @@ import play.api.{Configuration, Logger}
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class WithGenesisLoginAction @Inject()(messagesControllerComponents: MessagesControllerComponents, masterAccounts: master.Accounts, accountTokens: AccountTokens)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class WithGenesisLoginAction @Inject()(messagesControllerComponents: MessagesControllerComponents, masterAccounts: master.Accounts, masterTransactionAccountTokens: masterTransaction.AccountTokens)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val module: String = constants.Module.ACTIONS_WITH_GENESIS_LOGIN_ACTION
 
@@ -20,9 +19,9 @@ class WithGenesisLoginAction @Inject()(messagesControllerComponents: MessagesCon
       try {
         val username = request.session.get(constants.Security.USERNAME).getOrElse(throw new BaseException(constants.Error.USERNAME_NOT_FOUND))
         val sessionToken = request.session.get(constants.Security.TOKEN).getOrElse(throw new BaseException(constants.Error.TOKEN_NOT_FOUND))
-        accountTokens.Service.tryVerifyingSessionToken(username, sessionToken)
-        accountTokens.Service.tryVerifyingSessionTokenTime(username)
-        masterAccounts.Service.tryVerifyUserType(username, constants.User.GENESIS)
+        masterTransactionAccountTokens.Service.tryVerifyingSessionToken(username, sessionToken)
+        masterTransactionAccountTokens.Service.tryVerifyingSessionTokenTime(username)
+        masterAccounts.Service.tryVerifyingUserType(username, constants.User.GENESIS)
         f(username)(request)
       }
       catch {
