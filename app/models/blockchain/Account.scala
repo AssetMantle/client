@@ -127,7 +127,7 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   object Service {
 
-    def addEntity(username: String, password: String)(implicit executionContext: ExecutionContext): String = {
+    def create(username: String, password: String)(implicit executionContext: ExecutionContext): String = {
       val addKeyResponse = addKey.Service.post(addKey.Request(username, password, getSeed.Service.get().body))
       Await.result(add(Account(addKeyResponse.address, 0, addKeyResponse.pub_key, -1, 0, dirtyBit = false)), Duration.Inf)
     }

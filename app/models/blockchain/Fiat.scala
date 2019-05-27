@@ -122,7 +122,7 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
   object Service {
 
-    def addEntity(pegHash: String, ownerAddress: String, transactionID: String, transactionAmount: String, redeemedAmount: String, dirtyBit: Boolean)(implicit executionContext: ExecutionContext): String = Await.result(add(Fiat(pegHash, ownerAddress, transactionID, transactionAmount, redeemedAmount, dirtyBit)), Duration.Inf)
+    def create(pegHash: String, ownerAddress: String, transactionID: String, transactionAmount: String, redeemedAmount: String, dirtyBit: Boolean)(implicit executionContext: ExecutionContext): String = Await.result(add(Fiat(pegHash, ownerAddress, transactionID, transactionAmount, redeemedAmount, dirtyBit)), Duration.Inf)
 
     def getFiatPegWallet(address: String)(implicit executionContext: ExecutionContext): Seq[Fiat] = Await.result(getFiatPegWalletByAddress(address), Duration.Inf)
 

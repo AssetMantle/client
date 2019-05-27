@@ -125,7 +125,7 @@ class SetSellerFeedbacks @Inject()(protected val databaseConfigProvider: Databas
 
   object Service {
 
-    def addTransaction(from: String, to: String, pegHash: String, rating: Int, gas: Int, status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])(implicit executionContext: ExecutionContext): String = Await.result(add(SetSellerFeedback(from = from, to = to, pegHash = pegHash, rating = rating, gas = gas, status = status, txHash = txHash, ticketID = ticketID, responseCode = responseCode)), Duration.Inf)
+    def create(from: String, to: String, pegHash: String, rating: Int, gas: Int, status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])(implicit executionContext: ExecutionContext): String = Await.result(add(SetSellerFeedback(from = from, to = to, pegHash = pegHash, rating = rating, gas = gas, status = status, txHash = txHash, ticketID = ticketID, responseCode = responseCode)), Duration.Inf)
 
     def getTicketIDsOnStatus(): Seq[String] = Await.result(getTicketIDsWithNullStatus(), Duration.Inf)
 
@@ -143,7 +143,7 @@ class SetSellerFeedbacks @Inject()(protected val databaseConfigProvider: Databas
         Service.markTransactionSuccessful(ticketID, response.TxHash, response.Code)
         val setSellerFeedback = Service.getSetSellerFeedbackOnTicketID(ticketID)
         val fromAddress = masterAccounts.Service.getAddress(setSellerFeedback.from)
-        blockchainTraderFeedbackHistories.Service.addEntity(setSellerFeedback.to, setSellerFeedback.to, fromAddress, setSellerFeedback.pegHash, setSellerFeedback.rating.toString)
+        blockchainTraderFeedbackHistories.Service.create(setSellerFeedback.to, setSellerFeedback.to, fromAddress, setSellerFeedback.pegHash, setSellerFeedback.rating.toString)
         blockchainAccounts.Service.markDirty(fromAddress)
         pushNotification.sendNotification(masterAccounts.Service.getId(setSellerFeedback.to), constants.Notification.SUCCESS, response.TxHash)
         pushNotification.sendNotification(setSellerFeedback.from, constants.Notification.SUCCESS, response.TxHash)

@@ -133,7 +133,7 @@ class IssueAssets @Inject()(protected val databaseConfigProvider: DatabaseConfig
 
   object Service {
 
-    def addTransaction(from: String, to: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, unmoderated: Boolean, gas: Int, status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])(implicit executionContext: ExecutionContext): String = Await.result(add(IssueAsset(from = from, to = to, documentHash = documentHash, assetType = assetType, assetPrice = assetPrice, quantityUnit = quantityUnit, assetQuantity = assetQuantity, gas = gas, status = status, txHash = txHash, ticketID = ticketID, responseCode = responseCode, unmoderated = unmoderated)), Duration.Inf)
+    def create(from: String, to: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, unmoderated: Boolean, gas: Int, status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])(implicit executionContext: ExecutionContext): String = Await.result(add(IssueAsset(from = from, to = to, documentHash = documentHash, assetType = assetType, assetPrice = assetPrice, quantityUnit = quantityUnit, assetQuantity = assetQuantity, gas = gas, status = status, txHash = txHash, ticketID = ticketID, responseCode = responseCode, unmoderated = unmoderated)), Duration.Inf)
 
     def markTransactionSuccessful(ticketID: String, txHash: String, responseCode: String): Int = Await.result(updateTxHashStatusAndResponseCodeOnTicketID(ticketID, txHash, status = true, responseCode), Duration.Inf)
 

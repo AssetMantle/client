@@ -123,7 +123,7 @@ class SetBuyerFeedbacks @Inject()(protected val databaseConfigProvider: Database
 
   object Service {
 
-    def addTransaction(from: String, to: String, pegHash: String, rating: Int, gas: Int, status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])(implicit executionContext: ExecutionContext): String = Await.result(add(SetBuyerFeedback(from = from, to = to, pegHash = pegHash, rating = rating, gas = gas, status = status, txHash = txHash, ticketID = ticketID, responseCode = responseCode)), Duration.Inf)
+    def create(from: String, to: String, pegHash: String, rating: Int, gas: Int, status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])(implicit executionContext: ExecutionContext): String = Await.result(add(SetBuyerFeedback(from = from, to = to, pegHash = pegHash, rating = rating, gas = gas, status = status, txHash = txHash, ticketID = ticketID, responseCode = responseCode)), Duration.Inf)
 
     def getTicketIDsOnStatus(): Seq[String] = Await.result(getTicketIDsWithNullStatus(), Duration.Inf)
 
@@ -141,7 +141,7 @@ class SetBuyerFeedbacks @Inject()(protected val databaseConfigProvider: Database
         Service.markTransactionSuccessful(ticketID, response.TxHash, response.Code)
         val setBuyerFeedback = Service.getTransaction(ticketID)
         val fromAddress = masterAccounts.Service.getAddress(setBuyerFeedback.from)
-        blockchainTraderFeedbackHistories.Service.addEntity(setBuyerFeedback.to, fromAddress, setBuyerFeedback.to, setBuyerFeedback.pegHash, setBuyerFeedback.rating.toString)
+        blockchainTraderFeedbackHistories.Service.create(setBuyerFeedback.to, fromAddress, setBuyerFeedback.to, setBuyerFeedback.pegHash, setBuyerFeedback.rating.toString)
         blockchainAccounts.Service.markDirty(fromAddress)
         pushNotification.sendNotification(masterAccounts.Service.getId(setBuyerFeedback.to), constants.Notification.SUCCESS, response.TxHash)
         pushNotification.sendNotification(setBuyerFeedback.from, constants.Notification.SUCCESS, response.TxHash)

@@ -103,7 +103,7 @@ class Orders @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
 
   object Service {
 
-    def addEntity(id: String, fiatProofHash: Option[String], awbProofHash: Option[String])(implicit executionContext: ExecutionContext): String = Await.result(add(Order(id = id, fiatProofHash = fiatProofHash, awbProofHash = awbProofHash, dirtyBit = false)), Duration.Inf)
+    def create(id: String, fiatProofHash: Option[String], awbProofHash: Option[String])(implicit executionContext: ExecutionContext): String = Await.result(add(Order(id = id, fiatProofHash = fiatProofHash, awbProofHash = awbProofHash, dirtyBit = false)), Duration.Inf)
 
     def insertOrUpdate(id: String, fiatProofHash: Option[String], awbProofHash: Option[String], dirtyBit: Boolean)(implicit executionContext: ExecutionContext): Int = Await.result(upsert(Order(id = id, fiatProofHash = fiatProofHash, awbProofHash = awbProofHash, dirtyBit = dirtyBit)), Duration.Inf)
 

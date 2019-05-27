@@ -117,7 +117,7 @@ class AddOrganizations @Inject()(protected val databaseConfigProvider: DatabaseC
 
   object Service {
 
-    def addTransaction(from: String, to: String, organizationID: String, zoneID: String, status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])(implicit executionContext: ExecutionContext): String = Await.result(add(AddOrganization(from = from, to = to, organizationID = organizationID, zoneID = zoneID, status = status, txHash = txHash, ticketID = ticketID, responseCode = responseCode)), Duration.Inf)
+    def create(from: String, to: String, organizationID: String, zoneID: String, status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])(implicit executionContext: ExecutionContext): String = Await.result(add(AddOrganization(from = from, to = to, organizationID = organizationID, zoneID = zoneID, status = status, txHash = txHash, ticketID = ticketID, responseCode = responseCode)), Duration.Inf)
 
     def markTransactionSuccessful(ticketID: String, txHash: String, responseCode: String): Int = Await.result(updateTxHashStatusAndResponseCodeOnTicketID(ticketID, txHash, status = true, responseCode), Duration.Inf)
 
@@ -137,7 +137,7 @@ class AddOrganizations @Inject()(protected val databaseConfigProvider: DatabaseC
       try {
         Service.markTransactionSuccessful(ticketID, response.TxHash, response.Code)
         val addOrganization = Service.getTransaction(ticketID)
-        blockchainOrganizations.Service.addEntity(addOrganization.organizationID, addOrganization.to, dirtyBit = true)
+        blockchainOrganizations.Service.create(addOrganization.organizationID, addOrganization.to, dirtyBit = true)
         masterOrganizations.Service.updateStatus(addOrganization.organizationID, status = true)
         masterAccounts.Service.updateUserType(masterOrganizations.Service.getAccountId(addOrganization.organizationID), constants.User.ORGANIZATION)
         blockchainAccounts.Service.markDirty(masterAccounts.Service.getAddress(addOrganization.from))

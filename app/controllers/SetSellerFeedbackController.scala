@@ -33,7 +33,7 @@ class SetSellerFeedbackController @Inject()(messagesControllerComponents: Messag
         setSellerFeedbackData => {
           try {
             val ticketID = if (kafkaEnabled) transactionsSetSellerFeedback.Service.kafkaPost(transactionsSetSellerFeedback.Request(from = username, to = setSellerFeedbackData.buyerAddress, password = setSellerFeedbackData.password, pegHash = setSellerFeedbackData.pegHash, rating = setSellerFeedbackData.rating, gas = setSellerFeedbackData.gas)).ticketID else Random.nextString(32)
-            blockchainTransactionSetSellerFeedbacks.Service.addTransaction(from = username, to = setSellerFeedbackData.buyerAddress, pegHash = setSellerFeedbackData.pegHash, rating = setSellerFeedbackData.rating, gas = setSellerFeedbackData.gas, null, null, ticketID = ticketID, null)
+            blockchainTransactionSetSellerFeedbacks.Service.create(from = username, to = setSellerFeedbackData.buyerAddress, pegHash = setSellerFeedbackData.pegHash, rating = setSellerFeedbackData.rating, gas = setSellerFeedbackData.gas, null, null, ticketID = ticketID, null)
             if (!kafkaEnabled) {
               Future {
                 try {

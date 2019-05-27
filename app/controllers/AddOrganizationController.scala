@@ -57,7 +57,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
           try {
             val organizationAccountAddress = masterAccounts.Service.getAddress(masterOrganizations.Service.getAccountId(verifyOrganizationData.organizationID))
             val ticketID: String = if (kafkaEnabled) transactionsAddOrganization.Service.kafkaPost(transactionsAddOrganization.Request(from = username, to = organizationAccountAddress, organizationID = verifyOrganizationData.organizationID, zoneID = verifyOrganizationData.zoneID, password = verifyOrganizationData.password)).ticketID else Random.nextString(32)
-            blockchainTransactionAddOrganizations.Service.addTransaction(from = username, to = organizationAccountAddress, organizationID = verifyOrganizationData.organizationID, zoneID = verifyOrganizationData.zoneID, null, null, ticketID = ticketID, null)
+            blockchainTransactionAddOrganizations.Service.create(from = username, to = organizationAccountAddress, organizationID = verifyOrganizationData.organizationID, zoneID = verifyOrganizationData.zoneID, null, null, ticketID = ticketID, null)
             if (!kafkaEnabled) {
               Future {
                 try {

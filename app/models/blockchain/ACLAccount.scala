@@ -114,7 +114,7 @@ class ACLAccounts @Inject()(protected val databaseConfigProvider: DatabaseConfig
 
   object Service {
 
-    def addEntity(address: String, zoneID: String, organizationID: String, acl: ACL, dirtyBit: Boolean)(implicit executionContext: ExecutionContext): String = Await.result(add(ACLAccount(address, zoneID, organizationID, util.hashing.MurmurHash3.stringHash(acl.toString).toString, dirtyBit)), Duration.Inf)
+    def create(address: String, zoneID: String, organizationID: String, acl: ACL, dirtyBit: Boolean)(implicit executionContext: ExecutionContext): String = Await.result(add(ACLAccount(address, zoneID, organizationID, util.hashing.MurmurHash3.stringHash(acl.toString).toString, dirtyBit)), Duration.Inf)
 
     def insertOrUpdate(address: String, zoneID: String, organizationID: String, acl: ACL, dirtyBit: Boolean)(implicit executionContext: ExecutionContext): Int = Await.result(upsert(ACLAccount(address, zoneID, organizationID, util.hashing.MurmurHash3.stringHash(acl.toString).toString, dirtyBit)), Duration.Inf)
 

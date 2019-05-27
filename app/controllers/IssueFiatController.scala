@@ -87,7 +87,7 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
             if (masterTransactionIssueFiatRequests.Service.getStatus(issueFiatData.requestID).isEmpty) {
               val toAddress = masterAccounts.Service.getAddress(issueFiatData.accountID)
               val ticketID: String = if (kafkaEnabled) transactionsIssueFiat.Service.kafkaPost(transactionsIssueFiat.Request(from = username, to = toAddress, password = issueFiatData.password, transactionID = issueFiatData.transactionID, transactionAmount = issueFiatData.transactionAmount, gas = issueFiatData.gas)).ticketID else Random.nextString(32)
-              blockchainTransactionIssueFiats.Service.addTransaction(from = username, to = toAddress, transactionID = issueFiatData.transactionID, transactionAmount = issueFiatData.transactionAmount, gas = issueFiatData.gas, null, null, ticketID = ticketID, null)
+              blockchainTransactionIssueFiats.Service.create(from = username, to = toAddress, transactionID = issueFiatData.transactionID, transactionAmount = issueFiatData.transactionAmount, gas = issueFiatData.gas, null, null, ticketID = ticketID, null)
               masterTransactionIssueFiatRequests.Service.accept(issueFiatData.requestID, ticketID, issueFiatData.gas)
               if (!kafkaEnabled) {
                 Future {

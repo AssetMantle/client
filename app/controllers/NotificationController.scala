@@ -22,7 +22,7 @@ class NotificationController @Inject()(messagesControllerComponents: MessagesCon
   def notificationPage(pageNumber: Int = 0): Action[AnyContent] = withLoginAction.authenticated { username =>
     implicit request =>
       try {
-        Ok(views.html.component.master.notifications(notifications.Service.getNotifications(username, pageNumber * limit, limit)))
+        Ok(views.html.component.master.notifications(notifications.Service.get(username, pageNumber * limit, limit)))
       }
       catch {
         case baseException: BaseException => Ok(baseException.message)

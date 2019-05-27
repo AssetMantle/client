@@ -31,7 +31,7 @@ class ChangeSellerBidController @Inject()(messagesControllerComponents: Messages
         changeSellerBidData => {
           try {
             val ticketID: String = if (kafkaEnabled) transactionsChangeSellerBid.Service.kafkaPost(transactionsChangeSellerBid.Request(from = username, to = changeSellerBidData.buyerAddress, password = changeSellerBidData.password, bid = changeSellerBidData.bid, time = changeSellerBidData.time, pegHash = changeSellerBidData.pegHash, gas = changeSellerBidData.gas)).ticketID else Random.nextString(32)
-            blockchainTransactionChangeSellerBids.Service.addTransaction(from = username, to = changeSellerBidData.buyerAddress, bid = changeSellerBidData.bid, time = changeSellerBidData.time, pegHash = changeSellerBidData.pegHash, gas = changeSellerBidData.gas, null, null, ticketID = ticketID, null)
+            blockchainTransactionChangeSellerBids.Service.create(from = username, to = changeSellerBidData.buyerAddress, bid = changeSellerBidData.bid, time = changeSellerBidData.time, pegHash = changeSellerBidData.pegHash, gas = changeSellerBidData.gas, null, null, ticketID = ticketID, null)
             if(!kafkaEnabled){
               Future{
                 try {
@@ -67,11 +67,11 @@ class ChangeSellerBidController @Inject()(messagesControllerComponents: Messages
         try {
           if (kafkaEnabled) {
             val response = transactionsChangeSellerBid.Service.kafkaPost(transactionsChangeSellerBid.Request(from = changeSellerBidData.from, to = changeSellerBidData.to, password = changeSellerBidData.password, bid = changeSellerBidData.bid, time = changeSellerBidData.time, pegHash = changeSellerBidData.pegHash, gas = changeSellerBidData.gas))
-            blockchainTransactionChangeSellerBids.Service.addTransaction(from = changeSellerBidData.from, to = changeSellerBidData.to, bid = changeSellerBidData.bid, time = changeSellerBidData.time, pegHash = changeSellerBidData.pegHash, gas = changeSellerBidData.gas, null, null, ticketID = response.ticketID, null)
+            blockchainTransactionChangeSellerBids.Service.create(from = changeSellerBidData.from, to = changeSellerBidData.to, bid = changeSellerBidData.bid, time = changeSellerBidData.time, pegHash = changeSellerBidData.pegHash, gas = changeSellerBidData.gas, null, null, ticketID = response.ticketID, null)
             Ok(views.html.index(success = response.ticketID))
           } else {
             val response = transactionsChangeSellerBid.Service.post(transactionsChangeSellerBid.Request(from = changeSellerBidData.from, to = changeSellerBidData.to, password = changeSellerBidData.password, bid = changeSellerBidData.bid, time = changeSellerBidData.time, pegHash = changeSellerBidData.pegHash, gas = changeSellerBidData.gas))
-            blockchainTransactionChangeSellerBids.Service.addTransaction(from = changeSellerBidData.from, to = changeSellerBidData.to, bid = changeSellerBidData.bid, time = changeSellerBidData.time, pegHash = changeSellerBidData.pegHash, gas = changeSellerBidData.gas, null, txHash = Option(response.TxHash), ticketID = Random.nextString(32), null)
+            blockchainTransactionChangeSellerBids.Service.create(from = changeSellerBidData.from, to = changeSellerBidData.to, bid = changeSellerBidData.bid, time = changeSellerBidData.time, pegHash = changeSellerBidData.pegHash, gas = changeSellerBidData.gas, null, txHash = Option(response.TxHash), ticketID = Random.nextString(32), null)
             Ok(views.html.index(success = response.TxHash))
           }
         }

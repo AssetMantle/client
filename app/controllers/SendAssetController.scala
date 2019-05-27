@@ -31,7 +31,7 @@ class SendAssetController @Inject()(messagesControllerComponents: MessagesContro
         sendAssetData => {
           try {
             val ticketID: String = if (kafkaEnabled) transactionsSendAsset.Service.kafkaPost(transactionsSendAsset.Request(from = username, to = sendAssetData.buyerAddress, password = sendAssetData.password, pegHash = sendAssetData.pegHash, gas = sendAssetData.gas)).ticketID else Random.nextString(32)
-            blockchainTransactionSendAssets.Service.addTransaction(from = username, to = sendAssetData.buyerAddress, pegHash = sendAssetData.pegHash, gas = sendAssetData.gas, null, null, ticketID = ticketID, null)
+            blockchainTransactionSendAssets.Service.create(from = username, to = sendAssetData.buyerAddress, pegHash = sendAssetData.pegHash, gas = sendAssetData.gas, null, null, ticketID = ticketID, null)
             if(!kafkaEnabled){
               Future{
                 try {
@@ -66,11 +66,11 @@ class SendAssetController @Inject()(messagesControllerComponents: MessagesContro
         try {
           if (kafkaEnabled) {
             val response = transactionsSendAsset.Service.kafkaPost(transactionsSendAsset.Request(from = sendAssetData.from, to = sendAssetData.to, password = sendAssetData.password, pegHash = sendAssetData.pegHash, gas = sendAssetData.gas))
-            blockchainTransactionSendAssets.Service.addTransaction(from = sendAssetData.from, to = sendAssetData.to, pegHash = sendAssetData.pegHash, gas = sendAssetData.gas, null, null, ticketID = response.ticketID, null)
+            blockchainTransactionSendAssets.Service.create(from = sendAssetData.from, to = sendAssetData.to, pegHash = sendAssetData.pegHash, gas = sendAssetData.gas, null, null, ticketID = response.ticketID, null)
             Ok(views.html.index(success = response.ticketID))
           } else {
             val response = transactionsSendAsset.Service.post(transactionsSendAsset.Request(from = sendAssetData.from, to = sendAssetData.to, password = sendAssetData.password, pegHash = sendAssetData.pegHash, gas = sendAssetData.gas))
-            blockchainTransactionSendAssets.Service.addTransaction(from = sendAssetData.from, to = sendAssetData.to, pegHash = sendAssetData.pegHash, gas = sendAssetData.gas, null, txHash = Option(response.TxHash), ticketID = Random.nextString(32), null)
+            blockchainTransactionSendAssets.Service.create(from = sendAssetData.from, to = sendAssetData.to, pegHash = sendAssetData.pegHash, gas = sendAssetData.gas, null, txHash = Option(response.TxHash), ticketID = Random.nextString(32), null)
             Ok(views.html.index(success = response.TxHash))
           }
         }

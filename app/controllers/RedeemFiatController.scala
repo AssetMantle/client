@@ -34,7 +34,7 @@ class RedeemFiatController @Inject()(messagesControllerComponents: MessagesContr
           try {
             val toAddress = blockchainZones.Service.getAddress(redeemFiatData.zoneID)
             val ticketID = if (kafkaEnabled) transactionsRedeemFiat.Service.kafkaPost(transactionsRedeemFiat.Request(from = username, to = toAddress, password = redeemFiatData.password, redeemAmount = redeemFiatData.redeemAmount, gas = redeemFiatData.gas)).ticketID else Random.nextString(32)
-            blockchainTransactionRedeemFiats.Service.addTransaction(from = username, to = toAddress, redeemAmount = redeemFiatData.redeemAmount, gas = redeemFiatData.gas, null, null, ticketID = ticketID, null)
+            blockchainTransactionRedeemFiats.Service.create(from = username, to = toAddress, redeemAmount = redeemFiatData.redeemAmount, gas = redeemFiatData.gas, null, null, ticketID = ticketID, null)
             if (!kafkaEnabled) {
               Future {
                 try {

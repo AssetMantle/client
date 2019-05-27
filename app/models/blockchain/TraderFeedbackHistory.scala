@@ -87,7 +87,7 @@ class TraderFeedbackHistories @Inject()(protected val databaseConfigProvider: Da
 
   object Service {
 
-    def addEntity(address: String, buyerAddress: String, sellerAddress: String, pegHash: String, rating: String): String = Await.result(add(TraderFeedbackHistory(address, buyerAddress, sellerAddress, pegHash, rating)), Duration.Inf)
+    def create(address: String, buyerAddress: String, sellerAddress: String, pegHash: String, rating: String): String = Await.result(add(TraderFeedbackHistory(address, buyerAddress, sellerAddress, pegHash, rating)), Duration.Inf)
 
     def get(address: String): Seq[TraderFeedbackHistory] = Await.result(findById(address), Duration.Inf)
   }
