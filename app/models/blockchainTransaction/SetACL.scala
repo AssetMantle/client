@@ -68,7 +68,7 @@ class SetACLs @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
     }
   }
 
-  private def updateTxHashStatusAndResponseCodeOnTicketID(ticketID: String, txHash: String, status: Boolean, responseCode: String): Future[Int] = db.run(setACLTable.filter(_.ticketID === ticketID).map(x => (x.txHash, x.status, x.responseCode)).update(txHash, status, responseCode).asTry).map {
+  private def updateTxHashStatusAndResponseCodeOnTicketID(ticketID: String, txHash: String, status: Option[Boolean], responseCode: String): Future[Int] = db.run(setACLTable.filter(_.ticketID === ticketID).map(x => (x.txHash, x.status.?, x.responseCode)).update(txHash, status, responseCode).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
@@ -78,7 +78,7 @@ class SetACLs @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
     }
   }
 
-  private def updateStatusAndResponseOnTicketID(ticketID: String, status: Boolean, responseCode: String): Future[Int] = db.run(setACLTable.filter(_.ticketID === ticketID).map(x => (x.status, x.responseCode)).update((status, responseCode)).asTry).map {
+  private def updateStatusAndResponseOnTicketID(ticketID: String, status: Option[Boolean], responseCode: String): Future[Int] = db.run(setACLTable.filter(_.ticketID === ticketID).map(x => (x.status.?, x.responseCode)).update((status, responseCode)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
@@ -127,9 +127,9 @@ class SetACLs @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
 
     def create(from: String, aclAddress: String, organizationID: String, zoneID: String, acl: ACL, status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])(implicit executionContext: ExecutionContext): String = Await.result(add(SetACL(from, aclAddress, organizationID, zoneID, util.hashing.MurmurHash3.stringHash(acl.toString).toString, status, txHash, ticketID, responseCode)), Duration.Inf)
 
-    def markTransactionSuccessful(ticketID: String, txHash: String, responseCode: String): Int = Await.result(updateTxHashStatusAndResponseCodeOnTicketID(ticketID, txHash, status = true, responseCode), Duration.Inf)
+    def markTransactionSuccessful(ticketID: String, txHash: String, responseCode: String): Int = Await.result(updateTxHashStatusAndResponseCodeOnTicketID(ticketID, txHash, status = Option(true), responseCode), Duration.Inf)
 
-    def markTransactionFailed(ticketID: String, responseCode: String): Int = Await.result(updateStatusAndResponseOnTicketID(ticketID, status = false, responseCode), Duration.Inf)
+    def markTransactionFailed(ticketID: String, responseCode: String): Int = Await.result(updateStatusAndResponseOnTicketID(ticketID, status = Option(false), responseCode), Duration.Inf)
 
     def getSetACL(ticketID: String)(implicit executionContext: ExecutionContext): SetACL = Await.result(findByTicketID(ticketID), Duration.Inf)
 

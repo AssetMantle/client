@@ -68,7 +68,7 @@ class SetSellerFeedbacks @Inject()(protected val databaseConfigProvider: Databas
     }
   }
 
-  private def updateTxHashStatusAndResponseCodeOnTicketID(ticketID: String, txHash: String, status: Boolean, responseCode: String)(implicit executionContext: ExecutionContext): Future[Int] = db.run(setSellerFeedbackTable.filter(_.ticketID === ticketID).map(x => (x.txHash, x.status, x.responseCode)).update(txHash, status, responseCode).asTry).map {
+  private def updateTxHashStatusAndResponseCodeOnTicketID(ticketID: String, txHash: String, status: Option[Boolean], responseCode: String)(implicit executionContext: ExecutionContext): Future[Int] = db.run(setSellerFeedbackTable.filter(_.ticketID === ticketID).map(x => (x.txHash, x.status.?, x.responseCode)).update(txHash, status, responseCode).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
@@ -78,7 +78,7 @@ class SetSellerFeedbacks @Inject()(protected val databaseConfigProvider: Databas
     }
   }
 
-  private def updateStatusAndResponseOnTicketID(ticketID: String, status: Boolean, responseCode: String): Future[Int] = db.run(setSellerFeedbackTable.filter(_.ticketID === ticketID).map(x => (x.status, x.responseCode)).update((status, responseCode)).asTry).map {
+  private def updateStatusAndResponseOnTicketID(ticketID: String, status: Option[Boolean], responseCode: String): Future[Int] = db.run(setSellerFeedbackTable.filter(_.ticketID === ticketID).map(x => (x.status.?, x.responseCode)).update((status, responseCode)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
@@ -131,9 +131,9 @@ class SetSellerFeedbacks @Inject()(protected val databaseConfigProvider: Databas
 
     def getSetSellerFeedbackOnTicketID(ticketID: String): SetSellerFeedback = Await.result(findByTicketID(ticketID), Duration.Inf)
 
-    def markTransactionSuccessful(ticketID: String, txHash: String, responseCode: String): Int = Await.result(updateTxHashStatusAndResponseCodeOnTicketID(ticketID, txHash, status = true, responseCode), Duration.Inf)
+    def markTransactionSuccessful(ticketID: String, txHash: String, responseCode: String): Int = Await.result(updateTxHashStatusAndResponseCodeOnTicketID(ticketID, txHash, status = Option(true), responseCode), Duration.Inf)
 
-    def markTransactionFailed(ticketID: String, responseCode: String): Int = Await.result(updateStatusAndResponseOnTicketID(ticketID, status = false, responseCode), Duration.Inf)
+    def markTransactionFailed(ticketID: String, responseCode: String): Int = Await.result(updateStatusAndResponseOnTicketID(ticketID, status = Option(false), responseCode), Duration.Inf)
 
   }
 
