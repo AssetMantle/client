@@ -73,7 +73,7 @@ class Notifications @Inject()(protected val databaseConfigProvider: DatabaseConf
 
   object Service {
 
-    def addNotification(accountID: String, notificationTitle: String, notificationMessage: String)(implicit executionContext: ExecutionContext): String = Await.result(add(Notification(accountID, notificationTitle, notificationMessage, DateTime.now(DateTimeZone.UTC).getMillis, false, Random.nextString(32))), Duration.Inf)
+    def create(accountID: String, notificationTitle: String, notificationMessage: String)(implicit executionContext: ExecutionContext): String = Await.result(add(Notification(accountID, notificationTitle, notificationMessage, DateTime.now(DateTimeZone.UTC).getMillis, false, Random.nextString(32))), Duration.Inf)
 
     def get(accountID: String, offset: Int, limit: Int)(implicit executionContext: ExecutionContext): Seq[Notification] = Await.result(findNotificationsByAccountId(accountID, offset, limit), Duration.Inf)
 
