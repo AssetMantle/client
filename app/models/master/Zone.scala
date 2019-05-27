@@ -118,9 +118,9 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
   object Service {
 
-    def addZone(accountID: String, name: String, currency: String)(implicit executionContext: ExecutionContext): String = Await.result(add(Zone((-Math.abs(Random.nextInt)).toHexString.toUpperCase, accountID, name, currency, null)), Duration.Inf)
+    def create(accountID: String, name: String, currency: String)(implicit executionContext: ExecutionContext): String = Await.result(add(Zone((-Math.abs(Random.nextInt)).toHexString.toUpperCase, accountID, name, currency, null)), Duration.Inf)
 
-    def getZone(id: String)(implicit executionContext: ExecutionContext): Zone = Await.result(findById(id), Duration.Inf)
+    def get(id: String)(implicit executionContext: ExecutionContext): Zone = Await.result(findById(id), Duration.Inf)
 
     def updateStatus(id: String, status: Boolean)(implicit executionContext: ExecutionContext): Int = Await.result(updateStatusOnID(id, status), Duration.Inf)
 

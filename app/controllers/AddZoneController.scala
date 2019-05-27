@@ -30,7 +30,7 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
         },
         addZoneData => {
           try {
-            Ok(views.html.index(success = constants.Success.ADD_ZONE + ":" + masterZones.Service.addZone(accountID = username, name = addZoneData.name, currency = addZoneData.currency)))
+            Ok(views.html.index(success = constants.Success.ADD_ZONE + ":" + masterZones.Service.create(accountID = username, name = addZoneData.name, currency = addZoneData.currency)))
           }
           catch {
             case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))

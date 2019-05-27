@@ -30,7 +30,7 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
         },
         issueFiatRequestData => {
           try {
-            masterTransactionIssueFiatRequests.Service.addIssueFiatRequest(accountID = username, transactionID = issueFiatRequestData.transactionID, transactionAmount = issueFiatRequestData.transactionAmount)
+            masterTransactionIssueFiatRequests.Service.create(accountID = username, transactionID = issueFiatRequestData.transactionID, transactionAmount = issueFiatRequestData.transactionAmount)
             Ok(views.html.index(success = constants.Success.ISSUE_FIAT_REQUEST))
           }
           catch {

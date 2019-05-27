@@ -47,7 +47,7 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
               }
               Ok(views.html.index(success = ticketID))
             } else {
-              masterTransactionIssueAssetRequests.Service.addIssueAssetRequest(accountID = username, documentHash = issueAssetRequestData.documentHash, assetPrice = issueAssetRequestData.assetPrice, assetType = issueAssetRequestData.assetType, quantityUnit = issueAssetRequestData.quantityUnit, assetQuantity = issueAssetRequestData.assetQuantity)
+              masterTransactionIssueAssetRequests.Service.create(accountID = username, documentHash = issueAssetRequestData.documentHash, assetPrice = issueAssetRequestData.assetPrice, assetType = issueAssetRequestData.assetType, quantityUnit = issueAssetRequestData.quantityUnit, assetQuantity = issueAssetRequestData.assetQuantity)
               Ok(views.html.index(success = constants.Success.ISSUE_ASSET_REQUEST))
             }
           }

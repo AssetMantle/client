@@ -31,7 +31,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
         addOrganizationData => {
           try {
             if (masterZones.Service.getStatus(addOrganizationData.zoneID) == Option(true)) {
-              Ok(views.html.index(success = constants.Success.ADD_ORGANIZATION + ":" + masterOrganizations.Service.addOrganization(zoneID = addOrganizationData.zoneID, accountID = username, name = addOrganizationData.name, address = addOrganizationData.address, phone = addOrganizationData.phone, email = addOrganizationData.email)))
+              Ok(views.html.index(success = constants.Success.ADD_ORGANIZATION + ":" + masterOrganizations.Service.create(zoneID = addOrganizationData.zoneID, accountID = username, name = addOrganizationData.name, address = addOrganizationData.address, phone = addOrganizationData.phone, email = addOrganizationData.email)))
             } else {
               Ok(views.html.index(failure = Messages(constants.Error.UNVERIFIED_ZONE)))
             }

@@ -97,7 +97,7 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
         },
         requestCoinFormData => {
           try {
-            masterTransactionFaucetRequests.Service.addFaucetRequest(username, defaultFaucetToken)
+            masterTransactionFaucetRequests.Service.create(username, defaultFaucetToken)
             Ok(views.html.index(success = constants.Success.REQUEST_COINS))
           }
           catch {
