@@ -146,7 +146,6 @@ class ACLAccounts @Inject()(protected val databaseConfigProvider: DatabaseConfig
     }
   }
 
-
   actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
     Utility.dirtyEntityUpdater()
   }
