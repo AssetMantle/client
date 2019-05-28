@@ -204,7 +204,7 @@ class SendCoins @Inject()(protected val databaseConfigProvider: DatabaseConfigPr
         pushNotification.sendNotification(sendCoin.from, constants.Notification.SUCCESS, response.TxHash)
       }
       catch {
-        case baseException: BaseException => logger.error(constants.Response.BASE_EXCEPTION.message, baseException)
+        case baseException: BaseException => logger.error(baseException.failure.message, baseException)
           throw new BaseException(constants.Response.PSQL_EXCEPTION)
       }
     }
@@ -216,7 +216,7 @@ class SendCoins @Inject()(protected val databaseConfigProvider: DatabaseConfigPr
         pushNotification.sendNotification(masterAccounts.Service.getId(sendCoin.to), constants.Notification.FAILURE, message)
         pushNotification.sendNotification(sendCoin.from, constants.Notification.FAILURE, message)
       } catch {
-        case baseException: BaseException => logger.error(constants.Response.BASE_EXCEPTION.message, baseException)
+        case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
     }
   }

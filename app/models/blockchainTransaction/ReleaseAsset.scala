@@ -142,7 +142,7 @@ class ReleaseAssets @Inject()(protected val databaseConfigProvider: DatabaseConf
         pushNotification.sendNotification(releaseAsset.from, constants.Notification.SUCCESS, response.TxHash)
       }
       catch {
-        case baseException: BaseException => logger.error(constants.Response.BASE_EXCEPTION.message, baseException)
+        case baseException: BaseException => logger.error(baseException.failure.message, baseException)
           throw new BaseException(constants.Response.PSQL_EXCEPTION)
       }
     }
@@ -154,7 +154,7 @@ class ReleaseAssets @Inject()(protected val databaseConfigProvider: DatabaseConf
         pushNotification.sendNotification(masterAccounts.Service.getId(releaseAsset.to), constants.Notification.FAILURE, message)
         pushNotification.sendNotification(releaseAsset.from, constants.Notification.FAILURE, message)
       } catch {
-        case baseException: BaseException => logger.error(constants.Response.BASE_EXCEPTION.message, baseException)
+        case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
     }
   }

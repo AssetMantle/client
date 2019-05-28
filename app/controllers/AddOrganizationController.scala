@@ -64,7 +64,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
                 try {
                   blockchainTransactionAddOrganizations.Utility.onSuccess(ticketID, transactionsAddOrganization.Service.post(transactionsAddOrganization.Request(from = username, to = organizationAccountAddress, organizationID = verifyOrganizationData.organizationID, zoneID = verifyOrganizationData.zoneID, password = verifyOrganizationData.password)))
                 } catch {
-                  case baseException: BaseException => logger.error(constants.Response.BASE_EXCEPTION.message, baseException)
+                  case baseException: BaseException => logger.error(baseException.failure.message, baseException)
                   case blockChainException: BlockChainException => logger.error(blockChainException.failure.message, blockChainException)
                     blockchainTransactionAddOrganizations.Utility.onFailure(ticketID, blockChainException.failure.message)
                 }

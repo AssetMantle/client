@@ -197,7 +197,7 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
           fiatPegWallet.foreach(fiatPeg => if (fiatPegWallet.map(_.pegHash) contains dirtyFiat.pegHash) Service.insertOrUpdateFiat(fiatPeg.pegHash, dirtyFiat.ownerAddress, fiatPeg.transactionID, fiatPeg.transactionAmount, fiatPeg.redeemedAmount, dirtyBit = false) else Service.deleteFiat(dirtyFiat.pegHash, dirtyFiat.ownerAddress))
         }
         catch {
-          case baseException: BaseException => logger.info(constants.Response.BASE_EXCEPTION.message, baseException)
+          case baseException: BaseException => logger.info(baseException.failure.message, baseException)
             if (baseException.failure ==  constants.Response.NO_RESPONSE) {
               Service.deleteFiatPegWallet(dirtyFiat.ownerAddress)
             }

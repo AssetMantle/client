@@ -27,7 +27,7 @@ class WithUnknownLoginAction @Inject()(messagesControllerComponents: MessagesCon
       }
       catch {
         case baseException: BaseException => {
-          logger.info(constants.Response.BASE_EXCEPTION.message, baseException)
+          logger.info(baseException.failure.message, baseException)
           Results.Unauthorized(views.html.index(failures = Seq(baseException.failure)))
         }
       }

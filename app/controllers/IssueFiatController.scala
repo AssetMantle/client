@@ -94,7 +94,7 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
                   try {
                     blockchainTransactionIssueFiats.Utility.onSuccess(ticketID, transactionsIssueFiat.Service.post(transactionsIssueFiat.Request(from = username, to = toAddress, password = issueFiatData.password, transactionID = issueFiatData.transactionID, transactionAmount = issueFiatData.transactionAmount, gas = issueFiatData.gas)))
                   } catch {
-                    case baseException: BaseException => logger.error(constants.Response.BASE_EXCEPTION.message, baseException)
+                    case baseException: BaseException => logger.error(baseException.failure.message, baseException)
                     case blockChainException: BlockChainException => logger.error(blockChainException.failure.message, blockChainException)
                       blockchainTransactionIssueFiats.Utility.onFailure(ticketID, blockChainException.failure.message)
                   }
