@@ -156,7 +156,7 @@ class SendFiats @Inject()(protected val databaseConfigProvider: DatabaseConfigPr
         pushNotification.sendNotification(sendFiat.from, constants.Notification.SUCCESS, response.TxHash)
       }
       catch {
-        case baseException: BaseException => logger.error(constants.Response.BASE_EXCEPTION.message, baseException)
+        case baseException: BaseException => logger.error(baseException.failure.message, baseException)
           throw new BaseException(constants.Response.PSQL_EXCEPTION)
         case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
       }
@@ -170,7 +170,7 @@ class SendFiats @Inject()(protected val databaseConfigProvider: DatabaseConfigPr
         pushNotification.sendNotification(masterAccounts.Service.getId(sendFiat.to), constants.Notification.FAILURE, message)
         pushNotification.sendNotification(sendFiat.from, constants.Notification.FAILURE, message)
       } catch {
-        case baseException: BaseException => logger.error(constants.Response.BASE_EXCEPTION.message, baseException)
+        case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
     }
   }

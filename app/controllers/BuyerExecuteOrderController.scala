@@ -37,7 +37,7 @@ class BuyerExecuteOrderController @Inject()(messagesControllerComponents: Messag
                 try {
                   blockchainTransactionBuyerExecuteOrders.Utility.onSuccess(ticketID, transactionsBuyerExecuteOrder.Service.post(transactionsBuyerExecuteOrder.Request(from = username, password = buyerExecuteOrderData.password, buyerAddress = buyerExecuteOrderData.buyerAddress, sellerAddress = buyerExecuteOrderData.sellerAddress, fiatProofHash = buyerExecuteOrderData.fiatProofHash, pegHash = buyerExecuteOrderData.pegHash, gas = buyerExecuteOrderData.gas)))
                 } catch {
-                  case baseException: BaseException => logger.error(constants.Response.BASE_EXCEPTION.message, baseException)
+                  case baseException: BaseException => logger.error(baseException.failure.message, baseException)
                   case blockChainException: BlockChainException => logger.error(blockChainException.failure.message, blockChainException)
                     blockchainTransactionBuyerExecuteOrders.Utility.onFailure(ticketID, blockChainException.failure.message)
                 }
@@ -75,7 +75,7 @@ class BuyerExecuteOrderController @Inject()(messagesControllerComponents: Messag
                 try {
                   blockchainTransactionBuyerExecuteOrders.Utility.onSuccess(ticketID, transactionsBuyerExecuteOrder.Service.post(transactionsBuyerExecuteOrder.Request(from = username, password = unmoderatedBuyerExecuteOrderData.password, buyerAddress = buyerAddress, sellerAddress = unmoderatedBuyerExecuteOrderData.sellerAddress, fiatProofHash = unmoderatedBuyerExecuteOrderData.fiatProofHash, pegHash = unmoderatedBuyerExecuteOrderData.pegHash, gas = unmoderatedBuyerExecuteOrderData.gas)))
                 } catch {
-                  case baseException: BaseException => logger.error(constants.Response.BASE_EXCEPTION.message, baseException)
+                  case baseException: BaseException => logger.error(baseException.failure.message, baseException)
                   case blockChainException: BlockChainException => logger.error(blockChainException.failure.message, blockChainException)
                     blockchainTransactionBuyerExecuteOrders.Utility.onFailure(ticketID, blockChainException.failure.message)
                 }

@@ -37,7 +37,7 @@ class SendFiatController @Inject()(messagesControllerComponents: MessagesControl
                 try {
                   blockchainTransactionSendFiats.Utility.onSuccess(ticketID, transactionsSendFiat.Service.post(transactionsSendFiat.Request(from = username, to = sendFiatData.sellerAddress, password = sendFiatData.password, amount = sendFiatData.amount, pegHash = sendFiatData.pegHash, gas = sendFiatData.gas)))
                 } catch {
-                  case baseException: BaseException => logger.error(constants.Response.BASE_EXCEPTION.message, baseException)
+                  case baseException: BaseException => logger.error(baseException.failure.message, baseException)
                   case blockChainException: BlockChainException => logger.error(blockChainException.failure.message, blockChainException)
                     blockchainTransactionSendFiats.Utility.onFailure(ticketID, blockChainException.failure.message)
                 }

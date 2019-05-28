@@ -151,7 +151,7 @@ class SellerExecuteOrders @Inject()(protected val databaseConfigProvider: Databa
         pushNotification.sendNotification(sellerExecuteOrder.from, constants.Notification.SUCCESS, response.TxHash)
       }
       catch {
-        case baseException: BaseException => logger.error(constants.Response.BASE_EXCEPTION.message, baseException)
+        case baseException: BaseException => logger.error(baseException.failure.message, baseException)
           throw new BaseException(constants.Response.PSQL_EXCEPTION)
       }
     }
@@ -165,7 +165,7 @@ class SellerExecuteOrders @Inject()(protected val databaseConfigProvider: Databa
         pushNotification.sendNotification(masterAccounts.Service.getId(sellerExecuteOrder.buyerAddress), constants.Notification.FAILURE, message)
         pushNotification.sendNotification(sellerExecuteOrder.from, constants.Notification.FAILURE, message)
       } catch {
-        case baseException: BaseException => logger.error(constants.Response.BASE_EXCEPTION.message, baseException)
+        case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
     }
   }

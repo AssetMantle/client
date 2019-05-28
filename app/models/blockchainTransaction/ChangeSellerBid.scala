@@ -157,7 +157,7 @@ class ChangeSellerBids @Inject()(protected val databaseConfigProvider: DatabaseC
         pushNotification.sendNotification(toID, constants.Notification.SUCCESS, response.TxHash)
         pushNotification.sendNotification(changeSellerBid.from, constants.Notification.SUCCESS, response.TxHash)
       } catch {
-        case baseException: BaseException => logger.error(constants.Response.BASE_EXCEPTION.message, baseException)
+        case baseException: BaseException => logger.error(baseException.failure.message, baseException)
           throw new BaseException(constants.Response.PSQL_EXCEPTION)
         case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
       }
@@ -172,7 +172,7 @@ class ChangeSellerBids @Inject()(protected val databaseConfigProvider: DatabaseC
         pushNotification.sendNotification(masterAccounts.Service.getId(changeSellerBid.to), constants.Notification.FAILURE, message)
         pushNotification.sendNotification(changeSellerBid.from, constants.Notification.FAILURE, message)
       } catch {
-        case baseException: BaseException => logger.error(constants.Response.BASE_EXCEPTION.message, baseException)
+        case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
     }
   }

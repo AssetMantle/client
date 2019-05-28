@@ -189,7 +189,7 @@ class SetSellerFeedbacks @Inject()(protected val databaseConfigProvider: Databas
         pushNotification.sendNotification(masterAccounts.Service.getId(setSellerFeedback.to), constants.Notification.SUCCESS, response.TxHash)
         pushNotification.sendNotification(setSellerFeedback.from, constants.Notification.SUCCESS, response.TxHash)
       } catch {
-        case baseException: BaseException => logger.error(constants.Response.BASE_EXCEPTION.message, baseException)
+        case baseException: BaseException => logger.error(baseException.failure.message, baseException)
           throw new BaseException(constants.Response.PSQL_EXCEPTION)
       }
     }
@@ -201,7 +201,7 @@ class SetSellerFeedbacks @Inject()(protected val databaseConfigProvider: Databas
       pushNotification.sendNotification(masterAccounts.Service.getId(setSellerFeedback.to), constants.Notification.FAILURE, message)
       pushNotification.sendNotification(setSellerFeedback.from, constants.Notification.FAILURE, message)
       } catch {
-        case baseException: BaseException => logger.error(constants.Response.BASE_EXCEPTION.message, baseException)
+        case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
     }
   }

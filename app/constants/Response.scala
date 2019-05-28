@@ -71,7 +71,6 @@ object Response {
   val INVALID_OTP = new Failure("INVALID_OTP")
   val EMAIL_ADDRESS_NOT_FOUND = new Failure("EMAIL_ADDRESS_NOT_FOUND")
   val MOBILE_NUMBER_NOT_FOUND = new Failure("MOBILE_NUMBER_NOT_FOUND")
-  val BASE_EXCEPTION = new Failure("BASE_EXCEPTION")
   val CONNECT_EXCEPTION = new Failure("CONNECT_EXCEPTION")
   val EMAIL_NOT_FOUND = new Failure("EMAIL_NOT_FOUND")
   val NO_RESPONSE = new Failure("NO_RESPONSE")

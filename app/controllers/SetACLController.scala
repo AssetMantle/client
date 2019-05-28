@@ -41,7 +41,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
                   try {
                     blockchainTransactionSetACLs.Utility.onSuccess(ticketID, transactionsSetACL.Service.post(transactionsSetACL.Request(from = username, password = setACLData.password, aclAddress = setACLData.aclAddress, organizationID = setACLData.organizationID, zoneID = zoneID, issueAsset = setACLData.issueAsset.toString, issueFiat = setACLData.issueFiat.toString, sendAsset = setACLData.sendAsset.toString, sendFiat = setACLData.sendFiat.toString, redeemAsset = setACLData.redeemAsset.toString, redeemFiat = setACLData.redeemFiat.toString, sellerExecuteOrder = setACLData.sellerExecuteOrder.toString, buyerExecuteOrder = setACLData.buyerExecuteOrder.toString, changeBuyerBid = setACLData.changeBuyerBid.toString, changeSellerBid = setACLData.changeSellerBid.toString, confirmBuyerBid = setACLData.confirmBuyerBid.toString, confirmSellerBid = setACLData.confirmSellerBid.toString, negotiation = setACLData.negotiation.toString, releaseAsset = setACLData.releaseAsset.toString)))
                   } catch {
-                    case baseException: BaseException => logger.error(constants.Response.BASE_EXCEPTION.message, baseException)
+                    case baseException: BaseException => logger.error(baseException.failure.message, baseException)
                     case blockChainException: BlockChainException => logger.error(blockChainException.failure.message, blockChainException)
                       blockchainTransactionSetACLs.Utility.onFailure(ticketID, blockChainException.failure.message)
                   }

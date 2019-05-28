@@ -138,7 +138,7 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
         }
         catch {
           case blockChainException: BlockChainException => logger.error(blockChainException.failure.message, blockChainException)
-          case baseException: BaseException => logger.error(constants.Response.BASE_EXCEPTION.message, baseException)
+          case baseException: BaseException => logger.error(baseException.failure.message, baseException)
         }
       }
     }

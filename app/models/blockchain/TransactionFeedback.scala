@@ -230,7 +230,7 @@ class TransactionFeedbacks @Inject()(protected val databaseConfigProvider: Datab
           } else {
             logger.error(blockChainException.failure.message, blockChainException)
           }
-          case baseException: BaseException => logger.error(constants.Response.BASE_EXCEPTION.message, baseException)
+          case baseException: BaseException => logger.error(baseException.failure.message, baseException)
         }
       }
     }

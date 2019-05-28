@@ -39,7 +39,7 @@ class SetSellerFeedbackController @Inject()(messagesControllerComponents: Messag
                 try {
                   blockchainTransactionSetSellerFeedbacks.Utility.onSuccess(ticketID, transactionsSetSellerFeedback.Service.post(transactionsSetSellerFeedback.Request(from = username, to = setSellerFeedbackData.buyerAddress, password = setSellerFeedbackData.password, pegHash = setSellerFeedbackData.pegHash, rating = setSellerFeedbackData.rating, gas = setSellerFeedbackData.gas)))
                 } catch {
-                  case baseException: BaseException => logger.error(constants.Response.BASE_EXCEPTION.message, baseException)
+                  case baseException: BaseException => logger.error(baseException.failure.message, baseException)
                   case blockChainException: BlockChainException => logger.error(blockChainException.failure.message, blockChainException)
                     blockchainTransactionSetSellerFeedbacks.Utility.onFailure(ticketID, blockChainException.failure.message)
                 }

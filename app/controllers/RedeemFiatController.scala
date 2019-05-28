@@ -41,7 +41,7 @@ class RedeemFiatController @Inject()(messagesControllerComponents: MessagesContr
                 try {
                   redeemFiats.Utility.onSuccess(ticketID, transactionsRedeemFiat.Service.post(transactionsRedeemFiat.Request(from = username, to = toAddress, password = redeemFiatData.password, redeemAmount = redeemFiatData.redeemAmount, gas = redeemFiatData.gas)))
                 } catch {
-                  case baseException: BaseException => logger.error(constants.Response.BASE_EXCEPTION.message, baseException)
+                  case baseException: BaseException => logger.error(baseException.failure.message, baseException)
                   case blockChainException: BlockChainException => logger.error(blockChainException.failure.message, blockChainException)
                     redeemFiats.Utility.onFailure(ticketID, blockChainException.failure.message)
                 }

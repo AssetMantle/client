@@ -212,7 +212,7 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
           assetPegWallet.foreach(assetPeg => if (assetPegWallet.map(_.pegHash) contains dirtyAsset.pegHash) Service.insertOrUpdateAsset(pegHash = assetPeg.pegHash, documentHash = assetPeg.documentHash, assetType = assetPeg.assetType, assetPrice = assetPeg.assetPrice, assetQuantity = assetPeg.assetQuantity, quantityUnit = assetPeg.quantityUnit, ownerAddress = dirtyAsset.ownerAddress, locked = assetPeg.locked, unmoderated = assetPeg.unmoderated, dirtyBit = false) else Service.deleteAsset(dirtyAsset.pegHash))
         }
         catch {
-          case baseException: BaseException => logger.info(constants.Response.BASE_EXCEPTION.message, baseException)
+          case baseException: BaseException => logger.info(baseException.failure.message, baseException)
             if (baseException.failure == constants.Response.NO_RESPONSE) {
               Service.deleteAssetPegWallet(dirtyAsset.ownerAddress)
             }

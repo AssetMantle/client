@@ -39,7 +39,7 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
                   try {
                     blockchainTransactionIssueAssets.Utility.onSuccess(ticketID, transactionsIssueAsset.Service.post(transactionsIssueAsset.Request(from = username, to = fromAddress, password = issueAssetRequestData.password, documentHash = issueAssetRequestData.documentHash, assetType = issueAssetRequestData.assetType, assetPrice = issueAssetRequestData.assetPrice, quantityUnit = issueAssetRequestData.quantityUnit, assetQuantity = issueAssetRequestData.assetQuantity, gas = issueAssetRequestData.gas, unmoderated = issueAssetRequestData.unmoderated)))
                   } catch {
-                    case baseException: BaseException => logger.error(constants.Response.BASE_EXCEPTION.message, baseException)
+                    case baseException: BaseException => logger.error(baseException.failure.message, baseException)
                     case blockChainException: BlockChainException => logger.error(blockChainException.failure.message, blockChainException)
                       blockchainTransactionIssueAssets.Utility.onFailure(ticketID, blockChainException.failure.message)
                   }
@@ -113,7 +113,7 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
                   try {
                     blockchainTransactionIssueAssets.Utility.onSuccess(ticketID, transactionsIssueAsset.Service.post(transactionsIssueAsset.Request(from = username, to = toAddress, password = issueAssetData.password, documentHash = issueAssetData.documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.assetPrice, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.assetQuantity, gas = issueAssetData.gas, unmoderated = issueAssetData.unmoderated)))
                   } catch {
-                    case baseException: BaseException => logger.error(constants.Response.BASE_EXCEPTION.message, baseException)
+                    case baseException: BaseException => logger.error(baseException.failure.message, baseException)
                     case blockChainException: BlockChainException => logger.error(blockChainException.failure.message, blockChainException)
                       blockchainTransactionIssueAssets.Utility.onFailure(ticketID, blockChainException.failure.message)
                   }

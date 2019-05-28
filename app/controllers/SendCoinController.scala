@@ -43,7 +43,7 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
                 try {
                   blockchainTransactionSendCoins.Utility.onSuccess(ticketID, transactionsSendCoin.Service.post(transactionsSendCoin.Request(from = username, password = sendCoinData.password, to = sendCoinData.to, amount = Seq(transactionsSendCoin.Amount(denominationOfGasToken, sendCoinData.amount.toString)), gas = sendCoinData.gas)))
                 } catch {
-                  case baseException: BaseException => logger.error(constants.Response.BASE_EXCEPTION.message, baseException)
+                  case baseException: BaseException => logger.error(baseException.failure.message, baseException)
                   case blockChainException: BlockChainException => logger.error(blockChainException.failure.message, blockChainException)
                     blockchainTransactionSendCoins.Utility.onFailure(ticketID, blockChainException.failure.message)
                 }
@@ -163,7 +163,7 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
                   try {
                     blockchainTransactionSendCoins.Utility.onSuccess(ticketID, transactionsSendCoin.Service.post(transactionsSendCoin.Request(from = constants.User.MAIN_ACCOUNT, password = approveFaucetRequestFormData.password, to = toAddress, amount = Seq(transactionsSendCoin.Amount(denominationOfGasToken, defaultFaucetToken.toString)), gas = approveFaucetRequestFormData.gas)))
                   } catch {
-                    case baseException: BaseException => logger.error(constants.Response.BASE_EXCEPTION.message, baseException)
+                    case baseException: BaseException => logger.error(baseException.failure.message, baseException)
                     case blockChainException: BlockChainException => logger.error(blockChainException.failure.message, blockChainException)
                       blockchainTransactionSendCoins.Utility.onFailure(ticketID, blockChainException.failure.message)
                   }
