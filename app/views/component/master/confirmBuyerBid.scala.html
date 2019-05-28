@@ -2,23 +2,21 @@
 @import views.companion.master.ConfirmBuyerBid
 
 @(confirmBuyerBidForm: Form[ConfirmBuyerBid.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages(constants.Form.CONFIRM_BUYER_BID)) {
-    @form(action = routes.ConfirmBuyerBidController.confirmBuyerBid) {
-        @CSRF.formField
-        @inputText(confirmBuyerBidForm(constants.Form.SELLER_ADDRESS),'_label-> Messages(constants.Form.SELLER_ADDRESS))
-        @inputText(confirmBuyerBidForm(constants.Form.BID),'_label-> Messages(constants.Form.BID))
-        @inputText(confirmBuyerBidForm(constants.Form.TIME),'_label-> Messages(constants.Form.TIME))
-        @inputText(confirmBuyerBidForm(constants.Form.PEG_HASH),'_label-> Messages(constants.Form.PEG_HASH))
-        @inputText(confirmBuyerBidForm(constants.Form.GAS),'_label-> Messages(constants.Form.GAS))
-        @inputPassword(confirmBuyerBidForm(constants.Form.PASSWORD),'_label-> Messages(constants.Form.PASSWORD))
+@form(action = routes.ConfirmBuyerBidController.confirmBuyerBid, 'onkeypress -> "validateForm(event,this)") {
+    @CSRF.formField
+    @inputText(confirmBuyerBidForm(constants.Form.SELLER_ADDRESS), '_label -> Messages(constants.Form.SELLER_ADDRESS))
+    @inputText(confirmBuyerBidForm(constants.Form.BID), '_label -> Messages(constants.Form.BID))
+    @inputText(confirmBuyerBidForm(constants.Form.TIME), '_label -> Messages(constants.Form.TIME))
+    @inputText(confirmBuyerBidForm(constants.Form.PEG_HASH), '_label -> Messages(constants.Form.PEG_HASH))
+    @inputText(confirmBuyerBidForm(constants.Form.GAS), '_label -> Messages(constants.Form.GAS))
+    @inputPassword(confirmBuyerBidForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD))
 
-        @if(confirmBuyerBidForm.hasGlobalErrors) {
-            <ul>
-            @for(error <- confirmBuyerBidForm.globalErrors) {
-                <li>@error.format</li>
-            }
-            </ul>
-        }
-        <button type="submit">@Messages(constants.Form.CONFIRM_BUYER_BID)</button>
+  @if(confirmBuyerBidForm.hasGlobalErrors) {
+    <ul>
+    @for(error <- confirmBuyerBidForm.globalErrors) {
+      <li>@error.format</li>
     }
+    </ul>
+  }
+  <button type="button" onclick="submitForm(this)">@Messages(constants.Form.CONFIRM_BUYER_BID)</button>
 }

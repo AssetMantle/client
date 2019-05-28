@@ -2,24 +2,22 @@
 @import views.companion.blockchain.SellerExecuteOrder
 
 @(sellerExecuteOrderForm: Form[SellerExecuteOrder.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages(constants.Form.SELLER_EXECUTE_ORDER)) {
-    @form(action = routes.SellerExecuteOrderController.blockchainSellerExecuteOrder) {
-        @CSRF.formField
-        @inputText(sellerExecuteOrderForm(constants.Form.FROM),'_label-> Messages(constants.Form.FROM))
-        @inputText(sellerExecuteOrderForm(constants.Form.BUYER_ADDRESS),'_label-> Messages(constants.Form.BUYER_ADDRESS))
-        @inputText(sellerExecuteOrderForm(constants.Form.SELLER_ADDRESS),'_label-> Messages(constants.Form.SELLER_ADDRESS))
-        @inputText(sellerExecuteOrderForm(constants.Form.AWB_PROOF_HASH),'_label-> Messages(constants.Form.AWB_PROOF_HASH))
-        @inputText(sellerExecuteOrderForm(constants.Form.PEG_HASH),'_label-> Messages(constants.Form.PEG_HASH))
-        @inputText(sellerExecuteOrderForm(constants.Form.GAS),'_label-> Messages(constants.Form.GAS))
-        @inputPassword(sellerExecuteOrderForm(constants.Form.PASSWORD),'_label-> Messages(constants.Form.PASSWORD))
+@form(action = routes.SellerExecuteOrderController.blockchainSellerExecuteOrder, 'onkeypress -> "validateForm(event,this)") {
+    @CSRF.formField
+    @inputText(sellerExecuteOrderForm(constants.Form.FROM), '_label -> Messages(constants.Form.FROM))
+    @inputText(sellerExecuteOrderForm(constants.Form.BUYER_ADDRESS), '_label -> Messages(constants.Form.BUYER_ADDRESS))
+    @inputText(sellerExecuteOrderForm(constants.Form.SELLER_ADDRESS), '_label -> Messages(constants.Form.SELLER_ADDRESS))
+    @inputText(sellerExecuteOrderForm(constants.Form.AWB_PROOF_HASH), '_label -> Messages(constants.Form.AWB_PROOF_HASH))
+    @inputText(sellerExecuteOrderForm(constants.Form.PEG_HASH), '_label -> Messages(constants.Form.PEG_HASH))
+    @inputText(sellerExecuteOrderForm(constants.Form.GAS), '_label -> Messages(constants.Form.GAS))
+    @inputPassword(sellerExecuteOrderForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD))
 
-        @if(sellerExecuteOrderForm.hasGlobalErrors) {
-            <ul>
-            @for(error <- sellerExecuteOrderForm.globalErrors) {
-                <li>@error.format</li>
-            }
-            </ul>
+    @if(sellerExecuteOrderForm.hasGlobalErrors) {
+        <ul>
+        @for(error <- sellerExecuteOrderForm.globalErrors) {
+            <li>@error.format</li>
         }
-        <button type="submit">@Messages(constants.Form.SELLER_EXECUTE_ORDER)</button>
+        </ul>
     }
+    <button type="button" onclick="submitForm(this)">@Messages(constants.Form.SELLER_EXECUTE_ORDER)</button>
 }

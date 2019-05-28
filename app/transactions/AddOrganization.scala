@@ -42,16 +42,16 @@ class AddOrganization @Inject()(wsClient: WSClient)(implicit configuration: Conf
       Await.result(action(request), Duration.Inf)
     } catch {
       case connectException: ConnectException =>
-        logger.error(constants.Error.CONNECT_EXCEPTION, connectException)
-        throw new BlockChainException(constants.Error.CONNECT_EXCEPTION)
+        logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
+        throw new BlockChainException(constants.Response.CONNECT_EXCEPTION)
     }
 
     def kafkaPost(request: Request)(implicit executionContext: ExecutionContext): KafkaResponse = try {
       Await.result(kafkaAction(request), Duration.Inf)
     } catch {
       case connectException: ConnectException =>
-        logger.error(constants.Error.CONNECT_EXCEPTION, connectException)
-        throw new BlockChainException(constants.Error.CONNECT_EXCEPTION)
+        logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
+        throw new BlockChainException(constants.Response.CONNECT_EXCEPTION)
     }
 
     def getTxHashFromWSResponse(wsResponse: WSResponse): String = utilities.JSON.getResponseFromJson[Response](wsResponse).TxHash

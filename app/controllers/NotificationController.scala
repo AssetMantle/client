@@ -25,7 +25,7 @@ class NotificationController @Inject()(messagesControllerComponents: MessagesCon
         Ok(views.html.component.master.notifications(notifications.Service.getNotifications(username, pageNumber * limit, limit)))
       }
       catch {
-        case baseException: BaseException => Ok(baseException.message)
+        case baseException: BaseException => Ok(baseException.failure.message)
       }
   }
 

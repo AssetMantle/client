@@ -1,8 +1,9 @@
 @(username: String, userType: String, address: String, coins: Int = 0)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
 
 @common(Messages(constants.User.HOME)) {
-    <a href="@routes.AddOrganizationController.addOrganizationForm()">@Messages(constants.Form.ADD_ORGANIZATION)</a>
-    <a href="@routes.AddZoneController.addZoneForm()">@Messages(constants.Form.ADD_ZONE)</a>
+    <a onclick="getForm(jsRoutes.controllers.AddOrganizationController.addOrganizationForm())">@Messages(constants.Form.ADD_ORGANIZATION)</a>
+
+    <a onclick="getForm(jsRoutes.controllers.AddZoneController.addZoneForm())">@Messages(constants.Form.ADD_ZONE)</a>
 
     @component.master.commonHome(username = username, userType = userType, address = address, coins = coins)
 }

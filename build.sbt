@@ -34,9 +34,9 @@ libraryDependencies += "com.typesafe.play" %% "play-mailer-guice" % "6.0.1"
 
 libraryDependencies += "com.twilio.sdk" % "twilio" % "7.15.5"
 
-libraryDependencies +="io.gatling.highcharts" % "gatling-charts-highcharts" % "3.1.1" % "test"
+libraryDependencies += "io.gatling.highcharts" % "gatling-charts-highcharts" % "3.1.1" % "test"
 
-libraryDependencies +=  "io.gatling" % "gatling-test-framework" % "3.1.1" % "test"
+libraryDependencies += "io.gatling" % "gatling-test-framework" % "3.1.1" % "test"
 
 unmanagedResourceDirectories in Test += (baseDirectory.value / "target/web/public/test")
 

@@ -4,7 +4,7 @@ import controllers.actions.{WithTraderLoginAction, WithZoneLoginAction}
 import exceptions.{BaseException, BlockChainException}
 import javax.inject.{Inject, Singleton}
 import models.{blockchain, blockchainTransaction, master, masterTransaction}
-import play.api.i18n.{I18nSupport, Messages}
+import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
 
@@ -31,10 +31,10 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
         issueFiatRequestData => {
           try {
             masterTransactionIssueFiatRequests.Service.addIssueFiatRequest(accountID = username, transactionID = issueFiatRequestData.transactionID, transactionAmount = issueFiatRequestData.transactionAmount)
-            Ok(views.html.index(success = constants.Success.ISSUE_FIAT_REQUEST))
+            Ok(views.html.index(successes = Seq(constants.Response.ISSUE_FIAT_REQUEST_SENT)))
           }
           catch {
-            case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))
+            case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
           }
         }
       )
@@ -46,7 +46,7 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
         Ok(views.html.component.master.viewPendingIssueFiatRequests(masterTransactionIssueFiatRequests.Service.getPendingIssueFiatRequests(masterAccounts.Service.getIDsForAddresses(blockchainAclAccounts.Service.getAddressesUnderZone(masterZones.Service.getZoneId(username))))))
       }
       catch {
-        case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))
+        case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
@@ -63,10 +63,10 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
         rejectIssueFiatRequestData => {
           try {
             masterTransactionIssueFiatRequests.Service.updateStatus(rejectIssueFiatRequestData.requestID, status = false)
-            Ok(views.html.index(success = Messages(constants.Success.ISSUE_FIAT_REQUEST_REJECTED)))
+            Ok(views.html.index(successes = Seq(constants.Response.ISSUE_FIAT_REQUEST_REJECTED)))
           }
           catch {
-            case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))
+            case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
           }
         }
       )
@@ -94,22 +94,22 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
                   try {
                     blockchainTransactionIssueFiats.Utility.onSuccess(ticketID, transactionsIssueFiat.Service.post(transactionsIssueFiat.Request(from = username, to = toAddress, password = issueFiatData.password, transactionID = issueFiatData.transactionID, transactionAmount = issueFiatData.transactionAmount, gas = issueFiatData.gas)))
                   } catch {
-                    case baseException: BaseException => logger.error(constants.Error.BASE_EXCEPTION, baseException)
-                    case blockChainException: BlockChainException => logger.error(blockChainException.message, blockChainException)
-                      blockchainTransactionIssueFiats.Utility.onFailure(ticketID, blockChainException.message)
+                    case baseException: BaseException => logger.error(constants.Response.BASE_EXCEPTION.message, baseException)
+                    case blockChainException: BlockChainException => logger.error(blockChainException.failure.message, blockChainException)
+                      blockchainTransactionIssueFiats.Utility.onFailure(ticketID, blockChainException.failure.message)
                   }
                 }
               }
-              Ok(views.html.index(success = ticketID))
+              Ok(views.html.index(successes = Seq(constants.Response.FIAT_ISSUED)))
             } else {
-              Ok(views.html.index(failure = Messages(constants.Error.REQUEST_ALREADY_APPROVED_OR_REJECTED)))
+              Ok(views.html.index(failures = Seq(constants.Response.REQUEST_ALREADY_APPROVED_OR_REJECTED)))
             }
           }
           catch {
-            case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))
+            case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
             case blockChainException: BlockChainException =>
-              masterTransactionIssueFiatRequests.Service.updateComment(issueFiatData.requestID, blockChainException.message)
-              Ok(views.html.index(failure = blockChainException.message))
+              masterTransactionIssueFiatRequests.Service.updateComment(issueFiatData.requestID, blockChainException.failure.message)
+              Ok(views.html.index(failures = Seq(blockChainException.failure)))
           }
         }
       )
@@ -127,14 +127,15 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
       issueFiatData => {
         try {
           if (kafkaEnabled) {
-            Ok(views.html.index(success = transactionsIssueFiat.Service.kafkaPost(transactionsIssueFiat.Request(from = issueFiatData.from, to = issueFiatData.to, password = issueFiatData.password, transactionID = issueFiatData.transactionID, transactionAmount = issueFiatData.transactionAmount, gas = issueFiatData.gas)).ticketID))
+            transactionsIssueFiat.Service.kafkaPost(transactionsIssueFiat.Request(from = issueFiatData.from, to = issueFiatData.to, password = issueFiatData.password, transactionID = issueFiatData.transactionID, transactionAmount = issueFiatData.transactionAmount, gas = issueFiatData.gas))
           } else {
-            Ok(views.html.index(success = transactionsIssueFiat.Service.post(transactionsIssueFiat.Request(from = issueFiatData.from, to = issueFiatData.to, password = issueFiatData.password, transactionID = issueFiatData.transactionID, transactionAmount = issueFiatData.transactionAmount, gas = issueFiatData.gas)).TxHash))
+            transactionsIssueFiat.Service.post(transactionsIssueFiat.Request(from = issueFiatData.from, to = issueFiatData.to, password = issueFiatData.password, transactionID = issueFiatData.transactionID, transactionAmount = issueFiatData.transactionAmount, gas = issueFiatData.gas))
           }
+          Ok(views.html.index(successes = Seq(constants.Response.FIAT_ISSUED)))
         }
         catch {
-          case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))
-          case blockChainException: BlockChainException => Ok(views.html.index(failure = blockChainException.message))
+          case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
+          case blockChainException: BlockChainException => Ok(views.html.index(failures = Seq(blockChainException.failure)))
         }
       }
     )

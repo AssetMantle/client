@@ -2,22 +2,20 @@
 @import views.companion.blockchain.AddOrganization
 
 @(addOrganizationForm: Form[AddOrganization.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages(constants.Form.ADD_ORGANIZATION)) {
-    @form(action = routes.AddOrganizationController.blockchainAddOrganization) {
-        @CSRF.formField
-        @inputText(addOrganizationForm(constants.Form.FROM),'_label-> Messages(constants.Form.FROM))
-        @inputText(addOrganizationForm(constants.Form.TO),'_label-> Messages(constants.Form.TO))
-        @inputText(addOrganizationForm(constants.Form.ORGANIZATION_ID),'_label-> Messages(constants.Form.ORGANIZATION_ID))
-        @inputText(addOrganizationForm(constants.Form.ZONE_ID),'_label-> Messages(constants.Form.ZONE_ID))
-        @inputPassword(addOrganizationForm(constants.Form.PASSWORD),'_label-> Messages(constants.Form.PASSWORD))
+@form(action = routes.AddOrganizationController.blockchainAddOrganization, 'onkeypress -> "validateForm(event,this)") {
+    @CSRF.formField
+    @inputText(addOrganizationForm(constants.Form.FROM), '_label -> Messages(constants.Form.FROM))
+    @inputText(addOrganizationForm(constants.Form.TO), '_label -> Messages(constants.Form.TO))
+    @inputText(addOrganizationForm(constants.Form.ORGANIZATION_ID), '_label -> Messages(constants.Form.ORGANIZATION_ID))
+    @inputText(addOrganizationForm(constants.Form.ZONE_ID), '_label -> Messages(constants.Form.ZONE_ID))
+    @inputPassword(addOrganizationForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD))
 
-        @if(addOrganizationForm.hasGlobalErrors) {
-            <ul>
-            @for(error <- addOrganizationForm.globalErrors) {
-                <li>@error.format</li>
-            }
-            </ul>
+    @if(addOrganizationForm.hasGlobalErrors) {
+        <ul>
+        @for(error <- addOrganizationForm.globalErrors) {
+            <li>@error.format</li>
         }
-        <button type="submit">@Messages(constants.Form.ADD_ORGANIZATION)</button>
+        </ul>
     }
+    <button type="button" onclick="submitForm(this)">@Messages(constants.Form.ADD_ORGANIZATION)</button>
 }

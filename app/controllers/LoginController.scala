@@ -7,7 +7,7 @@ import models.blockchain
 import models.blockchain.ACLAccounts
 import models.master.{Accounts, Organizations, Zones}
 import play.api.Configuration
-import play.api.i18n.{I18nSupport, Messages}
+import play.api.i18n.I18nSupport
 import play.api.libs.ws.WSClient
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import queries.GetAccount
@@ -57,7 +57,7 @@ class LoginController @Inject()(messagesControllerComponents: MessagesController
           }
         }
         catch {
-          case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))
+          case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
         }
       }
     )

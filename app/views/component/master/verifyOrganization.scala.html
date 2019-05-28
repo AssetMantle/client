@@ -2,20 +2,18 @@
 @import views.companion.master.VerifyOrganization
 
 @(verifyOrganizationForm: Form[VerifyOrganization.Data], organizationID: String, zoneID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages(constants.Form.VERIFY_ORGANIZATION)) {
-    @form(action = routes.AddOrganizationController.verifyOrganization) {
-        @CSRF.formField
-        @inputText(verifyOrganizationForm(constants.Form.ORGANIZATION_ID).copy(value = Some(organizationID)),'_label-> Messages(constants.Form.ORGANIZATION_ID))
-        @inputText(verifyOrganizationForm(constants.Form.ZONE_ID).copy(value = Some(zoneID)),'_label-> Messages(constants.Form.ZONE_ID))
-        @inputPassword(verifyOrganizationForm(constants.Form.PASSWORD),'_label-> Messages(constants.Form.PASSWORD))
+@form(action = routes.AddOrganizationController.verifyOrganization, 'onkeypress -> "validateForm(event,this)") {
+    @CSRF.formField
+    @inputText(verifyOrganizationForm(constants.Form.ORGANIZATION_ID).copy(value = Some(organizationID)), '_label -> Messages(constants.Form.ORGANIZATION_ID))
+    @inputText(verifyOrganizationForm(constants.Form.ZONE_ID).copy(value = Some(zoneID)), '_label -> Messages(constants.Form.ZONE_ID))
+    @inputPassword(verifyOrganizationForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD))
 
-        @if(verifyOrganizationForm.hasGlobalErrors) {
-            <ul>
-            @for(error <- verifyOrganizationForm.globalErrors) {
-                <li>@error.format</li>
-            }
-            </ul>
+    @if(verifyOrganizationForm.hasGlobalErrors) {
+        <ul>
+        @for(error <- verifyOrganizationForm.globalErrors) {
+            <li>@error.format</li>
         }
-        <button type="submit">@Messages(constants.Form.VERIFY_ORGANIZATION)</button>
+        </ul>
     }
+    <button type="button" onclick="submitForm(this)">@Messages(constants.Form.VERIFY_ORGANIZATION)</button>
 }

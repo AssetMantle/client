@@ -4,7 +4,7 @@ import exceptions.{BaseException, BlockChainException}
 import javax.inject.{Inject, Singleton}
 import models.master.Accounts
 import play.api.Configuration
-import play.api.i18n.{I18nSupport, Messages}
+import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import views.companion.master.SignUp
 
@@ -30,10 +30,11 @@ class SignUpController @Inject()(messagesControllerComponents: MessagesControlle
       },
       signUpData => {
         try {
-          Ok(views.html.index(success = Messages(module + "." + constants.Success.SIGN_UP) + accounts.Service.addLogin(signUpData.username, signUpData.password, blockchainAccounts.Service.addAccount(signUpData.username, signUpData.password), request.lang.toString.stripPrefix("Lang(").stripSuffix(")").trim.split("_")(0))))
+          accounts.Service.addLogin(signUpData.username, signUpData.password, blockchainAccounts.Service.addAccount(signUpData.username, signUpData.password), request.lang.toString.stripPrefix("Lang(").stripSuffix(")").trim.split("_")(0))
+          Ok(views.html.index(successes = Seq(constants.Response.SIGNED_UP)))
         } catch {
-          case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))
-          case blockChainException: BlockChainException => Ok(views.html.index(failure = blockChainException.message))
+          case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
+          case blockChainException: BlockChainException => Ok(views.html.index(failures = Seq(blockChainException.failure)))
         }
       }
     )

@@ -2,27 +2,25 @@
 @import views.companion.blockchain.IssueAsset
 
 @(issueAssetForm: Form[IssueAsset.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages(constants.Form.ISSUE_ASSET)) {
-    @form(action = routes.IssueAssetController.blockchainIssueAsset) {
-        @CSRF.formField
-        @inputText(issueAssetForm(constants.Form.FROM),'_label-> Messages(constants.Form.FROM))
-        @inputText(issueAssetForm(constants.Form.TO),'_label-> Messages(constants.Form.TO))
-        @inputText(issueAssetForm(constants.Form.DOCUMENT_HASH),'_label-> Messages(constants.Form.DOCUMENT_HASH))
-        @inputText(issueAssetForm(constants.Form.ASSET_TYPE),'_label-> Messages(constants.Form.ASSET_TYPE))
-        @inputText(issueAssetForm(constants.Form.ASSET_PRICE),'_label-> Messages(constants.Form.ASSET_PRICE))
-        @inputText(issueAssetForm(constants.Form.QUANTITY_UNIT),'_label-> Messages(constants.Form.QUANTITY_UNIT))
-        @inputText(issueAssetForm(constants.Form.ASSET_QUANTITY),'_label-> Messages(constants.Form.ASSET_QUANTITY))
-        @checkbox(issueAssetForm(constants.Form.UNMODERATED), '_label -> Messages(constants.Form.UNMODERATED))
-        @inputText(issueAssetForm(constants.Form.GAS),'_label-> Messages(constants.Form.GAS))
-        @inputPassword(issueAssetForm(constants.Form.PASSWORD),'_label-> Messages(constants.Form.PASSWORD))
+@form(action = routes.IssueAssetController.blockchainIssueAsset, 'onkeypress -> "validateForm(event,this)") {
+    @CSRF.formField
+    @inputText(issueAssetForm(constants.Form.FROM), '_label -> Messages(constants.Form.FROM))
+    @inputText(issueAssetForm(constants.Form.TO), '_label -> Messages(constants.Form.TO))
+    @inputText(issueAssetForm(constants.Form.DOCUMENT_HASH), '_label -> Messages(constants.Form.DOCUMENT_HASH))
+    @inputText(issueAssetForm(constants.Form.ASSET_TYPE), '_label -> Messages(constants.Form.ASSET_TYPE))
+    @inputText(issueAssetForm(constants.Form.ASSET_PRICE), '_label -> Messages(constants.Form.ASSET_PRICE))
+    @inputText(issueAssetForm(constants.Form.QUANTITY_UNIT), '_label -> Messages(constants.Form.QUANTITY_UNIT))
+    @inputText(issueAssetForm(constants.Form.ASSET_QUANTITY), '_label -> Messages(constants.Form.ASSET_QUANTITY))
+    @checkbox(issueAssetForm(constants.Form.UNMODERATED), '_label -> Messages(constants.Form.UNMODERATED))
+    @inputText(issueAssetForm(constants.Form.GAS), '_label -> Messages(constants.Form.GAS))
+    @inputPassword(issueAssetForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD))
 
-        @if(issueAssetForm.hasGlobalErrors) {
-            <ul>
-            @for(error <- issueAssetForm.globalErrors) {
-                <li>@error.format</li>
-            }
-            </ul>
+    @if(issueAssetForm.hasGlobalErrors) {
+        <ul>
+        @for(error <- issueAssetForm.globalErrors) {
+            <li>@error.format</li>
         }
-        <button type="submit">@Messages(constants.Form.ISSUE_ASSET)</button>
+        </ul>
     }
+    <button type="button" onclick="submitForm(this)">@Messages(constants.Form.ISSUE_ASSET)</button>
 }

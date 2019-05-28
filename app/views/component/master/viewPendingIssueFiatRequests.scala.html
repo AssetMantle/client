@@ -2,26 +2,27 @@
 
 @(issueFiatRequests: Seq[IssueFiatRequest])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
 
-@common(Messages(constants.Form.PENDING_ISSUE_FIAT_REQUESTS)) {
 
-    <table>
+<table>
+    <tr>
+        <th>@Messages(constants.Form.ID)</th>
+        <th>@Messages(constants.Form.ACCOUNT_ID)</th>
+        <th>@Messages(constants.Form.TRANSACTION_ID)</th>
+        <th>@Messages(constants.Form.TRANSACTION_AMOUNT)</th>
+        <th>@Messages(constants.Form.STATUS)</th>
+    </tr>
+    @for(issueFiatRequest <- issueFiatRequests) {
         <tr>
-            <th>@Messages(constants.Form.ID)</th>
-            <th>@Messages(constants.Form.ACCOUNT_ID)</th>
-            <th>@Messages(constants.Form.TRANSACTION_ID)</th>
-            <th>@Messages(constants.Form.TRANSACTION_AMOUNT)</th>
-            <th>@Messages(constants.Form.STATUS)</th>
+            <td>@issueFiatRequest.id</td>
+            <td>@issueFiatRequest.accountID</td>
+            <td>@issueFiatRequest.transactionID</td>
+            <td>@issueFiatRequest.transactionAmount</td>
+            <td>
+                <a onclick="getForm(jsRoutes.controllers.IssueFiatController.issueFiatForm('@issueFiatRequest.id', '@issueFiatRequest.accountID', '@issueFiatRequest.transactionID', @issueFiatRequest.transactionAmount))">@Messages(constants.Form.APPROVE)</a>
+                /
+                <a onclick="getForm(jsRoutes.controllers.IssueFiatController.rejectIssueFiatRequestForm('@issueFiatRequest.id'))">@Messages(constants.Form.REJECT)</a>
+            </td>
         </tr>
-        @for(issueFiatRequest <- issueFiatRequests) {
-            <tr>
-                <td>@issueFiatRequest.id</td>
-                <td>@issueFiatRequest.accountID</td>
-                <td>@issueFiatRequest.transactionID</td>
-                <td>@issueFiatRequest.transactionAmount</td>
-                <td><a href="@routes.IssueFiatController.issueFiatForm(issueFiatRequest.id, issueFiatRequest.accountID, issueFiatRequest.transactionID, issueFiatRequest.transactionAmount)">@Messages(constants.Form.APPROVE)</a>
-                    /<a href="@routes.IssueFiatController.rejectIssueFiatRequestForm(issueFiatRequest.id)">@Messages(constants.Form.REJECT)</a></td>
-            </tr>
-        }
-    </table>
-    <br>
-}
+    }
+</table>
+<br>

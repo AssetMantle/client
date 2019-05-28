@@ -1,3 +1,3 @@
 package exceptions
 
-class BlockChainException(val message:String) extends Exception
+class BlockChainException(val failure: constants.Response.Failure) extends Exception

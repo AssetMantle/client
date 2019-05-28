@@ -34,16 +34,16 @@ class AccountTokens @Inject()(protected val databaseConfigProvider: DatabaseConf
   private def add(accountToken: AccountToken)(implicit executionContext: ExecutionContext): Future[String] = db.run((accountTokenTable returning accountTokenTable.map(_.id) += accountToken).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
-        throw new BaseException(constants.Error.PSQL_EXCEPTION)
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
     }
   }
 
   private def findById(id: String)(implicit executionContext: ExecutionContext): Future[AccountToken] = db.run(accountTokenTable.filter(_.id === id).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Error.NO_SUCH_ELEMENT_EXCEPTION, noSuchElementException)
-        throw new BaseException(constants.Error.NO_SUCH_ELEMENT_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }
   }
 
@@ -85,7 +85,7 @@ class AccountTokens @Inject()(protected val databaseConfigProvider: DatabaseConf
 
     def tryVerifySessionToken(username: String, sessionToken: String)(implicit executionContext: ExecutionContext): Boolean = {
       if(Await.result(findById(username), Duration.Inf).sessionTokenHash.get == util.hashing.MurmurHash3.stringHash(sessionToken).toString) true
-      else throw new BaseException(constants.Error.INVALID_TOKEN)
+      else throw new BaseException(constants.Response.INVALID_TOKEN)
     }
 
     def verifySessionTokenTime(username: Option[String])(implicit executionContext: ExecutionContext): Boolean = {
@@ -94,7 +94,7 @@ class AccountTokens @Inject()(protected val databaseConfigProvider: DatabaseConf
 
     def tryVerifySessionTokenTime(username: String)(implicit executionContext: ExecutionContext): Boolean = {
       if ((DateTime.now(DateTimeZone.UTC).getMillis - Await.result(findById(username), Duration.Inf).sessionTokenTime) < sessionTokenTimeout) true
-      else throw new BaseException(constants.Error.TOKEN_TIMEOUT)
+      else throw new BaseException(constants.Response.TOKEN_TIMEOUT)
     }
 
     def refreshSessionToken(username: String): String = {

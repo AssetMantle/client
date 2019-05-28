@@ -32,15 +32,15 @@ object issueFiatControllerTest {
 
   val rejectFiatRequestScenario: ScenarioBuilder = scenario("RejectFiatRequest")
     .feed(RequestIDFeeder.requestIDFeed)
-      .exec(http("RejectIssueFiat_GET")
-        .get(routes.IssueFiatController.rejectIssueFiatRequestForm(Test.TEST_REQUEST_ID).url)
-        .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
-      .pause(2)
-      .exec(http("RejectIssueFiat_POST")
-        .post(routes.IssueFiatController.issueFiatRequest().url)
-        .formParamMap(Map(
+    .exec(http("RejectIssueFiat_GET")
+      .get(routes.IssueFiatController.rejectIssueFiatRequestForm(Test.TEST_REQUEST_ID).url)
+      .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
+    .pause(2)
+    .exec(http("RejectIssueFiat_POST")
+      .post(routes.IssueFiatController.issueFiatRequest().url)
+      .formParamMap(Map(
         Form.REQUEST_ID -> "${%s}".format(Test.TEST_REQUEST_ID),
-         Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
+        Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
 
   val issueFiatScenario: ScenarioBuilder = scenario("IssueFiat")
     .feed(RequestIDFeeder.requestIDFeed)

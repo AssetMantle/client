@@ -2,23 +2,21 @@
 @import views.companion.blockchain.IssueFiat
 
 @(issueFiatForm: Form[IssueFiat.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages(constants.Form.ISSUE_FIAT)) {
-    @form(action = routes.IssueFiatController.blockchainIssueFiat) {
-        @CSRF.formField
-        @inputText(issueFiatForm(constants.Form.FROM),'_label-> Messages(constants.Form.FROM))
-        @inputText(issueFiatForm(constants.Form.TO),'_label-> Messages(constants.Form.TO))
-        @inputText(issueFiatForm(constants.Form.TRANSACTION_ID),'_label-> Messages(constants.Form.TRANSACTION_ID))
-        @inputText(issueFiatForm(constants.Form.TRANSACTION_AMOUNT),'_label-> Messages(constants.Form.TRANSACTION_AMOUNT))
-        @inputText(issueFiatForm(constants.Form.GAS),'_label-> Messages(constants.Form.GAS))
-        @inputPassword(issueFiatForm(constants.Form.PASSWORD),'_label-> Messages(constants.Form.PASSWORD))
+@form(action = routes.IssueFiatController.blockchainIssueFiat, 'onkeypress -> "validateForm(event,this)") {
+    @CSRF.formField
+    @inputText(issueFiatForm(constants.Form.FROM), '_label -> Messages(constants.Form.FROM))
+    @inputText(issueFiatForm(constants.Form.TO), '_label -> Messages(constants.Form.TO))
+    @inputText(issueFiatForm(constants.Form.TRANSACTION_ID), '_label -> Messages(constants.Form.TRANSACTION_ID))
+    @inputText(issueFiatForm(constants.Form.TRANSACTION_AMOUNT), '_label -> Messages(constants.Form.TRANSACTION_AMOUNT))
+    @inputText(issueFiatForm(constants.Form.GAS), '_label -> Messages(constants.Form.GAS))
+    @inputPassword(issueFiatForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD))
 
-        @if(issueFiatForm.hasGlobalErrors) {
-            <ul>
-            @for(error <- issueFiatForm.globalErrors) {
-                <li>@error.format</li>
-            }
-            </ul>
+    @if(issueFiatForm.hasGlobalErrors) {
+        <ul>
+        @for(error <- issueFiatForm.globalErrors) {
+            <li>@error.format</li>
         }
-        <button type="submit">@Messages(constants.Form.ISSUE_FIAT)</button>
+        </ul>
     }
+    <button type="button" onclick="submitForm(this)">@Messages(constants.Form.ISSUE_FIAT)</button>
 }
