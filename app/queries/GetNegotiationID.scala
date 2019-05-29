@@ -26,16 +26,17 @@ class GetNegotiationID @Inject()()(implicit wsClient: WSClient, configuration: C
 
   private val url = ip + ":" + port + "/" + path + "/"
 
-  private def action(request: String)(implicit executionContext: ExecutionContext): Future[Response] = wsClient.url(url + request).get.map { response => utilities.JSON.getResponseFromJson[Response](response)}
+  private def action(request: String)(implicit executionContext: ExecutionContext): Future[Response] = wsClient.url(url + request).get.map { response => utilities.JSON.getResponseFromJson[Response](response) }
 
   object Service {
 
     def get(buyerAccount: String, sellerAccount: String, pegHash: String)(implicit executionContext: ExecutionContext): Response = try {
-      Await.result(action(buyerAccount + "/" + sellerAccount +"/" + pegHash), Duration.Inf)
+      Await.result(action(buyerAccount + "/" + sellerAccount + "/" + pegHash), Duration.Inf)
     } catch {
       case connectException: ConnectException =>
-        logger.error(constants.Error.CONNECT_EXCEPTION, connectException)
-        throw new BlockChainException(constants.Error.CONNECT_EXCEPTION)
+        logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
+        throw new BlockChainException(constants.Response.CONNECT_EXCEPTION)
     }
   }
+
 }

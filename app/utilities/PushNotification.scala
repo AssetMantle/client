@@ -26,7 +26,7 @@ class PushNotification @Inject()(wsClient: WSClient, masterTransactionNotificati
       masterTransactionNotifications.Service.create(username, title, message)
       masterTransactionAccountTokens.Service.getTokenById(username).foreach(notificationToken => wsClient.url(url).withHttpHeaders(constants.Header.CONTENT_TYPE -> constants.Header.APPLICATION_JSON).withHttpHeaders(constants.Header.AUTHORIZATION -> authorizationKey).post(Json.toJson(Data(notificationToken, Notification(title, message)))))
     } catch {
-      case baseException: BaseException => throw new BaseException(baseException.message)
+      case baseException: BaseException => throw new BaseException(baseException.failure)
     }
   }
 

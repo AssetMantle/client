@@ -2,26 +2,24 @@
 
 @(zoneVerificationRequests: Seq[Zone])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
 
-@common(Messages(constants.Form.PENDING_VERIFY_ZONE_REQUESTS)) {
-    <table>
-        <tr>
-            <th>@Messages(constants.Form.ZONE_ID)</th>
-            <th>@Messages(constants.Form.ACCOUNT_ID)</th>
-            <th>@Messages(constants.Form.NAME)</th>
-            <th>@Messages(constants.Form.CURRENCY)</th>
-            <th>@Messages(constants.Form.STATUS)</th>
+<table>
+  <tr>
+    <th>@Messages(constants.Form.ZONE_ID)</th>
+    <th>@Messages(constants.Form.ACCOUNT_ID)</th>
+    <th>@Messages(constants.Form.NAME)</th>
+    <th>@Messages(constants.Form.CURRENCY)</th>
+    <th>@Messages(constants.Form.STATUS)</th>
 
-        </tr>
-        @for(zoneVerificationRequest <- zoneVerificationRequests) {
-            <tr>
-                <td>@zoneVerificationRequest.id</td>
-                <td>@zoneVerificationRequest.accountID</td>
-                <td>@zoneVerificationRequest.name</td>
-                <td>@zoneVerificationRequest.currency</td>
-                <td><a href="@routes.AddZoneController.verifyZoneForm(zoneVerificationRequest.id)">@Messages(constants.Form.APPROVE)</a>
-                    /<a href="@routes.AddZoneController.rejectVerifyZoneRequestForm(zoneVerificationRequest.id)">@Messages(constants.Form.REJECT)</a></td>
-            </tr>
-        }
-    </table>
-    <br>
-}
+  </tr>
+  @for(zoneVerificationRequest <- zoneVerificationRequests) {
+    <tr>
+      <td>@zoneVerificationRequest.id</td>
+      <td>@zoneVerificationRequest.accountID</td>
+      <td>@zoneVerificationRequest.name</td>
+      <td>@zoneVerificationRequest.currency</td>
+      <td><a onclick="getForm(jsRoutes.controllers.AddZoneController.verifyZoneForm('@zoneVerificationRequest.id'))">@Messages(constants.Form.APPROVE)</a>
+        /<a onclick="getForm(jsRoutes.controllers.AddZoneController.rejectVerifyZoneRequestForm('@zoneVerificationRequest.id'))">@Messages(constants.Form.REJECT)</a></td>
+    </tr>
+  }
+</table>
+<br>

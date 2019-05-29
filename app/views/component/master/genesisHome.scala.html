@@ -4,7 +4,8 @@
 
     @component.master.commonHome(username = username, userType = constants.User.GENESIS, address = address, coins = coins)
 
-    <a href="@routes.AddZoneController.viewPendingVerifyZoneRequests">@Messages(constants.Form.PENDING_VERIFY_ZONE_REQUESTS)</a>
-    <a href="@routes.SendCoinController.viewPendingFaucetRequests">@Messages(constants.Form.APPROVE_FAUCET_REQUEST)</a>
+    <a onclick="getForm(jsRoutes.controllers.AddZoneController.viewPendingVerifyZoneRequests())">@Messages(constants.Form.PENDING_VERIFY_ZONE_REQUESTS)</a>
+
+    <a onclick="getForm(jsRoutes.controllers.SendCoinController.viewPendingFaucetRequests())">@Messages(constants.Form.APPROVE_FAUCET_REQUEST)</a>
 
 }

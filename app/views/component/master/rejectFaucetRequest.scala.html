@@ -2,18 +2,16 @@
 @import views.companion.master.RejectFaucetRequest
 
 @(rejectFaucetRequestForm: Form[RejectFaucetRequest.Data], requestID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages(constants.Form.REJECT_FAUCET_REQUEST)) {
-    @form(action = routes.SendCoinController.rejectFaucetRequest) {
-        @CSRF.formField
-        @inputText(rejectFaucetRequestForm(constants.Form.REQUEST_ID).copy(value = Some(requestID)), '_label -> Messages(constants.Form.REQUEST_ID))
-        @inputText(rejectFaucetRequestForm(constants.Form.COMMENT), '_label -> Messages(constants.Form.COMMENT))
-        @if(rejectFaucetRequestForm.hasGlobalErrors) {
-            <ul>
-            @for(error <- rejectFaucetRequestForm.globalErrors) {
-                <li>@error.format</li>
-            }
-            </ul>
+@form(action = routes.SendCoinController.rejectFaucetRequest, 'onkeypress -> "validateForm(event,this)") {
+    @CSRF.formField
+    @inputText(rejectFaucetRequestForm(constants.Form.REQUEST_ID).copy(value = Some(requestID)), '_label -> Messages(constants.Form.REQUEST_ID))
+    @inputText(rejectFaucetRequestForm(constants.Form.COMMENT), '_label -> Messages(constants.Form.COMMENT))
+    @if(rejectFaucetRequestForm.hasGlobalErrors) {
+        <ul>
+        @for(error <- rejectFaucetRequestForm.globalErrors) {
+            <li>@error.format</li>
         }
-        <button type="submit">@Messages(constants.Form.REJECT_FAUCET_REQUEST)</button>
+        </ul>
     }
+    <button type="button" onclick="submitForm(this)">@Messages(constants.Form.REJECT_FAUCET_REQUEST)</button>
 }

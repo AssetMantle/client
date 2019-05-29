@@ -2,20 +2,19 @@
 @import views.companion.master.SignUp
 
 @(signUpForm: Form[SignUp.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-    @common(Messages(constants.Form.SIGNUP)) {
-        @form(action = routes.SignUpController.signUp) {
-            @CSRF.formField
-            @inputText(signUpForm(constants.Form.USERNAME),'_label-> Messages(constants.Form.USERNAME),'id->"username")<label id="result"></label>
-            @inputPassword(signUpForm(constants.Form.PASSWORD),'_label-> Messages(constants.Form.PASSWORD))
+@form(action = routes.SignUpController.signUp, 'onkeypress -> "validateForm(event,this)") {
+  @CSRF.formField
+  @inputText(signUpForm(constants.Form.USERNAME), '_label -> Messages(constants.Form.USERNAME), 'id -> "username") <label id="result"></label>
+  @inputPassword(signUpForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD))
 
-            @if(signUpForm.hasGlobalErrors) {
-                <ul>
-                @for(error <- signUpForm.globalErrors) {
-                    <li>@error.format</li>
-                }
-                </ul>
-            }
-            <button type="submit">@Messages(constants.Form.SIGNUP)</button>
-        }
+  @if(signUpForm.hasGlobalErrors) {
+    <ul>
+    @for(error <- signUpForm.globalErrors) {
+      <li>@error.format</li>
     }
+    </ul>
+  }
+  <button type="button" onclick="submitForm(this)">@Messages(constants.Form.SIGNUP)</button>
+}
+
 <script src="@routes.Assets.versioned("javascripts/checkUsername.js")" type="text/javascript"></script>

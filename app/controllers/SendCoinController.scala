@@ -4,7 +4,7 @@ import controllers.actions.{WithGenesisLoginAction, WithLoginAction, WithUnknown
 import exceptions.{BaseException, BlockChainException}
 import javax.inject.{Inject, Singleton}
 import models.{blockchain, blockchainTransaction, master, masterTransaction}
-import play.api.i18n.{I18nSupport, Messages}
+import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
 
@@ -43,17 +43,17 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
                 try {
                   blockchainTransactionSendCoins.Utility.onSuccess(ticketID, transactionsSendCoin.Service.post(transactionsSendCoin.Request(from = username, password = sendCoinData.password, to = sendCoinData.to, amount = Seq(transactionsSendCoin.Amount(denominationOfGasToken, sendCoinData.amount.toString)), gas = sendCoinData.gas)))
                 } catch {
-                  case baseException: BaseException => logger.error(constants.Error.BASE_EXCEPTION, baseException)
-                  case blockChainException: BlockChainException => logger.error(blockChainException.message, blockChainException)
-                    blockchainTransactionSendCoins.Utility.onFailure(ticketID, blockChainException.message)
+                  case baseException: BaseException => logger.error(baseException.failure.message, baseException)
+                  case blockChainException: BlockChainException => logger.error(blockChainException.failure.message, blockChainException)
+                    blockchainTransactionSendCoins.Utility.onFailure(ticketID, blockChainException.failure.message)
                 }
               }
             }
-            Ok(views.html.index(success = ticketID))
+            Ok(views.html.index(successes = Seq(constants.Response.COINS_SENT)))
           }
           catch {
-            case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))
-            case blockChainException: BlockChainException => Ok(views.html.index(failure = blockChainException.message))
+            case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
+            case blockChainException: BlockChainException => Ok(views.html.index(failures = Seq(blockChainException.failure)))
           }
         }
       )
@@ -71,15 +71,17 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
       sendCoinData => {
         try {
           if (kafkaEnabled) {
-            Ok(views.html.index(success = transactionsSendCoin.Service.kafkaPost(transactionsSendCoin.Request(from = sendCoinData.from, password = sendCoinData.password, to = sendCoinData.to, amount = Seq(transactionsSendCoin.Amount(denominationOfGasToken, sendCoinData.amount.toString)), gas = sendCoinData.gas)).ticketID))
+            transactionsSendCoin.Service.kafkaPost(transactionsSendCoin.Request(from = sendCoinData.from, password = sendCoinData.password, to = sendCoinData.to, amount = Seq(transactionsSendCoin.Amount(denominationOfGasToken, sendCoinData.amount.toString)), gas = sendCoinData.gas))
           }
           else {
-            Ok(views.html.index(success = transactionsSendCoin.Service.post(transactionsSendCoin.Request(from = sendCoinData.from, password = sendCoinData.password, to = sendCoinData.to, amount = Seq(transactionsSendCoin.Amount(denominationOfGasToken, sendCoinData.amount.toString)), gas = sendCoinData.gas)).TxHash))
+            transactionsSendCoin.Service.post(transactionsSendCoin.Request(from = sendCoinData.from, password = sendCoinData.password, to = sendCoinData.to, amount = Seq(transactionsSendCoin.Amount(denominationOfGasToken, sendCoinData.amount.toString)), gas = sendCoinData.gas))
           }
+          Ok(views.html.index(successes = Seq(constants.Response.COINS_SENT)))
+
         }
         catch {
-          case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))
-          case blockChainException: BlockChainException => Ok(views.html.index(failure = blockChainException.message))
+          case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
+          case blockChainException: BlockChainException => Ok(views.html.index(failures = Seq(blockChainException.failure)))
         }
       }
     )
@@ -98,10 +100,10 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
         requestCoinFormData => {
           try {
             masterTransactionFaucetRequests.Service.create(username, defaultFaucetToken)
-            Ok(views.html.index(success = constants.Success.REQUEST_COINS))
+            Ok(views.html.index(successes = Seq(constants.Response.COINS_REQUESTED)))
           }
           catch {
-            case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))
+            case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
           }
         }
       )
@@ -113,7 +115,7 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
         Ok(views.html.component.master.viewPendingFaucetRequests(masterTransactionFaucetRequests.Service.getPendingFaucetRequests))
       }
       catch {
-        case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))
+        case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
@@ -130,10 +132,10 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
         rejectFaucetRequestData => {
           try {
             masterTransactionFaucetRequests.Service.reject(rejectFaucetRequestData.requestID, comment = rejectFaucetRequestData.comment)
-            Ok(views.html.index(success = Messages(constants.Success.ISSUE_FIAT_REQUEST_REJECTED)))
+            Ok(views.html.index(successes = Seq(constants.Response.FAUCET_REQUEST_REJECTED)))
           }
           catch {
-            case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))
+            case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
           }
         }
       )
@@ -161,22 +163,22 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
                   try {
                     blockchainTransactionSendCoins.Utility.onSuccess(ticketID, transactionsSendCoin.Service.post(transactionsSendCoin.Request(from = constants.User.MAIN_ACCOUNT, password = approveFaucetRequestFormData.password, to = toAddress, amount = Seq(transactionsSendCoin.Amount(denominationOfGasToken, defaultFaucetToken.toString)), gas = approveFaucetRequestFormData.gas)))
                   } catch {
-                    case baseException: BaseException => logger.error(constants.Error.BASE_EXCEPTION, baseException)
-                    case blockChainException: BlockChainException => logger.error(blockChainException.message, blockChainException)
-                      blockchainTransactionSendCoins.Utility.onFailure(ticketID, blockChainException.message)
+                    case baseException: BaseException => logger.error(baseException.failure.message, baseException)
+                    case blockChainException: BlockChainException => logger.error(blockChainException.failure.message, blockChainException)
+                      blockchainTransactionSendCoins.Utility.onFailure(ticketID, blockChainException.failure.message)
                   }
                 }
               }
-              Ok(views.html.index(success = ticketID))
+              Ok(views.html.index(successes = Seq(constants.Response.FAUCET_REQUEST_APPROVED)))
             } else {
-              Ok(views.html.index(failure = Messages(constants.Error.REQUEST_ALREADY_APPROVED_OR_REJECTED)))
+              Ok(views.html.index(failures = Seq(constants.Response.REQUEST_ALREADY_APPROVED_OR_REJECTED)))
             }
           }
           catch {
-            case baseException: BaseException => Ok(views.html.index(failure = Messages(baseException.message)))
+            case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
             case blockChainException: BlockChainException =>
-              masterTransactionFaucetRequests.Service.updateComment(approveFaucetRequestFormData.requestID, blockChainException.message)
-              Ok(views.html.index(failure = blockChainException.message))
+              masterTransactionFaucetRequests.Service.updateComment(approveFaucetRequestFormData.requestID, blockChainException.failure.message)
+              Ok(views.html.index(failures = Seq(blockChainException.failure)))
           }
         }
       )

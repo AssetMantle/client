@@ -2,18 +2,16 @@
 @import views.companion.master.RejectVerifyZoneRequest
 
 @(rejectVerifyZoneRequestForm: Form[RejectVerifyZoneRequest.Data], zoneID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages(constants.Form.REJECT_VERIFY_ZONE_REQUEST)) {
-    @form(action = routes.AddZoneController.rejectVerifyZoneRequest) {
-        @CSRF.formField
-        @inputText(rejectVerifyZoneRequestForm(constants.Form.ZONE_ID).copy(value = Some(zoneID)), '_label -> Messages(constants.Form.ZONE_ID))
+@form(action = routes.AddZoneController.rejectVerifyZoneRequest, 'onkeypress -> "validateForm(event,this)") {
+  @CSRF.formField
+  @inputText(rejectVerifyZoneRequestForm(constants.Form.ZONE_ID).copy(value = Some(zoneID)), '_label -> Messages(constants.Form.ZONE_ID))
 
-        @if(rejectVerifyZoneRequestForm.hasGlobalErrors) {
-            <ul>
-            @for(error <- rejectVerifyZoneRequestForm.globalErrors) {
-                <li>@error.format</li>
-            }
-            </ul>
-        }
-        <button type="submit">@Messages(constants.Form.REJECT_VERIFY_ZONE_REQUEST)</button>
+  @if(rejectVerifyZoneRequestForm.hasGlobalErrors) {
+    <ul>
+    @for(error <- rejectVerifyZoneRequestForm.globalErrors) {
+      <li>@error.format</li>
     }
+    </ul>
+  }
+  <button type="button" onclick="submitForm(this)">@Messages(constants.Form.REJECT_VERIFY_ZONE_REQUEST)</button>
 }

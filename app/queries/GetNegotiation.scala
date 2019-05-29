@@ -5,8 +5,8 @@ import java.net.ConnectException
 import exceptions.BlockChainException
 import javax.inject.{Inject, Singleton}
 import play.api.libs.ws.WSClient
-import queries.responses.NegotiationResponse.Response
 import play.api.{Configuration, Logger}
+import queries.responses.NegotiationResponse.Response
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
@@ -34,8 +34,8 @@ class GetNegotiation @Inject()()(implicit wsClient: WSClient, configuration: Con
       Await.result(action(negotiationID), Duration.Inf)
     } catch {
       case connectException: ConnectException =>
-        logger.error(constants.Error.CONNECT_EXCEPTION, connectException)
-        throw new BlockChainException(constants.Error.CONNECT_EXCEPTION)
+        logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
+        throw new BlockChainException(constants.Response.CONNECT_EXCEPTION)
     }
   }
 

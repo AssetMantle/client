@@ -3,9 +3,6 @@ package transactions
 import java.net.ConnectException
 
 import exceptions.BlockChainException
-import javax.inject.Inject
-import play.api.libs.json.{JsObject, Json, OWrites}
-import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import play.api.libs.json.{Json, OWrites}
 import play.api.libs.ws.{WSClient, WSResponse}
@@ -45,16 +42,16 @@ class ReleaseAsset @Inject()(wsClient: WSClient)(implicit configuration: Configu
       Await.result(action(request), Duration.Inf)
     } catch {
       case connectException: ConnectException =>
-        logger.error(constants.Error.CONNECT_EXCEPTION, connectException)
-        throw new BlockChainException(constants.Error.CONNECT_EXCEPTION)
+        logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
+        throw new BlockChainException(constants.Response.CONNECT_EXCEPTION)
     }
 
     def kafkaPost(request: Request)(implicit executionContext: ExecutionContext): KafkaResponse = try {
       Await.result(kafkaAction(request), Duration.Inf)
     } catch {
       case connectException: ConnectException =>
-        logger.error(constants.Error.CONNECT_EXCEPTION, connectException)
-        throw new BlockChainException(constants.Error.CONNECT_EXCEPTION)
+        logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
+        throw new BlockChainException(constants.Response.CONNECT_EXCEPTION)
     }
 
     def getTxHashFromWSResponse(wsResponse: WSResponse): String = utilities.JSON.getResponseFromJson[Response](wsResponse).TxHash

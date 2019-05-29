@@ -2,10 +2,8 @@ package transactions
 
 import java.net.ConnectException
 
-import exceptions.BaseException
-import javax.inject.{Inject, Singleton}
 import exceptions.BlockChainException
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 import play.api.libs.json._
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
@@ -44,8 +42,8 @@ class AddKey @Inject()(wsClient: WSClient)(implicit configuration: Configuration
       Await.result(action(request), Duration.Inf)
     } catch {
       case connectException: ConnectException =>
-        logger.error(constants.Error.CONNECT_EXCEPTION, connectException)
-        throw new BlockChainException(constants.Error.CONNECT_EXCEPTION)
+        logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
+        throw new BlockChainException(constants.Response.CONNECT_EXCEPTION)
     }
   }
 

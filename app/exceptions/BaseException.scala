@@ -1,6 +1,5 @@
 package exceptions
 
-class BaseException(code: String)(implicit currentModule: String) extends Exception {
+class BaseException(val failure: constants.Response.Failure)(implicit currentModule: String) extends Exception {
   val module: String = currentModule
-  val message: String = module + "." + code
 }

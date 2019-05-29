@@ -2,21 +2,19 @@
 @import views.companion.blockchain.AddZone
 
 @(addZoneForm: Form[AddZone.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages(constants.Form.ADD_ZONE)) {
-    @form(action = routes.AddZoneController.blockchainAddZone) {
-        @CSRF.formField
-        @inputText(addZoneForm(constants.Form.FROM),'_label-> Messages(constants.Form.FROM))
-        @inputText(addZoneForm(constants.Form.TO),'_label-> Messages(constants.Form.TO))
-        @inputText(addZoneForm(constants.Form.ZONE_ID),'_label-> Messages(constants.Form.ZONE_ID))
-        @inputPassword(addZoneForm(constants.Form.PASSWORD),'_label-> Messages(constants.Form.PASSWORD))
+@form(action = routes.AddZoneController.blockchainAddZone, 'onkeypress -> "validateForm(event,this)") {
+    @CSRF.formField
+    @inputText(addZoneForm(constants.Form.FROM), '_label -> Messages(constants.Form.FROM))
+    @inputText(addZoneForm(constants.Form.TO), '_label -> Messages(constants.Form.TO))
+    @inputText(addZoneForm(constants.Form.ZONE_ID), '_label -> Messages(constants.Form.ZONE_ID))
+    @inputPassword(addZoneForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD))
 
-        @if(addZoneForm.hasGlobalErrors) {
-            <ul>
-            @for(error <- addZoneForm.globalErrors) {
-                <li>@error.format</li>
-            }
-            </ul>
+    @if(addZoneForm.hasGlobalErrors) {
+        <ul>
+        @for(error <- addZoneForm.globalErrors) {
+            <li>@error.format</li>
         }
-        <button type="submit">@Messages(constants.Form.ADD_ZONE)</button>
+        </ul>
     }
+    <button type="button" onclick="submitForm(this)">@Messages(constants.Form.ADD_ZONE)</button>
 }

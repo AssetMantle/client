@@ -2,8 +2,7 @@
 @import views.companion.master.UnmoderatedBuyerExecuteOrder
 
 @(unmoderatedBuyerExecuteOrderForm: Form[UnmoderatedBuyerExecuteOrder.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages(constants.Form.UNMODERATED_BUYER_EXECUTE_ORDER)) {
-    @form(action = routes.BuyerExecuteOrderController.unmoderatedBuyerExecuteOrder) {
+@form(action = routes.BuyerExecuteOrderController.unmoderatedBuyerExecuteOrder, 'onkeypress -> "validateForm(event,this)") {
         @CSRF.formField
         @inputText(unmoderatedBuyerExecuteOrderForm(constants.Form.SELLER_ADDRESS), '_label -> Messages(constants.Form.SELLER_ADDRESS))
         @inputText(unmoderatedBuyerExecuteOrderForm(constants.Form.FIAT_PROOF_HASH), '_label -> Messages(constants.Form.FIAT_PROOF_HASH))
@@ -18,6 +17,5 @@
             }
             </ul>
         }
-        <button type="submit">@Messages(constants.Form.UNMODERATED_BUYER_EXECUTE_ORDER)</button>
+        <button type="button" onclick="submitForm(this)">@Messages(constants.Form.UNMODERATED_BUYER_EXECUTE_ORDER)</button>
     }
-}

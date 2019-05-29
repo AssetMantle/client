@@ -2,21 +2,19 @@
 @import views.companion.master.RedeemAsset
 
 @(redeemAssetForm: Form[RedeemAsset.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages(constants.Form.REDEEM_ASSET)) {
-    @form(action = routes.RedeemAssetController.redeemAsset) {
-        @CSRF.formField
-        @inputText(redeemAssetForm(constants.Form.ZONE_ID),'_label-> Messages(constants.Form.ZONE_ID))
-        @inputText(redeemAssetForm(constants.Form.PEG_HASH),'_label-> Messages(constants.Form.PEG_HASH))
-        @inputText(redeemAssetForm(constants.Form.GAS),'_label-> Messages(constants.Form.GAS))
-        @inputPassword(redeemAssetForm(constants.Form.PASSWORD),'_label-> Messages(constants.Form.PASSWORD))
+@form(action = routes.RedeemAssetController.redeemAsset, 'onkeypress -> "validateForm(event,this)") {
+    @CSRF.formField
+    @inputText(redeemAssetForm(constants.Form.ZONE_ID), '_label -> Messages(constants.Form.ZONE_ID))
+    @inputText(redeemAssetForm(constants.Form.PEG_HASH), '_label -> Messages(constants.Form.PEG_HASH))
+    @inputText(redeemAssetForm(constants.Form.GAS), '_label -> Messages(constants.Form.GAS))
+    @inputPassword(redeemAssetForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD))
 
-        @if(redeemAssetForm.hasGlobalErrors) {
-            <ul>
-            @for(error <- redeemAssetForm.globalErrors) {
-                <li>@error.format</li>
-            }
-            </ul>
+    @if(redeemAssetForm.hasGlobalErrors) {
+        <ul>
+        @for(error <- redeemAssetForm.globalErrors) {
+            <li>@error.format</li>
         }
-        <button type="submit">@Messages(constants.Form.REDEEM_ASSET)</button>
+        </ul>
     }
+    <button type="button" onclick="submitForm(this)">@Messages(constants.Form.REDEEM_ASSET)</button>
 }

@@ -2,8 +2,6 @@ package feeders
 
 import constants.Test
 
-import scala.util.Random
-
 object SellerBidFeeder {
 
   val sellerBidFeed: Array[Map[String, String]] = arrayConstructor(Test.NUMBER_OF_USERS)

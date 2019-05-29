@@ -2,21 +2,19 @@
 @import views.companion.master.SendCoin
 
 @(sendCoinForm: Form[SendCoin.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages(constants.Form.SEND_COIN)) {
-    @form(action = routes.SendCoinController.sendCoin) {
-        @CSRF.formField
-        @inputText(sendCoinForm(constants.Form.TO),'_label-> Messages(constants.Form.TO))
-        @inputText(sendCoinForm(constants.Form.AMOUNT),'_label-> Messages(constants.Form.AMOUNT))
-        @inputText(sendCoinForm(constants.Form.GAS),'_label-> Messages(constants.Form.GAS))
-        @inputPassword(sendCoinForm(constants.Form.PASSWORD),'_label-> Messages(constants.Form.PASSWORD))
+@form(action = routes.SendCoinController.sendCoin, 'onkeypress -> "validateForm(event,this)") {
+  @CSRF.formField
+  @inputText(sendCoinForm(constants.Form.TO), '_label -> Messages(constants.Form.TO))
+  @inputText(sendCoinForm(constants.Form.AMOUNT), '_label -> Messages(constants.Form.AMOUNT))
+  @inputText(sendCoinForm(constants.Form.GAS), '_label -> Messages(constants.Form.GAS))
+  @inputPassword(sendCoinForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD))
 
-        @if(sendCoinForm.hasGlobalErrors) {
-            <ul>
-            @for(error <- sendCoinForm.globalErrors) {
-                <li>@error.format</li>
-            }
-            </ul>
-        }
-        <button type="submit">@Messages(constants.Form.SEND_COIN)</button>
+  @if(sendCoinForm.hasGlobalErrors) {
+    <ul>
+    @for(error <- sendCoinForm.globalErrors) {
+      <li>@error.format</li>
     }
+    </ul>
+  }
+  <button type="button" onclick="submitForm(this)">@Messages(constants.Form.SEND_COIN)</button>
 }

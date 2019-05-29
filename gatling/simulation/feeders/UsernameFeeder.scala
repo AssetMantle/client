@@ -1,6 +1,7 @@
 package feeders
 
 import constants.Test
+
 import scala.util.Random
 
 object UsernameFeeder {

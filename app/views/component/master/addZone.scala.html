@@ -2,19 +2,17 @@
 @import views.companion.master.AddZone
 
 @(addZoneForm: Form[AddZone.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages(constants.Form.ADD_ZONE)) {
-    @form(action = routes.AddZoneController.addZone) {
-        @CSRF.formField
-        @inputText(addZoneForm(constants.Form.NAME),'_label-> Messages(constants.Form.NAME))
-        @inputText(addZoneForm(constants.Form.CURRENCY),'_label-> Messages(constants.Form.CURRENCY))
+@form(action = routes.AddZoneController.addZone, 'onkeypress -> "validateForm(event,this)") {
+  @CSRF.formField
+  @inputText(addZoneForm(constants.Form.NAME), '_label -> Messages(constants.Form.NAME))
+  @inputText(addZoneForm(constants.Form.CURRENCY), '_label -> Messages(constants.Form.CURRENCY))
 
-        @if(addZoneForm.hasGlobalErrors) {
-            <ul>
-            @for(error <- addZoneForm.globalErrors) {
-                <li>@error.format</li>
-            }
-            </ul>
-        }
-        <button type="submit">@Messages(constants.Form.ADD_ZONE)</button>
+  @if(addZoneForm.hasGlobalErrors) {
+    <ul>
+    @for(error <- addZoneForm.globalErrors) {
+      <li>@error.format</li>
     }
+    </ul>
+  }
+  <button type="button" onclick="submitForm(this)">@Messages(constants.Form.ADD_ZONE)</button>
 }

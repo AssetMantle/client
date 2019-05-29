@@ -1,8 +1,8 @@
 package controllersTest
 
 import constants.{Form, Test}
-import feeders._
 import controllers.routes
+import feeders._
 import io.gatling.core.Predef._
 import io.gatling.core.structure.ScenarioBuilder
 import io.gatling.http.Predef._
