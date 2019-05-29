@@ -129,7 +129,7 @@ class SetSellerFeedbacks @Inject()(protected val databaseConfigProvider: Databas
 
     def getTicketIDsOnStatus(): Seq[String] = Await.result(getTicketIDsWithNullStatus, Duration.Inf)
 
-    def getSetSellerFeedbackOnTicketID(ticketID: String): SetSellerFeedback = Await.result(findByTicketID(ticketID), Duration.Inf)
+    def getTransaction(ticketID: String): SetSellerFeedback = Await.result(findByTicketID(ticketID), Duration.Inf)
 
     def markTransactionSuccessful(ticketID: String, txHash: String, responseCode: String): Int = Await.result(updateTxHashStatusAndResponseCodeOnTicketID(ticketID, txHash, status = Option(true), responseCode), Duration.Inf)
 
@@ -141,7 +141,7 @@ class SetSellerFeedbacks @Inject()(protected val databaseConfigProvider: Databas
     def onSuccess(ticketID: String, response: Response): Future[Unit] = Future {
       try {
         Service.markTransactionSuccessful(ticketID, response.TxHash, response.Code)
-        val setSellerFeedback = Service.getSetSellerFeedbackOnTicketID(ticketID)
+        val setSellerFeedback = Service.getTransaction(ticketID)
         val fromAddress = masterAccounts.Service.getAddress(setSellerFeedback.from)
         blockchainTraderFeedbackHistories.Service.create(setSellerFeedback.to, setSellerFeedback.to, fromAddress, setSellerFeedback.pegHash, setSellerFeedback.rating.toString)
         blockchainAccounts.Service.markDirty(fromAddress)
@@ -156,7 +156,7 @@ class SetSellerFeedbacks @Inject()(protected val databaseConfigProvider: Databas
     def onFailure(ticketID: String, message: String): Future[Unit] = Future {
       try {
         Service.markTransactionFailed(ticketID, message)
-        val setSellerFeedback = Service.getSetSellerFeedbackOnTicketID(ticketID)
+        val setSellerFeedback = Service.getTransaction(ticketID)
         pushNotification.sendNotification(masterAccounts.Service.getId(setSellerFeedback.to), constants.Notification.FAILURE, message)
         pushNotification.sendNotification(setSellerFeedback.from, constants.Notification.FAILURE, message)
       } catch {

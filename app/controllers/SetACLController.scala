@@ -18,11 +18,11 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
 
   private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
 
-  def setACLForm(): Action[AnyContent] = Action { implicit request =>
+  def setACLForm: Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.master.setACL(views.companion.master.SetACL.form))
   }
 
-  def setACL(): Action[AnyContent] = withZoneLoginAction.authenticated { username =>
+  def setACL: Action[AnyContent] = withZoneLoginAction.authenticated { username =>
     implicit request =>
       views.companion.master.SetACL.form.bindFromRequest().fold(
         formWithErrors => {

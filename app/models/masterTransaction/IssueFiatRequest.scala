@@ -67,19 +67,15 @@ class IssueFiatRequests @Inject()(protected val databaseConfigProvider: Database
     }
   }
 
-  private def getIssueFiatRequestsWithNullStatus(accountIDs: Seq[String])(implicit executionContext: ExecutionContext): Future[Seq[IssueFiatRequest]] = db.run(issueFiatRequestTable.filter(_.accountID.inSet(accountIDs)).filter(_.status.?.isEmpty).result)
-
-  private def deleteByID(id: String)(implicit executionContext: ExecutionContext) = db.run(issueFiatRequestTable.filter(_.id === id).delete.asTry).map {
+  private def getIssueFiatRequestsWithNullStatus(accountIDs: Seq[String])(implicit executionContext: ExecutionContext): Future[Seq[IssueFiatRequest]] = db.run(issueFiatRequestTable.filter(_.accountID.inSet(accountIDs)).filter(_.status.?.isEmpty).result.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }
   }
 
-  private def updateCommentByID(id: String, comment: String)(implicit executionContext: ExecutionContext) = db.run(issueFiatRequestTable.filter(_.id === id).map(_.comment).update(comment).asTry).map {
+  private def deleteByID(id: String)(implicit executionContext: ExecutionContext) = db.run(issueFiatRequestTable.filter(_.id === id).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -129,8 +125,6 @@ class IssueFiatRequests @Inject()(protected val databaseConfigProvider: Database
     def reject(id: String, comment: String)(implicit executionContext: ExecutionContext): Int = Await.result(updateStatusAndCommentByID(id = id, status = Option(false), comment = comment), Duration.Inf)
 
     def accept(requestID: String, ticketID: String, gas: Int)(implicit executionContext: ExecutionContext): Int = Await.result(updateTicketIDStatusAndGasByID(requestID, ticketID, status = Option(true), gas), Duration.Inf)
-
-    def updateComment(id: String, comment: String)(implicit executionContext: ExecutionContext): Int = Await.result(updateCommentByID(id, comment), Duration.Inf)
 
     def getPendingIssueFiatRequests(accountIDs: Seq[String])(implicit executionContext: ExecutionContext): Seq[IssueFiatRequest] = Await.result(getIssueFiatRequestsWithNullStatus(accountIDs), Duration.Inf)
 

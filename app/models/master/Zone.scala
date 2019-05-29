@@ -76,7 +76,7 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
     }
   }
 
-  private def getZonesWithNullStatus()(implicit executionContext: ExecutionContext): Future[Seq[Zone]] = db.run(zoneTable.filter(_.status.?.isEmpty).result)
+  private def getZonesWithNullStatus: Future[Seq[Zone]] = db.run(zoneTable.filter(_.status.?.isEmpty).result)
   
   private def updateStatusOnID(id: String, status: Boolean)(implicit executionContext: ExecutionContext) = db.run(zoneTable.filter(_.id === id).map(_.status.?).update(Option(status)).asTry).map {
     case Success(result) => result
@@ -128,7 +128,7 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
     def getZoneId(accountID: String)(implicit executionContext: ExecutionContext): String = Await.result(getZoneIdByAccountId(accountID), Duration.Inf)
 
-    def getVerifyZoneRequests()(implicit executionContext: ExecutionContext): Seq[Zone] = Await.result(getZonesWithNullStatus(), Duration.Inf)
+    def getVerifyZoneRequests: Seq[Zone] = Await.result(getZonesWithNullStatus, Duration.Inf)
 
     def getStatus(id: String)(implicit executionContext: ExecutionContext): Option[Boolean] = Await.result(getStatusByID(id), Duration.Inf)
 

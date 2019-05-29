@@ -131,7 +131,7 @@ class SetACLs @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
 
     def markTransactionFailed(ticketID: String, responseCode: String): Int = Await.result(updateStatusAndResponseCodeOnTicketID(ticketID, status = Option(false), responseCode), Duration.Inf)
 
-    def getSetACL(ticketID: String)(implicit executionContext: ExecutionContext): SetACL = Await.result(findByTicketID(ticketID), Duration.Inf)
+    def getTransaction(ticketID: String)(implicit executionContext: ExecutionContext): SetACL = Await.result(findByTicketID(ticketID), Duration.Inf)
 
     def getTicketIDsOnStatus(): Seq[String] = Await.result(getTicketIDsWithNullStatus, Duration.Inf)
   }
@@ -140,7 +140,7 @@ class SetACLs @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
     def onSuccess(ticketID: String, response: Response): Future[Unit] = Future {
       try {
         Service.markTransactionSuccessful(ticketID, response.TxHash, response.Code)
-        val setACL = Service.getSetACL(ticketID)
+        val setACL = Service.getTransaction(ticketID)
         blockchainAclAccounts.Service.insertOrUpdate(setACL.aclAddress, setACL.zoneID, setACL.organizationID, blockchainAclHashes.Service.getACL(setACL.aclHash), dirtyBit = true)
         masterAccounts.Service.updateUserTypeOnAddress(setACL.aclAddress, constants.User.TRADER)
         blockchainAccounts.Service.markDirty(masterAccounts.Service.getAddress(setACL.from))
@@ -156,7 +156,7 @@ class SetACLs @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
     def onFailure(ticketID: String, message: String): Future[Unit] = Future {
       try {
         Service.markTransactionFailed(ticketID, message)
-        val setACL = Service.getSetACL(ticketID)
+        val setACL = Service.getTransaction(ticketID)
         pushNotification.sendNotification(masterAccounts.Service.getId(setACL.aclAddress), constants.Notification.FAILURE, message)
         pushNotification.sendNotification(setACL.from, constants.Notification.FAILURE, message)
       } catch {

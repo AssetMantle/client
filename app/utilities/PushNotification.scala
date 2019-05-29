@@ -2,8 +2,7 @@ package utilities
 
 import exceptions.BaseException
 import javax.inject.Inject
-import models.master.Accounts
-import models.masterTransaction
+import models.{master, masterTransaction}
 import play.api.Configuration
 import play.api.i18n.{Lang, Langs, MessagesApi}
 import play.api.libs.json.{Json, OWrites}
@@ -11,7 +10,7 @@ import play.api.libs.ws.WSClient
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class PushNotification @Inject()(wsClient: WSClient, masterTransactionNotifications: masterTransaction.Notifications, accounts: Accounts, masterTransactionAccountTokens: masterTransaction.AccountTokens, langs: Langs, messagesApi: MessagesApi)(implicit exec: ExecutionContext, configuration: Configuration) {
+class PushNotification @Inject()(wsClient: WSClient, masterTransactionNotifications: masterTransaction.Notifications, masterAccounts: master.Accounts, masterTransactionAccountTokens: masterTransaction.AccountTokens, langs: Langs, messagesApi: MessagesApi)(implicit exec: ExecutionContext, configuration: Configuration) {
 
   private implicit val module: String = constants.Module.UTILITIES_PUSH_NOTIFICATION
 
@@ -19,7 +18,7 @@ class PushNotification @Inject()(wsClient: WSClient, masterTransactionNotificati
 
   private val authorizationKey = configuration.get[String]("notification.authorizationKey")
 
-  def sendNotification(username: String, notification: constants.Notification.Notification, messageParameters: String*)(implicit lang: Lang = Lang(accounts.Service.getLanguage(username))) = Future {
+  def sendNotification(username: String, notification: constants.Notification.Notification, messageParameters: String*)(implicit lang: Lang = Lang(masterAccounts.Service.getLanguage(username))) = Future {
     try {
       val title = messagesApi(notification.title)
       val message = messagesApi(notification.message, messageParameters: _*)

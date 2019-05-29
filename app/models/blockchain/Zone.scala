@@ -60,7 +60,7 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
     }
   }
 
-  private def updateDirtyBitByID(zoneID: String, dirtyBit: Boolean) = db.run(zoneTable.filter(_.id === zoneID).map(_.dirtyBit).update(dirtyBit).asTry).map {
+  private def findById(id: String)(implicit executionContext: ExecutionContext): Future[Zone] = db.run(zoneTable.filter(_.id === id).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -70,7 +70,21 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
     }
   }
 
-  private def findById(id: String)(implicit executionContext: ExecutionContext): Future[Zone] = db.run(zoneTable.filter(_.id === id).result.head.asTry).map {
+  private[models] class ZoneTable(tag: Tag) extends Table[Zone](tag, "Zone_BC") {
+
+    def * = (id, address, dirtyBit) <> (Zone.tupled, Zone.unapply)
+
+    def ? = (id.?, address.?, dirtyBit.?).shaped.<>({ r => import r._; _1.map(_ => Zone.tupled((_1.get, _2.get, _3.get))) }, (_: Any) => throw new Exception("Inserting into ? projection not supported."))
+
+    def id = column[String]("id", O.PrimaryKey)
+
+    def address = column[String]("address")
+
+    def dirtyBit = column[Boolean]("dirtyBit")
+
+  }
+
+  private def updateDirtyBitByID(zoneID: String, dirtyBit: Boolean) = db.run(zoneTable.filter(_.id === zoneID).map(_.dirtyBit).update(dirtyBit).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -110,20 +124,6 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
     }
   }
 
-  private[models] class ZoneTable(tag: Tag) extends Table[Zone](tag, "Zone_BC") {
-
-    def * = (id, address, dirtyBit) <> (Zone.tupled, Zone.unapply)
-
-    def ? = (id.?, address.?, dirtyBit.?).shaped.<>({ r => import r._; _1.map(_ => Zone.tupled((_1.get, _2.get, _3.get))) }, (_: Any) => throw new Exception("Inserting into ? projection not supported."))
-
-    def id = column[String]("id", O.PrimaryKey)
-
-    def address = column[String]("address")
-
-    def dirtyBit = column[Boolean]("dirtyBit")
-
-  }
-
   object Service {
 
     def create(id: String, address: String, dirtyBit: Boolean)(implicit executionContext: ExecutionContext): String = Await.result(add(Zone(id = id, address = address, dirtyBit = dirtyBit)), Duration.Inf)
@@ -134,7 +134,7 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
     def getDirtyZones: Seq[Zone] = Await.result(getZonesByDirtyBit(dirtyBit = true), Duration.Inf)
 
-    def refreshDirty(zoneID: String, address: String, dirtyBit: Boolean): Int = Await.result(updateAddressAndDirtyBitByID(zoneID, address, dirtyBit), Duration.Inf)
+    def refreshDirty(zoneID: String, address: String): Int = Await.result(updateAddressAndDirtyBitByID(zoneID, address, dirtyBit = false), Duration.Inf)
 
     def markDirty(zoneID: String): Int = Await.result(updateDirtyBitByID(zoneID, dirtyBit = true), Duration.Inf)
   }
@@ -146,7 +146,7 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
       for (dirtyZone <- dirtyZone) {
         try {
           val responseAddress = getZone.Service.get(dirtyZone.id)
-          Service.refreshDirty(dirtyZone.id, responseAddress.body, dirtyBit = false)
+          Service.refreshDirty(dirtyZone.id, responseAddress.body)
         }
         catch {
           case blockChainException: BlockChainException => logger.error(blockChainException.failure.message, blockChainException)
@@ -155,7 +155,6 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
       }
     }
   }
-
 
   actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
     Utility.dirtyEntityUpdater()

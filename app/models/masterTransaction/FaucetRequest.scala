@@ -46,7 +46,7 @@ class FaucetRequests @Inject()(protected val databaseConfigProvider: DatabaseCon
     }
   }
 
-  private def getFaucetRequestsWithNullStatus()(implicit executionContext: ExecutionContext): Future[Seq[FaucetRequest]] = db.run(faucetRequestTable.filter(_.status.?.isEmpty).result)
+  private def getFaucetRequestsWithNullStatus: Future[Seq[FaucetRequest]] = db.run(faucetRequestTable.filter(_.status.?.isEmpty).result)
 
   private def updateTicketIDStatusAndGasByID(id: String, ticketID: String, status: Option[Boolean], gas: Int)(implicit executionContext: ExecutionContext): Future[Int] = db.run(faucetRequestTable.filter(_.id === id).map(faucet => (faucet.ticketID, faucet.status.?, faucet.gas)).update(ticketID, status, gas).asTry).map {
     case Success(result) => result
@@ -59,16 +59,6 @@ class FaucetRequests @Inject()(protected val databaseConfigProvider: DatabaseCon
   }
 
   private def updateStatusAndCommentByID(id: String, status: Option[Boolean], comment: String)(implicit executionContext: ExecutionContext) = db.run(faucetRequestTable.filter(_.id === id).map(faucet => (faucet.status.?, faucet.comment)).update((status, comment)).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
-
-  private def updateCommentByID(id: String, comment: String)(implicit executionContext: ExecutionContext) = db.run(faucetRequestTable.filter(_.id === id).map(_.comment).update(comment).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -126,9 +116,7 @@ class FaucetRequests @Inject()(protected val databaseConfigProvider: DatabaseCon
 
     def reject(id: String, comment: String)(implicit executionContext: ExecutionContext): Int = Await.result(updateStatusAndCommentByID(id = id, status = Option(false), comment = comment), Duration.Inf)
 
-    def updateComment(id: String, comment: String)(implicit executionContext: ExecutionContext): Int = Await.result(updateCommentByID(id, comment), Duration.Inf)
-
-    def getPendingFaucetRequests()(implicit executionContext: ExecutionContext): Seq[FaucetRequest] = Await.result(getFaucetRequestsWithNullStatus(), Duration.Inf)
+    def getPendingFaucetRequests: Seq[FaucetRequest] = Await.result(getFaucetRequestsWithNullStatus, Duration.Inf)
 
     def delete(id: String)(implicit executionContext: ExecutionContext): Int = Await.result(deleteByID(id), Duration.Inf)
 

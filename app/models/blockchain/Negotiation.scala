@@ -112,7 +112,7 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
 
     def markDirty(id: String): Int = Await.result(updateDirtyBitById(id, dirtyBit = true), Duration.Inf)
 
-    def refreshDirty(id: String, bid: String, time: String, buyerSignature: Option[String], sellerSignature: Option[String], dirtyBit: Boolean): Int = Await.result(updateBidTimeSignatureDirtyBitsById(id = id, bid = bid, time = time, buyerSignature = buyerSignature, sellerSignature = sellerSignature, dirtyBit = dirtyBit), Duration.Inf)
+    def refreshDirty(id: String, bid: String, time: String, buyerSignature: Option[String], sellerSignature: Option[String]): Int = Await.result(updateBidTimeSignatureDirtyBitsById(id = id, bid = bid, time = time, buyerSignature = buyerSignature, sellerSignature = sellerSignature, dirtyBit = false), Duration.Inf)
 
     def getNegotiationID(buyerAddress: String, sellerAddress: String, pegHash: String)(implicit executionContext: ExecutionContext): String = Await.result(getIdByBuyerAddressSellerAddressAndPegHash(buyerAddress = buyerAddress, sellerAddress = sellerAddress, pegHash = pegHash), Duration.Inf)
   }
@@ -154,7 +154,7 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
       for (dirtyNegotiation <- dirtyNegotiations) {
         try {
           val responseNegotiation = getNegotiation.Service.get(dirtyNegotiation.id)
-          Service.refreshDirty(id = dirtyNegotiation.id, bid = responseNegotiation.value.bid, time = responseNegotiation.value.time, buyerSignature = responseNegotiation.value.buyerSignature, sellerSignature = responseNegotiation.value.sellerSignature, dirtyBit = false)
+          Service.refreshDirty(id = dirtyNegotiation.id, bid = responseNegotiation.value.bid, time = responseNegotiation.value.time, buyerSignature = responseNegotiation.value.buyerSignature, sellerSignature = responseNegotiation.value.sellerSignature)
         }
         catch {
           case blockChainException: BlockChainException => logger.error(blockChainException.failure.message, blockChainException)

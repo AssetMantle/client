@@ -34,10 +34,6 @@ class RedeemAssets @Inject()(protected val databaseConfigProvider: DatabaseConfi
 
   private[models] val redeemAssetTable = TableQuery[RedeemAssetTable]
 
-  private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
-  private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
-  private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
-
   private def add(redeemAsset: RedeemAsset)(implicit executionContext: ExecutionContext): Future[String] = db.run((redeemAssetTable returning redeemAssetTable.map(_.ticketID) += redeemAsset).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -87,6 +83,10 @@ class RedeemAssets @Inject()(protected val databaseConfigProvider: DatabaseConfi
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }
   }
+
+  private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
+  private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
+  private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
 
   private def deleteByTicketID(ticketID: String)(implicit executionContext: ExecutionContext) = db.run(redeemAssetTable.filter(_.ticketID === ticketID).delete.asTry).map {
     case Success(result) => result
@@ -158,7 +158,6 @@ class RedeemAssets @Inject()(protected val databaseConfigProvider: DatabaseConfi
       }
     }
   }
-
 
   if (kafkaEnabled) {
     actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {

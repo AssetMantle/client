@@ -107,8 +107,7 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
           }
           catch {
             case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
-            case blockChainException: BlockChainException => masterTransactionIssueFiatRequests.Service.updateComment(issueFiatData.requestID, blockChainException.failure.message)
-              Ok(views.html.index(failures = Seq(blockChainException.failure)))
+            case blockChainException: BlockChainException => Ok(views.html.index(failures = Seq(blockChainException.failure)))
           }
         }
       )

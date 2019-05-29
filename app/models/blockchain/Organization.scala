@@ -94,7 +94,7 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
 
     def getDirtyOrganizations: Seq[Organization] = Await.result(getOrganizationsByDirtyBit(dirtyBit = true), Duration.Inf)
 
-    def refreshDirty(id: String, address: String, dirtyBit: Boolean): Int = Await.result(updateAddressAndDirtyBitByID(id, address, dirtyBit), Duration.Inf)
+    def refreshDirty(id: String, address: String): Int = Await.result(updateAddressAndDirtyBitByID(id, address, dirtyBit = false), Duration.Inf)
   }
 
   private def getIdByAddress(address: String)(implicit executionContext: ExecutionContext): Future[String] = db.run(organizationTable.filter(_.address === address).map(_.id).result.head.asTry).map {
@@ -134,7 +134,7 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
       for (dirtyOrganization <- dirtyOrganizations) {
         try {
           val responseAddress = getOrganization.Service.get(dirtyOrganization.id)
-          Service.refreshDirty(dirtyOrganization.id, responseAddress.address, dirtyBit = false)
+          Service.refreshDirty(dirtyOrganization.id, responseAddress.address)
         }
         catch {
           case blockChainException: BlockChainException => logger.error(blockChainException.failure.message, blockChainException)
@@ -143,7 +143,6 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
       }
     }
   }
-
 
   actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
     Utility.dirtyEntityUpdater()
