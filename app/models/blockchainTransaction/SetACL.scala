@@ -48,7 +48,7 @@ class SetACLs @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
     }
   }
 
-  private def update(setACL: SetACL)(implicit executionContext: ExecutionContext): Future[Int] = db.run(setACLTable.insertOrUpdate(setACL).asTry).map {
+  private def upsert(setACL: SetACL)(implicit executionContext: ExecutionContext): Future[Int] = db.run(setACLTable.insertOrUpdate(setACL).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -68,7 +68,7 @@ class SetACLs @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
     }
   }
 
-  private def updateTxHashOnTicketID(ticketID: String, txHash: Option[String])(implicit executionContext: ExecutionContext) = db.run(setACLTable.filter(_.ticketID === ticketID).map(_.txHash.?).update(txHash).asTry).map {
+  private def updateTxHashStatusAndResponseCodeOnTicketID(ticketID: String, txHash: String, status: Option[Boolean], responseCode: String): Future[Int] = db.run(setACLTable.filter(_.ticketID === ticketID).map(x => (x.txHash, x.status.?, x.responseCode)).update(txHash, status, responseCode).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -78,7 +78,7 @@ class SetACLs @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
     }
   }
 
-  private def updateResponseCodeOnTicketID(ticketID: String, responseCode: String)(implicit executionContext: ExecutionContext) = db.run(setACLTable.filter(_.ticketID === ticketID).map(_.responseCode.?).update(Option(responseCode)).asTry).map {
+  private def updateStatusAndResponseCodeOnTicketID(ticketID: String, status: Option[Boolean], responseCode: String): Future[Int] = db.run(setACLTable.filter(_.ticketID === ticketID).map(x => (x.status.?, x.responseCode)).update((status, responseCode)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -88,39 +88,7 @@ class SetACLs @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
     }
   }
 
-  private def updateStatusOnTicketID(ticketID: String, status: Boolean)(implicit executionContext: ExecutionContext): Future[Int] = db.run(setACLTable.filter(_.ticketID === ticketID).map(_.status.?).update(Option(status)).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
-
-  private def updateTxHashStatusAndResponseCodeOnTicketID(ticketID: String, txHash: String, status: Boolean, responseCode: String): Future[Int] = db.run(setACLTable.filter(_.ticketID === ticketID).map(x => (x.txHash, x.status, x.responseCode)).update(txHash, status, responseCode).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
-
-  private def getTicketIDsWithEmptyTxHash()(implicit executionContext: ExecutionContext): Future[Seq[String]] = db.run(setACLTable.filter(_.txHash.?.isEmpty).map(_.ticketID).result)
-
-  private def getTicketIDsWithNullStatus()(implicit executionContext: ExecutionContext): Future[Seq[String]] = db.run(setACLTable.filter(_.status.?.isEmpty).map(_.ticketID).result)
-
-  private def getAddressByTicketID(ticketID: String)(implicit executionContext: ExecutionContext): Future[String] = db.run(setACLTable.filter(_.ticketID === ticketID).map(_.aclAddress).result.head.asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
+  private def getTicketIDsWithNullStatus: Future[Seq[String]] = db.run(setACLTable.filter(_.status.?.isEmpty).map(_.ticketID).result)
 
   private def deleteByTicketID(ticketID: String)(implicit executionContext: ExecutionContext) = db.run(setACLTable.filter(_.ticketID === ticketID).delete.asTry).map {
     case Success(result) => result
@@ -157,33 +125,25 @@ class SetACLs @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
 
   object Service {
 
-    def addSetACL(from: String, aclAddress: String, organizationID: String, zoneID: String, acl: ACL, status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])(implicit executionContext: ExecutionContext): String = Await.result(add(SetACL(from, aclAddress, organizationID, zoneID, util.hashing.MurmurHash3.stringHash(acl.toString).toString, status, txHash, ticketID, responseCode)), Duration.Inf)
+    def create(from: String, aclAddress: String, organizationID: String, zoneID: String, acl: ACL, status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])(implicit executionContext: ExecutionContext): String = Await.result(add(SetACL(from, aclAddress, organizationID, zoneID, util.hashing.MurmurHash3.stringHash(acl.toString).toString, status, txHash, ticketID, responseCode)), Duration.Inf)
 
-    def updateTxHash(ticketID: String, txHash: String)(implicit executionContext: ExecutionContext): Int = Await.result(updateTxHashOnTicketID(ticketID, Option(txHash)), Duration.Inf)
+    def markTransactionSuccessful(ticketID: String, txHash: String, responseCode: String): Int = Await.result(updateTxHashStatusAndResponseCodeOnTicketID(ticketID, txHash, status = Option(true), responseCode), Duration.Inf)
 
-    def updateResponseCode(ticketID: String, responseCode: String)(implicit executionContext: ExecutionContext): Int = Await.result(updateResponseCodeOnTicketID(ticketID, responseCode), Duration.Inf)
+    def markTransactionFailed(ticketID: String, responseCode: String): Int = Await.result(updateStatusAndResponseCodeOnTicketID(ticketID, status = Option(false), responseCode), Duration.Inf)
 
-    def updateStatus(ticketID: String, status: Boolean)(implicit executionContext: ExecutionContext): Int = Await.result(updateStatusOnTicketID(ticketID, status), Duration.Inf)
+    def getTransaction(ticketID: String)(implicit executionContext: ExecutionContext): SetACL = Await.result(findByTicketID(ticketID), Duration.Inf)
 
-    def updateTxHashStatusResponseCode(ticketID: String, txHash: String, status: Boolean, responseCode: String): Int = Await.result(updateTxHashStatusAndResponseCodeOnTicketID(ticketID, txHash, status, responseCode), Duration.Inf)
-
-    def getSetACL(ticketID: String)(implicit executionContext: ExecutionContext): SetACL = Await.result(findByTicketID(ticketID), Duration.Inf)
-
-    def getTicketIDs()(implicit executionContext: ExecutionContext): Seq[String] = Await.result(getTicketIDsWithEmptyTxHash(), Duration.Inf)
-
-    def getAddress(ticketID: String)(implicit executionContext: ExecutionContext): String = Await.result(getAddressByTicketID(ticketID), Duration.Inf)
-
-    def getTicketIDsOnStatus(): Seq[String] = Await.result(getTicketIDsWithNullStatus(), Duration.Inf)
+    def getTicketIDsOnStatus(): Seq[String] = Await.result(getTicketIDsWithNullStatus, Duration.Inf)
   }
 
   object Utility {
     def onSuccess(ticketID: String, response: Response): Future[Unit] = Future {
       try {
-        Service.updateTxHashStatusResponseCode(ticketID, response.TxHash, status = true, response.Code)
-        val setACL = Service.getSetACL(ticketID)
-        blockchainAclAccounts.Service.addOrUpdateACLAccount(setACL.aclAddress, setACL.zoneID, setACL.organizationID, blockchainAclHashes.Service.getACL(setACL.aclHash), dirtyBit = true)
+        Service.markTransactionSuccessful(ticketID, response.TxHash, response.Code)
+        val setACL = Service.getTransaction(ticketID)
+        blockchainAclAccounts.Service.insertOrUpdate(setACL.aclAddress, setACL.zoneID, setACL.organizationID, blockchainAclHashes.Service.getACL(setACL.aclHash), dirtyBit = true)
         masterAccounts.Service.updateUserTypeOnAddress(setACL.aclAddress, constants.User.TRADER)
-        blockchainAccounts.Service.updateDirtyBit(masterAccounts.Service.getAddress(setACL.from), dirtyBit = true)
+        blockchainAccounts.Service.markDirty(masterAccounts.Service.getAddress(setACL.from))
         blockchainTransactionFeedbacks.Service.insertOrUpdate(setACL.aclAddress, TraderReputationResponse.TransactionFeedbackResponse("0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"), dirtyBit = true)
         pushNotification.sendNotification(masterAccounts.Service.getId(setACL.aclAddress), constants.Notification.SUCCESS, response.TxHash)
         pushNotification.sendNotification(setACL.from, constants.Notification.SUCCESS, response.TxHash)
@@ -195,8 +155,8 @@ class SetACLs @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
 
     def onFailure(ticketID: String, message: String): Future[Unit] = Future {
       try {
-        Service.updateTxHashStatusResponseCode(ticketID, txHash = null, status = false, message)
-        val setACL = Service.getSetACL(ticketID)
+        Service.markTransactionFailed(ticketID, message)
+        val setACL = Service.getTransaction(ticketID)
         pushNotification.sendNotification(masterAccounts.Service.getId(setACL.aclAddress), constants.Notification.FAILURE, message)
         pushNotification.sendNotification(setACL.from, constants.Notification.FAILURE, message)
       } catch {

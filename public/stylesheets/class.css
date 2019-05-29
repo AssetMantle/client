@@ -195,7 +195,6 @@ body{
     cursor: pointer;
 }
 
-
 .cancelButton {
     width: auto;
     padding: 10px 18px;
@@ -203,7 +202,6 @@ body{
 }
 
 /* Modal*/
-
 
 .row {
     display: -ms-flexbox;
@@ -293,7 +291,6 @@ blur(5 px);
 }
 
 /*Alert*/
-
 
 /*Navbar*/
 

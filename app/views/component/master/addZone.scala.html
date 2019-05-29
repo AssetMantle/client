@@ -3,16 +3,16 @@
 
 @(addZoneForm: Form[AddZone.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @form(action = routes.AddZoneController.addZone, 'onkeypress -> "validateForm(event,this)") {
-  @CSRF.formField
-  @inputText(addZoneForm(constants.Form.NAME), '_label -> Messages(constants.Form.NAME))
-  @inputText(addZoneForm(constants.Form.CURRENCY), '_label -> Messages(constants.Form.CURRENCY))
+    @CSRF.formField
+    @inputText(addZoneForm(constants.Form.NAME), '_label -> Messages(constants.Form.NAME))
+    @inputText(addZoneForm(constants.Form.CURRENCY), '_label -> Messages(constants.Form.CURRENCY))
 
-  @if(addZoneForm.hasGlobalErrors) {
-    <ul>
-    @for(error <- addZoneForm.globalErrors) {
-      <li>@error.format</li>
+    @if(addZoneForm.hasGlobalErrors) {
+        <ul>
+        @for(error <- addZoneForm.globalErrors) {
+            <li>@error.format</li>
+        }
+        </ul>
     }
-    </ul>
-  }
-  <button type="button" onclick="submitForm(this)">@Messages(constants.Form.ADD_ZONE)</button>
+    <button type="button" onclick="submitForm(this)">@Messages(constants.Form.ADD_ZONE)</button>
 }

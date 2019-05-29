@@ -3,16 +3,16 @@
 
 @(logoutForm: Form[Logout.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @form(action = routes.LogoutController.logout, 'onkeypress -> "validateForm(event,this)") {
-  @CSRF.formField
-  @checkbox(logoutForm(constants.Form.RECEIVE_NOTIFICATIONS), '_label -> Messages(constants.Form.RECEIVE_NOTIFICATIONS))
+    @CSRF.formField
+    @checkbox(logoutForm(constants.Form.RECEIVE_NOTIFICATIONS), '_label -> Messages(constants.Form.RECEIVE_NOTIFICATIONS))
 
-  @if(logoutForm.hasGlobalErrors) {
-    <ul>
-    @for(error <- logoutForm.globalErrors) {
-      <li>@error.format</li>
+    @if(logoutForm.hasGlobalErrors) {
+        <ul>
+        @for(error <- logoutForm.globalErrors) {
+            <li>@error.format</li>
+        }
+        </ul>
     }
-    </ul>
-  }
-  <button type="button" onclick="submitForm(this)">@Messages(constants.Form.LOGOUT)</button>
+    <button type="button" onclick="submitForm(this)">@Messages(constants.Form.LOGOUT)</button>
 }
 

@@ -44,7 +44,13 @@ class ACLAccounts @Inject()(protected val databaseConfigProvider: DatabaseConfig
     }
   }
 
-  private def addOrUpdate(aclAccount: ACLAccount)(implicit executionContext: ExecutionContext): Future[Int] = db.run(aclTable.insertOrUpdate(aclAccount))
+  private def upsert(aclAccount: ACLAccount)(implicit executionContext: ExecutionContext): Future[Int] = db.run(aclTable.insertOrUpdate(aclAccount).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+    }
+  }
 
   private def add(aclAccount: ACLAccount)(implicit executionContext: ExecutionContext): Future[String] = db.run((aclTable returning aclTable.map(_.address) += aclAccount).asTry).map {
     case Success(result) => result
@@ -82,17 +88,17 @@ class ACLAccounts @Inject()(protected val databaseConfigProvider: DatabaseConfig
 
   object Service {
 
-    def addACLAccount(address: String, zoneID: String, organizationID: String, acl: ACL, dirtyBit: Boolean)(implicit executionContext: ExecutionContext): String = Await.result(add(ACLAccount(address, zoneID, organizationID, util.hashing.MurmurHash3.stringHash(acl.toString).toString, dirtyBit)), Duration.Inf)
+    def create(address: String, zoneID: String, organizationID: String, acl: ACL, dirtyBit: Boolean)(implicit executionContext: ExecutionContext): String = Await.result(add(ACLAccount(address, zoneID, organizationID, util.hashing.MurmurHash3.stringHash(acl.toString).toString, dirtyBit)), Duration.Inf)
 
-    def addOrUpdateACLAccount(address: String, zoneID: String, organizationID: String, acl: ACL, dirtyBit: Boolean)(implicit executionContext: ExecutionContext): Int = Await.result(addOrUpdate(ACLAccount(address, zoneID, organizationID, util.hashing.MurmurHash3.stringHash(acl.toString).toString, dirtyBit)), Duration.Inf)
+    def insertOrUpdate(address: String, zoneID: String, organizationID: String, acl: ACL, dirtyBit: Boolean)(implicit executionContext: ExecutionContext): Int = Await.result(upsert(ACLAccount(address, zoneID, organizationID, util.hashing.MurmurHash3.stringHash(acl.toString).toString, dirtyBit)), Duration.Inf)
 
-    def getACLAccount(address: String)(implicit executionContext: ExecutionContext): ACLAccount = Await.result(findByAddress(address), Duration.Inf)
+    def get(address: String)(implicit executionContext: ExecutionContext): ACLAccount = Await.result(findByAddress(address), Duration.Inf)
 
     def getAddressesUnderZone(zoneID: String)(implicit executionContext: ExecutionContext): Seq[String] = Await.result(getAddressesByZoneID(zoneID), Duration.Inf)
 
-    def getDirtyAddresses(dirtyBit: Boolean): Seq[String] = Await.result(getAddressesByDirtyBit(dirtyBit), Duration.Inf)
+    def getDirtyAddresses: Seq[String] = Await.result(getAddressesByDirtyBit(dirtyBit = true), Duration.Inf)
 
-    def updateDirtyBit(address: String, dirtyBit: Boolean): Int = Await.result(updateDirtyBitByAddress(address, dirtyBit), Duration.Inf)
+    def markDirty(address: String): Int = Await.result(updateDirtyBitByAddress(address, dirtyBit = true), Duration.Inf)
   }
 
   private def getAddressesByZoneID(zoneID: String)(implicit executionContext: ExecutionContext): Future[Seq[String]] = db.run(aclTable.filter(_.zoneID === zoneID).map(_.address).result.asTry).map {
@@ -128,18 +134,17 @@ class ACLAccounts @Inject()(protected val databaseConfigProvider: DatabaseConfig
   object Utility {
     def dirtyEntityUpdater(): Future[Unit] = Future {
       try {
-        val dirtyAddresses = Service.getDirtyAddresses(dirtyBit = true)
+        val dirtyAddresses = Service.getDirtyAddresses
         Thread.sleep(sleepTime)
         for (dirtyAddress <- dirtyAddresses) {
           val responseAccount = getACL.Service.get(dirtyAddress)
-          Service.addOrUpdateACLAccount(responseAccount.value.address, responseAccount.value.zoneID, responseAccount.value.organizationID, responseAccount.value.acl, dirtyBit = false)
+          Service.insertOrUpdate(responseAccount.value.address, responseAccount.value.zoneID, responseAccount.value.organizationID, responseAccount.value.acl, dirtyBit = false)
         }
       } catch {
         case blockChainException: BlockChainException => logger.error(blockChainException.failure.message, blockChainException)
       }
     }
   }
-
 
   actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
     Utility.dirtyEntityUpdater()

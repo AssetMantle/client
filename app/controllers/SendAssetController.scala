@@ -31,7 +31,7 @@ class SendAssetController @Inject()(messagesControllerComponents: MessagesContro
         sendAssetData => {
           try {
             val ticketID: String = if (kafkaEnabled) transactionsSendAsset.Service.kafkaPost(transactionsSendAsset.Request(from = username, to = sendAssetData.buyerAddress, password = sendAssetData.password, pegHash = sendAssetData.pegHash, gas = sendAssetData.gas)).ticketID else Random.nextString(32)
-            blockchainTransactionSendAssets.Service.addSendAsset(from = username, to = sendAssetData.buyerAddress, pegHash = sendAssetData.pegHash, gas = sendAssetData.gas, null, null, ticketID = ticketID, null)
+            blockchainTransactionSendAssets.Service.create(from = username, to = sendAssetData.buyerAddress, pegHash = sendAssetData.pegHash, gas = sendAssetData.gas, null, null, ticketID = ticketID, null)
             if (!kafkaEnabled) {
               Future {
                 try {
@@ -67,7 +67,7 @@ class SendAssetController @Inject()(messagesControllerComponents: MessagesContro
           if (kafkaEnabled) {
             transactionsSendAsset.Service.kafkaPost(transactionsSendAsset.Request(from = sendAssetData.from, to = sendAssetData.to, password = sendAssetData.password, pegHash = sendAssetData.pegHash, gas = sendAssetData.gas))
           } else {
-           transactionsSendAsset.Service.post(transactionsSendAsset.Request(from = sendAssetData.from, to = sendAssetData.to, password = sendAssetData.password, pegHash = sendAssetData.pegHash, gas = sendAssetData.gas))
+            transactionsSendAsset.Service.post(transactionsSendAsset.Request(from = sendAssetData.from, to = sendAssetData.to, password = sendAssetData.password, pegHash = sendAssetData.pegHash, gas = sendAssetData.gas))
           }
           Ok(views.html.index(successes = Seq(constants.Response.ASSET_SENT)))
 

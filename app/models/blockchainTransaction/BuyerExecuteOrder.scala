@@ -34,32 +34,64 @@ class BuyerExecuteOrders @Inject()(protected val databaseConfigProvider: Databas
   private[models] val buyerExecuteOrderTable = TableQuery[BuyerExecuteOrderTable]
 
   private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
-  private val schedulerInterval =  configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
+  private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
   private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
   private val sleepTime = configuration.get[Long]("blockchain.entityIterator.threadSleep")
 
   private def add(buyerExecuteOrder: BuyerExecuteOrder)(implicit executionContext: ExecutionContext): Future[String] = db.run((buyerExecuteOrderTable returning buyerExecuteOrderTable.map(_.ticketID) += buyerExecuteOrder).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException =>  logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
         throw new BaseException(constants.Response.PSQL_EXCEPTION)
     }
   }
 
-  private def update(buyerExecuteOrder: BuyerExecuteOrder)(implicit executionContext: ExecutionContext): Future[Int] = db.run(buyerExecuteOrderTable.insertOrUpdate(buyerExecuteOrder).asTry).map {
+  private def upsert(buyerExecuteOrder: BuyerExecuteOrder)(implicit executionContext: ExecutionContext): Future[Int] = db.run(buyerExecuteOrderTable.insertOrUpdate(buyerExecuteOrder).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException =>  logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def findByTicketID(ticketID: String)(implicit executionContext: ExecutionContext): Future[BuyerExecuteOrder] = db.run(buyerExecuteOrderTable.filter(_.ticketID === ticketID).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def updateStatusAndResponseCodeOnTicketID(ticketID: String, status: Option[Boolean], responseCode: String): Future[Int] = db.run(buyerExecuteOrderTable.filter(_.ticketID === ticketID).map(x => (x.status.?, x.responseCode)).update((status, responseCode)).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def getTicketIDsWithNullStatus: Future[Seq[String]] = db.run(buyerExecuteOrderTable.filter(_.status.?.isEmpty).map(_.ticketID).result)
+
+  private def updateTxHashStatusAndResponseCodeOnTicketID(ticketID: String, txHash: String, status: Option[Boolean], responseCode: String): Future[Int] = db.run(buyerExecuteOrderTable.filter(_.ticketID === ticketID).map(x => (x.txHash, x.status.?, x.responseCode)).update((txHash, status, responseCode)).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
         throw new BaseException(constants.Response.PSQL_EXCEPTION)
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }
   }
   
-  private def findByTicketID(ticketID: String)(implicit executionContext: ExecutionContext): Future[BuyerExecuteOrder] = db.run(buyerExecuteOrderTable.filter(_.ticketID === ticketID).result.head.asTry).map {
+  private def deleteByTicketID(ticketID: String)(implicit executionContext: ExecutionContext) = db.run(buyerExecuteOrderTable.filter(_.ticketID === ticketID).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException =>  logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
         throw new BaseException(constants.Response.PSQL_EXCEPTION)
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
@@ -90,48 +122,16 @@ class BuyerExecuteOrders @Inject()(protected val databaseConfigProvider: Databas
 
     def responseCode = column[String]("responseCode")
   }
-  
-  private def updateStatusAndResponseOnTicketID(ticketID: String, status: Boolean, responseCode: String): Future[Int] = db.run(buyerExecuteOrderTable.filter(_.ticketID === ticketID).map(x => (x.status, x.responseCode)).update((status, responseCode)).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException =>  logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
-
-  private def getTicketIDsWithNullStatus()(implicit executionContext: ExecutionContext): Future[Seq[String]] = db.run(buyerExecuteOrderTable.filter(_.status.?.isEmpty).map(_.ticketID).result)
-
-  private def updateTxHashStatusAndResponseOnTicketID(ticketID: String, txHash: String, status: Boolean, responseCode: String): Future[Int] = db.run(buyerExecuteOrderTable.filter(_.ticketID === ticketID).map(x => (x.txHash, x.status, x.responseCode)).update((txHash, status, responseCode)).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException =>  logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
-
-  private def deleteByTicketID(ticketID: String)(implicit executionContext: ExecutionContext) = db.run(buyerExecuteOrderTable.filter(_.ticketID === ticketID).delete.asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
 
   object Service {
 
-    def addBuyerExecuteOrder(from: String, buyerAddress: String, sellerAddress: String, fiatProofHash: String, pegHash: String, gas: Int,  status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String]) (implicit executionContext: ExecutionContext): String = Await.result(add(BuyerExecuteOrder(from = from, buyerAddress = buyerAddress, sellerAddress = sellerAddress,fiatProofHash = fiatProofHash, pegHash = pegHash, gas = gas, status = status, txHash = txHash, ticketID = ticketID, responseCode = responseCode)), Duration.Inf)
+    def create(from: String, buyerAddress: String, sellerAddress: String, fiatProofHash: String, pegHash: String, gas: Int, status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])(implicit executionContext: ExecutionContext): String = Await.result(add(BuyerExecuteOrder(from = from, buyerAddress = buyerAddress, sellerAddress = sellerAddress, fiatProofHash = fiatProofHash, pegHash = pegHash, gas = gas, status = status, txHash = txHash, ticketID = ticketID, responseCode = responseCode)), Duration.Inf)
 
-    def updateTxHashStatusResponseCode(ticketID: String, txHash: String, status: Boolean, responseCode: String): Int = Await.result(updateTxHashStatusAndResponseOnTicketID(ticketID, txHash, status, responseCode), Duration.Inf)
+    def markTransactionSuccessful(ticketID: String, txHash: String, responseCode: String): Int = Await.result(updateTxHashStatusAndResponseCodeOnTicketID(ticketID, txHash, status = Option(true), responseCode), Duration.Inf)
 
-    def updateStatusAndResponseCode(ticketID: String, status: Boolean, responseCode: String): Int = Await.result(updateStatusAndResponseOnTicketID(ticketID, status, responseCode), Duration.Inf)
+    def markTransactionFailed(ticketID: String, responseCode: String): Int = Await.result(updateStatusAndResponseCodeOnTicketID(ticketID, status = Option(false), responseCode), Duration.Inf)
 
-    def getTicketIDsOnStatus(): Seq[String] = Await.result(getTicketIDsWithNullStatus(), Duration.Inf)
+    def getTicketIDsOnStatus(): Seq[String] = Await.result(getTicketIDsWithNullStatus, Duration.Inf)
 
     def getTransaction(ticketID: String)(implicit executionContext: ExecutionContext): BuyerExecuteOrder = Await.result(findByTicketID(ticketID), Duration.Inf)
 
@@ -140,13 +140,13 @@ class BuyerExecuteOrders @Inject()(protected val databaseConfigProvider: Databas
   object Utility {
     def onSuccess(ticketID: String, response: Response): Future[Unit] = Future {
       try {
-        Service.updateTxHashStatusResponseCode(ticketID, response.TxHash, status = true, response.Code)
+        Service.markTransactionSuccessful(ticketID, response.TxHash, response.Code)
         val buyerExecuteOrder = Service.getTransaction(ticketID)
         val negotiationID = blockchainNegotiations.Service.getNegotiationID(buyerAddress = buyerExecuteOrder.buyerAddress, sellerAddress = buyerExecuteOrder.sellerAddress, pegHash = buyerExecuteOrder.pegHash)
-        blockchainOrders.Service.updateDirtyBit(id = negotiationID, true)
-        blockchainAccounts.Service.updateDirtyBit(buyerExecuteOrder.buyerAddress,true)
-        blockchainTransactionFeedbacks.Service.updateDirtyBit(buyerExecuteOrder.buyerAddress, true)
-        blockchainTransactionFeedbacks.Service.updateDirtyBit(buyerExecuteOrder.sellerAddress, true)
+        blockchainOrders.Service.markDirty(id = negotiationID)
+        blockchainAccounts.Service.markDirty(buyerExecuteOrder.buyerAddress)
+        blockchainTransactionFeedbacks.Service.markDirty(buyerExecuteOrder.buyerAddress)
+        blockchainTransactionFeedbacks.Service.markDirty(buyerExecuteOrder.sellerAddress)
         pushNotification.sendNotification(masterAccounts.Service.getId(buyerExecuteOrder.sellerAddress), constants.Notification.SUCCESS, response.TxHash)
         pushNotification.sendNotification(masterAccounts.Service.getId(buyerExecuteOrder.buyerAddress), constants.Notification.SUCCESS, response.TxHash)
         pushNotification.sendNotification(buyerExecuteOrder.from, constants.Notification.SUCCESS, response.TxHash)
@@ -158,10 +158,10 @@ class BuyerExecuteOrders @Inject()(protected val databaseConfigProvider: Databas
 
     def onFailure(ticketID: String, message: String): Future[Unit] = Future {
       try {
-        Service.updateStatusAndResponseCode(ticketID, status = false, message)
+        Service.markTransactionFailed(ticketID, message)
         val buyerExecuteOrder = Service.getTransaction(ticketID)
-        blockchainTransactionFeedbacks.Service.updateDirtyBit(buyerExecuteOrder.buyerAddress, true)
-        blockchainTransactionFeedbacks.Service.updateDirtyBit(buyerExecuteOrder.sellerAddress, true)
+        blockchainTransactionFeedbacks.Service.markDirty(buyerExecuteOrder.buyerAddress)
+        blockchainTransactionFeedbacks.Service.markDirty(buyerExecuteOrder.sellerAddress)
         pushNotification.sendNotification(masterAccounts.Service.getId(buyerExecuteOrder.sellerAddress), constants.Notification.FAILURE, message)
         pushNotification.sendNotification(masterAccounts.Service.getId(buyerExecuteOrder.buyerAddress), constants.Notification.FAILURE, message)
         pushNotification.sendNotification(buyerExecuteOrder.from, constants.Notification.FAILURE, message)

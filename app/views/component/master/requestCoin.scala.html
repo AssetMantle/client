@@ -3,15 +3,15 @@
 
 @(requestCoinFormForm: Form[RequestCoin.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @form(action = routes.SendCoinController.requestCoins, 'onkeypress -> "validateForm(event,this)") {
-  @CSRF.formField
-  @inputText(requestCoinFormForm(constants.Form.COUPON), '_label -> Messages(constants.Form.COUPON))
+    @CSRF.formField
+    @inputText(requestCoinFormForm(constants.Form.COUPON), '_label -> Messages(constants.Form.COUPON))
 
-  @if(requestCoinFormForm.hasGlobalErrors) {
-    <ul>
-    @for(error <- requestCoinFormForm.globalErrors) {
-      <li>@error.format</li>
+    @if(requestCoinFormForm.hasGlobalErrors) {
+        <ul>
+        @for(error <- requestCoinFormForm.globalErrors) {
+            <li>@error.format</li>
+        }
+        </ul>
     }
-    </ul>
-  }
-  <button type="button" onclick="submitForm(this)">@Messages(constants.Form.REQUEST_COIN)</button>
+    <button type="button" onclick="submitForm(this)">@Messages(constants.Form.REQUEST_COIN)</button>
 }

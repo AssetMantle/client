@@ -37,7 +37,7 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
         sendCoinData => {
           try {
             val ticketID: String = if (kafkaEnabled) transactionsSendCoin.Service.kafkaPost(transactionsSendCoin.Request(from = username, password = sendCoinData.password, to = sendCoinData.to, amount = Seq(transactionsSendCoin.Amount(denominationOfGasToken, sendCoinData.amount.toString)), gas = sendCoinData.gas)).ticketID else Random.nextString(32)
-            blockchainTransactionSendCoins.Service.addSendCoin(from = username, to = sendCoinData.to, amount = sendCoinData.amount, gas = sendCoinData.gas, null, null, ticketID = ticketID, null)
+            blockchainTransactionSendCoins.Service.create(from = username, to = sendCoinData.to, amount = sendCoinData.amount, gas = sendCoinData.gas, null, null, ticketID = ticketID, null)
             if (!kafkaEnabled) {
               Future {
                 try {
@@ -99,7 +99,7 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
         },
         requestCoinFormData => {
           try {
-            masterTransactionFaucetRequests.Service.addFaucetRequest(username, defaultFaucetToken)
+            masterTransactionFaucetRequests.Service.create(username, defaultFaucetToken)
             Ok(views.html.index(successes = Seq(constants.Response.COINS_REQUESTED)))
           }
           catch {
@@ -131,7 +131,7 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
         },
         rejectFaucetRequestData => {
           try {
-            masterTransactionFaucetRequests.Service.updateStatus(rejectFaucetRequestData.requestID, status = false)
+            masterTransactionFaucetRequests.Service.reject(rejectFaucetRequestData.requestID, comment = rejectFaucetRequestData.comment)
             Ok(views.html.index(successes = Seq(constants.Response.FAUCET_REQUEST_REJECTED)))
           }
           catch {
@@ -156,8 +156,8 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
             if (masterTransactionFaucetRequests.Service.getStatus(approveFaucetRequestFormData.requestID).isEmpty) {
               val toAddress = masterAccounts.Service.getAddress(approveFaucetRequestFormData.accountID)
               val ticketID: String = if (kafkaEnabled) transactionsSendCoin.Service.kafkaPost(transactionsSendCoin.Request(from = constants.User.MAIN_ACCOUNT, password = approveFaucetRequestFormData.password, to = toAddress, amount = Seq(transactionsSendCoin.Amount(denominationOfGasToken, defaultFaucetToken.toString)), gas = approveFaucetRequestFormData.gas)).ticketID else Random.nextString(32)
-              blockchainTransactionSendCoins.Service.addSendCoin(constants.User.MAIN_ACCOUNT, toAddress, defaultFaucetToken, approveFaucetRequestFormData.gas, null, null, ticketID, null)
-              masterTransactionFaucetRequests.Service.updateTicketIDStatusAndGas(approveFaucetRequestFormData.requestID, ticketID, status = true, approveFaucetRequestFormData.gas)
+              blockchainTransactionSendCoins.Service.create(constants.User.MAIN_ACCOUNT, toAddress, defaultFaucetToken, approveFaucetRequestFormData.gas, null, null, ticketID, null)
+              masterTransactionFaucetRequests.Service.accept(approveFaucetRequestFormData.requestID, ticketID, approveFaucetRequestFormData.gas)
               if (!kafkaEnabled) {
                 Future {
                   try {
@@ -176,9 +176,7 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
           }
           catch {
             case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
-            case blockChainException: BlockChainException =>
-              masterTransactionFaucetRequests.Service.updateComment(approveFaucetRequestFormData.requestID, blockChainException.failure.message)
-              Ok(views.html.index(failures = Seq(blockChainException.failure)))
+            case blockChainException: BlockChainException => Ok(views.html.index(failures = Seq(blockChainException.failure)))
           }
         }
       )

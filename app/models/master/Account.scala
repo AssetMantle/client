@@ -210,7 +210,7 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
     def getUserType(id: String)(implicit executionContext: ExecutionContext):String = Await.result(getUserTypeById(id), Duration.Inf)
 
-    def tryVerifyUserType(id: String, userType: String)(implicit executionContext: ExecutionContext): Boolean = {
+    def tryVerifyingUserType(id: String, userType: String)(implicit executionContext: ExecutionContext): Boolean = {
       if (Await.result(getUserTypeById(id), Duration.Inf) == userType) true
       else throw new BaseException(constants.Response.UNAUTHORIZED)
     }

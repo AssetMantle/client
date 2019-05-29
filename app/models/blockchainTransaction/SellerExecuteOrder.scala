@@ -46,7 +46,7 @@ class SellerExecuteOrders @Inject()(protected val databaseConfigProvider: Databa
     }
   }
 
-  private def update(sellerExecuteOrder: SellerExecuteOrder)(implicit executionContext: ExecutionContext): Future[Int] = db.run(sellerExecuteOrderTable.insertOrUpdate(sellerExecuteOrder).asTry).map {
+  private def upsert(sellerExecuteOrder: SellerExecuteOrder)(implicit executionContext: ExecutionContext): Future[Int] = db.run(sellerExecuteOrderTable.insertOrUpdate(sellerExecuteOrder).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -56,7 +56,7 @@ class SellerExecuteOrders @Inject()(protected val databaseConfigProvider: Databa
     }
   }
 
-  private def updateStatusAndResponseOnTicketID(ticketID: String, status: Boolean, responseCode: String): Future[Int] = db.run(sellerExecuteOrderTable.filter(_.ticketID === ticketID).map(x => (x.status, x.responseCode)).update((status, responseCode)).asTry).map {
+  private def updateStatusAndResponseCodeOnTicketID(ticketID: String, status: Option[Boolean], responseCode: String): Future[Int] = db.run(sellerExecuteOrderTable.filter(_.ticketID === ticketID).map(x => (x.status.?, x.responseCode)).update((status, responseCode)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -66,9 +66,9 @@ class SellerExecuteOrders @Inject()(protected val databaseConfigProvider: Databa
     }
   }
 
-  private def getTicketIDsWithNullStatus()(implicit executionContext: ExecutionContext): Future[Seq[String]] = db.run(sellerExecuteOrderTable.filter(_.status.?.isEmpty).map(_.ticketID).result)
+  private def getTicketIDsWithNullStatus: Future[Seq[String]] = db.run(sellerExecuteOrderTable.filter(_.status.?.isEmpty).map(_.ticketID).result)
 
-  private def updateTxHashStatusAndResponseOnTicketID(ticketID: String, txHash: String, status: Boolean, responseCode: String): Future[Int] = db.run(sellerExecuteOrderTable.filter(_.ticketID === ticketID).map(x => (x.txHash, x.status, x.responseCode)).update((txHash, status, responseCode)).asTry).map {
+  private def updateTxHashStatusAndResponseCodeOnTicketID(ticketID: String, txHash: String, status: Option[Boolean], responseCode: String): Future[Int] = db.run(sellerExecuteOrderTable.filter(_.ticketID === ticketID).map(x => (x.txHash, x.status.?, x.responseCode)).update((txHash, status, responseCode)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -125,13 +125,13 @@ class SellerExecuteOrders @Inject()(protected val databaseConfigProvider: Databa
 
   object Service {
 
-    def addSellerExecuteOrder(from: String, buyerAddress: String, sellerAddress: String, awbProofHash: String, pegHash: String, gas: Int, status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])(implicit executionContext: ExecutionContext): String = Await.result(add(SellerExecuteOrder(from = from, buyerAddress = buyerAddress, sellerAddress = sellerAddress, awbProofHash = awbProofHash, pegHash = pegHash, gas = gas, status = status, txHash = txHash, ticketID = ticketID, responseCode = responseCode)), Duration.Inf)
+    def create(from: String, buyerAddress: String, sellerAddress: String, awbProofHash: String, pegHash: String, gas: Int, status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])(implicit executionContext: ExecutionContext): String = Await.result(add(SellerExecuteOrder(from = from, buyerAddress = buyerAddress, sellerAddress = sellerAddress, awbProofHash = awbProofHash, pegHash = pegHash, gas = gas, status = status, txHash = txHash, ticketID = ticketID, responseCode = responseCode)), Duration.Inf)
 
-    def updateTxHashStatusResponseCode(ticketID: String, txHash: String, status: Boolean, responseCode: String): Int = Await.result(updateTxHashStatusAndResponseOnTicketID(ticketID, txHash, status, responseCode), Duration.Inf)
+    def markTransactionSuccessful(ticketID: String, txHash: String, responseCode: String): Int = Await.result(updateTxHashStatusAndResponseCodeOnTicketID(ticketID, txHash, status = Option(true), responseCode), Duration.Inf)
 
-    def updateStatusAndResponseCode(ticketID: String, status: Boolean, responseCode: String): Int = Await.result(updateStatusAndResponseOnTicketID(ticketID, status, responseCode), Duration.Inf)
+    def markTransactionFailed(ticketID: String, responseCode: String): Int = Await.result(updateStatusAndResponseCodeOnTicketID(ticketID, status = Option(false), responseCode), Duration.Inf)
 
-    def getTicketIDsOnStatus(): Seq[String] = Await.result(getTicketIDsWithNullStatus(), Duration.Inf)
+    def getTicketIDsOnStatus(): Seq[String] = Await.result(getTicketIDsWithNullStatus, Duration.Inf)
 
     def getTransaction(ticketID: String)(implicit executionContext: ExecutionContext): SellerExecuteOrder = Await.result(findByTicketID(ticketID), Duration.Inf)
 
@@ -140,13 +140,13 @@ class SellerExecuteOrders @Inject()(protected val databaseConfigProvider: Databa
   object Utility {
     def onSuccess(ticketID: String, response: Response): Future[Unit] = Future {
       try {
-        Service.updateTxHashStatusResponseCode(ticketID, response.TxHash, status = true, response.Code)
+        Service.markTransactionSuccessful(ticketID, response.TxHash, response.Code)
         val sellerExecuteOrder = Service.getTransaction(ticketID)
         val negotiationID = blockchainNegotiations.Service.getNegotiationID(buyerAddress = sellerExecuteOrder.buyerAddress, sellerAddress = sellerExecuteOrder.sellerAddress, pegHash = sellerExecuteOrder.pegHash)
-        blockchainOrders.Service.updateDirtyBit(id = negotiationID, true)
-        blockchainAccounts.Service.updateDirtyBit(sellerExecuteOrder.sellerAddress, dirtyBit = true)
-        blockchainTransactionFeedbacks.Service.updateDirtyBit(sellerExecuteOrder.buyerAddress, true)
-        blockchainTransactionFeedbacks.Service.updateDirtyBit(sellerExecuteOrder.sellerAddress, true)
+        blockchainOrders.Service.markDirty(id = negotiationID)
+        blockchainAccounts.Service.markDirty(sellerExecuteOrder.sellerAddress)
+        blockchainTransactionFeedbacks.Service.markDirty(sellerExecuteOrder.buyerAddress)
+        blockchainTransactionFeedbacks.Service.markDirty(sellerExecuteOrder.sellerAddress)
         pushNotification.sendNotification(masterAccounts.Service.getId(sellerExecuteOrder.buyerAddress), constants.Notification.SUCCESS, response.TxHash)
         pushNotification.sendNotification(sellerExecuteOrder.from, constants.Notification.SUCCESS, response.TxHash)
       }
@@ -158,10 +158,10 @@ class SellerExecuteOrders @Inject()(protected val databaseConfigProvider: Databa
 
     def onFailure(ticketID: String, message: String): Future[Unit] = Future {
       try {
-        Service.updateStatusAndResponseCode(ticketID, status = false, message)
+        Service.markTransactionFailed(ticketID, message)
         val sellerExecuteOrder = Service.getTransaction(ticketID)
-        blockchainTransactionFeedbacks.Service.updateDirtyBit(sellerExecuteOrder.buyerAddress, true)
-        blockchainTransactionFeedbacks.Service.updateDirtyBit(sellerExecuteOrder.sellerAddress, true)
+        blockchainTransactionFeedbacks.Service.markDirty(sellerExecuteOrder.buyerAddress)
+        blockchainTransactionFeedbacks.Service.markDirty(sellerExecuteOrder.sellerAddress)
         pushNotification.sendNotification(masterAccounts.Service.getId(sellerExecuteOrder.buyerAddress), constants.Notification.FAILURE, message)
         pushNotification.sendNotification(sellerExecuteOrder.from, constants.Notification.FAILURE, message)
       } catch {

@@ -3,19 +3,19 @@
 
 @(addOrganizationForm: Form[AddOrganization.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @form(action = routes.AddOrganizationController.addOrganization, 'onkeypress -> "validateForm(event,this)") {
-  @CSRF.formField
-  @inputText(addOrganizationForm(constants.Form.ZONE_ID), '_label -> Messages(constants.Form.ZONE_ID))
-  @inputText(addOrganizationForm(constants.Form.NAME), '_label -> Messages(constants.Form.NAME))
-  @inputText(addOrganizationForm(constants.Form.ADDRESS), '_label -> Messages(constants.Form.ADDRESS))
-  @inputText(addOrganizationForm(constants.Form.PHONE), '_label -> Messages(constants.Form.PHONE))
-  @inputText(addOrganizationForm(constants.Form.EMAIL), '_label -> Messages(constants.Form.EMAIL))
+    @CSRF.formField
+    @inputText(addOrganizationForm(constants.Form.ZONE_ID), '_label -> Messages(constants.Form.ZONE_ID))
+    @inputText(addOrganizationForm(constants.Form.NAME), '_label -> Messages(constants.Form.NAME))
+    @inputText(addOrganizationForm(constants.Form.ADDRESS), '_label -> Messages(constants.Form.ADDRESS))
+    @inputText(addOrganizationForm(constants.Form.PHONE), '_label -> Messages(constants.Form.PHONE))
+    @inputText(addOrganizationForm(constants.Form.EMAIL), '_label -> Messages(constants.Form.EMAIL))
 
-  @if(addOrganizationForm.hasGlobalErrors) {
-    <ul>
-    @for(error <- addOrganizationForm.globalErrors) {
-      <li>@error.format</li>
+    @if(addOrganizationForm.hasGlobalErrors) {
+        <ul>
+        @for(error <- addOrganizationForm.globalErrors) {
+            <li>@error.format</li>
+        }
+        </ul>
     }
-    </ul>
-  }
-  <button type="button" onclick="submitForm(this)">@Messages(constants.Form.ADD_ORGANIZATION)</button>
+    <button type="button" onclick="submitForm(this)">@Messages(constants.Form.ADD_ORGANIZATION)</button>
 }

@@ -32,7 +32,7 @@ class RedeemAssetController @Inject()(messagesControllerComponents: MessagesCont
           try {
             val toAddress = blockchainZones.Service.getAddress(redeemAssetData.zoneID)
             val ticketID: String = if (kafkaEnabled) transactionsRedeemAsset.Service.kafkaPost(transactionsRedeemAsset.Request(from = username, to = toAddress, password = redeemAssetData.password, pegHash = redeemAssetData.pegHash, gas = redeemAssetData.gas)).ticketID else Random.nextString(32)
-            blockchainTransactionRedeemAssets.Service.addRedeemAsset(from = username, to = toAddress, pegHash = redeemAssetData.pegHash, gas = redeemAssetData.gas, null, null, ticketID = ticketID, null)
+            blockchainTransactionRedeemAssets.Service.create(from = username, to = toAddress, pegHash = redeemAssetData.pegHash, gas = redeemAssetData.gas, null, null, ticketID = ticketID, null)
             if (!kafkaEnabled) {
               Future {
                 try {

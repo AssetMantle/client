@@ -76,15 +76,7 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
     }
   }
 
-  private def getZonesWithNullStatus()(implicit executionContext: ExecutionContext): Future[Seq[Zone]] = db.run(zoneTable.filter(_.status.?.isEmpty).result.asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
+  private def getZonesWithNullStatus: Future[Seq[Zone]] = db.run(zoneTable.filter(_.status.?.isEmpty).result)
   
   private def updateStatusOnID(id: String, status: Boolean)(implicit executionContext: ExecutionContext) = db.run(zoneTable.filter(_.id === id).map(_.status.?).update(Option(status)).asTry).map {
     case Success(result) => result
@@ -126,9 +118,9 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
   object Service {
 
-    def addZone(accountID: String, name: String, currency: String)(implicit executionContext: ExecutionContext): String = Await.result(add(Zone((-Math.abs(Random.nextInt)).toHexString.toUpperCase, accountID, name, currency, null)), Duration.Inf)
+    def create(accountID: String, name: String, currency: String)(implicit executionContext: ExecutionContext): String = Await.result(add(Zone((-Math.abs(Random.nextInt)).toHexString.toUpperCase, accountID, name, currency, null)), Duration.Inf)
 
-    def getZone(id: String)(implicit executionContext: ExecutionContext): Zone = Await.result(findById(id), Duration.Inf)
+    def get(id: String)(implicit executionContext: ExecutionContext): Zone = Await.result(findById(id), Duration.Inf)
 
     def updateStatus(id: String, status: Boolean)(implicit executionContext: ExecutionContext): Int = Await.result(updateStatusOnID(id, status), Duration.Inf)
 
@@ -136,7 +128,7 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
     def getZoneId(accountID: String)(implicit executionContext: ExecutionContext): String = Await.result(getZoneIdByAccountId(accountID), Duration.Inf)
 
-    def getVerifyZoneRequests()(implicit executionContext: ExecutionContext): Seq[Zone] = Await.result(getZonesWithNullStatus(), Duration.Inf)
+    def getVerifyZoneRequests: Seq[Zone] = Await.result(getZonesWithNullStatus, Duration.Inf)
 
     def getStatus(id: String)(implicit executionContext: ExecutionContext): Option[Boolean] = Await.result(getStatusByID(id), Duration.Inf)
 

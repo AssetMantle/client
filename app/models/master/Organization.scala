@@ -120,9 +120,9 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
 
   object Service {
 
-    def addOrganization(zoneID: String, accountID: String, name: String, address: String, phone: String, email: String)(implicit executionContext: ExecutionContext): String = Await.result(add(Organization((-Math.abs(Random.nextInt)).toHexString.toUpperCase, zoneID, accountID, name, address, phone, email, null)), Duration.Inf)
+    def create(zoneID: String, accountID: String, name: String, address: String, phone: String, email: String)(implicit executionContext: ExecutionContext): String = Await.result(add(Organization((-Math.abs(Random.nextInt)).toHexString.toUpperCase, zoneID, accountID, name, address, phone, email, null)), Duration.Inf)
 
-    def getOrganization(id: String)(implicit executionContext: ExecutionContext): Organization = Await.result(findById(id), Duration.Inf)
+    def get(id: String)(implicit executionContext: ExecutionContext): Organization = Await.result(findById(id), Duration.Inf)
 
     def updateStatus(id: String, status: Boolean)(implicit executionContext: ExecutionContext): Int = Await.result(updateStatusOnID(id, status), Duration.Inf)
 

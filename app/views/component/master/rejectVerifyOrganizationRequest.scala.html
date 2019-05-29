@@ -3,15 +3,15 @@
 
 @(rejectVerifyOrganizationRequestForm: Form[RejectVerifyOrganizationRequest.Data], organizationID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @form(action = routes.AddOrganizationController.rejectVerifyOrganizationRequest, 'onkeypress -> "validateForm(event,this)") {
-  @CSRF.formField
-  @inputText(rejectVerifyOrganizationRequestForm(constants.Form.ORGANIZATION_ID).copy(value = Some(organizationID)), '_label -> Messages(constants.Form.ORGANIZATION_ID))
+    @CSRF.formField
+    @inputText(rejectVerifyOrganizationRequestForm(constants.Form.ORGANIZATION_ID).copy(value = Some(organizationID)), '_label -> Messages(constants.Form.ORGANIZATION_ID))
 
-  @if(rejectVerifyOrganizationRequestForm.hasGlobalErrors) {
-    <ul>
-    @for(error <- rejectVerifyOrganizationRequestForm.globalErrors) {
-      <li>@error.format</li>
+    @if(rejectVerifyOrganizationRequestForm.hasGlobalErrors) {
+        <ul>
+        @for(error <- rejectVerifyOrganizationRequestForm.globalErrors) {
+            <li>@error.format</li>
+        }
+        </ul>
     }
-    </ul>
-  }
-  <button type="button" onclick="submitForm(this)">@Messages(constants.Form.REJECT_VERIFY_ORGANIZATION_REQUEST)</button>
+    <button type="button" onclick="submitForm(this)">@Messages(constants.Form.REJECT_VERIFY_ORGANIZATION_REQUEST)</button>
 }

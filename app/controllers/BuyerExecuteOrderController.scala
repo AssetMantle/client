@@ -31,7 +31,7 @@ class BuyerExecuteOrderController @Inject()(messagesControllerComponents: Messag
         buyerExecuteOrderData => {
           try {
             val ticketID: String = if (kafkaEnabled) transactionsBuyerExecuteOrder.Service.kafkaPost(transactionsBuyerExecuteOrder.Request(from = username, password = buyerExecuteOrderData.password, buyerAddress = buyerExecuteOrderData.buyerAddress, sellerAddress = buyerExecuteOrderData.sellerAddress, fiatProofHash = buyerExecuteOrderData.fiatProofHash, pegHash = buyerExecuteOrderData.pegHash, gas = buyerExecuteOrderData.gas)).ticketID else Random.nextString(32)
-            blockchainTransactionBuyerExecuteOrders.Service.addBuyerExecuteOrder(from = username, buyerAddress = buyerExecuteOrderData.buyerAddress, sellerAddress = buyerExecuteOrderData.sellerAddress, fiatProofHash = buyerExecuteOrderData.fiatProofHash, pegHash = buyerExecuteOrderData.pegHash, gas = buyerExecuteOrderData.gas, null, null, ticketID = ticketID, null)
+            blockchainTransactionBuyerExecuteOrders.Service.create(from = username, buyerAddress = buyerExecuteOrderData.buyerAddress, sellerAddress = buyerExecuteOrderData.sellerAddress, fiatProofHash = buyerExecuteOrderData.fiatProofHash, pegHash = buyerExecuteOrderData.pegHash, gas = buyerExecuteOrderData.gas, null, null, ticketID = ticketID, null)
             if (!kafkaEnabled) {
               Future {
                 try {
@@ -54,7 +54,6 @@ class BuyerExecuteOrderController @Inject()(messagesControllerComponents: Messag
       )
   }
 
-
   def unmoderatedBuyerExecuteOrderForm: Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.master.unmoderatedBuyerExecuteOrder(views.companion.master.UnmoderatedBuyerExecuteOrder.form))
   }
@@ -69,7 +68,7 @@ class BuyerExecuteOrderController @Inject()(messagesControllerComponents: Messag
           try {
             val buyerAddress = masterAccounts.Service.getAddress(username)
             val ticketID: String = if (kafkaEnabled) transactionsBuyerExecuteOrder.Service.kafkaPost(transactionsBuyerExecuteOrder.Request(from = username, password = unmoderatedBuyerExecuteOrderData.password, buyerAddress = buyerAddress, sellerAddress = unmoderatedBuyerExecuteOrderData.sellerAddress, fiatProofHash = unmoderatedBuyerExecuteOrderData.fiatProofHash, pegHash = unmoderatedBuyerExecuteOrderData.pegHash, gas = unmoderatedBuyerExecuteOrderData.gas)).ticketID else Random.nextString(32)
-            blockchainTransactionBuyerExecuteOrders.Service.addBuyerExecuteOrder(from = username, buyerAddress = buyerAddress, sellerAddress = unmoderatedBuyerExecuteOrderData.sellerAddress, fiatProofHash = unmoderatedBuyerExecuteOrderData.fiatProofHash, pegHash = unmoderatedBuyerExecuteOrderData.pegHash, gas = unmoderatedBuyerExecuteOrderData.gas, null, null, ticketID = ticketID, null)
+            blockchainTransactionBuyerExecuteOrders.Service.create(from = username, buyerAddress = buyerAddress, sellerAddress = unmoderatedBuyerExecuteOrderData.sellerAddress, fiatProofHash = unmoderatedBuyerExecuteOrderData.fiatProofHash, pegHash = unmoderatedBuyerExecuteOrderData.pegHash, gas = unmoderatedBuyerExecuteOrderData.gas, null, null, ticketID = ticketID, null)
             if (!kafkaEnabled) {
               Future {
                 try {

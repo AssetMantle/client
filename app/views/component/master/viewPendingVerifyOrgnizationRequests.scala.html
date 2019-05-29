@@ -3,29 +3,29 @@
 @(organizationVerificationRequests: Seq[Organization])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
 
 <table>
-  <tr>
-    <th>@Messages(constants.Form.ORGANIZATION_ID)</th>
-    <th>@Messages(constants.Form.ZONE_ID)</th>
-    <th>@Messages(constants.Form.ACCOUNT_ID)</th>
-    <th>@Messages(constants.Form.NAME)</th>
-    <th>@Messages(constants.Form.ADDRESS)</th>
-    <th>@Messages(constants.Form.PHONE)</th>
-    <th>@Messages(constants.Form.EMAIL)</th>
-    <th>@Messages(constants.Form.STATUS)</th>
-
-  </tr>
-  @for(organizationVerificationRequest <- organizationVerificationRequests) {
     <tr>
-      <td>@organizationVerificationRequest.id</td>
-      <td>@organizationVerificationRequest.zoneID</td>
-      <td>@organizationVerificationRequest.accountID</td>
-      <td>@organizationVerificationRequest.name</td>
-      <td>@organizationVerificationRequest.address</td>
-      <td>@organizationVerificationRequest.phone</td>
-      <td>@organizationVerificationRequest.email</td>
-      <td><a onclick="getForm(jsRoutes.controllers.AddOrganizationController.verifyOrganizationForm('@organizationVerificationRequest.id', '@organizationVerificationRequest.zoneID'))">@Messages(constants.Form.APPROVE)</a>
-        /<a onclick="getForm(jsRoutes.controllers.AddOrganizationController.rejectVerifyOrganizationRequestForm('@organizationVerificationRequest.id'))">@Messages(constants.Form.REJECT)</a></td>
+        <th>@Messages(constants.Form.ORGANIZATION_ID)</th>
+        <th>@Messages(constants.Form.ZONE_ID)</th>
+        <th>@Messages(constants.Form.ACCOUNT_ID)</th>
+        <th>@Messages(constants.Form.NAME)</th>
+        <th>@Messages(constants.Form.ADDRESS)</th>
+        <th>@Messages(constants.Form.PHONE)</th>
+        <th>@Messages(constants.Form.EMAIL)</th>
+        <th>@Messages(constants.Form.STATUS)</th>
+
     </tr>
-  }
+    @for(organizationVerificationRequest <- organizationVerificationRequests) {
+        <tr>
+            <td>@organizationVerificationRequest.id</td>
+            <td>@organizationVerificationRequest.zoneID</td>
+            <td>@organizationVerificationRequest.accountID</td>
+            <td>@organizationVerificationRequest.name</td>
+            <td>@organizationVerificationRequest.address</td>
+            <td>@organizationVerificationRequest.phone</td>
+            <td>@organizationVerificationRequest.email</td>
+            <td><a onclick="getForm(jsRoutes.controllers.AddOrganizationController.verifyOrganizationForm('@organizationVerificationRequest.id', '@organizationVerificationRequest.zoneID'))">@Messages(constants.Form.APPROVE)</a>
+                /<a onclick="getForm(jsRoutes.controllers.AddOrganizationController.rejectVerifyOrganizationRequestForm('@organizationVerificationRequest.id'))">@Messages(constants.Form.REJECT)</a></td>
+        </tr>
+    }
 </table>
 <br>
