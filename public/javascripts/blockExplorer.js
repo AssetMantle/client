@@ -43,7 +43,7 @@ function blockExplorer(){
                                 content = "<tr><td><button onclick='searchFunction("+ JSON.stringify(height) +")'>" + height + "</button></td><td>" + numTxs + "</td><td><div id='" + timerID + "'></div> </td></tr>" + content;
                                 lastBlockTime = time;
                                 if (counter > 0) {
-                                    initialGraphTime[initialGraphTime.length] = blockTime.getHours() + ":" + blockTime.getMinutes() + ":" + blockTime.getSeconds();
+                                    initialGraphTime[initialGraphTime.length] = height + "::" + blockTime.getHours() + ":" + blockTime.getMinutes() + ":" + blockTime.getSeconds();
                                     initialGraphData[initialGraphData.length] = differenceBetweenBlockTime;
                                     averageBlockTime = (averageBlockTime * counter + differenceBetweenBlockTime) / (counter + 1);
                                 }
@@ -78,7 +78,7 @@ function blockExplorer(){
                                     blockContainerList.removeChild(blockContainerList.childNodes[blockContainerList.childNodes.length - 1]);
                                     $('#' + blockExplorerTableBody).prepend("<tr><td><button onclick='searchFunction("+ JSON.stringify(height) +")'>" + height + "</button></td><td>" + numTxs + "</td><td ><div class='timer_div' id='" + timerID + "'></div></td></tr>");
                                     getBlockTime(time, timerID);
-                                    updateGraph("blockTimes", [blockTime.getHours() + ":" + blockTime.getMinutes() + ":" + blockTime.getSeconds()], [differenceBetweenBlockTime]);
+                                    updateGraph("blockTimes", [height + "::" + blockTime.getHours() + ":" + blockTime.getMinutes() + ":" + blockTime.getSeconds()], [differenceBetweenBlockTime]);
                                     lastBlockTime = time;
                                     if (counter > 0) {
                                         averageBlockTime = (averageBlockTime * counter + differenceBetweenBlockTime) / (counter + 1);
