@@ -104,7 +104,7 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
     def getCoins(address: String)(implicit executionContext: ExecutionContext): Int = Await.result(getCoinsByAddress(address), Duration.Inf)
 
-    def getDirtyAddresses(dirtyBit: Boolean): Seq[String] = Await.result(getAddressesByDirtyBit(dirtyBit), Duration.Inf)
+    def getDirtyAddresses: Seq[String] = Await.result(getAddressesByDirtyBit(dirtyBit = true), Duration.Inf)
 
     def markDirty(address: String): Int = Await.result(updateDirtyBitByAddress(address, dirtyBit = true), Duration.Inf)
   }
@@ -143,7 +143,7 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
   object Utility {
     def dirtyEntityUpdater(): Future[Unit] = Future {
       try {
-        val dirtyAddresses = Service.getDirtyAddresses(dirtyBit = true)
+        val dirtyAddresses = Service.getDirtyAddresses
         Thread.sleep(sleepTime)
         for (dirtyAddress <- dirtyAddresses) {
           val responseAccount = getAccount.Service.get(dirtyAddress)

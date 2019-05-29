@@ -106,7 +106,7 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
 
     def insertOrUpdate(id: String, buyerAddress: String, sellerAddress: String, assetPegHash: String, bid: String, time: String, buyerSignature: Option[String], sellerSignature: Option[String], dirtyBit: Boolean)(implicit executionContext: ExecutionContext): Int = Await.result(upsert(Negotiation(id = id, buyerAddress = buyerAddress, sellerAddress = sellerAddress, assetPegHash = assetPegHash, bid = bid, time = time, buyerSignature = buyerSignature, sellerSignature = sellerSignature, dirtyBit = dirtyBit)), Duration.Inf)
 
-    def getDirtyNegotiations(dirtyBit: Boolean): Seq[Negotiation] = Await.result(getNegotiationsByDirtyBit(dirtyBit), Duration.Inf)
+    def getDirtyNegotiations: Seq[Negotiation] = Await.result(getNegotiationsByDirtyBit(dirtyBit = true), Duration.Inf)
 
     def get(id: String): Negotiation = Await.result(findById(id), Duration.Inf)
 
@@ -149,7 +149,7 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
 
   object Utility {
     def dirtyEntityUpdater(): Future[Unit] = Future {
-      val dirtyNegotiations = Service.getDirtyNegotiations(true)
+      val dirtyNegotiations = Service.getDirtyNegotiations
       Thread.sleep(sleepTime)
       for (dirtyNegotiation <- dirtyNegotiations) {
         try {

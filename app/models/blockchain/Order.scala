@@ -107,14 +107,14 @@ class Orders @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
 
     def insertOrUpdate(id: String, fiatProofHash: Option[String], awbProofHash: Option[String], dirtyBit: Boolean)(implicit executionContext: ExecutionContext): Int = Await.result(upsert(Order(id = id, fiatProofHash = fiatProofHash, awbProofHash = awbProofHash, dirtyBit = dirtyBit)), Duration.Inf)
 
-    def getDirtyOrders(dirtyBit: Boolean): Seq[Order] = Await.result(getOrdersByDirtyBit(dirtyBit), Duration.Inf)
+    def getDirtyOrders: Seq[Order] = Await.result(getOrdersByDirtyBit(dirtyBit = true), Duration.Inf)
 
     def markDirty(id: String): Int = Await.result(updateDirtyBitById(id, dirtyBit = true), Duration.Inf)
   }
 
   object Utility {
     def dirtyEntityUpdater(): Future[Unit] = Future {
-      val dirtyOrders = Service.getDirtyOrders(true)
+      val dirtyOrders = Service.getDirtyOrders
       Thread.sleep(sleepTime)
       for (dirtyOrder <- dirtyOrders) {
         try {

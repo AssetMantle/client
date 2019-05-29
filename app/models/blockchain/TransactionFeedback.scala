@@ -209,7 +209,7 @@ class TransactionFeedbacks @Inject()(protected val databaseConfigProvider: Datab
 
     def getAddress(address: String)(implicit executionContext: ExecutionContext): TransactionFeedback = Await.result(findById(address), Duration.Inf)
 
-    def getDirtyAddresses(dirtyBit: Boolean): Seq[String] = Await.result(getTransactionFeedbacksByDirtyBit(dirtyBit), Duration.Inf)
+    def getDirtyAddresses: Seq[String] = Await.result(getTransactionFeedbacksByDirtyBit(dirtyBit = true), Duration.Inf)
 
     def refreshDirty(address: String, transactionFeedbackResponse: TransactionFeedbackResponse): Int = Await.result(updateTransactionFeedbackByAddress(address, TransactionFeedback(address = address, SendAssetCounts(transactionFeedbackResponse.sendAssetsPositiveTx, transactionFeedbackResponse.sendAssetsNegativeTx), SendFiatCounts(transactionFeedbackResponse.sendFiatsPositiveTx, transactionFeedbackResponse.sendFiatsNegativeTx), IBCIssueAssetCounts(transactionFeedbackResponse.ibcIssueAssetsPositiveTx, transactionFeedbackResponse.ibcIssueAssetsNegativeTx), IBCIssueFiatCounts(transactionFeedbackResponse.ibcIssueFiatsPositiveTx, transactionFeedbackResponse.ibcIssueFiatsNegativeTx), BuyerExecuteOrderCounts(transactionFeedbackResponse.buyerExecuteOrderPositiveTx, transactionFeedbackResponse.buyerExecuteOrderNegativeTx), SellerExecuteOrderCounts(transactionFeedbackResponse.sellerExecuteOrderPositiveTx, transactionFeedbackResponse.sellerExecuteOrderNegativeTx), ChangeBuyerBidCounts(transactionFeedbackResponse.changeBuyerBidPositiveTx, transactionFeedbackResponse.changeBuyerBidNegativeTx), ChangeSellerBidCounts(transactionFeedbackResponse.changeSellerBidPositiveTx, transactionFeedbackResponse.changeSellerBidNegativeTx), ConfirmBuyerBidCounts(transactionFeedbackResponse.confirmBuyerBidPositiveTx, transactionFeedbackResponse.confirmBuyerBidNegativeTx), ConfirmSellerBidCounts(transactionFeedbackResponse.confirmSellerBidPositiveTx, transactionFeedbackResponse.confirmSellerBidNegativeTx), NegotiationCounts(transactionFeedbackResponse.negotiationPositiveTx, transactionFeedbackResponse.negotiationNegativeTx), dirtyBit = false)), Duration.Inf)
 
@@ -218,7 +218,7 @@ class TransactionFeedbacks @Inject()(protected val databaseConfigProvider: Datab
 
   object Utility {
     def dirtyEntityUpdater(): Future[Unit] = Future {
-      val dirtyAddresses = Service.getDirtyAddresses(dirtyBit = true)
+      val dirtyAddresses = Service.getDirtyAddresses
       Thread.sleep(sleepTime)
       for (dirtyAddress <- dirtyAddresses) {
         try {
