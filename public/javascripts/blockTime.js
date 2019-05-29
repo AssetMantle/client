@@ -18,7 +18,7 @@ function updateClock(dateTime, timerID) {
 function format(time) {
     switch (true) {
         case (time < 120):
-            return time + "s ago";
+            return time.toFixed(1) + "s ago";
         case (time >= 120 && time < 60 * 120):
             return Math.floor(time / 60) + "min ago";
         case (time >= 60 * 120):
