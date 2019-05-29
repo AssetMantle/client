@@ -50,6 +50,33 @@
     <a onclick="getForm(jsRoutes.controllers.SetBuyerFeedbackController.blockchainSetBuyerFeedbackForm())">@Messages(constants.Form.SET_BUYER_FEEDBACK)</a>
     <a onclick="getForm(jsRoutes.controllers.SetSellerFeedbackController.blockchainSetSellerFeedbackForm">@Messages(constants.Form.SET_SELLER_FEEDBACK)</a>
 
+    <div class="flex-container">
+        <div class="flex-item">
+        @search()
+        </div>
+    </div>
+    <div class="flex-container">
+        <div class="flex-item">@lastBlockHeight()</div>
+        <div class="flex-item">@validators()</div>
+        <div class="flex-item"> @Messages(constants.Form.TOKENS)
+            <p id="tokensValue"></p></div>
+        <div class="flex-item">@averageBlockTime()</div>
+    </div>
+    <div  id="indexBottomDivision" class="flex-container">
+            <div class="flex-graph"> @blockTimeGraph()</div>
+            <div class="flex-tables">@blockExplorer()</div>
+            <div class="flex-tables"> @transactionExplorer()</div>
+
+        @transactionHash()
+
+        @blockHeight()
+
+        @validatorsTable()
+
+        @allBlocksTable()
+    </div>
+
+    @*
     <div class="mainDivision">
         <div class="topDivision">
             @search()
@@ -59,7 +86,6 @@
         <div class="box3"> @Messages(constants.Form.TOKENS)
             <p id="tokensValue"></p></div>
         <div class="box4">@averageBlockTime()</div>
-
         <div id="indexBottomDivision" class="indexBottomDivision">
             @blockTimeGraph()
             @blockExplorer()
@@ -74,4 +100,5 @@
 
         @allBlocksTable()
     </div>
+*@
 }
