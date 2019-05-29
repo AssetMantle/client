@@ -22,9 +22,9 @@ function graph(title, chartID) {
     ctx.data(chartID, chart);
 }
 
-function updateGraph(chartID, label, data) {
+function updateGraph(chartID, label, data, maxNumberOfPoints = 10) {
     let chart = $('#' + chartID).data(chartID);
-    if (chart.data.datasets[0].data.length > 10) {
+    if (chart.data.datasets[0].data.length > maxNumberOfPoints) {
         chart.data.labels.splice(0, 1);
         chart.data.datasets[0].data.splice(0, 1);
     }

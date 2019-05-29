@@ -3,6 +3,7 @@ getConfigurationAsynchronously("blockchain.main.ip");
 getConfigurationAsynchronously("blockchain.main.abciPort");
 
 function blockExplorer(){
+    let maxNumberOfItems = 8;
     let blockExplorerTableBody = "blockContainer";
     let wsURL = getConfiguration("blockchain.main.wsIP") + ":" + getConfiguration("blockchain.main.abciPort") + "/websocket";
     let mainIpAbciPort = getConfiguration("blockchain.main.ip") + ":" + getConfiguration("blockchain.main.abciPort");
@@ -19,7 +20,7 @@ function blockExplorer(){
         statusCode: {
             200: function (latestBlockHeightData) {
                 let latestBlockHeight = parseInt(latestBlockHeightData.result.response.last_block_height);
-                let urlMinMax = mainIpAbciPort + "/blockchain?minHeight=" + (latestBlockHeight - 6).toString(10) + "&maxHeight=" + latestBlockHeight.toString(10);
+                let urlMinMax = mainIpAbciPort + "/blockchain?minHeight=" + (latestBlockHeight - maxNumberOfItems).toString(10) + "&maxHeight=" + latestBlockHeight.toString(10);
                 $.ajax({
                     url: urlMinMax,
                     type: "GET",
@@ -56,7 +57,7 @@ function blockExplorer(){
                             for (let i = 0; i < initialTimeData.length; i++) {
                                 getBlockTime(initialTimeData[i], "timer" + i.toString(10));
                             }
-                            updateGraph("blockTimes", initialGraphTime, initialGraphData);
+                            updateGraph("blockTimes", initialGraphTime, initialGraphData, maxNumberOfItems -1);
                             lastBlockTime = initialTimeData[initialTimeData.length - 1];
 
                             window.addEventListener("load", function (evt) {
@@ -75,10 +76,10 @@ function blockExplorer(){
                                     let blockTime = new Date(time);
                                     let differenceBetweenBlockTime = (blockTime.getTime() - new Date(lastBlockTime).getTime()) / 1000;
                                     let blockContainerList = document.getElementById(blockExplorerTableBody);
-                                    blockContainerList.removeChild(blockContainerList.childNodes[blockContainerList.childNodes.length - 1]);
+                                    blockContainerList.removeChild(blockContainerList.childNodes[blockContainerList.childNodes.length - 2]);
                                     $('#' + blockExplorerTableBody).prepend("<tr><td><button onclick='searchFunction("+ JSON.stringify(height) +")'>" + height + "</button></td><td>" + numTxs + "</td><td ><div class='timer_div' id='" + timerID + "'></div></td></tr>");
                                     getBlockTime(time, timerID);
-                                    updateGraph("blockTimes", [height + "::" + blockTime.getHours() + ":" + blockTime.getMinutes() + ":" + blockTime.getSeconds()], [differenceBetweenBlockTime]);
+                                    updateGraph("blockTimes", [height + "::" + blockTime.getHours() + ":" + blockTime.getMinutes() + ":" + blockTime.getSeconds()], [differenceBetweenBlockTime], maxNumberOfItems - 1);
                                     lastBlockTime = time;
                                     if (counter > 0) {
                                         averageBlockTime = (averageBlockTime * counter + differenceBetweenBlockTime) / (counter + 1);
