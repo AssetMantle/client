@@ -26,7 +26,9 @@ class Email @Inject()(mailerClient: MailerClient, contacts: Contacts, accounts: 
       )
       mailerClient.send(email)
     }
-    catch{case baseException: BaseException => throw new BaseException(baseException.failure)}
+    catch {
+      case baseException: BaseException => throw new BaseException(baseException.failure)
+    }
   }
 }
 

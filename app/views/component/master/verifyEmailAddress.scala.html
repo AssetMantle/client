@@ -3,15 +3,15 @@
 
 @(verifyEmailAddressForm: Form[VerifyEmailAddress.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @form(action = routes.VerifyEmailAddressController.verifyEmailAddress, 'onkeypress -> "validateForm(event,this)") {
-  @CSRF.formField
-  @inputText(verifyEmailAddressForm(constants.Form.OTP), '_label -> Messages(constants.Form.OTP))
+    @CSRF.formField
+    @inputText(verifyEmailAddressForm(constants.Form.OTP), '_label -> Messages(constants.Form.OTP))
 
-  @if(verifyEmailAddressForm.hasGlobalErrors) {
-    <ul>
-    @for(error <- verifyEmailAddressForm.globalErrors) {
-      <li>@error.format</li>
+    @if(verifyEmailAddressForm.hasGlobalErrors) {
+        <ul>
+        @for(error <- verifyEmailAddressForm.globalErrors) {
+            <li>@error.format</li>
+        }
+        </ul>
     }
-    </ul>
-  }
-  <button type="button" onclick="submitForm(this)">@Messages(constants.Form.VERIFY_EMAIL_ADDRESS)</button>
+    <button type="button" onclick="submitForm(this)">@Messages(constants.Form.VERIFY_EMAIL_ADDRESS)</button>
 }

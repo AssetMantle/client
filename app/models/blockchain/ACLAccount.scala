@@ -47,8 +47,8 @@ class ACLAccounts @Inject()(protected val databaseConfigProvider: DatabaseConfig
   private def upsert(aclAccount: ACLAccount)(implicit executionContext: ExecutionContext): Future[Int] = db.run(aclTable.insertOrUpdate(aclAccount).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Error.PSQL_EXCEPTION, psqlException)
-        throw new BaseException(constants.Error.PSQL_EXCEPTION)
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
     }
   }
 

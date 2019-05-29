@@ -11,12 +11,12 @@
     @inputText(confirmBuyerBidForm(constants.Form.GAS), '_label -> Messages(constants.Form.GAS))
     @inputPassword(confirmBuyerBidForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD))
 
-  @if(confirmBuyerBidForm.hasGlobalErrors) {
-    <ul>
-    @for(error <- confirmBuyerBidForm.globalErrors) {
-      <li>@error.format</li>
+    @if(confirmBuyerBidForm.hasGlobalErrors) {
+        <ul>
+        @for(error <- confirmBuyerBidForm.globalErrors) {
+            <li>@error.format</li>
+        }
+        </ul>
     }
-    </ul>
-  }
-  <button type="button" onclick="submitForm(this)">@Messages(constants.Form.CONFIRM_BUYER_BID)</button>
+    <button type="button" onclick="submitForm(this)">@Messages(constants.Form.CONFIRM_BUYER_BID)</button>
 }

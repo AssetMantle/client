@@ -74,7 +74,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
           }
           catch {
             case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
-            case blockChainException: BlockChainException => Ok(views.html.index(failures =Seq(blockChainException.failure)))
+            case blockChainException: BlockChainException => Ok(views.html.index(failures = Seq(blockChainException.failure)))
           }
         }
       )

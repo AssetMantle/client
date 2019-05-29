@@ -78,7 +78,7 @@ class SetSellerFeedbacks @Inject()(protected val databaseConfigProvider: Databas
     }
   }
 
-  private def updateStatusAndResponseOnTicketID(ticketID: String, status: Option[Boolean], responseCode: String): Future[Int] = db.run(setSellerFeedbackTable.filter(_.ticketID === ticketID).map(x => (x.status.?, x.responseCode)).update((status, responseCode)).asTry).map {
+  private def updateStatusAndResponseCodeOnTicketID(ticketID: String, status: Option[Boolean], responseCode: String): Future[Int] = db.run(setSellerFeedbackTable.filter(_.ticketID === ticketID).map(x => (x.status.?, x.responseCode)).update((status, responseCode)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -88,7 +88,7 @@ class SetSellerFeedbacks @Inject()(protected val databaseConfigProvider: Databas
     }
   }
 
-  private def getTicketIDsWithNullStatus()(implicit executionContext: ExecutionContext): Future[Seq[String]] = db.run(setSellerFeedbackTable.filter(_.status.?.isEmpty).map(_.ticketID).result)
+  private def getTicketIDsWithNullStatus: Future[Seq[String]] = db.run(setSellerFeedbackTable.filter(_.status.?.isEmpty).map(_.ticketID).result)
 
   private def deleteByTicketID(ticketID: String)(implicit executionContext: ExecutionContext) = db.run(setSellerFeedbackTable.filter(_.ticketID === ticketID).delete.asTry).map {
     case Success(result) => result
@@ -127,13 +127,13 @@ class SetSellerFeedbacks @Inject()(protected val databaseConfigProvider: Databas
 
     def create(from: String, to: String, pegHash: String, rating: Int, gas: Int, status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])(implicit executionContext: ExecutionContext): String = Await.result(add(SetSellerFeedback(from = from, to = to, pegHash = pegHash, rating = rating, gas = gas, status = status, txHash = txHash, ticketID = ticketID, responseCode = responseCode)), Duration.Inf)
 
-    def getTicketIDsOnStatus(): Seq[String] = Await.result(getTicketIDsWithNullStatus(), Duration.Inf)
+    def getTicketIDsOnStatus(): Seq[String] = Await.result(getTicketIDsWithNullStatus, Duration.Inf)
 
     def getSetSellerFeedbackOnTicketID(ticketID: String): SetSellerFeedback = Await.result(findByTicketID(ticketID), Duration.Inf)
 
     def markTransactionSuccessful(ticketID: String, txHash: String, responseCode: String): Int = Await.result(updateTxHashStatusAndResponseCodeOnTicketID(ticketID, txHash, status = Option(true), responseCode), Duration.Inf)
 
-    def markTransactionFailed(ticketID: String, responseCode: String): Int = Await.result(updateStatusAndResponseOnTicketID(ticketID, status = Option(false), responseCode), Duration.Inf)
+    def markTransactionFailed(ticketID: String, responseCode: String): Int = Await.result(updateStatusAndResponseCodeOnTicketID(ticketID, status = Option(false), responseCode), Duration.Inf)
 
   }
 

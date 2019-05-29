@@ -3,7 +3,7 @@ package controllers.actions
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.{master, masterTransaction}
-import play.api.i18n.{I18nSupport, Messages}
+import play.api.i18n.I18nSupport
 import play.api.mvc._
 import play.api.{Configuration, Logger}
 

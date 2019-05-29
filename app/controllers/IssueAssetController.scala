@@ -126,8 +126,7 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
           }
           catch {
             case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
-            case blockChainException: BlockChainException => masterTransactionIssueAssetRequests.Service.updateComment(issueAssetData.requestID, blockChainException.message)
-              Ok(views.html.index(failures = Seq(blockChainException.failure)))
+            case blockChainException: BlockChainException => Ok(views.html.index(failures = Seq(blockChainException.failure)))
           }
         }
       )
@@ -150,7 +149,6 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
             transactionsIssueAsset.Service.post(transactionsIssueAsset.Request(from = issueAssetData.from, to = issueAssetData.to, password = issueAssetData.password, documentHash = issueAssetData.documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.assetPrice, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.assetQuantity, gas = issueAssetData.gas, unmoderated = issueAssetData.unmoderated))
           }
           Ok(views.html.index(successes = Seq(constants.Response.ASSET_ISSUED)))
-
         }
         catch {
           case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))

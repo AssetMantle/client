@@ -90,6 +90,7 @@ class TransactionFeedbacks @Inject()(protected val databaseConfigProvider: Datab
         Nil
     }
   }
+
   private def updateTransactionFeedbackByAddress(address: String, transactionFeedback: TransactionFeedback): Future[Int] = db.run(transactionFeedbackTable.filter(_.address === address).update(transactionFeedback).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {

@@ -26,6 +26,8 @@ class SMS @Inject()(contacts: Contacts, accounts: Accounts, messagesApi: Message
       Twilio.init(accountSID, authToken)
       Message.creator(new PhoneNumber(contacts.Service.findMobileNumber(accountID)), from, messagesApi(module + "Message" + "." + messageType, passedData(0))).create()
     }
-    catch{case baseException: BaseException => throw new BaseException(baseException.failure)}
+    catch {
+      case baseException: BaseException => throw new BaseException(baseException.failure)
+    }
   }
 }

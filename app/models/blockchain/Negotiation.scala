@@ -67,7 +67,7 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
         ""
     }
   }
-  
+
   private def getNegotiationsByDirtyBit(dirtyBit: Boolean): Future[Seq[Negotiation]] = db.run(negotiationTable.filter(_.dirtyBit === dirtyBit).result.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {

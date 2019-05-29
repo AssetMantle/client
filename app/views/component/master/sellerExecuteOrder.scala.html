@@ -3,20 +3,20 @@
 
 @(sellerExecuteOrderForm: Form[SellerExecuteOrder.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @form(action = routes.SellerExecuteOrderController.sellerExecuteOrder, 'onkeypress -> "validateForm(event,this)") {
-  @CSRF.formField
-  @inputText(sellerExecuteOrderForm(constants.Form.BUYER_ADDRESS), '_label -> Messages(constants.Form.BUYER_ADDRESS))
-  @inputText(sellerExecuteOrderForm(constants.Form.SELLER_ADDRESS), '_label -> Messages(constants.Form.SELLER_ADDRESS))
-  @inputText(sellerExecuteOrderForm(constants.Form.AWB_PROOF_HASH), '_label -> Messages(constants.Form.AWB_PROOF_HASH))
-  @inputText(sellerExecuteOrderForm(constants.Form.PEG_HASH), '_label -> Messages(constants.Form.PEG_HASH))
-  @inputText(sellerExecuteOrderForm(constants.Form.GAS), '_label -> Messages(constants.Form.GAS))
-  @inputPassword(sellerExecuteOrderForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD))
+    @CSRF.formField
+    @inputText(sellerExecuteOrderForm(constants.Form.BUYER_ADDRESS), '_label -> Messages(constants.Form.BUYER_ADDRESS))
+    @inputText(sellerExecuteOrderForm(constants.Form.SELLER_ADDRESS), '_label -> Messages(constants.Form.SELLER_ADDRESS))
+    @inputText(sellerExecuteOrderForm(constants.Form.AWB_PROOF_HASH), '_label -> Messages(constants.Form.AWB_PROOF_HASH))
+    @inputText(sellerExecuteOrderForm(constants.Form.PEG_HASH), '_label -> Messages(constants.Form.PEG_HASH))
+    @inputText(sellerExecuteOrderForm(constants.Form.GAS), '_label -> Messages(constants.Form.GAS))
+    @inputPassword(sellerExecuteOrderForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD))
 
-  @if(sellerExecuteOrderForm.hasGlobalErrors) {
-    <ul>
-    @for(error <- sellerExecuteOrderForm.globalErrors) {
-      <li>@error.format</li>
+    @if(sellerExecuteOrderForm.hasGlobalErrors) {
+        <ul>
+        @for(error <- sellerExecuteOrderForm.globalErrors) {
+            <li>@error.format</li>
+        }
+        </ul>
     }
-    </ul>
-  }
-  <button type="button" onclick="submitForm(this)">@Messages(constants.Form.SELLER_EXECUTE_ORDER)</button>
+    <button type="button" onclick="submitForm(this)">@Messages(constants.Form.SELLER_EXECUTE_ORDER)</button>
 }
