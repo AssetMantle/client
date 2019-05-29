@@ -3,16 +3,16 @@
 
 @(issueFiatRequestForm: Form[IssueFiatRequest.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @form(action = routes.IssueFiatController.issueFiatRequest, 'onkeypress -> "validateForm(event,this)") {
-  @CSRF.formField
-  @inputText(issueFiatRequestForm(constants.Form.TRANSACTION_ID), '_label -> Messages(constants.Form.TRANSACTION_ID))
-  @inputText(issueFiatRequestForm(constants.Form.TRANSACTION_AMOUNT), '_label -> Messages(constants.Form.TRANSACTION_AMOUNT))
+    @CSRF.formField
+    @inputText(issueFiatRequestForm(constants.Form.TRANSACTION_ID), '_label -> Messages(constants.Form.TRANSACTION_ID))
+    @inputText(issueFiatRequestForm(constants.Form.TRANSACTION_AMOUNT), '_label -> Messages(constants.Form.TRANSACTION_AMOUNT))
 
-  @if(issueFiatRequestForm.hasGlobalErrors) {
-    <ul>
-    @for(error <- issueFiatRequestForm.globalErrors) {
-      <li>@error.format</li>
+    @if(issueFiatRequestForm.hasGlobalErrors) {
+        <ul>
+        @for(error <- issueFiatRequestForm.globalErrors) {
+            <li>@error.format</li>
+        }
+        </ul>
     }
-    </ul>
-  }
-  <button type="button" onclick="submitForm(this)">@Messages(constants.Form.ISSUE_FIAT)</button>
+    <button type="button" onclick="submitForm(this)">@Messages(constants.Form.ISSUE_FIAT)</button>
 }

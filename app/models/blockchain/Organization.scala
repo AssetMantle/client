@@ -86,15 +86,15 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
 
   object Service {
 
-    def addOrganization(id: String, address: String, dirtyBit: Boolean)(implicit executionContext: ExecutionContext): String = Await.result(add(Organization(id = id, address = address, dirtyBit = dirtyBit)), Duration.Inf)
+    def create(id: String, address: String, dirtyBit: Boolean)(implicit executionContext: ExecutionContext): String = Await.result(add(Organization(id = id, address = address, dirtyBit = dirtyBit)), Duration.Inf)
 
     def getAddress(id: String)(implicit executionContext: ExecutionContext): String = Await.result(getAddressById(id), Duration.Inf)
 
     def getID(address: String)(implicit executionContext: ExecutionContext): String = Await.result(getIdByAddress(address), Duration.Inf)
 
-    def getDirtyOrganizations(dirtyBit: Boolean): Seq[Organization] = Await.result(getOrganizationsByDirtyBit(dirtyBit), Duration.Inf)
+    def getDirtyOrganizations: Seq[Organization] = Await.result(getOrganizationsByDirtyBit(dirtyBit = true), Duration.Inf)
 
-    def updateAddressAndDirtyBit(id: String, address: String, dirtyBit: Boolean): Int = Await.result(updateAddressAndDirtyBitByID(id, address, dirtyBit), Duration.Inf)
+    def refreshDirty(id: String, address: String): Int = Await.result(updateAddressAndDirtyBitByID(id, address, dirtyBit = false), Duration.Inf)
   }
 
   private def getIdByAddress(address: String)(implicit executionContext: ExecutionContext): Future[String] = db.run(organizationTable.filter(_.address === address).map(_.id).result.head.asTry).map {
@@ -129,12 +129,12 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
 
   object Utility {
     def dirtyEntityUpdater(): Future[Unit] = Future {
-      val dirtyOrganizations = Service.getDirtyOrganizations(dirtyBit = true)
+      val dirtyOrganizations = Service.getDirtyOrganizations
       Thread.sleep(sleepTime)
       for (dirtyOrganization <- dirtyOrganizations) {
         try {
           val responseAddress = getOrganization.Service.get(dirtyOrganization.id)
-          Service.updateAddressAndDirtyBit(dirtyOrganization.id, responseAddress.address, dirtyBit = false)
+          Service.refreshDirty(dirtyOrganization.id, responseAddress.address)
         }
         catch {
           case blockChainException: BlockChainException => logger.error(blockChainException.failure.message, blockChainException)
@@ -143,7 +143,6 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
       }
     }
   }
-
 
   actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
     Utility.dirtyEntityUpdater()

@@ -1,7 +1,7 @@
 @import models.blockchain.{ACLHash, Asset, Fiat}
 @import models.master.{Organization, Zone}
 
-@(username: String, userType: String, address: String, coins: Int = 0, assetPegWallet: Seq[Asset], fiatPegWallet: Seq[Fiat], totalFiat: Int, zone: Zone, organization: Organization, aclHash: ACLHash)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
+@(username: String, address: String, coins: Int = 0, assetPegWallet: Seq[Asset], fiatPegWallet: Seq[Fiat], totalFiat: Int, zone: Zone, organization: Organization, aclHash: ACLHash)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
 
 @common(Messages(constants.User.HOME)) {
     @if(aclHash.buyerExecuteOrder) {
@@ -47,7 +47,7 @@
     <a onclick="getForm(jsRoutes.controllers.SetBuyerFeedbackController.setBuyerFeedbackForm())">@Messages(constants.Form.SET_BUYER_FEEDBACK)</a>
     <a onclick="getForm(jsRoutes.controllers.SetSellerFeedbackController.setSellerFeedbackForm())">@Messages(constants.Form.SET_SELLER_FEEDBACK)</a>
 
-    @component.master.commonHome(username = username, userType = userType, address = address, coins = coins)
+    @component.master.commonHome(username = username, userType = constants.User.TRADER, address = address, coins = coins)
 
     <h2>@Messages(constants.Form.ZONE):</h2>
     @Messages(constants.Form.NAME): @zone.name <br>

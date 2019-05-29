@@ -1,7 +1,6 @@
 function getCookie(cookieName) {
     let name = cookieName + "=";
-    let decodedCookie = decodeURIComponent(document.cookie);
-    let cookieArray = decodedCookie.split(';');
+    let cookieArray = decodeURIComponent(document.cookie).split(';');
     for (let i = 0; i < cookieArray.length; i++) {
         let cookie = cookieArray[i];
         while (cookie.charAt(0) === ' ') {

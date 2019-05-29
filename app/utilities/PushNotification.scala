@@ -2,8 +2,7 @@ package utilities
 
 import exceptions.BaseException
 import javax.inject.Inject
-import models.master.Accounts
-import models.masterTransaction.{AccountTokens, Notifications}
+import models.{master, masterTransaction}
 import play.api.Configuration
 import play.api.i18n.{Lang, Langs, MessagesApi}
 import play.api.libs.json.{Json, OWrites}
@@ -11,7 +10,7 @@ import play.api.libs.ws.WSClient
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class PushNotification @Inject()(wsClient: WSClient, notifications: Notifications, accounts: Accounts, accountTokens: AccountTokens, langs: Langs, messagesApi: MessagesApi)(implicit exec: ExecutionContext, configuration: Configuration) {
+class PushNotification @Inject()(wsClient: WSClient, masterTransactionNotifications: masterTransaction.Notifications, masterAccounts: master.Accounts, masterTransactionAccountTokens: masterTransaction.AccountTokens, langs: Langs, messagesApi: MessagesApi)(implicit exec: ExecutionContext, configuration: Configuration) {
 
   private implicit val module: String = constants.Module.UTILITIES_PUSH_NOTIFICATION
 
@@ -19,12 +18,12 @@ class PushNotification @Inject()(wsClient: WSClient, notifications: Notification
 
   private val authorizationKey = configuration.get[String]("notification.authorizationKey")
 
-  def sendNotification(username: String, notification: constants.Notification.Notification, messageParameters: String*)(implicit lang: Lang = Lang(accounts.Service.getLanguage(username))) = Future {
+  def sendNotification(username: String, notification: constants.Notification.Notification, messageParameters: String*)(implicit lang: Lang = Lang(masterAccounts.Service.getLanguage(username))) = Future {
     try {
       val title = messagesApi(notification.title)
       val message = messagesApi(notification.message, messageParameters: _*)
-      notifications.Service.addNotification(username, title, message)
-      accountTokens.Service.getTokenById(username).foreach(notificationToken => wsClient.url(url).withHttpHeaders(constants.Header.CONTENT_TYPE -> constants.Header.APPLICATION_JSON).withHttpHeaders(constants.Header.AUTHORIZATION -> authorizationKey).post(Json.toJson(Data(notificationToken, Notification(title, message)))))
+      masterTransactionNotifications.Service.create(username, title, message)
+      masterTransactionAccountTokens.Service.getTokenById(username).foreach(notificationToken => wsClient.url(url).withHttpHeaders(constants.Header.CONTENT_TYPE -> constants.Header.APPLICATION_JSON).withHttpHeaders(constants.Header.AUTHORIZATION -> authorizationKey).post(Json.toJson(Data(notificationToken, Notification(title, message)))))
     } catch {
       case baseException: BaseException => throw new BaseException(baseException.failure)
     }
@@ -32,7 +31,7 @@ class PushNotification @Inject()(wsClient: WSClient, notifications: Notification
 
   private implicit val notificationWrites: OWrites[Notification] = Json.writes[Notification]
 
-  def registerNotificationToken(id: String, notificationToken: String): Int = accountTokens.Service.updateToken(id, notificationToken)
+  def registerNotificationToken(id: String, notificationToken: String): Int = masterTransactionAccountTokens.Service.updateToken(id, notificationToken)
 
   private implicit val dataWrites: OWrites[Data] = Json.writes[Data]
 

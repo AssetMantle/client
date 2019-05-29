@@ -31,7 +31,7 @@ class ReleaseAssetController @Inject()(messagesControllerComponents: MessagesCon
         releaseAssetData => {
           try {
             val ticketID: String = if (kafkaEnabled) transactionsReleaseAsset.Service.kafkaPost(transactionsReleaseAsset.Request(from = username, to = releaseAssetData.address, password = releaseAssetData.password, pegHash = releaseAssetData.pegHash, gas = releaseAssetData.gas)).ticketID else Random.nextString(32)
-            blockchainTransactionReleaseAssets.Service.addReleaseAsset(from = username, to = releaseAssetData.address, pegHash = releaseAssetData.pegHash, gas = releaseAssetData.gas, null, txHash = null, ticketID = ticketID, null)
+            blockchainTransactionReleaseAssets.Service.create(from = username, to = releaseAssetData.address, pegHash = releaseAssetData.pegHash, gas = releaseAssetData.gas, null, txHash = null, ticketID = ticketID, null)
             if (!kafkaEnabled) {
               Future {
                 try {

@@ -30,7 +30,7 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
         },
         addZoneData => {
           try {
-            masterZones.Service.addZone(accountID = username, name = addZoneData.name, currency = addZoneData.currency)
+            masterZones.Service.create(accountID = username, name = addZoneData.name, currency = addZoneData.currency)
             Ok(views.html.index(successes = Seq(constants.Response.ZONE_REQUEST_SENT)))
           }
           catch {
@@ -54,7 +54,7 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
           try {
             val zoneAccountAddress = masterAccounts.Service.getAddress(masterZones.Service.getAccountId(verifyZoneData.zoneID))
             val ticketID: String = if (kafkaEnabled) transactionsAddZone.Service.kafkaPost(transactionsAddZone.Request(from = username, to = zoneAccountAddress, zoneID = verifyZoneData.zoneID, password = verifyZoneData.password)).ticketID else Random.nextString(32)
-            blockchainTransactionAddZones.Service.addZone(username, zoneAccountAddress, verifyZoneData.zoneID, null, null, ticketID, null)
+            blockchainTransactionAddZones.Service.create(username, zoneAccountAddress, verifyZoneData.zoneID, null, null, ticketID, null)
 
             if (!kafkaEnabled) {
               Future {
@@ -71,7 +71,7 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
           }
           catch {
             case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
-            case blockChainException: BlockChainException => Ok(views.html.index(failures =Seq(blockChainException.failure)))
+            case blockChainException: BlockChainException => Ok(views.html.index(failures = Seq(blockChainException.failure)))
           }
         }
       )

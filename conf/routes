@@ -44,12 +44,12 @@ POST        /master/verifyZone                              controllers.AddZoneC
 
 GET         /master/viewVerifyZoneRequests                  controllers.AddZoneController.viewPendingVerifyZoneRequests
 GET         /master/rejectVerifyZoneRequest                 controllers.AddZoneController.rejectVerifyZoneRequestForm(zoneID: String)
-POST        /master/rejectVerifyZoneRequest                 controllers.AddZoneController.rejectVerifyZoneRequest
+POST        /master/rejectVerifyZoneRequest                controllers.AddZoneController.rejectVerifyZoneRequest
 
-GET         /master/verifyOrganization                      controllers.AddOrganizationController.verifyOrganizationForm(organizationID: String, zoneID: String)
-POST        /master/verifyOrganization                      controllers.AddOrganizationController.verifyOrganization
+GET         /master/verifyOrganization                     controllers.AddOrganizationController.verifyOrganizationForm(organizationID: String, zoneID: String)
+POST        /master/verifyOrganization                     controllers.AddOrganizationController.verifyOrganization
 
-GET         /master/viewVerifyOrganizationRequests          controllers.AddOrganizationController.viewPendingVerifyOrganizationRequests
+GET         /master/viewVerifyOrganizationRequests         controllers.AddOrganizationController.viewPendingVerifyOrganizationRequests
 GET         /master/rejectVerifyOrganizationRequest        controllers.AddOrganizationController.rejectVerifyOrganizationRequestForm(organizationID: String)
 POST        /master/rejectVerifyOrganizationRequest        controllers.AddOrganizationController.rejectVerifyOrganizationRequest
 
@@ -66,13 +66,13 @@ GET         /master/changeSellerBid                        controllers.ChangeSel
 POST        /master/changeSellerBid                        controllers.ChangeSellerBidController.changeSellerBid
 
 GET         /master/confirmBuyerBid                        controllers.ConfirmBuyerBidController.confirmBuyerBidForm
-POST        /master/confirmBuyerBid                         controllers.ConfirmBuyerBidController.confirmBuyerBid
+POST        /master/confirmBuyerBid                        controllers.ConfirmBuyerBidController.confirmBuyerBid
 
-GET         /master/confirmSellerBid                        controllers.ConfirmSellerBidController.confirmSellerBidForm
-POST        /master/confirmSellerBid                        controllers.ConfirmSellerBidController.confirmSellerBid
+GET         /master/confirmSellerBid                       controllers.ConfirmSellerBidController.confirmSellerBidForm
+POST        /master/confirmSellerBid                       controllers.ConfirmSellerBidController.confirmSellerBid
 
-GET         /master/issueAssetRequest                       controllers.IssueAssetController.issueAssetRequestForm
-POST        /master/issueAssetRequest                       controllers.IssueAssetController.issueAssetRequest
+GET         /master/issueAssetRequest                      controllers.IssueAssetController.issueAssetRequestForm
+POST        /master/issueAssetRequest                      controllers.IssueAssetController.issueAssetRequest
 
 GET         /master/viewPendingIssueAssetRequests           controllers.IssueAssetController.viewPendingIssueAssetRequests
 GET         /master/rejectIssueAssetRequest                 controllers.IssueAssetController.rejectIssueAssetRequestForm(requestID: String)
@@ -88,13 +88,13 @@ GET         /master/viewPendingIssueFiatRequests            controllers.IssueFia
 GET         /master/rejectIssueFiatRequest                  controllers.IssueFiatController.rejectIssueFiatRequestForm(requestID: String)
 POST        /master/rejectIssueFiatRequest                  controllers.IssueFiatController.rejectIssueFiatRequest
 
-GET         /master/issueFiat                               controllers.IssueFiatController.issueFiatForm(requestID: String, accountID: String, transactionID: String, transactionAmount: Int)
-POST        /master/issueFiat                               controllers.IssueFiatController.issueFiat
+GET         /master/issueFiat                              controllers.IssueFiatController.issueFiatForm(requestID: String, accountID: String, transactionID: String, transactionAmount: Int)
+POST        /master/issueFiat                              controllers.IssueFiatController.issueFiat
 
-GET         /master/redeemAsset                             controllers.RedeemAssetController.redeemAssetForm
-POST        /master/redeemAsset                             controllers.RedeemAssetController.redeemAsset
+GET         /master/redeemAsset                            controllers.RedeemAssetController.redeemAssetForm
+POST        /master/redeemAsset                            controllers.RedeemAssetController.redeemAsset
 
-GET         /master/redeemFiat                              controllers.RedeemFiatController.redeemFiatForm
+GET         /master/redeemFiat                             controllers.RedeemFiatController.redeemFiatForm
 POST        /master/redeemFiat                             controllers.RedeemFiatController.redeemFiat
 
 GET         /master/releaseAsset                           controllers.ReleaseAssetController.releaseAssetForm
@@ -113,13 +113,13 @@ GET         /master/sendCoin                               controllers.SendCoinC
 POST        /master/sendCoin                               controllers.SendCoinController.sendCoin
 
 GET         /master/requestCoins                           controllers.SendCoinController.requestCoinsForm
-POST        /master/requestCoins                            controllers.SendCoinController.requestCoins
+POST        /master/requestCoins                           controllers.SendCoinController.requestCoins
 
-GET         /master/viewPendingFaucetRequests               controllers.SendCoinController.viewPendingFaucetRequests
-GET         /master/approveFaucetRequests                   controllers.SendCoinController.approveFaucetRequestsForm(requestID: String, accountID: String)
-POST        /master/approveFaucetRequests                   controllers.SendCoinController.approveFaucetRequests
+GET         /master/viewPendingFaucetRequests              controllers.SendCoinController.viewPendingFaucetRequests
+GET         /master/approveFaucetRequests                  controllers.SendCoinController.approveFaucetRequestsForm(requestID: String, accountID: String)
+POST        /master/approveFaucetRequests                  controllers.SendCoinController.approveFaucetRequests
 
-GET         /master/rejectFaucetRequest                     controllers.SendCoinController.rejectFaucetRequestForm(requestID: String)
+GET         /master/rejectFaucetRequest                    controllers.SendCoinController.rejectFaucetRequestForm(requestID: String)
 POST        /master/rejectFaucetRequest                     controllers.SendCoinController.rejectFaucetRequest
 
 GET         /master/sendFiat                                controllers.SendFiatController.sendFiatForm

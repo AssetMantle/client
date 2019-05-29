@@ -33,7 +33,7 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
             if (issueAssetRequestData.unmoderated) {
               val fromAddress = masterAccounts.Service.getAddress(username)
               val ticketID: String = if (kafkaEnabled) transactionsIssueAsset.Service.kafkaPost(transactionsIssueAsset.Request(from = username, to = fromAddress, password = issueAssetRequestData.password, documentHash = issueAssetRequestData.documentHash, assetType = issueAssetRequestData.assetType, assetPrice = issueAssetRequestData.assetPrice, quantityUnit = issueAssetRequestData.quantityUnit, assetQuantity = issueAssetRequestData.assetQuantity, gas = issueAssetRequestData.gas, unmoderated = issueAssetRequestData.unmoderated)).ticketID else Random.nextString(32)
-              blockchainTransactionIssueAssets.Service.addIssueAsset(from = username, to = fromAddress, documentHash = issueAssetRequestData.documentHash, assetType = issueAssetRequestData.assetType, assetPrice = issueAssetRequestData.assetPrice, quantityUnit = issueAssetRequestData.quantityUnit, assetQuantity = issueAssetRequestData.assetQuantity, unmoderated = issueAssetRequestData.unmoderated, gas = issueAssetRequestData.gas, null, null, ticketID = ticketID, null)
+              blockchainTransactionIssueAssets.Service.create(from = username, to = fromAddress, documentHash = issueAssetRequestData.documentHash, assetType = issueAssetRequestData.assetType, assetPrice = issueAssetRequestData.assetPrice, quantityUnit = issueAssetRequestData.quantityUnit, assetQuantity = issueAssetRequestData.assetQuantity, unmoderated = issueAssetRequestData.unmoderated, gas = issueAssetRequestData.gas, null, null, ticketID = ticketID, null)
               if (!kafkaEnabled) {
                 Future {
                   try {
@@ -47,7 +47,7 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
               }
               Ok(views.html.index(successes = Seq(constants.Response.ASSET_ISSUED)))
             } else {
-              masterTransactionIssueAssetRequests.Service.addIssueAssetRequest(accountID = username, documentHash = issueAssetRequestData.documentHash, assetPrice = issueAssetRequestData.assetPrice, assetType = issueAssetRequestData.assetType, quantityUnit = issueAssetRequestData.quantityUnit, assetQuantity = issueAssetRequestData.assetQuantity)
+              masterTransactionIssueAssetRequests.Service.create(accountID = username, documentHash = issueAssetRequestData.documentHash, assetPrice = issueAssetRequestData.assetPrice, assetType = issueAssetRequestData.assetType, quantityUnit = issueAssetRequestData.quantityUnit, assetQuantity = issueAssetRequestData.assetQuantity)
               Ok(views.html.index(successes = Seq(constants.Response.ISSUE_ASSET_REQUEST_SENT)))
             }
           }
@@ -81,7 +81,7 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
         },
         rejectIssueAssetRequestData => {
           try {
-            masterTransactionIssueAssetRequests.Service.updateStatusAndComment(rejectIssueAssetRequestData.requestID, Option(false), rejectIssueAssetRequestData.comment)
+            masterTransactionIssueAssetRequests.Service.reject(id = rejectIssueAssetRequestData.requestID, comment = rejectIssueAssetRequestData.comment)
             Ok(views.html.index(successes = Seq(constants.Response.ISSUE_ASSET_REQUEST_REJECTED)))
           }
           catch {
@@ -106,8 +106,8 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
             val toAddress = masterAccounts.Service.getAddress(issueAssetData.accountID)
             if (masterTransactionIssueAssetRequests.Service.getStatus(issueAssetData.requestID).isEmpty) {
               val ticketID: String = if (kafkaEnabled) transactionsIssueAsset.Service.kafkaPost(transactionsIssueAsset.Request(from = username, to = toAddress, password = issueAssetData.password, documentHash = issueAssetData.documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.assetPrice, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.assetQuantity, gas = issueAssetData.gas, unmoderated = issueAssetData.unmoderated)).ticketID else Random.nextString(32)
-              blockchainTransactionIssueAssets.Service.addIssueAsset(from = username, to = toAddress, documentHash = issueAssetData.documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.assetPrice, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.assetQuantity, unmoderated = issueAssetData.unmoderated, gas = issueAssetData.gas, null, null, ticketID = ticketID, null)
-              masterTransactionIssueAssetRequests.Service.updateTicketIDStatusAndGas(issueAssetData.requestID, ticketID, true, issueAssetData.gas)
+              blockchainTransactionIssueAssets.Service.create(from = username, to = toAddress, documentHash = issueAssetData.documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.assetPrice, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.assetQuantity, unmoderated = issueAssetData.unmoderated, gas = issueAssetData.gas, null, null, ticketID = ticketID, null)
+              masterTransactionIssueAssetRequests.Service.accept(issueAssetData.requestID, ticketID, issueAssetData.gas)
               if (!kafkaEnabled) {
                 Future {
                   try {
@@ -149,7 +149,6 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
             transactionsIssueAsset.Service.post(transactionsIssueAsset.Request(from = issueAssetData.from, to = issueAssetData.to, password = issueAssetData.password, documentHash = issueAssetData.documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.assetPrice, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.assetQuantity, gas = issueAssetData.gas, unmoderated = issueAssetData.unmoderated))
           }
           Ok(views.html.index(successes = Seq(constants.Response.ASSET_ISSUED)))
-
         }
         catch {
           case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))

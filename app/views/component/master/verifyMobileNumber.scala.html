@@ -3,15 +3,15 @@
 
 @(verifyMobileNumberForm: Form[VerifyMobileNumber.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @form(action = routes.VerifyMobileNumberController.verifyMobileNumber, 'onkeypress -> "validateForm(event,this)") {
-  @CSRF.formField
-  @inputText(verifyMobileNumberForm(constants.Form.OTP), '_label -> Messages(constants.Form.OTP))
+    @CSRF.formField
+    @inputText(verifyMobileNumberForm(constants.Form.OTP), '_label -> Messages(constants.Form.OTP))
 
-  @if(verifyMobileNumberForm.hasGlobalErrors) {
-    <ul>
-    @for(error <- verifyMobileNumberForm.globalErrors) {
-      <li>@error.format</li>
+    @if(verifyMobileNumberForm.hasGlobalErrors) {
+        <ul>
+        @for(error <- verifyMobileNumberForm.globalErrors) {
+            <li>@error.format</li>
+        }
+        </ul>
     }
-    </ul>
-  }
-  <button type="button" onclick="submitForm(this)">@Messages(constants.Form.VERIFY_MOBILE_NUMBER)</button>
+    <button type="button" onclick="submitForm(this)">@Messages(constants.Form.VERIFY_MOBILE_NUMBER)</button>
 }
