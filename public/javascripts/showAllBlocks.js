@@ -2,13 +2,12 @@ getConfigurationAsynchronously("blockchain.main.wsIP");
 getConfigurationAsynchronously("blockchain.main.abciPort");
 getConfigurationAsynchronously("blockchain.main.ip");
 
-let showAllBlocksTableBody = "allBlocksTableBody";
-let click = 0;
+setCookie("showAllBlocksTableClick", 0, 1);
 
 function initialTableContent() {
     let wsURL = getConfiguration("blockchain.main.wsIP") + ":" + getConfiguration("blockchain.main.abciPort") + "/websocket";
-    click = 0;
-    changeTableContent(click);
+    setCookie("showAllBlocksTableClick", 0, 1);
+    changeTableContent(parseInt(getCookie("showAllBlocksTableClick"), 10));
 
     window.addEventListener("load", function (evt) {
         let wsNewBlock = new WebSocket(wsURL);
@@ -18,30 +17,32 @@ function initialTableContent() {
         };
 
         wsNewBlock.onmessage = function (message) {
-            if (click === 0) {
+            if (parseInt(getCookie("showAllBlocksTableClick"), 10) === 0) {
                 let dataNewBlock = JSON.parse(message.data);
-                let blockContainerList = document.getElementById(showAllBlocksTableBody);
+                let blockContainerList = document.getElementById("allBlocksTableBody");
                 let height = parseInt(dataNewBlock["result"]["data"]["value"]["block"]["header"]["height"], 10);
-                blockContainerList.removeChild(blockContainerList.childNodes[blockContainerList.childNodes.length - 1]);
-                $('#' + showAllBlocksTableBody).prepend("<tr><td>" + height + "</td><td>" + dataNewBlock["result"]["data"]["value"]["block"]["header"]["time"] + "</td><td>" + dataNewBlock["result"]["data"]["value"]["block"]["header"]["num_txs"] + "</td></td></tr>");
+                blockContainerList.removeChild(blockContainerList.childNodes[(blockContainerList.childNodes.length - 1)]);
+                $('#allBlocksTableBody').prepend("<tr><td>" + height + "</td><td>" + dataNewBlock["result"]["data"]["value"]["block"]["header"]["time"] + "</td><td>" + dataNewBlock["result"]["data"]["value"]["block"]["header"]["num_txs"] + "</td></td></tr>");
             }
         };
 
         wsNewBlock.onerror = function (evt) {
-            if (click === 0) {
-                document.getElementById(showAllBlocksTableBody).appendChild(document.createElement("div").innerHTML = "ERROR: " + evt.data);
+            if (parseInt(getCookie("showAllBlocksTableClick"), 10) === 0) {
+                document.getElementById("allBlocksTableBody").appendChild(document.createElement("div").innerHTML = "ERROR: " + evt.data);
             }
         };
     });
 }
 
 function onClickNext() {
-    click += 1;
+    let click = parseInt(getCookie("showAllBlocksTableClick"), 10) + 1;
+    setCookie("showAllBlocksTableClick", click, 1);
     changeTableContent(click);
 }
 
 function onClickPrevious() {
-    click -= 1;
+    let click = parseInt(getCookie("showAllBlocksTableClick"), 10) - 1;
+    setCookie("showAllBlocksTableClick", click, 1);
     if (click > 0) {
         changeTableContent(click);
     } else {
@@ -69,7 +70,7 @@ function changeTableContent(clickValue) {
                             Array.prototype.forEach.call(blocks, block => {
                                 content = content + "<tr><td>" + block["header"]["height"] + "</td><td>" + block["header"]["time"] + "</td><td>" + block["header"]["num_txs"] + "</td></td></tr>";
                             });
-                            $('#' + showAllBlocksTableBody).empty().append(content);
+                            $('#allBlocksTableBody').empty().append(content);
                         }
                     }
                 });
@@ -83,6 +84,7 @@ function showAllBlocksTable() {
     $('#txHashBottomDivision').hide();
     $('#indexBottomDivision').hide();
     $('#validatorsTable').hide();
+    initialTableContent();
     $('#allBlocksTable').show();
 }
 

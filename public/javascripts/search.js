@@ -1,7 +1,7 @@
-let invalidBlockHeight = "";
-let invalidTransactionHash = "";
-
 function searchFunction(searchData) {
+    let invalidBlockHeight = "";
+    let invalidTransactionHash = "";
+
     $("#searchForm").submit(function(e) {
         e.preventDefault();
     });
