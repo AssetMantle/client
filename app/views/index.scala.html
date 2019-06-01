@@ -1,7 +1,8 @@
-@import views.html.component.blockchain.{blockExplorer, transactionExplorer, transactionHash, allBlocksTable, validatorsTable, blockHeight, validators, lastBlockHeight, averageBlockTime, search, blockTimeGraph}
+@import views.html.component.blockchain._
 @(failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
 
 @common(Messages(constants.Form.INDEX), failures, warnings, successes, infos) {
+@*
     <a onclick="getForm(jsRoutes.controllers.LoginController.loginForm())">@Messages(constants.Form.LOGIN)</a>
     <a onclick="getForm(jsRoutes.controllers.LogoutController.logoutForm())">@Messages(constants.Form.LOGOUT)</a>
     <a onclick="getForm(jsRoutes.controllers.SignUpController.signUpForm())">@Messages(constants.Form.SIGNUP)</a>
@@ -48,24 +49,25 @@
     <a onclick="getForm(jsRoutes.controllers.SendFiatController.blockchainSendFiatForm())">@Messages(constants.Form.SEND_FIAT)</a>
     <a onclick="getForm(jsRoutes.controllers.SetACLController.blockchainSetACLForm())">@Messages(constants.Form.SET_ACL)</a>
     <a onclick="getForm(jsRoutes.controllers.SetBuyerFeedbackController.blockchainSetBuyerFeedbackForm())">@Messages(constants.Form.SET_BUYER_FEEDBACK)</a>
-    <a onclick="getForm(jsRoutes.controllers.SetSellerFeedbackController.blockchainSetSellerFeedbackForm">@Messages(constants.Form.SET_SELLER_FEEDBACK)</a>
-
+    <a onclick="getForm(jsRoutes.controllers.SetSellerFeedbackController.blockchainSetSellerFeedbackForm())">@Messages(constants.Form.SET_SELLER_FEEDBACK)</a>
+*@
     <div class="flex-container">
         <div class="flex-item">
         @search()
         </div>
     </div>
     <div class="flex-container">
-        <div class="flex-item">@lastBlockHeight()</div>
-        <div class="flex-item">@validators()</div>
-        <div class="flex-item"> @Messages(constants.Form.TOKENS)
+        <div class="flex-item box">@lastBlockHeight()</div>
+        <div class="flex-item box">@validators()</div>
+        <div class="flex-item box"> @Messages(constants.Form.TOKENS)
             <p id="tokensValue"></p></div>
-        <div class="flex-item">@averageBlockTime()</div>
+        <div class="flex-item box">@averageBlockTime()</div>
     </div>
     <div  id="indexBottomDivision" class="flex-container">
-            <div class="flex-graph"> @blockTimeGraph()</div>
-            <div class="flex-tables">@blockExplorer()</div>
-            <div class="flex-tables"> @transactionExplorer()</div>
+            <div class="box flex-graph flex-growth"> @blockTimeGraph()</div>
+            <div class="flex-growth box center-text" id="blockExplorer">@blockExplorer()</div>
+            <div  class="flex-growth box" id="transactionExplorer"> @transactionExplorer()</div>
+    </div>
 
         @transactionHash()
 
@@ -74,31 +76,7 @@
         @validatorsTable()
 
         @allBlocksTable()
-    </div>
 
-    @*
-    <div class="mainDivision">
-        <div class="topDivision">
-            @search()
-        </div>
-        <div class="box1">@lastBlockHeight()</div>
-        <div class="box2">@validators()</div>
-        <div class="box3"> @Messages(constants.Form.TOKENS)
-            <p id="tokensValue"></p></div>
-        <div class="box4">@averageBlockTime()</div>
-        <div id="indexBottomDivision" class="indexBottomDivision">
-            @blockTimeGraph()
-            @blockExplorer()
-            @transactionExplorer()
-        </div>
-
-        @transactionHash()
-
-        @blockHeight()
-
-        @validatorsTable()
-
-        @allBlocksTable()
-    </div>
-*@
+<script src="@routes.Assets.versioned("javascripts/back.js")" type="text/javascript"></script>
+<script>back()</script>
 }

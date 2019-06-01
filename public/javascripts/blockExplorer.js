@@ -77,7 +77,7 @@ function blockExplorer(){
                                     let differenceBetweenBlockTime = (blockTime.getTime() - new Date(lastBlockTime).getTime()) / 1000;
                                     let blockContainerList = document.getElementById(blockExplorerTableBody);
                                     blockContainerList.removeChild(blockContainerList.childNodes[blockContainerList.childNodes.length - 2]);
-                                    $('#' + blockExplorerTableBody).prepend("<tr><td><button onclick='searchFunction("+ JSON.stringify(height) +")'>" + height + "</button></td><td>" + numTxs + "</td><td ><div class='timer_div' id='" + timerID + "'></div></td></tr>");
+                                    $('#' + blockExplorerTableBody).prepend("<tr><td><button onclick='searchFunction("+ JSON.stringify(height) +")'>" + height + "</button></td><td>" + numTxs + "</td><td ><div id='" + timerID + "'></div></td></tr>");
                                     getBlockTime(time, timerID);
                                     updateGraph("blockTimes", [height + "::" + blockTime.getHours() + ":" + blockTime.getMinutes() + ":" + blockTime.getSeconds()], [differenceBetweenBlockTime], maxNumberOfItems - 1);
                                     lastBlockTime = time;

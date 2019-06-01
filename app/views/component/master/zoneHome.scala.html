@@ -12,13 +12,14 @@
     <a onclick="getForm(jsRoutes.controllers.SellerExecuteOrderController.sellerExecuteOrderForm())">@Messages(constants.Form.SELLER_EXECUTE_ORDER)</a>
     <a onclick="getForm(jsRoutes.controllers.SetACLController.setACLForm())">@Messages(constants.Form.SET_ACL)</a>
 
-    @component.master.commonHome(username = username, userType = constants.User.ZONE, address = address, coins = coins)
-
-    <br>
-    <h2>@Messages(constants.Form.ZONE):</h2>
-    @Messages(constants.Form.NAME): @zone.name <br>
-    @Messages(constants.Form.ZONE_ID): @zone.id <br>
-    @Messages(constants.Form.CURRENCY): @zone.currency <br>
-    @Messages(constants.Form.VERIFIED_STATUS): @zone.status <br>
-    <br>
+    <div class="flex-container">
+        @component.master.commonHome(username = username, userType = constants.User.ZONE, address = address, coins = coins)
+        <div class="flex-item box left-align flex-growth">
+            <h2>@Messages(constants.Form.ZONE):</h2>
+            @Messages(constants.Form.NAME): @zone.name <br>
+            @Messages(constants.Form.ZONE_ID): @zone.id <br>
+            @Messages(constants.Form.CURRENCY): @zone.currency <br>
+            @Messages(constants.Form.VERIFIED_STATUS): @zone.status <br>
+        </div>
+    </div>
 }

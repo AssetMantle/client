@@ -17,6 +17,19 @@
     <body>
         <div class="pageContent">
             <div class="stickyBar">
+                <div class = "navbar">
+                    <a class="active" href="#">Home</a>
+                        <a href="#">News</a>
+                    <a href="#">Contact</a>
+                    <a class="right" onclick="getForm(jsRoutes.controllers.SignUpController.signUpForm())">@Messages(constants.Form.SIGNUP)</a>
+                    <a class="right" onclick="getForm(jsRoutes.controllers.LogoutController.logoutForm())">@Messages(constants.Form.LOGOUT)</a>
+                    <a class="right" onclick="getForm(jsRoutes.controllers.LoginController.loginForm())">@Messages(constants.Form.LOGIN)</a>
+                    <a class="right notification" onclick="getForm(jsRoutes.controllers.NotificationController.notificationPage(0))">@Messages(constants.Form.INBOX)
+                    <span class="badge" id="notificationBadge">0</span>
+                    </a>
+
+                </div>
+
                 @for(failure <- failures) {
                     <div class="alert failure" onclick="getForm(@failure.action)">
                         <span class="closeButton">x</span>

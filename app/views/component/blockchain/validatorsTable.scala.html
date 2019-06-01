@@ -1,5 +1,5 @@
 @()(implicit messagesProvider: MessagesProvider)
-<div id="validatorsTable" class="validatorsTableBottomDivision">
+<div id="validatorsTable">
     <table>
         <thead>
             <tr>
@@ -11,7 +11,7 @@
         </thead>
         <tbody id="validatorsTableBody"></tbody>
     </table>
-    <button onclick='goBackValidatorsTable()' >@Messages(constants.Form.BACK)</button>
+    <button onclick='back()' >@Messages(constants.Form.BACK)</button>
 </div>
 <script>validatorsTable("validatorsTableBody")</script>
 <script src="@routes.Assets.versioned("javascripts/validators.js")" type="text/javascript"></script>

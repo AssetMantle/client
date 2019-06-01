@@ -1,21 +1,30 @@
 @import models.blockchain.Fiat
 
 @(fiatPegWallet: Seq[Fiat])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
-
-<table>
+    @*
+    <table>
     <tr>
-        <th>@Messages(constants.Form.PEG_HASH)</th>
-        <th>@Messages(constants.Form.TRANSACTION_ID)</th>
-        <th>@Messages(constants.Form.TRANSACTION_AMOUNT)</th>
-        <th>@Messages(constants.Form.REDEEM_AMOUNT)</th>
+    <th>@Messages(constants.Form.PEG_HASH)</th>
+    <th>@Messages(constants.Form.TRANSACTION_ID)</th>
+    <th>@Messages(constants.Form.TRANSACTION_AMOUNT)</th>
+    <th>@Messages(constants.Form.REDEEM_AMOUNT)</th>
     </tr>
     @for(fiat <- fiatPegWallet) {
-        <tr>
-            <td>@fiat.pegHash</td>
-            <td>@fiat.transactionID</td>
-            <td>@fiat.transactionAmount</td>
-            <td>@fiat.redeemedAmount</td>
-        </tr>
+    <tr>
+    <td>@fiat.pegHash</td>
+    <td>@fiat.transactionID</td>
+    <td>@fiat.transactionAmount</td>
+    <td>@fiat.redeemedAmount</td>
+    </tr>
     }
-</table>
-<br>
+    </table>
+    *@
+    @for(fiat <- fiatPegWallet) {
+        <div class="flex-item box left-align set-background-color" style="--color: #dc97ff;">
+            @Messages(constants.Form.PEG_HASH) : @fiat.pegHash <br>
+            @Messages(constants.Form.TRANSACTION_ID) : @fiat.transactionID <br>
+            @Messages(constants.Form.TRANSACTION_AMOUNT) : @fiat.transactionAmount <br>
+            @Messages(constants.Form.REDEEM_AMOUNT) : @fiat.redeemedAmount
+        </div>
+    }
+    <br>
