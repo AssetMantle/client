@@ -5,14 +5,14 @@ name := "comdex"
 
 version := "1.0"
 
-lazy val gatlingTest = config("gatling") extend Test
+lazy val GatlingTest = config("gatling") extend Test
 
-scalaSource in gatlingTest := baseDirectory.value / "gatling/simulation"
+scalaSource in GatlingTest := baseDirectory.value / "gatling/simulation"
 
 lazy val root = (project in file(".")).enablePlugins(PlayScala)
   .enablePlugins(GatlingPlugin)
-  .configs(gatlingTest)
-  .settings(inConfig(gatlingTest)(Defaults.testSettings): _*)
+  .configs(GatlingTest)
+  .settings(inConfig(GatlingTest)(Defaults.testSettings): _*)
 
 resolvers += "scalaz-bintray" at "https://dl.bintray.com/scalaz/releases"
 
