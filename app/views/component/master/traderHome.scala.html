@@ -47,16 +47,16 @@
     <a onclick="getForm(jsRoutes.controllers.SetBuyerFeedbackController.setBuyerFeedbackForm())">@Messages(constants.Form.SET_BUYER_FEEDBACK)</a>
     <a onclick="getForm(jsRoutes.controllers.SetSellerFeedbackController.setSellerFeedbackForm())">@Messages(constants.Form.SET_SELLER_FEEDBACK)</a>
 
-    <div class="flex-container">
+    <div class="flexContainer">
         @component.master.commonHome(username = username, userType = constants.User.TRADER, address = address, coins = coins)
-        <div class="flex-growth flex-item box left-align">
+        <div class="flexGrowth flexItem box leftAlign">
             <h2>@Messages(constants.Form.ZONE):</h2>
             @Messages(constants.Form.NAME): @zone.name <br>
             @Messages(constants.Form.ZONE_ID): @zone.id <br>
             @Messages(constants.Form.CURRENCY): @zone.currency <br>
             @Messages(constants.Form.VERIFIED_STATUS): @zone.status <br>
         </div>
-        <div class="flex-growth flex-item box left-align">
+        <div class="flexGrowth flexItem box leftAlign">
             <h2>@Messages(constants.Form.ORGANIZATION):</h2>
             @Messages(constants.Form.ORGANIZATION_NAME): @organization.name <br>
             @Messages(constants.Form.ORGANIZATION_ID): @organization.id <br>
@@ -68,13 +68,19 @@
         </div>
     </div>
 
-    <h2 class="center-text">@Messages(constants.User.ASSETS_OWNED) </h2>
-    <div class="flex-container">
+    <div>
+        <h2 class="centerText cursorPointer" onclick="hideUnhide(this)">@Messages(constants.User.ASSETS_OWNED) </h2>
+        <div class="flexContainer">
         @component.master.assetsTable(assetPegWallet)
+        </div>
     </div>
-    <h2 class="center-text">@Messages(constants.User.FIATS_OWNED) </h2>
-    <p class="center-text">@Messages(constants.User.FIATS_TOTAL_VALUE): @totalFiat </p>
-    <div class="flex-container">
-    @component.master.fiatsTable(fiatPegWallet)
+
+    <div>
+        <h2 class="centerText cursorPointer" onclick="hideUnhide(this)">@Messages(constants.User.FIATS_OWNED): @totalFiat</h2>
+        @*<p class="centerText">@Messages(constants.User.FIATS_TOTAL_VALUE): @totalFiat </p>*@
+        <div class="flexContainer">
+        @component.master.fiatsTable(fiatPegWallet)
+        </div>
     </div>
+    <script src="@routes.Assets.versioned("javascripts/style/hideElement.js")" type="text/javascript"></script>
 }

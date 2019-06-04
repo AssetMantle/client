@@ -31,7 +31,7 @@ body {
     background-color: rgba(0, 0, 0, 0.4);
 }
 
-.modal-content {
+.modalContent {
     background-color: #fefefe;
     padding: 2%;
     position: fixed;
@@ -99,7 +99,7 @@ body {
     background: #333;
 }
 
-.center-screen {
+.centerScreen {
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -179,7 +179,7 @@ blur(5 px);
 }
 
 .navbar a.active {
-    background-color: #4CAF50;
+    background-color: #3a53bc;
     color: white;
 }
 
@@ -205,25 +205,26 @@ blur(5 px);
 }
 
 /*Flex*/
-.flex-container {
+.flexContainer {
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
 }
 
-.flex-item {
+.flexItem {
     margin: 20px;
     text-align: center;
     padding: 10px;
     padding-top: 15px;
 }
 
-.flex-graph {
+
+.flexGraph {
     margin: 10px;
     width: 1000px;
 }
 
-.flex-growth {
+.flexGrowth {
     flex-grow: 1;
 }
 
@@ -232,25 +233,32 @@ blur(5 px);
 .box {
     border: 2px solid #8faab8;
     margin: 10px;
+    padding: 5px;
+    border-radius: 10px;
+
 }
 
-.left-align{
+.box:hover {
+    box-shadow: 0 12px 16px 0 rgba(0, 0, 0, 0.24), 0 17px 50px 0 rgba(0, 0, 0, 0.19);
+}
+
+.leftAlign {
     text-align: left;
 }
 
-.center-text{
+.centerText {
     text-align: center;
 }
 
-.width{
+.width {
     width: max-content;
 }
 
-.left-side {
+.leftSide {
     float: left;
 }
 
-.dynamic-table {
+.dynamicTable {
     display: table;
     border-collapse: collapse;
     margin: auto;
@@ -262,28 +270,49 @@ blur(5 px);
     flex-grow: 1;
 }
 
-.dynamic-table tr:nth-child(even) {
+.dynamicTable tr:nth-child(even) {
     background-color: #f2f2f2;
 }
 
-.dynamic-table tr:hover {
-    background-color: yellow;
+.dynamicTable th {
+    background-color: #a8b1ff;
 }
 
-.set-background-color {
+.dynamicTable tr:hover {
+    background-color: #ffce92;
+}
+
+.setBackgroundColor {
     background-color: var(--color);
 }
 
 button {
-    background-color: darkseagreen;
+    background-color: #3a53bc;
     border: none;
     color: white;
-    padding: 15px 32px;
+    padding: 10px 32px;
     text-align: center;
     width: auto;
     height: auto;
     text-decoration: none;
     display: inline-block;
     font-size: 16px;
-    margin: 10px;
+    margin: 5px;
+    border-radius: 5px;
+}
+
+.cursorPointer{
+    cursor: pointer;
+}
+
+button:hover {
+    cursor: pointer;
+}
+
+a:hover {
+    cursor: pointer;
+}
+
+input:hover{
+    cursor: crosshair;
 }

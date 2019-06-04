@@ -3,9 +3,9 @@
 @(username: String, address: String, coins: Int = 0, organization: Organization)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
 
 @common(Messages(constants.User.HOME)) {
-    <div class="flex-container">
+    <div class="flexContainer">
         @component.master.commonHome(username = username, userType = constants.User.ORGANIZATION, address = address, coins = coins)
-        <div class="flex-item box left-align">
+        <div class="flexItem box leftAlign">
             <h2>@Messages(constants.Form.ORGANIZATION)</h2>
             @Messages(constants.Form.ORGANIZATION_NAME): @organization.name <br>
             @Messages(constants.Form.ORGANIZATION_ID): @organization.id <br>

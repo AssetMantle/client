@@ -1,34 +1,9 @@
 @import models.blockchain.Asset
 
 @(assetPegWallet: Seq[Asset])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
-    @*
-    <table>
-    <tr>
-    <th>@Messages(constants.Form.PEG_HASH)</th>
-    <th>@Messages(constants.Form.DOCUMENT_HASH)</th>
-    <th>@Messages(constants.Form.ASSET_TYPE)</th>
-    <th>@Messages(constants.Form.ASSET_QUANTITY)</th>
-    <th>@Messages(constants.Form.ASSET_PRICE)</th>
-    <th>@Messages(constants.Form.QUANTITY_UNIT)</th>
-    <th>@Messages(constants.Form.UNMODERATED)</th>
-    <th>@Messages(constants.Form.LOCKED)</th>
-    </tr>
+
     @for(asset <- assetPegWallet) {
-    <tr>
-    <td>@asset.pegHash</td>
-    <td>@asset.documentHash</td>
-    <td>@asset.assetType</td>
-    <td>@asset.assetQuantity</td>
-    <td>@asset.assetPrice</td>
-    <td>@asset.quantityUnit</td>
-    <td>@asset.unmoderated</td>
-    <td>@asset.locked</td>
-    </tr>
-    }
-    </table>
-    *@
-    @for(asset <- assetPegWallet) {
-        <div class="flex-item box left-align set-background-color" style="--color: #d2ff7d;">
+        <div class="flexItem box leftAlign setBackgroundColor" style="--color: #ffd4ea;">
             @Messages(constants.Form.PEG_HASH) : @asset.pegHash <br>
             @Messages(constants.Form.DOCUMENT_HASH) : @asset.documentHash <br>
             @Messages(constants.Form.ASSET_TYPE) : @asset.assetType <br>

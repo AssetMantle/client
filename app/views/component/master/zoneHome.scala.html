@@ -12,9 +12,9 @@
     <a onclick="getForm(jsRoutes.controllers.SellerExecuteOrderController.sellerExecuteOrderForm())">@Messages(constants.Form.SELLER_EXECUTE_ORDER)</a>
     <a onclick="getForm(jsRoutes.controllers.SetACLController.setACLForm())">@Messages(constants.Form.SET_ACL)</a>
 
-    <div class="flex-container">
+    <div class="flexContainer">
         @component.master.commonHome(username = username, userType = constants.User.ZONE, address = address, coins = coins)
-        <div class="flex-item box left-align flex-growth">
+        <div class="flexItem box leftAlign flexGrowth">
             <h2>@Messages(constants.Form.ZONE):</h2>
             @Messages(constants.Form.NAME): @zone.name <br>
             @Messages(constants.Form.ZONE_ID): @zone.id <br>

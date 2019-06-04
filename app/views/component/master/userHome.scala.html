@@ -3,7 +3,7 @@
 @common(Messages(constants.User.HOME)) {
     <a onclick="getForm(jsRoutes.controllers.AddOrganizationController.addOrganizationForm())">@Messages(constants.Form.ADD_ORGANIZATION)</a>
             <a onclick="getForm(jsRoutes.controllers.AddZoneController.addZoneForm())">@Messages(constants.Form.ADD_ZONE)</a>
-            <div class="flex-container">
+            <div class="flexContainer">
                 @component.master.commonHome(username = username, userType = constants.User.USER, address = address, coins = coins)
             </div>
 }
