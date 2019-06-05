@@ -229,7 +229,7 @@ blur(5 px);
 }
 
 /*Flex*/
-
+/*Box*/
 .box {
     border: 2px solid #8faab8;
     margin: 10px;
@@ -241,23 +241,9 @@ blur(5 px);
 .box:hover {
     box-shadow: 0 12px 16px 0 rgba(0, 0, 0, 0.24), 0 17px 50px 0 rgba(0, 0, 0, 0.19);
 }
+/*Box*/
 
-.leftAlign {
-    text-align: left;
-}
-
-.centerText {
-    text-align: center;
-}
-
-.width {
-    width: max-content;
-}
-
-.leftSide {
-    float: left;
-}
-
+/*Table*/
 .dynamicTable {
     display: table;
     border-collapse: collapse;
@@ -282,10 +268,9 @@ blur(5 px);
     background-color: #ffce92;
 }
 
-.setBackgroundColor {
-    background-color: var(--color);
-}
+/*Table*/
 
+/*Button*/
 button {
     background-color: #3a53bc;
     border: none;
@@ -301,18 +286,87 @@ button {
     border-radius: 5px;
 }
 
-.cursorPointer{
+button:hover {
     cursor: pointer;
 }
 
-button:hover {
+/*Button*/
+
+.cursorPointer:hover {
     cursor: pointer;
+    color: blue;
 }
 
 a:hover {
     cursor: pointer;
 }
 
-input:hover{
+input:hover {
     cursor: crosshair;
 }
+
+input {
+    width: 135%;
+}
+
+.setBackgroundColor {
+    background-color: var(--color);
+}
+
+.leftAlign {
+    text-align: left;
+}
+
+.centerText {
+    text-align: center;
+}
+
+.width {
+    width: max-content;
+}
+
+.leftSide {
+    float: left;
+}
+
+/*.info {*/
+/*    display: none;*/
+/*}*/
+
+/*ToolTip*/
+dl {
+    position: relative;
+    width: max-content;
+    margin: 10px;
+}
+
+dd {
+    width: max-content;
+}
+dl .info {
+    visibility: hidden;
+    width: 150px;
+    background-color: #dadada;
+    color: #474747;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 0;
+    position: relative;
+    top: 5px;
+    float: right;
+}
+
+dl .info::after {
+    content: "";
+    position: absolute;
+    bottom: 25px;
+    left: 20px;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent transparent #dadada transparent;
+}
+dl:hover .info {
+    visibility: visible;
+}
+/*ToolTip*/
