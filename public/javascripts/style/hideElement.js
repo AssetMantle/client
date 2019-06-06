@@ -1,3 +1,3 @@
-$(".showHide").click(function (event) {
-    $(this).next().toggle("fast");
+$(".showHide").click(function () {
+    $(this).next().toggle("slow");
 });

@@ -69,18 +69,17 @@
     </div>
 
     <div>
-        <h2 class="centerText cursorPointer showHide">@Messages(constants.User.ASSETS_OWNED) </h2>
+        <h2 class="showHide centerText">@Messages(constants.User.ASSETS_OWNED) </h2>
         <div class="flexContainer">
-        @component.master.assetsTable(assetPegWallet)
+        @component.master.assetList(assetPegWallet)
         </div>
     </div>
 
     <div>
-        <h2 class="centerText cursorPointer showHide">@Messages(constants.User.FIATS_OWNED): @totalFiat</h2>
+        <h2 class="showHide centerText">@Messages(constants.User.FIATS_OWNED): @totalFiat</h2>
         @*<p class="centerText">@Messages(constants.User.FIATS_TOTAL_VALUE): @totalFiat </p>*@
         <div class="flexContainer">
-        @component.master.fiatsTable(fiatPegWallet)
+        @component.master.fiatList(fiatPegWallet)
         </div>
     </div>
-    <script src="@routes.Assets.versioned("javascripts/style/hideElement.js")" type="text/javascript"></script>
 }
