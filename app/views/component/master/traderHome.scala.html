@@ -54,9 +54,11 @@
 
     <div>
         <h2 class="showHide centerText">@Messages(constants.User.ASSETS_OWNED) </h2>
-        @if(aclHash.sendAsset) {
-            <a onclick="getForm(jsRoutes.controllers.SendAssetController.sendAssetForm())">@Messages(constants.Form.SEND_ASSET)</a>
+        <div class="centerText">
+        @if(aclHash.issueAsset) {
+            <button onclick="getForm(jsRoutes.controllers.IssueAssetController.issueAssetRequestForm())">@Messages(constants.Form.ISSUE_ASSET_REQUEST)</button>
         }
+        </div>
         <div class="flexContainer">
         @component.master.assetList(assetPegWallet, aclHash)
         </div>
@@ -64,10 +66,17 @@
 
     <div>
         <h2 class="showHide centerText">@Messages(constants.User.FIATS_OWNED): @totalFiat</h2>
-        @if(aclHash.sendFiat) {
-            <a onclick="getForm(jsRoutes.controllers.SendFiatController.sendFiatForm())">@Messages(constants.Form.SEND_FIAT)</a>
-        }
-        @*<p class="centerText">@Messages(constants.User.FIATS_TOTAL_VALUE): @totalFiat </p>*@
+        <div class="centerText">
+            @if(aclHash.issueFiat) {
+                <button onclick="getForm(jsRoutes.controllers.IssueFiatController.issueFiatRequestForm())">@Messages(constants.Form.ISSUE_FIAT_REQUEST)</button>
+            }
+            @if(aclHash.redeemFiat) {
+                <button onclick="getForm(jsRoutes.controllers.RedeemFiatController.redeemFiatForm())">@Messages(constants.Form.REDEEM_FIAT)</button>
+            }
+            @if(aclHash.sendFiat) {
+                <button onclick="getForm(jsRoutes.controllers.SendFiatController.sendFiatForm())">@Messages(constants.Form.SEND_FIAT)</button>
+            }
+        </div>
         <div class="flexContainer">
         @component.master.fiatList(fiatPegWallet, aclHash)
         </div>

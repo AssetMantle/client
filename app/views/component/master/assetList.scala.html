@@ -4,7 +4,8 @@
 @(assetPegWallet: Seq[Asset], aclHash: ACLHash)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
 
     @for(asset <- assetPegWallet) {
-        <div class="flexItem box leftAlign setBackgroundColor" style="--color: #ffd4ea;">
+        <div class="flexItem box assetBackgroundColor">
+            <div class="leftAlign">
             @Messages(constants.Form.PEG_HASH) : @asset.pegHash <br>
             @Messages(constants.Form.DOCUMENT_HASH) : @asset.documentHash <br>
             @Messages(constants.Form.ASSET_TYPE) : @asset.assetType <br>
@@ -12,9 +13,15 @@
             @Messages(constants.Form.ASSET_PRICE) : @asset.assetPrice <br>
             @Messages(constants.Form.QUANTITY_UNIT) : @asset.quantityUnit <br>
             @Messages(constants.Form.UNMODERATED) : @asset.unmoderated <br>
-            @Messages(constants.Form.LOCKED) : @asset.locked
-            @if(aclHash.redeemAsset) {
-                <a onclick="getForm(jsRoutes.controllers.RedeemAssetController.redeemAssetForm())">@Messages(constants.Form.REDEEM_ASSET)</a>
+            @Messages(constants.Form.LOCKED) : @asset.locked <br>
+            </div>
+            <div class="centerText" >
+                @if(aclHash.redeemAsset) {
+                <button class="width" onclick="getForm(jsRoutes.controllers.RedeemAssetController.redeemAssetForm())">@Messages(constants.Form.REDEEM_ASSET)</button>
+            } <br>
+            @if(aclHash.sendAsset) {
+                <button class="width"   onclick="getForm(jsRoutes.controllers.SendAssetController.sendAssetForm())">@Messages(constants.Form.SEND_ASSET)</button>
             }
+            </div>
         </div>
     }
