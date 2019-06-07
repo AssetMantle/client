@@ -1,6 +1,7 @@
+@import models.blockchain.ACLHash
 @import models.blockchain.Fiat
 
-@(fiatPegWallet: Seq[Fiat])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
+@(fiatPegWallet: Seq[Fiat], aclHash: ACLHash)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
 
     @for(fiat <- fiatPegWallet) {
         <div class="flexItem box leftAlign setBackgroundColor" style="--color: #6eff5c;">
@@ -8,5 +9,8 @@
             @Messages(constants.Form.TRANSACTION_ID) : @fiat.transactionID <br>
             @Messages(constants.Form.TRANSACTION_AMOUNT) : @fiat.transactionAmount <br>
             @Messages(constants.Form.REDEEM_AMOUNT) : @fiat.redeemedAmount
+            @if(aclHash.redeemFiat) {
+                <a onclick="getForm(jsRoutes.controllers.RedeemFiatController.redeemFiatForm())">@Messages(constants.Form.REDEEM_FIAT)</a>
+            }
         </div>
     }
