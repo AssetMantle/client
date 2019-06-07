@@ -205,6 +205,41 @@ blur(5 px);
 }
 
 /*Flex*/
+.pageFlexContainer {
+    display:flex;
+    justify-content:center;
+}
+
+.pageFlexContainer >div {
+    background-color: #ffffff;
+}
+
+.first {
+    width:20%;
+    margin-right: 1vw;
+}
+.second {
+    width:60%;
+}
+.third {
+    width:20%;
+    margin-left: 1vw;
+}
+
+@media only screen and (max-width: 1300px) {
+    .first {
+        display: none;
+    }
+
+    .third {
+        display: none;
+    }
+    .second {
+        margin: 0px;
+        width: 100%;
+    }
+}
+
 .flexContainer {
     display: flex;
     justify-content: center;
@@ -220,8 +255,7 @@ blur(5 px);
 
 
 .flexGraph {
-    margin: 10px;
-    width: 1000px;
+    width: 95%;
 }
 
 .flexGrowth {
@@ -234,7 +268,7 @@ blur(5 px);
     border: 2px solid #8faab8;
     margin: 10px;
     border-radius: 10px;
-    padding: 15px;
+    padding-bottom: 15px;
 }
 
 .box:hover {

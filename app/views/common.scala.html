@@ -3,6 +3,7 @@
 <html lang="en">
     <head>
         <title>@title</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/class.css")">
         <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/tag.css")">
         <link rel="shortcut icon" type="image/png" href="@routes.Assets.versioned("images/favicon.png")">
@@ -19,13 +20,13 @@
             <div class="stickyBar">
                 <div class = "navbar">
                     <a class="active" href="#">Home</a>
-                        <a href="#">News</a>
+                    <a href="#">News</a>
                     <a href="#">Contact</a>
                     <a class="right" onclick="getForm(jsRoutes.controllers.SignUpController.signUpForm())">@Messages(constants.Form.SIGNUP)</a>
                     <a class="right" onclick="getForm(jsRoutes.controllers.LogoutController.logoutForm())">@Messages(constants.Form.LOGOUT)</a>
                     <a class="right" onclick="getForm(jsRoutes.controllers.LoginController.loginForm())">@Messages(constants.Form.LOGIN)</a>
                     <a class="right notification" onclick="getForm(jsRoutes.controllers.NotificationController.notificationPage(0))">@Messages(constants.Form.INBOX)
-                    <span class="badge" id="notificationBadge">0</span>
+                        <span class="badge" id="notificationBadge">0</span>
                     </a>
 
                 </div>
@@ -60,7 +61,14 @@
                     </div>
                 }
             </div>
-            @content
+
+            <div class="pageFlexContainer">
+                <div class="first"></div>
+                <div class="second">
+                    @content
+                </div>
+                <div class="third"></div>
+            </div>
         </div>
 
         <div class="modal" id="commonModal">
