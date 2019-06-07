@@ -1,7 +1,7 @@
-@import models.blockchain.{ACLHash, Asset, Fiat}
+@import models.blockchain.{ACLHash, Asset, Fiat, Order, Negotiation}
 @import models.master.{Organization, Zone}
 
-@(username: String, address: String, coins: Int = 0, assetPegWallet: Seq[Asset], fiatPegWallet: Seq[Fiat], totalFiat: Int, zone: Zone, organization: Organization, aclHash: ACLHash)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
+@(username: String, address: String, coins: Int = 0, assetPegWallet: Seq[Asset], fiatPegWallet: Seq[Fiat], totalFiat: Int, zone: Zone, organization: Organization, orders: Seq[Order], negotiations: Seq[Negotiation], aclHash: ACLHash)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
 
 @common(Messages(constants.User.HOME)) {
     @if(aclHash.buyerExecuteOrder) {
@@ -72,6 +72,13 @@
     <h2>@Messages(constants.User.FIATS_OWNED) </h2>
     @Messages(constants.User.FIATS_TOTAL_VALUE): @totalFiat <br>
     @component.master.fiatsTable(fiatPegWallet)
+
+    @Messages(constants.Form.ON_GOING_NEGOTIATIONS)
+    @component.master.negotiationList(negotiations)
+    <br>
+
+    @Messages(constants.Form.ON_GOING_ORDERS)
+    @component.master.orderList(orders)
 
     <br>
 }
