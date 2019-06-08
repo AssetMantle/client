@@ -83,13 +83,7 @@ class TransactionFeedbacks @Inject()(protected val databaseConfigProvider: Datab
     }
   }
 
-  private def getTransactionFeedbacksByDirtyBit(dirtyBit: Boolean): Future[Seq[String]] = db.run(transactionFeedbackTable.filter(_.dirtyBit === dirtyBit).map(_.address).result.asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => logger.info(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        Nil
-    }
-  }
+  private def getTransactionFeedbacksByDirtyBit(dirtyBit: Boolean): Future[Seq[String]] = db.run(transactionFeedbackTable.filter(_.dirtyBit === dirtyBit).map(_.address).result)
 
   private def updateTransactionFeedbackByAddress(address: String, transactionFeedback: TransactionFeedback): Future[Int] = db.run(transactionFeedbackTable.filter(_.address === address).update(transactionFeedback).asTry).map {
     case Success(result) => result
