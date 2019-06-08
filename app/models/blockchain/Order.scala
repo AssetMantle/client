@@ -128,8 +128,7 @@ class Orders @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
             buyerAccount.value.fiatPegWallet.foreach(fiats => fiats.foreach(fiatPeg => blockchainFiats.Service.insertOrUpdate(fiatPeg.pegHash, negotiation.buyerAddress, fiatPeg.transactionID, fiatPeg.transactionAmount, fiatPeg.redeemedAmount, dirtyBit = true)))
 
             blockchainFiats.Service.deleteFiatPegWallet(dirtyOrder.id)
-            blockchainNegotiations.Service.deleteNegotiations(address = negotiation.buyerAddress, pegHash = negotiation.assetPegHash)
-            blockchainNegotiations.Service.deleteNegotiations(address = negotiation.sellerAddress, pegHash = negotiation.assetPegHash)
+            blockchainNegotiations.Service.deleteNegotiations(negotiation.assetPegHash)
           }
           Service.insertOrUpdate(dirtyOrder.id, awbProofHash = Option(orderResponse.value.awbProofHash), fiatProofHash = Option(orderResponse.value.fiatProofHash), dirtyBit = false)
         }

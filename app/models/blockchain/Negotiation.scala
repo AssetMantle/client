@@ -72,7 +72,7 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
 
   private def getNegotiationsByAddress(address: String): Future[Seq[Negotiation]] = db.run(negotiationTable.filter(negotiation => negotiation.buyerAddress === address || negotiation.sellerAddress === address).result)
 
-  private def deleteNegotiationsByAddressAndPegHash(address: String, pegHash: String) = db.run(negotiationTable.filter(_.buyerAddress === address).filter(_.assetPegHash === pegHash).delete.asTry).map {
+  private def deleteNegotiationsByPegHash(pegHash: String) = db.run(negotiationTable.filter(_.assetPegHash === pegHash).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -124,7 +124,7 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
 
     def getNegotiationsForAddress(address: String): Seq[Negotiation] = Await.result(getNegotiationsByAddress(address), Duration.Inf)
 
-    def deleteNegotiations(address: String, pegHash: String): Int = Await.result(deleteNegotiationsByAddressAndPegHash(address = address, pegHash = pegHash), Duration.Inf)
+    def deleteNegotiations(pegHash: String): Int = Await.result(deleteNegotiationsByPegHash(pegHash), Duration.Inf)
   }
 
   private def updateDirtyBitById(id: String, dirtyBit: Boolean): Future[Int] = db.run(negotiationTable.filter(_.id === id).map(_.dirtyBit).update(dirtyBit).asTry).map {
