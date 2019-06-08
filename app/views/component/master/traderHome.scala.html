@@ -1,7 +1,7 @@
-@import models.blockchain.{ACLHash, Asset, Fiat}
+@import models.blockchain.{ACLHash, Asset, Fiat, Order, Negotiation}
 @import models.master.{Organization, Zone}
 
-@(username: String, address: String, coins: Int = 0, assetPegWallet: Seq[Asset], fiatPegWallet: Seq[Fiat], totalFiat: Int, zone: Zone, organization: Organization, aclHash: ACLHash)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
+@(username: String, address: String, coins: Int = 0, assetPegWallet: Seq[Asset], fiatPegWallet: Seq[Fiat], totalFiat: Int, zone: Zone, organization: Organization, orders: Seq[Order], negotiations: Seq[Negotiation], aclHash: ACLHash)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
 
 @common(Messages(constants.User.HOME)) {
     @if(aclHash.buyerExecuteOrder) {
@@ -25,9 +25,25 @@
     @if(aclHash.issueFiat) {
         <a onclick="getForm(jsRoutes.controllers.IssueFiatController.issueFiatRequestForm())">@Messages(constants.Form.ISSUE_FIAT_REQUEST)</a>
     }
+    @if(aclHash.redeemAsset) {
+        <a onclick="getForm(jsRoutes.controllers.RedeemAssetController.redeemAssetForm())">@Messages(constants.Form.REDEEM_ASSET)</a>
+    }
+    @if(aclHash.redeemFiat) {
+        <a onclick="getForm(jsRoutes.controllers.RedeemFiatController.redeemFiatForm())">@Messages(constants.Form.REDEEM_FIAT)</a>
+    }
+    @if(aclHash.releaseAsset) {
+        <a onclick="getForm(jsRoutes.controllers.ReleaseAssetController.releaseAssetForm())">@Messages(constants.Form.RELEASE_ASSET)</a>
+    }
     @if(aclHash.sellerExecuteOrder) {
         <a onclick="getForm(jsRoutes.controllers.SellerExecuteOrderController.unmoderatedSellerExecuteOrderForm())">@Messages(constants.Form.UNMODERATED_SELLER_EXECUTE_ORDER)</a>
     }
+    @if(aclHash.sendAsset) {
+        <a onclick="getForm(jsRoutes.controllers.SendAssetController.sendAssetForm())">@Messages(constants.Form.SEND_ASSET)</a>
+    }
+    @if(aclHash.sendFiat) {
+        <a onclick="getForm(jsRoutes.controllers.SendFiatController.sendFiatForm())">@Messages(constants.Form.SEND_FIAT)</a>
+    }
+
     <a onclick="getForm(jsRoutes.controllers.SetBuyerFeedbackController.setBuyerFeedbackForm())">@Messages(constants.Form.SET_BUYER_FEEDBACK)</a>
     <a onclick="getForm(jsRoutes.controllers.SetSellerFeedbackController.setSellerFeedbackForm())">@Messages(constants.Form.SET_SELLER_FEEDBACK)</a>
 
@@ -80,5 +96,12 @@
         <div class="flexContainer">
         @component.master.fiatList(fiatPegWallet, aclHash)
         </div>
+    @Messages(constants.Form.ON_GOING_NEGOTIATIONS)
+    @component.master.negotiationList(negotiations)
+    <br>
+
+    @Messages(constants.Form.ON_GOING_ORDERS)
+    @component.master.orderList(orders)
+
     </div>
 }
