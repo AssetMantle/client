@@ -18,7 +18,7 @@ object AccountResponse {
       (JsPath \ "quantityUnit").read[String] and
       (JsPath \ "ownerAddress").read[String] and
       (JsPath \ "locked").read[Boolean] and
-      (JsPath \ "private").read[Boolean]
+      (JsPath \ "moderated").read[Boolean]
     ) (Asset.apply _)
 
   case class Asset(pegHash: String, documentHash: String, assetType: String, assetQuantity: String, assetPrice: String, quantityUnit: String, ownerAddress: String, locked: Boolean, unmoderated: Boolean)

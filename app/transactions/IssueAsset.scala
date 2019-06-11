@@ -43,7 +43,7 @@ class IssueAsset @Inject()(wsClient: WSClient)(implicit configuration: Configura
       "chainID" -> request.chainID,
       "password" -> request.password,
       "gas" -> request.gas,
-      "private" -> request.unmoderated
+      "moderated" -> request.unmoderated
     )
   }
 
