@@ -109,7 +109,7 @@ class FileUploadController @Inject()(messagesControllerComponents: MessagesContr
       }
   }
 
-  def updateImage(name: String): Action[AnyContent] = withUserLoginAction.authenticated { implicit username =>
+  def updateImage(name: String): Action[AnyContent] = withUserLoginAction.authenticated { username =>
     implicit request =>
       try {
         val (fileName, encodedBase64) = utilities.ImageUploadProcess.convertToThumbnail(name, uploadImagesPath)
@@ -126,7 +126,7 @@ class FileUploadController @Inject()(messagesControllerComponents: MessagesContr
       }
   }
 
-  def storePDF(name: String): Action[AnyContent] = withUserLoginAction.authenticated { implicit username =>
+  def storePDF(name: String): Action[AnyContent] = withUserLoginAction.authenticated { username =>
     implicit request =>
       try {
         val fileName = List(util.hashing.MurmurHash3.stringHash(Base64.encodeBase64String(utilities.FileResourceManager.convertToByteArray(utilities.FileResourceManager.newFile(uploadPDFsPath, name)))).toString, FileResourceManager.fileExtensionFromName(name)).mkString(".")
@@ -141,7 +141,7 @@ class FileUploadController @Inject()(messagesControllerComponents: MessagesContr
       }
   }
 
-  def updatePDF(name: String): Action[AnyContent] = withUserLoginAction.authenticated { implicit username =>
+  def updatePDF(name: String): Action[AnyContent] = withUserLoginAction.authenticated { username =>
     implicit request =>
       try {
         val fileName = List(util.hashing.MurmurHash3.stringHash(Base64.encodeBase64String(utilities.FileResourceManager.convertToByteArray(utilities.FileResourceManager.newFile(uploadPDFsPath, name)))).toString, FileResourceManager.fileExtensionFromName(name)).mkString(".")
@@ -158,7 +158,7 @@ class FileUploadController @Inject()(messagesControllerComponents: MessagesContr
       }
   }
 
-  def storeDOC(name: String): Action[AnyContent] = withUserLoginAction.authenticated { implicit username =>
+  def storeDOC(name: String): Action[AnyContent] = withUserLoginAction.authenticated { username =>
     implicit request =>
       try {
         val fileName = List(util.hashing.MurmurHash3.stringHash(Base64.encodeBase64String(utilities.FileResourceManager.convertToByteArray(utilities.FileResourceManager.newFile(uploadDOCsPath, name)))).toString, FileResourceManager.fileExtensionFromName(name)).mkString(".")
@@ -173,7 +173,7 @@ class FileUploadController @Inject()(messagesControllerComponents: MessagesContr
       }
   }
 
-  def updateDOC(name: String): Action[AnyContent] = withUserLoginAction.authenticated { implicit username =>
+  def updateDOC(name: String): Action[AnyContent] = withUserLoginAction.authenticated { username =>
     implicit request =>
       try {
         val fileName = List(util.hashing.MurmurHash3.stringHash(Base64.encodeBase64String(utilities.FileResourceManager.convertToByteArray(utilities.FileResourceManager.newFile(uploadDOCsPath, name)))).toString, FileResourceManager.fileExtensionFromName(name)).mkString(".")
