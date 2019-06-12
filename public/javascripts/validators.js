@@ -42,11 +42,3 @@ function seeValidatorsTable() {
     $('#indexBottomDivision').hide();
     $('#validatorsTable').show();
 }
-
-function goBackValidatorsTable() {
-    $('#blockHeightBottomDivision').hide();
-    $('#allBlocksTable').hide();
-    $('#validatorsTable').hide();
-    $('#txHashBottomDivision').hide();
-    $('#indexBottomDivision').show();
-}

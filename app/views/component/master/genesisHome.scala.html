@@ -1,11 +1,12 @@
 @(username: String, address: String, coins: Int = 0)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
 
 @common(Messages(constants.User.HOME)) {
-
+    <div class="flexContainer">
     @component.master.commonHome(username = username, userType = constants.User.GENESIS, address = address, coins = coins)
+    </div>
+    <div class="centerText">
+    <button onclick="getForm(jsRoutes.controllers.AddZoneController.viewPendingVerifyZoneRequests())">@Messages(constants.Form.PENDING_VERIFY_ZONE_REQUESTS)</button>
 
-    <a onclick="getForm(jsRoutes.controllers.AddZoneController.viewPendingVerifyZoneRequests())">@Messages(constants.Form.PENDING_VERIFY_ZONE_REQUESTS)</a>
-
-    <a onclick="getForm(jsRoutes.controllers.SendCoinController.viewPendingFaucetRequests())">@Messages(constants.Form.APPROVE_FAUCET_REQUEST)</a>
-
+    <button onclick="getForm(jsRoutes.controllers.SendCoinController.viewPendingFaucetRequests())">@Messages(constants.Form.APPROVE_FAUCET_REQUEST)</button>
+    </div>
 }

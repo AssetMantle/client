@@ -1,9 +1,9 @@
 @()(implicit messagesProvider: MessagesProvider)
-<div id="txHashBottomDivision" class="txHashBottomDivision">
+<div id="txHashBottomDivision" class="box">
     <div class="transactionHash">
         <h4><p id="txHashPageHash"></p></h4>
         <h3>@Messages(constants.Form.HEIGHT) : <p id="txHashPageHeight"></p></h3>
         <h3>@Messages(constants.Form.FEE) : <p id="txHashPageFee"></p></h3>
     </div>
-    <button onclick='goBackTransactionHashSearch()' >@Messages(constants.Form.BACK)</button>
+    <button onclick='back()' >@Messages(constants.Form.BACK)</button>
 </div>

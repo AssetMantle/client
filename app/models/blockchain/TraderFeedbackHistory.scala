@@ -47,15 +47,7 @@ class TraderFeedbackHistories @Inject()(protected val databaseConfigProvider: Da
     }
   }
 
-  private def findById(address: String)(implicit executionContext: ExecutionContext): Future[Seq[TraderFeedbackHistory]] = db.run(traderFeedbackHistoryTable.filter(_.address === address).result.asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
+  private def findById(address: String): Future[Seq[TraderFeedbackHistory]] = db.run(traderFeedbackHistoryTable.filter(_.address === address).result)
 
   private def deleteById(traderFeedbackHistory: TraderFeedbackHistory)(implicit executionContext: ExecutionContext) = db.run(traderFeedbackHistoryTable.filter(_.address === traderFeedbackHistory.address).filter(_.buyerAddress === traderFeedbackHistory.buyerAddress).filter(_.sellerAddress === traderFeedbackHistory.sellerAddress).filter(_.pegHash === traderFeedbackHistory.pegHash).delete.asTry).map {
     case Success(result) => result

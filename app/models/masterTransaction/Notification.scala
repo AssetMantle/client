@@ -37,13 +37,7 @@ class Notifications @Inject()(protected val databaseConfigProvider: DatabaseConf
     }
   }
 
-  private def findNotificationsByAccountId(accountID: String, offset: Int, limit: Int)(implicit executionContext: ExecutionContext): Future[Seq[models.masterTransaction.Notification]] = db.run(notificationTable.filter(_.accountID === accountID).sortBy(_.time.desc).drop(offset).take(limit).result.asTry).map{
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-    }
-  }
+  private def findNotificationsByAccountId(accountID: String, offset: Int, limit: Int): Future[Seq[Notification]] = db.run(notificationTable.filter(_.accountID === accountID).sortBy(_.time.desc).drop(offset).take(limit).result)
 
   private def findNumberOfUnreadByAccountId(accountID: String)(implicit executionContext: ExecutionContext): Future[Int] = db.run(notificationTable.filter(_.accountID === accountID).filter( _.read === false).length.result)
 

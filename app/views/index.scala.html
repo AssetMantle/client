@@ -2,6 +2,7 @@
 @(failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
 
 @common(Messages(constants.Form.INDEX), failures, warnings, successes, infos) {
+@*
     <a onclick="getForm(jsRoutes.controllers.LoginController.loginForm())">@Messages(constants.Form.LOGIN)</a>
     <a onclick="getForm(jsRoutes.controllers.LogoutController.logoutForm())">@Messages(constants.Form.LOGOUT)</a>
     <a onclick="getForm(jsRoutes.controllers.SignUpController.signUpForm())">@Messages(constants.Form.SIGNUP)</a>
@@ -28,6 +29,7 @@
     <a onclick="getForm(jsRoutes.controllers.SetACLController.setACLForm())">@Messages(constants.Form.SET_ACL)</a>
     <a onclick="getForm(jsRoutes.controllers.SetBuyerFeedbackController.setBuyerFeedbackForm())">@Messages(constants.Form.SET_BUYER_FEEDBACK)</a>
     <a onclick="getForm(jsRoutes.controllers.SetSellerFeedbackController.setSellerFeedbackForm())">@Messages(constants.Form.SET_SELLER_FEEDBACK)</a>
+*@
     <br>
     <a onclick="getForm(jsRoutes.controllers.AddKeyController.blockchainAddKeyForm())">@Messages(constants.Form.ADD_KEY)</a>
     <a onclick="getForm(jsRoutes.controllers.AddOrganizationController.blockchainAddOrganizationForm())">@Messages(constants.Form.ADD_ORGANIZATION)</a>
@@ -48,23 +50,26 @@
     <a onclick="getForm(jsRoutes.controllers.SendFiatController.blockchainSendFiatForm())">@Messages(constants.Form.SEND_FIAT)</a>
     <a onclick="getForm(jsRoutes.controllers.SetACLController.blockchainSetACLForm())">@Messages(constants.Form.SET_ACL)</a>
     <a onclick="getForm(jsRoutes.controllers.SetBuyerFeedbackController.blockchainSetBuyerFeedbackForm())">@Messages(constants.Form.SET_BUYER_FEEDBACK)</a>
-    <a onclick="getForm(jsRoutes.controllers.SetSellerFeedbackController.blockchainSetSellerFeedbackForm">@Messages(constants.Form.SET_SELLER_FEEDBACK)</a>
+    <a onclick="getForm(jsRoutes.controllers.SetSellerFeedbackController.blockchainSetSellerFeedbackForm())">@Messages(constants.Form.SET_SELLER_FEEDBACK)</a>
 
-    <div class="mainDivision">
-        <div class="topDivision">
-            @search()
+
+    <div class="flexContainer">
+        <div class="flexItem">
+        @search()
         </div>
-        <div class="box1">@lastBlockHeight()</div>
-        <div class="box2">@validators()</div>
-        <div class="box3"> @Messages(constants.Form.TOKENS)
+    </div>
+    <div class="flexContainer">
+        <div class="flexItem box">@lastBlockHeight()</div>
+        <div class="flexItem box">@validators()</div>
+        <div class="flexItem box"> @Messages(constants.Form.TOKENS)
             <p id="tokensValue"></p></div>
-        <div class="box4">@averageBlockTime()</div>
-
-        <div id="indexBottomDivision" class="indexBottomDivision">
-            @blockTimeGraph()
-            @blockExplorer()
-            @transactionExplorer()
-        </div>
+        <div class="flexItem box">@averageBlockTime()</div>
+    </div>
+    <div  id="indexBottomDivision" class="flexContainer">
+            <div class="box flexGraph flexGrowth"> @blockTimeGraph()</div>
+            <div class="box flexGrowth centerText" id="blockExplorer">@blockExplorer()</div>
+            <div  class="box flexGrowth centerText" id="transactionExplorer"> @transactionExplorer()</div>
+    </div>
 
         @transactionHash()
 
@@ -73,5 +78,7 @@
         @validatorsTable()
 
         @allBlocksTable()
-    </div>
+
+<script src="@routes.Assets.versioned("javascripts/back.js")" type="text/javascript"></script>
+<script>back()</script>
 }
