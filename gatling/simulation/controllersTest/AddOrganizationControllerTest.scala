@@ -84,13 +84,13 @@ object addOrganizationControllerTest {
         Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
 
   def getOrganizationID(query: String) = {
-    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://localhost:5432/comdex", "comdex", "comdex",
+    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://192.168.15.10:5432/comdex", "comdex", "comdex",
       s"""SELECT "id" FROM master."Organization" WHERE "accountID" = '$query';""")
     sqlQueryFeeder.apply().next()("id")
   }
 
   def getUnverifiedOrganizationID(zoneID: String) = {
-    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://localhost:5432/comdex", "comdex", "comdex",
+    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://192.168.15.10:5432/comdex", "comdex", "comdex",
       s"""SELECT "id" FROM master."Organization" WHERE "zoneID" = '$zoneID';""")
     sqlQueryFeeder.apply().next()("id")
   }
