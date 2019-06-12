@@ -17,6 +17,9 @@ object Response {
   val KEY_NEGOTIATION_ID = "negotiation_id"
   val KEY_ORDER_ID = "order_id"
   val KEY_EXECUTED = "executed"
+  val NULL_POINTER_EXCEPTION = new Failure("NULL_POINTER_EXCEPTION")
+  val GENERIC_EXCEPTION = new Failure("GENERIC_EXCEPTION")
+  val I_O_EXCEPTION = new Failure("I_O_EXCEPTION")
 
   //Success- for telling if something is done and the further steps opened up because of it
   val SUCCESS = new Success("SUCCESS")
@@ -58,6 +61,8 @@ object Response {
   val ZONE_ADDED = new Success("ZONE_ADDED")
   val ZONE_REQUEST_SENT = new Success("ZONE_REQUEST_SENT")
   val VERIFY_ORGANIZATION_REQUEST_REJECTED = new Success("VERIFY_ORGANIZATION_REQUEST_REJECTED")
+  val UPLOAD_SUCCESSFUL = new Success("UPLOAD_SUCCESSFUL")
+  val UPDATE_SUCCESSFUL = new Success("UPDATE_SUCCESSFUL")
 
   //Warning- for telling that something important is not done and ask to do it
   val VERIFY_MOBILE_NUMBER = new Warning("VERIFY_MOBILE_NUMBER", routes.javascript.VerifyMobileNumberController.verifyMobileNumberForm)

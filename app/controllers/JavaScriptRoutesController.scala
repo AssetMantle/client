@@ -76,8 +76,17 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.SendFiatController.blockchainSendFiatForm,
         routes.javascript.SetACLController.blockchainSetACLForm,
         routes.javascript.SetBuyerFeedbackController.blockchainSetBuyerFeedbackForm,
-        routes.javascript.SetSellerFeedbackController.blockchainSetSellerFeedbackForm
-
+        routes.javascript.SetSellerFeedbackController.blockchainSetSellerFeedbackForm,
+        routes.javascript.FileUploadController.uploadForm,
+        routes.javascript.FileUploadController.uploadImages,
+        routes.javascript.FileUploadController.storeImage,
+        routes.javascript.FileUploadController.updateImage,
+        routes.javascript.FileUploadController.uploadPDFs,
+        routes.javascript.FileUploadController.storePDF,
+        routes.javascript.FileUploadController.updatePDF,
+        routes.javascript.FileUploadController.uploadDOCs,
+        routes.javascript.FileUploadController.storeDOC,
+        routes.javascript.FileUploadController.updateDOC
       )
     ).as("text/javascript")
   }
