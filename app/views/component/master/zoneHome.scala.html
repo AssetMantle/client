@@ -2,8 +2,9 @@
 
 @(username: String, address: String, coins: Int = 0, zone: Zone)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
 
-@common(Messages(constants.User.HOME)) {
+@common(Messages(constants.User.HOME))(Html(""))(center)(Html(""))
 
+    @center = {
     <div class="flexContainer">
         @component.master.commonHome(username = username, userType = constants.User.ZONE, address = address, coins = coins)
         <div class="flexItem box leftAlign flexGrowth">
