@@ -19,22 +19,41 @@ class RampTest extends Simulation {
 
   val scenarioBuilderZoneOrganization: ScenarioBuilder =
     scenario("Zone/Organization Flow")
-    .exec(zoneSignUp.masterZoneSignUp)
-    .exec(organizationSignUp.masterOrganizationSignUp)
-    .exec(zoneLoginRequest.masterZoneLoginRequest)
-    .exec(loginMainAndApproveZone.masterLoginMainAndApproveZone)
-    .exec(OrganizationLoginRequest.masterOrganizationLoginRequest)
-    .exec(loginZoneAndApproveOrganization.masterLoginZoneAndApproveOrganization)
-    .exec(loginZoneAndSetACL.masterLoginZoneAndSetACL)
+      .exec(zoneSignUp.masterZoneSignUp)
+      .exec(zoneFaucetRequest.masterLoginAndRequestCoinZone)
+      .exec(loginMainApproveFaucetZone.masterLoginMainAndApproveFaucetRequestZone)
+      .exec(zoneLoginAddRequest.masterZoneLoginAddRequest)
+      .exec(loginMainAndApproveZone.masterLoginMainAndApproveZone)
+      .exec(organizationSignUp.masterOrganizationSignUp)
+      .exec(organizationFaucetRequest.masterLoginAndRequestCoinOrganization)
+      .exec(loginMainApproveFaucetOrganization.masterLoginMainAndApproveFaucetRequestOrganization)
+      .exec(OrganizationLoginAddRequest.masterOrganizationLoginAddRequest)
+      .exec(loginZoneAndApproveOrganization.masterLoginZoneAndApproveOrganization)
 
-  val scenarioBuilderTraders:ScenarioBuilder =
+  val scenarioBuilderTraders: ScenarioBuilder =
     scenario("Trader Flow")
-    .exec(traderSignUp.masterTraderSignUp)
-    .exec(traderLoginAndRequestCoin.masterTraderLoginAndRequestCoin)
+      .exec(traderSignUp.masterTraderSignUp)
+      .exec(traderLoginAndRequestCoin.masterTraderLoginAndRequestCoin)
+      .exec(loginMainAndApproveFaucetRequest.masterLoginMainAndApproveFaucetRequest)
+      .exec(loginZoneAndSetACL.masterLoginZoneAndSetACL)
+      .exec(sellerLoginAndIssueAssetRequest.masterSellerLoginAndIssueAssetRequest)
+      .exec(loginZoneAndIssueAsset.masterLoginZoneAndIssueAsset)
+      .exec(buyerLoginAndIssueFiatRequest.masterBuyerLoginAndIssueFiatRequest)
+      .exec(loginZoneAndIssueFiat.masterLoginZoneAndIssueFiat)
+      .exec(buyerLoginAndChangeBuyerBid.masterBuyerLoginAndChangeBuyerBid)
+      .exec(sellerLoginAndChangeSellerBid.masterSellerLoginAndChangeSellerBid)
+      .exec(buyerLoginAndConfirmBuyerBid.masterBuyerLoginAndConfirmBuyerBid)
+      .exec(sellerLoginAndConfirmSellerBid.masterSellerLoginAndConfirmSellerBid)
+      .exec(loginZoneAndReleaseAsset.masterLoginZoneAndReleaseAsset)
+      .exec(traderLoginAndRequestCoin.masterTraderLoginAndRequestCoin)
+      .exec(sellerLoginAndSendAsset.masterSellerLoginAndSendAsset)
+      .exec(buyerLoginAndSendFiat.masterBuyerLoginAndSendFiat)
+      .exec(loginZoneAndExecuteOrder.masterLoginZoneAndExecuteOrder)
+
 
   setUp(
-    scenarioBuilderZoneOrganization.inject(rampUsers(10) during 15),
-    scenarioBuilderTraders.inject(nothingFor(100), rampUsers(10) during 15)
+    scenarioBuilderZoneOrganization.inject(atOnceUsers(1))
+    //scenarioBuilderTraders.inject(nothingFor(100), rampUsers(10) during 15)
   ).protocols(http.baseUrl(Test.BASE_URL))
 }
 
@@ -51,30 +70,75 @@ object zoneSignUp {
         Form.USERNAME -> Test.TEST_ZONE_USERNAME_UNIQUE,
         Form.PASSWORD -> Test.TEST_ZONE_PASSWORD_UNIQUE,
         Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
-    .pause(5)
+    .pause(2)
 
 }
 
-object organizationSignUp {
+object zoneFaucetRequest {
 
-  val masterOrganizationSignUp: ScenarioBuilder = scenario("masterOrganizationSignUp")
-    .exec(http("OrganizationSignUp_GET")
-      .get(routes.SignUpController.signUpForm().url)
+  val masterLoginAndRequestCoinZone: ScenarioBuilder = scenario("masterLoginAndRequestCoinZone")
+    .exec(http("LoginZone_GET")
+      .get(routes.LoginController.loginForm().url)
       .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
-    .pause(5)
-    .exec(http("OrganizationSignUp_POST")
-      .post(routes.SignUpController.signUp().url)
+    .exec(http("Login_POST")
+      .post(routes.LoginController.login().url)
       .formParamMap(Map(
-        Form.USERNAME -> Test.TEST_ORGANIZATION_USERNAME_UNIQUE,
-        Form.PASSWORD -> Test.TEST_ORGANIZATION_PASSWORD_UNIQUE,
+        Form.USERNAME -> Test.TEST_ZONE_USERNAME_UNIQUE,
+        Form.PASSWORD -> Test.TEST_ZONE_PASSWORD_UNIQUE,
+        Form.NOTIFICATION_TOKEN -> "",
         Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
     .pause(5)
+    .feed(CouponFeeder.couponFeed)
+    .exec(http("RequestCoinZone_GET")
+      .get(routes.SendCoinController.requestCoinsForm().url)
+      .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
+    .pause(2)
+    .exec(http("RequestCoinZone_POST")
+      .post(routes.SendCoinController.requestCoins().url)
+      .formParamMap(Map(
+        Form.COUPON -> "${%s}".format(Test.TEST_COUPON),
+        Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
+    .pause(2)
+}
+
+
+object loginMainApproveFaucetZone {
+
+  val masterLoginMainAndApproveFaucetRequestZone: ScenarioBuilder = scenario("masterLoginMainAndApproveFaucetRequestZone")
+    .feed(GenesisFeeder.genesisFeed)
+    .feed(RequestIDFeeder.requestIDFeed)
+    .feed(GasFeeder.gasFeed)
+    .exec(http("MainLogin_GET")
+      .get(routes.LoginController.loginForm().url)
+      .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
+    .exec(http("MainLogin_POST")
+      .post(routes.LoginController.login().url)
+      .formParamMap(Map(
+        Form.USERNAME -> "${%s}".format(Test.TEST_MAIN_USERNAME),
+        Form.PASSWORD -> "${%s}".format(Test.TEST_MAIN_PASSWORD),
+        Form.NOTIFICATION_TOKEN -> "",
+        Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
+    .pause(2)
+    .exec { session => session.set(Test.TEST_REQUEST_ID, getRequestIDForFaucetRequest(Test.TEST_ZONE_USERNAME_UNIQUE)) }
+    .exec(http("ApproveFaucetRequestZone_GET")
+      .get(routes.SendCoinController.approveFaucetRequestsForm("${%s}".format(Test.TEST_REQUEST_ID), Test.TEST_ZONE_USERNAME_UNIQUE).url)
+      .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
+    .pause(2)
+    .exec(http("ApproveFaucetRequestZone_POST")
+      .post(routes.SendCoinController.approveFaucetRequests().url)
+      .formParamMap(Map(
+        Form.REQUEST_ID -> "${%s}".format(Test.TEST_REQUEST_ID),
+        Form.ACCOUNT_ID -> Test.TEST_ZONE_USERNAME_UNIQUE,
+        Form.PASSWORD -> "${%s}".format(Test.TEST_MAIN_PASSWORD),
+        Form.GAS -> "${%s}".format(Test.TEST_GAS),
+        Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
+    .pause(2)
 
 }
 
-object zoneLoginRequest{
+object zoneLoginAddRequest {
 
-  val masterZoneLoginRequest: ScenarioBuilder = scenario("masterZoneLoginRequest")
+  val masterZoneLoginAddRequest: ScenarioBuilder = scenario("masterZoneLoginAddRequest")
     .exec(http("ZoneLogin_GET")
       .get(routes.LoginController.loginForm().url)
       .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
@@ -98,10 +162,10 @@ object zoneLoginRequest{
         Form.NAME -> "${%s}".format(Test.TEST_NAME),
         Form.CURRENCY -> "${%s}".format(Test.TEST_CURRENCY),
         Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
-    .pause(5)
+    .pause(2)
 }
 
-object loginMainAndApproveZone{
+object loginMainAndApproveZone {
 
   val masterLoginMainAndApproveZone: ScenarioBuilder = scenario("masterLoginMainAndApproveZone")
     .feed(GenesisFeeder.genesisFeed)
@@ -128,48 +192,125 @@ object loginMainAndApproveZone{
         Form.ZONE_ID -> "${%s}".format(Test.TEST_ZONE_ID),
         Form.PASSWORD -> "${%s}".format(Test.TEST_MAIN_PASSWORD),
         Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
-    .pause(5)
+    .pause(2)
 }
 
-object OrganizationLoginRequest{
-val masterOrganizationLoginRequest: ScenarioBuilder = scenario("masterOrganizationLoginRequest")
-  .exec { session => session.set(Test.TEST_ZONE_ID, getZoneID(Test.TEST_ZONE_USERNAME_UNIQUE)) }
-  .doIfOrElse(session => getZoneStatus(Test.TEST_ZONE_USERNAME_UNIQUE)) {
-    exec(http("OrganizationLogin_GET")
+object organizationSignUp {
+
+  val masterOrganizationSignUp: ScenarioBuilder = scenario("masterOrganizationSignUp")
+    .exec(http("OrganizationSignUp_GET")
+      .get(routes.SignUpController.signUpForm().url)
+      .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
+    .pause(5)
+    .exec(http("OrganizationSignUp_POST")
+      .post(routes.SignUpController.signUp().url)
+      .formParamMap(Map(
+        Form.USERNAME -> Test.TEST_ORGANIZATION_USERNAME_UNIQUE,
+        Form.PASSWORD -> Test.TEST_ORGANIZATION_PASSWORD_UNIQUE,
+        Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
+    .pause(2)
+
+}
+
+object organizationFaucetRequest {
+
+  val masterLoginAndRequestCoinOrganization: ScenarioBuilder = scenario("masterLoginAndRequestCoinOrganization")
+    .exec(http("LoginOrganization_GET")
       .get(routes.LoginController.loginForm().url)
       .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
-      .exec(http("OrganizationLogin_POST")
-        .post(routes.LoginController.login().url)
-        .formParamMap(Map(
-          Form.USERNAME -> Test.TEST_ORGANIZATION_USERNAME_UNIQUE,
-          Form.PASSWORD -> Test.TEST_ORGANIZATION_PASSWORD_UNIQUE,
-          Form.NOTIFICATION_TOKEN -> "",
-          Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
-      .pause(5)
-      .feed(NameFeeder.nameFeed)
-      .feed(AddressFeeder.addressFeed)
-      .feed(EmailAddressFeeder.emailAddressFeed)
-      .feed(MobileNumberFeeder.mobileNumberFeed)
-      .exec(http("AddOrganization_GET")
-        .get(routes.AddOrganizationController.addOrganizationForm().url)
-        .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
-      .pause(2)
-      .exec(http("AddOrganization_POST")
-        .post(routes.AddOrganizationController.addOrganizationForm().url)
-        .formParamMap(Map(
-          Form.ZONE_ID -> "${%s}".format(Test.TEST_ZONE_ID),
-          Form.NAME -> "${%s}".format(Test.TEST_NAME),
-          Form.ADDRESS -> "${%s}".format(Test.TEST_ADDRESS),
-          Form.EMAIL -> "${%s}".format(Test.TEST_EMAIL_ADDRESS),
-          Form.PHONE -> "${%s}".format(Test.TEST_MOBILE_NUMBER),
-          Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
-      .pause(5)
-  } {
-    exec { session => println("OutsideLogin" + session); session }
-  }
+    .exec(http("LoginOrganization_POST")
+      .post(routes.LoginController.login().url)
+      .formParamMap(Map(
+        Form.USERNAME -> Test.TEST_ORGANIZATION_USERNAME_UNIQUE,
+        Form.PASSWORD -> Test.TEST_ORGANIZATION_PASSWORD_UNIQUE,
+        Form.NOTIFICATION_TOKEN -> "",
+        Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
+    .pause(5)
+    .feed(CouponFeeder.couponFeed)
+    .exec(http("RequestCoinOrganization_GET")
+      .get(routes.SendCoinController.requestCoinsForm().url)
+      .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
+    .pause(2)
+    .exec(http("RequestCoinOrganization_POST")
+      .post(routes.SendCoinController.requestCoins().url)
+      .formParamMap(Map(
+        Form.COUPON -> "${%s}".format(Test.TEST_COUPON),
+        Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
+    .pause(2)
 }
 
-object loginZoneAndApproveOrganization{
+object loginMainApproveFaucetOrganization {
+
+  val masterLoginMainAndApproveFaucetRequestOrganization: ScenarioBuilder = scenario("masterLoginMainAndApproveFaucetRequestOrganization")
+    .feed(GenesisFeeder.genesisFeed)
+    .feed(RequestIDFeeder.requestIDFeed)
+    .feed(GasFeeder.gasFeed)
+    .exec(http("MainLogin_GET")
+      .get(routes.LoginController.loginForm().url)
+      .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
+    .exec(http("MainLogin_POST")
+      .post(routes.LoginController.login().url)
+      .formParamMap(Map(
+        Form.USERNAME -> "${%s}".format(Test.TEST_MAIN_USERNAME),
+        Form.PASSWORD -> "${%s}".format(Test.TEST_MAIN_PASSWORD),
+        Form.NOTIFICATION_TOKEN -> "",
+        Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
+    .pause(2)
+    .exec { session => session.set(Test.TEST_REQUEST_ID, getRequestIDForFaucetRequest(Test.TEST_ORGANIZATION_USERNAME_UNIQUE)) }
+    .exec(http("ApproveFaucetRequest_GET")
+      .get(routes.SendCoinController.approveFaucetRequestsForm("${%s}".format(Test.TEST_REQUEST_ID),Test.TEST_ORGANIZATION_USERNAME_UNIQUE).url)
+      .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
+    .pause(2)
+    .exec(http("ApproveFaucetRequest_POST")
+      .post(routes.SendCoinController.approveFaucetRequests().url)
+      .formParamMap(Map(
+        Form.REQUEST_ID -> "${%s}".format(Test.TEST_REQUEST_ID),
+        Form.ACCOUNT_ID -> Test.TEST_ORGANIZATION_USERNAME_UNIQUE,
+        Form.PASSWORD -> "${%s}".format(Test.TEST_MAIN_PASSWORD),
+        Form.GAS -> "${%s}".format(Test.TEST_GAS),
+        Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
+    .pause(2)
+}
+
+object OrganizationLoginAddRequest {
+  val masterOrganizationLoginAddRequest: ScenarioBuilder = scenario("masterOrganizationLoginAddRequest")
+    .exec { session => session.set(Test.TEST_ZONE_ID, getZoneID(Test.TEST_ZONE_USERNAME_UNIQUE)) }
+    .doIfOrElse(session => getZoneStatus(Test.TEST_ZONE_USERNAME_UNIQUE)) {
+      exec(http("OrganizationLogin_GET")
+        .get(routes.LoginController.loginForm().url)
+        .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
+        .exec(http("OrganizationLogin_POST")
+          .post(routes.LoginController.login().url)
+          .formParamMap(Map(
+            Form.USERNAME -> Test.TEST_ORGANIZATION_USERNAME_UNIQUE,
+            Form.PASSWORD -> Test.TEST_ORGANIZATION_PASSWORD_UNIQUE,
+            Form.NOTIFICATION_TOKEN -> "",
+            Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
+        .pause(5)
+        .feed(NameFeeder.nameFeed)
+        .feed(AddressFeeder.addressFeed)
+        .feed(EmailAddressFeeder.emailAddressFeed)
+        .feed(MobileNumberFeeder.mobileNumberFeed)
+        .exec(http("AddOrganization_GET")
+          .get(routes.AddOrganizationController.addOrganizationForm().url)
+          .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
+        .pause(2)
+        .exec(http("AddOrganization_POST")
+          .post(routes.AddOrganizationController.addOrganizationForm().url)
+          .formParamMap(Map(
+            Form.ZONE_ID -> "${%s}".format(Test.TEST_ZONE_ID),
+            Form.NAME -> "${%s}".format(Test.TEST_NAME),
+            Form.ADDRESS -> "${%s}".format(Test.TEST_ADDRESS),
+            Form.EMAIL -> "${%s}".format(Test.TEST_EMAIL_ADDRESS),
+            Form.PHONE -> "${%s}".format(Test.TEST_MOBILE_NUMBER),
+            Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
+        .pause(2)
+    } {
+      exec { session => println("OutsideLogin" + session); session }
+    }
+}
+
+object loginZoneAndApproveOrganization {
 
   val masterLoginZoneAndApproveOrganization: ScenarioBuilder = scenario("masterLoginZoneAndApproveOrganization")
     .feed(ZoneIDFeeder.zoneIDFeed)
@@ -187,7 +328,7 @@ object loginZoneAndApproveOrganization{
             Form.NOTIFICATION_TOKEN -> "",
             Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
         .pause(2)
-        .exec { session => session.set(Test.TEST_ORGANIZATION_ID, getOrganizationID(session(Test.TEST_ORGANIZATION_USERNAME).as[String])) }
+        .exec { session => session.set(Test.TEST_ORGANIZATION_ID, getOrganizationID(Test.TEST_ORGANIZATION_USERNAME_UNIQUE)) }
         .exec(http("VerifyOrganization_GET")
           .get(routes.AddOrganizationController.verifyOrganizationForm("${%s}".format(Test.TEST_ORGANIZATION_ID), "${%s}".format(Test.TEST_ZONE_ID)).url)
           .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
@@ -199,61 +340,7 @@ object loginZoneAndApproveOrganization{
             Form.ORGANIZATION_ID -> "${%s}".format(Test.TEST_ORGANIZATION_ID),
             Form.PASSWORD -> Test.TEST_ZONE_PASSWORD_UNIQUE,
             Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
-        .pause(5)
-    } {
-      exec { session => println("OutsideApprove" + session); session }
-    }
-}
-
-object loginZoneAndSetACL{
-
-  val masterLoginZoneAndSetACL: ScenarioBuilder = scenario("masterLoginZoneAndSetACL")
-    .feed(ZoneIDFeeder.zoneIDFeed)
-    .feed(OrganizationIDFeeder.organizationIDFeed)
-    .feed(SellerLoginFeeder.sellerLoginFeed)
-    .feed(BuyerLoginFeeder.buyerLoginFeed)
-    .exec { session => session.set(Test.TEST_ZONE_ID, getZoneID(Test.TEST_ZONE_USERNAME_UNIQUE)) }
-    .doIfOrElse(session => getZoneStatus(Test.TEST_ZONE_USERNAME_UNIQUE)) {
-      exec(http("VerifiedZoneLogin_GET")
-        .get(routes.LoginController.loginForm().url)
-        .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
-        .exec(http("VerifiedZoneLogin_POST")
-          .post(routes.LoginController.login().url)
-          .formParamMap(Map(
-            Form.USERNAME -> Test.TEST_ZONE_USERNAME_UNIQUE,
-            Form.PASSWORD -> Test.TEST_ZONE_PASSWORD_UNIQUE,
-            Form.NOTIFICATION_TOKEN -> "",
-            Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
         .pause(2)
-        .exec { session => session.set(Test.TEST_ORGANIZATION_ID, getOrganizationID(session(Test.TEST_ORGANIZATION_USERNAME).as[String])) }
-        .exec(http("SetACLSeller_GET")
-          .get(routes.SetACLController.setACLForm().url)
-          .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
-        .pause(2)
-        .exec { session => session.set(Test.TEST_SELLER_ADDRESS, getAccountAddressByUsername(session(Test.TEST_SELLER_USERNAME).as[String])) }
-        .exec(http("SetACLSeller_POST")
-          .post(routes.SetACLController.setACL().url)
-          .formParamMap(Map(
-            Form.PASSWORD -> Test.TEST_ZONE_PASSWORD_UNIQUE,
-            Form.ACL_ADDRESS -> "${%s}".format(Test.TEST_SELLER_ADDRESS),
-            Form.ORGANIZATION_ID -> "${%s}".format(Test.TEST_ORGANIZATION_ID),
-            Form.ISSUE_ASSET -> setACLPrivileges.issueAsset, Form.ISSUE_FIAT -> setACLPrivileges.issueFiat, Form.SEND_ASSET -> setACLPrivileges.sendAsset, Form.SEND_FIAT -> setACLPrivileges.sendFiat, Form.REDEEM_ASSET -> setACLPrivileges.redeemAsset, Form.REDEEM_FIAT -> setACLPrivileges.redeemFiat, Form.SELLER_EXECUTE_ORDER -> setACLPrivileges.sellerExecuteOrder, Form.BUYER_EXECUTE_ORDER -> setACLPrivileges.buyerExecuteOrder, Form.CHANGE_BUYER_BID -> setACLPrivileges.changeBuyerBid, Form.CHANGE_SELLER_BID -> setACLPrivileges.changeSellerBid, Form.CONFIRM_BUYER_BID -> setACLPrivileges.confirmBuyerBid, Form.CONFIRM_SELLER_BID -> setACLPrivileges.confirmSellerBid, Form.NEGOTIATION -> setACLPrivileges.negotiation, Form.RELEASE_ASSET -> setACLPrivileges.releaseAsset,
-            Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
-        .pause(10)
-        .exec(http("SetACLBuyer_GET")
-          .get(routes.SetACLController.setACLForm().url)
-          .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
-        .pause(2)
-        .exec { session => session.set(Test.TEST_BUYER_ADDRESS, getAccountAddressByUsername(session(Test.TEST_BUYER_USERNAME).as[String])) }
-        .exec(http("SetACLBuyer_POST")
-          .post(routes.SetACLController.setACL().url)
-          .formParamMap(Map(
-            Form.PASSWORD -> Test.TEST_ZONE_PASSWORD_UNIQUE,
-            Form.ACL_ADDRESS -> "${%s}".format(Test.TEST_BUYER_ADDRESS),
-            Form.ORGANIZATION_ID -> "${%s}".format(Test.TEST_ORGANIZATION_ID),
-            Form.ISSUE_ASSET -> setACLPrivileges.issueAsset, Form.ISSUE_FIAT -> setACLPrivileges.issueFiat, Form.SEND_ASSET -> setACLPrivileges.sendAsset, Form.SEND_FIAT -> setACLPrivileges.sendFiat, Form.REDEEM_ASSET -> setACLPrivileges.redeemAsset, Form.REDEEM_FIAT -> setACLPrivileges.redeemFiat, Form.SELLER_EXECUTE_ORDER -> setACLPrivileges.sellerExecuteOrder, Form.BUYER_EXECUTE_ORDER -> setACLPrivileges.buyerExecuteOrder, Form.CHANGE_BUYER_BID -> setACLPrivileges.changeBuyerBid, Form.CHANGE_SELLER_BID -> setACLPrivileges.changeSellerBid, Form.CONFIRM_BUYER_BID -> setACLPrivileges.confirmBuyerBid, Form.CONFIRM_SELLER_BID -> setACLPrivileges.confirmSellerBid, Form.NEGOTIATION -> setACLPrivileges.negotiation, Form.RELEASE_ASSET -> setACLPrivileges.releaseAsset,
-            Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
-        .pause(5)
     } {
       exec { session => println("OutsideApprove" + session); session }
     }
@@ -269,7 +356,8 @@ object traderSignUp {
       println(session(Test.TEST_USERNAME).as[String] + "||" + session(Test.TEST_PASSWORD).as[String])
       println("*******************************************************************************************************-")
       session
-    }}
+    }
+    }
     .exec(http("SignUp_GET")
       .get(routes.SignUpController.signUpForm().url)
       .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
@@ -294,7 +382,8 @@ object traderLoginAndRequestCoin {
       println(session(Test.TEST_USERNAME).as[String] + "||" + session(Test.TEST_PASSWORD).as[String])
       println("*******************************************************************************************************-")
       session
-    }}
+    }
+    }
     .exec(http("Login_GET")
       .get(routes.LoginController.loginForm().url)
       .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
@@ -320,7 +409,7 @@ object traderLoginAndRequestCoin {
     .pause(5)
 }
 
-object loginMainAndApproveFaucetRequest{
+object loginMainAndApproveFaucetRequest {
 
   val masterLoginMainAndApproveFaucetRequest: ScenarioBuilder = scenario("masterLoginMainAndApproveFaucetRequest")
     .feed(GenesisFeeder.genesisFeed)
@@ -354,7 +443,61 @@ object loginMainAndApproveFaucetRequest{
     .pause(5)
 }
 
-object sellerLoginAndIssueAssetRequest{
+object loginZoneAndSetACL {
+
+  val masterLoginZoneAndSetACL: ScenarioBuilder = scenario("masterLoginZoneAndSetACL")
+    .feed(ZoneIDFeeder.zoneIDFeed)
+    .feed(OrganizationIDFeeder.organizationIDFeed)
+    .feed(SellerLoginFeeder.sellerLoginFeed)
+    .feed(BuyerLoginFeeder.buyerLoginFeed)
+    .exec { session => session.set(Test.TEST_ZONE_ID, getZoneID(Test.TEST_ZONE_USERNAME_UNIQUE)) }
+    .doIfOrElse(session => getZoneStatus(Test.TEST_ZONE_USERNAME_UNIQUE)) {
+      exec(http("VerifiedZoneLogin_GET")
+        .get(routes.LoginController.loginForm().url)
+        .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
+        .exec(http("VerifiedZoneLogin_POST")
+          .post(routes.LoginController.login().url)
+          .formParamMap(Map(
+            Form.USERNAME -> Test.TEST_ZONE_USERNAME_UNIQUE,
+            Form.PASSWORD -> Test.TEST_ZONE_PASSWORD_UNIQUE,
+            Form.NOTIFICATION_TOKEN -> "",
+            Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
+        .pause(2)
+        .exec { session => session.set(Test.TEST_ORGANIZATION_ID, getOrganizationID(Test.TEST_ORGANIZATION_USERNAME_UNIQUE)) }
+        .exec(http("SetACLSeller_GET")
+          .get(routes.SetACLController.setACLForm().url)
+          .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
+        .pause(2)
+        .exec { session => session.set(Test.TEST_SELLER_ADDRESS, getAccountAddressByUsername(session(Test.TEST_SELLER_USERNAME).as[String])) }
+        .exec(http("SetACLSeller_POST")
+          .post(routes.SetACLController.setACL().url)
+          .formParamMap(Map(
+            Form.PASSWORD -> Test.TEST_ZONE_PASSWORD_UNIQUE,
+            Form.ACL_ADDRESS -> "${%s}".format(Test.TEST_SELLER_ADDRESS),
+            Form.ORGANIZATION_ID -> "${%s}".format(Test.TEST_ORGANIZATION_ID),
+            Form.ISSUE_ASSET -> setACLPrivileges.issueAsset, Form.ISSUE_FIAT -> setACLPrivileges.issueFiat, Form.SEND_ASSET -> setACLPrivileges.sendAsset, Form.SEND_FIAT -> setACLPrivileges.sendFiat, Form.REDEEM_ASSET -> setACLPrivileges.redeemAsset, Form.REDEEM_FIAT -> setACLPrivileges.redeemFiat, Form.SELLER_EXECUTE_ORDER -> setACLPrivileges.sellerExecuteOrder, Form.BUYER_EXECUTE_ORDER -> setACLPrivileges.buyerExecuteOrder, Form.CHANGE_BUYER_BID -> setACLPrivileges.changeBuyerBid, Form.CHANGE_SELLER_BID -> setACLPrivileges.changeSellerBid, Form.CONFIRM_BUYER_BID -> setACLPrivileges.confirmBuyerBid, Form.CONFIRM_SELLER_BID -> setACLPrivileges.confirmSellerBid, Form.NEGOTIATION -> setACLPrivileges.negotiation, Form.RELEASE_ASSET -> setACLPrivileges.releaseAsset,
+            Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
+        .pause(10)
+        .exec(http("SetACLBuyer_GET")
+          .get(routes.SetACLController.setACLForm().url)
+          .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
+        .pause(2)
+        .exec { session => session.set(Test.TEST_BUYER_ADDRESS, getAccountAddressByUsername(session(Test.TEST_BUYER_USERNAME).as[String])) }
+        .exec(http("SetACLBuyer_POST")
+          .post(routes.SetACLController.setACL().url)
+          .formParamMap(Map(
+            Form.PASSWORD -> Test.TEST_ZONE_PASSWORD_UNIQUE,
+            Form.ACL_ADDRESS -> "${%s}".format(Test.TEST_BUYER_ADDRESS),
+            Form.ORGANIZATION_ID -> "${%s}".format(Test.TEST_ORGANIZATION_ID),
+            Form.ISSUE_ASSET -> setACLPrivileges.issueAsset, Form.ISSUE_FIAT -> setACLPrivileges.issueFiat, Form.SEND_ASSET -> setACLPrivileges.sendAsset, Form.SEND_FIAT -> setACLPrivileges.sendFiat, Form.REDEEM_ASSET -> setACLPrivileges.redeemAsset, Form.REDEEM_FIAT -> setACLPrivileges.redeemFiat, Form.SELLER_EXECUTE_ORDER -> setACLPrivileges.sellerExecuteOrder, Form.BUYER_EXECUTE_ORDER -> setACLPrivileges.buyerExecuteOrder, Form.CHANGE_BUYER_BID -> setACLPrivileges.changeBuyerBid, Form.CHANGE_SELLER_BID -> setACLPrivileges.changeSellerBid, Form.CONFIRM_BUYER_BID -> setACLPrivileges.confirmBuyerBid, Form.CONFIRM_SELLER_BID -> setACLPrivileges.confirmSellerBid, Form.NEGOTIATION -> setACLPrivileges.negotiation, Form.RELEASE_ASSET -> setACLPrivileges.releaseAsset,
+            Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
+        .pause(2)
+    } {
+      exec { session => println("OutsideApprove" + session); session }
+    }
+}
+
+object sellerLoginAndIssueAssetRequest {
 
   val masterSellerLoginAndIssueAssetRequest: ScenarioBuilder = scenario("masterSellerLoginAndIssueAssetRequest")
     .feed(SellerLoginFeeder.sellerLoginFeed)
@@ -390,7 +533,7 @@ object sellerLoginAndIssueAssetRequest{
     .pause(5)
 }
 
-object loginZoneAndIssueAsset{
+object loginZoneAndIssueAsset {
 
   val masterLoginZoneAndIssueAsset: ScenarioBuilder = scenario("masterLoginZoneAndIssueAsset")
     .feed(ZoneIDFeeder.zoneIDFeed)
@@ -440,7 +583,7 @@ object loginZoneAndIssueAsset{
     }
 }
 
-object buyerLoginAndIssueFiatRequest{
+object buyerLoginAndIssueFiatRequest {
 
   val masterBuyerLoginAndIssueFiatRequest: ScenarioBuilder = scenario("masterBuyerLoginAndIssueFiatRequest")
     .feed(BuyerLoginFeeder.buyerLoginFeed)
@@ -470,7 +613,7 @@ object buyerLoginAndIssueFiatRequest{
     .pause(5)
 }
 
-object loginZoneAndIssueFiat{
+object loginZoneAndIssueFiat {
 
   val masterLoginZoneAndIssueFiat: ScenarioBuilder = scenario("masterLoginZoneAndIssueFiat")
     .feed(ZoneIDFeeder.zoneIDFeed)
@@ -516,7 +659,7 @@ object loginZoneAndIssueFiat{
     }
 }
 
-object buyerLoginAndChangeBuyerBid{
+object buyerLoginAndChangeBuyerBid {
 
   val masterBuyerLoginAndChangeBuyerBid: ScenarioBuilder = scenario("masterBuyerLoginAndChangeBuyerBid")
     .feed(BuyerLoginFeeder.buyerLoginFeed)
@@ -559,7 +702,7 @@ object buyerLoginAndChangeBuyerBid{
     .pause(5)
 }
 
-object sellerLoginAndChangeSellerBid{
+object sellerLoginAndChangeSellerBid {
 
   val masterSellerLoginAndChangeSellerBid: ScenarioBuilder = scenario("masterSellerLoginAndChangeSellerBid")
     .feed(SellerLoginFeeder.sellerLoginFeed)
@@ -605,7 +748,7 @@ object sellerLoginAndChangeSellerBid{
 }
 
 
-object buyerLoginAndConfirmBuyerBid{
+object buyerLoginAndConfirmBuyerBid {
 
   val masterBuyerLoginAndConfirmBuyerBid: ScenarioBuilder = scenario("masterBuyerLoginAndConfirmBuyerBid")
     .feed(BuyerLoginFeeder.buyerLoginFeed)
@@ -649,7 +792,7 @@ object buyerLoginAndConfirmBuyerBid{
 }
 
 
-object sellerLoginAndConfirmSellerBid{
+object sellerLoginAndConfirmSellerBid {
 
   val masterSellerLoginAndConfirmSellerBid: ScenarioBuilder = scenario("masterSellerLoginAndConfirmSellerBid")
     .feed(SellerLoginFeeder.sellerLoginFeed)
@@ -694,7 +837,7 @@ object sellerLoginAndConfirmSellerBid{
     .pause(5)
 }
 
-object loginZoneAndReleaseAsset{
+object loginZoneAndReleaseAsset {
 
   val masterLoginZoneAndReleaseAsset: ScenarioBuilder = scenario("masterLoginZoneAndReleaseAsset")
     .doIfOrElse(session => getZoneStatus(Test.TEST_ZONE_USERNAME_UNIQUE)) {
@@ -734,7 +877,7 @@ object loginZoneAndReleaseAsset{
     }
 }
 
-object sellerLoginAndSendAsset{
+object sellerLoginAndSendAsset {
 
   val masterSellerLoginAndSendAsset: ScenarioBuilder = scenario("masterSellerLoginAndSendAsset")
     .feed(SellerLoginFeeder.sellerLoginFeed)
@@ -773,7 +916,7 @@ object sellerLoginAndSendAsset{
 }
 
 
-object buyerLoginAndSendFiat{
+object buyerLoginAndSendFiat {
 
   val masterBuyerLoginAndSendFiat: ScenarioBuilder = scenario("masterBuyerLoginAndSendFiat")
     .feed(BuyerLoginFeeder.buyerLoginFeed)
@@ -814,7 +957,7 @@ object buyerLoginAndSendFiat{
 }
 
 
-object loginZoneAndExecuteOrder{
+object loginZoneAndExecuteOrder {
 
   val masterLoginZoneAndExecuteOrder: ScenarioBuilder = scenario("masterLoginZoneAndExecuteOrder")
     .exec { session => session.set(Test.TEST_ZONE_ID, getZoneID(Test.TEST_ZONE_USERNAME_UNIQUE)) }
