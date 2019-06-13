@@ -4,10 +4,13 @@
 <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/tag.css")">
 
 <div class="box flexItem leftAlign flexGrowth">
-    <h2>@username</h2>
-    @Messages(constants.User.USER_TYPE): @userType <br/>
-    @Messages(constants.User.ADDRESS): @address <br/>
-    @Messages(constants.User.COINS): @coins
+    <h2 class="showHide showHideStyle centerText">@username</h2>
+    <div class="centerText">
+        @Messages(constants.User.COINS): @coins
     <button onclick="getForm(jsRoutes.controllers.SendCoinController.sendCoinForm())">@Messages(constants.Form.SEND_COIN)</button>
-    <br/>
+    </div>
+    <div>
+        @Messages(constants.User.USER_TYPE): @userType <br/>
+        @Messages(constants.User.ADDRESS): @address <br/>
+    </div>
 </div>

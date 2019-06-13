@@ -311,7 +311,7 @@ blur(5 px);
 
 .showHideStyle:hover {
     cursor: pointer;
-    color: blue;
+    color: rgba(255, 249, 6, 0.66);
 }
 
 .leftAlign {
