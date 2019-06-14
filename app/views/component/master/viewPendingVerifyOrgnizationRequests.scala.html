@@ -25,8 +25,7 @@
             <td>@organizationVerificationRequest.phone</td>
             <td>@organizationVerificationRequest.email</td>
             <td id = "kycDocuments@organizationVerificationRequest.accountID"><script>getOrganizationKycFilesWithZoneLoginAction("@organizationVerificationRequest.accountID")</script></td>
-            <td><a onclick="getForm(jsRoutes.controllers.AddOrganizationController.verifyOrganizationForm('@organizationVerificationRequest.id', '@organizationVerificationRequest.zoneID'))">@Messages(constants.Form.APPROVE)</a>
-                /<a onclick="getForm(jsRoutes.controllers.AddOrganizationController.rejectVerifyOrganizationRequestForm('@organizationVerificationRequest.id'))">@Messages(constants.Form.REJECT)</a></td>
+            <td><button class="approve" onclick="getForm(jsRoutes.controllers.AddOrganizationController.verifyOrganizationForm('@organizationVerificationRequest.id', '@organizationVerificationRequest.zoneID'))">@Messages(constants.Form.APPROVE)</button> <button class="reject" onclick="getForm(jsRoutes.controllers.AddOrganizationController.rejectVerifyOrganizationRequestForm('@organizationVerificationRequest.id'))">@Messages(constants.Form.REJECT)</button></td>
         </tr>
     }
 </table>

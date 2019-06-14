@@ -19,8 +19,7 @@
             <td>@zoneVerificationRequest.name</td>
             <td>@zoneVerificationRequest.currency</td>
             <td id = "kycDocuments@zoneVerificationRequest.accountID"><script>getZoneKycFilesWithGenesisLoginAction('@zoneVerificationRequest.accountID', ['@constants.File.BANK_DETAILS', '@constants.File.IDENTIFICATION'])</script></td>
-            <td><a onclick="getForm(jsRoutes.controllers.AddZoneController.verifyZoneForm('@zoneVerificationRequest.id'))">@Messages(constants.Form.APPROVE)</a>
-                /<a onclick="getForm(jsRoutes.controllers.AddZoneController.rejectVerifyZoneRequestForm('@zoneVerificationRequest.id'))">@Messages(constants.Form.REJECT)</a></td>
+            <td><button class="approve" onclick="getForm(jsRoutes.controllers.AddZoneController.verifyZoneForm('@zoneVerificationRequest.id'))">@Messages(constants.Form.APPROVE)</button> <button class="reject" onclick="getForm(jsRoutes.controllers.AddZoneController.rejectVerifyZoneRequestForm('@zoneVerificationRequest.id'))">@Messages(constants.Form.REJECT)</button></td>
         </tr>
     }
 </table>

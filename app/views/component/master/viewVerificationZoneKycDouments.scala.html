@@ -7,13 +7,13 @@
         <div id="zoneKycDocumentStatus@zoneKYC.id@zoneKYC.documentType"></div>
         @zoneKYC.status.getOrElse(None)  match {
             case true => {
-                <div id="buttonZoneKycDocumentStatus@zoneKYC.id@zoneKYC.documentType"><button onclick="rejectZoneKycDocument('@zoneKYC.id', '@zoneKYC.documentType')">@Messages(constants.Form.REJECT)</button></div>
+                <div id="buttonZoneKycDocumentStatus@zoneKYC.id@zoneKYC.documentType"><button class="reject" onclick="rejectZoneKycDocument('@zoneKYC.id', '@zoneKYC.documentType')">@Messages(constants.Form.REJECT)</button></div>
             }
             case false => {
-                <div id="buttonZoneKycDocumentStatus@zoneKYC.id@zoneKYC.documentType"><button onclick="verifyZoneKycDocument('@zoneKYC.id', '@zoneKYC.documentType')">@Messages(constants.Form.APPROVE)</button></div>
+                <div id="buttonZoneKycDocumentStatus@zoneKYC.id@zoneKYC.documentType"><button class="approve" onclick="verifyZoneKycDocument('@zoneKYC.id', '@zoneKYC.documentType')">@Messages(constants.Form.APPROVE)</button></div>
             }
             case _ => {
-                <div id="buttonZoneKycDocumentStatus@zoneKYC.id@zoneKYC.documentType"><button onclick="verifyZoneKycDocument('@zoneKYC.id', '@zoneKYC.documentType')">@Messages(constants.Form.APPROVE)</button>/<button onclick="rejectZoneKycDocument('@zoneKYC.id', '@zoneKYC.documentType')">@Messages(constants.Form.REJECT)</button></div>
+                <div id="buttonZoneKycDocumentStatus@zoneKYC.id@zoneKYC.documentType"><button class="approve" onclick="verifyZoneKycDocument('@zoneKYC.id', '@zoneKYC.documentType')">@Messages(constants.Form.APPROVE)</button> <button class="approve" onclick="rejectZoneKycDocument('@zoneKYC.id', '@zoneKYC.documentType')">@Messages(constants.Form.REJECT)</button></div>
             }
         }
     }

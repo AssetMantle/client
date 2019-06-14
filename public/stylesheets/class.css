@@ -418,3 +418,14 @@ dl:hover .info {
     cursor: pointer;
 }
 /*upload file css*/
+
+/*approve and reject color*/
+.approve {
+    background-color: #4CAF50;
+}
+
+.reject {
+    background-color: #f44336;
+}
+
+/*approve and reject color*/

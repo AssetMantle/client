@@ -7,13 +7,13 @@
         <div id="organizationKycDocumentStatus@organizationKYC.id@organizationKYC.documentType"></div>
         @organizationKYC.status.getOrElse(None)  match {
             case true => {
-                <div id="buttonOrganizationKycDocumentStatus@organizationKYC.id@organizationKYC.documentType"><button onclick="rejectOrganizationKycDocument('@organizationKYC.id', '@organizationKYC.documentType')">@Messages(constants.Form.REJECT)</button></div>
+                <div id="buttonOrganizationKycDocumentStatus@organizationKYC.id@organizationKYC.documentType"><button class="reject" onclick="rejectOrganizationKycDocument('@organizationKYC.id', '@organizationKYC.documentType')">@Messages(constants.Form.REJECT)</button></div>
             }
             case false => {
-                <div id="buttonOrganizationKycDocumentStatus@organizationKYC.id@organizationKYC.documentType"><button onclick="verifyOrganizationKycDocument('@organizationKYC.id', '@organizationKYC.documentType')">@Messages(constants.Form.APPROVE)</button></div>
+                <div id="buttonOrganizationKycDocumentStatus@organizationKYC.id@organizationKYC.documentType"><button class="approve" onclick="verifyOrganizationKycDocument('@organizationKYC.id', '@organizationKYC.documentType')">@Messages(constants.Form.APPROVE)</button></div>
             }
             case _ => {
-                <div id="buttonOrganizationKycDocumentStatus@organizationKYC.id@organizationKYC.documentType"><button onclick="verifyOrganizationKycDocument('@organizationKYC.id', '@organizationKYC.documentType')">@Messages(constants.Form.APPROVE)</button>/<button onclick="rejectOrganizationKycDocument('@organizationKYC.id', '@organizationKYC.documentType')">@Messages(constants.Form.REJECT)</button></div>
+                <div id="buttonOrganizationKycDocumentStatus@organizationKYC.id@organizationKYC.documentType"> <button class="approve" onclick="verifyOrganizationKycDocument('@organizationKYC.id', '@organizationKYC.documentType')">@Messages(constants.Form.APPROVE)</button> <button class="reject" onclick="rejectOrganizationKycDocument('@organizationKYC.id', '@organizationKYC.documentType')">@Messages(constants.Form.REJECT)</button></div>
             }
         }
     }

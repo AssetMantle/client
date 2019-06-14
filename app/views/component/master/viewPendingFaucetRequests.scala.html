@@ -16,9 +16,7 @@
             <td>@faucetRequest.accountID</td>
             <td>@faucetRequest.amount</td>
             <td>
-                <a onclick="getForm(jsRoutes.controllers.SendCoinController.approveFaucetRequestsForm('@faucetRequest.id', '@faucetRequest.accountID'))">@Messages(constants.Form.APPROVE)</a>
-                /
-                <a onclick="getForm(jsRoutes.controllers.SendCoinController.rejectFaucetRequestForm('@faucetRequest.id'))">@Messages(constants.Form.REJECT)</a>
+                <button class="approve" onclick="getForm(jsRoutes.controllers.SendCoinController.approveFaucetRequestsForm('@faucetRequest.id', '@faucetRequest.accountID'))">@Messages(constants.Form.APPROVE)</button> <button class="reject" onclick="getForm(jsRoutes.controllers.SendCoinController.rejectFaucetRequestForm('@faucetRequest.id'))">@Messages(constants.Form.REJECT)</button>
             </td>
         </tr>
     }
