@@ -1,7 +1,7 @@
 @import models.master.Organization
 
 @(organizationVerificationRequests: Seq[Organization])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
-
+<script src="@routes.Assets.versioned("javascripts/kycVerification.js")" type="text/javascript"></script>
 <table>
     <tr>
         <th>@Messages(constants.Form.ORGANIZATION_ID)</th>
@@ -11,6 +11,7 @@
         <th>@Messages(constants.Form.ADDRESS)</th>
         <th>@Messages(constants.Form.PHONE)</th>
         <th>@Messages(constants.Form.EMAIL)</th>
+        <th>@Messages(constants.Form.DOCUMENTS)</th>
         <th>@Messages(constants.Form.STATUS)</th>
 
     </tr>
@@ -23,9 +24,10 @@
             <td>@organizationVerificationRequest.address</td>
             <td>@organizationVerificationRequest.phone</td>
             <td>@organizationVerificationRequest.email</td>
+            <td id = "kycDocuments@organizationVerificationRequest.accountID"><script>getOrganizationKycFilesWithZoneLoginAction("@organizationVerificationRequest.accountID")</script></td>
             <td><a onclick="getForm(jsRoutes.controllers.AddOrganizationController.verifyOrganizationForm('@organizationVerificationRequest.id', '@organizationVerificationRequest.zoneID'))">@Messages(constants.Form.APPROVE)</a>
                 /<a onclick="getForm(jsRoutes.controllers.AddOrganizationController.rejectVerifyOrganizationRequestForm('@organizationVerificationRequest.id'))">@Messages(constants.Form.REJECT)</a></td>
         </tr>
     }
 </table>
-<br>
+

@@ -20,7 +20,7 @@ import scala.util.{Failure, Success}
 case class AddZone(from: String, to: String, zoneID: String, status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])
 
 @Singleton
-class AddZones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, transactionAddZone: transactions.AddZone, getResponse: GetResponse, actorSystem: ActorSystem, pushNotification: PushNotification, masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts, blockchainZones: models.blockchain.Zones, masterZones: master.Zones)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
+class AddZones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, masterZoneKYCs: master.ZoneKYCs, transactionAddZone: transactions.AddZone, getResponse: GetResponse, actorSystem: ActorSystem, pushNotification: PushNotification, masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts, blockchainZones: models.blockchain.Zones, masterZones: master.Zones)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_ADD_ZONE
 
@@ -33,6 +33,10 @@ class AddZones @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
   import databaseConfig.profile.api._
 
   private[models] val addZoneTable = TableQuery[AddZoneTable]
+
+  private val uploadZoneKycBankDetailsPath = configuration.get[String]("upload.zoneKYCsBankDetailsPath")
+
+  private val uploadZoneKycIdentificationPath = configuration.get[String]("upload.zoneKYCsIdentificationPath")
 
   private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
   private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
@@ -138,8 +142,10 @@ class AddZones @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
         blockchainZones.Service.create(addZone.zoneID, addZone.to, dirtyBit = true)
         masterZones.Service.updateStatus(addZone.zoneID, status = true)
         masterAccounts.Service.updateUserTypeOnAddress(addZone.to, constants.User.ZONE)
+        val zoneAccountId = masterAccounts.Service.getId(addZone.to)
+        masterZoneKYCs.Service.verifyAll(zoneAccountId)
         blockchainAccounts.Service.markDirty(masterAccounts.Service.getAddress(addZone.from))
-        pushNotification.sendNotification(masterAccounts.Service.getId(addZone.to), constants.Notification.SUCCESS, response.TxHash)
+        pushNotification.sendNotification(zoneAccountId, constants.Notification.SUCCESS, response.TxHash)
         pushNotification.sendNotification(addZone.from, constants.Notification.SUCCESS, response.TxHash)
       } catch {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)

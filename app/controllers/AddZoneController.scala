@@ -4,7 +4,7 @@ import controllers.actions.{WithGenesisLoginAction, WithUserLoginAction}
 import exceptions.{BaseException, BlockChainException}
 import javax.inject.{Inject, Singleton}
 import models.{blockchain, blockchainTransaction, master}
-import play.api.i18n.I18nSupport
+import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
 
@@ -12,11 +12,15 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Random
 
 @Singleton
-class AddZoneController @Inject()(messagesControllerComponents: MessagesControllerComponents, blockchainAccounts: blockchain.Accounts, transactionsAddZone: transactions.AddZone, blockchainZones: models.blockchain.Zones, blockchainTransactionAddZones: blockchainTransaction.AddZones, masterAccounts: master.Accounts, masterZones: master.Zones, withUserLoginAction: WithUserLoginAction, withGenesisLoginAction: WithGenesisLoginAction)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class AddZoneController @Inject()(messagesControllerComponents: MessagesControllerComponents, blockchainAccounts: blockchain.Accounts, masterZoneKYCs: master.ZoneKYCs, transactionsAddZone: transactions.AddZone, blockchainZones: models.blockchain.Zones, blockchainTransactionAddZones: blockchainTransaction.AddZones, masterAccounts: master.Accounts, masterZones: master.Zones, withUserLoginAction: WithUserLoginAction, withGenesisLoginAction: WithGenesisLoginAction)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
 
   private implicit val logger: Logger = Logger(this.getClass)
+
+  private val uploadZoneKycBankDetailsPath = configuration.get[String]("upload.zoneKYCsBankDetailsPath")
+
+  private val uploadZoneKycIdentificationPath = configuration.get[String]("upload.zoneKYCsIdentificationPath")
 
   def addZoneForm: Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.master.addZone(views.companion.master.AddZone.form))
@@ -55,7 +59,6 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
             val zoneAccountAddress = masterAccounts.Service.getAddress(masterZones.Service.getAccountId(verifyZoneData.zoneID))
             val ticketID: String = if (kafkaEnabled) transactionsAddZone.Service.kafkaPost(transactionsAddZone.Request(from = username, to = zoneAccountAddress, zoneID = verifyZoneData.zoneID, password = verifyZoneData.password)).ticketID else Random.nextString(32)
             blockchainTransactionAddZones.Service.create(username, zoneAccountAddress, verifyZoneData.zoneID, null, null, ticketID, null)
-
             if (!kafkaEnabled) {
               Future {
                 try {
@@ -87,6 +90,35 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
       }
   }
 
+  def viewKycDocuments(accountID: String): Action[AnyContent] = withGenesisLoginAction.authenticated { username =>
+    implicit request =>
+      try {
+        Ok(views.html.component.master.viewVerificationZoneKycDouments(masterZoneKYCs.Service.getAllDocuments(accountID)))
+      } catch {
+        case baseException: BaseException => BadRequest(views.html.index(failures = Seq(baseException.failure)))
+      }
+  }
+
+  def verifyKycDocument(accountID: String, documentType: String): Action[AnyContent] = withGenesisLoginAction.authenticated { username =>
+    implicit request =>
+      try {
+        masterZoneKYCs.Service.verify(id = accountID, documentType = documentType)
+        Ok(Messages(constants.Response.SUCCESS.message))
+      } catch {
+        case baseException: BaseException => BadRequest(Messages(baseException.failure.message))
+      }
+  }
+
+  def rejectKycDocument(accountID: String, documentType: String): Action[AnyContent] = withGenesisLoginAction.authenticated { username =>
+    implicit request =>
+      try {
+        masterZoneKYCs.Service.reject(id = accountID, documentType = documentType)
+        Ok(Messages(constants.Response.SUCCESS.message))
+      } catch {
+        case baseException: BaseException => BadRequest(Messages(baseException.failure.message))
+      }
+  }
+
   def rejectVerifyZoneRequestForm(zoneID: String): Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.master.rejectVerifyZoneRequest(views.companion.master.RejectVerifyZoneRequest.form, zoneID))
   }
@@ -100,6 +132,7 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
         rejectVerifyZoneRequestData => {
           try {
             masterZones.Service.updateStatus(rejectVerifyZoneRequestData.zoneID, status = false)
+            masterZoneKYCs.Service.rejectAll(masterZones.Service.getAccountId(rejectVerifyZoneRequestData.zoneID))
             Ok(views.html.index(successes = Seq(constants.Response.VERIFY_ZONE_REJECTED)))
           }
           catch {

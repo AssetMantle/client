@@ -1,0 +1,21 @@
+@import models.master.OrganizationKYC
+
+@(organizationKYC: OrganizationKYC)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+<div>
+    @utilities.FileOperations.fileExtensionFromName(organizationKYC.fileName) match {
+        case constants.File.PNG | constants.File.JPEG | constants.File.JPG => {
+            <li><a href="@routes.FileController.serveFileToGenesis(organizationKYC.fileName, organizationKYC.documentType)">@organizationKYC.documentType <br>
+            <img src="data:image/jpg;base64,@utilities.FileOperations.decodeImageThumbnailData(organizationKYC.file.get)" alt="@organizationKYC.documentType">
+            </a>
+                <br>
+                <div id="statusOrganizationKycDocumentStatus@organizationKYC.id@organizationKYC.documentType">@organizationKYC.status</div>
+            </li>
+        }
+        case _ => {
+            <li><a href="@routes.FileController.serveFileToGenesis(organizationKYC.fileName, organizationKYC.documentType)">@organizationKYC.documentType</a>
+                <br>
+                <div id="statusOrganizationKycDocumentStatus@organizationKYC.id@organizationKYC.documentType">@organizationKYC.status</div>
+            </li>
+        }
+    }
+</div>

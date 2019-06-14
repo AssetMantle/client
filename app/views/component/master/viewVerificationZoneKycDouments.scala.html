@@ -1,0 +1,20 @@
+@import models.master.ZoneKYC
+
+@(zoneKYCs: Seq[ZoneKYC])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+<div>
+    @for(zoneKYC <- zoneKYCs) {
+        @component.master.viewZoneKycDocument(zoneKYC)
+        <div id="zoneKycDocumentStatus@zoneKYC.id@zoneKYC.documentType"></div>
+        @zoneKYC.status.getOrElse(None)  match {
+            case true => {
+                <div id="buttonZoneKycDocumentStatus@zoneKYC.id@zoneKYC.documentType"><button onclick="rejectZoneKycDocument('@zoneKYC.id', '@zoneKYC.documentType')">@Messages(constants.Form.REJECT)</button></div>
+            }
+            case false => {
+                <div id="buttonZoneKycDocumentStatus@zoneKYC.id@zoneKYC.documentType"><button onclick="verifyZoneKycDocument('@zoneKYC.id', '@zoneKYC.documentType')">@Messages(constants.Form.APPROVE)</button></div>
+            }
+            case _ => {
+                <div id="buttonZoneKycDocumentStatus@zoneKYC.id@zoneKYC.documentType"><button onclick="verifyZoneKycDocument('@zoneKYC.id', '@zoneKYC.documentType')">@Messages(constants.Form.APPROVE)</button>/<button onclick="rejectZoneKycDocument('@zoneKYC.id', '@zoneKYC.documentType')">@Messages(constants.Form.REJECT)</button></div>
+            }
+        }
+    }
+</div>

@@ -4,7 +4,7 @@ import controllers.actions.{WithUserLoginAction, WithZoneLoginAction}
 import exceptions.{BaseException, BlockChainException}
 import javax.inject.{Inject, Singleton}
 import models.{blockchain, blockchainTransaction, master}
-import play.api.i18n.I18nSupport
+import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
 
@@ -12,7 +12,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Random
 
 @Singleton
-class AddOrganizationController @Inject()(messagesControllerComponents: MessagesControllerComponents, blockchainAccounts: blockchain.Accounts, transactionsAddOrganization: transactions.AddOrganization, blockchainOrganizations: blockchain.Organizations, masterZones: master.Zones, blockchainTransactionAddOrganizations: blockchainTransaction.AddOrganizations, masterOrganizations: master.Organizations, masterAccounts: master.Accounts, withUserLoginAction: WithUserLoginAction, withZoneLoginAction: WithZoneLoginAction)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class AddOrganizationController @Inject()(messagesControllerComponents: MessagesControllerComponents, blockchainAccounts: blockchain.Accounts, masterOrganizationKYCs: master.OrganizationKYCs, transactionsAddOrganization: transactions.AddOrganization, blockchainOrganizations: blockchain.Organizations, masterZones: master.Zones, blockchainTransactionAddOrganizations: blockchainTransaction.AddOrganizations, masterOrganizations: master.Organizations, masterAccounts: master.Accounts, withUserLoginAction: WithUserLoginAction, withZoneLoginAction: WithZoneLoginAction)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
 
@@ -80,6 +80,35 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
       )
   }
 
+  def viewKycDocuments(accountID: String): Action[AnyContent] = withZoneLoginAction.authenticated { username =>
+    implicit request =>
+      try {
+        Ok(views.html.component.master.viewVerificationOrganizationKycDouments(masterOrganizationKYCs.Service.getAllDocuments(accountID)))
+      } catch {
+        case baseException: BaseException => BadRequest(views.html.index(failures = Seq(baseException.failure)))
+      }
+  }
+
+  def verifyKycDocument(accountID: String, documentType: String): Action[AnyContent] = withZoneLoginAction.authenticated { username =>
+    implicit request =>
+      try {
+        masterOrganizationKYCs.Service.verify(id = accountID, documentType = documentType)
+        Ok(Messages(constants.Response.SUCCESS.message))
+      } catch {
+        case baseException: BaseException => BadRequest(Messages(baseException.failure.message))
+      }
+  }
+
+  def rejectKycDocument(accountID: String, documentType: String): Action[AnyContent] = withZoneLoginAction.authenticated { username =>
+    implicit request =>
+      try {
+        masterOrganizationKYCs.Service.reject(id = accountID, documentType = documentType)
+        Ok(Messages(constants.Response.SUCCESS.message))
+      } catch {
+        case baseException: BaseException => BadRequest(Messages(baseException.failure.message))
+      }
+  }
+
   def rejectVerifyOrganizationRequestForm(organizationID: String): Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.master.rejectVerifyOrganizationRequest(views.companion.master.RejectVerifyOrganizationRequest.form, organizationID))
   }
@@ -93,6 +122,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
         rejectVerifyOrganizationRequestData => {
           try {
             masterOrganizations.Service.updateStatus(rejectVerifyOrganizationRequestData.organizationID, false)
+            masterOrganizationKYCs.Service.rejectAll(masterOrganizations.Service.getAccountId(rejectVerifyOrganizationRequestData.organizationID))
             Ok(views.html.index(successes = Seq(constants.Response.VERIFY_ORGANIZATION_REQUEST_REJECTED)))
           }
           catch {

@@ -20,7 +20,7 @@ import scala.util.{Failure, Success}
 case class AddOrganization(from: String, to: String, organizationID: String, zoneID: String, status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])
 
 @Singleton
-class AddOrganizations @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, transactionAddOrganization: transactions.AddOrganization, getResponse: GetResponse, actorSystem: ActorSystem, pushNotification: PushNotification, masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts, blockchainOrganizations: blockchain.Organizations, masterOrganizations: master.Organizations)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
+class AddOrganizations @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, masterOrganizationKYCs: master.OrganizationKYCs, transactionAddOrganization: transactions.AddOrganization, getResponse: GetResponse, actorSystem: ActorSystem, pushNotification: PushNotification, masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts, blockchainOrganizations: blockchain.Organizations, masterOrganizations: master.Organizations)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_ADD_ORGANIZATION
 
@@ -31,6 +31,10 @@ class AddOrganizations @Inject()(protected val databaseConfigProvider: DatabaseC
   val db = databaseConfig.db
 
   import databaseConfig.profile.api._
+
+  private val uploadOrganizationKycBankDetailsPath = configuration.get[String]("upload.organizationKYCsBankDetailsPath")
+
+  private val uploadOrganizationKycIdentificationPath = configuration.get[String]("upload.organizationKYCsIdentificationPath")
 
   private[models] val addOrganizationTable = TableQuery[AddOrganizationTable]
 
@@ -140,8 +144,10 @@ class AddOrganizations @Inject()(protected val databaseConfigProvider: DatabaseC
         blockchainOrganizations.Service.create(addOrganization.organizationID, addOrganization.to, dirtyBit = true)
         masterOrganizations.Service.updateStatus(addOrganization.organizationID, status = true)
         masterAccounts.Service.updateUserType(masterOrganizations.Service.getAccountId(addOrganization.organizationID), constants.User.ORGANIZATION)
+        val organizationAccountId = masterAccounts.Service.getId(addOrganization.to)
+        masterOrganizationKYCs.Service.verifyAll(organizationAccountId)
         blockchainAccounts.Service.markDirty(masterAccounts.Service.getAddress(addOrganization.from))
-        pushNotification.sendNotification(masterAccounts.Service.getId(addOrganization.to), constants.Notification.SUCCESS, response.TxHash)
+        pushNotification.sendNotification(organizationAccountId, constants.Notification.SUCCESS, response.TxHash)
         pushNotification.sendNotification(addOrganization.from, constants.Notification.SUCCESS, response.TxHash)
       } catch {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)

@@ -1,44 +1,26 @@
-$(document).ready(function () {
+function userKycFileUpload(documentType) {
     let updatingFile = false;
 
-    let rImage = new Resumable({
-        target: jsRoutes.controllers.FileUploadController.uploadImages().url,
-        fileType: ['jpg', 'png', 'jpeg'],
-        query: {csrfToken: $('[name="csrfToken"]').attr('value')}
-    });
-    let rPDF = new Resumable({
-        target: jsRoutes.controllers.FileUploadController.uploadPDFs().url,
-        fileType: ['pdf'],
-        query: {csrfToken: $('[name="csrfToken"]').attr('value')}
-    });
-    let rDOC = new Resumable({
-        target: jsRoutes.controllers.FileUploadController.uploadDOCs().url,
-        fileType: ['doc', 'docx', 'txt'],
+    let rFile = new Resumable({
+        target: jsRoutes.controllers.FileController.uploadUserKYC(documentType).url,
+        fileType: ['jpg', 'png', 'jpeg', 'pdf', 'doc', 'txt', 'docx'],
         query: {csrfToken: $('[name="csrfToken"]').attr('value')}
     });
     let retries = 0;
     document.getElementById('uploadButton').onclick = function () {
-        rImage.upload();
-        rPDF.upload();
-        rDOC.upload();
+        rFile.upload();
         retries = 0;
     };
     document.getElementById('updateButton').onclick = function () {
         updatingFile = true;
-        rImage.upload();
-        rPDF.upload();
-        rDOC.upload();
+        rFile.upload();
         retries = 0;
     };
     document.getElementById('pauseButton').onclick = function () {
-        rImage.pause();
-        rPDF.pause();
-        rDOC.pause();
+        rFile.pause();
     };
     document.getElementById('cancelButton').onclick = function () {
-        rImage.cancel();
-        rPDF.cancel();
-        rDOC.cancel();
+        rFile.cancel();
         retries = 0;
     };
 
@@ -75,27 +57,25 @@ $(document).ready(function () {
 
             filesSpace.appendChild(li);
         } else {
-            rImage.removeFile(file);
-            rPDF.removeFile(file);
-            rDOC.removeFile(file);
+            rFile.removeFile(file);
         }
     }
 
-    rImage.assignBrowse(document.getElementById('browseButtonImages'));
-    rImage.on('fileAdded', function (file) {
+    rFile.assignBrowse(document.getElementById('browseButton'));
+    rFile.on('fileAdded', function (file) {
         addFileToList(file);
     });
-    rImage.on('fileProgress', function (file) {
+    rFile.on('fileProgress', function (file) {
         document.getElementById(file.uniqueIdentifier + "-progress").textContent = (file.progress(false) * 100.00) + '%';
     });
 
-    rImage.on('fileSuccess', function (file) {
+    rFile.on('fileSuccess', function (file) {
         let element = document.getElementById(file.uniqueIdentifier + "-progress");
         let route = "";
         if (updatingFile) {
-            route = jsRoutes.controllers.FileUploadController.updateImage(file.fileName);
+            route = jsRoutes.controllers.FileController.updateUserKYC(file.fileName, documentType);
         } else {
-            route = jsRoutes.controllers.FileUploadController.storeImage(file.fileName);
+            route = jsRoutes.controllers.FileController.storeUserKYC(file.fileName, documentType);
         }
         $.ajax({
             url: route.url,
@@ -111,7 +91,7 @@ $(document).ready(function () {
         updatingFile = false;
     });
 
-    rImage.on('cancel', function (file) {
+    rFile.on('cancel', function (file) {
         $(".uploadProgress").css("display", "flex");
         let anchors = filesSpace.getElementsByTagName('a');
         for (let i = anchors.length - 1; i >= 0; i--) {
@@ -120,48 +100,112 @@ $(document).ready(function () {
         errorMessage.textContent = 'Upload canceled';
     });
 
-    rImage.on('progress', function () {
+    rFile.on('progress', function () {
         $(".uploadProgress").css("display", "flex");
-        progress.textContent = (rImage.progress() * 100.00);
+        progress.textContent = (rFile.progress() * 100.00);
         let percent = progress.textContent;
         document.querySelector(".progressBar").style.width = percent + "%";
         document.querySelector(".progressBar").textContent = percent.toFixed(0) + "%";
     });
-    rImage.on('fileError', function (file, msg) {
+    rFile.on('fileError', function (file, msg) {
         document.getElementById(file.uniqueIdentifier + "-progress").textContent = msg;
         errorMessage.textContent = msg;
     });
-    rImage.on('fileRetry', function (file) {
+    rFile.on('fileRetry', function (file) {
         document.getElementById(file.uniqueIdentifier + "-progress").textContent = 'Retrying upload';
         retries++;
         errorMessage.textContent = "Retried " + retries + "time(s)";
         if (retries > 10) {
-            rImage.pause();
+            rFile.pause();
             errorMessage.textContent = 'Pausing file upload after ' + retries + ' attempts';
         }
     });
-    rImage.on('error', function (message, file) {
+    rFile.on('error', function (message, file) {
         errorMessage.textContent = message;
     });
-    rImage.on('catchAll', function (eventX) {
+    rFile.on('catchAll', function (eventX) {
         console.log(eventX)
     });
+}
 
+function userZoneKycFileUpload(documentType) {
+    let updatingFile = false;
 
-    rPDF.assignBrowse(document.getElementById('browseButtonPDFs'));
-    rPDF.on('fileAdded', function (file) {
+    let rFile = new Resumable({
+        target: jsRoutes.controllers.FileController.uploadZoneKycUser(documentType).url,
+        fileType: ['jpg', 'png', 'jpeg', 'pdf', 'doc', 'txt', 'docx'],
+        query: {csrfToken: $('[name="csrfToken"]').attr('value')}
+    });
+    let retries = 0;
+    document.getElementById('uploadButton').onclick = function () {
+        rFile.upload();
+        retries = 0;
+    };
+    document.getElementById('updateButton').onclick = function () {
+        updatingFile = true;
+        rFile.upload();
+        retries = 0;
+    };
+    document.getElementById('pauseButton').onclick = function () {
+        rFile.pause();
+    };
+    document.getElementById('cancelButton').onclick = function () {
+        rFile.cancel();
+        retries = 0;
+    };
+
+    let errorMessage = document.getElementById('errorMessage');
+    let successfulMessage = document.getElementById('successfulMessage');
+    let progress = document.getElementsByClassName('progressBar');
+    let filesSpace = document.getElementById('filesToBeUploaded');
+
+    function addFileToList(file) {
+        if ($("#filesToBeUploaded li").length === 0) {
+            let li = document.createElement('li');
+
+            let progressBar = document.createElement('span');
+            progressBar.textContent = '0 %';
+            progressBar.id = file.uniqueIdentifier + "-progress";
+
+            let fileNameSpan = document.createElement('span');
+            fileNameSpan.textContent = file.fileName;
+
+            let cancelButton = document.createElement('a');
+            cancelButton.href = '#';
+            cancelButton.textContent = 'Cancel';
+            cancelButton.onclick = function () {
+                file.cancel();
+                filesSpace.removeChild(li);
+            };
+
+            li.setAttribute('style', 'border: solid black thin; border-radius : 5px; margin-top : 10px; padding : 5px 10px');
+            li.appendChild(fileNameSpan);
+            li.appendChild(document.createElement('br'));
+            li.appendChild(progressBar);
+            li.appendChild(document.createElement('br'));
+            li.appendChild(cancelButton);
+
+            filesSpace.appendChild(li);
+        } else {
+            rFile.removeFile(file);
+        }
+    }
+
+    rFile.assignBrowse(document.getElementById('browseButton'));
+    rFile.on('fileAdded', function (file) {
         addFileToList(file);
     });
-    rPDF.on('fileProgress', function (file) {
+    rFile.on('fileProgress', function (file) {
         document.getElementById(file.uniqueIdentifier + "-progress").textContent = (file.progress(false) * 100.00) + '%';
     });
-    rPDF.on('fileSuccess', function (file) {
+
+    rFile.on('fileSuccess', function (file) {
         let element = document.getElementById(file.uniqueIdentifier + "-progress");
         let route = "";
         if (updatingFile) {
-            route = jsRoutes.controllers.FileUploadController.updatePDF(file.fileName);
+            route = jsRoutes.controllers.FileController.updateZoneKycUser(file.fileName, documentType);
         } else {
-            route = jsRoutes.controllers.FileUploadController.storePDF(file.fileName);
+            route = jsRoutes.controllers.FileController.storeZoneKycUser(file.fileName, documentType);
         }
         $.ajax({
             url: route.url,
@@ -176,7 +220,8 @@ $(document).ready(function () {
         });
         updatingFile = false;
     });
-    rPDF.on('cancel', function (file) {
+
+    rFile.on('cancel', function (file) {
         $(".uploadProgress").css("display", "flex");
         let anchors = filesSpace.getElementsByTagName('a');
         for (let i = anchors.length - 1; i >= 0; i--) {
@@ -184,47 +229,113 @@ $(document).ready(function () {
         }
         errorMessage.textContent = 'Upload canceled';
     });
-    rPDF.on('progress', function () {
+
+    rFile.on('progress', function () {
         $(".uploadProgress").css("display", "flex");
-        progress.textContent = (rImage.progress() * 100.00);
+        progress.textContent = (rFile.progress() * 100.00);
         let percent = progress.textContent;
         document.querySelector(".progressBar").style.width = percent + "%";
         document.querySelector(".progressBar").textContent = percent.toFixed(0) + "%";
     });
-    rPDF.on('fileError', function (file, msg) {
+    rFile.on('fileError', function (file, msg) {
         document.getElementById(file.uniqueIdentifier + "-progress").textContent = msg;
         errorMessage.textContent = msg;
     });
-    rPDF.on('fileRetry', function (file) {
+    rFile.on('fileRetry', function (file) {
         document.getElementById(file.uniqueIdentifier + "-progress").textContent = 'Retrying upload';
         retries++;
         errorMessage.textContent = "Retried " + retries + "time(s)";
         if (retries > 10) {
-            rPDF.pause();
+            rFile.pause();
             errorMessage.textContent = 'Pausing file upload after ' + retries + ' attempts';
         }
     });
-    rPDF.on('error', function (message, file) {
+    rFile.on('error', function (message, file) {
         errorMessage.textContent = message;
     });
-    rPDF.on('catchAll', function (eventX) {
+    rFile.on('catchAll', function (eventX) {
+        console.log(eventX)
     });
+}
 
+function userOrganiztionKycFileUpload(documentType) {
+    let updatingFile = false;
 
-    rDOC.assignBrowse(document.getElementById('browseButtonDOCs'));
-    rDOC.on('fileAdded', function (file) {
+    let rFile = new Resumable({
+        target: jsRoutes.controllers.FileController.uploadOrganizationKycUser(documentType).url,
+        fileType: ['jpg', 'png', 'jpeg', 'pdf', 'doc', 'txt', 'docx'],
+        query: {csrfToken: $('[name="csrfToken"]').attr('value')}
+    });
+    let retries = 0;
+    document.getElementById('uploadButton').onclick = function () {
+        rFile.upload();
+        retries = 0;
+    };
+    document.getElementById('updateButton').onclick = function () {
+        updatingFile = true;
+        rFile.upload();
+        retries = 0;
+    };
+    document.getElementById('pauseButton').onclick = function () {
+        rFile.pause();
+    };
+    document.getElementById('cancelButton').onclick = function () {
+        rFile.cancel();
+        retries = 0;
+    };
+
+    let errorMessage = document.getElementById('errorMessage');
+    let successfulMessage = document.getElementById('successfulMessage');
+    let progress = document.getElementsByClassName('progressBar');
+    let filesSpace = document.getElementById('filesToBeUploaded');
+
+    function addFileToList(file) {
+        if ($("#filesToBeUploaded li").length === 0) {
+            let li = document.createElement('li');
+
+            let progressBar = document.createElement('span');
+            progressBar.textContent = '0 %';
+            progressBar.id = file.uniqueIdentifier + "-progress";
+
+            let fileNameSpan = document.createElement('span');
+            fileNameSpan.textContent = file.fileName;
+
+            let cancelButton = document.createElement('a');
+            cancelButton.href = '#';
+            cancelButton.textContent = 'Cancel';
+            cancelButton.onclick = function () {
+                file.cancel();
+                filesSpace.removeChild(li);
+            };
+
+            li.setAttribute('style', 'border: solid black thin; border-radius : 5px; margin-top : 10px; padding : 5px 10px');
+            li.appendChild(fileNameSpan);
+            li.appendChild(document.createElement('br'));
+            li.appendChild(progressBar);
+            li.appendChild(document.createElement('br'));
+            li.appendChild(cancelButton);
+
+            filesSpace.appendChild(li);
+        } else {
+            rFile.removeFile(file);
+        }
+    }
+
+    rFile.assignBrowse(document.getElementById('browseButton'));
+    rFile.on('fileAdded', function (file) {
         addFileToList(file);
     });
-    rDOC.on('fileProgress', function (file) {
+    rFile.on('fileProgress', function (file) {
         document.getElementById(file.uniqueIdentifier + "-progress").textContent = (file.progress(false) * 100.00) + '%';
     });
-    rDOC.on('fileSuccess', function (file) {
+
+    rFile.on('fileSuccess', function (file) {
         let element = document.getElementById(file.uniqueIdentifier + "-progress");
         let route = "";
         if (updatingFile) {
-            route = jsRoutes.controllers.FileUploadController.updateDOC(file.fileName);
+            route = jsRoutes.controllers.FileController.updateOrganizationKycUser(file.fileName, documentType);
         } else {
-            route = jsRoutes.controllers.FileUploadController.storeDOC(file.fileName);
+            route = jsRoutes.controllers.FileController.storeOrganizationKycUser(file.fileName, documentType);
         }
         $.ajax({
             url: route.url,
@@ -239,7 +350,8 @@ $(document).ready(function () {
         });
         updatingFile = false;
     });
-    rDOC.on('cancel', function (file) {
+
+    rFile.on('cancel', function (file) {
         $(".uploadProgress").css("display", "flex");
         let anchors = filesSpace.getElementsByTagName('a');
         for (let i = anchors.length - 1; i >= 0; i--) {
@@ -247,30 +359,291 @@ $(document).ready(function () {
         }
         errorMessage.textContent = 'Upload canceled';
     });
-    rDOC.on('progress', function () {
+
+    rFile.on('progress', function () {
         $(".uploadProgress").css("display", "flex");
-        progress.textContent = (rImage.progress() * 100.00);
+        progress.textContent = (rFile.progress() * 100.00);
         let percent = progress.textContent;
         document.querySelector(".progressBar").style.width = percent + "%";
         document.querySelector(".progressBar").textContent = percent.toFixed(0) + "%";
     });
-    rDOC.on('fileError', function (file, msg) {
+    rFile.on('fileError', function (file, msg) {
         document.getElementById(file.uniqueIdentifier + "-progress").textContent = msg;
         errorMessage.textContent = msg;
     });
-    rDOC.on('fileRetry', function (file) {
+    rFile.on('fileRetry', function (file) {
         document.getElementById(file.uniqueIdentifier + "-progress").textContent = 'Retrying upload';
         retries++;
         errorMessage.textContent = "Retried " + retries + "time(s)";
         if (retries > 10) {
-            rDOC.pause();
+            rFile.pause();
             errorMessage.textContent = 'Pausing file upload after ' + retries + ' attempts';
         }
     });
-    rDOC.on('error', function (message, file) {
+    rFile.on('error', function (message, file) {
         errorMessage.textContent = message;
     });
-    rDOC.on('catchAll', function (eventX) {
+    rFile.on('catchAll', function (eventX) {
+        console.log(eventX)
     });
-});
+}
 
+function zoneKycFileUpload(documentType) {
+    let updatingFile = false;
+
+    let rFile = new Resumable({
+        target: jsRoutes.controllers.FileController.uploadZoneKYC(documentType).url,
+        fileType: ['jpg', 'png', 'jpeg', 'pdf', 'doc', 'txt', 'docx'],
+        query: {csrfToken: $('[name="csrfToken"]').attr('value')}
+    });
+    let retries = 0;
+    document.getElementById('uploadButton').onclick = function () {
+        rFile.upload();
+        retries = 0;
+    };
+    document.getElementById('updateButton').onclick = function () {
+        updatingFile = true;
+        rFile.upload();
+        retries = 0;
+    };
+    document.getElementById('pauseButton').onclick = function () {
+        rFile.pause();
+    };
+    document.getElementById('cancelButton').onclick = function () {
+        rFile.cancel();
+        retries = 0;
+    };
+
+    let errorMessage = document.getElementById('errorMessage');
+    let successfulMessage = document.getElementById('successfulMessage');
+    let progress = document.getElementsByClassName('progressBar');
+    let filesSpace = document.getElementById('filesToBeUploaded');
+
+    function addFileToList(file) {
+        if ($("#filesToBeUploaded li").length === 0) {
+            let li = document.createElement('li');
+
+            let progressBar = document.createElement('span');
+            progressBar.textContent = '0 %';
+            progressBar.id = file.uniqueIdentifier + "-progress";
+
+            let fileNameSpan = document.createElement('span');
+            fileNameSpan.textContent = file.fileName;
+
+            let cancelButton = document.createElement('a');
+            cancelButton.href = '#';
+            cancelButton.textContent = 'Cancel';
+            cancelButton.onclick = function () {
+                file.cancel();
+                filesSpace.removeChild(li);
+            };
+
+            li.setAttribute('style', 'border: solid black thin; border-radius : 5px; margin-top : 10px; padding : 5px 10px');
+            li.appendChild(fileNameSpan);
+            li.appendChild(document.createElement('br'));
+            li.appendChild(progressBar);
+            li.appendChild(document.createElement('br'));
+            li.appendChild(cancelButton);
+
+            filesSpace.appendChild(li);
+        } else {
+            rFile.removeFile(file);
+        }
+    }
+
+    rFile.assignBrowse(document.getElementById('browseButton'));
+    rFile.on('fileAdded', function (file) {
+        addFileToList(file);
+    });
+    rFile.on('fileProgress', function (file) {
+        document.getElementById(file.uniqueIdentifier + "-progress").textContent = (file.progress(false) * 100.00) + '%';
+    });
+
+    rFile.on('fileSuccess', function (file) {
+        let element = document.getElementById(file.uniqueIdentifier + "-progress");
+        let route = "";
+        if (updatingFile) {
+            route = jsRoutes.controllers.FileController.updateZoneKYC(file.fileName, documentType);
+        } else {
+            route = jsRoutes.controllers.FileController.storeZoneKYC(file.fileName, documentType);
+        }
+        $.ajax({
+            url: route.url,
+            type: route.type,
+            success: function (result) {
+                successfulMessage.textContent = result;
+            },
+            error: function (error) {
+                element.textContent = error.responseText;
+                errorMessage.textContent = error.responseText;
+            }
+        });
+        updatingFile = false;
+    });
+
+    rFile.on('cancel', function (file) {
+        $(".uploadProgress").css("display", "flex");
+        let anchors = filesSpace.getElementsByTagName('a');
+        for (let i = anchors.length - 1; i >= 0; i--) {
+            anchors[i].click();
+        }
+        errorMessage.textContent = 'Upload canceled';
+    });
+
+    rFile.on('progress', function () {
+        $(".uploadProgress").css("display", "flex");
+        progress.textContent = (rFile.progress() * 100.00);
+        let percent = progress.textContent;
+        document.querySelector(".progressBar").style.width = percent + "%";
+        document.querySelector(".progressBar").textContent = percent.toFixed(0) + "%";
+    });
+    rFile.on('fileError', function (file, msg) {
+        document.getElementById(file.uniqueIdentifier + "-progress").textContent = msg;
+        errorMessage.textContent = msg;
+    });
+    rFile.on('fileRetry', function (file) {
+        document.getElementById(file.uniqueIdentifier + "-progress").textContent = 'Retrying upload';
+        retries++;
+        errorMessage.textContent = "Retried " + retries + "time(s)";
+        if (retries > 10) {
+            rFile.pause();
+            errorMessage.textContent = 'Pausing file upload after ' + retries + ' attempts';
+        }
+    });
+    rFile.on('error', function (message, file) {
+        errorMessage.textContent = message;
+    });
+    rFile.on('catchAll', function (eventX) {
+        console.log(eventX)
+    });
+}
+
+function organizationKycFileUpload(documentType) {
+    let updatingFile = false;
+
+    let rFile = new Resumable({
+        target: jsRoutes.controllers.FileController.uploadOrganizationKYC(documentType).url,
+        fileType: ['jpg', 'png', 'jpeg', 'pdf', 'doc', 'txt', 'docx'],
+        query: {csrfToken: $('[name="csrfToken"]').attr('value')}
+    });
+    let retries = 0;
+    document.getElementById('uploadButton').onclick = function () {
+        rFile.upload();
+        retries = 0;
+    };
+    document.getElementById('updateButton').onclick = function () {
+        updatingFile = true;
+        rFile.upload();
+        retries = 0;
+    };
+    document.getElementById('pauseButton').onclick = function () {
+        rFile.pause();
+    };
+    document.getElementById('cancelButton').onclick = function () {
+        rFile.cancel();
+        retries = 0;
+    };
+
+    let errorMessage = document.getElementById('errorMessage');
+    let successfulMessage = document.getElementById('successfulMessage');
+    let progress = document.getElementsByClassName('progressBar');
+    let filesSpace = document.getElementById('filesToBeUploaded');
+
+    function addFileToList(file) {
+        if ($("#filesToBeUploaded li").length === 0) {
+            let li = document.createElement('li');
+
+            let progressBar = document.createElement('span');
+            progressBar.textContent = '0 %';
+            progressBar.id = file.uniqueIdentifier + "-progress";
+
+            let fileNameSpan = document.createElement('span');
+            fileNameSpan.textContent = file.fileName;
+
+            let cancelButton = document.createElement('a');
+            cancelButton.href = '#';
+            cancelButton.textContent = 'Cancel';
+            cancelButton.onclick = function () {
+                file.cancel();
+                filesSpace.removeChild(li);
+            };
+
+            li.setAttribute('style', 'border: solid black thin; border-radius : 5px; margin-top : 10px; padding : 5px 10px');
+            li.appendChild(fileNameSpan);
+            li.appendChild(document.createElement('br'));
+            li.appendChild(progressBar);
+            li.appendChild(document.createElement('br'));
+            li.appendChild(cancelButton);
+
+            filesSpace.appendChild(li);
+        } else {
+            rFile.removeFile(file);
+        }
+    }
+
+    rFile.assignBrowse(document.getElementById('browseButton'));
+    rFile.on('fileAdded', function (file) {
+        addFileToList(file);
+    });
+    rFile.on('fileProgress', function (file) {
+        document.getElementById(file.uniqueIdentifier + "-progress").textContent = (file.progress(false) * 100.00) + '%';
+    });
+
+    rFile.on('fileSuccess', function (file) {
+        let element = document.getElementById(file.uniqueIdentifier + "-progress");
+        let route = "";
+        if (updatingFile) {
+            route = jsRoutes.controllers.FileController.updateOrganizationKYC(file.fileName, documentType);
+        } else {
+            route = jsRoutes.controllers.FileController.storeOrganizationKYC(file.fileName, documentType);
+        }
+        $.ajax({
+            url: route.url,
+            type: route.type,
+            success: function (result) {
+                successfulMessage.textContent = result;
+            },
+            error: function (error) {
+                element.textContent = error.responseText;
+                errorMessage.textContent = error.responseText;
+            }
+        });
+        updatingFile = false;
+    });
+
+    rFile.on('cancel', function (file) {
+        $(".uploadProgress").css("display", "flex");
+        let anchors = filesSpace.getElementsByTagName('a');
+        for (let i = anchors.length - 1; i >= 0; i--) {
+            anchors[i].click();
+        }
+        errorMessage.textContent = 'Upload canceled';
+    });
+
+    rFile.on('progress', function () {
+        $(".uploadProgress").css("display", "flex");
+        progress.textContent = (rFile.progress() * 100.00);
+        let percent = progress.textContent;
+        document.querySelector(".progressBar").style.width = percent + "%";
+        document.querySelector(".progressBar").textContent = percent.toFixed(0) + "%";
+    });
+    rFile.on('fileError', function (file, msg) {
+        document.getElementById(file.uniqueIdentifier + "-progress").textContent = msg;
+        errorMessage.textContent = msg;
+    });
+    rFile.on('fileRetry', function (file) {
+        document.getElementById(file.uniqueIdentifier + "-progress").textContent = 'Retrying upload';
+        retries++;
+        errorMessage.textContent = "Retried " + retries + "time(s)";
+        if (retries > 10) {
+            rFile.pause();
+            errorMessage.textContent = 'Pausing file upload after ' + retries + ' attempts';
+        }
+    });
+    rFile.on('error', function (message, file) {
+        errorMessage.textContent = message;
+    });
+    rFile.on('catchAll', function (eventX) {
+        console.log(eventX)
+    });
+}

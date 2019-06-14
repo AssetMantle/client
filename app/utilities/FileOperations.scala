@@ -4,10 +4,11 @@ import java.io.RandomAccessFile
 import java.util.concurrent.{ConcurrentHashMap, ConcurrentMap}
 
 import exceptions.BaseException
+import org.apache.commons.codec.binary.Base64
 import play.api.Logger
 import views.companion.master.FileUpload.FileUploadInfo
 
-object FileUploader {
+object FileOperations {
 
   private implicit val module: String = constants.Module.FILE_UPLOAD
 
@@ -41,4 +42,10 @@ object FileUploader {
     }
   }
 
+  def fileExtensionFromName(fileName: String): String = {
+    if (fileName.lastIndexOf(".") != -1 && fileName.lastIndexOf(".") != 0) fileName.substring(fileName.lastIndexOf(".") + 1)
+    else ""
+  }
+
+  def decodeImageThumbnailData(data: Array[Byte]): String = Base64.encodeBase64String(Base64.decodeBase64(data))
 }

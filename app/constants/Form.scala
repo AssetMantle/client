@@ -31,6 +31,7 @@ object Form {
   val UPDATE = "UPDATE"
   val PAUSE_ALL = "PAUSE_ALL"
   val CANCEL_ALL = "CANCEL_ALL"
+  val DOCUMENTS = "DOCUMENTS"
 
   val BLOCK_HASH = "BLOCK_HASH"
   val HEIGHT = "HEIGHT"

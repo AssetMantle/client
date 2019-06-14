@@ -72,6 +72,7 @@ object Response {
   //Failure- for telling that something failed
   val FAILURE = new Failure("FAILURE")
   val NO_SUCH_ELEMENT_EXCEPTION = new Failure("NO_SUCH_ELEMENT_EXCEPTION")
+  val NO_SUCH_FILE_EXCEPTION = new Failure("NO_SUCH_FILE_EXCEPTION")
   val PSQL_EXCEPTION = new Failure("PSQL_EXCEPTION")
   val INVALID_OTP = new Failure("INVALID_OTP")
   val EMAIL_ADDRESS_NOT_FOUND = new Failure("EMAIL_ADDRESS_NOT_FOUND")

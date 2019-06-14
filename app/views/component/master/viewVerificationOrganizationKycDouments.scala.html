@@ -1,0 +1,20 @@
+@import models.master.OrganizationKYC
+
+@(organizationKYCs: Seq[OrganizationKYC])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+<div>
+    @for(organizationKYC <- organizationKYCs) {
+        @component.master.viewOrganizationKycDocument(organizationKYC)
+        <div id="organizationKycDocumentStatus@organizationKYC.id@organizationKYC.documentType"></div>
+        @organizationKYC.status.getOrElse(None)  match {
+            case true => {
+                <div id="buttonOrganizationKycDocumentStatus@organizationKYC.id@organizationKYC.documentType"><button onclick="rejectOrganizationKycDocument('@organizationKYC.id', '@organizationKYC.documentType')">@Messages(constants.Form.REJECT)</button></div>
+            }
+            case false => {
+                <div id="buttonOrganizationKycDocumentStatus@organizationKYC.id@organizationKYC.documentType"><button onclick="verifyOrganizationKycDocument('@organizationKYC.id', '@organizationKYC.documentType')">@Messages(constants.Form.APPROVE)</button></div>
+            }
+            case _ => {
+                <div id="buttonOrganizationKycDocumentStatus@organizationKYC.id@organizationKYC.documentType"><button onclick="verifyOrganizationKycDocument('@organizationKYC.id', '@organizationKYC.documentType')">@Messages(constants.Form.APPROVE)</button>/<button onclick="rejectOrganizationKycDocument('@organizationKYC.id', '@organizationKYC.documentType')">@Messages(constants.Form.REJECT)</button></div>
+            }
+        }
+    }
+</div>

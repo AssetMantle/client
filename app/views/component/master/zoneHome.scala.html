@@ -12,6 +12,12 @@
     <a onclick="getForm(jsRoutes.controllers.SellerExecuteOrderController.sellerExecuteOrderForm())">@Messages(constants.Form.SELLER_EXECUTE_ORDER)</a>
     <a onclick="getForm(jsRoutes.controllers.SetACLController.setACLForm())">@Messages(constants.Form.SET_ACL)</a>
 
+    <br>
+
+    <div id="bankDetails"><a onclick="getForm(jsRoutes.controllers.FileController.zoneKYCUploadForm('@constants.File.BANK_DETAILS'))">@Messages(constants.File.UPLOAD_ZONE_BANK_DETAILS)</a></div>
+    <div id="identification"><a onclick="getForm(jsRoutes.controllers.FileController.zoneKYCUploadForm('@constants.File.IDENTIFICATION'))">@Messages(constants.File.UPLOAD_ZONE_IDENTIFICATION)</a></div>
+
+
     @component.master.commonHome(username = username, userType = constants.User.ZONE, address = address, coins = coins)
 
     <br>

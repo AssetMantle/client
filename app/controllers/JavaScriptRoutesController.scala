@@ -77,16 +77,39 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.SetACLController.blockchainSetACLForm,
         routes.javascript.SetBuyerFeedbackController.blockchainSetBuyerFeedbackForm,
         routes.javascript.SetSellerFeedbackController.blockchainSetSellerFeedbackForm,
-        routes.javascript.FileUploadController.uploadForm,
-        routes.javascript.FileUploadController.uploadImages,
-        routes.javascript.FileUploadController.storeImage,
-        routes.javascript.FileUploadController.updateImage,
-        routes.javascript.FileUploadController.uploadPDFs,
-        routes.javascript.FileUploadController.storePDF,
-        routes.javascript.FileUploadController.updatePDF,
-        routes.javascript.FileUploadController.uploadDOCs,
-        routes.javascript.FileUploadController.storeDOC,
-        routes.javascript.FileUploadController.updateDOC
+
+        routes.javascript.FileController.userKYCUploadForm,
+        routes.javascript.FileController.uploadUserKYC,
+        routes.javascript.FileController.storeUserKYC,
+        routes.javascript.FileController.updateUserKYC,
+
+        routes.javascript.FileController.uploadZoneKycUser,
+        routes.javascript.FileController.storeZoneKycUser,
+        routes.javascript.FileController.updateZoneKycUser,
+
+        routes.javascript.FileController.uploadOrganizationKycUser,
+        routes.javascript.FileController.storeOrganizationKycUser,
+        routes.javascript.FileController.updateOrganizationKycUser,
+
+        routes.javascript.FileController.zoneKYCUploadForm,
+        routes.javascript.FileController.uploadZoneKYC,
+        routes.javascript.FileController.storeZoneKYC,
+        routes.javascript.FileController.updateZoneKYC,
+
+        routes.javascript.FileController.organizationKYCUploadForm,
+        routes.javascript.FileController.uploadOrganizationKYC,
+        routes.javascript.FileController.storeOrganizationKYC,
+        routes.javascript.FileController.updateOrganizationKYC,
+
+        routes.javascript.FileController.serveFileToGenesis,
+        routes.javascript.FileController.serveFileToZone,
+
+        routes.javascript.AddZoneController.viewKycDocuments,
+        routes.javascript.AddZoneController.verifyKycDocument,
+        routes.javascript.AddZoneController.rejectKycDocument,
+        routes.javascript.AddOrganizationController.viewKycDocuments,
+        routes.javascript.AddOrganizationController.verifyKycDocument,
+        routes.javascript.AddOrganizationController.rejectKycDocument,
       )
     ).as("text/javascript")
   }

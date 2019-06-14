@@ -1,16 +1,9 @@
 @import helper._
 
-@()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
+@(documentType: String, uploadType: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
 
 <div class = "uploadBar">
-    <div class = "browseContainer">
-        <button class="browseButton"><img src="@routes.Assets.versioned("images/browse.svg")" title="@Messages(constants.Form.BROWSE)" /></button>
-        <div class="browseContent">
-            <a id="browseButtonImages">@Messages(constants.File.IMAGES)</a>
-            <a id="browseButtonPDFs">@Messages(constants.File.PDFS)</a>
-            <a id="browseButtonDOCs">@Messages(constants.File.DOCS)</a>
-        </div>
-    </div>
+    <a id="browseButton"><img src="@routes.Assets.versioned("images/browse.svg")" title="@Messages(constants.Form.BROWSE)" /></a>
     @CSRF.formField
     <a id="uploadButton"><img src="@routes.Assets.versioned("images/upload.svg")" title="@Messages(constants.Form.UPLOAD)"/></a>
     <a id="updateButton"><img src="@routes.Assets.versioned("images/update.svg")" title="@Messages(constants.Form.UPDATE)"/></a>
@@ -24,6 +17,17 @@
     <div class="uploadProgressOuter"> <div class = "progressBar"></div></div>
     <div id="filesToBeUploaded"></div>
 </div>
-
 <script src="@routes.Assets.versioned("javascripts/resumable.js")" type="text/javascript"></script>
 <script src="@routes.Assets.versioned("javascripts/upload.js")" type="text/javascript"></script>
+@uploadType match {
+    case constants.File.UPLOAD_USER_ZONE_KYC => {
+        <script>userZoneKycFileUpload('@documentType')</script>
+    }
+    case constants.File.UPLOAD_USER_ORGANIZATION_KYC => {
+        <script>userOrganiztionKycFileUpload('@documentType')</script>
+    }
+    case _ => {
+        <script>userKycFileUpload('@documentType')</script>
+    }
+}
+

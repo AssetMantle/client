@@ -4,6 +4,9 @@
 
 @common(Messages(constants.User.HOME)) {
 
+    <div id="bankDetails"><a onclick="getForm(jsRoutes.controllers.FileController.organizationKYCUploadForm('@constants.File.BANK_DETAILS'))">@Messages(constants.File.UPLOAD_ORGANIZATION_BANK_DETAILS)</a></div>
+    <div id="identification"><a onclick="getForm(jsRoutes.controllers.FileController.organizationKYCUploadForm('@constants.File.IDENTIFICATION'))">@Messages(constants.File.UPLOAD_ORGANIZATION_IDENTIFICATION)</a></div>
+
     @component.master.commonHome(username = username, userType = constants.User.ORGANIZATION, address = address, coins = coins)
 
     <h2>@Messages(constants.Form.ORGANIZATION):</h2>

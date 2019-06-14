@@ -470,7 +470,7 @@ CREATE TABLE IF NOT EXISTS MASTER."ZoneKYC"
 (
   "id"           VARCHAR NOT NULL,
   "documentType" VARCHAR NOT NULL,
-  "status"       BOOLEAN NOT NULL,
+  "status"       BOOLEAN,
   "fileName"     VARCHAR NOT NULL,
   "file"         BYTEA,
   PRIMARY KEY ("id", "documentType")
@@ -480,7 +480,7 @@ CREATE TABLE IF NOT EXISTS MASTER."OrganizationKYC"
 (
   "id"           VARCHAR NOT NULL,
   "documentType" VARCHAR NOT NULL,
-  "status"       BOOLEAN NOT NULL,
+  "status"       BOOLEAN,
   "fileName"     VARCHAR NOT NULL,
   "file"         BYTEA,
   PRIMARY KEY ("id", "documentType")
@@ -490,7 +490,7 @@ CREATE TABLE IF NOT EXISTS MASTER."AccountKYC"
 (
   "id"           VARCHAR NOT NULL,
   "documentType" VARCHAR NOT NULL,
-  "status"       BOOLEAN NOT NULL,
+  "status"       BOOLEAN,
   "fileName"     VARCHAR NOT NULL,
   "file"         BYTEA,
   PRIMARY KEY ("id", "documentType")
@@ -626,10 +626,6 @@ ALTER TABLE MASTER."Contact"
   ADD CONSTRAINT Contact_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER."Zone"
   ADD CONSTRAINT Zone_Account_accountID FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");
-ALTER TABLE MASTER."ZoneKYC"
-  ADD CONSTRAINT ZoneKYC_Zone_id FOREIGN KEY ("id") REFERENCES MASTER."Zone" ("id");
-ALTER TABLE MASTER."OrganizationKYC"
-  ADD CONSTRAINT OrganizationKYC_Organization_id FOREIGN KEY ("id") REFERENCES MASTER."Organization" ("id");
 ALTER TABLE MASTER."AccountKYC"
   ADD CONSTRAINT AccountKYC_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER."OrganizationBankAccount"
