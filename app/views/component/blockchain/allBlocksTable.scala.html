@@ -1,6 +1,6 @@
 @()(implicit messagesProvider: MessagesProvider)
-<div id="allBlocksTable" class="allBlocksTableBottomDivision">
-    <table>
+<div id="allBlocksTable">
+    <table class="box dynamicTable">
         <tr>
             <th>@Messages(constants.Form.HEIGHT)</th>
             <th>@Messages(constants.Form.TIME)</th>
@@ -8,10 +8,10 @@
         </tr>
         <tbody id="allBlocksTableBody"></tbody>
     </table>
-    <script src="@routes.Assets.versioned("javascripts/showAllBlocks.js")" type="text/javascript"></script>
-    <script>initialTableContent()</script>
     <button onclick='onClickPrevious()'>@Messages(constants.Form.PREVIOUS)</button>
     <button onclick='onClickNext()'>@Messages(constants.Form.NEXT)</button>
     <br>
-    <button onclick='goBackAllBlocksTable()()' >@Messages(constants.Form.BACK)</button>
+    <button onclick='back()' >@Messages(constants.Form.BACK)</button>
 </div>
+<script src="@routes.Assets.versioned("javascripts/showAllBlocks.js")" type="text/javascript"></script>
+<script>initialTableContent()</script>

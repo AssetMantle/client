@@ -1,6 +1,6 @@
 function searchFunction(searchData) {
-    let invalidBlockHeight = "";
-    let invalidTransactionHash = "";
+    let invalidBlockHeight = getCookie("blockHeightError");
+    let invalidTransactionHash = getCookie("transactionHashError");
 
     $("#searchForm").submit(function(e) {
         e.preventDefault();
@@ -77,23 +77,7 @@ function searchFunction(searchData) {
     }
 }
 
-function goBackBlockHeightSearch() {
-    $('#blockHeightBottomDivision').hide();
-    $('#allBlocksTable').hide();
-    $('#txHashBottomDivision').hide();
-    $('#validatorsTable').hide();
-    $('#indexBottomDivision').show();
-}
-
-function goBackTransactionHashSearch() {
-    $('#txHashBottomDivision').hide();
-    $('#allBlocksTable').hide();
-    $('#blockHeightBottomDivision').hide();
-    $('#validatorsTable').hide();
-    $('#indexBottomDivision').show();
-}
-
 function setSearchErrorValues(blockHeightError, transactionHashError) {
-    invalidBlockHeight = blockHeightError;
-    invalidTransactionHash = transactionHashError;
+    setCookie("blockHeightError", blockHeightError,1);
+    setCookie("transactionHashError", transactionHashError,1);
 }

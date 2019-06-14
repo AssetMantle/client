@@ -76,13 +76,13 @@ object addZoneControllerTest {
         Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
 
   def getZoneID(query: String): String = {
-    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://localhost:5432/comdex", "comdex", "comdex",
+    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://192.168.15.10:5432/comdex", "comdex", "comdex",
       s"""SELECT "id" FROM master."Zone" WHERE "accountID" = '$query';""")
     sqlQueryFeeder.apply().next()("id").toString
   }
 
   def getZoneStatus(query: String): Boolean = {
-    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://localhost:5432/comdex", "comdex", "comdex",
+    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://192.168.15.10:5432/comdex", "comdex", "comdex",
       s"""SELECT "status" FROM master."Zone" WHERE "accountID" = '$query';""")
     if (sqlQueryFeeder.apply().next()("status") == true) true
     else false

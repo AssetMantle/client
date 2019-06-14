@@ -1,17 +1,14 @@
 @(username: String, userType: String, address: String, coins: Int = 0)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
 
-<link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/main.css")">
 <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/class.css")">
+<link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/tag.css")">
 
-<br>
-<a onclick="getForm(jsRoutes.controllers.SendCoinController.sendCoinForm())">@Messages(constants.Form.SEND_COIN)</a>
-<a onclick="getForm(jsRoutes.controllers.LogoutController.logoutForm())">@Messages(constants.Form.LOGOUT)</a>
-<br>
-<br>
-<h2>@username</h2>
-@Messages(constants.User.USER_TYPE): @userType <br>
-@Messages(constants.User.ADDRESS): @address <br>
-@Messages(constants.User.COINS): @coins <br>
-<br>
-<a onclick="getForm(jsRoutes.controllers.NotificationController.notificationPage(0))">@Messages(constants.Form.INBOX)</a>
+<div class="box flexItem leftAlign flexGrowth">
+    <h2>@username</h2>
+    @Messages(constants.User.USER_TYPE): @userType <br/>
+    @Messages(constants.User.ADDRESS): @address <br/>
+    @Messages(constants.User.COINS): @coins
+    <button onclick="getForm(jsRoutes.controllers.SendCoinController.sendCoinForm())">@Messages(constants.Form.SEND_COIN)</button>
+    <br/>
+</div>
 <script src="@routes.Assets.versioned("javascripts/viewFiles.js")" type="text/javascript"></script>

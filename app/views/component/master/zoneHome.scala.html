@@ -4,27 +4,25 @@
 
 @common(Messages(constants.User.HOME)) {
 
-    <a onclick="getForm(jsRoutes.controllers.AddOrganizationController.viewPendingVerifyOrganizationRequests())">@Messages(constants.Form.PENDING_VERIFY_ORGANIZATION_REQUESTS)</a>
-    <a onclick="getForm(jsRoutes.controllers.BuyerExecuteOrderController.buyerExecuteOrderForm())">@Messages(constants.Form.BUYER_EXECUTE_ORDER)</a>
-    <a onclick="getForm(jsRoutes.controllers.IssueAssetController.viewPendingIssueAssetRequests())">@Messages(constants.Form.PENDING_ISSUE_ASSET_REQUESTS)</a>
-    <a onclick="getForm(jsRoutes.controllers.IssueFiatController.viewPendingIssueFiatRequests())">@Messages(constants.Form.PENDING_ISSUE_FIAT_REQUESTS)</a>
-    <a onclick="getForm(jsRoutes.controllers.ReleaseAssetController.releaseAssetForm())">@Messages(constants.Form.RELEASE_ASSET)</a>
-    <a onclick="getForm(jsRoutes.controllers.SellerExecuteOrderController.sellerExecuteOrderForm())">@Messages(constants.Form.SELLER_EXECUTE_ORDER)</a>
-    <a onclick="getForm(jsRoutes.controllers.SetACLController.setACLForm())">@Messages(constants.Form.SET_ACL)</a>
-
-    <br>
-
-    <div id="bankDetails"><a onclick="getForm(jsRoutes.controllers.FileController.zoneKYCUploadForm('@constants.File.BANK_DETAILS'))">@Messages(constants.File.UPLOAD_ZONE_BANK_DETAILS)</a></div>
-    <div id="identification"><a onclick="getForm(jsRoutes.controllers.FileController.zoneKYCUploadForm('@constants.File.IDENTIFICATION'))">@Messages(constants.File.UPLOAD_ZONE_IDENTIFICATION)</a></div>
-
-
-    @component.master.commonHome(username = username, userType = constants.User.ZONE, address = address, coins = coins)
-
-    <br>
-    <h2>@Messages(constants.Form.ZONE):</h2>
-    @Messages(constants.Form.NAME): @zone.name <br>
-    @Messages(constants.Form.ZONE_ID): @zone.id <br>
-    @Messages(constants.Form.CURRENCY): @zone.currency <br>
-    @Messages(constants.Form.VERIFIED_STATUS): @zone.status <br>
-    <br>
+    <div class="flexContainer">
+        @component.master.commonHome(username = username, userType = constants.User.ZONE, address = address, coins = coins)
+        <div class="flexItem box leftAlign flexGrowth">
+            <h2>@Messages(constants.Form.ZONE):</h2>
+            @Messages(constants.Form.NAME): @zone.name <br>
+            @Messages(constants.Form.ZONE_ID): @zone.id <br>
+            @Messages(constants.Form.CURRENCY): @zone.currency <br>
+            @Messages(constants.Form.VERIFIED_STATUS): @zone.status <br>
+            <div id="bankDetails"><a onclick="getForm(jsRoutes.controllers.FileController.zoneKYCUploadForm('@constants.File.BANK_DETAILS'))">@Messages(constants.File.UPLOAD_ZONE_BANK_DETAILS)</a></div>
+            <div id="identification"><a onclick="getForm(jsRoutes.controllers.FileController.zoneKYCUploadForm('@constants.File.IDENTIFICATION'))">@Messages(constants.File.UPLOAD_ZONE_IDENTIFICATION)</a></div>
+        </div>
+    </div>
+    <div class="centerText">
+        <button onclick="getForm(jsRoutes.controllers.AddOrganizationController.viewPendingVerifyOrganizationRequests())">@Messages(constants.Form.PENDING_VERIFY_ORGANIZATION_REQUESTS)</button>
+        <button onclick="getForm(jsRoutes.controllers.BuyerExecuteOrderController.buyerExecuteOrderForm())">@Messages(constants.Form.BUYER_EXECUTE_ORDER)</button>
+        <button onclick="getForm(jsRoutes.controllers.IssueAssetController.viewPendingIssueAssetRequests())">@Messages(constants.Form.PENDING_ISSUE_ASSET_REQUESTS)</button>
+        <button onclick="getForm(jsRoutes.controllers.IssueFiatController.viewPendingIssueFiatRequests())">@Messages(constants.Form.PENDING_ISSUE_FIAT_REQUESTS)</button>
+        <button onclick="getForm(jsRoutes.controllers.ReleaseAssetController.releaseAssetForm())">@Messages(constants.Form.RELEASE_ASSET)</button>
+        <button onclick="getForm(jsRoutes.controllers.SellerExecuteOrderController.sellerExecuteOrderForm())">@Messages(constants.Form.SELLER_EXECUTE_ORDER)</button>
+        <button onclick="getForm(jsRoutes.controllers.SetACLController.setACLForm())">@Messages(constants.Form.SET_ACL)</button>
+    </div>
 }

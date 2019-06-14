@@ -1,18 +1,12 @@
 @()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
-<div id="transactionExplorer" class="transactionExplorer">
-    <p class="headingText">@Messages(constants.Form.TRANSACTIONS)</p>
-    <div>
-        <table>
-            <thead>
+    <h3>@Messages(constants.Form.TRANSACTIONS)</h3>
+        <table class="dynamicTable">
                 <tr>
                     <th>@Messages(constants.Form.HEIGHT)</th>
                     <th>@Messages(constants.Form.TRANSACTION_HASH)</th>
                     <th>@Messages(constants.Form.TYPE)</th>
                 </tr>
-            </thead>
             <tbody id="transactionContainer">
             </tbody>
         </table>
-    </div>
-</div>
 <script src="@routes.Assets.versioned("javascripts/transactionExplorer.js")" type="text/javascript"></script>
