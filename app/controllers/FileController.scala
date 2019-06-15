@@ -67,7 +67,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
         }
         masterAccountKYCs.Service.create(id = username, documentType = documentType, fileName = fileName, file = Option(encodedBase64))
         utilities.FileOperations.renameFile(path, name, fileName)
-        Ok(Messages(constants.Response.UPLOAD_SUCCESSFUL.message))
+        Ok(Messages(constants.Response.FILE_UPLOAD_SUCCESSFUL.message))
       } catch {
         case baseException: BaseException => utilities.FileOperations.deleteFile(path, name)
           BadRequest(Messages(baseException.failure.message))
@@ -88,7 +88,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
         utilities.FileOperations.deleteFile(fileResourceManager.getAccountFilePath(oldAccountKYC.documentType), oldAccountKYC.fileName)
         masterAccountKYCs.Service.updateOldDocument(id = username, documentType = documentType, fileName = fileName, file = Option(encodedBase64))
         utilities.FileOperations.renameFile(newPath, name, fileName)
-        Ok(Messages(constants.Response.UPDATE_SUCCESSFUL.message))
+        Ok(Messages(constants.Response.FILE_UPDATE_SUCCESSFUL.message))
       } catch {
         case baseException: BaseException => utilities.FileOperations.deleteFile(newPath, name)
           BadRequest(Messages(baseException.failure.message))
@@ -128,7 +128,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
         }
         masterZoneKYCs.Service.create(id = username, documentType = documentType, fileName = fileName, file = Option(encodedBase64))
         utilities.FileOperations.renameFile(path, name, fileName)
-        Ok(Messages(constants.Response.UPLOAD_SUCCESSFUL.message))
+        Ok(Messages(constants.Response.FILE_UPLOAD_SUCCESSFUL.message))
       } catch {
         case baseException: BaseException => utilities.FileOperations.deleteFile(path, name)
           BadRequest(Messages(baseException.failure.message))
@@ -149,7 +149,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
         utilities.FileOperations.deleteFile(fileResourceManager.getZoneFilePath(oldAccountKYC.documentType), oldAccountKYC.fileName)
         masterZoneKYCs.Service.updateOldDocument(id = username, documentType = documentType, fileName = fileName, file = Option(encodedBase64))
         utilities.FileOperations.renameFile(newPath, name, fileName)
-        Ok(Messages(constants.Response.UPDATE_SUCCESSFUL.message))
+        Ok(Messages(constants.Response.FILE_UPDATE_SUCCESSFUL.message))
       } catch {
         case baseException: BaseException => utilities.FileOperations.deleteFile(newPath, name)
           BadRequest(Messages(baseException.failure.message))
@@ -189,7 +189,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
         }
         masterOrganizationKYCs.Service.create(id = username, documentType = documentType, fileName = fileName, file = Option(encodedBase64))
         utilities.FileOperations.renameFile(path, name, fileName)
-        Ok(Messages(constants.Response.UPLOAD_SUCCESSFUL.message))
+        Ok(Messages(constants.Response.FILE_UPLOAD_SUCCESSFUL.message))
       } catch {
         case baseException: BaseException => utilities.FileOperations.deleteFile(path, name)
           BadRequest(Messages(baseException.failure.message))
@@ -210,7 +210,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
         utilities.FileOperations.deleteFile(fileResourceManager.getOrganizationFilePath(oldAccountKYC.documentType), oldAccountKYC.fileName)
         masterOrganizationKYCs.Service.updateOldDocument(id = username, documentType = documentType, fileName = fileName, file = Option(encodedBase64))
         utilities.FileOperations.renameFile(newPath, name, fileName)
-        Ok(Messages(constants.Response.UPDATE_SUCCESSFUL.message))
+        Ok(Messages(constants.Response.FILE_UPDATE_SUCCESSFUL.message))
       } catch {
         case baseException: BaseException => utilities.FileOperations.deleteFile(newPath, name)
           BadRequest(Messages(baseException.failure.message))
@@ -254,7 +254,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
         }
         masterZoneKYCs.Service.create(id = username, documentType = documentType, fileName = fileName, file = Option(encodedBase64))
         utilities.FileOperations.renameFile(path, name, fileName)
-        Ok(Messages(constants.Response.UPLOAD_SUCCESSFUL.message))
+        Ok(Messages(constants.Response.FILE_UPLOAD_SUCCESSFUL.message))
       } catch {
         case baseException: BaseException => utilities.FileOperations.deleteFile(path, name)
           BadRequest(Messages(baseException.failure.message))
@@ -275,7 +275,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
         utilities.FileOperations.deleteFile(fileResourceManager.getZoneFilePath(oldAccountKYC.documentType), oldAccountKYC.fileName)
         masterZoneKYCs.Service.updateOldDocument(id = username, documentType = documentType, fileName = fileName, file = Option(encodedBase64))
         utilities.FileOperations.renameFile(newPath, name, fileName)
-        Ok(Messages(constants.Response.UPDATE_SUCCESSFUL.message))
+        Ok(Messages(constants.Response.FILE_UPDATE_SUCCESSFUL.message))
       } catch {
         case baseException: BaseException => utilities.FileOperations.deleteFile(newPath, name)
           BadRequest(Messages(baseException.failure.message))
@@ -320,7 +320,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
         }
         masterOrganizationKYCs.Service.create(id = username, documentType = documentType, fileName = fileName, file = Option(encodedBase64))
         utilities.FileOperations.renameFile(path, name, fileName)
-        Ok(Messages(constants.Response.UPLOAD_SUCCESSFUL.message))
+        Ok(Messages(constants.Response.FILE_UPLOAD_SUCCESSFUL.message))
       } catch {
         case baseException: BaseException => utilities.FileOperations.deleteFile(path, name)
           BadRequest(Messages(baseException.failure.message))
@@ -341,7 +341,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
         utilities.FileOperations.deleteFile(fileResourceManager.getOrganizationFilePath(oldAccountKYC.documentType), oldAccountKYC.fileName)
         masterOrganizationKYCs.Service.updateOldDocument(id = username, documentType = documentType, fileName = fileName, file = Option(encodedBase64))
         utilities.FileOperations.renameFile(newPath, name, fileName)
-        Ok(Messages(constants.Response.UPDATE_SUCCESSFUL.message))
+        Ok(Messages(constants.Response.FILE_UPDATE_SUCCESSFUL.message))
       } catch {
         case baseException: BaseException => utilities.FileOperations.deleteFile(newPath, name)
           BadRequest(Messages(baseException.failure.message))

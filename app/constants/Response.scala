@@ -61,8 +61,8 @@ object Response {
   val ZONE_ADDED = new Success("ZONE_ADDED")
   val ZONE_REQUEST_SENT = new Success("ZONE_REQUEST_SENT")
   val VERIFY_ORGANIZATION_REQUEST_REJECTED = new Success("VERIFY_ORGANIZATION_REQUEST_REJECTED")
-  val UPLOAD_SUCCESSFUL = new Success("UPLOAD_SUCCESSFUL")
-  val UPDATE_SUCCESSFUL = new Success("UPDATE_SUCCESSFUL")
+  val FILE_UPLOAD_SUCCESSFUL = new Success("FILE_UPLOAD_SUCCESSFUL")
+  val FILE_UPDATE_SUCCESSFUL = new Success("FILE_UPDATE_SUCCESSFUL")
   val DOCUMENT_APPROVED = new Success("DOCUMENT_APPROVED")
 
   //Warning- for telling that something important is not done and ask to do it

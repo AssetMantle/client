@@ -90,7 +90,7 @@ function getOrganizationStoreAndUpdateJsRoutes(documentType, fileName) {
     return [storeRoute, updateRoute];
 }
 
-function getUploadJsRoutes(documentType, userType) {
+function getUploadJsRoutes(documentType, userType, submitTo) {
     let uploadRoute = '';
     switch (userType) {
         case "ZONE":
@@ -125,7 +125,7 @@ function getStoreAndUpdateJsRoutes(documentType, userType, fileName, submitTo) {
 
 function uploadFile(documentType, userType, submitTo = '') {
 
-    let uploadRoute = getUploadJsRoutes(documentType, userType);
+    let uploadRoute = getUploadJsRoutes(documentType, userType, submitTo);
     let updatingFile = false;
 
     let rFile = new Resumable({

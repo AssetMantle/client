@@ -13,7 +13,7 @@
                 <div id="buttonZoneKycDocumentStatus@zoneKYC.id@zoneKYC.documentType"><button class="approve" onclick="verifyZoneKycDocument('@zoneKYC.id', '@zoneKYC.documentType')">@Messages(constants.Form.APPROVE)</button></div>
             }
             case _ => {
-                <div id="buttonZoneKycDocumentStatus@zoneKYC.id@zoneKYC.documentType"><button class="approve" onclick="verifyZoneKycDocument('@zoneKYC.id', '@zoneKYC.documentType')">@Messages(constants.Form.APPROVE)</button> <button class="approve" onclick="rejectZoneKycDocument('@zoneKYC.id', '@zoneKYC.documentType')">@Messages(constants.Form.REJECT)</button></div>
+                <div id="buttonZoneKycDocumentStatus@zoneKYC.id@zoneKYC.documentType"><button class="approve" onclick="verifyZoneKycDocument('@zoneKYC.id', '@zoneKYC.documentType')">@Messages(constants.Form.APPROVE)</button> <button class="reject" onclick="rejectZoneKycDocument('@zoneKYC.id', '@zoneKYC.documentType')">@Messages(constants.Form.REJECT)</button></div>
             }
         }
     }
