@@ -36,14 +36,6 @@ class ZoneKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     }
   }
 
-  private def addMultiple(zoneKYCs: Seq[ZoneKYC]): Future[Seq[String]] = db.run((zoneKYCTable returning zoneKYCTable.map(_.id) ++= zoneKYCs).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-    }
-  }
-
   private def upsert(zoneKYC: ZoneKYC): Future[Int] = db.run(zoneKYCTable.insertOrUpdate(zoneKYC).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -109,8 +101,6 @@ class ZoneKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
   object Service {
 
     def create(id: String, documentType: String, fileName: String, file: Option[Array[Byte]]): String = Await.result(add(ZoneKYC(id = id, documentType = documentType, status = null, fileName = fileName, file = file)), Duration.Inf)
-
-    def insertMultipleDocuments(zoneKYCs: Seq[ZoneKYC]): Seq[String] = Await.result(addMultiple(zoneKYCs), Duration.Inf)
 
     def updateOldDocument(id: String, documentType: String, fileName: String, file: Option[Array[Byte]]): Int = Await.result(upsert(ZoneKYC(id = id, documentType = documentType, status = null, fileName = fileName, file = file)), Duration.Inf)
 

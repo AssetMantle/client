@@ -19,10 +19,6 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private val uploadZoneKycBankDetailsPath = configuration.get[String]("upload.zoneKYCsBankDetailsPath")
-
-  private val uploadZoneKycIdentificationPath = configuration.get[String]("upload.zoneKYCsIdentificationPath")
-
   def addZoneForm: Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.master.addZone(views.companion.master.AddZone.form))
   }

@@ -36,14 +36,6 @@ class OrganizationKYCs @Inject()(protected val databaseConfigProvider: DatabaseC
     }
   }
 
-  private def addMultiple(organizationKYCs: Seq[OrganizationKYC]): Future[Seq[String]] = db.run((organizationKYCTable returning organizationKYCTable.map(_.id) ++= organizationKYCs).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-    }
-  }
-
   private def upsert(organizationKYC: OrganizationKYC): Future[Int] = db.run(organizationKYCTable.insertOrUpdate(organizationKYC).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -108,8 +100,6 @@ class OrganizationKYCs @Inject()(protected val databaseConfigProvider: DatabaseC
   object Service {
 
     def create(id: String, documentType: String, fileName: String, file: Option[Array[Byte]]): String = Await.result(add(OrganizationKYC(id = id, documentType = documentType, status = null, fileName = fileName, file = file)), Duration.Inf)
-
-    def insertMultipleDocuments(organizationKYCs: Seq[OrganizationKYC]): Seq[String] = Await.result(addMultiple(organizationKYCs), Duration.Inf)
 
     def updateOldDocument(id: String, documentType: String, fileName: String, file: Option[Array[Byte]]): Int = Await.result(upsert(OrganizationKYC(id = id, documentType = documentType, status = null, fileName = fileName, file = file)), Duration.Inf)
 

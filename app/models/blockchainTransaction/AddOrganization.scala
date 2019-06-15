@@ -32,10 +32,6 @@ class AddOrganizations @Inject()(protected val databaseConfigProvider: DatabaseC
 
   import databaseConfig.profile.api._
 
-  private val uploadOrganizationKycBankDetailsPath = configuration.get[String]("upload.organizationKYCsBankDetailsPath")
-
-  private val uploadOrganizationKycIdentificationPath = configuration.get[String]("upload.organizationKYCsIdentificationPath")
-
   private[models] val addOrganizationTable = TableQuery[AddOrganizationTable]
 
   private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds

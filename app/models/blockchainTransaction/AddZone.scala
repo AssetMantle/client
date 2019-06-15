@@ -34,10 +34,6 @@ class AddZones @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   private[models] val addZoneTable = TableQuery[AddZoneTable]
 
-  private val uploadZoneKycBankDetailsPath = configuration.get[String]("upload.zoneKYCsBankDetailsPath")
-
-  private val uploadZoneKycIdentificationPath = configuration.get[String]("upload.zoneKYCsIdentificationPath")
-
   private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
   private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
   private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")

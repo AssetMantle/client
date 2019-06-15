@@ -11,17 +11,17 @@ class FileResourceManager @Inject()()(implicit exec: ExecutionContext, configura
 
   private val logger: Logger = Logger(this.getClass)
 
-  private val uploadAccountKycBankDetailsPath = configuration.get[String]("upload.accountKYCsBankDetailsPath")
+  private val uploadAccountKycBankDetailsPath = configuration.get[String]("upload.account.bankDetailsPath")
 
-  private val uploadAccountKycIdentificationPath = configuration.get[String]("upload.accountKYCsIdentificationPath")
+  private val uploadAccountKycIdentificationPath = configuration.get[String]("upload.account.identificationPath")
 
-  private val uploadZoneKycBankDetailsPath = configuration.get[String]("upload.zoneKYCsBankDetailsPath")
+  private val uploadZoneKycBankDetailsPath = configuration.get[String]("upload.zone.bankDetailsPath")
 
-  private val uploadZoneKycIdentificationPath = configuration.get[String]("upload.zoneKYCsIdentificationPath")
+  private val uploadZoneKycIdentificationPath = configuration.get[String]("upload.zone.identificationPath")
 
-  private val uploadOrganizationKycBankDetailsPath = configuration.get[String]("upload.organizationKYCsBankDetailsPath")
+  private val uploadOrganizationKycBankDetailsPath = configuration.get[String]("upload.organization.bankDetailsPath")
 
-  private val uploadOrganizationKycIdentificationPath = configuration.get[String]("upload.organizationKYCsIdentificationPath")
+  private val uploadOrganizationKycIdentificationPath = configuration.get[String]("upload.organization.identificationPath")
 
   def getAccountFilePath(documentType: String): String = {
     documentType match {
