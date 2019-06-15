@@ -63,6 +63,7 @@ object Response {
   val VERIFY_ORGANIZATION_REQUEST_REJECTED = new Success("VERIFY_ORGANIZATION_REQUEST_REJECTED")
   val UPLOAD_SUCCESSFUL = new Success("UPLOAD_SUCCESSFUL")
   val UPDATE_SUCCESSFUL = new Success("UPDATE_SUCCESSFUL")
+  val DOCUMENT_APPROVED = new Success("DOCUMENT_APPROVED")
 
   //Warning- for telling that something important is not done and ask to do it
   val VERIFY_MOBILE_NUMBER = new Warning("VERIFY_MOBILE_NUMBER", routes.javascript.VerifyMobileNumberController.verifyMobileNumberForm)
@@ -90,6 +91,7 @@ object Response {
   val TOKEN_TIMEOUT = new Failure("TOKEN_TIMEOUT")
   val INVALID_TOKEN = new Failure("INVALID_TOKEN")
   val UNAUTHORIZED = new Failure("UNAUTHORIZED")
+  val DOCUMENT_REJECTED = new Failure("DOCUMENT_REJECTED")
 
 
   class Failure(private val response: String, private val actionController: JavaScriptReverseRoute = null) {

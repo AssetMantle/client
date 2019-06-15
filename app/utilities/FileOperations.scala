@@ -10,7 +10,7 @@ import views.companion.master.FileUpload.FileUploadInfo
 
 object FileOperations {
 
-  private implicit val module: String = constants.Module.FILE_UPLOAD
+  private implicit val module: String = constants.Module.FILE_OPERATIONS
 
   private val uploadedParts: ConcurrentMap[String, Set[FileUploadInfo]] = new ConcurrentHashMap(8, 0.9f, 1)
 
