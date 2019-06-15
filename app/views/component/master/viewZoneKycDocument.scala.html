@@ -1,21 +1,4 @@
 @import models.master.ZoneKYC
 
-@(zoneKYC: ZoneKYC)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
-<div>
-    @utilities.FileOperations.fileExtensionFromName(zoneKYC.fileName) match {
-        case constants.File.PNG | constants.File.JPEG | constants.File.JPG => {
-            <li><a href="@routes.FileController.serveFileToGenesis(zoneKYC.fileName, zoneKYC.documentType)">@zoneKYC.documentType <br>
-            <img src="data:image/jpg;base64,@utilities.FileOperations.decodeImageThumbnailData(zoneKYC.file.get)" alt="@zoneKYC.documentType">
-            </a>
-                <br>
-                <div id="statusZoneKycDocumentStatus@zoneKYC.id@zoneKYC.documentType">@zoneKYC.status</div>
-            </li>
-        }
-        case _ => {
-            <li><a href="@routes.FileController.serveFileToGenesis(zoneKYC.fileName, zoneKYC.documentType)">@zoneKYC.documentType</a>
-                <br>
-                <div id="statusZoneKycDocumentStatus@zoneKYC.id@zoneKYC.documentType">@zoneKYC.status</div>
-            </li>
-        }
-    }
-</div>
+@(zoneKYC: ZoneKYC)(implicit messagesProvider: MessagesProvider)
+@component.master.viewKycDocument(id = zoneKYC.id, documentType = zoneKYC.documentType, status = zoneKYC.status, fileName = zoneKYC.fileName, file = zoneKYC.file)
