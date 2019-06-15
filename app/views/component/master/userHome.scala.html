@@ -5,17 +5,12 @@
     @component.master.commonHome(username = username, userType = constants.User.USER, address = address, coins = coins)
     </div>
     <div class="centerText">
-        <div id="bankDetails"><a onclick="getForm(jsRoutes.controllers.FileController.userKYCUploadForm('@constants.File.BANK_DETAILS', '@constants.File.UPLOAD_USER_GENERIC'))">@Messages(constants.File.UPLOAD_BANK_DETAILS)</a></div>
-        <div id="identification"><a onclick="getForm(jsRoutes.controllers.FileController.userKYCUploadForm('@constants.File.IDENTIFICATION', '@constants.File.UPLOAD_USER_GENERIC'))">@Messages(constants.File.UPLOAD_IDENTIFICATION)</a></div>
-
-        <br>
-        <div id="bankDetails"><a onclick="getForm(jsRoutes.controllers.FileController.userKYCUploadForm('@constants.File.BANK_DETAILS', '@constants.File.UPLOAD_USER_ZONE_KYC'))">@Messages(constants.File.UPLOAD_ZONE_BANK_DETAILS)</a></div>
-        <div id="identification"><a onclick="getForm(jsRoutes.controllers.FileController.userKYCUploadForm('@constants.File.IDENTIFICATION', '@constants.File.UPLOAD_USER_ZONE_KYC'))">@Messages(constants.File.UPLOAD_ZONE_IDENTIFICATION)</a></div>
-
-        <br>
-        <div id="bankDetails"><a onclick="getForm(jsRoutes.controllers.FileController.userKYCUploadForm('@constants.File.BANK_DETAILS', '@constants.File.UPLOAD_USER_ORGANIZATION_KYC'))">@Messages(constants.File.UPLOAD_ORGANIZATION_BANK_DETAILS)</a></div>
-        <div id="identification"><a onclick="getForm(jsRoutes.controllers.FileController.userKYCUploadForm('@constants.File.IDENTIFICATION', '@constants.File.UPLOAD_USER_ORGANIZATION_KYC'))">@Messages(constants.File.UPLOAD_ORGANIZATION_IDENTIFICATION)</a></div>
-
+        <button onclick="getForm(jsRoutes.controllers.FileController.userKYCUploadForm('@constants.File.BANK_DETAILS', '@constants.File.UPLOAD_USER_GENERIC'))">@Messages(constants.File.UPLOAD_BANK_DETAILS)</button>
+        <button onclick="getForm(jsRoutes.controllers.FileController.userKYCUploadForm('@constants.File.IDENTIFICATION', '@constants.File.UPLOAD_USER_GENERIC'))">@Messages(constants.File.UPLOAD_IDENTIFICATION)</button>
+        <button onclick="getForm(jsRoutes.controllers.FileController.userKYCUploadForm('@constants.File.BANK_DETAILS', '@constants.File.UPLOAD_USER_ZONE_KYC'))">@Messages(constants.File.UPLOAD_ZONE_BANK_DETAILS)</button>
+        <button onclick="getForm(jsRoutes.controllers.FileController.userKYCUploadForm('@constants.File.IDENTIFICATION', '@constants.File.UPLOAD_USER_ZONE_KYC'))">@Messages(constants.File.UPLOAD_ZONE_IDENTIFICATION)</button>
+        <button onclick="getForm(jsRoutes.controllers.FileController.userKYCUploadForm('@constants.File.BANK_DETAILS', '@constants.File.UPLOAD_USER_ORGANIZATION_KYC'))">@Messages(constants.File.UPLOAD_ORGANIZATION_BANK_DETAILS)</button>
+        <button onclick="getForm(jsRoutes.controllers.FileController.userKYCUploadForm('@constants.File.IDENTIFICATION', '@constants.File.UPLOAD_USER_ORGANIZATION_KYC'))">@Messages(constants.File.UPLOAD_ORGANIZATION_IDENTIFICATION)</button>
         <button onclick="getForm(jsRoutes.controllers.AddOrganizationController.addOrganizationForm())">@Messages(constants.Form.ADD_ORGANIZATION)</button>
         <button onclick="getForm(jsRoutes.controllers.AddZoneController.addZoneForm())">@Messages(constants.Form.ADD_ZONE)</button>
     </div>

@@ -12,8 +12,6 @@
             @Messages(constants.Form.ZONE_ID): @zone.id <br>
             @Messages(constants.Form.CURRENCY): @zone.currency <br>
             @Messages(constants.Form.VERIFIED_STATUS): @zone.status <br>
-            <div id="bankDetails"><a onclick="getForm(jsRoutes.controllers.FileController.zoneKYCUploadForm('@constants.File.BANK_DETAILS'))">@Messages(constants.File.UPLOAD_ZONE_BANK_DETAILS)</a></div>
-            <div id="identification"><a onclick="getForm(jsRoutes.controllers.FileController.zoneKYCUploadForm('@constants.File.IDENTIFICATION'))">@Messages(constants.File.UPLOAD_ZONE_IDENTIFICATION)</a></div>
         </div>
     </div>
     <div class="centerText">
@@ -24,5 +22,7 @@
         <button onclick="getForm(jsRoutes.controllers.ReleaseAssetController.releaseAssetForm())">@Messages(constants.Form.RELEASE_ASSET)</button>
         <button onclick="getForm(jsRoutes.controllers.SellerExecuteOrderController.sellerExecuteOrderForm())">@Messages(constants.Form.SELLER_EXECUTE_ORDER)</button>
         <button onclick="getForm(jsRoutes.controllers.SetACLController.setACLForm())">@Messages(constants.Form.SET_ACL)</button>
+        <button onclick="getForm(jsRoutes.controllers.FileController.zoneKYCUploadForm('@constants.File.BANK_DETAILS'))">@Messages(constants.File.UPLOAD_ZONE_BANK_DETAILS)</button>
+        <button onclick="getForm(jsRoutes.controllers.FileController.zoneKYCUploadForm('@constants.File.IDENTIFICATION'))">@Messages(constants.File.UPLOAD_ZONE_IDENTIFICATION)</button>
     </div>
 }

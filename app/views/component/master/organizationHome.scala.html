@@ -4,8 +4,6 @@
 
 @common(Messages(constants.User.HOME)) {
     <div class="flexContainer">
-        <div id="bankDetails"><a onclick="getForm(jsRoutes.controllers.FileController.organizationKYCUploadForm('@constants.File.BANK_DETAILS'))">@Messages(constants.File.UPLOAD_ORGANIZATION_BANK_DETAILS)</a></div>
-        <div id="identification"><a onclick="getForm(jsRoutes.controllers.FileController.organizationKYCUploadForm('@constants.File.IDENTIFICATION'))">@Messages(constants.File.UPLOAD_ORGANIZATION_IDENTIFICATION)</a></div>
         @component.master.commonHome(username = username, userType = constants.User.ORGANIZATION, address = address, coins = coins)
         <div class="flexItem box leftAlign">
             <h2>@Messages(constants.Form.ORGANIZATION)</h2>
@@ -17,5 +15,10 @@
             @Messages(constants.Form.EMAIL): @organization.email <br>
             @Messages(constants.Form.VERIFIED_STATUS): @organization.status <br>
         </div>
+    </div>
+    <div class="centerText">
+        <button onclick="getForm(jsRoutes.controllers.FileController.organizationKYCUploadForm('@constants.File.BANK_DETAILS'))">@Messages(constants.File.UPLOAD_ORGANIZATION_BANK_DETAILS)</button>
+        <button onclick="getForm(jsRoutes.controllers.FileController.organizationKYCUploadForm('@constants.File.IDENTIFICATION'))">@Messages(constants.File.UPLOAD_ORGANIZATION_IDENTIFICATION)</button>
+
     </div>
 }

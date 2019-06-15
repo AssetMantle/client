@@ -2,21 +2,5 @@
 
 @(documentType: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
 
-<div class = "uploadBar">
-    <a id="browseButton"><img src="@routes.Assets.versioned("images/browse.svg")" title="@Messages(constants.Form.BROWSE)" /></a>
-    @CSRF.formField
-    <a id="uploadButton"><img src="@routes.Assets.versioned("images/upload.svg")" title="@Messages(constants.Form.UPLOAD)"/></a>
-    <a id="updateButton"><img src="@routes.Assets.versioned("images/update.svg")" title="@Messages(constants.Form.UPDATE)"/></a>
-    <a id="pauseButton"><img src="@routes.Assets.versioned("images/stop.svg")" title="@Messages(constants.Form.PAUSE_ALL)"/></a>
-    <a id="cancelButton"><img src="@routes.Assets.versioned("images/cancel.svg")" title="@Messages(constants.Form.CANCEL_ALL)" /></a>
-</div>
-
-<div class = "uploadProgress">
-    <div id="errorMessage" style="color: red;"></div>
-    <div id="successfulMessage" style="color: green;"></div>
-    <div class="uploadProgressOuter"> <div class = "progressBar"></div></div>
-    <div id="filesToBeUploaded"></div>
-</div>
-<script src="@routes.Assets.versioned("javascripts/resumable.js")" type="text/javascript"></script>
-<script src="@routes.Assets.versioned("javascripts/upload.js")" type="text/javascript"></script>
-<script>organizationKycFileUpload('@documentType')</script>
+@component.master.fileUpload()
+<script>uploadFile('@documentType', '@constants.User.ORGANIZATION')</script>
