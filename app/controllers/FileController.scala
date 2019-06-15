@@ -16,7 +16,7 @@ import views.companion.master.FileUpload
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class FileController @Inject()(messagesControllerComponents: MessagesControllerComponents, blockchainACLs: blockchain.ACLAccounts, masterAccounts: master.Accounts, masterZones: master.Zones, masterOrganizations: master.Organizations, masterAccountKYCs: master.AccountKYCs, imageProcess: utilities.ImageProcess, fileResourceManager: utilities.FileResourceManager, withGenesisLoginAction: WithGenesisLoginAction, withUserLoginAction: WithUserLoginAction, masterZoneKYCs: master.ZoneKYCs, withZoneLoginAction: WithZoneLoginAction, masterOrganizationKYCs: master.OrganizationKYCs, withOrganizationLoginAction: WithOrganizationLoginAction)(implicit exec: ExecutionContext, configuration: Configuration, wsClient: WSClient) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class FileController @Inject()(messagesControllerComponents: MessagesControllerComponents, blockchainACLs: blockchain.ACLAccounts, masterAccounts: master.Accounts, masterZones: master.Zones, masterOrganizations: master.Organizations, masterAccountKYCs: master.AccountKYCs, fileResourceManager: utilities.FileResourceManager, withGenesisLoginAction: WithGenesisLoginAction, withUserLoginAction: WithUserLoginAction, masterZoneKYCs: master.ZoneKYCs, withZoneLoginAction: WithZoneLoginAction, masterOrganizationKYCs: master.OrganizationKYCs, withOrganizationLoginAction: WithOrganizationLoginAction)(implicit exec: ExecutionContext, configuration: Configuration, wsClient: WSClient) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -61,17 +61,17 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
     implicit request =>
       val path = fileResourceManager.getAccountFilePath(documentType)
       try {
-        val (fileName, encodedBase64) = fileResourceManager.fileExtensionFromName(name) match {
-          case constants.File.JPEG | constants.File.JPG | constants.File.PNG => imageProcess.convertToThumbnail(name, path)
-          case _ => (List(util.hashing.MurmurHash3.stringHash(Base64.encodeBase64String(fileResourceManager.convertToByteArray(fileResourceManager.newFile(path, name)))).toString, fileResourceManager.fileExtensionFromName(name)).mkString("."), null)
+        val (fileName, encodedBase64) = utilities.FileOperations.fileExtensionFromName(name) match {
+          case constants.File.JPEG | constants.File.JPG | constants.File.PNG => utilities.ImageProcess.convertToThumbnail(name, path)
+          case _ => (List(util.hashing.MurmurHash3.stringHash(Base64.encodeBase64String(utilities.FileOperations.convertToByteArray(utilities.FileOperations.newFile(path, name)))).toString, utilities.FileOperations.fileExtensionFromName(name)).mkString("."), null)
         }
         masterAccountKYCs.Service.create(id = username, documentType = documentType, fileName = fileName, file = Option(encodedBase64))
-        fileResourceManager.renameFile(path, name, fileName)
+        utilities.FileOperations.renameFile(path, name, fileName)
         Ok(Messages(constants.Response.UPLOAD_SUCCESSFUL.message))
       } catch {
-        case baseException: BaseException => fileResourceManager.deleteFile(path, name)
+        case baseException: BaseException => utilities.FileOperations.deleteFile(path, name)
           BadRequest(Messages(baseException.failure.message))
-        case e: Exception => fileResourceManager.deleteFile(path, name)
+        case e: Exception => utilities.FileOperations.deleteFile(path, name)
           BadRequest(Messages(e.getMessage))
       }
   }
@@ -81,18 +81,18 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
       val newPath = fileResourceManager.getAccountFilePath(documentType)
       try {
         val oldAccountKYC = masterAccountKYCs.Service.get(id = username, documentType = documentType)
-        val (fileName, encodedBase64) = fileResourceManager.fileExtensionFromName(name) match {
-          case constants.File.JPEG | constants.File.JPG | constants.File.PNG => imageProcess.convertToThumbnail(name, newPath)
-          case _ => (List(util.hashing.MurmurHash3.stringHash(Base64.encodeBase64String(fileResourceManager.convertToByteArray(fileResourceManager.newFile(newPath, name)))).toString, fileResourceManager.fileExtensionFromName(name)).mkString("."), null)
+        val (fileName, encodedBase64) = utilities.FileOperations.fileExtensionFromName(name) match {
+          case constants.File.JPEG | constants.File.JPG | constants.File.PNG => utilities.ImageProcess.convertToThumbnail(name, newPath)
+          case _ => (List(util.hashing.MurmurHash3.stringHash(Base64.encodeBase64String(utilities.FileOperations.convertToByteArray(utilities.FileOperations.newFile(newPath, name)))).toString, utilities.FileOperations.fileExtensionFromName(name)).mkString("."), null)
         }
-        fileResourceManager.deleteFile(fileResourceManager.getAccountFilePath(oldAccountKYC.documentType), oldAccountKYC.fileName)
+        utilities.FileOperations.deleteFile(fileResourceManager.getAccountFilePath(oldAccountKYC.documentType), oldAccountKYC.fileName)
         masterAccountKYCs.Service.updateOldDocument(id = username, documentType = documentType, fileName = fileName, file = Option(encodedBase64))
-        fileResourceManager.renameFile(newPath, name, fileName)
+        utilities.FileOperations.renameFile(newPath, name, fileName)
         Ok(Messages(constants.Response.UPDATE_SUCCESSFUL.message))
       } catch {
-        case baseException: BaseException => fileResourceManager.deleteFile(newPath, name)
+        case baseException: BaseException => utilities.FileOperations.deleteFile(newPath, name)
           BadRequest(Messages(baseException.failure.message))
-        case e: Exception => fileResourceManager.deleteFile(newPath, name)
+        case e: Exception => utilities.FileOperations.deleteFile(newPath, name)
           BadRequest(Messages(e.getMessage))
       }
   }
@@ -122,17 +122,17 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
     implicit request =>
       val path = fileResourceManager.getZoneFilePath(documentType)
       try {
-        val (fileName, encodedBase64) = fileResourceManager.fileExtensionFromName(name) match {
-          case constants.File.JPEG | constants.File.JPG | constants.File.PNG => imageProcess.convertToThumbnail(name, path)
-          case _ => (List(util.hashing.MurmurHash3.stringHash(Base64.encodeBase64String(fileResourceManager.convertToByteArray(fileResourceManager.newFile(path, name)))).toString, fileResourceManager.fileExtensionFromName(name)).mkString("."), null)
+        val (fileName, encodedBase64) = utilities.FileOperations.fileExtensionFromName(name) match {
+          case constants.File.JPEG | constants.File.JPG | constants.File.PNG => utilities.ImageProcess.convertToThumbnail(name, path)
+          case _ => (List(util.hashing.MurmurHash3.stringHash(Base64.encodeBase64String(utilities.FileOperations.convertToByteArray(utilities.FileOperations.newFile(path, name)))).toString, utilities.FileOperations.fileExtensionFromName(name)).mkString("."), null)
         }
         masterZoneKYCs.Service.create(id = username, documentType = documentType, fileName = fileName, file = Option(encodedBase64))
-        fileResourceManager.renameFile(path, name, fileName)
+        utilities.FileOperations.renameFile(path, name, fileName)
         Ok(Messages(constants.Response.UPLOAD_SUCCESSFUL.message))
       } catch {
-        case baseException: BaseException => fileResourceManager.deleteFile(path, name)
+        case baseException: BaseException => utilities.FileOperations.deleteFile(path, name)
           BadRequest(Messages(baseException.failure.message))
-        case e: Exception => fileResourceManager.deleteFile(path, name)
+        case e: Exception => utilities.FileOperations.deleteFile(path, name)
           BadRequest(Messages(e.getMessage))
       }
   }
@@ -142,18 +142,18 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
       val newPath = fileResourceManager.getZoneFilePath(documentType)
       try {
         val oldAccountKYC = masterZoneKYCs.Service.get(id = username, documentType = documentType)
-        val (fileName, encodedBase64) = fileResourceManager.fileExtensionFromName(name) match {
-          case constants.File.JPEG | constants.File.JPG | constants.File.PNG => imageProcess.convertToThumbnail(name, newPath)
-          case _ => (List(util.hashing.MurmurHash3.stringHash(Base64.encodeBase64String(fileResourceManager.convertToByteArray(fileResourceManager.newFile(newPath, name)))).toString, fileResourceManager.fileExtensionFromName(name)).mkString("."), null)
+        val (fileName, encodedBase64) = utilities.FileOperations.fileExtensionFromName(name) match {
+          case constants.File.JPEG | constants.File.JPG | constants.File.PNG => utilities.ImageProcess.convertToThumbnail(name, newPath)
+          case _ => (List(util.hashing.MurmurHash3.stringHash(Base64.encodeBase64String(utilities.FileOperations.convertToByteArray(utilities.FileOperations.newFile(newPath, name)))).toString, utilities.FileOperations.fileExtensionFromName(name)).mkString("."), null)
         }
-        fileResourceManager.deleteFile(fileResourceManager.getZoneFilePath(oldAccountKYC.documentType), oldAccountKYC.fileName)
+        utilities.FileOperations.deleteFile(fileResourceManager.getZoneFilePath(oldAccountKYC.documentType), oldAccountKYC.fileName)
         masterZoneKYCs.Service.updateOldDocument(id = username, documentType = documentType, fileName = fileName, file = Option(encodedBase64))
-        fileResourceManager.renameFile(newPath, name, fileName)
+        utilities.FileOperations.renameFile(newPath, name, fileName)
         Ok(Messages(constants.Response.UPDATE_SUCCESSFUL.message))
       } catch {
-        case baseException: BaseException => fileResourceManager.deleteFile(newPath, name)
+        case baseException: BaseException => utilities.FileOperations.deleteFile(newPath, name)
           BadRequest(Messages(baseException.failure.message))
-        case e: Exception => fileResourceManager.deleteFile(newPath, name)
+        case e: Exception => utilities.FileOperations.deleteFile(newPath, name)
           BadRequest(Messages(e.getMessage))
       }
   }
@@ -183,17 +183,17 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
     implicit request =>
       val path = fileResourceManager.getOrganizationFilePath(documentType)
       try {
-        val (fileName, encodedBase64) = fileResourceManager.fileExtensionFromName(name) match {
-          case constants.File.JPEG | constants.File.JPG | constants.File.PNG => imageProcess.convertToThumbnail(name, path)
-          case _ => (List(util.hashing.MurmurHash3.stringHash(Base64.encodeBase64String(fileResourceManager.convertToByteArray(fileResourceManager.newFile(path, name)))).toString, fileResourceManager.fileExtensionFromName(name)).mkString("."), null)
+        val (fileName, encodedBase64) = utilities.FileOperations.fileExtensionFromName(name) match {
+          case constants.File.JPEG | constants.File.JPG | constants.File.PNG => utilities.ImageProcess.convertToThumbnail(name, path)
+          case _ => (List(util.hashing.MurmurHash3.stringHash(Base64.encodeBase64String(utilities.FileOperations.convertToByteArray(utilities.FileOperations.newFile(path, name)))).toString, utilities.FileOperations.fileExtensionFromName(name)).mkString("."), null)
         }
         masterOrganizationKYCs.Service.create(id = username, documentType = documentType, fileName = fileName, file = Option(encodedBase64))
-        fileResourceManager.renameFile(path, name, fileName)
+        utilities.FileOperations.renameFile(path, name, fileName)
         Ok(Messages(constants.Response.UPLOAD_SUCCESSFUL.message))
       } catch {
-        case baseException: BaseException => fileResourceManager.deleteFile(path, name)
+        case baseException: BaseException => utilities.FileOperations.deleteFile(path, name)
           BadRequest(Messages(baseException.failure.message))
-        case e: Exception => fileResourceManager.deleteFile(path, name)
+        case e: Exception => utilities.FileOperations.deleteFile(path, name)
           BadRequest(Messages(e.getMessage))
       }
   }
@@ -203,18 +203,18 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
       val newPath = fileResourceManager.getOrganizationFilePath(documentType)
       try {
         val oldAccountKYC = masterOrganizationKYCs.Service.get(id = username, documentType = documentType)
-        val (fileName, encodedBase64) = fileResourceManager.fileExtensionFromName(name) match {
-          case constants.File.JPEG | constants.File.JPG | constants.File.PNG => imageProcess.convertToThumbnail(name, newPath)
-          case _ => (List(util.hashing.MurmurHash3.stringHash(Base64.encodeBase64String(fileResourceManager.convertToByteArray(fileResourceManager.newFile(newPath, name)))).toString, fileResourceManager.fileExtensionFromName(name)).mkString("."), null)
+        val (fileName, encodedBase64) = utilities.FileOperations.fileExtensionFromName(name) match {
+          case constants.File.JPEG | constants.File.JPG | constants.File.PNG => utilities.ImageProcess.convertToThumbnail(name, newPath)
+          case _ => (List(util.hashing.MurmurHash3.stringHash(Base64.encodeBase64String(utilities.FileOperations.convertToByteArray(utilities.FileOperations.newFile(newPath, name)))).toString, utilities.FileOperations.fileExtensionFromName(name)).mkString("."), null)
         }
-        fileResourceManager.deleteFile(fileResourceManager.getOrganizationFilePath(oldAccountKYC.documentType), oldAccountKYC.fileName)
+        utilities.FileOperations.deleteFile(fileResourceManager.getOrganizationFilePath(oldAccountKYC.documentType), oldAccountKYC.fileName)
         masterOrganizationKYCs.Service.updateOldDocument(id = username, documentType = documentType, fileName = fileName, file = Option(encodedBase64))
-        fileResourceManager.renameFile(newPath, name, fileName)
+        utilities.FileOperations.renameFile(newPath, name, fileName)
         Ok(Messages(constants.Response.UPDATE_SUCCESSFUL.message))
       } catch {
-        case baseException: BaseException => fileResourceManager.deleteFile(newPath, name)
+        case baseException: BaseException => utilities.FileOperations.deleteFile(newPath, name)
           BadRequest(Messages(baseException.failure.message))
-        case e: Exception => fileResourceManager.deleteFile(newPath, name)
+        case e: Exception => utilities.FileOperations.deleteFile(newPath, name)
           BadRequest(Messages(e.getMessage))
       }
   }
@@ -248,17 +248,17 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
     implicit request =>
       val path = fileResourceManager.getZoneFilePath(documentType)
       try {
-        val (fileName, encodedBase64) = fileResourceManager.fileExtensionFromName(name) match {
-          case constants.File.JPEG | constants.File.JPG | constants.File.PNG => imageProcess.convertToThumbnail(name, path)
-          case _ => (List(util.hashing.MurmurHash3.stringHash(Base64.encodeBase64String(fileResourceManager.convertToByteArray(fileResourceManager.newFile(path, name)))).toString, fileResourceManager.fileExtensionFromName(name)).mkString("."), null)
+        val (fileName, encodedBase64) = utilities.FileOperations.fileExtensionFromName(name) match {
+          case constants.File.JPEG | constants.File.JPG | constants.File.PNG => utilities.ImageProcess.convertToThumbnail(name, path)
+          case _ => (List(util.hashing.MurmurHash3.stringHash(Base64.encodeBase64String(utilities.FileOperations.convertToByteArray(utilities.FileOperations.newFile(path, name)))).toString, utilities.FileOperations.fileExtensionFromName(name)).mkString("."), null)
         }
         masterZoneKYCs.Service.create(id = username, documentType = documentType, fileName = fileName, file = Option(encodedBase64))
-        fileResourceManager.renameFile(path, name, fileName)
+        utilities.FileOperations.renameFile(path, name, fileName)
         Ok(Messages(constants.Response.UPLOAD_SUCCESSFUL.message))
       } catch {
-        case baseException: BaseException => fileResourceManager.deleteFile(path, name)
+        case baseException: BaseException => utilities.FileOperations.deleteFile(path, name)
           BadRequest(Messages(baseException.failure.message))
-        case e: Exception => fileResourceManager.deleteFile(path, name)
+        case e: Exception => utilities.FileOperations.deleteFile(path, name)
           BadRequest(Messages(e.getMessage))
       }
   }
@@ -268,18 +268,18 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
       val newPath = fileResourceManager.getZoneFilePath(documentType)
       try {
         val oldAccountKYC = masterZoneKYCs.Service.get(id = username, documentType = documentType)
-        val (fileName, encodedBase64) = fileResourceManager.fileExtensionFromName(name) match {
-          case constants.File.JPEG | constants.File.JPG | constants.File.PNG => imageProcess.convertToThumbnail(name, newPath)
-          case _ => (List(util.hashing.MurmurHash3.stringHash(Base64.encodeBase64String(fileResourceManager.convertToByteArray(fileResourceManager.newFile(newPath, name)))).toString, fileResourceManager.fileExtensionFromName(name)).mkString("."), null)
+        val (fileName, encodedBase64) = utilities.FileOperations.fileExtensionFromName(name) match {
+          case constants.File.JPEG | constants.File.JPG | constants.File.PNG => utilities.ImageProcess.convertToThumbnail(name, newPath)
+          case _ => (List(util.hashing.MurmurHash3.stringHash(Base64.encodeBase64String(utilities.FileOperations.convertToByteArray(utilities.FileOperations.newFile(newPath, name)))).toString, utilities.FileOperations.fileExtensionFromName(name)).mkString("."), null)
         }
-        fileResourceManager.deleteFile(fileResourceManager.getZoneFilePath(oldAccountKYC.documentType), oldAccountKYC.fileName)
+        utilities.FileOperations.deleteFile(fileResourceManager.getZoneFilePath(oldAccountKYC.documentType), oldAccountKYC.fileName)
         masterZoneKYCs.Service.updateOldDocument(id = username, documentType = documentType, fileName = fileName, file = Option(encodedBase64))
-        fileResourceManager.renameFile(newPath, name, fileName)
+        utilities.FileOperations.renameFile(newPath, name, fileName)
         Ok(Messages(constants.Response.UPDATE_SUCCESSFUL.message))
       } catch {
-        case baseException: BaseException => fileResourceManager.deleteFile(newPath, name)
+        case baseException: BaseException => utilities.FileOperations.deleteFile(newPath, name)
           BadRequest(Messages(baseException.failure.message))
-        case e: Exception => fileResourceManager.deleteFile(newPath, name)
+        case e: Exception => utilities.FileOperations.deleteFile(newPath, name)
           BadRequest(Messages(e.getMessage))
       }
   }
@@ -314,17 +314,17 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
     implicit request =>
       val path = fileResourceManager.getOrganizationFilePath(documentType)
       try {
-        val (fileName, encodedBase64) = fileResourceManager.fileExtensionFromName(name) match {
-          case constants.File.JPEG | constants.File.JPG | constants.File.PNG => imageProcess.convertToThumbnail(name, path)
-          case _ => (List(util.hashing.MurmurHash3.stringHash(Base64.encodeBase64String(fileResourceManager.convertToByteArray(fileResourceManager.newFile(path, name)))).toString, fileResourceManager.fileExtensionFromName(name)).mkString("."), null)
+        val (fileName, encodedBase64) = utilities.FileOperations.fileExtensionFromName(name) match {
+          case constants.File.JPEG | constants.File.JPG | constants.File.PNG => utilities.ImageProcess.convertToThumbnail(name, path)
+          case _ => (List(util.hashing.MurmurHash3.stringHash(Base64.encodeBase64String(utilities.FileOperations.convertToByteArray(utilities.FileOperations.newFile(path, name)))).toString, utilities.FileOperations.fileExtensionFromName(name)).mkString("."), null)
         }
         masterOrganizationKYCs.Service.create(id = username, documentType = documentType, fileName = fileName, file = Option(encodedBase64))
-        fileResourceManager.renameFile(path, name, fileName)
+        utilities.FileOperations.renameFile(path, name, fileName)
         Ok(Messages(constants.Response.UPLOAD_SUCCESSFUL.message))
       } catch {
-        case baseException: BaseException => fileResourceManager.deleteFile(path, name)
+        case baseException: BaseException => utilities.FileOperations.deleteFile(path, name)
           BadRequest(Messages(baseException.failure.message))
-        case e: Exception => fileResourceManager.deleteFile(path, name)
+        case e: Exception => utilities.FileOperations.deleteFile(path, name)
           BadRequest(Messages(e.getMessage))
       }
   }
@@ -334,18 +334,18 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
       val newPath = fileResourceManager.getOrganizationFilePath(documentType)
       try {
         val oldAccountKYC = masterOrganizationKYCs.Service.get(id = username, documentType = documentType)
-        val (fileName, encodedBase64) = fileResourceManager.fileExtensionFromName(name) match {
-          case constants.File.JPEG | constants.File.JPG | constants.File.PNG => imageProcess.convertToThumbnail(name, newPath)
-          case _ => (List(util.hashing.MurmurHash3.stringHash(Base64.encodeBase64String(fileResourceManager.convertToByteArray(fileResourceManager.newFile(newPath, name)))).toString, fileResourceManager.fileExtensionFromName(name)).mkString("."), null)
+        val (fileName, encodedBase64) = utilities.FileOperations.fileExtensionFromName(name) match {
+          case constants.File.JPEG | constants.File.JPG | constants.File.PNG => utilities.ImageProcess.convertToThumbnail(name, newPath)
+          case _ => (List(util.hashing.MurmurHash3.stringHash(Base64.encodeBase64String(utilities.FileOperations.convertToByteArray(utilities.FileOperations.newFile(newPath, name)))).toString, utilities.FileOperations.fileExtensionFromName(name)).mkString("."), null)
         }
-        fileResourceManager.deleteFile(fileResourceManager.getOrganizationFilePath(oldAccountKYC.documentType), oldAccountKYC.fileName)
+        utilities.FileOperations.deleteFile(fileResourceManager.getOrganizationFilePath(oldAccountKYC.documentType), oldAccountKYC.fileName)
         masterOrganizationKYCs.Service.updateOldDocument(id = username, documentType = documentType, fileName = fileName, file = Option(encodedBase64))
-        fileResourceManager.renameFile(newPath, name, fileName)
+        utilities.FileOperations.renameFile(newPath, name, fileName)
         Ok(Messages(constants.Response.UPDATE_SUCCESSFUL.message))
       } catch {
-        case baseException: BaseException => fileResourceManager.deleteFile(newPath, name)
+        case baseException: BaseException => utilities.FileOperations.deleteFile(newPath, name)
           BadRequest(Messages(baseException.failure.message))
-        case e: Exception => fileResourceManager.deleteFile(newPath, name)
+        case e: Exception => utilities.FileOperations.deleteFile(newPath, name)
           BadRequest(Messages(e.getMessage))
       }
   }
