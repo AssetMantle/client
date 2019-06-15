@@ -3,7 +3,7 @@
 @(organizationKYCs: Seq[OrganizationKYC])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 <div>
     @for(organizationKYC <- organizationKYCs) {
-        @component.master.viewOrganizationKycDocument(organizationKYC)
+        @component.master.viewKycDocument(id = organizationKYC.id, documentType = organizationKYC.documentType, status = organizationKYC.status, fileName = organizationKYC.fileName, file = organizationKYC.file)
         <div id="organizationKycDocumentStatus@organizationKYC.id@organizationKYC.documentType"></div>
         @organizationKYC.status.getOrElse(None)  match {
             case true => {

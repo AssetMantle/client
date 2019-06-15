@@ -1,4 +1,0 @@
-@import models.master.ZoneKYC
-
-@(zoneKYC: ZoneKYC)(implicit messagesProvider: MessagesProvider)
-@component.master.viewKycDocument(id = zoneKYC.id, documentType = zoneKYC.documentType, status = zoneKYC.status, fileName = zoneKYC.fileName, file = zoneKYC.file)

@@ -1,4 +1,0 @@
-@import models.master.OrganizationKYC
-
-@(organizationKYC: OrganizationKYC)(implicit messagesProvider: MessagesProvider)
-@component.master.viewKycDocument(id = organizationKYC.id, documentType = organizationKYC.documentType, status = organizationKYC.status, fileName = organizationKYC.fileName, file = organizationKYC.file)
