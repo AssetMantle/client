@@ -1,4 +1,4 @@
-function getZoneKycFilesWithGenesisLoginAction(accountID, documentTypeSequence) {
+function getZoneKycFilesToGenesis(accountID) {
     let route = jsRoutes.controllers.AddZoneController.viewKycDocuments(accountID);
     $.ajax({
         url: route.url,
@@ -12,7 +12,7 @@ function getZoneKycFilesWithGenesisLoginAction(accountID, documentTypeSequence) 
     });
 }
 
-function getOrganizationKycFilesWithZoneLoginAction(accountID) {
+function getOrganizationKycFilesToZone(accountID) {
     let route = jsRoutes.controllers.AddOrganizationController.viewKycDocuments(accountID);
     $.ajax({
         url: route.url,
