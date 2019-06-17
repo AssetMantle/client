@@ -32,8 +32,24 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
 
   private val uploadOrganizationKycIdentificationPath = configuration.get[String]("upload.organization.identificationPath")
 
-  def userKYCUploadForm(documentType: String, submitTo: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.fileUpload(documentType = documentType, userType = constants.User.USER, submitTo = submitTo))
+  def uploadForm(documentType: String, userType: String, target: String): Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.fileUpload(documentType = documentType, userType = userType, target = target))
+  }
+
+  def updateForm(documentType: String, userType: String, target: String): Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.fileUpdate(documentType = documentType, userType = userType, target = target))
+  }
+
+  def checkAccountKycFileExists(accountID: String, documentType: String): Action[AnyContent] = Action { implicit request =>
+    if (masterAccountKYCs.Service.checkFileExists(id = accountID, documentType = documentType)) Ok else NoContent
+  }
+
+  def checkZoneKycFileExists(accountID: String, documentType: String): Action[AnyContent] = Action { implicit request =>
+    if (masterZoneKYCs.Service.checkFileExists(id = accountID, documentType = documentType)) Ok else NoContent
+  }
+
+  def checkOrganizationKycFileExists(accountID: String, documentType: String): Action[AnyContent] = Action { implicit request =>
+    if (masterOrganizationKYCs.Service.checkFileExists(id = accountID, documentType = documentType)) Ok else NoContent
   }
 
   def uploadUserKYC(documentType: String) = Action(parse.multipartFormData) { implicit request =>
@@ -219,10 +235,6 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
       }
   }
 
-  def zoneKYCUploadForm(documentType: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.fileUpload(documentType = documentType, userType = constants.User.ZONE))
-  }
-
   def uploadZoneKYC(documentType: String) = Action(parse.multipartFormData) { implicit request =>
     FileUpload.form.bindFromRequest.fold(
       formWithErrors => {
@@ -283,11 +295,6 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
           BadRequest(Messages(e.getMessage))
       }
   }
-
-  def organizationKYCUploadForm(documentType: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.fileUpload(documentType = documentType, userType = constants.User.ORGANIZATION))
-  }
-
 
   def uploadOrganizationKYC(documentType: String) = Action(parse.multipartFormData) { implicit request =>
     FileUpload.form.bindFromRequest.fold(

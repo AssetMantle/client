@@ -1,9 +1,9 @@
-function getUserUploadJsRoutes(documentType, submitTo) {
+function getUserUploadJsRoutes(documentType, target) {
     let uploadRoute = '';
     switch (documentType) {
         case "BANK_DETAILS":
         case "IDENTIFICATION":
-            switch (submitTo) {
+            switch (target) {
                 case "ZONE":
                     uploadRoute = jsRoutes.controllers.FileController.uploadZoneKycUser(documentType);
                     break;
@@ -40,13 +40,13 @@ function getOrganizationUploadJsRoutes(documentType) {
     return uploadRoute
 }
 
-function getUserStoreAndUpdateJsRoutes(documentType, fileName, submitTo) {
+function getUserStoreAndUpdateJsRoutes(documentType, fileName, target) {
     let storeRoute = '';
     let updateRoute = '';
     switch (documentType) {
         case "BANK_DETAILS":
         case "IDENTIFICATION":
-            switch (submitTo) {
+            switch (target) {
                 case "ZONE":
                     updateRoute = jsRoutes.controllers.FileController.updateZoneKycUser(fileName, documentType);
                     storeRoute = jsRoutes.controllers.FileController.storeZoneKycUser(fileName, documentType);
@@ -90,7 +90,7 @@ function getOrganizationStoreAndUpdateJsRoutes(documentType, fileName) {
     return [storeRoute, updateRoute];
 }
 
-function getUploadJsRoutes(documentType, userType, submitTo) {
+function getUploadJsRoutes(documentType, userType, target) {
     let uploadRoute = '';
     switch (userType) {
         case "ZONE":
@@ -100,13 +100,13 @@ function getUploadJsRoutes(documentType, userType, submitTo) {
             uploadRoute = getOrganizationUploadJsRoutes(documentType);
             break;
         case "USER":
-            uploadRoute = getUserUploadJsRoutes(documentType, submitTo);
+            uploadRoute = getUserUploadJsRoutes(documentType, target);
             break;
     }
     return uploadRoute;
 }
 
-function getStoreAndUpdateJsRoutes(documentType, userType, fileName, submitTo) {
+function getStoreAndUpdateJsRoutes(documentType, userType, fileName, target) {
     let storeRoute = '';
     let updateRoute = '';
     switch (userType) {
@@ -117,7 +117,7 @@ function getStoreAndUpdateJsRoutes(documentType, userType, fileName, submitTo) {
             [storeRoute, updateRoute] = getOrganizationStoreAndUpdateJsRoutes(documentType, fileName);
             break;
         case "USER":
-            [storeRoute, updateRoute] = getUserStoreAndUpdateJsRoutes(documentType, fileName, submitTo);
+            [storeRoute, updateRoute] = getUserStoreAndUpdateJsRoutes(documentType, fileName, target);
             break;
     }
     return [storeRoute, updateRoute]
@@ -137,138 +137,98 @@ function getFileTypes(documentType) {
     return fileTypes
 }
 
-function uploadFile(documentType, userType, submitTo = '') {
-
-    let uploadRoute = getUploadJsRoutes(documentType, userType, submitTo);
-    let updatingFile = false;
-
-    let rFile = new Resumable({
-        target: uploadRoute.url,
+function uploadFile(documentType, userType, target) {
+    
+    const rFile = new Resumable({
+        target: getUploadJsRoutes(documentType, userType, target).url,
         fileType: getFileTypes(documentType),
         query: {csrfToken: $('[name="csrfToken"]').attr('value')}
     });
-    let retries = 0;
-    document.getElementById('uploadButton').onclick = function () {
-        rFile.upload();
-        retries = 0;
-    };
-    document.getElementById('updateButton').onclick = function () {
-        updatingFile = true;
-        rFile.upload();
-        retries = 0;
-    };
-    document.getElementById('pauseButton').onclick = function () {
-        rFile.pause();
-    };
-    document.getElementById('cancelButton').onclick = function () {
-        rFile.cancel();
-        retries = 0;
-    };
 
-    let uploadFailureSuccessMessage = document.getElementById('uploadFailureSuccessMessage');
-    uploadFailureSuccessMessage.style.color = "red";
-    let progress = document.getElementsByClassName('progressBar');
-    let filesSpace = document.getElementById('filesToBeUploaded');
+    rFile.assignBrowse(document.getElementById('browseUploadButton'));
 
-    function addFileToList(file) {
-        if ($("#filesToBeUploaded li").length === 0) {
-            let li = document.createElement('li');
+    rFile.assignDrop(document.getElementById('uploadSelector'));
 
-            let progressBar = document.createElement('span');
-            progressBar.textContent = '0 %';
-            progressBar.id = file.uniqueIdentifier + "-progress";
-
-            let fileNameSpan = document.createElement('span');
-            fileNameSpan.textContent = file.fileName;
-
-            let cancelButton = document.createElement('a');
-            cancelButton.href = '#';
-            cancelButton.textContent = 'Cancel';
-            cancelButton.onclick = function () {
-                file.cancel();
-                filesSpace.removeChild(li);
-            };
-
-            li.setAttribute('style', 'border: solid black thin; border-radius : 5px; margin-top : 10px; padding : 5px 10px');
-            li.appendChild(fileNameSpan);
-            li.appendChild(document.createElement('br'));
-            li.appendChild(progressBar);
-            li.appendChild(document.createElement('br'));
-            li.appendChild(cancelButton);
-
-            filesSpace.appendChild(li);
-        } else {
-            rFile.removeFile(file);
-        }
-    }
-
-    rFile.assignBrowse(document.getElementById('browseButton'));
     rFile.on('fileAdded', function (file) {
-        addFileToList(file);
-    });
-    rFile.on('fileProgress', function (file) {
-        document.getElementById(file.uniqueIdentifier + "-progress").textContent = (file.progress(false) * 100.00) + '%';
+        $("#uploader").show();
+        $("#uploadSelector").hide();
+        $("#fileName").html(file.fileName);
     });
 
+    rFile.on('fileProgress', function (file) {
+        moveProgressBar($("#fileUploadProgressBar"), (file.progress(false) * 100.00));
+    });
+
+    let uploadCompletionMessage = document.getElementById('uploadCompletionMessage');
     rFile.on('fileSuccess', function (file) {
-        let element = document.getElementById(file.uniqueIdentifier + "-progress");
-        let [storeRoute, updateRoute] = getStoreAndUpdateJsRoutes(documentType, userType, file.fileName, submitTo);      
-        let route = "";
-        if (updatingFile) {
-            route = updateRoute;
-        } else {
-            route = storeRoute;
-        }
+        $("#uploadControls").delay(1000).fadeOut(1000);
+        let [storeRoute, _] = getStoreAndUpdateJsRoutes(documentType, userType, file.fileName, target);
         $.ajax({
-            url: route.url,
-            type: route.type,
+            url: storeRoute.url,
+            type: storeRoute.type,
             success: function (result) {
-                uploadFailureSuccessMessage.textContent = result;
-                uploadFailureSuccessMessage.style.color = "green";
+                $("#uploadCompletionMessage").show();
+                uploadCompletionMessage.textContent  = result;
+                uploadCompletionMessage.style.color = "green";
             },
             error: function (error) {
-                element.textContent = error.responseText;
-                uploadFailureSuccessMessage.textContent = error.responseText;
-                uploadFailureSuccessMessage.style.color = "red";
+                $("#uploadCompletionMessage").show();
+                uploadCompletionMessage.textContent  = error.responseText;
+                uploadCompletionMessage.style.color = "red";
             }
         });
-        updatingFile = false;
+    });
+    
+    $("#uploadButton").click(function () {
+        rFile.upload();
     });
 
-    rFile.on('cancel', function (file) {
-        $(".uploadProgress").css("display", "flex");
-        let anchors = filesSpace.getElementsByTagName('a');
-        for (let i = anchors.length - 1; i >= 0; i--) {
-            anchors[i].click();
-        }
-        uploadFailureSuccessMessage.textContent = 'Upload canceled';
+}
+
+function updateFile(documentType, userType, target) {
+
+    const rFile = new Resumable({
+        target: getUploadJsRoutes(documentType, userType, target).url,
+        fileType: getFileTypes(documentType),
+        query: {csrfToken: $('[name="csrfToken"]').attr('value')}
     });
 
-    rFile.on('progress', function () {
-        $(".uploadProgress").css("display", "flex");
-        progress.textContent = (rFile.progress() * 100.00);
-        let percent = progress.textContent;
-        document.querySelector(".progressBar").style.width = percent + "%";
-        document.querySelector(".progressBar").textContent = percent.toFixed(0) + "%";
+    rFile.assignBrowse(document.getElementById('browseUpdateButton'));
+
+    rFile.assignDrop(document.getElementById('updateSelector'));
+
+    rFile.on('fileAdded', function (file) {
+        $("#updater").show();
+        $("#updateSelector").hide();
+        $("#fileName").html(file.fileName);
     });
-    rFile.on('fileError', function (file, msg) {
-        document.getElementById(file.uniqueIdentifier + "-progress").textContent = msg;
-        uploadFailureSuccessMessage.textContent = msg;
+
+    rFile.on('fileProgress', function (file) {
+        moveProgressBar($("#fileUpdateProgressBar"), (file.progress(false) * 100.00));
     });
-    rFile.on('fileRetry', function (file) {
-        document.getElementById(file.uniqueIdentifier + "-progress").textContent = 'Retrying upload';
-        retries++;
-        uploadFailureSuccessMessage.textContent = "Retried " + retries + "time(s)";
-        if (retries > 10) {
-            rFile.pause();
-            uploadFailureSuccessMessage.textContent = 'Pausing file upload after ' + retries + ' attempts';
-        }
+
+    let updateCompletionMessage = document.getElementById('updateCompletionMessage');
+    rFile.on('fileSuccess', function (file) {
+        $("#updateControls").delay(1000).fadeOut(1000);
+        let [_, updateRoute] = getStoreAndUpdateJsRoutes(documentType, userType, file.fileName, target);
+        $.ajax({
+            url: updateRoute.url,
+            type: updateRoute.type,
+            success: function (result) {
+                $("#updateCompletionMessage").show();
+                updateCompletionMessage.textContent  = result;
+                updateCompletionMessage.style.color = "green";
+            },
+            error: function (error) {
+                $("#updateCompletionMessage").show();
+                updateCompletionMessage.textContent  = error.responseText;
+                updateCompletionMessage.style.color = "red";
+            }
+        });
     });
-    rFile.on('error', function (message, file) {
-        uploadFailureSuccessMessage.textContent = message;
-    });
-    rFile.on('catchAll', function (eventX) {
-        console.log(eventX)
+
+    $("#updateButton").click(function () {
+        rFile.upload();
     });
 
 }

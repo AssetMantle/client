@@ -17,7 +17,7 @@
         </div>
     </div>
     <div class="centerText">
-        <button onclick="getForm(jsRoutes.controllers.FileController.organizationKYCUploadForm('@constants.File.BANK_DETAILS'))">@Messages(constants.File.UPLOAD_ORGANIZATION_BANK_DETAILS)</button>
-        <button onclick="getForm(jsRoutes.controllers.FileController.organizationKYCUploadForm('@constants.File.IDENTIFICATION'))">@Messages(constants.File.UPLOAD_ORGANIZATION_IDENTIFICATION)</button>
+        <button onclick="getForm(jsRoutes.controllers.FileController.updateForm('@constants.File.BANK_DETAILS', '@constants.User.ORGANIZATION', '@constants.User.ORGANIZATION'))">@Messages(constants.Form.UPDATE_ORGANIZATION_BANK_DETAILS)</button>
+        <button onclick="getForm(jsRoutes.controllers.FileController.updateForm('@constants.File.IDENTIFICATION', '@constants.User.ORGANIZATION', '@constants.User.ORGANIZATION'))">@Messages(constants.Form.UPDATE_ORGANIZATION_IDENTIFICATION)</button>
     </div>
 }

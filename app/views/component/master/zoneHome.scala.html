@@ -22,7 +22,7 @@
         <button onclick="getForm(jsRoutes.controllers.ReleaseAssetController.releaseAssetForm())">@Messages(constants.Form.RELEASE_ASSET)</button>
         <button onclick="getForm(jsRoutes.controllers.SellerExecuteOrderController.sellerExecuteOrderForm())">@Messages(constants.Form.SELLER_EXECUTE_ORDER)</button>
         <button onclick="getForm(jsRoutes.controllers.SetACLController.setACLForm())">@Messages(constants.Form.SET_ACL)</button>
-        <button onclick="getForm(jsRoutes.controllers.FileController.zoneKYCUploadForm('@constants.File.BANK_DETAILS'))">@Messages(constants.File.UPLOAD_ZONE_BANK_DETAILS)</button>
-        <button onclick="getForm(jsRoutes.controllers.FileController.zoneKYCUploadForm('@constants.File.IDENTIFICATION'))">@Messages(constants.File.UPLOAD_ZONE_IDENTIFICATION)</button>
+        <button onclick="getForm(jsRoutes.controllers.FileController.updateForm('@constants.File.BANK_DETAILS', '@constants.User.ZONE', '@constants.User.ZONE'))">@Messages(constants.Form.UPDATE_ZONE_BANK_DETAILS)</button>
+        <button onclick="getForm(jsRoutes.controllers.FileController.updateForm('@constants.File.IDENTIFICATION', '@constants.User.ZONE', '@constants.User.ZONE'))">@Messages(constants.Form.UPDATE_ZONE_IDENTIFICATION)</button>
     </div>
 }

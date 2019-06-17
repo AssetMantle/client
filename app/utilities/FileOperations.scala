@@ -24,13 +24,14 @@ object FileOperations {
     try {
       val fullFileName = uploadPath + fileInfo.resumableFilename
       val partialFile = new RandomAccessFile(fullFileName, "rw")
-      val offset = (fileInfo.resumableChunkNumber - 1) * fileInfo.resumableChunkSize.toLong
 
       try {
-        partialFile.seek(offset)
+        partialFile.seek((fileInfo.resumableChunkNumber - 1) * fileInfo.resumableChunkSize.toLong)
         partialFile.write(filePart, 0, filePart.length)
-      }
-      finally {
+      } catch {
+        case e: Exception => logger.error(constants.Response.GENERIC_EXCEPTION.message, e)
+          throw new BaseException(constants.Response.GENERIC_EXCEPTION)
+      } finally {
         partialFile.close()
       }
 
@@ -41,6 +42,7 @@ object FileOperations {
         uploadedParts.put(fullFileName, Set(fileInfo))
       }
     } catch {
+      case _: BaseException => throw new BaseException(constants.Response.GENERIC_EXCEPTION)
       case e: Exception => logger.error(constants.Response.GENERIC_EXCEPTION.message, e)
         throw new BaseException(constants.Response.GENERIC_EXCEPTION)
     }

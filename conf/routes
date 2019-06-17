@@ -21,8 +21,13 @@ POST        /master/login                                        controllers.Log
 GET         /master/getFilesGenesis                              controllers.FileController.serveFileToGenesis(fileName: String, documentType: String)
 GET         /master/getFilesZone                                 controllers.FileController.serveFileToZone(accountID: String, fileName: String, documentType: String)
 
-GET         /userUpload                                          controllers.FileController.userKYCUploadForm(documentType: String, submitTo: String)
-POST        /userUpload/submitFile                               controllers.FileController.uploadUserKYC(documentType: String)
+GET         /upload                                              controllers.FileController.uploadForm(documentType: String, userType: String, target: String)
+GET         /update                                              controllers.FileController.updateForm(documentType: String, userType: String, target: String)
+GET         /checkAccountKycFileExists                           controllers.FileController.checkAccountKycFileExists(accountID: String, documentType: String)
+GET         /checkZoneKycFileExists                              controllers.FileController.checkZoneKycFileExists(accountID: String, documentType: String)
+GET         /checkOrganizationKycFileExists                      controllers.FileController.checkOrganizationKycFileExists(accountID: String, documentType: String)
+
+POST        /userUpload/uploadFile                               controllers.FileController.uploadUserKYC(documentType: String)
 GET         /userUpload/storeFile                                controllers.FileController.storeUserKYC(name: String, documentType: String)
 GET         /userUpload/updateFile                               controllers.FileController.updateUserKYC(name: String, documentType: String)
 
@@ -34,13 +39,11 @@ POST        /userUpload/uploadOrganizationKycUserDocument        controllers.Fil
 GET         /userUpload/storeOrganizationKycUserDocument         controllers.FileController.storeOrganizationKycUser(name: String, documentType: String)
 GET         /userUpload/updateOrganizationKycUserDocument        controllers.FileController.updateOrganizationKycUser(name: String, documentType: String)
 
-GET         /zoneUpload                                          controllers.FileController.zoneKYCUploadForm(documentType: String)
-POST        /zoneUpload/submitFile                               controllers.FileController.uploadZoneKYC(documentType: String)
+POST        /zoneUpload/uploadFile                               controllers.FileController.uploadZoneKYC(documentType: String)
 GET         /zoneUpload/storeFile                                controllers.FileController.storeZoneKYC(name: String, documentType: String)
 GET         /zoneUpload/updateFile                               controllers.FileController.updateZoneKYC(name: String, documentType: String)
 
-GET         /organizationUpload                                  controllers.FileController.organizationKYCUploadForm(documentType: String)
-POST        /organizationUpload/submitFile                       controllers.FileController.uploadOrganizationKYC(documentType: String)
+POST        /organizationUpload/uploadFile                       controllers.FileController.uploadOrganizationKYC(documentType: String)
 GET         /organizationUpload/storeFile                        controllers.FileController.storeOrganizationKYC(name: String, documentType: String)
 GET         /organizationUpload/updateFile                       controllers.FileController.updateOrganizationKYC(name: String, documentType: String)
 

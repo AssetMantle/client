@@ -81,6 +81,9 @@ class OrganizationKYCs @Inject()(protected val databaseConfigProvider: DatabaseC
         throw new BaseException(constants.Response.PSQL_EXCEPTION)
     }
   }
+
+  private def checkByIdAndDocumentType(id: String, documentType: String): Future[Boolean] = db.run(organizationKYCTable.filter(_.id === id).filter(_.documentType === documentType).exists.result)
+
   private[models] class OrganizationKYCTable(tag: Tag) extends Table[OrganizationKYC](tag, "OrganizationKYC") {
 
     def * = (id, documentType, status.?, fileName, file.?) <> (OrganizationKYC.tupled, OrganizationKYC.unapply)
@@ -116,6 +119,9 @@ class OrganizationKYCs @Inject()(protected val databaseConfigProvider: DatabaseC
     def rejectAll(id: String): Int = Await.result(updateStatusById(id = id, status = Option(false)), Duration.Inf)
 
     def deleteAllDocuments(id: String): Int = Await.result(deleteById(id = id), Duration.Inf)
+
+    def checkFileExists(id: String, documentType: String): Boolean = Await.result(checkByIdAndDocumentType(id = id, documentType = documentType), Duration.Inf)
+
 
   }
   

@@ -337,6 +337,21 @@ blur(5 px);
 /*    display: none;*/
 /*}*/
 
+/* Progress Bar*/
+
+.progressContainer {
+    width: 100%;
+    background-color: #ddd;
+}
+
+.progressBar {
+    width: 0;
+    height: 1em;
+    background-color: #5eaf50;
+}
+
+/* Progress Bar*/
+
 /*ToolTip*/
 dl {
     position: relative;

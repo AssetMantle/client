@@ -82,6 +82,8 @@ class ZoneKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     }
   }
 
+  private def checkByIdAndDocumentType(id: String, documentType: String): Future[Boolean] = db.run(zoneKYCTable.filter(_.id === id).filter(_.documentType === documentType).exists.result)
+
   private[models] class ZoneKYCTable(tag: Tag) extends Table[ZoneKYC](tag, "ZoneKYC") {
 
     def * = (id, documentType, status.?, fileName, file.?) <> (ZoneKYC.tupled, ZoneKYC.unapply)
@@ -117,6 +119,9 @@ class ZoneKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     def rejectAll(id: String): Int = Await.result(updateStatusById(id = id, status = Option(false)), Duration.Inf)
 
     def deleteAllDocuments(id: String): Int = Await.result(deleteById(id = id), Duration.Inf)
+
+    def checkFileExists(id: String, documentType: String): Boolean = Await.result(checkByIdAndDocumentType(id = id, documentType = documentType), Duration.Inf)
+
 
   }
 
