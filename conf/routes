@@ -21,7 +21,7 @@ POST        /master/login                                        controllers.Log
 GET         /master/getFilesGenesis                              controllers.FileController.serveFileToGenesis(fileName: String, documentType: String)
 GET         /master/getFilesZone                                 controllers.FileController.serveFileToZone(accountID: String, fileName: String, documentType: String)
 
-GET         /userUpload                                          controllers.FileController.userKYCUploadForm(documentType: String, uploadType: String)
+GET         /userUpload                                          controllers.FileController.userKYCUploadForm(documentType: String, submitTo: String)
 POST        /userUpload/submitFile                               controllers.FileController.uploadUserKYC(documentType: String)
 GET         /userUpload/storeFile                                controllers.FileController.storeUserKYC(name: String, documentType: String)
 GET         /userUpload/updateFile                               controllers.FileController.updateUserKYC(name: String, documentType: String)

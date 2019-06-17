@@ -32,8 +32,8 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
 
   private val uploadOrganizationKycIdentificationPath = configuration.get[String]("upload.organization.identificationPath")
 
-  def userKYCUploadForm(documentType: String, uploadType: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.userFileUpload(documentType, uploadType))
+  def userKYCUploadForm(documentType: String, submitTo: String): Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.fileUpload(documentType = documentType, userType = constants.User.USER, submitTo = submitTo))
   }
 
   def uploadUserKYC(documentType: String) = Action(parse.multipartFormData) { implicit request =>
@@ -220,7 +220,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
   }
 
   def zoneKYCUploadForm(documentType: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.zoneFileUpload(documentType))
+    Ok(views.html.component.master.fileUpload(documentType = documentType, userType = constants.User.ZONE))
   }
 
   def uploadZoneKYC(documentType: String) = Action(parse.multipartFormData) { implicit request =>
@@ -285,7 +285,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
   }
 
   def organizationKYCUploadForm(documentType: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.organizationFileUpload(documentType))
+    Ok(views.html.component.master.fileUpload(documentType = documentType, userType = constants.User.ORGANIZATION))
   }
 
 

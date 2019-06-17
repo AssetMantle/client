@@ -1,6 +1,0 @@
-@import helper._
-
-@(documentType: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
-
-@component.master.fileUpload()
-<script>uploadFile('@documentType', '@constants.User.ORGANIZATION')</script>
