@@ -123,6 +123,20 @@ function getStoreAndUpdateJsRoutes(documentType, userType, fileName, submitTo) {
     return [storeRoute, updateRoute]
 }
 
+function getFileTypes(documentType) {
+    let fileTypes = [];
+    switch (documentType) {
+        case "BANK_DETAILS":
+        case "IDENTIFICATION":
+            fileTypes = ['jpg', 'png', 'jpeg', 'pdf', 'doc', 'txt', 'docx'];
+            break;
+        default:
+            fileTypes = ['jpg', 'png', 'jpeg'];
+            break;
+    }
+    return fileTypes
+}
+
 function uploadFile(documentType, userType, submitTo = '') {
 
     let uploadRoute = getUploadJsRoutes(documentType, userType, submitTo);
@@ -130,7 +144,7 @@ function uploadFile(documentType, userType, submitTo = '') {
 
     let rFile = new Resumable({
         target: uploadRoute.url,
-        fileType: ['jpg', 'png', 'jpeg', 'pdf', 'doc', 'txt', 'docx'],
+        fileType: getFileTypes(documentType),
         query: {csrfToken: $('[name="csrfToken"]').attr('value')}
     });
     let retries = 0;
