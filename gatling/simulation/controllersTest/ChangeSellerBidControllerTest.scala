@@ -64,8 +64,8 @@ object changeSellerBidControllerTest {
         Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
 
   def getSellerAddress(sellerUsername: String) = {
-    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://192.168.15.10:5432/comdex", "comdex", "comdex",
-      s"""SELECT "accountAddress" FROM master."Account" WHERE "id" = '$sellerUsername';""")
+    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://localhost:5432/comdex", "comdex", "comdex",
+      s"""SELECT COALESCE((SELECT "accountAddress" FROM master."Account" WHERE "id" = '$sellerUsername'),'0') AS "accountAddress";""")
     sqlQueryFeeder.apply().next()("accountAddress")
   }
 }
