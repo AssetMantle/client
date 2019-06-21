@@ -1,8 +1,8 @@
-@(username: String, address: String, coins: Int = 0)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
+@(username: String, address: String, coins: Int = 0, profilePicture: Array[Byte])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
 
 @common(Messages(constants.User.HOME)) {
     <div class="flexContainer">
-        @component.master.commonHome(username = username, userType = constants.User.UNKNOWN, address = address, coins = coins)
+        @component.master.commonHome(username = username, userType = constants.User.UNKNOWN, address = address, coins = coins, profilePicture = profilePicture)
         <button onclick="getForm(jsRoutes.controllers.SendCoinController.requestCoinsForm())">@Messages(constants.Form.REQUEST_COIN)</button>
     </div>
 }

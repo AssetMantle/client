@@ -1,7 +1,7 @@
 @import models.blockchain.{ACLHash, Asset, Fiat, Order, Negotiation}
 @import models.master.{Organization, Zone}
 
-@(username: String, address: String, coins: Int = 0, assetPegWallet: Seq[Asset], fiatPegWallet: Seq[Fiat], totalFiat: Int, zone: Zone, organization: Organization, orders: Seq[Order], negotiations: Seq[Negotiation], aclHash: ACLHash)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
+@(username: String, address: String, coins: Int = 0, assetPegWallet: Seq[Asset], fiatPegWallet: Seq[Fiat], totalFiat: Int, zone: Zone, organization: Organization, orders: Seq[Order], negotiations: Seq[Negotiation], aclHash: ACLHash, profilePicture: Array[Byte])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
 
 @common(Messages(constants.User.HOME)) {
     @if(aclHash.buyerExecuteOrder) {
@@ -48,7 +48,7 @@
     <a onclick="getForm(jsRoutes.controllers.SetSellerFeedbackController.setSellerFeedbackForm())">@Messages(constants.Form.SET_SELLER_FEEDBACK)</a>
 
     <div class="flexContainer">
-        @component.master.commonHome(username = username, userType = constants.User.TRADER, address = address, coins = coins)
+        @component.master.commonHome(username = username, userType = constants.User.TRADER, address = address, coins = coins, profilePicture = profilePicture)
         <div class="flexGrowth flexItem box leftAlign">
             <h2>@Messages(constants.Form.ZONE):</h2>
             @Messages(constants.Form.NAME): @zone.name <br>

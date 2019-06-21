@@ -15,6 +15,8 @@ class FileResourceManager @Inject()()(implicit exec: ExecutionContext, configura
 
   private val uploadAccountKycIdentificationPath = configuration.get[String]("upload.account.identificationPath")
 
+  private val uploadAccountProfilePicturePath = configuration.get[String]("upload.account.profilePicturePath")
+
   private val uploadZoneKycBankDetailsPath = configuration.get[String]("upload.zone.bankDetailsPath")
 
   private val uploadZoneKycIdentificationPath = configuration.get[String]("upload.zone.identificationPath")
@@ -23,7 +25,7 @@ class FileResourceManager @Inject()()(implicit exec: ExecutionContext, configura
 
   private val uploadOrganizationKycIdentificationPath = configuration.get[String]("upload.organization.identificationPath")
 
-  def getAccountFilePath(documentType: String): String = {
+  def getAccountKycFilePath(documentType: String): String = {
     documentType match {
       case constants.File.BANK_DETAILS => uploadAccountKycBankDetailsPath
       case constants.File.IDENTIFICATION => uploadAccountKycIdentificationPath
@@ -31,7 +33,7 @@ class FileResourceManager @Inject()()(implicit exec: ExecutionContext, configura
     }
   }
 
-  def getZoneFilePath(documentType: String): String = {
+  def getZoneKycFilePath(documentType: String): String = {
     documentType match {
       case constants.File.BANK_DETAILS => uploadZoneKycBankDetailsPath
       case constants.File.IDENTIFICATION => uploadZoneKycIdentificationPath
@@ -39,10 +41,17 @@ class FileResourceManager @Inject()()(implicit exec: ExecutionContext, configura
     }
   }
 
-  def getOrganizationFilePath(documentType: String): String = {
+  def getOrganizationKycFilePath(documentType: String): String = {
     documentType match {
       case constants.File.BANK_DETAILS => uploadOrganizationKycBankDetailsPath
       case constants.File.IDENTIFICATION => uploadOrganizationKycIdentificationPath
+      case _ => constants.File.UNKNOWN_TYPE
+    }
+  }
+
+  def getAccountFilePath(documentType: String): String = {
+    documentType match {
+      case constants.File.PROFILE_PICTURE => uploadAccountProfilePicturePath
       case _ => constants.File.UNKNOWN_TYPE
     }
   }

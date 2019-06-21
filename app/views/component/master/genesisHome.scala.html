@@ -1,8 +1,8 @@
-@(username: String, address: String, coins: Int = 0)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
+@(username: String, address: String, coins: Int = 0, profilePicture: Array[Byte])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
 
 @common(Messages(constants.User.HOME)) {
     <div class="flexContainer">
-    @component.master.commonHome(username = username, userType = constants.User.GENESIS, address = address, coins = coins)
+    @component.master.commonHome(username = username, userType = constants.User.GENESIS, address = address, coins = coins, profilePicture = profilePicture)
     </div>
     <div class="centerText">
     <button onclick="getForm(jsRoutes.controllers.AddZoneController.viewPendingVerifyZoneRequests())">@Messages(constants.Form.PENDING_VERIFY_ZONE_REQUESTS)</button>

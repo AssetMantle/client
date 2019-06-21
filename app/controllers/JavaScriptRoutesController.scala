@@ -80,6 +80,11 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
 
         routes.javascript.FileController.uploadForm,
         routes.javascript.FileController.updateForm,
+
+        routes.javascript.FileController.uploadAccountFile,
+        routes.javascript.FileController.storeAccountFile,
+        routes.javascript.FileController.updateAccountFile,
+
         routes.javascript.FileController.checkAccountKycFileExists,
         routes.javascript.FileController.checkZoneKycFileExists,
         routes.javascript.FileController.checkOrganizationKycFileExists,
@@ -88,13 +93,13 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.FileController.storeUserKYC,
         routes.javascript.FileController.updateUserKYC,
 
-        routes.javascript.FileController.uploadZoneKycUser,
-        routes.javascript.FileController.storeZoneKycUser,
-        routes.javascript.FileController.updateZoneKycUser,
+        routes.javascript.FileController.uploadUserZoneKyc,
+        routes.javascript.FileController.storeUserZoneKyc,
+        routes.javascript.FileController.updateUserZoneKyc,
 
-        routes.javascript.FileController.uploadOrganizationKycUser,
-        routes.javascript.FileController.storeOrganizationKycUser,
-        routes.javascript.FileController.updateOrganizationKycUser,
+        routes.javascript.FileController.uploadUserOrganizationKyc,
+        routes.javascript.FileController.storeUserOrganizationKyc,
+        routes.javascript.FileController.updateUserOrganizationKyc,
 
         routes.javascript.FileController.uploadZoneKYC,
         routes.javascript.FileController.storeZoneKYC,
@@ -104,8 +109,9 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.FileController.storeOrganizationKYC,
         routes.javascript.FileController.updateOrganizationKYC,
 
-        routes.javascript.FileController.serveFileToGenesis,
-        routes.javascript.FileController.serveFileToZone,
+        routes.javascript.FileController.genesisAccessedFile,
+        routes.javascript.FileController.zoneAccessedFile,
+        routes.javascript.FileController.file,
 
         routes.javascript.AddZoneController.viewKycDocuments,
         routes.javascript.AddZoneController.verifyKycDocument,

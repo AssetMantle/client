@@ -102,6 +102,9 @@ function getUploadJsRoutes(documentType, userType, target) {
         case "USER":
             uploadRoute = getUserUploadJsRoutes(documentType, target);
             break;
+        default:
+            uploadRoute = jsRoutes.controllers.FileController.uploadAccountFile(documentType);
+            break;
     }
     return uploadRoute;
 }
@@ -119,6 +122,10 @@ function getStoreAndUpdateJsRoutes(documentType, userType, fileName, target) {
         case "USER":
             [storeRoute, updateRoute] = getUserStoreAndUpdateJsRoutes(documentType, fileName, target);
             break;
+        default:
+            storeRoute = jsRoutes.controllers.FileController.storeAccountFile(fileName, documentType);
+            updateRoute = jsRoutes.controllers.FileController.updateAccountFile(fileName, documentType);
+            break;
     }
     return [storeRoute, updateRoute]
 }
@@ -129,6 +136,9 @@ function getFileTypes(documentType) {
         case "BANK_DETAILS":
         case "IDENTIFICATION":
             fileTypes = ['jpg', 'png', 'jpeg', 'pdf', 'doc', 'txt', 'docx'];
+            break;
+        case "PROFILE_PICTURE":
+            fileTypes = ['jpg', 'png', 'jpeg'];
             break;
         default:
             fileTypes = ['jpg', 'png', 'jpeg'];

@@ -1,8 +1,8 @@
-@(username: String, address: String, coins: Int = 0)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
+@(username: String, address: String, coins: Int = 0, profilePicture: Array[Byte])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
 
 @common(Messages(constants.User.HOME)) {
     <div class="flexContainer">
-    @component.master.commonHome(username = username, userType = constants.User.USER, address = address, coins = coins)
+    @component.master.commonHome(username = username, userType = constants.User.USER, address = address, coins = coins, profilePicture = profilePicture)
     </div>
     <script src="@routes.Assets.versioned("javascripts/showHideUploadUpdateButton.js")" type="text/javascript"></script>
     <div class="centerText">

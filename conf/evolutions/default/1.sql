@@ -476,6 +476,15 @@ CREATE TABLE IF NOT EXISTS MASTER."ZoneKYC"
   PRIMARY KEY ("id", "documentType")
 );
 
+CREATE TABLE IF NOT EXISTS MASTER."AccountFile"
+(
+  "id"           VARCHAR NOT NULL,
+  "documentType" VARCHAR NOT NULL,
+  "fileName"     VARCHAR NOT NULL,
+  "file"         BYTEA,
+  PRIMARY KEY ("id", "documentType")
+);
+
 CREATE TABLE IF NOT EXISTS MASTER."OrganizationKYC"
 (
   "id"           VARCHAR NOT NULL,
@@ -630,6 +639,8 @@ ALTER TABLE MASTER."AccountKYC"
   ADD CONSTRAINT AccountKYC_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER."OrganizationBankAccount"
   ADD CONSTRAINT OrganizationBankAccount_Organization_id FOREIGN KEY ("id") REFERENCES MASTER."Organization" ("id");
+ALTER TABLE MASTER."AccountFile"
+  ADD CONSTRAINT AccountFile_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
 
 ALTER TABLE MASTER_TRANSACTION."AccountToken"
   ADD CONSTRAINT AccountToken_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
@@ -702,6 +713,7 @@ DROP TABLE IF EXISTS MASTER."OrganizationKYC" CASCADE;
 DROP TABLE IF EXISTS MASTER."AccountKYC" CASCADE;
 DROP TABLE IF EXISTS MASTER."OrganizationBankAccount" CASCADE;
 DROP TABLE IF EXISTS MASTER."BankAccount" CASCADE;
+DROP TABLE IF EXISTS MASTER."AccountFile" CASCADE;
 
 DROP TABLE IF EXISTS MASTER_TRANSACTION."AccountToken" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."FaucetRequest" CASCADE;

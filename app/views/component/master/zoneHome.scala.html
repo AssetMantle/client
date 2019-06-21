@@ -1,11 +1,11 @@
 @import models.master.Zone
 
-@(username: String, address: String, coins: Int = 0, zone: Zone)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
+@(username: String, address: String, coins: Int = 0, zone: Zone, profilePicture: Array[Byte])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
 
 @common(Messages(constants.User.HOME)) {
 
     <div class="flexContainer">
-        @component.master.commonHome(username = username, userType = constants.User.ZONE, address = address, coins = coins)
+        @component.master.commonHome(username = username, userType = constants.User.ZONE, address = address, coins = coins, profilePicture = profilePicture)
         <div class="flexItem box leftAlign flexGrowth">
             <h2>@Messages(constants.Form.ZONE):</h2>
             @Messages(constants.Form.NAME): @zone.name <br>
