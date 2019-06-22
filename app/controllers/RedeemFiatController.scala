@@ -7,6 +7,7 @@ import models.{blockchain, blockchainTransaction}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
+import utilities.LoginState
 import views.companion.blockchain.RedeemFiat
 import views.companion.master
 
@@ -31,6 +32,7 @@ class RedeemFiatController @Inject()(messagesControllerComponents: MessagesContr
           BadRequest(views.html.component.master.redeemFiat(formWithErrors))
         },
         redeemFiatData => {
+          implicit val loginStateL:LoginState = LoginState(username)
           try {
             val toAddress = blockchainZones.Service.getAddress(redeemFiatData.zoneID)
             val ticketID = if (kafkaEnabled) transactionsRedeemFiat.Service.kafkaPost(transactionsRedeemFiat.Request(from = username, to = toAddress, password = redeemFiatData.password, redeemAmount = redeemFiatData.redeemAmount, gas = redeemFiatData.gas)).ticketID else Random.nextString(32)

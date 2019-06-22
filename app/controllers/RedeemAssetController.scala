@@ -7,6 +7,7 @@ import models.{blockchain, blockchainTransaction}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
+import utilities.LoginState
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Random
@@ -29,6 +30,7 @@ class RedeemAssetController @Inject()(messagesControllerComponents: MessagesCont
           BadRequest(views.html.component.master.redeemAsset(formWithErrors))
         },
         redeemAssetData => {
+          implicit val loginStateL:LoginState = LoginState(username)
           try {
             val toAddress = blockchainZones.Service.getAddress(redeemAssetData.zoneID)
             val ticketID: String = if (kafkaEnabled) transactionsRedeemAsset.Service.kafkaPost(transactionsRedeemAsset.Request(from = username, to = toAddress, password = redeemAssetData.password, pegHash = redeemAssetData.pegHash, gas = redeemAssetData.gas)).ticketID else Random.nextString(32)

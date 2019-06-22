@@ -7,6 +7,7 @@ import models.{blockchain, blockchainTransaction, master, masterTransaction}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
+import utilities.LoginState
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Random
@@ -29,6 +30,7 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
           BadRequest(views.html.component.master.issueAssetRequest(formWithErrors))
         },
         issueAssetRequestData => {
+          implicit val loginStateL:LoginState = LoginState(username)
           try {
             if (issueAssetRequestData.unmoderated) {
               val fromAddress = masterAccounts.Service.getAddress(username)
@@ -80,6 +82,7 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
           BadRequest(views.html.component.master.rejectIssueAssetRequest(formWithErrors, formWithErrors.data(constants.Form.REQUEST_ID)))
         },
         rejectIssueAssetRequestData => {
+          implicit val loginStateL:LoginState = LoginState(username)
           try {
             masterTransactionIssueAssetRequests.Service.reject(id = rejectIssueAssetRequestData.requestID, comment = rejectIssueAssetRequestData.comment)
             Ok(views.html.index(successes = Seq(constants.Response.ISSUE_ASSET_REQUEST_REJECTED)))
@@ -102,6 +105,7 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
           BadRequest(views.html.component.master.issueAsset(formWithErrors, formWithErrors.data(constants.Form.REQUEST_ID), formWithErrors.data(constants.Form.ACCOUNT_ID), formWithErrors.data(constants.Form.DOCUMENT_HASH), formWithErrors.data(constants.Form.ASSET_TYPE), formWithErrors.data(constants.Form.ASSET_PRICE).toInt, formWithErrors.data(constants.Form.QUANTITY_UNIT), formWithErrors.data(constants.Form.ASSET_QUANTITY).toInt))
         },
         issueAssetData => {
+          implicit val loginStateL:LoginState = LoginState(username)
           try {
             val toAddress = masterAccounts.Service.getAddress(issueAssetData.accountID)
             if (masterTransactionIssueAssetRequests.Service.getStatus(issueAssetData.requestID).isEmpty) {

@@ -7,6 +7,7 @@ import models.{blockchain, blockchainTransaction, master}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
+import utilities.LoginState
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Random
@@ -29,6 +30,7 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
           BadRequest(views.html.component.master.addZone(formWithErrors))
         },
         addZoneData => {
+          implicit val loginStateL:LoginState = LoginState(username)
           try {
             masterZones.Service.create(accountID = username, name = addZoneData.name, currency = addZoneData.currency)
             Ok(views.html.index(successes = Seq(constants.Response.ZONE_REQUEST_SENT)))
@@ -51,6 +53,7 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
           BadRequest(views.html.component.master.verifyZone(formWithErrors, formWithErrors.data(constants.Form.ZONE_ID)))
         },
         verifyZoneData => {
+          implicit val loginStateL:LoginState = LoginState(username)
           try {
             val zoneAccountAddress = masterAccounts.Service.getAddress(masterZones.Service.getAccountId(verifyZoneData.zoneID))
             val ticketID: String = if (kafkaEnabled) transactionsAddZone.Service.kafkaPost(transactionsAddZone.Request(from = username, to = zoneAccountAddress, zoneID = verifyZoneData.zoneID, password = verifyZoneData.password)).ticketID else Random.nextString(32)
@@ -98,6 +101,7 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
           BadRequest(views.html.component.master.rejectVerifyZoneRequest(formWithErrors, formWithErrors.data(constants.Form.ZONE_ID)))
         },
         rejectVerifyZoneRequestData => {
+          implicit val loginStateL:LoginState = LoginState(username)
           try {
             masterZones.Service.updateStatus(rejectVerifyZoneRequestData.zoneID, status = false)
             Ok(views.html.index(successes = Seq(constants.Response.VERIFY_ZONE_REJECTED)))

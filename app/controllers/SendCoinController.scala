@@ -7,6 +7,7 @@ import models.{blockchain, blockchainTransaction, master, masterTransaction}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
+import utilities.LoginState
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Random
@@ -35,6 +36,7 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
           BadRequest(views.html.component.master.sendCoin(formWithErrors))
         },
         sendCoinData => {
+          implicit val loginStateL:LoginState = LoginState(username)
           try {
             val ticketID: String = if (kafkaEnabled) transactionsSendCoin.Service.kafkaPost(transactionsSendCoin.Request(from = username, password = sendCoinData.password, to = sendCoinData.to, amount = Seq(transactionsSendCoin.Amount(denominationOfGasToken, sendCoinData.amount.toString)), gas = sendCoinData.gas)).ticketID else Random.nextString(32)
             blockchainTransactionSendCoins.Service.create(from = username, to = sendCoinData.to, amount = sendCoinData.amount, gas = sendCoinData.gas, null, null, ticketID = ticketID, null)
@@ -98,6 +100,7 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
           BadRequest(views.html.component.master.requestCoin(formWithErrors))
         },
         requestCoinFormData => {
+          implicit val loginStateL:LoginState = LoginState(username)
           try {
             masterTransactionFaucetRequests.Service.create(username, defaultFaucetToken)
             Ok(views.html.index(successes = Seq(constants.Response.COINS_REQUESTED)))
@@ -130,6 +133,7 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
           BadRequest(views.html.component.master.rejectFaucetRequest(formWithErrors, formWithErrors.data(constants.Form.REQUEST_ID)))
         },
         rejectFaucetRequestData => {
+          implicit val loginStateL:LoginState = LoginState(username)
           try {
             masterTransactionFaucetRequests.Service.reject(rejectFaucetRequestData.requestID, comment = rejectFaucetRequestData.comment)
             Ok(views.html.index(successes = Seq(constants.Response.FAUCET_REQUEST_REJECTED)))
@@ -152,6 +156,7 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
           BadRequest(views.html.component.master.approveFaucetRequests(formWithErrors, formWithErrors.data(constants.Form.REQUEST_ID), formWithErrors.data(constants.Form.ACCOUNT_ID)))
         },
         approveFaucetRequestFormData => {
+          implicit val loginStateL:LoginState = LoginState(username)
           try {
             if (masterTransactionFaucetRequests.Service.getStatus(approveFaucetRequestFormData.requestID).isEmpty) {
               val toAddress = masterAccounts.Service.getAddress(approveFaucetRequestFormData.accountID)

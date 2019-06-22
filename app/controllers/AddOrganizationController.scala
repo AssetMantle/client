@@ -7,6 +7,7 @@ import models.{blockchain, blockchainTransaction, master}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
+import utilities.LoginState
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Random
@@ -29,6 +30,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
           BadRequest(views.html.component.master.addOrganization(formWithErrors))
         },
         addOrganizationData => {
+          implicit val loginStateL:LoginState = LoginState(username)
           try {
             if (masterZones.Service.getStatus(addOrganizationData.zoneID) == Option(true)) {
               masterOrganizations.Service.create(zoneID = addOrganizationData.zoneID, accountID = username, name = addOrganizationData.name, address = addOrganizationData.address, phone = addOrganizationData.phone, email = addOrganizationData.email)
@@ -55,6 +57,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
           BadRequest(views.html.component.master.verifyOrganization(formWithErrors, formWithErrors.data(constants.Form.ORGANIZATION_ID), formWithErrors.data(constants.Form.ZONE_ID)))
         },
         verifyOrganizationData => {
+          implicit val loginStateL:LoginState = LoginState(username)
           try {
             val organizationAccountAddress = masterAccounts.Service.getAddress(masterOrganizations.Service.getAccountId(verifyOrganizationData.organizationID))
             val ticketID: String = if (kafkaEnabled) transactionsAddOrganization.Service.kafkaPost(transactionsAddOrganization.Request(from = username, to = organizationAccountAddress, organizationID = verifyOrganizationData.organizationID, zoneID = verifyOrganizationData.zoneID, password = verifyOrganizationData.password)).ticketID else Random.nextString(32)
@@ -91,8 +94,9 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
           BadRequest(views.html.component.master.rejectVerifyOrganizationRequest(formWithErrors, formWithErrors.data(constants.Form.ORGANIZATION_ID)))
         },
         rejectVerifyOrganizationRequestData => {
+          implicit val loginStateL:LoginState = LoginState(username)
           try {
-            masterOrganizations.Service.updateStatus(rejectVerifyOrganizationRequestData.organizationID, false)
+            masterOrganizations.Service.updateStatus(rejectVerifyOrganizationRequestData.organizationID, status = false)
             Ok(views.html.index(successes = Seq(constants.Response.VERIFY_ORGANIZATION_REQUEST_REJECTED)))
           }
           catch {

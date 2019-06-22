@@ -11,7 +11,7 @@ import play.api.i18n.I18nSupport
 import play.api.libs.ws.WSClient
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import queries.GetAccount
-import utilities.PushNotification
+import utilities.{LoginState, PushNotification}
 import views.companion.master.Login
 
 import scala.concurrent.ExecutionContext
@@ -32,29 +32,30 @@ class LoginController @Inject()(messagesControllerComponents: MessagesController
       },
       loginData => {
         try {
+          implicit val loginStateL:LoginState = LoginState(loginData.username)
           val userType = masterAccounts.Service.validateLoginAndGetUserType(loginData.username, loginData.password)
           val address = masterAccounts.Service.getAddress(loginData.username)
           pushNotification.registerNotificationToken(loginData.username, loginData.notificationToken)
           pushNotification.sendNotification(loginData.username, constants.Notification.LOGIN, loginData.username)
           userType match {
             case constants.User.GENESIS =>
-              withUsernameToken.Ok(views.html.component.master.genesisHome(username = loginData.username, address = address, coins = blockchainAccounts.Service.getCoins(address)), loginData.username)
+              withUsernameToken.Ok(views.html.genesisHome(username = loginData.username, address = address, coins = blockchainAccounts.Service.getCoins(address)), loginData.username)
             case constants.User.ZONE =>
-              withUsernameToken.Ok(views.html.component.master.zoneHome(username = loginData.username, address = address, coins = blockchainAccounts.Service.getCoins(address), zone = masterZones.Service.get(blockchainZones.Service.getID(address))), loginData.username)
+              withUsernameToken.Ok(views.html.zoneHome(username = loginData.username, address = address, coins = blockchainAccounts.Service.getCoins(address), zone = masterZones.Service.get(blockchainZones.Service.getID(address))), loginData.username)
             case constants.User.ORGANIZATION =>
-              withUsernameToken.Ok(views.html.component.master.organizationHome(username = loginData.username, address = address, coins = blockchainAccounts.Service.getCoins(address), organization = masterOrganizations.Service.get(blockchainOrganizations.Service.getID(address))), loginData.username)
+              withUsernameToken.Ok(views.html.organizationHome(username = loginData.username, address = address, coins = blockchainAccounts.Service.getCoins(address), organization = masterOrganizations.Service.get(blockchainOrganizations.Service.getID(address))), loginData.username)
             case constants.User.TRADER =>
               val aclAccount = blockchainAclAccounts.Service.get(address)
               val fiatPegWallet = blockchainFiats.Service.getFiatPegWallet(address)
               val negotiations = blockchainNegotiations.Service.getNegotiationsForAddress(masterAccounts.Service.getAddress(loginData.username))
-              withUsernameToken.Ok(views.html.component.master.traderHome(username = loginData.username, address = address, coins = blockchainAccounts.Service.getCoins(address), assetPegWallet = blockchainAssets.Service.getAssetPegWallet(address), fiatPegWallet = fiatPegWallet, totalFiat = fiatPegWallet.map(_.transactionAmount.toInt).sum, zone = masterZones.Service.get(aclAccount.zoneID), organization = masterOrganizations.Service.get(aclAccount.organizationID), orders = blockchainOrders.Service.getOrders(negotiations.map(_.id)), negotiations = negotiations, aclHash = blockchainAclHashes.Service.get(aclAccount.aclHash)), loginData.username)
+              withUsernameToken.Ok(views.html.traderHome(username = loginData.username, address = address, coins = blockchainAccounts.Service.getCoins(address), assetPegWallet = blockchainAssets.Service.getAssetPegWallet(address), fiatPegWallet = fiatPegWallet, totalFiat = fiatPegWallet.map(_.transactionAmount.toInt).sum, zone = masterZones.Service.get(aclAccount.zoneID), organization = masterOrganizations.Service.get(aclAccount.organizationID), orders = blockchainOrders.Service.getOrders(negotiations.map(_.id)), negotiations = negotiations, aclHash = blockchainAclHashes.Service.get(aclAccount.aclHash)), loginData.username)
             case constants.User.USER =>
-              withUsernameToken.Ok(views.html.component.master.userHome(username = loginData.username, address = address, coins = blockchainAccounts.Service.getCoins(address)), loginData.username)
+              withUsernameToken.Ok(views.html.userHome(username = loginData.username, address = address, coins = blockchainAccounts.Service.getCoins(address)), loginData.username)
             case constants.User.UNKNOWN =>
-              withUsernameToken.Ok(views.html.component.master.unknownHome(username = loginData.username, address = address), loginData.username)
+              withUsernameToken.Ok(views.html.unknownHome(username = loginData.username, address = address), loginData.username)
             case constants.User.WITHOUT_LOGIN =>
               masterAccounts.Service.updateUserType(loginData.username, constants.User.UNKNOWN)
-              withUsernameToken.Ok(views.html.component.master.unknownHome(username = loginData.username, address = address), loginData.username)
+              withUsernameToken.Ok(views.html.unknownHome(username = loginData.username, address = address), loginData.username)
           }
         }
         catch {

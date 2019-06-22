@@ -1,4 +1,5 @@
-@(title: String, failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(left: Html)(center:Html = Html(""))(right:Html = Html(""))(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@import utilities.LoginState
+@(title: String, failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(left: Html)(center:Html = Html(""))(right:Html = Html(""))(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash,loginState: LoginState=null)
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -22,12 +23,19 @@
                     <a class="active" href="#">Home</a>
                     <a href="#">News</a>
                     <a href="#">Contact</a>
-                    <a class="right" onclick="getForm(jsRoutes.controllers.SignUpController.signUpForm())">@Messages(constants.Form.SIGNUP)</a>
-                    <a class="right" onclick="getForm(jsRoutes.controllers.LogoutController.logoutForm())">@Messages(constants.Form.LOGOUT)</a>
-                    <a class="right" onclick="getForm(jsRoutes.controllers.LoginController.loginForm())">@Messages(constants.Form.LOGIN)</a>
-                    <a class="right notification" onclick="getForm(jsRoutes.controllers.NotificationController.notificationPage(0))">@Messages(constants.Form.INBOX)
-                        <span class="badge" id="notificationBadge">0</span>
-                    </a>
+                    @loginState match {
+                        case null => {
+                            <a class="right" onclick="getForm(jsRoutes.controllers.SignUpController.signUpForm())">@Messages(constants.Form.SIGNUP)</a>
+                            <a class="right" onclick="getForm(jsRoutes.controllers.LoginController.loginForm())">@Messages(constants.Form.LOGIN)</a>
+                        }
+                        case default => {
+                            <a class="right" onclick="getForm(jsRoutes.controllers.LogoutController.logoutForm())">@loginState.username</a>
+                            <a class="right" onclick="getForm(jsRoutes.controllers.LogoutController.logoutForm())">@Messages(constants.Form.LOGOUT)</a>
+                            <a class="right notification" onclick="getForm(jsRoutes.controllers.NotificationController.notificationPage(0))">@Messages(constants.Form.INBOX)
+                            <span class="badge" id="notificationBadge">0</span>
+                            </a>
+                        }
+                    }
 
                 </div>
 
