@@ -2,17 +2,12 @@
 
 @(orders: Seq[Order])(implicit messagesProvider: MessagesProvider)
 
-<table>
-    <tr>
-        <th>@Messages(constants.Form.ID)</th>
-        <th>@Messages(constants.Form.AWB_PROOF_HASH)</th>
-        <th>@Messages(constants.Form.FIAT_PROOF_HASH)</th>
-    </tr>
-    @for(order <- orders) {
-        <tr>
-            <td>@order.id</td>
-            <td>@order.awbProofHash</td>
-            <td>@order.fiatProofHash</td>
-        </tr>
-    }
-</table>
+@for(order <- orders) {
+    <div class="flexItem box colorCards">
+        <div class="leftAlign">
+            <span class="colorLeftText">@Messages(constants.Form.ID)</span> : @order.id <br>
+            <span class="colorLeftText">@Messages(constants.Form.AWB_PROOF_HASH)</span> : @order.awbProofHash <br>
+            <span class="colorLeftText">@Messages(constants.Form.FIAT_PROOF_HASH)</span> : @order.fiatProofHash <br>
+        </div>
+    </div>
+}

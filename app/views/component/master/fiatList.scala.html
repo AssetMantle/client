@@ -4,10 +4,10 @@
 @(fiatPegWallet: Seq[Fiat], aclHash: ACLHash)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
 
     @for(fiat <- fiatPegWallet) {
-        <div class="flexItem box leftAlign fiatBackgroundColor">
-            @Messages(constants.Form.PEG_HASH) : @fiat.pegHash <br>
-            @Messages(constants.Form.TRANSACTION_ID) : @fiat.transactionID <br>
-            @Messages(constants.Form.TRANSACTION_AMOUNT) : @fiat.transactionAmount <br>
-            @Messages(constants.Form.REDEEM_AMOUNT) : @fiat.redeemedAmount
+        <div class="flexItem box leftAlign colorCards">
+            <span class="colorLeftText">@Messages(constants.Form.PEG_HASH)</span> : @fiat.pegHash <br>
+            <span class="colorLeftText">@Messages(constants.Form.TRANSACTION_ID)</span> : @fiat.transactionID <br>
+            <span class="colorLeftText">@Messages(constants.Form.TRANSACTION_AMOUNT)</span> : @fiat.transactionAmount <br>
+            <span class="colorLeftText">@Messages(constants.Form.REDEEM_AMOUNT)</span> : @fiat.redeemedAmount
         </div>
     }

@@ -1,4 +1,4 @@
-@(title: String, failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(content: Html)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@(title: String, failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(left: Html)(center:Html = Html(""))(right:Html = Html(""))(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -63,11 +63,15 @@
             </div>
 
             <div class="pageFlexContainer">
-                <div class="first"></div>
-                <div class="second">
-                    @content
+                <div class="first">
+                    @left
                 </div>
-                <div class="third"></div>
+                <div class="second">
+                    @center
+                </div>
+                <div class="third">
+                    @right
+                </div>
             </div>
         </div>
 

@@ -2,17 +2,22 @@
 
 @(username: String, address: String, coins: Int = 0, zone: Zone)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
 
-@common(Messages(constants.User.HOME)) {
+@common(Messages(constants.User.HOME))(Html(""))(center)(Html(""))
 
+    @center = {
     <div class="flexContainer">
         @component.master.commonHome(username = username, userType = constants.User.ZONE, address = address, coins = coins)
         <div class="flexItem box leftAlign flexGrowth">
-            <h2>@Messages(constants.Form.ZONE):</h2>
-            @Messages(constants.Form.NAME): @zone.name <br>
+            <h2 class="showHide showHideStyle centerText">@Messages(constants.Form.ZONE):</h2>
+            @Messages(constants.Form.NAME): @zone.name
+            <div></div>
+            <div>
             @Messages(constants.Form.ZONE_ID): @zone.id <br>
             @Messages(constants.Form.CURRENCY): @zone.currency <br>
             @Messages(constants.Form.VERIFIED_STATUS): @zone.status <br>
+            </div>
         </div>
+
     </div>
     <div class="centerText">
         <button onclick="getForm(jsRoutes.controllers.AddOrganizationController.viewPendingVerifyOrganizationRequests())">@Messages(constants.Form.PENDING_VERIFY_ORGANIZATION_REQUESTS)</button>
