@@ -1,4 +1,4 @@
-@import models.blockchain.{ACLHash, Asset, Fiat, Order, Negotiation}
+@import models.blockchain.{ACLHash, Asset, Fiat, Negotiation, Order}
 @import models.master.{Organization, Zone}
 
 @(username: String, address: String, coins: Int = 0, assetPegWallet: Seq[Asset], fiatPegWallet: Seq[Fiat], totalFiat: Int, zone: Zone, organization: Organization, orders: Seq[Order], negotiations: Seq[Negotiation], aclHash: ACLHash, profilePicture: Array[Byte])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
@@ -75,8 +75,17 @@
             <button onclick="getForm(jsRoutes.controllers.IssueAssetController.issueAssetRequestForm())">@Messages(constants.Form.ISSUE_ASSET_REQUEST)</button>
         }
         </div>
-        <div class="flexContainer">
-        @component.master.assetList(assetPegWallet, aclHash)
+        <script src="@routes.Assets.versioned("javascripts/assetList.js")" type="text/javascript"></script>
+        <div id="assetsList" class="flexContainer">
+@*            @component.master.assetList(assetPegWallet, aclHash)*@
+            <script type="text/javascript">
+                    var assetCometMessage = function (event) {
+                        console.log("Response Event:    " + event + ", Length:" + event.length);
+                        let content = '';
+                            $('#assetsList').html(displayAssets(event, '@Messages(constants.Form.PEG_HASH)', '@Messages(constants.Form.DOCUMENT_HASH)','@Messages(constants.Form.ASSET_TYPE)','@Messages(constants.Form.ASSET_QUANTITY)','@Messages(constants.Form.ASSET_PRICE)','@Messages(constants.Form.QUANTITY_UNIT)','@Messages(constants.Form.UNMODERATED)', '@Messages(constants.Form.LOCKED)','@aclHash.redeemAsset','@aclHash.sendAsset', '@Messages(constants.Form.REDEEM_ASSET)', '@Messages(constants.Form.SEND_ASSET)'));
+                    }
+            </script>
+            <iframe class="hidden" src="@routes.IssueAssetController.assetComet(address)"></iframe>
         </div>
     </div>
 
@@ -96,12 +105,12 @@
         <div class="flexContainer">
         @component.master.fiatList(fiatPegWallet, aclHash)
         </div>
-    @Messages(constants.Form.ON_GOING_NEGOTIATIONS)
-    @component.master.negotiationList(negotiations)
-    <br>
+        @Messages(constants.Form.ON_GOING_NEGOTIATIONS)
+        @component.master.negotiationList(negotiations)
+        <br>
 
-    @Messages(constants.Form.ON_GOING_ORDERS)
-    @component.master.orderList(orders)
+            @Messages(constants.Form.ON_GOING_ORDERS)
+            @component.master.orderList(orders)
 
     </div>
 }

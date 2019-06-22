@@ -10,7 +10,8 @@ import play.api.{Configuration, Logger}
 import queries.GetAccount
 import slick.jdbc.JdbcProfile
 import utilities.PushNotification
-
+import akka.stream.scaladsl.Source
+import play.api.libs.json._
 import scala.concurrent.duration.{Duration, _}
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
@@ -27,6 +28,8 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
   private implicit val logger: Logger = Logger(this.getClass)
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_ASSET
+
+  private implicit val assetWrites: OWrites[Asset] = Json.writes[Asset]
 
   import databaseConfig.profile.api._
 
@@ -139,6 +142,12 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
     def getDirtyAssets: Seq[Asset] = Await.result(getAssetsByDirtyBit(dirtyBit = true), Duration.Inf)
 
     def markDirty(pegHash: String): Int = Await.result(updateDirtyBitByPegHash(pegHash, dirtyBit = true), Duration.Inf)
+
+    def assetCometSource(address: String): Source[JsValue, _] = {
+      val assetSource = Source.tick(0 millis, 5000 millis, "Asset")
+      val s = assetSource.map(_ => Json.toJson( getAssetPegWallet(address).map{asset => Json.toJson(asset)}))
+      s
+    }
 
   }
 

@@ -20,7 +20,7 @@ object TicketUpdater {
         onSuccess(ticketID, value)
       } catch {
         case blockChainException: BlockChainException => logger.error(blockChainException.failure.message, blockChainException)
-          if (blockChainException.failure.message != """{"response":"Request in process, wait and try after some time"}""") {
+          if (blockChainException.failure.message != """RESPONSE.FAILURE.{"response":"Request in process, wait and try after some time"}""") {
             onFailure(ticketID, blockChainException.failure.message)
           }
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
