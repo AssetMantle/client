@@ -2,11 +2,11 @@
 @import models.master.{Organization, Zone}
 @import utilities.LoginState
 
-@(username: String, address: String, coins: Int = 0, assetPegWallet: Seq[Asset], fiatPegWallet: Seq[Fiat], totalFiat: Int, zone: Zone, organization: Organization, orders: Seq[Order], negotiations: Seq[Negotiation], aclHash: ACLHash)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+@(username: String, address: String, coins: Int = 0, assetPegWallet: Seq[Asset], fiatPegWallet: Seq[Fiat], totalFiat: Int, zone: Zone, organization: Organization, orders: Seq[Order], negotiations: Seq[Negotiation], aclHash: ACLHash)( implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
 @common(Messages(constants.User.HOME))(Html(""))(center)(right)
 
-    @right = {
+@right = {
 
     @if(aclHash.buyerExecuteOrder) {
         <a onclick="getForm(jsRoutes.controllers.BuyerExecuteOrderController.unmoderatedBuyerExecuteOrderForm())">@Messages(constants.Form.UNMODERATED_BUYER_EXECUTE_ORDER)</a>
@@ -48,17 +48,20 @@
         <a onclick="getForm(jsRoutes.controllers.SendFiatController.sendFiatForm())">@Messages(constants.Form.SEND_FIAT)</a>
     } <br>
 
-        <a onclick="getForm(jsRoutes.controllers.SetBuyerFeedbackController.setBuyerFeedbackForm())">@Messages(constants.Form.SET_BUYER_FEEDBACK)</a> <br>
-        <a onclick="getForm(jsRoutes.controllers.SetSellerFeedbackController.setSellerFeedbackForm())">@Messages(constants.Form.SET_SELLER_FEEDBACK)</a> <br>
+    <a onclick="getForm(jsRoutes.controllers.SetBuyerFeedbackController.setBuyerFeedbackForm())">@Messages(constants.Form.SET_BUYER_FEEDBACK)</a>
+    <br>
+    <a onclick="getForm(jsRoutes.controllers.SetSellerFeedbackController.setSellerFeedbackForm())">@Messages(constants.Form.SET_SELLER_FEEDBACK)</a>
+    <br>
 
-    }
+}
 
-    @center = {
+@center = {
     <div class="flexContainer">
         @component.master.commonHome(username = username, userType = constants.User.TRADER, address = address, coins = coins)
-        <div class="flexGrowth flexItem box leftAlign">
-            <h2 class="showHide showHideStyle centerText">@Messages(constants.Form.ZONE):</h2>
-            <div></div>
+        <div class="flexGrowth flexItem box leftText">
+            <div>
+                <h2 class="showHide toggleElement centerText">@Messages(constants.Form.ZONE):</h2>
+            </div>
             <div>
                 @Messages(constants.Form.NAME): @zone.name <br>
                 @Messages(constants.Form.ZONE_ID): @zone.id <br>
@@ -66,9 +69,10 @@
                 @Messages(constants.Form.VERIFIED_STATUS): @zone.status <br>
             </div>
         </div>
-        <div class="flexGrowth flexItem box leftAlign">
-            <h2 class="showHide showHideStyle centerText">@Messages(constants.Form.ORGANIZATION):</h2>
-            <div></div>
+        <div class="flexGrowth flexItem box leftText">
+            <div>
+                <h2 class="showHide toggleElement centerText">@Messages(constants.Form.ORGANIZATION):</h2>
+            </div>
             <div>
                 @Messages(constants.Form.ORGANIZATION_NAME): @organization.name <br>
                 @Messages(constants.Form.ORGANIZATION_ID): @organization.id <br>
@@ -81,44 +85,51 @@
         </div>
     </div>
     <div class="flexContainer">
-        <div class="flexGrowth flexItem box leftAlign">
-            <h2 class="showHide showHideStyle centerText">@Messages(constants.User.ASSETS_OWNED) </h2>
-            <div class="centerText">
-            @if(aclHash.issueAsset) {
-                <button onclick="getForm(jsRoutes.controllers.IssueAssetController.issueAssetRequestForm())">@Messages(constants.Form.ISSUE_ASSET_REQUEST)</button>
-            }
+        <div class="flexGrowth flexItem box leftText">
+            <div>
+                <h2 class="showHide toggleElement centerText">@Messages(constants.User.ASSETS_OWNED) </h2>
+                <div class="centerText">
+                @if(aclHash.issueAsset) {
+                    <button onclick="getForm(jsRoutes.controllers.IssueAssetController.issueAssetRequestForm())">@Messages(constants.Form.ISSUE_ASSET_REQUEST)</button>
+                }
+                </div>
             </div>
             <div class="flexContainer">
             @component.master.assetList(assetPegWallet, aclHash)
             </div>
         </div>
 
-        <div class="flexGrowth flexItem box leftAlign">
-            <h2 class="showHide showHideStyle centerText">@Messages(constants.User.FIATS_OWNED): @totalFiat</h2>
-            <div class="centerText">
-                @if(aclHash.issueFiat) {
-                    <button onclick="getForm(jsRoutes.controllers.IssueFiatController.issueFiatRequestForm())">@Messages(constants.Form.ISSUE_FIAT_REQUEST)</button>
-                }
-                @if(aclHash.redeemFiat) {
-                    <button onclick="getForm(jsRoutes.controllers.RedeemFiatController.redeemFiatForm())">@Messages(constants.Form.REDEEM_FIAT)</button>
-                }
-                @if(aclHash.sendFiat) {
-                    <button onclick="getForm(jsRoutes.controllers.SendFiatController.sendFiatForm())">@Messages(constants.Form.SEND_FIAT)</button>
-                }
+        <div class="flexGrowth flexItem box leftText">
+            <div>
+                <h2 class="showHide toggleElement centerText">@Messages(constants.User.FIATS_OWNED): @totalFiat</h2>
+                <div class="centerText">
+                    @if(aclHash.issueFiat) {
+                        <button onclick="getForm(jsRoutes.controllers.IssueFiatController.issueFiatRequestForm())">@Messages(constants.Form.ISSUE_FIAT_REQUEST)</button>
+                    }
+                    @if(aclHash.redeemFiat) {
+                        <button onclick="getForm(jsRoutes.controllers.RedeemFiatController.redeemFiatForm())">@Messages(constants.Form.REDEEM_FIAT)</button>
+                    }
+                    @if(aclHash.sendFiat) {
+                        <button onclick="getForm(jsRoutes.controllers.SendFiatController.sendFiatForm())">@Messages(constants.Form.SEND_FIAT)</button>
+                    }
+                </div>
             </div>
             <div class="flexContainer">
             @component.master.fiatList(fiatPegWallet, aclHash)
             </div>
         </div>
-        <div class="flexGrowth flexItem box leftAlign">
-            <h2 class="showHide showHideStyle centerText">@Messages(constants.Form.ON_GOING_NEGOTIATIONS)</h2>
-            <div class="centerText"></div>
+
+        <div class="flexGrowth flexItem box leftText">
+            <div>
+                <h2 class="showHide toggleElement centerText">@Messages(constants.Form.ON_GOING_NEGOTIATIONS)</h2>
+            </div>
             <div class ="flexContainer">@component.master.negotiationList(negotiations)</div>
 
         </div>
-        <div class="flexGrowth flexItem box leftAlign">
-            <h2 class="showHide showHideStyle centerText">@Messages(constants.Form.ON_GOING_ORDERS)</h2>
-            <div class="centerText"></div>
+        <div class="flexGrowth flexItem box leftText">
+            <div>
+                <h2 class="showHide toggleElement centerText">@Messages(constants.Form.ON_GOING_ORDERS)</h2>
+            </div>
             <div class="flexContainer">@component.master.orderList(orders)</div>
         </div>
     </div>

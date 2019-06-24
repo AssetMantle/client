@@ -3,22 +3,22 @@
 @(negotiations: Seq[Negotiation])(implicit messagesProvider: MessagesProvider)
 
 @for(negotiation <- negotiations) {
-    <div class="flexItem box colorCards">
-        <div class="leftAlign">
+    <div class="flexItem box lightBlue">
+        <div class="leftText">
 
-            <span class="colorLeftText">@Messages(constants.Form.PEG_HASH)</span> : @negotiation.assetPegHash <br>
-            <span class="colorLeftText">@Messages(constants.Form.BID)</span> : @negotiation.bid <br>
-            <span class="colorLeftText">@Messages(constants.Form.TIME)</span> : @negotiation.time <br>
+            <span class="red">@Messages(constants.Form.PEG_HASH)</span> : @negotiation.assetPegHash <br>
+            <span class="red">@Messages(constants.Form.BID)</span> : @negotiation.bid <br>
+            <span class="red">@Messages(constants.Form.TIME)</span> : @negotiation.time <br>
             <button class="showHide">@Messages(constants.Form.SHOW_HIDE)</button>
             <div></div>
-            <div class="defaultDisplayNone">
-                <span class="colorLeftText">@Messages(constants.Form.BUYER_ADDRESS)</span> : @negotiation.buyerAddress <br>
-                <span class="colorLeftText">@Messages(constants.Form.SELLER_ADDRESS)</span>
+            <div class="hidden">
+                <span class="red">@Messages(constants.Form.BUYER_ADDRESS)</span> : @negotiation.buyerAddress <br>
+                <span class="red">@Messages(constants.Form.SELLER_ADDRESS)</span>
                 : @negotiation.sellerAddress <br>
-                <span class="colorLeftText">@Messages(constants.Form.NEGOTIATION_ID)</span> : @negotiation.id <br>
-                <span class="colorLeftText">@Messages(constants.Form.BUYER_SIGNATURE)</span>
+                <span class="red">@Messages(constants.Form.NEGOTIATION_ID)</span> : @negotiation.id <br>
+                <span class="red">@Messages(constants.Form.BUYER_SIGNATURE)</span>
                 : @negotiation.buyerSignature <br>
-                <span class="colorLeftText">@Messages(constants.Form.SELLER_SIGNATURE)</span>
+                <span class="red">@Messages(constants.Form.SELLER_SIGNATURE)</span>
                 : @negotiation.sellerSignature <br>
             </div>
         </div>
