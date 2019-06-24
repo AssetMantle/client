@@ -2,7 +2,7 @@
 @import views.companion.master.RedeemFiat
 
 @(redeemFiatForm: Form[RedeemFiat.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@form(action = routes.RedeemFiatController.redeemFiat) {
+    @form(action = routes.RedeemFiatController.redeemFiat, 'onkeypress -> "validateForm(event,this)") {
     @CSRF.formField
     @inputText(redeemFiatForm(constants.Form.ZONE_ID), '_label -> Messages(constants.Form.ZONE_ID))
     @inputText(redeemFiatForm(constants.Form.REDEEM_AMOUNT), '_label -> Messages(constants.Form.REDEEM_AMOUNT))
@@ -16,5 +16,5 @@
         }
         </ul>
     }
-    <button type="submit">@Messages(constants.Form.REDEEM_FIAT)</button>
+    <button type="button" onclick="submitForm(this)">@Messages(constants.Form.REDEEM_FIAT)</button>
 }

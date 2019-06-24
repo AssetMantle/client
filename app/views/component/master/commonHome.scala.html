@@ -2,16 +2,21 @@
 
 <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/class.css")">
 <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/tag.css")">
-<div class="box flexContainer leftAlign flexGrowth">
+
+<div class="box flexItem leftAlign flexGrowth">
     <div class="width70Percent">
-        <h2>@username</h2>
+    <h2 class="showHide showHideStyle centerText">@username</h2>
+    <div class="centerText">
+        @Messages(constants.User.COINS): @coins
+    <button onclick="getForm(jsRoutes.controllers.SendCoinController.sendCoinForm())">@Messages(constants.Form.SEND_COIN)</button>
+    </div>
+    <div>
         @Messages(constants.User.USER_TYPE): @userType <br/>
         @Messages(constants.User.ADDRESS): @address <br/>
-        @Messages(constants.User.COINS): @coins
-        <button onclick="getForm(jsRoutes.controllers.SendCoinController.sendCoinForm())">@Messages(constants.Form.SEND_COIN)</button>
+    </div>
     </div>
     <div class="width30Percent">
-    <img id="profilePicture" class="right" src="data:image/jpg;base64,@utilities.ImageProcess.decodeImageThumbnailData(profilePicture)" alt="profilePicture"><br><button id="profilePictureBottomUploadButton" class="bottom" onclick="getForm(jsRoutes.controllers.FileController.uploadForm('@constants.File.PROFILE_PICTURE', '@constants.Form.ACCOUNT', '@constants.Form.ACCOUNT'))">@Messages(constants.Form.UPLOAD)</button>
+        <img id="profilePicture" class="right" src="data:image/jpg;base64,@utilities.ImageProcess.decodeImageThumbnailData(profilePicture)" alt="profilePicture"><br><button id="profilePictureBottomUploadButton" class="bottom" onclick="getForm(jsRoutes.controllers.FileController.uploadForm('@constants.File.PROFILE_PICTURE', '@constants.Form.ACCOUNT', '@constants.Form.ACCOUNT'))">@Messages(constants.Form.UPLOAD)</button>
     </div>
 </div>
 <script src="@routes.Assets.versioned("javascripts/viewFiles.js")" type="text/javascript"></script>

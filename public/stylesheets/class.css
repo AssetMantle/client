@@ -312,24 +312,18 @@ blur(5 px);
 }
 /*Table*/
 
-.showHide {
-    background-color: #efefef;
+.showHideStyle {
+    background-color: #3a53bc;
 }
-.showHide:hover {
+
+.showHideStyle:hover {
     cursor: pointer;
-    color: blue;
-}
-
-.assetBackgroundColor {
-    background-color: rgba(215, 215, 215, 0.58);
-}
-
-.fiatBackgroundColor {
-    background-color: rgba(215, 215, 215, 0.58);
+    color: rgba(255, 249, 6, 0.66);
 }
 
 .leftAlign {
     text-align: left;
+    word-break: break-all;
 }
 
 .width {
@@ -340,6 +334,9 @@ blur(5 px);
     text-align: center;
 }
 
+.defaultDisplayNone {
+    display: none;
+}
 /*.info {*/
 /*    display: none;*/
 /*}*/
@@ -451,3 +448,14 @@ dl:hover .info {
 }
 
 /*approve and reject color*/
+/*ToolTip INPUT BOX SPECIFIC*/
+
+/* color */
+.colorCards {
+    background-color: #a8b1ff;
+}
+
+.colorLeftText {
+    color: rgba(131, 0, 4, 0.71);
+}
+/* color */

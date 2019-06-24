@@ -2,22 +2,20 @@
 @import views.companion.master.SetSellerFeedback
 
 @(setSellerFeedbackForm: Form[SetSellerFeedback.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@common(Messages(constants.Form.SET_SELLER_FEEDBACK)) {
-    @form(action = routes.SetSellerFeedbackController.setSellerFeedback) {
-        @CSRF.formField
-        @inputText(setSellerFeedbackForm(constants.Form.BUYER_ADDRESS), '_label -> Messages(constants.Form.BUYER_ADDRESS))
-        @inputText(setSellerFeedbackForm(constants.Form.PEG_HASH),'_label-> Messages(constants.Form.PEG_HASH))
-        @inputText(setSellerFeedbackForm(constants.Form.RATING),'_label-> Messages(constants.Form.RATING))
-        @inputText(setSellerFeedbackForm(constants.Form.GAS),'_label-> Messages(constants.Form.GAS))
-        @inputPassword(setSellerFeedbackForm(constants.Form.PASSWORD),'_label-> Messages(constants.Form.PASSWORD))
+@form(action = routes.SetSellerFeedbackController.setSellerFeedback, 'onkeypress -> "validateForm(event,this)") {
+    @CSRF.formField
+    @inputText(setSellerFeedbackForm(constants.Form.BUYER_ADDRESS), '_label -> Messages(constants.Form.BUYER_ADDRESS))
+    @inputText(setSellerFeedbackForm(constants.Form.PEG_HASH), '_label -> Messages(constants.Form.PEG_HASH))
+    @inputText(setSellerFeedbackForm(constants.Form.RATING), '_label -> Messages(constants.Form.RATING))
+    @inputText(setSellerFeedbackForm(constants.Form.GAS), '_label -> Messages(constants.Form.GAS))
+    @inputPassword(setSellerFeedbackForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD))
 
-        @if(setSellerFeedbackForm.hasGlobalErrors) {
-            <ul>
-            @for(error <- setSellerFeedbackForm.globalErrors) {
-                <li>@error.format</li>
-            }
-            </ul>
+    @if(setSellerFeedbackForm.hasGlobalErrors) {
+        <ul>
+        @for(error <- setSellerFeedbackForm.globalErrors) {
+            <li>@error.format</li>
         }
-        <button type="submit">@Messages(constants.Form.SET_SELLER_FEEDBACK)</button>
+        </ul>
     }
+    <button type="button" onclick="submitForm(this)">@Messages(constants.Form.SET_SELLER_FEEDBACK)</button>
 }
