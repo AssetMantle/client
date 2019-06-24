@@ -1,5 +1,5 @@
 @import helper._
-@(documentType: String, userType: String, target: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(documentType: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @CSRF.formField
 <div id="updateSelector">
@@ -26,4 +26,4 @@
 <script src="@routes.Assets.versioned("javascripts/resumable.js")" type="text/javascript"></script>
 <script src="@routes.Assets.versioned("javascripts/upload.js")" type="text/javascript"></script>
 <script src="@routes.Assets.versioned("javascripts/style/progressBar.js")" type="text/javascript"></script>
-<script>updateFile('@documentType', '@userType', '@target')</script>
+<script>updateFile(jsRoutes.controllers.FileController.uploadUserKYC, jsRoutes.controllers.FileController.updateUserKYC, '@documentType')</script>
