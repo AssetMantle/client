@@ -82,7 +82,7 @@ class AccountKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfig
     }
   }
 
-  private def checkByIdAndDocumentType(id: String, documentType: String): Future[Boolean] = db.run(accountKYCTable.filter(_.id === id).filter(_.documentType === documentType).exists.result)
+  private def checkFileExistsByIdAndDocumentType(id: String, documentType: String): Future[Boolean] = db.run(accountKYCTable.filter(_.id === id).filter(_.documentType === documentType).exists.result)
 
   private[models] class AccountKYCTable(tag: Tag) extends Table[AccountKYC](tag, "AccountKYC") {
 
@@ -116,7 +116,7 @@ class AccountKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfig
 
     def deleteAllDocuments(id: String): Int = Await.result(deleteById(id = id), Duration.Inf)
 
-    def checkFileExists(id: String, documentType: String): Boolean = Await.result(checkByIdAndDocumentType(id = id, documentType = documentType), Duration.Inf)
+    def checkFileExists(id: String, documentType: String): Boolean = Await.result(checkFileExistsByIdAndDocumentType(id = id, documentType = documentType), Duration.Inf)
   }
 
 }

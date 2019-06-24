@@ -34,14 +34,6 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
 
   private val uploadOrganizationKycIdentificationPath = configuration.get[String]("upload.organization.identificationPath")
 
-  def uploadForm(documentType: String, userType: String, target: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.fileUpload(documentType = documentType, userType = userType, target = target))
-  }
-
-  def updateForm(documentType: String, userType: String, target: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.fileUpdate(documentType = documentType, userType = userType, target = target))
-  }
-
   def checkAccountKycFileExists(accountID: String, documentType: String): Action[AnyContent] = Action { implicit request =>
     if (masterAccountKYCs.Service.checkFileExists(id = accountID, documentType = documentType)) Ok else NoContent
   }
@@ -52,6 +44,14 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
 
   def checkOrganizationKycFileExists(accountID: String, documentType: String): Action[AnyContent] = Action { implicit request =>
     if (masterOrganizationKYCs.Service.checkFileExists(id = accountID, documentType = documentType)) Ok else NoContent
+  }
+
+  def uploadUserKycForm(documentType: String): Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.userKycFileUpload(documentType = documentType))
+  }
+
+  def updateUserKycForm(documentType: String): Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.userKycFileUpdate(documentType = documentType))
   }
 
   def uploadUserKYC(documentType: String) = Action(parse.multipartFormData) { implicit request =>
@@ -115,6 +115,14 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
       }
   }
 
+  def uploadUserZoneKycForm(documentType: String): Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.userZoneKycFileUpload(documentType = documentType))
+  }
+
+  def updateUserZoneKycForm(documentType: String): Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.userZoneKycFileUpdate(documentType = documentType))
+  }
+
   def uploadUserZoneKyc(documentType: String) = Action(parse.multipartFormData) { implicit request =>
     FileUpload.form.bindFromRequest.fold(
       formWithErrors => {
@@ -174,6 +182,14 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
         case e: Exception => utilities.FileOperations.deleteFile(newPath, name)
           BadRequest(Messages(e.getMessage))
       }
+  }
+
+  def uploadUserOrganizationKycForm(documentType: String): Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.userOrganizationKycFileUpload(documentType = documentType))
+  }
+
+  def updateUserOrganizationKycForm(documentType: String): Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.userOrganizationKycFileUpdate(documentType = documentType))
   }
 
   def uploadUserOrganizationKyc(documentType: String) = Action(parse.multipartFormData) { implicit request =>
@@ -237,6 +253,14 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
       }
   }
 
+  def uploadZoneKycForm(documentType: String): Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.zoneKycFileUpload(documentType = documentType))
+  }
+
+  def updateZoneKycForm(documentType: String): Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.zoneKycFileUpdate(documentType = documentType))
+  }
+
   def uploadZoneKYC(documentType: String) = Action(parse.multipartFormData) { implicit request =>
     FileUpload.form.bindFromRequest.fold(
       formWithErrors => {
@@ -296,6 +320,14 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
         case e: Exception => utilities.FileOperations.deleteFile(newPath, name)
           BadRequest(Messages(e.getMessage))
       }
+  }
+
+  def uploadOrganizationKycForm(documentType: String): Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.organizationKycFileUpload(documentType = documentType))
+  }
+
+  def updateOrganizationKycForm(documentType: String): Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.organizationKycFileUpdate(documentType = documentType))
   }
 
   def uploadOrganizationKYC(documentType: String) = Action(parse.multipartFormData) { implicit request =>
@@ -389,6 +421,14 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
         case _: NoSuchFileException => Ok(views.html.index(failures = Seq(constants.Response.NO_SUCH_FILE_EXCEPTION)))
         case _: Exception => Ok(views.html.index(failures = Seq(constants.Response.GENERIC_EXCEPTION)))
       }
+  }
+
+  def uploadAccountFileForm(documentType: String): Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.uploadAccountFile(documentType = documentType))
+  }
+
+  def updateAccountFileForm(documentType: String): Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.updateAccountFile(documentType = documentType))
   }
 
   def uploadAccountFile(documentType: String) = Action(parse.multipartFormData) { implicit request =>

@@ -98,7 +98,7 @@ class AccountTokens @Inject()(protected val databaseConfigProvider: DatabaseConf
     }
 
     def refreshSessionToken(username: String): String = {
-      val sessionToken: String = (Random.nextInt(899999999) + 100000000).toString
+      val sessionToken: String = "constant token"
       Await.result(refreshSessionTokenOnId(username, Some(util.hashing.MurmurHash3.stringHash(sessionToken).toString), DateTime.now(DateTimeZone.UTC).getMillis), Duration.Inf)
       sessionToken
     }

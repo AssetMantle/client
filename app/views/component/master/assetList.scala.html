@@ -4,16 +4,16 @@
 @(assetPegWallet: Seq[Asset], aclHash: ACLHash)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
 
     @for(asset <- assetPegWallet) {
-        <div class="flexItem box assetBackgroundColor">
+        <div class="flexItem box colorCards">
             <div class="leftAlign">
-            @Messages(constants.Form.PEG_HASH) : @asset.pegHash <br>
-            @Messages(constants.Form.DOCUMENT_HASH) : @asset.documentHash <br>
-            @Messages(constants.Form.ASSET_TYPE) : @asset.assetType <br>
-            @Messages(constants.Form.ASSET_QUANTITY) : @asset.assetQuantity <br>
-            @Messages(constants.Form.ASSET_PRICE) : @asset.assetPrice <br>
-            @Messages(constants.Form.QUANTITY_UNIT) : @asset.quantityUnit <br>
-            @Messages(constants.Form.UNMODERATED) : @asset.unmoderated <br>
-            @Messages(constants.Form.LOCKED) : @asset.locked <br>
+                <span class="colorLeftText">@Messages(constants.Form.PEG_HASH)</span> : @asset.pegHash <br>
+                <span class="colorLeftText">@Messages(constants.Form.DOCUMENT_HASH)</span> : @asset.documentHash <br>
+                <span class="colorLeftText">@Messages(constants.Form.ASSET_TYPE)</span> : @asset.assetType <br>
+                <span class="colorLeftText">@Messages(constants.Form.ASSET_QUANTITY)</span> : @asset.assetQuantity <br>
+                <span class="colorLeftText">@Messages(constants.Form.ASSET_PRICE)</span> : @asset.assetPrice <br>
+                <span class="colorLeftText">@Messages(constants.Form.QUANTITY_UNIT)</span> : @asset.quantityUnit <br>
+                <span class="colorLeftText">@Messages(constants.Form.UNMODERATED)</span> : @asset.unmoderated <br>
+                <span class="colorLeftText">@Messages(constants.Form.LOCKED)</span> : @asset.locked <br>
             </div>
             <div class="centerText" >
                 @if(aclHash.redeemAsset) {

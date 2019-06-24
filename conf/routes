@@ -26,35 +26,44 @@ GET         /master/getGenesisAccessedFile                       controllers.Fil
 GET         /master/getZoneAccessedFile                          controllers.FileController.zoneAccessedFile(accountID: String, fileName: String, documentType: String)
 GET         /master/file                                         controllers.FileController.file(fileName: String, documentType: String)
 
-GET         /upload                                              controllers.FileController.uploadForm(documentType: String, userType: String, target: String)
-GET         /update                                              controllers.FileController.updateForm(documentType: String, userType: String, target: String)
-
-POST        /accountUpload/file                                  controllers.FileController.uploadAccountFile(documentType: String)
-GET         /accountUpload/storeFile                             controllers.FileController.storeAccountFile(name: String, documentType: String)
-GET         /accountUpload/updateFile                            controllers.FileController.updateAccountFile(name: String, documentType: String)
-
 GET         /checkAccountKycFileExists                           controllers.FileController.checkAccountKycFileExists(accountID: String, documentType: String)
 GET         /checkZoneKycFileExists                              controllers.FileController.checkZoneKycFileExists(accountID: String, documentType: String)
 GET         /checkOrganizationKycFileExists                      controllers.FileController.checkOrganizationKycFileExists(accountID: String, documentType: String)
 
+GET         /accountUpload                                       controllers.FileController.uploadAccountFileForm(documentType: String)
+POST        /accountUpload/file                                  controllers.FileController.uploadAccountFile(documentType: String)
+GET         /accountUpload/storeFile                             controllers.FileController.storeAccountFile(name: String, documentType: String)
+GET         /accountUpdate                                       controllers.FileController.updateAccountFileForm(documentType: String)
+GET         /accountUpdate/updateFile                            controllers.FileController.updateAccountFile(name: String, documentType: String)
+
+GET         /userUpload                                          controllers.FileController.uploadUserKycForm(documentType: String)
 POST        /userUpload/file                                     controllers.FileController.uploadUserKYC(documentType: String)
 GET         /userUpload/storeFile                                controllers.FileController.storeUserKYC(name: String, documentType: String)
-GET         /userUpload/updateFile                               controllers.FileController.updateUserKYC(name: String, documentType: String)
+GET         /userUpdate                                          controllers.FileController.updateUserKycForm(documentType: String)
+GET         /userUpdate/updateFile                               controllers.FileController.updateUserKYC(name: String, documentType: String)
 
+GET         /userUpload/zoneKYC                                  controllers.FileController.uploadUserZoneKycForm(documentType: String)
 POST        /userUpload/userZoneKycDocument                      controllers.FileController.uploadUserZoneKyc(documentType: String)
 GET         /userUpload/storeUserZoneKycDocument                 controllers.FileController.storeUserZoneKyc(name: String, documentType: String)
-GET         /userUpload/updateUserZoneKycDocument                controllers.FileController.updateUserZoneKyc(name: String, documentType: String)
+GET         /userUpdate/zoneKYC                                  controllers.FileController.updateUserZoneKycForm(documentType: String)
+GET         /userUpdate/updateUserZoneKycDocument                controllers.FileController.updateUserZoneKyc(name: String, documentType: String)
 
+GET         /userUpload/organizationKYC                          controllers.FileController.uploadUserOrganizationKycForm(documentType: String)
 POST        /userUpload/userOrganizationKycDocument              controllers.FileController.uploadUserOrganizationKyc(documentType: String)
 GET         /userUpload/storeUserOrganizationKycDocument         controllers.FileController.storeUserOrganizationKyc(name: String, documentType: String)
+GET         /userUpdate/organizationKYC                          controllers.FileController.updateUserOrganizationKycForm(documentType: String)
 GET         /userUpload/updateUserOrganizationKycDocument        controllers.FileController.updateUserOrganizationKyc(name: String, documentType: String)
 
+GET         /zoneUpload                                          controllers.FileController.uploadZoneKycForm(documentType: String)
 POST        /zoneUpload/file                                     controllers.FileController.uploadZoneKYC(documentType: String)
 GET         /zoneUpload/storeFile                                controllers.FileController.storeZoneKYC(name: String, documentType: String)
+GET         /zoneUpdate                                          controllers.FileController.updateZoneKycForm(documentType: String)
 GET         /zoneUpload/updateFile                               controllers.FileController.updateZoneKYC(name: String, documentType: String)
 
+GET         /organizationUpload                                  controllers.FileController.uploadOrganizationKycForm(documentType: String)
 POST        /organizationUpload/file                             controllers.FileController.uploadOrganizationKYC(documentType: String)
 GET         /organizationUpload/storeFile                        controllers.FileController.storeOrganizationKYC(name: String, documentType: String)
+GET         /organizationUpdate                                  controllers.FileController.updateOrganizationKycForm(documentType: String)
 GET         /organizationUpload/updateFile                       controllers.FileController.updateOrganizationKYC(name: String, documentType: String)
 
 
