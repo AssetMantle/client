@@ -80,7 +80,7 @@ object setACLControllerTest {
 
   def getAccountAddressByUsername(query: String): String = {
     val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://localhost:5432/comdex", "comdex", "comdex",
-      s"""SELECT "accountAddress" FROM master."Account" WHERE "id" = '$query';""")
+      s"""SELECT COALESCE((SELECT "accountAddress" FROM master."Account" WHERE "id" = '$query'),'0') AS "accountAddress";""")
     sqlQueryFeeder.apply().next()("accountAddress").toString
   }
 }

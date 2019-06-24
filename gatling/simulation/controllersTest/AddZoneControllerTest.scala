@@ -77,7 +77,7 @@ object addZoneControllerTest {
 
   def getZoneID(query: String): String = {
     val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://localhost:5432/comdex", "comdex", "comdex",
-      s"""SELECT "id" FROM master."Zone" WHERE "accountID" = '$query';""")
+      s""" SELECT COALESCE((SELECT "id" FROM master."Zone" WHERE "accountID" = '$query'),'0') AS "id";""")
     sqlQueryFeeder.apply().next()("id").toString
   }
 

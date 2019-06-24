@@ -65,7 +65,7 @@ object changeSellerBidControllerTest {
 
   def getSellerAddress(sellerUsername: String) = {
     val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://localhost:5432/comdex", "comdex", "comdex",
-      s"""SELECT "accountAddress" FROM master."Account" WHERE "id" = '$sellerUsername';""")
+      s"""SELECT COALESCE((SELECT "accountAddress" FROM master."Account" WHERE "id" = '$sellerUsername'),'0') AS "accountAddress";""")
     sqlQueryFeeder.apply().next()("accountAddress")
   }
 }

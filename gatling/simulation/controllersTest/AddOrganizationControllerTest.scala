@@ -85,13 +85,7 @@ object addOrganizationControllerTest {
 
   def getOrganizationID(query: String) = {
     val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://localhost:5432/comdex", "comdex", "comdex",
-      s"""SELECT "id" FROM master."Organization" WHERE "accountID" = '$query';""")
-    sqlQueryFeeder.apply().next()("id")
-  }
-
-  def getUnverifiedOrganizationID(zoneID: String) = {
-    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://localhost:5432/comdex", "comdex", "comdex",
-      s"""SELECT "id" FROM master."Organization" WHERE "zoneID" = '$zoneID';""")
-    sqlQueryFeeder.apply().next()("id")
+      s"""SELECT COALESCE((SELECT "id" FROM master."Organization" WHERE "accountID" = '$query'),'0') AS "id";""")
+    sqlQueryFeeder.apply().next()("id").toString
   }
 }
