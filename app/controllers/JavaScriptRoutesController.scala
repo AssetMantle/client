@@ -76,8 +76,58 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.SendFiatController.blockchainSendFiatForm,
         routes.javascript.SetACLController.blockchainSetACLForm,
         routes.javascript.SetBuyerFeedbackController.blockchainSetBuyerFeedbackForm,
-        routes.javascript.SetSellerFeedbackController.blockchainSetSellerFeedbackForm
+        routes.javascript.SetSellerFeedbackController.blockchainSetSellerFeedbackForm,
 
+        routes.javascript.FileController.checkAccountKycFileExists,
+        routes.javascript.FileController.checkZoneKycFileExists,
+        routes.javascript.FileController.checkOrganizationKycFileExists,
+
+        routes.javascript.FileController.uploadAccountFileForm,
+        routes.javascript.FileController.uploadAccountFile,
+        routes.javascript.FileController.storeAccountFile,
+        routes.javascript.FileController.updateAccountFileForm,
+        routes.javascript.FileController.updateAccountFile,
+
+        routes.javascript.FileController.uploadUserKycForm,
+        routes.javascript.FileController.uploadUserKYC,
+        routes.javascript.FileController.storeUserKYC,
+        routes.javascript.FileController.updateUserKycForm,
+        routes.javascript.FileController.updateUserKYC,
+
+        routes.javascript.FileController.uploadUserZoneKycForm,
+        routes.javascript.FileController.uploadUserZoneKyc,
+        routes.javascript.FileController.storeUserZoneKyc,
+        routes.javascript.FileController.updateUserZoneKycForm,
+        routes.javascript.FileController.updateUserZoneKyc,
+
+        routes.javascript.FileController.uploadUserOrganizationKycForm,
+        routes.javascript.FileController.uploadUserOrganizationKyc,
+        routes.javascript.FileController.storeUserOrganizationKyc,
+        routes.javascript.FileController.updateUserOrganizationKycForm,
+        routes.javascript.FileController.updateUserOrganizationKyc,
+
+        routes.javascript.FileController.uploadZoneKycForm,
+        routes.javascript.FileController.uploadZoneKYC,
+        routes.javascript.FileController.storeZoneKYC,
+        routes.javascript.FileController.updateZoneKycForm,
+        routes.javascript.FileController.updateZoneKYC,
+
+        routes.javascript.FileController.uploadOrganizationKycForm,
+        routes.javascript.FileController.uploadOrganizationKYC,
+        routes.javascript.FileController.storeOrganizationKYC,
+        routes.javascript.FileController.updateOrganizationKycForm,
+        routes.javascript.FileController.updateOrganizationKYC,
+
+        routes.javascript.FileController.genesisAccessedFile,
+        routes.javascript.FileController.zoneAccessedFile,
+        routes.javascript.FileController.file,
+
+        routes.javascript.AddZoneController.viewKycDocuments,
+        routes.javascript.AddZoneController.verifyKycDocument,
+        routes.javascript.AddZoneController.rejectKycDocument,
+        routes.javascript.AddOrganizationController.viewKycDocuments,
+        routes.javascript.AddOrganizationController.verifyKycDocument,
+        routes.javascript.AddOrganizationController.rejectKycDocument,
       )
     ).as("text/javascript")
   }

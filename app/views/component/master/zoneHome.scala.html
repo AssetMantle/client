@@ -1,12 +1,12 @@
 @import models.master.Zone
 
-@(username: String, address: String, coins: Int = 0, zone: Zone)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
+@(username: String, address: String, coins: Int = 0, zone: Zone, profilePicture: Array[Byte])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
 
 @common(Messages(constants.User.HOME))(Html(""))(center)(Html(""))
 
     @center = {
     <div class="flexContainer">
-        @component.master.commonHome(username = username, userType = constants.User.ZONE, address = address, coins = coins)
+        @component.master.commonHome(username = username, userType = constants.User.ZONE, address = address, coins = coins, profilePicture = profilePicture)
         <div class="flexItem box leftAlign flexGrowth">
             <h2 class="showHide showHideStyle centerText">@Messages(constants.Form.ZONE):</h2>
             @Messages(constants.Form.NAME): @zone.name
@@ -27,5 +27,7 @@
         <button onclick="getForm(jsRoutes.controllers.ReleaseAssetController.releaseAssetForm())">@Messages(constants.Form.RELEASE_ASSET)</button>
         <button onclick="getForm(jsRoutes.controllers.SellerExecuteOrderController.sellerExecuteOrderForm())">@Messages(constants.Form.SELLER_EXECUTE_ORDER)</button>
         <button onclick="getForm(jsRoutes.controllers.SetACLController.setACLForm())">@Messages(constants.Form.SET_ACL)</button>
+        <button onclick="getForm(jsRoutes.controllers.FileController.updateZoneKycForm('@constants.File.BANK_DETAILS'))">@Messages(constants.Form.UPDATE_ZONE_BANK_DETAILS)</button>
+        <button onclick="getForm(jsRoutes.controllers.FileController.updateZoneKycForm('@constants.File.IDENTIFICATION'))">@Messages(constants.Form.UPDATE_ZONE_IDENTIFICATION)</button>
     </div>
 }

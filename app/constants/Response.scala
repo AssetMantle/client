@@ -17,6 +17,9 @@ object Response {
   val KEY_NEGOTIATION_ID = "negotiation_id"
   val KEY_ORDER_ID = "order_id"
   val KEY_EXECUTED = "executed"
+  val NULL_POINTER_EXCEPTION = new Failure("NULL_POINTER_EXCEPTION")
+  val GENERIC_EXCEPTION = new Failure("GENERIC_EXCEPTION")
+  val I_O_EXCEPTION = new Failure("I_O_EXCEPTION")
 
   //Success- for telling if something is done and the further steps opened up because of it
   val SUCCESS = new Success("SUCCESS")
@@ -58,6 +61,9 @@ object Response {
   val ZONE_ADDED = new Success("ZONE_ADDED")
   val ZONE_REQUEST_SENT = new Success("ZONE_REQUEST_SENT")
   val VERIFY_ORGANIZATION_REQUEST_REJECTED = new Success("VERIFY_ORGANIZATION_REQUEST_REJECTED")
+  val FILE_UPLOAD_SUCCESSFUL = new Success("FILE_UPLOAD_SUCCESSFUL")
+  val FILE_UPDATE_SUCCESSFUL = new Success("FILE_UPDATE_SUCCESSFUL")
+  val DOCUMENT_APPROVED = new Success("DOCUMENT_APPROVED")
 
   //Warning- for telling that something important is not done and ask to do it
   val VERIFY_MOBILE_NUMBER = new Warning("VERIFY_MOBILE_NUMBER", routes.javascript.VerifyMobileNumberController.verifyMobileNumberForm)
@@ -67,6 +73,7 @@ object Response {
   //Failure- for telling that something failed
   val FAILURE = new Failure("FAILURE")
   val NO_SUCH_ELEMENT_EXCEPTION = new Failure("NO_SUCH_ELEMENT_EXCEPTION")
+  val NO_SUCH_FILE_EXCEPTION = new Failure("NO_SUCH_FILE_EXCEPTION")
   val PSQL_EXCEPTION = new Failure("PSQL_EXCEPTION")
   val INVALID_OTP = new Failure("INVALID_OTP")
   val EMAIL_ADDRESS_NOT_FOUND = new Failure("EMAIL_ADDRESS_NOT_FOUND")
@@ -84,6 +91,7 @@ object Response {
   val TOKEN_TIMEOUT = new Failure("TOKEN_TIMEOUT")
   val INVALID_TOKEN = new Failure("INVALID_TOKEN")
   val UNAUTHORIZED = new Failure("UNAUTHORIZED")
+  val DOCUMENT_REJECTED = new Failure("DOCUMENT_REJECTED")
 
 
   class Failure(private val response: String, private val actionController: JavaScriptReverseRoute = null) {

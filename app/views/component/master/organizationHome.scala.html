@@ -1,11 +1,11 @@
 @import models.master.Organization
 
-@(username: String, address: String, coins: Int = 0, organization: Organization)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
+@(username: String, address: String, coins: Int = 0, organization: Organization, profilePicture: Array[Byte])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
 
 @common(Messages(constants.User.HOME))(Html(""))(center)(Html(""))
 @center = {
     <div class="flexContainer">
-        @component.master.commonHome(username = username, userType = constants.User.ORGANIZATION, address = address, coins = coins)
+        @component.master.commonHome(username = username, userType = constants.User.ORGANIZATION, address = address, coins = coins, profilePicture = profilePicture)
         <div class="flexItem box leftAlign">
             <h2 class="showHide showHideStyle centerText">@Messages(constants.Form.ORGANIZATION)</h2>
             <div></div>
@@ -18,5 +18,9 @@
                 @Messages(constants.Form.EMAIL): @organization.email <br>
                 @Messages(constants.Form.VERIFIED_STATUS): @organization.status <br> </div>
         </div>
+    </div>
+    <div class="centerText">
+        <button onclick="getForm(jsRoutes.controllers.FileController.updateOrganizationKycForm('@constants.File.BANK_DETAILS'))">@Messages(constants.Form.UPDATE_ORGANIZATION_BANK_DETAILS)</button>
+        <button onclick="getForm(jsRoutes.controllers.FileController.updateOrganizationKycForm('@constants.File.IDENTIFICATION'))">@Messages(constants.Form.UPDATE_ORGANIZATION_IDENTIFICATION)</button>
     </div>
 }
