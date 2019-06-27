@@ -15,6 +15,12 @@ GET         /master/queryConfigurationVariable:query        controllers.Configur
 
 GET         /master/checkUsernameAvailable                  controllers.SignUpController.checkUsernameAvailable(username: String)
 
+GET         /master/component/commonHome                    controllers.JavaScriptResourceController.commonHome(username: String)
+GET         /master/component/assetPegWallet                controllers.JavaScriptResourceController.assetPegWallet(username: String)
+GET         /master/component/fiatPegWallet                 controllers.JavaScriptResourceController.fiatPegWallet(username: String)
+GET         /master/component/negotiation                   controllers.JavaScriptResourceController.negotiation(username: String)
+GET         /master/component/order                         controllers.JavaScriptResourceController.order(username: String)
+
 GET         /master/login                                   controllers.LoginController.loginForm
 POST        /master/login                                   controllers.LoginController.login
 
@@ -44,35 +50,35 @@ POST        /master/verifyZone                              controllers.AddZoneC
 
 GET         /master/viewVerifyZoneRequests                  controllers.AddZoneController.viewPendingVerifyZoneRequests
 GET         /master/rejectVerifyZoneRequest                 controllers.AddZoneController.rejectVerifyZoneRequestForm(zoneID: String)
-POST        /master/rejectVerifyZoneRequest                controllers.AddZoneController.rejectVerifyZoneRequest
+POST        /master/rejectVerifyZoneRequest                 controllers.AddZoneController.rejectVerifyZoneRequest
 
-GET         /master/verifyOrganization                     controllers.AddOrganizationController.verifyOrganizationForm(organizationID: String, zoneID: String)
-POST        /master/verifyOrganization                     controllers.AddOrganizationController.verifyOrganization
+GET         /master/verifyOrganization                      controllers.AddOrganizationController.verifyOrganizationForm(organizationID: String, zoneID: String)
+POST        /master/verifyOrganization                      controllers.AddOrganizationController.verifyOrganization
 
-GET         /master/viewVerifyOrganizationRequests         controllers.AddOrganizationController.viewPendingVerifyOrganizationRequests
-GET         /master/rejectVerifyOrganizationRequest        controllers.AddOrganizationController.rejectVerifyOrganizationRequestForm(organizationID: String)
-POST        /master/rejectVerifyOrganizationRequest        controllers.AddOrganizationController.rejectVerifyOrganizationRequest
+GET         /master/viewVerifyOrganizationRequests          controllers.AddOrganizationController.viewPendingVerifyOrganizationRequests
+GET         /master/rejectVerifyOrganizationRequest         controllers.AddOrganizationController.rejectVerifyOrganizationRequestForm(organizationID: String)
+POST        /master/rejectVerifyOrganizationRequest         controllers.AddOrganizationController.rejectVerifyOrganizationRequest
 
-GET         /master/buyerExecuteOrder                      controllers.BuyerExecuteOrderController.buyerExecuteOrderForm
-POST        /master/buyerExecuteOrder                      controllers.BuyerExecuteOrderController.buyerExecuteOrder
+GET         /master/buyerExecuteOrder                       controllers.BuyerExecuteOrderController.buyerExecuteOrderForm
+POST        /master/buyerExecuteOrder                       controllers.BuyerExecuteOrderController.buyerExecuteOrder
 
-GET         /master/unmoderatedBuyerExecuteOrder           controllers.BuyerExecuteOrderController.unmoderatedBuyerExecuteOrderForm
-POST        /master/unmoderatedBuyerExecuteOrder           controllers.BuyerExecuteOrderController.unmoderatedBuyerExecuteOrder
+GET         /master/unmoderatedBuyerExecuteOrder            controllers.BuyerExecuteOrderController.unmoderatedBuyerExecuteOrderForm
+POST        /master/unmoderatedBuyerExecuteOrder            controllers.BuyerExecuteOrderController.unmoderatedBuyerExecuteOrder
 
-GET         /master/changeBuyerBid                         controllers.ChangeBuyerBidController.changeBuyerBidForm
-POST        /master/changeBuyerBid                         controllers.ChangeBuyerBidController.changeBuyerBid
+GET         /master/changeBuyerBid                          controllers.ChangeBuyerBidController.changeBuyerBidForm
+POST        /master/changeBuyerBid                          controllers.ChangeBuyerBidController.changeBuyerBid
 
-GET         /master/changeSellerBid                        controllers.ChangeSellerBidController.changeSellerBidForm
-POST        /master/changeSellerBid                        controllers.ChangeSellerBidController.changeSellerBid
+GET         /master/changeSellerBid                         controllers.ChangeSellerBidController.changeSellerBidForm
+POST        /master/changeSellerBid                         controllers.ChangeSellerBidController.changeSellerBid
 
-GET         /master/confirmBuyerBid                        controllers.ConfirmBuyerBidController.confirmBuyerBidForm
-POST        /master/confirmBuyerBid                        controllers.ConfirmBuyerBidController.confirmBuyerBid
+GET         /master/confirmBuyerBid                         controllers.ConfirmBuyerBidController.confirmBuyerBidForm
+POST        /master/confirmBuyerBid                         controllers.ConfirmBuyerBidController.confirmBuyerBid
 
-GET         /master/confirmSellerBid                       controllers.ConfirmSellerBidController.confirmSellerBidForm
-POST        /master/confirmSellerBid                       controllers.ConfirmSellerBidController.confirmSellerBid
+GET         /master/confirmSellerBid                        controllers.ConfirmSellerBidController.confirmSellerBidForm
+POST        /master/confirmSellerBid                        controllers.ConfirmSellerBidController.confirmSellerBid
 
-GET         /master/issueAssetRequest                      controllers.IssueAssetController.issueAssetRequestForm
-POST        /master/issueAssetRequest                      controllers.IssueAssetController.issueAssetRequest
+GET         /master/issueAssetRequest                       controllers.IssueAssetController.issueAssetRequestForm
+POST        /master/issueAssetRequest                       controllers.IssueAssetController.issueAssetRequest
 
 GET         /master/viewPendingIssueAssetRequests           controllers.IssueAssetController.viewPendingIssueAssetRequests
 GET         /master/rejectIssueAssetRequest                 controllers.IssueAssetController.rejectIssueAssetRequestForm(requestID: String)
@@ -88,38 +94,38 @@ GET         /master/viewPendingIssueFiatRequests            controllers.IssueFia
 GET         /master/rejectIssueFiatRequest                  controllers.IssueFiatController.rejectIssueFiatRequestForm(requestID: String)
 POST        /master/rejectIssueFiatRequest                  controllers.IssueFiatController.rejectIssueFiatRequest
 
-GET         /master/issueFiat                              controllers.IssueFiatController.issueFiatForm(requestID: String, accountID: String, transactionID: String, transactionAmount: Int)
-POST        /master/issueFiat                              controllers.IssueFiatController.issueFiat
+GET         /master/issueFiat                               controllers.IssueFiatController.issueFiatForm(requestID: String, accountID: String, transactionID: String, transactionAmount: Int)
+POST        /master/issueFiat                               controllers.IssueFiatController.issueFiat
 
-GET         /master/redeemAsset                            controllers.RedeemAssetController.redeemAssetForm
-POST        /master/redeemAsset                            controllers.RedeemAssetController.redeemAsset
+GET         /master/redeemAsset                             controllers.RedeemAssetController.redeemAssetForm
+POST        /master/redeemAsset                             controllers.RedeemAssetController.redeemAsset
 
-GET         /master/redeemFiat                             controllers.RedeemFiatController.redeemFiatForm
-POST        /master/redeemFiat                             controllers.RedeemFiatController.redeemFiat
+GET         /master/redeemFiat                              controllers.RedeemFiatController.redeemFiatForm
+POST        /master/redeemFiat                              controllers.RedeemFiatController.redeemFiat
 
-GET         /master/releaseAsset                           controllers.ReleaseAssetController.releaseAssetForm
-POST        /master/releaseAsset                           controllers.ReleaseAssetController.releaseAsset
+GET         /master/releaseAsset                            controllers.ReleaseAssetController.releaseAssetForm
+POST        /master/releaseAsset                            controllers.ReleaseAssetController.releaseAsset
 
-GET         /master/sellerExecuteOrder                     controllers.SellerExecuteOrderController.sellerExecuteOrderForm
-POST        /master/sellerExecuteOrder                     controllers.SellerExecuteOrderController.sellerExecuteOrder
+GET         /master/sellerExecuteOrder                      controllers.SellerExecuteOrderController.sellerExecuteOrderForm
+POST        /master/sellerExecuteOrder                      controllers.SellerExecuteOrderController.sellerExecuteOrder
 
-GET         /master/unmoderatedSellerExecuteOrder          controllers.SellerExecuteOrderController.unmoderatedSellerExecuteOrderForm
-POST        /master/unmoderatedSellerExecuteOrder          controllers.SellerExecuteOrderController.unmoderatedSellerExecuteOrder
+GET         /master/unmoderatedSellerExecuteOrder           controllers.SellerExecuteOrderController.unmoderatedSellerExecuteOrderForm
+POST        /master/unmoderatedSellerExecuteOrder           controllers.SellerExecuteOrderController.unmoderatedSellerExecuteOrder
 
-GET         /master/sendAsset                              controllers.SendAssetController.sendAssetForm
-POST        /master/sendAsset                              controllers.SendAssetController.sendAsset
+GET         /master/sendAsset                               controllers.SendAssetController.sendAssetForm
+POST        /master/sendAsset                               controllers.SendAssetController.sendAsset
 
-GET         /master/sendCoin                               controllers.SendCoinController.sendCoinForm
-POST        /master/sendCoin                               controllers.SendCoinController.sendCoin
+GET         /master/sendCoin                                controllers.SendCoinController.sendCoinForm
+POST        /master/sendCoin                                controllers.SendCoinController.sendCoin
 
-GET         /master/requestCoins                           controllers.SendCoinController.requestCoinsForm
-POST        /master/requestCoins                           controllers.SendCoinController.requestCoins
+GET         /master/requestCoins                            controllers.SendCoinController.requestCoinsForm
+POST        /master/requestCoins                            controllers.SendCoinController.requestCoins
 
-GET         /master/viewPendingFaucetRequests              controllers.SendCoinController.viewPendingFaucetRequests
-GET         /master/approveFaucetRequests                  controllers.SendCoinController.approveFaucetRequestsForm(requestID: String, accountID: String)
-POST        /master/approveFaucetRequests                  controllers.SendCoinController.approveFaucetRequests
+GET         /master/viewPendingFaucetRequests               controllers.SendCoinController.viewPendingFaucetRequests
+GET         /master/approveFaucetRequests                   controllers.SendCoinController.approveFaucetRequestsForm(requestID: String, accountID: String)
+POST        /master/approveFaucetRequests                   controllers.SendCoinController.approveFaucetRequests
 
-GET         /master/rejectFaucetRequest                    controllers.SendCoinController.rejectFaucetRequestForm(requestID: String)
+GET         /master/rejectFaucetRequest                     controllers.SendCoinController.rejectFaucetRequestForm(requestID: String)
 POST        /master/rejectFaucetRequest                     controllers.SendCoinController.rejectFaucetRequest
 
 GET         /master/sendFiat                                controllers.SendFiatController.sendFiatForm

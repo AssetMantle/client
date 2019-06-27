@@ -1,13 +1,12 @@
 @(username: String, userType: String, address: String, coins: Int = 0)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
 
-<link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/class.css")">
-<link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/tag.css")">
-
 <div class="box flexItem leftAlign flexGrowth">
+    <div>
     <h2 class="showHide showHideStyle centerText">@username</h2>
     <div class="centerText">
         @Messages(constants.User.COINS): @coins
     <button onclick="getForm(jsRoutes.controllers.SendCoinController.sendCoinForm())">@Messages(constants.Form.SEND_COIN)</button>
+    </div>
     </div>
     <div>
         @Messages(constants.User.USER_TYPE): @userType <br/>

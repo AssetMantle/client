@@ -2,7 +2,7 @@
 @import models.master.{Organization, Zone}
 @import utilities.LoginState
 
-@(username: String, address: String, coins: Int = 0, assetPegWallet: Seq[Asset], fiatPegWallet: Seq[Fiat], totalFiat: Int, zone: Zone, organization: Organization, orders: Seq[Order], negotiations: Seq[Negotiation], aclHash: ACLHash)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+@(username: String, totalFiat: Int, zone: Zone, organization: Organization, aclHash: ACLHash)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
 @common(Messages(constants.User.HOME))(Html(""))(center)(right)
 
@@ -55,7 +55,7 @@
 
     @center = {
     <div class="flexContainer">
-        @component.master.commonHome(username = username, userType = constants.User.TRADER, address = address, coins = coins)
+@*        @component.master.commonHome(username = username, userType = constants.User.TRADER, address = address, coins = coins)*@
         <div class="flexGrowth flexItem box leftAlign">
             <h2 class="showHide showHideStyle centerText">@Messages(constants.Form.ZONE):</h2>
             <div></div>
@@ -89,7 +89,7 @@
             }
             </div>
             <div class="flexContainer">
-            @component.master.assetList(assetPegWallet, aclHash)
+            @*@component.master.assetList(assetPegWallet, aclHash)*@
             </div>
         </div>
 
@@ -107,19 +107,19 @@
                 }
             </div>
             <div class="flexContainer">
-            @component.master.fiatList(fiatPegWallet, aclHash)
+            @*@component.master.fiatList(fiatPegWallet, aclHash)*@
             </div>
         </div>
         <div class="flexGrowth flexItem box leftAlign">
             <h2 class="showHide showHideStyle centerText">@Messages(constants.Form.ON_GOING_NEGOTIATIONS)</h2>
             <div class="centerText"></div>
-            <div class ="flexContainer">@component.master.negotiationList(negotiations)</div>
+           @* <div class ="flexContainer">@component.master.negotiationList(negotiations)</div>*@
 
         </div>
         <div class="flexGrowth flexItem box leftAlign">
             <h2 class="showHide showHideStyle centerText">@Messages(constants.Form.ON_GOING_ORDERS)</h2>
             <div class="centerText"></div>
-            <div class="flexContainer">@component.master.orderList(orders)</div>
+            @*<div class="flexContainer">@component.master.orderList(orders)</div>*@
         </div>
     </div>
 }
