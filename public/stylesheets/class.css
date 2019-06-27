@@ -225,6 +225,14 @@ blur(5 px);
     width:20%;
     margin-left: 1vw;
 }
+.width70Percent{
+    width: 70%;
+    float: left;
+}
+.width30Percent{
+    width: 30%;
+    float: right;
+}
 
 @media only screen and (max-width: 1300px) {
     .first {
@@ -331,7 +339,22 @@ blur(5 px);
 /*    display: none;*/
 /*}*/
 
-/*ToolTip- INPUT BOX SPECIFIC*/
+/* Progress Bar*/
+
+.progressContainer {
+    width: 100%;
+    background-color: #ddd;
+}
+
+.progressBar {
+    width: 0;
+    height: 1em;
+    background-color: #5eaf50;
+}
+
+/* Progress Bar*/
+
+/*ToolTip*/
 dl {
     position: relative;
 }
@@ -362,6 +385,67 @@ dl .info::after {
 dl:hover .info {
     visibility: visible;
 }
+/*ToolTip*/
+
+/*upload file css*/
+.uploadBar {
+    display: flex;
+    justify-content: space-around;
+    min-width: 200px;
+    width: 30%;
+    height: 50px;
+    margin: auto;
+}
+
+.uploadBar img {
+    height: 32px;
+}
+
+.uploadProgress {
+    display: flex;
+    flex-direction: column;
+    min-width: 200px;
+    width: 30%;
+    margin-top: 20px !important;
+    margin: auto;
+}
+
+.uploadProgressOuter {
+    background-color: #20201F;
+    border-radius: 20px;
+    padding: 4px;
+}
+
+.uploadProgressOuter > div {
+    text-align: center;
+    background-color: #2196F3;
+    height: 16px;
+    border-radius: 10px;
+}
+
+.browseButton {
+    background-color: white;
+    color: white;
+    border: none;
+    padding: 0px;
+    margin: 0px;
+    height: 32px;
+    width: 32px;
+    margin-right: 10px;
+    cursor: pointer;
+}
+/*upload file css*/
+
+/*approve and reject color*/
+.approve {
+    background-color: #4CAF50;
+}
+
+.reject {
+    background-color: #f44336;
+}
+
+/*approve and reject color*/
 /*ToolTip INPUT BOX SPECIFIC*/
 
 /* color */
