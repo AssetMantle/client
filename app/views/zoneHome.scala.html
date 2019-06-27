@@ -1,16 +1,15 @@
 @import models.master.Zone
-
 @import utilities.LoginState
-@(username: String, address: String, coins: Int = 0, zone: Zone, profilePicture: Array[Byte])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration,loginState:LoginState=null)
+@(username: String, zone: Zone)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
 @common(Messages(constants.User.HOME))(Html(""))(center)(Html(""))
 
 @center = {
     <div class="flexContainer">
-        @component.master.commonHome(username = username, userType = constants.User.ZONE, address = address, coins = coins, profilePicture = profilePicture)
+        <div id="commonHome" class="box flexItem flexGrowth"></div>
         <div class="flexItem box leftAlign flexGrowth">
             <div>
-                <h2 class="showHide showHideStyle centerText">@Messages(constants.Form.ZONE):</h2>
+                <h2 class="showHide toggleElement centerText">@Messages(constants.Form.ZONE):</h2>
                 @Messages(constants.Form.NAME): @zone.name
             </div>
             <div>
@@ -32,4 +31,7 @@
         <button onclick="getForm(jsRoutes.controllers.FileController.updateZoneKycForm('@constants.File.BANK_DETAILS'))">@Messages(constants.Form.UPDATE_ZONE_BANK_DETAILS)</button>
         <button onclick="getForm(jsRoutes.controllers.FileController.updateZoneKycForm('@constants.File.IDENTIFICATION'))">@Messages(constants.Form.UPDATE_ZONE_IDENTIFICATION)</button>
     </div>
+    <script>
+            componentResource('commonHome', jsRoutes.controllers.JavaScriptResourceController.commonHome('@username'))
+    </script>
 }

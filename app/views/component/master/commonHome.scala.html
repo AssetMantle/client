@@ -1,6 +1,5 @@
 @(username: String, userType: String, address: String, coins: Int = 0, profilePicture: Array[Byte])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
 
-<div class="box flexItem flexGrowth">
 
     <div class="width70Percent">
         <div>
@@ -20,5 +19,4 @@
         <button id="profilePictureBottomUploadButton" class="bottom" onclick="getForm(jsRoutes.controllers.FileController.uploadAccountFileForm('@constants.File.PROFILE_PICTURE'))">@Messages(constants.Form.UPLOAD)</button>
         <button id="profilePictureBottomUploadButton" class="bottom" onclick="getForm(jsRoutes.controllers.FileController.updateAccountFileForm('@constants.File.PROFILE_PICTURE'))">@Messages(constants.Form.UPDATE)</button>
     </div>
-</div>
 <script src="@routes.Assets.versioned("javascripts/viewFiles.js")" type="text/javascript"></script>

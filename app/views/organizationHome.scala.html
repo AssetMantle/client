@@ -1,12 +1,12 @@
 @import models.master.Organization
 @import utilities.LoginState
 
-@(username: String, address: String, coins: Int = 0, organization: Organization, profilePicture: Array[Byte])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+@(username: String, organization: Organization)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
 @common(Messages(constants.User.HOME))(Html(""))(center)(Html(""))
 @center = {
     <div class="flexContainer">
-        @component.master.commonHome(username = username, userType = constants.User.ORGANIZATION, address = address, coins = coins, profilePicture = profilePicture)
+        <div id="commonHome" class="box flexItem flexGrowth"></div>
         <div class="flexItem box leftText">
             <div>
                 <h2 class="showHide toggleElement centerText">@Messages(constants.Form.ORGANIZATION)</h2>
@@ -26,4 +26,7 @@
         <button onclick="getForm(jsRoutes.controllers.FileController.updateOrganizationKycForm('@constants.File.BANK_DETAILS'))">@Messages(constants.Form.UPDATE_ORGANIZATION_BANK_DETAILS)</button>
         <button onclick="getForm(jsRoutes.controllers.FileController.updateOrganizationKycForm('@constants.File.IDENTIFICATION'))">@Messages(constants.Form.UPDATE_ORGANIZATION_IDENTIFICATION)</button>
     </div>
+    <script>
+            componentResource('commonHome', jsRoutes.controllers.JavaScriptResourceController.commonHome('@username'))
+    </script>
 }

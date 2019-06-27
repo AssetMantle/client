@@ -2,7 +2,7 @@
 @import models.master.{Organization, Zone}
 @import utilities.LoginState
 
-@(username: String, address: String, coins: Int = 0, assetPegWallet: Seq[Asset], fiatPegWallet: Seq[Fiat], totalFiat: Int, zone: Zone, organization: Organization, orders: Seq[Order], negotiations: Seq[Negotiation], aclHash: ACLHash, profilePicture: Array[Byte])( implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+@(username: String, totalFiat: Int, zone: Zone, organization: Organization, aclHash: ACLHash)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
 @common(Messages(constants.User.HOME))(Html(""))(center)(right)
 
@@ -53,11 +53,11 @@
     <a onclick="getForm(jsRoutes.controllers.SetSellerFeedbackController.setSellerFeedbackForm())">@Messages(constants.Form.SET_SELLER_FEEDBACK)</a>
     <br>
 
-}
+    }
 
 @center = {
     <div class="flexContainer">
-        @component.master.commonHome(username = username, userType = constants.User.TRADER, address = address, coins = coins, profilePicture = profilePicture)
+        <div id="commonHome" class="box flexItem flexGrowth"></div>
         <div class="flexGrowth flexItem box leftText">
             <div>
                 <h2 class="showHide toggleElement centerText">@Messages(constants.Form.ZONE):</h2>
@@ -94,8 +94,7 @@
                 }
                 </div>
             </div>
-            <div class="flexContainer">
-            @component.master.assetList(assetPegWallet, aclHash)
+            <div id="assetList" class="flexContainer">
             </div>
         </div>
 
@@ -114,8 +113,7 @@
                     }
                 </div>
             </div>
-            <div class="flexContainer">
-            @component.master.fiatList(fiatPegWallet, aclHash)
+            <div id="fiatList" class="flexContainer">
             </div>
         </div>
 
@@ -123,14 +121,29 @@
             <div>
                 <h2 class="showHide toggleElement centerText">@Messages(constants.Form.ON_GOING_NEGOTIATIONS)</h2>
             </div>
-            <div class ="flexContainer">@component.master.negotiationList(negotiations)</div>
+            <div id="negotiationList" class ="flexContainer"></div>
 
         </div>
         <div class="flexGrowth flexItem box leftText">
             <div>
                 <h2 class="showHide toggleElement centerText">@Messages(constants.Form.ON_GOING_ORDERS)</h2>
             </div>
-            <div class="flexContainer">@component.master.orderList(orders)</div>
+            <div id="orderList" class="flexContainer"></div>
         </div>
     </div>
+    <script>
+            componentResource('commonHome', jsRoutes.controllers.JavaScriptResourceController.commonHome('@username'))
+    </script>
+    <script>
+            componentResource('assetList', jsRoutes.controllers.JavaScriptResourceController.commonHome('@username'))
+    </script>
+    <script>
+            componentResource('fiatList', jsRoutes.controllers.JavaScriptResourceController.commonHome('@username'))
+    </script>
+    <script>
+            componentResource('negotiationList', jsRoutes.controllers.JavaScriptResourceController.commonHome('@username'))
+    </script>
+    <script>
+            componentResource('orderList', jsRoutes.controllers.JavaScriptResourceController.commonHome('@username'))
+    </script>
 }

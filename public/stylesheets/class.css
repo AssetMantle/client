@@ -109,7 +109,7 @@ body {
 }
 
 .blur {
-blur(5 px);
+filter: blur(5 px);
 }
 
 /*Alert*/
