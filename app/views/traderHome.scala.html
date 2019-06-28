@@ -132,18 +132,10 @@
         </div>
     </div>
     <script>
-            componentResource('commonHome', jsRoutes.controllers.JavaScriptResourceController.commonHome('@username'))
-    </script>
-    <script>
-            componentResource('assetList', jsRoutes.controllers.JavaScriptResourceController.commonHome('@username'))
-    </script>
-    <script>
-            componentResource('fiatList', jsRoutes.controllers.JavaScriptResourceController.commonHome('@username'))
-    </script>
-    <script>
-            componentResource('negotiationList', jsRoutes.controllers.JavaScriptResourceController.commonHome('@username'))
-    </script>
-    <script>
-            componentResource('orderList', jsRoutes.controllers.JavaScriptResourceController.commonHome('@username'))
+            componentResource('commonHome', jsRoutes.controllers.JavaScriptResourceController.commonHome('@username'));
+            componentResource('assetList', jsRoutes.controllers.JavaScriptResourceController.assetPegWallet('@username'));
+            componentResource('fiatList', jsRoutes.controllers.JavaScriptResourceController.fiatPegWallet('@username'));
+            componentResource('negotiationList', jsRoutes.controllers.JavaScriptResourceController.negotiation('@username'));
+            componentResource('orderList', jsRoutes.controllers.JavaScriptResourceController.order('@username'))
     </script>
 }
