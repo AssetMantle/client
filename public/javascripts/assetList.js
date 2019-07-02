@@ -1,9 +1,7 @@
 function displayAssets(assetPegWallet, pegHash, documentHash, assetType, assetQuantity, assetPrice, quantityUnit, unmoderated, locked, redeemAsset, sendAsset, redeemAssetMessage, sendAssetMessage) {
     let content = '';
-    let gta = "gta";
-    let tga = "tga";
     assetPegWallet.forEach(function (asset, index) {
-        content += `<div class='flexItem box assetBackgroundColor'><div class='leftAlign'>
+        content += `<span class='flexItem box assetBackgroundColor'><span class='leftAlign'>
                             ` + pegHash + ":" + asset.pegHash + `<br>
                             ` + documentHash + ":" + asset.documentHash + `<br>
                             ` + assetType + ":" + asset.assetType + `<br>
@@ -12,13 +10,13 @@ function displayAssets(assetPegWallet, pegHash, documentHash, assetType, assetQu
                             ` + quantityUnit + ":" + asset.quantityUnit + `<br>
                             ` + unmoderated + ":" + asset.unmoderated + `<br>
                             ` + locked + ":" + asset.locked + `<br>
-                            </div>`;
+                            </span>`;
 
         if(redeemAsset) {
-           content += "<div class='centerText'><button class='width' onclick='getForm(jsRoutes.controllers.RedeemAssetController.redeemAssetForm())'>" + redeemAssetMessage + "</button><br>"
+           content += "<span class='centerText'><button class='width' onclick='getForm(jsRoutes.controllers.RedeemAssetController.redeemAssetForm())'>" + redeemAssetMessage + "</button><br>"
         }
         if(sendAsset) {
-            content += "<button class='width' onclick='getForm(jsRoutes.controllers.SendAssetController.sendAssetForm())'>" + sendAssetMessage + "</button> </div> </div>"
+            content += "<button class='width' onclick='getForm(jsRoutes.controllers.SendAssetController.sendAssetForm())'>" + sendAssetMessage + "</button> </span> </span>"
         }
     });
     return content;

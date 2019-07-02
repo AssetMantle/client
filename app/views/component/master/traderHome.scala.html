@@ -5,54 +5,56 @@
 
 @common(Messages(constants.User.HOME))(Html(""))(center)(right)
 
-    @right = {
+@right = {
 
-    @if(aclHash.buyerExecuteOrder) {
-        <a onclick="getForm(jsRoutes.controllers.BuyerExecuteOrderController.unmoderatedBuyerExecuteOrderForm())">@Messages(constants.Form.UNMODERATED_BUYER_EXECUTE_ORDER)</a>
-    } <br>
-    @if(aclHash.changeBuyerBid) {
-        <a onclick="getForm(jsRoutes.controllers.ChangeBuyerBidController.changeBuyerBidForm())">@Messages(constants.Form.CHANGE_BUYER_BID)</a>
-    } <br>
-    @if(aclHash.changeSellerBid) {
-        <a onclick="getForm(jsRoutes.controllers.ChangeSellerBidController.changeSellerBidForm())">@Messages(constants.Form.CHANGE_SELLER_BID)</a>
-    } <br>
-    @if(aclHash.confirmBuyerBid) {
-        <a onclick="getForm(jsRoutes.controllers.ConfirmBuyerBidController.confirmBuyerBidForm())">@Messages(constants.Form.CONFIRM_BUYER_BID)</a>
-    } <br>
-    @if(aclHash.confirmSellerBid) {
-        <a onclick="getForm(jsRoutes.controllers.ConfirmSellerBidController.confirmSellerBidForm())">@Messages(constants.Form.CONFIRM_SELLER_BID)</a>
-    } <br>
-    @if(aclHash.issueAsset) {
-        <a onclick="getForm(jsRoutes.controllers.IssueAssetController.issueAssetRequestForm())">@Messages(constants.Form.ISSUE_ASSET_REQUEST)</a>
-    } <br>
-    @if(aclHash.issueFiat) {
-        <a onclick="getForm(jsRoutes.controllers.IssueFiatController.issueFiatRequestForm())">@Messages(constants.Form.ISSUE_FIAT_REQUEST)</a>
-    } <br>
-    @if(aclHash.redeemAsset) {
-        <a onclick="getForm(jsRoutes.controllers.RedeemAssetController.redeemAssetForm())">@Messages(constants.Form.REDEEM_ASSET)</a>
-    } <br>
-    @if(aclHash.redeemFiat) {
-        <a onclick="getForm(jsRoutes.controllers.RedeemFiatController.redeemFiatForm())">@Messages(constants.Form.REDEEM_FIAT)</a>
-    } <br>
-    @if(aclHash.releaseAsset) {
-        <a onclick="getForm(jsRoutes.controllers.ReleaseAssetController.releaseAssetForm())">@Messages(constants.Form.RELEASE_ASSET)</a>
-    } <br>
-    @if(aclHash.sellerExecuteOrder) {
-        <a onclick="getForm(jsRoutes.controllers.SellerExecuteOrderController.unmoderatedSellerExecuteOrderForm())">@Messages(constants.Form.UNMODERATED_SELLER_EXECUTE_ORDER)</a>
-    } <br>
-    @if(aclHash.sendAsset) {
-        <a onclick="getForm(jsRoutes.controllers.SendAssetController.sendAssetForm())">@Messages(constants.Form.SEND_ASSET)</a>
-    } <br>
-    @if(aclHash.sendFiat) {
-        <a onclick="getForm(jsRoutes.controllers.SendFiatController.sendFiatForm())">@Messages(constants.Form.SEND_FIAT)</a>
-    } <br>
+@if(aclHash.buyerExecuteOrder) {
+    <a onclick="getForm(jsRoutes.controllers.BuyerExecuteOrderController.unmoderatedBuyerExecuteOrderForm())">@Messages(constants.Form.UNMODERATED_BUYER_EXECUTE_ORDER)</a>
+} <br>
+@if(aclHash.changeBuyerBid) {
+    <a onclick="getForm(jsRoutes.controllers.ChangeBuyerBidController.changeBuyerBidForm())">@Messages(constants.Form.CHANGE_BUYER_BID)</a>
+} <br>
+@if(aclHash.changeSellerBid) {
+    <a onclick="getForm(jsRoutes.controllers.ChangeSellerBidController.changeSellerBidForm())">@Messages(constants.Form.CHANGE_SELLER_BID)</a>
+} <br>
+@if(aclHash.confirmBuyerBid) {
+    <a onclick="getForm(jsRoutes.controllers.ConfirmBuyerBidController.confirmBuyerBidForm())">@Messages(constants.Form.CONFIRM_BUYER_BID)</a>
+} <br>
+@if(aclHash.confirmSellerBid) {
+    <a onclick="getForm(jsRoutes.controllers.ConfirmSellerBidController.confirmSellerBidForm())">@Messages(constants.Form.CONFIRM_SELLER_BID)</a>
+} <br>
+@if(aclHash.issueAsset) {
+    <a onclick="getForm(jsRoutes.controllers.IssueAssetController.issueAssetRequestForm())">@Messages(constants.Form.ISSUE_ASSET_REQUEST)</a>
+} <br>
+@if(aclHash.issueFiat) {
+    <a onclick="getForm(jsRoutes.controllers.IssueFiatController.issueFiatRequestForm())">@Messages(constants.Form.ISSUE_FIAT_REQUEST)</a>
+} <br>
+@if(aclHash.redeemAsset) {
+    <a onclick="getForm(jsRoutes.controllers.RedeemAssetController.redeemAssetForm())">@Messages(constants.Form.REDEEM_ASSET)</a>
+} <br>
+@if(aclHash.redeemFiat) {
+    <a onclick="getForm(jsRoutes.controllers.RedeemFiatController.redeemFiatForm())">@Messages(constants.Form.REDEEM_FIAT)</a>
+} <br>
+@if(aclHash.releaseAsset) {
+    <a onclick="getForm(jsRoutes.controllers.ReleaseAssetController.releaseAssetForm())">@Messages(constants.Form.RELEASE_ASSET)</a>
+} <br>
+@if(aclHash.sellerExecuteOrder) {
+    <a onclick="getForm(jsRoutes.controllers.SellerExecuteOrderController.unmoderatedSellerExecuteOrderForm())">@Messages(constants.Form.UNMODERATED_SELLER_EXECUTE_ORDER)</a>
+} <br>
+@if(aclHash.sendAsset) {
+    <a onclick="getForm(jsRoutes.controllers.SendAssetController.sendAssetForm())">@Messages(constants.Form.SEND_ASSET)</a>
+} <br>
+@if(aclHash.sendFiat) {
+    <a onclick="getForm(jsRoutes.controllers.SendFiatController.sendFiatForm())">@Messages(constants.Form.SEND_FIAT)</a>
+} <br>
 
-        <a onclick="getForm(jsRoutes.controllers.SetBuyerFeedbackController.setBuyerFeedbackForm())">@Messages(constants.Form.SET_BUYER_FEEDBACK)</a> <br>
-        <a onclick="getForm(jsRoutes.controllers.SetSellerFeedbackController.setSellerFeedbackForm())">@Messages(constants.Form.SET_SELLER_FEEDBACK)</a> <br>
+    <a onclick="getForm(jsRoutes.controllers.SetBuyerFeedbackController.setBuyerFeedbackForm())">@Messages(constants.Form.SET_BUYER_FEEDBACK)</a>
+    <br>
+    <a onclick="getForm(jsRoutes.controllers.SetSellerFeedbackController.setSellerFeedbackForm())">@Messages(constants.Form.SET_SELLER_FEEDBACK)</a>
+    <br>
 
-    }
+}
 
-    @center = {
+@center = {
     <div class="flexContainer">
         @component.master.commonHome(username = username, userType = constants.User.TRADER, address = address, coins = coins, profilePicture = profilePicture)
         <div class="flexGrowth flexItem box leftAlign">
@@ -88,17 +90,36 @@
             }
             </div>
             <script src="@routes.Assets.versioned("javascripts/assetList.js")" type="text/javascript"></script>
-        <div id="assetsList" class="flexContainer">
-@*            @component.master.assetList(assetPegWallet, aclHash)*@
+            <div id="assetsList" class="flexContainer"></div>
             <script type="text/javascript">
                     var assetCometMessage = function (event) {
                         console.log("Response Event:    " + event + ", Length:" + event.length);
+                        @*//$('#assetsList').html(displayAssets(event, '@Messages(constants.Form.PEG_HASH)', '@Messages(constants.Form.DOCUMENT_HASH)','@Messages(constants.Form.ASSET_TYPE)','@Messages(constants.Form.ASSET_QUANTITY)','@Messages(constants.Form.ASSET_PRICE)','@Messages(constants.Form.QUANTITY_UNIT)','@Messages(constants.Form.UNMODERATED)', '@Messages(constants.Form.LOCKED)','@aclHash.redeemAsset','@aclHash.sendAsset', '@Messages(constants.Form.REDEEM_ASSET)', '@Messages(constants.Form.SEND_ASSET)'))*@
+
                         let content = '';
-                            $('#assetsList').html(displayAssets(event, '@Messages(constants.Form.PEG_HASH)', '@Messages(constants.Form.DOCUMENT_HASH)','@Messages(constants.Form.ASSET_TYPE)','@Messages(constants.Form.ASSET_QUANTITY)','@Messages(constants.Form.ASSET_PRICE)','@Messages(constants.Form.QUANTITY_UNIT)','@Messages(constants.Form.UNMODERATED)', '@Messages(constants.Form.LOCKED)','@aclHash.redeemAsset','@aclHash.sendAsset', '@Messages(constants.Form.REDEEM_ASSET)', '@Messages(constants.Form.SEND_ASSET)'));
+                        event.forEach(function (asset, index) {
+                            content += `<div class='flexItem box assetBackgroundColor'><div class='leftAlign'>
+                            ` + '@Messages(constants.Form.PEG_HASH)' + ":" + asset.pegHash + `<br>
+                            ` + '@Messages(constants.Form.DOCUMENT_HASH)' + ":" + asset.documentHash + `<br>
+                            ` + '@Messages(constants.Form.ASSET_TYPE)' + ":" + asset.assetType + `<br>
+                            ` + '@Messages(constants.Form.ASSET_QUANTITY)' + ":" + asset.assetQuantity + `<br>
+                            ` + '@Messages(constants.Form.ASSET_PRICE)' + ":" + asset.assetPrice + `<br>
+                            ` + '@Messages(constants.Form.QUANTITY_UNIT)' + ":" + asset.quantityUnit + `<br>
+                            ` + '@Messages(constants.Form.UNMODERATED)' + ":" + asset.unmoderated + `<br>
+                            ` + '@Messages(constants.Form.LOCKED)' + ":" + asset.locked + `<br>
+                            </div>`;
+
+                            if ('@aclHash.redeemAsset') {
+                                content += "<div class='centerText'><button class='width' onclick='getForm(jsRoutes.controllers.RedeemAssetController.redeemAssetForm())'>" + '@Messages(constants.Form.REDEEM_ASSET)' + "</button><br>"
+                            }
+                            if ('@aclHash.sendAsset') {
+                                content += "<button class='width' onclick='getForm(jsRoutes.controllers.SendAssetController.sendAssetForm())'>" + '@Messages(constants.Form.SEND_ASSET)' + "</button> </div> </div>"
+                            }
+                        });
+                        $('#assetsList').html(content);
                     }
             </script>
-            <iframe class="hidden" src="@routes.IssueAssetController.assetComet(address)"></iframe>
-            </div>
+            <iframe class="hidden" src="@routes.IssueAssetController.assetComet"></iframe>
         </div>
 
         <div class="flexGrowth flexItem box leftAlign">

@@ -1,7 +1,8 @@
 package controllers
 
-import akka.stream.Materializer
-import akka.stream.scaladsl.Source
+import akka.actor.{ActorRef, ActorSystem}
+import akka.stream.scaladsl.{Sink, Source}
+import akka.stream.{Materializer, OverflowStrategy}
 import controllers.actions.{WithTraderLoginAction, WithZoneLoginAction}
 import exceptions.{BaseException, BlockChainException}
 import javax.inject.{Inject, Singleton}
@@ -9,7 +10,6 @@ import models.{blockchain, blockchainTransaction, master, masterTransaction}
 import play.api.http.ContentTypes
 import play.api.i18n.I18nSupport
 import play.api.libs.Comet
-import play.api.libs.json._
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
 
@@ -17,17 +17,22 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Random
 
 @Singleton
-class IssueAssetController @Inject()(messagesControllerComponents: MessagesControllerComponents, blockchainAclAccounts: blockchain.ACLAccounts, masterZones: master.Zones, masterAccounts: master.Accounts, withTraderLoginAction: WithTraderLoginAction, withZoneLoginAction: WithZoneLoginAction, blockchainAssets: blockchain.Assets, transactionsIssueAsset: transactions.IssueAsset, blockchainTransactionIssueAssets: blockchainTransaction.IssueAssets, masterTransactionIssueAssetRequests: masterTransaction.IssueAssetRequests)(implicit exec: ExecutionContext, configuration: Configuration, materializer: Materializer) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class IssueAssetController @Inject()(messagesControllerComponents: MessagesControllerComponents, blockchainAclAccounts: blockchain.ACLAccounts, masterZones: master.Zones, masterAccounts: master.Accounts, withTraderLoginAction: WithTraderLoginAction, withZoneLoginAction: WithZoneLoginAction, blockchainAssets: blockchain.Assets, transactionsIssueAsset: transactions.IssueAsset, blockchainTransactionIssueAssets: blockchainTransaction.IssueAssets, masterTransactionIssueAssetRequests: masterTransaction.IssueAssetRequests)(implicit exec: ExecutionContext, configuration: Configuration, materializer: Materializer, system: ActorSystem) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private implicit val assetWrites: OWrites[blockchain.Asset] = Json.writes[blockchain.Asset]
+  def assetComet = withTraderLoginAction.authenticated { username =>
+    implicit request =>
+      val flow = Comet.json("parent.assetCometMessage")
+      val address = masterAccounts.Service.getAddress(username)
+      val source = Source.actorRef(0, OverflowStrategy.dropHead)
+      val actorRef: ActorRef = source.to(Sink.actorRef()).run()
+      val x = source.via(flow)
 
-  def assetComet(address: String) = Action {
-    val assetSource: Source[JsValue, _] = blockchainAssets.Service.assetCometSource(address)
-    Ok.chunked(assetSource.via(Comet.json("parent.assetCometMessage"))).as(ContentTypes.HTML)
+      val childAsset: ActorRef = system.actorOf(props = utilities.actors.ChildAsset.props(actorRef), name = address)
+      Ok.chunked(source via flow).as(ContentTypes.HTML)
   }
 
   def issueAssetRequestForm: Action[AnyContent] = Action { implicit request =>
