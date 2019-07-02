@@ -12,16 +12,23 @@
         </div>
     </div>
     <div class="flexContainer">
-        <div class="flexItem box">@lastBlockHeight()</div>
-        <div class="flexItem box">@validators()</div>
-        <div class="flexItem box"> @Messages(constants.Form.TOKENS)
+        <div class="flexItem box flexGrowth">@lastBlockHeight()</div>
+        <div class="flexItem box flexGrowth">@validators()</div>
+        <div class="flexItem box flexGrowth"> @Messages(constants.Form.TOKENS)
             <p id="tokensValue"></p></div>
-        <div class="flexItem box">@averageBlockTime()</div>
+        <div class="flexItem box flexGrowth">@averageBlockTime()</div>
     </div>
     <div id="indexBottomDivision" class="flexContainer">
         <div class="box flexGraph flexGrowth"> @blockTimeGraph()</div>
         <div class="box flexGrowth centerText" id="blockExplorer">@blockExplorer()</div>
         <div class="box flexGrowth centerText" id="transactionExplorer"> @transactionExplorer()</div>
+        <div class="flexGrowth box leftText">
+            <div>
+                <h2 class="showHide toggleElement centerText">@Messages(constants.User.ASSETS) </h2>
+            </div>
+            <div id="availableAssetList" class="flexContainer">
+            </div>
+        </div>
     </div>
 
     @transactionHash()
@@ -33,7 +40,10 @@
     @allBlocksTable()
 
     <script src="@routes.Assets.versioned("javascripts/back.js")" type="text/javascript"></script>
-    <script>back()</script>
+    <script>
+        back();
+        componentResource('availableAssetList', jsRoutes.controllers.ComponentViewController.availableAssets());
+    </script>
 }
 
 @right = {

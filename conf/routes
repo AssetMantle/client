@@ -1,4 +1,5 @@
 GET         /                                                    controllers.IndexController.index
+GET         /indexPage                                           controllers.IndexController.indexPage
 
 GET         /assets/*file                                        controllers.Assets.versioned(path="/public", file: Asset)
 
@@ -15,11 +16,14 @@ GET         /master/queryConfigurationVariable:query             controllers.Con
 
 GET         /master/checkUsernameAvailable                       controllers.SignUpController.checkUsernameAvailable(username: String)
 
-GET         /master/component/commonHome                    controllers.JavaScriptResourceController.commonHome(username: String)
-GET         /master/component/assetPegWallet                controllers.JavaScriptResourceController.assetPegWallet(username: String)
-GET         /master/component/fiatPegWallet                 controllers.JavaScriptResourceController.fiatPegWallet(username: String)
-GET         /master/component/negotiation                   controllers.JavaScriptResourceController.negotiation(username: String)
-GET         /master/component/order                         controllers.JavaScriptResourceController.order(username: String)
+GET         /master/component/commonHome                         controllers.ComponentViewController.commonHome(username: String)
+GET         /master/component/zone                               controllers.ComponentViewController.zone(username: String)
+GET         /master/component/organization                       controllers.ComponentViewController.organization(username: String)
+GET         /master/component/assetPegWallet                     controllers.ComponentViewController.assetPegWallet(username: String)
+GET         /master/component/fiatPegWallet                      controllers.ComponentViewController.fiatPegWallet(username: String)
+GET         /master/component/negotiation                        controllers.ComponentViewController.negotiation(username: String)
+GET         /master/component/order                              controllers.ComponentViewController.order(username: String)
+GET         /master/component/availableAssets                    controllers.ComponentViewController.availableAssets
 
 GET         /master/login                                        controllers.LoginController.loginForm
 POST        /master/login                                        controllers.LoginController.login

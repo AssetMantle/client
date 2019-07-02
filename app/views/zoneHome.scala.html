@@ -10,12 +10,8 @@
         <div class="flexItem box leftAlign flexGrowth">
             <div>
                 <h2 class="showHide toggleElement centerText">@Messages(constants.Form.ZONE):</h2>
-                @Messages(constants.Form.NAME): @zone.name
             </div>
-            <div>
-                @Messages(constants.Form.ZONE_ID): @zone.id <br>
-                @Messages(constants.Form.CURRENCY): @zone.currency <br>
-                @Messages(constants.Form.VERIFIED_STATUS): @zone.status <br>
+            <div id="zone">
             </div>
         </div>
 
@@ -32,6 +28,7 @@
         <button onclick="getForm(jsRoutes.controllers.FileController.updateZoneKycForm('@constants.File.IDENTIFICATION'))">@Messages(constants.Form.UPDATE_ZONE_IDENTIFICATION)</button>
     </div>
     <script>
-            componentResource('commonHome', jsRoutes.controllers.JavaScriptResourceController.commonHome('@username'))
+            componentResource('commonHome', jsRoutes.controllers.ComponentViewController.commonHome('@username'));
+            componentResource('zone', jsRoutes.controllers.ComponentViewController.zone('@username'));
     </script>
 }

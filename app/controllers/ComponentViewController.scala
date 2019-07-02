@@ -17,7 +17,7 @@ import utilities.LoginState
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class JavaScriptResourceController @Inject()(messagesControllerComponents: MessagesControllerComponents, withLoginAction: WithLoginAction, masterAccounts: Accounts,  masterAccountFiles: master.AccountFiles, blockchainAclAccounts: ACLAccounts, blockchainZones: blockchain.Zones, blockchainOrganizations: blockchain.Organizations, blockchainAssets: blockchain.Assets, blockchainFiats: blockchain.Fiats, blockchainNegotiations: blockchain.Negotiations, masterOrganizations: Organizations, masterZones: Zones, blockchainAclHashes: blockchain.ACLHashes, blockchainOrders: blockchain.Orders, getAccount: GetAccount, blockchainAccounts: blockchain.Accounts, withUsernameToken: WithUsernameToken)(implicit configuration: Configuration, executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class ComponentViewController @Inject()(messagesControllerComponents: MessagesControllerComponents, withLoginAction: WithLoginAction, masterAccounts: Accounts,  masterAccountFiles: master.AccountFiles, blockchainAclAccounts: ACLAccounts, blockchainZones: blockchain.Zones, blockchainOrganizations: blockchain.Organizations, blockchainAssets: blockchain.Assets, blockchainFiats: blockchain.Fiats, blockchainNegotiations: blockchain.Negotiations, masterOrganizations: Organizations, masterZones: Zones, blockchainAclHashes: blockchain.ACLHashes, blockchainOrders: blockchain.Orders, getAccount: GetAccount, blockchainAccounts: blockchain.Accounts, withUsernameToken: WithUsernameToken)(implicit configuration: Configuration, executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -32,6 +32,34 @@ class JavaScriptResourceController @Inject()(messagesControllerComponents: Messa
       }
     } catch {
       case baseException: BaseException => NoContent
+    }
+  }
+
+  def zone(username: String): Action[AnyContent] = Action { implicit request =>
+    try {
+      val account = masterAccounts.Service.getAccount(username)
+      account.userType match {
+        case constants.User.ZONE =>
+          Ok(views.html.component.master.zoneDetails(masterZones.Service.get(blockchainZones.Service.getID(account.accountAddress))))
+        case constants.User.TRADER =>
+          Ok(views.html.component.master.zoneDetails(masterZones.Service.get(blockchainAclAccounts.Service.get(account.accountAddress).zoneID)))
+      }
+    } catch {
+      case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
+    }
+  }
+
+  def organization(username: String): Action[AnyContent] = Action { implicit request =>
+    try {
+      val account = masterAccounts.Service.getAccount(username)
+      account.userType match {
+        case constants.User.ORGANIZATION =>
+          Ok(views.html.component.master.organizationDetails(masterOrganizations.Service.get(blockchainOrganizations.Service.getID(account.accountAddress))))
+        case constants.User.TRADER =>
+          Ok(views.html.component.master.organizationDetails(masterOrganizations.Service.get(blockchainAclAccounts.Service.get(account.accountAddress).organizationID)))
+      }
+    } catch {
+      case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
     }
   }
 
@@ -68,4 +96,13 @@ class JavaScriptResourceController @Inject()(messagesControllerComponents: Messa
       case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
     }
   }
+
+  def availableAssets: Action[AnyContent] = Action { implicit request =>
+    try {
+      Ok(views.html.component.master.availableAssetList(blockchainAssets.Service.getAllUnmoderated(blockchainOrders.Service.getAllOrderIds)))
+    } catch {
+      case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
+    }
+  }
+
 }
