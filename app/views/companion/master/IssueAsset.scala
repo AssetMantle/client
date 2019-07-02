@@ -13,12 +13,12 @@ object IssueAsset {
       constants.Form.ASSET_PRICE -> number(min = 1, max = 10000),
       constants.Form.QUANTITY_UNIT -> nonEmptyText(minLength = 1, maxLength = 20),
       constants.Form.ASSET_QUANTITY -> number(min = 1, max = 10000),
-      constants.Form.UNMODERATED -> boolean,
+      constants.Form.MODERATED -> boolean,
       constants.Form.PASSWORD -> nonEmptyText(minLength = 1, maxLength = 20),
       constants.Form.GAS -> number(min = 1, max = 10000)
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(requestID: String, accountID: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, unmoderated: Boolean, password: String, gas: Int)
+  case class Data(requestID: String, accountID: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, moderated: Boolean, password: String, gas: Int)
 
 }

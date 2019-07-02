@@ -55,25 +55,25 @@ class SellerExecuteOrderController @Inject()(messagesControllerComponents: Messa
       )
   }
 
-  def unmoderatedSellerExecuteOrderForm: Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.unmoderatedSellerExecuteOrder(views.companion.master.UnmoderatedSellerExecuteOrder.form))
+  def moderatedSellerExecuteOrderForm: Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.moderatedSellerExecuteOrder(views.companion.master.ModeratedSellerExecuteOrder.form))
   }
 
-  def unmoderatedSellerExecuteOrder: Action[AnyContent] = withTraderLoginAction.authenticated { username =>
+  def moderatedSellerExecuteOrder: Action[AnyContent] = withTraderLoginAction.authenticated { username =>
     implicit request =>
-      views.companion.master.UnmoderatedSellerExecuteOrder.form.bindFromRequest().fold(
+      views.companion.master.ModeratedSellerExecuteOrder.form.bindFromRequest().fold(
         formWithErrors => {
-          BadRequest(views.html.component.master.unmoderatedSellerExecuteOrder(formWithErrors))
+          BadRequest(views.html.component.master.moderatedSellerExecuteOrder(formWithErrors))
         },
-        unmoderatedSellerExecuteOrderData => {
+        moderatedSellerExecuteOrderData => {
           try {
             val sellerAddress = masterAccounts.Service.getAddress(username)
-            val ticketID: String = if (kafkaEnabled) transactionsSellerExecuteOrder.Service.kafkaPost(transactionsSellerExecuteOrder.Request(from = username, password = unmoderatedSellerExecuteOrderData.password, buyerAddress = unmoderatedSellerExecuteOrderData.buyerAddress, sellerAddress = sellerAddress, awbProofHash = unmoderatedSellerExecuteOrderData.awbProofHash, pegHash = unmoderatedSellerExecuteOrderData.pegHash, gas = unmoderatedSellerExecuteOrderData.gas)).ticketID else Random.nextString(32)
-            blockchainTransactionSellerExecuteOrders.Service.create(from = username, buyerAddress = unmoderatedSellerExecuteOrderData.buyerAddress, sellerAddress = sellerAddress, awbProofHash = unmoderatedSellerExecuteOrderData.awbProofHash, pegHash = unmoderatedSellerExecuteOrderData.pegHash, gas = unmoderatedSellerExecuteOrderData.gas, null, null, ticketID = ticketID, null)
+            val ticketID: String = if (kafkaEnabled) transactionsSellerExecuteOrder.Service.kafkaPost(transactionsSellerExecuteOrder.Request(from = username, password = moderatedSellerExecuteOrderData.password, buyerAddress = moderatedSellerExecuteOrderData.buyerAddress, sellerAddress = sellerAddress, awbProofHash = moderatedSellerExecuteOrderData.awbProofHash, pegHash = moderatedSellerExecuteOrderData.pegHash, gas = moderatedSellerExecuteOrderData.gas)).ticketID else Random.nextString(32)
+            blockchainTransactionSellerExecuteOrders.Service.create(from = username, buyerAddress = moderatedSellerExecuteOrderData.buyerAddress, sellerAddress = sellerAddress, awbProofHash = moderatedSellerExecuteOrderData.awbProofHash, pegHash = moderatedSellerExecuteOrderData.pegHash, gas = moderatedSellerExecuteOrderData.gas, null, null, ticketID = ticketID, null)
             if (!kafkaEnabled) {
               Future {
                 try {
-                  blockchainTransactionSellerExecuteOrders.Utility.onSuccess(ticketID, transactionsSellerExecuteOrder.Service.post(transactionsSellerExecuteOrder.Request(from = username, password = unmoderatedSellerExecuteOrderData.password, buyerAddress = unmoderatedSellerExecuteOrderData.buyerAddress, sellerAddress = sellerAddress, awbProofHash = unmoderatedSellerExecuteOrderData.awbProofHash, pegHash = unmoderatedSellerExecuteOrderData.pegHash, gas = unmoderatedSellerExecuteOrderData.gas)))
+                  blockchainTransactionSellerExecuteOrders.Utility.onSuccess(ticketID, transactionsSellerExecuteOrder.Service.post(transactionsSellerExecuteOrder.Request(from = username, password = moderatedSellerExecuteOrderData.password, buyerAddress = moderatedSellerExecuteOrderData.buyerAddress, sellerAddress = sellerAddress, awbProofHash = moderatedSellerExecuteOrderData.awbProofHash, pegHash = moderatedSellerExecuteOrderData.pegHash, gas = moderatedSellerExecuteOrderData.gas)))
                 } catch {
                   case baseException: BaseException => logger.error(baseException.failure.message, baseException)
                   case blockChainException: BlockChainException => logger.error(blockChainException.failure.message, blockChainException)

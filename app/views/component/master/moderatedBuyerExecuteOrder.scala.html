@@ -1,0 +1,22 @@
+@import helper._
+@import views.companion.master.ModeratedBuyerExecuteOrder
+
+@(moderatedBuyerExecuteOrderForm: Form[ModeratedBuyerExecuteOrder.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+    @form(action = routes.BuyerExecuteOrderController.moderatedBuyerExecuteOrder, 'onkeypress -> "validateForm(event,this)") {
+        @CSRF.formField
+        @inputText(moderatedBuyerExecuteOrderForm(constants.Form.BUYER_ADDRESS), '_label -> Messages(constants.Form.BUYER_ADDRESS))
+        @inputText(moderatedBuyerExecuteOrderForm(constants.Form.SELLER_ADDRESS), '_label -> Messages(constants.Form.SELLER_ADDRESS))
+        @inputText(moderatedBuyerExecuteOrderForm(constants.Form.FIAT_PROOF_HASH), '_label -> Messages(constants.Form.FIAT_PROOF_HASH))
+        @inputText(moderatedBuyerExecuteOrderForm(constants.Form.PEG_HASH), '_label -> Messages(constants.Form.PEG_HASH))
+        @inputText(moderatedBuyerExecuteOrderForm(constants.Form.GAS), '_label -> Messages(constants.Form.GAS))
+        @inputPassword(moderatedBuyerExecuteOrderForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD))
+
+        @if(moderatedBuyerExecuteOrderForm.hasGlobalErrors) {
+            <ul>
+            @for(error <- moderatedBuyerExecuteOrderForm.globalErrors) {
+                <li>@error.format</li>
+            }
+            </ul>
+        }
+        <button type="button" onclick="submitForm(this)">@Messages(constants.Form.MODERATED_BUYER_EXECUTE_ORDER)</button>
+    }
