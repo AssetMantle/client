@@ -25,14 +25,12 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
 
   def assetComet = withTraderLoginAction.authenticated { username =>
     implicit request =>
-      val flow = Comet.json("parent.assetCometMessage")
       val address = masterAccounts.Service.getAddress(username)
       val source = Source.actorRef(0, OverflowStrategy.dropHead)
-      val actorRef: ActorRef = source.to(Sink.actorRef()).run()
-      val x = source.via(flow)
+      val actorRef: ActorRef = source.to(Sink.ignore).run()
 
       val childAsset: ActorRef = system.actorOf(props = utilities.actors.ChildAsset.props(actorRef), name = address)
-      Ok.chunked(source via flow).as(ContentTypes.HTML)
+      Ok.chunked(source.map(x => x) via Comet.json("parent.assetCometMessage")).as(ContentTypes.HTML)
   }
 
   def issueAssetRequestForm: Action[AnyContent] = Action { implicit request =>
