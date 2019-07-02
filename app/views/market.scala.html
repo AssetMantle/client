@@ -1,0 +1,47 @@
+@import views.html.component.blockchain.{blockExplorer, transactionExplorer, transactionHash, allBlocksTable, validatorsTable, blockHeight, validators, lastBlockHeight, averageBlockTime, search, blockTimeGraph}
+@import utilities.LoginState
+@()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+
+@common(Messages(constants.Form.INDEX))(Html(""))(center)(Html(""))
+
+
+@center = {
+   <div class="flexContainer">
+       <div class="flexItem">
+       @search()
+        </div>
+    </div>
+    <div class="flexContainer">
+        <div class="flexItem box flexGrowth">@lastBlockHeight()</div>
+        <div class="flexItem box flexGrowth">@validators()</div>
+        <div class="flexItem box flexGrowth"> @Messages(constants.Form.TOKENS)
+            <p id="tokensValue"></p></div>
+        <div class="flexItem box flexGrowth">@averageBlockTime()</div>
+    </div>
+    <div id="indexBottomDivision" class="flexContainer">
+        <div class="box flexGraph flexGrowth"> @blockTimeGraph()</div>
+        <div class="box flexGrowth centerText" id="blockExplorer">@blockExplorer()</div>
+        <div class="box flexGrowth centerText" id="transactionExplorer"> @transactionExplorer()</div>
+        <div class="flexGrowth box leftText">
+            <div>
+                <h2 class="showHide toggleElement centerText">@Messages(constants.User.ASSETS) </h2>
+            </div>
+            <div id="availableAssetList" class="flexContainer">
+            </div>
+        </div>
+    </div>
+
+    @transactionHash()
+
+    @blockHeight()
+
+    @validatorsTable()
+
+    @allBlocksTable()
+
+    <script src="@routes.Assets.versioned("javascripts/back.js")" type="text/javascript"></script>
+    <script>
+        back();
+        componentResource('availableAssetList', jsRoutes.controllers.ComponentViewController.availableAssetList());
+    </script>
+}

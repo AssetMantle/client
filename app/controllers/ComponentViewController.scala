@@ -35,7 +35,7 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
     }
   }
 
-  def zone(username: String): Action[AnyContent] = Action { implicit request =>
+  def zoneDetails(username: String): Action[AnyContent] = Action { implicit request =>
     try {
       val account = masterAccounts.Service.getAccount(username)
       account.userType match {
@@ -49,7 +49,7 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
     }
   }
 
-  def organization(username: String): Action[AnyContent] = Action { implicit request =>
+  def organizationDetails(username: String): Action[AnyContent] = Action { implicit request =>
     try {
       val account = masterAccounts.Service.getAccount(username)
       account.userType match {
@@ -63,7 +63,7 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
     }
   }
 
-  def assetPegWallet(username: String): Action[AnyContent] = Action { implicit request =>
+  def assetList(username: String): Action[AnyContent] = Action { implicit request =>
     try {
       val address = masterAccounts.Service.getAddress(username)
       Ok(views.html.component.master.assetList(assetPegWallet = blockchainAssets.Service.getAssetPegWallet(address), aclHash = blockchainAclHashes.Service.get(blockchainAclAccounts.Service.get(address).aclHash)))
@@ -72,7 +72,7 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
     }
   }
 
-  def fiatPegWallet(username: String): Action[AnyContent] = Action { implicit request =>
+  def fiatList(username: String): Action[AnyContent] = Action { implicit request =>
     try {
       val address = masterAccounts.Service.getAddress(username)
       Ok(views.html.component.master.fiatList(fiatPegWallet = blockchainFiats.Service.getFiatPegWallet(address), aclHash = blockchainAclHashes.Service.get(blockchainAclAccounts.Service.get(address).aclHash)))
@@ -81,7 +81,7 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
     }
   }
 
-  def negotiation(username: String): Action[AnyContent] = Action { implicit request =>
+  def negotiationList(username: String): Action[AnyContent] = Action { implicit request =>
     try {
       Ok(views.html.component.master.negotiationList(blockchainNegotiations.Service.getNegotiationsForAddress(masterAccounts.Service.getAddress(username))))
     } catch {
@@ -89,7 +89,7 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
     }
   }
 
-  def order(username: String): Action[AnyContent] = Action { implicit request =>
+  def orderList(username: String): Action[AnyContent] = Action { implicit request =>
     try {
       Ok(views.html.component.master.orderList(blockchainOrders.Service.getOrders(blockchainNegotiations.Service.getNegotiationsForAddress(masterAccounts.Service.getAddress(username)).map(_.id))))
     } catch {
@@ -97,7 +97,7 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
     }
   }
 
-  def availableAssets: Action[AnyContent] = Action { implicit request =>
+  def availableAssetList: Action[AnyContent] = Action { implicit request =>
     try {
       Ok(views.html.component.master.availableAssetList(blockchainAssets.Service.getAllUnmoderated(blockchainOrders.Service.getAllOrderIds)))
     } catch {

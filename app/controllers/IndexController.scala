@@ -20,7 +20,7 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  def indexPage: Action[AnyContent] = withLoginAction.authenticated { username =>
+  def market: Action[AnyContent] = withLoginAction.authenticated { username =>
     implicit request =>
       try {
         implicit val loginState:LoginState = LoginState(username)

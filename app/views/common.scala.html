@@ -22,8 +22,8 @@
         <div class="pageContent">
             <div class="stickyBar">
                 <div class = "navbar">
-                    <a class="active" href="@routes.IndexController.index()" >Home</a>
-                    <a href="@routes.IndexController.indexPage()">Wall</a>
+                    <a class="active" href="@controllers.routes.IndexController.index()" >Home</a>
+                    <a href="@controllers.routes.IndexController.market()">Market</a>
                     <a href="#">News</a>
                     <a href="#">Contact</a>
                     @loginState match {
