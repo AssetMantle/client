@@ -4,7 +4,6 @@ object User {
 
   //common
   val UNAUTHORIZED_TRANSACTION = "UNAUTHORIZED_TRANSACTION"
-  val ASSETS="ASSETS"
   val COMDEX = "COMDEX"
   val HOME = "HOME"
   val USER_TYPE = "USER_TYPE"

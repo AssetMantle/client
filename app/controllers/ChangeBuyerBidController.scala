@@ -19,15 +19,15 @@ class ChangeBuyerBidController @Inject()(messagesControllerComponents: MessagesC
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  def changeBuyerBidForm: Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.changeBuyerBid(views.companion.master.ChangeBuyerBid.form))
+  def changeBuyerBidForm(sellerAddress:String, pegHash: String): Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.changeBuyerBid(views.companion.master.ChangeBuyerBid.form, sellerAddress, pegHash))
   }
 
   def changeBuyerBid: Action[AnyContent] = withTraderLoginAction.authenticated { username =>
     implicit request =>
       views.companion.master.ChangeBuyerBid.form.bindFromRequest().fold(
         formWithErrors => {
-          BadRequest(views.html.component.master.changeBuyerBid(formWithErrors))
+          BadRequest(views.html.component.master.changeBuyerBid(formWithErrors,formWithErrors.data(constants.Form.SELLER_ADDRESS), formWithErrors.data(constants.Form.PEG_HASH)))
         },
         changeBuyerBidData => {
           implicit val loginStateL:LoginState = LoginState(username)

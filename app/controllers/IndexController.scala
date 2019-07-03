@@ -20,17 +20,6 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  def market: Action[AnyContent] = withLoginAction.authenticated { username =>
-    implicit request =>
-      try {
-        implicit val loginState:LoginState = LoginState(username)
-        Ok(views.html.market())
-      }
-      catch {
-        case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
-      }
-  }
-
   def index: Action[AnyContent] = withLoginAction.authenticated { username =>
     implicit request =>
     try {

@@ -50,6 +50,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ComponentViewController.negotiationList,
         routes.javascript.ComponentViewController.orderList,
         routes.javascript.ComponentViewController.availableAssetList,
+        routes.javascript.ComponentViewController.availableAssetListWithLogin,
         routes.javascript.RedeemAssetController.redeemAssetForm,
         routes.javascript.RedeemFiatController.redeemFiatForm,
         routes.javascript.ReleaseAssetController.releaseAssetForm,

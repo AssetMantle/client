@@ -1,7 +1,7 @@
 @import models.blockchain.ACLHash
 @import models.blockchain.Asset
 
-@(assetList: Seq[Asset])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
+@(assetList: Seq[Asset], aclHash: ACLHash)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
 
     @for(asset <- assetList) {
         <div class="flexItem box lightBlue">
@@ -14,6 +14,14 @@
                 <span class="red">@Messages(constants.Form.QUANTITY_UNIT)</span> : @asset.quantityUnit <br>
                 <span class="red">@Messages(constants.Form.UNMODERATED)</span> : @asset.unmoderated <br>
                 <span class="red">@Messages(constants.Form.LOCKED)</span> : @asset.locked <br>
+            </div>
+            <div class="centerText">
+                @if(aclHash.changeBuyerBid) {
+                    <button onclick="getForm(jsRoutes.controllers.ChangeBuyerBidController.changeBuyerBidForm('@asset.ownerAddress','@asset.pegHash'))">@Messages(constants.Form.NEGOTIATE)</button>
+                } <br>
+                @if(aclHash.confirmBuyerBid) {
+                    <button onclick="getForm(jsRoutes.controllers.ConfirmBuyerBidController.confirmBuyerBidForm('@asset.ownerAddress','@asset.pegHash', @asset.assetPrice))">@Messages(constants.Form.ACCEPT_OFFER)</button>
+                } <br>
             </div>
         </div>
     }

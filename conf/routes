@@ -1,5 +1,5 @@
 GET         /                                                    controllers.IndexController.index
-GET         /market                                           controllers.IndexController.market
+GET         /market                                              controllers.ViewController.market
 
 GET         /assets/*file                                        controllers.Assets.versioned(path="/public", file: Asset)
 
@@ -17,13 +17,14 @@ GET         /master/queryConfigurationVariable:query             controllers.Con
 GET         /master/checkUsernameAvailable                       controllers.SignUpController.checkUsernameAvailable(username: String)
 
 GET         /master/component/commonHome                         controllers.ComponentViewController.commonHome(username: String)
-GET         /master/component/zone                               controllers.ComponentViewController.zoneDetails(username: String)
-GET         /master/component/organization                       controllers.ComponentViewController.organizationDetails(username: String)
-GET         /master/component/assetPegWallet                     controllers.ComponentViewController.assetList(username: String)
-GET         /master/component/fiatPegWallet                      controllers.ComponentViewController.fiatList(username: String)
-GET         /master/component/negotiation                        controllers.ComponentViewController.negotiationList(username: String)
-GET         /master/component/order                              controllers.ComponentViewController.orderList(username: String)
-GET         /master/component/availableAssets                    controllers.ComponentViewController.availableAssetList
+GET         /master/component/zoneDetails                        controllers.ComponentViewController.zoneDetails(username: String)
+GET         /master/component/organizationDetails                controllers.ComponentViewController.organizationDetails(username: String)
+GET         /master/component/assetList                          controllers.ComponentViewController.assetList(username: String)
+GET         /master/component/fiatList                           controllers.ComponentViewController.fiatList(username: String)
+GET         /master/component/negotiationList                    controllers.ComponentViewController.negotiationList(username: String)
+GET         /master/component/orderList                          controllers.ComponentViewController.orderList(username: String)
+GET         /master/component/availableAssetList                 controllers.ComponentViewController.availableAssetList
+GET         /master/component/availableAssetListWithLogin        controllers.ComponentViewController.availableAssetListWithLogin(username: String)
 
 GET         /master/login                                        controllers.LoginController.loginForm
 POST        /master/login                                        controllers.LoginController.login
@@ -120,16 +121,16 @@ POST        /master/buyerExecuteOrder                            controllers.Buy
 GET         /master/unmoderatedBuyerExecuteOrder                 controllers.BuyerExecuteOrderController.unmoderatedBuyerExecuteOrderForm
 POST        /master/unmoderatedBuyerExecuteOrder                 controllers.BuyerExecuteOrderController.unmoderatedBuyerExecuteOrder
 
-GET         /master/changeBuyerBid                               controllers.ChangeBuyerBidController.changeBuyerBidForm
+GET         /master/changeBuyerBid                               controllers.ChangeBuyerBidController.changeBuyerBidForm(sellerAddress:String, pegHash:String)
 POST        /master/changeBuyerBid                               controllers.ChangeBuyerBidController.changeBuyerBid
 
-GET         /master/changeSellerBid                              controllers.ChangeSellerBidController.changeSellerBidForm
+GET         /master/changeSellerBid                              controllers.ChangeSellerBidController.changeSellerBidForm(buyerAddress:String, pegHash: String)
 POST        /master/changeSellerBid                              controllers.ChangeSellerBidController.changeSellerBid
 
-GET         /master/confirmBuyerBid                              controllers.ConfirmBuyerBidController.confirmBuyerBidForm
+GET         /master/confirmBuyerBid                              controllers.ConfirmBuyerBidController.confirmBuyerBidForm(sellerAddress:String, pegHash: String, bid:Int)
 POST        /master/confirmBuyerBid                              controllers.ConfirmBuyerBidController.confirmBuyerBid
 
-GET         /master/confirmSellerBid                             controllers.ConfirmSellerBidController.confirmSellerBidForm
+GET         /master/confirmSellerBid                             controllers.ConfirmSellerBidController.confirmSellerBidForm(buyerAddress:String, pegHash: String, bid:Int)
 POST        /master/confirmSellerBid                             controllers.ConfirmSellerBidController.confirmSellerBid
 
 GET         /master/issueAssetRequest                            controllers.IssueAssetController.issueAssetRequestForm

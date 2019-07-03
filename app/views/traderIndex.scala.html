@@ -11,6 +11,7 @@
     @if(aclHash.buyerExecuteOrder) {
         <a onclick="getForm(jsRoutes.controllers.BuyerExecuteOrderController.unmoderatedBuyerExecuteOrderForm())">@Messages(constants.Form.UNMODERATED_BUYER_EXECUTE_ORDER)</a>
     } <br>
+    @*
     @if(aclHash.changeBuyerBid) {
         <a onclick="getForm(jsRoutes.controllers.ChangeBuyerBidController.changeBuyerBidForm())">@Messages(constants.Form.CHANGE_BUYER_BID)</a>
     } <br>
@@ -23,6 +24,7 @@
     @if(aclHash.confirmSellerBid) {
         <a onclick="getForm(jsRoutes.controllers.ConfirmSellerBidController.confirmSellerBidForm())">@Messages(constants.Form.CONFIRM_SELLER_BID)</a>
     } <br>
+    *@
     @if(aclHash.issueAsset) {
         <a onclick="getForm(jsRoutes.controllers.IssueAssetController.issueAssetRequestForm())">@Messages(constants.Form.ISSUE_ASSET_REQUEST)</a>
     } <br>

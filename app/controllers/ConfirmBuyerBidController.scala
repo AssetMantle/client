@@ -19,15 +19,15 @@ class ConfirmBuyerBidController @Inject()(messagesControllerComponents: Messages
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  def confirmBuyerBidForm: Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.confirmBuyerBid(views.companion.master.ConfirmBuyerBid.form))
+  def confirmBuyerBidForm(sellerAddress:String, pegHash: String, bid: Int): Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.confirmBuyerBid(views.companion.master.ConfirmBuyerBid.form,sellerAddress,pegHash, bid))
   }
 
   def confirmBuyerBid: Action[AnyContent] = withTraderLoginAction.authenticated { username =>
     implicit request =>
       views.companion.master.ConfirmBuyerBid.form.bindFromRequest().fold(
         formWithErrors => {
-          BadRequest(views.html.component.master.confirmBuyerBid(formWithErrors))
+          BadRequest(views.html.component.master.confirmBuyerBid(formWithErrors, formWithErrors.data(constants.Form.SELLER_ADDRESS), formWithErrors.data(constants.Form.PEG_HASH), formWithErrors.data(constants.Form.BID).toInt))
         },
         confirmBuyerBidData => {
           implicit val loginStateL:LoginState = LoginState(username)
