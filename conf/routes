@@ -107,8 +107,8 @@ POST        /master/rejectVerifyOrganizationRequest              controllers.Add
 GET         /master/buyerExecuteOrder                            controllers.BuyerExecuteOrderController.buyerExecuteOrderForm
 POST        /master/buyerExecuteOrder                            controllers.BuyerExecuteOrderController.buyerExecuteOrder
 
-GET         /master/unmoderatedBuyerExecuteOrder                 controllers.BuyerExecuteOrderController.unmoderatedBuyerExecuteOrderForm
-POST        /master/unmoderatedBuyerExecuteOrder                 controllers.BuyerExecuteOrderController.unmoderatedBuyerExecuteOrder
+GET         /master/moderatedBuyerExecuteOrder                 controllers.BuyerExecuteOrderController.moderatedBuyerExecuteOrderForm
+POST        /master/moderatedBuyerExecuteOrder                 controllers.BuyerExecuteOrderController.moderatedBuyerExecuteOrder
 
 GET         /master/changeBuyerBid                               controllers.ChangeBuyerBidController.changeBuyerBidForm
 POST        /master/changeBuyerBid                               controllers.ChangeBuyerBidController.changeBuyerBid
@@ -154,8 +154,8 @@ POST        /master/releaseAsset                                 controllers.Rel
 GET         /master/sellerExecuteOrder                           controllers.SellerExecuteOrderController.sellerExecuteOrderForm
 POST        /master/sellerExecuteOrder                           controllers.SellerExecuteOrderController.sellerExecuteOrder
 
-GET         /master/unmoderatedSellerExecuteOrder                controllers.SellerExecuteOrderController.unmoderatedSellerExecuteOrderForm
-POST        /master/unmoderatedSellerExecuteOrder                controllers.SellerExecuteOrderController.unmoderatedSellerExecuteOrder
+GET         /master/moderatedSellerExecuteOrder                controllers.SellerExecuteOrderController.moderatedSellerExecuteOrderForm
+POST        /master/moderatedSellerExecuteOrder                controllers.SellerExecuteOrderController.moderatedSellerExecuteOrder
 
 GET         /master/sendAsset                                    controllers.SendAssetController.sendAssetForm
 POST        /master/sendAsset                                    controllers.SendAssetController.sendAsset

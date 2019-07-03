@@ -8,7 +8,7 @@
     @right = {
 
     @if(aclHash.buyerExecuteOrder) {
-        <a onclick="getForm(jsRoutes.controllers.BuyerExecuteOrderController.unmoderatedBuyerExecuteOrderForm())">@Messages(constants.Form.UNMODERATED_BUYER_EXECUTE_ORDER)</a>
+        <a onclick="getForm(jsRoutes.controllers.BuyerExecuteOrderController.buyerExecuteOrderForm())">@Messages(constants.Form.MODERATED_BUYER_EXECUTE_ORDER)</a>
     } <br>
     @if(aclHash.changeBuyerBid) {
         <a onclick="getForm(jsRoutes.controllers.ChangeBuyerBidController.changeBuyerBidForm())">@Messages(constants.Form.CHANGE_BUYER_BID)</a>
@@ -38,7 +38,7 @@
         <a onclick="getForm(jsRoutes.controllers.ReleaseAssetController.releaseAssetForm())">@Messages(constants.Form.RELEASE_ASSET)</a>
     } <br>
     @if(aclHash.sellerExecuteOrder) {
-        <a onclick="getForm(jsRoutes.controllers.SellerExecuteOrderController.unmoderatedSellerExecuteOrderForm())">@Messages(constants.Form.UNMODERATED_SELLER_EXECUTE_ORDER)</a>
+        <a onclick="getForm(jsRoutes.controllers.SellerExecuteOrderController.sellerExecuteOrderForm())">@Messages(constants.Form.MODERATED_SELLER_EXECUTE_ORDER)</a>
     } <br>
     @if(aclHash.sendAsset) {
         <a onclick="getForm(jsRoutes.controllers.SendAssetController.sendAssetForm())">@Messages(constants.Form.SEND_ASSET)</a>

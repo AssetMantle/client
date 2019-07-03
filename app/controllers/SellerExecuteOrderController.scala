@@ -23,7 +23,7 @@ class SellerExecuteOrderController @Inject()(messagesControllerComponents: Messa
     Ok(views.html.component.master.sellerExecuteOrder(views.companion.master.SellerExecuteOrder.form))
   }
 
-  def sellerExecuteOrder: Action[AnyContent] = withZoneLoginAction.authenticated { username =>
+  def sellerExecuteOrder: Action[AnyContent] = withTraderLoginAction.authenticated { username =>
     implicit request =>
       views.companion.master.SellerExecuteOrder.form.bindFromRequest().fold(
         formWithErrors => {
@@ -31,12 +31,13 @@ class SellerExecuteOrderController @Inject()(messagesControllerComponents: Messa
         },
         sellerExecuteOrderData => {
           try {
-            val ticketID: String = if (kafkaEnabled) transactionsSellerExecuteOrder.Service.kafkaPost(transactionsSellerExecuteOrder.Request(from = username, password = sellerExecuteOrderData.password, buyerAddress = sellerExecuteOrderData.buyerAddress, sellerAddress = sellerExecuteOrderData.sellerAddress, awbProofHash = sellerExecuteOrderData.awbProofHash, pegHash = sellerExecuteOrderData.pegHash, gas = sellerExecuteOrderData.gas)).ticketID else Random.nextString(32)
-            blockchainTransactionSellerExecuteOrders.Service.create(from = username, buyerAddress = sellerExecuteOrderData.buyerAddress, sellerAddress = sellerExecuteOrderData.sellerAddress, awbProofHash = sellerExecuteOrderData.awbProofHash, pegHash = sellerExecuteOrderData.pegHash, gas = sellerExecuteOrderData.gas, null, null, ticketID = ticketID, null)
+            val sellerAddress = masterAccounts.Service.getAddress(username)
+            val ticketID: String = if (kafkaEnabled) transactionsSellerExecuteOrder.Service.kafkaPost(transactionsSellerExecuteOrder.Request(from = username, password = sellerExecuteOrderData.password, buyerAddress = sellerExecuteOrderData.buyerAddress, sellerAddress = sellerAddress, awbProofHash = sellerExecuteOrderData.awbProofHash, pegHash = sellerExecuteOrderData.pegHash, gas = sellerExecuteOrderData.gas)).ticketID else Random.nextString(32)
+            blockchainTransactionSellerExecuteOrders.Service.create(from = username, buyerAddress = sellerExecuteOrderData.buyerAddress, sellerAddress = sellerAddress, awbProofHash = sellerExecuteOrderData.awbProofHash, pegHash = sellerExecuteOrderData.pegHash, gas = sellerExecuteOrderData.gas, null, null, ticketID = ticketID, null)
             if (!kafkaEnabled) {
               Future {
                 try {
-                  blockchainTransactionSellerExecuteOrders.Utility.onSuccess(ticketID, transactionsSellerExecuteOrder.Service.post(transactionsSellerExecuteOrder.Request(from = username, password = sellerExecuteOrderData.password, buyerAddress = sellerExecuteOrderData.buyerAddress, sellerAddress = sellerExecuteOrderData.sellerAddress, awbProofHash = sellerExecuteOrderData.awbProofHash, pegHash = sellerExecuteOrderData.pegHash, gas = sellerExecuteOrderData.gas)))
+                  blockchainTransactionSellerExecuteOrders.Utility.onSuccess(ticketID, transactionsSellerExecuteOrder.Service.post(transactionsSellerExecuteOrder.Request(from = username, password = sellerExecuteOrderData.password, buyerAddress = sellerExecuteOrderData.buyerAddress, sellerAddress = sellerAddress, awbProofHash = sellerExecuteOrderData.awbProofHash, pegHash = sellerExecuteOrderData.pegHash, gas = sellerExecuteOrderData.gas)))
                 } catch {
                   case baseException: BaseException => logger.error(baseException.failure.message, baseException)
                   case blockChainException: BlockChainException => logger.error(blockChainException.failure.message, blockChainException)
@@ -49,7 +50,6 @@ class SellerExecuteOrderController @Inject()(messagesControllerComponents: Messa
           catch {
             case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
             case blockChainException: BlockChainException => Ok(views.html.index(failures = Seq(blockChainException.failure)))
-
           }
         }
       )
@@ -59,7 +59,7 @@ class SellerExecuteOrderController @Inject()(messagesControllerComponents: Messa
     Ok(views.html.component.master.moderatedSellerExecuteOrder(views.companion.master.ModeratedSellerExecuteOrder.form))
   }
 
-  def moderatedSellerExecuteOrder: Action[AnyContent] = withTraderLoginAction.authenticated { username =>
+  def moderatedSellerExecuteOrder: Action[AnyContent] = withZoneLoginAction.authenticated { username =>
     implicit request =>
       views.companion.master.ModeratedSellerExecuteOrder.form.bindFromRequest().fold(
         formWithErrors => {
@@ -67,13 +67,12 @@ class SellerExecuteOrderController @Inject()(messagesControllerComponents: Messa
         },
         moderatedSellerExecuteOrderData => {
           try {
-            val sellerAddress = masterAccounts.Service.getAddress(username)
-            val ticketID: String = if (kafkaEnabled) transactionsSellerExecuteOrder.Service.kafkaPost(transactionsSellerExecuteOrder.Request(from = username, password = moderatedSellerExecuteOrderData.password, buyerAddress = moderatedSellerExecuteOrderData.buyerAddress, sellerAddress = sellerAddress, awbProofHash = moderatedSellerExecuteOrderData.awbProofHash, pegHash = moderatedSellerExecuteOrderData.pegHash, gas = moderatedSellerExecuteOrderData.gas)).ticketID else Random.nextString(32)
-            blockchainTransactionSellerExecuteOrders.Service.create(from = username, buyerAddress = moderatedSellerExecuteOrderData.buyerAddress, sellerAddress = sellerAddress, awbProofHash = moderatedSellerExecuteOrderData.awbProofHash, pegHash = moderatedSellerExecuteOrderData.pegHash, gas = moderatedSellerExecuteOrderData.gas, null, null, ticketID = ticketID, null)
+            val ticketID: String = if (kafkaEnabled) transactionsSellerExecuteOrder.Service.kafkaPost(transactionsSellerExecuteOrder.Request(from = username, password = moderatedSellerExecuteOrderData.password, buyerAddress = moderatedSellerExecuteOrderData.buyerAddress, sellerAddress = moderatedSellerExecuteOrderData.sellerAddress, awbProofHash = moderatedSellerExecuteOrderData.awbProofHash, pegHash = moderatedSellerExecuteOrderData.pegHash, gas = moderatedSellerExecuteOrderData.gas)).ticketID else Random.nextString(32)
+            blockchainTransactionSellerExecuteOrders.Service.create(from = username, buyerAddress = moderatedSellerExecuteOrderData.buyerAddress, sellerAddress = moderatedSellerExecuteOrderData.sellerAddress, awbProofHash = moderatedSellerExecuteOrderData.awbProofHash, pegHash = moderatedSellerExecuteOrderData.pegHash, gas = moderatedSellerExecuteOrderData.gas, null, null, ticketID = ticketID, null)
             if (!kafkaEnabled) {
               Future {
                 try {
-                  blockchainTransactionSellerExecuteOrders.Utility.onSuccess(ticketID, transactionsSellerExecuteOrder.Service.post(transactionsSellerExecuteOrder.Request(from = username, password = moderatedSellerExecuteOrderData.password, buyerAddress = moderatedSellerExecuteOrderData.buyerAddress, sellerAddress = sellerAddress, awbProofHash = moderatedSellerExecuteOrderData.awbProofHash, pegHash = moderatedSellerExecuteOrderData.pegHash, gas = moderatedSellerExecuteOrderData.gas)))
+                  blockchainTransactionSellerExecuteOrders.Utility.onSuccess(ticketID, transactionsSellerExecuteOrder.Service.post(transactionsSellerExecuteOrder.Request(from = username, password = moderatedSellerExecuteOrderData.password, buyerAddress = moderatedSellerExecuteOrderData.buyerAddress, sellerAddress = moderatedSellerExecuteOrderData.sellerAddress, awbProofHash = moderatedSellerExecuteOrderData.awbProofHash, pegHash = moderatedSellerExecuteOrderData.pegHash, gas = moderatedSellerExecuteOrderData.gas)))
                 } catch {
                   case baseException: BaseException => logger.error(baseException.failure.message, baseException)
                   case blockChainException: BlockChainException => logger.error(blockChainException.failure.message, blockChainException)
@@ -86,7 +85,6 @@ class SellerExecuteOrderController @Inject()(messagesControllerComponents: Messa
           catch {
             case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
             case blockChainException: BlockChainException => Ok(views.html.index(failures = Seq(blockChainException.failure)))
-
           }
         }
       )
@@ -113,7 +111,6 @@ class SellerExecuteOrderController @Inject()(messagesControllerComponents: Messa
         catch {
           case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
           case blockChainException: BlockChainException => Ok(views.html.index(failures = Seq(blockChainException.failure)))
-
         }
       }
     )

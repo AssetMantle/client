@@ -22,7 +22,7 @@ class BuyerExecuteOrderController @Inject()(messagesControllerComponents: Messag
     Ok(views.html.component.master.buyerExecuteOrder(views.companion.master.BuyerExecuteOrder.form))
   }
 
-  def buyerExecuteOrder: Action[AnyContent] = withZoneLoginAction.authenticated { username =>
+  def buyerExecuteOrder: Action[AnyContent] = withTraderLoginAction.authenticated { username =>
     implicit request =>
       views.companion.master.BuyerExecuteOrder.form.bindFromRequest().fold(
         formWithErrors => {
@@ -58,7 +58,7 @@ class BuyerExecuteOrderController @Inject()(messagesControllerComponents: Messag
     Ok(views.html.component.master.moderatedBuyerExecuteOrder(views.companion.master.ModeratedBuyerExecuteOrder.form))
   }
 
-  def moderatedBuyerExecuteOrder: Action[AnyContent] = withTraderLoginAction.authenticated { username =>
+  def moderatedBuyerExecuteOrder: Action[AnyContent] = withZoneLoginAction.authenticated { username =>
     implicit request =>
       views.companion.master.ModeratedBuyerExecuteOrder.form.bindFromRequest().fold(
         formWithErrors => {
@@ -111,7 +111,6 @@ class BuyerExecuteOrderController @Inject()(messagesControllerComponents: Messag
         catch {
           case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
           case blockChainException: BlockChainException => Ok(views.html.index(failures = Seq(blockChainException.failure)))
-
         }
       }
     )

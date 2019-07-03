@@ -1,10 +1,10 @@
 $(document).ready(function () {
-    $('#unmoderated').click(function () {
-        if ($(this).prop("checked") === true) {
-            $('#unmoderatedIssueAssetRequestFormFields').show();
+    $('#moderated').click(function () {
+        if ($(this).prop("checked") === false) {
+            $('#moderatedIssueAssetRequestFormFields').show();
         }
-        else if ($(this).prop("checked") === false) {
-            $('#unmoderatedIssueAssetRequestFormFields').hide();
+        else {
+            $('#moderatedIssueAssetRequestFormFields').hide();
         }
     });
 });
