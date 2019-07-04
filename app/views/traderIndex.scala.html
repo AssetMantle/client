@@ -43,13 +43,14 @@
     @if(aclHash.sellerExecuteOrder) {
         <a onclick="getForm(jsRoutes.controllers.SellerExecuteOrderController.unmoderatedSellerExecuteOrderForm())">@Messages(constants.Form.UNMODERATED_SELLER_EXECUTE_ORDER)</a>
     } <br>
-    @if(aclHash.sendAsset) {
+  @*
+  @if(aclHash.sendAsset) {
         <a onclick="getForm(jsRoutes.controllers.SendAssetController.sendAssetForm())">@Messages(constants.Form.SEND_ASSET)</a>
     } <br>
     @if(aclHash.sendFiat) {
         <a onclick="getForm(jsRoutes.controllers.SendFiatController.sendFiatForm())">@Messages(constants.Form.SEND_FIAT)</a>
     } <br>
-
+    *@
     <a onclick="getForm(jsRoutes.controllers.SetBuyerFeedbackController.setBuyerFeedbackForm())">@Messages(constants.Form.SET_BUYER_FEEDBACK)</a>
     <br>
     <a onclick="getForm(jsRoutes.controllers.SetSellerFeedbackController.setSellerFeedbackForm())">@Messages(constants.Form.SET_SELLER_FEEDBACK)</a>

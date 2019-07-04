@@ -19,15 +19,15 @@ class SendFiatController @Inject()(messagesControllerComponents: MessagesControl
 
   private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
 
-  def sendFiatForm: Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.sendFiat(views.companion.master.SendFiat.form))
+  def sendFiatForm(sellerAddress:String, pegHash: String, bid: Int): Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.sendFiat(views.companion.master.SendFiat.form, sellerAddress, pegHash, bid))
   }
 
   def sendFiat: Action[AnyContent] = withTraderLoginAction.authenticated { username =>
     implicit request =>
       views.companion.master.SendFiat.form.bindFromRequest().fold(
         formWithErrors => {
-          BadRequest(views.html.component.master.sendFiat(formWithErrors))
+          BadRequest(views.html.component.master.sendFiat(formWithErrors, formWithErrors.data(constants.Form.SELLER_ADDRESS),formWithErrors.data(constants.Form.PEG_HASH), formWithErrors.data(constants.Form.BID).toInt))
         },
         sendFiatData => {
           implicit val loginStateL:LoginState = LoginState(username)

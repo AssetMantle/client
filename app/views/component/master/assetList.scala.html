@@ -19,9 +19,6 @@
                 @if(aclHash.redeemAsset) {
                 <button class="width" onclick="getForm(jsRoutes.controllers.RedeemAssetController.redeemAssetForm())">@Messages(constants.Form.REDEEM_ASSET)</button>
             } <br>
-            @if(aclHash.sendAsset) {
-                <button class="width"   onclick="getForm(jsRoutes.controllers.SendAssetController.sendAssetForm())">@Messages(constants.Form.SEND_ASSET)</button>
-            }
             </div>
         </div>
     }

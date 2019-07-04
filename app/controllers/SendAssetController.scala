@@ -19,15 +19,15 @@ class SendAssetController @Inject()(messagesControllerComponents: MessagesContro
 
   private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
 
-  def sendAssetForm: Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.sendAsset(views.companion.master.SendAsset.form))
+  def sendAssetForm(buyerAddress:String, pegHash: String): Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.sendAsset(views.companion.master.SendAsset.form, buyerAddress, pegHash))
   }
 
   def sendAsset: Action[AnyContent] = withTraderLoginAction.authenticated { username =>
     implicit request =>
       views.companion.master.SendAsset.form.bindFromRequest().fold(
         formWithErrors => {
-          BadRequest(views.html.component.master.sendAsset(formWithErrors))
+          BadRequest(views.html.component.master.sendAsset(formWithErrors, formWithErrors.data(constants.Form.BUYER_ADDRESS), formWithErrors.data(constants.Form.PEG_HASH)))
         },
         sendAssetData => {
           implicit val loginStateL:LoginState = LoginState(username)
