@@ -1,18 +1,19 @@
 package models.blockchain
 
-import akka.actor.{ActorRef, ActorSystem}
+import akka.actor.ActorRef
+import akka.stream.scaladsl.Source
 import akka.stream.{ActorMaterializer, OverflowStrategy}
-import akka.stream.scaladsl.{Sink, Source}
 import exceptions.{BaseException, BlockChainException}
 import javax.inject.{Inject, Singleton}
 import models.master
+import models.masterTransaction.AccountTokens
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.{JsValue, Json, OWrites}
 import play.api.{Configuration, Logger}
 import queries.GetAccount
 import slick.jdbc.JdbcProfile
-import utilities.PushNotification
+import utilities._
 
 import scala.concurrent.duration.{Duration, _}
 import scala.concurrent.{Await, ExecutionContext, Future}
@@ -23,13 +24,13 @@ case class Asset(pegHash: String, documentHash: String, assetType: String, asset
 case class AssetMessage(ownerAddress: String, assetsJsValue: JsValue)
 
 @Singleton
-class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, getAccount: GetAccount, masterAccounts: master.Accounts, actorSystem: ActorSystem, implicit val pushNotification: PushNotification)(implicit executionContext: ExecutionContext, configuration: Configuration, system: ActorSystem) {
+class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, shutdownActors: ShutdownActors, accountTokens: AccountTokens, getAccount: GetAccount, masterAccounts: master.Accounts, implicit val pushNotification: PushNotification)(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
   val db = databaseConfig.db
 
-  private val assetParentActor = system.actorOf(props = utilities.actors.Asset.props(system), name = "assetParentActor")
+  val mainAssetActor: ActorRef = Actor.system.actorOf(props = MainAssetActor.props, name = "mainAssetActor")
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -42,7 +43,9 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
   private[models] val assetTable = TableQuery[AssetTable]
 
   private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
+
   private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
+
   private val sleepTime = configuration.get[Long]("blockchain.entityIterator.threadSleep")
 
   private def add(asset: Asset)(implicit executionContext: ExecutionContext): Future[String] = db.run((assetTable returning assetTable.map(_.pegHash) += asset).asTry).map {
@@ -131,7 +134,7 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
 
   }
 
-  implicit val materializer: ActorMaterializer = ActorMaterializer()
+  private implicit val materializer: ActorMaterializer = ActorMaterializer()(Actor.system)
 
   object Service {
 
@@ -151,25 +154,12 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
 
     def markDirty(pegHash: String): Int = Await.result(updateDirtyBitByPegHash(pegHash, dirtyBit = true), Duration.Inf)
 
-    def assetCometSource(address: String) = {//: Source[JsValue, _] = {
-//      Source.tick(0 millis, 6000 millis, "JsValue").map(_ => Json.toJson(Service.getAssetPegWallet(address).map(asset => Json.toJson(asset))))
-
-      val source = Source.actorRef(0, OverflowStrategy.dropHead)
-
-      val actorRef: ActorRef = source.to(Sink.foreach(println)).run()
-
-      //val queueSource = Source.queue[JsValue](0, OverflowStrategy.dropHead).withAttributes(Attributes(Name(address)))
-      //val queue: Source[JsValue, SourceQueueWithComplete[JsValue]] = Source.queue(0, OverflowStrategy.dropHead)
-//
-//      val queue = Source
-//        .queue[JsValue](0, OverflowStrategy.dropHead)
-//        .throttle(0, 3.second)
-//        .toMat(Sink.foreach(x => println))(Keep.left)
-//        .run()
-//
-//
-      val _: ActorRef = system.actorOf(props = utilities.actors.ChildAsset.props(actorRef), name = address)
-      //queue
+    def assetCometSource(username: String) = {
+      shutdownActors.shutdown(username)
+      val (systemUserActor, source) = Source.actorRef[JsValue](0, OverflowStrategy.dropHead).preMaterialize()
+      Actor.system.actorOf(props = UserAssetActor.props(systemUserActor), name = masterAccounts.Service.getAddress(username))
+      shutdownActors.sessionTimeoutShutdown(username)
+      source
     }
   }
 
@@ -181,7 +171,7 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
         try {
           val assetPegWallet = getAccount.Service.get(dirtyAsset.ownerAddress).value.assetPegWallet.getOrElse(throw new BaseException(constants.Response.NO_RESPONSE))
           assetPegWallet.foreach(assetPeg => if (assetPegWallet.map(_.pegHash) contains dirtyAsset.pegHash) Service.insertOrUpdate(pegHash = assetPeg.pegHash, documentHash = assetPeg.documentHash, assetType = assetPeg.assetType, assetPrice = assetPeg.assetPrice, assetQuantity = assetPeg.assetQuantity, quantityUnit = assetPeg.quantityUnit, ownerAddress = dirtyAsset.ownerAddress, locked = assetPeg.locked, unmoderated = assetPeg.unmoderated, dirtyBit = false) else Service.deleteAsset(dirtyAsset.pegHash))
-          assetParentActor ! AssetMessage(ownerAddress = dirtyAsset.ownerAddress, assetsJsValue = Json.toJson(assetPegWallet.map { asset => Json.toJson(Asset(pegHash = asset.pegHash, documentHash = asset.documentHash, assetType = asset.assetType, assetPrice = asset.assetPrice, assetQuantity = asset.assetQuantity, quantityUnit = asset.quantityUnit, ownerAddress = dirtyAsset.ownerAddress, locked = asset.locked, unmoderated = asset.unmoderated, dirtyBit = false)) }))
+          mainAssetActor ! AssetMessage(ownerAddress = dirtyAsset.ownerAddress, assetsJsValue = Json.toJson(assetPegWallet.map { asset => Json.toJson(Asset(pegHash = asset.pegHash, documentHash = asset.documentHash, assetType = asset.assetType, assetPrice = asset.assetPrice, assetQuantity = asset.assetQuantity, quantityUnit = asset.quantityUnit, ownerAddress = dirtyAsset.ownerAddress, locked = asset.locked, unmoderated = asset.unmoderated, dirtyBit = false)) }))
         }
         catch {
           case baseException: BaseException => logger.info(baseException.failure.message, baseException)
@@ -194,7 +184,7 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
     }
   }
 
-  actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
+  Actor.system.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
     Utility.dirtyEntityUpdater()
   }
 

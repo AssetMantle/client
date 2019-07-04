@@ -1,8 +1,7 @@
 package controllers
 
-import akka.actor.{ActorRef, ActorSystem}
-import akka.stream.scaladsl.{Sink, Source}
-import akka.stream.{Materializer, OverflowStrategy}
+import akka.actor.ActorSystem
+import akka.stream.Materializer
 import controllers.actions.{WithTraderLoginAction, WithZoneLoginAction}
 import exceptions.{BaseException, BlockChainException}
 import javax.inject.{Inject, Singleton}
@@ -25,12 +24,7 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
 
   def assetComet = withTraderLoginAction.authenticated { username =>
     implicit request =>
-      val address = masterAccounts.Service.getAddress(username)
-      val source = Source.actorRef(0, OverflowStrategy.dropHead)
-      val actorRef: ActorRef = source.to(Sink.ignore).run()
-
-      val childAsset: ActorRef = system.actorOf(props = utilities.actors.ChildAsset.props(actorRef), name = address)
-      Ok.chunked(source.map(x => x) via Comet.json("parent.assetCometMessage")).as(ContentTypes.HTML)
+      Ok.chunked(blockchainAssets.Service.assetCometSource(username) via Comet.json("parent.assetCometMessage")).as(ContentTypes.HTML)
   }
 
   def issueAssetRequestForm: Action[AnyContent] = Action { implicit request =>

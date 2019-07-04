@@ -7,12 +7,13 @@ import models.masterTransaction.AccountTokens
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
+import utilities.ShutdownActors
 import views.companion.master.Logout
 
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class LogoutController @Inject()(messagesControllerComponents: MessagesControllerComponents, accountTokens: AccountTokens, withLoginAction: WithLoginAction)(implicit configuration: Configuration, exec: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class LogoutController @Inject()(messagesControllerComponents: MessagesControllerComponents, accountTokens: AccountTokens, withLoginAction: WithLoginAction, shutdownActors: ShutdownActors)(implicit configuration: Configuration, exec: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -33,6 +34,7 @@ class LogoutController @Inject()(messagesControllerComponents: MessagesControlle
             if (!loginData.receiveNotifications) {
               accountTokens.Service.deleteToken(username)
             }
+            shutdownActors.logOutShutdown(username)
             Ok(views.html.index(successes = Seq(constants.Response.LOGGED_OUT))).withNewSession
           }
           catch {

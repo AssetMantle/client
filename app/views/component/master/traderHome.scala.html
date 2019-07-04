@@ -90,15 +90,14 @@
             }
             </div>
             <script src="@routes.Assets.versioned("javascripts/assetList.js")" type="text/javascript"></script>
-            <div id="assetsList" class="flexContainer"></div>
+            <div id="assetsList" class="flexContainer">@component.master.assetList(assetPegWallet, aclHash)</div>
             <script type="text/javascript">
-                    var assetCometMessage = function (event) {
+                    let assetCometMessage = function (event) {
                         console.log("Response Event:    " + event + ", Length:" + event.length);
                         @*//$('#assetsList').html(displayAssets(event, '@Messages(constants.Form.PEG_HASH)', '@Messages(constants.Form.DOCUMENT_HASH)','@Messages(constants.Form.ASSET_TYPE)','@Messages(constants.Form.ASSET_QUANTITY)','@Messages(constants.Form.ASSET_PRICE)','@Messages(constants.Form.QUANTITY_UNIT)','@Messages(constants.Form.UNMODERATED)', '@Messages(constants.Form.LOCKED)','@aclHash.redeemAsset','@aclHash.sendAsset', '@Messages(constants.Form.REDEEM_ASSET)', '@Messages(constants.Form.SEND_ASSET)'))*@
-
-                        let content = '';
+                        var content = '';
                         event.forEach(function (asset, index) {
-                            content += `<div class='flexItem box assetBackgroundColor'><div class='leftAlign'>
+                            content += `<div class='flexItem box colorCards'><div class='leftAlign'>
                             ` + '@Messages(constants.Form.PEG_HASH)' + ":" + asset.pegHash + `<br>
                             ` + '@Messages(constants.Form.DOCUMENT_HASH)' + ":" + asset.documentHash + `<br>
                             ` + '@Messages(constants.Form.ASSET_TYPE)' + ":" + asset.assetType + `<br>

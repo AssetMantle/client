@@ -10,7 +10,7 @@ import slick.jdbc.JdbcProfile
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
-import scala.util.{Failure, Random, Success}
+import scala.util.{Failure, Success}
 
 case class AccountToken(id: String, notificationToken: Option[String], sessionTokenHash: Option[String], sessionTokenTime: Long)
 
@@ -76,6 +76,8 @@ class AccountTokens @Inject()(protected val databaseConfigProvider: DatabaseConf
     def updateToken(id: String, notificationToken: String): Int = Await.result(upsert(AccountToken(id, Option(notificationToken), null, DateTime.now(DateTimeZone.UTC).getMillis)), Duration.Inf)
 
     def getTokenById(id: String)(implicit executionContext: ExecutionContext): Option[String] = Await.result(findById(id), Duration.Inf).notificationToken
+
+    def getSessionTokenTimeById(id: String)(implicit executionContext: ExecutionContext): Long = Await.result(findById(id), Duration.Inf).sessionTokenTime
 
     def ifExists(id: String): Boolean = Await.result(checkById(id), Duration.Inf)
 
