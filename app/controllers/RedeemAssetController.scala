@@ -30,7 +30,7 @@ class RedeemAssetController @Inject()(messagesControllerComponents: MessagesCont
           BadRequest(views.html.component.master.redeemAsset(formWithErrors))
         },
         redeemAssetData => {
-          implicit val loginStateL:LoginState = LoginState(username)
+          implicit val loginState:LoginState = LoginState(username)
           try {
             val toAddress = blockchainZones.Service.getAddress(redeemAssetData.zoneID)
             val ticketID: String = if (kafkaEnabled) transactionsRedeemAsset.Service.kafkaPost(transactionsRedeemAsset.Request(from = username, to = toAddress, password = redeemAssetData.password, pegHash = redeemAssetData.pegHash, gas = redeemAssetData.gas)).ticketID else Random.nextString(32)

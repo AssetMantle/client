@@ -39,7 +39,7 @@ class VerifyMobileNumberController @Inject()(messagesControllerComponents: Messa
           BadRequest(views.html.component.master.verifyMobileNumber(formWithErrors))
         },
         verifyMobileNumberData => {
-          implicit val loginStateL:LoginState = LoginState(username)
+          implicit val loginState:LoginState = LoginState(username)
           try {
             if (!smsOTPs.Service.verifyOTP(username, verifyMobileNumberData.otp)) throw new BaseException(constants.Response.INVALID_OTP)
             if (contacts.Service.verifyMobileNumber(username) != 1) throw new BaseException(constants.Response.MOBILE_NUMBER_NOT_FOUND)

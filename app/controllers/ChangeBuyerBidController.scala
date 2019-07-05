@@ -30,7 +30,7 @@ class ChangeBuyerBidController @Inject()(messagesControllerComponents: MessagesC
           BadRequest(views.html.component.master.changeBuyerBid(formWithErrors,formWithErrors.data(constants.Form.SELLER_ADDRESS), formWithErrors.data(constants.Form.PEG_HASH)))
         },
         changeBuyerBidData => {
-          implicit val loginStateL:LoginState = LoginState(username)
+          implicit val loginState:LoginState = LoginState(username)
           try {
             val ticketID: String = if (kafkaEnabled) transactionsChangeBuyerBid.Service.kafkaPost(transactionsChangeBuyerBid.Request(from = username, to = changeBuyerBidData.sellerAddress, password = changeBuyerBidData.password, bid = changeBuyerBidData.bid, time = changeBuyerBidData.time, pegHash = changeBuyerBidData.pegHash, gas = changeBuyerBidData.gas)).ticketID else Random.nextString(32)
             blockchainTransactionChangeBuyerBids.Service.create(from = username, to = changeBuyerBidData.sellerAddress, bid = changeBuyerBidData.bid, time = changeBuyerBidData.time, pegHash = changeBuyerBidData.pegHash, gas = changeBuyerBidData.gas, null, null, ticketID = ticketID, null)

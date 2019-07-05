@@ -30,7 +30,7 @@ class ReleaseAssetController @Inject()(messagesControllerComponents: MessagesCon
           BadRequest(views.html.component.master.releaseAsset(formWithErrors))
         },
         releaseAssetData => {
-          implicit val loginStateL:LoginState = LoginState(username)
+          implicit val loginState:LoginState = LoginState(username)
           try {
             val ticketID: String = if (kafkaEnabled) transactionsReleaseAsset.Service.kafkaPost(transactionsReleaseAsset.Request(from = username, to = releaseAssetData.address, password = releaseAssetData.password, pegHash = releaseAssetData.pegHash, gas = releaseAssetData.gas)).ticketID else Random.nextString(32)
             blockchainTransactionReleaseAssets.Service.create(from = username, to = releaseAssetData.address, pegHash = releaseAssetData.pegHash, gas = releaseAssetData.gas, null, txHash = null, ticketID = ticketID, null)

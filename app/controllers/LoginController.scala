@@ -32,7 +32,7 @@ class LoginController @Inject()(messagesControllerComponents: MessagesController
       },
       loginData => {
         try {
-          implicit val loginStateL:LoginState = LoginState(loginData.username)
+          implicit val loginState:LoginState = LoginState(loginData.username)
           val userType = masterAccounts.Service.validateLoginAndGetUserType(loginData.username, loginData.password)
           val address = masterAccounts.Service.getAddress(loginData.username)
           pushNotification.registerNotificationToken(loginData.username, loginData.notificationToken)

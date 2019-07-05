@@ -27,7 +27,7 @@ class UpdateContactController @Inject()(messagesControllerComponents: MessagesCo
           BadRequest(views.html.component.master.updateContact(formWithErrors, constants.CountryCallingCode.COUNTRY_CODES))
         },
         signUpData => {
-          implicit val loginStateL:LoginState = LoginState(username)
+          implicit val loginState:LoginState = LoginState(username)
           if (contacts.Service.updateEmailAndMobile(username, signUpData.countryCode + signUpData.mobileNumber, signUpData.emailAddress)) Ok(views.html.index(successes = Seq(constants.Response.SUCCESS))) else Ok(views.html.index(failures = Seq(constants.Response.FAILURE)))
         }
       )

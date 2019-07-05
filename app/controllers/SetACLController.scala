@@ -30,7 +30,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
           BadRequest(views.html.component.master.setACL(formWithErrors))
         },
         setACLData => {
-          implicit val loginStateL:LoginState = LoginState(username)
+          implicit val loginState:LoginState = LoginState(username)
           try {
             if (masterOrganizations.Service.getStatus(setACLData.organizationID) == Option(true)) {
               val zoneID = masterZones.Service.getZoneId(username)
