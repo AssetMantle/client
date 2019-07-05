@@ -8,7 +8,7 @@ import models.masterTransaction.EmailOTPs
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
-import utilities.Email
+import utilities.{Email, LoginState}
 import views.companion.master.VerifyEmailAddress
 
 import scala.concurrent.ExecutionContext
@@ -39,6 +39,7 @@ class VerifyEmailAddressController @Inject()(messagesControllerComponents: Messa
           BadRequest(views.html.component.master.verifyEmailAddress(formWithErrors))
         },
         verifyEmailAddressData => {
+          implicit val loginState:LoginState = LoginState(username)
           try {
             if (!emailOTPs.Service.verifyOTP(username, verifyEmailAddressData.otp)) throw new BaseException(constants.Response.INVALID_OTP)
             if (contacts.Service.verifyEmailAddress(username) != 1) throw new BaseException(constants.Response.EMAIL_NOT_FOUND)

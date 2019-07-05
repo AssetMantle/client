@@ -1,4 +1,5 @@
 GET         /                                                    controllers.IndexController.index
+GET         /market                                              controllers.ViewController.market
 
 GET         /assets/*file                                        controllers.Assets.versioned(path="/public", file: Asset)
 
@@ -14,6 +15,16 @@ GET         /master/markNotificationAsRead                       controllers.Not
 GET         /master/queryConfigurationVariable:query             controllers.ConfigurationController.queryConfigurationVariable(query: String)
 
 GET         /master/checkUsernameAvailable                       controllers.SignUpController.checkUsernameAvailable(username: String)
+
+GET         /master/component/commonHome                         controllers.ComponentViewController.commonHome(username: String)
+GET         /master/component/zoneDetails                        controllers.ComponentViewController.zoneDetails(username: String)
+GET         /master/component/organizationDetails                controllers.ComponentViewController.organizationDetails(username: String)
+GET         /master/component/assetList                          controllers.ComponentViewController.assetList(username: String)
+GET         /master/component/fiatList                           controllers.ComponentViewController.fiatList(username: String)
+GET         /master/component/negotiationList                    controllers.ComponentViewController.negotiationList(username: String)
+GET         /master/component/orderList                          controllers.ComponentViewController.orderList(username: String)
+GET         /master/component/availableAssetList                 controllers.ComponentViewController.availableAssetList
+GET         /master/component/availableAssetListWithLogin        controllers.ComponentViewController.availableAssetListWithLogin(username: String)
 
 GET         /master/login                                        controllers.LoginController.loginForm
 POST        /master/login                                        controllers.LoginController.login
@@ -110,16 +121,16 @@ POST        /master/buyerExecuteOrder                            controllers.Buy
 GET         /master/unmoderatedBuyerExecuteOrder                 controllers.BuyerExecuteOrderController.unmoderatedBuyerExecuteOrderForm
 POST        /master/unmoderatedBuyerExecuteOrder                 controllers.BuyerExecuteOrderController.unmoderatedBuyerExecuteOrder
 
-GET         /master/changeBuyerBid                               controllers.ChangeBuyerBidController.changeBuyerBidForm
+GET         /master/changeBuyerBid                               controllers.ChangeBuyerBidController.changeBuyerBidForm(sellerAddress:String, pegHash:String)
 POST        /master/changeBuyerBid                               controllers.ChangeBuyerBidController.changeBuyerBid
 
-GET         /master/changeSellerBid                              controllers.ChangeSellerBidController.changeSellerBidForm
+GET         /master/changeSellerBid                              controllers.ChangeSellerBidController.changeSellerBidForm(buyerAddress:String, pegHash: String)
 POST        /master/changeSellerBid                              controllers.ChangeSellerBidController.changeSellerBid
 
-GET         /master/confirmBuyerBid                              controllers.ConfirmBuyerBidController.confirmBuyerBidForm
+GET         /master/confirmBuyerBid                              controllers.ConfirmBuyerBidController.confirmBuyerBidForm(sellerAddress:String, pegHash: String, bid:Int)
 POST        /master/confirmBuyerBid                              controllers.ConfirmBuyerBidController.confirmBuyerBid
 
-GET         /master/confirmSellerBid                             controllers.ConfirmSellerBidController.confirmSellerBidForm
+GET         /master/confirmSellerBid                             controllers.ConfirmSellerBidController.confirmSellerBidForm(buyerAddress:String, pegHash: String, bid:Int)
 POST        /master/confirmSellerBid                             controllers.ConfirmSellerBidController.confirmSellerBid
 
 GET         /master/issueAssetRequest                            controllers.IssueAssetController.issueAssetRequestForm
@@ -157,7 +168,7 @@ POST        /master/sellerExecuteOrder                           controllers.Sel
 GET         /master/unmoderatedSellerExecuteOrder                controllers.SellerExecuteOrderController.unmoderatedSellerExecuteOrderForm
 POST        /master/unmoderatedSellerExecuteOrder                controllers.SellerExecuteOrderController.unmoderatedSellerExecuteOrder
 
-GET         /master/sendAsset                                    controllers.SendAssetController.sendAssetForm
+GET         /master/sendAsset                                    controllers.SendAssetController.sendAssetForm(buyerAddress:String, pegHash: String)
 POST        /master/sendAsset                                    controllers.SendAssetController.sendAsset
 
 GET         /master/sendCoin                                     controllers.SendCoinController.sendCoinForm
@@ -173,7 +184,7 @@ POST        /master/approveFaucetRequests                        controllers.Sen
 GET         /master/rejectFaucetRequest                          controllers.SendCoinController.rejectFaucetRequestForm(requestID: String)
 POST        /master/rejectFaucetRequest                          controllers.SendCoinController.rejectFaucetRequest
 
-GET         /master/sendFiat                                     controllers.SendFiatController.sendFiatForm
+GET         /master/sendFiat                                     controllers.SendFiatController.sendFiatForm(sellerAddress:String, pegHash: String, bid: Int)
 POST        /master/sendFiat                                     controllers.SendFiatController.sendFiat
 
 GET         /master/setACL                                       controllers.SetACLController.setACLForm

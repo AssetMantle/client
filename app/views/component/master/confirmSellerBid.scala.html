@@ -1,13 +1,13 @@
 @import helper._
 @import views.companion.master.ConfirmSellerBid
 
-@(confirmSellerBidForm: Form[ConfirmSellerBid.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@(confirmSellerBidForm: Form[ConfirmSellerBid.Data], buyerAddress:String, pegHash:String, bid:Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @form(action = routes.ConfirmSellerBidController.confirmSellerBid, 'onkeypress -> "validateForm(event,this)") {
     @CSRF.formField
-    @inputText(confirmSellerBidForm(constants.Form.BUYER_ADDRESS), '_label -> Messages(constants.Form.BUYER_ADDRESS))
-    @inputText(confirmSellerBidForm(constants.Form.BID), '_label -> Messages(constants.Form.BID))
+    @inputText(confirmSellerBidForm(constants.Form.BUYER_ADDRESS).copy(value = Some(buyerAddress)), '_label -> Messages(constants.Form.BUYER_ADDRESS))
+    @inputText(confirmSellerBidForm(constants.Form.BID).copy(value = Some(bid.toString)), '_label -> Messages(constants.Form.BID))
     @inputText(confirmSellerBidForm(constants.Form.TIME), '_label -> Messages(constants.Form.TIME))
-    @inputText(confirmSellerBidForm(constants.Form.PEG_HASH), '_label -> Messages(constants.Form.PEG_HASH))
+    @inputText(confirmSellerBidForm(constants.Form.PEG_HASH).copy(value = Some(pegHash)), '_label -> Messages(constants.Form.PEG_HASH))
     @inputText(confirmSellerBidForm(constants.Form.GAS), '_label -> Messages(constants.Form.GAS))
     @inputPassword(confirmSellerBidForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD))
 

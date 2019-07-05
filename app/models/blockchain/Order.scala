@@ -73,6 +73,8 @@ class Orders @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
 
   private def getOrdersByIDs(ids: Seq[String]): Future[Seq[Order]] = db.run(orderTable.filter(_.id.inSet(ids)).result)
 
+  private def getOrderIDs: Future[Seq[String]] = db.run(orderTable.map(_.id).result)
+
   private def deleteById(id: String)(implicit executionContext: ExecutionContext): Future[Int] = db.run(orderTable.filter(_.id === id).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -106,6 +108,8 @@ class Orders @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
     def getDirtyOrders: Seq[Order] = Await.result(getOrdersByDirtyBit(dirtyBit = true), Duration.Inf)
 
     def getOrders(ids: Seq[String]): Seq[Order] = Await.result(getOrdersByIDs(ids), Duration.Inf)
+
+    def getAllOrderIds: Seq[String] = Await.result(getOrderIDs, Duration.Inf)
 
     def markDirty(id: String): Int = Await.result(updateDirtyBitById(id, dirtyBit = true), Duration.Inf)
   }

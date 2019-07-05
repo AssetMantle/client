@@ -1,9 +1,9 @@
 @import models.blockchain.ACLHash
 @import models.blockchain.Asset
 
-@(assetPegWallet: Seq[Asset], aclHash: ACLHash)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
+@(assetList: Seq[Asset], aclHash: ACLHash)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
 
-    @for(asset <- assetPegWallet) {
+    @for(asset <- assetList) {
         <div class="flexItem box lightBlue">
             <div class="leftText">
                 <span class="red">@Messages(constants.Form.PEG_HASH)</span> : @asset.pegHash <br>
@@ -15,10 +15,13 @@
                 <span class="red">@Messages(constants.Form.UNMODERATED)</span> : @asset.unmoderated <br>
                 <span class="red">@Messages(constants.Form.LOCKED)</span> : @asset.locked <br>
             </div>
-            <div class="centerText" >
-                @if(aclHash.redeemAsset) {
-                <button class="width" onclick="getForm(jsRoutes.controllers.RedeemAssetController.redeemAssetForm())">@Messages(constants.Form.REDEEM_ASSET)</button>
-            } <br>
+            <div class="centerText">
+                @if(aclHash.changeBuyerBid) {
+                    <button onclick="getForm(jsRoutes.controllers.ChangeBuyerBidController.changeBuyerBidForm('@asset.ownerAddress','@asset.pegHash'))">@Messages(constants.Form.NEGOTIATE)</button>
+                } <br>
+                @if(aclHash.confirmBuyerBid) {
+                    <button onclick="getForm(jsRoutes.controllers.ConfirmBuyerBidController.confirmBuyerBidForm('@asset.ownerAddress','@asset.pegHash', @asset.assetPrice))">@Messages(constants.Form.ACCEPT_OFFER)</button>
+                } <br>
             </div>
         </div>
     }
