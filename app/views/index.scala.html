@@ -1,5 +1,5 @@
 @import views.html.component.blockchain.{blockExplorer, transactionExplorer, transactionHash, allBlocksTable, validatorsTable, blockHeight, validators, lastBlockHeight, averageBlockTime, search, blockTimeGraph}
-@import utilities.LoginState
+@import controllers.actions.LoginState
 @(failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
 @common(Messages(constants.Form.INDEX), failures, warnings, successes, infos)(Html(""))(center)(right)

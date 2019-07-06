@@ -7,7 +7,6 @@ import models.{blockchain, blockchainTransaction, master}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
-import utilities.LoginState
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Random
@@ -69,13 +68,12 @@ class BuyerExecuteOrderController @Inject()(messagesControllerComponents: Messag
         unmoderatedBuyerExecuteOrderData => {
 
           try {
-            val buyerAddress = masterAccounts.Service.getAddress(loginState.username)
-            val ticketID: String = if (kafkaEnabled) transactionsBuyerExecuteOrder.Service.kafkaPost(transactionsBuyerExecuteOrder.Request(from = loginState.username, password = unmoderatedBuyerExecuteOrderData.password, buyerAddress = buyerAddress, sellerAddress = unmoderatedBuyerExecuteOrderData.sellerAddress, fiatProofHash = unmoderatedBuyerExecuteOrderData.fiatProofHash, pegHash = unmoderatedBuyerExecuteOrderData.pegHash, gas = unmoderatedBuyerExecuteOrderData.gas)).ticketID else Random.nextString(32)
-            blockchainTransactionBuyerExecuteOrders.Service.create(from = loginState.username, buyerAddress = buyerAddress, sellerAddress = unmoderatedBuyerExecuteOrderData.sellerAddress, fiatProofHash = unmoderatedBuyerExecuteOrderData.fiatProofHash, pegHash = unmoderatedBuyerExecuteOrderData.pegHash, gas = unmoderatedBuyerExecuteOrderData.gas, null, null, ticketID = ticketID, null)
+            val ticketID: String = if (kafkaEnabled) transactionsBuyerExecuteOrder.Service.kafkaPost(transactionsBuyerExecuteOrder.Request(from = loginState.username, password = unmoderatedBuyerExecuteOrderData.password, buyerAddress = loginState.address, sellerAddress = unmoderatedBuyerExecuteOrderData.sellerAddress, fiatProofHash = unmoderatedBuyerExecuteOrderData.fiatProofHash, pegHash = unmoderatedBuyerExecuteOrderData.pegHash, gas = unmoderatedBuyerExecuteOrderData.gas)).ticketID else Random.nextString(32)
+            blockchainTransactionBuyerExecuteOrders.Service.create(from = loginState.username, buyerAddress = loginState.address, sellerAddress = unmoderatedBuyerExecuteOrderData.sellerAddress, fiatProofHash = unmoderatedBuyerExecuteOrderData.fiatProofHash, pegHash = unmoderatedBuyerExecuteOrderData.pegHash, gas = unmoderatedBuyerExecuteOrderData.gas, null, null, ticketID = ticketID, null)
             if (!kafkaEnabled) {
               Future {
                 try {
-                  blockchainTransactionBuyerExecuteOrders.Utility.onSuccess(ticketID, transactionsBuyerExecuteOrder.Service.post(transactionsBuyerExecuteOrder.Request(from = loginState.username, password = unmoderatedBuyerExecuteOrderData.password, buyerAddress = buyerAddress, sellerAddress = unmoderatedBuyerExecuteOrderData.sellerAddress, fiatProofHash = unmoderatedBuyerExecuteOrderData.fiatProofHash, pegHash = unmoderatedBuyerExecuteOrderData.pegHash, gas = unmoderatedBuyerExecuteOrderData.gas)))
+                  blockchainTransactionBuyerExecuteOrders.Utility.onSuccess(ticketID, transactionsBuyerExecuteOrder.Service.post(transactionsBuyerExecuteOrder.Request(from = loginState.username, password = unmoderatedBuyerExecuteOrderData.password, buyerAddress = loginState.address, sellerAddress = unmoderatedBuyerExecuteOrderData.sellerAddress, fiatProofHash = unmoderatedBuyerExecuteOrderData.fiatProofHash, pegHash = unmoderatedBuyerExecuteOrderData.pegHash, gas = unmoderatedBuyerExecuteOrderData.gas)))
                 } catch {
                   case baseException: BaseException => logger.error(baseException.failure.message, baseException)
                   case blockChainException: BlockChainException => logger.error(blockChainException.failure.message, blockChainException)

@@ -1,7 +1,6 @@
 @import models.master.Organization
-@import utilities.LoginState
-
-@(username: String, organization: Organization)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+@import controllers.actions.LoginState
+@(organization: Organization)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
 @common(Messages(constants.User.HOME))(Html(""))(center)(Html(""))
 @center = {
@@ -21,7 +20,7 @@
         <button onclick="getForm(jsRoutes.controllers.FileController.updateOrganizationKycForm('@constants.File.IDENTIFICATION'))">@Messages(constants.Form.UPDATE_ORGANIZATION_IDENTIFICATION)</button>
     </div>
     <script>
-            componentResource('commonHome', jsRoutes.controllers.ComponentViewController.commonHome('@username'));
-            componentResource('organization', jsRoutes.controllers.ComponentViewController.organizationDetails('@username'));
+            componentResource('commonHome', jsRoutes.controllers.ComponentViewController.commonHome('@loginState.username'));
+            componentResource('organization', jsRoutes.controllers.ComponentViewController.organizationDetails('@loginState.username'));
     </script>
 }

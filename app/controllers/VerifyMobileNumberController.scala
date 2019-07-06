@@ -8,7 +8,7 @@ import models.masterTransaction.SMSOTPs
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
-import utilities.{LoginState, SMS}
+import utilities.SMS
 import views.companion.master.VerifyMobileNumber
 
 import scala.concurrent.ExecutionContext

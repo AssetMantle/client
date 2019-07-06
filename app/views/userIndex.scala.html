@@ -1,5 +1,5 @@
-@import utilities.LoginState
-@(username: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+@import controllers.actions.LoginState
+@()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
 @common(Messages(constants.User.HOME))(Html(""))(center)(Html(""))
 
@@ -11,26 +11,26 @@
     <div class="centerText">
         <button id="userButtonUploadBankDetailsUser" class="hidden" onclick="getForm(jsRoutes.controllers.FileController.uploadUserKycForm('@constants.File.BANK_DETAILS'))">@Messages(constants.Form.UPLOAD_BANK_DETAILS)</button>
         <button id="userButtonUpdateBankDetailsUser" class="hidden" onclick="getForm(jsRoutes.controllers.FileController.updateUserKycForm('@constants.File.BANK_DETAILS'))">@Messages(constants.Form.UPDATE_BANK_DETAILS)</button>
-        <script>checkAccountKycFileExists('@username', '@constants.File.BANK_DETAILS', "userButtonUploadBankDetailsUser", "userButtonUpdateBankDetailsUser")</script>
+        <script>checkAccountKycFileExists('@loginState.username', '@constants.File.BANK_DETAILS', "userButtonUploadBankDetailsUser", "userButtonUpdateBankDetailsUser")</script>
         <button id="userButtonUploadIdentificationUser" class="hidden" onclick="getForm(jsRoutes.controllers.FileController.uploadUserKycForm('@constants.File.IDENTIFICATION'))">@Messages(constants.Form.UPLOAD_IDENTIFICATION)</button>
         <button id="userButtonUpdateIdentificationUser" class="hidden" onclick="getForm(jsRoutes.controllers.FileController.updateUserKycForm('@constants.File.IDENTIFICATION'))">@Messages(constants.Form.UPDATE_IDENTIFICATION)</button>
-        <script>checkAccountKycFileExists('@username', '@constants.File.IDENTIFICATION', "userButtonUploadIdentificationUser", "userButtonUpdateIdentificationUser")</script>
+        <script>checkAccountKycFileExists('@loginState.username', '@constants.File.IDENTIFICATION', "userButtonUploadIdentificationUser", "userButtonUpdateIdentificationUser")</script>
         <button id="userButtonUploadBankDetailsZone" class="hidden" onclick="getForm(jsRoutes.controllers.FileController.uploadUserZoneKycForm('@constants.File.BANK_DETAILS'))">@Messages(constants.Form.UPLOAD_ZONE_BANK_DETAILS)</button>
         <button id="userButtonUpdateBankDetailsZone" class="hidden" onclick="getForm(jsRoutes.controllers.FileController.updateUserZoneKycForm('@constants.File.BANK_DETAILS'))">@Messages(constants.Form.UPDATE_ZONE_BANK_DETAILS)</button>
-        <script>checkZoneKycFileExists('@username', '@constants.File.BANK_DETAILS', "userButtonUploadBankDetailsZone", "userButtonUpdateBankDetailsZone")</script>
+        <script>checkZoneKycFileExists('@loginState.username', '@constants.File.BANK_DETAILS', "userButtonUploadBankDetailsZone", "userButtonUpdateBankDetailsZone")</script>
         <button id="userButtonUploadIdentificationZone" class="hidden" onclick="getForm(jsRoutes.controllers.FileController.uploadUserZoneKycForm('@constants.File.IDENTIFICATION'))">@Messages(constants.Form.UPLOAD_ZONE_IDENTIFICATION)</button>
         <button id="userButtonUpdateIdentificationZone" class="hidden" onclick="getForm(jsRoutes.controllers.FileController.updateUserZoneKycForm('@constants.File.IDENTIFICATION'))">@Messages(constants.Form.UPDATE_ZONE_IDENTIFICATION)</button>
-        <script>checkZoneKycFileExists('@username', '@constants.File.IDENTIFICATION', "userButtonUploadIdentificationZone", "userButtonUpdateIdentificationZone")</script>
+        <script>checkZoneKycFileExists('@loginState.username', '@constants.File.IDENTIFICATION', "userButtonUploadIdentificationZone", "userButtonUpdateIdentificationZone")</script>
         <button id="userButtonUploadBankDetailsOrganization" class="hidden" onclick="getForm(jsRoutes.controllers.FileController.uploadUserOrganizationKycForm('@constants.File.BANK_DETAILS'))">@Messages(constants.Form.UPLOAD_ORGANIZATION_BANK_DETAILS)</button>
         <button id="userButtonUpdateBankDetailsOrganization" class="hidden" onclick="getForm(jsRoutes.controllers.FileController.updateUserOrganizationKycForm('@constants.File.BANK_DETAILS'))">@Messages(constants.Form.UPDATE_ORGANIZATION_BANK_DETAILS)</button>
-        <script>checkOrganizationKycFileExists('@username', '@constants.File.BANK_DETAILS', "userButtonUploadBankDetailsOrganization", "userButtonUpdateBankDetailsOrganization")</script>
+        <script>checkOrganizationKycFileExists('@loginState.username', '@constants.File.BANK_DETAILS', "userButtonUploadBankDetailsOrganization", "userButtonUpdateBankDetailsOrganization")</script>
         <button id="userButtonUploadIdentificationOrganization" class="hidden" onclick="getForm(jsRoutes.controllers.FileController.uploadUserOrganizationKycForm('@constants.File.IDENTIFICATION'))">@Messages(constants.Form.UPLOAD_ORGANIZATION_IDENTIFICATION)</button>
         <button id="userButtonUpdateIdentificationOrganization" class="hidden" onclick="getForm(jsRoutes.controllers.FileController.updateUserOrganizationKycForm('@constants.File.IDENTIFICATION'))">@Messages(constants.Form.UPDATE_ORGANIZATION_IDENTIFICATION)</button>
-        <script>checkOrganizationKycFileExists('@username', '@constants.File.IDENTIFICATION', "userButtonUploadIdentificationOrganization", "userButtonUpdateIdentificationOrganization")</script>
+        <script>checkOrganizationKycFileExists('@loginState.username', '@constants.File.IDENTIFICATION', "userButtonUploadIdentificationOrganization", "userButtonUpdateIdentificationOrganization")</script>
         <button onclick="getForm(jsRoutes.controllers.AddOrganizationController.addOrganizationForm())">@Messages(constants.Form.ADD_ORGANIZATION)</button>
         <button onclick="getForm(jsRoutes.controllers.AddZoneController.addZoneForm())">@Messages(constants.Form.ADD_ZONE)</button>
     </div>
         <script>
-                componentResource('commonHome', jsRoutes.controllers.ComponentViewController.commonHome('@username'))
+                componentResource('commonHome', jsRoutes.controllers.ComponentViewController.commonHome('@loginState.username'))
         </script>
 }

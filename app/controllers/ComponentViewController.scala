@@ -12,12 +12,11 @@ import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
 import queries.GetAccount
-import utilities.LoginState
 
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class ComponentViewController @Inject()(messagesControllerComponents: MessagesControllerComponents, withLoginAction: WithLoginAction, masterAccounts: Accounts,  masterAccountFiles: master.AccountFiles, blockchainAclAccounts: ACLAccounts, blockchainZones: blockchain.Zones, blockchainOrganizations: blockchain.Organizations, blockchainAssets: blockchain.Assets, blockchainFiats: blockchain.Fiats, blockchainNegotiations: blockchain.Negotiations, masterOrganizations: Organizations, masterZones: Zones, blockchainAclHashes: blockchain.ACLHashes, blockchainOrders: blockchain.Orders, getAccount: GetAccount, blockchainAccounts: blockchain.Accounts, withUsernameToken: WithUsernameToken)(implicit configuration: Configuration, executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class ComponentViewController @Inject()(messagesControllerComponents: MessagesControllerComponents, masterAccounts: Accounts,  masterAccountFiles: master.AccountFiles, blockchainAclAccounts: ACLAccounts, blockchainZones: blockchain.Zones, blockchainOrganizations: blockchain.Organizations, blockchainAssets: blockchain.Assets, blockchainFiats: blockchain.Fiats, blockchainNegotiations: blockchain.Negotiations, masterOrganizations: Organizations, masterZones: Zones, blockchainAclHashes: blockchain.ACLHashes, blockchainOrders: blockchain.Orders, getAccount: GetAccount, blockchainAccounts: blockchain.Accounts, withUsernameToken: WithUsernameToken)(implicit configuration: Configuration, executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -85,7 +84,6 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
     try {
       val address = masterAccounts.Service.getAddress(username)
       val negotiations = blockchainNegotiations.Service.getNegotiationsForAddress(address)
-      val assetPegHashList = blockchainAssets.Service.getAssetPegWallet(address).map(_.pegHash)
       Ok(views.html.component.master.negotiationList(negotiations.filter(_.buyerAddress == address),negotiations.filter(_.sellerAddress == address), blockchainAssets.Service.getAssetPegWallet(address).map(_.pegHash)))
     } catch {
       case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))

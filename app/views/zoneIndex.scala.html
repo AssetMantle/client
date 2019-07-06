@@ -1,6 +1,6 @@
 @import models.master.Zone
-@import utilities.LoginState
-@(username: String, zone: Zone)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+@import controllers.actions.LoginState
+@(zone: Zone)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
 @common(Messages(constants.User.HOME))(Html(""))(center)(Html(""))
 

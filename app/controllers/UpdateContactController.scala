@@ -6,7 +6,6 @@ import models.master.Contacts
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
-import utilities.LoginState
 import views.companion.master.UpdateContact
 
 import scala.concurrent.ExecutionContext

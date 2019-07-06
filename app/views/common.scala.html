@@ -1,4 +1,4 @@
-@import utilities.LoginState
+@import controllers.actions.LoginState
 @(title: String, failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(left: Html)(center:Html = Html(""))(right:Html = Html(""))(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash,loginState: LoginState = null)
 <!DOCTYPE html>
 <html lang="en">

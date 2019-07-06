@@ -8,7 +8,7 @@ import models.masterTransaction.EmailOTPs
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
-import utilities.{Email, LoginState}
+import utilities.Email
 import views.companion.master.VerifyEmailAddress
 
 import scala.concurrent.ExecutionContext

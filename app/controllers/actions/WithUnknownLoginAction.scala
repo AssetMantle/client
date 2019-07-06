@@ -6,7 +6,6 @@ import models.{master, masterTransaction}
 import play.api.i18n.I18nSupport
 import play.api.mvc._
 import play.api.{Configuration, Logger}
-import utilities.LoginState
 
 import scala.concurrent.ExecutionContext
 
@@ -23,7 +22,7 @@ class WithUnknownLoginAction @Inject()(messagesControllerComponents: MessagesCon
         masterTransactionAccountTokens.Service.tryVerifyingSessionToken(username, sessionToken)
         masterTransactionAccountTokens.Service.tryVerifyingSessionTokenTime(username)
         masterAccounts.Service.tryVerifyingUserType(username, constants.User.UNKNOWN)
-        f(LoginState(username,request.session.get(constants.Security.USER_TYPE).getOrElse(throw new BaseException(constants.Response.USER_TYPE_NOT_FOUND))))(request)
+        f(LoginState(username, constants.User.UNKNOWN, masterAccounts.Service.getAddress(username)))(request)
       }
       catch {
         case baseException: BaseException => {

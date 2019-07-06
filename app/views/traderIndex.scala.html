@@ -1,8 +1,7 @@
 @import models.blockchain.{ACLHash, Asset, Fiat, Negotiation, Order}
 @import models.master.{Organization, Zone}
-@import utilities.LoginState
-
-@(username: String, totalFiat: Int, zone: Zone, organization: Organization, aclHash: ACLHash)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+@import controllers.actions.LoginState
+@(totalFiat: Int, zone: Zone, organization: Organization, aclHash: ACLHash)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
 @common(Messages(constants.User.HOME))(Html(""))(center)(right)
 
@@ -102,9 +101,6 @@
                     @if(aclHash.redeemFiat) {
                         <button onclick="getForm(jsRoutes.controllers.RedeemFiatController.redeemFiatForm())">@Messages(constants.Form.REDEEM_FIAT)</button>
                     }
-                    @if(aclHash.sendFiat) {
-                        <button onclick="getForm(jsRoutes.controllers.SendFiatController.sendFiatForm())">@Messages(constants.Form.SEND_FIAT)</button>
-                    }
                 </div>
             </div>
             <div id="fiatList" class="flexContainer">
@@ -126,12 +122,12 @@
         </div>
     </div>
     <script>
-            componentResource('commonHome', jsRoutes.controllers.ComponentViewController.commonHome('@username'));
-            componentResource('zone', jsRoutes.controllers.ComponentViewController.zoneDetails('@username'));
-            componentResource('organization', jsRoutes.controllers.ComponentViewController.organizationDetails('@username'));
-            componentResource('assetList', jsRoutes.controllers.ComponentViewController.assetList('@username'));
-            componentResource('fiatList', jsRoutes.controllers.ComponentViewController.fiatList('@username'));
-            componentResource('negotiationList', jsRoutes.controllers.ComponentViewController.negotiationList('@username'));
-            componentResource('orderList', jsRoutes.controllers.ComponentViewController.orderList('@username'))
+            componentResource('commonHome', jsRoutes.controllers.ComponentViewController.commonHome('@loginState.username'));
+            componentResource('zone', jsRoutes.controllers.ComponentViewController.zoneDetails('@loginState.username'));
+            componentResource('organization', jsRoutes.controllers.ComponentViewController.organizationDetails('@loginState.username'));
+            componentResource('assetList', jsRoutes.controllers.ComponentViewController.assetList('@loginState.username'));
+            componentResource('fiatList', jsRoutes.controllers.ComponentViewController.fiatList('@loginState.username'));
+            componentResource('negotiationList', jsRoutes.controllers.ComponentViewController.negotiationList('@loginState.username'));
+            componentResource('orderList', jsRoutes.controllers.ComponentViewController.orderList('@loginState.username'))
     </script>
 }
