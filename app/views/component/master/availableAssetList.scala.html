@@ -1,9 +1,9 @@
 @import models.blockchain.ACLHash
 @import models.blockchain.Asset
 
-@(assetPegWallet: Seq[Asset], aclHash: ACLHash)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
+@(assetList: Seq[Asset])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
 
-    @for(asset <- assetPegWallet) {
+    @for(asset <- assetList) {
         <div class="flexItem box lightBlue">
             <div class="leftText">
                 <span class="red">@Messages(constants.Form.PEG_HASH)</span> : @asset.pegHash <br>
@@ -14,11 +14,6 @@
                 <span class="red">@Messages(constants.Form.QUANTITY_UNIT)</span> : @asset.quantityUnit <br>
                 <span class="red">@Messages(constants.Form.UNMODERATED)</span> : @asset.unmoderated <br>
                 <span class="red">@Messages(constants.Form.LOCKED)</span> : @asset.locked <br>
-            </div>
-            <div class="centerText" >
-                @if(aclHash.redeemAsset) {
-                <button class="width" onclick="getForm(jsRoutes.controllers.RedeemAssetController.redeemAssetForm())">@Messages(constants.Form.REDEEM_ASSET)</button>
-            } <br>
             </div>
         </div>
     }

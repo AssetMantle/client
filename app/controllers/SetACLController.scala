@@ -7,6 +7,7 @@ import models.{blockchain, blockchainTransaction, master}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
+import utilities.LoginState
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Random
@@ -29,6 +30,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
           BadRequest(views.html.component.master.setACL(formWithErrors))
         },
         setACLData => {
+          implicit val loginState:LoginState = LoginState(username)
           try {
             if (masterOrganizations.Service.getStatus(setACLData.organizationID) == Option(true)) {
               val zoneID = masterZones.Service.getZoneId(username)

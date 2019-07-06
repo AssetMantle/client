@@ -1,13 +1,13 @@
 @import helper._
 @import views.companion.master.ChangeSellerBid
 
-@(changeSellerBidForm: Form[ChangeSellerBid.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@(changeSellerBidForm: Form[ChangeSellerBid.Data], buyerAddress:String, pegHash:String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @form(action = routes.ChangeSellerBidController.changeSellerBid, 'onkeypress -> "validateForm(event,this)") {
     @CSRF.formField
-    @inputText(changeSellerBidForm(constants.Form.BUYER_ADDRESS), '_label -> Messages(constants.Form.BUYER_ADDRESS))
+    @inputText(changeSellerBidForm(constants.Form.BUYER_ADDRESS).copy(value = Some(buyerAddress)), '_label -> Messages(constants.Form.BUYER_ADDRESS))
     @inputText(changeSellerBidForm(constants.Form.BID), '_label -> Messages(constants.Form.BID))
     @inputText(changeSellerBidForm(constants.Form.TIME), '_label -> Messages(constants.Form.TIME))
-    @inputText(changeSellerBidForm(constants.Form.PEG_HASH), '_label -> Messages(constants.Form.PEG_HASH))
+    @inputText(changeSellerBidForm(constants.Form.PEG_HASH).copy(value = Some(pegHash)), '_label -> Messages(constants.Form.PEG_HASH))
     @inputText(changeSellerBidForm(constants.Form.GAS), '_label -> Messages(constants.Form.GAS))
     @inputPassword(changeSellerBidForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD))
 

@@ -8,7 +8,7 @@ import models.masterTransaction.SMSOTPs
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
-import utilities.SMS
+import utilities.{LoginState, SMS}
 import views.companion.master.VerifyMobileNumber
 
 import scala.concurrent.ExecutionContext
@@ -39,6 +39,7 @@ class VerifyMobileNumberController @Inject()(messagesControllerComponents: Messa
           BadRequest(views.html.component.master.verifyMobileNumber(formWithErrors))
         },
         verifyMobileNumberData => {
+          implicit val loginState:LoginState = LoginState(username)
           try {
             if (!smsOTPs.Service.verifyOTP(username, verifyMobileNumberData.otp)) throw new BaseException(constants.Response.INVALID_OTP)
             if (contacts.Service.verifyMobileNumber(username) != 1) throw new BaseException(constants.Response.MOBILE_NUMBER_NOT_FOUND)

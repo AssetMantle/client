@@ -1,12 +1,12 @@
 @import helper._
 @import views.companion.master.SendFiat
 
-@(sendFiatForm: Form[SendFiat.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@(sendFiatForm: Form[SendFiat.Data], sellerAddress: String, pegHash: String, bid: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @form(action = routes.SendFiatController.sendFiat, 'onkeypress -> "validateForm(event,this)") {
     @CSRF.formField
-    @inputText(sendFiatForm(constants.Form.SELLER_ADDRESS), '_label -> Messages(constants.Form.SELLER_ADDRESS))
-    @inputText(sendFiatForm(constants.Form.AMOUNT), '_label -> Messages(constants.Form.AMOUNT))
-    @inputText(sendFiatForm(constants.Form.PEG_HASH), '_label -> Messages(constants.Form.PEG_HASH))
+    @inputText(sendFiatForm(constants.Form.SELLER_ADDRESS).copy(value = Some(sellerAddress)), '_label -> Messages(constants.Form.SELLER_ADDRESS))
+    @inputText(sendFiatForm(constants.Form.AMOUNT).copy(value = Some(bid.toString)), '_label -> Messages(constants.Form.AMOUNT))
+    @inputText(sendFiatForm(constants.Form.PEG_HASH).copy(value = Some(pegHash)), '_label -> Messages(constants.Form.PEG_HASH))
     @inputText(sendFiatForm(constants.Form.GAS), '_label -> Messages(constants.Form.GAS))
     @inputPassword(sendFiatForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD))
 

@@ -1,0 +1,13 @@
+@import utilities.LoginState
+@(username: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+
+@common(Messages(constants.User.HOME))(Html(""))(center)(Html(""))
+    @center = {
+    <div class="flexContainer">
+        <div id="commonHome" class="box flexItem flexGrowth"></div>
+        <button onclick="getForm(jsRoutes.controllers.SendCoinController.requestCoinsForm())">@Messages(constants.Form.REQUEST_COIN)</button>
+    </div>
+        <script>
+                componentResource('commonHome', jsRoutes.controllers.ComponentViewController.commonHome('@username'))
+        </script>
+}

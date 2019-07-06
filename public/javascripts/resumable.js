@@ -366,7 +366,8 @@
                         f.container = (typeof event != 'undefined' ? event.srcElement : null);
                         $.fire('fileAdded', f, event)
                     },0);
-                })()};
+                })()
+                }
             });
             window.setTimeout(function(){
                 $.fire('filesAdded', files)
