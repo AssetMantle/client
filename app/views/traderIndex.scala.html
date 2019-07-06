@@ -88,13 +88,39 @@
                 }
                 </div>
             </div>
-            <div id="assetList" class="flexContainer">
-            </div>
+            <div id="assetList" class="flexContainer"></div>
+            <script type="text/javascript">
+                    var assetCometMessage = function (event) {
+                        console.log("Response Event:    " + event + ", Length:" + event.length);
+                        let content = '';
+                        event.forEach(function (asset, index) {
+                            content += `<div class='flexItem box colorCards'><div class='leftAlign'>
+                            ` + '@Messages(constants.Form.PEG_HASH)' + ":" + asset.pegHash + `<br>
+                            ` + '@Messages(constants.Form.DOCUMENT_HASH)' + ":" + asset.documentHash + `<br>
+                            ` + '@Messages(constants.Form.ASSET_TYPE)' + ":" + asset.assetType + `<br>
+                            ` + '@Messages(constants.Form.ASSET_QUANTITY)' + ":" + asset.assetQuantity + `<br>
+                            ` + '@Messages(constants.Form.ASSET_PRICE)' + ":" + asset.assetPrice + `<br>
+                            ` + '@Messages(constants.Form.QUANTITY_UNIT)' + ":" + asset.quantityUnit + `<br>
+                            ` + '@Messages(constants.Form.UNMODERATED)' + ":" + asset.unmoderated + `<br>
+                            ` + '@Messages(constants.Form.LOCKED)' + ":" + asset.locked + `<br>
+                            </div>`;
+
+                            if ('@aclHash.redeemAsset') {
+                                content += "<div class='centerText'><button class='width' onclick='getForm(jsRoutes.controllers.RedeemAssetController.redeemAssetForm())'>" + '@Messages(constants.Form.REDEEM_ASSET)' + "</button><br>"
+                            }
+                            if ('@aclHash.sendAsset') {
+                                content += "<button class='width' onclick='getForm(jsRoutes.controllers.SendAssetController.sendAssetForm())'>" + '@Messages(constants.Form.SEND_ASSET)' + "</button> </div> </div>"
+                            }
+                        });
+                        $('#assetList').html(content);
+                    }
+            </script>
+            <iframe class="hidden" src="@routes.IssueAssetController.assetComet"></iframe>
         </div>
 
         <div class="flexGrowth flexItem box leftText">
             <div>
-                <h2 class="showHide toggleElement centerText">@Messages(constants.User.FIATS_OWNED): @totalFiat</h2>
+                <h2 class="showHide toggleElement centerText">@Messages(constants.User.FIATS_OWNED): <span id="totalFiat">@totalFiat</span></h2>
                 <div class="centerText">
                     @if(aclHash.issueFiat) {
                         <button onclick="getForm(jsRoutes.controllers.IssueFiatController.issueFiatRequestForm())">@Messages(constants.Form.ISSUE_FIAT_REQUEST)</button>
@@ -107,8 +133,25 @@
                     }
                 </div>
             </div>
-            <div id="fiatList" class="flexContainer">
-            </div>
+            <div id="fiatList" class="flexContainer"></div>
+            <script type="text/javascript">
+                    var fiatCometMessage = function (event) {
+                        console.log("Response Event:    " + JSON.stringify(event));
+                        let content = '';
+                        for(let i = 0; i < event.fiats.length; i++) {
+                            console.log(event.fiats[i]);
+                            content += `<div class='flexItem box leftAlign colorCards'>
+                                    ` + '@Messages(constants.Form.PEG_HASH)' +  ":" + event.fiats[i].pegHash + `<br>
+                                    ` + '@Messages(constants.Form.TRANSACTION_ID)' +  ":" + event.fiats[i].transactionID + ` <br>
+                                    ` + '@Messages(constants.Form.TRANSACTION_AMOUNT)' +  ":" + event.fiats[i].transactionAmount + ` <br>
+                                    ` + '@Messages(constants.Form.REDEEM_AMOUNT)' +  ":" + event.fiats[i].redeemedAmount + `
+                                    </div>`;
+                        }
+                        $('#fiatList').html(content);
+                        $('#totalFiat').html(event.totalFiat);
+                    }
+            </script>
+            <iframe class="hidden" src="@routes.IssueFiatController.fiatComet"></iframe>
         </div>
 
         <div class="flexGrowth flexItem box leftText">
