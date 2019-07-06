@@ -4,7 +4,9 @@ import controllers.actions.{WithTraderLoginAction, WithZoneLoginAction}
 import exceptions.{BaseException, BlockChainException}
 import javax.inject.{Inject, Singleton}
 import models.{blockchain, blockchainTransaction, master, masterTransaction}
+import play.api.http.ContentTypes
 import play.api.i18n.I18nSupport
+import play.api.libs.Comet
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
 
@@ -18,6 +20,11 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
 
   private implicit val logger: Logger = Logger(this.getClass)
 
+  def fiatComet = withTraderLoginAction.authenticated { username =>
+    implicit request =>
+      Ok.chunked(blockchainFiats.Service.fiatCometSource(username) via Comet.json("parent.fiatCometMessage")).as(ContentTypes.HTML)
+  }
+  
   def issueFiatRequestForm: Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.master.issueFiatRequest(views.companion.master.IssueFiatRequest.form))
   }

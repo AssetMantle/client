@@ -5,7 +5,7 @@ import java.net.ConnectException
 import akka.actor.ActorSystem
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import models.blockchain.AssetMessage
+import models.blockchain.AssetCometMessage
 import models.{blockchain, master}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
@@ -156,7 +156,7 @@ class SendAssets @Inject()(protected val databaseConfigProvider: DatabaseConfigP
         val orderResponse = getOrder.Service.get(negotiationID)
         orderResponse.value.assetPegWallet.foreach(assets => assets.foreach(asset => blockchainAssets.Service.insertOrUpdate(pegHash = asset.pegHash, documentHash = asset.documentHash, assetType = asset.assetType, assetPrice = asset.assetPrice, assetQuantity = asset.assetQuantity, quantityUnit = asset.quantityUnit, locked = asset.locked, unmoderated = asset.unmoderated, ownerAddress = negotiationID, dirtyBit = false)))
         val assetPegWallet = getAccount.Service.get(sellerAddress).value.assetPegWallet.getOrElse(Seq[AccountResponse.Asset]())
-        blockchainAssets.mainAssetActor ! AssetMessage(ownerAddress = sellerAddress, assetsJsValue = Json.toJson(assetPegWallet.map { asset => Json.toJson(blockchain.Asset(pegHash = asset.pegHash, documentHash = asset.documentHash, assetType = asset.assetType, assetPrice = asset.assetPrice, assetQuantity = asset.assetQuantity, quantityUnit = asset.quantityUnit, ownerAddress = sellerAddress, locked = asset.locked, unmoderated = asset.unmoderated, dirtyBit = false)) }))
+        blockchainAssets.mainAssetActor ! AssetCometMessage(ownerAddress = sellerAddress, message = Json.toJson(assetPegWallet.map { asset => Json.toJson(blockchain.Asset(pegHash = asset.pegHash, documentHash = asset.documentHash, assetType = asset.assetType, assetPrice = asset.assetPrice, assetQuantity = asset.assetQuantity, quantityUnit = asset.quantityUnit, ownerAddress = sellerAddress, locked = asset.locked, unmoderated = asset.unmoderated, dirtyBit = false)) }))
         blockchainAccounts.Service.markDirty(sellerAddress)
         blockchainTransactionFeedbacks.Service.markDirty(sellerAddress)
         pushNotification.sendNotification(masterAccounts.Service.getId(sendAsset.to), constants.Notification.SUCCESS, response.TxHash)

@@ -132,6 +132,7 @@ GET         /master/issueAsset                                   controllers.Iss
 POST        /master/issueAsset                                   controllers.IssueAssetController.issueAsset
 
 GET         /master/assetComet                                   controllers.IssueAssetController.assetComet
+GET         /master/fiatComet                                    controllers.IssueFiatController.fiatComet
 
 GET         /master/issueFiatRequest                             controllers.IssueFiatController.issueFiatRequestForm
 POST        /master/issueFiatRequest                             controllers.IssueFiatController.issueFiatRequest

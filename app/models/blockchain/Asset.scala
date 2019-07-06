@@ -1,8 +1,8 @@
 package models.blockchain
 
 import akka.actor.ActorRef
+import akka.stream.OverflowStrategy
 import akka.stream.scaladsl.Source
-import akka.stream.{ActorMaterializer, OverflowStrategy}
 import exceptions.{BaseException, BlockChainException}
 import javax.inject.{Inject, Singleton}
 import models.master
@@ -13,7 +13,8 @@ import play.api.libs.json.{JsValue, Json, OWrites}
 import play.api.{Configuration, Logger}
 import queries.GetAccount
 import slick.jdbc.JdbcProfile
-import utilities._
+import utilities.PushNotification
+import utilities.actors.{Actor, MainAssetActor, ShutdownActors, UserAssetActor}
 
 import scala.concurrent.duration.{Duration, _}
 import scala.concurrent.{Await, ExecutionContext, Future}
@@ -21,7 +22,7 @@ import scala.util.{Failure, Success}
 
 case class Asset(pegHash: String, documentHash: String, assetType: String, assetQuantity: String, assetPrice: String, quantityUnit: String, ownerAddress: String, locked: Boolean, unmoderated: Boolean, dirtyBit: Boolean)
 
-case class AssetMessage(ownerAddress: String, assetsJsValue: JsValue)
+case class AssetCometMessage(ownerAddress: String, message: JsValue)
 
 @Singleton
 class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, shutdownActors: ShutdownActors, accountTokens: AccountTokens, getAccount: GetAccount, masterAccounts: master.Accounts, implicit val pushNotification: PushNotification)(implicit executionContext: ExecutionContext, configuration: Configuration) {
@@ -134,8 +135,6 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
 
   }
 
-  private implicit val materializer: ActorMaterializer = ActorMaterializer()(Actor.system)
-
   object Service {
 
     def create(pegHash: String, documentHash: String, assetType: String, assetQuantity: String, assetPrice: String, quantityUnit: String, ownerAddress: String, unmoderated: Boolean, locked: Boolean, dirtyBit: Boolean)(implicit executionContext: ExecutionContext): String = Await.result(add(Asset(pegHash = pegHash, documentHash = documentHash, assetType = assetType, assetPrice = assetPrice, assetQuantity = assetQuantity, quantityUnit = quantityUnit, ownerAddress = ownerAddress, unmoderated = unmoderated, locked = locked, dirtyBit = dirtyBit)), Duration.Inf)
@@ -155,10 +154,12 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
     def markDirty(pegHash: String): Int = Await.result(updateDirtyBitByPegHash(pegHash, dirtyBit = true), Duration.Inf)
 
     def assetCometSource(username: String) = {
-      shutdownActors.shutdown(username)
-      val (systemUserActor, source) = Source.actorRef[JsValue](0, OverflowStrategy.dropHead).preMaterialize()
-      Actor.system.actorOf(props = UserAssetActor.props(systemUserActor), name = masterAccounts.Service.getAddress(username))
-      shutdownActors.sessionTimeoutShutdown(username)
+      val address = masterAccounts.Service.getAddress(username)
+      shutdownActors.shutdown(constants.Module.ACTOR_USER_ASSET, address)
+      Thread.sleep(1000)
+      val (systemUserActor, source) = Source.actorRef[JsValue](0, OverflowStrategy.dropHead).preMaterialize()(Actor.materializer)
+      Actor.system.actorOf(props = UserAssetActor.props(systemUserActor), name = constants.Module.ACTOR_USER_ASSET + address)
+      shutdownActors.sessionTimeoutShutdown(constants.Module.ACTOR_USER_ASSET, username)
       source
     }
   }
@@ -171,7 +172,7 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
         try {
           val assetPegWallet = getAccount.Service.get(dirtyAsset.ownerAddress).value.assetPegWallet.getOrElse(throw new BaseException(constants.Response.NO_RESPONSE))
           assetPegWallet.foreach(assetPeg => if (assetPegWallet.map(_.pegHash) contains dirtyAsset.pegHash) Service.insertOrUpdate(pegHash = assetPeg.pegHash, documentHash = assetPeg.documentHash, assetType = assetPeg.assetType, assetPrice = assetPeg.assetPrice, assetQuantity = assetPeg.assetQuantity, quantityUnit = assetPeg.quantityUnit, ownerAddress = dirtyAsset.ownerAddress, locked = assetPeg.locked, unmoderated = assetPeg.unmoderated, dirtyBit = false) else Service.deleteAsset(dirtyAsset.pegHash))
-          mainAssetActor ! AssetMessage(ownerAddress = dirtyAsset.ownerAddress, assetsJsValue = Json.toJson(assetPegWallet.map { asset => Json.toJson(Asset(pegHash = asset.pegHash, documentHash = asset.documentHash, assetType = asset.assetType, assetPrice = asset.assetPrice, assetQuantity = asset.assetQuantity, quantityUnit = asset.quantityUnit, ownerAddress = dirtyAsset.ownerAddress, locked = asset.locked, unmoderated = asset.unmoderated, dirtyBit = false)) }))
+          mainAssetActor ! AssetCometMessage(ownerAddress = dirtyAsset.ownerAddress, message = Json.toJson(assetPegWallet.map { asset => Json.toJson(Asset(pegHash = asset.pegHash, documentHash = asset.documentHash, assetType = asset.assetType, assetPrice = asset.assetPrice, assetQuantity = asset.assetQuantity, quantityUnit = asset.quantityUnit, ownerAddress = dirtyAsset.ownerAddress, locked = asset.locked, unmoderated = asset.unmoderated, dirtyBit = false)) }))
         }
         catch {
           case baseException: BaseException => logger.info(baseException.failure.message, baseException)

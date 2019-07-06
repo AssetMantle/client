@@ -7,7 +7,7 @@ import models.masterTransaction.AccountTokens
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
-import utilities.ShutdownActors
+import utilities.actors.ShutdownActors
 import views.companion.master.Logout
 
 import scala.concurrent.ExecutionContext
@@ -34,7 +34,8 @@ class LogoutController @Inject()(messagesControllerComponents: MessagesControlle
             if (!loginData.receiveNotifications) {
               accountTokens.Service.deleteToken(username)
             }
-            shutdownActors.logOutShutdown(username)
+            shutdownActors.logOutShutdown(constants.Module.ACTOR_USER_ASSET, username)
+            shutdownActors.logOutShutdown(constants.Module.ACTOR_USER_FIAT, username)
             Ok(views.html.index(successes = Seq(constants.Response.LOGGED_OUT))).withNewSession
           }
           catch {

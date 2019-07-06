@@ -89,13 +89,11 @@
                 <button onclick="getForm(jsRoutes.controllers.IssueAssetController.issueAssetRequestForm())">@Messages(constants.Form.ISSUE_ASSET_REQUEST)</button>
             }
             </div>
-            <script src="@routes.Assets.versioned("javascripts/assetList.js")" type="text/javascript"></script>
             <div id="assetsList" class="flexContainer">@component.master.assetList(assetPegWallet, aclHash)</div>
             <script type="text/javascript">
-                    let assetCometMessage = function (event) {
+                    var assetCometMessage = function (event) {
                         console.log("Response Event:    " + event + ", Length:" + event.length);
-                        @*//$('#assetsList').html(displayAssets(event, '@Messages(constants.Form.PEG_HASH)', '@Messages(constants.Form.DOCUMENT_HASH)','@Messages(constants.Form.ASSET_TYPE)','@Messages(constants.Form.ASSET_QUANTITY)','@Messages(constants.Form.ASSET_PRICE)','@Messages(constants.Form.QUANTITY_UNIT)','@Messages(constants.Form.UNMODERATED)', '@Messages(constants.Form.LOCKED)','@aclHash.redeemAsset','@aclHash.sendAsset', '@Messages(constants.Form.REDEEM_ASSET)', '@Messages(constants.Form.SEND_ASSET)'))*@
-                        var content = '';
+                        let content = '';
                         event.forEach(function (asset, index) {
                             content += `<div class='flexItem box colorCards'><div class='leftAlign'>
                             ` + '@Messages(constants.Form.PEG_HASH)' + ":" + asset.pegHash + `<br>
@@ -122,7 +120,7 @@
         </div>
 
         <div class="flexGrowth flexItem box leftAlign">
-            <h2 class="showHide showHideStyle centerText">@Messages(constants.User.FIATS_OWNED): @totalFiat</h2>
+            <h2 class="showHide showHideStyle centerText">@Messages(constants.User.FIATS_OWNED): <span id="totalFiat">@totalFiat</span></h2>
             <div class="centerText">
                 @if(aclHash.issueFiat) {
                     <button onclick="getForm(jsRoutes.controllers.IssueFiatController.issueFiatRequestForm())">@Messages(constants.Form.ISSUE_FIAT_REQUEST)</button>
@@ -134,9 +132,25 @@
                     <button onclick="getForm(jsRoutes.controllers.SendFiatController.sendFiatForm())">@Messages(constants.Form.SEND_FIAT)</button>
                 }
             </div>
-            <div class="flexContainer">
-            @component.master.fiatList(fiatPegWallet, aclHash)
-            </div>
+            <div id="fiatsList" class="flexContainer"> @component.master.fiatList(fiatPegWallet, aclHash)</div>
+            <script type="text/javascript">
+                    var fiatCometMessage = function (event) {
+                        console.log("Response Event:    " + JSON.stringify(event));
+                        let content = '';
+                        for(let i = 0; i < event.fiats.length; i++) {
+                            console.log(event.fiats[i]);
+                            content += `<div class='flexItem box leftAlign colorCards'>
+                                    ` + '@Messages(constants.Form.PEG_HASH)' +  ":" + event.fiats[i].pegHash + `<br>
+                                    ` + '@Messages(constants.Form.TRANSACTION_ID)' +  ":" + event.fiats[i].transactionID + ` <br>
+                                    ` + '@Messages(constants.Form.TRANSACTION_AMOUNT)' +  ":" + event.fiats[i].transactionAmount + ` <br>
+                                    ` + '@Messages(constants.Form.REDEEM_AMOUNT)' +  ":" + event.fiats[i].redeemedAmount + `
+                                    </div>`;
+                        }
+                        $('#fiatsList').html(content);
+                        $('#totalFiat').html(event.totalFiat);
+                    }
+            </script>
+            <iframe class="hidden" src="@routes.IssueFiatController.fiatComet"></iframe>
         </div>
         <div class="flexGrowth flexItem box leftAlign">
             <h2 class="showHide showHideStyle centerText">@Messages(constants.Form.ON_GOING_NEGOTIATIONS)</h2>

@@ -1,14 +1,18 @@
 package models.blockchain
 
-import akka.actor.ActorSystem
+import akka.actor.ActorRef
+import akka.stream.OverflowStrategy
+import akka.stream.scaladsl.Source
 import exceptions.{BaseException, BlockChainException}
 import javax.inject.{Inject, Singleton}
 import models.{master, masterTransaction}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
+import play.api.libs.json.{JsValue, Json, OWrites}
 import play.api.{Configuration, Logger}
 import queries.{GetAccount, GetOrder}
 import slick.jdbc.JdbcProfile
+import utilities.actors.{Actor, MainFiatActor, ShutdownActors, UserFiatActor}
 
 import scala.concurrent.duration.{Duration, _}
 import scala.concurrent.{Await, ExecutionContext, Future}
@@ -16,8 +20,12 @@ import scala.util.{Failure, Success}
 
 case class Fiat(pegHash: String, ownerAddress: String, transactionID: String, transactionAmount: String, redeemedAmount: String, dirtyBit: Boolean)
 
+case class FiatsMessage(totalFiat: String, fiats: Seq[Fiat])
+
+case class FiatCometMessage(ownerAddress: String, message: JsValue)
+
 @Singleton
-class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, blockchainNegotiations: Negotiations, actorSystem: ActorSystem, getAccount: GetAccount, masterTransactionIssueFiatRequests: masterTransaction.IssueFiatRequests, masterAccounts: master.Accounts, getOrder: GetOrder)(implicit executionContext: ExecutionContext, configuration: Configuration) {
+class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, shutdownActors: ShutdownActors, blockchainNegotiations: Negotiations, getAccount: GetAccount, masterTransactionIssueFiatRequests: masterTransaction.IssueFiatRequests, masterAccounts: master.Accounts, getOrder: GetOrder)(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -25,8 +33,14 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
   private implicit val logger: Logger = Logger(this.getClass)
 
+  private implicit val fiatWrites: OWrites[Fiat] = Json.writes[Fiat]
+
+  private implicit val fiatMessageWrites: OWrites[FiatsMessage] = Json.writes[FiatsMessage]
+
   private implicit val module: String = constants.Module.BLOCKCHAIN_FIAT
 
+  val mainFiatActor: ActorRef = Actor.system.actorOf(props = MainFiatActor.props, name = "mainFiatActor")
+  
   import databaseConfig.profile.api._
 
   private[models] val fiatTable = TableQuery[FiatTable]
@@ -107,6 +121,16 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
     def getDirtyFiats: Seq[Fiat] = Await.result(getFiatsByDirtyBit(dirtyBit = true), Duration.Inf)
 
     def markDirty(address: String): Int = Await.result(updateDirtyBitByAddress(address, dirtyBit = true), Duration.Inf)
+
+    def fiatCometSource(username: String) = {
+      val address = masterAccounts.Service.getAddress(username)
+      shutdownActors.shutdown(constants.Module.ACTOR_USER_FIAT, address)
+      Thread.sleep(1000)
+      val (systemUserActor, source) = Source.actorRef[JsValue](0, OverflowStrategy.dropHead).preMaterialize()(Actor.materializer)
+      Actor.system.actorOf(props = UserFiatActor.props(systemUserActor), name = constants.Module.ACTOR_USER_FIAT + address)
+      shutdownActors.sessionTimeoutShutdown(constants.Module.ACTOR_USER_FIAT, username)
+      source
+    }
   }
 
   private def deleteByPegHashAndAddress(pegHash: String, address: String)(implicit executionContext: ExecutionContext) = db.run(fiatTable.filter(_.pegHash === pegHash).filter(_.ownerAddress === address).delete.asTry).map {
@@ -137,6 +161,7 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
         try {
           val fiatPegWallet = getAccount.Service.get(dirtyFiat.ownerAddress).value.fiatPegWallet.getOrElse(throw new BaseException(constants.Response.NO_RESPONSE))
           fiatPegWallet.foreach(fiatPeg => if (fiatPegWallet.map(_.pegHash) contains dirtyFiat.pegHash) Service.insertOrUpdate(fiatPeg.pegHash, dirtyFiat.ownerAddress, fiatPeg.transactionID, fiatPeg.transactionAmount, fiatPeg.redeemedAmount, dirtyBit = false) else Service.deleteFiat(dirtyFiat.pegHash, dirtyFiat.ownerAddress))
+          mainFiatActor ! FiatCometMessage(ownerAddress = dirtyFiat.ownerAddress, message = Json.toJson(FiatsMessage(totalFiat = fiatPegWallet.map(_.transactionAmount.toInt).sum.toString, fiats = fiatPegWallet.map{fiat => Fiat(pegHash = fiat.pegHash, ownerAddress = dirtyFiat.ownerAddress, transactionID = fiat.transactionID, transactionAmount = fiat.transactionAmount, redeemedAmount = fiat.redeemedAmount, dirtyBit = false)})))
         }
         catch {
           case baseException: BaseException => logger.info(baseException.failure.message, baseException)
@@ -149,7 +174,7 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
     }
   }
 
-  actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
+  Actor.system.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
     Utility.dirtyEntityUpdater()
   }
 }

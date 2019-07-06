@@ -1,4 +1,4 @@
-package utilities
+package utilities.actors
 
 import java.util.concurrent.TimeUnit
 
@@ -24,21 +24,22 @@ class ShutdownActors @Inject()(masterAccounts: models.master.Accounts, accountTo
 
   private implicit val module: String = constants.Module.ACTOR_SHUTDOWN
 
-  def sessionTimeoutShutdown(username: String): Unit = Future {
+  def sessionTimeoutShutdown(actorType: String, username: String): Unit = Future {
     while (true) {
       Thread.sleep(sessionTokenTimeout)
       if (!accountTokens.Service.verifySessionTokenTime(Option(username))){
-        shutdown(username)
+        shutdown(actorType, masterAccounts.Service.getAddress(username))
         return
       }
     }
   }
 
-  def logOutShutdown(username: String): Future[Unit] = Future{ shutdown(username)}
+  def logOutShutdown(actorType: String, username: String): Future[Unit] = Future{ shutdown(actorType, masterAccounts.Service.getAddress(username)) }
 
-  def shutdown(username: String): Unit = {
-    Actor.system.actorSelection("/user/" + masterAccounts.Service.getAddress(username)).resolveOne().onComplete {
-      case Success(actorRef) => actorRef ! ShutdownActorMessage()
+  def shutdown(actorType: String, address: String): Unit = {
+    Actor.system.actorSelection("/user/" + actorType + address).resolveOne().onComplete {
+      case Success(actorRef) => logger.info(module + ": " + actorType + address)
+        actorRef ! ShutdownActorMessage()
       case Failure(ex) => logger.info(module + ": " + ex.getMessage)
     }
   }
