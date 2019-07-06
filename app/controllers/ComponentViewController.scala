@@ -85,7 +85,8 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
     try {
       val address = masterAccounts.Service.getAddress(username)
       val negotiations = blockchainNegotiations.Service.getNegotiationsForAddress(address)
-      Ok(views.html.component.master.negotiationList(negotiations.filter(_.buyerAddress == address),negotiations.filter(_.sellerAddress == address )))
+      val assetPegHashList = blockchainAssets.Service.getAssetPegWallet(address).map(_.pegHash)
+      Ok(views.html.component.master.negotiationList(negotiations.filter(_.buyerAddress == address),negotiations.filter(_.sellerAddress == address), blockchainAssets.Service.getAssetPegWallet(address).map(_.pegHash)))
     } catch {
       case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
     }

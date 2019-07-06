@@ -32,12 +32,11 @@ class LoginController @Inject()(messagesControllerComponents: MessagesController
       },
       loginData => {
         try {
-          implicit val loginState:LoginState = LoginState(loginData.username)
-          val userType = masterAccounts.Service.validateLoginAndGetUserType(loginData.username, loginData.password)
+          implicit val loginState:LoginState = LoginState(loginData.username, masterAccounts.Service.validateLoginAndGetUserType(loginData.username, loginData.password))
           val address = masterAccounts.Service.getAddress(loginData.username)
           pushNotification.registerNotificationToken(loginData.username, loginData.notificationToken)
           pushNotification.sendNotification(loginData.username, constants.Notification.LOGIN, loginData.username)
-          userType match {
+          loginState.userType match {
             case constants.User.GENESIS =>
               withUsernameToken.Ok(views.html.genesisIndex(username = loginData.username), loginData.username)
             case constants.User.ZONE =>

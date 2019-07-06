@@ -28,7 +28,7 @@
         <button onclick="getForm(jsRoutes.controllers.FileController.updateZoneKycForm('@constants.File.IDENTIFICATION'))">@Messages(constants.Form.UPDATE_ZONE_IDENTIFICATION)</button>
     </div>
     <script>
-            componentResource('commonHome', jsRoutes.controllers.ComponentViewController.commonHome('@username'));
-            componentResource('zone', jsRoutes.controllers.ComponentViewController.zoneDetails('@username'));
+            componentResource('commonHome', jsRoutes.controllers.ComponentViewController.commonHome('@loginState.username'));
+            componentResource('zone', jsRoutes.controllers.ComponentViewController.zoneDetails('@loginState.username'));
     </script>
 }

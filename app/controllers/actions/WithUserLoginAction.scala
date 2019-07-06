@@ -6,6 +6,7 @@ import models.{master, masterTransaction}
 import play.api.i18n.I18nSupport
 import play.api.mvc._
 import play.api.{Configuration, Logger}
+import utilities.LoginState
 
 import scala.concurrent.ExecutionContext
 
@@ -14,7 +15,7 @@ class WithUserLoginAction @Inject()(messagesControllerComponents: MessagesContro
 
   private implicit val module: String = constants.Module.ACTIONS_WITH_USER_LOGIN_ACTION
 
-  def authenticated(f: ⇒ String => Request[AnyContent] => Result)(implicit logger: Logger): Action[AnyContent] = {
+  def authenticated(f: ⇒ LoginState => Request[AnyContent] => Result)(implicit logger: Logger): Action[AnyContent] = {
     Action { implicit request ⇒
       try {
         val username = request.session.get(constants.Security.USERNAME).getOrElse(throw new BaseException(constants.Response.USERNAME_NOT_FOUND))
@@ -22,7 +23,7 @@ class WithUserLoginAction @Inject()(messagesControllerComponents: MessagesContro
         masterTransactionAccountTokens.Service.tryVerifyingSessionToken(username, sessionToken)
         masterTransactionAccountTokens.Service.tryVerifyingSessionTokenTime(username)
         masterAccounts.Service.tryVerifyingUserType(username, constants.User.USER)
-        f(username)(request)
+        f(LoginState(username,request.session.get(constants.Security.USER_TYPE).getOrElse(throw new BaseException(constants.Response.USER_TYPE_NOT_FOUND))))(request)
       }
       catch {
         case baseException: BaseException => {

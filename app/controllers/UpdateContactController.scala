@@ -20,15 +20,15 @@ class UpdateContactController @Inject()(messagesControllerComponents: MessagesCo
     Ok(views.html.component.master.updateContact(UpdateContact.form, constants.CountryCallingCode.COUNTRY_CODES))
   }
 
-  def updateContact: Action[AnyContent] = withLoginAction.authenticated { username =>
+  def updateContact: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       UpdateContact.form.bindFromRequest().fold(
         formWithErrors => {
           BadRequest(views.html.component.master.updateContact(formWithErrors, constants.CountryCallingCode.COUNTRY_CODES))
         },
         signUpData => {
-          implicit val loginState:LoginState = LoginState(username)
-          if (contacts.Service.updateEmailAndMobile(username, signUpData.countryCode + signUpData.mobileNumber, signUpData.emailAddress)) Ok(views.html.index(successes = Seq(constants.Response.SUCCESS))) else Ok(views.html.index(failures = Seq(constants.Response.FAILURE)))
+
+          if (contacts.Service.updateEmailAndMobile(loginState.username, signUpData.countryCode + signUpData.mobileNumber, signUpData.emailAddress)) Ok(views.html.index(successes = Seq(constants.Response.SUCCESS))) else Ok(views.html.index(failures = Seq(constants.Response.FAILURE)))
         }
       )
   }

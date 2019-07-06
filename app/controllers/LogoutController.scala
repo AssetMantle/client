@@ -22,7 +22,7 @@ class LogoutController @Inject()(messagesControllerComponents: MessagesControlle
     Ok(views.html.component.master.logout(Logout.form))
   }
 
-  def logout: Action[AnyContent] = withLoginAction.authenticated { username =>
+  def logout: Action[AnyContent] = withLoginAction.authenticated { loginState =>
     implicit request =>
       Logout.form.bindFromRequest().fold(
         formWithErrors => {
@@ -31,7 +31,7 @@ class LogoutController @Inject()(messagesControllerComponents: MessagesControlle
         loginData => {
           try {
             if (!loginData.receiveNotifications) {
-              accountTokens.Service.deleteToken(username)
+              accountTokens.Service.deleteToken(loginState.username)
             }
             Ok(views.html.index(successes = Seq(constants.Response.LOGGED_OUT))).withNewSession
           }

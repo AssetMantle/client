@@ -25,23 +25,22 @@ class RedeemFiatController @Inject()(messagesControllerComponents: MessagesContr
     Ok(views.html.component.master.redeemFiat(master.RedeemFiat.form))
   }
 
-  def redeemFiat: Action[AnyContent] = withTraderLoginAction.authenticated { username =>
+  def redeemFiat: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       master.RedeemFiat.form.bindFromRequest().fold(
         formWithErrors => {
           BadRequest(views.html.component.master.redeemFiat(formWithErrors))
         },
         redeemFiatData => {
-          implicit val loginState:LoginState = LoginState(username)
+
           try {
             val toAddress = blockchainZones.Service.getAddress(redeemFiatData.zoneID)
-            val ticketID = if (kafkaEnabled) transactionsRedeemFiat.Service.kafkaPost(transactionsRedeemFiat.Request(from = username, to = toAddress, password = redeemFiatData.password, redeemAmount = redeemFiatData.redeemAmount, gas = redeemFiatData.gas)).ticketID else Random.nextString(32)
-            blockchainTransactionRedeemFiats.Service.create(from = username, to = toAddress, redeemAmount = redeemFiatData.redeemAmount, gas = redeemFiatData.gas, null, null, ticketID = ticketID, null)
+            val ticketID = if (kafkaEnabled) transactionsRedeemFiat.Service.kafkaPost(transactionsRedeemFiat.Request(from = loginState.username, to = toAddress, password = redeemFiatData.password, redeemAmount = redeemFiatData.redeemAmount, gas = redeemFiatData.gas)).ticketID else Random.nextString(32)
+            blockchainTransactionRedeemFiats.Service.create(from = loginState.username, to = toAddress, redeemAmount = redeemFiatData.redeemAmount, gas = redeemFiatData.gas, null, null, ticketID = ticketID, null)
             if (!kafkaEnabled) {
               Future {
                 try {
-                  blockchainTransactionRedeemFiats.Utility.onSuccess(ticketID, transactionsRedeemFiat.Service.post(transactionsRedeemFiat.Request(from = username, to = toAddress, password = redeemFiatData.password, redeemAmount = redeemFiatData.redeemAmount, gas = redeemFiatData.gas)))
-                } catch {
+                  loginState.username                } catch {
                   case baseException: BaseException => logger.error(baseException.failure.message, baseException)
                   case blockChainException: BlockChainException => logger.error(blockChainException.failure.message, blockChainException)
                     blockchainTransactionRedeemFiats.Utility.onFailure(ticketID, blockChainException.failure.message)

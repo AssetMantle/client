@@ -19,31 +19,31 @@ class NotificationController @Inject()(messagesControllerComponents: MessagesCon
 
   private val limit = configuration.get[Int]("notification.notificationsPerPage")
 
-  def notificationPage(pageNumber: Int = 0): Action[AnyContent] = withLoginAction.authenticated { username =>
+  def notificationPage(pageNumber: Int = 0): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        Ok(views.html.component.master.notifications(notifications.Service.get(username, pageNumber * limit, limit)))
+        Ok(views.html.component.master.notifications(notifications.Service.get(loginState.username, pageNumber * limit, limit)))
       }
       catch {
         case baseException: BaseException => Ok(baseException.failure.message)
       }
   }
 
-  def unreadNotificationCount(): Action[AnyContent] = withLoginAction.authenticated { username =>
+  def unreadNotificationCount(): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        Ok(notifications.Service.getNumberOfUnread(username).toString)
+        Ok(notifications.Service.getNumberOfUnread(loginState.username).toString)
       }
       catch {
         case _: BaseException => NoContent
       }
   }
 
-  def markNotificationRead(notificationID: String): Action[AnyContent] = withLoginAction.authenticated { username =>
+  def markNotificationRead(notificationID: String): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
         notifications.Service.markAsRead(notificationID)
-        Ok(notifications.Service.getNumberOfUnread(username).toString)
+        Ok(notifications.Service.getNumberOfUnread(loginState.username).toString)
       }
       catch {
         case _: BaseException => NoContent

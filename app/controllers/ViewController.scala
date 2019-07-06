@@ -20,10 +20,10 @@ class ViewController @Inject()(messagesControllerComponents: MessagesControllerC
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  def market: Action[AnyContent] = withLoginAction.authenticated { username =>
+  def market: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        implicit val loginState:LoginState = LoginState(username)
+
         Ok(views.html.market())
       }
       catch {

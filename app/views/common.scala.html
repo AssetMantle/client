@@ -1,5 +1,5 @@
 @import utilities.LoginState
-@(title: String, failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(left: Html)(center:Html = Html(""))(right:Html = Html(""))(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash,loginState: LoginState=null)
+@(title: String, failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(left: Html)(center:Html = Html(""))(right:Html = Html(""))(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash,loginState: LoginState = null)
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -30,7 +30,7 @@
                             <a class="right" onclick="getForm(jsRoutes.controllers.LoginController.loginForm())">@Messages(constants.Form.LOGIN)</a>
                         }
                         case default => {
-                            <a href="@controllers.routes.ViewController.market()">Market</a>
+                            <a id="market" href="@controllers.routes.ViewController.market()">Market</a>
 
                             <a class="right" onclick="getForm(jsRoutes.controllers.LogoutController.logoutForm())">@loginState.username</a>
                             <a class="right" onclick="getForm(jsRoutes.controllers.LogoutController.logoutForm())">@Messages(constants.Form.LOGOUT)</a>
@@ -39,8 +39,6 @@
                             </a>
                         }
                     }
-                    <a href="#">News</a>
-                    <a href="#">Contact</a>
 
                 </div>
 
@@ -103,5 +101,8 @@
         <script src="@routes.Assets.versioned("javascripts/style/ajaxLoading.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/style/modal.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/style/hideElement.js")" type="text/javascript"></script>
+        <script>
+                @*componentResource('market', jsRoutes.controllers.ViewController.market('@loginState.username'));*@
+        </script>
     </body>
 </html>
