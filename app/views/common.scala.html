@@ -30,8 +30,15 @@
                             <a class="right" onclick="getForm(jsRoutes.controllers.LoginController.loginForm())">@Messages(constants.Form.LOGIN)</a>
                         }
                         case default => {
-                            <a id="market" href="@controllers.routes.ViewController.market()">Market</a>
-
+                            @loginState.userType match {
+                                case constants.User.TRADER => {
+                                    <a id="market" href="@controllers.routes.ViewController.market()">Market</a>
+                                }
+                                case constants.User.ZONE => {
+                                    <a id="market" href="@controllers.routes.ViewController.request()">Request</a>
+                                }
+                            case _ => {}
+                            }
                             <a class="right" onclick="getForm(jsRoutes.controllers.LogoutController.logoutForm())">@loginState.username</a>
                             <a class="right" onclick="getForm(jsRoutes.controllers.LogoutController.logoutForm())">@Messages(constants.Form.LOGOUT)</a>
                             <a class="right notification" onclick="getForm(jsRoutes.controllers.NotificationController.notificationPage(0))">@Messages(constants.Form.INBOX)

@@ -60,6 +60,26 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
     }
   }
 
+  private def findBuyerOrdersInZone(ids: Seq[String], addresses:Seq[String]): Future[Seq[Negotiation]] = db.run(negotiationTable.filter(_.id inSet ids).filter(_.buyerAddress inSet addresses).result.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def findSellerOrdersInZone(ids: Seq[String], addresses:Seq[String]): Future[Seq[Negotiation]] = db.run(negotiationTable.filter(_.id inSet ids).filter(_.sellerAddress inSet addresses).result.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
   private def getIdByBuyerAddressSellerAddressAndPegHash(buyerAddress: String, sellerAddress: String, pegHash: String)(implicit executionContext: ExecutionContext): Future[String] = db.run(negotiationTable.filter(_.buyerAddress === buyerAddress).filter(_.sellerAddress === sellerAddress).filter(_.assetPegHash === pegHash).map(_.id).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -115,6 +135,10 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
     def getDirtyNegotiations: Seq[Negotiation] = Await.result(getNegotiationsByDirtyBit(dirtyBit = true), Duration.Inf)
 
     def get(id: String): Negotiation = Await.result(findById(id), Duration.Inf)
+
+    def getBuyerNegotiationsByOrderAndZone(ids:Seq[String], addresses:Seq[String]): Seq[Negotiation] = Await.result(findBuyerOrdersInZone(ids, addresses), Duration.Inf)
+
+    def getSellerNegotiationsByOrderAndZone(ids:Seq[String], addresses:Seq[String]): Seq[Negotiation] = Await.result(findSellerOrdersInZone(ids, addresses), Duration.Inf)
 
     def markDirty(id: String): Int = Await.result(updateDirtyBitById(id, dirtyBit = true), Duration.Inf)
 

@@ -42,6 +42,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.IssueFiatController.issueFiatForm,
         routes.javascript.IssueFiatController.issueFiatRequestForm,
         routes.javascript.IssueFiatController.rejectIssueFiatRequestForm,
+
         routes.javascript.ComponentViewController.commonHome,
         routes.javascript.ComponentViewController.zoneDetails,
         routes.javascript.ComponentViewController.organizationDetails,
@@ -51,6 +52,10 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ComponentViewController.orderList,
         routes.javascript.ComponentViewController.availableAssetList,
         routes.javascript.ComponentViewController.availableAssetListWithLogin,
+        routes.javascript.ReleaseAssetController.releaseAssetList,
+        routes.javascript.BuyerExecuteOrderController.buyerExecuteOrderList,
+        routes.javascript.SellerExecuteOrderController.sellerExecuteOrderList,
+
         routes.javascript.RedeemAssetController.redeemAssetForm,
         routes.javascript.RedeemFiatController.redeemFiatForm,
         routes.javascript.ReleaseAssetController.releaseAssetForm,

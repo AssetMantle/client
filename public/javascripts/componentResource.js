@@ -1,7 +1,5 @@
 function componentResource(source, route){
     const div = $('#'+ source);
-
-    console.log(div);
     $.ajax({
         url: route.url,
         type: route.type,

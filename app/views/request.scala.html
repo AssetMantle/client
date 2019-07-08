@@ -1,0 +1,67 @@
+@import controllers.actions.LoginState
+@()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+
+    @common(Messages(constants.Form.INDEX))(Html(""))(center)(Html(""))
+
+
+    @center = {
+        <div class="flexContainer">
+            <div class="flexGrowth box leftText">
+                <div>
+                    <h2 class="showHide toggleElement centerText">@Messages(constants.Form.PENDING_VERIFY_ORGANIZATION_REQUESTS) </h2>
+                </div>
+                <div id="pendingVerifyOrganizationRequests" class="flexContainer">
+                </div>
+            </div>
+
+            <div class="flexGrowth box leftText">
+                <div>
+                    <h2 class="showHide toggleElement centerText">@Messages(constants.Form.PENDING_ISSUE_ASSET_REQUESTS) </h2>
+                </div>
+                <div id="pendingIssueAssetRequests" class="flexContainer">
+                </div>
+            </div>
+
+            <div class="flexGrowth box leftText">
+                <div>
+                    <h2 class="showHide toggleElement centerText">@Messages(constants.Form.RELEASE_ASSET) </h2>
+                </div>
+                <div id="releaseAsset" class="flexContainer">
+                </div>
+            </div>
+
+            <div class="flexGrowth box leftText">
+                <div>
+                    <h2 class="showHide toggleElement centerText">@Messages(constants.Form.PENDING_ISSUE_FIAT_REQUESTS) </h2>
+                </div>
+                <div id="pendingIssueFiatRequests" class="flexContainer">
+                </div>
+            </div>
+
+            <div class="flexGrowth box leftText">
+                <div>
+                    <h2 class="showHide toggleElement centerText">@Messages(constants.Form.BUYER_EXECUTE_ORDER) </h2>
+                </div>
+                <div id="buyerExecuteOrderList" class="flexContainer">
+                </div>
+            </div>
+
+            <div class="flexGrowth box leftText">
+                <div>
+                    <h2 class="showHide toggleElement centerText">@Messages(constants.Form.SELLER_EXECUTE_ORDER) </h2>
+                </div>
+                <div id="sellerExecuteOrderList" class="flexContainer">
+                </div>
+            </div>
+
+        </div>
+
+        <script>
+                componentResource('pendingVerifyOrganizationRequests', jsRoutes.controllers.AddOrganizationController.viewPendingVerifyOrganizationRequests());
+                componentResource('pendingIssueAssetRequests', jsRoutes.controllers.IssueAssetController.viewPendingIssueAssetRequests());
+                componentResource('pendingIssueFiatRequests', jsRoutes.controllers.IssueFiatController.viewPendingIssueFiatRequests());
+                componentResource('releaseAsset', jsRoutes.controllers.ReleaseAssetController.releaseAssetList());
+                componentResource('buyerExecuteOrderList', jsRoutes.controllers.BuyerExecuteOrderController.buyerExecuteOrderList());
+                componentResource('sellerExecuteOrderList', jsRoutes.controllers.SellerExecuteOrderController.sellerExecuteOrderList());
+        </script>
+    }

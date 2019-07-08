@@ -1,13 +1,13 @@
 @import helper._
 @import views.companion.master.SellerExecuteOrder
 
-@(sellerExecuteOrderForm: Form[SellerExecuteOrder.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@(sellerExecuteOrderForm: Form[SellerExecuteOrder.Data], buyerAddress:String, sellerAddress:String, pegHash:String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @form(action = routes.SellerExecuteOrderController.sellerExecuteOrder, 'onkeypress -> "validateForm(event,this)") {
     @CSRF.formField
-    @inputText(sellerExecuteOrderForm(constants.Form.BUYER_ADDRESS), '_label -> Messages(constants.Form.BUYER_ADDRESS))
-    @inputText(sellerExecuteOrderForm(constants.Form.SELLER_ADDRESS), '_label -> Messages(constants.Form.SELLER_ADDRESS))
+    @inputText(sellerExecuteOrderForm(constants.Form.BUYER_ADDRESS).copy(value = Some(buyerAddress)), '_label -> Messages(constants.Form.BUYER_ADDRESS))
+    @inputText(sellerExecuteOrderForm(constants.Form.SELLER_ADDRESS).copy(value = Some(sellerAddress)), '_label -> Messages(constants.Form.SELLER_ADDRESS))
     @inputText(sellerExecuteOrderForm(constants.Form.AWB_PROOF_HASH), '_label -> Messages(constants.Form.AWB_PROOF_HASH))
-    @inputText(sellerExecuteOrderForm(constants.Form.PEG_HASH), '_label -> Messages(constants.Form.PEG_HASH))
+    @inputText(sellerExecuteOrderForm(constants.Form.PEG_HASH).copy(value = Some(pegHash)), '_label -> Messages(constants.Form.PEG_HASH))
     @inputText(sellerExecuteOrderForm(constants.Form.GAS), '_label -> Messages(constants.Form.GAS))
     @inputPassword(sellerExecuteOrderForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD))
 

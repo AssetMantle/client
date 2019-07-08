@@ -1,5 +1,6 @@
 GET         /                                                    controllers.IndexController.index
 GET         /market                                              controllers.ViewController.market
+GET         /request                                             controllers.ViewController.request
 
 GET         /assets/*file                                        controllers.Assets.versioned(path="/public", file: Asset)
 
@@ -25,6 +26,9 @@ GET         /master/component/negotiationList                    controllers.Com
 GET         /master/component/orderList                          controllers.ComponentViewController.orderList(username: String)
 GET         /master/component/availableAssetList                 controllers.ComponentViewController.availableAssetList
 GET         /master/component/availableAssetListWithLogin        controllers.ComponentViewController.availableAssetListWithLogin(username: String)
+GET         /master/component/releaseAssetList                   controllers.ReleaseAssetController.releaseAssetList
+GET         /master/component/buyerExecuteOrderList              controllers.BuyerExecuteOrderController.buyerExecuteOrderList
+GET         /master/component/sellerExecuteOrderList             controllers.SellerExecuteOrderController.sellerExecuteOrderList
 
 GET         /master/login                                        controllers.LoginController.loginForm
 POST        /master/login                                        controllers.LoginController.login
@@ -115,7 +119,7 @@ GET         /master/viewVerifyOrganizationRequests               controllers.Add
 GET         /master/rejectVerifyOrganizationRequest              controllers.AddOrganizationController.rejectVerifyOrganizationRequestForm(organizationID: String)
 POST        /master/rejectVerifyOrganizationRequest              controllers.AddOrganizationController.rejectVerifyOrganizationRequest
 
-GET         /master/buyerExecuteOrder                            controllers.BuyerExecuteOrderController.buyerExecuteOrderForm
+GET         /master/buyerExecuteOrder                            controllers.BuyerExecuteOrderController.buyerExecuteOrderForm(buyerAddress:String, sellerAddress:String, pegHash:String)
 POST        /master/buyerExecuteOrder                            controllers.BuyerExecuteOrderController.buyerExecuteOrder
 
 GET         /master/unmoderatedBuyerExecuteOrder                 controllers.BuyerExecuteOrderController.unmoderatedBuyerExecuteOrderForm
@@ -159,10 +163,10 @@ POST        /master/redeemAsset                                  controllers.Red
 GET         /master/redeemFiat                                   controllers.RedeemFiatController.redeemFiatForm
 POST        /master/redeemFiat                                   controllers.RedeemFiatController.redeemFiat
 
-GET         /master/releaseAsset                                 controllers.ReleaseAssetController.releaseAssetForm
+GET         /master/releaseAsset                                 controllers.ReleaseAssetController.releaseAssetForm(ownerAddress: String, pegHash: String)
 POST        /master/releaseAsset                                 controllers.ReleaseAssetController.releaseAsset
 
-GET         /master/sellerExecuteOrder                           controllers.SellerExecuteOrderController.sellerExecuteOrderForm
+GET         /master/sellerExecuteOrder                           controllers.SellerExecuteOrderController.sellerExecuteOrderForm(buyerAddress:String, sellerAddress:String, pegHash:String)
 POST        /master/sellerExecuteOrder                           controllers.SellerExecuteOrderController.sellerExecuteOrder
 
 GET         /master/unmoderatedSellerExecuteOrder                controllers.SellerExecuteOrderController.unmoderatedSellerExecuteOrderForm

@@ -13,21 +13,21 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Random
 
 @Singleton
-class SellerExecuteOrderController @Inject()(messagesControllerComponents: MessagesControllerComponents, masterAccounts: master.Accounts, blockchainOrders: blockchain.Orders, blockchainAccounts: blockchain.Accounts, withTraderLoginAction: WithTraderLoginAction, withZoneLoginAction: WithZoneLoginAction, transactionsSellerExecuteOrder: transactions.SellerExecuteOrder, blockchainTransactionSellerExecuteOrders: blockchainTransaction.SellerExecuteOrders)(implicit exec: ExecutionContext, configuration: Configuration, accounts: Accounts) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class SellerExecuteOrderController @Inject()(messagesControllerComponents: MessagesControllerComponents, masterAccounts: master.Accounts, blockchainOrders: blockchain.Orders, blockchainAccounts: blockchain.Accounts, blockchainACLAccounts: blockchain.ACLAccounts, blockchainZones: blockchain.Zones, blockchainNegotiations:blockchain.Negotiations, withTraderLoginAction: WithTraderLoginAction, withZoneLoginAction: WithZoneLoginAction, transactionsSellerExecuteOrder: transactions.SellerExecuteOrder, blockchainTransactionSellerExecuteOrders: blockchainTransaction.SellerExecuteOrders)(implicit exec: ExecutionContext, configuration: Configuration, accounts: Accounts) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
   private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
 
-  def sellerExecuteOrderForm: Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.sellerExecuteOrder(views.companion.master.SellerExecuteOrder.form))
+  def sellerExecuteOrderForm(buyerAddress:String, sellerAddress:String, pegHash:String): Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.sellerExecuteOrder(views.companion.master.SellerExecuteOrder.form, buyerAddress, sellerAddress, pegHash))
   }
 
   def sellerExecuteOrder: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       views.companion.master.SellerExecuteOrder.form.bindFromRequest().fold(
         formWithErrors => {
-          BadRequest(views.html.component.master.sellerExecuteOrder(formWithErrors))
+          BadRequest(views.html.component.master.sellerExecuteOrder(formWithErrors, formWithErrors.data(constants.Form.BUYER_ADDRESS),formWithErrors.data(constants.Form.SELLER_ADDRESS), formWithErrors.data(constants.Form.PEG_HASH)))
         },
         sellerExecuteOrderData => {
 
@@ -54,6 +54,15 @@ class SellerExecuteOrderController @Inject()(messagesControllerComponents: Messa
           }
         }
       )
+  }
+
+  def sellerExecuteOrderList: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      try {
+        Ok(views.html.component.master.sellerExecuteOrderList(blockchainNegotiations.Service.getSellerNegotiationsByOrderAndZone(blockchainOrders.Service.getAllOrderIds, blockchainACLAccounts.Service.getAddressesUnderZone(blockchainZones.Service.getID(loginState.address)))))
+      }catch {
+        case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
+      }
   }
 
   def unmoderatedSellerExecuteOrderForm: Action[AnyContent] = Action { implicit request =>

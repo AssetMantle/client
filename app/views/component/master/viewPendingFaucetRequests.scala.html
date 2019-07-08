@@ -1,7 +1,7 @@
 @import models.masterTransaction.FaucetRequest
 
 @(faucetRequests: Seq[FaucetRequest])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
-
+@*
 <table>
     <tr>
         <th>@Messages(constants.Form.ID)</th>
@@ -21,4 +21,12 @@
         </tr>
     }
 </table>
+*@
+@for(faucetRequest <- faucetRequests) {
+    <div class="flexItem box leftText lightBlue">
+        <span class="red">@Messages(constants.Form.ACCOUNT_ID)</span> :@faucetRequest.accountID <br>
+        <span class="red">@Messages(constants.Form.AMOUNT)</span> : @faucetRequest.amount <br>
+        <button class="approve" onclick="getForm(jsRoutes.controllers.SendCoinController.approveFaucetRequestsForm('@faucetRequest.id', '@faucetRequest.accountID'))">@Messages(constants.Form.APPROVE)</button> <button class="reject" onclick="getForm(jsRoutes.controllers.SendCoinController.rejectFaucetRequestForm('@faucetRequest.id'))">@Messages(constants.Form.REJECT)</button>
+    </div>
+}
 <br>

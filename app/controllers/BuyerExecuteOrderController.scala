@@ -12,21 +12,21 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Random
 
 @Singleton
-class BuyerExecuteOrderController @Inject()(messagesControllerComponents: MessagesControllerComponents, masterAccounts: master.Accounts, blockchainOrders: blockchain.Orders, blockchainAccounts: blockchain.Accounts, withZoneLoginAction: WithZoneLoginAction, withTraderLoginAction: WithTraderLoginAction, transactionsBuyerExecuteOrder: transactions.BuyerExecuteOrder, blockchainTransactionBuyerExecuteOrders: blockchainTransaction.BuyerExecuteOrders)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class BuyerExecuteOrderController @Inject()(messagesControllerComponents: MessagesControllerComponents, masterAccounts: master.Accounts, blockchainOrders: blockchain.Orders, blockchainAccounts: blockchain.Accounts, blockchainACLAccounts: blockchain.ACLAccounts, blockchainZones: blockchain.Zones, blockchainNegotiations:blockchain.Negotiations, withZoneLoginAction: WithZoneLoginAction, withTraderLoginAction: WithTraderLoginAction, transactionsBuyerExecuteOrder: transactions.BuyerExecuteOrder, blockchainTransactionBuyerExecuteOrders: blockchainTransaction.BuyerExecuteOrders)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  def buyerExecuteOrderForm: Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.buyerExecuteOrder(views.companion.master.BuyerExecuteOrder.form))
+  def buyerExecuteOrderForm(buyerAddress:String, sellerAddress:String, pegHash:String): Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.buyerExecuteOrder(views.companion.master.BuyerExecuteOrder.form, buyerAddress, sellerAddress, pegHash))
   }
 
   def buyerExecuteOrder: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       views.companion.master.BuyerExecuteOrder.form.bindFromRequest().fold(
         formWithErrors => {
-          BadRequest(views.html.component.master.buyerExecuteOrder(formWithErrors))
+          BadRequest(views.html.component.master.buyerExecuteOrder(formWithErrors, formWithErrors.data(constants.Form.BUYER_ADDRESS),formWithErrors.data(constants.Form.SELLER_ADDRESS), formWithErrors.data(constants.Form.PEG_HASH)))
         },
         buyerExecuteOrderData => {
 
@@ -53,6 +53,15 @@ class BuyerExecuteOrderController @Inject()(messagesControllerComponents: Messag
           }
         }
       )
+  }
+
+  def buyerExecuteOrderList: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      try {
+        Ok(views.html.component.master.buyerExecuteOrderList(blockchainNegotiations.Service.getBuyerNegotiationsByOrderAndZone(blockchainOrders.Service.getAllOrderIds, blockchainACLAccounts.Service.getAddressesUnderZone(blockchainZones.Service.getID(loginState.address)))))
+      }catch {
+        case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
+      }
   }
 
   def unmoderatedBuyerExecuteOrderForm: Action[AnyContent] = Action { implicit request =>
