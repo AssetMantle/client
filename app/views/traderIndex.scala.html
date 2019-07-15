@@ -10,62 +10,23 @@
     @if(aclHash.buyerExecuteOrder) {
         <a onclick="getForm(jsRoutes.controllers.BuyerExecuteOrderController.unmoderatedBuyerExecuteOrderForm())">@Messages(constants.Form.UNMODERATED_BUYER_EXECUTE_ORDER)</a>
     } <br>
-    @*
-    @if(aclHash.changeBuyerBid) {
-        <a onclick="getForm(jsRoutes.controllers.ChangeBuyerBidController.changeBuyerBidForm())">@Messages(constants.Form.CHANGE_BUYER_BID)</a>
-    } <br>
-    @if(aclHash.changeSellerBid) {
-        <a onclick="getForm(jsRoutes.controllers.ChangeSellerBidController.changeSellerBidForm())">@Messages(constants.Form.CHANGE_SELLER_BID)</a>
-    } <br>
-    @if(aclHash.confirmBuyerBid) {
-        <a onclick="getForm(jsRoutes.controllers.ConfirmBuyerBidController.confirmBuyerBidForm())">@Messages(constants.Form.CONFIRM_BUYER_BID)</a>
-    } <br>
-    @if(aclHash.confirmSellerBid) {
-        <a onclick="getForm(jsRoutes.controllers.ConfirmSellerBidController.confirmSellerBidForm())">@Messages(constants.Form.CONFIRM_SELLER_BID)</a>
-    } <br>
-    *@
-    @if(aclHash.issueAsset) {
-        <a onclick="getForm(jsRoutes.controllers.IssueAssetController.issueAssetRequestForm())">@Messages(constants.Form.ISSUE_ASSET_REQUEST)</a>
-    } <br>
-    @if(aclHash.issueFiat) {
-        <a onclick="getForm(jsRoutes.controllers.IssueFiatController.issueFiatRequestForm())">@Messages(constants.Form.ISSUE_FIAT_REQUEST)</a>
-    } <br>
-    @if(aclHash.redeemAsset) {
-        <a onclick="getForm(jsRoutes.controllers.RedeemAssetController.redeemAssetForm())">@Messages(constants.Form.REDEEM_ASSET)</a>
-    } <br>
-    @if(aclHash.redeemFiat) {
-        <a onclick="getForm(jsRoutes.controllers.RedeemFiatController.redeemFiatForm())">@Messages(constants.Form.REDEEM_FIAT)</a>
-    } <br>
-    @if(aclHash.releaseAsset) {
-        <a onclick="getForm(jsRoutes.controllers.ReleaseAssetController.releaseAssetForm())">@Messages(constants.Form.RELEASE_ASSET)</a>
-    } <br>
+
     @if(aclHash.sellerExecuteOrder) {
         <a onclick="getForm(jsRoutes.controllers.SellerExecuteOrderController.unmoderatedSellerExecuteOrderForm())">@Messages(constants.Form.UNMODERATED_SELLER_EXECUTE_ORDER)</a>
     } <br>
-  @*
-  @if(aclHash.sendAsset) {
-        <a onclick="getForm(jsRoutes.controllers.SendAssetController.sendAssetForm())">@Messages(constants.Form.SEND_ASSET)</a>
-    } <br>
-    @if(aclHash.sendFiat) {
-        <a onclick="getForm(jsRoutes.controllers.SendFiatController.sendFiatForm())">@Messages(constants.Form.SEND_FIAT)</a>
-    } <br>
-    *@
-    <a onclick="getForm(jsRoutes.controllers.SetBuyerFeedbackController.setBuyerFeedbackForm())">@Messages(constants.Form.SET_BUYER_FEEDBACK)</a>
-    <br>
-    <a onclick="getForm(jsRoutes.controllers.SetSellerFeedbackController.setSellerFeedbackForm())">@Messages(constants.Form.SET_SELLER_FEEDBACK)</a>
-    <br>
-
     }
 
 @center = {
     <div class="flexContainer">
-        <div id="commonHome" class="box flexItem flexGrowth"></div>
+        <div id="commonHome" class="box flexItem flexGrowth">
+        </div>
+        <button onclick="getForm(jsRoutes.controllers.FileController.updateTraderKycForm('@constants.File.IDENTIFICATION'))">@Messages(constants.Form.UPDATE_TRADER_IDENTIFICATION)</button>
+
         <div class="flexGrowth flexItem box leftText">
             <div>
                 <h2 class="showHide toggleElement centerText">@Messages(constants.Form.ZONE):</h2>
             </div>
             <div id="zone">
-
             </div>
         </div>
         <div class="flexGrowth flexItem box leftText">
@@ -73,7 +34,6 @@
                 <h2 class="showHide toggleElement centerText">@Messages(constants.Form.ORGANIZATION):</h2>
             </div>
             <div id="organization">
-
             </div>
         </div>
     </div>
@@ -99,7 +59,7 @@
                         <button onclick="getForm(jsRoutes.controllers.IssueFiatController.issueFiatRequestForm())">@Messages(constants.Form.ISSUE_FIAT_REQUEST)</button>
                     }
                     @if(aclHash.redeemFiat) {
-                        <button onclick="getForm(jsRoutes.controllers.RedeemFiatController.redeemFiatForm())">@Messages(constants.Form.REDEEM_FIAT)</button>
+                        <button onclick="getForm(jsRoutes.controllers.RedeemFiatController.redeemFiatForm('@loginState.address'))">@Messages(constants.Form.REDEEM_FIAT)</button>
                     }
                 </div>
             </div>
@@ -120,14 +80,31 @@
             </div>
             <div id="orderList" class="flexContainer"></div>
         </div>
+        <div class="flexGrowth flexItem box leftText">
+            <div>
+                <h2 class="showHide toggleElement centerText">@Messages(constants.Form.SUBMIT_FEEDBACK)</h2>
+            </div>
+            <div>
+                <h2 class="showHide toggleElement centerText">@Messages(constants.Form.BUY_ORDER_FEEDBACKS)</h2>
+            </div>
+            <div id="setBuyerFeedbackList" class="flexContainer"></div>
+            <div class="box">
+                <div>
+                    <h2 class="showHide toggleElement centerText">@Messages(constants.Form.SELL_ORDER_FEEDBACKS)</h2>
+                </div>
+                <div id="setSellerFeedbackList" class="flexContainer"></div>
+            </div>
+        </div>
     </div>
     <script>
-            componentResource('commonHome', jsRoutes.controllers.ComponentViewController.commonHome('@loginState.username'));
-            componentResource('zone', jsRoutes.controllers.ComponentViewController.zoneDetails('@loginState.username'));
-            componentResource('organization', jsRoutes.controllers.ComponentViewController.organizationDetails('@loginState.username'));
-            componentResource('assetList', jsRoutes.controllers.ComponentViewController.assetList('@loginState.username'));
-            componentResource('fiatList', jsRoutes.controllers.ComponentViewController.fiatList('@loginState.username'));
-            componentResource('negotiationList', jsRoutes.controllers.ComponentViewController.negotiationList('@loginState.username'));
-            componentResource('orderList', jsRoutes.controllers.ComponentViewController.orderList('@loginState.username'))
+            componentResource('commonHome', jsRoutes.controllers.ComponentViewController.commonHome());
+            componentResource('zone', jsRoutes.controllers.ComponentViewController.zoneDetails());
+            componentResource('organization', jsRoutes.controllers.ComponentViewController.organizationDetails());
+            componentResource('assetList', jsRoutes.controllers.ComponentViewController.assetList());
+            componentResource('fiatList', jsRoutes.controllers.ComponentViewController.fiatList());
+            componentResource('negotiationList', jsRoutes.controllers.ComponentViewController.negotiationList());
+            componentResource('orderList', jsRoutes.controllers.ComponentViewController.orderList());
+            componentResource('setBuyerFeedbackList', jsRoutes.controllers.SetBuyerFeedbackController.buyerFeedbackList());
+            componentResource('setSellerFeedbackList', jsRoutes.controllers.SetSellerFeedbackController.sellerFeedbackList());
     </script>
 }

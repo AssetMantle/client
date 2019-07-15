@@ -1,0 +1,15 @@
+@import models.blockchain.TraderFeedbackHistory
+
+@(traderFeedbackHistories: Seq[TraderFeedbackHistory])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
+
+    @for(traderFeedbackHistory <- traderFeedbackHistories) {
+        <div class="flexItem box lightBlue">
+            <div class="leftText">
+                <span class="red">@Messages(constants.Form.BUYER_ADDRESS)</span> : @traderFeedbackHistory.buyerAddress <br>
+                <span class="red">@Messages(constants.Form.PEG_HASH)</span> : @traderFeedbackHistory.pegHash <br>
+            </div>
+            <div class="centerText" >
+                <button class="width" onclick="getForm(jsRoutes.controllers.SetSellerFeedbackController.setSellerFeedbackForm('@traderFeedbackHistory.buyerAddress','@traderFeedbackHistory.pegHash'))">@Messages(constants.Form.SUBMIT_FEEDBACK)</button><br>
+            </div>
+        </div>
+    }

@@ -1,11 +1,11 @@
 @import helper._
 @import views.companion.master.RedeemAsset
 
-@(redeemAssetForm: Form[RedeemAsset.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@(redeemAssetForm: Form[RedeemAsset.Data], zoneID: String, pegHash: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @form(action = routes.RedeemAssetController.redeemAsset, 'onkeypress -> "validateForm(event,this)") {
     @CSRF.formField
-    @inputText(redeemAssetForm(constants.Form.ZONE_ID), '_label -> Messages(constants.Form.ZONE_ID))
-    @inputText(redeemAssetForm(constants.Form.PEG_HASH), '_label -> Messages(constants.Form.PEG_HASH))
+    @inputText(redeemAssetForm(constants.Form.ZONE_ID).copy(value = Some(zoneID)), '_label -> Messages(constants.Form.ZONE_ID))
+    @inputText(redeemAssetForm(constants.Form.PEG_HASH).copy(value = Some(pegHash)), '_label -> Messages(constants.Form.PEG_HASH))
     @inputText(redeemAssetForm(constants.Form.GAS), '_label -> Messages(constants.Form.GAS))
     @inputPassword(redeemAssetForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD))
 

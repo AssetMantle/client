@@ -5,8 +5,8 @@
 @for(negotiation <- negotiationList){
     <div class="flexItem box lightBlue ">
         <div class="leftText">
-            <span class="red">@Messages(constants.Form.OWNER_ADDRESS)</span> : @negotiation.assetPegHash <br>
-            <span class="red">@Messages(constants.Form.PEG_HASH)</span> : @negotiation.time <br>
+            <span class="red">@Messages(constants.Form.PEG_HASH)</span> : @negotiation.assetPegHash <br>
+            <span class="red">@Messages(constants.Form.TIME)</span> : @negotiation.time <br>
         </div>
         <div class="centerText">
             <button onclick="getForm(jsRoutes.controllers.BuyerExecuteOrderController.buyerExecuteOrderForm('@negotiation.buyerAddress', '@negotiation.sellerAddress','@negotiation.assetPegHash'))">@Messages(constants.Form.BUYER_EXECUTE_ORDER)</button>

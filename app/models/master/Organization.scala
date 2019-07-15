@@ -46,6 +46,16 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
     }
   }
 
+  private def findByAccountID(accountID: String)(implicit executionContext: ExecutionContext): Future[Organization] = db.run(organizationTable.filter(_.accountID === accountID).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
   private def getAccountIdById(id: String)(implicit executionContext: ExecutionContext): Future[String] = db.run(organizationTable.filter(_.id === id).map(_.accountID).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -115,6 +125,8 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
     def create(zoneID: String, accountID: String, name: String, address: String, phone: String, email: String)(implicit executionContext: ExecutionContext): String = Await.result(add(Organization((-Math.abs(Random.nextInt)).toHexString.toUpperCase, zoneID, accountID, name, address, phone, email, null)), Duration.Inf)
 
     def get(id: String)(implicit executionContext: ExecutionContext): Organization = Await.result(findById(id), Duration.Inf)
+
+    def getByAccountID(accountID: String)(implicit executionContext: ExecutionContext): Organization = Await.result(findByAccountID(accountID), Duration.Inf)
 
     def updateStatus(id: String, status: Boolean)(implicit executionContext: ExecutionContext): Int = Await.result(updateStatusOnID(id, status), Duration.Inf)
 

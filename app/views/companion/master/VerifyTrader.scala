@@ -3,7 +3,7 @@ package views.companion.master
 import play.api.data.Form
 import play.api.data.Forms.{boolean, mapping, nonEmptyText}
 
-object SetACL {
+object VerifyTrader {
   val form = Form(
     mapping(
       constants.Form.PASSWORD -> nonEmptyText(minLength = 1, maxLength = 20),

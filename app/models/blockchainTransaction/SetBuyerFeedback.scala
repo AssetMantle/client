@@ -141,7 +141,7 @@ class SetBuyerFeedbacks @Inject()(protected val databaseConfigProvider: Database
         Service.markTransactionSuccessful(ticketID, response.TxHash, response.Code)
         val setBuyerFeedback = Service.getTransaction(ticketID)
         val fromAddress = masterAccounts.Service.getAddress(setBuyerFeedback.from)
-        blockchainTraderFeedbackHistories.Service.create(setBuyerFeedback.to, fromAddress, setBuyerFeedback.to, setBuyerFeedback.pegHash, setBuyerFeedback.rating.toString)
+        blockchainTraderFeedbackHistories.Service.update(setBuyerFeedback.to, fromAddress, setBuyerFeedback.to, setBuyerFeedback.pegHash, setBuyerFeedback.rating.toString)
         blockchainAccounts.Service.markDirty(fromAddress)
         pushNotification.sendNotification(masterAccounts.Service.getId(setBuyerFeedback.to), constants.Notification.SUCCESS, response.TxHash)
         pushNotification.sendNotification(setBuyerFeedback.from, constants.Notification.SUCCESS, response.TxHash)

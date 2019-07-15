@@ -1,6 +1,6 @@
 package controllers
 
-import controllers.actions.WithLoginAction
+import controllers.actions.{WithLoginAction, WithOrganizationLoginAction, WithTraderLoginAction, WithZoneLoginAction}
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
@@ -16,83 +16,81 @@ import queries.GetAccount
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class ComponentViewController @Inject()(messagesControllerComponents: MessagesControllerComponents, masterAccounts: Accounts,  masterAccountFiles: master.AccountFiles, blockchainAclAccounts: ACLAccounts, blockchainZones: blockchain.Zones, blockchainOrganizations: blockchain.Organizations, blockchainAssets: blockchain.Assets, blockchainFiats: blockchain.Fiats, blockchainNegotiations: blockchain.Negotiations, masterOrganizations: Organizations, masterZones: Zones, blockchainAclHashes: blockchain.ACLHashes, blockchainOrders: blockchain.Orders, getAccount: GetAccount, blockchainAccounts: blockchain.Accounts, withUsernameToken: WithUsernameToken)(implicit configuration: Configuration, executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class ComponentViewController @Inject()(messagesControllerComponents: MessagesControllerComponents, masterAccounts: Accounts,  masterAccountFiles: master.AccountFiles, blockchainAclAccounts: ACLAccounts, blockchainZones: blockchain.Zones, blockchainOrganizations: blockchain.Organizations, blockchainAssets: blockchain.Assets, blockchainFiats: blockchain.Fiats, blockchainNegotiations: blockchain.Negotiations, masterOrganizations: Organizations, masterZones: Zones, blockchainAclHashes: blockchain.ACLHashes, blockchainOrders: blockchain.Orders, getAccount: GetAccount, blockchainAccounts: blockchain.Accounts, withUsernameToken: WithUsernameToken, withLoginAction: WithLoginAction, withZoneLoginAction: WithZoneLoginAction, withOrganizationLoginAction: WithOrganizationLoginAction, withTraderLoginAction: WithTraderLoginAction)(implicit configuration: Configuration, executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  def commonHome(username: String): Action[AnyContent] = Action { implicit request =>
+  def commonHome: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+    implicit request =>
     try {
-      val account = masterAccounts.Service.getAccount(username)
-      account.userType match {
+      loginState.userType match {
         case constants.User.UNKNOWN =>
-          Ok(views.html.component.master.commonHome(username, account.userType, account.accountAddress, profilePicture = masterAccountFiles.Service.getProfilePicture(username)))
+          Ok(views.html.component.master.commonHome(loginState.username, loginState.userType, loginState.address, profilePicture = masterAccountFiles.Service.getProfilePicture(loginState.username)))
         case _ =>
-          Ok(views.html.component.master.commonHome(username, account.userType, account.accountAddress, blockchainAccounts.Service.getCoins(account.accountAddress),profilePicture = masterAccountFiles.Service.getProfilePicture(username)))
+          Ok(views.html.component.master.commonHome(loginState.username, loginState.userType, loginState.address, blockchainAccounts.Service.getCoins(loginState.address),profilePicture = masterAccountFiles.Service.getProfilePicture(loginState.username)))
       }
     } catch {
       case baseException: BaseException => NoContent
     }
   }
 
-  def zoneDetails(username: String): Action[AnyContent] = Action { implicit request =>
+  def zoneDetails: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+    implicit request =>
     try {
-      val account = masterAccounts.Service.getAccount(username)
-      account.userType match {
+      loginState.userType match {
         case constants.User.ZONE =>
-          Ok(views.html.component.master.zoneDetails(masterZones.Service.get(blockchainZones.Service.getID(account.accountAddress))))
+          Ok(views.html.component.master.zoneDetails(masterZones.Service.get(blockchainZones.Service.getID(loginState.address))))
         case constants.User.TRADER =>
-          Ok(views.html.component.master.zoneDetails(masterZones.Service.get(blockchainAclAccounts.Service.get(account.accountAddress).zoneID)))
+          Ok(views.html.component.master.zoneDetails(masterZones.Service.get(blockchainAclAccounts.Service.get(loginState.address).zoneID)))
       }
     } catch {
       case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
     }
   }
 
-  def organizationDetails(username: String): Action[AnyContent] = Action { implicit request =>
+  def organizationDetails: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+    implicit request =>
     try {
-      val account = masterAccounts.Service.getAccount(username)
-      account.userType match {
+      loginState.userType match {
         case constants.User.ORGANIZATION =>
-          Ok(views.html.component.master.organizationDetails(masterOrganizations.Service.get(blockchainOrganizations.Service.getID(account.accountAddress))))
+          Ok(views.html.component.master.organizationDetails(masterOrganizations.Service.get(blockchainOrganizations.Service.getID(loginState.address))))
         case constants.User.TRADER =>
-          Ok(views.html.component.master.organizationDetails(masterOrganizations.Service.get(blockchainAclAccounts.Service.get(account.accountAddress).organizationID)))
+          Ok(views.html.component.master.organizationDetails(masterOrganizations.Service.get(blockchainAclAccounts.Service.get(loginState.address).organizationID)))
       }
+  } catch {
+    case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
+  }
+  }
+
+  def assetList: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+    try {
+      Ok(views.html.component.master.assetList(assetPegWallet = blockchainAssets.Service.getAssetPegWallet(loginState.address), aclHash = blockchainAclHashes.Service.get(blockchainAclAccounts.Service.get(loginState.address).aclHash)))
     } catch {
       case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
     }
   }
 
-  def assetList(username: String): Action[AnyContent] = Action { implicit request =>
+  def fiatList: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState => implicit request =>
     try {
-      val address = masterAccounts.Service.getAddress(username)
-      Ok(views.html.component.master.assetList(assetPegWallet = blockchainAssets.Service.getAssetPegWallet(address), aclHash = blockchainAclHashes.Service.get(blockchainAclAccounts.Service.get(address).aclHash)))
+      Ok(views.html.component.master.fiatList(fiatPegWallet = blockchainFiats.Service.getFiatPegWallet(loginState.address), aclHash = blockchainAclHashes.Service.get(blockchainAclAccounts.Service.get(loginState.address).aclHash)))
     } catch {
       case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
     }
   }
 
-  def fiatList(username: String): Action[AnyContent] = Action { implicit request =>
+  def negotiationList: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState => implicit request =>
     try {
-      val address = masterAccounts.Service.getAddress(username)
-      Ok(views.html.component.master.fiatList(fiatPegWallet = blockchainFiats.Service.getFiatPegWallet(address), aclHash = blockchainAclHashes.Service.get(blockchainAclAccounts.Service.get(address).aclHash)))
+      val negotiations = blockchainNegotiations.Service.getNegotiationsForAddress(loginState.address)
+      Ok(views.html.component.master.negotiationList(negotiations.filter(_.buyerAddress == loginState.address),negotiations.filter(_.sellerAddress == loginState.address), blockchainAssets.Service.getAssetPegWallet(loginState.address).map(_.pegHash)))
     } catch {
       case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
     }
   }
 
-  def negotiationList(username: String): Action[AnyContent] = Action { implicit request =>
+  def orderList: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState => implicit request =>
     try {
-      val address = masterAccounts.Service.getAddress(username)
-      val negotiations = blockchainNegotiations.Service.getNegotiationsForAddress(address)
-      Ok(views.html.component.master.negotiationList(negotiations.filter(_.buyerAddress == address),negotiations.filter(_.sellerAddress == address), blockchainAssets.Service.getAssetPegWallet(address).map(_.pegHash)))
-    } catch {
-      case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
-    }
-  }
-
-  def orderList(username: String): Action[AnyContent] = Action { implicit request =>
-    try {
-      Ok(views.html.component.master.orderList(blockchainOrders.Service.getOrders(blockchainNegotiations.Service.getNegotiationsForAddress(masterAccounts.Service.getAddress(username)).map(_.id))))
+      Ok(views.html.component.master.orderList(blockchainOrders.Service.getOrders(blockchainNegotiations.Service.getNegotiationsForAddress(loginState.address).map(_.id))))
     } catch {
       case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
     }
@@ -106,9 +104,9 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
     }
   }
 
-  def availableAssetListWithLogin(username:String): Action[AnyContent] = Action { implicit request =>
+  def availableAssetListWithLogin: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState => implicit request =>
     try {
-      Ok(views.html.component.master.availableAssetListWithLogin(blockchainAssets.Service.getAllUnmoderated(blockchainOrders.Service.getAllOrderIds), blockchainAclHashes.Service.get(blockchainAclAccounts.Service.get(masterAccounts.Service.getAddress(username)).aclHash)))
+      Ok(views.html.component.master.availableAssetListWithLogin(blockchainAssets.Service.getAllUnmoderated(blockchainOrders.Service.getAllOrderIds), blockchainAclHashes.Service.get(blockchainAclAccounts.Service.get(loginState.address).aclHash)))
     } catch {
       case baseException: BaseException => NoContent
     }

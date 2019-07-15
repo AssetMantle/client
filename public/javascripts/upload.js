@@ -16,7 +16,7 @@ function getFileTypes(documentType) {
 }
 
 function uploadFile(uploadRoute, storeRoute, documentType) {
-    
+    console.log(uploadRoute, storeRoute, documentType);
     const rFile = new Resumable({
         target: uploadRoute(documentType).url,
         fileType: getFileTypes(documentType),

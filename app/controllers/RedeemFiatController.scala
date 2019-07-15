@@ -14,21 +14,21 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Random
 
 @Singleton
-class RedeemFiatController @Inject()(messagesControllerComponents: MessagesControllerComponents, blockchainZones: blockchain.Zones, withTraderLoginAction: WithTraderLoginAction, transactionsRedeemFiat: transactions.RedeemFiat, blockchainTransactionRedeemFiats: blockchainTransaction.RedeemFiats)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class RedeemFiatController @Inject()(messagesControllerComponents: MessagesControllerComponents, blockchainZones: blockchain.Zones, blockchainACLAccounts: blockchain.ACLAccounts, withTraderLoginAction: WithTraderLoginAction, transactionsRedeemFiat: transactions.RedeemFiat, blockchainTransactionRedeemFiats: blockchainTransaction.RedeemFiats)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
   private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
 
-  def redeemFiatForm: Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.redeemFiat(master.RedeemFiat.form))
+  def redeemFiatForm(ownerAddress: String): Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.redeemFiat(master.RedeemFiat.form, blockchainACLAccounts.Service.get(ownerAddress).zoneID))
   }
 
   def redeemFiat: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       master.RedeemFiat.form.bindFromRequest().fold(
         formWithErrors => {
-          BadRequest(views.html.component.master.redeemFiat(formWithErrors))
+          BadRequest(views.html.component.master.redeemFiat(formWithErrors, formWithErrors.data(constants.Form.ZONE_ID)))
         },
         redeemFiatData => {
 
@@ -39,7 +39,8 @@ class RedeemFiatController @Inject()(messagesControllerComponents: MessagesContr
             if (!kafkaEnabled) {
               Future {
                 try {
-                  loginState.username                } catch {
+                  blockchainTransactionRedeemFiats.Utility.onSuccess(ticketID, transactionsRedeemFiat.Service.post(transactionsRedeemFiat.Request(from = loginState.username, to = toAddress, password = redeemFiatData.password, redeemAmount = redeemFiatData.redeemAmount, gas = redeemFiatData.gas)))
+                } catch {
                   case baseException: BaseException => logger.error(baseException.failure.message, baseException)
                   case blockChainException: BlockChainException => logger.error(blockChainException.failure.message, blockChainException)
                     blockchainTransactionRedeemFiats.Utility.onFailure(ticketID, blockChainException.failure.message)

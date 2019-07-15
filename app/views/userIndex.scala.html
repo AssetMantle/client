@@ -27,8 +27,13 @@
         <button id="userButtonUploadIdentificationOrganization" class="hidden" onclick="getForm(jsRoutes.controllers.FileController.uploadUserOrganizationKycForm('@constants.File.IDENTIFICATION'))">@Messages(constants.Form.UPLOAD_ORGANIZATION_IDENTIFICATION)</button>
         <button id="userButtonUpdateIdentificationOrganization" class="hidden" onclick="getForm(jsRoutes.controllers.FileController.updateUserOrganizationKycForm('@constants.File.IDENTIFICATION'))">@Messages(constants.Form.UPDATE_ORGANIZATION_IDENTIFICATION)</button>
         <script>checkOrganizationKycFileExists('@loginState.username', '@constants.File.IDENTIFICATION', "userButtonUploadIdentificationOrganization", "userButtonUpdateIdentificationOrganization")</script>
+        <button id="userButtonUploadIdentificationTrader" class="hidden" onclick="getForm(jsRoutes.controllers.FileController.uploadUserTraderKycForm('@constants.File.IDENTIFICATION'))">@Messages(constants.Form.UPLOAD_TRADER_IDENTIFICATION)</button>
+        <button id="userButtonUpdateIdentificationTrader" class="hidden" onclick="getForm(jsRoutes.controllers.FileController.updateUserTraderKycForm('@constants.File.IDENTIFICATION'))">@Messages(constants.Form.UPDATE_TRADER_IDENTIFICATION)</button>
+        <script>checkTraderKycFileExists('@loginState.username', '@constants.File.IDENTIFICATION', "userButtonUploadIdentificationTrader", "userButtonUpdateIdentificationTrader")</script>
+
         <button onclick="getForm(jsRoutes.controllers.AddOrganizationController.addOrganizationForm())">@Messages(constants.Form.ADD_ORGANIZATION)</button>
         <button onclick="getForm(jsRoutes.controllers.AddZoneController.addZoneForm())">@Messages(constants.Form.ADD_ZONE)</button>
+        <button onclick="getForm(jsRoutes.controllers.SetACLController.addTraderForm())">@Messages(constants.Form.ADD_TRADER)</button>
     </div>
         <script>
                 componentResource('commonHome', jsRoutes.controllers.ComponentViewController.commonHome('@loginState.username'))

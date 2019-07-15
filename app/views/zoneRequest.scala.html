@@ -13,7 +13,13 @@
                 <div id="pendingVerifyOrganizationRequests" class="flexContainer">
                 </div>
             </div>
-
+            <div class="flexGrowth box leftText">
+                <div>
+                    <h2 class="showHide toggleElement centerText">@Messages(constants.Form.SET_ACL) </h2>
+                </div>
+                <div id="setACLList" class="flexContainer">
+                </div>
+            </div>
             <div class="flexGrowth box leftText">
                 <div>
                     <h2 class="showHide toggleElement centerText">@Messages(constants.Form.PENDING_ISSUE_ASSET_REQUESTS) </h2>
@@ -58,6 +64,7 @@
 
         <script>
                 componentResource('pendingVerifyOrganizationRequests', jsRoutes.controllers.AddOrganizationController.viewPendingVerifyOrganizationRequests());
+                componentResource('setACLList', jsRoutes.controllers.SetACLController.zoneViewPendingVerifyTraderRequests());
                 componentResource('pendingIssueAssetRequests', jsRoutes.controllers.IssueAssetController.viewPendingIssueAssetRequests());
                 componentResource('pendingIssueFiatRequests', jsRoutes.controllers.IssueFiatController.viewPendingIssueFiatRequests());
                 componentResource('releaseAsset', jsRoutes.controllers.ReleaseAssetController.releaseAssetList());

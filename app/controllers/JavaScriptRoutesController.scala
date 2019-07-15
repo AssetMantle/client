@@ -30,6 +30,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.AddZoneController.verifyZoneForm,
         routes.javascript.AddZoneController.rejectVerifyZoneRequestForm,
         routes.javascript.BuyerExecuteOrderController.buyerExecuteOrderForm,
+        routes.javascript.BuyerExecuteOrderController.unmoderatedBuyerExecuteOrderForm,
         routes.javascript.ChangeBuyerBidController.changeBuyerBidForm,
         routes.javascript.ChangeSellerBidController.changeSellerBidForm,
         routes.javascript.ConfirmBuyerBidController.confirmBuyerBidForm,
@@ -55,12 +56,14 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ReleaseAssetController.releaseAssetList,
         routes.javascript.BuyerExecuteOrderController.buyerExecuteOrderList,
         routes.javascript.SellerExecuteOrderController.sellerExecuteOrderList,
+        routes.javascript.SetBuyerFeedbackController.buyerFeedbackList,
+        routes.javascript.SetSellerFeedbackController.sellerFeedbackList,
 
         routes.javascript.RedeemAssetController.redeemAssetForm,
         routes.javascript.RedeemFiatController.redeemFiatForm,
         routes.javascript.ReleaseAssetController.releaseAssetForm,
         routes.javascript.SellerExecuteOrderController.sellerExecuteOrderForm,
-        routes.javascript.SellerExecuteOrderController.sellerExecuteOrderForm,
+        routes.javascript.SellerExecuteOrderController.unmoderatedSellerExecuteOrderForm,
         routes.javascript.SendAssetController.sendAssetForm,
         routes.javascript.SendCoinController.requestCoinsForm,
         routes.javascript.SendCoinController.approveFaucetRequestsForm,
@@ -68,9 +71,18 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.SendCoinController.viewPendingFaucetRequests,
         routes.javascript.SendCoinController.sendCoinForm,
         routes.javascript.SendFiatController.sendFiatForm,
-        routes.javascript.SetACLController.setACLForm,
+
+        routes.javascript.SetACLController.zoneVerifyTraderForm,
+        routes.javascript.SetACLController.organizationVerifyTraderForm,
+        routes.javascript.SetACLController.addTraderForm,
+        routes.javascript.SetACLController.zoneRejectVerifyTraderRequestForm,
+        routes.javascript.SetACLController.zoneViewPendingVerifyTraderRequests,
+        routes.javascript.SetACLController.organizationRejectVerifyTraderRequestForm,
+        routes.javascript.SetACLController.organizationViewPendingVerifyTraderRequests,
+
         routes.javascript.SetBuyerFeedbackController.setBuyerFeedbackForm,
         routes.javascript.SetSellerFeedbackController.setSellerFeedbackForm,
+
         routes.javascript.AddKeyController.blockchainAddKeyForm,
         routes.javascript.AddOrganizationController.blockchainAddOrganizationForm,
         routes.javascript.AddZoneController.blockchainAddZoneForm,
@@ -96,6 +108,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.FileController.checkAccountKycFileExists,
         routes.javascript.FileController.checkZoneKycFileExists,
         routes.javascript.FileController.checkOrganizationKycFileExists,
+        routes.javascript.FileController.checkTraderKycFileExists,
 
         routes.javascript.FileController.uploadAccountFileForm,
         routes.javascript.FileController.uploadAccountFile,
@@ -121,6 +134,12 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.FileController.updateUserOrganizationKycForm,
         routes.javascript.FileController.updateUserOrganizationKyc,
 
+        routes.javascript.FileController.uploadUserTraderKycForm,
+        routes.javascript.FileController.uploadUserTraderKyc,
+        routes.javascript.FileController.storeUserTraderKyc,
+        routes.javascript.FileController.updateUserTraderKycForm,
+        routes.javascript.FileController.updateUserTraderKyc,
+
         routes.javascript.FileController.uploadZoneKycForm,
         routes.javascript.FileController.uploadZoneKYC,
         routes.javascript.FileController.storeZoneKYC,
@@ -133,8 +152,15 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.FileController.updateOrganizationKycForm,
         routes.javascript.FileController.updateOrganizationKYC,
 
+        routes.javascript.FileController.uploadTraderKycForm,
+        routes.javascript.FileController.uploadTraderKYC,
+        routes.javascript.FileController.storeTraderKYC,
+        routes.javascript.FileController.updateTraderKycForm,
+        routes.javascript.FileController.updateTraderKYC,
+
         routes.javascript.FileController.genesisAccessedFile,
-        routes.javascript.FileController.zoneAccessedFile,
+        routes.javascript.FileController.zoneAccessedOrganizationFile,
+        routes.javascript.FileController.zoneAccessedTraderFile,
         routes.javascript.FileController.file,
 
         routes.javascript.AddZoneController.viewKycDocuments,
@@ -143,6 +169,12 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.AddOrganizationController.viewKycDocuments,
         routes.javascript.AddOrganizationController.verifyKycDocument,
         routes.javascript.AddOrganizationController.rejectKycDocument,
+        routes.javascript.SetACLController.zoneViewKycDocuments,
+        routes.javascript.SetACLController.zoneVerifyKycDocument,
+        routes.javascript.SetACLController.zoneRejectKycDocument,
+        routes.javascript.SetACLController.organizationViewKycDocuments,
+        routes.javascript.SetACLController.organizationVerifyKycDocument,
+        routes.javascript.SetACLController.organizationRejectKycDocument
       )
     ).as("text/javascript")
   }

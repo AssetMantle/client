@@ -1,0 +1,28 @@
+@import controllers.actions.LoginState
+@()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+
+    @common(Messages(constants.Form.INDEX))(Html(""))(center)(Html(""))
+
+    @center = {
+        <div class="flexContainer">
+            <div class="flexGrowth box leftText">
+                <div>
+                    <h2 class="showHide toggleElement centerText">@Messages(constants.Form.PENDING_VERIFY_ZONE_REQUESTS) </h2>
+                </div>
+                <div id="pendingVerifyZoneRequests" class="flexContainer">
+                </div>
+            </div>
+            <div class="flexGrowth box leftText">
+                <div>
+                    <h2 class="showHide toggleElement centerText">@Messages(constants.Form.APPROVE_FAUCET_REQUEST) </h2>
+                </div>
+                <div id="pendingFaucetRequests" class="flexContainer">
+                </div>
+            </div>
+        </div>
+
+        <script>
+                componentResource('pendingVerifyZoneRequests', jsRoutes.controllers.AddZoneController.viewPendingVerifyZoneRequests());
+                componentResource('pendingFaucetRequests', jsRoutes.controllers.SendCoinController.viewPendingFaucetRequests());
+        </script>
+    }
