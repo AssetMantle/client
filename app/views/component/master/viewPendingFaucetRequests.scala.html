@@ -1,27 +1,7 @@
 @import models.masterTransaction.FaucetRequest
 
 @(faucetRequests: Seq[FaucetRequest])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
-@*
-<table>
-    <tr>
-        <th>@Messages(constants.Form.ID)</th>
-        <th>@Messages(constants.Form.ACCOUNT_ID)</th>
-        <th>@Messages(constants.Form.AMOUNT)</th>
-        <th>@Messages(constants.Form.STATUS)</th>
 
-    </tr>
-    @for(faucetRequest <- faucetRequests) {
-        <tr>
-            <td>@faucetRequest.id</td>
-            <td>@faucetRequest.accountID</td>
-            <td>@faucetRequest.amount</td>
-            <td>
-                <button class="approve" onclick="getForm(jsRoutes.controllers.SendCoinController.approveFaucetRequestsForm('@faucetRequest.id', '@faucetRequest.accountID'))">@Messages(constants.Form.APPROVE)</button> <button class="reject" onclick="getForm(jsRoutes.controllers.SendCoinController.rejectFaucetRequestForm('@faucetRequest.id'))">@Messages(constants.Form.REJECT)</button>
-            </td>
-        </tr>
-    }
-</table>
-*@
 @for(faucetRequest <- faucetRequests) {
     <div class="flexItem box leftText lightBlue">
         <span class="red">@Messages(constants.Form.ACCOUNT_ID)</span> :@faucetRequest.accountID <br>
