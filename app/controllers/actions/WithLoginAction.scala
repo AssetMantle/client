@@ -26,7 +26,7 @@ class WithLoginAction @Inject()(messagesControllerComponents: MessagesController
       catch {
         case baseException: BaseException => {
           logger.info(baseException.failure.message, baseException)
-          Results.Unauthorized(views.html.index(failures = Seq(baseException.failure)))
+          Results.Unauthorized(views.html.index()).withNewSession
         }
       }
     }

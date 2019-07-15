@@ -1,20 +1,17 @@
 @import models.master.Zone
-
-@(username: String, address: String, coins: Int = 0, zone: Zone, profilePicture: Array[Byte])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
+@import utilities.LoginState
+@(username: String, zone: Zone)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
 @common(Messages(constants.User.HOME))(Html(""))(center)(Html(""))
 
-    @center = {
+@center = {
     <div class="flexContainer">
-        @component.master.commonHome(username = username, userType = constants.User.ZONE, address = address, coins = coins, profilePicture = profilePicture)
+        <div id="commonHome" class="box flexItem flexGrowth"></div>
         <div class="flexItem box leftAlign flexGrowth">
-            <h2 class="showHide showHideStyle centerText">@Messages(constants.Form.ZONE):</h2>
-            @Messages(constants.Form.NAME): @zone.name
-            <div></div>
             <div>
-            @Messages(constants.Form.ZONE_ID): @zone.id <br>
-            @Messages(constants.Form.CURRENCY): @zone.currency <br>
-            @Messages(constants.Form.VERIFIED_STATUS): @zone.status <br>
+                <h2 class="showHide toggleElement centerText">@Messages(constants.Form.ZONE):</h2>
+            </div>
+            <div id="zone">
             </div>
         </div>
 
@@ -30,4 +27,8 @@
         <button onclick="getForm(jsRoutes.controllers.FileController.updateZoneKycForm('@constants.File.BANK_DETAILS'))">@Messages(constants.Form.UPDATE_ZONE_BANK_DETAILS)</button>
         <button onclick="getForm(jsRoutes.controllers.FileController.updateZoneKycForm('@constants.File.IDENTIFICATION'))">@Messages(constants.Form.UPDATE_ZONE_IDENTIFICATION)</button>
     </div>
+    <script>
+            componentResource('commonHome', jsRoutes.controllers.ComponentViewController.commonHome('@username'));
+            componentResource('zone', jsRoutes.controllers.ComponentViewController.zoneDetails('@username'));
+    </script>
 }

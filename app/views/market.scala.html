@@ -1,0 +1,24 @@
+@import views.html.component.blockchain.{blockExplorer, transactionExplorer, transactionHash, allBlocksTable, validatorsTable, blockHeight, validators, lastBlockHeight, averageBlockTime, search, blockTimeGraph}
+@import utilities.LoginState
+@()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+
+@common(Messages(constants.Form.INDEX))(Html(""))(center)(Html(""))
+
+
+@center = {
+   <div class="flexContainer">
+
+        <div class="flexGrowth box leftText">
+            <div>
+                <h2 class="showHide toggleElement centerText">@Messages(constants.Form.ASSETS) </h2>
+            </div>
+            <div id="availableAssetListWithLogin" class="flexContainer">
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        componentResource('availableAssetListWithLogin', jsRoutes.controllers.ComponentViewController.availableAssetListWithLogin('@loginState.username'));
+    </script>
+}

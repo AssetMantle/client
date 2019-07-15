@@ -1,3 +1,3 @@
 $(".showHide").click(function () {
-    $(this).next().next().slideToggle("fast");
+    $(this).parent().next().slideToggle("fast");
 });

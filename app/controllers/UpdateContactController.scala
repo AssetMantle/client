@@ -6,6 +6,7 @@ import models.master.Contacts
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
+import utilities.LoginState
 import views.companion.master.UpdateContact
 
 import scala.concurrent.ExecutionContext
@@ -26,6 +27,7 @@ class UpdateContactController @Inject()(messagesControllerComponents: MessagesCo
           BadRequest(views.html.component.master.updateContact(formWithErrors, constants.CountryCallingCode.COUNTRY_CODES))
         },
         signUpData => {
+          implicit val loginState:LoginState = LoginState(username)
           if (contacts.Service.updateEmailAndMobile(username, signUpData.countryCode + signUpData.mobileNumber, signUpData.emailAddress)) Ok(views.html.index(successes = Seq(constants.Response.SUCCESS))) else Ok(views.html.index(failures = Seq(constants.Response.FAILURE)))
         }
       )
