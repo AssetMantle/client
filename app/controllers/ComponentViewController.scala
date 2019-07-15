@@ -1,23 +1,23 @@
 package controllers
 
-import controllers.actions.WithLoginAction
+import controllers.actions.{WithLoginAction, WithTraderLoginAction}
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import models.blockchain
-import models.master
 import models.blockchain.ACLAccounts
 import models.master.{Accounts, Organizations, Zones}
+import models.{blockchain, master}
+import play.api.http.ContentTypes
 import play.api.i18n.I18nSupport
+import play.api.libs.Comet
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
 import queries.GetAccount
-import utilities.LoginState
 
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class ComponentViewController @Inject()(messagesControllerComponents: MessagesControllerComponents, withLoginAction: WithLoginAction, masterAccounts: Accounts,  masterAccountFiles: master.AccountFiles, blockchainAclAccounts: ACLAccounts, blockchainZones: blockchain.Zones, blockchainOrganizations: blockchain.Organizations, blockchainAssets: blockchain.Assets, blockchainFiats: blockchain.Fiats, blockchainNegotiations: blockchain.Negotiations, masterOrganizations: Organizations, masterZones: Zones, blockchainAclHashes: blockchain.ACLHashes, blockchainOrders: blockchain.Orders, getAccount: GetAccount, blockchainAccounts: blockchain.Accounts, withUsernameToken: WithUsernameToken)(implicit configuration: Configuration, executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class ComponentViewController @Inject()(messagesControllerComponents: MessagesControllerComponents, withTraderLoginAction: WithTraderLoginAction, withLoginAction: WithLoginAction, masterAccounts: Accounts,  masterAccountFiles: master.AccountFiles, blockchainAclAccounts: ACLAccounts, blockchainZones: blockchain.Zones, blockchainOrganizations: blockchain.Organizations, blockchainAssets: blockchain.Assets, blockchainFiats: blockchain.Fiats, blockchainNegotiations: blockchain.Negotiations, masterOrganizations: Organizations, masterZones: Zones, blockchainAclHashes: blockchain.ACLHashes, blockchainOrders: blockchain.Orders, getAccount: GetAccount, blockchainAccounts: blockchain.Accounts, withUsernameToken: WithUsernameToken)(implicit configuration: Configuration, executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -114,4 +114,25 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
       case baseException: BaseException => NoContent
     }
   }
+
+  def assetComet: Action[AnyContent] = withTraderLoginAction.authenticated { username =>
+    implicit request =>
+      Ok.chunked(blockchainAssets.Service.assetCometSource(username) via Comet.json("parent.assetCometMessage")).as(ContentTypes.HTML)
+  }
+
+  def fiatComet: Action[AnyContent] = withTraderLoginAction.authenticated { username =>
+    implicit request =>
+      Ok.chunked(blockchainFiats.Service.fiatCometSource(username) via Comet.json("parent.fiatCometMessage")).as(ContentTypes.HTML)
+  }
+
+  def negotiationComet: Action[AnyContent] = withTraderLoginAction.authenticated { username =>
+    implicit request =>
+      Ok.chunked(blockchainNegotiations.Service.negotiationCometSource(username) via Comet.json("parent.negotiationCometMessage")).as(ContentTypes.HTML)
+  }
+
+  def orderComet: Action[AnyContent] = withTraderLoginAction.authenticated { username =>
+    implicit request =>
+      Ok.chunked(blockchainOrders.Service.orderCometSource(username) via Comet.json("parent.orderCometMessage")).as(ContentTypes.HTML)
+  }
+
 }

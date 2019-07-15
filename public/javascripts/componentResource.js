@@ -1,13 +1,13 @@
 function componentResource(source, route){
     const div = $('#'+ source);
 
-    console.log(div);
     $.ajax({
         url: route.url,
         type: route.type,
         async: true,
         statusCode: {
             200: function (data) {
+                console.log(source);
                 div.html(data)
             },
             500: function (data) {

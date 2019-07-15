@@ -142,8 +142,10 @@ POST        /master/rejectIssueAssetRequest                      controllers.Iss
 GET         /master/issueAsset                                   controllers.IssueAssetController.issueAssetForm(requestID: String, accountID: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int)
 POST        /master/issueAsset                                   controllers.IssueAssetController.issueAsset
 
-GET         /master/assetComet                                   controllers.IssueAssetController.assetComet
-GET         /master/fiatComet                                    controllers.IssueFiatController.fiatComet
+GET         /master/assetComet                                   controllers.ComponentViewController.assetComet
+GET         /master/fiatComet                                    controllers.ComponentViewController.fiatComet
+GET         /master/negotiationComet                             controllers.ComponentViewController.negotiationComet
+GET         /master/orderComet                                   controllers.ComponentViewController.orderComet
 
 GET         /master/issueFiatRequest                             controllers.IssueFiatController.issueFiatRequestForm
 POST        /master/issueFiatRequest                             controllers.IssueFiatController.issueFiatRequest

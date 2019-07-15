@@ -1,13 +1,18 @@
 package models.blockchain
 
-import akka.actor.ActorSystem
+import akka.actor.{ActorRef, ActorSystem}
+import akka.stream.OverflowStrategy
+import akka.stream.scaladsl.Source
 import exceptions.{BaseException, BlockChainException}
 import javax.inject.{Inject, Singleton}
+import models.master
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
+import play.api.libs.json.{JsValue, Json}
 import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
 import utilities.PushNotification
+import utilities.actors.{Actor, MainOrderActor, ShutdownActors}
 
 import scala.concurrent.duration.{Duration, _}
 import scala.concurrent.{Await, ExecutionContext, Future}
@@ -15,8 +20,10 @@ import scala.util.{Failure, Success}
 
 case class Order(id: String, fiatProofHash: Option[String], awbProofHash: Option[String], dirtyBit: Boolean)
 
+case class OrderCometMessage(ownerAddress: String, message: JsValue)
+
 @Singleton
-class Orders @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, getAccount: queries.GetAccount, blockchainNegotiations: Negotiations, blockchainAssets: Assets, blockchainFiats: Fiats, getOrder: queries.GetOrder, actorSystem: ActorSystem, implicit val pushNotification: PushNotification)(implicit executionContext: ExecutionContext, configuration: Configuration) {
+class Orders @Inject()(shutdownActors: ShutdownActors, masterAccounts: master.Accounts, protected val databaseConfigProvider: DatabaseConfigProvider, getAccount: queries.GetAccount, blockchainNegotiations: Negotiations, blockchainAssets: Assets, blockchainFiats: Fiats, getOrder: queries.GetOrder, actorSystem: ActorSystem, implicit val pushNotification: PushNotification)(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -29,9 +36,16 @@ class Orders @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
   private implicit val module: String = constants.Module.BLOCKCHAIN_ORDER
 
   private[models] val orderTable = TableQuery[OrderTable]
+
   private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
+
   private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
+
   private val sleepTime = configuration.get[Long]("blockchain.entityIterator.threadSleep")
+
+  private val actorTimeout = configuration.get[Int]("akka.actors.timeout").seconds
+
+  val mainOrderActor: ActorRef = Actor.system.actorOf(props = MainOrderActor.props(actorTimeout), name = constants.Module.ACTOR_MAIN_ORDER)
 
   private def add(order: Order)(implicit executionContext: ExecutionContext): Future[String] = db.run((orderTable returning orderTable.map(_.id) += order).asTry).map {
     case Success(result) => result
@@ -112,6 +126,15 @@ class Orders @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
     def getAllOrderIds: Seq[String] = Await.result(getOrderIDs, Duration.Inf)
 
     def markDirty(id: String): Int = Await.result(updateDirtyBitById(id, dirtyBit = true), Duration.Inf)
+
+    def orderCometSource(username: String) = {
+      val address = masterAccounts.Service.getAddress(username)
+      shutdownActors.shutdown(constants.Module.ACTOR_MAIN_ORDER, address)
+      Thread.sleep(500)
+      val (systemUserActor, source) = Source.actorRef[JsValue](0, OverflowStrategy.dropHead).preMaterialize()(Actor.materializer)
+      mainOrderActor ! utilities.actors.CreateOrderChildActorMessage(address = address, actorRef = systemUserActor)
+      source
+    }
   }
 
   object Utility {
@@ -135,6 +158,9 @@ class Orders @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
             blockchainNegotiations.Service.deleteNegotiations(negotiation.assetPegHash)
           }
           Service.insertOrUpdate(dirtyOrder.id, awbProofHash = Option(orderResponse.value.awbProofHash), fiatProofHash = Option(orderResponse.value.fiatProofHash), dirtyBit = false)
+          mainOrderActor ! OrderCometMessage(ownerAddress = negotiation.buyerAddress, message = Json.toJson(constants.Comet.PING))
+          mainOrderActor ! OrderCometMessage(ownerAddress = negotiation.sellerAddress, message = Json.toJson(constants.Comet.PING))
+
         }
         catch {
           case blockChainException: BlockChainException => logger.error(blockChainException.failure.message, blockChainException)
@@ -144,7 +170,7 @@ class Orders @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
     }
   }
 
-  actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
+  Actor.system.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
     Utility.dirtyEntityUpdater()
   }
 

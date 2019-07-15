@@ -453,6 +453,10 @@ dl:hover .info {
     background-color: #a8b1ff;
 }
 
+.grey {
+    background-color: #D3D3D3;
+}
+
 .red {
     color: rgba(131, 0, 4, 0.71);
 }

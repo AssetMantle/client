@@ -4,7 +4,7 @@
 @(assetPegWallet: Seq[Asset], aclHash: ACLHash)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
 
     @for(asset <- assetPegWallet) {
-        <div class="flexItem box lightBlue">
+        <div class="flexItem box grey">
             <div class="leftText">
                 <span class="red">@Messages(constants.Form.PEG_HASH)</span> : @asset.pegHash <br>
                 <span class="red">@Messages(constants.Form.DOCUMENT_HASH)</span> : @asset.documentHash <br>

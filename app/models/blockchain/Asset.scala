@@ -9,12 +9,12 @@ import models.master
 import models.masterTransaction.AccountTokens
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
-import play.api.libs.json.{JsValue, Json, OWrites}
+import play.api.libs.json.{JsValue, Json}
 import play.api.{Configuration, Logger}
 import queries.GetAccount
 import slick.jdbc.JdbcProfile
 import utilities.PushNotification
-import utilities.actors.{Actor, MainAssetActor, ShutdownActors, UserAssetActor}
+import utilities.actors.{Actor, MainAssetActor, ShutdownActors}
 
 import scala.concurrent.duration.{Duration, _}
 import scala.concurrent.{Await, ExecutionContext, Future}
@@ -31,13 +31,13 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
 
   val db = databaseConfig.db
 
-  val mainAssetActor: ActorRef = Actor.system.actorOf(props = MainAssetActor.props, name = "mainAssetActor")
+  private val actorTimeout = configuration.get[Int]("akka.actors.timeout").seconds
+
+  val mainAssetActor: ActorRef = Actor.system.actorOf(props = MainAssetActor.props(actorTimeout), name = constants.Module.ACTOR_MAIN_ASSET)
 
   private implicit val logger: Logger = Logger(this.getClass)
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_ASSET
-
-  private implicit val assetWrites: OWrites[Asset] = Json.writes[Asset]
 
   import databaseConfig.profile.api._
 
@@ -74,7 +74,8 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }
   }
-  private def findAllUnmoderated(excludedAssets:Seq[String]):Future[Seq[Asset]] = db.run(assetTable.filter(_.unmoderated === false).filter(assets => !(assets.ownerAddress inSet excludedAssets)).result.asTry).map {
+
+  private def findAllUnmoderated(excludedAssets: Seq[String]): Future[Seq[Asset]] = db.run(assetTable.filter(_.unmoderated === false).filter(assets => !(assets.ownerAddress inSet excludedAssets)).result.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -150,7 +151,7 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
 
     def get(pegHash: String)(implicit executionContext: ExecutionContext): Asset = Await.result(findByPegHash(pegHash), Duration.Inf)
 
-    def getAllUnmoderated(excludedAssets:Seq[String]):Seq[Asset] = Await.result(findAllUnmoderated(excludedAssets),Duration.Inf)
+    def getAllUnmoderated(excludedAssets: Seq[String]): Seq[Asset] = Await.result(findAllUnmoderated(excludedAssets), Duration.Inf)
 
     def getAssetPegWallet(address: String)(implicit executionContext: ExecutionContext): Seq[Asset] = Await.result(getAssetPegWalletByAddress(address), Duration.Inf)
 
@@ -166,11 +167,10 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
 
     def assetCometSource(username: String) = {
       val address = masterAccounts.Service.getAddress(username)
-      shutdownActors.shutdown(constants.Module.ACTOR_USER_ASSET, address)
-      Thread.sleep(1000)
+      shutdownActors.shutdown(constants.Module.ACTOR_MAIN_ASSET, address)
+      Thread.sleep(500)
       val (systemUserActor, source) = Source.actorRef[JsValue](0, OverflowStrategy.dropHead).preMaterialize()(Actor.materializer)
-      Actor.system.actorOf(props = UserAssetActor.props(systemUserActor), name = constants.Module.ACTOR_USER_ASSET + address)
-      shutdownActors.sessionTimeoutShutdown(constants.Module.ACTOR_USER_ASSET, username)
+      mainAssetActor ! utilities.actors.CreateAssetChildActorMessage(address = address, actorRef = systemUserActor)
       source
     }
   }
@@ -183,7 +183,7 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
         try {
           val assetPegWallet = getAccount.Service.get(dirtyAsset.ownerAddress).value.assetPegWallet.getOrElse(throw new BaseException(constants.Response.NO_RESPONSE))
           assetPegWallet.foreach(assetPeg => if (assetPegWallet.map(_.pegHash) contains dirtyAsset.pegHash) Service.insertOrUpdate(pegHash = assetPeg.pegHash, documentHash = assetPeg.documentHash, assetType = assetPeg.assetType, assetPrice = assetPeg.assetPrice, assetQuantity = assetPeg.assetQuantity, quantityUnit = assetPeg.quantityUnit, ownerAddress = dirtyAsset.ownerAddress, locked = assetPeg.locked, unmoderated = assetPeg.unmoderated, dirtyBit = false) else Service.deleteAsset(dirtyAsset.pegHash))
-          mainAssetActor ! AssetCometMessage(ownerAddress = dirtyAsset.ownerAddress, message = Json.toJson(assetPegWallet.map { asset => Json.toJson(Asset(pegHash = asset.pegHash, documentHash = asset.documentHash, assetType = asset.assetType, assetPrice = asset.assetPrice, assetQuantity = asset.assetQuantity, quantityUnit = asset.quantityUnit, ownerAddress = dirtyAsset.ownerAddress, locked = asset.locked, unmoderated = asset.unmoderated, dirtyBit = false)) }))
+          mainAssetActor ! AssetCometMessage(ownerAddress = dirtyAsset.ownerAddress, message = Json.toJson(constants.Comet.PING))
         }
         catch {
           case baseException: BaseException => logger.info(baseException.failure.message, baseException)

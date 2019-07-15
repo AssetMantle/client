@@ -24,9 +24,8 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
     implicit request =>
     try {
       implicit val loginState:LoginState = LoginState(username)
-      val userType = masterAccounts.Service.getUserType(username)
       val address = masterAccounts.Service.getAddress(username)
-      userType match {
+      masterAccounts.Service.getUserType(username) match {
         case constants.User.GENESIS =>
           withUsernameToken.Ok(views.html.genesisIndex(username = username), username)
         case constants.User.ZONE =>
@@ -36,7 +35,6 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
         case constants.User.TRADER =>
           val aclAccount = blockchainAclAccounts.Service.get(address)
           val fiatPegWallet = blockchainFiats.Service.getFiatPegWallet(address)
-          val negotiations = blockchainNegotiations.Service.getNegotiationsForAddress(masterAccounts.Service.getAddress(username))
           withUsernameToken.Ok(views.html.traderIndex(username = username, totalFiat = fiatPegWallet.map(_.transactionAmount.toInt).sum, zone = masterZones.Service.get(aclAccount.zoneID), organization = masterOrganizations.Service.get(aclAccount.organizationID), aclHash = blockchainAclHashes.Service.get(aclAccount.aclHash)), username)
         case constants.User.USER =>
           withUsernameToken.Ok(views.html.userIndex(username = username), username)

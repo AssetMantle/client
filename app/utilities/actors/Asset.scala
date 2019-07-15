@@ -1,7 +1,5 @@
 package utilities.actors
 
-import java.util.concurrent.TimeUnit
-
 import akka.actor.{Actor, ActorLogging, ActorRef, PoisonPill, Props}
 import akka.util.Timeout
 import models.blockchain
@@ -11,13 +9,15 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.duration.FiniteDuration
 import scala.util.{Failure, Success}
 
+case class CreateAssetChildActorMessage(address: String, actorRef: ActorRef)
+
 object MainAssetActor {
-  def props = Props(new MainAssetActor)
+  def props(actorTimeout: FiniteDuration) = Props(new MainAssetActor(actorTimeout))
 }
 
-class MainAssetActor extends Actor with ActorLogging {
+class MainAssetActor(actorTimeout: FiniteDuration) extends Actor with ActorLogging {
 
-  private implicit val timeout: Timeout = Timeout(FiniteDuration(1, TimeUnit.SECONDS))
+  private implicit val timeout: Timeout = Timeout(actorTimeout)
 
   private implicit val executionContext: ExecutionContext = context.dispatcher
 
@@ -27,21 +27,22 @@ class MainAssetActor extends Actor with ActorLogging {
 
   def receive = {
     case assetCometMessage: blockchain.AssetCometMessage =>
-      Actor.system.actorSelection("/user/" + constants.Module.ACTOR_USER_ASSET + assetCometMessage.ownerAddress).resolveOne().onComplete {
+      Actor.system.actorSelection("/user/" + constants.Module.ACTOR_MAIN_ASSET + "/" + assetCometMessage.ownerAddress).resolveOne().onComplete {
         case Success(actorRef) => actorRef ! assetCometMessage
         case Failure(ex) => logger.info(module + ": " + ex.getMessage)
       }
+    case createAssetChildActorMessage: CreateAssetChildActorMessage => context.actorOf(props = UserAssetActor.props(createAssetChildActorMessage.actorRef, actorTimeout), name = createAssetChildActorMessage.address)
   }
 
 }
 
 object UserAssetActor {
-  def props(systemUserActor: ActorRef) = Props(new UserAssetActor(systemUserActor))
+  def props(systemUserActor: ActorRef, actorTimeout: FiniteDuration) = Props(new UserAssetActor(systemUserActor, actorTimeout))
 }
 
-class UserAssetActor(systemUserActor: ActorRef) extends Actor with ActorLogging {
+class UserAssetActor(systemUserActor: ActorRef, actorTimeout: FiniteDuration) extends Actor with ActorLogging {
 
-  private implicit val timeout: Timeout = Timeout(FiniteDuration(1, TimeUnit.SECONDS))
+  private implicit val timeout: Timeout = Timeout(actorTimeout)
 
   private implicit val executionContext: ExecutionContext = context.dispatcher
 
@@ -49,9 +50,10 @@ class UserAssetActor(systemUserActor: ActorRef) extends Actor with ActorLogging 
 
   private implicit val module: String = constants.Module.ACTOR_USER_ASSET
 
+  override def postStop(): Unit = log.info(module + ": Actor Stopped")
+
   def receive = {
-    case assetCometMessage: blockchain.AssetCometMessage => logger.info(module + ": " + assetCometMessage.ownerAddress)
-      systemUserActor ! assetCometMessage.message
+    case assetCometMessage: blockchain.AssetCometMessage => systemUserActor ! assetCometMessage.message
     case _: ShutdownActorMessage =>
       systemUserActor ! PoisonPill
       context.stop(self)
