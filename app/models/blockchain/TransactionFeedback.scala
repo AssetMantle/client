@@ -1,5 +1,6 @@
 package models.blockchain
 
+import akka.actor.ActorSystem
 import exceptions.{BaseException, BlockChainException}
 import javax.inject.{Inject, Singleton}
 import org.postgresql.util.PSQLException
@@ -9,7 +10,6 @@ import queries.GetTraderReputation
 import queries.responses.TraderReputationResponse
 import queries.responses.TraderReputationResponse.TransactionFeedbackResponse
 import slick.jdbc.JdbcProfile
-import utilities.actors.Actor
 
 import scala.concurrent.duration.{Duration, _}
 import scala.concurrent.{Await, ExecutionContext, Future}
@@ -40,7 +40,7 @@ case class ConfirmSellerBidCounts(confirmSellerBidPositiveTx: String, confirmSel
 case class NegotiationCounts(negotiationPositiveTx: String, negotiationNegativeTx: String)
 
 @Singleton
-class TransactionFeedbacks @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, getTraderReputation: GetTraderReputation)(implicit executionContext: ExecutionContext, configuration: Configuration) {
+class TransactionFeedbacks @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, actorSystem: ActorSystem, getTraderReputation: GetTraderReputation)(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -232,7 +232,7 @@ class TransactionFeedbacks @Inject()(protected val databaseConfigProvider: Datab
     }
   }
 
-  Actor.system.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
+  actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
     Utility.dirtyEntityUpdater()
   }
 }

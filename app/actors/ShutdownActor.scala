@@ -1,5 +1,6 @@
-package utilities.actors
+package actors
 
+import akka.actor.ActorSystem
 import akka.util.Timeout
 import javax.inject.{Inject, Singleton}
 import play.api.{Configuration, Logger}
@@ -11,7 +12,7 @@ import scala.util.{Failure, Success}
 case class ShutdownActorMessage()
 
 @Singleton
-class ShutdownActors @Inject()(masterAccounts: models.master.Accounts)(implicit executionContext: ExecutionContext, configuration: Configuration) {
+class ShutdownActors @Inject()(actorSystem: ActorSystem, masterAccounts: models.master.Accounts)(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
   private val actorTimeout = configuration.get[Int]("akka.actors.timeout").seconds
 
@@ -26,7 +27,7 @@ class ShutdownActors @Inject()(masterAccounts: models.master.Accounts)(implicit 
   }
 
   def shutdown(actorPath: String, address: String): Unit = {
-    Actor.system.actorSelection("/user/" + actorPath + "/" + address).resolveOne().onComplete {
+    actorSystem.actorSelection("/user/" + actorPath + "/" + address).resolveOne().onComplete {
       case Success(actorRef) => logger.info(module + ": " + actorPath + "/" + address)
         actorRef ! ShutdownActorMessage()
       case Failure(ex) => logger.info(module + ": " + ex.getMessage)

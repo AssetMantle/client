@@ -1,8 +1,9 @@
 package models.blockchain
 
-import akka.actor.ActorRef
-import akka.stream.OverflowStrategy
+import actors.{MainAccountActor, ShutdownActors}
+import akka.actor.{ActorRef, ActorSystem}
 import akka.stream.scaladsl.Source
+import akka.stream.{ActorMaterializer, OverflowStrategy}
 import exceptions.{BaseException, BlockChainException}
 import javax.inject.{Inject, Singleton}
 import models.master
@@ -14,7 +15,6 @@ import queries.GetAccount
 import slick.jdbc.JdbcProfile
 import transactions.{AddKey, GetSeed}
 import utilities.PushNotification
-import utilities.actors.{Actor, MainAccountActor, ShutdownActors}
 
 import scala.concurrent.duration.{Duration, _}
 import scala.concurrent.{Await, ExecutionContext, Future}
@@ -25,7 +25,7 @@ case class Account(address: String, coins: Int, publicKey: String, accountNumber
 case class AccountCometMessage(ownerAddress: String, message: JsValue)
 
 @Singleton
-class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, shutdownActors: ShutdownActors, getSeed: GetSeed, addKey: AddKey, getAccount: GetAccount, masterAccounts: master.Accounts, implicit val pushNotification: PushNotification)(implicit executionContext: ExecutionContext, configuration: Configuration) {
+class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, actorSystem: ActorSystem, shutdownActors: ShutdownActors, getSeed: GetSeed, addKey: AddKey, getAccount: GetAccount, masterAccounts: master.Accounts, implicit val pushNotification: PushNotification)(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -35,10 +35,16 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_ACCOUNT
 
+  private implicit val materializer: ActorMaterializer = ActorMaterializer()(actorSystem)
+
   import databaseConfig.profile.api._
-  val mainAccountActor: ActorRef = Actor.system.actorOf(props = MainAccountActor.props(actorTimeout), name = constants.Module.ACTOR_MAIN_ACCOUNT)
+
+  val mainAccountActor: ActorRef = actorSystem.actorOf(props = MainAccountActor.props(actorTimeout, actorSystem), name = constants.Module.ACTOR_MAIN_ACCOUNT)
+
   private[models] val accountTable = TableQuery[AccountTable]
+
   private val actorTimeout = configuration.get[Int]("akka.actors.timeout").seconds
+
   private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
 
   private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
@@ -145,8 +151,8 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
       val address = masterAccounts.Service.getAddress(username)
       shutdownActors.shutdown(constants.Module.ACTOR_MAIN_ACCOUNT, address)
       Thread.sleep(500)
-      val (systemUserActor, source) = Source.actorRef[JsValue](0, OverflowStrategy.dropHead).preMaterialize()(Actor.materializer)
-      mainAccountActor ! utilities.actors.CreateAccountChildActorMessage(address = address, actorRef = systemUserActor)
+      val (systemUserActor, source) = Source.actorRef[JsValue](0, OverflowStrategy.dropHead).preMaterialize()
+      mainAccountActor ! actors.CreateAccountChildActorMessage(address = address, actorRef = systemUserActor)
       source
     }
   }
@@ -168,7 +174,7 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     }
   }
 
-  Actor.system.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
+  actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
     Utility.dirtyEntityUpdater()
   }
 }

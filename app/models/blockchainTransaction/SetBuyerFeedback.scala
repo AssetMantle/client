@@ -11,7 +11,8 @@ import slick.jdbc.JdbcProfile
 import transactions.GetResponse
 import transactions.responses.TransactionResponse.Response
 import utilities.PushNotification
-import utilities.actors.Actor
+import actors.Actor
+import akka.actor.ActorSystem
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
@@ -20,7 +21,7 @@ import scala.util.{Failure, Success}
 case class SetBuyerFeedback(from: String, to: String, pegHash: String, rating: Int, gas: Int, status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])
 
 @Singleton
-class SetBuyerFeedbacks @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, transactionSetBuyerFeedback: transactions.SetBuyerFeedback, getResponse: GetResponse, pushNotification: PushNotification, masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts, blockchainTraderFeedbackHistories: blockchain.TraderFeedbackHistories)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
+class SetBuyerFeedbacks @Inject()(actorSystem: ActorSystem, protected val databaseConfigProvider: DatabaseConfigProvider, transactionSetBuyerFeedback: transactions.SetBuyerFeedback, getResponse: GetResponse, pushNotification: PushNotification, masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts, blockchainTraderFeedbackHistories: blockchain.TraderFeedbackHistories)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_SET_BUYER_FEEDBACK
 
@@ -165,7 +166,7 @@ class SetBuyerFeedbacks @Inject()(protected val databaseConfigProvider: Database
 
 
   if (kafkaEnabled) {
-    Actor.system.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
+    actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
       utilities.TicketUpdater.start(Service.getTicketIDsOnStatus, transactionSetBuyerFeedback.Service.getTxFromWSResponse, Utility.onSuccess, Utility.onFailure)
     }
   }

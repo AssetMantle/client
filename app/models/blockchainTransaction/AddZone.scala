@@ -11,7 +11,8 @@ import slick.jdbc.JdbcProfile
 import transactions.GetResponse
 import transactions.responses.TransactionResponse.Response
 import utilities.PushNotification
-import utilities.actors.Actor
+import actors.Actor
+import akka.actor.ActorSystem
 
 import scala.concurrent.duration.{Duration, _}
 import scala.concurrent.{Await, ExecutionContext, Future}
@@ -20,7 +21,7 @@ import scala.util.{Failure, Success}
 case class AddZone(from: String, to: String, zoneID: String, status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])
 
 @Singleton
-class AddZones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, masterZoneKYCs: master.ZoneKYCs, transactionAddZone: transactions.AddZone, getResponse: GetResponse, pushNotification: PushNotification, masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts, blockchainZones: models.blockchain.Zones, masterZones: master.Zones)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
+class AddZones @Inject()(actorSystem: ActorSystem, protected val databaseConfigProvider: DatabaseConfigProvider, masterZoneKYCs: master.ZoneKYCs, transactionAddZone: transactions.AddZone, getResponse: GetResponse, pushNotification: PushNotification, masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts, blockchainZones: models.blockchain.Zones, masterZones: master.Zones)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_ADD_ZONE
 
@@ -163,7 +164,7 @@ class AddZones @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
 
   if (kafkaEnabled) {
-    Actor.system.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
+    actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
       utilities.TicketUpdater.start(Service.getTicketIDsOnStatus, transactionAddZone.Service.getTxFromWSResponse, Utility.onSuccess, Utility.onFailure)
     }
   }

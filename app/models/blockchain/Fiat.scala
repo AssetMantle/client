@@ -1,8 +1,9 @@
 package models.blockchain
 
-import akka.actor.ActorRef
-import akka.stream.OverflowStrategy
+import actors.{MainFiatActor, ShutdownActors}
+import akka.actor.{ActorRef, ActorSystem}
 import akka.stream.scaladsl.Source
+import akka.stream.{ActorMaterializer, OverflowStrategy}
 import exceptions.{BaseException, BlockChainException}
 import javax.inject.{Inject, Singleton}
 import models.{master, masterTransaction}
@@ -12,7 +13,6 @@ import play.api.libs.json.{JsValue, Json}
 import play.api.{Configuration, Logger}
 import queries.{GetAccount, GetOrder}
 import slick.jdbc.JdbcProfile
-import utilities.actors.{Actor, MainFiatActor, ShutdownActors}
 
 import scala.concurrent.duration.{Duration, _}
 import scala.concurrent.{Await, ExecutionContext, Future}
@@ -23,7 +23,7 @@ case class Fiat(pegHash: String, ownerAddress: String, transactionID: String, tr
 case class FiatCometMessage(ownerAddress: String, message: JsValue)
 
 @Singleton
-class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, shutdownActors: ShutdownActors, blockchainNegotiations: Negotiations, getAccount: GetAccount, masterTransactionIssueFiatRequests: masterTransaction.IssueFiatRequests, masterAccounts: master.Accounts, getOrder: GetOrder)(implicit executionContext: ExecutionContext, configuration: Configuration) {
+class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, actorSystem: ActorSystem, shutdownActors: ShutdownActors, blockchainNegotiations: Negotiations, getAccount: GetAccount, masterTransactionIssueFiatRequests: masterTransaction.IssueFiatRequests, masterAccounts: master.Accounts, getOrder: GetOrder)(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -32,14 +32,21 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
   private implicit val logger: Logger = Logger(this.getClass)
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_FIAT
-  val mainFiatActor: ActorRef = Actor.system.actorOf(props = MainFiatActor.props(actorTimeout), name = constants.Module.ACTOR_MAIN_FIAT)
+
   private val actorTimeout = configuration.get[Int]("akka.actors.timeout").seconds
 
+  val mainFiatActor: ActorRef = actorSystem.actorOf(props = MainFiatActor.props(actorTimeout, actorSystem), name = constants.Module.ACTOR_MAIN_FIAT)
+
   import databaseConfig.profile.api._
+
   private[models] val fiatTable = TableQuery[FiatTable]
 
+  private implicit val materializer: ActorMaterializer = ActorMaterializer()(actorSystem)
+
   private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
+
   private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
+
   private val sleepTime = configuration.get[Long]("blockchain.entityIterator.threadSleep")
 
   private def add(fiat: Fiat)(implicit executionContext: ExecutionContext): Future[String] = db.run((fiatTable returning fiatTable.map(_.pegHash) += fiat).asTry).map {
@@ -139,8 +146,8 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
       val address = masterAccounts.Service.getAddress(username)
       shutdownActors.shutdown(constants.Module.ACTOR_MAIN_FIAT, address)
       Thread.sleep(500)
-      val (systemUserActor, source) = Source.actorRef[JsValue](0, OverflowStrategy.dropHead).preMaterialize()(Actor.materializer)
-      mainFiatActor ! utilities.actors.CreateFiatChildActorMessage(address = address, actorRef = systemUserActor)
+      val (systemUserActor, source) = Source.actorRef[JsValue](0, OverflowStrategy.dropHead).preMaterialize()
+      mainFiatActor ! actors.CreateFiatChildActorMessage(address = address, actorRef = systemUserActor)
       source
     }
   }
@@ -166,7 +173,7 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
     }
   }
 
-  Actor.system.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
+  actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
     Utility.dirtyEntityUpdater()
   }
 }

@@ -1,8 +1,9 @@
 package models.blockchain
 
-import akka.actor.ActorRef
-import akka.stream.OverflowStrategy
+import actors.{MainNegotiationActor, ShutdownActors}
+import akka.actor.{ActorRef, ActorSystem}
 import akka.stream.scaladsl.Source
+import akka.stream.{ActorMaterializer, OverflowStrategy}
 import exceptions.{BaseException, BlockChainException}
 import javax.inject.{Inject, Singleton}
 import models.master
@@ -12,7 +13,6 @@ import play.api.libs.json.{JsValue, Json}
 import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
 import utilities.PushNotification
-import utilities.actors.{Actor, MainNegotiationActor, ShutdownActors}
 
 import scala.concurrent.duration.{Duration, _}
 import scala.concurrent.{Await, ExecutionContext, Future}
@@ -23,7 +23,7 @@ case class Negotiation(id: String, buyerAddress: String, sellerAddress: String, 
 case class NegotiationCometMessage(ownerAddress: String, message: JsValue)
 
 @Singleton
-class Negotiations @Inject()(shutdownActors: ShutdownActors, masterAccounts: master.Accounts, protected val databaseConfigProvider: DatabaseConfigProvider, getNegotiation: queries.GetNegotiation, implicit val pushNotification: PushNotification)(implicit executionContext: ExecutionContext, configuration: Configuration) {
+class Negotiations @Inject()(shutdownActors: ShutdownActors, masterAccounts: master.Accounts, actorSystem: ActorSystem, protected val databaseConfigProvider: DatabaseConfigProvider, getNegotiation: queries.GetNegotiation, implicit val pushNotification: PushNotification)(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -33,9 +33,14 @@ class Negotiations @Inject()(shutdownActors: ShutdownActors, masterAccounts: mas
 
   private implicit val logger: Logger = Logger(this.getClass)
 
+  private implicit val materializer: ActorMaterializer = ActorMaterializer()(actorSystem)
+
   private implicit val module: String = constants.Module.BLOCKCHAIN_NEGOTIATION
-  val mainNegotiationActor: ActorRef = Actor.system.actorOf(props = MainNegotiationActor.props(actorTimeout), name = constants.Module.ACTOR_MAIN_NEGOTIATION)
+
   private val actorTimeout = configuration.get[Int]("akka.actors.timeout").seconds
+
+  val mainNegotiationActor: ActorRef = actorSystem.actorOf(props = MainNegotiationActor.props(actorTimeout, actorSystem), name = constants.Module.ACTOR_MAIN_NEGOTIATION)
+
   private[models] val negotiationTable = TableQuery[NegotiationTable]
 
   private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
@@ -170,8 +175,8 @@ class Negotiations @Inject()(shutdownActors: ShutdownActors, masterAccounts: mas
       val address = masterAccounts.Service.getAddress(username)
       shutdownActors.shutdown(constants.Module.ACTOR_MAIN_NEGOTIATION, address)
       Thread.sleep(500)
-      val (systemUserActor, source) = Source.actorRef[JsValue](0, OverflowStrategy.dropHead).preMaterialize()(Actor.materializer)
-      mainNegotiationActor ! utilities.actors.CreateNegotiationChildActorMessage(address = address, actorRef = systemUserActor)
+      val (systemUserActor, source) = Source.actorRef[JsValue](0, OverflowStrategy.dropHead).preMaterialize()
+      mainNegotiationActor ! actors.CreateNegotiationChildActorMessage(address = address, actorRef = systemUserActor)
       source
     }
   }
@@ -195,7 +200,7 @@ class Negotiations @Inject()(shutdownActors: ShutdownActors, masterAccounts: mas
     }
   }
 
-  Actor.system.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
+  actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
     Utility.dirtyEntityUpdater()
   }
 }

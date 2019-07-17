@@ -1,7 +1,8 @@
-package utilities.actors
+package actors
 
-import akka.actor.{Actor, ActorLogging, ActorRef, PoisonPill, Props}
+import akka.actor.{Actor, ActorLogging, ActorRef, ActorSystem, PoisonPill, Props}
 import akka.util.Timeout
+import javax.inject.{Inject, Singleton}
 import models.blockchain
 import play.api.Logger
 
@@ -12,10 +13,11 @@ import scala.util.{Failure, Success}
 case class CreateAccountChildActorMessage(address: String, actorRef: ActorRef)
 
 object MainAccountActor {
-  def props(actorTimeout: FiniteDuration) = Props(new MainAccountActor(actorTimeout))
+  def props(actorTimeout: FiniteDuration, actorSystem: ActorSystem) = Props(new MainAccountActor(actorTimeout, actorSystem))
 }
 
-class MainAccountActor(actorTimeout: FiniteDuration) extends Actor with ActorLogging {
+@Singleton
+class MainAccountActor @Inject()(actorTimeout: FiniteDuration, actorSystem: ActorSystem) extends Actor with ActorLogging {
 
   private implicit val timeout: Timeout = Timeout(actorTimeout)
 
@@ -27,7 +29,7 @@ class MainAccountActor(actorTimeout: FiniteDuration) extends Actor with ActorLog
 
   def receive = {
     case accountCometMessage: blockchain.AccountCometMessage =>
-      Actor.system.actorSelection("/user/" + constants.Module.ACTOR_MAIN_ACCOUNT + "/" + accountCometMessage.ownerAddress).resolveOne().onComplete {
+      actorSystem.actorSelection("/user/" + constants.Module.ACTOR_MAIN_ACCOUNT + "/" + accountCometMessage.ownerAddress).resolveOne().onComplete {
         case Success(actorRef) => actorRef ! accountCometMessage
         case Failure(ex) => logger.info(module + ": " + ex.getMessage)
       }

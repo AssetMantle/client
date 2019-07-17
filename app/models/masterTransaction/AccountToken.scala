@@ -9,7 +9,8 @@ import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
-import utilities.actors.{Actor, ShutdownActors}
+import actors.{Actor, ShutdownActors}
+import akka.actor.ActorSystem
 
 import scala.concurrent.duration.{Duration, _}
 import scala.concurrent.{Await, ExecutionContext, Future}
@@ -18,7 +19,7 @@ import scala.util.{Failure, Success}
 case class AccountToken(id: String, notificationToken: Option[String], sessionTokenHash: Option[String], sessionTokenTime: Option[Long])
 
 @Singleton
-class AccountTokens @Inject()(shutdownActors: ShutdownActors, masterAccounts: master.Accounts, protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext, configuration: Configuration) {
+class AccountTokens @Inject()(actorSystem: ActorSystem, shutdownActors: ShutdownActors, masterAccounts: master.Accounts, protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
   private implicit val module: String = constants.Module.MASTER_TRANSACTION_ACCOUNT_TOKEN
 
@@ -126,7 +127,7 @@ class AccountTokens @Inject()(shutdownActors: ShutdownActors, masterAccounts: ma
     def deleteToken(username: String)(implicit executionContext: ExecutionContext): Boolean = if (Await.result(deleteById(username), Duration.Inf) == 1) true else false
   }
 
-  Actor.system.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
+  actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
     val ids = Service.getTimedOutIds
     masterAccounts.Service.getTradersAddressFromIds(ids).foreach { address =>
         shutdownActors.shutdown(constants.Module.ACTOR_MAIN_ACCOUNT, address)

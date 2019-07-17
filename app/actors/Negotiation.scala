@@ -1,7 +1,8 @@
-package utilities.actors
+package actors
 
-import akka.actor.{Actor, ActorLogging, ActorRef, PoisonPill, Props}
+import akka.actor.{Actor, ActorLogging, ActorRef, ActorSystem, PoisonPill, Props}
 import akka.util.Timeout
+import javax.inject.{Inject, Singleton}
 import models.blockchain
 import play.api.Logger
 
@@ -12,10 +13,11 @@ import scala.util.{Failure, Success}
 case class CreateNegotiationChildActorMessage(address: String, actorRef: ActorRef)
 
 object MainNegotiationActor {
-  def props(actorTimeout: FiniteDuration) = Props(new MainNegotiationActor(actorTimeout))
+  def props(actorTimeout: FiniteDuration, actorSystem: ActorSystem) = Props(new MainNegotiationActor(actorTimeout, actorSystem))
 }
 
-class MainNegotiationActor(actorTimeout: FiniteDuration) extends Actor with ActorLogging {
+@Singleton
+class MainNegotiationActor @Inject()(actorTimeout: FiniteDuration, actorSystem: ActorSystem) extends Actor with ActorLogging {
 
   private implicit val timeout: Timeout = Timeout(actorTimeout)
 
@@ -27,7 +29,7 @@ class MainNegotiationActor(actorTimeout: FiniteDuration) extends Actor with Acto
 
   def receive = {
     case negotiationCometMessage: blockchain.NegotiationCometMessage =>
-      Actor.system.actorSelection("/user/" + constants.Module.ACTOR_MAIN_NEGOTIATION + "/" + negotiationCometMessage.ownerAddress).resolveOne().onComplete {
+      actorSystem.actorSelection("/user/" + constants.Module.ACTOR_MAIN_NEGOTIATION + "/" + negotiationCometMessage.ownerAddress).resolveOne().onComplete {
         case Success(actorRef) => actorRef ! negotiationCometMessage
         case Failure(ex) => logger.info(module + ": " + ex.getMessage)
       }

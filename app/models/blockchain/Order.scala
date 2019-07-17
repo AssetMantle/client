@@ -1,8 +1,9 @@
 package models.blockchain
 
-import akka.actor.ActorRef
-import akka.stream.OverflowStrategy
+import actors.{MainOrderActor, ShutdownActors}
+import akka.actor.{ActorRef, ActorSystem}
 import akka.stream.scaladsl.Source
+import akka.stream.{ActorMaterializer, OverflowStrategy}
 import exceptions.{BaseException, BlockChainException}
 import javax.inject.{Inject, Singleton}
 import models.master
@@ -12,7 +13,6 @@ import play.api.libs.json.{JsValue, Json}
 import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
 import utilities.PushNotification
-import utilities.actors.{Actor, MainOrderActor, ShutdownActors}
 
 import scala.concurrent.duration.{Duration, _}
 import scala.concurrent.{Await, ExecutionContext, Future}
@@ -23,7 +23,7 @@ case class Order(id: String, fiatProofHash: Option[String], awbProofHash: Option
 case class OrderCometMessage(ownerAddress: String, message: JsValue)
 
 @Singleton
-class Orders @Inject()(shutdownActors: ShutdownActors, masterAccounts: master.Accounts, protected val databaseConfigProvider: DatabaseConfigProvider, getAccount: queries.GetAccount, blockchainNegotiations: Negotiations, blockchainAssets: Assets, blockchainFiats: Fiats, getOrder: queries.GetOrder, implicit val pushNotification: PushNotification)(implicit executionContext: ExecutionContext, configuration: Configuration) {
+class Orders @Inject()(shutdownActors: ShutdownActors, masterAccounts: master.Accounts, actorSystem: ActorSystem, protected val databaseConfigProvider: DatabaseConfigProvider, getAccount: queries.GetAccount, blockchainNegotiations: Negotiations, blockchainAssets: Assets, blockchainFiats: Fiats, getOrder: queries.GetOrder, implicit val pushNotification: PushNotification)(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -33,13 +33,21 @@ class Orders @Inject()(shutdownActors: ShutdownActors, masterAccounts: master.Ac
 
   private implicit val logger: Logger = Logger(this.getClass)
 
+  implicit val materializer: ActorMaterializer = ActorMaterializer()(actorSystem)
+
   private implicit val module: String = constants.Module.BLOCKCHAIN_ORDER
-  val mainOrderActor: ActorRef = Actor.system.actorOf(props = MainOrderActor.props(actorTimeout), name = constants.Module.ACTOR_MAIN_ORDER)
-  private[models] val orderTable = TableQuery[OrderTable]
-  private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
-  private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
-  private val sleepTime = configuration.get[Long]("blockchain.entityIterator.threadSleep")
+
   private val actorTimeout = configuration.get[Int]("akka.actors.timeout").seconds
+
+  val mainOrderActor: ActorRef = actorSystem.actorOf(props = MainOrderActor.props(actorTimeout, actorSystem), name = constants.Module.ACTOR_MAIN_ORDER)
+
+  private[models] val orderTable = TableQuery[OrderTable]
+
+  private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
+
+  private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
+
+  private val sleepTime = configuration.get[Long]("blockchain.entityIterator.threadSleep")
 
   private def add(order: Order)(implicit executionContext: ExecutionContext): Future[String] = db.run((orderTable returning orderTable.map(_.id) += order).asTry).map {
     case Success(result) => result
@@ -125,8 +133,8 @@ class Orders @Inject()(shutdownActors: ShutdownActors, masterAccounts: master.Ac
       val address = masterAccounts.Service.getAddress(username)
       shutdownActors.shutdown(constants.Module.ACTOR_MAIN_ORDER, address)
       Thread.sleep(500)
-      val (systemUserActor, source) = Source.actorRef[JsValue](0, OverflowStrategy.dropHead).preMaterialize()(Actor.materializer)
-      mainOrderActor ! utilities.actors.CreateOrderChildActorMessage(address = address, actorRef = systemUserActor)
+      val (systemUserActor, source) = Source.actorRef[JsValue](0, OverflowStrategy.dropHead).preMaterialize()
+      mainOrderActor ! actors.CreateOrderChildActorMessage(address = address, actorRef = systemUserActor)
       source
     }
   }
@@ -164,7 +172,7 @@ class Orders @Inject()(shutdownActors: ShutdownActors, masterAccounts: master.Ac
     }
   }
 
-  Actor.system.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
+  actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
     Utility.dirtyEntityUpdater()
   }
 

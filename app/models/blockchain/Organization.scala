@@ -1,5 +1,6 @@
 package models.blockchain
 
+import akka.actor.ActorSystem
 import exceptions.{BaseException, BlockChainException}
 import javax.inject.{Inject, Singleton}
 import org.postgresql.util.PSQLException
@@ -7,7 +8,6 @@ import play.api.db.slick.DatabaseConfigProvider
 import play.api.{Configuration, Logger}
 import queries.GetOrganization
 import slick.jdbc.JdbcProfile
-import utilities.actors.Actor
 
 import scala.concurrent.duration.{Duration, _}
 import scala.concurrent.{Await, ExecutionContext, Future}
@@ -16,7 +16,7 @@ import scala.util.{Failure, Success}
 case class Organization(id: String, address: String, dirtyBit: Boolean)
 
 @Singleton
-class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, getOrganization: GetOrganization)(implicit executionContext: ExecutionContext, configuration: Configuration) {
+class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, actorSystem: ActorSystem, getOrganization: GetOrganization)(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -138,7 +138,7 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
     }
   }
 
-  Actor.system.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
+  actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
     Utility.dirtyEntityUpdater()
   }
 }
