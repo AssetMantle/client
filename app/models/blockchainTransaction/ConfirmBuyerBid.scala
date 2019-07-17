@@ -2,7 +2,6 @@ package models.blockchainTransaction
 
 import java.net.ConnectException
 
-import akka.actor.ActorSystem
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.{blockchain, master}
@@ -14,15 +13,16 @@ import queries.{GetNegotiation, GetNegotiationID}
 import slick.jdbc.JdbcProfile
 import transactions.responses.TransactionResponse.Response
 import utilities.PushNotification
+import utilities.actors.Actor
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class ConfirmBuyerBid(from: String, to: String, bid: Int, time: Int, pegHash: String, gas: Int,  status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])
+case class ConfirmBuyerBid(from: String, to: String, bid: Int, time: Int, pegHash: String, gas: Int, status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])
 
 @Singleton
-class ConfirmBuyerBids @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, blockchainTransactionFeedbacks: blockchain.TransactionFeedbacks, getNegotiationID: GetNegotiationID, blockchainNegotiations: blockchain.Negotiations, getNegotiation: GetNegotiation, transactionConfirmBuyerBid: transactions.ConfirmBuyerBid, actorSystem: ActorSystem, pushNotification: PushNotification, masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
+class ConfirmBuyerBids @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, blockchainTransactionFeedbacks: blockchain.TransactionFeedbacks, getNegotiationID: GetNegotiationID, blockchainNegotiations: blockchain.Negotiations, getNegotiation: GetNegotiation, transactionConfirmBuyerBid: transactions.ConfirmBuyerBid, pushNotification: PushNotification, masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_CONFIRM_BUYER_BID
 
@@ -90,7 +90,7 @@ class ConfirmBuyerBids @Inject()(protected val databaseConfigProvider: DatabaseC
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }
   }
-  
+
   private def deleteByTicketID(ticketID: String)(implicit executionContext: ExecutionContext) = db.run(confirmBuyerBidTable.filter(_.ticketID === ticketID).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -125,7 +125,7 @@ class ConfirmBuyerBids @Inject()(protected val databaseConfigProvider: DatabaseC
 
     def responseCode = column[String]("responseCode")
   }
-  
+
 
   object Service {
 
@@ -180,7 +180,7 @@ class ConfirmBuyerBids @Inject()(protected val databaseConfigProvider: DatabaseC
 
 
   if (kafkaEnabled) {
-    actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
+    Actor.system.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
       utilities.TicketUpdater.start(Service.getTicketIDsOnStatus, transactionConfirmBuyerBid.Service.getTxFromWSResponse, Utility.onSuccess, Utility.onFailure)
     }
   }

@@ -1,6 +1,5 @@
 package models.blockchain
 
-import akka.actor.ActorSystem
 import exceptions.{BaseException, BlockChainException}
 import javax.inject.{Inject, Singleton}
 import org.postgresql.util.PSQLException
@@ -8,6 +7,7 @@ import play.api.db.slick.DatabaseConfigProvider
 import play.api.{Configuration, Logger}
 import queries.GetOrganization
 import slick.jdbc.JdbcProfile
+import utilities.actors.Actor
 
 import scala.concurrent.duration.{Duration, _}
 import scala.concurrent.{Await, ExecutionContext, Future}
@@ -16,7 +16,7 @@ import scala.util.{Failure, Success}
 case class Organization(id: String, address: String, dirtyBit: Boolean)
 
 @Singleton
-class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, actorSystem: ActorSystem, getOrganization: GetOrganization)(implicit executionContext: ExecutionContext, configuration: Configuration) {
+class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, getOrganization: GetOrganization)(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -64,33 +64,6 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
     }
   }
 
-  private[models] class OrganizationTable(tag: Tag) extends Table[Organization](tag, "Organization_BC") {
-
-    def * = (id, address, dirtyBit) <> (Organization.tupled, Organization.unapply)
-
-    def ? = (id.?, address.?, dirtyBit.?).shaped.<>({ r => import r._; _1.map(_ => Organization.tupled((_1.get, _2.get, _3.get))) }, (_: Any) => throw new Exception("Inserting into ? projection not supported."))
-
-    def id = column[String]("id", O.PrimaryKey)
-
-    def dirtyBit = column[Boolean]("dirtyBit")
-
-    def address = column[String]("address")
-
-  }
-
-  object Service {
-
-    def create(id: String, address: String, dirtyBit: Boolean)(implicit executionContext: ExecutionContext): String = Await.result(add(Organization(id = id, address = address, dirtyBit = dirtyBit)), Duration.Inf)
-
-    def getAddress(id: String)(implicit executionContext: ExecutionContext): String = Await.result(getAddressById(id), Duration.Inf)
-
-    def getID(address: String)(implicit executionContext: ExecutionContext): String = Await.result(getIdByAddress(address), Duration.Inf)
-
-    def getDirtyOrganizations: Seq[Organization] = Await.result(getOrganizationsByDirtyBit(dirtyBit = true), Duration.Inf)
-
-    def refreshDirty(id: String, address: String): Int = Await.result(updateAddressAndDirtyBitByID(id, address, dirtyBit = false), Duration.Inf)
-  }
-
   private def getIdByAddress(address: String)(implicit executionContext: ExecutionContext): Future[String] = db.run(organizationTable.filter(_.address === address).map(_.id).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -121,6 +94,33 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
     }
   }
 
+  private[models] class OrganizationTable(tag: Tag) extends Table[Organization](tag, "Organization_BC") {
+
+    def * = (id, address, dirtyBit) <> (Organization.tupled, Organization.unapply)
+
+    def id = column[String]("id", O.PrimaryKey)
+
+    def dirtyBit = column[Boolean]("dirtyBit")
+
+    def address = column[String]("address")
+
+    def ? = (id.?, address.?, dirtyBit.?).shaped.<>({ r => import r._; _1.map(_ => Organization.tupled((_1.get, _2.get, _3.get))) }, (_: Any) => throw new Exception("Inserting into ? projection not supported."))
+
+  }
+
+  object Service {
+
+    def create(id: String, address: String, dirtyBit: Boolean)(implicit executionContext: ExecutionContext): String = Await.result(add(Organization(id = id, address = address, dirtyBit = dirtyBit)), Duration.Inf)
+
+    def getAddress(id: String)(implicit executionContext: ExecutionContext): String = Await.result(getAddressById(id), Duration.Inf)
+
+    def getID(address: String)(implicit executionContext: ExecutionContext): String = Await.result(getIdByAddress(address), Duration.Inf)
+
+    def getDirtyOrganizations: Seq[Organization] = Await.result(getOrganizationsByDirtyBit(dirtyBit = true), Duration.Inf)
+
+    def refreshDirty(id: String, address: String): Int = Await.result(updateAddressAndDirtyBitByID(id, address, dirtyBit = false), Duration.Inf)
+  }
+
   object Utility {
     def dirtyEntityUpdater(): Future[Unit] = Future {
       val dirtyOrganizations = Service.getDirtyOrganizations
@@ -138,7 +138,7 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
     }
   }
 
-  actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
+  Actor.system.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
     Utility.dirtyEntityUpdater()
   }
 }

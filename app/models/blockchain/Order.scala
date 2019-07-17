@@ -1,6 +1,6 @@
 package models.blockchain
 
-import akka.actor.{ActorRef, ActorSystem}
+import akka.actor.ActorRef
 import akka.stream.OverflowStrategy
 import akka.stream.scaladsl.Source
 import exceptions.{BaseException, BlockChainException}
@@ -23,7 +23,7 @@ case class Order(id: String, fiatProofHash: Option[String], awbProofHash: Option
 case class OrderCometMessage(ownerAddress: String, message: JsValue)
 
 @Singleton
-class Orders @Inject()(shutdownActors: ShutdownActors, masterAccounts: master.Accounts, protected val databaseConfigProvider: DatabaseConfigProvider, getAccount: queries.GetAccount, blockchainNegotiations: Negotiations, blockchainAssets: Assets, blockchainFiats: Fiats, getOrder: queries.GetOrder, actorSystem: ActorSystem, implicit val pushNotification: PushNotification)(implicit executionContext: ExecutionContext, configuration: Configuration) {
+class Orders @Inject()(shutdownActors: ShutdownActors, masterAccounts: master.Accounts, protected val databaseConfigProvider: DatabaseConfigProvider, getAccount: queries.GetAccount, blockchainNegotiations: Negotiations, blockchainAssets: Assets, blockchainFiats: Fiats, getOrder: queries.GetOrder, implicit val pushNotification: PushNotification)(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -34,18 +34,12 @@ class Orders @Inject()(shutdownActors: ShutdownActors, masterAccounts: master.Ac
   private implicit val logger: Logger = Logger(this.getClass)
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_ORDER
-
-  private[models] val orderTable = TableQuery[OrderTable]
-
-  private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
-
-  private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
-
-  private val sleepTime = configuration.get[Long]("blockchain.entityIterator.threadSleep")
-
-  private val actorTimeout = configuration.get[Int]("akka.actors.timeout").seconds
-
   val mainOrderActor: ActorRef = Actor.system.actorOf(props = MainOrderActor.props(actorTimeout), name = constants.Module.ACTOR_MAIN_ORDER)
+  private[models] val orderTable = TableQuery[OrderTable]
+  private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
+  private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
+  private val sleepTime = configuration.get[Long]("blockchain.entityIterator.threadSleep")
+  private val actorTimeout = configuration.get[Int]("akka.actors.timeout").seconds
 
   private def add(order: Order)(implicit executionContext: ExecutionContext): Future[String] = db.run((orderTable returning orderTable.map(_.id) += order).asTry).map {
     case Success(result) => result

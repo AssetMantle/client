@@ -1,6 +1,5 @@
 package models.blockchainTransaction
 
-import akka.actor.ActorSystem
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.{blockchain, master}
@@ -12,15 +11,16 @@ import queries.GetAccount
 import slick.jdbc.JdbcProfile
 import transactions.responses.TransactionResponse.Response
 import utilities.PushNotification
+import utilities.actors.Actor
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class RedeemAsset(from: String, to: String, pegHash: String, gas: Int,  status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])
+case class RedeemAsset(from: String, to: String, pegHash: String, gas: Int, status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])
 
 @Singleton
-class RedeemAssets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, getAccount: GetAccount, blockchainAssets: blockchain.Assets, transactionRedeemAsset: transactions.RedeemAsset, blockchainAccounts: blockchain.Accounts, actorSystem: ActorSystem, pushNotification: PushNotification, masterAccounts: master.Accounts)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
+class RedeemAssets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, getAccount: GetAccount, blockchainAssets: blockchain.Assets, transactionRedeemAsset: transactions.RedeemAsset, blockchainAccounts: blockchain.Accounts, pushNotification: PushNotification, masterAccounts: master.Accounts)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_REDEEM_ASSET
 
@@ -33,6 +33,9 @@ class RedeemAssets @Inject()(protected val databaseConfigProvider: DatabaseConfi
   import databaseConfig.profile.api._
 
   private[models] val redeemAssetTable = TableQuery[RedeemAssetTable]
+  private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
+  private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
+  private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
 
   private def add(redeemAsset: RedeemAsset)(implicit executionContext: ExecutionContext): Future[String] = db.run((redeemAssetTable returning redeemAssetTable.map(_.ticketID) += redeemAsset).asTry).map {
     case Success(result) => result
@@ -83,10 +86,6 @@ class RedeemAssets @Inject()(protected val databaseConfigProvider: DatabaseConfi
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }
   }
-
-  private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
-  private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
-  private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
 
   private def deleteByTicketID(ticketID: String)(implicit executionContext: ExecutionContext) = db.run(redeemAssetTable.filter(_.ticketID === ticketID).delete.asTry).map {
     case Success(result) => result
@@ -160,9 +159,9 @@ class RedeemAssets @Inject()(protected val databaseConfigProvider: DatabaseConfi
   }
 
   if (kafkaEnabled) {
-    actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
+    Actor.system.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
       utilities.TicketUpdater.start(Service.getTicketIDsOnStatus, transactionRedeemAsset.Service.getTxFromWSResponse, Utility.onSuccess, Utility.onFailure)
     }
   }
-  
+
 }

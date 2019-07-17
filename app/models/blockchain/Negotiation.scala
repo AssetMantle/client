@@ -34,11 +34,8 @@ class Negotiations @Inject()(shutdownActors: ShutdownActors, masterAccounts: mas
   private implicit val logger: Logger = Logger(this.getClass)
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_NEGOTIATION
-
-  private val actorTimeout = configuration.get[Int]("akka.actors.timeout").seconds
-
   val mainNegotiationActor: ActorRef = Actor.system.actorOf(props = MainNegotiationActor.props(actorTimeout), name = constants.Module.ACTOR_MAIN_NEGOTIATION)
-
+  private val actorTimeout = configuration.get[Int]("akka.actors.timeout").seconds
   private[models] val negotiationTable = TableQuery[NegotiationTable]
 
   private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds

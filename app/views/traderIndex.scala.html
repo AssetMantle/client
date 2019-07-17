@@ -114,7 +114,7 @@
             <div id="fiatList" class="flexContainer"></div>
             <script type="text/javascript">
                     var fiatCometMessage = function (event) {
-                        $('#totalFiat').html(event.totalFiat);
+                        $('#totalFiat').html(event);
                         componentResource('fiatList', jsRoutes.controllers.ComponentViewController.fiatList('@username'));
                     }
             </script>
@@ -152,8 +152,8 @@
             componentResource('negotiationList', jsRoutes.controllers.ComponentViewController.negotiationList('@username'));
             componentResource('orderList', jsRoutes.controllers.ComponentViewController.orderList('@username'));
     </script>
-    <iframe class="hidden" src="@routes.ComponentViewController.assetComet()"></iframe>
-    <iframe class="hidden" src="@routes.ComponentViewController.fiatComet()"></iframe>
-    <iframe class="hidden" src="@routes.ComponentViewController.negotiationComet()"></iframe>
-    <iframe class="hidden" src="@routes.ComponentViewController.orderComet()"></iframe>
+    <iframe class="hidden" src="@routes.ComponentViewController.assetComet"></iframe>
+    <iframe class="hidden" src="@routes.ComponentViewController.fiatComet"></iframe>
+    <iframe class="hidden" src="@routes.ComponentViewController.negotiationComet"></iframe>
+    <iframe class="hidden" src="@routes.ComponentViewController.orderComet"></iframe>
   }

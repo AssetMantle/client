@@ -1,6 +1,5 @@
 package models.blockchain
 
-import akka.actor.ActorSystem
 import exceptions.{BaseException, BlockChainException}
 import javax.inject.{Inject, Singleton}
 import org.postgresql.util.PSQLException
@@ -8,6 +7,7 @@ import play.api.db.slick.DatabaseConfigProvider
 import play.api.{Configuration, Logger}
 import queries.GetACL
 import slick.jdbc.JdbcProfile
+import utilities.actors.Actor
 
 import scala.concurrent.duration.{Duration, _}
 import scala.concurrent.{Await, ExecutionContext, Future}
@@ -18,7 +18,7 @@ case class ACLAccount(address: String, zoneID: String, organizationID: String, a
 case class ACL(issueAsset: Boolean, issueFiat: Boolean, sendAsset: Boolean, sendFiat: Boolean, redeemAsset: Boolean, redeemFiat: Boolean, sellerExecuteOrder: Boolean, buyerExecuteOrder: Boolean, changeBuyerBid: Boolean, changeSellerBid: Boolean, confirmBuyerBid: Boolean, confirmSellerBid: Boolean, negotiation: Boolean, releaseAsset: Boolean)
 
 @Singleton
-class ACLAccounts @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, actorSystem: ActorSystem, aclHashes: ACLHashes, getACL: GetACL)(implicit executionContext: ExecutionContext, configuration: Configuration) {
+class ACLAccounts @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, aclHashes: ACLHashes, getACL: GetACL)(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -64,6 +64,27 @@ class ACLAccounts @Inject()(protected val databaseConfigProvider: DatabaseConfig
     }
   }
 
+  private def getAddressesByZoneID(zoneID: String): Future[Seq[String]] = db.run(aclTable.filter(_.zoneID === zoneID).map(_.address).result)
+
+  private def deleteByAddress(address: String)(implicit executionContext: ExecutionContext) = db.run(aclTable.filter(_.address === address).delete.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def updateDirtyBitByAddress(address: String, dirtyBit: Boolean): Future[Int] = db.run(aclTable.filter(_.address === address).map(_.dirtyBit).update(dirtyBit).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
 
   private[models] class ACLTable(tag: Tag) extends Table[ACLAccount](tag, "ACLAccount_BC") {
 
@@ -95,28 +116,6 @@ class ACLAccounts @Inject()(protected val databaseConfigProvider: DatabaseConfig
     def markDirty(address: String): Int = Await.result(updateDirtyBitByAddress(address, dirtyBit = true), Duration.Inf)
   }
 
-  private def getAddressesByZoneID(zoneID: String): Future[Seq[String]] = db.run(aclTable.filter(_.zoneID === zoneID).map(_.address).result)
-
-  private def deleteByAddress(address: String)(implicit executionContext: ExecutionContext) = db.run(aclTable.filter(_.address === address).delete.asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
-
-  private def updateDirtyBitByAddress(address: String, dirtyBit: Boolean): Future[Int] = db.run(aclTable.filter(_.address === address).map(_.dirtyBit).update(dirtyBit).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
-
   object Utility {
     def dirtyEntityUpdater(): Future[Unit] = Future {
       try {
@@ -132,7 +131,7 @@ class ACLAccounts @Inject()(protected val databaseConfigProvider: DatabaseConfig
     }
   }
 
-  actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
+  Actor.system.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
     Utility.dirtyEntityUpdater()
   }
 }

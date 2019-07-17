@@ -87,7 +87,7 @@ class OrganizationKYCs @Inject()(protected val databaseConfigProvider: DatabaseC
   private[models] class OrganizationKYCTable(tag: Tag) extends Table[OrganizationKYC](tag, "OrganizationKYC") {
 
     def * = (id, documentType, status.?, fileName, file.?) <> (OrganizationKYC.tupled, OrganizationKYC.unapply)
-    
+
     def id = column[String]("id", O.PrimaryKey)
 
     def documentType = column[String]("documentType", O.PrimaryKey)
@@ -124,5 +124,5 @@ class OrganizationKYCs @Inject()(protected val databaseConfigProvider: DatabaseC
 
 
   }
-  
+
 }

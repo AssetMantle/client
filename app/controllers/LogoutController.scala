@@ -34,8 +34,11 @@ class LogoutController @Inject()(messagesControllerComponents: MessagesControlle
             if (!loginData.receiveNotifications) {
               accountTokens.Service.deleteToken(username)
             }
+            shutdownActors.logOutShutdown(constants.Module.ACTOR_MAIN_ACCOUNT, username)
             shutdownActors.logOutShutdown(constants.Module.ACTOR_MAIN_ASSET, username)
             shutdownActors.logOutShutdown(constants.Module.ACTOR_MAIN_FIAT, username)
+            shutdownActors.logOutShutdown(constants.Module.ACTOR_MAIN_NEGOTIATION, username)
+            shutdownActors.logOutShutdown(constants.Module.ACTOR_MAIN_ORDER, username)
             accountTokens.Service.resetSessionTokenTime(username)
             Ok(views.html.index(successes = Seq(constants.Response.LOGGED_OUT))).withNewSession
           }

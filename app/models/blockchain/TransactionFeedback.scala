@@ -1,6 +1,5 @@
 package models.blockchain
 
-import akka.actor.ActorSystem
 import exceptions.{BaseException, BlockChainException}
 import javax.inject.{Inject, Singleton}
 import org.postgresql.util.PSQLException
@@ -10,6 +9,7 @@ import queries.GetTraderReputation
 import queries.responses.TraderReputationResponse
 import queries.responses.TraderReputationResponse.TransactionFeedbackResponse
 import slick.jdbc.JdbcProfile
+import utilities.actors.Actor
 
 import scala.concurrent.duration.{Duration, _}
 import scala.concurrent.{Await, ExecutionContext, Future}
@@ -40,7 +40,7 @@ case class ConfirmSellerBidCounts(confirmSellerBidPositiveTx: String, confirmSel
 case class NegotiationCounts(negotiationPositiveTx: String, negotiationNegativeTx: String)
 
 @Singleton
-class TransactionFeedbacks @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, actorSystem: ActorSystem, getTraderReputation: GetTraderReputation)(implicit executionContext: ExecutionContext, configuration: Configuration) {
+class TransactionFeedbacks @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, getTraderReputation: GetTraderReputation)(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -73,6 +73,7 @@ class TransactionFeedbacks @Inject()(protected val databaseConfigProvider: Datab
         throw new BaseException(constants.Response.PSQL_EXCEPTION)
     }
   }
+
   private def findById(address: String)(implicit executionContext: ExecutionContext): Future[TransactionFeedback] = db.run(transactionFeedbackTable.filter(_.address === address).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -231,7 +232,7 @@ class TransactionFeedbacks @Inject()(protected val databaseConfigProvider: Datab
     }
   }
 
-  actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
+  Actor.system.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
     Utility.dirtyEntityUpdater()
   }
 }

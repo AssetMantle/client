@@ -115,6 +115,12 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
     }
   }
 
+  def accountComet: Action[AnyContent] = withLoginAction.authenticated { username =>
+  implicit request =>
+    Ok.chunked(blockchainAccounts.Service.accountCometSource(username) via Comet.json("parent.accountCometMessage")).as(ContentTypes.HTML)
+
+  }
+
   def assetComet: Action[AnyContent] = withTraderLoginAction.authenticated { username =>
     implicit request =>
       Ok.chunked(blockchainAssets.Service.assetCometSource(username) via Comet.json("parent.assetCometMessage")).as(ContentTypes.HTML)

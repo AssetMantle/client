@@ -3,6 +3,7 @@ package models.masterTransaction
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.master
+import org.graalvm.compiler.nodes.memory.address.AddressNode.Address
 import org.joda.time.{DateTime, DateTimeZone}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
@@ -127,12 +128,12 @@ class AccountTokens @Inject()(shutdownActors: ShutdownActors, masterAccounts: ma
 
   Actor.system.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
     val ids = Service.getTimedOutIds
-    ids.foreach { id =>
-      if (masterAccounts.Service.getUserType(id) == constants.User.TRADER) {
-        val address = masterAccounts.Service.getAddress(id)
+    masterAccounts.Service.getTradersAddressFromIds(ids).foreach { address =>
+        shutdownActors.shutdown(constants.Module.ACTOR_MAIN_ACCOUNT, address)
         shutdownActors.shutdown(constants.Module.ACTOR_MAIN_ASSET, address)
         shutdownActors.shutdown(constants.Module.ACTOR_MAIN_FIAT, address)
-      }
+        shutdownActors.shutdown(constants.Module.ACTOR_MAIN_NEGOTIATION, address)
+        shutdownActors.shutdown(constants.Module.ACTOR_MAIN_ORDER, address)
     }
     Service.resetSessionTokenTimeByIds(ids)
   }

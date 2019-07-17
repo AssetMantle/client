@@ -30,17 +30,14 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
   val db = databaseConfig.db
-
-  private val actorTimeout = configuration.get[Int]("akka.actors.timeout").seconds
-
   val mainAssetActor: ActorRef = Actor.system.actorOf(props = MainAssetActor.props(actorTimeout), name = constants.Module.ACTOR_MAIN_ASSET)
+  private val actorTimeout = configuration.get[Int]("akka.actors.timeout").seconds
 
   private implicit val logger: Logger = Logger(this.getClass)
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_ASSET
 
   import databaseConfig.profile.api._
-
   private[models] val assetTable = TableQuery[AssetTable]
 
   private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
