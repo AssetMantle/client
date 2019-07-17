@@ -22,7 +22,7 @@ class ShutdownActors @Inject()(actorSystem: ActorSystem, masterAccounts: models.
 
   private implicit val module: String = constants.Module.ACTOR_SHUTDOWN
 
-  def logOutShutdown(actorPath: String, username: String): Future[Unit] = Future {
+  def onLogOut(actorPath: String, username: String): Future[Unit] = Future {
     shutdown(actorPath, masterAccounts.Service.getAddress(username))
   }
 

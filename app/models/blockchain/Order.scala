@@ -33,7 +33,7 @@ class Orders @Inject()(shutdownActors: ShutdownActors, masterAccounts: master.Ac
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  implicit val materializer: ActorMaterializer = ActorMaterializer()(actorSystem)
+  private implicit val materializer: ActorMaterializer = ActorMaterializer()(actorSystem)
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_ORDER
 

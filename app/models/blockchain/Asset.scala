@@ -29,9 +29,9 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
-  private implicit val materializer: ActorMaterializer = ActorMaterializer()(actorSystem)
-
   val db = databaseConfig.db
+
+  private implicit val materializer: ActorMaterializer = ActorMaterializer()(actorSystem)
 
   private val actorTimeout = configuration.get[Int]("akka.actors.timeout").seconds
 
