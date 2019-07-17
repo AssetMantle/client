@@ -13,7 +13,6 @@ import queries.{GetNegotiation, GetNegotiationID}
 import slick.jdbc.JdbcProfile
 import transactions.responses.TransactionResponse.Response
 import utilities.PushNotification
-import actors.Actor
 import akka.actor.ActorSystem
 
 import scala.concurrent.duration._

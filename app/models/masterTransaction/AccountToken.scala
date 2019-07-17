@@ -9,7 +9,7 @@ import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
-import actors.{Actor, ShutdownActors}
+import actors.ShutdownActors
 import akka.actor.ActorSystem
 
 import scala.concurrent.duration.{Duration, _}

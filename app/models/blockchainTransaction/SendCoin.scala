@@ -13,7 +13,6 @@ import slick.jdbc.JdbcProfile
 import transactions.GetResponse
 import transactions.responses.TransactionResponse.Response
 import utilities.PushNotification
-import actors.Actor
 import akka.actor.ActorSystem
 
 import scala.concurrent.duration.{Duration, _}
