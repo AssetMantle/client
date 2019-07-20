@@ -7,7 +7,6 @@ function componentResource(source, route){
         async: true,
         statusCode: {
             200: function (data) {
-                console.log(source);
                 div.html(data)
             },
             500: function (data) {
