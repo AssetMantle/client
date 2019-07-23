@@ -10,8 +10,13 @@
             <div>
                 <h2 class="showHide toggleElement centerText">@Messages(constants.Form.ORGANIZATION)</h2>
             </div>
-            <div id="organization">
-
+            <div id="organization"></div>
+        </div>
+        <div class="flexItem box leftText">
+            <div>
+                <h2 class="showHide toggleElement centerText">@Messages(constants.Form.ZONE):</h2>
+            </div>
+            <div id="zone">
             </div>
         </div>
     </div>
@@ -20,7 +25,8 @@
         <button onclick="getForm(jsRoutes.controllers.FileController.updateOrganizationKycForm('@constants.File.IDENTIFICATION'))">@Messages(constants.Form.UPDATE_ORGANIZATION_IDENTIFICATION)</button>
     </div>
     <script>
-            componentResource('commonHome', jsRoutes.controllers.ComponentViewController.commonHome('@loginState.username'));
-            componentResource('organization', jsRoutes.controllers.ComponentViewController.organizationDetails('@loginState.username'));
+            componentResource('commonHome', jsRoutes.controllers.ComponentViewController.commonHome());
+            componentResource('zone', jsRoutes.controllers.ComponentViewController.zoneDetails());
+            componentResource('organization', jsRoutes.controllers.ComponentViewController.organizationDetails());
     </script>
 }

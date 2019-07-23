@@ -3,7 +3,7 @@
 @(issueFiatRequests: Seq[IssueFiatRequest])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
 
 @for(issueFiatRequest <- issueFiatRequests) {
-    <div class="flexItem box leftText lightBlue">
+    <div class="flexItem box firstBox leftText lightBlue">
         <span class="red">@Messages(constants.Form.ACCOUNT_ID)</span> : @issueFiatRequest.accountID <br>
         <span class="red">@Messages(constants.Form.DOCUMENT_HASH)</span> : @issueFiatRequest.transactionID <br>
         <span class="red">@Messages(constants.Form.ASSET_TYPE)</span> : @issueFiatRequest.transactionAmount <br>

@@ -1,20 +1,20 @@
-@import models.blockchain.{ACLHash, Asset, Fiat, Negotiation, Order}
-@import models.master.{Organization, Zone}
 @import controllers.actions.LoginState
+@import models.blockchain.ACLHash
+@import models.master.{Organization, Zone}
 @(totalFiat: Int, zone: Zone, organization: Organization, aclHash: ACLHash)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
 @common(Messages(constants.User.HOME))(Html(""))(center)(right)
 
 @right = {
 
-    @if(aclHash.buyerExecuteOrder) {
-        <a onclick="getForm(jsRoutes.controllers.BuyerExecuteOrderController.unmoderatedBuyerExecuteOrderForm())">@Messages(constants.Form.UNMODERATED_BUYER_EXECUTE_ORDER)</a>
-    } <br>
+@if(aclHash.buyerExecuteOrder) {
+    <a onclick="getForm(jsRoutes.controllers.BuyerExecuteOrderController.unmoderatedBuyerExecuteOrderForm())">@Messages(constants.Form.UNMODERATED_BUYER_EXECUTE_ORDER)</a>
+} <br>
 
-    @if(aclHash.sellerExecuteOrder) {
-        <a onclick="getForm(jsRoutes.controllers.SellerExecuteOrderController.unmoderatedSellerExecuteOrderForm())">@Messages(constants.Form.UNMODERATED_SELLER_EXECUTE_ORDER)</a>
-    } <br>
-    }
+@if(aclHash.sellerExecuteOrder) {
+    <a onclick="getForm(jsRoutes.controllers.SellerExecuteOrderController.unmoderatedSellerExecuteOrderForm())">@Messages(constants.Form.UNMODERATED_SELLER_EXECUTE_ORDER)</a>
+} <br>
+}
 
 @center = {
     <div class="flexContainer">
@@ -37,10 +37,11 @@
             </div>
         </div>
     </div>
+
     <div class="flexContainer">
         <div class="flexGrowth flexItem box leftText">
             <div>
-                <h2 class="showHide toggleElement centerText">@Messages(constants.User.ASSETS_OWNED) </h2>
+                <h2 class="showHide toggleElement centerText" onclick="fetchOrShowHide('assetList', jsRoutes.controllers.ComponentViewController.assetList(), this)">@Messages(constants.User.ASSETS_OWNED) </h2>
                 <div class="centerText">
                 @if(aclHash.issueAsset) {
                     <button onclick="getForm(jsRoutes.controllers.IssueAssetController.issueAssetRequestForm())">@Messages(constants.Form.ISSUE_ASSET_REQUEST)</button>
@@ -53,7 +54,7 @@
 
         <div class="flexGrowth flexItem box leftText">
             <div>
-                <h2 class="showHide toggleElement centerText">@Messages(constants.User.FIATS_OWNED): @totalFiat</h2>
+                <h2 class="showHide toggleElement centerText" onclick="fetchOrShowHide('fiatList', jsRoutes.controllers.ComponentViewController.fiatList(), this)">@Messages(constants.User.FIATS_OWNED): @totalFiat</h2>
                 <div class="centerText">
                     @if(aclHash.issueFiat) {
                         <button onclick="getForm(jsRoutes.controllers.IssueFiatController.issueFiatRequestForm())">@Messages(constants.Form.ISSUE_FIAT_REQUEST)</button>
@@ -71,28 +72,47 @@
             <div>
                 <h2 class="showHide toggleElement centerText">@Messages(constants.Form.ON_GOING_NEGOTIATIONS)</h2>
             </div>
-            <div id="negotiationList" class ="flexContainer"></div>
+            <div class ="flexContainer">
+                <div class="box">
+                    <div>
+                        <h2 class="showHide toggleElement centerText" onclick="fetchOrShowHide('buyNegotiationList', jsRoutes.controllers.ComponentViewController.buyNegotiationList(), this)">@Messages(constants.Form.BUY)</h2>
+                    </div>
+                    <div id="buyNegotiationList" class ="flexContainer"></div>
+                </div>
 
+                <div class="box">
+                    <div>
+                        <h2 class="showHide toggleElement centerText" onclick="fetchOrShowHide('sellNegotiationList', jsRoutes.controllers.ComponentViewController.sellNegotiationList(), this)">@Messages(constants.Form.SELL)</h2>
+                    </div>
+                    <div id="sellNegotiationList" class ="flexContainer"></div>
+                </div>
+            </div>
         </div>
+
         <div class="flexGrowth flexItem box leftText">
             <div>
-                <h2 class="showHide toggleElement centerText">@Messages(constants.Form.ON_GOING_ORDERS)</h2>
+                <h2 class="showHide toggleElement centerText" onclick="fetchOrShowHide('orderList', jsRoutes.controllers.ComponentViewController.orderList(), this)">@Messages(constants.Form.ON_GOING_ORDERS)</h2>
             </div>
             <div id="orderList" class="flexContainer"></div>
         </div>
+
         <div class="flexGrowth flexItem box leftText">
             <div>
                 <h2 class="showHide toggleElement centerText">@Messages(constants.Form.SUBMIT_FEEDBACK)</h2>
             </div>
-            <div>
-                <h2 class="showHide toggleElement centerText">@Messages(constants.Form.BUY_ORDER_FEEDBACKS)</h2>
-            </div>
-            <div id="setBuyerFeedbackList" class="flexContainer"></div>
-            <div class="box">
-                <div>
-                    <h2 class="showHide toggleElement centerText">@Messages(constants.Form.SELL_ORDER_FEEDBACKS)</h2>
+            <div class ="flexContainer">
+                <div class="box">
+                    <div>
+                        <h2 class="showHide toggleElement centerText" onclick="fetchOrShowHide('setBuyerFeedbackList', jsRoutes.controllers.SetBuyerFeedbackController.buyerFeedbackList(), this)">@Messages(constants.Form.BUY_ORDER_FEEDBACKS)</h2>
+                    </div>
+                    <div id="setBuyerFeedbackList" class="flexContainer"></div>
                 </div>
-                <div id="setSellerFeedbackList" class="flexContainer"></div>
+                <div class="box">
+                    <div>
+                        <h2 class="showHide toggleElement centerText" onclick="fetchOrShowHide('setSellerFeedbackList', jsRoutes.controllers.SetSellerFeedbackController.sellerFeedbackList(), this)">@Messages(constants.Form.SELL_ORDER_FEEDBACKS)</h2>
+                    </div>
+                    <div id="setSellerFeedbackList" class="flexContainer"></div>
+                </div>
             </div>
         </div>
     </div>
@@ -100,11 +120,6 @@
             componentResource('commonHome', jsRoutes.controllers.ComponentViewController.commonHome());
             componentResource('zone', jsRoutes.controllers.ComponentViewController.zoneDetails());
             componentResource('organization', jsRoutes.controllers.ComponentViewController.organizationDetails());
-            componentResource('assetList', jsRoutes.controllers.ComponentViewController.assetList());
-            componentResource('fiatList', jsRoutes.controllers.ComponentViewController.fiatList());
-            componentResource('negotiationList', jsRoutes.controllers.ComponentViewController.negotiationList());
-            componentResource('orderList', jsRoutes.controllers.ComponentViewController.orderList());
-            componentResource('setBuyerFeedbackList', jsRoutes.controllers.SetBuyerFeedbackController.buyerFeedbackList());
-            componentResource('setSellerFeedbackList', jsRoutes.controllers.SetSellerFeedbackController.sellerFeedbackList());
     </script>
 }
+

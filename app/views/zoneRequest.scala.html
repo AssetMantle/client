@@ -8,21 +8,21 @@
         <div class="flexContainer">
             <div class="flexGrowth box leftText">
                 <div>
-                    <h2 class="showHide toggleElement centerText">@Messages(constants.Form.PENDING_VERIFY_ORGANIZATION_REQUESTS) </h2>
+                    <h2 class="showHide toggleElement centerText" onclick="fetchOrShowHide('pendingVerifyOrganizationRequests', jsRoutes.controllers.AddOrganizationController.viewPendingVerifyOrganizationRequests(),this)">@Messages(constants.Form.PENDING_VERIFY_ORGANIZATION_REQUESTS) </h2>
                 </div>
                 <div id="pendingVerifyOrganizationRequests" class="flexContainer">
                 </div>
             </div>
             <div class="flexGrowth box leftText">
                 <div>
-                    <h2 class="showHide toggleElement centerText">@Messages(constants.Form.SET_ACL) </h2>
+                    <h2 class="showHide toggleElement centerText" onclick="fetchOrShowHide('setACLList', jsRoutes.controllers.SetACLController.zoneViewPendingVerifyTraderRequests(),this)">@Messages(constants.Form.SET_ACL) </h2>
                 </div>
                 <div id="setACLList" class="flexContainer">
                 </div>
             </div>
             <div class="flexGrowth box leftText">
                 <div>
-                    <h2 class="showHide toggleElement centerText">@Messages(constants.Form.PENDING_ISSUE_ASSET_REQUESTS) </h2>
+                    <h2 class="showHide toggleElement centerText" onclick="fetchOrShowHide('pendingIssueAssetRequests', jsRoutes.controllers.IssueAssetController.viewPendingIssueAssetRequests(),this)">@Messages(constants.Form.PENDING_ISSUE_ASSET_REQUESTS) </h2>
                 </div>
                 <div id="pendingIssueAssetRequests" class="flexContainer">
                 </div>
@@ -30,15 +30,7 @@
 
             <div class="flexGrowth box leftText">
                 <div>
-                    <h2 class="showHide toggleElement centerText">@Messages(constants.Form.RELEASE_ASSET) </h2>
-                </div>
-                <div id="releaseAsset" class="flexContainer">
-                </div>
-            </div>
-
-            <div class="flexGrowth box leftText">
-                <div>
-                    <h2 class="showHide toggleElement centerText">@Messages(constants.Form.PENDING_ISSUE_FIAT_REQUESTS) </h2>
+                    <h2 class="showHide toggleElement centerText" onclick="fetchOrShowHide('pendingIssueFiatRequests', jsRoutes.controllers.IssueFiatController.viewPendingIssueFiatRequests(),this)">@Messages(constants.Form.PENDING_ISSUE_FIAT_REQUESTS) </h2>
                 </div>
                 <div id="pendingIssueFiatRequests" class="flexContainer">
                 </div>
@@ -46,7 +38,15 @@
 
             <div class="flexGrowth box leftText">
                 <div>
-                    <h2 class="showHide toggleElement centerText">@Messages(constants.Form.BUYER_EXECUTE_ORDER) </h2>
+                    <h2 class="showHide toggleElement centerText" onclick="fetchOrShowHide('releaseAsset', jsRoutes.controllers.ReleaseAssetController.releaseAssetList(),this)">@Messages(constants.Form.RELEASE_ASSET) </h2>
+                </div>
+                <div id="releaseAsset" class="flexContainer">
+                </div>
+            </div>
+
+            <div class="flexGrowth box leftText">
+                <div>
+                    <h2 class="showHide toggleElement centerText" onclick="fetchOrShowHide('buyerExecuteOrderList', jsRoutes.controllers.BuyerExecuteOrderController.buyerExecuteOrderList(),this)">@Messages(constants.Form.BUYER_EXECUTE_ORDER) </h2>
                 </div>
                 <div id="buyerExecuteOrderList" class="flexContainer">
                 </div>
@@ -54,7 +54,7 @@
 
             <div class="flexGrowth box leftText">
                 <div>
-                    <h2 class="showHide toggleElement centerText">@Messages(constants.Form.SELLER_EXECUTE_ORDER) </h2>
+                    <h2 class="showHide toggleElement centerText" onclick="fetchOrShowHide('sellerExecuteOrderList', jsRoutes.controllers.SellerExecuteOrderController.sellerExecuteOrderList(),this)">@Messages(constants.Form.SELLER_EXECUTE_ORDER) </h2>
                 </div>
                 <div id="sellerExecuteOrderList" class="flexContainer">
                 </div>
@@ -62,13 +62,4 @@
 
         </div>
 
-        <script>
-                componentResource('pendingVerifyOrganizationRequests', jsRoutes.controllers.AddOrganizationController.viewPendingVerifyOrganizationRequests());
-                componentResource('setACLList', jsRoutes.controllers.SetACLController.zoneViewPendingVerifyTraderRequests());
-                componentResource('pendingIssueAssetRequests', jsRoutes.controllers.IssueAssetController.viewPendingIssueAssetRequests());
-                componentResource('pendingIssueFiatRequests', jsRoutes.controllers.IssueFiatController.viewPendingIssueFiatRequests());
-                componentResource('releaseAsset', jsRoutes.controllers.ReleaseAssetController.releaseAssetList());
-                componentResource('buyerExecuteOrderList', jsRoutes.controllers.BuyerExecuteOrderController.buyerExecuteOrderList());
-                componentResource('sellerExecuteOrderList', jsRoutes.controllers.SellerExecuteOrderController.sellerExecuteOrderList());
-        </script>
     }

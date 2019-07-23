@@ -7,11 +7,11 @@
     @center = {
         <div class="flexContainer">
 
-            <div class="flexGrowth box leftText">
+            <div class="flexGrowth box leftText lightBlue">
                 <div>
-                    <h2 class="showHide toggleElement centerText" onclick="fetchOrShowHide('setACLList', jsRoutes.controllers.SetACLController.organizationViewPendingVerifyTraderRequests(), this)">@Messages(constants.Form.SET_ACL) </h2>
+                    <h2 class="showHide toggleElement centerText" onclick="fetchOrShowHide('organizationInformation', jsRoutes.controllers.SetACLController.viewTradersInOrganization(), this)">@Messages(constants.Form.TRADERS) </h2>
                 </div>
-                <div id="setACLList" class="flexContainer">
+                <div id="organizationInformation" class="flexContainer rightPadding scrollableFirst">
                 </div>
             </div>
         </div>

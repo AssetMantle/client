@@ -1,20 +1,26 @@
 @(username: String, userType: String, address: String, coins: Int = 0, profilePicture: Array[Byte])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
 
-    <div class="width70Percent">
-        <div>
-            <h2 class="showHide toggleElement centerText">@username</h2>
-            <div class="centerText">
-                @Messages(constants.User.COINS): @coins
-                <button onclick="getForm(jsRoutes.controllers.SendCoinController.sendCoinForm())">@Messages(constants.Form.SEND_COIN)</button>
-            </div>
-        </div>
-        <div>
-            @Messages(constants.User.USER_TYPE): @userType <br/>
-            @Messages(constants.User.ADDRESS): @address <br/>
+<div class="width70Percent">
+    <div>
+        <h2 class="showHide toggleElement centerText">@username</h2>
+        <div class="leftText">
+            @Messages(constants.User.COINS): @coins
+            <button onclick="getForm(jsRoutes.controllers.SendCoinController.sendCoinForm())">@Messages(constants.Form.SEND_COIN)</button>
         </div>
     </div>
-    <div class="width30Percent">
-        <img id="profilePicture" src="data:image/jpg;base64,@utilities.ImageProcess.decodeImageThumbnailData(profilePicture)" alt="profilePicture"><br>
+    <div  class="leftText">
+        @Messages(constants.User.USER_TYPE): @userType <br/>
+        @Messages(constants.User.ADDRESS): @address <br/>
+    </div>
+</div>
+<div class="width30Percent">
+    @if(profilePicture sameElements Array[Byte]()) {
+        <img id="profilePicture" class="profilePicture" src="@routes.Assets.versioned("images/defaultProfilePicture.jpg")" alt="@constants.Form.PROFILE_PICTURE">
+        <br>
         <button id="profilePictureBottomUploadButton" class="bottom" onclick="getForm(jsRoutes.controllers.FileController.uploadAccountFileForm('@constants.File.PROFILE_PICTURE'))">@Messages(constants.Form.UPLOAD)</button>
+    } else {
+        <img id="profilePicture" class="profilePicture" src="data:image/jpg;base64,@utilities.ImageProcess.decodeImageThumbnailData(profilePicture)" alt="@constants.Form.PROFILE_PICTURE">
+        <br>
         <button id="profilePictureBottomUploadButton" class="bottom" onclick="getForm(jsRoutes.controllers.FileController.updateAccountFileForm('@constants.File.PROFILE_PICTURE'))">@Messages(constants.Form.UPDATE)</button>
-    </div>
+    }
+</div>

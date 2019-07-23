@@ -14,14 +14,20 @@
             <div id="zone">
             </div>
         </div>
-
+        <div class="flexGrowth flexItem box leftText">
+            <div>
+                <h2 class="showHide toggleElement centerText">@Messages(constants.Form.GENESIS)</h2>
+            </div>
+            <div id="genesisDetails" class ="flexContainer"></div>
+        </div>
     </div>
     <div class="centerText">
         <button onclick="getForm(jsRoutes.controllers.FileController.updateZoneKycForm('@constants.File.BANK_DETAILS'))">@Messages(constants.Form.UPDATE_ZONE_BANK_DETAILS)</button>
         <button onclick="getForm(jsRoutes.controllers.FileController.updateZoneKycForm('@constants.File.IDENTIFICATION'))">@Messages(constants.Form.UPDATE_ZONE_IDENTIFICATION)</button>
     </div>
     <script>
-            componentResource('commonHome', jsRoutes.controllers.ComponentViewController.commonHome('@loginState.username'));
-            componentResource('zone', jsRoutes.controllers.ComponentViewController.zoneDetails('@loginState.username'));
+            componentResource('commonHome', jsRoutes.controllers.ComponentViewController.commonHome());
+            componentResource('zone', jsRoutes.controllers.ComponentViewController.zoneDetails());
+            componentResource('genesisDetails', jsRoutes.controllers.ComponentViewController.genesisDetails());
     </script>
 }

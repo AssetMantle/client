@@ -1,6 +1,6 @@
 package controllers
 
-import controllers.actions.{WithOrganizationLoginAction, WithUserLoginAction, WithZoneLoginAction}
+import controllers.actions.{WithGenesisLoginAction, WithOrganizationLoginAction, WithUserLoginAction, WithZoneLoginAction}
 import exceptions.{BaseException, BlockChainException}
 import javax.inject.{Inject, Singleton}
 import models.{blockchain, blockchainTransaction, master}
@@ -13,7 +13,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Random
 
 @Singleton
-class SetACLController @Inject()(messagesControllerComponents: MessagesControllerComponents, blockchainAccounts: blockchain.Accounts, masterZones: master.Zones, masterOrganizations: master.Organizations, masterTraders: master.Traders, masterTraderKYCs: master.TraderKYCs,withZoneLoginAction: WithZoneLoginAction, withOrganizationLoginAction: WithOrganizationLoginAction, withUserLoginAction: WithUserLoginAction, masterAccounts: master.Accounts, transactionsSetACL: transactions.SetACL, blockchainAclAccounts: blockchain.ACLAccounts, blockchainTransactionSetACLs: blockchainTransaction.SetACLs, blockchainAclHashes: blockchain.ACLHashes, pushNotification: PushNotification)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class SetACLController @Inject()(messagesControllerComponents: MessagesControllerComponents, blockchainAccounts: blockchain.Accounts, masterZones: master.Zones, masterOrganizations: master.Organizations, masterTraders: master.Traders, masterTraderKYCs: master.TraderKYCs,withZoneLoginAction: WithZoneLoginAction, withOrganizationLoginAction: WithOrganizationLoginAction, withUserLoginAction: WithUserLoginAction, withGenesisLoginAction: WithGenesisLoginAction,masterAccounts: master.Accounts, transactionsSetACL: transactions.SetACL, blockchainAclAccounts: blockchain.ACLAccounts, blockchainTransactionSetACLs: blockchainTransaction.SetACLs, blockchainAclHashes: blockchain.ACLHashes, pushNotification: PushNotification)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -257,6 +257,40 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
     implicit request =>
       try {
         Ok(views.html.component.master.organizationViewPendingVerifyTraderRequests(masterTraders.Service.getVerifyTraderRequestsForOrganization(masterOrganizations.Service.getByAccountID(loginState.username).id)))
+      }
+      catch {
+        case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
+      }
+  }
+
+  def viewTradersInOrganization: Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      try {
+        Ok(views.html.component.master.viewTradersInOrganizationForOrganization(masterTraders.Service.getTradersForOrganization(masterOrganizations.Service.getByAccountID(loginState.username).id)))
+      }
+      catch {
+        case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
+      }
+  }
+
+  def viewTradersInOrganizationForZone(organizationID: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      try {
+        if(masterOrganizations.Service.get(organizationID).zoneID == masterZones.Service.getZoneId(loginState.username)){
+          Ok(views.html.component.master.viewTradersInOrganization(masterTraders.Service.getTradersForOrganization(organizationID)))
+        }else {
+          Ok(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
+        }
+      }
+      catch {
+        case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
+      }
+  }
+
+  def viewTradersInOrganizationForGenesis(organizationID: String): Action[AnyContent] = withGenesisLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      try {
+        Ok(views.html.component.master.viewTradersInOrganization(masterTraders.Service.getTradersForOrganization(organizationID)))
       }
       catch {
         case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))

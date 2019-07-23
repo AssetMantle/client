@@ -90,6 +90,8 @@ class Traders @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
 
   private def getTradersWithNullStatusByOrganizationID(organizationID: String): Future[Seq[Trader]] = db.run(traderTable.filter(_.organizationID === organizationID).filter(_.status.?.isEmpty).result)
 
+  private def getTradersByOrganizationID(organizationID: String): Future[Seq[Trader]] = db.run(traderTable.filter(_.organizationID === organizationID).result)
+
   private def updateStatusOnID(id: String, status: Boolean) = db.run(traderTable.filter(_.id === id).map(_.status.?).update(Option(status)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -145,6 +147,8 @@ class Traders @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
     def getVerifyTraderRequestsForZone(zoneID: String): Seq[Trader] = Await.result(getTradersWithNullStatusByZoneID(zoneID), Duration.Inf)
 
     def getVerifyTraderRequestsForOrganization(organizationID: String): Seq[Trader] = Await.result(getTradersWithNullStatusByOrganizationID(organizationID), Duration.Inf)
+
+    def getTradersForOrganization(organizationID: String): Seq[Trader] = Await.result(getTradersByOrganizationID(organizationID), Duration.Inf)
 
     def getStatus(id: String): Option[Boolean] = Await.result(getStatusById(id), Duration.Inf)
 

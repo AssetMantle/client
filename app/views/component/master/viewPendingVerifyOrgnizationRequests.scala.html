@@ -5,7 +5,7 @@
 <script src="@routes.Assets.versioned("javascripts/viewFiles.js")" type="text/javascript"></script>
 
     @for(organizationVerificationRequest <- organizationVerificationRequests) {
-        <div class="flexItem box leftText lightBlue">
+        <div class="flexItem box firstBox leftText lightBlue">
             <span class="red">@Messages(constants.Form.ORGANIZATION_ID)</span> : @organizationVerificationRequest.id <br>
             <span class="red">@Messages(constants.Form.ZONE_ID)</span> : @organizationVerificationRequest.zoneID <br>
             <span class="red">@Messages(constants.Form.ACCOUNT_ID)</span> : @organizationVerificationRequest.accountID <br>

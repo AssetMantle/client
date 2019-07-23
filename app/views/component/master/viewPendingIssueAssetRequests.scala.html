@@ -3,7 +3,7 @@
 @(issueAssetRequests: Seq[IssueAssetRequest])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
 
 @for(issueAssetRequest <- issueAssetRequests) {
-    <div class="flexItem box leftText lightBlue">
+    <div class="flexItem box firstBox leftText lightBlue">
         <span class="red">@Messages(constants.Form.ACCOUNT_ID)</span> :@issueAssetRequest.accountID <br>
         <span class="red">@Messages(constants.Form.DOCUMENT_HASH)</span> : @issueAssetRequest.documentHash <br>
         <span class="red">@Messages(constants.Form.ASSET_TYPE)</span> : @issueAssetRequest.assetType <br>

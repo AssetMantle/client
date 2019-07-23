@@ -3,7 +3,7 @@
 @(traderFeedbackHistories: Seq[TraderFeedbackHistory])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
 
     @for(traderFeedbackHistory <- traderFeedbackHistories) {
-        <div class="flexItem box lightBlue">
+        <div class="flexItem box thirdBox lightBlue">
             <div class="leftText">
                 <span class="red">@Messages(constants.Form.BUYER_ADDRESS)</span> : @traderFeedbackHistory.buyerAddress <br>
                 <span class="red">@Messages(constants.Form.PEG_HASH)</span> : @traderFeedbackHistory.pegHash <br>

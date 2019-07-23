@@ -3,7 +3,7 @@
 @(negotiationList : Seq[Negotiation])(implicit messagesProvider: MessagesProvider)
 
 @for(negotiation <- negotiationList){
-    <div class="flexItem box lightBlue">
+    <div class="flexItem box firstBox lightBlue">
         <div class="leftText">
             <span class="red">@Messages(constants.Form.PEG_HASH)</span> : @negotiation.assetPegHash <br>
             <span class="red">@Messages(constants.Form.TIME)</span> : @negotiation.time <br>

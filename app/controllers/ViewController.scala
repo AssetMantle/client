@@ -39,6 +39,16 @@ class ViewController @Inject()(messagesControllerComponents: MessagesControllerC
       }
   }
 
+  def genesisInformation: Action[AnyContent] = withGenesisLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      try {
+        Ok(views.html.genesisInformation())
+      }
+      catch {
+        case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
+      }
+  }
+
   def zoneRequest: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
@@ -49,10 +59,30 @@ class ViewController @Inject()(messagesControllerComponents: MessagesControllerC
       }
   }
 
+  def zoneInformation: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      try {
+        Ok(views.html.zoneInformation())
+      }
+      catch {
+        case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
+      }
+  }
+
   def organizationRequest: Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
         Ok(views.html.organizationRequest())
+      }
+      catch {
+        case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
+      }
+  }
+
+  def organizationInformation: Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      try {
+        Ok(views.html.organizationInformation())
       }
       catch {
         case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
