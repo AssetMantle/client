@@ -4,15 +4,13 @@ import controllers.actions.WithLoginAction
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import models.blockchain
-import models.master
 import models.blockchain.ACLAccounts
+import models.{blockchain, master}
 import models.master.{Accounts, Organizations, Zones}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
 import queries.GetAccount
-import utilities.LoginState
 
 import scala.concurrent.ExecutionContext
 
@@ -101,7 +99,7 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
 
   def availableAssetList: Action[AnyContent] = Action { implicit request =>
     try {
-      Ok(views.html.component.master.availableAssetList(blockchainAssets.Service.getAllUnmoderated(blockchainOrders.Service.getAllOrderIds)))
+      Ok(views.html.component.master.availableAssetList(blockchainAssets.Service.getAllModerated(blockchainOrders.Service.getAllOrderIds)))
     } catch {
       case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
     }
@@ -109,7 +107,7 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
 
   def availableAssetListWithLogin(username:String): Action[AnyContent] = Action { implicit request =>
     try {
-      Ok(views.html.component.master.availableAssetListWithLogin(blockchainAssets.Service.getAllUnmoderated(blockchainOrders.Service.getAllOrderIds), blockchainAclHashes.Service.get(blockchainAclAccounts.Service.get(masterAccounts.Service.getAddress(username)).aclHash)))
+      Ok(views.html.component.master.availableAssetListWithLogin(blockchainAssets.Service.getAllModerated(blockchainOrders.Service.getAllOrderIds), blockchainAclHashes.Service.get(blockchainAclAccounts.Service.get(masterAccounts.Service.getAddress(username)).aclHash)))
     } catch {
       case baseException: BaseException => NoContent
     }
