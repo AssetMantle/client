@@ -4,7 +4,6 @@
 @(buyerExecuteOrderForm: Form[BuyerExecuteOrder.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @form(action = routes.BuyerExecuteOrderController.buyerExecuteOrder, 'onkeypress -> "validateForm(event,this)") {
     @CSRF.formField
-    @inputText(buyerExecuteOrderForm(constants.Form.BUYER_ADDRESS), '_label -> Messages(constants.Form.BUYER_ADDRESS))
     @inputText(buyerExecuteOrderForm(constants.Form.SELLER_ADDRESS), '_label -> Messages(constants.Form.SELLER_ADDRESS))
     @inputText(buyerExecuteOrderForm(constants.Form.FIAT_PROOF_HASH), '_label -> Messages(constants.Form.FIAT_PROOF_HASH))
     @inputText(buyerExecuteOrderForm(constants.Form.PEG_HASH), '_label -> Messages(constants.Form.PEG_HASH))

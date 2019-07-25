@@ -143,7 +143,7 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Asset_BC"
   "quantityUnit"  VARCHAR NOT NULL,
   "ownerAddress"  VARCHAR NOT NULL,
   "locked"        BOOLEAN NOT NULL,
-  "unmoderated"   BOOLEAN NOT NULL,
+  "moderated"   BOOLEAN NOT NULL,
   "dirtyBit"      BOOLEAN,
   PRIMARY KEY ("pegHash")
 );
@@ -319,7 +319,7 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."IssueAsset"
   "assetPrice"    INT     NOT NULL,
   "quantityUnit"  VARCHAR NOT NULL,
   "assetQuantity" INT     NOT NULL,
-  "unmoderated"   BOOLEAN NOT NULL,
+  "moderated"   BOOLEAN NOT NULL,
   "gas"           INT     NOT NULL,
   "status"        BOOLEAN,
   "txHash"        VARCHAR,

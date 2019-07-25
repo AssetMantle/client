@@ -1,7 +1,6 @@
 package queries.responses
 
-import play.api.libs.functional.syntax._
-import play.api.libs.json.{JsPath, Json, Reads}
+import play.api.libs.json.{Json, Reads}
 
 object AccountResponse {
 
@@ -9,19 +8,9 @@ object AccountResponse {
 
   implicit val coinsReads: Reads[Coins] = Json.reads[Coins]
 
-  implicit val assetReads: Reads[Asset] = (
-    (JsPath \ "pegHash").read[String] and
-      (JsPath \ "documentHash").read[String] and
-      (JsPath \ "assetType").read[String] and
-      (JsPath \ "assetQuantity").read[String] and
-      (JsPath \ "assetPrice").read[String] and
-      (JsPath \ "quantityUnit").read[String] and
-      (JsPath \ "ownerAddress").read[String] and
-      (JsPath \ "locked").read[Boolean] and
-      (JsPath \ "moderated").read[Boolean]
-    ) (Asset.apply _)
+  implicit val assetReads: Reads[Asset] = Json.reads[Asset]
 
-  case class Asset(pegHash: String, documentHash: String, assetType: String, assetQuantity: String, assetPrice: String, quantityUnit: String, ownerAddress: String, locked: Boolean, unmoderated: Boolean)
+  case class Asset(pegHash: String, documentHash: String, assetType: String, assetQuantity: String, assetPrice: String, quantityUnit: String, ownerAddress: String, locked: Boolean, moderated: Boolean)
 
   case class Owners(ownerAddress: String, amount: String)
 
