@@ -1,10 +1,15 @@
 package models.blockchain
 
-import akka.actor.ActorSystem
+import actors.{MainNegotiationActor, ShutdownActors}
+import akka.actor.{ActorRef, ActorSystem}
+import akka.stream.scaladsl.Source
+import akka.stream.{ActorMaterializer, OverflowStrategy}
 import exceptions.{BaseException, BlockChainException}
 import javax.inject.{Inject, Singleton}
+import models.master
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
+import play.api.libs.json.{JsValue, Json}
 import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
 import utilities.PushNotification
@@ -15,8 +20,10 @@ import scala.util.{Failure, Success}
 
 case class Negotiation(id: String, buyerAddress: String, sellerAddress: String, assetPegHash: String, bid: String, time: String, buyerSignature: Option[String], sellerSignature: Option[String], dirtyBit: Boolean)
 
+case class NegotiationCometMessage(ownerAddress: String, message: JsValue)
+
 @Singleton
-class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, getNegotiation: queries.GetNegotiation, actorSystem: ActorSystem, implicit val pushNotification: PushNotification)(implicit executionContext: ExecutionContext, configuration: Configuration) {
+class Negotiations @Inject()(shutdownActors: ShutdownActors, masterAccounts: master.Accounts, actorSystem: ActorSystem, protected val databaseConfigProvider: DatabaseConfigProvider, getNegotiation: queries.GetNegotiation, implicit val pushNotification: PushNotification)(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -26,12 +33,20 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
 
   private implicit val logger: Logger = Logger(this.getClass)
 
+  private implicit val materializer: ActorMaterializer = ActorMaterializer()(actorSystem)
+
   private implicit val module: String = constants.Module.BLOCKCHAIN_NEGOTIATION
+
+  private val actorTimeout = configuration.get[Int]("akka.actors.timeout").seconds
+
+  val mainNegotiationActor: ActorRef = actorSystem.actorOf(props = MainNegotiationActor.props(actorTimeout, actorSystem), name = constants.Module.ACTOR_MAIN_NEGOTIATION)
 
   private[models] val negotiationTable = TableQuery[NegotiationTable]
 
   private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
+
   private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
+
   private val sleepTime = configuration.get[Long]("blockchain.entityIterator.threadSleep")
 
   private def add(negotiation: Negotiation)(implicit executionContext: ExecutionContext): Future[String] = db.run((negotiationTable returning negotiationTable.map(_.id) += negotiation).asTry).map {
@@ -81,7 +96,37 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }
   }
-  
+
+  private def updateDirtyBitById(id: String, dirtyBit: Boolean): Future[Int] = db.run(negotiationTable.filter(_.id === id).map(_.dirtyBit).update(dirtyBit).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def updateBidTimeSignatureDirtyBitsById(id: String, bid: String, time: String, buyerSignature: Option[String], sellerSignature: Option[String], dirtyBit: Boolean): Future[Int] = db.run(negotiationTable.filter(_.id === id).map(negotiation => (negotiation.bid, negotiation.time, negotiation.buyerSignature.?, negotiation.sellerSignature.?, negotiation.dirtyBit)).update((bid, time, buyerSignature, sellerSignature, dirtyBit)).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def deleteById(id: String)(implicit executionContext: ExecutionContext): Future[Int] = db.run(negotiationTable.filter(_.id === id).delete.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
   private[models] class NegotiationTable(tag: Tag) extends Table[Negotiation](tag, "Negotiation_BC") {
 
     def * = (id, buyerAddress, sellerAddress, assetPegHash, bid, time, buyerSignature.?, sellerSignature.?, dirtyBit) <> (Negotiation.tupled, Negotiation.unapply)
@@ -125,35 +170,14 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
     def getNegotiationsForAddress(address: String): Seq[Negotiation] = Await.result(getNegotiationsByAddress(address), Duration.Inf)
 
     def deleteNegotiations(pegHash: String): Int = Await.result(deleteNegotiationsByPegHash(pegHash), Duration.Inf)
-  }
 
-  private def updateDirtyBitById(id: String, dirtyBit: Boolean): Future[Int] = db.run(negotiationTable.filter(_.id === id).map(_.dirtyBit).update(dirtyBit).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
-
-  private def updateBidTimeSignatureDirtyBitsById(id: String, bid: String, time: String, buyerSignature: Option[String], sellerSignature: Option[String], dirtyBit: Boolean): Future[Int] = db.run(negotiationTable.filter(_.id === id).map(negotiation => (negotiation.bid, negotiation.time, negotiation.buyerSignature.?, negotiation.sellerSignature.?, negotiation.dirtyBit)).update((bid, time, buyerSignature, sellerSignature, dirtyBit)).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
-
-  private def deleteById(id: String)(implicit executionContext: ExecutionContext): Future[Int] = db.run(negotiationTable.filter(_.id === id).delete.asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    def negotiationCometSource(username: String) = {
+      val address = masterAccounts.Service.getAddress(username)
+      shutdownActors.shutdown(constants.Module.ACTOR_MAIN_NEGOTIATION, address)
+      Thread.sleep(500)
+      val (systemUserActor, source) = Source.actorRef[JsValue](0, OverflowStrategy.dropHead).preMaterialize()
+      mainNegotiationActor ! actors.CreateNegotiationChildActorMessage(address = address, actorRef = systemUserActor)
+      source
     }
   }
 
@@ -165,6 +189,8 @@ class Negotiations @Inject()(protected val databaseConfigProvider: DatabaseConfi
         try {
           val responseNegotiation = getNegotiation.Service.get(dirtyNegotiation.id)
           Service.refreshDirty(id = dirtyNegotiation.id, bid = responseNegotiation.value.bid, time = responseNegotiation.value.time, buyerSignature = responseNegotiation.value.buyerSignature, sellerSignature = responseNegotiation.value.sellerSignature)
+          mainNegotiationActor ! NegotiationCometMessage(ownerAddress = dirtyNegotiation.sellerAddress, message = Json.toJson(constants.Comet.PING))
+          mainNegotiationActor ! NegotiationCometMessage(ownerAddress = dirtyNegotiation.buyerAddress, message = Json.toJson(constants.Comet.PING))
         }
         catch {
           case blockChainException: BlockChainException => logger.error(blockChainException.failure.message, blockChainException)

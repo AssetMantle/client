@@ -3,9 +3,8 @@ package controllers
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import models.blockchain
-import models.master
 import models.blockchain.ACLAccounts
+import models.{blockchain, master}
 import play.api.Configuration
 import play.api.i18n.I18nSupport
 import play.api.libs.ws.WSClient
@@ -47,7 +46,6 @@ class LoginController @Inject()(messagesControllerComponents: MessagesController
             case constants.User.TRADER =>
               val aclAccount = blockchainAclAccounts.Service.get(address)
               val fiatPegWallet = blockchainFiats.Service.getFiatPegWallet(address)
-              val negotiations = blockchainNegotiations.Service.getNegotiationsForAddress(masterAccounts.Service.getAddress(loginData.username))
               withUsernameToken.Ok(views.html.traderIndex(username = loginData.username, totalFiat = fiatPegWallet.map(_.transactionAmount.toInt).sum, zone = masterZones.Service.get(aclAccount.zoneID), organization = masterOrganizations.Service.get(aclAccount.organizationID), aclHash = blockchainAclHashes.Service.get(aclAccount.aclHash)), loginData.username)
             case constants.User.USER =>
               withUsernameToken.Ok(views.html.userIndex(username = loginData.username), loginData.username)

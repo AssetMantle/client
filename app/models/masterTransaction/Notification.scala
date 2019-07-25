@@ -39,7 +39,7 @@ class Notifications @Inject()(protected val databaseConfigProvider: DatabaseConf
 
   private def findNotificationsByAccountId(accountID: String, offset: Int, limit: Int): Future[Seq[Notification]] = db.run(notificationTable.filter(_.accountID === accountID).sortBy(_.time.desc).drop(offset).take(limit).result)
 
-  private def findNumberOfUnreadByAccountId(accountID: String)(implicit executionContext: ExecutionContext): Future[Int] = db.run(notificationTable.filter(_.accountID === accountID).filter( _.read === false).length.result)
+  private def findNumberOfUnreadByAccountId(accountID: String)(implicit executionContext: ExecutionContext): Future[Int] = db.run(notificationTable.filter(_.accountID === accountID).filter(_.read === false).length.result)
 
   private def markReadById(id: String): Future[Int] = db.run(notificationTable.filter(_.id === id).map(_.read).update(true))
 

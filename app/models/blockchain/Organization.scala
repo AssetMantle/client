@@ -64,33 +64,6 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
     }
   }
 
-  private[models] class OrganizationTable(tag: Tag) extends Table[Organization](tag, "Organization_BC") {
-
-    def * = (id, address, dirtyBit) <> (Organization.tupled, Organization.unapply)
-
-    def ? = (id.?, address.?, dirtyBit.?).shaped.<>({ r => import r._; _1.map(_ => Organization.tupled((_1.get, _2.get, _3.get))) }, (_: Any) => throw new Exception("Inserting into ? projection not supported."))
-
-    def id = column[String]("id", O.PrimaryKey)
-
-    def dirtyBit = column[Boolean]("dirtyBit")
-
-    def address = column[String]("address")
-
-  }
-
-  object Service {
-
-    def create(id: String, address: String, dirtyBit: Boolean)(implicit executionContext: ExecutionContext): String = Await.result(add(Organization(id = id, address = address, dirtyBit = dirtyBit)), Duration.Inf)
-
-    def getAddress(id: String)(implicit executionContext: ExecutionContext): String = Await.result(getAddressById(id), Duration.Inf)
-
-    def getID(address: String)(implicit executionContext: ExecutionContext): String = Await.result(getIdByAddress(address), Duration.Inf)
-
-    def getDirtyOrganizations: Seq[Organization] = Await.result(getOrganizationsByDirtyBit(dirtyBit = true), Duration.Inf)
-
-    def refreshDirty(id: String, address: String): Int = Await.result(updateAddressAndDirtyBitByID(id, address, dirtyBit = false), Duration.Inf)
-  }
-
   private def getIdByAddress(address: String)(implicit executionContext: ExecutionContext): Future[String] = db.run(organizationTable.filter(_.address === address).map(_.id).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -119,6 +92,33 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }
+  }
+
+  private[models] class OrganizationTable(tag: Tag) extends Table[Organization](tag, "Organization_BC") {
+
+    def * = (id, address, dirtyBit) <> (Organization.tupled, Organization.unapply)
+
+    def id = column[String]("id", O.PrimaryKey)
+
+    def dirtyBit = column[Boolean]("dirtyBit")
+
+    def address = column[String]("address")
+
+    def ? = (id.?, address.?, dirtyBit.?).shaped.<>({ r => import r._; _1.map(_ => Organization.tupled((_1.get, _2.get, _3.get))) }, (_: Any) => throw new Exception("Inserting into ? projection not supported."))
+
+  }
+
+  object Service {
+
+    def create(id: String, address: String, dirtyBit: Boolean)(implicit executionContext: ExecutionContext): String = Await.result(add(Organization(id = id, address = address, dirtyBit = dirtyBit)), Duration.Inf)
+
+    def getAddress(id: String)(implicit executionContext: ExecutionContext): String = Await.result(getAddressById(id), Duration.Inf)
+
+    def getID(address: String)(implicit executionContext: ExecutionContext): String = Await.result(getIdByAddress(address), Duration.Inf)
+
+    def getDirtyOrganizations: Seq[Organization] = Await.result(getOrganizationsByDirtyBit(dirtyBit = true), Duration.Inf)
+
+    def refreshDirty(id: String, address: String): Int = Await.result(updateAddressAndDirtyBitByID(id, address, dirtyBit = false), Duration.Inf)
   }
 
   object Utility {

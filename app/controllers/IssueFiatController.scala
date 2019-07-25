@@ -30,7 +30,7 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
           BadRequest(views.html.component.master.issueFiatRequest(formWithErrors))
         },
         issueFiatRequestData => {
-          implicit val loginState:LoginState = LoginState(username)
+          implicit val loginState: LoginState = LoginState(username)
           try {
             masterTransactionIssueFiatRequests.Service.create(accountID = username, transactionID = issueFiatRequestData.transactionID, transactionAmount = issueFiatRequestData.transactionAmount)
             Ok(views.html.index(successes = Seq(constants.Response.ISSUE_FIAT_REQUEST_SENT)))
@@ -63,7 +63,7 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
           BadRequest(views.html.component.master.rejectIssueFiatRequest(formWithErrors, formWithErrors.data(constants.Form.REQUEST_ID)))
         },
         rejectIssueFiatRequestData => {
-          implicit val loginState:LoginState = LoginState(username)
+          implicit val loginState: LoginState = LoginState(username)
           try {
             masterTransactionIssueFiatRequests.Service.reject(id = rejectIssueFiatRequestData.requestID, comment = rejectIssueFiatRequestData.comment)
             Ok(views.html.index(successes = Seq(constants.Response.ISSUE_FIAT_REQUEST_REJECTED)))
@@ -86,7 +86,7 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
           BadRequest(views.html.component.master.issueFiat(formWithErrors, formWithErrors.data(constants.Form.REQUEST_ID), formWithErrors.data(constants.Form.ACCOUNT_ID), formWithErrors.data(constants.Form.TRANSACTION_ID), formWithErrors.data(constants.Form.TRANSACTION_AMOUNT).toInt))
         },
         issueFiatData => {
-          implicit val loginState:LoginState = LoginState(username)
+          implicit val loginState: LoginState = LoginState(username)
           try {
             if (masterTransactionIssueFiatRequests.Service.getStatus(issueFiatData.requestID).isEmpty) {
               val toAddress = masterAccounts.Service.getAddress(issueFiatData.accountID)

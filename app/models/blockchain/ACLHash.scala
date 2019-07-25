@@ -102,4 +102,5 @@ class ACLHashes @Inject()(protected val databaseConfigProvider: DatabaseConfigPr
       ACL(issueAsset = aclHash.issueAsset, issueFiat = aclHash.issueFiat, sendAsset = aclHash.sendAsset, sendFiat = aclHash.sendFiat, redeemAsset = aclHash.redeemAsset, redeemFiat = aclHash.redeemFiat, sellerExecuteOrder = aclHash.sellerExecuteOrder, buyerExecuteOrder = aclHash.buyerExecuteOrder, changeBuyerBid = aclHash.changeBuyerBid, changeSellerBid = aclHash.changeSellerBid, confirmBuyerBid = aclHash.confirmBuyerBid, confirmSellerBid = aclHash.confirmSellerBid, negotiation = aclHash.negotiation, releaseAsset = aclHash.releaseAsset)
     }
   }
+
 }

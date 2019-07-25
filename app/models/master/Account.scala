@@ -107,6 +107,8 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   private def getIDsByAddresses(addresses: Seq[String]): Future[Seq[String]] = db.run(accountTable.filter(_.accountAddress.inSet(addresses)).map(_.id).result)
 
+  private def getAddressByUserTypeFromIds(ids: Seq[String], userType: String): Future[Seq[String]] = db.run(accountTable.filter(_.id.inSet(ids)).filter(_.userType === userType).map(_.accountAddress).result)
+
   private def getUserTypeByAddress(address: String)(implicit executionContext: ExecutionContext): Future[String] = db.run(accountTable.filter(_.accountAddress === address).map(_.userType).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -127,7 +129,7 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     }
   }
 
-  private def updateUserTypeById(id: String, userType: String)(implicit executionContext: ExecutionContext):Future[Int] = db.run(accountTable.filter(_.id === id).map(_.userType).update(userType).asTry).map {
+  private def updateUserTypeById(id: String, userType: String)(implicit executionContext: ExecutionContext): Future[Int] = db.run(accountTable.filter(_.id === id).map(_.userType).update(userType).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -137,7 +139,7 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     }
   }
 
-  private def updateUserTypeByAddress(address: String, userType: String)(implicit executionContext: ExecutionContext):Future[Int] = db.run(accountTable.filter(_.accountAddress === address).map(_.userType).update(userType).asTry).map {
+  private def updateUserTypeByAddress(address: String, userType: String)(implicit executionContext: ExecutionContext): Future[Int] = db.run(accountTable.filter(_.accountAddress === address).map(_.userType).update(userType).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -186,30 +188,32 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
       accountAddress
     }
 
-    def getAccount(username: String)(implicit executionContext: ExecutionContext):Account = Await.result(findById(username), Duration.Inf)
+    def getAccount(username: String)(implicit executionContext: ExecutionContext): Account = Await.result(findById(username), Duration.Inf)
 
-    def getLanguage(id: String)(implicit executionContext: ExecutionContext):String = Await.result(getLanguageById(id), Duration.Inf)
+    def getLanguage(id: String)(implicit executionContext: ExecutionContext): String = Await.result(getLanguageById(id), Duration.Inf)
 
-    def getId(accountAddress: String)(implicit executionContext: ExecutionContext):String = Await.result(getIdByAddress(accountAddress), Duration.Inf)
+    def getId(accountAddress: String)(implicit executionContext: ExecutionContext): String = Await.result(getIdByAddress(accountAddress), Duration.Inf)
 
     def getAccountByAddress(accountAddress: String)(implicit executionContext: ExecutionContext): Account = Await.result(findByAddress(accountAddress), Duration.Inf)
 
-    def getAddress(id: String)(implicit executionContext: ExecutionContext):String = Await.result(getAddressById(id), Duration.Inf)
+    def getAddress(id: String)(implicit executionContext: ExecutionContext): String = Await.result(getAddressById(id), Duration.Inf)
 
     def updateUserType(id: String, userType: String)(implicit executionContext: ExecutionContext): Int = Await.result(updateUserTypeById(id, userType), Duration.Inf)
 
     def updateUserTypeOnAddress(address: String, userType: String)(implicit executionContext: ExecutionContext): Int = Await.result(updateUserTypeByAddress(address, userType), Duration.Inf)
 
-    def getUserType(id: String)(implicit executionContext: ExecutionContext):String = Await.result(getUserTypeById(id), Duration.Inf)
+    def getUserType(id: String)(implicit executionContext: ExecutionContext): String = Await.result(getUserTypeById(id), Duration.Inf)
 
     def tryVerifyingUserType(id: String, userType: String)(implicit executionContext: ExecutionContext): Boolean = {
       if (Await.result(getUserTypeById(id), Duration.Inf) == userType) true
       else throw new BaseException(constants.Response.UNAUTHORIZED)
     }
 
-    def getUserTypeOnAddress(address: String)(implicit executionContext: ExecutionContext):String = Await.result(getUserTypeByAddress(address), Duration.Inf)
+    def getUserTypeOnAddress(address: String)(implicit executionContext: ExecutionContext): String = Await.result(getUserTypeByAddress(address), Duration.Inf)
 
-    def getIDsForAddresses(addresses: Seq[String])(implicit executionContext: ExecutionContext): Seq[String] = Await.result(getIDsByAddresses(addresses), Duration.Inf)
+    def getIDsForAddresses(addresses: Seq[String]): Seq[String] = Await.result(getIDsByAddresses(addresses), Duration.Inf)
+
+    def getTradersAddressFromIds(ids: Seq[String]): Seq[String] = Await.result(getAddressByUserTypeFromIds(ids, constants.User.TRADER), Duration.Inf)
   }
 
 }

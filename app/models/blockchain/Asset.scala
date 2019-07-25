@@ -1,11 +1,16 @@
 package models.blockchain
 
-import akka.actor.ActorSystem
+import actors.{MainAssetActor, ShutdownActors}
+import akka.actor.{ActorRef, ActorSystem}
+import akka.stream.scaladsl.Source
+import akka.stream.{ActorMaterializer, OverflowStrategy}
 import exceptions.{BaseException, BlockChainException}
 import javax.inject.{Inject, Singleton}
 import models.master
+import models.masterTransaction.AccountTokens
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
+import play.api.libs.json.{JsValue, Json}
 import play.api.{Configuration, Logger}
 import queries.GetAccount
 import slick.jdbc.JdbcProfile
@@ -17,12 +22,20 @@ import scala.util.{Failure, Success}
 
 case class Asset(pegHash: String, documentHash: String, assetType: String, assetQuantity: String, assetPrice: String, quantityUnit: String, ownerAddress: String, locked: Boolean, moderated: Boolean, dirtyBit: Boolean)
 
+case class AssetCometMessage(ownerAddress: String, message: JsValue)
+
 @Singleton
-class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, getAccount: GetAccount, masterAccounts: master.Accounts, actorSystem: ActorSystem, implicit val pushNotification: PushNotification)(implicit executionContext: ExecutionContext, configuration: Configuration) {
+class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, actorSystem: ActorSystem, shutdownActors: ShutdownActors, accountTokens: AccountTokens, getAccount: GetAccount, masterAccounts: master.Accounts, implicit val pushNotification: PushNotification)(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
   val db = databaseConfig.db
+
+  private implicit val materializer: ActorMaterializer = ActorMaterializer()(actorSystem)
+
+  private val actorTimeout = configuration.get[Int]("akka.actors.timeout").seconds
+
+  val mainAssetActor: ActorRef = actorSystem.actorOf(props = MainAssetActor.props(actorTimeout, actorSystem), name = constants.Module.ACTOR_MAIN_ASSET)
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -33,7 +46,9 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
   private[models] val assetTable = TableQuery[AssetTable]
 
   private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
+
   private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
+
   private val sleepTime = configuration.get[Long]("blockchain.entityIterator.threadSleep")
 
   private def add(asset: Asset)(implicit executionContext: ExecutionContext): Future[String] = db.run((assetTable returning assetTable.map(_.pegHash) += asset).asTry).map {
@@ -151,6 +166,14 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
 
     def markDirty(pegHash: String): Int = Await.result(updateDirtyBitByPegHash(pegHash, dirtyBit = true), Duration.Inf)
 
+    def assetCometSource(username: String) = {
+      val address = masterAccounts.Service.getAddress(username)
+      shutdownActors.shutdown(constants.Module.ACTOR_MAIN_ASSET, address)
+      Thread.sleep(500)
+      val (systemUserActor, source) = Source.actorRef[JsValue](0, OverflowStrategy.dropHead).preMaterialize()
+      mainAssetActor ! actors.CreateAssetChildActorMessage(address = address, actorRef = systemUserActor)
+      source
+    }
   }
 
   object Utility {

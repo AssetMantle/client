@@ -38,7 +38,7 @@ class EmailOTPs @Inject()(protected val databaseConfigProvider: DatabaseConfigPr
     }
   }
 
-  private def deleteById(id: String) = db.run(emailOTPTable.filter(_.id === id).delete)
+  private def deleteById(id: String): Future[Int] = db.run(emailOTPTable.filter(_.id === id).delete)
 
   private[models] class EmailOTPTable(tag: Tag) extends Table[EmailOTP](tag, "EmailOTP") {
 
@@ -53,9 +53,9 @@ class EmailOTPs @Inject()(protected val databaseConfigProvider: DatabaseConfigPr
 
   object Service {
 
-    def sendOTP(id: String) = {
+    def sendOTP(id: String): String = {
       val otp = (Random.nextInt(899999) + 100000).toString;
-      if (Await.result(update(new EmailOTP(id, util.hashing.MurmurHash3.stringHash(otp).toString)), Duration.Inf) == 0) throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+      if (Await.result(update(EmailOTP(id, util.hashing.MurmurHash3.stringHash(otp).toString)), Duration.Inf) == 0) throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
       otp
     }
 
