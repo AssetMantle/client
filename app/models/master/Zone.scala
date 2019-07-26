@@ -47,7 +47,7 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
   }
   
   private def findAll: Future[Seq[Zone]] = db.run(zoneTable.result)
-  
+
   private def deleteById(id: String) = db.run(zoneTable.filter(_.id === id).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -101,7 +101,6 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
   }
 
 
-
   private[models] class ZoneTable(tag: Tag) extends Table[Zone](tag, "Zone") {
 
     def * = (id, accountID, name, currency, status.?) <> (Zone.tupled, Zone.unapply)
@@ -123,7 +122,7 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
     def create(accountID: String, name: String, currency: String): String = Await.result(add(Zone((-Math.abs(Random.nextInt)).toHexString.toUpperCase, accountID, name, currency, null)), Duration.Inf)
 
     def get(id: String): Zone = Await.result(findById(id), Duration.Inf)
-    
+
     def getAll: Seq[Zone] = Await.result(findAll, Duration.Inf)
 
     def updateStatus(id: String, status: Boolean): Int = Await.result(updateStatusOnID(id, status), Duration.Inf)

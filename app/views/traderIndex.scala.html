@@ -8,11 +8,11 @@
 @right = {
 
 @if(aclHash.buyerExecuteOrder) {
-    <a onclick="getForm(jsRoutes.controllers.BuyerExecuteOrderController.unmoderatedBuyerExecuteOrderForm())">@Messages(constants.Form.UNMODERATED_BUYER_EXECUTE_ORDER)</a>
+    <a onclick="getForm(jsRoutes.controllers.BuyerExecuteOrderController.unmoderatedBuyerExecuteOrderForm())">@Messages(constants.Form.BUYER_EXECUTE_ORDER)</a>
 } <br>
 
 @if(aclHash.sellerExecuteOrder) {
-    <a onclick="getForm(jsRoutes.controllers.SellerExecuteOrderController.unmoderatedSellerExecuteOrderForm())">@Messages(constants.Form.UNMODERATED_SELLER_EXECUTE_ORDER)</a>
+    <a onclick="getForm(jsRoutes.controllers.SellerExecuteOrderController.unmoderatedSellerExecuteOrderForm())">@Messages(constants.Form.SELLER_EXECUTE_ORDER)</a>
 } <br>
 }
 
@@ -48,13 +48,17 @@
                 }
                 </div>
             </div>
-            <div id="assetList" class="flexContainer">
-            </div>
+            <div id="assetList" class="flexContainer"></div>
+            <script type="text/javascript">
+                    var assetCometMessage = function (event) {
+                        componentResource('assetList', jsRoutes.controllers.ComponentViewController.assetList());
+                    }
+            </script>
         </div>
 
         <div class="flexGrowth flexItem box leftText">
             <div>
-                <h2 class="showHide toggleElement centerText" onclick="fetchOrShowHide('fiatList', jsRoutes.controllers.ComponentViewController.fiatList(), this)">@Messages(constants.User.FIATS_OWNED): @totalFiat</h2>
+                <h2 class="showHide toggleElement centerText" onclick="fetchOrShowHide('fiatList', jsRoutes.controllers.ComponentViewController.fiatList(), this)">@Messages(constants.User.FIATS_OWNED): <span id="totalFiat">@totalFiat</span></h2>
                 <div class="centerText">
                     @if(aclHash.issueFiat) {
                         <button onclick="getForm(jsRoutes.controllers.IssueFiatController.issueFiatRequestForm())">@Messages(constants.Form.ISSUE_FIAT_REQUEST)</button>
@@ -64,8 +68,13 @@
                     }
                 </div>
             </div>
-            <div id="fiatList" class="flexContainer">
-            </div>
+            <div id="fiatList" class="flexContainer"></div>
+            <script type="text/javascript">
+                    var fiatCometMessage = function (event) {
+                        $('#totalFiat').html(event);
+                        componentResource('fiatList', jsRoutes.controllers.ComponentViewController.fiatList());
+                    }
+            </script>
         </div>
 
         <div class="flexGrowth flexItem box leftText">
@@ -78,6 +87,11 @@
                         <h2 class="showHide toggleElement centerText" onclick="fetchOrShowHide('buyNegotiationList', jsRoutes.controllers.ComponentViewController.buyNegotiationList(), this)">@Messages(constants.Form.BUY)</h2>
                     </div>
                     <div id="buyNegotiationList" class ="flexContainer"></div>
+                    <script type="text/javascript">
+                            var buyNegotiationCometMessage = function (event) {
+                                componentResource('buyNegotiationList', jsRoutes.controllers.ComponentViewController.buyNegotiationList());
+                            }
+                    </script>
                 </div>
 
                 <div class="box">
@@ -85,6 +99,11 @@
                         <h2 class="showHide toggleElement centerText" onclick="fetchOrShowHide('sellNegotiationList', jsRoutes.controllers.ComponentViewController.sellNegotiationList(), this)">@Messages(constants.Form.SELL)</h2>
                     </div>
                     <div id="sellNegotiationList" class ="flexContainer"></div>
+                    <script type="text/javascript">
+                            var sellNegotiationCometMessage = function (event) {
+                                componentResource('sellNegotiationList', jsRoutes.controllers.ComponentViewController.sellNegotiationList());
+                            }
+                    </script>
                 </div>
             </div>
         </div>
@@ -94,6 +113,11 @@
                 <h2 class="showHide toggleElement centerText" onclick="fetchOrShowHide('orderList', jsRoutes.controllers.ComponentViewController.orderList(), this)">@Messages(constants.Form.ON_GOING_ORDERS)</h2>
             </div>
             <div id="orderList" class="flexContainer"></div>
+            <script type="text/javascript">
+                    var orderCometMessage = function (event) {
+                        componentResource('orderList', jsRoutes.controllers.ComponentViewController.orderList());
+                    }
+            </script>
         </div>
 
         <div class="flexGrowth flexItem box leftText">
@@ -121,5 +145,8 @@
             componentResource('zone', jsRoutes.controllers.ComponentViewController.zoneDetails());
             componentResource('organization', jsRoutes.controllers.ComponentViewController.organizationDetails());
     </script>
-}
-
+    <iframe class="hidden" src="@routes.ComponentViewController.assetComet"></iframe>
+    <iframe class="hidden" src="@routes.ComponentViewController.fiatComet"></iframe>
+    <iframe class="hidden" src="@routes.ComponentViewController.negotiationComet"></iframe>
+    <iframe class="hidden" src="@routes.ComponentViewController.orderComet"></iframe>
+  }

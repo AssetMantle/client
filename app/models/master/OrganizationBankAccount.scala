@@ -33,8 +33,6 @@ class OrganizationBankAccounts @Inject()(protected val databaseConfigProvider: D
 
     def * = (id, accountHolder, bankName, nickName, country, swift, address, zipcode, status) <> (OrganizationBankAccount.tupled, OrganizationBankAccount.unapply)
 
-    def ? = (id.?, accountHolder.?, bankName.?, nickName.?, country.?, swift.?, address.?, zipcode.?, status.?).shaped.<>({ r => import r._; _1.map(_ => OrganizationBankAccount.tupled((_1.get, _2.get, _3.get, _4.get, _5.get, _6.get, _7.get, _8.get, _9.get))) }, (_: Any) => throw new Exception("Inserting into ? projection not supported."))
-
     def id = column[String]("id", O.PrimaryKey)
 
     def accountHolder = column[String]("accountHolder")
@@ -52,6 +50,8 @@ class OrganizationBankAccounts @Inject()(protected val databaseConfigProvider: D
     def zipcode = column[String]("zipcode")
 
     def status = column[String]("status")
+
+    def ? = (id.?, accountHolder.?, bankName.?, nickName.?, country.?, swift.?, address.?, zipcode.?, status.?).shaped.<>({ r => import r._; _1.map(_ => OrganizationBankAccount.tupled((_1.get, _2.get, _3.get, _4.get, _5.get, _6.get, _7.get, _8.get, _9.get))) }, (_: Any) => throw new Exception("Inserting into ? projection not supported."))
 
 
   }

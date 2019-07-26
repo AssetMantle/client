@@ -73,6 +73,7 @@ class TransactionFeedbacks @Inject()(protected val databaseConfigProvider: Datab
         throw new BaseException(constants.Response.PSQL_EXCEPTION)
     }
   }
+
   private def findById(address: String)(implicit executionContext: ExecutionContext): Future[TransactionFeedback] = db.run(transactionFeedbackTable.filter(_.address === address).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {

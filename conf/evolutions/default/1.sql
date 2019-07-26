@@ -80,17 +80,17 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Fiat_BC"
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Asset_BC"
 (
-    "pegHash"       VARCHAR NOT NULL,
-    "documentHash"  VARCHAR NOT NULL,
-    "assetType"     VARCHAR NOT NULL,
-    "assetQuantity" VARCHAR NOT NULL,
-    "assetPrice"    VARCHAR NOT NULL,
-    "quantityUnit"  VARCHAR NOT NULL,
-    "ownerAddress"  VARCHAR NOT NULL,
-    "locked"        BOOLEAN NOT NULL,
-    "unmoderated"   BOOLEAN NOT NULL,
-    "dirtyBit"      BOOLEAN,
-    PRIMARY KEY ("pegHash")
+  "pegHash"       VARCHAR NOT NULL,
+  "documentHash"  VARCHAR NOT NULL,
+  "assetType"     VARCHAR NOT NULL,
+  "assetQuantity" VARCHAR NOT NULL,
+  "assetPrice"    VARCHAR NOT NULL,
+  "quantityUnit"  VARCHAR NOT NULL,
+  "ownerAddress"  VARCHAR NOT NULL,
+  "locked"        BOOLEAN NOT NULL,
+  "moderated"   BOOLEAN NOT NULL,
+  "dirtyBit"      BOOLEAN,
+  PRIMARY KEY ("pegHash")
 );
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Negotiation_BC"
@@ -257,20 +257,20 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."ConfirmSellerBid"
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."IssueAsset"
 (
-    "from"          VARCHAR NOT NULL,
-    "to"            VARCHAR NOT NULL,
-    "documentHash"  VARCHAR NOT NULL,
-    "assetType"     VARCHAR NOT NULL,
-    "assetPrice"    INT     NOT NULL,
-    "quantityUnit"  VARCHAR NOT NULL,
-    "assetQuantity" INT     NOT NULL,
-    "unmoderated"   BOOLEAN NOT NULL,
-    "gas"           INT     NOT NULL,
-    "status"        BOOLEAN,
-    "txHash"        VARCHAR,
-    "ticketID"      VARCHAR NOT NULL,
-    "responseCode"  VARCHAR,
-    PRIMARY KEY ("ticketID")
+  "from"          VARCHAR NOT NULL,
+  "to"            VARCHAR NOT NULL,
+  "documentHash"  VARCHAR NOT NULL,
+  "assetType"     VARCHAR NOT NULL,
+  "assetPrice"    INT     NOT NULL,
+  "quantityUnit"  VARCHAR NOT NULL,
+  "assetQuantity" INT     NOT NULL,
+  "moderated"   BOOLEAN NOT NULL,
+  "gas"           INT     NOT NULL,
+  "status"        BOOLEAN,
+  "txHash"        VARCHAR,
+  "ticketID"      VARCHAR NOT NULL,
+  "responseCode"  VARCHAR,
+  PRIMARY KEY ("ticketID")
 );
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."IssueFiat"

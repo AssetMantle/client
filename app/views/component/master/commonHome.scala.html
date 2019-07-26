@@ -24,3 +24,9 @@
         <button id="profilePictureBottomUploadButton" class="bottom" onclick="getForm(jsRoutes.controllers.FileController.updateAccountFileForm('@constants.File.PROFILE_PICTURE'))">@Messages(constants.Form.UPDATE)</button>
     }
 </div>
+<script type="text/javascript">
+        var accountCometMessage = function (event) {
+            componentResource('commonHome', jsRoutes.controllers.ComponentViewController.commonHome());
+        }
+</script>
+<iframe class="hidden" src="@routes.ComponentViewController.accountComet"></iframe>

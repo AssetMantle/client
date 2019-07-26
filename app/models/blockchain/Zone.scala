@@ -64,20 +64,6 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
     }
   }
 
-  private[models] class ZoneTable(tag: Tag) extends Table[Zone](tag, "Zone_BC") {
-
-    def * = (id, address, dirtyBit) <> (Zone.tupled, Zone.unapply)
-
-    def ? = (id.?, address.?, dirtyBit.?).shaped.<>({ r => import r._; _1.map(_ => Zone.tupled((_1.get, _2.get, _3.get))) }, (_: Any) => throw new Exception("Inserting into ? projection not supported."))
-
-    def id = column[String]("id", O.PrimaryKey)
-
-    def address = column[String]("address")
-
-    def dirtyBit = column[Boolean]("dirtyBit")
-
-  }
-
   private def updateDirtyBitByID(zoneID: String, dirtyBit: Boolean) = db.run(zoneTable.filter(_.id === zoneID).map(_.dirtyBit).update(dirtyBit).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -116,6 +102,20 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }
+  }
+
+  private[models] class ZoneTable(tag: Tag) extends Table[Zone](tag, "Zone_BC") {
+
+    def * = (id, address, dirtyBit) <> (Zone.tupled, Zone.unapply)
+
+    def id = column[String]("id", O.PrimaryKey)
+
+    def address = column[String]("address")
+
+    def dirtyBit = column[Boolean]("dirtyBit")
+
+    def ? = (id.?, address.?, dirtyBit.?).shaped.<>({ r => import r._; _1.map(_ => Zone.tupled((_1.get, _2.get, _3.get))) }, (_: Any) => throw new Exception("Inserting into ? projection not supported."))
+
   }
 
   object Service {

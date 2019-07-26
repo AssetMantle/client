@@ -1,6 +1,5 @@
 package models.blockchain
 
-import akka.actor.ActorSystem
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import org.postgresql.util.PSQLException
@@ -15,7 +14,7 @@ import scala.util.{Failure, Success}
 case class TraderFeedbackHistory(address: String, buyerAddress: String, sellerAddress: String, pegHash: String, rating: String)
 
 @Singleton
-class TraderFeedbackHistories @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, actorSystem: ActorSystem)(implicit executionContext: ExecutionContext, configuration: Configuration) {
+class TraderFeedbackHistories @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
