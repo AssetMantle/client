@@ -107,7 +107,9 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   private def getIDsByAddresses(addresses: Seq[String]): Future[Seq[String]] = db.run(accountTable.filter(_.accountAddress.inSet(addresses)).map(_.id).result)
 
-  private def getAddressByUserTypeFromIds(ids: Seq[String], userType: String): Future[Seq[String]] = db.run(accountTable.filter(_.id.inSet(ids)).filter(_.userType === userType).map(_.accountAddress).result)
+  private def getAddressByIds(ids: Seq[String]): Future[Seq[String]] = db.run(accountTable.filter(_.id.inSet(ids)).map(_.accountAddress).result)
+
+  private def filterAddressOnUserType(addresses: Seq[String], userType: String): Future[Seq[String]] = db.run(accountTable.filter(_.accountAddress.inSet(addresses)).filter(_.userType === userType).map(_.accountAddress).result)
 
   private def getUserTypeByAddress(address: String)(implicit executionContext: ExecutionContext): Future[String] = db.run(accountTable.filter(_.accountAddress === address).map(_.userType).result.head.asTry).map {
     case Success(result) => result
@@ -213,7 +215,9 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
     def getIDsForAddresses(addresses: Seq[String]): Seq[String] = Await.result(getIDsByAddresses(addresses), Duration.Inf)
 
-    def getTradersAddressFromIds(ids: Seq[String]): Seq[String] = Await.result(getAddressByUserTypeFromIds(ids, constants.User.TRADER), Duration.Inf)
+    def getAddresses(ids: Seq[String]): Seq[String] = Await.result(getAddressByIds(ids), Duration.Inf)
+
+    def filterTraderAddresses(addresses: Seq[String]): Seq[String] = Await.result(filterAddressOnUserType(addresses, constants.User.TRADER), Duration.Inf)
   }
 
 }
