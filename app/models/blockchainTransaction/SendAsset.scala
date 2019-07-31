@@ -2,21 +2,19 @@ package models.blockchainTransaction
 
 import java.net.ConnectException
 
+import akka.actor.ActorSystem
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import models.blockchain.AssetCometMessage
 import models.{blockchain, master}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.{Json, OWrites}
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
-import queries.responses.AccountResponse
 import queries.{GetAccount, GetOrder}
 import slick.jdbc.JdbcProfile
 import transactions.responses.TransactionResponse.Response
 import utilities.PushNotification
-import akka.actor.ActorSystem
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
