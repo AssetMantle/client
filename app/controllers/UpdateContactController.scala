@@ -26,9 +26,9 @@ class UpdateContactController @Inject()(messagesControllerComponents: MessagesCo
         formWithErrors => {
           BadRequest(views.html.component.master.updateContact(formWithErrors, constants.CountryCallingCode.COUNTRY_CODES))
         },
-        signUpData => {
+        updateContactData => {
           try {
-            contacts.Service.insertOrUpdateContact(loginState.username, signUpData.countryCode + signUpData.mobileNumber, signUpData.emailAddress)
+            contacts.Service.insertOrUpdateContact(loginState.username, updateContactData.countryCode + updateContactData.mobileNumber, updateContactData.emailAddress)
             masterAccounts.Service.updateStatusUnverifiedContact(loginState.username)
             Ok(views.html.index(successes = Seq(constants.Response.SUCCESS)))
           } catch {
