@@ -10,7 +10,7 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.duration.FiniteDuration
 import scala.util.{Failure, Success}
 
-case class CreateFiatChildActorMessage(address: String, actorRef: ActorRef)
+case class CreateFiatChildActorMessage(username: String, actorRef: ActorRef)
 
 object MainFiatActor {
   def props(actorTimeout: FiniteDuration, actorSystem: ActorSystem) = Props(new MainFiatActor(actorTimeout, actorSystem))
@@ -29,11 +29,11 @@ class MainFiatActor @Inject()(actorTimeout: FiniteDuration, actorSystem: ActorSy
 
   def receive = {
     case fiatCometMessage: blockchain.FiatCometMessage =>
-      actorSystem.actorSelection("/user/" + constants.Module.ACTOR_MAIN_FIAT + "/" + fiatCometMessage.ownerAddress).resolveOne().onComplete {
+      actorSystem.actorSelection("/user/" + constants.Module.ACTOR_MAIN_FIAT + "/" + fiatCometMessage.username).resolveOne().onComplete {
         case Success(actorRef) => actorRef ! fiatCometMessage
         case Failure(ex) => logger.info(module + ": " + ex.getMessage)
       }
-    case createFiatChildActorMessage: CreateFiatChildActorMessage => context.actorOf(props = UserFiatActor.props(createFiatChildActorMessage.actorRef, actorTimeout), name = createFiatChildActorMessage.address)
+    case createFiatChildActorMessage: CreateFiatChildActorMessage => context.actorOf(props = UserFiatActor.props(createFiatChildActorMessage.actorRef, actorTimeout), name = createFiatChildActorMessage.username)
   }
 
 }

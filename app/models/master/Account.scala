@@ -109,7 +109,7 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   private def getAddressByIds(ids: Seq[String]): Future[Seq[String]] = db.run(accountTable.filter(_.id.inSet(ids)).map(_.accountAddress).result)
 
-  private def filterAddressOnUserType(addresses: Seq[String], userType: String): Future[Seq[String]] = db.run(accountTable.filter(_.accountAddress.inSet(addresses)).filter(_.userType === userType).map(_.accountAddress).result)
+  private def filterIdsOnUserType(ids: Seq[String], userType: String): Future[Seq[String]] = db.run(accountTable.filter(_.id.inSet(ids)).filter(_.userType === userType).map(_.id).result)
 
   private def getUserTypeByAddress(address: String)(implicit executionContext: ExecutionContext): Future[String] = db.run(accountTable.filter(_.accountAddress === address).map(_.userType).result.head.asTry).map {
     case Success(result) => result
@@ -217,7 +217,7 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
     def getAddresses(ids: Seq[String]): Seq[String] = Await.result(getAddressByIds(ids), Duration.Inf)
 
-    def filterTraderAddresses(addresses: Seq[String]): Seq[String] = Await.result(filterAddressOnUserType(addresses, constants.User.TRADER), Duration.Inf)
+    def filterTraderIds(ids: Seq[String]): Seq[String] = Await.result(filterIdsOnUserType(ids, constants.User.TRADER), Duration.Inf)
   }
 
 }
