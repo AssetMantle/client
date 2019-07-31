@@ -1,9 +1,9 @@
 @import controllers.actions.LoginState
 @import models.blockchain.ACLHash
 @import models.master.{Organization, Zone}
-@(totalFiat: Int, zone: Zone, organization: Organization, aclHash: ACLHash)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+@(totalFiat: Int, zone: Zone, organization: Organization, aclHash: ACLHash, failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
-@common(Messages(constants.User.HOME))(Html(""))(center)(right)
+@common(Messages(constants.User.HOME), failures, warnings, successes, infos)(Html(""))(center)(right)
 
 @right = {
 

@@ -11,10 +11,10 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Account(id: String, secretHash: String, accountAddress: String, language: String, userType: String)
+case class Account(id: String, secretHash: String, accountAddress: String, language: String, userType: String, status: String)
 
 @Singleton
-class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider) {
+class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.MASTER_ACCOUNT
 
@@ -77,7 +77,7 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     }
   }
 
-  private def getUserTypeByIDAndSecretHash(id: String, secretHash: String)(implicit executionContext: ExecutionContext): Future[String] = db.run(accountTable.filter(_.id === id).filter(_.secretHash === secretHash).map(_.userType).result.head.asTry).map {
+  private def getStatusByIDAndSecretHash(id: String, secretHash: String)(implicit executionContext: ExecutionContext): Future[String] = db.run(accountTable.filter(_.id === id).filter(_.secretHash === secretHash).map(_.status).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -95,7 +95,7 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     }
   }
 
-  private def getUserTypeById(id: String)(implicit executionContext: ExecutionContext): Future[String] = db.run(accountTable.filter(_.id === id).map(_.userType).result.head.asTry).map {
+  private def getUserTypeById(id: String): Future[String] = db.run(accountTable.filter(_.id === id).map(_.userType).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -110,6 +110,14 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
   private def getAddressByIds(ids: Seq[String]): Future[Seq[String]] = db.run(accountTable.filter(_.id.inSet(ids)).map(_.accountAddress).result)
 
   private def filterIdsOnUserType(ids: Seq[String], userType: String): Future[Seq[String]] = db.run(accountTable.filter(_.id.inSet(ids)).filter(_.userType === userType).map(_.id).result)
+
+  private def updateStatusById(id: String, status: String): Future[Int] = db.run(accountTable.filter(_.id === id).map(_.status).update(status).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
 
   private def getUserTypeByAddress(address: String)(implicit executionContext: ExecutionContext): Future[String] = db.run(accountTable.filter(_.accountAddress === address).map(_.userType).result.head.asTry).map {
     case Success(result) => result
@@ -165,7 +173,7 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   private[models] class AccountTable(tag: Tag) extends Table[Account](tag, "Account") {
 
-    def * = (id, secretHash, accountAddress, language, userType) <> (Account.tupled, Account.unapply)
+    def * = (id, secretHash, accountAddress, language, userType, status) <> (Account.tupled, Account.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
@@ -177,16 +185,18 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
     def userType = column[String]("userType")
 
+    def status = column[String]("status")
+
   }
 
   object Service {
 
-    def validateLoginAndGetUserType(username: String, password: String)(implicit executionContext: ExecutionContext): String = Await.result(getUserTypeByIDAndSecretHash(username, util.hashing.MurmurHash3.stringHash(password).toString), Duration.Inf)
+    def validateLoginAndGetStatus(username: String, password: String)(implicit executionContext: ExecutionContext): String = Await.result(getStatusByIDAndSecretHash(username, util.hashing.MurmurHash3.stringHash(password).toString), Duration.Inf)
 
     def checkUsernameAvailable(username: String): Boolean = !Await.result(checkById(username), Duration.Inf)
 
     def addLogin(username: String, password: String, accountAddress: String, language: String)(implicit executionContext: ExecutionContext): String = {
-      Await.result(add(Account(username, util.hashing.MurmurHash3.stringHash(password).toString, accountAddress, language, constants.User.WITHOUT_LOGIN)), Duration.Inf)
+      Await.result(add(Account(username, util.hashing.MurmurHash3.stringHash(password).toString, accountAddress, language, constants.User.WITHOUT_LOGIN, constants.Status.Account.NO_CONTACT)), Duration.Inf)
       accountAddress
     }
 
@@ -218,6 +228,14 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     def getAddresses(ids: Seq[String]): Seq[String] = Await.result(getAddressByIds(ids), Duration.Inf)
 
     def filterTraderIds(ids: Seq[String]): Seq[String] = Await.result(filterIdsOnUserType(ids, constants.User.TRADER), Duration.Inf)
+
+    def updateStatusUnverifiedContact(id: String): Int = Await.result(updateStatusById(id, constants.Status.Account.CONTACT_UNVERIFIED), Duration.Inf)
+
+    def updateStatusUnverifiedMobile(id: String): Int = Await.result(updateStatusById(id, constants.Status.Account.MOBILE_NUMBER_UNVERIFIED), Duration.Inf)
+
+    def updateStatusUnverifiedEmail(id: String): Int = Await.result(updateStatusById(id, constants.Status.Account.EMAIL_ADDRESS_UNVERIFIED), Duration.Inf)
+
+    def updateStatusComplete(id: String): Int = Await.result(updateStatusById(id, constants.Status.Account.COMPLETE), Duration.Inf)
   }
 
 }

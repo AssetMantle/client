@@ -111,15 +111,17 @@ class Contacts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   object Service {
 
+    def getContact(id: String): Contact = Await.result(findById(id), Duration.Inf)
+
     def insertOrUpdateEmailAndMobile(id: String, mobileNumber: String, emailAddress: String): Boolean = if (0 < Await.result(upsert(Contact(id, mobileNumber, mobileNumberVerified =  false, emailAddress, emailAddressVerified = false)), Duration.Inf)) true else false
 
     def verifyMobileNumber(id: String): Int = Await.result(updateMobileNumberVerificationStatusOnId(id, verificationStatus = true), Duration.Inf)
 
     def verifyEmailAddress(id: String): Int = Await.result(updateEmailVerificationStatusOnId(id, verificationStatus = true), Duration.Inf)
 
-    def findEmailAddress(id: String): String = Await.result(findEmailAddressById(id), Duration.Inf)
+    def getEmailAddress(id: String): String = Await.result(findEmailAddressById(id), Duration.Inf)
 
-    def findMobileNumber(id: String): String = Await.result(findMobileNumberById(id), Duration.Inf)
+    def getMobileNumber(id: String): String = Await.result(findMobileNumberById(id), Duration.Inf)
 
     def getMobileVerificationStatus(id: String): Boolean = Await.result(findById(id), Duration.Inf).mobileNumberVerified
 

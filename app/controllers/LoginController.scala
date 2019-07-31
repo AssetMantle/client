@@ -18,7 +18,7 @@ import views.companion.master.Login
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class LoginController @Inject()(messagesControllerComponents: MessagesControllerComponents, masterAccounts: master.Accounts, blockchainAclAccounts: ACLAccounts, blockchainZones: blockchain.Zones, blockchainOrganizations: blockchain.Organizations, blockchainAssets: blockchain.Assets, blockchainFiats: blockchain.Fiats, blockchainNegotiations: blockchain.Negotiations, masterOrganizations: master.Organizations, masterZones: master.Zones, blockchainAclHashes: blockchain.ACLHashes, blockchainOrders: blockchain.Orders, getAccount: GetAccount, blockchainAccounts: blockchain.Accounts, withUsernameToken: WithUsernameToken, pushNotification: PushNotification)(implicit exec: ExecutionContext, configuration: Configuration, wsClient: WSClient) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class LoginController @Inject()(messagesControllerComponents: MessagesControllerComponents, masterContacts: master.Contacts, masterAccounts: master.Accounts, blockchainAclAccounts: ACLAccounts, blockchainZones: blockchain.Zones, blockchainOrganizations: blockchain.Organizations, blockchainAssets: blockchain.Assets, blockchainFiats: blockchain.Fiats, blockchainNegotiations: blockchain.Negotiations, masterOrganizations: master.Organizations, masterZones: master.Zones, blockchainAclHashes: blockchain.ACLHashes, blockchainOrders: blockchain.Orders, getAccount: GetAccount, blockchainAccounts: blockchain.Accounts, withUsernameToken: WithUsernameToken, pushNotification: PushNotification)(implicit exec: ExecutionContext, configuration: Configuration, wsClient: WSClient) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val module: String = constants.Module.CONTROLLERS_LOGIN
 
@@ -33,27 +33,28 @@ class LoginController @Inject()(messagesControllerComponents: MessagesController
       },
       loginData => {
         try {
-          implicit val loginState:LoginState = LoginState(loginData.username, masterAccounts.Service.validateLoginAndGetUserType(loginData.username, loginData.password), masterAccounts.Service.getAddress(loginData.username))
+          implicit val loginState: LoginState = LoginState(loginData.username, masterAccounts.Service.getUserType(loginData.username), masterAccounts.Service.getAddress(loginData.username))
+          val contactWarnings: Seq[constants.Response.Warning] = utilities.Contact.getWarnings(masterAccounts.Service.validateLoginAndGetStatus(loginData.username, loginData.password))
           pushNotification.registerNotificationToken(loginData.username, loginData.notificationToken)
           pushNotification.sendNotification(loginData.username, constants.Notification.LOGIN, loginData.username)
           loginState.userType match {
             case constants.User.GENESIS =>
-              withUsernameToken.Ok(views.html.genesisIndex(), loginData.username)
+              withUsernameToken.Ok(views.html.genesisIndex(warnings = contactWarnings), loginData.username)
             case constants.User.ZONE =>
-              withUsernameToken.Ok(views.html.zoneIndex(zone = masterZones.Service.get(blockchainZones.Service.getID(loginState.address))), loginData.username)
+              withUsernameToken.Ok(views.html.zoneIndex(zone = masterZones.Service.get(blockchainZones.Service.getID(loginState.address)), warnings = contactWarnings), loginData.username)
             case constants.User.ORGANIZATION =>
-              withUsernameToken.Ok(views.html.organizationIndex(organization = masterOrganizations.Service.get(blockchainOrganizations.Service.getID(loginState.address))), loginData.username)
+              withUsernameToken.Ok(views.html.organizationIndex(organization = masterOrganizations.Service.get(blockchainOrganizations.Service.getID(loginState.address)), warnings = contactWarnings), loginData.username)
             case constants.User.TRADER =>
               val aclAccount = blockchainAclAccounts.Service.get(loginState.address)
               val fiatPegWallet = blockchainFiats.Service.getFiatPegWallet(loginState.address)
-              withUsernameToken.Ok(views.html.traderIndex(totalFiat = fiatPegWallet.map(_.transactionAmount.toInt).sum, zone = masterZones.Service.get(aclAccount.zoneID), organization = masterOrganizations.Service.get(aclAccount.organizationID), aclHash = blockchainAclHashes.Service.get(aclAccount.aclHash)), loginData.username)
+              withUsernameToken.Ok(views.html.traderIndex(totalFiat = fiatPegWallet.map(_.transactionAmount.toInt).sum, zone = masterZones.Service.get(aclAccount.zoneID), organization = masterOrganizations.Service.get(aclAccount.organizationID), aclHash = blockchainAclHashes.Service.get(aclAccount.aclHash), warnings = contactWarnings), loginData.username)
             case constants.User.USER =>
-              withUsernameToken.Ok(views.html.userIndex(), loginData.username)
+              withUsernameToken.Ok(views.html.userIndex(warnings = contactWarnings), loginData.username)
             case constants.User.UNKNOWN =>
-              withUsernameToken.Ok(views.html.anonymousIndex(), loginData.username)
+              withUsernameToken.Ok(views.html.anonymousIndex(warnings = contactWarnings), loginData.username)
             case constants.User.WITHOUT_LOGIN =>
               masterAccounts.Service.updateUserType(loginData.username, constants.User.UNKNOWN)
-              withUsernameToken.Ok(views.html.anonymousIndex(), loginData.username)
+              withUsernameToken.Ok(views.html.anonymousIndex(warnings = contactWarnings), loginData.username)
           }
         }
         catch {
