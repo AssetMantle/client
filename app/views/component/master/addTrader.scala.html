@@ -1,0 +1,20 @@
+@import helper._
+@import views.companion.master.AddTrader
+
+@(addTraderForm: Form[AddTrader.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@form(action = routes.SetACLController.addTrader, 'onkeypress -> "validateForm(event,this)") {
+    @CSRF.formField
+    @inputText(addTraderForm(constants.Form.ZONE_ID), '_label -> Messages(constants.Form.ZONE_ID))
+    @inputText(addTraderForm(constants.Form.ORGANIZATION_ID), '_label -> Messages(constants.Form.ORGANIZATION_ID))
+    @inputText(addTraderForm(constants.Form.NAME), '_label -> Messages(constants.Form.NAME))
+
+
+    @if(addTraderForm.hasGlobalErrors) {
+        <ul>
+        @for(error <- addTraderForm.globalErrors) {
+            <li>@error.format</li>
+        }
+        </ul>
+    }
+    <button type="button" onclick="submitForm(this)">@Messages(constants.Form.ADD_TRADER)</button>
+}

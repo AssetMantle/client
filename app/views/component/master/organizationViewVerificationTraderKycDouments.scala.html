@@ -1,0 +1,20 @@
+@import models.master.TraderKYC
+
+@(traderKYCs: Seq[TraderKYC])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+<div>
+    @for(traderKYC <- traderKYCs) {
+        @component.master.organizationViewKycDocument(id = traderKYC.id, documentType = traderKYC.documentType, status = traderKYC.organizationStatus, fileName = traderKYC.fileName, file = traderKYC.file)
+        <div id="traderKycDocumentStatus@traderKYC.id@traderKYC.documentType"></div>
+        @traderKYC.organizationStatus.getOrElse(None)  match {
+            case true => {
+                <div id="buttonTraderKycDocumentStatus@traderKYC.id@traderKYC.documentType"><button class="reject" onclick="organizationRejectTraderKycDocument('@traderKYC.id', '@traderKYC.documentType')">@Messages(constants.Form.REJECT)</button></div>
+            }
+            case false => {
+                <div id="buttonTraderKycDocumentStatus@traderKYC.id@traderKYC.documentType"><button class="approve" onclick="organizationVerifyTraderKycDocument('@traderKYC.id', '@traderKYC.documentType')">@Messages(constants.Form.APPROVE)</button></div>
+            }
+            case _ => {
+                <div id="buttonTraderKycDocumentStatus@traderKYC.id@traderKYC.documentType"> <button class="approve" onclick="organizationVerifyTraderKycDocument('@traderKYC.id', '@traderKYC.documentType')">@Messages(constants.Form.APPROVE)</button> <button class="reject" onclick="organizationRejectTraderKycDocument('@traderKYC.id', '@traderKYC.documentType')">@Messages(constants.Form.REJECT)</button></div>
+            }
+        }
+    }
+</div>

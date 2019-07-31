@@ -1,16 +1,12 @@
-@import utilities.LoginState
-@(username: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+@import controllers.actions.LoginState
+@()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
 @common(Messages(constants.User.HOME))(Html(""))(center)(Html(""))
 @center = {
-        <div class="flexContainer">
-            <div id="commonHome" class="box flexItem flexGrowth"></div>
-        <div class="centerText">
-            <button onclick="getForm(jsRoutes.controllers.AddZoneController.viewPendingVerifyZoneRequests())">@Messages(constants.Form.PENDING_VERIFY_ZONE_REQUESTS)</button>
-            <button onclick="getForm(jsRoutes.controllers.SendCoinController.viewPendingFaucetRequests())">@Messages(constants.Form.APPROVE_FAUCET_REQUEST)</button>
-        </div>
-        </div>
+    <div class="flexContainer">
+        <div id="commonHome" class="box flexItem flexGrowth"></div>
+    </div>
     <script>
-        componentResource('commonHome', jsRoutes.controllers.ComponentViewController.commonHome('@username'))
+        componentResource('commonHome', jsRoutes.controllers.ComponentViewController.commonHome())
     </script>
 }

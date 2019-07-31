@@ -8,7 +8,7 @@ import models.masterTransaction.EmailOTPs
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
-import utilities.{Email, LoginState}
+import utilities.Email
 import views.companion.master.VerifyEmailAddress
 
 import scala.concurrent.ExecutionContext
@@ -20,11 +20,11 @@ class VerifyEmailAddressController @Inject()(messagesControllerComponents: Messa
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  def verifyEmailAddressForm: Action[AnyContent] = withLoginAction.authenticated { username =>
+  def verifyEmailAddressForm: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        val otp = emailOTPs.Service.sendOTP(username)
-        email.sendEmail(username, constants.Email.OTP, Seq(otp))
+        val otp = emailOTPs.Service.sendOTP(loginState.username)
+        email.sendEmail(loginState.username, constants.Email.OTP, Seq(otp))
         Ok(views.html.component.master.verifyEmailAddress(VerifyEmailAddress.form))
       }
       catch {
@@ -32,17 +32,17 @@ class VerifyEmailAddressController @Inject()(messagesControllerComponents: Messa
       }
   }
 
-  def verifyEmailAddress: Action[AnyContent] = withLoginAction.authenticated { username =>
+  def verifyEmailAddress: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       VerifyEmailAddress.form.bindFromRequest().fold(
         formWithErrors => {
           BadRequest(views.html.component.master.verifyEmailAddress(formWithErrors))
         },
         verifyEmailAddressData => {
-          implicit val loginState:LoginState = LoginState(username)
+
           try {
-            if (!emailOTPs.Service.verifyOTP(username, verifyEmailAddressData.otp)) throw new BaseException(constants.Response.INVALID_OTP)
-            if (contacts.Service.verifyEmailAddress(username) != 1) throw new BaseException(constants.Response.EMAIL_NOT_FOUND)
+            if (!emailOTPs.Service.verifyOTP(loginState.username, verifyEmailAddressData.otp)) throw new BaseException(constants.Response.INVALID_OTP)
+            if (contacts.Service.verifyEmailAddress(loginState.username) != 1) throw new BaseException(constants.Response.EMAIL_NOT_FOUND)
             Ok(views.html.index(successes = Seq(constants.Response.EMAIL_ADDRESS_VERIFIED)))
           }
           catch {

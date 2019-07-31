@@ -26,11 +26,20 @@
 @*        <span class="tooltiptext"  onclick="copyToClipboard('text_element')">Tooltip text</span>*@
 @*    </div>*@
 </div>
-
-<script src="@routes.Assets.versioned("javascripts/viewFiles.js")" type="text/javascript"></script>
+<div class="width30Percent">
+    @if(profilePicture sameElements Array[Byte]()) {
+        <img id="profilePicture" class="profilePicture" src="@routes.Assets.versioned("images/defaultProfilePicture.jpg")" alt="@constants.Form.PROFILE_PICTURE">
+        <br>
+        <button id="profilePictureBottomUploadButton" class="bottom" onclick="getForm(jsRoutes.controllers.FileController.uploadAccountFileForm('@constants.File.PROFILE_PICTURE'))">@Messages(constants.Form.UPLOAD)</button>
+    } else {
+        <img id="profilePicture" class="profilePicture" src="data:image/jpg;base64,@utilities.ImageProcess.decodeImageThumbnailData(profilePicture)" alt="@constants.Form.PROFILE_PICTURE">
+        <br>
+        <button id="profilePictureBottomUploadButton" class="bottom" onclick="getForm(jsRoutes.controllers.FileController.updateAccountFileForm('@constants.File.PROFILE_PICTURE'))">@Messages(constants.Form.UPDATE)</button>
+    }
+</div>
 <script type="text/javascript">
         var accountCometMessage = function (event) {
-            componentResource('commonHome', jsRoutes.controllers.ComponentViewController.commonHome('@username'));
+            componentResource('commonHome', jsRoutes.controllers.ComponentViewController.commonHome());
         }
 </script>
 <iframe class="hidden" src="@routes.ComponentViewController.accountComet"></iframe>

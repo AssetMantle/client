@@ -1,0 +1,18 @@
+@import models.master.Zone
+
+@(zones: Seq[Zone])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
+
+@for(zone <- zones) {
+    <div class="flexItem box firstBox leftText lightBlue">
+        <span class="red">@Messages(constants.Form.ID)</span> :@zone.id <br>
+        <span class="red">@Messages(constants.Form.ACCOUNT_ID)</span> :@zone.accountID <br>
+        <span class="red">@Messages(constants.Form.NAME)</span> :@zone.name <br>
+        <span class="red">@Messages(constants.Form.CURRENCY)</span> :@zone.currency <br>
+        <div class="box leftMargin">
+            <div>
+                <h2 class="showHide toggleElement centerText" onclick="fetchOrShowHide('@zone.accountID', jsRoutes.controllers.AddOrganizationController.viewOrganizationsInZoneForGenesis('@zone.id') ,this)">@Messages(constants.Form.ORGANIZATIONS)</h2>
+            </div>
+            <div id="@zone.accountID" class="flexContainer rightPadding scrollableSecond"></div>
+        </div>
+    </div>
+}

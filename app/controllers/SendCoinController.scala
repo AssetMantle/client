@@ -7,7 +7,6 @@ import models.{blockchain, blockchainTransaction, master, masterTransaction}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
-import utilities.LoginState
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Random
@@ -29,21 +28,21 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
     Ok(views.html.component.master.sendCoin(views.companion.master.SendCoin.form))
   }
 
-  def sendCoin: Action[AnyContent] = withLoginAction.authenticated { username =>
+  def sendCoin: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       views.companion.master.SendCoin.form.bindFromRequest().fold(
         formWithErrors => {
           BadRequest(views.html.component.master.sendCoin(formWithErrors))
         },
         sendCoinData => {
-          implicit val loginState:LoginState = LoginState(username)
+
           try {
-            val ticketID: String = if (kafkaEnabled) transactionsSendCoin.Service.kafkaPost(transactionsSendCoin.Request(from = username, password = sendCoinData.password, to = sendCoinData.to, amount = Seq(transactionsSendCoin.Amount(denominationOfGasToken, sendCoinData.amount.toString)), gas = sendCoinData.gas)).ticketID else Random.nextString(32)
-            blockchainTransactionSendCoins.Service.create(from = username, to = sendCoinData.to, amount = sendCoinData.amount, gas = sendCoinData.gas, null, null, ticketID = ticketID, null)
+            val ticketID: String = if (kafkaEnabled) transactionsSendCoin.Service.kafkaPost(transactionsSendCoin.Request(from = loginState.username, password = sendCoinData.password, to = sendCoinData.to, amount = Seq(transactionsSendCoin.Amount(denominationOfGasToken, sendCoinData.amount.toString)), gas = sendCoinData.gas)).ticketID else Random.nextString(32)
+            blockchainTransactionSendCoins.Service.create(from = loginState.username, to = sendCoinData.to, amount = sendCoinData.amount, gas = sendCoinData.gas, null, null, ticketID = ticketID, null)
             if (!kafkaEnabled) {
               Future {
                 try {
-                  blockchainTransactionSendCoins.Utility.onSuccess(ticketID, transactionsSendCoin.Service.post(transactionsSendCoin.Request(from = username, password = sendCoinData.password, to = sendCoinData.to, amount = Seq(transactionsSendCoin.Amount(denominationOfGasToken, sendCoinData.amount.toString)), gas = sendCoinData.gas)))
+                  blockchainTransactionSendCoins.Utility.onSuccess(ticketID, transactionsSendCoin.Service.post(transactionsSendCoin.Request(from = loginState.username, password = sendCoinData.password, to = sendCoinData.to, amount = Seq(transactionsSendCoin.Amount(denominationOfGasToken, sendCoinData.amount.toString)), gas = sendCoinData.gas)))
                 } catch {
                   case baseException: BaseException => logger.error(baseException.failure.message, baseException)
                   case blockChainException: BlockChainException => logger.error(blockChainException.failure.message, blockChainException)
@@ -93,16 +92,15 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
     Ok(views.html.component.master.requestCoin(views.companion.master.RequestCoin.form))
   }
 
-  def requestCoins: Action[AnyContent] = withUnknownLoginAction.authenticated { username =>
+  def requestCoins: Action[AnyContent] = withUnknownLoginAction.authenticated { implicit loginState =>
     implicit request =>
       views.companion.master.RequestCoin.form.bindFromRequest().fold(
         formWithErrors => {
           BadRequest(views.html.component.master.requestCoin(formWithErrors))
         },
         requestCoinFormData => {
-          implicit val loginState:LoginState = LoginState(username)
           try {
-            masterTransactionFaucetRequests.Service.create(username, defaultFaucetToken)
+            masterTransactionFaucetRequests.Service.create(loginState.username, defaultFaucetToken)
             Ok(views.html.index(successes = Seq(constants.Response.COINS_REQUESTED)))
           }
           catch {
@@ -112,7 +110,7 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
       )
   }
 
-  def viewPendingFaucetRequests: Action[AnyContent] = withGenesisLoginAction.authenticated { username =>
+  def viewPendingFaucetRequests: Action[AnyContent] = withGenesisLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
         Ok(views.html.component.master.viewPendingFaucetRequests(masterTransactionFaucetRequests.Service.getPendingFaucetRequests))
@@ -126,14 +124,14 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
     Ok(views.html.component.master.rejectFaucetRequest(views.companion.master.RejectFaucetRequest.form, requestID))
   }
 
-  def rejectFaucetRequest: Action[AnyContent] = withGenesisLoginAction.authenticated { username =>
+  def rejectFaucetRequest: Action[AnyContent] = withGenesisLoginAction.authenticated { implicit loginState =>
     implicit request =>
       views.companion.master.RejectFaucetRequest.form.bindFromRequest().fold(
         formWithErrors => {
           BadRequest(views.html.component.master.rejectFaucetRequest(formWithErrors, formWithErrors.data(constants.Form.REQUEST_ID)))
         },
         rejectFaucetRequestData => {
-          implicit val loginState:LoginState = LoginState(username)
+
           try {
             masterTransactionFaucetRequests.Service.reject(rejectFaucetRequestData.requestID, comment = rejectFaucetRequestData.comment)
             Ok(views.html.index(successes = Seq(constants.Response.FAUCET_REQUEST_REJECTED)))
@@ -149,14 +147,14 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
     Ok(views.html.component.master.approveFaucetRequests(views.companion.master.ApproveFaucetRequest.form, requestID, accountID))
   }
 
-  def approveFaucetRequests: Action[AnyContent] = withGenesisLoginAction.authenticated { username =>
+  def approveFaucetRequests: Action[AnyContent] = withGenesisLoginAction.authenticated { implicit loginState =>
     implicit request =>
       views.companion.master.ApproveFaucetRequest.form.bindFromRequest().fold(
         formWithErrors => {
           BadRequest(views.html.component.master.approveFaucetRequests(formWithErrors, formWithErrors.data(constants.Form.REQUEST_ID), formWithErrors.data(constants.Form.ACCOUNT_ID)))
         },
         approveFaucetRequestFormData => {
-          implicit val loginState:LoginState = LoginState(username)
+
           try {
             if (masterTransactionFaucetRequests.Service.getStatus(approveFaucetRequestFormData.requestID).isEmpty) {
               val toAddress = masterAccounts.Service.getAddress(approveFaucetRequestFormData.accountID)

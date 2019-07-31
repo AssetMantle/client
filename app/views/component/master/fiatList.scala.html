@@ -4,7 +4,7 @@
 @(fiatPegWallet: Seq[Fiat], aclHash: ACLHash)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
 
     @for(fiat <- fiatPegWallet) {
-        <div class="flexItem box leftText lightBlue">
+        <div class="flexItem box thirdBox leftText lightBlue">
             <span class="red">@Messages(constants.Form.PEG_HASH)</span> : @fiat.pegHash <br>
             <span class="red">@Messages(constants.Form.TRANSACTION_ID)</span> : @fiat.transactionID <br>
             <span class="red">@Messages(constants.Form.TRANSACTION_AMOUNT)</span> : @fiat.transactionAmount <br>

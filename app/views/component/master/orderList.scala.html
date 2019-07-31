@@ -3,9 +3,11 @@
 @(orders: Seq[Order])(implicit messagesProvider: MessagesProvider)
 
 @for(order <- orders) {
-    <div class="flexItem box lightBlue leftText">
+    <div class="flexItem thirdBox box lightBlue">
+        <div class="leftText">
             <span class="red">@Messages(constants.Form.ID)</span> : @order.id <br>
             <span class="red">@Messages(constants.Form.AWB_PROOF_HASH)</span> : @order.awbProofHash <br>
             <span class="red">@Messages(constants.Form.FIAT_PROOF_HASH)</span> : @order.fiatProofHash <br>
+        </div>
     </div>
 }

@@ -143,7 +143,7 @@ class SetSellerFeedbacks @Inject()(actorSystem: ActorSystem, protected val datab
         Service.markTransactionSuccessful(ticketID, response.TxHash, response.Code)
         val setSellerFeedback = Service.getTransaction(ticketID)
         val fromAddress = masterAccounts.Service.getAddress(setSellerFeedback.from)
-        blockchainTraderFeedbackHistories.Service.create(setSellerFeedback.to, setSellerFeedback.to, fromAddress, setSellerFeedback.pegHash, setSellerFeedback.rating.toString)
+        blockchainTraderFeedbackHistories.Service.update(setSellerFeedback.to, setSellerFeedback.to, fromAddress, setSellerFeedback.pegHash, setSellerFeedback.rating.toString)
         blockchainAccounts.Service.markDirty(fromAddress)
         pushNotification.sendNotification(masterAccounts.Service.getId(setSellerFeedback.to), constants.Notification.SUCCESS, response.TxHash)
         pushNotification.sendNotification(setSellerFeedback.from, constants.Notification.SUCCESS, response.TxHash)
