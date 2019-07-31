@@ -10,7 +10,7 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.duration.FiniteDuration
 import scala.util.{Failure, Success}
 
-case class CreateNegotiationChildActorMessage(address: String, actorRef: ActorRef)
+case class CreateNegotiationChildActorMessage(username: String, actorRef: ActorRef)
 
 object MainNegotiationActor {
   def props(actorTimeout: FiniteDuration, actorSystem: ActorSystem) = Props(new MainNegotiationActor(actorTimeout, actorSystem))
@@ -29,11 +29,11 @@ class MainNegotiationActor @Inject()(actorTimeout: FiniteDuration, actorSystem: 
 
   def receive = {
     case negotiationCometMessage: blockchain.NegotiationCometMessage =>
-      actorSystem.actorSelection("/user/" + constants.Module.ACTOR_MAIN_NEGOTIATION + "/" + negotiationCometMessage.ownerAddress).resolveOne().onComplete {
+      actorSystem.actorSelection("/user/" + constants.Module.ACTOR_MAIN_NEGOTIATION + "/" + negotiationCometMessage.username).resolveOne().onComplete {
         case Success(actorRef) => actorRef ! negotiationCometMessage
         case Failure(ex) => logger.info(module + ": " + ex.getMessage)
       }
-    case createNegotiationChildActorMessage: CreateNegotiationChildActorMessage => context.actorOf(props = UserNegotiationActor.props(createNegotiationChildActorMessage.actorRef, actorTimeout), name = createNegotiationChildActorMessage.address)
+    case createNegotiationChildActorMessage: CreateNegotiationChildActorMessage => context.actorOf(props = UserNegotiationActor.props(createNegotiationChildActorMessage.actorRef, actorTimeout), name = createNegotiationChildActorMessage.username)
   }
 
 }

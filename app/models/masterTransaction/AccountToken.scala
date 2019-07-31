@@ -128,15 +128,14 @@ class AccountTokens @Inject()(actorSystem: ActorSystem, shutdownActors: Shutdown
 
   actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
     val ids = Service.getTimedOutIds
-    val addresses = masterAccounts.Service.getAddresses(ids)
-    addresses.foreach { address =>
-      shutdownActors.shutdown(constants.Module.ACTOR_MAIN_ACCOUNT, address)
+    ids.foreach { id =>
+      shutdownActors.shutdown(constants.Module.ACTOR_MAIN_ACCOUNT, id)
     }
-    masterAccounts.Service.filterTraderAddresses(addresses).foreach{ address =>
-      shutdownActors.shutdown(constants.Module.ACTOR_MAIN_ASSET, address)
-      shutdownActors.shutdown(constants.Module.ACTOR_MAIN_FIAT, address)
-      shutdownActors.shutdown(constants.Module.ACTOR_MAIN_NEGOTIATION, address)
-      shutdownActors.shutdown(constants.Module.ACTOR_MAIN_ORDER, address)
+    masterAccounts.Service.filterTraderIds(ids).foreach{ id =>
+      shutdownActors.shutdown(constants.Module.ACTOR_MAIN_ASSET, id)
+      shutdownActors.shutdown(constants.Module.ACTOR_MAIN_FIAT, id)
+      shutdownActors.shutdown(constants.Module.ACTOR_MAIN_NEGOTIATION, id)
+      shutdownActors.shutdown(constants.Module.ACTOR_MAIN_ORDER, id)
     }
     Service.resetSessionTokenTimeByIds(ids)
   }

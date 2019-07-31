@@ -22,7 +22,7 @@ import scala.util.{Failure, Success}
 
 case class Asset(pegHash: String, documentHash: String, assetType: String, assetQuantity: String, assetPrice: String, quantityUnit: String, ownerAddress: String, locked: Boolean, moderated: Boolean, dirtyBit: Boolean)
 
-case class AssetCometMessage(ownerAddress: String, message: JsValue)
+case class AssetCometMessage(username: String, message: JsValue)
 
 @Singleton
 class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, actorSystem: ActorSystem, shutdownActors: ShutdownActors, accountTokens: AccountTokens, getAccount: GetAccount, masterAccounts: master.Accounts, implicit val pushNotification: PushNotification)(implicit executionContext: ExecutionContext, configuration: Configuration) {
@@ -167,11 +167,10 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
     def markDirty(pegHash: String): Int = Await.result(updateDirtyBitByPegHash(pegHash, dirtyBit = true), Duration.Inf)
 
     def assetCometSource(username: String) = {
-      val address = masterAccounts.Service.getAddress(username)
-      shutdownActors.shutdown(constants.Module.ACTOR_MAIN_ASSET, address)
+      shutdownActors.shutdown(constants.Module.ACTOR_MAIN_ASSET, username)
       Thread.sleep(500)
       val (systemUserActor, source) = Source.actorRef[JsValue](0, OverflowStrategy.dropHead).preMaterialize()
-      mainAssetActor ! actors.CreateAssetChildActorMessage(address = address, actorRef = systemUserActor)
+      mainAssetActor ! actors.CreateAssetChildActorMessage(username = username, actorRef = systemUserActor)
       source
     }
   }
@@ -184,7 +183,7 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
         try {
           val assetPegWallet = getAccount.Service.get(dirtyAsset.ownerAddress).value.assetPegWallet.getOrElse(throw new BaseException(constants.Response.NO_RESPONSE))
           assetPegWallet.foreach(assetPeg => if (assetPegWallet.map(_.pegHash) contains dirtyAsset.pegHash) Service.insertOrUpdate(pegHash = assetPeg.pegHash, documentHash = assetPeg.documentHash, assetType = assetPeg.assetType, assetPrice = assetPeg.assetPrice, assetQuantity = assetPeg.assetQuantity, quantityUnit = assetPeg.quantityUnit, ownerAddress = dirtyAsset.ownerAddress, locked = assetPeg.locked, moderated = assetPeg.moderated, dirtyBit = false) else Service.deleteAsset(dirtyAsset.pegHash))
-          mainAssetActor ! AssetCometMessage(ownerAddress = dirtyAsset.ownerAddress, message = Json.toJson(constants.Comet.PING))
+          mainAssetActor ! AssetCometMessage(username = masterAccounts.Service.getId(dirtyAsset.ownerAddress), message = Json.toJson(constants.Comet.PING))
         }
         catch {
           case baseException: BaseException => logger.info(baseException.failure.message, baseException)
