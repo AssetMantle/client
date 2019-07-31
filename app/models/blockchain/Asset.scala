@@ -33,6 +33,8 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
 
   private implicit val materializer: ActorMaterializer = ActorMaterializer()(actorSystem)
 
+  private val cometActorSleepTime = configuration.get[Long]("akka.actors.cometActorSleepTime")
+
   private val actorTimeout = configuration.get[Int]("akka.actors.timeout").seconds
 
   val mainAssetActor: ActorRef = actorSystem.actorOf(props = MainAssetActor.props(actorTimeout, actorSystem), name = constants.Module.ACTOR_MAIN_ASSET)
@@ -168,7 +170,7 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
 
     def assetCometSource(username: String) = {
       shutdownActors.shutdown(constants.Module.ACTOR_MAIN_ASSET, username)
-      Thread.sleep(500)
+      Thread.sleep(cometActorSleepTime)
       val (systemUserActor, source) = Source.actorRef[JsValue](0, OverflowStrategy.dropHead).preMaterialize()
       mainAssetActor ! actors.CreateAssetChildActorMessage(username = username, actorRef = systemUserActor)
       source

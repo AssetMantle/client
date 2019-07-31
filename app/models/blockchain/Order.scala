@@ -39,6 +39,8 @@ class Orders @Inject()(shutdownActors: ShutdownActors, masterAccounts: master.Ac
 
   private val actorTimeout = configuration.get[Int]("akka.actors.timeout").seconds
 
+  private val cometActorSleepTime = configuration.get[Long]("akka.actors.cometActorSleepTime")
+
   val mainOrderActor: ActorRef = actorSystem.actorOf(props = MainOrderActor.props(actorTimeout, actorSystem), name = constants.Module.ACTOR_MAIN_ORDER)
 
   private[models] val orderTable = TableQuery[OrderTable]
@@ -131,7 +133,7 @@ class Orders @Inject()(shutdownActors: ShutdownActors, masterAccounts: master.Ac
 
     def orderCometSource(username: String) = {
       shutdownActors.shutdown(constants.Module.ACTOR_MAIN_ORDER, username)
-      Thread.sleep(500)
+      Thread.sleep(cometActorSleepTime)
       val (systemUserActor, source) = Source.actorRef[JsValue](0, OverflowStrategy.dropHead).preMaterialize()
       mainOrderActor ! actors.CreateOrderChildActorMessage(username = username, actorRef = systemUserActor)
       source

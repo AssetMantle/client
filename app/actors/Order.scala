@@ -52,8 +52,6 @@ class UserOrderActor(systemUserActor: ActorRef, actorTimeout: FiniteDuration) ex
 
   private implicit val module: String = constants.Module.ACTOR_USER_ORDER
 
-  override def postStop(): Unit = log.info(module + ": Actor Stopped")
-
   def receive = {
     case orderCometMessage: blockchain.OrderCometMessage => systemUserActor ! orderCometMessage.message
     case _: ShutdownActorMessage =>

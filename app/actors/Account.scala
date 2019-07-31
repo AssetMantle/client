@@ -52,8 +52,6 @@ class UserAccountActor(systemUserActor: ActorRef, actorTimeout: FiniteDuration) 
 
   private implicit val module: String = constants.Module.ACTOR_USER_ACCOUNT
 
-  override def postStop(): Unit = log.info(module + ": Actor Stopped")
-
   def receive = {
     case accountCometMessage: blockchain.AccountCometMessage => systemUserActor ! accountCometMessage.message
     case _: ShutdownActorMessage =>

@@ -39,6 +39,8 @@ class Negotiations @Inject()(shutdownActors: ShutdownActors, masterAccounts: mas
 
   private val actorTimeout = configuration.get[Int]("akka.actors.timeout").seconds
 
+  private val cometActorSleepTime = configuration.get[Long]("akka.actors.cometActorSleepTime")
+
   val mainNegotiationActor: ActorRef = actorSystem.actorOf(props = MainNegotiationActor.props(actorTimeout, actorSystem), name = constants.Module.ACTOR_MAIN_NEGOTIATION)
 
   private[models] val negotiationTable = TableQuery[NegotiationTable]
@@ -173,7 +175,7 @@ class Negotiations @Inject()(shutdownActors: ShutdownActors, masterAccounts: mas
 
     def negotiationCometSource(username: String) = {
       shutdownActors.shutdown(constants.Module.ACTOR_MAIN_NEGOTIATION, username)
-      Thread.sleep(500)
+      Thread.sleep(cometActorSleepTime)
       val (systemUserActor, source) = Source.actorRef[JsValue](0, OverflowStrategy.dropHead).preMaterialize()
       mainNegotiationActor ! actors.CreateNegotiationChildActorMessage(username = username, actorRef = systemUserActor)
       source

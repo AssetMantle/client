@@ -52,8 +52,6 @@ class UserAssetActor(systemUserActor: ActorRef, actorTimeout: FiniteDuration) ex
 
   private implicit val module: String = constants.Module.ACTOR_USER_ASSET
 
-  override def postStop(): Unit = log.info(module + ": Actor Stopped")
-
   def receive = {
     case assetCometMessage: blockchain.AssetCometMessage => systemUserActor ! assetCometMessage.message
     case _: ShutdownActorMessage =>

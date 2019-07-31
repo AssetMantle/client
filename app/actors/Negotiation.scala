@@ -52,8 +52,6 @@ class UserNegotiationActor(systemUserActor: ActorRef, actorTimeout: FiniteDurati
 
   private implicit val module: String = constants.Module.ACTOR_USER_NEGOTIATION
 
-  override def postStop(): Unit = log.info(module + ": Actor Stopped")
-
   def receive = {
     case negotiationCometMessage: blockchain.NegotiationCometMessage => systemUserActor ! negotiationCometMessage.message
     case _: ShutdownActorMessage =>

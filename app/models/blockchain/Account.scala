@@ -41,6 +41,8 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   private val actorTimeout = configuration.get[Int]("akka.actors.timeout").seconds
 
+  private val cometActorSleepTime = configuration.get[Long]("akka.actors.cometActorSleepTime")
+
   val mainAccountActor: ActorRef = actorSystem.actorOf(props = MainAccountActor.props(actorTimeout, actorSystem), name = constants.Module.ACTOR_MAIN_ACCOUNT)
 
   private[models] val accountTable = TableQuery[AccountTable]
@@ -149,7 +151,7 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
     def accountCometSource(username: String) = {
       shutdownActors.shutdown(constants.Module.ACTOR_MAIN_ACCOUNT, username)
-      Thread.sleep(500)
+      Thread.sleep(cometActorSleepTime)
       val (systemUserActor, source) = Source.actorRef[JsValue](0, OverflowStrategy.dropHead).preMaterialize()
       mainAccountActor ! actors.CreateAccountChildActorMessage(username = username, actorRef = systemUserActor)
       source
