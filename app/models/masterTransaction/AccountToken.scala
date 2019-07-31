@@ -1,16 +1,15 @@
 package models.masterTransaction
 
+import actors.ShutdownActors
+import akka.actor.ActorSystem
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.master
-import org.graalvm.compiler.nodes.memory.address.AddressNode.Address
 import org.joda.time.{DateTime, DateTimeZone}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
-import actors.ShutdownActors
-import akka.actor.ActorSystem
 
 import scala.concurrent.duration.{Duration, _}
 import scala.concurrent.{Await, ExecutionContext, Future}
@@ -129,12 +128,15 @@ class AccountTokens @Inject()(actorSystem: ActorSystem, shutdownActors: Shutdown
 
   actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
     val ids = Service.getTimedOutIds
-    masterAccounts.Service.getTradersAddressFromIds(ids).foreach { address =>
-        shutdownActors.shutdown(constants.Module.ACTOR_MAIN_ACCOUNT, address)
-        shutdownActors.shutdown(constants.Module.ACTOR_MAIN_ASSET, address)
-        shutdownActors.shutdown(constants.Module.ACTOR_MAIN_FIAT, address)
-        shutdownActors.shutdown(constants.Module.ACTOR_MAIN_NEGOTIATION, address)
-        shutdownActors.shutdown(constants.Module.ACTOR_MAIN_ORDER, address)
+    val addresses = masterAccounts.Service.getAddresses(ids)
+    addresses.foreach { address =>
+      shutdownActors.shutdown(constants.Module.ACTOR_MAIN_ACCOUNT, address)
+    }
+    masterAccounts.Service.filterTraderAddresses(addresses).foreach{ address =>
+      shutdownActors.shutdown(constants.Module.ACTOR_MAIN_ASSET, address)
+      shutdownActors.shutdown(constants.Module.ACTOR_MAIN_FIAT, address)
+      shutdownActors.shutdown(constants.Module.ACTOR_MAIN_NEGOTIATION, address)
+      shutdownActors.shutdown(constants.Module.ACTOR_MAIN_ORDER, address)
     }
     Service.resetSessionTokenTimeByIds(ids)
   }
