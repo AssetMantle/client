@@ -1,10 +1,10 @@
 @import helper._
 @import views.companion.master.RedeemFiat
 
-@(redeemFiatForm: Form[RedeemFiat.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@(redeemFiatForm: Form[RedeemFiat.Data], zoneID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
     @form(action = routes.RedeemFiatController.redeemFiat, 'onkeypress -> "validateForm(event,this)") {
     @CSRF.formField
-    @inputText(redeemFiatForm(constants.Form.ZONE_ID), '_label -> Messages(constants.Form.ZONE_ID))
+    @inputText(redeemFiatForm(constants.Form.ZONE_ID).copy(value = Some(zoneID)), '_label -> Messages(constants.Form.ZONE_ID))
     @inputText(redeemFiatForm(constants.Form.REDEEM_AMOUNT), '_label -> Messages(constants.Form.REDEEM_AMOUNT))
     @inputText(redeemFiatForm(constants.Form.GAS), '_label -> Messages(constants.Form.GAS))
     @inputPassword(redeemFiatForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD))

@@ -14,7 +14,7 @@ import scala.util.{Failure, Random, Success}
 case class Zone(id: String, accountID: String, name: String, currency: String, status: Option[Boolean])
 
 @Singleton
-class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider) {
+class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -28,7 +28,7 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
   private[models] val zoneTable = TableQuery[ZoneTable]
 
-  private def add(zone: Zone)(implicit executionContext: ExecutionContext): Future[String] = db.run((zoneTable returning zoneTable.map(_.id) += zone).asTry).map {
+  private def add(zone: Zone): Future[String] = db.run((zoneTable returning zoneTable.map(_.id) += zone).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -36,7 +36,19 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
     }
   }
 
-  private def findById(id: String)(implicit executionContext: ExecutionContext): Future[Zone] = db.run(zoneTable.filter(_.id === id).result.head.asTry).map {
+  private def findById(id: String): Future[Zone] = db.run(zoneTable.filter(_.id === id).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+  
+  private def findAll: Future[Seq[Zone]] = db.run(zoneTable.result)
+
+  private def deleteById(id: String) = db.run(zoneTable.filter(_.id === id).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -46,7 +58,7 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
     }
   }
 
-  private def deleteById(id: String)(implicit executionContext: ExecutionContext) = db.run(zoneTable.filter(_.id === id).delete.asTry).map {
+  private def getAccountIdById(id: String): Future[String] = db.run(zoneTable.filter(_.id === id).map(_.accountID).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -56,17 +68,7 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
     }
   }
 
-  private def getAccountIdById(id: String)(implicit executionContext: ExecutionContext): Future[String] = db.run(zoneTable.filter(_.id === id).map(_.accountID).result.head.asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
-
-  private def getZoneIdByAccountId(accountID: String)(implicit executionContext: ExecutionContext): Future[String] = db.run(zoneTable.filter(_.accountID === accountID).map(_.id).result.head.asTry).map {
+  private def getZoneIdByAccountId(accountID: String): Future[String] = db.run(zoneTable.filter(_.accountID === accountID).map(_.id).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -77,8 +79,8 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
   }
 
   private def getZonesWithNullStatus: Future[Seq[Zone]] = db.run(zoneTable.filter(_.status.?.isEmpty).result)
-
-  private def updateStatusOnID(id: String, status: Boolean)(implicit executionContext: ExecutionContext) = db.run(zoneTable.filter(_.id === id).map(_.status.?).update(Option(status)).asTry).map {
+  
+  private def updateStatusOnID(id: String, status: Boolean) = db.run(zoneTable.filter(_.id === id).map(_.status.?).update(Option(status)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -88,7 +90,7 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
     }
   }
 
-  private def getStatusByID(id: String)(implicit executionContext: ExecutionContext): Future[Option[Boolean]] = db.run(zoneTable.filter(_.id === id).map(_.status.?).result.head.asTry).map {
+  private def getStatusByID(id: String): Future[Option[Boolean]] = db.run(zoneTable.filter(_.id === id).map(_.status.?).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -117,19 +119,21 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
   object Service {
 
-    def create(accountID: String, name: String, currency: String)(implicit executionContext: ExecutionContext): String = Await.result(add(Zone((-Math.abs(Random.nextInt)).toHexString.toUpperCase, accountID, name, currency, null)), Duration.Inf)
+    def create(accountID: String, name: String, currency: String): String = Await.result(add(Zone((-Math.abs(Random.nextInt)).toHexString.toUpperCase, accountID, name, currency, null)), Duration.Inf)
 
-    def get(id: String)(implicit executionContext: ExecutionContext): Zone = Await.result(findById(id), Duration.Inf)
+    def get(id: String): Zone = Await.result(findById(id), Duration.Inf)
 
-    def updateStatus(id: String, status: Boolean)(implicit executionContext: ExecutionContext): Int = Await.result(updateStatusOnID(id, status), Duration.Inf)
+    def getAll: Seq[Zone] = Await.result(findAll, Duration.Inf)
 
-    def getAccountId(id: String)(implicit executionContext: ExecutionContext): String = Await.result(getAccountIdById(id), Duration.Inf)
+    def updateStatus(id: String, status: Boolean): Int = Await.result(updateStatusOnID(id, status), Duration.Inf)
 
-    def getZoneId(accountID: String)(implicit executionContext: ExecutionContext): String = Await.result(getZoneIdByAccountId(accountID), Duration.Inf)
+    def getAccountId(id: String): String = Await.result(getAccountIdById(id), Duration.Inf)
+
+    def getZoneId(accountID: String): String = Await.result(getZoneIdByAccountId(accountID), Duration.Inf)
 
     def getVerifyZoneRequests: Seq[Zone] = Await.result(getZonesWithNullStatus, Duration.Inf)
 
-    def getStatus(id: String)(implicit executionContext: ExecutionContext): Option[Boolean] = Await.result(getStatusByID(id), Duration.Inf)
+    def getStatus(id: String): Option[Boolean] = Await.result(getStatusByID(id), Duration.Inf)
 
   }
 

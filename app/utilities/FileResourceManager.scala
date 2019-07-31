@@ -25,6 +25,8 @@ class FileResourceManager @Inject()()(implicit exec: ExecutionContext, configura
 
   private val uploadOrganizationKycIdentificationPath = configuration.get[String]("upload.organization.identificationPath")
 
+  private val uploadTraderKycIdentificationPath = configuration.get[String]("upload.trader.identificationPath")
+
   def getAccountKycFilePath(documentType: String): String = {
     documentType match {
       case constants.File.BANK_DETAILS => uploadAccountKycBankDetailsPath
@@ -45,6 +47,13 @@ class FileResourceManager @Inject()()(implicit exec: ExecutionContext, configura
     documentType match {
       case constants.File.BANK_DETAILS => uploadOrganizationKycBankDetailsPath
       case constants.File.IDENTIFICATION => uploadOrganizationKycIdentificationPath
+      case _ => constants.File.UNKNOWN_TYPE
+    }
+  }
+
+  def getTraderKycFilePath(documentType: String): String = {
+    documentType match {
+      case constants.File.IDENTIFICATION => uploadTraderKycIdentificationPath
       case _ => constants.File.UNKNOWN_TYPE
     }
   }

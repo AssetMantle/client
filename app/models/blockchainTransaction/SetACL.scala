@@ -22,7 +22,7 @@ import scala.util.{Failure, Success}
 case class SetACL(from: String, aclAddress: String, organizationID: String, zoneID: String, aclHash: String, status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])
 
 @Singleton
-class SetACLs @Inject()(actorSystem: ActorSystem, protected val databaseConfigProvider: DatabaseConfigProvider, blockchainTransactionFeedbacks: blockchain.TransactionFeedbacks, transactionSetACL: transactions.SetACL, getResponse: GetResponse, blockchainAccounts: blockchain.Accounts, blockchainAclHashes: blockchain.ACLHashes, blockchainAclAccounts: blockchain.ACLAccounts, pushNotification: PushNotification, masterAccounts: master.Accounts)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
+class SetACLs @Inject()(actorSystem: ActorSystem, protected val databaseConfigProvider: DatabaseConfigProvider, blockchainTransactionFeedbacks: blockchain.TransactionFeedbacks, transactionSetACL: transactions.SetACL, getResponse: GetResponse, blockchainAccounts: blockchain.Accounts, blockchainAclHashes: blockchain.ACLHashes, blockchainAclAccounts: blockchain.ACLAccounts, pushNotification: PushNotification, masterAccounts: master.Accounts, masterTraders: master.Traders, masterTraderKYCs: master.TraderKYCs)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_SET_ACL
 
@@ -141,11 +141,15 @@ class SetACLs @Inject()(actorSystem: ActorSystem, protected val databaseConfigPr
       try {
         Service.markTransactionSuccessful(ticketID, response.TxHash, response.Code)
         val setACL = Service.getTransaction(ticketID)
+         val aclAccountID = masterAccounts.Service.getId(setACL.aclAddress)
         blockchainAclAccounts.Service.insertOrUpdate(setACL.aclAddress, setACL.zoneID, setACL.organizationID, blockchainAclHashes.Service.getACL(setACL.aclHash), dirtyBit = true)
         masterAccounts.Service.updateUserTypeOnAddress(setACL.aclAddress, constants.User.TRADER)
+        masterTraders.Service.updateStatusByAccountID(aclAccountID, status = true)
+        masterTraderKYCs.Service.organizationVerifyAll(setACL.organizationID)
+        masterTraderKYCs.Service.zoneVerifyAll(setACL.zoneID)
         blockchainAccounts.Service.markDirty(masterAccounts.Service.getAddress(setACL.from))
         blockchainTransactionFeedbacks.Service.insertOrUpdate(setACL.aclAddress, TraderReputationResponse.TransactionFeedbackResponse("0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"), dirtyBit = true)
-        pushNotification.sendNotification(masterAccounts.Service.getId(setACL.aclAddress), constants.Notification.SUCCESS, response.TxHash)
+        pushNotification.sendNotification(aclAccountID, constants.Notification.SUCCESS, response.TxHash)
         pushNotification.sendNotification(setACL.from, constants.Notification.SUCCESS, response.TxHash)
       } catch {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)

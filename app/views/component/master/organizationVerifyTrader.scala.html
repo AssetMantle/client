@@ -1,0 +1,33 @@
+@import helper._
+@import views.companion.master.VerifyTrader
+
+@(verifyTraderForm: Form[VerifyTrader.Data], aclAddress:String, organizationID:String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@form(action = routes.SetACLController.organizationVerifyTrader, 'onkeypress -> "validateForm(event,this)") {
+    @CSRF.formField
+    @inputText(verifyTraderForm(constants.Form.ACL_ADDRESS).copy(value = Some(aclAddress)), '_label -> Messages(constants.Form.ACL_ADDRESS))
+    @inputText(verifyTraderForm(constants.Form.ORGANIZATION_ID).copy(value = Some(organizationID)), '_label -> Messages(constants.Form.ORGANIZATION_ID))
+    @checkbox(verifyTraderForm(constants.Form.ISSUE_ASSET), '_label -> Messages(constants.Form.ISSUE_ASSET))
+    @checkbox(verifyTraderForm(constants.Form.ISSUE_FIAT), '_label -> Messages(constants.Form.ISSUE_FIAT))
+    @checkbox(verifyTraderForm(constants.Form.SEND_ASSET), '_label -> Messages(constants.Form.SEND_ASSET))
+    @checkbox(verifyTraderForm(constants.Form.SEND_FIAT), '_label -> Messages(constants.Form.SEND_FIAT))
+    @checkbox(verifyTraderForm(constants.Form.REDEEM_ASSET), '_label -> Messages(constants.Form.REDEEM_ASSET))
+    @checkbox(verifyTraderForm(constants.Form.REDEEM_FIAT), '_label -> Messages(constants.Form.REDEEM_FIAT))
+    @checkbox(verifyTraderForm(constants.Form.SELLER_EXECUTE_ORDER), '_label -> Messages(constants.Form.SELLER_EXECUTE_ORDER))
+    @checkbox(verifyTraderForm(constants.Form.BUYER_EXECUTE_ORDER), '_label -> Messages(constants.Form.BUYER_EXECUTE_ORDER))
+    @checkbox(verifyTraderForm(constants.Form.CHANGE_BUYER_BID), '_label -> Messages(constants.Form.CHANGE_BUYER_BID))
+    @checkbox(verifyTraderForm(constants.Form.CHANGE_SELLER_BID), '_label -> Messages(constants.Form.CHANGE_SELLER_BID))
+    @checkbox(verifyTraderForm(constants.Form.CONFIRM_BUYER_BID), '_label -> Messages(constants.Form.CONFIRM_BUYER_BID))
+    @checkbox(verifyTraderForm(constants.Form.CONFIRM_SELLER_BID), '_label -> Messages(constants.Form.CONFIRM_SELLER_BID))
+    @checkbox(verifyTraderForm(constants.Form.NEGOTIATION), '_label -> Messages(constants.Form.NEGOTIATION))
+    @checkbox(verifyTraderForm(constants.Form.RELEASE_ASSET), '_label -> Messages(constants.Form.RELEASE_ASSET))
+    @inputPassword(verifyTraderForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD))
+
+    @if(verifyTraderForm.hasGlobalErrors) {
+        <ul>
+        @for(error <- verifyTraderForm.globalErrors) {
+            <li>@error.format</li>
+        }
+        </ul>
+    }
+    <button type="button" onclick="submitForm(this)">@Messages(constants.Form.VERIFY_TRADER)</button>
+}

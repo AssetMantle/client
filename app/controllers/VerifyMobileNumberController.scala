@@ -8,7 +8,7 @@ import models.masterTransaction.SMSOTPs
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
-import utilities.{LoginState, SMS}
+import utilities.SMS
 import views.companion.master.VerifyMobileNumber
 
 import scala.concurrent.ExecutionContext
@@ -20,11 +20,11 @@ class VerifyMobileNumberController @Inject()(messagesControllerComponents: Messa
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  def verifyMobileNumberForm: Action[AnyContent] = withLoginAction.authenticated { username =>
+  def verifyMobileNumberForm: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        val otp = smsOTPs.Service.sendOTP(username)
-        SMS.sendSMS(username, constants.SMS.OTP, Seq(otp))
+        val otp = smsOTPs.Service.sendOTP(loginState.username)
+        SMS.sendSMS(loginState.username, constants.SMS.OTP, Seq(otp))
         Ok(views.html.component.master.verifyMobileNumber(VerifyMobileNumber.form))
       }
       catch {
@@ -32,17 +32,17 @@ class VerifyMobileNumberController @Inject()(messagesControllerComponents: Messa
       }
   }
 
-  def verifyMobileNumber: Action[AnyContent] = withLoginAction.authenticated { username =>
+  def verifyMobileNumber: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       VerifyMobileNumber.form.bindFromRequest().fold(
         formWithErrors => {
           BadRequest(views.html.component.master.verifyMobileNumber(formWithErrors))
         },
         verifyMobileNumberData => {
-          implicit val loginState:LoginState = LoginState(username)
+
           try {
-            if (!smsOTPs.Service.verifyOTP(username, verifyMobileNumberData.otp)) throw new BaseException(constants.Response.INVALID_OTP)
-            if (contacts.Service.verifyMobileNumber(username) != 1) throw new BaseException(constants.Response.MOBILE_NUMBER_NOT_FOUND)
+            if (!smsOTPs.Service.verifyOTP(loginState.username, verifyMobileNumberData.otp)) throw new BaseException(constants.Response.INVALID_OTP)
+            if (contacts.Service.verifyMobileNumber(loginState.username) != 1) throw new BaseException(constants.Response.MOBILE_NUMBER_NOT_FOUND)
             Ok(views.html.index(successes = Seq(constants.Response.SUCCESS)))
           }
           catch {

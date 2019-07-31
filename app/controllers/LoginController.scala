@@ -1,16 +1,18 @@
 package controllers
 
+import controllers.actions.LoginState
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
+import models.blockchain
+import models.master
 import models.blockchain.ACLAccounts
-import models.{blockchain, master}
 import play.api.Configuration
 import play.api.i18n.I18nSupport
 import play.api.libs.ws.WSClient
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import queries.GetAccount
-import utilities.{LoginState, PushNotification}
+import utilities.PushNotification
 import views.companion.master.Login
 
 import scala.concurrent.ExecutionContext
@@ -31,29 +33,27 @@ class LoginController @Inject()(messagesControllerComponents: MessagesController
       },
       loginData => {
         try {
-          implicit val loginState:LoginState = LoginState(loginData.username)
-          val userType = masterAccounts.Service.validateLoginAndGetUserType(loginData.username, loginData.password)
-          val address = masterAccounts.Service.getAddress(loginData.username)
+          implicit val loginState:LoginState = LoginState(loginData.username, masterAccounts.Service.validateLoginAndGetUserType(loginData.username, loginData.password), masterAccounts.Service.getAddress(loginData.username))
           pushNotification.registerNotificationToken(loginData.username, loginData.notificationToken)
           pushNotification.sendNotification(loginData.username, constants.Notification.LOGIN, loginData.username)
-          userType match {
+          loginState.userType match {
             case constants.User.GENESIS =>
-              withUsernameToken.Ok(views.html.genesisIndex(username = loginData.username), loginData.username)
+              withUsernameToken.Ok(views.html.genesisIndex(), loginData.username)
             case constants.User.ZONE =>
-              withUsernameToken.Ok(views.html.zoneIndex(username = loginData.username, zone = masterZones.Service.get(blockchainZones.Service.getID(address))), loginData.username)
+              withUsernameToken.Ok(views.html.zoneIndex(zone = masterZones.Service.get(blockchainZones.Service.getID(loginState.address))), loginData.username)
             case constants.User.ORGANIZATION =>
-              withUsernameToken.Ok(views.html.organizationIndex(username = loginData.username, organization = masterOrganizations.Service.get(blockchainOrganizations.Service.getID(address))), loginData.username)
+              withUsernameToken.Ok(views.html.organizationIndex(organization = masterOrganizations.Service.get(blockchainOrganizations.Service.getID(loginState.address))), loginData.username)
             case constants.User.TRADER =>
-              val aclAccount = blockchainAclAccounts.Service.get(address)
-              val fiatPegWallet = blockchainFiats.Service.getFiatPegWallet(address)
-              withUsernameToken.Ok(views.html.traderIndex(username = loginData.username, totalFiat = fiatPegWallet.map(_.transactionAmount.toInt).sum, zone = masterZones.Service.get(aclAccount.zoneID), organization = masterOrganizations.Service.get(aclAccount.organizationID), aclHash = blockchainAclHashes.Service.get(aclAccount.aclHash)), loginData.username)
+              val aclAccount = blockchainAclAccounts.Service.get(loginState.address)
+              val fiatPegWallet = blockchainFiats.Service.getFiatPegWallet(loginState.address)
+              withUsernameToken.Ok(views.html.traderIndex(totalFiat = fiatPegWallet.map(_.transactionAmount.toInt).sum, zone = masterZones.Service.get(aclAccount.zoneID), organization = masterOrganizations.Service.get(aclAccount.organizationID), aclHash = blockchainAclHashes.Service.get(aclAccount.aclHash)), loginData.username)
             case constants.User.USER =>
-              withUsernameToken.Ok(views.html.userIndex(username = loginData.username), loginData.username)
+              withUsernameToken.Ok(views.html.userIndex(), loginData.username)
             case constants.User.UNKNOWN =>
-              withUsernameToken.Ok(views.html.anonymousIndex(username = loginData.username), loginData.username)
+              withUsernameToken.Ok(views.html.anonymousIndex(), loginData.username)
             case constants.User.WITHOUT_LOGIN =>
               masterAccounts.Service.updateUserType(loginData.username, constants.User.UNKNOWN)
-              withUsernameToken.Ok(views.html.anonymousIndex(username = loginData.username), loginData.username)
+              withUsernameToken.Ok(views.html.anonymousIndex(), loginData.username)
           }
         }
         catch {

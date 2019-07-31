@@ -58,7 +58,7 @@ class AccountFiles @Inject()(protected val databaseConfigProvider: DatabaseConfi
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => documentType match {
-        case constants.File.PROFILE_PICTURE => Array()
+        case constants.File.PROFILE_PICTURE => Array[Byte]()
         case _ => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
           throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
       }

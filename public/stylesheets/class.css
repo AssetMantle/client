@@ -201,7 +201,7 @@ filter: blur(5 px);
 
 
 .hidden {
-    display: None;
+    display: none;
 }
 
 /*Flex*/
@@ -250,14 +250,13 @@ filter: blur(5 px);
 
 .flexContainer {
     display: flex;
-    justify-content: center;
+    justify-content: left;
     flex-wrap: wrap;
+    align-items: flex-start;
 }
 
 .flexItem {
-    margin: 20px;
     text-align: center;
-    padding: 10px;
     padding-top: 15px;
 }
 
@@ -274,9 +273,29 @@ filter: blur(5 px);
 /*Box*/
 .box {
     border: 2px solid #8faab8;
-    margin: 10px;
     border-radius: 10px;
     padding-bottom: 15px;
+}
+
+.firstBox {
+    width: 30%;
+    margin-left: 10px;
+    margin-bottom: 10px;
+    padding-right: 10px;
+}
+
+.secondBox {
+    width: 100%;
+    margin-left: 10px;
+    margin-bottom: 10px;
+    padding-right: 10px;
+}
+
+.thirdBox{
+    width: 200px;
+    margin-left: 10px;
+    margin-bottom: 10px;
+    padding-right: 10px;
 }
 
 .box:hover {
@@ -335,6 +354,31 @@ filter: blur(5 px);
     text-align: center;
 }
 
+.leftMargin {
+    margin-left: 10px;
+}
+
+.rightPadding {
+    padding-right: 10px;
+}
+
+.scrollableFirst {
+    min-height: min-content;
+    max-height: 85vh;
+    overflow-y: scroll;
+}
+
+.scrollableSecond {
+    min-height: min-content;
+    max-height: 50vh;
+    overflow-y: scroll;
+}
+
+.scrollableThird {
+    min-height: min-content;
+    max-height: 20vh;
+    overflow-y: scroll;
+}
 /*.info {*/
 /*    display: none;*/
 /*}*/
@@ -352,6 +396,10 @@ filter: blur(5 px);
     background-color: #5eaf50;
 }
 
+.profilePicture{
+    height: 100px;
+    width: 100px;
+}
 /* Progress Bar*/
 
 /*ToolTip*/

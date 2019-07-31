@@ -1,72 +1,32 @@
-@import models.blockchain.{ACLHash, Asset, Fiat, Negotiation, Order}
+@import controllers.actions.LoginState
+@import models.blockchain.ACLHash
 @import models.master.{Organization, Zone}
-@import utilities.LoginState
-
-@(username: String, totalFiat: Int, zone: Zone, organization: Organization, aclHash: ACLHash)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+@(totalFiat: Int, zone: Zone, organization: Organization, aclHash: ACLHash)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
 @common(Messages(constants.User.HOME))(Html(""))(center)(right)
 
 @right = {
 
-    @if(aclHash.buyerExecuteOrder) {
-        <a onclick="getForm(jsRoutes.controllers.BuyerExecuteOrderController.buyerExecuteOrderForm())">@Messages(constants.Form.BUYER_EXECUTE_ORDER)</a>
-    } <br>
-    @*
-    @if(aclHash.changeBuyerBid) {
-        <a onclick="getForm(jsRoutes.controllers.ChangeBuyerBidController.changeBuyerBidForm())">@Messages(constants.Form.CHANGE_BUYER_BID)</a>
-    } <br>
-    @if(aclHash.changeSellerBid) {
-        <a onclick="getForm(jsRoutes.controllers.ChangeSellerBidController.changeSellerBidForm())">@Messages(constants.Form.CHANGE_SELLER_BID)</a>
-    } <br>
-    @if(aclHash.confirmBuyerBid) {
-        <a onclick="getForm(jsRoutes.controllers.ConfirmBuyerBidController.confirmBuyerBidForm())">@Messages(constants.Form.CONFIRM_BUYER_BID)</a>
-    } <br>
-    @if(aclHash.confirmSellerBid) {
-        <a onclick="getForm(jsRoutes.controllers.ConfirmSellerBidController.confirmSellerBidForm())">@Messages(constants.Form.CONFIRM_SELLER_BID)</a>
-    } <br>
-    *@
-    @if(aclHash.issueAsset) {
-        <a onclick="getForm(jsRoutes.controllers.IssueAssetController.issueAssetRequestForm())">@Messages(constants.Form.ISSUE_ASSET_REQUEST)</a>
-    } <br>
-    @if(aclHash.issueFiat) {
-        <a onclick="getForm(jsRoutes.controllers.IssueFiatController.issueFiatRequestForm())">@Messages(constants.Form.ISSUE_FIAT_REQUEST)</a>
-    } <br>
-    @if(aclHash.redeemAsset) {
-        <a onclick="getForm(jsRoutes.controllers.RedeemAssetController.redeemAssetForm())">@Messages(constants.Form.REDEEM_ASSET)</a>
-    } <br>
-    @if(aclHash.redeemFiat) {
-        <a onclick="getForm(jsRoutes.controllers.RedeemFiatController.redeemFiatForm())">@Messages(constants.Form.REDEEM_FIAT)</a>
-    } <br>
-    @if(aclHash.releaseAsset) {
-        <a onclick="getForm(jsRoutes.controllers.ReleaseAssetController.releaseAssetForm())">@Messages(constants.Form.RELEASE_ASSET)</a>
-    } <br>
-    @if(aclHash.sellerExecuteOrder) {
-        <a onclick="getForm(jsRoutes.controllers.SellerExecuteOrderController.sellerExecuteOrderForm())">@Messages(constants.Form.SELLER_EXECUTE_ORDER)</a>
-    } <br>
-  @*
-  @if(aclHash.sendAsset) {
-        <a onclick="getForm(jsRoutes.controllers.SendAssetController.sendAssetForm())">@Messages(constants.Form.SEND_ASSET)</a>
-    } <br>
-    @if(aclHash.sendFiat) {
-        <a onclick="getForm(jsRoutes.controllers.SendFiatController.sendFiatForm())">@Messages(constants.Form.SEND_FIAT)</a>
-    } <br>
-    *@
-    <a onclick="getForm(jsRoutes.controllers.SetBuyerFeedbackController.setBuyerFeedbackForm())">@Messages(constants.Form.SET_BUYER_FEEDBACK)</a>
-    <br>
-    <a onclick="getForm(jsRoutes.controllers.SetSellerFeedbackController.setSellerFeedbackForm())">@Messages(constants.Form.SET_SELLER_FEEDBACK)</a>
-    <br>
+@if(aclHash.buyerExecuteOrder) {
+    <a onclick="getForm(jsRoutes.controllers.BuyerExecuteOrderController.unmoderatedBuyerExecuteOrderForm())">@Messages(constants.Form.BUYER_EXECUTE_ORDER)</a>
+} <br>
 
-    }
+@if(aclHash.sellerExecuteOrder) {
+    <a onclick="getForm(jsRoutes.controllers.SellerExecuteOrderController.unmoderatedSellerExecuteOrderForm())">@Messages(constants.Form.SELLER_EXECUTE_ORDER)</a>
+} <br>
+}
 
 @center = {
     <div class="flexContainer">
-        <div id="commonHome" class="box flexItem flexGrowth"></div>
+        <div id="commonHome" class="box flexItem flexGrowth">
+        </div>
+        <button onclick="getForm(jsRoutes.controllers.FileController.updateTraderKycForm('@constants.File.IDENTIFICATION'))">@Messages(constants.Form.UPDATE_TRADER_IDENTIFICATION)</button>
+
         <div class="flexGrowth flexItem box leftText">
             <div>
                 <h2 class="showHide toggleElement centerText">@Messages(constants.Form.ZONE):</h2>
             </div>
             <div id="zone">
-
             </div>
         </div>
         <div class="flexGrowth flexItem box leftText">
@@ -74,14 +34,14 @@
                 <h2 class="showHide toggleElement centerText">@Messages(constants.Form.ORGANIZATION):</h2>
             </div>
             <div id="organization">
-
             </div>
         </div>
     </div>
+
     <div class="flexContainer">
         <div class="flexGrowth flexItem box leftText">
             <div>
-                <h2 class="showHide toggleElement centerText">@Messages(constants.User.ASSETS_OWNED) </h2>
+                <h2 class="showHide toggleElement centerText" onclick="fetchOrShowHide('assetList', jsRoutes.controllers.ComponentViewController.assetList(), this)">@Messages(constants.User.ASSETS_OWNED) </h2>
                 <div class="centerText">
                 @if(aclHash.issueAsset) {
                     <button onclick="getForm(jsRoutes.controllers.IssueAssetController.issueAssetRequestForm())">@Messages(constants.Form.ISSUE_ASSET_REQUEST)</button>
@@ -91,23 +51,20 @@
             <div id="assetList" class="flexContainer"></div>
             <script type="text/javascript">
                     var assetCometMessage = function (event) {
-                        componentResource('assetList', jsRoutes.controllers.ComponentViewController.assetList('@username'));
+                        componentResource('assetList', jsRoutes.controllers.ComponentViewController.assetList());
                     }
             </script>
         </div>
 
         <div class="flexGrowth flexItem box leftText">
             <div>
-                <h2 class="showHide toggleElement centerText">@Messages(constants.User.FIATS_OWNED): <span id="totalFiat">@totalFiat</span></h2>
+                <h2 class="showHide toggleElement centerText" onclick="fetchOrShowHide('fiatList', jsRoutes.controllers.ComponentViewController.fiatList(), this)">@Messages(constants.User.FIATS_OWNED): <span id="totalFiat">@totalFiat</span></h2>
                 <div class="centerText">
                     @if(aclHash.issueFiat) {
                         <button onclick="getForm(jsRoutes.controllers.IssueFiatController.issueFiatRequestForm())">@Messages(constants.Form.ISSUE_FIAT_REQUEST)</button>
                     }
                     @if(aclHash.redeemFiat) {
-                        <button onclick="getForm(jsRoutes.controllers.RedeemFiatController.redeemFiatForm())">@Messages(constants.Form.REDEEM_FIAT)</button>
-                    }
-                    @if(aclHash.sendFiat) {
-                        <button onclick="getForm(jsRoutes.controllers.SendFiatController.sendFiatForm())">@Messages(constants.Form.SEND_FIAT)</button>
+                        <button onclick="getForm(jsRoutes.controllers.RedeemFiatController.redeemFiatForm('@loginState.address'))">@Messages(constants.Form.REDEEM_FIAT)</button>
                     }
                 </div>
             </div>
@@ -115,7 +72,7 @@
             <script type="text/javascript">
                     var fiatCometMessage = function (event) {
                         $('#totalFiat').html(event);
-                        componentResource('fiatList', jsRoutes.controllers.ComponentViewController.fiatList('@username'));
+                        componentResource('fiatList', jsRoutes.controllers.ComponentViewController.fiatList());
                     }
             </script>
         </div>
@@ -124,33 +81,69 @@
             <div>
                 <h2 class="showHide toggleElement centerText">@Messages(constants.Form.ON_GOING_NEGOTIATIONS)</h2>
             </div>
-            <div id="negotiationList" class ="flexContainer"></div>
-            <script type="text/javascript">
-                    var negotiationCometMessage = function (event) {
-                        componentResource('negotiationList', jsRoutes.controllers.ComponentViewController.negotiationList('@username'));
-                    }
-            </script>
+            <div class ="flexContainer">
+                <div class="box">
+                    <div>
+                        <h2 class="showHide toggleElement centerText" onclick="fetchOrShowHide('buyNegotiationList', jsRoutes.controllers.ComponentViewController.buyNegotiationList(), this)">@Messages(constants.Form.BUY)</h2>
+                    </div>
+                    <div id="buyNegotiationList" class ="flexContainer"></div>
+                    <script type="text/javascript">
+                            var buyNegotiationCometMessage = function (event) {
+                                componentResource('buyNegotiationList', jsRoutes.controllers.ComponentViewController.buyNegotiationList());
+                            }
+                    </script>
+                </div>
+
+                <div class="box">
+                    <div>
+                        <h2 class="showHide toggleElement centerText" onclick="fetchOrShowHide('sellNegotiationList', jsRoutes.controllers.ComponentViewController.sellNegotiationList(), this)">@Messages(constants.Form.SELL)</h2>
+                    </div>
+                    <div id="sellNegotiationList" class ="flexContainer"></div>
+                    <script type="text/javascript">
+                            var sellNegotiationCometMessage = function (event) {
+                                componentResource('sellNegotiationList', jsRoutes.controllers.ComponentViewController.sellNegotiationList());
+                            }
+                    </script>
+                </div>
+            </div>
         </div>
+
         <div class="flexGrowth flexItem box leftText">
             <div>
-                <h2 class="showHide toggleElement centerText">@Messages(constants.Form.ON_GOING_ORDERS)</h2>
+                <h2 class="showHide toggleElement centerText" onclick="fetchOrShowHide('orderList', jsRoutes.controllers.ComponentViewController.orderList(), this)">@Messages(constants.Form.ON_GOING_ORDERS)</h2>
             </div>
             <div id="orderList" class="flexContainer"></div>
             <script type="text/javascript">
                     var orderCometMessage = function (event) {
-                        componentResource('orderList', jsRoutes.controllers.ComponentViewController.orderList('@username'));
+                        componentResource('orderList', jsRoutes.controllers.ComponentViewController.orderList());
                     }
             </script>
         </div>
+
+        <div class="flexGrowth flexItem box leftText">
+            <div>
+                <h2 class="showHide toggleElement centerText">@Messages(constants.Form.SUBMIT_FEEDBACK)</h2>
+            </div>
+            <div class ="flexContainer">
+                <div class="box">
+                    <div>
+                        <h2 class="showHide toggleElement centerText" onclick="fetchOrShowHide('setBuyerFeedbackList', jsRoutes.controllers.SetBuyerFeedbackController.buyerFeedbackList(), this)">@Messages(constants.Form.BUY_ORDER_FEEDBACKS)</h2>
+                    </div>
+                    <div id="setBuyerFeedbackList" class="flexContainer"></div>
+                </div>
+                <div class="box">
+                    <div>
+                        <h2 class="showHide toggleElement centerText" onclick="fetchOrShowHide('setSellerFeedbackList', jsRoutes.controllers.SetSellerFeedbackController.sellerFeedbackList(), this)">@Messages(constants.Form.SELL_ORDER_FEEDBACKS)</h2>
+                    </div>
+                    <div id="setSellerFeedbackList" class="flexContainer"></div>
+                </div>
+            </div>
+        </div>
     </div>
     <script>
-            componentResource('commonHome', jsRoutes.controllers.ComponentViewController.commonHome('@username'));
-            componentResource('zone', jsRoutes.controllers.ComponentViewController.zoneDetails('@username'));
-            componentResource('organization', jsRoutes.controllers.ComponentViewController.organizationDetails('@username'));
-            componentResource('assetList', jsRoutes.controllers.ComponentViewController.assetList('@username'));
-            componentResource('fiatList', jsRoutes.controllers.ComponentViewController.fiatList('@username'));
-            componentResource('negotiationList', jsRoutes.controllers.ComponentViewController.negotiationList('@username'));
-            componentResource('orderList', jsRoutes.controllers.ComponentViewController.orderList('@username'));
+            componentResource('commonHome', jsRoutes.controllers.ComponentViewController.commonHome());
+            componentResource('zone', jsRoutes.controllers.ComponentViewController.zoneDetails());
+            componentResource('organization', jsRoutes.controllers.ComponentViewController.organizationDetails());
     </script>
     <iframe class="hidden" src="@routes.ComponentViewController.assetComet"></iframe>
     <iframe class="hidden" src="@routes.ComponentViewController.fiatComet"></iframe>
