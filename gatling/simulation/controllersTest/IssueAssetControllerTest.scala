@@ -105,13 +105,13 @@ object issueAssetControllerTest {
         Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
 
   def getRequestIDForIssueAsset(query: String): String = {
-    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://localhost:5432/comdex", "comdex", "comdex",
+    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://localhost:5432/commitCentral", "commitCentral", "commitCentral",
       s"""SELECT COALESCE((SELECT "id" FROM master_transaction."IssueAssetRequest" WHERE "accountID" = '$query'),'0') AS "id";""")
     sqlQueryFeeder.apply().next()("id").toString
   }
 
   def getPegHashByOwnerAddress(ownerAddress: String): String = {
-    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://localhost:5432/comdex", "comdex", "comdex",
+    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://localhost:5432/commitCentral", "commitCentral", "commitCentral",
       s"""SELECT COALESCE((SELECT "pegHash" FROM blockchain."Asset_BC" WHERE "ownerAddress" = '$ownerAddress'),'0') AS "pegHash";""")
     sqlQueryFeeder.apply().next()("pegHash").toString
   }

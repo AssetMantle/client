@@ -39,11 +39,11 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   import databaseConfig.profile.api._
 
+  private val actorTimeout = configuration.get[Int]("akka.actors.timeout").seconds
+
   val mainAccountActor: ActorRef = actorSystem.actorOf(props = MainAccountActor.props(actorTimeout, actorSystem), name = constants.Module.ACTOR_MAIN_ACCOUNT)
 
   private[models] val accountTable = TableQuery[AccountTable]
-
-  private val actorTimeout = configuration.get[Int]("akka.actors.timeout").seconds
 
   private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
 
@@ -133,7 +133,9 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
   object Service {
 
     def create(username: String, password: String)(implicit executionContext: ExecutionContext): String = {
-      val addKeyResponse = addKey.Service.post(addKey.Request(username, password, getSeed.Service.get().body))
+      val request = addKey.Request(username, password, getSeed.Service.get().body)
+      val addKeyResponse = addKey.Service.post(request)
+      logger.info(request.toString)
       Await.result(add(Account(addKeyResponse.address, 0, addKeyResponse.pub_key, -1, 0, dirtyBit = false)), Duration.Inf)
     }
 
@@ -165,7 +167,7 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
         for (dirtyAddress <- dirtyAddresses) {
           val responseAccount = getAccount.Service.get(dirtyAddress)
           Service.refreshDirty(responseAccount.value.address, responseAccount.value.sequence.toInt, responseAccount.value.coins.get.filter(_.denom == denominationOfGasToken).map(_.amount.toInt).sum)
-          mainAccountActor ! AssetCometMessage(ownerAddress = dirtyAddress, message = Json.toJson(constants.Comet.PING))
+          mainAccountActor ! AccountCometMessage(ownerAddress = dirtyAddress, message = Json.toJson(constants.Comet.PING))
 
         }
       } catch {

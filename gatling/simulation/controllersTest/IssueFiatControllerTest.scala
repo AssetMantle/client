@@ -87,7 +87,7 @@ object issueFiatControllerTest {
         Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
 
   def getRequestIDForIssueFiat(query: String): String = {
-    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://localhost:5432/comdex", "comdex", "comdex",
+    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://localhost:5432/commitCentral", "commitCentral", "commitCentral",
       s"""SELECT COALESCE((SELECT "id" FROM master_transaction."IssueFiatRequest" WHERE "accountID" = '$query'),'0') AS "id";""")
     sqlQueryFeeder.apply().next()("id").toString
   }

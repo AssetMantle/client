@@ -1,7 +1,7 @@
 import _root_.io.gatling.sbt.GatlingPlugin
 import _root_.sbt.Keys._
 
-name := "comdex"
+name := "commitCentral"
 
 version := "1.0"
 

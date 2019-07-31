@@ -184,6 +184,7 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
         try {
           val assetPegWallet = getAccount.Service.get(dirtyAsset.ownerAddress).value.assetPegWallet.getOrElse(throw new BaseException(constants.Response.NO_RESPONSE))
           assetPegWallet.foreach(assetPeg => if (assetPegWallet.map(_.pegHash) contains dirtyAsset.pegHash) Service.insertOrUpdate(pegHash = assetPeg.pegHash, documentHash = assetPeg.documentHash, assetType = assetPeg.assetType, assetPrice = assetPeg.assetPrice, assetQuantity = assetPeg.assetQuantity, quantityUnit = assetPeg.quantityUnit, ownerAddress = dirtyAsset.ownerAddress, locked = assetPeg.locked, moderated = assetPeg.moderated, dirtyBit = false) else Service.deleteAsset(dirtyAsset.pegHash))
+          mainAssetActor ! AssetCometMessage(ownerAddress = dirtyAsset.ownerAddress, message = Json.toJson(constants.Comet.PING))
         }
         catch {
           case baseException: BaseException => logger.info(baseException.failure.message, baseException)

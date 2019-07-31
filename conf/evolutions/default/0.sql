@@ -1,11 +1,11 @@
 -- Create database and user scripts. To be run before evolutions are started.
 
 
-CREATE USER comdex WITH PASSWORD 'comdex';
+CREATE USER "commitCentral" WITH PASSWORD 'commitCentral';
 
-CREATE DATABASE comdex WITH OWNER = comdex;
+CREATE DATABASE "commitCentral" WITH OWNER = "commitCentral";
 
-ALTER USER comdex SET SEARCH_PATH = "$user", BLOCKCHAIN, BLOCKCHAIN_TRANSACTION, MASTER, MASTER_TRANSACTION;
+ALTER USER "commitCentral" SET SEARCH_PATH = "$user", BLOCKCHAIN, BLOCKCHAIN_TRANSACTION, MASTER, MASTER_TRANSACTION;
 
 
 

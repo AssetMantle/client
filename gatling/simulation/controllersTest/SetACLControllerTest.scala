@@ -79,7 +79,7 @@ object setACLControllerTest {
         Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
 
   def getAccountAddressByUsername(query: String): String = {
-    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://localhost:5432/comdex", "comdex", "comdex",
+    val sqlQueryFeeder = jdbcFeeder("jdbc:postgresql://localhost:5432/commitCentral", "commitCentral", "commitCentral",
       s"""SELECT COALESCE((SELECT "accountAddress" FROM master."Account" WHERE "id" = '$query'),'0') AS "accountAddress";""")
     sqlQueryFeeder.apply().next()("accountAddress").toString
   }
