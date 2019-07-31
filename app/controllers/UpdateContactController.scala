@@ -6,7 +6,6 @@ import models.master.Contacts
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
-import utilities.LoginState
 import views.companion.master.UpdateContact
 
 import scala.concurrent.ExecutionContext
@@ -16,19 +15,19 @@ class UpdateContactController @Inject()(messagesControllerComponents: MessagesCo
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  def updateContactForm(): Action[AnyContent] = Action { implicit request =>
+  def updateContactForm: Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.master.updateContact(UpdateContact.form, constants.CountryCallingCode.COUNTRY_CODES))
   }
 
-  def updateContact(): Action[AnyContent] = withLoginAction.authenticated { username =>
+  def updateContact: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       UpdateContact.form.bindFromRequest().fold(
         formWithErrors => {
           BadRequest(views.html.component.master.updateContact(formWithErrors, constants.CountryCallingCode.COUNTRY_CODES))
         },
-        updateContactData => {
-          implicit val loginState:LoginState = LoginState(username)
-          if (contacts.Service.insertOrUpdateEmailAndMobile(username, updateContactData.countryCode + updateContactData.mobileNumber, updateContactData.emailAddress)) Ok(views.html.index(successes = Seq(constants.Response.SUCCESS))) else Ok(views.html.index(failures = Seq(constants.Response.FAILURE)))
+        signUpData => {
+
+          if (contacts.Service.insertOrUpdateEmailAndMobile(loginState.username, signUpData.countryCode + signUpData.mobileNumber, signUpData.emailAddress)) Ok(views.html.index(successes = Seq(constants.Response.SUCCESS))) else Ok(views.html.index(failures = Seq(constants.Response.FAILURE)))
         }
       )
   }

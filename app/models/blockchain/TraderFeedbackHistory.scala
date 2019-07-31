@@ -36,7 +36,7 @@ class TraderFeedbackHistories @Inject()(protected val databaseConfigProvider: Da
     }
   }
 
-  private def update(traderFeedbackHistory: TraderFeedbackHistory): Future[Int] = db.run(traderFeedbackHistoryTable.filter(_.address === traderFeedbackHistory.address).filter(_.buyerAddress === traderFeedbackHistory.buyerAddress).filter(_.sellerAddress === traderFeedbackHistory.sellerAddress).filter(_.pegHash === traderFeedbackHistory.pegHash).update(traderFeedbackHistory).asTry).map {
+  private def updateTraderFeedbackHistory(traderFeedbackHistory: TraderFeedbackHistory): Future[Int] = db.run(traderFeedbackHistoryTable.filter(_.address === traderFeedbackHistory.address).filter(_.buyerAddress === traderFeedbackHistory.buyerAddress).filter(_.sellerAddress === traderFeedbackHistory.sellerAddress).filter(_.pegHash === traderFeedbackHistory.pegHash).update(traderFeedbackHistory).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -45,6 +45,10 @@ class TraderFeedbackHistories @Inject()(protected val databaseConfigProvider: Da
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }
   }
+
+  private def findBuyersByNullRating(address: String): Future[Seq[TraderFeedbackHistory]] = db.run(traderFeedbackHistoryTable.filter(_.buyerAddress === address).filter(_.rating === "").filterNot(_.address === address).result)
+
+  private def findSellersByNullRating(address: String): Future[Seq[TraderFeedbackHistory]] = db.run(traderFeedbackHistoryTable.filter(_.sellerAddress === address).filter(_.rating === "").filterNot(_.address === address).result)
 
   private def findById(address: String): Future[Seq[TraderFeedbackHistory]] = db.run(traderFeedbackHistoryTable.filter(_.address === address).result)
 
@@ -80,7 +84,13 @@ class TraderFeedbackHistories @Inject()(protected val databaseConfigProvider: Da
 
     def create(address: String, buyerAddress: String, sellerAddress: String, pegHash: String, rating: String): String = Await.result(add(TraderFeedbackHistory(address, buyerAddress, sellerAddress, pegHash, rating)), Duration.Inf)
 
+    def update(address: String, buyerAddress: String, sellerAddress: String, pegHash: String, rating: String): Int = Await.result(updateTraderFeedbackHistory(TraderFeedbackHistory(address, buyerAddress, sellerAddress, pegHash, rating)), Duration.Inf)
+
     def get(address: String): Seq[TraderFeedbackHistory] = Await.result(findById(address), Duration.Inf)
+
+    def getNullRatingsForBuyerFeedback(buyerAddress: String): Seq[TraderFeedbackHistory] = Await.result(findBuyersByNullRating(buyerAddress), Duration.Inf)
+
+    def getNullRatingsForSellerFeedback(sellerAddress: String): Seq[TraderFeedbackHistory] = Await.result(findSellersByNullRating(sellerAddress), Duration.Inf)
   }
 
 }

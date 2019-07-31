@@ -2,25 +2,13 @@
 
 @(issueFiatRequests: Seq[IssueFiatRequest])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
 
+@for(issueFiatRequest <- issueFiatRequests) {
+    <div class="flexItem box firstBox leftText lightBlue">
+        <span class="red">@Messages(constants.Form.ACCOUNT_ID)</span> : @issueFiatRequest.accountID <br>
+        <span class="red">@Messages(constants.Form.DOCUMENT_HASH)</span> : @issueFiatRequest.transactionID <br>
+        <span class="red">@Messages(constants.Form.ASSET_TYPE)</span> : @issueFiatRequest.transactionAmount <br>
+        <button class="approve" onclick="getForm(jsRoutes.controllers.IssueFiatController.issueFiatForm('@issueFiatRequest.id', '@issueFiatRequest.accountID', '@issueFiatRequest.transactionID', @issueFiatRequest.transactionAmount))">@Messages(constants.Form.APPROVE)</button> <button class="reject" onclick="getForm(jsRoutes.controllers.IssueFiatController.rejectIssueFiatRequestForm('@issueFiatRequest.id'))">@Messages(constants.Form.REJECT)</button>
+    </div>
+}
 
-<table>
-    <tr>
-        <th>@Messages(constants.Form.ID)</th>
-        <th>@Messages(constants.Form.ACCOUNT_ID)</th>
-        <th>@Messages(constants.Form.TRANSACTION_ID)</th>
-        <th>@Messages(constants.Form.TRANSACTION_AMOUNT)</th>
-        <th>@Messages(constants.Form.STATUS)</th>
-    </tr>
-    @for(issueFiatRequest <- issueFiatRequests) {
-        <tr>
-            <td>@issueFiatRequest.id</td>
-            <td>@issueFiatRequest.accountID</td>
-            <td>@issueFiatRequest.transactionID</td>
-            <td>@issueFiatRequest.transactionAmount</td>
-            <td>
-                <button class="approve" onclick="getForm(jsRoutes.controllers.IssueFiatController.issueFiatForm('@issueFiatRequest.id', '@issueFiatRequest.accountID', '@issueFiatRequest.transactionID', @issueFiatRequest.transactionAmount))">@Messages(constants.Form.APPROVE)</button> <button class="reject" onclick="getForm(jsRoutes.controllers.IssueFiatController.rejectIssueFiatRequestForm('@issueFiatRequest.id'))">@Messages(constants.Form.REJECT)</button>
-            </td>
-        </tr>
-    }
-</table>
 <br>

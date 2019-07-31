@@ -24,7 +24,7 @@ class LogoutController @Inject()(messagesControllerComponents: MessagesControlle
     Ok(views.html.component.master.logout(Logout.form))
   }
 
-  def logout: Action[AnyContent] = withLoginAction.authenticated { username =>
+  def logout: Action[AnyContent] = withLoginAction.authenticated { loginState =>
     implicit request =>
       Logout.form.bindFromRequest().fold(
         formWithErrors => {
@@ -33,16 +33,16 @@ class LogoutController @Inject()(messagesControllerComponents: MessagesControlle
         loginData => {
           try {
             if (!loginData.receiveNotifications) {
-              accountTokens.Service.deleteToken(username)
+              accountTokens.Service.deleteToken(loginState.username)
             }
-            shutdownActors.onLogOut(constants.Module.ACTOR_MAIN_ACCOUNT, username)
-            if (masterAccounts.Service.getUserType(username) == constants.User.TRADER) {
-              shutdownActors.onLogOut(constants.Module.ACTOR_MAIN_ASSET, username)
-              shutdownActors.onLogOut(constants.Module.ACTOR_MAIN_FIAT, username)
-              shutdownActors.onLogOut(constants.Module.ACTOR_MAIN_NEGOTIATION, username)
-              shutdownActors.onLogOut(constants.Module.ACTOR_MAIN_ORDER, username)
+            shutdownActors.onLogOut(constants.Module.ACTOR_MAIN_ACCOUNT, loginState.username)
+            if (masterAccounts.Service.getUserType(loginState.username) == constants.User.TRADER) {
+              shutdownActors.onLogOut(constants.Module.ACTOR_MAIN_ASSET, loginState.username)
+              shutdownActors.onLogOut(constants.Module.ACTOR_MAIN_FIAT, loginState.username)
+              shutdownActors.onLogOut(constants.Module.ACTOR_MAIN_NEGOTIATION, loginState.username)
+              shutdownActors.onLogOut(constants.Module.ACTOR_MAIN_ORDER, loginState.username)
             }
-            accountTokens.Service.resetSessionTokenTime(username)
+            accountTokens.Service.resetSessionTokenTime(loginState.username)
             Ok(views.html.index(successes = Seq(constants.Response.LOGGED_OUT))).withNewSession
           }
           catch {

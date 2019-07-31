@@ -1,0 +1,18 @@
+@import controllers.actions.LoginState
+@()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+
+    @common(Messages(constants.Form.INDEX))(Html(""))(center)(Html(""))
+
+
+    @center = {
+        <div class="flexContainer">
+
+            <div class="flexGrowth box leftText lightBlue">
+                <div>
+                    <h2 class="showHide toggleElement centerText" onclick="fetchOrShowHide('genesisInformation', jsRoutes.controllers.AddZoneController.viewZonesInGenesis(), this)">@Messages(constants.Form.ZONES) </h2>
+                </div>
+                <div id="genesisInformation" class="flexContainer scrollableFirst"></div>
+            </div>
+        </div>
+
+    }
