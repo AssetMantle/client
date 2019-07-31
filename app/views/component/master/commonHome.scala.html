@@ -1,24 +1,30 @@
 @(username: String, userType: String, address: String, coins: Int = 0, profilePicture: Array[Byte])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
 
+<div class="width30Percent">
+    <img id="profilePicture" class="image img-raised rounded img-fluid" src="data:image/jpg;base64,@utilities.ImageProcess.decodeImageThumbnailData(profilePicture)" alt="profilePicture">
+    <br>
+    <button id="profilePictureBottomUploadButton" class="bottom btn btn-default btn-sm" onclick="getForm(jsRoutes.controllers.FileController.uploadAccountFileForm('@constants.File.PROFILE_PICTURE'))">@Messages(constants.Form.UPLOAD)</button>
+    <button id="profilePictureBottomUploadButton" class="bottom btn btn-default btn-sm" onclick="getForm(jsRoutes.controllers.FileController.updateAccountFileForm('@constants.File.PROFILE_PICTURE'))">@Messages(constants.Form.UPDATE)</button>
+</div>
 <div class="width70Percent">
     <div>
-        <h2 class="showHide toggleElement centerText">@username</h2>
-        <div class="centerText">
+        <h2 class="title leftText">@username</h2>
+        <div class="leftText">
             @Messages(constants.User.COINS): @coins
-        <button onclick="getForm(jsRoutes.controllers.SendCoinController.sendCoinForm())">@Messages(constants.Form.SEND_COIN)</button>
+        <button class="text-center btn btn-primary btn-sm" onclick="getForm(jsRoutes.controllers.SendCoinController.sendCoinForm())">@Messages(constants.Form.SEND_COIN)</button>
         </div>
     </div>
-    <div>
-        @Messages(constants.User.USER_TYPE): @userType <br/>
-        @Messages(constants.User.ADDRESS): @address <br/>
+    <br>
+    <div class="leftText">
+      <p> @Messages(constants.User.USER_TYPE): @userType </p>
+        <p> @Messages(constants.User.ADDRESS):<span id="text_element" class="hash_code"> @address</span> <span onclick="copyToClipboard('text_element')"> <i class="fa fa-clipboard"></i></span></p>
+
+    </div>
+    <div class="tooltip">Hover over me
+        <span class="tooltiptext"  onclick="copyToClipboard('text_element')">Tooltip text</span>
     </div>
 </div>
-<div class="width30Percent">
-    <img id="profilePicture" src="data:image/jpg;base64,@utilities.ImageProcess.decodeImageThumbnailData(profilePicture)" alt="profilePicture">
-    <br>
-    <button id="profilePictureBottomUploadButton" class="bottom" onclick="getForm(jsRoutes.controllers.FileController.uploadAccountFileForm('@constants.File.PROFILE_PICTURE'))">@Messages(constants.Form.UPLOAD)</button>
-    <button id="profilePictureBottomUploadButton" class="bottom" onclick="getForm(jsRoutes.controllers.FileController.updateAccountFileForm('@constants.File.PROFILE_PICTURE'))">@Messages(constants.Form.UPDATE)</button>
-</div>
+
 <script src="@routes.Assets.versioned("javascripts/viewFiles.js")" type="text/javascript"></script>
 <script type="text/javascript">
         var accountCometMessage = function (event) {

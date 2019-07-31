@@ -4,13 +4,13 @@
 @(confirmSellerBidForm: Form[ConfirmSellerBid.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @form(action = routes.ConfirmSellerBidController.blockchainConfirmSellerBid, 'onkeypress -> "validateForm(event,this)") {
     @CSRF.formField
-    @inputText(confirmSellerBidForm(constants.Form.FROM), '_label -> Messages(constants.Form.FROM))
-    @inputText(confirmSellerBidForm(constants.Form.TO), '_label -> Messages(constants.Form.TO))
-    @inputText(confirmSellerBidForm(constants.Form.BID), '_label -> Messages(constants.Form.BID))
-    @inputText(confirmSellerBidForm(constants.Form.TIME), '_label -> Messages(constants.Form.TIME))
-    @inputText(confirmSellerBidForm(constants.Form.PEG_HASH), '_label -> Messages(constants.Form.PEG_HASH))
-    @inputText(confirmSellerBidForm(constants.Form.GAS), '_label -> Messages(constants.Form.GAS))
-    @inputPassword(confirmSellerBidForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD))
+    @inputText(confirmSellerBidForm(constants.Form.FROM), '_label -> Messages(constants.Form.FROM),'class -> "form-control")
+    @inputText(confirmSellerBidForm(constants.Form.TO), '_label -> Messages(constants.Form.TO),'class -> "form-control")
+    @inputText(confirmSellerBidForm(constants.Form.BID), '_label -> Messages(constants.Form.BID),'class -> "form-control")
+    @inputText(confirmSellerBidForm(constants.Form.TIME), '_label -> Messages(constants.Form.TIME),'class -> "form-control")
+    @inputText(confirmSellerBidForm(constants.Form.PEG_HASH), '_label -> Messages(constants.Form.PEG_HASH),'class -> "form-control")
+    @inputText(confirmSellerBidForm(constants.Form.GAS), '_label -> Messages(constants.Form.GAS),'class -> "form-control")
+    @inputPassword(confirmSellerBidForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD),'class -> "form-control")
 
     @if(confirmSellerBidForm.hasGlobalErrors) {
         <ul>
@@ -19,5 +19,5 @@
         }
         </ul>
     }
-    <button type="button" onclick="submitForm(this)">@Messages(constants.Form.CONFIRM_SELLER_BID)</button>
+    <button type="button" class="btn btn-primary" onclick="submitForm(this)">@Messages(constants.Form.CONFIRM_SELLER_BID)</button>
 }

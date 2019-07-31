@@ -4,12 +4,12 @@
 @(issueFiatForm: Form[IssueFiat.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @form(action = routes.IssueFiatController.blockchainIssueFiat, 'onkeypress -> "validateForm(event,this)") {
     @CSRF.formField
-    @inputText(issueFiatForm(constants.Form.FROM), '_label -> Messages(constants.Form.FROM))
-    @inputText(issueFiatForm(constants.Form.TO), '_label -> Messages(constants.Form.TO))
-    @inputText(issueFiatForm(constants.Form.TRANSACTION_ID), '_label -> Messages(constants.Form.TRANSACTION_ID))
-    @inputText(issueFiatForm(constants.Form.TRANSACTION_AMOUNT), '_label -> Messages(constants.Form.TRANSACTION_AMOUNT))
-    @inputText(issueFiatForm(constants.Form.GAS), '_label -> Messages(constants.Form.GAS))
-    @inputPassword(issueFiatForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD))
+    @inputText(issueFiatForm(constants.Form.FROM), '_label -> Messages(constants.Form.FROM),'class -> "form-control")
+    @inputText(issueFiatForm(constants.Form.TO), '_label -> Messages(constants.Form.TO),'class -> "form-control")
+    @inputText(issueFiatForm(constants.Form.TRANSACTION_ID), '_label -> Messages(constants.Form.TRANSACTION_ID),'class -> "form-control")
+    @inputText(issueFiatForm(constants.Form.TRANSACTION_AMOUNT), '_label -> Messages(constants.Form.TRANSACTION_AMOUNT),'class -> "form-control")
+    @inputText(issueFiatForm(constants.Form.GAS), '_label -> Messages(constants.Form.GAS),'class -> "form-control")
+    @inputPassword(issueFiatForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD),'class -> "form-control")
 
     @if(issueFiatForm.hasGlobalErrors) {
         <ul>
@@ -18,5 +18,5 @@
         }
         </ul>
     }
-    <button type="button" onclick="submitForm(this)">@Messages(constants.Form.ISSUE_FIAT)</button>
+    <button type="button" class="btn btn-primary" onclick="submitForm(this)">@Messages(constants.Form.ISSUE_FIAT)</button>
 }

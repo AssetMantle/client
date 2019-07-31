@@ -4,11 +4,11 @@
 @(redeemAssetForm: Form[RedeemAsset.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @form(action = routes.RedeemAssetController.blockchainRedeemAsset, 'onkeypress -> "validateForm(event,this)") {
     @CSRF.formField
-    @inputText(redeemAssetForm(constants.Form.FROM), '_label -> Messages(constants.Form.FROM))
-    @inputText(redeemAssetForm(constants.Form.TO), '_label -> Messages(constants.Form.TO))
-    @inputText(redeemAssetForm(constants.Form.PEG_HASH), '_label -> Messages(constants.Form.PEG_HASH))
-    @inputText(redeemAssetForm(constants.Form.GAS), '_label -> Messages(constants.Form.GAS))
-    @inputPassword(redeemAssetForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD))
+    @inputText(redeemAssetForm(constants.Form.FROM), '_label -> Messages(constants.Form.FROM),'class -> "form-control")
+    @inputText(redeemAssetForm(constants.Form.TO), '_label -> Messages(constants.Form.TO),'class -> "form-control")
+    @inputText(redeemAssetForm(constants.Form.PEG_HASH), '_label -> Messages(constants.Form.PEG_HASH),'class -> "form-control")
+    @inputText(redeemAssetForm(constants.Form.GAS), '_label -> Messages(constants.Form.GAS),'class -> "form-control")
+    @inputPassword(redeemAssetForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD),'class -> "form-control")
 
     @if(redeemAssetForm.hasGlobalErrors) {
         <ul>
@@ -17,5 +17,5 @@
         }
         </ul>
     }
-    <button type="button" onclick="submitForm(this)">@Messages(constants.Form.REDEEM_ASSET)</button>
+    <button type="button" class="btn btn-primary" onclick="submitForm(this)">@Messages(constants.Form.REDEEM_ASSET)</button>
 }

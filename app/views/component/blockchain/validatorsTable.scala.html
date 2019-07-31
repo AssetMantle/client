@@ -1,6 +1,9 @@
 @()(implicit messagesProvider: MessagesProvider)
-<div id="validatorsTable" class="box">
-    <table>
+<div id="validatorsTable">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item" aria-current="page"  onclick='back()' > < @Messages(constants.Form.BACK)</>
+    </ol>
+    <table class="table white border">
         <thead>
             <tr>
                 <th>@Messages(constants.Form.OPERATOR)</th>
@@ -11,7 +14,6 @@
         </thead>
         <tbody id="validatorsTableBody"></tbody>
     </table>
-    <button onclick='back()' >@Messages(constants.Form.BACK)</button>
 </div>
 <script>validatorsTable("validatorsTableBody")</script>
 <script src="@routes.Assets.versioned("javascripts/validators.js")" type="text/javascript"></script>

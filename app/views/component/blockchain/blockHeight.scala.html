@@ -1,17 +1,23 @@
 @()(implicit messagesProvider: MessagesProvider)
-<div id="blockHeightBottomDivision" class="box">
-        @Messages(constants.Form.BLOCK): <p id="blockHeightPageHeight"></p> <br>
-        @Messages(constants.Form.TIME): <p id="blockHeightPageTime"></p> <br>
-        @Messages(constants.Form.NUM_TXS): <p id="blockHeightPageNumTxs"></p>
 
-        <h4>@Messages(constants.Form.TRANSACTIONS)</h4>
-        <p id="blockHeightPageDataHash"></p>
 
-        <h4>@Messages(constants.Form.EVIDENCE_HASH)</h4>
-        <p id="blockHeightPageEvidenceHash"></p>
+<div id="blockHeightBottomDivision" >
+        <ol class="breadcrumb">
+                <li class="breadcrumb-item" aria-current="page"  onclick='back()' > < @Messages(constants.Form.BACK)</>
+        </ol>
+        <div class="card card-body">
 
-        <h4>@Messages(constants.Form.VALIDATORS_HASH)</h4>
-        <p id="blockHeightPageValidatorsHash"></p>
+                @Messages(constants.Form.BLOCK): <p id="blockHeightPageHeight"></p> <br>
+                @Messages(constants.Form.TIME): <p id="blockHeightPageTime"></p> <br>
+                @Messages(constants.Form.NUM_TXS): <p id="blockHeightPageNumTxs"></p>
 
-    <button onclick='back()' >@Messages(constants.Form.BACK)</button>
+                <h4>@Messages(constants.Form.TRANSACTIONS)</h4>
+                <p id="blockHeightPageDataHash"></p>
+
+                <h4>@Messages(constants.Form.EVIDENCE_HASH)</h4>
+                <p id="blockHeightPageEvidenceHash"></p>
+
+                <h4>@Messages(constants.Form.VALIDATORS_HASH)</h4>
+                <p id="blockHeightPageValidatorsHash"></p>
+        </div>
 </div>

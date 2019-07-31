@@ -4,11 +4,11 @@
 @(releaseAssetForm: Form[ReleaseAsset.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @form(action = routes.ReleaseAssetController.blockchainReleaseAsset, 'onkeypress -> "validateForm(event,this)") {
     @CSRF.formField
-    @inputText(releaseAssetForm(constants.Form.FROM), '_label -> Messages(constants.Form.FROM))
-    @inputText(releaseAssetForm(constants.Form.TO), '_label -> Messages(constants.Form.TO))
-    @inputText(releaseAssetForm(constants.Form.PEG_HASH), '_label -> Messages(constants.Form.PEG_HASH))
-    @inputText(releaseAssetForm(constants.Form.GAS), '_label -> Messages(constants.Form.GAS))
-    @inputPassword(releaseAssetForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD))
+    @inputText(releaseAssetForm(constants.Form.FROM), '_label -> Messages(constants.Form.FROM),'class -> "form-control")
+    @inputText(releaseAssetForm(constants.Form.TO), '_label -> Messages(constants.Form.TO),'class -> "form-control")
+    @inputText(releaseAssetForm(constants.Form.PEG_HASH), '_label -> Messages(constants.Form.PEG_HASH),'class -> "form-control")
+    @inputText(releaseAssetForm(constants.Form.GAS), '_label -> Messages(constants.Form.GAS),'class -> "form-control")
+    @inputPassword(releaseAssetForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD),'class -> "form-control")
 
     @if(releaseAssetForm.hasGlobalErrors) {
         <ul>
@@ -17,5 +17,6 @@
         }
         </ul>
     }
-    <button type="button" onclick="submitForm(this)">@Messages(constants.Form.RELEASE_ASSET)</button>
+    <button type="button" class="btn btn-primary" onclick="submitForm(this)">@Messages(constants.Form.RELEASE_ASSET)</button>
+
 }

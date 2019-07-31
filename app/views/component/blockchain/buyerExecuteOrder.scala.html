@@ -4,13 +4,13 @@
 @(buyerExecuteOrderForm: Form[BuyerExecuteOrder.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @form(action = routes.BuyerExecuteOrderController.blockchainBuyerExecuteOrder, 'onkeypress -> "validateForm(event,this)") {
     @CSRF.formField
-    @inputText(buyerExecuteOrderForm(constants.Form.FROM), '_label -> Messages(constants.Form.FROM))
-    @inputText(buyerExecuteOrderForm(constants.Form.BUYER_ADDRESS), '_label -> Messages(constants.Form.BUYER_ADDRESS))
-    @inputText(buyerExecuteOrderForm(constants.Form.SELLER_ADDRESS), '_label -> Messages(constants.Form.SELLER_ADDRESS))
-    @inputText(buyerExecuteOrderForm(constants.Form.FIAT_PROOF_HASH), '_label -> Messages(constants.Form.FIAT_PROOF_HASH))
-    @inputText(buyerExecuteOrderForm(constants.Form.PEG_HASH), '_label -> Messages(constants.Form.PEG_HASH))
-    @inputText(buyerExecuteOrderForm(constants.Form.GAS), '_label -> Messages(constants.Form.GAS))
-    @inputPassword(buyerExecuteOrderForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD))
+    @inputText(buyerExecuteOrderForm(constants.Form.FROM), '_label -> Messages(constants.Form.FROM),'class -> "form-control")
+    @inputText(buyerExecuteOrderForm(constants.Form.BUYER_ADDRESS), '_label -> Messages(constants.Form.BUYER_ADDRESS),'class -> "form-control")
+    @inputText(buyerExecuteOrderForm(constants.Form.SELLER_ADDRESS), '_label -> Messages(constants.Form.SELLER_ADDRESS),'class -> "form-control")
+    @inputText(buyerExecuteOrderForm(constants.Form.FIAT_PROOF_HASH), '_label -> Messages(constants.Form.FIAT_PROOF_HASH),'class -> "form-control")
+    @inputText(buyerExecuteOrderForm(constants.Form.PEG_HASH), '_label -> Messages(constants.Form.PEG_HASH),'class -> "form-control")
+    @inputText(buyerExecuteOrderForm(constants.Form.GAS), '_label -> Messages(constants.Form.GAS),'class -> "form-control")
+    @inputPassword(buyerExecuteOrderForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD),'class -> "form-control")
 
     @if(buyerExecuteOrderForm.hasGlobalErrors) {
         <ul>
@@ -19,5 +19,5 @@
         }
         </ul>
     }
-    <button type="button" onclick="submitForm(this)">@Messages(constants.Form.BUYER_EXECUTE_ORDER)</button>
+    <button type="button" class="btn btn-primary" onclick="submitForm(this)">@Messages(constants.Form.BUYER_EXECUTE_ORDER)</button>
 }

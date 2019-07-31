@@ -4,11 +4,11 @@
 @(sendCoinForm: Form[SendCoin.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @form(action = routes.SendCoinController.blockchainSendCoin, 'onkeypress -> "validateForm(event,this)") {
     @CSRF.formField
-    @inputText(sendCoinForm(constants.Form.FROM), '_label -> Messages(constants.Form.FROM))
-    @inputText(sendCoinForm(constants.Form.TO), '_label -> Messages(constants.Form.TO))
-    @inputText(sendCoinForm(constants.Form.AMOUNT), '_label -> Messages(constants.Form.AMOUNT))
-    @inputText(sendCoinForm(constants.Form.GAS), '_label -> Messages(constants.Form.GAS))
-    @inputPassword(sendCoinForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD))
+    @inputText(sendCoinForm(constants.Form.FROM), '_label -> Messages(constants.Form.FROM),'class -> "form-control")
+    @inputText(sendCoinForm(constants.Form.TO), '_label -> Messages(constants.Form.TO),'class -> "form-control")
+    @inputText(sendCoinForm(constants.Form.AMOUNT), '_label -> Messages(constants.Form.AMOUNT),'class -> "form-control")
+    @inputText(sendCoinForm(constants.Form.GAS), '_label -> Messages(constants.Form.GAS),'class -> "form-control")
+    @inputPassword(sendCoinForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD),'class -> "form-control")
 
     @if(sendCoinForm.hasGlobalErrors) {
         <ul>
@@ -17,5 +17,5 @@
         }
         </ul>
     }
-    <button type="button" onclick="submitForm(this)">@Messages(constants.Form.SEND_COIN)</button>
+    <button type="button" class="btn btn-primary" onclick="submitForm(this)">@Messages(constants.Form.SEND_COIN)</button>
 }

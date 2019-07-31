@@ -4,11 +4,11 @@
 @(addOrganizationForm: Form[AddOrganization.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @form(action = routes.AddOrganizationController.blockchainAddOrganization, 'onkeypress -> "validateForm(event,this)") {
     @CSRF.formField
-    @inputText(addOrganizationForm(constants.Form.FROM), '_label -> Messages(constants.Form.FROM))
-    @inputText(addOrganizationForm(constants.Form.TO), '_label -> Messages(constants.Form.TO))
-    @inputText(addOrganizationForm(constants.Form.ORGANIZATION_ID), '_label -> Messages(constants.Form.ORGANIZATION_ID))
-    @inputText(addOrganizationForm(constants.Form.ZONE_ID), '_label -> Messages(constants.Form.ZONE_ID))
-    @inputPassword(addOrganizationForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD))
+    @inputText(addOrganizationForm(constants.Form.FROM), '_label -> Messages(constants.Form.FROM),'class -> "form-control")
+    @inputText(addOrganizationForm(constants.Form.TO), '_label -> Messages(constants.Form.TO),'class -> "form-control")
+    @inputText(addOrganizationForm(constants.Form.ORGANIZATION_ID), '_label -> Messages(constants.Form.ORGANIZATION_ID),'class -> "form-control")
+    @inputText(addOrganizationForm(constants.Form.ZONE_ID), '_label -> Messages(constants.Form.ZONE_ID),'class -> "form-control")
+    @inputPassword(addOrganizationForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD),'class -> "form-control")
 
     @if(addOrganizationForm.hasGlobalErrors) {
         <ul>
@@ -17,5 +17,5 @@
         }
         </ul>
     }
-    <button type="button" onclick="submitForm(this)">@Messages(constants.Form.ADD_ORGANIZATION)</button>
+    <button type="button" class="btn btn-primary" onclick="submitForm(this)">@Messages(constants.Form.ADD_ORGANIZATION)</button>
 }

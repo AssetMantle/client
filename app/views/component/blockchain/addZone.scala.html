@@ -4,10 +4,10 @@
 @(addZoneForm: Form[AddZone.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @form(action = routes.AddZoneController.blockchainAddZone, 'onkeypress -> "validateForm(event,this)") {
     @CSRF.formField
-    @inputText(addZoneForm(constants.Form.FROM), '_label -> Messages(constants.Form.FROM))
-    @inputText(addZoneForm(constants.Form.TO), '_label -> Messages(constants.Form.TO))
-    @inputText(addZoneForm(constants.Form.ZONE_ID), '_label -> Messages(constants.Form.ZONE_ID))
-    @inputPassword(addZoneForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD))
+    @inputText(addZoneForm(constants.Form.FROM), '_label -> Messages(constants.Form.FROM),'class -> "form-control")
+    @inputText(addZoneForm(constants.Form.TO), '_label -> Messages(constants.Form.TO),'class -> "form-control")
+    @inputText(addZoneForm(constants.Form.ZONE_ID), '_label -> Messages(constants.Form.ZONE_ID),'class -> "form-control")
+    @inputPassword(addZoneForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD),'class -> "form-control")
 
     @if(addZoneForm.hasGlobalErrors) {
         <ul>
@@ -16,5 +16,5 @@
         }
         </ul>
     }
-    <button type="button" onclick="submitForm(this)">@Messages(constants.Form.ADD_ZONE)</button>
+    <button type="button" class="btn btn-primary" onclick="submitForm(this)">@Messages(constants.Form.ADD_ZONE)</button>
 }

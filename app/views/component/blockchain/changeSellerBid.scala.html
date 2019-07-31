@@ -4,13 +4,13 @@
 @(changeSellerBidForm: Form[ChangeSellerBid.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @form(action = routes.ChangeSellerBidController.blockchainChangeSellerBid, 'onkeypress -> "validateForm(event,this)") {
     @CSRF.formField
-    @inputText(changeSellerBidForm(constants.Form.FROM), '_label -> Messages(constants.Form.FROM))
-    @inputText(changeSellerBidForm(constants.Form.TO), '_label -> Messages(constants.Form.TO))
-    @inputText(changeSellerBidForm(constants.Form.BID), '_label -> Messages(constants.Form.BID))
-    @inputText(changeSellerBidForm(constants.Form.TIME), '_label -> Messages(constants.Form.TIME))
-    @inputText(changeSellerBidForm(constants.Form.PEG_HASH), '_label -> Messages(constants.Form.PEG_HASH))
-    @inputText(changeSellerBidForm(constants.Form.GAS), '_label -> Messages(constants.Form.GAS))
-    @inputPassword(changeSellerBidForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD))
+    @inputText(changeSellerBidForm(constants.Form.FROM), '_label -> Messages(constants.Form.FROM),'class -> "form-control")
+    @inputText(changeSellerBidForm(constants.Form.TO), '_label -> Messages(constants.Form.TO),'class -> "form-control")
+    @inputText(changeSellerBidForm(constants.Form.BID), '_label -> Messages(constants.Form.BID),'class -> "form-control")
+    @inputText(changeSellerBidForm(constants.Form.TIME), '_label -> Messages(constants.Form.TIME),'class -> "form-control")
+    @inputText(changeSellerBidForm(constants.Form.PEG_HASH), '_label -> Messages(constants.Form.PEG_HASH),'class -> "form-control")
+    @inputText(changeSellerBidForm(constants.Form.GAS), '_label -> Messages(constants.Form.GAS),'class -> "form-control")
+    @inputPassword(changeSellerBidForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD),'class -> "form-control")
 
     @if(changeSellerBidForm.hasGlobalErrors) {
         <ul>
@@ -19,5 +19,5 @@
         }
         </ul>
     }
-    <button type="button" onclick="submitForm(this)">@Messages(constants.Form.CHANGE_SELLER_BID)</button>
+    <button type="button" class="btn btn-primary" onclick="submitForm(this)">@Messages(constants.Form.CHANGE_SELLER_BID)</button>
 }

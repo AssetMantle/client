@@ -3,13 +3,13 @@
 
 @common(Messages(constants.User.HOME))(Html(""))(center)(Html(""))
 @center = {
-    <div class="flexContainer">
-        <div id="commonHome" class="box flexItem flexGrowth"></div>
-    <div class="centerText">
-        <button onclick="getForm(jsRoutes.controllers.AddZoneController.viewPendingVerifyZoneRequests())">@Messages(constants.Form.PENDING_VERIFY_ZONE_REQUESTS)</button>
-        <button onclick="getForm(jsRoutes.controllers.SendCoinController.viewPendingFaucetRequests())">@Messages(constants.Form.APPROVE_FAUCET_REQUEST)</button>
-    </div>
-    </div>
+        <div class="flexContainer">
+            <div id="commonHome" class="box flexItem flexGrowth"></div>
+        <div class="centerText">
+            <button onclick="getForm(jsRoutes.controllers.AddZoneController.viewPendingVerifyZoneRequests())">@Messages(constants.Form.PENDING_VERIFY_ZONE_REQUESTS)</button>
+            <button onclick="getForm(jsRoutes.controllers.SendCoinController.viewPendingFaucetRequests())">@Messages(constants.Form.APPROVE_FAUCET_REQUEST)</button>
+        </div>
+        </div>
     <script>
         componentResource('commonHome', jsRoutes.controllers.ComponentViewController.commonHome('@username'))
     </script>

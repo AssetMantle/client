@@ -4,11 +4,11 @@
 @(redeemFiatForm: Form[RedeemFiat.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @form(action = routes.RedeemFiatController.blockchainRedeemFiat, 'onkeypress -> "validateForm(event,this)") {
     @CSRF.formField
-    @inputText(redeemFiatForm(constants.Form.FROM), '_label -> Messages(constants.Form.FROM))
-    @inputText(redeemFiatForm(constants.Form.TO), '_label -> Messages(constants.Form.TO))
-    @inputText(redeemFiatForm(constants.Form.REDEEM_AMOUNT), '_label -> Messages(constants.Form.REDEEM_AMOUNT))
-    @inputText(redeemFiatForm(constants.Form.GAS), '_label -> Messages(constants.Form.GAS))
-    @inputPassword(redeemFiatForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD))
+    @inputText(redeemFiatForm(constants.Form.FROM), '_label -> Messages(constants.Form.FROM),'class -> "form-control")
+    @inputText(redeemFiatForm(constants.Form.TO), '_label -> Messages(constants.Form.TO),'class -> "form-control")
+    @inputText(redeemFiatForm(constants.Form.REDEEM_AMOUNT), '_label -> Messages(constants.Form.REDEEM_AMOUNT),'class -> "form-control")
+    @inputText(redeemFiatForm(constants.Form.GAS), '_label -> Messages(constants.Form.GAS),'class -> "form-control")
+    @inputPassword(redeemFiatForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD),'class -> "form-control")
 
     @if(redeemFiatForm.hasGlobalErrors) {
         <ul>
@@ -17,5 +17,5 @@
         }
         </ul>
     }
-    <button type="button" onclick="submitForm(this)">@Messages(constants.Form.REDEEM_FIAT)</button>
+    <button type="button" class="btn btn-primary" onclick="submitForm(this)">@Messages(constants.Form.REDEEM_FIAT)</button>
 }

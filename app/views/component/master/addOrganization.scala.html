@@ -4,11 +4,11 @@
 @(addOrganizationForm: Form[AddOrganization.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @form(action = routes.AddOrganizationController.addOrganization, 'onkeypress -> "validateForm(event,this)") {
     @CSRF.formField
-    @inputText(addOrganizationForm(constants.Form.ZONE_ID), '_label -> Messages(constants.Form.ZONE_ID))
-    @inputText(addOrganizationForm(constants.Form.NAME), '_label -> Messages(constants.Form.NAME))
-    @inputText(addOrganizationForm(constants.Form.ADDRESS), '_label -> Messages(constants.Form.ADDRESS))
-    @inputText(addOrganizationForm(constants.Form.PHONE), '_label -> Messages(constants.Form.PHONE))
-    @inputText(addOrganizationForm(constants.Form.EMAIL), '_label -> Messages(constants.Form.EMAIL))
+    @inputText(addOrganizationForm(constants.Form.ZONE_ID), '_label -> Messages(constants.Form.ZONE_ID),'class -> "form-control")
+    @inputText(addOrganizationForm(constants.Form.NAME), '_label -> Messages(constants.Form.NAME),'class -> "form-control")
+    @inputText(addOrganizationForm(constants.Form.ADDRESS), '_label -> Messages(constants.Form.ADDRESS),'class -> "form-control")
+    @inputText(addOrganizationForm(constants.Form.PHONE), '_label -> Messages(constants.Form.PHONE),'class -> "form-control")
+    @inputText(addOrganizationForm(constants.Form.EMAIL), '_label -> Messages(constants.Form.EMAIL),'class -> "form-control")
 
     @if(addOrganizationForm.hasGlobalErrors) {
         <ul>

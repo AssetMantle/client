@@ -4,8 +4,9 @@
 @(signUpForm: Form[SignUp.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @form(action = routes.SignUpController.signUp, 'onkeypress -> "validateForm(event,this)") {
     @CSRF.formField
-    @inputText(signUpForm(constants.Form.USERNAME), '_label -> Messages(constants.Form.USERNAME), 'id -> "username") <label id="result"></label>
-    @inputPassword(signUpForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD))
+    <div id="modal_close" onclick="modal_close()" class="close">x</div>
+    @inputText(signUpForm(constants.Form.USERNAME), '_label -> Messages(constants.Form.USERNAME), 'id -> "username", 'class-> "form-control"    ) <label id="result"></label>
+    @inputPassword(signUpForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD), 'class-> "form-control")
 
     @if(signUpForm.hasGlobalErrors) {
         <ul>
@@ -14,7 +15,7 @@
         }
         </ul>
     }
-    <button type="button" onclick="submitForm(this)">@Messages(constants.Form.SIGNUP)</button>
+    <button type="button" class="btn btn-primary" onclick="submitForm(this)">@Messages(constants.Form.SIGNUP)</button>
 }
 
 <script src="@routes.Assets.versioned("javascripts/checkUsername.js")" type="text/javascript"></script>

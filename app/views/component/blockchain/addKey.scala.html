@@ -4,9 +4,9 @@
 @(addKeyFrom: Form[AddKey.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @form(action = routes.AddKeyController.blockchainAddKey, 'onkeypress -> "validateForm(event,this)") {
     @CSRF.formField
-    @inputText(addKeyFrom(constants.Form.NAME), '_label -> Messages(constants.Form.NAME))
-    @inputText(addKeyFrom(constants.Form.SEED), '_label -> Messages(constants.Form.SEED))
-    @inputPassword(addKeyFrom(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD))
+    @inputText(addKeyFrom(constants.Form.NAME), '_label -> Messages(constants.Form.NAME),'class -> "form-control")
+    @inputText(addKeyFrom(constants.Form.SEED), '_label -> Messages(constants.Form.SEED),'class -> "form-control")
+    @inputPassword(addKeyFrom(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD),'class -> "form-control")
 
     @if(addKeyFrom.hasGlobalErrors) {
         <ul>
@@ -15,5 +15,5 @@
         }
         </ul>
     }
-    <button type="button" onclick="submitForm(this)">@Messages(constants.Form.ADD_KEY)</button>
+    <button type="button" class="btn btn-primary" onclick="submitForm(this)">@Messages(constants.Form.ADD_KEY)</button>
 }

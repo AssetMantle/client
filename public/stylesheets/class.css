@@ -12,7 +12,7 @@ body {
     color: white;
 }
 
-.read {
+.navbar a .read {
     background-color: #aaaaaa;
 }
 
@@ -31,21 +31,41 @@ body {
     background-color: rgba(0, 0, 0, 0.4);
 }
 
-.modalContent {
-    background-color: #fefefe;
-    padding: 2%;
-    position: fixed;
-    top: 25%;
-    left: 25%;
-    max-height: 60%;
-    overflow: auto;
-    width: 50%;
+@media (max-width:500px) {
+    .modalContent {
+        background-color: #fefefe;
+        padding: 2%;
+        position: fixed;
+        top: 25%;
+        left: 15%;
+        max-height: 60%;
+        overflow: auto;
+    }
+    table thead{
+        font-size: 12px;
+    }
+}
+@media (min-width:500px){
+    .modalContent {
+        background-color: #fefefe;
+        padding: 2%;
+        position: fixed;
+        top: 25%;
+        left: 40%;
+        max-height: 60%;
+        overflow: auto;
+    }
+
+
+}
+.form{
+    padding:30px;
 }
 
 .close {
     position: absolute;
-    right: 25px;
-    top: 0;
+    right: 15px;
+    top: 10px;
     color: #000;
     font-size: 2em;
     font-weight: bold;
@@ -109,11 +129,13 @@ body {
 }
 
 .blur {
-filter: blur(5 px);
+    filter: blur(5 px);
 }
 
 /*Alert*/
 .alert {
+    position:relative;
+    top:70px;
     padding: 10px;
     color: white;
     opacity: 1;
@@ -165,7 +187,7 @@ filter: blur(5 px);
 .navbar a {
     float: left;
     display: block;
-    color: #f2f2f2;
+    color: #9BB6C7;
     text-align: center;
     padding: 14px 16px;
     text-decoration: none;
@@ -174,13 +196,13 @@ filter: blur(5 px);
 }
 
 .navbar a:hover {
-    background-color: #ddd;
-    color: black;
+    background-color: #F3F8FF;
+    color: #1B7FBD;
 }
 
 .navbar a.active {
-    background-color: #3a53bc;
-    color: white;
+    background-color: #F3F8FF;
+    color: #1B7FBD;
 }
 
 .navbar a.right {
@@ -206,21 +228,107 @@ filter: blur(5 px);
 
 /*Flex*/
 .pageFlexContainer {
+    margin-top: 100px;
     display:flex;
     justify-content:center;
 }
 
 .pageFlexContainer >div {
-    background-color: #ffffff;
+    /*background-color: #ffffff;*/
+}
+/*side bar for system mode*/
+@media (min-width: 1200px) {
+
+    .close-sidebar{
+        display: none;
+    }
+    .first .closebtn{
+        display: none;
+    }
+    .first {
+        position: fixed;
+        left: 0;
+        top:0;
+        height:100%;
+        background: #31353D;
+        padding-top:60px;
+        padding-left: 40px;
+        padding-right: 30px;
+        width: 250px;
+        margin-right: 1vw;
+        overflow: auto;
+    }
+    .first a {
+        color:#fff;
+        padding:8px 0px 8px 20px;
+        text-decoration: none;
+        display: block;
+        transition: 0.3s;
+    }
+    .first a:hover{
+        color: #31353D;
+        background: #fff;
+        border-radius: 10px;
+    }
+
+    .second {
+        display: inline-block;
+        width: 100%;
+        padding-top: 20px;
+    }
+    .pageFlexContainer .second{
+        padding-left: 280px;
+    }
+}
+/*side bar for mobile mode*/
+@media (max-width: 1200px) {
+    .first {
+        height: 100%;
+        width: 0;
+        position: fixed;
+        z-index: 101;
+        top: 0;
+        left: 0;
+        background-color:#31353D;
+        overflow-x: hidden;
+        transition: 0.5s;
+        padding-top: 60px;
+
+
+    }
+    .first a {
+        color: #818896;
+        padding:8px 0px 8px 50px;
+        text-decoration: none;
+        display: block;
+        transition: 0.3s;
+    }
+    .first .closebtn {
+        position: relative;
+        top: 0;
+        right: -70%;
+        font-size: 20px;
+    }
+    .close-sidebar{
+        top:60px;
+        color:#fff;
+        font-size:30px;
+        cursor:pointer;
+        background:grey;
+        padding: 5px;
+        border-radius: 10px;
+        transition-delay: 0.3s;
+        position:fixed;
+        left: -20px;
+        z-index:100;
+    }
+    .second {
+        position:relative;
+        padding-top: 20px;
+        width:100%;
+    }
 }
 
-.first {
-    width:20%;
-    margin-right: 1vw;
-}
-.second {
-    width:60%;
-}
 .third {
     width:20%;
     margin-left: 1vw;
@@ -230,23 +338,34 @@ filter: blur(5 px);
     float: left;
 }
 .width30Percent{
+    transition: .5s ease;
     width: 30%;
     float: right;
 }
-
-@media only screen and (max-width: 1300px) {
-    .first {
-        display: none;
-    }
-
-    .third {
-        display: none;
-    }
-    .second {
-        margin: 0px;
-        width: 100%;
-    }
+.bottom {
+    opacity: 0;
+    position: relative;
+    top: -20%;
+    transition: .5s ease;
 }
+.width30Percent:hover img{
+    opacity: 0.3;
+}
+
+.width30Percent:hover .bottom{
+    opacity: 1;
+}
+/*@media only screen and (max-width: 1200px) {*/
+
+
+/*    .third {*/
+/*        display: none;*/
+/*    }*/
+/*    .second {*/
+/*        margin: 0px;*/
+/*        width: 100%;*/
+/*    }*/
+/*}*/
 
 .flexContainer {
     display: flex;
@@ -255,12 +374,14 @@ filter: blur(5 px);
 }
 
 .flexItem {
-    margin: 20px;
     text-align: center;
     padding: 10px;
     padding-top: 15px;
 }
-
+.flex-row{
+    display: flex;
+    flex-direction: row;
+}
 
 .flexGraph {
     width: 95%;
@@ -326,6 +447,9 @@ filter: blur(5 px);
     text-align: left;
     word-break: break-all;
 }
+rightText{
+    text-align: right;
+}
 
 .width {
     width: 100%;
@@ -361,7 +485,6 @@ dl {
 
 dl .info {
     visibility: hidden;
-    width: 175px;
     background-color: #dadada;
     color: #838383;
     text-align: center;
@@ -370,6 +493,7 @@ dl .info {
     top: 5px;
     float: right;
     font-size: smaller;
+    padding: 0;
 }
 
 dl .info::after {
@@ -386,6 +510,11 @@ dl:hover .info {
     visibility: visible;
 }
 /*ToolTip*/
+/*notification*/
+.notification-box{
+    padding:10px;
+    border-bottom: 1px solid grey;
+}
 
 /*upload file css*/
 .uploadBar {
@@ -457,3 +586,42 @@ dl:hover .info {
     color: rgba(131, 0, 4, 0.71);
 }
 /* color */
+/*floating label*/
+.form-group {
+    position: relative;
+    margin-bottom: 1.5rem;
+}
+
+.form-control-placeholder {
+    position: absolute;
+    top: 0;
+    padding: 7px 0 0 13px;
+    transition: all 200ms;
+    opacity: 0.5;
+}
+
+.form-control:focus + .form-control-placeholder,
+.form-control:valid + .form-control-placeholder {
+    font-size: 75%;
+    transform: translate3d(0, -100%, 0);
+    opacity: 1;
+}
+.hash_code{
+    width : 100px;
+    overflow:hidden;
+    display:inline-block;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    height: 1.2em;
+    margin-left: 20px;
+}
+.pageContent{
+    width: 500px;
+    float:right;
+    position: relative;
+    right:50px;
+    padding-bottom: 50px;
+}
+.fa{
+    cursor: pointer;
+}

@@ -2,72 +2,95 @@
 @import utilities.LoginState
 @(failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
-@common(Messages(constants.Form.INDEX), failures, warnings, successes, infos)(Html(""))(center)(right)
+@common(Messages(constants.Form.INDEX), failures, warnings, successes, infos)(left)(center)(Html(""))
 
 
 @center = {
-   <div class="flexContainer">
-       <div class="flexItem">
+
+    <div class="close-sidebar"><span onclick="openNav()">==</span>
+    </div>
+   <div class="">
        @search()
-        </div>
     </div>
-    <div class="flexContainer">
-        <div class="flexItem box flexGrowth">@lastBlockHeight()</div>
-        <div class="flexItem box flexGrowth">@validators()</div>
-        <div class="flexItem box flexGrowth"> @Messages(constants.Form.TOKENS)
-            <p id="tokensValue"></p></div>
-        <div class="flexItem box flexGrowth">@averageBlockTime()</div>
-    </div>
-    <div id="indexBottomDivision" class="flexContainer">
-        <div class="box flexGraph flexGrowth"> @blockTimeGraph()</div>
-        <div class="box flexGrowth centerText" id="blockExplorer">@blockExplorer()</div>
-        <div class="box flexGrowth centerText" id="transactionExplorer"> @transactionExplorer()</div>
-        <div class="flexGrowth box leftText">
-            <div>
-                <h2 class="showHide toggleElement centerText">@Messages(constants.Form.ASSETS) </h2>
+            <div class="row">
+                <div class="col-md-3 col-sm-6">
+                    <div class="card  card-body h-65">@lastBlockHeight()</div>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <div class="card card-body h-65">@validators()</div>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <div class="card card-body h-65">
+                        <p id="tokensValue" class="heading"></p>
+                        <h5 class="lower_case">@Messages(constants.Form.TOKENS)</h5>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <div class="card  card-body h-65">@averageBlockTime()</div>
+                </div>
             </div>
-            <div id="availableAssetList" class="flexContainer">
+            <div id="indexBottomDivision" >
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card flexGraph flexGrowth"> @blockTimeGraph()</div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class=" flexGrowth centerText" id="blockExplorer">@blockExplorer()</div>
+                    </div>
+                    <div class="col-md-6 col-lg-6">
+                        <div class=" flexGrowth centerText" id="transactionExplorer"> @transactionExplorer()</div>
+                    </div>
+                    @*            <div class="col-md-12">*@
+                    @*                <div class="flexGrowth  leftText">*@
+                        @*                <div>*@
+                            @*                    <h2 class="showHide toggleElement centerText">@Messages(constants.Form.ASSETS) </h2>*@
+                            @*                </div>*@
+                        @*                <div id="availableAssetList" class="flexContainer">*@
+                            @*                </div>*@
+                        @*                </div>*@
+                    @*            </div>*@
+                </div>
             </div>
-        </div>
-    </div>
 
-    @transactionHash()
 
-    @blockHeight()
+@transactionHash()
 
-    @validatorsTable()
+@blockHeight()
 
-    @allBlocksTable()
+@validatorsTable()
+
+@allBlocksTable()
 
     <script src="@routes.Assets.versioned("javascripts/back.js")" type="text/javascript"></script>
     <script>
-        back();
-        componentResource('availableAssetList', jsRoutes.controllers.ComponentViewController.availableAssetList());
+            back();
+            componentResource('availableAssetList', jsRoutes.controllers.ComponentViewController.availableAssetList());
     </script>
 }
 
-@right = {
+@left = {
+    <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">X</a>
 
-    <br>
-    <a onclick="getForm(jsRoutes.controllers.AddKeyController.blockchainAddKeyForm())">@Messages(constants.Form.ADD_KEY)</a> <br>
-    <a onclick="getForm(jsRoutes.controllers.AddOrganizationController.blockchainAddOrganizationForm())">@Messages(constants.Form.ADD_ORGANIZATION)</a>  <br>
-    <a onclick="getForm(jsRoutes.controllers.AddZoneController.blockchainAddZoneForm())">@Messages(constants.Form.ADD_ZONE)</a>  <br>
-    <a onclick="getForm(jsRoutes.controllers.BuyerExecuteOrderController.blockchainBuyerExecuteOrderForm())">@Messages(constants.Form.BUYER_EXECUTE_ORDER)</a> <br>
-    <a onclick="getForm(jsRoutes.controllers.ChangeBuyerBidController.blockchainChangeBuyerBidForm())">@Messages(constants.Form.CHANGE_BUYER_BID)</a> <br>
-    <a onclick="getForm(jsRoutes.controllers.ChangeSellerBidController.blockchainChangeSellerBidForm())">@Messages(constants.Form.CHANGE_SELLER_BID)</a> <br>
-    <a onclick="getForm(jsRoutes.controllers.ConfirmBuyerBidController.blockchainConfirmBuyerBidForm())">@Messages(constants.Form.CONFIRM_BUYER_BID)</a> <br>
-    <a onclick="getForm(jsRoutes.controllers.ConfirmSellerBidController.blockchainConfirmSellerBidForm())">@Messages(constants.Form.CONFIRM_SELLER_BID)</a> <br>
-    <a onclick="getForm(jsRoutes.controllers.IssueAssetController.blockchainIssueAssetForm())">@Messages(constants.Form.ISSUE_ASSET)</a> <br>
-    <a onclick="getForm(jsRoutes.controllers.IssueFiatController.blockchainIssueFiatForm())">@Messages(constants.Form.ISSUE_FIAT)</a> <br>
-    <a onclick="getForm(jsRoutes.controllers.RedeemAssetController.blockchainRedeemAssetForm())">@Messages(constants.Form.REDEEM_ASSET)</a> <br>
-    <a onclick="getForm(jsRoutes.controllers.RedeemFiatController.blockchainRedeemFiatForm())">@Messages(constants.Form.REDEEM_FIAT)</a> <br>
-    <a onclick="getForm(jsRoutes.controllers.ReleaseAssetController.blockchainReleaseAssetForm())">@Messages(constants.Form.RELEASE_ASSET)</a> <br>
-    <a onclick="getForm(jsRoutes.controllers.SellerExecuteOrderController.blockchainSellerExecuteOrderForm())">@Messages(constants.Form.SELLER_EXECUTE_ORDER)</a> <br>
-    <a onclick="getForm(jsRoutes.controllers.SendAssetController.blockchainSendAssetForm())">@Messages(constants.Form.SEND_ASSET)</a> <br>
-    <a onclick="getForm(jsRoutes.controllers.SendCoinController.blockchainSendCoinForm())">@Messages(constants.Form.SEND_COIN)</a> <br>
-    <a onclick="getForm(jsRoutes.controllers.SendFiatController.blockchainSendFiatForm())">@Messages(constants.Form.SEND_FIAT)</a> <br>
-    <a onclick="getForm(jsRoutes.controllers.SetACLController.blockchainSetACLForm())">@Messages(constants.Form.SET_ACL)</a> <br>
-    <a onclick="getForm(jsRoutes.controllers.SetBuyerFeedbackController.blockchainSetBuyerFeedbackForm())">@Messages(constants.Form.SET_BUYER_FEEDBACK)</a> <br>
-    <a onclick="getForm(jsRoutes.controllers.SetSellerFeedbackController.blockchainSetSellerFeedbackForm())">@Messages(constants.Form.SET_SELLER_FEEDBACK)</a> <br>
+
+    <a onclick="getForm(jsRoutes.controllers.AddKeyController.blockchainAddKeyForm())">@Messages(constants.Form.ADD_KEY)</a>   <br>
+    <a onclick="getForm(jsRoutes.controllers.AddOrganizationController.blockchainAddOrganizationForm())">@Messages(constants.Form.ADD_ORGANIZATION)</a>   <br>
+    <a onclick="getForm(jsRoutes.controllers.AddZoneController.blockchainAddZoneForm())">@Messages(constants.Form.ADD_ZONE)</a>   <br>
+    <a onclick="getForm(jsRoutes.controllers.BuyerExecuteOrderController.blockchainBuyerExecuteOrderForm())">@Messages(constants.Form.BUYER_EXECUTE_ORDER)</a>   <br>
+    <a onclick="getForm(jsRoutes.controllers.ChangeBuyerBidController.blockchainChangeBuyerBidForm())">@Messages(constants.Form.CHANGE_BUYER_BID)</a>   <br>
+    <a onclick="getForm(jsRoutes.controllers.ChangeSellerBidController.blockchainChangeSellerBidForm())">@Messages(constants.Form.CHANGE_SELLER_BID)</a>   <br>
+    <a onclick="getForm(jsRoutes.controllers.ConfirmBuyerBidController.blockchainConfirmBuyerBidForm())">@Messages(constants.Form.CONFIRM_BUYER_BID)</a>   <br>
+    <a onclick="getForm(jsRoutes.controllers.ConfirmSellerBidController.blockchainConfirmSellerBidForm())">@Messages(constants.Form.CONFIRM_SELLER_BID)</a>   <br>
+    <a onclick="getForm(jsRoutes.controllers.IssueAssetController.blockchainIssueAssetForm())">@Messages(constants.Form.ISSUE_ASSET)</a>   <br>
+    <a onclick="getForm(jsRoutes.controllers.IssueFiatController.blockchainIssueFiatForm())">@Messages(constants.Form.ISSUE_FIAT)</a>   <br>
+    <a onclick="getForm(jsRoutes.controllers.RedeemAssetController.blockchainRedeemAssetForm())">@Messages(constants.Form.REDEEM_ASSET)</a>   <br>
+    <a onclick="getForm(jsRoutes.controllers.RedeemFiatController.blockchainRedeemFiatForm())">@Messages(constants.Form.REDEEM_FIAT)</a>   <br>
+    <a onclick="getForm(jsRoutes.controllers.ReleaseAssetController.blockchainReleaseAssetForm())">@Messages(constants.Form.RELEASE_ASSET)</a>   <br>
+    <a onclick="getForm(jsRoutes.controllers.SellerExecuteOrderController.blockchainSellerExecuteOrderForm())">@Messages(constants.Form.SELLER_EXECUTE_ORDER)</a>   <br>
+    <a onclick="getForm(jsRoutes.controllers.SendAssetController.blockchainSendAssetForm())">@Messages(constants.Form.SEND_ASSET)</a>   <br>
+    <a onclick="getForm(jsRoutes.controllers.SendCoinController.blockchainSendCoinForm())">@Messages(constants.Form.SEND_COIN)</a>   <br>
+    <a onclick="getForm(jsRoutes.controllers.SendFiatController.blockchainSendFiatForm())">@Messages(constants.Form.SEND_FIAT)</a>   <br>
+    <a onclick="getForm(jsRoutes.controllers.SetACLController.blockchainSetACLForm())">@Messages(constants.Form.SET_ACL)</a>   <br>
+    <a onclick="getForm(jsRoutes.controllers.SetBuyerFeedbackController.blockchainSetBuyerFeedbackForm())">@Messages(constants.Form.SET_BUYER_FEEDBACK)</a>   <br>
+    <a onclick="getForm(jsRoutes.controllers.SetSellerFeedbackController.blockchainSetSellerFeedbackForm())">@Messages(constants.Form.SET_SELLER_FEEDBACK)</a>   <br>
 
 }
