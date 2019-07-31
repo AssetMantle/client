@@ -11,7 +11,6 @@ import play.api.{Configuration, Logger}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import queries.GetAccount
-import utilities.LoginState
 
 import scala.concurrent.ExecutionContext
 
@@ -20,29 +19,27 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  def index: Action[AnyContent] = withLoginAction.authenticated { username =>
+  def index: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
     try {
-      implicit val loginState:LoginState = LoginState(username)
-      val address = masterAccounts.Service.getAddress(username)
-      masterAccounts.Service.getUserType(username) match {
+      loginState.userType match {
         case constants.User.GENESIS =>
-          withUsernameToken.Ok(views.html.genesisIndex(username = username), username)
+          withUsernameToken.Ok(views.html.genesisIndex(), loginState.username)
         case constants.User.ZONE =>
-          withUsernameToken.Ok(views.html.zoneIndex(username = username, zone = masterZones.Service.get(blockchainZones.Service.getID(address))), username)
+          withUsernameToken.Ok(views.html.zoneIndex(zone = masterZones.Service.get(blockchainZones.Service.getID(loginState.address))), loginState.username)
         case constants.User.ORGANIZATION =>
-          withUsernameToken.Ok(views.html.organizationIndex(username = username, organization = masterOrganizations.Service.get(blockchainOrganizations.Service.getID(address))), username)
+          withUsernameToken.Ok(views.html.organizationIndex(organization = masterOrganizations.Service.get(blockchainOrganizations.Service.getID(loginState.address))), loginState.username)
         case constants.User.TRADER =>
-          val aclAccount = blockchainAclAccounts.Service.get(address)
-          val fiatPegWallet = blockchainFiats.Service.getFiatPegWallet(address)
-          withUsernameToken.Ok(views.html.traderIndex(username = username, totalFiat = fiatPegWallet.map(_.transactionAmount.toInt).sum, zone = masterZones.Service.get(aclAccount.zoneID), organization = masterOrganizations.Service.get(aclAccount.organizationID), aclHash = blockchainAclHashes.Service.get(aclAccount.aclHash)), username)
+          val aclAccount = blockchainAclAccounts.Service.get(loginState.address)
+          val fiatPegWallet = blockchainFiats.Service.getFiatPegWallet(loginState.address)
+          withUsernameToken.Ok(views.html.traderIndex(totalFiat = fiatPegWallet.map(_.transactionAmount.toInt).sum, zone = masterZones.Service.get(aclAccount.zoneID), organization = masterOrganizations.Service.get(aclAccount.organizationID), aclHash = blockchainAclHashes.Service.get(aclAccount.aclHash)), loginState.username)
         case constants.User.USER =>
-          withUsernameToken.Ok(views.html.userIndex(username = username), username)
+          withUsernameToken.Ok(views.html.userIndex(), loginState.username)
         case constants.User.UNKNOWN =>
-          withUsernameToken.Ok(views.html.anonymousIndex(username = username), username)
+          withUsernameToken.Ok(views.html.anonymousIndex(), loginState.username)
         case constants.User.WITHOUT_LOGIN =>
-          masterAccounts.Service.updateUserType(username, constants.User.UNKNOWN)
-          withUsernameToken.Ok(views.html.anonymousIndex(username = username), username)
+          masterAccounts.Service.updateUserType(loginState.username, constants.User.UNKNOWN)
+          withUsernameToken.Ok(views.html.anonymousIndex(), loginState.username)
       }
     }
     catch {

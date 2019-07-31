@@ -14,7 +14,7 @@ class WithGenesisLoginAction @Inject()(messagesControllerComponents: MessagesCon
 
   private implicit val module: String = constants.Module.ACTIONS_WITH_GENESIS_LOGIN_ACTION
 
-  def authenticated(f: ⇒ String => Request[AnyContent] => Result)(implicit logger: Logger): Action[AnyContent] = {
+  def authenticated(f: ⇒ LoginState => Request[AnyContent] => Result)(implicit logger: Logger): Action[AnyContent] = {
     Action { implicit request ⇒
       try {
         val username = request.session.get(constants.Security.USERNAME).getOrElse(throw new BaseException(constants.Response.USERNAME_NOT_FOUND))
@@ -22,7 +22,7 @@ class WithGenesisLoginAction @Inject()(messagesControllerComponents: MessagesCon
         masterTransactionAccountTokens.Service.tryVerifyingSessionToken(username, sessionToken)
         masterTransactionAccountTokens.Service.tryVerifyingSessionTokenTime(username)
         masterAccounts.Service.tryVerifyingUserType(username, constants.User.GENESIS)
-        f(username)(request)
+        f(LoginState(username, constants.User.GENESIS, masterAccounts.Service.getAddress(username)))(request)
       }
       catch {
         case baseException: BaseException => {

@@ -46,6 +46,16 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
     }
   }
 
+  private def findByAccountID(accountID: String)(implicit executionContext: ExecutionContext): Future[Organization] = db.run(organizationTable.filter(_.accountID === accountID).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
   private def getAccountIdById(id: String)(implicit executionContext: ExecutionContext): Future[String] = db.run(organizationTable.filter(_.id === id).map(_.accountID).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -77,6 +87,8 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
   }
 
   private def getOrganizationsWithNullStatusByZoneID(zoneID: String): Future[Seq[Organization]] = db.run(organizationTable.filter(_.zoneID === zoneID).filter(_.status.?.isEmpty).result)
+
+  private def getOrganizationsByZoneID(zoneID: String): Future[Seq[Organization]] = db.run(organizationTable.filter(_.zoneID === zoneID).result)
 
   private def updateStatusOnID(id: String, status: Boolean)(implicit executionContext: ExecutionContext) = db.run(organizationTable.filter(_.id === id).map(_.status.?).update(Option(status)).asTry).map {
     case Success(result) => result
@@ -116,11 +128,15 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
 
     def get(id: String)(implicit executionContext: ExecutionContext): Organization = Await.result(findById(id), Duration.Inf)
 
+    def getByAccountID(accountID: String)(implicit executionContext: ExecutionContext): Organization = Await.result(findByAccountID(accountID), Duration.Inf)
+
     def updateStatus(id: String, status: Boolean)(implicit executionContext: ExecutionContext): Int = Await.result(updateStatusOnID(id, status), Duration.Inf)
 
     def getAccountId(id: String)(implicit executionContext: ExecutionContext): String = Await.result(getAccountIdById(id), Duration.Inf)
 
     def getVerifyOrganizationRequests(zoneID: String)(implicit executionContext: ExecutionContext): Seq[Organization] = Await.result(getOrganizationsWithNullStatusByZoneID(zoneID), Duration.Inf)
+
+    def getOrganizationsInZone(zoneID: String)(implicit executionContext: ExecutionContext): Seq[Organization] = Await.result(getOrganizationsByZoneID(zoneID), Duration.Inf)
 
     def getStatus(id: String)(implicit executionContext: ExecutionContext): Option[Boolean] = Await.result(getStatusById(id), Duration.Inf)
 

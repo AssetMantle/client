@@ -1,0 +1,20 @@
+@import models.master.Organization
+
+@(organizations: Seq[Organization])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
+
+@for(organization <- organizations) {
+    <div class="flexItem box firstBox leftText lightBlue">
+        <span class="red">@Messages(constants.Form.ID)</span> :@organization.id <br>
+        <span class="red">@Messages(constants.Form.ACCOUNT_ID)</span> :@organization.accountID <br>
+        <span class="red">@Messages(constants.Form.NAME)</span> :@organization.name <br>
+        <span class="red">@Messages(constants.Form.ADDRESS)</span> :@organization.address <br>
+        <span class="red">@Messages(constants.Form.PHONE)</span> :@organization.phone <br>
+        <span class="red">@Messages(constants.Form.EMAIL)</span> :@organization.email <br>
+        <div class="box leftMargin">
+            <div>
+                <h2 class="showHide toggleElement centerText"  onclick="fetchOrShowHide('@organization.accountID', jsRoutes.controllers.SetACLController.viewTradersInOrganizationForZone('@organization.id') ,this)">@Messages(constants.Form.TRADERS)</h2>
+            </div>
+            <div id="@organization.accountID" class="flexContainer rightPadding scrollableThird"></div>
+        </div>
+    </div>
+}

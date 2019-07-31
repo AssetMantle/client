@@ -1,13 +1,13 @@
 @import helper._
 @import views.companion.master.ModeratedSellerExecuteOrder
 
-@(moderatedSellerExecuteOrderForm: Form[ModeratedSellerExecuteOrder.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@(moderatedSellerExecuteOrderForm: Form[ModeratedSellerExecuteOrder.Data],buyerAddress:String, sellerAddress:String, pegHash:String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @form(action = routes.SellerExecuteOrderController.moderatedSellerExecuteOrder, 'onkeypress -> "validateForm(event,this)") {
     @CSRF.formField
-    @inputText(moderatedSellerExecuteOrderForm(constants.Form.BUYER_ADDRESS), '_label -> Messages(constants.Form.BUYER_ADDRESS))
-    @inputText(moderatedSellerExecuteOrderForm(constants.Form.SELLER_ADDRESS), '_label -> Messages(constants.Form.SELLER_ADDRESS))
+    @inputText(moderatedSellerExecuteOrderForm(constants.Form.BUYER_ADDRESS).copy(value = Some(buyerAddress)), '_label -> Messages(constants.Form.BUYER_ADDRESS))
+    @inputText(moderatedSellerExecuteOrderForm(constants.Form.SELLER_ADDRESS).copy(value = Some(sellerAddress)), '_label -> Messages(constants.Form.SELLER_ADDRESS))
     @inputText(moderatedSellerExecuteOrderForm(constants.Form.AWB_PROOF_HASH), '_label -> Messages(constants.Form.AWB_PROOF_HASH))
-    @inputText(moderatedSellerExecuteOrderForm(constants.Form.PEG_HASH), '_label -> Messages(constants.Form.PEG_HASH))
+    @inputText(moderatedSellerExecuteOrderForm(constants.Form.PEG_HASH).copy(value = Some(pegHash)), '_label -> Messages(constants.Form.PEG_HASH))
     @inputText(moderatedSellerExecuteOrderForm(constants.Form.GAS), '_label -> Messages(constants.Form.GAS))
     @inputPassword(moderatedSellerExecuteOrderForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD))
 

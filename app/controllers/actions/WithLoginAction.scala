@@ -14,14 +14,14 @@ class WithLoginAction @Inject()(messagesControllerComponents: MessagesController
 
   private implicit val module: String = constants.Module.ACTIONS_WITH_LOGIN_ACTION
 
-  def authenticated(f: ⇒ String => Request[AnyContent] => Result)(implicit logger: Logger): Action[AnyContent] = {
+  def authenticated(f: ⇒ LoginState => Request[AnyContent] => Result)(implicit logger: Logger): Action[AnyContent] = {
     Action { implicit request ⇒
       try {
         val username = request.session.get(constants.Security.USERNAME).getOrElse(throw new BaseException(constants.Response.USERNAME_NOT_FOUND))
         val sessionToken = request.session.get(constants.Security.TOKEN).getOrElse(throw new BaseException(constants.Response.TOKEN_NOT_FOUND))
         masterTransactionAccountTokens.Service.tryVerifyingSessionToken(username, sessionToken)
         masterTransactionAccountTokens.Service.tryVerifyingSessionTokenTime(username)
-        f(username)(request)
+        f(LoginState(username, masterAccounts.Service.getUserType(username), masterAccounts.Service.getAddress(username)))(request)
       }
       catch {
         case baseException: BaseException => {

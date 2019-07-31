@@ -1,0 +1,17 @@
+@import helper._
+@import views.companion.master.RejectVerifyTraderRequest
+
+@(rejectVerifyTraderRequestForm: Form[RejectVerifyTraderRequest.Data], traderID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@form(action = routes.SetACLController.organizationRejectVerifyTraderRequest, 'onkeypress -> "validateForm(event,this)") {
+    @CSRF.formField
+    @inputText(rejectVerifyTraderRequestForm(constants.Form.TRADER_ID).copy(value = Some(traderID)), '_label -> Messages(constants.Form.TRADER_ID))
+
+    @if(rejectVerifyTraderRequestForm.hasGlobalErrors) {
+        <ul>
+        @for(error <- rejectVerifyTraderRequestForm.globalErrors) {
+            <li>@error.format</li>
+        }
+        </ul>
+    }
+    <button type="button" onclick="submitForm(this)">@Messages(constants.Form.REJECT_VERIFY_TRADER_REQUEST)</button>
+}
