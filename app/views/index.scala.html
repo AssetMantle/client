@@ -69,9 +69,8 @@
 }
 
 @left = {
+    <div class="first sidenav" id="mySidenav">
     <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">X</a>
-
-
     <a onclick="getForm(jsRoutes.controllers.AddKeyController.blockchainAddKeyForm())">@Messages(constants.Form.ADD_KEY)</a>   <br>
     <a onclick="getForm(jsRoutes.controllers.AddOrganizationController.blockchainAddOrganizationForm())">@Messages(constants.Form.ADD_ORGANIZATION)</a>   <br>
     <a onclick="getForm(jsRoutes.controllers.AddZoneController.blockchainAddZoneForm())">@Messages(constants.Form.ADD_ZONE)</a>   <br>
@@ -92,5 +91,5 @@
     <a onclick="getForm(jsRoutes.controllers.SetACLController.blockchainSetACLForm())">@Messages(constants.Form.SET_ACL)</a>   <br>
     <a onclick="getForm(jsRoutes.controllers.SetBuyerFeedbackController.blockchainSetBuyerFeedbackForm())">@Messages(constants.Form.SET_BUYER_FEEDBACK)</a>   <br>
     <a onclick="getForm(jsRoutes.controllers.SetSellerFeedbackController.blockchainSetSellerFeedbackForm())">@Messages(constants.Form.SET_SELLER_FEEDBACK)</a>   <br>
-
+    </div>
 }

@@ -12,17 +12,19 @@
         <div class="leftText">
             @Messages(constants.User.COINS): @coins
         <button class="text-center btn btn-primary btn-sm" onclick="getForm(jsRoutes.controllers.SendCoinController.sendCoinForm())">@Messages(constants.Form.SEND_COIN)</button>
+            <button class="btn btn-primary btn-sm" onclick="getForm(jsRoutes.controllers.SendCoinController.requestCoinsForm())">@Messages(constants.Form.REQUEST_COIN)</button>
+
         </div>
     </div>
-    <br>
+
     <div class="leftText">
       <p> @Messages(constants.User.USER_TYPE): @userType </p>
-        <p> @Messages(constants.User.ADDRESS):<span id="text_element" class="hash_code"> @address</span> <span onclick="copyToClipboard('text_element')"> <i class="fa fa-clipboard"></i></span></p>
+        <p> @Messages(constants.User.ADDRESS):<span id="text_element" class="hash_code"> @address</span> <span onclick="copyToClipboard('text_e lement')"> <i class="fa fa-clipboard"></i></span></p>
 
     </div>
-    <div class="tooltip">Hover over me
-        <span class="tooltiptext"  onclick="copyToClipboard('text_element')">Tooltip text</span>
-    </div>
+@*    <div class="tooltip">Hover over me*@
+@*        <span class="tooltiptext"  onclick="copyToClipboard('text_element')">Tooltip text</span>*@
+@*    </div>*@
 </div>
 
 <script src="@routes.Assets.versioned("javascripts/viewFiles.js")" type="text/javascript"></script>
