@@ -1,11 +1,11 @@
 -- Create database and user scripts. To be run before evolutions are started.
 
 
-CREATE USER "commitCentral" WITH PASSWORD 'commitCentral';
+CREATE USER "commit" WITH PASSWORD 'commit';
 
-CREATE DATABASE "commitCentral" WITH OWNER = "commitCentral";
+CREATE DATABASE "commit" WITH OWNER = "commit";
 
-ALTER USER "commitCentral" SET SEARCH_PATH = "$user", BLOCKCHAIN, BLOCKCHAIN_TRANSACTION, MASTER, MASTER_TRANSACTION;
+ALTER USER "commit" SET SEARCH_PATH = "$user", BLOCKCHAIN, BLOCKCHAIN_TRANSACTION, MASTER, MASTER_TRANSACTION;
 
 
 
