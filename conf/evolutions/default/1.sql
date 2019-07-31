@@ -697,7 +697,7 @@ VALUES ('cosmos14375p72aunmu3vuwevu5e4vgegekd0n0sj9czh',
         false);
 
 INSERT INTO master."Account" ("id", "secretHash", "accountAddress", "language", "userType", "status")
-VALUES ('main', '-1886325765', 'cosmos14375p72aunmu3vuwevu5e4vgegekd0n0sj9czh', 'en', 'GENESIS', 'COMPLETE');
+VALUES ('main', '-1886325765', 'cosmos14375p72aunmu3vuwevu5e4vgegekd0n0sj9czh', 'en', 'GENESIS', 'NO_CONTACT');
 
 # --- !Downs
 
