@@ -8362,8 +8362,8 @@ form.searchForm input[type=text]::placeholder {
   height: 65% !important; }
 
 .inside-button {
-  background-color: #EEF9FF;
-  color: #1B7FBD;
+  background-color: #3a53bc;
+  color: #fff;
   padding: 10px 15px;
   border-radius: 5px;
   margin: 5px 0;

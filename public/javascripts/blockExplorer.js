@@ -41,7 +41,7 @@ function blockExplorer(){
                             let blockTime = new Date(time);
                             initialTimeData[initialTimeData.length] = time;
                             let differenceBetweenBlockTime = ( blockTime.getTime() - new Date(lastBlockTime).getTime()) / 1000;
-                            content = "<tr><td><button class='inside-button' onclick='searchFunction("+ JSON.stringify(height) +")'>" + height + "</button></td><td>" + numTxs + "</td><td><div id='" + timerID + "'></div> </td></tr>" + content;
+                            content = "<tr><td><button onclick='searchFunction("+ JSON.stringify(height) +")'>" + height + "</button></td><td>" + numTxs + "</td><td><div id='" + timerID + "'></div> </td></tr>" + content;
                             lastBlockTime = time;
                             if (counter > 0) {
                                 initialGraphTime[initialGraphTime.length] = height + "::" + blockTime.getHours() + ":" + blockTime.getMinutes() + ":" + blockTime.getSeconds();
