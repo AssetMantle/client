@@ -66,6 +66,8 @@ class Contacts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
         throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }
   }
 
@@ -113,7 +115,7 @@ class Contacts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
     def getContact(id: String): Contact = Await.result(findById(id), Duration.Inf)
 
-    def insertOrUpdateEmailAndMobile(id: String, mobileNumber: String, emailAddress: String): Boolean = if (0 < Await.result(upsert(Contact(id, mobileNumber, mobileNumberVerified =  false, emailAddress, emailAddressVerified = false)), Duration.Inf)) true else false
+    def insertOrUpdateContact(id: String, mobileNumber: String, emailAddress: String): Boolean = if (0 < Await.result(upsert(Contact(id, mobileNumber, mobileNumberVerified =  false, emailAddress, emailAddressVerified = false)), Duration.Inf)) true else false
 
     def verifyMobileNumber(id: String): Int = Await.result(updateMobileNumberVerificationStatusOnId(id, verificationStatus = true), Duration.Inf)
 

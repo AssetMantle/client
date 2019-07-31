@@ -28,10 +28,9 @@ class UpdateContactController @Inject()(messagesControllerComponents: MessagesCo
         },
         signUpData => {
           try {
-            contacts.Service.insertOrUpdateEmailAndMobile(loginState.username, signUpData.countryCode + signUpData.mobileNumber, signUpData.emailAddress)
+            contacts.Service.insertOrUpdateContact(loginState.username, signUpData.countryCode + signUpData.mobileNumber, signUpData.emailAddress)
             masterAccounts.Service.updateStatusUnverifiedContact(loginState.username)
             Ok(views.html.index(successes = Seq(constants.Response.SUCCESS)))
-
           } catch {
             case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
           }
