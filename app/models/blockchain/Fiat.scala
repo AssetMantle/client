@@ -20,7 +20,7 @@ import scala.util.{Failure, Success}
 
 case class Fiat(pegHash: String, ownerAddress: String, transactionID: String, transactionAmount: String, redeemedAmount: String, dirtyBit: Boolean)
 
-case class FiatCometMessage(ownerAddress: String, message: JsValue)
+case class FiatCometMessage(username: String, message: JsValue)
 
 @Singleton
 class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, actorSystem: ActorSystem, shutdownActors: ShutdownActors, blockchainNegotiations: Negotiations, getAccount: GetAccount, masterTransactionIssueFiatRequests: masterTransaction.IssueFiatRequests, masterAccounts: master.Accounts, getOrder: GetOrder)(implicit executionContext: ExecutionContext, configuration: Configuration) {
@@ -34,6 +34,8 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
   private implicit val module: String = constants.Module.BLOCKCHAIN_FIAT
 
   private val actorTimeout = configuration.get[Int]("akka.actors.timeout").seconds
+
+  private val cometActorSleepTime = configuration.get[Long]("akka.actors.cometActorSleepTime")
 
   val mainFiatActor: ActorRef = actorSystem.actorOf(props = MainFiatActor.props(actorTimeout, actorSystem), name = constants.Module.ACTOR_MAIN_FIAT)
 
@@ -143,11 +145,10 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
     def markDirty(address: String): Int = Await.result(updateDirtyBitByAddress(address, dirtyBit = true), Duration.Inf)
 
     def fiatCometSource(username: String) = {
-      val address = masterAccounts.Service.getAddress(username)
-      shutdownActors.shutdown(constants.Module.ACTOR_MAIN_FIAT, address)
-      Thread.sleep(500)
+      shutdownActors.shutdown(constants.Module.ACTOR_MAIN_FIAT, username)
+      Thread.sleep(cometActorSleepTime)
       val (systemUserActor, source) = Source.actorRef[JsValue](0, OverflowStrategy.dropHead).preMaterialize()
-      mainFiatActor ! actors.CreateFiatChildActorMessage(address = address, actorRef = systemUserActor)
+      mainFiatActor ! actors.CreateFiatChildActorMessage(username = username, actorRef = systemUserActor)
       source
     }
   }
@@ -160,7 +161,7 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
         try {
           val fiatPegWallet = getAccount.Service.get(dirtyFiat.ownerAddress).value.fiatPegWallet.getOrElse(throw new BaseException(constants.Response.NO_RESPONSE))
           fiatPegWallet.foreach(fiatPeg => if (fiatPegWallet.map(_.pegHash) contains dirtyFiat.pegHash) Service.insertOrUpdate(fiatPeg.pegHash, dirtyFiat.ownerAddress, fiatPeg.transactionID, fiatPeg.transactionAmount, fiatPeg.redeemedAmount, dirtyBit = false) else Service.deleteFiat(dirtyFiat.pegHash, dirtyFiat.ownerAddress))
-          mainFiatActor ! FiatCometMessage(ownerAddress = dirtyFiat.ownerAddress, message = Json.toJson(fiatPegWallet.map(_.transactionAmount.toInt).sum.toString))
+          mainFiatActor ! FiatCometMessage(username = masterAccounts.Service.getId(dirtyFiat.ownerAddress), message = Json.toJson(fiatPegWallet.map(_.transactionAmount.toInt).sum.toString))
         }
         catch {
           case baseException: BaseException => logger.info(baseException.failure.message, baseException)

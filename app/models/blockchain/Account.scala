@@ -22,7 +22,7 @@ import scala.util.{Failure, Success}
 
 case class Account(address: String, coins: Int, publicKey: String, accountNumber: Int, sequence: Int, dirtyBit: Boolean)
 
-case class AccountCometMessage(ownerAddress: String, message: JsValue)
+case class AccountCometMessage(username: String, message: JsValue)
 
 @Singleton
 class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, actorSystem: ActorSystem, shutdownActors: ShutdownActors, getSeed: GetSeed, addKey: AddKey, getAccount: GetAccount, masterAccounts: master.Accounts, implicit val pushNotification: PushNotification)(implicit executionContext: ExecutionContext, configuration: Configuration) {
@@ -39,11 +39,13 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   import databaseConfig.profile.api._
 
+  private val actorTimeout = configuration.get[Int]("akka.actors.timeout").seconds
+
+  private val cometActorSleepTime = configuration.get[Long]("akka.actors.cometActorSleepTime")
+
   val mainAccountActor: ActorRef = actorSystem.actorOf(props = MainAccountActor.props(actorTimeout, actorSystem), name = constants.Module.ACTOR_MAIN_ACCOUNT)
 
   private[models] val accountTable = TableQuery[AccountTable]
-
-  private val actorTimeout = configuration.get[Int]("akka.actors.timeout").seconds
 
   private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
 
@@ -148,11 +150,10 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     def markDirty(address: String): Int = Await.result(updateDirtyBitByAddress(address, dirtyBit = true), Duration.Inf)
 
     def accountCometSource(username: String) = {
-      val address = masterAccounts.Service.getAddress(username)
-      shutdownActors.shutdown(constants.Module.ACTOR_MAIN_ACCOUNT, address)
-      Thread.sleep(500)
+      shutdownActors.shutdown(constants.Module.ACTOR_MAIN_ACCOUNT, username)
+      Thread.sleep(cometActorSleepTime)
       val (systemUserActor, source) = Source.actorRef[JsValue](0, OverflowStrategy.dropHead).preMaterialize()
-      mainAccountActor ! actors.CreateAccountChildActorMessage(address = address, actorRef = systemUserActor)
+      mainAccountActor ! actors.CreateAccountChildActorMessage(username = username, actorRef = systemUserActor)
       source
     }
   }
@@ -165,8 +166,7 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
         for (dirtyAddress <- dirtyAddresses) {
           val responseAccount = getAccount.Service.get(dirtyAddress)
           Service.refreshDirty(responseAccount.value.address, responseAccount.value.sequence.toInt, responseAccount.value.coins.get.filter(_.denom == denominationOfGasToken).map(_.amount.toInt).sum)
-          mainAccountActor ! AssetCometMessage(ownerAddress = dirtyAddress, message = Json.toJson(constants.Comet.PING))
-
+          mainAccountActor ! AccountCometMessage(username = masterAccounts.Service.getId(dirtyAddress), message = Json.toJson(constants.Comet.PING))
         }
       } catch {
         case blockChainException: BlockChainException => logger.error(blockChainException.failure.message, blockChainException)

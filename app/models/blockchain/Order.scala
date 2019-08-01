@@ -20,7 +20,7 @@ import scala.util.{Failure, Success}
 
 case class Order(id: String, fiatProofHash: Option[String], awbProofHash: Option[String], dirtyBit: Boolean)
 
-case class OrderCometMessage(ownerAddress: String, message: JsValue)
+case class OrderCometMessage(username: String, message: JsValue)
 
 @Singleton
 class Orders @Inject()(shutdownActors: ShutdownActors, masterAccounts: master.Accounts, actorSystem: ActorSystem, protected val databaseConfigProvider: DatabaseConfigProvider, getAccount: queries.GetAccount, blockchainNegotiations: Negotiations, blockchainTraderFeedbackHistories: TraderFeedbackHistories, blockchainAssets: Assets, blockchainFiats: Fiats, getOrder: queries.GetOrder, implicit val pushNotification: PushNotification)(implicit executionContext: ExecutionContext, configuration: Configuration) {
@@ -38,6 +38,8 @@ class Orders @Inject()(shutdownActors: ShutdownActors, masterAccounts: master.Ac
   private implicit val module: String = constants.Module.BLOCKCHAIN_ORDER
 
   private val actorTimeout = configuration.get[Int]("akka.actors.timeout").seconds
+
+  private val cometActorSleepTime = configuration.get[Long]("akka.actors.cometActorSleepTime")
 
   val mainOrderActor: ActorRef = actorSystem.actorOf(props = MainOrderActor.props(actorTimeout, actorSystem), name = constants.Module.ACTOR_MAIN_ORDER)
 
@@ -130,11 +132,10 @@ class Orders @Inject()(shutdownActors: ShutdownActors, masterAccounts: master.Ac
     def markDirty(id: String): Int = Await.result(updateDirtyBitById(id, dirtyBit = true), Duration.Inf)
 
     def orderCometSource(username: String) = {
-      val address = masterAccounts.Service.getAddress(username)
-      shutdownActors.shutdown(constants.Module.ACTOR_MAIN_ORDER, address)
-      Thread.sleep(500)
+      shutdownActors.shutdown(constants.Module.ACTOR_MAIN_ORDER, username)
+      Thread.sleep(cometActorSleepTime)
       val (systemUserActor, source) = Source.actorRef[JsValue](0, OverflowStrategy.dropHead).preMaterialize()
-      mainOrderActor ! actors.CreateOrderChildActorMessage(address = address, actorRef = systemUserActor)
+      mainOrderActor ! actors.CreateOrderChildActorMessage(username = username, actorRef = systemUserActor)
       source
     }
   }
@@ -165,8 +166,8 @@ class Orders @Inject()(shutdownActors: ShutdownActors, masterAccounts: master.Ac
 
           }
           Service.insertOrUpdate(dirtyOrder.id, awbProofHash = Option(orderResponse.value.awbProofHash), fiatProofHash = Option(orderResponse.value.fiatProofHash), dirtyBit = false)
-          mainOrderActor ! OrderCometMessage(ownerAddress = negotiation.buyerAddress, message = Json.toJson(constants.Comet.PING))
-          mainOrderActor ! OrderCometMessage(ownerAddress = negotiation.sellerAddress, message = Json.toJson(constants.Comet.PING))
+          mainOrderActor ! OrderCometMessage(username = masterAccounts.Service.getId(negotiation.buyerAddress), message = Json.toJson(constants.Comet.PING))
+          mainOrderActor ! OrderCometMessage(username = masterAccounts.Service.getId(negotiation.sellerAddress), message = Json.toJson(constants.Comet.PING))
 
         }
         catch {

@@ -12,7 +12,7 @@ import scala.util.{Failure, Success}
 case class ShutdownActorMessage()
 
 @Singleton
-class ShutdownActors @Inject()(actorSystem: ActorSystem, masterAccounts: models.master.Accounts)(implicit executionContext: ExecutionContext, configuration: Configuration) {
+class ShutdownActors @Inject()(actorSystem: ActorSystem)(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
   private val actorTimeout = configuration.get[Int]("akka.actors.timeout").seconds
 
@@ -23,12 +23,12 @@ class ShutdownActors @Inject()(actorSystem: ActorSystem, masterAccounts: models.
   private implicit val module: String = constants.Module.ACTOR_SHUTDOWN
 
   def onLogOut(actorPath: String, username: String): Future[Unit] = Future {
-    shutdown(actorPath, masterAccounts.Service.getAddress(username))
+    shutdown(actorPath,username)
   }
 
-  def shutdown(actorPath: String, address: String): Unit = {
-    actorSystem.actorSelection("/user/" + actorPath + "/" + address).resolveOne().onComplete {
-      case Success(actorRef) => logger.info(module + ": " + actorPath + "/" + address)
+  def shutdown(actorPath: String, username: String): Unit = {
+    actorSystem.actorSelection("/user/" + actorPath + "/" + username).resolveOne().onComplete {
+      case Success(actorRef) => logger.info(module + ": " + actorPath + "/" + username)
         actorRef ! ShutdownActorMessage()
       case Failure(ex) => logger.info(module + ": " + ex.getMessage)
     }

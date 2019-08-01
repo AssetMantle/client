@@ -20,7 +20,7 @@ import scala.util.{Failure, Success}
 
 case class Negotiation(id: String, buyerAddress: String, sellerAddress: String, assetPegHash: String, bid: String, time: String, buyerSignature: Option[String], sellerSignature: Option[String], dirtyBit: Boolean)
 
-case class NegotiationCometMessage(ownerAddress: String, message: JsValue)
+case class NegotiationCometMessage(username: String, message: JsValue)
 
 @Singleton
 class Negotiations @Inject()(shutdownActors: ShutdownActors, masterAccounts: master.Accounts, actorSystem: ActorSystem, protected val databaseConfigProvider: DatabaseConfigProvider, getNegotiation: queries.GetNegotiation, implicit val pushNotification: PushNotification)(implicit executionContext: ExecutionContext, configuration: Configuration) {
@@ -38,6 +38,8 @@ class Negotiations @Inject()(shutdownActors: ShutdownActors, masterAccounts: mas
   private implicit val module: String = constants.Module.BLOCKCHAIN_NEGOTIATION
 
   private val actorTimeout = configuration.get[Int]("akka.actors.timeout").seconds
+
+  private val cometActorSleepTime = configuration.get[Long]("akka.actors.cometActorSleepTime")
 
   val mainNegotiationActor: ActorRef = actorSystem.actorOf(props = MainNegotiationActor.props(actorTimeout, actorSystem), name = constants.Module.ACTOR_MAIN_NEGOTIATION)
 
@@ -196,11 +198,10 @@ class Negotiations @Inject()(shutdownActors: ShutdownActors, masterAccounts: mas
     def deleteNegotiations(pegHash: String): Int = Await.result(deleteNegotiationsByPegHash(pegHash), Duration.Inf)
 
     def negotiationCometSource(username: String) = {
-      val address = masterAccounts.Service.getAddress(username)
-      shutdownActors.shutdown(constants.Module.ACTOR_MAIN_NEGOTIATION, address)
-      Thread.sleep(500)
+      shutdownActors.shutdown(constants.Module.ACTOR_MAIN_NEGOTIATION, username)
+      Thread.sleep(cometActorSleepTime)
       val (systemUserActor, source) = Source.actorRef[JsValue](0, OverflowStrategy.dropHead).preMaterialize()
-      mainNegotiationActor ! actors.CreateNegotiationChildActorMessage(address = address, actorRef = systemUserActor)
+      mainNegotiationActor ! actors.CreateNegotiationChildActorMessage(username = username, actorRef = systemUserActor)
       source
     }
   }
@@ -213,8 +214,8 @@ class Negotiations @Inject()(shutdownActors: ShutdownActors, masterAccounts: mas
         try {
           val responseNegotiation = getNegotiation.Service.get(dirtyNegotiation.id)
           Service.refreshDirty(id = dirtyNegotiation.id, bid = responseNegotiation.value.bid, time = responseNegotiation.value.time, buyerSignature = responseNegotiation.value.buyerSignature, sellerSignature = responseNegotiation.value.sellerSignature)
-          mainNegotiationActor ! NegotiationCometMessage(ownerAddress = dirtyNegotiation.sellerAddress, message = Json.toJson(constants.Comet.PING))
-          mainNegotiationActor ! NegotiationCometMessage(ownerAddress = dirtyNegotiation.buyerAddress, message = Json.toJson(constants.Comet.PING))
+          mainNegotiationActor ! NegotiationCometMessage(username = masterAccounts.Service.getId(dirtyNegotiation.sellerAddress), message = Json.toJson(constants.Comet.PING))
+          mainNegotiationActor ! NegotiationCometMessage(username = masterAccounts.Service.getId(dirtyNegotiation.buyerAddress), message = Json.toJson(constants.Comet.PING))
         }
         catch {
           case blockChainException: BlockChainException => logger.error(blockChainException.failure.message, blockChainException)

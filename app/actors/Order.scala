@@ -10,7 +10,7 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.duration.FiniteDuration
 import scala.util.{Failure, Success}
 
-case class CreateOrderChildActorMessage(address: String, actorRef: ActorRef)
+case class CreateOrderChildActorMessage(username: String, actorRef: ActorRef)
 
 object MainOrderActor {
   def props(actorTimeout: FiniteDuration, actorSystem: ActorSystem) = Props(new MainOrderActor(actorTimeout, actorSystem))
@@ -29,11 +29,11 @@ class MainOrderActor @Inject()(actorTimeout: FiniteDuration,actorSystem: ActorSy
 
   def receive = {
     case orderCometMessage: blockchain.OrderCometMessage =>
-      actorSystem.actorSelection("/user/" + constants.Module.ACTOR_MAIN_ORDER + "/" + orderCometMessage.ownerAddress).resolveOne().onComplete {
+      actorSystem.actorSelection("/user/" + constants.Module.ACTOR_MAIN_ORDER + "/" + orderCometMessage.username).resolveOne().onComplete {
         case Success(actorRef) => actorRef ! orderCometMessage
         case Failure(ex) => logger.info(module + ": " + ex.getMessage)
       }
-    case createOrderChildActorMessage: CreateOrderChildActorMessage => context.actorOf(props = UserOrderActor.props(createOrderChildActorMessage.actorRef, actorTimeout), name = createOrderChildActorMessage.address)
+    case createOrderChildActorMessage: CreateOrderChildActorMessage => context.actorOf(props = UserOrderActor.props(createOrderChildActorMessage.actorRef, actorTimeout), name = createOrderChildActorMessage.username)
   }
 
 }
@@ -51,8 +51,6 @@ class UserOrderActor(systemUserActor: ActorRef, actorTimeout: FiniteDuration) ex
   private implicit val logger: Logger = Logger(this.getClass)
 
   private implicit val module: String = constants.Module.ACTOR_USER_ORDER
-
-  override def postStop(): Unit = log.info(module + ": Actor Stopped")
 
   def receive = {
     case orderCometMessage: blockchain.OrderCometMessage => systemUserActor ! orderCometMessage.message
