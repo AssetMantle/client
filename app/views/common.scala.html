@@ -52,8 +52,11 @@
                         <ul class="nav navbar-nav">
                         @loginState match {
                             case null => {
-                                <li class="nav-item"> <a  onclick="getForm(jsRoutes.controllers.SignUpController.signUpForm())"><i class="fa fa-user-plus"></i> @Messages(constants.Form.SIGNUP)</a></li>
-                                <li class="nav-item"><a onclick="getForm(jsRoutes.controllers.LoginController.loginForm())"><i class="fa fa-sign-in" aria-hidden="true"></i> @Messages(constants.Form.LOGIN)</a></li>
+                                <li class="nav-item"> <a onclick="getForm(jsRoutes.controllers.SignUpController.signUpForm())"><i class="fa fa-user-plus"></i>
+                                    @Messages(constants.Form.SIGNUP)</a></li>
+                                <li class="nav-item"><a onclick="getForm(jsRoutes.controllers.LoginController.loginForm())"><i class="fa fa-sign-in" aria-hidden="true"></i>
+                                    @Messages(constants.Form.LOGIN)</a>
+                                </li>
                             }
                             case default => {
                                 @loginState.userType match {
@@ -64,14 +67,14 @@
                                         <a href="@controllers.routes.ViewController.zoneRequest()">@Messages(constants.Form.REQUEST)</a>
                                         <a href="@controllers.routes.ViewController.zoneInformation()">@Messages(constants.Form.INFORMATION)</a>
                                     }
-                                     case constants.User.ORGANIZATION => {
-                                         <a href="@controllers.routes.ViewController.organizationRequest()">@Messages(constants.Form.REQUEST)</a>
-                                         <a href="@controllers.routes.ViewController.organizationInformation()">@Messages(constants.Form.INFORMATION)</a>
+                                    case constants.User.ORGANIZATION => {
+                                        <a href="@controllers.routes.ViewController.organizationRequest()">@Messages(constants.Form.REQUEST)</a>
+                                        <a href="@controllers.routes.ViewController.organizationInformation()">@Messages(constants.Form.INFORMATION)</a>
                                     }
-                                      case constants.User.GENESIS => {
+                                    case constants.User.GENESIS => {
                                         <a href="@controllers.routes.ViewController.genesisRequest()">@Messages(constants.Form.REQUEST)</a>
-                                          <a href="@controllers.routes.ViewController.genesisInformation()">@Messages(constants.Form.INFORMATION)</a>
-                                      }
+                                        <a href="@controllers.routes.ViewController.genesisInformation()">@Messages(constants.Form.INFORMATION)</a>
+                                    }
                                     case _ => {}
                                 }
                                 <a class="right" onclick="getForm(jsRoutes.controllers.LogoutController.logoutForm())">@loginState.username</a>
@@ -80,7 +83,7 @@
                                 <span class="badge" id="notificationBadge">0</span>
                                 </a>
                             }
-                   
+                        }
 
                         </ul>
                     </div>
