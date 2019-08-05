@@ -32,9 +32,9 @@
     <body>
         <header>
             <nav class="navbar fixed-top navbar-expand-lg">
-                <div class = "container">
+                <div class = "container-fluid">
                     <div class="navbar-translate">
-                        <a class="navbar-brand active" href="@controllers.routes.IndexController.index()" ><i class="fa fa-home" aria-hidden="true"></i> Home</a>
+                        <a class="active" href="@controllers.routes.IndexController.index()" ><i class="fa fa-home" aria-hidden="true"></i> Home</a>
 
                         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#myNavbar" aria-expanded="false" aria-label="Toggle navigation">
                             <span class="sr-only">Toggle navigation</span>
@@ -45,11 +45,11 @@
                     </div>
 
                     <div class="collapse navbar-collapse" id="myNavbar">
-                        <ul class="navbar-nav mr-auto">
-                            <li class="nav-item"> <a href="#"> <i class="fa fa-newspaper-o" aria-hidden="true"></i> News</a></li>
-                            <li class="nav-item">   <a href="#"><i class="fa fa-address-book"></i> Contact</a></li>
-                        </ul>
-                        <ul class="nav navbar-nav">
+@*                        <ul class="navbar-nav mr-auto">*@
+@*                            <li class="nav-item"> <a href="#"> <i class="fa fa-newspaper-o" aria-hidden="true"></i> News</a></li>*@
+@*                            <li class="nav-item">   <a href="#"><i class="fa fa-address-book"></i> Contact</a></li>*@
+@*                        </ul>*@
+                        <ul class="nav navbar-nav ml-auto">
                         @loginState match {
                             case null => {
                                 <li class="nav-item"> <a onclick="getForm(jsRoutes.controllers.SignUpController.signUpForm())"><i class="fa fa-user-plus"></i>
@@ -77,11 +77,13 @@
                                     }
                                     case _ => {}
                                 }
-                                <a class="right" onclick="getForm(jsRoutes.controllers.LogoutController.logoutForm())">@loginState.username</a>
-                                <a class="right" onclick="getForm(jsRoutes.controllers.LogoutController.logoutForm())">@Messages(constants.Form.LOGOUT)</a>
-                                <a class="right notification" onclick="getForm(jsRoutes.controllers.NotificationController.notificationPage(0))">@Messages(constants.Form.INBOX)
-                                <span class="badge" id="notificationBadge">0</span>
-                                </a>
+                                <li><a class="nav-item notification" onclick="getForm(jsRoutes.controllers.NotificationController.notificationPage(0))"><i class="fa fa-bell" aria-hidden="true"></i> @Messages(constants.Form.INBOX)
+                                    <span class="badge" id="notificationBadge">0</span>
+                                </a></li>
+                                <li><a class="nav-item" onclick="getForm(jsRoutes.controllers.LogoutController.logoutForm())"><i class="fa fa-sign-out" aria-hidden="true"></i> @Messages(constants.Form.LOGOUT)</a></li>
+                                <li> <a class="nav-item" onclick="getForm(jsRoutes.controllers.LogoutController.logoutForm())"><i class="fa fa-user" aria-hidden="true"></i> @loginState.username</a></li>
+
+
                             }
                         }
 

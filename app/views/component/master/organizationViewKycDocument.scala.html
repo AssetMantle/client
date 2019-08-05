@@ -5,13 +5,13 @@
             <li><a href="@routes.FileController.organizationAccessedFile(id, fileName, documentType)">@Messages(documentType) <br>
             <img src="data:image/jpg;base64,@utilities.ImageProcess.decodeImageThumbnailData(file.get)" alt="@documentType">
             </a>
-                <br>
+
                 <div id="kycDocumentStatus@id@documentType">@status</div>
             </li>
         }
         case _ => {
             <li><a href="@routes.FileController.organizationAccessedFile(id, fileName, documentType)">@Messages(documentType)</a>
-                <br>
+
                 <div id="kycDocumentStatus@id@documentType">@status</div>
             </li>
         }

@@ -3,9 +3,9 @@
 
 @common(Messages(constants.User.HOME))(Html(""))(center)(Html(""))
 @center = {
-    <div class="flexContainer">
-        <div id="commonHome" class="profile-card flexItem flexGrowth"></div>
-           </div>
+    <div>
+        <div id="commonHome" class="flexItem flexGrowth"></div>
+    </div>
         <script>
                 componentResource('commonHome', jsRoutes.controllers.ComponentViewController.commonHome('@loginState.username'))
         </script>

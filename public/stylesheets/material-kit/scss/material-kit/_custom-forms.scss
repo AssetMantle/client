@@ -31,6 +31,9 @@ $white : #fff;
 .fr{
   float: right;
 }
+.fl{
+  float:left;
+}
 .btn-full-width{
   margin-top: 20px;
   width: 100%;
@@ -64,6 +67,15 @@ $white : #fff;
   border: none;
   cursor: pointer;
   opacity: 0.8;
+}
+.heading{
+  font-family:$central-font;
+  font-style: normal;
+  font-weight: bold;
+  font-size: 16px;
+  line-height: 19px;
+  letter-spacing: 0.02em;
+  color: #32323E;
 }
 // end of custom classes
 
@@ -119,18 +131,8 @@ table{
     float: right;
   }
 }
-.heading{
-  font-family:$central-font;
-  font-style: normal;
-  font-weight: bold;
-  font-size: 16px;
-  line-height: 19px;
-  letter-spacing: 0.02em;
-  color: #32323E;
-}
-.breadcrumb{
-  width:100px;
-}
+
+
 //side bar scrollbar
 .first::-webkit-scrollbar {
   width: 0;
@@ -154,13 +156,10 @@ table{
     text-align: center;
     border-radius: 6px;
     padding: 5px 0;
-
-    /* Position the tooltip */
     position: absolute;
     z-index: 1;
   }
 }
-
 .tooltip:hover .tooltiptext {
   visibility: visible;
 }

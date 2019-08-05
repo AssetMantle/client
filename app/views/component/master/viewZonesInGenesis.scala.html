@@ -1,13 +1,49 @@
 @import models.master.Zone
+@import controllers.actions.LoginState
 
-@(zones: Seq[Zone])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
 
+@(zones: Seq[Zone])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+@common(Messages(constants.Form.INDEX))(Html(""))(center)(Html(""))
+
+    @center ={
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="#">@Messages(constants.Form.ZONES)</a></li>
+        </ol>
+        <div class="card">
+            <div class="card-header">
+                <h4 class="leftText heading">@Messages(constants.Form.ZONES)</h4>
+            </div>
+            <div class="card-body">
+            <table class="table"">
+    <thead>
+        <tr>
+            <td>@Messages(constants.Form.ID)</td>
+            <td>@Messages(constants.Form.ACCOUNT_ID)</td>
+            <td>@Messages(constants.Form.NAME)</td>
+            <td>@Messages(constants.Form.CURRENCY)</td>
+        </tr>
+    </thead>
+    @for(zone <- zones) {
+        <tbody>
+            <tr>
+                <td>@zone.id</td>
+                <td>@zone.accountID</td>
+                <td>@zone.name</td>
+                <td>@zone.currency</td>
+                <td><a href="@controllers.routes.AddOrganizationController.viewOrganizationsInZoneForGenesis(zone.id)">View</a></td>
+            </tr>
+        </tbody>
+    }
+</table>
+            </div>
+        </div>
 @for(zone <- zones) {
     <div class="flexItem box firstBox leftText lightBlue">
         <span class="red">@Messages(constants.Form.ID)</span> :@zone.id <br>
         <span class="red">@Messages(constants.Form.ACCOUNT_ID)</span> :@zone.accountID <br>
         <span class="red">@Messages(constants.Form.NAME)</span> :@zone.name <br>
         <span class="red">@Messages(constants.Form.CURRENCY)</span> :@zone.currency <br>
+
         <div class="box leftMargin">
             <div>
                 <h2 class="showHide toggleElement centerText" onclick="fetchOrShowHide('@zone.accountID', jsRoutes.controllers.AddOrganizationController.viewOrganizationsInZoneForGenesis('@zone.id') ,this)">@Messages(constants.Form.ORGANIZATIONS)</h2>
@@ -16,3 +52,4 @@
         </div>
     </div>
 }
+    }

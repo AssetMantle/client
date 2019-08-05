@@ -5,13 +5,26 @@
 
 
     @center = {
+        <div class="container">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="leftText heading"><a href="@controllers.routes.AddOrganizationController.viewOrganizationsInZone()">@Messages(constants.Form.ORGANIZATIONS)</a></h4>
+            </div>
+            <div class="card-body">
+                <div id="zoneInformation" class="flexContainer scrollableFirst"></div>
+
+            </div>
+        </div>
+
         <div class="flexContainer">
 
             <div class="flexGrowth box leftText lightBlue">
                 <div>
+
                     <h2 class="showHide toggleElement centerText" onclick="fetchOrShowHide('zoneInformation', jsRoutes.controllers.AddOrganizationController.viewOrganizationsInZone() ,this)">@Messages(constants.Form.ORGANIZATIONS) </h2>
                 </div>
-                <div id="zoneInformation" class="flexContainer scrollableFirst"></div>
+
             </div>
+        </div>
         </div>
     }

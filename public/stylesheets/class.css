@@ -182,6 +182,7 @@ body {
     overflow: hidden;
     background-color: #333;
     margin-bottom: 5px;
+    font-size: 14px;
 }
 
 .navbar a {
@@ -191,7 +192,7 @@ body {
     text-align: center;
     padding: 14px 16px;
     text-decoration: none;
-    font-size: 1em;
+    font-size: 14px;
     cursor: pointer;
 }
 
@@ -252,23 +253,24 @@ body {
         height:100%;
         background: #31353D;
         padding-top:60px;
-        padding-left: 40px;
-        padding-right: 30px;
-        width: 250px;
+        padding-left: 10px;
+        width: 200px;
         margin-right: 1vw;
         overflow: auto;
     }
-    .first a {
-        color:#fff;
-        padding:8px 0px 8px 20px;
-        text-decoration: none;
-        display: block;
-        transition: 0.3s;
+    .first li{
+        list-style-type: none;
     }
-    .first a:hover{
+    .first li a {
+        color:#fff;
+        padding:8px 0px 0px 20px;
+        text-decoration: none;
+        transition: 0.3s;
+        display: inline-block;
+        margin-bottom:10px;
+    }
+    .first li:hover {
         color: #31353D;
-        background: #fff;
-        border-radius: 10px;
     }
 
     .second {
@@ -277,7 +279,7 @@ body {
         padding-top: 20px;
     }
     .pageFlexContainer .second{
-        padding-left: 280px;
+        padding-left: 210px;
     }
 }
 /*side bar for mobile mode*/
@@ -296,17 +298,25 @@ body {
 
 
     }
-    .first a {
-        color: #818896;
-        padding:8px 0px 8px 50px;
-        text-decoration: none;
-        display: block;
-        transition: 0.3s;
+    .first li{
+        list-style-type: none;
     }
+    .first li a {
+        color:#fff;
+        padding:8px 0px 0px 20px;
+        text-decoration: none;
+        transition: 0.3s;
+        display: inline-block;
+        margin-bottom:10px;
+    }
+    .first li:hover {
+        color: #31353D;
+    }
+
     .first .closebtn {
         position: relative;
         top: 0;
-        right: -70%;
+        right: -80%;
         font-size: 20px;
     }
     .close-sidebar{
@@ -333,14 +343,14 @@ body {
     width:20%;
     margin-left: 1vw;
 }
+
 .width70Percent{
     width: 70%;
     float: left;
 }
-.width30Percent{
+.profile_hover{
     transition: .5s ease;
-    width: 30%;
-    float: right;
+
 }
 .bottom {
     opacity: 0;
@@ -348,11 +358,11 @@ body {
     top: -20%;
     transition: .5s ease;
 }
-.width30Percent:hover img{
+.profile_hover:hover img{
     opacity: 0.3;
 }
 
-.width30Percent:hover .bottom{
+.profile_hover:hover .bottom{
     opacity: 1;
 }
 /*@media only screen and (max-width: 1200px) {*/
@@ -522,8 +532,8 @@ rightText{
 }
 
 .profilePicture{
-    height: 100px;
-    width: 100px;
+    height: 200px;
+    width: 200px;
 }
 /* Progress Bar*/
 

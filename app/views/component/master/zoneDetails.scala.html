@@ -1,7 +1,7 @@
 @import models.master.Zone
 
 @(zone: Zone)(implicit messagesProvider: MessagesProvider)
-    @Messages(constants.Form.NAME): @zone.name <br>
-    @Messages(constants.Form.ZONE_ID): @zone.id <br>
-    @Messages(constants.Form.CURRENCY): @zone.currency <br>
-    @Messages(constants.Form.VERIFIED_STATUS): @zone.status <br>
+<h4>@Messages(constants.Form.NAME):@zone.name </h4>
+<h4>@Messages(constants.Form.ZONE_ID):@zone.id </h4>
+<h4>@Messages(constants.Form.CURRENCY): @zone.currency </h4>
+<h4>@Messages(constants.Form.VERIFIED_STATUS): @zone.status </h4>

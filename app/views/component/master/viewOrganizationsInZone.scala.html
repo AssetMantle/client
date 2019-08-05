@@ -1,6 +1,50 @@
 @import models.master.Organization
+@import controllers.actions.LoginState
 
-@(organizations: Seq[Organization])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
+@(organizations: Seq[Organization])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+@common(Messages(constants.Form.INDEX))(Html(""))(center)(Html(""))
+
+    @center = {
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="#">@Messages(constants.Form.ORGANIZATIONS)</a></li>
+        </ol>
+        <div class="card">
+            <div class="card-header">
+                <h4 class="leftText heading">@Messages(constants.Form.ORGANIZATIONS)</h4>
+            </div>
+            <div class="card-body">
+                <table class="table">
+                    <thead>
+                        <tr>
+
+                            <td>@Messages(constants.Form.ID)</td>
+                            <td>@Messages(constants.Form.ACCOUNT_ID)</td>
+                            <td>@Messages(constants.Form.NAME)</td>
+                            <td>@Messages(constants.Form.ADDRESS)</td>
+                            <td>@Messages(constants.Form.PHONE)</td>
+                            <td>@Messages(constants.Form.EMAIL)</td>
+                            <td>Action</td>
+                        </tr>
+                    </thead>
+                    @for(organization <- organizations) {
+                        <tbody>
+
+                            <tr>
+                                <td>@organization.id</td>
+                                <td>@organization.accountID</td>
+                                <td>@organization.name</td>
+                                <td>@organization.address </td>
+                                <td>@organization.phone</td>
+                                <td>@organization.email</td>
+                                <td><a href="@controllers.routes.SetACLController.viewTradersInOrganizationForZone(organization.id)">View</a></td>
+                            </tr>
+                        </tbody>
+                    }
+                </table>
+
+
+            </div>
+        </div>
 
 @for(organization <- organizations) {
     <div class="flexItem box firstBox leftText lightBlue">
@@ -12,9 +56,10 @@
         <span class="red">@Messages(constants.Form.EMAIL)</span> :@organization.email <br>
         <div class="box leftMargin">
             <div>
-                <h2 class="showHide toggleElement centerText"  onclick="fetchOrShowHide('@organization.accountID', jsRoutes.controllers.SetACLController.viewTradersInOrganizationForZone('@organization.id') ,this)">@Messages(constants.Form.TRADERS)</h2>
-            </div>
+                <h2 class="showHide toggleElement centerText"  onclick="fetchOrShowHide('@organization.accountID', jsRoutes.controllers.ganizationForZone('@organization.id') ,this)">@Messages(constants.Form.TRADERS)</h2>
+            </div>SetACLController.viewTradersInOr
             <div id="@organization.accountID" class="flexContainer rightPadding scrollableThird"></div>
         </div>
     </div>
 }
+    }

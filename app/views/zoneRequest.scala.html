@@ -2,9 +2,40 @@
 @()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
     @common(Messages(constants.Form.INDEX))(Html(""))(center)(Html(""))
+@center = {
+<div class="container">
+      <div id="accordion">
+        <div class="card">
+            <div class="card-header">
+                <a onclick="fetchOrShowHide('pendingVerifyOrganizationRequests', jsRoutes.controllers.AddOrganizationController.viewPendingVerifyOrganizationRequests(),this)" class="collapsed card-link" data-toggle="collapse" href="#collapseTwo">
+                    @Messages(constants.Form.PENDING_VERIFY_ORGANIZATION_REQUESTS)
+                </a>
+
+            </div>
+            <div  id="collapseTwo" class="collapse" data-parent="#accordion">
+                <div class="card-body">
+                  <div id="pendingVerifyOrganizationRequests" class="flexContainer">
+                  </div>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header">
+                <a class="collapsed card-link" data-toggle="collapse" href="#collapseTwo">
+                    Collapse
+                </a>
+            </div>
+            <div id="collapseTwo" class="collapse" data-parent="#accordion">
+                <div class="card-body">
+                    Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
 
 
-    @center = {
         <div class="flexContainer">
             <div class="flexGrowth box leftText">
                 <div>

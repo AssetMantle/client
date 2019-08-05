@@ -1,7 +1,28 @@
 @import models.master.Trader
+@import controllers.actions.LoginState
 
-@(traders: Seq[Trader])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
+@(traders: Seq[Trader])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+    @common(Messages(constants.Form.INDEX))(Html(""))(center)(Html(""))
+    @center = {
+<table class="table">
+    <thead>
+        <tr>
+            <td>@Messages(constants.Form.ID)</td>
+            <td>@Messages(constants.Form.ACCOUNT_ID)</td>
+            <td>@Messages(constants.Form.NAME)</td>
 
+        </tr>
+    </thead>
+    @for(trader <- traders) {
+    <tbody>
+        <tr>
+            <td>@trader.id</td>
+            <td>@trader.accountID</td>
+            <td>@trader.name</td>
+        </tr>
+    </tbody>
+        }
+</table>
 @for(trader <- traders) {
     <div class="flexItem box firstBox leftText lightBlue">
         <span class="red">@Messages(constants.Form.ID)</span> :@trader.id <br>
@@ -10,3 +31,4 @@
         @*        <button class="approve" onclick="getForm(jsRoutes.controllers.IssueAssetController.issueAssetForm('@issueAssetRequest.id', '@issueAssetRequest.accountID', '@issueAssetRequest.documentHash', '@issueAssetRequest.assetType', @issueAssetRequest.assetPrice, '@issueAssetRequest.quantityUnit', @issueAssetRequest.assetQuantity))">@Messages(constants.Form.APPROVE)</button> <button class="reject" onclick="getForm(jsRoutes.controllers.IssueAssetController.rejectIssueAssetRequestForm('@issueAssetRequest.id'))">@Messages(constants.Form.REJECT)</button>*@
     </div>
 }
+    }

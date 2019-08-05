@@ -96,20 +96,23 @@
 
     .card-header {
       // border-radius: $border-radius-base;
-      padding: $bmd-label-top-margin-base 15px;
-      margin-left: 15px;
-      margin-right: 15px;
-      margin-top: -30px;
-      border: 0;
-      background: linear-gradient(60deg, $grey-200, $grey-400);
+      padding: .75rem 1.25rem;
+      margin-bottom: 0;
+      // margin-left: 15px;
+      // margin-right: 15px;
+      // margin-top: -30px;
+      background-color: rgba(0,0,0,.03);
+      border-bottom: 0 solid transparent;
+     
+      // background: linear-gradient(60deg, $grey-200, $grey-400);
 
       .title{
         color: $white-color;
       }
 
-      &:not([class*="header-"]){
-        @include shadow-big();
-      }
+      // &:not([class*="header-"]){
+      //   @include shadow-big();
+      // }
 
       .nav-tabs {
         padding: 0;
