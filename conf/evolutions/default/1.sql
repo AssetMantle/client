@@ -95,15 +95,19 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Asset_BC"
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Negotiation_BC"
 (
-  "id"              VARCHAR NOT NULL,
-  "buyerAddress"    VARCHAR NOT NULL,
-  "sellerAddress"   VARCHAR NOT NULL,
-  "assetPegHash"    VARCHAR NOT NULL,
-  "bid"             VARCHAR NOT NULL,
-  "time"            VARCHAR NOT NULL,
-  "buyerSignature"  VARCHAR,
-  "sellerSignature" VARCHAR,
-  "dirtyBit"        BOOLEAN NOT NULL,
+  "id"                 VARCHAR NOT NULL,
+  "buyerAddress"       VARCHAR NOT NULL,
+  "sellerAddress"      VARCHAR NOT NULL,
+  "assetPegHash"       VARCHAR NOT NULL,
+  "bid"                VARCHAR NOT NULL,
+  "time"               VARCHAR NOT NULL,
+  "buyerSignature"     VARCHAR,
+  "sellerSignature"    VARCHAR,
+  "buyerBlockHeight"   VARCHAR,
+  "sellerBlockHeight"  VARCHAR,
+  "buyerContractHash"  VARCHAR,
+  "sellerContractHash" VARCHAR,
+  "dirtyBit"           BOOLEAN NOT NULL,
   PRIMARY KEY ("id")
 );
 
@@ -227,31 +231,33 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."ChangeSellerBid"
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."ConfirmBuyerBid"
 (
-  "from"         VARCHAR NOT NULL,
-  "to"           VARCHAR NOT NULL,
-  "bid"          INT     NOT NULL,
-  "time"         INT     NOT NULL,
-  "pegHash"      VARCHAR NOT NULL,
-  "gas"          INT     NOT NULL,
-  "status"       BOOLEAN,
-  "txHash"       VARCHAR,
-  "ticketID"     VARCHAR NOT NULL,
-  "responseCode" VARCHAR,
+  "from"              VARCHAR NOT NULL,
+  "to"                VARCHAR NOT NULL,
+  "bid"               INT     NOT NULL,
+  "time"              INT     NOT NULL,
+  "pegHash"           VARCHAR NOT NULL,
+  "buyerContractHash" VARCHAR NOT NULL,
+  "gas"               INT     NOT NULL,
+  "status"            BOOLEAN,
+  "txHash"            VARCHAR,
+  "ticketID"          VARCHAR NOT NULL,
+  "responseCode"      VARCHAR,
   PRIMARY KEY ("ticketID")
 );
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."ConfirmSellerBid"
 (
-  "from"         VARCHAR NOT NULL,
-  "to"           VARCHAR NOT NULL,
-  "bid"          INT     NOT NULL,
-  "time"         INT     NOT NULL,
-  "pegHash"      VARCHAR NOT NULL,
-  "gas"          INT     NOT NULL,
-  "status"       BOOLEAN,
-  "txHash"       VARCHAR,
-  "ticketID"     VARCHAR NOT NULL,
-  "responseCode" VARCHAR,
+  "from"               VARCHAR NOT NULL,
+  "to"                 VARCHAR NOT NULL,
+  "bid"                INT     NOT NULL,
+  "time"               INT     NOT NULL,
+  "pegHash"            VARCHAR NOT NULL,
+  "sellerContractHash" VARCHAR NOT NULL,
+  "gas"                INT     NOT NULL,
+  "status"             BOOLEAN,
+  "txHash"             VARCHAR,
+  "ticketID"           VARCHAR NOT NULL,
+  "responseCode"       VARCHAR,
   PRIMARY KEY ("ticketID")
 );
 

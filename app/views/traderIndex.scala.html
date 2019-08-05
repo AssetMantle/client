@@ -87,24 +87,19 @@
                         <h2 class="showHide toggleElement centerText" onclick="fetchOrShowHide('buyNegotiationList', jsRoutes.controllers.ComponentViewController.buyNegotiationList(), this)">@Messages(constants.Form.BUY)</h2>
                     </div>
                     <div id="buyNegotiationList" class ="flexContainer"></div>
-                    <script type="text/javascript">
-                            var buyNegotiationCometMessage = function (event) {
-                                componentResource('buyNegotiationList', jsRoutes.controllers.ComponentViewController.buyNegotiationList());
-                            }
-                    </script>
                 </div>
-
                 <div class="box">
                     <div>
                         <h2 class="showHide toggleElement centerText" onclick="fetchOrShowHide('sellNegotiationList', jsRoutes.controllers.ComponentViewController.sellNegotiationList(), this)">@Messages(constants.Form.SELL)</h2>
                     </div>
                     <div id="sellNegotiationList" class ="flexContainer"></div>
-                    <script type="text/javascript">
-                            var sellNegotiationCometMessage = function (event) {
-                                componentResource('sellNegotiationList', jsRoutes.controllers.ComponentViewController.sellNegotiationList());
-                            }
-                    </script>
                 </div>
+                <script type="text/javascript">
+                        var negotiationCometMessage = function (event) {
+                            componentResource('buyNegotiationList', jsRoutes.controllers.ComponentViewController.buyNegotiationList());
+                            componentResource('sellNegotiationList', jsRoutes.controllers.ComponentViewController.sellNegotiationList());
+                        }
+                </script>
             </div>
         </div>
 
