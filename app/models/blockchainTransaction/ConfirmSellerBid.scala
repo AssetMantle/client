@@ -19,7 +19,7 @@ import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class ConfirmSellerBid(from: String, to: String, bid: Int, time: Int, pegHash: String, gas: Int, status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])
+case class ConfirmSellerBid(from: String, to: String, bid: Int, time: Int, pegHash: String, sellerContractHash: String, gas: Int, status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])
 
 @Singleton
 class ConfirmSellerBids @Inject()(actorSystem: ActorSystem, protected val databaseConfigProvider: DatabaseConfigProvider, blockchainTransactionFeedbacks: blockchain.TransactionFeedbacks, getNegotiationID: GetNegotiationID, getNegotiation: GetNegotiation, blockchainNegotiations: blockchain.Negotiations, transactionConfirmSellerBid: transactions.ConfirmSellerBid, pushNotification: PushNotification, masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
@@ -103,7 +103,7 @@ class ConfirmSellerBids @Inject()(actorSystem: ActorSystem, protected val databa
 
   private[models] class ConfirmSellerBidTable(tag: Tag) extends Table[ConfirmSellerBid](tag, "ConfirmSellerBid") {
 
-    def * = (from, to, bid, time, pegHash, gas, status.?, txHash.?, ticketID, responseCode.?) <> (ConfirmSellerBid.tupled, ConfirmSellerBid.unapply)
+    def * = (from, to, bid, time, pegHash, sellerContractHash, gas, status.?, txHash.?, ticketID, responseCode.?) <> (ConfirmSellerBid.tupled, ConfirmSellerBid.unapply)
 
     def from = column[String]("from")
 
@@ -114,6 +114,8 @@ class ConfirmSellerBids @Inject()(actorSystem: ActorSystem, protected val databa
     def time = column[Int]("time")
 
     def pegHash = column[String]("pegHash")
+
+    def sellerContractHash = column[String]("sellerContractHash")
 
     def gas = column[Int]("gas")
 
@@ -128,7 +130,7 @@ class ConfirmSellerBids @Inject()(actorSystem: ActorSystem, protected val databa
 
   object Service {
 
-    def create(from: String, to: String, bid: Int, time: Int, pegHash: String, gas: Int, status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])(implicit executionContext: ExecutionContext): String = Await.result(add(ConfirmSellerBid(from = from, to = to, bid = bid, time = time, pegHash = pegHash, gas = gas, status = status, txHash = txHash, ticketID = ticketID, responseCode = responseCode)), Duration.Inf)
+    def create(from: String, to: String, bid: Int, time: Int, pegHash: String, sellerContractHash: String, gas: Int, status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])(implicit executionContext: ExecutionContext): String = Await.result(add(ConfirmSellerBid(from = from, to = to, bid = bid, time = time, pegHash = pegHash, sellerContractHash = sellerContractHash, gas = gas, status = status, txHash = txHash, ticketID = ticketID, responseCode = responseCode)), Duration.Inf)
 
     def markTransactionSuccessful(ticketID: String, txHash: String, responseCode: String): Int = Await.result(updateTxHashStatusAndResponseCodeOnTicketID(ticketID, txHash, status = Option(true), responseCode), Duration.Inf)
 
@@ -150,7 +152,7 @@ class ConfirmSellerBids @Inject()(actorSystem: ActorSystem, protected val databa
         Thread.sleep(sleepTime)
         val negotiationID = blockchainNegotiations.Service.getNegotiationID(buyerAddress = confirmSellerBid.to, sellerAddress = fromAddress, pegHash = confirmSellerBid.pegHash)
         val negotiationResponse = if (negotiationID == "") getNegotiation.Service.get(getNegotiationID.Service.get(buyerAccount = toID, sellerAccount = confirmSellerBid.from, pegHash = confirmSellerBid.pegHash).negotiationID) else getNegotiation.Service.get(negotiationID)
-        blockchainNegotiations.Service.insertOrUpdate(id = negotiationResponse.value.negotiationID, buyerAddress = negotiationResponse.value.buyerAddress, sellerAddress = negotiationResponse.value.sellerAddress, assetPegHash = negotiationResponse.value.pegHash, bid = negotiationResponse.value.bid, time = negotiationResponse.value.time, buyerSignature = negotiationResponse.value.buyerSignature, sellerSignature = negotiationResponse.value.sellerSignature, true)
+        blockchainNegotiations.Service.insertOrUpdate(id = negotiationResponse.value.negotiationID, buyerAddress = negotiationResponse.value.buyerAddress, sellerAddress = negotiationResponse.value.sellerAddress, assetPegHash = negotiationResponse.value.pegHash, bid = negotiationResponse.value.bid, time = negotiationResponse.value.time, buyerSignature = negotiationResponse.value.buyerSignature, sellerSignature = negotiationResponse.value.sellerSignature, buyerBlockHeight = negotiationResponse.value.buyerBlockHeight, sellerBlockHeight = negotiationResponse.value.sellerBlockHeight, buyerContractHash = negotiationResponse.value.BuyerContractHash, sellerContractHash = negotiationResponse.value.SellerContractHash, dirtyBit = true)
         blockchainAccounts.Service.markDirty(fromAddress)
         blockchainTransactionFeedbacks.Service.markDirty(fromAddress)
         blockchainTransactionFeedbacks.Service.markDirty(confirmSellerBid.to)

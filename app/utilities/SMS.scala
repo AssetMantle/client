@@ -24,7 +24,7 @@ class SMS @Inject()(contacts: Contacts, accounts: Accounts, messagesApi: Message
   def sendSMS(accountID: String, messageType: String, passedData: Seq[String] = Seq(""))(implicit lang: Lang = Lang(accounts.Service.getLanguage(accountID))) {
     try{
       Twilio.init(accountSID, authToken)
-      Message.creator(new PhoneNumber(contacts.Service.findMobileNumber(accountID)), from, messagesApi(module + "Message" + "." + messageType, passedData(0))).create()
+      Message.creator(new PhoneNumber(contacts.Service.getMobileNumber(accountID)), from, messagesApi(module + "Message" + "." + messageType + " " + passedData(0))).create()
     }
     catch {
       case baseException: BaseException => throw new BaseException(baseException.failure)

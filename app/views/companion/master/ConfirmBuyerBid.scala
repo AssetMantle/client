@@ -11,10 +11,11 @@ object ConfirmBuyerBid {
       constants.Form.BID -> number(min = 1, max = 10000),
       constants.Form.TIME -> number(min = 1, max = 10000),
       constants.Form.PEG_HASH -> nonEmptyText(minLength = 1, maxLength = 20),
+      constants.Form.BUYER_CONTRACT_HASH -> nonEmptyText(minLength = 5, maxLength = 40),
       constants.Form.GAS -> number(min = 1, max = 10000)
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(password: String, sellerAddress: String, bid: Int, time: Int, pegHash: String, gas: Int)
+  case class Data(password: String, sellerAddress: String, bid: Int, time: Int, pegHash: String, buyerContractHash: String, gas: Int)
 
 }

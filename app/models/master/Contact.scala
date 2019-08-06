@@ -3,6 +3,7 @@ package models.master
 
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
+import org.postgresql.util.PSQLException
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.JdbcProfile
@@ -14,7 +15,7 @@ import scala.util.{Failure, Success}
 case class Contact(id: String, mobileNumber: String, mobileNumberVerified: Boolean, emailAddress: String, emailAddressVerified: Boolean)
 
 @Singleton
-class Contacts @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider) {
+class Contacts @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.MASTER_CONTACT
 
@@ -28,11 +29,15 @@ class Contacts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   private[models] val contactTable = TableQuery[ContactTable]
 
-  private def add(contact: Contact): Future[String] = db.run(contactTable returning contactTable.map(_.id) += contact)
+  private def add(contact: Contact): Future[String] = db.run((contactTable returning contactTable.map(_.id) += contact).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+    }
+  }
 
-  private def findById(id: String): Future[Contact] = db.run(contactTable.filter(_.id === id).result.head)
-
-  private def findEmailAddressById(id: String)(implicit executionContext: ExecutionContext): Future[String] = db.run(contactTable.filter(_.id === id).map(_.emailAddress).result.head.asTry).map {
+  private def findById(id: String): Future[Contact] = db.run(contactTable.filter(_.id === id).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -40,7 +45,7 @@ class Contacts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     }
   }
 
-  private def findMobileNumberById(id: String)(implicit executionContext: ExecutionContext): Future[String] = db.run(contactTable.filter(_.id === id).map(_.mobileNumber).result.head.asTry).map {
+  private def findEmailAddressById(id: String): Future[String] = db.run(contactTable.filter(_.id === id).map(_.emailAddress).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -48,13 +53,47 @@ class Contacts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     }
   }
 
-  private def deleteById(id: String) = db.run(contactTable.filter(_.id === id).delete)
+  private def findMobileNumberById(id: String): Future[String] = db.run(contactTable.filter(_.id === id).map(_.mobileNumber).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
 
-  private def update(contact: Contact): Future[Int] = db.run(contactTable.insertOrUpdate(contact))
+  private def deleteById(id: String) = db.run(contactTable.filter(_.id === id).delete.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
 
-  private def verifyMobileNumberOnId(id: String): Future[Int] = db.run(contactTable.filter(_.id === id).map(_.mobileNumberVerified).update(true))
+  private def upsert(contact: Contact): Future[Int] = db.run(contactTable.insertOrUpdate(contact).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+    }
+  }
 
-  private def verifyEmailAddressOnId(id: String): Future[Int] = db.run(contactTable.filter(_.id === id).map(_.emailAddressVerified).update(true))
+  private def updateMobileNumberVerificationStatusOnId(id: String, verificationStatus: Boolean): Future[Int] = db.run(contactTable.filter(_.id === id).map(_.mobileNumberVerified).update(verificationStatus).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def updateEmailVerificationStatusOnId(id: String, verificationStatus: Boolean): Future[Int] = db.run(contactTable.filter(_.id === id).map(_.emailAddressVerified).update(verificationStatus).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
 
   private[models] class ContactTable(tag: Tag) extends Table[Contact](tag, "Contact") {
 
@@ -70,21 +109,25 @@ class Contacts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
     def emailAddressVerified = column[Boolean]("emailAddressVerified")
 
-    def ? = (id.?, mobileNumber.?, mobileNumberVerified.?, emailAddress.?, emailAddressVerified.?).shaped.<>({ r => import r._; _1.map(_ => Contact.tupled((_1.get, _2.get, _3.get, _4.get, _5.get))) }, (_: Any) => throw new Exception("Inserting into ? projection not supported."))
-
   }
 
   object Service {
 
-    def updateEmailAndMobile(id: String, mobileNumber: String, emailAddress: String): Boolean = if (0 < Await.result(update(new Contact(id, mobileNumber, false, emailAddress, false)), Duration.Inf)) true else false
+    def getContact(id: String): Contact = Await.result(findById(id), Duration.Inf)
 
-    def verifyMobileNumber(id: String): Int = Await.result(verifyMobileNumberOnId(id), Duration.Inf)
+    def insertOrUpdateContact(id: String, mobileNumber: String, emailAddress: String): Boolean = if (0 < Await.result(upsert(Contact(id, mobileNumber, mobileNumberVerified =  false, emailAddress, emailAddressVerified = false)), Duration.Inf)) true else false
 
-    def verifyEmailAddress(id: String): Int = Await.result(verifyEmailAddressOnId(id), Duration.Inf)
+    def verifyMobileNumber(id: String): Int = Await.result(updateMobileNumberVerificationStatusOnId(id, verificationStatus = true), Duration.Inf)
 
-    def findEmailAddress(id: String)(implicit executionContext: ExecutionContext): String = Await.result(findEmailAddressById(id), Duration.Inf)
+    def verifyEmailAddress(id: String): Int = Await.result(updateEmailVerificationStatusOnId(id, verificationStatus = true), Duration.Inf)
 
-    def findMobileNumber(id: String)(implicit executionContext: ExecutionContext): String = Await.result(findMobileNumberById(id), Duration.Inf)
+    def getEmailAddress(id: String): String = Await.result(findEmailAddressById(id), Duration.Inf)
+
+    def getMobileNumber(id: String): String = Await.result(findMobileNumberById(id), Duration.Inf)
+
+    def getMobileVerificationStatus(id: String): Boolean = Await.result(findById(id), Duration.Inf).mobileNumberVerified
+
+    def getEmailVerificationStatus(id: String): Boolean = Await.result(findById(id), Duration.Inf).emailAddressVerified
 
   }
 

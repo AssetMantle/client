@@ -3,7 +3,7 @@ package controllers
 import controllers.actions.WithLoginAction
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import models.master.Contacts
+import models.master
 import models.masterTransaction.SMSOTPs
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
@@ -14,7 +14,7 @@ import views.companion.master.VerifyMobileNumber
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class VerifyMobileNumberController @Inject()(messagesControllerComponents: MessagesControllerComponents, smsOTPs: SMSOTPs, contacts: Contacts, withLoginAction: WithLoginAction, SMS: SMS)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class VerifyMobileNumberController @Inject()(messagesControllerComponents: MessagesControllerComponents, masterAccounts: master.Accounts, smsOTPs: SMSOTPs, masterContacts: master.Contacts, withLoginAction: WithLoginAction, SMS: SMS)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val module: String = constants.Module.CONTROLLERS_SMS
 
@@ -41,8 +41,14 @@ class VerifyMobileNumberController @Inject()(messagesControllerComponents: Messa
         verifyMobileNumberData => {
 
           try {
-            if (!smsOTPs.Service.verifyOTP(loginState.username, verifyMobileNumberData.otp)) throw new BaseException(constants.Response.INVALID_OTP)
-            if (contacts.Service.verifyMobileNumber(loginState.username) != 1) throw new BaseException(constants.Response.MOBILE_NUMBER_NOT_FOUND)
+            smsOTPs.Service.verifyOTP(loginState.username, verifyMobileNumberData.otp)
+            masterContacts.Service.verifyMobileNumber(loginState.username)
+            val contact = masterContacts.Service.getContact(loginState.username)
+            if (contact.emailAddressVerified && contact.mobileNumberVerified) {
+              masterAccounts.Service.updateStatusComplete(loginState.username)
+            } else {
+              masterAccounts.Service.updateStatusUnverifiedEmail(loginState.username)
+            }
             Ok(views.html.index(successes = Seq(constants.Response.SUCCESS)))
           }
           catch {

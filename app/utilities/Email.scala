@@ -20,9 +20,9 @@ class Email @Inject()(mailerClient: MailerClient, contacts: Contacts, accounts: 
       val email = Email(
         subject = messagesApi(module + "Subject" + "." + messageType),
         from = fromAddress,
-        to = Seq(contacts.Service.findEmailAddress(accountID)),
+        to = Seq(contacts.Service.getEmailAddress(accountID)),
         attachments = Seq(),
-        bodyText = Some(messagesApi(module + "Message" + "." + messageType, passedData(0))),
+        bodyText = Some(messagesApi(module + "Message" + "." + messageType + " " + passedData(0))),
       )
       mailerClient.send(email)
     }
