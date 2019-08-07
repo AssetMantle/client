@@ -38,7 +38,7 @@ class ACLAccounts @Inject()(protected val databaseConfigProvider: DatabaseConfig
 
   private def getAddressesByDirtyBit(dirtyBit: Boolean): Future[Seq[String]] = db.run(aclTable.filter(_.dirtyBit === dirtyBit).map(_.address).result)
 
-  private def upsert(aclAccount: ACLAccount)(implicit executionContext: ExecutionContext): Future[Int] = db.run(aclTable.insertOrUpdate(aclAccount).asTry).map {
+  private def upsert(aclAccount: ACLAccount): Future[Int] = db.run(aclTable.insertOrUpdate(aclAccount).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -46,7 +46,7 @@ class ACLAccounts @Inject()(protected val databaseConfigProvider: DatabaseConfig
     }
   }
 
-  private def add(aclAccount: ACLAccount)(implicit executionContext: ExecutionContext): Future[String] = db.run((aclTable returning aclTable.map(_.address) += aclAccount).asTry).map {
+  private def add(aclAccount: ACLAccount): Future[String] = db.run((aclTable returning aclTable.map(_.address) += aclAccount).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -54,7 +54,7 @@ class ACLAccounts @Inject()(protected val databaseConfigProvider: DatabaseConfig
     }
   }
 
-  private def findByAddress(address: String)(implicit executionContext: ExecutionContext): Future[ACLAccount] = db.run(aclTable.filter(_.address === address).result.head.asTry).map {
+  private def findByAddress(address: String): Future[ACLAccount] = db.run(aclTable.filter(_.address === address).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -103,13 +103,13 @@ class ACLAccounts @Inject()(protected val databaseConfigProvider: DatabaseConfig
 
   object Service {
 
-    def create(address: String, zoneID: String, organizationID: String, acl: ACL, dirtyBit: Boolean)(implicit executionContext: ExecutionContext): String = Await.result(add(ACLAccount(address, zoneID, organizationID, util.hashing.MurmurHash3.stringHash(acl.toString).toString, dirtyBit)), Duration.Inf)
+    def create(address: String, zoneID: String, organizationID: String, acl: ACL, dirtyBit: Boolean): String = Await.result(add(ACLAccount(address, zoneID, organizationID, util.hashing.MurmurHash3.stringHash(acl.toString).toString, dirtyBit)), Duration.Inf)
 
-    def insertOrUpdate(address: String, zoneID: String, organizationID: String, acl: ACL, dirtyBit: Boolean)(implicit executionContext: ExecutionContext): Int = Await.result(upsert(ACLAccount(address, zoneID, organizationID, util.hashing.MurmurHash3.stringHash(acl.toString).toString, dirtyBit)), Duration.Inf)
+    def insertOrUpdate(address: String, zoneID: String, organizationID: String, acl: ACL, dirtyBit: Boolean): Int = Await.result(upsert(ACLAccount(address, zoneID, organizationID, util.hashing.MurmurHash3.stringHash(acl.toString).toString, dirtyBit)), Duration.Inf)
 
-    def get(address: String)(implicit executionContext: ExecutionContext): ACLAccount = Await.result(findByAddress(address), Duration.Inf)
+    def get(address: String): ACLAccount = Await.result(findByAddress(address), Duration.Inf)
 
-    def getAddressesUnderZone(zoneID: String)(implicit executionContext: ExecutionContext): Seq[String] = Await.result(getAddressesByZoneID(zoneID), Duration.Inf)
+    def getAddressesUnderZone(zoneID: String): Seq[String] = Await.result(getAddressesByZoneID(zoneID), Duration.Inf)
 
     def getDirtyAddresses: Seq[String] = Await.result(getAddressesByDirtyBit(dirtyBit = true), Duration.Inf)
 

@@ -28,7 +28,7 @@ class IssueAssetRequests @Inject()(protected val databaseConfigProvider: Databas
 
   private[models] val issueAssetRequestTable = TableQuery[IssueAssetRequestTable]
 
-  private def add(issueAssetRequest: IssueAssetRequest)(implicit executionContext: ExecutionContext): Future[String] = db.run((issueAssetRequestTable returning issueAssetRequestTable.map(_.id) += issueAssetRequest).asTry).map {
+  private def add(issueAssetRequest: IssueAssetRequest): Future[String] = db.run((issueAssetRequestTable returning issueAssetRequestTable.map(_.id) += issueAssetRequest).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -36,7 +36,7 @@ class IssueAssetRequests @Inject()(protected val databaseConfigProvider: Databas
     }
   }
 
-  private def findByID(id: String)(implicit executionContext: ExecutionContext): Future[IssueAssetRequest] = db.run(issueAssetRequestTable.filter(_.id === id).result.head.asTry).map {
+  private def findByID(id: String): Future[IssueAssetRequest] = db.run(issueAssetRequestTable.filter(_.id === id).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -78,7 +78,7 @@ class IssueAssetRequests @Inject()(protected val databaseConfigProvider: Databas
     }
   }
 
-  private def getStatusByID(id: String)(implicit executionContext: ExecutionContext): Future[Option[Boolean]] = db.run(issueAssetRequestTable.filter(_.id === id).map(_.status.?).result.head.asTry).map {
+  private def getStatusByID(id: String): Future[Option[Boolean]] = db.run(issueAssetRequestTable.filter(_.id === id).map(_.status.?).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.info(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -116,17 +116,17 @@ class IssueAssetRequests @Inject()(protected val databaseConfigProvider: Databas
 
   object Service {
 
-    def create(accountID: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int)(implicit executionContext: ExecutionContext): String = Await.result(add(IssueAssetRequest(id = Random.nextString(32), null, accountID = accountID, documentHash = documentHash, assetType = assetType, assetPrice = assetPrice, quantityUnit = quantityUnit, assetQuantity = assetQuantity, null, null, null)), Duration.Inf)
+    def create(accountID: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int): String = Await.result(add(IssueAssetRequest(id = Random.nextString(32), null, accountID = accountID, documentHash = documentHash, assetType = assetType, assetPrice = assetPrice, quantityUnit = quantityUnit, assetQuantity = assetQuantity, null, null, null)), Duration.Inf)
 
-    def accept(id: String, ticketID: String, gas: Int)(implicit executionContext: ExecutionContext): Int = Await.result(updateTicketIDStatusAndGasByID(id, ticketID, status = true, gas), Duration.Inf)
+    def accept(id: String, ticketID: String, gas: Int): Int = Await.result(updateTicketIDStatusAndGasByID(id, ticketID, status = true, gas), Duration.Inf)
 
-    def reject(id: String, comment: String)(implicit executionContext: ExecutionContext): Int = Await.result(updateStatusAndCommentByID(id = id, status = Option(false), comment = comment), Duration.Inf)
+    def reject(id: String, comment: String): Int = Await.result(updateStatusAndCommentByID(id = id, status = Option(false), comment = comment), Duration.Inf)
 
-    def getPendingIssueAssetRequests(accountIDs: Seq[String])(implicit executionContext: ExecutionContext): Seq[IssueAssetRequest] = Await.result(getIssueAssetRequestsWithNullStatus(accountIDs), Duration.Inf)
+    def getPendingIssueAssetRequests(accountIDs: Seq[String]): Seq[IssueAssetRequest] = Await.result(getIssueAssetRequestsWithNullStatus(accountIDs), Duration.Inf)
 
-    def delete(id: String)(implicit executionContext: ExecutionContext): Int = Await.result(deleteByID(id), Duration.Inf)
+    def delete(id: String): Int = Await.result(deleteByID(id), Duration.Inf)
 
-    def getStatus(id: String)(implicit executionContext: ExecutionContext): Option[Boolean] = Await.result(getStatusByID(id), Duration.Inf)
+    def getStatus(id: String): Option[Boolean] = Await.result(getStatusByID(id), Duration.Inf)
 
   }
 

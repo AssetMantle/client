@@ -44,7 +44,7 @@ class EmailOTPs @Inject()(protected val databaseConfigProvider: DatabaseConfigPr
     }
   }
 
-  private def findById(id: String)(implicit executionContext: ExecutionContext): Future[EmailOTP] = db.run(emailOTPTable.filter(_.id === id).result.head.asTry).map {
+  private def findById(id: String): Future[EmailOTP] = db.run(emailOTPTable.filter(_.id === id).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -80,7 +80,7 @@ class EmailOTPs @Inject()(protected val databaseConfigProvider: DatabaseConfigPr
       otp
     }
 
-    def verifyOTP(id: String, otp: String)(implicit executionContext: ExecutionContext): Boolean = {
+    def verifyOTP(id: String, otp: String): Boolean = {
       if (Await.result(findById(id), Duration.Inf).secretHash != util.hashing.MurmurHash3.stringHash(otp).toString) throw new BaseException(constants.Response.INVALID_OTP)
       true
     }

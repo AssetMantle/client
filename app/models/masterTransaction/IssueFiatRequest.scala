@@ -28,7 +28,7 @@ class IssueFiatRequests @Inject()(protected val databaseConfigProvider: Database
 
   private[models] val issueFiatRequestTable = TableQuery[IssueFiatRequestTable]
 
-  private def add(issueFiatRequest: IssueFiatRequest)(implicit executionContext: ExecutionContext): Future[String] = db.run((issueFiatRequestTable returning issueFiatRequestTable.map(_.id) += issueFiatRequest).asTry).map {
+  private def add(issueFiatRequest: IssueFiatRequest): Future[String] = db.run((issueFiatRequestTable returning issueFiatRequestTable.map(_.id) += issueFiatRequest).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -36,7 +36,7 @@ class IssueFiatRequests @Inject()(protected val databaseConfigProvider: Database
     }
   }
 
-  private def findByID(id: String)(implicit executionContext: ExecutionContext): Future[IssueFiatRequest] = db.run(issueFiatRequestTable.filter(_.id === id).result.head.asTry).map {
+  private def findByID(id: String): Future[IssueFiatRequest] = db.run(issueFiatRequestTable.filter(_.id === id).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -79,7 +79,7 @@ class IssueFiatRequests @Inject()(protected val databaseConfigProvider: Database
     }
   }
 
-  private def getStatusByID(id: String)(implicit executionContext: ExecutionContext): Future[Option[Boolean]] = db.run(issueFiatRequestTable.filter(_.id === id).map(_.status.?).result.head.asTry).map {
+  private def getStatusByID(id: String): Future[Option[Boolean]] = db.run(issueFiatRequestTable.filter(_.id === id).map(_.status.?).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -114,17 +114,17 @@ class IssueFiatRequests @Inject()(protected val databaseConfigProvider: Database
 
   object Service {
 
-    def create(accountID: String, transactionID: String, transactionAmount: Int)(implicit executionContext: ExecutionContext): String = Await.result(add(IssueFiatRequest(id = Random.nextString(32), accountID = accountID, transactionID = transactionID, transactionAmount = transactionAmount, null, null, null, null)), Duration.Inf)
+    def create(accountID: String, transactionID: String, transactionAmount: Int): String = Await.result(add(IssueFiatRequest(id = Random.nextString(32), accountID = accountID, transactionID = transactionID, transactionAmount = transactionAmount, null, null, null, null)), Duration.Inf)
 
-    def reject(id: String, comment: String)(implicit executionContext: ExecutionContext): Int = Await.result(updateStatusAndCommentByID(id = id, status = Option(false), comment = comment), Duration.Inf)
+    def reject(id: String, comment: String): Int = Await.result(updateStatusAndCommentByID(id = id, status = Option(false), comment = comment), Duration.Inf)
 
-    def accept(requestID: String, ticketID: String, gas: Int)(implicit executionContext: ExecutionContext): Int = Await.result(updateTicketIDStatusAndGasByID(requestID, ticketID, status = Option(true), gas), Duration.Inf)
+    def accept(requestID: String, ticketID: String, gas: Int): Int = Await.result(updateTicketIDStatusAndGasByID(requestID, ticketID, status = Option(true), gas), Duration.Inf)
 
-    def getPendingIssueFiatRequests(accountIDs: Seq[String])(implicit executionContext: ExecutionContext): Seq[IssueFiatRequest] = Await.result(getIssueFiatRequestsWithNullStatus(accountIDs), Duration.Inf)
+    def getPendingIssueFiatRequests(accountIDs: Seq[String]): Seq[IssueFiatRequest] = Await.result(getIssueFiatRequestsWithNullStatus(accountIDs), Duration.Inf)
 
-    def delete(id: String)(implicit executionContext: ExecutionContext): Int = Await.result(deleteByID(id), Duration.Inf)
+    def delete(id: String): Int = Await.result(deleteByID(id), Duration.Inf)
 
-    def getStatus(id: String)(implicit executionContext: ExecutionContext): Option[Boolean] = Await.result(getStatusByID(id), Duration.Inf)
+    def getStatus(id: String): Option[Boolean] = Await.result(getStatusByID(id), Duration.Inf)
 
   }
 

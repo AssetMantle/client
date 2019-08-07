@@ -29,7 +29,7 @@ class Notifications @Inject()(protected val databaseConfigProvider: DatabaseConf
 
   private[models] val notificationTable = TableQuery[NotificationTable]
 
-  private def add(notification: Notification)(implicit executionContext: ExecutionContext): Future[String] = db.run((notificationTable returning notificationTable.map(_.accountID) += notification).asTry).map {
+  private def add(notification: Notification): Future[String] = db.run((notificationTable returning notificationTable.map(_.accountID) += notification).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -39,7 +39,7 @@ class Notifications @Inject()(protected val databaseConfigProvider: DatabaseConf
 
   private def findNotificationsByAccountId(accountID: String, offset: Int, limit: Int): Future[Seq[Notification]] = db.run(notificationTable.filter(_.accountID === accountID).sortBy(_.time.desc).drop(offset).take(limit).result)
 
-  private def findNumberOfUnreadByAccountId(accountID: String)(implicit executionContext: ExecutionContext): Future[Int] = db.run(notificationTable.filter(_.accountID === accountID).filter(_.read === false).length.result)
+  private def findNumberOfUnreadByAccountId(accountID: String): Future[Int] = db.run(notificationTable.filter(_.accountID === accountID).filter(_.read === false).length.result)
 
   private def markReadById(id: String): Future[Int] = db.run(notificationTable.filter(_.id === id).map(_.read).update(true))
 
@@ -67,13 +67,13 @@ class Notifications @Inject()(protected val databaseConfigProvider: DatabaseConf
 
   object Service {
 
-    def create(accountID: String, notificationTitle: String, notificationMessage: String)(implicit executionContext: ExecutionContext): String = Await.result(add(Notification(accountID, notificationTitle, notificationMessage, DateTime.now(DateTimeZone.UTC).getMillis, false, Random.nextString(32))), Duration.Inf)
+    def create(accountID: String, notificationTitle: String, notificationMessage: String): String = Await.result(add(Notification(accountID, notificationTitle, notificationMessage, DateTime.now(DateTimeZone.UTC).getMillis, false, Random.nextString(32))), Duration.Inf)
 
-    def get(accountID: String, offset: Int, limit: Int)(implicit executionContext: ExecutionContext): Seq[Notification] = Await.result(findNotificationsByAccountId(accountID, offset, limit), Duration.Inf)
+    def get(accountID: String, offset: Int, limit: Int): Seq[Notification] = Await.result(findNotificationsByAccountId(accountID, offset, limit), Duration.Inf)
 
     def markAsRead(id: String): Int = Await.result(markReadById(id), Duration.Inf)
 
-    def getNumberOfUnread(accountID: String)(implicit executionContext: ExecutionContext): Int = Await.result(findNumberOfUnreadByAccountId(accountID), Duration.Inf)
+    def getNumberOfUnread(accountID: String): Int = Await.result(findNumberOfUnreadByAccountId(accountID), Duration.Inf)
 
   }
 

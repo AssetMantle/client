@@ -51,7 +51,7 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
   private val sleepTime = configuration.get[Long]("blockchain.entityIterator.threadSleep")
 
-  private def add(fiat: Fiat)(implicit executionContext: ExecutionContext): Future[String] = db.run((fiatTable returning fiatTable.map(_.pegHash) += fiat).asTry).map {
+  private def add(fiat: Fiat): Future[String] = db.run((fiatTable returning fiatTable.map(_.pegHash) += fiat).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -59,7 +59,7 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
     }
   }
 
-  private def upsert(fiat: Fiat)(implicit executionContext: ExecutionContext): Future[Int] = db.run(fiatTable.insertOrUpdate(fiat).asTry).map {
+  private def upsert(fiat: Fiat): Future[Int] = db.run(fiatTable.insertOrUpdate(fiat).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -67,7 +67,7 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
     }
   }
 
-  private def findByPegHashAndOwnerAddress(pegHash: String, ownerAddress: String)(implicit executionContext: ExecutionContext): Future[Fiat] = db.run(fiatTable.filter(_.pegHash === pegHash).filter(_.ownerAddress === ownerAddress).result.head.asTry).map {
+  private def findByPegHashAndOwnerAddress(pegHash: String, ownerAddress: String): Future[Fiat] = db.run(fiatTable.filter(_.pegHash === pegHash).filter(_.ownerAddress === ownerAddress).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -130,15 +130,15 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
   object Service {
 
-    def create(pegHash: String, ownerAddress: String, transactionID: String, transactionAmount: String, redeemedAmount: String, dirtyBit: Boolean)(implicit executionContext: ExecutionContext): String = Await.result(add(Fiat(pegHash, ownerAddress, transactionID, transactionAmount, redeemedAmount, dirtyBit)), Duration.Inf)
+    def create(pegHash: String, ownerAddress: String, transactionID: String, transactionAmount: String, redeemedAmount: String, dirtyBit: Boolean): String = Await.result(add(Fiat(pegHash, ownerAddress, transactionID, transactionAmount, redeemedAmount, dirtyBit)), Duration.Inf)
 
-    def getFiatPegWallet(address: String)(implicit executionContext: ExecutionContext): Seq[Fiat] = Await.result(getFiatPegWalletByAddress(address), Duration.Inf)
+    def getFiatPegWallet(address: String): Seq[Fiat] = Await.result(getFiatPegWalletByAddress(address), Duration.Inf)
 
-    def insertOrUpdate(pegHash: String, ownerAddress: String, transactionID: String, transactionAmount: String, redeemedAmount: String, dirtyBit: Boolean)(implicit executionContext: ExecutionContext): Int = Await.result(upsert(Fiat(pegHash = pegHash, ownerAddress, transactionID = transactionID, transactionAmount = transactionAmount, redeemedAmount = redeemedAmount, dirtyBit)), Duration.Inf)
+    def insertOrUpdate(pegHash: String, ownerAddress: String, transactionID: String, transactionAmount: String, redeemedAmount: String, dirtyBit: Boolean): Int = Await.result(upsert(Fiat(pegHash = pegHash, ownerAddress, transactionID = transactionID, transactionAmount = transactionAmount, redeemedAmount = redeemedAmount, dirtyBit)), Duration.Inf)
 
-    def deleteFiat(pegHash: String, address: String)(implicit executionContext: ExecutionContext): Int = Await.result(deleteByPegHashAndAddress(pegHash, address), Duration.Inf)
+    def deleteFiat(pegHash: String, address: String): Int = Await.result(deleteByPegHashAndAddress(pegHash, address), Duration.Inf)
 
-    def deleteFiatPegWallet(address: String)(implicit executionContext: ExecutionContext): Int = Await.result(deleteByAddress(address), Duration.Inf)
+    def deleteFiatPegWallet(address: String): Int = Await.result(deleteByAddress(address), Duration.Inf)
 
     def getDirtyFiats: Seq[Fiat] = Await.result(getFiatsByDirtyBit(dirtyBit = true), Duration.Inf)
 

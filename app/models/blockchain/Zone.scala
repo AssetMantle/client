@@ -34,7 +34,7 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
   private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
   private val sleepTime = configuration.get[Long]("blockchain.entityIterator.threadSleep")
 
-  private def add(zone: Zone)(implicit executionContext: ExecutionContext): Future[String] = db.run((zoneTable returning zoneTable.map(_.id) += zone).asTry).map {
+  private def add(zone: Zone): Future[String] = db.run((zoneTable returning zoneTable.map(_.id) += zone).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -54,7 +54,7 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
   private def getZonesByDirtyBit(dirtyBit: Boolean): Future[Seq[Zone]] = db.run(zoneTable.filter(_.dirtyBit === dirtyBit).result)
 
-  private def findById(id: String)(implicit executionContext: ExecutionContext): Future[Zone] = db.run(zoneTable.filter(_.id === id).result.head.asTry).map {
+  private def findById(id: String): Future[Zone] = db.run(zoneTable.filter(_.id === id).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -74,7 +74,7 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
     }
   }
 
-  private def getAddressById(id: String)(implicit executionContext: ExecutionContext): Future[String] = db.run(zoneTable.filter(_.id === id).map(_.address).result.head.asTry).map {
+  private def getAddressById(id: String): Future[String] = db.run(zoneTable.filter(_.id === id).map(_.address).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -84,7 +84,7 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
     }
   }
 
-  private def getIdByAddress(address: String)(implicit executionContext: ExecutionContext): Future[String] = db.run(zoneTable.filter(_.address === address).map(_.id).result.head.asTry).map {
+  private def getIdByAddress(address: String): Future[String] = db.run(zoneTable.filter(_.address === address).map(_.id).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -120,11 +120,11 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
   object Service {
 
-    def create(id: String, address: String, dirtyBit: Boolean)(implicit executionContext: ExecutionContext): String = Await.result(add(Zone(id = id, address = address, dirtyBit = dirtyBit)), Duration.Inf)
+    def create(id: String, address: String, dirtyBit: Boolean): String = Await.result(add(Zone(id = id, address = address, dirtyBit = dirtyBit)), Duration.Inf)
 
-    def getAddress(id: String)(implicit executionContext: ExecutionContext): String = Await.result(getAddressById(id), Duration.Inf)
+    def getAddress(id: String): String = Await.result(getAddressById(id), Duration.Inf)
 
-    def getID(address: String)(implicit executionContext: ExecutionContext): String = Await.result(getIdByAddress(address), Duration.Inf)
+    def getID(address: String): String = Await.result(getIdByAddress(address), Duration.Inf)
 
     def getDirtyZones: Seq[Zone] = Await.result(getZonesByDirtyBit(dirtyBit = true), Duration.Inf)
 

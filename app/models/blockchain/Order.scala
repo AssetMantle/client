@@ -51,7 +51,7 @@ class Orders @Inject()(shutdownActors: ShutdownActors, masterAccounts: master.Ac
 
   private val sleepTime = configuration.get[Long]("blockchain.entityIterator.threadSleep")
 
-  private def add(order: Order)(implicit executionContext: ExecutionContext): Future[String] = db.run((orderTable returning orderTable.map(_.id) += order).asTry).map {
+  private def add(order: Order): Future[String] = db.run((orderTable returning orderTable.map(_.id) += order).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -59,7 +59,7 @@ class Orders @Inject()(shutdownActors: ShutdownActors, masterAccounts: master.Ac
     }
   }
 
-  private def upsert(order: Order)(implicit executionContext: ExecutionContext): Future[Int] = db.run(orderTable.insertOrUpdate(order).asTry).map {
+  private def upsert(order: Order): Future[Int] = db.run(orderTable.insertOrUpdate(order).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -67,7 +67,7 @@ class Orders @Inject()(shutdownActors: ShutdownActors, masterAccounts: master.Ac
     }
   }
 
-  private def findById(id: String)(implicit executionContext: ExecutionContext): Future[Order] = db.run(orderTable.filter(_.id === id).result.head.asTry).map {
+  private def findById(id: String): Future[Order] = db.run(orderTable.filter(_.id === id).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -93,7 +93,7 @@ class Orders @Inject()(shutdownActors: ShutdownActors, masterAccounts: master.Ac
 
   private def getOrderIDs: Future[Seq[String]] = db.run(orderTable.map(_.id).result)
 
-  private def deleteById(id: String)(implicit executionContext: ExecutionContext): Future[Int] = db.run(orderTable.filter(_.id === id).delete.asTry).map {
+  private def deleteById(id: String): Future[Int] = db.run(orderTable.filter(_.id === id).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -119,9 +119,9 @@ class Orders @Inject()(shutdownActors: ShutdownActors, masterAccounts: master.Ac
 
   object Service {
 
-    def create(id: String, fiatProofHash: Option[String], awbProofHash: Option[String])(implicit executionContext: ExecutionContext): String = Await.result(add(Order(id = id, fiatProofHash = fiatProofHash, awbProofHash = awbProofHash, dirtyBit = false)), Duration.Inf)
+    def create(id: String, fiatProofHash: Option[String], awbProofHash: Option[String]): String = Await.result(add(Order(id = id, fiatProofHash = fiatProofHash, awbProofHash = awbProofHash, dirtyBit = false)), Duration.Inf)
 
-    def insertOrUpdate(id: String, fiatProofHash: Option[String], awbProofHash: Option[String], dirtyBit: Boolean)(implicit executionContext: ExecutionContext): Int = Await.result(upsert(Order(id = id, fiatProofHash = fiatProofHash, awbProofHash = awbProofHash, dirtyBit = dirtyBit)), Duration.Inf)
+    def insertOrUpdate(id: String, fiatProofHash: Option[String], awbProofHash: Option[String], dirtyBit: Boolean): Int = Await.result(upsert(Order(id = id, fiatProofHash = fiatProofHash, awbProofHash = awbProofHash, dirtyBit = dirtyBit)), Duration.Inf)
 
     def getDirtyOrders: Seq[Order] = Await.result(getOrdersByDirtyBit(dirtyBit = true), Duration.Inf)
 

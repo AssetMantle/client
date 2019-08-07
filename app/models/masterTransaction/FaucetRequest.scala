@@ -28,7 +28,7 @@ class FaucetRequests @Inject()(protected val databaseConfigProvider: DatabaseCon
 
   private[models] val faucetRequestTable = TableQuery[FaucetRequestTable]
 
-  private def add(faucetRequest: FaucetRequest)(implicit executionContext: ExecutionContext): Future[String] = db.run((faucetRequestTable returning faucetRequestTable.map(_.id) += faucetRequest).asTry).map {
+  private def add(faucetRequest: FaucetRequest): Future[String] = db.run((faucetRequestTable returning faucetRequestTable.map(_.id) += faucetRequest).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -36,7 +36,7 @@ class FaucetRequests @Inject()(protected val databaseConfigProvider: DatabaseCon
     }
   }
 
-  private def findByAccountID(accountID: String)(implicit executionContext: ExecutionContext): Future[FaucetRequest] = db.run(faucetRequestTable.filter(_.accountID === accountID).result.head.asTry).map {
+  private def findByAccountID(accountID: String): Future[FaucetRequest] = db.run(faucetRequestTable.filter(_.accountID === accountID).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -48,7 +48,7 @@ class FaucetRequests @Inject()(protected val databaseConfigProvider: DatabaseCon
 
   private def getFaucetRequestsWithNullStatus: Future[Seq[FaucetRequest]] = db.run(faucetRequestTable.filter(_.status.?.isEmpty).result)
 
-  private def updateTicketIDStatusAndGasByID(id: String, ticketID: String, status: Option[Boolean], gas: Int)(implicit executionContext: ExecutionContext): Future[Int] = db.run(faucetRequestTable.filter(_.id === id).map(faucet => (faucet.ticketID, faucet.status.?, faucet.gas)).update(ticketID, status, gas).asTry).map {
+  private def updateTicketIDStatusAndGasByID(id: String, ticketID: String, status: Option[Boolean], gas: Int): Future[Int] = db.run(faucetRequestTable.filter(_.id === id).map(faucet => (faucet.ticketID, faucet.status.?, faucet.gas)).update(ticketID, status, gas).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -78,7 +78,7 @@ class FaucetRequests @Inject()(protected val databaseConfigProvider: DatabaseCon
     }
   }
 
-  private def getStatusByID(id: String)(implicit executionContext: ExecutionContext): Future[Option[Boolean]] = db.run(faucetRequestTable.filter(_.id === id).map(_.status.?).result.head.asTry).map {
+  private def getStatusByID(id: String): Future[Option[Boolean]] = db.run(faucetRequestTable.filter(_.id === id).map(_.status.?).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -110,17 +110,17 @@ class FaucetRequests @Inject()(protected val databaseConfigProvider: DatabaseCon
 
   object Service {
 
-    def create(accountID: String, amount: Int)(implicit executionContext: ExecutionContext): String = Await.result(add(FaucetRequest(Random.nextString(32), null, accountID, amount, null, null, null)), Duration.Inf)
+    def create(accountID: String, amount: Int): String = Await.result(add(FaucetRequest(Random.nextString(32), null, accountID, amount, null, null, null)), Duration.Inf)
 
-    def accept(requestID: String, ticketID: String, gas: Int)(implicit executionContext: ExecutionContext): Int = Await.result(updateTicketIDStatusAndGasByID(requestID, ticketID, status = Option(true), gas), Duration.Inf)
+    def accept(requestID: String, ticketID: String, gas: Int): Int = Await.result(updateTicketIDStatusAndGasByID(requestID, ticketID, status = Option(true), gas), Duration.Inf)
 
-    def reject(id: String, comment: String)(implicit executionContext: ExecutionContext): Int = Await.result(updateStatusAndCommentByID(id = id, status = Option(false), comment = comment), Duration.Inf)
+    def reject(id: String, comment: String): Int = Await.result(updateStatusAndCommentByID(id = id, status = Option(false), comment = comment), Duration.Inf)
 
     def getPendingFaucetRequests: Seq[FaucetRequest] = Await.result(getFaucetRequestsWithNullStatus, Duration.Inf)
 
-    def delete(id: String)(implicit executionContext: ExecutionContext): Int = Await.result(deleteByID(id), Duration.Inf)
+    def delete(id: String): Int = Await.result(deleteByID(id), Duration.Inf)
 
-    def getStatus(id: String)(implicit executionContext: ExecutionContext): Option[Boolean] = Await.result(getStatusByID(id), Duration.Inf)
+    def getStatus(id: String): Option[Boolean] = Await.result(getStatusByID(id), Duration.Inf)
 
   }
 

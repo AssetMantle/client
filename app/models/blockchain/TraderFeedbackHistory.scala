@@ -28,7 +28,7 @@ class TraderFeedbackHistories @Inject()(protected val databaseConfigProvider: Da
 
   private[models] val traderFeedbackHistoryTable = TableQuery[TraderFeedbackHistoryTable]
 
-  private def add(traderFeedbackHistory: TraderFeedbackHistory)(implicit executionContext: ExecutionContext): Future[String] = db.run((traderFeedbackHistoryTable returning traderFeedbackHistoryTable.map(_.address) += traderFeedbackHistory).asTry).map {
+  private def add(traderFeedbackHistory: TraderFeedbackHistory): Future[String] = db.run((traderFeedbackHistoryTable returning traderFeedbackHistoryTable.map(_.address) += traderFeedbackHistory).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)

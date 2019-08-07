@@ -38,7 +38,7 @@ class AccountTokens @Inject()(actorSystem: ActorSystem, shutdownActors: Shutdown
 
   private[models] val accountTokenTable = TableQuery[AccountTokenTable]
 
-  private def add(accountToken: AccountToken)(implicit executionContext: ExecutionContext): Future[String] = db.run((accountTokenTable returning accountTokenTable.map(_.id) += accountToken).asTry).map {
+  private def add(accountToken: AccountToken): Future[String] = db.run((accountTokenTable returning accountTokenTable.map(_.id) += accountToken).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -46,7 +46,7 @@ class AccountTokens @Inject()(actorSystem: ActorSystem, shutdownActors: Shutdown
     }
   }
 
-  private def findById(id: String)(implicit executionContext: ExecutionContext): Future[AccountToken] = db.run(accountTokenTable.filter(_.id === id).result.head.asTry).map {
+  private def findById(id: String): Future[AccountToken] = db.run(accountTokenTable.filter(_.id === id).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -87,26 +87,26 @@ class AccountTokens @Inject()(actorSystem: ActorSystem, shutdownActors: Shutdown
 
     def updateToken(id: String, notificationToken: String): Int = Await.result(upsert(AccountToken(id, Option(notificationToken), null, Option(DateTime.now(DateTimeZone.UTC).getMillis))), Duration.Inf)
 
-    def getTokenById(id: String)(implicit executionContext: ExecutionContext): Option[String] = Await.result(findById(id), Duration.Inf).notificationToken
+    def getTokenById(id: String): Option[String] = Await.result(findById(id), Duration.Inf).notificationToken
 
-    def getSessionTokenTimeById(id: String)(implicit executionContext: ExecutionContext): Long = Await.result(findById(id), Duration.Inf).sessionTokenTime.getOrElse(0.toLong)
+    def getSessionTokenTimeById(id: String): Long = Await.result(findById(id), Duration.Inf).sessionTokenTime.getOrElse(0.toLong)
 
     def ifExists(id: String): Boolean = Await.result(checkById(id), Duration.Inf)
 
-    def verifySessionToken(username: Option[String], sessionToken: Option[String])(implicit executionContext: ExecutionContext): Boolean = {
+    def verifySessionToken(username: Option[String], sessionToken: Option[String]): Boolean = {
       Await.result(findById(username.getOrElse(return false)), Duration.Inf).sessionTokenHash.get == util.hashing.MurmurHash3.stringHash(sessionToken.getOrElse(return false)).toString
     }
 
-    def tryVerifyingSessionToken(username: String, sessionToken: String)(implicit executionContext: ExecutionContext): Boolean = {
+    def tryVerifyingSessionToken(username: String, sessionToken: String): Boolean = {
       if (Await.result(findById(username), Duration.Inf).sessionTokenHash.get == util.hashing.MurmurHash3.stringHash(sessionToken).toString) true
       else throw new BaseException(constants.Response.INVALID_TOKEN)
     }
 
-    def verifySessionTokenTime(username: Option[String])(implicit executionContext: ExecutionContext): Boolean = {
+    def verifySessionTokenTime(username: Option[String]): Boolean = {
       (DateTime.now(DateTimeZone.UTC).getMillis - Await.result(findById(username.getOrElse(return false)), Duration.Inf).sessionTokenTime.getOrElse(return false)) < sessionTokenTimeout
     }
 
-    def tryVerifyingSessionTokenTime(username: String)(implicit executionContext: ExecutionContext): Boolean = {
+    def tryVerifyingSessionTokenTime(username: String): Boolean = {
       if ((DateTime.now(DateTimeZone.UTC).getMillis - Await.result(findById(username), Duration.Inf).sessionTokenTime.getOrElse(return false)) < sessionTokenTimeout) true
       else throw new BaseException(constants.Response.TOKEN_TIMEOUT)
     }
@@ -123,7 +123,7 @@ class AccountTokens @Inject()(actorSystem: ActorSystem, shutdownActors: Shutdown
 
     def getTimedOutIds: Seq[String] = Await.result(getSessionTimedOutIds, Duration.Inf)
 
-    def deleteToken(username: String)(implicit executionContext: ExecutionContext): Boolean = if (Await.result(deleteById(username), Duration.Inf) == 1) true else false
+    def deleteToken(username: String): Boolean = if (Await.result(deleteById(username), Duration.Inf) == 1) true else false
   }
 
   actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
