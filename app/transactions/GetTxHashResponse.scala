@@ -25,12 +25,12 @@ class GetTxHashResponse @Inject()()(implicit wsClient: WSClient, configuration: 
 
   private val url = ip + ":" + port + "/" + path + "/"
 
-  private def action(request: String):Future[WSResponse] = wsClient.url(url + request).get
+  private def action(request: String): Future[WSResponse] = wsClient.url(url + request).get
 
   object Service {
 
     def get(txHash: String): WSResponse = {
-      try{
+      try {
         Await.result(action(txHash), Duration.Inf)
       } catch {
         case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
@@ -38,4 +38,5 @@ class GetTxHashResponse @Inject()()(implicit wsClient: WSClient, configuration: 
       }
     }
   }
+
 }

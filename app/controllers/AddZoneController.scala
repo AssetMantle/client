@@ -162,9 +162,9 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
       addZoneData => {
         try {
           if (kafkaEnabled) {
-            transactionsAddZone.Service.kafkaPost(transactionsAddZone.Request(from = addZoneData.from, to = addZoneData.to, zoneID = addZoneData.zoneID, password = addZoneData.password)).ticketID
+            transactionsAddZone.Service.kafkaPost(transactionsAddZone.Request(transactionsAddZone.BaseRequest(from = addZoneData.from), to = addZoneData.to, zoneID = addZoneData.zoneID, password = addZoneData.password, mode = transactionMode)).ticketID
           } else {
-            transactionsAddZone.Service.post(transactionsAddZone.Request(from = addZoneData.from, to = addZoneData.to, zoneID = addZoneData.zoneID, password = addZoneData.password))
+            transactionsAddZone.Service.post(transactionsAddZone.Request(transactionsAddZone.BaseRequest(from = addZoneData.from), to = addZoneData.to, zoneID = addZoneData.zoneID, password = addZoneData.password, mode = transactionMode))
           }
           Ok(views.html.index(successes = Seq(constants.Response.ZONE_ADDED)))
         }

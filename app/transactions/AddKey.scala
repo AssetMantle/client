@@ -26,15 +26,15 @@ class AddKey @Inject()(wsClient: WSClient)(implicit configuration: Configuration
 
   private val url = ip + ":" + port + "/" + path
 
+  private def action(request: Request)(implicit executionContext: ExecutionContext): Future[Response] = wsClient.url(url).post(Json.toJson(request)).map { response => utilities.JSON.getResponseFromJson[Response](response) }
+
+  private implicit val requestWrites: OWrites[Request] = Json.writes[Request]
+
   case class Request(name: String, password: String, seed: String)
-
-  private implicit val requestWrites: OWrites[Request] =  Json.writes[Request]
-
-  case class Response(name: String, address: String, pub_key: String, seed: String)
 
   private implicit val responseReads: Reads[Response] = Json.reads[Response]
 
-  private def action(request: Request)(implicit executionContext: ExecutionContext): Future[Response] = wsClient.url(url).post(Json.toJson(request)).map { response => utilities.JSON.getResponseFromJson[Response](response) }
+  case class Response(name: String, address: String, pub_key: String, seed: String)
 
   object Service {
 

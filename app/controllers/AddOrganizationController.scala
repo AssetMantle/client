@@ -64,7 +64,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
             transaction.process[AddOrganization, transactionsAddOrganization.Request](
               entity = AddOrganization(from = loginState.address, to = organizationAccountAddress, organizationID = verifyOrganizationData.organizationID, zoneID = verifyOrganizationData.zoneID, null, null,ticketID = "", mode = transactionMode, code = null),
               blockchainTransactionCreate = blockchainTransactionAddOrganizations.Service.create,
-              request = transactionsAddOrganization.Request(transactionsAddOrganization.BaseRequest(from = loginState.address), to = organizationAccountAddress, organizationID = verifyOrganizationData.organizationID, zoneID = verifyOrganizationData.zoneID, password = verifyOrganizationData.password),
+              request = transactionsAddOrganization.Request(transactionsAddOrganization.BaseRequest(from = loginState.address), to = organizationAccountAddress, organizationID = verifyOrganizationData.organizationID, zoneID = verifyOrganizationData.zoneID, password = verifyOrganizationData.password, mode = transactionMode),
               kafkaAction = transactionsAddOrganization.Service.kafkaPost,
               action = transactionsAddOrganization.Service.post,
               onSuccess = blockchainTransactionAddOrganizations.Utility.onSuccess,
@@ -177,9 +177,9 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
       addOrganizationData => {
         try {
           if (kafkaEnabled) {
-            transactionsAddOrganization.Service.kafkaPost(transactionsAddOrganization.Request(transactionsAddOrganization.BaseRequest(from = addOrganizationData.from), to = addOrganizationData.to, organizationID = addOrganizationData.organizationID, zoneID = addOrganizationData.zoneID, password = addOrganizationData.password, mode = constants.Transaction.ASYNC_MODE))
+            transactionsAddOrganization.Service.kafkaPost(transactionsAddOrganization.Request(transactionsAddOrganization.BaseRequest(from = addOrganizationData.from), to = addOrganizationData.to, organizationID = addOrganizationData.organizationID, zoneID = addOrganizationData.zoneID, password = addOrganizationData.password, mode = transactionMode))
           } else {
-            transactionsAddOrganization.Service.post(transactionsAddOrganization.Request(transactionsAddOrganization.BaseRequest(from = addOrganizationData.from), to = addOrganizationData.to, organizationID = addOrganizationData.organizationID, zoneID = addOrganizationData.zoneID, password = addOrganizationData.password, mode = constants.Transaction.BLOCK_MODE))
+            transactionsAddOrganization.Service.post(transactionsAddOrganization.Request(transactionsAddOrganization.BaseRequest(from = addOrganizationData.from), to = addOrganizationData.to, organizationID = addOrganizationData.organizationID, zoneID = addOrganizationData.zoneID, password = addOrganizationData.password, mode = transactionMode))
           }
           Ok(views.html.index(successes = Seq(constants.Response.ORGANIZATION_ADDED)))
         }
