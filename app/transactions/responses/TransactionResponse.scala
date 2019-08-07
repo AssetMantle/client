@@ -4,16 +4,24 @@ import play.api.libs.json.{Json, Reads}
 
 object TransactionResponse {
 
-  implicit val keyValueReads: Reads[KeyValue] = Json.reads[KeyValue]
+  case class BlockResponse(height: String, txhash: String, gas_wanted: String, gas_used: String, code: Option[Int])
 
-  implicit val responseReads: Reads[Response] = Json.reads[Response]
+  implicit val blockResponseReads: Reads[BlockResponse] = Json.reads[BlockResponse]
 
-  case class KeyValue(Key: String, Value: String)
+  case class SyncResponse(height: String, txhash: String)
 
-  case class Response(GasUsed: String, GasWanted: String, Height: String, Tags: Seq[KeyValue], TxHash: String, Code: String)
+  implicit val syncResponseReads: Reads[SyncResponse] = Json.reads[SyncResponse]
 
-  implicit val kafkaResponseReads: Reads[KafkaResponse] = Json.reads[KafkaResponse]
+  case class AsyncResponse(height: String, txhash: String)
+
+  implicit val asyncResponseReads: Reads[AsyncResponse] = Json.reads[AsyncResponse]
+
+  case class BlockModeErrorResponse(error: String)
+
+  implicit val blockModeErrorResponseReads: Reads[BlockModeErrorResponse] = Json.reads[BlockModeErrorResponse]
 
   case class KafkaResponse(ticketID: String)
+
+  implicit val kafkaResponseReads: Reads[KafkaResponse] = Json.reads[KafkaResponse]
 
 }

@@ -5,9 +5,9 @@ import java.net.ConnectException
 import exceptions.BlockChainException
 import javax.inject.{Inject, Singleton}
 import play.api.libs.json.{Json, OWrites}
-import play.api.libs.ws.{WSClient, WSResponse}
+import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
-import transactions.responses.TransactionResponse.{KafkaResponse, Response}
+import transactions.responses.TransactionResponse.{BlockResponse, KafkaResponse}
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
@@ -19,6 +19,8 @@ class AddZone @Inject()(wsClient: WSClient) (implicit configuration: Configurati
 
   private implicit val logger: Logger = Logger(this.getClass)
 
+  private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
+
   private val ip = configuration.get[String]("blockchain.main.ip")
 
   private val port = configuration.get[String]("blockchain.main.restPort")
@@ -29,17 +31,21 @@ class AddZone @Inject()(wsClient: WSClient) (implicit configuration: Configurati
 
   private val chainID = configuration.get[String]("blockchain.main.chainID")
 
-  case class Request(from: String, to: String, zoneID: String, chainID: String = chainID, password: String)
+  case class BaseRequest(from: String, chain_id: String = chainID)
+
+  private implicit val baseRequestWrites: OWrites[BaseRequest] = Json.writes[BaseRequest]
+
+  case class Request(base_req: BaseRequest, to: String, zoneID: String, password: String, mode: String = transactionMode)
 
   private implicit val requestWrites: OWrites[Request] = Json.writes[Request]
 
-  private def action(request: Request)(implicit executionContext: ExecutionContext): Future[Response] = wsClient.url(url).post(Json.toJson(request)).map { response => utilities.JSON.getResponseFromJson[Response](response) }
+  private def action(request: Request)(implicit executionContext: ExecutionContext): Future[BlockResponse] = wsClient.url(url).post(Json.toJson(request)).map { response => utilities.JSON.getResponseFromJson[BlockResponse](response) }
 
   private def kafkaAction(request: Request)(implicit executionContext: ExecutionContext): Future[KafkaResponse] = wsClient.url(url).post(Json.toJson(request)).map { response => utilities.JSON.getResponseFromJson[KafkaResponse](response)}
 
 
   object Service {
-    def post(request: Request)(implicit executionContext: ExecutionContext): Response = try {
+    def post(request: Request)(implicit executionContext: ExecutionContext): BlockResponse = try {
       Await.result(action(request), Duration.Inf)
     } catch {
       case connectException: ConnectException =>
@@ -54,10 +60,5 @@ class AddZone @Inject()(wsClient: WSClient) (implicit configuration: Configurati
         logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
         throw new BlockChainException(constants.Response.CONNECT_EXCEPTION)
     }
-
-    def getTxHashFromWSResponse(wsResponse: WSResponse): String = utilities.JSON.getResponseFromJson[Response](wsResponse).TxHash
-
-    def getTxFromWSResponse(wsResponse: WSResponse): Response = utilities.JSON.getResponseFromJson[Response](wsResponse)
-
   }
 }

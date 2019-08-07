@@ -1,29 +1,31 @@
 package controllers
 
-import controllers.actions.{WithGenesisLoginAction, WithOrganizationLoginAction, WithUserLoginAction, WithZoneLoginAction}
+import controllers.actions.{WithGenesisLoginAction, WithUserLoginAction, WithZoneLoginAction}
 import exceptions.{BaseException, BlockChainException}
 import javax.inject.{Inject, Singleton}
+import models.blockchainTransaction.AddOrganization
 import models.{blockchain, blockchainTransaction, master}
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
-import utilities.PushNotification
+import utilities.{PushNotification, Transaction}
 
-import scala.concurrent.{ExecutionContext, Future}
-import scala.util.Random
+import scala.concurrent.ExecutionContext
 
 @Singleton
-class AddOrganizationController @Inject()(messagesControllerComponents: MessagesControllerComponents, pushNotification: PushNotification, blockchainAccounts: blockchain.Accounts, masterOrganizationKYCs: master.OrganizationKYCs, masterTraders: master.Traders, transactionsAddOrganization: transactions.AddOrganization, blockchainOrganizations: blockchain.Organizations, masterZones: master.Zones, blockchainTransactionAddOrganizations: blockchainTransaction.AddOrganizations, masterOrganizations: master.Organizations, masterAccounts: master.Accounts, withUserLoginAction: WithUserLoginAction, withZoneLoginAction: WithZoneLoginAction, withGenesisLoginAction: WithGenesisLoginAction)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class AddOrganizationController @Inject()(messagesControllerComponents: MessagesControllerComponents, transaction: Transaction, pushNotification: PushNotification, blockchainAccounts: blockchain.Accounts, masterOrganizationKYCs: master.OrganizationKYCs, masterTraders: master.Traders, transactionsAddOrganization: transactions.AddOrganization, blockchainOrganizations: blockchain.Organizations, masterZones: master.Zones, blockchainTransactionAddOrganizations: blockchainTransaction.AddOrganizations, masterOrganizations: master.Organizations, masterAccounts: master.Accounts, withUserLoginAction: WithUserLoginAction, withZoneLoginAction: WithZoneLoginAction, withGenesisLoginAction: WithGenesisLoginAction)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
 
+  private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
+
   private implicit val logger: Logger = Logger(this.getClass)
 
-  def addOrganizationForm: Action[AnyContent] = Action { implicit request =>
+  def addOrganizationForm(): Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.master.addOrganization(views.companion.master.AddOrganization.form))
   }
 
-  def addOrganization: Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
+  def addOrganization(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
       views.companion.master.AddOrganization.form.bindFromRequest().fold(
         formWithErrors => {
@@ -57,22 +59,17 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
           BadRequest(views.html.component.master.verifyOrganization(formWithErrors, formWithErrors.data(constants.Form.ORGANIZATION_ID), formWithErrors.data(constants.Form.ZONE_ID)))
         },
         verifyOrganizationData => {
-
           try {
             val organizationAccountAddress = masterAccounts.Service.getAddress(masterOrganizations.Service.getAccountId(verifyOrganizationData.organizationID))
-            val ticketID: String = if (kafkaEnabled) transactionsAddOrganization.Service.kafkaPost(transactionsAddOrganization.Request(from = loginState.username, to = organizationAccountAddress, organizationID = verifyOrganizationData.organizationID, zoneID = verifyOrganizationData.zoneID, password = verifyOrganizationData.password)).ticketID else Random.nextString(32)
-            blockchainTransactionAddOrganizations.Service.create(from = loginState.username, to = organizationAccountAddress, organizationID = verifyOrganizationData.organizationID, zoneID = verifyOrganizationData.zoneID, null, null, ticketID = ticketID, null)
-            if (!kafkaEnabled) {
-              Future {
-                try {
-                  blockchainTransactionAddOrganizations.Utility.onSuccess(ticketID, transactionsAddOrganization.Service.post(transactionsAddOrganization.Request(from = loginState.username, to = organizationAccountAddress, organizationID = verifyOrganizationData.organizationID, zoneID = verifyOrganizationData.zoneID, password = verifyOrganizationData.password)))
-                } catch {
-                  case baseException: BaseException => logger.error(baseException.failure.message, baseException)
-                  case blockChainException: BlockChainException => logger.error(blockChainException.failure.message, blockChainException)
-                    blockchainTransactionAddOrganizations.Utility.onFailure(ticketID, blockChainException.failure.message)
-                }
-              }
-            }
+            transaction.process[AddOrganization, transactionsAddOrganization.Request](
+              entity = AddOrganization(from = loginState.address, to = organizationAccountAddress, organizationID = verifyOrganizationData.organizationID, zoneID = verifyOrganizationData.zoneID, null, null,ticketID = "", mode = transactionMode, code = null),
+              blockchainTransactionCreate = blockchainTransactionAddOrganizations.Service.create,
+              request = transactionsAddOrganization.Request(transactionsAddOrganization.BaseRequest(from = loginState.address), to = organizationAccountAddress, organizationID = verifyOrganizationData.organizationID, zoneID = verifyOrganizationData.zoneID, password = verifyOrganizationData.password),
+              kafkaAction = transactionsAddOrganization.Service.kafkaPost,
+              action = transactionsAddOrganization.Service.post,
+              onSuccess = blockchainTransactionAddOrganizations.Utility.onSuccess,
+              onFailure = blockchainTransactionAddOrganizations.Utility.onFailure
+            )
             Ok(views.html.index(successes = Seq(constants.Response.ORGANIZATION_VERIFIED)))
           }
           catch {
@@ -118,7 +115,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
     Ok(views.html.component.master.rejectVerifyOrganizationRequest(views.companion.master.RejectVerifyOrganizationRequest.form, organizationID))
   }
 
-  def rejectVerifyOrganizationRequest: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+  def rejectVerifyOrganizationRequest(): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       views.companion.master.RejectVerifyOrganizationRequest.form.bindFromRequest().fold(
         formWithErrors => {
@@ -127,7 +124,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
         rejectVerifyOrganizationRequestData => {
 
           try {
-            masterOrganizations.Service.updateStatus(rejectVerifyOrganizationRequestData.organizationID, false)
+            masterOrganizations.Service.updateStatus(rejectVerifyOrganizationRequestData.organizationID, status = false)
             masterOrganizationKYCs.Service.rejectAll(masterOrganizations.Service.getAccountId(rejectVerifyOrganizationRequestData.organizationID))
             Ok(views.html.index(successes = Seq(constants.Response.VERIFY_ORGANIZATION_REQUEST_REJECTED)))
           }
@@ -180,9 +177,9 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
       addOrganizationData => {
         try {
           if (kafkaEnabled) {
-            transactionsAddOrganization.Service.kafkaPost(transactionsAddOrganization.Request(from = addOrganizationData.from, to = addOrganizationData.to, organizationID = addOrganizationData.organizationID, zoneID = addOrganizationData.zoneID, password = addOrganizationData.password))
+            transactionsAddOrganization.Service.kafkaPost(transactionsAddOrganization.Request(transactionsAddOrganization.BaseRequest(from = addOrganizationData.from), to = addOrganizationData.to, organizationID = addOrganizationData.organizationID, zoneID = addOrganizationData.zoneID, password = addOrganizationData.password, mode = constants.Transaction.ASYNC_MODE))
           } else {
-            transactionsAddOrganization.Service.post(transactionsAddOrganization.Request(from = addOrganizationData.from, to = addOrganizationData.to, organizationID = addOrganizationData.organizationID, zoneID = addOrganizationData.zoneID, password = addOrganizationData.password))
+            transactionsAddOrganization.Service.post(transactionsAddOrganization.Request(transactionsAddOrganization.BaseRequest(from = addOrganizationData.from), to = addOrganizationData.to, organizationID = addOrganizationData.organizationID, zoneID = addOrganizationData.zoneID, password = addOrganizationData.password, mode = constants.Transaction.BLOCK_MODE))
           }
           Ok(views.html.index(successes = Seq(constants.Response.ORGANIZATION_ADDED)))
         }

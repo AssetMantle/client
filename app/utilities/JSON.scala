@@ -7,6 +7,7 @@ import exceptions.BlockChainException
 import play.api.Logger
 import play.api.libs.json._
 import play.api.libs.ws.WSResponse
+import transactions.responses.TransactionResponse.BlockModeErrorResponse
 
 object JSON {
 
@@ -15,8 +16,13 @@ object JSON {
       val responseFromJson: JsResult[T] = Json.fromJson[T](response.json)
       responseFromJson match {
         case JsSuccess(value: T, _: JsPath) => value
-        case errors: JsError => logger.info(errors.toString)
-          throw new BlockChainException(new Failure(response.body.toString, null))
+        case _: JsError =>
+          val errorResponseFromJson: JsResult[BlockModeErrorResponse] = Json.fromJson[BlockModeErrorResponse](response.json)
+          errorResponseFromJson match {
+            case JsSuccess(value: BlockModeErrorResponse, _) => throw new BlockChainException(new Failure(value.error, null))
+            case errors: JsError => logger.info(errors.toString)
+              throw new BlockChainException(new Failure(response.body.toString, null))
+          }
       }
     }
     catch {

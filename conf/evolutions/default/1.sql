@@ -167,9 +167,9 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."AddOrganization"
   "zoneID"         VARCHAR NOT NULL,
   "status"         BOOLEAN,
   "txHash"         VARCHAR,
-  "ticketID"       VARCHAR NOT NULL,
-  "responseCode"   VARCHAR,
-  PRIMARY KEY ("ticketID")
+  "mode"           VARCHAR NOT NULL,
+  "code"           VARCHAR,
+  PRIMARY KEY ("txHash")
 );
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."AddZone"
