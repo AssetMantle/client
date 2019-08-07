@@ -8,7 +8,6 @@ import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
-import transactions.GetResponse
 import transactions.responses.TransactionResponse.BlockResponse
 import utilities.{PushNotification, TransactionEntity}
 
@@ -16,12 +15,12 @@ import scala.concurrent.duration.{Duration, _}
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class AddZone(from: String, to: String, zoneID: String, status: Option[Boolean], txHash: Option[String], mode: String, ticketID: String, code: Option[String]) extends TransactionEntity {
+case class AddZone(from: String, to: String, zoneID: String, status: Option[Boolean], txHash: Option[String], mode: String, ticketID: String, mode: String, code: Option[String]) extends TransactionEntity {
   def mutateTicketID(newTicketID: String): AddZone = AddZone(from = from, to = to, zoneID = zoneID, status = status, txHash = txHash, ticketID = newTicketID, mode = mode, code = code)
 }
 
 @Singleton
-class AddZones @Inject()(actorSystem: ActorSystem, transaction: utilities.Transaction, protected val databaseConfigProvider: DatabaseConfigProvider, masterZoneKYCs: master.ZoneKYCs, transactionAddZone: transactions.AddZone, getResponse: GetResponse, pushNotification: PushNotification, masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts, blockchainZones: models.blockchain.Zones, masterZones: master.Zones)(implicit configuration: Configuration, executionContext: ExecutionContext) {
+class AddZones @Inject()(actorSystem: ActorSystem, transaction: utilities.Transaction, protected val databaseConfigProvider: DatabaseConfigProvider, masterZoneKYCs: master.ZoneKYCs, transactionAddZone: transactions.AddZone, pushNotification: PushNotification, masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts, blockchainZones: models.blockchain.Zones, masterZones: master.Zones)(implicit configuration: Configuration, executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_ADD_ZONE
 
@@ -39,7 +38,7 @@ class AddZones @Inject()(actorSystem: ActorSystem, transaction: utilities.Transa
   private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
   private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
 
-  private def add(addZone: AddZone)(implicit executionContext: ExecutionContext): Future[String] = db.run((addZoneTable returning addZoneTable.map(_.ticketID) += addZone).asTry).map {
+  private def add(addZone: AddZone): Future[String] = db.run((addZoneTable returning addZoneTable.map(_.ticketID) += addZone).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -47,7 +46,7 @@ class AddZones @Inject()(actorSystem: ActorSystem, transaction: utilities.Transa
     }
   }
 
-  private def upsert(addZone: AddZone)(implicit executionContext: ExecutionContext): Future[Int] = db.run(addZoneTable.insertOrUpdate(addZone).asTry).map {
+  private def upsert(addZone: AddZone): Future[Int] = db.run(addZoneTable.insertOrUpdate(addZone).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -55,7 +54,7 @@ class AddZones @Inject()(actorSystem: ActorSystem, transaction: utilities.Transa
     }
   }
 
-  private def findByTicketID(ticketID: String)(implicit executionContext: ExecutionContext): Future[AddZone] = db.run(addZoneTable.filter(_.ticketID === ticketID).result.head.asTry).map {
+  private def findByTicketID(ticketID: String): Future[AddZone] = db.run(addZoneTable.filter(_.ticketID === ticketID).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -75,7 +74,7 @@ class AddZones @Inject()(actorSystem: ActorSystem, transaction: utilities.Transa
 
   private def getTicketIDsWithNullStatus: Future[Seq[String]] = db.run(addZoneTable.filter(_.status.?.isEmpty).map(_.ticketID).result)
 
-  private def updateTxHashAndStatusOnTicketID(ticketID: String, txHash: Option[String], status: Option[Boolean])(implicit executionContext: ExecutionContext): Future[Int] = db.run(addZoneTable.filter(_.ticketID === ticketID).map(x => (x.txHash.?, x.status.?)).update(txHash, status).asTry).map {
+  private def updateTxHashAndStatusOnTicketID(ticketID: String, txHash: Option[String], status: Option[Boolean]): Future[Int] = db.run(addZoneTable.filter(_.ticketID === ticketID).map(x => (x.txHash.?, x.status.?)).update(txHash, status).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -85,7 +84,7 @@ class AddZones @Inject()(actorSystem: ActorSystem, transaction: utilities.Transa
     }
   }
 
-  private def deleteByTicketID(ticketID: String)(implicit executionContext: ExecutionContext): Future[Int] = db.run(addZoneTable.filter(_.ticketID === ticketID).delete.asTry).map {
+  private def deleteByTicketID(ticketID: String): Future[Int] = db.run(addZoneTable.filter(_.ticketID === ticketID).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
