@@ -10,8 +10,8 @@ import transactions.{GetResponse, GetTxHashResponse}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Random
 
-abstract class TransactionEntity {
-  def mutateTicketID(ticketID: String): TransactionEntity
+abstract class TransactionEntity[T] {
+  def mutateTicketID(ticketID: String): T
 }
 
 @Singleton
@@ -23,7 +23,7 @@ class Transaction @Inject()()(implicit executionContext: ExecutionContext, confi
 
   private implicit val module: String = constants.Module.UTILITIES_TRANSACTION
 
-  def process[T1 <: TransactionEntity, T2](entity: T1, blockchainTransactionCreate: T1 => String, request: T2, kafkaAction: T2 => KafkaResponse, action: T2 => BlockResponse, onSuccess: (String, BlockResponse) => Unit, onFailure: (String, String) => Unit): String = {
+  def process[T1 <: TransactionEntity[T1], T2](entity: T1, blockchainTransactionCreate: T1 => String, request: T2, kafkaAction: T2 => KafkaResponse, action: T2 => BlockResponse, onSuccess: (String, BlockResponse) => Unit, onFailure: (String, String) => Unit): String = {
     try {
       val ticketID: String = if (kafkaEnabled) kafkaAction(request).ticketID else Random.nextString(32)
       blockchainTransactionCreate(entity.mutateTicketID(ticketID))

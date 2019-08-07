@@ -14,7 +14,7 @@ import scala.util.{Failure, Random, Success}
 case class Organization(id: String, zoneID: String, accountID: String, name: String, address: String, phone: String, email: String, status: Option[Boolean])
 
 @Singleton
-class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider) {
+class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 

@@ -14,7 +14,7 @@ import scala.util.{Failure, Random, Success}
 case class IssueAssetRequest(id: String, ticketID: Option[String], accountID: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, gas: Option[Int], status: Option[Boolean], comment: Option[String])
 
 @Singleton
-class IssueAssetRequests @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider) {
+class IssueAssetRequests @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 

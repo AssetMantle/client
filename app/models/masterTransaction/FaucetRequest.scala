@@ -14,7 +14,7 @@ import scala.util.{Failure, Random, Success}
 case class FaucetRequest(id: String, ticketID: Option[String], accountID: String, amount: Int, gas: Option[Int], status: Option[Boolean], comment: Option[String])
 
 @Singleton
-class FaucetRequests @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider) {
+class FaucetRequests @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 

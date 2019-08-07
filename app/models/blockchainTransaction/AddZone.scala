@@ -15,7 +15,7 @@ import scala.concurrent.duration.{Duration, _}
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class AddZone(from: String, to: String, zoneID: String, status: Option[Boolean], txHash: Option[String], mode: String, ticketID: String, mode: String, code: Option[String]) extends TransactionEntity {
+case class AddZone(from: String, to: String, zoneID: String, status: Option[Boolean], txHash: Option[String], ticketID: String, mode: String, code: Option[String]) extends TransactionEntity[AddZone] {
   def mutateTicketID(newTicketID: String): AddZone = AddZone(from = from, to = to, zoneID = zoneID, status = status, txHash = txHash, ticketID = newTicketID, mode = mode, code = code)
 }
 

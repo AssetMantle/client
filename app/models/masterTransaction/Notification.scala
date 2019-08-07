@@ -15,7 +15,7 @@ import scala.util.{Failure, Random, Success}
 case class Notification(accountID: String, notificationTitle: String, notificationMessage: String, time: Long, read: Boolean, id: String)
 
 @Singleton
-class Notifications @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider) {
+class Notifications @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.MASTER_TRANSACTION_NOTIFICATION
 
