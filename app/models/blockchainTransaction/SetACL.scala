@@ -72,7 +72,7 @@ class SetACLs @Inject()(actorSystem: ActorSystem, transaction: utilities.Transac
     }
   }
 
-  private def updateStatusAndResponseCodeOnTicketID(ticketID: String, status: Option[Boolean], code: String): Future[Int] = db.run(setACLTable.filter(_.ticketID === ticketID).map(x => (x.status.?, x.code)).update((status, code)).asTry).map {
+  private def updateStatusAndCodeOnTicketID(ticketID: String, status: Option[Boolean], code: String): Future[Int] = db.run(setACLTable.filter(_.ticketID === ticketID).map(x => (x.status.?, x.code)).update((status, code)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -125,7 +125,7 @@ class SetACLs @Inject()(actorSystem: ActorSystem, transaction: utilities.Transac
 
     def markTransactionSuccessful(ticketID: String, txHash: String): Int = Await.result(updateTxHashAndStatusOnTicketID(ticketID, Option(txHash), status = Option(true)), Duration.Inf)
 
-    def markTransactionFailed(ticketID: String, code: String): Int = Await.result(updateStatusAndResponseCodeOnTicketID(ticketID, status = Option(false), code), Duration.Inf)
+    def markTransactionFailed(ticketID: String, code: String): Int = Await.result(updateStatusAndCodeOnTicketID(ticketID, status = Option(false), code), Duration.Inf)
 
     def getTransaction(ticketID: String): SetACL = Await.result(findByTicketID(ticketID), Duration.Inf)
 
