@@ -135,8 +135,8 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
   object Service {
 
     def create(username: String, password: String): String = {
-      val addKeyResponse = addKey.Service.post(addKey.Request(username, password, getSeed.Service.get().body))
-      Await.result(add(Account(addKeyResponse.address, 0, addKeyResponse.pub_key, -1, 0, dirtyBit = false)), Duration.Inf)
+      val addKeyResponse = addKey.Service.post(addKey.Request(username, password))
+      Await.result(add(Account(addKeyResponse.address, 0, addKeyResponse.pubkey, -1, 0, dirtyBit = false)), Duration.Inf)
     }
 
     def refreshDirty(address: String, sequence: Int, coins: Int): Int = Await.result(updateSequenceCoinsAndDirtyBitByAddress(address, sequence, coins, dirtyBit = false), Duration.Inf)

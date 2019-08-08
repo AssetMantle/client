@@ -167,20 +167,22 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."AddOrganization"
   "zoneID"         VARCHAR NOT NULL,
   "status"         BOOLEAN,
   "txHash"         VARCHAR,
+  "ticketID"       VARCHAR NOT NULL,
   "mode"           VARCHAR NOT NULL,
   "code"           VARCHAR,
-  PRIMARY KEY ("txHash")
+  PRIMARY KEY ("ticketID")
 );
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."AddZone"
 (
-  "from"         VARCHAR NOT NULL,
-  "to"           VARCHAR NOT NULL,
-  "zoneID"       VARCHAR NOT NULL,
-  "status"       BOOLEAN,
-  "txHash"       VARCHAR,
-  "ticketID"     VARCHAR NOT NULL,
-  "responseCode" VARCHAR,
+  "from"     VARCHAR NOT NULL,
+  "to"       VARCHAR NOT NULL,
+  "zoneID"   VARCHAR NOT NULL,
+  "status"   BOOLEAN,
+  "txHash"   VARCHAR,
+  "ticketID" VARCHAR NOT NULL,
+  "mode"     VARCHAR NOT NULL,
+  "code"     VARCHAR,
   PRIMARY KEY ("ticketID")
 );
 
@@ -195,37 +197,40 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."BuyerExecuteOrder"
   "status"        BOOLEAN,
   "txHash"        VARCHAR,
   "ticketID"      VARCHAR NOT NULL,
-  "responseCode"  VARCHAR,
+  "mode"          VARCHAR NOT NULL,
+  "code"          VARCHAR,
   PRIMARY KEY ("ticketID")
 );
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."ChangeBuyerBid"
 (
-  "from"         VARCHAR NOT NULL,
-  "to"           VARCHAR NOT NULL,
-  "bid"          INT     NOT NULL,
-  "time"         INT     NOT NULL,
-  "pegHash"      VARCHAR NOT NULL,
-  "gas"          INT     NOT NULL,
-  "status"       BOOLEAN,
-  "txHash"       VARCHAR,
-  "ticketID"     VARCHAR NOT NULL,
-  "responseCode" VARCHAR,
+  "from"     VARCHAR NOT NULL,
+  "to"       VARCHAR NOT NULL,
+  "bid"      INT     NOT NULL,
+  "time"     INT     NOT NULL,
+  "pegHash"  VARCHAR NOT NULL,
+  "gas"      INT     NOT NULL,
+  "status"   BOOLEAN,
+  "txHash"   VARCHAR,
+  "ticketID" VARCHAR NOT NULL,
+  "mode"     VARCHAR NOT NULL,
+  "code"     VARCHAR,
   PRIMARY KEY ("ticketID")
 );
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."ChangeSellerBid"
 (
-  "from"         VARCHAR NOT NULL,
-  "to"           VARCHAR NOT NULL,
-  "bid"          INT     NOT NULL,
-  "time"         INT     NOT NULL,
-  "pegHash"      VARCHAR NOT NULL,
-  "gas"          INT     NOT NULL,
-  "status"       BOOLEAN,
-  "txHash"       VARCHAR,
-  "ticketID"     VARCHAR NOT NULL,
-  "responseCode" VARCHAR,
+  "from"     VARCHAR NOT NULL,
+  "to"       VARCHAR NOT NULL,
+  "bid"      INT     NOT NULL,
+  "time"     INT     NOT NULL,
+  "pegHash"  VARCHAR NOT NULL,
+  "gas"      INT     NOT NULL,
+  "status"   BOOLEAN,
+  "txHash"   VARCHAR,
+  "ticketID" VARCHAR NOT NULL,
+  "mode"     VARCHAR NOT NULL,
+  "code"     VARCHAR,
   PRIMARY KEY ("ticketID")
 );
 
@@ -241,7 +246,8 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."ConfirmBuyerBid"
   "status"            BOOLEAN,
   "txHash"            VARCHAR,
   "ticketID"          VARCHAR NOT NULL,
-  "responseCode"      VARCHAR,
+  "mode"              VARCHAR NOT NULL,
+  "code"              VARCHAR,
   PRIMARY KEY ("ticketID")
 );
 
@@ -257,7 +263,8 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."ConfirmSellerBid"
   "status"             BOOLEAN,
   "txHash"             VARCHAR,
   "ticketID"           VARCHAR NOT NULL,
-  "responseCode"       VARCHAR,
+  "mode"               VARCHAR NOT NULL,
+  "code"               VARCHAR,
   PRIMARY KEY ("ticketID")
 );
 
@@ -275,7 +282,8 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."IssueAsset"
   "status"        BOOLEAN,
   "txHash"        VARCHAR,
   "ticketID"      VARCHAR NOT NULL,
-  "responseCode"  VARCHAR,
+  "mode"          VARCHAR NOT NULL,
+  "code"          VARCHAR,
   PRIMARY KEY ("ticketID")
 );
 
@@ -289,20 +297,22 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."IssueFiat"
   "status"            BOOLEAN,
   "txHash"            VARCHAR,
   "ticketID"          VARCHAR NOT NULL,
-  "responseCode"      VARCHAR,
+  "mode"              VARCHAR NOT NULL,
+  "code"              VARCHAR,
   PRIMARY KEY ("ticketID")
 );
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."RedeemAsset"
 (
-  "from"         VARCHAR NOT NULL,
-  "to"           VARCHAR NOT NULL,
-  "pegHash"      VARCHAR NOT NULL,
-  "gas"          INT     NOT NULL,
-  "status"       BOOLEAN,
-  "txHash"       VARCHAR,
-  "ticketID"     VARCHAR NOT NULL,
-  "responseCode" VARCHAR,
+  "from"     VARCHAR NOT NULL,
+  "to"       VARCHAR NOT NULL,
+  "pegHash"  VARCHAR NOT NULL,
+  "gas"      INT     NOT NULL,
+  "status"   BOOLEAN,
+  "txHash"   VARCHAR,
+  "ticketID" VARCHAR NOT NULL,
+  "mode"     VARCHAR NOT NULL,
+  "code"     VARCHAR,
   PRIMARY KEY ("ticketID")
 );
 
@@ -315,20 +325,22 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."RedeemFiat"
   "status"       BOOLEAN,
   "txHash"       VARCHAR,
   "ticketID"     VARCHAR NOT NULL,
-  "responseCode" VARCHAR,
+  "mode"         VARCHAR NOT NULL,
+  "code"         VARCHAR,
   PRIMARY KEY ("ticketID")
 );
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."ReleaseAsset"
 (
-  "from"         VARCHAR NOT NULL,
-  "to"           VARCHAR NOT NULL,
-  "pegHash"      VARCHAR NOT NULL,
-  "gas"          INT     NOT NULL,
-  "status"       BOOLEAN,
-  "txHash"       VARCHAR,
-  "ticketID"     VARCHAR NOT NULL,
-  "responseCode" VARCHAR,
+  "from"     VARCHAR NOT NULL,
+  "to"       VARCHAR NOT NULL,
+  "pegHash"  VARCHAR NOT NULL,
+  "gas"      INT     NOT NULL,
+  "status"   BOOLEAN,
+  "txHash"   VARCHAR,
+  "ticketID" VARCHAR NOT NULL,
+  "mode"     VARCHAR NOT NULL,
+  "code"     VARCHAR,
   PRIMARY KEY ("ticketID")
 );
 
@@ -343,47 +355,51 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."SellerExecuteOrder"
   "status"        BOOLEAN,
   "txHash"        VARCHAR,
   "ticketID"      VARCHAR NOT NULL,
-  "responseCode"  VARCHAR,
+  "mode"          VARCHAR NOT NULL,
+  "code"          VARCHAR,
   PRIMARY KEY ("ticketID")
 );
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."SendAsset"
 (
-  "from"         VARCHAR NOT NULL,
-  "to"           VARCHAR NOT NULL,
-  "pegHash"      VARCHAR NOT NULL,
-  "gas"          INT     NOT NULL,
-  "status"       BOOLEAN,
-  "txHash"       VARCHAR,
-  "ticketID"     VARCHAR NOT NULL,
-  "responseCode" VARCHAR,
+  "from"     VARCHAR NOT NULL,
+  "to"       VARCHAR NOT NULL,
+  "pegHash"  VARCHAR NOT NULL,
+  "gas"      INT     NOT NULL,
+  "status"   BOOLEAN,
+  "txHash"   VARCHAR,
+  "ticketID" VARCHAR NOT NULL,
+  "mode"     VARCHAR NOT NULL,
+  "code"     VARCHAR,
   PRIMARY KEY ("ticketID")
 );
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."SendCoin"
 (
-  "from"         VARCHAR NOT NULL,
-  "to"           VARCHAR NOT NULL,
-  "amount"       INT     NOT NULL,
-  "gas"          INT     NOT NULL,
-  "status"       BOOLEAN,
-  "txHash"       VARCHAR,
-  "ticketID"     VARCHAR NOT NULL,
-  "responseCode" VARCHAR,
+  "from"     VARCHAR NOT NULL,
+  "to"       VARCHAR NOT NULL,
+  "amount"   INT     NOT NULL,
+  "gas"      INT     NOT NULL,
+  "status"   BOOLEAN,
+  "txHash"   VARCHAR,
+  "ticketID" VARCHAR NOT NULL,
+  "mode"     VARCHAR NOT NULL,
+  "code"     VARCHAR,
   PRIMARY KEY ("ticketID")
 );
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."SendFiat"
 (
-  "from"         VARCHAR NOT NULL,
-  "to"           VARCHAR NOT NULL,
-  "amount"       INT     NOT NULL,
-  "pegHash"      VARCHAR NOT NULL,
-  "gas"          INT     NOT NULL,
-  "status"       BOOLEAN,
-  "txHash"       VARCHAR,
-  "ticketID"     VARCHAR NOT NULL,
-  "responseCode" VARCHAR,
+  "from"     VARCHAR NOT NULL,
+  "to"       VARCHAR NOT NULL,
+  "amount"   INT     NOT NULL,
+  "pegHash"  VARCHAR NOT NULL,
+  "gas"      INT     NOT NULL,
+  "status"   BOOLEAN,
+  "txHash"   VARCHAR,
+  "ticketID" VARCHAR NOT NULL,
+  "mode"     VARCHAR NOT NULL,
+  "code"     VARCHAR,
   PRIMARY KEY ("ticketID")
 );
 
@@ -397,35 +413,38 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."SetACL"
   "status"         BOOLEAN,
   "txHash"         VARCHAR,
   "ticketID"       VARCHAR NOT NULL,
-  "responseCode"   VARCHAR,
+  "mode"           VARCHAR NOT NULL,
+  "code"           VARCHAR,
   PRIMARY KEY ("ticketID")
 );
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."SetBuyerFeedback"
 (
-  "from"         VARCHAR NOT NULL,
-  "to"           VARCHAR NOT NULL,
-  "pegHash"      VARCHAR NOT NULL,
-  "rating"       INT     NOT NULL,
-  "gas"          INT     NOT NULL,
-  "status"       BOOLEAN,
-  "txHash"       VARCHAR,
-  "ticketID"     VARCHAR NOT NULL,
-  "responseCode" VARCHAR,
+  "from"     VARCHAR NOT NULL,
+  "to"       VARCHAR NOT NULL,
+  "pegHash"  VARCHAR NOT NULL,
+  "rating"   INT     NOT NULL,
+  "gas"      INT     NOT NULL,
+  "status"   BOOLEAN,
+  "txHash"   VARCHAR,
+  "ticketID" VARCHAR NOT NULL,
+  "mode"     VARCHAR NOT NULL,
+  "code"     VARCHAR,
   PRIMARY KEY ("ticketID")
 );
 
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."SetSellerFeedback"
 (
-  "from"         VARCHAR NOT NULL,
-  "to"           VARCHAR NOT NULL,
-  "pegHash"      VARCHAR NOT NULL,
-  "rating"       INT     NOT NULL,
-  "gas"          INT     NOT NULL,
-  "status"       BOOLEAN,
-  "txHash"       VARCHAR,
-  "ticketID"     VARCHAR NOT NULL,
-  "responseCode" VARCHAR,
+  "from"     VARCHAR NOT NULL,
+  "to"       VARCHAR NOT NULL,
+  "pegHash"  VARCHAR NOT NULL,
+  "rating"   INT     NOT NULL,
+  "gas"      INT     NOT NULL,
+  "status"   BOOLEAN,
+  "txHash"   VARCHAR,
+  "ticketID" VARCHAR NOT NULL,
+  "mode"     VARCHAR NOT NULL,
+  "code"     VARCHAR,
   PRIMARY KEY ("ticketID")
 );
 
@@ -695,15 +714,15 @@ ALTER TABLE MASTER_TRANSACTION."EmailOTP"
 /*Initial State*/
 
 INSERT INTO blockchain."Account_BC" ("address", "coins", "publicKey", "accountNumber", "sequence", "dirtyBit")
-VALUES ('cosmos14375p72aunmu3vuwevu5e4vgegekd0n0sj9czh',
+VALUES ('commit17jxmr4felwgeugmeu6c4gr4vq0hmeaxlamvxjg',
         1000,
-        'VMzqh7vxmb/7W4w+1DQxAuISeI1dbCYPdcdIEh/HhRg=',
+        'commitpub1addwnpepqty3h2wuanwkjw5g2jn6p0rwcy7j7xm985t8kg8zpkp7ay83rrz2276x7qn',
         0,
         0,
         false);
 
 INSERT INTO master."Account" ("id", "secretHash", "accountAddress", "language", "userType", "status")
-VALUES ('main', '-1886325765', 'cosmos14375p72aunmu3vuwevu5e4vgegekd0n0sj9czh', 'en', 'GENESIS', 'NO_CONTACT');
+VALUES ('main', '-233904575', 'commit17jxmr4felwgeugmeu6c4gr4vq0hmeaxlamvxjg', 'en', 'GENESIS', 'NO_CONTACT');
 
 # --- !Downs
 

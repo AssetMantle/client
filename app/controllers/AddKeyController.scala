@@ -23,7 +23,7 @@ class AddKeyController @Inject()(messagesControllerComponents: MessagesControlle
       },
       addKeyData => {
         try {
-          transactionsAddKey.Service.post(transactionsAddKey.Request(addKeyData.name, addKeyData.password, addKeyData.seed))
+          transactionsAddKey.Service.post(transactionsAddKey.Request(addKeyData.name, addKeyData.password))
           Ok(views.html.index(successes = Seq(constants.Response.KEY_ADDED)))
         }
         catch {

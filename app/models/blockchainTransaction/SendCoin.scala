@@ -142,13 +142,13 @@ class SendCoins @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
         Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
         val sendCoin = Service.getTransaction(ticketID)
         blockchainAccounts.Service.markDirty(sendCoin.to)
-        blockchainAccounts.Service.markDirty(masterAccounts.Service.getAddress(sendCoin.from))
+        blockchainAccounts.Service.markDirty(sendCoin.from)
         val toAccount = masterAccounts.Service.getAccountByAddress(sendCoin.to)
         if (toAccount.userType == constants.User.UNKNOWN) {
           masterAccounts.Service.updateUserType(toAccount.id, constants.User.USER)
         }
         pushNotification.sendNotification(toAccount.id, constants.Notification.SUCCESS, blockResponse.txhash)
-        pushNotification.sendNotification(sendCoin.from, constants.Notification.SUCCESS, blockResponse.txhash)
+        pushNotification.sendNotification(masterAccounts.Service.getId(sendCoin.from), constants.Notification.SUCCESS, blockResponse.txhash)
       }
       catch {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)

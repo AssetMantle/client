@@ -25,25 +25,27 @@ class SendCoin @Inject()(wsClient: WSClient)(implicit configuration: Configurati
 
   private val chainID = configuration.get[String]("blockchain.main.chainID")
 
-  private val path = "sendCoin"
+  private val path = "bank/accounts/"
+
+  private val path2 = "/transfers"
 
   private val url = ip + ":" + port + "/" + path
-
-  private def action(request: Request): Future[BlockResponse] = wsClient.url(url).post(Json.toJson(request)).map { response => utilities.JSON.getResponseFromJson[BlockResponse](response) }
-
-  private implicit val amountWrites: OWrites[Amount] = Json.writes[Amount]
-
-  private def kafkaAction(request: Request): Future[KafkaResponse] = wsClient.url(url).post(Json.toJson(request)).map { response => utilities.JSON.getResponseFromJson[KafkaResponse](response) }
-
-  private implicit val requestWrites: OWrites[Request] = Json.writes[Request]
 
   case class Amount(denom: String, amount: String)
 
   case class BaseRequest(from: String, chain_id: String = chainID)
 
+  case class Request(base_req: BaseRequest, password: String, to: String, amount: Seq[Amount], mode: String, gas: Int)
+
   private implicit val baseRequestWrites: OWrites[BaseRequest] = Json.writes[BaseRequest]
 
-  case class Request(base_req: BaseRequest, password: String, to: String, amount: Seq[Amount], mode: String, gas: Int)
+  private implicit val amountWrites: OWrites[Amount] = Json.writes[Amount]
+
+  private implicit val requestWrites: OWrites[Request] = Json.writes[Request]
+
+  private def action(request: Request): Future[BlockResponse] = wsClient.url(url+ request.to + path2).post(Json.toJson(request)).map { response => utilities.JSON.getResponseFromJson[BlockResponse](response) }
+
+  private def kafkaAction(request: Request): Future[KafkaResponse] = wsClient.url(url).post(Json.toJson(request)).map { response => utilities.JSON.getResponseFromJson[KafkaResponse](response) }
 
   object Service {
     def post(request: Request): BlockResponse = try {

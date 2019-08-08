@@ -22,7 +22,7 @@ class GetAccount @Inject()()(implicit wsClient: WSClient, configuration: Configu
 
   private val port = configuration.get[String]("blockchain.main.restPort")
 
-  private val path = "accounts"
+  private val path = "auth/accounts"
 
   private val url = ip + ":" + port + "/" + path + "/"
 
