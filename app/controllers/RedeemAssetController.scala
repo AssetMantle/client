@@ -41,7 +41,8 @@ class RedeemAssetController @Inject()(messagesControllerComponents: MessagesCont
               asyncAction = transactionsRedeemAsset.Service.asyncPost,
               syncAction = transactionsRedeemAsset.Service.syncPost,
               onSuccess = blockchainTransactionRedeemAssets.Utility.onSuccess,
-              onFailure = blockchainTransactionRedeemAssets.Utility.onFailure
+              onFailure = blockchainTransactionRedeemAssets.Utility.onFailure,
+              updateTransactionHash = blockchainTransactionRedeemAssets.Service.updateTransactionHash
             )
             Ok(views.html.index(successes = Seq(constants.Response.ASSET_REDEEMED)))
           }

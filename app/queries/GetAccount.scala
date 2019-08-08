@@ -26,11 +26,11 @@ class GetAccount @Inject()()(implicit wsClient: WSClient, configuration: Configu
 
   private val url = ip + ":" + port + "/" + path + "/"
 
-  private def action(request: String)(implicit executionContext: ExecutionContext): Future[Response] = wsClient.url(url + request).get.map { response => utilities.JSON.getResponseFromJson[Response](response)}
+  private def action(request: String): Future[Response] = wsClient.url(url + request).get.map { response => utilities.JSON.getResponseFromJson[Response](response)}
 
   object Service {
 
-    def get(address: String)(implicit executionContext: ExecutionContext): Response = try {
+    def get(address: String): Response = try {
       Await.result(action(address), Duration.Inf)
     } catch {
       case connectException: ConnectException =>

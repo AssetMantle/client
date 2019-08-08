@@ -43,7 +43,8 @@ class RedeemFiatController @Inject()(messagesControllerComponents: MessagesContr
               asyncAction = transactionsRedeemFiat.Service.asyncPost,
               syncAction = transactionsRedeemFiat.Service.syncPost,
               onSuccess = blockchainTransactionRedeemFiats.Utility.onSuccess,
-              onFailure = blockchainTransactionRedeemFiats.Utility.onFailure
+              onFailure = blockchainTransactionRedeemFiats.Utility.onFailure,
+              updateTransactionHash = blockchainTransactionRedeemFiats.Service.updateTransactionHash
             )
             Ok(views.html.index(successes = Seq(constants.Response.FIAT_REDEEMED)))
           }

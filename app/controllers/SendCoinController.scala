@@ -46,7 +46,8 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
               asyncAction = transactionsSendCoin.Service.asyncPost,
               syncAction = transactionsSendCoin.Service.syncPost,
               onSuccess = blockchainTransactionSendCoins.Utility.onSuccess,
-              onFailure = blockchainTransactionSendCoins.Utility.onFailure
+              onFailure = blockchainTransactionSendCoins.Utility.onFailure,
+              updateTransactionHash = blockchainTransactionSendCoins.Service.updateTransactionHash
             )
             Ok(views.html.index(successes = Seq(constants.Response.COINS_SENT)))
           }
@@ -165,7 +166,8 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
                 asyncAction = transactionsSendCoin.Service.asyncPost,
                 syncAction = transactionsSendCoin.Service.syncPost,
                 onSuccess = blockchainTransactionSendCoins.Utility.onSuccess,
-                onFailure = blockchainTransactionSendCoins.Utility.onFailure
+                onFailure = blockchainTransactionSendCoins.Utility.onFailure,
+                updateTransactionHash = blockchainTransactionSendCoins.Service.updateTransactionHash
               )
               masterTransactionFaucetRequests.Service.accept(approveFaucetRequestFormData.requestID, ticketID, approveFaucetRequestFormData.gas)
               Ok(views.html.index(successes = Seq(constants.Response.FAUCET_REQUEST_APPROVED)))

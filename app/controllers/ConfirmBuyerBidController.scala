@@ -40,7 +40,8 @@ class ConfirmBuyerBidController @Inject()(messagesControllerComponents: Messages
               asyncAction = transactionsConfirmBuyerBid.Service.asyncPost,
               syncAction = transactionsConfirmBuyerBid.Service.syncPost,
               onSuccess = blockchainTransactionConfirmBuyerBids.Utility.onSuccess,
-              onFailure = blockchainTransactionConfirmBuyerBids.Utility.onFailure
+              onFailure = blockchainTransactionConfirmBuyerBids.Utility.onFailure,
+              updateTransactionHash = blockchainTransactionConfirmBuyerBids.Service.updateTransactionHash
             )
             Ok(views.html.index(successes = Seq(constants.Response.BUYER_BID_CONFIRMED)))
           }

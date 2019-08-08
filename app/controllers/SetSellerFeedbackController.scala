@@ -42,7 +42,8 @@ class SetSellerFeedbackController @Inject()(messagesControllerComponents: Messag
               asyncAction = transactionsSetSellerFeedback.Service.asyncPost,
               syncAction = transactionsSetSellerFeedback.Service.syncPost,
               onSuccess = blockchainTransactionSetSellerFeedbacks.Utility.onSuccess,
-              onFailure = blockchainTransactionSetSellerFeedbacks.Utility.onFailure
+              onFailure = blockchainTransactionSetSellerFeedbacks.Utility.onFailure,
+              updateTransactionHash = blockchainTransactionSetSellerFeedbacks.Service.updateTransactionHash
             )
             Ok(views.html.index(successes = Seq(constants.Response.SELLER_FEEDBACK_SET)))
           }

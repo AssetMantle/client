@@ -40,7 +40,8 @@ class ChangeBuyerBidController @Inject()(messagesControllerComponents: MessagesC
               asyncAction = transactionsChangeBuyerBid.Service.asyncPost,
               syncAction = transactionsChangeBuyerBid.Service.syncPost,
               onSuccess = blockchainTransactionChangeBuyerBids.Utility.onSuccess,
-              onFailure = blockchainTransactionChangeBuyerBids.Utility.onFailure
+              onFailure = blockchainTransactionChangeBuyerBids.Utility.onFailure,
+              updateTransactionHash = blockchainTransactionChangeBuyerBids.Service.updateTransactionHash
             )
             Ok(views.html.index(successes = Seq(constants.Response.BUYER_BID_CHANGED)))
           }

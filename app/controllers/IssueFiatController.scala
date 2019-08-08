@@ -96,7 +96,8 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
                 asyncAction = transactionsIssueFiat.Service.asyncPost,
                 syncAction = transactionsIssueFiat.Service.syncPost,
                 onSuccess = blockchainTransactionIssueFiats.Utility.onSuccess,
-                onFailure = blockchainTransactionIssueFiats.Utility.onFailure
+                onFailure = blockchainTransactionIssueFiats.Utility.onFailure,
+                updateTransactionHash = blockchainTransactionIssueFiats.Service.updateTransactionHash
               )
               masterTransactionIssueFiatRequests.Service.accept(issueFiatData.requestID, ticketID, issueFiatData.gas)
               Ok(views.html.index(successes = Seq(constants.Response.FIAT_ISSUED)))

@@ -42,7 +42,8 @@ class SellerExecuteOrderController @Inject()(messagesControllerComponents: Messa
               asyncAction = transactionsSellerExecuteOrder.Service.asyncPost,
               syncAction = transactionsSellerExecuteOrder.Service.syncPost,
               onSuccess = blockchainTransactionSellerExecuteOrders.Utility.onSuccess,
-              onFailure = blockchainTransactionSellerExecuteOrders.Utility.onFailure
+              onFailure = blockchainTransactionSellerExecuteOrders.Utility.onFailure,
+              updateTransactionHash = blockchainTransactionSellerExecuteOrders.Service.updateTransactionHash
             )
             Ok(views.html.index(successes = Seq(constants.Response.SELLER_ORDER_EXECUTED)))
           }
@@ -76,15 +77,16 @@ class SellerExecuteOrderController @Inject()(messagesControllerComponents: Messa
         moderatedSellerExecuteOrderData => {
           try {
             transaction.process[blockchainTransaction.SellerExecuteOrder, transactionsSellerExecuteOrder.Request](
-              entity = blockchainTransaction.SellerExecuteOrder(from = loginState.address, buyerAddress = loginState.address, sellerAddress = moderatedSellerExecuteOrderData.sellerAddress, fiatProofHash = moderatedSellerExecuteOrderData.fiatProofHash, pegHash = moderatedSellerExecuteOrderData.pegHash, gas = moderatedSellerExecuteOrderData.gas, status = null, txHash = null, ticketID = "", mode = transactionMode, code =  null),
+              entity = blockchainTransaction.SellerExecuteOrder(from = loginState.address, buyerAddress = loginState.address, sellerAddress = moderatedSellerExecuteOrderData.sellerAddress, awbProofHash = moderatedSellerExecuteOrderData.awbProofHash, pegHash = moderatedSellerExecuteOrderData.pegHash, gas = moderatedSellerExecuteOrderData.gas, status = null, txHash = null, ticketID = "", mode = transactionMode, code =  null),
               blockchainTransactionCreate = blockchainTransactionSellerExecuteOrders.Service.create,
-              request = transactionsSellerExecuteOrder.Request(transactionsSellerExecuteOrder.BaseRequest(from = loginState.address), password = moderatedSellerExecuteOrderData.password, buyerAddress = loginState.address, sellerAddress = moderatedSellerExecuteOrderData.sellerAddress, fiatProofHash = moderatedSellerExecuteOrderData.fiatProofHash, pegHash = moderatedSellerExecuteOrderData.pegHash, gas = moderatedSellerExecuteOrderData.gas, mode = transactionMode),
+              request = transactionsSellerExecuteOrder.Request(transactionsSellerExecuteOrder.BaseRequest(from = loginState.address), password = moderatedSellerExecuteOrderData.password, buyerAddress = loginState.address, sellerAddress = moderatedSellerExecuteOrderData.sellerAddress, awbProofHash = moderatedSellerExecuteOrderData.awbProofHash, pegHash = moderatedSellerExecuteOrderData.pegHash, gas = moderatedSellerExecuteOrderData.gas, mode = transactionMode),
               kafkaAction = transactionsSellerExecuteOrder.Service.kafkaPost,
               blockAction = transactionsSellerExecuteOrder.Service.blockPost,
               asyncAction = transactionsSellerExecuteOrder.Service.asyncPost,
               syncAction = transactionsSellerExecuteOrder.Service.syncPost,
               onSuccess = blockchainTransactionSellerExecuteOrders.Utility.onSuccess,
-              onFailure = blockchainTransactionSellerExecuteOrders.Utility.onFailure
+              onFailure = blockchainTransactionSellerExecuteOrders.Utility.onFailure,
+              updateTransactionHash = blockchainTransactionSellerExecuteOrders.Service.updateTransactionHash
             )
             Ok(views.html.index(successes = Seq(constants.Response.SELLER_ORDER_EXECUTED)))
           }

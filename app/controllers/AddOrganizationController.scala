@@ -69,7 +69,8 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
               asyncAction = transactionsAddOrganization.Service.asyncPost,
               syncAction = transactionsAddOrganization.Service.syncPost,
               onSuccess = blockchainTransactionAddOrganizations.Utility.onSuccess,
-              onFailure = blockchainTransactionAddOrganizations.Utility.onFailure
+              onFailure = blockchainTransactionAddOrganizations.Utility.onFailure,
+              updateTransactionHash = blockchainTransactionAddOrganizations.Service.updateTransactionHash
             )
             Ok(views.html.index(successes = Seq(constants.Response.ORGANIZATION_VERIFIED)))
           }
@@ -123,7 +124,6 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
           BadRequest(views.html.component.master.rejectVerifyOrganizationRequest(formWithErrors, formWithErrors.data(constants.Form.ORGANIZATION_ID)))
         },
         rejectVerifyOrganizationRequestData => {
-
           try {
             masterOrganizations.Service.updateStatus(rejectVerifyOrganizationRequestData.organizationID, status = false)
             masterOrganizationKYCs.Service.rejectAll(masterOrganizations.Service.getAccountId(rejectVerifyOrganizationRequestData.organizationID))

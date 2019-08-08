@@ -41,7 +41,8 @@ class SendFiatController @Inject()(messagesControllerComponents: MessagesControl
               asyncAction = transactionsSendFiat.Service.asyncPost,
               syncAction = transactionsSendFiat.Service.syncPost,
               onSuccess = blockchainTransactionSendFiats.Utility.onSuccess,
-              onFailure = blockchainTransactionSendFiats.Utility.onFailure
+              onFailure = blockchainTransactionSendFiats.Utility.onFailure,
+              updateTransactionHash = blockchainTransactionSendFiats.Service.updateTransactionHash
             )
             Ok(views.html.index(successes = Seq(constants.Response.FIAT_SENT)))
           }

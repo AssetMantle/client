@@ -40,7 +40,8 @@ class SendAssetController @Inject()(messagesControllerComponents: MessagesContro
               asyncAction = transactionsSendAsset.Service.asyncPost,
               syncAction = transactionsSendAsset.Service.syncPost,
               onSuccess = blockchainTransactionSendAssets.Utility.onSuccess,
-              onFailure = blockchainTransactionSendAssets.Utility.onFailure
+              onFailure = blockchainTransactionSendAssets.Utility.onFailure,
+              updateTransactionHash = blockchainTransactionSendAssets.Service.updateTransactionHash
             )
             Ok(views.html.index(successes = Seq(constants.Response.ASSET_SENT)))
           }

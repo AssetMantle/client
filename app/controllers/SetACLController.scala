@@ -72,7 +72,8 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
                 asyncAction = transactionsSetACL.Service.asyncPost,
                 syncAction = transactionsSetACL.Service.syncPost,
                 onSuccess = blockchainTransactionSetACLs.Utility.onSuccess,
-                onFailure = blockchainTransactionSetACLs.Utility.onFailure
+                onFailure = blockchainTransactionSetACLs.Utility.onFailure,
+                updateTransactionHash = blockchainTransactionSetACLs.Service.updateTransactionHash
               )
               Ok(views.html.index(successes = Seq(constants.Response.ACL_SET)))
             } else {
@@ -178,7 +179,8 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
                 asyncAction = transactionsSetACL.Service.asyncPost,
                 syncAction = transactionsSetACL.Service.syncPost,
                 onSuccess = blockchainTransactionSetACLs.Utility.onSuccess,
-                onFailure = blockchainTransactionSetACLs.Utility.onFailure
+                onFailure = blockchainTransactionSetACLs.Utility.onFailure,
+                updateTransactionHash = blockchainTransactionSetACLs.Service.updateTransactionHash
               )
               Ok(views.html.index(successes = Seq(constants.Response.ACL_SET)))
             } else {

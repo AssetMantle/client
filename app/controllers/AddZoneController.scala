@@ -65,7 +65,8 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
               asyncAction = transactionsAddZone.Service.asyncPost,
               syncAction = transactionsAddZone.Service.syncPost,
               onSuccess = blockchainTransactionAddZones.Utility.onSuccess,
-              onFailure = blockchainTransactionAddZones.Utility.onFailure
+              onFailure = blockchainTransactionAddZones.Utility.onFailure,
+              updateTransactionHash = blockchainTransactionAddZones.Service.updateTransactionHash
             )
             Ok(views.html.index(successes = Seq(constants.Response.ZONE_VERIFIED)))
           }

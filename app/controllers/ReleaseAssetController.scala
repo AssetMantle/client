@@ -40,7 +40,8 @@ class ReleaseAssetController @Inject()(messagesControllerComponents: MessagesCon
               asyncAction = transactionsReleaseAsset.Service.asyncPost,
               syncAction = transactionsReleaseAsset.Service.syncPost,
               onSuccess = blockchainTransactionReleaseAssets.Utility.onSuccess,
-              onFailure = blockchainTransactionReleaseAssets.Utility.onFailure
+              onFailure = blockchainTransactionReleaseAssets.Utility.onFailure,
+              updateTransactionHash = blockchainTransactionReleaseAssets.Service.updateTransactionHash
             )
             Ok(views.html.index(successes = Seq(constants.Response.ASSET_RELEASED)))
           }

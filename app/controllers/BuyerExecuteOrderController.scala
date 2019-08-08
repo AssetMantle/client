@@ -40,7 +40,8 @@ class BuyerExecuteOrderController @Inject()(messagesControllerComponents: Messag
               asyncAction = transactionsBuyerExecuteOrder.Service.asyncPost,
               syncAction = transactionsBuyerExecuteOrder.Service.syncPost,
               onSuccess = blockchainTransactionBuyerExecuteOrders.Utility.onSuccess,
-              onFailure = blockchainTransactionBuyerExecuteOrders.Utility.onFailure
+              onFailure = blockchainTransactionBuyerExecuteOrders.Utility.onFailure,
+              updateTransactionHash = blockchainTransactionBuyerExecuteOrders.Service.updateTransactionHash
             )
             Ok(views.html.index(successes = Seq(constants.Response.BUYER_ORDER_EXECUTED)))
           }
@@ -82,7 +83,8 @@ class BuyerExecuteOrderController @Inject()(messagesControllerComponents: Messag
               asyncAction = transactionsBuyerExecuteOrder.Service.asyncPost,
               syncAction = transactionsBuyerExecuteOrder.Service.syncPost,
               onSuccess = blockchainTransactionBuyerExecuteOrders.Utility.onSuccess,
-              onFailure = blockchainTransactionBuyerExecuteOrders.Utility.onFailure
+              onFailure = blockchainTransactionBuyerExecuteOrders.Utility.onFailure,
+              updateTransactionHash = blockchainTransactionBuyerExecuteOrders.Service.updateTransactionHash
             )
             Ok(views.html.index(successes = Seq(constants.Response.BUYER_ORDER_EXECUTED)))
           }

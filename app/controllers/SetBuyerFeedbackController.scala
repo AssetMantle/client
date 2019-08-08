@@ -40,7 +40,8 @@ class SetBuyerFeedbackController @Inject()(messagesControllerComponents: Message
               asyncAction = transactionsSetBuyerFeedback.Service.asyncPost,
               syncAction = transactionsSetBuyerFeedback.Service.syncPost,
               onSuccess = blockchainTransactionSetBuyerFeedbacks.Utility.onSuccess,
-              onFailure = blockchainTransactionSetBuyerFeedbacks.Utility.onFailure
+              onFailure = blockchainTransactionSetBuyerFeedbacks.Utility.onFailure,
+              updateTransactionHash = blockchainTransactionSetBuyerFeedbacks.Service.updateTransactionHash
             )
             Ok(views.html.index(successes = Seq(constants.Response.BUYER_FEEDBACK_SET)))
           }

@@ -41,7 +41,8 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
                 asyncAction = transactionsIssueAsset.Service.asyncPost,
                 syncAction = transactionsIssueAsset.Service.syncPost,
                 onSuccess = blockchainTransactionIssueAssets.Utility.onSuccess,
-                onFailure = blockchainTransactionIssueAssets.Utility.onFailure
+                onFailure = blockchainTransactionIssueAssets.Utility.onFailure,
+                updateTransactionHash = blockchainTransactionIssueAssets.Service.updateTransactionHash
               )
               Ok(views.html.index(successes = Seq(constants.Response.ASSET_ISSUED)))
             } else {
@@ -113,7 +114,8 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
                 asyncAction = transactionsIssueAsset.Service.asyncPost,
                 syncAction = transactionsIssueAsset.Service.syncPost,
                 onSuccess = blockchainTransactionIssueAssets.Utility.onSuccess,
-                onFailure = blockchainTransactionIssueAssets.Utility.onFailure
+                onFailure = blockchainTransactionIssueAssets.Utility.onFailure,
+                updateTransactionHash = blockchainTransactionIssueAssets.Service.updateTransactionHash
               )
               masterTransactionIssueAssetRequests.Service.accept(issueAssetData.requestID, ticketID, issueAssetData.gas)
               Ok(views.html.index(successes = Seq(constants.Response.ASSET_ISSUED)))

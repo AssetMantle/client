@@ -26,11 +26,11 @@ class GetNegotiation @Inject()()(implicit wsClient: WSClient, configuration: Con
 
   private val url = ip + ":" + port + "/" + path + "/"
 
-  private def action(request: String)(implicit executionContext: ExecutionContext): Future[Response] = wsClient.url(url + request).get.map { response => utilities.JSON.getResponseFromJson[Response](response) }
+  private def action(request: String): Future[Response] = wsClient.url(url + request).get.map { response => utilities.JSON.getResponseFromJson[Response](response) }
 
   object Service {
 
-    def get(negotiationID: String)(implicit executionContext: ExecutionContext): Response = try {
+    def get(negotiationID: String): Response = try {
       Await.result(action(negotiationID), Duration.Inf)
     } catch {
       case connectException: ConnectException =>
