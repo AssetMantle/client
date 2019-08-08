@@ -100,6 +100,16 @@ class SendFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
     }
   }
 
+  private def updateTxHashOnTicketID(ticketID: String, txHash: Option[String]): Future[Int] = db.run(sendFiatTable.filter(_.ticketID === ticketID).map(x => x.txHash.?).update(txHash).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
   private[models] class SendFiatTable(tag: Tag) extends Table[SendFiat](tag, "SendFiat") {
 
     def * = (from, to, amount, pegHash, gas, status.?, txHash.?, ticketID, mode, code.?) <> (SendFiat.tupled, SendFiat.unapply)
@@ -138,6 +148,8 @@ class SendFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
     def getTransaction(ticketID: String): SendFiat = Await.result(findByTicketID(ticketID), Duration.Inf)
 
     def getTransactionHash(ticketID: String): Option[String] = Await.result(findByTicketID(ticketID), Duration.Inf).txHash
+
+    def updateTransactionHash(ticketID: String, txHash: String): Int = Await.result(updateTxHashOnTicketID(ticketID = ticketID, txHash = Option(txHash)), Duration.Inf)
 
   }
 
