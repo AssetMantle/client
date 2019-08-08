@@ -8,8 +8,7 @@ import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
 
-import scala.concurrent.{ExecutionContext, Future}
-import scala.util.Random
+import scala.concurrent.ExecutionContext
 
 @Singleton
 class ChangeSellerBidController @Inject()(messagesControllerComponents: MessagesControllerComponents, transaction: utilities.Transaction, blockchainNegotiations: blockchain.Negotiations, blockchainAccounts: blockchain.Accounts, withTraderLoginAction: WithTraderLoginAction, transactionsChangeSellerBid: transactions.ChangeSellerBid, blockchainTransactionChangeSellerBids: blockchainTransaction.ChangeSellerBids)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
@@ -32,19 +31,17 @@ class ChangeSellerBidController @Inject()(messagesControllerComponents: Messages
         },
         changeSellerBidData => {
           try {
-            val ticketID: String = if (kafkaEnabled) transactionsChangeSellerBid.Service.kafkaPost(transactionsChangeSellerBid.Request(transactionsChangeSellerBid.BaseRequest(from = loginState.address), to = changeSellerBidData.buyerAddress, password = changeSellerBidData.password, bid = changeSellerBidData.bid, time = changeSellerBidData.time, pegHash = changeSellerBidData.pegHash, gas = changeSellerBidData.gas, mode = transactionMode)).ticketID else Random.nextString(32)
-            blockchainTransactionChangeSellerBids.Service.create(blockchainTransaction.ChangeSellerBid(from = loginState.address, to = changeSellerBidData.buyerAddress, bid = changeSellerBidData.bid, time = changeSellerBidData.time, pegHash = changeSellerBidData.pegHash, gas = changeSellerBidData.gas, status = null, txHash = null, ticketID = ticketID, mode = transactionMode, code = null))
-            if (!kafkaEnabled) {
-              Future {
-                try {
-                  blockchainTransactionChangeSellerBids.Utility.onSuccess(ticketID, transactionsChangeSellerBid.Service.post(transactionsChangeSellerBid.Request(transactionsChangeSellerBid.BaseRequest(from = loginState.address), to = changeSellerBidData.buyerAddress, password = changeSellerBidData.password, bid = changeSellerBidData.bid, time = changeSellerBidData.time, pegHash = changeSellerBidData.pegHash, gas = changeSellerBidData.gas, mode = transactionMode)))
-                } catch {
-                  case baseException: BaseException => logger.error(baseException.failure.message, baseException)
-                  case blockChainException: BlockChainException => logger.error(blockChainException.failure.message, blockChainException)
-                    blockchainTransactionChangeSellerBids.Utility.onFailure(ticketID, blockChainException.failure.message)
-                }
-              }
-            }
+            transaction.process[blockchainTransaction.ChangeSellerBid, transactionsChangeSellerBid.Request](
+              entity = blockchainTransaction.ChangeSellerBid(from = loginState.address, to = changeSellerBidData.buyerAddress, bid = changeSellerBidData.bid, time = changeSellerBidData.time, pegHash = changeSellerBidData.pegHash, gas = changeSellerBidData.gas, status = null, txHash = null, ticketID = "", mode = transactionMode, code = null),
+              blockchainTransactionCreate = blockchainTransactionChangeSellerBids.Service.create,
+              request = transactionsChangeSellerBid.Request(transactionsChangeSellerBid.BaseRequest(from = loginState.address), to = changeSellerBidData.buyerAddress, password = changeSellerBidData.password, bid = changeSellerBidData.bid, time = changeSellerBidData.time, pegHash = changeSellerBidData.pegHash, gas = changeSellerBidData.gas, mode = transactionMode),
+              kafkaAction = transactionsChangeSellerBid.Service.kafkaPost,
+              blockAction = transactionsChangeSellerBid.Service.blockPost,
+              asyncAction = transactionsChangeSellerBid.Service.asyncPost,
+              syncAction = transactionsChangeSellerBid.Service.syncPost,
+              onSuccess = blockchainTransactionChangeSellerBids.Utility.onSuccess,
+              onFailure = blockchainTransactionChangeSellerBids.Utility.onFailure
+            )
             Ok(views.html.index(successes = Seq(constants.Response.SELLER_BID_CHANGED)))
           }
           catch {
@@ -70,7 +67,7 @@ class ChangeSellerBidController @Inject()(messagesControllerComponents: Messages
           if (kafkaEnabled) {
             transactionsChangeSellerBid.Service.kafkaPost(transactionsChangeSellerBid.Request(transactionsChangeSellerBid.BaseRequest(from = changeSellerBidData.from), to = changeSellerBidData.to, password = changeSellerBidData.password, bid = changeSellerBidData.bid, time = changeSellerBidData.time, pegHash = changeSellerBidData.pegHash, gas = changeSellerBidData.gas, mode = transactionMode))
           } else {
-            transactionsChangeSellerBid.Service.post(transactionsChangeSellerBid.Request(transactionsChangeSellerBid.BaseRequest(from = changeSellerBidData.from), to = changeSellerBidData.to, password = changeSellerBidData.password, bid = changeSellerBidData.bid, time = changeSellerBidData.time, pegHash = changeSellerBidData.pegHash, gas = changeSellerBidData.gas, mode = transactionMode))
+            transactionsChangeSellerBid.Service.blockPost(transactionsChangeSellerBid.Request(transactionsChangeSellerBid.BaseRequest(from = changeSellerBidData.from), to = changeSellerBidData.to, password = changeSellerBidData.password, bid = changeSellerBidData.bid, time = changeSellerBidData.time, pegHash = changeSellerBidData.pegHash, gas = changeSellerBidData.gas, mode = transactionMode))
           }
           Ok(views.html.index(successes = Seq(constants.Response.SELLER_BID_CHANGED)))
         }

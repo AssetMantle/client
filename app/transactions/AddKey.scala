@@ -26,7 +26,7 @@ class AddKey @Inject()(wsClient: WSClient)(implicit configuration: Configuration
 
   private val url = ip + ":" + port + "/" + path
 
-  private def action(request: Request)(implicit executionContext: ExecutionContext): Future[Response] = wsClient.url(url).post(Json.toJson(request)).map { response => utilities.JSON.getResponseFromJson[Response](response) }
+  private def blockAction(request: Request): Future[Response] = wsClient.url(url).post(Json.toJson(request)).map { response => utilities.JSON.getResponseFromJson[Response](response) }
 
   private implicit val requestWrites: OWrites[Request] = Json.writes[Request]
 
@@ -38,8 +38,8 @@ class AddKey @Inject()(wsClient: WSClient)(implicit configuration: Configuration
 
   object Service {
 
-    def post(request: Request)(implicit executionContext: ExecutionContext): Response = try {
-      Await.result(action(request), Duration.Inf)
+    def post(request: Request): Response = try {
+      Await.result(blockAction(request), Duration.Inf)
     } catch {
       case connectException: ConnectException =>
         logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)

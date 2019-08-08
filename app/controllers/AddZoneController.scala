@@ -20,11 +20,11 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  def addZoneForm: Action[AnyContent] = Action { implicit request =>
+  def addZoneForm(): Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.master.addZone(views.companion.master.AddZone.form))
   }
 
-  def addZone: Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
+  def addZone(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
       views.companion.master.AddZone.form.bindFromRequest().fold(
         formWithErrors => {
@@ -61,7 +61,9 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
               blockchainTransactionCreate = blockchainTransactionAddZones.Service.create,
               request = transactionsAddZone.Request(transactionsAddZone.BaseRequest(from = loginState.address), to = zoneAccountAddress, zoneID = verifyZoneData.zoneID, password = verifyZoneData.password, mode = transactionMode),
               kafkaAction = transactionsAddZone.Service.kafkaPost,
-              action = transactionsAddZone.Service.post,
+              blockAction = transactionsAddZone.Service.blockPost,
+              asyncAction = transactionsAddZone.Service.asyncPost,
+              syncAction = transactionsAddZone.Service.syncPost,
               onSuccess = blockchainTransactionAddZones.Utility.onSuccess,
               onFailure = blockchainTransactionAddZones.Utility.onFailure
             )
@@ -164,7 +166,7 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
           if (kafkaEnabled) {
             transactionsAddZone.Service.kafkaPost(transactionsAddZone.Request(transactionsAddZone.BaseRequest(from = addZoneData.from), to = addZoneData.to, zoneID = addZoneData.zoneID, password = addZoneData.password, mode = transactionMode)).ticketID
           } else {
-            transactionsAddZone.Service.post(transactionsAddZone.Request(transactionsAddZone.BaseRequest(from = addZoneData.from), to = addZoneData.to, zoneID = addZoneData.zoneID, password = addZoneData.password, mode = transactionMode))
+            transactionsAddZone.Service.blockPost(transactionsAddZone.Request(transactionsAddZone.BaseRequest(from = addZoneData.from), to = addZoneData.to, zoneID = addZoneData.zoneID, password = addZoneData.password, mode = transactionMode))
           }
           Ok(views.html.index(successes = Seq(constants.Response.ZONE_ADDED)))
         }

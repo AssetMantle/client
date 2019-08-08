@@ -7,7 +7,7 @@ import javax.inject.{Inject, Singleton}
 import play.api.libs.json.{Json, OWrites}
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
-import transactions.responses.TransactionResponse.{BlockResponse, KafkaResponse}
+import transactions.responses.TransactionResponse.{AsyncResponse, BlockResponse, KafkaResponse, SyncResponse}
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
@@ -29,7 +29,7 @@ class IssueFiat @Inject()(wsClient: WSClient)(implicit configuration: Configurat
 
   private val chainID = configuration.get[String]("blockchain.main.chainID")
 
-  private def action(request: Request): Future[BlockResponse] = wsClient.url(url).post(Json.toJson(request)).map { response => utilities.JSON.getResponseFromJson[BlockResponse](response) }
+  private def blockAction(request: Request): Future[BlockResponse] = wsClient.url(url).post(Json.toJson(request)).map { response => utilities.JSON.getResponseFromJson[BlockResponse](response) }
 
   private implicit val baseRequestWrites: OWrites[BaseRequest] = Json.writes[BaseRequest]
 
@@ -41,9 +41,13 @@ class IssueFiat @Inject()(wsClient: WSClient)(implicit configuration: Configurat
 
   case class Request(base_req: BaseRequest, to: String, transactionID: String, transactionAmount: Int, mode: String, password: String, gas: Int)
 
+  private def asyncAction(request: Request): Future[AsyncResponse] = wsClient.url(url).post(Json.toJson(request)).map { response => utilities.JSON.getResponseFromJson[AsyncResponse](response) }
+
+  private def syncAction(request: Request): Future[SyncResponse] = wsClient.url(url).post(Json.toJson(request)).map { response => utilities.JSON.getResponseFromJson[SyncResponse](response) }
+
   object Service {
-    def post(request: Request): BlockResponse = try {
-      Await.result(action(request), Duration.Inf)
+    def blockPost(request: Request): BlockResponse = try {
+      Await.result(blockAction(request), Duration.Inf)
     } catch {
       case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
         throw new BlockChainException(constants.Response.CONNECT_EXCEPTION)
@@ -55,6 +59,21 @@ class IssueFiat @Inject()(wsClient: WSClient)(implicit configuration: Configurat
       case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
         throw new BlockChainException(constants.Response.CONNECT_EXCEPTION)
     }
+
+    def asyncPost(request: Request): AsyncResponse = try {
+      Await.result(asyncAction(request), Duration.Inf)
+    } catch {
+      case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
+        throw new BlockChainException(constants.Response.CONNECT_EXCEPTION)
+    }
+
+    def syncPost(request: Request): SyncResponse = try {
+      Await.result(syncAction(request), Duration.Inf)
+    } catch {
+      case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
+        throw new BlockChainException(constants.Response.CONNECT_EXCEPTION)
+    }
+
   }
 
 }

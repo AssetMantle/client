@@ -38,7 +38,9 @@ class SellerExecuteOrderController @Inject()(messagesControllerComponents: Messa
               blockchainTransactionCreate = blockchainTransactionSellerExecuteOrders.Service.create,
               request = transactionsSellerExecuteOrder.Request(transactionsSellerExecuteOrder.BaseRequest(from = loginState.address), password = sellerExecuteOrderData.password, sellerAddress = loginState.address, buyerAddress = sellerExecuteOrderData.buyerAddress, awbProofHash = sellerExecuteOrderData.awbProofHash, pegHash = sellerExecuteOrderData.pegHash, gas = sellerExecuteOrderData.gas, mode = transactionMode),
               kafkaAction = transactionsSellerExecuteOrder.Service.kafkaPost,
-              action = transactionsSellerExecuteOrder.Service.post,
+              blockAction = transactionsSellerExecuteOrder.Service.blockPost,
+              asyncAction = transactionsSellerExecuteOrder.Service.asyncPost,
+              syncAction = transactionsSellerExecuteOrder.Service.syncPost,
               onSuccess = blockchainTransactionSellerExecuteOrders.Utility.onSuccess,
               onFailure = blockchainTransactionSellerExecuteOrders.Utility.onFailure
             )
@@ -73,19 +75,17 @@ class SellerExecuteOrderController @Inject()(messagesControllerComponents: Messa
         },
         moderatedSellerExecuteOrderData => {
           try {
-            val ticketID: String = if (kafkaEnabled) transactionsSellerExecuteOrder.Service.kafkaPost(transactionsSellerExecuteOrder.Request(transactionsSellerExecuteOrder.BaseRequest(from = loginState.address), password = moderatedSellerExecuteOrderData.password, buyerAddress = moderatedSellerExecuteOrderData.buyerAddress, sellerAddress = moderatedSellerExecuteOrderData.sellerAddress, awbProofHash = moderatedSellerExecuteOrderData.awbProofHash, pegHash = moderatedSellerExecuteOrderData.pegHash, gas = moderatedSellerExecuteOrderData.gas, mode = transactionMode)).ticketID else Random.nextString(32)
-            blockchainTransactionSellerExecuteOrders.Service.create(blockchainTransaction.SellerExecuteOrder(from = loginState.address, buyerAddress = moderatedSellerExecuteOrderData.buyerAddress, sellerAddress = moderatedSellerExecuteOrderData.sellerAddress, awbProofHash = moderatedSellerExecuteOrderData.awbProofHash, pegHash = moderatedSellerExecuteOrderData.pegHash, gas = moderatedSellerExecuteOrderData.gas, status = null, txHash = null, ticketID = ticketID, mode = transactionMode, code = null))
-            if (!kafkaEnabled) {
-              Future {
-                try {
-                  blockchainTransactionSellerExecuteOrders.Utility.onSuccess(ticketID, transactionsSellerExecuteOrder.Service.post(transactionsSellerExecuteOrder.Request(transactionsSellerExecuteOrder.BaseRequest(from = loginState.address), password = moderatedSellerExecuteOrderData.password, buyerAddress = moderatedSellerExecuteOrderData.buyerAddress, sellerAddress = moderatedSellerExecuteOrderData.sellerAddress, awbProofHash = moderatedSellerExecuteOrderData.awbProofHash, pegHash = moderatedSellerExecuteOrderData.pegHash, gas = moderatedSellerExecuteOrderData.gas, mode = transactionMode)))
-                } catch {
-                  case baseException: BaseException => logger.error(baseException.failure.message, baseException)
-                  case blockChainException: BlockChainException => logger.error(blockChainException.failure.message, blockChainException)
-                    blockchainTransactionSellerExecuteOrders.Utility.onFailure(ticketID, blockChainException.failure.message)
-                }
-              }
-            }
+            transaction.process[blockchainTransaction.SellerExecuteOrder, transactionsSellerExecuteOrder.Request](
+              entity = blockchainTransaction.SellerExecuteOrder(from = loginState.address, buyerAddress = loginState.address, sellerAddress = moderatedSellerExecuteOrderData.sellerAddress, fiatProofHash = moderatedSellerExecuteOrderData.fiatProofHash, pegHash = moderatedSellerExecuteOrderData.pegHash, gas = moderatedSellerExecuteOrderData.gas, status = null, txHash = null, ticketID = "", mode = transactionMode, code =  null),
+              blockchainTransactionCreate = blockchainTransactionSellerExecuteOrders.Service.create,
+              request = transactionsSellerExecuteOrder.Request(transactionsSellerExecuteOrder.BaseRequest(from = loginState.address), password = moderatedSellerExecuteOrderData.password, buyerAddress = loginState.address, sellerAddress = moderatedSellerExecuteOrderData.sellerAddress, fiatProofHash = moderatedSellerExecuteOrderData.fiatProofHash, pegHash = moderatedSellerExecuteOrderData.pegHash, gas = moderatedSellerExecuteOrderData.gas, mode = transactionMode),
+              kafkaAction = transactionsSellerExecuteOrder.Service.kafkaPost,
+              blockAction = transactionsSellerExecuteOrder.Service.blockPost,
+              asyncAction = transactionsSellerExecuteOrder.Service.asyncPost,
+              syncAction = transactionsSellerExecuteOrder.Service.syncPost,
+              onSuccess = blockchainTransactionSellerExecuteOrders.Utility.onSuccess,
+              onFailure = blockchainTransactionSellerExecuteOrders.Utility.onFailure
+            )
             Ok(views.html.index(successes = Seq(constants.Response.SELLER_ORDER_EXECUTED)))
           }
           catch {
@@ -110,7 +110,7 @@ class SellerExecuteOrderController @Inject()(messagesControllerComponents: Messa
           if (kafkaEnabled) {
             transactionsSellerExecuteOrder.Service.kafkaPost(transactionsSellerExecuteOrder.Request(transactionsSellerExecuteOrder.BaseRequest(from = sellerExecuteOrderData.from), password = sellerExecuteOrderData.password, buyerAddress = sellerExecuteOrderData.buyerAddress, sellerAddress = sellerExecuteOrderData.sellerAddress, awbProofHash = sellerExecuteOrderData.awbProofHash, pegHash = sellerExecuteOrderData.pegHash, gas = sellerExecuteOrderData.gas, mode = transactionMode))
           } else {
-            transactionsSellerExecuteOrder.Service.post(transactionsSellerExecuteOrder.Request(transactionsSellerExecuteOrder.BaseRequest(from = sellerExecuteOrderData.from), password = sellerExecuteOrderData.password, buyerAddress = sellerExecuteOrderData.buyerAddress, sellerAddress = sellerExecuteOrderData.sellerAddress, awbProofHash = sellerExecuteOrderData.awbProofHash, pegHash = sellerExecuteOrderData.pegHash, gas = sellerExecuteOrderData.gas, mode = transactionMode))
+            transactionsSellerExecuteOrder.Service.blockPost(transactionsSellerExecuteOrder.Request(transactionsSellerExecuteOrder.BaseRequest(from = sellerExecuteOrderData.from), password = sellerExecuteOrderData.password, buyerAddress = sellerExecuteOrderData.buyerAddress, sellerAddress = sellerExecuteOrderData.sellerAddress, awbProofHash = sellerExecuteOrderData.awbProofHash, pegHash = sellerExecuteOrderData.pegHash, gas = sellerExecuteOrderData.gas, mode = transactionMode))
           }
           Ok(views.html.index(successes = Seq(constants.Response.SELLER_ORDER_EXECUTED)))
         }

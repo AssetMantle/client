@@ -8,8 +8,7 @@ import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
 
-import scala.concurrent.{ExecutionContext, Future}
-import scala.util.Random
+import scala.concurrent.ExecutionContext
 
 @Singleton
 class SendCoinController @Inject()(messagesControllerComponents: MessagesControllerComponents, transaction: utilities.Transaction, masterAccounts: master.Accounts, withLoginAction: WithLoginAction, withGenesisLoginAction: WithGenesisLoginAction, blockchainAccounts: blockchain.Accounts, masterTransactionFaucetRequests: masterTransaction.FaucetRequests, withUnknownLoginAction: WithUnknownLoginAction, transactionsSendCoin: transactions.SendCoin, blockchainTransactionSendCoins: blockchainTransaction.SendCoins, withUserLoginAction: WithUserLoginAction)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
@@ -37,21 +36,18 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
           BadRequest(views.html.component.master.sendCoin(formWithErrors))
         },
         sendCoinData => {
-
           try {
-            val ticketID: String = if (kafkaEnabled) transactionsSendCoin.Service.kafkaPost(transactionsSendCoin.Request(transactionsSendCoin.BaseRequest(from = loginState.address), password = sendCoinData.password, to = sendCoinData.to, amount = Seq(transactionsSendCoin.Amount(denominationOfGasToken, sendCoinData.amount.toString)), gas = sendCoinData.gas, mode = transactionMode)).ticketID else Random.nextString(32)
-            blockchainTransactionSendCoins.Service.create(blockchainTransaction.SendCoin(from = loginState.address, to = sendCoinData.to, amount = sendCoinData.amount, gas = sendCoinData.gas, status = null, txHash = null, ticketID = ticketID, mode = transactionMode, code = null))
-            if (!kafkaEnabled) {
-              Future {
-                try {
-                  blockchainTransactionSendCoins.Utility.onSuccess(ticketID, transactionsSendCoin.Service.post(transactionsSendCoin.Request(transactionsSendCoin.BaseRequest(from = loginState.address), password = sendCoinData.password, to = sendCoinData.to, amount = Seq(transactionsSendCoin.Amount(denominationOfGasToken, sendCoinData.amount.toString)), gas = sendCoinData.gas, mode = transactionMode)))
-                } catch {
-                  case baseException: BaseException => logger.error(baseException.failure.message, baseException)
-                  case blockChainException: BlockChainException => logger.error(blockChainException.failure.message, blockChainException)
-                    blockchainTransactionSendCoins.Utility.onFailure(ticketID, blockChainException.failure.message)
-                }
-              }
-            }
+            transaction.process[blockchainTransaction.SendCoin, transactionsSendCoin.Request](
+              entity = blockchainTransaction.SendCoin(from = loginState.address, to = sendCoinData.to, amount = sendCoinData.amount, gas = sendCoinData.gas, status = null, txHash = null, ticketID = "", mode = transactionMode, code = null),
+              blockchainTransactionCreate = blockchainTransactionSendCoins.Service.create,
+              request = transactionsSendCoin.Request(transactionsSendCoin.BaseRequest(from = loginState.address), password = sendCoinData.password, to = sendCoinData.to, amount = Seq(transactionsSendCoin.Amount(denominationOfGasToken, sendCoinData.amount.toString)), gas = sendCoinData.gas, mode = transactionMode),
+              kafkaAction = transactionsSendCoin.Service.kafkaPost,
+              blockAction = transactionsSendCoin.Service.blockPost,
+              asyncAction = transactionsSendCoin.Service.asyncPost,
+              syncAction = transactionsSendCoin.Service.syncPost,
+              onSuccess = blockchainTransactionSendCoins.Utility.onSuccess,
+              onFailure = blockchainTransactionSendCoins.Utility.onFailure
+            )
             Ok(views.html.index(successes = Seq(constants.Response.COINS_SENT)))
           }
           catch {
@@ -77,7 +73,7 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
             transactionsSendCoin.Service.kafkaPost(transactionsSendCoin.Request(transactionsSendCoin.BaseRequest(from = sendCoinData.from), password = sendCoinData.password, to = sendCoinData.to, amount = Seq(transactionsSendCoin.Amount(denominationOfGasToken, sendCoinData.amount.toString)), gas = sendCoinData.gas, mode = transactionMode))
           }
           else {
-            transactionsSendCoin.Service.post(transactionsSendCoin.Request(transactionsSendCoin.BaseRequest(from = sendCoinData.from), password = sendCoinData.password, to = sendCoinData.to, amount = Seq(transactionsSendCoin.Amount(denominationOfGasToken, sendCoinData.amount.toString)), gas = sendCoinData.gas, mode = transactionMode))
+            transactionsSendCoin.Service.blockPost(transactionsSendCoin.Request(transactionsSendCoin.BaseRequest(from = sendCoinData.from), password = sendCoinData.password, to = sendCoinData.to, amount = Seq(transactionsSendCoin.Amount(denominationOfGasToken, sendCoinData.amount.toString)), gas = sendCoinData.gas, mode = transactionMode))
           }
           Ok(views.html.index(successes = Seq(constants.Response.COINS_SENT)))
 
@@ -160,20 +156,18 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
           try {
             if (masterTransactionFaucetRequests.Service.getStatus(approveFaucetRequestFormData.requestID).isEmpty) {
               val toAddress = masterAccounts.Service.getAddress(approveFaucetRequestFormData.accountID)
-              val ticketID: String = if (kafkaEnabled) transactionsSendCoin.Service.kafkaPost(transactionsSendCoin.Request(transactionsSendCoin.BaseRequest(from = loginState.address), password = approveFaucetRequestFormData.password, to = toAddress, amount = Seq(transactionsSendCoin.Amount(denominationOfGasToken, defaultFaucetToken.toString)), gas = approveFaucetRequestFormData.gas, mode = transactionMode)).ticketID else Random.nextString(32)
-              blockchainTransactionSendCoins.Service.create(blockchainTransaction.SendCoin(from = loginState.address, to = toAddress, amount = defaultFaucetToken, gas = approveFaucetRequestFormData.gas, status = null, txHash = null, ticketID = ticketID, mode = transactionMode, code = null))
+              val ticketID = transaction.process[blockchainTransaction.SendCoin, transactionsSendCoin.Request](
+                entity = blockchainTransaction.SendCoin(from = loginState.address, to = toAddress, amount = defaultFaucetToken, gas = approveFaucetRequestFormData.gas, status = null, txHash = null, ticketID = "", mode = transactionMode, code = null),
+                blockchainTransactionCreate = blockchainTransactionSendCoins.Service.create,
+                request = transactionsSendCoin.Request(transactionsSendCoin.BaseRequest(from = loginState.address), password = approveFaucetRequestFormData.password, to = toAddress, amount = Seq(transactionsSendCoin.Amount(denominationOfGasToken, defaultFaucetToken.toString)), gas = approveFaucetRequestFormData.gas, mode = transactionMode),
+                kafkaAction = transactionsSendCoin.Service.kafkaPost,
+                blockAction = transactionsSendCoin.Service.blockPost,
+                asyncAction = transactionsSendCoin.Service.asyncPost,
+                syncAction = transactionsSendCoin.Service.syncPost,
+                onSuccess = blockchainTransactionSendCoins.Utility.onSuccess,
+                onFailure = blockchainTransactionSendCoins.Utility.onFailure
+              )
               masterTransactionFaucetRequests.Service.accept(approveFaucetRequestFormData.requestID, ticketID, approveFaucetRequestFormData.gas)
-              if (!kafkaEnabled) {
-                Future {
-                  try {
-                    blockchainTransactionSendCoins.Utility.onSuccess(ticketID, transactionsSendCoin.Service.post(transactionsSendCoin.Request(transactionsSendCoin.BaseRequest(from = loginState.address), password = approveFaucetRequestFormData.password, to = toAddress, amount = Seq(transactionsSendCoin.Amount(denominationOfGasToken, defaultFaucetToken.toString)), gas = approveFaucetRequestFormData.gas, mode = transactionMode)))
-                  } catch {
-                    case baseException: BaseException => logger.error(baseException.failure.message, baseException)
-                    case blockChainException: BlockChainException => logger.error(blockChainException.failure.message, blockChainException)
-                      blockchainTransactionSendCoins.Utility.onFailure(ticketID, blockChainException.failure.message)
-                  }
-                }
-              }
               Ok(views.html.index(successes = Seq(constants.Response.FAUCET_REQUEST_APPROVED)))
             } else {
               Ok(views.html.index(failures = Seq(constants.Response.REQUEST_ALREADY_APPROVED_OR_REJECTED)))

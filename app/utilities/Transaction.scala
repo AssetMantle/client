@@ -4,7 +4,7 @@ import exceptions.{BaseException, BlockChainException}
 import javax.inject.{Inject, Singleton}
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
-import transactions.responses.TransactionResponse.{BlockResponse, KafkaResponse}
+import transactions.responses.TransactionResponse.{AsyncResponse, BlockResponse, KafkaResponse, SyncResponse}
 import transactions.{GetResponse, GetTxHashResponse}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -19,18 +19,24 @@ class Transaction @Inject()()(implicit executionContext: ExecutionContext, confi
 
   private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
 
+  private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
+
   private implicit val logger: Logger = Logger(this.getClass)
 
   private implicit val module: String = constants.Module.UTILITIES_TRANSACTION
 
-  def process[T1 <: TransactionEntity[T1], T2](entity: T1, blockchainTransactionCreate: T1 => String, request: T2, kafkaAction: T2 => KafkaResponse, action: T2 => BlockResponse, onSuccess: (String, BlockResponse) => Unit, onFailure: (String, String) => Unit): String = {
+  def process[T1 <: TransactionEntity[T1], T2](entity: T1, blockchainTransactionCreate: T1 => String, request: T2, kafkaAction: T2 => KafkaResponse, blockAction: T2 => BlockResponse, asyncAction: T2 => AsyncResponse, syncAction: T2 => SyncResponse, onSuccess: (String, BlockResponse) => Unit, onFailure: (String, String) => Unit): String = {
     try {
       val ticketID: String = if (kafkaEnabled) kafkaAction(request).ticketID else Random.nextString(32)
       blockchainTransactionCreate(entity.mutateTicketID(ticketID))
       if (!kafkaEnabled) {
         Future {
           try {
-            onSuccess(ticketID, action(request))
+            transactionMode match {
+              case constants.Transactions.BLOCK_MODE => onSuccess(ticketID, blockAction(request))
+              case constants.Transactions.ASYNC_MODE => onSuccess(ticketID, asyncAction(request))
+              case constants.Transactions.SYNC_MODE => onSuccess(ticketID, syncAction(request))
+            }
           } catch {
             case baseException: BaseException => logger.error(baseException.failure.message, baseException)
             case blockChainException: BlockChainException => logger.error(blockChainException.failure.message, blockChainException)

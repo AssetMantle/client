@@ -8,8 +8,7 @@ import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
 
-import scala.concurrent.{ExecutionContext, Future}
-import scala.util.Random
+import scala.concurrent.ExecutionContext
 
 @Singleton
 class ReleaseAssetController @Inject()(messagesControllerComponents: MessagesControllerComponents, transaction: utilities.Transaction, blockchainAssets: blockchain.Assets, blockchainACLAccounts: blockchain.ACLAccounts, blockchainZones: blockchain.Zones,blockchainAccounts: blockchain.Accounts, withZoneLoginAction: WithZoneLoginAction, transactionsReleaseAsset: transactions.ReleaseAsset, blockchainTransactionReleaseAssets: blockchainTransaction.ReleaseAssets)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
@@ -32,19 +31,17 @@ class ReleaseAssetController @Inject()(messagesControllerComponents: MessagesCon
         },
         releaseAssetData => {
           try {
-            val ticketID: String = if (kafkaEnabled) transactionsReleaseAsset.Service.kafkaPost(transactionsReleaseAsset.Request(transactionsReleaseAsset.BaseRequest(from = loginState.address), to = releaseAssetData.address, password = releaseAssetData.password, pegHash = releaseAssetData.pegHash, gas = releaseAssetData.gas, mode = transactionMode)).ticketID else Random.nextString(32)
-            blockchainTransactionReleaseAssets.Service.create(blockchainTransaction.ReleaseAsset(from = loginState.address, to = releaseAssetData.address, pegHash = releaseAssetData.pegHash, gas = releaseAssetData.gas, status = null, txHash = null, ticketID = ticketID, mode = transactionMode, code = null))
-            if (!kafkaEnabled) {
-              Future {
-                try {
-                  blockchainTransactionReleaseAssets.Utility.onSuccess(ticketID, transactionsReleaseAsset.Service.post(transactionsReleaseAsset.Request(transactionsReleaseAsset.BaseRequest(from = loginState.address), to = releaseAssetData.address, password = releaseAssetData.password, pegHash = releaseAssetData.pegHash, gas = releaseAssetData.gas, mode = transactionMode)))
-                } catch {
-                  case baseException: BaseException => logger.error(baseException.failure.message, baseException)
-                  case blockChainException: BlockChainException => logger.error(blockChainException.failure.message, blockChainException)
-                    blockchainTransactionReleaseAssets.Utility.onFailure(ticketID, blockChainException.failure.message)
-                }
-              }
-            }
+            transaction.process[blockchainTransaction.ReleaseAsset, transactionsReleaseAsset.Request](
+              entity = blockchainTransaction.ReleaseAsset(from = loginState.address, to = releaseAssetData.address, pegHash = releaseAssetData.pegHash, gas = releaseAssetData.gas, status = null, txHash = null, ticketID = "", mode = transactionMode, code = null),
+              blockchainTransactionCreate = blockchainTransactionReleaseAssets.Service.create,
+              request = transactionsReleaseAsset.Request(transactionsReleaseAsset.BaseRequest(from = loginState.address), to = releaseAssetData.address, password = releaseAssetData.password, pegHash = releaseAssetData.pegHash, gas = releaseAssetData.gas, mode = transactionMode),
+              kafkaAction = transactionsReleaseAsset.Service.kafkaPost,
+              blockAction = transactionsReleaseAsset.Service.blockPost,
+              asyncAction = transactionsReleaseAsset.Service.asyncPost,
+              syncAction = transactionsReleaseAsset.Service.syncPost,
+              onSuccess = blockchainTransactionReleaseAssets.Utility.onSuccess,
+              onFailure = blockchainTransactionReleaseAssets.Utility.onFailure
+            )
             Ok(views.html.index(successes = Seq(constants.Response.ASSET_RELEASED)))
           }
           catch {
@@ -78,7 +75,7 @@ class ReleaseAssetController @Inject()(messagesControllerComponents: MessagesCon
           if (kafkaEnabled) {
             transactionsReleaseAsset.Service.kafkaPost(transactionsReleaseAsset.Request(transactionsReleaseAsset.BaseRequest(from = releaseAssetData.from), to = releaseAssetData.to, password = releaseAssetData.password, pegHash = releaseAssetData.pegHash, gas = releaseAssetData.gas, mode = transactionMode))
           } else {
-            transactionsReleaseAsset.Service.post(transactionsReleaseAsset.Request(transactionsReleaseAsset.BaseRequest(from = releaseAssetData.from), to = releaseAssetData.to, password = releaseAssetData.password, pegHash = releaseAssetData.pegHash, gas = releaseAssetData.gas, mode = transactionMode))
+            transactionsReleaseAsset.Service.blockPost(transactionsReleaseAsset.Request(transactionsReleaseAsset.BaseRequest(from = releaseAssetData.from), to = releaseAssetData.to, password = releaseAssetData.password, pegHash = releaseAssetData.pegHash, gas = releaseAssetData.gas, mode = transactionMode))
           }
           Ok(views.html.index(successes = Seq(constants.Response.ASSET_RELEASED)))
         }

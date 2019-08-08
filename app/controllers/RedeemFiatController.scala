@@ -10,8 +10,7 @@ import play.api.{Configuration, Logger}
 import views.companion.blockchain.RedeemFiat
 import views.companion.master
 
-import scala.concurrent.{ExecutionContext, Future}
-import scala.util.Random
+import scala.concurrent.ExecutionContext
 
 @Singleton
 class RedeemFiatController @Inject()(messagesControllerComponents: MessagesControllerComponents, transaction: utilities.Transaction, blockchainZones: blockchain.Zones, blockchainACLAccounts: blockchain.ACLAccounts, withTraderLoginAction: WithTraderLoginAction, transactionsRedeemFiat: transactions.RedeemFiat, blockchainTransactionRedeemFiats: blockchainTransaction.RedeemFiats)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
@@ -35,19 +34,17 @@ class RedeemFiatController @Inject()(messagesControllerComponents: MessagesContr
         redeemFiatData => {
           try {
             val toAddress = blockchainZones.Service.getAddress(redeemFiatData.zoneID)
-            val ticketID = if (kafkaEnabled) transactionsRedeemFiat.Service.kafkaPost(transactionsRedeemFiat.Request(transactionsRedeemFiat.BaseRequest(from = loginState.address), to = toAddress, password = redeemFiatData.password, redeemAmount = redeemFiatData.redeemAmount, gas = redeemFiatData.gas, mode = transactionMode)).ticketID else Random.nextString(32)
-            blockchainTransactionRedeemFiats.Service.create(blockchainTransaction.RedeemFiat(from = loginState.address, to = toAddress, redeemAmount = redeemFiatData.redeemAmount, gas = redeemFiatData.gas, null, null, ticketID = ticketID, mode = transactionMode, null))
-            if (!kafkaEnabled) {
-              Future {
-                try {
-                  blockchainTransactionRedeemFiats.Utility.onSuccess(ticketID, transactionsRedeemFiat.Service.post(transactionsRedeemFiat.Request(transactionsRedeemFiat.BaseRequest(from = loginState.address), to = toAddress, password = redeemFiatData.password, redeemAmount = redeemFiatData.redeemAmount, gas = redeemFiatData.gas, mode = transactionMode)))
-                } catch {
-                  case baseException: BaseException => logger.error(baseException.failure.message, baseException)
-                  case blockChainException: BlockChainException => logger.error(blockChainException.failure.message, blockChainException)
-                    blockchainTransactionRedeemFiats.Utility.onFailure(ticketID, blockChainException.failure.message)
-                }
-              }
-            }
+            transaction.process[blockchainTransaction.RedeemFiat, transactionsRedeemFiat.Request](
+              entity = blockchainTransaction.RedeemFiat(from = loginState.address, to = toAddress, redeemAmount = redeemFiatData.redeemAmount, gas = redeemFiatData.gas, null, null, ticketID = "", mode = transactionMode, null),
+              blockchainTransactionCreate = blockchainTransactionRedeemFiats.Service.create,
+              request = transactionsRedeemFiat.Request(transactionsRedeemFiat.BaseRequest(from = loginState.address), to = toAddress, password = redeemFiatData.password, redeemAmount = redeemFiatData.redeemAmount, gas = redeemFiatData.gas, mode = transactionMode),
+              kafkaAction = transactionsRedeemFiat.Service.kafkaPost,
+              blockAction = transactionsRedeemFiat.Service.blockPost,
+              asyncAction = transactionsRedeemFiat.Service.asyncPost,
+              syncAction = transactionsRedeemFiat.Service.syncPost,
+              onSuccess = blockchainTransactionRedeemFiats.Utility.onSuccess,
+              onFailure = blockchainTransactionRedeemFiats.Utility.onFailure
+            )
             Ok(views.html.index(successes = Seq(constants.Response.FIAT_REDEEMED)))
           }
           catch {
@@ -73,7 +70,7 @@ class RedeemFiatController @Inject()(messagesControllerComponents: MessagesContr
           if (kafkaEnabled) {
             transactionsRedeemFiat.Service.kafkaPost(transactionsRedeemFiat.Request(transactionsRedeemFiat.BaseRequest(from = redeemFiatData.from), to = redeemFiatData.to, password = redeemFiatData.password, redeemAmount = redeemFiatData.redeemAmount, gas = redeemFiatData.gas, mode = transactionMode))
           } else {
-            transactionsRedeemFiat.Service.post(transactionsRedeemFiat.Request(transactionsRedeemFiat.BaseRequest(from = redeemFiatData.from), to = redeemFiatData.to, password = redeemFiatData.password, redeemAmount = redeemFiatData.redeemAmount, gas = redeemFiatData.gas, mode = transactionMode))
+            transactionsRedeemFiat.Service.blockPost(transactionsRedeemFiat.Request(transactionsRedeemFiat.BaseRequest(from = redeemFiatData.from), to = redeemFiatData.to, password = redeemFiatData.password, redeemAmount = redeemFiatData.redeemAmount, gas = redeemFiatData.gas, mode = transactionMode))
           }
           Ok(views.html.index(successes = Seq(constants.Response.FIAT_REDEEMED)))
         }

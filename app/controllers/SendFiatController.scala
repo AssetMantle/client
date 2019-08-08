@@ -8,8 +8,7 @@ import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
 
-import scala.concurrent.{ExecutionContext, Future}
-import scala.util.Random
+import scala.concurrent.ExecutionContext
 
 @Singleton
 class SendFiatController @Inject()(messagesControllerComponents: MessagesControllerComponents, transaction: utilities.Transaction, blockchainFiats: blockchain.Fiats, blockchainOrders: blockchain.Orders, blockchainAccounts: blockchain.Accounts, withTraderLoginAction: WithTraderLoginAction, transactionsSendFiat: transactions.SendFiat, blockchainTransactionSendFiats: blockchainTransaction.SendFiats)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
@@ -33,19 +32,17 @@ class SendFiatController @Inject()(messagesControllerComponents: MessagesControl
         sendFiatData => {
 
           try {
-            val ticketID: String = if (kafkaEnabled) transactionsSendFiat.Service.kafkaPost(transactionsSendFiat.Request(transactionsSendFiat.BaseRequest(from = loginState.address), to = sendFiatData.sellerAddress, password = sendFiatData.password, amount = sendFiatData.amount, pegHash = sendFiatData.pegHash, gas = sendFiatData.gas, mode = transactionMode)).ticketID else Random.nextString(32)
-            blockchainTransactionSendFiats.Service.create(blockchainTransaction.SendFiat(from = loginState.address, to = sendFiatData.sellerAddress, amount = sendFiatData.amount, pegHash = sendFiatData.pegHash, gas = sendFiatData.gas, status = null, txHash = null, ticketID = ticketID, mode = transactionMode, code = null))
-            if (!kafkaEnabled) {
-              Future {
-                try {
-                  blockchainTransactionSendFiats.Utility.onSuccess(ticketID, transactionsSendFiat.Service.post(transactionsSendFiat.Request(transactionsSendFiat.BaseRequest(from = loginState.address), to = sendFiatData.sellerAddress, password = sendFiatData.password, amount = sendFiatData.amount, pegHash = sendFiatData.pegHash, gas = sendFiatData.gas, mode = transactionMode)))
-                } catch {
-                  case baseException: BaseException => logger.error(baseException.failure.message, baseException)
-                  case blockChainException: BlockChainException => logger.error(blockChainException.failure.message, blockChainException)
-                    blockchainTransactionSendFiats.Utility.onFailure(ticketID, blockChainException.failure.message)
-                }
-              }
-            }
+            transaction.process[blockchainTransaction.SendFiat, transactionsSendFiat.Request](
+              entity = blockchainTransaction.SendFiat(from = loginState.address, to = sendFiatData.sellerAddress, amount = sendFiatData.amount, pegHash = sendFiatData.pegHash, gas = sendFiatData.gas, status = null, txHash = null, ticketID = "", mode = transactionMode, code = null),
+              blockchainTransactionCreate = blockchainTransactionSendFiats.Service.create,
+              request = transactionsSendFiat.Request(transactionsSendFiat.BaseRequest(from = loginState.address), to = sendFiatData.sellerAddress, password = sendFiatData.password, amount = sendFiatData.amount, pegHash = sendFiatData.pegHash, gas = sendFiatData.gas, mode = transactionMode),
+              kafkaAction = transactionsSendFiat.Service.kafkaPost,
+              blockAction = transactionsSendFiat.Service.blockPost,
+              asyncAction = transactionsSendFiat.Service.asyncPost,
+              syncAction = transactionsSendFiat.Service.syncPost,
+              onSuccess = blockchainTransactionSendFiats.Utility.onSuccess,
+              onFailure = blockchainTransactionSendFiats.Utility.onFailure
+            )
             Ok(views.html.index(successes = Seq(constants.Response.FIAT_SENT)))
           }
           catch {
@@ -70,7 +67,7 @@ class SendFiatController @Inject()(messagesControllerComponents: MessagesControl
           if (kafkaEnabled) {
             transactionsSendFiat.Service.kafkaPost(transactionsSendFiat.Request(transactionsSendFiat.BaseRequest(from = sendFiatData.from), to = sendFiatData.to, password = sendFiatData.password, amount = sendFiatData.amount, pegHash = sendFiatData.pegHash, gas = sendFiatData.gas, mode = transactionMode))
           } else {
-            transactionsSendFiat.Service.post(transactionsSendFiat.Request(transactionsSendFiat.BaseRequest(from = sendFiatData.from), to = sendFiatData.to, password = sendFiatData.password, amount = sendFiatData.amount, pegHash = sendFiatData.pegHash, gas = sendFiatData.gas, mode = transactionMode))
+            transactionsSendFiat.Service.blockPost(transactionsSendFiat.Request(transactionsSendFiat.BaseRequest(from = sendFiatData.from), to = sendFiatData.to, password = sendFiatData.password, amount = sendFiatData.amount, pegHash = sendFiatData.pegHash, gas = sendFiatData.gas, mode = transactionMode))
           }
           Ok(views.html.index(successes = Seq(constants.Response.FIAT_SENT)))
         }

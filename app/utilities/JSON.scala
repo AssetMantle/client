@@ -12,7 +12,6 @@ object JSON {
 
   def getResponseFromJson[T](response: WSResponse)(implicit logger: Logger, reads: Reads[T]): T = {
     try {
-      logger.info(response.body)
       val responseFromJson: JsResult[T] = Json.fromJson[T](response.json)
       responseFromJson match {
         case JsSuccess(value: T, _: JsPath) => value

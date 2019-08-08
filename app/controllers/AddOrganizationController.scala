@@ -65,7 +65,9 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
               blockchainTransactionCreate = blockchainTransactionAddOrganizations.Service.create,
               request = transactionsAddOrganization.Request(transactionsAddOrganization.BaseRequest(from = loginState.address), to = organizationAccountAddress, organizationID = verifyOrganizationData.organizationID, zoneID = verifyOrganizationData.zoneID, password = verifyOrganizationData.password, mode = transactionMode),
               kafkaAction = transactionsAddOrganization.Service.kafkaPost,
-              action = transactionsAddOrganization.Service.post,
+              blockAction = transactionsAddOrganization.Service.blockPost,
+              asyncAction = transactionsAddOrganization.Service.asyncPost,
+              syncAction = transactionsAddOrganization.Service.syncPost,
               onSuccess = blockchainTransactionAddOrganizations.Utility.onSuccess,
               onFailure = blockchainTransactionAddOrganizations.Utility.onFailure
             )
@@ -178,7 +180,11 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
           if (kafkaEnabled) {
             transactionsAddOrganization.Service.kafkaPost(transactionsAddOrganization.Request(transactionsAddOrganization.BaseRequest(from = addOrganizationData.from), to = addOrganizationData.to, organizationID = addOrganizationData.organizationID, zoneID = addOrganizationData.zoneID, password = addOrganizationData.password, mode = transactionMode))
           } else {
-            transactionsAddOrganization.Service.post(transactionsAddOrganization.Request(transactionsAddOrganization.BaseRequest(from = addOrganizationData.from), to = addOrganizationData.to, organizationID = addOrganizationData.organizationID, zoneID = addOrganizationData.zoneID, password = addOrganizationData.password, mode = transactionMode))
+            transactionMode match {
+              case constants.Transactions.BLOCK_MODE => transactionsAddOrganization.Service.blockPost(transactionsAddOrganization.Request(transactionsAddOrganization.BaseRequest(from = addOrganizationData.from), to = addOrganizationData.to, organizationID = addOrganizationData.organizationID, zoneID = addOrganizationData.zoneID, password = addOrganizationData.password, mode = transactionMode))
+              case constants.Transactions.ASYNC_MODE => transactionsAddOrganization.Service.asyncPost(transactionsAddOrganization.Request(transactionsAddOrganization.BaseRequest(from = addOrganizationData.from), to = addOrganizationData.to, organizationID = addOrganizationData.organizationID, zoneID = addOrganizationData.zoneID, password = addOrganizationData.password, mode = transactionMode))
+              case constants.Transactions.SYNC_MODE => transactionsAddOrganization.Service.syncPost(transactionsAddOrganization.Request(transactionsAddOrganization.BaseRequest(from = addOrganizationData.from), to = addOrganizationData.to, organizationID = addOrganizationData.organizationID, zoneID = addOrganizationData.zoneID, password = addOrganizationData.password, mode = transactionMode))
+            }
           }
           Ok(views.html.index(successes = Seq(constants.Response.ORGANIZATION_ADDED)))
         }
