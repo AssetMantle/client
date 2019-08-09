@@ -56,14 +56,11 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
         verifyZoneData => {
           try {
             val zoneAccountAddress = masterAccounts.Service.getAddress(masterZones.Service.getAccountId(verifyZoneData.zoneID))
-            transaction.process[blockchainTransaction.AddZone, transactionsAddZone.Request](
+            transaction.process2[blockchainTransaction.AddZone, transactionsAddZone.Request](
               entity = blockchainTransaction.AddZone(from = loginState.address, to = zoneAccountAddress, zoneID = verifyZoneData.zoneID, status =  null, txHash = null, ticketID = "", mode = transactionMode, code = null),
               blockchainTransactionCreate = blockchainTransactionAddZones.Service.create,
               request = transactionsAddZone.Request(transactionsAddZone.BaseRequest(from = loginState.address), to = zoneAccountAddress, zoneID = verifyZoneData.zoneID, password = verifyZoneData.password, mode = transactionMode),
-              kafkaAction = transactionsAddZone.Service.kafkaPost,
-              blockAction = transactionsAddZone.Service.blockPost,
-              asyncAction = transactionsAddZone.Service.asyncPost,
-              syncAction = transactionsAddZone.Service.syncPost,
+              action = transactionsAddZone.Service.post,
               onSuccess = blockchainTransactionAddZones.Utility.onSuccess,
               onFailure = blockchainTransactionAddZones.Utility.onFailure,
               updateTransactionHash = blockchainTransactionAddZones.Service.updateTransactionHash
@@ -164,11 +161,12 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
       },
       addZoneData => {
         try {
-          if (kafkaEnabled) {
-            transactionsAddZone.Service.kafkaPost(transactionsAddZone.Request(transactionsAddZone.BaseRequest(from = addZoneData.from), to = addZoneData.to, zoneID = addZoneData.zoneID, password = addZoneData.password, mode = transactionMode)).ticketID
-          } else {
-            transactionsAddZone.Service.blockPost(transactionsAddZone.Request(transactionsAddZone.BaseRequest(from = addZoneData.from), to = addZoneData.to, zoneID = addZoneData.zoneID, password = addZoneData.password, mode = transactionMode))
-          }
+//          if (kafkaEnabled) {
+//            transactionsAddZone.Service.kafkaPost(transactionsAddZone.Request(transactionsAddZone.BaseRequest(from = addZoneData.from), to = addZoneData.to, zoneID = addZoneData.zoneID, password = addZoneData.password, mode = transactionMode)).ticketID
+//          } else {
+//            transactionsAddZone.Service.blockPost(transactionsAddZone.Request(transactionsAddZone.BaseRequest(from = addZoneData.from), to = addZoneData.to, zoneID = addZoneData.zoneID, password = addZoneData.password, mode = transactionMode))
+//          }
+          transactionsAddZone.Service.post(transactionsAddZone.Request(transactionsAddZone.BaseRequest(from = addZoneData.from), to = addZoneData.to, zoneID = addZoneData.zoneID, password = addZoneData.password, mode = transactionMode))
           Ok(views.html.index(successes = Seq(constants.Response.ZONE_ADDED)))
         }
         catch {

@@ -8,6 +8,7 @@ import play.api.libs.json.{Json, OWrites}
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
 import transactions.responses.TransactionResponse.{AsyncResponse, BlockResponse, KafkaResponse, SyncResponse}
+import utilities.RequestEntity
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
@@ -39,7 +40,7 @@ class IssueAsset @Inject()(wsClient: WSClient)(implicit configuration: Configura
 
   private implicit val requestWrites: OWrites[Request] = Json.writes[Request]
 
-  case class Request(base_req: BaseRequest, to: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, mode: String, password: String, gas: Int, moderated: Boolean)
+  case class Request(base_req: BaseRequest, to: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, mode: String, password: String, gas: Int, moderated: Boolean) extends RequestEntity
 
   private def asyncAction(request: Request): Future[AsyncResponse] = wsClient.url(url).post(Json.toJson(request)).map { response => utilities.JSON.getResponseFromJson[AsyncResponse](response) }
 

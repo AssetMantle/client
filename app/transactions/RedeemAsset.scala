@@ -8,6 +8,7 @@ import play.api.libs.json.{Json, OWrites}
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
 import transactions.responses.TransactionResponse.{AsyncResponse, BlockResponse, KafkaResponse, SyncResponse}
+import utilities.RequestEntity
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
@@ -39,7 +40,7 @@ class RedeemAsset @Inject()(wsClient: WSClient)(implicit configuration: Configur
 
   case class BaseRequest(from: String, chain_id: String = chainID)
 
-  case class Request(base_req: BaseRequest, password: String, to: String, pegHash: String, mode: String, gas: Int)
+  case class Request(base_req: BaseRequest, password: String, to: String, pegHash: String, mode: String, gas: Int) extends RequestEntity
 
   private def asyncAction(request: Request): Future[AsyncResponse] = wsClient.url(url).post(Json.toJson(request)).map { response => utilities.JSON.getResponseFromJson[AsyncResponse](response) }
 

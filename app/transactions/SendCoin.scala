@@ -8,6 +8,7 @@ import play.api.libs.json.{Json, OWrites}
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
 import transactions.responses.TransactionResponse.{AsyncResponse, BlockResponse, KafkaResponse, SyncResponse}
+import utilities.RequestEntity
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
@@ -25,17 +26,17 @@ class SendCoin @Inject()(wsClient: WSClient)(implicit configuration: Configurati
 
   private val chainID = configuration.get[String]("blockchain.main.chainID")
 
-  private val path = "bank/accounts/"
+  private val path1 = "bank/accounts/"
 
   private val path2 = "/transfers"
 
-  private val url = ip + ":" + port + "/" + path
+  private val url = ip + ":" + port + "/" + path1
 
   case class Amount(denom: String, amount: String)
 
   case class BaseRequest(from: String, chain_id: String = chainID)
 
-  case class Request(base_req: BaseRequest, password: String, to: String, amount: Seq[Amount], mode: String, gas: Int)
+  case class Request(base_req: BaseRequest, password: String, to: String, amount: Seq[Amount], mode: String, gas: Int) extends RequestEntity
 
   private implicit val baseRequestWrites: OWrites[BaseRequest] = Json.writes[BaseRequest]
 
@@ -45,11 +46,11 @@ class SendCoin @Inject()(wsClient: WSClient)(implicit configuration: Configurati
 
   private def blockAction(request: Request): Future[BlockResponse] = wsClient.url(url+ request.to + path2).post(Json.toJson(request)).map { response => utilities.JSON.getResponseFromJson[BlockResponse](response) }
 
-  private def kafkaAction(request: Request): Future[KafkaResponse] = wsClient.url(url).post(Json.toJson(request)).map { response => utilities.JSON.getResponseFromJson[KafkaResponse](response) }
+  private def kafkaAction(request: Request): Future[KafkaResponse] = wsClient.url(url+ request.to + path2).post(Json.toJson(request)).map { response => utilities.JSON.getResponseFromJson[KafkaResponse](response) }
 
-  private def asyncAction(request: Request): Future[AsyncResponse] = wsClient.url(url).post(Json.toJson(request)).map { response => utilities.JSON.getResponseFromJson[AsyncResponse](response) }
+  private def asyncAction(request: Request): Future[AsyncResponse] = wsClient.url(url+ request.to + path2).post(Json.toJson(request)).map { response => utilities.JSON.getResponseFromJson[AsyncResponse](response) }
 
-  private def syncAction(request: Request): Future[SyncResponse] = wsClient.url(url).post(Json.toJson(request)).map { response => utilities.JSON.getResponseFromJson[SyncResponse](response) }
+  private def syncAction(request: Request): Future[SyncResponse] = wsClient.url(url+ request.to + path2).post(Json.toJson(request)).map { response => utilities.JSON.getResponseFromJson[SyncResponse](response) }
 
   object Service {
     def blockPost(request: Request): BlockResponse = try {
