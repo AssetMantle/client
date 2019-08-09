@@ -42,6 +42,7 @@ class IssueAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tra
   private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
   private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
   private val sleepTime = configuration.get[Long]("blockchain.entityIterator.threadSleep")
+  private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
   private def add(issueAsset: IssueAsset): Future[String] = db.run((issueAssetTable returning issueAssetTable.map(_.ticketID) += issueAsset).asTry).map {
     case Success(result) => result
@@ -168,9 +169,9 @@ class IssueAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tra
         Thread.sleep(sleepTime)
         val responseAccount = getAccount.Service.get(issueAsset.to)
         responseAccount.value.assetPegWallet.foreach(assets => assets.foreach(asset => blockchainAssets.Service.insertOrUpdate(pegHash = asset.pegHash, documentHash = asset.documentHash, assetType = asset.assetType, assetPrice = asset.assetPrice, assetQuantity = asset.assetQuantity, quantityUnit = asset.quantityUnit, locked = asset.locked, moderated = asset.moderated, ownerAddress = issueAsset.to, dirtyBit = true)))
-        blockchainAccounts.Service.markDirty(masterAccounts.Service.getAddress(issueAsset.from))
+        blockchainAccounts.Service.markDirty(issueAsset.from)
         pushNotification.sendNotification(masterAccounts.Service.getId(issueAsset.to), constants.Notification.SUCCESS, blockResponse.txhash)
-        pushNotification.sendNotification(issueAsset.from, constants.Notification.SUCCESS, blockResponse.txhash)
+        pushNotification.sendNotification(masterAccounts.Service.getId(issueAsset.from), constants.Notification.SUCCESS, blockResponse.txhash)
       } catch {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
           throw new BaseException(constants.Response.PSQL_EXCEPTION)
@@ -183,15 +184,14 @@ class IssueAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tra
         Service.markTransactionFailed(ticketID, message)
         val issueAsset = Service.getTransaction(ticketID)
         pushNotification.sendNotification(masterAccounts.Service.getId(issueAsset.to), constants.Notification.FAILURE, message)
-        pushNotification.sendNotification(issueAsset.from, constants.Notification.FAILURE, message)
+        pushNotification.sendNotification(masterAccounts.Service.getId(issueAsset.from), constants.Notification.FAILURE, message)
       } catch {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
     }
   }
 
-
-  if (kafkaEnabled) {
+  if (kafkaEnabled || transactionMode != constants.Transactions.BLOCK_MODE) {
     actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
       transaction.ticketUpdater(Service.getTicketIDsOnStatus, Service.getTransactionHash, Utility.onSuccess, Utility.onFailure)
     }

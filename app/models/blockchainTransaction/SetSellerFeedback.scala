@@ -40,7 +40,7 @@ class SetSellerFeedbacks @Inject()(actorSystem: ActorSystem, transaction: utilit
   private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
   private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
   private val sleepTime = configuration.get[Long]("blockchain.entityIterator.threadSleep")
-
+  private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
   private def add(setSellerFeedback: SetSellerFeedback): Future[String] = db.run((setSellerFeedbackTable returning setSellerFeedbackTable.map(_.ticketID) += setSellerFeedback).asTry).map {
     case Success(result) => result
@@ -156,11 +156,10 @@ class SetSellerFeedbacks @Inject()(actorSystem: ActorSystem, transaction: utilit
       try {
         Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
         val setSellerFeedback = Service.getTransaction(ticketID)
-        val fromAddress = masterAccounts.Service.getAddress(setSellerFeedback.from)
-        blockchainTraderFeedbackHistories.Service.update(setSellerFeedback.to, setSellerFeedback.to, fromAddress, setSellerFeedback.pegHash, setSellerFeedback.rating.toString)
-        blockchainAccounts.Service.markDirty(fromAddress)
+        blockchainTraderFeedbackHistories.Service.update(setSellerFeedback.from, setSellerFeedback.to, setSellerFeedback.from, setSellerFeedback.pegHash, setSellerFeedback.rating.toString)
+        blockchainAccounts.Service.markDirty(setSellerFeedback.from)
         pushNotification.sendNotification(masterAccounts.Service.getId(setSellerFeedback.to), constants.Notification.SUCCESS, blockResponse.txhash)
-        pushNotification.sendNotification(setSellerFeedback.from, constants.Notification.SUCCESS, blockResponse.txhash)
+        pushNotification.sendNotification(masterAccounts.Service.getId(setSellerFeedback.from), constants.Notification.SUCCESS, blockResponse.txhash)
       } catch {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
           throw new BaseException(constants.Response.PSQL_EXCEPTION)
@@ -172,15 +171,14 @@ class SetSellerFeedbacks @Inject()(actorSystem: ActorSystem, transaction: utilit
         Service.markTransactionFailed(ticketID, message)
         val setSellerFeedback = Service.getTransaction(ticketID)
         pushNotification.sendNotification(masterAccounts.Service.getId(setSellerFeedback.to), constants.Notification.FAILURE, message)
-        pushNotification.sendNotification(setSellerFeedback.from, constants.Notification.FAILURE, message)
+        pushNotification.sendNotification(masterAccounts.Service.getId(setSellerFeedback.from), constants.Notification.FAILURE, message)
       } catch {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
     }
   }
 
-
-  if (kafkaEnabled) {
+  if (kafkaEnabled || transactionMode != constants.Transactions.BLOCK_MODE) {
     actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
       transaction.ticketUpdater(Service.getTicketIDsOnStatus, Service.getTransactionHash, Utility.onSuccess, Utility.onFailure)
     }

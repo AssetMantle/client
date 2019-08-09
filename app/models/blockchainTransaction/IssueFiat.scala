@@ -42,6 +42,7 @@ class IssueFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
   private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
   private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
   private val sleepTime = configuration.get[Long]("blockchain.entityIterator.threadSleep")
+  private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
   private def add(issueFiat: IssueFiat): Future[String] = db.run((issueFiatTable returning issueFiatTable.map(_.ticketID) += issueFiat).asTry).map {
     case Success(result) => result
@@ -159,9 +160,9 @@ class IssueFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
         val issueFiat = Service.getTransaction(ticketID)
         Thread.sleep(sleepTime)
         getAccount.Service.get(issueFiat.to).value.fiatPegWallet.foreach(fiats => fiats.foreach(fiatPeg => blockchainFiats.Service.insertOrUpdate(fiatPeg.pegHash, issueFiat.to, fiatPeg.transactionID, fiatPeg.transactionAmount, fiatPeg.redeemedAmount, dirtyBit = true)))
-        blockchainAccounts.Service.markDirty(masterAccounts.Service.getAddress(issueFiat.from))
+        blockchainAccounts.Service.markDirty(issueFiat.from)
         pushNotification.sendNotification(masterAccounts.Service.getId(issueFiat.to), constants.Notification.SUCCESS, blockResponse.txhash)
-        pushNotification.sendNotification(issueFiat.from, constants.Notification.SUCCESS, blockResponse.txhash)
+        pushNotification.sendNotification(masterAccounts.Service.getId(issueFiat.from), constants.Notification.SUCCESS, blockResponse.txhash)
       }
       catch {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
@@ -175,15 +176,14 @@ class IssueFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
         Service.markTransactionFailed(ticketID, message)
         val issueFiat = Service.getTransaction(ticketID)
         pushNotification.sendNotification(masterAccounts.Service.getId(issueFiat.to), constants.Notification.FAILURE, message)
-        pushNotification.sendNotification(issueFiat.from, constants.Notification.FAILURE, message)
+        pushNotification.sendNotification(masterAccounts.Service.getId(issueFiat.from), constants.Notification.FAILURE, message)
       } catch {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
     }
   }
 
-
-  if (kafkaEnabled) {
+  if (kafkaEnabled || transactionMode != constants.Transactions.BLOCK_MODE) {
     actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
       transaction.ticketUpdater(Service.getTicketIDsOnStatus, Service.getTransactionHash, Utility.onSuccess, Utility.onFailure)
     }

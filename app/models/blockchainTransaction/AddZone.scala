@@ -37,6 +37,7 @@ class AddZones @Inject()(actorSystem: ActorSystem, transaction: utilities.Transa
   private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
   private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
   private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
+  private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
   private def add(addZone: AddZone): Future[String] = db.run((addZoneTable returning addZoneTable.map(_.ticketID) += addZone).asTry).map {
     case Success(result) => result
@@ -174,7 +175,7 @@ class AddZones @Inject()(actorSystem: ActorSystem, transaction: utilities.Transa
     }
   }
 
-  if (kafkaEnabled) {
+  if (kafkaEnabled || transactionMode != constants.Transactions.BLOCK_MODE) {
     actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
       transaction.ticketUpdater(Service.getTicketIDsOnStatus, Service.getTransactionHash, Utility.onSuccess, Utility.onFailure)
     }

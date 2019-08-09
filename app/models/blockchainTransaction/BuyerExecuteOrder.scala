@@ -39,6 +39,7 @@ class BuyerExecuteOrders @Inject()(actorSystem: ActorSystem, transaction: utilit
   private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
   private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
   private val sleepTime = configuration.get[Long]("blockchain.entityIterator.threadSleep")
+  private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
   private def add(buyerExecuteOrder: BuyerExecuteOrder): Future[String] = db.run((buyerExecuteOrderTable returning buyerExecuteOrderTable.map(_.ticketID) += buyerExecuteOrder).asTry).map {
     case Success(result) => result
@@ -191,7 +192,7 @@ class BuyerExecuteOrders @Inject()(actorSystem: ActorSystem, transaction: utilit
     }
   }
 
-  if (kafkaEnabled) {
+  if (kafkaEnabled || transactionMode != constants.Transactions.BLOCK_MODE) {
     actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
       transaction.ticketUpdater(Service.getTicketIDsOnStatus, Service.getTransactionHash, Utility.onSuccess, Utility.onFailure)
     }

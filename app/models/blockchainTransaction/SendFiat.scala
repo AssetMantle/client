@@ -43,6 +43,7 @@ class SendFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
   private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
   private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
   private val sleepTime = configuration.get[Long]("blockchain.entityIterator.threadSleep")
+  private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
   private def add(sendFiat: SendFiat): Future[String] = db.run((sendFiatTable returning sendFiatTable.map(_.ticketID) += sendFiat).asTry).map {
     case Success(result) => result
@@ -158,17 +159,16 @@ class SendFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
       try {
         Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
         val sendFiat = Service.getTransaction(ticketID)
-        val fromAddress = masterAccounts.Service.getAddress(sendFiat.from)
-        val negotiationID = blockchainNegotiations.Service.getNegotiationID(buyerAddress = fromAddress, sellerAddress = sendFiat.to, pegHash = sendFiat.pegHash)
-        blockchainOrders.Service.insertOrUpdate(id = negotiationID, null, null, false)
-        blockchainFiats.Service.markDirty(fromAddress)
-        blockchainTransactionFeedbacks.Service.markDirty(fromAddress)
+        val negotiationID = blockchainNegotiations.Service.getNegotiationID(buyerAddress = sendFiat.from, sellerAddress = sendFiat.to, pegHash = sendFiat.pegHash)
+        blockchainOrders.Service.insertOrUpdate(id = negotiationID, null, null, dirtyBit = false)
         Thread.sleep(sleepTime)
         val orderResponse = getOrder.Service.get(negotiationID)
+        blockchainFiats.Service.markDirty(sendFiat.from)
+        blockchainTransactionFeedbacks.Service.markDirty(sendFiat.from)
         orderResponse.value.fiatPegWallet.foreach(fiats => fiats.foreach(fiatPeg => blockchainFiats.Service.insertOrUpdate(pegHash = fiatPeg.pegHash, ownerAddress = negotiationID, transactionID = fiatPeg.transactionID, transactionAmount = fiatPeg.transactionAmount, redeemedAmount = fiatPeg.redeemedAmount, dirtyBit = false)))
-        blockchainAccounts.Service.markDirty(fromAddress)
+        blockchainAccounts.Service.markDirty(sendFiat.from)
         pushNotification.sendNotification(masterAccounts.Service.getId(sendFiat.to), constants.Notification.SUCCESS, blockResponse.txhash)
-        pushNotification.sendNotification(sendFiat.from, constants.Notification.SUCCESS, blockResponse.txhash)
+        pushNotification.sendNotification(masterAccounts.Service.getId(sendFiat.from), constants.Notification.SUCCESS, blockResponse.txhash)
       }
       catch {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
@@ -181,17 +181,16 @@ class SendFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
       try {
         Service.markTransactionFailed(ticketID, message)
         val sendFiat = Service.getTransaction(ticketID)
-        blockchainTransactionFeedbacks.Service.markDirty(masterAccounts.Service.getAddress(sendFiat.from))
+        blockchainTransactionFeedbacks.Service.markDirty(sendFiat.from)
         pushNotification.sendNotification(masterAccounts.Service.getId(sendFiat.to), constants.Notification.FAILURE, message)
-        pushNotification.sendNotification(sendFiat.from, constants.Notification.FAILURE, message)
+        pushNotification.sendNotification(masterAccounts.Service.getId(sendFiat.from), constants.Notification.FAILURE, message)
       } catch {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
     }
   }
 
-
-  if (kafkaEnabled) {
+  if (kafkaEnabled || transactionMode != constants.Transactions.BLOCK_MODE) {
     actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
       transaction.ticketUpdater(Service.getTicketIDsOnStatus, Service.getTransactionHash, Utility.onSuccess, Utility.onFailure)
     }

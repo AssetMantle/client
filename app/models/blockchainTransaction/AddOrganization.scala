@@ -176,7 +176,7 @@ class AddOrganizations @Inject()(actorSystem: ActorSystem, transaction: utilitie
     }
   }
 
-  if (kafkaEnabled && transactionMode != constants.Transactions.BLOCK_MODE) {
+  if (kafkaEnabled || transactionMode != constants.Transactions.BLOCK_MODE) {
     actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
       transaction.ticketUpdater(Service.getTicketIDsOnStatus, Service.getTransactionHash, Utility.onSuccess, Utility.onFailure)
     }

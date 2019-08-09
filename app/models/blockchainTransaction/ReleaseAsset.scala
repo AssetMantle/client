@@ -39,6 +39,7 @@ class ReleaseAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.T
   private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
   private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
   private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
+  private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
   private def add(releaseAsset: ReleaseAsset): Future[String] = db.run((releaseAssetTable returning releaseAssetTable.map(_.ticketID) += releaseAsset).asTry).map {
     case Success(result) => result
@@ -153,9 +154,9 @@ class ReleaseAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.T
         Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
         val releaseAsset = Service.getTransaction(ticketID)
         blockchainAssets.Service.markDirty(releaseAsset.pegHash)
-        blockchainAccounts.Service.markDirty(masterAccounts.Service.getAddress(releaseAsset.from))
+        blockchainAccounts.Service.markDirty(releaseAsset.from)
         pushNotification.sendNotification(masterAccounts.Service.getId(releaseAsset.to), constants.Notification.SUCCESS, blockResponse.txhash)
-        pushNotification.sendNotification(releaseAsset.from, constants.Notification.SUCCESS, blockResponse.txhash)
+        pushNotification.sendNotification(masterAccounts.Service.getId(releaseAsset.from), constants.Notification.SUCCESS, blockResponse.txhash)
       }
       catch {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
@@ -168,15 +169,14 @@ class ReleaseAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.T
         Service.markTransactionFailed(ticketID, message)
         val releaseAsset = Service.getTransaction(ticketID)
         pushNotification.sendNotification(masterAccounts.Service.getId(releaseAsset.to), constants.Notification.FAILURE, message)
-        pushNotification.sendNotification(releaseAsset.from, constants.Notification.FAILURE, message)
+        pushNotification.sendNotification(masterAccounts.Service.getId(releaseAsset.from), constants.Notification.FAILURE, message)
       } catch {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
     }
   }
 
-
-  if (kafkaEnabled) {
+  if (kafkaEnabled || transactionMode != constants.Transactions.BLOCK_MODE) {
     actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
       transaction.ticketUpdater(Service.getTicketIDsOnStatus, Service.getTransactionHash, Utility.onSuccess, Utility.onFailure)
     }

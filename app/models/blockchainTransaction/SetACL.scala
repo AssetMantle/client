@@ -39,6 +39,7 @@ class SetACLs @Inject()(actorSystem: ActorSystem, transaction: utilities.Transac
   private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
   private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
   private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
+  private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
   private def add(setACL: SetACL): Future[String] = db.run((setACLTable returning setACLTable.map(_.ticketID) += setACL).asTry).map {
     case Success(result) => result
@@ -160,10 +161,10 @@ class SetACLs @Inject()(actorSystem: ActorSystem, transaction: utilities.Transac
         masterTraders.Service.updateStatusByAccountID(aclAccountID, status = true)
         masterTraderKYCs.Service.organizationVerifyAll(setACL.organizationID)
         masterTraderKYCs.Service.zoneVerifyAll(setACL.zoneID)
-        blockchainAccounts.Service.markDirty(masterAccounts.Service.getAddress(setACL.from))
+        blockchainAccounts.Service.markDirty(setACL.from)
         blockchainTransactionFeedbacks.Service.insertOrUpdate(setACL.aclAddress, TraderReputationResponse.TransactionFeedbackResponse("0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"), dirtyBit = true)
         pushNotification.sendNotification(aclAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
-        pushNotification.sendNotification(setACL.from, constants.Notification.SUCCESS, blockResponse.txhash)
+        pushNotification.sendNotification(masterAccounts.Service.getId(setACL.from), constants.Notification.SUCCESS, blockResponse.txhash)
       } catch {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
           throw new BaseException(constants.Response.PSQL_EXCEPTION)
@@ -175,15 +176,14 @@ class SetACLs @Inject()(actorSystem: ActorSystem, transaction: utilities.Transac
         Service.markTransactionFailed(ticketID, message)
         val setACL = Service.getTransaction(ticketID)
         pushNotification.sendNotification(masterAccounts.Service.getId(setACL.aclAddress), constants.Notification.FAILURE, message)
-        pushNotification.sendNotification(setACL.from, constants.Notification.FAILURE, message)
+        pushNotification.sendNotification(masterAccounts.Service.getId(setACL.from), constants.Notification.FAILURE, message)
       } catch {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
     }
   }
 
-
-  if (kafkaEnabled) {
+  if (kafkaEnabled || transactionMode != constants.Transactions.BLOCK_MODE) {
     actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
       transaction.ticketUpdater(Service.getTicketIDsOnStatus, Service.getTransactionHash, Utility.onSuccess, Utility.onFailure)
     }

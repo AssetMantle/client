@@ -43,6 +43,7 @@ class ChangeSellerBids @Inject()(actorSystem: ActorSystem, transaction: utilitie
   private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
   private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
   private val sleepTime = configuration.get[Long]("blockchain.entityIterator.threadSleep")
+  private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
   private def add(changeSellerBid: ChangeSellerBid): Future[String] = db.run((changeSellerBidTable returning changeSellerBidTable.map(_.ticketID) += changeSellerBid).asTry).map {
     case Success(result) => result
@@ -159,17 +160,15 @@ class ChangeSellerBids @Inject()(actorSystem: ActorSystem, transaction: utilitie
       try {
         Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
         val changeSellerBid = Service.getTransaction(ticketID)
-        val fromAddress = masterAccounts.Service.getAddress(changeSellerBid.from)
-        val toID = masterAccounts.Service.getId(changeSellerBid.to)
         Thread.sleep(sleepTime)
-        val negotiationID = blockchainNegotiations.Service.getNegotiationID(buyerAddress = changeSellerBid.to, sellerAddress = fromAddress, pegHash = changeSellerBid.pegHash)
-        val negotiationResponse = if (negotiationID == "") getNegotiation.Service.get(getNegotiationID.Service.get(buyerAccount = toID, sellerAccount = changeSellerBid.from, pegHash = changeSellerBid.pegHash).negotiationID) else getNegotiation.Service.get(negotiationID)
+        val negotiationID = blockchainNegotiations.Service.getNegotiationID(buyerAddress = changeSellerBid.to, sellerAddress = changeSellerBid.from, pegHash = changeSellerBid.pegHash)
+        val negotiationResponse = if (negotiationID == "") getNegotiation.Service.get(getNegotiationID.Service.get(buyerAddress = changeSellerBid.to, sellerAddress = changeSellerBid.from, pegHash = changeSellerBid.pegHash).negotiationID) else getNegotiation.Service.get(negotiationID)
         blockchainNegotiations.Service.insertOrUpdate(id = negotiationResponse.value.negotiationID, buyerAddress = negotiationResponse.value.buyerAddress, sellerAddress = negotiationResponse.value.sellerAddress, assetPegHash = negotiationResponse.value.pegHash, bid = negotiationResponse.value.bid, time = negotiationResponse.value.time, buyerSignature = negotiationResponse.value.buyerSignature, sellerSignature = negotiationResponse.value.sellerSignature, buyerBlockHeight = negotiationResponse.value.buyerBlockHeight, sellerBlockHeight = negotiationResponse.value.sellerBlockHeight, buyerContractHash = negotiationResponse.value.BuyerContractHash, sellerContractHash = negotiationResponse.value.SellerContractHash, dirtyBit = true)
-        blockchainAccounts.Service.markDirty(fromAddress)
-        blockchainTransactionFeedbacks.Service.markDirty(fromAddress)
+        blockchainAccounts.Service.markDirty(changeSellerBid.from)
+        blockchainTransactionFeedbacks.Service.markDirty(changeSellerBid.from)
         blockchainTransactionFeedbacks.Service.markDirty(changeSellerBid.to)
-        pushNotification.sendNotification(toID, constants.Notification.SUCCESS, blockResponse.txhash)
-        pushNotification.sendNotification(changeSellerBid.from, constants.Notification.SUCCESS, blockResponse.txhash)
+        pushNotification.sendNotification(masterAccounts.Service.getId(changeSellerBid.from), constants.Notification.SUCCESS, blockResponse.txhash)
+        pushNotification.sendNotification(masterAccounts.Service.getId(changeSellerBid.to), constants.Notification.SUCCESS, blockResponse.txhash)
       } catch {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
           throw new BaseException(constants.Response.PSQL_EXCEPTION)
@@ -181,18 +180,17 @@ class ChangeSellerBids @Inject()(actorSystem: ActorSystem, transaction: utilitie
       try {
         Service.markTransactionFailed(ticketID, message)
         val changeSellerBid = Service.getTransaction(ticketID)
-        blockchainTransactionFeedbacks.Service.markDirty(masterAccounts.Service.getAddress(changeSellerBid.from))
+        blockchainTransactionFeedbacks.Service.markDirty(changeSellerBid.from)
         blockchainTransactionFeedbacks.Service.markDirty(changeSellerBid.to)
         pushNotification.sendNotification(masterAccounts.Service.getId(changeSellerBid.to), constants.Notification.FAILURE, message)
-        pushNotification.sendNotification(changeSellerBid.from, constants.Notification.FAILURE, message)
+        pushNotification.sendNotification(masterAccounts.Service.getId(changeSellerBid.from), constants.Notification.FAILURE, message)
       } catch {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
     }
   }
 
-
-  if (kafkaEnabled) {
+  if (kafkaEnabled || transactionMode != constants.Transactions.BLOCK_MODE) {
     actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
       transaction.ticketUpdater(Service.getTicketIDsOnStatus, Service.getTransactionHash, Utility.onSuccess, Utility.onFailure)
     }

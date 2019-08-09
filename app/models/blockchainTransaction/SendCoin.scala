@@ -40,6 +40,8 @@ class SendCoins @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
   private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
   private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
   private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
+  private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
+  private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
   private def add(sendCoin: SendCoin): Future[String] = db.run((sendCoinTable returning sendCoinTable.map(_.ticketID) += sendCoin).asTry).map {
     case Success(result) => result
@@ -173,14 +175,16 @@ class SendCoins @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
         Service.markTransactionFailed(ticketID, message)
         val sendCoin = Service.getTransaction(ticketID)
         pushNotification.sendNotification(masterAccounts.Service.getId(sendCoin.to), constants.Notification.FAILURE, message)
-        pushNotification.sendNotification(sendCoin.from, constants.Notification.FAILURE, message)
+        pushNotification.sendNotification(masterAccounts.Service.getId(sendCoin.from), constants.Notification.FAILURE, message)
       } catch {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
     }
   }
 
-  actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
-    transaction.ticketUpdater(Service.getTicketIDsOnStatus, Service.getTransactionHash, Utility.onSuccess, Utility.onFailure)
+  if (kafkaEnabled || transactionMode != constants.Transactions.BLOCK_MODE) {
+    actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
+      transaction.ticketUpdater(Service.getTicketIDsOnStatus, Service.getTransactionHash, Utility.onSuccess, Utility.onFailure)
+    }
   }
 }

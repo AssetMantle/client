@@ -49,6 +49,7 @@ class SendAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
   private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
 
   private val sleepTime = configuration.get[Long]("blockchain.entityIterator.threadSleep")
+  private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
   private def add(sendAsset: SendAsset): Future[String] = db.run((sendAssetTable returning sendAssetTable.map(_.ticketID) += sendAsset).asTry).map {
     case Success(result) => result
@@ -162,16 +163,15 @@ class SendAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
       try {
         Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
         val sendAsset = Service.getTransaction(ticketID)
-        val sellerAddress = masterAccounts.Service.getAddress(sendAsset.from)
-        val negotiationID = blockchainNegotiations.Service.getNegotiationID(buyerAddress = sendAsset.to, sellerAddress = sellerAddress, pegHash = sendAsset.pegHash)
-        blockchainOrders.Service.insertOrUpdate(id = negotiationID, null, null, false)
+        val negotiationID = blockchainNegotiations.Service.getNegotiationID(buyerAddress = sendAsset.to, sellerAddress = sendAsset.from, pegHash = sendAsset.pegHash)
+        blockchainOrders.Service.insertOrUpdate(id = negotiationID, null, null, dirtyBit = false)
         Thread.sleep(sleepTime)
         val orderResponse = getOrder.Service.get(negotiationID)
         orderResponse.value.assetPegWallet.foreach(assets => assets.foreach(asset => blockchainAssets.Service.insertOrUpdate(pegHash = asset.pegHash, documentHash = asset.documentHash, assetType = asset.assetType, assetPrice = asset.assetPrice, assetQuantity = asset.assetQuantity, quantityUnit = asset.quantityUnit, locked = asset.locked, moderated = asset.moderated, ownerAddress = negotiationID, dirtyBit = false)))
-        blockchainAccounts.Service.markDirty(sellerAddress)
-        blockchainTransactionFeedbacks.Service.markDirty(sellerAddress)
+        blockchainAccounts.Service.markDirty(sendAsset.from)
+        blockchainTransactionFeedbacks.Service.markDirty(sendAsset.from)
         pushNotification.sendNotification(masterAccounts.Service.getId(sendAsset.to), constants.Notification.SUCCESS, blockResponse.txhash)
-        pushNotification.sendNotification(sendAsset.from, constants.Notification.SUCCESS, blockResponse.txhash)
+        pushNotification.sendNotification(masterAccounts.Service.getId(sendAsset.from), constants.Notification.SUCCESS, blockResponse.txhash)
       } catch {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
           throw new BaseException(constants.Response.PSQL_EXCEPTION)
@@ -185,15 +185,14 @@ class SendAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
         val sendAsset = Service.getTransaction(ticketID)
         blockchainTransactionFeedbacks.Service.markDirty(masterAccounts.Service.getAddress(sendAsset.from))
         pushNotification.sendNotification(masterAccounts.Service.getId(sendAsset.to), constants.Notification.FAILURE, message)
-        pushNotification.sendNotification(sendAsset.from, constants.Notification.FAILURE, message)
+        pushNotification.sendNotification(masterAccounts.Service.getId(sendAsset.from), constants.Notification.FAILURE, message)
       } catch {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
     }
   }
 
-
-  if (kafkaEnabled) {
+  if (kafkaEnabled || transactionMode != constants.Transactions.BLOCK_MODE) {
     actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
       transaction.ticketUpdater(Service.getTicketIDsOnStatus, Service.getTransactionHash, Utility.onSuccess, Utility.onFailure)
     }
