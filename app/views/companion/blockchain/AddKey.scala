@@ -8,10 +8,9 @@ object AddKey {
     mapping(
       constants.Form.NAME -> nonEmptyText(minLength = 1, maxLength = 20),
       constants.Form.PASSWORD -> nonEmptyText(minLength = 1, maxLength = 20),
-      constants.Form.SEED -> nonEmptyText(minLength = 1, maxLength = 200)
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(name: String, password: String, seed: String)
+  case class Data(name: String, password: String)
 
 }

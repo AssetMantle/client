@@ -5,7 +5,6 @@
 @form(action = routes.AddKeyController.blockchainAddKey, 'onkeypress -> "validateForm(event,this)") {
     @CSRF.formField
     @inputText(addKeyFrom(constants.Form.NAME), '_label -> Messages(constants.Form.NAME))
-    @inputText(addKeyFrom(constants.Form.SEED), '_label -> Messages(constants.Form.SEED))
     @inputPassword(addKeyFrom(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD))
 
     @if(addKeyFrom.hasGlobalErrors) {

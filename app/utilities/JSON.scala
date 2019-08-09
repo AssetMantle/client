@@ -17,13 +17,6 @@ object JSON {
         case JsSuccess(value: T, _: JsPath) => value
         case errors: JsError => logger.info(errors.toString)
           throw new BlockChainException(new Failure(response.body.toString, null))
-//        case _: JsError =>
-//          val errorResponseFromJson: JsResult[BlockModeErrorResponse] = Json.fromJson[BlockModeErrorResponse](response.json)
-//          errorResponseFromJson match {
-//            case JsSuccess(value: BlockModeErrorResponse, _) => throw new BlockChainException(new Failure(value.error, null))
-//            case errors: JsError => logger.info(errors.toString)
-//              throw new BlockChainException(new Failure(response.body.toString, null))
-//          }
       }
     }
     catch {
