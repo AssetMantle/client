@@ -167,7 +167,7 @@ class AddZones @Inject()(actorSystem: ActorSystem, transaction: utilities.Transa
         Service.markTransactionFailed(ticketID, message)
         val addZone = Service.getTransaction(ticketID)
         pushNotification.sendNotification(masterAccounts.Service.getId(addZone.to), constants.Notification.FAILURE, message)
-        pushNotification.sendNotification(addZone.from, constants.Notification.FAILURE, message)
+        pushNotification.sendNotification(masterAccounts.Service.getId(addZone.from), constants.Notification.FAILURE, message)
       } catch {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }

@@ -160,17 +160,15 @@ class ChangeBuyerBids @Inject()(actorSystem: ActorSystem, transaction: utilities
       try {
         Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
         val changeBuyerBid = Service.getTransaction(ticketID)
-        val fromAddress = masterAccounts.Service.getAddress(changeBuyerBid.from)
-        val toID = masterAccounts.Service.getId(changeBuyerBid.to)
         Thread.sleep(sleepTime)
-        val negotiationID = blockchainNegotiations.Service.getNegotiationID(buyerAddress = fromAddress, sellerAddress = changeBuyerBid.to, pegHash = changeBuyerBid.pegHash)
-        val negotiationResponse = if (negotiationID == "") getNegotiation.Service.get(getNegotiationID.Service.get(buyerAccount = changeBuyerBid.from, sellerAccount = toID, pegHash = changeBuyerBid.pegHash).negotiationID) else getNegotiation.Service.get(negotiationID)
+        val negotiationID = blockchainNegotiations.Service.getNegotiationID(buyerAddress = changeBuyerBid.from, sellerAddress = changeBuyerBid.to, pegHash = changeBuyerBid.pegHash)
+        val negotiationResponse = if (negotiationID == "") getNegotiation.Service.get(getNegotiationID.Service.get(buyerAddress = changeBuyerBid.from, sellerAddress = changeBuyerBid.to, pegHash = changeBuyerBid.pegHash).negotiationID) else getNegotiation.Service.get(negotiationID)
         blockchainNegotiations.Service.insertOrUpdate(id = negotiationResponse.value.negotiationID, buyerAddress = negotiationResponse.value.buyerAddress, sellerAddress = negotiationResponse.value.sellerAddress, assetPegHash = negotiationResponse.value.pegHash, bid = negotiationResponse.value.bid, time = negotiationResponse.value.time, buyerSignature = negotiationResponse.value.buyerSignature, sellerSignature = negotiationResponse.value.sellerSignature, buyerBlockHeight = negotiationResponse.value.buyerBlockHeight, sellerBlockHeight = negotiationResponse.value.sellerBlockHeight, buyerContractHash = negotiationResponse.value.BuyerContractHash, sellerContractHash = negotiationResponse.value.SellerContractHash, dirtyBit = true)
-        blockchainAccounts.Service.markDirty(fromAddress)
-        blockchainTransactionFeedbacks.Service.markDirty(fromAddress)
+        blockchainAccounts.Service.markDirty(changeBuyerBid.from)
+        blockchainTransactionFeedbacks.Service.markDirty(changeBuyerBid.from)
         blockchainTransactionFeedbacks.Service.markDirty(changeBuyerBid.to)
-        pushNotification.sendNotification(toID, constants.Notification.SUCCESS, blockResponse.txhash)
-        pushNotification.sendNotification(changeBuyerBid.from, constants.Notification.SUCCESS, blockResponse.txhash)
+        pushNotification.sendNotification(masterAccounts.Service.getId(changeBuyerBid.to), constants.Notification.SUCCESS, blockResponse.txhash)
+        pushNotification.sendNotification(masterAccounts.Service.getId(changeBuyerBid.from), constants.Notification.SUCCESS, blockResponse.txhash)
       } catch {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
           throw new BaseException(constants.Response.PSQL_EXCEPTION)
@@ -182,10 +180,10 @@ class ChangeBuyerBids @Inject()(actorSystem: ActorSystem, transaction: utilities
       try {
         Service.markTransactionFailed(ticketID, message)
         val changeBuyerBid = Service.getTransaction(ticketID)
-        blockchainTransactionFeedbacks.Service.markDirty(masterAccounts.Service.getAddress(changeBuyerBid.from))
+        blockchainTransactionFeedbacks.Service.markDirty(changeBuyerBid.from)
         blockchainTransactionFeedbacks.Service.markDirty(changeBuyerBid.to)
         pushNotification.sendNotification(masterAccounts.Service.getId(changeBuyerBid.to), constants.Notification.FAILURE, message)
-        pushNotification.sendNotification(changeBuyerBid.from, constants.Notification.FAILURE, message)
+        pushNotification.sendNotification(masterAccounts.Service.getId(changeBuyerBid.from), constants.Notification.FAILURE, message)
       } catch {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }

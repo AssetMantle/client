@@ -37,6 +37,7 @@ class AddOrganizations @Inject()(actorSystem: ActorSystem, transaction: utilitie
   private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
   private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
   private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
+  private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
   private def add(addOrganization: AddOrganization): Future[String] = db.run((addOrganizationTable returning addOrganizationTable.map(_.ticketID) += addOrganization).asTry).map {
     case Success(result) => result
@@ -154,9 +155,9 @@ class AddOrganizations @Inject()(actorSystem: ActorSystem, transaction: utilitie
         masterAccounts.Service.updateUserType(masterOrganizations.Service.getAccountId(addOrganization.organizationID), constants.User.ORGANIZATION)
         val organizationAccountId = masterAccounts.Service.getId(addOrganization.to)
         masterOrganizationKYCs.Service.verifyAll(organizationAccountId)
-        blockchainAccounts.Service.markDirty(masterAccounts.Service.getAddress(addOrganization.from))
+        blockchainAccounts.Service.markDirty(addOrganization.from)
         pushNotification.sendNotification(organizationAccountId, constants.Notification.SUCCESS, blockResponse.txhash)
-        pushNotification.sendNotification(addOrganization.from, constants.Notification.SUCCESS, blockResponse.txhash)
+        pushNotification.sendNotification(masterAccounts.Service.getId(addOrganization.from), constants.Notification.SUCCESS, blockResponse.txhash)
       } catch {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
           throw new BaseException(constants.Response.PSQL_EXCEPTION)
@@ -168,14 +169,14 @@ class AddOrganizations @Inject()(actorSystem: ActorSystem, transaction: utilitie
         Service.markTransactionFailed(ticketID, message)
         val addOrganization = Service.getTransaction(ticketID)
         pushNotification.sendNotification(masterAccounts.Service.getId(addOrganization.to), constants.Notification.FAILURE, message)
-        pushNotification.sendNotification(addOrganization.from, constants.Notification.FAILURE, message)
+        pushNotification.sendNotification(masterAccounts.Service.getId(addOrganization.from), constants.Notification.FAILURE, message)
       } catch {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
     }
   }
 
-  if (kafkaEnabled) {
+  if (kafkaEnabled && transactionMode != constants.Transactions.BLOCK_MODE) {
     actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
       transaction.ticketUpdater(Service.getTicketIDsOnStatus, Service.getTransactionHash, Utility.onSuccess, Utility.onFailure)
     }

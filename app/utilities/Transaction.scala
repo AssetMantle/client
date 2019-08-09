@@ -80,7 +80,7 @@ class Transaction @Inject()(getTxHashResponse: GetTxHashResponse, getResponse: G
     val ticketIDsSeq: Seq[String] = getTickets()
     for (ticketID <- ticketIDsSeq) {
       try {
-        val response: WSResponse = if (kafkaEnabled) {getResponse.Service.get(ticketID)} else getTxHashResponse.Service.get(getTransactionHash(ticketID).getOrElse(throw new BaseException(constants.Response.FAILURE)))
+        val response: WSResponse = if (kafkaEnabled) {getResponse.Service.get(ticketID)} else getTxHashResponse.Service.get(getTransactionHash(ticketID).getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)))
         val blockResponse = transactionMode match {
           case constants.Transactions.BLOCK_MODE => utilities.JSON.getResponseFromJson[BlockResponse](response)
           case constants.Transactions.ASYNC_MODE => utilities.JSON.getResponseFromJson[BlockResponse](getTxHashResponse.Service.get(utilities.JSON.getResponseFromJson[AsyncResponse](response).txhash))
