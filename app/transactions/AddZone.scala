@@ -33,11 +33,11 @@ class AddZone @Inject()(wsClient: WSClient)(implicit configuration: Configuratio
 
   private implicit val requestWrites: OWrites[Request] = Json.writes[Request]
 
+  private def action(request: Request): Future[WSResponse] = wsClient.url(url).post(Json.toJson(request))
+
   case class BaseRequest(from: String, chain_id: String = chainID)
 
   case class Request(base_req: BaseRequest, to: String, zoneID: String, password: String, mode: String) extends RequestEntity
-
-  private def action(request: Request): Future[WSResponse] = wsClient.url(url).post(Json.toJson(request))
 
   object Service {
     def post(request: Request): WSResponse = try {

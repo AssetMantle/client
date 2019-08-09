@@ -29,30 +29,7 @@ class Transaction @Inject()(getTxHashResponse: GetTxHashResponse, getResponse: G
 
   private implicit val module: String = constants.Module.UTILITIES_TRANSACTION
 
-  def process[T1 <: TransactionEntity[T1], T2 <: RequestEntity](entity: T1, blockchainTransactionCreate: T1 => String, request: T2, kafkaAction: T2 => KafkaResponse, blockAction: T2 => BlockResponse, asyncAction: T2 => AsyncResponse, syncAction: T2 => SyncResponse, onSuccess: (String, BlockResponse) => Unit, onFailure: (String, String) => Unit, updateTransactionHash:(String, String) => Int): String = {
-    try {
-      val ticketID: String = if (kafkaEnabled) kafkaAction(request).ticketID else Random.nextString(32)
-      blockchainTransactionCreate(entity.mutateTicketID(ticketID))
-      if (!kafkaEnabled) {
-        Future {
-          try {
-            transactionMode match {
-              case constants.Transactions.BLOCK_MODE => onSuccess(ticketID, blockAction(request))
-              case constants.Transactions.ASYNC_MODE => updateTransactionHash(ticketID, asyncAction(request).txhash)
-              case constants.Transactions.SYNC_MODE => updateTransactionHash(ticketID, syncAction(request).txhash)
-            }
-          } catch {
-            case baseException: BaseException => logger.error(baseException.failure.message, baseException)
-            case blockChainException: BlockChainException => logger.error(blockChainException.failure.message, blockChainException)
-              onFailure(ticketID, blockChainException.failure.message)
-          }
-        }
-      }
-      ticketID
-    }
-  }
-
-  def process2[T1 <: TransactionEntity[T1], T2 <: RequestEntity](entity: T1, blockchainTransactionCreate: T1 => String, request: T2, action: T2 => WSResponse,  onSuccess: (String, BlockResponse) => Unit, onFailure: (String, String) => Unit, updateTransactionHash:(String, String) => Int): String = {
+  def process[T1 <: TransactionEntity[T1], T2 <: RequestEntity](entity: T1, blockchainTransactionCreate: T1 => String, request: T2, action: T2 => WSResponse,  onSuccess: (String, BlockResponse) => Unit, onFailure: (String, String) => Unit, updateTransactionHash:(String, String) => Int): String = {
     try {
       val ticketID: String = if (kafkaEnabled) utilities.JSON.getResponseFromJson[KafkaResponse](action(request)).ticketID else Random.nextString(32)
       blockchainTransactionCreate(entity.mutateTicketID(ticketID))

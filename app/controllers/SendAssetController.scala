@@ -19,7 +19,7 @@ class SendAssetController @Inject()(messagesControllerComponents: MessagesContro
 
   private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
 
-  def sendAssetForm(buyerAddress:String, pegHash: String): Action[AnyContent] = Action { implicit request =>
+  def sendAssetForm(buyerAddress: String, pegHash: String): Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.master.sendAsset(views.companion.master.SendAsset.form, buyerAddress, pegHash))
   }
 
@@ -35,10 +35,7 @@ class SendAssetController @Inject()(messagesControllerComponents: MessagesContro
               entity = blockchainTransaction.SendAsset(from = loginState.address, to = sendAssetData.buyerAddress, pegHash = sendAssetData.pegHash, gas = sendAssetData.gas, status = null, txHash = null, ticketID = "", mode = transactionMode, code = null),
               blockchainTransactionCreate = blockchainTransactionSendAssets.Service.create,
               request = transactionsSendAsset.Request(transactionsSendAsset.BaseRequest(from = loginState.address), to = sendAssetData.buyerAddress, password = sendAssetData.password, pegHash = sendAssetData.pegHash, gas = sendAssetData.gas, mode = transactionMode),
-              kafkaAction = transactionsSendAsset.Service.kafkaPost,
-              blockAction = transactionsSendAsset.Service.blockPost,
-              asyncAction = transactionsSendAsset.Service.asyncPost,
-              syncAction = transactionsSendAsset.Service.syncPost,
+              action = transactionsSendAsset.Service.post,
               onSuccess = blockchainTransactionSendAssets.Utility.onSuccess,
               onFailure = blockchainTransactionSendAssets.Utility.onFailure,
               updateTransactionHash = blockchainTransactionSendAssets.Service.updateTransactionHash
@@ -64,11 +61,7 @@ class SendAssetController @Inject()(messagesControllerComponents: MessagesContro
       },
       sendAssetData => {
         try {
-          if (kafkaEnabled) {
-            transactionsSendAsset.Service.kafkaPost(transactionsSendAsset.Request(transactionsSendAsset.BaseRequest(from = sendAssetData.from), to = sendAssetData.to, password = sendAssetData.password, pegHash = sendAssetData.pegHash, gas = sendAssetData.gas, mode = transactionMode))
-          } else {
-            transactionsSendAsset.Service.blockPost(transactionsSendAsset.Request(transactionsSendAsset.BaseRequest(from = sendAssetData.from), to = sendAssetData.to, password = sendAssetData.password, pegHash = sendAssetData.pegHash, gas = sendAssetData.gas, mode = transactionMode))
-          }
+          transactionsSendAsset.Service.post(transactionsSendAsset.Request(transactionsSendAsset.BaseRequest(from = sendAssetData.from), to = sendAssetData.to, password = sendAssetData.password, pegHash = sendAssetData.pegHash, gas = sendAssetData.gas, mode = transactionMode))
           Ok(views.html.index(successes = Seq(constants.Response.ASSET_SENT)))
 
         }

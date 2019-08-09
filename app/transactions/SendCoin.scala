@@ -5,9 +5,8 @@ import java.net.ConnectException
 import exceptions.BlockChainException
 import javax.inject.{Inject, Singleton}
 import play.api.libs.json.{Json, OWrites}
-import play.api.libs.ws.WSClient
+import play.api.libs.ws.{WSClient, WSResponse}
 import play.api.{Configuration, Logger}
-import transactions.responses.TransactionResponse.{AsyncResponse, BlockResponse, KafkaResponse, SyncResponse}
 import utilities.RequestEntity
 
 import scala.concurrent.duration.Duration
@@ -32,50 +31,23 @@ class SendCoin @Inject()(wsClient: WSClient)(implicit configuration: Configurati
 
   private val url = ip + ":" + port + "/" + path1
 
-  case class Amount(denom: String, amount: String)
-
-  case class BaseRequest(from: String, chain_id: String = chainID)
-
-  case class Request(base_req: BaseRequest, password: String, to: String, amount: Seq[Amount], mode: String, gas: Int) extends RequestEntity
-
   private implicit val baseRequestWrites: OWrites[BaseRequest] = Json.writes[BaseRequest]
 
   private implicit val amountWrites: OWrites[Amount] = Json.writes[Amount]
 
   private implicit val requestWrites: OWrites[Request] = Json.writes[Request]
 
-  private def blockAction(request: Request): Future[BlockResponse] = wsClient.url(url+ request.to + path2).post(Json.toJson(request)).map { response => utilities.JSON.getResponseFromJson[BlockResponse](response) }
+  private def action(request: Request): Future[WSResponse] = wsClient.url(url + request.to + path2).post(Json.toJson(request))
 
-  private def kafkaAction(request: Request): Future[KafkaResponse] = wsClient.url(url+ request.to + path2).post(Json.toJson(request)).map { response => utilities.JSON.getResponseFromJson[KafkaResponse](response) }
+  case class Amount(denom: String, amount: String)
 
-  private def asyncAction(request: Request): Future[AsyncResponse] = wsClient.url(url+ request.to + path2).post(Json.toJson(request)).map { response => utilities.JSON.getResponseFromJson[AsyncResponse](response) }
+  case class BaseRequest(from: String, chain_id: String = chainID)
 
-  private def syncAction(request: Request): Future[SyncResponse] = wsClient.url(url+ request.to + path2).post(Json.toJson(request)).map { response => utilities.JSON.getResponseFromJson[SyncResponse](response) }
+  case class Request(base_req: BaseRequest, password: String, to: String, amount: Seq[Amount], mode: String, gas: Int) extends RequestEntity
 
   object Service {
-    def blockPost(request: Request): BlockResponse = try {
-      Await.result(blockAction(request), Duration.Inf)
-    } catch {
-      case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
-        throw new BlockChainException(constants.Response.CONNECT_EXCEPTION)
-    }
-
-    def kafkaPost(request: Request): KafkaResponse = try {
-      Await.result(kafkaAction(request), Duration.Inf)
-    } catch {
-      case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
-        throw new BlockChainException(constants.Response.CONNECT_EXCEPTION)
-    }
-
-    def asyncPost(request: Request): AsyncResponse = try {
-      Await.result(asyncAction(request), Duration.Inf)
-    } catch {
-      case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
-        throw new BlockChainException(constants.Response.CONNECT_EXCEPTION)
-    }
-
-    def syncPost(request: Request): SyncResponse = try {
-      Await.result(syncAction(request), Duration.Inf)
+    def post(request: Request): WSResponse = try {
+      Await.result(action(request), Duration.Inf)
     } catch {
       case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
         throw new BlockChainException(constants.Response.CONNECT_EXCEPTION)

@@ -61,13 +61,10 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
           try {
             val organizationAccountAddress = masterAccounts.Service.getAddress(masterOrganizations.Service.getAccountId(verifyOrganizationData.organizationID))
             transaction.process[AddOrganization, transactionsAddOrganization.Request](
-              entity = AddOrganization(from = loginState.address, to = organizationAccountAddress, organizationID = verifyOrganizationData.organizationID, zoneID = verifyOrganizationData.zoneID, null, null,ticketID = "", mode = transactionMode, code = null),
+              entity = AddOrganization(from = loginState.address, to = organizationAccountAddress, organizationID = verifyOrganizationData.organizationID, zoneID = verifyOrganizationData.zoneID, null, null, ticketID = "", mode = transactionMode, code = null),
               blockchainTransactionCreate = blockchainTransactionAddOrganizations.Service.create,
               request = transactionsAddOrganization.Request(transactionsAddOrganization.BaseRequest(from = loginState.address), to = organizationAccountAddress, organizationID = verifyOrganizationData.organizationID, zoneID = verifyOrganizationData.zoneID, password = verifyOrganizationData.password, mode = transactionMode),
-              kafkaAction = transactionsAddOrganization.Service.kafkaPost,
-              blockAction = transactionsAddOrganization.Service.blockPost,
-              asyncAction = transactionsAddOrganization.Service.asyncPost,
-              syncAction = transactionsAddOrganization.Service.syncPost,
+              action = transactionsAddOrganization.Service.post,
               onSuccess = blockchainTransactionAddOrganizations.Utility.onSuccess,
               onFailure = blockchainTransactionAddOrganizations.Utility.onFailure,
               updateTransactionHash = blockchainTransactionAddOrganizations.Service.updateTransactionHash
@@ -177,15 +174,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
       },
       addOrganizationData => {
         try {
-          if (kafkaEnabled) {
-            transactionsAddOrganization.Service.kafkaPost(transactionsAddOrganization.Request(transactionsAddOrganization.BaseRequest(from = addOrganizationData.from), to = addOrganizationData.to, organizationID = addOrganizationData.organizationID, zoneID = addOrganizationData.zoneID, password = addOrganizationData.password, mode = transactionMode))
-          } else {
-            transactionMode match {
-              case constants.Transactions.BLOCK_MODE => transactionsAddOrganization.Service.blockPost(transactionsAddOrganization.Request(transactionsAddOrganization.BaseRequest(from = addOrganizationData.from), to = addOrganizationData.to, organizationID = addOrganizationData.organizationID, zoneID = addOrganizationData.zoneID, password = addOrganizationData.password, mode = transactionMode))
-              case constants.Transactions.ASYNC_MODE => transactionsAddOrganization.Service.asyncPost(transactionsAddOrganization.Request(transactionsAddOrganization.BaseRequest(from = addOrganizationData.from), to = addOrganizationData.to, organizationID = addOrganizationData.organizationID, zoneID = addOrganizationData.zoneID, password = addOrganizationData.password, mode = transactionMode))
-              case constants.Transactions.SYNC_MODE => transactionsAddOrganization.Service.syncPost(transactionsAddOrganization.Request(transactionsAddOrganization.BaseRequest(from = addOrganizationData.from), to = addOrganizationData.to, organizationID = addOrganizationData.organizationID, zoneID = addOrganizationData.zoneID, password = addOrganizationData.password, mode = transactionMode))
-            }
-          }
+          transactionsAddOrganization.Service.post(transactionsAddOrganization.Request(transactionsAddOrganization.BaseRequest(from = addOrganizationData.from), to = addOrganizationData.to, organizationID = addOrganizationData.organizationID, zoneID = addOrganizationData.zoneID, password = addOrganizationData.password, mode = transactionMode))
           Ok(views.html.index(successes = Seq(constants.Response.ORGANIZATION_ADDED)))
         }
         catch {

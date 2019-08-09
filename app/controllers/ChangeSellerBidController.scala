@@ -19,8 +19,8 @@ class ChangeSellerBidController @Inject()(messagesControllerComponents: Messages
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  def changeSellerBidForm(buyerAddress:String, pegHash: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.changeSellerBid(views.companion.master.ChangeSellerBid.form, buyerAddress,pegHash))
+  def changeSellerBidForm(buyerAddress: String, pegHash: String): Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.changeSellerBid(views.companion.master.ChangeSellerBid.form, buyerAddress, pegHash))
   }
 
   def changeSellerBid: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
@@ -35,10 +35,7 @@ class ChangeSellerBidController @Inject()(messagesControllerComponents: Messages
               entity = blockchainTransaction.ChangeSellerBid(from = loginState.address, to = changeSellerBidData.buyerAddress, bid = changeSellerBidData.bid, time = changeSellerBidData.time, pegHash = changeSellerBidData.pegHash, gas = changeSellerBidData.gas, status = null, txHash = null, ticketID = "", mode = transactionMode, code = null),
               blockchainTransactionCreate = blockchainTransactionChangeSellerBids.Service.create,
               request = transactionsChangeSellerBid.Request(transactionsChangeSellerBid.BaseRequest(from = loginState.address), to = changeSellerBidData.buyerAddress, password = changeSellerBidData.password, bid = changeSellerBidData.bid, time = changeSellerBidData.time, pegHash = changeSellerBidData.pegHash, gas = changeSellerBidData.gas, mode = transactionMode),
-              kafkaAction = transactionsChangeSellerBid.Service.kafkaPost,
-              blockAction = transactionsChangeSellerBid.Service.blockPost,
-              asyncAction = transactionsChangeSellerBid.Service.asyncPost,
-              syncAction = transactionsChangeSellerBid.Service.syncPost,
+              action = transactionsChangeSellerBid.Service.post,
               onSuccess = blockchainTransactionChangeSellerBids.Utility.onSuccess,
               onFailure = blockchainTransactionChangeSellerBids.Utility.onFailure,
               updateTransactionHash = blockchainTransactionChangeSellerBids.Service.updateTransactionHash
@@ -65,11 +62,7 @@ class ChangeSellerBidController @Inject()(messagesControllerComponents: Messages
       },
       changeSellerBidData => {
         try {
-          if (kafkaEnabled) {
-            transactionsChangeSellerBid.Service.kafkaPost(transactionsChangeSellerBid.Request(transactionsChangeSellerBid.BaseRequest(from = changeSellerBidData.from), to = changeSellerBidData.to, password = changeSellerBidData.password, bid = changeSellerBidData.bid, time = changeSellerBidData.time, pegHash = changeSellerBidData.pegHash, gas = changeSellerBidData.gas, mode = transactionMode))
-          } else {
-            transactionsChangeSellerBid.Service.blockPost(transactionsChangeSellerBid.Request(transactionsChangeSellerBid.BaseRequest(from = changeSellerBidData.from), to = changeSellerBidData.to, password = changeSellerBidData.password, bid = changeSellerBidData.bid, time = changeSellerBidData.time, pegHash = changeSellerBidData.pegHash, gas = changeSellerBidData.gas, mode = transactionMode))
-          }
+          transactionsChangeSellerBid.Service.post(transactionsChangeSellerBid.Request(transactionsChangeSellerBid.BaseRequest(from = changeSellerBidData.from), to = changeSellerBidData.to, password = changeSellerBidData.password, bid = changeSellerBidData.bid, time = changeSellerBidData.time, pegHash = changeSellerBidData.pegHash, gas = changeSellerBidData.gas, mode = transactionMode))
           Ok(views.html.index(successes = Seq(constants.Response.SELLER_BID_CHANGED)))
         }
         catch {

@@ -1,14 +1,14 @@
 package controllers
 
+import actors.ShutdownActors
 import controllers.actions.WithLoginAction
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
+import models.master
 import models.masterTransaction.AccountTokens
 import play.api.i18n.I18nSupport
-import models.master
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
-import actors.ShutdownActors
 import views.companion.master.Logout
 
 import scala.concurrent.ExecutionContext

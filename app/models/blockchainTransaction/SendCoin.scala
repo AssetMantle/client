@@ -41,7 +41,6 @@ class SendCoins @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
   private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
   private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
-  private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
   private def add(sendCoin: SendCoin): Future[String] = db.run((sendCoinTable returning sendCoinTable.map(_.ticketID) += sendCoin).asTry).map {
     case Success(result) => result

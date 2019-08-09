@@ -41,10 +41,7 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
               entity = blockchainTransaction.SendCoin(from = loginState.address, to = sendCoinData.to, amount = sendCoinData.amount, gas = sendCoinData.gas, status = null, txHash = null, ticketID = "", mode = transactionMode, code = null),
               blockchainTransactionCreate = blockchainTransactionSendCoins.Service.create,
               request = transactionsSendCoin.Request(transactionsSendCoin.BaseRequest(from = loginState.address), password = sendCoinData.password, to = sendCoinData.to, amount = Seq(transactionsSendCoin.Amount(denominationOfGasToken, sendCoinData.amount.toString)), gas = sendCoinData.gas, mode = transactionMode),
-              kafkaAction = transactionsSendCoin.Service.kafkaPost,
-              blockAction = transactionsSendCoin.Service.blockPost,
-              asyncAction = transactionsSendCoin.Service.asyncPost,
-              syncAction = transactionsSendCoin.Service.syncPost,
+              action = transactionsSendCoin.Service.post,
               onSuccess = blockchainTransactionSendCoins.Utility.onSuccess,
               onFailure = blockchainTransactionSendCoins.Utility.onFailure,
               updateTransactionHash = blockchainTransactionSendCoins.Service.updateTransactionHash
@@ -70,12 +67,7 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
       },
       sendCoinData => {
         try {
-          if (kafkaEnabled) {
-            transactionsSendCoin.Service.kafkaPost(transactionsSendCoin.Request(transactionsSendCoin.BaseRequest(from = sendCoinData.from), password = sendCoinData.password, to = sendCoinData.to, amount = Seq(transactionsSendCoin.Amount(denominationOfGasToken, sendCoinData.amount.toString)), gas = sendCoinData.gas, mode = transactionMode))
-          }
-          else {
-            transactionsSendCoin.Service.blockPost(transactionsSendCoin.Request(transactionsSendCoin.BaseRequest(from = sendCoinData.from), password = sendCoinData.password, to = sendCoinData.to, amount = Seq(transactionsSendCoin.Amount(denominationOfGasToken, sendCoinData.amount.toString)), gas = sendCoinData.gas, mode = transactionMode))
-          }
+          transactionsSendCoin.Service.post(transactionsSendCoin.Request(transactionsSendCoin.BaseRequest(from = sendCoinData.from), password = sendCoinData.password, to = sendCoinData.to, amount = Seq(transactionsSendCoin.Amount(denominationOfGasToken, sendCoinData.amount.toString)), gas = sendCoinData.gas, mode = transactionMode))
           Ok(views.html.index(successes = Seq(constants.Response.COINS_SENT)))
 
         }
@@ -161,10 +153,7 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
                 entity = blockchainTransaction.SendCoin(from = loginState.address, to = toAddress, amount = defaultFaucetToken, gas = approveFaucetRequestFormData.gas, status = null, txHash = null, ticketID = "", mode = transactionMode, code = null),
                 blockchainTransactionCreate = blockchainTransactionSendCoins.Service.create,
                 request = transactionsSendCoin.Request(transactionsSendCoin.BaseRequest(from = loginState.address), password = approveFaucetRequestFormData.password, to = toAddress, amount = Seq(transactionsSendCoin.Amount(denominationOfGasToken, defaultFaucetToken.toString)), gas = approveFaucetRequestFormData.gas, mode = transactionMode),
-                kafkaAction = transactionsSendCoin.Service.kafkaPost,
-                blockAction = transactionsSendCoin.Service.blockPost,
-                asyncAction = transactionsSendCoin.Service.asyncPost,
-                syncAction = transactionsSendCoin.Service.syncPost,
+                action = transactionsSendCoin.Service.post,
                 onSuccess = blockchainTransactionSendCoins.Utility.onSuccess,
                 onFailure = blockchainTransactionSendCoins.Utility.onFailure,
                 updateTransactionHash = blockchainTransactionSendCoins.Service.updateTransactionHash

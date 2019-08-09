@@ -19,7 +19,7 @@ class ChangeBuyerBidController @Inject()(messagesControllerComponents: MessagesC
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  def changeBuyerBidForm(sellerAddress:String, pegHash: String): Action[AnyContent] = Action { implicit request =>
+  def changeBuyerBidForm(sellerAddress: String, pegHash: String): Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.master.changeBuyerBid(views.companion.master.ChangeBuyerBid.form, sellerAddress, pegHash))
   }
 
@@ -27,7 +27,7 @@ class ChangeBuyerBidController @Inject()(messagesControllerComponents: MessagesC
     implicit request =>
       views.companion.master.ChangeBuyerBid.form.bindFromRequest().fold(
         formWithErrors => {
-          BadRequest(views.html.component.master.changeBuyerBid(formWithErrors,formWithErrors.data(constants.Form.SELLER_ADDRESS), formWithErrors.data(constants.Form.PEG_HASH)))
+          BadRequest(views.html.component.master.changeBuyerBid(formWithErrors, formWithErrors.data(constants.Form.SELLER_ADDRESS), formWithErrors.data(constants.Form.PEG_HASH)))
         },
         changeBuyerBidData => {
           try {
@@ -35,10 +35,7 @@ class ChangeBuyerBidController @Inject()(messagesControllerComponents: MessagesC
               entity = blockchainTransaction.ChangeBuyerBid(from = loginState.address, to = changeBuyerBidData.sellerAddress, bid = changeBuyerBidData.bid, time = changeBuyerBidData.time, pegHash = changeBuyerBidData.pegHash, gas = changeBuyerBidData.gas, status = null, txHash = null, ticketID = "", mode = transactionMode, code = null),
               blockchainTransactionCreate = blockchainTransactionChangeBuyerBids.Service.create,
               request = transactionsChangeBuyerBid.Request(transactionsChangeBuyerBid.BaseRequest(from = loginState.address), to = changeBuyerBidData.sellerAddress, password = changeBuyerBidData.password, bid = changeBuyerBidData.bid, time = changeBuyerBidData.time, pegHash = changeBuyerBidData.pegHash, gas = changeBuyerBidData.gas, mode = transactionMode),
-              kafkaAction = transactionsChangeBuyerBid.Service.kafkaPost,
-              blockAction = transactionsChangeBuyerBid.Service.blockPost,
-              asyncAction = transactionsChangeBuyerBid.Service.asyncPost,
-              syncAction = transactionsChangeBuyerBid.Service.syncPost,
+              action = transactionsChangeBuyerBid.Service.post,
               onSuccess = blockchainTransactionChangeBuyerBids.Utility.onSuccess,
               onFailure = blockchainTransactionChangeBuyerBids.Utility.onFailure,
               updateTransactionHash = blockchainTransactionChangeBuyerBids.Service.updateTransactionHash
@@ -64,11 +61,7 @@ class ChangeBuyerBidController @Inject()(messagesControllerComponents: MessagesC
       },
       changeBuyerBidData => {
         try {
-          if (kafkaEnabled) {
-            transactionsChangeBuyerBid.Service.kafkaPost(transactionsChangeBuyerBid.Request(transactionsChangeBuyerBid.BaseRequest(from = changeBuyerBidData.from), to = changeBuyerBidData.to, password = changeBuyerBidData.password, bid = changeBuyerBidData.bid, time = changeBuyerBidData.time, pegHash = changeBuyerBidData.pegHash, gas = changeBuyerBidData.gas, mode = transactionMode))
-          } else {
-            transactionsChangeBuyerBid.Service.blockPost(transactionsChangeBuyerBid.Request(transactionsChangeBuyerBid.BaseRequest(from = changeBuyerBidData.from), to = changeBuyerBidData.to, password = changeBuyerBidData.password, bid = changeBuyerBidData.bid, time = changeBuyerBidData.time, pegHash = changeBuyerBidData.pegHash, gas = changeBuyerBidData.gas, mode = transactionMode))
-          }
+          transactionsChangeBuyerBid.Service.post(transactionsChangeBuyerBid.Request(transactionsChangeBuyerBid.BaseRequest(from = changeBuyerBidData.from), to = changeBuyerBidData.to, password = changeBuyerBidData.password, bid = changeBuyerBidData.bid, time = changeBuyerBidData.time, pegHash = changeBuyerBidData.pegHash, gas = changeBuyerBidData.gas, mode = transactionMode))
           Ok(views.html.index(successes = Seq(constants.Response.BUYER_BID_CHANGED)))
 
         }

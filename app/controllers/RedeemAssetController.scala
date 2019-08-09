@@ -36,10 +36,7 @@ class RedeemAssetController @Inject()(messagesControllerComponents: MessagesCont
               entity = blockchainTransaction.RedeemAsset(from = loginState.address, to = toAddress, pegHash = redeemAssetData.pegHash, gas = redeemAssetData.gas, status = null, txHash = null, ticketID = "", mode = transactionMode, code = null),
               blockchainTransactionCreate = blockchainTransactionRedeemAssets.Service.create,
               request = transactionsRedeemAsset.Request(transactionsRedeemAsset.BaseRequest(from = loginState.address), to = toAddress, password = redeemAssetData.password, pegHash = redeemAssetData.pegHash, gas = redeemAssetData.gas, mode = transactionMode),
-              kafkaAction = transactionsRedeemAsset.Service.kafkaPost,
-              blockAction = transactionsRedeemAsset.Service.blockPost,
-              asyncAction = transactionsRedeemAsset.Service.asyncPost,
-              syncAction = transactionsRedeemAsset.Service.syncPost,
+              action = transactionsRedeemAsset.Service.post,
               onSuccess = blockchainTransactionRedeemAssets.Utility.onSuccess,
               onFailure = blockchainTransactionRedeemAssets.Utility.onFailure,
               updateTransactionHash = blockchainTransactionRedeemAssets.Service.updateTransactionHash
@@ -66,11 +63,7 @@ class RedeemAssetController @Inject()(messagesControllerComponents: MessagesCont
       },
       redeemAssetData => {
         try {
-          if (kafkaEnabled) {
-            transactionsRedeemAsset.Service.kafkaPost(transactionsRedeemAsset.Request(transactionsRedeemAsset.BaseRequest(from = redeemAssetData.from), to = redeemAssetData.to, password = redeemAssetData.password, pegHash = redeemAssetData.pegHash, gas = redeemAssetData.gas, mode = transactionMode))
-          } else {
-            transactionsRedeemAsset.Service.blockPost(transactionsRedeemAsset.Request(transactionsRedeemAsset.BaseRequest(from = redeemAssetData.from), to = redeemAssetData.to, password = redeemAssetData.password, pegHash = redeemAssetData.pegHash, gas = redeemAssetData.gas, mode = transactionMode))
-          }
+          transactionsRedeemAsset.Service.post(transactionsRedeemAsset.Request(transactionsRedeemAsset.BaseRequest(from = redeemAssetData.from), to = redeemAssetData.to, password = redeemAssetData.password, pegHash = redeemAssetData.pegHash, gas = redeemAssetData.gas, mode = transactionMode))
           Ok(views.html.index(successes = Seq(constants.Response.ASSET_REDEEMED)))
         }
         catch {

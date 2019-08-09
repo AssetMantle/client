@@ -11,7 +11,7 @@ import play.api.{Configuration, Logger}
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class BuyerExecuteOrderController @Inject()(messagesControllerComponents: MessagesControllerComponents, transaction: utilities.Transaction, masterAccounts: master.Accounts, blockchainOrders: blockchain.Orders, blockchainAccounts: blockchain.Accounts, withZoneLoginAction: WithZoneLoginAction, withTraderLoginAction: WithTraderLoginAction, transactionsBuyerExecuteOrder: transactions.BuyerExecuteOrder, blockchainTransactionBuyerExecuteOrders: blockchainTransaction.BuyerExecuteOrders, blockchainACLAccounts: blockchain.ACLAccounts, blockchainZones: blockchain.Zones, blockchainNegotiations:blockchain.Negotiations)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class BuyerExecuteOrderController @Inject()(messagesControllerComponents: MessagesControllerComponents, transaction: utilities.Transaction, masterAccounts: master.Accounts, blockchainOrders: blockchain.Orders, blockchainAccounts: blockchain.Accounts, withZoneLoginAction: WithZoneLoginAction, withTraderLoginAction: WithTraderLoginAction, transactionsBuyerExecuteOrder: transactions.BuyerExecuteOrder, blockchainTransactionBuyerExecuteOrders: blockchainTransaction.BuyerExecuteOrders, blockchainACLAccounts: blockchain.ACLAccounts, blockchainZones: blockchain.Zones, blockchainNegotiations: blockchain.Negotiations)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
 
@@ -19,7 +19,7 @@ class BuyerExecuteOrderController @Inject()(messagesControllerComponents: Messag
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  def buyerExecuteOrderForm(sellerAddress:String, pegHash:String): Action[AnyContent] = Action { implicit request =>
+  def buyerExecuteOrderForm(sellerAddress: String, pegHash: String): Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.master.buyerExecuteOrder(views.companion.master.BuyerExecuteOrder.form, sellerAddress, pegHash))
   }
 
@@ -32,13 +32,10 @@ class BuyerExecuteOrderController @Inject()(messagesControllerComponents: Messag
         buyerExecuteOrderData => {
           try {
             transaction.process[blockchainTransaction.BuyerExecuteOrder, transactionsBuyerExecuteOrder.Request](
-              entity = blockchainTransaction.BuyerExecuteOrder(from = loginState.address, buyerAddress = loginState.address, sellerAddress = buyerExecuteOrderData.sellerAddress, fiatProofHash = buyerExecuteOrderData.fiatProofHash, pegHash = buyerExecuteOrderData.pegHash, gas = buyerExecuteOrderData.gas, status = null, txHash = null, ticketID = "", mode = transactionMode, code =  null),
+              entity = blockchainTransaction.BuyerExecuteOrder(from = loginState.address, buyerAddress = loginState.address, sellerAddress = buyerExecuteOrderData.sellerAddress, fiatProofHash = buyerExecuteOrderData.fiatProofHash, pegHash = buyerExecuteOrderData.pegHash, gas = buyerExecuteOrderData.gas, status = null, txHash = null, ticketID = "", mode = transactionMode, code = null),
               blockchainTransactionCreate = blockchainTransactionBuyerExecuteOrders.Service.create,
               request = transactionsBuyerExecuteOrder.Request(transactionsBuyerExecuteOrder.BaseRequest(from = loginState.address), password = buyerExecuteOrderData.password, buyerAddress = loginState.address, sellerAddress = buyerExecuteOrderData.sellerAddress, fiatProofHash = buyerExecuteOrderData.fiatProofHash, pegHash = buyerExecuteOrderData.pegHash, gas = buyerExecuteOrderData.gas, mode = transactionMode),
-              kafkaAction = transactionsBuyerExecuteOrder.Service.kafkaPost,
-              blockAction = transactionsBuyerExecuteOrder.Service.blockPost,
-              asyncAction = transactionsBuyerExecuteOrder.Service.asyncPost,
-              syncAction = transactionsBuyerExecuteOrder.Service.syncPost,
+              action = transactionsBuyerExecuteOrder.Service.post,
               onSuccess = blockchainTransactionBuyerExecuteOrders.Utility.onSuccess,
               onFailure = blockchainTransactionBuyerExecuteOrders.Utility.onFailure,
               updateTransactionHash = blockchainTransactionBuyerExecuteOrders.Service.updateTransactionHash
@@ -57,12 +54,12 @@ class BuyerExecuteOrderController @Inject()(messagesControllerComponents: Messag
     implicit request =>
       try {
         Ok(views.html.component.master.moderatedBuyerExecuteOrderList(blockchainNegotiations.Service.getBuyerNegotiationsByOrderAndZone(blockchainOrders.Service.getAllOrderIds, blockchainACLAccounts.Service.getAddressesUnderZone(blockchainZones.Service.getID(loginState.address)))))
-      }catch {
+      } catch {
         case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
-  def moderatedBuyerExecuteOrderForm(buyerAddress:String, sellerAddress: String, pegHash:String): Action[AnyContent] = Action { implicit request =>
+  def moderatedBuyerExecuteOrderForm(buyerAddress: String, sellerAddress: String, pegHash: String): Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.master.moderatedBuyerExecuteOrder(views.companion.master.ModeratedBuyerExecuteOrder.form, buyerAddress, sellerAddress, pegHash))
   }
 
@@ -75,13 +72,10 @@ class BuyerExecuteOrderController @Inject()(messagesControllerComponents: Messag
         moderatedBuyerExecuteOrderData => {
           try {
             transaction.process[blockchainTransaction.BuyerExecuteOrder, transactionsBuyerExecuteOrder.Request](
-              entity = blockchainTransaction.BuyerExecuteOrder(from = loginState.address, buyerAddress = loginState.address, sellerAddress = moderatedBuyerExecuteOrderData.sellerAddress, fiatProofHash = moderatedBuyerExecuteOrderData.fiatProofHash, pegHash = moderatedBuyerExecuteOrderData.pegHash, gas = moderatedBuyerExecuteOrderData.gas, status = null, txHash = null, ticketID = "", mode = transactionMode, code =  null),
+              entity = blockchainTransaction.BuyerExecuteOrder(from = loginState.address, buyerAddress = loginState.address, sellerAddress = moderatedBuyerExecuteOrderData.sellerAddress, fiatProofHash = moderatedBuyerExecuteOrderData.fiatProofHash, pegHash = moderatedBuyerExecuteOrderData.pegHash, gas = moderatedBuyerExecuteOrderData.gas, status = null, txHash = null, ticketID = "", mode = transactionMode, code = null),
               blockchainTransactionCreate = blockchainTransactionBuyerExecuteOrders.Service.create,
               request = transactionsBuyerExecuteOrder.Request(transactionsBuyerExecuteOrder.BaseRequest(from = loginState.address), password = moderatedBuyerExecuteOrderData.password, buyerAddress = loginState.address, sellerAddress = moderatedBuyerExecuteOrderData.sellerAddress, fiatProofHash = moderatedBuyerExecuteOrderData.fiatProofHash, pegHash = moderatedBuyerExecuteOrderData.pegHash, gas = moderatedBuyerExecuteOrderData.gas, mode = transactionMode),
-              kafkaAction = transactionsBuyerExecuteOrder.Service.kafkaPost,
-              blockAction = transactionsBuyerExecuteOrder.Service.blockPost,
-              asyncAction = transactionsBuyerExecuteOrder.Service.asyncPost,
-              syncAction = transactionsBuyerExecuteOrder.Service.syncPost,
+              action = transactionsBuyerExecuteOrder.Service.post,
               onSuccess = blockchainTransactionBuyerExecuteOrders.Utility.onSuccess,
               onFailure = blockchainTransactionBuyerExecuteOrders.Utility.onFailure,
               updateTransactionHash = blockchainTransactionBuyerExecuteOrders.Service.updateTransactionHash
@@ -107,11 +101,7 @@ class BuyerExecuteOrderController @Inject()(messagesControllerComponents: Messag
       },
       buyerExecuteOrderData => {
         try {
-          if (kafkaEnabled) {
-            transactionsBuyerExecuteOrder.Service.kafkaPost(transactionsBuyerExecuteOrder.Request(transactionsBuyerExecuteOrder.BaseRequest(from = buyerExecuteOrderData.from), password = buyerExecuteOrderData.password, buyerAddress = buyerExecuteOrderData.buyerAddress, sellerAddress = buyerExecuteOrderData.sellerAddress, fiatProofHash = buyerExecuteOrderData.fiatProofHash, pegHash = buyerExecuteOrderData.pegHash, gas = buyerExecuteOrderData.gas, mode = transactionMode))
-          } else {
-            transactionsBuyerExecuteOrder.Service.blockPost(transactionsBuyerExecuteOrder.Request(transactionsBuyerExecuteOrder.BaseRequest(from = buyerExecuteOrderData.from), password = buyerExecuteOrderData.password, buyerAddress = buyerExecuteOrderData.buyerAddress, sellerAddress = buyerExecuteOrderData.sellerAddress, fiatProofHash = buyerExecuteOrderData.fiatProofHash, pegHash = buyerExecuteOrderData.pegHash, gas = buyerExecuteOrderData.gas, mode = transactionMode))
-          }
+          transactionsBuyerExecuteOrder.Service.post(transactionsBuyerExecuteOrder.Request(transactionsBuyerExecuteOrder.BaseRequest(from = buyerExecuteOrderData.from), password = buyerExecuteOrderData.password, buyerAddress = buyerExecuteOrderData.buyerAddress, sellerAddress = buyerExecuteOrderData.sellerAddress, fiatProofHash = buyerExecuteOrderData.fiatProofHash, pegHash = buyerExecuteOrderData.pegHash, gas = buyerExecuteOrderData.gas, mode = transactionMode))
           Ok(views.html.index(successes = Seq(constants.Response.BUYER_ORDER_EXECUTED)))
 
         }

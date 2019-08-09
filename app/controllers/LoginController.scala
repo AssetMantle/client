@@ -4,9 +4,8 @@ import controllers.actions.LoginState
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import models.blockchain
-import models.master
 import models.blockchain.ACLAccounts
+import models.{blockchain, master}
 import play.api.Configuration
 import play.api.i18n.I18nSupport
 import play.api.libs.ws.WSClient
