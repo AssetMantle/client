@@ -100,7 +100,7 @@ class IssueFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
     }
   }
 
-  private def deleteByTicketID(ticketID: String)(implicit executionContext: ExecutionContext) = db.run(issueFiatTable.filter(_.ticketID === ticketID).delete.asTry).map {
+  private def deleteByTicketID(ticketID: String) = db.run(issueFiatTable.filter(_.ticketID === ticketID).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)

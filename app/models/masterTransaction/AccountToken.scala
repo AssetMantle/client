@@ -54,19 +54,57 @@ class AccountTokens @Inject()(actorSystem: ActorSystem, shutdownActors: Shutdown
     }
   }
 
-  private def upsert(accountToken: AccountToken) = db.run(accountTokenTable.insertOrUpdate(accountToken))
+  private def upsert(accountToken: AccountToken) = db.run(accountTokenTable.insertOrUpdate(accountToken).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
 
-  private def refreshSessionTokenOnId(id: String, tokenHash: Option[String], tokenTime: Long) = db.run(accountTokenTable.filter(_.id === id).map(accountTokenTable => (accountTokenTable.sessionTokenHash.?, accountTokenTable.sessionTokenTime)).update(tokenHash, tokenTime))
+  private def refreshSessionTokenOnId(id: String, tokenHash: Option[String], tokenTime: Long) = db.run(accountTokenTable.filter(_.id === id).map(accountTokenTable => (accountTokenTable.sessionTokenHash.?, accountTokenTable.sessionTokenTime)).update(tokenHash, tokenTime).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
 
   private def getSessionTimedOutIds: Future[Seq[String]] = db.run(accountTokenTable.filter(_.sessionTokenTime.?.isDefined).filter(_.sessionTokenTime < DateTime.now(DateTimeZone.UTC).getMillis - sessionTokenTimeout).map(_.id).result)
 
-  private def setSessionTokenTimeByIds(ids: Seq[String], sessionTokenTime: Option[Long]) = db.run(accountTokenTable.filter(_.id.inSet(ids)).map(_.sessionTokenTime.?).update(sessionTokenTime))
+  private def setSessionTokenTimeByIds(ids: Seq[String], sessionTokenTime: Option[Long]) = db.run(accountTokenTable.filter(_.id.inSet(ids)).map(_.sessionTokenTime.?).update(sessionTokenTime).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
 
-  private def setSessionTokenTimeById(id: String, sessionTokenTime: Option[Long]) = db.run(accountTokenTable.filter(_.id === id).map(_.sessionTokenTime.?).update(sessionTokenTime))
+  private def setSessionTokenTimeById(id: String, sessionTokenTime: Option[Long]) = db.run(accountTokenTable.filter(_.id === id).map(_.sessionTokenTime.?).update(sessionTokenTime).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
 
   private def checkById(id: String): Future[Boolean] = db.run(accountTokenTable.filter(_.id === id).exists.result)
 
-  private def deleteById(id: String) = db.run(accountTokenTable.filter(_.id === id).delete)
+  private def deleteById(id: String) = db.run(accountTokenTable.filter(_.id === id).delete.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
 
   private[models] class AccountTokenTable(tag: Tag) extends Table[AccountToken](tag, "AccountToken") {
 
