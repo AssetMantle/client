@@ -18,8 +18,6 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
-  private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
-
   def addTraderForm(): Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.master.addTrader(views.companion.master.AddTrader.form))
   }
@@ -31,7 +29,6 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
           BadRequest(views.html.component.master.addTrader(formWithErrors))
         },
         addTraderData => {
-
           try {
             if (masterOrganizations.Service.getStatus(addTraderData.organizationID) == Option(true)) {
               masterTraders.Service.create(zoneID = addTraderData.zoneID, organizationID = addTraderData.organizationID, accountID = loginState.username, name = addTraderData.name)
@@ -128,7 +125,6 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
           BadRequest(views.html.component.master.zoneRejectVerifyTraderRequest(formWithErrors, formWithErrors.data(constants.Form.TRADER_ID)))
         },
         rejectVerifyTraderRequestData => {
-
           try {
             masterTraders.Service.updateStatus(rejectVerifyTraderRequestData.traderID, status = false)
             masterTraderKYCs.Service.zoneRejectAll(masterZones.Service.getAccountId(rejectVerifyTraderRequestData.traderID))
@@ -231,7 +227,6 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
           BadRequest(views.html.component.master.organizationRejectVerifyTraderRequest(formWithErrors, formWithErrors.data(constants.Form.TRADER_ID)))
         },
         rejectVerifyTraderRequestData => {
-
           try {
             masterTraders.Service.updateStatus(rejectVerifyTraderRequestData.traderID, status = false)
             masterTraderKYCs.Service.organizationRejectAll(masterOrganizations.Service.getAccountId(rejectVerifyTraderRequestData.traderID))

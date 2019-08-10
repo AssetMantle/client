@@ -17,8 +17,8 @@ import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class RedeemAsset(from: String, to: String, pegHash: String, gas: Int, status: Option[Boolean], txHash: Option[String], ticketID: String, mode: String, code: Option[String]) extends TransactionEntity[RedeemAsset] {
-  def mutateTicketID(newTicketID: String): RedeemAsset = RedeemAsset(from = from, to = to, pegHash = pegHash, gas = gas, status = status, txHash, ticketID = newTicketID, mode = mode, code = code)
+case class RedeemAsset(from: String, to: String, pegHash: String,  status: Option[Boolean], txHash: Option[String], ticketID: String, mode: String, code: Option[String]) extends TransactionEntity[RedeemAsset] {
+  def mutateTicketID(newTicketID: String): RedeemAsset = RedeemAsset(from = from, to = to, pegHash = pegHash, status = status, txHash, ticketID = newTicketID, mode = mode, code = code)
 }
 
 
@@ -109,15 +109,13 @@ class RedeemAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tr
 
   private[models] class RedeemAssetTable(tag: Tag) extends Table[RedeemAsset](tag, "RedeemAsset") {
 
-    def * = (from, to, pegHash, gas, status.?, txHash.?, ticketID, mode, code.?) <> (RedeemAsset.tupled, RedeemAsset.unapply)
+    def * = (from, to, pegHash, status.?, txHash.?, ticketID, mode, code.?) <> (RedeemAsset.tupled, RedeemAsset.unapply)
 
     def from = column[String]("from")
 
     def to = column[String]("to")
 
     def pegHash = column[String]("pegHash")
-
-    def gas = column[Int]("gas")
 
     def status = column[Boolean]("status")
 
@@ -132,7 +130,7 @@ class RedeemAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tr
 
   object Service {
 
-    def create(redeemAsset: RedeemAsset): String = Await.result(add(RedeemAsset(from = redeemAsset.from, to = redeemAsset.to, pegHash = redeemAsset.pegHash, gas = redeemAsset.gas, status = redeemAsset.status, txHash = redeemAsset.txHash, ticketID = redeemAsset.ticketID, mode = redeemAsset.mode, code = redeemAsset.code)), Duration.Inf)
+    def create(redeemAsset: RedeemAsset): String = Await.result(add(RedeemAsset(from = redeemAsset.from, to = redeemAsset.to, pegHash = redeemAsset.pegHash, status = redeemAsset.status, txHash = redeemAsset.txHash, ticketID = redeemAsset.ticketID, mode = redeemAsset.mode, code = redeemAsset.code)), Duration.Inf)
 
     def markTransactionSuccessful(ticketID: String, txHash: String): Int = Await.result(updateTxHashAndStatusOnTicketID(ticketID, Option(txHash), status = Option(true)), Duration.Inf)
 

@@ -8,7 +8,6 @@
     @inputText(changeSellerBidForm(constants.Form.BID), '_label -> Messages(constants.Form.BID))
     @inputText(changeSellerBidForm(constants.Form.TIME), '_label -> Messages(constants.Form.TIME))
     @inputText(changeSellerBidForm(constants.Form.PEG_HASH).copy(value = Some(pegHash)), '_label -> Messages(constants.Form.PEG_HASH))
-    @inputText(changeSellerBidForm(constants.Form.GAS), '_label -> Messages(constants.Form.GAS))
     @inputPassword(changeSellerBidForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD))
 
     @if(changeSellerBidForm.hasGlobalErrors) {

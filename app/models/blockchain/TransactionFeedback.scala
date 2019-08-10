@@ -106,7 +106,7 @@ class TransactionFeedbacks @Inject()(protected val databaseConfigProvider: Datab
     }
   }
 
-  private def deleteById(address: String)(implicit executionContext: ExecutionContext) = db.run(transactionFeedbackTable.filter(_.address === address).delete.asTry).map {
+  private def deleteById(address: String)= db.run(transactionFeedbackTable.filter(_.address === address).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)

@@ -14,8 +14,6 @@ import scala.concurrent.ExecutionContext
 @Singleton
 class AddZoneController @Inject()(messagesControllerComponents: MessagesControllerComponents, transaction: utilities.Transaction, pushNotification: PushNotification, blockchainAccounts: blockchain.Accounts, masterZoneKYCs: master.ZoneKYCs, masterOrganizations: master.Organizations, transactionsAddZone: transactions.AddZone, blockchainZones: models.blockchain.Zones, blockchainTransactionAddZones: blockchainTransaction.AddZones, masterAccounts: master.Accounts, masterZones: master.Zones, withUserLoginAction: WithUserLoginAction, withGenesisLoginAction: WithGenesisLoginAction)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
-  private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
-
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
   private implicit val logger: Logger = Logger(this.getClass)
@@ -31,7 +29,6 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
           BadRequest(views.html.component.master.addZone(formWithErrors))
         },
         addZoneData => {
-
           try {
             masterZones.Service.create(accountID = loginState.username, name = addZoneData.name, currency = addZoneData.currency)
             Ok(views.html.index(successes = Seq(constants.Response.ZONE_REQUEST_SENT)))
@@ -127,7 +124,6 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
           BadRequest(views.html.component.master.rejectVerifyZoneRequest(formWithErrors, formWithErrors.data(constants.Form.ZONE_ID)))
         },
         rejectVerifyZoneRequestData => {
-
           try {
             masterZones.Service.updateStatus(rejectVerifyZoneRequestData.zoneID, status = false)
             masterZoneKYCs.Service.rejectAll(masterZones.Service.getAccountId(rejectVerifyZoneRequestData.zoneID))

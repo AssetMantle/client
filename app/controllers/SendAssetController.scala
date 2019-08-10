@@ -17,8 +17,6 @@ class SendAssetController @Inject()(messagesControllerComponents: MessagesContro
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
-  private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
-
   def sendAssetForm(buyerAddress: String, pegHash: String): Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.master.sendAsset(views.companion.master.SendAsset.form, buyerAddress, pegHash))
   }
@@ -32,9 +30,9 @@ class SendAssetController @Inject()(messagesControllerComponents: MessagesContro
         sendAssetData => {
           try {
             transaction.process[blockchainTransaction.SendAsset, transactionsSendAsset.Request](
-              entity = blockchainTransaction.SendAsset(from = loginState.address, to = sendAssetData.buyerAddress, pegHash = sendAssetData.pegHash, gas = sendAssetData.gas, status = null, txHash = null, ticketID = "", mode = transactionMode, code = null),
+              entity = blockchainTransaction.SendAsset(from = loginState.address, to = sendAssetData.buyerAddress, pegHash = sendAssetData.pegHash, status = null, txHash = null, ticketID = "", mode = transactionMode, code = null),
               blockchainTransactionCreate = blockchainTransactionSendAssets.Service.create,
-              request = transactionsSendAsset.Request(transactionsSendAsset.BaseRequest(from = loginState.address), to = sendAssetData.buyerAddress, password = sendAssetData.password, pegHash = sendAssetData.pegHash, gas = sendAssetData.gas, mode = transactionMode),
+              request = transactionsSendAsset.Request(transactionsSendAsset.BaseRequest(from = loginState.address), to = sendAssetData.buyerAddress, password = sendAssetData.password, pegHash = sendAssetData.pegHash, mode = transactionMode),
               action = transactionsSendAsset.Service.post,
               onSuccess = blockchainTransactionSendAssets.Utility.onSuccess,
               onFailure = blockchainTransactionSendAssets.Utility.onFailure,
@@ -61,7 +59,7 @@ class SendAssetController @Inject()(messagesControllerComponents: MessagesContro
       },
       sendAssetData => {
         try {
-          transactionsSendAsset.Service.post(transactionsSendAsset.Request(transactionsSendAsset.BaseRequest(from = sendAssetData.from), to = sendAssetData.to, password = sendAssetData.password, pegHash = sendAssetData.pegHash, gas = sendAssetData.gas, mode = transactionMode))
+          transactionsSendAsset.Service.post(transactionsSendAsset.Request(transactionsSendAsset.BaseRequest(from = sendAssetData.from), to = sendAssetData.to, password = sendAssetData.password, pegHash = sendAssetData.pegHash, mode = sendAssetData.mode))
           Ok(views.html.index(successes = Seq(constants.Response.ASSET_SENT)))
 
         }

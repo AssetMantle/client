@@ -16,8 +16,8 @@ import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class ReleaseAsset(from: String, to: String, pegHash: String, gas: Int, status: Option[Boolean], txHash: Option[String], ticketID: String, mode: String, code: Option[String]) extends TransactionEntity[ReleaseAsset] {
-  def mutateTicketID(newTicketID: String): ReleaseAsset = ReleaseAsset(from = from, to = to, pegHash = pegHash, gas = gas, status = status, txHash, ticketID = newTicketID, mode = mode, code = code)
+case class ReleaseAsset(from: String, to: String, pegHash: String,  status: Option[Boolean], txHash: Option[String], ticketID: String, mode: String, code: Option[String]) extends TransactionEntity[ReleaseAsset] {
+  def mutateTicketID(newTicketID: String): ReleaseAsset = ReleaseAsset(from = from, to = to, pegHash = pegHash, status = status, txHash, ticketID = newTicketID, mode = mode, code = code)
 }
 
 
@@ -109,15 +109,13 @@ class ReleaseAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.T
 
   private[models] class ReleaseAssetTable(tag: Tag) extends Table[ReleaseAsset](tag, "ReleaseAsset") {
 
-    def * = (from, to, pegHash, gas, status.?, txHash.?, ticketID, mode, code.?) <> (ReleaseAsset.tupled, ReleaseAsset.unapply)
+    def * = (from, to, pegHash, status.?, txHash.?, ticketID, mode, code.?) <> (ReleaseAsset.tupled, ReleaseAsset.unapply)
 
     def from = column[String]("from")
 
     def to = column[String]("to")
 
     def pegHash = column[String]("pegHash")
-
-    def gas = column[Int]("gas")
 
     def status = column[Boolean]("status")
 
@@ -132,7 +130,7 @@ class ReleaseAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.T
 
   object Service {
 
-    def create(releaseAsset: ReleaseAsset): String = Await.result(add(ReleaseAsset(from = releaseAsset.from, to = releaseAsset.to, pegHash = releaseAsset.pegHash, gas = releaseAsset.gas, status = releaseAsset.status, txHash = releaseAsset.txHash, ticketID = releaseAsset.ticketID, mode = releaseAsset.mode, code = releaseAsset.code)), Duration.Inf)
+    def create(releaseAsset: ReleaseAsset): String = Await.result(add(ReleaseAsset(from = releaseAsset.from, to = releaseAsset.to, pegHash = releaseAsset.pegHash, status = releaseAsset.status, txHash = releaseAsset.txHash, ticketID = releaseAsset.ticketID, mode = releaseAsset.mode, code = releaseAsset.code)), Duration.Inf)
 
     def getTicketIDsOnStatus(): Seq[String] = Await.result(getTicketIDsWithNullStatus, Duration.Inf)
 

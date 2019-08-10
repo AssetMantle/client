@@ -17,11 +17,7 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
-  private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
-
   private val defaultFaucetToken = configuration.get[Int]("blockchain.defaultFaucetToken")
-
-  private val mainAddress = masterAccounts.Service.getAddress(constants.User.MAIN_ACCOUNT)
 
   private val denominationOfGasToken = configuration.get[String]("blockchain.denom.gas")
 
@@ -38,9 +34,9 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
         sendCoinData => {
           try {
             transaction.process[blockchainTransaction.SendCoin, transactionsSendCoin.Request](
-              entity = blockchainTransaction.SendCoin(from = loginState.address, to = sendCoinData.to, amount = sendCoinData.amount, gas = sendCoinData.gas, status = null, txHash = null, ticketID = "", mode = transactionMode, code = null),
+              entity = blockchainTransaction.SendCoin(from = loginState.address, to = sendCoinData.to, amount = sendCoinData.amount, status = null, txHash = null, ticketID = "", mode = transactionMode, code = null),
               blockchainTransactionCreate = blockchainTransactionSendCoins.Service.create,
-              request = transactionsSendCoin.Request(transactionsSendCoin.BaseRequest(from = loginState.address), password = sendCoinData.password, to = sendCoinData.to, amount = Seq(transactionsSendCoin.Amount(denominationOfGasToken, sendCoinData.amount.toString)), gas = sendCoinData.gas, mode = transactionMode),
+              request = transactionsSendCoin.Request(transactionsSendCoin.BaseRequest(from = loginState.address), password = sendCoinData.password, to = sendCoinData.to, amount = Seq(transactionsSendCoin.Amount(denominationOfGasToken, sendCoinData.amount.toString)), mode = transactionMode),
               action = transactionsSendCoin.Service.post,
               onSuccess = blockchainTransactionSendCoins.Utility.onSuccess,
               onFailure = blockchainTransactionSendCoins.Utility.onFailure,
@@ -67,9 +63,8 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
       },
       sendCoinData => {
         try {
-          transactionsSendCoin.Service.post(transactionsSendCoin.Request(transactionsSendCoin.BaseRequest(from = sendCoinData.from), password = sendCoinData.password, to = sendCoinData.to, amount = Seq(transactionsSendCoin.Amount(denominationOfGasToken, sendCoinData.amount.toString)), gas = sendCoinData.gas, mode = transactionMode))
+          transactionsSendCoin.Service.post(transactionsSendCoin.Request(transactionsSendCoin.BaseRequest(from = sendCoinData.from), password = sendCoinData.password, to = sendCoinData.to, amount = Seq(transactionsSendCoin.Amount(denominationOfGasToken, sendCoinData.amount.toString)), mode = sendCoinData.mode))
           Ok(views.html.index(successes = Seq(constants.Response.COINS_SENT)))
-
         }
         catch {
           case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
@@ -122,7 +117,6 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
           BadRequest(views.html.component.master.rejectFaucetRequest(formWithErrors, formWithErrors.data(constants.Form.REQUEST_ID)))
         },
         rejectFaucetRequestData => {
-
           try {
             masterTransactionFaucetRequests.Service.reject(rejectFaucetRequestData.requestID, comment = rejectFaucetRequestData.comment)
             Ok(views.html.index(successes = Seq(constants.Response.FAUCET_REQUEST_REJECTED)))
@@ -145,20 +139,19 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
           BadRequest(views.html.component.master.approveFaucetRequests(formWithErrors, formWithErrors.data(constants.Form.REQUEST_ID), formWithErrors.data(constants.Form.ACCOUNT_ID)))
         },
         approveFaucetRequestFormData => {
-
           try {
             if (masterTransactionFaucetRequests.Service.getStatus(approveFaucetRequestFormData.requestID).isEmpty) {
               val toAddress = masterAccounts.Service.getAddress(approveFaucetRequestFormData.accountID)
               val ticketID = transaction.process[blockchainTransaction.SendCoin, transactionsSendCoin.Request](
-                entity = blockchainTransaction.SendCoin(from = loginState.address, to = toAddress, amount = defaultFaucetToken, gas = approveFaucetRequestFormData.gas, status = null, txHash = null, ticketID = "", mode = transactionMode, code = null),
+                entity = blockchainTransaction.SendCoin(from = loginState.address, to = toAddress, amount = defaultFaucetToken, status = null, txHash = null, ticketID = "", mode = transactionMode, code = null),
                 blockchainTransactionCreate = blockchainTransactionSendCoins.Service.create,
-                request = transactionsSendCoin.Request(transactionsSendCoin.BaseRequest(from = loginState.address), password = approveFaucetRequestFormData.password, to = toAddress, amount = Seq(transactionsSendCoin.Amount(denominationOfGasToken, defaultFaucetToken.toString)), gas = approveFaucetRequestFormData.gas, mode = transactionMode),
+                request = transactionsSendCoin.Request(transactionsSendCoin.BaseRequest(from = loginState.address), password = approveFaucetRequestFormData.password, to = toAddress, amount = Seq(transactionsSendCoin.Amount(denominationOfGasToken, defaultFaucetToken.toString)), mode = transactionMode),
                 action = transactionsSendCoin.Service.post,
                 onSuccess = blockchainTransactionSendCoins.Utility.onSuccess,
                 onFailure = blockchainTransactionSendCoins.Utility.onFailure,
                 updateTransactionHash = blockchainTransactionSendCoins.Service.updateTransactionHash
               )
-              masterTransactionFaucetRequests.Service.accept(approveFaucetRequestFormData.requestID, ticketID, approveFaucetRequestFormData.gas)
+              masterTransactionFaucetRequests.Service.accept(approveFaucetRequestFormData.requestID, ticketID)
               Ok(views.html.index(successes = Seq(constants.Response.FAUCET_REQUEST_APPROVED)))
             } else {
               Ok(views.html.index(failures = Seq(constants.Response.REQUEST_ALREADY_APPROVED_OR_REJECTED)))

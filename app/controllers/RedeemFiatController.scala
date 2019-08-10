@@ -19,8 +19,6 @@ class RedeemFiatController @Inject()(messagesControllerComponents: MessagesContr
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
-  private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
-
   def redeemFiatForm(ownerAddress: String): Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.master.redeemFiat(master.RedeemFiat.form, blockchainACLAccounts.Service.get(ownerAddress).zoneID))
   }
@@ -35,9 +33,9 @@ class RedeemFiatController @Inject()(messagesControllerComponents: MessagesContr
           try {
             val toAddress = blockchainZones.Service.getAddress(redeemFiatData.zoneID)
             transaction.process[blockchainTransaction.RedeemFiat, transactionsRedeemFiat.Request](
-              entity = blockchainTransaction.RedeemFiat(from = loginState.address, to = toAddress, redeemAmount = redeemFiatData.redeemAmount, gas = redeemFiatData.gas, null, null, ticketID = "", mode = transactionMode, null),
+              entity = blockchainTransaction.RedeemFiat(from = loginState.address, to = toAddress, redeemAmount = redeemFiatData.redeemAmount, null, null, ticketID = "", mode = transactionMode, null),
               blockchainTransactionCreate = blockchainTransactionRedeemFiats.Service.create,
-              request = transactionsRedeemFiat.Request(transactionsRedeemFiat.BaseRequest(from = loginState.address), to = toAddress, password = redeemFiatData.password, redeemAmount = redeemFiatData.redeemAmount, gas = redeemFiatData.gas, mode = transactionMode),
+              request = transactionsRedeemFiat.Request(transactionsRedeemFiat.BaseRequest(from = loginState.address), to = toAddress, password = redeemFiatData.password, redeemAmount = redeemFiatData.redeemAmount, mode = transactionMode),
               action = transactionsRedeemFiat.Service.post,
               onSuccess = blockchainTransactionRedeemFiats.Utility.onSuccess,
               onFailure = blockchainTransactionRedeemFiats.Utility.onFailure,
@@ -48,7 +46,6 @@ class RedeemFiatController @Inject()(messagesControllerComponents: MessagesContr
           catch {
             case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
             case blockChainException: BlockChainException => Ok(views.html.index(failures = Seq(blockChainException.failure)))
-
           }
         }
       )
@@ -65,13 +62,12 @@ class RedeemFiatController @Inject()(messagesControllerComponents: MessagesContr
       },
       redeemFiatData => {
         try {
-          transactionsRedeemFiat.Service.post(transactionsRedeemFiat.Request(transactionsRedeemFiat.BaseRequest(from = redeemFiatData.from), to = redeemFiatData.to, password = redeemFiatData.password, redeemAmount = redeemFiatData.redeemAmount, gas = redeemFiatData.gas, mode = transactionMode))
+          transactionsRedeemFiat.Service.post(transactionsRedeemFiat.Request(transactionsRedeemFiat.BaseRequest(from = redeemFiatData.from), to = redeemFiatData.to, password = redeemFiatData.password, redeemAmount = redeemFiatData.redeemAmount, mode = redeemFiatData.mode))
           Ok(views.html.index(successes = Seq(constants.Response.FIAT_REDEEMED)))
         }
         catch {
           case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
           case blockChainException: BlockChainException => Ok(views.html.index(failures = Seq(blockChainException.failure)))
-
         }
       }
     )

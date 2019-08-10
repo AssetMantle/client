@@ -46,7 +46,7 @@ class ACLHashes @Inject()(protected val databaseConfigProvider: DatabaseConfigPr
     }
   }
 
-  private def deleteByHash(hash: String)(implicit executionContext: ExecutionContext) = db.run(aclTable.filter(_.hash === hash).delete.asTry).map {
+  private def deleteByHash(hash: String)= db.run(aclTable.filter(_.hash === hash).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)

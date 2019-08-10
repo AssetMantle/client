@@ -43,7 +43,7 @@ class SendCoin @Inject()(wsClient: WSClient)(implicit configuration: Configurati
 
   case class BaseRequest(from: String, chain_id: String = chainID)
 
-  case class Request(base_req: BaseRequest, password: String, to: String, amount: Seq[Amount], mode: String, gas: Int) extends RequestEntity
+  case class Request(base_req: BaseRequest, password: String, to: String, amount: Seq[Amount], mode: String) extends RequestEntity
 
   object Service {
     def post(request: Request): WSResponse = try {

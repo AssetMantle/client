@@ -7,7 +7,6 @@
     @inputText(sellerExecuteOrderForm(constants.Form.BUYER_ADDRESS).copy(value = Some(buyerAddress)), '_label -> Messages(constants.Form.BUYER_ADDRESS))
     @inputText(sellerExecuteOrderForm(constants.Form.AWB_PROOF_HASH), '_label -> Messages(constants.Form.AWB_PROOF_HASH))
     @inputText(sellerExecuteOrderForm(constants.Form.PEG_HASH).copy(value = Some(pegHash)), '_label -> Messages(constants.Form.PEG_HASH))
-    @inputText(sellerExecuteOrderForm(constants.Form.GAS), '_label -> Messages(constants.Form.GAS))
     @inputPassword(sellerExecuteOrderForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD))
 
     @if(sellerExecuteOrderForm.hasGlobalErrors) {

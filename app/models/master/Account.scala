@@ -161,7 +161,7 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   private def checkById(id: String): Future[Boolean] = db.run(accountTable.filter(_.id === id).exists.result)
 
-  private def deleteById(id: String)(implicit executionContext: ExecutionContext) = db.run(accountTable.filter(_.id === id).delete.asTry).map {
+  private def deleteById(id: String)= db.run(accountTable.filter(_.id === id).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)

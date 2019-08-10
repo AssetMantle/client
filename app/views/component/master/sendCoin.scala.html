@@ -6,7 +6,6 @@
     @CSRF.formField
     @inputText(sendCoinForm(constants.Form.TO), '_label -> Messages(constants.Form.TO))
     @inputText(sendCoinForm(constants.Form.AMOUNT), '_label -> Messages(constants.Form.AMOUNT))
-    @inputText(sendCoinForm(constants.Form.GAS), '_label -> Messages(constants.Form.GAS))
     @inputPassword(sendCoinForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD))
 
     @if(sendCoinForm.hasGlobalErrors) {

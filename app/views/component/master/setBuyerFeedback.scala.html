@@ -7,7 +7,6 @@
     @inputText(setBuyerFeedbackForm(constants.Form.SELLER_ADDRESS).copy(value = Some(sellerAddress)), '_label -> Messages(constants.Form.SELLER_ADDRESS))
     @inputText(setBuyerFeedbackForm(constants.Form.PEG_HASH).copy(value = Some(pegHash)), '_label -> Messages(constants.Form.PEG_HASH))
     @inputText(setBuyerFeedbackForm(constants.Form.RATING), '_label -> Messages(constants.Form.RATING))
-    @inputText(setBuyerFeedbackForm(constants.Form.GAS), '_label -> Messages(constants.Form.GAS))
     @inputPassword(setBuyerFeedbackForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD))
 
     @if(setBuyerFeedbackForm.hasGlobalErrors) {

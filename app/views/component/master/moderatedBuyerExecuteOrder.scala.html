@@ -8,8 +8,7 @@
         @inputText(moderatedBuyerExecuteOrderForm(constants.Form.SELLER_ADDRESS).copy(value = Some(sellerAddress)), '_label -> Messages(constants.Form.SELLER_ADDRESS))
         @inputText(moderatedBuyerExecuteOrderForm(constants.Form.FIAT_PROOF_HASH), '_label -> Messages(constants.Form.FIAT_PROOF_HASH))
         @inputText(moderatedBuyerExecuteOrderForm(constants.Form.PEG_HASH).copy(value = Some(pegHash)), '_label -> Messages(constants.Form.PEG_HASH))
-        @inputText(moderatedBuyerExecuteOrderForm(constants.Form.GAS), '_label -> Messages(constants.Form.GAS))
-        @inputPassword(moderatedBuyerExecuteOrderForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD))
+            @inputPassword(moderatedBuyerExecuteOrderForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD))
 
         @if(moderatedBuyerExecuteOrderForm.hasGlobalErrors) {
             <ul>

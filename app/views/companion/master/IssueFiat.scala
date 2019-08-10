@@ -11,10 +11,9 @@ object IssueFiat {
       constants.Form.TRANSACTION_ID -> nonEmptyText(minLength = 1, maxLength = 20),
       constants.Form.TRANSACTION_AMOUNT -> number(min = 1, max = 10000),
       constants.Form.PASSWORD -> nonEmptyText(minLength = 1, maxLength = 20),
-      constants.Form.GAS -> number(min = 1, max = 10000)
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(requestID: String, accountID: String, transactionID: String, transactionAmount: Int, password: String, gas: Int)
+  case class Data(requestID: String, accountID: String, transactionID: String, transactionAmount: Int, password: String)
 
 }

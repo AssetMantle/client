@@ -31,7 +31,7 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
             Ok(views.html.component.master.commonHome(loginState.username, loginState.userType, loginState.address, blockchainAccounts.Service.getCoins(loginState.address), profilePicture = masterAccountFiles.Service.getProfilePicture(loginState.username)))
         }
       } catch {
-        case baseException: BaseException => NoContent
+        case _: BaseException => NoContent
       }
   }
 
@@ -132,14 +132,13 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
       try {
         Ok(views.html.component.master.availableAssetListWithLogin(blockchainAssets.Service.getAllModerated(blockchainOrders.Service.getAllOrderIds), blockchainAclHashes.Service.get(blockchainAclAccounts.Service.get(loginState.address).aclHash)))
       } catch {
-        case baseException: BaseException => NoContent
+        case _: BaseException => NoContent
       }
   }
 
   def accountComet: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       Ok.chunked(blockchainAccounts.Service.accountCometSource(loginState.username) via Comet.json("parent.accountCometMessage")).as(ContentTypes.HTML)
-
   }
 
   def assetComet: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>

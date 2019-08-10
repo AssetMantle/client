@@ -11,7 +11,6 @@
     @inputText(issueAssetForm(constants.Form.ASSET_PRICE).copy(value = Some(assetPrice.toString)), '_label -> Messages(constants.Form.ASSET_PRICE))
     @inputText(issueAssetForm(constants.Form.QUANTITY_UNIT).copy(value = Some(quantityUnit)), '_label -> Messages(constants.Form.QUANTITY_UNIT))
     @inputText(issueAssetForm(constants.Form.ASSET_QUANTITY).copy(value = Some(assetQuantity.toString)), '_label -> Messages(constants.Form.ASSET_QUANTITY))
-    @inputText(issueAssetForm(constants.Form.GAS), '_label -> Messages(constants.Form.GAS))
     @inputPassword(issueAssetForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD))
 
     @if(issueAssetForm.hasGlobalErrors) {

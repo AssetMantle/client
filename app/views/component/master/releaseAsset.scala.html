@@ -6,7 +6,6 @@
     @CSRF.formField
     @inputText(releaseAssetForm(constants.Form.ADDRESS).copy(value = Some(ownerAddress)), '_label -> Messages(constants.Form.ADDRESS))
     @inputText(releaseAssetForm(constants.Form.PEG_HASH).copy(value = Some(pegHash)), '_label -> Messages(constants.Form.PEG_HASH))
-    @inputText(releaseAssetForm(constants.Form.GAS), '_label -> Messages(constants.Form.GAS))
     @inputPassword(releaseAssetForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD))
 
     @if(releaseAssetForm.hasGlobalErrors) {

@@ -107,6 +107,7 @@ object Form {
   val FIAT_PROOF_HASH = "FIAT_PROOF_HASH"
   val PEG_HASH = "PEG_HASH"
   val GAS = "GAS"
+  val MODE= "MODE"
   val STATUS = "STATUS"
   val BID = "BID"
   val TIME = "TIME"

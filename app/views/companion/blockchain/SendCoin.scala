@@ -10,9 +10,9 @@ object SendCoin {
       constants.Form.TO -> nonEmptyText(minLength = 1, maxLength = 45),
       constants.Form.AMOUNT -> number(min = 1, max = 1000000),
       constants.Form.PASSWORD -> nonEmptyText(minLength = 1, maxLength = 20),
-      constants.Form.GAS -> number(min = 1, max = 10000)
+      constants.Form.MODE-> nonEmptyText(minLength = 4, maxLength = 5)
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(from: String, to: String, amount: Int, password: String, gas: Int)
+  case class Data(from: String, to: String, amount: Int, password: String, mode: String)
 }

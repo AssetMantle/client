@@ -12,10 +12,10 @@ object ChangeSellerBid {
       constants.Form.BID -> number(min = 1, max = 10000),
       constants.Form.TIME -> number(min = 1, max = 10000),
       constants.Form.PEG_HASH -> nonEmptyText(minLength = 1, maxLength = 20),
-      constants.Form.GAS -> number(min = 1, max = 10000)
+      constants.Form.MODE-> nonEmptyText(minLength = 4, maxLength = 5)
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(from: String, password: String, to: String, bid: Int, time: Int, pegHash: String, gas: Int)
+  case class Data(from: String, password: String, to: String, bid: Int, time: Int, pegHash: String, mode: String)
 
 }

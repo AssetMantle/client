@@ -7,7 +7,6 @@
     @inputText(approveFaucetRequestForm(constants.Form.REQUEST_ID).copy(value = Some(requestID)), '_label -> Messages(constants.Form.REQUEST_ID))
     @inputText(approveFaucetRequestForm(constants.Form.ACCOUNT_ID).copy(value = Some(accountID)), '_label -> Messages(constants.Form.ACCOUNT_ID))
     @inputPassword(approveFaucetRequestForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD))
-    @inputText(approveFaucetRequestForm(constants.Form.GAS), '_label -> Messages(constants.Form.GAS))
 
     @if(approveFaucetRequestForm.hasGlobalErrors) {
         <ul>

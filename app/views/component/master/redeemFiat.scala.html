@@ -6,7 +6,6 @@
     @CSRF.formField
     @inputText(redeemFiatForm(constants.Form.ZONE_ID).copy(value = Some(zoneID)), '_label -> Messages(constants.Form.ZONE_ID))
     @inputText(redeemFiatForm(constants.Form.REDEEM_AMOUNT), '_label -> Messages(constants.Form.REDEEM_AMOUNT))
-    @inputText(redeemFiatForm(constants.Form.GAS), '_label -> Messages(constants.Form.GAS))
     @inputPassword(redeemFiatForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD))
 
     @if(redeemFiatForm.hasGlobalErrors) {

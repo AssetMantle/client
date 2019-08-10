@@ -15,10 +15,10 @@ object IssueAsset {
       constants.Form.ASSET_QUANTITY -> number(min = 1, max = 10000),
       constants.Form.MODERATED -> boolean,
       constants.Form.PASSWORD -> nonEmptyText(minLength = 1, maxLength = 20),
-      constants.Form.GAS -> number(min = 1, max = 10000)
+      constants.Form.MODE-> nonEmptyText(minLength = 4, maxLength = 5)
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(from: String, to: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, moderated: Boolean, password: String, gas: Int)
+  case class Data(from: String, to: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, moderated: Boolean, password: String, mode: String)
 
 }

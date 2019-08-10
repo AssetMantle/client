@@ -20,7 +20,7 @@ import scala.concurrent.duration.{Duration, _}
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Account(address: String, coins: Int, publicKey: String, accountNumber: Int, sequence: Int, dirtyBit: Boolean)
+case class Account(address: String, coins: String, publicKey: String, accountNumber: Int, sequence: Int, dirtyBit: Boolean)
 
 case class AccountCometMessage(username: String, message: JsValue)
 
@@ -75,7 +75,7 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   private def getAddressesByDirtyBit(dirtyBit: Boolean): Future[Seq[String]] = db.run(accountTable.filter(_.dirtyBit === dirtyBit).map(_.address).result)
 
-  private def updateSequenceCoinsAndDirtyBitByAddress(address: String, sequence: Int, coins: Int, dirtyBit: Boolean): Future[Int] = db.run(accountTable.filter(_.address === address).map(x => (x.sequence, x.coins, x.dirtyBit)).update((sequence, coins, dirtyBit)).asTry).map {
+  private def updateSequenceCoinsAndDirtyBitByAddress(address: String, sequence: Int, coins: String, dirtyBit: Boolean): Future[Int] = db.run(accountTable.filter(_.address === address).map(x => (x.sequence, x.coins, x.dirtyBit)).update((sequence, coins, dirtyBit)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -95,7 +95,7 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     }
   }
 
-  private def getCoinsByAddress(address: String): Future[Int] = db.run(accountTable.filter(_.address === address).map(_.coins).result.head.asTry).map {
+  private def getCoinsByAddress(address: String): Future[String] = db.run(accountTable.filter(_.address === address).map(_.coins).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -105,7 +105,7 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     }
   }
 
-  private def deleteByAddress(address: String)(implicit executionContext: ExecutionContext) = db.run(accountTable.filter(_.address === address).delete.asTry).map {
+  private def deleteByAddress(address: String)= db.run(accountTable.filter(_.address === address).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -121,7 +121,7 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
     def address = column[String]("address", O.PrimaryKey)
 
-    def coins = column[Int]("coins")
+    def coins = column[String]("coins")
 
     def publicKey = column[String]("publicKey")
 
@@ -136,14 +136,14 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
     def create(username: String, password: String): String = {
       val addKeyResponse = addKey.Service.post(addKey.Request(username, password))
-      Await.result(add(Account(addKeyResponse.address, 0, addKeyResponse.pubkey, -1, 0, dirtyBit = false)), Duration.Inf)
+      Await.result(add(Account(addKeyResponse.address, "0", addKeyResponse.pubkey, -1, 0, dirtyBit = false)), Duration.Inf)
     }
 
-    def refreshDirty(address: String, sequence: Int, coins: Int): Int = Await.result(updateSequenceCoinsAndDirtyBitByAddress(address, sequence, coins, dirtyBit = false), Duration.Inf)
+    def refreshDirty(address: String, sequence: Int, coins: String): Int = Await.result(updateSequenceCoinsAndDirtyBitByAddress(address, sequence, coins, dirtyBit = false), Duration.Inf)
 
     def get(address: String): Account = Await.result(findByAddress(address), Duration.Inf)
 
-    def getCoins(address: String): Int = Await.result(getCoinsByAddress(address), Duration.Inf)
+    def getCoins(address: String): String = Await.result(getCoinsByAddress(address), Duration.Inf)
 
     def getDirtyAddresses: Seq[String] = Await.result(getAddressesByDirtyBit(dirtyBit = true), Duration.Inf)
 
@@ -165,10 +165,11 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
         Thread.sleep(sleepTime)
         for (dirtyAddress <- dirtyAddresses) {
           val responseAccount = getAccount.Service.get(dirtyAddress)
-          Service.refreshDirty(responseAccount.value.address, responseAccount.value.sequence.toInt, responseAccount.value.coins.get.filter(_.denom == denominationOfGasToken).map(_.amount.toInt).sum)
+          Service.refreshDirty(responseAccount.value.address, responseAccount.value.sequence.toInt, responseAccount.value.coins.get.filter(_.denom == denominationOfGasToken).map(_.amount).head)
           mainAccountActor ! AccountCometMessage(username = masterAccounts.Service.getId(dirtyAddress), message = Json.toJson(constants.Comet.PING))
         }
       } catch {
+        case baseException: BaseException => logger.error(baseException.failure.message, baseException)
         case blockChainException: BlockChainException => logger.error(blockChainException.failure.message, blockChainException)
       }
     }

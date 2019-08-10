@@ -19,8 +19,6 @@ class SetSellerFeedbackController @Inject()(messagesControllerComponents: Messag
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
-  private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
-
   def setSellerFeedbackForm(buyerAddress: String, pegHash: String): Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.master.setSellerFeedback(master.SetSellerFeedback.form, buyerAddress, pegHash))
   }
@@ -34,9 +32,9 @@ class SetSellerFeedbackController @Inject()(messagesControllerComponents: Messag
         setSellerFeedbackData => {
           try {
             transaction.process[blockchainTransaction.SetSellerFeedback, transactionsSetSellerFeedback.Request](
-              entity = blockchainTransaction.SetSellerFeedback(from = loginState.address, to = setSellerFeedbackData.buyerAddress, pegHash = setSellerFeedbackData.pegHash, rating = setSellerFeedbackData.rating, gas = setSellerFeedbackData.gas, status = null, txHash = null, ticketID = "", code = null, mode = transactionMode),
+              entity = blockchainTransaction.SetSellerFeedback(from = loginState.address, to = setSellerFeedbackData.buyerAddress, pegHash = setSellerFeedbackData.pegHash, rating = setSellerFeedbackData.rating, status = null, txHash = null, ticketID = "", code = null, mode = transactionMode),
               blockchainTransactionCreate = blockchainTransactionSetSellerFeedbacks.Service.create,
-              request = transactionsSetSellerFeedback.Request(transactionsSetSellerFeedback.BaseRequest(from = loginState.address), to = setSellerFeedbackData.buyerAddress, password = setSellerFeedbackData.password, pegHash = setSellerFeedbackData.pegHash, rating = setSellerFeedbackData.rating, gas = setSellerFeedbackData.gas, mode = transactionMode),
+              request = transactionsSetSellerFeedback.Request(transactionsSetSellerFeedback.BaseRequest(from = loginState.address), to = setSellerFeedbackData.buyerAddress, password = setSellerFeedbackData.password, pegHash = setSellerFeedbackData.pegHash, rating = setSellerFeedbackData.rating, mode = transactionMode),
               action = transactionsSetSellerFeedback.Service.post,
               onSuccess = blockchainTransactionSetSellerFeedbacks.Utility.onSuccess,
               onFailure = blockchainTransactionSetSellerFeedbacks.Utility.onFailure,
@@ -72,7 +70,7 @@ class SetSellerFeedbackController @Inject()(messagesControllerComponents: Messag
       },
       setSellerFeedbackData => {
         try {
-          transactionsSetSellerFeedback.Service.post(transactionsSetSellerFeedback.Request(transactionsSetSellerFeedback.BaseRequest(from = setSellerFeedbackData.from), to = setSellerFeedbackData.to, password = setSellerFeedbackData.password, pegHash = setSellerFeedbackData.pegHash, rating = setSellerFeedbackData.rating, gas = setSellerFeedbackData.gas, mode = transactionMode))
+          transactionsSetSellerFeedback.Service.post(transactionsSetSellerFeedback.Request(transactionsSetSellerFeedback.BaseRequest(from = setSellerFeedbackData.from), to = setSellerFeedbackData.to, password = setSellerFeedbackData.password, pegHash = setSellerFeedbackData.pegHash, rating = setSellerFeedbackData.rating, mode = setSellerFeedbackData.mode))
           Ok(views.html.index(successes = Seq(constants.Response.SELLER_FEEDBACK_SET)))
         }
         catch {
