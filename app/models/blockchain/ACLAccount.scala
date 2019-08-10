@@ -124,6 +124,7 @@ class ACLAccounts @Inject()(protected val databaseConfigProvider: DatabaseConfig
           Service.insertOrUpdate(responseAccount.value.address, responseAccount.value.zoneID, responseAccount.value.organizationID, responseAccount.value.acl, dirtyBit = false)
         }
       } catch {
+        case baseException: BaseException => logger.error(baseException.failure.message, baseException)
         case blockChainException: BlockChainException => logger.error(blockChainException.failure.message, blockChainException)
       }
     }

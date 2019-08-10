@@ -161,12 +161,10 @@ class Orders @Inject()(shutdownActors: ShutdownActors, masterAccounts: master.Ac
             blockchainTraderFeedbackHistories.Service.create(negotiation.sellerAddress, negotiation.buyerAddress, negotiation.sellerAddress, negotiation.assetPegHash, rating = "")
             blockchainTraderFeedbackHistories.Service.create(negotiation.buyerAddress, negotiation.buyerAddress, negotiation.sellerAddress, negotiation.assetPegHash,  rating = "")
             blockchainNegotiations.Service.deleteNegotiations(negotiation.assetPegHash)
-
           }
           Service.insertOrUpdate(dirtyOrder.id, awbProofHash = Option(orderResponse.value.awbProofHash), fiatProofHash = Option(orderResponse.value.fiatProofHash), dirtyBit = false)
           mainOrderActor ! OrderCometMessage(username = masterAccounts.Service.getId(negotiation.buyerAddress), message = Json.toJson(constants.Comet.PING))
           mainOrderActor ! OrderCometMessage(username = masterAccounts.Service.getId(negotiation.sellerAddress), message = Json.toJson(constants.Comet.PING))
-
         }
         catch {
           case blockChainException: BlockChainException => logger.error(blockChainException.failure.message, blockChainException)
