@@ -60,7 +60,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
     Ok(views.html.component.master.userKycFileUpdate(documentType = documentType))
   }
 
-  def uploadUserKYC(documentType: String) = Action(parse.multipartFormData) { implicit request =>
+  def uploadUserKyc(documentType: String) = Action(parse.multipartFormData) { implicit request =>
     FileUpload.form.bindFromRequest.fold(
       formWithErrors => {
         BadRequest(formWithErrors.errors.mkString("\n"))
@@ -81,7 +81,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
     )
   }
 
-  def storeUserKYC(name: String, documentType: String): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
+  def storeUserKyc(name: String, documentType: String): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val path = fileResourceManager.getAccountKycFilePath(documentType)
       try {
@@ -100,7 +100,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
       }
   }
 
-  def updateUserKYC(name: String, documentType: String): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
+  def updateUserKyc(name: String, documentType: String): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val newPath = fileResourceManager.getAccountKycFilePath(documentType)
       try {
