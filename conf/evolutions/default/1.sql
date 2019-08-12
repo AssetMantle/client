@@ -31,8 +31,8 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Account_BC"
   "address"       VARCHAR NOT NULL,
   "coins"         VARCHAR NOT NULL,
   "publicKey"     VARCHAR NOT NULL,
-  "accountNumber" INT     NOT NULL,
-  "sequence"      INT     NOT NULL,
+  "accountNumber" VARCHAR NOT NULL,
+  "sequence"      VARCHAR NOT NULL,
   "dirtyBit"      BOOLEAN NOT NULL,
   PRIMARY KEY ("address")
 );
@@ -698,8 +698,8 @@ INSERT INTO blockchain."Account_BC" ("address", "coins", "publicKey", "accountNu
 VALUES ('commit17jxmr4felwgeugmeu6c4gr4vq0hmeaxlamvxjg',
         '1000',
         'commitpub1addwnpepqty3h2wuanwkjw5g2jn6p0rwcy7j7xm985t8kg8zpkp7ay83rrz2276x7qn',
-        0,
-        0,
+        '0',
+        '0',
         true);
 
 INSERT INTO master."Account" ("id", "secretHash", "accountAddress", "language", "userType", "status")
