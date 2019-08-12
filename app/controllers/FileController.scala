@@ -336,7 +336,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
     Ok(views.html.component.master.zoneKycFileUpdate(documentType = documentType))
   }
 
-  def uploadZoneKYC(documentType: String) = Action(parse.multipartFormData) { implicit request =>
+  def uploadZoneKyc(documentType: String) = Action(parse.multipartFormData) { implicit request =>
     FileUpload.form.bindFromRequest.fold(
       formWithErrors => {
         BadRequest(formWithErrors.errors.mkString("\n"))
@@ -357,7 +357,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
     )
   }
 
-  def storeZoneKYC(name: String, documentType: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+  def storeZoneKyc(name: String, documentType: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val path = fileResourceManager.getZoneKycFilePath(documentType)
       try {
@@ -376,7 +376,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
       }
   }
 
-  def updateZoneKYC(name: String, documentType: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+  def updateZoneKyc(name: String, documentType: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val newPath = fileResourceManager.getZoneKycFilePath(documentType)
       try {
@@ -405,7 +405,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
     Ok(views.html.component.master.organizationKycFileUpdate(documentType = documentType))
   }
 
-  def uploadOrganizationKYC(documentType: String) = Action(parse.multipartFormData) { implicit request =>
+  def uploadOrganizationKyc(documentType: String) = Action(parse.multipartFormData) { implicit request =>
     FileUpload.form.bindFromRequest.fold(
       formWithErrors => {
         BadRequest(formWithErrors.errors.mkString("\n"))
@@ -426,7 +426,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
     )
   }
 
-  def storeOrganizationKYC(name: String, documentType: String): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+  def storeOrganizationKyc(name: String, documentType: String): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val path = fileResourceManager.getOrganizationKycFilePath(documentType)
       try {
@@ -445,7 +445,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
       }
   }
 
-  def updateOrganizationKYC(name: String, documentType: String): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+  def updateOrganizationKyc(name: String, documentType: String): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val newPath = fileResourceManager.getOrganizationKycFilePath(documentType)
       try {
@@ -475,7 +475,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
     Ok(views.html.component.master.traderKycFileUpdate(documentType = documentType))
   }
 
-  def uploadTraderKYC(documentType: String) = Action(parse.multipartFormData) { implicit request =>
+  def uploadTraderKyc(documentType: String) = Action(parse.multipartFormData) { implicit request =>
     FileUpload.form.bindFromRequest.fold(
       formWithErrors => {
         BadRequest(formWithErrors.errors.mkString("\n"))
@@ -496,7 +496,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
     )
   }
 
-  def storeTraderKYC(name: String, documentType: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def storeTraderKyc(name: String, documentType: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val path = fileResourceManager.getTraderKycFilePath(documentType)
       try {
@@ -515,7 +515,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
       }
   }
 
-  def updateTraderKYC(name: String, documentType: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def updateTraderKyc(name: String, documentType: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val newPath = fileResourceManager.getTraderKycFilePath(documentType)
       try {

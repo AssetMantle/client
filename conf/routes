@@ -96,16 +96,16 @@ GET         /zoneUpdate                                                  control
 GET         /zoneUpload/updateFile                                       controllers.FileController.updateZoneKYC(name: String, documentType: String)
 
 GET         /organizationUpload                                          controllers.FileController.uploadOrganizationKycForm(documentType: String)
-POST        /organizationUpload/file                                     controllers.FileController.uploadOrganizationKYC(documentType: String)
-GET         /organizationUpload/storeFile                                controllers.FileController.storeOrganizationKYC(name: String, documentType: String)
+POST        /organizationUpload/file                                     controllers.FileController.uploadOrganizationKyc(documentType: String)
+GET         /organizationUpload/storeFile                                controllers.FileController.storeOrganizationKyc(name: String, documentType: String)
 GET         /organizationUpdate                                          controllers.FileController.updateOrganizationKycForm(documentType: String)
-GET         /organizationUpload/updateFile                               controllers.FileController.updateOrganizationKYC(name: String, documentType: String)
+GET         /organizationUpload/updateFile                               controllers.FileController.updateOrganizationKyc(name: String, documentType: String)
 
 GET         /traderUpload                                                controllers.FileController.uploadTraderKycForm(documentType: String)
-POST        /traderUpload/file                                           controllers.FileController.uploadTraderKYC(documentType: String)
-GET         /traderUpload/storeFile                                      controllers.FileController.storeTraderKYC(name: String, documentType: String)
+POST        /traderUpload/file                                           controllers.FileController.uploadTraderKyc(documentType: String)
+GET         /traderUpload/storeFile                                      controllers.FileController.storeTraderKyc(name: String, documentType: String)
 GET         /traderUpdate                                                controllers.FileController.updateTraderKycForm(documentType: String)
-GET         /traderUpload/updateFile                                     controllers.FileController.updateTraderKYC(name: String, documentType: String)
+GET         /traderUpload/updateFile                                     controllers.FileController.updateTraderKyc(name: String, documentType: String)
 
 GET         /master/logout                                               controllers.LogoutController.logoutForm
 POST        /master/logout                                               controllers.LogoutController.logout
