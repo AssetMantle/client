@@ -29,10 +29,10 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Organization_BC"
 CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Account_BC"
 (
   "address"       VARCHAR NOT NULL,
-  "coins"         INT     NOT NULL,
+  "coins"         VARCHAR NOT NULL,
   "publicKey"     VARCHAR NOT NULL,
-  "accountNumber" INT     NOT NULL,
-  "sequence"      INT     NOT NULL,
+  "accountNumber" VARCHAR NOT NULL,
+  "sequence"      VARCHAR NOT NULL,
   "dirtyBit"      BOOLEAN NOT NULL,
   PRIMARY KEY ("address")
 );
@@ -696,11 +696,11 @@ ALTER TABLE MASTER_TRANSACTION."EmailOTP"
 
 INSERT INTO blockchain."Account_BC" ("address", "coins", "publicKey", "accountNumber", "sequence", "dirtyBit")
 VALUES ('cosmos14375p72aunmu3vuwevu5e4vgegekd0n0sj9czh',
-        1000,
+        '1000',
         'VMzqh7vxmb/7W4w+1DQxAuISeI1dbCYPdcdIEh/HhRg=',
-        0,
-        0,
-        false);
+        '0',
+        '0',
+        true);
 
 INSERT INTO master."Account" ("id", "secretHash", "accountAddress", "language", "userType", "status")
 VALUES ('main', '-1886325765', 'cosmos14375p72aunmu3vuwevu5e4vgegekd0n0sj9czh', 'en', 'GENESIS', 'NO_CONTACT');
