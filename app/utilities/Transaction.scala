@@ -58,7 +58,7 @@ class Transaction @Inject()(getTxHashResponse: GetTxHashResponse, getResponse: G
     for (ticketID <- ticketIDsSeq) {
       try {
         val response: WSResponse = if (kafkaEnabled) {getResponse.Service.get(ticketID)} else getTxHashResponse.Service.get(getTransactionHash(ticketID).getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)))
-        val blockResponse = transactionMode match {
+        val blockResponse: BlockResponse = transactionMode match {
           case constants.Transactions.BLOCK_MODE => utilities.JSON.getResponseFromJson[BlockResponse](response)
           case constants.Transactions.ASYNC_MODE => utilities.JSON.getResponseFromJson[BlockResponse](getTxHashResponse.Service.get(utilities.JSON.getResponseFromJson[AsyncResponse](response).txhash))
           case constants.Transactions.SYNC_MODE => utilities.JSON.getResponseFromJson[BlockResponse](getTxHashResponse.Service.get(utilities.JSON.getResponseFromJson[SyncResponse](response).txhash))
@@ -66,7 +66,7 @@ class Transaction @Inject()(getTxHashResponse: GetTxHashResponse, getResponse: G
         if (blockResponse.code.isEmpty) onSuccess(ticketID, blockResponse) else onFailure(ticketID, blockResponse.code.get.toString)
       } catch {
         case blockChainException: BlockChainException => logger.error(blockChainException.failure.message, blockChainException)
-          if (blockChainException.failure.message != """RESPONSE.FAILURE.{"response":"Request in process, wait and try after some time"}""") {
+          if (blockChainException.failure.message != """RESPONSE.FAILURE.{"response":"Request in process, wait and try after some time"}""" || !blockChainException.failure.message.matches("""RESPONSE.FAILURE.{"error":"Tx: response error: RPC error -32603 - Internal error: Tx .\w+. not found"})""")) {
             onFailure(ticketID, blockChainException.failure.message)
           }
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
