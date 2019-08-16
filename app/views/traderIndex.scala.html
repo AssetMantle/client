@@ -8,11 +8,11 @@
 @right = {
 
 @if(aclHash.buyerExecuteOrder) {
-    <a onclick="getForm(jsRoutes.controllers.BuyerExecuteOrderController.unmoderatedBuyerExecuteOrderForm())">@Messages(constants.Form.BUYER_EXECUTE_ORDER)</a>
+    <a onclick="getForm(jsRoutes.controllers.BuyerExecuteOrderController.buyerExecuteOrderForm())">@Messages(constants.Form.BUYER_EXECUTE_ORDER)</a>
 } <br>
 
 @if(aclHash.sellerExecuteOrder) {
-    <a onclick="getForm(jsRoutes.controllers.SellerExecuteOrderController.unmoderatedSellerExecuteOrderForm())">@Messages(constants.Form.SELLER_EXECUTE_ORDER)</a>
+    <a onclick="getForm(jsRoutes.controllers.SellerExecuteOrderController.sellerExecuteOrderForm())">@Messages(constants.Form.SELLER_EXECUTE_ORDER)</a>
 } <br>
 }
 
