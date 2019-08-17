@@ -2,12 +2,21 @@
 @import views.companion.master.ReleaseAsset
 
 @(releaseAssetForm: Form[ReleaseAsset.Data], ownerAddress:String, pegHash: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+
 @form(action = routes.ReleaseAssetController.releaseAsset, 'onkeypress -> "validateForm(event,this)") {
+    <div class="latest_card-header latest_card-header-primary text-center">
+        <h4 class="latest_card-title">@Messages(constants.Form.REJECT_VERIFY_ZONE_REQUEST)</h4>
+    </div>
+    <div class="latest_card-body">
     @CSRF.formField
-    @inputText(releaseAssetForm(constants.Form.ADDRESS).copy(value = Some(ownerAddress)), '_label -> Messages(constants.Form.ADDRESS))
-    @inputText(releaseAssetForm(constants.Form.PEG_HASH).copy(value = Some(pegHash)), '_label -> Messages(constants.Form.PEG_HASH))
-    @inputText(releaseAssetForm(constants.Form.GAS), '_label -> Messages(constants.Form.GAS))
-    @inputPassword(releaseAssetForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD))
+    @inputText(releaseAssetForm(constants.Form.ADDRESS).copy(value = Some(ownerAddress)), '_label -> Messages(constants.Form.ADDRESS),
+        'class -> "form-control",'placeholder->Messages(constants.Form.ADDRESS),'required->true)
+    @inputText(releaseAssetForm(constants.Form.PEG_HASH).copy(value = Some(pegHash)), '_label -> Messages(constants.Form.PEG_HASH),
+        'class -> "form-control",'placeholder->Messages(constants.Form.PEG_HASH),'required->true)
+    @inputText(releaseAssetForm(constants.Form.GAS), '_label -> Messages(constants.Form.GAS),
+        'class -> "form-control",'placeholder->Messages(constants.Form.GAS),'required->true)
+    @inputPassword(releaseAssetForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD),
+        'class -> "form-control",'placeholder->Messages(constants.Form.PASSWORD),'required->true)
 
     @if(releaseAssetForm.hasGlobalErrors) {
         <ul>
@@ -16,5 +25,7 @@
         }
         </ul>
     }
-    <button type="button" onclick="submitForm(this)">@Messages(constants.Form.RELEASE_ASSET)</button>
+    <button type="button" class="btn btn-sm btn-primary" onclick="submitForm(this)">@Messages(constants.Form.RELEASE_ASSET)</button>
+    </div>
+
 }

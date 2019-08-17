@@ -1,63 +1,25 @@
 @import models.master.Organization
-@import controllers.actions.LoginState
 
-@(organizations: Seq[Organization])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
-@common(Messages(constants.Form.INDEX))(Html(""))(center)(Html(""))
-@center ={
-    <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="@controllers.routes.AddZoneController.viewZonesInGenesis()">@Messages(constants.Form.ZONES)</a></li>
-        <li class="breadcrumb-item"><a>@Messages(constants.Form.ORGANIZATIONS)</a></li>
-    </ol>
-    <div class="card">
-        <div class="card-header">
-            <h4 class="leftText heading">@Messages(constants.Form.ORGANIZATIONS)</h4>
-        </div>
-        <div class="card-body">
-        <table class="table">
-            <thead>
-                <tr>
-                    <td>@Messages(constants.Form.ID)</td>
-                    <td>@Messages(constants.Form.ACCOUNT_ID)</td>
-                    <td>@Messages(constants.Form.NAME)</td>
-                    <td>@Messages(constants.Form.ADDRESS)</td>
-                    <td>@Messages(constants.Form.PHONE)</td>
-                    <td>@Messages(constants.Form.EMAIL)</td>
-                    <td></td>
-
-                </tr>
-            </thead>
-            @for(organization <- organizations) {
-                <tbody>
-                    <tr>
-                        <td>@organization.id</td>
-                        <td>@organization.accountID</td>
-                        <td>@organization.name</td>
-                        <td>@organization.address</td>
-                        <td>@organization.phone </td>
-                        <td>@organization.email </td>
-
-                        <td><a href="@controllers.routes.SetACLController.viewTradersInOrganizationForGenesis(organization.id)">view</a></td>
-                    </tr>
-                </tbody>
-            }
-        </table>
-        </div>
-    </div>
+@(organizations: Seq[Organization])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
+<div class="col-md-12">
 @for(organization <- organizations) {
-    <div class="flexItem box secondBox leftText lightBlue">
+    <div class="flexItem card secondBox leftText lightBlue">
+        <div class="card-body">
         <span class="red">@Messages(constants.Form.ID)</span> :@organization.id <br>
         <span class="red">@Messages(constants.Form.ACCOUNT_ID)</span> :@organization.accountID <br>
         <span class="red">@Messages(constants.Form.NAME)</span> :@organization.name <br>
         <span class="red">@Messages(constants.Form.ADDRESS)</span> :@organization.address <br>
         <span class="red">@Messages(constants.Form.PHONE)</span> :@organization.phone <br>
         <span class="red">@Messages(constants.Form.EMAIL)</span> :@organization.email <br>
-        <div class="box">
+        </div>
+        <div class="leftMargin">
             <div>
-                <h2 class="showHide toggleElement centerText"  onclick="fetchOrShowHide('@organization.accountID', jsRoutes.controllers.SetACLController.viewTradersInOrganizationForGenesis('@organization.id') ,this)">@Messages(constants.Form.TRADERS)</h2>
+                <h4 class="showHide toggleElement centerText"  onclick="fetchOrShowHide('@organization.accountID', jsRoutes.controllers.SetACLController.viewTradersInOrganizationForGenesis('@organization.id') ,this)">@Messages(constants.Form.TRADERS)</h4>
             </div>
             <div id="@organization.accountID" class="flexContainer rightPadding scrollableThird"></div>
         </div>
     </div>
-}
+
 
 }
+</div>

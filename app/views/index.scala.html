@@ -6,8 +6,8 @@
 
 
 @center = {
-
-    <div class="close-sidebar"><span onclick="openNav()">==</span>
+    <div class="sidebar_btn" id="sidebar_btn" onclick="openNav()">
+        <span><i class="fa fa-bars" aria-hidden="true"></i></span>
     </div>
    <div class="">
        @search()
@@ -22,7 +22,7 @@
                 <div class="col-md-3 col-sm-6">
                     <div class="card card-body h-65">
                         <p id="tokensValue" class="heading"></p>
-                        <h5 class="lower_case">@Messages(constants.Form.TOKENS)</h5>
+                        <h5>@Messages(constants.Form.TOKENS)</h5>
                     </div>
                 </div>
                 <div class="col-md-3 col-sm-6">
@@ -31,10 +31,10 @@
             </div>
             <div id="indexBottomDivision" >
                 <div class="row">
-                    <div class="col-md-12">
-                        <div>
+                    <div class="col-md-6 d-flex">
+                        <div class="flexGrowth">
                             <div class="card">
-                                <div class="card-header"><span class="heading">Block Time Graph</span></div>
+                                <div class="card-header"><span class="heading">BLOCK TIME GRAPH</span></div>
                                 <div class="card-body">
                                       <div class="flexGraph flexGrowth"> @blockTimeGraph()</div>
                                 </div>
@@ -42,20 +42,17 @@
                         </div>
 
                     </div>
-                    <div class="col-md-12">
-                        <div class="flexGrowth card leftText">
-                            <div class="card-header">
-                                <span class="heading">@Messages(constants.Form.ASSETS) </span>
-                            </div>
-                            <div class="card-body">
+                    <div class="col-md-6 col-lg-6 d-flex ">
+                        <div class="flexGrowth centerText" id="transactionExplorer"> @transactionExplorer()</div>
+                    </div>
+                </div>
+
+
                                 <div id="availableAssetList" class="flexContainer">
                                 </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6 col-lg-6">
-                        <div class=" flexGrowth centerText" id="transactionExplorer"> @transactionExplorer()</div>
-                    </div>
+
+
+
                     <div class="col-md-6">
                         <div class="flexGrowth centerText" id="blockExplorer">@blockExplorer()</div>
                     </div>

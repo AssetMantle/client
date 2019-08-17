@@ -1,9 +1,9 @@
 .navbar {
     border: 0;
+    color:$white-color;
     border-radius: $border-radius-base;
     margin-bottom: 20px;
-    @include navbar-colors($white-color, $navbar-color);
-
+    background:#10292e;
     &.fixed-top{
         border-radius: 0;
     }
@@ -88,6 +88,7 @@
           vertical-align: middle;
           outline: 0;
           display: block;
+            background: #fff;
           border-radius: 1px;
 
             & + .navbar-toggler-icon{
@@ -115,6 +116,7 @@
         height: 50px;
         font-size: $navbar-brand-font-size - 0.125;
         line-height: 30px;
+        bottom:8px;
     }
 
     &.bg-primary{

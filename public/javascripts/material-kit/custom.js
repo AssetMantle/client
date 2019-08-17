@@ -9,8 +9,13 @@ function modal_close()
 {
     document.getElementById("commonModal").style.display = "none";
 }
-
-
+//
+// $(document).mouseup(function (e) {
+//     var popup = $("#mySidenav");
+//     if (!$('#sidebar_btn').is(e.target) && !popup.is(e.target) && popup.has(e.target).length == 0) {
+//         document.getElementById("mySidenav").style.width = "0px";
+//     }
+// });
 function copyToClipboard(elementId) {
 
     // Create an auxiliary hidden input

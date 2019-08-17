@@ -17,10 +17,10 @@
             </div>
             <div class="centerText">
                 @if(aclHash.changeBuyerBid) {
-                    <button onclick="getForm(jsRoutes.controllers.ChangeBuyerBidController.changeBuyerBidForm('@asset.ownerAddress','@asset.pegHash'))">@Messages(constants.Form.NEGOTIATE)</button>
+                    <button class="btn btn-sm btn-primary" onclick="getForm(jsRoutes.controllers.ChangeBuyerBidController.changeBuyerBidForm('@asset.ownerAddress','@asset.pegHash'))">@Messages(constants.Form.NEGOTIATE)</button>
                 } <br>
                 @if(aclHash.confirmBuyerBid) {
-                    <button onclick="getForm(jsRoutes.controllers.ConfirmBuyerBidController.confirmBuyerBidForm('@asset.ownerAddress','@asset.pegHash', @asset.assetPrice))">@Messages(constants.Form.ACCEPT_OFFER)</button>
+                    <button class="btn btn-sm btn-primary" onclick="getForm(jsRoutes.controllers.ConfirmBuyerBidController.confirmBuyerBidForm('@asset.ownerAddress','@asset.pegHash', @asset.assetPrice))">@Messages(constants.Form.ACCEPT_OFFER)</button>
                 } <br>
             </div>
         </div>

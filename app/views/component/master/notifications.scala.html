@@ -1,5 +1,5 @@
 @(notifications: Seq[models.masterTransaction.Notification] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-<div id="notificationContainer" class = "notificationContainer">
+<div id="notificationContainer" class = "notificationContainer fixed_modal">
     @for(notification <- notifications) {
         <div class = "notification-box">
             <div @if(notification.read) {
@@ -14,5 +14,6 @@
     }
 <div class = "notification"> <button class="btn-full-width inside-button" onclick="loadMoreNotifications()">@Messages(constants.Form.LOAD_MORE_NOTIFICATIONS)</button></div>
 </div>
+
 <script src="@routes.Assets.versioned("javascripts/markNotificationRead.js")" type="text/javascript"></script>
 <script src="@routes.Assets.versioned("javascripts/loadMoreNotifications.js")" type="text/javascript"></script>

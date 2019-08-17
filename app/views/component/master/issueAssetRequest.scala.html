@@ -2,17 +2,31 @@
 @import views.companion.master.IssueAssetRequest
 
 @(issueAssetRequestForm: Form[IssueAssetRequest.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+    <div class="fixed_modal">
 @form(action = routes.IssueAssetController.issueAssetRequest, 'onkeypress -> "validateForm(event,this)") {
     @CSRF.formField
-    @inputText(issueAssetRequestForm(constants.Form.DOCUMENT_HASH), '_label -> Messages(constants.Form.DOCUMENT_HASH))
-    @inputText(issueAssetRequestForm(constants.Form.ASSET_TYPE), '_label -> Messages(constants.Form.ASSET_TYPE))
-    @inputText(issueAssetRequestForm(constants.Form.ASSET_PRICE), '_label -> Messages(constants.Form.ASSET_PRICE))
-    @inputText(issueAssetRequestForm(constants.Form.QUANTITY_UNIT), '_label -> Messages(constants.Form.QUANTITY_UNIT))
-    @inputText(issueAssetRequestForm(constants.Form.ASSET_QUANTITY), '_label -> Messages(constants.Form.ASSET_QUANTITY))
+    <div class="latest_card-header latest_card-header-primary text-center">
+        <h4 class="latest_card-title">@Messages(constants.Form.ISSUE_ASSET_REQUEST)</h4>
+    </div>
+    <div class="latest_card-body">
+    @inputText(issueAssetRequestForm(constants.Form.DOCUMENT_HASH), '_label -> Messages(constants.Form.DOCUMENT_HASH),
+        'class -> "form-control",'placeholder->Messages(constants.Form.DOCUMENT_HASH),'required->true)
+    @inputText(issueAssetRequestForm(constants.Form.ASSET_TYPE), '_label -> Messages(constants.Form.ASSET_TYPE),
+        'class -> "form-control",'placeholder->Messages(constants.Form.ASSET_TYPE),'required->true)
+    @inputText(issueAssetRequestForm(constants.Form.ASSET_PRICE), '_label -> Messages(constants.Form.ASSET_PRICE),
+        'class -> "form-control",'placeholder->Messages(constants.Form.ASSET_PRICE),'required->true)
+    @inputText(issueAssetRequestForm(constants.Form.QUANTITY_UNIT), '_label -> Messages(constants.Form.QUANTITY_UNIT),
+        'class -> "form-control",'placeholder->Messages(constants.Form.QUANTITY_UNIT),'required->true)
+    @inputText(issueAssetRequestForm(constants.Form.ASSET_QUANTITY), '_label -> Messages(constants.Form.ASSET_QUANTITY),
+        'class -> "form-control",'placeholder->Messages(constants.Form.ASSET_QUANTITY),'required->true)
+
     @checkbox(issueAssetRequestForm(constants.Form.MODERATED), '_label -> Messages(constants.Form.MODERATED), 'id -> "moderated")
+
     <div id="moderatedIssueAssetRequestFormFields">
-        @inputText(issueAssetRequestForm(constants.Form.GAS).copy(value = Some("0")), '_label -> Messages(constants.Form.GAS))
-        @inputPassword(issueAssetRequestForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD))
+        @inputText(issueAssetRequestForm(constants.Form.GAS).copy(value = Some("0")), '_label -> Messages(constants.Form.GAS),
+            'class -> "form-control",'placeholder->Messages(constants.Form.GAS),'required->true)
+        @inputPassword(issueAssetRequestForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD),
+            'class -> "form-control",'placeholder->Messages(constants.Form.PASSWORD),'required->true)
     </div>
 
     @if(issueAssetRequestForm.hasGlobalErrors) {
@@ -22,6 +36,10 @@
         }
         </ul>
     }
-    <button type="button" onclick="submitForm(this)">@Messages(constants.Form.ISSUE_ASSET_REQUEST)</button>
+    <button type="button" class="btn btn-primary btn-sm" onclick="submitForm(this)">@Messages(constants.Form.ISSUE_ASSET_REQUEST)</button>
     <script src="@routes.Assets.versioned("javascripts/showIssueAssetRequestFormFields.js")" type="text/javascript"></script>
-}
+    </div>
+    }
+    </div>
+
+

@@ -6,12 +6,15 @@
 <script src="@routes.Assets.versioned("javascripts/viewFiles.js")" type="text/javascript"></script>
 
     @for(zoneVerificationRequest <- zoneVerificationRequests) {
-        <div class="flexItem box firstBox leftText lightBlue">
+    <div class="col-md-6">
+        <div class="flexItem card-body leftText lightBlue">
             <span class="red">@Messages(constants.Form.ZONE_ID)</span> : @zoneVerificationRequest.id <br>
             <span class="red">@Messages(constants.Form.ACCOUNT_ID)</span> : @zoneVerificationRequest.accountID <br>
             <span class="red">@Messages(constants.Form.NAME)</span> : @zoneVerificationRequest.name <br>
             <span class="red">@Messages(constants.Form.CURRENCY)</span> : @zoneVerificationRequest.currency <br>
             <span class="red">@Messages(constants.Form.DOCUMENTS)</span> : <span id = "kycDocuments@zoneVerificationRequest.accountID"><script>getZoneKycFilesToGenesis('@zoneVerificationRequest.accountID')</script></span> <br>
-            <button class="approve" onclick="getForm(jsRoutes.controllers.AddZoneController.verifyZoneForm('@zoneVerificationRequest.id'))">@Messages(constants.Form.APPROVE)</button> <button class="reject" onclick="getForm(jsRoutes.controllers.AddZoneController.rejectVerifyZoneRequestForm('@zoneVerificationRequest.id'))">@Messages(constants.Form.REJECT)</button>
+            <button class="approve btn btn-sm btn-success" onclick="getForm(jsRoutes.controllers.AddZoneController.verifyZoneForm('@zoneVerificationRequest.id'))">@Messages(constants.Form.APPROVE)</button>
+            <button class="reject btn btn-sm btn-danger" onclick="getForm(jsRoutes.controllers.AddZoneController.rejectVerifyZoneRequestForm('@zoneVerificationRequest.id'))">@Messages(constants.Form.REJECT)</button>
         </div>
+    </div>
     }

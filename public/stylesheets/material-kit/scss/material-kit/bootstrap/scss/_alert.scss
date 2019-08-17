@@ -4,7 +4,7 @@
 
 .alert {
   position: relative;
-  padding: $alert-padding-y $alert-padding-x;
+  padding: 10px 15px;
   margin-bottom: $alert-margin-bottom;
   border: $alert-border-width solid transparent;
   @include border-radius($alert-border-radius);
@@ -13,7 +13,7 @@
 // Headings for larger alerts
 .alert-heading {
   // Specified to prevent conflicts of changing $headings-color
-  color: inherit;
+  color: #fff;
 }
 
 // Provide class for links that match alerts

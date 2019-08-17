@@ -3,10 +3,14 @@
 
 @(addKeyFrom: Form[AddKey.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @form(action = routes.AddKeyController.blockchainAddKey, 'onkeypress -> "validateForm(event,this)") {
+    <div class="latest_card-header latest_card-header-primary text-center">
+        <h4 class="latest_card-title">@Messages(constants.Form.ADD_KEY)</h4>
+    </div>
+    <div class="latest_card-body">
     @CSRF.formField
-    @inputText(addKeyFrom(constants.Form.NAME), '_label -> Messages(constants.Form.NAME),'class -> "form-control")
-    @inputText(addKeyFrom(constants.Form.SEED), '_label -> Messages(constants.Form.SEED),'class -> "form-control")
-    @inputPassword(addKeyFrom(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD),'class -> "form-control")
+    @inputText(addKeyFrom(constants.Form.NAME), '_label -> Messages(constants.Form.NAME),'class -> "form-control",'placeholder->Messages(constants.Form.NAME),'required->true)
+    @inputText(addKeyFrom(constants.Form.SEED), '_label -> Messages(constants.Form.SEED),'class -> "form-control",'placeholder->Messages(constants.Form.SEED),'required->true)
+    @inputPassword(addKeyFrom(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD),'class -> "form-control",'placeholder->Messages(constants.Form.PASSWORD),'required->true)
 
     @if(addKeyFrom.hasGlobalErrors) {
         <ul>
@@ -15,5 +19,6 @@
         }
         </ul>
     }
-    <button type="button" class="btn btn-primary" onclick="submitForm(this)">@Messages(constants.Form.ADD_KEY)</button>
+    <button type="button" class="btn btn-primary btn-sm" onclick="submitForm(this)">@Messages(constants.Form.ADD_KEY)</button>
 }
+</div>

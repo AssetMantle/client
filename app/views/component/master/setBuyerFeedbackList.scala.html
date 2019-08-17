@@ -9,7 +9,7 @@
                 <span class="red">@Messages(constants.Form.PEG_HASH)</span> : @traderFeedbackHistory.pegHash <br>
             </div>
             <div class="centerText" >
-                <button class="width" onclick="getForm(jsRoutes.controllers.SetBuyerFeedbackController.setBuyerFeedbackForm('@traderFeedbackHistory.sellerAddress','@traderFeedbackHistory.pegHash'))">@Messages(constants.Form.SUBMIT_FEEDBACK)</button><br>
+                <button class="width btn-primary btn" onclick="getForm(jsRoutes.controllers.SetBuyerFeedbackController.setBuyerFeedbackForm('@traderFeedbackHistory.sellerAddress','@traderFeedbackHistory.pegHash'))">@Messages(constants.Form.SUBMIT_FEEDBACK)</button><br>
             </div>
         </div>
     }

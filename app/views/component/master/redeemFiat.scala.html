@@ -2,12 +2,21 @@
 @import views.companion.master.RedeemFiat
 
 @(redeemFiatForm: Form[RedeemFiat.Data], zoneID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+
     @form(action = routes.RedeemFiatController.redeemFiat, 'onkeypress -> "validateForm(event,this)") {
+        <div class="latest_card-header latest_card-header-primary text-center">
+            <h4 class="latest_card-title">@Messages(constants.Form.REDEEM_FIAT)</h4>
+        </div>
+        <div class="latest_card-body">
     @CSRF.formField
-    @inputText(redeemFiatForm(constants.Form.ZONE_ID).copy(value = Some(zoneID)), '_label -> Messages(constants.Form.ZONE_ID))
-    @inputText(redeemFiatForm(constants.Form.REDEEM_AMOUNT), '_label -> Messages(constants.Form.REDEEM_AMOUNT))
-    @inputText(redeemFiatForm(constants.Form.GAS), '_label -> Messages(constants.Form.GAS))
-    @inputPassword(redeemFiatForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD))
+    @inputText(redeemFiatForm(constants.Form.ZONE_ID).copy(value = Some(zoneID)), '_label -> Messages(constants.Form.ZONE_ID),
+        'class -> "form-control",'placeholder->Messages(constants.Form.ZONE_ID),'required->true)
+    @inputText(redeemFiatForm(constants.Form.REDEEM_AMOUNT), '_label -> Messages(constants.Form.REDEEM_AMOUNT),
+        'class -> "form-control",'placeholder->Messages(constants.Form.REDEEM_AMOUNT),'required->true)
+    @inputText(redeemFiatForm(constants.Form.GAS), '_label -> Messages(constants.Form.GAS),
+        'class -> "form-control",'placeholder->Messages(constants.Form.GAS),'required->true)
+    @inputPassword(redeemFiatForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD),
+        'class -> "form-control",'placeholder->Messages(constants.Form.PASSWORD),'required->true)
 
     @if(redeemFiatForm.hasGlobalErrors) {
         <ul>
@@ -16,5 +25,6 @@
         }
         </ul>
     }
-    <button type="button" onclick="submitForm(this)">@Messages(constants.Form.REDEEM_FIAT)</button>
+    <button type="button" class="btn btn-sm btn-primary" onclick="submitForm(this)">@Messages(constants.Form.REDEEM_FIAT)</button>
+        </div>
 }

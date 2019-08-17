@@ -8,7 +8,7 @@
   $variation-color-text: map-get($args, variation-color-text);
 
   background-color: lighten($variation-color,3%);
-  color: $variation-color-text;
+
 
   a, .alert-link {
     color: $variation-color-text;

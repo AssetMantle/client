@@ -3,12 +3,17 @@
 
 @(addOrganizationForm: Form[AddOrganization.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @form(action = routes.AddOrganizationController.blockchainAddOrganization, 'onkeypress -> "validateForm(event,this)") {
-    @CSRF.formField
-    @inputText(addOrganizationForm(constants.Form.FROM), '_label -> Messages(constants.Form.FROM),'class -> "form-control")
-    @inputText(addOrganizationForm(constants.Form.TO), '_label -> Messages(constants.Form.TO),'class -> "form-control")
-    @inputText(addOrganizationForm(constants.Form.ORGANIZATION_ID), '_label -> Messages(constants.Form.ORGANIZATION_ID),'class -> "form-control")
-    @inputText(addOrganizationForm(constants.Form.ZONE_ID), '_label -> Messages(constants.Form.ZONE_ID),'class -> "form-control")
-    @inputPassword(addOrganizationForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD),'class -> "form-control")
+    <div class="latest_card-header latest_card-header-primary text-center">
+        <h4 class="latest_card-title">@Messages(constants.Form.ADD_ORGANIZATION)</h4>
+    </div>
+
+    <div class="latest_card-body">
+        @CSRF.formField
+    @inputText(addOrganizationForm(constants.Form.FROM), '_label -> Messages(constants.Form.FROM),'class -> "form-control",'placeholder-> Messages(constants.Form.FROM),'required->true)
+    @inputText(addOrganizationForm(constants.Form.TO), '_label -> Messages(constants.Form.TO),'class -> "form-control",'placeholder->Messages(constants.Form.TO),'required->true)
+    @inputText(addOrganizationForm(constants.Form.ORGANIZATION_ID), '_label -> Messages(constants.Form.ORGANIZATION_ID),'class -> "form-control",'placeholder->Messages(constants.Form.ORGANIZATION_ID),'required->true)
+    @inputText(addOrganizationForm(constants.Form.ZONE_ID), '_label -> Messages(constants.Form.ZONE_ID),'class -> "form-control",'placeholder->Messages(constants.Form.ZONE_ID),'required->true)
+    @inputPassword(addOrganizationForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD),'class -> "form-control",'placeholder->Messages(constants.Form.PASSWORD),'required->true)
 
     @if(addOrganizationForm.hasGlobalErrors) {
         <ul>
@@ -17,5 +22,7 @@
         }
         </ul>
     }
-    <button type="button" class="btn btn-primary" onclick="submitForm(this)">@Messages(constants.Form.ADD_ORGANIZATION)</button>
-}
+    <button type="button" class="btn btn-primary btn-sm" onclick="submitForm(this)">@Messages(constants.Form.ADD_ORGANIZATION)</button>
+</div>
+    }
+

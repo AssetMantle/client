@@ -3,13 +3,18 @@
 
 @(assetList: Seq[Asset])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
 
-
-                <table class="table">
-                    <thead>
+<div class="card">
+    <div class="card-header">
+        <span class="heading">@Messages(constants.Form.ASSETS) </span>
+    </div>
+    <div class="card-body">
+<div class="table-responsive">
+    <table class="table white">
+        <thead>
                         <tr>
-                            <th scope="col">@Messages(constants.Form.PEG_HASH)</th>
-                            <th scope="col">@Messages(constants.Form.DOCUMENT_HASH)</th>
-                            <th scope="col">@Messages(constants.Form.ASSET_TYPE)</th>
+                            <th>@Messages(constants.Form.PEG_HASH)</th>
+                            <th>@Messages(constants.Form.DOCUMENT_HASH)</th>
+                            <th>@Messages(constants.Form.ASSET_TYPE)</th>
                             <th>@Messages(constants.Form.ASSET_QUANTITY)</th>
                             <th>@Messages(constants.Form.ASSET_PRICE)</th>
                             <th>@Messages(constants.Form.QUANTITY_UNIT)</th>
@@ -35,6 +40,7 @@
                     }
                     </tbody>
                 </table>
+</div>
 
-
-
+</div>
+</div>

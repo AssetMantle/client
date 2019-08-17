@@ -114,12 +114,13 @@ body {
 }
 
 .footer {
-    padding: 20px;
-    text-align: center;
-    background: #333;
+    position:fixed;
+    bottom: 0;
+    right: 30px;
 }
 
 .centerScreen {
+    padding-top:200px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -127,21 +128,24 @@ body {
     text-align: center;
     min-height: 100vh;
 }
+.centerScreen img{
+    width: 120px;
+}
 
 .blur {
     filter: blur(5 px);
 }
 
 /*Alert*/
-.alert {
-    position:relative;
-    top:70px;
-    padding: 10px;
-    color: white;
-    opacity: 1;
-    transition: opacity 0.6s;
-    margin-bottom: 5px;
-}
+/*.alert {*/
+/*    position:relative;*/
+/*    top:70px;*/
+/*    padding: 10px;*/
+/*    color: white;*/
+/*    opacity: 1;*/
+/*    transition: opacity 0.6s;*/
+/*    margin-bottom: 5px;*/
+/*}*/
 
 .alert.success {
     background-color: #4CAF50;
@@ -175,12 +179,33 @@ body {
 }
 
 /*Alert*/
+.alert-box-single{
+    color:#fff;
+    float: right;
+}
 
+/*display block */
+.dblock{
+    display: block;
+    text-align: center;
+}
+/*documents*/
+.document_images img{
+    width: 120px;
+}
+.verify_documents_buttons{
+    text-align: center;
+}
+.documenet_details_card{
+    height: 300px;
+    overflow: auto;
+}
+
+/**/
 /*Navbar*/
 
 .navbar {
     overflow: hidden;
-    background-color: #333;
     margin-bottom: 5px;
     font-size: 14px;
 }
@@ -188,7 +213,7 @@ body {
 .navbar a {
     float: left;
     display: block;
-    color: #9BB6C7;
+    color: rgba(255,255,255,0.75);
     text-align: center;
     padding: 14px 16px;
     text-decoration: none;
@@ -197,19 +222,20 @@ body {
 }
 
 .navbar a:hover {
-    background-color: #F3F8FF;
-    color: #1B7FBD;
+    color: #fff;
 }
 
 .navbar a.active {
-    background-color: #F3F8FF;
-    color: #1B7FBD;
+    color: #fff;
 }
 
 .navbar a.right {
     float: right;
 }
-
+.navbar a.navbar-brand .logo{
+    max-height: 45px;
+    max-width: 130px;
+}
 .sticky {
     position: fixed;
     top: 0;
@@ -221,128 +247,26 @@ body {
 }
 
 /*Navbar*/
-
+.second {
+    width: 100%;
+    padding-top: 20px;
+}
 
 .hidden {
     display: none;
 }
 
 /*Flex*/
+/*Flex*/
 .pageFlexContainer {
-    margin-top: 100px;
-    display:flex;
+    margin-top: 60px;
     justify-content:center;
 }
 
 .pageFlexContainer >div {
     /*background-color: #ffffff;*/
 }
-/*side bar for system mode*/
-@media (min-width: 1200px) {
 
-    .close-sidebar{
-        display: none;
-    }
-    .first .closebtn{
-        display: none;
-    }
-    .first {
-        position: fixed;
-        left: 0;
-        top:0;
-        height:100%;
-        background: #31353D;
-        padding-top:60px;
-        padding-left: 10px;
-        width: 200px;
-        margin-right: 1vw;
-        overflow: auto;
-    }
-    .first li{
-        list-style-type: none;
-    }
-    .first li a {
-        color:#fff;
-        padding:8px 0px 0px 20px;
-        text-decoration: none;
-        transition: 0.3s;
-        display: inline-block;
-        margin-bottom:10px;
-    }
-    .first li:hover {
-        color: #31353D;
-    }
-
-    .second {
-        display: inline-block;
-        width: 100%;
-        padding-top: 20px;
-    }
-    .pageFlexContainer .second{
-        padding-left: 210px;
-    }
-}
-/*side bar for mobile mode*/
-@media (max-width: 1200px) {
-    .first {
-        height: 100%;
-        width: 0;
-        position: fixed;
-        z-index: 101;
-        top: 0;
-        left: 0;
-        background-color:#31353D;
-        overflow-x: hidden;
-        transition: 0.5s;
-        padding-top: 60px;
-
-
-    }
-    .first li{
-        list-style-type: none;
-    }
-    .first li a {
-        color:#fff;
-        padding:8px 0px 0px 20px;
-        text-decoration: none;
-        transition: 0.3s;
-        display: inline-block;
-        margin-bottom:10px;
-    }
-    .first li:hover {
-        color: #31353D;
-    }
-
-    .first .closebtn {
-        position: relative;
-        top: 0;
-        right: -80%;
-        font-size: 20px;
-    }
-    .close-sidebar{
-        top:60px;
-        color:#fff;
-        font-size:30px;
-        cursor:pointer;
-        background:grey;
-        padding: 5px;
-        border-radius: 10px;
-        transition-delay: 0.3s;
-        position:fixed;
-        left: -20px;
-        z-index:100;
-    }
-    .second {
-        position:relative;
-        padding-top: 20px;
-        width:100%;
-    }
-}
-
-.third {
-    width:20%;
-    margin-left: 1vw;
-}
 
 .width70Percent{
     width: 70%;
@@ -450,6 +374,11 @@ body {
 .dynamicTable th {
     background-color: #a8b1ff;
 }
+.result{
+    position: relative;
+    top: -30px;
+    left: 30px;
+}
 
 .dynamicTable tr {
     height: 30px;
@@ -465,12 +394,12 @@ body {
 /*Table*/
 
 .toggleElement {
-    background-color: #3a53bc;
+    background-color: #149f98;
 }
 
 .toggleElement:hover {
     cursor: pointer;
-    color: rgba(255, 249, 6, 0.66);
+    color: #10292e;
 }
 
 .leftText {
@@ -553,6 +482,7 @@ dl .info {
     float: right;
     font-size: smaller;
     padding: 0;
+    display: inline-table;
 }
 
 dl .info::after {
@@ -565,16 +495,22 @@ dl .info::after {
     border-style: solid;
     border-color: transparent transparent #dadada transparent;
 }
-dl:hover .info {
-    visibility: visible;
-}
+/*dl:hover .info {*/
+/*    visibility: visible;*/
+/*}*/
 /*ToolTip*/
 /*notification*/
+.notifications{
+    height: 500px;
+    overflow: auto;
+}
 .notification-box{
     padding:10px;
     border-bottom: 1px solid grey;
 }
-
+.request_coin{
+    padding:30px;
+}
 /*upload file css*/
 .uploadBar {
     display: flex;
@@ -674,13 +610,35 @@ dl:hover .info {
     height: 1.2em;
     margin-left: 20px;
 }
-.pageContent{
-    width: 500px;
-    float:right;
-    position: relative;
-    right:50px;
-    padding-bottom: 50px;
-}
+
 .fa{
     cursor: pointer;
+}
+.input-group-prepend .input-group-text{
+    margin-bottom: 30px;
+}
+.fixed_modal{
+    height: 500px;
+    overflow-y:scroll;
+}
+.fixed_modal .input-group-prepend .input-group-text{
+    margin-top: -25px;
+}
+/*logout*/
+.logout .input-group-prepend{
+    margin-top: 40px;
+    margin-left: 40px;
+}
+
+.logout .input-group-prepend .input-group-text
+{
+    margin-top: -20px;
+}
+.logout  button
+{
+margin-top:-30px;
+left:35%;
+}
+.pageContent{
+    margin-top: 50px;
 }

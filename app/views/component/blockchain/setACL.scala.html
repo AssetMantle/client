@@ -3,26 +3,115 @@
 
 @(setACLForm: Form[SetACL.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @form(action = routes.SetACLController.blockchainSetACL, 'onkeypress -> "validateForm(event,this)") {
+    <div class="latest_card-header latest_card-header-primary text-center">
+        <h4 class="latest_card-title">@Messages(constants.Form.ISSUE_FIAT)</h4>
+    </div>
+    <div class="latest_card-body fixed_modal">
     @CSRF.formField
-    @inputText(setACLForm(constants.Form.FROM), '_label -> Messages(constants.Form.FROM),'class -> "form-control")
-    @inputText(setACLForm(constants.Form.ACL_ADDRESS), '_label -> Messages(constants.Form.ACL_ADDRESS),'class -> "form-control")
-    @inputText(setACLForm(constants.Form.ORGANIZATION_ID), '_label -> Messages(constants.Form.ORGANIZATION_ID),'class -> "form-control")
-    @inputText(setACLForm(constants.Form.ZONE_ID), '_label -> Messages(constants.Form.ZONE_ID),'class -> "form-control")
-    @checkbox(setACLForm(constants.Form.ISSUE_ASSET), '_label -> Messages(constants.Form.ISSUE_ASSET),'class -> "form-control")
-    @checkbox(setACLForm(constants.Form.ISSUE_FIAT), '_label -> Messages(constants.Form.ISSUE_FIAT),'class -> "form-control")
-    @checkbox(setACLForm(constants.Form.SEND_ASSET), '_label -> Messages(constants.Form.SEND_ASSET),'class -> "form-control")
-    @checkbox(setACLForm(constants.Form.SEND_FIAT), '_label -> Messages(constants.Form.SEND_FIAT),'class -> "form-control")
-    @checkbox(setACLForm(constants.Form.REDEEM_ASSET), '_label -> Messages(constants.Form.REDEEM_ASSET),'class -> "form-control")
-    @checkbox(setACLForm(constants.Form.REDEEM_FIAT), '_label -> Messages(constants.Form.REDEEM_FIAT),'class -> "form-control")
-    @checkbox(setACLForm(constants.Form.SELLER_EXECUTE_ORDER), '_label -> Messages(constants.Form.SELLER_EXECUTE_ORDER),'class -> "form-control")
-    @checkbox(setACLForm(constants.Form.BUYER_EXECUTE_ORDER), '_label -> Messages(constants.Form.BUYER_EXECUTE_ORDER),'class -> "form-control")
-    @checkbox(setACLForm(constants.Form.CHANGE_BUYER_BID), '_label -> Messages(constants.Form.CHANGE_BUYER_BID),'class -> "form-control")
-    @checkbox(setACLForm(constants.Form.CHANGE_SELLER_BID), '_label -> Messages(constants.Form.CHANGE_SELLER_BID),'class -> "form-control")
-    @checkbox(setACLForm(constants.Form.CONFIRM_BUYER_BID), '_label -> Messages(constants.Form.CONFIRM_BUYER_BID),'class -> "form-control")
-    @checkbox(setACLForm(constants.Form.CONFIRM_SELLER_BID), '_label -> Messages(constants.Form.CONFIRM_SELLER_BID),'class -> "form-control")
-    @checkbox(setACLForm(constants.Form.NEGOTIATION), '_label -> Messages(constants.Form.NEGOTIATION),'class -> "form-control")
-    @checkbox(setACLForm(constants.Form.RELEASE_ASSET), '_label -> Messages(constants.Form.RELEASE_ASSET),'class -> "form-control")
-    @inputPassword(setACLForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD),'class -> "form-control")
+    @inputText(setACLForm(constants.Form.FROM), '_label -> Messages(constants.Form.FROM),'class -> "form-control",
+        'placeholder->Messages(constants.Form.FROM),'required->true)
+    @inputText(setACLForm(constants.Form.ACL_ADDRESS), '_label -> Messages(constants.Form.ACL_ADDRESS),'class -> "form-control",
+        'placeholder->Messages(constants.Form.ACL_ADDRESS),'required->true)
+    @inputText(setACLForm(constants.Form.ORGANIZATION_ID), '_label -> Messages(constants.Form.ORGANIZATION_ID),'class -> "form-control",
+        'placeholder->Messages(constants.Form.ORGANIZATION_ID),'required->true)
+    @inputText(setACLForm(constants.Form.ZONE_ID), '_label -> Messages(constants.Form.ZONE_ID),'class -> "form-control",
+        'placeholder->Messages(constants.Form.ZONE_ID),'required->true)
+        <div class="input-group-prepend">
+            @checkbox(setACLForm(constants.Form.ISSUE_ASSET), '_label -> Messages(constants.Form.ISSUE_ASSET))
+        <span class="input-group-text">
+        @Messages(constants.Form.ISSUE_ASSET)
+        </span>
+        </div>
+        <div class="input-group-prepend">
+            @checkbox(setACLForm(constants.Form.ISSUE_FIAT), '_label -> Messages(constants.Form.ISSUE_FIAT))
+            <span class="input-group-text">
+                @Messages(constants.Form.ISSUE_FIAT)
+            </span>
+
+        </div>
+        <div class="input-group-prepend">
+            @checkbox(setACLForm(constants.Form.SEND_ASSET), '_label -> Messages(constants.Form.SEND_ASSET))
+            <span class="input-group-text">
+                @Messages(constants.Form.SEND_ASSET)
+            </span>
+
+        </div>
+        <div class="input-group-prepend">
+            @checkbox(setACLForm(constants.Form.SEND_FIAT), '_label -> Messages(constants.Form.SEND_FIAT))
+            <span class="input-group-text">
+                @Messages(constants.Form.SEND_FIAT)
+            </span>
+
+        </div>
+        <div class="input-group-prepend">
+            @checkbox(setACLForm(constants.Form.REDEEM_ASSET), '_label -> Messages(constants.Form.REDEEM_ASSET))
+            <span class="input-group-text">
+                @Messages(constants.Form.REDEEM_ASSET)
+            </span>
+
+        </div>
+        <div class="input-group-prepend">
+            @checkbox(setACLForm(constants.Form.REDEEM_FIAT), '_label -> Messages(constants.Form.REDEEM_FIAT))
+            <span class="input-group-text">
+                @Messages(constants.Form.REDEEM_FIAT)
+            </span>
+
+        </div>
+        <div class="input-group-prepend">
+            @checkbox(setACLForm(constants.Form.SELLER_EXECUTE_ORDER), '_label -> Messages(constants.Form.SELLER_EXECUTE_ORDER))
+            <span class="input-group-text">
+                @Messages(constants.Form.SELLER_EXECUTE_ORDER)
+            </span>
+        </div>
+        <div class="input-group-prepend">
+            @checkbox(setACLForm(constants.Form.BUYER_EXECUTE_ORDER), '_label -> Messages(constants.Form.BUYER_EXECUTE_ORDER))
+            <span class="input-group-text">
+                @Messages(constants.Form.BUYER_EXECUTE_ORDER)
+            </span>
+        </div>
+        <div class="input-group-prepend">
+            @checkbox(setACLForm(constants.Form.CHANGE_BUYER_BID), '_label -> Messages(constants.Form.CHANGE_BUYER_BID))
+            <span class="input-group-text">
+                @Messages(constants.Form.CHANGE_BUYER_BID)
+            </span>
+        </div>
+        <div class="input-group-prepend">
+            @checkbox(setACLForm(constants.Form.CHANGE_SELLER_BID), '_label -> Messages(constants.Form.CHANGE_SELLER_BID))
+            <span class="input-group-text">
+                @Messages(constants.Form.CHANGE_SELLER_BID)
+            </span>
+
+        </div>
+        <div class="input-group-prepend">
+            @checkbox(setACLForm(constants.Form.CONFIRM_BUYER_BID), '_label -> Messages(constants.Form.CONFIRM_BUYER_BID))
+            <span class="input-group-text">
+                @Messages(constants.Form.CONFIRM_BUYER_BID)
+            </span>
+
+        </div>
+        <div class="input-group-prepend">
+            @checkbox(setACLForm(constants.Form.CONFIRM_SELLER_BID), '_label -> Messages(constants.Form.CONFIRM_SELLER_BID))
+            <span class="input-group-text">
+                @Messages(constants.Form.CONFIRM_SELLER_BID)
+            </span>
+
+        </div>
+        <div class="input-group-prepend">
+            @checkbox(setACLForm(constants.Form.NEGOTIATION), '_label -> Messages(constants.Form.NEGOTIATION))
+            <span class="input-group-text">
+                @Messages(constants.Form.NEGOTIATION)
+            </span>
+
+        </div>
+        <div class="input-group-prepend">
+        @checkbox(setACLForm(constants.Form.RELEASE_ASSET), '_label -> Messages(constants.Form.RELEASE_ASSET))
+        <span class="input-group-text">
+            @Messages(constants.Form.RELEASE_ASSET)
+        </span>
+
+    </div>
+
+    @inputPassword(setACLForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD),'class->"form-control",'placeholder->"Password",'required->true)
 
     @if(setACLForm.hasGlobalErrors) {
         <ul>
@@ -31,5 +120,9 @@
         }
         </ul>
     }
-    <button type="button" class="btn btn-primary" onclick="submitForm(this)">@Messages(constants.Form.SET_ACL)</button>
-}
+
+    <button type="button" class="btn btn-primary btn-sm" onclick="submitForm(this)">@Messages(constants.Form.SET_ACL)</button>
+
+    </div>
+    }
+</div>

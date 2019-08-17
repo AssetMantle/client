@@ -2,15 +2,20 @@
 @import views.companion.blockchain.ConfirmBuyerBid
 
 @(confirmBuyerBidForm: Form[ConfirmBuyerBid.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+    <div class="fixed_modal">
 @form(action = routes.ConfirmBuyerBidController.blockchainConfirmBuyerBid, 'onkeypress -> "validateForm(event,this)") {
+    <div class="latest_card-header latest_card-header-primary text-center">
+        <h4 class="latest_card-title">@Messages(constants.Form.CONFIRM_BUYER_BID)</h4>
+    </div>
+    <div class="latest_card-body">
     @CSRF.formField
-    @inputText(confirmBuyerBidForm(constants.Form.FROM), '_label -> Messages(constants.Form.FROM),'class -> "form-control")
-    @inputText(confirmBuyerBidForm(constants.Form.TO), '_label -> Messages(constants.Form.TO),'class -> "form-control")
-    @inputText(confirmBuyerBidForm(constants.Form.BID), '_label -> Messages(constants.Form.BID),'class -> "form-control")
-    @inputText(confirmBuyerBidForm(constants.Form.TIME), '_label -> Messages(constants.Form.TIME),'class -> "form-control")
-    @inputText(confirmBuyerBidForm(constants.Form.PEG_HASH), '_label -> Messages(constants.Form.PEG_HASH),'class -> "form-control")
-    @inputText(confirmBuyerBidForm(constants.Form.GAS), '_label -> Messages(constants.Form.GAS),'class -> "form-control")
-    @inputPassword(confirmBuyerBidForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD),'class -> "form-control")
+    @inputText(confirmBuyerBidForm(constants.Form.FROM), '_label -> Messages(constants.Form.FROM),'class -> "form-control",'placeholder->Messages(constants.Form.FROM),'required->true)
+    @inputText(confirmBuyerBidForm(constants.Form.TO), '_label -> Messages(constants.Form.TO),'class -> "form-control",'placeholder->Messages(constants.Form.TO),'required->true)
+    @inputText(confirmBuyerBidForm(constants.Form.BID), '_label -> Messages(constants.Form.BID),'class -> "form-control",'placeholder->Messages(constants.Form.BID),'required->true)
+    @inputText(confirmBuyerBidForm(constants.Form.TIME), '_label -> Messages(constants.Form.TIME),'class -> "form-control",'placeholder->Messages(constants.Form.TIME),'required->true)
+    @inputText(confirmBuyerBidForm(constants.Form.PEG_HASH), '_label -> Messages(constants.Form.PEG_HASH),'class -> "form-control",'placeholder->Messages(constants.Form.PEG_HASH),'required->true)
+    @inputText(confirmBuyerBidForm(constants.Form.GAS), '_label -> Messages(constants.Form.GAS),'class -> "form-control",'placeholder->Messages(constants.Form.GAS),'required->true)
+    @inputPassword(confirmBuyerBidForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD),'class -> "form-control",'placeholder->Messages(constants.Form.PASSWORD),'required->true)
 
     @if(confirmBuyerBidForm.hasGlobalErrors) {
         <ul>
@@ -19,5 +24,8 @@
         }
         </ul>
     }
-    <button type="button" class="btn btn-primary" onclick="submitForm(this)">@Messages(constants.Form.CONFIRM_BUYER_BID)</button>
-}
+    <button type="button" class="btn btn-primary btn-sm" onclick="submitForm(this)">@Messages(constants.Form.CONFIRM_BUYER_BID)</button>
+    </div>
+
+    }
+</div>

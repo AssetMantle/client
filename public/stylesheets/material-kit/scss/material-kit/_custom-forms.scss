@@ -16,7 +16,6 @@ $white : #fff;
   font-size: 14px;
   line-height: 16px;
   letter-spacing: 0.02em;
-  text-transform:lowercase;
   color: #797992;
 }
 //end of extends
@@ -100,7 +99,7 @@ $white : #fff;
 
 
 body{
-  background: $bg-color;
+  background: #f4f4f4;
   font-family: $central-font;
 }
 .navbar{
@@ -113,13 +112,15 @@ body{
     padding:20px;
     justify-content: center;
     display: flex;
+    width:100%;
   @extend  %box-shadow;
 }
 form.searchForm input[type=text] {
   background: #DEEDF6;
   border-radius: 5px;
-  padding-left: 20px;
   margin-right: 10px;
+  height: 43px;
+  margin-top: 4px;
 }
 
 form.searchForm input[type=text]::placeholder{
@@ -140,26 +141,90 @@ table{
 .first:hover::-webkit-scrollbar {
   width: 0.5em;
 }
-@media (max-width: 767px) {
 
+// side bar
+.sidebar_btn{
+  top: 80px;
+  color: #fff;
+  cursor: pointer;
+  background:linear-gradient(60deg, #149f98, #102923);
+  padding: 5px;
+  border-radius: 10px;
+  transition-delay: 0.3s;
+  position: fixed;
+  left: -20px;
+  padding-left: 30px;
+  z-index: 100;
 }
-.tooltip {
-  opacity: 1;
+.closebtn {
   position: relative;
+  top: 15px;
+  right: -80%;
+  font-size: 20px;
+}
+.first{
+  height: 100%;
+  width: 0;
+  position: fixed;
+  z-index: 101;
+  top: 0;
+  left: 0;
+  background-color:#8faa9d;
+  overflow-x: hidden;
+  transition: 0.5s;
+  padding-top: 60px;
+}
+.first li{
+  list-style-type: none;
+}
+.first a {
+  color: #fff;
+}
+.first li a {
+  padding:8px 0px 0px 20px;
+  text-decoration: none;
+  transition: 0.3s;
   display: inline-block;
-
-  .tooltiptext {
-    visibility: hidden;
-    width: 120px;
-    background-color: black;
-    color: blue;
-    text-align: center;
-    border-radius: 6px;
-    padding: 5px 0;
-    position: absolute;
-    z-index: 1;
+  margin-bottom:10px;
+}
+.first li:hover {
+  color: #31353D;
+}
+.sign_up{
+  .login-page .footer{
+    margin-bottom: 25px;
+  }
+  .card .card-header .nav-tabs{
+    margin-left: 80px;
+  }
+  .card-body .login{
+    margin-top: 60px;
   }
 }
-.tooltip:hover .tooltiptext {
-  visibility: visible;
+@media (min-width:400px){
+    .modal-dialog{
+      max-width: 350px;
+      margin: 1.75rem auto;
+    }
 }
+
+//.tooltip {
+//  opacity: 1;
+//  position: relative;
+//  display: inline-block;
+//
+//  .tooltiptext {
+//    visibility: hidden;
+//    width: 120px;
+//    background-color: black;
+//    color: blue;
+//    text-align: center;
+//    border-radius: 6px;
+//    padding: 5px 0;
+//    position: absolute;
+//    z-index: 1;
+//  }
+//}
+//.tooltip:hover .tooltiptext {
+//  visibility: visible;
+//}
