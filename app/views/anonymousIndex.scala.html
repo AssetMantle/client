@@ -1,18 +1,11 @@
 @import controllers.actions.LoginState
 @(failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
-<<<<<<< HEAD
-@common(Messages(constants.User.HOME))(Html(""))(center)(Html(""))
-@center = {
-    <div>
-        <div id="commonHome" class="flexItem flexGrowth"></div>
-=======
 @common(Messages(constants.User.HOME), failures, warnings, successes, infos)(Html(""))(center)(Html(""))
     @center = {
     <div class="flexContainer">
         <div id="commonHome" class="box flexItem flexGrowth"></div>
         <button onclick="getForm(jsRoutes.controllers.SendCoinController.requestCoinsForm())">@Messages(constants.Form.REQUEST_COIN)</button>
->>>>>>> c32be14860106cc345de01f8f6a61211f12e0e9f
     </div>
         <script>
                 componentResource('commonHome', jsRoutes.controllers.ComponentViewController.commonHome('@loginState.username'))
