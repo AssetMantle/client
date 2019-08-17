@@ -11,7 +11,7 @@
     <div class="fixed_modal">
    <div class="latest_card-body">
     @CSRF.formField
-<<<<<<< HEAD
+
     @inputText(confirmBuyerBidForm(constants.Form.SELLER_ADDRESS).copy(value = Some(sellerAddress)), '_label -> Messages(constants.Form.SELLER_ADDRESS),
         'class -> "form-control",'placeholder->Messages(constants.Form.SELLER_ADDRESS),'required->true))
     @inputText(confirmBuyerBidForm(constants.Form.BID)copy(value = Some(bid.toString)), '_label -> Messages(constants.Form.BID),
@@ -26,15 +26,6 @@
         'placeholder->Messages(constants.Form.BUYER_CONTRACT_HASH),'required->true))
         @inputPassword(confirmBuyerBidForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD),'class -> "form-control",
         'placeholder->Messages(constants.Form.PASSWORD),'required->true))
-=======
-    @inputText(confirmBuyerBidForm(constants.Form.SELLER_ADDRESS).copy(value = Some(sellerAddress)), '_label -> Messages(constants.Form.SELLER_ADDRESS))
-    @inputText(confirmBuyerBidForm(constants.Form.BID)copy(value = Some(bid.toString)), '_label -> Messages(constants.Form.BID))
-    @inputText(confirmBuyerBidForm(constants.Form.TIME), '_label -> Messages(constants.Form.TIME))
-    @inputText(confirmBuyerBidForm(constants.Form.PEG_HASH).copy(value = Some(pegHash)), '_label -> Messages(constants.Form.PEG_HASH))
-    @inputText(confirmBuyerBidForm(constants.Form.GAS), '_label -> Messages(constants.Form.GAS))
-    @inputText(confirmBuyerBidForm(constants.Form.BUYER_CONTRACT_HASH), '_label -> Messages(constants.Form.BUYER_CONTRACT_HASH))
-    @inputPassword(confirmBuyerBidForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD))
->>>>>>> c32be14860106cc345de01f8f6a61211f12e0e9f
 
     @if(confirmBuyerBidForm.hasGlobalErrors) {
         <ul>

@@ -10,7 +10,7 @@
     <div class="fixed_modal">
     <div class="latest_card-body">
     @CSRF.formField
-<<<<<<< HEAD
+
     @inputText(confirmSellerBidForm(constants.Form.FROM), '_label -> Messages(constants.Form.FROM),'class -> "form-control",'placeholder->Messages(constants.Form.FROM),'required->true)
     @inputText(confirmSellerBidForm(constants.Form.TO), '_label -> Messages(constants.Form.TO),'class -> "form-control",'placeholder->Messages(constants.Form.TO),'required->true)
     @inputText(confirmSellerBidForm(constants.Form.BID), '_label -> Messages(constants.Form.BID),'class -> "form-control",'placeholder->Messages(constants.Form.BID),'required->true)
@@ -19,16 +19,6 @@
     @inputText(confirmSellerBidForm(constants.Form.GAS), '_label -> Messages(constants.Form.GAS),'class -> "form-control",'placeholder->Messages(constants.Form.GAS),'required->true)
     @inputText(confirmSellerBidForm(constants.Form.SELLER_CONTRACT_HASH), '_label -> Messages(constants.Form.SELLER_CONTRACT_HASH),'class -> "form-control",'placeholder->Messages(constants.Form.SELLER_CONTRACT_HASH),'required->true)
     @inputPassword(confirmSellerBidForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD),'class -> "form-control",'placeholder->Messages(constants.Form.PASSWORD),'required->true)
-=======
-    @inputText(confirmSellerBidForm(constants.Form.FROM), '_label -> Messages(constants.Form.FROM))
-    @inputText(confirmSellerBidForm(constants.Form.TO), '_label -> Messages(constants.Form.TO))
-    @inputText(confirmSellerBidForm(constants.Form.BID), '_label -> Messages(constants.Form.BID))
-    @inputText(confirmSellerBidForm(constants.Form.TIME), '_label -> Messages(constants.Form.TIME))
-    @inputText(confirmSellerBidForm(constants.Form.PEG_HASH), '_label -> Messages(constants.Form.PEG_HASH))
-    @inputText(confirmSellerBidForm(constants.Form.GAS), '_label -> Messages(constants.Form.GAS))
-    @inputText(confirmSellerBidForm(constants.Form.SELLER_CONTRACT_HASH), '_label -> Messages(constants.Form.SELLER_CONTRACT_HASH))
-    @inputPassword(confirmSellerBidForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD))
->>>>>>> c32be14860106cc345de01f8f6a61211f12e0e9f
 
     @if(confirmSellerBidForm.hasGlobalErrors) {
         <ul>
