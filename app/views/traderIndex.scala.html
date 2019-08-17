@@ -1,18 +1,18 @@
 @import controllers.actions.LoginState
 @import models.blockchain.ACLHash
 @import models.master.{Organization, Zone}
-@(totalFiat: Int, zone: Zone, organization: Organization, aclHash: ACLHash)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+@(totalFiat: Int, zone: Zone, organization: Organization, aclHash: ACLHash, failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
-@common(Messages(constants.User.HOME))(Html(""))(center)(right)
+@common(Messages(constants.User.HOME), failures, warnings, successes, infos)(Html(""))(center)(right)
 
 @right = {
 
 @if(aclHash.buyerExecuteOrder) {
-    <a onclick="getForm(jsRoutes.controllers.BuyerExecuteOrderController.unmoderatedBuyerExecuteOrderForm())">@Messages(constants.Form.BUYER_EXECUTE_ORDER)</a>
+    <a onclick="getForm(jsRoutes.controllers.BuyerExecuteOrderController.buyerExecuteOrderForm())">@Messages(constants.Form.BUYER_EXECUTE_ORDER)</a>
 } <br>
 
 @if(aclHash.sellerExecuteOrder) {
-    <a onclick="getForm(jsRoutes.controllers.SellerExecuteOrderController.unmoderatedSellerExecuteOrderForm())">@Messages(constants.Form.SELLER_EXECUTE_ORDER)</a>
+    <a onclick="getForm(jsRoutes.controllers.SellerExecuteOrderController.sellerExecuteOrderForm())">@Messages(constants.Form.SELLER_EXECUTE_ORDER)</a>
 } <br>
 }
 
@@ -87,24 +87,19 @@
                         <h2 class="showHide toggleElement centerText" onclick="fetchOrShowHide('buyNegotiationList', jsRoutes.controllers.ComponentViewController.buyNegotiationList(), this)">@Messages(constants.Form.BUY)</h2>
                     </div>
                     <div id="buyNegotiationList" class ="flexContainer"></div>
-                    <script type="text/javascript">
-                            var buyNegotiationCometMessage = function (event) {
-                                componentResource('buyNegotiationList', jsRoutes.controllers.ComponentViewController.buyNegotiationList());
-                            }
-                    </script>
                 </div>
-
                 <div class="box">
                     <div>
                         <h2 class="showHide toggleElement centerText" onclick="fetchOrShowHide('sellNegotiationList', jsRoutes.controllers.ComponentViewController.sellNegotiationList(), this)">@Messages(constants.Form.SELL)</h2>
                     </div>
                     <div id="sellNegotiationList" class ="flexContainer"></div>
-                    <script type="text/javascript">
-                            var sellNegotiationCometMessage = function (event) {
-                                componentResource('sellNegotiationList', jsRoutes.controllers.ComponentViewController.sellNegotiationList());
-                            }
-                    </script>
                 </div>
+                <script type="text/javascript">
+                        var negotiationCometMessage = function (event) {
+                            componentResource('buyNegotiationList', jsRoutes.controllers.ComponentViewController.buyNegotiationList());
+                            componentResource('sellNegotiationList', jsRoutes.controllers.ComponentViewController.sellNegotiationList());
+                        }
+                </script>
             </div>
         </div>
 

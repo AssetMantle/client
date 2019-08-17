@@ -3,6 +3,8 @@ import _root_.sbt.Keys._
 
 name := "commit"
 
+maintainer := "deepanshu@cosmiclabs.co"
+
 version := "1.0"
 
 lazy val GatlingTest = config("gatling") extend Test

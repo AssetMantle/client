@@ -29,7 +29,7 @@ class ConfirmBuyerBid @Inject()(wsClient: WSClient)(implicit configuration: Conf
 
   private val chainID = configuration.get[String]("blockchain.main.chainID")
 
-  case class Request(from: String, password: String, to: String, bid: Int, time: Int, pegHash: String, chainID: String = chainID, gas: Int)
+  case class Request(from: String, password: String, to: String, bid: Int, time: Int, pegHash: String, buyerContractHash: String, chainID: String = chainID, gas: Int)
 
   private implicit val requestWrites: OWrites[Request] = Json.writes[Request]
 

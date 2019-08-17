@@ -1,8 +1,8 @@
 @import models.master.Zone
 @import controllers.actions.LoginState
-@(zone: Zone)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+@(zone: Zone, failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
-@common(Messages(constants.User.HOME))(Html(""))(center)(Html(""))
+@common(Messages(constants.User.HOME), failures, warnings, successes, infos )(Html(""))(center)(Html(""))
 
 @center = {
     <div class="row">
