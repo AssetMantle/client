@@ -3,11 +3,11 @@
 
 @(issueFiatForm: Form[IssueFiat.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 
-    <div class="fixed_modal">
 @form(action = routes.IssueFiatController.blockchainIssueFiat, 'onkeypress -> "validateForm(event,this)") {
     <div class="latest_card-header latest_card-header-primary text-center">
         <h4 class="latest_card-title">@Messages(constants.Form.ISSUE_FIAT)</h4>
     </div>
+    <div class="fixed_modal">
     <div class="latest_card-body">
     @CSRF.formField
     @inputText(issueFiatForm(constants.Form.FROM), '_label -> Messages(constants.Form.FROM),'class -> "form-control",

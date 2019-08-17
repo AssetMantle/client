@@ -2,11 +2,12 @@
 @import views.companion.master.ModeratedSellerExecuteOrder
 
 @(moderatedSellerExecuteOrderForm: Form[ModeratedSellerExecuteOrder.Data],buyerAddress:String, sellerAddress:String, pegHash:String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-    <div class="fixed_modal">
+
 @form(action = routes.SellerExecuteOrderController.moderatedSellerExecuteOrder, 'onkeypress -> "validateForm(event,this)") {
     <div class="latest_card-header latest_card-header-primary text-center">
         <h4 class="latest_card-title">@Messages(constants.Form.MODERATED_SELLER_EXECUTE_ORDER)</h4>
     </div>
+    <div class="fixed_modal">
     <div class="latest_card-body">
     @CSRF.formField
     @inputText(moderatedSellerExecuteOrderForm(constants.Form.BUYER_ADDRESS).copy(value = Some(buyerAddress)), '_label -> Messages(constants.Form.BUYER_ADDRESS),

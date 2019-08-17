@@ -2,11 +2,12 @@
 @import views.companion.blockchain.SetSellerFeedback
 
 @(setSellerFeedbackForm: Form[SetSellerFeedback.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-    <div class="fixed_modal">
+
 @form(action = routes.SetSellerFeedbackController.blockchainSetSellerFeedback, 'onkeypress -> "validateForm(event,this)") {
     <div class="latest_card-header latest_card-header-primary text-center">
         <h4 class="latest_card-title">@Messages(constants.Form.SET_SELLER_FEEDBACK)</h4>
     </div>
+    <div class="fixed_modal">
     <div class="latest_card-body">
     @CSRF.formField
     @inputText(setSellerFeedbackForm(constants.Form.FROM), '_label -> Messages(constants.Form.FROM),'class -> "form-control",

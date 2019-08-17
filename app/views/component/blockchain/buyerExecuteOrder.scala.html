@@ -2,11 +2,12 @@
 @import views.companion.blockchain.BuyerExecuteOrder
 
 @(buyerExecuteOrderForm: Form[BuyerExecuteOrder.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-    <div class="fixed_modal">
+
     @form(action = routes.BuyerExecuteOrderController.blockchainBuyerExecuteOrder, 'onkeypress -> "validateForm(event,this)") {
         <div class="latest_card-header latest_card-header-primary text-center">
             <h4 class="latest_card-title">@Messages(constants.Form.BUYER_EXECUTE_ORDER)</h4>
         </div>
+    <div class="fixed_modal">
         <div class="latest_card-body">
             @CSRF.formField
     @inputText(buyerExecuteOrderForm(constants.Form.FROM), '_label -> Messages(constants.Form.FROM),'class -> "form-control",'placeholder->Messages(constants.Form.FROM),'required->true)

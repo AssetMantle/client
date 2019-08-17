@@ -2,12 +2,13 @@
 @import views.companion.master.IssueAssetRequest
 
 @(issueAssetRequestForm: Form[IssueAssetRequest.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-    <div class="fixed_modal">
+
 @form(action = routes.IssueAssetController.issueAssetRequest, 'onkeypress -> "validateForm(event,this)") {
     @CSRF.formField
     <div class="latest_card-header latest_card-header-primary text-center">
         <h4 class="latest_card-title">@Messages(constants.Form.ISSUE_ASSET_REQUEST)</h4>
     </div>
+    <div class="fixed_modal">
     <div class="latest_card-body">
     @inputText(issueAssetRequestForm(constants.Form.DOCUMENT_HASH), '_label -> Messages(constants.Form.DOCUMENT_HASH),
         'class -> "form-control",'placeholder->Messages(constants.Form.DOCUMENT_HASH),'required->true)

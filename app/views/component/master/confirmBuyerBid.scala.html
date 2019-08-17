@@ -2,11 +2,13 @@
 @import views.companion.master.ConfirmBuyerBid
 
 @(confirmBuyerBidForm: Form[ConfirmBuyerBid.Data], sellerAddress:String, pegHash:String, bid:Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-    <div class="fixed_modal">
+
 @form(action = routes.ConfirmBuyerBidController.confirmBuyerBid, 'onkeypress -> "validateForm(event,this)") {
     <div class="latest_card-header latest_card-header-primary text-center">
         <h4 class="latest_card-title">@Messages(constants.Form.CONFIRM_BUYER_BID)</h4>
     </div>
+    <div class="fixed_modal">
+    <div class="fixed_modal">
    <div class="latest_card-body">
     @CSRF.formField
     @inputText(confirmBuyerBidForm(constants.Form.SELLER_ADDRESS).copy(value = Some(sellerAddress)), '_label -> Messages(constants.Form.SELLER_ADDRESS),
