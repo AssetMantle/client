@@ -3,7 +3,5 @@ function fetchOrShowHide(source, route, e){
     if( !$.trim( div.html() ).length ) {
         componentResource(source, route);
             showHide($(e));
-        // $(e).parent().next().slideToggle("fast");
-        // xyz
     }
 }
