@@ -8,12 +8,12 @@
     </div>
     <div class="latest_card-body">
     @CSRF.formField
-    @inputText(changeBuyerBidForm(constants.Form.SELLER_ADDRESS).copy(value = Some(sellerAddress)), '_label -> Messages(constants.Form.SELLER_ADDRESS),'class -> "form-control",'placeholder->"Seller Address",'required->true))
-    @inputText(changeBuyerBidForm(constants.Form.BID), '_label -> Messages(constants.Form.BID),'class -> "form-control",'placeholder->"Bid",'required->true))
-    @inputText(changeBuyerBidForm(constants.Form.TIME), '_label -> Messages(constants.Form.TIME),'class -> "form-control",'placeholder->"Time",'required->true))
-    @inputText(changeBuyerBidForm(constants.Form.PEG_HASH).copy(value = Some(pegHash)), '_label -> Messages(constants.Form.PEG_HASH),'class -> "form-control",'placeholder->"Peg Hash",'required->true))
-    @inputText(changeBuyerBidForm(constants.Form.GAS), '_label -> Messages(constants.Form.GAS),'class -> "form-control",'placeholder->"Gas",'required->true))
-    @inputPassword(changeBuyerBidForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD),'class -> "form-control",'placeholder->"Password",'required->true))
+    @inputText(changeBuyerBidForm(constants.Form.SELLER_ADDRESS).copy(value = Some(sellerAddress)), '_label -> Messages(constants.Form.SELLER_ADDRESS),'class -> "form-control",'placeholder->"Seller Address",'required->true)
+    @inputText(changeBuyerBidForm(constants.Form.BID), '_label -> Messages(constants.Form.BID),'class -> "form-control",'placeholder->"Bid",'required->true)
+    @inputText(changeBuyerBidForm(constants.Form.TIME), '_label -> Messages(constants.Form.TIME),'class -> "form-control",'placeholder->"Time",'required->true)
+    @inputText(changeBuyerBidForm(constants.Form.PEG_HASH).copy(value = Some(pegHash)), '_label -> Messages(constants.Form.PEG_HASH),'class -> "form-control",'placeholder->"Peg Hash",'required->true)
+    @inputText(changeBuyerBidForm(constants.Form.GAS), '_label -> Messages(constants.Form.GAS),'class -> "form-control",'placeholder->"Gas",'required->true)
+    @inputPassword(changeBuyerBidForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD),'class -> "form-control",'placeholder->"Password",'required->true)
 
     @if(changeBuyerBidForm.hasGlobalErrors) {
         <ul>
