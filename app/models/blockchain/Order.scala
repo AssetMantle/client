@@ -90,6 +90,8 @@ class Orders @Inject()(shutdownActors: ShutdownActors, masterAccounts: master.Ac
   private def getOrdersByIDs(ids: Seq[String]): Future[Seq[Order]] = db.run(orderTable.filter(_.id.inSet(ids)).result)
 
   private def getOrderIDs: Future[Seq[String]] = db.run(orderTable.map(_.id).result)
+  private def getOrderIDsWithoutFiatProofHash: Future[Seq[String]] = db.run(orderTable.filter(_.fiatProofHash === "").map(_.id).result)
+  private def getOrderIDsWithoutAWBProofHash: Future[Seq[String]] = db.run(orderTable.filter(_.awbProofHash === "").map(_.id).result)
 
   private def deleteById(id: String): Future[Int] = db.run(orderTable.filter(_.id === id).delete.asTry).map {
     case Success(result) => result
@@ -117,7 +119,7 @@ class Orders @Inject()(shutdownActors: ShutdownActors, masterAccounts: master.Ac
 
   object Service {
 
-    def create(id: String, fiatProofHash: Option[String], awbProofHash: Option[String]): String = Await.result(add(Order(id = id, fiatProofHash = fiatProofHash, awbProofHash = awbProofHash, dirtyBit = false)), Duration.Inf)
+    def create(id: String, fiatProofHash: Option[String], awbProofHash: Option[String]): String = Await.result(add(Order(id = id, fiatProofHash = fiatProofHash, awbProofHash = awbProofHash, dirtyBit = true)), Duration.Inf)
 
     def insertOrUpdate(id: String, fiatProofHash: Option[String], awbProofHash: Option[String], dirtyBit: Boolean): Int = Await.result(upsert(Order(id = id, fiatProofHash = fiatProofHash, awbProofHash = awbProofHash, dirtyBit = dirtyBit)), Duration.Inf)
 
@@ -126,6 +128,8 @@ class Orders @Inject()(shutdownActors: ShutdownActors, masterAccounts: master.Ac
     def getOrders(ids: Seq[String]): Seq[Order] = Await.result(getOrdersByIDs(ids), Duration.Inf)
 
     def getAllOrderIds: Seq[String] = Await.result(getOrderIDs, Duration.Inf)
+    def getAllOrderIdsWithoutFiatProofHash: Seq[String] = Await.result(getOrderIDsWithoutFiatProofHash, Duration.Inf)
+    def getAllOrderIdsWithoutAWBProofHash: Seq[String] = Await.result(getOrderIDsWithoutAWBProofHash, Duration.Inf)
 
     def markDirty(id: String): Int = Await.result(updateDirtyBitById(id, dirtyBit = true), Duration.Inf)
 
