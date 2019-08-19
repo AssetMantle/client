@@ -8,7 +8,7 @@
         @zoneKYC.status.getOrElse(None)  match {
             case true => {
                 <div id="buttonZoneKycDocumentStatus@zoneKYC.id@zoneKYC.documentType">
-                    <button class="btn btn-sm btn-danger" onclick="rejectZoneKycDocument('@zoneKYC.id', '@zoneKYC.documentType')">@Messages(constants.Form.REJECT)w</button>
+                    <button class="btn btn-sm btn-danger" onclick="rejectZoneKycDocument('@zoneKYC.id', '@zoneKYC.documentType')">@Messages(constants.Form.REJECT)</button>
                 </div>
             }
             case false => {
@@ -19,7 +19,7 @@
             case _ => {
                 <div id="buttonZoneKycDocumentStatus@zoneKYC.id@zoneKYC.documentType">
                     <button class="btn btn-sm btn-success" onclick="verifyZoneKycDocument('@zoneKYC.id', '@zoneKYC.documentType')">@Messages(constants.Form.APPROVE)</button>
-                     <button class="btn btn-sm btn-success" onclick="rejectZoneKycDocument('@zoneKYC.id', '@zoneKYC.documentType')">@Messages(constants.Form.REJECT)</button></div>
+                     <button class="btn btn-sm btn-danger" onclick="rejectZoneKycDocument('@zoneKYC.id', '@zoneKYC.documentType')">@Messages(constants.Form.REJECT)</button></div>
             }
         }
     }

@@ -22,15 +22,11 @@
                     <h2 class="card-title">@username</h2>
                     <p> @Messages(constants.User.COINS): @coins</p>
                     <button class="text-center btn btn-primary btn-sm" onclick="getForm(jsRoutes.controllers.SendCoinController.sendCoinForm())">@Messages(constants.Form.SEND_COIN)</button>
-                    <button class="btn btn-primary btn-sm" onclick="getForm(jsRoutes.controllers.SendCoinController.requestCoinsForm())">@Messages(constants.Form.REQUEST_COIN)</button>
 
                     <p> @Messages(constants.User.USER_TYPE): @userType </p>
 
                     <p> @Messages(constants.User.ADDRESS):<span id="text_element" class="hash_code"> @address</span> <span onclick="copyToClipboard('text_element')"> <i class="fa fa-clipboard"></i></span></p>
 
-                    @*    <div class="tooltip">Hover over me*@
-                    @*        <span class="tooltiptext"  onclick="copyToClipboard('text_element')">Tooltip text</span>*@
-                    @*    </div>*@
                 </div>
             </div>
 
