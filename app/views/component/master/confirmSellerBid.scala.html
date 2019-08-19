@@ -16,7 +16,7 @@
     @inputText(confirmSellerBidForm(constants.Form.BID).copy(value = Some(bid.toString)), '_label -> Messages(constants.Form.BID),
         'class -> "form-control",'placeholder->Messages(constants.Form.BID),'required->true)
     @inputText(confirmSellerBidForm(constants.Form.TIME), '_label -> Messages(constants.Form.TIME),'class -> "form-control",
-        'placeholder->"Zone Id",'required->true)
+        'placeholder-> Messages(constants.Form.TIME),'required->true)
     @inputText(confirmSellerBidForm(constants.Form.PEG_HASH).copy(value = Some(pegHash)), '_label -> Messages(constants.Form.PEG_HASH),
         'class -> "form-control",'placeholder->Messages(constants.Form.PEG_HASH),'required->true)
     @inputText(confirmSellerBidForm(constants.Form.GAS), '_label -> Messages(constants.Form.GAS),'class -> "form-control",
