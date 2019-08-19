@@ -7,6 +7,7 @@ body {
 .badge {
     padding: 0.2em 0.5em;
     border-radius: 1em;
+    border-radius: 1em;
     background-color: red;
     font-size: 0.8em;
     color: white;
@@ -247,9 +248,18 @@ body {
 }
 
 /*Navbar*/
-.second {
-    width: 100%;
-    padding-top: 20px;
+
+
+.left_side {
+    width:20%;
+    margin-right: 1vw;
+}
+.middle {
+    width:60%;
+}
+.right_side {
+    width:20%;
+    margin-left: 1vw;
 }
 
 .hidden {
@@ -259,6 +269,7 @@ body {
 /*Flex*/
 /*Flex*/
 .pageFlexContainer {
+    display:flex;
     margin-top: 60px;
     justify-content:center;
 }
