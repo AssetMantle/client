@@ -2,24 +2,24 @@
 
 @(organizations: Seq[Organization])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
 <div class="col-md-12">
-@for(organization <- organizations) {
-    <div class="flexItem card secondBox leftText lightBlue">
-        <div class="card-body">
-        <span class="red">@Messages(constants.Form.ID)</span> :@organization.id <br>
-        <span class="red">@Messages(constants.Form.ACCOUNT_ID)</span> :@organization.accountID <br>
-        <span class="red">@Messages(constants.Form.NAME)</span> :@organization.name <br>
-        <span class="red">@Messages(constants.Form.ADDRESS)</span> :@organization.address <br>
-        <span class="red">@Messages(constants.Form.PHONE)</span> :@organization.phone <br>
-        <span class="red">@Messages(constants.Form.EMAIL)</span> :@organization.email <br>
-        </div>
-        <div class="leftMargin">
-            <div>
-                <h4 class="showHide toggleElement centerText"  onclick="fetchOrShowHide('@organization.accountID', jsRoutes.controllers.SetACLController.viewTradersInOrganizationForGenesis('@organization.id') ,this)">@Messages(constants.Form.TRADERS)</h4>
+    @for(organization <- organizations) {
+        <div class="flexItem card secondBox leftText lightBlue">
+            <div class="card-body">
+                <span class="red">@Messages(constants.Form.ID)</span> :@organization.id <br>
+                <span class="red">@Messages(constants.Form.ACCOUNT_ID)</span> :@organization.accountID <br>
+                <span class="red">@Messages(constants.Form.NAME)</span> :@organization.name <br>
+                <span class="red">@Messages(constants.Form.ADDRESS)</span> :@organization.address <br>
+                <span class="red">@Messages(constants.Form.PHONE)</span> :@organization.phone <br>
+                <span class="red">@Messages(constants.Form.EMAIL)</span> :@organization.email <br>
             </div>
-            <div id="@organization.accountID" class="flexContainer rightPadding scrollableThird"></div>
+            <div class="leftMargin">
+                <div>
+                    <h4 class="showHide toggleElement centerText" onclick="fetchOrShowHide('@organization.id', jsRoutes.controllers.SetACLController.viewTradersInOrganizationForGenesis('@organization.id'), this)">@Messages(constants.Form.TRADERS)</h4>
+                </div>
+                <div id="@organization.id" class="flexContainer rightPadding scrollableThird"></div>
+            </div>
         </div>
-    </div>
 
 
-}
+    }
 </div>

@@ -14,9 +14,9 @@
         </div>
         <div class="leftMargin">
             <div>
-                <h4 class="showHide toggleElement centerText" onclick="fetchOrShowHide('@zone.accountID', jsRoutes.controllers.AddOrganizationController.viewOrganizationsInZoneForGenesis('@zone.id') ,this)">@Messages(constants.Form.ORGANIZATIONS)</h4>
+                <h4 class="showHide toggleElement centerText" onclick="fetchOrShowHide('@zone.id', jsRoutes.controllers.AddOrganizationController.viewOrganizationsInZoneForGenesis('@zone.id') ,this)">@Messages(constants.Form.ORGANIZATIONS)</h4>
             </div>
-            <div id="@zone.accountID" class="flexContainer rightPadding scrollableSecond"></div>
+            <div id="@zone.id" class="flexContainer rightPadding scrollableSecond"></div>
         </div>
         </div>
 
