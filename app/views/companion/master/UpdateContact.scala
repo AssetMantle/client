@@ -5,12 +5,11 @@ import play.api.data.Forms._
 
 object UpdateContact {
 
-
   val form = Form(
     mapping(
-      constants.Form.EMAIL_ADDRESS -> email,
-      constants.Form.MOBILE_NUMBER -> nonEmptyText(minLength = 10, maxLength = 10),
-      constants.Form.COUNTRY_CODE -> nonEmptyText(minLength = 1, maxLength = 5)
+      constants.Form.EMAIL -> email,
+      constants.Form.MOBILE_NUMBER -> nonEmptyText(minLength = constants.FormConstraint.MOBILE_NUMBER_MINIMUM_LENGTH, maxLength = constants.FormConstraint.MOBILE_NUMBER_MAXIMUM_LENGTH).verifying(constants.FormConstraint.mobileNumberCheckConstraint),
+      constants.Form.COUNTRY_CODE -> nonEmptyText(minLength = constants.FormConstraint.COUNTRY_CODE_MINIMUM_LENGTH, maxLength = constants.FormConstraint.COUNTRY_CODE_MAXIMUM_LENGTH)
     )(Data.apply)(Data.unapply)
   )
 

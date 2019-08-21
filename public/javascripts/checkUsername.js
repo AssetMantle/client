@@ -3,28 +3,43 @@ $(document).ready(function () {
     $('#username').keyup(function () {
 
         let username = $(this).val();
-        let result = $('#result');
+        let usernameAvailable = $('#usernameAvailable');
+        let usernameAvailableImageResult = $('#usernameAvailableImageResult');
+        let usernameUnavailableImageResult = $('#usernameUnavailableImageResult');
+        let usernameLoadingImageResult = $('#usernameLoadingImageResult');
         let route = jsRoutes.controllers.SignUpController.checkUsernameAvailable(username);
 
         if (username.length > 2) {
-            result.html('loading');
+            usernameUnavailableImageResult.hide();
+            usernameAvailableImageResult.hide();
+            usernameLoadingImageResult.show();
             $.ajax({
                 url: route.url,
                 type: route.type,
                 statusCode: {
                     200: function () {
-                        result.html('available');
+                        usernameAvailable.prop("checked", true);
+                        usernameUnavailableImageResult.hide();
+                        usernameAvailableImageResult.show();
+                        usernameLoadingImageResult.hide();
                     },
                     204: function () {
-                        result.html('taken');
+                        usernameAvailable.prop("checked", false);
+                        usernameUnavailableImageResult.show();
+                        usernameAvailableImageResult.hide();
+                        usernameLoadingImageResult.hide();
                     }
                 }
             });
         } else {
-            result.html('Enter at least 3 characters');
+            usernameUnavailableImageResult.hide();
+            usernameAvailableImageResult.hide();
+            usernameLoadingImageResult.show();
         }
         if (username.length === 0) {
-            result.html('');
+            usernameLoadingImageResult.hide();
+            usernameUnavailableImageResult.hide();
+            usernameAvailableImageResult.hide();
         }
     });
 });
