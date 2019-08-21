@@ -1,12 +1,11 @@
 package controllers
 
-import controllers.actions.{WithLoginAction, WithOrganizationLoginAction, WithTraderLoginAction, WithZoneLoginAction}
+import controllers.actions.{WithLoginAction, WithTraderLoginAction, WithZoneLoginAction}
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import models.blockchain.ACLAccounts
+import models.blockchain.{ACLAccounts, Negotiation}
 import models.master.{Accounts, Organizations, Zones}
-import models.{blockchain, master}
 import models.{blockchain, master}
 import play.api.http.ContentTypes
 import play.api.i18n.I18nSupport
@@ -18,7 +17,7 @@ import queries.GetAccount
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class ComponentViewController @Inject()(messagesControllerComponents: MessagesControllerComponents, withZoneLoginAction: WithZoneLoginAction,withTraderLoginAction: WithTraderLoginAction, withLoginAction: WithLoginAction, masterAccounts: Accounts,  masterAccountFiles: master.AccountFiles, blockchainAclAccounts: ACLAccounts, blockchainZones: blockchain.Zones, blockchainOrganizations: blockchain.Organizations, blockchainAssets: blockchain.Assets, blockchainFiats: blockchain.Fiats, blockchainNegotiations: blockchain.Negotiations, masterOrganizations: Organizations, masterZones: Zones, blockchainAclHashes: blockchain.ACLHashes, blockchainOrders: blockchain.Orders, getAccount: GetAccount, blockchainAccounts: blockchain.Accounts, withUsernameToken: WithUsernameToken)(implicit configuration: Configuration, executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class ComponentViewController @Inject()(messagesControllerComponents: MessagesControllerComponents, withZoneLoginAction: WithZoneLoginAction, withTraderLoginAction: WithTraderLoginAction, withLoginAction: WithLoginAction, masterAccounts: Accounts, masterAccountFiles: master.AccountFiles, blockchainAclAccounts: ACLAccounts, blockchainZones: blockchain.Zones, blockchainOrganizations: blockchain.Organizations, blockchainAssets: blockchain.Assets, blockchainFiats: blockchain.Fiats, blockchainNegotiations: blockchain.Negotiations, masterOrganizations: Organizations, masterZones: Zones, blockchainAclHashes: blockchain.ACLHashes, blockchainOrders: blockchain.Orders, getAccount: GetAccount, blockchainAccounts: blockchain.Accounts, withUsernameToken: WithUsernameToken)(implicit configuration: Configuration, executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -96,7 +95,7 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
   def buyNegotiationList: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        Ok(views.html.component.master.buyNegotiationList( blockchainNegotiations.Service.getNegotiationsForAddress(loginState.address).filter(_.buyerAddress == loginState.address), blockchainAssets.Service.getAssetPegWallet(loginState.address).map(_.pegHash)))
+        Ok(views.html.component.master.buyNegotiationList(blockchainNegotiations.Service.getNegotiationsForAddress(loginState.address).filter(_.buyerAddress == loginState.address), blockchainAssets.Service.getAssetPegWallet(loginState.address).map(_.pegHash), aclHash = blockchainAclHashes.Service.get(blockchainAclAccounts.Service.get(loginState.address).aclHash)))
       } catch {
         case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
       }
@@ -104,8 +103,8 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
 
   def sellNegotiationList: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      try{
-        Ok(views.html.component.master.sellNegotiationList(blockchainNegotiations.Service.getNegotiationsForAddress(loginState.address).filter(_.sellerAddress == loginState.address), blockchainAssets.Service.getAssetPegWallet(loginState.address).map(_.pegHash)))
+      try {
+        Ok(views.html.component.master.sellNegotiationList(blockchainNegotiations.Service.getNegotiationsForAddress(loginState.address).filter(_.sellerAddress == loginState.address), blockchainAssets.Service.getAssetPegWallet(loginState.address).map(_.pegHash), aclHash = blockchainAclHashes.Service.get(blockchainAclAccounts.Service.get(loginState.address).aclHash)))
       } catch {
         case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
       }
@@ -114,7 +113,16 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
   def orderList: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        Ok(views.html.component.master.orderList(blockchainOrders.Service.getOrders(blockchainNegotiations.Service.getNegotiationsForAddress(loginState.address).map(_.id))))
+        //        val aclHash = blockchainAclHashes.Service.get(blockchainAclAccounts.Service.get(loginState.address).aclHash)
+        val negotiations = blockchainNegotiations.Service.getNegotiationsForAddress(loginState.address)
+        val orders = blockchainOrders.Service.getOrders(negotiations.map(_.id))
+        val relevantNegotiations: Seq[Negotiation] = negotiations.filter(negotiation => orders.map(_.id) contains negotiation.id)
+        val assets = blockchainAssets.Service.getByAddresses(relevantNegotiations.map(_.id))
+
+        Ok(views.html.component.master.orderList(orders.filter(order => (for (relevantNegotiation <- relevantNegotiations; if relevantNegotiation.buyerAddress == loginState.address && !assets.filter(asset => asset.pegHash == relevantNegotiation.assetPegHash).head.moderated) yield relevantNegotiation).map(_.id) contains order.id),
+          orders.filter(order => (for (relevantNegotiation <- relevantNegotiations; if relevantNegotiation.sellerAddress == loginState.address && !assets.filter(asset => asset.pegHash == relevantNegotiation.assetPegHash).head.moderated) yield relevantNegotiation).map(_.id) contains order.id),
+          orders.filter(order => (for (relevantNegotiation <- relevantNegotiations; if assets.filter(asset => asset.pegHash == relevantNegotiation.assetPegHash).head.moderated) yield relevantNegotiation).map(_.id) contains order.id),
+          blockchainAclHashes.Service.get(blockchainAclAccounts.Service.get(loginState.address).aclHash)))
       } catch {
         case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
       }
@@ -122,7 +130,7 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
 
   def availableAssetList: Action[AnyContent] = Action { implicit request =>
     try {
-      Ok(views.html.component.master.availableAssetList(blockchainAssets.Service.getAllModerated(blockchainOrders.Service.getAllOrderIds)))
+      Ok(views.html.component.master.availableAssetList(blockchainAssets.Service.getAllPublic(blockchainOrders.Service.getAllOrderIds)))
     } catch {
       case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
     }
@@ -131,15 +139,15 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
   def availableAssetListWithLogin: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        Ok(views.html.component.master.availableAssetListWithLogin(blockchainAssets.Service.getAllModerated(blockchainOrders.Service.getAllOrderIds), blockchainAclHashes.Service.get(blockchainAclAccounts.Service.get(loginState.address).aclHash)))
+        Ok(views.html.component.master.availableAssetListWithLogin(blockchainAssets.Service.getAllPublic(blockchainOrders.Service.getAllOrderIds), blockchainAclHashes.Service.get(blockchainAclAccounts.Service.get(loginState.address).aclHash)))
       } catch {
         case baseException: BaseException => NoContent
       }
   }
 
   def accountComet: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
-  implicit request =>
-    Ok.chunked(blockchainAccounts.Service.accountCometSource(loginState.username) via Comet.json("parent.accountCometMessage")).as(ContentTypes.HTML)
+    implicit request =>
+      Ok.chunked(blockchainAccounts.Service.accountCometSource(loginState.username) via Comet.json("parent.accountCometMessage")).as(ContentTypes.HTML)
 
   }
 

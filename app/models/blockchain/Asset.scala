@@ -78,7 +78,7 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }
   }
-  private def findAllAssetsByModerated(excludedAssets:Seq[String], moderated: Boolean):Future[Seq[Asset]] = db.run(assetTable.filter(_.moderated === moderated).filter(assets => !(assets.ownerAddress inSet excludedAssets)).result.asTry).map {
+  private def findAllAssetsByPublic(excludedAssets:Seq[String]):Future[Seq[Asset]] = db.run(assetTable.filter(assets => !(assets.ownerAddress inSet excludedAssets)).result.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -89,6 +89,16 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
   }
 
   private def findAllUnLocked(ownerAddresses:Seq[String]):Future[Seq[Asset]] = db.run(assetTable.filter(_.locked === true).filter(asset => asset.ownerAddress inSet ownerAddresses).result.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def findByAddresses(ownerAddresses:Seq[String]):Future[Seq[Asset]] = db.run(assetTable.filter(asset => asset.ownerAddress inSet ownerAddresses).result.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -164,9 +174,11 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
 
     def get(pegHash: String)(implicit executionContext: ExecutionContext): Asset = Await.result(findByPegHash(pegHash), Duration.Inf)
 
-    def getAllModerated(excludedAssets:Seq[String]):Seq[Asset] = Await.result(findAllAssetsByModerated(excludedAssets,  moderated = true),Duration.Inf)
+    def getAllPublic(excludedAssets:Seq[String]):Seq[Asset] = Await.result(findAllAssetsByPublic(excludedAssets),Duration.Inf)
 
     def getAllLocked(ownerAddresses:Seq[String]):Seq[Asset] = Await.result(findAllUnLocked(ownerAddresses),Duration.Inf)
+
+    def getByAddresses(ownerAddresses:Seq[String]):Seq[Asset] = Await.result(findByAddresses(ownerAddresses),Duration.Inf)
 
     def getAssetPegWallet(address: String)(implicit executionContext: ExecutionContext): Seq[Asset] = Await.result(getAssetPegWalletByAddress(address), Duration.Inf)
 

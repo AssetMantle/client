@@ -19,8 +19,9 @@ class SellerExecuteOrderController @Inject()(messagesControllerComponents: Messa
 
   private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
 
-  def sellerExecuteOrderForm(buyerAddress:String, pegHash:String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.sellerExecuteOrder(views.companion.master.SellerExecuteOrder.form, buyerAddress, pegHash))
+  def sellerExecuteOrderForm(orderID:String): Action[AnyContent] = Action { implicit request =>
+    val negotiation = blockchainNegotiations.Service.get(orderID)
+    Ok(views.html.component.master.sellerExecuteOrder(views.companion.master.SellerExecuteOrder.form, negotiation.buyerAddress, negotiation.assetPegHash))
   }
 
   def sellerExecuteOrder: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
