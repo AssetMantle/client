@@ -7,7 +7,7 @@ object RejectVerifyTraderRequest {
 
   val form = Form(
     mapping(
-      constants.Form.TRADER_ID -> nonEmptyText(minLength = 4, maxLength = 45),
+      constants.Form.TRADER_ID -> nonEmptyText(minLength = constants.FormConstraint.TRADER_ID_MINIMUM_LENGTH, maxLength = constants.FormConstraint.TRADER_ID_MAXIMUM_LENGTH)
     )(Data.apply)(Data.unapply)
   )
 
