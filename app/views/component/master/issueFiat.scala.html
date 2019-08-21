@@ -15,7 +15,7 @@
     @inputText(issueFiatForm(constants.Form.ACCOUNT_ID).copy(value = Some(accountID)), '_label -> Messages(constants.Form.ACCOUNT_ID),
         'class -> "form-control",'placeholder->Messages(constants.Form.ACCOUNT_ID),'required->true)
     @inputText(issueFiatForm(constants.Form.TRANSACTION_ID).copy(value = Some(transactionID)), '_label -> Messages(constants.Form.TRANSACTION_ID),
-        'class -> "form-control",'placeholder->Messages(constants.Form.TRADER_ID),'required->true)
+        'class -> "form-control",'placeholder->Messages(constants.Form.TRANSACTION_ID),'required->true)
     @inputText(issueFiatForm(constants.Form.TRANSACTION_AMOUNT).copy(value = Some(transactionAmount.toString)), '_label -> Messages(constants.Form.TRANSACTION_AMOUNT),
         'class -> "form-control",'placeholder->Messages(constants.Form.TRANSACTION_AMOUNT),'required->true)
     @inputText(issueFiatForm(constants.Form.GAS), '_label -> Messages(constants.Form.GAS),

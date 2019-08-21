@@ -101,7 +101,7 @@ object FormConstraint {
   })
 
   val mobileNumberCheckConstraint: Constraint[String] = Constraint("constraints.mobileNumberCheck")({ mobileNumber: String =>
-    val errors = if (!mobileNumber.matches("""\d*""")) Seq(ValidationError(constants.Response.PASSWORD_IS_ALL_NUMBERS.message)) else Nil
+    val errors = if (!mobileNumber.matches("[0-9]+")) Seq(ValidationError(constants.Response.MOBILE_NUMBER_DO_NOT_CONTAINS_ONLY_NUMBERS.message)) else Nil
     if (errors.isEmpty) {
       Valid
     } else {

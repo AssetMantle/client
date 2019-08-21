@@ -11,7 +11,7 @@ object ConfirmSellerBid {
       constants.Form.BID -> number(min = constants.FormConstraint.BID_MINIMUM_VALUE, max = constants.FormConstraint.BID_MAXIMUM_VALUE),
       constants.Form.TIME -> number(min = constants.FormConstraint.BLOCK_TIME_MINIMUM_VALUE, max = constants.FormConstraint.BLOCK_TIME_MAXIMUM_VALUE),
       constants.Form.PEG_HASH -> nonEmptyText(minLength = constants.FormConstraint.PEG_HASH_MINIMUM_LENGTH, maxLength = constants.FormConstraint.PEG_HASH_MAXIMUM_LENGTH),
-      constants.Form.SELLER_CONTRACT_HASH -> nonEmptyText(minLength = 5, maxLength = 40),
+      constants.Form.SELLER_CONTRACT_HASH -> nonEmptyText(minLength = 40, maxLength = 40),
       constants.Form.GAS -> number(min = constants.FormConstraint.GAS_MINIMUM_VALUE, max = constants.FormConstraint.GAS_MAXIMUM_VALUE)
     )(Data.apply)(Data.unapply)
   )

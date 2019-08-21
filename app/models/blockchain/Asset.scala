@@ -98,7 +98,7 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
     }
   }
 
-  private def findByAddresses(ownerAddresses:Seq[String]):Future[Seq[Asset]] = db.run(assetTable.filter(asset => asset.ownerAddress inSet ownerAddresses).result.asTry).map {
+  private def findByPegHashes(pegHashes:Seq[String]):Future[Seq[Asset]] = db.run(assetTable.filter(asset => asset.pegHash inSet pegHashes).result.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -178,7 +178,7 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
 
     def getAllLocked(ownerAddresses:Seq[String]):Seq[Asset] = Await.result(findAllUnLocked(ownerAddresses),Duration.Inf)
 
-    def getByAddresses(ownerAddresses:Seq[String]):Seq[Asset] = Await.result(findByAddresses(ownerAddresses),Duration.Inf)
+    def getByPegHashes(pegHashes:Seq[String]):Seq[Asset] = Await.result(findByPegHashes(pegHashes),Duration.Inf)
 
     def getAssetPegWallet(address: String)(implicit executionContext: ExecutionContext): Seq[Asset] = Await.result(getAssetPegWalletByAddress(address), Duration.Inf)
 
@@ -215,6 +215,7 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
           case baseException: BaseException => logger.info(baseException.failure.message, baseException)
             if (baseException.failure == constants.Response.NO_RESPONSE) {
               Service.deleteAssetPegWallet(dirtyAsset.ownerAddress)
+              mainAssetActor ! AssetCometMessage(username = masterAccounts.Service.getId(dirtyAsset.ownerAddress), message = Json.toJson(constants.Comet.PING))
             }
           case blockChainException: BlockChainException => logger.error(blockChainException.failure.message, blockChainException)
         }

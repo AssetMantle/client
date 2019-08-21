@@ -99,6 +99,7 @@ object Response {
   val PASSWORDS_DO_NOT_MATCH = new Failure("PASSWORDS_DO_NOT_MATCH")
   val PASSWORD_IS_ALL_LETTERS = new Failure("PASSWORD_IS_ALL_LETTERS")
   val PASSWORD_IS_ALL_NUMBERS = new Failure("PASSWORD_IS_ALL_NUMBERS")
+  val MOBILE_NUMBER_DO_NOT_CONTAINS_ONLY_NUMBERS = new Failure("MOBILE_NUMBER_DO_NOT_CONTAINS_ONLY_NUMBERS")
 
 
   class Failure(private val response: String, private val actionController: JavaScriptReverseRoute = null) {

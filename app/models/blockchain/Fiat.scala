@@ -167,6 +167,7 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
           case baseException: BaseException => logger.info(baseException.failure.message, baseException)
             if (baseException.failure == constants.Response.NO_RESPONSE) {
               Service.deleteFiatPegWallet(dirtyFiat.ownerAddress)
+              mainFiatActor ! FiatCometMessage(username = masterAccounts.Service.getId(dirtyFiat.ownerAddress), message = Json.toJson("0"))
             }
           case blockChainException: BlockChainException => logger.error(blockChainException.failure.message, blockChainException)
         }
