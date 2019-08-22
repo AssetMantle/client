@@ -3,12 +3,21 @@
 
 @(redeemAssetForm: Form[RedeemAsset.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @form(action = routes.RedeemAssetController.blockchainRedeemAsset, 'onkeypress -> "validateForm(event,this)") {
+    <div class="latest_card-header latest_card-header-primary text-center">
+        <h4 class="latest_card-title">@Messages(constants.Form.REDEEM_ASSET)</h4>
+    </div>
+    <div class="latest_card-body">
     @CSRF.formField
-    @inputText(redeemAssetForm(constants.Form.FROM), '_label -> Messages(constants.Form.FROM))
-    @inputText(redeemAssetForm(constants.Form.TO), '_label -> Messages(constants.Form.TO))
-    @inputText(redeemAssetForm(constants.Form.PEG_HASH), '_label -> Messages(constants.Form.PEG_HASH))
-    @inputText(redeemAssetForm(constants.Form.GAS), '_label -> Messages(constants.Form.GAS))
-    @inputPassword(redeemAssetForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD))
+    @inputText(redeemAssetForm(constants.Form.FROM), '_label -> Messages(constants.Form.FROM),'class -> "form-control",
+        'placeholder->Messages(constants.Form.FROM),'required->true)
+    @inputText(redeemAssetForm(constants.Form.TO), '_label -> Messages(constants.Form.TO),'class -> "form-control",
+        'placeholder->Messages(constants.Form.TO),'required->true)
+    @inputText(redeemAssetForm(constants.Form.PEG_HASH), '_label -> Messages(constants.Form.PEG_HASH),
+        'class -> "form-control",'placeholder->Messages(constants.Form.PEG_HASH),'required->true)
+    @inputText(redeemAssetForm(constants.Form.GAS), '_label -> Messages(constants.Form.GAS),'class -> "form-control",
+        'placeholder->Messages(constants.Form.GAS),'required->true)
+    @inputPassword(redeemAssetForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD),
+        'class -> "form-control",'placeholder->Messages(constants.Form.PASSWORD),'required->true)
 
     @if(redeemAssetForm.hasGlobalErrors) {
         <ul>
@@ -17,5 +26,8 @@
         }
         </ul>
     }
-    <button type="button" onclick="submitForm(this)">@Messages(constants.Form.REDEEM_ASSET)</button>
-}
+    <button type="button" class="btn btn-primary btn-sm" onclick="submitForm(this)">@Messages(constants.Form.REDEEM_ASSET)</button>
+    </div>
+    </div>
+
+    }

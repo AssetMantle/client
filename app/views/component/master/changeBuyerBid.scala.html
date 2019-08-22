@@ -2,15 +2,18 @@
 @import views.companion.master.ChangeBuyerBid
 
 @(changeBuyerBidForm: Form[ChangeBuyerBid.Data], sellerAddress:String, pegHash:String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-
 @form(action = routes.ChangeBuyerBidController.changeBuyerBid, 'onkeypress -> "validateForm(event,this)") {
+    <div class="latest_card-header latest_card-header-primary text-center">
+        <h4 class="latest_card-title">@Messages(constants.Form.CHANGE_BUYER_BID)</h4>
+    </div>
+    <div class="latest_card-body">
     @CSRF.formField
-    @inputText(changeBuyerBidForm(constants.Form.SELLER_ADDRESS).copy(value = Some(sellerAddress)), '_label -> Messages(constants.Form.SELLER_ADDRESS))
-    @inputText(changeBuyerBidForm(constants.Form.BID), '_label -> Messages(constants.Form.BID))
-    @inputText(changeBuyerBidForm(constants.Form.TIME), '_label -> Messages(constants.Form.TIME))
-    @inputText(changeBuyerBidForm(constants.Form.PEG_HASH).copy(value = Some(pegHash)), '_label -> Messages(constants.Form.PEG_HASH))
-    @inputText(changeBuyerBidForm(constants.Form.GAS), '_label -> Messages(constants.Form.GAS))
-    @inputPassword(changeBuyerBidForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD))
+    @inputText(changeBuyerBidForm(constants.Form.SELLER_ADDRESS).copy(value = Some(sellerAddress)), '_label -> Messages(constants.Form.SELLER_ADDRESS),'class -> "form-control",'placeholder->"Seller Address",'required->true)
+    @inputText(changeBuyerBidForm(constants.Form.BID), '_label -> Messages(constants.Form.BID),'class -> "form-control",'placeholder->"Bid",'required->true)
+    @inputText(changeBuyerBidForm(constants.Form.TIME), '_label -> Messages(constants.Form.TIME),'class -> "form-control",'placeholder->"Time",'required->true)
+    @inputText(changeBuyerBidForm(constants.Form.PEG_HASH).copy(value = Some(pegHash)), '_label -> Messages(constants.Form.PEG_HASH),'class -> "form-control",'placeholder->"Peg Hash",'required->true)
+    @inputText(changeBuyerBidForm(constants.Form.GAS), '_label -> Messages(constants.Form.GAS),'class -> "form-control",'placeholder->"Gas",'required->true)
+    @inputPassword(changeBuyerBidForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD),'class -> "form-control",'placeholder->"Password",'required->true)
 
     @if(changeBuyerBidForm.hasGlobalErrors) {
         <ul>
@@ -19,6 +22,6 @@
         }
         </ul>
     }
-    <button type="button" onclick="submitForm(this)">@Messages(constants.Form.CHANGE_BUYER_BID)</button>
-}
-
+    <button type="button" class="btn btn-sm btn-primary" onclick="submitForm(this)">@Messages(constants.Form.CHANGE_BUYER_BID)</button>
+    </div>
+    }

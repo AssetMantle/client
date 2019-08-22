@@ -3,11 +3,15 @@
 @(issueFiatRequests: Seq[IssueFiatRequest])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
 
 @for(issueFiatRequest <- issueFiatRequests) {
-    <div class="flexItem box firstBox leftText lightBlue">
+    <div class="col-md-4">
+        <br>
+    <div class="flexItem card-body leftText lightBlue">
         <span class="red">@Messages(constants.Form.ACCOUNT_ID)</span> : @issueFiatRequest.accountID <br>
         <span class="red">@Messages(constants.Form.DOCUMENT_HASH)</span> : @issueFiatRequest.transactionID <br>
         <span class="red">@Messages(constants.Form.ASSET_TYPE)</span> : @issueFiatRequest.transactionAmount <br>
-        <button class="approve" onclick="getForm(jsRoutes.controllers.IssueFiatController.issueFiatForm('@issueFiatRequest.id', '@issueFiatRequest.accountID', '@issueFiatRequest.transactionID', @issueFiatRequest.transactionAmount))">@Messages(constants.Form.APPROVE)</button> <button class="reject" onclick="getForm(jsRoutes.controllers.IssueFiatController.rejectIssueFiatRequestForm('@issueFiatRequest.id'))">@Messages(constants.Form.REJECT)</button>
+        <button class="btn btn-sm btn-success" onclick="getForm(jsRoutes.controllers.IssueFiatController.issueFiatForm('@issueFiatRequest.id', '@issueFiatRequest.accountID', '@issueFiatRequest.transactionID', @issueFiatRequest.transactionAmount))">@Messages(constants.Form.APPROVE)</button>
+        <button class=" btn btn-sm btn-danger" onclick="getForm(jsRoutes.controllers.IssueFiatController.rejectIssueFiatRequestForm('@issueFiatRequest.id'))">@Messages(constants.Form.REJECT)</button>
+    </div>
     </div>
 }
 

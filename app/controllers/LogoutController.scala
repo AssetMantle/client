@@ -34,6 +34,8 @@ class LogoutController @Inject()(messagesControllerComponents: MessagesControlle
           try {
             if (!loginData.receiveNotifications) {
               accountTokens.Service.deleteToken(loginState.username)
+            } else {
+              accountTokens.Service.resetSessionTokenTime(loginState.username)
             }
             shutdownActors.onLogOut(constants.Module.ACTOR_MAIN_ACCOUNT, loginState.username)
             if (masterAccounts.Service.getUserType(loginState.username) == constants.User.TRADER) {
@@ -42,7 +44,6 @@ class LogoutController @Inject()(messagesControllerComponents: MessagesControlle
               shutdownActors.onLogOut(constants.Module.ACTOR_MAIN_NEGOTIATION, loginState.username)
               shutdownActors.onLogOut(constants.Module.ACTOR_MAIN_ORDER, loginState.username)
             }
-            accountTokens.Service.resetSessionTokenTime(loginState.username)
             Ok(views.html.index(successes = Seq(constants.Response.LOGGED_OUT))).withNewSession
           }
           catch {

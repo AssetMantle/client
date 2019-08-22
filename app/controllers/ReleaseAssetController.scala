@@ -1,6 +1,6 @@
 package controllers
 
-import controllers.actions.{WithLoginAction, WithZoneLoginAction}
+import controllers.actions.WithZoneLoginAction
 import exceptions.{BaseException, BlockChainException}
 import javax.inject.{Inject, Singleton}
 import models.{blockchain, blockchainTransaction}
@@ -22,7 +22,7 @@ class ReleaseAssetController @Inject()(messagesControllerComponents: MessagesCon
     Ok(views.html.component.master.releaseAsset(views.companion.master.ReleaseAsset.form, ownerAddress, pegHash))
   }
 
-  def releaseAsset: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+  def releaseAsset(): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       views.companion.master.ReleaseAsset.form.bindFromRequest().fold(
         formWithErrors => {

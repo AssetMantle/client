@@ -19,8 +19,9 @@ class SellerExecuteOrderController @Inject()(messagesControllerComponents: Messa
 
   private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
 
-  def sellerExecuteOrderForm(buyerAddress:String, pegHash:String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.sellerExecuteOrder(views.companion.master.SellerExecuteOrder.form, buyerAddress, pegHash))
+  def sellerExecuteOrderForm(orderID:String): Action[AnyContent] = Action { implicit request =>
+    val negotiation = blockchainNegotiations.Service.get(orderID)
+    Ok(views.html.component.master.sellerExecuteOrder(views.companion.master.SellerExecuteOrder.form, negotiation.buyerAddress, negotiation.assetPegHash))
   }
 
   def sellerExecuteOrder: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
@@ -57,7 +58,7 @@ class SellerExecuteOrderController @Inject()(messagesControllerComponents: Messa
   def moderatedSellerExecuteOrderList: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        Ok(views.html.component.master.moderatedSellerExecuteOrderList(blockchainNegotiations.Service.getSellerNegotiationsByOrderAndZone(blockchainOrders.Service.getAllOrderIds, blockchainACLAccounts.Service.getAddressesUnderZone(blockchainZones.Service.getID(loginState.address)))))
+        Ok(views.html.component.master.moderatedSellerExecuteOrderList(blockchainNegotiations.Service.getSellerNegotiationsByOrderAndZone(blockchainOrders.Service.getAllOrderIdsWithoutAWBProofHash, blockchainACLAccounts.Service.getAddressesUnderZone(blockchainZones.Service.getID(loginState.address)))))
       }catch {
         case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
       }

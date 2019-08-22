@@ -3,11 +3,14 @@
 @(releaseAssetList : Seq[Asset])(implicit messagesProvider: MessagesProvider)
 
 @for(releaseAsset <- releaseAssetList){
-    <div class="flexItem box firstBox lightBlue">
+    <div class="col-md-3">
+        <br>
+    <div class="flexItem card-body lightBlue">
         <div class="leftText">
             <span class="red">@Messages(constants.Form.OWNER_ADDRESS)</span> : @releaseAsset.ownerAddress <br>
             <span class="red">@Messages(constants.Form.PEG_HASH)</span> : @releaseAsset.pegHash <br>
-            <button onclick="getForm(jsRoutes.controllers.ReleaseAssetController.releaseAssetForm('@releaseAsset.ownerAddress','@releaseAsset.pegHash'))">@Messages(constants.Form.RELEASE_ASSET)</button>
+            <button class="btn btn-sm btn-primary" onclick="getForm(jsRoutes.controllers.ReleaseAssetController.releaseAssetForm('@releaseAsset.ownerAddress','@releaseAsset.pegHash'))">@Messages(constants.Form.RELEASE_ASSET)</button>
         </div>
+    </div>
     </div>
 }

@@ -1,6 +1,18 @@
+/** {*/
+/*    box-sizing: border-box;*/
+/*}*/
+
 html {
     height: 100%;
 }
+
+/*body {*/
+/*    margin: 0;*/
+/*    height: 100%;*/
+/*    font-size: 1vw;*/
+/*    font-family: Arial, Helvetica, sans-serif;*/
+/*}*/
+
 
 input {
     width: 100%;
@@ -17,8 +29,8 @@ input:hover {
 }
 
 button {
-    background-color: #0006b8;
-    color: white;
+    background-color:#EEF9FF;
+    color: #1B7FBD;
     padding: 10px 15px;
     border-radius: 5px;
     margin: 5px 0;
@@ -44,3 +56,20 @@ a:hover {
 h2 {
     color: white;
 }
+label{
+    display: none !important;
+}
+/*label{*/
+/*    position: absolute;*/
+/*    top: 0;*/
+/*    padding: 7px 0 0 13px;*/
+/*    transition: all 200ms;*/
+/*    opacity: 0.5;*/
+/*}*/
+
+/*.form-control:focus + .form-control-placeholder,*/
+/*.form-control:valid + .form-control-placeholder {*/
+/*    font-size: 75%;*/
+/*    transform: translate3d(0, -100%, 0);*/
+/*    opacity: 1;*/
+/*}*/

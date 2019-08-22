@@ -3,7 +3,6 @@ $(document).click(function (e) {
         const hideElement = $(this);
         if (hideElement.is(e.target)) {
             showHide(hideElement);
-
         }
     });
 });

@@ -2,7 +2,7 @@ function getForm(route, modalContent = '#commonModalContent', modal = '#commonMo
     $.ajax({
         url: route.url,
         type: route.type,
-        async: true,
+        async: false,
         statusCode: {
             200: function (data) {
                 $(modal).fadeIn(200);

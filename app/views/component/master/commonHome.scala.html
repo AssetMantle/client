@@ -1,29 +1,40 @@
 @(username: String, userType: String, address: String, coins: String = "0", profilePicture: Array[Byte])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
 
-<div class="width70Percent">
-    <div>
-        <h2 class="showHide toggleElement centerText">@username</h2>
-        <div class="leftText">
-            @Messages(constants.User.COINS): @coins
-            <button onclick="getForm(jsRoutes.controllers.SendCoinController.sendCoinForm())">@Messages(constants.Form.SEND_COIN)</button>
+
+<div class="container ">
+    <div class="card">
+        <div class="row ">
+            <div class="col-md-4 ">
+                <div class="profile_hover">
+                @if(profilePicture sameElements Array[Byte]()) {
+                    <img id="profilePicture" class="profilePicture" src="@routes.Assets.versioned("images/defaultProfilePicture.jpg")" alt="@constants.Form.PROFILE_PICTURE">
+                    <br>
+                    <button id="profilePictureBottomUploadButton" class="bottom btn btn-default btn-sm" onclick="getForm(jsRoutes.controllers.FileController.uploadAccountFileForm('@constants.File.PROFILE_PICTURE'))">@Messages(constants.Form.UPLOAD)</button>
+                } else {
+                    <img id="profilePicture" class="profilePicture" src="data:image/jpg;base64,@utilities.ImageProcess.decodeImageThumbnailData(profilePicture)" alt="@constants.Form.PROFILE_PICTURE">
+                    <br>
+                    <button id="profilePictureBottomUploadButton" class="bottom btn btn-default btn-sm" onclick="getForm(jsRoutes.controllers.FileController.updateAccountFileForm('@constants.File.PROFILE_PICTURE'))">@Messages(constants.Form.UPDATE)</button>
+                }
+                </div>
+            </div>
+            <div class="col-md-8 px-3">
+                <div class="card-block px-3">
+                    <h2 class="card-title">@username</h2>
+                    <p> @Messages(constants.User.COINS): @coins</p>
+                    <button class="text-center btn btn-primary btn-sm" onclick="getForm(jsRoutes.controllers.SendCoinController.sendCoinForm())">@Messages(constants.Form.SEND_COIN)</button>
+
+                    <p> @Messages(constants.User.USER_TYPE): @userType </p>
+
+                    <p> @Messages(constants.User.ADDRESS):<span id="text_element" class="hash_code"> @address</span> <span onclick="copyToClipboard('text_element')"> <i class="fa fa-clipboard"></i></span></p>
+
+                </div>
+            </div>
+
         </div>
     </div>
-    <div  class="leftText">
-        @Messages(constants.User.USER_TYPE): @userType <br/>
-        @Messages(constants.User.ADDRESS): @address <br/>
-    </div>
 </div>
-<div class="width30Percent">
-    @if(profilePicture sameElements Array[Byte]()) {
-        <img id="profilePicture" class="profilePicture" src="@routes.Assets.versioned("images/defaultProfilePicture.jpg")" alt="@constants.Form.PROFILE_PICTURE">
-        <br>
-        <button id="profilePictureBottomUploadButton" class="bottom" onclick="getForm(jsRoutes.controllers.FileController.uploadAccountFileForm('@constants.File.PROFILE_PICTURE'))">@Messages(constants.Form.UPLOAD)</button>
-    } else {
-        <img id="profilePicture" class="profilePicture" src="data:image/jpg;base64,@utilities.ImageProcess.decodeImageThumbnailData(profilePicture)" alt="@constants.Form.PROFILE_PICTURE">
-        <br>
-        <button id="profilePictureBottomUploadButton" class="bottom" onclick="getForm(jsRoutes.controllers.FileController.updateAccountFileForm('@constants.File.PROFILE_PICTURE'))">@Messages(constants.Form.UPDATE)</button>
-    }
-</div>
+
+
 <script type="text/javascript">
         var accountCometMessage = function (event) {
             componentResource('commonHome', jsRoutes.controllers.ComponentViewController.commonHome());

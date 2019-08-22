@@ -36,13 +36,9 @@ class Orders @Inject()(shutdownActors: ShutdownActors, masterAccounts: master.Ac
   private implicit val materializer: ActorMaterializer = ActorMaterializer()(actorSystem)
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_ORDER
-
   private val actorTimeout = configuration.get[Int]("akka.actors.timeout").seconds
-
-  private val cometActorSleepTime = configuration.get[Long]("akka.actors.cometActorSleepTime")
-
   val mainOrderActor: ActorRef = actorSystem.actorOf(props = MainOrderActor.props(actorTimeout, actorSystem), name = constants.Module.ACTOR_MAIN_ORDER)
-
+  private val cometActorSleepTime = configuration.get[Long]("akka.actors.cometActorSleepTime")
   private[models] val orderTable = TableQuery[OrderTable]
 
   private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
@@ -93,6 +89,10 @@ class Orders @Inject()(shutdownActors: ShutdownActors, masterAccounts: master.Ac
 
   private def getOrderIDs: Future[Seq[String]] = db.run(orderTable.map(_.id).result)
 
+  private def getOrderIDsWithoutFiatProofHash: Future[Seq[String]] = db.run(orderTable.filter(_.fiatProofHash.?.isEmpty).map(_.id).result)
+
+  private def getOrderIDsWithoutAWBProofHash: Future[Seq[String]] = db.run(orderTable.filter(_.awbProofHash.?.isEmpty).map(_.id).result)
+
   private def deleteById(id: String)(implicit executionContext: ExecutionContext): Future[Int] = db.run(orderTable.filter(_.id === id).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -119,7 +119,7 @@ class Orders @Inject()(shutdownActors: ShutdownActors, masterAccounts: master.Ac
 
   object Service {
 
-    def create(id: String, fiatProofHash: Option[String], awbProofHash: Option[String])(implicit executionContext: ExecutionContext): String = Await.result(add(Order(id = id, fiatProofHash = fiatProofHash, awbProofHash = awbProofHash, dirtyBit = false)), Duration.Inf)
+    def create(id: String, fiatProofHash: Option[String], awbProofHash: Option[String])(implicit executionContext: ExecutionContext): String = Await.result(add(Order(id = id, fiatProofHash = fiatProofHash, awbProofHash = awbProofHash, dirtyBit = true)), Duration.Inf)
 
     def insertOrUpdate(id: String, fiatProofHash: Option[String], awbProofHash: Option[String], dirtyBit: Boolean)(implicit executionContext: ExecutionContext): Int = Await.result(upsert(Order(id = id, fiatProofHash = fiatProofHash, awbProofHash = awbProofHash, dirtyBit = dirtyBit)), Duration.Inf)
 
@@ -128,6 +128,10 @@ class Orders @Inject()(shutdownActors: ShutdownActors, masterAccounts: master.Ac
     def getOrders(ids: Seq[String]): Seq[Order] = Await.result(getOrdersByIDs(ids), Duration.Inf)
 
     def getAllOrderIds: Seq[String] = Await.result(getOrderIDs, Duration.Inf)
+
+    def getAllOrderIdsWithoutFiatProofHash: Seq[String] = Await.result(getOrderIDsWithoutFiatProofHash, Duration.Inf)
+
+    def getAllOrderIdsWithoutAWBProofHash: Seq[String] = Await.result(getOrderIDsWithoutAWBProofHash, Duration.Inf)
 
     def markDirty(id: String): Int = Await.result(updateDirtyBitById(id, dirtyBit = true), Duration.Inf)
 
@@ -159,13 +163,13 @@ class Orders @Inject()(shutdownActors: ShutdownActors, masterAccounts: master.Ac
 
             blockchainFiats.Service.deleteFiatPegWallet(dirtyOrder.id)
           }
-          if (orderResponse.value.awbProofHash != "" && orderResponse.value.fiatProofHash != ""){
+          if (orderResponse.value.awbProofHash != "" && orderResponse.value.fiatProofHash != "") {
             blockchainTraderFeedbackHistories.Service.create(negotiation.sellerAddress, negotiation.buyerAddress, negotiation.sellerAddress, negotiation.assetPegHash, rating = "")
-            blockchainTraderFeedbackHistories.Service.create(negotiation.buyerAddress, negotiation.buyerAddress, negotiation.sellerAddress, negotiation.assetPegHash,  rating = "")
+            blockchainTraderFeedbackHistories.Service.create(negotiation.buyerAddress, negotiation.buyerAddress, negotiation.sellerAddress, negotiation.assetPegHash, rating = "")
             blockchainNegotiations.Service.deleteNegotiations(negotiation.assetPegHash)
 
           }
-          Service.insertOrUpdate(dirtyOrder.id, awbProofHash = Option(orderResponse.value.awbProofHash), fiatProofHash = Option(orderResponse.value.fiatProofHash), dirtyBit = false)
+          Service.insertOrUpdate(dirtyOrder.id, awbProofHash = if (orderResponse.value.awbProofHash == "") null else Option(orderResponse.value.awbProofHash), fiatProofHash = if (orderResponse.value.fiatProofHash == "") null else Option(orderResponse.value.fiatProofHash), dirtyBit = false)
           mainOrderActor ! OrderCometMessage(username = masterAccounts.Service.getId(negotiation.buyerAddress), message = Json.toJson(constants.Comet.PING))
           mainOrderActor ! OrderCometMessage(username = masterAccounts.Service.getId(negotiation.sellerAddress), message = Json.toJson(constants.Comet.PING))
 

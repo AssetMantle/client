@@ -2,14 +2,26 @@
 @import views.companion.master.ModeratedSellerExecuteOrder
 
 @(moderatedSellerExecuteOrderForm: Form[ModeratedSellerExecuteOrder.Data],buyerAddress:String, sellerAddress:String, pegHash:String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+
 @form(action = routes.SellerExecuteOrderController.moderatedSellerExecuteOrder, 'onkeypress -> "validateForm(event,this)") {
+    <div class="latest_card-header latest_card-header-primary text-center">
+        <h4 class="latest_card-title">@Messages(constants.Form.MODERATED_SELLER_EXECUTE_ORDER)</h4>
+    </div>
+    <div>
+    <div class="latest_card-body">
     @CSRF.formField
-    @inputText(moderatedSellerExecuteOrderForm(constants.Form.BUYER_ADDRESS).copy(value = Some(buyerAddress)), '_label -> Messages(constants.Form.BUYER_ADDRESS))
-    @inputText(moderatedSellerExecuteOrderForm(constants.Form.SELLER_ADDRESS).copy(value = Some(sellerAddress)), '_label -> Messages(constants.Form.SELLER_ADDRESS))
-    @inputText(moderatedSellerExecuteOrderForm(constants.Form.AWB_PROOF_HASH), '_label -> Messages(constants.Form.AWB_PROOF_HASH))
-    @inputText(moderatedSellerExecuteOrderForm(constants.Form.PEG_HASH).copy(value = Some(pegHash)), '_label -> Messages(constants.Form.PEG_HASH))
-    @inputText(moderatedSellerExecuteOrderForm(constants.Form.GAS), '_label -> Messages(constants.Form.GAS))
-    @inputPassword(moderatedSellerExecuteOrderForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD))
+    @inputText(moderatedSellerExecuteOrderForm(constants.Form.BUYER_ADDRESS).copy(value = Some(buyerAddress)), '_label -> Messages(constants.Form.BUYER_ADDRESS),
+        'class -> "form-control",'placeholder->Messages(constants.Form.BUYER_ADDRESS),'required->true)
+    @inputText(moderatedSellerExecuteOrderForm(constants.Form.SELLER_ADDRESS).copy(value = Some(sellerAddress)), '_label -> Messages(constants.Form.SELLER_ADDRESS),
+        'class -> "form-control",'placeholder->Messages(constants.Form.SELLER_ADDRESS),'required->true)
+    @inputText(moderatedSellerExecuteOrderForm(constants.Form.AWB_PROOF_HASH), '_label -> Messages(constants.Form.AWB_PROOF_HASH),
+        'class -> "form-control",'placeholder->Messages(constants.Form.AWB_PROOF_HASH),'required->true)
+    @inputText(moderatedSellerExecuteOrderForm(constants.Form.PEG_HASH).copy(value = Some(pegHash)), '_label -> Messages(constants.Form.PEG_HASH),
+        'class -> "form-control",'placeholder->Messages(constants.Form.PEG_HASH),'required->true)
+    @inputText(moderatedSellerExecuteOrderForm(constants.Form.GAS), '_label -> Messages(constants.Form.GAS),
+        'class -> "form-control",'placeholder->Messages(constants.Form.GAS),'required->true)
+    @inputPassword(moderatedSellerExecuteOrderForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD),
+        'class -> "form-control",'placeholder->Messages(constants.Form.PASSWORD),'required->true)
 
     @if(moderatedSellerExecuteOrderForm.hasGlobalErrors) {
         <ul>
@@ -18,5 +30,9 @@
         }
         </ul>
     }
-    <button type="button" onclick="submitForm(this)">@Messages(constants.Form.MODERATED_SELLER_EXECUTE_ORDER)</button>
-}
+    <button type="button" class="btn btn-primary btn-sm" onclick="submitForm(this)">@Messages(constants.Form.MODERATED_SELLER_EXECUTE_ORDER)</button>
+    </div>
+    </div>
+    }
+
+

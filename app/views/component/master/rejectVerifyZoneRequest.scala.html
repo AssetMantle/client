@@ -3,8 +3,13 @@
 
 @(rejectVerifyZoneRequestForm: Form[RejectVerifyZoneRequest.Data], zoneID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @form(action = routes.AddZoneController.rejectVerifyZoneRequest, 'onkeypress -> "validateForm(event,this)") {
+    <div class="latest_card-header latest_card-header-primary text-center">
+        <h4 class="latest_card-title">@Messages(constants.Form.REJECT_VERIFY_ZONE_REQUEST)</h4>
+    </div>
+    <div class="latest_card-body">
     @CSRF.formField
-    @inputText(rejectVerifyZoneRequestForm(constants.Form.ZONE_ID).copy(value = Some(zoneID)), '_label -> Messages(constants.Form.ZONE_ID))
+    @inputText(rejectVerifyZoneRequestForm(constants.Form.ZONE_ID).copy(value = Some(zoneID)), '_label -> Messages(constants.Form.ZONE_ID),
+        'class -> "form-control",'placeholder->Messages(constants.Form.ZONE_ID),'required->true)
 
     @if(rejectVerifyZoneRequestForm.hasGlobalErrors) {
         <ul>
@@ -13,5 +18,6 @@
         }
         </ul>
     }
-    <button type="button" onclick="submitForm(this)">@Messages(constants.Form.REJECT_VERIFY_ZONE_REQUEST)</button>
+    <button type="button" class="btn btn-sm btn-primary" onclick="submitForm(this)">@Messages(constants.Form.REJECT_VERIFY_ZONE_REQUEST)</button>
+    </div>
 }

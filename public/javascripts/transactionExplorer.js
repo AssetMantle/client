@@ -9,7 +9,7 @@ function transactionExplorer() {
     let blockchainHeightURL = getConfiguration("blockchain.main.ip") + ":" + getConfiguration("blockchain.main.abciPort") + "/block?height=";
 
     let content = '';
-    for (let i = 0; i < 8; i++) {
+    for (let i = 0; i < 7; i++) {
         content = "<tr><td></td><td></td><td></td></tr>" + content;
     }
     $('#transactionContainer').prepend(content);
@@ -41,7 +41,8 @@ function transactionExplorer() {
                                     if (transactionContainerListLength > 8) {
                                         transactionContainerList.removeChild(transactionContainerList.childNodes[transactionContainerListLength - 1]);
                                     }
-                                    $('#transactionContainer').prepend("<tr><td><button onclick='searchFunction("+ JSON.stringify(height) +")'>" + height + "</button></td><td><button onclick='searchFunction("+ JSON.stringify(txHash) +")'>" + txHash + "</button></td><td >" + msgType.tx.value.msg[0].type + "</td></tr>");
+                                    $('#transactionContainer').prepend("<tr><td><button onclick='searchFunction("+ JSON.stringify(height) +")'>" + height + "<td><button onclick='searchFunction("+ JSON.stringify(txHash) +")'><span id=\"text_element\" class=\"hash_code\"> " + txHash + "</span></button></td></button></td><td >" + msgType.tx.value.msg[0].type + "</td></tr>");
+
                                 }
                             }
                         });

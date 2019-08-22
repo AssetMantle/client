@@ -2,11 +2,19 @@
 @import views.companion.master.VerifyOrganization
 
 @(verifyOrganizationForm: Form[VerifyOrganization.Data], organizationID: String, zoneID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+
 @form(action = routes.AddOrganizationController.verifyOrganization, 'onkeypress -> "validateForm(event,this)") {
+    <div class="latest_card-header latest_card-header-primary text-center">
+        <h4 class="latest_card-title">@Messages(constants.Form.VERIFY_ORGANIZATION)</h4>
+    </div>
+    <div class="latest_card-body">
     @CSRF.formField
-    @inputText(verifyOrganizationForm(constants.Form.ORGANIZATION_ID).copy(value = Some(organizationID)), '_label -> Messages(constants.Form.ORGANIZATION_ID))
-    @inputText(verifyOrganizationForm(constants.Form.ZONE_ID).copy(value = Some(zoneID)), '_label -> Messages(constants.Form.ZONE_ID))
-    @inputPassword(verifyOrganizationForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD))
+    @inputText(verifyOrganizationForm(constants.Form.ORGANIZATION_ID).copy(value = Some(organizationID)), '_label -> Messages(constants.Form.ORGANIZATION_ID),
+        'class -> "form-control",'placeholder->Messages(constants.Form.ORGANIZATION_ID),'required->true)
+    @inputText(verifyOrganizationForm(constants.Form.ZONE_ID).copy(value = Some(zoneID)), '_label -> Messages(constants.Form.ZONE_ID),
+        'class -> "form-control",'placeholder->Messages(constants.Form.ZONE_ID),'required->true)
+    @inputPassword(verifyOrganizationForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD),
+        'class -> "form-control",'placeholder->Messages(constants.Form.PASSWORD),'required->true)
 
     @if(verifyOrganizationForm.hasGlobalErrors) {
         <ul>
@@ -15,5 +23,7 @@
         }
         </ul>
     }
-    <button type="button" onclick="submitForm(this)">@Messages(constants.Form.VERIFY_ORGANIZATION)</button>
+    <button type="button" class="btn btn-primary btn-sm" onclick="submitForm(this)">@Messages(constants.Form.VERIFY_ORGANIZATION)</button>
+    </div>
+
 }

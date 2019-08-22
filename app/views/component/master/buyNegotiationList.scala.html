@@ -1,6 +1,6 @@
-@import models.blockchain.Negotiation
+@import models.blockchain.{ACLHash, Negotiation}
 
-@(buyNegotiations: Seq[Negotiation], assetPegHashList: Seq[String])(implicit messagesProvider: MessagesProvider)
+@(buyNegotiations: Seq[Negotiation], assetPegHashList: Seq[String], aclHash: ACLHash)(implicit messagesProvider: MessagesProvider)
 @for(negotiation <- buyNegotiations) {
     <div class="flexItem box thirdBox lightBlue">
         <div class="leftText">
@@ -8,14 +8,19 @@
             <span class="red">@Messages(constants.Form.PEG_HASH)</span> : @negotiation.assetPegHash <br>
             <span class="red">@Messages(constants.Form.BID)</span> : @negotiation.bid <br>
             <span class="red">@Messages(constants.Form.TIME)</span> : @negotiation.time <br>
-            <div>
-                @if(negotiation.sellerSignature.getOrElse(null) == null || negotiation.buyerSignature.getOrElse(null) == null) {
-                    <button onclick="getForm(jsRoutes.controllers.ChangeBuyerBidController.changeBuyerBidForm('@negotiation.sellerAddress', '@negotiation.assetPegHash'))">@Messages(constants.Form.NEGOTIATE)</button>
-                    <button onclick="getForm(jsRoutes.controllers.ConfirmBuyerBidController.confirmBuyerBidForm('@negotiation.sellerAddress', '@negotiation.assetPegHash', @negotiation.bid))">@Messages(constants.Form.ACCEPT_OFFER)</button>
+            <div class="centerText" >
+                @if(negotiation.buyerSignature.getOrElse(null) == null) {
+                    @if(aclHash.changeBuyerBid) {
+                        <button class="width btn btn-primary btn-sm" onclick="getForm(jsRoutes.controllers.ChangeBuyerBidController.changeBuyerBidForm('@negotiation.sellerAddress', '@negotiation.assetPegHash'))">@Messages(constants.Form.NEGOTIATE)</button>
+                    } <br>
+                    @if(aclHash.confirmBuyerBid) {
+                        <button class="width btn btn-primary btn-sm" onclick="getForm(jsRoutes.controllers.ConfirmBuyerBidController.confirmBuyerBidForm('@negotiation.sellerAddress', '@negotiation.assetPegHash', @negotiation.bid))">@Messages(constants.Form.ACCEPT_OFFER)</button>
+                    } <br>
                 }
                 @if(negotiation.sellerSignature.getOrElse(null) != null && negotiation.buyerSignature.getOrElse(null) != null) {
-                    <button onclick="getForm(jsRoutes.controllers.SendFiatController.sendFiatForm('@negotiation.sellerAddress', '@negotiation.assetPegHash', @negotiation.bid))">@Messages(constants.Form.SEND_FIAT)</button>
-
+                    @if(aclHash.sendFiat) {
+                        <button onclick="getForm(jsRoutes.controllers.SendFiatController.sendFiatForm('@negotiation.sellerAddress', '@negotiation.assetPegHash', @negotiation.bid))">@Messages(constants.Form.SEND_FIAT)</button>
+                    } <br>
                 }
             <button class="showHide">@Messages(constants.Form.SHOW_HIDE)</button>
             </div>
@@ -28,7 +33,8 @@
                 <span class="red">@Messages(constants.Form.BUYER_BLOCK_HEIGHT)</span>: @negotiation.buyerBlockHeight <br>
                 <span class="red">@Messages(constants.Form.SELLER_BLOCK_HEIGHT)</span>: @negotiation.sellerBlockHeight <br>
                 <span class="red">@Messages(constants.Form.BUYER_CONTRACT_HASH)</span>: @negotiation.buyerContractHash <br>
-                <span class="red">@Messages(constants.Form.SELLER_CONTRACT_HASH)</span>: @negotiation.sellerContractHash <br>
+                <span class="red">@Messages(constants.Form.SELLER_CONTRACT_HASH)</span>
+                : @negotiation.sellerContractHash <br>
             </div>
         </div>
     </div>

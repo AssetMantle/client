@@ -7,13 +7,13 @@
         <div id="traderKycDocumentStatus@traderKYC.id@traderKYC.documentType"></div>
         @traderKYC.organizationStatus.getOrElse(None)  match {
             case true => {
-                <div id="buttonTraderKycDocumentStatus@traderKYC.id@traderKYC.documentType"><button class="reject" onclick="organizationRejectTraderKycDocument('@traderKYC.id', '@traderKYC.documentType')">@Messages(constants.Form.REJECT)</button></div>
+                <div id="buttonTraderKycDocumentStatus@traderKYC.id@traderKYC.documentType"><button class="btn btn-danger btn-sm" onclick="organizationRejectTraderKycDocument('@traderKYC.id', '@traderKYC.documentType')">@Messages(constants.Form.REJECT)</button></div>
             }
             case false => {
-                <div id="buttonTraderKycDocumentStatus@traderKYC.id@traderKYC.documentType"><button class="approve" onclick="organizationVerifyTraderKycDocument('@traderKYC.id', '@traderKYC.documentType')">@Messages(constants.Form.APPROVE)</button></div>
+                <div id="buttonTraderKycDocumentStatus@traderKYC.id@traderKYC.documentType"><button class="btn btn-success btn-sm" onclick="organizationVerifyTraderKycDocument('@traderKYC.id', '@traderKYC.documentType')">@Messages(constants.Form.APPROVE)</button></div>
             }
             case _ => {
-                <div id="buttonTraderKycDocumentStatus@traderKYC.id@traderKYC.documentType"> <button class="approve" onclick="organizationVerifyTraderKycDocument('@traderKYC.id', '@traderKYC.documentType')">@Messages(constants.Form.APPROVE)</button> <button class="reject" onclick="organizationRejectTraderKycDocument('@traderKYC.id', '@traderKYC.documentType')">@Messages(constants.Form.REJECT)</button></div>
+                <div id="buttonTraderKycDocumentStatus@traderKYC.id@traderKYC.documentType"> <button class="btn btn-success btn-sm" onclick="organizationVerifyTraderKycDocument('@traderKYC.id', '@traderKYC.documentType')">@Messages(constants.Form.APPROVE)</button> <button class="btn btn-danger btn-sm" onclick="organizationRejectTraderKycDocument('@traderKYC.id', '@traderKYC.documentType')">@Messages(constants.Form.REJECT)</button></div>
             }
         }
     }

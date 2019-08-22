@@ -138,7 +138,7 @@ class SendAssets @Inject()(actorSystem: ActorSystem, protected val databaseConfi
 
     def getTicketIDsOnStatus(): Seq[String] = Await.result(getTicketIDsWithNullStatus, Duration.Inf)
 
-    def getTransaction(ticketID: String)(implicit executionContext: ExecutionContext): SendAsset = Await.result(findByTicketID(ticketID), Duration.Inf)
+    def getTransaction(ticketID: String): SendAsset = Await.result(findByTicketID(ticketID), Duration.Inf)
 
   }
 
@@ -149,7 +149,7 @@ class SendAssets @Inject()(actorSystem: ActorSystem, protected val databaseConfi
         val sendAsset = Service.getTransaction(ticketID)
         val sellerAddress = masterAccounts.Service.getAddress(sendAsset.from)
         val negotiationID = blockchainNegotiations.Service.getNegotiationID(buyerAddress = sendAsset.to, sellerAddress = sellerAddress, pegHash = sendAsset.pegHash)
-        blockchainOrders.Service.insertOrUpdate(id = negotiationID, null, null, false)
+        blockchainOrders.Service.insertOrUpdate(id = negotiationID, null, null, dirtyBit = true)
         Thread.sleep(sleepTime)
         val orderResponse = getOrder.Service.get(negotiationID)
         orderResponse.value.assetPegWallet.foreach(assets => assets.foreach(asset => blockchainAssets.Service.insertOrUpdate(pegHash = asset.pegHash, documentHash = asset.documentHash, assetType = asset.assetType, assetPrice = asset.assetPrice, assetQuantity = asset.assetQuantity, quantityUnit = asset.quantityUnit, locked = asset.locked, moderated = asset.moderated, ownerAddress = negotiationID, dirtyBit = false)))

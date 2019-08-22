@@ -3,14 +3,18 @@
 @(issueAssetRequests: Seq[IssueAssetRequest])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
 
 @for(issueAssetRequest <- issueAssetRequests) {
-    <div class="flexItem box firstBox leftText lightBlue">
+    <div class="col-md-4">
+        <br>
+    <div class="flexItem card-body leftText lightBlue">
         <span class="red">@Messages(constants.Form.ACCOUNT_ID)</span> :@issueAssetRequest.accountID <br>
         <span class="red">@Messages(constants.Form.DOCUMENT_HASH)</span> : @issueAssetRequest.documentHash <br>
         <span class="red">@Messages(constants.Form.ASSET_TYPE)</span> : @issueAssetRequest.assetType <br>
         <span class="red">@Messages(constants.Form.ASSET_QUANTITY)</span> : @issueAssetRequest.assetQuantity <br>
         <span class="red">@Messages(constants.Form.ASSET_PRICE)</span> : @issueAssetRequest.assetPrice <br>
         <span class="red">@Messages(constants.Form.QUANTITY_UNIT)</span> : @issueAssetRequest.quantityUnit <br>
-        <button class="approve" onclick="getForm(jsRoutes.controllers.IssueAssetController.issueAssetForm('@issueAssetRequest.id', '@issueAssetRequest.accountID', '@issueAssetRequest.documentHash', '@issueAssetRequest.assetType', @issueAssetRequest.assetPrice, '@issueAssetRequest.quantityUnit', @issueAssetRequest.assetQuantity))">@Messages(constants.Form.APPROVE)</button> <button class="reject" onclick="getForm(jsRoutes.controllers.IssueAssetController.rejectIssueAssetRequestForm('@issueAssetRequest.id'))">@Messages(constants.Form.REJECT)</button>
+        <button class="btn btn-sm btn-success" onclick="getForm(jsRoutes.controllers.IssueAssetController.issueAssetForm('@issueAssetRequest.id', '@issueAssetRequest.accountID', '@issueAssetRequest.documentHash', '@issueAssetRequest.assetType', @issueAssetRequest.assetPrice, '@issueAssetRequest.quantityUnit', @issueAssetRequest.assetQuantity))">@Messages(constants.Form.APPROVE)</button>
+        <button class="btn-danger btn btn-sm" onclick="getForm(jsRoutes.controllers.IssueAssetController.rejectIssueAssetRequestForm('@issueAssetRequest.id'))">@Messages(constants.Form.REJECT)</button>
+    </div>
     </div>
 }
 <br>

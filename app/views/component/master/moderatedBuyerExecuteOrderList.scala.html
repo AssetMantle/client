@@ -3,13 +3,15 @@
 @(negotiationList : Seq[Negotiation])(implicit messagesProvider: MessagesProvider)
 
 @for(negotiation <- negotiationList){
-    <div class="flexItem box firstBox lightBlue ">
+    <div class="col-md-6">
+    <div class="flexItem card-body lightBlue ">
         <div class="leftText">
             <span class="red">@Messages(constants.Form.PEG_HASH)</span> : @negotiation.assetPegHash <br>
             <span class="red">@Messages(constants.Form.TIME)</span> : @negotiation.time <br>
         </div>
         <div class="centerText">
-            <button onclick="getForm(jsRoutes.controllers.BuyerExecuteOrderController.moderatedBuyerExecuteOrderForm('@negotiation.buyerAddress', '@negotiation.sellerAddress','@negotiation.assetPegHash'))">@Messages(constants.Form.BUYER_EXECUTE_ORDER)</button>
+            <button class="btn btn-sm btn-primary" onclick="getForm(jsRoutes.controllers.BuyerExecuteOrderController.moderatedBuyerExecuteOrderForm('@negotiation.buyerAddress', '@negotiation.sellerAddress','@negotiation.assetPegHash'))">@Messages(constants.Form.BUYER_EXECUTE_ORDER)</button>
         </div>
+    </div>
     </div>
 }

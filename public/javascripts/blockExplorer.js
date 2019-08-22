@@ -35,22 +35,22 @@ function blockExplorer(){
                             let lastBlockHeight = 0;
                             Array.prototype.forEach.call(blocks.reverse(), block => {
                                 let height = parseInt(block["header"]["height"], 10);
-                                let numTxs = block["header"]["num_txs"];
-                                let time = block["header"]["time"];
-                                let timerID = "timer" + counter.toString(10);
-                                let blockTime = new Date(time);
-                                initialTimeData[initialTimeData.length] = time;
-                                let differenceBetweenBlockTime = ( blockTime.getTime() - new Date(lastBlockTime).getTime()) / 1000;
-                                content = "<tr><td><button onclick='searchFunction("+ JSON.stringify(height) +")'>" + height + "</button></td><td>" + numTxs + "</td><td><div id='" + timerID + "'></div> </td></tr>" + content;
-                                lastBlockTime = time;
-                                if (counter > 0) {
-                                    initialGraphTime[initialGraphTime.length] = height + "::" + blockTime.getHours() + ":" + blockTime.getMinutes() + ":" + blockTime.getSeconds();
-                                    initialGraphData[initialGraphData.length] = differenceBetweenBlockTime;
-                                    averageBlockTime = (averageBlockTime * counter + differenceBetweenBlockTime) / (counter + 1);
-                                }
-                                counter += 1;
-                                lastBlockHeight = height;
-                            });
+                            let numTxs = block["header"]["num_txs"];
+                            let time = block["header"]["time"];
+                            let timerID = "timer" + counter.toString(10);
+                            let blockTime = new Date(time);
+                            initialTimeData[initialTimeData.length] = time;
+                            let differenceBetweenBlockTime = ( blockTime.getTime() - new Date(lastBlockTime).getTime()) / 1000;
+                            content = "<tr><td><button onclick='searchFunction("+ JSON.stringify(height) +")'>" + height + "</button></td><td>" + numTxs + "</td><td><div id='" + timerID + "'></div> </td></tr>" + content;
+                            lastBlockTime = time;
+                            if (counter > 0) {
+                                initialGraphTime[initialGraphTime.length] = height + "::" + blockTime.getHours() + ":" + blockTime.getMinutes() + ":" + blockTime.getSeconds();
+                                initialGraphData[initialGraphData.length] = differenceBetweenBlockTime;
+                                averageBlockTime = (averageBlockTime * counter + differenceBetweenBlockTime) / (counter + 1);
+                            }
+                            counter += 1;
+                            lastBlockHeight = height;
+                        });
                             averageBlockTimeUpdater(averageBlockTime);
                             updateLastBlock(abciInfoURL, lastBlockHeight, lastBlockTime);
                             $('#' + blockExplorerTableBody).prepend(content);
