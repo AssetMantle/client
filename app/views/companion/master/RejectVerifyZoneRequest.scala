@@ -7,7 +7,7 @@ object RejectVerifyZoneRequest {
 
   val form = Form(
     mapping(
-      constants.Form.ZONE_ID -> nonEmptyText(minLength = 4, maxLength = 45),
+      constants.Form.ZONE_ID -> nonEmptyText(minLength = constants.FormConstraint.ZONE_ID_MINIMUM_LENGTH, maxLength = constants.FormConstraint.ZONE_ID_MAXIMUM_LENGTH),
     )(Data.apply)(Data.unapply)
   )
 

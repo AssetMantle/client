@@ -7,8 +7,8 @@ object RejectFaucetRequest {
 
   val form = Form(
     mapping(
-      constants.Form.REQUEST_ID -> nonEmptyText(minLength = 4, maxLength = 45),
-      constants.Form.COMMENT -> nonEmptyText(minLength = 0, maxLength = 100),
+      constants.Form.REQUEST_ID -> nonEmptyText(minLength = constants.FormConstraint.REQUEST_ID_LENGTH, maxLength = constants.FormConstraint.REQUEST_ID_LENGTH),
+      constants.Form.COMMENT -> nonEmptyText(minLength = constants.FormConstraint.COMMENT_MINIMUM_LENGTH, maxLength = constants.FormConstraint.COMMENT_MAXIMUM_LENGTH),
     )(Data.apply)(Data.unapply)
   )
 

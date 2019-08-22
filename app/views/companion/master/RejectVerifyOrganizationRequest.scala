@@ -7,7 +7,7 @@ object RejectVerifyOrganizationRequest {
 
   val form = Form(
     mapping(
-      constants.Form.ORGANIZATION_ID -> nonEmptyText(minLength = 4, maxLength = 45),
+      constants.Form.ORGANIZATION_ID -> nonEmptyText(minLength = constants.FormConstraint.ORGANIZATION_ID_MINIMUM_LENGTH, maxLength = constants.FormConstraint.ORGANIZATION_ID_MAXIMUM_LENGTH),
     )(Data.apply)(Data.unapply)
   )
 

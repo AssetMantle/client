@@ -388,8 +388,8 @@ body {
 }
 .result{
     position: relative;
-    top: -30px;
-    left: 30px;
+    width:20px;
+    height:20px;
 }
 
 .dynamicTable tr {

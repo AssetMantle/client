@@ -6,12 +6,12 @@ import play.api.data.Forms.{mapping, nonEmptyText, _}
 object IssueFiat {
   val form = Form(
     mapping(
-      constants.Form.REQUEST_ID -> nonEmptyText(minLength = 1, maxLength = 45),
-      constants.Form.ACCOUNT_ID -> nonEmptyText(minLength = 1, maxLength = 45),
-      constants.Form.TRANSACTION_ID -> nonEmptyText(minLength = 1, maxLength = 20),
-      constants.Form.TRANSACTION_AMOUNT -> number(min = 1, max = 10000),
-      constants.Form.PASSWORD -> nonEmptyText(minLength = 1, maxLength = 20),
-      constants.Form.GAS -> number(min = 1, max = 10000)
+      constants.Form.REQUEST_ID -> nonEmptyText(minLength = constants.FormConstraint.REQUEST_ID_LENGTH, maxLength = constants.FormConstraint.REQUEST_ID_LENGTH),
+      constants.Form.ACCOUNT_ID -> nonEmptyText(minLength = constants.FormConstraint.USERNAME_MINIMUM_LENGTH, maxLength = constants.FormConstraint.USERNAME_MAXIMUM_LENGTH),
+      constants.Form.TRANSACTION_ID -> nonEmptyText(minLength = constants.FormConstraint.TRANSACTION_ID_MINIMUM_LENGTH, maxLength = constants.FormConstraint.TRANSACTION_ID_MAXIMUM_LENGTH),
+      constants.Form.TRANSACTION_AMOUNT -> number(min = constants.FormConstraint.TRANSACTION_AMOUNT_MINIMUM_VALUE, max = constants.FormConstraint.TRANSACTION_AMOUNT_MAXIMUM_VALUE),
+      constants.Form.PASSWORD -> nonEmptyText(minLength = constants.FormConstraint.PASSWORD_MINIMUM_LENGTH, maxLength = constants.FormConstraint.PASSWORD_MAXIMUM_LENGTH),
+      constants.Form.GAS -> number(min = constants.FormConstraint.GAS_MINIMUM_VALUE, max = constants.FormConstraint.GAS_MAXIMUM_VALUE)
     )(Data.apply)(Data.unapply)
   )
 

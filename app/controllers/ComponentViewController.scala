@@ -113,15 +113,13 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
   def orderList: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        //        val aclHash = blockchainAclHashes.Service.get(blockchainAclAccounts.Service.get(loginState.address).aclHash)
         val negotiations = blockchainNegotiations.Service.getNegotiationsForAddress(loginState.address)
         val orders = blockchainOrders.Service.getOrders(negotiations.map(_.id))
         val relevantNegotiations: Seq[Negotiation] = negotiations.filter(negotiation => orders.map(_.id) contains negotiation.id)
-        val assets = blockchainAssets.Service.getByAddresses(relevantNegotiations.map(_.id))
-
-        Ok(views.html.component.master.orderList(orders.filter(order => (for (relevantNegotiation <- relevantNegotiations; if relevantNegotiation.buyerAddress == loginState.address && !assets.filter(asset => asset.pegHash == relevantNegotiation.assetPegHash).head.moderated) yield relevantNegotiation).map(_.id) contains order.id),
-          orders.filter(order => (for (relevantNegotiation <- relevantNegotiations; if relevantNegotiation.sellerAddress == loginState.address && !assets.filter(asset => asset.pegHash == relevantNegotiation.assetPegHash).head.moderated) yield relevantNegotiation).map(_.id) contains order.id),
-          orders.filter(order => (for (relevantNegotiation <- relevantNegotiations; if assets.filter(asset => asset.pegHash == relevantNegotiation.assetPegHash).head.moderated) yield relevantNegotiation).map(_.id) contains order.id),
+        val assets = blockchainAssets.Service.getByPegHashes(relevantNegotiations.map(_.assetPegHash))
+        Ok(views.html.component.master.orderList(orders.filter(order => (for (relevantNegotiation <- relevantNegotiations; if relevantNegotiation.buyerAddress == loginState.address && !assets.find(asset => asset.pegHash == relevantNegotiation.assetPegHash).orNull.moderated) yield relevantNegotiation).map(_.id) contains order.id),
+          orders.filter(order => (for (relevantNegotiation <- relevantNegotiations; if relevantNegotiation.sellerAddress == loginState.address && !assets.find(asset => asset.pegHash == relevantNegotiation.assetPegHash).orNull.moderated) yield relevantNegotiation).map(_.id) contains order.id),
+          orders.filter(order => (for (relevantNegotiation <- relevantNegotiations; if assets.find(asset => asset.pegHash == relevantNegotiation.assetPegHash).orNull.moderated) yield relevantNegotiation).map(_.id) contains order.id),
           blockchainAclHashes.Service.get(blockchainAclAccounts.Service.get(loginState.address).aclHash)))
       } catch {
         case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
