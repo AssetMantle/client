@@ -91,9 +91,9 @@ class Orders @Inject()(shutdownActors: ShutdownActors, masterAccounts: master.Ac
 
   private def getOrderIDs: Future[Seq[String]] = db.run(orderTable.map(_.id).result)
 
-  private def getOrderIDsWithoutFiatProofHash: Future[Seq[String]] = db.run(orderTable.filter(_.fiatProofHash === "").map(_.id).result)
+  private def getOrderIDsWithoutFiatProofHash: Future[Seq[String]] = db.run(orderTable.filter(_.fiatProofHash.?.isEmpty).map(_.id).result)
 
-  private def getOrderIDsWithoutAWBProofHash: Future[Seq[String]] = db.run(orderTable.filter(_.awbProofHash === "").map(_.id).result)
+  private def getOrderIDsWithoutAWBProofHash: Future[Seq[String]] = db.run(orderTable.filter(_.awbProofHash.?.isEmpty).map(_.id).result)
 
   private def deleteById(id: String): Future[Int] = db.run(orderTable.filter(_.id === id).delete.asTry).map {
     case Success(result) => result
@@ -170,7 +170,7 @@ class Orders @Inject()(shutdownActors: ShutdownActors, masterAccounts: master.Ac
             blockchainTraderFeedbackHistories.Service.create(negotiation.buyerAddress, negotiation.buyerAddress, negotiation.sellerAddress, negotiation.assetPegHash,  rating = "")
             blockchainNegotiations.Service.deleteNegotiations(negotiation.assetPegHash)
           }
-          Service.insertOrUpdate(dirtyOrder.id, awbProofHash = Option(orderResponse.value.awbProofHash), fiatProofHash = Option(orderResponse.value.fiatProofHash), dirtyBit = false)
+          Service.insertOrUpdate(dirtyOrder.id, awbProofHash = if (orderResponse.value.awbProofHash == "") null else Option(orderResponse.value.awbProofHash), fiatProofHash = if (orderResponse.value.fiatProofHash == "") null else Option(orderResponse.value.fiatProofHash), dirtyBit = false)
           mainOrderActor ! OrderCometMessage(username = masterAccounts.Service.getId(negotiation.buyerAddress), message = Json.toJson(constants.Comet.PING))
           mainOrderActor ! OrderCometMessage(username = masterAccounts.Service.getId(negotiation.sellerAddress), message = Json.toJson(constants.Comet.PING))
         }
