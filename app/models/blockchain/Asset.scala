@@ -185,6 +185,7 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
           case baseException: BaseException => logger.info(baseException.failure.message, baseException)
             if (baseException.failure == constants.Response.NO_RESPONSE) {
               Service.deleteAssetPegWallet(dirtyAsset.ownerAddress)
+              mainAssetActor ! AssetCometMessage(username = masterAccounts.Service.getId(dirtyAsset.ownerAddress), message = Json.toJson(constants.Comet.PING))
             }
           case blockChainException: BlockChainException => logger.error(blockChainException.failure.message, blockChainException)
         }
