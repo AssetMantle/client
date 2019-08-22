@@ -2067,7 +2067,7 @@ tbody.collapse.show {
   color: #212529;
   text-align: left;
   list-style: none;
-  background-color: #ffffff;
+  background-color: #10292e;
   background-clip: padding-box;
   border: 1px solid rgba(0, 0, 0, 0.15);
   border-radius: 0.25rem;
@@ -10280,7 +10280,7 @@ h2.title {
     display: flex;
     flex-flow: nowrap;
     align-items: center;
-    color: #333;
+    color: rgba(255, 255, 255, 0.75);
     font-weight: normal;
     text-decoration: none;
     font-size: .8125rem;

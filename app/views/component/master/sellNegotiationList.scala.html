@@ -10,7 +10,7 @@
                 <span class="red">@Messages(constants.Form.BID)</span> : @negotiation.bid <br>
                 <span class="red">@Messages(constants.Form.TIME)</span> : @negotiation.time <br>
                 <div class="centerText" >
-                    @if(negotiation.sellerSignature.getOrElse(null) == null || negotiation.buyerSignature.getOrElse(null) == null) {
+                    @if(negotiation.sellerSignature.getOrElse(null) == null) {
                         @if(aclHash.changeSellerBid) {
                             <button class="width btn btn-primary btn-sm" onclick="getForm(jsRoutes.controllers.ChangeSellerBidController.changeSellerBidForm('@negotiation.buyerAddress', '@negotiation.assetPegHash'))">@Messages(constants.Form.NEGOTIATE)</button>
                         } <br>
