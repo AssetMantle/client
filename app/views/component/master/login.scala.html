@@ -3,7 +3,10 @@
 
 @(loginForm: Form[Login.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 
+<div class="latest_card-header latest_card-header-primary text-center">
+    <h4 class="latest_card-title">@Messages(constants.Form.LOGIN)</h4>
 
+</div>
     @form(action = routes.LoginController.login, 'onkeypress -> "validateForm(event,this)" ) {
 
 @*        <div class="form-group">*@
@@ -12,10 +15,7 @@
 @*            <span class="bmd-help">We'll never share your email with anyone else.</span>*@
 @*        </div>*@
 
-    <div class="latest_card-header latest_card-header-primary text-center">
-        <h4 class="latest_card-title">@Messages(constants.Form.LOGIN)</h4>
 
-    </div>
     <div class="latest_card-body">
             @CSRF.formField
 

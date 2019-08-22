@@ -8,7 +8,7 @@
     <div class="latest_card-header latest_card-header-primary text-center">
         <h4 class="latest_card-title">@Messages(constants.Form.VERIFY_TRADER)</h4>
     </div>
-    <div class="fixed_modal">
+    <div class=" ">
     <div class="latest_card-body">
     @CSRF.formField
     @inputText(verifyTraderForm(constants.Form.ACL_ADDRESS).copy(value = Some(aclAddress)), '_label -> Messages(constants.Form.ACL_ADDRESS),

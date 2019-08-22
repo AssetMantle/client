@@ -7,7 +7,7 @@
     <div class="latest_card-header latest_card-header-primary text-center">
         <h4 class="latest_card-title">@Messages(constants.Form.ISSUE_FIAT)</h4>
     </div>
-    <div class="fixed_modal">
+    <div class=" ">
    <div class="latest_card-body">
     @CSRF.formField
     @inputText(issueFiatForm(constants.Form.REQUEST_ID).copy(value = Some(requestID)), '_label -> Messages(constants.Form.REQUEST_ID),

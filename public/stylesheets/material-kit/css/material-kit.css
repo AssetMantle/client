@@ -11373,7 +11373,6 @@ footer {
   border-radius: 6px;
   color: rgba(0, 0, 0, 0.87);
   background: #fff;
-  width: 100%;
   box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.07); }
   .latest_card .latest_card-category:not([class*="text-"]) {
     color: #999999; }

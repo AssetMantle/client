@@ -8,7 +8,7 @@
     <div class="latest_card-header latest_card-header-primary text-center">
         <h4 class="latest_card-title">@Messages(constants.Form.ISSUE_ASSET_REQUEST)</h4>
     </div>
-    <div class="fixed_modal">
+    <div class=" ">
     <div class="latest_card-body">
     @inputText(issueAssetRequestForm(constants.Form.DOCUMENT_HASH), '_label -> Messages(constants.Form.DOCUMENT_HASH),
         'class -> "form-control",'placeholder->Messages(constants.Form.DOCUMENT_HASH),'required->true)
@@ -21,7 +21,14 @@
     @inputText(issueAssetRequestForm(constants.Form.ASSET_QUANTITY), '_label -> Messages(constants.Form.ASSET_QUANTITY),
         'class -> "form-control",'placeholder->Messages(constants.Form.ASSET_QUANTITY),'required->true)
 
-    @checkbox(issueAssetRequestForm(constants.Form.MODERATED), '_label -> Messages(constants.Form.MODERATED), 'id -> "moderated")
+        <div class="input-group-prepend issue_asset">
+            @checkbox(issueAssetRequestForm(constants.Form.MODERATED), '_label -> Messages(constants.Form.MODERATED), 'id -> "moderated")
+
+            <span class="input-group-text">
+                @Messages(constants.Form.MODERATED)
+            </span>
+
+        </div>
 
     <div id="moderatedIssueAssetRequestFormFields">
         @inputText(issueAssetRequestForm(constants.Form.GAS).copy(value = Some("0")), '_label -> Messages(constants.Form.GAS),
