@@ -21,12 +21,7 @@
         <script src="@routes.Assets.versioned("javascripts/pushNotification.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/notification.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/componentResource.js")" type="text/javascript"></script>
-        <script src="@routes.Assets.versioned("javascripts/material-kit/core/bootstrap-material-design.min.js")" type="text/javascript"></script>
-        <script src="@routes.Assets.versioned("javascripts/material-kit/plugins/bootstrap-datetimepicker.js")" type="text/javascript"></script>
-        <script src="@routes.Assets.versioned("javascripts/material-kit/core/popper.min.js")" type="text/javascript"></script>
-        <script src="@routes.Assets.versioned("javascripts/material-kit/plugins/moment.min.js")" type="text/javascript"></script>
-        <script src="@routes.Assets.versioned("javascripts/material-kit/plugins/jquery.sharrre.js")" type="text/javascript"></script>
-        <script src="@routes.Assets.versioned("javascripts/material-kit/custom.js")" type="text/javascript"></script>
+
         <script src="@routes.Assets.versioned("javascripts/fetchOrShowHide.js")" type="text/javascript"></script>
 
     </head>
@@ -48,13 +43,14 @@
                     </div>
 
                     <div class="collapse navbar-collapse" id="myNavbar">
-@*                        <ul class="navbar-nav mr-auto">*@
-@*                            <li class="nav-item"> <a href="#"> <i class="fa fa-newspaper-o" aria-hidden="true"></i> News</a></li>*@
-@*                            <li class="nav-item">   <a href="#"><i class="fa fa-address-book"></i> Contact</a></li>*@
-@*                        </ul>*@
-                        <ul class="nav navbar-nav ml-auto">
+                        @* <ul class="navbar-nav mr-auto">*@
+                        @* <li class="nav-item"> <a href="#"> <i class="fa fa-newspaper-o" aria-hidden="true"></i> News</a></li>*@
+                        @* <li class="nav-item"> <a href="#"><i class="fa fa-address-book"></i> Contact</a></li>*@
+                        @* </ul>*@
+                        <ul class="navbar-nav ml-auto">
                         @loginState match {
                             case null => {
+
                                 <li class="nav-item"> <a onclick="getForm(jsRoutes.controllers.SignUpController.signUpForm())"><i class="fa fa-user-plus"></i>
                                     @Messages(constants.Form.SIGNUP)</a></li>
                                 <li class="nav-item"><a onclick="getForm(jsRoutes.controllers.LoginController.loginForm())"><i class="fa fa-sign-in" aria-hidden="true"></i>
@@ -68,7 +64,7 @@
                                     }
                                     case constants.User.ZONE => {
                                         <li><a class="nav-item" href="@controllers.routes.ViewController.zoneRequest()">@Messages(constants.Form.REQUEST)</a></li>
-                                        <li><a class="nav-item"  href="@controllers.routes.ViewController.zoneInformation()">@Messages(constants.Form.INFORMATION)</a></li>
+                                        <li><a class="nav-item" href="@controllers.routes.ViewController.zoneInformation()">@Messages(constants.Form.INFORMATION)</a></li>
                                     }
                                     case constants.User.ORGANIZATION => {
                                         <li><a class="nav-item" href="@controllers.routes.ViewController.organizationRequest()">@Messages(constants.Form.REQUEST)</a></li>
@@ -80,12 +76,25 @@
                                     }
                                     case _ => {}
                                 }
-                                <li><a class="nav-item notification" onclick="getForm(jsRoutes.controllers.NotificationController.notificationPage(0))"><i class="fa fa-bell" aria-hidden="true"></i> @Messages(constants.Form.INBOX)
+                                <li><a class="nav-item notification" onclick="getForm(jsRoutes.controllers.NotificationController.notificationPage(0))"><i class="fa fa-bell" aria-hidden="true"></i>
+                                    @Messages(constants.Form.INBOX)
                                     <span class="badge" id="notificationBadge">0</span>
-                                </a></li>
-                                <li><a class="nav-item" onclick="getForm(jsRoutes.controllers.LogoutController.logoutForm())"><i class="fa fa-sign-out" aria-hidden="true"></i> @Messages(constants.Form.LOGOUT)</a></li>
-                                <li> <a class="nav-item" onclick="getForm(jsRoutes.controllers.LogoutController.logoutForm())"><i class="fa fa-user" aria-hidden="true"></i> @loginState.username</a></li>
+                                </a>
+                                </li>
+                                        <li class="nav-item dropdown">
+                                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                @loginState.username
+                                            </a>
+                                            <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
 
+                                                <a class="dropdown-item" onclick="getForm(jsRoutes.controllers.LogoutController.logoutForm())"><i class="fa fa-sign-out" aria-hidden="true"></i>
+                                                    @Messages(constants.Form.LOGOUT)</a>
+                                            </div>
+                                        </li>
+                                <li><a class="nav-item" onclick="getForm(jsRoutes.controllers.LogoutController.logoutForm())"><i class="fa fa-sign-out" aria-hidden="true"></i>
+                                    @Messages(constants.Form.LOGOUT)</a></li>
+                                <li> <a class="nav-item" onclick="getForm(jsRoutes.controllers.LogoutController.logoutForm())"><i class="fa fa-user" aria-hidden="true"></i>
+                                    @loginState.username</a></li>
 
                             }
                         }
@@ -127,17 +136,17 @@
                 </div>
             }
         </div>
-            <div class="pageFlexContainer">
-                <div class="left_side">
-                @left
-                </div>
-                <div class="middle">
-                @center
-                </div>
-                <div class="right_side">
-                @right
-                </div>
+        <div class="pageFlexContainer">
+            <div class="left_side">
+            @left
             </div>
+            <div class="middle">
+            @center
+            </div>
+            <div class="right_side">
+            @right
+            </div>
+        </div>
 
 
         <div class="modal" id="commonModal">
@@ -156,8 +165,8 @@
                 <div class="copyright float-right">
                             &copy;
                     <script>
-          document.write(new Date().getFullYear())
-        </script>
+                            document.write(new Date().getFullYear())
+                    </script>
                     <a href="" target="_blank">Commit</a>
                 </div>
             </div>
@@ -171,5 +180,14 @@
         <script src="@routes.Assets.versioned("javascripts/style/ajaxLoading.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/style/modal.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/style/hideElement.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.versioned("javascripts/material-kit/core/jquery.min.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.versioned("javascripts/material-kit/core/popper.min.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.versioned("javascripts/material-kit/core/bootstrap-material-design.min.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.versioned("javascripts/material-kit/plugins/moment.min.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.versioned("javascripts/material-kit/plugins/bootstrap-datetimepicker.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.versioned("javascripts/material-kit/plugins/nouislider.min.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.versioned("javascripts/material-kit/plugins/jquery.sharrre.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.versioned("javascripts/material-kit/custom.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.versioned("javascripts/material-kit/material-kit.js?v=2.0.5")" type="text/javascript"></script>
     </body>
 </html>
