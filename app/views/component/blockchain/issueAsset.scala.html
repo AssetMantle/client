@@ -7,7 +7,7 @@
     <div class="latest_card-header latest_card-header-primary text-center">
         <h4 class="latest_card-title">@Messages(constants.Form.ISSUE_ASSET)</h4>
     </div>
-    <div class=" ">
+    <div>
     <div class="latest_card-body">
     @CSRF.formField
     @inputText(issueAssetForm(constants.Form.FROM), '_label -> Messages(constants.Form.FROM),'class -> "form-control",
@@ -40,5 +40,6 @@
     }
     <button type="button" class="btn btn-primary btn-sm" onclick="submitForm(this)">@Messages(constants.Form.ISSUE_ASSET)</button>
     </div>
+    </div>
+
     }
-</div>
