@@ -1,6 +1,7 @@
 @import models.master.Trader
+@import controllers.actions.LoginState
 
-@(traders: Seq[Trader])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
+@(traders: Seq[Trader])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
 @for(trader <- traders) {
     <div class="col-md-12">

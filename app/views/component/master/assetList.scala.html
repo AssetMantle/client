@@ -1,7 +1,8 @@
 @import models.blockchain.ACLHash
 @import models.blockchain.Asset
+@import controllers.actions.LoginState
 
-@(assetPegWallet: Seq[Asset], aclHash: ACLHash)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
+@(assetPegWallet: Seq[Asset])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
     @for(asset <- assetPegWallet) {
         <div class="flexItem box thirdBox lightBlue">
@@ -16,7 +17,7 @@
                 <span class="red">@Messages(constants.Form.LOCKED)</span> : @asset.locked <br>
             </div>
             <div class="centerText" >
-                @if(aclHash.redeemAsset) {
+                @if(loginState.acl.orNull.redeemAsset) {
                 <button class="width btn btn-primary btn-sm" onclick="getForm(jsRoutes.controllers.RedeemAssetController.redeemAssetForm('@asset.ownerAddress','@asset.pegHash'))">@Messages(constants.Form.REDEEM_ASSET)</button>
             } <br>
             </div>

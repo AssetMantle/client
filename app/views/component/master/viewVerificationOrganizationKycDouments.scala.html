@@ -1,6 +1,7 @@
 @import models.master.OrganizationKYC
+@import controllers.actions.LoginState
 
-@(organizationKYCs: Seq[OrganizationKYC])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(organizationKYCs: Seq[OrganizationKYC])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 <div class="verify_buttons">
     @for(organizationKYC <- organizationKYCs) {
         @component.master.zoneViewOrganizationKycDocument(id = organizationKYC.id, documentType = organizationKYC.documentType, status = organizationKYC.status, fileName = organizationKYC.fileName, file = organizationKYC.file)

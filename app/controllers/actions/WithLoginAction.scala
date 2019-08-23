@@ -21,7 +21,7 @@ class WithLoginAction @Inject()(messagesControllerComponents: MessagesController
         val sessionToken = request.session.get(constants.Security.TOKEN).getOrElse(throw new BaseException(constants.Response.TOKEN_NOT_FOUND))
         masterTransactionAccountTokens.Service.tryVerifyingSessionToken(username, sessionToken)
         masterTransactionAccountTokens.Service.tryVerifyingSessionTokenTime(username)
-        f(LoginState(username, masterAccounts.Service.getUserType(username), masterAccounts.Service.getAddress(username)))(request)
+        f(LoginState(username, masterAccounts.Service.getUserType(username), masterAccounts.Service.getAddress(username), null))(request)
       }
       catch {
         case baseException: BaseException => {

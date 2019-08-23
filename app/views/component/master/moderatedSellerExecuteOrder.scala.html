@@ -1,7 +1,8 @@
 @import helper._
 @import views.companion.master.ModeratedSellerExecuteOrder
+@import controllers.actions.LoginState
 
-@(moderatedSellerExecuteOrderForm: Form[ModeratedSellerExecuteOrder.Data],buyerAddress:String, sellerAddress:String, pegHash:String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@(moderatedSellerExecuteOrderForm: Form[ModeratedSellerExecuteOrder.Data],buyerAddress:String, sellerAddress:String, pegHash:String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 
 @form(action = routes.SellerExecuteOrderController.moderatedSellerExecuteOrder, 'onkeypress -> "validateForm(event,this)") {
     <div class="latest_card-header latest_card-header-primary text-center">

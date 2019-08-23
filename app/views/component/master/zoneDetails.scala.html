@@ -1,6 +1,7 @@
 @import models.master.Zone
+@import controllers.actions.LoginState
 
-@(zone: Zone)(implicit messagesProvider: MessagesProvider)
+@(zone: Zone)(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
     @Messages(constants.Form.NAME): @zone.name <br>
     @Messages(constants.Form.ZONE_ID): @zone.id <br>
     @Messages(constants.Form.CURRENCY): @zone.currency <br>

@@ -2,7 +2,7 @@ package controllers.actions
 
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import models.{master, masterTransaction}
+import models.{blockchain, master, masterTransaction}
 import play.api.i18n.I18nSupport
 import play.api.mvc._
 import play.api.{Configuration, Logger}
@@ -10,7 +10,7 @@ import play.api.{Configuration, Logger}
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class WithTraderLoginAction @Inject()(messagesControllerComponents: MessagesControllerComponents, masterAccounts: master.Accounts, masterTransactionAccountTokens: masterTransaction.AccountTokens)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class WithTraderLoginAction @Inject()(messagesControllerComponents: MessagesControllerComponents, masterAccounts: master.Accounts, blockchainACLHashes: blockchain.ACLHashes, blockchainACLAccounts: blockchain.ACLAccounts, masterTransactionAccountTokens: masterTransaction.AccountTokens)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val module: String = constants.Module.ACTIONS_WITH_TRADER_LOGIN_ACTION
 
@@ -22,7 +22,8 @@ class WithTraderLoginAction @Inject()(messagesControllerComponents: MessagesCont
         masterTransactionAccountTokens.Service.tryVerifyingSessionToken(username, sessionToken)
         masterTransactionAccountTokens.Service.tryVerifyingSessionTokenTime(username)
         masterAccounts.Service.tryVerifyingUserType(username, constants.User.TRADER)
-        f(LoginState(username, constants.User.TRADER, masterAccounts.Service.getAddress(username)))(request)
+        val address = masterAccounts.Service.getAddress(username)
+        f(LoginState(username, constants.User.TRADER, address, Option(blockchainACLHashes.Service.getACL(blockchainACLAccounts.Service.getACLHash(address)))))(request)
       }
       catch {
         case baseException: BaseException => {

@@ -22,7 +22,7 @@ class WithUserLoginAction @Inject()(messagesControllerComponents: MessagesContro
         masterTransactionAccountTokens.Service.tryVerifyingSessionToken(username, sessionToken)
         masterTransactionAccountTokens.Service.tryVerifyingSessionTokenTime(username)
         masterAccounts.Service.tryVerifyingUserType(username, constants.User.USER)
-        f(LoginState(username, constants.User.USER, masterAccounts.Service.getAddress(username)))(request)
+        f(LoginState(username, constants.User.USER, masterAccounts.Service.getAddress(username), null))(request)
       }
       catch {
         case baseException: BaseException => {

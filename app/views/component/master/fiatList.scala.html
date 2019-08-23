@@ -1,7 +1,7 @@
-@import models.blockchain.ACLHash
 @import models.blockchain.Fiat
+@import controllers.actions.LoginState
 
-@(fiatPegWallet: Seq[Fiat], aclHash: ACLHash)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
+@(fiatPegWallet: Seq[Fiat])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
     @for(fiat <- fiatPegWallet) {
         <div class="flexItem box thirdBox leftText lightBlue">

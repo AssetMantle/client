@@ -2,7 +2,7 @@ package controllers.actions
 
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import models.{master, masterTransaction}
+import models.{master, masterTransaction, blockchain}
 import play.api.i18n.I18nSupport
 import play.api.mvc._
 import play.api.{Configuration, Logger}
@@ -22,7 +22,7 @@ class WithGenesisLoginAction @Inject()(messagesControllerComponents: MessagesCon
         masterTransactionAccountTokens.Service.tryVerifyingSessionToken(username, sessionToken)
         masterTransactionAccountTokens.Service.tryVerifyingSessionTokenTime(username)
         masterAccounts.Service.tryVerifyingUserType(username, constants.User.GENESIS)
-        f(LoginState(username, constants.User.GENESIS, masterAccounts.Service.getAddress(username)))(request)
+        f(LoginState(username, constants.User.GENESIS, masterAccounts.Service.getAddress(username), null))(request)
       }
       catch {
         case baseException: BaseException => {

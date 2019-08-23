@@ -1,7 +1,8 @@
 @import models.blockchain.Order
 @import models.blockchain.ACLHash
+@import controllers.actions.LoginState
 
-@(unModeratedBuyOrders: Seq[Order], unModeratedSellOrders: Seq[Order], moderatedOrders: Seq[Order], aclHash: ACLHash)(implicit messagesProvider: MessagesProvider)
+@(unModeratedBuyOrders: Seq[Order], unModeratedSellOrders: Seq[Order], moderatedOrders: Seq[Order])(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
 
     @for(unModeratedBuyOrder <- unModeratedBuyOrders) {
         <div class="flexItem thirdBox box lightBlue">
@@ -10,7 +11,7 @@
                 <span class="red">@Messages(constants.Form.AWB_PROOF_HASH)</span> : @unModeratedBuyOrder.awbProofHash <br>
                 <span class="red">@Messages(constants.Form.FIAT_PROOF_HASH)</span> : @unModeratedBuyOrder.fiatProofHash <br>
                 <div class="centerText" >
-                    @if(aclHash.buyerExecuteOrder) {
+                    @if(loginState.acl.orNull.buyerExecuteOrder) {
                         <button class="width btn btn-primary btn-sm" onclick="getForm(jsRoutes.controllers.BuyerExecuteOrderController.buyerExecuteOrderForm('@unModeratedBuyOrder.id'))">@Messages(constants.Form.BUYER_EXECUTE_ORDER)</button>
                     } <br>
                 </div>
@@ -25,7 +26,7 @@
                 <span class="red">@Messages(constants.Form.AWB_PROOF_HASH)</span> : @unModeratedSellOrder.awbProofHash <br>
                 <span class="red">@Messages(constants.Form.FIAT_PROOF_HASH)</span> : @unModeratedSellOrder.fiatProofHash <br>
                 <div class="centerText" >
-                    @if(aclHash.sellerExecuteOrder) {
+                    @if(loginState.acl.orNull.sellerExecuteOrder) {
                         <button class="width btn btn-primary btn-sm" onclick="getForm(jsRoutes.controllers.SellerExecuteOrderController.sellerExecuteOrderForm('@unModeratedSellOrder.id'))">@Messages(constants.Form.SELLER_EXECUTE_ORDER)</button>
                     } <br>
                 </div>

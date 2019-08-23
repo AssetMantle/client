@@ -22,7 +22,7 @@ class WithUnknownLoginAction @Inject()(messagesControllerComponents: MessagesCon
         masterTransactionAccountTokens.Service.tryVerifyingSessionToken(username, sessionToken)
         masterTransactionAccountTokens.Service.tryVerifyingSessionTokenTime(username)
         masterAccounts.Service.tryVerifyingUserType(username, constants.User.UNKNOWN)
-        f(LoginState(username, constants.User.UNKNOWN, masterAccounts.Service.getAddress(username)))(request)
+        f(LoginState(username, constants.User.UNKNOWN, masterAccounts.Service.getAddress(username), null))(request)
       }
       catch {
         case baseException: BaseException => {

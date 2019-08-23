@@ -1,7 +1,8 @@
 @import helper._
 @import views.companion.master.VerifyZone
+@import controllers.actions.LoginState
 
-@(verifyZoneForm: Form[VerifyZone.Data], zoneID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@(verifyZoneForm: Form[VerifyZone.Data], zoneID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @form(action = routes.AddZoneController.verifyZone, 'onkeypress -> "validateForm(event,this)") {
     <div class="latest_card-header latest_card-header-primary text-center">
         <h4 class="latest_card-title">@Messages(constants.Form.VERIFY_ZONE)</h4>

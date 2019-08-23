@@ -33,7 +33,9 @@ class LoginController @Inject()(messagesControllerComponents: MessagesController
       },
       loginData => {
         try {
-          implicit val loginState: LoginState = LoginState(loginData.username, masterAccounts.Service.getUserType(loginData.username), masterAccounts.Service.getAddress(loginData.username))
+          val userType = masterAccounts.Service.getUserType(loginData.username)
+          val address = masterAccounts.Service.getAddress(loginData.username)
+          implicit val loginState: LoginState = LoginState(loginData.username, userType, address , if (userType == constants.User.TRADER) Option(blockchainAclHashes.Service.getACL(blockchainAclAccounts.Service.getACLHash(address))) else null)
           val contactWarnings: Seq[constants.Response.Warning] = utilities.Contact.getWarnings(masterAccounts.Service.validateLoginAndGetStatus(loginData.username, loginData.password))
           pushNotification.registerNotificationToken(loginData.username, loginData.notificationToken)
           pushNotification.sendNotification(loginData.username, constants.Notification.LOGIN, loginData.username)
@@ -46,8 +48,7 @@ class LoginController @Inject()(messagesControllerComponents: MessagesController
               withUsernameToken.Ok(views.html.organizationIndex(organization = masterOrganizations.Service.get(blockchainOrganizations.Service.getID(loginState.address)), warnings = contactWarnings), loginData.username)
             case constants.User.TRADER =>
               val aclAccount = blockchainAclAccounts.Service.get(loginState.address)
-              val fiatPegWallet = blockchainFiats.Service.getFiatPegWallet(loginState.address)
-              withUsernameToken.Ok(views.html.traderIndex(totalFiat = fiatPegWallet.map(_.transactionAmount.toInt).sum, zone = masterZones.Service.get(aclAccount.zoneID), organization = masterOrganizations.Service.get(aclAccount.organizationID), aclHash = blockchainAclHashes.Service.get(aclAccount.aclHash), warnings = contactWarnings), loginData.username)
+              withUsernameToken.Ok(views.html.traderIndex(totalFiat = blockchainFiats.Service.getFiatPegWallet(loginState.address).map(_.transactionAmount.toInt).sum, zone = masterZones.Service.get(aclAccount.zoneID), organization = masterOrganizations.Service.get(aclAccount.organizationID), warnings = contactWarnings), loginData.username)
             case constants.User.USER =>
               withUsernameToken.Ok(views.html.userIndex(warnings = contactWarnings), loginData.username)
             case constants.User.UNKNOWN =>

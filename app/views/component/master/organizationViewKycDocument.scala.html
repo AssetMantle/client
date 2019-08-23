@@ -1,4 +1,6 @@
-@(id: String, documentType: String, status: Option[Boolean], fileName: String, file: Option[Array[Byte]])(implicit messagesProvider: MessagesProvider)
+@import controllers.actions.LoginState
+
+@(id: String, documentType: String, status: Option[Boolean], fileName: String, file: Option[Array[Byte]])(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
 <div>
     @utilities.FileOperations.fileExtensionFromName(fileName) match {
         case constants.File.PNG | constants.File.JPEG | constants.File.JPG => {

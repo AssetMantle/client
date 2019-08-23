@@ -1,7 +1,8 @@
 @import helper._
 @import views.companion.master.IssueFiat
+@import controllers.actions.LoginState
 
-@(issueFiatForm: Form[IssueFiat.Data], requestID: String, accountID: String, transactionID: String, transactionAmount: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@(issueFiatForm: Form[IssueFiat.Data], requestID: String, accountID: String, transactionID: String, transactionAmount: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 
 @form(action = routes.IssueFiatController.issueFiat, 'onkeypress -> "validateForm(event,this)") {
     <div class="latest_card-header latest_card-header-primary text-center">

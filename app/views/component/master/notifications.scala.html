@@ -1,4 +1,6 @@
-@(notifications: Seq[models.masterTransaction.Notification] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@import controllers.actions.LoginState
+
+@(notifications: Seq[models.masterTransaction.Notification] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 <div id="notificationContainer" class = "notificationContainer">
     @for(notification <- notifications) {
         <div class = "notification">

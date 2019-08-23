@@ -1,7 +1,8 @@
 @import models.blockchain.ACLHash
 @import models.blockchain.Asset
+@import controllers.actions.LoginState
 
-@(assetList: Seq[Asset], aclHash: ACLHash)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
+@(assetList: Seq[Asset])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
     @for(asset <- assetList) {
         <div class="flexItem box firstBox lightBlue">
@@ -16,10 +17,10 @@
                 <span class="red">@Messages(constants.Form.LOCKED)</span> : @asset.locked <br>
             </div>
             <div class="centerText">
-                @if(aclHash.changeBuyerBid) {
+                @if(loginState.acl.orNull.changeBuyerBid) {
                     <button class="btn btn-sm btn-primary" onclick="getForm(jsRoutes.controllers.ChangeBuyerBidController.changeBuyerBidForm('@asset.ownerAddress','@asset.pegHash'))">@Messages(constants.Form.NEGOTIATE)</button>
                 } <br>
-                @if(aclHash.confirmBuyerBid) {
+                @if(loginState.acl.orNull.confirmBuyerBid) {
                     <button class="btn btn-sm btn-primary" onclick="getForm(jsRoutes.controllers.ConfirmBuyerBidController.confirmBuyerBidForm('@asset.ownerAddress','@asset.pegHash', @asset.assetPrice))">@Messages(constants.Form.ACCEPT_OFFER)</button>
                 } <br>
             </div>

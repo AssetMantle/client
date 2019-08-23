@@ -1,6 +1,7 @@
 @import models.blockchain.Asset
+@import controllers.actions.LoginState
 
-@(releaseAssetList : Seq[Asset])(implicit messagesProvider: MessagesProvider)
+@(releaseAssetList : Seq[Asset])(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
 
 @for(releaseAsset <- releaseAssetList){
     <div class="col-md-3">
