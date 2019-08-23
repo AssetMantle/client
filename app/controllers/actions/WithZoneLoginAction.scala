@@ -22,7 +22,7 @@ class WithZoneLoginAction @Inject()(messagesControllerComponents: MessagesContro
         masterTransactionAccountTokens.Service.tryVerifyingSessionToken(username, sessionToken)
         masterTransactionAccountTokens.Service.tryVerifyingSessionTokenTime(username)
         masterAccounts.Service.tryVerifyingUserType(username, constants.User.ZONE)
-        f(LoginState(username, constants.User.ZONE, masterAccounts.Service.getAddress(username), null))(request)
+        f(LoginState(username, constants.User.ZONE, masterAccounts.Service.getAddress(username)))(request)
       }
       catch {
         case baseException: BaseException => {

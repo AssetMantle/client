@@ -22,7 +22,7 @@ class WithGenesisLoginAction @Inject()(messagesControllerComponents: MessagesCon
         masterTransactionAccountTokens.Service.tryVerifyingSessionToken(username, sessionToken)
         masterTransactionAccountTokens.Service.tryVerifyingSessionTokenTime(username)
         masterAccounts.Service.tryVerifyingUserType(username, constants.User.GENESIS)
-        f(LoginState(username, constants.User.GENESIS, masterAccounts.Service.getAddress(username), null))(request)
+        f(LoginState(username, constants.User.GENESIS, masterAccounts.Service.getAddress(username)))(request)
       }
       catch {
         case baseException: BaseException => {
