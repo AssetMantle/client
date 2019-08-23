@@ -1,8 +1,8 @@
 @import helper._
 @import views.companion.master.UpdateContact
+@import controllers.actions.LoginState
 
-
-@(updateContactForm: Form[UpdateContact.Data], countryCallingCodes: Seq[(String, String)])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@(updateContactForm: Form[UpdateContact.Data], countryCallingCodes: Seq[(String, String)])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 
 @form(action = routes.UpdateContactController.updateContact, 'onkeypress -> "validateForm(event,this)") {
     <div class="latest_card-header latest_card-header-primary text-center">

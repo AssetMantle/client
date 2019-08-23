@@ -2,7 +2,7 @@ package controllers.actions
 
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import models.{master, masterTransaction}
+import models.{master, masterTransaction, blockchain}
 import play.api.i18n.I18nSupport
 import play.api.mvc._
 import play.api.{Configuration, Logger}

@@ -1,7 +1,8 @@
 @import helper._
 @import views.companion.master.IssueAssetRequest
+@import controllers.actions.LoginState
 
-@(issueAssetRequestForm: Form[IssueAssetRequest.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@(issueAssetRequestForm: Form[IssueAssetRequest.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 
 @form(action = routes.IssueAssetController.issueAssetRequest, 'onkeypress -> "validateForm(event,this)") {
     @CSRF.formField

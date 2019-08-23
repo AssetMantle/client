@@ -31,8 +31,7 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
           withUsernameToken.Ok(views.html.organizationIndex(organization = masterOrganizations.Service.get(blockchainOrganizations.Service.getID(loginState.address))), loginState.username)
         case constants.User.TRADER =>
           val aclAccount = blockchainAclAccounts.Service.get(loginState.address)
-          val fiatPegWallet = blockchainFiats.Service.getFiatPegWallet(loginState.address)
-          withUsernameToken.Ok(views.html.traderIndex(totalFiat = fiatPegWallet.map(_.transactionAmount.toInt).sum, zone = masterZones.Service.get(aclAccount.zoneID), organization = masterOrganizations.Service.get(aclAccount.organizationID), aclHash = blockchainAclHashes.Service.get(aclAccount.aclHash)), loginState.username)
+          withUsernameToken.Ok(views.html.traderIndex(totalFiat =  blockchainFiats.Service.getFiatPegWallet(loginState.address).map(_.transactionAmount.toInt).sum, zone = masterZones.Service.get(aclAccount.zoneID), organization = masterOrganizations.Service.get(aclAccount.organizationID)), loginState.username)
         case constants.User.USER =>
           withUsernameToken.Ok(views.html.userIndex(), loginState.username)
         case constants.User.UNKNOWN =>

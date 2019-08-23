@@ -1,7 +1,8 @@
+@import controllers.actions.LoginState
 @import helper._
 @import views.companion.master.Login
 
-@(loginForm: Form[Login.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@(loginForm: Form[Login.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 
 <div class="latest_card-header latest_card-header-primary text-center">
     <h4 class="latest_card-title">@Messages(constants.Form.LOGIN)</h4>
@@ -11,6 +12,7 @@
 
         <div class="latest_card-body">
             @CSRF.formField
+
             <div class="input-group">
                 <div class="input-group-prepend">
                     <span class="input-group-text">
@@ -29,6 +31,7 @@
                 </div>
             </div>
             <div class = "hidden">@inputText(loginForm(constants.Form.NOTIFICATION_TOKEN), 'id -> constants.Form.NOTIFICATION_TOKEN, 'readonly -> true)</div>
+
             @if(loginForm.hasGlobalErrors) {
                 <ul>
                 @for(error <- loginForm.globalErrors) {
@@ -37,6 +40,7 @@
                 </ul>
             }
             <button type="button" class="btn btn-primary " onclick="submitForm(this)">@Messages(constants.Form.LOGIN)</button>
-
         </div>
-    }
+}
+
+

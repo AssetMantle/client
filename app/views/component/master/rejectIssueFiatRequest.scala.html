@@ -1,7 +1,8 @@
 @import helper._
 @import views.companion.master.RejectIssueFiatRequest
+@import controllers.actions.LoginState
 
-@(rejectIssueFiatRequestForm: Form[RejectIssueFiatRequest.Data], requestID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@(rejectIssueFiatRequestForm: Form[RejectIssueFiatRequest.Data], requestID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @form(action = routes.IssueFiatController.rejectIssueFiatRequest, 'onkeypress -> "validateForm(event,this)") {
     <div class="latest_card-header latest_card-header-primary text-center">
         <h4 class="latest_card-title">@Messages(constants.Form.REJECT_ISSUE_FIAT_REQUEST)</h4>

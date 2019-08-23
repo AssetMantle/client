@@ -1,7 +1,8 @@
 @import helper._
 @import views.companion.master.RejectVerifyTraderRequest
+@import controllers.actions.LoginState
 
-@(rejectVerifyTraderRequestForm: Form[RejectVerifyTraderRequest.Data], traderID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@(rejectVerifyTraderRequestForm: Form[RejectVerifyTraderRequest.Data], traderID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @form(action = routes.SetACLController.organizationRejectVerifyTraderRequest, 'onkeypress -> "validateForm(event,this)") {
     <div class="latest_card-header latest_card-header-primary text-center">
         <h4 class="latest_card-title">@Messages(constants.Form.REJECT_VERIFY_TRADER_REQUEST)</h4>

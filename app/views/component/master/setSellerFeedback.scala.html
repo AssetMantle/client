@@ -1,7 +1,8 @@
 @import helper._
 @import views.companion.master.SetSellerFeedback
+@import controllers.actions.LoginState
 
-@(setSellerFeedbackForm: Form[SetSellerFeedback.Data], buyerAddress: String, pegHash: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@(setSellerFeedbackForm: Form[SetSellerFeedback.Data], buyerAddress: String, pegHash: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @form(action = routes.SetSellerFeedbackController.setSellerFeedback, 'onkeypress -> "validateForm(event,this)") {
     <div class="latest_card-header latest_card-header-primary text-center">
         <h4 class="latest_card-title">@Messages(constants.Form.SET_SELLER_FEEDBACK)</h4>

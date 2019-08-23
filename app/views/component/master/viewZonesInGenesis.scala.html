@@ -1,6 +1,7 @@
 @import models.master.Zone
+@import controllers.actions.LoginState
 
-@(zones: Seq[Zone])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
+@(zones: Seq[Zone])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
 @for(zone <- zones) {
 

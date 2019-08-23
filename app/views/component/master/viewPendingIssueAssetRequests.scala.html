@@ -1,6 +1,7 @@
 @import models.masterTransaction.IssueAssetRequest
+@import controllers.actions.LoginState
 
-@(issueAssetRequests: Seq[IssueAssetRequest])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
+@(issueAssetRequests: Seq[IssueAssetRequest])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
 @for(issueAssetRequest <- issueAssetRequests) {
     <div class="col-md-4">

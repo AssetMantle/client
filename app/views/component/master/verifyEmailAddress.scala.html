@@ -1,7 +1,8 @@
 @import helper._
 @import views.companion.master.VerifyEmailAddress
+@import controllers.actions.LoginState
 
-@(verifyEmailAddressForm: Form[VerifyEmailAddress.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@(verifyEmailAddressForm: Form[VerifyEmailAddress.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @form(action = routes.VerifyEmailAddressController.verifyEmailAddress, 'onkeypress -> "validateForm(event,this)") {
     <div class="latest_card-header latest_card-header-primary text-center">
         <h4 class="latest_card-title">@Messages(constants.Form.VERIFY_EMAIL_ADDRESS)</h4>

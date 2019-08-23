@@ -1,6 +1,7 @@
 @import models.master.ZoneKYC
+@import controllers.actions.LoginState
 
-@(zoneKYCs: Seq[ZoneKYC])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(zoneKYCs: Seq[ZoneKYC])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 <div>
     @for(zoneKYC <- zoneKYCs) {
         @component.master.genesisViewKycDocument(id = zoneKYC.id, documentType = zoneKYC.documentType, status = zoneKYC.status, fileName = zoneKYC.fileName, file = zoneKYC.file)

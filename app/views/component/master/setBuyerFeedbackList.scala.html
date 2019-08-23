@@ -1,6 +1,7 @@
 @import models.blockchain.TraderFeedbackHistory
+@import controllers.actions.LoginState
 
-@(traderFeedbackHistories: Seq[TraderFeedbackHistory])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
+@(traderFeedbackHistories: Seq[TraderFeedbackHistory])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
     @for(traderFeedbackHistory <- traderFeedbackHistories) {
         <div class="flexItem box thirdBox lightBlue">

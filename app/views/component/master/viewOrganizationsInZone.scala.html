@@ -1,6 +1,7 @@
 @import models.master.Organization
+@import controllers.actions.LoginState
 
-@(organizations: Seq[Organization])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
+@(organizations: Seq[Organization])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
 @for(organization <- organizations) {
     <div id="collapseTwo" class="collapse" data-parent="#accordion">

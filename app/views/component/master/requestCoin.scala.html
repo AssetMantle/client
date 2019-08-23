@@ -1,7 +1,8 @@
 @import helper._
 @import views.companion.master.RequestCoin
+@import controllers.actions.LoginState
 
-@(requestCoinFormForm: Form[RequestCoin.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@(requestCoinFormForm: Form[RequestCoin.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 
     <div class="request_coin">
 @form(action = routes.SendCoinController.requestCoins, 'onkeypress -> "validateForm(event,this)") {
