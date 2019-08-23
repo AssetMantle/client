@@ -26,14 +26,18 @@
             </div>
         </div>
     </div>
-
     <div class="flexContainer">
         <div class="flexGrowth flexItem box leftText">
             <div>
                 <h2 class="showHide toggleElement centerText" onclick="fetchOrShowHide('assetList', jsRoutes.controllers.ComponentViewController.assetList(), this)">@Messages(constants.User.ASSETS_OWNED) </h2>
                 <div class="centerText">
-                @if(loginState.acl.orNull.issueAsset) {
-                    <button onclick="getForm(jsRoutes.controllers.IssueAssetController.issueAssetRequestForm())">@Messages(constants.Form.ISSUE_ASSET_REQUEST)</button>
+                @loginState.acl match {
+                    case Some(acl) => {
+                        @if(acl.issueAsset) {
+                            <button onclick="getForm(jsRoutes.controllers.IssueAssetController.issueAssetRequestForm())">@Messages(constants.Form.ISSUE_ASSET_REQUEST)</button>
+                        }
+                    }
+                    case _ => {}
                 }
                 </div>
             </div>
@@ -49,12 +53,17 @@
             <div>
                 <h2 class="showHide toggleElement centerText" onclick="fetchOrShowHide('fiatList', jsRoutes.controllers.ComponentViewController.fiatList(), this)">@Messages(constants.User.FIATS_OWNED): <span id="totalFiat">@totalFiat</span></h2>
                 <div class="centerText">
-                    @if(loginState.acl.orNull.issueFiat) {
-                        <button onclick="getForm(jsRoutes.controllers.IssueFiatController.issueFiatRequestForm())">@Messages(constants.Form.ISSUE_FIAT_REQUEST)</button>
-                    }
-                    @if(loginState.acl.orNull.redeemFiat) {
-                        <button onclick="getForm(jsRoutes.controllers.RedeemFiatController.redeemFiatForm('@loginState.address'))">@Messages(constants.Form.REDEEM_FIAT)</button>
-                    }
+                     @loginState.acl match {
+                        case Some(acl) => {
+                            @if(acl.issueFiat) {
+                                <button onclick="getForm(jsRoutes.controllers.IssueFiatController.issueFiatRequestForm())">@Messages(constants.Form.ISSUE_FIAT_REQUEST)</button>
+                            }
+                            @if(acl.redeemFiat) {
+                                <button onclick="getForm(jsRoutes.controllers.RedeemFiatController.redeemFiatForm('@loginState.address'))">@Messages(constants.Form.REDEEM_FIAT)</button>
+                            }
+                        }
+                        case _ => {}
+                     }
                 </div>
             </div>
             <div id="fiatList" class="flexContainer"></div>

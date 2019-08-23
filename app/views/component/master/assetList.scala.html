@@ -1,25 +1,31 @@
-@import models.blockchain.ACLHash
-@import models.blockchain.Asset
 @import controllers.actions.LoginState
+@import models.blockchain.Asset
 
 @(assetPegWallet: Seq[Asset])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
-    @for(asset <- assetPegWallet) {
-        <div class="flexItem box thirdBox lightBlue">
-            <div class="leftText">
-                <span class="red">@Messages(constants.Form.PEG_HASH)</span> : @asset.pegHash <br>
-                <span class="red">@Messages(constants.Form.DOCUMENT_HASH)</span> : @asset.documentHash <br>
-                <span class="red">@Messages(constants.Form.ASSET_TYPE)</span> : @asset.assetType <br>
-                <span class="red">@Messages(constants.Form.ASSET_QUANTITY)</span> : @asset.assetQuantity <br>
-                <span class="red">@Messages(constants.Form.ASSET_PRICE)</span> : @asset.assetPrice <br>
-                <span class="red">@Messages(constants.Form.QUANTITY_UNIT)</span> : @asset.quantityUnit <br>
-                <span class="red">@Messages(constants.Form.MODERATED)</span> : @asset.moderated <br>
-                <span class="red">@Messages(constants.Form.LOCKED)</span> : @asset.locked <br>
-            </div>
-            <div class="centerText" >
-                @if(loginState.acl.orNull.redeemAsset) {
-                <button class="width btn btn-primary btn-sm" onclick="getForm(jsRoutes.controllers.RedeemAssetController.redeemAssetForm('@asset.ownerAddress','@asset.pegHash'))">@Messages(constants.Form.REDEEM_ASSET)</button>
-            } <br>
-            </div>
+@for(asset <- assetPegWallet) {
+    <div class="flexItem box thirdBox lightBlue">
+        <div class="leftText">
+            <span class="red">@Messages(constants.Form.PEG_HASH)</span> : @asset.pegHash <br>
+            <span class="red">@Messages(constants.Form.DOCUMENT_HASH)</span> : @asset.documentHash <br>
+            <span class="red">@Messages(constants.Form.ASSET_TYPE)</span> : @asset.assetType <br>
+            <span class="red">@Messages(constants.Form.ASSET_QUANTITY)</span> : @asset.assetQuantity <br>
+            <span class="red">@Messages(constants.Form.ASSET_PRICE)</span> : @asset.assetPrice <br>
+            <span class="red">@Messages(constants.Form.QUANTITY_UNIT)</span> : @asset.quantityUnit <br>
+            <span class="red">@Messages(constants.Form.MODERATED)</span> : @asset.moderated <br>
+            <span class="red">@Messages(constants.Form.LOCKED)</span> : @asset.locked <br>
         </div>
-    }
+        <div class="centerText" >
+        @loginState.acl match {
+            case Some(acl) => {
+                @if(acl.redeemAsset) {
+                    <button class="width btn btn-primary btn-sm" onclick="getForm(jsRoutes.controllers.RedeemAssetController.redeemAssetForm('@asset.ownerAddress', '@asset.pegHash'))">@Messages(constants.Form.REDEEM_ASSET)</button>
+                    <br>
+                    }
+            }
+            case _ => {}
+        }
+
+        </div>
+    </div>
+}

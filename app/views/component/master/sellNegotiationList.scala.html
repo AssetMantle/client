@@ -1,47 +1,56 @@
-@import models.blockchain.{ACLHash, Negotiation}
 @import controllers.actions.LoginState
+@import models.blockchain.Negotiation
 
 @(sellNegotiations: Seq[Negotiation], assetPegHashList: Seq[String])(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
 
-    @for(negotiation <- sellNegotiations) {
-        <div class="flexItem box thirdBox lightBlue">
-            <div class="leftText">
+@for(negotiation <- sellNegotiations) {
+    <div class="flexItem box thirdBox lightBlue">
+        <div class="leftText">
 
-                <span class="red">@Messages(constants.Form.PEG_HASH)</span> : @negotiation.assetPegHash <br>
-                <span class="red">@Messages(constants.Form.BID)</span> : @negotiation.bid <br>
-                <span class="red">@Messages(constants.Form.TIME)</span> : @negotiation.time <br>
-                <div class="centerText" >
-                    @if(negotiation.sellerSignature.getOrElse(null) == null) {
-                        @if(loginState.acl.orNull.changeSellerBid) {
-                            <button class="width btn btn-primary btn-sm" onclick="getForm(jsRoutes.controllers.ChangeSellerBidController.changeSellerBidForm('@negotiation.buyerAddress', '@negotiation.assetPegHash'))">@Messages(constants.Form.NEGOTIATE)</button>
-                        } <br>
-                        @if(loginState.acl.orNull.confirmSellerBid) {
-                            <button class="width btn btn-primary btn-sm" onclick="getForm(jsRoutes.controllers.ConfirmSellerBidController.confirmSellerBidForm('@negotiation.buyerAddress', '@negotiation.assetPegHash', @negotiation.bid))">@Messages(constants.Form.ACCEPT_OFFER)</button>
-                        } <br>
+            <span class="red">@Messages(constants.Form.PEG_HASH)</span> : @negotiation.assetPegHash <br>
+            <span class="red">@Messages(constants.Form.BID)</span> : @negotiation.bid <br>
+            <span class="red">@Messages(constants.Form.TIME)</span> : @negotiation.time <br>
+            <div class="centerText" >
+                @if(negotiation.sellerSignature.getOrElse(null) == null) {
+                    @loginState.acl match {
+                        case Some(acl) => {
+                            @if(acl.changeSellerBid) {
+                                <button class="width btn btn-primary btn-sm" onclick="getForm(jsRoutes.controllers.ChangeSellerBidController.changeSellerBidForm('@negotiation.buyerAddress', '@negotiation.assetPegHash'))">@Messages(constants.Form.NEGOTIATE)</button>
+                            } <br>
+                            @if(acl.confirmSellerBid) {
+                                <button class="width btn btn-primary btn-sm" onclick="getForm(jsRoutes.controllers.ConfirmSellerBidController.confirmSellerBidForm('@negotiation.buyerAddress', '@negotiation.assetPegHash', @negotiation.bid))">@Messages(constants.Form.ACCEPT_OFFER)</button>
+                            } <br>
+                        }
+                        case _ => {}
                     }
-                    @if(negotiation.sellerSignature.getOrElse(null) != null && negotiation.buyerSignature.getOrElse(null) != null && (assetPegHashList contains negotiation.assetPegHash)) {
-                        @if(loginState.acl.orNull.sendAsset) {
-                            <button class="width btn btn-primary btn-sm" onclick="getForm(jsRoutes.controllers.SendAssetController.sendAssetForm('@negotiation.buyerAddress', '@negotiation.assetPegHash'))">@Messages(constants.Form.SEND_ASSET)</button>
-                        } <br>
-
+                }
+                @if(negotiation.sellerSignature.getOrElse(null) != null && negotiation.buyerSignature.getOrElse(null) != null && (assetPegHashList contains negotiation.assetPegHash)) {
+                    @loginState.acl match {
+                        case Some(acl) => {
+                            @if(acl.sendAsset) {
+                                <button class="width btn btn-primary btn-sm" onclick="getForm(jsRoutes.controllers.SendAssetController.sendAssetForm('@negotiation.buyerAddress', '@negotiation.assetPegHash'))">@Messages(constants.Form.SEND_ASSET)</button>
+                            } <br>
+                        }
+                        case _ => {}
                     }
-                <button class="showHide btn btn-sm">@Messages(constants.Form.SHOW_HIDE)</button>
-                </div>
-                <div class="hidden">
-                    <span class="red">@Messages(constants.Form.BUYER_ADDRESS)</span> : @negotiation.buyerAddress <br>
-                    <span class="red">@Messages(constants.Form.SELLER_ADDRESS)</span>: @negotiation.sellerAddress <br>
-                    <span class="red">@Messages(constants.Form.NEGOTIATION_ID)</span> : @negotiation.id <br>
-                    <span class="red">@Messages(constants.Form.BUYER_SIGNATURE)</span>: @negotiation.buyerSignature <br>
-                    <span class="red">@Messages(constants.Form.SELLER_SIGNATURE)</span>: @negotiation.sellerSignature <br>
-                    <span class="red">@Messages(constants.Form.BUYER_BLOCK_HEIGHT)</span>
-                    : @negotiation.buyerBlockHeight <br>
-                    <span class="red">@Messages(constants.Form.SELLER_BLOCK_HEIGHT)</span>
-                    : @negotiation.sellerBlockHeight <br>
-                    <span class="red">@Messages(constants.Form.BUYER_CONTRACT_HASH)</span>
-                    : @negotiation.buyerContractHash <br>
-                    <span class="red">@Messages(constants.Form.SELLER_CONTRACT_HASH)</span>
-                    : @negotiation.sellerContractHash <br>
-                </div>
+                }
+            <button class="showHide btn btn-sm">@Messages(constants.Form.SHOW_HIDE)</button>
+            </div>
+            <div class="hidden">
+                <span class="red">@Messages(constants.Form.BUYER_ADDRESS)</span> : @negotiation.buyerAddress <br>
+                <span class="red">@Messages(constants.Form.SELLER_ADDRESS)</span>: @negotiation.sellerAddress <br>
+                <span class="red">@Messages(constants.Form.NEGOTIATION_ID)</span> : @negotiation.id <br>
+                <span class="red">@Messages(constants.Form.BUYER_SIGNATURE)</span>: @negotiation.buyerSignature <br>
+                <span class="red">@Messages(constants.Form.SELLER_SIGNATURE)</span>: @negotiation.sellerSignature <br>
+                <span class="red">@Messages(constants.Form.BUYER_BLOCK_HEIGHT)</span>
+                : @negotiation.buyerBlockHeight <br>
+                <span class="red">@Messages(constants.Form.SELLER_BLOCK_HEIGHT)</span>
+                : @negotiation.sellerBlockHeight <br>
+                <span class="red">@Messages(constants.Form.BUYER_CONTRACT_HASH)</span>
+                : @negotiation.buyerContractHash <br>
+                <span class="red">@Messages(constants.Form.SELLER_CONTRACT_HASH)</span>
+                : @negotiation.sellerContractHash <br>
             </div>
         </div>
-    }
+    </div>
+}
