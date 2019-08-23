@@ -48,10 +48,6 @@
                     </div>
 
                     <div class="collapse navbar-collapse" id="myNavbar">
-@*                        <ul class="navbar-nav mr-auto">*@
-@*                            <li class="nav-item"> <a href="#"> <i class="fa fa-newspaper-o" aria-hidden="true"></i> News</a></li>*@
-@*                            <li class="nav-item">   <a href="#"><i class="fa fa-address-book"></i> Contact</a></li>*@
-@*                        </ul>*@
                         <ul class="nav navbar-nav ml-auto">
                         @loginState match {
                             case null => {
@@ -68,7 +64,7 @@
                                     }
                                     case constants.User.ZONE => {
                                         <li><a class="nav-item" href="@controllers.routes.ViewController.zoneRequest()">@Messages(constants.Form.REQUEST)</a></li>
-                                        <li><a class="nav-item"  href="@controllers.routes.ViewController.zoneInformation()">@Messages(constants.Form.INFORMATION)</a></li>
+                                        <li><a class="nav-item" href="@controllers.routes.ViewController.zoneInformation()">@Messages(constants.Form.INFORMATION)</a></li>
                                     }
                                     case constants.User.ORGANIZATION => {
                                         <li><a class="nav-item" href="@controllers.routes.ViewController.organizationRequest()">@Messages(constants.Form.REQUEST)</a></li>
@@ -80,11 +76,16 @@
                                     }
                                     case _ => {}
                                 }
-                                <li><a class="nav-item notification" onclick="getForm(jsRoutes.controllers.NotificationController.notificationPage(0))"><i class="fa fa-bell" aria-hidden="true"></i> @Messages(constants.Form.INBOX)
+                                <li><a class="nav-item notification" onclick="getForm(jsRoutes.controllers.NotificationController.notificationPage(0))"><i class="fa fa-bell" aria-hidden="true"></i>
+                                    @Messages(constants.Form.INBOX)
                                     <span class="badge" id="notificationBadge">0</span>
-                                </a></li>
-                                <li><a class="nav-item" onclick="getForm(jsRoutes.controllers.LogoutController.logoutForm())"><i class="fa fa-sign-out" aria-hidden="true"></i> @Messages(constants.Form.LOGOUT)</a></li>
-                                <li> <a class="nav-item" onclick="getForm(jsRoutes.controllers.LogoutController.logoutForm())"><i class="fa fa-user" aria-hidden="true"></i> @loginState.username</a></li>
+                                </a>
+                                </li>
+                                <li><a class="nav-item" onclick="getForm(jsRoutes.controllers.LogoutController.logoutForm())"><i class="fa fa-sign-out" aria-hidden="true"></i>
+                                    @Messages(constants.Form.LOGOUT)</a>
+                                </li>
+                                <li> <a class="nav-item" onclick="getForm(jsRoutes.controllers.LogoutController.logoutForm())"><i class="fa fa-user" aria-hidden="true"></i>
+                                    @loginState.username</a></li>
 
 
                             }
@@ -127,23 +128,23 @@
                 </div>
             }
         </div>
-            <div class="pageFlexContainer">
-                <div class="left_side">
-                @left
-                </div>
-                <div class="middle">
-                @center
-                </div>
-                <div class="right_side">
-                @right
-                </div>
+        <div class="pageFlexContainer">
+            <div class="left_side">
+            @left
             </div>
+            <div class="middle">
+            @center
+            </div>
+            <div class="right_side">
+            @right
+            </div>
+        </div>
 
 
         <div class="modal" id="commonModal">
 
-                <div class="latest_card latest_card-login modalContent" id="commonModalContent">
-                </div>
+            <div class="latest_card latest_card-login modalContent" id="commonModalContent">
+            </div>
 
 
         </div>
@@ -156,8 +157,8 @@
                 <div class="copyright float-right">
                             &copy;
                     <script>
-          document.write(new Date().getFullYear())
-        </script>
+                            document.write(new Date().getFullYear())
+                    </script>
                     <a href="" target="_blank">Commit</a>
                 </div>
             </div>

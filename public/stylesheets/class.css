@@ -138,17 +138,6 @@ body {
     filter: blur(5 px);
 }
 
-/*Alert*/
-/*.alert {*/
-/*    position:relative;*/
-/*    top:70px;*/
-/*    padding: 10px;*/
-/*    color: white;*/
-/*    opacity: 1;*/
-/*    transition: opacity 0.6s;*/
-/*    margin-bottom: 5px;*/
-/*}*/
-
 .alert.success {
     background-color: #4CAF50;
 }
@@ -303,16 +292,6 @@ body {
 }
 /*@media only screen and (max-width: 1200px) {*/
 
-
-/*    .third {*/
-/*        display: none;*/
-/*    }*/
-/*    .second {*/
-/*        margin: 0px;*/
-/*        width: 100%;*/
-/*    }*/
-/*}*/
-
 .flexContainer {
     display: flex;
     justify-content: left;
@@ -455,9 +434,6 @@ rightText{
     max-height: 20vh;
     overflow-y: scroll;
 }
-/*.info {*/
-/*    display: none;*/
-/*}*/
 
 /* Progress Bar*/
 
@@ -507,9 +483,7 @@ dl .info::after {
     border-style: solid;
     border-color: transparent transparent #dadada transparent;
 }
-/*dl:hover .info {*/
-/*    visibility: visible;*/
-/*}*/
+
 /*ToolTip*/
 /*notification*/
 .notifications{

@@ -1,12 +1,12 @@
 package views.companion.master
 
 import play.api.data.Form
-import play.api.data.Forms.{mapping, text}
+import play.api.data.Forms.mapping
 
 object RequestCoin {
   val form = Form(
     mapping(
-      constants.Form.COUPON -> text(minLength = constants.FormConstraint.COUPON_MINIMUM_LENGTH, maxLength = constants.FormConstraint.COUPON_MAXIMUM_LENGTH),
+      constants.Form.COUPON -> constants.FormField.COUPON.field
 
     )(Data.apply)(Data.unapply)
   )
