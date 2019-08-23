@@ -41,6 +41,7 @@ body {
         width: 200px !important;
         left: 15%;
         max-height: 60%;
+
         overflow: auto;
     }
     table thead{
@@ -56,6 +57,7 @@ body {
         left: 35%;
         max-height: 60%;
         overflow: auto;
+        max-width:600px;
     }
 
 
@@ -614,7 +616,7 @@ dl .info::after {
 }
 
 .input-group-prepend .input-group-text{
-    margin-bottom: 30px;
+    margin-top: -90px;
 }
 . {
     height: 500px;

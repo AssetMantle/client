@@ -12,13 +12,13 @@ class StringFormField (minimumLength: Int, maximumLength: Int, regex: Regex = ""
 }
 
 class IntFormField (minimumValue: Int, maximumValue: Int) {
-  val field: Mapping[Int] =  number(min = maximumValue, max = maximumValue)
+  val field: Mapping[Int] =  number(min = minimumValue, max = maximumValue)
 }
 
 object FormField {
 
   val SIGNUP_USERNAME = new StringFormField(3,  50, RegularExpression.ACCOUNT_ID, Response.INVALID_USERNAME.message)
-  val SIGNUP_PASSWORD = new StringFormField(8, 128)
+  val SIGNUP_PASSWORD = new StringFormField(6, 128, RegularExpression.PASSWORD, Response.INVALID_PASSWORD.message)
   val PASSWORD = new StringFormField(0, 128)
   val PHONE = new StringFormField(8,15, RegularExpression.MOBILE_NUMBER)
   val BLOCKCHAIN_ADDRESS = new StringFormField(45, 45)
@@ -36,7 +36,7 @@ object FormField {
   val TRANSACTION_ID = new StringFormField(2, 50, RegularExpression.ALL_NUMBERS_ALL_LETTERS)
   val NOTIFICATION_TOKEN = new StringFormField(0, 200)
   val COMMENT = new StringFormField(0, 200)
-  val COUPON = new StringFormField(2, 50, RegularExpression.ALL_NUMBERS_ALL_LETTERS)
+  val COUPON = new StringFormField(0, 50, RegularExpression.ALL_NUMBERS_ALL_LETTERS)
   val COUNTRY_CODE = new StringFormField(1, 5)
   val OTP = new StringFormField(4, 10, RegularExpression.ALL_NUMBERS_ALL_LETTERS)
   val CURRENCY = new StringFormField(2, 30, RegularExpression.ALL_LETTERS)
