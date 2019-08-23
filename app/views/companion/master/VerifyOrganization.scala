@@ -8,9 +8,9 @@ object VerifyOrganization {
 
   val form = Form(
     mapping(
-      constants.Form.ORGANIZATION_ID -> constants.FormField.ORGANIZATION_ID.field,
-      constants.Form.ZONE_ID -> constants.FormField.ZONE_ID.field,
-      constants.Form.PASSWORD -> constants.FormField.PASSWORD.field,
+      constants.FormField.ORGANIZATION_ID.name -> constants.FormField.ORGANIZATION_ID.field,
+      constants.FormField.ZONE_ID.name -> constants.FormField.ZONE_ID.field,
+      constants.FormField.PASSWORD.name -> constants.FormField.PASSWORD.field,
     )(Data.apply)(Data.unapply)
   )
 

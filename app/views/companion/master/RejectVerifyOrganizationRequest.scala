@@ -7,7 +7,7 @@ object RejectVerifyOrganizationRequest {
 
   val form = Form(
     mapping(
-      constants.Form.ORGANIZATION_ID -> constants.FormField.ORGANIZATION_ID.field,
+      constants.FormField.ORGANIZATION_ID.name -> constants.FormField.ORGANIZATION_ID.field,
     )(Data.apply)(Data.unapply)
   )
 

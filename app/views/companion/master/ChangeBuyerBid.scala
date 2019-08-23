@@ -6,12 +6,12 @@ import play.api.data.Forms._
 object ChangeBuyerBid {
   val form = Form(
     mapping(
-      constants.Form.PASSWORD -> constants.FormField.PASSWORD.field,
-      constants.Form.SELLER_ADDRESS -> constants.FormField.BLOCKCHAIN_ADDRESS.field,
-      constants.Form.BID -> constants.FormField.BID.field,
-      constants.Form.TIME -> constants.FormField.BLOCK_TIME.field,
-      constants.Form.PEG_HASH -> constants.FormField.PEG_HASH.field,
-      constants.Form.GAS -> constants.FormField.GAS.field
+      constants.FormField.PASSWORD.name -> constants.FormField.PASSWORD.field,
+      constants.FormField.SELLER_ADDRESS.name -> constants.FormField.SELLER_ADDRESS.field,
+      constants.FormField.BID.name -> constants.FormField.BID.field,
+      constants.FormField.TIME.name -> constants.FormField.TIME.field,
+      constants.FormField.PEG_HASH.name -> constants.FormField.PEG_HASH.field,
+      constants.FormField.GAS.name -> constants.FormField.GAS.field
     )(Data.apply)(Data.unapply)
   )
 

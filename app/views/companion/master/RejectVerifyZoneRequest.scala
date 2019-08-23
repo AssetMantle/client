@@ -7,7 +7,7 @@ object RejectVerifyZoneRequest {
 
   val form = Form(
     mapping(
-      constants.Form.ZONE_ID -> constants.FormField.ZONE_ID.field,
+      constants.FormField.ZONE_ID.name -> constants.FormField.ZONE_ID.field,
     )(Data.apply)(Data.unapply)
   )
 

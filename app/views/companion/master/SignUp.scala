@@ -7,10 +7,10 @@ object SignUp {
 
   val form = Form(
     mapping(
-      constants.Form.USERNAME -> constants.FormField.SIGNUP_USERNAME.field,
+      constants.FormField.SIGNUP_USERNAME.name -> constants.FormField.SIGNUP_USERNAME.field,
       constants.Form.USERNAME_AVAILABLE -> boolean,
-      constants.Form.PASSWORD -> constants.FormField.SIGNUP_PASSWORD.field,
-      constants.Form.CONFIRM_PASSWORD -> constants.FormField.SIGNUP_PASSWORD.field
+      constants.FormField.SIGNUP_PASSWORD.name -> constants.FormField.SIGNUP_PASSWORD.field,
+      constants.FormField.SIGNUP_CONFIRM_PASSWORD.name -> constants.FormField.SIGNUP_CONFIRM_PASSWORD.field
     )(Data.apply)(Data.unapply).verifying(constants.FormConstraint.signUpCheckConstraint))
 
   case class Data(username: String, usernameAvailable: Boolean, password: String, confirmPassword: String)

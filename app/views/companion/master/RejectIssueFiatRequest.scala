@@ -7,8 +7,8 @@ object RejectIssueFiatRequest {
 
   val form = Form(
     mapping(
-      constants.Form.REQUEST_ID -> constants.FormField.REQUEST_ID.field,
-      constants.Form.COMMENT -> constants.FormField.COMMENT.field,
+      constants.FormField.REQUEST_ID.name -> constants.FormField.REQUEST_ID.field,
+      constants.FormField.COMMENT.name -> constants.FormField.COMMENT.field,
     )(Data.apply)(Data.unapply)
   )
 

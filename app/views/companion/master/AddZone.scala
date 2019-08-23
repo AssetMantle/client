@@ -6,8 +6,8 @@ import play.api.data.Forms._
 object AddZone {
   val form = Form(
     mapping(
-      constants.Form.NAME -> constants.FormField.NAME.field,
-      constants.Form.CURRENCY -> constants.FormField.CURRENCY.field
+      constants.FormField.NAME.name -> constants.FormField.NAME.field,
+      constants.FormField.CURRENCY.name -> constants.FormField.CURRENCY.field
 
     )(Data.apply)(Data.unapply)
   )

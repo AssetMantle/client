@@ -6,10 +6,10 @@ import play.api.data.Forms._
 object RedeemAsset {
   val form = Form(
     mapping(
-      constants.Form.ZONE_ID -> constants.FormField.ZONE_ID.field,
-      constants.Form.PEG_HASH -> constants.FormField.PEG_HASH.field,
-      constants.Form.PASSWORD -> constants.FormField.PASSWORD.field,
-      constants.Form.GAS -> constants.FormField.GAS.field
+      constants.FormField.ZONE_ID.name -> constants.FormField.ZONE_ID.field,
+      constants.FormField.PEG_HASH.name -> constants.FormField.PEG_HASH.field,
+      constants.FormField.PASSWORD.name -> constants.FormField.PASSWORD.field,
+      constants.FormField.GAS.name -> constants.FormField.GAS.field
     )(Data.apply)(Data.unapply)
   )
 

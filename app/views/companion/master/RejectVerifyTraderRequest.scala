@@ -7,7 +7,7 @@ object RejectVerifyTraderRequest {
 
   val form = Form(
     mapping(
-      constants.Form.TRADER_ID -> constants.FormField.TRADER_ID.field
+      constants.FormField.TRADER_ID.name -> constants.FormField.TRADER_ID.field
     )(Data.apply)(Data.unapply)
   )
 

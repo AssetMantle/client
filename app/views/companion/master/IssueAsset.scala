@@ -6,15 +6,15 @@ import play.api.data.Forms._
 object IssueAsset {
   val form = Form(
     mapping(
-      constants.Form.REQUEST_ID -> constants.FormField.REQUEST_ID.field,
-      constants.Form.ACCOUNT_ID -> constants.FormField.ACCOUNT_ID.field,
-      constants.Form.DOCUMENT_HASH -> constants.FormField.HASH.field,
-      constants.Form.ASSET_TYPE -> constants.FormField.ASSET_TYPE.field,
-      constants.Form.ASSET_PRICE -> constants.FormField.ASSET_PRICE.field,
-      constants.Form.QUANTITY_UNIT -> constants.FormField.QUANTITY_UNIT.field,
-      constants.Form.ASSET_QUANTITY -> constants.FormField.ASSET_QUANTITY.field,
-      constants.Form.PASSWORD -> constants.FormField.PASSWORD.field,
-      constants.Form.GAS -> constants.FormField.GAS.field
+      constants.FormField.REQUEST_ID.name -> constants.FormField.REQUEST_ID.field,
+      constants.FormField.ACCOUNT_ID.name -> constants.FormField.ACCOUNT_ID.field,
+      constants.FormField.DOCUMENT_HASH.name -> constants.FormField.DOCUMENT_HASH.field,
+      constants.FormField.ASSET_TYPE.name -> constants.FormField.ASSET_TYPE.field,
+      constants.FormField.ASSET_PRICE.name -> constants.FormField.ASSET_PRICE.field,
+      constants.FormField.QUANTITY_UNIT.name -> constants.FormField.QUANTITY_UNIT.field,
+      constants.FormField.ASSET_QUANTITY.name -> constants.FormField.ASSET_QUANTITY.field,
+      constants.FormField.PASSWORD.name -> constants.FormField.PASSWORD.field,
+      constants.FormField.GAS.name -> constants.FormField.GAS.field
     )(Data.apply)(Data.unapply)
   )
 
