@@ -37,7 +37,7 @@ class SetSellerFeedback @Inject()(wsClient: WSClient)(implicit configuration: Co
 
   case class BaseRequest(from: String, chain_id: String = chainID)
 
-  case class Request(base_req: BaseRequest, password: String, to: String, pegHash: String, rating: Int, mode: String) extends RequestEntity
+  case class Request(base_req: BaseRequest, password: String, to: String, pegHash: String, rating: String, mode: String) extends RequestEntity
 
   object Service {
     def post(request: Request): WSResponse = try {

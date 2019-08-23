@@ -10,11 +10,11 @@
             <span class="red">@Messages(constants.Form.BID)</span> : @negotiation.bid <br>
             <span class="red">@Messages(constants.Form.TIME)</span> : @negotiation.time <br>
             <div>
-                @if(negotiation.sellerSignature.getOrElse(null) == null || negotiation.buyerSignature.getOrElse(null) == null) {
+                @if(negotiation.sellerSignature.orNull == null) {
                     <button onclick="getForm(jsRoutes.controllers.ChangeSellerBidController.changeSellerBidForm('@negotiation.buyerAddress', '@negotiation.assetPegHash'))">@Messages(constants.Form.NEGOTIATE)</button>
                     <button onclick="getForm(jsRoutes.controllers.ConfirmSellerBidController.confirmSellerBidForm('@negotiation.buyerAddress', '@negotiation.assetPegHash', @negotiation.bid))">@Messages(constants.Form.ACCEPT_OFFER)</button>
                 }
-                @if(negotiation.sellerSignature.getOrElse(null) != null && negotiation.buyerSignature.getOrElse(null) != null && (assetPegHashList contains negotiation.assetPegHash)) {
+                @if(negotiation.sellerSignature.orNull != null && negotiation.buyerSignature.orNull != null && (assetPegHashList contains negotiation.assetPegHash)) {
 
                     <button onclick="getForm(jsRoutes.controllers.SendAssetController.sendAssetForm('@negotiation.buyerAddress', '@negotiation.assetPegHash'))">@Messages(constants.Form.SEND_ASSET)</button>
 

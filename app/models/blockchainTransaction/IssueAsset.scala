@@ -19,8 +19,8 @@ import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class IssueAsset(from: String, to: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, moderated: Boolean,  status: Option[Boolean], txHash: Option[String], ticketID: String, mode: String, code: Option[String]) extends TransactionEntity[IssueAsset] {
-  def mutateTicketID(newTicketID: String): IssueAsset = IssueAsset(from = from, to = to, documentHash = documentHash, assetType = assetType, assetPrice = assetPrice, quantityUnit = quantityUnit, assetQuantity = assetQuantity, moderated = moderated, status = status, txHash, ticketID = newTicketID, mode = mode, code = code)
+case class IssueAsset(from: String, to: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, moderated: Boolean, takerAddress: Option[String], status: Option[Boolean], txHash: Option[String], ticketID: String, mode: String, code: Option[String]) extends TransactionEntity[IssueAsset] {
+  def mutateTicketID(newTicketID: String): IssueAsset = IssueAsset(from = from, to = to, documentHash = documentHash, assetType = assetType, assetPrice = assetPrice, quantityUnit = quantityUnit, assetQuantity = assetQuantity, moderated = moderated, takerAddress = takerAddress, status = status, txHash, ticketID = newTicketID, mode = mode, code = code)
 }
 
 
@@ -112,7 +112,7 @@ class IssueAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tra
 
   private[models] class IssueAssetTable(tag: Tag) extends Table[IssueAsset](tag, "IssueAsset") {
 
-    def * = (from, to, documentHash, assetType, assetPrice, quantityUnit, assetQuantity, moderated, status.?, txHash.?, ticketID, mode, code.?) <> (IssueAsset.tupled, IssueAsset.unapply)
+    def * = (from, to, documentHash, assetType, assetPrice, quantityUnit, assetQuantity, moderated, takerAddress.?, status.?, txHash.?, ticketID, mode, code.?) <> (IssueAsset.tupled, IssueAsset.unapply)
 
     def from = column[String]("from")
 
@@ -130,6 +130,8 @@ class IssueAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tra
 
     def moderated = column[Boolean]("moderated")
 
+    def takerAddress = column[String]("takerAddress")
+
     def status = column[Boolean]("status")
 
     def txHash = column[String]("txHash")
@@ -143,7 +145,7 @@ class IssueAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tra
 
   object Service {
 
-    def create(issueAsset: IssueAsset): String = Await.result(add(IssueAsset(from = issueAsset.from, to = issueAsset.to, documentHash = issueAsset.documentHash, assetType = issueAsset.assetType, assetPrice = issueAsset.assetPrice, quantityUnit = issueAsset.quantityUnit, assetQuantity = issueAsset.assetQuantity, status = issueAsset.status, txHash = issueAsset.txHash, ticketID = issueAsset.ticketID, mode = issueAsset.mode, code = issueAsset.code, moderated = issueAsset.moderated)), Duration.Inf)
+    def create(issueAsset: IssueAsset): String = Await.result(add(IssueAsset(from = issueAsset.from, to = issueAsset.to, documentHash = issueAsset.documentHash, assetType = issueAsset.assetType, assetPrice = issueAsset.assetPrice, quantityUnit = issueAsset.quantityUnit, assetQuantity = issueAsset.assetQuantity, status = issueAsset.status, txHash = issueAsset.txHash, ticketID = issueAsset.ticketID, mode = issueAsset.mode, code = issueAsset.code, moderated = issueAsset.moderated, takerAddress = issueAsset.takerAddress)), Duration.Inf)
 
     def markTransactionSuccessful(ticketID: String, txHash: String): Int = Await.result(updateTxHashAndStatusOnTicketID(ticketID, Option(txHash), status = Option(true)), Duration.Inf)
 
@@ -166,7 +168,7 @@ class IssueAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tra
         val issueAsset = Service.getTransaction(ticketID)
         Thread.sleep(sleepTime)
         val responseAccount = getAccount.Service.get(issueAsset.to)
-        responseAccount.value.assetPegWallet.foreach(assets => assets.foreach(asset => blockchainAssets.Service.insertOrUpdate(pegHash = asset.pegHash, documentHash = asset.documentHash, assetType = asset.assetType, assetPrice = asset.assetPrice, assetQuantity = asset.assetQuantity, quantityUnit = asset.quantityUnit, locked = asset.locked, moderated = asset.moderated, ownerAddress = issueAsset.to, dirtyBit = true)))
+        responseAccount.value.assetPegWallet.foreach(assets => assets.foreach(asset => blockchainAssets.Service.insertOrUpdate(pegHash = asset.pegHash, documentHash = asset.documentHash, assetType = asset.assetType, assetPrice = asset.assetPrice, assetQuantity = asset.assetQuantity, quantityUnit = asset.quantityUnit, locked = asset.locked, moderated = asset.moderated, takerAddress = if (asset.takerAddress == "") null else Option(asset.takerAddress), ownerAddress = issueAsset.to, dirtyBit = true)))
         blockchainAccounts.Service.markDirty(issueAsset.from)
         pushNotification.sendNotification(masterAccounts.Service.getId(issueAsset.to), constants.Notification.SUCCESS, blockResponse.txhash)
         pushNotification.sendNotification(masterAccounts.Service.getId(issueAsset.from), constants.Notification.SUCCESS, blockResponse.txhash)

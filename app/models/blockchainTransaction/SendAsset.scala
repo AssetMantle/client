@@ -165,7 +165,7 @@ class SendAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
         blockchainOrders.Service.insertOrUpdate(id = negotiationID, null, null, dirtyBit = true)
         Thread.sleep(sleepTime)
         val orderResponse = getOrder.Service.get(negotiationID)
-        orderResponse.value.assetPegWallet.foreach(assets => assets.foreach(asset => blockchainAssets.Service.insertOrUpdate(pegHash = asset.pegHash, documentHash = asset.documentHash, assetType = asset.assetType, assetPrice = asset.assetPrice, assetQuantity = asset.assetQuantity, quantityUnit = asset.quantityUnit, locked = asset.locked, moderated = asset.moderated, ownerAddress = negotiationID, dirtyBit = false)))
+        orderResponse.value.assetPegWallet.foreach(assets => assets.foreach(asset => blockchainAssets.Service.insertOrUpdate(pegHash = asset.pegHash, documentHash = asset.documentHash, assetType = asset.assetType, assetPrice = asset.assetPrice, assetQuantity = asset.assetQuantity, quantityUnit = asset.quantityUnit, locked = asset.locked, moderated = asset.moderated, ownerAddress = negotiationID, takerAddress = if (asset.takerAddress == "") null else Option(asset.takerAddress), dirtyBit = false)))
         blockchainAccounts.Service.markDirty(sendAsset.from)
         blockchainTransactionFeedbacks.Service.markDirty(sendAsset.from)
         pushNotification.sendNotification(masterAccounts.Service.getId(sendAsset.to), constants.Notification.SUCCESS, blockResponse.txhash)

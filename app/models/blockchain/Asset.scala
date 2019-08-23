@@ -20,7 +20,7 @@ import scala.concurrent.duration.{Duration, _}
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Asset(pegHash: String, documentHash: String, assetType: String, assetQuantity: String, assetPrice: String, quantityUnit: String, ownerAddress: String, locked: Boolean, moderated: Boolean, dirtyBit: Boolean)
+case class Asset(pegHash: String, documentHash: String, assetType: String, assetQuantity: String, assetPrice: String, quantityUnit: String, ownerAddress: String, locked: Boolean, moderated: Boolean, takerAddress: Option[String], dirtyBit: Boolean)
 
 case class AssetCometMessage(username: String, message: JsValue)
 
@@ -116,7 +116,7 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
 
   private[models] class AssetTable(tag: Tag) extends Table[Asset](tag, _tableName = "Asset_BC") {
 
-    def * = (pegHash, documentHash, assetType, assetQuantity, assetPrice, quantityUnit, ownerAddress, locked, moderated, dirtyBit) <> (Asset.tupled, Asset.unapply)
+    def * = (pegHash, documentHash, assetType, assetQuantity, assetPrice, quantityUnit, ownerAddress, locked, moderated, takerAddress.?, dirtyBit) <> (Asset.tupled, Asset.unapply)
 
     def pegHash = column[String]("pegHash", O.PrimaryKey)
 
@@ -136,13 +136,15 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
 
     def moderated = column[Boolean]("moderated")
 
+    def takerAddress = column[String]("takerAddress")
+
     def dirtyBit = column[Boolean]("dirtyBit")
 
   }
 
   object Service {
 
-    def create(pegHash: String, documentHash: String, assetType: String, assetQuantity: String, assetPrice: String, quantityUnit: String, ownerAddress: String, moderated: Boolean, locked: Boolean, dirtyBit: Boolean): String = Await.result(add(Asset(pegHash = pegHash, documentHash = documentHash, assetType = assetType, assetPrice = assetPrice, assetQuantity = assetQuantity, quantityUnit = quantityUnit, ownerAddress = ownerAddress, moderated = moderated, locked = locked, dirtyBit = dirtyBit)), Duration.Inf)
+    def create(pegHash: String, documentHash: String, assetType: String, assetQuantity: String, assetPrice: String, quantityUnit: String, ownerAddress: String, moderated: Boolean, takerAddress: Option[String], locked: Boolean, dirtyBit: Boolean): String = Await.result(add(Asset(pegHash = pegHash, documentHash = documentHash, assetType = assetType, assetPrice = assetPrice, assetQuantity = assetQuantity, quantityUnit = quantityUnit, ownerAddress = ownerAddress, moderated = moderated, takerAddress = takerAddress, locked = locked, dirtyBit = dirtyBit)), Duration.Inf)
 
     def get(pegHash: String): Asset = Await.result(findByPegHash(pegHash), Duration.Inf)
 
@@ -152,7 +154,7 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
 
     def getAssetPegWallet(address: String): Seq[Asset] = Await.result(getAssetPegWalletByAddress(address), Duration.Inf)
 
-    def insertOrUpdate(pegHash: String, documentHash: String, assetType: String, assetQuantity: String, assetPrice: String, quantityUnit: String, ownerAddress: String, moderated: Boolean, locked: Boolean, dirtyBit: Boolean): Int = Await.result(upsert(Asset(pegHash = pegHash, documentHash = documentHash, assetType = assetType, assetQuantity = assetQuantity, assetPrice = assetPrice, quantityUnit = quantityUnit, ownerAddress = ownerAddress, moderated = moderated, locked = locked, dirtyBit = dirtyBit)), Duration.Inf)
+    def insertOrUpdate(pegHash: String, documentHash: String, assetType: String, assetQuantity: String, assetPrice: String, quantityUnit: String, ownerAddress: String, moderated: Boolean, takerAddress: Option[String], locked: Boolean, dirtyBit: Boolean): Int = Await.result(upsert(Asset(pegHash = pegHash, documentHash = documentHash, assetType = assetType, assetQuantity = assetQuantity, assetPrice = assetPrice, quantityUnit = quantityUnit, ownerAddress = ownerAddress, moderated = moderated, takerAddress = takerAddress, locked = locked, dirtyBit = dirtyBit)), Duration.Inf)
 
     def deleteAsset(pegHash: String): Int = Await.result(deleteByPegHash(pegHash), Duration.Inf)
 
@@ -178,7 +180,7 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
       for (dirtyAsset <- dirtyAssets) {
         try {
           val assetPegWallet = getAccount.Service.get(dirtyAsset.ownerAddress).value.assetPegWallet.getOrElse(throw new BaseException(constants.Response.NO_RESPONSE))
-          assetPegWallet.foreach(assetPeg => if (assetPegWallet.map(_.pegHash) contains dirtyAsset.pegHash) Service.insertOrUpdate(pegHash = assetPeg.pegHash, documentHash = assetPeg.documentHash, assetType = assetPeg.assetType, assetPrice = assetPeg.assetPrice, assetQuantity = assetPeg.assetQuantity, quantityUnit = assetPeg.quantityUnit, ownerAddress = dirtyAsset.ownerAddress, locked = assetPeg.locked, moderated = assetPeg.moderated, dirtyBit = false) else Service.deleteAsset(dirtyAsset.pegHash))
+          assetPegWallet.foreach(assetPeg => if (assetPegWallet.map(_.pegHash) contains dirtyAsset.pegHash) Service.insertOrUpdate(pegHash = assetPeg.pegHash, documentHash = assetPeg.documentHash, assetType = assetPeg.assetType, assetPrice = assetPeg.assetPrice, assetQuantity = assetPeg.assetQuantity, quantityUnit = assetPeg.quantityUnit, ownerAddress = dirtyAsset.ownerAddress, locked = assetPeg.locked, moderated = assetPeg.moderated, takerAddress = if (assetPeg.takerAddress == "") null else Option(assetPeg.takerAddress), dirtyBit = false) else Service.deleteAsset(dirtyAsset.pegHash))
           mainAssetActor ! AssetCometMessage(username = masterAccounts.Service.getId(dirtyAsset.ownerAddress), message = Json.toJson(constants.Comet.PING))
         }
         catch {

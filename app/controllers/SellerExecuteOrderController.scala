@@ -71,9 +71,9 @@ class SellerExecuteOrderController @Inject()(messagesControllerComponents: Messa
         moderatedSellerExecuteOrderData => {
           try {
             transaction.process[blockchainTransaction.SellerExecuteOrder, transactionsSellerExecuteOrder.Request](
-              entity = blockchainTransaction.SellerExecuteOrder(from = loginState.address, buyerAddress = loginState.address, sellerAddress = moderatedSellerExecuteOrderData.sellerAddress, awbProofHash = moderatedSellerExecuteOrderData.awbProofHash, pegHash = moderatedSellerExecuteOrderData.pegHash, status = null, txHash = null, ticketID = "", mode = transactionMode, code = null),
+              entity = blockchainTransaction.SellerExecuteOrder(from = loginState.address, buyerAddress = moderatedSellerExecuteOrderData.buyerAddress, sellerAddress = moderatedSellerExecuteOrderData.sellerAddress, awbProofHash = moderatedSellerExecuteOrderData.awbProofHash, pegHash = moderatedSellerExecuteOrderData.pegHash, status = null, txHash = null, ticketID = "", mode = transactionMode, code = null),
               blockchainTransactionCreate = blockchainTransactionSellerExecuteOrders.Service.create,
-              request = transactionsSellerExecuteOrder.Request(transactionsSellerExecuteOrder.BaseRequest(from = loginState.address), password = moderatedSellerExecuteOrderData.password, buyerAddress = loginState.address, sellerAddress = moderatedSellerExecuteOrderData.sellerAddress, awbProofHash = moderatedSellerExecuteOrderData.awbProofHash, pegHash = moderatedSellerExecuteOrderData.pegHash, mode = transactionMode),
+              request = transactionsSellerExecuteOrder.Request(transactionsSellerExecuteOrder.BaseRequest(from = loginState.address), password = moderatedSellerExecuteOrderData.password, buyerAddress = moderatedSellerExecuteOrderData.buyerAddress, sellerAddress = moderatedSellerExecuteOrderData.sellerAddress, awbProofHash = moderatedSellerExecuteOrderData.awbProofHash, pegHash = moderatedSellerExecuteOrderData.pegHash, mode = transactionMode),
               action = transactionsSellerExecuteOrder.Service.post,
               onSuccess = blockchainTransactionSellerExecuteOrders.Utility.onSuccess,
               onFailure = blockchainTransactionSellerExecuteOrders.Utility.onFailure,

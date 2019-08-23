@@ -1,7 +1,7 @@
 @import helper._
 @import views.companion.master.IssueAsset
 
-@(issueAssetForm: Form[IssueAsset.Data], requestID: String, accountID: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@(issueAssetForm: Form[IssueAsset.Data], requestID: String, accountID: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, takerAddress: Option[String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @form(action = routes.IssueAssetController.issueAsset, 'onkeypress -> "validateForm(event,this)") {
     @CSRF.formField
     @inputText(issueAssetForm(constants.Form.REQUEST_ID).copy(value = Some(requestID)), '_label -> Messages(constants.Form.REQUEST_ID))
@@ -11,6 +11,7 @@
     @inputText(issueAssetForm(constants.Form.ASSET_PRICE).copy(value = Some(assetPrice.toString)), '_label -> Messages(constants.Form.ASSET_PRICE))
     @inputText(issueAssetForm(constants.Form.QUANTITY_UNIT).copy(value = Some(quantityUnit)), '_label -> Messages(constants.Form.QUANTITY_UNIT))
     @inputText(issueAssetForm(constants.Form.ASSET_QUANTITY).copy(value = Some(assetQuantity.toString)), '_label -> Messages(constants.Form.ASSET_QUANTITY))
+    @inputText(issueAssetForm(constants.Form.TAKER_ADDRESS).copy(value = takerAddress), '_label -> Messages(constants.Form.TAKER_ADDRESS))
     @inputPassword(issueAssetForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD))
 
     @if(issueAssetForm.hasGlobalErrors) {

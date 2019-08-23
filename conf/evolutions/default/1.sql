@@ -89,6 +89,7 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN."Asset_BC"
   "ownerAddress"  VARCHAR NOT NULL,
   "locked"        BOOLEAN NOT NULL,
   "moderated"     BOOLEAN NOT NULL,
+  "takerAddress"  VARCHAR,
   "dirtyBit"      BOOLEAN,
   PRIMARY KEY ("pegHash")
 );
@@ -273,6 +274,7 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."IssueAsset"
   "quantityUnit"  VARCHAR NOT NULL,
   "assetQuantity" INT     NOT NULL,
   "moderated"     BOOLEAN NOT NULL,
+  "takerAddress"  VARCHAR,
   "status"        BOOLEAN,
   "txHash"        VARCHAR,
   "ticketID"      VARCHAR NOT NULL,
@@ -582,6 +584,7 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."IssueAssetRequest"
   "assetPrice"    INT     NOT NULL,
   "quantityUnit"  VARCHAR NOT NULL,
   "assetQuantity" INT     NOT NULL,
+  "takerAddress"  VARCHAR,
   "status"        BOOLEAN,
   "comment"       VARCHAR,
   PRIMARY KEY ("id")
@@ -624,6 +627,8 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."EmailOTP"
   PRIMARY KEY ("id")
 );
 
+ALTER TABLE BLOCKCHAIN."Asset_BC"
+  ADD CONSTRAINT Asset_BC_Taker_Address FOREIGN KEY ("takerAddress") REFERENCES BLOCKCHAIN."Account_BC" ("address");
 ALTER TABLE BLOCKCHAIN."ACLAccount_BC"
   ADD CONSTRAINT ACLAccount_Account_address FOREIGN KEY ("address") REFERENCES BLOCKCHAIN."Account_BC" ("address");
 ALTER TABLE BLOCKCHAIN."ACLAccount_BC"
@@ -683,6 +688,8 @@ ALTER TABLE MASTER_TRANSACTION."FaucetRequest"
   ADD CONSTRAINT FaucetRequest_MasterAccount_AccountID FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER_TRANSACTION."IssueAssetRequest"
   ADD CONSTRAINT IssueAssetRequest_MasterAccount_AccountID FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");
+ALTER TABLE MASTER_TRANSACTION."IssueAssetRequest"
+  ADD CONSTRAINT IssueAssetRequest_Taker_Address FOREIGN KEY ("takerAddress") REFERENCES BLOCKCHAIN."Account_BC" ("address");
 ALTER TABLE MASTER_TRANSACTION."IssueFiatRequest"
   ADD CONSTRAINT IssueFiatRequest_MasterAccount_AccountID FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER_TRANSACTION."Notification"

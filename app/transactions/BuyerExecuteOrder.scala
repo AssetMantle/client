@@ -29,19 +29,20 @@ class BuyerExecuteOrder @Inject()(wsClient: WSClient)(implicit configuration: Co
 
   private val chainID = configuration.get[String]("blockchain.main.chainID")
 
+  case class BaseRequest(from: String, chain_id: String = chainID)
+
+  case class Request(base_req: BaseRequest, password: String, buyerAddress: String, sellerAddress: String, fiatProofHash: String, pegHash: String, mode: String) extends RequestEntity
+
   private implicit val baseRequestWrites: OWrites[BaseRequest] = Json.writes[BaseRequest]
 
   private implicit val requestWrites: OWrites[Request] = Json.writes[Request]
 
   private def action(request: Request): Future[WSResponse] = wsClient.url(url).post(Json.toJson(request))
 
-  case class BaseRequest(from: String, chain_id: String = chainID)
-
-  case class Request(base_req: BaseRequest, password: String, buyerAddress: String, sellerAddress: String, fiatProofHash: String, pegHash: String, mode: String) extends RequestEntity
-
   object Service {
 
     def post(request: Request): WSResponse = try {
+      logger.info(Json.toJson(request).toString())
       Await.result(action(request), Duration.Inf)
     } catch {
       case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)

@@ -32,7 +32,7 @@ class SetBuyerFeedbackController @Inject()(messagesControllerComponents: Message
             transaction.process[blockchainTransaction.SetBuyerFeedback, transactionsSetBuyerFeedback.Request](
               entity = blockchainTransaction.SetBuyerFeedback(from = loginState.address, to = setBuyerFeedbackData.sellerAddress, pegHash = setBuyerFeedbackData.pegHash, rating = setBuyerFeedbackData.rating, status = null, txHash = null, ticketID = "", code = null, mode = transactionMode),
               blockchainTransactionCreate = blockchainTransactionSetBuyerFeedbacks.Service.create,
-              request = transactionsSetBuyerFeedback.Request(transactionsSetBuyerFeedback.BaseRequest(from = loginState.address), to = setBuyerFeedbackData.sellerAddress, password = setBuyerFeedbackData.password, pegHash = setBuyerFeedbackData.pegHash, rating = setBuyerFeedbackData.rating, mode = transactionMode),
+              request = transactionsSetBuyerFeedback.Request(transactionsSetBuyerFeedback.BaseRequest(from = loginState.address), to = setBuyerFeedbackData.sellerAddress, password = setBuyerFeedbackData.password, pegHash = setBuyerFeedbackData.pegHash, rating = setBuyerFeedbackData.rating.toString, mode = transactionMode),
               action = transactionsSetBuyerFeedback.Service.post,
               onSuccess = blockchainTransactionSetBuyerFeedbacks.Utility.onSuccess,
               onFailure = blockchainTransactionSetBuyerFeedbacks.Utility.onFailure,
@@ -68,7 +68,7 @@ class SetBuyerFeedbackController @Inject()(messagesControllerComponents: Message
       },
       setBuyerFeedbackData => {
         try {
-          transactionsSetBuyerFeedback.Service.post(transactionsSetBuyerFeedback.Request(transactionsSetBuyerFeedback.BaseRequest(from = setBuyerFeedbackData.from), to = setBuyerFeedbackData.to, password = setBuyerFeedbackData.password, pegHash = setBuyerFeedbackData.pegHash, rating = setBuyerFeedbackData.rating, mode = setBuyerFeedbackData.mode))
+          transactionsSetBuyerFeedback.Service.post(transactionsSetBuyerFeedback.Request(transactionsSetBuyerFeedback.BaseRequest(from = setBuyerFeedbackData.from), to = setBuyerFeedbackData.to, password = setBuyerFeedbackData.password, pegHash = setBuyerFeedbackData.pegHash, rating = setBuyerFeedbackData.rating.toString, mode = setBuyerFeedbackData.mode))
           Ok(views.html.index(successes = Seq(constants.Response.BUYER_FEEDBACK_SET)))
         }
         catch {

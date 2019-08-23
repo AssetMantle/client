@@ -37,7 +37,7 @@ class ConfirmBuyerBid @Inject()(wsClient: WSClient)(implicit configuration: Conf
 
   case class BaseRequest(from: String, chain_id: String = chainID)
 
-  case class Request(base_req: BaseRequest, password: String, to: String, bid: Int, time: Int, pegHash: String, buyerContractHash: String, mode: String) extends RequestEntity
+  case class Request(base_req: BaseRequest, password: String, to: String, bid: String, time: String, pegHash: String, buyerContractHash: String, mode: String) extends RequestEntity
 
   object Service {
     def post(request: Request): WSResponse = try {

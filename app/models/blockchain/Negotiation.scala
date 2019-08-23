@@ -203,7 +203,7 @@ class Negotiations @Inject()(shutdownActors: ShutdownActors, masterAccounts: mas
       for (dirtyNegotiation <- dirtyNegotiations) {
         try {
           val negotiationResponse = getNegotiation.Service.get(dirtyNegotiation.id)
-          Service.refreshDirty(id = negotiationResponse.value.negotiationID, bid = negotiationResponse.value.bid, time = negotiationResponse.value.time, buyerSignature = negotiationResponse.value.buyerSignature, sellerSignature = negotiationResponse.value.sellerSignature, buyerBlockHeight = negotiationResponse.value.buyerBlockHeight, sellerBlockHeight = negotiationResponse.value.sellerBlockHeight, buyerContractHash = negotiationResponse.value.BuyerContractHash, sellerContractHash = negotiationResponse.value.SellerContractHash)
+          Service.refreshDirty(id = negotiationResponse.value.negotiationID, bid = negotiationResponse.value.bid, time = negotiationResponse.value.time, buyerSignature = negotiationResponse.value.buyerSignature, sellerSignature = negotiationResponse.value.sellerSignature, buyerBlockHeight = negotiationResponse.value.buyerBlockHeight, sellerBlockHeight = negotiationResponse.value.sellerBlockHeight, buyerContractHash = negotiationResponse.value.buyerContractHash, sellerContractHash = negotiationResponse.value.sellerContractHash)
           mainNegotiationActor ! NegotiationCometMessage(username = masterAccounts.Service.getId(dirtyNegotiation.sellerAddress), message = Json.toJson(constants.Comet.PING))
           mainNegotiationActor ! NegotiationCometMessage(username = masterAccounts.Service.getId(dirtyNegotiation.buyerAddress), message = Json.toJson(constants.Comet.PING))
         }

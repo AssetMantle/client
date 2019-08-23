@@ -35,7 +35,7 @@ class RedeemFiatController @Inject()(messagesControllerComponents: MessagesContr
             transaction.process[blockchainTransaction.RedeemFiat, transactionsRedeemFiat.Request](
               entity = blockchainTransaction.RedeemFiat(from = loginState.address, to = toAddress, redeemAmount = redeemFiatData.redeemAmount, null, null, ticketID = "", mode = transactionMode, null),
               blockchainTransactionCreate = blockchainTransactionRedeemFiats.Service.create,
-              request = transactionsRedeemFiat.Request(transactionsRedeemFiat.BaseRequest(from = loginState.address), to = toAddress, password = redeemFiatData.password, redeemAmount = redeemFiatData.redeemAmount, mode = transactionMode),
+              request = transactionsRedeemFiat.Request(transactionsRedeemFiat.BaseRequest(from = loginState.address), to = toAddress, password = redeemFiatData.password, redeemAmount = redeemFiatData.redeemAmount.toString, mode = transactionMode),
               action = transactionsRedeemFiat.Service.post,
               onSuccess = blockchainTransactionRedeemFiats.Utility.onSuccess,
               onFailure = blockchainTransactionRedeemFiats.Utility.onFailure,
@@ -62,7 +62,7 @@ class RedeemFiatController @Inject()(messagesControllerComponents: MessagesContr
       },
       redeemFiatData => {
         try {
-          transactionsRedeemFiat.Service.post(transactionsRedeemFiat.Request(transactionsRedeemFiat.BaseRequest(from = redeemFiatData.from), to = redeemFiatData.to, password = redeemFiatData.password, redeemAmount = redeemFiatData.redeemAmount, mode = redeemFiatData.mode))
+          transactionsRedeemFiat.Service.post(transactionsRedeemFiat.Request(transactionsRedeemFiat.BaseRequest(from = redeemFiatData.from), to = redeemFiatData.to, password = redeemFiatData.password, redeemAmount = redeemFiatData.redeemAmount.toString, mode = redeemFiatData.mode))
           Ok(views.html.index(successes = Seq(constants.Response.FIAT_REDEEMED)))
         }
         catch {

@@ -29,19 +29,19 @@ class IssueAsset @Inject()(wsClient: WSClient)(implicit configuration: Configura
 
   private val chainID = configuration.get[String]("blockchain.main.chainID")
 
-  private implicit val baseRequestWrites: OWrites[BaseRequest] = Json.writes[BaseRequest]
+  case class BaseRequest(from: String, chain_id: String = chainID)
 
-  private def action(request: Request): Future[WSResponse] = wsClient.url(url).post(Json.toJson(request))
+  case class Request(base_req: BaseRequest, to: String, documentHash: String, assetType: String, assetPrice: String, quantityUnit: String, assetQuantity: String, takerAddress: String, mode: String, password: String, moderated: Boolean) extends RequestEntity
+
+  private implicit val baseRequestWrites: OWrites[BaseRequest] = Json.writes[BaseRequest]
 
   private implicit val requestWrites: OWrites[Request] = Json.writes[Request]
 
-  case class BaseRequest(from: String, chain_id: String = chainID)
-
-  case class Request(base_req: BaseRequest, to: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, mode: String, password: String, moderated: Boolean) extends RequestEntity
+  private def action(request: Request): Future[WSResponse] = wsClient.url(url).post(Json.toJson(request))
 
   object Service {
     def post(request: Request): WSResponse = try {
-      Await.result(action(request), Duration.Inf)
+    Await.result(action(request), Duration.Inf)
     } catch {
       case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
         throw new BlockChainException(constants.Response.CONNECT_EXCEPTION)

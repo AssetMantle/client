@@ -70,9 +70,9 @@ class BuyerExecuteOrderController @Inject()(messagesControllerComponents: Messag
         moderatedBuyerExecuteOrderData => {
           try {
             transaction.process[blockchainTransaction.BuyerExecuteOrder, transactionsBuyerExecuteOrder.Request](
-              entity = blockchainTransaction.BuyerExecuteOrder(from = loginState.address, buyerAddress = loginState.address, sellerAddress = moderatedBuyerExecuteOrderData.sellerAddress, fiatProofHash = moderatedBuyerExecuteOrderData.fiatProofHash, pegHash = moderatedBuyerExecuteOrderData.pegHash, status = null, txHash = null, ticketID = "", mode = transactionMode, code = null),
+              entity = blockchainTransaction.BuyerExecuteOrder(from = loginState.address, buyerAddress = moderatedBuyerExecuteOrderData.buyerAddress, sellerAddress = moderatedBuyerExecuteOrderData.sellerAddress, fiatProofHash = moderatedBuyerExecuteOrderData.fiatProofHash, pegHash = moderatedBuyerExecuteOrderData.pegHash, status = null, txHash = null, ticketID = "", mode = transactionMode, code = null),
               blockchainTransactionCreate = blockchainTransactionBuyerExecuteOrders.Service.create,
-              request = transactionsBuyerExecuteOrder.Request(transactionsBuyerExecuteOrder.BaseRequest(from = loginState.address), password = moderatedBuyerExecuteOrderData.password, buyerAddress = loginState.address, sellerAddress = moderatedBuyerExecuteOrderData.sellerAddress, fiatProofHash = moderatedBuyerExecuteOrderData.fiatProofHash, pegHash = moderatedBuyerExecuteOrderData.pegHash, mode = transactionMode),
+              request = transactionsBuyerExecuteOrder.Request(transactionsBuyerExecuteOrder.BaseRequest(from = loginState.address), password = moderatedBuyerExecuteOrderData.password, buyerAddress = moderatedBuyerExecuteOrderData.buyerAddress, sellerAddress = moderatedBuyerExecuteOrderData.sellerAddress, fiatProofHash = moderatedBuyerExecuteOrderData.fiatProofHash, pegHash = moderatedBuyerExecuteOrderData.pegHash, mode = transactionMode),
               action = transactionsBuyerExecuteOrder.Service.post,
               onSuccess = blockchainTransactionBuyerExecuteOrders.Utility.onSuccess,
               onFailure = blockchainTransactionBuyerExecuteOrders.Utility.onFailure,

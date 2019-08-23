@@ -9,11 +9,11 @@
             <span class="red">@Messages(constants.Form.BID)</span> : @negotiation.bid <br>
             <span class="red">@Messages(constants.Form.TIME)</span> : @negotiation.time <br>
             <div>
-                @if(negotiation.sellerSignature.getOrElse(null) == null || negotiation.buyerSignature.getOrElse(null) == null) {
+                @if(negotiation.buyerSignature.orNull == null) {
                     <button onclick="getForm(jsRoutes.controllers.ChangeBuyerBidController.changeBuyerBidForm('@negotiation.sellerAddress', '@negotiation.assetPegHash'))">@Messages(constants.Form.NEGOTIATE)</button>
                     <button onclick="getForm(jsRoutes.controllers.ConfirmBuyerBidController.confirmBuyerBidForm('@negotiation.sellerAddress', '@negotiation.assetPegHash', @negotiation.bid))">@Messages(constants.Form.ACCEPT_OFFER)</button>
                 }
-                @if(negotiation.sellerSignature.getOrElse(null) != null && negotiation.buyerSignature.getOrElse(null) != null) {
+                @if(negotiation.sellerSignature.orNull != null && negotiation.buyerSignature.orNull != null) {
                     <button onclick="getForm(jsRoutes.controllers.SendFiatController.sendFiatForm('@negotiation.sellerAddress', '@negotiation.assetPegHash', @negotiation.bid))">@Messages(constants.Form.SEND_FIAT)</button>
 
                 }
