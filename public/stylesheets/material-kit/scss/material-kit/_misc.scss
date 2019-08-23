@@ -1,10 +1,15 @@
+body{
+  background-color: #eee;
+  color: $black-color;
+  font-weight: 300;
+}
 
 legend {
   border-bottom: 0;
 }
 
 .serif-font{
-    font-family: $font-family-serif;
+  font-family: $font-family-serif;
 }
 
 // Prevent highlight on mobile
@@ -20,14 +25,14 @@ a{
   color: $link-color;
   &:hover,
   &:focus{
-      color: darken($link-color, 5%);
-      text-decoration: none;
+    color: darken($link-color, 5%);
+    text-decoration: none;
   }
 
   &.text-info{
-      &:hover, &:focus{
-          color: darken($brand-info, 5%);
-      }
+    &:hover, &:focus{
+      color: darken($brand-info, 5%);
+    }
   }
 
   & .material-icons {
@@ -36,36 +41,36 @@ a{
 }
 
 .main{
-    background: #FFFFFF;
-    position: relative;
-    z-index: 3;
+  background: #FFFFFF;
+  position: relative;
+  z-index: 3;
 }
 
 .form-check,
 label{
-    font-size: 14px;
-    line-height: 1.42857;
-    color: $checkboxes-text-color;
-    font-weight: 400;
+  font-size: 14px;
+  line-height: 1.42857;
+  color: $checkboxes-text-color;
+  font-weight: 400;
 }
 
 .main-raised{
-    margin: -60px 30px 0px;
-    border-radius: $border-radius-base * 2;
-    @include shadow-16dp();
+  margin: -60px 30px 0px;
+  border-radius: $border-radius-base * 2;
+  @include shadow-16dp();
 }
 
 /*           Animations              */
 .animation-transition-general{
-    @include transitions($general-transition-time, $transition-linear);
+  @include transitions($general-transition-time, $transition-linear);
 }
 
 .animation-transition-slow{
-    @include transitions($slow-transition-time, $transition-linear);
+  @include transitions($slow-transition-time, $transition-linear);
 }
 
 .animation-transition-fast{
-    @include transitions($fast-transition-time, $transition-ease);
+  @include transitions($fast-transition-time, $transition-ease);
 }
 
 
@@ -74,7 +79,7 @@ label{
 .bootstrap-tagsinput .tag,
 .bootstrap-tagsinput [data-role="remove"],
 .card-collapse .card-header a i{
-    @include transitions($fast-transition-time, $transition-ease);
+  @include transitions($fast-transition-time, $transition-ease);
 }
 
 .signup-page{
@@ -242,112 +247,112 @@ label{
 }
 
 .tim-row{
-    margin-bottom: 20px;
+  margin-bottom: 20px;
 }
 
 .tim-white-buttons {
-    background-color: #777777;
+  background-color: #777777;
 }
 .title{
-    margin-top: 30px;
-    margin-bottom: 25px;
-    min-height: 32px;
+  margin-top: 30px;
+  margin-bottom: 25px;
+  min-height: 32px;
 }
 
 #map {
-    position: relative;
-    z-index: 2;
-    width: 100%;
-    height: calc(100vh - 70px);
-    margin-top: 70px;
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  height: calc(100vh - 70px);
+  margin-top: 70px;
 }
 
 .tim-typo{
-    padding-left: 25%;
-    margin-bottom: 40px;
-    position: relative;
-    width: 100%;
+  padding-left: 25%;
+  margin-bottom: 40px;
+  position: relative;
+  width: 100%;
 }
 .tim-typo .tim-note{
-    bottom: 5px;
-    color: #c0c1c2;
-    display: block;
-    font-weight: 400;
-    font-size: 13px;
-    line-height: 15px;
-    left: 0;
-    margin-left: 20px;
-    position: absolute;
-    width: 260px;
+  bottom: 5px;
+  color: #c0c1c2;
+  display: block;
+  font-weight: 400;
+  font-size: 13px;
+  line-height: 15px;
+  left: 0;
+  margin-left: 20px;
+  position: absolute;
+  width: 260px;
 }
 .tim-row{
-    padding-top: 50px;
+  padding-top: 50px;
 }
 .tim-row h3{
-    margin-top: 0;
+  margin-top: 0;
 }
 #typography h1, #typography h2, #typography h3,
 #typography h4, #typography h5, #typography h6{
-    margin-bottom: 0;
+  margin-bottom: 0;
 }
 
 .switch{
-    margin-right: 20px;
+  margin-right: 20px;
 }
 #navbar-full .navbar{
-    border-radius: 0 !important;
-    margin-bottom: 15px;
-    z-index: 2;
+  border-radius: 0 !important;
+  margin-bottom: 15px;
+  z-index: 2;
 }
 .space{
-    height: 130px;
-    display: block;
+  height: 130px;
+  display: block;
 }
 .space-110{
-    height: 110px;
-    display: block;
+  height: 110px;
+  display: block;
 }
 .space-50{
-    height: 50px;
-    display: block;
+  height: 50px;
+  display: block;
 }
 .space-70{
-    height: 70px;
-    display: block;
+  height: 70px;
+  display: block;
 }
 .navigation-example .img-src{
-    background-attachment: scroll;
+  background-attachment: scroll;
 }
 
 .navigation-example{
-    background-position: center center;
-    background-size: cover;
-    margin-top:0;
-    min-height: 740px;
+  background-position: center center;
+  background-size: cover;
+  margin-top:0;
+  min-height: 740px;
 }
 #notifications{
-    background-color: $white-color;
-    display: block;
-    width: 100%;
-    position: relative;
+  background-color: $white-color;
+  display: block;
+  width: 100%;
+  position: relative;
 }
 #notifications .alert-danger{
-    margin-bottom: 0px;
+  margin-bottom: 0px;
 }
 .tim-note{
-    text-transform: capitalize;
+  text-transform: capitalize;
 }
 
 #buttons .btn{
-    margin: 0 0px 15px;
+  margin: 0 0px 15px;
 }
 .space-100{
-    height: 100px;
-    display: block;
-    width: 100%;
+  height: 100px;
+  display: block;
+  width: 100%;
 }
 
-  // PARALLAX
+// PARALLAX
 
 .parallax{
   width:100%;
@@ -355,58 +360,58 @@ label{
 
   display: block;
   background-attachment: fixed;
-    background-repeat:no-repeat;
-    background-size:cover;
-    background-position: center center;
+  background-repeat:no-repeat;
+  background-size:cover;
+  background-position: center center;
 
 }
 .parallax .parallax-image{
-    width: 100%;
-    overflow: hidden;
-    position: absolute;
+  width: 100%;
+  overflow: hidden;
+  position: absolute;
 }
 .parallax .parallax-image img{
-    width: 100%;
+  width: 100%;
 }
 
 @media (max-width: 768px){
-    .parallax .parallax-image{
-         width: 100%;
-         height: 640px;
-         overflow: hidden;
-     }
-    .parallax .parallax-image img{
-       height: 100%;
-       width: auto;
-   }
+  .parallax .parallax-image{
+    width: 100%;
+    height: 640px;
+    overflow: hidden;
+  }
+  .parallax .parallax-image img{
+    height: 100%;
+    width: auto;
+  }
 }
 
 .separator{
-    content: "Separator";
-    color: #FFFFFF;
-    display: block;
-    width: 100%;
-    padding: 20px;
+  content: "Separator";
+  color: #FFFFFF;
+  display: block;
+  width: 100%;
+  padding: 20px;
 }
 .separator-line{
-    background-color: #EEE;
-    height: 1px;
-    width: 100%;
-    display: block;
+  background-color: #EEE;
+  height: 1px;
+  width: 100%;
+  display: block;
 }
 .separator.separator-gray{
-    background-color: #EEEEEE;
+  background-color: #EEEEEE;
 }
 .social-buttons-demo .btn{
   margin: 10px 5px 7px 1px;
 }
 
 .img-container{
-    width: 100%;
-    overflow: hidden;
+  width: 100%;
+  overflow: hidden;
 }
 .img-container img{
-    width: 100%;
+  width: 100%;
 }
 
 .section-black {
@@ -420,35 +425,35 @@ label{
 }
 
 .sharing-area{
-    margin-top: 80px;
+  margin-top: 80px;
 }
 .sharing-area .btn{
-    margin: 15px 4px 0;
-    color: #FFFFFF;
+  margin: 15px 4px 0;
+  color: #FFFFFF;
 }
 .sharing-area .btn i{
-    font-size: 18px;
-    position: relative;
-    top: 2px;
-    margin-right: 5px;
+  font-size: 18px;
+  position: relative;
+  top: 2px;
+  margin-right: 5px;
 }
 #navbar{
-    margin-bottom: -20px;
+  margin-bottom: -20px;
 }
 .sharing-area .btn-twitter{
-    background-color: #55acee;
+  background-color: #55acee;
 }
 .sharing-area .btn-facebook{
-    background-color: #3b5998;
+  background-color: #3b5998;
 }
 .sharing-area .btn-google-plus{
-    background-color: #dd4b39;
+  background-color: #dd4b39;
 }
 .sharing-area .btn-github{
-    background-color: #333333;
+  background-color: #333333;
 }
 #navbar .navbar{
-    border-radius: 0;
+  border-radius: 0;
 }
 
 @media (max-width: 830px){
@@ -524,7 +529,7 @@ label{
 
 // docs
 
- .bd-docs {
+.bd-docs {
   .bd-toc-item {
     .bd-sidenav a span {
       float: right;

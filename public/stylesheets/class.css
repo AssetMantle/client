@@ -53,7 +53,7 @@ body {
         padding: 2%;
         position: fixed;
         top: 25%;
-        left: 40%;
+        left: 35%;
         max-height: 60%;
         overflow: auto;
     }
@@ -196,7 +196,6 @@ body {
 /*Navbar*/
 
 .navbar {
-    overflow: hidden;
     margin-bottom: 5px;
     font-size: 14px;
 }
@@ -605,7 +604,11 @@ dl .info::after {
     margin-bottom: -40px !important;
     padding-top: 20px !important;
 }
+.input-group-prepend span{
+    color:#aaa !important;
+}
 .issue_asset .input-group-text{
+
     margin-top: -50px !important;
     margin-bottom: 0px !important;
 }
