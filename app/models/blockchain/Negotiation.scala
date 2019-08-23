@@ -91,6 +91,10 @@ class Negotiations @Inject()(shutdownActors: ShutdownActors, masterAccounts: mas
 
   private def getNegotiationsByAddress(address: String): Future[Seq[Negotiation]] = db.run(negotiationTable.filter(negotiation => negotiation.buyerAddress === address || negotiation.sellerAddress === address).result)
 
+  private def getNegotiationsByBuyerAddress(address: String): Future[Seq[Negotiation]] = db.run(negotiationTable.filter(negotiation => negotiation.buyerAddress === address ).result)
+
+  private def getNegotiationsBySellerAddress(address: String): Future[Seq[Negotiation]] = db.run(negotiationTable.filter(negotiation =>  negotiation.sellerAddress === address).result)
+
   private def deleteNegotiationsByPegHash(pegHash: String) = db.run(negotiationTable.filter(_.assetPegHash === pegHash).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -184,6 +188,10 @@ class Negotiations @Inject()(shutdownActors: ShutdownActors, masterAccounts: mas
     def getNegotiationID(buyerAddress: String, sellerAddress: String, pegHash: String): String = Await.result(getIdByBuyerAddressSellerAddressAndPegHash(buyerAddress = buyerAddress, sellerAddress = sellerAddress, pegHash = pegHash), Duration.Inf)
 
     def getNegotiationsForAddress(address: String): Seq[Negotiation] = Await.result(getNegotiationsByAddress(address), Duration.Inf)
+
+    def getNegotiationsForBuyerAddress(address: String): Seq[Negotiation] = Await.result(getNegotiationsByBuyerAddress(address), Duration.Inf)
+
+    def getNegotiationsForSellerAddress(address: String): Seq[Negotiation] = Await.result(getNegotiationsBySellerAddress(address), Duration.Inf)
 
     def deleteNegotiations(pegHash: String): Int = Await.result(deleteNegotiationsByPegHash(pegHash), Duration.Inf)
 
