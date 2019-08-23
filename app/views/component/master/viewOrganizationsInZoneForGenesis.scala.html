@@ -1,6 +1,7 @@
 @import models.master.Organization
+@import controllers.actions.LoginState
 
-@(organizations: Seq[Organization])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
+@(organizations: Seq[Organization])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 <div class="col-md-12">
     @for(organization <- organizations) {
         <div class="flexItem card secondBox leftText lightBlue">

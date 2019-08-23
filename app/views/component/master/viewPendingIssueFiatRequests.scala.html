@@ -1,6 +1,7 @@
 @import models.masterTransaction.IssueFiatRequest
+@import controllers.actions.LoginState
 
-@(issueFiatRequests: Seq[IssueFiatRequest])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
+@(issueFiatRequests: Seq[IssueFiatRequest])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
 @for(issueFiatRequest <- issueFiatRequests) {
     <div class="col-md-4">

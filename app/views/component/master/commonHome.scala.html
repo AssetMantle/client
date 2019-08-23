@@ -1,4 +1,6 @@
-@(username: String, userType: String, address: String, coins: String = "0", profilePicture: Array[Byte])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
+@import controllers.actions.LoginState
+
+@(coins: String = "0", profilePicture: Array[Byte])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
 
 <div class="container ">
@@ -19,13 +21,13 @@
             </div>
             <div class="col-md-8 px-3">
                 <div class="card-block px-3">
-                    <h2 class="card-title">@username</h2>
+                    <h2 class="card-title">@loginState.username</h2>
                     <p> @Messages(constants.User.COINS): @coins</p>
                     <button class="text-center btn btn-primary btn-sm" onclick="getForm(jsRoutes.controllers.SendCoinController.sendCoinForm())">@Messages(constants.Form.SEND_COIN)</button>
 
-                    <p> @Messages(constants.User.USER_TYPE): @userType </p>
+                    <p> @Messages(constants.User.USER_TYPE): @loginState.userType </p>
 
-                    <p> @Messages(constants.User.ADDRESS):<span id="text_element" class="hash_code"> @address</span> <span onclick="copyToClipboard('text_element')"> <i class="fa fa-clipboard"></i></span></p>
+                    <p> @Messages(constants.User.ADDRESS):<span id="text_element" class="hash_code"> @loginState.address</span> <span onclick="copyToClipboard('text_element')"> <i class="fa fa-clipboard"></i></span></p>
 
                 </div>
             </div>

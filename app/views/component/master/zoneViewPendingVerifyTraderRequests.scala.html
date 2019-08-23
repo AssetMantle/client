@@ -1,6 +1,7 @@
 @import models.master.Trader
 
-@(traderVerificationRequests: Seq[Trader])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
+@import controllers.actions.LoginState
+@(traderVerificationRequests: Seq[Trader])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 <script src="@routes.Assets.versioned("javascripts/kycVerification.js")" type="text/javascript"></script>
 <script src="@routes.Assets.versioned("javascripts/viewFiles.js")" type="text/javascript"></script>
 

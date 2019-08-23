@@ -1,7 +1,8 @@
 @import helper._
 @import views.companion.master.VerifyTrader
+@import controllers.actions.LoginState
 
-@(verifyTraderForm: Form[VerifyTrader.Data], aclAddress: String, organizationID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@(verifyTraderForm: Form[VerifyTrader.Data], aclAddress: String, organizationID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 
 
 @form(action = routes.SetACLController.zoneVerifyTrader, 'onkeypress -> "validateForm(event,this)") {

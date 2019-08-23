@@ -1,6 +1,7 @@
 @import models.masterTransaction.FaucetRequest
+@import controllers.actions.LoginState
 
-@(faucetRequests: Seq[FaucetRequest])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
+@(faucetRequests: Seq[FaucetRequest])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 @for(faucetRequest <- faucetRequests) {
     <div class="col-md-6">
         <br>

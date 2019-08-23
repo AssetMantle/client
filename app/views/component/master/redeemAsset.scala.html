@@ -1,7 +1,8 @@
 @import helper._
 @import views.companion.master.RedeemAsset
+@import controllers.actions.LoginState
 
-@(redeemAssetForm: Form[RedeemAsset.Data], zoneID: String, pegHash: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@(redeemAssetForm: Form[RedeemAsset.Data], zoneID: String, pegHash: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 
 @form(action = routes.RedeemAssetController.redeemAsset, 'onkeypress -> "validateForm(event,this)") {
     <div class="latest_card-header latest_card-header-primary text-center">

@@ -26,9 +26,9 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
       try {
         loginState.userType match {
           case constants.User.UNKNOWN =>
-            Ok(views.html.component.master.commonHome(loginState.username, loginState.userType, loginState.address, profilePicture = masterAccountFiles.Service.getProfilePicture(loginState.username)))
+            Ok(views.html.component.master.commonHome( profilePicture = masterAccountFiles.Service.getProfilePicture(loginState.username)))
           case _ =>
-            Ok(views.html.component.master.commonHome(loginState.username, loginState.userType, loginState.address, blockchainAccounts.Service.getCoins(loginState.address), profilePicture = masterAccountFiles.Service.getProfilePicture(loginState.username)))
+            Ok(views.html.component.master.commonHome( blockchainAccounts.Service.getCoins(loginState.address), masterAccountFiles.Service.getProfilePicture(loginState.username)))
         }
       } catch {
         case baseException: BaseException => NoContent
@@ -77,7 +77,7 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
   def assetList: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        Ok(views.html.component.master.assetList(assetPegWallet = blockchainAssets.Service.getAssetPegWallet(loginState.address), aclHash = blockchainAclHashes.Service.get(blockchainAclAccounts.Service.get(loginState.address).aclHash)))
+        Ok(views.html.component.master.assetList(blockchainAssets.Service.getAssetPegWallet(loginState.address)))
       } catch {
         case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
       }
@@ -86,7 +86,7 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
   def fiatList: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        Ok(views.html.component.master.fiatList(fiatPegWallet = blockchainFiats.Service.getFiatPegWallet(loginState.address), aclHash = blockchainAclHashes.Service.get(blockchainAclAccounts.Service.get(loginState.address).aclHash)))
+        Ok(views.html.component.master.fiatList( blockchainFiats.Service.getFiatPegWallet(loginState.address)))
       } catch {
         case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
       }
@@ -95,7 +95,7 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
   def buyNegotiationList: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        Ok(views.html.component.master.buyNegotiationList(blockchainNegotiations.Service.getNegotiationsForAddress(loginState.address).filter(_.buyerAddress == loginState.address), blockchainAssets.Service.getAssetPegWallet(loginState.address).map(_.pegHash), aclHash = blockchainAclHashes.Service.get(blockchainAclAccounts.Service.get(loginState.address).aclHash)))
+        Ok(views.html.component.master.buyNegotiationList(blockchainNegotiations.Service.getNegotiationsForBuyerAddress(loginState.address), blockchainAssets.Service.getAssetPegHashes(loginState.address)))
       } catch {
         case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
       }
@@ -104,7 +104,7 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
   def sellNegotiationList: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        Ok(views.html.component.master.sellNegotiationList(blockchainNegotiations.Service.getNegotiationsForAddress(loginState.address).filter(_.sellerAddress == loginState.address), blockchainAssets.Service.getAssetPegWallet(loginState.address).map(_.pegHash), aclHash = blockchainAclHashes.Service.get(blockchainAclAccounts.Service.get(loginState.address).aclHash)))
+        Ok(views.html.component.master.sellNegotiationList(blockchainNegotiations.Service.getNegotiationsForSellerAddress(loginState.address), blockchainAssets.Service.getAssetPegHashes(loginState.address)))
       } catch {
         case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
       }
@@ -115,12 +115,11 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
       try {
         val negotiations = blockchainNegotiations.Service.getNegotiationsForAddress(loginState.address)
         val orders = blockchainOrders.Service.getOrders(negotiations.map(_.id))
-        val relevantNegotiations: Seq[Negotiation] = negotiations.filter(negotiation => orders.map(_.id) contains negotiation.id)
-        val assets = blockchainAssets.Service.getByPegHashes(relevantNegotiations.map(_.assetPegHash))
-        Ok(views.html.component.master.orderList(orders.filter(order => (for (relevantNegotiation <- relevantNegotiations; if relevantNegotiation.buyerAddress == loginState.address && !assets.find(asset => asset.pegHash == relevantNegotiation.assetPegHash).orNull.moderated) yield relevantNegotiation).map(_.id) contains order.id),
-          orders.filter(order => (for (relevantNegotiation <- relevantNegotiations; if relevantNegotiation.sellerAddress == loginState.address && !assets.find(asset => asset.pegHash == relevantNegotiation.assetPegHash).orNull.moderated) yield relevantNegotiation).map(_.id) contains order.id),
-          orders.filter(order => (for (relevantNegotiation <- relevantNegotiations; if assets.find(asset => asset.pegHash == relevantNegotiation.assetPegHash).orNull.moderated) yield relevantNegotiation).map(_.id) contains order.id),
-          blockchainAclHashes.Service.get(blockchainAclAccounts.Service.get(loginState.address).aclHash)))
+        val negotiationsOfOrders: Seq[Negotiation] = negotiations.filter(negotiation => orders.map(_.id) contains negotiation.id)
+        val assets = blockchainAssets.Service.getByPegHashes(negotiationsOfOrders.map(_.assetPegHash))
+        Ok(views.html.component.master.orderList(orders.filter(order => (for (negotiationsOfOrder <- negotiationsOfOrders; if negotiationsOfOrder.buyerAddress == loginState.address && !assets.find(asset => asset.pegHash == negotiationsOfOrder.assetPegHash).orNull.moderated) yield negotiationsOfOrder).map(_.id) contains order.id),
+          orders.filter(order => (for (negotiationsOfOrder <- negotiationsOfOrders; if negotiationsOfOrder.sellerAddress == loginState.address && !assets.find(asset => asset.pegHash == negotiationsOfOrder.assetPegHash).orNull.moderated) yield negotiationsOfOrder).map(_.id) contains order.id),
+          orders.filter(order => (for (negotiationsOfOrder <- negotiationsOfOrders; if assets.find(asset => asset.pegHash == negotiationsOfOrder.assetPegHash).orNull.moderated) yield negotiationsOfOrder).map(_.id) contains order.id)))
       } catch {
         case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
       }
@@ -137,7 +136,7 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
   def availableAssetListWithLogin: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        Ok(views.html.component.master.availableAssetListWithLogin(blockchainAssets.Service.getAllPublic(blockchainOrders.Service.getAllOrderIds), blockchainAclHashes.Service.get(blockchainAclAccounts.Service.get(loginState.address).aclHash)))
+        Ok(views.html.component.master.availableAssetListWithLogin(blockchainAssets.Service.getAllPublic(blockchainOrders.Service.getAllOrderIds)))
       } catch {
         case baseException: BaseException => NoContent
       }

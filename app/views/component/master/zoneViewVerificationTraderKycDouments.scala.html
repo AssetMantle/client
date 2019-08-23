@@ -1,6 +1,7 @@
 @import models.master.TraderKYC
+@import controllers.actions.LoginState
 
-@(traderKYCs: Seq[TraderKYC])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(traderKYCs: Seq[TraderKYC])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 <div>
     @for(traderKYC <- traderKYCs) {
         @component.master.zoneViewTraderKycDocument(id = traderKYC.id, documentType = traderKYC.documentType, status = traderKYC.zoneStatus, fileName = traderKYC.fileName, file = traderKYC.file)

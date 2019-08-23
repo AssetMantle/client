@@ -1,7 +1,8 @@
 @import helper._
 @import views.companion.master.VerifyOrganization
+@import controllers.actions.LoginState
 
-@(verifyOrganizationForm: Form[VerifyOrganization.Data], organizationID: String, zoneID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@(verifyOrganizationForm: Form[VerifyOrganization.Data], organizationID: String, zoneID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 
 @form(action = routes.AddOrganizationController.verifyOrganization, 'onkeypress -> "validateForm(event,this)") {
     <div class="latest_card-header latest_card-header-primary text-center">

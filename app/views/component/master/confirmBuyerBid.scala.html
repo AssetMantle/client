@@ -1,7 +1,8 @@
 @import helper._
 @import views.companion.master.ConfirmBuyerBid
+@import controllers.actions.LoginState
 
-@(confirmBuyerBidForm: Form[ConfirmBuyerBid.Data], sellerAddress: String, pegHash: String, bid: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@(confirmBuyerBidForm: Form[ConfirmBuyerBid.Data], sellerAddress: String, pegHash: String, bid: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 
 @form(action = routes.ConfirmBuyerBidController.confirmBuyerBid, 'onkeypress -> "validateForm(event,this)") {
     <div class="latest_card-header latest_card-header-primary text-center">

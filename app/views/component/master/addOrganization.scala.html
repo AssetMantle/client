@@ -1,7 +1,8 @@
 @import helper._
 @import views.companion.master.AddOrganization
+@import controllers.actions.LoginState
 
-@(addOrganizationForm: Form[AddOrganization.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@(addOrganizationForm: Form[AddOrganization.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @form(action = routes.AddOrganizationController.addOrganization, 'onkeypress -> "validateForm(event,this)") {
     <div class="latest_card-header latest_card-header-primary text-center">
         <h4 class="latest_card-title">@Messages(constants.Form.ADD_ORGANIZATION)</h4>
