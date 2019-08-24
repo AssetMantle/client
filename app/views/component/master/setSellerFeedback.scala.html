@@ -1,13 +1,22 @@
 @import helper._
 @import views.companion.master.SetSellerFeedback
+@import controllers.actions.LoginState
 
-@(setSellerFeedbackForm: Form[SetSellerFeedback.Data], buyerAddress: String, pegHash: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@(setSellerFeedbackForm: Form[SetSellerFeedback.Data], buyerAddress: String, pegHash: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @form(action = routes.SetSellerFeedbackController.setSellerFeedback, 'onkeypress -> "validateForm(event,this)") {
+    <div class="latest_card-header latest_card-header-primary text-center">
+        <h4 class="latest_card-title">@Messages(constants.Form.SET_SELLER_FEEDBACK)</h4>
+    </div>
+    <div class="latest_card-body">
     @CSRF.formField
-    @inputText(setSellerFeedbackForm(constants.Form.BUYER_ADDRESS).copy(value = Some(buyerAddress)), '_label -> Messages(constants.Form.BUYER_ADDRESS))
-    @inputText(setSellerFeedbackForm(constants.Form.PEG_HASH).copy(value = Some(pegHash)), '_label -> Messages(constants.Form.PEG_HASH))
-    @inputText(setSellerFeedbackForm(constants.Form.RATING), '_label -> Messages(constants.Form.RATING))
-    @inputPassword(setSellerFeedbackForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD))
+    @inputText(setSellerFeedbackForm(constants.Form.BUYER_ADDRESS).copy(value = Some(buyerAddress)), '_label -> Messages(constants.Form.BUYER_ADDRESS),
+        'class -> "form-control",'placeholder->Messages(constants.Form.BUYER_ADDRESS),'required->true)
+    @inputText(setSellerFeedbackForm(constants.Form.PEG_HASH).copy(value = Some(pegHash)), '_label -> Messages(constants.Form.PEG_HASH),
+        'class -> "form-control",'placeholder->Messages(constants.Form.PEG_HASH),'required->true)
+    @inputText(setSellerFeedbackForm(constants.Form.RATING), '_label -> Messages(constants.Form.RATING),
+        'class -> "form-control",'placeholder->Messages(constants.Form.RATING),'required->true)
+    @inputPassword(setSellerFeedbackForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD),
+        'class -> "form-control",'placeholder->Messages(constants.Form.PASSWORD),'required->true)
 
     @if(setSellerFeedbackForm.hasGlobalErrors) {
         <ul>
@@ -16,5 +25,6 @@
         }
         </ul>
     }
-    <button type="button" onclick="submitForm(this)">@Messages(constants.Form.SET_SELLER_FEEDBACK)</button>
+    <button type="button" class="btn btn-sm btn-primary" onclick="submitForm(this)">@Messages(constants.Form.SET_SELLER_FEEDBACK)</button>
+    </div>
 }

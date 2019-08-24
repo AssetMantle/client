@@ -30,7 +30,8 @@ class MainFiatActor @Inject()(actorTimeout: FiniteDuration, actorSystem: ActorSy
   def receive = {
     case fiatCometMessage: blockchain.FiatCometMessage =>
       actorSystem.actorSelection("/user/" + constants.Module.ACTOR_MAIN_FIAT + "/" + fiatCometMessage.username).resolveOne().onComplete {
-        case Success(actorRef) => actorRef ! fiatCometMessage
+        case Success(actorRef) => logger.info(module +  " " + fiatCometMessage.username + ": " + fiatCometMessage.message)
+          actorRef ! fiatCometMessage
         case Failure(ex) => logger.info(module + ": " + ex.getMessage)
       }
     case createFiatChildActorMessage: CreateFiatChildActorMessage => context.actorOf(props = UserFiatActor.props(createFiatChildActorMessage.actorRef, actorTimeout), name = createFiatChildActorMessage.username)

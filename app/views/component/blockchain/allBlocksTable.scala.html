@@ -1,17 +1,25 @@
 @()(implicit messagesProvider: MessagesProvider)
 <div id="allBlocksTable">
-    <table class="box dynamicTable">
-        <tr>
-            <th>@Messages(constants.Form.HEIGHT)</th>
-            <th>@Messages(constants.Form.TIME)</th>
-            <th>@Messages(constants.Form.NUM_TXS)</th>
-        </tr>
+
+        <a class="back-button" onclick='back()' > <i class="fa fa-undo"></i> @Messages(constants.Form.BACK)</a>
+
+    <div class="table-responsive">
+    <table class="table white border">
+        <thead>
+            <tr>
+                <th>@Messages(constants.Form.HEIGHT)</th>
+                <th>@Messages(constants.Form.TIME)</th>
+                <th>@Messages(constants.Form.NUM_TXS)</th>
+            </tr>
+        </thead>
         <tbody id="allBlocksTableBody"></tbody>
+        <tr><td colspan="3"  > <button class="btn btn-sm btn-primary" onclick='onClickPrevious()'><< @Messages(constants.Form.PREVIOUS)</button>
+            <button class="btn btn-sm btn-primary fr" onclick='onClickNext()'>@Messages(constants.Form.NEXT) >></button>
+
+        </td></tr>
     </table>
-    <button onclick='onClickPrevious()'>@Messages(constants.Form.PREVIOUS)</button>
-    <button onclick='onClickNext()'>@Messages(constants.Form.NEXT)</button>
-    <br>
-    <button onclick='back()' >@Messages(constants.Form.BACK)</button>
+    </div>
+
 </div>
 <script src="@routes.Assets.versioned("javascripts/showAllBlocks.js")" type="text/javascript"></script>
 <script>initialTableContent()</script>

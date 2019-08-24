@@ -4,10 +4,15 @@
 <html lang="en">
     <head>
         <title>@title</title>
+        <link rel="shortcut icon" type="image/png" href="/img/logo1.ico"/>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href="https://fonts.googleapis.com/css?family=Overpass&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet">
+        <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
         <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/class.css")">
         <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/tag.css")">
-        <link rel="shortcut icon" type="image/png" href="@routes.Assets.versioned("images/favicon.png")">
+        <link rel="shortcut icon" type="image/png" href="@routes.Assets.versioned("images/favicon.ico")">
+        <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/material-kit/css/material-kit.css")">
         <script src="@routes.JavaScriptRoutesController.javascriptRoutes" type="text/javascript" ></script>
         <script src="@routes.Assets.versioned("javascripts/jQuery.min.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/firebase.js")" type="text/javascript"></script>
@@ -20,95 +25,143 @@
 
     </head>
     <body>
-        <div class="pageContent">
-            <div class="stickyBar">
-                <div class = "navbar">
-                    <a class="active" href="@controllers.routes.IndexController.index()" >Home</a>
+        <header>
+            <nav class="navbar fixed-top navbar-expand-lg">
+                <div class = "container">
+                    <div class="navbar-translate">
+                        <a class="navbar-brand" href="@controllers.routes.IndexController.index()" >
+                            <img src="@routes.Assets.versioned("images/commit_logo.png")" class="img-fluid logo">
+                        </a>
 
-                    @loginState match {
-                        case null => {
-                            <a class="right" onclick="getForm(jsRoutes.controllers.SignUpController.signUpForm())">@Messages(constants.Form.SIGNUP)</a>
-                            <a class="right" onclick="getForm(jsRoutes.controllers.LoginController.loginForm())">@Messages(constants.Form.LOGIN)</a>
-                        }
-                        case default => {
-                            @loginState.userType match {
-                                case constants.User.TRADER => {
-                                    <a href="@controllers.routes.ViewController.market()">@Messages(constants.Form.MARKET)</a>
-                                }
-                                case constants.User.ZONE => {
-                                    <a href="@controllers.routes.ViewController.zoneRequest()">@Messages(constants.Form.REQUEST)</a>
-                                    <a href="@controllers.routes.ViewController.zoneInformation()">@Messages(constants.Form.INFORMATION)</a>
-                                }
-                                 case constants.User.ORGANIZATION => {
-                                     <a href="@controllers.routes.ViewController.organizationRequest()">@Messages(constants.Form.REQUEST)</a>
-                                     <a href="@controllers.routes.ViewController.organizationInformation()">@Messages(constants.Form.INFORMATION)</a>
-                                }
-                                  case constants.User.GENESIS => {
-                                    <a href="@controllers.routes.ViewController.genesisRequest()">@Messages(constants.Form.REQUEST)</a>
-                                      <a href="@controllers.routes.ViewController.genesisInformation()">@Messages(constants.Form.INFORMATION)</a>
-                                  }
-                                case _ => {}
+                        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#myNavbar" aria-expanded="false" aria-label="Toggle navigation">
+                            <span class="sr-only">Toggle navigation</span>
+                            <span class="navbar-toggler-icon"></span>
+                            <span class="navbar-toggler-icon"></span>
+                            <span class="navbar-toggler-icon"></span>
+                        </button>
+                    </div>
+
+                    <div class="collapse navbar-collapse" id="myNavbar">
+                        <ul class="navbar-nav ml-auto">
+                        @loginState match {
+                            case null => {
+
+                                <li class="nav-item"> <a onclick="getForm(jsRoutes.controllers.SignUpController.signUpForm())"><i class="fa fa-user-plus"></i>
+                                    @Messages(constants.Form.SIGNUP)</a></li>
+                                <li class="nav-item"><a onclick="getForm(jsRoutes.controllers.LoginController.loginForm())"><i class="fa fa-sign-in" aria-hidden="true"></i>
+                                    @Messages(constants.Form.LOGIN)</a>
+                                </li>
                             }
-                            <a class="right" onclick="getForm(jsRoutes.controllers.LogoutController.logoutForm())">@loginState.username</a>
-                            <a class="right" onclick="getForm(jsRoutes.controllers.LogoutController.logoutForm())">@Messages(constants.Form.LOGOUT)</a>
-                            <a class="right notification" onclick="getForm(jsRoutes.controllers.NotificationController.notificationPage(0))">@Messages(constants.Form.INBOX)
-                            <span class="badge" id="notificationBadge">0</span>
-                            </a>
+                            case default => {
+                                @loginState.userType match {
+                                    case constants.User.TRADER => {
+                                        <li><a class="nav-item" href="@controllers.routes.ViewController.market()">@Messages(constants.Form.MARKET)</a></li>
+                                    }
+                                    case constants.User.ZONE => {
+                                        <li><a class="nav-item" href="@controllers.routes.ViewController.zoneRequest()">@Messages(constants.Form.REQUEST)</a></li>
+                                        <li><a class="nav-item" href="@controllers.routes.ViewController.zoneInformation()">@Messages(constants.Form.INFORMATION)</a></li>
+                                    }
+                                    case constants.User.ORGANIZATION => {
+                                        <li><a class="nav-item" href="@controllers.routes.ViewController.organizationRequest()">@Messages(constants.Form.REQUEST)</a></li>
+                                        <li><a class="nav-item" href="@controllers.routes.ViewController.organizationInformation()">@Messages(constants.Form.INFORMATION)</a></li>
+                                    }
+                                    case constants.User.GENESIS => {
+                                        <li><a class="nav-item" href="@controllers.routes.ViewController.genesisRequest()">@Messages(constants.Form.REQUEST)</a></li>
+                                        <li><a class="nav-item" href="@controllers.routes.ViewController.genesisInformation()">@Messages(constants.Form.INFORMATION)</a></li>
+                                    }
+                                    case _ => {}
+                                }
+                                <li><a class="nav-item notification" onclick="getForm(jsRoutes.controllers.NotificationController.notificationPage(0))"><i class="fa fa-bell" aria-hidden="true"></i>
+                                    @Messages(constants.Form.INBOX)
+                                    <span class="badge" id="notificationBadge">0</span>
+                                </a>
+                                </li>
+                                        <li class="nav-item dropdown">
+                                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                @loginState.username
+                                            </a>
+                                            <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+
+                                                <a class="dropdown-item" onclick="getForm(jsRoutes.controllers.LogoutController.logoutForm())"><i class="fa fa-sign-out" aria-hidden="true"></i> &nbsp;
+                                                    @Messages(constants.Form.LOGOUT)</a>
+                                            </div>
+                                        </li>
+
+                            }
                         }
-                    }
 
+                        </ul>
+                    </div>
                 </div>
+            </nav>
 
-                @for(failure <- failures) {
-                    <div class="alert failure" onclick="getForm(@failure.action)">
-                        <span class="closeButton">x</span>
-                        <strong>@Messages(constants.Form.FAILURE)</strong>
-                        @Messages(failure.message)
-                    </div>
-                }
-                @for(warning <- warnings) {
-                    <div class="alert warning" onclick="getForm(@warning.action)">
-                        <span class="closeButton">x</span>
-                        <strong>@Messages(constants.Form.WARNING)</strong>
-                        @Messages(warning.message)
-                    </div>
-                }
+        </header>
+        <div class="pageContent text-center">
+            @for(failure <- failures) {
+                <div class="alert failure" onclick="getForm(@failure.action)">
+                    <span class="closeButton">x</span>
+                    <strong>@Messages(constants.Form.FAILURE)</strong>
+                    @Messages(failure.message)
+                </div>
+            }
+            @for(warning <- warnings) {
+                <div class="alert warning" onclick="getForm(@warning.action)">
+                    <span class="closeButton">x</span>
+                    <strong>@Messages(constants.Form.WARNING)</strong>
+                    @Messages(warning.message)
+                </div>
+            }
 
-                @for(success <- successes) {
-                    <div class="alert success" onclick="getForm(@success.action)">
-                        <span class="closeButton">x</span>
-                        <strong>@Messages(constants.Form.SUCCESS)</strong>
-                        @Messages(success.message)
-                    </div>
-                }
-                @for(info <- infos) {
-                    <div class="alert information" onclick="getForm(@info.action)">
-                        <span class="closeButton">x</span>
-                        <strong>@Messages(constants.Form.INFORMATION)</strong>
-                        @Messages(info.message)
-                    </div>
-                }
+            @for(success <- successes) {
+                <div class="alert success" onclick="getForm(@success.action)">
+                    <span class="closeButton">x</span>
+                    <strong>@Messages(constants.Form.SUCCESS)</strong>
+                    @Messages(success.message)
+                </div>
+            }
+            @for(info <- infos) {
+                <div class="alert information" onclick="getForm(@info.action)">
+                    <span class="closeButton">x</span>
+                    <strong>@Messages(constants.Form.INFORMATION)</strong>
+                    @Messages(info.message)
+                </div>
+            }
+        </div>
+        <div class="pageFlexContainer">
+            <div class="left_side">
+            @left
             </div>
-
-            <div class="pageFlexContainer">
-                <div class="first">
-                @left
-                </div>
-                <div class="second">
-                @center
-                </div>
-                <div class="third">
-                @right
-                </div>
+            <div class="middle">
+            @center
+            </div>
+            <div class="right_side">
+            @right
             </div>
         </div>
+
 
         <div class="modal" id="commonModal">
-            <div class="modalContent " id="commonModalContent"></div>
+
+                <div class="latest_card latest_card-login modalContent" id="commonModalContent">
+                </div>
+
+
         </div>
+
         <div class = "modal centerScreen" id="loading">
-            <img src="@routes.Assets.versioned("images/loading.gif")" alt = "@Messages(constants.Form.LOADING)"/>
+            <img src="@routes.Assets.versioned("images/loader.svg")" alt = "@Messages(constants.Form.LOADING)"/>
         </div>
+        <footer class="footer">
+            <div class="container">
+                <div class="copyright float-right">
+                            &copy;
+                    <script>
+                            document.write(new Date().getFullYear())
+                    </script>
+                    <a href="" target="_blank">Commit</a>
+                </div>
+            </div>
+        </footer>
         <script type="text/javascript" src="@routes.JavaScriptRoutesController.javascriptRoutes"></script>
         <script src="@routes.Assets.versioned("javascripts/getForm.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/submitForm.js")" type="text/javascript"></script>
@@ -118,5 +171,14 @@
         <script src="@routes.Assets.versioned("javascripts/style/ajaxLoading.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/style/modal.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/style/hideElement.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.versioned("javascripts/material-kit/core/jquery.min.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.versioned("javascripts/material-kit/core/popper.min.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.versioned("javascripts/material-kit/core/bootstrap-material-design.min.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.versioned("javascripts/material-kit/plugins/moment.min.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.versioned("javascripts/material-kit/plugins/bootstrap-datetimepicker.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.versioned("javascripts/material-kit/plugins/nouislider.min.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.versioned("javascripts/material-kit/plugins/jquery.sharrre.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.versioned("javascripts/material-kit/custom.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.versioned("javascripts/material-kit/material-kit.js?v=2.0.5")" type="text/javascript"></script>
     </body>
 </html>

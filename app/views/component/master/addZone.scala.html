@@ -1,11 +1,18 @@
 @import helper._
 @import views.companion.master.AddZone
+@import controllers.actions.LoginState
 
-@(addZoneForm: Form[AddZone.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@(addZoneForm: Form[AddZone.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @form(action = routes.AddZoneController.addZone, 'onkeypress -> "validateForm(event,this)") {
+    <div class="latest_card-header latest_card-header-primary text-center">
+        <h4 class="latest_card-title">@Messages(constants.Form.ADD_ZONE)</h4>
+    </div>
+    <div class="latest_card-body">
     @CSRF.formField
-    @inputText(addZoneForm(constants.Form.NAME), '_label -> Messages(constants.Form.NAME))
-    @inputText(addZoneForm(constants.Form.CURRENCY), '_label -> Messages(constants.Form.CURRENCY))
+    @inputText(addZoneForm(constants.Form.NAME), '_label -> Messages(constants.Form.NAME),
+        'placeholder->Messages(constants.Form.NAME),'required->true,'class->"form-control")
+    @inputText(addZoneForm(constants.Form.CURRENCY), '_label -> Messages(constants.Form.CURRENCY),
+        'placeholder->Messages(constants.Form.CURRENCY),'required->true,'class->"form-control")
 
     @if(addZoneForm.hasGlobalErrors) {
         <ul>
@@ -14,5 +21,6 @@
         }
         </ul>
     }
-    <button type="button" onclick="submitForm(this)">@Messages(constants.Form.ADD_ZONE)</button>
-}
+    <button type="button" class="btn btn-primary btn-sm" onclick="submitForm(this)">@Messages(constants.Form.ADD_ZONE)</button>
+    </div>
+    }

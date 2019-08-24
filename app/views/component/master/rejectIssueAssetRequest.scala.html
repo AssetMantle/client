@@ -1,11 +1,18 @@
 @import helper._
 @import views.companion.master.RejectIssueAssetRequest
+@import controllers.actions.LoginState
 
-@(rejectIssueAssetRequestForm: Form[RejectIssueAssetRequest.Data], requestID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@(rejectIssueAssetRequestForm: Form[RejectIssueAssetRequest.Data], requestID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @form(action = routes.IssueAssetController.rejectIssueAssetRequest, 'onkeypress -> "validateForm(event,this)") {
+    <div class="latest_card-header latest_card-header-primary text-center">
+        <h4 class="latest_card-title">@Messages(constants.Form.REJECT_ISSUE_ASSET_REQUEST)</h4>
+    </div>
+    <div class="latest_card-body">
     @CSRF.formField
-    @inputText(rejectIssueAssetRequestForm(constants.Form.REQUEST_ID).copy(value = Some(requestID)), '_label -> Messages(constants.Form.REQUEST_ID))
-    @inputText(rejectIssueAssetRequestForm(constants.Form.COMMENT), '_label -> Messages(constants.Form.COMMENT))
+    @inputText(rejectIssueAssetRequestForm(constants.Form.REQUEST_ID).copy(value = Some(requestID)), '_label -> Messages(constants.Form.REQUEST_ID),
+        'class -> "form-control",'placeholder->Messages(constants.Form.REQUEST_ID),'required->true)
+    @inputText(rejectIssueAssetRequestForm(constants.Form.COMMENT), '_label -> Messages(constants.Form.COMMENT),
+        'class -> "form-control",'placeholder->Messages(constants.Form.COMMENT),'required->true)
     @if(rejectIssueAssetRequestForm.hasGlobalErrors) {
         <ul>
         @for(error <- rejectIssueAssetRequestForm.globalErrors) {
@@ -13,5 +20,6 @@
         }
         </ul>
     }
-    <button type="button" onclick="submitForm(this)">@Messages(constants.Form.REJECT_ISSUE_ASSET_REQUEST)</button>
+    <button type="button" class="btn btn-sm btn-primary" onclick="submitForm(this)">@Messages(constants.Form.REJECT_ISSUE_ASSET_REQUEST)</button>
+    </div>
 }

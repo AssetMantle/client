@@ -1,19 +1,22 @@
 @import models.master.OrganizationKYC
+@import controllers.actions.LoginState
 
-@(organizationKYCs: Seq[OrganizationKYC])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
-<div>
+@(organizationKYCs: Seq[OrganizationKYC])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+<div class="verify_buttons">
     @for(organizationKYC <- organizationKYCs) {
         @component.master.zoneViewOrganizationKycDocument(id = organizationKYC.id, documentType = organizationKYC.documentType, status = organizationKYC.status, fileName = organizationKYC.fileName, file = organizationKYC.file)
         <div id="organizationKycDocumentStatus@organizationKYC.id@organizationKYC.documentType"></div>
         @organizationKYC.status.getOrElse(None)  match {
             case true => {
-                <div id="buttonOrganizationKycDocumentStatus@organizationKYC.id@organizationKYC.documentType"><button class="reject" onclick="rejectOrganizationKycDocument('@organizationKYC.id', '@organizationKYC.documentType')">@Messages(constants.Form.REJECT)</button></div>
+                <div id="buttonOrganizationKycDocumentStatus@organizationKYC.id@organizationKYC.documentType"><button class="btn btn-sm btn-danger" onclick="rejectOrganizationKycDocument('@organizationKYC.id', '@organizationKYC.documentType')">@Messages(constants.Form.REJECT)</button></div>
             }
             case false => {
-                <div id="buttonOrganizationKycDocumentStatus@organizationKYC.id@organizationKYC.documentType"><button class="approve" onclick="verifyOrganizationKycDocument('@organizationKYC.id', '@organizationKYC.documentType')">@Messages(constants.Form.APPROVE)</button></div>
+                <div id="buttonOrganizationKycDocumentStatus@organizationKYC.id@organizationKYC.documentType"><button class="btn btn-sm btn-success" onclick="verifyOrganizationKycDocument('@organizationKYC.id', '@organizationKYC.documentType')">@Messages(constants.Form.APPROVE)</button></div>
             }
             case _ => {
-                <div id="buttonOrganizationKycDocumentStatus@organizationKYC.id@organizationKYC.documentType"> <button class="approve" onclick="verifyOrganizationKycDocument('@organizationKYC.id', '@organizationKYC.documentType')">@Messages(constants.Form.APPROVE)</button> <button class="reject" onclick="rejectOrganizationKycDocument('@organizationKYC.id', '@organizationKYC.documentType')">@Messages(constants.Form.REJECT)</button></div>
+                <div id="buttonOrganizationKycDocumentStatus@organizationKYC.id@organizationKYC.documentType">
+                     <button class="btn btn-sm btn-success" onclick="verifyOrganizationKycDocument('@organizationKYC.id', '@organizationKYC.documentType')">@Messages(constants.Form.APPROVE)</button>
+                    <button class="btn btn-sm btn-danger" onclick="rejectOrganizationKycDocument('@organizationKYC.id', '@organizationKYC.documentType')">@Messages(constants.Form.REJECT)</button></div>
             }
         }
     }

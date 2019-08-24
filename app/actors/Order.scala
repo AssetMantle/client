@@ -30,7 +30,8 @@ class MainOrderActor @Inject()(actorTimeout: FiniteDuration,actorSystem: ActorSy
   def receive = {
     case orderCometMessage: blockchain.OrderCometMessage =>
       actorSystem.actorSelection("/user/" + constants.Module.ACTOR_MAIN_ORDER + "/" + orderCometMessage.username).resolveOne().onComplete {
-        case Success(actorRef) => actorRef ! orderCometMessage
+        case Success(actorRef) => logger.info(module + " " + orderCometMessage.username + ": " + orderCometMessage.message)
+          actorRef ! orderCometMessage
         case Failure(ex) => logger.info(module + ": " + ex.getMessage)
       }
     case createOrderChildActorMessage: CreateOrderChildActorMessage => context.actorOf(props = UserOrderActor.props(createOrderChildActorMessage.actorRef, actorTimeout), name = createOrderChildActorMessage.username)

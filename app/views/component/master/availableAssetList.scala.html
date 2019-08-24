@@ -1,7 +1,8 @@
 @import models.blockchain.ACLHash
 @import models.blockchain.Asset
+@import controllers.actions.LoginState
 
-@(assetList: Seq[Asset])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
+@(assetList: Seq[Asset])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
     @for(asset <- assetList) {
         <div class="flexItem box firstBox lightBlue">

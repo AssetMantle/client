@@ -6,9 +6,9 @@ import play.api.data.Forms._
 object RedeemFiat {
   val form = Form(
     mapping(
-      constants.Form.PASSWORD -> nonEmptyText(minLength = 1, maxLength = 20),
-      constants.Form.ZONE_ID -> nonEmptyText(minLength = 1, maxLength = 45),
-      constants.Form.REDEEM_AMOUNT -> number(min = 1, max = 10000),
+      constants.FormField.NON_EMPTY_PASSWORD.name -> constants.FormField.NON_EMPTY_PASSWORD.field,
+      constants.FormField.ZONE_ID.name -> constants.FormField.ZONE_ID.field,
+      constants.FormField.REDEEM_AMOUNT.name -> constants.FormField.REDEEM_AMOUNT.field,
     )(Data.apply)(Data.unapply)
   )
 

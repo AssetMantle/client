@@ -165,9 +165,9 @@ class Orders @Inject()(shutdownActors: ShutdownActors, masterAccounts: master.Ac
 
             blockchainFiats.Service.deleteFiatPegWallet(dirtyOrder.id)
           }
-          if (orderResponse.value.awbProofHash != "" && orderResponse.value.fiatProofHash != ""){
+          if (orderResponse.value.awbProofHash != "" && orderResponse.value.fiatProofHash != "") {
             blockchainTraderFeedbackHistories.Service.create(negotiation.sellerAddress, negotiation.buyerAddress, negotiation.sellerAddress, negotiation.assetPegHash, rating = "")
-            blockchainTraderFeedbackHistories.Service.create(negotiation.buyerAddress, negotiation.buyerAddress, negotiation.sellerAddress, negotiation.assetPegHash,  rating = "")
+            blockchainTraderFeedbackHistories.Service.create(negotiation.buyerAddress, negotiation.buyerAddress, negotiation.sellerAddress, negotiation.assetPegHash, rating = "")
             blockchainNegotiations.Service.deleteNegotiations(negotiation.assetPegHash)
           }
           Service.insertOrUpdate(dirtyOrder.id, awbProofHash = if (orderResponse.value.awbProofHash == "") null else Option(orderResponse.value.awbProofHash), fiatProofHash = if (orderResponse.value.fiatProofHash == "") null else Option(orderResponse.value.fiatProofHash), dirtyBit = false)

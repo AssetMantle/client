@@ -5,12 +5,11 @@ import play.api.data.Forms._
 
 object UpdateContact {
 
-
   val form = Form(
     mapping(
-      constants.Form.EMAIL_ADDRESS -> email,
-      constants.Form.MOBILE_NUMBER -> nonEmptyText(minLength = 10, maxLength = 10),
-      constants.Form.COUNTRY_CODE -> nonEmptyText(minLength = 1, maxLength = 5)
+      constants.FormField.EMAIL.name -> constants.FormField.EMAIL.field,
+      constants.FormField.MOBILE_NUMBER.name -> constants.FormField.MOBILE_NUMBER.field,
+      constants.FormField.COUNTRY_CODE.name -> constants.FormField.COUNTRY_CODE.field
     )(Data.apply)(Data.unapply)
   )
 

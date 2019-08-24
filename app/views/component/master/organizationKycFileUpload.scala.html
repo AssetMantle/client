@@ -1,9 +1,11 @@
 @import helper._
-@(documentType: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@import controllers.actions.LoginState
+
+@(documentType: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
 @CSRF.formField
 <div id="uploadSelector">
-    <button id="browseUploadButton">@Messages(constants.Form.BROWSE)</button>
+    <button class="btn btn-sm" id="browseUploadButton">@Messages(constants.Form.BROWSE)</button>
     <p class="centerText"><small>@Messages(constants.Form.OR)</small></p>
     <div class="dropBox">
         <p class="centerText"><small>@Messages(constants.Form.DROP_FILE)</small></p>
@@ -17,7 +19,7 @@
         <div class="progressContainer">
             <div class="progressBar" id="fileUploadProgressBar"></div>
         </div>
-        <button id="uploadButton" >@Messages(constants.Form.UPLOAD)</button>
+        <button class="btn btn-sm" id="uploadButton" >@Messages(constants.Form.UPLOAD)</button>
     </div>
 </div>
 

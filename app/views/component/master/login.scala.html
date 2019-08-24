@@ -1,20 +1,46 @@
+@import controllers.actions.LoginState
 @import helper._
 @import views.companion.master.Login
 
-@(loginForm: Form[Login.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@form(action = routes.LoginController.login, 'onkeypress -> "validateForm(event,this)") {
-    @CSRF.formField
-    @inputText(loginForm(constants.Form.USERNAME), '_label -> Messages(constants.Form.USERNAME))
-    @inputPassword(loginForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD))
-    <div class = "hidden">@inputText(loginForm(constants.Form.NOTIFICATION_TOKEN), 'id -> constants.Form.NOTIFICATION_TOKEN, 'readonly -> true)</div>
+@(loginForm: Form[Login.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 
-    @if(loginForm.hasGlobalErrors) {
-        <ul>
-        @for(error <- loginForm.globalErrors) {
-            <li>@error.format</li>
-        }
-        </ul>
-    }
-    <button type="button" onclick="submitForm(this)">@Messages(constants.Form.LOGIN)</button>
+<div class="latest_card-header latest_card-header-primary text-center">
+    <h4 class="latest_card-title">@Messages(constants.Form.LOGIN)</h4>
+
+</div>
+    @form(action = routes.LoginController.login, 'onkeypress -> "validateForm(event,this)") {
+
+        <div class="latest_card-body">
+            @CSRF.formField
+
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">
+                        <i class="fa fa-user"></i>
+                    </span>
+                    @inputText(loginForm(constants.Form.USERNAME), '_label -> Messages(constants.Form.USERNAME), 'class -> "form-control", 'placeholder -> "Username", 'required -> true)
+
+                </div>
+            </div>
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">
+                        <i class="fa fa-lock" aria-hidden="true"></i>
+                    </span>
+                    @inputPassword(loginForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD), 'class -> "form-control", 'placeholder -> "Password", 'required -> true)
+                </div>
+            </div>
+            <div class = "hidden">@inputText(loginForm(constants.Form.NOTIFICATION_TOKEN), 'id -> constants.Form.NOTIFICATION_TOKEN, 'readonly -> true)</div>
+
+            @if(loginForm.hasGlobalErrors) {
+                <ul>
+                @for(error <- loginForm.globalErrors) {
+                    <li>@error.format</li>
+                }
+                </ul>
+            }
+            <button type="button" class="btn btn-primary " onclick="submitForm(this)">@Messages(constants.Form.LOGIN)</button>
+        </div>
 }
+
 

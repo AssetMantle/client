@@ -94,7 +94,10 @@ object Response {
   val INVALID_TOKEN = new Failure("INVALID_TOKEN")
   val UNAUTHORIZED = new Failure("UNAUTHORIZED")
   val DOCUMENT_REJECTED = new Failure("DOCUMENT_REJECTED")
-
+  val PASSWORDS_DO_NOT_MATCH = new Failure("PASSWORDS_DO_NOT_MATCH")
+  val USERNAME_UNAVAILABLE = new Failure("USERNAME_UNAVAILABLE")
+  val INVALID_USERNAME = new Failure("INVALID_USERNAME")
+  val INVALID_PASSWORD = new Failure("INVALID_PASSWORD")
 
   class Failure(private val response: String, private val actionController: JavaScriptReverseRoute = null) {
     val message: String = PREFIX + FAILURE_PREFIX + response

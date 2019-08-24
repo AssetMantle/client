@@ -1,10 +1,16 @@
 @import helper._
 @import views.companion.master.RejectVerifyTraderRequest
+@import controllers.actions.LoginState
 
-@(rejectVerifyTraderRequestForm: Form[RejectVerifyTraderRequest.Data], traderID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@(rejectVerifyTraderRequestForm: Form[RejectVerifyTraderRequest.Data], traderID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @form(action = routes.SetACLController.organizationRejectVerifyTraderRequest, 'onkeypress -> "validateForm(event,this)") {
+    <div class="latest_card-header latest_card-header-primary text-center">
+        <h4 class="latest_card-title">@Messages(constants.Form.REJECT_VERIFY_TRADER_REQUEST)</h4>
+    </div>
+    <div class="latest_card-body">
     @CSRF.formField
-    @inputText(rejectVerifyTraderRequestForm(constants.Form.TRADER_ID).copy(value = Some(traderID)), '_label -> Messages(constants.Form.TRADER_ID))
+    @inputText(rejectVerifyTraderRequestForm(constants.Form.TRADER_ID).copy(value = Some(traderID)), '_label -> Messages(constants.Form.TRADER_ID),
+        'class -> "form-control",'placeholder->Messages(constants.Form.TRADER_ID),'required->true)
 
     @if(rejectVerifyTraderRequestForm.hasGlobalErrors) {
         <ul>
@@ -13,5 +19,7 @@
         }
         </ul>
     }
-    <button type="button" onclick="submitForm(this)">@Messages(constants.Form.REJECT_VERIFY_TRADER_REQUEST)</button>
+    <button type="button" class="btn btn-sm btn-primary" onclick="submitForm(this)">@Messages(constants.Form.REJECT_VERIFY_TRADER_REQUEST)</button>
+    </div>
+
 }

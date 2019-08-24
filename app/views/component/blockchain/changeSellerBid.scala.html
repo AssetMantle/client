@@ -3,14 +3,18 @@
 
 @(changeSellerBidForm: Form[ChangeSellerBid.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @form(action = routes.ChangeSellerBidController.blockchainChangeSellerBid, 'onkeypress -> "validateForm(event,this)") {
+    <div class="latest_card-header latest_card-header-primary text-center">
+        <h4 class="latest_card-title">@Messages(constants.Form.CHANGE_SELLER_BID)</h4>
+    </div>
+    <div class="latest_card-body">
     @CSRF.formField
-    @inputText(changeSellerBidForm(constants.Form.FROM), '_label -> Messages(constants.Form.FROM))
-    @inputText(changeSellerBidForm(constants.Form.TO), '_label -> Messages(constants.Form.TO))
-    @inputText(changeSellerBidForm(constants.Form.BID), '_label -> Messages(constants.Form.BID))
-    @inputText(changeSellerBidForm(constants.Form.TIME), '_label -> Messages(constants.Form.TIME))
-    @inputText(changeSellerBidForm(constants.Form.PEG_HASH), '_label -> Messages(constants.Form.PEG_HASH))
-    @inputText(changeSellerBidForm(constants.Form.MODE), '_label -> Messages(constants.Form.MODE))
-    @inputPassword(changeSellerBidForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD))
+    @inputText(changeSellerBidForm(constants.Form.FROM), '_label -> Messages(constants.Form.FROM),'class -> "form-control",'placeholder->Messages(constants.Form.FROM),'required->true)
+    @inputText(changeSellerBidForm(constants.Form.TO), '_label -> Messages(constants.Form.TO),'class -> "form-control",'placeholder->Messages(constants.Form.TO),'required->true)
+    @inputText(changeSellerBidForm(constants.Form.BID), '_label -> Messages(constants.Form.BID),'class -> "form-control",'placeholder->Messages(constants.Form.BID),'required->true)
+    @inputText(changeSellerBidForm(constants.Form.TIME), '_label -> Messages(constants.Form.TIME),'class -> "form-control",'placeholder->Messages(constants.Form.TIME),'required->true)
+    @inputText(changeSellerBidForm(constants.Form.PEG_HASH), '_label -> Messages(constants.Form.PEG_HASH),'class -> "form-control",'placeholder->Messages(constants.Form.PEG_HASH),'required->true)
+    @inputText(changeSellerBidForm(constants.Form.MODE), '_label -> Messages(constants.Form.MODE),'class -> "form-control",'placeholder->Messages(constants.Form.MODE),'required->true)
+    @inputPassword(changeSellerBidForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD),'class -> "form-control",'placeholder->Messages(constants.Form.PASSWORD),'required->true)
 
     @if(changeSellerBidForm.hasGlobalErrors) {
         <ul>
@@ -19,5 +23,7 @@
         }
         </ul>
     }
-    <button type="button" onclick="submitForm(this)">@Messages(constants.Form.CHANGE_SELLER_BID)</button>
-}
+    <button type="button" class="btn btn-primary btn-sm" onclick="submitForm(this)">@Messages(constants.Form.CHANGE_SELLER_BID)</button>
+    </div>
+    </div>
+    }

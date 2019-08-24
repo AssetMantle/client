@@ -1,16 +1,16 @@
 package views.companion.blockchain
 
 import play.api.data.Form
-import play.api.data.Forms.{mapping, nonEmptyText, _}
+import play.api.data.Forms.{mapping, nonEmptyText}
 
 object IssueFiat {
   val form = Form(
     mapping(
-      constants.Form.FROM -> nonEmptyText(minLength = 1, maxLength = 20),
-      constants.Form.TO -> nonEmptyText(minLength = 1, maxLength = 45),
-      constants.Form.TRANSACTION_ID -> nonEmptyText(minLength = 1, maxLength = 20),
-      constants.Form.TRANSACTION_AMOUNT -> number(min = 1, max = 10000),
-      constants.Form.PASSWORD -> nonEmptyText(minLength = 1, maxLength = 20),
+      constants.FormField.FROM.name -> constants.FormField.FROM.field,
+      constants.FormField.TO.name -> constants.FormField.TO.field,
+      constants.FormField.TRANSACTION_ID.name -> constants.FormField.TRANSACTION_ID.field,
+      constants.FormField.TRANSACTION_AMOUNT.name -> constants.FormField.TRANSACTION_AMOUNT.field,
+      constants.FormField.NON_EMPTY_PASSWORD.name -> constants.FormField.NON_EMPTY_PASSWORD.field,
       constants.Form.MODE-> nonEmptyText(minLength = 4, maxLength = 5)
     )(Data.apply)(Data.unapply)
   )

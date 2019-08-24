@@ -6,9 +6,9 @@ import play.api.data.Forms._
 object ReleaseAsset {
   val form = Form(
     mapping(
-      constants.Form.ADDRESS -> nonEmptyText(minLength = 1, maxLength = 45),
-      constants.Form.PEG_HASH -> nonEmptyText(minLength = 1, maxLength = 20),
-      constants.Form.PASSWORD -> nonEmptyText(minLength = 1, maxLength = 20),
+      constants.FormField.BLOCKCHAIN_ADDRESS.name -> constants.FormField.BLOCKCHAIN_ADDRESS.field,
+      constants.FormField.PEG_HASH.name -> constants.FormField.PEG_HASH.field,
+      constants.FormField.NON_EMPTY_PASSWORD.name -> constants.FormField.NON_EMPTY_PASSWORD.field,
     )(Data.apply)(Data.unapply)
   )
 

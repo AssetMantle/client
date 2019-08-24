@@ -2,15 +2,21 @@
 @import views.companion.blockchain.BuyerExecuteOrder
 
 @(buyerExecuteOrderForm: Form[BuyerExecuteOrder.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@form(action = routes.BuyerExecuteOrderController.blockchainBuyerExecuteOrder, 'onkeypress -> "validateForm(event,this)") {
-    @CSRF.formField
-    @inputText(buyerExecuteOrderForm(constants.Form.FROM), '_label -> Messages(constants.Form.FROM))
-    @inputText(buyerExecuteOrderForm(constants.Form.BUYER_ADDRESS), '_label -> Messages(constants.Form.BUYER_ADDRESS))
-    @inputText(buyerExecuteOrderForm(constants.Form.SELLER_ADDRESS), '_label -> Messages(constants.Form.SELLER_ADDRESS))
-    @inputText(buyerExecuteOrderForm(constants.Form.FIAT_PROOF_HASH), '_label -> Messages(constants.Form.FIAT_PROOF_HASH))
-    @inputText(buyerExecuteOrderForm(constants.Form.PEG_HASH)   , '_label -> Messages(constants.Form.PEG_HASH))
-    @inputText(buyerExecuteOrderForm(constants.Form.MODE), '_label -> Messages(constants.Form.MODE))
-    @inputPassword(buyerExecuteOrderForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD))
+
+    @form(action = routes.BuyerExecuteOrderController.blockchainBuyerExecuteOrder, 'onkeypress -> "validateForm(event,this)") {
+        <div class="latest_card-header latest_card-header-primary text-center">
+            <h4 class="latest_card-title">@Messages(constants.Form.BUYER_EXECUTE_ORDER)</h4>
+        </div>
+    <div class=" ">
+        <div class="latest_card-body">
+            @CSRF.formField
+    @inputText(buyerExecuteOrderForm(constants.Form.FROM), '_label -> Messages(constants.Form.FROM),'class -> "form-control",'placeholder->Messages(constants.Form.FROM),'required->true)
+    @inputText(buyerExecuteOrderForm(constants.Form.BUYER_ADDRESS), '_label -> Messages(constants.Form.BUYER_ADDRESS),'class -> "form-control",'placeholder->Messages(constants.Form.BUYER_ADDRESS),'required->true)
+    @inputText(buyerExecuteOrderForm(constants.Form.SELLER_ADDRESS), '_label -> Messages(constants.Form.SELLER_ADDRESS),'class -> "form-control",'placeholder->Messages(constants.Form.SELLER_ADDRESS),'required->true)
+    @inputText(buyerExecuteOrderForm(constants.Form.FIAT_PROOF_HASH), '_label -> Messages(constants.Form.FIAT_PROOF_HASH),'class -> "form-control",'placeholder->Messages(constants.Form.FIAT_PROOF_HASH),'required->true)
+    @inputText(buyerExecuteOrderForm(constants.Form.PEG_HASH)   , '_label -> Messages(constants.Form.PEG_HASH),'class -> "form-control",'placeholder->Messages(constants.Form.PEG_HASH),'required->true)
+    @inputText(buyerExecuteOrderForm(constants.Form.MODE), '_label -> Messages(constants.Form.MODE),'class -> "form-control",'placeholder->Messages(constants.Form.GAS),'required->true)
+    @inputPassword(buyerExecuteOrderForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD),'class -> "form-control",'placeholder->Messages(constants.Form.PASSWORD),'required->true)
 
     @if(buyerExecuteOrderForm.hasGlobalErrors) {
         <ul>
@@ -19,5 +25,8 @@
         }
         </ul>
     }
-    <button type="button" onclick="submitForm(this)">@Messages(constants.Form.BUYER_EXECUTE_ORDER)</button>
-}
+    <button type="button" class="btn btn-primary" onclick="submitForm(this)">@Messages(constants.Form.BUYER_EXECUTE_ORDER)</button>
+        </div>
+    </div>
+        }
+

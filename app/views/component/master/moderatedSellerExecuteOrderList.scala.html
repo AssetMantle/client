@@ -1,15 +1,18 @@
 @import models.blockchain.Negotiation
+@import controllers.actions.LoginState
 
-@(negotiationList : Seq[Negotiation])(implicit messagesProvider: MessagesProvider)
+@(negotiationList : Seq[Negotiation])(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
 
 @for(negotiation <- negotiationList){
-    <div class="flexItem box firstBox lightBlue">
+    <div class="col-md-6">
+    <div class="flexItem card-body lightBlue">
         <div class="leftText">
             <span class="red">@Messages(constants.Form.PEG_HASH)</span> : @negotiation.assetPegHash <br>
             <span class="red">@Messages(constants.Form.TIME)</span> : @negotiation.time <br>
         </div>
         <div class="centerText">
-            <button onclick="getForm(jsRoutes.controllers.SellerExecuteOrderController.moderatedSellerExecuteOrderForm('@negotiation.buyerAddress', '@negotiation.sellerAddress','@negotiation.assetPegHash'));">@Messages(constants.Form.SELLER_EXECUTE_ORDER)</button>
+            <button class="btn btn-primary btn-sm" onclick="getForm(jsRoutes.controllers.SellerExecuteOrderController.moderatedSellerExecuteOrderForm('@negotiation.buyerAddress', '@negotiation.sellerAddress','@negotiation.assetPegHash'));">@Messages(constants.Form.SELLER_EXECUTE_ORDER)</button>
         </div>
+    </div>
     </div>
 }

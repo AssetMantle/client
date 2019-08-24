@@ -1,20 +1,57 @@
 @import helper._
 @import views.companion.master.SignUp
+@import controllers.actions.LoginState
 
-@(signUpForm: Form[SignUp.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@(signUpForm: Form[SignUp.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+
 @form(action = routes.SignUpController.signUp, 'onkeypress -> "validateForm(event,this)") {
-    @CSRF.formField
-    @inputText(signUpForm(constants.Form.USERNAME), '_label -> Messages(constants.Form.USERNAME), 'id -> "username") <label id="result"></label>
-    @inputPassword(signUpForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD))
-
-    @if(signUpForm.hasGlobalErrors) {
-        <ul>
-        @for(error <- signUpForm.globalErrors) {
-            <li>@error.format</li>
+    <div class="latest_card-header latest_card-header-primary text-center">
+        <h4 class="latest_card-title">@Messages(constants.Form.SIGNUP)</h4>
+    </div>
+    <div class="latest_card-body">
+        @CSRF.formField
+        <div class="input-group">
+            <div class="input-group-prepend">
+                <span class="input-group-text">
+                    <i class="fa fa-user"></i>
+                </span>
+                @inputText(signUpForm(constants.Form.USERNAME), 'id -> "username", 'class -> "form-control", 'placeholder -> Messages(constants.Form.USERNAME), 'required -> true)
+                <span id="usernameAvailableResult">
+                    <img id="usernameAvailableImageResult" class="result hidden" src="@routes.Assets.versioned("images/success.jpg")">
+                    <img id="usernameUnavailableImageResult" class="result hidden" src="@routes.Assets.versioned("images/unavailable.jpg")">
+                    <img id="usernameLoadingImageResult" class="result hidden" src="@routes.Assets.versioned("images/loading.gif")">
+                </span>
+            </div>
+        </div>
+        <div class="input-group">
+            <div class="input-group-prepend">
+                <span class="input-group-text">
+                    <i class="fa fa-lock" aria-hidden="true"></i>
+                </span>
+                @inputPassword(signUpForm(constants.Form.PASSWORD), 'id -> "password", 'class -> "form-control", 'placeholder -> Messages(constants.Form.PASSWORD), 'required -> true)
+            </div>
+        </div>
+        <div class="input-group">
+            <div class="input-group-prepend">
+                <span class="input-group-text">
+                    <i class="fa fa-lock" aria-hidden="true"></i>
+                </span>
+                @inputPassword(signUpForm(constants.Form.CONFIRM_PASSWORD), 'id -> "confirmPassword", 'class -> "form-control", 'placeholder -> Messages(constants.Form.CONFIRM_PASSWORD), 'required -> true)
+                <span id="matchPasswordsResult">
+                    <img id="matchPasswordsImageResult" class="result hidden" src="@routes.Assets.versioned("images/exclamation.png")">
+                </span>
+            </div>
+        </div>
+        @checkbox(signUpForm(constants.Form.USERNAME_AVAILABLE), 'id -> "usernameAvailable", 'class -> "hidden", 'required -> true)
+        @if(signUpForm.hasGlobalErrors) {
+            <ul>
+            @for(error <- signUpForm.globalErrors) {
+                <li>@error.format</li>
+            }
+            </ul>
         }
-        </ul>
-    }
-    <button type="button" onclick="submitForm(this)">@Messages(constants.Form.SIGNUP)</button>
+        <button type="button" class="btn btn-primary" onclick="submitForm(this)">@Messages(constants.Form.SIGNUP)</button>
+    </div>
 }
-
 <script src="@routes.Assets.versioned("javascripts/checkUsername.js")" type="text/javascript"></script>
+<script src="@routes.Assets.versioned("javascripts/checkPasswords.js")" type="text/javascript"></script>

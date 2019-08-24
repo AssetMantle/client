@@ -1,12 +1,21 @@
 @import helper._
 @import views.companion.master.SendCoin
+@import controllers.actions.LoginState
 
-@(sendCoinForm: Form[SendCoin.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@(sendCoinForm: Form[SendCoin.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+
 @form(action = routes.SendCoinController.sendCoin, 'onkeypress -> "validateForm(event,this)") {
+    <div class="latest_card-header latest_card-header-primary text-center">
+        <h4 class="latest_card-title">@Messages(constants.Form.SEND_COIN)</h4>
+    </div>
+    <div class="latest_card-body">
     @CSRF.formField
-    @inputText(sendCoinForm(constants.Form.TO), '_label -> Messages(constants.Form.TO))
-    @inputText(sendCoinForm(constants.Form.AMOUNT), '_label -> Messages(constants.Form.AMOUNT))
-    @inputPassword(sendCoinForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD))
+    @inputText(sendCoinForm(constants.Form.TO), '_label -> Messages(constants.Form.TO),'class -> "form-control",
+        'placeholder->Messages(constants.Form.TO), 'required ->true)
+    @inputText(sendCoinForm(constants.Form.AMOUNT), '_label -> Messages(constants.Form.AMOUNT),'class -> "form-control",
+        'placeholder->Messages(constants.Form.AMOUNT), 'required ->true)
+    @inputPassword(sendCoinForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD),
+        'class -> "form-control",'placeholder->Messages(constants.Form.PASSWORD), 'required ->true)
 
     @if(sendCoinForm.hasGlobalErrors) {
         <ul>
@@ -15,5 +24,7 @@
         }
         </ul>
     }
-    <button type="button" onclick="submitForm(this)">@Messages(constants.Form.SEND_COIN)</button>
+    <button type="button" class="btn btn-primary btn-sm" onclick="submitForm(this)">@Messages(constants.Form.SEND_COIN)</button>
+    </div>
 }
+

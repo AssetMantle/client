@@ -170,7 +170,7 @@ GET         /master/viewVerifyOrganizationRequests                       control
 GET         /master/rejectVerifyOrganizationRequest                      controllers.AddOrganizationController.rejectVerifyOrganizationRequestForm(organizationID: String)
 POST        /master/rejectVerifyOrganizationRequest                      controllers.AddOrganizationController.rejectVerifyOrganizationRequest
 
-GET         /master/buyerExecuteOrder                                    controllers.BuyerExecuteOrderController.buyerExecuteOrderForm(sellerAddress:String, pegHash:String)
+GET         /master/buyerExecuteOrder                                    controllers.BuyerExecuteOrderController.buyerExecuteOrderForm(orderID: String)
 POST        /master/buyerExecuteOrder                                    controllers.BuyerExecuteOrderController.buyerExecuteOrder
 
 GET         /master/moderatedBuyerExecuteOrder                           controllers.BuyerExecuteOrderController.moderatedBuyerExecuteOrderForm(buyerAddress:String, sellerAddress:String, pegHash:String)
@@ -223,7 +223,7 @@ POST        /master/redeemFiat                                           control
 GET         /master/releaseAsset                                         controllers.ReleaseAssetController.releaseAssetForm(ownerAddress: String, pegHash: String)
 POST        /master/releaseAsset                                         controllers.ReleaseAssetController.releaseAsset
 
-GET         /master/sellerExecuteOrder                                   controllers.SellerExecuteOrderController.sellerExecuteOrderForm(sellerAddress:String, pegHash:String)
+GET         /master/sellerExecuteOrder                                   controllers.SellerExecuteOrderController.sellerExecuteOrderForm(orderID:String)
 POST        /master/sellerExecuteOrder                                   controllers.SellerExecuteOrderController.sellerExecuteOrder
 
 GET         /master/moderatedSellerExecuteOrder                          controllers.SellerExecuteOrderController.moderatedSellerExecuteOrderForm(buyerAddress:String, sellerAddress:String, pegHash:String)

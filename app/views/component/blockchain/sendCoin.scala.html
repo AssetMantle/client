@@ -3,12 +3,21 @@
 
 @(sendCoinForm: Form[SendCoin.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @form(action = routes.SendCoinController.blockchainSendCoin, 'onkeypress -> "validateForm(event,this)") {
+    <div class="latest_card-header latest_card-header-primary text-center">
+        <h4 class="latest_card-title">@Messages(constants.Form.SEND_COIN)</h4>
+    </div>
+    <div class="latest_card-body">
     @CSRF.formField
-    @inputText(sendCoinForm(constants.Form.FROM), '_label -> Messages(constants.Form.FROM))
-    @inputText(sendCoinForm(constants.Form.TO), '_label -> Messages(constants.Form.TO))
-    @inputText(sendCoinForm(constants.Form.AMOUNT), '_label -> Messages(constants.Form.AMOUNT))
-    @inputText(sendCoinForm(constants.Form.MODE), '_label -> Messages(constants.Form.MODE))
-    @inputPassword(sendCoinForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD))
+    @inputText(sendCoinForm(constants.Form.FROM), '_label -> Messages(constants.Form.FROM),'class -> "form-control",
+        'placeholder->Messages(constants.Form.FROM),'required->true)
+    @inputText(sendCoinForm(constants.Form.TO), '_label -> Messages(constants.Form.TO),'class -> "form-control",
+        'placeholder->Messages(constants.Form.TO),'required->true)
+    @inputText(sendCoinForm(constants.Form.AMOUNT), '_label -> Messages(constants.Form.AMOUNT),'class -> "form-control",
+        'placeholder->Messages(constants.Form.AMOUNT),'required->true)
+    @inputText(sendCoinForm(constants.Form.MODE), '_label -> Messages(constants.Form.MODE),'class -> "form-control",
+        'placeholder->Messages(constants.Form.MODE),'required->true)
+    @inputPassword(sendCoinForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD),'class -> "form-control",
+        'placeholder->Messages(constants.Form.PASSWORD),'required->true)
 
     @if(sendCoinForm.hasGlobalErrors) {
         <ul>
@@ -17,5 +26,6 @@
         }
         </ul>
     }
-    <button type="button" onclick="submitForm(this)">@Messages(constants.Form.SEND_COIN)</button>
+    <button type="button" class="btn btn-primary btn-sm" onclick="submitForm(this)">@Messages(constants.Form.SEND_COIN)</button>
+    </div>
 }

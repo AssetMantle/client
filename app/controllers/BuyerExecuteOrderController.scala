@@ -17,8 +17,9 @@ class BuyerExecuteOrderController @Inject()(messagesControllerComponents: Messag
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  def buyerExecuteOrderForm(sellerAddress: String, pegHash: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.buyerExecuteOrder(views.companion.master.BuyerExecuteOrder.form, sellerAddress, pegHash))
+  def buyerExecuteOrderForm(orderID: String): Action[AnyContent] = Action { implicit request =>
+    val negotiation = blockchainNegotiations.Service.get(orderID)
+    Ok(views.html.component.master.buyerExecuteOrder(views.companion.master.BuyerExecuteOrder.form, negotiation.sellerAddress, negotiation.assetPegHash))
   }
 
   def buyerExecuteOrder: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>

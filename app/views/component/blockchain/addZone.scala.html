@@ -3,11 +3,15 @@
 
 @(addZoneForm: Form[AddZone.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @form(action = routes.AddZoneController.blockchainAddZone, 'onkeypress -> "validateForm(event,this)") {
-    @CSRF.formField
-    @inputText(addZoneForm(constants.Form.FROM), '_label -> Messages(constants.Form.FROM))
-    @inputText(addZoneForm(constants.Form.TO), '_label -> Messages(constants.Form.TO))
-    @inputText(addZoneForm(constants.Form.ZONE_ID), '_label -> Messages(constants.Form.ZONE_ID))
-    @inputPassword(addZoneForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD))
+    <div class="latest_card-header latest_card-header-primary text-center">
+        <h4 class="latest_card-title">@Messages(constants.Form.ADD_ZONE)</h4>
+    </div>
+    <div class="latest_card-body">
+        @CSRF.formField
+     @inputText(addZoneForm(constants.Form.FROM), '_label -> Messages(constants.Form.FROM),'class -> "form-control",'placeholder->Messages(constants.Form.FROM),'required->true)
+    @inputText(addZoneForm(constants.Form.TO), '_label -> Messages(constants.Form.TO),'class -> "form-control",'placeholder->Messages(constants.Form.TO),'required->true)
+    @inputText(addZoneForm(constants.Form.ZONE_ID), '_label -> Messages(constants.Form.ZONE_ID),'class -> "form-control",'placeholder->Messages(constants.Form.ZONE_ID),'required->true)
+    @inputPassword(addZoneForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD),'class -> "form-control",'placeholder->Messages(constants.Form.PASSWORD),'required->true)
 
     @if(addZoneForm.hasGlobalErrors) {
         <ul>
@@ -16,5 +20,7 @@
         }
         </ul>
     }
-    <button type="button" onclick="submitForm(this)">@Messages(constants.Form.ADD_ZONE)</button>
+    <button type="button" class="btn btn-primary btn-sm" onclick="submitForm(this)">@Messages(constants.Form.ADD_ZONE)</button>
+
+    </div>
 }

@@ -1,11 +1,16 @@
 @import models.master.Organization
+@import controllers.actions.LoginState
 
-@(organizationVerificationRequests: Seq[Organization])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
+@(organizationVerificationRequests: Seq[Organization])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 <script src="@routes.Assets.versioned("javascripts/kycVerification.js")" type="text/javascript"></script>
 <script src="@routes.Assets.versioned("javascripts/viewFiles.js")" type="text/javascript"></script>
 
-    @for(organizationVerificationRequest <- organizationVerificationRequests) {
-        <div class="flexItem box firstBox leftText lightBlue">
+@for(organizationVerificationRequest <- organizationVerificationRequests) {
+
+<div class="col-md-4">
+    <br>
+    <div class="card-body lightBlue documenet_details_card">
+        <div class="documenet_details">
             <span class="red">@Messages(constants.Form.ORGANIZATION_ID)</span> : @organizationVerificationRequest.id <br>
             <span class="red">@Messages(constants.Form.ZONE_ID)</span> : @organizationVerificationRequest.zoneID <br>
             <span class="red">@Messages(constants.Form.ACCOUNT_ID)</span> : @organizationVerificationRequest.accountID <br>
@@ -13,8 +18,19 @@
             <span class="red">@Messages(constants.Form.ADDRESS)</span> : @organizationVerificationRequest.address <br>
             <span class="red">@Messages(constants.Form.PHONE)</span> : @organizationVerificationRequest.phone <br>
             <span class="red">@Messages(constants.Form.EMAIL)</span> : @organizationVerificationRequest.email <br>
-            <span class="red">@Messages(constants.Form.DOCUMENTS)</span> : <span id = "kycDocuments@organizationVerificationRequest.accountID"><script>getOrganizationKycFilesToZone("@organizationVerificationRequest.accountID")</script></span> <br>
-            <button class="approve" onclick="getForm(jsRoutes.controllers.AddOrganizationController.verifyOrganizationForm('@organizationVerificationRequest.id', '@organizationVerificationRequest.zoneID'))">@Messages(constants.Form.APPROVE)</button> <button class="reject" onclick="getForm(jsRoutes.controllers.AddOrganizationController.rejectVerifyOrganizationRequestForm('@organizationVerificationRequest.id'))">@Messages(constants.Form.REJECT)</button>
+            <span class="red">@Messages(constants.Form.DOCUMENTS)</span> :
         </div>
-    }
-<br>
+        <span id = "kycDocuments@organizationVerificationRequest.accountID">
+            <script>getOrganizationKycFilesToZone("@organizationVerificationRequest.accountID")</script>
+        </span> <br>
+        <div class="final_verify_buttons">
+            <button class="btn btn-sm btn-success" onclick="getForm(jsRoutes.controllers.AddOrganizationController.verifyOrganizationForm('@organizationVerificationRequest.id', '@organizationVerificationRequest.zoneID'))">@Messages(constants.Form.APPROVE)</button>
+            <button class="btn btn-sm btn-danger" onclick="getForm(jsRoutes.controllers.AddOrganizationController.rejectVerifyOrganizationRequestForm('@organizationVerificationRequest.id'))">@Messages(constants.Form.REJECT)</button>
+        </div>
+    </div>
+    <br>
+</div>
+    <br>
+}
+
+

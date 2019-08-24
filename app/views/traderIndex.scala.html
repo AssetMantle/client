@@ -1,20 +1,9 @@
 @import controllers.actions.LoginState
-@import models.blockchain.ACLHash
+@import models.blockchain.ACL
 @import models.master.{Organization, Zone}
-@(totalFiat: Int, zone: Zone, organization: Organization, aclHash: ACLHash, failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+@(totalFiat: Int, zone: Zone, organization: Organization, failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
-@common(Messages(constants.User.HOME), failures, warnings, successes, infos)(Html(""))(center)(right)
-
-@right = {
-
-@if(aclHash.buyerExecuteOrder) {
-    <a onclick="getForm(jsRoutes.controllers.BuyerExecuteOrderController.buyerExecuteOrderForm())">@Messages(constants.Form.BUYER_EXECUTE_ORDER)</a>
-} <br>
-
-@if(aclHash.sellerExecuteOrder) {
-    <a onclick="getForm(jsRoutes.controllers.SellerExecuteOrderController.sellerExecuteOrderForm())">@Messages(constants.Form.SELLER_EXECUTE_ORDER)</a>
-} <br>
-}
+@common(Messages(constants.User.HOME), failures, warnings, successes, infos)(Html(""))(center)(Html(""))
 
 @center = {
     <div class="flexContainer">
@@ -37,20 +26,25 @@
             </div>
         </div>
     </div>
-
     <div class="flexContainer">
         <div class="flexGrowth flexItem box leftText">
             <div>
                 <h2 class="showHide toggleElement centerText" onclick="fetchOrShowHide('assetList', jsRoutes.controllers.ComponentViewController.assetList(), this)">@Messages(constants.User.ASSETS_OWNED) </h2>
                 <div class="centerText">
-                @if(aclHash.issueAsset) {
-                    <button onclick="getForm(jsRoutes.controllers.IssueAssetController.issueAssetRequestForm())">@Messages(constants.Form.ISSUE_ASSET_REQUEST)</button>
+                @loginState.acl match {
+                    case Some(acl) => {
+                        @if(acl.issueAsset) {
+                            <button onclick="getForm(jsRoutes.controllers.IssueAssetController.issueAssetRequestForm())">@Messages(constants.Form.ISSUE_ASSET_REQUEST)</button>
+                        }
+                    }
+                    case _ => {}
                 }
                 </div>
             </div>
             <div id="assetList" class="flexContainer"></div>
             <script type="text/javascript">
                     var assetCometMessage = function (event) {
+                        console.log(event.toString());
                         componentResource('assetList', jsRoutes.controllers.ComponentViewController.assetList());
                     }
             </script>
@@ -60,17 +54,23 @@
             <div>
                 <h2 class="showHide toggleElement centerText" onclick="fetchOrShowHide('fiatList', jsRoutes.controllers.ComponentViewController.fiatList(), this)">@Messages(constants.User.FIATS_OWNED): <span id="totalFiat">@totalFiat</span></h2>
                 <div class="centerText">
-                    @if(aclHash.issueFiat) {
-                        <button onclick="getForm(jsRoutes.controllers.IssueFiatController.issueFiatRequestForm())">@Messages(constants.Form.ISSUE_FIAT_REQUEST)</button>
-                    }
-                    @if(aclHash.redeemFiat) {
-                        <button onclick="getForm(jsRoutes.controllers.RedeemFiatController.redeemFiatForm('@loginState.address'))">@Messages(constants.Form.REDEEM_FIAT)</button>
-                    }
+                     @loginState.acl match {
+                        case Some(acl) => {
+                            @if(acl.issueFiat) {
+                                <button onclick="getForm(jsRoutes.controllers.IssueFiatController.issueFiatRequestForm())">@Messages(constants.Form.ISSUE_FIAT_REQUEST)</button>
+                            }
+                            @if(acl.redeemFiat) {
+                                <button onclick="getForm(jsRoutes.controllers.RedeemFiatController.redeemFiatForm('@loginState.address'))">@Messages(constants.Form.REDEEM_FIAT)</button>
+                            }
+                        }
+                        case _ => {}
+                     }
                 </div>
             </div>
             <div id="fiatList" class="flexContainer"></div>
             <script type="text/javascript">
                     var fiatCometMessage = function (event) {
+                        console.log(event.toString());
                         $('#totalFiat').html(event);
                         componentResource('fiatList', jsRoutes.controllers.ComponentViewController.fiatList());
                     }
@@ -96,6 +96,7 @@
                 </div>
                 <script type="text/javascript">
                         var negotiationCometMessage = function (event) {
+                            console.log(event.toString());
                             componentResource('buyNegotiationList', jsRoutes.controllers.ComponentViewController.buyNegotiationList());
                             componentResource('sellNegotiationList', jsRoutes.controllers.ComponentViewController.sellNegotiationList());
                         }
@@ -110,6 +111,7 @@
             <div id="orderList" class="flexContainer"></div>
             <script type="text/javascript">
                     var orderCometMessage = function (event) {
+                        console.log(event.toString());
                         componentResource('orderList', jsRoutes.controllers.ComponentViewController.orderList());
                     }
             </script>

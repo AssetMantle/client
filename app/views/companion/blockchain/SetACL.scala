@@ -1,16 +1,16 @@
 package views.companion.blockchain
 
 import play.api.data.Form
-import play.api.data.Forms.{mapping, nonEmptyText, boolean}
+import play.api.data.Forms.{boolean, mapping}
 
 object SetACL {
   val form = Form(
     mapping(
-      constants.Form.FROM -> nonEmptyText(minLength = 1, maxLength = 20),
-      constants.Form.PASSWORD -> nonEmptyText(minLength = 1, maxLength = 20),
-      constants.Form.ACL_ADDRESS -> nonEmptyText(minLength = 1, maxLength = 45),
-      constants.Form.ORGANIZATION_ID -> nonEmptyText(minLength = 1, maxLength = 20),
-      constants.Form.ZONE_ID -> nonEmptyText(minLength = 1, maxLength = 20),
+      constants.FormField.FROM.name -> constants.FormField.FROM.field,
+      constants.FormField.NON_EMPTY_PASSWORD.name -> constants.FormField.NON_EMPTY_PASSWORD.field,
+      constants.FormField.ACL_ADDRESS.name -> constants.FormField.ACL_ADDRESS.field,
+      constants.FormField.ORGANIZATION_ID.name -> constants.FormField.ORGANIZATION_ID.field,
+      constants.FormField.ZONE_ID.name -> constants.FormField.ZONE_ID.field,
       constants.Form.ISSUE_ASSET -> boolean,
       constants.Form.ISSUE_FIAT -> boolean,
       constants.Form.SEND_ASSET -> boolean,

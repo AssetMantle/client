@@ -6,16 +6,16 @@ import play.api.data.Forms._
 object IssueAsset {
   val form = Form(
     mapping(
-      constants.Form.FROM -> nonEmptyText(minLength = 1, maxLength = 20),
-      constants.Form.TO -> nonEmptyText(minLength = 1, maxLength = 45),
-      constants.Form.DOCUMENT_HASH -> nonEmptyText(minLength = 1, maxLength = 20),
-      constants.Form.ASSET_TYPE -> nonEmptyText(minLength = 1, maxLength = 20),
-      constants.Form.ASSET_PRICE -> number(min = 1, max = 10000),
-      constants.Form.QUANTITY_UNIT -> nonEmptyText(minLength = 1, maxLength = 20),
-      constants.Form.ASSET_QUANTITY -> number(min = 1, max = 10000),
+      constants.FormField.FROM.name -> constants.FormField.FROM.field,
+      constants.FormField.TO.name -> constants.FormField.TO.field,
+      constants.FormField.DOCUMENT_HASH.name -> constants.FormField.DOCUMENT_HASH.field,
+      constants.FormField.ASSET_TYPE.name -> constants.FormField.ASSET_TYPE.field,
+      constants.FormField.ASSET_PRICE.name -> constants.FormField.ASSET_PRICE.field,
+      constants.FormField.QUANTITY_UNIT.name -> constants.FormField.QUANTITY_UNIT.field,
+      constants.FormField.ASSET_QUANTITY.name -> constants.FormField.ASSET_QUANTITY.field,
       constants.Form.MODERATED -> boolean,
       constants.Form.TAKER_ADDRESS -> text(minLength = 45, maxLength = 45),
-      constants.Form.PASSWORD -> nonEmptyText(minLength = 1, maxLength = 20),
+      constants.FormField.NON_EMPTY_PASSWORD.name -> constants.FormField.NON_EMPTY_PASSWORD.field,
       constants.Form.MODE-> nonEmptyText(minLength = 4, maxLength = 5)
     )(Data.apply)(Data.unapply)
   )

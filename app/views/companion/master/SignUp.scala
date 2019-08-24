@@ -5,14 +5,14 @@ import play.api.data.Forms._
 
 object SignUp {
 
-
   val form = Form(
     mapping(
-      constants.Form.USERNAME -> nonEmptyText(minLength = 4, maxLength = 20),
-      constants.Form.PASSWORD -> nonEmptyText(minLength = 8, maxLength = 50)
-    )(Data.apply)(Data.unapply)
-  )
+      constants.FormField.SIGNUP_USERNAME.name -> constants.FormField.SIGNUP_USERNAME.field,
+      constants.Form.USERNAME_AVAILABLE -> boolean,
+      constants.FormField.SIGNUP_PASSWORD.name -> constants.FormField.SIGNUP_PASSWORD.field,
+      constants.FormField.SIGNUP_CONFIRM_PASSWORD.name -> constants.FormField.SIGNUP_CONFIRM_PASSWORD.field
+    )(Data.apply)(Data.unapply).verifying(constants.FormConstraint.signUpCheckConstraint))
 
-  case class Data(username: String, password: String)
+  case class Data(username: String, usernameAvailable: Boolean, password: String, confirmPassword: String)
 
 }

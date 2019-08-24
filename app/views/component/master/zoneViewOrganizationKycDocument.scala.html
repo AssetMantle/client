@@ -1,19 +1,20 @@
-@(id: String, documentType: String, status: Option[Boolean], fileName: String, file: Option[Array[Byte]])(implicit messagesProvider: MessagesProvider)
+@import controllers.actions.LoginState
+
+@(id: String, documentType: String, status: Option[Boolean], fileName: String, file: Option[Array[Byte]])(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
 <div>
     @utilities.FileOperations.fileExtensionFromName(fileName) match {
         case constants.File.PNG | constants.File.JPEG | constants.File.JPG => {
-            <li><a href="@routes.FileController.zoneAccessedOrganizationFile(id,fileName, documentType)">@Messages(documentType) <br>
+            <div class="document_images"> <a href="@routes.FileController.zoneAccessedOrganizationFile(id,fileName, documentType)">@Messages(documentType) <br>
             <img src="data:image/jpg;base64,@utilities.ImageProcess.decodeImageThumbnailData(file.get)" alt="@documentType">
             </a>
-                <br>
                 <div id="kycDocumentStatus@id@documentType">@status</div>
-            </li>
+            </div>
         }
         case _ => {
-            <li><a href="@routes.FileController.zoneAccessedOrganizationFile(id, fileName, documentType)">@Messages(documentType)</a>
+            <div class="document_images"> <a href="@routes.FileController.zoneAccessedOrganizationFile(id, fileName, documentType)">@Messages(documentType)</a>
                 <br>
                 <div id="kycDocumentStatus@id@documentType">@status</div>
-            </li>
+            </div>
         }
     }
 </div>

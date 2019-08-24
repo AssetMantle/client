@@ -2,14 +2,26 @@
 @import views.companion.blockchain.IssueFiat
 
 @(issueFiatForm: Form[IssueFiat.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+
 @form(action = routes.IssueFiatController.blockchainIssueFiat, 'onkeypress -> "validateForm(event,this)") {
+    <div class="latest_card-header latest_card-header-primary text-center">
+        <h4 class="latest_card-title">@Messages(constants.Form.ISSUE_FIAT)</h4>
+    </div>
+    <div>
+    <div class="latest_card-body">
     @CSRF.formField
-    @inputText(issueFiatForm(constants.Form.FROM), '_label -> Messages(constants.Form.FROM))
-    @inputText(issueFiatForm(constants.Form.TO), '_label -> Messages(constants.Form.TO))
-    @inputText(issueFiatForm(constants.Form.TRANSACTION_ID), '_label -> Messages(constants.Form.TRANSACTION_ID))
-    @inputText(issueFiatForm(constants.Form.TRANSACTION_AMOUNT), '_label -> Messages(constants.Form.TRANSACTION_AMOUNT))
-    @inputText(issueFiatForm(constants.Form.MODE), '_label -> Messages(constants.Form.MODE))
-    @inputPassword(issueFiatForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD))
+    @inputText(issueFiatForm(constants.Form.FROM), '_label -> Messages(constants.Form.FROM),'class -> "form-control",
+        'placeholder->Messages(constants.Form.FROM),'required->true)
+    @inputText(issueFiatForm(constants.Form.TO), '_label -> Messages(constants.Form.TO),'class -> "form-control",
+        'placeholder->Messages(constants.Form.TO),'required->true)
+    @inputText(issueFiatForm(constants.Form.TRANSACTION_ID), '_label -> Messages(constants.Form.TRANSACTION_ID),
+        'class -> "form-control",'placeholder->Messages(constants.Form.TRADER_ID),'required->true)
+    @inputText(issueFiatForm(constants.Form.TRANSACTION_AMOUNT), '_label -> Messages(constants.Form.TRANSACTION_AMOUNT),
+        'class -> "form-control",'placeholder->Messages(constants.Form.TRANSACTION_AMOUNT),'required->true)
+    @inputText(issueFiatForm(constants.Form.MODE), '_label -> Messages(constants.Form.MODE),'class -> "form-control",
+        'placeholder->Messages(constants.Form.MODE),'required->true)
+    @inputPassword(issueFiatForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD),
+        'class -> "form-control",'placeholder->Messages(constants.Form.PASSWORD),'required->true)
 
     @if(issueFiatForm.hasGlobalErrors) {
         <ul>
@@ -18,5 +30,8 @@
         }
         </ul>
     }
-    <button type="button" onclick="submitForm(this)">@Messages(constants.Form.ISSUE_FIAT)</button>
-}
+    <button type="button" class="btn btn-primary btn-sm" onclick="submitForm(this)">@Messages(constants.Form.ISSUE_FIAT)</button>
+    </div>
+    </div>
+
+    }

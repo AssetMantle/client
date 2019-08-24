@@ -6,7 +6,7 @@ import play.api.data.Forms._
 object VerifyMobileNumber {
   val form = Form(
     mapping(
-      constants.Form.OTP -> nonEmptyText(minLength = 4, maxLength = 6),
+      constants.FormField.OTP.name -> constants.FormField.OTP.field
     )(Data.apply)(Data.unapply)
   )
   case class Data(otp: String)

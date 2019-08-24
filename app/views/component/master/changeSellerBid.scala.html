@@ -1,23 +1,28 @@
+@import controllers.actions.LoginState
 @import helper._
 @import views.companion.master.ChangeSellerBid
 
-@(changeSellerBidForm: Form[ChangeSellerBid.Data], buyerAddress:String, pegHash:String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@(changeSellerBidForm: Form[ChangeSellerBid.Data], buyerAddress: String, pegHash: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @form(action = routes.ChangeSellerBidController.changeSellerBid, 'onkeypress -> "validateForm(event,this)") {
-    @CSRF.formField
-    @inputText(changeSellerBidForm(constants.Form.BUYER_ADDRESS).copy(value = Some(buyerAddress)), '_label -> Messages(constants.Form.BUYER_ADDRESS))
-    @inputText(changeSellerBidForm(constants.Form.BID), '_label -> Messages(constants.Form.BID))
-    @inputText(changeSellerBidForm(constants.Form.TIME), '_label -> Messages(constants.Form.TIME))
-    @inputText(changeSellerBidForm(constants.Form.PEG_HASH).copy(value = Some(pegHash)), '_label -> Messages(constants.Form.PEG_HASH))
-    @inputPassword(changeSellerBidForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD))
+    <div class="latest_card-header latest_card-header-primary text-center">
+        <h4 class="latest_card-title">@Messages(constants.Form.CHANGE_SELLER_BID)</h4>
+    </div>
+    <div class="latest_card-body">
+        @CSRF.formField
+        @inputText(changeSellerBidForm(constants.Form.BUYER_ADDRESS).copy(value = Some(buyerAddress)), '_label -> Messages(constants.Form.BUYER_ADDRESS), 'class -> "form-control", 'placeholder -> "Buyer Address", 'required -> true)
+        @inputText(changeSellerBidForm(constants.Form.BID), '_label -> Messages(constants.Form.BID), 'class -> "form-control", 'placeholder -> Messages(constants.Form.BID), 'required -> true)
+        @inputText(changeSellerBidForm(constants.Form.TIME), '_label -> Messages(constants.Form.TIME), 'class -> "form-control", 'placeholder -> Messages(constants.Form.TIME), 'required -> true)
+        @inputText(changeSellerBidForm(constants.Form.PEG_HASH).copy(value = Some(pegHash)), '_label -> Messages(constants.Form.PEG_HASH), 'class -> "form-control", 'placeholder -> Messages(constants.Form.PEG_HASH), 'required -> true)
+        @inputPassword(changeSellerBidForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD), 'class -> "form-control", 'placeholder -> Messages(constants.Form.PASSWORD), 'required -> true)
 
-    @if(changeSellerBidForm.hasGlobalErrors) {
-        <ul>
-        @for(error <- changeSellerBidForm.globalErrors) {
-            <li>@error.format</li>
+        @if(changeSellerBidForm.hasGlobalErrors) {
+            <ul>
+            @for(error <- changeSellerBidForm.globalErrors) {
+                <li>@error.format</li>
+            }
+            </ul>
         }
-        </ul>
-    }
-    <button type="button" onclick="submitForm(this)">@Messages(constants.Form.CHANGE_SELLER_BID)</button>
+        <button type="button" class="btn btn-sm btn-primary" onclick="submitForm(this)">@Messages(constants.Form.CHANGE_SELLER_BID)</button>
+    </div>
 }
-
 

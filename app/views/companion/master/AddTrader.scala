@@ -8,9 +8,9 @@ object AddTrader {
 
   val form = Form(
     mapping(
-      constants.Form.ZONE_ID -> nonEmptyText(minLength = 8, maxLength = 50),
-      constants.Form.ORGANIZATION_ID -> nonEmptyText(minLength = 8, maxLength = 50),
-      constants.Form.NAME -> nonEmptyText(minLength = 8, maxLength = 50),
+      constants.FormField.ZONE_ID.name -> constants.FormField.ZONE_ID.field,
+      constants.FormField.ORGANIZATION_ID.name -> constants.FormField.ORGANIZATION_ID.field,
+      constants.FormField.NAME.name -> constants.FormField.NAME.field,
     )(Data.apply)(Data.unapply)
   )
 

@@ -1,13 +1,52 @@
+@import controllers.actions.LoginState
 @import models.blockchain.Order
 
-@(orders: Seq[Order])(implicit messagesProvider: MessagesProvider)
+@(unModeratedBuyOrders: Seq[Order], unModeratedSellOrders: Seq[Order], moderatedOrders: Seq[Order])(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
 
-@for(order <- orders) {
+@for(unModeratedBuyOrder <- unModeratedBuyOrders) {
     <div class="flexItem thirdBox box lightBlue">
         <div class="leftText">
-            <span class="red">@Messages(constants.Form.ID)</span> : @order.id <br>
-            <span class="red">@Messages(constants.Form.AWB_PROOF_HASH)</span> : @order.awbProofHash <br>
-            <span class="red">@Messages(constants.Form.FIAT_PROOF_HASH)</span> : @order.fiatProofHash <br>
+            <span class="red">@Messages(constants.Form.ID)</span> : @unModeratedBuyOrder.id <br>
+            <span class="red">@Messages(constants.Form.AWB_PROOF_HASH)</span> : @unModeratedBuyOrder.awbProofHash <br>
+            <span class="red">@Messages(constants.Form.FIAT_PROOF_HASH)</span> : @unModeratedBuyOrder.fiatProofHash <br>
+            <div class="centerText" >
+            @loginState.acl match {
+                case Some(acl) => {
+                    @if(acl.buyerExecuteOrder) {
+                        <button class="width btn btn-primary btn-sm" onclick="getForm(jsRoutes.controllers.BuyerExecuteOrderController.buyerExecuteOrderForm('@unModeratedBuyOrder.id'))">@Messages(constants.Form.BUYER_EXECUTE_ORDER)</button>
+                    } <br>
+                    }
+                case _ => {}
+            }
+            </div>
+        </div>
+    </div>
+}
+
+@for(unModeratedSellOrder <- unModeratedSellOrders) {
+    <div class="flexItem thirdBox box lightBlue">
+        <div class="leftText">
+            <span class="red">@Messages(constants.Form.ID)</span> : @unModeratedSellOrder.id <br>
+            <span class="red">@Messages(constants.Form.AWB_PROOF_HASH)</span> : @unModeratedSellOrder.awbProofHash <br>
+            <span class="red">@Messages(constants.Form.FIAT_PROOF_HASH)</span> : @unModeratedSellOrder.fiatProofHash <br>
+            <div class="centerText" >
+            @loginState.acl match {
+                case Some(acl) => {
+                    @if(acl.sellerExecuteOrder) {
+                        <button class="width btn btn-primary btn-sm" onclick="getForm(jsRoutes.controllers.SellerExecuteOrderController.sellerExecuteOrderForm('@unModeratedSellOrder.id'))">@Messages(constants.Form.SELLER_EXECUTE_ORDER)</button>
+                    } <br>}
+                case _ => {}
+            }
+            </div>
+        </div>
+    </div>
+}
+@for(moderatedOrder <- moderatedOrders) {
+    <div class="flexItem thirdBox box lightBlue">
+        <div class="leftText">
+            <span class="red">@Messages(constants.Form.ID)</span> : @moderatedOrder.id <br>
+            <span class="red">@Messages(constants.Form.AWB_PROOF_HASH)</span> : @moderatedOrder.awbProofHash <br>
+            <span class="red">@Messages(constants.Form.FIAT_PROOF_HASH)</span> : @moderatedOrder.fiatProofHash <br>
         </div>
     </div>
 }

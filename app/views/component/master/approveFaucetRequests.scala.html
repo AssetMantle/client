@@ -1,12 +1,20 @@
 @import helper._
 @import views.companion.master.ApproveFaucetRequest
+@import controllers.actions.LoginState
 
-@(approveFaucetRequestForm: Form[ApproveFaucetRequest.Data], requestID: String, accountID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@(approveFaucetRequestForm: Form[ApproveFaucetRequest.Data], requestID: String, accountID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @form(action = routes.SendCoinController.approveFaucetRequests, 'onkeypress -> "validateForm(event,this)") {
+    <div class="latest_card-header latest_card-header-primary text-center">
+        <h4 class="latest_card-title">@Messages(constants.Form.SEND_COIN)</h4>
+    </div>
+    <div class="latest_card-body">
     @CSRF.formField
-    @inputText(approveFaucetRequestForm(constants.Form.REQUEST_ID).copy(value = Some(requestID)), '_label -> Messages(constants.Form.REQUEST_ID))
-    @inputText(approveFaucetRequestForm(constants.Form.ACCOUNT_ID).copy(value = Some(accountID)), '_label -> Messages(constants.Form.ACCOUNT_ID))
-    @inputPassword(approveFaucetRequestForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD))
+    @inputText(approveFaucetRequestForm(constants.Form.REQUEST_ID).copy(value = Some(requestID)),
+        '_label -> Messages(constants.Form.REQUEST_ID),'placeholder->Messages(constants.Form.REQUEST_ID),'required->true,'class -> "form-control")
+    @inputText(approveFaucetRequestForm(constants.Form.ACCOUNT_ID).copy(value = Some(accountID)),
+        '_label -> Messages(constants.Form.ACCOUNT_ID),'placeholder->Messages(constants.Form.ACCOUNT_ID),'required->true,'class -> "form-control")
+    @inputPassword(approveFaucetRequestForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD),
+        'placeholder->Messages(constants.Form.PASSWORD),'required->true,'class -> "form-control")
 
     @if(approveFaucetRequestForm.hasGlobalErrors) {
         <ul>
@@ -15,5 +23,6 @@
         }
         </ul>
     }
-    <button type="button" onclick="submitForm(this)">@Messages(constants.Form.SEND_COIN)</button>
+    <button type="button" class="btn btn-primary btn-sm" onclick="submitForm(this)">@Messages(constants.Form.SEND_COIN)</button>
+    </div>
 }

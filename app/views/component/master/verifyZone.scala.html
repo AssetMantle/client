@@ -1,11 +1,18 @@
 @import helper._
 @import views.companion.master.VerifyZone
+@import controllers.actions.LoginState
 
-@(verifyZoneForm: Form[VerifyZone.Data], zoneID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@(verifyZoneForm: Form[VerifyZone.Data], zoneID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @form(action = routes.AddZoneController.verifyZone, 'onkeypress -> "validateForm(event,this)") {
+    <div class="latest_card-header latest_card-header-primary text-center">
+        <h4 class="latest_card-title">@Messages(constants.Form.VERIFY_ZONE)</h4>
+    </div>
+    <div class="latest_card-body">
     @CSRF.formField
-    @inputText(verifyZoneForm(constants.Form.ZONE_ID).copy(value = Some(zoneID)), '_label -> Messages(constants.Form.ZONE_ID))
-    @inputPassword(verifyZoneForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD))
+    @inputText(verifyZoneForm(constants.Form.ZONE_ID).copy(value = Some(zoneID)), '_label -> Messages(constants.Form.ZONE_ID),
+        'class -> "form-control",'placeholder->Messages(constants.Form.ZONE_ID),'required->true)
+    @inputPassword(verifyZoneForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD),
+        'class -> "form-control",'placeholder->Messages(constants.Form.PASSWORD),'required->true)
     @if(verifyZoneForm.hasGlobalErrors) {
         <ul>
         @for(error <- verifyZoneForm.globalErrors) {
@@ -13,5 +20,7 @@
         }
         </ul>
     }
-    <button type="button" onclick="submitForm(this)">@Messages(constants.Form.VERIFY_ZONE)</button>
+    <button type="button" class="btn btn-sm btn-primary" onclick="submitForm(this)">@Messages(constants.Form.VERIFY_ZONE)</button>
+
+    </div>
 }

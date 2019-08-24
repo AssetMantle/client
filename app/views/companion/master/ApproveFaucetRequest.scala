@@ -7,9 +7,9 @@ object ApproveFaucetRequest {
 
   val form = Form(
     mapping(
-      constants.Form.REQUEST_ID -> nonEmptyText(minLength = 1, maxLength = 45),
-      constants.Form.ACCOUNT_ID -> nonEmptyText(minLength = 1, maxLength = 45),
-      constants.Form.PASSWORD -> nonEmptyText(minLength = 1, maxLength = 20),
+      constants.FormField.REQUEST_ID.name -> constants.FormField.REQUEST_ID.field,
+      constants.FormField.ACCOUNT_ID.name -> constants.FormField.ACCOUNT_ID.field,
+      constants.FormField.NON_EMPTY_PASSWORD.name -> constants.FormField.NON_EMPTY_PASSWORD.field,
     )(Data.apply)(Data.unapply)
   )
 

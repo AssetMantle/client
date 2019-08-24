@@ -1,12 +1,20 @@
 @import helper._
 @import views.companion.master.AddTrader
+@import controllers.actions.LoginState
 
-@(addTraderForm: Form[AddTrader.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@(addTraderForm: Form[AddTrader.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @form(action = routes.SetACLController.addTrader, 'onkeypress -> "validateForm(event,this)") {
+    <div class="latest_card-header latest_card-header-primary text-center">
+        <h4 class="latest_card-title">@Messages(constants.Form.ADD_TRADER)</h4>
+    </div>
+    <div class="latest_card-body">
     @CSRF.formField
-    @inputText(addTraderForm(constants.Form.ZONE_ID), '_label -> Messages(constants.Form.ZONE_ID))
-    @inputText(addTraderForm(constants.Form.ORGANIZATION_ID), '_label -> Messages(constants.Form.ORGANIZATION_ID))
-    @inputText(addTraderForm(constants.Form.NAME), '_label -> Messages(constants.Form.NAME))
+    @inputText(addTraderForm(constants.Form.ZONE_ID), '_label -> Messages(constants.Form.ZONE_ID),
+        'placeholder->Messages(constants.Form.ZONE_ID),'required->true,'class -> "form-control")
+    @inputText(addTraderForm(constants.Form.ORGANIZATION_ID), '_label -> Messages(constants.Form.ORGANIZATION_ID),
+        'placeholder->Messages(constants.Form.ORGANIZATION_ID),'required->true,'class -> "form-control")
+    @inputText(addTraderForm(constants.Form.NAME), '_label -> Messages(constants.Form.NAME),
+        'placeholder->Messages(constants.Form.NAME),'required->true,'class -> "form-control")
 
 
     @if(addTraderForm.hasGlobalErrors) {
@@ -16,5 +24,6 @@
         }
         </ul>
     }
-    <button type="button" onclick="submitForm(this)">@Messages(constants.Form.ADD_TRADER)</button>
-}
+    <button type="button" class="btn btn-primary btn-sm" onclick="submitForm(this)">@Messages(constants.Form.ADD_TRADER)</button>
+    </div>
+    }

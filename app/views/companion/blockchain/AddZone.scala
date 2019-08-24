@@ -6,10 +6,10 @@ import play.api.data.Forms._
 object AddZone {
   val form = Form(
     mapping(
-      constants.Form.FROM -> nonEmptyText(minLength = 1, maxLength = 20),
-      constants.Form.TO -> nonEmptyText(minLength = 1, maxLength = 45),
-      constants.Form.ZONE_ID -> nonEmptyText(minLength = 1, maxLength = 20),
-      constants.Form.PASSWORD -> nonEmptyText(minLength = 1, maxLength = 20)
+      constants.FormField.FROM.name -> constants.FormField.FROM.field,
+      constants.FormField.TO.name -> constants.FormField.TO.field,
+      constants.FormField.ZONE_ID.name -> constants.FormField.ZONE_ID.field,
+      constants.FormField.NON_EMPTY_PASSWORD.name -> constants.FormField.NON_EMPTY_PASSWORD.field
 
     )(Data.apply)(Data.unapply)
   )

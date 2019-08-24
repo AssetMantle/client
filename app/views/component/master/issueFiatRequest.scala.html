@@ -1,11 +1,18 @@
 @import helper._
 @import views.companion.master.IssueFiatRequest
+@import controllers.actions.LoginState
 
-@(issueFiatRequestForm: Form[IssueFiatRequest.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@(issueFiatRequestForm: Form[IssueFiatRequest.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @form(action = routes.IssueFiatController.issueFiatRequest, 'onkeypress -> "validateForm(event,this)") {
+    <div class="latest_card-header latest_card-header-primary text-center">
+        <h4 class="latest_card-title">@Messages(constants.Form.ISSUE_FIAT)</h4>
+    </div>
+    <div class="latest_card-body">
     @CSRF.formField
-    @inputText(issueFiatRequestForm(constants.Form.TRANSACTION_ID), '_label -> Messages(constants.Form.TRANSACTION_ID))
-    @inputText(issueFiatRequestForm(constants.Form.TRANSACTION_AMOUNT), '_label -> Messages(constants.Form.TRANSACTION_AMOUNT))
+    @inputText(issueFiatRequestForm(constants.Form.TRANSACTION_ID), '_label -> Messages(constants.Form.TRANSACTION_ID),
+        'class -> "form-control",'placeholder->Messages(constants.Form.TRANSACTION_ID),'required->true)
+    @inputText(issueFiatRequestForm(constants.Form.TRANSACTION_AMOUNT), '_label -> Messages(constants.Form.TRANSACTION_AMOUNT),
+        'class -> "form-control",'placeholder->Messages(constants.Form.TRANSACTION_AMOUNT),'required->true)
 
     @if(issueFiatRequestForm.hasGlobalErrors) {
         <ul>
@@ -14,5 +21,7 @@
         }
         </ul>
     }
-    <button type="button" onclick="submitForm(this)">@Messages(constants.Form.ISSUE_FIAT)</button>
+    <button type="button" class="btn btn-sm btn-primary" onclick="submitForm(this)">@Messages(constants.Form.ISSUE_FIAT)</button>
+    </div>
+
 }

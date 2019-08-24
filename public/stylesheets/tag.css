@@ -1,3 +1,4 @@
+
 html {
     height: 100%;
 }
@@ -17,8 +18,8 @@ input:hover {
 }
 
 button {
-    background-color: #0006b8;
-    color: white;
+    background-color:#EEF9FF;
+    color: #1B7FBD;
     padding: 10px 15px;
     border-radius: 5px;
     margin: 5px 0;
@@ -43,4 +44,7 @@ a:hover {
 
 h2 {
     color: white;
+}
+label{
+    display: none !important;
 }

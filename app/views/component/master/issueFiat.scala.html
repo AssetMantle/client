@@ -1,14 +1,26 @@
 @import helper._
 @import views.companion.master.IssueFiat
+@import controllers.actions.LoginState
 
-@(issueFiatForm: Form[IssueFiat.Data], requestID: String, accountID: String, transactionID: String, transactionAmount: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@(issueFiatForm: Form[IssueFiat.Data], requestID: String, accountID: String, transactionID: String, transactionAmount: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+
 @form(action = routes.IssueFiatController.issueFiat, 'onkeypress -> "validateForm(event,this)") {
+    <div class="latest_card-header latest_card-header-primary text-center">
+        <h4 class="latest_card-title">@Messages(constants.Form.ISSUE_FIAT)</h4>
+    </div>
+    <div>
+   <div class="latest_card-body">
     @CSRF.formField
-    @inputText(issueFiatForm(constants.Form.REQUEST_ID).copy(value = Some(requestID)), '_label -> Messages(constants.Form.REQUEST_ID))
-    @inputText(issueFiatForm(constants.Form.ACCOUNT_ID).copy(value = Some(accountID)), '_label -> Messages(constants.Form.ACCOUNT_ID))
-    @inputText(issueFiatForm(constants.Form.TRANSACTION_ID).copy(value = Some(transactionID)), '_label -> Messages(constants.Form.TRANSACTION_ID))
-    @inputText(issueFiatForm(constants.Form.TRANSACTION_AMOUNT).copy(value = Some(transactionAmount.toString)), '_label -> Messages(constants.Form.TRANSACTION_AMOUNT))
-    @inputPassword(issueFiatForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD))
+    @inputText(issueFiatForm(constants.Form.REQUEST_ID).copy(value = Some(requestID)), '_label -> Messages(constants.Form.REQUEST_ID),
+        'class -> "form-control",'placeholder->Messages(constants.Form.REQUEST_ID),'required->true)
+    @inputText(issueFiatForm(constants.Form.ACCOUNT_ID).copy(value = Some(accountID)), '_label -> Messages(constants.Form.ACCOUNT_ID),
+        'class -> "form-control",'placeholder->Messages(constants.Form.ACCOUNT_ID),'required->true)
+    @inputText(issueFiatForm(constants.Form.TRANSACTION_ID).copy(value = Some(transactionID)), '_label -> Messages(constants.Form.TRANSACTION_ID),
+        'class -> "form-control",'placeholder->Messages(constants.Form.TRANSACTION_ID),'required->true)
+    @inputText(issueFiatForm(constants.Form.TRANSACTION_AMOUNT).copy(value = Some(transactionAmount.toString)), '_label -> Messages(constants.Form.TRANSACTION_AMOUNT),
+        'class -> "form-control",'placeholder->Messages(constants.Form.TRANSACTION_AMOUNT),'required->true)
+    @inputPassword(issueFiatForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD),
+        'class -> "form-control",'placeholder->Messages(constants.Form.PASSWORD),'required->true)
 
     @if(issueFiatForm.hasGlobalErrors) {
         <ul>
@@ -17,5 +29,8 @@
         }
         </ul>
     }
-    <button type="button" onclick="submitForm(this)">@Messages(constants.Form.ISSUE_FIAT)</button>
-}
+    <button type="button" class="btn btn-sm btn-primary" onclick="submitForm(this)">@Messages(constants.Form.ISSUE_FIAT)</button>
+
+   </div>
+    </div>
+   }

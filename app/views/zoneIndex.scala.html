@@ -5,21 +5,31 @@
 @common(Messages(constants.User.HOME), failures, warnings, successes, infos )(Html(""))(center)(Html(""))
 
 @center = {
-    <div class="flexContainer">
-        <div id="commonHome" class="box flexItem flexGrowth"></div>
-        <div class="flexItem box leftAlign flexGrowth">
-            <div>
-                <h2 class="showHide toggleElement centerText">@Messages(constants.Form.ZONE):</h2>
+    <div class="row">
+        <div class="col-md-8 d-flex align-items-stretch">
+                 <div id="commonHome" class="flexItem flexGrowth"></div>
+        </div>
+        <div class="col-md-4 flexItem flexGrowth leftText d-flex align-items-stretch">
+        <div class="card">
+            <div class="card-header ">
+                <span class="heading">@Messages(constants.Form.ZONE):</span>
             </div>
+            <div class="card-body">
             <div id="zone">
             </div>
-        </div>
-        <div class="flexGrowth flexItem box leftText">
-            <div>
-                <h2 class="showHide toggleElement centerText">@Messages(constants.Form.GENESIS)</h2>
             </div>
-            <div id="genesisDetails" class ="flexContainer"></div>
         </div>
+        </div>
+        <div class="col-md-12 flexGrowth flexItem d-flex align-items-stretch">
+        <div class="card">
+            <div class="card-header leftText">
+                <span class="heading">@Messages(constants.Form.GENESIS)</span>
+            </div>
+            <div class="card-body">
+               <div id="genesisDetails" class ="flexContainer"></div>
+            </div>
+        </div>
+    </div>
     </div>
     <div class="centerText">
         <button onclick="getForm(jsRoutes.controllers.FileController.updateZoneKycForm('@constants.File.BANK_DETAILS'))">@Messages(constants.Form.UPDATE_ZONE_BANK_DETAILS)</button>

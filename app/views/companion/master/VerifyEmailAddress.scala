@@ -8,7 +8,7 @@ object VerifyEmailAddress {
 
   val form = Form(
     mapping(
-      constants.Form.OTP -> nonEmptyText(minLength = 6, maxLength = 6),
+      constants.FormField.OTP.name -> constants.FormField.OTP.field,
     )(Data.apply)(Data.unapply)
   )
 
