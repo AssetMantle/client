@@ -7,11 +7,11 @@ object AddOrganization {
 
   val form = Form(
     mapping(
-      constants.Form.FROM -> nonEmptyText(minLength = 1, maxLength = 20),
-      constants.Form.TO -> nonEmptyText(minLength = 1, maxLength = 45),
-      constants.Form.ORGANIZATION_ID -> nonEmptyText(minLength = 1, maxLength = 20),
-      constants.Form.ZONE_ID -> nonEmptyText(minLength = 1, maxLength = 20),
-      constants.Form.PASSWORD -> nonEmptyText(minLength = 1, maxLength = 20)
+      constants.FormField.FROM.name -> constants.FormField.FROM.field,
+      constants.FormField.TO.name -> constants.FormField.TO.field,
+      constants.FormField.ORGANIZATION_ID.name -> constants.FormField.ORGANIZATION_ID.field,
+      constants.FormField.ZONE_ID.name -> constants.FormField.ZONE_ID.field,
+      constants.FormField.PASSWORD.name -> constants.FormField.PASSWORD.field
     )(Data.apply)(Data.unapply)
   )
 

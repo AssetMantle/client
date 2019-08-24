@@ -1,14 +1,14 @@
 package views.companion.blockchain
 
 import play.api.data.Form
-import play.api.data.Forms.{mapping, nonEmptyText}
+import play.api.data.Forms.mapping
 
 object AddKey {
   val form = Form(
     mapping(
-      constants.Form.NAME -> nonEmptyText(minLength = 1, maxLength = 20),
-      constants.Form.PASSWORD -> nonEmptyText(minLength = 1, maxLength = 20),
-      constants.Form.SEED -> nonEmptyText(minLength = 1, maxLength = 200)
+      constants.FormField.NAME.name -> constants.FormField.NAME.field,
+      constants.FormField.PASSWORD.name -> constants.FormField.PASSWORD.field,
+      constants.FormField.SEED.name -> constants.FormField.SEED.field
     )(Data.apply)(Data.unapply)
   )
 

@@ -6,14 +6,14 @@ import play.api.data.Forms._
 object ConfirmSellerBid {
   val form = Form(
     mapping(
-      constants.Form.FROM -> nonEmptyText(minLength = 1, maxLength = 20),
-      constants.Form.PASSWORD -> nonEmptyText(minLength = 1, maxLength = 20),
-      constants.Form.TO -> nonEmptyText(minLength = 1, maxLength = 45),
-      constants.Form.BID -> number(min = 1, max = 10000),
-      constants.Form.TIME -> number(min = 1, max = 10000),
-      constants.Form.PEG_HASH -> nonEmptyText(minLength = 1, maxLength = 20),
-      constants.Form.SELLER_CONTRACT_HASH -> nonEmptyText(minLength = 5, maxLength = 40),
-      constants.Form.GAS -> number(min = 1, max = 10000)
+      constants.FormField.FROM.name -> constants.FormField.FROM.field,
+      constants.FormField.PASSWORD.name -> constants.FormField.PASSWORD.field,
+      constants.FormField.TO.name -> constants.FormField.TO.field,
+      constants.FormField.BID.name -> constants.FormField.BID.field,
+      constants.FormField.TIME.name -> constants.FormField.TIME.field,
+      constants.FormField.PEG_HASH.name -> constants.FormField.PEG_HASH.field,
+      constants.FormField.SELLER_CONTRACT_HASH.name -> constants.FormField.SELLER_CONTRACT_HASH.field,
+      constants.FormField.GAS.name -> constants.FormField.GAS.field
     )(Data.apply)(Data.unapply)
   )
 
