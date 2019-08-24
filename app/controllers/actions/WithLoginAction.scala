@@ -26,10 +26,8 @@ class WithLoginAction @Inject()(messagesControllerComponents: MessagesController
         f(LoginState(username, userType, address, if (userType == constants.User.TRADER) Option(blockchainACLHashes.Service.getACL(blockchainACLAccounts.Service.getACLHash(address))) else null))(request)
       }
       catch {
-        case baseException: BaseException => {
-          logger.info(baseException.failure.message, baseException)
+        case baseException: BaseException => logger.info(baseException.failure.message, baseException)
           Results.Unauthorized(views.html.index()).withNewSession
-        }
       }
     }
   }

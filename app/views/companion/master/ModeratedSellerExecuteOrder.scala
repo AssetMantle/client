@@ -6,7 +6,7 @@ import play.api.data.Forms._
 object ModeratedSellerExecuteOrder {
   val form = Form(
     mapping(
-      constants.FormField.PASSWORD.name -> constants.FormField.PASSWORD.field,
+      constants.FormField.NON_EMPTY_PASSWORD.name -> constants.FormField.NON_EMPTY_PASSWORD.field,
       constants.FormField.BUYER_ADDRESS.name -> constants.FormField.BUYER_ADDRESS.field,
       constants.FormField.SELLER_ADDRESS.name -> constants.FormField.SELLER_ADDRESS.field,
       constants.FormField.AWB_PROOF_HASH.name -> constants.FormField.AWB_PROOF_HASH.field,

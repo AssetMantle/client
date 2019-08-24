@@ -7,7 +7,7 @@ object AddKey {
   val form = Form(
     mapping(
       constants.FormField.NAME.name -> constants.FormField.NAME.field,
-      constants.FormField.PASSWORD.name -> constants.FormField.PASSWORD.field,
+      constants.FormField.NON_EMPTY_PASSWORD.name -> constants.FormField.NON_EMPTY_PASSWORD.field,
       constants.FormField.SEED.name -> constants.FormField.SEED.field
     )(Data.apply)(Data.unapply)
   )

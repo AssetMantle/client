@@ -11,7 +11,7 @@ object AddOrganization {
       constants.FormField.TO.name -> constants.FormField.TO.field,
       constants.FormField.ORGANIZATION_ID.name -> constants.FormField.ORGANIZATION_ID.field,
       constants.FormField.ZONE_ID.name -> constants.FormField.ZONE_ID.field,
-      constants.FormField.PASSWORD.name -> constants.FormField.PASSWORD.field
+      constants.FormField.NON_EMPTY_PASSWORD.name -> constants.FormField.NON_EMPTY_PASSWORD.field
     )(Data.apply)(Data.unapply)
   )
 

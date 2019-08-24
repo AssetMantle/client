@@ -13,7 +13,7 @@ object IssueAsset {
       constants.FormField.ASSET_PRICE.name -> constants.FormField.ASSET_PRICE.field,
       constants.FormField.QUANTITY_UNIT.name -> constants.FormField.QUANTITY_UNIT.field,
       constants.FormField.ASSET_QUANTITY.name -> constants.FormField.ASSET_QUANTITY.field,
-      constants.FormField.PASSWORD.name -> constants.FormField.PASSWORD.field,
+      constants.FormField.NON_EMPTY_PASSWORD.name -> constants.FormField.NON_EMPTY_PASSWORD.field,
       constants.FormField.GAS.name -> constants.FormField.GAS.field
     )(Data.apply)(Data.unapply)
   )

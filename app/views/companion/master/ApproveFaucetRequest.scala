@@ -9,7 +9,7 @@ object ApproveFaucetRequest {
     mapping(
       constants.FormField.REQUEST_ID.name -> constants.FormField.REQUEST_ID.field,
       constants.FormField.ACCOUNT_ID.name -> constants.FormField.ACCOUNT_ID.field,
-      constants.FormField.PASSWORD.name -> constants.FormField.PASSWORD.field,
+      constants.FormField.NON_EMPTY_PASSWORD.name -> constants.FormField.NON_EMPTY_PASSWORD.field,
       constants.FormField.GAS.name -> constants.FormField.GAS.field
     )(Data.apply)(Data.unapply)
   )

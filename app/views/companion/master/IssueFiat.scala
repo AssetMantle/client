@@ -10,7 +10,7 @@ object IssueFiat {
       constants.FormField.ACCOUNT_ID.name -> constants.FormField.ACCOUNT_ID.field,
       constants.FormField.TRANSACTION_ID.name -> constants.FormField.TRANSACTION_ID.field,
       constants.FormField.TRANSACTION_AMOUNT.name -> constants.FormField.TRANSACTION_AMOUNT.field,
-      constants.FormField.PASSWORD.name -> constants.FormField.PASSWORD.field,
+      constants.FormField.NON_EMPTY_PASSWORD.name -> constants.FormField.NON_EMPTY_PASSWORD.field,
       constants.FormField.GAS.name -> constants.FormField.GAS.field
     )(Data.apply)(Data.unapply)
   )

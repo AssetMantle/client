@@ -6,7 +6,7 @@ import play.api.data.Forms.{boolean, mapping}
 object VerifyTrader {
   val form = Form(
     mapping(
-      constants.FormField.PASSWORD.name -> constants.FormField.PASSWORD.field,
+      constants.FormField.NON_EMPTY_PASSWORD.name -> constants.FormField.NON_EMPTY_PASSWORD.field,
       constants.FormField.ACL_ADDRESS.name -> constants.FormField.ACL_ADDRESS.field,
       constants.FormField.ORGANIZATION_ID.name -> constants.FormField.ORGANIZATION_ID.field,
       constants.Form.ISSUE_ASSET -> boolean,

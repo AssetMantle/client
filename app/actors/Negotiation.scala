@@ -30,7 +30,8 @@ class MainNegotiationActor @Inject()(actorTimeout: FiniteDuration, actorSystem: 
   def receive = {
     case negotiationCometMessage: blockchain.NegotiationCometMessage =>
       actorSystem.actorSelection("/user/" + constants.Module.ACTOR_MAIN_NEGOTIATION + "/" + negotiationCometMessage.username).resolveOne().onComplete {
-        case Success(actorRef) => actorRef ! negotiationCometMessage
+        case Success(actorRef) => logger.info(module + " " + negotiationCometMessage.username + ": " + negotiationCometMessage.message)
+          actorRef ! negotiationCometMessage
         case Failure(ex) => logger.info(module + ": " + ex.getMessage)
       }
     case createNegotiationChildActorMessage: CreateNegotiationChildActorMessage => context.actorOf(props = UserNegotiationActor.props(createNegotiationChildActorMessage.actorRef, actorTimeout), name = createNegotiationChildActorMessage.username)
