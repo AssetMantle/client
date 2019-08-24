@@ -1,6 +1,6 @@
 package controllers
 
-import controllers.actions.{WithGenesisLoginAction, WithLoginAction, WithOrganizationLoginAction, WithTraderLoginAction, WithZoneLoginAction}
+import controllers.actions.{WithGenesisLoginAction, WithOrganizationLoginAction, WithTraderLoginAction, WithZoneLoginAction}
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}

@@ -572,7 +572,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
   def zoneAccessedTraderFile(accountID: String, fileName: String, documentType: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        if(masterTraders.Service.getByAccountID(accountID).zoneID == masterZones.Service.getZoneId(loginState.username)){
+        if (masterTraders.Service.getByAccountID(accountID).zoneID == masterZones.Service.getZoneId(loginState.username)) {
           documentType match {
             case constants.File.IDENTIFICATION => Ok.sendFile(new java.io.File(uploadTraderKycIdentificationPath + fileName))
             case _ => BadRequest

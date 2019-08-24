@@ -9,9 +9,8 @@ object SendCoin {
       constants.FormField.TO.name -> constants.FormField.TO.field,
       constants.FormField.AMOUNT.name -> constants.FormField.AMOUNT.field,
       constants.FormField.NON_EMPTY_PASSWORD.name -> constants.FormField.NON_EMPTY_PASSWORD.field,
-      constants.FormField.GAS.name -> constants.FormField.GAS.field
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(to: String, amount: Int, password: String, gas: Int)
+  case class Data(to: String, amount: Int, password: String)
 }

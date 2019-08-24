@@ -26,8 +26,10 @@
         'class -> "form-control",'placeholder->Messages(constants.Form.ASSET_QUANTITY),'required->true)
     @checkbox(issueAssetForm(constants.Form.MODERATED), '_label -> Messages(constants.Form.MODERATED),
         'class -> "form-control",'placeholder->Messages(constants.Form.MODERATED),'required->true)
-    @inputText(issueAssetForm(constants.Form.GAS), '_label -> Messages(constants.Form.GAS),'class -> "form-control"
-        ,'placeholder->Messages(constants.Form.GAS),'required->true)
+    @inputText(issueAssetForm(constants.Form.TAKER_ADDRESS), '_label -> Messages(constants.Form.TAKER_ADDRESS),
+        'class -> "form-control",'placeholder->Messages(constants.Form.TAKER_ADDRESS),'required->true))
+    @inputText(issueAssetForm(constants.Form.MODE), '_label -> Messages(constants.Form.MODE),'class -> "form-control"
+        ,'placeholder->Messages(constants.Form.MODE),'required->true)
     @inputPassword(issueAssetForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD),
         'class -> "form-control",'placeholder->Messages(constants.Form.PASSWORD),'required->true)
 

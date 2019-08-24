@@ -3,54 +3,46 @@ package controllers
 import controllers.actions.WithTraderLoginAction
 import exceptions.{BaseException, BlockChainException}
 import javax.inject.{Inject, Singleton}
-import models.blockchainTransaction
-import models.blockchain
+import models.{blockchain, blockchainTransaction}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
 
-import scala.concurrent.{ExecutionContext, Future}
-import scala.util.Random
+import scala.concurrent.ExecutionContext
 
 @Singleton
-class SetBuyerFeedbackController @Inject()(messagesControllerComponents: MessagesControllerComponents, withTraderLoginAction: WithTraderLoginAction, transactionsSetBuyerFeedback: transactions.SetBuyerFeedback, blockchainTransactionSetBuyerFeedbacks: blockchainTransaction.SetBuyerFeedbacks, blockchainTraderFeedbackHistories: blockchain.TraderFeedbackHistories)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class SetBuyerFeedbackController @Inject()(messagesControllerComponents: MessagesControllerComponents, transaction: utilities.Transaction, withTraderLoginAction: WithTraderLoginAction, transactionsSetBuyerFeedback: transactions.SetBuyerFeedback, blockchainTransactionSetBuyerFeedbacks: blockchainTransaction.SetBuyerFeedbacks, blockchainTraderFeedbackHistories: blockchain.TraderFeedbackHistories)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
+  private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
-  def setBuyerFeedbackForm(sellerAddress:String, pegHash:String): Action[AnyContent] = Action { implicit request =>
+  def setBuyerFeedbackForm(sellerAddress: String, pegHash: String): Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.master.setBuyerFeedback(views.companion.master.SetBuyerFeedback.form, sellerAddress, pegHash))
   }
 
-  def setBuyerFeedback: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def setBuyerFeedback(): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       views.companion.master.SetBuyerFeedback.form.bindFromRequest().fold(
         formWithErrors => {
           BadRequest(views.html.component.master.setBuyerFeedback(formWithErrors, formWithErrors.data(constants.Form.SELLER_ADDRESS), formWithErrors.data(constants.Form.PEG_HASH)))
         },
         setBuyerFeedbackData => {
-
-          val ticketID = if (kafkaEnabled) transactionsSetBuyerFeedback.Service.kafkaPost(transactionsSetBuyerFeedback.Request(from = loginState.username, to = setBuyerFeedbackData.sellerAddress, password = setBuyerFeedbackData.password, pegHash = setBuyerFeedbackData.pegHash, rating = setBuyerFeedbackData.rating, gas = setBuyerFeedbackData.gas)).ticketID else Random.nextString(32)
-          blockchainTransactionSetBuyerFeedbacks.Service.create(from = loginState.username, to = setBuyerFeedbackData.sellerAddress, pegHash = setBuyerFeedbackData.pegHash, rating = setBuyerFeedbackData.rating, gas = setBuyerFeedbackData.gas, null, null, ticketID = ticketID, null)
           try {
-            if (!kafkaEnabled) {
-              Future {
-                try {
-                  blockchainTransactionSetBuyerFeedbacks.Utility.onSuccess(ticketID, transactionsSetBuyerFeedback.Service.post(transactionsSetBuyerFeedback.Request(from = loginState.username, to = setBuyerFeedbackData.sellerAddress, password = setBuyerFeedbackData.password, pegHash = setBuyerFeedbackData.pegHash, rating = setBuyerFeedbackData.rating, gas = setBuyerFeedbackData.gas)))
-                } catch {
-                  case baseException: BaseException => logger.error(baseException.failure.message, baseException)
-                  case blockChainException: BlockChainException => logger.error(blockChainException.failure.message, blockChainException)
-                    blockchainTransactionSetBuyerFeedbacks.Utility.onFailure(ticketID, blockChainException.failure.message)
-                }
-              }
-            }
+            transaction.process[blockchainTransaction.SetBuyerFeedback, transactionsSetBuyerFeedback.Request](
+              entity = blockchainTransaction.SetBuyerFeedback(from = loginState.address, to = setBuyerFeedbackData.sellerAddress, pegHash = setBuyerFeedbackData.pegHash, rating = setBuyerFeedbackData.rating, status = null, txHash = null, ticketID = "", code = null, mode = transactionMode),
+              blockchainTransactionCreate = blockchainTransactionSetBuyerFeedbacks.Service.create,
+              request = transactionsSetBuyerFeedback.Request(transactionsSetBuyerFeedback.BaseRequest(from = loginState.address), to = setBuyerFeedbackData.sellerAddress, password = setBuyerFeedbackData.password, pegHash = setBuyerFeedbackData.pegHash, rating = setBuyerFeedbackData.rating.toString, mode = transactionMode),
+              action = transactionsSetBuyerFeedback.Service.post,
+              onSuccess = blockchainTransactionSetBuyerFeedbacks.Utility.onSuccess,
+              onFailure = blockchainTransactionSetBuyerFeedbacks.Utility.onFailure,
+              updateTransactionHash = blockchainTransactionSetBuyerFeedbacks.Service.updateTransactionHash
+            )
             Ok(views.html.index(successes = Seq(constants.Response.BUYER_FEEDBACK_SET)))
           }
           catch {
             case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
             case blockChainException: BlockChainException => Ok(views.html.index(failures = Seq(blockChainException.failure)))
-
           }
         }
       )
@@ -76,11 +68,7 @@ class SetBuyerFeedbackController @Inject()(messagesControllerComponents: Message
       },
       setBuyerFeedbackData => {
         try {
-          if (kafkaEnabled) {
-            transactionsSetBuyerFeedback.Service.kafkaPost(transactionsSetBuyerFeedback.Request(from = setBuyerFeedbackData.from, to = setBuyerFeedbackData.to, password = setBuyerFeedbackData.password, pegHash = setBuyerFeedbackData.pegHash, rating = setBuyerFeedbackData.rating, gas = setBuyerFeedbackData.gas))
-          } else {
-            transactionsSetBuyerFeedback.Service.post(transactionsSetBuyerFeedback.Request(from = setBuyerFeedbackData.from, to = setBuyerFeedbackData.to, password = setBuyerFeedbackData.password, pegHash = setBuyerFeedbackData.pegHash, rating = setBuyerFeedbackData.rating, gas = setBuyerFeedbackData.gas))
-          }
+          transactionsSetBuyerFeedback.Service.post(transactionsSetBuyerFeedback.Request(transactionsSetBuyerFeedback.BaseRequest(from = setBuyerFeedbackData.from), to = setBuyerFeedbackData.to, password = setBuyerFeedbackData.password, pegHash = setBuyerFeedbackData.pegHash, rating = setBuyerFeedbackData.rating.toString, mode = setBuyerFeedbackData.mode))
           Ok(views.html.index(successes = Seq(constants.Response.BUYER_FEEDBACK_SET)))
         }
         catch {

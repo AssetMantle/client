@@ -25,7 +25,7 @@ class GetSeed @Inject()(wsClient: WSClient)(implicit configuration: Configuratio
 
   private val url = ip + ":" + port + "/" + path
 
-  private def action()(implicit executionContext: ExecutionContext): Future[Response] = wsClient.url(url).get.map { response => new Response(response) }
+  private def action(): Future[Response] = wsClient.url(url).get.map { response => new Response(response) }
 
   class Response(response: WSResponse) {
     val body: String = response.body
@@ -33,7 +33,7 @@ class GetSeed @Inject()(wsClient: WSClient)(implicit configuration: Configuratio
 
   object Service {
 
-    def get()(implicit executionContext: ExecutionContext): Response = try {
+    def get(): Response = try {
       Await.result(action(), Duration.Inf)
     } catch {
       case connectException: ConnectException =>

@@ -8,10 +8,9 @@ object AddKey {
     mapping(
       constants.FormField.NAME.name -> constants.FormField.NAME.field,
       constants.FormField.NON_EMPTY_PASSWORD.name -> constants.FormField.NON_EMPTY_PASSWORD.field,
-      constants.FormField.SEED.name -> constants.FormField.SEED.field
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(name: String, password: String, seed: String)
+  case class Data(name: String, password: String)
 
 }

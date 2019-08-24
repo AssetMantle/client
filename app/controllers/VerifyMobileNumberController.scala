@@ -39,7 +39,6 @@ class VerifyMobileNumberController @Inject()(messagesControllerComponents: Messa
           BadRequest(views.html.component.master.verifyMobileNumber(formWithErrors))
         },
         verifyMobileNumberData => {
-
           try {
             smsOTPs.Service.verifyOTP(loginState.username, verifyMobileNumberData.otp)
             masterContacts.Service.verifyMobileNumber(loginState.username)
@@ -54,6 +53,7 @@ class VerifyMobileNumberController @Inject()(messagesControllerComponents: Messa
           catch {
             case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
           }
-        })
+        }
+      )
   }
 }

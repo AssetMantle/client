@@ -28,8 +28,8 @@ GET         /master/component/zoneDetails                                control
 GET         /master/component/organizationDetails                        controllers.ComponentViewController.organizationDetails
 GET         /master/component/assetList                                  controllers.ComponentViewController.assetList
 GET         /master/component/fiatList                                   controllers.ComponentViewController.fiatList
-GET         /master/component/buyNegotiationList                            controllers.ComponentViewController.buyNegotiationList
-GET         /master/component/sellNegotiationList                            controllers.ComponentViewController.sellNegotiationList
+GET         /master/component/buyNegotiationList                         controllers.ComponentViewController.buyNegotiationList
+GET         /master/component/sellNegotiationList                        controllers.ComponentViewController.sellNegotiationList
 GET         /master/component/orderList                                  controllers.ComponentViewController.orderList
 GET         /master/component/availableAssetList                         controllers.ComponentViewController.availableAssetList
 GET         /master/component/availableAssetListWithLogin                controllers.ComponentViewController.availableAssetListWithLogin
@@ -173,8 +173,8 @@ POST        /master/rejectVerifyOrganizationRequest                      control
 GET         /master/buyerExecuteOrder                                    controllers.BuyerExecuteOrderController.buyerExecuteOrderForm(orderID: String)
 POST        /master/buyerExecuteOrder                                    controllers.BuyerExecuteOrderController.buyerExecuteOrder
 
-GET         /master/moderatedBuyerExecuteOrder                 controllers.BuyerExecuteOrderController.moderatedBuyerExecuteOrderForm(buyerAddress:String, sellerAddress:String, pegHash:String)
-POST        /master/moderatedBuyerExecuteOrder                 controllers.BuyerExecuteOrderController.moderatedBuyerExecuteOrder
+GET         /master/moderatedBuyerExecuteOrder                           controllers.BuyerExecuteOrderController.moderatedBuyerExecuteOrderForm(buyerAddress:String, sellerAddress:String, pegHash:String)
+POST        /master/moderatedBuyerExecuteOrder                           controllers.BuyerExecuteOrderController.moderatedBuyerExecuteOrder
 
 GET         /master/changeBuyerBid                                       controllers.ChangeBuyerBidController.changeBuyerBidForm(sellerAddress:String, pegHash:String)
 POST        /master/changeBuyerBid                                       controllers.ChangeBuyerBidController.changeBuyerBid
@@ -195,14 +195,14 @@ GET         /master/viewPendingIssueAssetRequests                        control
 GET         /master/rejectIssueAssetRequest                              controllers.IssueAssetController.rejectIssueAssetRequestForm(requestID: String)
 POST        /master/rejectIssueAssetRequest                              controllers.IssueAssetController.rejectIssueAssetRequest
 
-GET         /master/issueAsset                                           controllers.IssueAssetController.issueAssetForm(requestID: String, accountID: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int)
+GET         /master/issueAsset                                           controllers.IssueAssetController.issueAssetForm(requestID: String, accountID: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, takerAddress: Option[String])
 POST        /master/issueAsset                                           controllers.IssueAssetController.issueAsset
 
-GET         /master/accountComet                                 controllers.ComponentViewController.accountComet
-GET         /master/assetComet                                   controllers.ComponentViewController.assetComet
-GET         /master/fiatComet                                    controllers.ComponentViewController.fiatComet
-GET         /master/negotiationComet                             controllers.ComponentViewController.negotiationComet
-GET         /master/orderComet                                   controllers.ComponentViewController.orderComet
+GET         /master/accountComet                                         controllers.ComponentViewController.accountComet
+GET         /master/assetComet                                           controllers.ComponentViewController.assetComet
+GET         /master/fiatComet                                            controllers.ComponentViewController.fiatComet
+GET         /master/negotiationComet                                     controllers.ComponentViewController.negotiationComet
+GET         /master/orderComet                                           controllers.ComponentViewController.orderComet
 
 GET         /master/issueFiatRequest                                     controllers.IssueFiatController.issueFiatRequestForm
 POST        /master/issueFiatRequest                                     controllers.IssueFiatController.issueFiatRequest
@@ -226,8 +226,8 @@ POST        /master/releaseAsset                                         control
 GET         /master/sellerExecuteOrder                                   controllers.SellerExecuteOrderController.sellerExecuteOrderForm(orderID:String)
 POST        /master/sellerExecuteOrder                                   controllers.SellerExecuteOrderController.sellerExecuteOrder
 
-GET         /master/moderatedSellerExecuteOrder                controllers.SellerExecuteOrderController.moderatedSellerExecuteOrderForm(buyerAddress:String, sellerAddress:String, pegHash:String)
-POST        /master/moderatedSellerExecuteOrder                controllers.SellerExecuteOrderController.moderatedSellerExecuteOrder
+GET         /master/moderatedSellerExecuteOrder                          controllers.SellerExecuteOrderController.moderatedSellerExecuteOrderForm(buyerAddress:String, sellerAddress:String, pegHash:String)
+POST        /master/moderatedSellerExecuteOrder                          controllers.SellerExecuteOrderController.moderatedSellerExecuteOrder
 
 GET         /master/sendAsset                                            controllers.SendAssetController.sendAssetForm(buyerAddress:String, pegHash: String)
 POST        /master/sendAsset                                            controllers.SendAssetController.sendAsset

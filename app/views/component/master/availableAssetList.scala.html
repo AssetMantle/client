@@ -4,44 +4,18 @@
 
 @(assetList: Seq[Asset])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
-<div class="card">
-    <div class="card-header">
-        <span class="heading">@Messages(constants.Form.ASSETS) </span>
-    </div>
-    <div class="card-body">
-<div class="table-responsive">
-    <table class="table white">
-        <thead>
-                        <tr>
-                            <th>@Messages(constants.Form.PEG_HASH)</th>
-                            <th>@Messages(constants.Form.DOCUMENT_HASH)</th>
-                            <th>@Messages(constants.Form.ASSET_TYPE)</th>
-                            <th>@Messages(constants.Form.ASSET_QUANTITY)</th>
-                            <th>@Messages(constants.Form.ASSET_PRICE)</th>
-                            <th>@Messages(constants.Form.QUANTITY_UNIT)</th>
-                            <th>@Messages(constants.Form.MODERATED)</th>
-                            <th>@Messages(constants.Form.LOCKED)</th>
-
-                        </tr>
-                    </thead>
-                    <tbody>
-                    @for(asset <- assetList) {
-                        <tr>
-                            <td> @asset.pegHash </td>
-                            <td> @asset.documentHash </td>
-                            <td>@asset.assetType</td>
-                            <td>@asset.assetQuantity</td>
-                            <td>@asset.assetPrice</td>
-                            <td>@asset.quantityUnit</td>
-                            <td>@asset.moderated</td>
-                            <td>@asset.locked</td>
-
-
-                        </tr>
-                    }
-                    </tbody>
-                </table>
-</div>
-
-</div>
-</div>
+    @for(asset <- assetList) {
+        <div class="flexItem box firstBox lightBlue">
+            <div class="leftText">
+                <span class="red">@Messages(constants.Form.PEG_HASH)</span> : @asset.pegHash <br>
+                <span class="red">@Messages(constants.Form.DOCUMENT_HASH)</span> : @asset.documentHash <br>
+                <span class="red">@Messages(constants.Form.ASSET_TYPE)</span> : @asset.assetType <br>
+                <span class="red">@Messages(constants.Form.ASSET_QUANTITY)</span> : @asset.assetQuantity <br>
+                <span class="red">@Messages(constants.Form.ASSET_PRICE)</span> : @asset.assetPrice <br>
+                <span class="red">@Messages(constants.Form.QUANTITY_UNIT)</span> : @asset.quantityUnit <br>
+                <span class="red">@Messages(constants.Form.MODERATED)</span> : @asset.moderated <br>
+                <span class="red">@Messages(constants.Form.TAKER_ADDRESS)</span> : @asset.takerAddress <br>
+                <span class="red">@Messages(constants.Form.LOCKED)</span> : @asset.locked <br>
+            </div>
+        </div>
+    }

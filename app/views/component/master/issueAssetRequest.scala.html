@@ -21,7 +21,8 @@
         'class -> "form-control",'placeholder->Messages(constants.Form.QUANTITY_UNIT),'required->true)
     @inputText(issueAssetRequestForm(constants.Form.ASSET_QUANTITY), '_label -> Messages(constants.Form.ASSET_QUANTITY),
         'class -> "form-control",'placeholder->Messages(constants.Form.ASSET_QUANTITY),'required->true)
-
+    @inputText(issueAssetRequestForm(constants.Form.TAKER_ADDRESS), '_label -> Messages(constants.Form.TAKER_ADDRESS),
+        'class -> "form-control",'placeholder->Messages(constants.Form.TAKER_ADDRESS),'required->true))
         <div class="input-group-prepend issue_asset">
             @checkbox(issueAssetRequestForm(constants.Form.MODERATED), '_label -> Messages(constants.Form.MODERATED), 'id -> "moderated")
 
@@ -32,8 +33,6 @@
         </div>
 
     <div id="moderatedIssueAssetRequestFormFields">
-        @inputText(issueAssetRequestForm(constants.Form.GAS).copy(value = Some("0")), '_label -> Messages(constants.Form.GAS),
-            'class -> "form-control",'placeholder->Messages(constants.Form.GAS),'required->true)
         @inputPassword(issueAssetRequestForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD),
             'class -> "form-control",'placeholder->Messages(constants.Form.PASSWORD),'required->true)
     </div>
@@ -50,6 +49,3 @@
     </div>
     </div>
     }
-
-
-

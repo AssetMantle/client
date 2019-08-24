@@ -9,28 +9,26 @@ import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerC
 import play.api.{Configuration, Logger}
 import utilities.PushNotification
 
-import scala.concurrent.{ExecutionContext, Future}
-import scala.util.Random
+import scala.concurrent.ExecutionContext
 
 @Singleton
-class SetACLController @Inject()(messagesControllerComponents: MessagesControllerComponents, blockchainAccounts: blockchain.Accounts, masterZones: master.Zones, masterOrganizations: master.Organizations, masterTraders: master.Traders, masterTraderKYCs: master.TraderKYCs,withZoneLoginAction: WithZoneLoginAction, withOrganizationLoginAction: WithOrganizationLoginAction, withUserLoginAction: WithUserLoginAction, withGenesisLoginAction: WithGenesisLoginAction,masterAccounts: master.Accounts, transactionsSetACL: transactions.SetACL, blockchainAclAccounts: blockchain.ACLAccounts, blockchainTransactionSetACLs: blockchainTransaction.SetACLs, blockchainAclHashes: blockchain.ACLHashes, pushNotification: PushNotification)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class SetACLController @Inject()(messagesControllerComponents: MessagesControllerComponents, transaction: utilities.Transaction, blockchainAccounts: blockchain.Accounts, masterZones: master.Zones, masterOrganizations: master.Organizations, masterTraders: master.Traders, masterTraderKYCs: master.TraderKYCs, withZoneLoginAction: WithZoneLoginAction, withOrganizationLoginAction: WithOrganizationLoginAction, withUserLoginAction: WithUserLoginAction, withGenesisLoginAction: WithGenesisLoginAction, masterAccounts: master.Accounts, transactionsSetACL: transactions.SetACL, blockchainAclAccounts: blockchain.ACLAccounts, blockchainTransactionSetACLs: blockchainTransaction.SetACLs, blockchainAclHashes: blockchain.ACLHashes, pushNotification: PushNotification)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
+  private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
-  def addTraderForm: Action[AnyContent] = Action { implicit request =>
+  def addTraderForm(): Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.master.addTrader(views.companion.master.AddTrader.form))
   }
 
-  def addTrader: Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
+  def addTrader(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
       views.companion.master.AddTrader.form.bindFromRequest().fold(
         formWithErrors => {
           BadRequest(views.html.component.master.addTrader(formWithErrors))
         },
         addTraderData => {
-
           try {
             if (masterOrganizations.Service.getStatus(addTraderData.organizationID) == Option(true)) {
               masterTraders.Service.create(zoneID = addTraderData.zoneID, organizationID = addTraderData.organizationID, accountID = loginState.username, name = addTraderData.name)
@@ -57,25 +55,20 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
           BadRequest(views.html.component.master.zoneVerifyTrader(formWithErrors, formWithErrors.data(constants.Form.ACL_ADDRESS), formWithErrors.data(constants.Form.ORGANIZATION_ID)))
         },
         verifyTraderData => {
-
           try {
             if (masterOrganizations.Service.getStatus(verifyTraderData.organizationID) == Option(true)) {
               val zoneID = masterZones.Service.getZoneId(loginState.username)
-              val ticketID = if (kafkaEnabled) transactionsSetACL.Service.kafkaPost(transactionsSetACL.Request(from = loginState.username, password = verifyTraderData.password, aclAddress = verifyTraderData.aclAddress, organizationID = verifyTraderData.organizationID, zoneID = zoneID, issueAsset = verifyTraderData.issueAsset.toString, issueFiat = verifyTraderData.issueFiat.toString, sendAsset = verifyTraderData.sendAsset.toString, sendFiat = verifyTraderData.sendFiat.toString, redeemAsset = verifyTraderData.redeemAsset.toString, redeemFiat = verifyTraderData.redeemFiat.toString, sellerExecuteOrder = verifyTraderData.sellerExecuteOrder.toString, buyerExecuteOrder = verifyTraderData.buyerExecuteOrder.toString, changeBuyerBid = verifyTraderData.changeBuyerBid.toString, changeSellerBid = verifyTraderData.changeSellerBid.toString, confirmBuyerBid = verifyTraderData.confirmBuyerBid.toString, confirmSellerBid = verifyTraderData.confirmSellerBid.toString, negotiation = verifyTraderData.negotiation.toString, releaseAsset = verifyTraderData.releaseAsset.toString)).ticketID else Random.nextString(32)
               val acl = blockchain.ACL(issueAsset = verifyTraderData.issueAsset, issueFiat = verifyTraderData.issueFiat, sendAsset = verifyTraderData.sendAsset, sendFiat = verifyTraderData.sendFiat, redeemAsset = verifyTraderData.redeemAsset, redeemFiat = verifyTraderData.redeemFiat, sellerExecuteOrder = verifyTraderData.sellerExecuteOrder, buyerExecuteOrder = verifyTraderData.buyerExecuteOrder, changeBuyerBid = verifyTraderData.changeBuyerBid, changeSellerBid = verifyTraderData.changeSellerBid, confirmBuyerBid = verifyTraderData.confirmBuyerBid, confirmSellerBid = verifyTraderData.changeSellerBid, negotiation = verifyTraderData.negotiation, releaseAsset = verifyTraderData.releaseAsset)
               blockchainAclHashes.Service.create(acl)
-              blockchainTransactionSetACLs.Service.create(from = loginState.username, aclAddress = verifyTraderData.aclAddress, organizationID = verifyTraderData.organizationID, zoneID = zoneID, acl = acl, null, txHash = null, ticketID = ticketID, null)
-              if (!kafkaEnabled) {
-                Future {
-                  try {
-                    blockchainTransactionSetACLs.Utility.onSuccess(ticketID, transactionsSetACL.Service.post(transactionsSetACL.Request(from = loginState.username, password = verifyTraderData.password, aclAddress = verifyTraderData.aclAddress, organizationID = verifyTraderData.organizationID, zoneID = zoneID, issueAsset = verifyTraderData.issueAsset.toString, issueFiat = verifyTraderData.issueFiat.toString, sendAsset = verifyTraderData.sendAsset.toString, sendFiat = verifyTraderData.sendFiat.toString, redeemAsset = verifyTraderData.redeemAsset.toString, redeemFiat = verifyTraderData.redeemFiat.toString, sellerExecuteOrder = verifyTraderData.sellerExecuteOrder.toString, buyerExecuteOrder = verifyTraderData.buyerExecuteOrder.toString, changeBuyerBid = verifyTraderData.changeBuyerBid.toString, changeSellerBid = verifyTraderData.changeSellerBid.toString, confirmBuyerBid = verifyTraderData.confirmBuyerBid.toString, confirmSellerBid = verifyTraderData.confirmSellerBid.toString, negotiation = verifyTraderData.negotiation.toString, releaseAsset = verifyTraderData.releaseAsset.toString)))
-                  } catch {
-                    case baseException: BaseException => logger.error(baseException.failure.message, baseException)
-                    case blockChainException: BlockChainException => logger.error(blockChainException.failure.message, blockChainException)
-                      blockchainTransactionSetACLs.Utility.onFailure(ticketID, blockChainException.failure.message)
-                  }
-                }
-              }
+              transaction.process[blockchainTransaction.SetACL, transactionsSetACL.Request](
+                entity = blockchainTransaction.SetACL(from = loginState.address, aclAddress = verifyTraderData.aclAddress, organizationID = verifyTraderData.organizationID, zoneID = zoneID, aclHash = util.hashing.MurmurHash3.stringHash(acl.toString).toString, status = null, txHash = null, ticketID = "", mode = transactionMode, code = null),
+                blockchainTransactionCreate = blockchainTransactionSetACLs.Service.create,
+                request = transactionsSetACL.Request(transactionsSetACL.BaseRequest(from = loginState.address), password = verifyTraderData.password, aclAddress = verifyTraderData.aclAddress, organizationID = verifyTraderData.organizationID, zoneID = zoneID, issueAsset = verifyTraderData.issueAsset.toString, issueFiat = verifyTraderData.issueFiat.toString, sendAsset = verifyTraderData.sendAsset.toString, sendFiat = verifyTraderData.sendFiat.toString, redeemAsset = verifyTraderData.redeemAsset.toString, redeemFiat = verifyTraderData.redeemFiat.toString, sellerExecuteOrder = verifyTraderData.sellerExecuteOrder.toString, buyerExecuteOrder = verifyTraderData.buyerExecuteOrder.toString, changeBuyerBid = verifyTraderData.changeBuyerBid.toString, changeSellerBid = verifyTraderData.changeSellerBid.toString, confirmBuyerBid = verifyTraderData.confirmBuyerBid.toString, confirmSellerBid = verifyTraderData.confirmSellerBid.toString, negotiation = verifyTraderData.negotiation.toString, releaseAsset = verifyTraderData.releaseAsset.toString, mode = transactionMode),
+                action = transactionsSetACL.Service.post,
+                onSuccess = blockchainTransactionSetACLs.Utility.onSuccess,
+                onFailure = blockchainTransactionSetACLs.Utility.onFailure,
+                updateTransactionHash = blockchainTransactionSetACLs.Service.updateTransactionHash
+              )
               Ok(views.html.index(successes = Seq(constants.Response.ACL_SET)))
             } else {
               Ok(views.html.index(failures = Seq(constants.Response.UNVERIFIED_ORGANIZATION)))
@@ -132,7 +125,6 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
           BadRequest(views.html.component.master.zoneRejectVerifyTraderRequest(formWithErrors, formWithErrors.data(constants.Form.TRADER_ID)))
         },
         rejectVerifyTraderRequestData => {
-
           try {
             masterTraders.Service.updateStatus(rejectVerifyTraderRequestData.traderID, status = false)
             masterTraderKYCs.Service.zoneRejectAll(masterZones.Service.getAccountId(rejectVerifyTraderRequestData.traderID))
@@ -155,7 +147,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
       }
   }
 
-  def organizationVerifyTraderForm(accountID:String ,organizationID:String): Action[AnyContent] = Action { implicit request =>
+  def organizationVerifyTraderForm(accountID: String, organizationID: String): Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.master.organizationVerifyTrader(views.companion.master.VerifyTrader.form, masterAccounts.Service.getAddress(accountID), organizationID))
   }
 
@@ -166,25 +158,20 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
           BadRequest(views.html.component.master.organizationVerifyTrader(formWithErrors, formWithErrors.data(constants.Form.ACL_ADDRESS), formWithErrors.data(constants.Form.ORGANIZATION_ID)))
         },
         verifyTraderData => {
-
           try {
             if (masterOrganizations.Service.getStatus(verifyTraderData.organizationID) == Option(true)) {
               val zoneID = masterOrganizations.Service.get(verifyTraderData.organizationID).zoneID
-              val ticketID = if (kafkaEnabled) transactionsSetACL.Service.kafkaPost(transactionsSetACL.Request(from = loginState.username, password = verifyTraderData.password, aclAddress = verifyTraderData.aclAddress, organizationID = verifyTraderData.organizationID, zoneID = zoneID, issueAsset = verifyTraderData.issueAsset.toString, issueFiat = verifyTraderData.issueFiat.toString, sendAsset = verifyTraderData.sendAsset.toString, sendFiat = verifyTraderData.sendFiat.toString, redeemAsset = verifyTraderData.redeemAsset.toString, redeemFiat = verifyTraderData.redeemFiat.toString, sellerExecuteOrder = verifyTraderData.sellerExecuteOrder.toString, buyerExecuteOrder = verifyTraderData.buyerExecuteOrder.toString, changeBuyerBid = verifyTraderData.changeBuyerBid.toString, changeSellerBid = verifyTraderData.changeSellerBid.toString, confirmBuyerBid = verifyTraderData.confirmBuyerBid.toString, confirmSellerBid = verifyTraderData.confirmSellerBid.toString, negotiation = verifyTraderData.negotiation.toString, releaseAsset = verifyTraderData.releaseAsset.toString)).ticketID else Random.nextString(32)
               val acl = blockchain.ACL(issueAsset = verifyTraderData.issueAsset, issueFiat = verifyTraderData.issueFiat, sendAsset = verifyTraderData.sendAsset, sendFiat = verifyTraderData.sendFiat, redeemAsset = verifyTraderData.redeemAsset, redeemFiat = verifyTraderData.redeemFiat, sellerExecuteOrder = verifyTraderData.sellerExecuteOrder, buyerExecuteOrder = verifyTraderData.buyerExecuteOrder, changeBuyerBid = verifyTraderData.changeBuyerBid, changeSellerBid = verifyTraderData.changeSellerBid, confirmBuyerBid = verifyTraderData.confirmBuyerBid, confirmSellerBid = verifyTraderData.changeSellerBid, negotiation = verifyTraderData.negotiation, releaseAsset = verifyTraderData.releaseAsset)
               blockchainAclHashes.Service.create(acl)
-              blockchainTransactionSetACLs.Service.create(from = loginState.username, aclAddress = verifyTraderData.aclAddress, organizationID = verifyTraderData.organizationID, zoneID = zoneID, acl = acl, null, txHash = null, ticketID = ticketID, null)
-              if (!kafkaEnabled) {
-                Future {
-                  try {
-                    blockchainTransactionSetACLs.Utility.onSuccess(ticketID, transactionsSetACL.Service.post(transactionsSetACL.Request(from = loginState.username, password = verifyTraderData.password, aclAddress = verifyTraderData.aclAddress, organizationID = verifyTraderData.organizationID, zoneID = zoneID, issueAsset = verifyTraderData.issueAsset.toString, issueFiat = verifyTraderData.issueFiat.toString, sendAsset = verifyTraderData.sendAsset.toString, sendFiat = verifyTraderData.sendFiat.toString, redeemAsset = verifyTraderData.redeemAsset.toString, redeemFiat = verifyTraderData.redeemFiat.toString, sellerExecuteOrder = verifyTraderData.sellerExecuteOrder.toString, buyerExecuteOrder = verifyTraderData.buyerExecuteOrder.toString, changeBuyerBid = verifyTraderData.changeBuyerBid.toString, changeSellerBid = verifyTraderData.changeSellerBid.toString, confirmBuyerBid = verifyTraderData.confirmBuyerBid.toString, confirmSellerBid = verifyTraderData.confirmSellerBid.toString, negotiation = verifyTraderData.negotiation.toString, releaseAsset = verifyTraderData.releaseAsset.toString)))
-                  } catch {
-                    case baseException: BaseException => logger.error(baseException.failure.message, baseException)
-                    case blockChainException: BlockChainException => logger.error(blockChainException.failure.message, blockChainException)
-                      blockchainTransactionSetACLs.Utility.onFailure(ticketID, blockChainException.failure.message)
-                  }
-                }
-              }
+              transaction.process[blockchainTransaction.SetACL, transactionsSetACL.Request](
+                entity = blockchainTransaction.SetACL(from = loginState.address, aclAddress = verifyTraderData.aclAddress, organizationID = verifyTraderData.organizationID, zoneID = zoneID, aclHash = util.hashing.MurmurHash3.stringHash(acl.toString).toString, status = null, txHash = null, ticketID = "", mode = transactionMode, code = null),
+                blockchainTransactionCreate = blockchainTransactionSetACLs.Service.create,
+                request = transactionsSetACL.Request(transactionsSetACL.BaseRequest(from = loginState.address), password = verifyTraderData.password, aclAddress = verifyTraderData.aclAddress, organizationID = verifyTraderData.organizationID, zoneID = zoneID, issueAsset = verifyTraderData.issueAsset.toString, issueFiat = verifyTraderData.issueFiat.toString, sendAsset = verifyTraderData.sendAsset.toString, sendFiat = verifyTraderData.sendFiat.toString, redeemAsset = verifyTraderData.redeemAsset.toString, redeemFiat = verifyTraderData.redeemFiat.toString, sellerExecuteOrder = verifyTraderData.sellerExecuteOrder.toString, buyerExecuteOrder = verifyTraderData.buyerExecuteOrder.toString, changeBuyerBid = verifyTraderData.changeBuyerBid.toString, changeSellerBid = verifyTraderData.changeSellerBid.toString, confirmBuyerBid = verifyTraderData.confirmBuyerBid.toString, confirmSellerBid = verifyTraderData.confirmSellerBid.toString, negotiation = verifyTraderData.negotiation.toString, releaseAsset = verifyTraderData.releaseAsset.toString, mode = transactionMode),
+                action = transactionsSetACL.Service.post,
+                onSuccess = blockchainTransactionSetACLs.Utility.onSuccess,
+                onFailure = blockchainTransactionSetACLs.Utility.onFailure,
+                updateTransactionHash = blockchainTransactionSetACLs.Service.updateTransactionHash
+              )
               Ok(views.html.index(successes = Seq(constants.Response.ACL_SET)))
             } else {
               Ok(views.html.index(failures = Seq(constants.Response.UNVERIFIED_ORGANIZATION)))
@@ -240,9 +227,8 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
           BadRequest(views.html.component.master.organizationRejectVerifyTraderRequest(formWithErrors, formWithErrors.data(constants.Form.TRADER_ID)))
         },
         rejectVerifyTraderRequestData => {
-
           try {
-            masterTraders.Service.updateStatus(rejectVerifyTraderRequestData.traderID, false)
+            masterTraders.Service.updateStatus(rejectVerifyTraderRequestData.traderID, status = false)
             masterTraderKYCs.Service.organizationRejectAll(masterOrganizations.Service.getAccountId(rejectVerifyTraderRequestData.traderID))
             Ok(views.html.index(successes = Seq(constants.Response.VERIFY_TRADER_REQUEST_REJECTED)))
           }
@@ -276,9 +262,9 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
   def viewTradersInOrganizationForZone(organizationID: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        if(masterOrganizations.Service.get(organizationID).zoneID == masterZones.Service.getZoneId(loginState.username)){
+        if (masterOrganizations.Service.get(organizationID).zoneID == masterZones.Service.getZoneId(loginState.username)) {
           Ok(views.html.component.master.viewTradersInOrganization(masterTraders.Service.getTradersForOrganization(organizationID)))
-        }else {
+        } else {
           Ok(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
         }
       }
@@ -308,12 +294,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
       },
       setACLData => {
         try {
-          if (kafkaEnabled) {
-            transactionsSetACL.Service.kafkaPost(transactionsSetACL.Request(from = setACLData.from, password = setACLData.password, aclAddress = setACLData.aclAddress, organizationID = setACLData.organizationID, zoneID = setACLData.zoneID, issueAsset = setACLData.issueAsset.toString, issueFiat = setACLData.issueFiat.toString, sendAsset = setACLData.sendAsset.toString, sendFiat = setACLData.sendFiat.toString, redeemAsset = setACLData.redeemAsset.toString, redeemFiat = setACLData.redeemFiat.toString, sellerExecuteOrder = setACLData.sellerExecuteOrder.toString, buyerExecuteOrder = setACLData.buyerExecuteOrder.toString, changeBuyerBid = setACLData.changeBuyerBid.toString, changeSellerBid = setACLData.changeSellerBid.toString, confirmBuyerBid = setACLData.confirmBuyerBid.toString, confirmSellerBid = setACLData.confirmSellerBid.toString, negotiation = setACLData.negotiation.toString, releaseAsset = setACLData.releaseAsset.toString))
-
-          } else {
-            transactionsSetACL.Service.post(transactionsSetACL.Request(from = setACLData.from, password = setACLData.password, aclAddress = setACLData.aclAddress, organizationID = setACLData.organizationID, zoneID = setACLData.zoneID, issueAsset = setACLData.issueAsset.toString, issueFiat = setACLData.issueFiat.toString, sendAsset = setACLData.sendAsset.toString, sendFiat = setACLData.sendFiat.toString, redeemAsset = setACLData.redeemAsset.toString, redeemFiat = setACLData.redeemFiat.toString, sellerExecuteOrder = setACLData.sellerExecuteOrder.toString, buyerExecuteOrder = setACLData.buyerExecuteOrder.toString, changeBuyerBid = setACLData.changeBuyerBid.toString, changeSellerBid = setACLData.changeSellerBid.toString, confirmBuyerBid = setACLData.confirmBuyerBid.toString, confirmSellerBid = setACLData.confirmSellerBid.toString, negotiation = setACLData.negotiation.toString, releaseAsset = setACLData.releaseAsset.toString))
-          }
+          transactionsSetACL.Service.post(transactionsSetACL.Request(transactionsSetACL.BaseRequest(from = setACLData.from), password = setACLData.password, aclAddress = setACLData.aclAddress, organizationID = setACLData.organizationID, zoneID = setACLData.zoneID, issueAsset = setACLData.issueAsset.toString, issueFiat = setACLData.issueFiat.toString, sendAsset = setACLData.sendAsset.toString, sendFiat = setACLData.sendFiat.toString, redeemAsset = setACLData.redeemAsset.toString, redeemFiat = setACLData.redeemFiat.toString, sellerExecuteOrder = setACLData.sellerExecuteOrder.toString, buyerExecuteOrder = setACLData.buyerExecuteOrder.toString, changeBuyerBid = setACLData.changeBuyerBid.toString, changeSellerBid = setACLData.changeSellerBid.toString, confirmBuyerBid = setACLData.confirmBuyerBid.toString, confirmSellerBid = setACLData.confirmSellerBid.toString, negotiation = setACLData.negotiation.toString, releaseAsset = setACLData.releaseAsset.toString, mode = transactionMode))
           Ok(views.html.index(successes = Seq(constants.Response.ACL_SET)))
         }
         catch {

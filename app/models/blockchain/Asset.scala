@@ -20,7 +20,7 @@ import scala.concurrent.duration.{Duration, _}
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Asset(pegHash: String, documentHash: String, assetType: String, assetQuantity: String, assetPrice: String, quantityUnit: String, ownerAddress: String, locked: Boolean, moderated: Boolean, dirtyBit: Boolean)
+case class Asset(pegHash: String, documentHash: String, assetType: String, assetQuantity: String, assetPrice: String, quantityUnit: String, ownerAddress: String, locked: Boolean, moderated: Boolean, takerAddress: Option[String], dirtyBit: Boolean)
 
 case class AssetCometMessage(username: String, message: JsValue)
 
@@ -53,7 +53,7 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
 
   private val sleepTime = configuration.get[Long]("blockchain.entityIterator.threadSleep")
 
-  private def add(asset: Asset)(implicit executionContext: ExecutionContext): Future[String] = db.run((assetTable returning assetTable.map(_.pegHash) += asset).asTry).map {
+  private def add(asset: Asset): Future[String] = db.run((assetTable returning assetTable.map(_.pegHash) += asset).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -61,7 +61,7 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
     }
   }
 
-  private def upsert(asset: Asset)(implicit executionContext: ExecutionContext): Future[Int] = db.run(assetTable.insertOrUpdate(asset).asTry).map {
+  private def upsert(asset: Asset): Future[Int] = db.run(assetTable.insertOrUpdate(asset).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -74,45 +74,21 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
         throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }
   }
-  private def findAllAssetsByPublic(excludedAssets:Seq[String]):Future[Seq[Asset]] = db.run(assetTable.filter(assets => !(assets.ownerAddress inSet excludedAssets)).result.asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
+  private def findAllAssetsByPublic(excludedAssets:Seq[String]):Future[Seq[Asset]] = db.run(assetTable.filter(assets => !(assets.ownerAddress inSet excludedAssets)).result)
 
-  private def findAllUnLocked(ownerAddresses:Seq[String]):Future[Seq[Asset]] = db.run(assetTable.filter(_.locked === true).filter(asset => asset.ownerAddress inSet ownerAddresses).result.asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
+  private def findAllAssetsByModerated(excludedAssets:Seq[String], moderated: Boolean): Future[Seq[Asset]] = db.run(assetTable.filter(_.moderated === moderated).filter(assets => !(assets.ownerAddress inSet excludedAssets)).result)
 
-  private def findByPegHashes(pegHashes:Seq[String]):Future[Seq[Asset]] = db.run(assetTable.filter(asset => asset.pegHash inSet pegHashes).result.asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
+  private def findAllUnLocked(ownerAddresses:Seq[String]):Future[Seq[Asset]] = db.run(assetTable.filter(_.locked === true).filter(asset => asset.ownerAddress inSet ownerAddresses).result)
+
+  private def findByPegHashes(pegHashes:Seq[String]):Future[Seq[Asset]] = db.run(assetTable.filter(asset => asset.pegHash inSet pegHashes).result)
 
   private def getAssetPegWalletByAddress(address: String): Future[Seq[Asset]] = db.run(assetTable.filter(_.ownerAddress === address).result)
 
   private def getAssetPegHashesByAddress(address: String): Future[Seq[String]] = db.run(assetTable.filter(_.ownerAddress === address).map(_.pegHash).result)
 
-  private def updateDirtyBitByPegHash(pegHash: String, dirtyBit: Boolean)(implicit executionContext: ExecutionContext): Future[Int] = db.run(assetTable.filter(_.pegHash === pegHash).map(_.dirtyBit).update(dirtyBit).asTry).map {
+  private def updateDirtyBitByPegHash(pegHash: String, dirtyBit: Boolean): Future[Int] = db.run(assetTable.filter(_.pegHash === pegHash).map(_.dirtyBit).update(dirtyBit).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -124,7 +100,7 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
 
   private def getAssetsByDirtyBit(dirtyBit: Boolean): Future[Seq[Asset]] = db.run(assetTable.filter(_.dirtyBit === dirtyBit).result)
 
-  private def deleteByPegHash(pegHash: String)(implicit executionContext: ExecutionContext): Future[Int] = db.run(assetTable.filter(_.pegHash === pegHash).delete.asTry).map {
+  private def deleteByPegHash(pegHash: String): Future[Int] = db.run(assetTable.filter(_.pegHash === pegHash).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -134,7 +110,7 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
     }
   }
 
-  private def deleteAssetPegWalletByAddress(ownerAddress: String)(implicit executionContext: ExecutionContext) = db.run(assetTable.filter(_.ownerAddress === ownerAddress).delete.asTry).map {
+  private def deleteAssetPegWalletByAddress(ownerAddress: String)= db.run(assetTable.filter(_.ownerAddress === ownerAddress).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -146,7 +122,7 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
 
   private[models] class AssetTable(tag: Tag) extends Table[Asset](tag, _tableName = "Asset_BC") {
 
-    def * = (pegHash, documentHash, assetType, assetQuantity, assetPrice, quantityUnit, ownerAddress, locked, moderated, dirtyBit) <> (Asset.tupled, Asset.unapply)
+    def * = (pegHash, documentHash, assetType, assetQuantity, assetPrice, quantityUnit, ownerAddress, locked, moderated, takerAddress.?, dirtyBit) <> (Asset.tupled, Asset.unapply)
 
     def pegHash = column[String]("pegHash", O.PrimaryKey)
 
@@ -166,15 +142,17 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
 
     def moderated = column[Boolean]("moderated")
 
+    def takerAddress = column[String]("takerAddress")
+
     def dirtyBit = column[Boolean]("dirtyBit")
 
   }
 
   object Service {
 
-    def create(pegHash: String, documentHash: String, assetType: String, assetQuantity: String, assetPrice: String, quantityUnit: String, ownerAddress: String, moderated: Boolean, locked: Boolean, dirtyBit: Boolean)(implicit executionContext: ExecutionContext): String = Await.result(add(Asset(pegHash = pegHash, documentHash = documentHash, assetType = assetType, assetPrice = assetPrice, assetQuantity = assetQuantity, quantityUnit = quantityUnit, ownerAddress = ownerAddress, moderated = moderated, locked = locked, dirtyBit = dirtyBit)), Duration.Inf)
+    def create(pegHash: String, documentHash: String, assetType: String, assetQuantity: String, assetPrice: String, quantityUnit: String, ownerAddress: String, moderated: Boolean, takerAddress: Option[String], locked: Boolean, dirtyBit: Boolean): String = Await.result(add(Asset(pegHash = pegHash, documentHash = documentHash, assetType = assetType, assetPrice = assetPrice, assetQuantity = assetQuantity, quantityUnit = quantityUnit, ownerAddress = ownerAddress, moderated = moderated, takerAddress = takerAddress, locked = locked, dirtyBit = dirtyBit)), Duration.Inf)
 
-    def get(pegHash: String)(implicit executionContext: ExecutionContext): Asset = Await.result(findByPegHash(pegHash), Duration.Inf)
+    def get(pegHash: String): Asset = Await.result(findByPegHash(pegHash), Duration.Inf)
 
     def getAllPublic(excludedAssets:Seq[String]):Seq[Asset] = Await.result(findAllAssetsByPublic(excludedAssets),Duration.Inf)
 
@@ -182,15 +160,15 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
 
     def getByPegHashes(pegHashes:Seq[String]):Seq[Asset] = Await.result(findByPegHashes(pegHashes),Duration.Inf)
 
-    def getAssetPegWallet(address: String)(implicit executionContext: ExecutionContext): Seq[Asset] = Await.result(getAssetPegWalletByAddress(address), Duration.Inf)
+    def getAssetPegWallet(address: String): Seq[Asset] = Await.result(getAssetPegWalletByAddress(address), Duration.Inf)
 
     def getAssetPegHashes(address: String)(implicit executionContext: ExecutionContext): Seq[String] = Await.result(getAssetPegHashesByAddress(address), Duration.Inf)
 
-    def insertOrUpdate(pegHash: String, documentHash: String, assetType: String, assetQuantity: String, assetPrice: String, quantityUnit: String, ownerAddress: String, moderated: Boolean, locked: Boolean, dirtyBit: Boolean)(implicit executionContext: ExecutionContext): Int = Await.result(upsert(Asset(pegHash = pegHash, documentHash = documentHash, assetType = assetType, assetQuantity = assetQuantity, assetPrice = assetPrice, quantityUnit = quantityUnit, ownerAddress = ownerAddress, moderated = moderated, locked = locked, dirtyBit = dirtyBit)), Duration.Inf)
+    def insertOrUpdate(pegHash: String, documentHash: String, assetType: String, assetQuantity: String, assetPrice: String, quantityUnit: String, ownerAddress: String, moderated: Boolean, takerAddress: Option[String], locked: Boolean, dirtyBit: Boolean): Int = Await.result(upsert(Asset(pegHash = pegHash, documentHash = documentHash, assetType = assetType, assetQuantity = assetQuantity, assetPrice = assetPrice, quantityUnit = quantityUnit, ownerAddress = ownerAddress, moderated = moderated, takerAddress = takerAddress, locked = locked, dirtyBit = dirtyBit)), Duration.Inf)
 
-    def deleteAsset(pegHash: String)(implicit executionContext: ExecutionContext): Int = Await.result(deleteByPegHash(pegHash), Duration.Inf)
+    def deleteAsset(pegHash: String): Int = Await.result(deleteByPegHash(pegHash), Duration.Inf)
 
-    def deleteAssetPegWallet(ownerAddress: String)(implicit executionContext: ExecutionContext): Int = Await.result(deleteAssetPegWalletByAddress(ownerAddress), Duration.Inf)
+    def deleteAssetPegWallet(ownerAddress: String): Int = Await.result(deleteAssetPegWalletByAddress(ownerAddress), Duration.Inf)
 
     def getDirtyAssets: Seq[Asset] = Await.result(getAssetsByDirtyBit(dirtyBit = true), Duration.Inf)
 
@@ -212,7 +190,7 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
       for (dirtyAsset <- dirtyAssets) {
         try {
           val assetPegWallet = getAccount.Service.get(dirtyAsset.ownerAddress).value.assetPegWallet.getOrElse(throw new BaseException(constants.Response.NO_RESPONSE))
-          assetPegWallet.foreach(assetPeg => if (assetPegWallet.map(_.pegHash) contains dirtyAsset.pegHash) Service.insertOrUpdate(pegHash = assetPeg.pegHash, documentHash = assetPeg.documentHash, assetType = assetPeg.assetType, assetPrice = assetPeg.assetPrice, assetQuantity = assetPeg.assetQuantity, quantityUnit = assetPeg.quantityUnit, ownerAddress = dirtyAsset.ownerAddress, locked = assetPeg.locked, moderated = assetPeg.moderated, dirtyBit = false) else Service.deleteAsset(dirtyAsset.pegHash))
+          assetPegWallet.foreach(assetPeg => if (assetPegWallet.map(_.pegHash) contains dirtyAsset.pegHash) Service.insertOrUpdate(pegHash = assetPeg.pegHash, documentHash = assetPeg.documentHash, assetType = assetPeg.assetType, assetPrice = assetPeg.assetPrice, assetQuantity = assetPeg.assetQuantity, quantityUnit = assetPeg.quantityUnit, ownerAddress = dirtyAsset.ownerAddress, locked = assetPeg.locked, moderated = assetPeg.moderated, takerAddress = if (assetPeg.takerAddress == "") null else Option(assetPeg.takerAddress), dirtyBit = false) else Service.deleteAsset(dirtyAsset.pegHash))
           mainAssetActor ! AssetCometMessage(username = masterAccounts.Service.getId(dirtyAsset.ownerAddress), message = Json.toJson(constants.Comet.PING))
         }
         catch {

@@ -1,6 +1,6 @@
 package controllers
 
-import controllers.actions.{WithGenesisLoginAction, WithUserLoginAction, WithZoneLoginAction}
+import controllers.actions.{WithGenesisLoginAction, WithUserLoginAction}
 import exceptions.{BaseException, BlockChainException}
 import javax.inject.{Inject, Singleton}
 import models.{blockchain, blockchainTransaction, master}
@@ -9,28 +9,26 @@ import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerC
 import play.api.{Configuration, Logger}
 import utilities.PushNotification
 
-import scala.concurrent.{ExecutionContext, Future}
-import scala.util.Random
+import scala.concurrent.ExecutionContext
 
 @Singleton
-class AddZoneController @Inject()(messagesControllerComponents: MessagesControllerComponents, pushNotification: PushNotification, blockchainAccounts: blockchain.Accounts, masterZoneKYCs: master.ZoneKYCs, masterOrganizations: master.Organizations, transactionsAddZone: transactions.AddZone, blockchainZones: models.blockchain.Zones, blockchainTransactionAddZones: blockchainTransaction.AddZones, masterAccounts: master.Accounts, masterZones: master.Zones, withUserLoginAction: WithUserLoginAction, withGenesisLoginAction: WithGenesisLoginAction)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class AddZoneController @Inject()(messagesControllerComponents: MessagesControllerComponents, transaction: utilities.Transaction, pushNotification: PushNotification, blockchainAccounts: blockchain.Accounts, masterZoneKYCs: master.ZoneKYCs, masterOrganizations: master.Organizations, transactionsAddZone: transactions.AddZone, blockchainZones: models.blockchain.Zones, blockchainTransactionAddZones: blockchainTransaction.AddZones, masterAccounts: master.Accounts, masterZones: master.Zones, withUserLoginAction: WithUserLoginAction, withGenesisLoginAction: WithGenesisLoginAction)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
-  private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
+  private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  def addZoneForm: Action[AnyContent] = Action { implicit request =>
+  def addZoneForm(): Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.master.addZone(views.companion.master.AddZone.form))
   }
 
-  def addZone: Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
+  def addZone(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
       views.companion.master.AddZone.form.bindFromRequest().fold(
         formWithErrors => {
           BadRequest(views.html.component.master.addZone(formWithErrors))
         },
         addZoneData => {
-
           try {
             masterZones.Service.create(accountID = loginState.username, name = addZoneData.name, currency = addZoneData.currency)
             Ok(views.html.index(successes = Seq(constants.Response.ZONE_REQUEST_SENT)))
@@ -53,23 +51,17 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
           BadRequest(views.html.component.master.verifyZone(formWithErrors, formWithErrors.data(constants.Form.ZONE_ID)))
         },
         verifyZoneData => {
-
           try {
             val zoneAccountAddress = masterAccounts.Service.getAddress(masterZones.Service.getAccountId(verifyZoneData.zoneID))
-            val ticketID: String = if (kafkaEnabled) transactionsAddZone.Service.kafkaPost(transactionsAddZone.Request(from = loginState.username, to = zoneAccountAddress, zoneID = verifyZoneData.zoneID, password = verifyZoneData.password)).ticketID else Random.nextString(32)
-            blockchainTransactionAddZones.Service.create(loginState.username, zoneAccountAddress, verifyZoneData.zoneID, null, null, ticketID, null)
-
-            if (!kafkaEnabled) {
-              Future {
-                try {
-                  blockchainTransactionAddZones.Utility.onSuccess(ticketID, transactionsAddZone.Service.post(transactionsAddZone.Request(from = loginState.username, to = zoneAccountAddress, zoneID = verifyZoneData.zoneID, password = verifyZoneData.password)))
-                } catch {
-                  case baseException: BaseException => logger.error(baseException.failure.message, baseException)
-                  case blockChainException: BlockChainException => logger.error(blockChainException.failure.message, blockChainException)
-                    blockchainTransactionAddZones.Utility.onFailure(ticketID, blockChainException.failure.message)
-                }
-              }
-            }
+            transaction.process[blockchainTransaction.AddZone, transactionsAddZone.Request](
+              entity = blockchainTransaction.AddZone(from = loginState.address, to = zoneAccountAddress, zoneID = verifyZoneData.zoneID, status = null, txHash = null, ticketID = "", mode = transactionMode, code = null),
+              blockchainTransactionCreate = blockchainTransactionAddZones.Service.create,
+              request = transactionsAddZone.Request(transactionsAddZone.BaseRequest(from = loginState.address), to = zoneAccountAddress, zoneID = verifyZoneData.zoneID, password = verifyZoneData.password, mode = transactionMode),
+              action = transactionsAddZone.Service.post,
+              onSuccess = blockchainTransactionAddZones.Utility.onSuccess,
+              onFailure = blockchainTransactionAddZones.Utility.onFailure,
+              updateTransactionHash = blockchainTransactionAddZones.Service.updateTransactionHash
+            )
             Ok(views.html.index(successes = Seq(constants.Response.ZONE_VERIFIED)))
           }
           catch {
@@ -132,7 +124,6 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
           BadRequest(views.html.component.master.rejectVerifyZoneRequest(formWithErrors, formWithErrors.data(constants.Form.ZONE_ID)))
         },
         rejectVerifyZoneRequestData => {
-
           try {
             masterZones.Service.updateStatus(rejectVerifyZoneRequestData.zoneID, status = false)
             masterZoneKYCs.Service.rejectAll(masterZones.Service.getAccountId(rejectVerifyZoneRequestData.zoneID))
@@ -166,11 +157,7 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
       },
       addZoneData => {
         try {
-          if (kafkaEnabled) {
-            transactionsAddZone.Service.kafkaPost(transactionsAddZone.Request(from = addZoneData.from, to = addZoneData.to, zoneID = addZoneData.zoneID, password = addZoneData.password)).ticketID
-          } else {
-            transactionsAddZone.Service.post(transactionsAddZone.Request(from = addZoneData.from, to = addZoneData.to, zoneID = addZoneData.zoneID, password = addZoneData.password))
-          }
+          transactionsAddZone.Service.post(transactionsAddZone.Request(transactionsAddZone.BaseRequest(from = addZoneData.from), to = addZoneData.to, zoneID = addZoneData.zoneID, password = addZoneData.password, mode = transactionMode))
           Ok(views.html.index(successes = Seq(constants.Response.ZONE_ADDED)))
         }
         catch {

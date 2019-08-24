@@ -11,10 +11,9 @@ object ChangeBuyerBid {
       constants.FormField.BID.name -> constants.FormField.BID.field,
       constants.FormField.TIME.name -> constants.FormField.TIME.field,
       constants.FormField.PEG_HASH.name -> constants.FormField.PEG_HASH.field,
-      constants.FormField.GAS.name -> constants.FormField.GAS.field
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(password: String, sellerAddress: String, bid: Int, time: Int, pegHash: String, gas: Int)
+  case class Data(password: String, sellerAddress: String, bid: Int, time: Int, pegHash: String)
 
 }

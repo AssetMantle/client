@@ -8,13 +8,12 @@ import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
 
-import scala.concurrent.{ExecutionContext, Future}
-import scala.util.Random
+import scala.concurrent.ExecutionContext
 
 @Singleton
-class IssueFiatController @Inject()(messagesControllerComponents: MessagesControllerComponents, withZoneLoginAction: WithZoneLoginAction, masterTransactionIssueFiatRequests: masterTransaction.IssueFiatRequests, blockchainAclAccounts: blockchain.ACLAccounts, masterZones: master.Zones, blockchainAccounts: blockchain.Accounts, withTraderLoginAction: WithTraderLoginAction, masterAccounts: master.Accounts, blockchainFiats: models.blockchain.Fiats, transactionsIssueFiat: transactions.IssueFiat, blockchainTransactionIssueFiats: blockchainTransaction.IssueFiats)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class IssueFiatController @Inject()(messagesControllerComponents: MessagesControllerComponents, transaction: utilities.Transaction, withZoneLoginAction: WithZoneLoginAction, masterTransactionIssueFiatRequests: masterTransaction.IssueFiatRequests, blockchainAclAccounts: blockchain.ACLAccounts, masterZones: master.Zones, blockchainAccounts: blockchain.Accounts, withTraderLoginAction: WithTraderLoginAction, masterAccounts: master.Accounts, blockchainFiats: models.blockchain.Fiats, transactionsIssueFiat: transactions.IssueFiat, blockchainTransactionIssueFiats: blockchainTransaction.IssueFiats)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
-  private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
+  private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -29,7 +28,6 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
           BadRequest(views.html.component.master.issueFiatRequest(formWithErrors))
         },
         issueFiatRequestData => {
-
           try {
             masterTransactionIssueFiatRequests.Service.create(accountID = loginState.username, transactionID = issueFiatRequestData.transactionID, transactionAmount = issueFiatRequestData.transactionAmount)
             Ok(views.html.index(successes = Seq(constants.Response.ISSUE_FIAT_REQUEST_SENT)))
@@ -62,7 +60,6 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
           BadRequest(views.html.component.master.rejectIssueFiatRequest(formWithErrors, formWithErrors.data(constants.Form.REQUEST_ID)))
         },
         rejectIssueFiatRequestData => {
-
           try {
             masterTransactionIssueFiatRequests.Service.reject(id = rejectIssueFiatRequestData.requestID, comment = rejectIssueFiatRequestData.comment)
             Ok(views.html.index(successes = Seq(constants.Response.ISSUE_FIAT_REQUEST_REJECTED)))
@@ -85,24 +82,19 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
           BadRequest(views.html.component.master.issueFiat(formWithErrors, formWithErrors.data(constants.Form.REQUEST_ID), formWithErrors.data(constants.Form.ACCOUNT_ID), formWithErrors.data(constants.Form.TRANSACTION_ID), formWithErrors.data(constants.Form.TRANSACTION_AMOUNT).toInt))
         },
         issueFiatData => {
-
           try {
             if (masterTransactionIssueFiatRequests.Service.getStatus(issueFiatData.requestID).isEmpty) {
               val toAddress = masterAccounts.Service.getAddress(issueFiatData.accountID)
-              val ticketID: String = if (kafkaEnabled) transactionsIssueFiat.Service.kafkaPost(transactionsIssueFiat.Request(from = loginState.username, to = toAddress, password = issueFiatData.password, transactionID = issueFiatData.transactionID, transactionAmount = issueFiatData.transactionAmount, gas = issueFiatData.gas)).ticketID else Random.nextString(32)
-              blockchainTransactionIssueFiats.Service.create(from = loginState.username, to = toAddress, transactionID = issueFiatData.transactionID, transactionAmount = issueFiatData.transactionAmount, gas = issueFiatData.gas, null, null, ticketID = ticketID, null)
-              masterTransactionIssueFiatRequests.Service.accept(issueFiatData.requestID, ticketID, issueFiatData.gas)
-              if (!kafkaEnabled) {
-                Future {
-                  try {
-                    blockchainTransactionIssueFiats.Utility.onSuccess(ticketID, transactionsIssueFiat.Service.post(transactionsIssueFiat.Request(from = loginState.username, to = toAddress, password = issueFiatData.password, transactionID = issueFiatData.transactionID, transactionAmount = issueFiatData.transactionAmount, gas = issueFiatData.gas)))
-                  } catch {
-                    case baseException: BaseException => logger.error(baseException.failure.message, baseException)
-                    case blockChainException: BlockChainException => logger.error(blockChainException.failure.message, blockChainException)
-                      blockchainTransactionIssueFiats.Utility.onFailure(ticketID, blockChainException.failure.message)
-                  }
-                }
-              }
+              val ticketID = transaction.process[blockchainTransaction.IssueFiat, transactionsIssueFiat.Request](
+                entity = blockchainTransaction.IssueFiat(from = loginState.address, to = toAddress, transactionID = issueFiatData.transactionID, transactionAmount = issueFiatData.transactionAmount, null, null, ticketID = "", mode = transactionMode, null),
+                blockchainTransactionCreate = blockchainTransactionIssueFiats.Service.create,
+                request = transactionsIssueFiat.Request(transactionsIssueFiat.BaseRequest(from = loginState.address), to = toAddress, password = issueFiatData.password, transactionID = issueFiatData.transactionID, transactionAmount = issueFiatData.transactionAmount.toString, mode = transactionMode),
+                action = transactionsIssueFiat.Service.post,
+                onSuccess = blockchainTransactionIssueFiats.Utility.onSuccess,
+                onFailure = blockchainTransactionIssueFiats.Utility.onFailure,
+                updateTransactionHash = blockchainTransactionIssueFiats.Service.updateTransactionHash
+              )
+              masterTransactionIssueFiatRequests.Service.accept(issueFiatData.requestID, ticketID)
               Ok(views.html.index(successes = Seq(constants.Response.FIAT_ISSUED)))
             } else {
               Ok(views.html.index(failures = Seq(constants.Response.REQUEST_ALREADY_APPROVED_OR_REJECTED)))
@@ -127,11 +119,7 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
       },
       issueFiatData => {
         try {
-          if (kafkaEnabled) {
-            transactionsIssueFiat.Service.kafkaPost(transactionsIssueFiat.Request(from = issueFiatData.from, to = issueFiatData.to, password = issueFiatData.password, transactionID = issueFiatData.transactionID, transactionAmount = issueFiatData.transactionAmount, gas = issueFiatData.gas))
-          } else {
-            transactionsIssueFiat.Service.post(transactionsIssueFiat.Request(from = issueFiatData.from, to = issueFiatData.to, password = issueFiatData.password, transactionID = issueFiatData.transactionID, transactionAmount = issueFiatData.transactionAmount, gas = issueFiatData.gas))
-          }
+          transactionsIssueFiat.Service.post(transactionsIssueFiat.Request(transactionsIssueFiat.BaseRequest(from = issueFiatData.from), to = issueFiatData.to, password = issueFiatData.password, transactionID = issueFiatData.transactionID, transactionAmount = issueFiatData.transactionAmount.toString, mode = issueFiatData.mode))
           Ok(views.html.index(successes = Seq(constants.Response.FIAT_ISSUED)))
         }
         catch {

@@ -7,7 +7,7 @@ import javax.inject.{Inject, Singleton}
 import play.api.libs.json.{Json, OWrites}
 import play.api.libs.ws.{WSClient, WSResponse}
 import play.api.{Configuration, Logger}
-import transactions.responses.TransactionResponse.{KafkaResponse, Response}
+import utilities.RequestEntity
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
@@ -29,34 +29,23 @@ class IssueAsset @Inject()(wsClient: WSClient)(implicit configuration: Configura
 
   private val chainID = configuration.get[String]("blockchain.main.chainID")
 
-  private def action(request: Request)(implicit executionContext: ExecutionContext): Future[Response] = wsClient.url(url).post(Json.toJson(request)).map { response => utilities.JSON.getResponseFromJson[Response](response) }
+  case class BaseRequest(from: String, chain_id: String = chainID)
+
+  case class Request(base_req: BaseRequest, to: String, documentHash: String, assetType: String, assetPrice: String, quantityUnit: String, assetQuantity: String, takerAddress: String, mode: String, password: String, moderated: Boolean) extends RequestEntity
+
+  private implicit val baseRequestWrites: OWrites[BaseRequest] = Json.writes[BaseRequest]
 
   private implicit val requestWrites: OWrites[Request] = Json.writes[Request]
 
-  private def kafkaAction(request: Request)(implicit executionContext: ExecutionContext): Future[KafkaResponse] = wsClient.url(url).post(Json.toJson(request)).map { response => utilities.JSON.getResponseFromJson[KafkaResponse](response) }
-
-  case class Request(from: String, to: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, chainID: String = chainID, password: String, gas: Int, moderated: Boolean)
+  private def action(request: Request): Future[WSResponse] = wsClient.url(url).post(Json.toJson(request))
 
   object Service {
-    def post(request: Request)(implicit executionContext: ExecutionContext): Response = try {
-      Await.result(action(request), Duration.Inf)
+    def post(request: Request): WSResponse = try {
+    Await.result(action(request), Duration.Inf)
     } catch {
-      case connectException: ConnectException =>
-        logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
+      case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
         throw new BlockChainException(constants.Response.CONNECT_EXCEPTION)
     }
-
-    def kafkaPost(request: Request)(implicit executionContext: ExecutionContext): KafkaResponse = try {
-      Await.result(kafkaAction(request), Duration.Inf)
-    } catch {
-      case connectException: ConnectException =>
-        logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
-        throw new BlockChainException(constants.Response.CONNECT_EXCEPTION)
-    }
-
-    def getTxHashFromWSResponse(wsResponse: WSResponse): String = utilities.JSON.getResponseFromJson[Response](wsResponse).TxHash
-
-    def getTxFromWSResponse(wsResponse: WSResponse): Response = utilities.JSON.getResponseFromJson[Response](wsResponse)
   }
 
 }

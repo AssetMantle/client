@@ -10,7 +10,7 @@ object AccountResponse {
 
   implicit val assetReads: Reads[Asset] = Json.reads[Asset]
 
-  case class Asset(pegHash: String, documentHash: String, assetType: String, assetQuantity: String, assetPrice: String, quantityUnit: String, ownerAddress: String, locked: Boolean, moderated: Boolean)
+  case class Asset(pegHash: String, documentHash: String, assetType: String, assetQuantity: String, assetPrice: String, quantityUnit: String, ownerAddress: String, locked: Boolean, moderated: Boolean, takerAddress: String)
 
   case class Owners(ownerAddress: String, amount: String)
 

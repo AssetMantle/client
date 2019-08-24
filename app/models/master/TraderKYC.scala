@@ -57,6 +57,8 @@ class TraderKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfigP
   private def zoneUpdateStatusById(id: String, zoneStatus: Option[Boolean]): Future[Int] = db.run(traderKYCTable.filter(_.id === id).map(_.zoneStatus.?).update(zoneStatus).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }
@@ -65,6 +67,8 @@ class TraderKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfigP
   private def zoneUpdateStatusByIdAndDocumentType(id: String, documentType: String, zoneStatus: Option[Boolean]): Future[Int] = db.run(traderKYCTable.filter(_.id === id).filter(_.documentType === documentType).map(_.zoneStatus.?).update(zoneStatus).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }
@@ -73,6 +77,8 @@ class TraderKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfigP
   private def organizationUpdateStatusById(id: String, status: Option[Boolean]): Future[Int] = db.run(traderKYCTable.filter(_.id === id).map(_.organizationStatus.?).update(status).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }
@@ -81,6 +87,8 @@ class TraderKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfigP
   private def organizationUpdateStatusByIdAndDocumentType(id: String, documentType: String, status: Option[Boolean]): Future[Int] = db.run(traderKYCTable.filter(_.id === id).filter(_.documentType === documentType).map(_.organizationStatus.?).update(status).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }

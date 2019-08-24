@@ -36,9 +36,13 @@ class Orders @Inject()(shutdownActors: ShutdownActors, masterAccounts: master.Ac
   private implicit val materializer: ActorMaterializer = ActorMaterializer()(actorSystem)
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_ORDER
+
   private val actorTimeout = configuration.get[Int]("akka.actors.timeout").seconds
-  val mainOrderActor: ActorRef = actorSystem.actorOf(props = MainOrderActor.props(actorTimeout, actorSystem), name = constants.Module.ACTOR_MAIN_ORDER)
+
   private val cometActorSleepTime = configuration.get[Long]("akka.actors.cometActorSleepTime")
+
+  val mainOrderActor: ActorRef = actorSystem.actorOf(props = MainOrderActor.props(actorTimeout, actorSystem), name = constants.Module.ACTOR_MAIN_ORDER)
+
   private[models] val orderTable = TableQuery[OrderTable]
 
   private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
@@ -47,7 +51,7 @@ class Orders @Inject()(shutdownActors: ShutdownActors, masterAccounts: master.Ac
 
   private val sleepTime = configuration.get[Long]("blockchain.entityIterator.threadSleep")
 
-  private def add(order: Order)(implicit executionContext: ExecutionContext): Future[String] = db.run((orderTable returning orderTable.map(_.id) += order).asTry).map {
+  private def add(order: Order): Future[String] = db.run((orderTable returning orderTable.map(_.id) += order).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -55,7 +59,7 @@ class Orders @Inject()(shutdownActors: ShutdownActors, masterAccounts: master.Ac
     }
   }
 
-  private def upsert(order: Order)(implicit executionContext: ExecutionContext): Future[Int] = db.run(orderTable.insertOrUpdate(order).asTry).map {
+  private def upsert(order: Order): Future[Int] = db.run(orderTable.insertOrUpdate(order).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -63,11 +67,9 @@ class Orders @Inject()(shutdownActors: ShutdownActors, masterAccounts: master.Ac
     }
   }
 
-  private def findById(id: String)(implicit executionContext: ExecutionContext): Future[Order] = db.run(orderTable.filter(_.id === id).result.head.asTry).map {
+  private def findById(id: String): Future[Order] = db.run(orderTable.filter(_.id === id).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }
@@ -93,7 +95,7 @@ class Orders @Inject()(shutdownActors: ShutdownActors, masterAccounts: master.Ac
 
   private def getOrderIDsWithoutAWBProofHash: Future[Seq[String]] = db.run(orderTable.filter(_.awbProofHash.?.isEmpty).map(_.id).result)
 
-  private def deleteById(id: String)(implicit executionContext: ExecutionContext): Future[Int] = db.run(orderTable.filter(_.id === id).delete.asTry).map {
+  private def deleteById(id: String): Future[Int] = db.run(orderTable.filter(_.id === id).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -119,9 +121,9 @@ class Orders @Inject()(shutdownActors: ShutdownActors, masterAccounts: master.Ac
 
   object Service {
 
-    def create(id: String, fiatProofHash: Option[String], awbProofHash: Option[String])(implicit executionContext: ExecutionContext): String = Await.result(add(Order(id = id, fiatProofHash = fiatProofHash, awbProofHash = awbProofHash, dirtyBit = true)), Duration.Inf)
+    def create(id: String, fiatProofHash: Option[String], awbProofHash: Option[String]): String = Await.result(add(Order(id = id, fiatProofHash = fiatProofHash, awbProofHash = awbProofHash, dirtyBit = true)), Duration.Inf)
 
-    def insertOrUpdate(id: String, fiatProofHash: Option[String], awbProofHash: Option[String], dirtyBit: Boolean)(implicit executionContext: ExecutionContext): Int = Await.result(upsert(Order(id = id, fiatProofHash = fiatProofHash, awbProofHash = awbProofHash, dirtyBit = dirtyBit)), Duration.Inf)
+    def insertOrUpdate(id: String, fiatProofHash: Option[String], awbProofHash: Option[String], dirtyBit: Boolean): Int = Await.result(upsert(Order(id = id, fiatProofHash = fiatProofHash, awbProofHash = awbProofHash, dirtyBit = dirtyBit)), Duration.Inf)
 
     def getDirtyOrders: Seq[Order] = Await.result(getOrdersByDirtyBit(dirtyBit = true), Duration.Inf)
 
@@ -154,11 +156,11 @@ class Orders @Inject()(shutdownActors: ShutdownActors, masterAccounts: master.Ac
           val negotiation = blockchainNegotiations.Service.get(dirtyOrder.id)
           if ((orderResponse.value.awbProofHash != "" && orderResponse.value.fiatProofHash != "") || (orderResponse.value.awbProofHash == "" && orderResponse.value.fiatProofHash == "")) {
             val sellerAccount = getAccount.Service.get(negotiation.sellerAddress)
-            sellerAccount.value.assetPegWallet.foreach(assets => assets.foreach(asset => blockchainAssets.Service.insertOrUpdate(pegHash = asset.pegHash, documentHash = asset.documentHash, assetType = asset.assetType, assetQuantity = asset.assetQuantity, quantityUnit = asset.quantityUnit, assetPrice = asset.assetPrice, ownerAddress = negotiation.sellerAddress, moderated = asset.moderated, locked = asset.locked, dirtyBit = true)))
+            sellerAccount.value.assetPegWallet.foreach(assets => assets.foreach(asset => blockchainAssets.Service.insertOrUpdate(pegHash = asset.pegHash, documentHash = asset.documentHash, assetType = asset.assetType, assetQuantity = asset.assetQuantity, quantityUnit = asset.quantityUnit, assetPrice = asset.assetPrice, ownerAddress = negotiation.sellerAddress, moderated = asset.moderated, takerAddress = if (asset.takerAddress == "") null else Option(asset.takerAddress), locked = asset.locked, dirtyBit = true)))
             sellerAccount.value.fiatPegWallet.foreach(fiats => fiats.foreach(fiatPeg => blockchainFiats.Service.insertOrUpdate(fiatPeg.pegHash, negotiation.sellerAddress, fiatPeg.transactionID, fiatPeg.transactionAmount, fiatPeg.redeemedAmount, dirtyBit = true)))
 
             val buyerAccount = getAccount.Service.get(negotiation.buyerAddress)
-            buyerAccount.value.assetPegWallet.foreach(assets => assets.foreach(asset => blockchainAssets.Service.insertOrUpdate(pegHash = asset.pegHash, documentHash = asset.documentHash, assetType = asset.assetType, assetQuantity = asset.assetQuantity, quantityUnit = asset.quantityUnit, assetPrice = asset.assetPrice, ownerAddress = negotiation.buyerAddress, moderated = asset.moderated, locked = asset.locked, dirtyBit = true)))
+            buyerAccount.value.assetPegWallet.foreach(assets => assets.foreach(asset => blockchainAssets.Service.insertOrUpdate(pegHash = asset.pegHash, documentHash = asset.documentHash, assetType = asset.assetType, assetQuantity = asset.assetQuantity, quantityUnit = asset.quantityUnit, assetPrice = asset.assetPrice, ownerAddress = negotiation.buyerAddress, moderated = asset.moderated, takerAddress = if (asset.takerAddress == "") null else Option(asset.takerAddress), locked = asset.locked, dirtyBit = true)))
             buyerAccount.value.fiatPegWallet.foreach(fiats => fiats.foreach(fiatPeg => blockchainFiats.Service.insertOrUpdate(fiatPeg.pegHash, negotiation.buyerAddress, fiatPeg.transactionID, fiatPeg.transactionAmount, fiatPeg.redeemedAmount, dirtyBit = true)))
 
             blockchainFiats.Service.deleteFiatPegWallet(dirtyOrder.id)
@@ -167,12 +169,10 @@ class Orders @Inject()(shutdownActors: ShutdownActors, masterAccounts: master.Ac
             blockchainTraderFeedbackHistories.Service.create(negotiation.sellerAddress, negotiation.buyerAddress, negotiation.sellerAddress, negotiation.assetPegHash, rating = "")
             blockchainTraderFeedbackHistories.Service.create(negotiation.buyerAddress, negotiation.buyerAddress, negotiation.sellerAddress, negotiation.assetPegHash, rating = "")
             blockchainNegotiations.Service.deleteNegotiations(negotiation.assetPegHash)
-
           }
           Service.insertOrUpdate(dirtyOrder.id, awbProofHash = if (orderResponse.value.awbProofHash == "") null else Option(orderResponse.value.awbProofHash), fiatProofHash = if (orderResponse.value.fiatProofHash == "") null else Option(orderResponse.value.fiatProofHash), dirtyBit = false)
           mainOrderActor ! OrderCometMessage(username = masterAccounts.Service.getId(negotiation.buyerAddress), message = Json.toJson(constants.Comet.PING))
           mainOrderActor ! OrderCometMessage(username = masterAccounts.Service.getId(negotiation.sellerAddress), message = Json.toJson(constants.Comet.PING))
-
         }
         catch {
           case blockChainException: BlockChainException => logger.error(blockChainException.failure.message, blockChainException)

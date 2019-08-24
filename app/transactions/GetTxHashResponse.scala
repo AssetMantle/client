@@ -11,7 +11,7 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 
 @Singleton
-class GetResponse @Inject()()(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
+class GetTxHashResponse @Inject()()(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.TRANSACTIONS_GET_RESPONSE
 
@@ -21,7 +21,7 @@ class GetResponse @Inject()()(implicit wsClient: WSClient, configuration: Config
 
   private val port = configuration.get[String]("blockchain.main.restPort")
 
-  private val path = "response"
+  private val path = "txs"
 
   private val url = ip + ":" + port + "/" + path + "/"
 
@@ -29,9 +29,9 @@ class GetResponse @Inject()()(implicit wsClient: WSClient, configuration: Config
 
   object Service {
 
-    def get(ticketID: String): WSResponse = {
+    def get(txHash: String): WSResponse = {
       try {
-        Await.result(action(ticketID), Duration.Inf)
+        Await.result(action(txHash), Duration.Inf)
       } catch {
         case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
           throw new BlockChainException(constants.Response.CONNECT_EXCEPTION)

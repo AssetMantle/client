@@ -1,5 +1,6 @@
 package models.blockchainTransaction
 
+import akka.actor.ActorSystem
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.masterTransaction.FaucetRequests
@@ -10,19 +11,20 @@ import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
 import queries.GetAccount
 import slick.jdbc.JdbcProfile
-import transactions.GetResponse
-import transactions.responses.TransactionResponse.Response
-import utilities.PushNotification
-import akka.actor.ActorSystem
+import transactions.responses.TransactionResponse.BlockResponse
+import utilities.{PushNotification, TransactionEntity}
 
 import scala.concurrent.duration.{Duration, _}
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class SendCoin(from: String, to: String, amount: Int, gas: Int, status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])
+case class SendCoin(from: String, to: String, amount: Int,  status: Option[Boolean], txHash: Option[String], ticketID: String, mode: String, code: Option[String]) extends TransactionEntity[SendCoin] {
+  def mutateTicketID(newTicketID: String): SendCoin = SendCoin(from = from, to = to, amount = amount, status = status, txHash, ticketID = newTicketID, mode = mode, code = code)
+}
+
 
 @Singleton
-class SendCoins @Inject()(actorSystem: ActorSystem, protected val databaseConfigProvider: DatabaseConfigProvider, transactionSendCoin: transactions.SendCoin, getResponse: GetResponse, pushNotification: PushNotification, masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts, implicit val faucetRequests: FaucetRequests, implicit val getAccount: GetAccount)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
+class SendCoins @Inject()(actorSystem: ActorSystem, transaction: utilities.Transaction, protected val databaseConfigProvider: DatabaseConfigProvider, transactionSendCoin: transactions.SendCoin, pushNotification: PushNotification, masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts, implicit val faucetRequests: FaucetRequests, implicit val getAccount: GetAccount)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -38,8 +40,9 @@ class SendCoins @Inject()(actorSystem: ActorSystem, protected val databaseConfig
   private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
   private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
   private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
+  private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
-  private def add(sendCoin: SendCoin)(implicit executionContext: ExecutionContext): Future[String] = db.run((sendCoinTable returning sendCoinTable.map(_.ticketID) += sendCoin).asTry).map {
+  private def add(sendCoin: SendCoin): Future[String] = db.run((sendCoinTable returning sendCoinTable.map(_.ticketID) += sendCoin).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -47,7 +50,15 @@ class SendCoins @Inject()(actorSystem: ActorSystem, protected val databaseConfig
     }
   }
 
-  private def upsert(sendCoin: SendCoin)(implicit executionContext: ExecutionContext): Future[Int] = db.run(sendCoinTable.insertOrUpdate(sendCoin).asTry).map {
+  private def upsert(sendCoin: SendCoin): Future[Int] = db.run(sendCoinTable.insertOrUpdate(sendCoin).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+    }
+  }
+
+  private def updateStatusAndCodeOnTicketID(ticketID: String, status: Option[Boolean], code: String): Future[Int] = db.run(sendCoinTable.filter(_.ticketID === ticketID).map(x => (x.status.?, x.code)).update((status, code)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -57,7 +68,7 @@ class SendCoins @Inject()(actorSystem: ActorSystem, protected val databaseConfig
     }
   }
 
-  private def updateStatusAndResponseCodeOnTicketID(ticketID: String, status: Option[Boolean], responseCode: String): Future[Int] = db.run(sendCoinTable.filter(_.ticketID === ticketID).map(x => (x.status.?, x.responseCode)).update((status, responseCode)).asTry).map {
+  private def updateTxHashAndStatusOnTicketID(ticketID: String, txHash: Option[String], status: Option[Boolean]): Future[Int] = db.run(sendCoinTable.filter(_.ticketID === ticketID).map(x => (x.txHash.?, x.status.?)).update((txHash, status)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -67,21 +78,9 @@ class SendCoins @Inject()(actorSystem: ActorSystem, protected val databaseConfig
     }
   }
 
-  private def updateTxHashStatusAndResponseCodeOnTicketID(ticketID: String, txHash: String, status: Option[Boolean], responseCode: String): Future[Int] = db.run(sendCoinTable.filter(_.ticketID === ticketID).map(x => (x.txHash, x.status.?, x.responseCode)).update((txHash, status, responseCode)).asTry).map {
+  private def findByTicketID(ticketID: String): Future[SendCoin] = db.run(sendCoinTable.filter(_.ticketID === ticketID).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
-
-  private def findByTicketID(ticketID: String)(implicit executionContext: ExecutionContext): Future[SendCoin] = db.run(sendCoinTable.filter(_.ticketID === ticketID).result.head.asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }
@@ -89,7 +88,17 @@ class SendCoins @Inject()(actorSystem: ActorSystem, protected val databaseConfig
 
   private def getTicketIDsWithNullStatus: Future[Seq[String]] = db.run(sendCoinTable.filter(_.status.?.isEmpty).map(_.ticketID).result)
 
-  private def deleteByTicketID(ticketID: String)(implicit executionContext: ExecutionContext) = db.run(sendCoinTable.filter(_.ticketID === ticketID).delete.asTry).map {
+  private def deleteByTicketID(ticketID: String) = db.run(sendCoinTable.filter(_.ticketID === ticketID).delete.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def updateTxHashOnTicketID(ticketID: String, txHash: Option[String]): Future[Int] = db.run(sendCoinTable.filter(_.ticketID === ticketID).map(x => x.txHash.?).update(txHash).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -101,7 +110,7 @@ class SendCoins @Inject()(actorSystem: ActorSystem, protected val databaseConfig
 
   private[models] class SendCoinTable(tag: Tag) extends Table[SendCoin](tag, "SendCoin") {
 
-    def * = (from, to, amount, gas, status.?, txHash.?, ticketID, responseCode.?) <> (SendCoin.tupled, SendCoin.unapply)
+    def * = (from, to, amount, status.?, txHash.?, ticketID, mode, code.?) <> (SendCoin.tupled, SendCoin.unapply)
 
     def from = column[String]("from")
 
@@ -109,44 +118,48 @@ class SendCoins @Inject()(actorSystem: ActorSystem, protected val databaseConfig
 
     def amount = column[Int]("amount")
 
-    def gas = column[Int]("gas")
-
     def status = column[Boolean]("status")
 
     def txHash = column[String]("txHash")
 
     def ticketID = column[String]("ticketID", O.PrimaryKey)
 
-    def responseCode = column[String]("responseCode")
+    def mode = column[String]("mode")
+
+    def code = column[String]("code")
   }
 
   object Service {
 
-    def create(from: String, to: String, amount: Int, gas: Int, status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])(implicit executionContext: ExecutionContext): String = Await.result(add(SendCoin(from = from, to = to, amount = amount, gas = gas, status = status, txHash = txHash, ticketID = ticketID, responseCode = responseCode)), Duration.Inf)
+    def create(sendCoin: SendCoin): String = Await.result(add(SendCoin(from = sendCoin.from, to = sendCoin.to, amount = sendCoin.amount, status = sendCoin.status, txHash = sendCoin.txHash, ticketID = sendCoin.ticketID, mode = sendCoin.mode, code = sendCoin.code)), Duration.Inf)
 
-    def markTransactionFailed(ticketID: String, responseCode: String): Int = Await.result(updateStatusAndResponseCodeOnTicketID(ticketID, status = Option(false), responseCode), Duration.Inf)
+    def markTransactionFailed(ticketID: String, code: String): Int = Await.result(updateStatusAndCodeOnTicketID(ticketID, status = Option(false), code), Duration.Inf)
 
-    def markTransactionSuccessful(ticketID: String, txHash: String, responseCode: String): Int = Await.result(updateTxHashStatusAndResponseCodeOnTicketID(ticketID, txHash, status = Option(true), responseCode), Duration.Inf)
+    def markTransactionSuccessful(ticketID: String, txHash: String): Int = Await.result(updateTxHashAndStatusOnTicketID(ticketID, Option(txHash), status = Option(true)), Duration.Inf)
 
     def getTicketIDsOnStatus(): Seq[String] = Await.result(getTicketIDsWithNullStatus, Duration.Inf)
 
-    def getTransaction(ticketID: String)(implicit executionContext: ExecutionContext): SendCoin = Await.result(findByTicketID(ticketID), Duration.Inf)
+    def getTransaction(ticketID: String): SendCoin = Await.result(findByTicketID(ticketID), Duration.Inf)
+
+    def getTransactionHash(ticketID: String): Option[String] = Await.result(findByTicketID(ticketID), Duration.Inf).txHash
+
+    def updateTransactionHash(ticketID: String, txHash: String): Int = Await.result(updateTxHashOnTicketID(ticketID = ticketID, txHash = Option(txHash)), Duration.Inf)
 
   }
 
   object Utility {
-    def onSuccess(ticketID: String, response: Response): Future[Unit] = Future {
+    def onSuccess(ticketID: String, blockResponse: BlockResponse): Future[Unit] = Future {
       try {
-        Service.markTransactionSuccessful(ticketID, response.TxHash, response.Code)
+        Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
         val sendCoin = Service.getTransaction(ticketID)
         blockchainAccounts.Service.markDirty(sendCoin.to)
-        blockchainAccounts.Service.markDirty(masterAccounts.Service.getAddress(sendCoin.from))
+        blockchainAccounts.Service.markDirty(sendCoin.from)
         val toAccount = masterAccounts.Service.getAccountByAddress(sendCoin.to)
         if (toAccount.userType == constants.User.UNKNOWN) {
           masterAccounts.Service.updateUserType(toAccount.id, constants.User.USER)
         }
-        pushNotification.sendNotification(toAccount.id, constants.Notification.SUCCESS, response.TxHash)
-        pushNotification.sendNotification(sendCoin.from, constants.Notification.SUCCESS, response.TxHash)
+        pushNotification.sendNotification(toAccount.id, constants.Notification.SUCCESS, blockResponse.txhash)
+        pushNotification.sendNotification(masterAccounts.Service.getId(sendCoin.from), constants.Notification.SUCCESS, blockResponse.txhash)
       }
       catch {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
@@ -159,17 +172,16 @@ class SendCoins @Inject()(actorSystem: ActorSystem, protected val databaseConfig
         Service.markTransactionFailed(ticketID, message)
         val sendCoin = Service.getTransaction(ticketID)
         pushNotification.sendNotification(masterAccounts.Service.getId(sendCoin.to), constants.Notification.FAILURE, message)
-        pushNotification.sendNotification(sendCoin.from, constants.Notification.FAILURE, message)
+        pushNotification.sendNotification(masterAccounts.Service.getId(sendCoin.from), constants.Notification.FAILURE, message)
       } catch {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
     }
   }
 
-
-  if (kafkaEnabled) {
+  if (kafkaEnabled || transactionMode != constants.Transactions.BLOCK_MODE) {
     actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
-      utilities.TicketUpdater.start(Service.getTicketIDsOnStatus, transactionSendCoin.Service.getTxFromWSResponse, Utility.onSuccess, Utility.onFailure)
+      transaction.ticketUpdater(Service.getTicketIDsOnStatus, Service.getTransactionHash, Utility.onSuccess, Utility.onFailure)
     }
   }
 }

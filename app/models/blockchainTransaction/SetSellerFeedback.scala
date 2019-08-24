@@ -1,5 +1,6 @@
 package models.blockchainTransaction
 
+import akka.actor.ActorSystem
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.{blockchain, master}
@@ -8,19 +9,20 @@ import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
-import transactions.GetResponse
-import transactions.responses.TransactionResponse.Response
-import utilities.PushNotification
-import akka.actor.ActorSystem
+import transactions.responses.TransactionResponse.BlockResponse
+import utilities.{PushNotification, TransactionEntity}
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class SetSellerFeedback(from: String, to: String, pegHash: String, rating: Int, gas: Int, status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])
+case class SetSellerFeedback(from: String, to: String, pegHash: String, rating: Int,  status: Option[Boolean], txHash: Option[String], ticketID: String, mode: String, code: Option[String]) extends TransactionEntity[SetSellerFeedback] {
+  def mutateTicketID(newTicketID: String): SetSellerFeedback = SetSellerFeedback(from = from, to = to, pegHash = pegHash, rating = rating, status = status, txHash = txHash, ticketID = newTicketID, mode = mode, code = code)
+}
+
 
 @Singleton
-class SetSellerFeedbacks @Inject()(actorSystem: ActorSystem, protected val databaseConfigProvider: DatabaseConfigProvider, transactionSetSellerFeedback: transactions.SetSellerFeedback, getResponse: GetResponse, pushNotification: PushNotification, masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts, blockchainTraderFeedbackHistories: blockchain.TraderFeedbackHistories)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
+class SetSellerFeedbacks @Inject()(actorSystem: ActorSystem, transaction: utilities.Transaction, protected val databaseConfigProvider: DatabaseConfigProvider, transactionSetSellerFeedback: transactions.SetSellerFeedback, pushNotification: PushNotification, masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts, blockchainTraderFeedbackHistories: blockchain.TraderFeedbackHistories)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_SET_SELLER_FEEDBACK
 
@@ -38,9 +40,9 @@ class SetSellerFeedbacks @Inject()(actorSystem: ActorSystem, protected val datab
   private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
   private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
   private val sleepTime = configuration.get[Long]("blockchain.entityIterator.threadSleep")
+  private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
-
-  private def add(setSellerFeedback: SetSellerFeedback)(implicit executionContext: ExecutionContext): Future[String] = db.run((setSellerFeedbackTable returning setSellerFeedbackTable.map(_.ticketID) += setSellerFeedback).asTry).map {
+  private def add(setSellerFeedback: SetSellerFeedback): Future[String] = db.run((setSellerFeedbackTable returning setSellerFeedbackTable.map(_.ticketID) += setSellerFeedback).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -48,7 +50,23 @@ class SetSellerFeedbacks @Inject()(actorSystem: ActorSystem, protected val datab
     }
   }
 
-  private def upsert(setSellerFeedback: SetSellerFeedback)(implicit executionContext: ExecutionContext): Future[Int] = db.run(setSellerFeedbackTable.insertOrUpdate(setSellerFeedback).asTry).map {
+  private def upsert(setSellerFeedback: SetSellerFeedback): Future[Int] = db.run(setSellerFeedbackTable.insertOrUpdate(setSellerFeedback).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+    }
+  }
+
+  private def findByTicketID(ticketID: String): Future[SetSellerFeedback] = db.run(setSellerFeedbackTable.filter(_.ticketID === ticketID).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def updateTxHashAndStatusOnTicketID(ticketID: String, txHash: Option[String], status: Option[Boolean]): Future[Int] = db.run(setSellerFeedbackTable.filter(_.ticketID === ticketID).map(x => (x.txHash.?, x.status.?)).update(txHash, status).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -58,27 +76,7 @@ class SetSellerFeedbacks @Inject()(actorSystem: ActorSystem, protected val datab
     }
   }
 
-  private def findByTicketID(ticketID: String)(implicit executionContext: ExecutionContext): Future[SetSellerFeedback] = db.run(setSellerFeedbackTable.filter(_.ticketID === ticketID).result.head.asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
-
-  private def updateTxHashStatusAndResponseCodeOnTicketID(ticketID: String, txHash: String, status: Option[Boolean], responseCode: String)(implicit executionContext: ExecutionContext): Future[Int] = db.run(setSellerFeedbackTable.filter(_.ticketID === ticketID).map(x => (x.txHash, x.status.?, x.responseCode)).update(txHash, status, responseCode).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
-
-  private def updateStatusAndResponseCodeOnTicketID(ticketID: String, status: Option[Boolean], responseCode: String): Future[Int] = db.run(setSellerFeedbackTable.filter(_.ticketID === ticketID).map(x => (x.status.?, x.responseCode)).update((status, responseCode)).asTry).map {
+  private def updateStatusAndCodeOnTicketID(ticketID: String, status: Option[Boolean], code: String): Future[Int] = db.run(setSellerFeedbackTable.filter(_.ticketID === ticketID).map(x => (x.status.?, x.code)).update((status, code)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -90,7 +88,17 @@ class SetSellerFeedbacks @Inject()(actorSystem: ActorSystem, protected val datab
 
   private def getTicketIDsWithNullStatus: Future[Seq[String]] = db.run(setSellerFeedbackTable.filter(_.status.?.isEmpty).map(_.ticketID).result)
 
-  private def deleteByTicketID(ticketID: String)(implicit executionContext: ExecutionContext) = db.run(setSellerFeedbackTable.filter(_.ticketID === ticketID).delete.asTry).map {
+  private def deleteByTicketID(ticketID: String) = db.run(setSellerFeedbackTable.filter(_.ticketID === ticketID).delete.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def updateTxHashOnTicketID(ticketID: String, txHash: Option[String]): Future[Int] = db.run(setSellerFeedbackTable.filter(_.ticketID === ticketID).map(x => x.txHash.?).update(txHash).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -102,7 +110,7 @@ class SetSellerFeedbacks @Inject()(actorSystem: ActorSystem, protected val datab
 
   private[models] class SetSellerFeedbackTable(tag: Tag) extends Table[SetSellerFeedback](tag, "SetSellerFeedback") {
 
-    def * = (from, to, pegHash, rating, gas, status.?, txHash.?, ticketID, responseCode.?) <> (SetSellerFeedback.tupled, SetSellerFeedback.unapply)
+    def * = (from, to, pegHash, rating, status.?, txHash.?, ticketID, mode, code.?) <> (SetSellerFeedback.tupled, SetSellerFeedback.unapply)
 
     def from = column[String]("from")
 
@@ -112,41 +120,44 @@ class SetSellerFeedbacks @Inject()(actorSystem: ActorSystem, protected val datab
 
     def rating = column[Int]("rating")
 
-    def gas = column[Int]("gas")
-
     def status = column[Boolean]("status")
 
     def txHash = column[String]("txHash")
 
     def ticketID = column[String]("ticketID", O.PrimaryKey)
 
-    def responseCode = column[String]("responseCode")
+    def mode = column[String]("mode")
+
+    def code = column[String]("code")
   }
 
   object Service {
 
-    def create(from: String, to: String, pegHash: String, rating: Int, gas: Int, status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])(implicit executionContext: ExecutionContext): String = Await.result(add(SetSellerFeedback(from = from, to = to, pegHash = pegHash, rating = rating, gas = gas, status = status, txHash = txHash, ticketID = ticketID, responseCode = responseCode)), Duration.Inf)
+    def create(setSellerFeedback: SetSellerFeedback): String = Await.result(add(SetSellerFeedback(from = setSellerFeedback.from, to = setSellerFeedback.to, pegHash = setSellerFeedback.pegHash, rating = setSellerFeedback.rating, status = setSellerFeedback.status, txHash = setSellerFeedback.txHash, ticketID = setSellerFeedback.ticketID, mode = setSellerFeedback.mode, code = setSellerFeedback.code)), Duration.Inf)
 
     def getTicketIDsOnStatus(): Seq[String] = Await.result(getTicketIDsWithNullStatus, Duration.Inf)
 
     def getTransaction(ticketID: String): SetSellerFeedback = Await.result(findByTicketID(ticketID), Duration.Inf)
 
-    def markTransactionSuccessful(ticketID: String, txHash: String, responseCode: String): Int = Await.result(updateTxHashStatusAndResponseCodeOnTicketID(ticketID, txHash, status = Option(true), responseCode), Duration.Inf)
+    def markTransactionSuccessful(ticketID: String, txHash: String): Int = Await.result(updateTxHashAndStatusOnTicketID(ticketID, Option(txHash), status = Option(true)), Duration.Inf)
 
-    def markTransactionFailed(ticketID: String, responseCode: String): Int = Await.result(updateStatusAndResponseCodeOnTicketID(ticketID, status = Option(false), responseCode), Duration.Inf)
+    def markTransactionFailed(ticketID: String, code: String): Int = Await.result(updateStatusAndCodeOnTicketID(ticketID, status = Option(false), code), Duration.Inf)
+
+    def getTransactionHash(ticketID: String): Option[String] = Await.result(findByTicketID(ticketID), Duration.Inf).txHash
+
+    def updateTransactionHash(ticketID: String, txHash: String): Int = Await.result(updateTxHashOnTicketID(ticketID = ticketID, txHash = Option(txHash)), Duration.Inf)
 
   }
 
   object Utility {
-    def onSuccess(ticketID: String, response: Response): Future[Unit] = Future {
+    def onSuccess(ticketID: String, blockResponse: BlockResponse): Future[Unit] = Future {
       try {
-        Service.markTransactionSuccessful(ticketID, response.TxHash, response.Code)
+        Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
         val setSellerFeedback = Service.getTransaction(ticketID)
-        val fromAddress = masterAccounts.Service.getAddress(setSellerFeedback.from)
-        blockchainTraderFeedbackHistories.Service.update(setSellerFeedback.to, setSellerFeedback.to, fromAddress, setSellerFeedback.pegHash, setSellerFeedback.rating.toString)
-        blockchainAccounts.Service.markDirty(fromAddress)
-        pushNotification.sendNotification(masterAccounts.Service.getId(setSellerFeedback.to), constants.Notification.SUCCESS, response.TxHash)
-        pushNotification.sendNotification(setSellerFeedback.from, constants.Notification.SUCCESS, response.TxHash)
+        blockchainTraderFeedbackHistories.Service.update(setSellerFeedback.from, setSellerFeedback.to, setSellerFeedback.from, setSellerFeedback.pegHash, setSellerFeedback.rating.toString)
+        blockchainAccounts.Service.markDirty(setSellerFeedback.from)
+        pushNotification.sendNotification(masterAccounts.Service.getId(setSellerFeedback.to), constants.Notification.SUCCESS, blockResponse.txhash)
+        pushNotification.sendNotification(masterAccounts.Service.getId(setSellerFeedback.from), constants.Notification.SUCCESS, blockResponse.txhash)
       } catch {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
           throw new BaseException(constants.Response.PSQL_EXCEPTION)
@@ -158,17 +169,16 @@ class SetSellerFeedbacks @Inject()(actorSystem: ActorSystem, protected val datab
         Service.markTransactionFailed(ticketID, message)
         val setSellerFeedback = Service.getTransaction(ticketID)
         pushNotification.sendNotification(masterAccounts.Service.getId(setSellerFeedback.to), constants.Notification.FAILURE, message)
-        pushNotification.sendNotification(setSellerFeedback.from, constants.Notification.FAILURE, message)
+        pushNotification.sendNotification(masterAccounts.Service.getId(setSellerFeedback.from), constants.Notification.FAILURE, message)
       } catch {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
     }
   }
 
-
-  if (kafkaEnabled) {
+  if (kafkaEnabled || transactionMode != constants.Transactions.BLOCK_MODE) {
     actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
-      utilities.TicketUpdater.start(Service.getTicketIDsOnStatus, transactionSetSellerFeedback.Service.getTxFromWSResponse, Utility.onSuccess, Utility.onFailure)
+      transaction.ticketUpdater(Service.getTicketIDsOnStatus, Service.getTransactionHash, Utility.onSuccess, Utility.onFailure)
     }
   }
 

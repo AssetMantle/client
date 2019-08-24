@@ -9,10 +9,9 @@ object RedeemAsset {
       constants.FormField.ZONE_ID.name -> constants.FormField.ZONE_ID.field,
       constants.FormField.PEG_HASH.name -> constants.FormField.PEG_HASH.field,
       constants.FormField.NON_EMPTY_PASSWORD.name -> constants.FormField.NON_EMPTY_PASSWORD.field,
-      constants.FormField.GAS.name -> constants.FormField.GAS.field
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(zoneID: String, pegHash: String, password: String, gas: Int)
+  case class Data(zoneID: String, pegHash: String, password: String)
 
 }

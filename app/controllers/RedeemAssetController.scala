@@ -3,22 +3,21 @@ package controllers
 import controllers.actions.WithTraderLoginAction
 import exceptions.{BaseException, BlockChainException}
 import javax.inject.{Inject, Singleton}
-import models.{blockchain, blockchainTransaction, master}
+import models.{blockchain, blockchainTransaction}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
 
-import scala.concurrent.{ExecutionContext, Future}
-import scala.util.Random
+import scala.concurrent.ExecutionContext
 
 @Singleton
-class RedeemAssetController @Inject()(messagesControllerComponents: MessagesControllerComponents, blockchainZones: blockchain.Zones, withTraderLoginAction: WithTraderLoginAction, transactionsRedeemAsset: transactions.RedeemAsset, blockchainACLAccounts: blockchain.ACLAccounts, blockchainTransactionRedeemAssets: blockchainTransaction.RedeemAssets)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class RedeemAssetController @Inject()(messagesControllerComponents: MessagesControllerComponents, transaction: utilities.Transaction, blockchainZones: blockchain.Zones, withTraderLoginAction: WithTraderLoginAction, transactionsRedeemAsset: transactions.RedeemAsset, blockchainACLAccounts: blockchain.ACLAccounts, blockchainTransactionRedeemAssets: blockchainTransaction.RedeemAssets)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
+  private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
-  def redeemAssetForm(ownerAddress:String, pegHash:String): Action[AnyContent] = Action { implicit request =>
+  def redeemAssetForm(ownerAddress: String, pegHash: String): Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.master.redeemAsset(views.companion.master.RedeemAsset.form, blockchainACLAccounts.Service.get(ownerAddress).zoneID, pegHash))
   }
 
@@ -29,22 +28,17 @@ class RedeemAssetController @Inject()(messagesControllerComponents: MessagesCont
           BadRequest(views.html.component.master.redeemAsset(formWithErrors, formWithErrors.data(constants.Form.ZONE_ID), formWithErrors.data(constants.Form.PEG_HASH)))
         },
         redeemAssetData => {
-
           try {
             val toAddress = blockchainZones.Service.getAddress(redeemAssetData.zoneID)
-            val ticketID: String = if (kafkaEnabled) transactionsRedeemAsset.Service.kafkaPost(transactionsRedeemAsset.Request(from = loginState.username, to = toAddress, password = redeemAssetData.password, pegHash = redeemAssetData.pegHash, gas = redeemAssetData.gas)).ticketID else Random.nextString(32)
-            blockchainTransactionRedeemAssets.Service.create(from = loginState.username, to = toAddress, pegHash = redeemAssetData.pegHash, gas = redeemAssetData.gas, null, null, ticketID = ticketID, null)
-            if (!kafkaEnabled) {
-              Future {
-                try {
-                  blockchainTransactionRedeemAssets.Utility.onSuccess(ticketID, transactionsRedeemAsset.Service.post(transactionsRedeemAsset.Request(from = loginState.username, to = toAddress, password = redeemAssetData.password, pegHash = redeemAssetData.pegHash, gas = redeemAssetData.gas)))
-                } catch {
-                  case baseException: BaseException => logger.error(baseException.failure.message, baseException)
-                  case blockChainException: BlockChainException => logger.error(blockChainException.failure.message, blockChainException)
-                    blockchainTransactionRedeemAssets.Utility.onFailure(ticketID, blockChainException.failure.message)
-                }
-              }
-            }
+            transaction.process[blockchainTransaction.RedeemAsset, transactionsRedeemAsset.Request](
+              entity = blockchainTransaction.RedeemAsset(from = loginState.address, to = toAddress, pegHash = redeemAssetData.pegHash, status = null, txHash = null, ticketID = "", mode = transactionMode, code = null),
+              blockchainTransactionCreate = blockchainTransactionRedeemAssets.Service.create,
+              request = transactionsRedeemAsset.Request(transactionsRedeemAsset.BaseRequest(from = loginState.address), to = toAddress, password = redeemAssetData.password, pegHash = redeemAssetData.pegHash, mode = transactionMode),
+              action = transactionsRedeemAsset.Service.post,
+              onSuccess = blockchainTransactionRedeemAssets.Utility.onSuccess,
+              onFailure = blockchainTransactionRedeemAssets.Utility.onFailure,
+              updateTransactionHash = blockchainTransactionRedeemAssets.Service.updateTransactionHash
+            )
             Ok(views.html.index(successes = Seq(constants.Response.ASSET_REDEEMED)))
           }
           catch {
@@ -67,11 +61,7 @@ class RedeemAssetController @Inject()(messagesControllerComponents: MessagesCont
       },
       redeemAssetData => {
         try {
-          if (kafkaEnabled) {
-            transactionsRedeemAsset.Service.kafkaPost(transactionsRedeemAsset.Request(from = redeemAssetData.from, to = redeemAssetData.to, password = redeemAssetData.password, pegHash = redeemAssetData.pegHash, gas = redeemAssetData.gas))
-          } else {
-            transactionsRedeemAsset.Service.post(transactionsRedeemAsset.Request(from = redeemAssetData.from, to = redeemAssetData.to, password = redeemAssetData.password, pegHash = redeemAssetData.pegHash, gas = redeemAssetData.gas))
-          }
+          transactionsRedeemAsset.Service.post(transactionsRedeemAsset.Request(transactionsRedeemAsset.BaseRequest(from = redeemAssetData.from), to = redeemAssetData.to, password = redeemAssetData.password, pegHash = redeemAssetData.pegHash, mode = redeemAssetData.mode))
           Ok(views.html.index(successes = Seq(constants.Response.ASSET_REDEEMED)))
         }
         catch {

@@ -3,12 +3,13 @@ package controllers
 import controllers.actions.WithLoginAction
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
+import models.master
 import models.master.Contacts
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
 import views.companion.master.UpdateContact
-import models.master
+
 import scala.concurrent.ExecutionContext
 
 @Singleton

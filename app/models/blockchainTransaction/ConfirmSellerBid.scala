@@ -12,17 +12,20 @@ import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
 import queries.{GetNegotiation, GetNegotiationID}
 import slick.jdbc.JdbcProfile
-import transactions.responses.TransactionResponse.Response
-import utilities.PushNotification
+import transactions.responses.TransactionResponse.BlockResponse
+import utilities.{PushNotification, TransactionEntity}
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class ConfirmSellerBid(from: String, to: String, bid: Int, time: Int, pegHash: String, sellerContractHash: String, gas: Int, status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])
+case class ConfirmSellerBid(from: String, to: String, bid: Int, time: Int, pegHash: String, sellerContractHash: String,  status: Option[Boolean], txHash: Option[String], ticketID: String, mode: String, code: Option[String]) extends TransactionEntity[ConfirmSellerBid] {
+  def mutateTicketID(newTicketID: String): ConfirmSellerBid = ConfirmSellerBid(from = from, to = to, bid = bid, time = time, pegHash = pegHash, sellerContractHash = sellerContractHash, status = status, txHash, ticketID = newTicketID, mode = mode, code = code)
+}
+
 
 @Singleton
-class ConfirmSellerBids @Inject()(actorSystem: ActorSystem, protected val databaseConfigProvider: DatabaseConfigProvider, blockchainTransactionFeedbacks: blockchain.TransactionFeedbacks, getNegotiationID: GetNegotiationID, getNegotiation: GetNegotiation, blockchainNegotiations: blockchain.Negotiations, transactionConfirmSellerBid: transactions.ConfirmSellerBid, pushNotification: PushNotification, masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
+class ConfirmSellerBids @Inject()(actorSystem: ActorSystem, transaction: utilities.Transaction, protected val databaseConfigProvider: DatabaseConfigProvider, blockchainTransactionFeedbacks: blockchain.TransactionFeedbacks, getNegotiationID: GetNegotiationID, getNegotiation: GetNegotiation, blockchainNegotiations: blockchain.Negotiations, transactionConfirmSellerBid: transactions.ConfirmSellerBid, pushNotification: PushNotification, masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_CONFIRM_SELLER_BID
 
@@ -40,8 +43,9 @@ class ConfirmSellerBids @Inject()(actorSystem: ActorSystem, protected val databa
   private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
   private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
   private val sleepTime = configuration.get[Long]("blockchain.entityIterator.threadSleep")
+  private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
-  private def add(confirmSellerBid: ConfirmSellerBid)(implicit executionContext: ExecutionContext): Future[String] = db.run((confirmSellerBidTable returning confirmSellerBidTable.map(_.ticketID) += confirmSellerBid).asTry).map {
+  private def add(confirmSellerBid: ConfirmSellerBid): Future[String] = db.run((confirmSellerBidTable returning confirmSellerBidTable.map(_.ticketID) += confirmSellerBid).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -49,27 +53,23 @@ class ConfirmSellerBids @Inject()(actorSystem: ActorSystem, protected val databa
     }
   }
 
-  private def upsert(confirmSellerBid: ConfirmSellerBid)(implicit executionContext: ExecutionContext): Future[Int] = db.run(confirmSellerBidTable.insertOrUpdate(confirmSellerBid).asTry).map {
+  private def upsert(confirmSellerBid: ConfirmSellerBid): Future[Int] = db.run(confirmSellerBidTable.insertOrUpdate(confirmSellerBid).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
         throw new BaseException(constants.Response.PSQL_EXCEPTION)
+    }
+  }
+
+  private def findByTicketID(ticketID: String): Future[ConfirmSellerBid] = db.run(confirmSellerBidTable.filter(_.ticketID === ticketID).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }
   }
 
-  private def findByTicketID(ticketID: String)(implicit executionContext: ExecutionContext): Future[ConfirmSellerBid] = db.run(confirmSellerBidTable.filter(_.ticketID === ticketID).result.head.asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
-
-  private def updateStatusAndResponseCodeOnTicketID(ticketID: String, status: Option[Boolean], responseCode: String): Future[Int] = db.run(confirmSellerBidTable.filter(_.ticketID === ticketID).map(x => (x.status.?, x.responseCode)).update((status, responseCode)).asTry).map {
+  private def updateStatusAndCodeOnTicketID(ticketID: String, status: Option[Boolean], code: String): Future[Int] = db.run(confirmSellerBidTable.filter(_.ticketID === ticketID).map(x => (x.status.?, x.code)).update((status, code)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -81,7 +81,7 @@ class ConfirmSellerBids @Inject()(actorSystem: ActorSystem, protected val databa
 
   private def getTicketIDsWithNullStatus: Future[Seq[String]] = db.run(confirmSellerBidTable.filter(_.status.?.isEmpty).map(_.ticketID).result)
 
-  private def updateTxHashStatusAndResponseCodeOnTicketID(ticketID: String, txHash: String, status: Option[Boolean], responseCode: String): Future[Int] = db.run(confirmSellerBidTable.filter(_.ticketID === ticketID).map(x => (x.txHash, x.status.?, x.responseCode)).update((txHash, status, responseCode)).asTry).map {
+  private def updateTxHashAndStatusOnTicketID(ticketID: String, txHash: Option[String], status: Option[Boolean]): Future[Int] = db.run(confirmSellerBidTable.filter(_.ticketID === ticketID).map(x => (x.txHash.?, x.status.?)).update((txHash, status)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -91,7 +91,17 @@ class ConfirmSellerBids @Inject()(actorSystem: ActorSystem, protected val databa
     }
   }
 
-  private def deleteByTicketID(ticketID: String)(implicit executionContext: ExecutionContext) = db.run(confirmSellerBidTable.filter(_.ticketID === ticketID).delete.asTry).map {
+  private def updateTxHashOnTicketID(ticketID: String, txHash: Option[String]): Future[Int] = db.run(confirmSellerBidTable.filter(_.ticketID === ticketID).map(x => x.txHash.?).update(txHash).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def deleteByTicketID(ticketID: String) = db.run(confirmSellerBidTable.filter(_.ticketID === ticketID).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -103,7 +113,7 @@ class ConfirmSellerBids @Inject()(actorSystem: ActorSystem, protected val databa
 
   private[models] class ConfirmSellerBidTable(tag: Tag) extends Table[ConfirmSellerBid](tag, "ConfirmSellerBid") {
 
-    def * = (from, to, bid, time, pegHash, sellerContractHash, gas, status.?, txHash.?, ticketID, responseCode.?) <> (ConfirmSellerBid.tupled, ConfirmSellerBid.unapply)
+    def * = (from, to, bid, time, pegHash, sellerContractHash, status.?, txHash.?, ticketID, mode, code.?) <> (ConfirmSellerBid.tupled, ConfirmSellerBid.unapply)
 
     def from = column[String]("from")
 
@@ -117,47 +127,49 @@ class ConfirmSellerBids @Inject()(actorSystem: ActorSystem, protected val databa
 
     def sellerContractHash = column[String]("sellerContractHash")
 
-    def gas = column[Int]("gas")
-
     def status = column[Boolean]("status")
 
     def txHash = column[String]("txHash")
 
     def ticketID = column[String]("ticketID", O.PrimaryKey)
 
-    def responseCode = column[String]("responseCode")
+    def mode = column[String]("mode")
+
+    def code = column[String]("code")
   }
 
   object Service {
 
-    def create(from: String, to: String, bid: Int, time: Int, pegHash: String, sellerContractHash: String, gas: Int, status: Option[Boolean], txHash: Option[String], ticketID: String, responseCode: Option[String])(implicit executionContext: ExecutionContext): String = Await.result(add(ConfirmSellerBid(from = from, to = to, bid = bid, time = time, pegHash = pegHash, sellerContractHash = sellerContractHash, gas = gas, status = status, txHash = txHash, ticketID = ticketID, responseCode = responseCode)), Duration.Inf)
+    def create(confirmSellerBid: ConfirmSellerBid): String = Await.result(add(ConfirmSellerBid(from = confirmSellerBid.from, to = confirmSellerBid.to, bid = confirmSellerBid.bid, time = confirmSellerBid.time, pegHash = confirmSellerBid.pegHash, sellerContractHash = confirmSellerBid.sellerContractHash, status = confirmSellerBid.status, txHash = confirmSellerBid.txHash, ticketID = confirmSellerBid.ticketID, mode = confirmSellerBid.mode, code = confirmSellerBid.code)), Duration.Inf)
 
-    def markTransactionSuccessful(ticketID: String, txHash: String, responseCode: String): Int = Await.result(updateTxHashStatusAndResponseCodeOnTicketID(ticketID, txHash, status = Option(true), responseCode), Duration.Inf)
+    def markTransactionSuccessful(ticketID: String, txHash: String): Int = Await.result(updateTxHashAndStatusOnTicketID(ticketID, Option(txHash), status = Option(true)), Duration.Inf)
 
-    def markTransactionFailed(ticketID: String, responseCode: String): Int = Await.result(updateStatusAndResponseCodeOnTicketID(ticketID, status = Option(false), responseCode), Duration.Inf)
+    def markTransactionFailed(ticketID: String, code: String): Int = Await.result(updateStatusAndCodeOnTicketID(ticketID, status = Option(false), code), Duration.Inf)
 
     def getTicketIDsOnStatus(): Seq[String] = Await.result(getTicketIDsWithNullStatus, Duration.Inf)
 
-    def getTransaction(ticketID: String)(implicit executionContext: ExecutionContext): ConfirmSellerBid = Await.result(findByTicketID(ticketID), Duration.Inf)
+    def getTransaction(ticketID: String): ConfirmSellerBid = Await.result(findByTicketID(ticketID), Duration.Inf)
+
+    def getTransactionHash(ticketID: String): Option[String] = Await.result(findByTicketID(ticketID), Duration.Inf).txHash
+
+    def updateTransactionHash(ticketID: String, txHash: String): Int = Await.result(updateTxHashOnTicketID(ticketID = ticketID, txHash = Option(txHash)), Duration.Inf)
 
   }
 
   object Utility {
-    def onSuccess(ticketID: String, response: Response): Future[Unit] = Future {
+    def onSuccess(ticketID: String, blockResponse: BlockResponse): Future[Unit] = Future {
       try {
-        Service.markTransactionSuccessful(ticketID, response.TxHash, response.Code)
+        Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
         val confirmSellerBid = Service.getTransaction(ticketID)
-        val fromAddress = masterAccounts.Service.getAddress(confirmSellerBid.from)
-        val toID = masterAccounts.Service.getId(confirmSellerBid.to)
         Thread.sleep(sleepTime)
-        val negotiationID = blockchainNegotiations.Service.getNegotiationID(buyerAddress = confirmSellerBid.to, sellerAddress = fromAddress, pegHash = confirmSellerBid.pegHash)
-        val negotiationResponse = if (negotiationID == "") getNegotiation.Service.get(getNegotiationID.Service.get(buyerAccount = toID, sellerAccount = confirmSellerBid.from, pegHash = confirmSellerBid.pegHash).negotiationID) else getNegotiation.Service.get(negotiationID)
-        blockchainNegotiations.Service.insertOrUpdate(id = negotiationResponse.value.negotiationID, buyerAddress = negotiationResponse.value.buyerAddress, sellerAddress = negotiationResponse.value.sellerAddress, assetPegHash = negotiationResponse.value.pegHash, bid = negotiationResponse.value.bid, time = negotiationResponse.value.time, buyerSignature = negotiationResponse.value.buyerSignature, sellerSignature = negotiationResponse.value.sellerSignature, buyerBlockHeight = negotiationResponse.value.buyerBlockHeight, sellerBlockHeight = negotiationResponse.value.sellerBlockHeight, buyerContractHash = negotiationResponse.value.BuyerContractHash, sellerContractHash = negotiationResponse.value.SellerContractHash, dirtyBit = true)
-        blockchainAccounts.Service.markDirty(fromAddress)
-        blockchainTransactionFeedbacks.Service.markDirty(fromAddress)
+        val negotiationID = blockchainNegotiations.Service.getNegotiationID(buyerAddress = confirmSellerBid.to, sellerAddress = confirmSellerBid.from, pegHash = confirmSellerBid.pegHash)
+        val negotiationResponse = if (negotiationID == "") getNegotiation.Service.get(getNegotiationID.Service.get(buyerAddress = confirmSellerBid.to, sellerAddress = confirmSellerBid.from, pegHash = confirmSellerBid.pegHash).negotiationID) else getNegotiation.Service.get(negotiationID)
+        blockchainNegotiations.Service.insertOrUpdate(id = negotiationResponse.value.negotiationID, buyerAddress = negotiationResponse.value.buyerAddress, sellerAddress = negotiationResponse.value.sellerAddress, assetPegHash = negotiationResponse.value.pegHash, bid = negotiationResponse.value.bid, time = negotiationResponse.value.time, buyerSignature = negotiationResponse.value.buyerSignature, sellerSignature = negotiationResponse.value.sellerSignature, buyerBlockHeight = negotiationResponse.value.buyerBlockHeight, sellerBlockHeight = negotiationResponse.value.sellerBlockHeight, buyerContractHash = negotiationResponse.value.buyerContractHash, sellerContractHash = negotiationResponse.value.sellerContractHash, dirtyBit = true)
+        blockchainAccounts.Service.markDirty(confirmSellerBid.from)
+        blockchainTransactionFeedbacks.Service.markDirty(confirmSellerBid.from)
         blockchainTransactionFeedbacks.Service.markDirty(confirmSellerBid.to)
-        pushNotification.sendNotification(toID, constants.Notification.SUCCESS, response.TxHash)
-        pushNotification.sendNotification(confirmSellerBid.from, constants.Notification.SUCCESS, response.TxHash)
+        pushNotification.sendNotification(masterAccounts.Service.getId(confirmSellerBid.from), constants.Notification.SUCCESS, blockResponse.txhash)
+        pushNotification.sendNotification(masterAccounts.Service.getId(confirmSellerBid.to), constants.Notification.SUCCESS, blockResponse.txhash)
       } catch {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
           throw new BaseException(constants.Response.PSQL_EXCEPTION)
@@ -169,20 +181,19 @@ class ConfirmSellerBids @Inject()(actorSystem: ActorSystem, protected val databa
       try {
         Service.markTransactionFailed(ticketID, message)
         val confirmSellerBid = Service.getTransaction(ticketID)
-        blockchainTransactionFeedbacks.Service.markDirty(masterAccounts.Service.getAddress(confirmSellerBid.from))
+        blockchainTransactionFeedbacks.Service.markDirty(confirmSellerBid.from)
         blockchainTransactionFeedbacks.Service.markDirty(confirmSellerBid.to)
+        pushNotification.sendNotification(masterAccounts.Service.getId(confirmSellerBid.from), constants.Notification.FAILURE, message)
         pushNotification.sendNotification(masterAccounts.Service.getId(confirmSellerBid.to), constants.Notification.FAILURE, message)
-        pushNotification.sendNotification(confirmSellerBid.from, constants.Notification.FAILURE, message)
       } catch {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
     }
   }
 
-
-  if (kafkaEnabled) {
+  if (kafkaEnabled || transactionMode != constants.Transactions.BLOCK_MODE) {
     actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
-      utilities.TicketUpdater.start(Service.getTicketIDsOnStatus, transactionConfirmSellerBid.Service.getTxFromWSResponse, Utility.onSuccess, Utility.onFailure)
+      transaction.ticketUpdater(Service.getTicketIDsOnStatus, Service.getTransactionHash, Utility.onSuccess, Utility.onFailure)
     }
   }
 }

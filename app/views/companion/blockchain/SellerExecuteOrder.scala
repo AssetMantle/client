@@ -12,10 +12,10 @@ object SellerExecuteOrder {
       constants.FormField.SELLER_ADDRESS.name -> constants.FormField.SELLER_ADDRESS.field,
       constants.FormField.AWB_PROOF_HASH.name -> constants.FormField.AWB_PROOF_HASH.field,
       constants.FormField.PEG_HASH.name -> constants.FormField.PEG_HASH.field,
-      constants.FormField.GAS.name -> constants.FormField.GAS.field
+      constants.FormField.MODE.name -> constants.FormField.MODE.field
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(from: String, password: String, buyerAddress: String, sellerAddress: String, awbProofHash: String, pegHash: String, gas: Int)
+  case class Data(from: String, password: String, buyerAddress: String, sellerAddress: String, awbProofHash: String, pegHash: String, mode: String)
 
 }

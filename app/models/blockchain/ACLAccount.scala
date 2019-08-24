@@ -57,8 +57,6 @@ class ACLAccounts @Inject()(protected val databaseConfigProvider: DatabaseConfig
   private def findByAddress(address: String): Future[ACLAccount] = db.run(aclTable.filter(_.address === address).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }
@@ -67,8 +65,6 @@ class ACLAccounts @Inject()(protected val databaseConfigProvider: DatabaseConfig
   private def findACLHashByAddress(address: String): Future[String] = db.run(aclTable.filter(_.address === address).map(_.aclHash).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }
@@ -118,7 +114,7 @@ class ACLAccounts @Inject()(protected val databaseConfigProvider: DatabaseConfig
     def insertOrUpdate(address: String, zoneID: String, organizationID: String, acl: ACL, dirtyBit: Boolean): Int = Await.result(upsert(ACLAccount(address, zoneID, organizationID, util.hashing.MurmurHash3.stringHash(acl.toString).toString, dirtyBit)), Duration.Inf)
 
     def get(address: String): ACLAccount = Await.result(findByAddress(address), Duration.Inf)
-    
+
     def getACLHash(address: String): String = Await.result(findACLHashByAddress(address), Duration.Inf)
 
     def getAddressesUnderZone(zoneID: String): Seq[String] = Await.result(getAddressesByZoneID(zoneID), Duration.Inf)
@@ -138,6 +134,7 @@ class ACLAccounts @Inject()(protected val databaseConfigProvider: DatabaseConfig
           Service.insertOrUpdate(responseAccount.value.address, responseAccount.value.zoneID, responseAccount.value.organizationID, responseAccount.value.acl, dirtyBit = false)
         }
       } catch {
+        case baseException: BaseException => logger.error(baseException.failure.message, baseException)
         case blockChainException: BlockChainException => logger.error(blockChainException.failure.message, blockChainException)
       }
     }

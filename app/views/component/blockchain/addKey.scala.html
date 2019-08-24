@@ -8,9 +8,8 @@
     </div>
     <div class="latest_card-body">
     @CSRF.formField
-    @inputText(addKeyFrom(constants.Form.NAME), '_label -> Messages(constants.Form.NAME),'class -> "form-control",'placeholder->Messages(constants.Form.NAME),'required->true)
-    @inputText(addKeyFrom(constants.Form.SEED), '_label -> Messages(constants.Form.SEED),'class -> "form-control",'placeholder->Messages(constants.Form.SEED),'required->true)
-    @inputPassword(addKeyFrom(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD),'class -> "form-control",'placeholder->Messages(constants.Form.PASSWORD),'required->true)
+    @inputText(addKeyFrom(constants.Form.NAME), '_label -> Messages(constants.Form.NAME))
+    @inputPassword(addKeyFrom(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD))
 
     @if(addKeyFrom.hasGlobalErrors) {
         <ul>

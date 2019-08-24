@@ -31,7 +31,7 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
             Ok(views.html.component.master.commonHome( blockchainAccounts.Service.getCoins(loginState.address), masterAccountFiles.Service.getProfilePicture(loginState.username)))
         }
       } catch {
-        case baseException: BaseException => NoContent
+        case _: BaseException => NoContent
       }
   }
 
@@ -86,7 +86,7 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
   def fiatList: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        Ok(views.html.component.master.fiatList( blockchainFiats.Service.getFiatPegWallet(loginState.address)))
+        Ok(views.html.component.master.fiatList(blockchainFiats.Service.getFiatPegWallet(loginState.address)))
       } catch {
         case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
       }
@@ -138,14 +138,13 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
       try {
         Ok(views.html.component.master.availableAssetListWithLogin(blockchainAssets.Service.getAllPublic(blockchainOrders.Service.getAllOrderIds)))
       } catch {
-        case baseException: BaseException => NoContent
+        case _: BaseException => NoContent
       }
   }
 
   def accountComet: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       Ok.chunked(blockchainAccounts.Service.accountCometSource(loginState.username) via Comet.json("parent.accountCometMessage")).as(ContentTypes.HTML)
-
   }
 
   def assetComet: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>

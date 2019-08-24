@@ -28,7 +28,7 @@ class ACLHashes @Inject()(protected val databaseConfigProvider: DatabaseConfigPr
 
   private[models] val aclTable = TableQuery[ACLHashTable]
 
-  private def add(aclHash: ACLHash)(implicit executionContext: ExecutionContext): Future[String] = db.run((aclTable returning aclTable.map(_.hash) += aclHash).asTry).map {
+  private def add(aclHash: ACLHash): Future[String] = db.run((aclTable returning aclTable.map(_.hash) += aclHash).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.info(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -36,17 +36,15 @@ class ACLHashes @Inject()(protected val databaseConfigProvider: DatabaseConfigPr
     }
   }
 
-  private def findByHash(hash: String)(implicit executionContext: ExecutionContext): Future[ACLHash] = db.run(aclTable.filter(_.hash === hash).result.head.asTry).map {
+  private def findByHash(hash: String): Future[ACLHash] = db.run(aclTable.filter(_.hash === hash).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }
   }
 
-  private def deleteByHash(hash: String)(implicit executionContext: ExecutionContext) = db.run(aclTable.filter(_.hash === hash).delete.asTry).map {
+  private def deleteByHash(hash: String)= db.run(aclTable.filter(_.hash === hash).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -93,9 +91,9 @@ class ACLHashes @Inject()(protected val databaseConfigProvider: DatabaseConfigPr
   }
 
   object Service {
-    def create(acl: ACL)(implicit executionContext: ExecutionContext): String = Await.result(add(ACLHash(acl.issueAsset, acl.issueFiat, acl.sendAsset, acl.sendFiat, acl.redeemAsset, acl.redeemFiat, acl.sellerExecuteOrder, acl.buyerExecuteOrder, acl.changeBuyerBid, acl.changeSellerBid, acl.confirmBuyerBid, acl.confirmSellerBid, acl.negotiation, acl.releaseAsset, util.hashing.MurmurHash3.stringHash(acl.toString).toString)), Duration.Inf)
+    def create(acl: ACL): String = Await.result(add(ACLHash(acl.issueAsset, acl.issueFiat, acl.sendAsset, acl.sendFiat, acl.redeemAsset, acl.redeemFiat, acl.sellerExecuteOrder, acl.buyerExecuteOrder, acl.changeBuyerBid, acl.changeSellerBid, acl.confirmBuyerBid, acl.confirmSellerBid, acl.negotiation, acl.releaseAsset, util.hashing.MurmurHash3.stringHash(acl.toString).toString)), Duration.Inf)
 
-    def get(hash: String)(implicit executionContext: ExecutionContext): ACLHash = Await.result(findByHash(hash), Duration.Inf)
+    def get(hash: String): ACLHash = Await.result(findByHash(hash), Duration.Inf)
 
     def getACL(hash: String): ACL = {
       val aclHash = Await.result(findByHash(hash), Duration.Inf)

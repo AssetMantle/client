@@ -9,10 +9,9 @@ object RedeemFiat {
       constants.FormField.NON_EMPTY_PASSWORD.name -> constants.FormField.NON_EMPTY_PASSWORD.field,
       constants.FormField.ZONE_ID.name -> constants.FormField.ZONE_ID.field,
       constants.FormField.REDEEM_AMOUNT.name -> constants.FormField.REDEEM_AMOUNT.field,
-      constants.FormField.GAS.name -> constants.FormField.GAS.field
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(password: String, zoneID: String, redeemAmount: Int, gas: Int)
+  case class Data(password: String, zoneID: String, redeemAmount: Int)
 
 }

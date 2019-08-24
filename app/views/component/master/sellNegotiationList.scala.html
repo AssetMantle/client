@@ -24,7 +24,7 @@
                         case _ => {}
                     }
                 }
-                @if(negotiation.sellerSignature.getOrElse(null) != null && negotiation.buyerSignature.getOrElse(null) != null && (assetPegHashList contains negotiation.assetPegHash)) {
+                @if(negotiation.sellerSignature.orNull != null && negotiation.buyerSignature.orNull != null && (assetPegHashList contains negotiation.assetPegHash)) {
                     @loginState.acl match {
                         case Some(acl) => {
                             @if(acl.sendAsset) {

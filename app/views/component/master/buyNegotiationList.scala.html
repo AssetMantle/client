@@ -10,7 +10,7 @@
             <span class="red">@Messages(constants.Form.BID)</span> : @negotiation.bid <br>
             <span class="red">@Messages(constants.Form.TIME)</span> : @negotiation.time <br>
             <div class="centerText" >
-                @if(negotiation.buyerSignature.getOrElse(null) == null) {
+                @if(negotiation.buyerSignature.orNull == null) {
                     @loginState.acl match {
                         case Some(acl) => {
                             @if(acl.changeBuyerBid) {
@@ -23,7 +23,7 @@
                         case _ => {}
                     }
                 }
-                @if(negotiation.sellerSignature.getOrElse(null) != null && negotiation.buyerSignature.getOrElse(null) != null) {
+                @if(negotiation.sellerSignature.orNull != null && negotiation.buyerSignature.orNull != null) {
                     @loginState.acl match {
                         case Some(acl) => {
                             @if(acl.sendFiat) {

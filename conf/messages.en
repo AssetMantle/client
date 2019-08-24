@@ -126,6 +126,7 @@ SELLER_ADDRESS=Seller Address
 FIAT_PROOF_HASH=Fiat Proof Hash
 PEG_HASH=Peg Hash
 GAS=Gas
+MODE=Mode
 BID=Bid
 TIME=Time
 DOCUMENT_HASH=Document Hash

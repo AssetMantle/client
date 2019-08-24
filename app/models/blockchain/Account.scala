@@ -55,7 +55,7 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   private val denominationOfGasToken = configuration.get[String]("blockchain.denom.gas")
 
-  private def add(account: Account)(implicit executionContext: ExecutionContext): Future[String] = db.run((accountTable returning accountTable.map(_.address) += account).asTry).map {
+  private def add(account: Account): Future[String] = db.run((accountTable returning accountTable.map(_.address) += account).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -85,27 +85,23 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     }
   }
 
-  private def findByAddress(address: String)(implicit executionContext: ExecutionContext): Future[Account] = db.run(accountTable.filter(_.address === address).result.head.asTry).map {
+  private def findByAddress(address: String): Future[Account] = db.run(accountTable.filter(_.address === address).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }
   }
 
-  private def getCoinsByAddress(address: String)(implicit executionContext: ExecutionContext): Future[String] = db.run(accountTable.filter(_.address === address).map(_.coins).result.head.asTry).map {
+  private def getCoinsByAddress(address: String): Future[String] = db.run(accountTable.filter(_.address === address).map(_.coins).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }
   }
 
-  private def deleteByAddress(address: String)(implicit executionContext: ExecutionContext) = db.run(accountTable.filter(_.address === address).delete.asTry).map {
+  private def deleteByAddress(address: String)= db.run(accountTable.filter(_.address === address).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -134,16 +130,16 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   object Service {
 
-    def create(username: String, password: String)(implicit executionContext: ExecutionContext): String = {
-      val addKeyResponse = addKey.Service.post(addKey.Request(username, password, getSeed.Service.get().body))
-      Await.result(add(Account(addKeyResponse.address, "0", addKeyResponse.pub_key, "-1", "0", dirtyBit = false)), Duration.Inf)
+    def create(username: String, password: String): String = {
+      val addKeyResponse = addKey.Service.post(addKey.Request(username, password))
+      Await.result(add(Account(addKeyResponse.address, "0", addKeyResponse.pubkey, "-1", "0", dirtyBit = false)), Duration.Inf)
     }
 
     def refreshDirty(address: String, sequence: String, coins: String): Int = Await.result(updateSequenceCoinsAndDirtyBitByAddress(address, sequence, coins, dirtyBit = false), Duration.Inf)
 
-    def get(address: String)(implicit executionContext: ExecutionContext): Account = Await.result(findByAddress(address), Duration.Inf)
+    def get(address: String): Account = Await.result(findByAddress(address), Duration.Inf)
 
-    def getCoins(address: String)(implicit executionContext: ExecutionContext): String = Await.result(getCoinsByAddress(address), Duration.Inf)
+    def getCoins(address: String): String = Await.result(getCoinsByAddress(address), Duration.Inf)
 
     def getDirtyAddresses: Seq[String] = Await.result(getAddressesByDirtyBit(dirtyBit = true), Duration.Inf)
 
@@ -169,6 +165,7 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
           mainAccountActor ! AccountCometMessage(username = masterAccounts.Service.getId(dirtyAddress), message = Json.toJson(constants.Comet.PING))
         }
       } catch {
+        case baseException: BaseException => logger.error(baseException.failure.message, baseException)
         case blockChainException: BlockChainException => logger.error(blockChainException.failure.message, blockChainException)
       }
     }
