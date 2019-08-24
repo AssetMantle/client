@@ -1,14 +1,14 @@
 package views.companion.master
 
 import play.api.data.Form
-import play.api.data.Forms.{mapping, nonEmptyText}
+import play.api.data.Forms.mapping
 
 object RejectIssueAssetRequest {
 
   val form = Form(
     mapping(
-      constants.Form.REQUEST_ID -> nonEmptyText(minLength = constants.FormConstraint.REQUEST_ID_LENGTH, maxLength = constants.FormConstraint.REQUEST_ID_LENGTH),
-      constants.Form.COMMENT -> nonEmptyText(minLength = constants.FormConstraint.COMMENT_MINIMUM_LENGTH, maxLength = constants.FormConstraint.COMMENT_MAXIMUM_LENGTH),
+      constants.FormField.REQUEST_ID.name -> constants.FormField.REQUEST_ID.field,
+      constants.FormField.COMMENT.name -> constants.FormField.COMMENT.field,
     )(Data.apply)(Data.unapply)
   )
 

@@ -1,13 +1,13 @@
 package views.companion.master
 
 import play.api.data.Form
-import play.api.data.Forms.{mapping, nonEmptyText}
+import play.api.data.Forms.mapping
 
 object RejectVerifyTraderRequest {
 
   val form = Form(
     mapping(
-      constants.Form.TRADER_ID -> nonEmptyText(minLength = constants.FormConstraint.TRADER_ID_MINIMUM_LENGTH, maxLength = constants.FormConstraint.TRADER_ID_MAXIMUM_LENGTH)
+      constants.FormField.TRADER_ID.name -> constants.FormField.TRADER_ID.field
     )(Data.apply)(Data.unapply)
   )
 

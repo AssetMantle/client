@@ -7,9 +7,9 @@ object UpdateContact {
 
   val form = Form(
     mapping(
-      constants.Form.EMAIL -> email,
-      constants.Form.MOBILE_NUMBER -> nonEmptyText(minLength = constants.FormConstraint.MOBILE_NUMBER_MINIMUM_LENGTH, maxLength = constants.FormConstraint.MOBILE_NUMBER_MAXIMUM_LENGTH).verifying(constants.FormConstraint.mobileNumberCheckConstraint),
-      constants.Form.COUNTRY_CODE -> nonEmptyText(minLength = constants.FormConstraint.COUNTRY_CODE_MINIMUM_LENGTH, maxLength = constants.FormConstraint.COUNTRY_CODE_MAXIMUM_LENGTH)
+      constants.FormField.EMAIL.name -> constants.FormField.EMAIL.field,
+      constants.FormField.MOBILE_NUMBER.name -> constants.FormField.MOBILE_NUMBER.field,
+      constants.FormField.COUNTRY_CODE.name -> constants.FormField.COUNTRY_CODE.field
     )(Data.apply)(Data.unapply)
   )
 

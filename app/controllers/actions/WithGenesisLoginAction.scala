@@ -2,7 +2,7 @@ package controllers.actions
 
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import models.{master, masterTransaction, blockchain}
+import models.{master, masterTransaction}
 import play.api.i18n.I18nSupport
 import play.api.mvc._
 import play.api.{Configuration, Logger}
@@ -25,10 +25,8 @@ class WithGenesisLoginAction @Inject()(messagesControllerComponents: MessagesCon
         f(LoginState(username, constants.User.GENESIS, masterAccounts.Service.getAddress(username)))(request)
       }
       catch {
-        case baseException: BaseException => {
-          logger.info(baseException.failure.message, baseException)
+        case baseException: BaseException => logger.info(baseException.failure.message, baseException)
           Results.Unauthorized(views.html.index(failures = Seq(baseException.failure)))
-        }
       }
     }
   }

@@ -30,7 +30,9 @@ class MainAccountActor @Inject()(actorTimeout: FiniteDuration, actorSystem: Acto
   def receive = {
     case accountCometMessage: blockchain.AccountCometMessage =>
       actorSystem.actorSelection("/user/" + constants.Module.ACTOR_MAIN_ACCOUNT + "/" + accountCometMessage.username).resolveOne().onComplete {
-        case Success(actorRef) => actorRef ! accountCometMessage
+        case Success(actorRef) => logger.info(module + " " + accountCometMessage.username + ": " + accountCometMessage.message)
+
+          actorRef ! accountCometMessage
         case Failure(ex) => logger.info(module + ": " + ex.getMessage)
       }
     case createAccountChildActorMessage: CreateAccountChildActorMessage => context.actorOf(props = UserAccountActor.props(createAccountChildActorMessage.actorRef, actorTimeout), name = createAccountChildActorMessage.username)

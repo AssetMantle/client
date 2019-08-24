@@ -1,17 +1,17 @@
 package views.companion.master
 
 import play.api.data.Form
-import play.api.data.Forms.{mapping, nonEmptyText, _}
+import play.api.data.Forms.mapping
 
 object IssueFiat {
   val form = Form(
     mapping(
-      constants.Form.REQUEST_ID -> nonEmptyText(minLength = constants.FormConstraint.REQUEST_ID_LENGTH, maxLength = constants.FormConstraint.REQUEST_ID_LENGTH),
-      constants.Form.ACCOUNT_ID -> nonEmptyText(minLength = constants.FormConstraint.USERNAME_MINIMUM_LENGTH, maxLength = constants.FormConstraint.USERNAME_MAXIMUM_LENGTH),
-      constants.Form.TRANSACTION_ID -> nonEmptyText(minLength = constants.FormConstraint.TRANSACTION_ID_MINIMUM_LENGTH, maxLength = constants.FormConstraint.TRANSACTION_ID_MAXIMUM_LENGTH),
-      constants.Form.TRANSACTION_AMOUNT -> number(min = constants.FormConstraint.TRANSACTION_AMOUNT_MINIMUM_VALUE, max = constants.FormConstraint.TRANSACTION_AMOUNT_MAXIMUM_VALUE),
-      constants.Form.PASSWORD -> nonEmptyText(minLength = constants.FormConstraint.PASSWORD_MINIMUM_LENGTH, maxLength = constants.FormConstraint.PASSWORD_MAXIMUM_LENGTH),
-      constants.Form.GAS -> number(min = constants.FormConstraint.GAS_MINIMUM_VALUE, max = constants.FormConstraint.GAS_MAXIMUM_VALUE)
+      constants.FormField.REQUEST_ID.name -> constants.FormField.REQUEST_ID.field,
+      constants.FormField.ACCOUNT_ID.name -> constants.FormField.ACCOUNT_ID.field,
+      constants.FormField.TRANSACTION_ID.name -> constants.FormField.TRANSACTION_ID.field,
+      constants.FormField.TRANSACTION_AMOUNT.name -> constants.FormField.TRANSACTION_AMOUNT.field,
+      constants.FormField.NON_EMPTY_PASSWORD.name -> constants.FormField.NON_EMPTY_PASSWORD.field,
+      constants.FormField.GAS.name -> constants.FormField.GAS.field
     )(Data.apply)(Data.unapply)
   )
 

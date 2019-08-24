@@ -43,6 +43,7 @@ h2{
         width: 200px !important;
         left: 15%;
         max-height: 60%;
+
         overflow: auto;
     }
     table thead{
@@ -58,6 +59,7 @@ h2{
         left: 35%;
         max-height: 60%;
         overflow: auto;
+        max-width:600px;
     }
 
 
@@ -139,17 +141,6 @@ h2{
 .blur {
     filter: blur(5 px);
 }
-
-/*Alert*/
-/*.alert {*/
-/*    position:relative;*/
-/*    top:70px;*/
-/*    padding: 10px;*/
-/*    color: white;*/
-/*    opacity: 1;*/
-/*    transition: opacity 0.6s;*/
-/*    margin-bottom: 5px;*/
-/*}*/
 
 .alert.success {
     background-color: #4CAF50;
@@ -304,16 +295,6 @@ h2{
 }
 /*@media only screen and (max-width: 1200px) {*/
 
-
-/*    .third {*/
-/*        display: none;*/
-/*    }*/
-/*    .second {*/
-/*        margin: 0px;*/
-/*        width: 100%;*/
-/*    }*/
-/*}*/
-
 .flexContainer {
     display: flex;
     justify-content: left;
@@ -456,9 +437,6 @@ rightText{
     max-height: 20vh;
     overflow-y: scroll;
 }
-/*.info {*/
-/*    display: none;*/
-/*}*/
 
 /* Progress Bar*/
 
@@ -508,9 +486,7 @@ dl .info::after {
     border-style: solid;
     border-color: transparent transparent #dadada transparent;
 }
-/*dl:hover .info {*/
-/*    visibility: visible;*/
-/*}*/
+
 /*ToolTip*/
 /*notification*/
 .notifications{
@@ -642,7 +618,7 @@ dl .info::after {
 }
 
 .input-group-prepend .input-group-text{
-    margin-bottom: 30px;
+    margin-top: -90px;
 }
 . {
     height: 500px;

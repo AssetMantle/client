@@ -1,14 +1,14 @@
 package views.companion.master
 
 import play.api.data.Form
-import play.api.data.Forms.{boolean, mapping, nonEmptyText}
+import play.api.data.Forms.{boolean, mapping}
 
 object VerifyTrader {
   val form = Form(
     mapping(
-      constants.Form.PASSWORD -> nonEmptyText(minLength = constants.FormConstraint.PASSWORD_MINIMUM_LENGTH, maxLength = constants.FormConstraint.PASSWORD_MAXIMUM_LENGTH),
-      constants.Form.ACL_ADDRESS -> nonEmptyText(minLength = constants.FormConstraint.BLOCKCHAIN_ADDRESS_LENGTH, maxLength = constants.FormConstraint.BLOCKCHAIN_ADDRESS_LENGTH),
-      constants.Form.ORGANIZATION_ID -> nonEmptyText(minLength = constants.FormConstraint.ORGANIZATION_ID_MINIMUM_LENGTH, maxLength = constants.FormConstraint.ORGANIZATION_ID_MAXIMUM_LENGTH),
+      constants.FormField.NON_EMPTY_PASSWORD.name -> constants.FormField.NON_EMPTY_PASSWORD.field,
+      constants.FormField.ACL_ADDRESS.name -> constants.FormField.ACL_ADDRESS.field,
+      constants.FormField.ORGANIZATION_ID.name -> constants.FormField.ORGANIZATION_ID.field,
       constants.Form.ISSUE_ASSET -> boolean,
       constants.Form.ISSUE_FIAT -> boolean,
       constants.Form.SEND_ASSET -> boolean,

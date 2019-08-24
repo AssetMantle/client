@@ -25,10 +25,8 @@ class WithUnknownLoginAction @Inject()(messagesControllerComponents: MessagesCon
         f(LoginState(username, constants.User.UNKNOWN, masterAccounts.Service.getAddress(username)))(request)
       }
       catch {
-        case baseException: BaseException => {
-          logger.info(baseException.failure.message, baseException)
+        case baseException: BaseException => logger.info(baseException.failure.message, baseException)
           Results.Unauthorized(views.html.index(failures = Seq(baseException.failure)))
-        }
       }
     }
   }

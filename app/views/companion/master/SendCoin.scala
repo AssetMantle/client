@@ -6,10 +6,10 @@ import play.api.data.Forms._
 object SendCoin {
   val form = Form(
     mapping(
-      constants.Form.TO -> nonEmptyText(minLength = constants.FormConstraint.BLOCKCHAIN_ADDRESS_LENGTH, maxLength = constants.FormConstraint.BLOCKCHAIN_ADDRESS_LENGTH),
-      constants.Form.AMOUNT -> number(min = constants.FormConstraint.AMOUNT_MINIMUM_VALUE, max = constants.FormConstraint.AMOUNT_MAXIMUM_VALUE),
-      constants.Form.PASSWORD -> nonEmptyText(minLength = constants.FormConstraint.PASSWORD_MINIMUM_LENGTH, maxLength = constants.FormConstraint.PASSWORD_MAXIMUM_LENGTH),
-      constants.Form.GAS -> number(min = constants.FormConstraint.GAS_MINIMUM_VALUE, max = constants.FormConstraint.GAS_MAXIMUM_VALUE)
+      constants.FormField.TO.name -> constants.FormField.TO.field,
+      constants.FormField.AMOUNT.name -> constants.FormField.AMOUNT.field,
+      constants.FormField.NON_EMPTY_PASSWORD.name -> constants.FormField.NON_EMPTY_PASSWORD.field,
+      constants.FormField.GAS.name -> constants.FormField.GAS.field
     )(Data.apply)(Data.unapply)
   )
 
