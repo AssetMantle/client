@@ -86,7 +86,7 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
   def fiatList: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        Ok(views.html.component.master.fiatList( blockchainFiats.Service.getFiatPegWallet(loginState.address)))
+        Ok(views.html.component.master.fiatList(blockchainFiats.Service.getFiatPegWallet(loginState.address)))
       } catch {
         case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
       }

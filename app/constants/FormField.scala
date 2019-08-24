@@ -55,9 +55,9 @@ object FormField {
   val BUYER_CONTRACT_HASH = new StringFormField("BUYER_CONTRACT_HASH", 40, 40, RegularExpression.HASH)
   val SELLER_CONTRACT_HASH = new StringFormField("SELLER_CONTRACT_HASH", 40, 40, RegularExpression.HASH)
   val DOCUMENT_HASH = new StringFormField("DOCUMENT_HASH", 4, 50, RegularExpression.HASH)
-  val FROM = new StringFormField("FROM", 3, 50, RegularExpression.ACCOUNT_ID)
-
-  val SEED = new StringFormField("SEED", 1, 300)
+  val FROM = new StringFormField("FROM", 45, 45)
+  val MODE = new StringFormField("MODE", 2, 200)
+  val TAKER_ADDRESS = new StringFormField( "TAKER_ADDRESS", 45, 45)
 
   val GAS = new IntFormField("GAS", 0, 1000000)
   val BID = new IntFormField("BID", 0, Int.MaxValue)

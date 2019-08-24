@@ -11,7 +11,7 @@ object IssueFiat {
       constants.FormField.TRANSACTION_ID.name -> constants.FormField.TRANSACTION_ID.field,
       constants.FormField.TRANSACTION_AMOUNT.name -> constants.FormField.TRANSACTION_AMOUNT.field,
       constants.FormField.NON_EMPTY_PASSWORD.name -> constants.FormField.NON_EMPTY_PASSWORD.field,
-      constants.Form.MODE-> nonEmptyText(minLength = 4, maxLength = 5)
+      constants.FormField.MODE.name -> constants.FormField.MODE.field
     )(Data.apply)(Data.unapply)
   )
 

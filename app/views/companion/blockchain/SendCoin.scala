@@ -10,7 +10,7 @@ object SendCoin {
       constants.FormField.TO.name -> constants.FormField.TO.field,
       constants.FormField.AMOUNT.name -> constants.FormField.AMOUNT.field,
       constants.FormField.NON_EMPTY_PASSWORD.name -> constants.FormField.NON_EMPTY_PASSWORD.field,
-      constants.Form.MODE-> nonEmptyText(minLength = 4, maxLength = 5)
+      constants.FormField.MODE.name -> constants.FormField.MODE.field
     )(Data.apply)(Data.unapply)
   )
 

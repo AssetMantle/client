@@ -12,7 +12,7 @@ object SellerExecuteOrder {
       constants.FormField.SELLER_ADDRESS.name -> constants.FormField.SELLER_ADDRESS.field,
       constants.FormField.AWB_PROOF_HASH.name -> constants.FormField.AWB_PROOF_HASH.field,
       constants.FormField.PEG_HASH.name -> constants.FormField.PEG_HASH.field,
-      constants.Form.MODE-> nonEmptyText(minLength = 4, maxLength = 5)
+      constants.FormField.MODE.name -> constants.FormField.MODE.field
     )(Data.apply)(Data.unapply)
   )
 

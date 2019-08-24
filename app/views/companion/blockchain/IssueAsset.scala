@@ -14,9 +14,9 @@ object IssueAsset {
       constants.FormField.QUANTITY_UNIT.name -> constants.FormField.QUANTITY_UNIT.field,
       constants.FormField.ASSET_QUANTITY.name -> constants.FormField.ASSET_QUANTITY.field,
       constants.Form.MODERATED -> boolean,
-      constants.Form.TAKER_ADDRESS -> text(minLength = 45, maxLength = 45),
+      constants.FormField.TAKER_ADDRESS.name -> constants.FormField.TAKER_ADDRESS.field,
       constants.FormField.NON_EMPTY_PASSWORD.name -> constants.FormField.NON_EMPTY_PASSWORD.field,
-      constants.Form.MODE-> nonEmptyText(minLength = 4, maxLength = 5)
+      constants.FormField.MODE.name -> constants.FormField.MODE.field
     )(Data.apply)(Data.unapply)
   )
 

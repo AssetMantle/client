@@ -10,7 +10,7 @@ object ReleaseAsset {
       constants.FormField.TO.name -> constants.FormField.TO.field,
       constants.FormField.PEG_HASH.name -> constants.FormField.PEG_HASH.field,
       constants.FormField.NON_EMPTY_PASSWORD.name -> constants.FormField.NON_EMPTY_PASSWORD.field,
-      constants.Form.MODE-> nonEmptyText(minLength = 4, maxLength = 5)
+      constants.FormField.MODE.name -> constants.FormField.MODE.field
     )(Data.apply)(Data.unapply)
   )
 
