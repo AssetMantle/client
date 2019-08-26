@@ -49,6 +49,11 @@ class Transaction @Inject()(getTxHashResponse: GetTxHashResponse, getResponse: G
         }
       }
       ticketID
+    } catch {
+      case baseException: BaseException => logger.error(baseException.failure.message, baseException)
+        throw new BaseException(baseException.failure)
+      case blockChainException: BlockChainException => logger.error(blockChainException.failure.message, blockChainException)
+        throw new BlockChainException(blockChainException.failure)
     }
   }
 

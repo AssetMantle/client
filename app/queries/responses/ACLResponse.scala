@@ -2,6 +2,7 @@ package queries.responses
 
 import models.blockchain.ACL
 import play.api.libs.json.{Json, Reads}
+import transactions.responses.ResponseEntity
 
 object ACLResponse {
 
@@ -11,7 +12,7 @@ object ACLResponse {
 
   implicit val valueReads: Reads[Value] = Json.reads[Value]
 
-  case class Response(value: Value)
+  case class Response(value: Value)  extends ResponseEntity
 
   implicit val responseReads: Reads[Response] = Json.reads[Response]
 
