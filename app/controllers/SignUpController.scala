@@ -33,8 +33,8 @@ class SignUpController @Inject()(messagesControllerComponents: MessagesControlle
           accounts.Service.addLogin(signUpData.username, signUpData.password, blockchainAccounts.Service.create(signUpData.username, signUpData.password), request.lang.toString.stripPrefix("Lang(").stripSuffix(")").trim.split("_")(0))
           Ok(views.html.index(successes = Seq(constants.Response.SIGNED_UP)))
         } catch {
-          case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
-          case blockChainException: BlockChainException => Ok(views.html.index(failures = Seq(blockChainException.failure)))
+          case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+          case blockChainException: BlockChainException => InternalServerError(views.html.index(failures = Seq(blockChainException.failure)))
         }
       }
     )

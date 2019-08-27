@@ -47,7 +47,7 @@ class LogoutController @Inject()(messagesControllerComponents: MessagesControlle
             Ok(views.html.index(successes = Seq(constants.Response.LOGGED_OUT))).withNewSession
           }
           catch {
-            case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
         }
       )

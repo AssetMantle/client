@@ -1,6 +1,7 @@
 package controllers
 
 import controllers.actions.WithTraderLoginAction
+import controllers.results.WithUsernameToken
 import exceptions.{BaseException, BlockChainException}
 import javax.inject.{Inject, Singleton}
 import models.{blockchain, blockchainTransaction}
@@ -11,7 +12,7 @@ import play.api.{Configuration, Logger}
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class ChangeBuyerBidController @Inject()(messagesControllerComponents: MessagesControllerComponents, transaction: utilities.Transaction, blockchainNegotiations: blockchain.Negotiations, blockchainAccounts: blockchain.Accounts, withTraderLoginAction: WithTraderLoginAction, transactionsChangeBuyerBid: transactions.ChangeBuyerBid, blockchainTransactionChangeBuyerBids: blockchainTransaction.ChangeBuyerBids)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class ChangeBuyerBidController @Inject()(messagesControllerComponents: MessagesControllerComponents, transaction: utilities.Transaction, blockchainNegotiations: blockchain.Negotiations, blockchainAccounts: blockchain.Accounts, withTraderLoginAction: WithTraderLoginAction, transactionsChangeBuyerBid: transactions.ChangeBuyerBid, blockchainTransactionChangeBuyerBids: blockchainTransaction.ChangeBuyerBids)(implicit exec: ExecutionContext, configuration: Configuration, withUsernameToken: WithUsernameToken) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
@@ -38,11 +39,11 @@ class ChangeBuyerBidController @Inject()(messagesControllerComponents: MessagesC
               onFailure = blockchainTransactionChangeBuyerBids.Utility.onFailure,
               updateTransactionHash = blockchainTransactionChangeBuyerBids.Service.updateTransactionHash
             )
-            Ok(views.html.index(successes = Seq(constants.Response.BUYER_BID_CHANGED)))
+            withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.BUYER_BID_CHANGED)))
           }
           catch {
-            case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
-            case blockChainException: BlockChainException => Ok(views.html.index(failures = Seq(blockChainException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+            case blockChainException: BlockChainException => InternalServerError(views.html.index(failures = Seq(blockChainException.failure)))
           }
         }
       )
@@ -63,8 +64,8 @@ class ChangeBuyerBidController @Inject()(messagesControllerComponents: MessagesC
           Ok(views.html.index(successes = Seq(constants.Response.BUYER_BID_CHANGED)))
         }
         catch {
-          case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
-          case blockChainException: BlockChainException => Ok(views.html.index(failures = Seq(blockChainException.failure)))
+          case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+          case blockChainException: BlockChainException => InternalServerError(views.html.index(failures = Seq(blockChainException.failure)))
         }
       }
     )

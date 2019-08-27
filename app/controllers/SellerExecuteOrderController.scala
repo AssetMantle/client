@@ -1,6 +1,7 @@
 package controllers
 
 import controllers.actions.{WithTraderLoginAction, WithZoneLoginAction}
+import controllers.results.WithUsernameToken
 import exceptions.{BaseException, BlockChainException}
 import javax.inject.{Inject, Singleton}
 import models.master.Accounts
@@ -12,7 +13,7 @@ import play.api.{Configuration, Logger}
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class SellerExecuteOrderController @Inject()(messagesControllerComponents: MessagesControllerComponents, transaction: utilities.Transaction, masterAccounts: master.Accounts, blockchainOrders: blockchain.Orders, blockchainAccounts: blockchain.Accounts, withTraderLoginAction: WithTraderLoginAction, withZoneLoginAction: WithZoneLoginAction, transactionsSellerExecuteOrder: transactions.SellerExecuteOrder, blockchainTransactionSellerExecuteOrders: blockchainTransaction.SellerExecuteOrders)(implicit exec: ExecutionContext, configuration: Configuration, accounts: Accounts, blockchainACLAccounts: blockchain.ACLAccounts, blockchainZones: blockchain.Zones, blockchainNegotiations: blockchain.Negotiations) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class SellerExecuteOrderController @Inject()(messagesControllerComponents: MessagesControllerComponents, transaction: utilities.Transaction, masterAccounts: master.Accounts, blockchainOrders: blockchain.Orders, blockchainAccounts: blockchain.Accounts, withTraderLoginAction: WithTraderLoginAction, withZoneLoginAction: WithZoneLoginAction, transactionsSellerExecuteOrder: transactions.SellerExecuteOrder, blockchainTransactionSellerExecuteOrders: blockchainTransaction.SellerExecuteOrders, accounts: Accounts, blockchainACLAccounts: blockchain.ACLAccounts, blockchainZones: blockchain.Zones, blockchainNegotiations: blockchain.Negotiations, withUsernameToken: WithUsernameToken)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -40,11 +41,11 @@ class SellerExecuteOrderController @Inject()(messagesControllerComponents: Messa
               onFailure = blockchainTransactionSellerExecuteOrders.Utility.onFailure,
               updateTransactionHash = blockchainTransactionSellerExecuteOrders.Service.updateTransactionHash
             )
-            Ok(views.html.index(successes = Seq(constants.Response.SELLER_ORDER_EXECUTED)))
+            withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.SELLER_ORDER_EXECUTED)))
           }
           catch {
-            case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
-            case blockChainException: BlockChainException => Ok(views.html.index(failures = Seq(blockChainException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+            case blockChainException: BlockChainException => InternalServerError(views.html.index(failures = Seq(blockChainException.failure)))
           }
         }
       )
@@ -53,9 +54,9 @@ class SellerExecuteOrderController @Inject()(messagesControllerComponents: Messa
   def moderatedSellerExecuteOrderList: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        Ok(views.html.component.master.moderatedSellerExecuteOrderList(blockchainNegotiations.Service.getSellerNegotiationsByOrderAndZone(blockchainOrders.Service.getAllOrderIdsWithoutAWBProofHash, blockchainACLAccounts.Service.getAddressesUnderZone(blockchainZones.Service.getID(loginState.address)))))
+        withUsernameToken.Ok(views.html.component.master.moderatedSellerExecuteOrderList(blockchainNegotiations.Service.getSellerNegotiationsByOrderAndZone(blockchainOrders.Service.getAllOrderIdsWithoutAWBProofHash, blockchainACLAccounts.Service.getAddressesUnderZone(blockchainZones.Service.getID(loginState.address)))))
       } catch {
-        case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
@@ -83,8 +84,8 @@ class SellerExecuteOrderController @Inject()(messagesControllerComponents: Messa
             Ok(views.html.index(successes = Seq(constants.Response.SELLER_ORDER_EXECUTED)))
           }
           catch {
-            case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
-            case blockChainException: BlockChainException => Ok(views.html.index(failures = Seq(blockChainException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+            case blockChainException: BlockChainException => InternalServerError(views.html.index(failures = Seq(blockChainException.failure)))
           }
         }
       )
@@ -105,8 +106,8 @@ class SellerExecuteOrderController @Inject()(messagesControllerComponents: Messa
           Ok(views.html.index(successes = Seq(constants.Response.SELLER_ORDER_EXECUTED)))
         }
         catch {
-          case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
-          case blockChainException: BlockChainException => Ok(views.html.index(failures = Seq(blockChainException.failure)))
+          case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+          case blockChainException: BlockChainException => InternalServerError(views.html.index(failures = Seq(blockChainException.failure)))
         }
       }
     )
