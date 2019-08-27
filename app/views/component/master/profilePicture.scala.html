@@ -10,6 +10,6 @@
     } else {
         <img id="profilePicture" class="profilePicture" src="data:image/jpg;base64,@utilities.ImageProcess.decodeImageThumbnailData(profilePicture)" alt="@constants.Form.PROFILE_PICTURE">
         <br>
-        <button id="profilePictureBottomUploadButton" class="bottom btn btn-default btn-sm" onclick="getForm(jsRoutes.controllers.FileController.updateAccountFileForm('@constants.File.PROFILE_PICTURE'))">@Messages(constants.Form.UPDATE)</button>
+        <button id="profilePictureBottomUpdateButton" class="bottom btn btn-default btn-sm" onclick="getForm(jsRoutes.controllers.FileController.updateAccountFileForm('@constants.File.PROFILE_PICTURE'))">@Messages(constants.Form.UPDATE)</button>
     }
 </div>

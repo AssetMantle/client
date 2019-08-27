@@ -8,7 +8,7 @@ $(document).ready(function () {
         type: profilePictureRoute.type,
         statusCode: {
             200: function (data) {
-                document.getElementById('profilePicture').innerHTML = data;
+                document.getElementById('profilePhoto').innerHTML = data;
             },
             204: function (data) {
             }
