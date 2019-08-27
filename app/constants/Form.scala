@@ -3,6 +3,7 @@ package constants
 object Form {
 
   val INDEX = "INDEX"
+  val PROFILE = "PROFILE"
   val MARKET = "MARKET"
   val REQUEST = "REQUEST"
   val ACCEPT_OFFER = "ACCEPT_OFFER"
@@ -20,6 +21,7 @@ object Form {
   val EVIDENCE = "EVIDENCE"
   val EVIDENCE_HASH = "EVIDENCE_HASH"
   val SEE_ALL = "SEE_ALL"
+  val ACL = "ACL"
   val COMMENT = "COMMENT"
   val LATEST_BLOCK_HEIGHT = "LATEST_BLOCK_HEIGHT"
   val AVERAGE_BLOCK_TIME = "AVERAGE_BLOCK_TIME"
@@ -96,6 +98,7 @@ object Form {
   val CONFIRM_PASSWORD = "CONFIRM_PASSWORD"
   val FROM = "FROM"
   val TO = "TO"
+  val TRADER = "TRADER"
   val ORGANIZATION = "ORGANIZATION"
   val ZONE = "ZONE"
   val GENESIS = "GENESIS"

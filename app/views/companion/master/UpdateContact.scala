@@ -7,7 +7,7 @@ object UpdateContact {
 
   val form = Form(
     mapping(
-      constants.FormField.EMAIL.name -> constants.FormField.EMAIL.field,
+      constants.FormField.EMAIL_ADDRESS.name -> constants.FormField.EMAIL_ADDRESS.field,
       constants.FormField.MOBILE_NUMBER.name -> constants.FormField.MOBILE_NUMBER.field,
       constants.FormField.COUNTRY_CODE.name -> constants.FormField.COUNTRY_CODE.field
     )(Data.apply)(Data.unapply)

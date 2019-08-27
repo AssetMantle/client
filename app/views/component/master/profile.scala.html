@@ -1,0 +1,159 @@
+@import controllers.actions.LoginState
+
+@()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+
+<div class="container">
+    <div class="card">
+        <div class="row ">
+
+            <div class="col-md-4">
+                <div id="profilePicture"></div>
+            </div>
+
+            <div class="col-md-8 px-3">
+                <div class="card-block px-3">
+                    <h2 class="card-title">@loginState.username</h2>
+
+                    <p>@Messages(constants.User.USER_TYPE): <span id="userTypeValue">@loginState.userType </span></p>
+
+                    <p>@Messages(constants.Form.BLOCKCHAIN_ADDRESS)
+                        : <span id="blockchainAddressValue"><span id="text_element" class="hash_code">@loginState.address</span> <span onclick="copyToClipboard('text_element')"> <i class="fa fa-clipboard"></i></span></span></p>
+
+                    <p>@Messages(constants.Form.EMAIL_ADDRESS): <span id="emailAddressValue"></span>
+                        <span id="emailAddressVerificationStatus">
+                            <img id="emailAddressValueVerifiedImage" class="result hidden" src="@routes.Assets.versioned("images/success.jpg")">
+                            <img id="emailAddressValueUnverifiedImage" class="result hidden" src="@routes.Assets.versioned("images/unverified.png")">
+                            <button id="verifyEmailAddress" class="hidden" onclick="getForm(jsRoutes.controllers.VerifyEmailAddressController.verifyEmailAddressForm())">@Messages(constants.Form.VERIFY_EMAIL_ADDRESS)</button>
+                        </span>
+                    </p>
+
+                    <p>@Messages(constants.Form.MOBILE_NUMBER): <span id="phoneValue"></span>
+                        <span id="phoneVerificationStatus">
+                            <img id="phoneValueVerifiedImage" class="result hidden" src="@routes.Assets.versioned("images/success.jpg")">
+                            <img id="phoneValueUnverifiedImage" class="result hidden" src="@routes.Assets.versioned("images/unverified.png")">
+                            <button id="verifyPhone" class="hidden" onclick="getForm(jsRoutes.controllers.VerifyMobileNumberController.verifyMobileNumberForm())">@Messages(constants.Form.VERIFY_MOBILE_NUMBER)</button>
+                        </span>
+                    </p>
+
+                    <span id="updateContact" class="hidden"><button onclick="getForm(jsRoutes.controllers.ContactController.updateContactForm())">@Messages(constants.Form.UPDATE_CONTACT)</button></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="card">
+        <div class="row ">
+            <div class="col-md-8 px-3">
+                <div class="card-block px-3">
+                    <h2 class="card-title">@Messages(constants.Form.DOCUMENTS)</h2>
+                    <div id="profileDocuments"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="card">
+        <div class="row ">
+            <div class="col-md-8 px-3">
+                <div class="card-block px-3">
+                    <h2 class="card-title">@Messages(constants.Form.ACL)</h2>
+                    <div id="profileACL">
+                    @loginState.acl match {
+                        case Some(acl) => {
+                            <p>@Messages(constants.Form.ISSUE_ASSET): <span>@if(acl.issueAsset) {
+                                <img class="result" src="@routes.Assets.versioned("images/success.jpg")">
+                            } else {
+                                <img class="result" src="@routes.Assets.versioned("images/unverified.png")">
+                                }</span></p>
+
+                            <p>@Messages(constants.Form.ISSUE_FIAT): <span>@if(acl.issueFiat) {
+                                <img class="result" src="@routes.Assets.versioned("images/success.jpg")">
+                            } else {
+                                <img class="result" src="@routes.Assets.versioned("images/unverified.png")">
+                                }</span></p>
+
+                            <p>@Messages(constants.Form.SEND_ASSET): <span>@if(acl.sendAsset) {
+                                <img class="result" src="@routes.Assets.versioned("images/success.jpg")">
+                            } else {
+                                <img class="result" src="@routes.Assets.versioned("images/unverified.png")">
+                                }</span></p>
+
+                            <p>@Messages(constants.Form.SEND_FIAT): <span>@if(acl.sendFiat) {
+                                <img class="result" src="@routes.Assets.versioned("images/success.jpg")">
+                            } else {
+                                <img class="result" src="@routes.Assets.versioned("images/unverified.png")">
+                                }</span></p>
+
+                            <p>@Messages(constants.Form.REDEEM_ASSET): <span>@if(acl.redeemAsset) {
+                                <img class="result" src="@routes.Assets.versioned("images/success.jpg")">
+                            } else {
+                                <img class="result" src="@routes.Assets.versioned("images/unverified.png")">
+                                }</span></p>
+
+                            <p>@Messages(constants.Form.REDEEM_FIAT): <span>@if(acl.redeemFiat) {
+                                <img class="result" src="@routes.Assets.versioned("images/success.jpg")">
+                            } else {
+                                <img class="result" src="@routes.Assets.versioned("images/unverified.png")">
+                                }</span></p>
+
+                            <p>@Messages(constants.Form.BUYER_EXECUTE_ORDER): <span>@if(acl.buyerExecuteOrder) {
+                                <img class="result" src="@routes.Assets.versioned("images/success.jpg")">
+                            } else {
+                                <img class="result" src="@routes.Assets.versioned("images/unverified.png")">
+                                }</span></p>
+
+                            <p>@Messages(constants.Form.SELLER_EXECUTE_ORDER): <span>@if(acl.sellerExecuteOrder) {
+                                <img class="result" src="@routes.Assets.versioned("images/success.jpg")">
+                            } else {
+                                <img class="result" src="@routes.Assets.versioned("images/unverified.png")">
+                                }</span></p>
+
+                            <p>@Messages(constants.Form.NEGOTIATION): <span>@if(acl.negotiation) {
+                                <img class="result" src="@routes.Assets.versioned("images/success.jpg")">
+                            } else {
+                                <img class="result" src="@routes.Assets.versioned("images/unverified.png")">
+                                }</span></p>
+
+                            <p>@Messages(constants.Form.CHANGE_BUYER_BID): <span>@if(acl.changeBuyerBid) {
+                                <img class="result" src="@routes.Assets.versioned("images/success.jpg")">
+                            } else {
+                                <img class="result" src="@routes.Assets.versioned("images/unverified.png")">
+                                }</span></p>
+
+                            <p>@Messages(constants.Form.CHANGE_SELLER_BID): <span>@if(acl.changeSellerBid) {
+                                <img class="result" src="@routes.Assets.versioned("images/success.jpg")">
+                            } else {
+                                <img class="result" src="@routes.Assets.versioned("images/unverified.png")">
+                                }</span></p>
+
+                            <p>@Messages(constants.Form.CONFIRM_BUYER_BID): <span>@if(acl.confirmBuyerBid) {
+                                <img class="result" src="@routes.Assets.versioned("images/success.jpg")">
+                            } else {
+                                <img class="result" src="@routes.Assets.versioned("images/unverified.png")">
+                                }</span></p>
+
+                            <p>@Messages(constants.Form.CONFIRM_SELLER_BID): <span>@if(acl.confirmSellerBid) {
+                                <img class="result" src="@routes.Assets.versioned("images/success.jpg")">
+                            } else {
+                                <img class="result" src="@routes.Assets.versioned("images/unverified.png")">
+                                }</span></p>
+
+                            <p>@Messages(constants.Form.RELEASE_ASSET): <span>@if(acl.releaseAsset) {
+                                <img class="result" src="@routes.Assets.versioned("images/success.jpg")">
+                            } else {
+                                <img class="result" src="@routes.Assets.versioned("images/unverified.png")">
+                                }</span></p>
+                        }
+                        case _ => {}
+                    }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="@routes.Assets.versioned("javascripts/profile.js")" type="text/javascript"></script>
