@@ -610,37 +610,36 @@ dl .info::after {
 .input-group-prepend span{
     color:#aaa !important;
 }
+.input-group input{
+    width: 350px;
+}
 .issue_asset .input-group-text{
 
     margin-top: -50px !important;
     margin-bottom: 0px !important;
 }
 
-.input-group-prepend .input-group-text{
-    margin-top: -90px;
+.ml-cb .input-group-prepend{
+    margin-bottom: 20px;
 }
-. {
-    height: 500px;
-    overflow-y:scroll;
-}
-.  .input-group-prepend .input-group-text{
-    margin-top: -25px;
+.ml-cb .input-group-prepend .input-group-text{
+    margin-top: -50px;
 }
 /*logout*/
-.logout .input-group-prepend{
-    margin-top: 40px;
-    margin-left: 40px;
-}
+/*.logout .input-group-prepend{*/
+/*    margin-top: 40px;*/
+/*    margin-left: 40px;*/
+/*}*/
 
-.logout .input-group-prepend .input-group-text
-{
-    margin-top: -20px;
-}
-.logout  button
-{
-margin-top:-30px;
-left:35%;
-}
+/*.logout .input-group-prepend .input-group-text*/
+/*{*/
+/*    margin-top: -20px;*/
+/*}*/
+/*.logout  button*/
+/*{*/
+/*margin-top:-30px;*/
+/*left:35%;*/
+/*}*/
 .pageContent{
     margin-top: 50px;
 }
