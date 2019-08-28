@@ -1,6 +1,7 @@
 package controllers
 
 import controllers.actions.WithLoginAction
+import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.masterTransaction.Notifications
@@ -11,7 +12,7 @@ import play.api.{Configuration, Logger}
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class NotificationController @Inject()(messagesControllerComponents: MessagesControllerComponents, notifications: Notifications, withLoginAction: WithLoginAction)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class NotificationController @Inject()(messagesControllerComponents: MessagesControllerComponents, notifications: Notifications, withLoginAction: WithLoginAction, withUsernameToken: WithUsernameToken)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -22,17 +23,17 @@ class NotificationController @Inject()(messagesControllerComponents: MessagesCon
   def notificationPage(pageNumber: Int = 0): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        Ok(views.html.component.master.notifications(notifications.Service.get(loginState.username, pageNumber * limit, limit)))
+        withUsernameToken.Ok(views.html.component.master.notifications(notifications.Service.get(loginState.username, pageNumber * limit, limit)))
       }
       catch {
-        case baseException: BaseException => Ok(baseException.failure.message)
+        case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
   }
 
   def unreadNotificationCount(): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        Ok(notifications.Service.getNumberOfUnread(loginState.username).toString)
+        withUsernameToken.Ok(notifications.Service.getNumberOfUnread(loginState.username).toString)
       }
       catch {
         case _: BaseException => NoContent
@@ -43,7 +44,7 @@ class NotificationController @Inject()(messagesControllerComponents: MessagesCon
     implicit request =>
       try {
         notifications.Service.markAsRead(notificationID)
-        Ok(notifications.Service.getNumberOfUnread(loginState.username).toString)
+        withUsernameToken.Ok(notifications.Service.getNumberOfUnread(loginState.username).toString)
       }
       catch {
         case _: BaseException => NoContent

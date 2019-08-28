@@ -1,6 +1,7 @@
 package controllers
 
 import controllers.actions.{WithGenesisLoginAction, WithOrganizationLoginAction, WithUserLoginAction, WithZoneLoginAction}
+import controllers.results.WithUsernameToken
 import exceptions.{BaseException, BlockChainException}
 import javax.inject.{Inject, Singleton}
 import models.{blockchain, blockchainTransaction, master}
@@ -12,7 +13,7 @@ import utilities.PushNotification
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class SetACLController @Inject()(messagesControllerComponents: MessagesControllerComponents, transaction: utilities.Transaction, blockchainAccounts: blockchain.Accounts, masterZones: master.Zones, masterOrganizations: master.Organizations, masterTraders: master.Traders, masterTraderKYCs: master.TraderKYCs, withZoneLoginAction: WithZoneLoginAction, withOrganizationLoginAction: WithOrganizationLoginAction, withUserLoginAction: WithUserLoginAction, withGenesisLoginAction: WithGenesisLoginAction, masterAccounts: master.Accounts, transactionsSetACL: transactions.SetACL, blockchainAclAccounts: blockchain.ACLAccounts, blockchainTransactionSetACLs: blockchainTransaction.SetACLs, blockchainAclHashes: blockchain.ACLHashes, pushNotification: PushNotification)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class SetACLController @Inject()(messagesControllerComponents: MessagesControllerComponents, transaction: utilities.Transaction, blockchainAccounts: blockchain.Accounts, masterZones: master.Zones, masterOrganizations: master.Organizations, masterTraders: master.Traders, masterTraderKYCs: master.TraderKYCs, withZoneLoginAction: WithZoneLoginAction, withOrganizationLoginAction: WithOrganizationLoginAction, withUserLoginAction: WithUserLoginAction, withGenesisLoginAction: WithGenesisLoginAction, masterAccounts: master.Accounts, transactionsSetACL: transactions.SetACL, blockchainAclAccounts: blockchain.ACLAccounts, blockchainTransactionSetACLs: blockchainTransaction.SetACLs, blockchainAclHashes: blockchain.ACLHashes, pushNotification: PushNotification, withUsernameToken: WithUsernameToken)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -32,13 +33,13 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
           try {
             if (masterOrganizations.Service.getStatus(addTraderData.organizationID) == Option(true)) {
               masterTraders.Service.create(zoneID = addTraderData.zoneID, organizationID = addTraderData.organizationID, accountID = loginState.username, name = addTraderData.name)
-              Ok(views.html.index(successes = Seq(constants.Response.TRADER_ADDED)))
+              withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.TRADER_ADDED)))
             } else {
-              Ok(views.html.index(failures = Seq(constants.Response.UNVERIFIED_ORGANIZATION)))
+              Unauthorized(views.html.index(failures = Seq(constants.Response.UNVERIFIED_ORGANIZATION)))
             }
           }
           catch {
-            case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
         }
       )
@@ -69,14 +70,14 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
                 onFailure = blockchainTransactionSetACLs.Utility.onFailure,
                 updateTransactionHash = blockchainTransactionSetACLs.Service.updateTransactionHash
               )
-              Ok(views.html.index(successes = Seq(constants.Response.ACL_SET)))
+              withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ACL_SET)))
             } else {
-              Ok(views.html.index(failures = Seq(constants.Response.UNVERIFIED_ORGANIZATION)))
+              Unauthorized(views.html.index(failures = Seq(constants.Response.UNVERIFIED_ORGANIZATION)))
             }
           }
           catch {
-            case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
-            case blockChainException: BlockChainException => Ok(views.html.index(failures = Seq(blockChainException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+            case blockChainException: BlockChainException => InternalServerError(views.html.index(failures = Seq(blockChainException.failure)))
           }
         }
       )
@@ -85,9 +86,9 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
   def zoneViewKycDocuments(accountID: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        Ok(views.html.component.master.zoneViewVerificationTraderKycDouments(masterTraderKYCs.Service.getAllDocuments(accountID)))
+        withUsernameToken.Ok(views.html.component.master.zoneViewVerificationTraderKycDouments(masterTraderKYCs.Service.getAllDocuments(accountID)))
       } catch {
-        case baseException: BaseException => BadRequest(views.html.index(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
@@ -96,9 +97,9 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
       try {
         masterTraderKYCs.Service.zoneVerify(id = accountID, documentType = documentType)
         pushNotification.sendNotification(accountID, constants.Notification.SUCCESS, Messages(constants.Response.DOCUMENT_APPROVED.message))
-        Ok(Messages(constants.Response.SUCCESS.message))
+        withUsernameToken.Ok(Messages(constants.Response.SUCCESS.message))
       } catch {
-        case baseException: BaseException => BadRequest(Messages(baseException.failure.message))
+        case baseException: BaseException => InternalServerError(Messages(baseException.failure.message))
       }
   }
 
@@ -107,9 +108,9 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
       try {
         masterTraderKYCs.Service.zoneReject(id = accountID, documentType = documentType)
         pushNotification.sendNotification(accountID, constants.Notification.FAILURE, Messages(constants.Response.DOCUMENT_REJECTED.message))
-        Ok(Messages(constants.Response.SUCCESS.message))
+        withUsernameToken.Ok(Messages(constants.Response.SUCCESS.message))
       } catch {
-        case baseException: BaseException => BadRequest(Messages(baseException.failure.message))
+        case baseException: BaseException => InternalServerError(Messages(baseException.failure.message))
       }
   }
 
@@ -128,10 +129,10 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
           try {
             masterTraders.Service.updateStatus(rejectVerifyTraderRequestData.traderID, status = false)
             masterTraderKYCs.Service.zoneRejectAll(masterZones.Service.getAccountId(rejectVerifyTraderRequestData.traderID))
-            Ok(views.html.index(successes = Seq(constants.Response.VERIFY_TRADER_REQUEST_REJECTED)))
+            withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.VERIFY_TRADER_REQUEST_REJECTED)))
           }
           catch {
-            case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
         }
       )
@@ -140,10 +141,10 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
   def zoneViewPendingVerifyTraderRequests: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        Ok(views.html.component.master.zoneViewPendingVerifyTraderRequests(masterTraders.Service.getVerifyTraderRequestsForZone(masterZones.Service.getZoneId(loginState.username))))
+        withUsernameToken.Ok(views.html.component.master.zoneViewPendingVerifyTraderRequests(masterTraders.Service.getVerifyTraderRequestsForZone(masterZones.Service.getZoneId(loginState.username))))
       }
       catch {
-        case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
@@ -172,14 +173,14 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
                 onFailure = blockchainTransactionSetACLs.Utility.onFailure,
                 updateTransactionHash = blockchainTransactionSetACLs.Service.updateTransactionHash
               )
-              Ok(views.html.index(successes = Seq(constants.Response.ACL_SET)))
+              withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ACL_SET)))
             } else {
-              Ok(views.html.index(failures = Seq(constants.Response.UNVERIFIED_ORGANIZATION)))
+              Unauthorized(views.html.index(failures = Seq(constants.Response.UNVERIFIED_ORGANIZATION)))
             }
           }
           catch {
-            case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
-            case blockChainException: BlockChainException => Ok(views.html.index(failures = Seq(blockChainException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+            case blockChainException: BlockChainException => InternalServerError(views.html.index(failures = Seq(blockChainException.failure)))
           }
         }
       )
@@ -188,9 +189,9 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
   def organizationViewKycDocuments(accountID: String): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        Ok(views.html.component.master.organizationViewVerificationTraderKycDouments(masterTraderKYCs.Service.getAllDocuments(accountID)))
+        withUsernameToken.Ok(views.html.component.master.organizationViewVerificationTraderKycDouments(masterTraderKYCs.Service.getAllDocuments(accountID)))
       } catch {
-        case baseException: BaseException => BadRequest(views.html.index(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
@@ -199,9 +200,9 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
       try {
         masterTraderKYCs.Service.organizationVerify(id = accountID, documentType = documentType)
         pushNotification.sendNotification(accountID, constants.Notification.SUCCESS, Messages(constants.Response.DOCUMENT_APPROVED.message))
-        Ok(Messages(constants.Response.SUCCESS.message))
+        withUsernameToken.Ok(Messages(constants.Response.SUCCESS.message))
       } catch {
-        case baseException: BaseException => BadRequest(Messages(baseException.failure.message))
+        case baseException: BaseException => InternalServerError(Messages(baseException.failure.message))
       }
   }
 
@@ -210,9 +211,9 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
       try {
         masterTraderKYCs.Service.organizationReject(id = accountID, documentType = documentType)
         pushNotification.sendNotification(accountID, constants.Notification.FAILURE, Messages(constants.Response.DOCUMENT_REJECTED.message))
-        Ok(Messages(constants.Response.SUCCESS.message))
+        withUsernameToken.Ok(Messages(constants.Response.SUCCESS.message))
       } catch {
-        case baseException: BaseException => BadRequest(Messages(baseException.failure.message))
+        case baseException: BaseException => InternalServerError(Messages(baseException.failure.message))
       }
   }
 
@@ -230,10 +231,10 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
           try {
             masterTraders.Service.updateStatus(rejectVerifyTraderRequestData.traderID, status = false)
             masterTraderKYCs.Service.organizationRejectAll(masterOrganizations.Service.getAccountId(rejectVerifyTraderRequestData.traderID))
-            Ok(views.html.index(successes = Seq(constants.Response.VERIFY_TRADER_REQUEST_REJECTED)))
+            withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.VERIFY_TRADER_REQUEST_REJECTED)))
           }
           catch {
-            case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
         }
       )
@@ -242,20 +243,20 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
   def organizationViewPendingVerifyTraderRequests: Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        Ok(views.html.component.master.organizationViewPendingVerifyTraderRequests(masterTraders.Service.getVerifyTraderRequestsForOrganization(masterOrganizations.Service.getByAccountID(loginState.username).id)))
+        withUsernameToken.Ok(views.html.component.master.organizationViewPendingVerifyTraderRequests(masterTraders.Service.getVerifyTraderRequestsForOrganization(masterOrganizations.Service.getByAccountID(loginState.username).id)))
       }
       catch {
-        case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
   def viewTradersInOrganization: Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        Ok(views.html.component.master.viewTradersInOrganizationForOrganization(masterTraders.Service.getTradersForOrganization(masterOrganizations.Service.getByAccountID(loginState.username).id)))
+        withUsernameToken.Ok(views.html.component.master.viewTradersInOrganizationForOrganization(masterTraders.Service.getTradersForOrganization(masterOrganizations.Service.getByAccountID(loginState.username).id)))
       }
       catch {
-        case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
@@ -263,23 +264,23 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
     implicit request =>
       try {
         if (masterOrganizations.Service.get(organizationID).zoneID == masterZones.Service.getZoneId(loginState.username)) {
-          Ok(views.html.component.master.viewTradersInOrganization(masterTraders.Service.getTradersForOrganization(organizationID)))
+          withUsernameToken.Ok(views.html.component.master.viewTradersInOrganization(masterTraders.Service.getTradersForOrganization(organizationID)))
         } else {
-          Ok(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
+          Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
         }
       }
       catch {
-        case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
   def viewTradersInOrganizationForGenesis(organizationID: String): Action[AnyContent] = withGenesisLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        Ok(views.html.component.master.viewTradersInOrganization(masterTraders.Service.getTradersForOrganization(organizationID)))
+        withUsernameToken.Ok(views.html.component.master.viewTradersInOrganization(masterTraders.Service.getTradersForOrganization(organizationID)))
       }
       catch {
-        case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
@@ -298,8 +299,8 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
           Ok(views.html.index(successes = Seq(constants.Response.ACL_SET)))
         }
         catch {
-          case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
-          case blockChainException: BlockChainException => Ok(views.html.index(failures = Seq(blockChainException.failure)))
+          case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+          case blockChainException: BlockChainException => InternalServerError(views.html.index(failures = Seq(blockChainException.failure)))
         }
       }
     )

@@ -44,7 +44,7 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
     }
   }
   
-  private def findAll: Future[Seq[Zone]] = db.run(zoneTable.result)
+  private def findAll: Future[Seq[Zone]] = db.run(zoneTable.filter(_.status === true).result)
 
   private def deleteById(id: String) = db.run(zoneTable.filter(_.id === id).delete.asTry).map {
     case Success(result) => result

@@ -1,6 +1,7 @@
 package controllers
 
 import controllers.actions.{WithGenesisLoginAction, WithUserLoginAction, WithZoneLoginAction}
+import controllers.results.WithUsernameToken
 import exceptions.{BaseException, BlockChainException}
 import javax.inject.{Inject, Singleton}
 import models.blockchainTransaction.AddOrganization
@@ -13,7 +14,7 @@ import utilities.PushNotification
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class AddOrganizationController @Inject()(messagesControllerComponents: MessagesControllerComponents, transaction: utilities.Transaction, pushNotification: PushNotification, blockchainAccounts: blockchain.Accounts, masterOrganizationKYCs: master.OrganizationKYCs, masterTraders: master.Traders, transactionsAddOrganization: transactions.AddOrganization, blockchainOrganizations: blockchain.Organizations, masterZones: master.Zones, blockchainTransactionAddOrganizations: blockchainTransaction.AddOrganizations, masterOrganizations: master.Organizations, masterAccounts: master.Accounts, withUserLoginAction: WithUserLoginAction, withZoneLoginAction: WithZoneLoginAction, withGenesisLoginAction: WithGenesisLoginAction)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class AddOrganizationController @Inject()(messagesControllerComponents: MessagesControllerComponents, transaction: utilities.Transaction, pushNotification: PushNotification, blockchainAccounts: blockchain.Accounts, masterOrganizationKYCs: master.OrganizationKYCs, masterTraders: master.Traders, transactionsAddOrganization: transactions.AddOrganization, blockchainOrganizations: blockchain.Organizations, masterZones: master.Zones, blockchainTransactionAddOrganizations: blockchainTransaction.AddOrganizations, masterOrganizations: master.Organizations, masterAccounts: master.Accounts, withUserLoginAction: WithUserLoginAction, withZoneLoginAction: WithZoneLoginAction, withGenesisLoginAction: WithGenesisLoginAction, withUsernameToken: WithUsernameToken)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
@@ -33,13 +34,13 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
           try {
             if (masterZones.Service.getStatus(addOrganizationData.zoneID) == Option(true)) {
               masterOrganizations.Service.create(zoneID = addOrganizationData.zoneID, accountID = loginState.username, name = addOrganizationData.name, address = addOrganizationData.address, phone = addOrganizationData.phone, email = addOrganizationData.email)
-              Ok(views.html.index(successes = Seq(constants.Response.ORGANIZATION_ADDED)))
+              withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ORGANIZATION_ADDED)))
             } else {
-              Ok(views.html.index(failures = Seq(constants.Response.UNVERIFIED_ZONE)))
+              Unauthorized(views.html.index(failures = Seq(constants.Response.UNVERIFIED_ZONE)))
             }
           }
           catch {
-            case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
         }
       )
@@ -67,11 +68,11 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
               onFailure = blockchainTransactionAddOrganizations.Utility.onFailure,
               updateTransactionHash = blockchainTransactionAddOrganizations.Service.updateTransactionHash
             )
-            Ok(views.html.index(successes = Seq(constants.Response.ORGANIZATION_VERIFIED)))
+            withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ORGANIZATION_VERIFIED)))
           }
           catch {
-            case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
-            case blockChainException: BlockChainException => Ok(views.html.index(failures = Seq(blockChainException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+            case blockChainException: BlockChainException => InternalServerError(views.html.index(failures = Seq(blockChainException.failure)))
           }
         }
       )
@@ -80,9 +81,9 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
   def viewKycDocuments(accountID: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        Ok(views.html.component.master.viewVerificationOrganizationKycDouments(masterOrganizationKYCs.Service.getAllDocuments(accountID)))
+        withUsernameToken.Ok(views.html.component.master.viewVerificationOrganizationKycDouments(masterOrganizationKYCs.Service.getAllDocuments(accountID)))
       } catch {
-        case baseException: BaseException => BadRequest(views.html.index(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
@@ -91,9 +92,9 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
       try {
         masterOrganizationKYCs.Service.verify(id = accountID, documentType = documentType)
         pushNotification.sendNotification(accountID, constants.Notification.SUCCESS, Messages(constants.Response.DOCUMENT_APPROVED.message))
-        Ok(Messages(constants.Response.SUCCESS.message))
+        withUsernameToken.Ok(Messages(constants.Response.SUCCESS.message))
       } catch {
-        case baseException: BaseException => BadRequest(Messages(baseException.failure.message))
+        case baseException: BaseException => InternalServerError(Messages(baseException.failure.message))
       }
   }
 
@@ -102,9 +103,9 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
       try {
         masterOrganizationKYCs.Service.reject(id = accountID, documentType = documentType)
         pushNotification.sendNotification(accountID, constants.Notification.FAILURE, Messages(constants.Response.DOCUMENT_REJECTED.message))
-        Ok(Messages(constants.Response.SUCCESS.message))
+        withUsernameToken.Ok(Messages(constants.Response.SUCCESS.message))
       } catch {
-        case baseException: BaseException => BadRequest(Messages(baseException.failure.message))
+        case baseException: BaseException => InternalServerError(Messages(baseException.failure.message))
       }
   }
 
@@ -122,10 +123,10 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
           try {
             masterOrganizations.Service.updateStatus(rejectVerifyOrganizationRequestData.organizationID, status = false)
             masterOrganizationKYCs.Service.rejectAll(masterOrganizations.Service.getAccountId(rejectVerifyOrganizationRequestData.organizationID))
-            Ok(views.html.index(successes = Seq(constants.Response.VERIFY_ORGANIZATION_REQUEST_REJECTED)))
+            withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.VERIFY_ORGANIZATION_REQUEST_REJECTED)))
           }
           catch {
-            case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
         }
       )
@@ -137,7 +138,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
         Ok(views.html.component.master.viewPendingVerifyOrgnizationRequests(masterOrganizations.Service.getVerifyOrganizationRequests(masterZones.Service.getZoneId(loginState.username))))
       }
       catch {
-        case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
@@ -147,7 +148,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
         Ok(views.html.component.master.viewOrganizationsInZone(masterOrganizations.Service.getOrganizationsInZone(masterZones.Service.getZoneId(loginState.username))))
       }
       catch {
-        case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
@@ -157,7 +158,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
         Ok(views.html.component.master.viewOrganizationsInZoneForGenesis(masterOrganizations.Service.getOrganizationsInZone(zoneID)))
       }
       catch {
-        case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
@@ -176,8 +177,8 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
           Ok(views.html.index(successes = Seq(constants.Response.ORGANIZATION_ADDED)))
         }
         catch {
-          case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
-          case blockChainException: BlockChainException => Ok(views.html.index(failures = Seq(blockChainException.failure)))
+          case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+          case blockChainException: BlockChainException => InternalServerError(views.html.index(failures = Seq(blockChainException.failure)))
         }
       }
     )
