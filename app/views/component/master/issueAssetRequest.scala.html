@@ -23,13 +23,11 @@
         'class -> "form-control",'placeholder->Messages(constants.Form.ASSET_QUANTITY),'required->true)
     @inputText(issueAssetRequestForm(constants.Form.TAKER_ADDRESS), '_label -> Messages(constants.Form.TAKER_ADDRESS),
         'class -> "form-control",'placeholder->Messages(constants.Form.TAKER_ADDRESS),'required->true)
-        <div class="input-group-prepend issue_asset">
+        <div class="input-group-prepend">
             @checkbox(issueAssetRequestForm(constants.Form.MODERATED), '_label -> Messages(constants.Form.MODERATED), 'id -> "moderated")
-
             <span class="input-group-text">
                 @Messages(constants.Form.MODERATED)
             </span>
-
         </div>
 
     <div id="moderatedIssueAssetRequestFormFields">
