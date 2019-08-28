@@ -3,6 +3,7 @@ body {
 }
 h2{
     color: rgba(0, 0, 0, 0.87) !important;
+    font-size: 1.5625rem !important;
 }
 /* Notification*/
 
@@ -624,22 +625,11 @@ dl .info::after {
 }
 .ml-cb .input-group-prepend .input-group-text{
     margin-top: -50px;
+    margin-left: -5px;
 }
-/*logout*/
-/*.logout .input-group-prepend{*/
-/*    margin-top: 40px;*/
-/*    margin-left: 40px;*/
-/*}*/
 
-/*.logout .input-group-prepend .input-group-text*/
-/*{*/
-/*    margin-top: -20px;*/
-/*}*/
-/*.logout  button*/
-/*{*/
-/*margin-top:-30px;*/
-/*left:35%;*/
-/*}*/
+
 .pageContent{
     margin-top: 50px;
 }
+
