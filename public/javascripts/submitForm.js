@@ -10,15 +10,21 @@ function submitForm(source, target = '#commonModalContent') {
             400: function (data) {
                 result.html(data.responseText);
             },
-            200: function (data) {
+            401: function (data) {
                 const newDocument = document.open("text/html", "replace");
-                newDocument.write(data);
+                newDocument.write(data.responseText);
                 newDocument.close();
             },
             500: function (data) {
-                result.html(data.responseText);
-            }
+                console.log(data);
+                const newDocument = document.open("text/html", "replace");
+                newDocument.write(data.responseText);
+                newDocument.close();
+            },
+            200: function (data) {const newDocument = document.open("text/html", "replace");
+                newDocument.write(data);
+                newDocument.close();
+            },
         }
     });
-
 }

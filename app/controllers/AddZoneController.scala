@@ -1,6 +1,7 @@
 package controllers
 
 import controllers.actions.{WithGenesisLoginAction, WithUserLoginAction}
+import controllers.results.WithUsernameToken
 import exceptions.{BaseException, BlockChainException}
 import javax.inject.{Inject, Singleton}
 import models.{blockchain, blockchainTransaction, master}
@@ -12,7 +13,7 @@ import utilities.PushNotification
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class AddZoneController @Inject()(messagesControllerComponents: MessagesControllerComponents, transaction: utilities.Transaction, pushNotification: PushNotification, blockchainAccounts: blockchain.Accounts, masterZoneKYCs: master.ZoneKYCs, masterOrganizations: master.Organizations, transactionsAddZone: transactions.AddZone, blockchainZones: models.blockchain.Zones, blockchainTransactionAddZones: blockchainTransaction.AddZones, masterAccounts: master.Accounts, masterZones: master.Zones, withUserLoginAction: WithUserLoginAction, withGenesisLoginAction: WithGenesisLoginAction)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class AddZoneController @Inject()(messagesControllerComponents: MessagesControllerComponents, transaction: utilities.Transaction, pushNotification: PushNotification, blockchainAccounts: blockchain.Accounts, masterZoneKYCs: master.ZoneKYCs, masterOrganizations: master.Organizations, transactionsAddZone: transactions.AddZone, blockchainZones: models.blockchain.Zones, blockchainTransactionAddZones: blockchainTransaction.AddZones, masterAccounts: master.Accounts, masterZones: master.Zones, withUserLoginAction: WithUserLoginAction, withGenesisLoginAction: WithGenesisLoginAction, withUsernameToken: WithUsernameToken)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
@@ -31,10 +32,10 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
         addZoneData => {
           try {
             masterZones.Service.create(accountID = loginState.username, name = addZoneData.name, currency = addZoneData.currency)
-            Ok(views.html.index(successes = Seq(constants.Response.ZONE_REQUEST_SENT)))
+            withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ZONE_REQUEST_SENT)))
           }
           catch {
-            case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
         }
       )
@@ -62,11 +63,11 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
               onFailure = blockchainTransactionAddZones.Utility.onFailure,
               updateTransactionHash = blockchainTransactionAddZones.Service.updateTransactionHash
             )
-            Ok(views.html.index(successes = Seq(constants.Response.ZONE_VERIFIED)))
+            withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ZONE_VERIFIED)))
           }
           catch {
-            case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
-            case blockChainException: BlockChainException => Ok(views.html.index(failures = Seq(blockChainException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+            case blockChainException: BlockChainException => InternalServerError(views.html.index(failures = Seq(blockChainException.failure)))
           }
         }
       )
@@ -75,19 +76,19 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
   def viewPendingVerifyZoneRequests: Action[AnyContent] = withGenesisLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        Ok(views.html.component.master.viewPendingVerifyZoneRequests(masterZones.Service.getVerifyZoneRequests))
+        withUsernameToken.Ok(views.html.component.master.viewPendingVerifyZoneRequests(masterZones.Service.getVerifyZoneRequests))
       }
       catch {
-        case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
   def viewKycDocuments(accountID: String): Action[AnyContent] = withGenesisLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        Ok(views.html.component.master.viewVerificationZoneKycDouments(masterZoneKYCs.Service.getAllDocuments(accountID)))
+        withUsernameToken.Ok(views.html.component.master.viewVerificationZoneKycDouments(masterZoneKYCs.Service.getAllDocuments(accountID)))
       } catch {
-        case baseException: BaseException => BadRequest(views.html.index(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
@@ -96,9 +97,9 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
       try {
         masterZoneKYCs.Service.verify(id = accountID, documentType = documentType)
         pushNotification.sendNotification(accountID, constants.Notification.SUCCESS, Messages(constants.Response.DOCUMENT_APPROVED.message))
-        Ok(Messages(constants.Response.SUCCESS.message))
+        withUsernameToken.Ok(Messages(constants.Response.SUCCESS.message))
       } catch {
-        case baseException: BaseException => BadRequest(Messages(baseException.failure.message))
+        case baseException: BaseException => InternalServerError(Messages(baseException.failure.message))
       }
   }
 
@@ -107,9 +108,9 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
       try {
         masterZoneKYCs.Service.reject(id = accountID, documentType = documentType)
         pushNotification.sendNotification(accountID, constants.Notification.FAILURE, Messages(constants.Response.DOCUMENT_REJECTED.message))
-        Ok(Messages(constants.Response.SUCCESS.message))
+        withUsernameToken.Ok(Messages(constants.Response.SUCCESS.message))
       } catch {
-        case baseException: BaseException => BadRequest(Messages(baseException.failure.message))
+        case baseException: BaseException => InternalServerError(Messages(baseException.failure.message))
       }
   }
 
@@ -127,10 +128,10 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
           try {
             masterZones.Service.updateStatus(rejectVerifyZoneRequestData.zoneID, status = false)
             masterZoneKYCs.Service.rejectAll(masterZones.Service.getAccountId(rejectVerifyZoneRequestData.zoneID))
-            Ok(views.html.index(successes = Seq(constants.Response.VERIFY_ZONE_REJECTED)))
+            withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.VERIFY_ZONE_REJECTED)))
           }
           catch {
-            case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
         }
       )
@@ -139,10 +140,10 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
   def viewZonesInGenesis: Action[AnyContent] = withGenesisLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        Ok(views.html.component.master.viewZonesInGenesis(masterZones.Service.getAll))
+        withUsernameToken.Ok(views.html.component.master.viewZonesInGenesis(masterZones.Service.getAll))
       }
       catch {
-        case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
@@ -161,8 +162,8 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
           Ok(views.html.index(successes = Seq(constants.Response.ZONE_ADDED)))
         }
         catch {
-          case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
-          case blockChainException: BlockChainException => Ok(views.html.index(failures = Seq(blockChainException.failure)))
+          case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+          case blockChainException: BlockChainException => InternalServerError(views.html.index(failures = Seq(blockChainException.failure)))
         }
       }
     )

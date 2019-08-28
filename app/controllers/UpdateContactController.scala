@@ -1,6 +1,7 @@
 package controllers
 
 import controllers.actions.WithLoginAction
+import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.master
@@ -13,7 +14,7 @@ import views.companion.master.UpdateContact
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class UpdateContactController @Inject()(messagesControllerComponents: MessagesControllerComponents, contacts: Contacts, withLoginAction: WithLoginAction, masterAccounts: master.Accounts)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class UpdateContactController @Inject()(messagesControllerComponents: MessagesControllerComponents, contacts: Contacts, withLoginAction: WithLoginAction, masterAccounts: master.Accounts, withUsernameToken: WithUsernameToken)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -31,9 +32,9 @@ class UpdateContactController @Inject()(messagesControllerComponents: MessagesCo
           try {
             contacts.Service.insertOrUpdateContact(loginState.username, updateContactData.countryCode + updateContactData.mobileNumber, updateContactData.emailAddress)
             masterAccounts.Service.updateStatusUnverifiedContact(loginState.username)
-            Ok(views.html.index(successes = Seq(constants.Response.SUCCESS)))
+            withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.SUCCESS)))
           } catch {
-            case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
         }
       )

@@ -1,6 +1,7 @@
 package controllers
 
 import controllers.actions.WithTraderLoginAction
+import controllers.results.WithUsernameToken
 import exceptions.{BaseException, BlockChainException}
 import javax.inject.{Inject, Singleton}
 import models.{blockchain, blockchainTransaction}
@@ -11,7 +12,7 @@ import play.api.{Configuration, Logger}
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class SetBuyerFeedbackController @Inject()(messagesControllerComponents: MessagesControllerComponents, transaction: utilities.Transaction, withTraderLoginAction: WithTraderLoginAction, transactionsSetBuyerFeedback: transactions.SetBuyerFeedback, blockchainTransactionSetBuyerFeedbacks: blockchainTransaction.SetBuyerFeedbacks, blockchainTraderFeedbackHistories: blockchain.TraderFeedbackHistories)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class SetBuyerFeedbackController @Inject()(messagesControllerComponents: MessagesControllerComponents, transaction: utilities.Transaction, withTraderLoginAction: WithTraderLoginAction, transactionsSetBuyerFeedback: transactions.SetBuyerFeedback, blockchainTransactionSetBuyerFeedbacks: blockchainTransaction.SetBuyerFeedbacks, blockchainTraderFeedbackHistories: blockchain.TraderFeedbackHistories, withUsernameToken: WithUsernameToken)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -38,11 +39,11 @@ class SetBuyerFeedbackController @Inject()(messagesControllerComponents: Message
               onFailure = blockchainTransactionSetBuyerFeedbacks.Utility.onFailure,
               updateTransactionHash = blockchainTransactionSetBuyerFeedbacks.Service.updateTransactionHash
             )
-            Ok(views.html.index(successes = Seq(constants.Response.BUYER_FEEDBACK_SET)))
+            withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.BUYER_FEEDBACK_SET)))
           }
           catch {
-            case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
-            case blockChainException: BlockChainException => Ok(views.html.index(failures = Seq(blockChainException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+            case blockChainException: BlockChainException => InternalServerError(views.html.index(failures = Seq(blockChainException.failure)))
           }
         }
       )
@@ -51,9 +52,9 @@ class SetBuyerFeedbackController @Inject()(messagesControllerComponents: Message
   def buyerFeedbackList: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        Ok(views.html.component.master.setBuyerFeedbackList(blockchainTraderFeedbackHistories.Service.getNullRatingsForBuyerFeedback(loginState.address)))
+        withUsernameToken.Ok(views.html.component.master.setBuyerFeedbackList(blockchainTraderFeedbackHistories.Service.getNullRatingsForBuyerFeedback(loginState.address)))
       } catch {
-        case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
@@ -72,8 +73,8 @@ class SetBuyerFeedbackController @Inject()(messagesControllerComponents: Message
           Ok(views.html.index(successes = Seq(constants.Response.BUYER_FEEDBACK_SET)))
         }
         catch {
-          case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
-          case blockChainException: BlockChainException => Ok(views.html.index(failures = Seq(blockChainException.failure)))
+          case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+          case blockChainException: BlockChainException => InternalServerError(views.html.index(failures = Seq(blockChainException.failure)))
 
         }
       }

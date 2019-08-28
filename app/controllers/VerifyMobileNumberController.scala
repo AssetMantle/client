@@ -1,6 +1,7 @@
 package controllers
 
 import controllers.actions.WithLoginAction
+import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.master
@@ -14,7 +15,7 @@ import views.companion.master.VerifyMobileNumber
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class VerifyMobileNumberController @Inject()(messagesControllerComponents: MessagesControllerComponents, masterAccounts: master.Accounts, smsOTPs: SMSOTPs, masterContacts: master.Contacts, withLoginAction: WithLoginAction, SMS: SMS)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class VerifyMobileNumberController @Inject()(messagesControllerComponents: MessagesControllerComponents, masterAccounts: master.Accounts, smsOTPs: SMSOTPs, masterContacts: master.Contacts, withLoginAction: WithLoginAction, SMS: SMS, withUsernameToken: WithUsernameToken)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val module: String = constants.Module.CONTROLLERS_SMS
 
@@ -25,10 +26,10 @@ class VerifyMobileNumberController @Inject()(messagesControllerComponents: Messa
       try {
         val otp = smsOTPs.Service.sendOTP(loginState.username)
         SMS.sendSMS(loginState.username, constants.SMS.OTP, Seq(otp))
-        Ok(views.html.component.master.verifyMobileNumber(VerifyMobileNumber.form))
+        withUsernameToken.Ok(views.html.component.master.verifyMobileNumber(VerifyMobileNumber.form))
       }
       catch {
-        case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
@@ -48,10 +49,10 @@ class VerifyMobileNumberController @Inject()(messagesControllerComponents: Messa
             } else {
               masterAccounts.Service.updateStatusUnverifiedEmail(loginState.username)
             }
-            Ok(views.html.index(successes = Seq(constants.Response.SUCCESS)))
+            withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.SUCCESS)))
           }
           catch {
-            case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
         }
       )

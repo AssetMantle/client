@@ -1,6 +1,7 @@
 package controllers
 
 import controllers.actions.{WithGenesisLoginAction, WithLoginAction, WithUnknownLoginAction, WithUserLoginAction}
+import controllers.results.WithUsernameToken
 import exceptions.{BaseException, BlockChainException}
 import javax.inject.{Inject, Singleton}
 import models.{blockchain, blockchainTransaction, master, masterTransaction}
@@ -11,7 +12,7 @@ import play.api.{Configuration, Logger}
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class SendCoinController @Inject()(messagesControllerComponents: MessagesControllerComponents, transaction: utilities.Transaction, masterAccounts: master.Accounts, withLoginAction: WithLoginAction, withGenesisLoginAction: WithGenesisLoginAction, blockchainAccounts: blockchain.Accounts, masterTransactionFaucetRequests: masterTransaction.FaucetRequests, withUnknownLoginAction: WithUnknownLoginAction, transactionsSendCoin: transactions.SendCoin, blockchainTransactionSendCoins: blockchainTransaction.SendCoins, withUserLoginAction: WithUserLoginAction)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class SendCoinController @Inject()(messagesControllerComponents: MessagesControllerComponents, transaction: utilities.Transaction, masterAccounts: master.Accounts, withLoginAction: WithLoginAction, withGenesisLoginAction: WithGenesisLoginAction, blockchainAccounts: blockchain.Accounts, masterTransactionFaucetRequests: masterTransaction.FaucetRequests, withUnknownLoginAction: WithUnknownLoginAction, transactionsSendCoin: transactions.SendCoin, blockchainTransactionSendCoins: blockchainTransaction.SendCoins, withUserLoginAction: WithUserLoginAction, withUsernameToken: WithUsernameToken)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -42,11 +43,11 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
               onFailure = blockchainTransactionSendCoins.Utility.onFailure,
               updateTransactionHash = blockchainTransactionSendCoins.Service.updateTransactionHash
             )
-            Ok(views.html.index(successes = Seq(constants.Response.COINS_SENT)))
+            withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.COINS_SENT)))
           }
           catch {
-            case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
-            case blockChainException: BlockChainException => Ok(views.html.index(failures = Seq(blockChainException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+            case blockChainException: BlockChainException => InternalServerError(views.html.index(failures = Seq(blockChainException.failure)))
           }
         }
       )
@@ -67,8 +68,8 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
           Ok(views.html.index(successes = Seq(constants.Response.COINS_SENT)))
         }
         catch {
-          case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
-          case blockChainException: BlockChainException => Ok(views.html.index(failures = Seq(blockChainException.failure)))
+          case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+          case blockChainException: BlockChainException => InternalServerError(views.html.index(failures = Seq(blockChainException.failure)))
         }
       }
     )
@@ -87,10 +88,10 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
         requestCoinFormData => {
           try {
             masterTransactionFaucetRequests.Service.create(loginState.username, defaultFaucetToken)
-            Ok(views.html.index(successes = Seq(constants.Response.COINS_REQUESTED)))
+            withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.COINS_REQUESTED)))
           }
           catch {
-            case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
         }
       )
@@ -99,10 +100,10 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
   def viewPendingFaucetRequests: Action[AnyContent] = withGenesisLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        Ok(views.html.component.master.viewPendingFaucetRequests(masterTransactionFaucetRequests.Service.getPendingFaucetRequests))
+        withUsernameToken.Ok(views.html.component.master.viewPendingFaucetRequests(masterTransactionFaucetRequests.Service.getPendingFaucetRequests))
       }
       catch {
-        case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
@@ -119,10 +120,10 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
         rejectFaucetRequestData => {
           try {
             masterTransactionFaucetRequests.Service.reject(rejectFaucetRequestData.requestID, comment = rejectFaucetRequestData.comment)
-            Ok(views.html.index(successes = Seq(constants.Response.FAUCET_REQUEST_REJECTED)))
+            withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.FAUCET_REQUEST_REJECTED)))
           }
           catch {
-            case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
         }
       )
@@ -152,14 +153,14 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
                 updateTransactionHash = blockchainTransactionSendCoins.Service.updateTransactionHash
               )
               masterTransactionFaucetRequests.Service.accept(approveFaucetRequestFormData.requestID, ticketID)
-              Ok(views.html.index(successes = Seq(constants.Response.FAUCET_REQUEST_APPROVED)))
+              withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.FAUCET_REQUEST_APPROVED)))
             } else {
-              Ok(views.html.index(failures = Seq(constants.Response.REQUEST_ALREADY_APPROVED_OR_REJECTED)))
+              Unauthorized(views.html.index(failures = Seq(constants.Response.REQUEST_ALREADY_APPROVED_OR_REJECTED)))
             }
           }
           catch {
-            case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
-            case blockChainException: BlockChainException => Ok(views.html.index(failures = Seq(blockChainException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+            case blockChainException: BlockChainException => InternalServerError(views.html.index(failures = Seq(blockChainException.failure)))
           }
         }
       )
