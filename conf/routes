@@ -11,6 +11,13 @@ GET         /profile                                                     control
 GET         /profileDocuments                                            controllers.ComponentViewController.profileDocuments
 GET         /profilePicture                                              controllers.ComponentViewController.profilePicture
 
+GET         /account/changePassword                                      controllers.AccountController.changePasswordForm
+POST        /account/changePassword                                      controllers.AccountController.changePassword
+GET         /account/forgotPasswordUsername                              controllers.AccountController.emailOTPForgotPasswordForm
+POST        /account/forgotPasswordUsername                              controllers.AccountController.emailOTPForgotPassword
+GET         /account/forgotPassword                                      controllers.AccountController.forgotPasswordForm(username: String)
+POST        /account/forgotPassword                                      controllers.AccountController.forgotPassword(username: String)
+
 GET         /contact                                                     controllers.ContactController.getContact
 
 GET         /assets/*file                                                controllers.Assets.versioned(path="/public", file: Asset)

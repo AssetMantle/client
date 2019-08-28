@@ -20,7 +20,7 @@ class IntFormField (fieldName: String, minimumValue: Int, maximumValue: Int) {
 object FormField {
 
   val SIGNUP_USERNAME = new StringFormField("USERNAME", 3,  50, RegularExpression.ACCOUNT_ID, Response.INVALID_USERNAME.message)
-  val SIGNUP_PASSWORD = new StringFormField("PASSWORD", 6, 128, RegularExpression.PASSWORD, Response.INVALID_PASSWORD.message)
+  val SIGNUP_PASSWORD = new StringFormField("PASSWORD", 8, 128, RegularExpression.PASSWORD, Response.INVALID_PASSWORD.message)
   val SIGNUP_CONFIRM_PASSWORD = new StringFormField("CONFIRM_PASSWORD", 6, 128, RegularExpression.PASSWORD, Response.INVALID_PASSWORD.message)
   val USERNAME = new StringFormField("USERNAME", 3, 50, RegularExpression.ACCOUNT_ID)
   val NON_EMPTY_PASSWORD = new StringFormField("PASSWORD", 1, 128)
@@ -56,7 +56,12 @@ object FormField {
   val DOCUMENT_HASH = new StringFormField("DOCUMENT_HASH", 4, 50, RegularExpression.HASH)
   val FROM = new StringFormField("FROM", 45, 45)
   val MODE = new StringFormField("MODE", 4, 5)
-  val TAKER_ADDRESS = new StringFormField( "TAKER_ADDRESS", 45, 45)
+  val TAKER_ADDRESS = new StringFormField( "TAKER_ADDRESS", 0, 45)
+
+  val OLD_PASSWORD = new StringFormField("OLD_PASSWORD", 1, 128)
+  val NEW_PASSWORD = new StringFormField("NEW_PASSWORD", 1, 128, RegularExpression.PASSWORD, Response.INVALID_PASSWORD.message)
+  val CONFIRM_NEW_PASSWORD = new StringFormField("CONFIRM_NEW_PASSWORD", 1, 128, RegularExpression.PASSWORD, Response.INVALID_PASSWORD.message)
+  val MNEMONIC = new StringFormField("MNEMONIC", 1, 200)
 
   val GAS = new IntFormField("GAS", 0, 1000000)
   val BID = new IntFormField("BID", 0, Int.MaxValue)

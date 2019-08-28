@@ -66,6 +66,8 @@ object Response {
   val FILE_UPLOAD_SUCCESSFUL = new Success("FILE_UPLOAD_SUCCESSFUL")
   val FILE_UPDATE_SUCCESSFUL = new Success("FILE_UPDATE_SUCCESSFUL")
   val DOCUMENT_APPROVED = new Success("DOCUMENT_APPROVED")
+  val PASSWORD_UPDATED = new Success("PASSWORD_UPDATED")
+  val OTP_SENT = new Success("OTP_SENT")
 
   //Warning- for telling that something important is not done and ask to do it
   val VERIFY_MOBILE_NUMBER = new Warning("VERIFY_MOBILE_NUMBER", routes.javascript.VerifyMobileNumberController.verifyMobileNumberForm)
