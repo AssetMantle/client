@@ -170,7 +170,7 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
   def profileDocuments(): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
     try {
-      val documents: Seq[Document] =  loginState.userType match {
+      val documents: Seq[Document[_]] =  loginState.userType match {
         case constants.User.ZONE => masterZoneKYC.Service.getAllDocuments(loginState.username)
         case constants.User.ORGANIZATION => masterOrganizationKYC.Service.getAllDocuments(loginState.username)
         case constants.User.TRADER => masterTraderKYC.Service.getAllDocuments(loginState.username)

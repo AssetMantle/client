@@ -11,7 +11,7 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class OrganizationKYC(id: String, documentType: String, status: Option[Boolean], fileName: String, file: Option[Array[Byte]]) extends Document {
+case class OrganizationKYC(id: String, documentType: String, status: Option[Boolean], fileName: String, file: Option[Array[Byte]]) extends Document[OrganizationKYC] {
 
   def getDocumentType: String = documentType
 
@@ -20,6 +20,10 @@ case class OrganizationKYC(id: String, documentType: String, status: Option[Bool
   def getFile: Option[Array[Byte]] = file
 
   def getStatus: Option[Boolean] = status
+
+  def updateFileName(newFileName: String): OrganizationKYC = OrganizationKYC(id = id, documentType = documentType, status = status, fileName = newFileName, file = file)
+
+  def updateFile(newFile: Option[Array[Byte]]): OrganizationKYC = OrganizationKYC(id = id, documentType = documentType, status = status, fileName = fileName, file = newFile)
 }
 
 @Singleton

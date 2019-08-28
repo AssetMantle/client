@@ -1,7 +1,7 @@
 @import controllers.actions.LoginState
 @import models.master.Document
 
-@(documents: Seq[Document])(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
+@(documents: Seq[Document[_]])(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
 <div>
     @for(document <- documents){
         @if(document.getDocumentType != constants.File.PROFILE_PICTURE) {

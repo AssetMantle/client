@@ -71,7 +71,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
       fileUploadInfo => {
         try {
           request.body.file("file") match {
-            case None => BadRequest("No file")
+            case None => BadRequest(Messages(constants.Response.NO_FILE.message))
             case Some(file) =>
               utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, fileResourceManager.getAccountKycFilePath(documentType))
               Ok
@@ -88,39 +88,36 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
     implicit request =>
       val path = fileResourceManager.getAccountKycFilePath(documentType)
       try {
-        val (fileName, encodedBase64) = utilities.FileOperations.fileExtensionFromName(name) match {
-          case constants.File.JPEG | constants.File.JPG | constants.File.PNG => utilities.ImageProcess.convertToThumbnail(name, path)
-          case _ => (List(util.hashing.MurmurHash3.stringHash(Base64.encodeBase64String(utilities.FileOperations.convertToByteArray(utilities.FileOperations.newFile(path, name)))).toString, utilities.FileOperations.fileExtensionFromName(name)).mkString("."), null)
-        }
-        masterAccountKYCs.Service.create(id = loginState.username, documentType = documentType, fileName = fileName, file = Option(encodedBase64))
-        utilities.FileOperations.renameFile(path, name, fileName)
+        fileResourceManager.storeFile[master.AccountKYC](
+          name = name,
+          documentType = documentType,
+          path = path,
+          document = master.AccountKYC(id = loginState.username, documentType = documentType, status = null, fileName = name, file = null),
+          masterCreate = masterAccountKYCs.Service.create
+        )
         withUsernameToken.Ok(Messages(constants.Response.FILE_UPLOAD_SUCCESSFUL.message))
       } catch {
         case baseException: BaseException => utilities.FileOperations.deleteFile(path, name)
           InternalServerError(Messages(baseException.failure.message))
-        case e: Exception => utilities.FileOperations.deleteFile(path, name)
-          InternalServerError(Messages(e.getMessage))
       }
   }
 
   def updateUserKyc(name: String, documentType: String): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val newPath = fileResourceManager.getAccountKycFilePath(documentType)
+      val path = fileResourceManager.getAccountKycFilePath(documentType)
       try {
-        val oldAccountKYC = masterAccountKYCs.Service.get(id = loginState.username, documentType = documentType)
-        val (fileName, encodedBase64) = utilities.FileOperations.fileExtensionFromName(name) match {
-          case constants.File.JPEG | constants.File.JPG | constants.File.PNG => utilities.ImageProcess.convertToThumbnail(name, newPath)
-          case _ => (List(util.hashing.MurmurHash3.stringHash(Base64.encodeBase64String(utilities.FileOperations.convertToByteArray(utilities.FileOperations.newFile(newPath, name)))).toString, utilities.FileOperations.fileExtensionFromName(name)).mkString("."), null)
-        }
-        utilities.FileOperations.deleteFile(fileResourceManager.getAccountKycFilePath(oldAccountKYC.documentType), oldAccountKYC.fileName)
-        masterAccountKYCs.Service.updateOldDocument(id = loginState.username, documentType = documentType, fileName = fileName, file = Option(encodedBase64))
-        utilities.FileOperations.renameFile(newPath, name, fileName)
+        fileResourceManager.updateFile[master.AccountKYC](
+          name = name,
+          documentType = documentType,
+          path = path,
+          oldDocumentFileName = masterAccountKYCs.Service.getFileName(id = loginState.username, documentType = documentType),
+          document = master.AccountKYC(id = loginState.username, documentType = documentType, status = null, fileName = name, file  = null),
+          updateOldDocument = masterAccountKYCs.Service.updateOldDocument
+        )
         withUsernameToken.Ok(Messages(constants.Response.FILE_UPDATE_SUCCESSFUL.message))
       } catch {
-        case baseException: BaseException => utilities.FileOperations.deleteFile(newPath, name)
+        case baseException: BaseException => utilities.FileOperations.deleteFile(path, name)
           InternalServerError(Messages(baseException.failure.message))
-        case e: Exception => utilities.FileOperations.deleteFile(newPath, name)
-          InternalServerError(Messages(e.getMessage))
       }
   }
 
@@ -140,7 +137,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
       fileUploadInfo => {
         try {
           request.body.file("file") match {
-            case None => BadRequest("No file")
+            case None => BadRequest(Messages(constants.Response.NO_FILE.message))
             case Some(file) =>
               utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, fileResourceManager.getZoneKycFilePath(documentType))
               Ok
@@ -209,7 +206,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
       fileUploadInfo => {
         try {
           request.body.file("file") match {
-            case None => BadRequest("No file")
+            case None => BadRequest(Messages(constants.Response.NO_FILE.message))
             case Some(file) =>
               utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, fileResourceManager.getOrganizationKycFilePath(documentType))
               Ok
@@ -278,7 +275,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
       fileUploadInfo => {
         try {
           request.body.file("file") match {
-            case None => BadRequest("No file")
+            case None => BadRequest(Messages(constants.Response.NO_FILE.message))
             case Some(file) =>
               utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, fileResourceManager.getTraderKycFilePath(documentType))
               Ok
@@ -347,7 +344,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
       fileUploadInfo => {
         try {
           request.body.file("file") match {
-            case None => BadRequest("No file")
+            case None => BadRequest(Messages(constants.Response.NO_FILE.message))
             case Some(file) =>
               utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, fileResourceManager.getZoneKycFilePath(documentType))
               Ok
@@ -416,7 +413,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
       fileUploadInfo => {
         try {
           request.body.file("file") match {
-            case None => BadRequest("No file")
+            case None => BadRequest(Messages(constants.Response.NO_FILE.message))
             case Some(file) =>
               utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, fileResourceManager.getOrganizationKycFilePath(documentType))
               Ok
@@ -486,7 +483,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
       fileUploadInfo => {
         try {
           request.body.file("file") match {
-            case None => BadRequest("No file")
+            case None => BadRequest(Messages(constants.Response.NO_FILE.message))
             case Some(file) =>
               utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, fileResourceManager.getTraderKycFilePath(documentType))
               Ok
@@ -622,7 +619,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
       fileUploadInfo => {
         try {
           request.body.file("file") match {
-            case None => BadRequest("No file")
+            case None => BadRequest(Messages(constants.Response.NO_FILE.message))
             case Some(file) =>
               utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, fileResourceManager.getAccountFilePath(documentType))
               Ok

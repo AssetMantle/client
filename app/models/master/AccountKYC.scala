@@ -11,7 +11,7 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class AccountKYC(id: String, documentType: String, status: Option[Boolean], fileName: String, file: Option[Array[Byte]]) extends Document {
+case class AccountKYC(id: String, documentType: String, status: Option[Boolean], fileName: String, file: Option[Array[Byte]]) extends Document[AccountKYC] {
 
   def getDocumentType: String = documentType
 
@@ -20,6 +20,10 @@ case class AccountKYC(id: String, documentType: String, status: Option[Boolean],
   def getFile: Option[Array[Byte]] = file
 
   def getStatus: Option[Boolean] = status
+
+  def updateFileName(newFileName: String): AccountKYC = AccountKYC(id = id, documentType = documentType, status = status, fileName = newFileName, file = file)
+
+  def updateFile(newFile: Option[Array[Byte]]): AccountKYC = AccountKYC(id = id, documentType = documentType, status = status, fileName = fileName, file = newFile)
 }
 
 @Singleton
@@ -56,6 +60,14 @@ class AccountKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfig
   }
 
   private def findByIdDocumentType(id: String, documentType: String): Future[AccountKYC] = db.run(accountKYCTable.filter(_.id === id).filter(_.documentType === documentType).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def getFileNameByIdDocumentType(id: String, documentType: String): Future[String] = db.run(accountKYCTable.filter(_.id === id).filter(_.documentType === documentType).map(_.fileName).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -113,11 +125,13 @@ class AccountKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfig
 
   object Service {
 
-    def create(id: String, documentType: String, fileName: String, file: Option[Array[Byte]]): String = Await.result(add(AccountKYC(id = id, documentType = documentType, status = null, fileName = fileName, file = file)), Duration.Inf)
+    def create(accountKYC: AccountKYC): String = Await.result(add(AccountKYC(id = accountKYC.id, documentType = accountKYC.documentType, status = null, fileName = accountKYC.fileName, file = accountKYC.file)), Duration.Inf)
 
-    def updateOldDocument(id: String, documentType: String, fileName: String, file: Option[Array[Byte]]): Int = Await.result(upsert(AccountKYC(id = id, documentType = documentType, status = null, fileName = fileName, file = file)), Duration.Inf)
+    def updateOldDocument(accountKYC: AccountKYC): Int = Await.result(upsert(AccountKYC(id = accountKYC.id, documentType = accountKYC.documentType, status = accountKYC.status, fileName = accountKYC.fileName, file = accountKYC.file)), Duration.Inf)
 
     def get(id: String, documentType: String): AccountKYC = Await.result(findByIdDocumentType(id = id, documentType = documentType), Duration.Inf)
+
+    def getFileName(id: String, documentType: String): String = Await.result(getFileNameByIdDocumentType(id = id, documentType = documentType), Duration.Inf)
 
     def getAllDocuments(id: String): Seq[AccountKYC] = Await.result(getAllDocumentsById(id = id), Duration.Inf)
 

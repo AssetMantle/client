@@ -11,7 +11,7 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-abstract class Document {
+abstract class Document[T] {
   def getDocumentType: String
 
   def getFileName: String
@@ -19,9 +19,13 @@ abstract class Document {
   def getFile: Option[Array[Byte]]
 
   def getStatus: Option[Boolean]
+
+  def updateFileName(newFileName: String): T
+
+  def updateFile(newFile: Option[Array[Byte]]): T
 }
 
-case class AccountFile(id: String, documentType: String, fileName: String, file: Option[Array[Byte]]) extends Document {
+case class AccountFile(id: String, documentType: String, fileName: String, file: Option[Array[Byte]]) extends Document[AccountFile] {
 
   def getDocumentType: String = documentType
 
@@ -30,6 +34,10 @@ case class AccountFile(id: String, documentType: String, fileName: String, file:
   def getFile: Option[Array[Byte]] = file
 
   def getStatus: Option[Boolean] = Option(true)
+
+  def updateFileName(newFileName: String): AccountFile = AccountFile(id = id, documentType = documentType, fileName = newFileName, file = file)
+
+  def updateFile(newFile: Option[Array[Byte]]): AccountFile = AccountFile(id = id, documentType = documentType, fileName = fileName, file = newFile)
 }
 
 @Singleton
