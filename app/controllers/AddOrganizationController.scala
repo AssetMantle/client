@@ -33,7 +33,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
         addOrganizationData => {
           try {
             if (masterZones.Service.getStatus(addOrganizationData.zoneID) == Option(true)) {
-              masterOrganizations.Service.create(zoneID = addOrganizationData.zoneID, accountID = loginState.username, name = addOrganizationData.name, address = addOrganizationData.address, phone = addOrganizationData.phone, email = addOrganizationData.email)
+              masterOrganizations.Service.create(zoneID = addOrganizationData.zoneID, accountID = loginState.username, name = addOrganizationData.name, address = addOrganizationData.address, phone = addOrganizationData.mobileNumber, email = addOrganizationData.emailAddress)
               withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ORGANIZATION_ADDED)))
             } else {
               Unauthorized(views.html.index(failures = Seq(constants.Response.UNVERIFIED_ZONE)))
