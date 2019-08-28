@@ -81,10 +81,12 @@
                                     @loginState.username
                                     </a>
                                     <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                        <a class="dropdown-item" href="@controllers.routes.ViewController.profile()"><i class="fa fa-user-circle-o" aria-hidden="true"></i>
+                                            &nbsp;
+                                            @Messages(constants.Form.PROFILE)</a>
                                         <a class="dropdown-item" onclick="getForm(jsRoutes.controllers.LogoutController.logoutForm())"><i class="fa fa-sign-out" aria-hidden="true"></i>
                                                 &nbsp;
                                             @Messages(constants.Form.LOGOUT)</a>
-                                        <a class="dropdown-item" href="@controllers.routes.ViewController.profile()">@Messages(constants.Form.PROFILE)</a>
                                     </div>
                                 </li>
                             }
