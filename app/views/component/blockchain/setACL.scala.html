@@ -7,7 +7,7 @@
         <h4 class="latest_card-title">@Messages(constants.Form.ISSUE_FIAT)</h4>
     </div>
     <div>
-        <div class="latest_card-body">
+        <div class="latest_card-body ml-cb">
             @CSRF.formField
             @inputText(setACLForm(constants.Form.FROM), '_label -> Messages(constants.Form.FROM), 'class -> "form-control",
                 'placeholder -> Messages(constants.Form.FROM), 'required -> true)

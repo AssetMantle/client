@@ -463,7 +463,6 @@ dl {
 }
 
 dl .info {
-    visibility: hidden;
     background-color: #dadada;
     color: #838383;
     text-align: center;
@@ -473,7 +472,7 @@ dl .info {
     float: right;
     font-size: smaller;
     padding: 0;
-    display: inline-table;
+    display: none;
 }
 
 dl .info::after {
