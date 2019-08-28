@@ -61,9 +61,9 @@
             <div class="col-md-8 px-3">
                 <div class="card-block px-3">
                     <div id="profileACL">
-                        <h2 class="card-title">@Messages(constants.Form.ACL)</h2>
                         @loginState.acl match {
                             case Some(acl) => {
+                                <h2 class="card-title">@Messages(constants.Form.ACL)</h2>
                                 <p>@Messages(constants.Form.ISSUE_ASSET): <span>@if(acl.issueAsset) {
                                     <img class="result" src="@routes.Assets.versioned("images/success.jpg")">
                                 } else {
