@@ -11,7 +11,16 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class AccountKYC(id: String, documentType: String, status: Option[Boolean], fileName: String, file: Option[Array[Byte]])
+case class AccountKYC(id: String, documentType: String, status: Option[Boolean], fileName: String, file: Option[Array[Byte]]) extends Document {
+
+  def getDocumentType: String = documentType
+
+  def getFileName: String = fileName
+
+  def getFile: Option[Array[Byte]] = file
+
+  def getStatus: Option[Boolean] = status
+}
 
 @Singleton
 class AccountKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
@@ -84,6 +93,8 @@ class AccountKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfig
 
   private def checkFileExistsByIdAndDocumentType(id: String, documentType: String): Future[Boolean] = db.run(accountKYCTable.filter(_.id === id).filter(_.documentType === documentType).exists.result)
 
+  private def checkByIdAndFileName(id: String, fileName: String): Future[Boolean] = db.run(accountKYCTable.filter(_.id === id).filter(_.fileName === fileName).exists.result)
+
   private[models] class AccountKYCTable(tag: Tag) extends Table[AccountKYC](tag, "AccountKYC") {
 
     def * = (id, documentType, status.?, fileName, file.?) <> (AccountKYC.tupled, AccountKYC.unapply)
@@ -117,6 +128,8 @@ class AccountKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfig
     def deleteAllDocuments(id: String): Int = Await.result(deleteById(id = id), Duration.Inf)
 
     def checkFileExists(id: String, documentType: String): Boolean = Await.result(checkFileExistsByIdAndDocumentType(id = id, documentType = documentType), Duration.Inf)
+
+    def checkFileNameExists(id: String, fileName: String): Boolean = Await.result(checkByIdAndFileName(id = id, fileName = fileName), Duration.Inf)
   }
 
 }

@@ -21,21 +21,23 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private val uploadAccountKycBankDetailsPath = configuration.get[String]("upload.account.bankDetailsPath")
+  private implicit val module: String = constants.Module.FILE_CONTROLLER
 
-  private val uploadAccountKycIdentificationPath = configuration.get[String]("upload.account.identificationPath")
+  private val uploadAccountKycBankDetailsPath: String = configuration.get[String]("upload.account.bankDetailsPath")
 
-  private val uploadAccountProfilePicturePath = configuration.get[String]("upload.account.profilePicturePath")
+  private val uploadAccountKycIdentificationPath: String = configuration.get[String]("upload.account.identificationPath")
 
-  private val uploadZoneKycBankDetailsPath = configuration.get[String]("upload.zone.bankDetailsPath")
+  private val uploadAccountProfilePicturePath: String = configuration.get[String]("upload.account.profilePicturePath")
 
-  private val uploadZoneKycIdentificationPath = configuration.get[String]("upload.zone.identificationPath")
+  private val uploadZoneKycBankDetailsPath: String = configuration.get[String]("upload.zone.bankDetailsPath")
 
-  private val uploadOrganizationKycBankDetailsPath = configuration.get[String]("upload.organization.bankDetailsPath")
+  private val uploadZoneKycIdentificationPath: String = configuration.get[String]("upload.zone.identificationPath")
 
-  private val uploadOrganizationKycIdentificationPath = configuration.get[String]("upload.organization.identificationPath")
+  private val uploadOrganizationKycBankDetailsPath: String = configuration.get[String]("upload.organization.bankDetailsPath")
 
-  private val uploadTraderKycIdentificationPath = configuration.get[String]("upload.trader.identificationPath")
+  private val uploadOrganizationKycIdentificationPath: String = configuration.get[String]("upload.organization.identificationPath")
+
+  private val uploadTraderKycIdentificationPath: String = configuration.get[String]("upload.trader.identificationPath")
 
   def checkAccountKycFileExists(accountID: String, documentType: String): Action[AnyContent] = Action { implicit request =>
     if (masterAccountKYCs.Service.checkFileExists(id = accountID, documentType = documentType)) Ok else NoContent
@@ -676,13 +678,18 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
   def file(fileName: String, documentType: String): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        documentType match {
-          case constants.File.PROFILE_PICTURE => withUserLoginAction.Ok.sendFile(new java.io.File(uploadAccountProfilePicturePath + fileName))
-          case _ => Unauthorized
+        val path: String = loginState.userType match {
+          case constants.User.ZONE => if (masterZoneKYCs.Service.checkFileNameExists(id = loginState.username, fileName = fileName)) fileResourceManager.getZoneKycFilePath(documentType) else throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION)
+          case constants.User.ORGANIZATION => if (masterOrganizationKYCs.Service.checkFileNameExists(id = loginState.username, fileName = fileName)) fileResourceManager.getOrganizationKycFilePath(documentType) else throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION)
+          case constants.User.TRADER => if (masterTraderKYCs.Service.checkFileNameExists(id = loginState.username, fileName = fileName)) fileResourceManager.getTraderKycFilePath(documentType) else throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION)
+          case constants.User.USER => if (masterAccountKYCs.Service.checkFileNameExists(id = loginState.username, fileName = fileName)) fileResourceManager.getAccountKycFilePath(documentType) else throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION)
+          case _ => if (masterAccountFiles.Service.checkFileNameExists(id = loginState.username, fileName = fileName)) fileResourceManager.getAccountFilePath(documentType) else throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION)
         }
+        Ok.sendFile(new java.io.File(path + fileName))
       } catch {
-        case _: NoSuchFileException => InternalServerError(Messages(constants.Response.NO_SUCH_FILE_EXCEPTION.message))
-        case _: Exception => InternalServerError(Messages(constants.Response.GENERIC_EXCEPTION.message))
+        case baseException: BaseException => BadRequest(Messages(baseException.failure.message))
+        case _: NoSuchFileException => BadRequest(Messages(constants.Response.NO_SUCH_FILE_EXCEPTION.message))
+        case _: Exception => BadRequest(Messages(constants.Response.GENERIC_EXCEPTION.message))
       }
   }
 

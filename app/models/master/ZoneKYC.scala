@@ -11,7 +11,16 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class ZoneKYC(id: String, documentType: String, status: Option[Boolean], fileName: String, file: Option[Array[Byte]])
+case class ZoneKYC(id: String, documentType: String, status: Option[Boolean], fileName: String, file: Option[Array[Byte]]) extends Document {
+
+  def getDocumentType: String = documentType
+
+  def getFileName: String = fileName
+
+  def getFile: Option[Array[Byte]] = file
+
+  def getStatus: Option[Boolean] = status
+}
 
 @Singleton
 class ZoneKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
@@ -88,6 +97,8 @@ class ZoneKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   private def checkByIdAndDocumentType(id: String, documentType: String): Future[Boolean] = db.run(zoneKYCTable.filter(_.id === id).filter(_.documentType === documentType).exists.result)
 
+  private def checkByIdAndFileName(id: String, fileName: String): Future[Boolean] = db.run(zoneKYCTable.filter(_.id === id).filter(_.fileName === fileName).exists.result)
+
   private[models] class ZoneKYCTable(tag: Tag) extends Table[ZoneKYC](tag, "ZoneKYC") {
 
     def * = (id, documentType, status.?, fileName, file.?) <> (ZoneKYC.tupled, ZoneKYC.unapply)
@@ -125,6 +136,8 @@ class ZoneKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     def deleteAllDocuments(id: String): Int = Await.result(deleteById(id = id), Duration.Inf)
 
     def checkFileExists(id: String, documentType: String): Boolean = Await.result(checkByIdAndDocumentType(id = id, documentType = documentType), Duration.Inf)
+
+    def checkFileNameExists(id: String, fileName: String): Boolean = Await.result(checkByIdAndFileName(id = id, fileName = fileName), Duration.Inf)
 
   }
 

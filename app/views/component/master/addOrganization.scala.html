@@ -15,10 +15,10 @@
         'placeholder->Messages(constants.Form.NAME),'required->true)
     @inputText(addOrganizationForm(constants.Form.ADDRESS), '_label -> Messages(constants.Form.ADDRESS),'class -> "form-control",
         'placeholder->Messages(constants.Form.ADDRESS),'required->true)
-    @inputText(addOrganizationForm(constants.Form.PHONE), '_label -> Messages(constants.Form.PHONE),'class -> "form-control",
-        'placeholder->Messages(constants.Form.PHONE),'required->true)
-    @inputText(addOrganizationForm(constants.Form.EMAIL), '_label -> Messages(constants.Form.EMAIL),'class -> "form-control",
-        'placeholder->Messages(constants.Form.EMAIL),'required->true)
+    @inputText(addOrganizationForm(constants.Form.MOBILE_NUMBER), '_label -> Messages(constants.Form.MOBILE_NUMBER),'class -> "form-control",
+        'placeholder->Messages(constants.Form.MOBILE_NUMBER),'required->true)
+    @inputText(addOrganizationForm(constants.Form.EMAIL_ADDRESS), '_label -> Messages(constants.Form.EMAIL_ADDRESS),'class -> "form-control",
+        'placeholder->Messages(constants.Form.EMAIL_ADDRESS),'required->true)
 
     @if(addOrganizationForm.hasGlobalErrors) {
         <ul>
