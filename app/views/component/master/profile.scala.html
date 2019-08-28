@@ -2,6 +2,9 @@
 
 @()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
+@common(Messages(constants.Form.PROFILE))(Html(""))(center)(Html(""))
+
+@center = {
 <div class="container">
     <div class="card">
         <div class="row ">
@@ -157,3 +160,4 @@
     </div>
 </div>
 <script src="@routes.Assets.versioned("javascripts/profile.js")" type="text/javascript"></script>
+}
