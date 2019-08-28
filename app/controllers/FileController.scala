@@ -3,6 +3,7 @@ package controllers
 import java.nio.file.{Files, NoSuchFileException}
 
 import controllers.actions._
+import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject._
 import models.{blockchain, master}
@@ -16,7 +17,7 @@ import views.companion.master.FileUpload
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class FileController @Inject()(messagesControllerComponents: MessagesControllerComponents, withLoginAction: WithLoginAction, masterAccountFiles: master.AccountFiles, blockchainACLs: blockchain.ACLAccounts, masterAccounts: master.Accounts, masterZones: master.Zones, masterOrganizations: master.Organizations, masterTraders: master.Traders, masterAccountKYCs: master.AccountKYCs, fileResourceManager: utilities.FileResourceManager, withGenesisLoginAction: WithGenesisLoginAction, withUserLoginAction: WithUserLoginAction, masterZoneKYCs: master.ZoneKYCs, withZoneLoginAction: WithZoneLoginAction, masterOrganizationKYCs: master.OrganizationKYCs, withOrganizationLoginAction: WithOrganizationLoginAction, masterTraderKYCs: master.TraderKYCs, withTraderLoginAction: WithTraderLoginAction)(implicit exec: ExecutionContext, configuration: Configuration, wsClient: WSClient) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class FileController @Inject()(messagesControllerComponents: MessagesControllerComponents, withLoginAction: WithLoginAction, masterAccountFiles: master.AccountFiles, blockchainACLs: blockchain.ACLAccounts, masterAccounts: master.Accounts, masterZones: master.Zones, masterOrganizations: master.Organizations, masterTraders: master.Traders, masterAccountKYCs: master.AccountKYCs, fileResourceManager: utilities.FileResourceManager, withGenesisLoginAction: WithGenesisLoginAction, withUserLoginAction: WithUserLoginAction, masterZoneKYCs: master.ZoneKYCs, withZoneLoginAction: WithZoneLoginAction, masterOrganizationKYCs: master.OrganizationKYCs, withOrganizationLoginAction: WithOrganizationLoginAction, masterTraderKYCs: master.TraderKYCs, withTraderLoginAction: WithTraderLoginAction, withUsernameToken: WithUsernameToken)(implicit exec: ExecutionContext, configuration: Configuration, wsClient: WSClient) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -77,7 +78,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
           }
         }
         catch {
-          case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
+          case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
         }
       }
     )
@@ -93,12 +94,12 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
         }
         masterAccountKYCs.Service.create(id = loginState.username, documentType = documentType, fileName = fileName, file = Option(encodedBase64))
         utilities.FileOperations.renameFile(path, name, fileName)
-        Ok(Messages(constants.Response.FILE_UPLOAD_SUCCESSFUL.message))
+        withUsernameToken.Ok(Messages(constants.Response.FILE_UPLOAD_SUCCESSFUL.message))
       } catch {
         case baseException: BaseException => utilities.FileOperations.deleteFile(path, name)
-          BadRequest(Messages(baseException.failure.message))
+          InternalServerError(Messages(baseException.failure.message))
         case e: Exception => utilities.FileOperations.deleteFile(path, name)
-          BadRequest(Messages(e.getMessage))
+          InternalServerError(Messages(e.getMessage))
       }
   }
 
@@ -114,12 +115,12 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
         utilities.FileOperations.deleteFile(fileResourceManager.getAccountKycFilePath(oldAccountKYC.documentType), oldAccountKYC.fileName)
         masterAccountKYCs.Service.updateOldDocument(id = loginState.username, documentType = documentType, fileName = fileName, file = Option(encodedBase64))
         utilities.FileOperations.renameFile(newPath, name, fileName)
-        Ok(Messages(constants.Response.FILE_UPDATE_SUCCESSFUL.message))
+        withUsernameToken.Ok(Messages(constants.Response.FILE_UPDATE_SUCCESSFUL.message))
       } catch {
         case baseException: BaseException => utilities.FileOperations.deleteFile(newPath, name)
-          BadRequest(Messages(baseException.failure.message))
+          InternalServerError(Messages(baseException.failure.message))
         case e: Exception => utilities.FileOperations.deleteFile(newPath, name)
-          BadRequest(Messages(e.getMessage))
+          InternalServerError(Messages(e.getMessage))
       }
   }
 
@@ -146,7 +147,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
           }
         }
         catch {
-          case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
+          case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
         }
       }
     )
@@ -162,12 +163,12 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
         }
         masterZoneKYCs.Service.create(id = loginState.username, documentType = documentType, fileName = fileName, file = Option(encodedBase64))
         utilities.FileOperations.renameFile(path, name, fileName)
-        Ok(Messages(constants.Response.FILE_UPLOAD_SUCCESSFUL.message))
+        withUsernameToken.Ok(Messages(constants.Response.FILE_UPLOAD_SUCCESSFUL.message))
       } catch {
         case baseException: BaseException => utilities.FileOperations.deleteFile(path, name)
-          BadRequest(Messages(baseException.failure.message))
+          InternalServerError(Messages(baseException.failure.message))
         case e: Exception => utilities.FileOperations.deleteFile(path, name)
-          BadRequest(Messages(e.getMessage))
+          InternalServerError(Messages(e.getMessage))
       }
   }
 
@@ -183,12 +184,12 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
         utilities.FileOperations.deleteFile(fileResourceManager.getZoneKycFilePath(oldAccountKYC.documentType), oldAccountKYC.fileName)
         masterZoneKYCs.Service.updateOldDocument(id = loginState.username, documentType = documentType, fileName = fileName, file = Option(encodedBase64))
         utilities.FileOperations.renameFile(newPath, name, fileName)
-        Ok(Messages(constants.Response.FILE_UPDATE_SUCCESSFUL.message))
+        withUsernameToken.Ok(Messages(constants.Response.FILE_UPDATE_SUCCESSFUL.message))
       } catch {
         case baseException: BaseException => utilities.FileOperations.deleteFile(newPath, name)
-          BadRequest(Messages(baseException.failure.message))
+          InternalServerError(Messages(baseException.failure.message))
         case e: Exception => utilities.FileOperations.deleteFile(newPath, name)
-          BadRequest(Messages(e.getMessage))
+          InternalServerError(Messages(e.getMessage))
       }
   }
 
@@ -215,7 +216,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
           }
         }
         catch {
-          case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
+          case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
         }
       }
     )
@@ -231,12 +232,12 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
         }
         masterOrganizationKYCs.Service.create(id = loginState.username, documentType = documentType, fileName = fileName, file = Option(encodedBase64))
         utilities.FileOperations.renameFile(path, name, fileName)
-        Ok(Messages(constants.Response.FILE_UPLOAD_SUCCESSFUL.message))
+        withUsernameToken.Ok(Messages(constants.Response.FILE_UPLOAD_SUCCESSFUL.message))
       } catch {
         case baseException: BaseException => utilities.FileOperations.deleteFile(path, name)
-          BadRequest(Messages(baseException.failure.message))
+          InternalServerError(Messages(baseException.failure.message))
         case e: Exception => utilities.FileOperations.deleteFile(path, name)
-          BadRequest(Messages(e.getMessage))
+          InternalServerError(Messages(e.getMessage))
       }
   }
 
@@ -252,12 +253,12 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
         utilities.FileOperations.deleteFile(fileResourceManager.getOrganizationKycFilePath(oldAccountKYC.documentType), oldAccountKYC.fileName)
         masterOrganizationKYCs.Service.updateOldDocument(id = loginState.username, documentType = documentType, fileName = fileName, file = Option(encodedBase64))
         utilities.FileOperations.renameFile(newPath, name, fileName)
-        Ok(Messages(constants.Response.FILE_UPDATE_SUCCESSFUL.message))
+        withUsernameToken.Ok(Messages(constants.Response.FILE_UPDATE_SUCCESSFUL.message))
       } catch {
         case baseException: BaseException => utilities.FileOperations.deleteFile(newPath, name)
-          BadRequest(Messages(baseException.failure.message))
+          InternalServerError(Messages(baseException.failure.message))
         case e: Exception => utilities.FileOperations.deleteFile(newPath, name)
-          BadRequest(Messages(e.getMessage))
+          InternalServerError(Messages(e.getMessage))
       }
   }
 
@@ -284,7 +285,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
           }
         }
         catch {
-          case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
+          case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
         }
       }
     )
@@ -300,12 +301,12 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
         }
         masterTraderKYCs.Service.create(id = loginState.username, documentType = documentType, fileName = fileName, file = Option(encodedBase64))
         utilities.FileOperations.renameFile(path, name, fileName)
-        Ok(Messages(constants.Response.FILE_UPLOAD_SUCCESSFUL.message))
+        withUsernameToken.Ok(Messages(constants.Response.FILE_UPLOAD_SUCCESSFUL.message))
       } catch {
         case baseException: BaseException => utilities.FileOperations.deleteFile(path, name)
-          BadRequest(Messages(baseException.failure.message))
+          InternalServerError(Messages(baseException.failure.message))
         case e: Exception => utilities.FileOperations.deleteFile(path, name)
-          BadRequest(Messages(e.getMessage))
+          InternalServerError(Messages(e.getMessage))
       }
   }
 
@@ -321,12 +322,12 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
         utilities.FileOperations.deleteFile(fileResourceManager.getTraderKycFilePath(oldAccountKYC.documentType), oldAccountKYC.fileName)
         masterTraderKYCs.Service.updateOldDocument(id = loginState.username, documentType = documentType, fileName = fileName, file = Option(encodedBase64))
         utilities.FileOperations.renameFile(newPath, name, fileName)
-        Ok(Messages(constants.Response.FILE_UPDATE_SUCCESSFUL.message))
+        withUsernameToken.Ok(Messages(constants.Response.FILE_UPDATE_SUCCESSFUL.message))
       } catch {
         case baseException: BaseException => utilities.FileOperations.deleteFile(newPath, name)
-          BadRequest(Messages(baseException.failure.message))
+          InternalServerError(Messages(baseException.failure.message))
         case e: Exception => utilities.FileOperations.deleteFile(newPath, name)
-          BadRequest(Messages(e.getMessage))
+          InternalServerError(Messages(e.getMessage))
       }
   }
 
@@ -353,7 +354,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
           }
         }
         catch {
-          case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
+          case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
         }
       }
     )
@@ -369,12 +370,12 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
         }
         masterZoneKYCs.Service.create(id = loginState.username, documentType = documentType, fileName = fileName, file = Option(encodedBase64))
         utilities.FileOperations.renameFile(path, name, fileName)
-        Ok(Messages(constants.Response.FILE_UPLOAD_SUCCESSFUL.message))
+        withUsernameToken.Ok(Messages(constants.Response.FILE_UPLOAD_SUCCESSFUL.message))
       } catch {
         case baseException: BaseException => utilities.FileOperations.deleteFile(path, name)
-          BadRequest(Messages(baseException.failure.message))
+          InternalServerError(Messages(baseException.failure.message))
         case e: Exception => utilities.FileOperations.deleteFile(path, name)
-          BadRequest(Messages(e.getMessage))
+          InternalServerError(Messages(e.getMessage))
       }
   }
 
@@ -390,12 +391,12 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
         utilities.FileOperations.deleteFile(fileResourceManager.getZoneKycFilePath(oldAccountKYC.documentType), oldAccountKYC.fileName)
         masterZoneKYCs.Service.updateOldDocument(id = loginState.username, documentType = documentType, fileName = fileName, file = Option(encodedBase64))
         utilities.FileOperations.renameFile(newPath, name, fileName)
-        Ok(Messages(constants.Response.FILE_UPDATE_SUCCESSFUL.message))
+        withUsernameToken.Ok(Messages(constants.Response.FILE_UPDATE_SUCCESSFUL.message))
       } catch {
         case baseException: BaseException => utilities.FileOperations.deleteFile(newPath, name)
-          BadRequest(Messages(baseException.failure.message))
+          InternalServerError(Messages(baseException.failure.message))
         case e: Exception => utilities.FileOperations.deleteFile(newPath, name)
-          BadRequest(Messages(e.getMessage))
+          InternalServerError(Messages(e.getMessage))
       }
   }
 
@@ -422,7 +423,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
           }
         }
         catch {
-          case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
+          case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
         }
       }
     )
@@ -438,12 +439,12 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
         }
         masterOrganizationKYCs.Service.create(id = loginState.username, documentType = documentType, fileName = fileName, file = Option(encodedBase64))
         utilities.FileOperations.renameFile(path, name, fileName)
-        Ok(Messages(constants.Response.FILE_UPLOAD_SUCCESSFUL.message))
+        withUsernameToken.Ok(Messages(constants.Response.FILE_UPLOAD_SUCCESSFUL.message))
       } catch {
         case baseException: BaseException => utilities.FileOperations.deleteFile(path, name)
-          BadRequest(Messages(baseException.failure.message))
+          InternalServerError(Messages(baseException.failure.message))
         case e: Exception => utilities.FileOperations.deleteFile(path, name)
-          BadRequest(Messages(e.getMessage))
+          InternalServerError(Messages(e.getMessage))
       }
   }
 
@@ -459,12 +460,12 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
         utilities.FileOperations.deleteFile(fileResourceManager.getOrganizationKycFilePath(oldAccountKYC.documentType), oldAccountKYC.fileName)
         masterOrganizationKYCs.Service.updateOldDocument(id = loginState.username, documentType = documentType, fileName = fileName, file = Option(encodedBase64))
         utilities.FileOperations.renameFile(newPath, name, fileName)
-        Ok(Messages(constants.Response.FILE_UPDATE_SUCCESSFUL.message))
+        withUsernameToken.Ok(Messages(constants.Response.FILE_UPDATE_SUCCESSFUL.message))
       } catch {
         case baseException: BaseException => utilities.FileOperations.deleteFile(newPath, name)
-          BadRequest(Messages(baseException.failure.message))
+          InternalServerError(Messages(baseException.failure.message))
         case e: Exception => utilities.FileOperations.deleteFile(newPath, name)
-          BadRequest(Messages(e.getMessage))
+          InternalServerError(Messages(e.getMessage))
       }
   }
 
@@ -492,7 +493,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
           }
         }
         catch {
-          case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
+          case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
         }
       }
     )
@@ -508,12 +509,12 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
         }
         masterTraderKYCs.Service.create(id = loginState.username, documentType = documentType, fileName = fileName, file = Option(encodedBase64))
         utilities.FileOperations.renameFile(path, name, fileName)
-        Ok(Messages(constants.Response.FILE_UPLOAD_SUCCESSFUL.message))
+        withUsernameToken.Ok(Messages(constants.Response.FILE_UPLOAD_SUCCESSFUL.message))
       } catch {
         case baseException: BaseException => utilities.FileOperations.deleteFile(path, name)
-          BadRequest(Messages(baseException.failure.message))
+          InternalServerError(Messages(baseException.failure.message))
         case e: Exception => utilities.FileOperations.deleteFile(path, name)
-          BadRequest(Messages(e.getMessage))
+          InternalServerError(Messages(e.getMessage))
       }
   }
 
@@ -529,12 +530,12 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
         utilities.FileOperations.deleteFile(fileResourceManager.getTraderKycFilePath(oldAccountKYC.documentType), oldAccountKYC.fileName)
         masterTraderKYCs.Service.updateOldDocument(id = loginState.username, documentType = documentType, fileName = fileName, file = Option(encodedBase64))
         utilities.FileOperations.renameFile(newPath, name, fileName)
-        Ok(Messages(constants.Response.FILE_UPDATE_SUCCESSFUL.message))
+        withUsernameToken.Ok(Messages(constants.Response.FILE_UPDATE_SUCCESSFUL.message))
       } catch {
         case baseException: BaseException => utilities.FileOperations.deleteFile(newPath, name)
-          BadRequest(Messages(baseException.failure.message))
+          InternalServerError(Messages(baseException.failure.message))
         case e: Exception => utilities.FileOperations.deleteFile(newPath, name)
-          BadRequest(Messages(e.getMessage))
+          InternalServerError(Messages(e.getMessage))
       }
   }
 
@@ -543,13 +544,13 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
     implicit request =>
       try {
         documentType match {
-          case constants.File.BANK_DETAILS => Ok.sendFile(new java.io.File(uploadZoneKycBankDetailsPath + fileName))
-          case constants.File.IDENTIFICATION => Ok.sendFile(new java.io.File(uploadZoneKycIdentificationPath + fileName))
-          case _ => BadRequest
+          case constants.File.BANK_DETAILS => withUserLoginAction.Ok.sendFile(new java.io.File(uploadZoneKycBankDetailsPath + fileName))
+          case constants.File.IDENTIFICATION => withUserLoginAction.Ok.sendFile(new java.io.File(uploadZoneKycIdentificationPath + fileName))
+          case _ => Unauthorized
         }
       } catch {
-        case _: NoSuchFileException => Ok(views.html.index(failures = Seq(constants.Response.NO_SUCH_FILE_EXCEPTION)))
-        case _: Exception => Ok(views.html.index(failures = Seq(constants.Response.GENERIC_EXCEPTION)))
+        case _: NoSuchFileException => InternalServerError(views.html.index(failures = Seq(constants.Response.NO_SUCH_FILE_EXCEPTION)))
+        case _: Exception => InternalServerError(views.html.index(failures = Seq(constants.Response.GENERIC_EXCEPTION)))
       }
   }
 
@@ -558,16 +559,16 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
       try {
         if (masterOrganizations.Service.getByAccountID(accountID).zoneID == masterZones.Service.getZoneId(loginState.username)) {
           documentType match {
-            case constants.File.BANK_DETAILS => Ok.sendFile(new java.io.File(uploadOrganizationKycBankDetailsPath + fileName))
-            case constants.File.IDENTIFICATION => Ok.sendFile(new java.io.File(uploadOrganizationKycIdentificationPath + fileName))
-            case _ => BadRequest
+            case constants.File.BANK_DETAILS => withUserLoginAction.Ok.sendFile(new java.io.File(uploadOrganizationKycBankDetailsPath + fileName))
+            case constants.File.IDENTIFICATION => withUserLoginAction.Ok.sendFile(new java.io.File(uploadOrganizationKycIdentificationPath + fileName))
+            case _ => Unauthorized
           }
         } else {
-          Ok(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
+          Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
         }
       } catch {
-        case _: NoSuchFileException => Ok(views.html.index(failures = Seq(constants.Response.NO_SUCH_FILE_EXCEPTION)))
-        case _: Exception => Ok(views.html.index(failures = Seq(constants.Response.GENERIC_EXCEPTION)))
+        case _: NoSuchFileException => InternalServerError(views.html.index(failures = Seq(constants.Response.NO_SUCH_FILE_EXCEPTION)))
+        case _: Exception => InternalServerError(views.html.index(failures = Seq(constants.Response.GENERIC_EXCEPTION)))
       }
   }
 
@@ -576,15 +577,15 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
       try {
         if (masterTraders.Service.getByAccountID(accountID).zoneID == masterZones.Service.getZoneId(loginState.username)) {
           documentType match {
-            case constants.File.IDENTIFICATION => Ok.sendFile(new java.io.File(uploadTraderKycIdentificationPath + fileName))
-            case _ => BadRequest
+            case constants.File.IDENTIFICATION => withUserLoginAction.Ok.sendFile(new java.io.File(uploadTraderKycIdentificationPath + fileName))
+            case _ => Unauthorized
           }
         } else {
-          Ok(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
+          Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
         }
       } catch {
-        case _: NoSuchFileException => Ok(views.html.index(failures = Seq(constants.Response.NO_SUCH_FILE_EXCEPTION)))
-        case _: Exception => Ok(views.html.index(failures = Seq(constants.Response.GENERIC_EXCEPTION)))
+        case _: NoSuchFileException => InternalServerError(views.html.index(failures = Seq(constants.Response.NO_SUCH_FILE_EXCEPTION)))
+        case _: Exception => InternalServerError(views.html.index(failures = Seq(constants.Response.GENERIC_EXCEPTION)))
       }
   }
 
@@ -593,15 +594,15 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
       try {
         if (masterTraders.Service.getByAccountID(accountID).organizationID == masterOrganizations.Service.getByAccountID(loginState.username).id) {
           documentType match {
-            case constants.File.IDENTIFICATION => Ok.sendFile(new java.io.File(uploadTraderKycIdentificationPath + fileName))
-            case _ => BadRequest
+            case constants.File.IDENTIFICATION => withUserLoginAction.Ok.sendFile(new java.io.File(uploadTraderKycIdentificationPath + fileName))
+            case _ => Unauthorized
           }
         } else {
-          Ok(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
+          Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
         }
       } catch {
-        case _: NoSuchFileException => Ok(views.html.index(failures = Seq(constants.Response.NO_SUCH_FILE_EXCEPTION)))
-        case _: Exception => Ok(views.html.index(failures = Seq(constants.Response.GENERIC_EXCEPTION)))
+        case _: NoSuchFileException => InternalServerError(views.html.index(failures = Seq(constants.Response.NO_SUCH_FILE_EXCEPTION)))
+        case _: Exception => InternalServerError(views.html.index(failures = Seq(constants.Response.GENERIC_EXCEPTION)))
       }
   }
 
@@ -628,7 +629,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
           }
         }
         catch {
-          case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
+          case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
         }
       }
     )
@@ -644,12 +645,12 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
         }
         masterAccountFiles.Service.create(id = loginState.username, documentType = documentType, fileName = fileName, file = Option(encodedBase64))
         utilities.FileOperations.renameFile(path, name, fileName)
-        Ok(Messages(constants.Response.FILE_UPLOAD_SUCCESSFUL.message))
+        withUserLoginAction.Ok(Messages(constants.Response.FILE_UPLOAD_SUCCESSFUL.message))
       } catch {
         case baseException: BaseException => utilities.FileOperations.deleteFile(path, name)
-          BadRequest(Messages(baseException.failure.message))
+          InternalServerError(Messages(baseException.failure.message))
         case e: Exception => utilities.FileOperations.deleteFile(path, name)
-          BadRequest(Messages(e.getMessage))
+          InternalServerError(Messages(e.getMessage))
       }
   }
 
@@ -665,12 +666,12 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
         utilities.FileOperations.deleteFile(fileResourceManager.getAccountFilePath(oldAccountKYC.documentType), oldAccountKYC.fileName)
         masterAccountFiles.Service.updateOldDocument(id = loginState.username, documentType = documentType, fileName = fileName, file = Option(encodedBase64))
         utilities.FileOperations.renameFile(newPath, name, fileName)
-        Ok(Messages(constants.Response.FILE_UPDATE_SUCCESSFUL.message))
+        withUserLoginAction.Ok(Messages(constants.Response.FILE_UPDATE_SUCCESSFUL.message))
       } catch {
         case baseException: BaseException => utilities.FileOperations.deleteFile(newPath, name)
-          BadRequest(Messages(baseException.failure.message))
+          InternalServerError(Messages(baseException.failure.message))
         case e: Exception => utilities.FileOperations.deleteFile(newPath, name)
-          BadRequest(Messages(e.getMessage))
+          InternalServerError(Messages(e.getMessage))
       }
   }
 

@@ -1,6 +1,7 @@
 package controllers
 
 import controllers.actions.WithTraderLoginAction
+import controllers.results.WithUsernameToken
 import exceptions.{BaseException, BlockChainException}
 import javax.inject.{Inject, Singleton}
 import models.{blockchain, blockchainTransaction}
@@ -11,7 +12,7 @@ import play.api.{Configuration, Logger}
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class ConfirmSellerBidController @Inject()(messagesControllerComponents: MessagesControllerComponents, transaction: utilities.Transaction, blockchainAccounts: blockchain.Accounts, withTraderLoginAction: WithTraderLoginAction, transactionsConfirmSellerBid: transactions.ConfirmSellerBid, blockchainTransactionConfirmSellerBids: blockchainTransaction.ConfirmSellerBids)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class ConfirmSellerBidController @Inject()(messagesControllerComponents: MessagesControllerComponents, transaction: utilities.Transaction, blockchainAccounts: blockchain.Accounts, withTraderLoginAction: WithTraderLoginAction, transactionsConfirmSellerBid: transactions.ConfirmSellerBid, blockchainTransactionConfirmSellerBids: blockchainTransaction.ConfirmSellerBids, withUsernameToken: WithUsernameToken)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
@@ -38,11 +39,11 @@ class ConfirmSellerBidController @Inject()(messagesControllerComponents: Message
               onFailure = blockchainTransactionConfirmSellerBids.Utility.onFailure,
               updateTransactionHash = blockchainTransactionConfirmSellerBids.Service.updateTransactionHash
             )
-            Ok(views.html.index(successes = Seq(constants.Response.SELLER_BID_CONFIRMED)))
+            withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.SELLER_BID_CONFIRMED)))
           }
           catch {
-            case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
-            case blockChainException: BlockChainException => Ok(views.html.index(failures = Seq(blockChainException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+            case blockChainException: BlockChainException => InternalServerError(views.html.index(failures = Seq(blockChainException.failure)))
           }
         }
       )
@@ -63,8 +64,8 @@ class ConfirmSellerBidController @Inject()(messagesControllerComponents: Message
           Ok(views.html.index(successes = Seq(constants.Response.SELLER_BID_CONFIRMED)))
         }
         catch {
-          case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
-          case blockChainException: BlockChainException => Ok(views.html.index(failures = Seq(blockChainException.failure)))
+          case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+          case blockChainException: BlockChainException => InternalServerError(views.html.index(failures = Seq(blockChainException.failure)))
         }
       }
     )

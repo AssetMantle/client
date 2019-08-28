@@ -1,6 +1,7 @@
 package controllers
 
 import controllers.actions.WithTraderLoginAction
+import controllers.results.WithUsernameToken
 import exceptions.{BaseException, BlockChainException}
 import javax.inject.{Inject, Singleton}
 import models.{blockchain, blockchainTransaction}
@@ -11,7 +12,7 @@ import play.api.{Configuration, Logger}
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class SendAssetController @Inject()(messagesControllerComponents: MessagesControllerComponents, transaction: utilities.Transaction, blockchainAssets: blockchain.Assets, blockchainOrders: blockchain.Orders, blockchainAccounts: blockchain.Accounts, withTraderLoginAction: WithTraderLoginAction, transactionsSendAsset: transactions.SendAsset, blockchainTransactionSendAssets: blockchainTransaction.SendAssets)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class SendAssetController @Inject()(messagesControllerComponents: MessagesControllerComponents, transaction: utilities.Transaction, blockchainAssets: blockchain.Assets, blockchainOrders: blockchain.Orders, blockchainAccounts: blockchain.Accounts, withTraderLoginAction: WithTraderLoginAction, transactionsSendAsset: transactions.SendAsset, blockchainTransactionSendAssets: blockchainTransaction.SendAssets, withUsernameToken: WithUsernameToken)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -38,11 +39,11 @@ class SendAssetController @Inject()(messagesControllerComponents: MessagesContro
               onFailure = blockchainTransactionSendAssets.Utility.onFailure,
               updateTransactionHash = blockchainTransactionSendAssets.Service.updateTransactionHash
             )
-            Ok(views.html.index(successes = Seq(constants.Response.ASSET_SENT)))
+            withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ASSET_SENT)))
           }
           catch {
-            case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
-            case blockChainException: BlockChainException => Ok(views.html.index(failures = Seq(blockChainException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+            case blockChainException: BlockChainException => InternalServerError(views.html.index(failures = Seq(blockChainException.failure)))
           }
         }
       )
@@ -64,8 +65,8 @@ class SendAssetController @Inject()(messagesControllerComponents: MessagesContro
 
         }
         catch {
-          case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
-          case blockChainException: BlockChainException => Ok(views.html.index(failures = Seq(blockChainException.failure)))
+          case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+          case blockChainException: BlockChainException => InternalServerError(views.html.index(failures = Seq(blockChainException.failure)))
         }
       }
     )

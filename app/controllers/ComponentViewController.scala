@@ -26,9 +26,9 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
       try {
         loginState.userType match {
           case constants.User.UNKNOWN =>
-            Ok(views.html.component.master.commonHome( profilePicture = masterAccountFiles.Service.getProfilePicture(loginState.username)))
+            withUsernameToken.Ok(views.html.component.master.commonHome( profilePicture = masterAccountFiles.Service.getProfilePicture(loginState.username)))
           case _ =>
-            Ok(views.html.component.master.commonHome( blockchainAccounts.Service.getCoins(loginState.address), masterAccountFiles.Service.getProfilePicture(loginState.username)))
+            withUsernameToken.Ok(views.html.component.master.commonHome( blockchainAccounts.Service.getCoins(loginState.address), masterAccountFiles.Service.getProfilePicture(loginState.username)))
         }
       } catch {
         case _: BaseException => NoContent
@@ -38,9 +38,9 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
   def genesisDetails: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        Ok(views.html.component.master.genesisDetails(masterAccounts.Service.getAddress("main")))
+        withUsernameToken.Ok(views.html.component.master.genesisDetails(masterAccounts.Service.getAddress("main")))
       } catch {
-        case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
@@ -49,14 +49,14 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
       try {
         loginState.userType match {
           case constants.User.ZONE =>
-            Ok(views.html.component.master.zoneDetails(masterZones.Service.get(blockchainZones.Service.getID(loginState.address))))
+            withUsernameToken.Ok(views.html.component.master.zoneDetails(masterZones.Service.get(blockchainZones.Service.getID(loginState.address))))
           case constants.User.ORGANIZATION =>
-            Ok(views.html.component.master.zoneDetails(masterZones.Service.get(masterOrganizations.Service.getByAccountID(loginState.username).zoneID)))
+            withUsernameToken.Ok(views.html.component.master.zoneDetails(masterZones.Service.get(masterOrganizations.Service.getByAccountID(loginState.username).zoneID)))
           case constants.User.TRADER =>
-            Ok(views.html.component.master.zoneDetails(masterZones.Service.get(blockchainAclAccounts.Service.get(loginState.address).zoneID)))
+            withUsernameToken.Ok(views.html.component.master.zoneDetails(masterZones.Service.get(blockchainAclAccounts.Service.get(loginState.address).zoneID)))
         }
       } catch {
-        case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
@@ -65,48 +65,48 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
       try {
         loginState.userType match {
           case constants.User.ORGANIZATION =>
-            Ok(views.html.component.master.organizationDetails(masterOrganizations.Service.get(blockchainOrganizations.Service.getID(loginState.address))))
+            withUsernameToken.Ok(views.html.component.master.organizationDetails(masterOrganizations.Service.get(blockchainOrganizations.Service.getID(loginState.address))))
           case constants.User.TRADER =>
-            Ok(views.html.component.master.organizationDetails(masterOrganizations.Service.get(blockchainAclAccounts.Service.get(loginState.address).organizationID)))
+            withUsernameToken.Ok(views.html.component.master.organizationDetails(masterOrganizations.Service.get(blockchainAclAccounts.Service.get(loginState.address).organizationID)))
         }
       } catch {
-        case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
   def assetList: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        Ok(views.html.component.master.assetList(blockchainAssets.Service.getAssetPegWallet(loginState.address)))
+        withUsernameToken.Ok(views.html.component.master.assetList(blockchainAssets.Service.getAssetPegWallet(loginState.address)))
       } catch {
-        case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
   def fiatList: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        Ok(views.html.component.master.fiatList(blockchainFiats.Service.getFiatPegWallet(loginState.address)))
+        withUsernameToken.Ok(views.html.component.master.fiatList(blockchainFiats.Service.getFiatPegWallet(loginState.address)))
       } catch {
-        case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
   def buyNegotiationList: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        Ok(views.html.component.master.buyNegotiationList(blockchainNegotiations.Service.getNegotiationsForBuyerAddress(loginState.address), blockchainAssets.Service.getAssetPegHashes(loginState.address)))
+        withUsernameToken.Ok(views.html.component.master.buyNegotiationList(blockchainNegotiations.Service.getNegotiationsForBuyerAddress(loginState.address), blockchainAssets.Service.getAssetPegHashes(loginState.address)))
       } catch {
-        case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
   def sellNegotiationList: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        Ok(views.html.component.master.sellNegotiationList(blockchainNegotiations.Service.getNegotiationsForSellerAddress(loginState.address), blockchainAssets.Service.getAssetPegHashes(loginState.address)))
+        withUsernameToken.Ok(views.html.component.master.sellNegotiationList(blockchainNegotiations.Service.getNegotiationsForSellerAddress(loginState.address), blockchainAssets.Service.getAssetPegHashes(loginState.address)))
       } catch {
-        case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
@@ -117,11 +117,11 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
         val orders = blockchainOrders.Service.getOrders(negotiations.map(_.id))
         val negotiationsOfOrders: Seq[Negotiation] = negotiations.filter(negotiation => orders.map(_.id) contains negotiation.id)
         val assets = blockchainAssets.Service.getByPegHashes(negotiationsOfOrders.map(_.assetPegHash))
-        Ok(views.html.component.master.orderList(orders.filter(order => (for (negotiationsOfOrder <- negotiationsOfOrders; if negotiationsOfOrder.buyerAddress == loginState.address && !assets.find(asset => asset.pegHash == negotiationsOfOrder.assetPegHash).orNull.moderated) yield negotiationsOfOrder).map(_.id) contains order.id),
+        withUsernameToken.Ok(views.html.component.master.orderList(orders.filter(order => (for (negotiationsOfOrder <- negotiationsOfOrders; if negotiationsOfOrder.buyerAddress == loginState.address && !assets.find(asset => asset.pegHash == negotiationsOfOrder.assetPegHash).orNull.moderated) yield negotiationsOfOrder).map(_.id) contains order.id),
           orders.filter(order => (for (negotiationsOfOrder <- negotiationsOfOrders; if negotiationsOfOrder.sellerAddress == loginState.address && !assets.find(asset => asset.pegHash == negotiationsOfOrder.assetPegHash).orNull.moderated) yield negotiationsOfOrder).map(_.id) contains order.id),
           orders.filter(order => (for (negotiationsOfOrder <- negotiationsOfOrders; if assets.find(asset => asset.pegHash == negotiationsOfOrder.assetPegHash).orNull.moderated) yield negotiationsOfOrder).map(_.id) contains order.id)))
       } catch {
-        case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
@@ -129,14 +129,14 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
     try {
       Ok(views.html.component.master.availableAssetList(blockchainAssets.Service.getAllPublic(blockchainOrders.Service.getAllOrderIds)))
     } catch {
-      case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
+      case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
     }
   }
 
   def availableAssetListWithLogin: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        Ok(views.html.component.master.availableAssetListWithLogin(blockchainAssets.Service.getAllPublic(blockchainOrders.Service.getAllOrderIds)))
+        withUsernameToken.Ok(views.html.component.master.availableAssetListWithLogin(blockchainAssets.Service.getAllPublic(blockchainOrders.Service.getAllOrderIds)))
       } catch {
         case _: BaseException => NoContent
       }
