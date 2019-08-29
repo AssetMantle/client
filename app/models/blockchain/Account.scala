@@ -156,7 +156,6 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     def dirtyEntityUpdater(): Future[Unit] = Future {
       try {
         val dirtyAddresses = Service.getDirtyAddresses
-        println(Thread.currentThread().getName())
         Thread.sleep(sleepTime)
         for (dirtyAddress <- dirtyAddresses) {
           val responseAccount = getAccount.Service.get(dirtyAddress)
