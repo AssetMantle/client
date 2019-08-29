@@ -323,8 +323,10 @@ h2{
 /*Flex*/
 /*Box*/
 .box {
-    border: 2px solid #8faab8;
-    border-radius: 10px;
+    background: lightblue;
+    box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.07);
+    margin:0px 5px 10px 0px;
+    border-radius: 5px;
     padding-bottom: 15px;
 }
 
@@ -349,9 +351,9 @@ h2{
     padding-right: 10px;
 }
 
-.box:hover {
-    box-shadow: 0 12px 16px 0 rgba(0, 0, 0, 0.24), 0 17px 50px 0 rgba(0, 0, 0, 0.19);
-}
+/*.box:hover {*/
+/*    box-shadow: 0 12px 16px 0 rgba(0, 0, 0, 0.24), 0 17px 50px 0 rgba(0, 0, 0, 0.19);*/
+/*}*/
 /*Box*/
 
 /*Table*/
