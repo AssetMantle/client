@@ -19,7 +19,7 @@ import scala.concurrent.duration.{Duration, _}
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Account(address: String, coins: String, publicKey: String, accountNumber: String, sequence: String, dirtyBit: Boolean)
+case class Account(address: String, coins: String = "", publicKey: String, accountNumber: String = "", sequence: String = "", dirtyBit: Boolean)
 
 case class AccountCometMessage(username: String, message: JsValue)
 
@@ -29,6 +29,8 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
   val db = databaseConfig.db
+
+  private val ec:ExecutionContext= actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -129,7 +131,7 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   object Service {
 
-    def create(address: String, pubkey: String): String = Await.result(add(Account(address, "0", pubkey, "-1", "0", dirtyBit = false)), Duration.Inf)
+    def create(address: String, pubkey: String): String = Await.result(add(Account(address = address, publicKey = pubkey, dirtyBit = false)), Duration.Inf)
 
     def refreshDirty(address: String, sequence: String, coins: String): Int = Await.result(updateSequenceCoinsAndDirtyBitByAddress(address, sequence, coins, dirtyBit = false), Duration.Inf)
 
@@ -164,10 +166,10 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
         case blockChainException: BlockChainException => logger.error(blockChainException.failure.message, blockChainException)
       }
-    }
+    }(ec)
   }
 
   actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
     Utility.dirtyEntityUpdater()
-  }
+  }(ec)
 }

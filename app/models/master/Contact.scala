@@ -41,7 +41,7 @@ class Contacts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+        null
     }
   }
 
@@ -117,7 +117,7 @@ class Contacts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   object Service {
 
-    def getContact(id: String): Contact = Await.result(findById(id), Duration.Inf)
+    def getContact(id: String): Option[Contact] = Option(Await.result(findById(id), Duration.Inf))
 
     def insertOrUpdateContact(id: String, mobileNumber: String, emailAddress: String): Boolean = if (0 < Await.result(upsert(Contact(id, mobileNumber, mobileNumberVerified =  false, emailAddress, emailAddressVerified = false)), Duration.Inf)) true else false
 

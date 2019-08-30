@@ -3,18 +3,12 @@
 
 @common(Messages(constants.User.HOME), failures, warnings, successes, infos)(Html(""))(center)(Html(""))
 
-    @center = {
+@center = {
     <div class="flexContainer">
         <div id="commonHome" class="flexItem flexGrowth"></div>
     </div>
     <script src="@routes.Assets.versioned("javascripts/showHideUploadUpdateButton.js")" type="text/javascript"></script>
     <div class="centerText">
-        <button id="userButtonUploadBankDetailsUser" class="hidden" onclick="getForm(jsRoutes.controllers.FileController.uploadUserKycForm('@constants.File.BANK_DETAILS'))">@Messages(constants.Form.UPLOAD_BANK_DETAILS)</button>
-        <button id="userButtonUpdateBankDetailsUser" class="hidden" onclick="getForm(jsRoutes.controllers.FileController.updateUserKycForm('@constants.File.BANK_DETAILS'))">@Messages(constants.Form.UPDATE_BANK_DETAILS)</button>
-        <script>checkAccountKycFileExists('@loginState.username', '@constants.File.BANK_DETAILS', "userButtonUploadBankDetailsUser", "userButtonUpdateBankDetailsUser")</script>
-        <button id="userButtonUploadIdentificationUser" class="hidden" onclick="getForm(jsRoutes.controllers.FileController.uploadUserKycForm('@constants.File.IDENTIFICATION'))">@Messages(constants.Form.UPLOAD_IDENTIFICATION)</button>
-        <button id="userButtonUpdateIdentificationUser" class="hidden" onclick="getForm(jsRoutes.controllers.FileController.updateUserKycForm('@constants.File.IDENTIFICATION'))">@Messages(constants.Form.UPDATE_IDENTIFICATION)</button>
-        <script>checkAccountKycFileExists('@loginState.username', '@constants.File.IDENTIFICATION', "userButtonUploadIdentificationUser", "userButtonUpdateIdentificationUser")</script>
         <button id="userButtonUploadBankDetailsZone" class="hidden" onclick="getForm(jsRoutes.controllers.FileController.uploadUserZoneKycForm('@constants.File.BANK_DETAILS'))">@Messages(constants.Form.UPLOAD_ZONE_BANK_DETAILS)</button>
         <button id="userButtonUpdateBankDetailsZone" class="hidden" onclick="getForm(jsRoutes.controllers.FileController.updateUserZoneKycForm('@constants.File.BANK_DETAILS'))">@Messages(constants.Form.UPDATE_ZONE_BANK_DETAILS)</button>
         <script>checkZoneKycFileExists('@loginState.username', '@constants.File.BANK_DETAILS', "userButtonUploadBankDetailsZone", "userButtonUpdateBankDetailsZone")</script>
@@ -35,7 +29,7 @@
         <button onclick="getForm(jsRoutes.controllers.AddZoneController.addZoneForm())">@Messages(constants.Form.ADD_ZONE)</button>
         <button onclick="getForm(jsRoutes.controllers.SetACLController.addTraderForm())">@Messages(constants.Form.ADD_TRADER)</button>
     </div>
-        <script>
-                componentResource('commonHome', jsRoutes.controllers.ComponentViewController.commonHome('@loginState.username'))
-        </script>
+    <script>
+            componentResource('commonHome', jsRoutes.controllers.ComponentViewController.commonHome('@loginState.username'))
+    </script>
 }

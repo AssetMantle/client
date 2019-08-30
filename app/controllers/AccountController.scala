@@ -64,7 +64,7 @@ class AccountController @Inject()(messagesControllerComponents: MessagesControll
         try {
           val otp = masterTransactionEmailOTP.Service.sendOTP(emailOTPForgotPasswordData.username)
           email.sendEmail(emailOTPForgotPasswordData.username, constants.Email.OTP, Seq(otp))
-          Ok(emailOTPForgotPasswordData.username)
+          PartialContent(views.html.component.master.forgotPassword(views.companion.master.ForgotPassword.form, emailOTPForgotPasswordData.username))
         }
         catch {
           case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))

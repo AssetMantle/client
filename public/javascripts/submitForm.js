@@ -21,9 +21,13 @@ function submitForm(source, target = '#commonModalContent') {
                 newDocument.write(data.responseText);
                 newDocument.close();
             },
-            200: function (data) {const newDocument = document.open("text/html", "replace");
+            200: function (data) {
+                const newDocument = document.open("text/html", "replace");
                 newDocument.write(data);
                 newDocument.close();
+            },
+            206: function (data) {
+                $(target).html(data);
             },
         }
     });
