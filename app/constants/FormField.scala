@@ -6,22 +6,11 @@ import play.api.data.validation.Constraints
 
 import scala.util.matching.Regex
 
-//TODO: Error Response through Messages
-class StringFormField (fieldName: String, minimumLength: Int, maximumLength: Int, regex: Regex = """.*""".r, errorMessage: String = "Error Response") {
-  val name: String = fieldName
-  val field: Mapping[String] =  text(minLength = minimumLength, maxLength = maximumLength).verifying(Constraints.pattern(regex = regex, error = errorMessage))
-}
-
-class IntFormField (fieldName: String, minimumValue: Int, maximumValue: Int) {
-  val name: String = fieldName
-  val field: Mapping[Int] =  number(min = minimumValue, max = maximumValue)
-}
-
 object FormField {
 
   val SIGNUP_USERNAME = new StringFormField("USERNAME", 3,  50, RegularExpression.ACCOUNT_ID, Response.INVALID_USERNAME.message)
   val SIGNUP_PASSWORD = new StringFormField("PASSWORD", 8, 128, RegularExpression.PASSWORD, Response.INVALID_PASSWORD.message)
-  val SIGNUP_CONFIRM_PASSWORD = new StringFormField("CONFIRM_PASSWORD", 6, 128, RegularExpression.PASSWORD, Response.INVALID_PASSWORD.message)
+  val SIGNUP_CONFIRM_PASSWORD = new StringFormField("CONFIRM_PASSWORD", 8, 128, RegularExpression.PASSWORD, Response.INVALID_PASSWORD.message)
   val USERNAME = new StringFormField("USERNAME", 3, 50, RegularExpression.ACCOUNT_ID)
   val NON_EMPTY_PASSWORD = new StringFormField("PASSWORD", 1, 128)
   val PASSWORD = new StringFormField("PASSWORD", 0, 128)
@@ -61,7 +50,7 @@ object FormField {
   val OLD_PASSWORD = new StringFormField("OLD_PASSWORD", 1, 128)
   val NEW_PASSWORD = new StringFormField("NEW_PASSWORD", 1, 128, RegularExpression.PASSWORD, Response.INVALID_PASSWORD.message)
   val CONFIRM_NEW_PASSWORD = new StringFormField("CONFIRM_NEW_PASSWORD", 1, 128, RegularExpression.PASSWORD, Response.INVALID_PASSWORD.message)
-  val MNEMONIC = new StringFormField("MNEMONIC", 1, 200)
+  val SEED = new StringFormField("SEED", 1, 200)
 
   val GAS = new IntFormField("GAS", 0, 1000000)
   val BID = new IntFormField("BID", 0, Int.MaxValue)
@@ -73,4 +62,14 @@ object FormField {
   val AMOUNT = new IntFormField("AMOUNT", 0, Int.MaxValue)
   val RATING = new IntFormField("RATING", 0, 100)
 
+  //TODO: Error Response through Messages
+  class StringFormField (fieldName: String, minimumLength: Int, maximumLength: Int, regex: Regex = """.*""".r, errorMessage: String = "Error Response") {
+    val name: String = fieldName
+    val field: Mapping[String] =  text(minLength = minimumLength, maxLength = maximumLength).verifying(Constraints.pattern(regex = regex, error = errorMessage))
+  }
+
+  class IntFormField (fieldName: String, minimumValue: Int, maximumValue: Int) {
+    val name: String = fieldName
+    val field: Mapping[Int] =  number(min = minimumValue, max = maximumValue)
+  }
 }

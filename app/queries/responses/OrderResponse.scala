@@ -2,7 +2,8 @@ package queries.responses
 
 import play.api.libs.json.{Json, Reads}
 import queries.responses.AccountResponse.{Asset, Fiat}
-import transactions.responses.ResponseEntity
+import transactions.Abstract.BaseResponse
+
 
 object OrderResponse {
 
@@ -10,7 +11,7 @@ object OrderResponse {
 
   implicit val valueReads: Reads[Value] = Json.reads[Value]
 
-  case class Response(value: Value)  extends ResponseEntity
+  case class Response(value: Value) extends BaseResponse
 
   implicit val responseReads: Reads[Response] = Json.reads[Response]
 

@@ -2,6 +2,7 @@ package models.master
 
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
+import models.Trait.Document
 import org.postgresql.util.PSQLException
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
@@ -11,20 +12,7 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class AccountKYC(id: String, documentType: String, status: Option[Boolean], fileName: String, file: Option[Array[Byte]]) extends Document[AccountKYC] {
-
-  def getDocumentType: String = documentType
-
-  def getFileName: String = fileName
-
-  def getFile: Option[Array[Byte]] = file
-
-  def getStatus: Option[Boolean] = status
-
-  def updateFileName(newFileName: String): AccountKYC = AccountKYC(id = id, documentType = documentType, status = status, fileName = newFileName, file = file)
-
-  def updateFile(newFile: Option[Array[Byte]]): AccountKYC = AccountKYC(id = id, documentType = documentType, status = status, fileName = fileName, file = newFile)
-}
+case class AccountKYC(id: String, documentType: String, status: Option[Boolean], fileName: String, file: Option[Array[Byte]]) extends Document
 
 @Singleton
 class AccountKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {

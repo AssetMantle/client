@@ -5,7 +5,8 @@ import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.blockchain.{ACLAccounts, Negotiation}
-import models.master.{Accounts, Document, Organizations, Zones}
+import models.master.{Accounts, Organizations, Zones}
+import models.Trait.Document
 import models.{blockchain, master}
 import play.api.http.ContentTypes
 import play.api.i18n.I18nSupport
@@ -179,7 +180,7 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
       }
       Ok(views.html.component.master.viewDocuments(documents))
     } catch {
-      case _: BaseException => NoContent
+      case _: BaseException => InternalServerError
     }
   }
 
@@ -188,8 +189,7 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
       try {
         Ok(views.html.component.master.profilePicture(masterAccountFile.Service.getProfilePicture(loginState.username)))
       } catch {
-        case _: BaseException => Ok(views.html.component.master.profilePicture())
+        case _: BaseException => InternalServerError(views.html.component.master.profilePicture())
       }
   }
-
 }

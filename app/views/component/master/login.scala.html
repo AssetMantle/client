@@ -6,7 +6,6 @@
 
 <div class="latest_card-header latest_card-header-primary text-center">
     <h4 class="latest_card-title">@Messages(constants.Form.LOGIN)</h4>
-
 </div>
 @form(action = routes.LoginController.login, 'onkeypress -> "validateForm(event,this)") {
 
@@ -42,7 +41,6 @@
         <button type="button" class="btn btn-primary " onclick="submitForm(this)">@Messages(constants.Form.LOGIN)</button>
         <button type="button" class="btn btn-primary" onclick="getForm(jsRoutes.controllers.AccountController.emailOTPForgotPasswordForm())">@Messages(constants.Form.FORGOT_PASSWORD)</button>
     </div>
-    <script src="@routes.Assets.versioned("javascripts/forgotPassword.js")" type="text/javascript"></script>
 }
 
 
