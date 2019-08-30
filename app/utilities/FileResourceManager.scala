@@ -3,8 +3,8 @@ package utilities
 import exceptions.BaseException
 import org.apache.commons.codec.binary.Base64
 import javax.inject.Inject
+import models.Trait.Document
 import play.api.{Configuration, Logger}
-import models.master.Document
 
 import scala.concurrent.ExecutionContext
 

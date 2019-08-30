@@ -12,7 +12,12 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class AccountKYC(id: String, documentType: String, status: Option[Boolean], fileName: String, file: Option[Array[Byte]]) extends Document
+case class AccountKYC(id: String, documentType: String, fileName: String, file: Option[Array[Byte]], status: Option[Boolean]) extends Document[AccountKYC] {
+
+  def updateFile(newFile: Option[Array[Byte]]): AccountKYC = AccountKYC(id = id, documentType = documentType, fileName = fileName, file = newFile, status = status)
+
+  def updateFileName(newFileName: String): AccountKYC = AccountKYC(id = id, documentType = documentType, fileName = newFileName, file = file, status = status)
+}
 
 @Singleton
 class AccountKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
@@ -97,7 +102,7 @@ class AccountKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfig
 
   private[models] class AccountKYCTable(tag: Tag) extends Table[AccountKYC](tag, "AccountKYC") {
 
-    def * = (id, documentType, status.?, fileName, file.?) <> (AccountKYC.tupled, AccountKYC.unapply)
+    def * = (id, documentType, fileName, file.?, status.?) <> (AccountKYC.tupled, AccountKYC.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
@@ -113,9 +118,9 @@ class AccountKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfig
 
   object Service {
 
-    def create(accountKYC: AccountKYC): String = Await.result(add(AccountKYC(id = accountKYC.id, documentType = accountKYC.documentType, status = null, fileName = accountKYC.fileName, file = accountKYC.file)), Duration.Inf)
+    def create(accountKYC: AccountKYC): String = Await.result(add(AccountKYC(id = accountKYC.id, documentType = accountKYC.documentType, fileName = accountKYC.fileName, file = accountKYC.file, status = None)), Duration.Inf)
 
-    def updateOldDocument(accountKYC: AccountKYC): Int = Await.result(upsert(AccountKYC(id = accountKYC.id, documentType = accountKYC.documentType, status = accountKYC.status, fileName = accountKYC.fileName, file = accountKYC.file)), Duration.Inf)
+    def updateOldDocument(accountKYC: AccountKYC): Int = Await.result(upsert(AccountKYC(id = accountKYC.id, documentType = accountKYC.documentType, fileName = accountKYC.fileName, file = accountKYC.file, status = None)), Duration.Inf)
 
     def get(id: String, documentType: String): AccountKYC = Await.result(findByIdDocumentType(id = id, documentType = documentType), Duration.Inf)
 
