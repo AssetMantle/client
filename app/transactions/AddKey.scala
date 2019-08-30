@@ -7,7 +7,7 @@ import javax.inject.{Inject, Singleton}
 import play.api.libs.json._
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
-import transactions.responses.ResponseEntity
+import transactions.Abstract.BaseResponse
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
@@ -35,7 +35,7 @@ class AddKey @Inject()(wsClient: WSClient)(implicit configuration: Configuration
 
   private implicit val responseReads: Reads[Response] = Json.reads[Response]
 
-  case class Response(name: String, address: String, pubkey: String, mnemonic: String) extends ResponseEntity
+  case class Response(name: String, address: String, pubkey: String, mnemonic: String) extends BaseResponse
 
   object Service {
 

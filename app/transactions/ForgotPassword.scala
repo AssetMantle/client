@@ -7,8 +7,8 @@ import javax.inject.{Inject, Singleton}
 import play.api.libs.json.{Json, OWrites, Reads}
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
-import transactions.responses.ResponseEntity
-import utilities.RequestEntity
+import transactions.Abstract.BaseResponse
+import transactions.Abstract.BaseRequestEntity
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
@@ -28,11 +28,11 @@ class ForgotPassword @Inject()(wsClient: WSClient)(implicit configuration: Confi
 
   private val url = ip + ":" + port + "/" + path + "/"
 
-  case class Request(seed: String, newPassword: String, confirmNewPassword: String) extends RequestEntity
+  case class Request(seed: String, newPassword: String, confirmNewPassword: String) extends BaseRequestEntity
 
   private implicit val requestWrites: OWrites[Request] = Json.writes[Request]
 
-  case class Response(error: Boolean, message: String) extends ResponseEntity
+  case class Response(error: Boolean, message: String) extends BaseResponse
 
   private implicit val responseReads: Reads[Response] = Json.reads[Response]
 

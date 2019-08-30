@@ -2,6 +2,7 @@ package models.master
 
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
+import models.Trait.Document
 import org.postgresql.util.PSQLException
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
@@ -11,15 +12,8 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class TraderKYC(id: String, documentType: String, zoneStatus: Option[Boolean], organizationStatus: Option[Boolean], fileName: String, file: Option[Array[Byte]]) extends Document {
-
-  def getDocumentType: String = documentType
-
-  def getFileName: String = fileName
-
-  def getFile: Option[Array[Byte]] = file
-
-  def getStatus: Option[Boolean] = Option(zoneStatus.getOrElse(false) && organizationStatus.getOrElse(false))
+case class TraderKYC(id: String, documentType: String, zoneStatus: Option[Boolean], organizationStatus: Option[Boolean], fileName: String, file: Option[Array[Byte]]) extends Document{
+  override val status: Option[Boolean] = Option(zoneStatus.getOrElse(false) && organizationStatus.getOrElse(false))
 }
 
 @Singleton

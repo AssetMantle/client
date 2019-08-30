@@ -191,7 +191,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.SetACLController.organizationRejectKycDocument,
 
         //profile
-        routes.javascript.ContactController.getContact,
+        routes.javascript.ContactController.contact,
 
         routes.javascript.AccountController.changePasswordForm,
         routes.javascript.AccountController.emailOTPForgotPasswordForm,
