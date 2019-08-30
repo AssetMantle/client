@@ -7,7 +7,7 @@ import javax.inject.{Inject, Singleton}
 import play.api.libs.json.{Json, OWrites}
 import play.api.libs.ws.{WSClient, WSResponse}
 import play.api.{Configuration, Logger}
-import utilities.RequestEntity
+import transactions.Abstract.BaseRequestEntity
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
@@ -31,7 +31,7 @@ class IssueAsset @Inject()(wsClient: WSClient)(implicit configuration: Configura
 
   case class BaseRequest(from: String, chain_id: String = chainID)
 
-  case class Request(base_req: BaseRequest, to: String, documentHash: String, assetType: String, assetPrice: String, quantityUnit: String, assetQuantity: String, takerAddress: String, mode: String, password: String, moderated: Boolean) extends RequestEntity
+  case class Request(base_req: BaseRequest, to: String, documentHash: String, assetType: String, assetPrice: String, quantityUnit: String, assetQuantity: String, takerAddress: String, mode: String, password: String, moderated: Boolean) extends BaseRequestEntity
 
   private implicit val baseRequestWrites: OWrites[BaseRequest] = Json.writes[BaseRequest]
 
@@ -41,7 +41,7 @@ class IssueAsset @Inject()(wsClient: WSClient)(implicit configuration: Configura
 
   object Service {
     def post(request: Request): WSResponse = try {
-    Await.result(action(request), Duration.Inf)
+      Await.result(action(request), Duration.Inf)
     } catch {
       case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
         throw new BlockChainException(constants.Response.CONNECT_EXCEPTION)

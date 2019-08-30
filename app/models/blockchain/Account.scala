@@ -19,7 +19,7 @@ import scala.concurrent.duration.{Duration, _}
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Account(address: String, coins: String, publicKey: String, accountNumber: String, sequence: String, dirtyBit: Boolean)
+case class Account(address: String, coins: String = "", publicKey: String, accountNumber: String = "", sequence: String = "", dirtyBit: Boolean)
 
 case class AccountCometMessage(username: String, message: JsValue)
 
@@ -129,7 +129,7 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   object Service {
 
-    def create(address: String, pubkey: String): String = Await.result(add(Account(address, "0", pubkey, "-1", "0", dirtyBit = false)), Duration.Inf)
+    def create(address: String, pubkey: String): String = Await.result(add(Account(address = address, publicKey = pubkey, dirtyBit = false)), Duration.Inf)
 
     def refreshDirty(address: String, sequence: String, coins: String): Int = Await.result(updateSequenceCoinsAndDirtyBitByAddress(address, sequence, coins, dirtyBit = false), Duration.Inf)
 

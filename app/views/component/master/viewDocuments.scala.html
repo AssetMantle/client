@@ -1,16 +1,16 @@
 @import controllers.actions.LoginState
-@import models.master.Document
+@import models.Trait.Document
 
 @(documents: Seq[Document])(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
 <div>
     @for(document <- documents){
-        @if(document.getDocumentType != constants.File.PROFILE_PICTURE) {
-            @utilities.FileOperations.fileExtensionFromName(document.getFileName) match {
+        @if(document.documentType != constants.File.PROFILE_PICTURE) {
+            @utilities.FileOperations.fileExtensionFromName(document.fileName) match {
                 case constants.File.PNG | constants.File.JPEG | constants.File.JPG => {
-                    <li><a href="@routes.FileController.file(document.getFileName, document.getDocumentType)">@Messages(document.getDocumentType) <br>
-                    <img src="data:image/jpg;base64,@utilities.ImageProcess.decodeImageThumbnailData(document.getFile.get)" alt="@document.getDocumentType">
+                    <li><a href="@routes.FileController.file(document.fileName, document.documentType)">@Messages(document.documentType) <br>
+                    <img src="data:image/jpg;base64,@utilities.ImageProcess.decodeImageThumbnailData(document.file.get)" alt="@document.documentType">
                     </a>
-                        <span>@if(document.getStatus) {
+                        <span>@if(document.status) {
                             <img class="result" src="@routes.Assets.versioned("images/success.jpg")">
                         } else {
                             <img class="result" src="@routes.Assets.versioned("images/unverified.png")">
@@ -19,8 +19,8 @@
                     </li>
                 }
                 case _ => {
-                    <li><a href="@routes.FileController.file(document.getFileName, document.getDocumentType)">@Messages(document.getDocumentType)</a>
-                        <span>@if(document.getStatus) {
+                    <li><a href="@routes.FileController.file(document.fileName, document.documentType)">@Messages(document.documentType)</a>
+                        <span>@if(document.status) {
                             <img class="result" src="@routes.Assets.versioned("images/success.jpg")">
                         } else {
                             <img class="result" src="@routes.Assets.versioned("images/unverified.png")">
