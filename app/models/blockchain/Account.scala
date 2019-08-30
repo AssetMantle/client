@@ -13,7 +13,6 @@ import play.api.libs.json.{JsValue, Json}
 import play.api.{Configuration, Logger}
 import queries.GetAccount
 import slick.jdbc.JdbcProfile
-import transactions.{AddKey, GetSeed}
 import utilities.PushNotification
 
 import scala.concurrent.duration.{Duration, _}
@@ -25,7 +24,7 @@ case class Account(address: String, coins: String, publicKey: String, accountNum
 case class AccountCometMessage(username: String, message: JsValue)
 
 @Singleton
-class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, actorSystem: ActorSystem, shutdownActors: ShutdownActors, getSeed: GetSeed, addKey: AddKey, getAccount: GetAccount, masterAccounts: master.Accounts, implicit val pushNotification: PushNotification)(implicit executionContext: ExecutionContext, configuration: Configuration) {
+class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, actorSystem: ActorSystem, shutdownActors: ShutdownActors, getAccount: GetAccount, masterAccounts: master.Accounts, implicit val pushNotification: PushNotification)(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -130,10 +129,7 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   object Service {
 
-    def create(username: String, password: String): String = {
-      val addKeyResponse = addKey.Service.post(addKey.Request(username, password))
-      Await.result(add(Account(addKeyResponse.address, "0", addKeyResponse.pubkey, "-1", "0", dirtyBit = false)), Duration.Inf)
-    }
+    def create(address: String, pubkey: String): String = Await.result(add(Account(address, "0", pubkey, "-1", "0", dirtyBit = false)), Duration.Inf)
 
     def refreshDirty(address: String, sequence: String, coins: String): Int = Await.result(updateSequenceCoinsAndDirtyBitByAddress(address, sequence, coins, dirtyBit = false), Duration.Inf)
 

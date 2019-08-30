@@ -20,12 +20,11 @@ class IntFormField (fieldName: String, minimumValue: Int, maximumValue: Int) {
 object FormField {
 
   val SIGNUP_USERNAME = new StringFormField("USERNAME", 3,  50, RegularExpression.ACCOUNT_ID, Response.INVALID_USERNAME.message)
-  val SIGNUP_PASSWORD = new StringFormField("PASSWORD", 6, 128, RegularExpression.PASSWORD, Response.INVALID_PASSWORD.message)
+  val SIGNUP_PASSWORD = new StringFormField("PASSWORD", 8, 128, RegularExpression.PASSWORD, Response.INVALID_PASSWORD.message)
   val SIGNUP_CONFIRM_PASSWORD = new StringFormField("CONFIRM_PASSWORD", 6, 128, RegularExpression.PASSWORD, Response.INVALID_PASSWORD.message)
   val USERNAME = new StringFormField("USERNAME", 3, 50, RegularExpression.ACCOUNT_ID)
   val NON_EMPTY_PASSWORD = new StringFormField("PASSWORD", 1, 128)
   val PASSWORD = new StringFormField("PASSWORD", 0, 128)
-  val PHONE = new StringFormField("PHONE", 8,15, RegularExpression.MOBILE_NUMBER)
   val MOBILE_NUMBER = new StringFormField("MOBILE_NUMBER", 8, 15, RegularExpression.MOBILE_NUMBER)
   val BLOCKCHAIN_ADDRESS = new StringFormField("BLOCKCHAIN_ADDRESS", 45, 45)
   val ACL_ADDRESS = new StringFormField("ACL_ADDRESS", 45, 45)
@@ -51,13 +50,18 @@ object FormField {
   val COUNTRY_CODE = new StringFormField("COUNTRY_CODE", 1, 5)
   val OTP = new StringFormField("OTP", 4, 10, RegularExpression.ALL_NUMBERS_ALL_LETTERS)
   val CURRENCY = new StringFormField("CURRENCY", 2, 30, RegularExpression.ALL_LETTERS)
-  val EMAIL = new StringFormField("EMAIL", 6, 100, RegularExpression.EMAIL)
+  val EMAIL_ADDRESS = new StringFormField("EMAIL_ADDRESS", 6, 100, RegularExpression.EMAIL_ADDRESS)
   val BUYER_CONTRACT_HASH = new StringFormField("BUYER_CONTRACT_HASH", 40, 40, RegularExpression.HASH)
   val SELLER_CONTRACT_HASH = new StringFormField("SELLER_CONTRACT_HASH", 40, 40, RegularExpression.HASH)
   val DOCUMENT_HASH = new StringFormField("DOCUMENT_HASH", 4, 50, RegularExpression.HASH)
   val FROM = new StringFormField("FROM", 45, 45)
   val MODE = new StringFormField("MODE", 4, 5)
   val TAKER_ADDRESS = new StringFormField( "TAKER_ADDRESS", 0, 45)
+
+  val OLD_PASSWORD = new StringFormField("OLD_PASSWORD", 1, 128)
+  val NEW_PASSWORD = new StringFormField("NEW_PASSWORD", 1, 128, RegularExpression.PASSWORD, Response.INVALID_PASSWORD.message)
+  val CONFIRM_NEW_PASSWORD = new StringFormField("CONFIRM_NEW_PASSWORD", 1, 128, RegularExpression.PASSWORD, Response.INVALID_PASSWORD.message)
+  val MNEMONIC = new StringFormField("MNEMONIC", 1, 200)
 
   val GAS = new IntFormField("GAS", 0, 1000000)
   val BID = new IntFormField("BID", 0, Int.MaxValue)

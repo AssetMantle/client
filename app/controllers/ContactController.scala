@@ -5,8 +5,8 @@ import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.master
-import models.master.Contacts
 import play.api.i18n.I18nSupport
+import play.api.libs.json.{Json, OWrites}
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
 import views.companion.master.UpdateContact
@@ -14,15 +14,17 @@ import views.companion.master.UpdateContact
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class UpdateContactController @Inject()(messagesControllerComponents: MessagesControllerComponents, contacts: Contacts, withLoginAction: WithLoginAction, masterAccounts: master.Accounts, withUsernameToken: WithUsernameToken)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class ContactController @Inject()(messagesControllerComponents: MessagesControllerComponents, masterContacts: master.Contacts, withLoginAction: WithLoginAction, masterAccounts: master.Accounts, withUsernameToken: WithUsernameToken)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  def updateContactForm(): Action[AnyContent] = Action { implicit request =>
+  implicit val contactWrites: OWrites[master.Contact] = Json.writes[master.Contact]
+
+  def updateContactForm: Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.master.updateContact(UpdateContact.form, constants.CountryCallingCode.COUNTRY_CODES))
   }
 
-  def updateContact(): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def updateContact: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       UpdateContact.form.bindFromRequest().fold(
         formWithErrors => {
@@ -30,7 +32,7 @@ class UpdateContactController @Inject()(messagesControllerComponents: MessagesCo
         },
         updateContactData => {
           try {
-            contacts.Service.insertOrUpdateContact(loginState.username, updateContactData.countryCode + updateContactData.mobileNumber, updateContactData.emailAddress)
+            masterContacts.Service.insertOrUpdateContact(loginState.username, updateContactData.countryCode + updateContactData.mobileNumber, updateContactData.emailAddress)
             masterAccounts.Service.updateStatusUnverifiedContact(loginState.username)
             withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.SUCCESS)))
           } catch {
@@ -38,5 +40,14 @@ class UpdateContactController @Inject()(messagesControllerComponents: MessagesCo
           }
         }
       )
+  }
+
+  def getContact: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      try {
+        Ok(Json.toJson(masterContacts.Service.getContact(loginState.username)))
+      } catch {
+        case _: BaseException => NoContent
+      }
   }
 }

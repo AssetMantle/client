@@ -635,3 +635,27 @@ dl .info::after {
     margin-top: 50px;
 }
 
+.tab_acl{
+    display: flex;
+    flex-wrap: wrap;
+}
+.tab_acl p{
+    padding-left:20px;
+}
+.warning .fa{
+    color:#fd7e14;
+}
+.success .fa{
+    color: #3cbf3c;
+}
+.failure .fa{
+    color:red;
+}
+.ur-change-password{
+    display: flex;
+    margin-bottom: 10px;
+}
+.ur-change-password button{
+margin-left: 50px;
+    margin-top: -20px;
+}
