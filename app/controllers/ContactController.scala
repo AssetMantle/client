@@ -47,7 +47,7 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
       try {
         Ok(views.html.component.master.contact(masterContacts.Service.getContact(loginState.username)))
       } catch {
-        case _: BaseException => NoContent
+        case _: BaseException => InternalServerError
       }
   }
 }
