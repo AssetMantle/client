@@ -11,7 +11,7 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Random, Success}
 
-case class IssueFiatRequest(id: String, accountID: String, transactionID: String, transactionAmount: Int, status: Option[Boolean], ticketID: Option[String], comment: Option[String])
+case class IssueFiatRequest(id: String, accountID: String, transactionID: String, transactionAmount: Int, gas: Option[Int], status: Option[Boolean], ticketID: Option[String], comment: Option[String])
 
 @Singleton
 class IssueFiatRequests @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
@@ -88,7 +88,7 @@ class IssueFiatRequests @Inject()(protected val databaseConfigProvider: Database
 
   private[models] class IssueFiatRequestTable(tag: Tag) extends Table[IssueFiatRequest](tag, "IssueFiatRequest") {
 
-    def * = (id, accountID, transactionID, transactionAmount, status.?, ticketID.?, comment.?) <> (IssueFiatRequest.tupled, IssueFiatRequest.unapply)
+    def * = (id, accountID, transactionID, transactionAmount,gas.?, status.?, ticketID.?, comment.?) <> (IssueFiatRequest.tupled, IssueFiatRequest.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
@@ -97,6 +97,8 @@ class IssueFiatRequests @Inject()(protected val databaseConfigProvider: Database
     def transactionID = column[String]("transactionID")
 
     def transactionAmount = column[Int]("transactionAmount")
+
+    def gas = column[Int]("gas")
 
     def status = column[Boolean]("status")
 
@@ -108,7 +110,7 @@ class IssueFiatRequests @Inject()(protected val databaseConfigProvider: Database
 
   object Service {
 
-    def create(accountID: String, transactionID: String, transactionAmount: Int): String = Await.result(add(IssueFiatRequest(id = Random.nextString(32), accountID = accountID, transactionID = transactionID, transactionAmount = transactionAmount, null, null, null)), Duration.Inf)
+    def create(accountID: String, transactionID: String, transactionAmount: Int): String = Await.result(add(IssueFiatRequest(id = Random.nextString(32), accountID = accountID, transactionID = transactionID, transactionAmount = transactionAmount, null,null, null, null)), Duration.Inf)
 
     def reject(id: String, comment: String): Int = Await.result(updateStatusAndCommentByID(id = id, status = Option(false), comment = comment), Duration.Inf)
 

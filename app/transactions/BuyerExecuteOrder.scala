@@ -31,7 +31,7 @@ class BuyerExecuteOrder @Inject()(wsClient: WSClient)(implicit configuration: Co
 
   case class BaseRequest(from: String, chain_id: String = chainID)
 
-  case class Request(base_req: BaseRequest, password: String, buyerAddress: String, sellerAddress: String, fiatProofHash: String, pegHash: String, mode: String) extends RequestEntity
+  case class Request(base_req: BaseRequest, password: String, buyerAddress: String, sellerAddress: String, fiatProofHash: String, pegHash: String,gas:String, mode: String) extends RequestEntity
 
   private implicit val baseRequestWrites: OWrites[BaseRequest] = Json.writes[BaseRequest]
 

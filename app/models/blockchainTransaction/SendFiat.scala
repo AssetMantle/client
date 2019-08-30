@@ -19,8 +19,8 @@ import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class SendFiat(from: String, to: String, amount: Int, pegHash: String,  status: Option[Boolean], txHash: Option[String], ticketID: String, mode: String, code: Option[String]) extends TransactionEntity[SendFiat] {
-  def mutateTicketID(newTicketID: String): SendFiat = SendFiat(from = from, to = to, amount = amount, pegHash = pegHash, status = status, txHash = txHash, ticketID = newTicketID, mode = mode, code = code)
+case class SendFiat(from: String, to: String, amount: Int, pegHash: String,gas: Int,  status: Option[Boolean], txHash: Option[String], ticketID: String, mode: String, code: Option[String]) extends TransactionEntity[SendFiat] {
+  def mutateTicketID(newTicketID: String): SendFiat = SendFiat(from = from, to = to, amount = amount, pegHash = pegHash,gas=gas, status = status, txHash = txHash, ticketID = newTicketID, mode = mode, code = code)
 }
 
 
@@ -113,7 +113,7 @@ class SendFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
 
   private[models] class SendFiatTable(tag: Tag) extends Table[SendFiat](tag, "SendFiat") {
 
-    def * = (from, to, amount, pegHash, status.?, txHash.?, ticketID, mode, code.?) <> (SendFiat.tupled, SendFiat.unapply)
+    def * = (from, to, amount, pegHash,gas, status.?, txHash.?, ticketID, mode, code.?) <> (SendFiat.tupled, SendFiat.unapply)
 
     def from = column[String]("from")
 
@@ -122,6 +122,8 @@ class SendFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
     def amount = column[Int]("amount")
 
     def pegHash = column[String]("pegHash")
+
+    def gas = column[Int]("gas")
 
     def status = column[Boolean]("status")
 
@@ -136,7 +138,7 @@ class SendFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
 
   object Service {
 
-    def create(sendFiat: SendFiat): String = Await.result(add(SendFiat(from = sendFiat.from, to = sendFiat.to, amount = sendFiat.amount, pegHash = sendFiat.pegHash, status = sendFiat.status, txHash = sendFiat.txHash, ticketID = sendFiat.ticketID, mode = sendFiat.mode, code = sendFiat.code)), Duration.Inf)
+    def create(sendFiat: SendFiat): String = Await.result(add(SendFiat(from = sendFiat.from, to = sendFiat.to, amount = sendFiat.amount, pegHash = sendFiat.pegHash,gas=sendFiat.gas, status = sendFiat.status, txHash = sendFiat.txHash, ticketID = sendFiat.ticketID, mode = sendFiat.mode, code = sendFiat.code)), Duration.Inf)
 
     def markTransactionSuccessful(ticketID: String, txHash: String): Int = Await.result(updateTxHashAndStatusOnTicketID(ticketID, Option(txHash), status = Option(true)), Duration.Inf)
 
