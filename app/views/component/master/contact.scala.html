@@ -1,0 +1,26 @@
+@import models.master.Contact
+@import controllers.actions.LoginState
+
+@(contact: Contact)(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
+
+<p>@Messages(constants.Form.EMAIL_ADDRESS): <span id="emailAddressValue">@contact.emailAddress</span>
+    @if(contact.emailAddressVerified){
+        <span class="result success hidden"><i class="fa fa-check " aria-hidden="true"></i></span>
+    }else{
+        <span class="result warning hidden"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+        <button class="hidden" onclick="getForm(jsRoutes.controllers.VerifyEmailAddressController.verifyEmailAddressForm())">@Messages(constants.Form.VERIFY_EMAIL_ADDRESS)</button>
+        </span>
+    }
+</p>
+
+<p>@Messages(constants.Form.MOBILE_NUMBER): <span id="phoneValue">@contact.mobileNumber</span>
+    @if(contact.mobileNumberVerified) {
+        <span class="result success hidden"><i class="fa fa-check " aria-hidden="true"></i></span>
+    } else {
+        <span class="result warning hidden"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+        <button class="hidden" onclick="getForm(jsRoutes.controllers.VerifyMobileNumberController.verifyMobileNumberForm())">@Messages(constants.Form.VERIFY_MOBILE_NUMBER)</button>
+        </span>
+    }
+</p>
+
+<span id="updateContact" class="hidden"><button onclick="getForm(jsRoutes.controllers.ContactController.updateContactForm())">@Messages(constants.Form.UPDATE_CONTACT)</button></span>

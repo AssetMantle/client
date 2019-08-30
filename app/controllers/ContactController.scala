@@ -42,10 +42,10 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
       )
   }
 
-  def getContact: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def contact: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        Ok(Json.toJson(masterContacts.Service.getContact(loginState.username)))
+        Ok(views.html.component.master.contact(masterContacts.Service.getContact(loginState.username)))
       } catch {
         case _: BaseException => NoContent
       }

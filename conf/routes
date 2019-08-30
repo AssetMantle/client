@@ -18,7 +18,7 @@ POST        /account/forgotPasswordUsername                              control
 GET         /account/forgotPassword                                      controllers.AccountController.forgotPasswordForm(username: String)
 POST        /account/forgotPassword                                      controllers.AccountController.forgotPassword(username: String)
 
-GET         /contact                                                     controllers.ContactController.getContact
+GET         /contact                                                     controllers.ContactController.contact
 
 GET         /assets/*file                                                controllers.Assets.versioned(path="/public", file: Asset)
 
