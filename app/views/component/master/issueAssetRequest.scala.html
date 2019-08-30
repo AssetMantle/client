@@ -1,6 +1,6 @@
+@import controllers.actions.LoginState
 @import helper._
 @import views.companion.master.IssueAssetRequest
-@import controllers.actions.LoginState
 
 @(issueAssetRequestForm: Form[IssueAssetRequest.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 
@@ -10,42 +10,68 @@
         <h4 class="latest_card-title">@Messages(constants.Form.ISSUE_ASSET_REQUEST)</h4>
     </div>
     <div >
-    <div class="latest_card-body">
-    @inputText(issueAssetRequestForm(constants.Form.DOCUMENT_HASH), '_label -> Messages(constants.Form.DOCUMENT_HASH),
-        'class -> "form-control",'placeholder->Messages(constants.Form.DOCUMENT_HASH),'required->true)
-    @inputText(issueAssetRequestForm(constants.Form.ASSET_TYPE), '_label -> Messages(constants.Form.ASSET_TYPE),
-        'class -> "form-control",'placeholder->Messages(constants.Form.ASSET_TYPE),'required->true)
-    @inputText(issueAssetRequestForm(constants.Form.ASSET_PRICE), '_label -> Messages(constants.Form.ASSET_PRICE),
-        'class -> "form-control",'placeholder->Messages(constants.Form.ASSET_PRICE),'required->true)
-    @inputText(issueAssetRequestForm(constants.Form.QUANTITY_UNIT), '_label -> Messages(constants.Form.QUANTITY_UNIT),
-        'class -> "form-control",'placeholder->Messages(constants.Form.QUANTITY_UNIT),'required->true)
-    @inputText(issueAssetRequestForm(constants.Form.ASSET_QUANTITY), '_label -> Messages(constants.Form.ASSET_QUANTITY),
-        'class -> "form-control",'placeholder->Messages(constants.Form.ASSET_QUANTITY),'required->true)
-    @inputText(issueAssetRequestForm(constants.Form.TAKER_ADDRESS), '_label -> Messages(constants.Form.TAKER_ADDRESS),
-        'class -> "form-control",'placeholder->Messages(constants.Form.TAKER_ADDRESS),'required->true)
-        <div class="input-group-prepend issue_asset">
-            @checkbox(issueAssetRequestForm(constants.Form.MODERATED), '_label -> Messages(constants.Form.MODERATED), 'id -> "moderated")
+        <div class="latest_card-body">
+            @inputText(issueAssetRequestForm(constants.Form.DOCUMENT_HASH), '_label -> Messages(constants.Form.DOCUMENT_HASH),
+                'class -> "form-control", 'placeholder -> Messages(constants.Form.DOCUMENT_HASH), 'required -> true)
+            @inputText(issueAssetRequestForm(constants.Form.ASSET_TYPE), '_label -> Messages(constants.Form.ASSET_TYPE),
+                'class -> "form-control", 'placeholder -> Messages(constants.Form.ASSET_TYPE), 'required -> true)
+            @inputText(issueAssetRequestForm(constants.Form.QUANTITY_UNIT), '_label -> Messages(constants.Form.QUANTITY_UNIT),
+                'class -> "form-control", 'placeholder -> Messages(constants.Form.QUANTITY_UNIT), 'required -> true)
+            @inputText(issueAssetRequestForm(constants.Form.ASSET_QUANTITY), '_label -> Messages(constants.Form.ASSET_QUANTITY),
+                'class -> "form-control", 'placeholder -> Messages(constants.Form.ASSET_QUANTITY), 'required -> true)
+            @inputText(issueAssetRequestForm(constants.Form.ASSET_PRICE), '_label -> Messages(constants.Form.ASSET_PRICE),
+                'class -> "form-control", 'placeholder -> Messages(constants.Form.ASSET_PRICE), 'required -> true)
+            @inputText(issueAssetRequestForm(constants.Form.TAKER_ADDRESS), '_label -> Messages(constants.Form.TAKER_ADDRESS),
+                'class -> "form-control", 'placeholder -> Messages(constants.Form.TAKER_ADDRESS), 'required -> true)
+            @select(issueAssetRequestForm(constants.Form.DELIVERY_TERM), Seq(("l","d"),("f","k")), '_label -> Messages(constants.Form.DELIVERY_TERM),
+                'class -> "form-control", 'placeholder -> Messages(constants.Form.DELIVERY_TERM), 'required -> true)
+            @inputText(issueAssetRequestForm(constants.Form.TRADE_TYPE), '_label -> Messages(constants.Form.ASSET_QUANTITY),
+                'class -> "form-control",'placeholder->Messages(constants.Form.ASSET_QUANTITY),'required->true)
+            @inputText(issueAssetRequestForm(constants.Form.ASSET_QUANTITY), '_label -> Messages(constants.Form.ASSET_QUANTITY),
+                'class -> "form-control",'placeholder->Messages(constants.Form.ASSET_QUANTITY),'required->true)
+            @inputText(issueAssetRequestForm(constants.Form.ASSET_QUANTITY), '_label -> Messages(constants.Form.ASSET_QUANTITY),
+                'class -> "form-control",'placeholder->Messages(constants.Form.ASSET_QUANTITY),'required->true)
+            @inputText(issueAssetRequestForm(constants.Form.ASSET_QUANTITY), '_label -> Messages(constants.Form.ASSET_QUANTITY),
+                'class -> "form-control",'placeholder->Messages(constants.Form.ASSET_QUANTITY),'required->true)
+            @inputText(issueAssetRequestForm(constants.Form.ASSET_QUANTITY), '_label -> Messages(constants.Form.ASSET_QUANTITY),
+                'class -> "form-control",'placeholder->Messages(constants.Form.ASSET_QUANTITY),'required->true)
+            @inputText(issueAssetRequestForm(constants.Form.ASSET_QUANTITY), '_label -> Messages(constants.Form.ASSET_QUANTITY),
+                'class -> "form-control",'placeholder->Messages(constants.Form.ASSET_QUANTITY),'required->true)
 
-            <span class="input-group-text">
+
+
+
+
+
+
+
+
+
+
+
+            <div class="input-group-prepend issue_asset">
+                @checkbox(issueAssetRequestForm(constants.Form.MODERATED), '_label -> Messages(constants.Form.MODERATED), 'id -> "moderated")
+
+                <span class="input-group-text">
                 @Messages(constants.Form.MODERATED)
-            </span>
+                </span>
 
+            </div>
+
+            <div id="moderatedIssueAssetRequestFormFields">
+            @inputPassword(issueAssetRequestForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD),
+                'class -> "form-control", 'placeholder -> Messages(constants.Form.PASSWORD), 'required -> true)
+            </div>
+
+            @if(issueAssetRequestForm.hasGlobalErrors) {
+                <ul>
+                @for(error <- issueAssetRequestForm.globalErrors) {
+                    <li>@error.format</li>
+                }
+                </ul>
+            }
+            <button type="button" class="btn btn-primary btn-sm" onclick="submitForm(this)">@Messages(constants.Form.ISSUE_ASSET_REQUEST)</button>
+            <script src="@routes.Assets.versioned("javascripts/showIssueAssetRequestFormFields.js")" type="text/javascript"></script>
         </div>
-
-    <div id="moderatedIssueAssetRequestFormFields">
-        @inputPassword(issueAssetRequestForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD),
-            'class -> "form-control",'placeholder->Messages(constants.Form.PASSWORD),'required->true)
     </div>
-
-    @if(issueAssetRequestForm.hasGlobalErrors) {
-        <ul>
-        @for(error <- issueAssetRequestForm.globalErrors) {
-            <li>@error.format</li>
-        }
-        </ul>
-    }
-    <button type="button" class="btn btn-primary btn-sm" onclick="submitForm(this)">@Messages(constants.Form.ISSUE_ASSET_REQUEST)</button>
-    <script src="@routes.Assets.versioned("javascripts/showIssueAssetRequestFormFields.js")" type="text/javascript"></script>
-    </div>
-    </div>
-    }
+}
