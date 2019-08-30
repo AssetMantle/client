@@ -1,9 +1,9 @@
 package constants
 
-import play.api.data.Forms.{number, text}
+import play.api.data.Forms.{number, text, date}
 import play.api.data.Mapping
 import play.api.data.validation.Constraints
-
+import java.util.Date
 import scala.util.matching.Regex
 
 //TODO: Error Response through Messages
@@ -12,9 +12,20 @@ class StringFormField (fieldName: String, minimumLength: Int, maximumLength: Int
   val field: Mapping[String] =  text(minLength = minimumLength, maxLength = maximumLength).verifying(Constraints.pattern(regex = regex, error = errorMessage))
 }
 
+class StringFormFieldOption(fieldName: String, option: Seq[String], errorMessage: String = "Error Response") {
+  val name: String = fieldName
+  val field: Mapping[String] =  text.verifying(constraint = field => option contains field, error = errorMessage)
+}
+
+
 class IntFormField (fieldName: String, minimumValue: Int, maximumValue: Int) {
   val name: String = fieldName
   val field: Mapping[Int] =  number(min = minimumValue, max = maximumValue)
+}
+
+class DateFormField (fieldName: String) {
+  val name: String = fieldName
+  val field: Mapping[Date] =  date("dd-MM-yyyy")
 }
 
 object FormField {
@@ -58,6 +69,18 @@ object FormField {
   val FROM = new StringFormField("FROM", 45, 45)
   val MODE = new StringFormField("MODE", 4, 5)
   val TAKER_ADDRESS = new StringFormField( "TAKER_ADDRESS", 0, 45)
+  val PORT_OF_LOADING = new StringFormField( "PORT_OF_LOADING", 0, 100)
+  val PORT_OF_DISCHARGE = new StringFormField( "PORT_OF_DISCHARGE", 0, 100)
+
+  val COMMODITY_OPTIONS = new StringFormFieldOption("COMMODITY_OPTIONS", constants.Option.COMMODITY_OPTIONS.options)
+  val DELIVERY_TERM = new StringFormFieldOption("DELIVERY_TERM", constants.Option.DELIVERY_TERM.options)
+  val QUALITY = new StringFormFieldOption("QUALITY", constants.Option.QUALITY.options)
+  val TRADE_TYPE = new StringFormFieldOption("TRADE_TYPE", constants.Option.TRADE_TYPE.options)
+  val COUNTRY = new StringFormFieldOption("COUNTRY", constants.Option.COUNTRY.options)
+  val PHYSICAL_DOCUMENTS_HANDLED_VIA = new StringFormFieldOption("PHYSICAL_DOCUMENTS_HANDLED_VIA", constants.Option.PHYSICAL_DOCUMENTS_HANDLED_VIA.options)
+  val COMDEX_PAYMENT_TERMS = new StringFormFieldOption("COMDEX_PAYMENT_TERMS", constants.Option.COMDEX_PAYMENT_TERMS.options)
+
+  val SHIPMENT_DATE = new DateFormField("SHIPMENT_DATE")
 
   val GAS = new IntFormField("GAS", 0, 1000000)
   val BID = new IntFormField("BID", 0, Int.MaxValue)

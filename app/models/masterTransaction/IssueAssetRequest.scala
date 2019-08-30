@@ -1,18 +1,28 @@
 package models.masterTransaction
 
+import java.util.Date
+
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import org.postgresql.util.PSQLException
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
+import play.api.libs.json.{Json, OWrites, Reads}
 import slick.jdbc.JdbcProfile
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Random, Success}
 
-case class IssueAssetRequest(id: String, ticketID: Option[String], accountID: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, takerAddress: Option[String], status: Option[Boolean], comment: Option[String])
+case class IssueAssetRequest(id: String, ticketID: Option[String], pegHash: Option[String], accountID: String, documentHash: String, assetType: String, quantityUnit: String, assetQuantity: Int, assetPrice: Int, takerAddress: Option[String], shipmentDetails: String, physicalDocumentsHandledVia: Option[String], paymentTerms: Option[String], status: String, comment: Option[String])
 
+object ShipmentDetails{
+
+  case class ShipmentDetails(deliveryTerm: String, tradeType: String, portOfLoading: String, portOfDischarge: String, shipmentDate: Date)
+
+  implicit val oblReads: Reads[ShipmentDetails] = Json.reads[ShipmentDetails]
+  implicit val oblWrites: OWrites[ShipmentDetails] = Json.writes[ShipmentDetails]
+}
 @Singleton
 class IssueAssetRequests @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
 
@@ -44,7 +54,7 @@ class IssueAssetRequests @Inject()(protected val databaseConfigProvider: Databas
     }
   }
 
-  private def updateTicketIDAndStatusByID(id: String, ticketID: String, status: Boolean) = db.run(issueAssetRequestTable.filter(_.id === id).map(faucet => (faucet.ticketID, faucet.status)).update((ticketID, status)).asTry).map {
+  private def updateTicketIDAndStatusByID(id: String, ticketID: String, status: String) = db.run(issueAssetRequestTable.filter(_.id === id).map(faucet => (faucet.ticketID, faucet.status)).update((ticketID, status)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -54,7 +64,7 @@ class IssueAssetRequests @Inject()(protected val databaseConfigProvider: Databas
     }
   }
 
-  private def updateStatusAndCommentByID(id: String, status: Option[Boolean], comment: String) = db.run(issueAssetRequestTable.filter(_.id === id).map(issueAssetRequest => (issueAssetRequest.status.?, issueAssetRequest.comment)).update((status, comment)).asTry).map {
+  private def updateStatusAndCommentByID(id: String, status: String, comment: String) = db.run(issueAssetRequestTable.filter(_.id === id).map(issueAssetRequest => (issueAssetRequest.status, issueAssetRequest.comment)).update((status, comment)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -76,7 +86,7 @@ class IssueAssetRequests @Inject()(protected val databaseConfigProvider: Databas
     }
   }
 
-  private def getStatusByID(id: String): Future[Option[Boolean]] = db.run(issueAssetRequestTable.filter(_.id === id).map(_.status.?).result.head.asTry).map {
+  private def getStatusByID(id: String): Future[String] = db.run(issueAssetRequestTable.filter(_.id === id).map(_.status).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.info(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -86,11 +96,13 @@ class IssueAssetRequests @Inject()(protected val databaseConfigProvider: Databas
 
   private[models] class IssueAssetRequestTable(tag: Tag) extends Table[IssueAssetRequest](tag, "IssueAssetRequest") {
 
-    def * = (id, ticketID.?, accountID, documentHash, assetType, assetPrice, quantityUnit, assetQuantity, takerAddress.?, status.?, comment.?) <> (IssueAssetRequest.tupled, IssueAssetRequest.unapply)
+    def * = (id, ticketID.?, pegHash.?, accountID, documentHash, assetType, quantityUnit, assetQuantity, assetPrice, takerAddress.?, shipmentDetails, physicalDocumentsHandledVia.?, paymentTerms.?, status, comment.?) <> (IssueAssetRequest.tupled, IssueAssetRequest.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
     def ticketID = column[String]("ticketID")
+
+    def pegHash = column[String]("pegHash")
 
     def accountID = column[String]("accountID")
 
@@ -98,15 +110,21 @@ class IssueAssetRequests @Inject()(protected val databaseConfigProvider: Databas
 
     def assetType = column[String]("assetType")
 
-    def assetPrice = column[Int]("assetPrice")
-
     def quantityUnit = column[String]("quantityUnit")
 
     def assetQuantity = column[Int]("assetQuantity")
 
+    def assetPrice = column[Int]("assetPrice")
+
     def takerAddress = column[String]("takerAddress")
 
-    def status = column[Boolean]("status")
+    def shipmentDetails = column[String]("shipmentDetails")
+
+    def physicalDocumentsHandledVia = column[String]("physicalDocumentsHandledVia")
+
+    def paymentTerms = column[String]("paymentTerms")
+
+    def status = column[String]("status")
 
     def comment = column[String]("comment")
 
@@ -114,17 +132,18 @@ class IssueAssetRequests @Inject()(protected val databaseConfigProvider: Databas
 
   object Service {
 
-    def create(accountID: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, takerAddress: Option[String]): String = Await.result(add(IssueAssetRequest(id = Random.nextString(32), null, accountID = accountID, documentHash = documentHash, assetType = assetType, assetPrice = assetPrice, quantityUnit = quantityUnit, assetQuantity = assetQuantity, takerAddress = takerAddress, null, null)), Duration.Inf)
+    def create(id: String, ticketID: Option[String], pegHash: Option[String], accountID: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, takerAddress: Option[String], deliveryTerm:String, tradeType:String, portOfLoading: String, portOfDischarge: String, shipmentDate: Date, physicalDocumentsHandledVia: Option[String], paymentTerms: Option[String], status: String): String =
+      Await.result(add(IssueAssetRequest(id = id, ticketID = ticketID, pegHash = pegHash, accountID = accountID, documentHash = documentHash, assetType = assetType, quantityUnit = quantityUnit, assetQuantity = assetQuantity, assetPrice = assetPrice, takerAddress = takerAddress, shipmentDetails = Json.toJson(ShipmentDetails.ShipmentDetails(deliveryTerm,tradeType,portOfLoading,portOfDischarge,shipmentDate)).toString(), physicalDocumentsHandledVia = physicalDocumentsHandledVia, paymentTerms = paymentTerms, status = status, comment = null)), Duration.Inf)
 
-    def accept(id: String, ticketID: String): Int = Await.result(updateTicketIDAndStatusByID(id, ticketID, status = true), Duration.Inf)
+    def accept(id: String, ticketID: String): Int = Await.result(updateTicketIDAndStatusByID(id, ticketID, status = constants.Status.Asset.LISTED_FOR_TRADE), Duration.Inf)
 
-    def reject(id: String, comment: String): Int = Await.result(updateStatusAndCommentByID(id = id, status = Option(false), comment = comment), Duration.Inf)
+    def reject(id: String, comment: String): Int = Await.result(updateStatusAndCommentByID(id = id, status = constants.Status.Asset.REJECTED, comment = comment), Duration.Inf)
 
     def getPendingIssueAssetRequests(accountIDs: Seq[String]): Seq[IssueAssetRequest] = Await.result(getIssueAssetRequestsWithNullStatus(accountIDs), Duration.Inf)
 
     def delete(id: String): Int = Await.result(deleteByID(id), Duration.Inf)
 
-    def getStatus(id: String): Option[Boolean] = Await.result(getStatusByID(id), Duration.Inf)
+    def getStatus(id: String): String = Await.result(getStatusByID(id), Duration.Inf)
 
   }
 
