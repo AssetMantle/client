@@ -2275,7 +2275,6 @@ tbody.collapse.show {
 .input-group {
   position: relative;
   display: flex;
-  flex-wrap: wrap;
   align-items: stretch;
   width: 100%; }
   .input-group > .form-control,
@@ -2317,22 +2316,19 @@ tbody.collapse.show {
       border-top-left-radius: 0;
       border-bottom-left-radius: 0; }
 
-.input-group-prepend,
-.input-group-append {
-  display: flex; }
-  .input-group-prepend .btn,
-  .input-group-append .btn {
-    position: relative;
-    z-index: 2; }
-  .input-group-prepend .btn + .btn,
-  .input-group-prepend .btn + .input-group-text,
-  .input-group-prepend .input-group-text + .input-group-text,
-  .input-group-prepend .input-group-text + .btn,
-  .input-group-append .btn + .btn,
-  .input-group-append .btn + .input-group-text,
-  .input-group-append .input-group-text + .input-group-text,
-  .input-group-append .input-group-text + .btn {
-    margin-left: -1px; }
+.input-group-prepend .btn,
+.input-group-append .btn {
+  position: relative;
+  z-index: 2; }
+.input-group-prepend .btn + .btn,
+.input-group-prepend .btn + .input-group-text,
+.input-group-prepend .input-group-text + .input-group-text,
+.input-group-prepend .input-group-text + .btn,
+.input-group-append .btn + .btn,
+.input-group-append .btn + .input-group-text,
+.input-group-append .input-group-text + .input-group-text,
+.input-group-append .input-group-text + .btn {
+  margin-left: -1px; }
 
 .input-group-prepend {
   margin-right: -1px; }
@@ -10961,6 +10957,7 @@ footer {
   margin-top: 30px;
   border-radius: 6px;
   color: rgba(0, 0, 0, 0.87);
+  width: 100%;
   background: #fff;
   box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.07); }
   .latest_card .latest_card-category:not([class*="text-"]) {
