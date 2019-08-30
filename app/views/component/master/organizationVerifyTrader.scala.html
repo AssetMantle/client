@@ -9,7 +9,7 @@
         <h4 class="latest_card-title">@Messages(constants.Form.VERIFY_TRADER)</h4>
     </div>
     <div>
-    <div class="latest_card-body">
+    <div class="latest_card-body ml-cb">
     @CSRF.formField
     @inputText(verifyTraderForm(constants.Form.ACL_ADDRESS).copy(value = Some(aclAddress)), '_label -> Messages(constants.Form.ACL_ADDRESS),
         'class -> "form-control",'placeholder->Messages(constants.Form.ACL_ADDRESS),'required->true)

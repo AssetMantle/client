@@ -26,6 +26,8 @@ class AccountTokens @Inject()(actorSystem: ActorSystem, shutdownActors: Shutdown
 
   val db = databaseConfig.db
 
+  private val ec:ExecutionContext= actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
+
   private val sessionTokenTimeout: Long = configuration.get[Long]("sessionToken.timeout")
 
   private val logger: Logger = Logger(this.getClass)
@@ -176,6 +178,6 @@ class AccountTokens @Inject()(actorSystem: ActorSystem, shutdownActors: Shutdown
       shutdownActors.shutdown(constants.Module.ACTOR_MAIN_ORDER, id)
     }
     Service.resetSessionTokenTimeByIds(ids)
-  }
+  }(ec)
 }
 

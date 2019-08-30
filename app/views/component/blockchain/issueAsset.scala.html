@@ -8,7 +8,7 @@
         <h4 class="latest_card-title">@Messages(constants.Form.ISSUE_ASSET)</h4>
     </div>
     <div>
-    <div class="latest_card-body">
+    <div class="latest_card-body ml-cb">
     @CSRF.formField
     @inputText(issueAssetForm(constants.Form.FROM), '_label -> Messages(constants.Form.FROM),'class -> "form-control",
         'placeholder->Messages(constants.Form.FROM),'required->true)
@@ -24,8 +24,12 @@
         'class -> "form-control",'placeholder->Messages(constants.Form.QUANTITY_UNIT),'required->true)
     @inputText(issueAssetForm(constants.Form.ASSET_QUANTITY), '_label -> Messages(constants.Form.ASSET_QUANTITY),
         'class -> "form-control",'placeholder->Messages(constants.Form.ASSET_QUANTITY),'required->true)
-    @checkbox(issueAssetForm(constants.Form.MODERATED), '_label -> Messages(constants.Form.MODERATED),
-        'class -> "form-control",'placeholder->Messages(constants.Form.MODERATED),'required->true)
+        <div class="input-group-prepend">
+            @checkbox(issueAssetForm(constants.Form.MODERATED))
+            <span class="input-group-text">
+            @Messages(constants.Form.MODERATED)
+            </span>
+        </div>
     @inputText(issueAssetForm(constants.Form.TAKER_ADDRESS), '_label -> Messages(constants.Form.TAKER_ADDRESS),
         'class -> "form-control",'placeholder->Messages(constants.Form.TAKER_ADDRESS),'required->true))
     @inputText(issueAssetForm(constants.Form.MODE), '_label -> Messages(constants.Form.MODE),'class -> "form-control"
