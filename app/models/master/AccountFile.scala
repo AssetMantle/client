@@ -11,7 +11,26 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class AccountFile(id: String, documentType: String, fileName: String, file: Option[Array[Byte]])
+abstract class Document {
+  def getDocumentType: String
+
+  def getFileName: String
+
+  def getFile: Option[Array[Byte]]
+
+  def getStatus: Option[Boolean]
+}
+
+case class AccountFile(id: String, documentType: String, fileName: String, file: Option[Array[Byte]]) extends Document {
+
+  def getDocumentType: String = documentType
+
+  def getFileName: String = fileName
+
+  def getFile: Option[Array[Byte]] = file
+
+  def getStatus: Option[Boolean] = Option(true)
+}
 
 @Singleton
 class AccountFiles @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
@@ -79,6 +98,8 @@ class AccountFiles @Inject()(protected val databaseConfigProvider: DatabaseConfi
 
   private def checkByIdAndDocumentType(id: String, documentType: String): Future[Boolean] = db.run(accountFileTable.filter(_.id === id).filter(_.documentType === documentType).exists.result)
 
+  private def checkByIdAndFileName(id: String, fileName: String): Future[Boolean] = db.run(accountFileTable.filter(_.id === id).filter(_.fileName === fileName).exists.result)
+
   private[models] class AccountFileTable(tag: Tag) extends Table[AccountFile](tag, "AccountFile") {
 
     def * = (id, documentType, fileName, file.?) <> (AccountFile.tupled, AccountFile.unapply)
@@ -108,6 +129,8 @@ class AccountFiles @Inject()(protected val databaseConfigProvider: DatabaseConfi
     def checkFileExists(id: String, documentType: String): Boolean = Await.result(checkByIdAndDocumentType(id = id, documentType = documentType), Duration.Inf)
 
     def getProfilePicture(id: String): Array[Byte] = Await.result(getFileByIdDocumentType(id = id, documentType = constants.File.PROFILE_PICTURE), Duration.Inf)
+
+    def checkFileNameExists(id: String, fileName: String): Boolean = Await.result(checkByIdAndFileName(id = id, fileName = fileName), Duration.Inf)
   }
 
 }

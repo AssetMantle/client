@@ -11,7 +11,16 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class TraderKYC(id: String, documentType: String, zoneStatus: Option[Boolean], organizationStatus: Option[Boolean], fileName: String, file: Option[Array[Byte]])
+case class TraderKYC(id: String, documentType: String, zoneStatus: Option[Boolean], organizationStatus: Option[Boolean], fileName: String, file: Option[Array[Byte]]) extends Document {
+
+  def getDocumentType: String = documentType
+
+  def getFileName: String = fileName
+
+  def getFile: Option[Array[Byte]] = file
+
+  def getStatus: Option[Boolean] = Option(zoneStatus.getOrElse(false) && organizationStatus.getOrElse(false))
+}
 
 @Singleton
 class TraderKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
@@ -108,6 +117,8 @@ class TraderKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfigP
 
   private def checkByIdAndDocumentType(id: String, documentType: String): Future[Boolean] = db.run(traderKYCTable.filter(_.id === id).filter(_.documentType === documentType).exists.result)
 
+  private def checkByIdAndFileName(id: String, fileName: String): Future[Boolean] = db.run(traderKYCTable.filter(_.id === id).filter(_.fileName === fileName).exists.result)
+
   private[models] class TraderKYCTable(tag: Tag) extends Table[TraderKYC](tag, "TraderKYC") {
 
     def * = (id, documentType, zoneStatus.?, organizationStatus.?, fileName, file.?) <> (TraderKYC.tupled, TraderKYC.unapply)
@@ -156,6 +167,7 @@ class TraderKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfigP
 
     def checkFileExists(id: String, documentType: String): Boolean = Await.result(checkByIdAndDocumentType(id = id, documentType = documentType), Duration.Inf)
 
+    def checkFileNameExists(id: String, fileName: String): Boolean = Await.result(checkByIdAndFileName(id = id, fileName = fileName), Duration.Inf)
 
   }
   

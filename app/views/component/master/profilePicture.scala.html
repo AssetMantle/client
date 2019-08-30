@@ -1,0 +1,15 @@
+@import controllers.actions.LoginState
+
+@(profilePicture: Array[Byte] = Array[Byte]())(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
+
+<div class="profile_hover">
+    @if(profilePicture sameElements Array[Byte]()) {
+        <img id="profilePicture" class="profilePicture" src="@routes.Assets.versioned("images/defaultProfilePicture.jpg")" alt="@constants.Form.PROFILE_PICTURE">
+        <br>
+        <button id="profilePictureBottomUploadButton" class="bottom btn btn-default btn-sm" onclick="getForm(jsRoutes.controllers.FileController.uploadAccountFileForm('@constants.File.PROFILE_PICTURE'))">@Messages(constants.Form.UPLOAD)</button>
+    } else {
+        <img id="profilePicture" class="profilePicture" src="data:image/jpg;base64,@utilities.ImageProcess.decodeImageThumbnailData(profilePicture)" alt="@constants.Form.PROFILE_PICTURE">
+        <br>
+        <button id="profilePictureBottomUpdateButton" class="bottom btn btn-default btn-sm" onclick="getForm(jsRoutes.controllers.FileController.updateAccountFileForm('@constants.File.PROFILE_PICTURE'))">@Messages(constants.Form.UPDATE)</button>
+    }
+</div>

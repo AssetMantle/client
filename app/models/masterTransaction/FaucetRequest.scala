@@ -84,6 +84,8 @@ class FaucetRequests @Inject()(protected val databaseConfigProvider: DatabaseCon
     }
   }
 
+  private def verifyRequestById(id: String, accountID: String): Future[Boolean] = db.run(faucetRequestTable.filter(_.id === id).filter(_.accountID === accountID).exists.result)
+
   private[models] class FaucetRequestTable(tag: Tag) extends Table[FaucetRequest](tag, "FaucetRequest") {
 
     def * = (id, ticketID.?, accountID, amount, status.?, comment.?) <> (FaucetRequest.tupled, FaucetRequest.unapply)
@@ -115,6 +117,8 @@ class FaucetRequests @Inject()(protected val databaseConfigProvider: DatabaseCon
     def delete(id: String): Int = Await.result(deleteByID(id), Duration.Inf)
 
     def getStatus(id: String): Option[Boolean] = Await.result(getStatusByID(id), Duration.Inf)
+
+    def verifyREquest(id: String, accountID: String): Boolean = Await.result(verifyRequestById(id = id, accountID = accountID), Duration.Inf)
 
   }
 

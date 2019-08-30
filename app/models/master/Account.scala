@@ -85,6 +85,8 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     }
   }
 
+  private def validateLoginByIDAndSecretHash(id: String, secretHash: String): Future[Boolean] = db.run(accountTable.filter(_.id === id).filter(_.secretHash === secretHash).exists.result)
+
   private def getIDsByAddresses(addresses: Seq[String]): Future[Seq[String]] = db.run(accountTable.filter(_.accountAddress.inSet(addresses)).map(_.id).result)
 
   private def getAddressByIds(ids: Seq[String]): Future[Seq[String]] = db.run(accountTable.filter(_.id.inSet(ids)).map(_.accountAddress).result)
@@ -135,6 +137,16 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     }
   }
 
+  private def updatePasswordByID(id: String, secretHash: String): Future[Int] = db.run(accountTable.filter(_.id === id).map(_.secretHash).update(secretHash).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
   private def checkById(id: String): Future[Boolean] = db.run(accountTable.filter(_.id === id).exists.result)
 
   private def deleteById(id: String)= db.run(accountTable.filter(_.id === id).delete.asTry).map {
@@ -168,6 +180,10 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
   object Service {
 
     def validateLoginAndGetStatus(username: String, password: String): String = Await.result(getStatusByIDAndSecretHash(username, util.hashing.MurmurHash3.stringHash(password).toString), Duration.Inf)
+
+    def validateLogin(username: String, password: String): Boolean = Await.result(validateLoginByIDAndSecretHash(id = username, secretHash = util.hashing.MurmurHash3.stringHash(password).toString), Duration.Inf)
+
+    def updatePassword(username:String, newPassword: String): Int = Await.result(updatePasswordByID(id = username, secretHash = util.hashing.MurmurHash3.stringHash(newPassword).toString), Duration.Inf)
 
     def checkUsernameAvailable(username: String): Boolean = !Await.result(checkById(username), Duration.Inf)
 
