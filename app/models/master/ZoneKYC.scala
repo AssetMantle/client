@@ -12,7 +12,12 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class ZoneKYC(id: String, documentType: String, status: Option[Boolean], fileName: String, file: Option[Array[Byte]]) extends Document
+case class ZoneKYC(id: String, documentType: String, fileName: String, file: Option[Array[Byte]], status: Option[Boolean]) extends Document[ZoneKYC]{
+
+  def updateFile(newFile: Option[Array[Byte]]): ZoneKYC = ZoneKYC(id = id, documentType = documentType, fileName = fileName, file = newFile, status = status)
+
+  def updateFileName(newFileName: String): ZoneKYC = ZoneKYC(id = id, documentType = documentType, fileName = newFileName, file = file, status = status)
+}
 
 @Singleton
 class ZoneKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
@@ -48,6 +53,14 @@ class ZoneKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
   }
 
   private def findByIdDocumentType(id: String, documentType: String): Future[ZoneKYC] = db.run(zoneKYCTable.filter(_.id === id).filter(_.documentType === documentType).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def getFileNameByIdDocumentType(id: String, documentType: String): Future[String] = db.run(zoneKYCTable.filter(_.id === id).filter(_.documentType === documentType).map(_.fileName).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -93,7 +106,7 @@ class ZoneKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   private[models] class ZoneKYCTable(tag: Tag) extends Table[ZoneKYC](tag, "ZoneKYC") {
 
-    def * = (id, documentType, status.?, fileName, file.?) <> (ZoneKYC.tupled, ZoneKYC.unapply)
+    def * = (id, documentType, fileName, file.?, status.?) <> (ZoneKYC.tupled, ZoneKYC.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
@@ -109,11 +122,13 @@ class ZoneKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   object Service {
 
-    def create(id: String, documentType: String, fileName: String, file: Option[Array[Byte]]): String = Await.result(add(ZoneKYC(id = id, documentType = documentType, status = null, fileName = fileName, file = file)), Duration.Inf)
+    def create(zoneKYC: ZoneKYC): String = Await.result(add(ZoneKYC(id = zoneKYC.id, documentType = zoneKYC.documentType, fileName = zoneKYC.fileName, file = zoneKYC.file, status = None)), Duration.Inf)
 
-    def updateOldDocument(id: String, documentType: String, fileName: String, file: Option[Array[Byte]]): Int = Await.result(upsert(ZoneKYC(id = id, documentType = documentType, status = null, fileName = fileName, file = file)), Duration.Inf)
+    def updateOldDocument(zoneKYC: ZoneKYC): Int = Await.result(upsert(ZoneKYC(id = zoneKYC.id, documentType = zoneKYC.documentType, fileName = zoneKYC.fileName, file = zoneKYC.file, status = None)), Duration.Inf)
 
     def get(id: String, documentType: String): ZoneKYC = Await.result(findByIdDocumentType(id = id, documentType = documentType), Duration.Inf)
+
+    def getFileName(id: String, documentType: String): String = Await.result(getFileNameByIdDocumentType(id = id, documentType = documentType), Duration.Inf)
 
     def getAllDocuments(id: String): Seq[ZoneKYC] = Await.result(getAllDocumentsById(id = id), Duration.Inf)
 

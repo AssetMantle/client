@@ -493,9 +493,9 @@ CREATE TABLE IF NOT EXISTS MASTER."ZoneKYC"
 (
   "id"           VARCHAR NOT NULL,
   "documentType" VARCHAR NOT NULL,
-  "status"       BOOLEAN,
   "fileName"     VARCHAR NOT NULL,
   "file"         BYTEA,
+  "status"       BOOLEAN,
   PRIMARY KEY ("id", "documentType")
 );
 
@@ -512,9 +512,9 @@ CREATE TABLE IF NOT EXISTS MASTER."OrganizationKYC"
 (
   "id"           VARCHAR NOT NULL,
   "documentType" VARCHAR NOT NULL,
-  "status"       BOOLEAN,
   "fileName"     VARCHAR NOT NULL,
   "file"         BYTEA,
+  "status"       BOOLEAN,
   PRIMARY KEY ("id", "documentType")
 );
 
@@ -522,9 +522,9 @@ CREATE TABLE IF NOT EXISTS MASTER."AccountKYC"
 (
   "id"           VARCHAR NOT NULL,
   "documentType" VARCHAR NOT NULL,
-  "status"       BOOLEAN,
   "fileName"     VARCHAR NOT NULL,
   "file"         BYTEA,
+  "status"       BOOLEAN,
   PRIMARY KEY ("id", "documentType")
 );
 
@@ -532,10 +532,10 @@ CREATE TABLE IF NOT EXISTS MASTER."TraderKYC"
 (
   "id"                 VARCHAR NOT NULL,
   "documentType"       VARCHAR NOT NULL,
-  "zoneStatus"         BOOLEAN,
-  "organizationStatus" BOOLEAN,
   "fileName"           VARCHAR NOT NULL,
   "file"               BYTEA,
+  "zoneStatus"         BOOLEAN,
+  "organizationStatus" BOOLEAN,
   PRIMARY KEY ("id", "documentType")
 );
 

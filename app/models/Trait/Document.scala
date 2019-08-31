@@ -1,6 +1,8 @@
 package models.Trait
 
-trait Document{
+trait Document[T]{
+
+  val id: String
 
   val documentType: String
 
@@ -9,4 +11,9 @@ trait Document{
   val file: Option[Array[Byte]]
 
   val status: Option[Boolean]
+
+  def updateFileName(newFileName: String): T
+
+  def updateFile(newFile: Option[Array[Byte]]): T
+
 }

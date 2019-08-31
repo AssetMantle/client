@@ -12,8 +12,13 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class AccountFile(id: String, documentType: String, fileName: String, file: Option[Array[Byte]]) extends Document {
-  override val status: Option[Boolean] = Option(true)
+case class AccountFile(id: String, documentType: String, fileName: String, file: Option[Array[Byte]]) extends Document[AccountFile] {
+
+  val status: Option[Boolean] = Option(true)
+
+  def updateFile(newFile: Option[Array[Byte]]): AccountFile = AccountFile(id = id, documentType = documentType, fileName = fileName, file = newFile)
+
+  def updateFileName(newFileName: String): AccountFile = AccountFile(id = id, documentType = documentType, fileName = newFileName, file = file)
 }
 
 @Singleton
@@ -50,6 +55,14 @@ class AccountFiles @Inject()(protected val databaseConfigProvider: DatabaseConfi
   }
 
   private def findByIdDocumentType(id: String, documentType: String): Future[AccountFile] = db.run(accountFileTable.filter(_.id === id).filter(_.documentType === documentType).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def getFileNameByIdDocumentType(id: String, documentType: String): Future[String] = db.run(accountFileTable.filter(_.id === id).filter(_.documentType === documentType).map(_.fileName).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -100,11 +113,13 @@ class AccountFiles @Inject()(protected val databaseConfigProvider: DatabaseConfi
 
   object Service {
 
-    def create(id: String, documentType: String, fileName: String, file: Option[Array[Byte]]): String = Await.result(add(AccountFile(id = id, documentType = documentType, fileName = fileName, file = file)), Duration.Inf)
+    def create(accountFile: AccountFile): String = Await.result(add(AccountFile(id = accountFile.id, documentType = accountFile.documentType, fileName = accountFile.fileName, file = accountFile.file)), Duration.Inf)
 
-    def updateOldDocument(id: String, documentType: String, fileName: String, file: Option[Array[Byte]]): Int = Await.result(upsert(AccountFile(id = id, documentType = documentType, fileName = fileName, file = file)), Duration.Inf)
+    def updateOldDocument(accountFile: AccountFile): Int = Await.result(upsert(AccountFile(id = accountFile.id, documentType = accountFile.documentType, fileName = accountFile.fileName, file = accountFile.file)), Duration.Inf)
 
     def get(id: String, documentType: String): AccountFile = Await.result(findByIdDocumentType(id = id, documentType = documentType), Duration.Inf)
+
+    def getFileName(id: String, documentType: String): String = Await.result(getFileNameByIdDocumentType(id = id, documentType = documentType), Duration.Inf)
 
     def getAllDocuments(id: String): Seq[AccountFile] = Await.result(getAllDocumentsById(id = id), Duration.Inf)
 
