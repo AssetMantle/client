@@ -100,6 +100,7 @@ object Response {
   val USERNAME_UNAVAILABLE = new Failure("USERNAME_UNAVAILABLE")
   val INVALID_USERNAME = new Failure("INVALID_USERNAME")
   val INVALID_PASSWORD = new Failure("INVALID_PASSWORD")
+  val NO_FILE = new Failure("NO_FILE")
 
   class Failure(private val response: String, private val actionController: JavaScriptReverseRoute = null) {
     val message: String = PREFIX + FAILURE_PREFIX + response

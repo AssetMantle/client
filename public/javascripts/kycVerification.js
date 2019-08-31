@@ -6,7 +6,8 @@ function verifyZoneKycDocument(accountID, documentType) {
         success: function (result) {
             document.getElementById('zoneKycDocumentStatus' + accountID + documentType).innerHTML = result;
             $('#buttonZoneKycDocumentStatus' + accountID + documentType).hide();
-            document.getElementById('kycDocumentStatus' + accountID + documentType).innerHTML = 'true';
+            document.getElementById('unverifiedDocumentStatus' + accountID + documentType).style.display = "none";
+            document.getElementById('verifiedDocumentStatus' + accountID + documentType).style.display = "block";
         },
         error: function (error) {
             document.getElementById('zoneKycDocumentStatus' + accountID + documentType).innerHTML = error;
@@ -20,9 +21,11 @@ function verifyOrganizationKycDocument(accountID, documentType) {
         url: route.url,
         type: route.type,
         success: function (result) {
+            const x = document.getElementById('verifiedDocumentStatus' + accountID + documentType);
             document.getElementById('organizationKycDocumentStatus' + accountID + documentType).innerHTML = result;
             $('#buttonOrganizationKycDocumentStatus' + accountID + documentType).hide();
-            document.getElementById('kycDocumentStatus' + accountID + documentType).innerHTML = 'true';
+            document.getElementById('unverifiedDocumentStatus' + accountID + documentType).style.display = "none";
+            document.getElementById('verifiedDocumentStatus' + accountID + documentType).style.display = "block";
         },
         error: function (error) {
             document.getElementById('organizationKycDocumentStatus' + accountID + documentType).innerHTML = error;
@@ -38,7 +41,8 @@ function organizationVerifyTraderKycDocument(accountID, documentType) {
         success: function (result) {
             document.getElementById('traderKycDocumentStatus' + accountID + documentType).innerHTML = result;
             $('#buttonTraderKycDocumentStatus' + accountID + documentType).hide();
-            document.getElementById('kycDocumentStatus' + accountID + documentType).innerHTML = 'true';
+            document.getElementById('unverifiedDocumentStatus' + accountID + documentType).style.display = "none";
+            document.getElementById('verifiedDocumentStatus' + accountID + documentType).style.display = "block";
         },
         error: function (error) {
             document.getElementById('traderKycDocumentStatus' + accountID + documentType).innerHTML = error;
@@ -54,7 +58,8 @@ function zoneVerifyTraderKycDocument(accountID, documentType) {
         success: function (result) {
             document.getElementById('traderKycDocumentStatus' + accountID + documentType).innerHTML = result;
             $('#buttonTraderKycDocumentStatus' + accountID + documentType).hide();
-            document.getElementById('kycDocumentStatus' + accountID + documentType).innerHTML = 'true';
+            document.getElementById('unverifiedDocumentStatus' + accountID + documentType).style.display = "none";
+            document.getElementById('verifiedDocumentStatus' + accountID + documentType).style.display = "block";
         },
         error: function (error) {
             document.getElementById('traderKycDocumentStatus' + accountID + documentType).innerHTML = error;
@@ -70,7 +75,8 @@ function rejectZoneKycDocument(accountID, documentType) {
         success: function (result) {
             document.getElementById('zoneKycDocumentStatus' + accountID + documentType).innerHTML = result;
             $('#buttonZoneKycDocumentStatus' + accountID + documentType).hide();
-            document.getElementById('kycDocumentStatus' + accountID + documentType).innerHTML = 'false';
+            document.getElementById('verifiedDocumentStatus' + accountID + documentType).style.display = "none";
+            document.getElementById('unverifiedDocumentStatus' + accountID + documentType).style.display = "block";
         },
         error: function (error) {
             document.getElementById('zoneKycDocumentStatus' + accountID + documentType).innerHTML = error;
@@ -86,7 +92,8 @@ function rejectOrganizationKycDocument(accountID, documentType) {
         success: function (result) {
             document.getElementById('organizationKycDocumentStatus' + accountID + documentType).innerHTML = result;
             $('#buttonOrganizationKycDocumentStatus' + accountID + documentType).hide();
-            document.getElementById('kycDocumentStatus' + accountID + documentType).innerHTML = 'false';
+            document.getElementById('verifiedDocumentStatus' + accountID + documentType).style.display = "none";
+            document.getElementById('unverifiedDocumentStatus' + accountID + documentType).style.display = "block";
         },
         error: function (error) {
             document.getElementById('organizationKycDocumentStatus' + accountID + documentType).innerHTML = error;
@@ -102,7 +109,8 @@ function organizationRejectTraderKycDocument(accountID, documentType) {
         success: function (result) {
             document.getElementById('traderKycDocumentStatus' + accountID + documentType).innerHTML = result;
             $('#buttonTraderKycDocumentStatus' + accountID + documentType).hide();
-            document.getElementById('kycDocumentStatus' + accountID + documentType).innerHTML = 'false';
+            document.getElementById('verifiedDocumentStatus' + accountID + documentType).style.display = "none";
+            document.getElementById('unverifiedDocumentStatus' + accountID + documentType).style.display = "block";
         },
         error: function (error) {
             document.getElementById('traderKycDocumentStatus' + accountID + documentType).innerHTML = error;
@@ -118,7 +126,8 @@ function zoneRejectTraderKycDocument(accountID, documentType) {
         success: function (result) {
             document.getElementById('traderKycDocumentStatus' + accountID + documentType).innerHTML = result;
             $('#buttonTraderKycDocumentStatus' + accountID + documentType).hide();
-            document.getElementById('kycDocumentStatus' + accountID + documentType).innerHTML = 'false';
+            document.getElementById('verifiedDocumentStatus' + accountID + documentType).style.display = "none";
+            document.getElementById('unverifiedDocumentStatus' + accountID + documentType).style.display = "block";
         },
         error: function (error) {
             document.getElementById('traderKycDocumentStatus' + accountID + documentType).innerHTML = error;
