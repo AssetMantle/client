@@ -4,7 +4,7 @@
 @(documents: Seq[Document[_]])(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
 
 @for(document <- documents){
-    @component.master.viewDocument(document){
+    @component.master.commonDocument(document){
         <a href="@routes.FileController.file(document.fileName, document.documentType)">@Messages(document.documentType)</a> <br>
     }(Html(""))
 }

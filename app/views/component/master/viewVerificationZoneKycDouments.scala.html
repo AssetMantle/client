@@ -4,7 +4,7 @@
 @(zoneKYCs: Seq[ZoneKYC])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 <div>
     @for(zoneKYC <- zoneKYCs) {
-        @component.master.viewDocument(zoneKYC){
+        @component.master.commonDocument(zoneKYC){
             <a href="@routes.FileController.genesisAccessedFile(zoneKYC.fileName, zoneKYC.documentType)">@Messages(zoneKYC.documentType)</a>
         } {
             <div id="zoneKycDocumentStatus@zoneKYC.id@zoneKYC.documentType"></div>

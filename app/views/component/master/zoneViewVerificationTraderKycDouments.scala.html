@@ -4,7 +4,7 @@
 @(traderKYCs: Seq[TraderKYC])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 <div>
     @for(traderKYC <- traderKYCs) {
-        @component.master.viewDocument(traderKYC){
+        @component.master.commonDocument(traderKYC){
             <a href="@routes.FileController.zoneAccessedTraderFile(traderKYC.id, traderKYC.fileName, traderKYC.documentType)">@traderKYC.documentType</a>
         }{
             <div id="traderKycDocumentStatus@traderKYC.id@traderKYC.documentType"></div>

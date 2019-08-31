@@ -4,7 +4,7 @@
 @(traderKYCs: Seq[TraderKYC])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 <div>
     @for(traderKYC <- traderKYCs) {
-        @component.master.viewDocument(traderKYC){
+        @component.master.commonDocument(traderKYC){
             <a href="@routes.FileController.organizationAccessedFile(traderKYC.id, traderKYC.fileName, traderKYC.documentType)">@Messages(traderKYC.documentType)</a>
         }{
             <div id="traderKycDocumentStatus@traderKYC.id@traderKYC.documentType"></div>
@@ -26,7 +26,7 @@
                     <span id="organizationViewUnverifiedTraderKYCDocumentZoneStatus@traderKYC.id@traderKYC.documentType" class="result failure"><i class="fa fa-times-circle-o" aria-hidden="true"></i></span>
                     <span id="organizationViewVerifiedTraderKYCDocumentZoneStatus@traderKYC.id@traderKYC.documentType" class="result success hidden"><i class="fa fa-check " aria-hidden="true"></i></span>
                 }
-                </san>
+                </span>
             </div>
             @traderKYC.organizationStatus.getOrElse(None) match {
                 case true => {
