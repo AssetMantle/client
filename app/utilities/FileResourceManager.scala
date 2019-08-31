@@ -78,8 +78,10 @@ class FileResourceManager @Inject()()(implicit exec: ExecutionContext, configura
       utilities.FileOperations.renameFile(path, name, fileName)
     } catch {
       case baseException: BaseException => logger.error(baseException.failure.message)
+        utilities.FileOperations.deleteFile(path, name)
         throw new BaseException(baseException.failure)
       case e: Exception => logger.error(e.getMessage)
+        utilities.FileOperations.deleteFile(path, name)
         throw new BaseException(constants.Response.GENERIC_EXCEPTION)
     }
   }
@@ -95,8 +97,10 @@ class FileResourceManager @Inject()()(implicit exec: ExecutionContext, configura
       utilities.FileOperations.renameFile(path, name, fileName)
     } catch {
       case baseException: BaseException => logger.error(baseException.failure.message)
+        utilities.FileOperations.deleteFile(path, name)
         throw new BaseException(baseException.failure)
       case e: Exception => logger.error(e.getMessage)
+        utilities.FileOperations.deleteFile(path, name)
         throw new BaseException(constants.Response.GENERIC_EXCEPTION)
     }
   }
