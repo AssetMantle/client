@@ -1,0 +1,39 @@
+@import controllers.actions.LoginState
+@import helper._
+@import views.companion.master.IssueAssetDocument
+
+@(issueAssetDocumentForm: Form[IssueAssetDocument.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+
+@form(action = routes.IssueAssetController.issueAssetRequest, 'onkeypress -> "validateForm(event,this)") {
+    @CSRF.formField
+    <div class="latest_card-header latest_card-header-primary text-center">
+        <h4 class="latest_card-title">@Messages(constants.Form.ISSUE_ASSET_REQUEST)</h4>
+    </div>
+    <div >
+        <div class="latest_card-body ml-cb">
+            @inputText(issueAssetDocumentForm(constants.Form.BILL_OF_LADING_NUMBER), '_label -> Messages(constants.Form.BILL_OF_LADING_NUMBER),
+                'class -> "form-control", 'placeholder -> Messages(constants.Form.BILL_OF_LADING_NUMBER), 'required -> true)
+            @inputText(issueAssetDocumentForm(constants.Form.PORT_OF_LOADING), '_label -> Messages(constants.Form.PORT_OF_LOADING),
+                'class -> "form-control", 'placeholder -> Messages(constants.Form.PORT_OF_LOADING), 'required -> true)
+            @inputText(issueAssetDocumentForm(constants.Form.SHIPPER_NAME), '_label -> Messages(constants.Form.SHIPPER_NAME),
+                'class -> "form-control", 'placeholder -> Messages(constants.Form.SHIPPER_NAME), 'required -> true)
+            @inputText(issueAssetDocumentForm(constants.Form.SHIPPER_ADDRESS), '_label -> Messages(constants.Form.SHIPPER_ADDRESS),
+                'class -> "form-control", 'placeholder -> Messages(constants.Form.SHIPPER_ADDRESS), 'required -> true)
+            @inputDate(issueAssetDocumentForm(constants.Form.SHIPMENT_DATE), '_label -> Messages(constants.Form.SHIPMENT_DATE),
+                'class -> "form-control",'placeholder->Messages(constants.Form.SHIPMENT_DATE), '_name ->  Messages(constants.Form.SHIPMENT_DATE), 'required->true)
+            @inputText(issueAssetDocumentForm(constants.Form.NOTIFY_PARTY_NAME), '_label -> Messages(constants.Form.NOTIFY_PARTY_NAME),
+                'class -> "form-control", 'placeholder -> Messages(constants.Form.TAKER_ADDRESS), 'required -> true)
+            @inputText(issueAssetDocumentForm(constants.Form.NOTIFY_PARTY_ADDRESS), '_label -> Messages(constants.Form.NOTIFY_PARTY_ADDRESS),
+                'class -> "form-control", 'placeholder -> Messages(constants.Form.NOTIFY_PARTY_ADDRESS), 'required -> true)
+            @select(issueAssetDocumentForm(constants.Form.DELIVERY_TERM), for(option <- constants.Option.DELIVERY_TERM.options)yield (option,Messages(option)), '_label -> Messages(constants.Form.DELIVERY_TERM),
+                'class -> "form-control", 'placeholder -> Messages(constants.Form.DELIVERY_TERM), '_default -> Messages(constants.Form.DELIVERY_TERM), 'required -> true)
+            @inputText(issueAssetDocumentForm(constants.Form.ASSET_QUANTITY), '_label -> Messages(constants.Form.ASSET_QUANTITY),
+                'class -> "form-control", 'placeholder -> Messages(constants.Form.ASSET_QUANTITY), 'required -> true)
+            @inputText(issueAssetDocumentForm(constants.Form.ASSET_PRICE), '_label -> Messages(constants.Form.ASSET_PRICE),
+                'class -> "form-control", 'placeholder -> Messages(constants.Form.ASSET_PRICE), 'required -> true)
+
+
+            <button type="button" class="btn btn-primary btn-sm" onclick="submitForm(this)">@Messages(constants.Form.ISSUE_ASSET_DOCUMENT)</button>
+        </div>
+    </div>
+}
