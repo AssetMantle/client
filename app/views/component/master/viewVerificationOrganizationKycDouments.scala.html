@@ -4,20 +4,23 @@
 @(organizationKYCs: Seq[OrganizationKYC])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 <div class="verify_buttons">
     @for(organizationKYC <- organizationKYCs) {
-        @component.master.viewDocuments(Seq(organizationKYC))
-        <div id="organizationKycDocumentStatus@organizationKYC.id@organizationKYC.documentType"></div>
-        @organizationKYC.status.getOrElse(None) match {
-            case true => {
-                <div id="buttonOrganizationKycDocumentStatus@organizationKYC.id@organizationKYC.documentType"><button class="btn btn-sm btn-danger" onclick="rejectOrganizationKycDocument('@organizationKYC.id', '@organizationKYC.documentType')">@Messages(constants.Form.REJECT)</button></div>
-            }
-            case false => {
-                <div id="buttonOrganizationKycDocumentStatus@organizationKYC.id@organizationKYC.documentType"><button class="btn btn-sm btn-success" onclick="verifyOrganizationKycDocument('@organizationKYC.id', '@organizationKYC.documentType')">@Messages(constants.Form.APPROVE)</button></div>
-            }
-            case _ => {
-                <div id="buttonOrganizationKycDocumentStatus@organizationKYC.id@organizationKYC.documentType">
-                    <button class="btn btn-sm btn-success" onclick="verifyOrganizationKycDocument('@organizationKYC.id', '@organizationKYC.documentType')">@Messages(constants.Form.APPROVE)</button>
-                    <button class="btn btn-sm btn-danger" onclick="rejectOrganizationKycDocument('@organizationKYC.id', '@organizationKYC.documentType')">@Messages(constants.Form.REJECT)</button>
-                </div>
+        @component.master.viewDocument(organizationKYC){
+            <a href="@routes.FileController.zoneAccessedOrganizationFile(organizationKYC.id, organizationKYC.fileName, organizationKYC.documentType)">@Messages(organizationKYC.documentType)</a>
+        } {
+            <div id="organizationKycDocumentStatus@organizationKYC.id@organizationKYC.documentType"></div>
+            @organizationKYC.status.getOrElse(None) match {
+                case true => {
+                    <div id="buttonOrganizationKycDocumentStatus@organizationKYC.id@organizationKYC.documentType"><button class="btn btn-sm btn-danger" onclick="rejectOrganizationKycDocument('@organizationKYC.id', '@organizationKYC.documentType')">@Messages(constants.Form.REJECT)</button></div>
+                }
+                case false => {
+                    <div id="buttonOrganizationKycDocumentStatus@organizationKYC.id@organizationKYC.documentType"><button class="btn btn-sm btn-success" onclick="verifyOrganizationKycDocument('@organizationKYC.id', '@organizationKYC.documentType')">@Messages(constants.Form.APPROVE)</button></div>
+                }
+                case _ => {
+                    <div id="buttonOrganizationKycDocumentStatus@organizationKYC.id@organizationKYC.documentType">
+                        <button class="btn btn-sm btn-success" onclick="verifyOrganizationKycDocument('@organizationKYC.id', '@organizationKYC.documentType')">@Messages(constants.Form.APPROVE)</button>
+                        <button class="btn btn-sm btn-danger" onclick="rejectOrganizationKycDocument('@organizationKYC.id', '@organizationKYC.documentType')">@Messages(constants.Form.REJECT)</button>
+                    </div>
+                }
             }
         }
     }
