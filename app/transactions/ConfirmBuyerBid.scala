@@ -7,7 +7,7 @@ import javax.inject.{Inject, Singleton}
 import play.api.libs.json.{Json, OWrites}
 import play.api.libs.ws.{WSClient, WSResponse}
 import play.api.{Configuration, Logger}
-import utilities.RequestEntity
+import transactions.Abstract.BaseRequestEntity
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
@@ -37,7 +37,7 @@ class ConfirmBuyerBid @Inject()(wsClient: WSClient)(implicit configuration: Conf
 
   case class BaseRequest(from: String, chain_id: String = chainID)
 
-  case class Request(base_req: BaseRequest, password: String, to: String, bid: String, time: String, pegHash: String, buyerContractHash: String,gas:String, mode: String) extends RequestEntity
+  case class Request(base_req: BaseRequest, password: String, to: String, bid: String, time: String, pegHash: String, buyerContractHash: String,gas:String, mode: String) extends BaseRequestEntity
 
   object Service {
     def post(request: Request): WSResponse = try {

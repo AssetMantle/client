@@ -7,7 +7,7 @@
 .input-group {
   position: relative;
   display: flex;
-  flex-wrap: wrap; // For form validation feedback
+  //flex-wrap: wrap; // For form validation feedback
   align-items: stretch;
   width: 100%;
 
@@ -61,7 +61,6 @@
 
 .input-group-prepend,
 .input-group-append {
-  display: flex;
 
   // Ensure buttons are always above inputs for more visually pleasing borders.
   // This isn't needed for `.input-group-text` since it shares the same border-color

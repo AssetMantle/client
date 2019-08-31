@@ -10,7 +10,7 @@
         <h4 class="latest_card-title">@Messages(constants.Form.ISSUE_ASSET_REQUEST)</h4>
     </div>
     <div >
-    <div class="latest_card-body">
+    <div class="latest_card-body ml-cb">
     @inputText(issueAssetRequestForm(constants.Form.DOCUMENT_HASH), '_label -> Messages(constants.Form.DOCUMENT_HASH),
         'class -> "form-control",'placeholder->Messages(constants.Form.DOCUMENT_HASH),'required->true)
     @inputText(issueAssetRequestForm(constants.Form.ASSET_TYPE), '_label -> Messages(constants.Form.ASSET_TYPE),
@@ -23,16 +23,16 @@
         'class -> "form-control",'placeholder->Messages(constants.Form.ASSET_QUANTITY),'required->true)
     @inputText(issueAssetRequestForm(constants.Form.TAKER_ADDRESS), '_label -> Messages(constants.Form.TAKER_ADDRESS),
         'class -> "form-control",'placeholder->Messages(constants.Form.TAKER_ADDRESS),'required->true)
-        <div class="input-group-prepend issue_asset">
+        <div class="input-group-prepend">
             @checkbox(issueAssetRequestForm(constants.Form.MODERATED), '_label -> Messages(constants.Form.MODERATED), 'id -> "moderated")
-
             <span class="input-group-text">
                 @Messages(constants.Form.MODERATED)
             </span>
-
         </div>
 
     <div id="moderatedIssueAssetRequestFormFields">
+        @inputText(issueAssetRequestForm(constants.Form.GAS), '_label -> Messages(constants.Form.GAS),
+            'class -> "form-control",'placeholder->Messages(constants.Form.GAS),'required->true)
         @inputPassword(issueAssetRequestForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD),
             'class -> "form-control",'placeholder->Messages(constants.Form.PASSWORD),'required->true)
     </div>

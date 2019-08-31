@@ -24,7 +24,6 @@ object FileOperations {
     try {
       val fullFileName = uploadPath + fileInfo.resumableFilename
       val partialFile = new RandomAccessFile(fullFileName, "rw")
-
       try {
         partialFile.seek((fileInfo.resumableChunkNumber - 1) * fileInfo.resumableChunkSize.toLong)
         partialFile.write(filePart, 0, filePart.length)
@@ -129,5 +128,7 @@ object FileOperations {
         throw new BaseException(constants.Response.GENERIC_EXCEPTION)
     }
   }
+
+  def fetchFile(path: String, fileName: String) = new java.io.File(path + fileName)
 
 }

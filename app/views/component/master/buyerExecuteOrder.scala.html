@@ -15,7 +15,9 @@
         'class -> "form-control",'placeholder->Messages(constants.Form.FIAT_PROOF_HASH),'required->true)
     @inputText(buyerExecuteOrderForm(constants.Form.PEG_HASH).copy(value = Some(pegHash)), '_label -> Messages(constants.Form.PEG_HASH),
         'class -> "form-control",'placeholder->Messages(constants.Form.PEG_HASH),'required->true)
-    @inputPassword(buyerExecuteOrderForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD),
+        @inputText(buyerExecuteOrderForm(constants.Form.GAS), '_label -> Messages(constants.Form.GAS),
+            'class -> "form-control",'placeholder->Messages(constants.Form.GAS),'required->true)
+        @inputPassword(buyerExecuteOrderForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD),
         'class -> "form-control",'placeholder->Messages(constants.Form.PASSWORD),'required->true)
 
     @if(buyerExecuteOrderForm.hasGlobalErrors) {

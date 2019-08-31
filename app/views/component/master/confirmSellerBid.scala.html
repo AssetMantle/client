@@ -22,7 +22,9 @@
         'class -> "form-control",'placeholder->Messages(constants.Form.PEG_HASH),'required->true)
     @inputText(confirmSellerBidForm(constants.Form.SELLER_CONTRACT_HASH), '_label -> Messages(constants.Form.SELLER_CONTRACT_HASH),'class -> "form-control",
         'placeholder->Messages(constants.Form.SELLER_CONTRACT_HASH),'required->true)
-    @inputPassword(confirmSellerBidForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD),'class -> "form-control",
+        @inputText(confirmSellerBidForm(constants.Form.GAS), '_label -> Messages(constants.Form.GAS),
+            'class -> "form-control",'placeholder->Messages(constants.Form.GAS),'required->true)
+        @inputPassword(confirmSellerBidForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD),'class -> "form-control",
         'placeholder->Messages(constants.Form.PASSWORD),'required->true)
 
     @if(confirmSellerBidForm.hasGlobalErrors) {

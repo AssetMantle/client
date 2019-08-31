@@ -544,8 +544,8 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
     implicit request =>
       try {
         documentType match {
-          case constants.File.BANK_DETAILS => withUserLoginAction.Ok.sendFile(new java.io.File(uploadZoneKycBankDetailsPath + fileName))
-          case constants.File.IDENTIFICATION => withUserLoginAction.Ok.sendFile(new java.io.File(uploadZoneKycIdentificationPath + fileName))
+          case constants.File.BANK_DETAILS => withUserLoginAction.Ok.sendFile(utilities.FileOperations.fetchFile(path = uploadZoneKycBankDetailsPath, fileName = fileName))
+          case constants.File.IDENTIFICATION => withUserLoginAction.Ok.sendFile(utilities.FileOperations.fetchFile(path = uploadZoneKycIdentificationPath, fileName = fileName))
           case _ => Unauthorized
         }
       } catch {
@@ -559,8 +559,8 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
       try {
         if (masterOrganizations.Service.getByAccountID(accountID).zoneID == masterZones.Service.getZoneId(loginState.username)) {
           documentType match {
-            case constants.File.BANK_DETAILS => withUserLoginAction.Ok.sendFile(new java.io.File(uploadOrganizationKycBankDetailsPath + fileName))
-            case constants.File.IDENTIFICATION => withUserLoginAction.Ok.sendFile(new java.io.File(uploadOrganizationKycIdentificationPath + fileName))
+            case constants.File.BANK_DETAILS => withUserLoginAction.Ok.sendFile(utilities.FileOperations.fetchFile(path = uploadOrganizationKycBankDetailsPath, fileName = fileName))
+            case constants.File.IDENTIFICATION => withUserLoginAction.Ok.sendFile(utilities.FileOperations.fetchFile(path = uploadOrganizationKycIdentificationPath, fileName = fileName))
             case _ => Unauthorized
           }
         } else {
@@ -577,7 +577,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
       try {
         if (masterTraders.Service.getByAccountID(accountID).zoneID == masterZones.Service.getZoneId(loginState.username)) {
           documentType match {
-            case constants.File.IDENTIFICATION => withUserLoginAction.Ok.sendFile(new java.io.File(uploadTraderKycIdentificationPath + fileName))
+            case constants.File.IDENTIFICATION => withUserLoginAction.Ok.sendFile(utilities.FileOperations.fetchFile(path = uploadTraderKycIdentificationPath, fileName = fileName))
             case _ => Unauthorized
           }
         } else {
@@ -594,7 +594,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
       try {
         if (masterTraders.Service.getByAccountID(accountID).organizationID == masterOrganizations.Service.getByAccountID(loginState.username).id) {
           documentType match {
-            case constants.File.IDENTIFICATION => withUserLoginAction.Ok.sendFile(new java.io.File(uploadTraderKycIdentificationPath + fileName))
+            case constants.File.IDENTIFICATION => withUserLoginAction.Ok.sendFile(utilities.FileOperations.fetchFile(path = uploadTraderKycIdentificationPath, fileName = fileName))
             case _ => Unauthorized
           }
         } else {
@@ -685,11 +685,11 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
           case constants.User.USER => if (masterAccountKYCs.Service.checkFileNameExists(id = loginState.username, fileName = fileName)) fileResourceManager.getAccountKycFilePath(documentType) else throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION)
           case _ => if (masterAccountFiles.Service.checkFileNameExists(id = loginState.username, fileName = fileName)) fileResourceManager.getAccountFilePath(documentType) else throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION)
         }
-        Ok.sendFile(new java.io.File(path + fileName))
+        Ok.sendFile(utilities.FileOperations.fetchFile(path = path, fileName = fileName))
       } catch {
-        case baseException: BaseException => BadRequest(Messages(baseException.failure.message))
-        case _: NoSuchFileException => BadRequest(Messages(constants.Response.NO_SUCH_FILE_EXCEPTION.message))
-        case _: Exception => BadRequest(Messages(constants.Response.GENERIC_EXCEPTION.message))
+        case baseException: BaseException => InternalServerError(Messages(baseException.failure.message))
+        case _: NoSuchFileException => InternalServerError(Messages(constants.Response.NO_SUCH_FILE_EXCEPTION.message))
+        case _: Exception => InternalServerError(Messages(constants.Response.GENERIC_EXCEPTION.message))
       }
   }
 

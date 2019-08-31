@@ -102,7 +102,7 @@ class SellerExecuteOrderController @Inject()(messagesControllerComponents: Messa
       },
       sellerExecuteOrderData => {
         try {
-          transactionsSellerExecuteOrder.Service.post(transactionsSellerExecuteOrder.Request(transactionsSellerExecuteOrder.BaseRequest(from = sellerExecuteOrderData.from), password = sellerExecuteOrderData.password, buyerAddress = sellerExecuteOrderData.buyerAddress, sellerAddress = sellerExecuteOrderData.sellerAddress, awbProofHash = sellerExecuteOrderData.awbProofHash, pegHash = sellerExecuteOrderData.pegHash,gas=moderatedSellerExecuteOrderData.gas.toString, mode = sellerExecuteOrderData.mode))
+          transactionsSellerExecuteOrder.Service.post(transactionsSellerExecuteOrder.Request(transactionsSellerExecuteOrder.BaseRequest(from = sellerExecuteOrderData.from), password = sellerExecuteOrderData.password, buyerAddress = sellerExecuteOrderData.buyerAddress, sellerAddress = sellerExecuteOrderData.sellerAddress, awbProofHash = sellerExecuteOrderData.awbProofHash, pegHash = sellerExecuteOrderData.pegHash,gas=sellerExecuteOrderData.gas.toString, mode = sellerExecuteOrderData.mode))
           Ok(views.html.index(successes = Seq(constants.Response.SELLER_ORDER_EXECUTED)))
         }
         catch {
