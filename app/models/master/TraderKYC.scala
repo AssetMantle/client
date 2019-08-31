@@ -12,8 +12,13 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class TraderKYC(id: String, documentType: String, zoneStatus: Option[Boolean], organizationStatus: Option[Boolean], fileName: String, file: Option[Array[Byte]]) extends Document{
-  override val status: Option[Boolean] = Option(zoneStatus.getOrElse(false) && organizationStatus.getOrElse(false))
+case class TraderKYC(id: String, documentType: String, fileName: String, file: Option[Array[Byte]], zoneStatus: Option[Boolean], organizationStatus: Option[Boolean]) extends Document[TraderKYC] {
+
+  val status: Option[Boolean] = Option(zoneStatus.getOrElse(false) && organizationStatus.getOrElse(false))
+
+  def updateFileName(newFileName: String): TraderKYC = TraderKYC(id = id, documentType = documentType, zoneStatus = zoneStatus, organizationStatus = organizationStatus, fileName = newFileName, file = file)
+
+  def updateFile(newFile: Option[Array[Byte]]): TraderKYC = TraderKYC(id = id, documentType = documentType, zoneStatus = zoneStatus, organizationStatus = organizationStatus, fileName = fileName, file = newFile)
 }
 
 @Singleton
@@ -50,6 +55,14 @@ class TraderKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfigP
   }
 
   private def findByIdDocumentType(id: String, documentType: String): Future[TraderKYC] = db.run(traderKYCTable.filter(_.id === id).filter(_.documentType === documentType).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def getFileNameByIdDocumentType(id: String, documentType: String): Future[String] = db.run(traderKYCTable.filter(_.id === id).filter(_.documentType === documentType).map(_.fileName).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -115,7 +128,7 @@ class TraderKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfigP
 
   private[models] class TraderKYCTable(tag: Tag) extends Table[TraderKYC](tag, "TraderKYC") {
 
-    def * = (id, documentType, zoneStatus.?, organizationStatus.?, fileName, file.?) <> (TraderKYC.tupled, TraderKYC.unapply)
+    def * = (id, documentType, fileName, file.?, zoneStatus.?, organizationStatus.?) <> (TraderKYC.tupled, TraderKYC.unapply)
     
     def id = column[String]("id", O.PrimaryKey)
 
@@ -133,11 +146,13 @@ class TraderKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfigP
 
   object Service {
 
-    def create(id: String, documentType: String, fileName: String, file: Option[Array[Byte]]): String = Await.result(add(TraderKYC(id = id, documentType = documentType, zoneStatus = null, organizationStatus = null, fileName = fileName, file = file)), Duration.Inf)
+    def create(traderKYC: TraderKYC): String = Await.result(add(TraderKYC(id = traderKYC.id, documentType = traderKYC.documentType, fileName = traderKYC.fileName, file = traderKYC.file, zoneStatus = None, organizationStatus = None)), Duration.Inf)
 
-    def updateOldDocument(id: String, documentType: String, fileName: String, file: Option[Array[Byte]]): Int = Await.result(upsert(TraderKYC(id = id, documentType = documentType, zoneStatus = null, organizationStatus = null, fileName = fileName, file = file)), Duration.Inf)
+    def updateOldDocument(traderKYC: TraderKYC): Int = Await.result(upsert(TraderKYC(id = traderKYC.id, documentType = traderKYC.documentType, fileName = traderKYC.fileName, file = traderKYC.file, zoneStatus = None, organizationStatus = None)), Duration.Inf)
 
     def get(id: String, documentType: String): TraderKYC = Await.result(findByIdDocumentType(id = id, documentType = documentType), Duration.Inf)
+
+    def getFileName(id: String, documentType: String): String = Await.result(getFileNameByIdDocumentType(id = id, documentType = documentType), Duration.Inf)
 
     def getAllDocuments(id: String): Seq[TraderKYC] = Await.result(getAllDocumentsById(id = id), Duration.Inf)
 
