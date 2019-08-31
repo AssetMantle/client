@@ -37,4 +37,7 @@ function copyToClipboard(elementId) {
     document.body.removeChild(aux);
 
 }
+$('.close-icon').on('click',function() {
+    $(this).closest('.card').fadeOut();
+})
 
