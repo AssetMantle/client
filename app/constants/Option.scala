@@ -4,7 +4,7 @@ package constants
 object Option {
   class DropdownOption(val options: Seq[String])
 
-  val COMMODITY_OPTIONS = new DropdownOption(Seq("Oil", "Coal", "Gold", "Wheat"))
+  val ASSET_TYPE = new DropdownOption(Seq("Oil", "Coal", "Gold", "Wheat"))
 
   val DELIVERY_TERM = new DropdownOption(Seq("FOB", "CIF", "CFR"))
 

@@ -12,13 +12,13 @@ import slick.jdbc.JdbcProfile
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
-import scala.util.{Failure, Random, Success}
+import scala.util.{Failure, Success}
 
 case class IssueAssetRequest(id: String, ticketID: Option[String], pegHash: Option[String], accountID: String, documentHash: String, assetType: String, quantityUnit: String, assetQuantity: Int, assetPrice: Int, takerAddress: Option[String], shipmentDetails: String, physicalDocumentsHandledVia: Option[String], paymentTerms: Option[String], status: String, comment: Option[String])
 
 object ShipmentDetails{
 
-  case class ShipmentDetails(deliveryTerm: String, tradeType: String, portOfLoading: String, portOfDischarge: String, shipmentDate: Date)
+  case class ShipmentDetails(commodityName: String, quality: String, deliveryTerm: String, tradeType: String, portOfLoading: String, portOfDischarge: String, shipmentDate: Date)
 
   implicit val oblReads: Reads[ShipmentDetails] = Json.reads[ShipmentDetails]
   implicit val oblWrites: OWrites[ShipmentDetails] = Json.writes[ShipmentDetails]
@@ -132,8 +132,8 @@ class IssueAssetRequests @Inject()(protected val databaseConfigProvider: Databas
 
   object Service {
 
-    def create(id: String, ticketID: Option[String], pegHash: Option[String], accountID: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, takerAddress: Option[String], deliveryTerm:String, tradeType:String, portOfLoading: String, portOfDischarge: String, shipmentDate: Date, physicalDocumentsHandledVia: Option[String], paymentTerms: Option[String], status: String): String =
-      Await.result(add(IssueAssetRequest(id = id, ticketID = ticketID, pegHash = pegHash, accountID = accountID, documentHash = documentHash, assetType = assetType, quantityUnit = quantityUnit, assetQuantity = assetQuantity, assetPrice = assetPrice, takerAddress = takerAddress, shipmentDetails = Json.toJson(ShipmentDetails.ShipmentDetails(deliveryTerm,tradeType,portOfLoading,portOfDischarge,shipmentDate)).toString(), physicalDocumentsHandledVia = physicalDocumentsHandledVia, paymentTerms = paymentTerms, status = status, comment = null)), Duration.Inf)
+    def create(id: String, ticketID: Option[String], pegHash: Option[String], accountID: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, takerAddress: Option[String], commodityName: String, quality: String, deliveryTerm:String, tradeType:String, portOfLoading: String, portOfDischarge: String, shipmentDate: Date, physicalDocumentsHandledVia: Option[String], paymentTerms: Option[String], status: String): String =
+      Await.result(add(IssueAssetRequest(id = id, ticketID = ticketID, pegHash = pegHash, accountID = accountID, documentHash = documentHash, assetType = assetType, quantityUnit = quantityUnit, assetQuantity = assetQuantity, assetPrice = assetPrice, takerAddress = takerAddress, shipmentDetails = Json.toJson(ShipmentDetails.ShipmentDetails(commodityName, quality, deliveryTerm, tradeType, portOfLoading, portOfDischarge, shipmentDate)).toString(), physicalDocumentsHandledVia = physicalDocumentsHandledVia, paymentTerms = paymentTerms, status = status, comment = null)), Duration.Inf)
 
     def accept(id: String, ticketID: String): Int = Await.result(updateTicketIDAndStatusByID(id, ticketID, status = constants.Status.Asset.LISTED_FOR_TRADE), Duration.Inf)
 

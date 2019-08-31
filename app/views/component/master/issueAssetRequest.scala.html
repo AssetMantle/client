@@ -13,8 +13,8 @@
         <div class="latest_card-body ml-cb">
             @inputText(issueAssetRequestForm(constants.Form.DOCUMENT_HASH), '_label -> Messages(constants.Form.DOCUMENT_HASH),
                 'class -> "form-control", 'placeholder -> Messages(constants.Form.DOCUMENT_HASH), 'required -> true)
-            @inputText(issueAssetRequestForm(constants.Form.ASSET_TYPE), '_label -> Messages(constants.Form.ASSET_TYPE),
-                'class -> "form-control", 'placeholder -> Messages(constants.Form.ASSET_TYPE), 'required -> true)
+            @select(issueAssetRequestForm(constants.Form.ASSET_TYPE), for(option <- constants.Option.ASSET_TYPE.options)yield (option,Messages(option)), '_label -> Messages(constants.Form.ASSET_TYPE),
+                'class -> "form-control", 'placeholder -> Messages(constants.Form.ASSET_TYPE), '_default -> Messages(constants.Form.ASSET_TYPE), 'required -> true)
             @inputText(issueAssetRequestForm(constants.Form.QUANTITY_UNIT), '_label -> Messages(constants.Form.QUANTITY_UNIT),
                 'class -> "form-control", 'placeholder -> Messages(constants.Form.QUANTITY_UNIT), 'required -> true)
             @inputText(issueAssetRequestForm(constants.Form.ASSET_QUANTITY), '_label -> Messages(constants.Form.ASSET_QUANTITY),
@@ -23,31 +23,24 @@
                 'class -> "form-control", 'placeholder -> Messages(constants.Form.ASSET_PRICE), 'required -> true)
             @inputText(issueAssetRequestForm(constants.Form.TAKER_ADDRESS), '_label -> Messages(constants.Form.TAKER_ADDRESS),
                 'class -> "form-control", 'placeholder -> Messages(constants.Form.TAKER_ADDRESS), 'required -> true)
-            @select(issueAssetRequestForm(constants.Form.DELIVERY_TERM), Seq(("l","d"),("f","k")), '_label -> Messages(constants.Form.DELIVERY_TERM),
-                'class -> "form-control", 'placeholder -> Messages(constants.Form.DELIVERY_TERM), 'required -> true)
-            @inputText(issueAssetRequestForm(constants.Form.TRADE_TYPE), '_label -> Messages(constants.Form.ASSET_QUANTITY),
-                'class -> "form-control",'placeholder->Messages(constants.Form.ASSET_QUANTITY),'required->true)
-            @inputText(issueAssetRequestForm(constants.Form.ASSET_QUANTITY), '_label -> Messages(constants.Form.ASSET_QUANTITY),
-                'class -> "form-control",'placeholder->Messages(constants.Form.ASSET_QUANTITY),'required->true)
-            @inputText(issueAssetRequestForm(constants.Form.ASSET_QUANTITY), '_label -> Messages(constants.Form.ASSET_QUANTITY),
-                'class -> "form-control",'placeholder->Messages(constants.Form.ASSET_QUANTITY),'required->true)
-            @inputText(issueAssetRequestForm(constants.Form.ASSET_QUANTITY), '_label -> Messages(constants.Form.ASSET_QUANTITY),
-                'class -> "form-control",'placeholder->Messages(constants.Form.ASSET_QUANTITY),'required->true)
-            @inputText(issueAssetRequestForm(constants.Form.ASSET_QUANTITY), '_label -> Messages(constants.Form.ASSET_QUANTITY),
-                'class -> "form-control",'placeholder->Messages(constants.Form.ASSET_QUANTITY),'required->true)
-            @inputText(issueAssetRequestForm(constants.Form.ASSET_QUANTITY), '_label -> Messages(constants.Form.ASSET_QUANTITY),
-                'class -> "form-control",'placeholder->Messages(constants.Form.ASSET_QUANTITY),'required->true)
-
-
-
-
-
-
-
-
-
-
-
+            @inputText(issueAssetRequestForm(constants.Form.COMMODITY_NAME), '_label -> Messages(constants.Form.COMMODITY_NAME),
+                'class -> "form-control", 'placeholder -> Messages(constants.Form.COMMODITY_NAME), 'required -> true)
+            @select(issueAssetRequestForm(constants.Form.QUALITY), for(option <- constants.Option.QUALITY.options)yield (option,Messages(option)), '_label -> Messages(constants.Form.QUALITY),
+                'class -> "form-control", 'placeholder -> Messages(constants.Form.QUALITY), '_default -> Messages(constants.Form.QUALITY), 'required -> true)
+            @select(issueAssetRequestForm(constants.Form.DELIVERY_TERM), for(option <- constants.Option.DELIVERY_TERM.options)yield (option,Messages(option)), '_label -> Messages(constants.Form.DELIVERY_TERM),
+                'class -> "form-control", 'placeholder -> Messages(constants.Form.DELIVERY_TERM), '_default -> Messages(constants.Form.DELIVERY_TERM), 'required -> true)
+            @select(issueAssetRequestForm(constants.Form.TRADE_TYPE), for(option <- constants.Option.TRADE_TYPE.options)yield (option,Messages(option)), '_label -> Messages(constants.Form.TRADE_TYPE),
+                'class -> "form-control",'placeholder->Messages(constants.Form.TRADE_TYPE),'_default -> Messages(constants.Form.TRADE_TYPE), 'required->true)
+            @inputText(issueAssetRequestForm(constants.Form.PORT_OF_LOADING), '_label -> Messages(constants.Form.PORT_OF_LOADING),
+                'class -> "form-control",'placeholder->Messages(constants.Form.PORT_OF_LOADING),'required->true)
+            @inputText(issueAssetRequestForm(constants.Form.PORT_OF_DISCHARGE), '_label -> Messages(constants.Form.PORT_OF_DISCHARGE),
+                'class -> "form-control",'placeholder->Messages(constants.Form.PORT_OF_DISCHARGE),'required->true)
+            @inputDate(issueAssetRequestForm(constants.Form.SHIPMENT_DATE), '_label -> Messages(constants.Form.SHIPMENT_DATE),
+                'class -> "form-control",'placeholder->Messages(constants.Form.SHIPMENT_DATE), '_name ->  Messages(constants.Form.SHIPMENT_DATE), 'required->true)
+            @select(issueAssetRequestForm(constants.Form.PHYSICAL_DOCUMENTS_HANDLED_VIA), for(option <- constants.Option.PHYSICAL_DOCUMENTS_HANDLED_VIA.options)yield (option,Messages(option)), '_label -> Messages(constants.Form.ASSET_QUANTITY),
+                'class -> "form-control",'placeholder->Messages(constants.Form.PHYSICAL_DOCUMENTS_HANDLED_VIA), '_default -> Messages(constants.Form.PHYSICAL_DOCUMENTS_HANDLED_VIA), 'required->true)
+            @select(issueAssetRequestForm(constants.Form.COMDEX_PAYMENT_TERMS), for(option <- constants.Option.COMDEX_PAYMENT_TERMS.options)yield (option,Messages(option)), '_label -> Messages(constants.Form.COMDEX_PAYMENT_TERMS),
+                'class -> "form-control",'placeholder->Messages(constants.Form.COMDEX_PAYMENT_TERMS), '_default -> Messages(constants.Form.COMDEX_PAYMENT_TERMS), 'required->true)
 
             <div class="input-group-prepend issue_asset">
                 @checkbox(issueAssetRequestForm(constants.Form.MODERATED), '_label -> Messages(constants.Form.MODERATED), 'id -> "moderated")

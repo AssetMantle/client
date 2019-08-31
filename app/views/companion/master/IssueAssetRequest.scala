@@ -16,6 +16,8 @@ object IssueAssetRequest {
       constants.FormField.ASSET_PRICE.name -> constants.FormField.ASSET_PRICE.field,
       constants.Form.MODERATED -> boolean,
       constants.FormField.TAKER_ADDRESS.name -> constants.FormField.TAKER_ADDRESS.field,
+      constants.FormField.COMMODITY_NAME.name -> constants.FormField.COMMODITY_NAME.field,
+      constants.FormField.QUALITY.name -> constants.FormField.QUALITY.field,
       constants.FormField.DELIVERY_TERM.name -> constants.FormField.DELIVERY_TERM.field,
       constants.FormField.TRADE_TYPE.name -> constants.FormField.TRADE_TYPE.field,
       constants.FormField.PORT_OF_LOADING.name -> constants.FormField.PORT_OF_LOADING.field,
@@ -27,7 +29,7 @@ object IssueAssetRequest {
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(documentHash: String, assetType: String, quantityUnit: String, assetQuantity: Int, assetPrice: Int, moderated: Boolean, takerAddress: String, deliveryTerm: String, tradeType: String, portOfLoading: String, portOfDischarge: String, shipmentDate: Date, physicalDocumentsHandledVia: String, comdexPaymentTerms: String, password: String)
+  case class Data(documentHash: String, assetType: String, quantityUnit: String, assetQuantity: Int, assetPrice: Int, moderated: Boolean, takerAddress: String, commodityName: String, quality: String, deliveryTerm: String, tradeType: String, portOfLoading: String, portOfDischarge: String, shipmentDate: Date, physicalDocumentsHandledVia: String, comdexPaymentTerms: String, password: String)
 
 }
 
