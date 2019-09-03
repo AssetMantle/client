@@ -9,6 +9,7 @@
     <div class="latest_card-header latest_card-header-primary text-center">
         <h4 class="latest_card-title">@Messages(constants.Form.ISSUE_ASSET_REQUEST)</h4>
     </div>
+    <script src="@routes.Assets.versioned("javascripts/showHideUploadUpdateButton.js")" type="text/javascript"></script>
     <div >
         <div class="latest_card-body ml-cb">
             @inputText(issueAssetDocumentForm(constants.Form.BILL_OF_LADING_NUMBER), '_label -> Messages(constants.Form.BILL_OF_LADING_NUMBER),
@@ -31,7 +32,6 @@
                 'class -> "form-control", 'placeholder -> Messages(constants.Form.ASSET_QUANTITY), 'required -> true)
             @inputText(issueAssetDocumentForm(constants.Form.ASSET_PRICE), '_label -> Messages(constants.Form.ASSET_PRICE),
                 'class -> "form-control", 'placeholder -> Messages(constants.Form.ASSET_PRICE), 'required -> true)
-
 
             <button type="button" class="btn btn-primary btn-sm" onclick="submitForm(this)">@Messages(constants.Form.ISSUE_ASSET_DOCUMENT)</button>
         </div>

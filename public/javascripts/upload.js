@@ -68,7 +68,6 @@ function uploadFile(uploadRoute, storeRoute, documentType) {
 }
 
 function updateFile(uploadRoute, updateRoute, documentType) {
-
     const rFile = new Resumable({
         target: uploadRoute(documentType).url,
         fileType: getFileTypes(documentType),

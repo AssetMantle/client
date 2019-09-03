@@ -10,6 +10,7 @@ import models.{blockchain, master}
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.libs.ws.WSClient
 import play.api.mvc._
+import play.api.routing.JavaScriptReverseRoute
 import play.api.{Configuration, Logger}
 import views.companion.master.FileUpload
 
@@ -299,11 +300,11 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
   }
 
   def uploadZoneKycForm(documentType: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.zoneKycFileUpload(documentType = documentType))
+    Ok(views.html.component.master.uploadFile(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadZoneKyc), utilities.String.getJsRouteFunction(routes.javascript.FileController.storeZoneKyc), documentType))
   }
 
   def updateZoneKycForm(documentType: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.zoneKycFileUpdate(documentType = documentType))
+    Ok(views.html.component.master.updateFile(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadZoneKyc), utilities.String.getJsRouteFunction(routes.javascript.FileController.updateZoneKyc) , documentType))
   }
 
   def uploadZoneKyc(documentType: String) = Action(parse.multipartFormData) { implicit request =>
