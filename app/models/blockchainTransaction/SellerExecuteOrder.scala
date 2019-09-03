@@ -17,8 +17,8 @@ import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class SellerExecuteOrder(from: String, buyerAddress: String, sellerAddress: String, awbProofHash: String, pegHash: String, status: Option[Boolean], txHash: Option[String], ticketID: String, mode: String, code: Option[String]) extends BaseTransaction[SellerExecuteOrder] {
-  def mutateTicketID(newTicketID: String): SellerExecuteOrder = SellerExecuteOrder(from = from, buyerAddress = buyerAddress, sellerAddress = sellerAddress, awbProofHash = awbProofHash, pegHash = pegHash, status = status, txHash, ticketID = newTicketID, mode = mode, code = code)
+case class SellerExecuteOrder(from: String, buyerAddress: String, sellerAddress: String, awbProofHash: String, pegHash: String,gas:Int,  status: Option[Boolean], txHash: Option[String], ticketID: String, mode: String, code: Option[String]) extends BaseTransaction[SellerExecuteOrder] {
+  def mutateTicketID(newTicketID: String): SellerExecuteOrder = SellerExecuteOrder(from = from, buyerAddress = buyerAddress, sellerAddress = sellerAddress, awbProofHash = awbProofHash, pegHash = pegHash,gas=gas, status = status, txHash, ticketID = newTicketID, mode = mode, code = code)
 }
 
 
@@ -28,6 +28,8 @@ class SellerExecuteOrders @Inject()(actorSystem: ActorSystem, transaction: utili
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_SELLER_EXECUTE_ORDER
 
   private implicit val logger: Logger = Logger(this.getClass)
+
+  private val schedulerExecutionContext:ExecutionContext= actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -111,7 +113,7 @@ class SellerExecuteOrders @Inject()(actorSystem: ActorSystem, transaction: utili
 
   private[models] class SellerExecuteOrderTable(tag: Tag) extends Table[SellerExecuteOrder](tag, "SellerExecuteOrder") {
 
-    def * = (from, buyerAddress, sellerAddress, awbProofHash, pegHash, status.?, txHash.?, ticketID, mode, code.?) <> (SellerExecuteOrder.tupled, SellerExecuteOrder.unapply)
+    def * = (from, buyerAddress, sellerAddress, awbProofHash, pegHash,gas, status.?, txHash.?, ticketID, mode, code.?) <> (SellerExecuteOrder.tupled, SellerExecuteOrder.unapply)
 
     def from = column[String]("from")
 
@@ -122,6 +124,8 @@ class SellerExecuteOrders @Inject()(actorSystem: ActorSystem, transaction: utili
     def awbProofHash = column[String]("awbProofHash")
 
     def pegHash = column[String]("pegHash")
+
+    def gas = column[Int]("gas")
 
     def status = column[Boolean]("status")
 
@@ -136,7 +140,7 @@ class SellerExecuteOrders @Inject()(actorSystem: ActorSystem, transaction: utili
 
   object Service {
 
-    def create(sellerExecuteOrder: SellerExecuteOrder): String = Await.result(add(SellerExecuteOrder(from = sellerExecuteOrder.from, buyerAddress = sellerExecuteOrder.buyerAddress, sellerAddress = sellerExecuteOrder.sellerAddress, awbProofHash = sellerExecuteOrder.awbProofHash, pegHash = sellerExecuteOrder.pegHash, status = sellerExecuteOrder.status, txHash = sellerExecuteOrder.txHash, ticketID = sellerExecuteOrder.ticketID, mode = sellerExecuteOrder.mode, code = sellerExecuteOrder.code)), Duration.Inf)
+    def create(sellerExecuteOrder: SellerExecuteOrder): String = Await.result(add(SellerExecuteOrder(from = sellerExecuteOrder.from, buyerAddress = sellerExecuteOrder.buyerAddress, sellerAddress = sellerExecuteOrder.sellerAddress, awbProofHash = sellerExecuteOrder.awbProofHash, pegHash = sellerExecuteOrder.pegHash, gas=sellerExecuteOrder.gas,status = sellerExecuteOrder.status, txHash = sellerExecuteOrder.txHash, ticketID = sellerExecuteOrder.ticketID, mode = sellerExecuteOrder.mode, code = sellerExecuteOrder.code)), Duration.Inf)
 
     def markTransactionSuccessful(ticketID: String, txHash: String): Int = Await.result(updateTxHashAndStatusOnTicketID(ticketID, Option(txHash), status = Option(true)), Duration.Inf)
 
@@ -196,6 +200,6 @@ class SellerExecuteOrders @Inject()(actorSystem: ActorSystem, transaction: utili
   if (kafkaEnabled || transactionMode != constants.Transactions.BLOCK_MODE) {
     actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
       transaction.ticketUpdater(Service.getTicketIDsOnStatus, Service.getTransactionHash, Utility.onSuccess, Utility.onFailure)
-    }
+    }(schedulerExecutionContext)
   }
 }

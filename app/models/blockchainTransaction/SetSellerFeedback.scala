@@ -17,8 +17,8 @@ import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class SetSellerFeedback(from: String, to: String, pegHash: String, rating: Int, status: Option[Boolean], txHash: Option[String], ticketID: String, mode: String, code: Option[String]) extends BaseTransaction[SetSellerFeedback] {
-  def mutateTicketID(newTicketID: String): SetSellerFeedback = SetSellerFeedback(from = from, to = to, pegHash = pegHash, rating = rating, status = status, txHash = txHash, ticketID = newTicketID, mode = mode, code = code)
+case class SetSellerFeedback(from: String, to: String, pegHash: String, rating: Int, gas: Int, status: Option[Boolean], txHash: Option[String], ticketID: String, mode: String, code: Option[String]) extends BaseTransaction[SetSellerFeedback] {
+  def mutateTicketID(newTicketID: String): SetSellerFeedback = SetSellerFeedback(from = from, to = to, pegHash = pegHash, rating = rating,gas=gas, status = status, txHash = txHash, ticketID = newTicketID, mode = mode, code = code)
 }
 
 
@@ -28,6 +28,8 @@ class SetSellerFeedbacks @Inject()(actorSystem: ActorSystem, transaction: utilit
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_SET_SELLER_FEEDBACK
 
   private implicit val logger: Logger = Logger(this.getClass)
+
+  private val schedulerExecutionContext:ExecutionContext= actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -111,7 +113,7 @@ class SetSellerFeedbacks @Inject()(actorSystem: ActorSystem, transaction: utilit
 
   private[models] class SetSellerFeedbackTable(tag: Tag) extends Table[SetSellerFeedback](tag, "SetSellerFeedback") {
 
-    def * = (from, to, pegHash, rating, status.?, txHash.?, ticketID, mode, code.?) <> (SetSellerFeedback.tupled, SetSellerFeedback.unapply)
+    def * = (from, to, pegHash, rating, gas, status.?, txHash.?, ticketID, mode, code.?) <> (SetSellerFeedback.tupled, SetSellerFeedback.unapply)
 
     def from = column[String]("from")
 
@@ -120,6 +122,8 @@ class SetSellerFeedbacks @Inject()(actorSystem: ActorSystem, transaction: utilit
     def pegHash = column[String]("pegHash")
 
     def rating = column[Int]("rating")
+
+    def gas = column[Int]("gas")
 
     def status = column[Boolean]("status")
 
@@ -134,7 +138,7 @@ class SetSellerFeedbacks @Inject()(actorSystem: ActorSystem, transaction: utilit
 
   object Service {
 
-    def create(setSellerFeedback: SetSellerFeedback): String = Await.result(add(SetSellerFeedback(from = setSellerFeedback.from, to = setSellerFeedback.to, pegHash = setSellerFeedback.pegHash, rating = setSellerFeedback.rating, status = setSellerFeedback.status, txHash = setSellerFeedback.txHash, ticketID = setSellerFeedback.ticketID, mode = setSellerFeedback.mode, code = setSellerFeedback.code)), Duration.Inf)
+    def create(setSellerFeedback: SetSellerFeedback): String = Await.result(add(SetSellerFeedback(from = setSellerFeedback.from, to = setSellerFeedback.to, pegHash = setSellerFeedback.pegHash, rating = setSellerFeedback.rating,gas=setSellerFeedback.gas, status = setSellerFeedback.status, txHash = setSellerFeedback.txHash, ticketID = setSellerFeedback.ticketID, mode = setSellerFeedback.mode, code = setSellerFeedback.code)), Duration.Inf)
 
     def getTicketIDsOnStatus(): Seq[String] = Await.result(getTicketIDsWithNullStatus, Duration.Inf)
 
@@ -155,7 +159,7 @@ class SetSellerFeedbacks @Inject()(actorSystem: ActorSystem, transaction: utilit
       try {
         Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
         val setSellerFeedback = Service.getTransaction(ticketID)
-        blockchainTraderFeedbackHistories.Service.update(setSellerFeedback.from, setSellerFeedback.to, setSellerFeedback.from, setSellerFeedback.pegHash, setSellerFeedback.rating.toString)
+        blockchainTraderFeedbackHistories.Service.update(setSellerFeedback.to, setSellerFeedback.to, setSellerFeedback.from, setSellerFeedback.pegHash, setSellerFeedback.rating.toString)
         blockchainAccounts.Service.markDirty(setSellerFeedback.from)
         pushNotification.sendNotification(masterAccounts.Service.getId(setSellerFeedback.to), constants.Notification.SUCCESS, blockResponse.txhash)
         pushNotification.sendNotification(masterAccounts.Service.getId(setSellerFeedback.from), constants.Notification.SUCCESS, blockResponse.txhash)
@@ -180,7 +184,7 @@ class SetSellerFeedbacks @Inject()(actorSystem: ActorSystem, transaction: utilit
   if (kafkaEnabled || transactionMode != constants.Transactions.BLOCK_MODE) {
     actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
       transaction.ticketUpdater(Service.getTicketIDsOnStatus, Service.getTransactionHash, Utility.onSuccess, Utility.onFailure)
-    }
+    }(schedulerExecutionContext)
   }
 
 }

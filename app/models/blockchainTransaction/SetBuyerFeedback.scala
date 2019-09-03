@@ -17,8 +17,8 @@ import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class SetBuyerFeedback(from: String, to: String, pegHash: String, rating: Int, status: Option[Boolean], txHash: Option[String], ticketID: String, mode: String, code: Option[String]) extends BaseTransaction[SetBuyerFeedback] {
-  def mutateTicketID(newTicketID: String): SetBuyerFeedback = SetBuyerFeedback(from = from, to = to, pegHash = pegHash, rating = rating, status = status, txHash = txHash, ticketID = newTicketID, mode = mode, code = code)
+case class SetBuyerFeedback(from: String, to: String, pegHash: String, rating: Int,gas:Int,  status: Option[Boolean], txHash: Option[String], ticketID: String, mode: String, code: Option[String]) extends BaseTransaction[SetBuyerFeedback] {
+  def mutateTicketID(newTicketID: String): SetBuyerFeedback = SetBuyerFeedback(from = from, to = to, pegHash = pegHash, rating = rating,gas=gas, status = status, txHash = txHash, ticketID = newTicketID, mode = mode, code = code)
 }
 
 
@@ -28,6 +28,8 @@ class SetBuyerFeedbacks @Inject()(actorSystem: ActorSystem, transaction: utiliti
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_SET_BUYER_FEEDBACK
 
   private implicit val logger: Logger = Logger(this.getClass)
+
+  private val schedulerExecutionContext:ExecutionContext= actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -110,7 +112,7 @@ class SetBuyerFeedbacks @Inject()(actorSystem: ActorSystem, transaction: utiliti
 
   private[models] class SetBuyerFeedbackTable(tag: Tag) extends Table[SetBuyerFeedback](tag, "SetBuyerFeedback") {
 
-    def * = (from, to, pegHash, rating, status.?, txHash.?, ticketID, mode, code.?) <> (SetBuyerFeedback.tupled, SetBuyerFeedback.unapply)
+    def * = (from, to, pegHash, rating,gas, status.?, txHash.?, ticketID, mode, code.?) <> (SetBuyerFeedback.tupled, SetBuyerFeedback.unapply)
 
     def from = column[String]("from")
 
@@ -119,6 +121,8 @@ class SetBuyerFeedbacks @Inject()(actorSystem: ActorSystem, transaction: utiliti
     def pegHash = column[String]("pegHash")
 
     def rating = column[Int]("rating")
+
+    def gas = column[Int]("gas")
 
     def status = column[Boolean]("status")
 
@@ -133,7 +137,7 @@ class SetBuyerFeedbacks @Inject()(actorSystem: ActorSystem, transaction: utiliti
 
   object Service {
 
-    def create(setBuyerFeedback: SetBuyerFeedback): String = Await.result(add(SetBuyerFeedback(from = setBuyerFeedback.from, to = setBuyerFeedback.to, pegHash = setBuyerFeedback.pegHash, rating = setBuyerFeedback.rating, status = setBuyerFeedback.status, txHash = setBuyerFeedback.txHash, ticketID = setBuyerFeedback.ticketID, mode = setBuyerFeedback.mode, code = setBuyerFeedback.code)), Duration.Inf)
+    def create(setBuyerFeedback: SetBuyerFeedback): String = Await.result(add(SetBuyerFeedback(from = setBuyerFeedback.from, to = setBuyerFeedback.to, pegHash = setBuyerFeedback.pegHash, rating = setBuyerFeedback.rating,gas=setBuyerFeedback.gas, status = setBuyerFeedback.status, txHash = setBuyerFeedback.txHash, ticketID = setBuyerFeedback.ticketID, mode = setBuyerFeedback.mode, code = setBuyerFeedback.code)), Duration.Inf)
 
     def getTicketIDsOnStatus(): Seq[String] = Await.result(getTicketIDsWithNullStatus, Duration.Inf)
 
@@ -179,7 +183,7 @@ class SetBuyerFeedbacks @Inject()(actorSystem: ActorSystem, transaction: utiliti
   if (kafkaEnabled || transactionMode != constants.Transactions.BLOCK_MODE) {
     actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
       transaction.ticketUpdater(Service.getTicketIDsOnStatus, Service.getTransactionHash, Utility.onSuccess, Utility.onFailure)
-    }
+    }(schedulerExecutionContext)
   }
 
 }

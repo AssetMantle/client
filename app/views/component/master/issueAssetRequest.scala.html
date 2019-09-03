@@ -31,6 +31,8 @@
         </div>
 
     <div id="moderatedIssueAssetRequestFormFields">
+        @inputText(issueAssetRequestForm(constants.Form.GAS).copy(value = Some("0")), '_label -> Messages(constants.Form.GAS),
+            'class -> "form-control",'placeholder->Messages(constants.Form.GAS),  'required->true)
         @inputPassword(issueAssetRequestForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD),
             'class -> "form-control",'placeholder->Messages(constants.Form.PASSWORD),'required->true)
     </div>

@@ -11,10 +11,11 @@ object IssueFiat {
       constants.FormField.TRANSACTION_ID.name -> constants.FormField.TRANSACTION_ID.field,
       constants.FormField.TRANSACTION_AMOUNT.name -> constants.FormField.TRANSACTION_AMOUNT.field,
       constants.FormField.NON_EMPTY_PASSWORD.name -> constants.FormField.NON_EMPTY_PASSWORD.field,
+      constants.FormField.GAS.name -> constants.FormField.GAS.field,
       constants.FormField.MODE.name -> constants.FormField.MODE.field
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(from: String, to: String, transactionID: String, transactionAmount: Int, password: String, mode: String)
+  case class Data(from: String, to: String, transactionID: String, transactionAmount: Int, password: String, gas:Int, mode: String)
 
 }
