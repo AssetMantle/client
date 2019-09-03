@@ -31,7 +31,7 @@ class Orders @Inject()(shutdownActors: ShutdownActors, masterAccounts: master.Ac
 
   import databaseConfig.profile.api._
 
-  private val ec:ExecutionContext= actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
+  private val schedulerExecutionContext:ExecutionContext= actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -181,11 +181,11 @@ class Orders @Inject()(shutdownActors: ShutdownActors, masterAccounts: master.Ac
           case baseException: BaseException => logger.error(baseException.failure.message, baseException)
         }
       }
-    }(ec)
+    }(schedulerExecutionContext)
   }
 
   actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
     Utility.dirtyEntityUpdater()
-  }(ec)
+  }(schedulerExecutionContext)
 
 }

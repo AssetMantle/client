@@ -31,7 +31,7 @@ class IssueAsset @Inject()(wsClient: WSClient)(implicit configuration: Configura
 
   case class BaseRequest(from: String, chain_id: String = chainID)
 
-  case class Request(base_req: BaseRequest, to: String, documentHash: String, assetType: String, assetPrice: String, quantityUnit: String, assetQuantity: String, takerAddress: String, mode: String, password: String, moderated: Boolean) extends BaseRequestEntity
+  case class Request(base_req: BaseRequest, to: String, documentHash: String, assetType: String, assetPrice: String, quantityUnit: String, assetQuantity: String,gas:String , takerAddress: String, mode: String, password: String, moderated: Boolean) extends BaseRequestEntity
 
   private implicit val baseRequestWrites: OWrites[BaseRequest] = Json.writes[BaseRequest]
 

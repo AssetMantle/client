@@ -195,6 +195,7 @@ h2{
 .documenet_details_card{
     height: 300px;
     overflow: auto;
+    width: 225px;
 }
 
 /**/
