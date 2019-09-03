@@ -78,10 +78,10 @@
                                     <div class="centerText">
                                         <button id="userButtonUploadBankDetailsUser" class="hidden" onclick="getForm(jsRoutes.controllers.FileController.uploadUserKycForm('@constants.File.BANK_DETAILS'))">@Messages(constants.Form.UPLOAD_BANK_DETAILS)</button>
                                         <button id="userButtonUpdateBankDetailsUser" class="hidden" onclick="getForm(jsRoutes.controllers.FileController.updateUserKycForm('@constants.File.BANK_DETAILS'))">@Messages(constants.Form.UPDATE_BANK_DETAILS)</button>
-                                        <script>checkAccountKycFileExists('@loginState.username', '@constants.File.BANK_DETAILS', "userButtonUploadBankDetailsUser", "userButtonUpdateBankDetailsUser")</script>
+                                        <script>checkFileExists(jsRoutes.controllers.FileController.checkAccountKycFileExists('@loginState.username', '@constants.File.BANK_DETAILS'), "userButtonUploadBankDetailsUser", "userButtonUpdateBankDetailsUser")</script>
                                         <button id="userButtonUploadIdentificationUser" class="hidden" onclick="getForm(jsRoutes.controllers.FileController.uploadUserKycForm('@constants.File.IDENTIFICATION'))">@Messages(constants.Form.UPLOAD_IDENTIFICATION)</button>
                                         <button id="userButtonUpdateIdentificationUser" class="hidden" onclick="getForm(jsRoutes.controllers.FileController.updateUserKycForm('@constants.File.IDENTIFICATION'))">@Messages(constants.Form.UPDATE_IDENTIFICATION)</button>
-                                        <script>checkAccountKycFileExists('@loginState.username', '@constants.File.IDENTIFICATION', "userButtonUploadIdentificationUser", "userButtonUpdateIdentificationUser")</script>
+                                        <script>checkFileExists(jsRoutes.controllers.FileController.checkAccountKycFileExists('@loginState.username', '@constants.File.IDENTIFICATION'), "userButtonUploadIdentificationUser", "userButtonUpdateIdentificationUser")</script>
                                     </div>
                                 }
                                 case constants.User.UNKNOWN => {}

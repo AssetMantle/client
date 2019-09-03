@@ -21,7 +21,7 @@
             <span class="red">@Messages(constants.Form.DOCUMENTS)</span> :
         </div>
         <span id = "kycDocuments@organizationVerificationRequest.accountID">
-            <script>getOrganizationKycFilesToZone("@organizationVerificationRequest.accountID")</script>
+            <script>getFiles('@organizationVerificationRequest.accountID',jsRoutes.controllers.AddOrganizationController.viewKycDocuments('@organizationVerificationRequest.accountID'))</script>
         </span> <br>
         <div class="final_verify_buttons">
             <button class="btn btn-sm btn-success" onclick="getForm(jsRoutes.controllers.AddOrganizationController.verifyOrganizationForm('@organizationVerificationRequest.id', '@organizationVerificationRequest.zoneID'))">@Messages(constants.Form.APPROVE)</button>

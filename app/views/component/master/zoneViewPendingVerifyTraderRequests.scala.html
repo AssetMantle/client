@@ -13,7 +13,7 @@
             <span class="red">@Messages(constants.Form.ORGANIZATION_ID)</span> : @traderVerificationRequest.organizationID <br>
             <span class="red">@Messages(constants.Form.ACCOUNT_ID)</span> : @traderVerificationRequest.accountID <br>
             <span class="red">@Messages(constants.Form.NAME)</span> : @traderVerificationRequest.name <br>
-            <span class="red">@Messages(constants.Form.DOCUMENTS)</span> : <span id = "kycDocuments@traderVerificationRequest.accountID"><script>getTraderKycFilesToZone("@traderVerificationRequest.accountID")</script></span> <br>
+            <span class="red">@Messages(constants.Form.DOCUMENTS)</span> : <span id = "kycDocuments@traderVerificationRequest.accountID"><script>getFiles('@traderVerificationRequest.accountID', jsRoutes.controllers.SetACLController.zoneViewKycDocuments('@traderVerificationRequest.accountID'))</script></span> <br>
             <button class="btn btn-sm btn-success" onclick="getForm(jsRoutes.controllers.SetACLController.zoneVerifyTraderForm('@traderVerificationRequest.accountID', '@traderVerificationRequest.organizationID'))">@Messages(constants.Form.APPROVE)</button>
             <button class="btn btn-sm btn-danger" onclick="getForm(jsRoutes.controllers.SetACLController.zoneRejectVerifyTraderRequestForm('@traderVerificationRequest.id'))">@Messages(constants.Form.REJECT)</button>
         </div>
