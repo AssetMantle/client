@@ -1,0 +1,10 @@
+@import models.Trait.Document
+@import controllers.actions.LoginState
+
+@(documents: Seq[Document[_]])(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
+
+@for(document <- documents){
+    @component.master.commonDocument(document){
+        <a href="@routes.FileController.file(document.fileName, document.documentType)">@Messages(document.documentType)</a> <br>
+    }(Html(""))
+}
