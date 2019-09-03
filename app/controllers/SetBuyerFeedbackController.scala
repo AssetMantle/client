@@ -52,7 +52,8 @@ class SetBuyerFeedbackController @Inject()(messagesControllerComponents: Message
   def buyerFeedbackList: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        withUsernameToken.Ok(views.html.component.master.setBuyerFeedbackList(blockchainTraderFeedbackHistories.Service.getNullRatingsForBuyerFeedback(loginState.address)))
+        val a=blockchainTraderFeedbackHistories.Service.getNullRatingsForBuyerFeedback(loginState.address)
+        withUsernameToken.Ok(views.html.component.master.setBuyerFeedbackList(a))
       } catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }

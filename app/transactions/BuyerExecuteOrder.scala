@@ -43,7 +43,6 @@ class BuyerExecuteOrder @Inject()(wsClient: WSClient)(implicit configuration: Co
   object Service {
 
     def post(request: Request): WSResponse = try {
-      logger.info(Json.toJson(request).toString())
       Await.result(action(request), Duration.Inf)
     } catch {
       case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)

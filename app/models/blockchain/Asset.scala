@@ -31,7 +31,7 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
 
   val db = databaseConfig.db
 
-  private val ec:ExecutionContext= actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
+  private val schedulerExecutionContext:ExecutionContext= actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
 
   private implicit val materializer: ActorMaterializer = ActorMaterializer()(actorSystem)
 
@@ -204,11 +204,11 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
           case blockChainException: BlockChainException => logger.error(blockChainException.failure.message, blockChainException)
         }
       }
-    }(ec)
+    }(schedulerExecutionContext)
   }
 
   actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
     Utility.dirtyEntityUpdater()
-  }(ec)
+  }(schedulerExecutionContext)
 
 }

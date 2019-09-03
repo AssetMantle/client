@@ -31,6 +31,8 @@ class SendCoins @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
 
   private implicit val logger: Logger = Logger(this.getClass)
 
+  private val schedulerExecutionContext:ExecutionContext= actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
+
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_SEND_COIN
 
   val db = databaseConfig.db
@@ -185,6 +187,6 @@ class SendCoins @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
   if (kafkaEnabled || transactionMode != constants.Transactions.BLOCK_MODE) {
     actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
       transaction.ticketUpdater(Service.getTicketIDsOnStatus, Service.getTransactionHash, Utility.onSuccess, Utility.onFailure)
-    }
+    }(schedulerExecutionContext)
   }
 }

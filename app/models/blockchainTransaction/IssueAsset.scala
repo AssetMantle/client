@@ -32,6 +32,8 @@ class IssueAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tra
 
   private implicit val logger: Logger = Logger(this.getClass)
 
+  private val schedulerExecutionContext:ExecutionContext= actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
+
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
   val db = databaseConfig.db
@@ -197,6 +199,6 @@ class IssueAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tra
   if (kafkaEnabled || transactionMode != constants.Transactions.BLOCK_MODE) {
     actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
       transaction.ticketUpdater(Service.getTicketIDsOnStatus, Service.getTransactionHash, Utility.onSuccess, Utility.onFailure)
-    }
+    }(schedulerExecutionContext)
   }
 }

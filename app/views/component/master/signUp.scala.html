@@ -1,6 +1,6 @@
+@import controllers.actions.LoginState
 @import helper._
 @import views.companion.master.SignUp
-@import controllers.actions.LoginState
 
 @(signUpForm: Form[SignUp.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 
@@ -15,20 +15,13 @@
                 <span class="input-group-text">
                     <i class="fa fa-user"></i>
                 </span>
-                @inputText(signUpForm(constants.Form.USERNAME), 'id -> "username", 'class -> "form-control", 'placeholder -> Messages(constants.Form.USERNAME), 'required -> true)
-                <span id="usernameAvailableResult">
-                    <span id="usernameAvailableImageResult" class="result success hidden"><i class="fa fa-check" aria-hidden="true"></i></span>
-                    <span id="usernameUnavailableImageResult" class="result failure hidden"><i class="fa fa-ban" aria-hidden="true"></i></span>
-                    <span id="usernameLoadingImageResult" class="result hidden"><i class="fa fa-spinner" aria-hidden="true"></i></span>
-               </span>
             </div>
             @inputText(signUpForm(constants.Form.USERNAME), 'id -> "username", 'class -> "form-control", 'placeholder -> Messages(constants.Form.USERNAME), 'required -> true)
             <span id="usernameAvailableResult">
-                <img id="usernameAvailableImageResult" class="result hidden" src="@routes.Assets.versioned("images/success.jpg")">
-                <img id="usernameUnavailableImageResult" class="result hidden" src="@routes.Assets.versioned("images/unavailable.jpg")">
-                <img id="usernameLoadingImageResult" class="result hidden" src="@routes.Assets.versioned("images/loading.gif")">
+                <span id="usernameAvailableImageResult" class="result success hidden"><i class="fa fa-check" aria-hidden="true"></i></span>
+                <span id="usernameUnavailableImageResult" class="result failure hidden"><i class="fa fa-ban" aria-hidden="true"></i></span>
+                <span id="usernameLoadingImageResult" class="result hidden"><i class="fa fa-spinner" aria-hidden="true"></i></span>
             </span>
-
         </div>
         <div class="input-group">
             <div class="input-group-prepend">
@@ -37,23 +30,17 @@
                 </span>
             </div>
             @inputPassword(signUpForm(constants.Form.PASSWORD), 'id -> "password", 'class -> "form-control", 'placeholder -> Messages(constants.Form.PASSWORD), 'required -> true)
-
         </div>
         <div class="input-group">
             <div class="input-group-prepend">
                 <span class="input-group-text">
                     <i class="fa fa-lock" aria-hidden="true"></i>
                 </span>
-                @inputPassword(signUpForm(constants.Form.CONFIRM_PASSWORD), 'id -> "confirmPassword", 'class -> "form-control", 'placeholder -> Messages(constants.Form.CONFIRM_PASSWORD), 'required -> true)
-                <span id="matchPasswordsResult">
-                    <span id="matchPasswordsImageResult" class="result warning hidden"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i></span>
-                 </span>
             </div>
             @inputPassword(signUpForm(constants.Form.CONFIRM_PASSWORD), 'id -> "confirmPassword", 'class -> "form-control", 'placeholder -> Messages(constants.Form.CONFIRM_PASSWORD), 'required -> true)
             <span id="matchPasswordsResult">
-                <img id="matchPasswordsImageResult" class="result hidden" src="@routes.Assets.versioned("images/exclamation.png")">
+                <span id="matchPasswordsImageResult" class="result warning hidden"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i></span>
             </span>
-
         </div>
         @checkbox(signUpForm(constants.Form.USERNAME_AVAILABLE), 'id -> "usernameAvailable", 'class -> "hidden", 'required -> true)
         @if(signUpForm.hasGlobalErrors) {

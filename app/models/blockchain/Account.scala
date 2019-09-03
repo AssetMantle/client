@@ -30,7 +30,7 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   val db = databaseConfig.db
 
-  private val ec:ExecutionContext= actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
+  private val schedulerExecutionContext:ExecutionContext= actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -166,10 +166,10 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
         case blockChainException: BlockChainException => logger.error(blockChainException.failure.message, blockChainException)
       }
-    }(ec)
+    }(schedulerExecutionContext)
   }
 
   actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
     Utility.dirtyEntityUpdater()
-  }(ec)
+  }(schedulerExecutionContext)
 }
