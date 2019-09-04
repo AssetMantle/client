@@ -11,7 +11,7 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Random, Success}
 
-case class FaucetRequest(id: String, ticketID: Option[String], accountID: String, amount: Int, status: Option[Boolean], comment: Option[String])
+case class FaucetRequest(id: String, ticketID: Option[String], accountID: String, amount: Int,gas: Option[Int], status: Option[Boolean], comment: Option[String])
 
 @Singleton
 class FaucetRequests @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
@@ -88,7 +88,7 @@ class FaucetRequests @Inject()(protected val databaseConfigProvider: DatabaseCon
 
   private[models] class FaucetRequestTable(tag: Tag) extends Table[FaucetRequest](tag, "FaucetRequest") {
 
-    def * = (id, ticketID.?, accountID, amount, status.?, comment.?) <> (FaucetRequest.tupled, FaucetRequest.unapply)
+    def * = (id, ticketID.?, accountID, amount, gas.?,status.?, comment.?) <> (FaucetRequest.tupled, FaucetRequest.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
@@ -98,6 +98,8 @@ class FaucetRequests @Inject()(protected val databaseConfigProvider: DatabaseCon
 
     def amount = column[Int]("amount")
 
+    def gas = column[Int]("gas")
+
     def status = column[Boolean]("status")
 
     def comment = column[String]("comment")
@@ -106,7 +108,7 @@ class FaucetRequests @Inject()(protected val databaseConfigProvider: DatabaseCon
 
   object Service {
 
-    def create(accountID: String, amount: Int): String = Await.result(add(FaucetRequest(Random.nextString(32), null, accountID, amount, null, null)), Duration.Inf)
+    def create(accountID: String, amount: Int): String = Await.result(add(FaucetRequest(Random.nextString(32), null, accountID, amount,null, null, null)), Duration.Inf)
 
     def accept(requestID: String, ticketID: String): Int = Await.result(updateTicketIDAndStatusByID(requestID, ticketID, status = Option(true)), Duration.Inf)
 

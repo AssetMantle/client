@@ -12,10 +12,11 @@ object ChangeSellerBid {
       constants.FormField.BID.name -> constants.FormField.BID.field,
       constants.FormField.TIME.name -> constants.FormField.TIME.field,
       constants.FormField.PEG_HASH.name -> constants.FormField.PEG_HASH.field,
+      constants.FormField.GAS.name -> constants.FormField.GAS.field,
       constants.FormField.MODE.name -> constants.FormField.MODE.field
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(from: String, password: String, to: String, bid: Int, time: Int, pegHash: String, mode: String)
+  case class Data(from: String, password: String, to: String, bid: Int, time: Int, pegHash: String, gas:Int, mode: String)
 
 }

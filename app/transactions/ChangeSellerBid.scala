@@ -37,7 +37,7 @@ class ChangeSellerBid @Inject()(wsClient: WSClient)(implicit configuration: Conf
 
   case class BaseRequest(from: String, chain_id: String = chainID)
 
-  case class Request(base_req: BaseRequest, password: String, to: String, bid: String, time: String, pegHash: String, mode: String) extends BaseRequestEntity
+  case class Request(base_req: BaseRequest, password: String, to: String, bid: String, time: String, pegHash: String,gas:String, mode: String) extends BaseRequestEntity
 
   object Service {
     def post(request: Request): WSResponse = try {

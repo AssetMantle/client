@@ -29,7 +29,7 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
   val db = databaseConfig.db
 
-  private val ec:ExecutionContext= actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
+  private val schedulerExecutionContext:ExecutionContext= actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -172,10 +172,10 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
           case blockChainException: BlockChainException => logger.error(blockChainException.failure.message, blockChainException)
         }
       }
-    }(ec)
+    }(schedulerExecutionContext)
   }
 
   actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
     Utility.dirtyEntityUpdater()
-  }(ec)
+  }(schedulerExecutionContext)
 }

@@ -14,14 +14,14 @@ import play.api.{Configuration, Logger}
 import queries.{GetNegotiation, GetNegotiationID}
 import slick.jdbc.JdbcProfile
 import transactions.responses.TransactionResponse.BlockResponse
-import utilities.PushNotification
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
+import utilities.PushNotification
 
-case class ChangeBuyerBid(from: String, to: String, bid: Int, time: Int, pegHash: String, status: Option[Boolean], txHash: Option[String], ticketID: String, mode: String, code: Option[String]) extends BaseTransaction[ChangeBuyerBid] {
-  def mutateTicketID(newTicketID: String): ChangeBuyerBid = ChangeBuyerBid(from = from, to = to, bid = bid, time = time, pegHash = pegHash, status = status, txHash, ticketID = newTicketID, mode = mode, code = code)
+case class ChangeBuyerBid(from: String, to: String, bid: Int, time: Int, pegHash: String,gas: Int,  status: Option[Boolean], txHash: Option[String], ticketID: String, mode: String, code: Option[String]) extends BaseTransaction[ChangeBuyerBid] {
+  def mutateTicketID(newTicketID: String): ChangeBuyerBid = ChangeBuyerBid(from = from, to = to, bid = bid, time = time, pegHash = pegHash, gas=gas,status = status, txHash, ticketID = newTicketID, mode = mode, code = code)
 }
 
 
@@ -31,6 +31,8 @@ class ChangeBuyerBids @Inject()(actorSystem: ActorSystem, transaction: utilities
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_CHANGE_BUYER_BID
 
   private implicit val logger: Logger = Logger(this.getClass)
+
+  private val schedulerExecutionContext:ExecutionContext= actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -114,7 +116,7 @@ class ChangeBuyerBids @Inject()(actorSystem: ActorSystem, transaction: utilities
 
   private[models] class ChangeBuyerBidTable(tag: Tag) extends Table[ChangeBuyerBid](tag, "ChangeBuyerBid") {
 
-    def * = (from, to, bid, time, pegHash, status.?, txHash.?, ticketID, mode, code.?) <> (ChangeBuyerBid.tupled, ChangeBuyerBid.unapply)
+    def * = (from, to, bid, time, pegHash,gas , status.?, txHash.?, ticketID, mode, code.?) <> (ChangeBuyerBid.tupled, ChangeBuyerBid.unapply)
 
     def from = column[String]("from")
 
@@ -125,6 +127,8 @@ class ChangeBuyerBids @Inject()(actorSystem: ActorSystem, transaction: utilities
     def time = column[Int]("time")
 
     def pegHash = column[String]("pegHash")
+
+    def gas = column[Int]("gas")
 
     def status = column[Boolean]("status")
 
@@ -139,7 +143,7 @@ class ChangeBuyerBids @Inject()(actorSystem: ActorSystem, transaction: utilities
 
   object Service {
 
-    def create(changeBuyerBid: ChangeBuyerBid): String = Await.result(add(ChangeBuyerBid(from = changeBuyerBid.from, to = changeBuyerBid.to, bid = changeBuyerBid.bid, time = changeBuyerBid.time, pegHash = changeBuyerBid.pegHash, status = changeBuyerBid.status, txHash = changeBuyerBid.txHash, ticketID = changeBuyerBid.ticketID, mode = changeBuyerBid.mode, code = changeBuyerBid.code)), Duration.Inf)
+    def create(changeBuyerBid: ChangeBuyerBid): String = Await.result(add(ChangeBuyerBid(from = changeBuyerBid.from, to = changeBuyerBid.to, bid = changeBuyerBid.bid, time = changeBuyerBid.time, pegHash = changeBuyerBid.pegHash,gas=changeBuyerBid.gas, status = changeBuyerBid.status, txHash = changeBuyerBid.txHash, ticketID = changeBuyerBid.ticketID, mode = changeBuyerBid.mode, code = changeBuyerBid.code)), Duration.Inf)
 
     def markTransactionSuccessful(ticketID: String, txHash: String): Int = Await.result(updateTxHashAndStatusOnTicketID(ticketID, Option(txHash), status = Option(true)), Duration.Inf)
 
@@ -193,6 +197,6 @@ class ChangeBuyerBids @Inject()(actorSystem: ActorSystem, transaction: utilities
   if (kafkaEnabled || transactionMode != constants.Transactions.BLOCK_MODE) {
     actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
       transaction.ticketUpdater(Service.getTicketIDsOnStatus, Service.getTransactionHash, Utility.onSuccess, Utility.onFailure)
-    }
+    }(schedulerExecutionContext)
   }
 }

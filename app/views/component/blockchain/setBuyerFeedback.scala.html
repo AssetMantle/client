@@ -18,7 +18,9 @@
         'placeholder->Messages(constants.Form.PEG_HASH),'required->true)
     @inputText(setBuyerFeedbackForm(constants.Form.RATING), '_label -> Messages(constants.Form.RATING),'class -> "form-control",
         'placeholder->Messages(constants.Form.RATING),'required->true)
-    @inputText(setBuyerFeedbackForm(constants.Form.MODE), '_label -> Messages(constants.Form.MODE),'class -> "form-control",
+        @inputText(setBuyerFeedbackForm(constants.Form.GAS), '_label -> Messages(constants.Form.GAS),
+            'class -> "form-control",'placeholder->Messages(constants.Form.GAS),'required->true)
+        @inputText(setBuyerFeedbackForm(constants.Form.MODE), '_label -> Messages(constants.Form.MODE),'class -> "form-control",
         'placeholder->Messages(constants.Form.MODE),'required->true)
     @inputPassword(setBuyerFeedbackForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD),'class -> "form-control",
         'placeholder->Messages(constants.Form.PASSWORD),'required->true)

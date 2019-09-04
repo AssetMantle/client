@@ -20,8 +20,8 @@ import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class ConfirmBuyerBid(from: String, to: String, bid: Int, time: Int, pegHash: String, buyerContractHash: String, status: Option[Boolean], txHash: Option[String], ticketID: String, mode: String, code: Option[String]) extends BaseTransaction[ConfirmBuyerBid] {
-  def mutateTicketID(newTicketID: String): ConfirmBuyerBid = ConfirmBuyerBid(from = from, to = to, bid = bid, time = time, pegHash = pegHash, buyerContractHash = buyerContractHash, status = status, txHash, ticketID = newTicketID, mode = mode, code = code)
+case class ConfirmBuyerBid(from: String, to: String, bid: Int, time: Int, pegHash: String, buyerContractHash: String, gas: Int, status: Option[Boolean], txHash: Option[String], ticketID: String, mode: String, code: Option[String]) extends BaseTransaction[ConfirmBuyerBid] {
+  def mutateTicketID(newTicketID: String): ConfirmBuyerBid = ConfirmBuyerBid(from = from, to = to, bid = bid, time = time, pegHash = pegHash, buyerContractHash = buyerContractHash, gas=gas,status = status, txHash, ticketID = newTicketID, mode = mode, code = code)
 }
 
 
@@ -31,6 +31,8 @@ class ConfirmBuyerBids @Inject()(actorSystem: ActorSystem, transaction: utilitie
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_CONFIRM_BUYER_BID
 
   private implicit val logger: Logger = Logger(this.getClass)
+
+  private val schedulerExecutionContext:ExecutionContext= actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -114,7 +116,7 @@ class ConfirmBuyerBids @Inject()(actorSystem: ActorSystem, transaction: utilitie
 
   private[models] class ConfirmBuyerBidTable(tag: Tag) extends Table[ConfirmBuyerBid](tag, "ConfirmBuyerBid") {
 
-    def * = (from, to, bid, time, pegHash, buyerContractHash, status.?, txHash.?, ticketID, mode, code.?) <> (ConfirmBuyerBid.tupled, ConfirmBuyerBid.unapply)
+    def * = (from, to, bid, time, pegHash,  buyerContractHash, gas,status.?, txHash.?, ticketID, mode, code.?) <> (ConfirmBuyerBid.tupled, ConfirmBuyerBid.unapply)
 
     def from = column[String]("from")
 
@@ -127,6 +129,8 @@ class ConfirmBuyerBids @Inject()(actorSystem: ActorSystem, transaction: utilitie
     def pegHash = column[String]("pegHash")
 
     def buyerContractHash = column[String]("buyerContractHash")
+
+    def gas = column[Int]("gas")
 
     def status = column[Boolean]("status")
 
@@ -141,7 +145,7 @@ class ConfirmBuyerBids @Inject()(actorSystem: ActorSystem, transaction: utilitie
 
   object Service {
 
-    def create(confirmBuyerBid: ConfirmBuyerBid): String = Await.result(add(ConfirmBuyerBid(from = confirmBuyerBid.from, to = confirmBuyerBid.to, bid = confirmBuyerBid.bid, time = confirmBuyerBid.time, pegHash = confirmBuyerBid.pegHash, buyerContractHash = confirmBuyerBid.buyerContractHash, status = confirmBuyerBid.status, txHash = confirmBuyerBid.txHash, ticketID = confirmBuyerBid.ticketID, mode = confirmBuyerBid.mode, code = confirmBuyerBid.code)), Duration.Inf)
+    def create(confirmBuyerBid: ConfirmBuyerBid): String = Await.result(add(ConfirmBuyerBid(from = confirmBuyerBid.from, to = confirmBuyerBid.to, bid = confirmBuyerBid.bid, time = confirmBuyerBid.time, pegHash = confirmBuyerBid.pegHash,gas=confirmBuyerBid.gas, buyerContractHash = confirmBuyerBid.buyerContractHash, status = confirmBuyerBid.status, txHash = confirmBuyerBid.txHash, ticketID = confirmBuyerBid.ticketID, mode = confirmBuyerBid.mode, code = confirmBuyerBid.code)), Duration.Inf)
 
     def markTransactionSuccessful(ticketID: String, txHash: String): Int = Await.result(updateTxHashAndStatusOnTicketID(ticketID, Option(txHash), status = Option(true)), Duration.Inf)
 
@@ -195,6 +199,6 @@ class ConfirmBuyerBids @Inject()(actorSystem: ActorSystem, transaction: utilitie
   if (kafkaEnabled || transactionMode != constants.Transactions.BLOCK_MODE) {
     actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
       transaction.ticketUpdater(Service.getTicketIDsOnStatus, Service.getTransactionHash, Utility.onSuccess, Utility.onFailure)
-    }
+    }(schedulerExecutionContext)
   }
 }
