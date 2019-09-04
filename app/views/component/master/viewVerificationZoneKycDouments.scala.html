@@ -1,27 +1,30 @@
-@import models.master.ZoneKYC
 @import controllers.actions.LoginState
+@import models.master.ZoneKYC
 
 @(zoneKYCs: Seq[ZoneKYC])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 <div>
     @for(zoneKYC <- zoneKYCs) {
-        @component.master.viewDocuments(Seq(zoneKYC))
-        <div id="zoneKycDocumentStatus@zoneKYC.id@zoneKYC.documentType"></div>
-        @zoneKYC.status.getOrElse(None)  match {
-            case true => {
-                <div id="buttonZoneKycDocumentStatus@zoneKYC.id@zoneKYC.documentType">
-                    <button class="btn btn-sm btn-danger" onclick="rejectZoneKycDocument('@zoneKYC.id', '@zoneKYC.documentType')">@Messages(constants.Form.REJECT)</button>
-                </div>
-            }
-            case false => {
-                <div id="buttonZoneKycDocumentStatus@zoneKYC.id@zoneKYC.documentType">
-                    <button class="btn btn-sm btn-success" onclick="verifyZoneKycDocument('@zoneKYC.id', '@zoneKYC.documentType')">@Messages(constants.Form.APPROVE)</button>
-                </div>
-            }
-            case _ => {
-                <div id="buttonZoneKycDocumentStatus@zoneKYC.id@zoneKYC.documentType">
-                    <button class="btn btn-sm btn-success" onclick="verifyZoneKycDocument('@zoneKYC.id', '@zoneKYC.documentType')">@Messages(constants.Form.APPROVE)</button>
-                     <button class="btn btn-sm btn-danger" onclick="rejectZoneKycDocument('@zoneKYC.id', '@zoneKYC.documentType')">@Messages(constants.Form.REJECT)</button>
-                </div>
+        @component.master.commonDocument(zoneKYC){
+            <a href="@routes.FileController.genesisAccessedFile(zoneKYC.fileName, zoneKYC.documentType)">@Messages(zoneKYC.documentType)</a>
+        } {
+            <div id="zoneKycDocumentStatus@zoneKYC.id@zoneKYC.documentType"></div>
+            @zoneKYC.status.getOrElse(None) match {
+                case true => {
+                    <div id="buttonZoneKycDocumentStatus@zoneKYC.id@zoneKYC.documentType">
+                        <button class="btn btn-sm btn-danger" onclick="rejectZoneKycDocument('@zoneKYC.id', '@zoneKYC.documentType')">@Messages(constants.Form.REJECT)</button>
+                    </div>
+                }
+                case false => {
+                    <div id="buttonZoneKycDocumentStatus@zoneKYC.id@zoneKYC.documentType">
+                        <button class="btn btn-sm btn-success" onclick="verifyZoneKycDocument('@zoneKYC.id', '@zoneKYC.documentType')">@Messages(constants.Form.APPROVE)</button>
+                    </div>
+                }
+                case _ => {
+                    <div id="buttonZoneKycDocumentStatus@zoneKYC.id@zoneKYC.documentType">
+                        <button class="btn btn-sm btn-success" onclick="verifyZoneKycDocument('@zoneKYC.id', '@zoneKYC.documentType')">@Messages(constants.Form.APPROVE)</button>
+                        <button class="btn btn-sm btn-danger" onclick="rejectZoneKycDocument('@zoneKYC.id', '@zoneKYC.documentType')">@Messages(constants.Form.REJECT)</button>
+                    </div>
+                }
             }
         }
     }

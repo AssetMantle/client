@@ -19,8 +19,8 @@ import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class IssueFiat(from: String, to: String, transactionID: String, transactionAmount: Int, status: Option[Boolean], txHash: Option[String], ticketID: String, mode: String, code: Option[String]) extends BaseTransaction[IssueFiat] {
-  def mutateTicketID(newTicketID: String): IssueFiat = IssueFiat(from = from, to = to, transactionID = transactionID, transactionAmount = transactionAmount, status = status, txHash, ticketID = newTicketID, mode = mode, code = code)
+case class IssueFiat(from: String, to: String, transactionID: String, transactionAmount: Int,  gas: Int, status: Option[Boolean], txHash: Option[String], ticketID: String, mode: String, code: Option[String]) extends BaseTransaction[IssueFiat] {
+  def mutateTicketID(newTicketID: String): IssueFiat = IssueFiat(from = from, to = to, transactionID = transactionID, transactionAmount = transactionAmount, gas=gas,status = status, txHash, ticketID = newTicketID, mode = mode, code = code)
 }
 
 
@@ -30,6 +30,8 @@ class IssueFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_ISSUE_FIAT
 
   private implicit val logger: Logger = Logger(this.getClass)
+
+  private val schedulerExecutionContext:ExecutionContext= actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -113,7 +115,7 @@ class IssueFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
 
   private[models] class IssueFiatTable(tag: Tag) extends Table[IssueFiat](tag, "IssueFiat") {
 
-    def * = (from, to, transactionID, transactionAmount, status.?, txHash.?, ticketID, mode, code.?) <> (IssueFiat.tupled, IssueFiat.unapply)
+    def * = (from, to, transactionID, transactionAmount, gas,status.?, txHash.?, ticketID, mode, code.?) <> (IssueFiat.tupled, IssueFiat.unapply)
 
     def from = column[String]("from")
 
@@ -122,6 +124,8 @@ class IssueFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
     def transactionID = column[String]("transactionID")
 
     def transactionAmount = column[Int]("transactionAmount")
+
+    def gas = column[Int]("gas")
 
     def status = column[Boolean]("status")
 
@@ -136,7 +140,7 @@ class IssueFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
 
   object Service {
 
-    def create(issueFiat: IssueFiat): String = Await.result(add(IssueFiat(from = issueFiat.from, to = issueFiat.to, transactionID = issueFiat.transactionID, transactionAmount = issueFiat.transactionAmount, status = issueFiat.status, txHash = issueFiat.txHash, ticketID = issueFiat.ticketID, mode = issueFiat.mode, code = issueFiat.code)), Duration.Inf)
+    def create(issueFiat: IssueFiat): String = Await.result(add(IssueFiat(from = issueFiat.from, to = issueFiat.to, transactionID = issueFiat.transactionID, transactionAmount = issueFiat.transactionAmount, gas=issueFiat.gas,status = issueFiat.status, txHash = issueFiat.txHash, ticketID = issueFiat.ticketID, mode = issueFiat.mode, code = issueFiat.code)), Duration.Inf)
 
     def markTransactionSuccessful(ticketID: String, txHash: String): Int = Await.result(updateTxHashAndStatusOnTicketID(ticketID, Option(txHash), status = Option(true)), Duration.Inf)
 
@@ -185,6 +189,6 @@ class IssueFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
   if (kafkaEnabled || transactionMode != constants.Transactions.BLOCK_MODE) {
     actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
       transaction.ticketUpdater(Service.getTicketIDsOnStatus, Service.getTransactionHash, Utility.onSuccess, Utility.onFailure)
-    }
+    }(schedulerExecutionContext)
   }
 }

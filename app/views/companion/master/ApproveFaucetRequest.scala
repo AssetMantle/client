@@ -10,9 +10,10 @@ object ApproveFaucetRequest {
       constants.FormField.REQUEST_ID.name -> constants.FormField.REQUEST_ID.field,
       constants.FormField.ACCOUNT_ID.name -> constants.FormField.ACCOUNT_ID.field,
       constants.FormField.NON_EMPTY_PASSWORD.name -> constants.FormField.NON_EMPTY_PASSWORD.field,
+      constants.FormField.GAS.name -> constants.FormField.GAS.field,
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(requestID: String, accountID: String, password: String)
+  case class Data(requestID: String, accountID: String, password: String,gas:Int)
 
 }

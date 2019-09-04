@@ -21,8 +21,8 @@ import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class SendAsset(from: String, to: String, pegHash: String, status: Option[Boolean], txHash: Option[String], ticketID: String, mode: String, code: Option[String]) extends BaseTransaction[SendAsset] {
-  def mutateTicketID(newTicketID: String): SendAsset = SendAsset(from = from, to = to, pegHash = pegHash, status = status, txHash, ticketID = newTicketID, mode = mode, code = code)
+case class SendAsset(from: String, to: String, pegHash: String,gas: Int,  status: Option[Boolean], txHash: Option[String], ticketID: String, mode: String, code: Option[String]) extends BaseTransaction[SendAsset] {
+  def mutateTicketID(newTicketID: String): SendAsset = SendAsset(from = from, to = to, pegHash = pegHash,gas=gas, status = status, txHash, ticketID = newTicketID, mode = mode, code = code)
 }
 
 
@@ -32,6 +32,8 @@ class SendAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_SEND_ASSET
 
   private implicit val logger: Logger = Logger(this.getClass)
+
+  private val schedulerExecutionContext:ExecutionContext= actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -120,13 +122,15 @@ class SendAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
 
   private[models] class SendAssetTable(tag: Tag) extends Table[SendAsset](tag, "SendAsset") {
 
-    def * = (from, to, pegHash, status.?, txHash.?, ticketID, mode, code.?) <> (SendAsset.tupled, SendAsset.unapply)
+    def * = (from, to, pegHash,gas, status.?, txHash.?, ticketID, mode, code.?) <> (SendAsset.tupled, SendAsset.unapply)
 
     def from = column[String]("from")
 
     def to = column[String]("to")
 
     def pegHash = column[String]("pegHash")
+
+    def gas = column[Int]("gas")
 
     def status = column[Boolean]("status")
 
@@ -141,7 +145,7 @@ class SendAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
 
   object Service {
 
-    def create(sendAsset: SendAsset): String = Await.result(add(SendAsset(from = sendAsset.from, to = sendAsset.to, pegHash = sendAsset.pegHash, status = sendAsset.status, txHash = sendAsset.txHash, ticketID = sendAsset.ticketID, mode = sendAsset.mode, code = sendAsset.code)), Duration.Inf)
+    def create(sendAsset: SendAsset): String = Await.result(add(SendAsset(from = sendAsset.from, to = sendAsset.to, pegHash = sendAsset.pegHash,gas=sendAsset.gas, status = sendAsset.status, txHash = sendAsset.txHash, ticketID = sendAsset.ticketID, mode = sendAsset.mode, code = sendAsset.code)), Duration.Inf)
 
     def markTransactionSuccessful(ticketID: String, txHash: String): Int = Await.result(updateTxHashAndStatusOnTicketID(ticketID, Option(txHash), status = Option(true)), Duration.Inf)
 
@@ -194,6 +198,6 @@ class SendAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
   if (kafkaEnabled || transactionMode != constants.Transactions.BLOCK_MODE) {
     actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
       transaction.ticketUpdater(Service.getTicketIDsOnStatus, Service.getTransactionHash, Utility.onSuccess, Utility.onFailure)
-    }
+    }(schedulerExecutionContext)
   }
 }

@@ -116,6 +116,8 @@ class IssueAssetRequests @Inject()(protected val databaseConfigProvider: Databas
 
     def assetPrice = column[Int]("assetPrice")
 
+    def gas = column[Int]("gas")
+
     def takerAddress = column[String]("takerAddress")
 
     def shipmentDetails = column[String]("shipmentDetails")

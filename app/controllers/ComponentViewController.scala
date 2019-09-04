@@ -178,7 +178,7 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
         case constants.User.USER => masterAccountKYC.Service.getAllDocuments(loginState.username)
         case _ => masterAccountFile.Service.getAllDocuments(loginState.username)
       }
-      Ok(views.html.component.master.viewDocuments(documents))
+      Ok(views.html.component.master.profileDocuments(documents))
     } catch {
       case _: BaseException => InternalServerError
     }
