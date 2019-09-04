@@ -6,6 +6,7 @@ function submitForm(source, target = '#commonModalContent') {
         contentType: 'application/x-www-form-urlencoded',
         url: form.attr('action'),
         data: form.serialize(),
+        async: false,
         statusCode: {
             400: function (data) {
                 result.html(data.responseText);
