@@ -55,9 +55,9 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
           try {
             val zoneAccountAddress = masterAccounts.Service.getAddress(masterZones.Service.getAccountId(verifyZoneData.zoneID))
             transaction.process[blockchainTransaction.AddZone, transactionsAddZone.Request](
-              entity = blockchainTransaction.AddZone(from = loginState.address, to = zoneAccountAddress, zoneID = verifyZoneData.zoneID, status = null, txHash = null, ticketID = "", mode = transactionMode, code = null),
+              entity = blockchainTransaction.AddZone(from = loginState.address, to = zoneAccountAddress, zoneID = verifyZoneData.zoneID, gas = verifyZoneData.gas, ticketID = "", mode = transactionMode),
               blockchainTransactionCreate = blockchainTransactionAddZones.Service.create,
-              request = transactionsAddZone.Request(transactionsAddZone.BaseRequest(from = loginState.address), to = zoneAccountAddress, zoneID = verifyZoneData.zoneID, password = verifyZoneData.password, mode = transactionMode),
+              request = transactionsAddZone.Request(transactionsAddZone.BaseRequest(from = loginState.address, gas = verifyZoneData.gas.toString), to = zoneAccountAddress, zoneID = verifyZoneData.zoneID, password = verifyZoneData.password, mode = transactionMode),
               action = transactionsAddZone.Service.post,
               onSuccess = blockchainTransactionAddZones.Utility.onSuccess,
               onFailure = blockchainTransactionAddZones.Utility.onFailure,
@@ -158,7 +158,7 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
       },
       addZoneData => {
         try {
-          transactionsAddZone.Service.post(transactionsAddZone.Request(transactionsAddZone.BaseRequest(from = addZoneData.from), to = addZoneData.to, zoneID = addZoneData.zoneID, password = addZoneData.password, mode = transactionMode))
+          transactionsAddZone.Service.post(transactionsAddZone.Request(transactionsAddZone.BaseRequest(from = addZoneData.from, gas = addZoneData.gas.toString), to = addZoneData.to, zoneID = addZoneData.zoneID, password = addZoneData.password, mode = transactionMode))
           Ok(views.html.index(successes = Seq(constants.Response.ZONE_ADDED)))
         }
         catch {

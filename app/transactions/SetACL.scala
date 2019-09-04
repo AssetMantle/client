@@ -35,7 +35,7 @@ class SetACL @Inject()(wsClient: WSClient)(implicit configuration: Configuration
 
   private def action(request: Request): Future[WSResponse] = wsClient.url(url).post(Json.toJson(request))
 
-  case class BaseRequest(from: String, chain_id: String = chainID)
+  case class BaseRequest(from: String, chain_id: String = chainID, gas: String)
 
   case class Request(base_req: BaseRequest, password: String, aclAddress: String, organizationID: String, zoneID: String, mode: String, issueAsset: String, issueFiat: String, sendAsset: String, sendFiat: String, redeemAsset: String, redeemFiat: String, buyerExecuteOrder: String, sellerExecuteOrder: String, changeBuyerBid: String, changeSellerBid: String, confirmBuyerBid: String, confirmSellerBid: String, negotiation: String, releaseAsset: String) extends BaseRequestEntity
 

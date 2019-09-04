@@ -106,7 +106,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
           documentType = documentType,
           path = fileResourceManager.getAccountKycFilePath(documentType),
           oldDocumentFileName = masterAccountKYCs.Service.getFileName(id = loginState.username, documentType = documentType),
-          document = master.AccountKYC(id = loginState.username, documentType = documentType, status = None, fileName = name, file  = None),
+          document = master.AccountKYC(id = loginState.username, documentType = documentType, status = None, fileName = name, file = None),
           updateOldDocument = masterAccountKYCs.Service.updateOldDocument
         )
         withUsernameToken.Ok(Messages(constants.Response.FILE_UPDATE_SUCCESSFUL.message))
@@ -167,7 +167,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
           documentType = documentType,
           path = fileResourceManager.getZoneKycFilePath(documentType),
           oldDocumentFileName = masterZoneKYCs.Service.getFileName(id = loginState.username, documentType = documentType),
-          document = master.ZoneKYC(id = loginState.username, documentType = documentType, status = None, fileName = name, file  = None),
+          document = master.ZoneKYC(id = loginState.username, documentType = documentType, status = None, fileName = name, file = None),
           updateOldDocument = masterZoneKYCs.Service.updateOldDocument
         )
         withUsernameToken.Ok(Messages(constants.Response.FILE_UPDATE_SUCCESSFUL.message))
@@ -228,7 +228,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
           documentType = documentType,
           path = fileResourceManager.getTraderKycFilePath(documentType),
           oldDocumentFileName = masterTraderKYCs.Service.getFileName(id = loginState.username, documentType = documentType),
-          document = master.TraderKYC(id = loginState.username, documentType = documentType, fileName = name, file  = None, zoneStatus = None, organizationStatus = None),
+          document = master.TraderKYC(id = loginState.username, documentType = documentType, fileName = name, file = None, zoneStatus = None, organizationStatus = None),
           updateOldDocument = masterTraderKYCs.Service.updateOldDocument
         )
         withUsernameToken.Ok(Messages(constants.Response.FILE_UPDATE_SUCCESSFUL.message))
@@ -289,7 +289,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
           documentType = documentType,
           path = fileResourceManager.getZoneKycFilePath(documentType),
           oldDocumentFileName = masterZoneKYCs.Service.getFileName(id = loginState.username, documentType = documentType),
-          document = master.ZoneKYC(id = loginState.username, documentType = documentType, status = None, fileName = name, file  = None),
+          document = master.ZoneKYC(id = loginState.username, documentType = documentType, status = None, fileName = name, file = None),
           updateOldDocument = masterZoneKYCs.Service.updateOldDocument
         )
         withUsernameToken.Ok(Messages(constants.Response.FILE_UPDATE_SUCCESSFUL.message))
@@ -299,11 +299,11 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
   }
 
   def uploadOrganizationKycForm(documentType: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.uploadFileForm(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadUserOrganizationKyc), utilities.String.getJsRouteFunction(routes.javascript.FileController.storeUserOrganizationKyc), documentType))
+    Ok(views.html.component.master.uploadFileForm(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadOrganizationKyc), utilities.String.getJsRouteFunction(routes.javascript.FileController.storeOrganizationKyc), documentType))
   }
 
   def updateOrganizationKycForm(documentType: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.updateFileForm(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadUserOrganizationKyc), utilities.String.getJsRouteFunction(routes.javascript.FileController.updateUserOrganizationKyc), documentType))
+    Ok(views.html.component.master.updateFileForm(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadOrganizationKyc), utilities.String.getJsRouteFunction(routes.javascript.FileController.updateOrganizationKyc), documentType))
   }
 
   def uploadOrganizationKyc(documentType: String) = Action(parse.multipartFormData) { implicit request =>
@@ -350,7 +350,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
           documentType = documentType,
           path = fileResourceManager.getOrganizationKycFilePath(documentType),
           oldDocumentFileName = masterOrganizationKYCs.Service.getFileName(id = loginState.username, documentType = documentType),
-          document = master.OrganizationKYC(id = loginState.username, documentType = documentType, status = None, fileName = name, file  = None),
+          document = master.OrganizationKYC(id = loginState.username, documentType = documentType, status = None, fileName = name, file = None),
           updateOldDocument = masterOrganizationKYCs.Service.updateOldDocument
         )
         withUsernameToken.Ok(Messages(constants.Response.FILE_UPDATE_SUCCESSFUL.message))
@@ -412,7 +412,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
           documentType = documentType,
           path = fileResourceManager.getTraderKycFilePath(documentType),
           oldDocumentFileName = masterTraderKYCs.Service.getFileName(id = loginState.username, documentType = documentType),
-          document = master.TraderKYC(id = loginState.username, documentType = documentType, fileName = name, file  = None, zoneStatus = None, organizationStatus = None),
+          document = master.TraderKYC(id = loginState.username, documentType = documentType, fileName = name, file = None, zoneStatus = None, organizationStatus = None),
           updateOldDocument = masterTraderKYCs.Service.updateOldDocument
         )
         withUsernameToken.Ok(Messages(constants.Response.FILE_UPDATE_SUCCESSFUL.message))
@@ -540,7 +540,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
           documentType = documentType,
           path = fileResourceManager.getAccountFilePath(documentType),
           oldDocumentFileName = masterAccountFiles.Service.getFileName(id = loginState.username, documentType = documentType),
-          document = master.AccountFile(id = loginState.username, documentType = documentType, fileName = name, file  = None),
+          document = master.AccountFile(id = loginState.username, documentType = documentType, fileName = name, file = None),
           updateOldDocument = masterAccountFiles.Service.updateOldDocument
         )
         withUserLoginAction.Ok(Messages(constants.Response.FILE_UPDATE_SUCCESSFUL.message))

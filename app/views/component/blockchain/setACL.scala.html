@@ -111,7 +111,7 @@
                 </span>
 
             </div>
-
+            @inputText(setACLForm(constants.Form.GAS), '_label -> Messages(constants.Form.GAS), 'class -> "form-control", 'placeholder -> Messages(constants.Form.GAS), 'required -> true)
             @inputPassword(setACLForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD), 'class -> "form-control", 'placeholder -> Messages(constants.Form.PASSWORD), 'required -> true)
 
             @if(setACLForm.hasGlobalErrors) {

@@ -12,7 +12,7 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class OrganizationKYC(id: String, documentType: String, fileName: String, file: Option[Array[Byte]], status: Option[Boolean]) extends Document[OrganizationKYC]{
+case class OrganizationKYC(id: String, documentType: String, fileName: String, file: Option[Array[Byte]], status: Option[Boolean] = None) extends Document[OrganizationKYC]{
 
   def updateFile(newFile: Option[Array[Byte]]): OrganizationKYC = OrganizationKYC(id = id, documentType = documentType, fileName = fileName, file = newFile, status = status)
 
@@ -119,9 +119,9 @@ class OrganizationKYCs @Inject()(protected val databaseConfigProvider: DatabaseC
 
   object Service {
 
-    def create(organizationKYC: OrganizationKYC): String = Await.result(add(OrganizationKYC(id = organizationKYC.id, documentType = organizationKYC.documentType, fileName = organizationKYC.fileName, file = organizationKYC.file, status = None)), Duration.Inf)
+    def create(organizationKYC: OrganizationKYC): String = Await.result(add(OrganizationKYC(id = organizationKYC.id, documentType = organizationKYC.documentType, fileName = organizationKYC.fileName, file = organizationKYC.file)), Duration.Inf)
 
-    def updateOldDocument(organizationKYC: OrganizationKYC): Int = Await.result(upsert(OrganizationKYC(id = organizationKYC.id, documentType = organizationKYC.documentType, fileName = organizationKYC.fileName, file = organizationKYC.file, status = None)), Duration.Inf)
+    def updateOldDocument(organizationKYC: OrganizationKYC): Int = Await.result(upsert(OrganizationKYC(id = organizationKYC.id, documentType = organizationKYC.documentType, fileName = organizationKYC.fileName, file = organizationKYC.file)), Duration.Inf)
 
     def get(id: String, documentType: String): OrganizationKYC = Await.result(findByIdDocumentType(id = id, documentType = documentType), Duration.Inf)
 

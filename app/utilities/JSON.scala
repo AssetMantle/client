@@ -40,7 +40,7 @@ object JSON {
     }
     catch {
       case jsonParseException: JsonParseException => logger.info(jsonParseException.getMessage, jsonParseException)
-        throw new BlockChainException(new Failure(jsonParseException.getMessage, null))
+        throw new BaseException(new Failure(jsonParseException.getMessage, null))
       case jsonMappingException: JsonMappingException => logger.info(jsonMappingException.getMessage, jsonMappingException)
         throw new BaseException(new Failure(jsonMappingException.getMessage, null))
     }

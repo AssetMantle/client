@@ -4,9 +4,9 @@ import controllers.actions.{WithLoginAction, WithTraderLoginAction, WithZoneLogi
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
+import models.Trait.Document
 import models.blockchain.{ACLAccounts, Negotiation}
 import models.master.{Accounts, Organizations, Zones}
-import models.Trait.Document
 import models.{blockchain, master}
 import play.api.http.ContentTypes
 import play.api.i18n.I18nSupport
@@ -27,9 +27,9 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
       try {
         loginState.userType match {
           case constants.User.UNKNOWN =>
-            withUsernameToken.Ok(views.html.component.master.commonHome( profilePicture = masterAccountFiles.Service.getProfilePicture(loginState.username)))
+            withUsernameToken.Ok(views.html.component.master.commonHome(profilePicture = masterAccountFiles.Service.getProfilePicture(loginState.username)))
           case _ =>
-            withUsernameToken.Ok(views.html.component.master.commonHome( blockchainAccounts.Service.getCoins(loginState.address), masterAccountFiles.Service.getProfilePicture(loginState.username)))
+            withUsernameToken.Ok(views.html.component.master.commonHome(blockchainAccounts.Service.getCoins(loginState.address), masterAccountFiles.Service.getProfilePicture(loginState.username)))
         }
       } catch {
         case _: BaseException => NoContent
@@ -170,18 +170,18 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
 
   def profileDocuments(): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-    try {
-      val documents: Seq[Document[_]] =  loginState.userType match {
-        case constants.User.ZONE => masterZoneKYC.Service.getAllDocuments(loginState.username)
-        case constants.User.ORGANIZATION => masterOrganizationKYC.Service.getAllDocuments(loginState.username)
-        case constants.User.TRADER => masterTraderKYC.Service.getAllDocuments(loginState.username)
-        case constants.User.USER => masterAccountKYC.Service.getAllDocuments(loginState.username)
-        case _ => masterAccountFile.Service.getAllDocuments(loginState.username)
+      try {
+        val documents: Seq[Document[_]] = loginState.userType match {
+          case constants.User.ZONE => masterZoneKYC.Service.getAllDocuments(loginState.username)
+          case constants.User.ORGANIZATION => masterOrganizationKYC.Service.getAllDocuments(loginState.username)
+          case constants.User.TRADER => masterTraderKYC.Service.getAllDocuments(loginState.username)
+          case constants.User.USER => masterAccountKYC.Service.getAllDocuments(loginState.username)
+          case _ => masterAccountFile.Service.getAllDocuments(loginState.username)
+        }
+        Ok(views.html.component.master.profileDocuments(documents))
+      } catch {
+        case _: BaseException => InternalServerError
       }
-      Ok(views.html.component.master.profileDocuments(documents))
-    } catch {
-      case _: BaseException => InternalServerError
-    }
   }
 
   def profilePicture(): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>

@@ -1,13 +1,15 @@
 package constants
 
-import play.api.data.Forms.{number, text}
+import java.util.Date
+
+import play.api.data.Forms.{number, text, date}
 import play.api.data.Mapping
 import play.api.data.validation.Constraints
 
 import scala.util.matching.Regex
 
 object FormField {
-
+  //StringFormField
   val SIGNUP_USERNAME = new StringFormField("USERNAME", 3,  50, RegularExpression.ACCOUNT_ID, Response.INVALID_USERNAME.message)
   val SIGNUP_PASSWORD = new StringFormField("PASSWORD", 8, 128, RegularExpression.PASSWORD, Response.INVALID_PASSWORD.message)
   val SIGNUP_CONFIRM_PASSWORD = new StringFormField("CONFIRM_PASSWORD", 8, 128, RegularExpression.PASSWORD, Response.INVALID_PASSWORD.message)
@@ -24,7 +26,6 @@ object FormField {
   val ORGANIZATION_ID = new StringFormField("ORGANIZATION_ID", 8, 16, RegularExpression.HASH)
   val TRADER_ID = new StringFormField("TRADER_ID", 8, 16, RegularExpression.HASH)
   val NAME = new StringFormField("NAME", 2, 50)
-  val ESTABLISHMENT_DATE = new StringFormField("ESTABLISHMENT_DATE", 6, 30)
   val ABBREVIATION = new StringFormField("ABBREVIATION", 2, 10)
   val ADDRESS = new StringFormField("ADDRESS", 6, 100)
   val REQUEST_ID = new StringFormField("REQUEST_ID", 32, 32)
@@ -73,7 +74,7 @@ object FormField {
   val NEW_PASSWORD = new StringFormField("NEW_PASSWORD", 1, 128, RegularExpression.PASSWORD, Response.INVALID_PASSWORD.message)
   val CONFIRM_NEW_PASSWORD = new StringFormField("CONFIRM_NEW_PASSWORD", 1, 128, RegularExpression.PASSWORD, Response.INVALID_PASSWORD.message)
   val SEED = new StringFormField("SEED", 1, 200)
-
+  //IntFormField
   val GAS = new IntFormField("GAS", 0, 1000000)
   val BID = new IntFormField("BID", 0, Int.MaxValue)
   val TIME = new IntFormField("TIME", 0, Int.MaxValue)
@@ -83,7 +84,8 @@ object FormField {
   val REDEEM_AMOUNT = new IntFormField("REDEEM_AMOUNT", 0, Int.MaxValue)
   val AMOUNT = new IntFormField("AMOUNT", 0, Int.MaxValue)
   val RATING = new IntFormField("RATING", 0, 100)
-
+  //DateFormField
+  val ESTABLISHMENT_DATE = new DateFormField("ESTABLISHMENT_DATE")
   //TODO: Error Response through Messages
   class StringFormField (fieldName: String, minimumLength: Int, maximumLength: Int, regex: Regex = """.*""".r, errorMessage: String = "Error Response") {
     val name: String = fieldName
@@ -93,5 +95,10 @@ object FormField {
   class IntFormField (fieldName: String, minimumValue: Int, maximumValue: Int) {
     val name: String = fieldName
     val field: Mapping[Int] =  number(min = minimumValue, max = maximumValue)
+  }
+
+  class DateFormField (fieldName: String) {
+    val name: String = fieldName
+    val field: Mapping[Date] =  date("dd-MM-yyyy")
   }
 }

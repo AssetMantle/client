@@ -1,6 +1,6 @@
 package models.master
 
-import java.sql.Timestamp
+import java.sql.Date
 
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
@@ -13,7 +13,7 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Random, Success}
 
-case class Organization(id: String, zoneID: String, accountID: String, name: String, abbreviation: Option[String] = None, establishmentDate: Timestamp, registeredAddress: String, postalAddress: String, email: String, ubo: Option[String] = None, status: Option[Boolean])
+case class Organization(id: String, zoneID: String, accountID: String, name: String, abbreviation: Option[String] = None, establishmentDate: Date, registeredAddress: String, postalAddress: String, email: String, ubo: Option[String] = None, status: Option[Boolean] = None)
 
 @Singleton
 class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
@@ -124,7 +124,7 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
 
     def abbreviation = column[String]("abbreviation")
 
-    def establishmentDate = column[Timestamp]("establishmentDate")
+    def establishmentDate = column[Date]("establishmentDate")
 
     def registeredAddress = column[String]("registeredAddress")
 
@@ -140,9 +140,9 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
 
   object Service {
 
-    def create(zoneID: String, accountID: String, name: String, abbreviation: Option[String], establishmentDate: Timestamp, registeredAddress: String, postalAddress: String, email: String, ubo: Option[String]): String = Await.result(add(Organization(id = (-Math.abs(Random.nextInt)).toHexString.toUpperCase, zoneID = zoneID, accountID = accountID, name = name, abbreviation = abbreviation, establishmentDate = establishmentDate, registeredAddress = registeredAddress, postalAddress = postalAddress, email = email, ubo = ubo, status = None)), Duration.Inf)
+    def create(zoneID: String, accountID: String, name: String, abbreviation: Option[String], establishmentDate: Date, registeredAddress: String, postalAddress: String, email: String, ubo: Option[String]): String = Await.result(add(Organization(id = (-Math.abs(Random.nextInt)).toHexString.toUpperCase, zoneID = zoneID, accountID = accountID, name = name, abbreviation = abbreviation, establishmentDate = establishmentDate, registeredAddress = registeredAddress, postalAddress = postalAddress, email = email, ubo = ubo)), Duration.Inf)
 
-    def insertOrUpdate(zoneID: String, accountID: String, name: String, abbreviation: Option[String], establishmentDate: Timestamp, registeredAddress: String, postalAddress: String, email: String, ubo: Option[String]): String = {
+    def insertOrUpdate(zoneID: String, accountID: String, name: String, abbreviation: Option[String], establishmentDate: Date, registeredAddress: String, postalAddress: String, email: String, ubo: Option[String]): String = {
       val id = try{
         getID(accountID)
       } catch {
@@ -152,7 +152,7 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
           throw new BaseException(baseException.failure)
         }
       }
-      Await.result(upsert(Organization(id = id, zoneID = zoneID, accountID = accountID, name = name, abbreviation = abbreviation, establishmentDate = establishmentDate, registeredAddress = registeredAddress, postalAddress = postalAddress, email = email, ubo = ubo, status = None)), Duration.Inf)
+      Await.result(upsert(Organization(id = id, zoneID = zoneID, accountID = accountID, name = name, abbreviation = abbreviation, establishmentDate = establishmentDate, registeredAddress = registeredAddress, postalAddress = postalAddress, email = email, ubo = ubo)), Duration.Inf)
       id
     }
 

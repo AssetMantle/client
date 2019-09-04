@@ -11,7 +11,7 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class OrganizationBankAccountDetail(id: String, accountHolder: String, nickName: String, accountNumber: String, bankName: String, swiftAddress: String, address: String, country: String, zipCode: String, status: Option[Boolean])
+case class OrganizationBankAccountDetail(id: String, accountHolder: String, nickName: String, accountNumber: String, bankName: String, swiftAddress: String, address: String, country: String, zipCode: String, status: Option[Boolean] = None)
 
 @Singleton
 class OrganizationBankAccountDetails @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
@@ -89,9 +89,9 @@ class OrganizationBankAccountDetails @Inject()(protected val databaseConfigProvi
   }
 
   object Service {
-    def create(id: String, accountHolder: String, nickName: String, accountNumber: String, bankName: String, swiftAddress: String, country: String, address: String, zipCode: String): String = Await.result(add(OrganizationBankAccountDetail(id = id, accountHolder = accountHolder, nickName = nickName, accountNumber = accountNumber, bankName = bankName, swiftAddress = swiftAddress, country = country, address = address, zipCode = zipCode, status = None)), Duration.Inf)
+    def create(id: String, accountHolder: String, nickName: String, accountNumber: String, bankName: String, swiftAddress: String, country: String, address: String, zipCode: String): String = Await.result(add(OrganizationBankAccountDetail(id = id, accountHolder = accountHolder, nickName = nickName, accountNumber = accountNumber, bankName = bankName, swiftAddress = swiftAddress, country = country, address = address, zipCode = zipCode)), Duration.Inf)
 
-    def insertOrUpdate(id: String, accountHolder: String, nickName: String, accountNumber: String, bankName: String, swiftAddress: String, country: String, address: String, zipCode: String): Int = Await.result(upsert(OrganizationBankAccountDetail(id = id, accountHolder = accountHolder, nickName = nickName, accountNumber = accountNumber, bankName = bankName, swiftAddress = swiftAddress, country = country, address = address, zipCode = zipCode, status = None)), Duration.Inf)
+    def insertOrUpdate(id: String, accountHolder: String, nickName: String, accountNumber: String, bankName: String, swiftAddress: String, country: String, address: String, zipCode: String): Int = Await.result(upsert(OrganizationBankAccountDetail(id = id, accountHolder = accountHolder, nickName = nickName, accountNumber = accountNumber, bankName = bankName, swiftAddress = swiftAddress, country = country, address = address, zipCode = zipCode)), Duration.Inf)
 
     def get(id: String): OrganizationBankAccountDetail = Await.result(findById(id), Duration.Inf)
   }

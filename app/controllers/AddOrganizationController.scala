@@ -1,7 +1,7 @@
 package controllers
 
 import java.nio.file.Files
-import java.sql.Timestamp
+import java.sql.Date
 
 import controllers.actions.{WithGenesisLoginAction, WithUserLoginAction, WithZoneLoginAction}
 import controllers.results.WithUsernameToken
@@ -52,7 +52,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
         addOrganizationData => {
           try {
             if (masterZones.Service.getStatus(addOrganizationData.zoneID) == Option(true)) {
-              val id = masterOrganizations.Service.insertOrUpdate(zoneID = addOrganizationData.zoneID, accountID = loginState.username, name = addOrganizationData.name, abbreviation = Option(addOrganizationData.abbreviation), establishmentDate = new Timestamp(addOrganizationData.establishmentDate.getTime), registeredAddress = Json.toJson(master.Address(addressLine1 = addOrganizationData.registeredAddressLine1, addressLine2 = addOrganizationData.registeredAddressLine2, landmark = Option(addOrganizationData.registeredAddressLandmark), city = addOrganizationData.registeredAddressCity, country = addOrganizationData.registeredAddressCountry, zipCode = addOrganizationData.registeredAddressZipCode, phone = addOrganizationData.registeredAddressPhone)).toString(), postalAddress = Json.toJson(master.Address(addressLine1 = addOrganizationData.postalAddressLine1, addressLine2 = addOrganizationData.postalAddressLine2, landmark = Option(addOrganizationData.postalAddressLandmark), city = addOrganizationData.postalAddressCity, country = addOrganizationData.postalAddressCountry, zipCode = addOrganizationData.postalAddressZipCode, phone = addOrganizationData.postalAddressPhone)).toString(), email = addOrganizationData.email, ubo = None)
+              val id = masterOrganizations.Service.insertOrUpdate(zoneID = addOrganizationData.zoneID, accountID = loginState.username, name = addOrganizationData.name, abbreviation = Option(addOrganizationData.abbreviation), establishmentDate = new Date(addOrganizationData.establishmentDate.getTime), registeredAddress = Json.toJson(master.Address(addressLine1 = addOrganizationData.registeredAddressLine1, addressLine2 = addOrganizationData.registeredAddressLine2, landmark = Option(addOrganizationData.registeredAddressLandmark), city = addOrganizationData.registeredAddressCity, country = addOrganizationData.registeredAddressCountry, zipCode = addOrganizationData.registeredAddressZipCode, phone = addOrganizationData.registeredAddressPhone)).toString(), postalAddress = Json.toJson(master.Address(addressLine1 = addOrganizationData.postalAddressLine1, addressLine2 = addOrganizationData.postalAddressLine2, landmark = Option(addOrganizationData.postalAddressLandmark), city = addOrganizationData.postalAddressCity, country = addOrganizationData.postalAddressCountry, zipCode = addOrganizationData.postalAddressZipCode, phone = addOrganizationData.postalAddressPhone)).toString(), email = addOrganizationData.email, ubo = None)
               try {
                 val organizationBankAccountDetail = masterOrganizationBankAccountDetails.Service.get(id)
                 PartialContent(views.html.component.master.organizationBankAccountDetail(views.companion.master.OrganizationBankAccountDetail.form, accountHolderName = organizationBankAccountDetail.accountHolder, nickName = organizationBankAccountDetail.nickName, accountNumber = organizationBankAccountDetail.accountNumber, bankName = organizationBankAccountDetail.bankName, swiftAddress = organizationBankAccountDetail.swiftAddress, address = organizationBankAccountDetail.address, country = organizationBankAccountDetail.country, zipCode = organizationBankAccountDetail.zipCode))
@@ -112,7 +112,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
   }
 
   def uploadUserOrganizationKycForm(documentType: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.userOrganizationKycFileUpload(documentType = documentType))
+    Ok(views.html.component.master.uploadFileForm(utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.uploadUserOrganizationKyc), utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.storeUserOrganizationKyc), documentType))
   }
 
   def uploadUserOrganizationKyc(documentType: String) = Action(parse.multipartFormData) { implicit request =>
@@ -138,35 +138,37 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
   def storeUserOrganizationKyc(name: String, documentType: String): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
+        val id = masterOrganizations.Service.getID(loginState.username)
         fileResourceManager.storeFile[master.OrganizationKYC](
           name = name,
           documentType = documentType,
           path = fileResourceManager.getOrganizationKycFilePath(documentType),
-          document = master.OrganizationKYC(id = loginState.username, documentType = documentType, status = None, fileName = name, file = None),
+          document = master.OrganizationKYC(id = id, documentType = documentType, status = None, fileName = name, file = None),
           masterCreate = masterOrganizationKYCs.Service.create
         )
-        PartialContent(views.html.component.master.organizationKYC(masterOrganizationKYCs.Service.getAllDocuments(masterOrganizations.Service.getID(loginState.username))))
+        PartialContent(views.html.component.master.organizationKYC(masterOrganizationKYCs.Service.getAllDocuments(id)))
       } catch {
         case baseException: BaseException => InternalServerError(Messages(baseException.failure.message))
       }
   }
 
   def updateUserOrganizationKycForm(documentType: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.userOrganizationKycFileUpdate(documentType = documentType))
+    Ok(views.html.component.master.updateFileForm(utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.uploadUserOrganizationKyc), utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.updateUserOrganizationKyc), documentType))
   }
 
   def updateUserOrganizationKyc(name: String, documentType: String): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
+        val id = masterOrganizations.Service.getID(loginState.username)
         fileResourceManager.updateFile[master.OrganizationKYC](
           name = name,
           documentType = documentType,
           path = fileResourceManager.getOrganizationKycFilePath(documentType),
-          oldDocumentFileName = masterOrganizationKYCs.Service.getFileName(id = loginState.username, documentType = documentType),
-          document = master.OrganizationKYC(id = loginState.username, documentType = documentType, status = None, fileName = name, file = None),
+          oldDocumentFileName = masterOrganizationKYCs.Service.getFileName(id = id, documentType = documentType),
+          document = master.OrganizationKYC(id = id, documentType = documentType, status = None, fileName = name, file = None),
           updateOldDocument = masterOrganizationKYCs.Service.updateOldDocument
         )
-        PartialContent(views.html.component.master.organizationKYC(masterOrganizationKYCs.Service.getAllDocuments(masterOrganizations.Service.getID(loginState.username))))
+        PartialContent(views.html.component.master.organizationKYC(masterOrganizationKYCs.Service.getAllDocuments(id)))
       } catch {
         case baseException: BaseException => InternalServerError(Messages(baseException.failure.message))
       }
@@ -186,9 +188,9 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
           try {
             val organizationAccountAddress = masterAccounts.Service.getAddress(masterOrganizations.Service.getAccountId(verifyOrganizationData.organizationID))
             transaction.process[AddOrganization, transactionsAddOrganization.Request](
-              entity = AddOrganization(from = loginState.address, to = organizationAccountAddress, organizationID = verifyOrganizationData.organizationID, zoneID = verifyOrganizationData.zoneID, null, null, ticketID = "", mode = transactionMode, code = null),
+              entity = AddOrganization(from = loginState.address, to = organizationAccountAddress, organizationID = verifyOrganizationData.organizationID, zoneID = verifyOrganizationData.zoneID, gas = verifyOrganizationData.gas, ticketID = "", mode = transactionMode),
               blockchainTransactionCreate = blockchainTransactionAddOrganizations.Service.create,
-              request = transactionsAddOrganization.Request(transactionsAddOrganization.BaseRequest(from = loginState.address), to = organizationAccountAddress, organizationID = verifyOrganizationData.organizationID, zoneID = verifyOrganizationData.zoneID, password = verifyOrganizationData.password, mode = transactionMode),
+              request = transactionsAddOrganization.Request(transactionsAddOrganization.BaseRequest(from = loginState.address, gas = verifyOrganizationData.gas.toString), to = organizationAccountAddress, organizationID = verifyOrganizationData.organizationID, zoneID = verifyOrganizationData.zoneID, password = verifyOrganizationData.password, mode = transactionMode),
               action = transactionsAddOrganization.Service.post,
               onSuccess = blockchainTransactionAddOrganizations.Utility.onSuccess,
               onFailure = blockchainTransactionAddOrganizations.Utility.onFailure,
@@ -299,7 +301,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
       },
       addOrganizationData => {
         try {
-          transactionsAddOrganization.Service.post(transactionsAddOrganization.Request(transactionsAddOrganization.BaseRequest(from = addOrganizationData.from), to = addOrganizationData.to, organizationID = addOrganizationData.organizationID, zoneID = addOrganizationData.zoneID, password = addOrganizationData.password, mode = transactionMode))
+          transactionsAddOrganization.Service.post(transactionsAddOrganization.Request(transactionsAddOrganization.BaseRequest(from = addOrganizationData.from, gas = addOrganizationData.gas.toString), to = addOrganizationData.to, organizationID = addOrganizationData.organizationID, zoneID = addOrganizationData.zoneID, password = addOrganizationData.password, mode = transactionMode))
           Ok(views.html.index(successes = Seq(constants.Response.ORGANIZATION_ADDED)))
         }
         catch {

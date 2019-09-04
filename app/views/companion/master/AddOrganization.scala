@@ -13,7 +13,7 @@ object AddOrganization {
       constants.FormField.ZONE_ID.name -> constants.FormField.ZONE_ID.field,
       constants.FormField.NAME.name -> constants.FormField.NAME.field,
       constants.FormField.ABBREVIATION.name -> constants.FormField.ABBREVIATION.field,
-      constants.Form.ESTABLISHMENT_DATE -> date,
+      constants.FormField.ESTABLISHMENT_DATE.name -> constants.FormField.ESTABLISHMENT_DATE.field,
       constants.FormField.REGISTERED_ADDRESS_LINE_1.name -> constants.FormField.REGISTERED_ADDRESS_LINE_1.field,
       constants.FormField.REGISTERED_ADDRESS_LINE_2.name -> constants.FormField.REGISTERED_ADDRESS_LINE_2.field,
       constants.FormField.REGISTERED_LANDMARK.name -> constants.FormField.REGISTERED_LANDMARK.field,

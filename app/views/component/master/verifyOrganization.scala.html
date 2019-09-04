@@ -10,12 +10,10 @@
     </div>
     <div class="latest_card-body">
     @CSRF.formField
-    @inputText(verifyOrganizationForm(constants.Form.ORGANIZATION_ID).copy(value = Some(organizationID)), '_label -> Messages(constants.Form.ORGANIZATION_ID),
-        'class -> "form-control",'placeholder->Messages(constants.Form.ORGANIZATION_ID),'required->true)
-    @inputText(verifyOrganizationForm(constants.Form.ZONE_ID).copy(value = Some(zoneID)), '_label -> Messages(constants.Form.ZONE_ID),
-        'class -> "form-control",'placeholder->Messages(constants.Form.ZONE_ID),'required->true)
-    @inputPassword(verifyOrganizationForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD),
-        'class -> "form-control",'placeholder->Messages(constants.Form.PASSWORD),'required->true)
+        @inputText(verifyOrganizationForm(constants.Form.ORGANIZATION_ID).copy(value = Some(organizationID)), '_label -> Messages(constants.Form.ORGANIZATION_ID), 'class -> "form-control",'placeholder->Messages(constants.Form.ORGANIZATION_ID),'required->true)
+        @inputText(verifyOrganizationForm(constants.Form.ZONE_ID).copy(value = Some(zoneID)), '_label -> Messages(constants.Form.ZONE_ID), 'class -> "form-control",'placeholder->Messages(constants.Form.ZONE_ID),'required->true)
+        @inputText(verifyOrganizationForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.GAS.name),'required->true)
+        @inputPassword(verifyOrganizationForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD), 'class -> "form-control",'placeholder->Messages(constants.Form.PASSWORD),'required->true)
 
     @if(verifyOrganizationForm.hasGlobalErrors) {
         <ul>

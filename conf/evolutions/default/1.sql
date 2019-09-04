@@ -166,6 +166,7 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."AddOrganization"
   "to"             VARCHAR NOT NULL,
   "organizationID" VARCHAR NOT NULL,
   "zoneID"         VARCHAR NOT NULL,
+  "gas"            INT     NOT NULL,
   "status"         BOOLEAN,
   "txHash"         VARCHAR,
   "ticketID"       VARCHAR NOT NULL,
@@ -179,6 +180,7 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."AddZone"
   "from"     VARCHAR NOT NULL,
   "to"       VARCHAR NOT NULL,
   "zoneID"   VARCHAR NOT NULL,
+  "gas"      INT     NOT NULL,
   "status"   BOOLEAN,
   "txHash"   VARCHAR,
   "ticketID" VARCHAR NOT NULL,
@@ -210,7 +212,7 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."ChangeBuyerBid"
   "bid"      INT     NOT NULL,
   "time"     INT     NOT NULL,
   "pegHash"  VARCHAR NOT NULL,
-  "gas"      INT NOT NULL,
+  "gas"      INT     NOT NULL,
   "status"   BOOLEAN,
   "txHash"   VARCHAR,
   "ticketID" VARCHAR NOT NULL,
@@ -226,7 +228,7 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."ChangeSellerBid"
   "bid"      INT     NOT NULL,
   "time"     INT     NOT NULL,
   "pegHash"  VARCHAR NOT NULL,
-  "gas"      INT NOT NULL,
+  "gas"      INT     NOT NULL,
   "status"   BOOLEAN,
   "txHash"   VARCHAR,
   "ticketID" VARCHAR NOT NULL,
@@ -243,7 +245,7 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."ConfirmBuyerBid"
   "time"              INT     NOT NULL,
   "pegHash"           VARCHAR NOT NULL,
   "buyerContractHash" VARCHAR NOT NULL,
-  "gas"               INT NOT NULL,
+  "gas"               INT     NOT NULL,
   "status"            BOOLEAN,
   "txHash"            VARCHAR,
   "ticketID"          VARCHAR NOT NULL,
@@ -260,7 +262,7 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."ConfirmSellerBid"
   "time"               INT     NOT NULL,
   "pegHash"            VARCHAR NOT NULL,
   "sellerContractHash" VARCHAR NOT NULL,
-  "gas"                INT NOT NULL,
+  "gas"                INT     NOT NULL,
   "status"             BOOLEAN,
   "txHash"             VARCHAR,
   "ticketID"           VARCHAR NOT NULL,
@@ -412,6 +414,7 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."SetACL"
   "organizationID" VARCHAR NOT NULL,
   "zoneID"         VARCHAR NOT NULL,
   "aclHash"        VARCHAR NOT NULL,
+  "gas"            INT     NOT NULL,
   "status"         BOOLEAN,
   "txHash"         VARCHAR,
   "ticketID"       VARCHAR NOT NULL,
@@ -467,7 +470,7 @@ CREATE TABLE IF NOT EXISTS MASTER."Organization"
   "accountID"         VARCHAR   NOT NULL UNIQUE,
   "name"              VARCHAR   NOT NULL,
   "abbreviation"      VARCHAR,
-  "establishmentDate" TIMESTAMP NOT NULL,
+  "establishmentDate" DATE NOT NULL,
   "registeredAddress" VARCHAR   NOT NULL,
   "postalAddress"     VARCHAR   NOT NULL,
   "ubo"               VARCHAR,
@@ -700,6 +703,8 @@ ALTER TABLE MASTER."Zone"
   ADD CONSTRAINT Zone_Account_accountID FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER."AccountKYC"
   ADD CONSTRAINT AccountKYC_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
+ALTER TABLE MASTER."OrganizationKYC"
+  ADD CONSTRAINT OrganizationKYC_Organization_id FOREIGN KEY ("id") REFERENCES MASTER."Organization" ("id");
 ALTER TABLE MASTER."OrganizationBankAccountDetail"
   ADD CONSTRAINT OrganizationBankAccountDetail_Organization_id FOREIGN KEY ("id") REFERENCES MASTER."Organization" ("id");
 ALTER TABLE MASTER."AccountFile"

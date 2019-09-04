@@ -3,9 +3,9 @@ package controllers
 import exceptions.{BaseException, BlockChainException}
 import javax.inject.{Inject, Singleton}
 import models.master
-import play.api.{Configuration, Logger}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
+import play.api.{Configuration, Logger}
 import views.companion.master.SignUp
 
 import scala.concurrent.ExecutionContext
