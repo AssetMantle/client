@@ -1,5 +1,7 @@
 package models.master
 
+import java.sql.Timestamp
+
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import org.postgresql.util.PSQLException
@@ -11,7 +13,7 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Random, Success}
 
-case class Organization(id: String, zoneID: String, accountID: String, name: String, address: String, phone: String, email: String, status: Option[Boolean])
+case class Organization(id: String, zoneID: String, accountID: String, name: String, abbreviation: Option[String] = None, establishmentDate: Timestamp, registeredAddress: String, postalAddress: String, email: String, ubo: Option[String] = None, status: Option[Boolean])
 
 @Singleton
 class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
@@ -29,6 +31,14 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
   private[models] val organizationTable = TableQuery[OrganizationTable]
 
   private def add(organization: Organization): Future[String] = db.run((organizationTable returning organizationTable.map(_.id) += organization).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+    }
+  }
+
+  private def upsert(organization: Organization): Future[Int] = db.run(organizationTable.insertOrUpdate(organization).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -60,6 +70,14 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
     }
   }
 
+  private def getIDByAccountID(accountID: String): Future[String] = db.run(organizationTable.filter(_.accountID === accountID).map(_.id).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
   private def getStatusById(id: String): Future[Option[Boolean]] = db.run(organizationTable.filter(_.id === id).map(_.status.?).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -68,7 +86,7 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
     }
   }
 
-  private def deleteById(id: String)= db.run(organizationTable.filter(_.id === id).delete.asTry).map {
+  private def deleteById(id: String) = db.run(organizationTable.filter(_.id === id).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -82,7 +100,7 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
 
   private def getOrganizationsByZoneID(zoneID: String): Future[Seq[Organization]] = db.run(organizationTable.filter(_.zoneID === zoneID).result)
 
-  private def updateStatusOnID(id: String, status: Boolean)= db.run(organizationTable.filter(_.id === id).map(_.status.?).update(Option(status)).asTry).map {
+  private def updateStatusOnID(id: String, status: Boolean) = db.run(organizationTable.filter(_.id === id).map(_.status.?).update(Option(status)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -94,7 +112,7 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
 
   private[models] class OrganizationTable(tag: Tag) extends Table[Organization](tag, "Organization") {
 
-    def * = (id, zoneID, accountID, name, address, phone, email, status.?) <> (Organization.tupled, Organization.unapply)
+    def * = (id, zoneID, accountID, name, abbreviation.?, establishmentDate, registeredAddress, postalAddress, email, ubo.?, status.?) <> (Organization.tupled, Organization.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
@@ -104,11 +122,17 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
 
     def name = column[String]("name")
 
-    def address = column[String]("address")
+    def abbreviation = column[String]("abbreviation")
 
-    def phone = column[String]("phone")
+    def establishmentDate = column[Timestamp]("establishmentDate")
+
+    def registeredAddress = column[String]("registeredAddress")
+
+    def postalAddress = column[String]("postalAddress")
 
     def email = column[String]("email")
+
+    def ubo = column[String]("ubo")
 
     def status = column[Boolean]("status")
 
@@ -116,11 +140,27 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
 
   object Service {
 
-    def create(zoneID: String, accountID: String, name: String, address: String, phone: String, email: String): String = Await.result(add(Organization((-Math.abs(Random.nextInt)).toHexString.toUpperCase, zoneID, accountID, name, address, phone, email, null)), Duration.Inf)
+    def create(zoneID: String, accountID: String, name: String, abbreviation: Option[String], establishmentDate: Timestamp, registeredAddress: String, postalAddress: String, email: String, ubo: Option[String]): String = Await.result(add(Organization(id = (-Math.abs(Random.nextInt)).toHexString.toUpperCase, zoneID = zoneID, accountID = accountID, name = name, abbreviation = abbreviation, establishmentDate = establishmentDate, registeredAddress = registeredAddress, postalAddress = postalAddress, email = email, ubo = ubo, status = None)), Duration.Inf)
+
+    def insertOrUpdate(zoneID: String, accountID: String, name: String, abbreviation: Option[String], establishmentDate: Timestamp, registeredAddress: String, postalAddress: String, email: String, ubo: Option[String]): String = {
+      val id = try{
+        getID(accountID)
+      } catch {
+        case baseException: BaseException => if (baseException.failure == constants.Response.NO_SUCH_ELEMENT_EXCEPTION){
+          (-Math.abs(Random.nextInt)).toHexString.toUpperCase
+        } else {
+          throw new BaseException(baseException.failure)
+        }
+      }
+      Await.result(upsert(Organization(id = id, zoneID = zoneID, accountID = accountID, name = name, abbreviation = abbreviation, establishmentDate = establishmentDate, registeredAddress = registeredAddress, postalAddress = postalAddress, email = email, ubo = ubo, status = None)), Duration.Inf)
+      id
+    }
 
     def get(id: String): Organization = Await.result(findById(id), Duration.Inf)
 
     def getByAccountID(accountID: String): Organization = Await.result(findByAccountID(accountID), Duration.Inf)
+
+    def getID(accountID: String): String = Await.result(getIDByAccountID(accountID), Duration.Inf)
 
     def updateStatus(id: String, status: Boolean): Int = Await.result(updateStatusOnID(id, status), Duration.Inf)
 

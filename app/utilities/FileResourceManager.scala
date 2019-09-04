@@ -24,7 +24,7 @@ class FileResourceManager @Inject()()(implicit exec: ExecutionContext, configura
 
   private val uploadZoneKycIdentificationPath = configuration.get[String]("upload.zone.identificationPath")
 
-  private val uploadOrganizationKycBankDetailsPath = configuration.get[String]("upload.organization.bankDetailsPath")
+  private val uploadOrganizationKYCBankAccountDetailPath = configuration.get[String]("upload.organization.bankAccountDetailPath")
 
   private val uploadOrganizationKycIdentificationPath = configuration.get[String]("upload.organization.identificationPath")
 
@@ -48,8 +48,13 @@ class FileResourceManager @Inject()()(implicit exec: ExecutionContext, configura
 
   def getOrganizationKycFilePath(documentType: String): String = {
     documentType match {
-      case constants.File.BANK_DETAILS => uploadOrganizationKycBankDetailsPath
+      case constants.File.BANK_ACCOUNT_DETAIL => uploadOrganizationKYCBankAccountDetailPath
       case constants.File.IDENTIFICATION => uploadOrganizationKycIdentificationPath
+      case constants.File.LATEST_AUDITED_FINANCIAL_REPORT => uploadOrganizationKYCBankAccountDetailPath
+      case constants.File.LAST_YEAR_AUDITED_FINANCIAL_REPORT => uploadOrganizationKycIdentificationPath
+      case constants.File.MANAGEMENT => uploadOrganizationKYCBankAccountDetailPath
+      case constants.File.ACRA => uploadOrganizationKycIdentificationPath
+      case constants.File.SHARE_STRUCTURE => uploadOrganizationKycIdentificationPath
       case _ => constants.File.UNKNOWN_TYPE
     }
   }

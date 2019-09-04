@@ -142,11 +142,11 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.FileController.updateUserZoneKycForm,
         routes.javascript.FileController.updateUserZoneKyc,
 
-        routes.javascript.FileController.uploadUserOrganizationKycForm,
-        routes.javascript.FileController.uploadUserOrganizationKyc,
-        routes.javascript.FileController.storeUserOrganizationKyc,
-        routes.javascript.FileController.updateUserOrganizationKycForm,
-        routes.javascript.FileController.updateUserOrganizationKyc,
+        routes.javascript.AddOrganizationController.uploadUserOrganizationKycForm,
+        routes.javascript.AddOrganizationController.uploadUserOrganizationKyc,
+        routes.javascript.AddOrganizationController.storeUserOrganizationKyc,
+        routes.javascript.AddOrganizationController.updateUserOrganizationKycForm,
+        routes.javascript.AddOrganizationController.updateUserOrganizationKyc,
 
         routes.javascript.FileController.uploadUserTraderKycForm,
         routes.javascript.FileController.uploadUserTraderKyc,

@@ -446,14 +446,17 @@ CREATE TABLE IF NOT EXISTS MASTER."Zone"
 
 CREATE TABLE IF NOT EXISTS MASTER."Organization"
 (
-  "id"        VARCHAR NOT NULL,
-  "zoneID"    VARCHAR NOT NULL,
-  "accountID" VARCHAR NOT NULL UNIQUE,
-  "name"      VARCHAR NOT NULL,
-  "address"   VARCHAR NOT NULL,
-  "phone"     VARCHAR NOT NULL,
-  "email"     VARCHAR NOT NULL,
-  "status"    BOOLEAN,
+  "id"                VARCHAR   NOT NULL,
+  "zoneID"            VARCHAR   NOT NULL,
+  "accountID"         VARCHAR   NOT NULL UNIQUE,
+  "name"              VARCHAR   NOT NULL,
+  "abbreviation"      VARCHAR,
+  "establishmentDate" TIMESTAMP NOT NULL,
+  "registeredAddress" VARCHAR   NOT NULL,
+  "postalAddress"     VARCHAR   NOT NULL,
+  "ubo"               VARCHAR,
+  "email"             VARCHAR   NOT NULL,
+  "status"            BOOLEAN,
   PRIMARY KEY ("id")
 );
 
@@ -539,17 +542,18 @@ CREATE TABLE IF NOT EXISTS MASTER."TraderKYC"
   PRIMARY KEY ("id", "documentType")
 );
 
-CREATE TABLE IF NOT EXISTS MASTER."OrganizationBankAccount"
+CREATE TABLE IF NOT EXISTS MASTER."OrganizationBankAccountDetail"
 (
   "id"            VARCHAR NOT NULL,
   "accountHolder" VARCHAR NOT NULL,
-  "bankName"      VARCHAR NOT NULL,
   "nickName"      VARCHAR NOT NULL,
-  "country"       VARCHAR NOT NULL,
-  "swift"         VARCHAR NOT NULL,
+  "accountNumber" VARCHAR NOT NULL,
+  "bankName"      VARCHAR NOT NULL,
+  "swiftAddress"  VARCHAR NOT NULL,
   "address"       VARCHAR NOT NULL,
-  "zipcode"       VARCHAR NOT NULL,
-  "status"        VARCHAR NOT NULL,
+  "country"       VARCHAR NOT NULL,
+  "zipCode"       VARCHAR NOT NULL,
+  "status"        VARCHAR,
   PRIMARY KEY ("id")
 );
 
@@ -677,8 +681,8 @@ ALTER TABLE MASTER."Zone"
   ADD CONSTRAINT Zone_Account_accountID FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER."AccountKYC"
   ADD CONSTRAINT AccountKYC_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
-ALTER TABLE MASTER."OrganizationBankAccount"
-  ADD CONSTRAINT OrganizationBankAccount_Organization_id FOREIGN KEY ("id") REFERENCES MASTER."Organization" ("id");
+ALTER TABLE MASTER."OrganizationBankAccountDetail"
+  ADD CONSTRAINT OrganizationBankAccountDetail_Organization_id FOREIGN KEY ("id") REFERENCES MASTER."Organization" ("id");
 ALTER TABLE MASTER."AccountFile"
   ADD CONSTRAINT AccountFile_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
 
@@ -754,7 +758,7 @@ DROP TABLE IF EXISTS MASTER."ZoneKYC" CASCADE;
 DROP TABLE IF EXISTS MASTER."OrganizationKYC" CASCADE;
 DROP TABLE IF EXISTS MASTER."TraderKYC" CASCADE;
 DROP TABLE IF EXISTS MASTER."AccountKYC" CASCADE;
-DROP TABLE IF EXISTS MASTER."OrganizationBankAccount" CASCADE;
+DROP TABLE IF EXISTS MASTER."OrganizationBankAccountDetail" CASCADE;
 DROP TABLE IF EXISTS MASTER."AccountFile" CASCADE;
 
 DROP TABLE IF EXISTS MASTER_TRANSACTION."AccountToken" CASCADE;

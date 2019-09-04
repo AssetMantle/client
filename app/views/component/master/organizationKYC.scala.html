@@ -1,0 +1,47 @@
+@import controllers.actions.LoginState
+@import models.master.OrganizationKYC
+
+@(organizationKYCs: Seq[OrganizationKYC])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+
+
+@for(organizationKYC <- organizationKYCs){
+    @organizationKYC.documentType match{
+        case constants.File.LATEST_AUDITED_FINANCIAL_REPORT => {
+            <button onclick="getForm(jsRoutes.controllers.AddOrganizationController.updateUserOrganizationKycForm('@constants.File.LATEST_AUDITED_FINANCIAL_REPORT'))">@Messages(constants.Form.UPDATE_LATEST_AUDITED_FINANCIAL_REPORT)</button>
+        }
+        case constants.File.LAST_YEAR_AUDITED_FINANCIAL_REPORT => {
+            <button onclick="getForm(jsRoutes.controllers.AddOrganizationController.updateUserOrganizationKycForm('@constants.File.LAST_YEAR_AUDITED_FINANCIAL_REPORT'))">@Messages(constants.Form.UPDATE_LAST_YEAR_AUDITED_FINANCIAL_REPORT)</button>
+        }
+        case constants.File.MANAGEMENT => {
+            <button onclick="getForm(jsRoutes.controllers.AddOrganizationController.updateUserOrganizationKycForm('@constants.File.MANAGEMENT'))">@Messages(constants.Form.UPDATE_MANAGEMENT)</button>
+        }
+        case constants.File.ACRA => {
+            <button onclick="getForm(jsRoutes.controllers.AddOrganizationController.updateUserOrganizationKycForm('@constants.File.ACRA'))">@Messages(constants.Form.UPDATE_ACRA)</button>
+        }
+        case constants.File.SHARE_STRUCTURE => {
+            <button onclick="getForm(jsRoutes.controllers.AddOrganizationController.updateUserOrganizationKycForm('@constants.File.SHARE_STRUCTURE'))">@Messages(constants.Form.UPDATE_SHARE_STRUCTURE)</button>
+        }
+        case constants.File.BANK_ACCOUNT_DETAIL => {
+            <button onclick="getForm(jsRoutes.controllers.AddOrganizationController.updateUserOrganizationKycForm('@constants.File.BANK_ACCOUNT_DETAIL'))">@Messages(constants.Form.UPDATE_BANK_ACCOUNT_DETAIL)</button>
+        }
+    }
+}
+<div id="uploadLatestAuditedFinancialReport">
+    <button onclick="getForm(jsRoutes.controllers.AddOrganizationController.uploadUserOrganizationKycForm('@constants.File.LATEST_AUDITED_FINANCIAL_REPORT'))">@Messages(constants.Form.UPLOAD_LATEST_AUDITED_FINANCIAL_REPORT)</button>
+</div>
+<div id="uploadLastYearAuditedFinancialReport">
+    <button onclick="getForm(jsRoutes.controllers.AddOrganizationController.uploadUserOrganizationKycForm('@constants.File.LAST_YEAR_AUDITED_FINANCIAL_REPORT'))">@Messages(constants.Form.UPLOAD_LAST_YEAR_AUDITED_FINANCIAL_REPORT)</button>
+
+</div>
+<div id="uploadManagement">
+    <button onclick="getForm(jsRoutes.controllers.AddOrganizationController.uploadUserOrganizationKycForm('@constants.File.MANAGEMENT'))">@Messages(constants.Form.UPLOAD_MANAGEMENT)</button>
+</div>
+<div id="uploadACRA">
+    <button onclick="getForm(jsRoutes.controllers.AddOrganizationController.uploadUserOrganizationKycForm('@constants.File.ACRA'))">@Messages(constants.Form.UPLOAD_ACRA)</button>
+</div>
+<div id="uploadShareStructure">
+    <button onclick="getForm(jsRoutes.controllers.AddOrganizationController.uploadUserOrganizationKycForm('@constants.File.SHARE_STRUCTURE'))">@Messages(constants.Form.UPLOAD_SHARE_STRUCTURE)</button>
+</div>
+<div id="uploadBankAccountDetail">
+    <button onclick="getForm(jsRoutes.controllers.AddOrganizationController.uploadUserOrganizationKycForm('@constants.File.BANK_ACCOUNT_DETAIL'))">@Messages(constants.Form.UPLOAD_BANK_ACCOUNT_DETAIL)</button>
+</div>

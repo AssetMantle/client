@@ -90,12 +90,6 @@ GET         /userUpload/storeUserZoneKycDocument                         control
 GET         /userUpdate/zoneKyc                                          controllers.FileController.updateUserZoneKycForm(documentType: String)
 GET         /userUpdate/updateUserZoneKycDocument                        controllers.FileController.updateUserZoneKyc(name: String, documentType: String)
 
-GET         /userUpload/organizationKyc                                  controllers.FileController.uploadUserOrganizationKycForm(documentType: String)
-POST        /userUpload/userOrganizationKycDocument                      controllers.FileController.uploadUserOrganizationKyc(documentType: String)
-GET         /userUpload/storeUserOrganizationKycDocument                 controllers.FileController.storeUserOrganizationKyc(name: String, documentType: String)
-GET         /userUpdate/organizationKyc                                  controllers.FileController.updateUserOrganizationKycForm(documentType: String)
-GET         /userUpload/updateUserOrganizationKycDocument                controllers.FileController.updateUserOrganizationKyc(name: String, documentType: String)
-
 GET         /userUpload/traderKyc                                        controllers.FileController.uploadUserTraderKycForm(documentType: String)
 POST        /userUpload/userTraderKycDocument                            controllers.FileController.uploadUserTraderKyc(documentType: String)
 GET         /userUpload/storeUserTraderKycDocument                       controllers.FileController.storeUserTraderKyc(name: String, documentType: String)
@@ -159,6 +153,14 @@ POST        /master/organizationRejectVerifyTraderRequest                control
 
 GET         /master/addOrganization                                      controllers.AddOrganizationController.addOrganizationForm
 POST        /master/addOrganization                                      controllers.AddOrganizationController.addOrganization
+POST        /master/organizationBankAccountDetail                        controllers.AddOrganizationController.organizationBankAccountDetail
+POST        /master/reviewOrganizationKYC                                controllers.AddOrganizationController.reviewOrganizationKYC
+
+GET         /userUpload/organizationKyc                                  controllers.AddOrganizationController.uploadUserOrganizationKycForm(documentType: String)
+POST        /userUpload/userOrganizationKycDocument                      controllers.AddOrganizationController.uploadUserOrganizationKyc(documentType: String)
+GET         /userUpload/storeUserOrganizationKycDocument                 controllers.AddOrganizationController.storeUserOrganizationKyc(name: String, documentType: String)
+GET         /userUpdate/organizationKyc                                  controllers.AddOrganizationController.updateUserOrganizationKycForm(documentType: String)
+GET         /userUpload/updateUserOrganizationKycDocument                controllers.AddOrganizationController.updateUserOrganizationKyc(name: String, documentType: String)
 
 GET         /master/addZone                                              controllers.AddZoneController.addZoneForm
 POST        /master/addZone                                              controllers.AddZoneController.addZone
