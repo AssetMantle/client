@@ -13,7 +13,9 @@
  // * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 
-<!DOCTYPE html>
+ <
+ !DOCTYPE;
+ html >;
 var big_image;
 
 $(document).ready(function() {
@@ -186,9 +188,9 @@ function debounce(func, wait, immediate) {
     }, wait);
     if (immediate && !timeout) func.apply(context, args);
   };
-};
+}
 
-var BrowserDetect = {
+ var BrowserDetect = {
   init: function() {
     this.browser = this.searchString(this.dataBrowser) || "Other";
     this.version = this.searchVersion(navigator.userAgent) || this.searchVersion(navigator.appVersion) || "Unknown";
