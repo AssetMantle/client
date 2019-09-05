@@ -18,7 +18,7 @@
                     <i class="fa fa-user"></i>
                 </span>
             </div>
-            @inputText(loginForm(constants.Form.USERNAME), '_label -> Messages(constants.Form.USERNAME), 'class -> "form-control", 'placeholder -> "Username", 'required -> true)
+            @inputText(loginForm(constants.FormField.USERNAME.name), '_label -> Messages(constants.FormField.USERNAME.name), 'class -> "form-control", 'placeholder -> "Username", 'required -> true)
         </div>
         <div class="input-group">
             <div class="input-group-prepend">
@@ -26,9 +26,9 @@
                     <i class="fa fa-lock" aria-hidden="true"></i>
                 </span>
             </div>
-            @inputPassword(loginForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD), 'class -> "form-control", 'placeholder -> "Password", 'required -> true)
+            @inputPassword(loginForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "form-control", 'placeholder -> "Password", 'required -> true)
         </div>
-        <div class = "hidden">@inputText(loginForm(constants.Form.NOTIFICATION_TOKEN), 'id -> constants.Form.NOTIFICATION_TOKEN, 'readonly -> true)</div>
+        <div class = "hidden">@inputText(loginForm(constants.FormField.NOTIFICATION_TOKEN.name), 'id -> constants.FormField.NOTIFICATION_TOKEN.name, 'readonly -> true)</div>
 
         @if(loginForm.hasGlobalErrors) {
             <ul>
