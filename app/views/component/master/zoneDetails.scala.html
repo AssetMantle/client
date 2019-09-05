@@ -2,7 +2,7 @@
 @import controllers.actions.LoginState
 
 @(zone: Zone)(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
-    @Messages(constants.Form.NAME): @zone <br>
+    @Messages(constants.Form.NAME): @zone.name <br>
     @Messages(constants.Form.ZONE_ID): @zone.id <br>
     @Messages(constants.Form.CURRENCY): @zone.currency <br>
     @Messages(constants.Form.VERIFIED_STATUS): @zone.status <br>
