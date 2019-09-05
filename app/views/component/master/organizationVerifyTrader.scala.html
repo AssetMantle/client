@@ -11,10 +11,10 @@
     <div>
     <div class="latest_card-body ml-cb">
     @CSRF.formField
-    @inputText(verifyTraderForm(constants.Form.ACL_ADDRESS).copy(value = Some(aclAddress)), '_label -> Messages(constants.Form.ACL_ADDRESS),
-        'class -> "form-control",'placeholder->Messages(constants.Form.ACL_ADDRESS),'required->true)
-    @inputText(verifyTraderForm(constants.Form.ORGANIZATION_ID).copy(value = Some(organizationID)), '_label -> Messages(constants.Form.ORGANIZATION_ID),
-        'class -> "form-control",'placeholder->Messages(constants.Form.ORGANIZATION_ID),'required->true)
+    @inputText(verifyTraderForm(constants.FormField.ACL_ADDRESS.name).copy(value = Some(aclAddress)), '_label -> Messages(constants.FormField.ACL_ADDRESS.name),
+        'class -> "form-control",'placeholder->Messages(constants.FormField.ACL_ADDRESS.name),'required->true)
+    @inputText(verifyTraderForm(constants.FormField.ORGANIZATION_ID.name).copy(value = Some(organizationID)), '_label -> Messages(constants.FormField.ORGANIZATION_ID.name),
+        'class -> "form-control",'placeholder->Messages(constants.FormField.ORGANIZATION_ID.name),'required->true)
         <div class="input-group-prepend">
             @checkbox(verifyTraderForm(constants.Form.ISSUE_ASSET), '_label -> Messages(constants.Form.ISSUE_ASSET))
             <span class="input-group-text">
@@ -114,8 +114,8 @@
 
         </div>
 
-    @inputPassword(verifyTraderForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD),
-        'class -> "form-control",'placeholder->Messages(constants.Form.PASSWORD),'required->true)
+    @inputPassword(verifyTraderForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name),
+        'class -> "form-control",'placeholder->Messages(constants.FormField.PASSWORD.name),'required->true)
 
     @if(verifyTraderForm.hasGlobalErrors) {
         <ul>
