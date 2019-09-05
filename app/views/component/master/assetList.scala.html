@@ -1,7 +1,8 @@
 @import controllers.actions.LoginState
 @import models.blockchain.Asset
+@import models.masterTransaction.IssueAssetRequest
 
-@(assetPegWallet: Seq[Asset])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+@(assetPegWallet: Seq[IssueAssetRequest])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
 @for(asset <- assetPegWallet) {
     <div class="flexItem box thirdBox lightBlue">
@@ -12,10 +13,13 @@
             <span class="red">@Messages(constants.Form.ASSET_QUANTITY)</span> : @asset.assetQuantity <br>
             <span class="red">@Messages(constants.Form.ASSET_PRICE)</span> : @asset.assetPrice <br>
             <span class="red">@Messages(constants.Form.QUANTITY_UNIT)</span> : @asset.quantityUnit <br>
-            <span class="red">@Messages(constants.Form.MODERATED)</span> : @asset.moderated <br>
+@*            <span class="red">@Messages(constants.Form.MODERATED)</span> : @asset.moderated <br>*@
             <span class="red">@Messages(constants.Form.TAKER_ADDRESS)</span> : @asset.takerAddress <br>
-                <span class="red">@Messages(constants.Form.LOCKED)</span> : @asset.locked <br>
+@*                <span class="red">@Messages(constants.Form.LOCKED)</span> : @asset.locked <br>*@
+            <span class="red">@Messages(constants.Form.STATUS)</span> : @asset.status <br>
+
         </div>
+        @*
         <div class="centerText" >
         @loginState.acl match {
             case Some(acl) => {
@@ -28,5 +32,9 @@
         }
 
         </div>
+        *@
+            @if(asset.status == constants.Status.Asset.INCOMPLETE_DETAILS){
+                <button class="width btn btn-primary btn-sm" onclick="getForm(jsRoutes.controllers.IssueAssetController.issueAssetRequestForm('@asset.id', '@asset.quantityUnit'))">@Messages(constants.Form.ISSUE_ASSET_REQUEST)</button>
+            }
     </div>
 }

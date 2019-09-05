@@ -201,7 +201,7 @@ POST        /master/confirmBuyerBid                                      control
 GET         /master/confirmSellerBid                                     controllers.ConfirmSellerBidController.confirmSellerBidForm(buyerAddress:String, pegHash: String, bid:Int)
 POST        /master/confirmSellerBid                                     controllers.ConfirmSellerBidController.confirmSellerBid
 
-GET         /master/issueAssetRequest                                    controllers.IssueAssetController.issueAssetRequestForm
+GET         /master/issueAssetRequest                                    controllers.IssueAssetController.issueAssetRequestForm(id: String)
 POST        /master/issueAssetRequest                                    controllers.IssueAssetController.issueAssetRequest
 
 GET         /master/viewPendingIssueAssetRequests                        controllers.IssueAssetController.viewPendingIssueAssetRequests

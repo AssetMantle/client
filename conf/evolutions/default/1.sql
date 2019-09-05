@@ -603,7 +603,6 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."IssueAssetRequest"
     "assetQuantity"               INT     NOT NULL,
     "assetPrice"                  INT     NOT NULL,
     "takerAddress"                VARCHAR,
-    "gas"                         INT,
     "shipmentDetails"             VARCHAR NOT NULL,
     "physicalDocumentsHandledVia" VARCHAR,
     "paymentTerms"                VARCHAR NOT NULL,

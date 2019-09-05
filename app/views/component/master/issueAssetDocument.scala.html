@@ -2,9 +2,9 @@
 @import helper._
 @import views.companion.master.IssueAssetDocument
 
-@(issueAssetDocumentForm: Form[IssueAssetDocument.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@(issueAssetDocumentForm: Form[IssueAssetDocument.Data], id: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 
-@form(action = routes.IssueAssetController.issueAssetRequest, 'onkeypress -> "validateForm(event,this)") {
+@form(action = routes.IssueAssetController.issueAssetRequest(), 'onkeypress -> "validateForm(event,this)") {
     @CSRF.formField
     <div class="latest_card-header latest_card-header-primary text-center">
         <h4 class="latest_card-title">@Messages(constants.Form.ISSUE_ASSET_REQUEST)</h4>
@@ -12,6 +12,8 @@
     <script src="@routes.Assets.versioned("javascripts/showHideUploadUpdateButton.js")" type="text/javascript"></script>
     <div >
         <div class="latest_card-body ml-cb">
+            @inputText(issueAssetDocumentForm(constants.Form.ID).copy(value = Some(id)), '_label -> Messages(constants.Form.ID),
+                'class -> "form-control", 'placeholder -> Messages(constants.Form.ID), 'required -> true)
             @inputText(issueAssetDocumentForm(constants.Form.BILL_OF_LADING_NUMBER), '_label -> Messages(constants.Form.BILL_OF_LADING_NUMBER),
                 'class -> "form-control", 'placeholder -> Messages(constants.Form.BILL_OF_LADING_NUMBER), 'required -> true)
             @inputText(issueAssetDocumentForm(constants.Form.PORT_OF_LOADING), '_label -> Messages(constants.Form.PORT_OF_LOADING),

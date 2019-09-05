@@ -7,7 +7,7 @@ import javax.inject.{Inject, Singleton}
 import models.blockchain.{ACLAccounts, Negotiation}
 import models.master.{Accounts, Organizations, Zones}
 import models.Trait.Document
-import models.{blockchain, master}
+import models.{blockchain, master, masterTransaction}
 import play.api.http.ContentTypes
 import play.api.i18n.I18nSupport
 import play.api.libs.Comet
@@ -18,7 +18,7 @@ import queries.GetAccount
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class ComponentViewController @Inject()(messagesControllerComponents: MessagesControllerComponents, masterAccountKYC: master.AccountKYCs, masterAccountFile: master.AccountFiles, masterZoneKYC: master.ZoneKYCs, masterOrganizationKYC: master.OrganizationKYCs, masterTraderKYC: master.TraderKYCs, withZoneLoginAction: WithZoneLoginAction, withTraderLoginAction: WithTraderLoginAction, withLoginAction: WithLoginAction, masterAccounts: Accounts, masterAccountFiles: master.AccountFiles, blockchainAclAccounts: ACLAccounts, blockchainZones: blockchain.Zones, blockchainOrganizations: blockchain.Organizations, blockchainAssets: blockchain.Assets, blockchainFiats: blockchain.Fiats, blockchainNegotiations: blockchain.Negotiations, masterOrganizations: Organizations, masterZones: Zones, blockchainAclHashes: blockchain.ACLHashes, blockchainOrders: blockchain.Orders, getAccount: GetAccount, blockchainAccounts: blockchain.Accounts, withUsernameToken: WithUsernameToken)(implicit configuration: Configuration, executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class ComponentViewController @Inject()(messagesControllerComponents: MessagesControllerComponents, masterAccountKYC: master.AccountKYCs, masterAccountFile: master.AccountFiles, masterZoneKYC: master.ZoneKYCs, masterOrganizationKYC: master.OrganizationKYCs, masterTraderKYC: master.TraderKYCs, withZoneLoginAction: WithZoneLoginAction, withTraderLoginAction: WithTraderLoginAction, withLoginAction: WithLoginAction, masterAccounts: Accounts, masterAccountFiles: master.AccountFiles, masterTransactionIssueAssetRequests: masterTransaction.IssueAssetRequests, blockchainAclAccounts: ACLAccounts, blockchainZones: blockchain.Zones, blockchainOrganizations: blockchain.Organizations, blockchainAssets: blockchain.Assets, blockchainFiats: blockchain.Fiats, blockchainNegotiations: blockchain.Negotiations, masterOrganizations: Organizations, masterZones: Zones, blockchainAclHashes: blockchain.ACLHashes, blockchainOrders: blockchain.Orders, getAccount: GetAccount, blockchainAccounts: blockchain.Accounts, withUsernameToken: WithUsernameToken)(implicit configuration: Configuration, executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -75,10 +75,19 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
       }
   }
 
+//  def assetList: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+//    implicit request =>
+//      try {
+//        withUsernameToken.Ok(views.html.component.master.assetList(blockchainAssets.Service.getAssetPegWallet(loginState.address)))
+//      } catch {
+//        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+//      }
+//  }
+
   def assetList: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        withUsernameToken.Ok(views.html.component.master.assetList(blockchainAssets.Service.getAssetPegWallet(loginState.address)))
+        withUsernameToken.Ok(views.html.component.master.assetList(masterTransactionIssueAssetRequests.Service.getIssueAssetsByAccountID(loginState.username)))
       } catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }

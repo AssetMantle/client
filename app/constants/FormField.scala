@@ -1,15 +1,16 @@
 package constants
 
+import java.util.Date
+
+import play.api.data.Forms.{date, number, text}
 import play.api.data.Mapping
 import play.api.data.validation.Constraints
 
 import scala.util.matching.Regex
-import play.api.data.Forms.{number, text, date}
-import java.util.Date
 
 object FormField {
 
-  val SIGNUP_USERNAME = new StringFormField("USERNAME", 3,  50, RegularExpression.ACCOUNT_ID, Response.INVALID_USERNAME.message)
+  val SIGNUP_USERNAME = new StringFormField("USERNAME", 3, 50, RegularExpression.ACCOUNT_ID, Response.INVALID_USERNAME.message)
   val SIGNUP_PASSWORD = new StringFormField("PASSWORD", 8, 128, RegularExpression.PASSWORD, Response.INVALID_PASSWORD.message)
   val SIGNUP_CONFIRM_PASSWORD = new StringFormField("CONFIRM_PASSWORD", 8, 128, RegularExpression.PASSWORD, Response.INVALID_PASSWORD.message)
   val USERNAME = new StringFormField("USERNAME", 3, 50, RegularExpression.ACCOUNT_ID)
@@ -46,9 +47,9 @@ object FormField {
   val DOCUMENT_HASH = new StringFormField("DOCUMENT_HASH", 4, 50, RegularExpression.HASH)
   val FROM = new StringFormField("FROM", 45, 45)
   val MODE = new StringFormField("MODE", 4, 5)
-  val TAKER_ADDRESS = new StringFormField( "TAKER_ADDRESS", 0, 45)
-  val PORT_OF_LOADING = new StringFormField( "PORT_OF_LOADING", 0, 100)
-  val PORT_OF_DISCHARGE = new StringFormField( "PORT_OF_DISCHARGE", 0, 100)
+  val TAKER_ADDRESS = new StringFormField("TAKER_ADDRESS", 0, 45)
+  val PORT_OF_LOADING = new StringFormField("PORT_OF_LOADING", 0, 100)
+  val PORT_OF_DISCHARGE = new StringFormField("PORT_OF_DISCHARGE", 0, 100)
   val BILL_OF_LADING_NUMBER = new StringFormField("COMMODITY_NAME", 2, 20, RegularExpression.ALL_NUMBERS_ALL_LETTERS)
   val SHIPPER_NAME = new StringFormField("SHIPPER_NAME", 2, 20, RegularExpression.ALL_NUMBERS_ALL_LETTERS)
   val SHIPPER_ADDRESS = new StringFormField("SHIPPER_ADDRESS", 2, 100, RegularExpression.ALL_NUMBERS_ALL_LETTERS)
@@ -81,24 +82,24 @@ object FormField {
   val RATING = new IntFormField("RATING", 0, 100)
 
   //TODO: Error Response through Messages
-  class StringFormField (fieldName: String, minimumLength: Int, maximumLength: Int, regex: Regex = """.*""".r, errorMessage: String = "Error Response") {
+  class StringFormField(fieldName: String, minimumLength: Int, maximumLength: Int, regex: Regex = """.*""".r, errorMessage: String = "Error Response") {
     val name: String = fieldName
-    val field: Mapping[String] =  text(minLength = minimumLength, maxLength = maximumLength).verifying(Constraints.pattern(regex = regex, error = errorMessage))
+    val field: Mapping[String] = text(minLength = minimumLength, maxLength = maximumLength).verifying(Constraints.pattern(regex = regex, error = errorMessage))
   }
 
   class StringFormFieldOption(fieldName: String, option: Seq[String], errorMessage: String = "Error Response") {
     val name: String = fieldName
-    val field: Mapping[String] =  text.verifying(constraint = field => option contains field, error = errorMessage)
+    val field: Mapping[String] = text.verifying(constraint = field => option contains field, error = errorMessage)
   }
 
-  class IntFormField (fieldName: String, minimumValue: Int, maximumValue: Int) {
+  class IntFormField(fieldName: String, minimumValue: Int, maximumValue: Int) {
     val name: String = fieldName
-    val field: Mapping[Int] =  number(min = minimumValue, max = maximumValue)
+    val field: Mapping[Int] = number(min = minimumValue, max = maximumValue)
   }
 
-  class DateFormField (fieldName: String) {
+  class DateFormField(fieldName: String) {
     val name: String = fieldName
-    val field: Mapping[Date] =  date("dd-MM-yyyy")
+    val field: Mapping[Date] = date
   }
 
 }

@@ -15,7 +15,6 @@ object IssueAssetRequest {
       constants.FormField.ASSET_QUANTITY.name -> constants.FormField.ASSET_QUANTITY.field,
       constants.FormField.ASSET_PRICE.name -> constants.FormField.ASSET_PRICE.field,
       constants.Form.MODERATED -> boolean,
-      constants.FormField.GAS.name -> constants.FormField.GAS.field,
       constants.FormField.TAKER_ADDRESS.name -> constants.FormField.TAKER_ADDRESS.field,
       constants.FormField.COMMODITY_NAME.name -> constants.FormField.COMMODITY_NAME.field,
       constants.FormField.QUALITY.name -> constants.FormField.QUALITY.field,
@@ -26,11 +25,10 @@ object IssueAssetRequest {
       constants.FormField.SHIPMENT_DATE.name -> constants.FormField.SHIPMENT_DATE.field,
       constants.FormField.PHYSICAL_DOCUMENTS_HANDLED_VIA.name -> constants.FormField.PHYSICAL_DOCUMENTS_HANDLED_VIA.field,
       constants.FormField.COMDEX_PAYMENT_TERMS.name -> constants.FormField.COMDEX_PAYMENT_TERMS.field,
-      constants.FormField.PASSWORD.name -> constants.FormField.PASSWORD.field,
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(documentHash: String, assetType: String, quantityUnit: String, assetQuantity: Int, assetPrice: Int, moderated: Boolean, gas: Int, takerAddress: String, commodityName: String, quality: String, deliveryTerm: String, tradeType: String, portOfLoading: String, portOfDischarge: String, shipmentDate: Date, physicalDocumentsHandledVia: String, comdexPaymentTerms: String, password: String)
+  case class Data(documentHash: String, assetType: String, quantityUnit: String, assetQuantity: Int, assetPrice: Int, moderated: Boolean, takerAddress: String, commodityName: String, quality: String, deliveryTerm: String, tradeType: String, portOfLoading: String, portOfDischarge: String, shipmentDate: Date, physicalDocumentsHandledVia: String, comdexPaymentTerms: String)
 
 }
 

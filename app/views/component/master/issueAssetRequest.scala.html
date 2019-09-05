@@ -1,6 +1,7 @@
 @import controllers.actions.LoginState
 @import helper._
 @import views.companion.master.IssueAssetRequest
+@import models.masterTransaction
 
 @(issueAssetRequestForm: Form[IssueAssetRequest.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 
@@ -49,7 +50,7 @@
                 @Messages(constants.Form.MODERATED)
             </span>
         </div>
-
+    <br>
     <div id="moderatedIssueAssetRequestFormFields">
         @inputText(issueAssetRequestForm(constants.Form.GAS).copy(value = Some("0")), '_label -> Messages(constants.Form.GAS),
             'class -> "form-control",'placeholder->Messages(constants.Form.GAS),  'required->true)

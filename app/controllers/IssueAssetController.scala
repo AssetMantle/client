@@ -6,6 +6,7 @@ import exceptions.{BaseException, BlockChainException}
 import javax.inject.{Inject, Singleton}
 import models.{blockchain, blockchainTransaction, master, masterTransaction}
 import play.api.i18n.I18nSupport
+import play.api.libs.json.Json
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
 
@@ -19,8 +20,14 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  def issueAssetRequestForm: Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.issueAssetRequest(views.companion.master.IssueAssetRequest.form))
+  def issueAssetRequestForm(id: String = ""): Action[AnyContent] = Action { implicit request =>
+    try {
+      val assetRequest = masterTransactionIssueAssetRequests.Service.getIssueAssetsByID(id)
+      val shipmentDetails = Json.parse(assetRequest.shipmentDetails).as[masterTransaction.JsonDetails.ShipmentDetails]
+      Ok(views.html.component.master.issueAssetRequest(views.companion.master.IssueAssetRequest.form.fill(views.companion.master.IssueAssetRequest.Data(assetRequest.documentHash, assetRequest.assetType, assetRequest.quantityUnit, assetRequest.assetQuantity, assetRequest.assetPrice, true, assetRequest.takerAddress.getOrElse(""), shipmentDetails.commodityName, shipmentDetails.quality, shipmentDetails.deliveryTerm, shipmentDetails.tradeType, shipmentDetails.portOfLoading, shipmentDetails.portOfDischarge, shipmentDetails.shipmentDate, assetRequest.physicalDocumentsHandledVia, assetRequest.paymentTerms))))
+    } catch {
+      case _: BaseException => Ok(views.html.component.master.issueAssetRequest(views.companion.master.IssueAssetRequest.form))
+    }
   }
 
   def issueAssetRequest: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
@@ -31,21 +38,46 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
         },
         issueAssetRequestData => {
           try {
+            val id = Random.nextString(32)
             if (!issueAssetRequestData.moderated) {
-              transaction.process[blockchainTransaction.IssueAsset, transactionsIssueAsset.Request](
-                entity = blockchainTransaction.IssueAsset(from = loginState.address, to = loginState.address, documentHash = issueAssetRequestData.documentHash, assetType = issueAssetRequestData.assetType, assetPrice = issueAssetRequestData.assetPrice, quantityUnit = issueAssetRequestData.quantityUnit, assetQuantity = issueAssetRequestData.assetQuantity, moderated = issueAssetRequestData.moderated,gas=issueAssetRequestData.gas ,takerAddress = if (issueAssetRequestData.takerAddress == "") null else Option(issueAssetRequestData.takerAddress), status = null, txHash = null, ticketID = "", mode = transactionMode, code = null),
-                blockchainTransactionCreate = blockchainTransactionIssueAssets.Service.create,
-                request = transactionsIssueAsset.Request(transactionsIssueAsset.BaseRequest(from = loginState.address), to = loginState.address, password = issueAssetRequestData.password, documentHash = issueAssetRequestData.documentHash, assetType = issueAssetRequestData.assetType, assetPrice = issueAssetRequestData.assetPrice.toString, quantityUnit = issueAssetRequestData.quantityUnit, assetQuantity = issueAssetRequestData.assetQuantity.toString, moderated = issueAssetRequestData.moderated, gas=issueAssetRequestData.gas.toString,takerAddress = issueAssetRequestData.takerAddress, mode = transactionMode),
-                action = transactionsIssueAsset.Service.post,
-                onSuccess = blockchainTransactionIssueAssets.Utility.onSuccess,
-                onFailure = blockchainTransactionIssueAssets.Utility.onFailure,
-                updateTransactionHash = blockchainTransactionIssueAssets.Service.updateTransactionHash
-              )
+              //              transaction.process[blockchainTransaction.IssueAsset, transactionsIssueAsset.Request](
+              //                entity = blockchainTransaction.IssueAsset(from = loginState.address, to = loginState.address, documentHash = issueAssetRequestData.documentHash, assetType = issueAssetRequestData.assetType, assetPrice = issueAssetRequestData.assetPrice, quantityUnit = issueAssetRequestData.quantityUnit, assetQuantity = issueAssetRequestData.assetQuantity, moderated = issueAssetRequestData.moderated,gas=issueAssetRequestData.gas ,takerAddress = if (issueAssetRequestData.takerAddress == "") null else Option(issueAssetRequestData.takerAddress), status = null, txHash = null, ticketID = "", mode = transactionMode, code = null),
+              //                blockchainTransactionCreate = blockchainTransactionIssueAssets.Service.create,
+              //                request = transactionsIssueAsset.Request(transactionsIssueAsset.BaseRequest(from = loginState.address), to = loginState.address, password = issueAssetRequestData.password, documentHash = issueAssetRequestData.documentHash, assetType = issueAssetRequestData.assetType, assetPrice = issueAssetRequestData.assetPrice.toString, quantityUnit = issueAssetRequestData.quantityUnit, assetQuantity = issueAssetRequestData.assetQuantity.toString, moderated = issueAssetRequestData.moderated, gas=issueAssetRequestData.gas.toString,takerAddress = issueAssetRequestData.takerAddress, mode = transactionMode),
+              //                action = transactionsIssueAsset.Service.post,
+              //                onSuccess = blockchainTransactionIssueAssets.Utility.onSuccess,
+              //                onFailure = blockchainTransactionIssueAssets.Utility.onFailure,
+              //                updateTransactionHash = blockchainTransactionIssueAssets.Service.updateTransactionHash
+              //              )
               withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ASSET_ISSUED)))
             } else {
-              //masterTransactionIssueAssetRequests.Service.create(id = Random.nextString(32), pegHash = null, accountID = loginState.username, documentHash = issueAssetRequestData.documentHash, assetType = issueAssetRequestData.assetType, quantityUnit = issueAssetRequestData.quantityUnit, assetQuantity = issueAssetRequestData.assetQuantity, assetPrice = issueAssetRequestData.assetPrice, takerAddress = if (issueAssetRequestData.takerAddress == "") null else Option(issueAssetRequestData.takerAddress), portOfLoading = issueAssetRequestData.por)
-              withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ISSUE_ASSET_REQUEST_SENT)))
+              masterTransactionIssueAssetRequests.Service.create(id = id, ticketID = null, pegHash = null, accountID = loginState.username, documentHash = issueAssetRequestData.documentHash, assetType = issueAssetRequestData.assetType, quantityUnit = issueAssetRequestData.quantityUnit, assetQuantity = issueAssetRequestData.assetQuantity, assetPrice = issueAssetRequestData.assetPrice, takerAddress = if (issueAssetRequestData.takerAddress == "") null else Option(issueAssetRequestData.takerAddress), commodityName = issueAssetRequestData.commodityName, quality = issueAssetRequestData.quality, deliveryTerm = issueAssetRequestData.deliveryTerm, tradeType = issueAssetRequestData.tradeType, portOfLoading = issueAssetRequestData.portOfLoading, portOfDischarge = issueAssetRequestData.portOfDischarge, shipmentDate = issueAssetRequestData.shipmentDate, physicalDocumentsHandledVia = issueAssetRequestData.physicalDocumentsHandledVia, paymentTerms = issueAssetRequestData.comdexPaymentTerms, status = constants.Status.Asset.INCOMPLETE_DETAILS)
+              PartialContent(views.html.component.master.issueAssetDocument(views.companion.master.IssueAssetDocument.form, id))
+
+              //              PartialContent(views.html.index(successes = Seq(constants.Response.ISSUE_ASSET_REQUEST_SENT)))
             }
+          }
+          catch {
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+            case blockChainException: BlockChainException => InternalServerError(views.html.index(failures = Seq(blockChainException.failure)))
+          }
+        }
+      )
+  }
+
+  def issueAssetDocumentForm(id: String): Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.issueAssetDocument(views.companion.master.IssueAssetDocument.form, id))
+  }
+
+  def issueAssetDocument: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      views.companion.master.IssueAssetDocument.form.bindFromRequest().fold(
+        formWithErrors => {
+          BadRequest(views.html.component.master.issueAssetDocument(formWithErrors, constants.Form.ID))
+        },
+        issueAssetDocumentData => {
+          try {
+            Ok
           }
           catch {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -58,7 +90,7 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
   def viewPendingIssueAssetRequests: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        withUsernameToken.Ok(views.html.component.master.viewPendingIssueAssetRequests(masterTransactionIssueAssetRequests.Service.getPendingIssueAssetRequests(masterAccounts.Service.getIDsForAddresses(blockchainAclAccounts.Service.getAddressesUnderZone(masterZones.Service.getZoneId(loginState.username))))))
+        withUsernameToken.Ok(views.html.component.master.viewPendingIssueAssetRequests(masterTransactionIssueAssetRequests.Service.getPendingIssueAssetRequests(masterAccounts.Service.getIDsForAddresses(blockchainAclAccounts.Service.getAddressesUnderZone(masterZones.Service.getZoneId(loginState.username))), constants.Status.Asset.REQUESTED)))
       }
       catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -102,9 +134,9 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
             val toAddress = masterAccounts.Service.getAddress(issueAssetData.accountID)
             if (masterTransactionIssueAssetRequests.Service.getStatus(issueAssetData.requestID).isEmpty) {
               val ticketID = transaction.process[blockchainTransaction.IssueAsset, transactionsIssueAsset.Request](
-                entity = blockchainTransaction.IssueAsset(from = loginState.address, to = toAddress, documentHash = issueAssetData.documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.assetPrice, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.assetQuantity, moderated = true, gas=issueAssetData.gas,takerAddress = if (issueAssetData.takerAddress == "") null else Option(issueAssetData.takerAddress), status = null, txHash = null, ticketID = "", mode = transactionMode, code = null),
+                entity = blockchainTransaction.IssueAsset(from = loginState.address, to = toAddress, documentHash = issueAssetData.documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.assetPrice, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.assetQuantity, moderated = true, gas = issueAssetData.gas, takerAddress = if (issueAssetData.takerAddress == "") null else Option(issueAssetData.takerAddress), status = null, txHash = null, ticketID = "", mode = transactionMode, code = null),
                 blockchainTransactionCreate = blockchainTransactionIssueAssets.Service.create,
-                request = transactionsIssueAsset.Request(transactionsIssueAsset.BaseRequest(from = loginState.address), to = toAddress, password = issueAssetData.password, documentHash = issueAssetData.documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.assetPrice.toString, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.assetQuantity.toString, moderated = true,gas=issueAssetData.gas.toString, takerAddress = issueAssetData.takerAddress, mode = transactionMode),
+                request = transactionsIssueAsset.Request(transactionsIssueAsset.BaseRequest(from = loginState.address), to = toAddress, password = issueAssetData.password, documentHash = issueAssetData.documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.assetPrice.toString, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.assetQuantity.toString, moderated = true, gas = issueAssetData.gas.toString, takerAddress = issueAssetData.takerAddress, mode = transactionMode),
                 action = transactionsIssueAsset.Service.post,
                 onSuccess = blockchainTransactionIssueAssets.Utility.onSuccess,
                 onFailure = blockchainTransactionIssueAssets.Utility.onFailure,
@@ -135,7 +167,7 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
       },
       issueAssetData => {
         try {
-          transactionsIssueAsset.Service.post(transactionsIssueAsset.Request(transactionsIssueAsset.BaseRequest(from = issueAssetData.from), to = issueAssetData.to, password = issueAssetData.password, documentHash = issueAssetData.documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.assetPrice.toString, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.assetQuantity.toString,gas=issueAssetData.gas.toString, moderated = issueAssetData.moderated, takerAddress = issueAssetData.takerAddress, mode = issueAssetData.mode))
+          transactionsIssueAsset.Service.post(transactionsIssueAsset.Request(transactionsIssueAsset.BaseRequest(from = issueAssetData.from), to = issueAssetData.to, password = issueAssetData.password, documentHash = issueAssetData.documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.assetPrice.toString, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.assetQuantity.toString, gas = issueAssetData.gas.toString, moderated = issueAssetData.moderated, takerAddress = issueAssetData.takerAddress, mode = issueAssetData.mode))
           Ok(views.html.index(successes = Seq(constants.Response.ASSET_ISSUED)))
         }
         catch {
