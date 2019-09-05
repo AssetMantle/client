@@ -2,7 +2,7 @@
 @import controllers.actions.LoginState
 
 @(organization: Organization)(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
-    @Messages(constants.Form.ORGANIZATION_NAME): @organization.name <br>
+    @Messages(constants.Form.ORGANIZATION_NAME): @organization <br>
     @Messages(constants.Form.ORGANIZATION_ID): @organization.id <br>
     @Messages(constants.Form.ORGANIZATION_USERNAME): @organization.accountID <br>
     @Messages(constants.Form.ADDRESS): @organization.address <br>
