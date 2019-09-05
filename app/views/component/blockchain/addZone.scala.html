@@ -8,10 +8,10 @@
     </div>
     <div class="latest_card-body">
         @CSRF.formField
-     @inputText(addZoneForm(constants.Form.FROM), '_label -> Messages(constants.Form.FROM),'class -> "form-control",'placeholder->Messages(constants.Form.FROM),'required->true)
-    @inputText(addZoneForm(constants.Form.TO), '_label -> Messages(constants.Form.TO),'class -> "form-control",'placeholder->Messages(constants.Form.TO),'required->true)
-    @inputText(addZoneForm(constants.Form.ZONE_ID), '_label -> Messages(constants.Form.ZONE_ID),'class -> "form-control",'placeholder->Messages(constants.Form.ZONE_ID),'required->true)
-    @inputPassword(addZoneForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD),'class -> "form-control",'placeholder->Messages(constants.Form.PASSWORD),'required->true)
+     @inputText(addZoneForm(constants.FormField.FROM.name), '_label -> Messages(constants.FormField.FROM.name),'class -> "form-control",'placeholder->Messages(constants.FormField.FROM.name),'required->true)
+    @inputText(addZoneForm(constants.FormField.TO.name), '_label -> Messages(constants.FormField.TO.name),'class -> "form-control",'placeholder->Messages(constants.FormField.TO.name),'required->true)
+    @inputText(addZoneForm(constants.FormField.ZONE_ID.name), '_label -> Messages(constants.FormField.ZONE_ID.name),'class -> "form-control",'placeholder->Messages(constants.FormField.ZONE_ID.name),'required->true)
+    @inputPassword(addZoneForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name),'class -> "form-control",'placeholder->Messages(constants.FormField.PASSWORD.name),'required->true)
 
     @if(addZoneForm.hasGlobalErrors) {
         <ul>

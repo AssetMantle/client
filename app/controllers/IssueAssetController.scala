@@ -22,11 +22,15 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
 
   def issueAssetRequestForm(id: String = ""): Action[AnyContent] = Action { implicit request =>
     try {
+      if (id == ""){
       val assetRequest = masterTransactionIssueAssetRequests.Service.getIssueAssetsByID(id)
       val shipmentDetails = Json.parse(assetRequest.shipmentDetails).as[masterTransaction.JsonDetails.ShipmentDetails]
       Ok(views.html.component.master.issueAssetRequest(views.companion.master.IssueAssetRequest.form.fill(views.companion.master.IssueAssetRequest.Data(assetRequest.documentHash, assetRequest.assetType, assetRequest.quantityUnit, assetRequest.assetQuantity, assetRequest.assetPrice, true, assetRequest.takerAddress.getOrElse(""), shipmentDetails.commodityName, shipmentDetails.quality, shipmentDetails.deliveryTerm, shipmentDetails.tradeType, shipmentDetails.portOfLoading, shipmentDetails.portOfDischarge, shipmentDetails.shipmentDate, assetRequest.physicalDocumentsHandledVia, assetRequest.paymentTerms))))
+    } else {
+        Ok(views.html.component.master.issueAssetRequest(views.companion.master.IssueAssetRequest.form))
+      }
     } catch {
-      case _: BaseException => Ok(views.html.component.master.issueAssetRequest(views.companion.master.IssueAssetRequest.form))
+      case _: BaseException => InternalServerError(views.html.component.master.issueAssetRequest(views.companion.master.IssueAssetRequest.form))
     }
   }
 
