@@ -108,7 +108,7 @@ class FaucetRequests @Inject()(protected val databaseConfigProvider: DatabaseCon
 
   object Service {
 
-    def create(accountID: String, amount: Int): String = Await.result(add(FaucetRequest(utilities.IDGenerator.generateRequestID(), null, accountID, amount,null, null, null)), Duration.Inf)
+    def create(accountID: String, amount: Int): String = Await.result(add(FaucetRequest(utilities.IDGenerator.requestID(), null, accountID, amount,null, null, null)), Duration.Inf)
 
     def accept(requestID: String, ticketID: String): Int = Await.result(updateTicketIDAndStatusByID(requestID, ticketID, status = Option(true)), Duration.Inf)
 

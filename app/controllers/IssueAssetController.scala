@@ -147,3 +147,4 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
     )
   }
 }
+
