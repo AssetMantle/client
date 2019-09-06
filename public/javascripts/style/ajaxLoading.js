@@ -1,4 +1,4 @@
-$('#loading').fadeOut(100);
+$('#loading').fadeIn(100);
 $(document).ajaxStart(function () {
     $('#loading').fadeIn(100);
 }).ajaxStop(function () {

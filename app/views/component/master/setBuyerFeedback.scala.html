@@ -10,16 +10,11 @@
     </div>
     <div class="latest_card-body">
     @CSRF.formField
-    @inputText(setBuyerFeedbackForm(constants.FormField.SELLER_ADDRESS.name).copy(value = Some(sellerAddress)), '_label -> Messages(constants.FormField.SELLER_ADDRESS.name),
-        'class -> "form-control",'placeholder->Messages(constants.FormField.SELLER_ADDRESS.name),'required->true)
-    @inputText(setBuyerFeedbackForm(constants.FormField.PEG_HASH.name).copy(value = Some(pegHash)), '_label -> Messages(constants.FormField.PEG_HASH.name),
-        'class -> "form-control",'placeholder->Messages(constants.FormField.PEG_HASH.name),'required->true)
-    @inputText(setBuyerFeedbackForm(constants.Form.RATING), '_label -> Messages(constants.Form.RATING),
-        'class -> "form-control",'placeholder->Messages(constants.Form.RATING),'required->true)
-        @inputText(setBuyerFeedbackForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name),
-            'class -> "form-control",'placeholder->Messages(constants.FormField.GAS.name),'required->true)
-        @inputPassword(setBuyerFeedbackForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name),
-        'class -> "form-control",'placeholder->Messages(constants.FormField.PASSWORD.name),'required->true)
+    @inputText(setBuyerFeedbackForm(constants.FormField.SELLER_ADDRESS.name).copy(value = Some(sellerAddress)), '_label -> Messages(constants.FormField.SELLER_ADDRESS.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.SELLER_ADDRESS.name),'required->true)
+    @inputText(setBuyerFeedbackForm(constants.FormField.PEG_HASH.name).copy(value = Some(pegHash)), '_label -> Messages(constants.FormField.PEG_HASH.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.PEG_HASH.name),'required->true)
+    @inputText(setBuyerFeedbackForm(constants.FormField.RATING.name), '_label -> Messages(constants.FormField.RATING.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.RATING.name),'required->true)
+    @inputText(setBuyerFeedbackForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.GAS.name),'required->true)
+    @inputPassword(setBuyerFeedbackForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.PASSWORD.name),'required->true)
 
     @if(setBuyerFeedbackForm.hasGlobalErrors) {
         <ul>

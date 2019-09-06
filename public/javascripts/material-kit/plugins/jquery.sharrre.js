@@ -371,7 +371,7 @@
     this._name = pluginName;
 
     this.init();
-  };
+  }
 
   /* Initialization method
   ================================================== */
