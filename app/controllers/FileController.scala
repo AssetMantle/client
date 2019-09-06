@@ -69,7 +69,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
   }
 
   def checkTraderAssetFileExists(id: String, documentType: String): Action[AnyContent] = Action { implicit request =>
-    if (masterTraderKYCs.Service.checkFileExists(id = id, documentType = documentType)) Ok else NoContent
+    if (masterTransactionFiles.Service.checkFileExists(id = id, documentType = documentType)) Ok else NoContent
   }
 
   def uploadUserKycForm(documentType: String): Action[AnyContent] = Action { implicit request =>
@@ -520,7 +520,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
           request.body.file("file") match {
             case None => BadRequest(Messages(constants.Response.NO_FILE.message))
             case Some(file) => utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, fileResourceManager.getTraderAssetFilePath(documentType))
-              Ok
+              PartialContent
           }
         }
         catch {
@@ -538,7 +538,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
           documentType = documentType,
           path = fileResourceManager.getTraderAssetFilePath(documentType),
           document = masterTransaction.File(id = id, documentType = documentType, fileName = name, file = None, context = None, status = None),
-          masterCreate = masterTransactionFiles.Service.create
+          masterCreate = masterTransactionFiles.Service.createOrUpdateOldDocument
         )
         withUsernameToken.Ok(Messages(constants.Response.FILE_UPLOAD_SUCCESSFUL.message))
       } catch {
@@ -555,7 +555,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
           path = fileResourceManager.getTraderAssetFilePath(documentType),
           oldDocumentFileName = masterTransactionFiles.Service.getFileName(id = id, documentType = documentType),
           document = masterTransaction.File(id = id, documentType = documentType, fileName = name, file = None, context = None, status = None),
-          updateOldDocument = masterTransactionFiles.Service.updateOldDocument
+          updateOldDocument = masterTransactionFiles.Service.insertOrUpdateOldDocument
         )
         withUsernameToken.Ok(Messages(constants.Response.FILE_UPDATE_SUCCESSFUL.message))
       } catch {

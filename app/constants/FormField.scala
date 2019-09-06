@@ -56,6 +56,7 @@ object FormField {
   val NOTIFY_PARTY_NAME = new StringFormField("NOTIFY_PARTY_NAME", 2, 20, RegularExpression.ALL_NUMBERS_ALL_LETTERS)
   val NOTIFY_PARTY_ADDRESS = new StringFormField("NOTIFY_PARTY_ADDRESS", 2, 100, RegularExpression.ALL_NUMBERS_ALL_LETTERS)
   val ISSUE_ASSET_REQUEST_ID = new StringFormField("ISSUE_ASSET_REQUEST_ID", 0, 32)
+  val INVOICE_NUMBER = new StringFormField("INVOICE_NUMBER", 0, 32)
 
   val ASSET_TYPE = new StringFormFieldOption("ASSET_TYPE", constants.Option.ASSET_TYPE.options)
   val DELIVERY_TERM = new StringFormFieldOption("DELIVERY_TERM", constants.Option.DELIVERY_TERM.options)
@@ -66,6 +67,7 @@ object FormField {
   val COMDEX_PAYMENT_TERMS = new StringFormFieldOption("COMDEX_PAYMENT_TERMS", constants.Option.COMDEX_PAYMENT_TERMS.options)
 
   val SHIPMENT_DATE = new DateFormField("SHIPMENT_DATE")
+  val INVOICE_DATE = new DateFormField("INVOICE_DATE")
 
   val OLD_PASSWORD = new StringFormField("OLD_PASSWORD", 1, 128)
   val NEW_PASSWORD = new StringFormField("NEW_PASSWORD", 1, 128, RegularExpression.PASSWORD, Response.INVALID_PASSWORD.message)
