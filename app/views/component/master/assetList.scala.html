@@ -34,7 +34,7 @@
         </div>
         *@
             @if(asset.status == constants.Status.Asset.INCOMPLETE_DETAILS){
-                <button class="width btn btn-primary btn-sm" onclick="getForm(jsRoutes.controllers.IssueAssetController.issueAssetRequestForm('@asset.id', '@asset.quantityUnit'))">@Messages(constants.Form.ISSUE_ASSET_REQUEST)</button>
+                <button class="width btn btn-primary btn-sm" onclick="getForm(jsRoutes.controllers.IssueAssetController.issueAssetRequestForm('@asset.id'))">@Messages(constants.Form.ISSUE_ASSET_REQUEST)</button>
             }
     </div>
 }

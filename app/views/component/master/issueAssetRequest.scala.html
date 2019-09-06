@@ -11,6 +11,7 @@
     </div>
     <div >
         <div class="latest_card-body ml-cb">
+            @inputText(issueAssetRequestForm(constants.FormField.ISSUE_ASSET_REQUEST_ID.name), '_label -> Messages(constants.FormField.ISSUE_ASSET_REQUEST_ID.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.ISSUE_ASSET_REQUEST_ID.name), 'required -> true)
             @inputText(issueAssetRequestForm(constants.FormField.DOCUMENT_HASH.name), '_label -> Messages(constants.FormField.DOCUMENT_HASH.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.DOCUMENT_HASH.name), 'required -> true)
             @select(issueAssetRequestForm(constants.FormField.ASSET_TYPE.name), for(option <- constants.Option.ASSET_TYPE.options) yield (option, Messages(option)), '_label -> Messages(constants.FormField.ASSET_TYPE.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.ASSET_TYPE.name), '_default -> Messages(constants.FormField.ASSET_TYPE.name), 'required -> true)
             @inputText(issueAssetRequestForm(constants.FormField.QUANTITY_UNIT.name), '_label -> Messages(constants.FormField.QUANTITY_UNIT.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.QUANTITY_UNIT.name), 'required -> true)
@@ -27,6 +28,7 @@
             @select(issueAssetRequestForm(constants.FormField.PHYSICAL_DOCUMENTS_HANDLED_VIA.name), for(option <- constants.Option.PHYSICAL_DOCUMENTS_HANDLED_VIA.options) yield (option, Messages(option)), '_label -> Messages(constants.FormField.PHYSICAL_DOCUMENTS_HANDLED_VIA.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.PHYSICAL_DOCUMENTS_HANDLED_VIA.name), '_default -> Messages(constants.FormField.PHYSICAL_DOCUMENTS_HANDLED_VIA.name), 'required -> true)
             @select(issueAssetRequestForm(constants.FormField.COMDEX_PAYMENT_TERMS.name), for(option <- constants.Option.COMDEX_PAYMENT_TERMS.options) yield (option, Messages(option)), '_label -> Messages(constants.FormField.COMDEX_PAYMENT_TERMS.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.COMDEX_PAYMENT_TERMS.name), '_default -> Messages(constants.FormField.COMDEX_PAYMENT_TERMS.name), 'required -> true)
 
+            @*
             <div class="input-group-prepend issue_asset">
                 @checkbox(issueAssetRequestForm(constants.Form.MODERATED), '_label -> Messages(constants.Form.MODERATED), 'id -> "moderated")
                 <span class="input-group-text">               @Messages(constants.Form.MODERATED)                </span>
@@ -36,7 +38,7 @@
                 @inputText(issueAssetRequestForm(constants.FormField.GAS.name).copy(value = Some("0")), '_label -> Messages(constants.FormField.GAS.name), 'class -> "form-control", 'placeholder -> Messages(constants.Form.GAS), 'required -> true)
                 @inputPassword(issueAssetRequestForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.PASSWORD.name), 'required -> true)
             </div>
-
+            *@
             @if(issueAssetRequestForm.hasGlobalErrors) {
                 <ul>
                 @for(error <- issueAssetRequestForm.globalErrors) {

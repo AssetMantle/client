@@ -9,6 +9,7 @@ object IssueAssetDocument {
 
   val form = Form(
     mapping(
+      constants.FormField.ISSUE_ASSET_REQUEST_ID.name -> constants.FormField.ISSUE_ASSET_REQUEST_ID.field,
       constants.FormField.BILL_OF_LADING_NUMBER.name -> constants.FormField.BILL_OF_LADING_NUMBER.field,
       constants.FormField.PORT_OF_LOADING.name -> constants.FormField.PORT_OF_LOADING.field,
       constants.FormField.SHIPPER_NAME.name -> constants.FormField.SHIPPER_NAME.field,
@@ -22,7 +23,7 @@ object IssueAssetDocument {
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(billOfLadingNumber: String, portOfLoading: String, shipperName: String, shipperAddress: String, shipmentDate: Date, notifyPartyName: String, notifyPartyAddress: String, deliveryTerm: String, assetQuantity: Int, assetPrice: Int)
+  case class Data(requestID: String, billOfLadingNumber: String, portOfLoading: String, shipperName: String, shipperAddress: String, shipmentDate: Date, notifyPartyName: String, notifyPartyAddress: String, deliveryTerm: String, assetQuantity: Int, assetPrice: Int)
 
 }
 

@@ -15,7 +15,7 @@ function getFileTypes(documentType) {
     return fileTypes
 }
 
-function uploadFile(uploadRoute, storeRoute, documentType) {
+function uploadFile(uploadRoute, storeRoute, documentType, id ="") {
     const rFile = new Resumable({
         target: uploadRoute(documentType).url,
         fileType: getFileTypes(documentType),
@@ -39,7 +39,7 @@ function uploadFile(uploadRoute, storeRoute, documentType) {
     let uploadCompletionMessage = document.getElementById('uploadCompletionMessage');
     rFile.on('fileSuccess', function (file) {
         $("#uploadControls").delay(1000).fadeOut(1000);
-        let storeDbRoute = storeRoute(file.fileName, documentType);
+        let storeDbRoute = storeRoute(file.fileName, documentType, id);
         $.ajax({
             url: storeDbRoute.url,
             type: storeDbRoute.type,
@@ -67,7 +67,7 @@ function uploadFile(uploadRoute, storeRoute, documentType) {
 
 }
 
-function updateFile(uploadRoute, updateRoute, documentType) {
+function updateFile(uploadRoute, updateRoute, documentType, id = "") {
     const rFile = new Resumable({
         target: uploadRoute(documentType).url,
         fileType: getFileTypes(documentType),
@@ -91,7 +91,7 @@ function updateFile(uploadRoute, updateRoute, documentType) {
     let updateCompletionMessage = document.getElementById('updateCompletionMessage');
     rFile.on('fileSuccess', function (file) {
         $("#updateControls").delay(1000).fadeOut(1000);
-        let updateDbRoute = updateRoute(file.fileName, documentType);
+        let updateDbRoute = updateRoute(file.fileName, documentType, id);
         $.ajax({
             url: updateDbRoute.url,
             type: updateDbRoute.type,

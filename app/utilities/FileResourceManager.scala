@@ -30,6 +30,20 @@ class FileResourceManager @Inject()()(implicit exec: ExecutionContext, configura
 
   private val uploadTraderKycIdentificationPath = configuration.get[String]("upload.trader.identificationPath")
 
+  private val uploadTraderAssetContractPath: String = configuration.get[String]("upload.asset.contract")
+
+  private val uploadTraderAssetOBLPath: String = configuration.get[String]("upload.asset.obl")
+
+  private val uploadTraderAssetInvoicePath: String = configuration.get[String]("upload.asset.invoice")
+
+  private val uploadTraderAssetPackingListPath: String = configuration.get[String]("upload.asset.packingList")
+
+  private val uploadTraderAssetCOOPath: String = configuration.get[String]("upload.asset.coo")
+
+  private val uploadTraderAssetCOAPath: String = configuration.get[String]("upload.asset.coa")
+
+  private val uploadTraderAssetOtherPath: String = configuration.get[String]("upload.asset.other")
+
   def getAccountKycFilePath(documentType: String): String = {
     documentType match {
       case constants.File.BANK_DETAILS => uploadAccountKycBankDetailsPath
@@ -57,6 +71,19 @@ class FileResourceManager @Inject()()(implicit exec: ExecutionContext, configura
   def getTraderKycFilePath(documentType: String): String = {
     documentType match {
       case constants.File.IDENTIFICATION => uploadTraderKycIdentificationPath
+      case _ => constants.File.UNKNOWN_TYPE
+    }
+  }
+
+  def getTraderAssetFilePath(documentType: String): String = {
+    documentType match {
+      case constants.File.CONTRACT => uploadTraderAssetContractPath
+      case constants.File.OBL => uploadTraderAssetOBLPath
+      case constants.File.INVOICE => uploadTraderAssetInvoicePath
+      case constants.File.PACKING_LIST => uploadTraderAssetPackingListPath
+      case constants.File.COO => uploadTraderAssetCOOPath
+      case constants.File.COA => uploadTraderAssetCOAPath
+      case constants.File.OTHER => uploadTraderAssetOtherPath
       case _ => constants.File.UNKNOWN_TYPE
     }
   }
