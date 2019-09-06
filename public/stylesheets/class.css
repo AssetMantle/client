@@ -121,9 +121,12 @@ h2{
 }
 
 .footer {
-    position:fixed;
+    position: relative;
     bottom: 0;
-    right: 30px;
+    padding:5px 5px;
+    background: #333333;
+    text-align: center;
+
 }
 
 .centerScreen {
@@ -200,7 +203,7 @@ h2{
 
 
 .navigationBarLogo{
-    max-height: 45px;
+    max-height: 30px;
     max-width: 130px;
 }
 .sticky {
@@ -632,11 +635,11 @@ margin-left: 50px;
     color: #fff;
     cursor: pointer;
     background:linear-gradient(60deg, #149f98, #102923);
-    padding:5px 30px 5px 5px;
+    padding:5px 5px 5px 15px;
     border-radius: 10px;
     transition-delay: 0.3s;
     position: fixed;
-    left: -20px;
+    left: -10px;
     z-index: 100;
 }
 .sideBarCloseButton {
@@ -649,7 +652,7 @@ margin-left: 50px;
     width: 0;
     position: fixed;
     z-index: 101;
-    top:60px;
+    top:40px;
     left: 0;
     background-color:#8faa9d;
     overflow-x: hidden;
