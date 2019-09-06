@@ -7,7 +7,7 @@ import io.gatling.core.Predef._
 import io.gatling.core.structure.ScenarioBuilder
 import io.gatling.http.Predef._
 
-class SignUpControllerTest extends Simulation {
+class AccountControllerTest extends Simulation {
   val scenarioBuilder: ScenarioBuilder = signUpControllerTest.signUpScenario
   setUp(scenarioBuilder.inject(atOnceUsers(Test.NUMBER_OF_USERS))).protocols(http.baseUrl(Test.BASE_URL))
 }
@@ -18,10 +18,10 @@ object signUpControllerTest {
     .feed(UsernameFeeder.usernameFeed)
     .feed(PasswordFeeder.passwordFeed)
     .exec(http("SignUp_GET")
-      .get(routes.SignUpController.signUpForm().url)
+      .get(routes.AccountController.signUpForm().url)
       .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
     .exec(http("SignUp_POST")
-      .post(routes.SignUpController.signUp().url)
+      .post(routes.AccountController.signUp().url)
       .formParamMap(Map(
         Form.USERNAME -> "${%s}".format(Test.TEST_USERNAME),
         Form.PASSWORD -> "${%s}".format(Test.TEST_PASSWORD),
