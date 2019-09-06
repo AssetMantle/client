@@ -19,6 +19,8 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
 
   private implicit val logger: Logger = Logger(this.getClass)
 
+  private implicit val module:String= constants.Module.CONTROLLERS_ADD_ZONE
+
   def addZoneForm(): Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.master.addZone(views.companion.master.AddZone.form))
   }
