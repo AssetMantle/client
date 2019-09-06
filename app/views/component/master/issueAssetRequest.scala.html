@@ -24,17 +24,17 @@
     @inputText(issueAssetRequestForm(constants.Form.TAKER_ADDRESS), '_label -> Messages(constants.Form.TAKER_ADDRESS),
         'class -> "form-control",'placeholder->Messages(constants.Form.TAKER_ADDRESS),'required->true)
         <div class="input-group-prepend">
-            @checkbox(issueAssetRequestForm(constants.Form.MODERATED), '_label -> Messages(constants.Form.MODERATED), 'id -> "moderated")
+            @checkbox(issueAssetRequestForm(constants.FormField.MODE.nameRATED), '_label -> Messages(constants.FormField.MODE.nameRATED), 'id -> "moderated")
             <span class="input-group-text">
-                @Messages(constants.Form.MODERATED)
+                @Messages(constants.FormField.MODE.nameRATED)
             </span>
         </div>
 
     <div id="moderatedIssueAssetRequestFormFields">
-        @inputText(issueAssetRequestForm(constants.Form.GAS).copy(value = Some("0")), '_label -> Messages(constants.Form.GAS),
-            'class -> "form-control",'placeholder->Messages(constants.Form.GAS),  'required->true)
-        @inputPassword(issueAssetRequestForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD),
-            'class -> "form-control",'placeholder->Messages(constants.Form.PASSWORD),'required->true)
+        @inputText(issueAssetRequestForm(constants.FormField.GAS.name).copy(value = Some("0")), '_label -> Messages(constants.FormField.GAS.name),
+            'class -> "form-control",'placeholder->Messages(constants.FormField.GAS.name),  'required->true)
+        @inputPassword(issueAssetRequestForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name),
+            'class -> "form-control",'placeholder->Messages(constants.FormField.PASSWORD.name),'required->true)
     </div>
 
     @if(issueAssetRequestForm.hasGlobalErrors) {

@@ -6,8 +6,8 @@
     @for(traderFeedbackHistory <- traderFeedbackHistories) {
         <div class="flexItem box thirdBox lightBlue">
             <div class="leftText">
-                <span class="red">@Messages(constants.Form.BUYER_ADDRESS)</span> : @traderFeedbackHistory.buyerAddress <br>
-                <span class="red">@Messages(constants.Form.PEG_HASH)</span> : @traderFeedbackHistory.pegHash <br>
+                <span class="red">@Messages(constants.FormField.BUYER_ADDRESS.name)</span> : @traderFeedbackHistory.buyerAddress <br>
+                <span class="red">@Messages(constants.FormField.PEG_HASH.name)</span> : @traderFeedbackHistory.pegHash <br>
             </div>
             <div class="centerText" >
                 <button class="width btn btn-primary" onclick="getForm(jsRoutes.controllers.SetSellerFeedbackController.setSellerFeedbackForm('@traderFeedbackHistory.buyerAddress','@traderFeedbackHistory.pegHash'))">@Messages(constants.Form.SUBMIT_FEEDBACK)</button><br>

@@ -13,10 +13,10 @@
         '_label -> Messages(constants.Form.REQUEST_ID),'placeholder->Messages(constants.Form.REQUEST_ID),'required->true,'class -> "form-control")
     @inputText(approveFaucetRequestForm(constants.Form.ACCOUNT_ID).copy(value = Some(accountID)),
         '_label -> Messages(constants.Form.ACCOUNT_ID),'placeholder->Messages(constants.Form.ACCOUNT_ID),'required->true,'class -> "form-control")
-        @inputText(approveFaucetRequestForm(constants.Form.GAS), '_label -> Messages(constants.Form.GAS),
-            'class -> "form-control",'placeholder->Messages(constants.Form.GAS),'required->true)
-        @inputPassword(approveFaucetRequestForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD),
-        'placeholder->Messages(constants.Form.PASSWORD),'required->true,'class -> "form-control")
+        @inputText(approveFaucetRequestForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name),
+            'class -> "form-control",'placeholder->Messages(constants.FormField.GAS.name),'required->true)
+        @inputPassword(approveFaucetRequestForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name),
+        'placeholder->Messages(constants.FormField.PASSWORD.name),'required->true,'class -> "form-control")
 
     @if(approveFaucetRequestForm.hasGlobalErrors) {
         <ul>

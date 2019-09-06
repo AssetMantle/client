@@ -6,13 +6,13 @@
 @for(asset <- assetList) {
     <div class="flexItem box firstBox lightBlue">
         <div class="leftText">
-            <span class="red">@Messages(constants.Form.PEG_HASH)</span> : @asset.pegHash <br>
+            <span class="red">@Messages(constants.FormField.PEG_HASH.name)</span> : @asset.pegHash <br>
             <span class="red">@Messages(constants.Form.DOCUMENT_HASH)</span> : @asset.documentHash <br>
             <span class="red">@Messages(constants.Form.ASSET_TYPE)</span> : @asset.assetType <br>
             <span class="red">@Messages(constants.Form.ASSET_QUANTITY)</span> : @asset.assetQuantity <br>
             <span class="red">@Messages(constants.Form.ASSET_PRICE)</span> : @asset.assetPrice <br>
             <span class="red">@Messages(constants.Form.QUANTITY_UNIT)</span> : @asset.quantityUnit <br>
-            <span class="red">@Messages(constants.Form.MODERATED)</span> : @asset.moderated <br>
+            <span class="red">@Messages(constants.FormField.MODE.nameRATED)</span> : @asset.moderated <br>
             <span class="red">@Messages(constants.Form.TAKER_ADDRESS)</span> : @asset.takerAddress <br>
                 <span class="red">@Messages(constants.Form.LOCKED)</span> : @asset.locked <br>
         </div>

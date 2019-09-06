@@ -9,8 +9,8 @@
     </div>
     <div class="latest_card-body">
     @CSRF.formField
-    @inputText(addZoneForm(constants.Form.NAME), '_label -> Messages(constants.Form.NAME),
-        'placeholder->Messages(constants.Form.NAME),'required->true,'class->"form-control")
+    @inputText(addZoneForm(constants.FormField.NAME.name), '_label -> Messages(constants.FormField.NAME.name),
+        'placeholder->Messages(constants.FormField.NAME.name),'required->true,'class->"form-control")
     @inputText(addZoneForm(constants.Form.CURRENCY), '_label -> Messages(constants.Form.CURRENCY),
         'placeholder->Messages(constants.Form.CURRENCY),'required->true,'class->"form-control")
 

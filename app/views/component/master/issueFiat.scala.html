@@ -19,10 +19,10 @@
         'class -> "form-control",'placeholder->Messages(constants.Form.TRANSACTION_ID),'required->true)
     @inputText(issueFiatForm(constants.Form.TRANSACTION_AMOUNT).copy(value = Some(transactionAmount.toString)), '_label -> Messages(constants.Form.TRANSACTION_AMOUNT),
         'class -> "form-control",'placeholder->Messages(constants.Form.TRANSACTION_AMOUNT),'required->true)
-       @inputText(issueFiatForm(constants.Form.GAS), '_label -> Messages(constants.Form.GAS),
-           'class -> "form-control",'placeholder->Messages(constants.Form.GAS),'required->true)
-       @inputPassword(issueFiatForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD),
-        'class -> "form-control",'placeholder->Messages(constants.Form.PASSWORD),'required->true)
+       @inputText(issueFiatForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name),
+           'class -> "form-control",'placeholder->Messages(constants.FormField.GAS.name),'required->true)
+       @inputPassword(issueFiatForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name),
+        'class -> "form-control",'placeholder->Messages(constants.FormField.PASSWORD.name),'required->true)
 
     @if(issueFiatForm.hasGlobalErrors) {
         <ul>

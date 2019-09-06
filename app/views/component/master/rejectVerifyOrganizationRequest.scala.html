@@ -9,8 +9,8 @@
     </div>
     <div class="latest_card-body">
     @CSRF.formField
-    @inputText(rejectVerifyOrganizationRequestForm(constants.Form.ORGANIZATION_ID).copy(value = Some(organizationID)), '_label -> Messages(constants.Form.ORGANIZATION_ID),
-        'class -> "form-control",'placeholder->Messages(constants.Form.ORGANIZATION_ID),'required->true)
+    @inputText(rejectVerifyOrganizationRequestForm(constants.FormField.ORGANIZATION_ID.name).copy(value = Some(organizationID)), '_label -> Messages(constants.FormField.ORGANIZATION_ID.name),
+        'class -> "form-control",'placeholder->Messages(constants.FormField.ORGANIZATION_ID.name),'required->true)
 
     @if(rejectVerifyOrganizationRequestForm.hasGlobalErrors) {
         <ul>

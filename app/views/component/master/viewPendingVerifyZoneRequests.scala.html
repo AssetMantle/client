@@ -9,9 +9,9 @@
     @for(zoneVerificationRequest <- zoneVerificationRequests) {
     <div class="col-md-6">
         <div class="flexItem card-body leftText lightBlue">
-            <span class="red">@Messages(constants.Form.ZONE_ID)</span> : @zoneVerificationRequest.id <br>
+            <span class="red">@Messages(constants.FormField.ZONE_ID.name)</span> : @zoneVerificationRequest.id <br>
             <span class="red">@Messages(constants.Form.ACCOUNT_ID)</span> : @zoneVerificationRequest.accountID <br>
-            <span class="red">@Messages(constants.Form.NAME)</span> : @zoneVerificationRequest.name <br>
+            <span class="red">@Messages(constants.FormField.NAME.name)</span> : @zoneVerificationRequest.name <br>
             <span class="red">@Messages(constants.Form.CURRENCY)</span> : @zoneVerificationRequest.currency <br>
             <span class="red">@Messages(constants.Form.DOCUMENTS)</span> : <span id = "kycDocuments@zoneVerificationRequest.accountID"><script>getZoneKycFilesToGenesis('@zoneVerificationRequest.accountID')</script></span> <br>
             <button class="btn btn-sm btn-success" onclick="getForm(jsRoutes.controllers.AddZoneController.verifyZoneForm('@zoneVerificationRequest.id'))">@Messages(constants.Form.APPROVE)</button>

@@ -9,8 +9,8 @@
     </div>
     <div class="latest_card-body">
     @CSRF.formField
-    @inputText(rejectVerifyZoneRequestForm(constants.Form.ZONE_ID).copy(value = Some(zoneID)), '_label -> Messages(constants.Form.ZONE_ID),
-        'class -> "form-control",'placeholder->Messages(constants.Form.ZONE_ID),'required->true)
+    @inputText(rejectVerifyZoneRequestForm(constants.FormField.ZONE_ID.name).copy(value = Some(zoneID)), '_label -> Messages(constants.FormField.ZONE_ID.name),
+        'class -> "form-control",'placeholder->Messages(constants.FormField.ZONE_ID.name),'required->true)
 
     @if(rejectVerifyZoneRequestForm.hasGlobalErrors) {
         <ul>

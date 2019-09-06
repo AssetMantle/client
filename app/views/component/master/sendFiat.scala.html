@@ -10,16 +10,16 @@
     </div>
     <div class="latest_card-body">
     @CSRF.formField
-    @inputText(sendFiatForm(constants.Form.SELLER_ADDRESS).copy(value = Some(sellerAddress)), '_label -> Messages(constants.Form.SELLER_ADDRESS),
-        'class -> "form-control",'placeholder->Messages(constants.Form.SELLER_ADDRESS),'required->true)
+    @inputText(sendFiatForm(constants.FormField.SELLER_ADDRESS.name).copy(value = Some(sellerAddress)), '_label -> Messages(constants.FormField.SELLER_ADDRESS.name),
+        'class -> "form-control",'placeholder->Messages(constants.FormField.SELLER_ADDRESS.name),'required->true)
     @inputText(sendFiatForm(constants.Form.AMOUNT).copy(value = Some(bid.toString)), '_label -> Messages(constants.Form.AMOUNT),
         'class -> "form-control",'placeholder->Messages(constants.Form.AMOUNT),'required->true)
-    @inputText(sendFiatForm(constants.Form.PEG_HASH).copy(value = Some(pegHash)), '_label -> Messages(constants.Form.PEG_HASH),
-        'class -> "form-control",'placeholder->Messages(constants.Form.PEG_HASH),'required->true)
-        @inputText(sendFiatForm(constants.Form.GAS), '_label -> Messages(constants.Form.GAS),
-            'class -> "form-control",'placeholder->Messages(constants.Form.GAS),'required->true)
-        @inputPassword(sendFiatForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD),
-        'class -> "form-control",'placeholder->Messages(constants.Form.PASSWORD),'required->true)
+    @inputText(sendFiatForm(constants.FormField.PEG_HASH.name).copy(value = Some(pegHash)), '_label -> Messages(constants.FormField.PEG_HASH.name),
+        'class -> "form-control",'placeholder->Messages(constants.FormField.PEG_HASH.name),'required->true)
+        @inputText(sendFiatForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name),
+            'class -> "form-control",'placeholder->Messages(constants.FormField.GAS.name),'required->true)
+        @inputPassword(sendFiatForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name),
+        'class -> "form-control",'placeholder->Messages(constants.FormField.PASSWORD.name),'required->true)
 
     @if(sendFiatForm.hasGlobalErrors) {
         <ul>

@@ -28,6 +28,8 @@ class Transaction @Inject()(getTxHashResponse: GetTxHashResponse, getResponse: G
       val ticketID: String = if (kafkaEnabled) utilities.JSON.getResponseFromJson[KafkaResponse](action(request)).ticketID else Random.nextString(32)
       blockchainTransactionCreate(entity.mutateTicketID(ticketID))
       if (!kafkaEnabled) {
+
+
         Future {
           try {
             transactionMode match {

@@ -8,7 +8,7 @@
         <div class="leftText">
             <span class="red">@Messages(constants.Form.ID)</span> : @unModeratedBuyOrder.id <br>
             <span class="red">@Messages(constants.Form.AWB_PROOF_HASH)</span> : @unModeratedBuyOrder.awbProofHash <br>
-            <span class="red">@Messages(constants.Form.FIAT_PROOF_HASH)</span> : @unModeratedBuyOrder.fiatProofHash <br>
+            <span class="red">@Messages(constants.FormField.FIAT_PROOF_HASH.name)</span> : @unModeratedBuyOrder.fiatProofHash <br>
             <div class="centerText" >
             @loginState.acl match {
                 case Some(acl) => {
@@ -28,7 +28,7 @@
         <div class="leftText">
             <span class="red">@Messages(constants.Form.ID)</span> : @unModeratedSellOrder.id <br>
             <span class="red">@Messages(constants.Form.AWB_PROOF_HASH)</span> : @unModeratedSellOrder.awbProofHash <br>
-            <span class="red">@Messages(constants.Form.FIAT_PROOF_HASH)</span> : @unModeratedSellOrder.fiatProofHash <br>
+            <span class="red">@Messages(constants.FormField.FIAT_PROOF_HASH.name)</span> : @unModeratedSellOrder.fiatProofHash <br>
             <div class="centerText" >
             @loginState.acl match {
                 case Some(acl) => {
@@ -46,7 +46,7 @@
         <div class="leftText">
             <span class="red">@Messages(constants.Form.ID)</span> : @moderatedOrder.id <br>
             <span class="red">@Messages(constants.Form.AWB_PROOF_HASH)</span> : @moderatedOrder.awbProofHash <br>
-            <span class="red">@Messages(constants.Form.FIAT_PROOF_HASH)</span> : @moderatedOrder.fiatProofHash <br>
+            <span class="red">@Messages(constants.FormField.FIAT_PROOF_HASH.name)</span> : @moderatedOrder.fiatProofHash <br>
         </div>
     </div>
 }

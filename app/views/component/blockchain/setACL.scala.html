@@ -9,14 +9,14 @@
     <div>
         <div class="latest_card-body ml-cb">
             @CSRF.formField
-            @inputText(setACLForm(constants.Form.FROM), '_label -> Messages(constants.Form.FROM), 'class -> "form-control",
-                'placeholder -> Messages(constants.Form.FROM), 'required -> true)
+            @inputText(setACLForm(constants.FormField.FROM.name), '_label -> Messages(constants.FormField.FROM.name), 'class -> "form-control",
+                'placeholder -> Messages(constants.FormField.FROM.name), 'required -> true)
             @inputText(setACLForm(constants.Form.ACL_ADDRESS), '_label -> Messages(constants.Form.ACL_ADDRESS), 'class -> "form-control",
                 'placeholder -> Messages(constants.Form.ACL_ADDRESS), 'required -> true)
-            @inputText(setACLForm(constants.Form.ORGANIZATION_ID), '_label -> Messages(constants.Form.ORGANIZATION_ID), 'class -> "form-control",
-                'placeholder -> Messages(constants.Form.ORGANIZATION_ID), 'required -> true)
-            @inputText(setACLForm(constants.Form.ZONE_ID), '_label -> Messages(constants.Form.ZONE_ID), 'class -> "form-control",
-                'placeholder -> Messages(constants.Form.ZONE_ID), 'required -> true)
+            @inputText(setACLForm(constants.FormField.ORGANIZATION_ID.name), '_label -> Messages(constants.FormField.ORGANIZATION_ID.name), 'class -> "form-control",
+                'placeholder -> Messages(constants.FormField.ORGANIZATION_ID.name), 'required -> true)
+            @inputText(setACLForm(constants.FormField.ZONE_ID.name), '_label -> Messages(constants.FormField.ZONE_ID.name), 'class -> "form-control",
+                'placeholder -> Messages(constants.FormField.ZONE_ID.name), 'required -> true)
             <div class="input-group-prepend">
                 @checkbox(setACLForm(constants.Form.ISSUE_ASSET), '_label -> Messages(constants.Form.ISSUE_ASSET))
                 <span class="input-group-text">
@@ -112,7 +112,7 @@
 
             </div>
 
-            @inputPassword(setACLForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD), 'class -> "form-control", 'placeholder -> Messages(constants.Form.PASSWORD), 'required -> true)
+            @inputPassword(setACLForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.PASSWORD.name), 'required -> true)
 
             @if(setACLForm.hasGlobalErrors) {
                 <ul>

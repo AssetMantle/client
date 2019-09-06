@@ -9,18 +9,18 @@
     </div>
     <div class="latest_card-body">
     @CSRF.formField
-    @inputText(sendAssetForm(constants.Form.FROM), '_label -> Messages(constants.Form.FROM),'class -> "form-control",
-        'placeholder->Messages(constants.Form.FROM),'required->true)
-    @inputText(sendAssetForm(constants.Form.TO), '_label -> Messages(constants.Form.TO),'class -> "form-control",
-        'placeholder->Messages(constants.Form.TO),'required->true)
-    @inputText(sendAssetForm(constants.Form.PEG_HASH), '_label -> Messages(constants.Form.PEG_HASH),
-        'class -> "form-control",'placeholder->Messages(constants.Form.PEG_HASH),'required->true)
-        @inputText(sendAssetForm(constants.Form.GAS), '_label -> Messages(constants.Form.GAS),
-            'class -> "form-control",'placeholder->Messages(constants.Form.GAS),'required->true)
-        @inputText(sendAssetForm(constants.Form.MODE), '_label -> Messages(constants.Form.MODE),'class -> "form-control",
-        'placeholder->Messages(constants.Form.MODE),'required->true)
-    @inputPassword(sendAssetForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD),
-        'class -> "form-control",'placeholder->Messages(constants.Form.PASSWORD),'required->true)
+    @inputText(sendAssetForm(constants.FormField.FROM.name), '_label -> Messages(constants.FormField.FROM.name),'class -> "form-control",
+        'placeholder->Messages(constants.FormField.FROM.name),'required->true)
+    @inputText(sendAssetForm(constants.FormField.TO.name), '_label -> Messages(constants.FormField.TO.name),'class -> "form-control",
+        'placeholder->Messages(constants.FormField.TO.name),'required->true)
+    @inputText(sendAssetForm(constants.FormField.PEG_HASH.name), '_label -> Messages(constants.FormField.PEG_HASH.name),
+        'class -> "form-control",'placeholder->Messages(constants.FormField.PEG_HASH.name),'required->true)
+        @inputText(sendAssetForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name),
+            'class -> "form-control",'placeholder->Messages(constants.FormField.GAS.name),'required->true)
+        @inputText(sendAssetForm(constants.FormField.MODE.name), '_label -> Messages(constants.FormField.MODE.name),'class -> "form-control",
+        'placeholder->Messages(constants.FormField.MODE.name),'required->true)
+    @inputPassword(sendAssetForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name),
+        'class -> "form-control",'placeholder->Messages(constants.FormField.PASSWORD.name),'required->true)
 
     @if(sendAssetForm.hasGlobalErrors) {
         <ul>
