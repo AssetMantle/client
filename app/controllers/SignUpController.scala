@@ -1,5 +1,8 @@
 package controllers
 
+import java.util.Calendar
+import java.util.concurrent.atomic.AtomicInteger
+
 import exceptions.{BaseException, BlockChainException}
 import javax.inject.{Inject, Singleton}
 import models.master
@@ -16,7 +19,7 @@ class SignUpController @Inject()(messagesControllerComponents: MessagesControlle
   private val module: String = constants.Module.CONTROLLERS_SIGN_UP
 
   private implicit val logger: Logger = Logger(this.getClass)
-
+  val count = new AtomicInteger()
   def signUpForm: Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.master.signUp(SignUp.form))
   }
