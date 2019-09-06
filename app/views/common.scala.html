@@ -44,7 +44,7 @@
                         @loginState match {
                             case null => {
 
-                                <li class="nav-item"> <a onclick="getForm(jsRoutes.controllers.SignUpController.signUpForm())"><i class="fa fa-user-plus"></i>
+                                <li class="nav-item"> <a onclick="getForm(jsRoutes.controllers.AccountController.signUpForm())"><i class="fa fa-user-plus"></i>
                                     @Messages(constants.Form.SIGNUP)</a></li>
                                 <li class="nav-item"><a onclick="getForm(jsRoutes.controllers.LoginController.loginForm())"><i class="fa fa-sign-in" aria-hidden="true"></i>
                                     @Messages(constants.Form.LOGIN)</a>
@@ -80,7 +80,7 @@
                                     </a>
                                     <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
                                         <a class="dropdown-item" href="@controllers.routes.ViewController.profile()"><i class="fa fa-user-circle-o" aria-hidden="true"></i>
-                                            &nbsp;
+                                                &nbsp;
                                             @Messages(constants.Form.PROFILE)</a>
                                         <a class="dropdown-item" onclick="getForm(jsRoutes.controllers.LogoutController.logoutForm())"><i class="fa fa-sign-out" aria-hidden="true"></i>
                                                 &nbsp;
@@ -96,7 +96,7 @@
             </nav>
 
         </header>
-        <div class="pageContent text-center">
+        <div class="pageContent">
             @for(failure <- failures) {
                 <div class="alert failure" onclick="getForm(@failure.action)">
                     <span class="closeButton">x</span>
@@ -141,11 +141,8 @@
 
 
         <div class="modal" id="commonModal">
-
             <div class="latest_card latest_card-login modalContent" id="commonModalContent">
             </div>
-
-
         </div>
 
         <div class = "modal centerScreen" id="loading">
