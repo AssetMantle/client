@@ -93,6 +93,7 @@ object Form {
   val NAME = "NAME"
   val SEED = "SEED"
   val PASSWORD = "PASSWORD"
+  val CONFIRM_PASSWORD="CONFIRM_PASSWORD"
   val FROM = "FROM"
   val TO = "TO"
   val ORGANIZATION = "ORGANIZATION"
