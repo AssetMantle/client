@@ -6,11 +6,23 @@ GET         /zoneInformation                                             control
 GET         /organizationRequest                                         controllers.ViewController.organizationRequest
 GET         /organizationInformation                                     controllers.ViewController.organizationInformation
 GET         /market                                                      controllers.ViewController.market
+GET         /profile                                                     controllers.ViewController.profile
+
+GET         /profileDocuments                                            controllers.ComponentViewController.profileDocuments
+GET         /profilePicture                                              controllers.ComponentViewController.profilePicture
+
+GET         /account/changePassword                                      controllers.AccountController.changePasswordForm
+POST        /account/changePassword                                      controllers.AccountController.changePassword
+GET         /account/forgotPasswordUsername                              controllers.AccountController.emailOTPForgotPasswordForm
+POST        /account/forgotPasswordUsername                              controllers.AccountController.emailOTPForgotPassword
+GET         /account/forgotPassword                                      controllers.AccountController.forgotPasswordForm(username: String)
+POST        /account/forgotPassword                                      controllers.AccountController.forgotPassword(username: String)
+
+GET         /contact                                                     controllers.ContactController.contact
 
 GET         /assets/*file                                                controllers.Assets.versioned(path="/public", file: Asset)
 
 GET         /firebase-messaging-sw.js                                    controllers.Assets.at(path="/public/javascripts", file="firebase-messaging-sw.js")
-GET         /notificationImage.png                                       controllers.Assets.at(path="/public/images", file="notificationImage.png")
 
 GET         /javascriptRoutes                                            controllers.JavaScriptRoutesController.javascriptRoutes
 
@@ -113,8 +125,8 @@ POST        /master/logout                                               control
 GET         /master/signUp                                               controllers.SignUpController.signUpForm
 POST        /master/signUp                                               controllers.SignUpController.signUp
 
-GET         /master/updateContact                                        controllers.UpdateContactController.updateContactForm
-POST        /master/updateContact                                        controllers.UpdateContactController.updateContact
+GET         /master/updateContact                                        controllers.ContactController.updateContactForm
+POST        /master/updateContact                                        controllers.ContactController.updateContact
 
 GET         /master/verifyMobileNumber                                   controllers.VerifyMobileNumberController.verifyMobileNumberForm
 POST        /master/verifyMobileNumber                                   controllers.VerifyMobileNumberController.verifyMobileNumber

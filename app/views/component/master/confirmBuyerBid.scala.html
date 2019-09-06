@@ -12,18 +12,13 @@
             <div class="latest_card-body">
                 @CSRF.formField
 
-                @inputText(confirmBuyerBidForm(constants.Form.SELLER_ADDRESS).copy(value = Some(sellerAddress)), '_label -> Messages(constants.Form.SELLER_ADDRESS),
-                    'class -> "form-control", 'placeholder -> Messages(constants.Form.SELLER_ADDRESS), 'required -> true)
-                @inputText(confirmBuyerBidForm(constants.Form.BID) copy (value = Some(bid.toString)), '_label -> Messages(constants.Form.BID),
-                    'class -> "form-control", 'placeholder -> Messages(constants.Form.BID), 'required -> true)
-                @inputText(confirmBuyerBidForm(constants.Form.TIME), '_label -> Messages(constants.Form.TIME), 'class -> "form-control",
-                    'placeholder -> Messages(constants.Form.TIME), 'required -> true)
-                @inputText(confirmBuyerBidForm(constants.Form.PEG_HASH).copy(value = Some(pegHash)), '_label -> Messages(constants.Form.PEG_HASH),
-                    'class -> "form-control", 'placeholder -> Messages(constants.Form.PEG_HASH), 'required -> true)
-                @inputText(confirmBuyerBidForm(constants.Form.BUYER_CONTRACT_HASH), '_label -> Messages(constants.Form.BUYER_CONTRACT_HASH), 'class -> "form-control",
-                    'placeholder -> Messages(constants.Form.BUYER_CONTRACT_HASH), 'required -> true)
-                @inputPassword(confirmBuyerBidForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD), 'class -> "form-control",
-                    'placeholder -> Messages(constants.Form.PASSWORD), 'required -> true)
+                @inputText(confirmBuyerBidForm(constants.FormField.SELLER_ADDRESS.name).copy(value = Some(sellerAddress)), '_label -> Messages(constants.FormField.SELLER_ADDRESS.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.SELLER_ADDRESS.name), 'required -> true)
+                @inputText(confirmBuyerBidForm(constants.FormField.BID.name) copy (value = Some(bid.toString)), '_label -> Messages(constants.FormField.BID.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.BID.name), 'required -> true)
+                @inputText(confirmBuyerBidForm(constants.FormField.TIME.name), '_label -> Messages(constants.FormField.TIME.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.TIME.name), 'required -> true)
+                @inputText(confirmBuyerBidForm(constants.FormField.PEG_HASH.name).copy(value = Some(pegHash)), '_label -> Messages(constants.FormField.PEG_HASH.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.PEG_HASH.name), 'required -> true)
+                @inputText(confirmBuyerBidForm(constants.FormField.BUYER_CONTRACT_HASH.name), '_label -> Messages(constants.FormField.BUYER_CONTRACT_HASH.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.BUYER_CONTRACT_HASH.name), 'required -> true)
+                @inputText(confirmBuyerBidForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.GAS.name),'required->true)
+                @inputPassword(confirmBuyerBidForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.PASSWORD.name), 'required -> true)
 
                 @if(confirmBuyerBidForm.hasGlobalErrors) {
                     <ul>

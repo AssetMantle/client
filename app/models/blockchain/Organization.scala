@@ -22,6 +22,8 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
 
   val db = databaseConfig.db
 
+  private val schedulerExecutionContext:ExecutionContext= actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
+
   private implicit val logger: Logger = Logger(this.getClass)
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_ORGANIZATION
@@ -129,10 +131,10 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
           case baseException: BaseException => logger.error(baseException.failure.message, baseException)
         }
       }
-    }
+    }(schedulerExecutionContext)
   }
 
   actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
     Utility.dirtyEntityUpdater()
-  }
+  }(schedulerExecutionContext)
 }

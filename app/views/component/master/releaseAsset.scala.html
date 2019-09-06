@@ -10,12 +10,10 @@
     </div>
     <div class="latest_card-body">
     @CSRF.formField
-    @inputText(releaseAssetForm(constants.Form.BLOCKCHAIN_ADDRESS).copy(value = Some(ownerAddress)), '_label -> Messages(constants.Form.BLOCKCHAIN_ADDRESS),
-        'class -> "form-control",'placeholder->Messages(constants.Form.BLOCKCHAIN_ADDRESS),'required->true)
-    @inputText(releaseAssetForm(constants.Form.PEG_HASH).copy(value = Some(pegHash)), '_label -> Messages(constants.Form.PEG_HASH),
-        'class -> "form-control",'placeholder->Messages(constants.Form.PEG_HASH),'required->true)
-    @inputPassword(releaseAssetForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD),
-        'class -> "form-control",'placeholder->Messages(constants.Form.PASSWORD),'required->true)
+    @inputText(releaseAssetForm(constants.FormField.BLOCKCHAIN_ADDRESS.name).copy(value = Some(ownerAddress)), '_label -> Messages(constants.FormField.BLOCKCHAIN_ADDRESS.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.BLOCKCHAIN_ADDRESS.name),'required->true)
+    @inputText(releaseAssetForm(constants.FormField.PEG_HASH.name).copy(value = Some(pegHash)), '_label -> Messages(constants.FormField.PEG_HASH.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.PEG_HASH.name),'required->true)
+    @inputText(releaseAssetForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.GAS.name),'required->true)
+    @inputPassword(releaseAssetForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.PASSWORD.name),'required->true)
 
     @if(releaseAssetForm.hasGlobalErrors) {
         <ul>

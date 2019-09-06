@@ -10,8 +10,7 @@
     </div>
     <div class="latest_card-body">
     @CSRF.formField
-    @inputText(verifyMobileNumberForm(constants.Form.OTP), '_label -> Messages(constants.Form.OTP),
-        'class -> "form-control",'placeholder->Messages(constants.Form.OTP),'required->true)
+    @inputText(verifyMobileNumberForm(constants.FormField.OTP.name), '_label -> Messages(constants.FormField.OTP.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.OTP.name),'required->true)
 
     @if(verifyMobileNumberForm.hasGlobalErrors) {
         <ul>

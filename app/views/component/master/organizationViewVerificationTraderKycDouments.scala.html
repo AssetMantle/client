@@ -1,20 +1,46 @@
-@import models.master.TraderKYC
 @import controllers.actions.LoginState
+@import models.master.TraderKYC
 
 @(traderKYCs: Seq[TraderKYC])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 <div>
     @for(traderKYC <- traderKYCs) {
-        @component.master.organizationViewKycDocument(id = traderKYC.id, documentType = traderKYC.documentType, status = traderKYC.organizationStatus, fileName = traderKYC.fileName, file = traderKYC.file)
-        <div id="traderKycDocumentStatus@traderKYC.id@traderKYC.documentType"></div>
-        @traderKYC.organizationStatus.getOrElse(None)  match {
-            case true => {
-                <div id="buttonTraderKycDocumentStatus@traderKYC.id@traderKYC.documentType"><button class="btn btn-danger btn-sm" onclick="organizationRejectTraderKycDocument('@traderKYC.id', '@traderKYC.documentType')">@Messages(constants.Form.REJECT)</button></div>
-            }
-            case false => {
-                <div id="buttonTraderKycDocumentStatus@traderKYC.id@traderKYC.documentType"><button class="btn btn-success btn-sm" onclick="organizationVerifyTraderKycDocument('@traderKYC.id', '@traderKYC.documentType')">@Messages(constants.Form.APPROVE)</button></div>
-            }
-            case _ => {
-                <div id="buttonTraderKycDocumentStatus@traderKYC.id@traderKYC.documentType"> <button class="btn btn-success btn-sm" onclick="organizationVerifyTraderKycDocument('@traderKYC.id', '@traderKYC.documentType')">@Messages(constants.Form.APPROVE)</button> <button class="btn btn-danger btn-sm" onclick="organizationRejectTraderKycDocument('@traderKYC.id', '@traderKYC.documentType')">@Messages(constants.Form.REJECT)</button></div>
+        @component.master.commonDocument(traderKYC){
+            <a href="@routes.FileController.organizationAccessedFile(traderKYC.id, traderKYC.fileName, traderKYC.documentType)">@Messages(traderKYC.documentType)</a>
+        }{
+            <div id="traderKycDocumentStatus@traderKYC.id@traderKYC.documentType"></div>
+            <div>
+                <span class="red">@Messages(constants.Form.ORGANIZATION_VERIFICATION):
+                @if(traderKYC.organizationStatus.getOrElse(false)) {
+                    <span id="organizationViewVerifiedTraderKYCDocumentOrganizationStatus@traderKYC.id@traderKYC.documentType" class="result success"><i class="fa fa-check " aria-hidden="true"></i></span>
+                    <span id="organizationViewUnverifiedTraderKYCDocumentOrganizationStatus@traderKYC.id@traderKYC.documentType" class="result failure hidden"><i class="fa fa-times-circle-o" aria-hidden="true"></i></span>
+                } else {
+                    <span id="organizationViewUnverifiedTraderKYCDocumentOrganizationStatus@traderKYC.id@traderKYC.documentType" class="result failure"><i class="fa fa-times-circle-o" aria-hidden="true"></i></span>
+                    <span id="organizationViewVerifiedTraderKYCDocumentOrganizationStatus@traderKYC.id@traderKYC.documentType" class="result success hidden"><i class="fa fa-check " aria-hidden="true"></i></span>
+                }
+                </span><br>
+                <span class="red">@Messages(constants.Form.ZONE_VERIFICATION):
+                @if(traderKYC.zoneStatus.getOrElse(false)) {
+                    <span id="organizationViewVerifiedTraderKYCDocumentZoneStatus@traderKYC.id@traderKYC.documentType" class="result success"><i class="fa fa-check " aria-hidden="true"></i></span>
+                    <span id="organizationViewUnverifiedTraderKYCDocumentZoneStatus@traderKYC.id@traderKYC.documentType" class="result failure hidden"><i class="fa fa-times-circle-o" aria-hidden="true"></i></span>
+                } else {
+                    <span id="organizationViewUnverifiedTraderKYCDocumentZoneStatus@traderKYC.id@traderKYC.documentType" class="result failure"><i class="fa fa-times-circle-o" aria-hidden="true"></i></span>
+                    <span id="organizationViewVerifiedTraderKYCDocumentZoneStatus@traderKYC.id@traderKYC.documentType" class="result success hidden"><i class="fa fa-check " aria-hidden="true"></i></span>
+                }
+                </span>
+            </div>
+            @traderKYC.organizationStatus.getOrElse(None) match {
+                case true => {
+                    <div id="buttonTraderKycDocumentStatus@traderKYC.id@traderKYC.documentType"><button class="btn btn-danger btn-sm" onclick="organizationRejectTraderKycDocument('@traderKYC.id', '@traderKYC.documentType')">@Messages(constants.Form.REJECT)</button></div>
+                }
+                case false => {
+                    <div id="buttonTraderKycDocumentStatus@traderKYC.id@traderKYC.documentType"><button class="btn btn-success btn-sm" onclick="organizationVerifyTraderKycDocument('@traderKYC.id', '@traderKYC.documentType')">@Messages(constants.Form.APPROVE)</button></div>
+                }
+                case _ => {
+                    <div id="buttonTraderKycDocumentStatus@traderKYC.id@traderKYC.documentType">
+                        <button class="btn btn-success btn-sm" onclick="organizationVerifyTraderKycDocument('@traderKYC.id', '@traderKYC.documentType')">@Messages(constants.Form.APPROVE)</button>
+                        <button class="btn btn-danger btn-sm" onclick="organizationRejectTraderKycDocument('@traderKYC.id', '@traderKYC.documentType')">@Messages(constants.Form.REJECT)</button>
+                    </div>
+                }
             }
         }
     }

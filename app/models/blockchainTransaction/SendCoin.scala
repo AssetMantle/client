@@ -3,6 +3,7 @@ package models.blockchainTransaction
 import akka.actor.ActorSystem
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
+import models.Abstract.BaseTransaction
 import models.masterTransaction.FaucetRequests
 import models.{blockchain, master}
 import org.postgresql.util.PSQLException
@@ -12,14 +13,14 @@ import play.api.{Configuration, Logger}
 import queries.GetAccount
 import slick.jdbc.JdbcProfile
 import transactions.responses.TransactionResponse.BlockResponse
-import utilities.{PushNotification, TransactionEntity}
+import utilities.PushNotification
 
 import scala.concurrent.duration.{Duration, _}
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class SendCoin(from: String, to: String, amount: Int,  status: Option[Boolean], txHash: Option[String], ticketID: String, mode: String, code: Option[String]) extends TransactionEntity[SendCoin] {
-  def mutateTicketID(newTicketID: String): SendCoin = SendCoin(from = from, to = to, amount = amount, status = status, txHash, ticketID = newTicketID, mode = mode, code = code)
+case class SendCoin(from: String, to: String, amount: Int,gas: Int,  status: Option[Boolean], txHash: Option[String], ticketID: String, mode: String, code: Option[String]) extends BaseTransaction[SendCoin] {
+  def mutateTicketID(newTicketID: String): SendCoin = SendCoin(from = from, to = to, amount = amount,gas=gas, status = status, txHash, ticketID = newTicketID, mode = mode, code = code)
 }
 
 
@@ -29,6 +30,8 @@ class SendCoins @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
   private implicit val logger: Logger = Logger(this.getClass)
+
+  private val schedulerExecutionContext:ExecutionContext= actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_SEND_COIN
 
@@ -110,13 +113,15 @@ class SendCoins @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
 
   private[models] class SendCoinTable(tag: Tag) extends Table[SendCoin](tag, "SendCoin") {
 
-    def * = (from, to, amount, status.?, txHash.?, ticketID, mode, code.?) <> (SendCoin.tupled, SendCoin.unapply)
+    def * = (from, to, amount,gas, status.?, txHash.?, ticketID, mode, code.?) <> (SendCoin.tupled, SendCoin.unapply)
 
     def from = column[String]("from")
 
     def to = column[String]("to")
 
     def amount = column[Int]("amount")
+
+    def gas = column[Int]("gas")
 
     def status = column[Boolean]("status")
 
@@ -131,7 +136,7 @@ class SendCoins @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
 
   object Service {
 
-    def create(sendCoin: SendCoin): String = Await.result(add(SendCoin(from = sendCoin.from, to = sendCoin.to, amount = sendCoin.amount, status = sendCoin.status, txHash = sendCoin.txHash, ticketID = sendCoin.ticketID, mode = sendCoin.mode, code = sendCoin.code)), Duration.Inf)
+    def create(sendCoin: SendCoin): String = Await.result(add(SendCoin(from = sendCoin.from, to = sendCoin.to, amount = sendCoin.amount,gas=sendCoin.gas, status = sendCoin.status, txHash = sendCoin.txHash, ticketID = sendCoin.ticketID, mode = sendCoin.mode, code = sendCoin.code)), Duration.Inf)
 
     def markTransactionFailed(ticketID: String, code: String): Int = Await.result(updateStatusAndCodeOnTicketID(ticketID, status = Option(false), code), Duration.Inf)
 
@@ -182,6 +187,6 @@ class SendCoins @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
   if (kafkaEnabled || transactionMode != constants.Transactions.BLOCK_MODE) {
     actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
       transaction.ticketUpdater(Service.getTicketIDsOnStatus, Service.getTransactionHash, Utility.onSuccess, Utility.onFailure)
-    }
+    }(schedulerExecutionContext)
   }
 }

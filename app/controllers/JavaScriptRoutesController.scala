@@ -18,7 +18,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.LoginController.loginForm,
         routes.javascript.LogoutController.logoutForm,
         routes.javascript.SignUpController.signUpForm,
-        routes.javascript.UpdateContactController.updateContactForm,
+        routes.javascript.ContactController.updateContactForm,
         routes.javascript.VerifyMobileNumberController.verifyMobileNumberForm,
         routes.javascript.VerifyEmailAddressController.verifyEmailAddressForm,
         routes.javascript.AddOrganizationController.addOrganizationForm,
@@ -55,6 +55,11 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ComponentViewController.orderList,
         routes.javascript.ComponentViewController.availableAssetList,
         routes.javascript.ComponentViewController.availableAssetListWithLogin,
+        routes.javascript.ComponentViewController.profileDocuments,
+        routes.javascript.ComponentViewController.profilePicture,
+
+        routes.javascript.ViewController.profile,
+
         routes.javascript.ReleaseAssetController.releaseAssetList,
         routes.javascript.BuyerExecuteOrderController.moderatedBuyerExecuteOrderList,
         routes.javascript.SellerExecuteOrderController.moderatedSellerExecuteOrderList,
@@ -183,7 +188,14 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.SetACLController.zoneRejectKycDocument,
         routes.javascript.SetACLController.organizationViewKycDocuments,
         routes.javascript.SetACLController.organizationVerifyKycDocument,
-        routes.javascript.SetACLController.organizationRejectKycDocument
+        routes.javascript.SetACLController.organizationRejectKycDocument,
+
+        //profile
+        routes.javascript.ContactController.contact,
+
+        routes.javascript.AccountController.changePasswordForm,
+        routes.javascript.AccountController.emailOTPForgotPasswordForm,
+        routes.javascript.AccountController.forgotPasswordForm,
       )
     ).as("text/javascript")
   }

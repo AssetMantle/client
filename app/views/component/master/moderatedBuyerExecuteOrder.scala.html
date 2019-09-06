@@ -12,16 +12,12 @@
     <div>
         <div class="latest_card-body">
         @CSRF.formField
-        @inputText(moderatedBuyerExecuteOrderForm(constants.Form.BUYER_ADDRESS).copy(value = Some(buyerAddress)), '_label -> Messages(constants.Form.BUYER_ADDRESS),
-            'class -> "form-control",'placeholder->Messages(constants.Form.BUYER_ADDRESS),'required->true)
-        @inputText(moderatedBuyerExecuteOrderForm(constants.Form.SELLER_ADDRESS).copy(value = Some(sellerAddress)), '_label -> Messages(constants.Form.SELLER_ADDRESS),
-            'class -> "form-control",'placeholder->Messages(constants.Form.SELLER_ADDRESS),'required->true)
-        @inputText(moderatedBuyerExecuteOrderForm(constants.Form.FIAT_PROOF_HASH), '_label -> Messages(constants.Form.FIAT_PROOF_HASH),
-            'class -> "form-control",'placeholder->Messages(constants.Form.FIAT_PROOF_HASH),'required->true)
-        @inputText(moderatedBuyerExecuteOrderForm(constants.Form.PEG_HASH).copy(value = Some(pegHash)), '_label -> Messages(constants.Form.PEG_HASH),
-            'class -> "form-control",'placeholder->Messages(constants.Form.PEG_HASH),'required->true)
-        @inputPassword(moderatedBuyerExecuteOrderForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD),
-            'class -> "form-control",'placeholder->Messages(constants.Form.PASSWORD),'required->true)
+        @inputText(moderatedBuyerExecuteOrderForm(constants.FormField.BUYER_ADDRESS.name).copy(value = Some(buyerAddress)), '_label -> Messages(constants.FormField.BUYER_ADDRESS.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.BUYER_ADDRESS.name),'required->true)
+        @inputText(moderatedBuyerExecuteOrderForm(constants.FormField.SELLER_ADDRESS.name).copy(value = Some(sellerAddress)), '_label -> Messages(constants.FormField.SELLER_ADDRESS.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.SELLER_ADDRESS.name),'required->true)
+        @inputText(moderatedBuyerExecuteOrderForm(constants.FormField.FIAT_PROOF_HASH.name), '_label -> Messages(constants.FormField.FIAT_PROOF_HASH.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.FIAT_PROOF_HASH.name),'required->true)
+        @inputText(moderatedBuyerExecuteOrderForm(constants.FormField.PEG_HASH.name).copy(value = Some(pegHash)), '_label -> Messages(constants.FormField.PEG_HASH.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.PEG_HASH.name),'required->true)
+        @inputText(moderatedBuyerExecuteOrderForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.GAS.name),'required->true)
+        @inputPassword(moderatedBuyerExecuteOrderForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.PASSWORD.name),'required->true)
 
         @if(moderatedBuyerExecuteOrderForm.hasGlobalErrors) {
             <ul>

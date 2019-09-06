@@ -9,10 +9,8 @@
     </div>
     <div class="latest_card-body">
     @CSRF.formField
-    @inputText(issueFiatRequestForm(constants.Form.TRANSACTION_ID), '_label -> Messages(constants.Form.TRANSACTION_ID),
-        'class -> "form-control",'placeholder->Messages(constants.Form.TRANSACTION_ID),'required->true)
-    @inputText(issueFiatRequestForm(constants.Form.TRANSACTION_AMOUNT), '_label -> Messages(constants.Form.TRANSACTION_AMOUNT),
-        'class -> "form-control",'placeholder->Messages(constants.Form.TRANSACTION_AMOUNT),'required->true)
+    @inputText(issueFiatRequestForm(constants.FormField.TRANSACTION_ID.name), '_label -> Messages(constants.FormField.TRANSACTION_ID.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.TRANSACTION_ID.name),'required->true)
+    @inputText(issueFiatRequestForm(constants.FormField.TRANSACTION_AMOUNT.name), '_label -> Messages(constants.FormField.TRANSACTION_AMOUNT.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.TRANSACTION_AMOUNT.name),'required->true)
 
     @if(issueFiatRequestForm.hasGlobalErrors) {
         <ul>

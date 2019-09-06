@@ -43,15 +43,20 @@ function uploadFile(uploadRoute, storeRoute, documentType) {
         $.ajax({
             url: storeDbRoute.url,
             type: storeDbRoute.type,
-            success: function (result) {
-                $("#uploadCompletionMessage").show();
-                uploadCompletionMessage.textContent  = result;
-                uploadCompletionMessage.style.color = "green";
-            },
-            error: function (error) {
-                $("#uploadCompletionMessage").show();
-                uploadCompletionMessage.textContent  = error.responseText;
-                uploadCompletionMessage.style.color = "red";
+            statusCode: {
+                200: function (data) {
+                    $("#uploadCompletionMessage").show();
+                    uploadCompletionMessage.textContent  = data;
+                },
+                400: function (error) {
+                    $("#uploadCompletionMessage").show();
+                    uploadCompletionMessage.textContent  = error.responseText;
+                },
+                500: function (data) {
+                    const newDocument = document.open("text/html", "replace");
+                    newDocument.write(data.responseText);
+                    newDocument.close();
+                }
             }
         });
     });
@@ -91,15 +96,20 @@ function updateFile(uploadRoute, updateRoute, documentType) {
         $.ajax({
             url: updateDbRoute.url,
             type: updateDbRoute.type,
-            success: function (result) {
-                $("#updateCompletionMessage").show();
-                updateCompletionMessage.textContent  = result;
-                updateCompletionMessage.style.color = "green";
-            },
-            error: function (error) {
-                $("#updateCompletionMessage").show();
-                updateCompletionMessage.textContent  = error.responseText;
-                updateCompletionMessage.style.color = "red";
+            statusCode: {
+                200: function (data) {
+                    $("#updateCompletionMessage").show();
+                    updateCompletionMessage.textContent  = data;
+                },
+                400: function (error) {
+                    $("#updateCompletionMessage").show();
+                    updateCompletionMessage.textContent  = error.responseText;
+                },
+                500: function (data) {
+                    const newDocument = document.open("text/html", "replace");
+                    newDocument.write(data.responseText);
+                    newDocument.close();
+                }
             }
         });
     });

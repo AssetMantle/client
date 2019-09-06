@@ -4,29 +4,28 @@
 
 @(logoutForm: Form[Logout.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 
-<div class="logout">
-    @form(action = routes.LogoutController.logout, 'onkeypress -> "validateForm(event,this)") {
-        @CSRF.formField
 
-        <div class="latest_card-body ml-cb">
-            <div class="input-group">
-                <div class="input-group-prepend">
-                    <span class="input-group-text">
-                    @Messages(constants.Form.RECEIVE_NOTIFICATIONS)
-                    </span>
-                    @checkbox(logoutForm(constants.Form.RECEIVE_NOTIFICATIONS))
-                </div>
-            </div>
+@form(action = routes.LogoutController.logout, 'onkeypress -> "validateForm(event,this)") {
+    @CSRF.formField
 
-            @if(logoutForm.hasGlobalErrors) {
-                <ul>
-                @for(error <- logoutForm.globalErrors) {
-                    <li>@error.format</li>
-                }
-                </ul>
-            }
-            <button type="button" class="btn btn-primary btn-sm" onclick="submitForm(this)">@Messages(constants.Form.LOGOUT)</button>
+    <div class="latest_card-body ml-cb">
+
+        <div class="input-group-prepend">
+            @checkbox(logoutForm(constants.Form.RECEIVE_NOTIFICATIONS), '_label -> Messages(constants.Form.RECEIVE_NOTIFICATIONS))
+            <span class="input-group-text">
+            @Messages(constants.Form.RECEIVE_NOTIFICATIONS)
+            </span>
+
         </div>
-    }
-</div>
+
+        @if(logoutForm.hasGlobalErrors) {
+            <ul>
+            @for(error <- logoutForm.globalErrors) {
+                <li>@error.format</li>
+            }
+            </ul>
+        }
+        <button type="button" class="btn btn-primary btn-sm" onclick="submitForm(this)">@Messages(constants.Form.LOGOUT)</button>
+    </div>
+}
 

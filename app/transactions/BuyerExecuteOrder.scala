@@ -7,7 +7,8 @@ import javax.inject.{Inject, Singleton}
 import play.api.libs.json.{Json, OWrites}
 import play.api.libs.ws.{WSClient, WSResponse}
 import play.api.{Configuration, Logger}
-import utilities.RequestEntity
+import transactions.Abstract.BaseRequestEntity
+
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
@@ -31,7 +32,7 @@ class BuyerExecuteOrder @Inject()(wsClient: WSClient)(implicit configuration: Co
 
   case class BaseRequest(from: String, chain_id: String = chainID)
 
-  case class Request(base_req: BaseRequest, password: String, buyerAddress: String, sellerAddress: String, fiatProofHash: String, pegHash: String, mode: String) extends RequestEntity
+  case class Request(base_req: BaseRequest, password: String, buyerAddress: String, sellerAddress: String, fiatProofHash: String, pegHash: String,gas:String, mode: String) extends BaseRequestEntity
 
   private implicit val baseRequestWrites: OWrites[BaseRequest] = Json.writes[BaseRequest]
 
@@ -42,7 +43,6 @@ class BuyerExecuteOrder @Inject()(wsClient: WSClient)(implicit configuration: Co
   object Service {
 
     def post(request: Request): WSResponse = try {
-      logger.info(Json.toJson(request).toString())
       Await.result(action(request), Duration.Inf)
     } catch {
       case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)

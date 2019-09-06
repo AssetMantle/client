@@ -7,7 +7,6 @@ import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject._
 import models.{blockchain, master}
-import org.apache.commons.codec.binary.Base64
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.libs.ws.WSClient
 import play.api.mvc._
@@ -21,21 +20,23 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private val uploadAccountKycBankDetailsPath = configuration.get[String]("upload.account.bankDetailsPath")
+  private implicit val module: String = constants.Module.FILE_CONTROLLER
 
-  private val uploadAccountKycIdentificationPath = configuration.get[String]("upload.account.identificationPath")
+  private val uploadAccountKycBankDetailsPath: String = configuration.get[String]("upload.account.bankDetailsPath")
 
-  private val uploadAccountProfilePicturePath = configuration.get[String]("upload.account.profilePicturePath")
+  private val uploadAccountKycIdentificationPath: String = configuration.get[String]("upload.account.identificationPath")
 
-  private val uploadZoneKycBankDetailsPath = configuration.get[String]("upload.zone.bankDetailsPath")
+  private val uploadAccountProfilePicturePath: String = configuration.get[String]("upload.account.profilePicturePath")
 
-  private val uploadZoneKycIdentificationPath = configuration.get[String]("upload.zone.identificationPath")
+  private val uploadZoneKycBankDetailsPath: String = configuration.get[String]("upload.zone.bankDetailsPath")
 
-  private val uploadOrganizationKycBankDetailsPath = configuration.get[String]("upload.organization.bankDetailsPath")
+  private val uploadZoneKycIdentificationPath: String = configuration.get[String]("upload.zone.identificationPath")
 
-  private val uploadOrganizationKycIdentificationPath = configuration.get[String]("upload.organization.identificationPath")
+  private val uploadOrganizationKycBankDetailsPath: String = configuration.get[String]("upload.organization.bankDetailsPath")
 
-  private val uploadTraderKycIdentificationPath = configuration.get[String]("upload.trader.identificationPath")
+  private val uploadOrganizationKycIdentificationPath: String = configuration.get[String]("upload.organization.identificationPath")
+
+  private val uploadTraderKycIdentificationPath: String = configuration.get[String]("upload.trader.identificationPath")
 
   def checkAccountKycFileExists(accountID: String, documentType: String): Action[AnyContent] = Action { implicit request =>
     if (masterAccountKYCs.Service.checkFileExists(id = accountID, documentType = documentType)) Ok else NoContent
@@ -54,11 +55,11 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
   }
 
   def uploadUserKycForm(documentType: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.userKycFileUpload(documentType = documentType))
+    Ok(views.html.component.master.uploadFileForm(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadUserKyc), utilities.String.getJsRouteFunction(routes.javascript.FileController.storeUserKyc), documentType))
   }
 
   def updateUserKycForm(documentType: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.userKycFileUpdate(documentType = documentType))
+    Ok(views.html.component.master.updateFileForm(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadUserKyc), utilities.String.getJsRouteFunction(routes.javascript.FileController.updateUserKyc), documentType))
   }
 
   def uploadUserKyc(documentType: String) = Action(parse.multipartFormData) { implicit request =>
@@ -69,9 +70,8 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
       fileUploadInfo => {
         try {
           request.body.file("file") match {
-            case None => BadRequest("No file")
-            case Some(file) =>
-              utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, fileResourceManager.getAccountKycFilePath(documentType))
+            case None => BadRequest(Messages(constants.Response.NO_FILE.message))
+            case Some(file) => utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, fileResourceManager.getAccountKycFilePath(documentType))
               Ok
           }
         }
@@ -84,50 +84,43 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
 
   def storeUserKyc(name: String, documentType: String): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val path = fileResourceManager.getAccountKycFilePath(documentType)
       try {
-        val (fileName, encodedBase64) = utilities.FileOperations.fileExtensionFromName(name) match {
-          case constants.File.JPEG | constants.File.JPG | constants.File.PNG => utilities.ImageProcess.convertToThumbnail(name, path)
-          case _ => (List(util.hashing.MurmurHash3.stringHash(Base64.encodeBase64String(utilities.FileOperations.convertToByteArray(utilities.FileOperations.newFile(path, name)))).toString, utilities.FileOperations.fileExtensionFromName(name)).mkString("."), null)
-        }
-        masterAccountKYCs.Service.create(id = loginState.username, documentType = documentType, fileName = fileName, file = Option(encodedBase64))
-        utilities.FileOperations.renameFile(path, name, fileName)
+        fileResourceManager.storeFile[master.AccountKYC](
+          name = name,
+          documentType = documentType,
+          path = fileResourceManager.getAccountKycFilePath(documentType),
+          document = master.AccountKYC(id = loginState.username, documentType = documentType, status = None, fileName = name, file = None),
+          masterCreate = masterAccountKYCs.Service.create
+        )
         withUsernameToken.Ok(Messages(constants.Response.FILE_UPLOAD_SUCCESSFUL.message))
       } catch {
-        case baseException: BaseException => utilities.FileOperations.deleteFile(path, name)
-          InternalServerError(Messages(baseException.failure.message))
-        case e: Exception => utilities.FileOperations.deleteFile(path, name)
-          InternalServerError(Messages(e.getMessage))
+        case baseException: BaseException => InternalServerError(Messages(baseException.failure.message))
       }
   }
 
   def updateUserKyc(name: String, documentType: String): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val newPath = fileResourceManager.getAccountKycFilePath(documentType)
       try {
-        val oldAccountKYC = masterAccountKYCs.Service.get(id = loginState.username, documentType = documentType)
-        val (fileName, encodedBase64) = utilities.FileOperations.fileExtensionFromName(name) match {
-          case constants.File.JPEG | constants.File.JPG | constants.File.PNG => utilities.ImageProcess.convertToThumbnail(name, newPath)
-          case _ => (List(util.hashing.MurmurHash3.stringHash(Base64.encodeBase64String(utilities.FileOperations.convertToByteArray(utilities.FileOperations.newFile(newPath, name)))).toString, utilities.FileOperations.fileExtensionFromName(name)).mkString("."), null)
-        }
-        utilities.FileOperations.deleteFile(fileResourceManager.getAccountKycFilePath(oldAccountKYC.documentType), oldAccountKYC.fileName)
-        masterAccountKYCs.Service.updateOldDocument(id = loginState.username, documentType = documentType, fileName = fileName, file = Option(encodedBase64))
-        utilities.FileOperations.renameFile(newPath, name, fileName)
+        fileResourceManager.updateFile[master.AccountKYC](
+          name = name,
+          documentType = documentType,
+          path = fileResourceManager.getAccountKycFilePath(documentType),
+          oldDocumentFileName = masterAccountKYCs.Service.getFileName(id = loginState.username, documentType = documentType),
+          document = master.AccountKYC(id = loginState.username, documentType = documentType, status = None, fileName = name, file  = None),
+          updateOldDocument = masterAccountKYCs.Service.updateOldDocument
+        )
         withUsernameToken.Ok(Messages(constants.Response.FILE_UPDATE_SUCCESSFUL.message))
       } catch {
-        case baseException: BaseException => utilities.FileOperations.deleteFile(newPath, name)
-          InternalServerError(Messages(baseException.failure.message))
-        case e: Exception => utilities.FileOperations.deleteFile(newPath, name)
-          InternalServerError(Messages(e.getMessage))
+        case baseException: BaseException => InternalServerError(Messages(baseException.failure.message))
       }
   }
 
   def uploadUserZoneKycForm(documentType: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.userZoneKycFileUpload(documentType = documentType))
+    Ok(views.html.component.master.uploadFileForm(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadUserZoneKyc), utilities.String.getJsRouteFunction(routes.javascript.FileController.storeUserZoneKyc), documentType))
   }
 
   def updateUserZoneKycForm(documentType: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.userZoneKycFileUpdate(documentType = documentType))
+    Ok(views.html.component.master.updateFileForm(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadUserZoneKyc), utilities.String.getJsRouteFunction(routes.javascript.FileController.updateUserZoneKyc), documentType))
   }
 
   def uploadUserZoneKyc(documentType: String) = Action(parse.multipartFormData) { implicit request =>
@@ -138,9 +131,8 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
       fileUploadInfo => {
         try {
           request.body.file("file") match {
-            case None => BadRequest("No file")
-            case Some(file) =>
-              utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, fileResourceManager.getZoneKycFilePath(documentType))
+            case None => BadRequest(Messages(constants.Response.NO_FILE.message))
+            case Some(file) => utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, fileResourceManager.getZoneKycFilePath(documentType))
               Ok
           }
         }
@@ -153,50 +145,43 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
 
   def storeUserZoneKyc(name: String, documentType: String): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val path = fileResourceManager.getZoneKycFilePath(documentType)
       try {
-        val (fileName, encodedBase64) = utilities.FileOperations.fileExtensionFromName(name) match {
-          case constants.File.JPEG | constants.File.JPG | constants.File.PNG => utilities.ImageProcess.convertToThumbnail(name, path)
-          case _ => (List(util.hashing.MurmurHash3.stringHash(Base64.encodeBase64String(utilities.FileOperations.convertToByteArray(utilities.FileOperations.newFile(path, name)))).toString, utilities.FileOperations.fileExtensionFromName(name)).mkString("."), null)
-        }
-        masterZoneKYCs.Service.create(id = loginState.username, documentType = documentType, fileName = fileName, file = Option(encodedBase64))
-        utilities.FileOperations.renameFile(path, name, fileName)
+        fileResourceManager.storeFile[master.ZoneKYC](
+          name = name,
+          documentType = documentType,
+          path = fileResourceManager.getZoneKycFilePath(documentType),
+          document = master.ZoneKYC(id = loginState.username, documentType = documentType, status = None, fileName = name, file = None),
+          masterCreate = masterZoneKYCs.Service.create
+        )
         withUsernameToken.Ok(Messages(constants.Response.FILE_UPLOAD_SUCCESSFUL.message))
       } catch {
-        case baseException: BaseException => utilities.FileOperations.deleteFile(path, name)
-          InternalServerError(Messages(baseException.failure.message))
-        case e: Exception => utilities.FileOperations.deleteFile(path, name)
-          InternalServerError(Messages(e.getMessage))
+        case baseException: BaseException => InternalServerError(Messages(baseException.failure.message))
       }
   }
 
   def updateUserZoneKyc(name: String, documentType: String): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val newPath = fileResourceManager.getZoneKycFilePath(documentType)
       try {
-        val oldAccountKYC = masterZoneKYCs.Service.get(id = loginState.username, documentType = documentType)
-        val (fileName, encodedBase64) = utilities.FileOperations.fileExtensionFromName(name) match {
-          case constants.File.JPEG | constants.File.JPG | constants.File.PNG => utilities.ImageProcess.convertToThumbnail(name, newPath)
-          case _ => (List(util.hashing.MurmurHash3.stringHash(Base64.encodeBase64String(utilities.FileOperations.convertToByteArray(utilities.FileOperations.newFile(newPath, name)))).toString, utilities.FileOperations.fileExtensionFromName(name)).mkString("."), null)
-        }
-        utilities.FileOperations.deleteFile(fileResourceManager.getZoneKycFilePath(oldAccountKYC.documentType), oldAccountKYC.fileName)
-        masterZoneKYCs.Service.updateOldDocument(id = loginState.username, documentType = documentType, fileName = fileName, file = Option(encodedBase64))
-        utilities.FileOperations.renameFile(newPath, name, fileName)
+        fileResourceManager.updateFile[master.ZoneKYC](
+          name = name,
+          documentType = documentType,
+          path = fileResourceManager.getZoneKycFilePath(documentType),
+          oldDocumentFileName = masterZoneKYCs.Service.getFileName(id = loginState.username, documentType = documentType),
+          document = master.ZoneKYC(id = loginState.username, documentType = documentType, status = None, fileName = name, file  = None),
+          updateOldDocument = masterZoneKYCs.Service.updateOldDocument
+        )
         withUsernameToken.Ok(Messages(constants.Response.FILE_UPDATE_SUCCESSFUL.message))
       } catch {
-        case baseException: BaseException => utilities.FileOperations.deleteFile(newPath, name)
-          InternalServerError(Messages(baseException.failure.message))
-        case e: Exception => utilities.FileOperations.deleteFile(newPath, name)
-          InternalServerError(Messages(e.getMessage))
+        case baseException: BaseException => InternalServerError(Messages(baseException.failure.message))
       }
   }
 
   def uploadUserOrganizationKycForm(documentType: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.userOrganizationKycFileUpload(documentType = documentType))
+    Ok(views.html.component.master.uploadFileForm(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadUserOrganizationKyc), utilities.String.getJsRouteFunction(routes.javascript.FileController.storeUserOrganizationKyc), documentType))
   }
 
   def updateUserOrganizationKycForm(documentType: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.userOrganizationKycFileUpdate(documentType = documentType))
+    Ok(views.html.component.master.updateFileForm(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadUserOrganizationKyc), utilities.String.getJsRouteFunction(routes.javascript.FileController.updateUserOrganizationKyc), documentType))
   }
 
   def uploadUserOrganizationKyc(documentType: String) = Action(parse.multipartFormData) { implicit request =>
@@ -207,9 +192,8 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
       fileUploadInfo => {
         try {
           request.body.file("file") match {
-            case None => BadRequest("No file")
-            case Some(file) =>
-              utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, fileResourceManager.getOrganizationKycFilePath(documentType))
+            case None => BadRequest(Messages(constants.Response.NO_FILE.message))
+            case Some(file) => utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, fileResourceManager.getOrganizationKycFilePath(documentType))
               Ok
           }
         }
@@ -222,50 +206,43 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
 
   def storeUserOrganizationKyc(name: String, documentType: String): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val path = fileResourceManager.getOrganizationKycFilePath(documentType)
       try {
-        val (fileName, encodedBase64) = utilities.FileOperations.fileExtensionFromName(name) match {
-          case constants.File.JPEG | constants.File.JPG | constants.File.PNG => utilities.ImageProcess.convertToThumbnail(name, path)
-          case _ => (List(util.hashing.MurmurHash3.stringHash(Base64.encodeBase64String(utilities.FileOperations.convertToByteArray(utilities.FileOperations.newFile(path, name)))).toString, utilities.FileOperations.fileExtensionFromName(name)).mkString("."), null)
-        }
-        masterOrganizationKYCs.Service.create(id = loginState.username, documentType = documentType, fileName = fileName, file = Option(encodedBase64))
-        utilities.FileOperations.renameFile(path, name, fileName)
+        fileResourceManager.storeFile[master.OrganizationKYC](
+          name = name,
+          documentType = documentType,
+          path = fileResourceManager.getOrganizationKycFilePath(documentType),
+          document = master.OrganizationKYC(id = loginState.username, documentType = documentType, status = None, fileName = name, file = None),
+          masterCreate = masterOrganizationKYCs.Service.create
+        )
         withUsernameToken.Ok(Messages(constants.Response.FILE_UPLOAD_SUCCESSFUL.message))
       } catch {
-        case baseException: BaseException => utilities.FileOperations.deleteFile(path, name)
-          InternalServerError(Messages(baseException.failure.message))
-        case e: Exception => utilities.FileOperations.deleteFile(path, name)
-          InternalServerError(Messages(e.getMessage))
+        case baseException: BaseException => InternalServerError(Messages(baseException.failure.message))
       }
   }
 
   def updateUserOrganizationKyc(name: String, documentType: String): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val newPath = fileResourceManager.getOrganizationKycFilePath(documentType)
       try {
-        val oldAccountKYC = masterOrganizationKYCs.Service.get(id = loginState.username, documentType = documentType)
-        val (fileName, encodedBase64) = utilities.FileOperations.fileExtensionFromName(name) match {
-          case constants.File.JPEG | constants.File.JPG | constants.File.PNG => utilities.ImageProcess.convertToThumbnail(name, newPath)
-          case _ => (List(util.hashing.MurmurHash3.stringHash(Base64.encodeBase64String(utilities.FileOperations.convertToByteArray(utilities.FileOperations.newFile(newPath, name)))).toString, utilities.FileOperations.fileExtensionFromName(name)).mkString("."), null)
-        }
-        utilities.FileOperations.deleteFile(fileResourceManager.getOrganizationKycFilePath(oldAccountKYC.documentType), oldAccountKYC.fileName)
-        masterOrganizationKYCs.Service.updateOldDocument(id = loginState.username, documentType = documentType, fileName = fileName, file = Option(encodedBase64))
-        utilities.FileOperations.renameFile(newPath, name, fileName)
+        fileResourceManager.updateFile[master.OrganizationKYC](
+          name = name,
+          documentType = documentType,
+          path = fileResourceManager.getOrganizationKycFilePath(documentType),
+          oldDocumentFileName = masterOrganizationKYCs.Service.getFileName(id = loginState.username, documentType = documentType),
+          document = master.OrganizationKYC(id = loginState.username, documentType = documentType, status = None, fileName = name, file  = None),
+          updateOldDocument = masterOrganizationKYCs.Service.updateOldDocument
+        )
         withUsernameToken.Ok(Messages(constants.Response.FILE_UPDATE_SUCCESSFUL.message))
       } catch {
-        case baseException: BaseException => utilities.FileOperations.deleteFile(newPath, name)
-          InternalServerError(Messages(baseException.failure.message))
-        case e: Exception => utilities.FileOperations.deleteFile(newPath, name)
-          InternalServerError(Messages(e.getMessage))
+        case baseException: BaseException => InternalServerError(Messages(baseException.failure.message))
       }
   }
 
   def uploadUserTraderKycForm(documentType: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.userTraderKycFileUpload(documentType = documentType))
+    Ok(views.html.component.master.uploadFileForm(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadUserTraderKyc), utilities.String.getJsRouteFunction(routes.javascript.FileController.storeUserTraderKyc), documentType))
   }
 
   def updateUserTraderKycForm(documentType: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.userTraderKycFileUpdate(documentType = documentType))
+    Ok(views.html.component.master.updateFileForm(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadUserTraderKyc), utilities.String.getJsRouteFunction(routes.javascript.FileController.updateUserTraderKyc), documentType))
   }
 
   def uploadUserTraderKyc(documentType: String) = Action(parse.multipartFormData) { implicit request =>
@@ -276,9 +253,8 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
       fileUploadInfo => {
         try {
           request.body.file("file") match {
-            case None => BadRequest("No file")
-            case Some(file) =>
-              utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, fileResourceManager.getTraderKycFilePath(documentType))
+            case None => BadRequest(Messages(constants.Response.NO_FILE.message))
+            case Some(file) => utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, fileResourceManager.getTraderKycFilePath(documentType))
               Ok
           }
         }
@@ -291,50 +267,43 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
 
   def storeUserTraderKyc(name: String, documentType: String): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val path = fileResourceManager.getTraderKycFilePath(documentType)
       try {
-        val (fileName, encodedBase64) = utilities.FileOperations.fileExtensionFromName(name) match {
-          case constants.File.JPEG | constants.File.JPG | constants.File.PNG => utilities.ImageProcess.convertToThumbnail(name, path)
-          case _ => (List(util.hashing.MurmurHash3.stringHash(Base64.encodeBase64String(utilities.FileOperations.convertToByteArray(utilities.FileOperations.newFile(path, name)))).toString, utilities.FileOperations.fileExtensionFromName(name)).mkString("."), null)
-        }
-        masterTraderKYCs.Service.create(id = loginState.username, documentType = documentType, fileName = fileName, file = Option(encodedBase64))
-        utilities.FileOperations.renameFile(path, name, fileName)
+        fileResourceManager.storeFile[master.TraderKYC](
+          name = name,
+          documentType = documentType,
+          path = fileResourceManager.getTraderKycFilePath(documentType),
+          document = master.TraderKYC(id = loginState.username, documentType = documentType, fileName = name, file = None, zoneStatus = None, organizationStatus = None),
+          masterCreate = masterTraderKYCs.Service.create
+        )
         withUsernameToken.Ok(Messages(constants.Response.FILE_UPLOAD_SUCCESSFUL.message))
       } catch {
-        case baseException: BaseException => utilities.FileOperations.deleteFile(path, name)
-          InternalServerError(Messages(baseException.failure.message))
-        case e: Exception => utilities.FileOperations.deleteFile(path, name)
-          InternalServerError(Messages(e.getMessage))
+        case baseException: BaseException => InternalServerError(Messages(baseException.failure.message))
       }
   }
 
   def updateUserTraderKyc(name: String, documentType: String): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val newPath = fileResourceManager.getTraderKycFilePath(documentType)
       try {
-        val oldAccountKYC = masterTraderKYCs.Service.get(id = loginState.username, documentType = documentType)
-        val (fileName, encodedBase64) = utilities.FileOperations.fileExtensionFromName(name) match {
-          case constants.File.JPEG | constants.File.JPG | constants.File.PNG => utilities.ImageProcess.convertToThumbnail(name, newPath)
-          case _ => (List(util.hashing.MurmurHash3.stringHash(Base64.encodeBase64String(utilities.FileOperations.convertToByteArray(utilities.FileOperations.newFile(newPath, name)))).toString, utilities.FileOperations.fileExtensionFromName(name)).mkString("."), null)
-        }
-        utilities.FileOperations.deleteFile(fileResourceManager.getTraderKycFilePath(oldAccountKYC.documentType), oldAccountKYC.fileName)
-        masterTraderKYCs.Service.updateOldDocument(id = loginState.username, documentType = documentType, fileName = fileName, file = Option(encodedBase64))
-        utilities.FileOperations.renameFile(newPath, name, fileName)
+        fileResourceManager.updateFile[master.TraderKYC](
+          name = name,
+          documentType = documentType,
+          path = fileResourceManager.getTraderKycFilePath(documentType),
+          oldDocumentFileName = masterTraderKYCs.Service.getFileName(id = loginState.username, documentType = documentType),
+          document = master.TraderKYC(id = loginState.username, documentType = documentType, fileName = name, file  = None, zoneStatus = None, organizationStatus = None),
+          updateOldDocument = masterTraderKYCs.Service.updateOldDocument
+        )
         withUsernameToken.Ok(Messages(constants.Response.FILE_UPDATE_SUCCESSFUL.message))
       } catch {
-        case baseException: BaseException => utilities.FileOperations.deleteFile(newPath, name)
-          InternalServerError(Messages(baseException.failure.message))
-        case e: Exception => utilities.FileOperations.deleteFile(newPath, name)
-          InternalServerError(Messages(e.getMessage))
+        case baseException: BaseException => InternalServerError(Messages(baseException.failure.message))
       }
   }
 
   def uploadZoneKycForm(documentType: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.zoneKycFileUpload(documentType = documentType))
+    Ok(views.html.component.master.uploadFileForm(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadZoneKyc), utilities.String.getJsRouteFunction(routes.javascript.FileController.storeZoneKyc), documentType))
   }
 
   def updateZoneKycForm(documentType: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.zoneKycFileUpdate(documentType = documentType))
+    Ok(views.html.component.master.updateFileForm(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadZoneKyc), utilities.String.getJsRouteFunction(routes.javascript.FileController.updateZoneKyc), documentType))
   }
 
   def uploadZoneKyc(documentType: String) = Action(parse.multipartFormData) { implicit request =>
@@ -345,9 +314,8 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
       fileUploadInfo => {
         try {
           request.body.file("file") match {
-            case None => BadRequest("No file")
-            case Some(file) =>
-              utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, fileResourceManager.getZoneKycFilePath(documentType))
+            case None => BadRequest(Messages(constants.Response.NO_FILE.message))
+            case Some(file) => utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, fileResourceManager.getZoneKycFilePath(documentType))
               Ok
           }
         }
@@ -360,50 +328,43 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
 
   def storeZoneKyc(name: String, documentType: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val path = fileResourceManager.getZoneKycFilePath(documentType)
       try {
-        val (fileName, encodedBase64) = utilities.FileOperations.fileExtensionFromName(name) match {
-          case constants.File.JPEG | constants.File.JPG | constants.File.PNG => utilities.ImageProcess.convertToThumbnail(name, path)
-          case _ => (List(util.hashing.MurmurHash3.stringHash(Base64.encodeBase64String(utilities.FileOperations.convertToByteArray(utilities.FileOperations.newFile(path, name)))).toString, utilities.FileOperations.fileExtensionFromName(name)).mkString("."), null)
-        }
-        masterZoneKYCs.Service.create(id = loginState.username, documentType = documentType, fileName = fileName, file = Option(encodedBase64))
-        utilities.FileOperations.renameFile(path, name, fileName)
+        fileResourceManager.storeFile[master.ZoneKYC](
+          name = name,
+          documentType = documentType,
+          path = fileResourceManager.getZoneKycFilePath(documentType),
+          document = master.ZoneKYC(id = loginState.username, documentType = documentType, fileName = name, file = None, status = None),
+          masterCreate = masterZoneKYCs.Service.create
+        )
         withUsernameToken.Ok(Messages(constants.Response.FILE_UPLOAD_SUCCESSFUL.message))
       } catch {
-        case baseException: BaseException => utilities.FileOperations.deleteFile(path, name)
-          InternalServerError(Messages(baseException.failure.message))
-        case e: Exception => utilities.FileOperations.deleteFile(path, name)
-          InternalServerError(Messages(e.getMessage))
+        case baseException: BaseException => InternalServerError(Messages(baseException.failure.message))
       }
   }
 
   def updateZoneKyc(name: String, documentType: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val newPath = fileResourceManager.getZoneKycFilePath(documentType)
       try {
-        val oldAccountKYC = masterZoneKYCs.Service.get(id = loginState.username, documentType = documentType)
-        val (fileName, encodedBase64) = utilities.FileOperations.fileExtensionFromName(name) match {
-          case constants.File.JPEG | constants.File.JPG | constants.File.PNG => utilities.ImageProcess.convertToThumbnail(name, newPath)
-          case _ => (List(util.hashing.MurmurHash3.stringHash(Base64.encodeBase64String(utilities.FileOperations.convertToByteArray(utilities.FileOperations.newFile(newPath, name)))).toString, utilities.FileOperations.fileExtensionFromName(name)).mkString("."), null)
-        }
-        utilities.FileOperations.deleteFile(fileResourceManager.getZoneKycFilePath(oldAccountKYC.documentType), oldAccountKYC.fileName)
-        masterZoneKYCs.Service.updateOldDocument(id = loginState.username, documentType = documentType, fileName = fileName, file = Option(encodedBase64))
-        utilities.FileOperations.renameFile(newPath, name, fileName)
+        fileResourceManager.updateFile[master.ZoneKYC](
+          name = name,
+          documentType = documentType,
+          path = fileResourceManager.getZoneKycFilePath(documentType),
+          oldDocumentFileName = masterZoneKYCs.Service.getFileName(id = loginState.username, documentType = documentType),
+          document = master.ZoneKYC(id = loginState.username, documentType = documentType, status = None, fileName = name, file  = None),
+          updateOldDocument = masterZoneKYCs.Service.updateOldDocument
+        )
         withUsernameToken.Ok(Messages(constants.Response.FILE_UPDATE_SUCCESSFUL.message))
       } catch {
-        case baseException: BaseException => utilities.FileOperations.deleteFile(newPath, name)
-          InternalServerError(Messages(baseException.failure.message))
-        case e: Exception => utilities.FileOperations.deleteFile(newPath, name)
-          InternalServerError(Messages(e.getMessage))
+        case baseException: BaseException => InternalServerError(Messages(baseException.failure.message))
       }
   }
 
   def uploadOrganizationKycForm(documentType: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.organizationKycFileUpload(documentType = documentType))
+    Ok(views.html.component.master.uploadFileForm(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadUserOrganizationKyc), utilities.String.getJsRouteFunction(routes.javascript.FileController.storeUserOrganizationKyc), documentType))
   }
 
   def updateOrganizationKycForm(documentType: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.organizationKycFileUpdate(documentType = documentType))
+    Ok(views.html.component.master.updateFileForm(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadUserOrganizationKyc), utilities.String.getJsRouteFunction(routes.javascript.FileController.updateUserOrganizationKyc), documentType))
   }
 
   def uploadOrganizationKyc(documentType: String) = Action(parse.multipartFormData) { implicit request =>
@@ -414,9 +375,8 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
       fileUploadInfo => {
         try {
           request.body.file("file") match {
-            case None => BadRequest("No file")
-            case Some(file) =>
-              utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, fileResourceManager.getOrganizationKycFilePath(documentType))
+            case None => BadRequest(Messages(constants.Response.NO_FILE.message))
+            case Some(file) => utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, fileResourceManager.getOrganizationKycFilePath(documentType))
               Ok
           }
         }
@@ -429,51 +389,44 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
 
   def storeOrganizationKyc(name: String, documentType: String): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val path = fileResourceManager.getOrganizationKycFilePath(documentType)
       try {
-        val (fileName, encodedBase64) = utilities.FileOperations.fileExtensionFromName(name) match {
-          case constants.File.JPEG | constants.File.JPG | constants.File.PNG => utilities.ImageProcess.convertToThumbnail(name, path)
-          case _ => (List(util.hashing.MurmurHash3.stringHash(Base64.encodeBase64String(utilities.FileOperations.convertToByteArray(utilities.FileOperations.newFile(path, name)))).toString, utilities.FileOperations.fileExtensionFromName(name)).mkString("."), null)
-        }
-        masterOrganizationKYCs.Service.create(id = loginState.username, documentType = documentType, fileName = fileName, file = Option(encodedBase64))
-        utilities.FileOperations.renameFile(path, name, fileName)
+        fileResourceManager.storeFile[master.OrganizationKYC](
+          name = name,
+          documentType = documentType,
+          path = fileResourceManager.getOrganizationKycFilePath(documentType),
+          document = master.OrganizationKYC(id = loginState.username, documentType = documentType, status = None, fileName = name, file = None),
+          masterCreate = masterOrganizationKYCs.Service.create
+        )
         withUsernameToken.Ok(Messages(constants.Response.FILE_UPLOAD_SUCCESSFUL.message))
       } catch {
-        case baseException: BaseException => utilities.FileOperations.deleteFile(path, name)
-          InternalServerError(Messages(baseException.failure.message))
-        case e: Exception => utilities.FileOperations.deleteFile(path, name)
-          InternalServerError(Messages(e.getMessage))
+        case baseException: BaseException => InternalServerError(Messages(baseException.failure.message))
       }
   }
 
   def updateOrganizationKyc(name: String, documentType: String): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val newPath = fileResourceManager.getOrganizationKycFilePath(documentType)
       try {
-        val oldAccountKYC = masterOrganizationKYCs.Service.get(id = loginState.username, documentType = documentType)
-        val (fileName, encodedBase64) = utilities.FileOperations.fileExtensionFromName(name) match {
-          case constants.File.JPEG | constants.File.JPG | constants.File.PNG => utilities.ImageProcess.convertToThumbnail(name, newPath)
-          case _ => (List(util.hashing.MurmurHash3.stringHash(Base64.encodeBase64String(utilities.FileOperations.convertToByteArray(utilities.FileOperations.newFile(newPath, name)))).toString, utilities.FileOperations.fileExtensionFromName(name)).mkString("."), null)
-        }
-        utilities.FileOperations.deleteFile(fileResourceManager.getOrganizationKycFilePath(oldAccountKYC.documentType), oldAccountKYC.fileName)
-        masterOrganizationKYCs.Service.updateOldDocument(id = loginState.username, documentType = documentType, fileName = fileName, file = Option(encodedBase64))
-        utilities.FileOperations.renameFile(newPath, name, fileName)
+        fileResourceManager.updateFile[master.OrganizationKYC](
+          name = name,
+          documentType = documentType,
+          path = fileResourceManager.getOrganizationKycFilePath(documentType),
+          oldDocumentFileName = masterOrganizationKYCs.Service.getFileName(id = loginState.username, documentType = documentType),
+          document = master.OrganizationKYC(id = loginState.username, documentType = documentType, status = None, fileName = name, file  = None),
+          updateOldDocument = masterOrganizationKYCs.Service.updateOldDocument
+        )
         withUsernameToken.Ok(Messages(constants.Response.FILE_UPDATE_SUCCESSFUL.message))
       } catch {
-        case baseException: BaseException => utilities.FileOperations.deleteFile(newPath, name)
-          InternalServerError(Messages(baseException.failure.message))
-        case e: Exception => utilities.FileOperations.deleteFile(newPath, name)
-          InternalServerError(Messages(e.getMessage))
+        case baseException: BaseException => InternalServerError(Messages(baseException.failure.message))
       }
   }
 
 
   def uploadTraderKycForm(documentType: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.traderKycFileUpload(documentType = documentType))
+    Ok(views.html.component.master.uploadFileForm(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadTraderKyc), utilities.String.getJsRouteFunction(routes.javascript.FileController.storeTraderKyc), documentType))
   }
 
   def updateTraderKycForm(documentType: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.traderKycFileUpdate(documentType = documentType))
+    Ok(views.html.component.master.updateFileForm(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadTraderKyc), utilities.String.getJsRouteFunction(routes.javascript.FileController.updateTraderKyc), documentType))
   }
 
   def uploadTraderKyc(documentType: String) = Action(parse.multipartFormData) { implicit request =>
@@ -484,9 +437,8 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
       fileUploadInfo => {
         try {
           request.body.file("file") match {
-            case None => BadRequest("No file")
-            case Some(file) =>
-              utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, fileResourceManager.getTraderKycFilePath(documentType))
+            case None => BadRequest(Messages(constants.Response.NO_FILE.message))
+            case Some(file) => utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, fileResourceManager.getTraderKycFilePath(documentType))
               Ok
           }
         }
@@ -499,41 +451,34 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
 
   def storeTraderKyc(name: String, documentType: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val path = fileResourceManager.getTraderKycFilePath(documentType)
       try {
-        val (fileName, encodedBase64) = utilities.FileOperations.fileExtensionFromName(name) match {
-          case constants.File.JPEG | constants.File.JPG | constants.File.PNG => utilities.ImageProcess.convertToThumbnail(name, path)
-          case _ => (List(util.hashing.MurmurHash3.stringHash(Base64.encodeBase64String(utilities.FileOperations.convertToByteArray(utilities.FileOperations.newFile(path, name)))).toString, utilities.FileOperations.fileExtensionFromName(name)).mkString("."), null)
-        }
-        masterTraderKYCs.Service.create(id = loginState.username, documentType = documentType, fileName = fileName, file = Option(encodedBase64))
-        utilities.FileOperations.renameFile(path, name, fileName)
+        fileResourceManager.storeFile[master.TraderKYC](
+          name = name,
+          documentType = documentType,
+          path = fileResourceManager.getTraderKycFilePath(documentType),
+          document = master.TraderKYC(id = loginState.username, documentType = documentType, fileName = name, file = None, zoneStatus = None, organizationStatus = None),
+          masterCreate = masterTraderKYCs.Service.create
+        )
         withUsernameToken.Ok(Messages(constants.Response.FILE_UPLOAD_SUCCESSFUL.message))
       } catch {
-        case baseException: BaseException => utilities.FileOperations.deleteFile(path, name)
-          InternalServerError(Messages(baseException.failure.message))
-        case e: Exception => utilities.FileOperations.deleteFile(path, name)
-          InternalServerError(Messages(e.getMessage))
+        case baseException: BaseException => InternalServerError(Messages(baseException.failure.message))
       }
   }
 
   def updateTraderKyc(name: String, documentType: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val newPath = fileResourceManager.getTraderKycFilePath(documentType)
       try {
-        val oldAccountKYC = masterTraderKYCs.Service.get(id = loginState.username, documentType = documentType)
-        val (fileName, encodedBase64) = utilities.FileOperations.fileExtensionFromName(name) match {
-          case constants.File.JPEG | constants.File.JPG | constants.File.PNG => utilities.ImageProcess.convertToThumbnail(name, newPath)
-          case _ => (List(util.hashing.MurmurHash3.stringHash(Base64.encodeBase64String(utilities.FileOperations.convertToByteArray(utilities.FileOperations.newFile(newPath, name)))).toString, utilities.FileOperations.fileExtensionFromName(name)).mkString("."), null)
-        }
-        utilities.FileOperations.deleteFile(fileResourceManager.getTraderKycFilePath(oldAccountKYC.documentType), oldAccountKYC.fileName)
-        masterTraderKYCs.Service.updateOldDocument(id = loginState.username, documentType = documentType, fileName = fileName, file = Option(encodedBase64))
-        utilities.FileOperations.renameFile(newPath, name, fileName)
+        fileResourceManager.updateFile[master.TraderKYC](
+          name = name,
+          documentType = documentType,
+          path = fileResourceManager.getTraderKycFilePath(documentType),
+          oldDocumentFileName = masterTraderKYCs.Service.getFileName(id = loginState.username, documentType = documentType),
+          document = master.TraderKYC(id = loginState.username, documentType = documentType, fileName = name, file  = None, zoneStatus = None, organizationStatus = None),
+          updateOldDocument = masterTraderKYCs.Service.updateOldDocument
+        )
         withUsernameToken.Ok(Messages(constants.Response.FILE_UPDATE_SUCCESSFUL.message))
       } catch {
-        case baseException: BaseException => utilities.FileOperations.deleteFile(newPath, name)
-          InternalServerError(Messages(baseException.failure.message))
-        case e: Exception => utilities.FileOperations.deleteFile(newPath, name)
-          InternalServerError(Messages(e.getMessage))
+        case baseException: BaseException => InternalServerError(Messages(baseException.failure.message))
       }
   }
 
@@ -542,8 +487,8 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
     implicit request =>
       try {
         documentType match {
-          case constants.File.BANK_DETAILS => withUserLoginAction.Ok.sendFile(new java.io.File(uploadZoneKycBankDetailsPath + fileName))
-          case constants.File.IDENTIFICATION => withUserLoginAction.Ok.sendFile(new java.io.File(uploadZoneKycIdentificationPath + fileName))
+          case constants.File.BANK_DETAILS => withUserLoginAction.Ok.sendFile(utilities.FileOperations.fetchFile(path = uploadZoneKycBankDetailsPath, fileName = fileName))
+          case constants.File.IDENTIFICATION => withUserLoginAction.Ok.sendFile(utilities.FileOperations.fetchFile(path = uploadZoneKycIdentificationPath, fileName = fileName))
           case _ => Unauthorized
         }
       } catch {
@@ -557,8 +502,8 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
       try {
         if (masterOrganizations.Service.getByAccountID(accountID).zoneID == masterZones.Service.getZoneId(loginState.username)) {
           documentType match {
-            case constants.File.BANK_DETAILS => withUserLoginAction.Ok.sendFile(new java.io.File(uploadOrganizationKycBankDetailsPath + fileName))
-            case constants.File.IDENTIFICATION => withUserLoginAction.Ok.sendFile(new java.io.File(uploadOrganizationKycIdentificationPath + fileName))
+            case constants.File.BANK_DETAILS => withUserLoginAction.Ok.sendFile(utilities.FileOperations.fetchFile(path = uploadOrganizationKycBankDetailsPath, fileName = fileName))
+            case constants.File.IDENTIFICATION => withUserLoginAction.Ok.sendFile(utilities.FileOperations.fetchFile(path = uploadOrganizationKycIdentificationPath, fileName = fileName))
             case _ => Unauthorized
           }
         } else {
@@ -575,7 +520,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
       try {
         if (masterTraders.Service.getByAccountID(accountID).zoneID == masterZones.Service.getZoneId(loginState.username)) {
           documentType match {
-            case constants.File.IDENTIFICATION => withUserLoginAction.Ok.sendFile(new java.io.File(uploadTraderKycIdentificationPath + fileName))
+            case constants.File.IDENTIFICATION => withUserLoginAction.Ok.sendFile(utilities.FileOperations.fetchFile(path = uploadTraderKycIdentificationPath, fileName = fileName))
             case _ => Unauthorized
           }
         } else {
@@ -592,7 +537,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
       try {
         if (masterTraders.Service.getByAccountID(accountID).organizationID == masterOrganizations.Service.getByAccountID(loginState.username).id) {
           documentType match {
-            case constants.File.IDENTIFICATION => withUserLoginAction.Ok.sendFile(new java.io.File(uploadTraderKycIdentificationPath + fileName))
+            case constants.File.IDENTIFICATION => withUserLoginAction.Ok.sendFile(utilities.FileOperations.fetchFile(path = uploadTraderKycIdentificationPath, fileName = fileName))
             case _ => Unauthorized
           }
         } else {
@@ -605,11 +550,11 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
   }
 
   def uploadAccountFileForm(documentType: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.uploadAccountFile(documentType = documentType))
+    Ok(views.html.component.master.uploadFileForm(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadAccountFile), utilities.String.getJsRouteFunction(routes.javascript.FileController.storeAccountFile), documentType))
   }
 
   def updateAccountFileForm(documentType: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.updateAccountFile(documentType = documentType))
+    Ok(views.html.component.master.updateFileForm(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadAccountFile), utilities.String.getJsRouteFunction(routes.javascript.FileController.updateAccountFile), documentType))
   }
 
   def uploadAccountFile(documentType: String) = Action(parse.multipartFormData) { implicit request =>
@@ -620,9 +565,8 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
       fileUploadInfo => {
         try {
           request.body.file("file") match {
-            case None => BadRequest("No file")
-            case Some(file) =>
-              utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, fileResourceManager.getAccountFilePath(documentType))
+            case None => BadRequest(Messages(constants.Response.NO_FILE.message))
+            case Some(file) => utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, fileResourceManager.getAccountFilePath(documentType))
               Ok
           }
         }
@@ -635,52 +579,50 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
 
   def storeAccountFile(name: String, documentType: String): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val path = fileResourceManager.getAccountFilePath(documentType)
       try {
-        val (fileName, encodedBase64) = utilities.FileOperations.fileExtensionFromName(name) match {
-          case constants.File.JPEG | constants.File.JPG | constants.File.PNG => utilities.ImageProcess.convertToThumbnail(name, path)
-          case _ => (List(util.hashing.MurmurHash3.stringHash(Base64.encodeBase64String(utilities.FileOperations.convertToByteArray(utilities.FileOperations.newFile(path, name)))).toString, utilities.FileOperations.fileExtensionFromName(name)).mkString("."), null)
-        }
-        masterAccountFiles.Service.create(id = loginState.username, documentType = documentType, fileName = fileName, file = Option(encodedBase64))
-        utilities.FileOperations.renameFile(path, name, fileName)
+        fileResourceManager.storeFile[master.AccountFile](
+          name = name,
+          documentType = documentType,
+          path = fileResourceManager.getAccountFilePath(documentType),
+          document = master.AccountFile(id = loginState.username, documentType = documentType, fileName = name, file = None),
+          masterCreate = masterAccountFiles.Service.create
+        )
         withUserLoginAction.Ok(Messages(constants.Response.FILE_UPLOAD_SUCCESSFUL.message))
       } catch {
-        case baseException: BaseException => utilities.FileOperations.deleteFile(path, name)
-          InternalServerError(Messages(baseException.failure.message))
-        case e: Exception => utilities.FileOperations.deleteFile(path, name)
-          InternalServerError(Messages(e.getMessage))
+        case baseException: BaseException => InternalServerError(Messages(baseException.failure.message))
       }
   }
 
   def updateAccountFile(name: String, documentType: String): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val newPath = fileResourceManager.getAccountFilePath(documentType)
       try {
-        val oldAccountKYC = masterAccountFiles.Service.get(id = loginState.username, documentType = documentType)
-        val (fileName, encodedBase64) = utilities.FileOperations.fileExtensionFromName(name) match {
-          case constants.File.JPEG | constants.File.JPG | constants.File.PNG => utilities.ImageProcess.convertToThumbnail(name, newPath)
-          case _ => (List(util.hashing.MurmurHash3.stringHash(Base64.encodeBase64String(utilities.FileOperations.convertToByteArray(utilities.FileOperations.newFile(newPath, name)))).toString, utilities.FileOperations.fileExtensionFromName(name)).mkString("."), null)
-        }
-        utilities.FileOperations.deleteFile(fileResourceManager.getAccountFilePath(oldAccountKYC.documentType), oldAccountKYC.fileName)
-        masterAccountFiles.Service.updateOldDocument(id = loginState.username, documentType = documentType, fileName = fileName, file = Option(encodedBase64))
-        utilities.FileOperations.renameFile(newPath, name, fileName)
+        fileResourceManager.updateFile[master.AccountFile](
+          name = name,
+          documentType = documentType,
+          path = fileResourceManager.getAccountFilePath(documentType),
+          oldDocumentFileName = masterAccountFiles.Service.getFileName(id = loginState.username, documentType = documentType),
+          document = master.AccountFile(id = loginState.username, documentType = documentType, fileName = name, file  = None),
+          updateOldDocument = masterAccountFiles.Service.updateOldDocument
+        )
         withUserLoginAction.Ok(Messages(constants.Response.FILE_UPDATE_SUCCESSFUL.message))
       } catch {
-        case baseException: BaseException => utilities.FileOperations.deleteFile(newPath, name)
-          InternalServerError(Messages(baseException.failure.message))
-        case e: Exception => utilities.FileOperations.deleteFile(newPath, name)
-          InternalServerError(Messages(e.getMessage))
+        case baseException: BaseException => InternalServerError(Messages(baseException.failure.message))
       }
   }
 
   def file(fileName: String, documentType: String): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        documentType match {
-          case constants.File.PROFILE_PICTURE => withUserLoginAction.Ok.sendFile(new java.io.File(uploadAccountProfilePicturePath + fileName))
-          case _ => Unauthorized
+        val path: String = loginState.userType match {
+          case constants.User.ZONE => if (masterZoneKYCs.Service.checkFileNameExists(id = loginState.username, fileName = fileName)) fileResourceManager.getZoneKycFilePath(documentType) else throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION)
+          case constants.User.ORGANIZATION => if (masterOrganizationKYCs.Service.checkFileNameExists(id = loginState.username, fileName = fileName)) fileResourceManager.getOrganizationKycFilePath(documentType) else throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION)
+          case constants.User.TRADER => if (masterTraderKYCs.Service.checkFileNameExists(id = loginState.username, fileName = fileName)) fileResourceManager.getTraderKycFilePath(documentType) else throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION)
+          case constants.User.USER => if (masterAccountKYCs.Service.checkFileNameExists(id = loginState.username, fileName = fileName)) fileResourceManager.getAccountKycFilePath(documentType) else throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION)
+          case _ => if (masterAccountFiles.Service.checkFileNameExists(id = loginState.username, fileName = fileName)) fileResourceManager.getAccountFilePath(documentType) else throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION)
         }
+        Ok.sendFile(utilities.FileOperations.fetchFile(path = path, fileName = fileName))
       } catch {
+        case baseException: BaseException => InternalServerError(Messages(baseException.failure.message))
         case _: NoSuchFileException => InternalServerError(Messages(constants.Response.NO_SUCH_FILE_EXCEPTION.message))
         case _: Exception => InternalServerError(Messages(constants.Response.GENERIC_EXCEPTION.message))
       }

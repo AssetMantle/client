@@ -2,6 +2,7 @@ package models.master
 
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
+import models.Trait.Document
 import org.postgresql.util.PSQLException
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
@@ -11,7 +12,13 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class OrganizationKYC(id: String, documentType: String, status: Option[Boolean], fileName: String, file: Option[Array[Byte]])
+case class OrganizationKYC(id: String, documentType: String, fileName: String, file: Option[Array[Byte]], status: Option[Boolean]) extends Document[OrganizationKYC]{
+
+  def updateFile(newFile: Option[Array[Byte]]): OrganizationKYC = OrganizationKYC(id = id, documentType = documentType, fileName = fileName, file = newFile, status = status)
+
+  def updateFileName(newFileName: String): OrganizationKYC = OrganizationKYC(id = id, documentType = documentType, fileName = newFileName, file = file, status = status)
+
+}
 
 @Singleton
 class OrganizationKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
@@ -54,6 +61,14 @@ class OrganizationKYCs @Inject()(protected val databaseConfigProvider: DatabaseC
     }
   }
 
+  private def getFileNameByIdDocumentType(id: String, documentType: String): Future[String] = db.run(organizationKYCTable.filter(_.id === id).filter(_.documentType === documentType).map(_.fileName).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
   private def updateStatusById(id: String, status: Option[Boolean]): Future[Int] = db.run(organizationKYCTable.filter(_.id === id).map(_.status.?).update(status).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -84,9 +99,11 @@ class OrganizationKYCs @Inject()(protected val databaseConfigProvider: DatabaseC
 
   private def checkByIdAndDocumentType(id: String, documentType: String): Future[Boolean] = db.run(organizationKYCTable.filter(_.id === id).filter(_.documentType === documentType).exists.result)
 
+  private def checkByIdAndFileName(id: String, fileName: String): Future[Boolean] = db.run(organizationKYCTable.filter(_.id === id).filter(_.fileName === fileName).exists.result)
+
   private[models] class OrganizationKYCTable(tag: Tag) extends Table[OrganizationKYC](tag, "OrganizationKYC") {
 
-    def * = (id, documentType, status.?, fileName, file.?) <> (OrganizationKYC.tupled, OrganizationKYC.unapply)
+    def * = (id, documentType, fileName, file.?, status.?) <> (OrganizationKYC.tupled, OrganizationKYC.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
@@ -102,11 +119,13 @@ class OrganizationKYCs @Inject()(protected val databaseConfigProvider: DatabaseC
 
   object Service {
 
-    def create(id: String, documentType: String, fileName: String, file: Option[Array[Byte]]): String = Await.result(add(OrganizationKYC(id = id, documentType = documentType, status = null, fileName = fileName, file = file)), Duration.Inf)
+    def create(organizationKYC: OrganizationKYC): String = Await.result(add(OrganizationKYC(id = organizationKYC.id, documentType = organizationKYC.documentType, fileName = organizationKYC.fileName, file = organizationKYC.file, status = None)), Duration.Inf)
 
-    def updateOldDocument(id: String, documentType: String, fileName: String, file: Option[Array[Byte]]): Int = Await.result(upsert(OrganizationKYC(id = id, documentType = documentType, status = null, fileName = fileName, file = file)), Duration.Inf)
+    def updateOldDocument(organizationKYC: OrganizationKYC): Int = Await.result(upsert(OrganizationKYC(id = organizationKYC.id, documentType = organizationKYC.documentType, fileName = organizationKYC.fileName, file = organizationKYC.file, status = None)), Duration.Inf)
 
     def get(id: String, documentType: String): OrganizationKYC = Await.result(findByIdDocumentType(id = id, documentType = documentType), Duration.Inf)
+
+    def getFileName(id: String, documentType: String): String = Await.result(getFileNameByIdDocumentType(id = id, documentType = documentType), Duration.Inf)
 
     def getAllDocuments(id: String): Seq[OrganizationKYC] = Await.result(getAllDocumentsById(id = id), Duration.Inf)
 
@@ -122,6 +141,7 @@ class OrganizationKYCs @Inject()(protected val databaseConfigProvider: DatabaseC
 
     def checkFileExists(id: String, documentType: String): Boolean = Await.result(checkByIdAndDocumentType(id = id, documentType = documentType), Duration.Inf)
 
+    def checkFileNameExists(id: String, fileName: String): Boolean = Await.result(checkByIdAndFileName(id = id, fileName = fileName), Duration.Inf)
 
   }
 

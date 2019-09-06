@@ -10,32 +10,23 @@
     <div>
     <div class="latest_card-body ml-cb">
     @CSRF.formField
-    @inputText(issueAssetForm(constants.Form.FROM), '_label -> Messages(constants.Form.FROM),'class -> "form-control",
-        'placeholder->Messages(constants.Form.FROM),'required->true)
-    @inputText(issueAssetForm(constants.Form.TO), '_label -> Messages(constants.Form.TO),'class -> "form-control",
-        'placeholder->Messages(constants.Form.TO),'required->true)
-    @inputText(issueAssetForm(constants.Form.DOCUMENT_HASH), '_label -> Messages(constants.Form.DOCUMENT_HASH),
-        'class -> "form-control",'placeholder->Messages(constants.Form.DOCUMENT_HASH),'required->true)
-    @inputText(issueAssetForm(constants.Form.ASSET_TYPE), '_label -> Messages(constants.Form.ASSET_TYPE),
-        'class -> "form-control",'placeholder->Messages(constants.Form.ASSET_TYPE),'required->true)
-    @inputText(issueAssetForm(constants.Form.ASSET_PRICE), '_label -> Messages(constants.Form.ASSET_PRICE),
-        'class -> "form-control",'placeholder->Messages(constants.Form.ASSET_PRICE),'required->true)
-    @inputText(issueAssetForm(constants.Form.QUANTITY_UNIT), '_label -> Messages(constants.Form.QUANTITY_UNIT),
-        'class -> "form-control",'placeholder->Messages(constants.Form.QUANTITY_UNIT),'required->true)
-    @inputText(issueAssetForm(constants.Form.ASSET_QUANTITY), '_label -> Messages(constants.Form.ASSET_QUANTITY),
-        'class -> "form-control",'placeholder->Messages(constants.Form.ASSET_QUANTITY),'required->true)
+    @inputText(issueAssetForm(constants.FormField.FROM.name), '_label -> Messages(constants.FormField.FROM.name),'class -> "form-control", 'placeholder->Messages(constants.FormField.FROM.name),'required->true)
+    @inputText(issueAssetForm(constants.FormField.TO.name), '_label -> Messages(constants.FormField.TO.name),'class -> "form-control", 'placeholder->Messages(constants.FormField.TO.name),'required->true)
+    @inputText(issueAssetForm(constants.FormField.DOCUMENT_HASH.name), '_label -> Messages(constants.FormField.DOCUMENT_HASH.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.DOCUMENT_HASH.name),'required->true)
+    @inputText(issueAssetForm(constants.FormField.ASSET_TYPE.name), '_label -> Messages(constants.FormField.ASSET_TYPE.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.ASSET_TYPE.name),'required->true)
+    @inputText(issueAssetForm(constants.FormField.ASSET_PRICE.name), '_label -> Messages(constants.FormField.ASSET_PRICE.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.ASSET_PRICE.name),'required->true)
+    @inputText(issueAssetForm(constants.FormField.QUANTITY_UNIT.name), '_label -> Messages(constants.FormField.QUANTITY_UNIT.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.QUANTITY_UNIT.name),'required->true)
+    @inputText(issueAssetForm(constants.FormField.ASSET_QUANTITY.name), '_label -> Messages(constants.FormField.ASSET_QUANTITY.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.ASSET_QUANTITY.name),'required->true)
         <div class="input-group-prepend">
             @checkbox(issueAssetForm(constants.Form.MODERATED))
             <span class="input-group-text">
             @Messages(constants.Form.MODERATED)
             </span>
         </div>
-    @inputText(issueAssetForm(constants.Form.TAKER_ADDRESS), '_label -> Messages(constants.Form.TAKER_ADDRESS),
-        'class -> "form-control",'placeholder->Messages(constants.Form.TAKER_ADDRESS),'required->true))
-    @inputText(issueAssetForm(constants.Form.MODE), '_label -> Messages(constants.Form.MODE),'class -> "form-control"
-        ,'placeholder->Messages(constants.Form.MODE),'required->true)
-    @inputPassword(issueAssetForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD),
-        'class -> "form-control",'placeholder->Messages(constants.Form.PASSWORD),'required->true)
+    @inputText(issueAssetForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.GAS.name),'required->true)
+    @inputText(issueAssetForm(constants.FormField.TAKER_ADDRESS.name), '_label -> Messages(constants.FormField.TAKER_ADDRESS.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.TAKER_ADDRESS.name),'required->true))
+    @inputText(issueAssetForm(constants.FormField.MODE.name), '_label -> Messages(constants.FormField.MODE.name),'class -> "form-control",'placeholder->Messages(constants.FormField.MODE.name),'required->true)
+    @inputPassword(issueAssetForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.PASSWORD.name),'required->true)
 
     @if(issueAssetForm.hasGlobalErrors) {
         <ul>

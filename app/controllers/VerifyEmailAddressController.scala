@@ -43,7 +43,7 @@ class VerifyEmailAddressController @Inject()(messagesControllerComponents: Messa
           try {
             emailOTPs.Service.verifyOTP(loginState.username, verifyEmailAddressData.otp)
             masterContacts.Service.verifyEmailAddress(loginState.username)
-            val contact = masterContacts.Service.getContact(loginState.username)
+            val contact = masterContacts.Service.getContact(loginState.username).getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION))
             if (contact.emailAddressVerified && contact.mobileNumberVerified) {
               masterAccounts.Service.updateStatusComplete(loginState.username)
             } else {

@@ -10,18 +10,13 @@
     <div>
     <div class="latest_card-body">
     @CSRF.formField
-    @inputText(issueFiatForm(constants.Form.FROM), '_label -> Messages(constants.Form.FROM),'class -> "form-control",
-        'placeholder->Messages(constants.Form.FROM),'required->true)
-    @inputText(issueFiatForm(constants.Form.TO), '_label -> Messages(constants.Form.TO),'class -> "form-control",
-        'placeholder->Messages(constants.Form.TO),'required->true)
-    @inputText(issueFiatForm(constants.Form.TRANSACTION_ID), '_label -> Messages(constants.Form.TRANSACTION_ID),
-        'class -> "form-control",'placeholder->Messages(constants.Form.TRADER_ID),'required->true)
-    @inputText(issueFiatForm(constants.Form.TRANSACTION_AMOUNT), '_label -> Messages(constants.Form.TRANSACTION_AMOUNT),
-        'class -> "form-control",'placeholder->Messages(constants.Form.TRANSACTION_AMOUNT),'required->true)
-    @inputText(issueFiatForm(constants.Form.MODE), '_label -> Messages(constants.Form.MODE),'class -> "form-control",
-        'placeholder->Messages(constants.Form.MODE),'required->true)
-    @inputPassword(issueFiatForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD),
-        'class -> "form-control",'placeholder->Messages(constants.Form.PASSWORD),'required->true)
+    @inputText(issueFiatForm(constants.FormField.FROM.name), '_label -> Messages(constants.FormField.FROM.name),'class -> "form-control", 'placeholder->Messages(constants.FormField.FROM.name),'required->true)
+    @inputText(issueFiatForm(constants.FormField.TO.name), '_label -> Messages(constants.FormField.TO.name),'class -> "form-control", 'placeholder->Messages(constants.FormField.TO.name),'required->true)
+    @inputText(issueFiatForm(constants.FormField.TRANSACTION_ID.name), '_label -> Messages(constants.FormField.TRANSACTION_ID.name), 'class -> "form-control",'placeholder->Messages(constants.Form.TRADER_ID),'required->true)
+    @inputText(issueFiatForm(constants.FormField.TRANSACTION_AMOUNT.name), '_label -> Messages(constants.FormField.TRANSACTION_AMOUNT.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.TRANSACTION_AMOUNT.name),'required->true)
+    @inputText(issueFiatForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.GAS.name),'required->true)
+    @inputText(issueFiatForm(constants.FormField.MODE.name), '_label -> Messages(constants.FormField.MODE.name),'class -> "form-control", 'placeholder->Messages(constants.FormField.MODE.name),'required->true)
+    @inputPassword(issueFiatForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.PASSWORD.name),'required->true)
 
     @if(issueFiatForm.hasGlobalErrors) {
         <ul>

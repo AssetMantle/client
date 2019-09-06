@@ -10,18 +10,13 @@
     <div>
     <div class="latest_card-body">
     @CSRF.formField
-    @inputText(setBuyerFeedbackForm(constants.Form.FROM), '_label -> Messages(constants.Form.FROM),'class -> "form-control",
-        'placeholder->Messages(constants.Form.FROM),'required->true)
-    @inputText(setBuyerFeedbackForm(constants.Form.TO), '_label -> Messages(constants.Form.TO),'class -> "form-control",
-        'placeholder->Messages(constants.Form.TO),'required->true)
-    @inputText(setBuyerFeedbackForm(constants.Form.PEG_HASH), '_label -> Messages(constants.Form.PEG_HASH),'class -> "form-control",
-        'placeholder->Messages(constants.Form.PEG_HASH),'required->true)
-    @inputText(setBuyerFeedbackForm(constants.Form.RATING), '_label -> Messages(constants.Form.RATING),'class -> "form-control",
-        'placeholder->Messages(constants.Form.RATING),'required->true)
-    @inputText(setBuyerFeedbackForm(constants.Form.MODE), '_label -> Messages(constants.Form.MODE),'class -> "form-control",
-        'placeholder->Messages(constants.Form.MODE),'required->true)
-    @inputPassword(setBuyerFeedbackForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD),'class -> "form-control",
-        'placeholder->Messages(constants.Form.PASSWORD),'required->true)
+    @inputText(setBuyerFeedbackForm(constants.FormField.FROM.name), '_label -> Messages(constants.FormField.FROM.name),'class -> "form-control", 'placeholder->Messages(constants.FormField.FROM.name),'required->true)
+    @inputText(setBuyerFeedbackForm(constants.FormField.TO.name), '_label -> Messages(constants.FormField.TO.name),'class -> "form-control", 'placeholder->Messages(constants.FormField.TO.name),'required->true)
+    @inputText(setBuyerFeedbackForm(constants.FormField.PEG_HASH.name), '_label -> Messages(constants.FormField.PEG_HASH.name),'class -> "form-control", 'placeholder->Messages(constants.FormField.PEG_HASH.name),'required->true)
+    @inputText(setBuyerFeedbackForm(constants.FormField.RATING.name), '_label -> Messages(constants.FormField.RATING.name),'class -> "form-control", 'placeholder->Messages(constants.FormField.RATING.name),'required->true)
+    @inputText(setBuyerFeedbackForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.GAS.name),'required->true)
+    @inputText(setBuyerFeedbackForm(constants.FormField.MODE.name), '_label -> Messages(constants.FormField.MODE.name),'class -> "form-control", 'placeholder->Messages(constants.FormField.MODE.name),'required->true)
+    @inputPassword(setBuyerFeedbackForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name),'class -> "form-control", 'placeholder->Messages(constants.FormField.PASSWORD.name),'required->true)
 
     @if(setBuyerFeedbackForm.hasGlobalErrors) {
         <ul>

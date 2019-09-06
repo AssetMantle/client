@@ -194,6 +194,7 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."BuyerExecuteOrder"
   "sellerAddress" VARCHAR NOT NULL,
   "fiatProofHash" VARCHAR NOT NULL,
   "pegHash"       VARCHAR NOT NULL,
+  "gas"           INT     NOT NULL,
   "status"        BOOLEAN,
   "txHash"        VARCHAR,
   "ticketID"      VARCHAR NOT NULL,
@@ -209,6 +210,7 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."ChangeBuyerBid"
   "bid"      INT     NOT NULL,
   "time"     INT     NOT NULL,
   "pegHash"  VARCHAR NOT NULL,
+  "gas"      INT NOT NULL,
   "status"   BOOLEAN,
   "txHash"   VARCHAR,
   "ticketID" VARCHAR NOT NULL,
@@ -224,6 +226,7 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."ChangeSellerBid"
   "bid"      INT     NOT NULL,
   "time"     INT     NOT NULL,
   "pegHash"  VARCHAR NOT NULL,
+  "gas"      INT NOT NULL,
   "status"   BOOLEAN,
   "txHash"   VARCHAR,
   "ticketID" VARCHAR NOT NULL,
@@ -240,6 +243,7 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."ConfirmBuyerBid"
   "time"              INT     NOT NULL,
   "pegHash"           VARCHAR NOT NULL,
   "buyerContractHash" VARCHAR NOT NULL,
+  "gas"               INT NOT NULL,
   "status"            BOOLEAN,
   "txHash"            VARCHAR,
   "ticketID"          VARCHAR NOT NULL,
@@ -256,6 +260,7 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."ConfirmSellerBid"
   "time"               INT     NOT NULL,
   "pegHash"            VARCHAR NOT NULL,
   "sellerContractHash" VARCHAR NOT NULL,
+  "gas"                INT NOT NULL,
   "status"             BOOLEAN,
   "txHash"             VARCHAR,
   "ticketID"           VARCHAR NOT NULL,
@@ -274,6 +279,7 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."IssueAsset"
   "quantityUnit"  VARCHAR NOT NULL,
   "assetQuantity" INT     NOT NULL,
   "moderated"     BOOLEAN NOT NULL,
+  "gas"           INT     NOT NULL,
   "takerAddress"  VARCHAR,
   "status"        BOOLEAN,
   "txHash"        VARCHAR,
@@ -289,6 +295,7 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."IssueFiat"
   "to"                VARCHAR NOT NULL,
   "transactionID"     VARCHAR NOT NULL,
   "transactionAmount" INT     NOT NULL,
+  "gas"               INT     NOT NULL,
   "status"            BOOLEAN,
   "txHash"            VARCHAR,
   "ticketID"          VARCHAR NOT NULL,
@@ -302,6 +309,7 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."RedeemAsset"
   "from"     VARCHAR NOT NULL,
   "to"       VARCHAR NOT NULL,
   "pegHash"  VARCHAR NOT NULL,
+  "gas"      INT     NOT NULL,
   "status"   BOOLEAN,
   "txHash"   VARCHAR,
   "ticketID" VARCHAR NOT NULL,
@@ -315,6 +323,7 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."RedeemFiat"
   "from"         VARCHAR NOT NULL,
   "to"           VARCHAR NOT NULL,
   "redeemAmount" INT     NOT NULL,
+  "gas"          INT     NOT NULL,
   "status"       BOOLEAN,
   "txHash"       VARCHAR,
   "ticketID"     VARCHAR NOT NULL,
@@ -328,6 +337,7 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."ReleaseAsset"
   "from"     VARCHAR NOT NULL,
   "to"       VARCHAR NOT NULL,
   "pegHash"  VARCHAR NOT NULL,
+  "gas"      INT     NOT NULL,
   "status"   BOOLEAN,
   "txHash"   VARCHAR,
   "ticketID" VARCHAR NOT NULL,
@@ -343,6 +353,7 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."SellerExecuteOrder"
   "sellerAddress" VARCHAR NOT NULL,
   "awbProofHash"  VARCHAR NOT NULL,
   "pegHash"       VARCHAR NOT NULL,
+  "gas"           INT     NOT NULL,
   "status"        BOOLEAN,
   "txHash"        VARCHAR,
   "ticketID"      VARCHAR NOT NULL,
@@ -356,6 +367,7 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."SendAsset"
   "from"     VARCHAR NOT NULL,
   "to"       VARCHAR NOT NULL,
   "pegHash"  VARCHAR NOT NULL,
+  "gas"      INT     NOT NULL,
   "status"   BOOLEAN,
   "txHash"   VARCHAR,
   "ticketID" VARCHAR NOT NULL,
@@ -369,6 +381,7 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."SendCoin"
   "from"     VARCHAR NOT NULL,
   "to"       VARCHAR NOT NULL,
   "amount"   INT     NOT NULL,
+  "gas"      INT     NOT NULL,
   "status"   BOOLEAN,
   "txHash"   VARCHAR,
   "ticketID" VARCHAR NOT NULL,
@@ -383,6 +396,7 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."SendFiat"
   "to"       VARCHAR NOT NULL,
   "amount"   INT     NOT NULL,
   "pegHash"  VARCHAR NOT NULL,
+  "gas"      INT     NOT NULL,
   "status"   BOOLEAN,
   "txHash"   VARCHAR,
   "ticketID" VARCHAR NOT NULL,
@@ -412,6 +426,7 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."SetBuyerFeedback"
   "to"       VARCHAR NOT NULL,
   "pegHash"  VARCHAR NOT NULL,
   "rating"   INT     NOT NULL,
+  "gas"      INT     NOT NULL,
   "status"   BOOLEAN,
   "txHash"   VARCHAR,
   "ticketID" VARCHAR NOT NULL,
@@ -426,6 +441,7 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."SetSellerFeedback"
   "to"       VARCHAR NOT NULL,
   "pegHash"  VARCHAR NOT NULL,
   "rating"   INT     NOT NULL,
+  "gas"      INT     NOT NULL,
   "status"   BOOLEAN,
   "txHash"   VARCHAR,
   "ticketID" VARCHAR NOT NULL,
@@ -493,9 +509,9 @@ CREATE TABLE IF NOT EXISTS MASTER."ZoneKYC"
 (
   "id"           VARCHAR NOT NULL,
   "documentType" VARCHAR NOT NULL,
-  "status"       BOOLEAN,
   "fileName"     VARCHAR NOT NULL,
   "file"         BYTEA,
+  "status"       BOOLEAN,
   PRIMARY KEY ("id", "documentType")
 );
 
@@ -512,9 +528,9 @@ CREATE TABLE IF NOT EXISTS MASTER."OrganizationKYC"
 (
   "id"           VARCHAR NOT NULL,
   "documentType" VARCHAR NOT NULL,
-  "status"       BOOLEAN,
   "fileName"     VARCHAR NOT NULL,
   "file"         BYTEA,
+  "status"       BOOLEAN,
   PRIMARY KEY ("id", "documentType")
 );
 
@@ -522,9 +538,9 @@ CREATE TABLE IF NOT EXISTS MASTER."AccountKYC"
 (
   "id"           VARCHAR NOT NULL,
   "documentType" VARCHAR NOT NULL,
-  "status"       BOOLEAN,
   "fileName"     VARCHAR NOT NULL,
   "file"         BYTEA,
+  "status"       BOOLEAN,
   PRIMARY KEY ("id", "documentType")
 );
 
@@ -532,10 +548,10 @@ CREATE TABLE IF NOT EXISTS MASTER."TraderKYC"
 (
   "id"                 VARCHAR NOT NULL,
   "documentType"       VARCHAR NOT NULL,
-  "zoneStatus"         BOOLEAN,
-  "organizationStatus" BOOLEAN,
   "fileName"           VARCHAR NOT NULL,
   "file"               BYTEA,
+  "zoneStatus"         BOOLEAN,
+  "organizationStatus" BOOLEAN,
   PRIMARY KEY ("id", "documentType")
 );
 
@@ -568,6 +584,7 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."FaucetRequest"
   "id"        VARCHAR NOT NULL,
   "accountID" VARCHAR NOT NULL,
   "amount"    INT     NOT NULL,
+  "gas"       INT,
   "status"    BOOLEAN,
   "ticketID"  VARCHAR,
   "comment"   VARCHAR,
@@ -585,6 +602,7 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."IssueAssetRequest"
   "quantityUnit"  VARCHAR NOT NULL,
   "assetQuantity" INT     NOT NULL,
   "takerAddress"  VARCHAR,
+  "gas"           INT,
   "status"        BOOLEAN,
   "comment"       VARCHAR,
   PRIMARY KEY ("id")
@@ -596,6 +614,7 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."IssueFiatRequest"
   "accountID"         VARCHAR NOT NULL,
   "transactionID"     VARCHAR NOT NULL,
   "transactionAmount" INT     NOT NULL,
+  "gas"               INT,
   "status"            BOOLEAN,
   "ticketID"          VARCHAR,
   "comment"           VARCHAR,

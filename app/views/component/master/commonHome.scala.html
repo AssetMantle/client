@@ -2,22 +2,11 @@
 
 @(coins: String = "0", profilePicture: Array[Byte])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
-
 <div class="container ">
     <div class="card">
         <div class="row ">
             <div class="col-md-4 ">
-                <div class="profile_hover">
-                @if(profilePicture sameElements Array[Byte]()) {
-                    <img id="profilePicture" class="profilePicture" src="@routes.Assets.versioned("images/defaultProfilePicture.jpg")" alt="@constants.Form.PROFILE_PICTURE">
-                    <br>
-                    <button id="profilePictureBottomUploadButton" class="bottom btn btn-default btn-sm" onclick="getForm(jsRoutes.controllers.FileController.uploadAccountFileForm('@constants.File.PROFILE_PICTURE'))">@Messages(constants.Form.UPLOAD)</button>
-                } else {
-                    <img id="profilePicture" class="profilePicture" src="data:image/jpg;base64,@utilities.ImageProcess.decodeImageThumbnailData(profilePicture)" alt="@constants.Form.PROFILE_PICTURE">
-                    <br>
-                    <button id="profilePictureBottomUploadButton" class="bottom btn btn-default btn-sm" onclick="getForm(jsRoutes.controllers.FileController.updateAccountFileForm('@constants.File.PROFILE_PICTURE'))">@Messages(constants.Form.UPDATE)</button>
-                }
-                </div>
+                @component.master.profilePicture(profilePicture)
             </div>
             <div class="col-md-8 px-3">
                 <div class="card-block px-3">
@@ -27,7 +16,9 @@
 
                     <p> @Messages(constants.User.USER_TYPE): @loginState.userType </p>
 
-                    <p> @Messages(constants.User.ADDRESS):<span id="text_element" class="hash_code"> @loginState.address</span> <span onclick="copyToClipboard('text_element')"> <i class="fa fa-clipboard"></i></span></p>
+                    <p> @Messages(constants.User.ADDRESS)
+                        :<span id="text_element" class="hash_code">@loginState.address</span>
+                        <span onclick="copyToClipboard('text_element')"> <i class="fa fa-clipboard"></i></span></p>
 
                 </div>
             </div>

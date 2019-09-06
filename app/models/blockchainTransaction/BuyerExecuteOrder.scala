@@ -3,6 +3,7 @@ package models.blockchainTransaction
 import akka.actor.ActorSystem
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
+import models.Abstract.BaseTransaction
 import models.{blockchain, master}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
@@ -10,14 +11,14 @@ import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
 import transactions.responses.TransactionResponse.BlockResponse
-import utilities.{PushNotification, TransactionEntity}
+import utilities.PushNotification
 
 import scala.concurrent.duration.{Duration, _}
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class BuyerExecuteOrder(from: String, buyerAddress: String, sellerAddress: String, fiatProofHash: String, pegHash: String, status: Option[Boolean], txHash: Option[String], ticketID: String, mode: String, code: Option[String]) extends TransactionEntity[BuyerExecuteOrder] {
-  def mutateTicketID(newTicketID: String): BuyerExecuteOrder = BuyerExecuteOrder(from = from, buyerAddress = buyerAddress, sellerAddress = sellerAddress, fiatProofHash = fiatProofHash, pegHash = pegHash, status = status, txHash, ticketID = newTicketID, mode = mode, code = code)
+case class BuyerExecuteOrder(from: String, buyerAddress: String, sellerAddress: String, fiatProofHash: String, pegHash: String,gas:Int, status: Option[Boolean], txHash: Option[String], ticketID: String, mode: String, code: Option[String]) extends BaseTransaction[BuyerExecuteOrder] {
+  def mutateTicketID(newTicketID: String): BuyerExecuteOrder = BuyerExecuteOrder(from = from, buyerAddress = buyerAddress, sellerAddress = sellerAddress, fiatProofHash = fiatProofHash, pegHash = pegHash,gas=gas, status = status, txHash, ticketID = newTicketID, mode = mode, code = code)
 }
 
 @Singleton
@@ -26,6 +27,8 @@ class BuyerExecuteOrders @Inject()(actorSystem: ActorSystem, transaction: utilit
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_BUYER_EXECUTE_ORDER
 
   private implicit val logger: Logger = Logger(this.getClass)
+
+  private val schedulerExecutionContext:ExecutionContext= actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -109,7 +112,7 @@ class BuyerExecuteOrders @Inject()(actorSystem: ActorSystem, transaction: utilit
 
   private[models] class BuyerExecuteOrderTable(tag: Tag) extends Table[BuyerExecuteOrder](tag, "BuyerExecuteOrder") {
 
-    def * = (from, buyerAddress, sellerAddress, fiatProofHash, pegHash, status.?, txHash.?, ticketID, mode, code.?) <> (BuyerExecuteOrder.tupled, BuyerExecuteOrder.unapply)
+    def * = (from, buyerAddress, sellerAddress, fiatProofHash, pegHash, gas , status.?, txHash.?, ticketID, mode, code.?) <> (BuyerExecuteOrder.tupled, BuyerExecuteOrder.unapply)
 
     def from = column[String]("from")
 
@@ -120,6 +123,8 @@ class BuyerExecuteOrders @Inject()(actorSystem: ActorSystem, transaction: utilit
     def fiatProofHash = column[String]("fiatProofHash")
 
     def pegHash = column[String]("pegHash")
+
+    def gas = column[Int]("gas")
 
     def status = column[Boolean]("status")
 
@@ -134,7 +139,7 @@ class BuyerExecuteOrders @Inject()(actorSystem: ActorSystem, transaction: utilit
 
   object Service {
 
-    def create(buyerExecuteOrder: BuyerExecuteOrder): String = Await.result(add(BuyerExecuteOrder(from = buyerExecuteOrder.from, buyerAddress = buyerExecuteOrder.buyerAddress, sellerAddress = buyerExecuteOrder.sellerAddress, fiatProofHash = buyerExecuteOrder.fiatProofHash, pegHash = buyerExecuteOrder.pegHash, status = buyerExecuteOrder.status, txHash = buyerExecuteOrder.txHash, ticketID = buyerExecuteOrder.ticketID, mode = buyerExecuteOrder.mode, code = buyerExecuteOrder.code)), Duration.Inf)
+    def create(buyerExecuteOrder: BuyerExecuteOrder): String = Await.result(add(BuyerExecuteOrder(from = buyerExecuteOrder.from, buyerAddress = buyerExecuteOrder.buyerAddress, sellerAddress = buyerExecuteOrder.sellerAddress, fiatProofHash = buyerExecuteOrder.fiatProofHash, pegHash = buyerExecuteOrder.pegHash, gas=buyerExecuteOrder.gas, status = buyerExecuteOrder.status, txHash = buyerExecuteOrder.txHash, ticketID = buyerExecuteOrder.ticketID, mode = buyerExecuteOrder.mode, code = buyerExecuteOrder.code)), Duration.Inf)
 
     def markTransactionSuccessful(ticketID: String, txHash: String): Int = Await.result(updateTxHashAndStatusOnTicketID(ticketID, Option(txHash), status = Option(true)), Duration.Inf)
 
@@ -193,6 +198,6 @@ class BuyerExecuteOrders @Inject()(actorSystem: ActorSystem, transaction: utilit
   if (kafkaEnabled || transactionMode != constants.Transactions.BLOCK_MODE) {
     actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
       transaction.ticketUpdater(Service.getTicketIDsOnStatus, Service.getTransactionHash, Utility.onSuccess, Utility.onFailure)
-    }
+    }(schedulerExecutionContext)
   }
 }

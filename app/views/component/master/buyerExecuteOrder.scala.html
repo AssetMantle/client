@@ -9,14 +9,11 @@
     </div>
     <div class="latest_card-body">
     @CSRF.formField
-    @inputText(buyerExecuteOrderForm(constants.Form.SELLER_ADDRESS).copy(value = Some(sellerAddress)), '_label -> Messages(constants.Form.SELLER_ADDRESS),
-        'class -> "form-control",'placeholder->Messages(constants.Form.SELLER_ADDRESS),'required->true)
-    @inputText(buyerExecuteOrderForm(constants.Form.FIAT_PROOF_HASH), '_label -> Messages(constants.Form.FIAT_PROOF_HASH),
-        'class -> "form-control",'placeholder->Messages(constants.Form.FIAT_PROOF_HASH),'required->true)
-    @inputText(buyerExecuteOrderForm(constants.Form.PEG_HASH).copy(value = Some(pegHash)), '_label -> Messages(constants.Form.PEG_HASH),
-        'class -> "form-control",'placeholder->Messages(constants.Form.PEG_HASH),'required->true)
-    @inputPassword(buyerExecuteOrderForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD),
-        'class -> "form-control",'placeholder->Messages(constants.Form.PASSWORD),'required->true)
+    @inputText(buyerExecuteOrderForm(constants.FormField.SELLER_ADDRESS.name).copy(value = Some(sellerAddress)), '_label -> Messages(constants.FormField.SELLER_ADDRESS.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.SELLER_ADDRESS.name),'required->true)
+    @inputText(buyerExecuteOrderForm(constants.FormField.FIAT_PROOF_HASH.name), '_label -> Messages(constants.FormField.FIAT_PROOF_HASH.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.FIAT_PROOF_HASH.name),'required->true)
+    @inputText(buyerExecuteOrderForm(constants.FormField.PEG_HASH.name).copy(value = Some(pegHash)), '_label -> Messages(constants.FormField.PEG_HASH.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.PEG_HASH.name),'required->true)
+    @inputText(buyerExecuteOrderForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.GAS.name),'required->true)
+    @inputPassword(buyerExecuteOrderForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.PASSWORD.name),'required->true)
 
     @if(buyerExecuteOrderForm.hasGlobalErrors) {
         <ul>
