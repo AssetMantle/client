@@ -9,7 +9,7 @@
     <div class="flexItem card-body lightBlue">
         <div class="leftText">
             <span class="red">@Messages(constants.Form.OWNER_ADDRESS)</span> : @releaseAsset.ownerAddress <br>
-            <span class="red">@Messages(constants.FormField.PEG_HASH.name)</span> : @releaseAsset.pegHash <br>
+            <span class="red">@Messages(constants.Form.PEG_HASH)</span> : @releaseAsset.pegHash <br>
             <button class="btn btn-sm btn-primary" onclick="getForm(jsRoutes.controllers.ReleaseAssetController.releaseAssetForm('@releaseAsset.ownerAddress','@releaseAsset.pegHash'))">@Messages(constants.Form.RELEASE_ASSET)</button>
         </div>
     </div>

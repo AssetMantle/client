@@ -3,7 +3,7 @@
 
 @(organization: Organization)(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
     @Messages(constants.Form.ORGANIZATION_NAME): @organization.name <br>
-    @Messages(constants.FormField.ORGANIZATION_ID.name): @organization.id <br>
+    @Messages(constants.Form.ORGANIZATION_ID): @organization.id <br>
     @Messages(constants.Form.ORGANIZATION_USERNAME): @organization.accountID <br>
     @Messages(constants.Form.ADDRESS): @organization.address <br>
     @Messages(constants.Form.PHONE): @organization.phone <br>

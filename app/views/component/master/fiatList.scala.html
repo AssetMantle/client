@@ -5,7 +5,7 @@
 
     @for(fiat <- fiatPegWallet) {
         <div class="flexItem box thirdBox leftText lightBlue">
-            <span class="red">@Messages(constants.FormField.PEG_HASH.name)</span> : @fiat.pegHash <br>
+            <span class="red">@Messages(constants.Form.PEG_HASH)</span> : @fiat.pegHash <br>
             <span class="red">@Messages(constants.Form.TRANSACTION_ID)</span> : @fiat.transactionID <br>
             <span class="red">@Messages(constants.Form.TRANSACTION_AMOUNT)</span> : @fiat.transactionAmount <br>
             <span class="red">@Messages(constants.Form.REDEEM_AMOUNT)</span> : @fiat.redeemedAmount
