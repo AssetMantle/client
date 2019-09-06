@@ -10,14 +10,14 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
   def javascriptRoutes = Action { implicit request =>
     Ok(
       JavaScriptReverseRouter("jsRoutes")(
-        routes.javascript.SignUpController.checkUsernameAvailable,
+        routes.javascript.AccountController.checkUsernameAvailable,
         routes.javascript.ConfigurationController.queryConfigurationVariable,
         routes.javascript.NotificationController.notificationPage,
         routes.javascript.NotificationController.unreadNotificationCount,
         routes.javascript.NotificationController.markNotificationRead,
         routes.javascript.LoginController.loginForm,
         routes.javascript.LogoutController.logoutForm,
-        routes.javascript.SignUpController.signUpForm,
+        routes.javascript.AccountController.signUpForm,
         routes.javascript.ContactController.updateContactForm,
         routes.javascript.VerifyMobileNumberController.verifyMobileNumberForm,
         routes.javascript.VerifyEmailAddressController.verifyEmailAddressForm,
