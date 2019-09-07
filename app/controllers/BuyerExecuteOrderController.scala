@@ -18,7 +18,7 @@ class BuyerExecuteOrderController @Inject()(messagesControllerComponents: Messag
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private implicit val module:String= constants.Module.CONTROLLERS_BUYER_EXECUTE_ORDER
+  private implicit val module: String = constants.Module.CONTROLLERS_BUYER_EXECUTE_ORDER
 
   def buyerExecuteOrderForm(orderID: String): Action[AnyContent] = Action { implicit request =>
     val negotiation = blockchainNegotiations.Service.get(orderID)

@@ -16,7 +16,7 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private implicit val module:String= constants.Module.CONTROLLERS_SEND_COIN
+  private implicit val module: String = constants.Module.CONTROLLERS_SEND_COIN
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 

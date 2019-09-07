@@ -14,6 +14,7 @@ function openNav() {
 function closeNav() {
     document.getElementById("sideBar").style.width = "0px";
 }
+
 function sideBarSearchFunction() {
     var input, filter, ul, li, a, i;
     input = document.getElementById("sideBarSearch");

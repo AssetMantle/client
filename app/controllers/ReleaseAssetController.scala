@@ -18,7 +18,7 @@ class ReleaseAssetController @Inject()(messagesControllerComponents: MessagesCon
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
-  private implicit val module:String= constants.Module.CONTROLLERS_RELEASE_ASSET
+  private implicit val module: String = constants.Module.CONTROLLERS_RELEASE_ASSET
 
   def releaseAssetForm(ownerAddress: String, pegHash: String): Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.master.releaseAsset(views.companion.master.ReleaseAsset.form, ownerAddress, pegHash))

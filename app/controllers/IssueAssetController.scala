@@ -21,7 +21,7 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private implicit val module:String= constants.Module.CONTROLLERS_ISSUE_ASSET
+  private implicit val module: String = constants.Module.CONTROLLERS_ISSUE_ASSET
 
   def issueAssetDetailForm(id: Option[String]): Action[AnyContent] = Action { implicit request =>
     try {
