@@ -146,6 +146,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.AddOrganizationController.userUpdateOrganizationKyc,
         routes.javascript.AddOrganizationController.reviewAddOrganizationForm,
         routes.javascript.AddOrganizationController.viewPendingVerifyOrganizationRequests,
+        routes.javascript.AddOrganizationController.viewOrganizationVerificationBankAccountDetail,
         routes.javascript.AddOrganizationController.viewKycDocuments,
         routes.javascript.AddOrganizationController.verifyKycDocument,
         routes.javascript.AddOrganizationController.rejectKycDocument,
@@ -180,7 +181,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.FileController.updateTraderKyc,
 
         routes.javascript.FileController.genesisAccessedFile,
-        routes.javascript.FileController.zoneAccessedOrganizationFile,
+        routes.javascript.FileController.zoneAccessedOrganizationKYCFile,
         routes.javascript.FileController.zoneAccessedTraderFile,
         routes.javascript.FileController.file,
 

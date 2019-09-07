@@ -5,7 +5,7 @@
 <div>
     <div id="documentContentTop">
         @documentContentTop
-    </div><br>
+    </div>
     @if(document.documentType != constants.File.PROFILE_PICTURE) {
         @utilities.FileOperations.fileExtensionFromName(document.fileName) match {
             case constants.File.PNG | constants.File.JPEG | constants.File.JPG => {
@@ -15,7 +15,7 @@
                 <a href="@documentLink"><img src="@routes.Assets.versioned("images/document.png")" alt="@document.documentType"></a>
             }
         }
-    }<br>
+    }
     <div id="documentContentBottom">
         @documentContentBottom
     </div>

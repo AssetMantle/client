@@ -3,6 +3,9 @@
 
 @(organizationKYCs: Seq[OrganizationKYC])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
+<div class="latest_card-header latest_card-header-primary text-center">
+    <h4 class="latest_card-title">@Messages(constants.Form.ORGANIZATION_KYC_FILES)</h4>
+</div>
 <div class="centerText">
     @for(organizationKYC <- organizationKYCs) {
         @component.master.commonDocumentViewer(organizationKYC) {

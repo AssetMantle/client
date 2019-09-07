@@ -79,6 +79,14 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
     }
   }
 
+  private def getZoneIDByID(id: String): Future[String] = db.run(organizationTable.filter(_.id === id).map(_.zoneID).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
   private def getVerificationStatusById(id: String): Future[Option[Boolean]] = db.run(organizationTable.filter(_.id === id).map(_.verificationStatus.?).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -97,7 +105,7 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
     }
   }
 
-  private def getOrganizationsWithNullVerificationStatusByZoneID(zoneID: String): Future[Seq[Organization]] = db.run(organizationTable.filter(_.zoneID === zoneID).filter(_.verificationStatus.?.isEmpty).result)
+  private def getOrganizationsWithCompletedStatusAndNullVerificationStatusByZoneID(zoneID: String): Future[Seq[Organization]] = db.run(organizationTable.filter(_.zoneID === zoneID).filter(_.completionStatus === true).filter(_.verificationStatus.?.isEmpty).result)
 
   private def getOrganizationsByZoneID(zoneID: String): Future[Seq[Organization]] = db.run(organizationTable.filter(_.zoneID === zoneID).filter(_.verificationStatus.? === Option(true)).result)
 
@@ -193,13 +201,15 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
 
     def getID(accountID: String): String = Await.result(getIDByAccountID(accountID), Duration.Inf)
 
+    def getZoneID(id: String): String = Await.result(getZoneIDByID(id), Duration.Inf)
+
     def rejectOrganization(id: String): Int = Await.result(updateVerificationStatusOnID(id, Option(false)), Duration.Inf)
 
     def verifyOrganization(id: String): Int = Await.result(updateVerificationStatusOnID(id, Option(true)), Duration.Inf)
 
     def getAccountId(id: String): String = Await.result(getAccountIdById(id), Duration.Inf)
 
-    def getVerifyOrganizationRequests(zoneID: String): Seq[Organization] = Await.result(getOrganizationsWithNullVerificationStatusByZoneID(zoneID), Duration.Inf)
+    def getVerifyOrganizationRequests(zoneID: String): Seq[Organization] = Await.result(getOrganizationsWithCompletedStatusAndNullVerificationStatusByZoneID(zoneID), Duration.Inf)
 
     def getOrganizationsInZone(zoneID: String): Seq[Organization] = Await.result(getOrganizationsByZoneID(zoneID), Duration.Inf)
 
@@ -209,8 +219,8 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
 
     def getUBOs(id: String): utils.UBOs = {
       try {
-        val a = utilities.JSON.getInstance[utils.UBOs](Await.result(getUBOsOnID(id), Duration.Inf).getOrElse(""))
-        a
+        val ubos = utilities.JSON.getInstance[utils.UBOs](Await.result(getUBOsOnID(id), Duration.Inf).getOrElse(Json.toJson[utils.UBOs](utils.UBOs()).toString))
+        ubos
       } catch {
         case _: BaseException => utils.UBOs(Seq())
       }

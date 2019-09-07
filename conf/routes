@@ -1,17 +1,17 @@
-GET         /                                      controllers.IndexController.index
+GET         /                                                            controllers.IndexController.index
 
-GET         /assets/*file                          controllers.Assets.versioned(path="/public", file: Asset)
+GET         /assets/*file                                                controllers.Assets.versioned(path="/public", file: Asset)
 
-GET         /javascriptRoutes                      controllers.JavaScriptRoutesController.javascriptRoutes
+GET         /javascriptRoutes                                            controllers.JavaScriptRoutesController.javascriptRoutes
 
-GET         /firebase-messaging-sw.js              controllers.Assets.at(path="/public/javascripts", file="firebase-messaging-sw.js")
+GET         /firebase-messaging-sw.js                                    controllers.Assets.at(path="/public/javascripts", file="firebase-messaging-sw.js")
 
 
-GET         /genesisRequest                        controllers.ViewController.genesisRequest
-GET         /genesisInformation                    controllers.ViewController.genesisInformation
-GET         /zoneRequest                           controllers.ViewController.zoneRequest
-GET         /zoneInformation                       controllers.ViewController.zoneInformation
-GET         /organizationRequest                   controllers.ViewController.organizationRequest
+GET         /genesisRequest                                              controllers.ViewController.genesisRequest
+GET         /genesisInformation                                          controllers.ViewController.genesisInformation
+GET         /zoneRequest                                                 controllers.ViewController.zoneRequest
+GET         /zoneInformation                                             controllers.ViewController.zoneInformation
+GET         /organizationRequest                                         controllers.ViewController.organizationRequest
 GET         /organizationInformation                                     controllers.ViewController.organizationInformation
 GET         /market                                                      controllers.ViewController.market
 GET         /profile                                                     controllers.ViewController.profile
@@ -21,20 +21,20 @@ GET         /profilePicture                                              control
 
 GET         /account/changePassword                                      controllers.AccountController.changePasswordForm
 POST        /account/changePassword                                      controllers.AccountController.changePassword
-GET         /account/forgotPasswordUsername        controllers.AccountController.emailOTPForgotPasswordForm
-POST        /account/forgotPasswordUsername        controllers.AccountController.emailOTPForgotPassword
-GET         /account/forgotPassword                controllers.AccountController.forgotPasswordForm(username: String)
-POST        /account/forgotPassword                controllers.AccountController.forgotPassword(username: String)
-GET         /account/checkUsernameAvailable        controllers.AccountController.checkUsernameAvailable(username: String)
-GET         /account/signUp                        controllers.AccountController.signUpForm
-POST        /account/signUp                        controllers.AccountController.signUp
+GET         /account/forgotPasswordUsername                              controllers.AccountController.emailOTPForgotPasswordForm
+POST        /account/forgotPasswordUsername                              controllers.AccountController.emailOTPForgotPassword
+GET         /account/forgotPassword                                      controllers.AccountController.forgotPasswordForm(username: String)
+POST        /account/forgotPassword                                      controllers.AccountController.forgotPassword(username: String)
+GET         /account/checkUsernameAvailable                              controllers.AccountController.checkUsernameAvailable(username: String)
+GET         /account/signUp                                              controllers.AccountController.signUpForm
+POST        /account/signUp                                              controllers.AccountController.signUp
 
 
-GET         /contact                               controllers.ContactController.contact
+GET         /contact                                                     controllers.ContactController.contact
 
-GET         /master/notifications                  controllers.NotificationController.notificationPage(pageNumber:Int)
-GET         /master/unreadNotificationCount        controllers.NotificationController.unreadNotificationCount()
-GET         /master/markNotificationAsRead         controllers.NotificationController.markNotificationRead(notificationID: String)
+GET         /master/notifications                                        controllers.NotificationController.notificationPage(pageNumber:Int)
+GET         /master/unreadNotificationCount                              controllers.NotificationController.unreadNotificationCount()
+GET         /master/markNotificationAsRead                               controllers.NotificationController.markNotificationRead(notificationID: String)
 
 GET         /master/queryConfigurationVariable:query                     controllers.ConfigurationController.queryConfigurationVariable(query: String)
 
@@ -66,7 +66,7 @@ GET         /master/login                                                control
 POST        /master/login                                                controllers.LoginController.login
 
 GET         /master/getGenesisAccessedFile                               controllers.FileController.genesisAccessedFile(fileName: String, documentType: String)
-GET         /master/getZoneAccessedOrganizationFile                      controllers.FileController.zoneAccessedOrganizationFile(accountID: String, fileName: String, documentType: String)
+GET         /master/zoneAccessedOrganizationKYCFile                      controllers.FileController.zoneAccessedOrganizationKYCFile(organizationID: String, fileName: String, documentType: String)
 GET         /master/getZoneAccessedTraderFile                            controllers.FileController.zoneAccessedTraderFile(accountID: String, fileName: String, documentType: String)
 GET         /master/getOrganizationAccessedFile                          controllers.FileController.organizationAccessedFile(accountID: String, fileName: String, documentType: String)
 GET         /master/file                                                 controllers.FileController.file(fileName: String, documentType: String)
@@ -167,6 +167,15 @@ GET         /master/userUpdateOrganizationKYCDocument                    control
 GET         /master/userAccessedOrganizationKYCFile                      controllers.AddOrganizationController.userAccessedOrganizationKYCFile(documentType: String)
 GET         /master/reviewOrganizationKYC                                controllers.AddOrganizationController.reviewAddOrganizationForm
 POST        /master/reviewOrganizationKYC                                controllers.AddOrganizationController.reviewAddOrganization
+GET         /master/viewVerifyOrganizationRequests                       controllers.AddOrganizationController.viewPendingVerifyOrganizationRequests
+GET         /master/viewOrganizationVerificationBankAccountDetail        controllers.AddOrganizationController.viewOrganizationVerificationBankAccountDetail(organizationID: String)
+GET         /master/viewOrganizationKycDocuments                         controllers.AddOrganizationController.viewKycDocuments(accountID: String)
+GET         /master/verifyOrganizationKycDocument                        controllers.AddOrganizationController.verifyKycDocument(accountID: String, documentType: String)
+GET         /master/rejectOrganizationKycDocument                        controllers.AddOrganizationController.rejectKycDocument(accountID: String, documentType: String)
+GET         /master/rejectVerifyOrganizationRequest                      controllers.AddOrganizationController.rejectVerifyOrganizationRequestForm(organizationID: String)
+POST        /master/rejectVerifyOrganizationRequest                      controllers.AddOrganizationController.rejectVerifyOrganizationRequest
+GET         /master/verifyOrganization                                   controllers.AddOrganizationController.verifyOrganizationForm(organizationID: String, zoneID: String)
+POST        /master/verifyOrganization                                   controllers.AddOrganizationController.verifyOrganization
 
 GET         /master/addZone                                              controllers.AddZoneController.addZoneForm
 POST        /master/addZone                                              controllers.AddZoneController.addZone
@@ -180,16 +189,6 @@ GET         /master/rejectZoneKycDocument                                control
 GET         /master/viewVerifyZoneRequests                               controllers.AddZoneController.viewPendingVerifyZoneRequests
 GET         /master/rejectVerifyZoneRequest                              controllers.AddZoneController.rejectVerifyZoneRequestForm(zoneID: String)
 POST        /master/rejectVerifyZoneRequest                              controllers.AddZoneController.rejectVerifyZoneRequest
-
-GET         /master/verifyOrganization                                   controllers.AddOrganizationController.verifyOrganizationForm(organizationID: String, zoneID: String)
-POST        /master/verifyOrganization                                   controllers.AddOrganizationController.verifyOrganization
-GET         /master/viewOrganizationKycDocuments                         controllers.AddOrganizationController.viewKycDocuments(accountID: String)
-GET         /master/verifyOrganizationKycDocument                        controllers.AddOrganizationController.verifyKycDocument(accountID: String, documentType: String)
-GET         /master/rejectOrganizationKycDocument                        controllers.AddOrganizationController.rejectKycDocument(accountID: String, documentType: String)
-
-GET         /master/viewVerifyOrganizationRequests                       controllers.AddOrganizationController.viewPendingVerifyOrganizationRequests
-GET         /master/rejectVerifyOrganizationRequest                      controllers.AddOrganizationController.rejectVerifyOrganizationRequestForm(organizationID: String)
-POST        /master/rejectVerifyOrganizationRequest                      controllers.AddOrganizationController.rejectVerifyOrganizationRequest
 
 GET         /master/buyerExecuteOrder                                    controllers.BuyerExecuteOrderController.buyerExecuteOrderForm(orderID: String)
 POST        /master/buyerExecuteOrder                                    controllers.BuyerExecuteOrderController.buyerExecuteOrder
