@@ -5,7 +5,7 @@ function openSideBar() {
 function closeSideBar() {
     document.getElementById("sideBar").style.width = "0px";
 }
-function sideBarSearchFunction() {
+function sideBarSearch() {
     var input, filter, ul, li, a, i;
     input = document.getElementById("sideBarSearch");
     filter = input.value.toUpperCase();
