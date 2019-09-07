@@ -1,11 +1,12 @@
+@import helper.inputText
+@import play.api.data.{Field, Form}
+
 @()(implicit messagesProvider: MessagesProvider)
 
 <form id="searchForm" class="searchForm">
-
-    <input type="text" class="cmuk-input" id="searchValue" placeholder="@Messages(constants.Form.SEARCH_TX_HASH_HEIGHT) "/>
-
-    <button class="btn btn-primary" onclick='searchFunction()'>@Messages(constants.Form.SEARCH)</button>
+    @inputText(Field(form = Form(constants.FormField.SEARCH_TX_HASH_HEIGHT.field), name = constants.FormField.SEARCH_TX_HASH_HEIGHT.name, constraints = Seq(), format = None, errors = Seq(), value = None), 'id -> "searchValue", 'placeholder -> Messages(constants.FormField.SEARCH_TX_HASH_HEIGHT.name), 'class -> "cmuk-input" )
+<button class="btn btn-primary" onclick='searchFunction()'>@Messages(constants.Form.SEARCH)</button>
 </form>
 
 <script src="@routes.Assets.versioned("javascripts/search.js")" type="text/javascript"></script>
-<script>setSearchErrorValues("@Messages(constants.Form.INVALID_BLOCK_HEIGHT)","@Messages(constants.Form.INVALID_TRANSACTION_HASH)")</script>
+<script>setSearchErrorValues("@Messages(constants.Form.INVALID_BLOCK_HEIGHT)", "@Messages(constants.Form.INVALID_TRANSACTION_HASH)")</script>
