@@ -25,10 +25,8 @@
         </div>
 
     <div id="moderatedIssueAssetRequestFormFields">
-        @inputText(issueAssetRequestForm(constants.FormField.GAS.name).copy(value = Some("0")), '_label -> Messages(constants.FormField.GAS.name),
-            'class -> "form-control",'placeholder->Messages(constants.FormField.GAS.name),  'required->true)
-        @inputPassword(issueAssetRequestForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name),
-            'class -> "form-control",'placeholder->Messages(constants.FormField.PASSWORD.name),'required->true)
+        @inputText(issueAssetRequestForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.GAS.name),  'required -> false)
+        @inputPassword(issueAssetRequestForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.PASSWORD.name), 'required -> false)
     </div>
 
     @if(issueAssetRequestForm.hasGlobalErrors) {

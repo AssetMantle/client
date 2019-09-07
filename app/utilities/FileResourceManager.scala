@@ -85,11 +85,11 @@ class FileResourceManager @Inject()()(implicit exec: ExecutionContext, configura
 
   def storeFile[T <: Document[T]](name: String, documentType: String, path: String, document: T, masterCreate: T => String): Unit = {
     try {
-      val (fileName, encodedBase64) = utilities.FileOperations.fileExtensionFromName(name) match {
+      val (fileName, encodedBase64): (String, Option[Array[Byte]]) = utilities.FileOperations.fileExtensionFromName(name) match {
         case constants.File.JPEG | constants.File.JPG | constants.File.PNG => utilities.ImageProcess.convertToThumbnail(name, path)
-        case _ => (List(util.hashing.MurmurHash3.stringHash(Base64.encodeBase64String(utilities.FileOperations.convertToByteArray(utilities.FileOperations.newFile(path, name)))).toString, utilities.FileOperations.fileExtensionFromName(name)).mkString("."), null)
+        case _ => (List(util.hashing.MurmurHash3.stringHash(Base64.encodeBase64String(utilities.FileOperations.convertToByteArray(utilities.FileOperations.newFile(path, name)))).toString, utilities.FileOperations.fileExtensionFromName(name)).mkString("."), None)
       }
-      masterCreate(document.updateFileName(fileName).updateFile(Option(encodedBase64)))
+      masterCreate(document.updateFileName(fileName).updateFile(encodedBase64))
       utilities.FileOperations.renameFile(path, name, fileName)
     } catch {
       case baseException: BaseException => logger.error(baseException.failure.message)
@@ -103,11 +103,11 @@ class FileResourceManager @Inject()()(implicit exec: ExecutionContext, configura
 
   def updateFile[T <: Document[T]](name: String, documentType: String, path: String, oldDocumentFileName: String, document: T, updateOldDocument: T => Int): Unit = {
     try {
-      val (fileName, encodedBase64) = utilities.FileOperations.fileExtensionFromName(name) match {
+      val (fileName, encodedBase64): (String, Option[Array[Byte]]) = utilities.FileOperations.fileExtensionFromName(name) match {
         case constants.File.JPEG | constants.File.JPG | constants.File.PNG => utilities.ImageProcess.convertToThumbnail(name, path)
-        case _ => (List(util.hashing.MurmurHash3.stringHash(Base64.encodeBase64String(utilities.FileOperations.convertToByteArray(utilities.FileOperations.newFile(path, name)))).toString, utilities.FileOperations.fileExtensionFromName(name)).mkString("."), null)
+        case _ => (List(util.hashing.MurmurHash3.stringHash(Base64.encodeBase64String(utilities.FileOperations.convertToByteArray(utilities.FileOperations.newFile(path, name)))).toString, utilities.FileOperations.fileExtensionFromName(name)).mkString("."), None)
       }
-      updateOldDocument(document.updateFileName(fileName).updateFile(Option(encodedBase64)))
+      updateOldDocument(document.updateFileName(fileName).updateFile(encodedBase64))
       utilities.FileOperations.deleteFile(path, oldDocumentFileName)
       utilities.FileOperations.renameFile(path, name, fileName)
     } catch {
