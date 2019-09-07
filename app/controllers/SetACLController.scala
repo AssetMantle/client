@@ -19,7 +19,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
-  private implicit val module:String= constants.Module.CONTROLLERS_SET_ACL
+  private implicit val module: String = constants.Module.CONTROLLERS_SET_ACL
 
   def addTraderForm(): Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.master.addTrader(views.companion.master.AddTrader.form))

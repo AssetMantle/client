@@ -5,12 +5,12 @@
 @common(Messages(constants.Form.INDEX), failures, warnings, successes, infos)(left)(center)(right)
 
 @left = {
-    <div class="sideBarOpenButton" onclick="openSideBar()">
+    <div class="sideBarOpenButton" onclick="openNav()">
         <span cmuk-icon="menu"></span>
     </div>
 
     <div class="sideBar" id="sideBar">
-        <a href="javascript:void(0)" class="sideBarCloseButton" onclick="closeSideBar()">x</a>
+        <a href="javascript:void(0)" class="sideBarCloseButton" onclick="closeNav()">x</a>
         <input type="text" id="sideBarSearch" class="sideBarSearch" onkeyup="sideBarSearchFunction()" placeholder="Search.." title="Type in a category">
         <ul id="sideBarSearchMenu">
         <li> <a onclick="getForm(jsRoutes.controllers.AddKeyController.blockchainAddKeyForm())">@Messages(constants.Form.ADD_KEY)</a> </li>

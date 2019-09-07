@@ -90,13 +90,14 @@
     padding: 20px;
 }
 
-.fakeimg {
-    background-color: #aaa;
-    width: 100%;
-    padding: 20px;
+.footer {
+    position: relative;
+    bottom: 0;
+    padding: 5px 5px;
+    background: #333333;
+    text-align: center;
+
 }
-
-
 
 .centerScreen {
     padding-top:200px;
@@ -113,6 +114,37 @@
 
 .blur {
     filter: blur(5 px);
+}
+
+.alert.success {
+    background-color: #4CAF50;
+}
+
+.alert.failure {
+    background-color: #f44336;
+}
+
+.alert.information {
+    background-color: #2196F3;
+}
+
+.alert.warning {
+    background-color: #ff9800;
+}
+
+.closeButton {
+    margin-right: 15px;
+    color: white;
+    font-weight: bold;
+    float: right;
+    font-size: 1em;
+    line-height: 20px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.closeButton:hover {
+    color: #3a3a3a;
 }
 
 /*Alert*/
@@ -301,6 +333,7 @@
 rightText{
     text-align: right;
 }
+
 .centerText {
     text-align: center;
 }
@@ -470,6 +503,10 @@ dl .info::after {
 }
 /* color */
 /*floating label*/
+.form-group {
+    position: relative;
+    margin-bottom: 1.5rem;
+}
 
 .hash_code{
     width : 100px;
@@ -558,12 +595,14 @@ margin-left: 50px;
     left: -10px;
     z-index: 100;
 }
+
 .sideBarCloseButton {
     position: relative;
     right: -85%;
     font-size: 20px;
 }
-.sideBar{
+
+.sideBar {
     height: 100%;
     width: 0;
     position: fixed;
@@ -574,15 +613,19 @@ margin-left: 50px;
     overflow-x: hidden;
     transition: 0.5s;
 }
-.sideBar ul{
-    padding-left:0px;
+
+.sideBar ul {
+    padding-left: 0px;
 }
-.sideBar li{
+
+.sideBar li {
     list-style-type: none;
 }
+
 .sideBar a {
     color: #fff;
 }
+
 .sideBar li a {
     padding:8px 0px 0px 20px;
     text-decoration: none;
@@ -594,6 +637,7 @@ margin-left: 50px;
     text-decoration: none;
     color: #31353D;
 }
+
 .sideBarSearch {
     border: 1px solid #ddd;
 }
