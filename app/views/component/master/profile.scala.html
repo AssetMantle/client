@@ -61,8 +61,10 @@
                                 }
                                 case constants.User.ORGANIZATION => {
                                     <div class="centerText">
-                                        <button onclick="getForm(jsRoutes.controllers.FileController.updateOrganizationKycForm('@constants.File.BANK_DETAILS'))">@Messages(constants.Form.UPDATE_ORGANIZATION_BANK_DETAILS)</button>
-                                        <button onclick="getForm(jsRoutes.controllers.FileController.updateOrganizationKycForm('@constants.File.IDENTIFICATION'))">@Messages(constants.Form.UPDATE_ORGANIZATION_IDENTIFICATION)</button>
+                                        @for(documentType <- constants.File.ORGANIZATION_KYC_DOCUMENT_TYPES){
+                                            @documentType
+                                            <button onclick="getForm(jsRoutes.controllers.FileController.updateOrganizationKYCForm('@documentType'))">@Messages(constants.Form.UPDATE)</button>
+                                        }
                                     </div>
                                 }
                                 case constants.User.TRADER => {

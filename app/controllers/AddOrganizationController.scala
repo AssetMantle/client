@@ -145,7 +145,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
       fileUploadInfo => {
         try {
           request.body.file("file") match {
-            case None => BadRequest(Messages(constants.Response.NO_FILE.message))
+            case None => BadRequest(views.html.index(failures = Seq(constants.Response.NO_FILE)))
             case Some(file) => utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, fileResourceManager.getOrganizationKycFilePath(documentType))
               Ok
           }
@@ -170,7 +170,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
         )
         PartialContent(views.html.component.master.userUploadOrUpdateOrganizationKYC(masterOrganizationKYCs.Service.getAllDocuments(id)))
       } catch {
-        case baseException: BaseException => InternalServerError(Messages(baseException.failure.message))
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
@@ -192,7 +192,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
         )
         PartialContent(views.html.component.master.userUploadOrUpdateOrganizationKYC(masterOrganizationKYCs.Service.getAllDocuments(id)))
       } catch {
-        case baseException: BaseException => InternalServerError(Messages(baseException.failure.message))
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
@@ -256,17 +256,21 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
         },
         verifyOrganizationData => {
           try {
-            val organizationAccountAddress = masterAccounts.Service.getAddress(masterOrganizations.Service.getAccountId(verifyOrganizationData.organizationID))
-            transaction.process[AddOrganization, transactionsAddOrganization.Request](
-              entity = AddOrganization(from = loginState.address, to = organizationAccountAddress, organizationID = verifyOrganizationData.organizationID, zoneID = verifyOrganizationData.zoneID, gas = verifyOrganizationData.gas, ticketID = "", mode = transactionMode),
-              blockchainTransactionCreate = blockchainTransactionAddOrganizations.Service.create,
-              request = transactionsAddOrganization.Request(transactionsAddOrganization.BaseRequest(from = loginState.address, gas = verifyOrganizationData.gas.toString), to = organizationAccountAddress, organizationID = verifyOrganizationData.organizationID, zoneID = verifyOrganizationData.zoneID, password = verifyOrganizationData.password, mode = transactionMode),
-              action = transactionsAddOrganization.Service.post,
-              onSuccess = blockchainTransactionAddOrganizations.Utility.onSuccess,
-              onFailure = blockchainTransactionAddOrganizations.Utility.onFailure,
-              updateTransactionHash = blockchainTransactionAddOrganizations.Service.updateTransactionHash
-            )
-            withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ORGANIZATION_VERIFIED)))
+            if (masterOrganizationKYCs.Service.checkAllKYCFilesVerified(verifyOrganizationData.organizationID)){
+              val organizationAccountAddress = masterAccounts.Service.getAddress(masterOrganizations.Service.getAccountId(verifyOrganizationData.organizationID))
+              transaction.process[AddOrganization, transactionsAddOrganization.Request](
+                entity = AddOrganization(from = loginState.address, to = organizationAccountAddress, organizationID = verifyOrganizationData.organizationID, zoneID = verifyOrganizationData.zoneID, gas = verifyOrganizationData.gas, ticketID = "", mode = transactionMode),
+                blockchainTransactionCreate = blockchainTransactionAddOrganizations.Service.create,
+                request = transactionsAddOrganization.Request(transactionsAddOrganization.BaseRequest(from = loginState.address, gas = verifyOrganizationData.gas.toString), to = organizationAccountAddress, organizationID = verifyOrganizationData.organizationID, zoneID = verifyOrganizationData.zoneID, password = verifyOrganizationData.password, mode = transactionMode),
+                action = transactionsAddOrganization.Service.post,
+                onSuccess = blockchainTransactionAddOrganizations.Utility.onSuccess,
+                onFailure = blockchainTransactionAddOrganizations.Utility.onFailure,
+                updateTransactionHash = blockchainTransactionAddOrganizations.Service.updateTransactionHash
+              )
+              withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ORGANIZATION_VERIFIED)))
+            } else {
+              BadRequest(views.html.index(failures = Seq(constants.Response.ALL_KYC_FILES_NOT_VERIFIED)))
+            }
           }
           catch {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -285,22 +289,22 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
       }
   }
 
-  def verifyKycDocument(accountID: String, documentType: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+  def verifyKycDocument(organizationID: String, documentType: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        masterOrganizationKYCs.Service.verify(id = accountID, documentType = documentType)
-        pushNotification.sendNotification(accountID, constants.Notification.SUCCESS, Messages(constants.Response.DOCUMENT_APPROVED.message))
+        masterOrganizationKYCs.Service.verify(id = organizationID, documentType = documentType)
+        pushNotification.sendNotification(username = masterOrganizations.Service.getAccountId(organizationID), notification = constants.Notification.SUCCESS, messageParameters = Messages(constants.Response.DOCUMENT_APPROVED.message))
         withUsernameToken.Ok(Messages(constants.Response.SUCCESS.message))
       } catch {
         case baseException: BaseException => InternalServerError(Messages(baseException.failure.message))
       }
   }
 
-  def rejectKycDocument(accountID: String, documentType: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+  def rejectKycDocument(organizationID: String, documentType: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        masterOrganizationKYCs.Service.reject(id = accountID, documentType = documentType)
-        pushNotification.sendNotification(accountID, constants.Notification.FAILURE, Messages(constants.Response.DOCUMENT_REJECTED.message))
+        masterOrganizationKYCs.Service.reject(id = organizationID, documentType = documentType)
+        pushNotification.sendNotification(username = masterOrganizations.Service.getAccountId(organizationID), notification = constants.Notification.FAILURE, messageParameters = Messages(constants.Response.DOCUMENT_REJECTED.message))
         withUsernameToken.Ok(Messages(constants.Response.SUCCESS.message))
       } catch {
         case baseException: BaseException => InternalServerError(Messages(baseException.failure.message))

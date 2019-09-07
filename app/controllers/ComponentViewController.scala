@@ -173,12 +173,12 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
       try {
         val documents: Seq[Document[_]] = loginState.userType match {
           case constants.User.ZONE => masterZoneKYC.Service.getAllDocuments(loginState.username)
-          case constants.User.ORGANIZATION => masterOrganizationKYC.Service.getAllDocuments(loginState.username)
+          case constants.User.ORGANIZATION => masterOrganizationKYC.Service.getAllDocuments(masterOrganizations.Service.getID(loginState.username))
           case constants.User.TRADER => masterTraderKYC.Service.getAllDocuments(loginState.username)
           case constants.User.USER => masterAccountKYC.Service.getAllDocuments(loginState.username)
           case _ => masterAccountFile.Service.getAllDocuments(loginState.username)
         }
-        Ok(views.html.component.master.profileDocuments(documents))
+        withUsernameToken.Ok(views.html.component.master.profileDocuments(documents))
       } catch {
         case _: BaseException => InternalServerError
       }
@@ -187,7 +187,7 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
   def profilePicture(): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        Ok(views.html.component.master.profilePicture(masterAccountFile.Service.getProfilePicture(loginState.username)))
+        withUsernameToken.Ok(views.html.component.master.profilePicture(masterAccountFile.Service.getProfilePicture(loginState.username)))
       } catch {
         case _: BaseException => InternalServerError(views.html.component.master.profilePicture())
       }

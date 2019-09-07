@@ -70,7 +70,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
       fileUploadInfo => {
         try {
           request.body.file("file") match {
-            case None => BadRequest(Messages(constants.Response.NO_FILE.message))
+            case None => BadRequest(views.html.index(failures = Seq(constants.Response.NO_FILE)))
             case Some(file) => utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, fileResourceManager.getAccountKycFilePath(documentType))
               Ok
           }
@@ -94,7 +94,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
         )
         withUsernameToken.Ok(Messages(constants.Response.FILE_UPLOAD_SUCCESSFUL.message))
       } catch {
-        case baseException: BaseException => InternalServerError(Messages(baseException.failure.message))
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
@@ -111,7 +111,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
         )
         withUsernameToken.Ok(Messages(constants.Response.FILE_UPDATE_SUCCESSFUL.message))
       } catch {
-        case baseException: BaseException => InternalServerError(Messages(baseException.failure.message))
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
@@ -131,7 +131,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
       fileUploadInfo => {
         try {
           request.body.file("file") match {
-            case None => BadRequest(Messages(constants.Response.NO_FILE.message))
+            case None => BadRequest(views.html.index(failures = Seq(constants.Response.NO_FILE)))
             case Some(file) => utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, fileResourceManager.getZoneKycFilePath(documentType))
               Ok
           }
@@ -155,7 +155,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
         )
         withUsernameToken.Ok(Messages(constants.Response.FILE_UPLOAD_SUCCESSFUL.message))
       } catch {
-        case baseException: BaseException => InternalServerError(Messages(baseException.failure.message))
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
@@ -172,7 +172,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
         )
         withUsernameToken.Ok(Messages(constants.Response.FILE_UPDATE_SUCCESSFUL.message))
       } catch {
-        case baseException: BaseException => InternalServerError(Messages(baseException.failure.message))
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
@@ -192,7 +192,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
       fileUploadInfo => {
         try {
           request.body.file("file") match {
-            case None => BadRequest(Messages(constants.Response.NO_FILE.message))
+            case None => BadRequest(views.html.index(failures = Seq(constants.Response.NO_FILE)))
             case Some(file) => utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, fileResourceManager.getTraderKycFilePath(documentType))
               Ok
           }
@@ -216,7 +216,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
         )
         withUsernameToken.Ok(Messages(constants.Response.FILE_UPLOAD_SUCCESSFUL.message))
       } catch {
-        case baseException: BaseException => InternalServerError(Messages(baseException.failure.message))
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
@@ -233,7 +233,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
         )
         withUsernameToken.Ok(Messages(constants.Response.FILE_UPDATE_SUCCESSFUL.message))
       } catch {
-        case baseException: BaseException => InternalServerError(Messages(baseException.failure.message))
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
@@ -253,7 +253,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
       fileUploadInfo => {
         try {
           request.body.file("file") match {
-            case None => BadRequest(Messages(constants.Response.NO_FILE.message))
+            case None => BadRequest(views.html.index(failures = Seq(constants.Response.NO_FILE)))
             case Some(file) => utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, fileResourceManager.getZoneKycFilePath(documentType))
               Ok
           }
@@ -277,7 +277,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
         )
         withUsernameToken.Ok(Messages(constants.Response.FILE_UPLOAD_SUCCESSFUL.message))
       } catch {
-        case baseException: BaseException => InternalServerError(Messages(baseException.failure.message))
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
@@ -294,7 +294,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
         )
         withUsernameToken.Ok(Messages(constants.Response.FILE_UPDATE_SUCCESSFUL.message))
       } catch {
-        case baseException: BaseException => InternalServerError(Messages(baseException.failure.message))
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
@@ -314,7 +314,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
       fileUploadInfo => {
         try {
           request.body.file("file") match {
-            case None => BadRequest(Messages(constants.Response.NO_FILE.message))
+            case None => BadRequest(views.html.index(failures = Seq(constants.Response.NO_FILE)))
             case Some(file) => utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, fileResourceManager.getOrganizationKycFilePath(documentType))
               Ok
           }
@@ -333,12 +333,12 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
           name = name,
           documentType = documentType,
           path = fileResourceManager.getOrganizationKycFilePath(documentType),
-          document = master.OrganizationKYC(id = loginState.username, documentType = documentType, status = None, fileName = name, file = None),
+          document = master.OrganizationKYC(id = masterOrganizations.Service.getID(loginState.username), documentType = documentType, status = None, fileName = name, file = None),
           masterCreate = masterOrganizationKYCs.Service.create
         )
         withUsernameToken.Ok(Messages(constants.Response.FILE_UPLOAD_SUCCESSFUL.message))
       } catch {
-        case baseException: BaseException => InternalServerError(Messages(baseException.failure.message))
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
@@ -349,13 +349,13 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
           name = name,
           documentType = documentType,
           path = fileResourceManager.getOrganizationKycFilePath(documentType),
-          oldDocumentFileName = masterOrganizationKYCs.Service.getFileName(id = loginState.username, documentType = documentType),
-          document = master.OrganizationKYC(id = loginState.username, documentType = documentType, status = None, fileName = name, file = None),
+          oldDocumentFileName = masterOrganizationKYCs.Service.getFileName(id = masterOrganizations.Service.getID(loginState.username), documentType = documentType),
+          document = master.OrganizationKYC(id = masterOrganizations.Service.getID(loginState.username), documentType = documentType, status = None, fileName = name, file = None),
           updateOldDocument = masterOrganizationKYCs.Service.updateOldDocument
         )
         withUsernameToken.Ok(Messages(constants.Response.FILE_UPDATE_SUCCESSFUL.message))
       } catch {
-        case baseException: BaseException => InternalServerError(Messages(baseException.failure.message))
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
@@ -376,7 +376,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
       fileUploadInfo => {
         try {
           request.body.file("file") match {
-            case None => BadRequest(Messages(constants.Response.NO_FILE.message))
+            case None => BadRequest(views.html.index(failures = Seq(constants.Response.NO_FILE)))
             case Some(file) => utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, fileResourceManager.getTraderKycFilePath(documentType))
               Ok
           }
@@ -400,7 +400,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
         )
         withUsernameToken.Ok(Messages(constants.Response.FILE_UPLOAD_SUCCESSFUL.message))
       } catch {
-        case baseException: BaseException => InternalServerError(Messages(baseException.failure.message))
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
@@ -417,7 +417,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
         )
         withUsernameToken.Ok(Messages(constants.Response.FILE_UPDATE_SUCCESSFUL.message))
       } catch {
-        case baseException: BaseException => InternalServerError(Messages(baseException.failure.message))
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
@@ -500,7 +500,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
       fileUploadInfo => {
         try {
           request.body.file("file") match {
-            case None => BadRequest(Messages(constants.Response.NO_FILE.message))
+            case None => BadRequest(views.html.index(failures = Seq(constants.Response.NO_FILE)))
             case Some(file) => utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, fileResourceManager.getAccountFilePath(documentType))
               Ok
           }
@@ -524,7 +524,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
         )
         withUsernameToken.Ok(Messages(constants.Response.FILE_UPLOAD_SUCCESSFUL.message))
       } catch {
-        case baseException: BaseException => InternalServerError(Messages(baseException.failure.message))
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
@@ -541,7 +541,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
         )
         withUsernameToken.Ok(Messages(constants.Response.FILE_UPDATE_SUCCESSFUL.message))
       } catch {
-        case baseException: BaseException => InternalServerError(Messages(baseException.failure.message))
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
@@ -550,16 +550,15 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
       try {
         val path: String = loginState.userType match {
           case constants.User.ZONE => if (masterZoneKYCs.Service.checkFileNameExists(id = loginState.username, fileName = fileName)) fileResourceManager.getZoneKycFilePath(documentType) else throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION)
-          case constants.User.ORGANIZATION => if (masterOrganizationKYCs.Service.checkFileNameExists(id = loginState.username, fileName = fileName)) fileResourceManager.getOrganizationKycFilePath(documentType) else throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION)
+          case constants.User.ORGANIZATION => if (masterOrganizationKYCs.Service.checkFileNameExists(id = masterOrganizations.Service.getID(loginState.username), fileName = fileName)) fileResourceManager.getOrganizationKycFilePath(documentType) else throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION)
           case constants.User.TRADER => if (masterTraderKYCs.Service.checkFileNameExists(id = loginState.username, fileName = fileName)) fileResourceManager.getTraderKycFilePath(documentType) else throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION)
           case constants.User.USER => if (masterAccountKYCs.Service.checkFileNameExists(id = loginState.username, fileName = fileName)) fileResourceManager.getAccountKycFilePath(documentType) else throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION)
           case _ => if (masterAccountFiles.Service.checkFileNameExists(id = loginState.username, fileName = fileName)) fileResourceManager.getAccountFilePath(documentType) else throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION)
         }
         Ok.sendFile(utilities.FileOperations.fetchFile(path = path, fileName = fileName))
       } catch {
-        case baseException: BaseException => InternalServerError(Messages(baseException.failure.message))
-        case _: NoSuchFileException => InternalServerError(Messages(constants.Response.NO_SUCH_FILE_EXCEPTION.message))
-        case _: Exception => InternalServerError(Messages(constants.Response.GENERIC_EXCEPTION.message))
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+        case _: NoSuchFileException => InternalServerError(views.html.index(failures = Seq(constants.Response.NO_SUCH_FILE_EXCEPTION)))
       }
   }
 

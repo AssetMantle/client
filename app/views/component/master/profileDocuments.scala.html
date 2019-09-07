@@ -4,7 +4,27 @@
 @(documents: Seq[Document[_]])(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
 
 @for(document <- documents){
-    @component.master.commonDocument(document){
-        <a href="@routes.FileController.file(document.fileName, document.documentType)">@Messages(document.documentType)</a> <br>
-    }(Html(""))
+    @component.master.commonDocumentViewer(document){@routes.FileController.file(document.fileName, document.documentType)}{
+        <a href="@routes.FileController.file(document.fileName, document.documentType)">@Messages(document.documentType)</a>
+    }{ @loginState.userType match {
+        case constants.User.GENESIS => {}
+        case constants.User.ZONE => {
+            <div class="centerText">
+                <button onclick="getForm(jsRoutes.controllers.FileController.updateZoneKycForm('@document.documentType'))">@Messages(constants.Form.UPDATE)</button>
+            </div>
+        }
+        case constants.User.ORGANIZATION => {
+            <div class="centerText">
+                <button onclick="getForm(jsRoutes.controllers.FileController.updateOrganizationKycForm('@document.documentType'))">@Messages(constants.Form.UPDATE)</button>
+            </div>
+        }
+        case constants.User.TRADER => {
+            <div class="centerText">
+                <button onclick="getForm(jsRoutes.controllers.FileController.updateTraderKycForm('@document.documentType'))">@Messages(constants.Form.UPDATE)</button>
+            </div>
+        }
+        case constants.User.USER => {}
+        case constants.User.UNKNOWN => {}
+        case constants.User.WITHOUT_LOGIN => {}
+    }}
 }
