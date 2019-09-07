@@ -3,7 +3,14 @@ function getFileTypes(documentType) {
     switch (documentType) {
         case "BANK_DETAILS":
         case "IDENTIFICATION":
-            fileTypes = ['jpg', 'png', 'jpeg', 'pdf', 'doc', 'txt', 'docx'];
+        case "CONTRACT":
+        case "PACKING_LIST":
+        case "COO":
+        case "COA":
+        case "INVOICE":
+        case "OBL":
+        case "OTHER":
+                fileTypes = ['jpg', 'png', 'jpeg', 'pdf', 'doc', 'txt', 'docx'];
             break;
         case "PROFILE_PICTURE":
             fileTypes = ['jpg', 'png', 'jpeg'];
@@ -15,13 +22,12 @@ function getFileTypes(documentType) {
     return fileTypes
 }
 
-function uploadFile(uploadRoute, storeRoute, documentType, id ="") {
+function uploadFile(uploadRoute, storeRoute, documentType, id) {
     const rFile = new Resumable({
         target: uploadRoute(documentType).url,
         fileType: getFileTypes(documentType),
         query: {csrfToken: $('[name="csrfToken"]').attr('value')}
     });
-
     rFile.assignBrowse(document.getElementById('browseUploadButton'));
 
     rFile.assignDrop(document.getElementById('uploadSelector'));
@@ -48,6 +54,9 @@ function uploadFile(uploadRoute, storeRoute, documentType, id ="") {
                     $("#uploadCompletionMessage").show();
                     uploadCompletionMessage.textContent  = data;
                 },
+                206: function (data) {
+                    $("#commonModalContent").html(data);
+                },
                 400: function (error) {
                     $("#uploadCompletionMessage").show();
                     uploadCompletionMessage.textContent  = error.responseText;
@@ -67,7 +76,7 @@ function uploadFile(uploadRoute, storeRoute, documentType, id ="") {
 
 }
 
-function updateFile(uploadRoute, updateRoute, documentType, id = "") {
+function updateFile(uploadRoute, updateRoute, documentType, id) {
     const rFile = new Resumable({
         target: uploadRoute(documentType).url,
         fileType: getFileTypes(documentType),
@@ -99,6 +108,9 @@ function updateFile(uploadRoute, updateRoute, documentType, id = "") {
                 200: function (data) {
                     $("#updateCompletionMessage").show();
                     updateCompletionMessage.textContent  = data;
+                },
+                206: function (data) {
+                    $("#commonModalContent").html(data);
                 },
                 400: function (error) {
                     $("#updateCompletionMessage").show();

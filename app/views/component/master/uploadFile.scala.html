@@ -1,7 +1,7 @@
 @import helper._
 @import controllers.actions.LoginState
 
-@(uploadRoute: String, storeRoute: String, documentType: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+@(uploadRoute: String, storeRoute: String, documentType: String, id: String = "")(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
 @CSRF.formField
 <div id="uploadSelector">
@@ -28,4 +28,4 @@
 <script src="@routes.Assets.versioned("javascripts/resumable.js")" type="text/javascript"></script>
 <script src="@routes.Assets.versioned("javascripts/upload.js")" type="text/javascript"></script>
 <script src="@routes.Assets.versioned("javascripts/style/progressBar.js")" type="text/javascript"></script>
-<script>uploadFile(@uploadRoute, @storeRoute,'@documentType')</script>
+<script>uploadFile(@uploadRoute, @storeRoute,'@documentType', '@id')</script>

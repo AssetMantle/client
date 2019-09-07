@@ -20,6 +20,8 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
 
   private implicit val logger: Logger = Logger(this.getClass)
 
+  private implicit val module:String= constants.Module.CONTROLLERS_ADD_ORGANIZATION
+
   def addOrganizationForm(): Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.master.addOrganization(views.companion.master.AddOrganization.form))
   }

@@ -1,6 +1,7 @@
 package controllers
 
 import java.nio.file.{Files, NoSuchFileException}
+import java.util.Date
 
 import controllers.actions._
 import controllers.results.WithUsernameToken
@@ -8,6 +9,7 @@ import exceptions.BaseException
 import javax.inject._
 import models.{blockchain, master, masterTransaction}
 import play.api.i18n.{I18nSupport, Messages}
+import play.api.libs.json.Json
 import play.api.libs.ws.WSClient
 import play.api.mvc._
 import play.api.{Configuration, Logger}
@@ -73,11 +75,11 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
   }
 
   def uploadUserKycForm(documentType: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.uploadFileForm(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadUserKyc), utilities.String.getJsRouteFunction(routes.javascript.FileController.storeUserKyc), documentType))
+    Ok(views.html.component.master.uploadFile(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadUserKyc), utilities.String.getJsRouteFunction(routes.javascript.FileController.storeUserKyc), documentType))
   }
 
   def updateUserKycForm(documentType: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.updateFileForm(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadUserKyc), utilities.String.getJsRouteFunction(routes.javascript.FileController.updateUserKyc), documentType))
+    Ok(views.html.component.master.updateFile(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadUserKyc), utilities.String.getJsRouteFunction(routes.javascript.FileController.updateUserKyc), documentType))
   }
 
   def uploadUserKyc(documentType: String) = Action(parse.multipartFormData) { implicit request =>
@@ -134,11 +136,11 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
   }
 
   def uploadUserZoneKycForm(documentType: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.uploadFileForm(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadUserZoneKyc), utilities.String.getJsRouteFunction(routes.javascript.FileController.storeUserZoneKyc), documentType))
+    Ok(views.html.component.master.uploadFile(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadUserZoneKyc), utilities.String.getJsRouteFunction(routes.javascript.FileController.storeUserZoneKyc), documentType))
   }
 
   def updateUserZoneKycForm(documentType: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.updateFileForm(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadUserZoneKyc), utilities.String.getJsRouteFunction(routes.javascript.FileController.updateUserZoneKyc), documentType))
+    Ok(views.html.component.master.updateFile(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadUserZoneKyc), utilities.String.getJsRouteFunction(routes.javascript.FileController.updateUserZoneKyc), documentType))
   }
 
   def uploadUserZoneKyc(documentType: String) = Action(parse.multipartFormData) { implicit request =>
@@ -195,11 +197,11 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
   }
 
   def uploadUserOrganizationKycForm(documentType: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.uploadFileForm(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadUserOrganizationKyc), utilities.String.getJsRouteFunction(routes.javascript.FileController.storeUserOrganizationKyc), documentType))
+    Ok(views.html.component.master.uploadFile(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadUserOrganizationKyc), utilities.String.getJsRouteFunction(routes.javascript.FileController.storeUserOrganizationKyc), documentType))
   }
 
   def updateUserOrganizationKycForm(documentType: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.updateFileForm(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadUserOrganizationKyc), utilities.String.getJsRouteFunction(routes.javascript.FileController.updateUserOrganizationKyc), documentType))
+    Ok(views.html.component.master.updateFile(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadUserOrganizationKyc), utilities.String.getJsRouteFunction(routes.javascript.FileController.updateUserOrganizationKyc), documentType))
   }
 
   def uploadUserOrganizationKyc(documentType: String) = Action(parse.multipartFormData) { implicit request =>
@@ -256,11 +258,11 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
   }
 
   def uploadUserTraderKycForm(documentType: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.uploadFileForm(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadUserTraderKyc), utilities.String.getJsRouteFunction(routes.javascript.FileController.storeUserTraderKyc), documentType))
+    Ok(views.html.component.master.uploadFile(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadUserTraderKyc), utilities.String.getJsRouteFunction(routes.javascript.FileController.storeUserTraderKyc), documentType))
   }
 
   def updateUserTraderKycForm(documentType: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.updateFileForm(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadUserTraderKyc), utilities.String.getJsRouteFunction(routes.javascript.FileController.updateUserTraderKyc), documentType))
+    Ok(views.html.component.master.updateFile(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadUserTraderKyc), utilities.String.getJsRouteFunction(routes.javascript.FileController.updateUserTraderKyc), documentType))
   }
 
   def uploadUserTraderKyc(documentType: String) = Action(parse.multipartFormData) { implicit request =>
@@ -317,11 +319,11 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
   }
 
   def uploadZoneKycForm(documentType: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.uploadFileForm(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadZoneKyc), utilities.String.getJsRouteFunction(routes.javascript.FileController.storeZoneKyc), documentType))
+    Ok(views.html.component.master.uploadFile(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadZoneKyc), utilities.String.getJsRouteFunction(routes.javascript.FileController.storeZoneKyc), documentType))
   }
 
   def updateZoneKycForm(documentType: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.updateFileForm(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadZoneKyc), utilities.String.getJsRouteFunction(routes.javascript.FileController.updateZoneKyc), documentType))
+    Ok(views.html.component.master.updateFile(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadZoneKyc), utilities.String.getJsRouteFunction(routes.javascript.FileController.updateZoneKyc), documentType))
   }
 
   def uploadZoneKyc(documentType: String) = Action(parse.multipartFormData) { implicit request =>
@@ -378,11 +380,11 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
   }
 
   def uploadOrganizationKycForm(documentType: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.uploadFileForm(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadUserOrganizationKyc), utilities.String.getJsRouteFunction(routes.javascript.FileController.storeUserOrganizationKyc), documentType))
+    Ok(views.html.component.master.uploadFile(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadUserOrganizationKyc), utilities.String.getJsRouteFunction(routes.javascript.FileController.storeUserOrganizationKyc), documentType))
   }
 
   def updateOrganizationKycForm(documentType: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.updateFileForm(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadUserOrganizationKyc), utilities.String.getJsRouteFunction(routes.javascript.FileController.updateUserOrganizationKyc), documentType))
+    Ok(views.html.component.master.updateFile(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadUserOrganizationKyc), utilities.String.getJsRouteFunction(routes.javascript.FileController.updateUserOrganizationKyc), documentType))
   }
 
   def uploadOrganizationKyc(documentType: String) = Action(parse.multipartFormData) { implicit request =>
@@ -440,11 +442,11 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
 
 
   def uploadTraderKycForm(documentType: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.uploadFileForm(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadTraderKyc), utilities.String.getJsRouteFunction(routes.javascript.FileController.storeTraderKyc), documentType))
+    Ok(views.html.component.master.uploadFile(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadTraderKyc), utilities.String.getJsRouteFunction(routes.javascript.FileController.storeTraderKyc), documentType))
   }
 
   def updateTraderKycForm(documentType: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.updateFileForm(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadTraderKyc), utilities.String.getJsRouteFunction(routes.javascript.FileController.updateTraderKyc), documentType))
+    Ok(views.html.component.master.updateFile(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadTraderKyc), utilities.String.getJsRouteFunction(routes.javascript.FileController.updateTraderKyc), documentType))
   }
 
   def uploadTraderKyc(documentType: String) = Action(parse.multipartFormData) { implicit request =>
@@ -500,14 +502,12 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
       }
   }
 
-  ////----------------------------------------------
-
-  def uploadTraderAssetForm(documentType: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.uploadFileForm(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadTraderAsset), utilities.String.getJsRouteFunction(routes.javascript.FileController.storeTraderAsset), documentType))
+  def uploadTraderAssetForm(documentType: String, id: String): Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.uploadFile(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadTraderAsset), utilities.String.getJsRouteFunction(routes.javascript.FileController.storeTraderAsset), documentType, id))
   }
 
-  def updateTraderAssetForm(documentType: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.updateFileForm(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadTraderAsset), utilities.String.getJsRouteFunction(routes.javascript.FileController.updateTraderAsset), documentType))
+  def updateTraderAssetForm(documentType: String, id: String): Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.updateFile(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadTraderAsset), utilities.String.getJsRouteFunction(routes.javascript.FileController.updateTraderAsset), documentType, id))
   }
 
   def uploadTraderAsset(documentType: String) = Action(parse.multipartFormData) { implicit request =>
@@ -520,7 +520,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
           request.body.file("file") match {
             case None => BadRequest(Messages(constants.Response.NO_FILE.message))
             case Some(file) => utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, fileResourceManager.getTraderAssetFilePath(documentType))
-              PartialContent
+              Ok
           }
         }
         catch {
@@ -530,7 +530,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
     )
   }
 
-  def storeTraderAsset(name: String, documentType: String, id: String = ""): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def storeTraderAsset(name: String, documentType: String, id: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
         fileResourceManager.storeFile[masterTransaction.File](
@@ -540,13 +540,28 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
           document = masterTransaction.File(id = id, documentType = documentType, fileName = name, file = None, context = None, status = None),
           masterCreate = masterTransactionFiles.Service.createOrUpdateOldDocument
         )
-        withUsernameToken.Ok(Messages(constants.Response.FILE_UPLOAD_SUCCESSFUL.message))
+        documentType match {
+          case constants.File.OBL =>
+            val obl = Json.parse(masterTransactionFiles.Service.getOrEmpty(id, constants.File.OBL).context.getOrElse(Json.toJson(masterTransaction.FileTypeContext.OBL("", "", "", "", "", "",  new Date(0), "", 0, 0)).toString)).as[masterTransaction.FileTypeContext.OBL]
+            PartialContent(views.html.component.master.issueAssetOBL(views.companion.master.IssueAssetOBL.form.fill(views.companion.master.IssueAssetOBL.Data(id, obl.billOfLadingId, obl.portOfLoading, obl.shipperName, obl.shipperAddress, obl.notifyPartyName, obl.notifyPartyAddress, obl.dateOfShipping, obl.deliveryTerm, obl.weightOfConsignment, obl.declaredAssetValue))))
+
+          case constants.File.INVOICE =>
+            val invoice = Json.parse(masterTransactionFiles.Service.getOrEmpty(id, constants.File.INVOICE).context.getOrElse(Json.toJson(masterTransaction.FileTypeContext.Invoice("",  new Date(0))).toString)).as[masterTransaction.FileTypeContext.Invoice]
+            PartialContent(views.html.component.master.issueAssetInvoice(views.companion.master.IssueAssetInvoice.form.fill(views.companion.master.IssueAssetInvoice.Data(id, invoice.invoiceNumber, invoice.invoiceDate))))
+
+          case constants.File.CONTRACT => PartialContent(views.html.component.master.issueAssetDocument(id))
+          case constants.File.PACKING_LIST => PartialContent(views.html.component.master.issueAssetDocument(id))
+          case constants.File.COO => PartialContent(views.html.component.master.issueAssetDocument(id))
+          case constants.File.COA => PartialContent(views.html.component.master.issueAssetDocument(id))
+          case constants.File.OTHER => PartialContent(views.html.component.master.issueAssetDocument(id))
+          case _ => PartialContent(views.html.component.master.issueAssetDocument(id))
+        }
       } catch {
         case baseException: BaseException => InternalServerError(Messages(baseException.failure.message))
       }
   }
 
-  def updateTraderAsset(name: String, documentType: String, id: String = ""): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def updateTraderAsset(name: String, documentType: String, id: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
         fileResourceManager.updateFile[masterTransaction.File](
@@ -557,13 +572,26 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
           document = masterTransaction.File(id = id, documentType = documentType, fileName = name, file = None, context = None, status = None),
           updateOldDocument = masterTransactionFiles.Service.insertOrUpdateOldDocument
         )
-        withUsernameToken.Ok(Messages(constants.Response.FILE_UPDATE_SUCCESSFUL.message))
+        documentType match {
+          case constants.File.OBL =>
+            val obl = Json.parse(masterTransactionFiles.Service.getOrEmpty(id, constants.File.OBL).context.getOrElse(Json.toJson(masterTransaction.FileTypeContext.OBL("", "", "", "", "", "",  new Date(0), "", 0, 0)).toString)).as[masterTransaction.FileTypeContext.OBL]
+            PartialContent(views.html.component.master.issueAssetOBL(views.companion.master.IssueAssetOBL.form.fill(views.companion.master.IssueAssetOBL.Data(id, obl.billOfLadingId, obl.portOfLoading, obl.shipperName, obl.shipperAddress, obl.notifyPartyName, obl.notifyPartyAddress, obl.dateOfShipping, obl.deliveryTerm, obl.weightOfConsignment, obl.declaredAssetValue))))
+
+          case constants.File.INVOICE =>
+            val invoice = Json.parse(masterTransactionFiles.Service.getOrEmpty(id, constants.File.INVOICE).context.getOrElse(Json.toJson(masterTransaction.FileTypeContext.Invoice("",  new Date(0))).toString)).as[masterTransaction.FileTypeContext.Invoice]
+            PartialContent(views.html.component.master.issueAssetInvoice(views.companion.master.IssueAssetInvoice.form.fill(views.companion.master.IssueAssetInvoice.Data(id, invoice.invoiceNumber, invoice.invoiceDate))))
+
+          case constants.File.CONTRACT => PartialContent(views.html.component.master.issueAssetDocument(id))
+          case constants.File.PACKING_LIST => PartialContent(views.html.component.master.issueAssetDocument(id))
+          case constants.File.COO => PartialContent(views.html.component.master.issueAssetDocument(id))
+          case constants.File.COA => PartialContent(views.html.component.master.issueAssetDocument(id))
+          case constants.File.OTHER => PartialContent(views.html.component.master.issueAssetDocument(id))
+          case _ => PartialContent(views.html.component.master.issueAssetDocument(id))
+        }
       } catch {
         case baseException: BaseException => InternalServerError(Messages(baseException.failure.message))
       }
   }
-
-  //// --------------------------------------------------------------------
 
   def file(fileName: String, documentType: String): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
@@ -587,8 +615,8 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
     implicit request =>
       try {
         documentType match {
-          case constants.File.BANK_DETAILS => withUserLoginAction.Ok.sendFile(utilities.FileOperations.fetchFile(path = uploadZoneKycBankDetailsPath, fileName = fileName))
-          case constants.File.IDENTIFICATION => withUserLoginAction.Ok.sendFile(utilities.FileOperations.fetchFile(path = uploadZoneKycIdentificationPath, fileName = fileName))
+          case constants.File.BANK_DETAILS => Ok.sendFile(utilities.FileOperations.fetchFile(path = uploadZoneKycBankDetailsPath, fileName = fileName))
+          case constants.File.IDENTIFICATION => Ok.sendFile(utilities.FileOperations.fetchFile(path = uploadZoneKycIdentificationPath, fileName = fileName))
           case _ => Unauthorized
         }
       } catch {
@@ -602,8 +630,8 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
       try {
         if (masterOrganizations.Service.getByAccountID(accountID).zoneID == masterZones.Service.getZoneId(loginState.username)) {
           documentType match {
-            case constants.File.BANK_DETAILS => withUserLoginAction.Ok.sendFile(utilities.FileOperations.fetchFile(path = uploadOrganizationKycBankDetailsPath, fileName = fileName))
-            case constants.File.IDENTIFICATION => withUserLoginAction.Ok.sendFile(utilities.FileOperations.fetchFile(path = uploadOrganizationKycIdentificationPath, fileName = fileName))
+            case constants.File.BANK_DETAILS => Ok.sendFile(utilities.FileOperations.fetchFile(path = uploadOrganizationKycBankDetailsPath, fileName = fileName))
+            case constants.File.IDENTIFICATION => Ok.sendFile(utilities.FileOperations.fetchFile(path = uploadOrganizationKycIdentificationPath, fileName = fileName))
             case _ => Unauthorized
           }
         } else {
@@ -620,7 +648,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
       try {
         if (masterTraders.Service.getByAccountID(accountID).zoneID == masterZones.Service.getZoneId(loginState.username)) {
           documentType match {
-            case constants.File.IDENTIFICATION => withUserLoginAction.Ok.sendFile(utilities.FileOperations.fetchFile(path = uploadTraderKycIdentificationPath, fileName = fileName))
+            case constants.File.IDENTIFICATION => Ok.sendFile(utilities.FileOperations.fetchFile(path = uploadTraderKycIdentificationPath, fileName = fileName))
             case _ => Unauthorized
           }
         } else {
@@ -637,7 +665,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
       try {
         if (masterTraders.Service.getByAccountID(accountID).organizationID == masterOrganizations.Service.getByAccountID(loginState.username).id) {
           documentType match {
-            case constants.File.IDENTIFICATION => withUserLoginAction.Ok.sendFile(utilities.FileOperations.fetchFile(path = uploadTraderKycIdentificationPath, fileName = fileName))
+            case constants.File.IDENTIFICATION => Ok.sendFile(utilities.FileOperations.fetchFile(path = uploadTraderKycIdentificationPath, fileName = fileName))
             case _ => Unauthorized
           }
         } else {
@@ -650,11 +678,11 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
   }
 
   def uploadAccountFileForm(documentType: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.uploadFileForm(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadAccountFile), utilities.String.getJsRouteFunction(routes.javascript.FileController.storeAccountFile), documentType))
+    Ok(views.html.component.master.uploadFile(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadAccountFile), utilities.String.getJsRouteFunction(routes.javascript.FileController.storeAccountFile), documentType))
   }
 
   def updateAccountFileForm(documentType: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.updateFileForm(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadAccountFile), utilities.String.getJsRouteFunction(routes.javascript.FileController.updateAccountFile), documentType))
+    Ok(views.html.component.master.updateFile(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadAccountFile), utilities.String.getJsRouteFunction(routes.javascript.FileController.updateAccountFile), documentType))
   }
 
   def uploadAccountFile(documentType: String) = Action(parse.multipartFormData) { implicit request =>
@@ -687,7 +715,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
           document = master.AccountFile(id = loginState.username, documentType = documentType, fileName = name, file = None),
           masterCreate = masterAccountFiles.Service.create
         )
-        withUserLoginAction.Ok(Messages(constants.Response.FILE_UPLOAD_SUCCESSFUL.message))
+        Ok(Messages(constants.Response.FILE_UPLOAD_SUCCESSFUL.message))
       } catch {
         case baseException: BaseException => InternalServerError(Messages(baseException.failure.message))
       }
@@ -704,7 +732,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
           document = master.AccountFile(id = loginState.username, documentType = documentType, fileName = name, file = None),
           updateOldDocument = masterAccountFiles.Service.updateOldDocument
         )
-        withUserLoginAction.Ok(Messages(constants.Response.FILE_UPDATE_SUCCESSFUL.message))
+        Ok(Messages(constants.Response.FILE_UPDATE_SUCCESSFUL.message))
       } catch {
         case baseException: BaseException => InternalServerError(Messages(baseException.failure.message))
       }

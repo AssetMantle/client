@@ -108,7 +108,7 @@ class Files @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
   private def findByIdDocumentTypeOrEmpty(id: String, documentType: String): Future[File] = db.run(fileTable.filter(_.id === id).filter(_.documentType === documentType).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => File("", "", "", None, None, None)
+      case _: NoSuchElementException => File("", "", "", None, None, None)
     }
   }
 
@@ -153,7 +153,7 @@ class Files @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
     def id = column[String]("id", O.PrimaryKey)
 
-    def documentType = column[String]("type", O.PrimaryKey)
+    def documentType = column[String]("documentType", O.PrimaryKey)
 
     def fileName = column[String]("fileName")
 
@@ -176,7 +176,7 @@ class Files @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
     def insertOrUpdateOldDocument(file: File): Int = Await.result(upsertFile(File(id = file.id, documentType = file.documentType, fileName = file.fileName, file = file.file, context = None, status = None)), Duration.Inf)
 
-    def insertOrUpdateContext(file: File): String = Await.result(upsertFile(file), Duration.Inf).toString
+    def insertOrUpdateContext(file: File): String = Await.result(upsertContext(file), Duration.Inf).toString
 
     def getFileName(id: String, documentType: String): String = Await.result(getFileNameByIdDocumentType(id = id, documentType = documentType), Duration.Inf)
 

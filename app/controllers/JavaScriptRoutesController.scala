@@ -10,14 +10,14 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
   def javascriptRoutes = Action { implicit request =>
     Ok(
       JavaScriptReverseRouter("jsRoutes")(
-        routes.javascript.SignUpController.checkUsernameAvailable,
+        routes.javascript.AccountController.checkUsernameAvailable,
         routes.javascript.ConfigurationController.queryConfigurationVariable,
         routes.javascript.NotificationController.notificationPage,
         routes.javascript.NotificationController.unreadNotificationCount,
         routes.javascript.NotificationController.markNotificationRead,
         routes.javascript.LoginController.loginForm,
         routes.javascript.LogoutController.logoutForm,
-        routes.javascript.SignUpController.signUpForm,
+        routes.javascript.AccountController.signUpForm,
         routes.javascript.ContactController.updateContactForm,
         routes.javascript.VerifyMobileNumberController.verifyMobileNumberForm,
         routes.javascript.VerifyEmailAddressController.verifyEmailAddressForm,
@@ -38,7 +38,9 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.IssueAssetController.viewPendingIssueAssetRequests,
         routes.javascript.IssueAssetController.issueAssetForm,
         routes.javascript.IssueAssetController.rejectIssueAssetRequestForm,
-        routes.javascript.IssueAssetController.issueAssetRequestForm,
+        routes.javascript.IssueAssetController.issueAssetDetailForm,
+        routes.javascript.IssueAssetController.issueAssetOBLForm,
+        routes.javascript.IssueAssetController.issueAssetInvoiceForm,
         routes.javascript.IssueFiatController.viewPendingIssueFiatRequests,
         routes.javascript.IssueFiatController.issueFiatForm,
         routes.javascript.IssueFiatController.issueFiatRequestForm,
@@ -46,6 +48,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
 
         routes.javascript.ComponentViewController.commonHome,
         routes.javascript.ComponentViewController.genesisDetails,
+        routes.javascript.ComponentViewController.zoneDetails,
         routes.javascript.ComponentViewController.zoneDetails,
         routes.javascript.ComponentViewController.organizationDetails,
         routes.javascript.ComponentViewController.assetList,

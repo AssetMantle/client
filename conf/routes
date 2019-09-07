@@ -1,4 +1,12 @@
 GET         /                                                            controllers.IndexController.index
+
+GET         /assets/*file                                                controllers.Assets.versioned(path="/public", file: Asset)
+
+GET         /javascriptRoutes                                            controllers.JavaScriptRoutesController.javascriptRoutes
+
+GET         /firebase-messaging-sw.js                                    controllers.Assets.at(path="/public/javascripts", file="firebase-messaging-sw.js")
+
+
 GET         /genesisRequest                                              controllers.ViewController.genesisRequest
 GET         /genesisInformation                                          controllers.ViewController.genesisInformation
 GET         /zoneRequest                                                 controllers.ViewController.zoneRequest
@@ -17,14 +25,12 @@ GET         /account/forgotPasswordUsername                              control
 POST        /account/forgotPasswordUsername                              controllers.AccountController.emailOTPForgotPassword
 GET         /account/forgotPassword                                      controllers.AccountController.forgotPasswordForm(username: String)
 POST        /account/forgotPassword                                      controllers.AccountController.forgotPassword(username: String)
+GET         /account/checkUsernameAvailable                              controllers.AccountController.checkUsernameAvailable(username: String)
+GET         /account/signUp                                              controllers.AccountController.signUpForm
+POST        /account/signUp                                              controllers.AccountController.signUp
+
 
 GET         /contact                                                     controllers.ContactController.contact
-
-GET         /assets/*file                                                controllers.Assets.versioned(path="/public", file: Asset)
-
-GET         /firebase-messaging-sw.js                                    controllers.Assets.at(path="/public/javascripts", file="firebase-messaging-sw.js")
-
-GET         /javascriptRoutes                                            controllers.JavaScriptRoutesController.javascriptRoutes
 
 GET         /master/notifications                                        controllers.NotificationController.notificationPage(pageNumber:Int)
 GET         /master/unreadNotificationCount                              controllers.NotificationController.unreadNotificationCount()
@@ -32,7 +38,6 @@ GET         /master/markNotificationAsRead                               control
 
 GET         /master/queryConfigurationVariable:query                     controllers.ConfigurationController.queryConfigurationVariable(query: String)
 
-GET         /master/checkUsernameAvailable                               controllers.SignUpController.checkUsernameAvailable(username: String)
 
 GET         /master/component/commonHome                                 controllers.ComponentViewController.commonHome
 GET         /master/component/genesisDetails                             controllers.ComponentViewController.genesisDetails
@@ -120,17 +125,14 @@ GET         /traderUpload/storeFile                                      control
 GET         /traderUpdate                                                controllers.FileController.updateTraderKycForm(documentType: String)
 GET         /traderUpload/updateFile                                     controllers.FileController.updateTraderKyc(name: String, documentType: String, id: String)
 
-GET         /traderUpload/assetForm                                      controllers.FileController.uploadTraderAssetForm(documentType: String)
+GET         /traderUpload/assetForm                                      controllers.FileController.uploadTraderAssetForm(documentType: String, id: String)
 POST        /traderUpload/assetDocument                                  controllers.FileController.uploadTraderAsset(documentType: String)
 GET         /traderUpload/storeAssetDocument                             controllers.FileController.storeTraderAsset(name: String, documentType: String, id: String)
-GET         /traderUpdate/assetForm                                      controllers.FileController.updateTraderAssetForm(documentType: String)
+GET         /traderUpdate/assetForm                                      controllers.FileController.updateTraderAssetForm(documentType: String, id :String)
 GET         /traderUpdate/assetDocument                                  controllers.FileController.updateTraderAsset(name: String, documentType: String, id: String)
 
 GET         /master/logout                                               controllers.LogoutController.logoutForm
 POST        /master/logout                                               controllers.LogoutController.logout
-
-GET         /master/signUp                                               controllers.SignUpController.signUpForm
-POST        /master/signUp                                               controllers.SignUpController.signUp
 
 GET         /master/updateContact                                        controllers.ContactController.updateContactForm
 POST        /master/updateContact                                        controllers.ContactController.updateContact
@@ -207,8 +209,14 @@ POST        /master/confirmBuyerBid                                      control
 GET         /master/confirmSellerBid                                     controllers.ConfirmSellerBidController.confirmSellerBidForm(buyerAddress:String, pegHash: String, bid:Int)
 POST        /master/confirmSellerBid                                     controllers.ConfirmSellerBidController.confirmSellerBid
 
-GET         /master/issueAssetRequest                                    controllers.IssueAssetController.issueAssetRequestForm(id: Option[String])
-POST        /master/issueAssetRequest                                    controllers.IssueAssetController.issueAssetRequest
+GET         /master/issueAssetDetail                                     controllers.IssueAssetController.issueAssetDetailForm(id: Option[String])
+POST        /master/issueAssetDetail                                     controllers.IssueAssetController.issueAssetDetail
+
+GET         /master/issueAssetOBL                                        controllers.IssueAssetController.issueAssetOBLForm(id: String)
+POST        /master/issueAssetOBL                                        controllers.IssueAssetController.issueAssetOBL
+
+GET         /master/issueAssetInvoice                                    controllers.IssueAssetController.issueAssetInvoiceForm(id: String)
+POST        /master/issueAssetInvoice                                    controllers.IssueAssetController.issueAssetInvoice
 
 GET         /master/viewPendingIssueAssetRequests                        controllers.IssueAssetController.viewPendingIssueAssetRequests
 GET         /master/rejectIssueAssetRequest                              controllers.IssueAssetController.rejectIssueAssetRequestForm(requestID: String)
