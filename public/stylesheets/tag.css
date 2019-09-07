@@ -1,9 +1,9 @@
-
-html {
-    height: 100%;
+html{
+    height:100%;
 }
 body {
-    margin: auto;
+    height: 100%;
+    background:#f4f4f4;
 }
 h2{
     color: rgba(0, 0, 0, 0.87) !important;
@@ -15,6 +15,7 @@ input {
     padding: 10px;
     background: #e2e2e2;
 }
+
 
 input:focus {
     background-color: #ddd;
