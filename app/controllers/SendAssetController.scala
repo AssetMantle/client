@@ -18,7 +18,7 @@ class SendAssetController @Inject()(messagesControllerComponents: MessagesContro
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
-  private implicit val module:String= constants.Module.CONTROLLERS_SEND_ASSET
+  private implicit val module: String = constants.Module.CONTROLLERS_SEND_ASSET
 
   def sendAssetForm(buyerAddress: String, pegHash: String): Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.master.sendAsset(views.companion.master.SendAsset.form, buyerAddress, pegHash))

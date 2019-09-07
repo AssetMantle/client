@@ -20,7 +20,7 @@ class RedeemFiatController @Inject()(messagesControllerComponents: MessagesContr
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
-  private implicit val module:String= constants.Module.CONTROLLERS_REDEEM_FIAT
+  private implicit val module: String = constants.Module.CONTROLLERS_REDEEM_FIAT
 
   def redeemFiatForm(ownerAddress: String): Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.master.redeemFiat(master.RedeemFiat.form, blockchainACLAccounts.Service.get(ownerAddress).zoneID))
