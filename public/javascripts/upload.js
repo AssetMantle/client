@@ -117,6 +117,9 @@ function updateFile(uploadRoute, updateRoute, documentType) {
                     const newDocument = document.open("text/html", "replace");
                     newDocument.write(data.responseText);
                     newDocument.close();
+                },
+                206: function (data) {
+                    $('#commonModalContent').html(data);
                 }
             }
         });

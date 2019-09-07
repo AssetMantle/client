@@ -2,7 +2,7 @@
 @import helper._
 @import views.companion.master.OrganizationBankAccountDetail
 
-@(organizationBankAccountDetailForm: Form[OrganizationBankAccountDetail.Data], accountHolderName: String, nickName: String, accountNumber: String, bankName: String, swiftAddress: String, address: String, country: String, zipCode: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+@(organizationBankAccountDetailForm: Form[OrganizationBankAccountDetail.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
 @form(action = routes.AddOrganizationController.organizationBankAccountDetail, 'onkeypress -> "validateForm(event,this)") {
     <div class="latest_card-header latest_card-header-primary text-center">
@@ -10,14 +10,14 @@
     </div>
     <div class="latest_card-body">
         @CSRF.formField
-        @inputText(organizationBankAccountDetailForm(constants.FormField.ACCOUNT_HOLDER_NAME.name).copy(value = Some(accountHolderName)), '_label -> Messages(constants.FormField.ACCOUNT_HOLDER_NAME.name), 'class -> "form-control", 'required -> true)
-        @inputText(organizationBankAccountDetailForm(constants.FormField.NICK_NAME.name).copy(value = Some(nickName)), '_label -> Messages(constants.FormField.NICK_NAME.name), 'class -> "form-control", 'required -> true)
-        @inputText(organizationBankAccountDetailForm(constants.FormField.ACCOUNT_NUMBER.name).copy(value = Some(accountNumber)), '_label -> Messages(constants.FormField.ACCOUNT_NUMBER.name), 'class -> "form-control", 'required -> true)
-        @inputText(organizationBankAccountDetailForm(constants.FormField.BANK_NAME.name).copy(value = Some(bankName)), '_label -> Messages(constants.FormField.BANK_NAME.name), 'class -> "form-control", 'required -> true)
-        @inputText(organizationBankAccountDetailForm(constants.FormField.SWIFT_ADDRESS.name).copy(value = Some(swiftAddress)), '_label -> Messages(constants.FormField.SWIFT_ADDRESS.name), 'class -> "form-control", 'required -> true)
-        @inputText(organizationBankAccountDetailForm(constants.FormField.ADDRESS.name).copy(value = Some(address)), '_label -> Messages(constants.FormField.ADDRESS.name), 'class -> "form-control", 'required -> true)
-        @inputText(organizationBankAccountDetailForm(constants.FormField.COUNTRY.name).copy(value = Some(country)), '_label -> Messages(constants.FormField.COUNTRY.name), 'class -> "form-control", 'required -> true)
-        @inputText(organizationBankAccountDetailForm(constants.FormField.ZIP_CODE.name).copy(value = Some(zipCode)), '_label -> Messages(constants.FormField.ZIP_CODE.name), 'class -> "form-control", 'required -> true)
+        @inputText(organizationBankAccountDetailForm(constants.FormField.ACCOUNT_HOLDER_NAME.name), '_label -> Messages(constants.FormField.ACCOUNT_HOLDER_NAME.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.ACCOUNT_HOLDER_NAME.name), 'required -> true)
+        @inputText(organizationBankAccountDetailForm(constants.FormField.NICK_NAME.name), '_label -> Messages(constants.FormField.NICK_NAME.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.NICK_NAME.name), 'required -> true)
+        @inputText(organizationBankAccountDetailForm(constants.FormField.ACCOUNT_NUMBER.name), '_label -> Messages(constants.FormField.ACCOUNT_NUMBER.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.ACCOUNT_NUMBER.name), 'required -> true)
+        @inputText(organizationBankAccountDetailForm(constants.FormField.BANK_NAME.name), '_label -> Messages(constants.FormField.BANK_NAME.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.BANK_NAME.name), 'required -> true)
+        @inputText(organizationBankAccountDetailForm(constants.FormField.SWIFT_CODE.name), '_label -> Messages(constants.FormField.SWIFT_CODE.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.SWIFT_CODE.name), 'required -> true)
+        @inputText(organizationBankAccountDetailForm(constants.FormField.ADDRESS.name), '_label -> Messages(constants.FormField.ADDRESS.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.ADDRESS.name), 'required -> true)
+        @inputText(organizationBankAccountDetailForm(constants.FormField.COUNTRY.name), '_label -> Messages(constants.FormField.COUNTRY.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.COUNTRY.name), 'required -> true)
+        @inputText(organizationBankAccountDetailForm(constants.FormField.ZIP_CODE.name), '_label -> Messages(constants.FormField.ZIP_CODE.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.ZIP_CODE.name), 'required -> true)
 
         @if(organizationBankAccountDetailForm.hasGlobalErrors) {
             <ul>
@@ -26,6 +26,7 @@
             }
             </ul>
         }
+        <button type="button" class="btn-sm btn btn-primary" onclick="getForm(jsRoutes.controllers.AddOrganizationController.userUpdateUBOsForm())">@Messages(constants.Form.BACK)</button>
         <button type="button" class="btn-sm btn btn-primary" onclick="submitForm(this)">@Messages(constants.Form.NEXT)</button>
     </div>
 }

@@ -21,11 +21,8 @@
                         <p>@Messages(constants.User.USER_TYPE): <span id="userTypeValue">@loginState.userType </span></p>
                         <button onclick="getForm(jsRoutes.controllers.AccountController.changePasswordForm())">@Messages(constants.Form.CHANGE_PASSWORD)</button>
                     </div>
-
-
                     <p>@Messages(constants.Form.BLOCKCHAIN_ADDRESS)
                         : <span id="blockchainAddressValue"><span id="text_element" class="hash_code">@loginState.address</span> <span onclick="copyToClipboard('text_element')"> <i class="fa fa-clipboard"></i></span></span></p>
-
                     <div id="profileContact"></div>
                 </div>
             </div>

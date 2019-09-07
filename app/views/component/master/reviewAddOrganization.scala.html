@@ -1,0 +1,98 @@
+@import controllers.actions.LoginState
+@import helper._
+@import models.master.utils.Address
+@import models.master.{Organization, OrganizationBankAccountDetail, OrganizationKYC, Zone}
+@import views.companion.master.OrganizationAgreement
+
+@(organizationAgreementForm: Form[OrganizationAgreement.Data], organization: Organization, ubos: Seq[master.utils.UBO], registeredAddress: Address, postalAddress: Address, zone: Zone, organizationBankAccountDetail: OrganizationBankAccountDetail, organizationKYCs: Seq[OrganizationKYC])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+
+<div class="latest_card-header latest_card-header-primary text-center">
+    <h4 class="latest_card-title">@Messages(constants.Form.REVIEW)</h4>
+</div>
+<div class="latest_card-body">
+    @Messages(constants.Form.ORGANIZATION_DETAILS):
+    <div id="organization" class="flexItem thirdBox box lightBlue">
+        <div class="leftText">
+            <span class="red">@Messages(constants.Form.NAME)</span> : @zone.name <br>
+            <span class="red">@Messages(constants.Form.CURRENCY)</span> : @zone.currency <br>
+            <span class="red">@Messages(constants.Form.ORGANIZATION_ID)</span> : @organization.id <br>
+            <span class="red">@Messages(constants.Form.NAME)</span> : @organization.name <br>
+            <span class="red">@Messages(constants.Form.ABBREVIATION)</span>
+            : @organization.abbreviation.getOrElse("") <br>
+            <span class="red">@Messages(constants.Form.ESTABLISHMENT_DATE)</span> : @organization.establishmentDate <br>
+            <span class="red">@Messages(constants.Form.EMAIL)</span> : @organization.email <br>
+            <div>@Messages(constants.Form.REGISTERED_ADDRESS) : <br>
+                <span class="red">@Messages(constants.Form.ADDRESS_LINE_1)</span> : @registeredAddress.addressLine1 <br>
+                <span class="red">@Messages(constants.Form.ADDRESS_LINE_2)</span> : @registeredAddress.addressLine2 <br>
+                <span class="red">@Messages(constants.Form.LANDMARK)</span>
+                : @registeredAddress.landmark.getOrElse("") <br>
+                <span class="red">@Messages(constants.Form.CITY)</span> : @registeredAddress.city <br>
+                <span class="red">@Messages(constants.Form.COUNTRY)</span> : @registeredAddress.country <br>
+                <span class="red">@Messages(constants.Form.ZIP_CODE)</span> : @registeredAddress.zipCode <br>
+                <span class="red">@Messages(constants.Form.PHONE)</span> : @registeredAddress.phone <br>
+            </div>
+            <div>@Messages(constants.Form.POSTAL_ADDRESS) : <br>
+                <span class="red">@Messages(constants.Form.ADDRESS_LINE_1)</span> : @postalAddress.addressLine1 <br>
+                <span class="red">@Messages(constants.Form.ADDRESS_LINE_2)</span> : @postalAddress.addressLine2 <br>
+                <span class="red">@Messages(constants.Form.LANDMARK)</span> : @postalAddress.landmark.getOrElse("") <br>
+                <span class="red">@Messages(constants.Form.CITY)</span> : @postalAddress.city <br>
+                <span class="red">@Messages(constants.Form.COUNTRY)</span> : @postalAddress.country <br>
+                <span class="red">@Messages(constants.Form.ZIP_CODE)</span> : @postalAddress.zipCode <br>
+                <span class="red">@Messages(constants.Form.PHONE)</span> : @postalAddress.phone <br>
+            </div>
+        </div>
+    </div>
+
+    @Messages(constants.Form.ORGANIZATION_UBO_DETAIL):
+    <div id="organizationUBODetail" class="flexItem thirdBox box lightBlue">
+        <div class="leftText">
+            @for(ubo <- ubos){
+                <span class="red">@Messages(constants.Form.PERSON_NAME)</span>: @ubo.personName <br>
+                <span class="red">@Messages(constants.Form.SHARE_PERCENTAGE)</span> : @ubo.sharePercentage <br>
+                <span class="red">@Messages(constants.Form.RELATIONSHIP)</span>: @ubo.relationship <br>
+                <span class="red">@Messages(constants.Form.TITLE)</span> : @ubo.title <br>
+            }
+        </div>
+    </div>
+
+    @Messages(constants.Form.ORGANIZATION_BANK_ACCOUNT_DETAIL):
+    <div id="organizationBankAccountDetail" class="flexItem thirdBox box lightBlue">
+        <div class="leftText">
+            <span class="red">@Messages(constants.Form.ACCOUNT_HOLDER_NAME)</span>
+            : @organizationBankAccountDetail.accountHolder <br>
+            <span class="red">@Messages(constants.Form.NICK_NAME)</span> : @organizationBankAccountDetail.nickName <br>
+            <span class="red">@Messages(constants.Form.ACCOUNT_NUMBER)</span>
+            : @organizationBankAccountDetail.accountNumber <br>
+            <span class="red">@Messages(constants.Form.BANK_NAME)</span> : @organizationBankAccountDetail.bankName <br>
+            <span class="red">@Messages(constants.Form.SWIFT_CODE)</span>
+            : @organizationBankAccountDetail.swiftAddress <br>
+            <span class="red">@Messages(constants.Form.BANK_ADDRESS)</span>
+            : @organizationBankAccountDetail.swiftAddress <br>
+            <span class="red">@Messages(constants.Form.COUNTRY)</span> : @organizationBankAccountDetail.country <br>
+            <span class="red">@Messages(constants.Form.ZIP_CODE)</span> : @organizationBankAccountDetail.zipCode <br>
+        </div>
+    </div>
+
+    <div id="organizationKYCs">@Messages(constants.Form.ORGANIZATION_KYC_FILES):
+    @for(organizationKYC <- organizationKYCs) {
+        @component.master.commonDocumentViewer(organizationKYC) {
+            @routes.AddOrganizationController.userAccessedOrganizationKYCFile(organizationKYC.documentType)
+        } { } {<span>@organizationKYC.documentType</span>}
+    }
+    </div>
+
+    @form(action = routes.AddOrganizationController.reviewAddOrganization, 'onkeypress -> "validateForm(event,this)") {
+        @CSRF.formField
+        @Messages(constants.Form.ORGANIZATION_AGREEMENT):
+        <span>@checkbox(organizationAgreementForm(constants.Form.AGREEMENT), '_label -> Messages(constants.Form.AGREEMENT), 'class -> "form-control", 'placeholder -> Messages(constants.Form.AGREEMENT), 'required -> true)</span>
+        @if(organizationAgreementForm.hasGlobalErrors) {
+            <ul>
+            @for(error <- organizationAgreementForm.globalErrors) {
+                <li>@error.format</li>
+            }
+            </ul>
+        }
+        <button type="button" class="btn-sm btn btn-primary" onclick="getForm(jsRoutes.controllers.AddOrganizationController.userUploadUpdateOrganizationKYCView())">@Messages(constants.Form.BACK)</button>
+        <button type="button" class="btn-sm btn btn-primary" onclick="submitForm(this)">@Messages(constants.Form.SUBMIT)</button>
+    </div>
+}

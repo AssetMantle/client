@@ -1,7 +1,7 @@
 @import models.master.Contact
 @import controllers.actions.LoginState
 
-@(userContact: Option[Contact] = null)(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
+@(userContact: Option[Contact])(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
 
 @userContact match {
     case Some(contact) => {

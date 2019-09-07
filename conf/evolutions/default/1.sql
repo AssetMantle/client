@@ -465,17 +465,18 @@ CREATE TABLE IF NOT EXISTS MASTER."Zone"
 
 CREATE TABLE IF NOT EXISTS MASTER."Organization"
 (
-  "id"                VARCHAR   NOT NULL,
-  "zoneID"            VARCHAR   NOT NULL,
-  "accountID"         VARCHAR   NOT NULL UNIQUE,
-  "name"              VARCHAR   NOT NULL,
-  "abbreviation"      VARCHAR,
-  "establishmentDate" DATE NOT NULL,
-  "registeredAddress" VARCHAR   NOT NULL,
-  "postalAddress"     VARCHAR   NOT NULL,
-  "ubo"               VARCHAR,
-  "email"             VARCHAR   NOT NULL,
-  "status"            BOOLEAN,
+  "id"                 VARCHAR NOT NULL,
+  "zoneID"             VARCHAR NOT NULL,
+  "accountID"          VARCHAR NOT NULL UNIQUE,
+  "name"               VARCHAR NOT NULL,
+  "abbreviation"       VARCHAR,
+  "establishmentDate"  DATE    NOT NULL,
+  "email"              VARCHAR NOT NULL,
+  "registeredAddress"  VARCHAR NOT NULL,
+  "postalAddress"      VARCHAR NOT NULL,
+  "ubos"                VARCHAR,
+  "completionStatus"   BOOLEAN NOT NULL,
+  "verificationStatus" BOOLEAN,
   PRIMARY KEY ("id")
 );
 

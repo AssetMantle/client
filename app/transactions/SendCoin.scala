@@ -31,6 +31,12 @@ class SendCoin @Inject()(wsClient: WSClient)(implicit configuration: Configurati
 
   private val url = ip + ":" + port + "/" + path1
 
+  case class Amount(denom: String, amount: String)
+
+  case class BaseRequest(from: String, chain_id: String = chainID, gas: String)
+
+  case class Request(base_req: BaseRequest, password: String, to: String, amount: Seq[Amount], mode: String) extends BaseRequestEntity
+
   private implicit val baseRequestWrites: OWrites[BaseRequest] = Json.writes[BaseRequest]
 
   private implicit val amountWrites: OWrites[Amount] = Json.writes[Amount]
@@ -38,12 +44,6 @@ class SendCoin @Inject()(wsClient: WSClient)(implicit configuration: Configurati
   private implicit val requestWrites: OWrites[Request] = Json.writes[Request]
 
   private def action(request: Request): Future[WSResponse] = wsClient.url(url + request.to + path2).post(Json.toJson(request))
-
-  case class Amount(denom: String, amount: String)
-
-  case class BaseRequest(from: String, chain_id: String = chainID, gas: String)
-
-  case class Request(base_req: BaseRequest, password: String, to: String, amount: Seq[Amount], mode: String) extends BaseRequestEntity
 
   object Service {
     def post(request: Request): WSResponse = try {

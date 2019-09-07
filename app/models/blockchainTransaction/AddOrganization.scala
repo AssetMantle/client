@@ -156,7 +156,7 @@ class AddOrganizations @Inject()(actorSystem: ActorSystem, transaction: utilitie
         Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
         val addOrganization = Service.getTransaction(ticketID)
         blockchainOrganizations.Service.create(addOrganization.organizationID, addOrganization.to, dirtyBit = true)
-        masterOrganizations.Service.updateStatus(addOrganization.organizationID, status = true)
+        masterOrganizations.Service.verifyOrganization(addOrganization.organizationID)
         masterAccounts.Service.updateUserType(masterOrganizations.Service.getAccountId(addOrganization.organizationID), constants.User.ORGANIZATION)
         val organizationAccountId = masterAccounts.Service.getId(addOrganization.to)
         masterOrganizationKYCs.Service.verifyAll(organizationAccountId)

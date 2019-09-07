@@ -152,14 +152,19 @@ POST        /master/organizationRejectVerifyTraderRequest                control
 
 GET         /master/addOrganization                                      controllers.AddOrganizationController.addOrganizationForm
 POST        /master/addOrganization                                      controllers.AddOrganizationController.addOrganization
+GET         /master/userUpdateUBOs                                       controllers.AddOrganizationController.userUpdateUBOsForm
+POST        /master/userUpdateUBOs                                       controllers.AddOrganizationController.userUpdateUBOs
+GET         /master/organizationBankAccountDetail                        controllers.AddOrganizationController.organizationBankAccountDetailForm
 POST        /master/organizationBankAccountDetail                        controllers.AddOrganizationController.organizationBankAccountDetail
-POST        /master/reviewOrganizationKYC                                controllers.AddOrganizationController.reviewOrganizationKYC
-
-GET         /userUpload/organizationKyc                                  controllers.AddOrganizationController.uploadUserOrganizationKycForm(documentType: String)
-POST        /userUpload/userOrganizationKycDocument                      controllers.AddOrganizationController.uploadUserOrganizationKyc(documentType: String)
-GET         /userUpload/storeUserOrganizationKycDocument                 controllers.AddOrganizationController.storeUserOrganizationKyc(name: String, documentType: String)
-GET         /userUpdate/organizationKyc                                  controllers.AddOrganizationController.updateUserOrganizationKycForm(documentType: String)
-GET         /userUpload/updateUserOrganizationKycDocument                controllers.AddOrganizationController.updateUserOrganizationKyc(name: String, documentType: String)
+GET         /master/userUploadOrUpdateOrganizationKYCView                controllers.AddOrganizationController.userUploadOrUpdateOrganizationKYCView
+GET         /master/userUploadOrganizationKYC                            controllers.AddOrganizationController.userUploadOrganizationKycForm(documentType: String)
+POST        /master/userUploadOrganizationKYCDocument                    controllers.AddOrganizationController.userUploadOrganizationKyc(documentType: String)
+GET         /master/storeUserOrganizationKYCDocument                     controllers.AddOrganizationController.userStoreOrganizationKyc(name: String, documentType: String)
+GET         /master/userUpdateOrganizationKYC                            controllers.AddOrganizationController.userUpdateOrganizationKycForm(documentType: String)
+GET         /master/userUpdateOrganizationKYCDocument                    controllers.AddOrganizationController.userUpdateOrganizationKyc(name: String, documentType: String)
+GET         /master/userAccessedOrganizationKYCFile                      controllers.AddOrganizationController.userAccessedOrganizationKYCFile(documentType: String)
+GET         /master/reviewOrganizationKYC                                controllers.AddOrganizationController.reviewAddOrganizationForm
+POST        /master/reviewOrganizationKYC                                controllers.AddOrganizationController.reviewAddOrganization
 
 GET         /master/addZone                                              controllers.AddZoneController.addZoneForm
 POST        /master/addZone                                              controllers.AddZoneController.addZone

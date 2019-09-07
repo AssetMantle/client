@@ -9,5 +9,7 @@ object VerifyMobileNumber {
       constants.FormField.OTP.name -> constants.FormField.OTP.field
     )(Data.apply)(Data.unapply)
   )
+
   case class Data(otp: String)
+
 }

@@ -64,9 +64,11 @@ class Transaction @Inject()(getTxHashResponse: GetTxHashResponse, getResponse: G
         }
         if (blockResponse.code.isEmpty) onSuccess(ticketID, blockResponse) else onFailure(ticketID, blockResponse.code.get.toString)
       } catch {
-        case blockChainException: BlockChainException => logger.error(blockChainException.failure.message, blockChainException)
-          if (blockChainException.failure.message != """RESPONSE.FAILURE.{"response":"Request in process, wait and try after some time"}""" || !blockChainException.failure.message.matches("""RESPONSE.FAILURE...error...Tx. response error. RPC error -32603 - Internal error: Tx .\w+. not found..""")) {
+        case blockChainException: BlockChainException =>
+          if (!blockChainException.failure.message.matches("""RESPONSE.FAILURE.Tx. response error. RPC error -32603 - Internal error. Tx .\w+. not found""")) {
             onFailure(ticketID, blockChainException.failure.message)
+          } else {
+            logger.error(blockChainException.failure.message, blockChainException)
           }
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }

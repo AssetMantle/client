@@ -32,7 +32,7 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
             withUsernameToken.Ok(views.html.component.master.commonHome(blockchainAccounts.Service.getCoins(loginState.address), masterAccountFiles.Service.getProfilePicture(loginState.username)))
         }
       } catch {
-        case _: BaseException => NoContent
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 

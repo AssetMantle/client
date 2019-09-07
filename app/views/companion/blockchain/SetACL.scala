@@ -7,7 +7,7 @@ object SetACL {
   val form = Form(
     mapping(
       constants.FormField.FROM.name -> constants.FormField.FROM.field,
-      constants.FormField.NON_EMPTY_PASSWORD.name -> constants.FormField.NON_EMPTY_PASSWORD.field,
+      constants.FormField.PASSWORD.name -> constants.FormField.PASSWORD.field,
       constants.FormField.ACL_ADDRESS.name -> constants.FormField.ACL_ADDRESS.field,
       constants.FormField.ORGANIZATION_ID.name -> constants.FormField.ORGANIZATION_ID.field,
       constants.FormField.ZONE_ID.name -> constants.FormField.ZONE_ID.field,

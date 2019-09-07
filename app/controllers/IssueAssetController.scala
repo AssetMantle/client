@@ -18,6 +18,8 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
 
   private implicit val logger: Logger = Logger(this.getClass)
 
+  private implicit val module: String = constants.Module.CONTROLLERS_ISSUE_ASSET
+
   def issueAssetRequestForm: Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.master.issueAssetRequest(views.companion.master.IssueAssetRequest.form))
   }
@@ -32,9 +34,9 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
           try {
             if (!issueAssetRequestData.moderated) {
               transaction.process[blockchainTransaction.IssueAsset, transactionsIssueAsset.Request](
-                entity = blockchainTransaction.IssueAsset(from = loginState.address, to = loginState.address, documentHash = issueAssetRequestData.documentHash, assetType = issueAssetRequestData.assetType, assetPrice = issueAssetRequestData.assetPrice, quantityUnit = issueAssetRequestData.quantityUnit, assetQuantity = issueAssetRequestData.assetQuantity, moderated = issueAssetRequestData.moderated, gas = issueAssetRequestData.gas, takerAddress = if (issueAssetRequestData.takerAddress == "") None else Option(issueAssetRequestData.takerAddress), ticketID = "", mode = transactionMode),
+                entity = blockchainTransaction.IssueAsset(from = loginState.address, to = loginState.address, documentHash = issueAssetRequestData.documentHash, assetType = issueAssetRequestData.assetType, assetPrice = issueAssetRequestData.assetPrice, quantityUnit = issueAssetRequestData.quantityUnit, assetQuantity = issueAssetRequestData.assetQuantity, moderated = issueAssetRequestData.moderated, takerAddress = if (issueAssetRequestData.takerAddress == "") None else Option(issueAssetRequestData.takerAddress), gas = issueAssetRequestData.gas.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)), ticketID = "", mode = transactionMode),
                 blockchainTransactionCreate = blockchainTransactionIssueAssets.Service.create,
-                request = transactionsIssueAsset.Request(transactionsIssueAsset.BaseRequest(from = loginState.address, gas = issueAssetRequestData.gas.toString), to = loginState.address, password = issueAssetRequestData.password, documentHash = issueAssetRequestData.documentHash, assetType = issueAssetRequestData.assetType, assetPrice = issueAssetRequestData.assetPrice.toString, quantityUnit = issueAssetRequestData.quantityUnit, assetQuantity = issueAssetRequestData.assetQuantity.toString, moderated = issueAssetRequestData.moderated, takerAddress = issueAssetRequestData.takerAddress, mode = transactionMode),
+                request = transactionsIssueAsset.Request(transactionsIssueAsset.BaseRequest(from = loginState.address, gas = issueAssetRequestData.gas.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)).toString), to = loginState.address, password = issueAssetRequestData.password.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)), documentHash = issueAssetRequestData.documentHash, assetType = issueAssetRequestData.assetType, assetPrice = issueAssetRequestData.assetPrice.toString, quantityUnit = issueAssetRequestData.quantityUnit, assetQuantity = issueAssetRequestData.assetQuantity.toString, moderated = issueAssetRequestData.moderated, takerAddress = issueAssetRequestData.takerAddress, mode = transactionMode),
                 action = transactionsIssueAsset.Service.post,
                 onSuccess = blockchainTransactionIssueAssets.Utility.onSuccess,
                 onFailure = blockchainTransactionIssueAssets.Utility.onFailure,

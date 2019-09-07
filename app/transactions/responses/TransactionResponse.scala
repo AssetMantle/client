@@ -17,9 +17,9 @@ object TransactionResponse {
 
   implicit val asyncResponseReads: Reads[AsyncResponse] = Json.reads[AsyncResponse]
 
-  case class BlockModeErrorResponse(error: String) extends BaseResponse
+  case class ErrorResponse(error: String) extends BaseResponse
 
-  implicit val blockModeErrorResponseReads: Reads[BlockModeErrorResponse] = Json.reads[BlockModeErrorResponse]
+  implicit val ErrorResponseReads: Reads[ErrorResponse] = Json.reads[ErrorResponse]
 
   case class KafkaResponse(ticketID: String) extends BaseResponse
 

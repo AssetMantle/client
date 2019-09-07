@@ -26,7 +26,17 @@ class FileResourceManager @Inject()()(implicit exec: ExecutionContext, configura
 
   private val uploadOrganizationKYCBankAccountDetailPath = configuration.get[String]("upload.organization.bankAccountDetailPath")
 
-  private val uploadOrganizationKycIdentificationPath = configuration.get[String]("upload.organization.identificationPath")
+  private val uploadOrganizationKycAdminProfileIdentificationPath = configuration.get[String]("upload.organization.adminProfileIdentificationPath")
+
+  private val uploadOrganizationKycLatestAuditedFinancialReportPath = configuration.get[String]("upload.organization.latestAuditedFinancialReportPath")
+
+  private val uploadOrganizationKYCLastYearAuditedFinancialReportPath = configuration.get[String]("upload.organization.lastYearAuditedFinancialReportPath")
+
+  private val uploadOrganizationKycManagementPath = configuration.get[String]("upload.organization.managementPath")
+
+  private val uploadOrganizationKYCACRAPath = configuration.get[String]("upload.organization.ACRAPath")
+
+  private val uploadOrganizationKycShareStructurePath = configuration.get[String]("upload.organization.shareStructurePath")
 
   private val uploadTraderKycIdentificationPath = configuration.get[String]("upload.trader.identificationPath")
 
@@ -49,12 +59,12 @@ class FileResourceManager @Inject()()(implicit exec: ExecutionContext, configura
   def getOrganizationKycFilePath(documentType: String): String = {
     documentType match {
       case constants.File.BANK_ACCOUNT_DETAIL => uploadOrganizationKYCBankAccountDetailPath
-      case constants.File.IDENTIFICATION => uploadOrganizationKycIdentificationPath
-      case constants.File.LATEST_AUDITED_FINANCIAL_REPORT => uploadOrganizationKYCBankAccountDetailPath
-      case constants.File.LAST_YEAR_AUDITED_FINANCIAL_REPORT => uploadOrganizationKycIdentificationPath
-      case constants.File.MANAGEMENT => uploadOrganizationKYCBankAccountDetailPath
-      case constants.File.ACRA => uploadOrganizationKycIdentificationPath
-      case constants.File.SHARE_STRUCTURE => uploadOrganizationKycIdentificationPath
+      case constants.File.ADMIN_PROFILE_IDENTIFICATION => uploadOrganizationKycAdminProfileIdentificationPath
+      case constants.File.LATEST_AUDITED_FINANCIAL_REPORT => uploadOrganizationKycLatestAuditedFinancialReportPath
+      case constants.File.LAST_YEAR_AUDITED_FINANCIAL_REPORT => uploadOrganizationKYCLastYearAuditedFinancialReportPath
+      case constants.File.MANAGEMENT => uploadOrganizationKycManagementPath
+      case constants.File.ACRA => uploadOrganizationKYCACRAPath
+      case constants.File.SHARE_STRUCTURE => uploadOrganizationKycShareStructurePath
       case _ => constants.File.UNKNOWN_TYPE
     }
   }

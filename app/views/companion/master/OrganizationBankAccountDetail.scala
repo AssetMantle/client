@@ -11,12 +11,13 @@ object OrganizationBankAccountDetail {
       constants.FormField.NICK_NAME.name -> constants.FormField.NICK_NAME.field,
       constants.FormField.ACCOUNT_NUMBER.name -> constants.FormField.ACCOUNT_NUMBER.field,
       constants.FormField.BANK_NAME.name -> constants.FormField.BANK_NAME.field,
-      constants.FormField.SWIFT_ADDRESS.name -> constants.FormField.SWIFT_ADDRESS.field,
+      constants.FormField.SWIFT_CODE.name -> constants.FormField.SWIFT_CODE.field,
       constants.FormField.ADDRESS.name -> constants.FormField.ADDRESS.field,
       constants.FormField.COUNTRY.name -> constants.FormField.COUNTRY.field,
       constants.FormField.ZIP_CODE.name -> constants.FormField.ZIP_CODE.field
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(accountHolder: String, nickName: String, bankAccountNumber: String, bankName: String, swiftAddress: String, address: String, country: String, zipCode: String)
+  case class Data(accountHolder: String, nickName: String, accountNumber: String, bankName: String, swiftAddress: String, address: String, country: String, zipCode: String)
+
 }

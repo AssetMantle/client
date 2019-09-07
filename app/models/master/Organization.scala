@@ -7,13 +7,14 @@ import javax.inject.{Inject, Singleton}
 import org.postgresql.util.PSQLException
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
+import play.api.libs.json.Json
 import slick.jdbc.JdbcProfile
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Random, Success}
 
-case class Organization(id: String, zoneID: String, accountID: String, name: String, abbreviation: Option[String] = None, establishmentDate: Date, registeredAddress: String, postalAddress: String, email: String, ubo: Option[String] = None, status: Option[Boolean] = None)
+case class Organization(id: String, zoneID: String, accountID: String, name: String, abbreviation: Option[String] = None, establishmentDate: Date, email: String, registeredAddress: String, postalAddress: String, ubos: Option[String] = None, completionStatus: Boolean = false, verificationStatus: Option[Boolean] = None)
 
 @Singleton
 class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
@@ -78,7 +79,7 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
     }
   }
 
-  private def getStatusById(id: String): Future[Option[Boolean]] = db.run(organizationTable.filter(_.id === id).map(_.status.?).result.head.asTry).map {
+  private def getVerificationStatusById(id: String): Future[Option[Boolean]] = db.run(organizationTable.filter(_.id === id).map(_.verificationStatus.?).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -96,11 +97,39 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
     }
   }
 
-  private def getOrganizationsWithNullStatusByZoneID(zoneID: String): Future[Seq[Organization]] = db.run(organizationTable.filter(_.zoneID === zoneID).filter(_.status.?.isEmpty).result)
+  private def getOrganizationsWithNullVerificationStatusByZoneID(zoneID: String): Future[Seq[Organization]] = db.run(organizationTable.filter(_.zoneID === zoneID).filter(_.verificationStatus.?.isEmpty).result)
 
-  private def getOrganizationsByZoneID(zoneID: String): Future[Seq[Organization]] = db.run(organizationTable.filter(_.zoneID === zoneID).filter(_.status===true).result)
+  private def getOrganizationsByZoneID(zoneID: String): Future[Seq[Organization]] = db.run(organizationTable.filter(_.zoneID === zoneID).filter(_.verificationStatus.? === Option(true)).result)
 
-  private def updateStatusOnID(id: String, status: Boolean) = db.run(organizationTable.filter(_.id === id).map(_.status.?).update(Option(status)).asTry).map {
+  private def updateVerificationStatusOnID(id: String, verificationStatus: Option[Boolean]) = db.run(organizationTable.filter(_.id === id).map(_.verificationStatus.?).update(verificationStatus).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def updateCompletionStatusOnID(id: String, completionStatus: Boolean) = db.run(organizationTable.filter(_.id === id).map(_.completionStatus).update(completionStatus).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def getUBOsOnID(id: String) = db.run(organizationTable.filter(_.id === id).map(_.ubos.?).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => logger.info(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        None
+    }
+  }
+
+  private def updateUBOsOnID(id: String, ubo: Option[String]) = db.run(organizationTable.filter(_.id === id).map(_.ubos.?).update(ubo).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -112,7 +141,7 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
 
   private[models] class OrganizationTable(tag: Tag) extends Table[Organization](tag, "Organization") {
 
-    def * = (id, zoneID, accountID, name, abbreviation.?, establishmentDate, registeredAddress, postalAddress, email, ubo.?, status.?) <> (Organization.tupled, Organization.unapply)
+    def * = (id, zoneID, accountID, name, abbreviation.?, establishmentDate, email, registeredAddress, postalAddress, ubos.?, completionStatus, verificationStatus.?) <> (Organization.tupled, Organization.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
@@ -126,23 +155,25 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
 
     def establishmentDate = column[Date]("establishmentDate")
 
+    def email = column[String]("email")
+
     def registeredAddress = column[String]("registeredAddress")
 
     def postalAddress = column[String]("postalAddress")
 
-    def email = column[String]("email")
+    def ubos = column[String]("ubos")
 
-    def ubo = column[String]("ubo")
+    def completionStatus = column[Boolean]("completionStatus")
 
-    def status = column[Boolean]("status")
+    def verificationStatus = column[Boolean]("verificationStatus")
 
   }
 
   object Service {
 
-    def create(zoneID: String, accountID: String, name: String, abbreviation: Option[String], establishmentDate: Date, registeredAddress: String, postalAddress: String, email: String, ubo: Option[String]): String = Await.result(add(Organization(id = (-Math.abs(Random.nextInt)).toHexString.toUpperCase, zoneID = zoneID, accountID = accountID, name = name, abbreviation = abbreviation, establishmentDate = establishmentDate, registeredAddress = registeredAddress, postalAddress = postalAddress, email = email, ubo = ubo)), Duration.Inf)
+    def create(zoneID: String, accountID: String, name: String, abbreviation: Option[String], establishmentDate: Date, email: String, registeredAddress: String, postalAddress: String, ubos: Option[String]): String = Await.result(add(Organization(id = (-Math.abs(Random.nextInt)).toHexString.toUpperCase, zoneID = zoneID, accountID = accountID, name = name, abbreviation = abbreviation, establishmentDate = establishmentDate, registeredAddress = registeredAddress, postalAddress = postalAddress, email = email, ubos = ubos)), Duration.Inf)
 
-    def insertOrUpdate(zoneID: String, accountID: String, name: String, abbreviation: Option[String], establishmentDate: Date, registeredAddress: String, postalAddress: String, email: String, ubo: Option[String]): String = {
+    def insertOrUpdateOrganizationDetails(zoneID: String, accountID: String, name: String, abbreviation: Option[String], establishmentDate: Date, email: String, registeredAddress: String, postalAddress: String): String = {
       val id = try{
         getID(accountID)
       } catch {
@@ -152,7 +183,7 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
           throw new BaseException(baseException.failure)
         }
       }
-      Await.result(upsert(Organization(id = id, zoneID = zoneID, accountID = accountID, name = name, abbreviation = abbreviation, establishmentDate = establishmentDate, registeredAddress = registeredAddress, postalAddress = postalAddress, email = email, ubo = ubo)), Duration.Inf)
+      Await.result(upsert(Organization(id = id, zoneID = zoneID, accountID = accountID, name = name, abbreviation = abbreviation, establishmentDate = establishmentDate, registeredAddress = registeredAddress, postalAddress = postalAddress, email = email, ubos = Option(Json.toJson(getUBOs(id)).toString))), Duration.Inf)
       id
     }
 
@@ -162,15 +193,32 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
 
     def getID(accountID: String): String = Await.result(getIDByAccountID(accountID), Duration.Inf)
 
-    def updateStatus(id: String, status: Boolean): Int = Await.result(updateStatusOnID(id, status), Duration.Inf)
+    def rejectOrganization(id: String): Int = Await.result(updateVerificationStatusOnID(id, Option(false)), Duration.Inf)
+
+    def verifyOrganization(id: String): Int = Await.result(updateVerificationStatusOnID(id, Option(true)), Duration.Inf)
 
     def getAccountId(id: String): String = Await.result(getAccountIdById(id), Duration.Inf)
 
-    def getVerifyOrganizationRequests(zoneID: String): Seq[Organization] = Await.result(getOrganizationsWithNullStatusByZoneID(zoneID), Duration.Inf)
+    def getVerifyOrganizationRequests(zoneID: String): Seq[Organization] = Await.result(getOrganizationsWithNullVerificationStatusByZoneID(zoneID), Duration.Inf)
 
     def getOrganizationsInZone(zoneID: String): Seq[Organization] = Await.result(getOrganizationsByZoneID(zoneID), Duration.Inf)
 
-    def getStatus(id: String): Option[Boolean] = Await.result(getStatusById(id), Duration.Inf)
+    def getVerificationStatus(id: String): Option[Boolean] = Await.result(getVerificationStatusById(id), Duration.Inf)
+
+    def markOrganizationFormCompleted(id: String): Int = Await.result(updateCompletionStatusOnID(id = id, completionStatus = true), Duration.Inf)
+
+    def getUBOs(id: String): utils.UBOs = {
+      try {
+        val a = utilities.JSON.getInstance[utils.UBOs](Await.result(getUBOsOnID(id), Duration.Inf).getOrElse(""))
+        a
+      } catch {
+        case _: BaseException => utils.UBOs(Seq())
+      }
+    }
+
+    def updateUBOs(id: String, ubos: Seq[utils.UBO]): Int = Await.result(updateUBOsOnID(id, Option(Json.toJson(utils.UBOs(ubos)).toString())), Duration.Inf)
+
+    def updateUBO(id: String, ubo: utils.UBO): Int = Await.result(updateUBOsOnID(id, Option(Json.toJson(utils.UBOs(getUBOs(id).ubos :+ ubo)).toString())), Duration.Inf)
 
   }
 

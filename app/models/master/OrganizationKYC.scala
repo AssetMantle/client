@@ -87,6 +87,8 @@ class OrganizationKYCs @Inject()(protected val databaseConfigProvider: DatabaseC
 
   private def getAllDocumentsById(id: String): Future[Seq[OrganizationKYC]] = db.run(organizationKYCTable.filter(_.id === id).result)
 
+  private def getAllDocumentTypeById(id: String): Future[Seq[String]] = db.run(organizationKYCTable.filter(_.id === id).map(_.documentType).result)
+
   private def deleteById(id: String) = db.run(organizationKYCTable.filter(_.id === id).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -142,6 +144,8 @@ class OrganizationKYCs @Inject()(protected val databaseConfigProvider: DatabaseC
     def checkFileExists(id: String, documentType: String): Boolean = Await.result(checkByIdAndDocumentType(id = id, documentType = documentType), Duration.Inf)
 
     def checkFileNameExists(id: String, fileName: String): Boolean = Await.result(checkByIdAndFileName(id = id, fileName = fileName), Duration.Inf)
+
+    def checkAllKYCFileTypesExists(id: String): Boolean = constants.File.ORGANIZATION_KYC_DOCUMENT_TYPES.forall(Await.result(getAllDocumentTypeById(id), Duration.Inf).contains)
 
   }
 
