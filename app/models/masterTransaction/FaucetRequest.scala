@@ -9,7 +9,7 @@ import slick.jdbc.JdbcProfile
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
-import scala.util.{Failure, Random, Success}
+import scala.util.{Failure, Success}
 
 case class FaucetRequest(id: String, ticketID: Option[String] = None, accountID: String, amount: Int, gas: Option[Int] = None, status: Option[Boolean] = None, comment: Option[String] = None)
 
@@ -108,7 +108,7 @@ class FaucetRequests @Inject()(protected val databaseConfigProvider: DatabaseCon
 
   object Service {
 
-    def create(accountID: String, amount: Int): String = Await.result(add(FaucetRequest(id  = utilities.IDGenerator.requestID(), accountID = accountID, amount = amount)), Duration.Inf)
+    def create(accountID: String, amount: Int): String = Await.result(add(FaucetRequest(id  = utilities.IDGenerator.requestID, accountID = accountID, amount = amount)), Duration.Inf)
 
     def accept(requestID: String, gas: Int, ticketID: String): Int = Await.result(updateTicketIDGasAndStatusByID(id = requestID, ticketID = ticketID, gas =  Option(gas), status = Option(true)), Duration.Inf)
 

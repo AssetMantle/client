@@ -107,7 +107,7 @@
                 </span>
 
             </div>
-            @inputText(setACLForm(constants.Form.GAS), '_label -> Messages(constants.Form.GAS), 'class -> "form-control", 'placeholder -> Messages(constants.Form.GAS), 'required -> true)
+            @inputText(setACLForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.GAS.name), 'required -> true)
             @inputPassword(setACLForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.PASSWORD.name), 'required -> true)
 
             @if(setACLForm.hasGlobalErrors) {

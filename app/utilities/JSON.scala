@@ -13,8 +13,6 @@ import transactions.responses.TransactionResponse.ErrorResponse
 
 object JSON {
 
-  implicit val ErrorResponseReads: Reads[ErrorResponse] = Json.reads[ErrorResponse]
-
   def getResponseFromJson[T <: BaseResponse](response: WSResponse)(implicit logger: Logger, reads: Reads[T]): T = {
     try {
       Json.fromJson[T](response.json) match {

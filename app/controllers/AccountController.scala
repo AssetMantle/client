@@ -20,7 +20,7 @@ import scala.concurrent.ExecutionContext
 @Singleton
 class AccountController @Inject()(messagesControllerComponents: MessagesControllerComponents, transactionAddKey: transactions.AddKey, transactionForgotPassword: transactions.ForgotPassword, email: Email, masterTransactionEmailOTP: masterTransaction.EmailOTPs, transactionsChangePassword: ChangePassword, withLoginAction: WithLoginAction, masterAccounts: master.Accounts, blockchainAclAccounts: ACLAccounts, blockchainZones: blockchain.Zones, blockchainOrganizations: blockchain.Organizations, blockchainAssets: blockchain.Assets, blockchainFiats: blockchain.Fiats, blockchainNegotiations: blockchain.Negotiations, masterOrganizations: master.Organizations, masterZones: master.Zones, blockchainAclHashes: blockchain.ACLHashes, blockchainOrders: blockchain.Orders, getAccount: GetAccount, blockchainAccounts: blockchain.Accounts, withUsernameToken: WithUsernameToken, pushNotification: PushNotification)(implicit exec: ExecutionContext, configuration: Configuration, wsClient: WSClient) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
-  private implicit val module: String = constants.Module.ACCOUNT_CONTROLLER
+  private implicit val module: String = constants.Module.CONTROLLER_ACCOUNT
 
   private implicit val logger: Logger = Logger(this.getClass)
 

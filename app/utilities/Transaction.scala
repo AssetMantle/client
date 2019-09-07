@@ -10,7 +10,6 @@ import transactions.responses.TransactionResponse.{AsyncResponse, BlockResponse,
 import transactions.{GetResponse, GetTxHashResponse}
 
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.Random
 
 @Singleton
 class Transaction @Inject()(getTxHashResponse: GetTxHashResponse, getResponse: GetResponse)(implicit executionContext: ExecutionContext, configuration: Configuration, wsClient: WSClient) {
@@ -21,7 +20,7 @@ class Transaction @Inject()(getTxHashResponse: GetTxHashResponse, getResponse: G
 
   def process[T1 <: BaseTransaction[T1], T2 <: BaseRequestEntity](entity: T1, blockchainTransactionCreate: T1 => String, request: T2, action: T2 => WSResponse,  onSuccess: (String, BlockResponse) => Unit, onFailure: (String, String) => Unit, updateTransactionHash:(String, String) => Int)(implicit module:String, logger:Logger): String = {
     try {
-      val ticketID: String = if (kafkaEnabled) utilities.JSON.getResponseFromJson[KafkaResponse](action(request)).ticketID else utilities.IDGenerator.ticketID()
+      val ticketID: String = if (kafkaEnabled) utilities.JSON.getResponseFromJson[KafkaResponse](action(request)).ticketID else utilities.IDGenerator.ticketID
       blockchainTransactionCreate(entity.mutateTicketID(ticketID))
       if (!kafkaEnabled) {
 
