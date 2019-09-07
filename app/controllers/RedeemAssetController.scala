@@ -18,6 +18,8 @@ class RedeemAssetController @Inject()(messagesControllerComponents: MessagesCont
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
+  private implicit val module:String= constants.Module.CONTROLLERS_REDEEM_ASSET
+
   def redeemAssetForm(ownerAddress: String, pegHash: String): Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.master.redeemAsset(views.companion.master.RedeemAsset.form, blockchainACLAccounts.Service.get(ownerAddress).zoneID, pegHash))
   }

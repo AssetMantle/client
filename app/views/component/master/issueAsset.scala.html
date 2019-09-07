@@ -10,26 +10,16 @@
     <div class=" ">
     <div class="latest_card-body">
     @CSRF.formField
-    @inputText(issueAssetForm(constants.Form.REQUEST_ID).copy(value = Some(requestID)), '_label -> Messages(constants.Form.REQUEST_ID),
-        'class -> "form-control",'placeholder->Messages(constants.Form.REQUEST_ID),'required->true)
-    @inputText(issueAssetForm(constants.Form.ACCOUNT_ID).copy(value = Some(accountID)), '_label -> Messages(constants.Form.ACCOUNT_ID),
-        'class -> "form-control",'placeholder->Messages(constants.Form.ACCOUNT_ID),'required->true)
-    @inputText(issueAssetForm(constants.Form.DOCUMENT_HASH).copy(value = Some(documentHash)), '_label -> Messages(constants.Form.DOCUMENT_HASH),
-        'class -> "form-control",'placeholder->Messages(constants.Form.DOCUMENT_HASH),'required->true)
-    @inputText(issueAssetForm(constants.Form.ASSET_TYPE).copy(value = Some(assetType)), '_label -> Messages(constants.Form.ASSET_TYPE),
-        'class -> "form-control",'placeholder->Messages(constants.Form.ASSET_TYPE),'required->true)
-    @inputText(issueAssetForm(constants.Form.ASSET_PRICE).copy(value = Some(assetPrice.toString)), '_label -> Messages(constants.Form.ASSET_PRICE),
-        'class -> "form-control",'placeholder->Messages(constants.Form.ASSET_PRICE),'required->true)
-    @inputText(issueAssetForm(constants.Form.QUANTITY_UNIT).copy(value = Some(quantityUnit)), '_label -> Messages(constants.Form.QUANTITY_UNIT),
-        'class -> "form-control",'placeholder->Messages(constants.Form.QUANTITY_UNIT),'required->true)
-    @inputText(issueAssetForm(constants.Form.ASSET_QUANTITY).copy(value = Some(assetQuantity.toString)), '_label -> Messages(constants.Form.ASSET_QUANTITY),
-        'class -> "form-control",'placeholder->Messages(constants.Form.ASSET_QUANTITY),'required->true)
-        @inputText(issueAssetForm(constants.Form.GAS), '_label -> Messages(constants.Form.GAS),
-            'class -> "form-control",'placeholder->Messages(constants.Form.GAS),'required->true)
-        @inputText(issueAssetForm(constants.Form.TAKER_ADDRESS).copy(value = takerAddress), '_label -> Messages(constants.Form.TAKER_ADDRESS),
-        'class -> "form-control",'placeholder->Messages(constants.Form.TAKER_ADDRESS),'required->true)
-    @inputPassword(issueAssetForm(constants.Form.PASSWORD), '_label -> Messages(constants.Form.PASSWORD),
-        'class -> "form-control",'placeholder->Messages(constants.Form.PASSWORD),'required->true)
+    @inputText(issueAssetForm(constants.FormField.REQUEST_ID.name).copy(value = Some(requestID)), '_label -> Messages(constants.FormField.REQUEST_ID.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.REQUEST_ID.name),'required->true)
+    @inputText(issueAssetForm(constants.FormField.ACCOUNT_ID.name).copy(value = Some(accountID)), '_label -> Messages(constants.FormField.ACCOUNT_ID.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.ACCOUNT_ID.name),'required->true)
+    @inputText(issueAssetForm(constants.FormField.DOCUMENT_HASH.name).copy(value = Some(documentHash)), '_label -> Messages(constants.FormField.DOCUMENT_HASH.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.DOCUMENT_HASH.name),'required->true)
+    @inputText(issueAssetForm(constants.FormField.ASSET_TYPE.name).copy(value = Some(assetType)), '_label -> Messages(constants.FormField.ASSET_TYPE.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.ASSET_TYPE.name),'required->true)
+    @inputText(issueAssetForm(constants.FormField.ASSET_PRICE.name).copy(value = Some(assetPrice.toString)), '_label -> Messages(constants.FormField.ASSET_PRICE.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.ASSET_PRICE.name),'required->true)
+    @inputText(issueAssetForm(constants.FormField.QUANTITY_UNIT.name).copy(value = Some(quantityUnit)), '_label -> Messages(constants.FormField.QUANTITY_UNIT.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.QUANTITY_UNIT.name),'required->true)
+    @inputText(issueAssetForm(constants.FormField.ASSET_QUANTITY.name).copy(value = Some(assetQuantity.toString)), '_label -> Messages(constants.FormField.ASSET_QUANTITY.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.ASSET_QUANTITY.name),'required->true)
+    @inputText(issueAssetForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.GAS.name),'required->true)
+    @inputText(issueAssetForm(constants.FormField.TAKER_ADDRESS.name).copy(value = takerAddress), '_label -> Messages(constants.FormField.TAKER_ADDRESS.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.TAKER_ADDRESS.name),'required->true)
+    @inputPassword(issueAssetForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.PASSWORD.name),'required->true)
 
     @if(issueAssetForm.hasGlobalErrors) {
         <ul>

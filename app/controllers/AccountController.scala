@@ -13,15 +13,44 @@ import play.api.{Configuration, Logger}
 import queries.GetAccount
 import transactions.ChangePassword
 import utilities.{Email, PushNotification}
+import views.companion.master.SignUp
 
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class AccountController @Inject()(messagesControllerComponents: MessagesControllerComponents, transactionForgotPassword: transactions.ForgotPassword, email: Email, masterTransactionEmailOTP: masterTransaction.EmailOTPs, transactionsChangePassword: ChangePassword, withLoginAction: WithLoginAction, masterAccounts: master.Accounts, blockchainAclAccounts: ACLAccounts, blockchainZones: blockchain.Zones, blockchainOrganizations: blockchain.Organizations, blockchainAssets: blockchain.Assets, blockchainFiats: blockchain.Fiats, blockchainNegotiations: blockchain.Negotiations, masterOrganizations: master.Organizations, masterZones: master.Zones, blockchainAclHashes: blockchain.ACLHashes, blockchainOrders: blockchain.Orders, getAccount: GetAccount, blockchainAccounts: blockchain.Accounts, withUsernameToken: WithUsernameToken, pushNotification: PushNotification)(implicit exec: ExecutionContext, configuration: Configuration, wsClient: WSClient) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class AccountController @Inject()(messagesControllerComponents: MessagesControllerComponents, transactionAddKey: transactions.AddKey, transactionForgotPassword: transactions.ForgotPassword, email: Email, masterTransactionEmailOTP: masterTransaction.EmailOTPs, transactionsChangePassword: ChangePassword, withLoginAction: WithLoginAction, masterAccounts: master.Accounts, blockchainAclAccounts: ACLAccounts, blockchainZones: blockchain.Zones, blockchainOrganizations: blockchain.Organizations, blockchainAssets: blockchain.Assets, blockchainFiats: blockchain.Fiats, blockchainNegotiations: blockchain.Negotiations, masterOrganizations: master.Organizations, masterZones: master.Zones, blockchainAclHashes: blockchain.ACLHashes, blockchainOrders: blockchain.Orders, getAccount: GetAccount, blockchainAccounts: blockchain.Accounts, withUsernameToken: WithUsernameToken, pushNotification: PushNotification)(implicit exec: ExecutionContext, configuration: Configuration, wsClient: WSClient) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val module: String = constants.Module.ACCOUNT_CONTROLLER
 
   private implicit val logger: Logger = Logger(this.getClass)
+
+  def checkUsernameAvailable(username: String): Action[AnyContent] = Action { implicit request =>
+    if (masterAccounts.Service.checkUsernameAvailable(username)) Ok else NoContent
+  }
+
+  def signUpForm: Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.signUp(SignUp.form))
+  }
+
+
+  def signUp: Action[AnyContent] = Action { implicit request =>
+    SignUp.form.bindFromRequest().fold(
+      formWithErrors => {
+        BadRequest(views.html.component.master.signUp(formWithErrors))
+      },
+      signUpData => {
+        try {
+          val addKeyResponse = transactionAddKey.Service.post(transactionAddKey.Request(signUpData.username, signUpData.password))
+          logger.info(addKeyResponse.toString)
+          masterAccounts.Service.addLogin(signUpData.username, signUpData.password, blockchainAccounts.Service.create(address = addKeyResponse.address, pubkey = addKeyResponse.pubkey), request.lang.toString.stripPrefix("Lang(").stripSuffix(")").trim.split("_")(0))
+          Ok(views.html.index(successes = Seq(constants.Response.SIGNED_UP)))
+        } catch {
+          case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+          case blockChainException: BlockChainException => InternalServerError(views.html.index(failures = Seq(blockChainException.failure)))
+        }
+      }
+    )
+  }
 
   def changePasswordForm: Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.master.changePassword(views.companion.master.ChangePassword.form))

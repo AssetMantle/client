@@ -121,9 +121,12 @@ h2{
 }
 
 .footer {
-    position:fixed;
+    position: relative;
     bottom: 0;
-    right: 30px;
+    padding:5px 5px;
+    background: #333333;
+    text-align: center;
+
 }
 
 .centerScreen {
@@ -160,7 +163,7 @@ h2{
 }
 
 .closeButton {
-    margin-left: 15px;
+    margin-right: 15px;
     color: white;
     font-weight: bold;
     float: right;
@@ -198,38 +201,9 @@ h2{
     width: 225px;
 }
 
-/**/
-/*Navbar*/
 
-.navbar {
-    margin-bottom: 5px;
-    font-size: 14px;
-}
-
-.navbar a {
-    float: left;
-    display: block;
-    color: rgba(255,255,255,0.75);
-    text-align: center;
-    padding: 14px 16px;
-    text-decoration: none;
-    font-size: 14px;
-    cursor: pointer;
-}
-
-.navbar a:hover {
-    color: #fff;
-}
-
-.navbar a.active {
-    color: #fff;
-}
-
-.navbar a.right {
-    float: right;
-}
-.navbar a.navbar-brand .logo{
-    max-height: 45px;
+.navigationBarLogo{
+    max-height: 30px;
     max-width: 130px;
 }
 .sticky {
@@ -260,20 +234,6 @@ h2{
 .hidden {
     display: none;
 }
-
-/*Flex*/
-/*Flex*/
-.pageFlexContainer {
-    display:flex;
-    margin-top: 60px;
-    justify-content:center;
-}
-
-.pageFlexContainer >div {
-    /*background-color: #ffffff;*/
-}
-
-
 .width70Percent{
     width: 70%;
     float: left;
@@ -352,10 +312,6 @@ h2{
     padding-right: 10px;
 }
 
-/*.box:hover {*/
-/*    box-shadow: 0 12px 16px 0 rgba(0, 0, 0, 0.24), 0 17px 50px 0 rgba(0, 0, 0, 0.19);*/
-/*}*/
-/*Box*/
 
 /*Table*/
 .dynamicTable {
@@ -407,14 +363,15 @@ h2{
 rightText{
     text-align: right;
 }
+.centerText {
+    text-align: center;
+}
 
 .width {
     width: 100%;
 }
 
-.centerText {
-    text-align: center;
-}
+
 
 .leftMargin {
     margin-left: 10px;
@@ -562,6 +519,7 @@ dl .info::after {
 }
 
 /*approve and reject color*/
+
 /*ToolTip INPUT BOX SPECIFIC*/
 
 /* color */
@@ -633,7 +591,8 @@ dl .info::after {
 
 
 .pageContent{
-    margin-top: 50px;
+    display: flex;
+    margin-top: 20px;
 }
 
 .tab_acl{
@@ -659,4 +618,66 @@ dl .info::after {
 .ur-change-password button{
 margin-left: 50px;
     margin-top: -20px;
+}
+
+/* Main search field*/
+.searchForm{
+    background:#fff;
+    padding:20px;
+    justify-content: center;
+    display: flex;
+    box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.07);
+}
+
+/* sidebar */
+.sideBarOpenButton{
+    top: 80px;
+    color: #fff;
+    cursor: pointer;
+    background:linear-gradient(60deg, #149f98, #102923);
+    padding:5px 5px 5px 15px;
+    border-radius: 10px;
+    transition-delay: 0.3s;
+    position: fixed;
+    left: -10px;
+    z-index: 100;
+}
+.sideBarCloseButton {
+    position: relative;
+    right: -85%;
+    font-size: 20px;
+}
+.sideBar{
+    height: 100%;
+    width: 0;
+    position: fixed;
+    z-index: 101;
+    top:40px;
+    left: 0;
+    background-color:#8faa9d;
+    overflow-x: hidden;
+    transition: 0.5s;
+}
+.sideBar ul{
+    padding-left:0px;
+}
+.sideBar li{
+    list-style-type: none;
+}
+.sideBar a {
+    color: #fff;
+}
+.sideBar li a {
+    padding:8px 0px 0px 20px;
+    text-decoration: none;
+    transition: 0.3s;
+    display: inline-block;
+    margin-bottom:10px;
+}
+.sideBar  a:hover, li a:hover{
+    text-decoration: none;
+    color: #31353D;
+}
+.sideBarSearch {
+    border: 1px solid #ddd;
 }

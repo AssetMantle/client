@@ -18,6 +18,8 @@ class ChangeBuyerBidController @Inject()(messagesControllerComponents: MessagesC
 
   private implicit val logger: Logger = Logger(this.getClass)
 
+  private implicit val module:String= constants.Module.CONTROLLERS_CHANGE_BUYER_BID
+
   def changeBuyerBidForm(sellerAddress: String, pegHash: String): Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.master.changeBuyerBid(views.companion.master.ChangeBuyerBid.form, sellerAddress, pegHash))
   }
