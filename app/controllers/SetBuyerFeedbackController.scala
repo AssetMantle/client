@@ -18,7 +18,7 @@ class SetBuyerFeedbackController @Inject()(messagesControllerComponents: Message
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
-  private implicit val module:String= constants.Module.CONTROLLERS_SET_BUYER_FEEDBACK
+  private implicit val module: String = constants.Module.CONTROLLERS_SET_BUYER_FEEDBACK
 
   def setBuyerFeedbackForm(sellerAddress: String, pegHash: String): Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.master.setBuyerFeedback(views.companion.master.SetBuyerFeedback.form, sellerAddress, pegHash))

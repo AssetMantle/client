@@ -19,7 +19,7 @@ class SellerExecuteOrderController @Inject()(messagesControllerComponents: Messa
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
-  private implicit val module:String= constants.Module.CONTROLLERS_SELLER_EXECUTE_ORDER
+  private implicit val module: String = constants.Module.CONTROLLERS_SELLER_EXECUTE_ORDER
 
   def sellerExecuteOrderForm(orderID: String): Action[AnyContent] = Action { implicit request =>
     val negotiation = blockchainNegotiations.Service.get(orderID)

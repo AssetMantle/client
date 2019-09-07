@@ -18,7 +18,7 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private implicit val module:String= constants.Module.CONTROLLERS_ISSUE_FIAT
+  private implicit val module: String = constants.Module.CONTROLLERS_ISSUE_FIAT
 
   def issueFiatRequestForm: Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.master.issueFiatRequest(views.companion.master.IssueFiatRequest.form))
