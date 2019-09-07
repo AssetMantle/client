@@ -1,19 +1,22 @@
 @()(implicit messagesProvider: MessagesProvider)
-<div id="validatorsTable">
-    <a class="back-button" onclick='back()' > <i class="fa fa-undo"></i> @Messages(constants.Form.BACK)</a>
 
-    <div class="table-responsive">
-    <table class="table white border">
-        <thead>
-            <tr>
-                <th>@Messages(constants.Form.OPERATOR)</th>
-                <th>@Messages(constants.Form.STATUS)</th>
-                <th>@Messages(constants.Form.TOKENS)</th>
-                <th>@Messages(constants.Form.DELEGATOR_SHARES)</th>
-            </tr>
-        </thead>
-        <tbody id="validatorsTableBody"></tbody>
-    </table>
+<div id="validatorsTable">
+    <div class="cmuk-card
+                cmuk-card-default
+                cmuk-card-body">
+        <a class="back-button" onclick='back()' > <i class="fa fa-undo"></i> @Messages(constants.Form.BACK)</a>
+        <table class="cmuk-table cmuk-table-divider">
+            <thead>
+                <tr>
+                    <th>@Messages(constants.Form.OPERATOR)</th>
+                    <th>@Messages(constants.Form.STATUS)</th>
+                    <th>@Messages(constants.Form.TOKENS)</th>
+                    <th>@Messages(constants.Form.DELEGATOR_SHARES)</th>
+                </tr>
+            </thead>
+            <tbody id="validatorsTableBody"></tbody>
+        </table>
+
     </div>
 </div>
 <script>validatorsTable("validatorsTableBody")</script>

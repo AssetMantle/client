@@ -18,6 +18,8 @@ class ConfirmSellerBidController @Inject()(messagesControllerComponents: Message
 
   private implicit val logger: Logger = Logger(this.getClass)
 
+  private implicit val module: String = constants.Module.CONTROLLERS_CONFIRM_SELLER_BID
+
   def confirmSellerBidForm(buyerAddress: String, pegHash: String, bid: Int): Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.master.confirmSellerBid(views.companion.master.ConfirmSellerBid.form, buyerAddress, pegHash, bid))
   }

@@ -10,7 +10,6 @@ import transactions.responses.TransactionResponse.{AsyncResponse, BlockResponse,
 import transactions.{GetResponse, GetTxHashResponse}
 
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.Random
 
 @Singleton
 class Transaction @Inject()(getTxHashResponse: GetTxHashResponse, getResponse: GetResponse)(implicit executionContext: ExecutionContext, configuration: Configuration, wsClient: WSClient) {
@@ -19,15 +18,13 @@ class Transaction @Inject()(getTxHashResponse: GetTxHashResponse, getResponse: G
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
-  private implicit val logger: Logger = Logger(this.getClass)
-
-  private implicit val module: String = constants.Module.UTILITIES_TRANSACTION
-
-  def process[T1 <: BaseTransaction[T1], T2 <: BaseRequestEntity](entity: T1, blockchainTransactionCreate: T1 => String, request: T2, action: T2 => WSResponse,  onSuccess: (String, BlockResponse) => Unit, onFailure: (String, String) => Unit, updateTransactionHash:(String, String) => Int): String = {
+  def process[T1 <: BaseTransaction[T1], T2 <: BaseRequestEntity](entity: T1, blockchainTransactionCreate: T1 => String, request: T2, action: T2 => WSResponse, onSuccess: (String, BlockResponse) => Unit, onFailure: (String, String) => Unit, updateTransactionHash: (String, String) => Int)(implicit module: String, logger: Logger): String = {
     try {
-      val ticketID: String = if (kafkaEnabled) utilities.JSON.getResponseFromJson[KafkaResponse](action(request)).ticketID else Random.nextString(32)
+      val ticketID: String = if (kafkaEnabled) utilities.JSON.getResponseFromJson[KafkaResponse](action(request)).ticketID else utilities.IDGenerator.ticketID()
       blockchainTransactionCreate(entity.mutateTicketID(ticketID))
       if (!kafkaEnabled) {
+
+
         Future {
           try {
             transactionMode match {
@@ -52,7 +49,7 @@ class Transaction @Inject()(getTxHashResponse: GetTxHashResponse, getResponse: G
   }
 
 
-  def ticketUpdater(getTickets: () => Seq[String], getTransactionHash: String => Option[String], onSuccess: (String, BlockResponse) => Unit, onFailure: (String, String) => Unit)(implicit logger: Logger) {
+  def ticketUpdater(getTickets: () => Seq[String], getTransactionHash: String => Option[String], onSuccess: (String, BlockResponse) => Unit, onFailure: (String, String) => Unit)(implicit module: String, logger: Logger) {
     val ticketIDsSeq: Seq[String] = getTickets()
     for (ticketID <- ticketIDsSeq) {
       try {
