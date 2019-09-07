@@ -2,17 +2,14 @@
 html {
     height: 100%;
 }
-
 body {
     margin: auto;
 }
-
-h2 {
+h2{
     color: rgba(0, 0, 0, 0.87) !important;
     font-size: 1.5625rem !important;
     color: white;
 }
-
 input {
     width: 100%;
     padding: 10px;
