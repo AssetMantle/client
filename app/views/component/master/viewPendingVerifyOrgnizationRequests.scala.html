@@ -18,7 +18,7 @@
             <span class="red">@Messages(constants.Form.ESTABLISHMENT_DATE)</span>: @organizationVerificationRequest.establishmentDate <br>
             <span class="red">@Messages(constants.Form.EMAIL)</span>: @organizationVerificationRequest.email <br>
             </div>
-
+            <br>
             @defining(utilities.JSON.getInstance[Address](organizationVerificationRequest.registeredAddress)) { registeredAddress: Address =>
                 <div>@Messages(constants.Form.REGISTERED_ADDRESS) : <br>
                 <span class="red">@Messages(constants.Form.ADDRESS_LINE_1)</span>: @registeredAddress.addressLine1 <br>
@@ -30,7 +30,7 @@
                 <span class="red">@Messages(constants.Form.PHONE)</span>: @registeredAddress.phone <br>
                 </div>
             }
-
+            <br>
             @defining(utilities.JSON.getInstance[Address](organizationVerificationRequest.postalAddress)) { postalAddress: Address =>
                 <div>@Messages(constants.Form.POSTAL_ADDRESS) : <br>
                 <span class="red">@Messages(constants.Form.ADDRESS_LINE_1)</span>: @postalAddress.addressLine1 <br>
@@ -42,7 +42,7 @@
                 <span class="red">@Messages(constants.Form.PHONE)</span>: @postalAddress.phone <br>
                 </div>
             }
-
+            <br>
             @defining(utilities.JSON.getInstance[UBOs](organizationVerificationRequest.ubos.getOrElse(Json.toJson[UBOs](UBOs()).toString)).ubos) { ubos: Seq[UBO] =>
                 <div>@Messages(constants.Form.ORGANIZATION_UBO_DETAIL): <br>
                     @for(ubo <- ubos) {
@@ -53,25 +53,19 @@
                         }
                 </div>
             }
-
             <br>
-
             <div>@Messages(constants.Form.ORGANIZATION_BANK_ACCOUNT_DETAIL): <br>
             <div id = "organizationBankAccountDetail@organizationVerificationRequest.accountID">
                 <script>componentResource('organizationBankAccountDetail@organizationVerificationRequest.accountID', jsRoutes.controllers.AddOrganizationController.viewOrganizationVerificationBankAccountDetail('@organizationVerificationRequest.id'))</script>
             </div>
             </div>
-
             <br>
-
             <div> @Messages(constants.Form.DOCUMENTS): <br>
             <div id = "kycDocuments@organizationVerificationRequest.accountID">
                 <script>componentResource('kycDocuments@organizationVerificationRequest.accountID', jsRoutes.controllers.AddOrganizationController.viewKycDocuments('@organizationVerificationRequest.id'))</script>
             </div>
             </div>
-
             <br>
-
             <div class="final_verify_buttons">
                 <button class="btn btn-sm btn-success" onclick="getForm(jsRoutes.controllers.AddOrganizationController.verifyOrganizationForm('@organizationVerificationRequest.id', '@organizationVerificationRequest.zoneID'))">@Messages(constants.Form.APPROVE)</button>
                 <button class="btn btn-sm btn-danger" onclick="getForm(jsRoutes.controllers.AddOrganizationController.rejectVerifyOrganizationRequestForm('@organizationVerificationRequest.id'))">@Messages(constants.Form.REJECT)</button>
