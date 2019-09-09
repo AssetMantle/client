@@ -112,6 +112,10 @@ class TraderKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfigP
 
   private def getAllDocumentsById(id: String): Future[Seq[TraderKYC]] = db.run(traderKYCTable.filter(_.id === id).result)
 
+  private def getAllDocumentTypeById(id: String): Future[Seq[String]] = db.run(traderKYCTable.filter(_.id === id).map(_.documentType).result)
+
+  private def getStatusForAllDocumentsById(id: String): Future[Seq[Boolean]] = db.run(traderKYCTable.filter(_.id === id).map(traderKYC => traderKYC.organizationStatus.?.getOrElse(false) && traderKYC.zoneStatus.?.getOrElse(false)).result)
+
   private def deleteById(id: String) = db.run(traderKYCTable.filter(_.id === id).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -177,6 +181,15 @@ class TraderKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfigP
     def checkFileExists(id: String, documentType: String): Boolean = Await.result(checkByIdAndDocumentType(id = id, documentType = documentType), Duration.Inf)
 
     def checkFileNameExists(id: String, fileName: String): Boolean = Await.result(checkByIdAndFileName(id = id, fileName = fileName), Duration.Inf)
+
+    //TODO whether database should contain constants.File.TRADER_KYC_DOCUMENT_TYPES (current scenario) OR constants.File.TRADER_KYC_DOCUMENT_TYPES should contain all database file type
+    def checkAllKYCFileTypesExists(id: String): Boolean = constants.File.TRADER_KYC_DOCUMENT_TYPES.forall(Await.result(getAllDocumentTypeById(id), Duration.Inf).contains)
+
+    //TODO whether checkAllKYCFileTypesExists should be called or not
+    def checkAllKYCFilesVerified(id: String): Boolean = {
+      val documentStatuses = Await.result(getStatusForAllDocumentsById(id), Duration.Inf)
+      if (documentStatuses.nonEmpty) documentStatuses.forall(status => status) else false
+    }
 
   }
   

@@ -1,1 +1,31 @@
-@()
+@import controllers.actions.LoginState
+@import models.master.TraderKYC
+
+@(traderKYCs: Seq[TraderKYC])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+
+<div class="latest_card-header latest_card-header-primary text-center">
+    <h4 class="latest_card-title">@Messages(constants.Form.ORGANIZATION_KYC_FILES)</h4>
+</div>
+<div class="centerText">
+    @for(traderKYC <- traderKYCs) {
+        @component.master.commonDocumentViewer(traderKYC) {
+@*//            @routes.AddOrganizationController.userAccessedTraderKYCFile(traderKYC.documentType)*@
+        } {
+@*            <a href="@routes.AddOrganizationController.userAccessedTraderKYCFile(traderKYC.documentType)">@Messages(traderKYC.documentType)</a>*@
+        } {
+@*            <div>*@
+@*                <button onclick="getForm(jsRoutes.controllers.AddOrganizationController.userUpdateOrganizationKycForm('@traderKYC.documentType'))">@Messages(constants.Form.UPDATE) @Messages(traderKYC.documentType)</button>*@
+@*                <script>hideElement('upload@traderKYC.documentType')</script>*@
+@*            </div>*@
+        }
+    }
+    @for(documentType <- constants.File.ORGANIZATION_KYC_DOCUMENT_TYPES) {
+@*        <div id="upload@documentType">*@
+@*            <button onclick="getForm(jsRoutes.controllers.AddOrganizationController.userUploadOrganizationKycForm('@documentType'))">@Messages(constants.Form.UPLOAD) @Messages(documentType)</button>*@
+@*        </div>*@
+    }
+</div>
+@*<button type="button" class="btn-sm btn btn-primary" onclick="getForm(jsRoutes.controllers.AddOrganizationController.organizationBankAccountDetailForm())">@Messages(constants.Form.BACK)</button>*@
+@* @if(constants.File.ORGANIZATION_KYC_DOCUMENT_TYPES.forall(traderKYCs.map(_.documentType).contains)) {*@
+@*    <button type="button" class="btn-sm btn btn-primary" id="getTraderKYCReviewForm" onclick="getForm(jsRoutes.controllers.AddOrganizationController.reviewAddOrganizationForm())">@Messages(constants.Form.NEXT)</button>*@
+@*//}*@

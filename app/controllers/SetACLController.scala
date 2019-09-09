@@ -56,9 +56,9 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
   def userUploadOrUpdateTraderKYCFiles(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        Ok
+        Ok(views.html.component.master.userUploadOrUpdateTraderKYC(masterTraderKYCs.Service.getAllDocuments(masterTraders.Service.getID(loginState.username))))
       } catch {
-        case _: BaseException => Ok
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 

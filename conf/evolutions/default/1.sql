@@ -707,6 +707,8 @@ ALTER TABLE MASTER."AccountKYC"
     ADD CONSTRAINT AccountKYC_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER."OrganizationKYC"
     ADD CONSTRAINT OrganizationKYC_Organization_id FOREIGN KEY ("id") REFERENCES MASTER."Organization" ("id");
+ALTER TABLE MASTER."TraderKYC"
+    ADD CONSTRAINT TraderKYC_Trader_id FOREIGN KEY ("id") REFERENCES MASTER."Trader" ("id");
 ALTER TABLE MASTER."OrganizationBankAccountDetail"
     ADD CONSTRAINT OrganizationBankAccountDetail_Organization_id FOREIGN KEY ("id") REFERENCES MASTER."Organization" ("id");
 ALTER TABLE MASTER."AccountFile"
