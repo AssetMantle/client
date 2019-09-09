@@ -73,7 +73,6 @@ GET         /master/file                                                 control
 
 GET         /checkAccountKycFileExists                                   controllers.FileController.checkAccountKycFileExists(accountID: String, documentType: String)
 GET         /checkZoneKycFileExists                                      controllers.FileController.checkZoneKycFileExists(accountID: String, documentType: String)
-GET         /checkOrganizationKycFileExists                              controllers.FileController.checkOrganizationKycFileExists(accountID: String, documentType: String)
 GET         /checkTraderKycFileExists                                    controllers.FileController.checkTraderKycFileExists(accountID: String, documentType: String)
 
 GET         /accountUpload                                               controllers.FileController.uploadAccountFileForm(documentType: String)

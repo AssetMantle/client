@@ -46,10 +46,6 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
     if (masterZoneKYCs.Service.checkFileExists(id = accountID, documentType = documentType)) Ok else NoContent
   }
 
-  def checkOrganizationKycFileExists(accountID: String, documentType: String): Action[AnyContent] = Action { implicit request =>
-    if (masterOrganizationKYCs.Service.checkFileExists(id = accountID, documentType = documentType)) Ok else NoContent
-  }
-
   def checkTraderKycFileExists(accountID: String, documentType: String): Action[AnyContent] = Action { implicit request =>
     if (masterTraderKYCs.Service.checkFileExists(id = accountID, documentType = documentType)) Ok else NoContent
   }

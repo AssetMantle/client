@@ -114,7 +114,6 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
 
         routes.javascript.FileController.checkAccountKycFileExists,
         routes.javascript.FileController.checkZoneKycFileExists,
-        routes.javascript.FileController.checkOrganizationKycFileExists,
         routes.javascript.FileController.checkTraderKycFileExists,
 
         routes.javascript.FileController.uploadAccountFileForm,
