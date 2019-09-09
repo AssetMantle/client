@@ -7,22 +7,25 @@
 <div class="centerText">
     <button id="traderButtonUploadContract" class="hidden" onclick="getForm(jsRoutes.controllers.FileController.uploadTraderAssetForm('@constants.File.CONTRACT', '@id'))">@Messages(constants.Form.UPLOAD_CONTRACT_DOCUMENT)</button>
     <button id="traderButtonUpdateContract" class="hidden" onclick="getForm(jsRoutes.controllers.FileController.updateTraderAssetForm('@constants.File.CONTRACT', '@id'))">@Messages(constants.Form.UPDATE_CONTRACT_DOCUMENT)</button>
-    <script>checkFileExists(jsRoutes.controllers.FileController.checkTraderAssetFileExists('@id', '@constants.File.CONTRACT'), "traderButtonUploadContract", "traderButtonUpdateContract")</script>
+    <script>checkFileExists(jsRoutes.controllers.FileController.checkTraderAssetFilesExist('@id', '@constants.File.CONTRACT'), "traderButtonUploadContract", "traderButtonUpdateContract")</script>
 
     <button id="traderButtonUploadPackingList" class="hidden" onclick="getForm(jsRoutes.controllers.FileController.uploadTraderAssetForm('@constants.File.PACKING_LIST', '@id'))">@Messages(constants.Form.UPLOAD_PACKING_LIST_DOCUMENT)</button>
     <button id="traderButtonUpdatePackingList" class="hidden" onclick="getForm(jsRoutes.controllers.FileController.updateTraderAssetForm('@constants.File.PACKING_LIST', '@id'))">@Messages(constants.Form.UPDATE_PACKING_LIST_DOCUMENT)</button>
-    <script>checkFileExists(jsRoutes.controllers.FileController.checkTraderAssetFileExists('@id', '@constants.File.PACKING_LIST'), "traderButtonUploadPackingList", "traderButtonUpdatePackingList")</script>
+    <script>checkFileExists(jsRoutes.controllers.FileController.checkTraderAssetFilesExist('@id', '@constants.File.PACKING_LIST'), "traderButtonUploadPackingList", "traderButtonUpdatePackingList")</script>
 
     <button id="traderButtonUploadCOO" class="hidden" onclick="getForm(jsRoutes.controllers.FileController.uploadTraderAssetForm('@constants.File.COO', '@id'))">@Messages(constants.Form.UPLOAD_COO_DOCUMENT)</button>
     <button id="traderButtonUpdateCOO" class="hidden" onclick="getForm(jsRoutes.controllers.FileController.updateTraderAssetForm('@constants.File.COO', '@id'))">@Messages(constants.Form.UPDATE_COO_DOCUMENT)</button>
-    <script>checkFileExists(jsRoutes.controllers.FileController.checkTraderAssetFileExists('@id', '@constants.File.COO'), "traderButtonUploadCOO", "traderButtonUpdateCOO")</script>
+    <script>checkFileExists(jsRoutes.controllers.FileController.checkTraderAssetFilesExist('@id', '@constants.File.COO'), "traderButtonUploadCOO", "traderButtonUpdateCOO")</script>
 
     <button id="traderButtonUploadCOA" class="hidden" onclick="getForm(jsRoutes.controllers.FileController.uploadTraderAssetForm('@constants.File.COA', '@id'))">@Messages(constants.Form.UPLOAD_COA_DOCUMENT)</button>
     <button id="traderButtonUpdateCOA" class="hidden" onclick="getForm(jsRoutes.controllers.FileController.updateTraderAssetForm('@constants.File.COA', '@id'))">@Messages(constants.Form.UPDATE_COA_DOCUMENT)</button>
-    <script>checkFileExists(jsRoutes.controllers.FileController.checkTraderAssetFileExists('@id', '@constants.File.COA'), "traderButtonUploadCOA", "traderButtonUpdateCOA")</script>
+    <script>checkFileExists(jsRoutes.controllers.FileController.checkTraderAssetFilesExist('@id', '@constants.File.COA'), "traderButtonUploadCOA", "traderButtonUpdateCOA")</script>
 
     <button id="traderButtonUploadOther" class="hidden" onclick="getForm(jsRoutes.controllers.FileController.uploadTraderAssetForm('@constants.File.OTHER', '@id'))">@Messages(constants.Form.UPLOAD_OTHER_DOCUMENT)</button>
     <button id="traderButtonUpdateOther" class="hidden" onclick="getForm(jsRoutes.controllers.FileController.updateTraderAssetForm('@constants.File.OTHER', '@id'))">@Messages(constants.Form.UPDATE_OTHER_DOCUMENT)</button>
-    <script>checkFileExists(jsRoutes.controllers.FileController.checkTraderAssetFileExists('@id', '@constants.File.OTHER'), "traderButtonUploadOther", "traderButtonUpdateOther")</script>
+    <script>checkFileExists(jsRoutes.controllers.FileController.checkTraderAssetFilesExist('@id', '@constants.File.OTHER'), "traderButtonUploadOther", "traderButtonUpdateOther")</script>
 </div>
-    
+
+<button id="issueAssetDocuments" onclick="getForm(jsRoutes.controllers.IssueAssetController.issueAssetRequestForm('@id'))">@Messages(constants.Form.NEXT)</button>
+<script>checkFileExistsDisable(jsRoutes.controllers.FileController.checkTraderAssetFilesExist('@id', '@constants.File.CONTRACT', '@constants.File.PACKING_LIST', '@constants.File.COO', '@constants.File.COA'), 'issueAssetDocuments')</script>
+

@@ -70,8 +70,8 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
     if (masterTraderKYCs.Service.checkFileExists(id = accountID, documentType = documentType)) Ok else NoContent
   }
 
-  def checkTraderAssetFileExists(id: String, documentType: String): Action[AnyContent] = Action { implicit request =>
-    if (masterTransactionFiles.Service.checkFileExists(id = id, documentType = documentType)) Ok else NoContent
+  def checkTraderAssetFilesExist(id: String, documentTypes: String*): Action[AnyContent] = Action { implicit request =>
+    if (masterTransactionFiles.Service.checkFilesExist(id = id, documentTypes = documentTypes.toSeq)) Ok else NoContent
   }
 
   def uploadUserKycForm(documentType: String): Action[AnyContent] = Action { implicit request =>

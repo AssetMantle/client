@@ -11,7 +11,7 @@
     </div>
     <div >
         <div class="latest_card-body ml-cb">
-            @inputText(issueAssetDetailForm(constants.FormField.ISSUE_ASSET_REQUEST_ID.name), '_label -> Messages(constants.FormField.ISSUE_ASSET_REQUEST_ID.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.ISSUE_ASSET_REQUEST_ID.name), 'required -> true)
+            @inputText(issueAssetDetailForm(constants.FormField.REQUEST_ID.name), '_label -> Messages(constants.FormField.REQUEST_ID.name), 'class -> "form-control hidden", 'placeholder -> Messages(constants.FormField.REQUEST_ID.name), 'required -> true)
             @inputText(issueAssetDetailForm(constants.FormField.DOCUMENT_HASH.name), '_label -> Messages(constants.FormField.DOCUMENT_HASH.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.DOCUMENT_HASH.name), 'required -> true)
             @select(issueAssetDetailForm(constants.FormField.ASSET_TYPE.name), for(option <- constants.Option.ASSET_TYPE.options) yield (option, Messages(option)), '_label -> Messages(constants.FormField.ASSET_TYPE.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.ASSET_TYPE.name), '_default -> Messages(constants.FormField.ASSET_TYPE.name), 'required -> true)
             @inputText(issueAssetDetailForm(constants.FormField.QUANTITY_UNIT.name), '_label -> Messages(constants.FormField.QUANTITY_UNIT.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.QUANTITY_UNIT.name), 'required -> true)

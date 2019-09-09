@@ -154,7 +154,7 @@ class IssueAssetRequests @Inject()(protected val databaseConfigProvider: Databas
 
     def getIssueAssetsByAccountID(accountID: String): Seq[IssueAssetRequest] = Await.result(findIssueAssetsByAccountID(accountID), Duration.Inf)
 
-    def getIssueAssetsByID(id: String): IssueAssetRequest = Await.result(findByID(id), Duration.Inf)
+    def getIssueAssetByID(id: String): IssueAssetRequest = Await.result(findByID(id), Duration.Inf)
 
     def delete(id: String): Int = Await.result(deleteByID(id), Duration.Inf)
 

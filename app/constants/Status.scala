@@ -19,5 +19,4 @@ object Status {
     val IN_ORDER = "IN_ORDER"
     val COMPLETED_TRADE = "COMPLETED_TRADE"
   }
-
 }

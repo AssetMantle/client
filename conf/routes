@@ -75,7 +75,7 @@ GET         /checkAccountKycFileExists                                   control
 GET         /checkZoneKycFileExists                                      controllers.FileController.checkZoneKycFileExists(accountID: String, documentType: String)
 GET         /checkOrganizationKycFileExists                              controllers.FileController.checkOrganizationKycFileExists(accountID: String, documentType: String)
 GET         /checkTraderKycFileExists                                    controllers.FileController.checkTraderKycFileExists(accountID: String, documentType: String)
-GET         /checkTraderAssetFileExists                                  controllers.FileController.checkTraderAssetFileExists(accountID: String, documentType: String)
+GET         /checkTraderAssetFilesExist                                  controllers.FileController.checkTraderAssetFilesExist(accountID: String, documentType: String)
 
 GET         /accountUpload                                               controllers.FileController.uploadAccountFileForm(documentType: String)
 POST        /accountUpload/file                                          controllers.FileController.uploadAccountFile(documentType: String)
@@ -208,6 +208,10 @@ POST        /master/confirmBuyerBid                                      control
 
 GET         /master/confirmSellerBid                                     controllers.ConfirmSellerBidController.confirmSellerBidForm(buyerAddress:String, pegHash: String, bid:Int)
 POST        /master/confirmSellerBid                                     controllers.ConfirmSellerBidController.confirmSellerBid
+
+GET         /master/issueAssetRequest                                     controllers.IssueAssetController.issueAssetRequestForm(id: String)
+POST        /master/issueAssetRequest                                     controllers.IssueAssetController.issueAssetRequest
+GET        /master/assetDetail                                            controllers.IssueAssetController.assetDetail(id: String)
 
 GET         /master/issueAssetDetail                                     controllers.IssueAssetController.issueAssetDetailForm(id: Option[String])
 POST        /master/issueAssetDetail                                     controllers.IssueAssetController.issueAssetDetail

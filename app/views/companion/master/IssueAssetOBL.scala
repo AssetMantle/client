@@ -9,7 +9,7 @@ object IssueAssetOBL {
 
   val form = Form(
     mapping(
-      constants.FormField.ISSUE_ASSET_REQUEST_ID.name -> constants.FormField.ISSUE_ASSET_REQUEST_ID.field,
+      constants.FormField.REQUEST_ID.name -> constants.FormField.REQUEST_ID.field,
       constants.FormField.BILL_OF_LADING_NUMBER.name -> constants.FormField.BILL_OF_LADING_NUMBER.field,
       constants.FormField.PORT_OF_LOADING.name -> constants.FormField.PORT_OF_LOADING.field,
       constants.FormField.SHIPPER_NAME.name -> constants.FormField.SHIPPER_NAME.field,

@@ -77,7 +77,7 @@ class Files @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
     }
   }
 
-  private def upsertContext(file: File): Future[Int] = db.run(fileTable.map(x => (x.id, x.documentType, x.context.?)).insertOrUpdate(file.id, file.documentType, file.context).asTry).map {
+  private def upsertContext(file: File): Future[Int] = db.run(fileTable.map(x => (x.id, x.documentType, x.fileName,x.context.?)).insertOrUpdate(file.id, file.documentType, file.fileName, file.context).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -143,7 +143,7 @@ class Files @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
     }
   }
 
-  private def checkByIdAndDocumentType(id: String, documentType: String): Future[Boolean] = db.run(fileTable.filter(_.id === id).filter(_.documentType === documentType).exists.result)
+  private def checkByIdAndDocumentTypes(id: String, documentTypes: Seq[String]): Future[Boolean] = db.run(fileTable.filter(_.id === id).filter(_.documentType.inSet(documentTypes)).exists.result)
 
   private def checkByIdAndFileName(id: String, fileName: String): Future[Boolean] = db.run(fileTable.filter(_.id === id).filter(_.fileName === fileName).exists.result)
 
@@ -184,7 +184,7 @@ class Files @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
     def deleteAllDocuments(id: String): Int = Await.result(deleteById(id = id), Duration.Inf)
 
-    def checkFileExists(id: String, documentType: String): Boolean = Await.result(checkByIdAndDocumentType(id = id, documentType = documentType), Duration.Inf)
+    def checkFilesExist(id: String, documentTypes: Seq[String]): Boolean = Await.result(checkByIdAndDocumentTypes(id = id, documentTypes = documentTypes), Duration.Inf)
 
     def getProfilePicture(id: String): Array[Byte] = Await.result(getFileByIdDocumentType(id = id, documentType = constants.File.PROFILE_PICTURE), Duration.Inf)
 

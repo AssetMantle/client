@@ -1,0 +1,37 @@
+@import controllers.actions.LoginState
+@import helper._
+@import views.companion.master.ConfirmTransaction
+
+@(confirmTransactionForm: Form[ConfirmTransaction.Data], asset: masterTransaction.IssueAssetRequest)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+
+<div id="assetDetail"></div>
+@form(action = routes.IssueAssetController.issueAssetRequest, 'onkeypress -> "validateForm(event,this)") {
+    @CSRF.formField
+    <div class="latest_card-header latest_card-header-primary text-center">
+        <h4 class="latest_card-title">@Messages(constants.Form.ISSUE_ASSET_REQUEST)</h4>
+    </div>
+    <div >
+        <div class="latest_card-body ml-cb">
+            @inputText(confirmTransactionForm(constants.FormField.REQUEST_ID.name), '_label -> Messages(constants.FormField.REQUEST_ID.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.REQUEST_ID.name), 'required -> true)
+
+            @asset.paymentTerms match {
+                case constants.Option.COMDEX => {
+                    @inputText(confirmTransactionForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "form-control", 'type -> "number", 'placeholder -> Messages(constants.FormField.GAS.name), 'required -> true)
+                    @inputText(confirmTransactionForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.PASSWORD.name), 'required -> true)
+                }
+                case _ => {}
+            }
+
+            @if(confirmTransactionForm.hasGlobalErrors) {
+                <ul>
+                @for(error <- confirmTransactionForm.globalErrors) {
+                    <li>@error.format</li>
+                }
+                </ul>
+            }
+            <button type="button" class="btn btn-primary btn-sm" onclick="submitForm(this)">@Messages(constants.Form.ISSUE_ASSET_REQUEST)</button>
+            <script src="@routes.Assets.versioned("javascripts/showIssueAssetRequestFormFields.js")" type="text/javascript"></script>
+        </div>
+    </div>
+}
+<script>componentResource('assetDetail', jsRoutes.controllers.IssueAssetController.assetDetail('@asset.id'))</script>

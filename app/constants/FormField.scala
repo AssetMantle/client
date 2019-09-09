@@ -55,7 +55,6 @@ object FormField {
   val SHIPPER_ADDRESS = new StringFormField("SHIPPER_ADDRESS", 2, 100, RegularExpression.ALL_NUMBERS_ALL_LETTERS)
   val NOTIFY_PARTY_NAME = new StringFormField("NOTIFY_PARTY_NAME", 2, 20, RegularExpression.ALL_NUMBERS_ALL_LETTERS)
   val NOTIFY_PARTY_ADDRESS = new StringFormField("NOTIFY_PARTY_ADDRESS", 2, 100, RegularExpression.ALL_NUMBERS_ALL_LETTERS)
-  val ISSUE_ASSET_REQUEST_ID = new StringFormField("ISSUE_ASSET_REQUEST_ID", 0, 32)
   val INVOICE_NUMBER = new StringFormField("INVOICE_NUMBER", 0, 32)
 
   val ASSET_TYPE = new StringFormFieldOption("ASSET_TYPE", constants.Option.ASSET_TYPE.options)
