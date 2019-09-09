@@ -71,7 +71,7 @@ class FileResourceManager @Inject()()(implicit exec: ExecutionContext, configura
 
   def getTraderKycFilePath(documentType: String): String = {
     documentType match {
-      case constants.File.IDENTIFICATION => uploadTraderKycIdentificationPath
+      case constants.File.TRADER_IDENTIFICATION => uploadTraderKycIdentificationPath
       case _ => constants.File.UNKNOWN_TYPE
     }
   }

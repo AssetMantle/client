@@ -16,7 +16,7 @@
             <div>@Messages(constants.Form.TRADER_DETAILS):<br>
                 <span class="red">@Messages(constants.Form.NAME)</span>: @trader.name <br>
             </div>
-
+            <br>
             <div>@Messages(constants.Form.ORGANIZATION_DETAILS):<br>
                 <span class="red">@Messages(constants.Form.ORGANIZATION_ID)</span>: @organization.id <br>
                 <span class="red">@Messages(constants.Form.NAME)</span>: @organization.name <br>
@@ -24,12 +24,12 @@
                 <span class="red">@Messages(constants.Form.ESTABLISHMENT_DATE)</span>: @organization.establishmentDate <br>
                 <span class="red">@Messages(constants.Form.EMAIL)</span>: @organization.email <br>
             </div>
-
+            <br>
             <div>@Messages(constants.Form.ZONE_DETAILS):<br>
                 <span class="red">@Messages(constants.Form.NAME)</span>: @zone.name <br>
                 <span class="red">@Messages(constants.Form.CURRENCY)</span>: @zone.currency <br>
             </div>
-
+            <br>
             </div>
             @form(action = routes.SetACLController.reviewTraderCompletion, 'onkeypress -> "validateForm(event,this)") {
                 @CSRF.formField

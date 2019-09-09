@@ -96,7 +96,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
           name = name,
           documentType = documentType,
           path = fileResourceManager.getTraderKycFilePath(documentType),
-          document = master.TraderKYC(id = loginState.username, documentType = documentType, fileName = name, file = None, zoneStatus = None, organizationStatus = None),
+          document = master.TraderKYC(id = masterTraders.Service.getID(loginState.username), documentType = documentType, fileName = name, file = None, zoneStatus = None, organizationStatus = None),
           masterCreate = masterTraderKYCs.Service.create
         )
         PartialContent(views.html.component.master.userUploadOrUpdateTraderKYC(masterTraderKYCs.Service.getAllDocuments(masterTraders.Service.getID(loginState.username))))
@@ -112,12 +112,13 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
   def userUpdateTraderKYC(name: String, documentType: String): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
+        val id = masterTraders.Service.getID(loginState.username)
         fileResourceManager.updateFile[master.TraderKYC](
           name = name,
           documentType = documentType,
           path = fileResourceManager.getTraderKycFilePath(documentType),
-          oldDocumentFileName = masterTraderKYCs.Service.getFileName(id = loginState.username, documentType = documentType),
-          document = master.TraderKYC(id = loginState.username, documentType = documentType, fileName = name, file = None, zoneStatus = None, organizationStatus = None),
+          oldDocumentFileName = masterTraderKYCs.Service.getFileName(id = id, documentType = documentType),
+          document = master.TraderKYC(id = id, documentType = documentType, fileName = name, file = None, zoneStatus = None, organizationStatus = None),
           updateOldDocument = masterTraderKYCs.Service.updateOldDocument
         )
         PartialContent(views.html.component.master.userUploadOrUpdateTraderKYC(masterTraderKYCs.Service.getAllDocuments(masterTraders.Service.getID(loginState.username))))

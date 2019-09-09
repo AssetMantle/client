@@ -267,7 +267,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
               )
               withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ORGANIZATION_VERIFIED)))
             } else {
-              BadRequest(views.html.index(failures = Seq(constants.Response.ALL_KYC_FILES_NOT_VERIFIED)))
+              PreconditionFailed(views.html.index(failures = Seq(constants.Response.ALL_KYC_FILES_NOT_VERIFIED)))
             }
           }
           catch {

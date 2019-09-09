@@ -34,7 +34,7 @@
         @inputText(addOrganizationForm(constants.FormField.REGISTERED_PHONE.name), '_label -> Messages(constants.FormField.REGISTERED_PHONE.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.REGISTERED_PHONE.name), 'id -> "registeredPhone", 'required -> true)
 
         <div>
-            Messages(constants.Form.SAME_AS_REGISTERED_ADDRESS):
+            @Messages(constants.Form.SAME_AS_REGISTERED_ADDRESS):
             @checkbox(Field(form = Form(constants.FormField.SEARCH_TX_HASH_HEIGHT.field), name = constants.FormField.SEARCH_TX_HASH_HEIGHT.name, constraints = Seq(), format = None, errors = Seq(), value = None), 'id -> "organizationKYCSameAsRegisteredAddress", 'label -> Messages(constants.Form.SAME_AS_REGISTERED_ADDRESS))
         </div>
 
