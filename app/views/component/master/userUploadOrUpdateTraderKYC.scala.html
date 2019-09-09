@@ -27,5 +27,5 @@
 </div>
 <button type="button" class="btn-sm btn btn-primary" onclick="getForm(jsRoutes.controllers.SetACLController.addTraderForm())">@Messages(constants.Form.BACK)</button>
 @if(constants.File.TRADER_KYC_DOCUMENT_TYPES.forall(traderKYCs.map(_.documentType).contains)) {
-    <button type="button" class="btn-sm btn btn-primary" id="getTraderKYCReviewForm" onclick="getForm(jsRoutes.controllers.SetACLController.reviewAddTraderForm())">@Messages(constants.Form.NEXT)</button>
+    <button type="button" class="btn-sm btn btn-primary" id="getTraderKYCReviewForm" onclick="getForm(jsRoutes.controllers.SetACLController.reviewTraderCompletionForm())">@Messages(constants.Form.NEXT)</button>
 }

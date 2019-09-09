@@ -84,6 +84,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.SetACLController.userStoreTraderKYC,
         routes.javascript.SetACLController.userUpdateTraderKYCForm,
         routes.javascript.SetACLController.userUpdateTraderKYC,
+        routes.javascript.SetACLController.reviewTraderCompletionForm,
         routes.javascript.SetACLController.viewTradersInOrganization,
         routes.javascript.SetACLController.viewTradersInOrganizationForZone,
         routes.javascript.SetACLController.viewTradersInOrganizationForGenesis,
@@ -187,7 +188,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
 
         routes.javascript.FileController.genesisAccessedFile,
         routes.javascript.FileController.zoneAccessedOrganizationKYCFile,
-        routes.javascript.FileController.zoneAccessedTraderFile,
+        routes.javascript.FileController.zoneAccessedTraderKYCFile,
         routes.javascript.FileController.file,
 
         routes.javascript.AddZoneController.viewKycDocuments,

@@ -67,8 +67,8 @@ POST        /master/login                                                control
 
 GET         /master/getGenesisAccessedFile                               controllers.FileController.genesisAccessedFile(fileName: String, documentType: String)
 GET         /master/zoneAccessedOrganizationKYCFile                      controllers.FileController.zoneAccessedOrganizationKYCFile(organizationID: String, fileName: String, documentType: String)
-GET         /master/getZoneAccessedTraderFile                            controllers.FileController.zoneAccessedTraderFile(accountID: String, fileName: String, documentType: String)
-GET         /master/getOrganizationAccessedFile                          controllers.FileController.organizationAccessedFile(accountID: String, fileName: String, documentType: String)
+GET         /master/getZoneAccessedTraderFile                            controllers.FileController.zoneAccessedTraderKYCFile(accountID: String, fileName: String, documentType: String)
+GET         /master/getOrganizationAccessedFile                          controllers.FileController.organizationAccessedTraderKYCFile(accountID: String, fileName: String, documentType: String)
 GET         /master/file                                                 controllers.FileController.file(fileName: String, documentType: String)
 
 GET         /checkAccountKycFileExists                                   controllers.FileController.checkAccountKycFileExists(accountID: String, documentType: String)
@@ -127,6 +127,8 @@ POST        /master/userUploadTraderKYC                                  control
 GET         /master/userStoreTraderKYC                                   controllers.SetACLController.userStoreTraderKYC(name: String, documentType: String)
 GET         /master/userUpdateTraderKYCForm                              controllers.SetACLController.userUpdateTraderKYCForm(documentType: String)
 GET         /master/userUpdateTraderKYC                                  controllers.SetACLController.userUpdateTraderKYC(name: String, documentType: String)
+GET         /master/reviewTraderCompletion                               controllers.SetACLController.reviewTraderCompletionForm
+POST        /master/reviewTraderCompletion                               controllers.SetACLController.reviewTraderCompletion
 
 GET         /master/zoneVerifyTrader                                     controllers.SetACLController.zoneVerifyTraderForm(accountID: String, organizationID: String)
 POST        /master/zoneVerifyTrader                                     controllers.SetACLController.zoneVerifyTrader

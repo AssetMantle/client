@@ -110,6 +110,16 @@ class Traders @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
     }
   }
 
+  private def updateCompletionStatusOnID(id: String, completionStatus: Boolean) = db.run(traderTable.filter(_.id === id).map(_.completionStatus).update(completionStatus).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
   private def updateVerificationStatusOnAccountID(accountID: String, verificationStatus: Option[Boolean]) = db.run(traderTable.filter(_.accountID === accountID).map(_.verificationStatus.?).update(verificationStatus).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -181,6 +191,8 @@ class Traders @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
     def getTradersForOrganization(organizationID: String): Seq[Trader] = Await.result(getTradersByOrganizationID(organizationID), Duration.Inf)
 
     def getVerificationStatus(id: String): Boolean = Await.result(getVerificationStatusById(id), Duration.Inf).getOrElse(false)
+
+    def markTraderFormCompleted(id: String): Int = Await.result(updateCompletionStatusOnID(id = id, completionStatus = true), Duration.Inf)
 
   }
 

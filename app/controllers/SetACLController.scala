@@ -156,15 +156,15 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
         },
-        reviewOrganizationCompletionData => {
+        reviewTraderCompletionData => {
           try {
-            val id = masterOrganizations.Service.getID(loginState.username)
-            if (reviewOrganizationKYCData.completion && masterOrganizationKYCs.Service.checkAllKYCFileTypesExists(id)) {
-              masterOrganizations.Service.markOrganizationFormCompleted(id)
+            val id = masterTraders.Service.getID(loginState.username)
+            if (reviewTraderCompletionData.completion && masterTraderKYCs.Service.checkAllKYCFileTypesExists(id)) {
+              masterTraders.Service.markTraderFormCompleted(id)
               withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ORGANIZATION_ADDED_FOR_VERIFICATION)))
             } else {
-              val organization = masterOrganizations.Service.getByAccountID(loginState.username)
-              BadRequest(views.html.component.master.reviewAddOrganization(views.companion.master.OrganizationCompletion.form, organization = organization, zone = masterZones.Service.get(organization.zoneID), organizationBankAccountDetail = masterOrganizationBankAccountDetails.Service.get(organization.id), organizationKYCs = masterOrganizationKYCs.Service.getAllDocuments(organization.id)))
+              val trader = masterTraders.Service.getByAccountID(loginState.username)
+              BadRequest(views.html.component.master.reviewTraderCompletion(views.companion.master.TraderCompletion.form, trader = trader, organization = masterOrganizations.Service.get(trader.organizationID), zone = masterZones.Service.get(trader.zoneID), traderKYCs = masterTraderKYCs.Service.getAllDocuments(trader.id)))
             }
           }
           catch {

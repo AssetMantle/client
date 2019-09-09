@@ -5,9 +5,9 @@
 <div>
     @for(traderKYC <- traderKYCs) {
         @component.master.commonDocumentViewer(traderKYC){
-            @routes.FileController.organizationAccessedFile(traderKYC.id, traderKYC.fileName, traderKYC.documentType)
+            @routes.FileController.organizationAccessedTraderKYCFile(traderKYC.id, traderKYC.fileName, traderKYC.documentType)
         }{
-            <a href="@routes.FileController.organizationAccessedFile(traderKYC.id, traderKYC.fileName, traderKYC.documentType)">@Messages(traderKYC.documentType)</a>
+            <a href="@routes.FileController.organizationAccessedTraderKYCFile(traderKYC.id, traderKYC.fileName, traderKYC.documentType)">@Messages(traderKYC.documentType)</a>
         }{
             <div id="traderKycDocumentStatus@traderKYC.id@traderKYC.documentType"></div>
             <span class="red">@Messages(constants.Form.STATUS)
