@@ -213,31 +213,31 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
       )
   }
 
-  def zoneViewKycDocuments(accountID: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+  def zoneViewKycDocuments(traderID: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        withUsernameToken.Ok(views.html.component.master.zoneViewVerificationTraderKycDouments(masterTraderKYCs.Service.getAllDocuments(accountID)))
+        withUsernameToken.Ok(views.html.component.master.zoneViewVerificationTraderKycDouments(masterTraderKYCs.Service.getAllDocuments(traderID)))
       } catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
-  def zoneVerifyKycDocument(accountID: String, documentType: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+  def zoneVerifyKycDocument(traderID: String, documentType: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        masterTraderKYCs.Service.zoneVerify(id = accountID, documentType = documentType)
-        pushNotification.sendNotification(accountID, constants.Notification.SUCCESS, Messages(constants.Response.DOCUMENT_APPROVED.message))
+        masterTraderKYCs.Service.zoneVerify(id = traderID, documentType = documentType)
+        pushNotification.sendNotification(username = masterTraders.Service.getAccountId(traderID), notification = constants.Notification.SUCCESS, messageParameters = Messages(constants.Response.DOCUMENT_APPROVED.message))
         withUsernameToken.Ok(Messages(constants.Response.SUCCESS.message))
       } catch {
         case baseException: BaseException => InternalServerError(Messages(baseException.failure.message))
       }
   }
 
-  def zoneRejectKycDocument(accountID: String, documentType: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+  def zoneRejectKycDocument(traderID: String, documentType: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        masterTraderKYCs.Service.zoneReject(id = accountID, documentType = documentType)
-        pushNotification.sendNotification(accountID, constants.Notification.FAILURE, Messages(constants.Response.DOCUMENT_REJECTED.message))
+        masterTraderKYCs.Service.zoneReject(id = traderID, documentType = documentType)
+        pushNotification.sendNotification(username = masterTraders.Service.getAccountId(traderID), notification = constants.Notification.FAILURE, messageParameters = Messages(constants.Response.DOCUMENT_REJECTED.message))
         withUsernameToken.Ok(Messages(constants.Response.SUCCESS.message))
       } catch {
         case baseException: BaseException => InternalServerError(Messages(baseException.failure.message))
@@ -316,31 +316,31 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
       )
   }
 
-  def organizationViewKycDocuments(accountID: String): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+  def organizationViewKycDocuments(traderID: String): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        withUsernameToken.Ok(views.html.component.master.organizationViewVerificationTraderKycDouments(masterTraderKYCs.Service.getAllDocuments(accountID)))
+        withUsernameToken.Ok(views.html.component.master.organizationViewVerificationTraderKycDouments(masterTraderKYCs.Service.getAllDocuments(traderID)))
       } catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
-  def organizationVerifyKycDocument(accountID: String, documentType: String): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+  def organizationVerifyKycDocument(traderID: String, documentType: String): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        masterTraderKYCs.Service.organizationVerify(id = accountID, documentType = documentType)
-        pushNotification.sendNotification(accountID, constants.Notification.SUCCESS, Messages(constants.Response.DOCUMENT_APPROVED.message))
+        masterTraderKYCs.Service.organizationVerify(id = traderID, documentType = documentType)
+        pushNotification.sendNotification(username = masterTraders.Service.getAccountId(traderID), notification = constants.Notification.SUCCESS, messageParameters = Messages(constants.Response.DOCUMENT_APPROVED.message))
         withUsernameToken.Ok(Messages(constants.Response.SUCCESS.message))
       } catch {
         case baseException: BaseException => InternalServerError(Messages(baseException.failure.message))
       }
   }
 
-  def organizationRejectKycDocument(accountID: String, documentType: String): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+  def organizationRejectKycDocument(traderID: String, documentType: String): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        masterTraderKYCs.Service.organizationReject(id = accountID, documentType = documentType)
-        pushNotification.sendNotification(accountID, constants.Notification.FAILURE, Messages(constants.Response.DOCUMENT_REJECTED.message))
+        masterTraderKYCs.Service.organizationReject(id = traderID, documentType = documentType)
+        pushNotification.sendNotification(username = masterTraders.Service.getAccountId(traderID), notification = constants.Notification.FAILURE, messageParameters = Messages(constants.Response.DOCUMENT_REJECTED.message))
         withUsernameToken.Ok(Messages(constants.Response.SUCCESS.message))
       } catch {
         case baseException: BaseException => InternalServerError(Messages(baseException.failure.message))
