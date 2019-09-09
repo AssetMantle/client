@@ -15,8 +15,8 @@
         <button id="userButtonUploadIdentificationZone" class="hidden" onclick="getForm(jsRoutes.controllers.FileController.uploadUserZoneKycForm('@constants.File.IDENTIFICATION'))">@Messages(constants.Form.UPLOAD_ZONE_IDENTIFICATION)</button>
         <button id="userButtonUpdateIdentificationZone" class="hidden" onclick="getForm(jsRoutes.controllers.FileController.updateUserZoneKycForm('@constants.File.IDENTIFICATION'))">@Messages(constants.Form.UPDATE_ZONE_IDENTIFICATION)</button>
         <script>checkZoneKycFileExists('@loginState.username', '@constants.File.IDENTIFICATION', "userButtonUploadIdentificationZone", "userButtonUpdateIdentificationZone")</script>
-        <button id="userButtonUploadIdentificationTrader" class="hidden" onclick="getForm(jsRoutes.controllers.FileController.uploadUserTraderKycForm('@constants.File.IDENTIFICATION'))">@Messages(constants.Form.UPLOAD_TRADER_IDENTIFICATION)</button>
-        <button id="userButtonUpdateIdentificationTrader" class="hidden" onclick="getForm(jsRoutes.controllers.FileController.updateUserTraderKycForm('@constants.File.IDENTIFICATION'))">@Messages(constants.Form.UPDATE_TRADER_IDENTIFICATION)</button>
+        <button id="userButtonUploadIdentificationTrader" class="hidden" onclick="getForm(jsRoutes.controllers.FileController.userUploadTraderKYCForm('@constants.File.IDENTIFICATION'))">@Messages(constants.Form.UPLOAD_TRADER_IDENTIFICATION)</button>
+        <button id="userButtonUpdateIdentificationTrader" class="hidden" onclick="getForm(jsRoutes.controllers.FileController.userUpdateTraderKYCForm('@constants.File.IDENTIFICATION'))">@Messages(constants.Form.UPDATE_TRADER_IDENTIFICATION)</button>
         <script>checkFileExists(jsRoutes.controllers.FileController.checkTraderKycFileExists('@loginState.username', '@constants.File.IDENTIFICATION'), "userButtonUploadIdentificationTrader", "userButtonUpdateIdentificationTrader")</script>
 
         <button onclick="getForm(jsRoutes.controllers.AddOrganizationController.addOrganizationForm())">@Messages(constants.Form.ADD_ORGANIZATION)</button>

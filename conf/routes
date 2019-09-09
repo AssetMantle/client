@@ -94,12 +94,6 @@ GET         /userUpload/storeUserZoneKycDocument                         control
 GET         /userUpdate/zoneKyc                                          controllers.FileController.updateUserZoneKycForm(documentType: String)
 GET         /userUpdate/updateUserZoneKycDocument                        controllers.FileController.updateUserZoneKyc(name: String, documentType: String)
 
-GET         /userUpload/traderKyc                                        controllers.FileController.uploadUserTraderKycForm(documentType: String)
-POST        /userUpload/userTraderKycDocument                            controllers.FileController.uploadUserTraderKyc(documentType: String)
-GET         /userUpload/storeUserTraderKycDocument                       controllers.FileController.storeUserTraderKyc(name: String, documentType: String)
-GET         /userUpdate/traderKyc                                        controllers.FileController.updateUserTraderKycForm(documentType: String)
-GET         /userUpload/updateUserTraderKycDocument                      controllers.FileController.updateUserTraderKyc(name: String, documentType: String)
-
 GET         /zoneUpload                                                  controllers.FileController.uploadZoneKycForm(documentType: String)
 POST        /zoneUpload/file                                             controllers.FileController.uploadZoneKyc(documentType: String)
 GET         /zoneUpload/storeFile                                        controllers.FileController.storeZoneKyc(name: String, documentType: String)
@@ -126,7 +120,13 @@ POST        /master/verifyEmailAddress                                   control
 
 GET         /master/addTrader                                            controllers.SetACLController.addTraderForm
 POST        /master/addTrader                                            controllers.SetACLController.addTrader
-
+GET         /master/userUploadOrUpdateTraderKYCView                      controllers.SetACLController.userUploadOrUpdateTraderKYCView
+GET         /master/userAccessedTraderKYCFile                            controllers.SetACLController.userAccessedTraderKYCFile(documentType: String)
+GET         /master/userUploadTraderKYCForm                              controllers.SetACLController.userUploadTraderKYCForm(documentType: String)
+POST        /master/userUploadTraderKYC                                  controllers.SetACLController.userUploadTraderKYC(documentType: String)
+GET         /master/userStoreTraderKYC                                   controllers.SetACLController.userStoreTraderKYC(name: String, documentType: String)
+GET         /master/userUpdateTraderKYCForm                              controllers.SetACLController.userUpdateTraderKYCForm(documentType: String)
+GET         /master/userUpdateTraderKYC                                  controllers.SetACLController.userUpdateTraderKYC(name: String, documentType: String)
 
 GET         /master/zoneVerifyTrader                                     controllers.SetACLController.zoneVerifyTraderForm(accountID: String, organizationID: String)
 POST        /master/zoneVerifyTrader                                     controllers.SetACLController.zoneVerifyTrader
