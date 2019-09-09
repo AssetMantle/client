@@ -161,8 +161,8 @@ GET         /master/storeUserOrganizationKYCDocument                     control
 GET         /master/userUpdateOrganizationKYC                            controllers.AddOrganizationController.userUpdateOrganizationKycForm(documentType: String)
 GET         /master/userUpdateOrganizationKYCDocument                    controllers.AddOrganizationController.userUpdateOrganizationKyc(name: String, documentType: String)
 GET         /master/userAccessedOrganizationKYCFile                      controllers.AddOrganizationController.userAccessedOrganizationKYCFile(documentType: String)
-GET         /master/reviewOrganizationKYC                                controllers.AddOrganizationController.reviewAddOrganizationForm
-POST        /master/reviewOrganizationKYC                                controllers.AddOrganizationController.reviewAddOrganization
+GET         /master/reviewOrganizationKYC                                controllers.AddOrganizationController.reviewOrganizationCompletionForm
+POST        /master/reviewOrganizationKYC                                controllers.AddOrganizationController.reviewOrganizationCompletion
 GET         /master/viewVerifyOrganizationRequests                       controllers.AddOrganizationController.viewPendingVerifyOrganizationRequests
 GET         /master/viewOrganizationVerificationBankAccountDetail        controllers.AddOrganizationController.viewOrganizationVerificationBankAccountDetail(organizationID: String)
 GET         /master/viewOrganizationKycDocuments                         controllers.AddOrganizationController.viewKycDocuments(accountID: String)

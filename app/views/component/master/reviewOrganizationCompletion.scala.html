@@ -14,9 +14,11 @@
 <div class="latest_card-body">
     <div id="organization" class="flexItem thirdBox box lightBlue">
         <div class="leftText">
-            <div>@Messages(constants.Form.ORGANIZATION_DETAILS): <br>
+            <div>@Messages(constants.Form.ZONE_DETAILS): <br>
                 <span class="red">@Messages(constants.Form.NAME)</span>: @zone.name <br>
                 <span class="red">@Messages(constants.Form.CURRENCY)</span>: @zone.currency <br>
+            </div>
+            <div>@Messages(constants.Form.ORGANIZATION_DETAILS): <br>
                 <span class="red">@Messages(constants.Form.ORGANIZATION_ID)</span>: @organization.id <br>
                 <span class="red">@Messages(constants.Form.NAME)</span>: @organization.name <br>
                 <span class="red">@Messages(constants.Form.ABBREVIATION)</span>: @organization.abbreviation.getOrElse("") <br>
@@ -80,7 +82,7 @@
                 }
             </div>
             <br>
-            @form(action = routes.AddOrganizationController.reviewAddOrganization, 'onkeypress -> "validateForm(event,this)") {
+            @form(action = routes.AddOrganizationController.reviewOrganizationCompletion, 'onkeypress -> "validateForm(event,this)") {
                 @CSRF.formField
                 @Messages(constants.Form.COMPLETION):
                 <span>@checkbox(organizationCompletionForm(constants.Form.COMPLETION), '_label -> Messages(constants.Form.COMPLETION), 'class -> "form-control", 'placeholder -> Messages(constants.Form.COMPLETION), 'required -> true)</span>
