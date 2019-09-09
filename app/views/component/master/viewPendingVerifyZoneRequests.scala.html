@@ -1,19 +1,21 @@
-@import models.master.Zone
-@import models.master.AccountKYC
 @import controllers.actions.LoginState
+@import models.master.Zone
 
 @(zoneVerificationRequests: Seq[Zone])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 <script src="@routes.Assets.versioned("javascripts/kycVerification.js")" type="text/javascript"></script>
-    @for(zoneVerificationRequest <- zoneVerificationRequests) {
+@for(zoneVerificationRequest <- zoneVerificationRequests) {
     <div class="col-md-6">
         <div class="flexItem card-body leftText lightBlue">
-            <span class="red">@Messages(constants.Form.ZONE_ID)</span> : @zoneVerificationRequest.id <br>
-            <span class="red">@Messages(constants.Form.ACCOUNT_ID)</span> : @zoneVerificationRequest.accountID <br>
-            <span class="red">@Messages(constants.Form.NAME)</span> : @zoneVerificationRequest.name <br>
-            <span class="red">@Messages(constants.Form.CURRENCY)</span> : @zoneVerificationRequest.currency <br>
-            <span class="red">@Messages(constants.Form.DOCUMENTS)</span> : <span id = "kycDocuments@zoneVerificationRequest.accountID"><script>componentResource('kycDocuments@zoneVerificationRequest.accountID', jsRoutes.controllers.AddZoneController.viewKycDocuments('@zoneVerificationRequest.accountID'))</script></span> <br>
+            <span class="red">@Messages(constants.Form.ZONE_ID)</span>: @zoneVerificationRequest.id <br>
+            <span class="red">@Messages(constants.Form.ACCOUNT_ID)</span>: @zoneVerificationRequest.accountID <br>
+            <span class="red">@Messages(constants.Form.NAME)</span>: @zoneVerificationRequest.name <br>
+            <span class="red">@Messages(constants.Form.CURRENCY)</span>: @zoneVerificationRequest.currency <br>
+            <span class="red">@Messages(constants.Form.DOCUMENTS)</span>
+            : <span id = "kycDocuments@zoneVerificationRequest.accountID"><script>componentResource('kycDocuments@zoneVerificationRequest.accountID', jsRoutes.controllers.AddZoneController.viewKycDocuments('@zoneVerificationRequest.accountID'))</script></span>
+            <br>
             <button class="btn btn-sm btn-success" onclick="getForm(jsRoutes.controllers.AddZoneController.verifyZoneForm('@zoneVerificationRequest.id'))">@Messages(constants.Form.APPROVE)</button>
             <button class="btn btn-sm btn-danger" onclick="getForm(jsRoutes.controllers.AddZoneController.rejectVerifyZoneRequestForm('@zoneVerificationRequest.id'))">@Messages(constants.Form.REJECT)</button>
         </div>
     </div>
-    }
+    <br>
+}

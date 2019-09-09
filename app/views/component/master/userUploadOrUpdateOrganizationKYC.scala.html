@@ -74,13 +74,11 @@
     <div id="uploadBankAccountDetail">
         <button onclick="getForm(jsRoutes.controllers.AddOrganizationController.userUploadOrganizationKycForm('@constants.File.BANK_ACCOUNT_DETAIL'))">@Messages(constants.Form.UPLOAD_BANK_ACCOUNT_DETAIL)</button>
     </div>
-    <br>
     <div id="uploadAdminProfileIdentification">
         <button onclick="getForm(jsRoutes.controllers.AddOrganizationController.userUploadOrganizationKycForm('@constants.File.ADMIN_PROFILE_IDENTIFICATION'))">@Messages(constants.Form.UPLOAD_ADMIN_PROFILE_IDENTIFICATION)</button>
     </div>
-    <br>
 </div>
 <button type="button" class="btn-sm btn btn-primary" onclick="getForm(jsRoutes.controllers.AddOrganizationController.organizationBankAccountDetailForm())">@Messages(constants.Form.BACK)</button>
-    @if(constants.File.ORGANIZATION_KYC_DOCUMENT_TYPES.forall(organizationKYCs.map(_.documentType).contains)) {
-        <button type="button" class="btn-sm btn btn-primary" id="getOrganizationKYCReviewForm" onclick="getForm(jsRoutes.controllers.AddOrganizationController.reviewAddOrganizationForm())">@Messages(constants.Form.NEXT)</button>
-    }
+@if(constants.File.ORGANIZATION_KYC_DOCUMENT_TYPES.forall(organizationKYCs.map(_.documentType).contains)) {
+    <button type="button" class="btn-sm btn btn-primary" id="getOrganizationKYCReviewForm" onclick="getForm(jsRoutes.controllers.AddOrganizationController.reviewAddOrganizationForm())">@Messages(constants.Form.NEXT)</button>
+}

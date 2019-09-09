@@ -4,7 +4,6 @@
 
 @(verifyTraderForm: Form[VerifyTrader.Data], aclAddress: String, organizationID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 
-
 @form(action = routes.SetACLController.zoneVerifyTrader, 'onkeypress -> "validateForm(event,this)") {
     <div class="latest_card-header latest_card-header-primary text-center">
         <h4 class="latest_card-title">@Messages(constants.Form.VERIFY_TRADER)</h4>

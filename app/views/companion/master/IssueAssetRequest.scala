@@ -13,13 +13,13 @@ object IssueAssetRequest {
       constants.FormField.QUANTITY_UNIT.name -> constants.FormField.QUANTITY_UNIT.field,
       constants.FormField.ASSET_QUANTITY.name -> constants.FormField.ASSET_QUANTITY.field,
       constants.Form.MODERATED -> boolean,
-      constants.FormField.TAKER_ADDRESS.name -> constants.FormField.TAKER_ADDRESS.field,
+      constants.FormField.TAKER_ADDRESS.name -> optional(constants.FormField.TAKER_ADDRESS.field),
       constants.FormField.GAS.name -> optional(constants.FormField.GAS.field),
       constants.FormField.PASSWORD.name -> optional(constants.FormField.PASSWORD.field),
-    )(Data.apply)(Data.unapply)
+    )(Data.apply)(Data.unapply).verifying(constants.FormConstraint.issueAssetRequestCheckConstraint)
   )
 
-  case class Data(documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, moderated: Boolean, takerAddress: String, gas: Option[Int], password: Option[String])
+  case class Data(documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, moderated: Boolean, takerAddress: Option[String], gas: Option[Int], password: Option[String])
 
 }
 

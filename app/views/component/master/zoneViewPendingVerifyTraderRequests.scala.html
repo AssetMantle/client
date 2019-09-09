@@ -1,21 +1,19 @@
-@import models.master.Trader
-
 @import controllers.actions.LoginState
+@import models.master.Trader
 @(traderVerificationRequests: Seq[Trader])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 <script src="@routes.Assets.versioned("javascripts/kycVerification.js")" type="text/javascript"></script>
-    @for(traderVerificationRequest <- traderVerificationRequests) {
+@for(traderVerificationRequest <- traderVerificationRequests) {
     <div class="col-md-12">
         <br>
         <div class="flexItem card-body leftText lightBlue dblock lightBlue document_details_card">
-            <span class="red">@Messages(constants.Form.ZONE_ID)</span> : @traderVerificationRequest.zoneID <br>
-            <span class="red">@Messages(constants.Form.ORGANIZATION_ID)</span> : @traderVerificationRequest.organizationID <br>
-            <span class="red">@Messages(constants.Form.ACCOUNT_ID)</span> : @traderVerificationRequest.accountID <br>
-            <span class="red">@Messages(constants.Form.NAME)</span> : @traderVerificationRequest.name <br>
-            <span class="red">@Messages(constants.Form.DOCUMENTS)</span> : <span id = "kycDocuments@traderVerificationRequest.accountID"><script>componentResource('kycDocuments@traderVerificationRequest.accountID', jsRoutes.controllers.SetACLController.zoneViewKycDocuments('@traderVerificationRequest.accountID'))</script></span> <br>
+            <span class="red">@Messages(constants.Form.ZONE_ID)</span>: @traderVerificationRequest.zoneID <br>
+            <span class="red">@Messages(constants.Form.ORGANIZATION_ID)</span>: @traderVerificationRequest.organizationID <br>
+            <span class="red">@Messages(constants.Form.ACCOUNT_ID)</span>: @traderVerificationRequest.accountID <br>
+            <span class="red">@Messages(constants.Form.NAME)</span>: @traderVerificationRequest.name <br>
+            <span class="red">@Messages(constants.Form.DOCUMENTS)</span>: <span id = "kycDocuments@traderVerificationRequest.accountID"><script>componentResource('kycDocuments@traderVerificationRequest.accountID', jsRoutes.controllers.SetACLController.zoneViewKycDocuments('@traderVerificationRequest.accountID'))</script></span><br>
             <button class="btn btn-sm btn-success" onclick="getForm(jsRoutes.controllers.SetACLController.zoneVerifyTraderForm('@traderVerificationRequest.accountID', '@traderVerificationRequest.organizationID'))">@Messages(constants.Form.APPROVE)</button>
             <button class="btn btn-sm btn-danger" onclick="getForm(jsRoutes.controllers.SetACLController.zoneRejectVerifyTraderRequestForm('@traderVerificationRequest.id'))">@Messages(constants.Form.REJECT)</button>
         </div>
     </div>
-    }
-
-<br>
+    <br>
+}

@@ -48,7 +48,7 @@ object FormField {
   val DOCUMENT_HASH = new StringFormField("DOCUMENT_HASH", 4, 50, RegularExpression.HASH)
   val FROM = new StringFormField("FROM", 45, 45)
   val MODE = new StringFormField("MODE", 4, 5)
-  val TAKER_ADDRESS = new StringFormField( "TAKER_ADDRESS", 0, 45)
+  val TAKER_ADDRESS = new StringFormField( "TAKER_ADDRESS", 45, 45)
   val REGISTERED_ADDRESS_LINE_1 = new StringFormField("REGISTERED_ADDRESS_LINE_1", 4, 200)
   val REGISTERED_ADDRESS_LINE_2 = new StringFormField("REGISTERED_ADDRESS_LINE_2", 4, 200)
   val REGISTERED_LANDMARK = new StringFormField("REGISTERED_LANDMARK", 4, 100)

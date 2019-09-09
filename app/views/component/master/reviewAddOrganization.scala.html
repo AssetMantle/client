@@ -1,8 +1,8 @@
 @import controllers.actions.LoginState
 @import helper._
-@import play.api.Logger
 @import master.utils.{Address, UBO, UBOs}
 @import models.master.{Organization, OrganizationBankAccountDetail, OrganizationKYC, Zone}
+@import play.api.Logger
 @import play.api.libs.json.Json
 @import views.companion.master.OrganizationCompletion
 
@@ -15,36 +15,36 @@
     <div id="organization" class="flexItem thirdBox box lightBlue">
         <div class="leftText">
             <div>@Messages(constants.Form.ORGANIZATION_DETAILS): <br>
-                <span class="red">@Messages(constants.Form.NAME)</span> : @zone.name <br>
-                <span class="red">@Messages(constants.Form.CURRENCY)</span> : @zone.currency <br>
-                <span class="red">@Messages(constants.Form.ORGANIZATION_ID)</span> : @organization.id <br>
-                <span class="red">@Messages(constants.Form.NAME)</span> : @organization.name <br>
+                <span class="red">@Messages(constants.Form.NAME)</span>: @zone.name <br>
+                <span class="red">@Messages(constants.Form.CURRENCY)</span>: @zone.currency <br>
+                <span class="red">@Messages(constants.Form.ORGANIZATION_ID)</span>: @organization.id <br>
+                <span class="red">@Messages(constants.Form.NAME)</span>: @organization.name <br>
                 <span class="red">@Messages(constants.Form.ABBREVIATION)</span>: @organization.abbreviation.getOrElse("") <br>
                 <span class="red">@Messages(constants.Form.ESTABLISHMENT_DATE)</span>: @organization.establishmentDate <br>
-                <span class="red">@Messages(constants.Form.EMAIL)</span> : @organization.email <br>
+                <span class="red">@Messages(constants.Form.EMAIL)</span>: @organization.email <br>
             </div>
             <br>
             @defining(utilities.JSON.getInstance[Address](organization.registeredAddress)) { registeredAddress: Address =>
                 <div>@Messages(constants.Form.REGISTERED_ADDRESS) : <br>
-                <span class="red">@Messages(constants.Form.ADDRESS_LINE_1)</span> : @registeredAddress.addressLine1 <br>
-                <span class="red">@Messages(constants.Form.ADDRESS_LINE_2)</span> : @registeredAddress.addressLine2 <br>
+                <span class="red">@Messages(constants.Form.ADDRESS_LINE_1)</span>: @registeredAddress.addressLine1 <br>
+                <span class="red">@Messages(constants.Form.ADDRESS_LINE_2)</span>: @registeredAddress.addressLine2 <br>
                 <span class="red">@Messages(constants.Form.LANDMARK)</span>: @registeredAddress.landmark.getOrElse("") <br>
-                <span class="red">@Messages(constants.Form.CITY)</span> : @registeredAddress.city <br>
-                <span class="red">@Messages(constants.Form.COUNTRY)</span> : @registeredAddress.country <br>
-                <span class="red">@Messages(constants.Form.ZIP_CODE)</span> : @registeredAddress.zipCode <br>
-                <span class="red">@Messages(constants.Form.PHONE)</span> : @registeredAddress.phone
+                <span class="red">@Messages(constants.Form.CITY)</span>: @registeredAddress.city <br>
+                <span class="red">@Messages(constants.Form.COUNTRY)</span>: @registeredAddress.country <br>
+                <span class="red">@Messages(constants.Form.ZIP_CODE)</span>: @registeredAddress.zipCode <br>
+                <span class="red">@Messages(constants.Form.PHONE)</span>: @registeredAddress.phone
                 </div>
             }
             <br>
             @defining(utilities.JSON.getInstance[Address](organization.postalAddress)) { postalAddress: Address =>
                 <div>@Messages(constants.Form.POSTAL_ADDRESS) : <br>
-                <span class="red">@Messages(constants.Form.ADDRESS_LINE_1)</span> : @postalAddress.addressLine1 <br>
-                <span class="red">@Messages(constants.Form.ADDRESS_LINE_2)</span> : @postalAddress.addressLine2 <br>
-                <span class="red">@Messages(constants.Form.LANDMARK)</span> : @postalAddress.landmark.getOrElse("") <br>
-                <span class="red">@Messages(constants.Form.CITY)</span> : @postalAddress.city <br>
-                <span class="red">@Messages(constants.Form.COUNTRY)</span> : @postalAddress.country <br>
-                <span class="red">@Messages(constants.Form.ZIP_CODE)</span> : @postalAddress.zipCode <br>
-                <span class="red">@Messages(constants.Form.PHONE)</span> : @postalAddress.phone
+                <span class="red">@Messages(constants.Form.ADDRESS_LINE_1)</span>: @postalAddress.addressLine1 <br>
+                <span class="red">@Messages(constants.Form.ADDRESS_LINE_2)</span>: @postalAddress.addressLine2 <br>
+                <span class="red">@Messages(constants.Form.LANDMARK)</span>: @postalAddress.landmark.getOrElse("") <br>
+                <span class="red">@Messages(constants.Form.CITY)</span>: @postalAddress.city <br>
+                <span class="red">@Messages(constants.Form.COUNTRY)</span>: @postalAddress.country <br>
+                <span class="red">@Messages(constants.Form.ZIP_CODE)</span>: @postalAddress.zipCode <br>
+                <span class="red">@Messages(constants.Form.PHONE)</span>: @postalAddress.phone
                 </div>
             }
             <br>
@@ -52,9 +52,9 @@
                 <div>@Messages(constants.Form.ORGANIZATION_UBO_DETAIL): <br>
                     @for(ubo <- ubos) {
                         <span class="red">@Messages(constants.Form.PERSON_NAME)</span>: @ubo.personName <br>
-                        <span class="red">@Messages(constants.Form.SHARE_PERCENTAGE)</span> : @ubo.sharePercentage <br>
+                        <span class="red">@Messages(constants.Form.SHARE_PERCENTAGE)</span>: @ubo.sharePercentage <br>
                         <span class="red">@Messages(constants.Form.RELATIONSHIP)</span>: @ubo.relationship <br>
-                        <span class="red">@Messages(constants.Form.TITLE)</span> : @ubo.title <br>
+                        <span class="red">@Messages(constants.Form.TITLE)</span>: @ubo.title <br>
                         }
                 </div>
             }
@@ -66,7 +66,7 @@
                 <span class="red">@Messages(constants.Form.BANK_NAME)</span>: @organizationBankAccountDetail.bankName <br>
                 <span class="red">@Messages(constants.Form.SWIFT_CODE)</span>: @organizationBankAccountDetail.swiftAddress <br>
                 <span class="red">@Messages(constants.Form.BANK_ADDRESS)</span>: @organizationBankAccountDetail.swiftAddress <br>
-                <span class="red">@Messages(constants.Form.COUNTRY)</span> : @organizationBankAccountDetail.country <br>
+                <span class="red">@Messages(constants.Form.COUNTRY)</span>: @organizationBankAccountDetail.country <br>
                 <span class="red">@Messages(constants.Form.ZIP_CODE)</span>: @organizationBankAccountDetail.zipCode <br>
             </div>
             <br>
