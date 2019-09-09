@@ -13,10 +13,8 @@
         } {
             <a href="@routes.AddOrganizationController.userAccessedOrganizationKYCFile(organizationKYC.documentType)">@Messages(organizationKYC.documentType)</a>
         } {
-            <div>
-                <button onclick="getForm(jsRoutes.controllers.AddOrganizationController.userUpdateOrganizationKycForm('@organizationKYC.documentType'))">@Messages(constants.Form.UPDATE) @Messages(organizationKYC.documentType)</button>
-                <script>hideElement('upload@organizationKYC.documentType')</script>
-            </div>
+            <button onclick="getForm(jsRoutes.controllers.AddOrganizationController.userUpdateOrganizationKycForm('@organizationKYC.documentType'))">@Messages(constants.Form.UPDATE) @Messages(organizationKYC.documentType)</button>
+            <script>hideElement('upload@organizationKYC.documentType')</script>
         }
     }
     @for(documentType <- constants.File.ORGANIZATION_KYC_DOCUMENT_TYPES) {
