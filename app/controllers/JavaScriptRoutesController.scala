@@ -155,6 +155,11 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.AddOrganizationController.viewOrganizationsInZone,
         routes.javascript.AddOrganizationController.viewOrganizationsInZoneForGenesis,
         routes.javascript.AddOrganizationController.blockchainAddOrganizationForm,
+        routes.javascript.AddOrganizationController.uploadOrganizationKycForm,
+        routes.javascript.AddOrganizationController.uploadOrganizationKyc,
+        routes.javascript.AddOrganizationController.storeOrganizationKyc,
+        routes.javascript.AddOrganizationController.updateOrganizationKycForm,
+        routes.javascript.AddOrganizationController.updateOrganizationKyc,
 
         routes.javascript.FileController.uploadUserTraderKycForm,
         routes.javascript.FileController.uploadUserTraderKyc,
@@ -167,12 +172,6 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.FileController.storeZoneKyc,
         routes.javascript.FileController.updateZoneKycForm,
         routes.javascript.FileController.updateZoneKyc,
-
-        routes.javascript.FileController.uploadOrganizationKycForm,
-        routes.javascript.FileController.uploadOrganizationKyc,
-        routes.javascript.FileController.storeOrganizationKyc,
-        routes.javascript.FileController.updateOrganizationKycForm,
-        routes.javascript.FileController.updateOrganizationKyc,
 
         routes.javascript.FileController.uploadTraderKycForm,
         routes.javascript.FileController.uploadTraderKyc,

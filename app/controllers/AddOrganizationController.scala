@@ -2,7 +2,7 @@ package controllers
 
 import java.nio.file.Files
 
-import controllers.actions.{WithGenesisLoginAction, WithUserLoginAction, WithZoneLoginAction}
+import controllers.actions.{WithGenesisLoginAction, WithOrganizationLoginAction, WithUserLoginAction, WithZoneLoginAction}
 import controllers.results.WithUsernameToken
 import exceptions.{BaseException, BlockChainException}
 import javax.inject.{Inject, Singleton}
@@ -18,7 +18,7 @@ import views.companion.master.FileUpload
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class AddOrganizationController @Inject()(messagesControllerComponents: MessagesControllerComponents, fileResourceManager: utilities.FileResourceManager, transaction: utilities.Transaction, masterOrganizationBankAccountDetails: master.OrganizationBankAccountDetails, pushNotification: PushNotification, blockchainAccounts: blockchain.Accounts, masterOrganizationKYCs: master.OrganizationKYCs, masterTraders: master.Traders, transactionsAddOrganization: transactions.AddOrganization, blockchainOrganizations: blockchain.Organizations, masterZones: master.Zones, blockchainTransactionAddOrganizations: blockchainTransaction.AddOrganizations, masterOrganizations: master.Organizations, masterAccounts: master.Accounts, withUserLoginAction: WithUserLoginAction, withZoneLoginAction: WithZoneLoginAction, withGenesisLoginAction: WithGenesisLoginAction, withUsernameToken: WithUsernameToken)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class AddOrganizationController @Inject()(messagesControllerComponents: MessagesControllerComponents, withOrganizationLoginAction: WithOrganizationLoginAction, fileResourceManager: utilities.FileResourceManager, transaction: utilities.Transaction, masterOrganizationBankAccountDetails: master.OrganizationBankAccountDetails, pushNotification: PushNotification, blockchainAccounts: blockchain.Accounts, masterOrganizationKYCs: master.OrganizationKYCs, masterTraders: master.Traders, transactionsAddOrganization: transactions.AddOrganization, blockchainOrganizations: blockchain.Organizations, masterZones: master.Zones, blockchainTransactionAddOrganizations: blockchainTransaction.AddOrganizations, masterOrganizations: master.Organizations, masterAccounts: master.Accounts, withUserLoginAction: WithUserLoginAction, withZoneLoginAction: WithZoneLoginAction, withGenesisLoginAction: WithGenesisLoginAction, withUsernameToken: WithUsernameToken)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
@@ -349,6 +349,67 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
         Ok(views.html.component.master.viewPendingVerifyOrgnizationRequests(masterOrganizations.Service.getVerifyOrganizationRequests(masterZones.Service.getZoneId(loginState.username))))
       }
       catch {
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
+  }
+
+  def uploadOrganizationKycForm(documentType: String): Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.uploadFileForm(utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.uploadOrganizationKyc), utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.storeOrganizationKyc), documentType))
+  }
+
+  def updateOrganizationKycForm(documentType: String): Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.updateFileForm(utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.uploadOrganizationKyc), utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.updateOrganizationKyc), documentType))
+  }
+
+  def uploadOrganizationKyc(documentType: String) = Action(parse.multipartFormData) { implicit request =>
+    FileUpload.form.bindFromRequest.fold(
+      formWithErrors => {
+        BadRequest(formWithErrors.errors.mkString("\n"))
+      },
+      fileUploadInfo => {
+        try {
+          request.body.file("file") match {
+            case None => BadRequest(views.html.index(failures = Seq(constants.Response.NO_FILE)))
+            case Some(file) => utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, fileResourceManager.getOrganizationKycFilePath(documentType))
+              Ok
+          }
+        }
+        catch {
+          case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+        }
+      }
+    )
+  }
+
+  def storeOrganizationKyc(name: String, documentType: String): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      try {
+        fileResourceManager.storeFile[master.OrganizationKYC](
+          name = name,
+          documentType = documentType,
+          path = fileResourceManager.getOrganizationKycFilePath(documentType),
+          document = master.OrganizationKYC(id = masterOrganizations.Service.getID(loginState.username), documentType = documentType, status = None, fileName = name, file = None),
+          masterCreate = masterOrganizationKYCs.Service.create
+        )
+        withUsernameToken.Ok(Messages(constants.Response.FILE_UPLOAD_SUCCESSFUL.message))
+      } catch {
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
+  }
+
+  def updateOrganizationKyc(name: String, documentType: String): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      try {
+        fileResourceManager.updateFile[master.OrganizationKYC](
+          name = name,
+          documentType = documentType,
+          path = fileResourceManager.getOrganizationKycFilePath(documentType),
+          oldDocumentFileName = masterOrganizationKYCs.Service.getFileName(id = masterOrganizations.Service.getID(loginState.username), documentType = documentType),
+          document = master.OrganizationKYC(id = masterOrganizations.Service.getID(loginState.username), documentType = documentType, status = None, fileName = name, file = None),
+          updateOldDocument = masterOrganizationKYCs.Service.updateOldDocument
+        )
+        withUsernameToken.Ok(Messages(constants.Response.FILE_UPDATE_SUCCESSFUL.message))
+      } catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }

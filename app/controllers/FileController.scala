@@ -298,68 +298,6 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
       }
   }
 
-  def uploadOrganizationKycForm(documentType: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.uploadFileForm(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadOrganizationKyc), utilities.String.getJsRouteFunction(routes.javascript.FileController.storeOrganizationKyc), documentType))
-  }
-
-  def updateOrganizationKycForm(documentType: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.updateFileForm(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadOrganizationKyc), utilities.String.getJsRouteFunction(routes.javascript.FileController.updateOrganizationKyc), documentType))
-  }
-
-  def uploadOrganizationKyc(documentType: String) = Action(parse.multipartFormData) { implicit request =>
-    FileUpload.form.bindFromRequest.fold(
-      formWithErrors => {
-        BadRequest(formWithErrors.errors.mkString("\n"))
-      },
-      fileUploadInfo => {
-        try {
-          request.body.file("file") match {
-            case None => BadRequest(views.html.index(failures = Seq(constants.Response.NO_FILE)))
-            case Some(file) => utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, fileResourceManager.getOrganizationKycFilePath(documentType))
-              Ok
-          }
-        }
-        catch {
-          case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-        }
-      }
-    )
-  }
-
-  def storeOrganizationKyc(name: String, documentType: String): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
-    implicit request =>
-      try {
-        fileResourceManager.storeFile[master.OrganizationKYC](
-          name = name,
-          documentType = documentType,
-          path = fileResourceManager.getOrganizationKycFilePath(documentType),
-          document = master.OrganizationKYC(id = masterOrganizations.Service.getID(loginState.username), documentType = documentType, status = None, fileName = name, file = None),
-          masterCreate = masterOrganizationKYCs.Service.create
-        )
-        withUsernameToken.Ok(Messages(constants.Response.FILE_UPLOAD_SUCCESSFUL.message))
-      } catch {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-      }
-  }
-
-  def updateOrganizationKyc(name: String, documentType: String): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
-    implicit request =>
-      try {
-        fileResourceManager.updateFile[master.OrganizationKYC](
-          name = name,
-          documentType = documentType,
-          path = fileResourceManager.getOrganizationKycFilePath(documentType),
-          oldDocumentFileName = masterOrganizationKYCs.Service.getFileName(id = masterOrganizations.Service.getID(loginState.username), documentType = documentType),
-          document = master.OrganizationKYC(id = masterOrganizations.Service.getID(loginState.username), documentType = documentType, status = None, fileName = name, file = None),
-          updateOldDocument = masterOrganizationKYCs.Service.updateOldDocument
-        )
-        withUsernameToken.Ok(Messages(constants.Response.FILE_UPDATE_SUCCESSFUL.message))
-      } catch {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-      }
-  }
-
-
   def uploadTraderKycForm(documentType: String): Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.master.uploadFileForm(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadTraderKyc), utilities.String.getJsRouteFunction(routes.javascript.FileController.storeTraderKyc), documentType))
   }

@@ -106,12 +106,6 @@ GET         /zoneUpload/storeFile                                        control
 GET         /zoneUpdate                                                  controllers.FileController.updateZoneKycForm(documentType: String)
 GET         /zoneUpload/updateFile                                       controllers.FileController.updateZoneKyc(name: String, documentType: String)
 
-GET         /organizationUpload                                          controllers.FileController.uploadOrganizationKycForm(documentType: String)
-POST        /organizationUpload/file                                     controllers.FileController.uploadOrganizationKyc(documentType: String)
-GET         /organizationUpload/storeFile                                controllers.FileController.storeOrganizationKyc(name: String, documentType: String)
-GET         /organizationUpdate                                          controllers.FileController.updateOrganizationKycForm(documentType: String)
-GET         /organizationUpload/updateFile                               controllers.FileController.updateOrganizationKyc(name: String, documentType: String)
-
 GET         /traderUpload                                                controllers.FileController.uploadTraderKycForm(documentType: String)
 POST        /traderUpload/file                                           controllers.FileController.uploadTraderKyc(documentType: String)
 GET         /traderUpload/storeFile                                      controllers.FileController.storeTraderKyc(name: String, documentType: String)
@@ -176,6 +170,11 @@ GET         /master/rejectVerifyOrganizationRequest                      control
 POST        /master/rejectVerifyOrganizationRequest                      controllers.AddOrganizationController.rejectVerifyOrganizationRequest
 GET         /master/verifyOrganization                                   controllers.AddOrganizationController.verifyOrganizationForm(organizationID: String, zoneID: String)
 POST        /master/verifyOrganization                                   controllers.AddOrganizationController.verifyOrganization
+GET         /organizationUpload                                          controllers.AddOrganizationController.uploadOrganizationKycForm(documentType: String)
+POST        /organizationUpload/file                                     controllers.AddOrganizationController.uploadOrganizationKyc(documentType: String)
+GET         /organizationUpload/storeFile                                controllers.AddOrganizationController.storeOrganizationKyc(name: String, documentType: String)
+GET         /organizationUpdate                                          controllers.AddOrganizationController.updateOrganizationKycForm(documentType: String)
+GET         /organizationUpload/updateFile                               controllers.AddOrganizationController.updateOrganizationKyc(name: String, documentType: String)
 
 GET         /master/addZone                                              controllers.AddZoneController.addZoneForm
 POST        /master/addZone                                              controllers.AddZoneController.addZone
