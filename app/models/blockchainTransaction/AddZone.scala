@@ -155,7 +155,7 @@ class AddZones @Inject()(actorSystem: ActorSystem, transaction: utilities.Transa
         Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
         val addZone = Service.getTransaction(ticketID)
         blockchainZones.Service.create(addZone.zoneID, addZone.to, dirtyBit = true)
-        masterZones.Service.updateStatus(addZone.zoneID, status = true)
+        masterZones.Service.verifyZone(addZone.zoneID)
         masterAccounts.Service.updateUserTypeOnAddress(addZone.to, constants.User.ZONE)
         val zoneAccountId = masterAccounts.Service.getId(addZone.to)
         masterZoneKYCs.Service.verifyAll(zoneAccountId)

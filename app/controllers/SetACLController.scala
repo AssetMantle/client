@@ -21,8 +21,14 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
 
   private implicit val module: String = constants.Module.CONTROLLERS_SET_ACL
 
-  def addTraderForm(): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.addTrader(views.companion.master.AddTrader.form))
+  def addTraderForm(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      try {
+        val trader = masterTraders.Service.getByAccountID(loginState.username)
+        Ok(views.html.component.master.addTrader(views.companion.master.AddTrader.form.fill(views.companion.master.AddTrader.Data(zoneID = trader.zoneID, organizationID = trader.organizationID, name = trader.name))))
+      } catch {
+        case _: BaseException => Ok(views.html.component.master.addTrader(views.companion.master.AddTrader.form))
+      }
   }
 
   def addTrader(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
@@ -33,8 +39,8 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
         },
         addTraderData => {
           try {
-            if (masterOrganizations.Service.getVerificationStatus(addTraderData.organizationID) == Option(true)) {
-              masterTraders.Service.create(zoneID = addTraderData.zoneID, organizationID = addTraderData.organizationID, accountID = loginState.username, name = addTraderData.name)
+            if (masterOrganizations.Service.getVerificationStatus(addTraderData.organizationID)) {
+              masterTraders.Service.insertOrUpdateTraderDetails(zoneID = addTraderData.zoneID, organizationID = addTraderData.organizationID, accountID = loginState.username, name = addTraderData.name)
               withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.TRADER_ADDED)))
             } else {
               Unauthorized(views.html.index(failures = Seq(constants.Response.UNVERIFIED_ORGANIZATION)))
@@ -45,6 +51,15 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
           }
         }
       )
+  }
+
+  def userUploadOrUpdateTraderKYCFiles(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      try {
+        Ok
+      } catch {
+        case _: BaseException => Ok
+      }
   }
 
   def zoneVerifyTraderForm(accountID: String, organizationID: String): Action[AnyContent] = Action { implicit request =>
@@ -59,7 +74,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
         },
         verifyTraderData => {
           try {
-            if (masterOrganizations.Service.getVerificationStatus(verifyTraderData.organizationID) == Option(true)) {
+            if (masterOrganizations.Service.getVerificationStatus(verifyTraderData.organizationID)) {
               val zoneID = masterZones.Service.getZoneId(loginState.username)
               val acl = blockchain.ACL(issueAsset = verifyTraderData.issueAsset, issueFiat = verifyTraderData.issueFiat, sendAsset = verifyTraderData.sendAsset, sendFiat = verifyTraderData.sendFiat, redeemAsset = verifyTraderData.redeemAsset, redeemFiat = verifyTraderData.redeemFiat, sellerExecuteOrder = verifyTraderData.sellerExecuteOrder, buyerExecuteOrder = verifyTraderData.buyerExecuteOrder, changeBuyerBid = verifyTraderData.changeBuyerBid, changeSellerBid = verifyTraderData.changeSellerBid, confirmBuyerBid = verifyTraderData.confirmBuyerBid, confirmSellerBid = verifyTraderData.changeSellerBid, negotiation = verifyTraderData.negotiation, releaseAsset = verifyTraderData.releaseAsset)
               blockchainAclHashes.Service.create(acl)
@@ -162,7 +177,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
         },
         verifyTraderData => {
           try {
-            if (masterOrganizations.Service.getVerificationStatus(verifyTraderData.organizationID) == Option(true)) {
+            if (masterOrganizations.Service.getVerificationStatus(verifyTraderData.organizationID)) {
               val zoneID = masterOrganizations.Service.get(verifyTraderData.organizationID).zoneID
               val acl = blockchain.ACL(issueAsset = verifyTraderData.issueAsset, issueFiat = verifyTraderData.issueFiat, sendAsset = verifyTraderData.sendAsset, sendFiat = verifyTraderData.sendFiat, redeemAsset = verifyTraderData.redeemAsset, redeemFiat = verifyTraderData.redeemFiat, sellerExecuteOrder = verifyTraderData.sellerExecuteOrder, buyerExecuteOrder = verifyTraderData.buyerExecuteOrder, changeBuyerBid = verifyTraderData.changeBuyerBid, changeSellerBid = verifyTraderData.changeSellerBid, confirmBuyerBid = verifyTraderData.confirmBuyerBid, confirmSellerBid = verifyTraderData.changeSellerBid, negotiation = verifyTraderData.negotiation, releaseAsset = verifyTraderData.releaseAsset)
               blockchainAclHashes.Service.create(acl)

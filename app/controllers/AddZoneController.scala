@@ -128,7 +128,7 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
         },
         rejectVerifyZoneRequestData => {
           try {
-            masterZones.Service.updateStatus(rejectVerifyZoneRequestData.zoneID, status = false)
+            masterZones.Service.rejectZone(rejectVerifyZoneRequestData.zoneID)
             masterZoneKYCs.Service.rejectAll(masterZones.Service.getAccountId(rejectVerifyZoneRequestData.zoneID))
             withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.VERIFY_ZONE_REJECTED)))
           }

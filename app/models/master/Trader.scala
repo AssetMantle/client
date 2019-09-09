@@ -180,7 +180,7 @@ class Traders @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
 
     def getTradersForOrganization(organizationID: String): Seq[Trader] = Await.result(getTradersByOrganizationID(organizationID), Duration.Inf)
 
-    def getVerificationStatus(id: String): Option[Boolean] = Await.result(getVerificationStatusById(id), Duration.Inf)
+    def getVerificationStatus(id: String): Boolean = Await.result(getVerificationStatusById(id), Duration.Inf).getOrElse(false)
 
   }
 

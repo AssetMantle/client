@@ -222,7 +222,7 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
 
     def getOrganizationsInZone(zoneID: String): Seq[Organization] = Await.result(getOrganizationsByZoneID(zoneID), Duration.Inf)
 
-    def getVerificationStatus(id: String): Option[Boolean] = Await.result(getVerificationStatusById(id), Duration.Inf)
+    def getVerificationStatus(id: String): Boolean = Await.result(getVerificationStatusById(id), Duration.Inf).getOrElse(false)
 
     def markOrganizationFormCompleted(id: String): Int = Await.result(updateCompletionStatusOnID(id = id, completionStatus = true), Duration.Inf)
 

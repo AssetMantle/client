@@ -11,7 +11,7 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Random, Success}
 
-case class Zone(id: String, accountID: String, name: String, currency: String, status: Option[Boolean] = None)
+case class Zone(id: String, accountID: String, name: String, currency: String, verificationStatus: Option[Boolean] = None)
 
 @Singleton
 class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
@@ -44,7 +44,7 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
     }
   }
   
-  private def findAll: Future[Seq[Zone]] = db.run(zoneTable.filter(_.status === true).result)
+  private def findAll: Future[Seq[Zone]] = db.run(zoneTable.filter(_.verificationStatus === true).result)
 
   private def deleteById(id: String) = db.run(zoneTable.filter(_.id === id).delete.asTry).map {
     case Success(result) => result
@@ -72,9 +72,9 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
     }
   }
 
-  private def getZonesWithNullStatus: Future[Seq[Zone]] = db.run(zoneTable.filter(_.status.?.isEmpty).result)
+  private def getZonesWithNullVerificationStatus: Future[Seq[Zone]] = db.run(zoneTable.filter(_.verificationStatus.?.isEmpty).result)
   
-  private def updateStatusOnID(id: String, status: Boolean) = db.run(zoneTable.filter(_.id === id).map(_.status.?).update(Option(status)).asTry).map {
+  private def updateVerificationStatusOnID(id: String, verificationStatus: Option[Boolean]) = db.run(zoneTable.filter(_.id === id).map(_.verificationStatus.?).update(verificationStatus).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -84,7 +84,7 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
     }
   }
 
-  private def getStatusByID(id: String): Future[Option[Boolean]] = db.run(zoneTable.filter(_.id === id).map(_.status.?).result.head.asTry).map {
+  private def getVerificationStatusByID(id: String): Future[Option[Boolean]] = db.run(zoneTable.filter(_.id === id).map(_.verificationStatus.?).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -95,7 +95,7 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
   private[models] class ZoneTable(tag: Tag) extends Table[Zone](tag, "Zone") {
 
-    def * = (id, accountID, name, currency, status.?) <> (Zone.tupled, Zone.unapply)
+    def * = (id, accountID, name, currency, verificationStatus.?) <> (Zone.tupled, Zone.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
@@ -105,7 +105,7 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
     def currency = column[String]("currency")
 
-    def status = column[Boolean]("status")
+    def verificationStatus = column[Boolean]("verificationStatus")
 
   }
 
@@ -117,15 +117,17 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
     def getAll: Seq[Zone] = Await.result(findAll, Duration.Inf)
 
-    def updateStatus(id: String, status: Boolean): Int = Await.result(updateStatusOnID(id, status), Duration.Inf)
+    def verifyZone(id: String): Int = Await.result(updateVerificationStatusOnID(id, Option(true)), Duration.Inf)
+
+    def rejectZone(id: String): Int = Await.result(updateVerificationStatusOnID(id, Option(false)), Duration.Inf)
 
     def getAccountId(id: String): String = Await.result(getAccountIdById(id), Duration.Inf)
 
     def getZoneId(accountID: String): String = Await.result(getZoneIdByAccountId(accountID), Duration.Inf)
 
-    def getVerifyZoneRequests: Seq[Zone] = Await.result(getZonesWithNullStatus, Duration.Inf)
+    def getVerifyZoneRequests: Seq[Zone] = Await.result(getZonesWithNullVerificationStatus, Duration.Inf)
 
-    def getStatus(id: String): Option[Boolean] = Await.result(getStatusByID(id), Duration.Inf)
+    def getVerificationStatus(id: String): Boolean = Await.result(getVerificationStatusByID(id), Duration.Inf).getOrElse(false)
 
   }
 

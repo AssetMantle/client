@@ -455,11 +455,11 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."SetSellerFeedback"
 
 CREATE TABLE IF NOT EXISTS MASTER."Zone"
 (
-    "id"        VARCHAR NOT NULL,
-    "accountID" VARCHAR NOT NULL UNIQUE,
-    "name"      VARCHAR NOT NULL,
-    "currency"  VARCHAR NOT NULL,
-    "status"    BOOLEAN,
+    "id"                 VARCHAR NOT NULL,
+    "accountID"          VARCHAR NOT NULL UNIQUE,
+    "name"               VARCHAR NOT NULL,
+    "currency"           VARCHAR NOT NULL,
+    "verificationStatus" BOOLEAN,
     PRIMARY KEY ("id")
 );
 

@@ -46,7 +46,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
         },
         addOrganizationData => {
           try {
-            if (masterZones.Service.getStatus(addOrganizationData.zoneID) == Option(true)) {
+            if (masterZones.Service.getVerificationStatus(addOrganizationData.zoneID)) {
               val id = masterOrganizations.Service.insertOrUpdateOrganizationDetails(zoneID = addOrganizationData.zoneID, accountID = loginState.username, name = addOrganizationData.name, abbreviation = addOrganizationData.abbreviation, establishmentDate = utilities.Date.utilDateToSQLDate(addOrganizationData.establishmentDate), email = addOrganizationData.email, registeredAddress = Json.toJson(master.utils.Address(addressLine1 = addOrganizationData.registeredAddressLine1, addressLine2 = addOrganizationData.registeredAddressLine2, landmark = addOrganizationData.registeredAddressLandmark, city = addOrganizationData.registeredAddressCity, country = addOrganizationData.registeredAddressCountry, zipCode = addOrganizationData.registeredAddressZipCode, phone = addOrganizationData.registeredAddressPhone)).toString(), postalAddress = Json.toJson(master.utils.Address(addressLine1 = addOrganizationData.postalAddressLine1, addressLine2 = addOrganizationData.postalAddressLine2, landmark = addOrganizationData.postalAddressLandmark, city = addOrganizationData.postalAddressCity, country = addOrganizationData.postalAddressCountry, zipCode = addOrganizationData.postalAddressZipCode, phone = addOrganizationData.postalAddressPhone)).toString())
               try {
                 PartialContent(views.html.component.master.userUpdateUBOs(views.companion.master.AddUBOs.form.fill(views.companion.master.AddUBOs.Data(masterOrganizations.Service.getUBOs(id).ubos.map(ubo => Option(views.companion.master.AddUBOs.UBOData(personName = ubo.personName, sharePercentage = ubo.sharePercentage, relationship = ubo.relationship, title = ubo.title)))))))
@@ -66,7 +66,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
 
   def userUpdateUBOsForm(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      try{
+      try {
         Ok(views.html.component.master.userUpdateUBOs(views.companion.master.AddUBOs.form.fill(views.companion.master.AddUBOs.Data(masterOrganizations.Service.getUBOs(masterOrganizations.Service.getID(loginState.username)).ubos.map(ubo => Option(views.companion.master.AddUBOs.UBOData(personName = ubo.personName, sharePercentage = ubo.sharePercentage, relationship = ubo.relationship, title = ubo.title)))))))
       } catch {
         case _: BaseException => Ok(views.html.component.master.userUpdateUBOs(views.companion.master.AddUBOs.form))
@@ -81,8 +81,8 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
         },
         updateUBOsData => {
           try {
-            val id =masterOrganizations.Service.getID(loginState.username)
-            masterOrganizations.Service.updateUBOs(id = id, ubos = updateUBOsData.ubos.filter(_.isDefined).map ( uboData => master.utils.UBO(personName = uboData.get.personName, sharePercentage = uboData.get.sharePercentage, relationship = uboData.get.relationship, title = uboData.get.title)))
+            val id = masterOrganizations.Service.getID(loginState.username)
+            masterOrganizations.Service.updateUBOs(id = id, ubos = updateUBOsData.ubos.filter(_.isDefined).map(uboData => master.utils.UBO(personName = uboData.get.personName, sharePercentage = uboData.get.sharePercentage, relationship = uboData.get.relationship, title = uboData.get.title)))
             PartialContent(views.html.component.master.userUpdateUBOs(views.companion.master.AddUBOs.form.fill(views.companion.master.AddUBOs.Data(masterOrganizations.Service.getUBOs(id).ubos.map(ubo => Option(views.companion.master.AddUBOs.UBOData(personName = ubo.personName, sharePercentage = ubo.sharePercentage, relationship = ubo.relationship, title = ubo.title)))))))
           }
           catch {
@@ -122,7 +122,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
   }
 
   def userUploadOrUpdateOrganizationKYCView(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
-    implicit request => {
+    implicit request =>
       try {
         val id = masterOrganizations.Service.getID(loginState.username)
         Ok(views.html.component.master.userUploadOrUpdateOrganizationKYC(masterOrganizationKYCs.Service.getAllDocuments(id)))
@@ -130,7 +130,6 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
       catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
-    }
   }
 
   def userUploadOrganizationKycForm(documentType: String): Action[AnyContent] = Action { implicit request =>
@@ -256,7 +255,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
         },
         verifyOrganizationData => {
           try {
-            if (masterOrganizationKYCs.Service.checkAllKYCFilesVerified(verifyOrganizationData.organizationID)){
+            if (masterOrganizationKYCs.Service.checkAllKYCFilesVerified(verifyOrganizationData.organizationID)) {
               val organizationAccountAddress = masterAccounts.Service.getAddress(masterOrganizations.Service.getAccountId(verifyOrganizationData.organizationID))
               transaction.process[AddOrganization, transactionsAddOrganization.Request](
                 entity = AddOrganization(from = loginState.address, to = organizationAccountAddress, organizationID = verifyOrganizationData.organizationID, zoneID = verifyOrganizationData.zoneID, gas = verifyOrganizationData.gas, ticketID = "", mode = transactionMode),
@@ -336,11 +335,11 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
 
   def viewOrganizationVerificationBankAccountDetail(organizationID: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
-    try {
-      withUsernameToken.Ok(views.html.component.master.viewVerificationOrganizationBankAccountDetail(masterOrganizationBankAccountDetails.Service.get(organizationID)))
-    } catch {
-      case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-    }
+      try {
+        withUsernameToken.Ok(views.html.component.master.viewVerificationOrganizationBankAccountDetail(masterOrganizationBankAccountDetails.Service.get(organizationID)))
+      } catch {
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
   }
 
   def viewPendingVerifyOrganizationRequests: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
