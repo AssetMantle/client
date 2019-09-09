@@ -482,12 +482,13 @@ CREATE TABLE IF NOT EXISTS MASTER."Organization"
 
 CREATE TABLE IF NOT EXISTS MASTER."Trader"
 (
-    "id"             VARCHAR NOT NULL,
-    "zoneID"         VARCHAR NOT NULL,
-    "organizationID" VARCHAR NOT NULL,
-    "accountID"      VARCHAR NOT NULL UNIQUE,
-    "name"           VARCHAR NOT NULL,
-    "status"         BOOLEAN,
+    "id"                 VARCHAR NOT NULL,
+    "zoneID"             VARCHAR NOT NULL,
+    "organizationID"     VARCHAR NOT NULL,
+    "accountID"          VARCHAR NOT NULL UNIQUE,
+    "name"               VARCHAR NOT NULL,
+    "completionStatus"   BOOLEAN NOT NULL,
+    "verificationStatus" BOOLEAN,
     PRIMARY KEY ("id")
 );
 

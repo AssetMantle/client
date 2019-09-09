@@ -163,7 +163,7 @@ class SetACLs @Inject()(actorSystem: ActorSystem, transaction: utilities.Transac
         val aclAccountID = masterAccounts.Service.getId(setACL.aclAddress)
         blockchainAclAccounts.Service.insertOrUpdate(setACL.aclAddress, setACL.zoneID, setACL.organizationID, blockchainAclHashes.Service.getACL(setACL.aclHash), dirtyBit = true)
         masterAccounts.Service.updateUserTypeOnAddress(setACL.aclAddress, constants.User.TRADER)
-        masterTraders.Service.updateStatusByAccountID(aclAccountID, status = true)
+        masterTraders.Service.verifyTraderByAccountID(aclAccountID)
         masterTraderKYCs.Service.organizationVerifyAll(aclAccountID)
         masterTraderKYCs.Service.zoneVerifyAll(aclAccountID)
         blockchainAccounts.Service.markDirty(setACL.from)

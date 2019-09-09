@@ -129,7 +129,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
         },
         rejectVerifyTraderRequestData => {
           try {
-            masterTraders.Service.updateStatus(rejectVerifyTraderRequestData.traderID, status = false)
+            masterTraders.Service.rejectTrader(rejectVerifyTraderRequestData.traderID)
             masterTraderKYCs.Service.zoneRejectAll(masterZones.Service.getAccountId(rejectVerifyTraderRequestData.traderID))
             withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.VERIFY_TRADER_REQUEST_REJECTED)))
           }
@@ -231,7 +231,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
         },
         rejectVerifyTraderRequestData => {
           try {
-            masterTraders.Service.updateStatus(rejectVerifyTraderRequestData.traderID, status = false)
+            masterTraders.Service.rejectTrader(rejectVerifyTraderRequestData.traderID)
             masterTraderKYCs.Service.organizationRejectAll(masterOrganizations.Service.getAccountId(rejectVerifyTraderRequestData.traderID))
             withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.VERIFY_TRADER_REQUEST_REJECTED)))
           }
