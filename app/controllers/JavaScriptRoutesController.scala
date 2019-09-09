@@ -144,7 +144,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.AddOrganizationController.userStoreOrganizationKyc,
         routes.javascript.AddOrganizationController.userUpdateOrganizationKycForm,
         routes.javascript.AddOrganizationController.userUpdateOrganizationKyc,
-        routes.javascript.AddOrganizationController.reviewAddOrganizationForm,
+        routes.javascript.AddOrganizationController.reviewOrganizationCompletionForm,
         routes.javascript.AddOrganizationController.viewPendingVerifyOrganizationRequests,
         routes.javascript.AddOrganizationController.viewOrganizationVerificationBankAccountDetail,
         routes.javascript.AddOrganizationController.viewKycDocuments,

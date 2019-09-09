@@ -59,6 +59,7 @@ object Form {
   val SHARE_PERCENTAGE = "SHARE_PERCENTAGE"
   val RELATIONSHIP = "RELATIONSHIP"
   val TITLE = "TITLE"
+  val ZONE_DETAILS = "ZONE_DETAILS"
 
   //File Upload
   val BROWSE = "BROWSE"

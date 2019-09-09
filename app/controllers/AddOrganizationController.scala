@@ -204,36 +204,36 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
       }
   }
 
-  def reviewAddOrganizationForm(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
+  def reviewOrganizationCompletionForm(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
         val organization = masterOrganizations.Service.getByAccountID(loginState.username)
-        Ok(views.html.component.master.reviewAddOrganization(views.companion.master.OrganizationFormCompletion.form, organization = organization, zone = masterZones.Service.get(organization.zoneID), organizationBankAccountDetail = masterOrganizationBankAccountDetails.Service.get(organization.id), organizationKYCs = masterOrganizationKYCs.Service.getAllDocuments(organization.id)))
+        Ok(views.html.component.master.reviewOrganizationCompletion(views.companion.master.OrganizationCompletion.form, organization = organization, zone = masterZones.Service.get(organization.zoneID), organizationBankAccountDetail = masterOrganizationBankAccountDetails.Service.get(organization.id), organizationKYCs = masterOrganizationKYCs.Service.getAllDocuments(organization.id)))
       } catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
-  def reviewAddOrganization(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
+  def reviewOrganizationCompletion(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      views.companion.master.OrganizationFormCompletion.form.bindFromRequest().fold(
+      views.companion.master.OrganizationCompletion.form.bindFromRequest().fold(
         formWithErrors => {
           try {
             val organization = masterOrganizations.Service.getByAccountID(loginState.username)
-            BadRequest(views.html.component.master.reviewAddOrganization(formWithErrors, organization = organization, zone = masterZones.Service.get(organization.zoneID), organizationBankAccountDetail = masterOrganizationBankAccountDetails.Service.get(organization.id), organizationKYCs = masterOrganizationKYCs.Service.getAllDocuments(organization.id)))
+            BadRequest(views.html.component.master.reviewOrganizationCompletion(formWithErrors, organization = organization, zone = masterZones.Service.get(organization.zoneID), organizationBankAccountDetail = masterOrganizationBankAccountDetails.Service.get(organization.id), organizationKYCs = masterOrganizationKYCs.Service.getAllDocuments(organization.id)))
           } catch {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
         },
-        reviewOrganizationKYCData => {
+        reviewOrganizationCompletionData => {
           try {
             val id = masterOrganizations.Service.getID(loginState.username)
-            if (reviewOrganizationKYCData.completion && masterOrganizationKYCs.Service.checkAllKYCFileTypesExists(id)) {
+            if (reviewOrganizationCompletionData.completion && masterOrganizationKYCs.Service.checkAllKYCFileTypesExists(id)) {
               masterOrganizations.Service.markOrganizationFormCompleted(id)
               withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ORGANIZATION_ADDED_FOR_VERIFICATION)))
             } else {
               val organization = masterOrganizations.Service.getByAccountID(loginState.username)
-              BadRequest(views.html.component.master.reviewAddOrganization(views.companion.master.OrganizationFormCompletion.form, organization = organization, zone = masterZones.Service.get(organization.zoneID), organizationBankAccountDetail = masterOrganizationBankAccountDetails.Service.get(organization.id), organizationKYCs = masterOrganizationKYCs.Service.getAllDocuments(organization.id)))
+              BadRequest(views.html.component.master.reviewOrganizationCompletion(views.companion.master.OrganizationCompletion.form, organization = organization, zone = masterZones.Service.get(organization.zoneID), organizationBankAccountDetail = masterOrganizationBankAccountDetails.Service.get(organization.id), organizationKYCs = masterOrganizationKYCs.Service.getAllDocuments(organization.id)))
             }
           }
           catch {

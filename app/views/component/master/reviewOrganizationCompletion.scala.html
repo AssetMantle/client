@@ -4,9 +4,9 @@
 @import models.master.{Organization, OrganizationBankAccountDetail, OrganizationKYC, Zone}
 @import play.api.Logger
 @import play.api.libs.json.Json
-@import views.companion.master.OrganizationFormCompletion
+@import views.companion.master.OrganizationCompletion
 
-@(organizationCompletionForm: Form[OrganizationFormCompletion.Data], organization: Organization, zone: Zone, organizationBankAccountDetail: OrganizationBankAccountDetail, organizationKYCs: Seq[OrganizationKYC])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, module: String, logger: Logger, loginState: LoginState = null)
+@(organizationCompletionForm: Form[OrganizationCompletion.Data], organization: Organization, zone: Zone, organizationBankAccountDetail: OrganizationBankAccountDetail, organizationKYCs: Seq[OrganizationKYC])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, module: String, logger: Logger, loginState: LoginState = null)
 
 <div class="latest_card-header latest_card-header-primary text-center">
     <h4 class="latest_card-title">@Messages(constants.Form.REVIEW)</h4>
@@ -14,9 +14,11 @@
 <div class="latest_card-body">
     <div id="organization" class="flexItem thirdBox box lightBlue">
         <div class="leftText">
-            <div>@Messages(constants.Form.ORGANIZATION_DETAILS): <br>
+            <div>@Messages(constants.Form.ZONE_DETAILS): <br>
                 <span class="red">@Messages(constants.Form.NAME)</span>: @zone.name <br>
                 <span class="red">@Messages(constants.Form.CURRENCY)</span>: @zone.currency <br>
+            </div>
+            <div>@Messages(constants.Form.ORGANIZATION_DETAILS): <br>
                 <span class="red">@Messages(constants.Form.ORGANIZATION_ID)</span>: @organization.id <br>
                 <span class="red">@Messages(constants.Form.NAME)</span>: @organization.name <br>
                 <span class="red">@Messages(constants.Form.ABBREVIATION)</span>: @organization.abbreviation.getOrElse("") <br>
@@ -80,7 +82,7 @@
                 }
             </div>
             <br>
-            @form(action = routes.AddOrganizationController.reviewAddOrganization, 'onkeypress -> "validateForm(event,this)") {
+            @form(action = routes.AddOrganizationController.reviewOrganizationCompletion, 'onkeypress -> "validateForm(event,this)") {
                 @CSRF.formField
                 @Messages(constants.Form.COMPLETION):
                 <span>@checkbox(organizationCompletionForm(constants.Form.COMPLETION), '_label -> Messages(constants.Form.COMPLETION), 'class -> "form-control", 'placeholder -> Messages(constants.Form.COMPLETION), 'required -> true)</span>
