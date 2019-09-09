@@ -23,20 +23,20 @@
             <div>
                 <span class="red">@Messages(constants.Form.ORGANIZATION_VERIFICATION):
                 @if(traderKYC.organizationStatus.getOrElse(false)) {
-                    <span id="organizationViewVerifiedTraderKYCDocumentOrganizationStatus@traderKYC.id@traderKYC.documentType" class="result success"><i class="fa fa-check " aria-hidden="true"></i></span>
-                    <span id="organizationViewUnverifiedTraderKYCDocumentOrganizationStatus@traderKYC.id@traderKYC.documentType" class="result failure hidden"><i class="fa fa-times-circle-o" aria-hidden="true"></i></span>
+                    <span id="organizationViewVerifiedTraderKYCDocumentOrganizationStatus@traderKYC.id@traderKYC.documentType" class="result success"><img src="@routes.Assets.versioned("images/success.jpg")"></span>
+                    <span id="organizationViewUnverifiedTraderKYCDocumentOrganizationStatus@traderKYC.id@traderKYC.documentType" class="result failure hidden"><img src="@routes.Assets.versioned("images/unverified.png")"></span>
                 } else {
-                    <span id="organizationViewUnverifiedTraderKYCDocumentOrganizationStatus@traderKYC.id@traderKYC.documentType" class="result failure"><i class="fa fa-times-circle-o" aria-hidden="true"></i></span>
-                    <span id="organizationViewVerifiedTraderKYCDocumentOrganizationStatus@traderKYC.id@traderKYC.documentType" class="result success hidden"><i class="fa fa-check " aria-hidden="true"></i></span>
+                    <span id="organizationViewUnverifiedTraderKYCDocumentOrganizationStatus@traderKYC.id@traderKYC.documentType" class="result failure"><img src="@routes.Assets.versioned("images/unverified.png")"></span>
+                    <span id="organizationViewVerifiedTraderKYCDocumentOrganizationStatus@traderKYC.id@traderKYC.documentType" class="result success hidden"><img src="@routes.Assets.versioned("images/success.jpg")"></span>
                 }
                 </span><br>
                 <span class="red">@Messages(constants.Form.ZONE_VERIFICATION):
                 @if(traderKYC.zoneStatus.getOrElse(false)) {
-                    <span id="organizationViewVerifiedTraderKYCDocumentZoneStatus@traderKYC.id@traderKYC.documentType" class="result success"><i class="fa fa-check " aria-hidden="true"></i></span>
-                    <span id="organizationViewUnverifiedTraderKYCDocumentZoneStatus@traderKYC.id@traderKYC.documentType" class="result failure hidden"><i class="fa fa-times-circle-o" aria-hidden="true"></i></span>
+                    <span id="organizationViewVerifiedTraderKYCDocumentZoneStatus@traderKYC.id@traderKYC.documentType" class="result success"><img src="@routes.Assets.versioned("images/success.jpg")"></span>
+                    <span id="organizationViewUnverifiedTraderKYCDocumentZoneStatus@traderKYC.id@traderKYC.documentType" class="result failure hidden"><img src="@routes.Assets.versioned("images/unverified.png")"></span>
                 } else {
-                    <span id="organizationViewUnverifiedTraderKYCDocumentZoneStatus@traderKYC.id@traderKYC.documentType" class="result failure"><i class="fa fa-times-circle-o" aria-hidden="true"></i></span>
-                    <span id="organizationViewVerifiedTraderKYCDocumentZoneStatus@traderKYC.id@traderKYC.documentType" class="result success hidden"><i class="fa fa-check " aria-hidden="true"></i></span>
+                    <span id="organizationViewUnverifiedTraderKYCDocumentZoneStatus@traderKYC.id@traderKYC.documentType" class="result failure"><img src="@routes.Assets.versioned("images/unverified.png")"></span>
+                    <span id="organizationViewVerifiedTraderKYCDocumentZoneStatus@traderKYC.id@traderKYC.documentType" class="result success hidden"><img src="@routes.Assets.versioned("images/success.jpg")"></span>
                 }
                 </span>
             </div>
