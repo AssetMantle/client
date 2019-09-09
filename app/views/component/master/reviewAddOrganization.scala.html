@@ -4,9 +4,9 @@
 @import models.master.{Organization, OrganizationBankAccountDetail, OrganizationKYC, Zone}
 @import play.api.Logger
 @import play.api.libs.json.Json
-@import views.companion.master.OrganizationCompletion
+@import views.companion.master.OrganizationFormCompletion
 
-@(organizationCompletionForm: Form[OrganizationCompletion.Data], organization: Organization, zone: Zone, organizationBankAccountDetail: OrganizationBankAccountDetail, organizationKYCs: Seq[OrganizationKYC])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, module: String, logger: Logger, loginState: LoginState = null)
+@(organizationCompletionForm: Form[OrganizationFormCompletion.Data], organization: Organization, zone: Zone, organizationBankAccountDetail: OrganizationBankAccountDetail, organizationKYCs: Seq[OrganizationKYC])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, module: String, logger: Logger, loginState: LoginState = null)
 
 <div class="latest_card-header latest_card-header-primary text-center">
     <h4 class="latest_card-title">@Messages(constants.Form.REVIEW)</h4>
