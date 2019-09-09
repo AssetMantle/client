@@ -159,11 +159,12 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
   def userStoreOrganizationKyc(name: String, documentType: String): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
+        val id = masterOrganizations.Service.getID(loginState.username)
         fileResourceManager.storeFile[master.OrganizationKYC](
           name = name,
           documentType = documentType,
           path = fileResourceManager.getOrganizationKycFilePath(documentType),
-          document = master.OrganizationKYC(id = masterOrganizations.Service.getID(loginState.username), documentType = documentType, status = None, fileName = name, file = None),
+          document = master.OrganizationKYC(id = id, documentType = documentType, status = None, fileName = name, file = None),
           masterCreate = masterOrganizationKYCs.Service.create
         )
         PartialContent(views.html.component.master.userUploadOrUpdateOrganizationKYC(masterOrganizationKYCs.Service.getAllDocuments(id)))
