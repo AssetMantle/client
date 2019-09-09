@@ -126,9 +126,6 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.SetSellerFeedbackController.blockchainSetSellerFeedbackForm,
 
         routes.javascript.FileController.checkAccountKycFileExists,
-        routes.javascript.FileController.checkZoneKycFileExists,
-        routes.javascript.FileController.checkOrganizationKycFileExists,
-        routes.javascript.FileController.checkTraderKycFileExists,
 
         routes.javascript.FileController.uploadAccountFileForm,
         routes.javascript.FileController.uploadAccountFile,
@@ -180,11 +177,11 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.FileController.updateZoneKycForm,
         routes.javascript.FileController.updateZoneKyc,
 
-        routes.javascript.FileController.uploadTraderKycForm,
-        routes.javascript.FileController.uploadTraderKyc,
-        routes.javascript.FileController.storeTraderKyc,
-        routes.javascript.FileController.updateTraderKycForm,
-        routes.javascript.FileController.updateTraderKyc,
+        routes.javascript.SetACLController.uploadTraderKycForm,
+        routes.javascript.SetACLController.uploadTraderKyc,
+        routes.javascript.SetACLController.storeTraderKyc,
+        routes.javascript.SetACLController.updateTraderKycForm,
+        routes.javascript.SetACLController.updateTraderKyc,
 
         routes.javascript.FileController.genesisAccessedFile,
         routes.javascript.FileController.zoneAccessedOrganizationKYCFile,

@@ -2,7 +2,7 @@ package controllers
 
 import java.nio.file.Files
 
-import controllers.actions.{WithGenesisLoginAction, WithOrganizationLoginAction, WithUserLoginAction, WithZoneLoginAction}
+import controllers.actions.{WithGenesisLoginAction, WithOrganizationLoginAction, WithTraderLoginAction, WithUserLoginAction, WithZoneLoginAction}
 import controllers.results.WithUsernameToken
 import exceptions.{BaseException, BlockChainException}
 import javax.inject.{Inject, Singleton}
@@ -16,7 +16,7 @@ import views.companion.master.FileUpload
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class SetACLController @Inject()(messagesControllerComponents: MessagesControllerComponents, transaction: utilities.Transaction, fileResourceManager: utilities.FileResourceManager, blockchainAccounts: blockchain.Accounts, masterZones: master.Zones, masterOrganizations: master.Organizations, masterTraders: master.Traders, masterTraderKYCs: master.TraderKYCs, withZoneLoginAction: WithZoneLoginAction, withOrganizationLoginAction: WithOrganizationLoginAction, withUserLoginAction: WithUserLoginAction, withGenesisLoginAction: WithGenesisLoginAction, masterAccounts: master.Accounts, transactionsSetACL: transactions.SetACL, blockchainAclAccounts: blockchain.ACLAccounts, blockchainTransactionSetACLs: blockchainTransaction.SetACLs, blockchainAclHashes: blockchain.ACLHashes, pushNotification: PushNotification, withUsernameToken: WithUsernameToken)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class SetACLController @Inject()(messagesControllerComponents: MessagesControllerComponents, withTraderLoginAction: WithTraderLoginAction, transaction: utilities.Transaction, fileResourceManager: utilities.FileResourceManager, blockchainAccounts: blockchain.Accounts, masterZones: master.Zones, masterOrganizations: master.Organizations, masterTraders: master.Traders, masterTraderKYCs: master.TraderKYCs, withZoneLoginAction: WithZoneLoginAction, withOrganizationLoginAction: WithOrganizationLoginAction, withUserLoginAction: WithUserLoginAction, withGenesisLoginAction: WithGenesisLoginAction, masterAccounts: master.Accounts, transactionsSetACL: transactions.SetACL, blockchainAclAccounts: blockchain.ACLAccounts, blockchainTransactionSetACLs: blockchainTransaction.SetACLs, blockchainAclHashes: blockchain.ACLHashes, pushNotification: PushNotification, withUsernameToken: WithUsernameToken)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -376,6 +376,68 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
         withUsernameToken.Ok(views.html.component.master.organizationViewPendingVerifyTraderRequests(masterTraders.Service.getVerifyTraderRequestsForOrganization(masterOrganizations.Service.getByAccountID(loginState.username).id)))
       }
       catch {
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
+  }
+
+  def uploadTraderKycForm(documentType: String): Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.uploadFileForm(utilities.String.getJsRouteFunction(routes.javascript.SetACLController.uploadTraderKyc), utilities.String.getJsRouteFunction(routes.javascript.SetACLController.storeTraderKyc), documentType))
+  }
+
+  def uploadTraderKyc(documentType: String) = Action(parse.multipartFormData) { implicit request =>
+    FileUpload.form.bindFromRequest.fold(
+      formWithErrors => {
+        BadRequest(formWithErrors.errors.mkString("\n"))
+      },
+      fileUploadInfo => {
+        try {
+          request.body.file("file") match {
+            case None => BadRequest(views.html.index(failures = Seq(constants.Response.NO_FILE)))
+            case Some(file) => utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, fileResourceManager.getTraderKycFilePath(documentType))
+              Ok
+          }
+        }
+        catch {
+          case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+        }
+      }
+    )
+  }
+
+  def storeTraderKyc(name: String, documentType: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      try {
+        fileResourceManager.storeFile[master.TraderKYC](
+          name = name,
+          documentType = documentType,
+          path = fileResourceManager.getTraderKycFilePath(documentType),
+          document = master.TraderKYC(id = masterTraders.Service.getID(loginState.username), documentType = documentType, fileName = name, file = None, zoneStatus = None, organizationStatus = None),
+          masterCreate = masterTraderKYCs.Service.create
+        )
+        withUsernameToken.Ok(Messages(constants.Response.FILE_UPLOAD_SUCCESSFUL.message))
+      } catch {
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
+  }
+
+  def updateTraderKycForm(documentType: String): Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.updateFileForm(utilities.String.getJsRouteFunction(routes.javascript.SetACLController.uploadTraderKyc), utilities.String.getJsRouteFunction(routes.javascript.SetACLController.updateTraderKyc), documentType))
+  }
+
+  def updateTraderKyc(name: String, documentType: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      try {
+        val id = masterTraders.Service.getID(loginState.username)
+        fileResourceManager.updateFile[master.TraderKYC](
+          name = name,
+          documentType = documentType,
+          path = fileResourceManager.getTraderKycFilePath(documentType),
+          oldDocumentFileName = masterTraderKYCs.Service.getFileName(id = id, documentType = documentType),
+          document = master.TraderKYC(id = id, documentType = documentType, fileName = name, file = None, zoneStatus = None, organizationStatus = None),
+          updateOldDocument = masterTraderKYCs.Service.updateOldDocument
+        )
+        withUsernameToken.Ok(Messages(constants.Response.FILE_UPDATE_SUCCESSFUL.message))
+      } catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }

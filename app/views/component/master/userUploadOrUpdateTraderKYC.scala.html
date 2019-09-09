@@ -7,22 +7,20 @@
     <h4 class="latest_card-title">@Messages(constants.Form.TRADER_KYC_FILES)</h4>
 </div>
 <div class="centerText">
+    @for(documentType <- constants.File.TRADER_KYC_DOCUMENT_TYPES) {
+        <div id="upload@documentType">
+            <button onclick="getForm(jsRoutes.controllers.SetACLController.userUploadTraderKYCForm('@documentType'))">@Messages(constants.Form.UPLOAD) @Messages(documentType)</button>
+        </div>
+    }
     @for(traderKYC <- traderKYCs) {
         @component.master.commonDocumentViewer(traderKYC) {
             @routes.SetACLController.userAccessedTraderKYCFile(traderKYC.documentType)
         } {
             <a href="@routes.SetACLController.userAccessedTraderKYCFile(traderKYC.documentType)">@Messages(traderKYC.documentType)</a>
         } {
-            <div>
-                <button onclick="getForm(jsRoutes.controllers.SetACLController.userUpdateTraderKYCForm('@traderKYC.documentType'))">@Messages(constants.Form.UPDATE) @Messages(traderKYC.documentType)</button>
-                <script>hideElement('upload@traderKYC.documentType')</script>
-            </div>
+            <button onclick="getForm(jsRoutes.controllers.SetACLController.userUpdateTraderKYCForm('@traderKYC.documentType'))">@Messages(constants.Form.UPDATE) @Messages(traderKYC.documentType)</button>
+            <script>hideElement('upload@traderKYC.documentType')</script>
         }
-    }
-    @for(documentType <- constants.File.TRADER_KYC_DOCUMENT_TYPES) {
-        <div id="upload@documentType">
-            <button onclick="getForm(jsRoutes.controllers.SetACLController.userUploadTraderKYCForm('@documentType'))">@Messages(constants.Form.UPLOAD) @Messages(documentType)</button>
-        </div>
     }
 </div>
 <button type="button" class="btn-sm btn btn-primary" onclick="getForm(jsRoutes.controllers.SetACLController.addTraderForm())">@Messages(constants.Form.BACK)</button>
