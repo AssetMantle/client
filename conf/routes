@@ -163,9 +163,9 @@ GET         /master/reviewOrganizationKYC                                control
 POST        /master/reviewOrganizationKYC                                controllers.AddOrganizationController.reviewOrganizationCompletion
 GET         /master/viewVerifyOrganizationRequests                       controllers.AddOrganizationController.viewPendingVerifyOrganizationRequests
 GET         /master/viewOrganizationVerificationBankAccountDetail        controllers.AddOrganizationController.viewOrganizationVerificationBankAccountDetail(organizationID: String)
-GET         /master/viewOrganizationKycDocuments                         controllers.AddOrganizationController.viewKycDocuments(accountID: String)
-GET         /master/verifyOrganizationKycDocument                        controllers.AddOrganizationController.verifyKycDocument(accountID: String, documentType: String)
-GET         /master/rejectOrganizationKycDocument                        controllers.AddOrganizationController.rejectKycDocument(accountID: String, documentType: String)
+GET         /master/viewOrganizationKycDocuments                         controllers.AddOrganizationController.viewKycDocuments(organizationID: String)
+GET         /master/verifyOrganizationKycDocument                        controllers.AddOrganizationController.verifyKycDocument(organizationID: String, documentType: String)
+GET         /master/rejectOrganizationKycDocument                        controllers.AddOrganizationController.rejectKycDocument(organizationID: String, documentType: String)
 GET         /master/rejectVerifyOrganizationRequest                      controllers.AddOrganizationController.rejectVerifyOrganizationRequestForm(organizationID: String)
 POST        /master/rejectVerifyOrganizationRequest                      controllers.AddOrganizationController.rejectVerifyOrganizationRequest
 GET         /master/verifyOrganization                                   controllers.AddOrganizationController.verifyOrganizationForm(organizationID: String, zoneID: String)
