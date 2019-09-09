@@ -9,9 +9,7 @@ function submitForm(source, target = '#commonModalContent') {
         async: true,
         statusCode: {
             400: function (data) {
-                const newDocument = document.open("text/html", "replace");
-                newDocument.write(data.responseText);
-                newDocument.close();
+                result.html(data.responseText);
             },
             401: function (data) {
                 const newDocument = document.open("text/html", "replace");
