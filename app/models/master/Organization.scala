@@ -182,10 +182,10 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
     def create(zoneID: String, accountID: String, name: String, abbreviation: Option[String], establishmentDate: Date, email: String, registeredAddress: String, postalAddress: String, ubos: Option[String]): String = Await.result(add(Organization(id = (-Math.abs(Random.nextInt)).toHexString.toUpperCase, zoneID = zoneID, accountID = accountID, name = name, abbreviation = abbreviation, establishmentDate = establishmentDate, registeredAddress = registeredAddress, postalAddress = postalAddress, email = email, ubos = ubos)), Duration.Inf)
 
     def insertOrUpdateOrganizationDetails(zoneID: String, accountID: String, name: String, abbreviation: Option[String], establishmentDate: Date, email: String, registeredAddress: String, postalAddress: String): String = {
-      val id = try{
+      val id = try {
         getID(accountID)
       } catch {
-        case baseException: BaseException => if (baseException.failure == constants.Response.NO_SUCH_ELEMENT_EXCEPTION){
+        case baseException: BaseException => if (baseException.failure == constants.Response.NO_SUCH_ELEMENT_EXCEPTION) {
           (-Math.abs(Random.nextInt)).toHexString.toUpperCase
         } else {
           throw new BaseException(baseException.failure)
@@ -195,11 +195,20 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
       id
     }
 
+    def getID(accountID: String): String = Await.result(getIDByAccountID(accountID), Duration.Inf)
+
+    def getUBOs(id: String): utils.UBOs = {
+      try {
+        val ubos = utilities.JSON.getInstance[utils.UBOs](Await.result(getUBOsOnID(id), Duration.Inf).getOrElse(Json.toJson[utils.UBOs](utils.UBOs()).toString))
+        ubos
+      } catch {
+        case _: BaseException => utils.UBOs(Seq())
+      }
+    }
+
     def get(id: String): Organization = Await.result(findById(id), Duration.Inf)
 
     def getByAccountID(accountID: String): Organization = Await.result(findByAccountID(accountID), Duration.Inf)
-
-    def getID(accountID: String): String = Await.result(getIDByAccountID(accountID), Duration.Inf)
 
     def getZoneID(id: String): String = Await.result(getZoneIDByID(id), Duration.Inf)
 
@@ -216,15 +225,6 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
     def getVerificationStatus(id: String): Option[Boolean] = Await.result(getVerificationStatusById(id), Duration.Inf)
 
     def markOrganizationFormCompleted(id: String): Int = Await.result(updateCompletionStatusOnID(id = id, completionStatus = true), Duration.Inf)
-
-    def getUBOs(id: String): utils.UBOs = {
-      try {
-        val ubos = utilities.JSON.getInstance[utils.UBOs](Await.result(getUBOsOnID(id), Duration.Inf).getOrElse(Json.toJson[utils.UBOs](utils.UBOs()).toString))
-        ubos
-      } catch {
-        case _: BaseException => utils.UBOs(Seq())
-      }
-    }
 
     def updateUBOs(id: String, ubos: Seq[utils.UBO]): Int = Await.result(updateUBOsOnID(id, Option(Json.toJson(utils.UBOs(ubos)).toString())), Duration.Inf)
 
