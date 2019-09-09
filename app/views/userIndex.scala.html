@@ -9,16 +9,6 @@
     </div>
     <script src="@routes.Assets.versioned("javascripts/showHideUploadUpdateButton.js")" type="text/javascript"></script>
     <div class="centerText">
-        <button id="userButtonUploadBankDetailsZone" class="hidden" onclick="getForm(jsRoutes.controllers.FileController.uploadUserZoneKycForm('@constants.File.BANK_DETAILS'))">@Messages(constants.Form.UPLOAD_ZONE_BANK_DETAILS)</button>
-        <button id="userButtonUpdateBankDetailsZone" class="hidden" onclick="getForm(jsRoutes.controllers.FileController.updateUserZoneKycForm('@constants.File.BANK_DETAILS'))">@Messages(constants.Form.UPDATE_ZONE_BANK_DETAILS)</button>
-        <script>checkFileExists(jsRoutes.controllers.FileController.checkZoneKycFileExists('@loginState.username', '@constants.File.BANK_DETAILS'), "userButtonUploadBankDetailsZone", "userButtonUpdateBankDetailsZone")</script>
-        <button id="userButtonUploadIdentificationZone" class="hidden" onclick="getForm(jsRoutes.controllers.FileController.uploadUserZoneKycForm('@constants.File.IDENTIFICATION'))">@Messages(constants.Form.UPLOAD_ZONE_IDENTIFICATION)</button>
-        <button id="userButtonUpdateIdentificationZone" class="hidden" onclick="getForm(jsRoutes.controllers.FileController.updateUserZoneKycForm('@constants.File.IDENTIFICATION'))">@Messages(constants.Form.UPDATE_ZONE_IDENTIFICATION)</button>
-        <script>checkZoneKycFileExists('@loginState.username', '@constants.File.IDENTIFICATION', "userButtonUploadIdentificationZone", "userButtonUpdateIdentificationZone")</script>
-        <button id="userButtonUploadIdentificationTrader" class="hidden" onclick="getForm(jsRoutes.controllers.FileController.userUploadTraderKYCForm('@constants.File.IDENTIFICATION'))">@Messages(constants.Form.UPLOAD_TRADER_IDENTIFICATION)</button>
-        <button id="userButtonUpdateIdentificationTrader" class="hidden" onclick="getForm(jsRoutes.controllers.FileController.userUpdateTraderKYCForm('@constants.File.IDENTIFICATION'))">@Messages(constants.Form.UPDATE_TRADER_IDENTIFICATION)</button>
-        <script>checkFileExists(jsRoutes.controllers.FileController.checkTraderKycFileExists('@loginState.username', '@constants.File.IDENTIFICATION'), "userButtonUploadIdentificationTrader", "userButtonUpdateIdentificationTrader")</script>
-
         <button onclick="getForm(jsRoutes.controllers.AddOrganizationController.addOrganizationForm())">@Messages(constants.Form.ADD_ORGANIZATION)</button>
         <button onclick="getForm(jsRoutes.controllers.AddZoneController.addZoneForm())">@Messages(constants.Form.ADD_ZONE)</button>
         <button onclick="getForm(jsRoutes.controllers.SetACLController.addTraderForm())">@Messages(constants.Form.ADD_TRADER)</button>

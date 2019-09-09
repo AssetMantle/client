@@ -59,6 +59,7 @@ object Form {
   val SHARE_PERCENTAGE = "SHARE_PERCENTAGE"
   val RELATIONSHIP = "RELATIONSHIP"
   val TITLE = "TITLE"
+  val TRADER_KYC_FILES = "TRADER_KYC_FILES"
 
   //File Upload
   val BROWSE = "BROWSE"
