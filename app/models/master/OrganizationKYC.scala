@@ -147,9 +147,14 @@ class OrganizationKYCs @Inject()(protected val databaseConfigProvider: DatabaseC
 
     def checkFileNameExists(id: String, fileName: String): Boolean = Await.result(checkByIdAndFileName(id = id, fileName = fileName), Duration.Inf)
 
+    //TODO whether database should contain constants.File.TRADER_KYC_DOCUMENT_TYPES (current scenario) OR constants.File.TRADER_KYC_DOCUMENT_TYPES should contain all database file type
     def checkAllKYCFileTypesExists(id: String): Boolean = constants.File.ORGANIZATION_KYC_DOCUMENT_TYPES.forall(Await.result(getAllDocumentTypeById(id), Duration.Inf).contains)
 
-    def checkAllKYCFilesVerified(id: String): Boolean = Await.result(getStatusForAllDocumentsById(id), Duration.Inf).forall(status => status.getOrElse(false))
+    //TODO whether checkAllKYCFileTypesExists should be called or not
+    def checkAllKYCFilesVerified(id: String): Boolean = {
+      val documentStatuses = Await.result(getStatusForAllDocumentsById(id), Duration.Inf)
+      if (documentStatuses.nonEmpty) documentStatuses.forall(status => status.getOrElse(false)) else false
+    }
 
   }
 
