@@ -272,7 +272,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
           name = name,
           documentType = documentType,
           path = fileResourceManager.getTraderKycFilePath(documentType),
-          document = master.TraderKYC(id = loginState.username, documentType = documentType, fileName = name, file = None, zoneStatus = None, organizationStatus = None),
+          document = master.TraderKYC(id = masterTraders.Service.getID(loginState.username), documentType = documentType, fileName = name, file = None, zoneStatus = None, organizationStatus = None),
           masterCreate = masterTraderKYCs.Service.create
         )
         withUsernameToken.Ok(Messages(constants.Response.FILE_UPLOAD_SUCCESSFUL.message))
@@ -284,12 +284,13 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
   def updateTraderKyc(name: String, documentType: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
+        val id = masterTraders.Service.getID(loginState.username)
         fileResourceManager.updateFile[master.TraderKYC](
           name = name,
           documentType = documentType,
           path = fileResourceManager.getTraderKycFilePath(documentType),
-          oldDocumentFileName = masterTraderKYCs.Service.getFileName(id = loginState.username, documentType = documentType),
-          document = master.TraderKYC(id = loginState.username, documentType = documentType, fileName = name, file = None, zoneStatus = None, organizationStatus = None),
+          oldDocumentFileName = masterTraderKYCs.Service.getFileName(id = id, documentType = documentType),
+          document = master.TraderKYC(id = id, documentType = documentType, fileName = name, file = None, zoneStatus = None, organizationStatus = None),
           updateOldDocument = masterTraderKYCs.Service.updateOldDocument
         )
         withUsernameToken.Ok(Messages(constants.Response.FILE_UPDATE_SUCCESSFUL.message))
