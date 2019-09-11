@@ -2,80 +2,24 @@
 @import controllers.actions.LoginState
 
 @(zones: Seq[Zone])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
-<div class="cmuk-child-width-expand" cmuk-grid>
+
 @for(zone <- zones) {
-        <div class="cmuk-width-1-3 cmuk-card cmuk-card-body cmuk-card-default">
-            <div class="card-body">
-            <span class="red">@Messages(constants.Form.ID)</span> :@zone.id <br>
-            <span class="red">@Messages(constants.Form.ACCOUNT_ID)</span> :@zone.accountID <br>
-            <span class="red">@Messages(constants.Form.NAME)</span> :@zone.name <br>
-            <span class="red">@Messages(constants.Form.CURRENCY)</span> :@zone.currency <br>
-            </div>
-            <div class="leftMargin">
-                <div>
-                    <h4 class="showHide toggleElement centerText" onclick="fetchOrShowHide('@zone.id', jsRoutes.controllers.AddOrganizationController.viewOrganizationsInZoneForGenesis('@zone.id') ,this)">@Messages(constants.Form.ORGANIZATIONS)</h4>
-                </div>
-                <div id="@zone.id" class="flexContainer rightPadding scrollableSecond"></div>
-            </div>
+
+    <div class="col-md-4">
+    <div class="flexItem card firstBox leftText lightBlue">
+        <div class="card-body">
+        <span class="red">@Messages(constants.Form.ID)</span> :@zone.id <br>
+        <span class="red">@Messages(constants.Form.ACCOUNT_ID)</span> :@zone.accountID <br>
+        <span class="red">@Messages(constants.Form.NAME)</span> :@zone.name <br>
+        <span class="red">@Messages(constants.Form.CURRENCY)</span> :@zone.currency <br>
         </div>
-        <div class="cmuk-width-1-3 cmuk-card cmuk-card-body cmuk-card-default">
-            <div class="card-body">
-                <span class="red">@Messages(constants.Form.ID)</span> :@zone.id <br>
-                <span class="red">@Messages(constants.Form.ACCOUNT_ID)</span> :@zone.accountID <br>
-                <span class="red">@Messages(constants.Form.NAME)</span> :@zone.name <br>
-                <span class="red">@Messages(constants.Form.CURRENCY)</span> :@zone.currency <br>
+        <div class="leftMargin">
+            <div>
+                <h4 class="showHide toggleElement centerText" onclick="fetchOrShowHide('@zone.id', jsRoutes.controllers.AddOrganizationController.viewOrganizationsInZoneForGenesis('@zone.id') ,this)">@Messages(constants.Form.ORGANIZATIONS)</h4>
             </div>
-            <div class="leftMargin">
-                <div>
-                    <h4 class="showHide toggleElement centerText" onclick="fetchOrShowHide('@zone.id', jsRoutes.controllers.AddOrganizationController.viewOrganizationsInZoneForGenesis('@zone.id') ,this)">@Messages(constants.Form.ORGANIZATIONS)</h4>
-                </div>
-                <div id="@zone.id" class="flexContainer rightPadding scrollableSecond"></div>
-            </div>
-
-
+            <div id="@zone.id" class="flexContainer rightPadding scrollableSecond"></div>
         </div>
-        <div class="cmuk-width-1-3 cmuk-card cmuk-card-body cmuk-card-default">
-            <div class="card-body">
-                <span class="red">@Messages(constants.Form.ID)</span> :@zone.id <br>
-                <span class="red">@Messages(constants.Form.ACCOUNT_ID)</span> :@zone.accountID <br>
-                <span class="red">@Messages(constants.Form.NAME)</span> :@zone.name <br>
-                <span class="red">@Messages(constants.Form.CURRENCY)</span> :@zone.currency <br>
-            </div>
-            <div class="leftMargin">
-                <div>
-                    <h4 class="showHide toggleElement centerText" onclick="fetchOrShowHide('@zone.id', jsRoutes.controllers.AddOrganizationController.viewOrganizationsInZoneForGenesis('@zone.id') ,this)">@Messages(constants.Form.ORGANIZATIONS)</h4>
-                </div>
-                <div id="@zone.id" class="flexContainer rightPadding scrollableSecond"></div>
-            </div>
-
-
         </div>
-        <div class="cmuk-width-1-3 cmuk-card cmuk-card-body cmuk-card-default">
-            <div class="card-body">
-                <span class="red">@Messages(constants.Form.ID)</span> :@zone.id <br>
-                <span class="red">@Messages(constants.Form.ACCOUNT_ID)</span> :@zone.accountID <br>
-                <span class="red">@Messages(constants.Form.NAME)</span> :@zone.name <br>
-                <span class="red">@Messages(constants.Form.CURRENCY)</span> :@zone.currency <br>
-            </div>
-            <div class="leftMargin">
-                <div>
-                    <h4 class="showHide toggleElement centerText" onclick="fetchOrShowHide('@zone.id', jsRoutes.controllers.AddOrganizationController.viewOrganizationsInZoneForGenesis('@zone.id') ,this)">@Messages(constants.Form.ORGANIZATIONS)</h4>
-                </div>
-                <div id="@zone.id" class="flexContainer rightPadding scrollableSecond"></div>
-            </div>
 
-
-        </div>
+    </div>
 }
-</div>
-<div class="cmuk-child-width-expand cmuk-text-center" cmuk-grid>
-    <div>
-        <div class="cmuk-card cmuk-card-default cmuk-card-body">Item</div>
-    </div>
-    <div>
-        <div class="cmuk-card cmuk-card-default cmuk-card-body">Item</div>
-    </div>
-    <div>
-        <div class="cmuk-card cmuk-card-default cmuk-card-body">Item</div>
-    </div>
-</div>
