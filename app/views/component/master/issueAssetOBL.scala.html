@@ -12,7 +12,7 @@
 <div class="centerText">
     <button id="traderButtonUploadOBL" class="hidden" onclick="getForm(jsRoutes.controllers.FileController.uploadTraderAssetForm('@constants.File.OBL', '@issueAssetOBLForm.data(constants.FormField.REQUEST_ID.name)'))">@Messages(constants.Form.UPLOAD_OBL_DOCUMENT)</button>
     <button id="traderButtonUpdateOBL" class="hidden" onclick="getForm(jsRoutes.controllers.FileController.updateTraderAssetForm('@constants.File.OBL', '@issueAssetOBLForm.data(constants.FormField.REQUEST_ID.name)'))">@Messages(constants.Form.UPDATE_OBL_DOCUMENT)</button>
-    <script>checkFileExists(jsRoutes.controllers.FileController.checkTraderAssetFilesExist('@issueAssetOBLForm.data(constants.FormField.REQUEST_ID.name)', '@constants.File.OBL'), "traderButtonUploadOBL", "traderButtonUpdateOBL")</script>
+    <script>checkFileExists(jsRoutes.controllers.FileController.checkTraderAssetFileExists('@issueAssetOBLForm.data(constants.FormField.REQUEST_ID.name)', '@constants.File.OBL'), "traderButtonUploadOBL", "traderButtonUpdateOBL")</script>
 </div>
 
 @form(action = routes.IssueAssetController.issueAssetOBL(), 'onkeypress -> "validateForm(event,this)") {
@@ -34,7 +34,7 @@
             @inputText(issueAssetOBLForm(constants.FormField.ASSET_PRICE.name), '_label -> Messages(constants.FormField.ASSET_PRICE.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.ASSET_PRICE.name), 'required -> true)
 
             <button id="issueAssetOBL" type="button" class="btn btn-primary btn-sm" onclick="submitForm(this)">@Messages(constants.Form.ISSUE_ASSET_DOCUMENT)</button>
-            <script>checkFileExistsDisable(jsRoutes.controllers.FileController.checkTraderAssetFilesExist('@issueAssetOBLForm.data(constants.FormField.REQUEST_ID.name)', '@constants.File.OBL'), 'issueAssetOBL')</script>
+            <script>checkFileExistsDisable(jsRoutes.controllers.FileController.checkTraderAssetFileExists('@issueAssetOBLForm.data(constants.FormField.REQUEST_ID.name)', '@constants.File.OBL'), 'issueAssetOBL')</script>
         </div>
     </div>
 }

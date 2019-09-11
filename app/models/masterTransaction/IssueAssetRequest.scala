@@ -60,6 +60,14 @@ class IssueAssetRequests @Inject()(protected val databaseConfigProvider: Databas
     }
   }
 
+  private def findByTicektID(id: String): Future[IssueAssetRequest] = db.run(issueAssetRequestTable.filter(_.ticketID === id).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
   private def updateTicketIDAndStatusByID(id: String, ticketID: String, status: String) = db.run(issueAssetRequestTable.filter(_.id === id).map(faucet => (faucet.ticketID, faucet.status)).update((ticketID, status)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -70,7 +78,27 @@ class IssueAssetRequests @Inject()(protected val databaseConfigProvider: Databas
     }
   }
 
-  private def updateStatusAndCommentByID(id: String, status: String, comment: String) = db.run(issueAssetRequestTable.filter(_.id === id).map(issueAssetRequest => (issueAssetRequest.status, issueAssetRequest.comment)).update((status, comment)).asTry).map {
+  private def updateStatusAndCommentByID(id: String, status: String, comment: Option[String]) = db.run(issueAssetRequestTable.filter(_.id === id).map(issueAssetRequest => (issueAssetRequest.status, issueAssetRequest.comment.?)).update((status, comment)).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def updateTicketIDByID(id: String, ticketID: String) = db.run(issueAssetRequestTable.filter(_.id === id).map(_.ticketID).update(ticketID).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def updatePegHashAndStatusWithTicketID(ticketID: String, status: String, pegHash: Option[String]): Future[Int] = db.run(issueAssetRequestTable.filter(_.ticketID === ticketID).map(issueAssetRequest => (issueAssetRequest.status, issueAssetRequest.pegHash.?)).update((status, pegHash)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -95,6 +123,14 @@ class IssueAssetRequests @Inject()(protected val databaseConfigProvider: Databas
   }
 
   private def getStatusByID(id: String): Future[String] = db.run(issueAssetRequestTable.filter(_.id === id).map(_.status).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => logger.info(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def getAccountIDByID(id: String): Future[String] = db.run(issueAssetRequestTable.filter(_.id === id).map(_.accountID).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.info(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -148,13 +184,23 @@ class IssueAssetRequests @Inject()(protected val databaseConfigProvider: Databas
 
     def accept(id: String, ticketID: String): Int = Await.result(updateTicketIDAndStatusByID(id, ticketID, status = constants.Status.Asset.LISTED_FOR_TRADE), Duration.Inf)
 
-    def reject(id: String, comment: String): Int = Await.result(updateStatusAndCommentByID(id = id, status = constants.Status.Asset.REJECTED, comment = comment), Duration.Inf)
+    def reject(id: String, comment: String): Int = Await.result(updateStatusAndCommentByID(id = id, status = constants.Status.Asset.REJECTED, comment = Option(comment)), Duration.Inf)
+
+    def updateStatusAndComment(id: String, status: String, comment: Option[String] = None) :Int = Await.result(updateStatusAndCommentByID(id = id, status = status, comment = comment), Duration.Inf)
+
+    def updateTicketID(id: String, ticketID: String) :Int = Await.result(updateTicketIDByID(id = id, ticketID = ticketID), Duration.Inf)
+
+    def updatePegHashAndStatusByTicketID(ticketID: String, pegHash: Option[String], status: String) :Int = Await.result(updatePegHashAndStatusWithTicketID(ticketID = ticketID, pegHash = pegHash, status = status), Duration.Inf)
 
     def getPendingIssueAssetRequests(accountIDs: Seq[String], status: String): Seq[IssueAssetRequest] = Await.result(getIssueAssetRequestsWithStatus(accountIDs, status), Duration.Inf)
 
     def getIssueAssetsByAccountID(accountID: String): Seq[IssueAssetRequest] = Await.result(findIssueAssetsByAccountID(accountID), Duration.Inf)
 
     def getIssueAssetByID(id: String): IssueAssetRequest = Await.result(findByID(id), Duration.Inf)
+
+    def getIssueAssetByTicketID(ticketID: String): IssueAssetRequest = Await.result(findByTicektID(ticketID), Duration.Inf)
+
+    def getAccountID(id: String): String = Await.result(getAccountIDByID(id), Duration.Inf)
 
     def delete(id: String): Int = Await.result(deleteByID(id), Duration.Inf)
 

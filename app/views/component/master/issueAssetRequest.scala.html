@@ -4,8 +4,8 @@
 
 @(confirmTransactionForm: Form[ConfirmTransaction.Data], asset: masterTransaction.IssueAssetRequest)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 
-<div id="assetDetail"></div>
 @form(action = routes.IssueAssetController.issueAssetRequest, 'onkeypress -> "validateForm(event,this)") {
+    <div id="assetDetail"></div>
     @CSRF.formField
     <div class="latest_card-header latest_card-header-primary text-center">
         <h4 class="latest_card-title">@Messages(constants.Form.ISSUE_ASSET_REQUEST)</h4>
@@ -14,12 +14,15 @@
         <div class="latest_card-body ml-cb">
             @inputText(confirmTransactionForm(constants.FormField.REQUEST_ID.name), '_label -> Messages(constants.FormField.REQUEST_ID.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.REQUEST_ID.name), 'required -> true)
 
-            @asset.paymentTerms match {
+            @asset.physicalDocumentsHandledVia match {
                 case constants.Option.COMDEX => {
-                    @inputText(confirmTransactionForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "form-control", 'type -> "number", 'placeholder -> Messages(constants.FormField.GAS.name), 'required -> true)
-                    @inputText(confirmTransactionForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.PASSWORD.name), 'required -> true)
+                    @inputText(confirmTransactionForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "form-control hidden", 'type -> "number", 'placeholder -> Messages(constants.FormField.GAS.name), 'required -> true)
+                    @inputPassword(confirmTransactionForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "form-control hidden", 'placeholder -> Messages(constants.FormField.PASSWORD.name), 'required -> true)
                 }
-                case _ => {}
+                case _ => {
+                    @inputText(confirmTransactionForm(constants.FormField.GAS.name).copy(value = Some(0.toString)), '_label -> Messages(constants.FormField.GAS.name), 'class -> "form-control", 'type -> "number", 'placeholder -> Messages(constants.FormField.GAS.name), 'required -> true)
+                    @inputPassword(confirmTransactionForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.PASSWORD.name), 'required -> true)
+                }
             }
 
             @if(confirmTransactionForm.hasGlobalErrors) {

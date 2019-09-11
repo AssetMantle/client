@@ -68,6 +68,7 @@ POST        /master/login                                                control
 GET         /master/getGenesisAccessedFile                               controllers.FileController.genesisAccessedFile(fileName: String, documentType: String)
 GET         /master/getZoneAccessedOrganizationFile                      controllers.FileController.zoneAccessedOrganizationFile(accountID: String, fileName: String, documentType: String)
 GET         /master/getZoneAccessedTraderFile                            controllers.FileController.zoneAccessedTraderFile(accountID: String, fileName: String, documentType: String)
+GET         /master/getZoneAccessedAssetFile                             controllers.FileController.zoneAccessedAssetFile(id: String, fileName: String, documentType: String)
 GET         /master/getOrganizationAccessedFile                          controllers.FileController.organizationAccessedFile(accountID: String, fileName: String, documentType: String)
 GET         /master/file                                                 controllers.FileController.file(fileName: String, documentType: String)
 
@@ -75,7 +76,7 @@ GET         /checkAccountKycFileExists                                   control
 GET         /checkZoneKycFileExists                                      controllers.FileController.checkZoneKycFileExists(accountID: String, documentType: String)
 GET         /checkOrganizationKycFileExists                              controllers.FileController.checkOrganizationKycFileExists(accountID: String, documentType: String)
 GET         /checkTraderKycFileExists                                    controllers.FileController.checkTraderKycFileExists(accountID: String, documentType: String)
-GET         /checkTraderAssetFilesExist                                  controllers.FileController.checkTraderAssetFilesExist(accountID: String, documentType: String)
+GET         /checkTraderAssetFileExists                                  controllers.FileController.checkTraderAssetFileExists(id: String, documentType: String)
 
 GET         /accountUpload                                               controllers.FileController.uploadAccountFileForm(documentType: String)
 POST        /accountUpload/file                                          controllers.FileController.uploadAccountFile(documentType: String)
@@ -209,9 +210,9 @@ POST        /master/confirmBuyerBid                                      control
 GET         /master/confirmSellerBid                                     controllers.ConfirmSellerBidController.confirmSellerBidForm(buyerAddress:String, pegHash: String, bid:Int)
 POST        /master/confirmSellerBid                                     controllers.ConfirmSellerBidController.confirmSellerBid
 
-GET         /master/issueAssetRequest                                     controllers.IssueAssetController.issueAssetRequestForm(id: String)
-POST        /master/issueAssetRequest                                     controllers.IssueAssetController.issueAssetRequest
-GET        /master/assetDetail                                            controllers.IssueAssetController.assetDetail(id: String)
+GET         /master/issueAssetRequest                                    controllers.IssueAssetController.issueAssetRequestForm(id: String)
+POST        /master/issueAssetRequest                                    controllers.IssueAssetController.issueAssetRequest
+GET         /master/assetDetail                                          controllers.IssueAssetController.assetDetail(id: String)
 
 GET         /master/issueAssetDetail                                     controllers.IssueAssetController.issueAssetDetailForm(id: Option[String])
 POST        /master/issueAssetDetail                                     controllers.IssueAssetController.issueAssetDetail
@@ -225,6 +226,9 @@ POST        /master/issueAssetInvoice                                    control
 GET         /master/viewPendingIssueAssetRequests                        controllers.IssueAssetController.viewPendingIssueAssetRequests
 GET         /master/rejectIssueAssetRequest                              controllers.IssueAssetController.rejectIssueAssetRequestForm(requestID: String)
 POST        /master/rejectIssueAssetRequest                              controllers.IssueAssetController.rejectIssueAssetRequest
+GET         /master/viewTraderAssetDocuments                             controllers.IssueAssetController.viewAssetDocuments(id: String)
+GET         /master/verifyTraderAssetDocument                            controllers.IssueAssetController.verifyAssetDocument(id: String, documentType: String)
+GET         /master/rejectTraderAssetDocument                            controllers.IssueAssetController.rejectAssetDocument(id: String, documentType: String)
 
 GET         /master/issueAsset                                           controllers.IssueAssetController.issueAssetForm(requestID: String, accountID: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, takerAddress: Option[String])
 POST        /master/issueAsset                                           controllers.IssueAssetController.issueAsset

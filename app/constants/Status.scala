@@ -11,6 +11,7 @@ object Status {
   }
 
   object Asset {
+    val FAILED = "FAILED"
     val INCOMPLETE_DETAILS = "INCOMPLETE_DETAILS"
     val REQUESTED = "REQUESTED"
     val REJECTED = "REJECTED"

@@ -128,7 +128,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.FileController.checkZoneKycFileExists,
         routes.javascript.FileController.checkOrganizationKycFileExists,
         routes.javascript.FileController.checkTraderKycFileExists,
-        routes.javascript.FileController.checkTraderAssetFilesExist,
+        routes.javascript.FileController.checkTraderAssetFileExists,
 
         routes.javascript.FileController.uploadAccountFileForm,
         routes.javascript.FileController.uploadAccountFile,
@@ -195,6 +195,9 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.AddOrganizationController.viewKycDocuments,
         routes.javascript.AddOrganizationController.verifyKycDocument,
         routes.javascript.AddOrganizationController.rejectKycDocument,
+        routes.javascript.IssueAssetController.viewAssetDocuments,
+        routes.javascript.IssueAssetController.verifyAssetDocument,
+        routes.javascript.IssueAssetController.rejectAssetDocument,
         routes.javascript.SetACLController.zoneViewKycDocuments,
         routes.javascript.SetACLController.zoneVerifyKycDocument,
         routes.javascript.SetACLController.zoneRejectKycDocument,

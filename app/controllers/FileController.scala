@@ -18,7 +18,7 @@ import views.companion.master.FileUpload
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class FileController @Inject()(messagesControllerComponents: MessagesControllerComponents, withLoginAction: WithLoginAction, masterAccountFiles: master.AccountFiles, masterTransactionFiles: masterTransaction.Files, blockchainACLs: blockchain.ACLAccounts, masterAccounts: master.Accounts, masterZones: master.Zones, masterOrganizations: master.Organizations, masterTraders: master.Traders, masterAccountKYCs: master.AccountKYCs, fileResourceManager: utilities.FileResourceManager, withGenesisLoginAction: WithGenesisLoginAction, withUserLoginAction: WithUserLoginAction, masterZoneKYCs: master.ZoneKYCs, withZoneLoginAction: WithZoneLoginAction, masterOrganizationKYCs: master.OrganizationKYCs, withOrganizationLoginAction: WithOrganizationLoginAction, masterTraderKYCs: master.TraderKYCs, withTraderLoginAction: WithTraderLoginAction, withUsernameToken: WithUsernameToken)(implicit exec: ExecutionContext, configuration: Configuration, wsClient: WSClient) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class FileController @Inject()(messagesControllerComponents: MessagesControllerComponents, withLoginAction: WithLoginAction, masterAccountFiles: master.AccountFiles, masterTransactionFiles: masterTransaction.Files, masterTransactionIssueAssetRequests: masterTransaction.IssueAssetRequests, blockchainACLs: blockchain.ACLAccounts, masterAccounts: master.Accounts, masterZones: master.Zones, masterOrganizations: master.Organizations, masterTraders: master.Traders, masterAccountKYCs: master.AccountKYCs, fileResourceManager: utilities.FileResourceManager, withGenesisLoginAction: WithGenesisLoginAction, withUserLoginAction: WithUserLoginAction, masterZoneKYCs: master.ZoneKYCs, withZoneLoginAction: WithZoneLoginAction, masterOrganizationKYCs: master.OrganizationKYCs, withOrganizationLoginAction: WithOrganizationLoginAction, masterTraderKYCs: master.TraderKYCs, withTraderLoginAction: WithTraderLoginAction, withUsernameToken: WithUsernameToken)(implicit exec: ExecutionContext, configuration: Configuration, wsClient: WSClient) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -70,8 +70,8 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
     if (masterTraderKYCs.Service.checkFileExists(id = accountID, documentType = documentType)) Ok else NoContent
   }
 
-  def checkTraderAssetFilesExist(id: String, documentTypes: String*): Action[AnyContent] = Action { implicit request =>
-    if (masterTransactionFiles.Service.checkFilesExist(id = id, documentTypes = documentTypes.toSeq)) Ok else NoContent
+  def checkTraderAssetFileExists(id: String, documentType: String): Action[AnyContent] = Action { implicit request =>
+    if (masterTransactionFiles.Service.checkFileExists(id = id, documentType = documentType)) Ok else NoContent
   }
 
   def uploadUserKycForm(documentType: String): Action[AnyContent] = Action { implicit request =>
@@ -649,6 +649,29 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
         if (masterTraders.Service.getByAccountID(accountID).zoneID == masterZones.Service.getZoneId(loginState.username)) {
           documentType match {
             case constants.File.IDENTIFICATION => Ok.sendFile(utilities.FileOperations.fetchFile(path = uploadTraderKycIdentificationPath, fileName = fileName))
+            case _ => Unauthorized
+          }
+        } else {
+          Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
+        }
+      } catch {
+        case _: NoSuchFileException => InternalServerError(views.html.index(failures = Seq(constants.Response.NO_SUCH_FILE_EXCEPTION)))
+        case _: Exception => InternalServerError(views.html.index(failures = Seq(constants.Response.GENERIC_EXCEPTION)))
+      }
+  }
+
+  def zoneAccessedAssetFile(id: String, fileName: String, documentType: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      try {
+        if (masterTraders.Service.getByAccountID(masterTransactionIssueAssetRequests.Service.getAccountID(id)).zoneID == masterZones.Service.getZoneId(loginState.username)) {
+          documentType match {
+            case constants.File.OBL => Ok.sendFile(utilities.FileOperations.fetchFile(path = uploadTraderAssetOBLPath, fileName = fileName))
+            case constants.File.CONTRACT => Ok.sendFile(utilities.FileOperations.fetchFile(path = uploadTraderAssetContractPath, fileName = fileName))
+            case constants.File.PACKING_LIST => Ok.sendFile(utilities.FileOperations.fetchFile(path = uploadTraderAssetPackingListPath, fileName = fileName))
+            case constants.File.INVOICE => Ok.sendFile(utilities.FileOperations.fetchFile(path = uploadTraderAssetInvoicePath, fileName = fileName))
+            case constants.File.COO => Ok.sendFile(utilities.FileOperations.fetchFile(path = uploadTraderAssetCOOPath, fileName = fileName))
+            case constants.File.COA => Ok.sendFile(utilities.FileOperations.fetchFile(path = uploadTraderAssetCOAPath, fileName = fileName))
+            case constants.File.OTHER => Ok.sendFile(utilities.FileOperations.fetchFile(path = uploadTraderAssetOtherPath, fileName = fileName))
             case _ => Unauthorized
           }
         } else {

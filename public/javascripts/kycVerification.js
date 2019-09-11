@@ -32,6 +32,23 @@ function verifyOrganizationKycDocument(accountID, documentType) {
     });
 }
 
+function verifyOrganizationKycDocument(id, documentType) {
+    let route = jsRoutes.controllers.IssueAssetController.verifyAssetDocument(id, documentType);
+    $.ajax({
+        url: route.url,
+        type: route.type,
+        success: function (result) {
+            document.getElementById('TraderAssetDocumentStatus' + id + documentType).innerHTML = result;
+            $('#buttonTraderAssetDocumentStatus' + id + documentType).hide();
+            document.getElementById('unverifiedDocumentStatus' + id + documentType).style.display = "none";
+            document.getElementById('verifiedDocumentStatus' + id + documentType).style.display = "block";
+        },
+        error: function (error) {
+            document.getElementById('traderAssetDocumentStatus' + id + documentType).innerHTML = error;
+        }
+    });
+}
+
 function organizationVerifyTraderKycDocument(accountID, documentType) {
     let route = jsRoutes.controllers.SetACLController.organizationVerifyKycDocument(accountID, documentType);
     $.ajax({

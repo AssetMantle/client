@@ -1,0 +1,27 @@
+@import controllers.actions.LoginState
+@import models.masterTransaction.File
+
+@(files: Seq[File])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+<div class="verify_buttons">
+    @for(file <- files) {
+        @component.master.commonDocument(file){
+            <a href="@routes.FileController.zoneAccessedAssetFile(file.id, file.fileName, file.documentType)">@Messages(file.documentType)</a>
+        } {
+            <div id="traderAssetDocumentStatus@file.id@file.documentType"></div>
+            @file.status.getOrElse(None) match {
+                case true => {
+                    <div id="buttonTraderAssetDocumentStatus@file.id@file.documentType"><button class="btn btn-sm btn-danger" onclick="rejectAssetDocument('@file.id', '@file.documentType')">@Messages(constants.Form.REJECT)</button></div>
+                }
+                case false => {
+                    <div id="buttonTraderAssetDocumentStatus@file.id@file.documentType"><button class="btn btn-sm btn-success" onclick="verifyAssetDocument('@file.id', '@file.documentType')">@Messages(constants.Form.APPROVE)</button></div>
+                }
+                case _ => {
+                    <div id="buttonTraderAssetDocumentStatus@file.id@file.documentType">
+                        <button class="btn btn-sm btn-success" onclick="verifyAssetDocument('@file.id', '@file.documentType')">@Messages(constants.Form.APPROVE)</button>
+                        <button class="btn btn-sm btn-danger" onclick="rejectAssetDocument('@file.id', '@file.documentType')">@Messages(constants.Form.REJECT)</button>
+                    </div>
+                }
+            }
+        }
+    }
+</div>

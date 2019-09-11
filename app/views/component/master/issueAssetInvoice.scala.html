@@ -12,7 +12,7 @@
 <div class="centerText">
     <button id="traderButtonUploadInvoice" class="hidden" onclick="getForm(jsRoutes.controllers.FileController.uploadTraderAssetForm('@constants.File.INVOICE', '@issueAssetInvoiceForm.data(constants.FormField.REQUEST_ID.name)'))">@Messages(constants.Form.UPLOAD_INVOICE_DOCUMENT)</button>
     <button id="traderButtonUpdateInvoice" class="hidden" onclick="getForm(jsRoutes.controllers.FileController.updateTraderAssetForm('@constants.File.INVOICE', '@issueAssetInvoiceForm.data(constants.FormField.REQUEST_ID.name)'))">@Messages(constants.Form.UPDATE_INVOICE_DOCUMENT)</button>
-    <script>checkFileExists(jsRoutes.controllers.FileController.checkTraderAssetFilesExist('@issueAssetInvoiceForm.data(constants.FormField.REQUEST_ID.name)', '@constants.File.INVOICE'), "traderButtonUploadInvoice", "traderButtonUpdateInvoice")</script>
+    <script>checkFileExists(jsRoutes.controllers.FileController.checkTraderAssetFileExists('@issueAssetInvoiceForm.data(constants.FormField.REQUEST_ID.name)', '@constants.File.INVOICE'), "traderButtonUploadInvoice", "traderButtonUpdateInvoice")</script>
 </div>
 
     @form(action = routes.IssueAssetController.issueAssetInvoice(), 'onkeypress -> "validateForm(event,this)") {
@@ -26,7 +26,7 @@
                 @inputDate(issueAssetInvoiceForm(constants.FormField.INVOICE_DATE.name), '_label -> Messages(constants.FormField.INVOICE_DATE.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.INVOICE_DATE.name), '_name -> Messages(constants.FormField.INVOICE_DATE.name), 'required -> true)
 
                 <button type="button" id="issueAssetInvoice" class="btn btn-primary btn-sm" onclick="submitForm(this)">@Messages(constants.Form.ISSUE_ASSET_INVOICE)</button>
-                <script>checkFileExistsDisable(jsRoutes.controllers.FileController.checkTraderAssetFilesExist('@issueAssetInvoiceForm.data(constants.FormField.REQUEST_ID.name)', '@constants.File.INVOICE'), 'issueAssetInvoice')</script>
+                <script>checkFileExistsDisable(jsRoutes.controllers.FileController.checkTraderAssetFileExists('@issueAssetInvoiceForm.data(constants.FormField.REQUEST_ID.name)', '@constants.File.INVOICE'), 'issueAssetInvoice')</script>
             </div>
         </div>
     }
