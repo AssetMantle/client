@@ -5,13 +5,13 @@
 @common(Messages(constants.Form.INDEX), failures, warnings, successes, infos)(left)(center)(right)
 
 @left = {
-    <div class="sideBarOpenButton" onclick="openNav()">
+    <div class="sideBarOpenButton" onclick="openSideBar()">
         <span cmuk-icon="menu"></span>
     </div>
 
     <div class="sideBar" id="sideBar">
-        <a href="javascript:void(0)" class="sideBarCloseButton" onclick="closeNav()">x</a>
-        <input type="text" id="sideBarSearch" class="sideBarSearch" onkeyup="sideBarSearchFunction()" placeholder="Search.." title="Type in a category">
+        <a href="javascript:void(0)" class="sideBarCloseButton" onclick="closeSideBar()">x</a>
+        <input type="text" id="sideBarSearch" class="sideBarSearch" onkeyup="sideBarSearch()" placeholder="Search..">
         <ul id="sideBarSearchMenu">
         <li> <a onclick="getForm(jsRoutes.controllers.AddKeyController.blockchainAddKeyForm())">@Messages(constants.Form.ADD_KEY)</a> </li>
         <li> <a onclick="getForm(jsRoutes.controllers.AddOrganizationController.blockchainAddOrganizationForm())">@Messages(constants.Form.ADD_ORGANIZATION)</a> </li>
@@ -39,7 +39,7 @@
 @center = {
 
     <div class="cmuk-margin-medium-bottom">
-    @search()
+        @search()
     </div>
 
     <div class="cmuk-grid-match
@@ -51,29 +51,29 @@
             <div class="cmuk-card
                         cmuk-card-default
                         cmuk-card-body">
-            @lastBlockHeight()
+                @lastBlockHeight()
             </div>
         </div>
         <div>
             <div class="cmuk-card
                         cmuk-card-default
                         cmuk-card-body">
-            @validators()
+                        @validators()
             </div>
         </div>
         <div>
             <div class="cmuk-card
                         cmuk-card-default
                         cmuk-card-body">
-                <p id="tokensValue" class="heading"></p>
-                <h5>@Messages(constants.Form.TOKENS)</h5>
+                        <p id="tokensValue" class="heading"></p>
+                        <h5>@Messages(constants.Form.TOKENS)</h5>
             </div>
         </div>
         <div>
             <div class="cmuk-card
                         cmuk-card-default
                         cmuk-card-body">
-            @averageBlockTime()
+                        @averageBlockTime()
             </div>
         </div>
 
@@ -83,14 +83,11 @@
         <div class="cmuk-grid-match
                     cmuk-child-width-expand
                     cmuk-text-center" cmuk-grid>
-            @* <div class="leftText">*@
-            @* <span class="heading"></span>*@
-            @* </div>*@
             <div>
                 <div class="cmuk-card
                             cmuk-card-default
                             cmuk-card-body">
-                @blockTimeGraph()
+                            @blockTimeGraph()
                 </div>
             </div>
 
@@ -102,26 +99,26 @@
                 <div class="cmuk-card
                             cmuk-card-default
                             cmuk-card-body"
-                id="transactionExplorer">
-                @transactionExplorer()
+                     id="transactionExplorer">
+                            @transactionExplorer()
                 </div>
             </div>
             <div>
                 <div class="cmuk-card
                             cmuk-card-default
                             cmuk-card-body"
-                id="blockExplorer">
-                @blockExplorer()
+                     id="blockExplorer">
+                            @blockExplorer()
                 </div>
             </div>
         </div>
 
     </div>
 
-@transactionHash()
-@blockHeight()
-@validatorsTable()
-@allBlocksTable()
+    @transactionHash()
+    @blockHeight()
+    @validatorsTable()
+    @allBlocksTable()
 
     <script src="@routes.Assets.versioned("javascripts/back.js")" type="text/javascript"></script>
     <script>
