@@ -5,32 +5,31 @@
 @common(Messages(constants.User.HOME), failures, warnings, successes, infos )(Html(""))(center)(Html(""))
 
 @center = {
-    <div class="row">
-        <div class="col-md-8 d-flex align-items-stretch">
-                 <div id="commonHome" class="flexItem flexGrowth"></div>
-        </div>
-        <div class="col-md-4 flexItem flexGrowth leftText d-flex align-items-stretch">
-        <div class="card">
-            <div class="card-header ">
-                <span class="heading">@Messages(constants.Form.ZONE):</span>
-            </div>
-            <div class="card-body">
-            <div id="zone">
-            </div>
+    <div cmuk-grid>
+        <div class="cmuk-width-3-4 centerText">
+            <div class="cmuk-card
+                        cmuk-card-default
+                        cmuk-card-body">
+                        <div id="commonHome" class="flexItem flexGrowth"></div>
             </div>
         </div>
+        <div class="cmuk-width-1-4 centerText">
+            <div class="cmuk-card
+                        cmuk-card-default
+                        cmuk-card-body">
+                        <span class="heading">@Messages(constants.Form.ZONE):</span>
+                        <div id="zone"></div>
+            </div>
         </div>
-        <div class="col-md-12 flexGrowth flexItem d-flex align-items-stretch">
-        <div class="card">
-            <div class="card-header leftText">
+    </div>
+    <div class="cmuk-card
+                cmuk-card-default
+                cmuk-card-body
+                cmuk-margin-medium-top">
                 <span class="heading">@Messages(constants.Form.GENESIS)</span>
-            </div>
-            <div class="card-body">
-               <div id="genesisDetails" class ="flexContainer"></div>
-            </div>
-        </div>
+                <div id="genesisDetails" class ="flexContainer"></div>
     </div>
-    </div>
+
     <script>
             componentResource('commonHome', jsRoutes.controllers.ComponentViewController.commonHome());
             componentResource('zone', jsRoutes.controllers.ComponentViewController.zoneDetails());
