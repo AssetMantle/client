@@ -238,6 +238,10 @@
     text-align: center;
     padding-top: 15px;
 }
+.flexBox{
+    padding:5px;
+    margin:10px;
+}
 .flex-row{
     display: flex;
     flex-direction: row;
