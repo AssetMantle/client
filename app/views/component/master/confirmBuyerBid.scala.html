@@ -1,6 +1,6 @@
+@import controllers.actions.LoginState
 @import helper._
 @import views.companion.master.ConfirmBuyerBid
-@import controllers.actions.LoginState
 
 @(confirmBuyerBidForm: Form[ConfirmBuyerBid.Data], sellerAddress: String, pegHash: String, bid: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 
@@ -8,26 +8,31 @@
     <div class="latest_card-header latest_card-header-primary text-center">
         <h4 class="latest_card-title">@Messages(constants.Form.CONFIRM_BUYER_BID)</h4>
     </div>
-    <div>
-            <div class="latest_card-body">
-                @CSRF.formField
+    <script src="@routes.Assets.versioned("javascripts/showHideUploadUpdateButton.js")" type="text/javascript"></script>
+    <div class="centerText">
+        <button id="traderButtonUploadBuyerContract" class="hidden" onclick="getForm(jsRoutes.controllers.FileController.uploadTraderAssetForm('@constants.File.OBL', '@issueAssetOBLForm.data(constants.FormField.REQUEST_ID.name)'))">@Messages(constants.Form.UPLOAD_BUYER_CONTRACT)</button>
+        <button id="traderButtonUpdateBuyerContract" class="hidden" onclick="getForm(jsRoutes.controllers.FileController.updateTraderAssetForm('@constants.File.OBL', '@issueAssetOBLForm.data(constants.FormField.REQUEST_ID.name)'))">@Messages(constants.Form.UPDATE_SELLER_CONTRACT)</button>
+        <script>checkFileExists(jsRoutes.controllers.FileController.checkTraderAssetFileExists('@issueAssetOBLForm.data(constants.FormField.REQUEST_ID.name)', '@constants.File.OBL'), "traderButtonUploadBuyerContract", "traderButtonUpdateBuyerContract")</script>
+    </div>
+    <div class="latest_card-body">
+        @CSRF.formField
 
-                @inputText(confirmBuyerBidForm(constants.FormField.SELLER_ADDRESS.name).copy(value = Some(sellerAddress)), '_label -> Messages(constants.FormField.SELLER_ADDRESS.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.SELLER_ADDRESS.name), 'required -> true)
-                @inputText(confirmBuyerBidForm(constants.FormField.BID.name) copy (value = Some(bid.toString)), '_label -> Messages(constants.FormField.BID.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.BID.name), 'required -> true)
-                @inputText(confirmBuyerBidForm(constants.FormField.TIME.name), '_label -> Messages(constants.FormField.TIME.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.TIME.name), 'required -> true)
-                @inputText(confirmBuyerBidForm(constants.FormField.PEG_HASH.name).copy(value = Some(pegHash)), '_label -> Messages(constants.FormField.PEG_HASH.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.PEG_HASH.name), 'required -> true)
-                @inputText(confirmBuyerBidForm(constants.FormField.BUYER_CONTRACT_HASH.name), '_label -> Messages(constants.FormField.BUYER_CONTRACT_HASH.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.BUYER_CONTRACT_HASH.name), 'required -> true)
-                @inputText(confirmBuyerBidForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.GAS.name),'required->true)
-                @inputPassword(confirmBuyerBidForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.PASSWORD.name), 'required -> true)
+        @inputText(confirmBuyerBidForm(constants.FormField.SELLER_ADDRESS.name).copy(value = Some(sellerAddress)), '_label -> Messages(constants.FormField.SELLER_ADDRESS.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.SELLER_ADDRESS.name), 'required -> true)
+        @inputText(confirmBuyerBidForm(constants.FormField.BID.name) copy (value = Some(bid.toString)), '_label -> Messages(constants.FormField.BID.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.BID.name), 'required -> true)
+        @inputText(confirmBuyerBidForm(constants.FormField.TIME.name), '_label -> Messages(constants.FormField.TIME.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.TIME.name), 'required -> true)
+        @inputText(confirmBuyerBidForm(constants.FormField.PEG_HASH.name).copy(value = Some(pegHash)), '_label -> Messages(constants.FormField.PEG_HASH.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.PEG_HASH.name), 'required -> true)
+        @inputText(confirmBuyerBidForm(constants.FormField.BUYER_CONTRACT_HASH.name), '_label -> Messages(constants.FormField.BUYER_CONTRACT_HASH.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.BUYER_CONTRACT_HASH.name), 'required -> true)
+        @inputText(confirmBuyerBidForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.GAS.name), 'required -> true)
+        @inputPassword(confirmBuyerBidForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.PASSWORD.name), 'required -> true)
 
-                @if(confirmBuyerBidForm.hasGlobalErrors) {
-                    <ul>
-                    @for(error <- confirmBuyerBidForm.globalErrors) {
-                        <li>@error.format</li>
-                    }
-                    </ul>
-                }
-                <button type="button" class="btn btn-primary btn-sm" onclick="submitForm(this)">@Messages(constants.Form.CONFIRM_BUYER_BID)</button>
-            </div>
-        </div>
+        @if(confirmBuyerBidForm.hasGlobalErrors) {
+            <ul>
+            @for(error <- confirmBuyerBidForm.globalErrors) {
+                <li>@error.format</li>
+            }
+            </ul>
+        }
+        <button type="button" class="btn btn-primary btn-sm" onclick="submitForm(this)">@Messages(constants.Form.CONFIRM_BUYER_BID)</button>
+    </div>
+
 }

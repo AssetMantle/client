@@ -553,8 +553,10 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
           case constants.File.PACKING_LIST => PartialContent(views.html.component.master.issueAssetDocument(id))
           case constants.File.COO => PartialContent(views.html.component.master.issueAssetDocument(id))
           case constants.File.COA => PartialContent(views.html.component.master.issueAssetDocument(id))
+          case constants.File.BUYER_CONTRACT => PartialContent(views.html.component.master.confirmBuyerBid(id))
+          case constants.File.SELLER_CONTRACT => PartialContent(views.html.component.master.confirmSellerBid(id))
           case constants.File.OTHER => PartialContent(views.html.component.master.issueAssetDocument(id))
-          case _ => PartialContent(views.html.component.master.issueAssetDocument(id))
+          case _ => Ok(views.html.index())
         }
       } catch {
         case baseException: BaseException => InternalServerError(Messages(baseException.failure.message))
@@ -585,8 +587,10 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
           case constants.File.PACKING_LIST => PartialContent(views.html.component.master.issueAssetDocument(id))
           case constants.File.COO => PartialContent(views.html.component.master.issueAssetDocument(id))
           case constants.File.COA => PartialContent(views.html.component.master.issueAssetDocument(id))
+          case constants.File.BUYER_CONTRACT => PartialContent(views.html.component.master.confirmBuyerBid(id))
+          case constants.File.SELLER_CONTRACT => PartialContent(views.html.component.master.confirmSellerBid(id))
           case constants.File.OTHER => PartialContent(views.html.component.master.issueAssetDocument(id))
-          case _ => PartialContent(views.html.component.master.issueAssetDocument(id))
+          case _ => Ok(views.html.index())
         }
       } catch {
         case baseException: BaseException => InternalServerError(Messages(baseException.failure.message))
