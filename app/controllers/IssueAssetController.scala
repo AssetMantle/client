@@ -25,7 +25,7 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
   private implicit val module: String = constants.Module.CONTROLLERS_ISSUE_ASSET
 
   def issueAssetRequestForm(id: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.issueAssetRequest(views.companion.master.ConfirmTransaction.form.fill(views.companion.master.ConfirmTransaction.Data(id,0,"")), masterTransactionIssueAssetRequests.Service.getIssueAssetByID(id)))
+    Ok(views.html.component.master.issueAssetRequest(views.companion.master.ConfirmTransaction.form.fill(views.companion.master.ConfirmTransaction.Data(id, 0, "")), masterTransactionIssueAssetRequests.Service.getIssueAssetByID(id)))
   }
 
   def assetDetail(id: String): Action[AnyContent] = Action { implicit request =>
@@ -46,7 +46,7 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
               Ok(views.html.index(successes = Seq(constants.Response.ISSUE_ASSET_REQUEST_SENT)))
             } else {
               val ticketID = transaction.process[blockchainTransaction.IssueAsset, transactionsIssueAsset.Request](
-                entity = blockchainTransaction.IssueAsset(from = loginState.address, to = loginState.address, documentHash = asset.documentHash, assetType = asset.assetType, assetPrice = asset.assetPrice, quantityUnit = asset.quantityUnit, assetQuantity = asset.assetQuantity, moderated = false, gas = confirmTransactionData.gas, takerAddress = if (asset.takerAddress == "") null else asset.takerAddress, status = null, txHash = null, ticketID = "", mode = transactionMode, code = null),
+                entity = blockchainTransaction.IssueAsset(from = loginState.address, to = loginState.address, documentHash = asset.documentHash, assetType = asset.assetType, assetPrice = asset.assetPrice, quantityUnit = asset.quantityUnit, assetQuantity = asset.assetQuantity, moderated = false, gas = confirmTransactionData.gas, takerAddress = if (asset.takerAddress == Option("")) null else asset.takerAddress, status = null, txHash = null, ticketID = "", mode = transactionMode, code = null),
                 blockchainTransactionCreate = blockchainTransactionIssueAssets.Service.create,
                 request = transactionsIssueAsset.Request(transactionsIssueAsset.BaseRequest(from = loginState.address), to = loginState.address, password = confirmTransactionData.password, documentHash = asset.documentHash, assetType = asset.assetType, assetPrice = asset.assetPrice.toString, quantityUnit = asset.quantityUnit, assetQuantity = asset.assetQuantity.toString, moderated = false, gas = confirmTransactionData.gas.toString, takerAddress = asset.takerAddress.getOrElse(""), mode = transactionMode),
                 action = transactionsIssueAsset.Service.post,
@@ -90,7 +90,7 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
         issueAssetDetailData => {
           try {
             val id = if (issueAssetDetailData.requestID.isEmpty) utilities.IDGenerator.requestID() else issueAssetDetailData.requestID.get
-            masterTransactionIssueAssetRequests.Service.insertOrUpdate(id = id, ticketID = None, pegHash = None, accountID = loginState.username, documentHash = issueAssetDetailData.documentHash, assetType = issueAssetDetailData.assetType, quantityUnit = issueAssetDetailData.quantityUnit, assetQuantity = issueAssetDetailData.assetQuantity, assetPrice = issueAssetDetailData.assetPrice, takerAddress = if (issueAssetDetailData.takerAddress == "") None else Option(issueAssetDetailData.takerAddress), commodityName = issueAssetDetailData.commodityName, quality = issueAssetDetailData.quality, deliveryTerm = issueAssetDetailData.deliveryTerm, tradeType = issueAssetDetailData.tradeType, portOfLoading = issueAssetDetailData.portOfLoading, portOfDischarge = issueAssetDetailData.portOfDischarge, shipmentDate = issueAssetDetailData.shipmentDate, physicalDocumentsHandledVia = issueAssetDetailData.physicalDocumentsHandledVia, paymentTerms = issueAssetDetailData.comdexPaymentTerms, status = constants.Status.Asset.INCOMPLETE_DETAILS)
+            masterTransactionIssueAssetRequests.Service.insertOrUpdate(id = id, ticketID = None, pegHash = None, accountID = loginState.username, documentHash = issueAssetDetailData.documentHash, assetType = issueAssetDetailData.assetType, quantityUnit = issueAssetDetailData.quantityUnit, assetQuantity = issueAssetDetailData.assetQuantity, assetPrice = issueAssetDetailData.assetPrice, takerAddress = if (issueAssetDetailData.takerAddress == "") None else Option(issueAssetDetailData.takerAddress), shipmentDetails = masterTransaction.IssueAssetRequestDetails.ShipmentDetails(issueAssetDetailData.commodityName, issueAssetDetailData.quality, issueAssetDetailData.deliveryTerm, issueAssetDetailData.tradeType, issueAssetDetailData.portOfLoading, issueAssetDetailData.portOfDischarge, issueAssetDetailData.shipmentDate), physicalDocumentsHandledVia = issueAssetDetailData.physicalDocumentsHandledVia, paymentTerms = issueAssetDetailData.comdexPaymentTerms, status = constants.Status.Asset.INCOMPLETE_DETAILS)
             val obl = Json.parse(masterTransactionFiles.Service.getOrEmpty(id, constants.File.OBL).context.getOrElse(Json.toJson(masterTransaction.FileTypeContext.OBL("", "", "", "", "", "", new Date(0), "", 0, 0)).toString)).as[masterTransaction.FileTypeContext.OBL]
             PartialContent(views.html.component.master.issueAssetOBL(views.companion.master.IssueAssetOBL.form.fill(views.companion.master.IssueAssetOBL.Data(id, obl.billOfLadingId, obl.portOfLoading, obl.shipperName, obl.shipperAddress, obl.notifyPartyName, obl.notifyPartyAddress, obl.dateOfShipping, obl.deliveryTerm, obl.weightOfConsignment, obl.declaredAssetValue))))
 
@@ -105,36 +105,36 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
       )
   }
 
-    def issueAssetOBLForm(id: String): Action[AnyContent] = Action {
-      implicit request =>
-        val obl = Json.parse(masterTransactionFiles.Service.getOrEmpty(id, constants.File.OBL).context.getOrElse(Json.toJson(masterTransaction.FileTypeContext.OBL("", "", "", "", "", "",  new Date(0), "", 0, 0)).toString)).as[masterTransaction.FileTypeContext.OBL]
-        Ok(views.html.component.master.issueAssetOBL(views.companion.master.IssueAssetOBL.form.fill(views.companion.master.IssueAssetOBL.Data(id, obl.billOfLadingId, obl.portOfLoading, obl.shipperName, obl.shipperAddress, obl.notifyPartyName, obl.notifyPartyAddress, obl.dateOfShipping, obl.deliveryTerm, obl.weightOfConsignment, obl.declaredAssetValue))))
-    }
+  def issueAssetOBLForm(id: String): Action[AnyContent] = Action {
+    implicit request =>
+      val obl = Json.parse(masterTransactionFiles.Service.getOrEmpty(id, constants.File.OBL).context.getOrElse(Json.toJson(masterTransaction.FileTypeContext.OBL("", "", "", "", "", "", new Date(0), "", 0, 0)).toString)).as[masterTransaction.FileTypeContext.OBL]
+      Ok(views.html.component.master.issueAssetOBL(views.companion.master.IssueAssetOBL.form.fill(views.companion.master.IssueAssetOBL.Data(id, obl.billOfLadingId, obl.portOfLoading, obl.shipperName, obl.shipperAddress, obl.notifyPartyName, obl.notifyPartyAddress, obl.dateOfShipping, obl.deliveryTerm, obl.weightOfConsignment, obl.declaredAssetValue))))
+  }
 
-    def issueAssetOBL: Action[AnyContent] = withTraderLoginAction.authenticated {
-      implicit loginState =>
-        implicit request =>
-          views.companion.master.IssueAssetOBL.form.bindFromRequest().fold(
-            formWithErrors => {
-              BadRequest(views.html.component.master.issueAssetOBL(formWithErrors))
-            },
-            issueAssetOBLData => {
-              try {
-                //            PartialContent(views.html.component.master.issueAssetDetails())
-                masterTransactionFiles.Service.insertOrUpdateContext(masterTransaction.File(issueAssetOBLData.requestID, constants.File.OBL, masterTransactionFiles.Service.getOrEmpty(issueAssetOBLData.requestID,constants.File.OBL).fileName , None, Option(Json.toJson(masterTransaction.FileTypeContext.OBL(issueAssetOBLData.billOfLadingNumber, issueAssetOBLData.portOfLoading, issueAssetOBLData.shipperName, issueAssetOBLData.shipperAddress, issueAssetOBLData.notifyPartyName, issueAssetOBLData.notifyPartyAddress, issueAssetOBLData.shipmentDate, issueAssetOBLData.deliveryTerm, issueAssetOBLData.assetQuantity, issueAssetOBLData.assetPrice)).toString),None))
-                val invoice = Json.parse(masterTransactionFiles.Service.getOrEmpty(issueAssetOBLData.requestID, constants.File.INVOICE).context.getOrElse(Json.toJson(masterTransaction.FileTypeContext.Invoice("",  new Date(0))).toString)).as[masterTransaction.FileTypeContext.Invoice]
-                PartialContent(views.html.component.master.issueAssetInvoice(views.companion.master.IssueAssetInvoice.form.fill(views.companion.master.IssueAssetInvoice.Data(issueAssetOBLData.requestID, invoice.invoiceNumber, invoice.invoiceDate))))
-              }
-              catch {
-                case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-              }
+  def issueAssetOBL: Action[AnyContent] = withTraderLoginAction.authenticated {
+    implicit loginState =>
+      implicit request =>
+        views.companion.master.IssueAssetOBL.form.bindFromRequest().fold(
+          formWithErrors => {
+            BadRequest(views.html.component.master.issueAssetOBL(formWithErrors))
+          },
+          issueAssetOBLData => {
+            try {
+              //            PartialContent(views.html.component.master.issueAssetDetails())
+              masterTransactionFiles.Service.insertOrUpdateContext(masterTransaction.File(issueAssetOBLData.requestID, constants.File.OBL, masterTransactionFiles.Service.getOrEmpty(issueAssetOBLData.requestID, constants.File.OBL).fileName, None, Option(Json.toJson(masterTransaction.FileTypeContext.OBL(issueAssetOBLData.billOfLadingNumber, issueAssetOBLData.portOfLoading, issueAssetOBLData.shipperName, issueAssetOBLData.shipperAddress, issueAssetOBLData.notifyPartyName, issueAssetOBLData.notifyPartyAddress, issueAssetOBLData.shipmentDate, issueAssetOBLData.deliveryTerm, issueAssetOBLData.assetQuantity, issueAssetOBLData.assetPrice)).toString), None))
+              val invoice = Json.parse(masterTransactionFiles.Service.getOrEmpty(issueAssetOBLData.requestID, constants.File.INVOICE).context.getOrElse(Json.toJson(masterTransaction.FileTypeContext.Invoice("", new Date(0))).toString)).as[masterTransaction.FileTypeContext.Invoice]
+              PartialContent(views.html.component.master.issueAssetInvoice(views.companion.master.IssueAssetInvoice.form.fill(views.companion.master.IssueAssetInvoice.Data(issueAssetOBLData.requestID, invoice.invoiceNumber, invoice.invoiceDate))))
             }
-          )
-    }
+            catch {
+              case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+            }
+          }
+        )
+  }
 
   def issueAssetInvoiceForm(id: String): Action[AnyContent] = Action {
     implicit request =>
-      val invoice = Json.parse(masterTransactionFiles.Service.getOrEmpty(id, constants.File.INVOICE).context.getOrElse(Json.toJson(masterTransaction.FileTypeContext.Invoice("",  new Date(0))).toString)).as[masterTransaction.FileTypeContext.Invoice]
+      val invoice = Json.parse(masterTransactionFiles.Service.getOrEmpty(id, constants.File.INVOICE).context.getOrElse(Json.toJson(masterTransaction.FileTypeContext.Invoice("", new Date(0))).toString)).as[masterTransaction.FileTypeContext.Invoice]
       PartialContent(views.html.component.master.issueAssetInvoice(views.companion.master.IssueAssetInvoice.form.fill(views.companion.master.IssueAssetInvoice.Data(id, invoice.invoiceNumber, invoice.invoiceDate))))
   }
 
@@ -148,7 +148,7 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
           issueAssetInvoiceData => {
             try {
               //            PartialContent(views.html.component.master.issueAssetDetails())
-              masterTransactionFiles.Service.insertOrUpdateContext(masterTransaction.File(issueAssetInvoiceData.requestID, constants.File.INVOICE, "" ,None, Option(Json.toJson(masterTransaction.FileTypeContext.Invoice(issueAssetInvoiceData.invoiceNumber,issueAssetInvoiceData.invoiceDate)).toString()), None))
+              masterTransactionFiles.Service.insertOrUpdateContext(masterTransaction.File(issueAssetInvoiceData.requestID, constants.File.INVOICE, "", None, Option(Json.toJson(masterTransaction.FileTypeContext.Invoice(issueAssetInvoiceData.invoiceNumber, issueAssetInvoiceData.invoiceDate)).toString()), None))
               PartialContent(views.html.component.master.issueAssetDocument(issueAssetInvoiceData.requestID))
             }
             catch {
@@ -158,19 +158,18 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
         )
   }
 
-    def viewPendingIssueAssetRequests: Action[AnyContent] = withZoneLoginAction.authenticated {
-      implicit loginState =>
-        implicit request =>
-          try {
-            withUsernameToken.Ok(views.html.component.master.viewPendingIssueAssetRequests(masterTransactionIssueAssetRequests.Service.getPendingIssueAssetRequests(masterAccounts.Service.getIDsForAddresses(blockchainAclAccounts.Service.getAddressesUnderZone(masterZones.Service.getZoneId(loginState.username))), constants.Status.Asset.REQUESTED)))
-          }
-          catch {
-            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-          }
-    }
+  def viewPendingIssueAssetRequests: Action[AnyContent] = withZoneLoginAction.authenticated {
+    implicit loginState =>
+      implicit request =>
+        try {
+          withUsernameToken.Ok(views.html.component.master.viewPendingIssueAssetRequests(masterTransactionIssueAssetRequests.Service.getPendingIssueAssetRequests(masterAccounts.Service.getIDsForAddresses(blockchainAclAccounts.Service.getAddressesUnderZone(masterZones.Service.getZoneId(loginState.username))), constants.Status.Asset.REQUESTED)))
+        }
+        catch {
+          case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+        }
+  }
 
-  //////////////////////////////////
-    def viewAssetDocuments(id: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+  def viewAssetDocuments(id: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
         withUsernameToken.Ok(views.html.component.master.viewVerificationTraderAssetDouments(masterTransactionFiles.Service.getAllDocuments(id)))
@@ -200,85 +199,61 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
         case baseException: BaseException => InternalServerError(Messages(baseException.failure.message))
       }
   }
-  ///////////////////////////////////
-    def rejectIssueAssetRequestForm(requestID: String): Action[AnyContent] = Action {
+
+  def rejectIssueAssetRequestForm(requestID: String): Action[AnyContent] = Action {
+    implicit request =>
+      Ok(views.html.component.master.rejectIssueAssetRequest(views.companion.master.RejectIssueAssetRequest.form, requestID))
+  }
+
+  def rejectIssueAssetRequest: Action[AnyContent] = withZoneLoginAction.authenticated {
+    implicit loginState =>
       implicit request =>
-        Ok(views.html.component.master.rejectIssueAssetRequest(views.companion.master.RejectIssueAssetRequest.form, requestID))
-    }
-
-    def rejectIssueAssetRequest: Action[AnyContent] = withZoneLoginAction.authenticated {
-      implicit loginState =>
-        implicit request =>
-          views.companion.master.RejectIssueAssetRequest.form.bindFromRequest().fold(
-            formWithErrors => {
-              BadRequest(views.html.component.master.rejectIssueAssetRequest(formWithErrors, formWithErrors.data(constants.Form.REQUEST_ID)))
-            },
-            rejectIssueAssetRequestData => {
-              try {
-                masterTransactionIssueAssetRequests.Service.reject(id = rejectIssueAssetRequestData.requestID, comment = rejectIssueAssetRequestData.comment)
-                withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ISSUE_ASSET_REQUEST_REJECTED)))
-              }
-              catch {
-                case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-              }
-            }
-          )
-    }
-
-    def issueAssetForm(requestID: String, accountID: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, takerAddress: Option[String]): Action[AnyContent] = Action {
-      implicit request =>
-        Ok(views.html.component.master.issueAsset(views.companion.master.IssueAsset.form, requestID, accountID, documentHash, assetType, assetPrice, quantityUnit, assetQuantity, takerAddress))
-    }
-
-    def issueAsset: Action[AnyContent] = withZoneLoginAction.authenticated {
-      implicit loginState =>
-        implicit request =>
-          views.companion.master.IssueAsset.form.bindFromRequest().fold(
-            formWithErrors => {
-              BadRequest(views.html.component.master.issueAsset(formWithErrors, formWithErrors.data(constants.Form.REQUEST_ID), formWithErrors.data(constants.Form.ACCOUNT_ID), formWithErrors.data(constants.Form.DOCUMENT_HASH), formWithErrors.data(constants.Form.ASSET_TYPE), formWithErrors.data(constants.Form.ASSET_PRICE).toInt, formWithErrors.data(constants.Form.QUANTITY_UNIT), formWithErrors.data(constants.Form.ASSET_QUANTITY).toInt, Option(formWithErrors.data(constants.Form.TAKER_ADDRESS))))
-            },
-            issueAssetData => {
-              try {
-                val toAddress = masterAccounts.Service.getAddress(issueAssetData.accountID)
-                if (masterTransactionIssueAssetRequests.Service.getStatus(issueAssetData.requestID) == constants.Status.Asset.REQUESTED) {
-                  val ticketID = transaction.process[blockchainTransaction.IssueAsset, transactionsIssueAsset.Request](
-                    entity = blockchainTransaction.IssueAsset(from = loginState.address, to = toAddress, documentHash = issueAssetData.documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.assetPrice, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.assetQuantity, moderated = true, gas = issueAssetData.gas, takerAddress = if (issueAssetData.takerAddress == "") null else Option(issueAssetData.takerAddress), status = null, txHash = null, ticketID = "", mode = transactionMode, code = null),
-                    blockchainTransactionCreate = blockchainTransactionIssueAssets.Service.create,
-                    request = transactionsIssueAsset.Request(transactionsIssueAsset.BaseRequest(from = loginState.address), to = toAddress, password = issueAssetData.password, documentHash = issueAssetData.documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.assetPrice.toString, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.assetQuantity.toString, moderated = true, gas = issueAssetData.gas.toString, takerAddress = issueAssetData.takerAddress, mode = transactionMode),
-                    action = transactionsIssueAsset.Service.post,
-                    onSuccess = blockchainTransactionIssueAssets.Utility.onSuccess,
-                    onFailure = blockchainTransactionIssueAssets.Utility.onFailure,
-                    updateTransactionHash = blockchainTransactionIssueAssets.Service.updateTransactionHash
-                  )
-                  masterTransactionIssueAssetRequests.Service.updateTicketID(issueAssetData.requestID, ticketID)
-                  withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ASSET_ISSUED)))
-                } else {
-                  Unauthorized(views.html.index(failures = Seq(constants.Response.REQUEST_ALREADY_APPROVED_OR_REJECTED)))
-                }
-              }
-              catch {
-                case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-                case blockChainException: BlockChainException => InternalServerError(views.html.index(failures = Seq(blockChainException.failure)))
-              }
-            }
-          )
-    }
-
-    def blockchainIssueAssetForm: Action[AnyContent] = Action {
-      implicit request =>
-        Ok(views.html.component.blockchain.issueAsset(views.companion.blockchain.IssueAsset.form))
-    }
-
-    def blockchainIssueAsset: Action[AnyContent] = Action {
-      implicit request =>
-        views.companion.blockchain.IssueAsset.form.bindFromRequest().fold(
+        views.companion.master.RejectIssueAssetRequest.form.bindFromRequest().fold(
           formWithErrors => {
-            BadRequest(views.html.component.blockchain.issueAsset(formWithErrors))
+            BadRequest(views.html.component.master.rejectIssueAssetRequest(formWithErrors, formWithErrors.data(constants.Form.REQUEST_ID)))
+          },
+          rejectIssueAssetRequestData => {
+            try {
+              masterTransactionIssueAssetRequests.Service.reject(id = rejectIssueAssetRequestData.requestID, comment = rejectIssueAssetRequestData.comment)
+              withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ISSUE_ASSET_REQUEST_REJECTED)))
+            }
+            catch {
+              case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+            }
+          }
+        )
+  }
+
+  def issueAssetForm(requestID: String, accountID: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, takerAddress: Option[String]): Action[AnyContent] = Action {
+    implicit request =>
+      Ok(views.html.component.master.issueAsset(views.companion.master.IssueAsset.form, requestID, accountID, documentHash, assetType, assetPrice, quantityUnit, assetQuantity, takerAddress))
+  }
+
+  def issueAsset: Action[AnyContent] = withZoneLoginAction.authenticated {
+    implicit loginState =>
+      implicit request =>
+        views.companion.master.IssueAsset.form.bindFromRequest().fold(
+          formWithErrors => {
+            BadRequest(views.html.component.master.issueAsset(formWithErrors, formWithErrors.data(constants.Form.REQUEST_ID), formWithErrors.data(constants.Form.ACCOUNT_ID), formWithErrors.data(constants.Form.DOCUMENT_HASH), formWithErrors.data(constants.Form.ASSET_TYPE), formWithErrors.data(constants.Form.ASSET_PRICE).toInt, formWithErrors.data(constants.Form.QUANTITY_UNIT), formWithErrors.data(constants.Form.ASSET_QUANTITY).toInt, Option(formWithErrors.data(constants.Form.TAKER_ADDRESS))))
           },
           issueAssetData => {
             try {
-              transactionsIssueAsset.Service.post(transactionsIssueAsset.Request(transactionsIssueAsset.BaseRequest(from = issueAssetData.from), to = issueAssetData.to, password = issueAssetData.password, documentHash = issueAssetData.documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.assetPrice.toString, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.assetQuantity.toString, gas = issueAssetData.gas.toString, moderated = issueAssetData.moderated, takerAddress = issueAssetData.takerAddress, mode = issueAssetData.mode))
-              Ok(views.html.index(successes = Seq(constants.Response.ASSET_ISSUED)))
+              val toAddress = masterAccounts.Service.getAddress(issueAssetData.accountID)
+              if (masterTransactionIssueAssetRequests.Service.getStatus(issueAssetData.requestID) == constants.Status.Asset.REQUESTED) {
+                val ticketID = transaction.process[blockchainTransaction.IssueAsset, transactionsIssueAsset.Request](
+                  entity = blockchainTransaction.IssueAsset(from = loginState.address, to = toAddress, documentHash = issueAssetData.documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.assetPrice, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.assetQuantity, moderated = true, gas = issueAssetData.gas, takerAddress = if (issueAssetData.takerAddress == "") null else Option(issueAssetData.takerAddress), status = null, txHash = null, ticketID = "", mode = transactionMode, code = null),
+                  blockchainTransactionCreate = blockchainTransactionIssueAssets.Service.create,
+                  request = transactionsIssueAsset.Request(transactionsIssueAsset.BaseRequest(from = loginState.address), to = toAddress, password = issueAssetData.password, documentHash = issueAssetData.documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.assetPrice.toString, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.assetQuantity.toString, moderated = true, gas = issueAssetData.gas.toString, takerAddress = issueAssetData.takerAddress, mode = transactionMode),
+                  action = transactionsIssueAsset.Service.post,
+                  onSuccess = blockchainTransactionIssueAssets.Utility.onSuccess,
+                  onFailure = blockchainTransactionIssueAssets.Utility.onFailure,
+                  updateTransactionHash = blockchainTransactionIssueAssets.Service.updateTransactionHash
+                )
+                masterTransactionIssueAssetRequests.Service.updateTicketID(issueAssetData.requestID, ticketID)
+                withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ASSET_ISSUED)))
+              } else {
+                Unauthorized(views.html.index(failures = Seq(constants.Response.REQUEST_ALREADY_APPROVED_OR_REJECTED)))
+              }
             }
             catch {
               case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -286,5 +261,29 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
             }
           }
         )
-    }
   }
+
+  def blockchainIssueAssetForm: Action[AnyContent] = Action {
+    implicit request =>
+      Ok(views.html.component.blockchain.issueAsset(views.companion.blockchain.IssueAsset.form))
+  }
+
+  def blockchainIssueAsset: Action[AnyContent] = Action {
+    implicit request =>
+      views.companion.blockchain.IssueAsset.form.bindFromRequest().fold(
+        formWithErrors => {
+          BadRequest(views.html.component.blockchain.issueAsset(formWithErrors))
+        },
+        issueAssetData => {
+          try {
+            transactionsIssueAsset.Service.post(transactionsIssueAsset.Request(transactionsIssueAsset.BaseRequest(from = issueAssetData.from), to = issueAssetData.to, password = issueAssetData.password, documentHash = issueAssetData.documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.assetPrice.toString, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.assetQuantity.toString, gas = issueAssetData.gas.toString, moderated = issueAssetData.moderated, takerAddress = issueAssetData.takerAddress, mode = issueAssetData.mode))
+            Ok(views.html.index(successes = Seq(constants.Response.ASSET_ISSUED)))
+          }
+          catch {
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+            case blockChainException: BlockChainException => InternalServerError(views.html.index(failures = Seq(blockChainException.failure)))
+          }
+        }
+      )
+  }
+}

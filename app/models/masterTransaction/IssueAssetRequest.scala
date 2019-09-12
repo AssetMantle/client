@@ -8,6 +8,10 @@ import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.{Json, OWrites, Reads}
 import slick.jdbc.JdbcProfile
 import java.util.Date
+
+import models.masterTransaction.IssueAssetRequest.IssueAssetRequestParsed
+import models.masterTransaction.IssueAssetRequestDetails.ShipmentDetails
+
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
@@ -176,11 +180,11 @@ class IssueAssetRequests @Inject()(protected val databaseConfigProvider: Databas
 
   object Service {
 
-    def create(id: String, ticketID: Option[String], pegHash: Option[String], accountID: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, takerAddress: Option[String], commodityName: String, quality: String, deliveryTerm:String, tradeType:String, portOfLoading: String, portOfDischarge: String, shipmentDate: Date, physicalDocumentsHandledVia: String, paymentTerms: String, status: String): String =
-      Await.result(add(IssueAssetRequest(id = id, ticketID = ticketID, pegHash = pegHash, accountID = accountID, documentHash = documentHash, assetType = assetType, quantityUnit = quantityUnit, assetQuantity = assetQuantity, assetPrice = assetPrice, takerAddress = takerAddress, shipmentDetails = Json.toJson(IssueAssetRequestDetails.ShipmentDetails(commodityName, quality, deliveryTerm, tradeType, portOfLoading, portOfDischarge, shipmentDate)).toString(), physicalDocumentsHandledVia = physicalDocumentsHandledVia, paymentTerms = paymentTerms, status = status, comment = null)), Duration.Inf)
+    def create(id: String, ticketID: Option[String], pegHash: Option[String], accountID: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, takerAddress: Option[String], shipmentDetails: ShipmentDetails, physicalDocumentsHandledVia: String, paymentTerms: String, status: String): String =
+      Await.result(add(IssueAssetRequest(id = id, ticketID = ticketID, pegHash = pegHash, accountID = accountID, documentHash = documentHash, assetType = assetType, quantityUnit = quantityUnit, assetQuantity = assetQuantity, assetPrice = assetPrice, takerAddress = takerAddress, shipmentDetails = Json.toJson(shipmentDetails).toString, physicalDocumentsHandledVia = physicalDocumentsHandledVia, paymentTerms = paymentTerms, status = status, comment = null)), Duration.Inf)
 
-    def insertOrUpdate(id: String, ticketID: Option[String], pegHash: Option[String], accountID: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, takerAddress: Option[String], commodityName: String, quality: String, deliveryTerm:String, tradeType:String, portOfLoading: String, portOfDischarge: String, shipmentDate: Date, physicalDocumentsHandledVia: String, paymentTerms: String, status: String): Int =
-      Await.result(upsert(IssueAssetRequest(id = id, ticketID = ticketID, pegHash = pegHash, accountID = accountID, documentHash = documentHash, assetType = assetType, quantityUnit = quantityUnit, assetQuantity = assetQuantity, assetPrice = assetPrice, takerAddress = takerAddress, shipmentDetails = Json.toJson(IssueAssetRequestDetails.ShipmentDetails(commodityName, quality, deliveryTerm, tradeType, portOfLoading, portOfDischarge, shipmentDate)).toString(), physicalDocumentsHandledVia = physicalDocumentsHandledVia, paymentTerms = paymentTerms, status = status, comment = null)), Duration.Inf)
+    def insertOrUpdate(id: String, ticketID: Option[String], pegHash: Option[String], accountID: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, takerAddress: Option[String], shipmentDetails: ShipmentDetails, physicalDocumentsHandledVia: String, paymentTerms: String, status: String): Int =
+      Await.result(upsert(IssueAssetRequest(id = id, ticketID = ticketID, pegHash = pegHash, accountID = accountID, documentHash = documentHash, assetType = assetType, quantityUnit = quantityUnit, assetQuantity = assetQuantity, assetPrice = assetPrice, takerAddress = takerAddress, shipmentDetails = Json.toJson(shipmentDetails).toString, physicalDocumentsHandledVia = physicalDocumentsHandledVia, paymentTerms = paymentTerms, status = status, comment = null)), Duration.Inf)
 
     def accept(id: String, ticketID: String): Int = Await.result(updateTicketIDAndStatusByID(id, ticketID, status = constants.Status.Asset.LISTED_FOR_TRADE), Duration.Inf)
 
