@@ -35,7 +35,7 @@ class AddZone @Inject()(wsClient: WSClient)(implicit configuration: Configuratio
 
   private def action(request: Request): Future[WSResponse] = wsClient.url(url).post(Json.toJson(request))
 
-  case class BaseRequest(from: String, chain_id: String = chainID)
+  case class BaseRequest(from: String, chain_id: String = chainID, gas: String)
 
   case class Request(base_req: BaseRequest, to: String, zoneID: String, password: String, mode: String) extends BaseRequestEntity
 

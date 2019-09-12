@@ -16,14 +16,7 @@
                     <i class="fa fa-user"></i>
                 </span>
             </div>
-            @inputText(
-                signUpForm(constants.FormField.USERNAME.name),
-                'placeholder -> Messages(constants.FormField.USERNAME.name),
-                'id -> "username",
-              'class -> "cmuk-input",
-                'required -> true,
-                'onkeyup -> """checkUsernameAvailable(this, "#checkUsernameAvailableResult", "#usernameAvailable")"""
-            )
+            @inputText(signUpForm(constants.FormField.USERNAME.name), 'placeholder -> Messages(constants.FormField.USERNAME.name), 'id -> "username", 'class -> "cmuk-input", 'required -> true, 'onkeyup -> """checkUsernameAvailable(this, "#checkUsernameAvailableResult", "#usernameAvailable")""")
             <div id="checkUsernameAvailableResult" class="result"></div>
         </div>
         <div class="input-group">
@@ -32,12 +25,7 @@
                     <i class="fa fa-lock" aria-hidden="true"></i>
                 </span>
             </div>
-          @inputPassword(
-            signUpForm(constants.FormField.SIGNUP_PASSWORD.name),
-            'id -> "password",
-            'class -> "cmuk-input",
-            'placeholder -> Messages(constants.FormField.SIGNUP_PASSWORD.name),
-            'required -> true)
+            @inputPassword(signUpForm(constants.FormField.SIGNUP_PASSWORD.name), 'id -> "password", 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.SIGNUP_PASSWORD.name), 'required -> true)
         </div>
         <div class="input-group">
             <div class="input-group-prepend">
@@ -45,12 +33,7 @@
                     <i class="fa fa-lock" aria-hidden="true"></i>
                 </span>
             </div>
-          @inputPassword(
-            signUpForm(constants.FormField.SIGNUP_CONFIRM_PASSWORD.name),
-            'id -> "confirmPassword",
-            'class -> "cmuk-input",
-            'placeholder -> Messages(constants.FormField.SIGNUP_CONFIRM_PASSWORD.name),
-            'required -> true)
+            @inputPassword(signUpForm(constants.FormField.SIGNUP_CONFIRM_PASSWORD.name), 'id -> "confirmPassword", 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.SIGNUP_CONFIRM_PASSWORD.name), 'required -> true)
             <span id="matchPasswordsResult">
                 <span id="matchPasswordsImageResult" class="result warning hidden"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i></span>
             </span>

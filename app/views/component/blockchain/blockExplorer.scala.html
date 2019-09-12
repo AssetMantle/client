@@ -1,25 +1,21 @@
 @()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
 
 <div class="leftText">
-        <span class="heading">@Messages(constants.Form.BLOCKS)</span>
-    </div>
+    <span class="heading">@Messages(constants.Form.BLOCKS)</span>
+</div>
 
 <table class="cmuk-table cmuk-table-divider">
-
     <thead>
-
-                <tr>
-                    <th scope="col">@Messages(constants.Form.HEIGHT)</th>
-                    <th scope="col">@Messages(constants.Form.NUM_TXS)</th>
-                    <th scope="col">@Messages(constants.Form.TIME)</th>
-                </tr>
-            </thead>
-            <tbody id="blockContainer">
-
-    </tbody>
-            <tr> <td colspan="3"><button class="btn-full-width" onclick='showAllBlocksTable()' >@Messages(constants.Form.SEE_ALL)</button>
-            </td></tr>
-        </table>
+        <tr>
+            <th scope="col">@Messages(constants.Form.HEIGHT)</th>
+            <th scope="col">@Messages(constants.Form.NUM_TXS)</th>
+            <th scope="col">@Messages(constants.Form.TIME)</th>
+        </tr>
+    </thead>
+    <tbody id="blockContainer"></tbody>
+    <tr> <td colspan="3"><button class="btn-full-width" onclick='showAllBlocksTable()' >@Messages(constants.Form.SEE_ALL)</button>
+    </td></tr>
+</table>
 
 <script src="@routes.Assets.versioned("javascripts/lastBlock.js")" type="text/javascript"></script>
 <script src="@routes.Assets.versioned("javascripts/averageBlockTimeUpdater.js")" type="text/javascript"></script>

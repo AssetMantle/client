@@ -11,7 +11,7 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Random, Success}
 
-case class Trader(id: String, zoneID: String, organizationID:String, accountID: String, name: String, status: Option[Boolean])
+case class Trader(id: String, zoneID: String, organizationID:String, accountID: String, name: String, status: Option[Boolean] = None)
 
 @Singleton
 class Traders @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
@@ -124,7 +124,7 @@ class Traders @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
 
   object Service {
 
-    def create(zoneID: String, organizationID: String, accountID: String, name: String): String = Await.result(add(Trader((-Math.abs(Random.nextInt)).toHexString.toUpperCase, zoneID, organizationID, accountID, name, null)), Duration.Inf)
+    def create(zoneID: String, organizationID: String, accountID: String, name: String): String = Await.result(add(Trader((-Math.abs(Random.nextInt)).toHexString.toUpperCase, zoneID, organizationID, accountID, name)), Duration.Inf)
 
     def get(id: String): Trader = Await.result(findById(id), Duration.Inf)
 

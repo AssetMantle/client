@@ -35,9 +35,9 @@ class SendFiat @Inject()(wsClient: WSClient)(implicit configuration: Configurati
 
   private def action(request: Request): Future[WSResponse] = wsClient.url(url).post(Json.toJson(request))
 
-  case class BaseRequest(from: String, chain_id: String = chainID)
+  case class BaseRequest(from: String, chain_id: String = chainID, gas: String)
 
-  case class Request(base_req: BaseRequest, password: String, to: String, amount: String, pegHash: String,gas:String, mode: String) extends BaseRequestEntity
+  case class Request(base_req: BaseRequest, password: String, to: String, amount: String, pegHash: String, mode: String) extends BaseRequestEntity
 
   object Service {
     def post(request: Request): WSResponse = try {

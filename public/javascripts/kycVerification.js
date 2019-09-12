@@ -10,24 +10,24 @@ function verifyZoneKycDocument(accountID, documentType) {
             document.getElementById('verifiedDocumentStatus' + accountID + documentType).style.display = "block";
         },
         error: function (error) {
-            document.getElementById('zoneKycDocumentStatus' + accountID + documentType).innerHTML = error;
+            document.getElementById('zoneKycDocumentStatus' + accountID + documentType).innerHTML = error.responseText;
         }
     });
 }
 
-function verifyOrganizationKycDocument(accountID, documentType) {
-    let route = jsRoutes.controllers.AddOrganizationController.verifyKycDocument(accountID, documentType);
+function verifyOrganizationKycDocument(organizationID, documentType) {
+    let route = jsRoutes.controllers.AddOrganizationController.verifyKycDocument(organizationID, documentType);
     $.ajax({
         url: route.url,
         type: route.type,
         success: function (result) {
-            document.getElementById('organizationKycDocumentStatus' + accountID + documentType).innerHTML = result;
-            $('#buttonOrganizationKycDocumentStatus' + accountID + documentType).hide();
-            document.getElementById('unverifiedDocumentStatus' + accountID + documentType).style.display = "none";
-            document.getElementById('verifiedDocumentStatus' + accountID + documentType).style.display = "block";
+            document.getElementById('organizationKycDocumentStatus' + organizationID + documentType).innerHTML = result;
+            $('#buttonOrganizationKycDocumentStatus' + organizationID + documentType).hide();
+            document.getElementById('unverifiedDocumentStatus' + organizationID + documentType).style.display = "none";
+            document.getElementById('verifiedDocumentStatus' + organizationID + documentType).style.display = "block";
         },
         error: function (error) {
-            document.getElementById('organizationKycDocumentStatus' + accountID + documentType).innerHTML = error;
+            document.getElementById('organizationKycDocumentStatus' + organizationID + documentType).innerHTML = error.responseText;
         }
     });
 }
@@ -48,7 +48,7 @@ function organizationVerifyTraderKycDocument(accountID, documentType) {
             }
         },
         error: function (error) {
-            document.getElementById('traderKycDocumentStatus' + accountID + documentType).innerHTML = error;
+            document.getElementById('traderKycDocumentStatus' + accountID + documentType).innerHTML = error.responseText;
         }
     });
 }
@@ -69,7 +69,7 @@ function zoneVerifyTraderKycDocument(accountID, documentType) {
             }
         },
         error: function (error) {
-            document.getElementById('traderKycDocumentStatus' + accountID + documentType).innerHTML = error;
+            document.getElementById('traderKycDocumentStatus' + accountID + documentType).innerHTML = error.responseText;
         }
     });
 }
@@ -86,24 +86,25 @@ function rejectZoneKycDocument(accountID, documentType) {
             document.getElementById('unverifiedDocumentStatus' + accountID + documentType).style.display = "block";
         },
         error: function (error) {
-            document.getElementById('zoneKycDocumentStatus' + accountID + documentType).innerHTML = error;
+            document.getElementById('zoneKycDocumentStatus' + accountID + documentType).innerHTML = error.responseText;
         }
     });
 }
 
-function rejectOrganizationKycDocument(accountID, documentType) {
-    let route = jsRoutes.controllers.AddOrganizationController.rejectKycDocument(accountID, documentType);
+function rejectOrganizationKycDocument(organizationID, documentType) {
+    let route = jsRoutes.controllers.AddOrganizationController.rejectKycDocument(organizationID, documentType);
+    console.log('buttonOrganizationKycDocumentStatus' + organizationID + documentType);
     $.ajax({
         url: route.url,
         type: route.type,
         success: function (result) {
-            document.getElementById('organizationKycDocumentStatus' + accountID + documentType).innerHTML = result;
-            $('#buttonOrganizationKycDocumentStatus' + accountID + documentType).hide();
-            document.getElementById('verifiedDocumentStatus' + accountID + documentType).style.display = "none";
-            document.getElementById('unverifiedDocumentStatus' + accountID + documentType).style.display = "block";
+            document.getElementById('organizationKycDocumentStatus' + organizationID + documentType).innerHTML = result;
+            $('#buttonOrganizationKycDocumentStatus' + organizationID + documentType).hide();
+            document.getElementById('verifiedDocumentStatus' + organizationID + documentType).style.display = "none";
+            document.getElementById('unverifiedDocumentStatus' + organizationID + documentType).style.display = "block";
         },
         error: function (error) {
-            document.getElementById('organizationKycDocumentStatus' + accountID + documentType).innerHTML = error;
+            document.getElementById('organizationKycDocumentStatus' + organizationID + documentType).innerHTML = error.responseText;
         }
     });
 }
@@ -122,7 +123,7 @@ function organizationRejectTraderKycDocument(accountID, documentType) {
             document.getElementById('unverifiedDocumentStatus' + accountID + documentType).style.display = "block"
         },
         error: function (error) {
-            document.getElementById('traderKycDocumentStatus' + accountID + documentType).innerHTML = error;
+            document.getElementById('traderKycDocumentStatus' + accountID + documentType).innerHTML = error.responseText;
         }
     });
 }
@@ -141,7 +142,7 @@ function zoneRejectTraderKycDocument(accountID, documentType) {
             document.getElementById('unverifiedDocumentStatus' + accountID + documentType).style.display = "block"
         },
         error: function (error) {
-            document.getElementById('traderKycDocumentStatus' + accountID + documentType).innerHTML = error;
+            document.getElementById('traderKycDocumentStatus' + accountID + documentType).innerHTML = error.responseText;
         }
     });
 }

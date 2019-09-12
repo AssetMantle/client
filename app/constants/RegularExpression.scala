@@ -12,5 +12,5 @@ object RegularExpression {
   val ALL_LETTERS: Regex = """^[a-zA-z]*$""".r
   val HASH: Regex = """^[a-fA-F0-9]*$""".r
   val EMAIL_ADDRESS: Regex = """^[a-zA-Z0-9\.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$""".r
-
+  val SWIFT_CODE: Regex = """^[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$""".r
 }
