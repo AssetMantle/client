@@ -20,7 +20,7 @@ import scala.concurrent.ExecutionContext
 @Singleton
 class AccountController @Inject()(messagesControllerComponents: MessagesControllerComponents, transactionAddKey: transactions.AddKey, transactionForgotPassword: transactions.ForgotPassword, email: Email, masterTransactionEmailOTP: masterTransaction.EmailOTPs, transactionsChangePassword: ChangePassword, withLoginAction: WithLoginAction, masterAccounts: master.Accounts, blockchainAclAccounts: ACLAccounts, blockchainZones: blockchain.Zones, blockchainOrganizations: blockchain.Organizations, blockchainAssets: blockchain.Assets, blockchainFiats: blockchain.Fiats, blockchainNegotiations: blockchain.Negotiations, masterOrganizations: master.Organizations, masterZones: master.Zones, blockchainAclHashes: blockchain.ACLHashes, blockchainOrders: blockchain.Orders, getAccount: GetAccount, blockchainAccounts: blockchain.Accounts, withUsernameToken: WithUsernameToken, pushNotification: PushNotification)(implicit exec: ExecutionContext, configuration: Configuration, wsClient: WSClient) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
-  private val module: String = constants.Module.ACCOUNT_CONTROLLER
+  private implicit val module: String = constants.Module.CONTROLLER_ACCOUNT
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -65,7 +65,7 @@ class AccountController @Inject()(messagesControllerComponents: MessagesControll
         changePasswordData => {
           try {
             if (masterAccounts.Service.validateLogin(loginState.username, changePasswordData.oldPassword)) {
-              transactionsChangePassword.Service.post(username =  loginState.username, transactionsChangePassword.Request(oldPassword = changePasswordData.oldPassword, newPassword = changePasswordData.newPassword, confirmNewPassword = changePasswordData.confirmNewPassword))
+              transactionsChangePassword.Service.post(username = loginState.username, transactionsChangePassword.Request(oldPassword = changePasswordData.oldPassword, newPassword = changePasswordData.newPassword, confirmNewPassword = changePasswordData.confirmNewPassword))
               masterAccounts.Service.updatePassword(username = loginState.username, newPassword = changePasswordData.newPassword)
               Ok(views.html.index(successes = Seq(constants.Response.PASSWORD_UPDATED)))
             } else {
@@ -107,25 +107,25 @@ class AccountController @Inject()(messagesControllerComponents: MessagesControll
   }
 
   def forgotPassword(username: String): Action[AnyContent] = Action { implicit request =>
-      views.companion.master.ForgotPassword.form.bindFromRequest().fold(
-        formWithErrors => {
-          BadRequest(views.html.component.master.forgotPassword(formWithErrors, username))
-        },
-        forgotPasswordData => {
-          try {
-            if (masterTransactionEmailOTP.Service.verifyOTP(username, forgotPasswordData.otp)){
-              transactionForgotPassword.Service.post(username = username, transactionForgotPassword.Request(seed = forgotPasswordData.mnemonic, newPassword = forgotPasswordData.newPassword, confirmNewPassword = forgotPasswordData.confirmNewPassword))
-              masterAccounts.Service.updatePassword(username = username, newPassword = forgotPasswordData.newPassword)
-              Ok(views.html.index(successes = Seq(constants.Response.PASSWORD_UPDATED)))
-            } else {
-              BadRequest(views.html.index(failures = Seq(constants.Response.INVALID_PASSWORD)))
-            }
-          }
-          catch {
-            case blockChainException: BlockChainException => InternalServerError(views.html.index(failures = Seq(blockChainException.failure)))
-            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+    views.companion.master.ForgotPassword.form.bindFromRequest().fold(
+      formWithErrors => {
+        BadRequest(views.html.component.master.forgotPassword(formWithErrors, username))
+      },
+      forgotPasswordData => {
+        try {
+          if (masterTransactionEmailOTP.Service.verifyOTP(username, forgotPasswordData.otp)) {
+            transactionForgotPassword.Service.post(username = username, transactionForgotPassword.Request(seed = forgotPasswordData.mnemonic, newPassword = forgotPasswordData.newPassword, confirmNewPassword = forgotPasswordData.confirmNewPassword))
+            masterAccounts.Service.updatePassword(username = username, newPassword = forgotPasswordData.newPassword)
+            Ok(views.html.index(successes = Seq(constants.Response.PASSWORD_UPDATED)))
+          } else {
+            BadRequest(views.html.index(failures = Seq(constants.Response.INVALID_PASSWORD)))
           }
         }
-      )
+        catch {
+          case blockChainException: BlockChainException => InternalServerError(views.html.index(failures = Seq(blockChainException.failure)))
+          case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+        }
+      }
+    )
   }
 }

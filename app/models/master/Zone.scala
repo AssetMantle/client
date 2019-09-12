@@ -11,7 +11,7 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Random, Success}
 
-case class Zone(id: String, accountID: String, name: String, currency: String, status: Option[Boolean])
+case class Zone(id: String, accountID: String, name: String, currency: String, status: Option[Boolean] = None)
 
 @Singleton
 class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
@@ -111,7 +111,7 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
   object Service {
 
-    def create(accountID: String, name: String, currency: String): String = Await.result(add(Zone((-Math.abs(Random.nextInt)).toHexString.toUpperCase, accountID, name, currency, null)), Duration.Inf)
+    def create(accountID: String, name: String, currency: String): String = Await.result(add(Zone(id = (-Math.abs(Random.nextInt)).toHexString.toUpperCase, accountID = accountID, name = name, currency = currency)), Duration.Inf)
 
     def get(id: String): Zone = Await.result(findById(id), Duration.Inf)
 

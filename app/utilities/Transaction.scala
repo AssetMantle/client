@@ -20,7 +20,7 @@ class Transaction @Inject()(getTxHashResponse: GetTxHashResponse, getResponse: G
 
   def process[T1 <: BaseTransaction[T1], T2 <: BaseRequestEntity](entity: T1, blockchainTransactionCreate: T1 => String, request: T2, action: T2 => WSResponse, onSuccess: (String, BlockResponse) => Unit, onFailure: (String, String) => Unit, updateTransactionHash: (String, String) => Int)(implicit module: String, logger: Logger): String = {
     try {
-      val ticketID: String = if (kafkaEnabled) utilities.JSON.getResponseFromJson[KafkaResponse](action(request)).ticketID else utilities.IDGenerator.ticketID()
+      val ticketID: String = if (kafkaEnabled) utilities.JSON.getResponseFromJson[KafkaResponse](action(request)).ticketID else utilities.IDGenerator.ticketID
       blockchainTransactionCreate(entity.mutateTicketID(ticketID))
       if (!kafkaEnabled) {
 
@@ -61,9 +61,11 @@ class Transaction @Inject()(getTxHashResponse: GetTxHashResponse, getResponse: G
         }
         if (blockResponse.code.isEmpty) onSuccess(ticketID, blockResponse) else onFailure(ticketID, blockResponse.code.get.toString)
       } catch {
-        case blockChainException: BlockChainException => logger.error(blockChainException.failure.message, blockChainException)
-          if (blockChainException.failure.message != """RESPONSE.FAILURE.{"response":"Request in process, wait and try after some time"}""" || !blockChainException.failure.message.matches("""RESPONSE.FAILURE.{"error":"Tx: response error: RPC error -32603 - Internal error: Tx .\w+. not found"}""")) {
+        case blockChainException: BlockChainException =>
+          if (!blockChainException.failure.message.matches("""RESPONSE.FAILURE.Tx. response error. RPC error -32603 - Internal error. Tx .\w+. not found""")) {
             onFailure(ticketID, blockChainException.failure.message)
+          } else {
+            logger.error(blockChainException.failure.message, blockChainException)
           }
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }

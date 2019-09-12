@@ -1,27 +1,27 @@
+@import controllers.actions.LoginState
 @import helper._
 @import views.companion.master.BuyerExecuteOrder
-@import controllers.actions.LoginState
 
-@(buyerExecuteOrderForm: Form[BuyerExecuteOrder.Data], sellerAddress:String, pegHash:String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@(buyerExecuteOrderForm: Form[BuyerExecuteOrder.Data], sellerAddress: String, pegHash: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @form(action = routes.BuyerExecuteOrderController.buyerExecuteOrder, 'onkeypress -> "validateForm(event,this)") {
     <div class="latest_card-header latest_card-header-primary text-center">
         <h4 class="latest_card-title">@Messages(constants.Form.BUYER_EXECUTE_ORDER)</h4>
     </div>
     <div class="latest_card-body">
-    @CSRF.formField
-    @inputText(buyerExecuteOrderForm(constants.FormField.SELLER_ADDRESS.name).copy(value = Some(sellerAddress)), '_label -> Messages(constants.FormField.SELLER_ADDRESS.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.SELLER_ADDRESS.name),'required->true)
-    @inputText(buyerExecuteOrderForm(constants.FormField.FIAT_PROOF_HASH.name), '_label -> Messages(constants.FormField.FIAT_PROOF_HASH.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.FIAT_PROOF_HASH.name),'required->true)
-    @inputText(buyerExecuteOrderForm(constants.FormField.PEG_HASH.name).copy(value = Some(pegHash)), '_label -> Messages(constants.FormField.PEG_HASH.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.PEG_HASH.name),'required->true)
-    @inputText(buyerExecuteOrderForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.GAS.name),'required->true)
-    @inputPassword(buyerExecuteOrderForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.PASSWORD.name),'required->true)
+        @CSRF.formField
+        @inputText(buyerExecuteOrderForm(constants.FormField.SELLER_ADDRESS.name).copy(value = Some(sellerAddress)), '_label -> Messages(constants.FormField.SELLER_ADDRESS.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.SELLER_ADDRESS.name), 'required -> true)
+        @inputText(buyerExecuteOrderForm(constants.FormField.FIAT_PROOF_HASH.name), '_label -> Messages(constants.FormField.FIAT_PROOF_HASH.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.FIAT_PROOF_HASH.name), 'required -> true)
+        @inputText(buyerExecuteOrderForm(constants.FormField.PEG_HASH.name).copy(value = Some(pegHash)), '_label -> Messages(constants.FormField.PEG_HASH.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.PEG_HASH.name), 'required -> true)
+        @inputText(buyerExecuteOrderForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.GAS.name), 'required -> true)
+        @inputPassword(buyerExecuteOrderForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.PASSWORD.name), 'required -> true)
 
-    @if(buyerExecuteOrderForm.hasGlobalErrors) {
-        <ul>
-        @for(error <- buyerExecuteOrderForm.globalErrors) {
-            <li>@error.format</li>
+        @if(buyerExecuteOrderForm.hasGlobalErrors) {
+            <ul>
+            @for(error <- buyerExecuteOrderForm.globalErrors) {
+                <li>@error.format</li>
+            }
+            </ul>
         }
-        </ul>
-    }
-    <button type="button" class="btn btn-primary btn-sm" onclick="submitForm(this)">@Messages(constants.Form.BUYER_EXECUTE_ORDER)</button>
+        <button type="button" class="btn btn-primary btn-sm" onclick="submitForm(this)">@Messages(constants.Form.BUYER_EXECUTE_ORDER)</button>
     </div>
-    }
+}
