@@ -9,7 +9,6 @@ import play.api.libs.json.{Json, OWrites, Reads}
 import slick.jdbc.JdbcProfile
 import java.util.Date
 import models.masterTransaction.IssueAssetRequestDetails.ShipmentDetails
-
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
