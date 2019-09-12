@@ -19,7 +19,7 @@
             <span class="red">@Messages(constants.Form.EMAIL)</span>: @organizationVerificationRequest.email <br>
             </div>
             <br>
-            @defining(utilities.JSON.getInstance[Address](organizationVerificationRequest.registeredAddress)) { registeredAddress: Address =>
+            @defining(utilities.JSON.convertJsonStringToObject[Address](organizationVerificationRequest.registeredAddress)) { registeredAddress: Address =>
                 <div>@Messages(constants.Form.REGISTERED_ADDRESS) : <br>
                 <span class="red">@Messages(constants.Form.ADDRESS_LINE_1)</span>: @registeredAddress.addressLine1 <br>
                 <span class="red">@Messages(constants.Form.ADDRESS_LINE_2)</span>: @registeredAddress.addressLine2 <br>
@@ -31,7 +31,7 @@
                 </div>
             }
             <br>
-            @defining(utilities.JSON.getInstance[Address](organizationVerificationRequest.postalAddress)) { postalAddress: Address =>
+            @defining(utilities.JSON.convertJsonStringToObject[Address](organizationVerificationRequest.postalAddress)) { postalAddress: Address =>
                 <div>@Messages(constants.Form.POSTAL_ADDRESS) : <br>
                 <span class="red">@Messages(constants.Form.ADDRESS_LINE_1)</span>: @postalAddress.addressLine1 <br>
                 <span class="red">@Messages(constants.Form.ADDRESS_LINE_2)</span>: @postalAddress.addressLine2 <br>
@@ -43,7 +43,7 @@
                 </div>
             }
             <br>
-            @defining(utilities.JSON.getInstance[UBOs](organizationVerificationRequest.ubos.getOrElse(Json.toJson[UBOs](UBOs()).toString)).ubos) { ubos: Seq[UBO] =>
+            @defining(utilities.JSON.convertJsonStringToObject[UBOs](organizationVerificationRequest.ubos.getOrElse(Json.toJson[UBOs](UBOs()).toString)).ubos) { ubos: Seq[UBO] =>
                 <div>@Messages(constants.Form.ORGANIZATION_UBO_DETAIL): <br>
                     @for(ubo <- ubos) {
                         <span class="red">@Messages(constants.Form.PERSON_NAME)</span>: @ubo.personName <br>

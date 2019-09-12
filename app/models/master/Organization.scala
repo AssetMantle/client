@@ -188,7 +188,7 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
         case baseException: BaseException => if (baseException.failure == constants.Response.NO_SUCH_ELEMENT_EXCEPTION) {
           (-Math.abs(Random.nextInt)).toHexString.toUpperCase
         } else {
-          throw new BaseException(baseException.failure)
+          throw baseException
         }
       }
       Await.result(upsert(Organization(id = id, zoneID = zoneID, accountID = accountID, name = name, abbreviation = abbreviation, establishmentDate = establishmentDate, registeredAddress = registeredAddress, postalAddress = postalAddress, email = email, ubos = Option(Json.toJson(getUBOs(id)).toString))), Duration.Inf)
@@ -199,7 +199,7 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
 
     def getUBOs(id: String): utils.UBOs = {
       try {
-        val ubos = utilities.JSON.getInstance[utils.UBOs](Await.result(getUBOsOnID(id), Duration.Inf).getOrElse(Json.toJson[utils.UBOs](utils.UBOs()).toString))
+        val ubos = utilities.JSON.convertJsonStringToObject[utils.UBOs](Await.result(getUBOsOnID(id), Duration.Inf).getOrElse(Json.toJson[utils.UBOs](utils.UBOs()).toString))
         ubos
       } catch {
         case _: BaseException => utils.UBOs(Seq())

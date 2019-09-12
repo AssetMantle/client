@@ -30,8 +30,8 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
     implicit request =>
       try {
         val organization = masterOrganizations.Service.getByAccountID(loginState.username)
-        val registeredAddress = utilities.JSON.getInstance[master.utils.Address](organization.registeredAddress)
-        val postalAddress = utilities.JSON.getInstance[master.utils.Address](organization.postalAddress)
+        val registeredAddress = utilities.JSON.convertJsonStringToObject[master.utils.Address](organization.registeredAddress)
+        val postalAddress = utilities.JSON.convertJsonStringToObject[master.utils.Address](organization.postalAddress)
         Ok(views.html.component.master.addOrganization(views.companion.master.AddOrganization.form.fill(value = views.companion.master.AddOrganization.Data(zoneID = organization.zoneID, name = organization.name, abbreviation = organization.abbreviation, establishmentDate = utilities.Date.sqlDateToUtilDate(organization.establishmentDate), email = organization.email, registeredAddressLine1 = registeredAddress.addressLine1, registeredAddressLine2 = registeredAddress.addressLine2, registeredAddressLandmark = registeredAddress.landmark, registeredAddressCity = registeredAddress.city, registeredAddressCountry = registeredAddress.country, registeredAddressZipCode = registeredAddress.zipCode, registeredAddressPhone = registeredAddress.phone, postalAddressLine1 = postalAddress.addressLine1, postalAddressLine2 = postalAddress.addressLine2, postalAddressLandmark = postalAddress.landmark, postalAddressCity = postalAddress.city, postalAddressCountry = postalAddress.country, postalAddressZipCode = postalAddress.zipCode, postalAddressPhone = postalAddress.phone)), zones = masterZones.Service.getAll))
       } catch {
         case _: BaseException => Ok(views.html.component.master.addOrganization(views.companion.master.AddOrganization.form, zones = masterZones.Service.getAll))

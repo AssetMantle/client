@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonParseException
 import com.fasterxml.jackson.databind.JsonMappingException
 import constants.Response.Failure
 import exceptions.{BaseException, BlockChainException}
-import models.Abstract.BaseCaseClass
 import play.api.Logger
 import play.api.libs.json._
 import play.api.libs.ws.WSResponse
@@ -36,7 +35,7 @@ object JSON {
     }
   }
   
-  def getInstance[T <: BaseCaseClass](jsonString: String)(implicit module: String, logger: Logger, reads: Reads[T]): T = {
+  def convertJsonStringToObject[T](jsonString: String)(implicit module: String, logger: Logger, reads: Reads[T]): T = {
     try {
       Json.fromJson[T](Json.parse(jsonString)) match {
         case JsSuccess(value: T, _: JsPath) => value
