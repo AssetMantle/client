@@ -6,7 +6,7 @@ import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.master
 import models.masterTransaction.EmailOTPs
-import play.api.i18n.I18nSupport
+import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
 import utilities.Email
@@ -25,7 +25,7 @@ class VerifyEmailAddressController @Inject()(messagesControllerComponents: Messa
     implicit request =>
       try {
         val otp = emailOTPs.Service.sendOTP(loginState.username)
-        email.sendEmail(loginState.username, constants.Email.OTP, Seq(otp))
+        email.sendEmail(subject = Messages(constants.Email.VERIFY_EMAIL_OTP), toAccountID = loginState.username, bodyHtml = views.html.mail.emailOTP(otp))
         withUsernameToken.Ok(views.html.component.master.verifyEmailAddress(VerifyEmailAddress.form))
       }
       catch {

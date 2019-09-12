@@ -89,14 +89,14 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
   }
 
   def issueAssetForm(requestID: String, accountID: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, takerAddress: Option[String]): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.issueAsset(views.companion.master.IssueAsset.form, requestID, accountID, documentHash, assetType, assetPrice, quantityUnit, assetQuantity, takerAddress))
+    Ok(views.html.component.master.issueAsset(views.companion.master.IssueAsset.form.fill(views.companion.master.IssueAsset.Data(requestID = requestID, accountID = accountID, documentHash = documentHash, assetType = assetType, assetPrice = assetPrice, quantityUnit = quantityUnit, assetQuantity = assetQuantity, takerAddress = takerAddress, gas = constants.FormField.GAS.minimumValue, password = ""))))
   }
 
   def issueAsset: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       views.companion.master.IssueAsset.form.bindFromRequest().fold(
         formWithErrors => {
-          BadRequest(views.html.component.master.issueAsset(formWithErrors, formWithErrors.data(constants.Form.REQUEST_ID), formWithErrors.data(constants.Form.ACCOUNT_ID), formWithErrors.data(constants.Form.DOCUMENT_HASH), formWithErrors.data(constants.Form.ASSET_TYPE), formWithErrors.data(constants.Form.ASSET_PRICE).toInt, formWithErrors.data(constants.Form.QUANTITY_UNIT), formWithErrors.data(constants.Form.ASSET_QUANTITY).toInt, Option(formWithErrors.data(constants.Form.TAKER_ADDRESS))))
+          BadRequest(views.html.component.master.issueAsset(formWithErrors))
         },
         issueAssetData => {
           try {

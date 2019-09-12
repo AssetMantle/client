@@ -45,7 +45,7 @@ class Contacts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     }
   }
 
-  private def findEmailAddressById(id: String): Future[String] = db.run(contactTable.filter(_.id === id).map(_.emailAddress).result.head.asTry).map {
+  private def getEmailAddressById(id: String, emailAddressVerified: Option[Boolean]): Future[String] = db.run(contactTable.filter(_.id === id).filter(_.emailAddressVerified.? === emailAddressVerified).map(_.emailAddress).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -78,6 +78,8 @@ class Contacts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
         throw new BaseException(constants.Response.PSQL_EXCEPTION)
     }
   }
+
+  def getVerifiedEmailAddressesByIDs(ids: Seq[String]): Future[Seq[String]] = db.run(contactTable.filter(_.id.inSet(ids)).filter(_.emailAddressVerified.? === Option(true)).map(_.emailAddress).result)
 
   private def updateMobileNumberVerificationStatusOnId(id: String, verificationStatus: Boolean): Future[Int] = db.run(contactTable.filter(_.id === id).map(_.mobileNumberVerified).update(verificationStatus).asTry).map {
     case Success(result) => result
@@ -131,7 +133,11 @@ class Contacts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
     def verifyEmailAddress(id: String): Int = Await.result(updateEmailVerificationStatusOnId(id, verificationStatus = true), Duration.Inf)
 
-    def getEmailAddress(id: String): String = Await.result(findEmailAddressById(id), Duration.Inf)
+    def getVerifiedEmailAddress(id: String): String = Await.result(getEmailAddressById(id = id, emailAddressVerified = Option(true)), Duration.Inf)
+
+    def getUnverifiedEmailAddress(id: String): String = Await.result(getEmailAddressById(id = id, emailAddressVerified = Option(false)), Duration.Inf)
+
+    def getVerifiedEmailAddresses(ids: Seq[String]): Seq[String] = Await.result(getVerifiedEmailAddressesByIDs(ids), Duration.Inf)
 
     def getMobileNumber(id: String): String = Await.result(findMobileNumberById(id), Duration.Inf)
 

@@ -1,12 +1,11 @@
 package controllers
 
-import controllers.actions.{WithLoginAction, WithTraderLoginAction, WithZoneLoginAction}
+import controllers.actions.{WithLoginAction, WithOrganizationLoginAction, WithTraderLoginAction, WithZoneLoginAction}
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Trait.Document
 import models.blockchain.{ACLAccounts, Negotiation}
-import models.master.{Accounts, Organizations, Zones}
 import models.{blockchain, master}
 import play.api.http.ContentTypes
 import play.api.i18n.I18nSupport
@@ -18,7 +17,7 @@ import queries.GetAccount
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class ComponentViewController @Inject()(messagesControllerComponents: MessagesControllerComponents, masterTraders: master.Traders, masterAccountKYC: master.AccountKYCs, masterAccountFile: master.AccountFiles, masterZoneKYC: master.ZoneKYCs, masterOrganizationKYCs: master.OrganizationKYCs, masterTraderKYCs: master.TraderKYCs, withZoneLoginAction: WithZoneLoginAction, withTraderLoginAction: WithTraderLoginAction, withLoginAction: WithLoginAction, masterAccounts: Accounts, masterAccountFiles: master.AccountFiles, blockchainAclAccounts: ACLAccounts, blockchainZones: blockchain.Zones, blockchainOrganizations: blockchain.Organizations, blockchainAssets: blockchain.Assets, blockchainFiats: blockchain.Fiats, blockchainNegotiations: blockchain.Negotiations, masterOrganizations: Organizations, masterZones: Zones, blockchainAclHashes: blockchain.ACLHashes, blockchainOrders: blockchain.Orders, getAccount: GetAccount, blockchainAccounts: blockchain.Accounts, withUsernameToken: WithUsernameToken)(implicit configuration: Configuration, executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class ComponentViewController @Inject()(messagesControllerComponents: MessagesControllerComponents, masterTraders: master.Traders, masterAccountKYC: master.AccountKYCs, masterAccountFile: master.AccountFiles, masterZoneKYC: master.ZoneKYCs, masterOrganizationKYCs: master.OrganizationKYCs, masterTraderKYCs: master.TraderKYCs, blockchainTraderFeedbackHistories: blockchain.TraderFeedbackHistories, withOrganizationLoginAction: WithOrganizationLoginAction, withZoneLoginAction: WithZoneLoginAction, withTraderLoginAction: WithTraderLoginAction, withLoginAction: WithLoginAction, masterAccounts: master.Accounts, masterAccountFiles: master.AccountFiles, blockchainAclAccounts: ACLAccounts, blockchainZones: blockchain.Zones, blockchainOrganizations: blockchain.Organizations, blockchainAssets: blockchain.Assets, blockchainFiats: blockchain.Fiats, blockchainNegotiations: blockchain.Negotiations, masterOrganizations: master.Organizations, masterZones: master.Zones, blockchainAclHashes: blockchain.ACLHashes, blockchainOrders: blockchain.Orders, getAccount: GetAccount, blockchainAccounts: blockchain.Accounts, withUsernameToken: WithUsernameToken)(implicit configuration: Configuration, executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -190,6 +189,109 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
         withUsernameToken.Ok(views.html.component.master.profilePicture(masterAccountFile.Service.getProfilePicture(loginState.username)))
       } catch {
         case _: BaseException => InternalServerError(views.html.component.master.profilePicture())
+      }
+  }
+
+  def organizationViewTraderList(): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      try {
+        withUsernameToken.Ok(views.html.component.master.organizationViewTradersList(masterTraders.Service.getTradersListInOrganization(masterOrganizations.Service.getID(loginState.username))))
+      } catch {
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
+  }
+
+  def traderAssetListLengthInOrganization(traderID: String): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      try {
+        if (masterTraders.Service.verifyOrganizationTrader(traderID = traderID, masterOrganizations.Service.getID(loginState.username))) {
+          withUsernameToken.Ok(blockchainAssets.Service.getAssetPegWallet(masterAccounts.Service.getAddress(masterTraders.Service.getAccountId(traderID))).length.toString)
+        } else {
+          Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
+        }
+      } catch {
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
+  }
+
+  def traderTotalFiatInOrganization(traderID: String): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      try {
+        if (masterTraders.Service.verifyOrganizationTrader(traderID = traderID, masterOrganizations.Service.getID(loginState.username))) {
+          withUsernameToken.Ok(blockchainFiats.Service.getFiatPegWallet(masterAccounts.Service.getAddress(masterTraders.Service.getAccountId(traderID))).map(_.transactionAmount.toInt).sum.toString)
+        } else {
+          Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
+        }
+      } catch {
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
+  }
+
+  def traderBuyNegotiationListLengthInOrganization(traderID: String): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      try {
+        if (masterTraders.Service.verifyOrganizationTrader(traderID = traderID, masterOrganizations.Service.getID(loginState.username))) {
+          withUsernameToken.Ok(blockchainNegotiations.Service.getNegotiationsForBuyerAddress(masterAccounts.Service.getAddress(masterTraders.Service.getAccountId(traderID))).length.toString)
+        } else {
+          Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
+        }
+      } catch {
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
+  }
+
+  def traderSellNegotiationListLengthInOrganization(traderID: String): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      try {
+        if (masterTraders.Service.verifyOrganizationTrader(traderID = traderID, masterOrganizations.Service.getID(loginState.username))) {
+          withUsernameToken.Ok(blockchainNegotiations.Service.getNegotiationsForSellerAddress(masterAccounts.Service.getAddress(masterTraders.Service.getAccountId(traderID))).length.toString)
+        } else {
+          Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
+        }
+      } catch {
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
+  }
+
+  def traderBuyOrderListLengthInOrganization(traderID: String): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      try {
+        if (masterTraders.Service.verifyOrganizationTrader(traderID = traderID, masterOrganizations.Service.getID(loginState.username))) {
+          withUsernameToken.Ok(blockchainOrders.Service.getOrders(blockchainNegotiations.Service.getNegotiationIDsForBuyerAddress(masterAccounts.Service.getAddress(masterTraders.Service.getAccountId(traderID)))).length.toString)
+        } else {
+          Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
+        }
+      } catch {
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
+  }
+
+  def traderSellOrderListLengthInOrganization(traderID: String): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      try {
+        if (masterTraders.Service.verifyOrganizationTrader(traderID = traderID, masterOrganizations.Service.getID(loginState.username))) {
+          withUsernameToken.Ok(blockchainOrders.Service.getOrders(blockchainNegotiations.Service.getNegotiationIDsForSellerAddress(masterAccounts.Service.getAddress(masterTraders.Service.getAccountId(traderID)))).length.toString)
+        } else {
+          Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
+        }
+      } catch {
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
+  }
+
+  def organizationViewTrader(traderID: String): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      try {
+        if (masterTraders.Service.verifyOrganizationTrader(traderID = traderID, masterOrganizations.Service.getID(loginState.username))) {
+          val address = masterAccounts.Service.getAddress(masterTraders.Service.getAccountId(traderID))
+          val buyNegotiations = blockchainNegotiations.Service.getNegotiationsForBuyerAddress(address)
+          val sellNegotiations = blockchainNegotiations.Service.getNegotiationsForSellerAddress(address)
+          withUsernameToken.Ok(views.html.component.master.organizationViewTrader(trader = masterTraders.Service.get(traderID), assets = blockchainAssets.Service.getAssetPegWallet(address), fiats = blockchainFiats.Service.getFiatPegWallet(address), buyNegotiations = buyNegotiations, sellNegotiations = sellNegotiations, buyOrders = blockchainOrders.Service.getOrders(buyNegotiations.map(_.id)), sellOrders = blockchainOrders.Service.getOrders(sellNegotiations.map(_.id)), traderFeedbackHistories = blockchainTraderFeedbackHistories.Service.get(address)))
+        } else {
+          Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
+        }
+      } catch {
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 }

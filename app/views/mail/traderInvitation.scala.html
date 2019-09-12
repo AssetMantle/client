@@ -1,0 +1,5 @@
+@(username: String, url: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@mail.common(Messages(constants.Email.TRADER_INVITATION)){
+    @url
+}

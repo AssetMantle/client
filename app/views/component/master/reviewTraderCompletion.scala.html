@@ -11,7 +11,6 @@
 </div>
 
 <div class="latest_card-body">
-    <div id="organization" class="flexItem thirdBox box lightBlue">
         <div class="leftText">
             <div>@Messages(constants.Form.TRADER_DETAILS):<br>
                 <span class="red">@Messages(constants.Form.NAME)</span>: @trader.name <br>
@@ -30,7 +29,16 @@
                 <span class="red">@Messages(constants.Form.CURRENCY)</span>: @zone.currency <br>
             </div>
             <br>
+            <div id="traderKYCs">@Messages(constants.Form.ORGANIZATION_KYC_FILES): <br>
+            @for(traderKYC <- traderKYCs) {
+                @component.master.commonDocumentViewer(traderKYC) {
+                    @routes.AddOrganizationController.userAccessedOrganizationKYCFile(traderKYC.documentType)
+                } { } {
+                    <span>@traderKYC.documentType</span>
+                }
+            }
             </div>
+            <br>
             @form(action = routes.SetACLController.reviewTraderCompletion, 'onkeypress -> "validateForm(event,this)") {
                 @CSRF.formField
                 @Messages(constants.Form.COMPLETION):
@@ -45,6 +53,5 @@
                 <button type="button" class="btn-sm btn btn-primary" onclick="getForm(jsRoutes.controllers.SetACLController.userUploadOrUpdateTraderKYCView())">@Messages(constants.Form.BACK)</button>
                 <button type="button" class="btn-sm btn btn-primary" onclick="submitForm(this)">@Messages(constants.Form.SUBMIT)</button>
             }
-        </div>
     </div>
 </div>

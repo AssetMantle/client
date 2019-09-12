@@ -6,7 +6,7 @@ import exceptions.{BaseException, BlockChainException}
 import javax.inject.{Inject, Singleton}
 import models.blockchain.ACLAccounts
 import models.{blockchain, master, masterTransaction}
-import play.api.i18n.I18nSupport
+import play.api.i18n.{I18nSupport, Messages}
 import play.api.libs.ws.WSClient
 import play.api.mvc._
 import play.api.{Configuration, Logger}
@@ -92,7 +92,7 @@ class AccountController @Inject()(messagesControllerComponents: MessagesControll
       emailOTPForgotPasswordData => {
         try {
           val otp = masterTransactionEmailOTP.Service.sendOTP(emailOTPForgotPasswordData.username)
-          email.sendEmail(emailOTPForgotPasswordData.username, constants.Email.OTP, Seq(otp))
+          email.sendEmail(subject = Messages(constants.Email.FORGOT_PASSWORD_EMAIL_OTP), toAccountID = emailOTPForgotPasswordData.username, bodyHtml = views.html.mail.forgotPasswordEmailOTP(otp) )
           PartialContent(views.html.component.master.forgotPassword(views.companion.master.ForgotPassword.form, emailOTPForgotPasswordData.username))
         }
         catch {

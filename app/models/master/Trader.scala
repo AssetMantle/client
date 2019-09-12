@@ -98,7 +98,11 @@ class Traders @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
 
   private def getTradersWithCompletedStatusNullVerificationStatusByOrganizationID(organizationID: String): Future[Seq[Trader]] = db.run(traderTable.filter(_.organizationID === organizationID).filter(_.completionStatus === true).filter(_.verificationStatus.?.isEmpty).result)
 
-  private def getTradersByOrganizationID(organizationID: String): Future[Seq[Trader]] = db.run(traderTable.filter(_.organizationID === organizationID).filter(_.verificationStatus === true).result)
+  private def getVerifiedTradersByOrganizationID(organizationID: String): Future[Seq[Trader]] = db.run(traderTable.filter(_.organizationID === organizationID).filter(_.verificationStatus === true).result)
+
+  private def getTradersByOrganizationID(organizationID: String): Future[Seq[Trader]] = db.run(traderTable.filter(_.organizationID === organizationID).result)
+
+  private def checkOrganizationIDTraderIDExists(traderID: String, organizationID: String): Future[Boolean] = db.run(traderTable.filter(_.id === traderID).filter(_.organizationID === organizationID).exists.result)
 
   private def updateVerificationStatusOnID(id: String, verificationStatus: Option[Boolean]) = db.run(traderTable.filter(_.id === id).map(_.verificationStatus.?).update(verificationStatus).asTry).map {
     case Success(result) => result
@@ -188,11 +192,15 @@ class Traders @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
 
     def getVerifyTraderRequestsForOrganization(organizationID: String): Seq[Trader] = Await.result(getTradersWithCompletedStatusNullVerificationStatusByOrganizationID(organizationID), Duration.Inf)
 
-    def getTradersForOrganization(organizationID: String): Seq[Trader] = Await.result(getTradersByOrganizationID(organizationID), Duration.Inf)
+    def getVerifiedTradersForOrganization(organizationID: String): Seq[Trader] = Await.result(getVerifiedTradersByOrganizationID(organizationID), Duration.Inf)
 
     def getVerificationStatus(id: String): Boolean = Await.result(getVerificationStatusById(id), Duration.Inf).getOrElse(false)
 
     def markTraderFormCompleted(id: String): Int = Await.result(updateCompletionStatusOnID(id = id, completionStatus = true), Duration.Inf)
+
+    def getTradersListInOrganization(organizationID: String): Seq[Trader] = Await.result(getTradersByOrganizationID(organizationID), Duration.Inf)
+
+    def verifyOrganizationTrader(traderID: String, organizationID: String) = Await.result(checkOrganizationIDTraderIDExists(traderID = traderID, organizationID = organizationID), Duration.Inf)
 
   }
 

@@ -54,6 +54,7 @@ object Response {
   val VERIFY_ZONE_REJECTED = new Success("VERIFY_ZONE_REJECTED")
   val ORGANIZATION_ADDED = new Success("ORGANIZATION_ADDED")
   val ORGANIZATION_ADDED_FOR_VERIFICATION = new Success("ORGANIZATION_ADDED_FOR_VERIFICATION")
+  val TRADER_ADDED_FOR_VERIFICATION = new Success("TRADER_ADDED_FOR_VERIFICATION")
   val SELLER_BID_CHANGED = new Success("SELLER_BID_CHANGED")
   val SELLER_BID_CONFIRMED = new Success("SELLER_BID_CONFIRMED")
   val SELLER_FEEDBACK_SET = new Success("SELLER_FEEDBACK_SET")
@@ -69,6 +70,7 @@ object Response {
   val DOCUMENT_APPROVED = new Success("DOCUMENT_APPROVED")
   val PASSWORD_UPDATED = new Success("PASSWORD_UPDATED")
   val OTP_SENT = new Success("OTP_SENT")
+  val INVITATION_EMAIL_SENT = new Success("INVITATION_EMAIL_SENT")
 
   //Warning- for telling that something important is not done and ask to do it
   val VERIFY_MOBILE_NUMBER = new Warning("VERIFY_MOBILE_NUMBER", routes.javascript.VerifyMobileNumberController.verifyMobileNumberForm)

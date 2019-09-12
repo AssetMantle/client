@@ -6,6 +6,7 @@ import models.master.{Accounts, Contacts}
 import play.api.Configuration
 import play.api.i18n.{Lang, MessagesApi}
 import play.api.libs.mailer._
+import play.twirl.api.Html
 
 import scala.concurrent.ExecutionContext
 
@@ -15,16 +16,22 @@ class Email @Inject()(mailerClient: MailerClient, contacts: Contacts, accounts: 
 
   private val fromAddress = configuration.get[String]("play.mailer.user")
 
-  def sendEmail(accountID: String, messageType: String, passedData: Seq[String] = Seq(""))(implicit lang: Lang = Lang(accounts.Service.getLanguage(accountID))) {
+  def sendEmail(subject: String, toAccountID: String, ccAccountIDs: Seq[String] = Seq.empty, bccAccountIDs: Seq[String] = Seq.empty, bodyHtml: Html, charset: Option[String] = None, replyTo: Seq[String] = Seq.empty, bounceAddress: Option[String] = None, attachments: Seq[Attachment] = Seq.empty, headers: Seq[(String, String)] = Seq.empty)(implicit lang: Lang = Lang(accounts.Service.getLanguage(toAccountID))) {
     try {
-      val email = Email(
-        subject = messagesApi(module + "Subject" + "." + messageType),
+      val toEmailAddress = if(subject == constants.Email.VERIFY_EMAIL_OTP) contacts.Service.getUnverifiedEmailAddress(toAccountID) else contacts.Service.getVerifiedEmailAddress(toAccountID)
+      mailerClient.send(Email(
+        subject = subject,
         from = fromAddress,
-        to = Seq(contacts.Service.getEmailAddress(accountID)),
-        attachments = Seq(),
-        bodyText = Some(messagesApi(module + "Message" + "." + messageType + " " + passedData(0))),
-      )
-      mailerClient.send(email)
+        to = Seq(toEmailAddress),
+        cc = contacts.Service.getVerifiedEmailAddresses(ccAccountIDs),
+        bcc = contacts.Service.getVerifiedEmailAddresses(bccAccountIDs),
+        bodyHtml = Option(bodyHtml.toString),
+        charset = charset,
+        replyTo = replyTo,
+        bounceAddress = bounceAddress,
+        attachments = attachments,
+        headers = headers,
+      ))
     }
     catch {
       case baseException: BaseException => throw new BaseException(baseException.failure)

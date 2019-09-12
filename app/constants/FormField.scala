@@ -100,7 +100,7 @@ object FormField {
     val field: Mapping[String] =  text(minLength = minimumLength, maxLength = maximumLength).verifying(Constraints.pattern(regex = regex, name = regex.pattern.toString, error = errorMessage))
   }
 
-  class IntFormField (fieldName: String, minimumValue: Int, maximumValue: Int) {
+  class IntFormField (fieldName: String, val minimumValue: Int, val maximumValue: Int) {
     val name: String = fieldName
     val field: Mapping[Int] =  number(min = minimumValue, max = maximumValue)
   }

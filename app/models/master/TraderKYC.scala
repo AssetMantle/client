@@ -114,8 +114,6 @@ class TraderKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfigP
 
   private def getAllDocumentTypeById(id: String): Future[Seq[String]] = db.run(traderKYCTable.filter(_.id === id).map(_.documentType).result)
 
-  private def getStatusForAllDocumentsById(id: String): Future[Seq[Boolean]] = db.run(traderKYCTable.filter(_.id === id).map(traderKYC => traderKYC.organizationStatus.?.getOrElse(false) && traderKYC.zoneStatus.?.getOrElse(false)).result)
-
   private def deleteById(id: String) = db.run(traderKYCTable.filter(_.id === id).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -133,7 +131,7 @@ class TraderKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfigP
   private[models] class TraderKYCTable(tag: Tag) extends Table[TraderKYC](tag, "TraderKYC") {
 
     def * = (id, documentType, fileName, file.?, zoneStatus.?, organizationStatus.?) <> (TraderKYC.tupled, TraderKYC.unapply)
-    
+
     def id = column[String]("id", O.PrimaryKey)
 
     def documentType = column[String]("documentType", O.PrimaryKey)
@@ -187,10 +185,10 @@ class TraderKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfigP
 
     //TODO whether checkAllKYCFileTypesExists should be called or not
     def checkAllKYCFilesVerified(id: String): Boolean = {
-      val documentStatuses = Await.result(getStatusForAllDocumentsById(id), Duration.Inf)
+      val documentStatuses: Seq[Boolean] = getAllDocuments(id).map(traderKYC => traderKYC.zoneStatus.getOrElse(false) && traderKYC.organizationStatus.getOrElse(false))
       if (documentStatuses.nonEmpty) documentStatuses.forall(status => status) else false
     }
 
   }
-  
+
 }

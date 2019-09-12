@@ -1,0 +1,12 @@
+@(title: String)(body: Html = Html(""))(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>@title</title>
+    </head>
+    <body>
+        <div>
+            @body
+        </div>
+    </body>
+</html>

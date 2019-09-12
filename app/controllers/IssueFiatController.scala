@@ -75,14 +75,14 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
   }
 
   def issueFiatForm(requestID: String, accountID: String, transactionID: String, transactionAmount: Int): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.issueFiat(views.companion.master.IssueFiat.form, requestID, accountID, transactionID, transactionAmount))
+    Ok(views.html.component.master.issueFiat(views.companion.master.IssueFiat.form.fill(views.companion.master.IssueFiat.Data(requestID = requestID, accountID = accountID, transactionID = transactionID, transactionAmount = transactionAmount, gas = constants.FormField.GAS.minimumValue, password = ""))))
   }
 
   def issueFiat: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       views.companion.master.IssueFiat.form.bindFromRequest().fold(
         formWithErrors => {
-          BadRequest(views.html.component.master.issueFiat(formWithErrors, formWithErrors.data(constants.Form.REQUEST_ID), formWithErrors.data(constants.Form.ACCOUNT_ID), formWithErrors.data(constants.Form.TRANSACTION_ID), formWithErrors.data(constants.Form.TRANSACTION_AMOUNT).toInt))
+          BadRequest(views.html.component.master.issueFiat(formWithErrors))
         },
         issueFiatData => {
           try {

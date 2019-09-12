@@ -51,6 +51,16 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ComponentViewController.orderList,
         routes.javascript.ComponentViewController.availableAssetList,
         routes.javascript.ComponentViewController.availableAssetListWithLogin,
+
+        routes.javascript.ComponentViewController.organizationViewTraderList,
+        routes.javascript.ComponentViewController.traderAssetListLengthInOrganization,
+        routes.javascript.ComponentViewController.traderTotalFiatInOrganization,
+        routes.javascript.ComponentViewController.traderBuyNegotiationListLengthInOrganization,
+        routes.javascript.ComponentViewController.traderSellNegotiationListLengthInOrganization,
+        routes.javascript.ComponentViewController.traderBuyOrderListLengthInOrganization,
+        routes.javascript.ComponentViewController.traderSellOrderListLengthInOrganization,
+        routes.javascript.ComponentViewController.organizationViewTrader,
+
         routes.javascript.ComponentViewController.profileDocuments,
         routes.javascript.ComponentViewController.profilePicture,
 
@@ -77,6 +87,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.SendCoinController.sendCoinForm,
         routes.javascript.SendFiatController.sendFiatForm,
 
+        routes.javascript.SetACLController.traderInvitationForm,
         routes.javascript.SetACLController.addTraderForm,
         routes.javascript.SetACLController.userUploadOrUpdateTraderKYCView,
         routes.javascript.SetACLController.userUploadTraderKYCForm,
