@@ -22,8 +22,8 @@ class WithLoginAction @Inject()(messagesControllerComponents: MessagesController
         masterTransactionAccountTokens.Service.tryVerifyingSessionToken(username, sessionToken)
         masterTransactionAccountTokens.Service.tryVerifyingSessionTokenTime(username)
         val address = masterAccounts.Service.getAddress(username)
-          val userType = masterAccounts.Service.getUserType(username)
-        f(LoginState(username, userType, address, if (userType == constants.User.TRADER) Option(blockchainACLHashes.Service.getACL(blockchainACLAccounts.Service.getACLHash(address))) else null))(request)
+        val userType = masterAccounts.Service.getUserType(username)
+        f(LoginState(username, userType, address, if (userType == constants.User.TRADER) Option(blockchainACLHashes.Service.getACL(blockchainACLAccounts.Service.getACLHash(address))) else None))(request)
       }
       catch {
         case baseException: BaseException => logger.info(baseException.failure.message, baseException)

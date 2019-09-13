@@ -12,7 +12,7 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class OrganizationKYC(id: String, documentType: String, fileName: String, file: Option[Array[Byte]], status: Option[Boolean]) extends Document[OrganizationKYC]{
+case class OrganizationKYC(id: String, documentType: String, fileName: String, file: Option[Array[Byte]], status: Option[Boolean] = None) extends Document[OrganizationKYC]{
 
   def updateFile(newFile: Option[Array[Byte]]): OrganizationKYC = OrganizationKYC(id = id, documentType = documentType, fileName = fileName, file = newFile, status = status)
 
@@ -87,6 +87,10 @@ class OrganizationKYCs @Inject()(protected val databaseConfigProvider: DatabaseC
 
   private def getAllDocumentsById(id: String): Future[Seq[OrganizationKYC]] = db.run(organizationKYCTable.filter(_.id === id).result)
 
+  private def getAllDocumentTypeById(id: String): Future[Seq[String]] = db.run(organizationKYCTable.filter(_.id === id).map(_.documentType).result)
+
+  private def getStatusForAllDocumentsById(id: String): Future[Seq[Option[Boolean]]] = db.run(organizationKYCTable.filter(_.id === id).map(_.status.?).result)
+
   private def deleteById(id: String) = db.run(organizationKYCTable.filter(_.id === id).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -119,9 +123,9 @@ class OrganizationKYCs @Inject()(protected val databaseConfigProvider: DatabaseC
 
   object Service {
 
-    def create(organizationKYC: OrganizationKYC): String = Await.result(add(OrganizationKYC(id = organizationKYC.id, documentType = organizationKYC.documentType, fileName = organizationKYC.fileName, file = organizationKYC.file, status = None)), Duration.Inf)
+    def create(organizationKYC: OrganizationKYC): String = Await.result(add(OrganizationKYC(id = organizationKYC.id, documentType = organizationKYC.documentType, fileName = organizationKYC.fileName, file = organizationKYC.file)), Duration.Inf)
 
-    def updateOldDocument(organizationKYC: OrganizationKYC): Int = Await.result(upsert(OrganizationKYC(id = organizationKYC.id, documentType = organizationKYC.documentType, fileName = organizationKYC.fileName, file = organizationKYC.file, status = None)), Duration.Inf)
+    def updateOldDocument(organizationKYC: OrganizationKYC): Int = Await.result(upsert(OrganizationKYC(id = organizationKYC.id, documentType = organizationKYC.documentType, fileName = organizationKYC.fileName, file = organizationKYC.file)), Duration.Inf)
 
     def get(id: String, documentType: String): OrganizationKYC = Await.result(findByIdDocumentType(id = id, documentType = documentType), Duration.Inf)
 
@@ -142,6 +146,15 @@ class OrganizationKYCs @Inject()(protected val databaseConfigProvider: DatabaseC
     def checkFileExists(id: String, documentType: String): Boolean = Await.result(checkByIdAndDocumentType(id = id, documentType = documentType), Duration.Inf)
 
     def checkFileNameExists(id: String, fileName: String): Boolean = Await.result(checkByIdAndFileName(id = id, fileName = fileName), Duration.Inf)
+
+    //TODO whether database should contain constants.File.TRADER_KYC_DOCUMENT_TYPES (current scenario) OR constants.File.TRADER_KYC_DOCUMENT_TYPES should contain all database file type
+    def checkAllKYCFileTypesExists(id: String): Boolean = constants.File.ORGANIZATION_KYC_DOCUMENT_TYPES.forall(Await.result(getAllDocumentTypeById(id), Duration.Inf).contains)
+
+    //TODO whether checkAllKYCFileTypesExists should be called or not
+    def checkAllKYCFilesVerified(id: String): Boolean = {
+      val documentStatuses = Await.result(getStatusForAllDocumentsById(id), Duration.Inf)
+      if (documentStatuses.nonEmpty) documentStatuses.forall(status => status.getOrElse(false)) else false
+    }
 
   }
 

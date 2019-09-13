@@ -8,7 +8,7 @@ object RedeemAsset {
     mapping(
       constants.FormField.ZONE_ID.name -> constants.FormField.ZONE_ID.field,
       constants.FormField.PEG_HASH.name -> constants.FormField.PEG_HASH.field,
-      constants.FormField.NON_EMPTY_PASSWORD.name -> constants.FormField.NON_EMPTY_PASSWORD.field,
+      constants.FormField.PASSWORD.name -> constants.FormField.PASSWORD.field,
       constants.FormField.GAS.name -> constants.FormField.GAS.field
     )(Data.apply)(Data.unapply)
   )
