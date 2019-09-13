@@ -19,8 +19,8 @@ import scala.concurrent.duration.{Duration, _}
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class SendCoin(from: String, to: String, amount: Int,gas: Int,  status: Option[Boolean], txHash: Option[String], ticketID: String, mode: String, code: Option[String]) extends BaseTransaction[SendCoin] {
-  def mutateTicketID(newTicketID: String): SendCoin = SendCoin(from = from, to = to, amount = amount,gas=gas, status = status, txHash, ticketID = newTicketID, mode = mode, code = code)
+case class SendCoin(from: String, to: String, amount: Int, gas: Int,  status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None) extends BaseTransaction[SendCoin] {
+  def mutateTicketID(newTicketID: String): SendCoin = SendCoin(from = from, to = to, amount = amount, gas = gas, status = status, txHash, ticketID = newTicketID, mode = mode, code = code)
 }
 
 
@@ -113,7 +113,7 @@ class SendCoins @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
 
   private[models] class SendCoinTable(tag: Tag) extends Table[SendCoin](tag, "SendCoin") {
 
-    def * = (from, to, amount,gas, status.?, txHash.?, ticketID, mode, code.?) <> (SendCoin.tupled, SendCoin.unapply)
+    def * = (from, to, amount, gas, status.?, txHash.?, ticketID, mode, code.?) <> (SendCoin.tupled, SendCoin.unapply)
 
     def from = column[String]("from")
 
@@ -136,7 +136,7 @@ class SendCoins @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
 
   object Service {
 
-    def create(sendCoin: SendCoin): String = Await.result(add(SendCoin(from = sendCoin.from, to = sendCoin.to, amount = sendCoin.amount,gas=sendCoin.gas, status = sendCoin.status, txHash = sendCoin.txHash, ticketID = sendCoin.ticketID, mode = sendCoin.mode, code = sendCoin.code)), Duration.Inf)
+    def create(sendCoin: SendCoin): String = Await.result(add(SendCoin(from = sendCoin.from, to = sendCoin.to, amount = sendCoin.amount, gas=sendCoin.gas, status = sendCoin.status, txHash = sendCoin.txHash, ticketID = sendCoin.ticketID, mode = sendCoin.mode, code = sendCoin.code)), Duration.Inf)
 
     def markTransactionFailed(ticketID: String, code: String): Int = Await.result(updateStatusAndCodeOnTicketID(ticketID, status = Option(false), code), Duration.Inf)
 

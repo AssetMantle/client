@@ -16,11 +16,11 @@
 
             @asset.physicalDocumentsHandledVia match {
                 case constants.Option.COMDEX => {
-                    @inputText(confirmTransactionForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "form-control hidden", 'type -> "number", 'placeholder -> Messages(constants.FormField.GAS.name), 'required -> true)
+                    @inputText(confirmTransactionForm(constants.FormField.GAS.name).copy(value = Some(20000.toString)), '_label -> Messages(constants.FormField.GAS.name), 'class -> "form-control hidden", 'type -> "number", 'placeholder -> Messages(constants.FormField.GAS.name), 'required -> true)
                     @inputPassword(confirmTransactionForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "form-control hidden", 'placeholder -> Messages(constants.FormField.PASSWORD.name), 'required -> true)
                 }
                 case _ => {
-                    @inputText(confirmTransactionForm(constants.FormField.GAS.name).copy(value = Some(0.toString)), '_label -> Messages(constants.FormField.GAS.name), 'class -> "form-control", 'type -> "number", 'placeholder -> Messages(constants.FormField.GAS.name), 'required -> true)
+                    @inputText(confirmTransactionForm(constants.FormField.GAS.name).copy(value = Some(20000.toString)), '_label -> Messages(constants.FormField.GAS.name), 'class -> "form-control", 'type -> "number", 'placeholder -> Messages(constants.FormField.GAS.name), 'required -> true)
                     @inputPassword(confirmTransactionForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.PASSWORD.name), 'required -> true)
                 }
             }

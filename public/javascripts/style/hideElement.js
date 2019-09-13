@@ -11,3 +11,11 @@ function showHide(element){
     element.parent().next().slideToggle("fast");
 
 }
+
+function hideElement(element) {
+    $('#' + element).hide();
+}
+
+function showElement(element) {
+    $('#' + element).show();
+}

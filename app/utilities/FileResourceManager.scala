@@ -24,9 +24,19 @@ class FileResourceManager @Inject()()(implicit exec: ExecutionContext, configura
 
   private val uploadZoneKycIdentificationPath = configuration.get[String]("upload.zone.identificationPath")
 
-  private val uploadOrganizationKycBankDetailsPath = configuration.get[String]("upload.organization.bankDetailsPath")
+  private val uploadOrganizationKYCBankAccountDetailPath = configuration.get[String]("upload.organization.bankAccountDetailPath")
 
-  private val uploadOrganizationKycIdentificationPath = configuration.get[String]("upload.organization.identificationPath")
+  private val uploadOrganizationKycAdminProfileIdentificationPath = configuration.get[String]("upload.organization.adminProfileIdentificationPath")
+
+  private val uploadOrganizationKycLatestAuditedFinancialReportPath = configuration.get[String]("upload.organization.latestAuditedFinancialReportPath")
+
+  private val uploadOrganizationKYCLastYearAuditedFinancialReportPath = configuration.get[String]("upload.organization.lastYearAuditedFinancialReportPath")
+
+  private val uploadOrganizationKycManagementPath = configuration.get[String]("upload.organization.managementPath")
+
+  private val uploadOrganizationKYCACRAPath = configuration.get[String]("upload.organization.ACRAPath")
+
+  private val uploadOrganizationKycShareStructurePath = configuration.get[String]("upload.organization.shareStructurePath")
 
   private val uploadTraderKycIdentificationPath = configuration.get[String]("upload.trader.identificationPath")
 
@@ -70,8 +80,13 @@ class FileResourceManager @Inject()()(implicit exec: ExecutionContext, configura
 
   def getOrganizationKycFilePath(documentType: String): String = {
     documentType match {
-      case constants.File.BANK_DETAILS => uploadOrganizationKycBankDetailsPath
-      case constants.File.IDENTIFICATION => uploadOrganizationKycIdentificationPath
+      case constants.File.BANK_ACCOUNT_DETAIL => uploadOrganizationKYCBankAccountDetailPath
+      case constants.File.ADMIN_PROFILE_IDENTIFICATION => uploadOrganizationKycAdminProfileIdentificationPath
+      case constants.File.LATEST_AUDITED_FINANCIAL_REPORT => uploadOrganizationKycLatestAuditedFinancialReportPath
+      case constants.File.LAST_YEAR_AUDITED_FINANCIAL_REPORT => uploadOrganizationKYCLastYearAuditedFinancialReportPath
+      case constants.File.MANAGEMENT => uploadOrganizationKycManagementPath
+      case constants.File.ACRA => uploadOrganizationKYCACRAPath
+      case constants.File.SHARE_STRUCTURE => uploadOrganizationKycShareStructurePath
       case _ => constants.File.UNKNOWN_TYPE
     }
   }
@@ -115,11 +130,11 @@ class FileResourceManager @Inject()()(implicit exec: ExecutionContext, configura
 
   def storeFile[T <: Document[T]](name: String, documentType: String, path: String, document: T, masterCreate: T => String): Unit = {
     try {
-      val (fileName, encodedBase64) = utilities.FileOperations.fileExtensionFromName(name) match {
+      val (fileName, encodedBase64): (String, Option[Array[Byte]]) = utilities.FileOperations.fileExtensionFromName(name) match {
         case constants.File.JPEG | constants.File.JPG | constants.File.PNG => utilities.ImageProcess.convertToThumbnail(name, path)
-        case _ => (List(util.hashing.MurmurHash3.stringHash(Base64.encodeBase64String(utilities.FileOperations.convertToByteArray(utilities.FileOperations.newFile(path, name)))).toString, utilities.FileOperations.fileExtensionFromName(name)).mkString("."), null)
+        case _ => (List(util.hashing.MurmurHash3.stringHash(Base64.encodeBase64String(utilities.FileOperations.convertToByteArray(utilities.FileOperations.newFile(path, name)))).toString, utilities.FileOperations.fileExtensionFromName(name)).mkString("."), None)
       }
-      masterCreate(document.updateFileName(fileName).updateFile(Option(encodedBase64)))
+      masterCreate(document.updateFileName(fileName).updateFile(encodedBase64))
       utilities.FileOperations.renameFile(path, name, fileName)
     } catch {
       case baseException: BaseException => logger.error(baseException.failure.message)
@@ -133,11 +148,11 @@ class FileResourceManager @Inject()()(implicit exec: ExecutionContext, configura
 
   def updateFile[T <: Document[T]](name: String, documentType: String, path: String, oldDocumentFileName: String, document: T, updateOldDocument: T => Int): Unit = {
     try {
-      val (fileName, encodedBase64) = utilities.FileOperations.fileExtensionFromName(name) match {
+      val (fileName, encodedBase64): (String, Option[Array[Byte]]) = utilities.FileOperations.fileExtensionFromName(name) match {
         case constants.File.JPEG | constants.File.JPG | constants.File.PNG => utilities.ImageProcess.convertToThumbnail(name, path)
-        case _ => (List(util.hashing.MurmurHash3.stringHash(Base64.encodeBase64String(utilities.FileOperations.convertToByteArray(utilities.FileOperations.newFile(path, name)))).toString, utilities.FileOperations.fileExtensionFromName(name)).mkString("."), null)
+        case _ => (List(util.hashing.MurmurHash3.stringHash(Base64.encodeBase64String(utilities.FileOperations.convertToByteArray(utilities.FileOperations.newFile(path, name)))).toString, utilities.FileOperations.fileExtensionFromName(name)).mkString("."), None)
       }
-      updateOldDocument(document.updateFileName(fileName).updateFile(Option(encodedBase64)))
+      updateOldDocument(document.updateFileName(fileName).updateFile(encodedBase64))
       utilities.FileOperations.deleteFile(path, oldDocumentFileName)
       utilities.FileOperations.renameFile(path, name, fileName)
     } catch {

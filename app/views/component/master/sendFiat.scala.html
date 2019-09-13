@@ -1,6 +1,6 @@
+@import controllers.actions.LoginState
 @import helper._
 @import views.companion.master.SendFiat
-@import controllers.actions.LoginState
 
 @(sendFiatForm: Form[SendFiat.Data], sellerAddress: String, pegHash: String, bid: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 
@@ -9,20 +9,20 @@
         <h4 class="latest_card-title">@Messages(constants.Form.SEND_FIAT)</h4>
     </div>
     <div class="latest_card-body">
-    @CSRF.formField
-    @inputText(sendFiatForm(constants.FormField.SELLER_ADDRESS.name).copy(value = Some(sellerAddress)), '_label -> Messages(constants.FormField.SELLER_ADDRESS.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.SELLER_ADDRESS.name),'required->true)
-    @inputText(sendFiatForm(constants.FormField.AMOUNT.name).copy(value = Some(bid.toString)), '_label -> Messages(constants.FormField.AMOUNT.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.AMOUNT.name),'required->true)
-    @inputText(sendFiatForm(constants.FormField.PEG_HASH.name).copy(value = Some(pegHash)), '_label -> Messages(constants.FormField.PEG_HASH.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.PEG_HASH.name),'required->true)
-    @inputText(sendFiatForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.GAS.name),'required->true)
-    @inputPassword(sendFiatForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.PASSWORD.name),'required->true)
+        @CSRF.formField
+        @inputText(sendFiatForm(constants.FormField.SELLER_ADDRESS.name).copy(value = Some(sellerAddress)), '_label -> Messages(constants.FormField.SELLER_ADDRESS.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.SELLER_ADDRESS.name), 'required -> true)
+        @inputText(sendFiatForm(constants.FormField.AMOUNT.name).copy(value = Some(bid.toString)), '_label -> Messages(constants.FormField.AMOUNT.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.AMOUNT.name), 'required -> true)
+        @inputText(sendFiatForm(constants.FormField.PEG_HASH.name).copy(value = Some(pegHash)), '_label -> Messages(constants.FormField.PEG_HASH.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.PEG_HASH.name), 'required -> true)
+        @inputText(sendFiatForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.GAS.name), 'required -> true)
+        @inputPassword(sendFiatForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.PASSWORD.name), 'required -> true)
 
-    @if(sendFiatForm.hasGlobalErrors) {
-        <ul>
-        @for(error <- sendFiatForm.globalErrors) {
-            <li>@error.format</li>
+        @if(sendFiatForm.hasGlobalErrors) {
+            <ul>
+            @for(error <- sendFiatForm.globalErrors) {
+                <li>@error.format</li>
+            }
+            </ul>
         }
-        </ul>
-    }
-    <button type="button" class="btn btn-primary btn-sm" onclick="submitForm(this)">@Messages(constants.Form.SEND_FIAT)</button>
+        <button type="button" class="btn btn-primary btn-sm" onclick="submitForm(this)">@Messages(constants.Form.SEND_FIAT)</button>
     </div>
 }

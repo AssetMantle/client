@@ -1,6 +1,6 @@
+@import controllers.actions.LoginState
 @import helper._
 @import views.companion.master.RejectVerifyTraderRequest
-@import controllers.actions.LoginState
 
 @(rejectVerifyTraderRequestForm: Form[RejectVerifyTraderRequest.Data], traderID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @form(action = routes.SetACLController.organizationRejectVerifyTraderRequest, 'onkeypress -> "validateForm(event,this)") {
@@ -8,18 +8,17 @@
         <h4 class="latest_card-title">@Messages(constants.Form.REJECT_VERIFY_TRADER_REQUEST)</h4>
     </div>
     <div class="latest_card-body">
-    @CSRF.formField
-    @inputText(rejectVerifyTraderRequestForm(constants.FormField.TRADER_ID.name).copy(value = Some(traderID)), '_label -> Messages(constants.FormField.TRADER_ID.name),
-        'class -> "form-control",'placeholder->Messages(constants.FormField.TRADER_ID.name),'required->true)
+        @CSRF.formField
+        @inputText(rejectVerifyTraderRequestForm(constants.FormField.TRADER_ID.name).copy(value = Some(traderID)), '_label -> Messages(constants.FormField.TRADER_ID.name),
+            'class -> "form-control", 'placeholder -> Messages(constants.FormField.TRADER_ID.name), 'required -> true)
 
-    @if(rejectVerifyTraderRequestForm.hasGlobalErrors) {
-        <ul>
-        @for(error <- rejectVerifyTraderRequestForm.globalErrors) {
-            <li>@error.format</li>
+        @if(rejectVerifyTraderRequestForm.hasGlobalErrors) {
+            <ul>
+            @for(error <- rejectVerifyTraderRequestForm.globalErrors) {
+                <li>@error.format</li>
+            }
+            </ul>
         }
-        </ul>
-    }
-    <button type="button" class="btn btn-sm btn-primary" onclick="submitForm(this)">@Messages(constants.Form.REJECT_VERIFY_TRADER_REQUEST)</button>
+        <button type="button" class="btn btn-sm btn-primary" onclick="submitForm(this)">@Messages(constants.Form.REJECT_VERIFY_TRADER_REQUEST)</button>
     </div>
-
 }

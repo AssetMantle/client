@@ -4,21 +4,33 @@
 @(files: Seq[AssetFile])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 <div class="verify_buttons">
     @for(file <- files) {
-        @component.master.commonDocument(file){
+        @component.master.commonDocumentViewer(file) {
+            @routes.FileController.zoneAccessedAssetFile(file.id, file.fileName, file.documentType)
+        } {
             <a href="@routes.FileController.zoneAccessedAssetFile(file.id, file.fileName, file.documentType)">@Messages(file.documentType)</a>
         } {
-            <div id="traderAssetDocumentStatus@file.id@file.documentType"></div>
+            <span class="red">@Messages(constants.Form.STATUS)
+                @if(file.status.getOrElse(false)) {
+                    <span id="verifiedDocumentStatus@file.id @file.documentType" class="result success"><img src="@routes.Assets.versioned("images/success.jpg")"></span>
+                    <span id="unverifiedDocumentStatus@file.id @file.documentType" class="result failure hidden"><img src="@routes.Assets.versioned("images/unverified.png")"></span>
+                } else {
+                    <span id="unverifiedDocumentStatus@file.id @file.documentType" class="result failure"><img src="@routes.Assets.versioned("images/unverified.png")"></span>
+                    <span id="verifiedDocumentStatus@file.id @file.documentType" class="result success hidden"><img src="@routes.Assets.versioned("images/success.jpg")">
+                    }
+            </span>
+            </span>
+            <div id="organizationKycDocumentStatus@file.id @file.documentType"></div>
             @file.status.getOrElse(None) match {
                 case true => {
-                    <div id="buttonTraderAssetDocumentStatus@file.id@file.documentType"><button class="btn btn-sm btn-danger" onclick="rejectAssetDocument('@file.id', '@file.documentType')">@Messages(constants.Form.REJECT)</button></div>
+                    <div id="buttonOrganizationKycDocumentStatus@file.id@file.documentType"><button class="btn btn-sm btn-danger" onclick="rejectTraderAssetDocument('@file.id', '@file.documentType')">@Messages(constants.Form.REJECT)</button></div>
                 }
                 case false => {
-                    <div id="buttonTraderAssetDocumentStatus@file.id@file.documentType"><button class="btn btn-sm btn-success" onclick="verifyAssetDocument('@file.id', '@file.documentType')">@Messages(constants.Form.APPROVE)</button></div>
+                    <div id="buttonOrganizationKycDocumentStatus@file.id@file.documentType"><button class="btn btn-sm btn-success" onclick="verifyTraderAssetDocument('@file.id', '@file.documentType')">@Messages(constants.Form.APPROVE)</button></div>
                 }
                 case _ => {
-                    <div id="buttonTraderAssetDocumentStatus@file.id@file.documentType">
-                        <button class="btn btn-sm btn-success" onclick="verifyAssetDocument('@file.id', '@file.documentType')">@Messages(constants.Form.APPROVE)</button>
-                        <button class="btn btn-sm btn-danger" onclick="rejectAssetDocument('@file.id', '@file.documentType')">@Messages(constants.Form.REJECT)</button>
+                    <div id="buttonOrganizationKycDocumentStatus@file.id@file.documentType">
+                        <button class="btn btn-sm btn-success" onclick="verifyTraderAssetDocument('@file.id', '@file.documentType')">@Messages(constants.Form.APPROVE)</button>
+                        <button class="btn btn-sm btn-danger" onclick="rejectTraderAssetDocument('@file.id', '@file.documentType')">@Messages(constants.Form.REJECT)</button>
                     </div>
                 }
             }

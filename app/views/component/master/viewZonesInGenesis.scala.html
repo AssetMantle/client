@@ -1,25 +1,23 @@
-@import models.master.Zone
 @import controllers.actions.LoginState
+@import models.master.Zone
 
 @(zones: Seq[Zone])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
 @for(zone <- zones) {
-
     <div class="col-md-4">
-    <div class="flexItem card firstBox leftText lightBlue">
-        <div class="card-body">
-        <span class="red">@Messages(constants.Form.ID)</span> :@zone.id <br>
-        <span class="red">@Messages(constants.Form.ACCOUNT_ID)</span> :@zone.accountID <br>
-        <span class="red">@Messages(constants.Form.NAME)</span> :@zone.name <br>
-        <span class="red">@Messages(constants.Form.CURRENCY)</span> :@zone.currency <br>
-        </div>
-        <div class="leftMargin">
-            <div>
-                <h4 class="showHide toggleElement centerText" onclick="fetchOrShowHide('@zone.id', jsRoutes.controllers.AddOrganizationController.viewOrganizationsInZoneForGenesis('@zone.id') ,this)">@Messages(constants.Form.ORGANIZATIONS)</h4>
+        <div class="flexItem card firstBox leftText lightBlue">
+            <div class="card-body">
+                <span class="red">@Messages(constants.Form.ID)</span>:@zone.id <br>
+                <span class="red">@Messages(constants.Form.ACCOUNT_ID)</span>:@zone.accountID <br>
+                <span class="red">@Messages(constants.Form.NAME)</span>:@zone.name <br>
+                <span class="red">@Messages(constants.Form.CURRENCY)</span>:@zone.currency <br>
             </div>
-            <div id="@zone.id" class="flexContainer rightPadding scrollableSecond"></div>
+            <div class="leftMargin">
+                <div>
+                    <h4 class="showHide toggleElement centerText" onclick="fetchOrShowHide('@zone.id', jsRoutes.controllers.AddOrganizationController.viewOrganizationsInZoneForGenesis('@zone.id'), this)">@Messages(constants.Form.ORGANIZATIONS)</h4>
+                </div>
+                <div id="@zone.id" class="flexContainer rightPadding scrollableSecond"></div>
+            </div>
         </div>
-        </div>
-
     </div>
 }

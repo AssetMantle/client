@@ -7,21 +7,21 @@
         <h4 class="latest_card-title">@Messages(constants.Form.RELEASE_ASSET)</h4>
     </div>
     <div class="latest_card-body">
-    @CSRF.formField
-    @inputText(releaseAssetForm(constants.FormField.FROM.name), '_label -> Messages(constants.FormField.FROM.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.FROM.name),'required->true)
-    @inputText(releaseAssetForm(constants.FormField.TO.name), '_label -> Messages(constants.FormField.TO.name),'class -> "form-control", 'placeholder->Messages(constants.FormField.TO.name),'required->true)
-    @inputText(releaseAssetForm(constants.FormField.PEG_HASH.name), '_label -> Messages(constants.FormField.PEG_HASH.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.PEG_HASH.name),'required->true)
-    @inputText(releaseAssetForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.GAS.name),'required->true)
-    @inputText(releaseAssetForm(constants.FormField.MODE.name), '_label -> Messages(constants.FormField.MODE.name),'class -> "form-control", 'placeholder->Messages(constants.FormField.MODE.name),'required->true)
-    @inputPassword(releaseAssetForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.PASSWORD.name),'required->true)
+        @CSRF.formField
+        @inputText(releaseAssetForm(constants.FormField.FROM.name), '_label -> Messages(constants.FormField.FROM.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.FROM.name), 'required -> true)
+        @inputText(releaseAssetForm(constants.FormField.TO.name), '_label -> Messages(constants.FormField.TO.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.TO.name), 'required -> true)
+        @inputText(releaseAssetForm(constants.FormField.PEG_HASH.name), '_label -> Messages(constants.FormField.PEG_HASH.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.PEG_HASH.name), 'required -> true)
+        @inputText(releaseAssetForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.GAS.name), 'required -> true)
+        @inputText(releaseAssetForm(constants.FormField.MODE.name), '_label -> Messages(constants.FormField.MODE.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.MODE.name), 'required -> true)
+        @inputPassword(releaseAssetForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.PASSWORD.name), 'required -> true)
 
-    @if(releaseAssetForm.hasGlobalErrors) {
-        <ul>
-        @for(error <- releaseAssetForm.globalErrors) {
-            <li>@error.format</li>
+        @if(releaseAssetForm.hasGlobalErrors) {
+            <ul>
+            @for(error <- releaseAssetForm.globalErrors) {
+                <li>@error.format</li>
+            }
+            </ul>
         }
-        </ul>
-    }
-    <button type="button" class="btn btn-primary" onclick="submitForm(this)">@Messages(constants.Form.RELEASE_ASSET)</button>
+        <button type="button" class="btn btn-primary" onclick="submitForm(this)">@Messages(constants.Form.RELEASE_ASSET)</button>
     </div>
 }

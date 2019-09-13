@@ -25,7 +25,7 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
   private implicit val module: String = constants.Module.CONTROLLERS_ISSUE_ASSET
 
   def issueAssetRequestForm(id: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.issueAssetRequest(views.companion.master.ConfirmTransaction.form.fill(views.companion.master.ConfirmTransaction.Data(id, 0, "")), masterTransactionIssueAssetRequests.Service.getIssueAssetByID(id)))
+    Ok(views.html.component.master.issueAssetRequest(views.companion.master.ConfirmTransaction.form.fill(views.companion.master.ConfirmTransaction.Data(id, Option(0), Option(""))), masterTransactionIssueAssetRequests.Service.getIssueAssetByID(id)))
   }
 
   def assetDetail(id: String): Action[AnyContent] = Action { implicit request =>
@@ -46,9 +46,9 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
               Ok(views.html.index(successes = Seq(constants.Response.ISSUE_ASSET_REQUEST_SENT)))
             } else {
               val ticketID = transaction.process[blockchainTransaction.IssueAsset, transactionsIssueAsset.Request](
-                entity = blockchainTransaction.IssueAsset(from = loginState.address, to = loginState.address, documentHash = asset.documentHash, assetType = asset.assetType, assetPrice = asset.assetPrice, quantityUnit = asset.quantityUnit, assetQuantity = asset.assetQuantity, moderated = false, gas = confirmTransactionData.gas, takerAddress = if (asset.takerAddress == Option("")) null else asset.takerAddress, status = null, txHash = null, ticketID = "", mode = transactionMode, code = null),
+                entity = blockchainTransaction.IssueAsset(from = loginState.address, to = loginState.address, documentHash = asset.documentHash, assetType = asset.assetType, assetPrice = asset.assetPrice, quantityUnit = asset.quantityUnit, assetQuantity = asset.assetQuantity, moderated = false, takerAddress = asset.takerAddress, gas = confirmTransactionData.gas.getOrElse(throw new BaseException(constants.Response.GAS_NOT_GIVEN)), ticketID = "", mode = transactionMode),
                 blockchainTransactionCreate = blockchainTransactionIssueAssets.Service.create,
-                request = transactionsIssueAsset.Request(transactionsIssueAsset.BaseRequest(from = loginState.address), to = loginState.address, password = confirmTransactionData.password, documentHash = asset.documentHash, assetType = asset.assetType, assetPrice = asset.assetPrice.toString, quantityUnit = asset.quantityUnit, assetQuantity = asset.assetQuantity.toString, moderated = false, gas = confirmTransactionData.gas.toString, takerAddress = asset.takerAddress.getOrElse(""), mode = transactionMode),
+                request = transactionsIssueAsset.Request(transactionsIssueAsset.BaseRequest(from = loginState.address, gas = confirmTransactionData.gas.getOrElse(throw new BaseException(constants.Response.GAS_NOT_GIVEN)).toString), to = loginState.address, password = confirmTransactionData.password.getOrElse(throw new BaseException(constants.Response.PASSWORD_NOT_GIVEN)), documentHash = asset.documentHash, assetType = asset.assetType, assetPrice = asset.assetPrice.toString, quantityUnit = asset.quantityUnit, assetQuantity = asset.assetQuantity.toString, moderated = false, takerAddress = asset.takerAddress.getOrElse(""), mode = transactionMode),
                 action = transactionsIssueAsset.Service.post,
                 onSuccess = blockchainTransactionIssueAssets.Utility.onSuccess,
                 onFailure = blockchainTransactionIssueAssets.Utility.onFailure,
@@ -72,7 +72,7 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
       if (id.isDefined) {
         val assetRequest = masterTransactionIssueAssetRequests.Service.getIssueAssetByID(id.get)
         val shipmentDetails = Json.parse(assetRequest.shipmentDetails).as[masterTransaction.IssueAssetRequestDetails.ShipmentDetails]
-        Ok(views.html.component.master.issueAssetDetail(views.companion.master.IssueAssetDetail.form.fill(views.companion.master.IssueAssetDetail.Data(Option(assetRequest.id), assetRequest.documentHash, assetRequest.assetType, assetRequest.quantityUnit, assetRequest.assetQuantity, assetRequest.assetPrice, assetRequest.takerAddress.getOrElse(""), shipmentDetails.commodityName, shipmentDetails.quality, shipmentDetails.deliveryTerm, shipmentDetails.tradeType, shipmentDetails.portOfLoading, shipmentDetails.portOfDischarge, shipmentDetails.shipmentDate, assetRequest.physicalDocumentsHandledVia, assetRequest.paymentTerms))))
+        Ok(views.html.component.master.issueAssetDetail(views.companion.master.IssueAssetDetail.form.fill(views.companion.master.IssueAssetDetail.Data(Option(assetRequest.id), assetRequest.documentHash, assetRequest.assetType, assetRequest.quantityUnit, assetRequest.assetQuantity, assetRequest.assetPrice, assetRequest.takerAddress, shipmentDetails.commodityName, shipmentDetails.quality, shipmentDetails.deliveryTerm, shipmentDetails.tradeType, shipmentDetails.portOfLoading, shipmentDetails.portOfDischarge, shipmentDetails.shipmentDate, assetRequest.physicalDocumentsHandledVia, assetRequest.paymentTerms))))
       } else {
         Ok(views.html.component.master.issueAssetDetail(views.companion.master.IssueAssetDetail.form))
       }
@@ -90,7 +90,7 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
         issueAssetDetailData => {
           try {
             val id = if (issueAssetDetailData.requestID.isEmpty) utilities.IDGenerator.requestID() else issueAssetDetailData.requestID.get
-            masterTransactionIssueAssetRequests.Service.insertOrUpdate(id = id, ticketID = None, pegHash = None, accountID = loginState.username, documentHash = issueAssetDetailData.documentHash, assetType = issueAssetDetailData.assetType, quantityUnit = issueAssetDetailData.quantityUnit, assetQuantity = issueAssetDetailData.assetQuantity, assetPrice = issueAssetDetailData.assetPrice, takerAddress = if (issueAssetDetailData.takerAddress == "") None else Option(issueAssetDetailData.takerAddress), shipmentDetails = masterTransaction.IssueAssetRequestDetails.ShipmentDetails(issueAssetDetailData.commodityName, issueAssetDetailData.quality, issueAssetDetailData.deliveryTerm, issueAssetDetailData.tradeType, issueAssetDetailData.portOfLoading, issueAssetDetailData.portOfDischarge, issueAssetDetailData.shipmentDate), physicalDocumentsHandledVia = issueAssetDetailData.physicalDocumentsHandledVia, paymentTerms = issueAssetDetailData.comdexPaymentTerms, status = constants.Status.Asset.INCOMPLETE_DETAILS)
+            masterTransactionIssueAssetRequests.Service.insertOrUpdate(id = id, ticketID = None, pegHash = None, accountID = loginState.username, documentHash = issueAssetDetailData.documentHash, assetType = issueAssetDetailData.assetType, quantityUnit = issueAssetDetailData.quantityUnit, assetQuantity = issueAssetDetailData.assetQuantity, assetPrice = issueAssetDetailData.assetPrice, takerAddress = issueAssetDetailData.takerAddress, shipmentDetails = masterTransaction.IssueAssetRequestDetails.ShipmentDetails(issueAssetDetailData.commodityName, issueAssetDetailData.quality, issueAssetDetailData.deliveryTerm, issueAssetDetailData.tradeType, issueAssetDetailData.portOfLoading, issueAssetDetailData.portOfDischarge, issueAssetDetailData.shipmentDate), physicalDocumentsHandledVia = issueAssetDetailData.physicalDocumentsHandledVia, paymentTerms = issueAssetDetailData.comdexPaymentTerms, status = constants.Status.Asset.INCOMPLETE_DETAILS)
             val obl = Json.parse(masterTransactionAssetFiles.Service.getOrEmpty(id, constants.File.OBL).context.getOrElse(Json.toJson(masterTransaction.AssetFileTypeContext.OBL("", "", "", "", "", "", new Date(0), "", 0, 0)).toString)).as[masterTransaction.AssetFileTypeContext.OBL]
             PartialContent(views.html.component.master.issueAssetOBL(views.companion.master.IssueAssetOBL.form.fill(views.companion.master.IssueAssetOBL.Data(id, obl.billOfLadingId, obl.portOfLoading, obl.shipperName, obl.shipperAddress, obl.notifyPartyName, obl.notifyPartyAddress, obl.dateOfShipping, obl.deliveryTerm, obl.weightOfConsignment, obl.declaredAssetValue))))
 
@@ -241,9 +241,9 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
               val toAddress = masterAccounts.Service.getAddress(issueAssetData.accountID)
               if (masterTransactionIssueAssetRequests.Service.getStatus(issueAssetData.requestID) == constants.Status.Asset.REQUESTED) {
                 val ticketID = transaction.process[blockchainTransaction.IssueAsset, transactionsIssueAsset.Request](
-                  entity = blockchainTransaction.IssueAsset(from = loginState.address, to = toAddress, documentHash = issueAssetData.documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.assetPrice, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.assetQuantity, moderated = true, gas = issueAssetData.gas, takerAddress = if (issueAssetData.takerAddress == "") null else Option(issueAssetData.takerAddress), status = null, txHash = null, ticketID = "", mode = transactionMode, code = null),
+                  entity = blockchainTransaction.IssueAsset(from = loginState.address, to = toAddress, documentHash = issueAssetData.documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.assetPrice, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.assetQuantity, moderated = true, gas = issueAssetData.gas, takerAddress = issueAssetData.takerAddress, ticketID = "", mode = transactionMode),
                   blockchainTransactionCreate = blockchainTransactionIssueAssets.Service.create,
-                  request = transactionsIssueAsset.Request(transactionsIssueAsset.BaseRequest(from = loginState.address), to = toAddress, password = issueAssetData.password, documentHash = issueAssetData.documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.assetPrice.toString, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.assetQuantity.toString, moderated = true, gas = issueAssetData.gas.toString, takerAddress = issueAssetData.takerAddress, mode = transactionMode),
+                  request = transactionsIssueAsset.Request(transactionsIssueAsset.BaseRequest(from = loginState.address, gas = issueAssetData.gas.toString), to = toAddress, password = issueAssetData.password, documentHash = issueAssetData.documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.assetPrice.toString, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.assetQuantity.toString, moderated = true, takerAddress = issueAssetData.takerAddress.getOrElse(""), mode = transactionMode),
                   action = transactionsIssueAsset.Service.post,
                   onSuccess = blockchainTransactionIssueAssets.Utility.onSuccess,
                   onFailure = blockchainTransactionIssueAssets.Utility.onFailure,
@@ -263,20 +263,18 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
         )
   }
 
-  def blockchainIssueAssetForm: Action[AnyContent] = Action {
-    implicit request =>
-      Ok(views.html.component.blockchain.issueAsset(views.companion.blockchain.IssueAsset.form))
+  def blockchainIssueAssetForm: Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.blockchain.issueAsset(views.companion.blockchain.IssueAsset.form))
   }
 
-  def blockchainIssueAsset: Action[AnyContent] = Action {
-    implicit request =>
-      views.companion.blockchain.IssueAsset.form.bindFromRequest().fold(
-        formWithErrors => {
-          BadRequest(views.html.component.blockchain.issueAsset(formWithErrors))
-        },
-        issueAssetData => {
-          try {
-            transactionsIssueAsset.Service.post(transactionsIssueAsset.Request(transactionsIssueAsset.BaseRequest(from = issueAssetData.from), to = issueAssetData.to, password = issueAssetData.password, documentHash = issueAssetData.documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.assetPrice.toString, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.assetQuantity.toString, gas = issueAssetData.gas.toString, moderated = issueAssetData.moderated, takerAddress = issueAssetData.takerAddress, mode = issueAssetData.mode))
+  def blockchainIssueAsset: Action[AnyContent] = Action { implicit request =>
+    views.companion.blockchain.IssueAsset.form.bindFromRequest().fold(
+      formWithErrors => {
+        BadRequest(views.html.component.blockchain.issueAsset(formWithErrors))
+      },
+      issueAssetData => {
+        try {
+          transactionsIssueAsset.Service.post(transactionsIssueAsset.Request(transactionsIssueAsset.BaseRequest(from = issueAssetData.from, gas = issueAssetData.gas.toString), to = issueAssetData.to, password = issueAssetData.password, documentHash = issueAssetData.documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.assetPrice.toString, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.assetQuantity.toString, moderated = issueAssetData.moderated, takerAddress = issueAssetData.takerAddress, mode = issueAssetData.mode))
             Ok(views.html.index(successes = Seq(constants.Response.ASSET_ISSUED)))
           }
           catch {

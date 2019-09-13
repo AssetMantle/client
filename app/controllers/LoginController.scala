@@ -34,7 +34,7 @@ class LoginController @Inject()(messagesControllerComponents: MessagesController
         try {
           val userType = masterAccounts.Service.getUserType(loginData.username)
           val address = masterAccounts.Service.getAddress(loginData.username)
-          implicit val loginState: LoginState = LoginState(loginData.username, userType, address , if (userType == constants.User.TRADER) Option(blockchainAclHashes.Service.getACL(blockchainAclAccounts.Service.getACLHash(address))) else null)
+          implicit val loginState: LoginState = LoginState(loginData.username, userType, address, if (userType == constants.User.TRADER) Option(blockchainAclHashes.Service.getACL(blockchainAclAccounts.Service.getACLHash(address))) else None)
           val contactWarnings: Seq[constants.Response.Warning] = utilities.Contact.getWarnings(masterAccounts.Service.validateLoginAndGetStatus(loginData.username, loginData.password))
           pushNotification.registerNotificationToken(loginData.username, loginData.notificationToken)
           pushNotification.sendNotification(loginData.username, constants.Notification.LOGIN, loginData.username)

@@ -12,7 +12,7 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class ZoneKYC(id: String, documentType: String, fileName: String, file: Option[Array[Byte]], status: Option[Boolean]) extends Document[ZoneKYC]{
+case class ZoneKYC(id: String, documentType: String, fileName: String, file: Option[Array[Byte]], status: Option[Boolean] = None) extends Document[ZoneKYC]{
 
   def updateFile(newFile: Option[Array[Byte]]): ZoneKYC = ZoneKYC(id = id, documentType = documentType, fileName = fileName, file = newFile, status = status)
 
@@ -122,9 +122,9 @@ class ZoneKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   object Service {
 
-    def create(zoneKYC: ZoneKYC): String = Await.result(add(ZoneKYC(id = zoneKYC.id, documentType = zoneKYC.documentType, fileName = zoneKYC.fileName, file = zoneKYC.file, status = None)), Duration.Inf)
+    def create(zoneKYC: ZoneKYC): String = Await.result(add(ZoneKYC(id = zoneKYC.id, documentType = zoneKYC.documentType, fileName = zoneKYC.fileName, file = zoneKYC.file)), Duration.Inf)
 
-    def updateOldDocument(zoneKYC: ZoneKYC): Int = Await.result(upsert(ZoneKYC(id = zoneKYC.id, documentType = zoneKYC.documentType, fileName = zoneKYC.fileName, file = zoneKYC.file, status = None)), Duration.Inf)
+    def updateOldDocument(zoneKYC: ZoneKYC): Int = Await.result(upsert(ZoneKYC(id = zoneKYC.id, documentType = zoneKYC.documentType, fileName = zoneKYC.fileName, file = zoneKYC.file)), Duration.Inf)
 
     def get(id: String, documentType: String): ZoneKYC = Await.result(findByIdDocumentType(id = id, documentType = documentType), Duration.Inf)
 

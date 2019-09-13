@@ -12,7 +12,7 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class TraderKYC(id: String, documentType: String, fileName: String, file: Option[Array[Byte]], zoneStatus: Option[Boolean], organizationStatus: Option[Boolean]) extends Document[TraderKYC] {
+case class TraderKYC(id: String, documentType: String, fileName: String, file: Option[Array[Byte]], zoneStatus: Option[Boolean] = None, organizationStatus: Option[Boolean] = None) extends Document[TraderKYC] {
 
   val status: Option[Boolean] = Option(zoneStatus.getOrElse(false) && organizationStatus.getOrElse(false))
 
@@ -146,9 +146,9 @@ class TraderKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfigP
 
   object Service {
 
-    def create(traderKYC: TraderKYC): String = Await.result(add(TraderKYC(id = traderKYC.id, documentType = traderKYC.documentType, fileName = traderKYC.fileName, file = traderKYC.file, zoneStatus = None, organizationStatus = None)), Duration.Inf)
+    def create(traderKYC: TraderKYC): String = Await.result(add(TraderKYC(id = traderKYC.id, documentType = traderKYC.documentType, fileName = traderKYC.fileName, file = traderKYC.file)), Duration.Inf)
 
-    def updateOldDocument(traderKYC: TraderKYC): Int = Await.result(upsert(TraderKYC(id = traderKYC.id, documentType = traderKYC.documentType, fileName = traderKYC.fileName, file = traderKYC.file, zoneStatus = None, organizationStatus = None)), Duration.Inf)
+    def updateOldDocument(traderKYC: TraderKYC): Int = Await.result(upsert(TraderKYC(id = traderKYC.id, documentType = traderKYC.documentType, fileName = traderKYC.fileName, file = traderKYC.file)), Duration.Inf)
 
     def get(id: String, documentType: String): TraderKYC = Await.result(findByIdDocumentType(id = id, documentType = documentType), Duration.Inf)
 

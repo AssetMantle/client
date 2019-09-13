@@ -1,6 +1,6 @@
+@import controllers.actions.LoginState
 @import helper._
 @import views.companion.master.VerifyOrganization
-@import controllers.actions.LoginState
 
 @(verifyOrganizationForm: Form[VerifyOrganization.Data], organizationID: String, zoneID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 
@@ -9,19 +9,19 @@
         <h4 class="latest_card-title">@Messages(constants.Form.VERIFY_ORGANIZATION)</h4>
     </div>
     <div class="latest_card-body">
-    @CSRF.formField
-    @inputText(verifyOrganizationForm(constants.FormField.ORGANIZATION_ID.name).copy(value = Some(organizationID)), '_label -> Messages(constants.FormField.ORGANIZATION_ID.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.ORGANIZATION_ID.name),'required->true)
-    @inputText(verifyOrganizationForm(constants.FormField.ZONE_ID.name).copy(value = Some(zoneID)), '_label -> Messages(constants.FormField.ZONE_ID.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.ZONE_ID.name),'required->true)
-    @inputPassword(verifyOrganizationForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.PASSWORD.name),'required->true)
+        @CSRF.formField
+        @inputText(verifyOrganizationForm(constants.FormField.ORGANIZATION_ID.name).copy(value = Some(organizationID)), '_label -> Messages(constants.FormField.ORGANIZATION_ID.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.ORGANIZATION_ID.name), 'required -> true)
+        @inputText(verifyOrganizationForm(constants.FormField.ZONE_ID.name).copy(value = Some(zoneID)), '_label -> Messages(constants.FormField.ZONE_ID.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.ZONE_ID.name), 'required -> true)
+        @inputText(verifyOrganizationForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.GAS.name), 'required -> true)
+        @inputPassword(verifyOrganizationForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.PASSWORD.name), 'required -> true)
 
-    @if(verifyOrganizationForm.hasGlobalErrors) {
-        <ul>
-        @for(error <- verifyOrganizationForm.globalErrors) {
-            <li>@error.format</li>
+        @if(verifyOrganizationForm.hasGlobalErrors) {
+            <ul>
+            @for(error <- verifyOrganizationForm.globalErrors) {
+                <li>@error.format</li>
+            }
+            </ul>
         }
-        </ul>
-    }
-    <button type="button" class="btn btn-primary btn-sm" onclick="submitForm(this)">@Messages(constants.Form.VERIFY_ORGANIZATION)</button>
+        <button type="button" class="btn btn-primary btn-sm" onclick="submitForm(this)">@Messages(constants.Form.VERIFY_ORGANIZATION)</button>
     </div>
-
 }
