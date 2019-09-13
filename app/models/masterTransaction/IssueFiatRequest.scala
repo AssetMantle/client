@@ -9,9 +9,9 @@ import slick.jdbc.JdbcProfile
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
-import scala.util.{Failure, Random, Success}
+import scala.util.{Failure, Success}
 
-case class IssueFiatRequest(id: String, accountID: String, transactionID: String, transactionAmount: Int, gas: Option[Int], status: Option[Boolean], ticketID: Option[String], comment: Option[String])
+case class IssueFiatRequest(id: String, accountID: String, transactionID: String, transactionAmount: Int, gas: Option[Int] = None, status: Option[Boolean] = None, ticketID: Option[String] = None, comment: Option[String] = None)
 
 @Singleton
 class IssueFiatRequests @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
@@ -44,7 +44,7 @@ class IssueFiatRequests @Inject()(protected val databaseConfigProvider: Database
     }
   }
 
-  private def updateTicketIDAndStatusByID(id: String, ticketID: String, status: Option[Boolean]): Future[Int] = db.run(issueFiatRequestTable.filter(_.id === id).map(issueFiat => (issueFiat.ticketID, issueFiat.status.?)).update(ticketID, status).asTry).map {
+  private def updateTicketIDGasAndStatusByID(id: String, ticketID: String, gas: Option[Int], status: Option[Boolean]): Future[Int] = db.run(issueFiatRequestTable.filter(_.id === id).map(issueFiat => (issueFiat.ticketID, issueFiat.gas.?, issueFiat.status.?)).update(ticketID, gas, status).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -88,7 +88,7 @@ class IssueFiatRequests @Inject()(protected val databaseConfigProvider: Database
 
   private[models] class IssueFiatRequestTable(tag: Tag) extends Table[IssueFiatRequest](tag, "IssueFiatRequest") {
 
-    def * = (id, accountID, transactionID, transactionAmount,gas.?, status.?, ticketID.?, comment.?) <> (IssueFiatRequest.tupled, IssueFiatRequest.unapply)
+    def * = (id, accountID, transactionID, transactionAmount, gas.?, status.?, ticketID.?, comment.?) <> (IssueFiatRequest.tupled, IssueFiatRequest.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
@@ -110,11 +110,11 @@ class IssueFiatRequests @Inject()(protected val databaseConfigProvider: Database
 
   object Service {
 
-    def create(accountID: String, transactionID: String, transactionAmount: Int): String = Await.result(add(IssueFiatRequest(id =utilities.IDGenerator.requestID(), accountID = accountID, transactionID = transactionID, transactionAmount = transactionAmount, null,null, null, null)), Duration.Inf)
+    def create(accountID: String, transactionID: String, transactionAmount: Int): String = Await.result(add(IssueFiatRequest(id = utilities.IDGenerator.requestID, accountID = accountID, transactionID = transactionID, transactionAmount = transactionAmount)), Duration.Inf)
 
     def reject(id: String, comment: String): Int = Await.result(updateStatusAndCommentByID(id = id, status = Option(false), comment = comment), Duration.Inf)
 
-    def accept(requestID: String, ticketID: String): Int = Await.result(updateTicketIDAndStatusByID(requestID, ticketID, status = Option(true)), Duration.Inf)
+    def accept(requestID: String, ticketID: String, gas: Int): Int = Await.result(updateTicketIDGasAndStatusByID(requestID, ticketID, gas = Option(gas), status = Option(true)), Duration.Inf)
 
     def getPendingIssueFiatRequests(accountIDs: Seq[String]): Seq[IssueFiatRequest] = Await.result(getIssueFiatRequestsWithNullStatus(accountIDs), Duration.Inf)
 

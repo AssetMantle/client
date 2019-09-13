@@ -18,7 +18,7 @@ class SendFiatController @Inject()(messagesControllerComponents: MessagesControl
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
-  private implicit val module:String= constants.Module.CONTROLLERS_SEND_FIAT
+  private implicit val module: String = constants.Module.CONTROLLERS_SEND_FIAT
 
   def sendFiatForm(sellerAddress: String, pegHash: String, bid: Int): Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.master.sendFiat(views.companion.master.SendFiat.form, sellerAddress, pegHash, bid))
@@ -33,9 +33,9 @@ class SendFiatController @Inject()(messagesControllerComponents: MessagesControl
         sendFiatData => {
           try {
             transaction.process[blockchainTransaction.SendFiat, transactionsSendFiat.Request](
-              entity = blockchainTransaction.SendFiat(from = loginState.address, to = sendFiatData.sellerAddress, amount = sendFiatData.amount, pegHash = sendFiatData.pegHash,gas=sendFiatData.gas, status = null, txHash = null, ticketID = "", mode = transactionMode, code = null),
+              entity = blockchainTransaction.SendFiat(from = loginState.address, to = sendFiatData.sellerAddress, amount = sendFiatData.amount, pegHash = sendFiatData.pegHash, gas = sendFiatData.gas, ticketID = "", mode = transactionMode),
               blockchainTransactionCreate = blockchainTransactionSendFiats.Service.create,
-              request = transactionsSendFiat.Request(transactionsSendFiat.BaseRequest(from = loginState.address), to = sendFiatData.sellerAddress, password = sendFiatData.password, amount = sendFiatData.amount.toString, pegHash = sendFiatData.pegHash,gas=sendFiatData.gas.toString, mode = transactionMode),
+              request = transactionsSendFiat.Request(transactionsSendFiat.BaseRequest(from = loginState.address, gas = sendFiatData.gas.toString), to = sendFiatData.sellerAddress, password = sendFiatData.password, amount = sendFiatData.amount.toString, pegHash = sendFiatData.pegHash, mode = transactionMode),
               action = transactionsSendFiat.Service.post,
               onSuccess = blockchainTransactionSendFiats.Utility.onSuccess,
               onFailure = blockchainTransactionSendFiats.Utility.onFailure,
@@ -62,7 +62,7 @@ class SendFiatController @Inject()(messagesControllerComponents: MessagesControl
       },
       sendFiatData => {
         try {
-          transactionsSendFiat.Service.post(transactionsSendFiat.Request(transactionsSendFiat.BaseRequest(from = sendFiatData.from), to = sendFiatData.to, password = sendFiatData.password, amount = sendFiatData.amount.toString, pegHash = sendFiatData.pegHash,gas=sendFiatData.gas.toString, mode = sendFiatData.mode))
+          transactionsSendFiat.Service.post(transactionsSendFiat.Request(transactionsSendFiat.BaseRequest(from = sendFiatData.from, gas = sendFiatData.gas.toString), to = sendFiatData.to, password = sendFiatData.password, amount = sendFiatData.amount.toString, pegHash = sendFiatData.pegHash, mode = sendFiatData.mode))
           Ok(views.html.index(successes = Seq(constants.Response.FIAT_SENT)))
         }
         catch {

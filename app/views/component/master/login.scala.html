@@ -7,39 +7,35 @@
 <div class="">
     <h4 class="">@Messages(constants.Form.LOGIN)</h4>
 </div>
-@form(action = routes.LoginController.login, 'onkeypress -> "validateForm(event,this)") {
-
-    <div class="">
-        @CSRF.formField
-
-        <div class="input-group">
-            <div class="input-group-prepend">
-                <span class="input-group-text">
-                    <i class="fa fa-user"></i>
-                </span>
-            </div>
-            @inputText(loginForm(constants.FormField.USERNAME.name), '_label -> Messages(constants.FormField.USERNAME.name), 'class -> "cmuk-input", 'placeholder -> "Username", 'required -> true)
+@form(action = routes.AccountController.login, 'onkeypress -> "validateForm(event,this)") {
+    @CSRF.formField
+    <div class="input-group">
+        <div class="input-group-prepend">
+            <span class="input-group-text">
+                <i class="fa fa-user"></i>
+            </span>
         </div>
-        <div class="input-group">
-            <div class="input-group-prepend">
-                <span class="input-group-text">
-                    <i class="fa fa-lock" aria-hidden="true"></i>
-                </span>
-            </div>
-            @inputPassword(loginForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "cmuk-input", 'placeholder -> "Password", 'required -> true)
-        </div>
-        <div class = "hidden">@inputText(loginForm(constants.FormField.NOTIFICATION_TOKEN.name), 'id -> constants.FormField.NOTIFICATION_TOKEN.name, 'readonly -> true)</div>
-
-        @if(loginForm.hasGlobalErrors) {
-            <ul>
-            @for(error <- loginForm.globalErrors) {
-                <li>@error.format</li>
-            }
-            </ul>
-        }
-        <button type="button" class="btn btn-primary " onclick="submitForm(this)">@Messages(constants.Form.LOGIN)</button>
-        <button type="button" class="btn btn-primary" onclick="getForm(jsRoutes.controllers.AccountController.emailOTPForgotPasswordForm())">@Messages(constants.Form.FORGOT_PASSWORD)</button>
+        @inputText(loginForm(constants.FormField.USERNAME.name), '_label -> Messages(constants.FormField.USERNAME.name), 'class -> "cmuk-input", 'placeholder -> "Username", 'required -> true)
     </div>
+    <div class="input-group">
+        <div class="input-group-prepend">
+            <span class="input-group-text">
+                <i class="fa fa-lock" aria-hidden="true"></i>
+            </span>
+        </div>
+        @inputPassword(loginForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "cmuk-input", 'placeholder -> "Password", 'required -> true)
+    </div>
+    <div class = "hidden">@inputText(loginForm(constants.FormField.NOTIFICATION_TOKEN.name), 'id -> constants.FormField.NOTIFICATION_TOKEN.name, 'readonly -> true)</div>
+
+    @if(loginForm.hasGlobalErrors) {
+        <ul>
+        @for(error <- loginForm.globalErrors) {
+            <li>@error.format</li>
+        }
+        </ul>
+    }
+    <button type="button" class="btn btn-primary " onclick="submitForm(this)">@Messages(constants.Form.LOGIN)</button>
+    <button type="button" class="btn btn-primary" onclick="getForm(jsRoutes.controllers.AccountController.emailOTPForgotPasswordForm())">@Messages(constants.Form.FORGOT_PASSWORD)</button>
 }
 
 

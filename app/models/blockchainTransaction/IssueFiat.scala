@@ -19,8 +19,8 @@ import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class IssueFiat(from: String, to: String, transactionID: String, transactionAmount: Int,  gas: Int, status: Option[Boolean], txHash: Option[String], ticketID: String, mode: String, code: Option[String]) extends BaseTransaction[IssueFiat] {
-  def mutateTicketID(newTicketID: String): IssueFiat = IssueFiat(from = from, to = to, transactionID = transactionID, transactionAmount = transactionAmount, gas=gas,status = status, txHash, ticketID = newTicketID, mode = mode, code = code)
+case class IssueFiat(from: String, to: String, transactionID: String, transactionAmount: Int, gas: Int, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None) extends BaseTransaction[IssueFiat] {
+  def mutateTicketID(newTicketID: String): IssueFiat = IssueFiat(from = from, to = to, transactionID = transactionID, transactionAmount = transactionAmount, gas = gas, status = status, txHash, ticketID = newTicketID, mode = mode, code = code)
 }
 
 

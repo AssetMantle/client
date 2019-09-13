@@ -144,6 +144,9 @@ object FileOperations {
     }
   }
 
-  def fetchFile(path: String, fileName: String) = new java.io.File(path + fileName)
+  def fetchFile(path: String, fileName: String): File = {
+    val file = new java.io.File(path + fileName)
+    if (!file.exists()) throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION) else file
+  }
 
 }

@@ -1,17 +1,17 @@
-@import models.blockchain.Asset
 @import controllers.actions.LoginState
+@import models.blockchain.Asset
 
-@(releaseAssetList : Seq[Asset])(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
+@(releaseAssetList: Seq[Asset])(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
 
-@for(releaseAsset <- releaseAssetList){
+@for(releaseAsset <- releaseAssetList) {
     <div class="col-md-3">
         <br>
-    <div class="flexItem card-body lightBlue">
-        <div class="leftText">
-            <span class="red">@Messages(constants.Form.OWNER_ADDRESS)</span> : @releaseAsset.ownerAddress <br>
-            <span class="red">@Messages(constants.Form.PEG_HASH)</span> : @releaseAsset.pegHash <br>
-            <button class="btn btn-sm btn-primary" onclick="getForm(jsRoutes.controllers.ReleaseAssetController.releaseAssetForm('@releaseAsset.ownerAddress','@releaseAsset.pegHash'))">@Messages(constants.Form.RELEASE_ASSET)</button>
+        <div class="flexItem card-body lightBlue">
+            <div class="leftText">
+                <span class="red">@Messages(constants.Form.OWNER_ADDRESS)</span>: @releaseAsset.ownerAddress <br>
+                <span class="red">@Messages(constants.Form.PEG_HASH)</span>: @releaseAsset.pegHash <br>
+                <button class="btn btn-sm btn-primary" onclick="getForm(jsRoutes.controllers.ReleaseAssetController.releaseAssetForm('@releaseAsset.ownerAddress', '@releaseAsset.pegHash'))">@Messages(constants.Form.RELEASE_ASSET)</button>
+            </div>
         </div>
-    </div>
     </div>
 }

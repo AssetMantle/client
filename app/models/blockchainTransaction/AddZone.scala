@@ -16,8 +16,8 @@ import scala.concurrent.duration.{Duration, _}
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class AddZone(from: String, to: String, zoneID: String, status: Option[Boolean], txHash: Option[String], ticketID: String, mode: String, code: Option[String]) extends BaseTransaction[AddZone] {
-  def mutateTicketID(newTicketID: String): AddZone = AddZone(from = from, to = to, zoneID = zoneID, status = status, txHash = txHash, ticketID = newTicketID, mode = mode, code = code)
+case class AddZone(from: String, to: String, zoneID: String, gas: Int, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None) extends BaseTransaction[AddZone] {
+  def mutateTicketID(newTicketID: String): AddZone = AddZone(from = from, to = to, zoneID = zoneID, gas = gas, status = status, txHash = txHash, ticketID = newTicketID, mode = mode, code = code)
 }
 
 @Singleton
@@ -110,13 +110,15 @@ class AddZones @Inject()(actorSystem: ActorSystem, transaction: utilities.Transa
 
   private[models] class AddZoneTable(tag: Tag) extends Table[AddZone](tag, "AddZone") {
 
-    def * = (from, to, zoneID, status.?, txHash.?, ticketID, mode, code.?) <> (AddZone.tupled, AddZone.unapply)
+    def * = (from, to, zoneID, gas, status.?, txHash.?, ticketID, mode, code.?) <> (AddZone.tupled, AddZone.unapply)
 
     def from = column[String]("from")
 
     def to = column[String]("to")
 
     def zoneID = column[String]("zoneID")
+
+    def gas = column[Int]("gas")
 
     def status = column[Boolean]("status")
 
@@ -131,7 +133,7 @@ class AddZones @Inject()(actorSystem: ActorSystem, transaction: utilities.Transa
 
   object Service {
 
-    def create(addZone: AddZone): String = Await.result(add(AddZone(from = addZone.from, to = addZone.to, zoneID = addZone.zoneID, status = addZone.status, txHash = addZone.txHash, ticketID = addZone.ticketID, mode = addZone.mode, code = addZone.code)), Duration.Inf)
+    def create(addZone: AddZone): String = Await.result(add(AddZone(from = addZone.from, to = addZone.to, zoneID = addZone.zoneID, gas = addZone.gas, status = addZone.status, txHash = addZone.txHash, ticketID = addZone.ticketID, mode = addZone.mode, code = addZone.code)), Duration.Inf)
 
     def markTransactionSuccessful(ticketID: String, txHash: String): Int = Await.result(updateTxHashAndStatusOnTicketID(ticketID, Option(txHash), status = Option(true)), Duration.Inf)
 

@@ -9,9 +9,9 @@ import slick.jdbc.JdbcProfile
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
-import scala.util.{Failure, Random, Success}
+import scala.util.{Failure, Success}
 
-case class IssueAssetRequest(id: String, ticketID: Option[String], accountID: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, takerAddress: Option[String], status: Option[Boolean], comment: Option[String])
+case class IssueAssetRequest(id: String, ticketID: Option[String] = None, accountID: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, takerAddress: Option[String] = None, gas: Option[Int] = None, status: Option[Boolean] = None, comment: Option[String] = None)
 
 @Singleton
 class IssueAssetRequests @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
@@ -29,9 +29,7 @@ class IssueAssetRequests @Inject()(protected val databaseConfigProvider: Databas
   private[models] val issueAssetRequestTable = TableQuery[IssueAssetRequestTable]
 
   private def add(issueAssetRequest: IssueAssetRequest): Future[String] = db.run((issueAssetRequestTable returning issueAssetRequestTable.map(_.id) += issueAssetRequest).asTry).map {
-    case Success(result) =>
-      println(Thread.currentThread().getName + "inside add")
-      result
+    case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
         throw new BaseException(constants.Response.PSQL_EXCEPTION)
@@ -46,7 +44,7 @@ class IssueAssetRequests @Inject()(protected val databaseConfigProvider: Databas
     }
   }
 
-  private def updateTicketIDAndStatusByID(id: String, ticketID: String, status: Boolean) = db.run(issueAssetRequestTable.filter(_.id === id).map(faucet => (faucet.ticketID, faucet.status)).update((ticketID, status)).asTry).map {
+  private def updateTicketIDGasAndStatusByID(id: String, ticketID: String, gas: Option[Int], status: Boolean) = db.run(issueAssetRequestTable.filter(_.id === id).map(issueAssetRequest => (issueAssetRequest.ticketID, issueAssetRequest.gas.?, issueAssetRequest.status)).update((ticketID, gas, status)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -88,7 +86,7 @@ class IssueAssetRequests @Inject()(protected val databaseConfigProvider: Databas
 
   private[models] class IssueAssetRequestTable(tag: Tag) extends Table[IssueAssetRequest](tag, "IssueAssetRequest") {
 
-    def * = (id, ticketID.?, accountID, documentHash, assetType, assetPrice, quantityUnit, assetQuantity, takerAddress.?, status.?, comment.?) <> (IssueAssetRequest.tupled, IssueAssetRequest.unapply)
+    def * = (id, ticketID.?, accountID, documentHash, assetType, assetPrice, quantityUnit, assetQuantity, takerAddress.?, gas.?, status.?, comment.?) <> (IssueAssetRequest.tupled, IssueAssetRequest.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
@@ -118,11 +116,9 @@ class IssueAssetRequests @Inject()(protected val databaseConfigProvider: Databas
 
   object Service {
 
-    def create(accountID: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, takerAddress: Option[String]): String = {
-      println(Thread.currentThread().getName + "whatthefuck")
-      Await.result(add(IssueAssetRequest(id = utilities.IDGenerator.requestID(), null, accountID = accountID, documentHash = documentHash, assetType = assetType, assetPrice = assetPrice, quantityUnit = quantityUnit, assetQuantity = assetQuantity, takerAddress = takerAddress, null, null)), Duration.Inf)
-    }
-    def accept(id: String, ticketID: String): Int = Await.result(updateTicketIDAndStatusByID(id, ticketID, status = true), Duration.Inf)
+    def create(accountID: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, takerAddress: Option[String]): String = Await.result(add(IssueAssetRequest(id = utilities.IDGenerator.requestID, accountID = accountID, documentHash = documentHash, assetType = assetType, assetPrice = assetPrice, quantityUnit = quantityUnit, assetQuantity = assetQuantity, takerAddress = takerAddress)), Duration.Inf)
+
+    def accept(id: String, ticketID: String, gas: Int): Int = Await.result(updateTicketIDGasAndStatusByID(id = id, ticketID = ticketID, gas = Option(gas), status = true), Duration.Inf)
 
     def reject(id: String, comment: String): Int = Await.result(updateStatusAndCommentByID(id = id, status = Option(false), comment = comment), Duration.Inf)
 

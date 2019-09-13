@@ -1,6 +1,6 @@
 package models.masterTransaction
 
-import actors.ShutdownActors
+import actors.ShutdownActor
 import akka.actor.ActorSystem
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
@@ -18,7 +18,7 @@ import scala.util.{Failure, Success}
 case class AccountToken(id: String, notificationToken: Option[String], sessionTokenHash: Option[String], sessionTokenTime: Option[Long])
 
 @Singleton
-class AccountTokens @Inject()(actorSystem: ActorSystem, shutdownActors: ShutdownActors, masterAccounts: master.Accounts, protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext, configuration: Configuration) {
+class AccountTokens @Inject()(actorSystem: ActorSystem, shutdownActors: ShutdownActor, masterAccounts: master.Accounts, protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
   private implicit val module: String = constants.Module.MASTER_TRANSACTION_ACCOUNT_TOKEN
 
@@ -123,9 +123,9 @@ class AccountTokens @Inject()(actorSystem: ActorSystem, shutdownActors: Shutdown
   }
 
   object Service {
-    def insertOrUpdate(username: String, notificationToken: String): Int = Await.result(upsert(AccountToken(username, null, Option(notificationToken), Option(DateTime.now(DateTimeZone.UTC).getMillis))), Duration.Inf)
+    def insertOrUpdate(username: String, notificationToken: String): Int = Await.result(upsert(AccountToken(username, None, Option(notificationToken), Option(DateTime.now(DateTimeZone.UTC).getMillis))), Duration.Inf)
 
-    def updateToken(id: String, notificationToken: String): Int = Await.result(upsert(AccountToken(id, Option(notificationToken), null, Option(DateTime.now(DateTimeZone.UTC).getMillis))), Duration.Inf)
+    def updateToken(id: String, notificationToken: String): Int = Await.result(upsert(AccountToken(id, Option(notificationToken), None, Option(DateTime.now(DateTimeZone.UTC).getMillis))), Duration.Inf)
 
     def getTokenById(id: String): Option[String] = Await.result(findById(id), Duration.Inf).notificationToken
 
@@ -157,9 +157,9 @@ class AccountTokens @Inject()(actorSystem: ActorSystem, shutdownActors: Shutdown
       sessionToken
     }
 
-    def resetSessionTokenTime(username: String): Int = Await.result(setSessionTokenTimeById(username, null), Duration.Inf)
+    def resetSessionTokenTime(username: String): Int = Await.result(setSessionTokenTimeById(username, None), Duration.Inf)
 
-    def resetSessionTokenTimeByIds(usernames: Seq[String]): Int = Await.result(setSessionTokenTimeByIds(usernames, null), Duration.Inf)
+    def resetSessionTokenTimeByIds(usernames: Seq[String]): Int = Await.result(setSessionTokenTimeByIds(usernames, None), Duration.Inf)
 
     def getTimedOutIds: Seq[String] = Await.result(getSessionTimedOutIds, Duration.Inf)
 

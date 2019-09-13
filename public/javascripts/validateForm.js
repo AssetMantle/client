@@ -48,16 +48,16 @@ function validateElement(id) {
         }
 
         if (noOfInfoElements == 2) {
-            let firstInfoElement = ddElement[0].innerHTML.split(" ");
-            if (firstInfoElement[0] === "Minimum") {
-                if (inputValue < parseInt(firstInfoElement[2].replace(/,/g, ""))) {
+            let firstInfoElementArray = ddElement[0].innerHTML.split(" ");
+            if (firstInfoElementArray[0] === "Minimum") {
+                if (inputValue < parseInt(firstInfoElementArray[2].replace(/,/g, ""))) {
                     $("#" + id).css('border-color', 'red');
                     $("#" + id + '_field').append("<dd class=\"error\">Must be greater than or equal to " + ddElement[0].innerHTML.split(" ")[2] + "</dd>");
                     formValidationBoolean = false;
                     return
                 }
-            } else if (firstInfoElement[0] === "Maximum") {
-                if (inputValue > parseInt(firstInfoElement[2].replace(/,/g, ""))) {
+            } else if (firstInfoElementArray[0] === "Maximum") {
+                if (inputValue > parseInt(firstInfoElementArray[2].replace(/,/g, ""))) {
                     $("#" + id).css('border-color', 'red');
                     $("#" + id + '_field').append("<dd class=\"error\">Must be less than or equal to " + ddElement[0].innerHTML.split(" ")[2] + "</dd>");
                     formValidationBoolean = false;
@@ -65,24 +65,22 @@ function validateElement(id) {
                 }
             }
         } else if (noOfInfoElements == 3) {
-            let firstInfoElement = ddElement[0].innerHTML.split(" ");
+            let firstInfoElementArray = ddElement[0].innerHTML.split(" ");
+            let secondInfoElementArray = ddElement[1].innerHTML.split(" ");
 
-
-            let secondInfoElement = ddElement[1].innerHTML.split(" ");
-
-            if (firstInfoElement[0] === "Minimum") {
-                if (inputValue < parseInt(firstInfoElement[2].replace(/,/g, ""))) {
+            if (firstInfoElementArray[0] === "Minimum") {
+                if (inputValue < parseInt(firstInfoElementArray[2].replace(/,/g, ""))) {
                     $("#" + id).css('border-color', 'red');
-                    $("#" + id + '_field').append("<dd class=\"error\">Must be greater than or equal to " + firstInfoElement[2] + "</dd>");
+                    $("#" + id + '_field').append("<dd class=\"error\">Must be greater than or equal to " + firstInfoElementArray[2] + "</dd>");
                     formValidationBoolean = false;
                     return
                 }
             }
-            if (secondInfoElement[0] === "Maximum") {
+            if (secondInfoElementArray[0] === "Maximum") {
 
-                if (inputValue > parseInt(secondInfoElement[2].replace(/,/g, ""))) {
+                if (inputValue > parseInt(secondInfoElementArray[2].replace(/,/g, ""))) {
                     $("#" + id).css('border-color', 'red');
-                    $("#" + id + '_field').append("<dd class=\"error\">Must be less than or equal to " + secondInfoElement[2] + "</dd>");
+                    $("#" + id + '_field').append("<dd class=\"error\">Must be less than or equal to " + secondInfoElementArray[2] + "</dd>");
                     formValidationBoolean = false;
                     return
                 }
@@ -97,40 +95,40 @@ function validateElement(id) {
         if (newRegEx.test(document.getElementById(id).value)) {
 
             if (noOfInfoElements === 2) {
-                let firstInfoElement = ddElement[0].innerHTML.split(" ");
-                if (firstInfoElement[0] === "Minimum") {
-                    if (inputValue.length < parseInt(firstInfoElement[2])) {
+                let firstInfoElementArray = ddElement[0].innerHTML.split(" ");
+                if (firstInfoElementArray[0] === "Minimum") {
+                    if (inputValue.length < parseInt(firstInfoElementArray[2])) {
                         $("#" + id).css('border-color', 'red');
-                        $("#" + id + '_field').append("<dd class=\"error\">Minimum length is " + firstInfoElement[2] + "</dd>");
+                        $("#" + id + '_field').append("<dd class=\"error\">Minimum length is " + firstInfoElementArray[2] + "</dd>");
                         formValidationBoolean = false;
 
                         return
                     }
-                } else if (firstInfoElement[0] === "Maximum") {
-                    if (inputValue.length > parseInt(firstInfoElement[2])) {
+                } else if (firstInfoElementArray[0] === "Maximum") {
+                    if (inputValue.length > parseInt(firstInfoElementArray[2])) {
                         $("#" + id).css('border-color', 'red');
-                        $("#" + id + '_field').append("<dd class=\"error\">Maximum length is " + firstInfoElement[2] + "</dd>");
+                        $("#" + id + '_field').append("<dd class=\"error\">Maximum length is " + firstInfoElementArray[2] + "</dd>");
                         formValidationBoolean = false;
 
                         return
                     }
                 }
             } else if (noOfInfoElements === 3) {
-                let firstInfoElement = ddElement[0].innerHTML.split(" ");
-                let secondInfoElement = ddElement[1].innerHTML.split(" ");
+                let firstInfoElementArray = ddElement[0].innerHTML.split(" ");
+                let secondInfoElementArray = ddElement[1].innerHTML.split(" ");
 
-                if (firstInfoElement[0] === "Minimum") {
-                    if (inputValue.length < parseInt(firstInfoElement[2])) {
+                if (firstInfoElementArray[0] === "Minimum") {
+                    if (inputValue.length < parseInt(firstInfoElementArray[2])) {
                         $("#" + id).css('border-color', 'red');
-                        $("#" + id + '_field').append("<dd class=\"error\">Minimum length is " + firstInfoElement[2] + "</dd>");
+                        $("#" + id + '_field').append("<dd class=\"error\">Minimum length is " + firstInfoElementArray[2] + "</dd>");
                         formValidationBoolean = false;
                         return
                     }
                 }
-                if (secondInfoElement[0] === "Maximum") {
-                    if (inputValue.length > parseInt(secondInfoElement[2])) {
+                if (secondInfoElementArray[0] === "Maximum") {
+                    if (inputValue.length > parseInt(secondInfoElementArray[2])) {
                         $("#" + id).css('border-color', 'red');
-                        $("#" + id + '_field').append("<dd class=\"error\">Maximum length is " + secondInfoElement[2] + "</dd>");
+                        $("#" + id + '_field').append("<dd class=\"error\">Maximum length is " + secondInfoElementArray[2] + "</dd>");
                         formValidationBoolean = false;
                         return
                     }

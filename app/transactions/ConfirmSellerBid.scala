@@ -35,9 +35,9 @@ class ConfirmSellerBid @Inject()(wsClient: WSClient)(implicit configuration: Con
 
   private def action(request: Request): Future[WSResponse] = wsClient.url(url).post(Json.toJson(request))
 
-  case class BaseRequest(from: String, chain_id: String = chainID)
+  case class BaseRequest(from: String, chain_id: String = chainID, gas: String)
 
-  case class Request(base_req: BaseRequest, password: String, to: String, bid: String, time: String, pegHash: String, sellerContractHash: String,gas:String , mode: String) extends BaseRequestEntity
+  case class Request(base_req: BaseRequest, password: String, to: String, bid: String, time: String, pegHash: String, sellerContractHash: String, mode: String) extends BaseRequestEntity
 
   object Service {
     def post(request: Request): WSResponse = try {

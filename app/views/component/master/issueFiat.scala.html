@@ -1,6 +1,6 @@
+@import controllers.actions.LoginState
 @import helper._
 @import views.companion.master.IssueFiat
-@import controllers.actions.LoginState
 
 @(issueFiatForm: Form[IssueFiat.Data], requestID: String, accountID: String, transactionID: String, transactionAmount: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 
@@ -8,26 +8,23 @@
     <div class="latest_card-header latest_card-header-primary text-center">
         <h4 class="latest_card-title">@Messages(constants.Form.ISSUE_FIAT)</h4>
     </div>
-    <div>
-   <div class="latest_card-body">
-    @CSRF.formField
-    @inputText(issueFiatForm(constants.FormField.REQUEST_ID.name).copy(value = Some(requestID)), '_label -> Messages(constants.FormField.REQUEST_ID.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.REQUEST_ID.name),'required->true)
-    @inputText(issueFiatForm(constants.FormField.ACCOUNT_ID.name).copy(value = Some(accountID)), '_label -> Messages(constants.FormField.ACCOUNT_ID.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.ACCOUNT_ID.name),'required->true)
-    @inputText(issueFiatForm(constants.FormField.TRANSACTION_ID.name).copy(value = Some(transactionID)), '_label -> Messages(constants.FormField.TRANSACTION_ID.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.TRANSACTION_ID.name),'required->true)
-       @inputText(issueFiatForm(constants.FormField.TRANSACTION_AMOUNT.name).copy(value = Some(transactionAmount.toString)), '_label -> Messages(constants.FormField.TRANSACTION_AMOUNT.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.TRANSACTION_AMOUNT.name), 'required -> true, 'type -> "number")
-       @inputText(issueFiatForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.GAS.name), 'required -> true, 'type -> "number")
-    @inputPassword(issueFiatForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name),
-        'class -> "form-control",'placeholder->Messages(constants.FormField.PASSWORD.name),'required->true)
+    <div class="latest_card-body">
+        @CSRF.formField
+        @inputText(issueFiatForm(constants.FormField.REQUEST_ID.name).copy(value = Some(requestID)), '_label -> Messages(constants.FormField.REQUEST_ID.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.REQUEST_ID.name), 'required -> true)
+        @inputText(issueFiatForm(constants.FormField.ACCOUNT_ID.name).copy(value = Some(accountID)), '_label -> Messages(constants.FormField.ACCOUNT_ID.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.ACCOUNT_ID.name), 'required -> true)
+        @inputText(issueFiatForm(constants.FormField.TRANSACTION_ID.name).copy(value = Some(transactionID)), '_label -> Messages(constants.FormField.TRANSACTION_ID.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.TRANSACTION_ID.name), 'required -> true)
+        @inputText(issueFiatForm(constants.FormField.TRANSACTION_AMOUNT.name).copy(value = Some(transactionAmount.toString)), '_label -> Messages(constants.FormField.TRANSACTION_AMOUNT.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.TRANSACTION_AMOUNT.name), 'required -> true, 'type -> "number")
+        @inputText(issueFiatForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.GAS.name), 'required -> true, 'type -> "number")
+        @inputPassword(issueFiatForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name),
+            'class -> "form-control", 'placeholder -> Messages(constants.FormField.PASSWORD.name), 'required -> true)
 
-    @if(issueFiatForm.hasGlobalErrors) {
-        <ul>
-        @for(error <- issueFiatForm.globalErrors) {
-            <li>@error.format</li>
+        @if(issueFiatForm.hasGlobalErrors) {
+            <ul>
+            @for(error <- issueFiatForm.globalErrors) {
+                <li>@error.format</li>
+            }
+            </ul>
         }
-        </ul>
-    }
-    <button type="button" class="btn btn-sm btn-primary" onclick="submitForm(this)">@Messages(constants.Form.ISSUE_FIAT)</button>
-
-   </div>
+        <button type="button" class="btn btn-sm btn-primary" onclick="submitForm(this)">@Messages(constants.Form.ISSUE_FIAT)</button>
     </div>
-   }
+}

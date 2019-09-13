@@ -16,8 +16,8 @@ import scala.concurrent.duration.{Duration, _}
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class AddOrganization(from: String, to: String, organizationID: String, zoneID: String, status: Option[Boolean], txHash: Option[String], ticketID: String, mode: String, code: Option[String]) extends BaseTransaction[AddOrganization] {
-  def mutateTicketID(newTicketID: String): AddOrganization = AddOrganization(from = from, to = to, organizationID = organizationID, zoneID = zoneID, status = status, txHash = txHash, ticketID = newTicketID, mode = mode, code = code)
+case class AddOrganization(from: String, to: String, organizationID: String, zoneID: String, gas: Int, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None) extends BaseTransaction[AddOrganization] {
+  def mutateTicketID(newTicketID: String): AddOrganization = AddOrganization(from = from, to = to, organizationID = organizationID, zoneID = zoneID, gas = gas, status = status, txHash = txHash, ticketID = newTicketID, mode = mode, code = code)
 }
 
 @Singleton
@@ -110,7 +110,7 @@ class AddOrganizations @Inject()(actorSystem: ActorSystem, transaction: utilitie
 
   private[models] class AddOrganizationTable(tag: Tag) extends Table[AddOrganization](tag, "AddOrganization") {
 
-    def * = (from, to, organizationID, zoneID, status.?, txHash.?, ticketID, mode, code.?) <> (AddOrganization.tupled, AddOrganization.unapply)
+    def * = (from, to, organizationID, zoneID, gas, status.?, txHash.?, ticketID, mode, code.?) <> (AddOrganization.tupled, AddOrganization.unapply)
 
     def from = column[String]("from")
 
@@ -119,6 +119,8 @@ class AddOrganizations @Inject()(actorSystem: ActorSystem, transaction: utilitie
     def organizationID = column[String]("organizationID")
 
     def zoneID = column[String]("zoneID")
+
+    def gas = column[Int]("gas")
 
     def status = column[Boolean]("status")
 
@@ -133,7 +135,7 @@ class AddOrganizations @Inject()(actorSystem: ActorSystem, transaction: utilitie
 
   object Service {
 
-    def create(addOrganization: AddOrganization): String = Await.result(add(AddOrganization(from = addOrganization.from, to = addOrganization.to, organizationID = addOrganization.organizationID, zoneID = addOrganization.zoneID, status = addOrganization.status, txHash = addOrganization.txHash, ticketID = addOrganization.ticketID, mode = addOrganization.mode, code = addOrganization.code)), Duration.Inf)
+    def create(addOrganization: AddOrganization): String = Await.result(add(AddOrganization(from = addOrganization.from, to = addOrganization.to, organizationID = addOrganization.organizationID, zoneID = addOrganization.zoneID, gas = addOrganization.gas, status = addOrganization.status, txHash = addOrganization.txHash, ticketID = addOrganization.ticketID, mode = addOrganization.mode, code = addOrganization.code)), Duration.Inf)
 
     def markTransactionSuccessful(ticketID: String, txHash: String): Int = Await.result(updateTxHashAndStatusOnTicketID(ticketID, txHash = Option(txHash), status = Option(true)), Duration.Inf)
 
@@ -154,7 +156,7 @@ class AddOrganizations @Inject()(actorSystem: ActorSystem, transaction: utilitie
         Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
         val addOrganization = Service.getTransaction(ticketID)
         blockchainOrganizations.Service.create(addOrganization.organizationID, addOrganization.to, dirtyBit = true)
-        masterOrganizations.Service.updateStatus(addOrganization.organizationID, status = true)
+        masterOrganizations.Service.verifyOrganization(addOrganization.organizationID)
         masterAccounts.Service.updateUserType(masterOrganizations.Service.getAccountId(addOrganization.organizationID), constants.User.ORGANIZATION)
         val organizationAccountId = masterAccounts.Service.getId(addOrganization.to)
         masterOrganizationKYCs.Service.verifyAll(organizationAccountId)

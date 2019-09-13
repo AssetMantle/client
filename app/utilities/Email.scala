@@ -1,6 +1,6 @@
 package utilities
 
-import controllers.routes
+
 import exceptions.BaseException
 import javax.inject.Inject
 import models.master.{Accounts, Contacts}
@@ -23,7 +23,7 @@ class Email @Inject()(mailerClient: MailerClient, contacts: Contacts, accounts: 
         from = fromAddress,
         to = Seq(contacts.Service.getEmailAddress(accountID)),
         attachments = Seq(),
-        bodyHtml = Some(views.html.component.master.emailTemplate(passedData(0)).toString()),
+        bodyHtml = Some(messagesApi(module + "Message" + "." + messageType + " " + passedData(0))),
       )
       mailerClient.send(email)
     }

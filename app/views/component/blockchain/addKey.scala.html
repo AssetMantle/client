@@ -9,7 +9,7 @@
     <div class="latest_card-body">
         @CSRF.formField
         @inputText(addKeyFrom(constants.FormField.NAME.name), '_label -> Messages(constants.FormField.NAME.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.NAME.name), 'required -> true)
-        @inputPassword(addKeyFrom(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name),'class -> "form-control", 'placeholder -> Messages(constants.FormField.PASSWORD.name), 'required -> true)
+        @inputPassword(addKeyFrom(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.PASSWORD.name), 'required -> true)
 
         @if(addKeyFrom.hasGlobalErrors) {
             <ul>

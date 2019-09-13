@@ -1,27 +1,62 @@
-@import helper._
-@import views.companion.master.AddOrganization
 @import controllers.actions.LoginState
+@import helper._
+@import models.master.Zone
+@import views.companion.master.AddOrganization
 
-@(addOrganizationForm: Form[AddOrganization.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@(addOrganizationForm: Form[AddOrganization.Data], zones: Seq[Zone])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 @form(action = routes.AddOrganizationController.addOrganization, 'onkeypress -> "validateForm(event,this)") {
     <div class="latest_card-header latest_card-header-primary text-center">
         <h4 class="latest_card-title">@Messages(constants.Form.ADD_ORGANIZATION)</h4>
     </div>
     <div class="latest_card-body">
-    @CSRF.formField
-    @inputText(addOrganizationForm(constants.FormField.ZONE_ID.name), '_label -> Messages(constants.FormField.ZONE_ID.name),'class -> "form-control", 'placeholder->Messages(constants.FormField.ZONE_ID.name),'required->true)
-    @inputText(addOrganizationForm(constants.FormField.NAME.name), '_label -> Messages(constants.FormField.NAME.name),'class -> "form-control", 'placeholder->Messages(constants.FormField.NAME.name),'required->true)
-    @inputText(addOrganizationForm(constants.FormField.ADDRESS.name), '_label -> Messages(constants.FormField.ADDRESS.name),'class -> "form-control", 'placeholder->Messages(constants.FormField.ADDRESS.name),'required->true)
-    @inputText(addOrganizationForm(constants.FormField.MOBILE_NUMBER.name), '_label -> Messages(constants.FormField.MOBILE_NUMBER.name),'class -> "form-control", 'placeholder->Messages(constants.FormField.MOBILE_NUMBER.name),'required->true)
-    @inputText(addOrganizationForm(constants.FormField.EMAIL_ADDRESS.name), '_label -> Messages(constants.FormField.EMAIL_ADDRESS.name),'class -> "form-control", 'placeholder->Messages(constants.FormField.EMAIL_ADDRESS.name),'required->true)
+        @CSRF.formField
+        <div id="allZones">
+        @for(zone <- zones) {
+            <button type="button" class="btn-sm btn btn-primary" onclick="fillZoneIDField('@zone.id')">@Messages(constants.Form.NAME)
+                : @zone.name <br>
+                @Messages(constants.Form.CURRENCY): @zone.currency <br>
+                @Messages(constants.Form.ZONE_ID): @zone.id <br>
+            </button>
+            <br>
+            }
+        </div>
+        @inputText(addOrganizationForm(constants.FormField.ZONE_ID.name), '_label -> Messages(constants.FormField.ZONE_ID.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.ZONE_ID.name), 'id -> "zoneID", 'required -> true)
+        @inputText(addOrganizationForm(constants.FormField.NAME.name), '_label -> Messages(constants.FormField.NAME.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.NAME.name), 'required -> true)
+        @inputText(addOrganizationForm(constants.FormField.ABBREVIATION.name), '_label -> Messages(constants.FormField.ABBREVIATION.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.ABBREVIATION.name), 'required -> false)
+        @inputDate(addOrganizationForm(constants.FormField.ESTABLISHMENT_DATE.name), '_label -> Messages(constants.FormField.ESTABLISHMENT_DATE.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.ESTABLISHMENT_DATE.name), 'required -> true)
+        @inputText(addOrganizationForm(constants.FormField.EMAIL_ADDRESS.name), '_label -> Messages(constants.FormField.EMAIL_ADDRESS.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.EMAIL_ADDRESS.name), 'required -> true)
 
-    @if(addOrganizationForm.hasGlobalErrors) {
-        <ul>
-        @for(error <- addOrganizationForm.globalErrors) {
-            <li>@error.format</li>
+        @Messages(constants.Form.REGISTERED_ADDRESS):
+        @inputText(addOrganizationForm(constants.FormField.REGISTERED_ADDRESS_LINE_1.name), '_label -> Messages(constants.FormField.REGISTERED_ADDRESS_LINE_1.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.REGISTERED_ADDRESS_LINE_1.name), 'id -> "registeredAddressLine1", 'required -> true)
+        @inputText(addOrganizationForm(constants.FormField.REGISTERED_ADDRESS_LINE_2.name), '_label -> Messages(constants.FormField.REGISTERED_ADDRESS_LINE_2.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.REGISTERED_ADDRESS_LINE_2.name), 'id -> "registeredAddressLine2", 'required -> true)
+        @inputText(addOrganizationForm(constants.FormField.REGISTERED_LANDMARK.name), '_label -> Messages(constants.FormField.REGISTERED_LANDMARK.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.REGISTERED_LANDMARK.name), 'id -> "registeredLandmark", 'required -> true)
+        @inputText(addOrganizationForm(constants.FormField.REGISTERED_CITY.name), '_label -> Messages(constants.FormField.REGISTERED_CITY.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.REGISTERED_CITY.name), 'id -> "registeredCity", 'required -> true)
+        @inputText(addOrganizationForm(constants.FormField.REGISTERED_COUNTRY.name), '_label -> Messages(constants.FormField.REGISTERED_COUNTRY.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.REGISTERED_COUNTRY.name), 'id -> "registeredCountry", 'required -> true)
+        @inputText(addOrganizationForm(constants.FormField.REGISTERED_ZIP_CODE.name), '_label -> Messages(constants.FormField.REGISTERED_ZIP_CODE.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.REGISTERED_ZIP_CODE.name), 'id -> "registeredZipCode", 'required -> true)
+        @inputText(addOrganizationForm(constants.FormField.REGISTERED_PHONE.name), '_label -> Messages(constants.FormField.REGISTERED_PHONE.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.REGISTERED_PHONE.name), 'id -> "registeredPhone", 'required -> true)
+
+        <div>
+            @Messages(constants.Form.SAME_AS_REGISTERED_ADDRESS):
+            @checkbox(Field(form = Form(constants.FormField.SEARCH_TX_HASH_HEIGHT.field), name = constants.FormField.SEARCH_TX_HASH_HEIGHT.name, constraints = Seq(), format = None, errors = Seq(), value = None), 'id -> "organizationKYCSameAsRegisteredAddress", 'label -> Messages(constants.Form.SAME_AS_REGISTERED_ADDRESS))
+        </div>
+
+        @Messages(constants.Form.POSTAL_ADDRESS):
+        @inputText(addOrganizationForm(constants.FormField.POSTAL_ADDRESS_LINE_1.name), '_label -> Messages(constants.FormField.POSTAL_ADDRESS_LINE_1.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.POSTAL_ADDRESS_LINE_1.name), 'id -> "postalAddressLine1", 'required -> true)
+        @inputText(addOrganizationForm(constants.FormField.POSTAL_ADDRESS_LINE_2.name), '_label -> Messages(constants.FormField.POSTAL_ADDRESS_LINE_2.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.POSTAL_ADDRESS_LINE_2.name), 'id -> "postalAddressLine2", 'required -> true)
+        @inputText(addOrganizationForm(constants.FormField.POSTAL_LANDMARK.name), '_label -> Messages(constants.FormField.POSTAL_LANDMARK.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.POSTAL_LANDMARK.name), 'id -> "postalLandmark", 'required -> false)
+        @inputText(addOrganizationForm(constants.FormField.POSTAL_CITY.name), '_label -> Messages(constants.FormField.POSTAL_CITY.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.POSTAL_CITY.name), 'id -> "postalCity", 'required -> true)
+        @inputText(addOrganizationForm(constants.FormField.POSTAL_COUNTRY.name), '_label -> Messages(constants.FormField.POSTAL_COUNTRY.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.POSTAL_COUNTRY.name), 'id -> "postalCountry", 'required -> true)
+        @inputText(addOrganizationForm(constants.FormField.POSTAL_ZIP_CODE.name), '_label -> Messages(constants.FormField.POSTAL_ZIP_CODE.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.POSTAL_ZIP_CODE.name), 'id -> "postalZipCode", 'required -> true)
+        @inputText(addOrganizationForm(constants.FormField.POSTAL_PHONE.name), '_label -> Messages(constants.FormField.POSTAL_PHONE.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.POSTAL_PHONE.name), 'id -> "postalPhone", 'required -> true)
+
+        @if(addOrganizationForm.hasGlobalErrors) {
+            <ul>
+            @for(error <- addOrganizationForm.globalErrors) {
+                <li>@error.format</li>
+            }
+            </ul>
         }
-        </ul>
-    }
-    <button type="button" class="btn-sm btn btn-primary" onclick="submitForm(this)">@Messages(constants.Form.ADD_ORGANIZATION)</button>
+        <button type="button" class="btn-sm btn btn-primary" onclick="submitForm(this)">@Messages(constants.Form.NEXT)</button>
     </div>
-    }
+    <script src="@routes.Assets.versioned("javascripts/addOrganization.js")" type="text/javascript"></script>
+}

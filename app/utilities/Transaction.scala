@@ -10,7 +10,6 @@ import transactions.responses.TransactionResponse.{AsyncResponse, BlockResponse,
 import transactions.{GetResponse, GetTxHashResponse}
 
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.Random
 
 @Singleton
 class Transaction @Inject()(getTxHashResponse: GetTxHashResponse, getResponse: GetResponse)(implicit executionContext: ExecutionContext, configuration: Configuration, wsClient: WSClient) {
@@ -19,9 +18,9 @@ class Transaction @Inject()(getTxHashResponse: GetTxHashResponse, getResponse: G
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
-  def process[T1 <: BaseTransaction[T1], T2 <: BaseRequestEntity](entity: T1, blockchainTransactionCreate: T1 => String, request: T2, action: T2 => WSResponse,  onSuccess: (String, BlockResponse) => Unit, onFailure: (String, String) => Unit, updateTransactionHash:(String, String) => Int)(implicit module:String, logger:Logger): String = {
+  def process[T1 <: BaseTransaction[T1], T2 <: BaseRequestEntity](entity: T1, blockchainTransactionCreate: T1 => String, request: T2, action: T2 => WSResponse, onSuccess: (String, BlockResponse) => Unit, onFailure: (String, String) => Unit, updateTransactionHash: (String, String) => Int)(implicit module: String, logger: Logger): String = {
     try {
-      val ticketID: String = if (kafkaEnabled) utilities.JSON.getResponseFromJson[KafkaResponse](action(request)).ticketID else utilities.IDGenerator.ticketID()
+      val ticketID: String = if (kafkaEnabled) utilities.JSON.getResponseFromJson[KafkaResponse](action(request)).ticketID else utilities.IDGenerator.ticketID
       blockchainTransactionCreate(entity.mutateTicketID(ticketID))
       if (!kafkaEnabled) {
         Future {
@@ -48,7 +47,7 @@ class Transaction @Inject()(getTxHashResponse: GetTxHashResponse, getResponse: G
   }
 
 
-  def ticketUpdater(getTickets: () => Seq[String], getTransactionHash: String => Option[String], onSuccess: (String, BlockResponse) => Unit, onFailure: (String, String) => Unit)(implicit module:String,logger: Logger) {
+  def ticketUpdater(getTickets: () => Seq[String], getTransactionHash: String => Option[String], onSuccess: (String, BlockResponse) => Unit, onFailure: (String, String) => Unit)(implicit module: String, logger: Logger) {
     val ticketIDsSeq: Seq[String] = getTickets()
     for (ticketID <- ticketIDsSeq) {
       try {
@@ -60,9 +59,11 @@ class Transaction @Inject()(getTxHashResponse: GetTxHashResponse, getResponse: G
         }
         if (blockResponse.code.isEmpty) onSuccess(ticketID, blockResponse) else onFailure(ticketID, blockResponse.code.get.toString)
       } catch {
-        case blockChainException: BlockChainException => logger.error(blockChainException.failure.message, blockChainException)
-          if (blockChainException.failure.message != """RESPONSE.FAILURE.{"response":"Request in process, wait and try after some time"}""" || !blockChainException.failure.message.matches("""RESPONSE.FAILURE.{"error":"Tx: response error: RPC error -32603 - Internal error: Tx .\w+. not found"}""")) {
+        case blockChainException: BlockChainException =>
+          if (!blockChainException.failure.message.matches("""RESPONSE.FAILURE.Tx. response error. RPC error -32603 - Internal error. Tx .\w+. not found""")) {
             onFailure(ticketID, blockChainException.failure.message)
+          } else {
+            logger.error(blockChainException.failure.message, blockChainException)
           }
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }

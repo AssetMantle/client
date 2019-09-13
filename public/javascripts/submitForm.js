@@ -16,6 +16,11 @@ function submitForm(source, target = '#commonModalContent') {
                 newDocument.write(data.responseText);
                 newDocument.close();
             },
+            412: function (data) {
+                const newDocument = document.open("text/html", "replace");
+                newDocument.write(data.responseText);
+                newDocument.close();
+            },
             500: function (data) {
                 console.log(data);
                 const newDocument = document.open("text/html", "replace");
@@ -30,6 +35,10 @@ function submitForm(source, target = '#commonModalContent') {
             206: function (data) {
                 $(target).html(data);
             },
+        }
+    }).fail(function (XMLHttpRequest) {
+        if (XMLHttpRequest.readyState === 0) {
+            $('#connectionError').fadeIn(100);
         }
     });
 }

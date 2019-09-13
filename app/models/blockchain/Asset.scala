@@ -1,6 +1,6 @@
 package models.blockchain
 
-import actors.{MainAssetActor, ShutdownActors}
+import actors.{MainAssetActor, ShutdownActor}
 import akka.actor.{ActorRef, ActorSystem}
 import akka.stream.scaladsl.Source
 import akka.stream.{ActorMaterializer, OverflowStrategy}
@@ -25,7 +25,7 @@ case class Asset(pegHash: String, documentHash: String, assetType: String, asset
 case class AssetCometMessage(username: String, message: JsValue)
 
 @Singleton
-class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, actorSystem: ActorSystem, shutdownActors: ShutdownActors, accountTokens: AccountTokens, getAccount: GetAccount, masterAccounts: master.Accounts, implicit val pushNotification: PushNotification)(implicit executionContext: ExecutionContext, configuration: Configuration) {
+class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, actorSystem: ActorSystem, shutdownActors: ShutdownActor, accountTokens: AccountTokens, getAccount: GetAccount, masterAccounts: master.Accounts, implicit val pushNotification: PushNotification)(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -192,7 +192,7 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
       for (dirtyAsset <- dirtyAssets) {
         try {
           val assetPegWallet = getAccount.Service.get(dirtyAsset.ownerAddress).value.assetPegWallet.getOrElse(throw new BaseException(constants.Response.NO_RESPONSE))
-          assetPegWallet.foreach(assetPeg => if (assetPegWallet.map(_.pegHash) contains dirtyAsset.pegHash) Service.insertOrUpdate(pegHash = assetPeg.pegHash, documentHash = assetPeg.documentHash, assetType = assetPeg.assetType, assetPrice = assetPeg.assetPrice, assetQuantity = assetPeg.assetQuantity, quantityUnit = assetPeg.quantityUnit, ownerAddress = dirtyAsset.ownerAddress, locked = assetPeg.locked, moderated = assetPeg.moderated, takerAddress = if (assetPeg.takerAddress == "") null else Option(assetPeg.takerAddress), dirtyBit = false) else Service.deleteAsset(dirtyAsset.pegHash))
+          assetPegWallet.foreach(assetPeg => if (assetPegWallet.map(_.pegHash) contains dirtyAsset.pegHash) Service.insertOrUpdate(pegHash = assetPeg.pegHash, documentHash = assetPeg.documentHash, assetType = assetPeg.assetType, assetPrice = assetPeg.assetPrice, assetQuantity = assetPeg.assetQuantity, quantityUnit = assetPeg.quantityUnit, ownerAddress = dirtyAsset.ownerAddress, locked = assetPeg.locked, moderated = assetPeg.moderated, takerAddress = if (assetPeg.takerAddress == "") None else Option(assetPeg.takerAddress), dirtyBit = false) else Service.deleteAsset(dirtyAsset.pegHash))
           mainAssetActor ! AssetCometMessage(username = masterAccounts.Service.getId(dirtyAsset.ownerAddress), message = Json.toJson(constants.Comet.PING))
         }
         catch {

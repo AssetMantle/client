@@ -17,8 +17,8 @@ import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class SellerExecuteOrder(from: String, buyerAddress: String, sellerAddress: String, awbProofHash: String, pegHash: String,gas:Int,  status: Option[Boolean], txHash: Option[String], ticketID: String, mode: String, code: Option[String]) extends BaseTransaction[SellerExecuteOrder] {
-  def mutateTicketID(newTicketID: String): SellerExecuteOrder = SellerExecuteOrder(from = from, buyerAddress = buyerAddress, sellerAddress = sellerAddress, awbProofHash = awbProofHash, pegHash = pegHash,gas=gas, status = status, txHash, ticketID = newTicketID, mode = mode, code = code)
+case class SellerExecuteOrder(from: String, buyerAddress: String, sellerAddress: String, awbProofHash: String, pegHash: String, gas: Int, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None) extends BaseTransaction[SellerExecuteOrder] {
+  def mutateTicketID(newTicketID: String): SellerExecuteOrder = SellerExecuteOrder(from = from, buyerAddress = buyerAddress, sellerAddress = sellerAddress, awbProofHash = awbProofHash, pegHash = pegHash, gas = gas, status = status, txHash, ticketID = newTicketID, mode = mode, code = code)
 }
 
 
@@ -113,7 +113,7 @@ class SellerExecuteOrders @Inject()(actorSystem: ActorSystem, transaction: utili
 
   private[models] class SellerExecuteOrderTable(tag: Tag) extends Table[SellerExecuteOrder](tag, "SellerExecuteOrder") {
 
-    def * = (from, buyerAddress, sellerAddress, awbProofHash, pegHash,gas, status.?, txHash.?, ticketID, mode, code.?) <> (SellerExecuteOrder.tupled, SellerExecuteOrder.unapply)
+    def * = (from, buyerAddress, sellerAddress, awbProofHash, pegHash, gas, status.?, txHash.?, ticketID, mode, code.?) <> (SellerExecuteOrder.tupled, SellerExecuteOrder.unapply)
 
     def from = column[String]("from")
 

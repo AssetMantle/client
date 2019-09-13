@@ -7,11 +7,11 @@
     <div class="flexItem box thirdBox lightBlue">
         <div class="leftText">
 
-            <span class="red">@Messages(constants.Form.PEG_HASH)</span> : @negotiation.assetPegHash <br>
-            <span class="red">@Messages(constants.Form.BID)</span> : @negotiation.bid <br>
-            <span class="red">@Messages(constants.Form.TIME)</span> : @negotiation.time <br>
+            <span class="red">@Messages(constants.Form.PEG_HASH)</span>: @negotiation.assetPegHash <br>
+            <span class="red">@Messages(constants.Form.BID)</span>: @negotiation.bid <br>
+            <span class="red">@Messages(constants.Form.TIME)</span>: @negotiation.time <br>
             <div class="centerText" >
-                @if(negotiation.sellerSignature.getOrElse(null) == null) {
+                @if(negotiation.sellerSignature.orNull == null) {
                     @loginState.acl match {
                         case Some(acl) => {
                             @if(acl.changeSellerBid) {
@@ -37,17 +37,14 @@
             <button class="showHide btn btn-sm">@Messages(constants.Form.SHOW_HIDE)</button>
             </div>
             <div class="hidden">
-                <span class="red">@Messages(constants.Form.BUYER_ADDRESS)</span> : @negotiation.buyerAddress <br>
+                <span class="red">@Messages(constants.Form.BUYER_ADDRESS)</span>: @negotiation.buyerAddress <br>
                 <span class="red">@Messages(constants.Form.SELLER_ADDRESS)</span>: @negotiation.sellerAddress <br>
-                <span class="red">@Messages(constants.Form.NEGOTIATION_ID)</span> : @negotiation.id <br>
+                <span class="red">@Messages(constants.Form.NEGOTIATION_ID)</span>: @negotiation.id <br>
                 <span class="red">@Messages(constants.Form.BUYER_SIGNATURE)</span>: @negotiation.buyerSignature <br>
                 <span class="red">@Messages(constants.Form.SELLER_SIGNATURE)</span>: @negotiation.sellerSignature <br>
-                <span class="red">@Messages(constants.Form.BUYER_BLOCK_HEIGHT)</span>
-                : @negotiation.buyerBlockHeight <br>
-                <span class="red">@Messages(constants.Form.SELLER_BLOCK_HEIGHT)</span>
-                : @negotiation.sellerBlockHeight <br>
-                <span class="red">@Messages(constants.Form.BUYER_CONTRACT_HASH)</span>
-                : @negotiation.buyerContractHash <br>
+                <span class="red">@Messages(constants.Form.BUYER_BLOCK_HEIGHT)</span>: @negotiation.buyerBlockHeight <br>
+                <span class="red">@Messages(constants.Form.SELLER_BLOCK_HEIGHT)</span>: @negotiation.sellerBlockHeight <br>
+                <span class="red">@Messages(constants.Form.BUYER_CONTRACT_HASH)</span>: @negotiation.buyerContractHash <br>
                 <span class="red">@Messages(constants.Form.SELLER_CONTRACT_HASH)</span>
                 : @negotiation.sellerContractHash <br>
             </div>

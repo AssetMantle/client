@@ -35,9 +35,9 @@ class IssueFiat @Inject()(wsClient: WSClient)(implicit configuration: Configurat
 
   private implicit val requestWrites: OWrites[Request] = Json.writes[Request]
 
-  case class BaseRequest(from: String, chain_id: String = chainID)
+  case class BaseRequest(from: String, chain_id: String = chainID, gas: String)
 
-  case class Request(base_req: BaseRequest, to: String, transactionID: String, transactionAmount: String, gas:String,mode: String, password: String) extends BaseRequestEntity
+  case class Request(base_req: BaseRequest, to: String, transactionID: String, transactionAmount: String, mode: String, password: String) extends BaseRequestEntity
 
   object Service {
     def post(request: Request): WSResponse = try {

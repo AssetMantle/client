@@ -1,6 +1,6 @@
+@import controllers.actions.LoginState
 @import helper._
 @import views.companion.master.RejectFaucetRequest
-@import controllers.actions.LoginState
 
 @(rejectFaucetRequestForm: Form[RejectFaucetRequest.Data], requestID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @form(action = routes.SendCoinController.rejectFaucetRequest, 'onkeypress -> "validateForm(event,this)") {
@@ -8,16 +8,17 @@
         <h4 class="latest_card-title">@Messages(constants.Form.REJECT_FAUCET_REQUEST)</h4>
     </div>
     <div class="latest_card-body">
-    @CSRF.formField
-    @inputText(rejectFaucetRequestForm(constants.FormField.REQUEST_ID.name).copy(value = Some(requestID)), '_label -> Messages(constants.FormField.REQUEST_ID.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.REQUEST_ID.name),'required->true)
-    @inputText(rejectFaucetRequestForm(constants.FormField.COMMENT.name), '_label -> Messages(constants.FormField.COMMENT.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.COMMENT.name),'required->true)
-    @if(rejectFaucetRequestForm.hasGlobalErrors) {
-        <ul>
-        @for(error <- rejectFaucetRequestForm.globalErrors) {
-            <li>@error.format</li>
+        @CSRF.formField
+        @inputText(rejectFaucetRequestForm(constants.FormField.REQUEST_ID.name).copy(value = Some(requestID)), '_label -> Messages(constants.FormField.REQUEST_ID.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.REQUEST_ID.name), 'required -> true)
+        @inputText(rejectFaucetRequestForm(constants.FormField.COMMENT.name), '_label -> Messages(constants.FormField.COMMENT.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.COMMENT.name), 'required -> true)
+
+        @if(rejectFaucetRequestForm.hasGlobalErrors) {
+            <ul>
+            @for(error <- rejectFaucetRequestForm.globalErrors) {
+                <li>@error.format</li>
+            }
+            </ul>
         }
-        </ul>
-    }
-    <button type="button" class="btn btn-sm btn-primary" onclick="submitForm(this)">@Messages(constants.Form.REJECT_FAUCET_REQUEST)</button>
+        <button type="button" class="btn btn-sm btn-primary" onclick="submitForm(this)">@Messages(constants.Form.REJECT_FAUCET_REQUEST)</button>
     </div>
 }

@@ -18,7 +18,7 @@ class ConfirmBuyerBidController @Inject()(messagesControllerComponents: Messages
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private implicit val module:String= constants.Module.CONTROLLERS_CONFIRM_BUYER_BID
+  private implicit val module: String = constants.Module.CONTROLLERS_CONFIRM_BUYER_BID
 
   def confirmBuyerBidForm(sellerAddress: String, pegHash: String, bid: Int): Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.master.confirmBuyerBid(views.companion.master.ConfirmBuyerBid.form, sellerAddress, pegHash, bid))
@@ -33,9 +33,9 @@ class ConfirmBuyerBidController @Inject()(messagesControllerComponents: Messages
         confirmBuyerBidData => {
           try {
             transaction.process[blockchainTransaction.ConfirmBuyerBid, transactionsConfirmBuyerBid.Request](
-              entity = blockchainTransaction.ConfirmBuyerBid(from = loginState.address, to = confirmBuyerBidData.sellerAddress, bid = confirmBuyerBidData.bid, time = confirmBuyerBidData.time, pegHash = confirmBuyerBidData.pegHash, buyerContractHash = confirmBuyerBidData.buyerContractHash,gas=confirmBuyerBidData.gas, status = null, txHash = null, ticketID = "", mode = transactionMode, code = null),
+              entity = blockchainTransaction.ConfirmBuyerBid(from = loginState.address, to = confirmBuyerBidData.sellerAddress, bid = confirmBuyerBidData.bid, time = confirmBuyerBidData.time, pegHash = confirmBuyerBidData.pegHash, buyerContractHash = confirmBuyerBidData.buyerContractHash, gas = confirmBuyerBidData.gas, ticketID = "", mode = transactionMode),
               blockchainTransactionCreate = blockchainTransactionConfirmBuyerBids.Service.create,
-              request = transactionsConfirmBuyerBid.Request(transactionsConfirmBuyerBid.BaseRequest(from = loginState.address), to = confirmBuyerBidData.sellerAddress, password = confirmBuyerBidData.password, bid = confirmBuyerBidData.bid.toString, time = confirmBuyerBidData.time.toString, pegHash = confirmBuyerBidData.pegHash, buyerContractHash = confirmBuyerBidData.buyerContractHash,gas=confirmBuyerBidData.gas.toString, mode = transactionMode),
+              request = transactionsConfirmBuyerBid.Request(transactionsConfirmBuyerBid.BaseRequest(from = loginState.address, gas = confirmBuyerBidData.gas.toString), to = confirmBuyerBidData.sellerAddress, password = confirmBuyerBidData.password, bid = confirmBuyerBidData.bid.toString, time = confirmBuyerBidData.time.toString, pegHash = confirmBuyerBidData.pegHash, buyerContractHash = confirmBuyerBidData.buyerContractHash, mode = transactionMode),
               action = transactionsConfirmBuyerBid.Service.post,
               onSuccess = blockchainTransactionConfirmBuyerBids.Utility.onSuccess,
               onFailure = blockchainTransactionConfirmBuyerBids.Utility.onFailure,
@@ -62,7 +62,7 @@ class ConfirmBuyerBidController @Inject()(messagesControllerComponents: Messages
       },
       confirmBuyerBidData => {
         try {
-          transactionsConfirmBuyerBid.Service.post(transactionsConfirmBuyerBid.Request(transactionsConfirmBuyerBid.BaseRequest(from = confirmBuyerBidData.from), to = confirmBuyerBidData.to, password = confirmBuyerBidData.password, bid = confirmBuyerBidData.bid.toString, time = confirmBuyerBidData.time.toString, pegHash = confirmBuyerBidData.pegHash, buyerContractHash = confirmBuyerBidData.buyerContractHash,gas=confirmBuyerBidData.gas.toString, mode = confirmBuyerBidData.mode))
+          transactionsConfirmBuyerBid.Service.post(transactionsConfirmBuyerBid.Request(transactionsConfirmBuyerBid.BaseRequest(from = confirmBuyerBidData.from, gas = confirmBuyerBidData.gas.toString), to = confirmBuyerBidData.to, password = confirmBuyerBidData.password, bid = confirmBuyerBidData.bid.toString, time = confirmBuyerBidData.time.toString, pegHash = confirmBuyerBidData.pegHash, buyerContractHash = confirmBuyerBidData.buyerContractHash, mode = confirmBuyerBidData.mode))
           Ok(views.html.index(successes = Seq(constants.Response.BUYER_BID_CONFIRMED)))
         }
         catch {
