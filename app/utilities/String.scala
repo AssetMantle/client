@@ -16,4 +16,6 @@ object String {
     "#"
   }
 
+  def nestedFormField(fieldName: String)(implicit prefix: String): String = Seq(prefix, fieldName).mkString(".")
+
 }
