@@ -42,7 +42,7 @@
                                 <li>
                                     <a onclick="getForm(jsRoutes.controllers.AccountController.signUpForm())">
                                         <span cmuk-icon="users"></span>
-                                    @Messages(constants.Form.SIGNUP)</a></li>
+                                        @Messages(constants.Form.SIGNUP)</a></li>
                                 <li><a onclick="getForm(jsRoutes.controllers.LoginController.loginForm())"><span cmuk-icon="sign-in"></span>
                                     @Messages(constants.Form.LOGIN)</a>
                                 </li>
@@ -79,11 +79,11 @@
                                         <ul class="cmuk-nav cmuk-navbar-dropdown-nav">
                                             <li><a href="@controllers.routes.ViewController.profile()"><i class="fa fa-user-circle-o" aria-hidden="true"></i>
                                                     &nbsp;
-                                            @Messages(constants.Form.PROFILE)</a>
+                                                @Messages(constants.Form.PROFILE)</a>
                                             </li>
                                             <li> <a onclick="getForm(jsRoutes.controllers.LogoutController.logoutForm())"><i class="fa fa-sign-out" aria-hidden="true"></i>
                                                     &nbsp;
-                                            @Messages(constants.Form.LOGOUT)</a>
+                                                @Messages(constants.Form.LOGOUT)</a>
                                             </li>
 
                                         </ul>
@@ -154,6 +154,12 @@
         <div class = "modal centerScreen" id="loading">
             <img src="@routes.Assets.versioned("images/loading.gif")" alt = "@Messages(constants.Form.LOADING)"/>
         </div>
+
+        <div class = "modal centerScreen hidden" id="connectionError">
+            <img src="@routes.Assets.versioned("images/exclamation.png")" alt = "@Messages(constants.Form.CONNECTION_ERROR)"/>
+            <div>@Messages(constants.Form.CONNECTION_ERROR)</div>
+        </div>
+
         <footer class="footer cmuk-margin-medium-top">
             <div class="container">
                 <div class="copyright float-right">

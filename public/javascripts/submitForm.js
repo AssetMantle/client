@@ -31,5 +31,9 @@ function submitForm(source, target = '#commonModalContent') {
                 $(target).html(data);
             },
         }
+    }).fail(function (XMLHttpRequest) {
+        if (XMLHttpRequest.readyState === 0) {
+            $('#connectionError').fadeIn(100);
+        }
     });
 }
