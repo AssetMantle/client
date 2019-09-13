@@ -6,20 +6,18 @@ function validateForm(event, source) {
         event.preventDefault();
         const form = $(source).closest("form");
 
-        let x = form[0].getElementsByTagName("INPUT");
-
-        for (let i = 1; i < x.length; i++) {
-            $("#" + x[i].id).css('border-color', 'transparent');
-
-            let errorElements = $("#" + x[i].id + '_field').find(".error")
+        let inputElements = form[0].getElementsByTagName("INPUT");
+        for (let i = 1; i < inputElements.length; i++) {
+            $("#" + inputElements[i].id).css('border-color', 'transparent');
+            let errorElements = $("#" + inputElements[i].id + '_field').find(".error")
             try {
                 errorElements[0].remove();
             } catch {
             }
-            if (document.getElementById(x[i].id).type == 'checkbox' || document.getElementById(x[i].id).type == 'date') {
+            if ($("#" + inputElements[i].id).attr('type') === 'checkbox' || $("#" + inputElements[i].id).attr('type') === 'date') {
                 continue
             }
-            validateElement(x[i].id);
+            validateElement(inputElements[i].id);
         }
 
         if (formValidationBoolean === true) {

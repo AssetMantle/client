@@ -33,10 +33,6 @@ class VerifyEmailAddressController @Inject()(messagesControllerComponents: Messa
       }
   }
 
-  def emailContent: Action[AnyContent] = Action {
-    Ok(views.html.component.master.emailTemplate("somethin"))
-  }
-
   def verifyEmailAddress: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       VerifyEmailAddress.form.bindFromRequest().fold(
