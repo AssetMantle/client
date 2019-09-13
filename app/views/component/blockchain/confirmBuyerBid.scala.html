@@ -10,15 +10,15 @@
     <div>
     <div class="latest_card-body">
     @CSRF.formField
-    @inputText(confirmBuyerBidForm(constants.FormField.FROM.name), '_label -> Messages(constants.FormField.FROM.name),'class -> "form-control",'placeholder->Messages(constants.FormField.FROM.name),'required->true)
-    @inputText(confirmBuyerBidForm(constants.FormField.TO.name), '_label -> Messages(constants.FormField.TO.name),'class -> "form-control",'placeholder->Messages(constants.FormField.TO.name),'required->true)
-    @inputText(confirmBuyerBidForm(constants.FormField.BID.name), '_label -> Messages(constants.FormField.BID.name),'class -> "form-control",'placeholder->Messages(constants.FormField.BID.name),'required->true)
-    @inputText(confirmBuyerBidForm(constants.FormField.TIME.name), '_label -> Messages(constants.FormField.TIME.name),'class -> "form-control",'placeholder->Messages(constants.FormField.TIME.name),'required->true)
-    @inputText(confirmBuyerBidForm(constants.FormField.PEG_HASH.name), '_label -> Messages(constants.FormField.PEG_HASH.name),'class -> "form-control",'placeholder->Messages(constants.FormField.PEG_HASH.name),'required->true)
-    @inputText(confirmBuyerBidForm(constants.FormField.MODE.name), '_label -> Messages(constants.FormField.MODE.name),'class -> "form-control",'placeholder->Messages(constants.FormField.MODE.name),'required->true)
-    @inputText(confirmBuyerBidForm(constants.FormField.BUYER_CONTRACT_HASH.name), '_label -> Messages(constants.FormField.BUYER_CONTRACT_HASH.name),'class -> "form-control",'placeholder->Messages(constants.FormField.BUYER_CONTRACT_HASH.name),'required->true)
-    @inputText(confirmBuyerBidForm(constants.FormField.GAS.name)   , '_label -> Messages(constants.FormField.GAS.name),'class -> "form-control",'placeholder->Messages(constants.FormField.GAS.name),'required->true)
-    @inputPassword(confirmBuyerBidForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name),'class -> "form-control",'placeholder->Messages(constants.FormField.PASSWORD.name),'required->true)
+    @inputText(confirmBuyerBidForm(constants.FormField.FROM.name), '_label -> Messages(constants.FormField.FROM.name),'class -> "cmuk-input",'placeholder->Messages(constants.FormField.FROM.name),'required->true)
+    @inputText(confirmBuyerBidForm(constants.FormField.TO.name), '_label -> Messages(constants.FormField.TO.name),'class -> "cmuk-input",'placeholder->Messages(constants.FormField.TO.name),'required->true)
+    @inputText(confirmBuyerBidForm(constants.FormField.BID.name), '_label -> Messages(constants.FormField.BID.name),'class -> "cmuk-input",'placeholder->Messages(constants.FormField.BID.name),'required->true)
+    @inputText(confirmBuyerBidForm(constants.FormField.TIME.name), '_label -> Messages(constants.FormField.TIME.name),'class -> "cmuk-input",'placeholder->Messages(constants.FormField.TIME.name),'required->true)
+    @inputText(confirmBuyerBidForm(constants.FormField.PEG_HASH.name), '_label -> Messages(constants.FormField.PEG_HASH.name),'class -> "cmuk-input",'placeholder->Messages(constants.FormField.PEG_HASH.name),'required->true)
+    @inputText(confirmBuyerBidForm(constants.FormField.MODE.name), '_label -> Messages(constants.FormField.MODE.name),'class -> "cmuk-input",'placeholder->Messages(constants.FormField.MODE.name),'required->true)
+    @inputText(confirmBuyerBidForm(constants.FormField.BUYER_CONTRACT_HASH.name), '_label -> Messages(constants.FormField.BUYER_CONTRACT_HASH.name),'class -> "cmuk-input",'placeholder->Messages(constants.FormField.BUYER_CONTRACT_HASH.name),'required->true)
+    @inputText(confirmBuyerBidForm(constants.FormField.GAS.name)   , '_label -> Messages(constants.FormField.GAS.name),'class -> "cmuk-input",'placeholder->Messages(constants.FormField.GAS.name),'required->true)
+    @inputPassword(confirmBuyerBidForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name),'class -> "cmuk-input",'placeholder->Messages(constants.FormField.PASSWORD.name),'required->true)
 
     @if(confirmBuyerBidForm.hasGlobalErrors) {
         <ul>

@@ -10,10 +10,10 @@
     </div>
     <div class="latest_card-body">
     @CSRF.formField
-    @inputText(redeemAssetForm(constants.FormField.ZONE_ID.name).copy(value = Some(zoneID)), '_label -> Messages(constants.FormField.ZONE_ID.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.ZONE_ID.name),'required->true)
-    @inputText(redeemAssetForm(constants.FormField.PEG_HASH.name).copy(value = Some(pegHash)), '_label -> Messages(constants.FormField.PEG_HASH.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.PEG_HASH.name),'required->true)
-    @inputText(redeemAssetForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.GAS.name),'required->true)
-    @inputPassword(redeemAssetForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.PASSWORD.name),'required->true)
+    @inputText(redeemAssetForm(constants.FormField.ZONE_ID.name).copy(value = Some(zoneID)), '_label -> Messages(constants.FormField.ZONE_ID.name), 'class -> "cmuk-input",'placeholder->Messages(constants.FormField.ZONE_ID.name),'required->true)
+    @inputText(redeemAssetForm(constants.FormField.PEG_HASH.name).copy(value = Some(pegHash)), '_label -> Messages(constants.FormField.PEG_HASH.name), 'class -> "cmuk-input",'placeholder->Messages(constants.FormField.PEG_HASH.name),'required->true)
+    @inputText(redeemAssetForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "cmuk-input",'placeholder->Messages(constants.FormField.GAS.name),'required->true)
+    @inputPassword(redeemAssetForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "cmuk-input",'placeholder->Messages(constants.FormField.PASSWORD.name),'required->true)
 
     @if(redeemAssetForm.hasGlobalErrors) {
         <ul>

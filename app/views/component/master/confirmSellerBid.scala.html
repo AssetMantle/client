@@ -12,13 +12,13 @@
     <div class="latest_card-body">
     @CSRF.formField
 
-    @inputText(confirmSellerBidForm(constants.FormField.BUYER_ADDRESS.name).copy(value = Some(buyerAddress)), '_label -> Messages(constants.FormField.BUYER_ADDRESS.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.BUYER_ADDRESS.name),'required->true)
-    @inputText(confirmSellerBidForm(constants.FormField.BID.name).copy(value = Some(bid.toString)), '_label -> Messages(constants.FormField.BID.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.BID.name),'required->true)
-    @inputText(confirmSellerBidForm(constants.FormField.TIME.name), '_label -> Messages(constants.FormField.TIME.name),'class -> "form-control", 'placeholder-> Messages(constants.FormField.TIME.name),'required->true)
-    @inputText(confirmSellerBidForm(constants.FormField.PEG_HASH.name).copy(value = Some(pegHash)), '_label -> Messages(constants.FormField.PEG_HASH.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.PEG_HASH.name),'required->true)
-    @inputText(confirmSellerBidForm(constants.FormField.SELLER_CONTRACT_HASH.name), '_label -> Messages(constants.FormField.SELLER_CONTRACT_HASH.name),'class -> "form-control", 'placeholder->Messages(constants.FormField.SELLER_CONTRACT_HASH.name),'required->true)
-    @inputText(confirmSellerBidForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.GAS.name),'required->true)
-    @inputPassword(confirmSellerBidForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name),'class -> "form-control", 'placeholder->Messages(constants.FormField.PASSWORD.name),'required->true)
+    @inputText(confirmSellerBidForm(constants.FormField.BUYER_ADDRESS.name).copy(value = Some(buyerAddress)), '_label -> Messages(constants.FormField.BUYER_ADDRESS.name), 'class -> "cmuk-input",'placeholder->Messages(constants.FormField.BUYER_ADDRESS.name),'required->true)
+    @inputText(confirmSellerBidForm(constants.FormField.BID.name).copy(value = Some(bid.toString)), '_label -> Messages(constants.FormField.BID.name), 'class -> "cmuk-input",'placeholder->Messages(constants.FormField.BID.name),'required->true)
+    @inputText(confirmSellerBidForm(constants.FormField.TIME.name), '_label -> Messages(constants.FormField.TIME.name),'class -> "cmuk-input", 'placeholder-> Messages(constants.FormField.TIME.name),'required->true)
+    @inputText(confirmSellerBidForm(constants.FormField.PEG_HASH.name).copy(value = Some(pegHash)), '_label -> Messages(constants.FormField.PEG_HASH.name), 'class -> "cmuk-input",'placeholder->Messages(constants.FormField.PEG_HASH.name),'required->true)
+    @inputText(confirmSellerBidForm(constants.FormField.SELLER_CONTRACT_HASH.name), '_label -> Messages(constants.FormField.SELLER_CONTRACT_HASH.name),'class -> "cmuk-input", 'placeholder->Messages(constants.FormField.SELLER_CONTRACT_HASH.name),'required->true)
+    @inputText(confirmSellerBidForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "cmuk-input",'placeholder->Messages(constants.FormField.GAS.name),'required->true)
+    @inputPassword(confirmSellerBidForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name),'class -> "cmuk-input", 'placeholder->Messages(constants.FormField.PASSWORD.name),'required->true)
 
     @if(confirmSellerBidForm.hasGlobalErrors) {
         <ul>

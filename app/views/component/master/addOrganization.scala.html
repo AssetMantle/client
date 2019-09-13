@@ -9,11 +9,11 @@
     </div>
     <div class="latest_card-body">
     @CSRF.formField
-    @inputText(addOrganizationForm(constants.FormField.ZONE_ID.name), '_label -> Messages(constants.FormField.ZONE_ID.name),'class -> "form-control", 'placeholder->Messages(constants.FormField.ZONE_ID.name),'required->true)
-    @inputText(addOrganizationForm(constants.FormField.NAME.name), '_label -> Messages(constants.FormField.NAME.name),'class -> "form-control", 'placeholder->Messages(constants.FormField.NAME.name),'required->true)
-    @inputText(addOrganizationForm(constants.FormField.ADDRESS.name), '_label -> Messages(constants.FormField.ADDRESS.name),'class -> "form-control", 'placeholder->Messages(constants.FormField.ADDRESS.name),'required->true)
-    @inputText(addOrganizationForm(constants.FormField.MOBILE_NUMBER.name), '_label -> Messages(constants.FormField.MOBILE_NUMBER.name),'class -> "form-control", 'placeholder->Messages(constants.FormField.MOBILE_NUMBER.name),'required->true)
-    @inputText(addOrganizationForm(constants.FormField.EMAIL_ADDRESS.name), '_label -> Messages(constants.FormField.EMAIL_ADDRESS.name),'class -> "form-control", 'placeholder->Messages(constants.FormField.EMAIL_ADDRESS.name),'required->true)
+    @inputText(addOrganizationForm(constants.FormField.ZONE_ID.name), '_label -> Messages(constants.FormField.ZONE_ID.name),'class -> "cmuk-input", 'placeholder->Messages(constants.FormField.ZONE_ID.name),'required->true)
+    @inputText(addOrganizationForm(constants.FormField.NAME.name), '_label -> Messages(constants.FormField.NAME.name),'class -> "cmuk-input", 'placeholder->Messages(constants.FormField.NAME.name),'required->true)
+    @inputText(addOrganizationForm(constants.FormField.ADDRESS.name), '_label -> Messages(constants.FormField.ADDRESS.name),'class -> "cmuk-input", 'placeholder->Messages(constants.FormField.ADDRESS.name),'required->true)
+    @inputText(addOrganizationForm(constants.FormField.MOBILE_NUMBER.name), '_label -> Messages(constants.FormField.MOBILE_NUMBER.name),'class -> "cmuk-input", 'placeholder->Messages(constants.FormField.MOBILE_NUMBER.name),'required->true)
+    @inputText(addOrganizationForm(constants.FormField.EMAIL_ADDRESS.name), '_label -> Messages(constants.FormField.EMAIL_ADDRESS.name),'class -> "cmuk-input", 'placeholder->Messages(constants.FormField.EMAIL_ADDRESS.name),'required->true)
 
     @if(addOrganizationForm.hasGlobalErrors) {
         <ul>

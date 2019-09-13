@@ -10,14 +10,14 @@
     <div class=" ">
         <div class="latest_card-body">
             @CSRF.formField
-    @inputText(buyerExecuteOrderForm(constants.FormField.FROM.name), '_label -> Messages(constants.FormField.FROM.name),'class -> "form-control",'placeholder->Messages(constants.FormField.FROM.name),'required->true)
-    @inputText(buyerExecuteOrderForm(constants.FormField.BUYER_ADDRESS.name), '_label -> Messages(constants.FormField.BUYER_ADDRESS.name),'class -> "form-control",'placeholder->Messages(constants.FormField.BUYER_ADDRESS.name),'required->true)
-    @inputText(buyerExecuteOrderForm(constants.FormField.SELLER_ADDRESS.name), '_label -> Messages(constants.FormField.SELLER_ADDRESS.name),'class -> "form-control",'placeholder->Messages(constants.FormField.SELLER_ADDRESS.name),'required->true)
-    @inputText(buyerExecuteOrderForm(constants.FormField.FIAT_PROOF_HASH.name), '_label -> Messages(constants.FormField.FIAT_PROOF_HASH.name),'class -> "form-control",'placeholder->Messages(constants.FormField.FIAT_PROOF_HASH.name),'required->true)
-    @inputText(buyerExecuteOrderForm(constants.FormField.PEG_HASH.name)   , '_label -> Messages(constants.FormField.PEG_HASH.name),'class -> "form-control",'placeholder->Messages(constants.FormField.PEG_HASH.name),'required->true)
-    @inputText(buyerExecuteOrderForm(constants.FormField.GAS.name)   , '_label -> Messages(constants.FormField.GAS.name),'class -> "form-control",'placeholder->Messages(constants.FormField.GAS.name),'required->true)
-    @inputText(buyerExecuteOrderForm(constants.FormField.MODE.name), '_label -> Messages(constants.FormField.MODE.name),'class -> "form-control",'placeholder->Messages(constants.FormField.GAS.name),'required->true)
-    @inputPassword(buyerExecuteOrderForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name),'class -> "form-control",'placeholder->Messages(constants.FormField.PASSWORD.name),'required->true)
+    @inputText(buyerExecuteOrderForm(constants.FormField.FROM.name), '_label -> Messages(constants.FormField.FROM.name),'class -> "cmuk-input",'placeholder->Messages(constants.FormField.FROM.name),'required->true)
+    @inputText(buyerExecuteOrderForm(constants.FormField.BUYER_ADDRESS.name), '_label -> Messages(constants.FormField.BUYER_ADDRESS.name),'class -> "cmuk-input",'placeholder->Messages(constants.FormField.BUYER_ADDRESS.name),'required->true)
+    @inputText(buyerExecuteOrderForm(constants.FormField.SELLER_ADDRESS.name), '_label -> Messages(constants.FormField.SELLER_ADDRESS.name),'class -> "cmuk-input",'placeholder->Messages(constants.FormField.SELLER_ADDRESS.name),'required->true)
+    @inputText(buyerExecuteOrderForm(constants.FormField.FIAT_PROOF_HASH.name), '_label -> Messages(constants.FormField.FIAT_PROOF_HASH.name),'class -> "cmuk-input",'placeholder->Messages(constants.FormField.FIAT_PROOF_HASH.name),'required->true)
+    @inputText(buyerExecuteOrderForm(constants.FormField.PEG_HASH.name)   , '_label -> Messages(constants.FormField.PEG_HASH.name),'class -> "cmuk-input",'placeholder->Messages(constants.FormField.PEG_HASH.name),'required->true)
+    @inputText(buyerExecuteOrderForm(constants.FormField.GAS.name)   , '_label -> Messages(constants.FormField.GAS.name),'class -> "cmuk-input",'placeholder->Messages(constants.FormField.GAS.name),'required->true)
+    @inputText(buyerExecuteOrderForm(constants.FormField.MODE.name), '_label -> Messages(constants.FormField.MODE.name),'class -> "cmuk-input",'placeholder->Messages(constants.FormField.GAS.name),'required->true)
+    @inputPassword(buyerExecuteOrderForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name),'class -> "cmuk-input",'placeholder->Messages(constants.FormField.PASSWORD.name),'required->true)
 
     @if(buyerExecuteOrderForm.hasGlobalErrors) {
         <ul>

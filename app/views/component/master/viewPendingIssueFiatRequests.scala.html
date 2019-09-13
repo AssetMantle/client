@@ -10,8 +10,8 @@
         <span class="red">@Messages(constants.Form.ACCOUNT_ID)</span> : @issueFiatRequest.accountID <br>
         <span class="red">@Messages(constants.Form.TRANSACTION_ID)</span> : @issueFiatRequest.transactionID <br>
         <span class="red">@Messages(constants.Form.TRANSACTION_AMOUNT)</span> : @issueFiatRequest.transactionAmount <br>
-        <button class="btn btn-sm btn-success" onclick="getForm(jsRoutes.controllers.IssueFiatController.issueFiatForm('@issueFiatRequest.id', '@issueFiatRequest.accountID', '@issueFiatRequest.transactionID', @issueFiatRequest.transactionAmount))">@Messages(constants.Form.APPROVE)</button>
-        <button class=" btn btn-sm btn-danger" onclick="getForm(jsRoutes.controllers.IssueFiatController.rejectIssueFiatRequestForm('@issueFiatRequest.id'))">@Messages(constants.Form.REJECT)</button>
+        <button class="cmuk-button cmuk-button-success cmuk-button-small" onclick="getForm(jsRoutes.controllers.IssueFiatController.issueFiatForm('@issueFiatRequest.id', '@issueFiatRequest.accountID', '@issueFiatRequest.transactionID', @issueFiatRequest.transactionAmount))">@Messages(constants.Form.APPROVE)</button>
+        <button class="cmuk-button cmuk-button-danger cmuk-button-small" onclick="getForm(jsRoutes.controllers.IssueFiatController.rejectIssueFiatRequestForm('@issueFiatRequest.id'))">@Messages(constants.Form.REJECT)</button>
     </div>
     </div>
 }

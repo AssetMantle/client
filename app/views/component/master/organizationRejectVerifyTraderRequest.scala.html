@@ -10,7 +10,7 @@
     <div class="latest_card-body">
     @CSRF.formField
     @inputText(rejectVerifyTraderRequestForm(constants.FormField.TRADER_ID.name).copy(value = Some(traderID)), '_label -> Messages(constants.FormField.TRADER_ID.name),
-        'class -> "form-control",'placeholder->Messages(constants.FormField.TRADER_ID.name),'required->true)
+        'class -> "cmuk-input",'placeholder->Messages(constants.FormField.TRADER_ID.name),'required->true)
 
     @if(rejectVerifyTraderRequestForm.hasGlobalErrors) {
         <ul>

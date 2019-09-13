@@ -9,11 +9,11 @@
     </div>
     <div class="latest_card-body">
     @CSRF.formField
-    @inputText(setSellerFeedbackForm(constants.FormField.BUYER_ADDRESS.name).copy(value = Some(buyerAddress)), '_label -> Messages(constants.FormField.BUYER_ADDRESS.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.BUYER_ADDRESS.name),'required->true)
-    @inputText(setSellerFeedbackForm(constants.FormField.PEG_HASH.name).copy(value = Some(pegHash)), '_label -> Messages(constants.FormField.PEG_HASH.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.PEG_HASH.name),'required->true)
-    @inputText(setSellerFeedbackForm(constants.FormField.RATING.name), '_label -> Messages(constants.FormField.RATING.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.RATING.name),'required->true)
-    @inputText(setSellerFeedbackForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.GAS.name),'required->true)
-    @inputPassword(setSellerFeedbackForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.PASSWORD.name),'required->true)
+    @inputText(setSellerFeedbackForm(constants.FormField.BUYER_ADDRESS.name).copy(value = Some(buyerAddress)), '_label -> Messages(constants.FormField.BUYER_ADDRESS.name), 'class -> "cmuk-input",'placeholder->Messages(constants.FormField.BUYER_ADDRESS.name),'required->true)
+    @inputText(setSellerFeedbackForm(constants.FormField.PEG_HASH.name).copy(value = Some(pegHash)), '_label -> Messages(constants.FormField.PEG_HASH.name), 'class -> "cmuk-input",'placeholder->Messages(constants.FormField.PEG_HASH.name),'required->true)
+    @inputText(setSellerFeedbackForm(constants.FormField.RATING.name), '_label -> Messages(constants.FormField.RATING.name), 'class -> "cmuk-input",'placeholder->Messages(constants.FormField.RATING.name),'required->true)
+    @inputText(setSellerFeedbackForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "cmuk-input",'placeholder->Messages(constants.FormField.GAS.name),'required->true)
+    @inputPassword(setSellerFeedbackForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "cmuk-input",'placeholder->Messages(constants.FormField.PASSWORD.name),'required->true)
 
     @if(setSellerFeedbackForm.hasGlobalErrors) {
         <ul>
