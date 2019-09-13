@@ -77,6 +77,7 @@ GET         /checkZoneKycFileExists                                      control
 GET         /checkOrganizationKycFileExists                              controllers.FileController.checkOrganizationKycFileExists(accountID: String, documentType: String)
 GET         /checkTraderKycFileExists                                    controllers.FileController.checkTraderKycFileExists(accountID: String, documentType: String)
 GET         /checkTraderAssetFileExists                                  controllers.FileController.checkTraderAssetFileExists(id: String, documentType: String)
+GET         /checkTraderNegotiationFileExists                                  controllers.FileController.checkTraderNegotiationFileExists(id: String, documentType: String)
 
 GET         /accountUpload                                               controllers.FileController.uploadAccountFileForm(documentType: String)
 POST        /accountUpload/file                                          controllers.FileController.uploadAccountFile(documentType: String)
@@ -131,6 +132,12 @@ POST        /traderUpload/assetDocument                                  control
 GET         /traderUpload/storeAssetDocument                             controllers.FileController.storeTraderAsset(name: String, documentType: String, id: String)
 GET         /traderUpdate/assetForm                                      controllers.FileController.updateTraderAssetForm(documentType: String, id :String)
 GET         /traderUpdate/assetDocument                                  controllers.FileController.updateTraderAsset(name: String, documentType: String, id: String)
+
+GET         /traderUpload/negotiationForm                                      controllers.FileController.uploadTraderNegotiationForm(documentType: String, id: String)
+POST        /traderUpload/negotiationDocument                                  controllers.FileController.uploadTraderNegotiation(documentType: String)
+GET         /traderUpload/storeNegotiationDocument                             controllers.FileController.storeTraderNegotiation(name: String, documentType: String, id: String)
+GET         /traderUpdate/negotiationForm                                      controllers.FileController.updateTraderNegotiationForm(documentType: String, id :String)
+GET         /traderUpdate/negotiationDocument                                  controllers.FileController.updateTraderNegotiation(name: String, documentType: String, id: String)
 
 GET         /master/logout                                               controllers.LogoutController.logoutForm
 POST        /master/logout                                               controllers.LogoutController.logout

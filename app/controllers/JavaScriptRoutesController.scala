@@ -129,6 +129,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.FileController.checkOrganizationKycFileExists,
         routes.javascript.FileController.checkTraderKycFileExists,
         routes.javascript.FileController.checkTraderAssetFileExists,
+        routes.javascript.FileController.checkTraderNegotiationFileExists,
 
         routes.javascript.FileController.uploadAccountFileForm,
         routes.javascript.FileController.uploadAccountFile,
@@ -183,6 +184,12 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.FileController.storeTraderAsset,
         routes.javascript.FileController.updateTraderAssetForm,
         routes.javascript.FileController.updateTraderAsset,
+
+        routes.javascript.FileController.uploadTraderNegotiationForm,
+        routes.javascript.FileController.uploadTraderNegotiation,
+        routes.javascript.FileController.storeTraderNegotiation,
+        routes.javascript.FileController.updateTraderNegotiationForm,
+        routes.javascript.FileController.updateTraderNegotiation,
 
         routes.javascript.FileController.genesisAccessedFile,
         routes.javascript.FileController.zoneAccessedOrganizationFile,

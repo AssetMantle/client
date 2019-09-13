@@ -1,7 +1,7 @@
 @import controllers.actions.LoginState
-@import models.masterTransaction.File
+@import models.masterTransaction.AssetFile
 
-@(files: Seq[File])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+@(files: Seq[AssetFile])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 <div class="verify_buttons">
     @for(file <- files) {
         @component.master.commonDocument(file){

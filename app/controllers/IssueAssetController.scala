@@ -16,7 +16,7 @@ import utilities.PushNotification
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class IssueAssetController @Inject()(messagesControllerComponents: MessagesControllerComponents, pushNotification: PushNotification, transaction: utilities.Transaction, blockchainAclAccounts: blockchain.ACLAccounts, masterZones: master.Zones, masterAccounts: master.Accounts, masterTransactionFiles: masterTransaction.Files, withTraderLoginAction: WithTraderLoginAction, withZoneLoginAction: WithZoneLoginAction, blockchainAssets: blockchain.Assets, transactionsIssueAsset: transactions.IssueAsset, blockchainTransactionIssueAssets: blockchainTransaction.IssueAssets, masterTransactionIssueAssetRequests: masterTransaction.IssueAssetRequests, withUsernameToken: WithUsernameToken)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class IssueAssetController @Inject()(messagesControllerComponents: MessagesControllerComponents, pushNotification: PushNotification, transaction: utilities.Transaction, blockchainAclAccounts: blockchain.ACLAccounts, masterZones: master.Zones, masterAccounts: master.Accounts, masterTransactionAssetFiles: masterTransaction.AssetFiles, withTraderLoginAction: WithTraderLoginAction, withZoneLoginAction: WithZoneLoginAction, blockchainAssets: blockchain.Assets, transactionsIssueAsset: transactions.IssueAsset, blockchainTransactionIssueAssets: blockchainTransaction.IssueAssets, masterTransactionIssueAssetRequests: masterTransaction.IssueAssetRequests, withUsernameToken: WithUsernameToken)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
@@ -29,7 +29,7 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
   }
 
   def assetDetail(id: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.assetDetail(masterTransactionIssueAssetRequests.Service.getIssueAssetByID(id), masterTransactionFiles.Service.getAllDocuments(id)))
+    Ok(views.html.component.master.assetDetail(masterTransactionIssueAssetRequests.Service.getIssueAssetByID(id), masterTransactionAssetFiles.Service.getAllDocuments(id)))
   }
 
   def issueAssetRequest: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
@@ -91,7 +91,7 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
           try {
             val id = if (issueAssetDetailData.requestID.isEmpty) utilities.IDGenerator.requestID() else issueAssetDetailData.requestID.get
             masterTransactionIssueAssetRequests.Service.insertOrUpdate(id = id, ticketID = None, pegHash = None, accountID = loginState.username, documentHash = issueAssetDetailData.documentHash, assetType = issueAssetDetailData.assetType, quantityUnit = issueAssetDetailData.quantityUnit, assetQuantity = issueAssetDetailData.assetQuantity, assetPrice = issueAssetDetailData.assetPrice, takerAddress = if (issueAssetDetailData.takerAddress == "") None else Option(issueAssetDetailData.takerAddress), shipmentDetails = masterTransaction.IssueAssetRequestDetails.ShipmentDetails(issueAssetDetailData.commodityName, issueAssetDetailData.quality, issueAssetDetailData.deliveryTerm, issueAssetDetailData.tradeType, issueAssetDetailData.portOfLoading, issueAssetDetailData.portOfDischarge, issueAssetDetailData.shipmentDate), physicalDocumentsHandledVia = issueAssetDetailData.physicalDocumentsHandledVia, paymentTerms = issueAssetDetailData.comdexPaymentTerms, status = constants.Status.Asset.INCOMPLETE_DETAILS)
-            val obl = Json.parse(masterTransactionFiles.Service.getOrEmpty(id, constants.File.OBL).context.getOrElse(Json.toJson(masterTransaction.FileTypeContext.OBL("", "", "", "", "", "", new Date(0), "", 0, 0)).toString)).as[masterTransaction.FileTypeContext.OBL]
+            val obl = Json.parse(masterTransactionAssetFiles.Service.getOrEmpty(id, constants.File.OBL).context.getOrElse(Json.toJson(masterTransaction.AssetFileTypeContext.OBL("", "", "", "", "", "", new Date(0), "", 0, 0)).toString)).as[masterTransaction.AssetFileTypeContext.OBL]
             PartialContent(views.html.component.master.issueAssetOBL(views.companion.master.IssueAssetOBL.form.fill(views.companion.master.IssueAssetOBL.Data(id, obl.billOfLadingId, obl.portOfLoading, obl.shipperName, obl.shipperAddress, obl.notifyPartyName, obl.notifyPartyAddress, obl.dateOfShipping, obl.deliveryTerm, obl.weightOfConsignment, obl.declaredAssetValue))))
 
             //              PartialContent(views.html.index(successes = Seq(constants.Response.ISSUE_ASSET_REQUEST_SENT)))
@@ -107,7 +107,7 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
 
   def issueAssetOBLForm(id: String): Action[AnyContent] = Action {
     implicit request =>
-      val obl = Json.parse(masterTransactionFiles.Service.getOrEmpty(id, constants.File.OBL).context.getOrElse(Json.toJson(masterTransaction.FileTypeContext.OBL("", "", "", "", "", "", new Date(0), "", 0, 0)).toString)).as[masterTransaction.FileTypeContext.OBL]
+      val obl = Json.parse(masterTransactionAssetFiles.Service.getOrEmpty(id, constants.File.OBL).context.getOrElse(Json.toJson(masterTransaction.AssetFileTypeContext.OBL("", "", "", "", "", "", new Date(0), "", 0, 0)).toString)).as[masterTransaction.AssetFileTypeContext.OBL]
       Ok(views.html.component.master.issueAssetOBL(views.companion.master.IssueAssetOBL.form.fill(views.companion.master.IssueAssetOBL.Data(id, obl.billOfLadingId, obl.portOfLoading, obl.shipperName, obl.shipperAddress, obl.notifyPartyName, obl.notifyPartyAddress, obl.dateOfShipping, obl.deliveryTerm, obl.weightOfConsignment, obl.declaredAssetValue))))
   }
 
@@ -121,8 +121,8 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
           issueAssetOBLData => {
             try {
               //            PartialContent(views.html.component.master.issueAssetDetails())
-              masterTransactionFiles.Service.insertOrUpdateContext(masterTransaction.File(issueAssetOBLData.requestID, constants.File.OBL, masterTransactionFiles.Service.getOrEmpty(issueAssetOBLData.requestID, constants.File.OBL).fileName, None, Option(Json.toJson(masterTransaction.FileTypeContext.OBL(issueAssetOBLData.billOfLadingNumber, issueAssetOBLData.portOfLoading, issueAssetOBLData.shipperName, issueAssetOBLData.shipperAddress, issueAssetOBLData.notifyPartyName, issueAssetOBLData.notifyPartyAddress, issueAssetOBLData.shipmentDate, issueAssetOBLData.deliveryTerm, issueAssetOBLData.assetQuantity, issueAssetOBLData.assetPrice)).toString), None))
-              val invoice = Json.parse(masterTransactionFiles.Service.getOrEmpty(issueAssetOBLData.requestID, constants.File.INVOICE).context.getOrElse(Json.toJson(masterTransaction.FileTypeContext.Invoice("", new Date(0))).toString)).as[masterTransaction.FileTypeContext.Invoice]
+              masterTransactionAssetFiles.Service.insertOrUpdateContext(masterTransaction.AssetFile(issueAssetOBLData.requestID, constants.File.OBL, masterTransactionAssetFiles.Service.getOrEmpty(issueAssetOBLData.requestID, constants.File.OBL).fileName, None, Option(Json.toJson(masterTransaction.AssetFileTypeContext.OBL(issueAssetOBLData.billOfLadingNumber, issueAssetOBLData.portOfLoading, issueAssetOBLData.shipperName, issueAssetOBLData.shipperAddress, issueAssetOBLData.notifyPartyName, issueAssetOBLData.notifyPartyAddress, issueAssetOBLData.shipmentDate, issueAssetOBLData.deliveryTerm, issueAssetOBLData.assetQuantity, issueAssetOBLData.assetPrice)).toString), None))
+              val invoice = Json.parse(masterTransactionAssetFiles.Service.getOrEmpty(issueAssetOBLData.requestID, constants.File.INVOICE).context.getOrElse(Json.toJson(masterTransaction.AssetFileTypeContext.Invoice("", new Date(0))).toString)).as[masterTransaction.AssetFileTypeContext.Invoice]
               PartialContent(views.html.component.master.issueAssetInvoice(views.companion.master.IssueAssetInvoice.form.fill(views.companion.master.IssueAssetInvoice.Data(issueAssetOBLData.requestID, invoice.invoiceNumber, invoice.invoiceDate))))
             }
             catch {
@@ -134,7 +134,7 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
 
   def issueAssetInvoiceForm(id: String): Action[AnyContent] = Action {
     implicit request =>
-      val invoice = Json.parse(masterTransactionFiles.Service.getOrEmpty(id, constants.File.INVOICE).context.getOrElse(Json.toJson(masterTransaction.FileTypeContext.Invoice("", new Date(0))).toString)).as[masterTransaction.FileTypeContext.Invoice]
+      val invoice = Json.parse(masterTransactionAssetFiles.Service.getOrEmpty(id, constants.File.INVOICE).context.getOrElse(Json.toJson(masterTransaction.AssetFileTypeContext.Invoice("", new Date(0))).toString)).as[masterTransaction.AssetFileTypeContext.Invoice]
       PartialContent(views.html.component.master.issueAssetInvoice(views.companion.master.IssueAssetInvoice.form.fill(views.companion.master.IssueAssetInvoice.Data(id, invoice.invoiceNumber, invoice.invoiceDate))))
   }
 
@@ -148,7 +148,7 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
           issueAssetInvoiceData => {
             try {
               //            PartialContent(views.html.component.master.issueAssetDetails())
-              masterTransactionFiles.Service.insertOrUpdateContext(masterTransaction.File(issueAssetInvoiceData.requestID, constants.File.INVOICE, "", None, Option(Json.toJson(masterTransaction.FileTypeContext.Invoice(issueAssetInvoiceData.invoiceNumber, issueAssetInvoiceData.invoiceDate)).toString()), None))
+              masterTransactionAssetFiles.Service.insertOrUpdateContext(masterTransaction.AssetFile(issueAssetInvoiceData.requestID, constants.File.INVOICE, "", None, Option(Json.toJson(masterTransaction.AssetFileTypeContext.Invoice(issueAssetInvoiceData.invoiceNumber, issueAssetInvoiceData.invoiceDate)).toString()), None))
               PartialContent(views.html.component.master.issueAssetDocument(issueAssetInvoiceData.requestID))
             }
             catch {
@@ -172,7 +172,7 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
   def viewAssetDocuments(id: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        withUsernameToken.Ok(views.html.component.master.viewVerificationTraderAssetDouments(masterTransactionFiles.Service.getAllDocuments(id)))
+        withUsernameToken.Ok(views.html.component.master.viewVerificationTraderAssetDouments(masterTransactionAssetFiles.Service.getAllDocuments(id)))
       } catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
@@ -181,7 +181,7 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
   def verifyAssetDocument(id: String, documentType: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        masterTransactionFiles.Service.updateFileStatus(id = id, documentType = documentType, status = true)
+        masterTransactionAssetFiles.Service.updateFileStatus(id = id, documentType = documentType, status = true)
         pushNotification.sendNotification(masterTransactionIssueAssetRequests.Service.getAccountID(id), constants.Notification.SUCCESS, Messages(constants.Response.DOCUMENT_APPROVED.message))
         withUsernameToken.Ok(Messages(constants.Response.SUCCESS.message))
       } catch {
@@ -192,7 +192,7 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
   def rejectAssetDocument(id: String, documentType: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        masterTransactionFiles.Service.updateFileStatus(id = id, documentType = documentType, status = false)
+        masterTransactionAssetFiles.Service.updateFileStatus(id = id, documentType = documentType, status = false)
         pushNotification.sendNotification(masterTransactionIssueAssetRequests.Service.getAccountID(id), constants.Notification.FAILURE, Messages(constants.Response.DOCUMENT_REJECTED.message))
         withUsernameToken.Ok(Messages(constants.Response.SUCCESS.message))
       } catch {

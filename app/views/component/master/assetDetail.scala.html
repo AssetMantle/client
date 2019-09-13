@@ -1,6 +1,6 @@
 @import controllers.actions.LoginState
 
-@(asset: masterTransaction.IssueAssetRequest, documents: Seq[masterTransaction.File])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@(asset: masterTransaction.IssueAssetRequest, documents: Seq[masterTransaction.AssetFile])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 
 @if(asset.status != constants.Status.Asset.LISTED_FOR_TRADE) {
     <span class="red">@Messages(constants.Form.PEG_HASH)</span> : @asset.pegHash <br>

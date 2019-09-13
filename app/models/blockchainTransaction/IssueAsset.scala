@@ -175,10 +175,10 @@ class IssueAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tra
         val responseAccount = getAccount.Service.get(issueAsset.to)
         val assetRequest = masterTransactionIssueAssetRequests.Service.getIssueAssetByTicketID(ticketID)
         responseAccount.value.assetPegWallet.foreach(assets => assets.foreach(asset => {
+          blockchainAssets.Service.insertOrUpdate(pegHash = asset.pegHash, documentHash = asset.documentHash, assetType = asset.assetType, assetPrice = asset.assetPrice, assetQuantity = asset.assetQuantity, quantityUnit = asset.quantityUnit, locked = asset.locked, moderated = asset.moderated, takerAddress = if (asset.takerAddress == "") null else Option(asset.takerAddress), ownerAddress = issueAsset.to, dirtyBit = true)
           if(assetRequest.documentHash == asset.documentHash){
             masterTransactionIssueAssetRequests.Service.updatePegHashAndStatusByTicketID(ticketID, Option(asset.pegHash), constants.Status.Asset.LISTED_FOR_TRADE)
           }
-          blockchainAssets.Service.insertOrUpdate(pegHash = asset.pegHash, documentHash = asset.documentHash, assetType = asset.assetType, assetPrice = asset.assetPrice, assetQuantity = asset.assetQuantity, quantityUnit = asset.quantityUnit, locked = asset.locked, moderated = asset.moderated, takerAddress = if (asset.takerAddress == "") null else Option(asset.takerAddress), ownerAddress = issueAsset.to, dirtyBit = true)
         }))
         blockchainAccounts.Service.markDirty(issueAsset.from)
         pushNotification.sendNotification(masterAccounts.Service.getId(issueAsset.to), constants.Notification.SUCCESS, blockResponse.txhash)

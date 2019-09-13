@@ -138,7 +138,7 @@ class TraderKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfigP
 
     def organizationStatus = column[Boolean]("organizationStatus")
 
-    def fileName = column[String]("fileName")
+    def fileName = column[String]("fileName", O.Unique)
 
     def file = column[Array[Byte]]("file")
 

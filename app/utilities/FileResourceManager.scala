@@ -44,6 +44,14 @@ class FileResourceManager @Inject()()(implicit exec: ExecutionContext, configura
 
   private val uploadTraderAssetOtherPath: String = configuration.get[String]("upload.asset.other")
 
+  private val uploadTraderNegotiationBuyerContractPath: String = configuration.get[String]("upload.negotiation.buyerContract")
+
+  private val uploadTraderNegotiationSellerContractOtherPath: String = configuration.get[String]("upload.negotiation.sellerContract")
+
+  private val uploadTraderNegotiationAWBProofPath: String = configuration.get[String]("upload.negotiation.awbProof")
+
+  private val uploadTraderNegotiationFiatProofPath: String = configuration.get[String]("upload.negotiation.fiatProof")
+
   def getAccountKycFilePath(documentType: String): String = {
     documentType match {
       case constants.File.BANK_DETAILS => uploadAccountKycBankDetailsPath
@@ -84,6 +92,16 @@ class FileResourceManager @Inject()()(implicit exec: ExecutionContext, configura
       case constants.File.COO => uploadTraderAssetCOOPath
       case constants.File.COA => uploadTraderAssetCOAPath
       case constants.File.OTHER => uploadTraderAssetOtherPath
+      case _ => constants.File.UNKNOWN_TYPE
+    }
+  }
+
+  def getTraderNegotiationFilePath(documentType: String): String = {
+    documentType match {
+      case constants.File.BUYER_CONTRACT => uploadTraderNegotiationBuyerContractPath
+      case constants.File.SELLER_CONTRACT => uploadTraderNegotiationSellerContractOtherPath
+      case constants.File.AWB_PROOF => uploadTraderNegotiationAWBProofPath
+      case constants.File.FIAT_PROOF => uploadTraderNegotiationFiatProofPath
       case _ => constants.File.UNKNOWN_TYPE
     }
   }
