@@ -45,7 +45,7 @@ object Response {
   val ISSUE_ASSET_REQUEST_REJECTED = new Success("ISSUE_ASSET_REQUEST_REJECTED")
   val ISSUE_FIAT_REQUEST_REJECTED = new Success("ISSUE_FIAT_REQUEST_REJECTED")
   val LOGGED_IN = new Success("LOGGED_IN")
-  val SIGNED_UP = new Success("SIGNED_UP", routes.javascript.LoginController.loginForm)
+  val SIGNED_UP = new Success("SIGNED_UP", routes.javascript.AccountController.loginForm)
   val LOGGED_OUT = new Success("LOGGED_OUT")
   val KEY_ADDED = new Success("KEY_ADDED")
   val MOBILE_NUMBER_VERIFIED = new Success("MOBILE_NUMBER_VERIFIED")

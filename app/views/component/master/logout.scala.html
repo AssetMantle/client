@@ -5,7 +5,7 @@
 @(logoutForm: Form[Logout.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 
 
-@form(action = routes.LogoutController.logout, 'onkeypress -> "validateForm(event,this)") {
+  @form(action = routes.AccountController.logout, 'onkeypress -> "validateForm(event,this)") {
     @CSRF.formField
     <div class="latest_card-body ml-cb">
         <div class="input-group-prepend">
