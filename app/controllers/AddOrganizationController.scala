@@ -4,7 +4,7 @@ import java.nio.file.Files
 
 import controllers.actions.{WithGenesisLoginAction, WithOrganizationLoginAction, WithUserLoginAction, WithZoneLoginAction}
 import controllers.results.WithUsernameToken
-import exceptions.{BaseException, BlockChainException}
+import exceptions.{BaseException, BlockChainException, SerializationException}
 import javax.inject.{Inject, Singleton}
 import models.blockchainTransaction.AddOrganization
 import models.common.Entity.Address
@@ -32,7 +32,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
         val organization = masterOrganizations.Service.getByAccountID(loginState.username)
         Ok(views.html.component.master.addOrganization(views.companion.master.AddOrganization.form.fill(value = views.companion.master.AddOrganization.Data(zoneID = organization.zoneID, name = organization.name, abbreviation = organization.abbreviation, establishmentDate = utilities.Date.sqlDateToUtilDate(organization.establishmentDate), email = organization.email, registeredAddressLine1 = organization.registeredAddress.addressLine1, registeredAddressLine2 = organization.registeredAddress.addressLine2, registeredAddressLandmark = organization.registeredAddress.landmark, registeredAddressCity = organization.registeredAddress.city, registeredAddressCountry = organization.registeredAddress.country, registeredAddressZipCode = organization.registeredAddress.zipCode, registeredAddressPhone = organization.registeredAddress.phone, postalAddressLine1 = organization.postalAddress.addressLine1, postalAddressLine2 = organization.postalAddress.addressLine2, postalAddressLandmark = organization.postalAddress.landmark, postalAddressCity = organization.postalAddress.city, postalAddressCountry = organization.postalAddress.country, postalAddressZipCode = organization.postalAddress.zipCode, postalAddressPhone = organization.postalAddress.phone)), zones = masterZones.Service.getAll))
       } catch {
-        case _: BaseException => Ok(views.html.component.master.addOrganization(views.companion.master.AddOrganization.form, zones = masterZones.Service.getAll))
+        case _: BaseException | _: SerializationException => Ok(views.html.component.master.addOrganization(views.companion.master.AddOrganization.form, zones = masterZones.Service.getAll))
       }
   }
 
@@ -49,7 +49,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
               try {
                 PartialContent(views.html.component.master.userUpdateUBOs(views.companion.master.AddUBOs.form.fill(views.companion.master.AddUBOs.Data(masterOrganizations.Service.getUBOs(id).data.map(ubo => Option(views.companion.master.AddUBOs.UBOData(personName = ubo.personName, sharePercentage = ubo.sharePercentage, relationship = ubo.relationship, title = ubo.title)))))))
               } catch {
-                case _: BaseException => PartialContent(views.html.component.master.userUpdateUBOs(views.companion.master.AddUBOs.form))
+                case _: BaseException | _: SerializationException => PartialContent(views.html.component.master.userUpdateUBOs(views.companion.master.AddUBOs.form))
               }
             } else {
               Unauthorized(views.html.index(failures = Seq(constants.Response.UNVERIFIED_ZONE)))
@@ -68,6 +68,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
         Ok(views.html.component.master.userUpdateUBOs(views.companion.master.AddUBOs.form.fill(views.companion.master.AddUBOs.Data(masterOrganizations.Service.getUBOs(masterOrganizations.Service.getID(loginState.username)).data.map(ubo => Option(views.companion.master.AddUBOs.UBOData(personName = ubo.personName, sharePercentage = ubo.sharePercentage, relationship = ubo.relationship, title = ubo.title)))))))
       } catch {
         case _: BaseException => Ok(views.html.component.master.userUpdateUBOs(views.companion.master.AddUBOs.form))
+        case _: SerializationException => Ok(views.html.component.master.userUpdateUBOs(views.companion.master.AddUBOs.form))
       }
   }
 
@@ -85,6 +86,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
           }
           catch {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+            case serializationException: SerializationException => InternalServerError(views.html.index(failures = Seq(serializationException.failure)))
           }
         }
       )
@@ -136,7 +138,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
   def userUploadOrganizationKyc(documentType: String) = Action(parse.multipartFormData) { implicit request =>
     FileUpload.form.bindFromRequest.fold(
       formWithErrors => {
-        BadRequest(formWithErrors.errors.mkString("\n"))
+        BadRequest
       },
       fileUploadInfo => {
         try {
@@ -208,6 +210,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
         Ok(views.html.component.master.reviewOrganizationCompletion(views.companion.master.OrganizationCompletion.form, organization = organization, zone = masterZones.Service.get(organization.zoneID), organizationBankAccountDetail = masterOrganizationBankAccountDetails.Service.get(organization.id), organizationKYCs = masterOrganizationKYCs.Service.getAllDocuments(organization.id)))
       } catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+        case serializationException: SerializationException => InternalServerError(views.html.index(failures = Seq(serializationException.failure)))
       }
   }
 
@@ -220,6 +223,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
             BadRequest(views.html.component.master.reviewOrganizationCompletion(formWithErrors, organization = organization, zone = masterZones.Service.get(organization.zoneID), organizationBankAccountDetail = masterOrganizationBankAccountDetails.Service.get(organization.id), organizationKYCs = masterOrganizationKYCs.Service.getAllDocuments(organization.id)))
           } catch {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+            case serializationException: SerializationException => InternalServerError(views.html.index(failures = Seq(serializationException.failure)))
           }
         },
         reviewOrganizationCompletionData => {
@@ -235,6 +239,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
           }
           catch {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+            case serializationException: SerializationException => InternalServerError(views.html.index(failures = Seq(serializationException.failure)))
           }
         }
       )
@@ -360,7 +365,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
   def uploadOrganizationKyc(documentType: String) = Action(parse.multipartFormData) { implicit request =>
     FileUpload.form.bindFromRequest.fold(
       formWithErrors => {
-        BadRequest(formWithErrors.errors.mkString("\n"))
+        BadRequest
       },
       fileUploadInfo => {
         try {

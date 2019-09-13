@@ -2,7 +2,7 @@ package controllers
 
 import controllers.actions.{WithLoginAction, WithOrganizationLoginAction, WithTraderLoginAction, WithZoneLoginAction}
 import controllers.results.WithUsernameToken
-import exceptions.BaseException
+import exceptions.{BaseException, SerializationException}
 import javax.inject.{Inject, Singleton}
 import models.Trait.Document
 import models.blockchain.{ACLAccounts, Negotiation}
@@ -48,15 +48,13 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
     implicit request =>
       try {
         loginState.userType match {
-          case constants.User.ZONE =>
-            withUsernameToken.Ok(views.html.component.master.zoneDetails(masterZones.Service.get(blockchainZones.Service.getID(loginState.address))))
-          case constants.User.ORGANIZATION =>
-            withUsernameToken.Ok(views.html.component.master.zoneDetails(masterZones.Service.get(masterOrganizations.Service.getByAccountID(loginState.username).zoneID)))
-          case constants.User.TRADER =>
-            withUsernameToken.Ok(views.html.component.master.zoneDetails(masterZones.Service.get(blockchainAclAccounts.Service.get(loginState.address).zoneID)))
+          case constants.User.ZONE => withUsernameToken.Ok(views.html.component.master.zoneDetails(masterZones.Service.get(blockchainZones.Service.getID(loginState.address))))
+          case constants.User.ORGANIZATION => withUsernameToken.Ok(views.html.component.master.zoneDetails(masterZones.Service.get(masterOrganizations.Service.getByAccountID(loginState.username).zoneID)))
+          case constants.User.TRADER => withUsernameToken.Ok(views.html.component.master.zoneDetails(masterZones.Service.get(blockchainAclAccounts.Service.get(loginState.address).zoneID)))
         }
       } catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+        case serializationException: SerializationException => InternalServerError(views.html.index(failures = Seq(serializationException.failure)))
       }
   }
 

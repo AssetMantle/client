@@ -53,7 +53,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
   def uploadUserKyc(documentType: String) = Action(parse.multipartFormData) { implicit request =>
     FileUpload.form.bindFromRequest.fold(
       formWithErrors => {
-        BadRequest(formWithErrors.errors.mkString("\n"))
+        BadRequest
       },
       fileUploadInfo => {
         try {
@@ -114,7 +114,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
   def uploadUserZoneKyc(documentType: String) = Action(parse.multipartFormData) { implicit request =>
     FileUpload.form.bindFromRequest.fold(
       formWithErrors => {
-        BadRequest(formWithErrors.errors.mkString("\n"))
+        BadRequest
       },
       fileUploadInfo => {
         try {
@@ -175,7 +175,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
   def uploadZoneKyc(documentType: String) = Action(parse.multipartFormData) { implicit request =>
     FileUpload.form.bindFromRequest.fold(
       formWithErrors => {
-        BadRequest(formWithErrors.errors.mkString("\n"))
+        BadRequest
       },
       fileUploadInfo => {
         try {
@@ -270,7 +270,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
   def organizationAccessedTraderKYCFile(accountID: String, fileName: String, documentType: String): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        if (masterTraders.Service.getByAccountID(accountID).organizationID == masterOrganizations.Service.getByAccountID(loginState.username).id) {
+        if (masterTraders.Service.geOrganizationIDByAccountID(loginState.username) == masterOrganizations.Service.getID(loginState.username)) {
           Ok.sendFile(utilities.FileOperations.fetchFile(path = fileResourceManager.getTraderKycFilePath(documentType), fileName = fileName))
         } else {
           Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
@@ -292,7 +292,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
   def uploadAccountFile(documentType: String) = Action(parse.multipartFormData) { implicit request =>
     FileUpload.form.bindFromRequest.fold(
       formWithErrors => {
-        BadRequest(formWithErrors.errors.mkString("\n"))
+        BadRequest
       },
       fileUploadInfo => {
         try {

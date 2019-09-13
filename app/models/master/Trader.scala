@@ -60,6 +60,14 @@ class Traders @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
     }
   }
 
+  private def findOrganizationIDByAccountId(accountID: String): Future[String] = db.run(traderTable.filter(_.accountID === accountID).map(_.organizationID).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
   private def getAccountIdById(id: String): Future[String] = db.run(traderTable.filter(_.id === id).map(_.accountID).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -178,6 +186,8 @@ class Traders @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
 
     def getByAccountID(accountID: String): Trader = Await.result(findByAccountId(accountID), Duration.Inf)
 
+    def geOrganizationIDByAccountID(accountID: String): String = Await.result(findOrganizationIDByAccountId(accountID), Duration.Inf)
+
     def rejectTrader(id: String): Int = Await.result(updateVerificationStatusOnID(id = id, verificationStatus = Option(false)), Duration.Inf)
 
     def verifyTrader(id: String): Int = Await.result(updateVerificationStatusOnID(id = id, verificationStatus = Option(true)), Duration.Inf)
@@ -200,7 +210,7 @@ class Traders @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
 
     def getTradersListInOrganization(organizationID: String): Seq[Trader] = Await.result(getTradersByOrganizationID(organizationID), Duration.Inf)
 
-    def verifyOrganizationTrader(traderID: String, organizationID: String) = Await.result(checkOrganizationIDTraderIDExists(traderID = traderID, organizationID = organizationID), Duration.Inf)
+    def verifyOrganizationTrader(traderID: String, organizationID: String): Boolean = Await.result(checkOrganizationIDTraderIDExists(traderID = traderID, organizationID = organizationID), Duration.Inf)
 
   }
 

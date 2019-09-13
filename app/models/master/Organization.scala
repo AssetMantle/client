@@ -68,16 +68,16 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
     }
   }
 
-  private def findById(id: String): Future[Organization] = db.run(organizationTable.filter(_.id === id).result.head.asTry).map {
-    case Success(result) => result.deserialize
+  private def findById(id: String): Future[OrganizationSerialized] = db.run(organizationTable.filter(_.id === id).result.head.asTry).map {
+    case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }
   }
 
-  private def findByAccountID(accountID: String): Future[Organization] = db.run(organizationTable.filter(_.accountID === accountID).result.head.asTry).map {
-    case Success(result) => result.deserialize
+  private def findByAccountID(accountID: String): Future[OrganizationSerialized] = db.run(organizationTable.filter(_.accountID === accountID).result.head.asTry).map {
+    case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
@@ -213,9 +213,9 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
 
     def getUBOs(id: String): UBOs = utilities.JSON.convertJsonStringToObject[UBOs](Await.result(getUBOsOnID(id), Duration.Inf))
 
-    def get(id: String): Organization = Await.result(findById(id), Duration.Inf)
+    def get(id: String): Organization = Await.result(findById(id), Duration.Inf).deserialize
 
-    def getByAccountID(accountID: String): Organization = Await.result(findByAccountID(accountID), Duration.Inf)
+    def getByAccountID(accountID: String): Organization = Await.result(findByAccountID(accountID), Duration.Inf).deserialize
 
     def getZoneID(id: String): String = Await.result(getZoneIDByID(id), Duration.Inf)
 

@@ -3,7 +3,7 @@ package utilities
 import com.fasterxml.jackson.core.JsonParseException
 import com.fasterxml.jackson.databind.JsonMappingException
 import constants.Response.Failure
-import exceptions.{BaseException, BlockChainException}
+import exceptions.{BlockChainException, SerializationException}
 import play.api.Logger
 import play.api.libs.json._
 import play.api.libs.ws.WSResponse
@@ -40,14 +40,14 @@ object JSON {
       Json.fromJson[T](Json.parse(jsonString)) match {
         case JsSuccess(value: T, _: JsPath) => value
         case errors: JsError => logger.info(errors.toString)
-          throw new BaseException(new Failure(jsonString, null))
+          throw new SerializationException(constants.Response.JSON_PARSE_EXCEPTION)
       }
     }
     catch {
       case jsonParseException: JsonParseException => logger.info(jsonParseException.getMessage, jsonParseException)
-        throw new BaseException(new Failure(jsonParseException.getMessage, null))
+        throw new SerializationException(constants.Response.JSON_PARSE_EXCEPTION)
       case jsonMappingException: JsonMappingException => logger.info(jsonMappingException.getMessage, jsonMappingException)
-        throw new BaseException(new Failure(jsonMappingException.getMessage, null))
+        throw new SerializationException(constants.Response.JSON_MAPPING_EXCEPTION)
     }
   }
 }
