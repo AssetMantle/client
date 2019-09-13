@@ -111,7 +111,7 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
   object Service {
 
-    def create(accountID: String, name: String, currency: String): String = Await.result(add(Zone(id = (-Math.abs(Random.nextInt)).toHexString.toUpperCase, accountID = accountID, name = name, currency = currency)), Duration.Inf)
+    def create(accountID: String, name: String, currency: String): String = Await.result(add(Zone(id = utilities.IDGenerator.hexadecimal, accountID = accountID, name = name, currency = currency)), Duration.Inf)
 
     def get(id: String): Zone = Await.result(findById(id), Duration.Inf)
 

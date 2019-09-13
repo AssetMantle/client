@@ -1,8 +1,8 @@
-package models.master
+package models.common
 
 import play.api.libs.json.{Json, OWrites, Reads}
 
-object Address {
+object Entity {
 
   case class Address(addressLine1: String, addressLine2: String, landmark: Option[String] = None, city: String, country: String, zipCode: String, phone: String)
 

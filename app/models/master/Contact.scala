@@ -37,11 +37,11 @@ class Contacts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     }
   }
 
-  private def findById(id: String): Future[Contact] = db.run(contactTable.filter(_.id === id).result.head.asTry).map {
-    case Success(result) => result
+  private def findById(id: String): Future[Option[Contact]] = db.run(contactTable.filter(_.id === id).result.head.asTry).map {
+    case Success(result) => Option(result)
     case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.info(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        None
     }
   }
 
@@ -119,13 +119,7 @@ class Contacts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   object Service {
 
-    def getContact(id: String): Option[Contact] = {
-      try {
-        Option(Await.result(findById(id), Duration.Inf))
-      } catch {
-        case baseException: BaseException => if (baseException.failure == constants.Response.NO_SUCH_ELEMENT_EXCEPTION) None else throw baseException
-      }
-    }
+    def getContact(id: String): Option[Contact] = Await.result(findById(id), Duration.Inf)
 
     def insertOrUpdateContact(id: String, mobileNumber: String, emailAddress: String): Boolean = if (0 < Await.result(upsert(Contact(id, mobileNumber, mobileNumberVerified =  false, emailAddress, emailAddressVerified = false)), Duration.Inf)) true else false
 

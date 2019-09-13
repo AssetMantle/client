@@ -9,7 +9,7 @@ import slick.jdbc.JdbcProfile
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
-import scala.util.{Failure, Random, Success}
+import scala.util.{Failure, Success}
 
 case class Trader(id: String, zoneID: String, organizationID: String, accountID: String, name: String, completionStatus: Boolean = false, verificationStatus: Option[Boolean] = None)
 
@@ -156,14 +156,14 @@ class Traders @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
 
   object Service {
 
-    def create(zoneID: String, organizationID: String, accountID: String, name: String): String = Await.result(add(Trader((-Math.abs(Random.nextInt)).toHexString.toUpperCase, zoneID, organizationID, accountID, name)), Duration.Inf)
+    def create(zoneID: String, organizationID: String, accountID: String, name: String): String = Await.result(add(Trader(utilities.IDGenerator.hexadecimal, zoneID, organizationID, accountID, name)), Duration.Inf)
 
     def insertOrUpdateTraderDetails(zoneID: String, organizationID: String, accountID: String, name: String): String = {
       val id = try {
         getID(accountID)
       } catch {
         case baseException: BaseException => if (baseException.failure == constants.Response.NO_SUCH_ELEMENT_EXCEPTION) {
-          (-Math.abs(Random.nextInt)).toHexString.toUpperCase
+          utilities.IDGenerator.hexadecimal
         } else {
           throw new BaseException(baseException.failure)
         }

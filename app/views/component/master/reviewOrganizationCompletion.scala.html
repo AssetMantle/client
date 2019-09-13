@@ -1,6 +1,5 @@
 @import controllers.actions.LoginState
 @import helper._
-@import master.utils.{Address, UBO, UBOs}
 @import models.master.{Organization, OrganizationBankAccountDetail, OrganizationKYC, Zone}
 @import play.api.Logger
 @import play.api.libs.json.Json
@@ -27,40 +26,34 @@
             <span class="red">@Messages(constants.Form.EMAIL)</span>: @organization.email <br>
         </div>
         <br>
-        @defining(utilities.JSON.convertJsonStringToObject[Address](organization.registeredAddress)) { registeredAddress: Address =>
             <div>@Messages(constants.Form.REGISTERED_ADDRESS) : <br>
-            <span class="red">@Messages(constants.Form.ADDRESS_LINE_1)</span>: @registeredAddress.addressLine1 <br>
-            <span class="red">@Messages(constants.Form.ADDRESS_LINE_2)</span>: @registeredAddress.addressLine2 <br>
-            <span class="red">@Messages(constants.Form.LANDMARK)</span>: @registeredAddress.landmark.getOrElse("") <br>
-            <span class="red">@Messages(constants.Form.CITY)</span>: @registeredAddress.city <br>
-            <span class="red">@Messages(constants.Form.COUNTRY)</span>: @registeredAddress.country <br>
-            <span class="red">@Messages(constants.Form.ZIP_CODE)</span>: @registeredAddress.zipCode <br>
-            <span class="red">@Messages(constants.Form.PHONE)</span>: @registeredAddress.phone
+            <span class="red">@Messages(constants.Form.ADDRESS_LINE_1)</span>: @organization.registeredAddress.addressLine1 <br>
+            <span class="red">@Messages(constants.Form.ADDRESS_LINE_2)</span>: @organization.registeredAddress.addressLine2 <br>
+            <span class="red">@Messages(constants.Form.LANDMARK)</span>: @organization.registeredAddress.landmark.getOrElse("") <br>
+            <span class="red">@Messages(constants.Form.CITY)</span>: @organization.registeredAddress.city <br>
+            <span class="red">@Messages(constants.Form.COUNTRY)</span>: @organization.registeredAddress.country <br>
+            <span class="red">@Messages(constants.Form.ZIP_CODE)</span>: @organization.registeredAddress.zipCode <br>
+            <span class="red">@Messages(constants.Form.PHONE)</span>: @organization.registeredAddress.phone
             </div>
-        }
         <br>
-        @defining(utilities.JSON.convertJsonStringToObject[Address](organization.postalAddress)) { postalAddress: Address =>
             <div>@Messages(constants.Form.POSTAL_ADDRESS) : <br>
-            <span class="red">@Messages(constants.Form.ADDRESS_LINE_1)</span>: @postalAddress.addressLine1 <br>
-            <span class="red">@Messages(constants.Form.ADDRESS_LINE_2)</span>: @postalAddress.addressLine2 <br>
-            <span class="red">@Messages(constants.Form.LANDMARK)</span>: @postalAddress.landmark.getOrElse("") <br>
-            <span class="red">@Messages(constants.Form.CITY)</span>: @postalAddress.city <br>
-            <span class="red">@Messages(constants.Form.COUNTRY)</span>: @postalAddress.country <br>
-            <span class="red">@Messages(constants.Form.ZIP_CODE)</span>: @postalAddress.zipCode <br>
-            <span class="red">@Messages(constants.Form.PHONE)</span>: @postalAddress.phone
+            <span class="red">@Messages(constants.Form.ADDRESS_LINE_1)</span>: @organization.postalAddress.addressLine1 <br>
+            <span class="red">@Messages(constants.Form.ADDRESS_LINE_2)</span>: @organization.postalAddress.addressLine2 <br>
+            <span class="red">@Messages(constants.Form.LANDMARK)</span>: @organization.postalAddress.landmark.getOrElse("") <br>
+            <span class="red">@Messages(constants.Form.CITY)</span>: @organization.postalAddress.city <br>
+            <span class="red">@Messages(constants.Form.COUNTRY)</span>: @organization.postalAddress.country <br>
+            <span class="red">@Messages(constants.Form.ZIP_CODE)</span>: @organization.postalAddress.zipCode <br>
+            <span class="red">@Messages(constants.Form.PHONE)</span>: @organization.postalAddress.phone
             </div>
-        }
         <br>
-        @defining(utilities.JSON.convertJsonStringToObject[UBOs](organization.ubos.getOrElse(Json.toJson[UBOs](UBOs()).toString)).ubos) { ubos: Seq[UBO] =>
             <div>@Messages(constants.Form.ORGANIZATION_UBO_DETAIL): <br>
-                @for(ubo <- ubos) {
+                @for(ubo <- organization.ubos.data) {
                     <span class="red">@Messages(constants.Form.PERSON_NAME)</span>: @ubo.personName <br>
                     <span class="red">@Messages(constants.Form.SHARE_PERCENTAGE)</span>: @ubo.sharePercentage <br>
                     <span class="red">@Messages(constants.Form.RELATIONSHIP)</span>: @ubo.relationship <br>
                     <span class="red">@Messages(constants.Form.TITLE)</span>: @ubo.title <br>
                     }
             </div>
-        }
         <br>
         <div class="leftText">@Messages(constants.Form.ORGANIZATION_BANK_ACCOUNT_DETAIL): <br>
             <span class="red">@Messages(constants.Form.ACCOUNT_HOLDER_NAME)</span>
