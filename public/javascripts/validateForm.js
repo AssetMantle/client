@@ -2,7 +2,7 @@ let formValidationBoolean = true;
 
 function validateForm(event, source) {
     formValidationBoolean = true;
-    if (event.keyCode === 13) {
+    if (event.keyCode === 13 || event.button===0) {
         event.preventDefault();
         const form = $(source).closest("form");
 
