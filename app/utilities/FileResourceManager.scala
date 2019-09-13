@@ -34,7 +34,7 @@ class FileResourceManager @Inject()()(implicit exec: ExecutionContext, configura
 
   private val uploadOrganizationKycManagementPath = configuration.get[String]("upload.organization.managementPath")
 
-  private val uploadOrganizationKYCACRAPath = configuration.get[String]("upload.organization.ACRAPath")
+  private val uploadOrganizationKYCACRAPath = configuration.get[String]("upload.organization.acraPath")
 
   private val uploadOrganizationKycShareStructurePath = configuration.get[String]("upload.organization.shareStructurePath")
 

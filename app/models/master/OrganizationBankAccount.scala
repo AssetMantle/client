@@ -44,11 +44,11 @@ class OrganizationBankAccountDetails @Inject()(protected val databaseConfigProvi
     }
   }
 
-  private def findById(id: String): Future[OrganizationBankAccountDetail] = db.run(organizationBankAccountDetailTable.filter(_.id === id).result.head.asTry).map {
-    case Success(result) => result
+  private def findById(id: String): Future[Option[OrganizationBankAccountDetail]] = db.run(organizationBankAccountDetailTable.filter(_.id === id).result.head.asTry).map {
+    case Success(result) => Option(result)
     case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.info(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        None
     }
   }
 
@@ -93,7 +93,7 @@ class OrganizationBankAccountDetails @Inject()(protected val databaseConfigProvi
 
     def insertOrUpdate(id: String, accountHolder: String, nickName: String, accountNumber: String, bankName: String, swiftAddress: String, country: String, address: String, zipCode: String): Int = Await.result(upsert(OrganizationBankAccountDetail(id = id, accountHolder = accountHolder, nickName = nickName, accountNumber = accountNumber, bankName = bankName, swiftAddress = swiftAddress, country = country, address = address, zipCode = zipCode)), Duration.Inf)
 
-    def get(id: String): OrganizationBankAccountDetail = Await.result(findById(id), Duration.Inf)
+    def get(id: String): OrganizationBankAccountDetail = Await.result(findById(id), Duration.Inf).getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION))
   }
 
 }

@@ -17,7 +17,7 @@ import scala.util.{Failure, Success}
 
 case class UBO(personName: String, sharePercentage: Double, relationship: String, title: String)
 
-case class UBOs(data: Seq[UBO] = Seq.empty)
+case class UBOs(data: Seq[UBO])
 
 case class Organization(id: String, zoneID: String, accountID: String, name: String, abbreviation: Option[String] = None, establishmentDate: Date, email: String, registeredAddress: Address, postalAddress: Address, ubos: UBOs, completionStatus: Boolean = false, verificationStatus: Option[Boolean] = None)
 
@@ -28,13 +28,13 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
 
   private implicit val ubosReads: Reads[UBOs] = Json.reads[UBOs]
 
-  private implicit val ubosWrites: OWrites[UBOs] = Json.writes[UBOs]
-
   private implicit val uboWrites: OWrites[UBO] = Json.writes[UBO]
+
+  private implicit val ubosWrites: OWrites[UBOs] = Json.writes[UBOs]
 
   case class OrganizationSerialized(id: String, zoneID: String, accountID: String, name: String, abbreviation: Option[String] = None, establishmentDate: Date, email: String, registeredAddress: String, postalAddress: String, ubos: Option[String] = None, completionStatus: Boolean = false, verificationStatus: Option[Boolean] = None) {
 
-    def deserialize: Organization = Organization(id = id, zoneID = zoneID, accountID = accountID, name = name, abbreviation = abbreviation, establishmentDate = establishmentDate, email = email, registeredAddress = utilities.JSON.convertJsonStringToObject[Address](registeredAddress), postalAddress = utilities.JSON.convertJsonStringToObject[Address](postalAddress), ubos = utilities.JSON.convertJsonStringToObject[UBOs](ubos.getOrElse(Json.toJson(UBOs()).toString)), completionStatus = completionStatus, verificationStatus = verificationStatus)
+    def deserialize: Organization = Organization(id = id, zoneID = zoneID, accountID = accountID, name = name, abbreviation = abbreviation, establishmentDate = establishmentDate, email = email, registeredAddress = utilities.JSON.convertJsonStringToObject[Address](registeredAddress), postalAddress = utilities.JSON.convertJsonStringToObject[Address](postalAddress), ubos = utilities.JSON.convertJsonStringToObject[UBOs](ubos.getOrElse(Json.toJson(UBOs(Seq())).toString)), completionStatus = completionStatus, verificationStatus = verificationStatus)
 
   }
 
@@ -151,7 +151,7 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
   }
 
   private def getUBOsOnID(id: String): Future[String] = db.run(organizationTable.filter(_.id === id).map(_.ubos.?).result.head.asTry).map {
-    case Success(result) => result.getOrElse(Json.toJson(UBOs()).toString)
+    case Success(result) => result.getOrElse(Json.toJson(UBOs(Seq())).toString)
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
@@ -204,7 +204,7 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
 
     def insertOrUpdateOrganizationDetails(zoneID: String, accountID: String, name: String, abbreviation: Option[String], establishmentDate: Date, email: String, registeredAddress: Address, postalAddress: Address): String = {
       val id = Await.result(getIDByAccountID(accountID), Duration.Inf).getOrElse(utilities.IDGenerator.hexadecimal)
-      Await.result(upsert(serialize(Organization(id = id, zoneID = zoneID, accountID = accountID, name = name, abbreviation = abbreviation, establishmentDate = establishmentDate, registeredAddress = registeredAddress, postalAddress = postalAddress, email = email, ubos = UBOs()))), Duration.Inf)
+      Await.result(upsert(serialize(Organization(id = id, zoneID = zoneID, accountID = accountID, name = name, abbreviation = abbreviation, establishmentDate = establishmentDate, registeredAddress = registeredAddress, postalAddress = postalAddress, email = email, ubos = getUBOs(id)))), Duration.Inf)
       id
     }
 
@@ -232,7 +232,7 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
 
     def markOrganizationFormCompleted(id: String): Int = Await.result(updateCompletionStatusOnID(id = id, completionStatus = true), Duration.Inf)
 
-    def updateUBOs(id: String, ubos: Seq[UBO]): Int = Await.result(updateUBOsOnID(id, Option(Json.toJson(UBOs(ubos)).toString())), Duration.Inf)
+    def updateUBOs(id: String, ubos: Seq[UBO]): Int = Await.result(updateUBOsOnID(id, Option(Json.toJson(UBOs(data = ubos)).toString)), Duration.Inf)
 
   }
 

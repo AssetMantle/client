@@ -229,6 +229,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
         reviewOrganizationCompletionData => {
           try {
             val id = masterOrganizations.Service.getID(loginState.username)
+            logger.info(masterOrganizationKYCs.Service.checkAllKYCFileTypesExists(id).toString)
             if (reviewOrganizationCompletionData.completion && masterOrganizationKYCs.Service.checkAllKYCFileTypesExists(id)) {
               masterOrganizations.Service.markOrganizationFormCompleted(id)
               withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ORGANIZATION_ADDED_FOR_VERIFICATION)))
