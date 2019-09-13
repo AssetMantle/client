@@ -1,35 +1,78 @@
-@import models.master.Organization
 @import controllers.actions.LoginState
+@import master.utils.{Address, UBO, UBOs}
+@import models.master.Organization
+@import play.api.Logger
+@import play.api.libs.json.Json
 
-@(organizationVerificationRequests: Seq[Organization])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
-<script src="@routes.Assets.versioned("javascripts/kycVerification.js")" type="text/javascript"></script>
-<script src="@routes.Assets.versioned("javascripts/viewFiles.js")" type="text/javascript"></script>
-
+@(organizationVerificationRequests: Seq[Organization])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, module: String, logger: Logger, loginState: LoginState = null)
 @for(organizationVerificationRequest <- organizationVerificationRequests) {
-
-<div class="col-md-4">
-    <br>
-    <div class="card-body lightBlue documenet_details_card">
-        <div class="documenet_details">
-            <span class="red">@Messages(constants.Form.ORGANIZATION_ID)</span> : @organizationVerificationRequest.id <br>
-            <span class="red">@Messages(constants.Form.ZONE_ID)</span> : @organizationVerificationRequest.zoneID <br>
-            <span class="red">@Messages(constants.Form.ACCOUNT_ID)</span> : @organizationVerificationRequest.accountID <br>
-            <span class="red">@Messages(constants.Form.NAME)</span> : @organizationVerificationRequest.name <br>
-            <span class="red">@Messages(constants.Form.ADDRESS)</span> : @organizationVerificationRequest.address <br>
-            <span class="red">@Messages(constants.Form.PHONE)</span> : @organizationVerificationRequest.phone <br>
-            <span class="red">@Messages(constants.Form.EMAIL)</span> : @organizationVerificationRequest.email <br>
-            <span class="red">@Messages(constants.Form.DOCUMENTS)</span> :
-        </div>
-        <span id = "kycDocuments@organizationVerificationRequest.accountID">
-            <script>getFiles('kycDocuments@organizationVerificationRequest.accountID',jsRoutes.controllers.AddOrganizationController.viewKycDocuments('@organizationVerificationRequest.accountID'))</script>
-        </span> <br>
-        <div class="final_verify_buttons">
-            <button class="cmuk-button cmuk-button-success cmuk-button-small" onclick="getForm(jsRoutes.controllers.AddOrganizationController.verifyOrganizationForm('@organizationVerificationRequest.id', '@organizationVerificationRequest.zoneID'))">@Messages(constants.Form.APPROVE)</button>
-            <button class="cmuk-button cmuk-button-danger cmuk-button-small" onclick="getForm(jsRoutes.controllers.AddOrganizationController.rejectVerifyOrganizationRequestForm('@organizationVerificationRequest.id'))">@Messages(constants.Form.REJECT)</button>
+    <div class="col-md-4">
+        <br>
+        <div class="card-body lightBlue documenet_details_card">
+            <div>@Messages(constants.Form.ORGANIZATION_DETAILS): <br>
+            <span class="red">@Messages(constants.Form.ORGANIZATION_ID)</span>: @organizationVerificationRequest.id <br>
+            <span class="red">@Messages(constants.Form.ZONE_ID)</span>: @organizationVerificationRequest.zoneID <br>
+            <span class="red">@Messages(constants.Form.ACCOUNT_ID)</span>: @organizationVerificationRequest.accountID <br>
+            <span class="red">@Messages(constants.Form.NAME)</span>: @organizationVerificationRequest.name <br>
+            <span class="red">@Messages(constants.Form.ABBREVIATION)</span>: @organizationVerificationRequest.abbreviation.getOrElse("") <br>
+            <span class="red">@Messages(constants.Form.ESTABLISHMENT_DATE)</span>: @organizationVerificationRequest.establishmentDate <br>
+            <span class="red">@Messages(constants.Form.EMAIL)</span>: @organizationVerificationRequest.email <br>
+            </div>
+            <br>
+            @defining(utilities.JSON.getInstance[Address](organizationVerificationRequest.registeredAddress)) { registeredAddress: Address =>
+                <div>@Messages(constants.Form.REGISTERED_ADDRESS) : <br>
+                <span class="red">@Messages(constants.Form.ADDRESS_LINE_1)</span>: @registeredAddress.addressLine1 <br>
+                <span class="red">@Messages(constants.Form.ADDRESS_LINE_2)</span>: @registeredAddress.addressLine2 <br>
+                <span class="red">@Messages(constants.Form.LANDMARK)</span>: @registeredAddress.landmark.getOrElse("") <br>
+                <span class="red">@Messages(constants.Form.CITY)</span>: @registeredAddress.city <br>
+                <span class="red">@Messages(constants.Form.COUNTRY)</span>: @registeredAddress.country <br>
+                <span class="red">@Messages(constants.Form.ZIP_CODE)</span>: @registeredAddress.zipCode <br>
+                <span class="red">@Messages(constants.Form.PHONE)</span>: @registeredAddress.phone <br>
+                </div>
+            }
+            <br>
+            @defining(utilities.JSON.getInstance[Address](organizationVerificationRequest.postalAddress)) { postalAddress: Address =>
+                <div>@Messages(constants.Form.POSTAL_ADDRESS) : <br>
+                <span class="red">@Messages(constants.Form.ADDRESS_LINE_1)</span>: @postalAddress.addressLine1 <br>
+                <span class="red">@Messages(constants.Form.ADDRESS_LINE_2)</span>: @postalAddress.addressLine2 <br>
+                <span class="red">@Messages(constants.Form.LANDMARK)</span>: @postalAddress.landmark.getOrElse("") <br>
+                <span class="red">@Messages(constants.Form.CITY)</span>: @postalAddress.city <br>
+                <span class="red">@Messages(constants.Form.COUNTRY)</span>: @postalAddress.country <br>
+                <span class="red">@Messages(constants.Form.ZIP_CODE)</span>: @postalAddress.zipCode <br>
+                <span class="red">@Messages(constants.Form.PHONE)</span>: @postalAddress.phone <br>
+                </div>
+            }
+            <br>
+            @defining(utilities.JSON.getInstance[UBOs](organizationVerificationRequest.ubos.getOrElse(Json.toJson[UBOs](UBOs()).toString)).ubos) { ubos: Seq[UBO] =>
+                <div>@Messages(constants.Form.ORGANIZATION_UBO_DETAIL): <br>
+                    @for(ubo <- ubos) {
+                        <span class="red">@Messages(constants.Form.PERSON_NAME)</span>: @ubo.personName <br>
+                        <span class="red">@Messages(constants.Form.SHARE_PERCENTAGE)</span>: @ubo.sharePercentage <br>
+                        <span class="red">@Messages(constants.Form.RELATIONSHIP)</span>: @ubo.relationship <br>
+                        <span class="red">@Messages(constants.Form.TITLE)</span>: @ubo.title <br>
+                        }
+                </div>
+            }
+            <br>
+            <div>@Messages(constants.Form.ORGANIZATION_BANK_ACCOUNT_DETAIL): <br>
+            <div id = "organizationBankAccountDetail@organizationVerificationRequest.accountID">
+                <script>componentResource('organizationBankAccountDetail@organizationVerificationRequest.accountID', jsRoutes.controllers.AddOrganizationController.viewOrganizationVerificationBankAccountDetail('@organizationVerificationRequest.id'))</script>
+            </div>
+            </div>
+            <br>
+            <div> @Messages(constants.Form.DOCUMENTS): <br>
+            <div id = "kycDocuments@organizationVerificationRequest.accountID">
+                <script>componentResource('kycDocuments@organizationVerificationRequest.accountID', jsRoutes.controllers.AddOrganizationController.viewKycDocuments('@organizationVerificationRequest.id'))</script>
+            </div>
+            </div>
+            <br>
+            <div class="final_verify_buttons">
+                <button class="cmuk-button cmuk-button-success cmuk-button-small" onclick="getForm(jsRoutes.controllers.AddOrganizationController.verifyOrganizationForm('@organizationVerificationRequest.id', '@organizationVerificationRequest.zoneID'))">@Messages(constants.Form.APPROVE)</button>
+                <button class="cmuk-button cmuk-button-danger cmuk-button-small" onclick="getForm(jsRoutes.controllers.AddOrganizationController.rejectVerifyOrganizationRequestForm('@organizationVerificationRequest.id'))">@Messages(constants.Form.REJECT)</button>
+            </div>
+            <br>
         </div>
     </div>
-    <br>
-</div>
     <br>
 }
 

@@ -1,6 +1,6 @@
 package models.blockchain
 
-import actors.{MainNegotiationActor, ShutdownActors}
+import actors.{MainNegotiationActor, ShutdownActor}
 import akka.actor.{ActorRef, ActorSystem}
 import akka.stream.scaladsl.Source
 import akka.stream.{ActorMaterializer, OverflowStrategy}
@@ -18,12 +18,12 @@ import scala.concurrent.duration.{Duration, _}
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Negotiation(id: String, buyerAddress: String, sellerAddress: String, assetPegHash: String, bid: String, time: String, buyerSignature: Option[String], sellerSignature: Option[String], buyerBlockHeight: Option[String], sellerBlockHeight: Option[String], buyerContractHash: Option[String], sellerContractHash: Option[String], dirtyBit: Boolean)
+case class Negotiation(id: String, buyerAddress: String, sellerAddress: String, assetPegHash: String, bid: String, time: String, buyerSignature: Option[String] = None, sellerSignature: Option[String] = None, buyerBlockHeight: Option[String] = None, sellerBlockHeight: Option[String] = None, buyerContractHash: Option[String] = None, sellerContractHash: Option[String] = None, dirtyBit: Boolean)
 
 case class NegotiationCometMessage(username: String, message: JsValue)
 
 @Singleton
-class Negotiations @Inject()(shutdownActors: ShutdownActors, masterAccounts: master.Accounts, actorSystem: ActorSystem, protected val databaseConfigProvider: DatabaseConfigProvider, getNegotiation: queries.GetNegotiation, implicit val pushNotification: PushNotification)(implicit executionContext: ExecutionContext, configuration: Configuration) {
+class Negotiations @Inject()(shutdownActors: ShutdownActor, masterAccounts: master.Accounts, actorSystem: ActorSystem, protected val databaseConfigProvider: DatabaseConfigProvider, getNegotiation: queries.GetNegotiation, implicit val pushNotification: PushNotification)(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -171,7 +171,7 @@ class Negotiations @Inject()(shutdownActors: ShutdownActors, masterAccounts: mas
 
   object Service {
 
-    def create(id: String, buyerAddress: String, sellerAddress: String, assetPegHash: String, bid: String, time: String, buyerSignature: Option[String], sellerSignature: Option[String]): String = Await.result(add(Negotiation(id = id, buyerAddress = buyerAddress, sellerAddress = sellerAddress, assetPegHash = assetPegHash, bid = bid, time = time, buyerSignature = buyerSignature, sellerSignature = sellerSignature, null, null,null, null, dirtyBit = false)), Duration.Inf)
+    def create(id: String, buyerAddress: String, sellerAddress: String, assetPegHash: String, bid: String, time: String, buyerSignature: Option[String], sellerSignature: Option[String]): String = Await.result(add(Negotiation(id = id, buyerAddress = buyerAddress, sellerAddress = sellerAddress, assetPegHash = assetPegHash, bid = bid, time = time, buyerSignature = buyerSignature, sellerSignature = sellerSignature, dirtyBit = false)), Duration.Inf)
 
     def insertOrUpdate(id: String, buyerAddress: String, sellerAddress: String, assetPegHash: String, bid: String, time: String, buyerSignature: Option[String], sellerSignature: Option[String], buyerBlockHeight: Option[String], sellerBlockHeight: Option[String], buyerContractHash: Option[String], sellerContractHash: Option[String], dirtyBit: Boolean): Int = Await.result(upsert(Negotiation(id = id, buyerAddress = buyerAddress, sellerAddress = sellerAddress, assetPegHash = assetPegHash, bid = bid, time = time, buyerSignature = buyerSignature, sellerSignature = sellerSignature, buyerBlockHeight = buyerBlockHeight, sellerBlockHeight = sellerBlockHeight, buyerContractHash = buyerContractHash, sellerContractHash = sellerContractHash, dirtyBit = dirtyBit)), Duration.Inf)
 

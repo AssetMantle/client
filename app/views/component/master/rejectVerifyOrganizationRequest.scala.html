@@ -1,6 +1,6 @@
+@import controllers.actions.LoginState
 @import helper._
 @import views.companion.master.RejectVerifyOrganizationRequest
-@import controllers.actions.LoginState
 
 @(rejectVerifyOrganizationRequestForm: Form[RejectVerifyOrganizationRequest.Data], organizationID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @form(action = routes.AddOrganizationController.rejectVerifyOrganizationRequest, 'onkeypress -> "validateForm(event,this)") {
@@ -8,16 +8,16 @@
         <h4 class="latest_card-title">@Messages(constants.Form.REJECT_VERIFY_ORGANIZATION_REQUEST)</h4>
     </div>
     <div class="latest_card-body">
-    @CSRF.formField
-    @inputText(rejectVerifyOrganizationRequestForm(constants.FormField.ORGANIZATION_ID.name).copy(value = Some(organizationID)), '_label -> Messages(constants.FormField.ORGANIZATION_ID.name), 'class -> "cmuk-input",'placeholder->Messages(constants.FormField.ORGANIZATION_ID.name),'required->true)
+        @CSRF.formField
+        @inputText(rejectVerifyOrganizationRequestForm(constants.FormField.ORGANIZATION_ID.name).copy(value = Some(organizationID)), '_label -> Messages(constants.FormField.ORGANIZATION_ID.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.ORGANIZATION_ID.name), 'required -> true)
 
-    @if(rejectVerifyOrganizationRequestForm.hasGlobalErrors) {
-        <ul>
-        @for(error <- rejectVerifyOrganizationRequestForm.globalErrors) {
-            <li>@error.format</li>
+        @if(rejectVerifyOrganizationRequestForm.hasGlobalErrors) {
+            <ul>
+            @for(error <- rejectVerifyOrganizationRequestForm.globalErrors) {
+                <li>@error.format</li>
+            }
+            </ul>
         }
-        </ul>
-    }
-    <button type="button" class="btn btn-sm btn-primary" onclick="submitForm(this)">@Messages(constants.Form.REJECT_VERIFY_ORGANIZATION_REQUEST)</button>
+        <button type="button" class="btn btn-sm btn-primary" onclick="submitForm(this)">@Messages(constants.Form.REJECT_VERIFY_ORGANIZATION_REQUEST)</button>
     </div>
 }

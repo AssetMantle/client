@@ -18,8 +18,8 @@ import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class SetACL(from: String, aclAddress: String, organizationID: String, zoneID: String, aclHash: String, status: Option[Boolean], txHash: Option[String], ticketID: String, mode: String, code: Option[String]) extends BaseTransaction[SetACL] {
-  def mutateTicketID(newTicketID: String): SetACL = SetACL(from = from, aclAddress = aclAddress, organizationID = organizationID, zoneID = zoneID, aclHash = aclHash, status = status, txHash = txHash, ticketID = newTicketID, mode = mode, code = code)
+case class SetACL(from: String, aclAddress: String, organizationID: String, zoneID: String, aclHash: String, gas: Int, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None) extends BaseTransaction[SetACL] {
+  def mutateTicketID(newTicketID: String): SetACL = SetACL(from = from, aclAddress = aclAddress, organizationID = organizationID, zoneID = zoneID, aclHash = aclHash, status = status, gas = gas, txHash = txHash, ticketID = newTicketID, mode = mode, code = code)
 }
 
 @Singleton
@@ -112,7 +112,7 @@ class SetACLs @Inject()(actorSystem: ActorSystem, transaction: utilities.Transac
 
   private[models] class SetACLTable(tag: Tag) extends Table[SetACL](tag, "SetACL") {
 
-    def * = (from, aclAddress, organizationID, zoneID, aclHash, status.?, txHash.?, ticketID, mode, code.?) <> (SetACL.tupled, SetACL.unapply)
+    def * = (from, aclAddress, organizationID, zoneID, aclHash, gas, status.?, txHash.?, ticketID, mode, code.?) <> (SetACL.tupled, SetACL.unapply)
 
     def from = column[String]("from")
 
@@ -123,6 +123,8 @@ class SetACLs @Inject()(actorSystem: ActorSystem, transaction: utilities.Transac
     def zoneID = column[String]("zoneID")
 
     def aclHash = column[String]("aclHash")
+
+    def gas = column[Int]("gas")
 
     def status = column[Boolean]("status")
 
@@ -137,7 +139,7 @@ class SetACLs @Inject()(actorSystem: ActorSystem, transaction: utilities.Transac
 
   object Service {
 
-    def create(setACL: SetACL): String = Await.result(add(SetACL(from = setACL.from, aclAddress = setACL.aclAddress, organizationID = setACL.organizationID, zoneID = setACL.zoneID, aclHash = setACL.aclHash, status = setACL.status, txHash = setACL.txHash, ticketID = setACL.ticketID, mode = setACL.mode, code = setACL.code)), Duration.Inf)
+    def create(setACL: SetACL): String = Await.result(add(SetACL(from = setACL.from, aclAddress = setACL.aclAddress, organizationID = setACL.organizationID, zoneID = setACL.zoneID, aclHash = setACL.aclHash, gas = setACL.gas, status = setACL.status, txHash = setACL.txHash, ticketID = setACL.ticketID, mode = setACL.mode, code = setACL.code)), Duration.Inf)
 
     def markTransactionSuccessful(ticketID: String, txHash: String): Int = Await.result(updateTxHashAndStatusOnTicketID(ticketID, Option(txHash), status = Option(true)), Duration.Inf)
 

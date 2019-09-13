@@ -1,0 +1,31 @@
+@import controllers.actions.LoginState
+@import models.master.OrganizationKYC
+
+@(organizationKYCs: Seq[OrganizationKYC])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+
+<div class="latest_card-header latest_card-header-primary text-center">
+    <h4 class="latest_card-title">@Messages(constants.Form.ORGANIZATION_KYC_FILES)</h4>
+</div>
+<div class="centerText">
+    @for(documentType <- constants.File.ORGANIZATION_KYC_DOCUMENT_TYPES) {
+        <div id="upload@documentType">
+            <button onclick="getForm(jsRoutes.controllers.AddOrganizationController.userUploadOrganizationKycForm('@documentType'))">@Messages(constants.Form.UPLOAD) @Messages(documentType)</button>
+        </div>
+    }
+    @for(organizationKYC <- organizationKYCs) {
+        @component.master.commonDocumentViewer(organizationKYC) {
+            @routes.AddOrganizationController.userAccessedOrganizationKYCFile(organizationKYC.documentType)
+        } {
+            <a href="@routes.AddOrganizationController.userAccessedOrganizationKYCFile(organizationKYC.documentType)">@Messages(organizationKYC.documentType)</a>
+        } {
+            <button onclick="getForm(jsRoutes.controllers.AddOrganizationController.userUpdateOrganizationKycForm('@organizationKYC.documentType'))">@Messages(constants.Form.UPDATE) @Messages(organizationKYC.documentType)</button>
+            <script>hideElement('upload@organizationKYC.documentType')</script>
+        }
+    }
+</div>
+<button type="button" class="btn-sm btn btn-primary" onclick="getForm(jsRoutes.controllers.AddOrganizationController.organizationBankAccountDetailForm())">@Messages(constants.Form.BACK)</button>
+
+@*//TODO whether database should contain constants.File.TRADER_KYC_DOCUMENT_TYPES (current scenario) OR constants.File.TRADER_KYC_DOCUMENT_TYPES should contain all database file type*@
+@if(constants.File.ORGANIZATION_KYC_DOCUMENT_TYPES.forall(organizationKYCs.map(_.documentType).contains)) {
+    <button type="button" class="btn-sm btn btn-primary" id="getOrganizationKYCReviewForm" onclick="getForm(jsRoutes.controllers.AddOrganizationController.reviewOrganizationCompletionForm())">@Messages(constants.Form.NEXT)</button>
+}

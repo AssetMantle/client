@@ -33,9 +33,9 @@ class ChangeSellerBidController @Inject()(messagesControllerComponents: Messages
         changeSellerBidData => {
           try {
             transaction.process[blockchainTransaction.ChangeSellerBid, transactionsChangeSellerBid.Request](
-              entity = blockchainTransaction.ChangeSellerBid(from = loginState.address, to = changeSellerBidData.buyerAddress, bid = changeSellerBidData.bid, time = changeSellerBidData.time, pegHash = changeSellerBidData.pegHash,gas=changeSellerBidData.gas, status = null, txHash = null, ticketID = "", mode = transactionMode, code = null),
+              entity = blockchainTransaction.ChangeSellerBid(from = loginState.address, to = changeSellerBidData.buyerAddress, bid = changeSellerBidData.bid, time = changeSellerBidData.time, pegHash = changeSellerBidData.pegHash, gas = changeSellerBidData.gas, ticketID = "", mode = transactionMode),
               blockchainTransactionCreate = blockchainTransactionChangeSellerBids.Service.create,
-              request = transactionsChangeSellerBid.Request(transactionsChangeSellerBid.BaseRequest(from = loginState.address), to = changeSellerBidData.buyerAddress, password = changeSellerBidData.password, bid = changeSellerBidData.bid.toString, time = changeSellerBidData.time.toString, pegHash = changeSellerBidData.pegHash,gas=changeSellerBidData.gas.toString, mode = transactionMode),
+              request = transactionsChangeSellerBid.Request(transactionsChangeSellerBid.BaseRequest(from = loginState.address, gas = changeSellerBidData.gas.toString), to = changeSellerBidData.buyerAddress, password = changeSellerBidData.password, bid = changeSellerBidData.bid.toString, time = changeSellerBidData.time.toString, pegHash = changeSellerBidData.pegHash, mode = transactionMode),
               action = transactionsChangeSellerBid.Service.post,
               onSuccess = blockchainTransactionChangeSellerBids.Utility.onSuccess,
               onFailure = blockchainTransactionChangeSellerBids.Utility.onFailure,
@@ -63,7 +63,7 @@ class ChangeSellerBidController @Inject()(messagesControllerComponents: Messages
       },
       changeSellerBidData => {
         try {
-          transactionsChangeSellerBid.Service.post(transactionsChangeSellerBid.Request(transactionsChangeSellerBid.BaseRequest(from = changeSellerBidData.from), to = changeSellerBidData.to, password = changeSellerBidData.password, bid = changeSellerBidData.bid.toString, time = changeSellerBidData.time.toString, pegHash = changeSellerBidData.pegHash,gas=changeSellerBidData.gas.toString, mode = changeSellerBidData.mode))
+          transactionsChangeSellerBid.Service.post(transactionsChangeSellerBid.Request(transactionsChangeSellerBid.BaseRequest(from = changeSellerBidData.from, gas = changeSellerBidData.gas.toString), to = changeSellerBidData.to, password = changeSellerBidData.password, bid = changeSellerBidData.bid.toString, time = changeSellerBidData.time.toString, pegHash = changeSellerBidData.pegHash, mode = changeSellerBidData.mode))
           Ok(views.html.index(successes = Seq(constants.Response.SELLER_BID_CHANGED)))
         }
         catch {

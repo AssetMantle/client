@@ -14,20 +14,18 @@
              <h2 class="card-title">@loginState.username</h2>
                     <p> @Messages(constants.User.COINS): @coins</p>
                     <button class="text-center btn btn-primary btn-sm" onclick="getForm(jsRoutes.controllers.SendCoinController.sendCoinForm())">@Messages(constants.Form.SEND_COIN)</button>
-
                     <p> @Messages(constants.User.USER_TYPE): @loginState.userType </p>
 
                     <p> @Messages(constants.User.ADDRESS)
                        :  @loginState.address
                        </p>
-
                 </div>
             </div>
+        </div>
     </div>
-</div>
+
 <script type="text/javascript">
         var accountCometMessage = function (event) {
-            console.log(event.toString());
             componentResource('commonHome', jsRoutes.controllers.ComponentViewController.commonHome());
         }
 </script>

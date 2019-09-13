@@ -1,6 +1,6 @@
 package models.blockchain
 
-import actors.{MainAccountActor, ShutdownActors}
+import actors.{MainAccountActor, ShutdownActor}
 import akka.actor.{ActorRef, ActorSystem}
 import akka.stream.scaladsl.Source
 import akka.stream.{ActorMaterializer, OverflowStrategy}
@@ -24,7 +24,7 @@ case class Account(address: String, coins: String = "", publicKey: String, accou
 case class AccountCometMessage(username: String, message: JsValue)
 
 @Singleton
-class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, actorSystem: ActorSystem, shutdownActors: ShutdownActors, getAccount: GetAccount, masterAccounts: master.Accounts, implicit val pushNotification: PushNotification)(implicit executionContext: ExecutionContext, configuration: Configuration) {
+class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, actorSystem: ActorSystem, shutdownActors: ShutdownActor, getAccount: GetAccount, masterAccounts: master.Accounts, implicit val pushNotification: PushNotification)(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 

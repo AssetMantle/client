@@ -1,0 +1,102 @@
+@import controllers.actions.LoginState
+@import helper._
+@import master.utils.{Address, UBO, UBOs}
+@import models.master.{Organization, OrganizationBankAccountDetail, OrganizationKYC, Zone}
+@import play.api.Logger
+@import play.api.libs.json.Json
+@import views.companion.master.OrganizationCompletion
+
+@(organizationCompletionForm: Form[OrganizationCompletion.Data], organization: Organization, zone: Zone, organizationBankAccountDetail: OrganizationBankAccountDetail, organizationKYCs: Seq[OrganizationKYC])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, module: String, logger: Logger, loginState: LoginState = null)
+
+<div class="latest_card-header latest_card-header-primary text-center">
+    <h4 class="latest_card-title">@Messages(constants.Form.REVIEW)</h4>
+</div>
+<div class="latest_card-body">
+    <div id="organization" class="flexItem thirdBox box lightBlue">
+        <div class="leftText">
+            <div>@Messages(constants.Form.ZONE_DETAILS): <br>
+                <span class="red">@Messages(constants.Form.NAME)</span>: @zone.name <br>
+                <span class="red">@Messages(constants.Form.CURRENCY)</span>: @zone.currency <br>
+            </div>
+            <br>
+            <div>@Messages(constants.Form.ORGANIZATION_DETAILS): <br>
+                <span class="red">@Messages(constants.Form.ORGANIZATION_ID)</span>: @organization.id <br>
+                <span class="red">@Messages(constants.Form.NAME)</span>: @organization.name <br>
+                <span class="red">@Messages(constants.Form.ABBREVIATION)</span>: @organization.abbreviation.getOrElse("") <br>
+                <span class="red">@Messages(constants.Form.ESTABLISHMENT_DATE)</span>: @organization.establishmentDate <br>
+                <span class="red">@Messages(constants.Form.EMAIL)</span>: @organization.email <br>
+            </div>
+            <br>
+            @defining(utilities.JSON.getInstance[Address](organization.registeredAddress)) { registeredAddress: Address =>
+                <div>@Messages(constants.Form.REGISTERED_ADDRESS) : <br>
+                <span class="red">@Messages(constants.Form.ADDRESS_LINE_1)</span>: @registeredAddress.addressLine1 <br>
+                <span class="red">@Messages(constants.Form.ADDRESS_LINE_2)</span>: @registeredAddress.addressLine2 <br>
+                <span class="red">@Messages(constants.Form.LANDMARK)</span>: @registeredAddress.landmark.getOrElse("") <br>
+                <span class="red">@Messages(constants.Form.CITY)</span>: @registeredAddress.city <br>
+                <span class="red">@Messages(constants.Form.COUNTRY)</span>: @registeredAddress.country <br>
+                <span class="red">@Messages(constants.Form.ZIP_CODE)</span>: @registeredAddress.zipCode <br>
+                <span class="red">@Messages(constants.Form.PHONE)</span>: @registeredAddress.phone
+                </div>
+            }
+            <br>
+            @defining(utilities.JSON.getInstance[Address](organization.postalAddress)) { postalAddress: Address =>
+                <div>@Messages(constants.Form.POSTAL_ADDRESS) : <br>
+                <span class="red">@Messages(constants.Form.ADDRESS_LINE_1)</span>: @postalAddress.addressLine1 <br>
+                <span class="red">@Messages(constants.Form.ADDRESS_LINE_2)</span>: @postalAddress.addressLine2 <br>
+                <span class="red">@Messages(constants.Form.LANDMARK)</span>: @postalAddress.landmark.getOrElse("") <br>
+                <span class="red">@Messages(constants.Form.CITY)</span>: @postalAddress.city <br>
+                <span class="red">@Messages(constants.Form.COUNTRY)</span>: @postalAddress.country <br>
+                <span class="red">@Messages(constants.Form.ZIP_CODE)</span>: @postalAddress.zipCode <br>
+                <span class="red">@Messages(constants.Form.PHONE)</span>: @postalAddress.phone
+                </div>
+            }
+            <br>
+            @defining(utilities.JSON.getInstance[UBOs](organization.ubos.getOrElse(Json.toJson[UBOs](UBOs()).toString)).ubos) { ubos: Seq[UBO] =>
+                <div>@Messages(constants.Form.ORGANIZATION_UBO_DETAIL): <br>
+                    @for(ubo <- ubos) {
+                        <span class="red">@Messages(constants.Form.PERSON_NAME)</span>: @ubo.personName <br>
+                        <span class="red">@Messages(constants.Form.SHARE_PERCENTAGE)</span>: @ubo.sharePercentage <br>
+                        <span class="red">@Messages(constants.Form.RELATIONSHIP)</span>: @ubo.relationship <br>
+                        <span class="red">@Messages(constants.Form.TITLE)</span>: @ubo.title <br>
+                        }
+                </div>
+            }
+            <br>
+            <div class="leftText">@Messages(constants.Form.ORGANIZATION_BANK_ACCOUNT_DETAIL): <br>
+                <span class="red">@Messages(constants.Form.ACCOUNT_HOLDER_NAME)</span>: @organizationBankAccountDetail.accountHolder <br>
+                <span class="red">@Messages(constants.Form.NICK_NAME)</span>: @organizationBankAccountDetail.nickName <br>
+                <span class="red">@Messages(constants.Form.ACCOUNT_NUMBER)</span>: @organizationBankAccountDetail.accountNumber <br>
+                <span class="red">@Messages(constants.Form.BANK_NAME)</span>: @organizationBankAccountDetail.bankName <br>
+                <span class="red">@Messages(constants.Form.SWIFT_CODE)</span>: @organizationBankAccountDetail.swiftAddress <br>
+                <span class="red">@Messages(constants.Form.BANK_ADDRESS)</span>: @organizationBankAccountDetail.swiftAddress <br>
+                <span class="red">@Messages(constants.Form.COUNTRY)</span>: @organizationBankAccountDetail.country <br>
+                <span class="red">@Messages(constants.Form.ZIP_CODE)</span>: @organizationBankAccountDetail.zipCode <br>
+            </div>
+            <br>
+            <div id="organizationKYCs">@Messages(constants.Form.ORGANIZATION_KYC_FILES): <br>
+                @for(organizationKYC <- organizationKYCs) {
+                    @component.master.commonDocumentViewer(organizationKYC) {
+                        @routes.AddOrganizationController.userAccessedOrganizationKYCFile(organizationKYC.documentType)
+                    } { } {
+                        <span>@organizationKYC.documentType</span>
+                    }
+                }
+            </div>
+            <br>
+            @form(action = routes.AddOrganizationController.reviewOrganizationCompletion, 'onkeypress -> "validateForm(event,this)") {
+                @CSRF.formField
+                @Messages(constants.Form.COMPLETION):
+                <span>@checkbox(organizationCompletionForm(constants.Form.COMPLETION), '_label -> Messages(constants.Form.COMPLETION), 'class -> "form-control", 'placeholder -> Messages(constants.Form.COMPLETION), 'required -> true)</span>
+                @if(organizationCompletionForm.hasGlobalErrors) {
+                    <ul>
+                    @for(error <- organizationCompletionForm.globalErrors) {
+                        <li>@error.format</li>
+                    }
+                    </ul>
+                }
+                <button type="button" class="btn-sm btn btn-primary" onclick="getForm(jsRoutes.controllers.AddOrganizationController.userUploadOrUpdateOrganizationKYCView())">@Messages(constants.Form.BACK)</button>
+                <button type="button" class="btn-sm btn btn-primary" onclick="submitForm(this)">@Messages(constants.Form.SUBMIT)</button>
+            }
+        </div>
+    </div>
+</div>

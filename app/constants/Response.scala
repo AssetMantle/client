@@ -45,7 +45,7 @@ object Response {
   val ISSUE_ASSET_REQUEST_REJECTED = new Success("ISSUE_ASSET_REQUEST_REJECTED")
   val ISSUE_FIAT_REQUEST_REJECTED = new Success("ISSUE_FIAT_REQUEST_REJECTED")
   val LOGGED_IN = new Success("LOGGED_IN")
-  val SIGNED_UP = new Success("SIGNED_UP", routes.javascript.LoginController.loginForm)
+  val SIGNED_UP = new Success("SIGNED_UP", routes.javascript.AccountController.loginForm)
   val LOGGED_OUT = new Success("LOGGED_OUT")
   val KEY_ADDED = new Success("KEY_ADDED")
   val MOBILE_NUMBER_VERIFIED = new Success("MOBILE_NUMBER_VERIFIED")
@@ -53,6 +53,7 @@ object Response {
   val ZONE_VERIFIED = new Success("ZONE_VERIFIED")
   val VERIFY_ZONE_REJECTED = new Success("VERIFY_ZONE_REJECTED")
   val ORGANIZATION_ADDED = new Success("ORGANIZATION_ADDED")
+  val ORGANIZATION_ADDED_FOR_VERIFICATION = new Success("ORGANIZATION_ADDED_FOR_VERIFICATION")
   val SELLER_BID_CHANGED = new Success("SELLER_BID_CHANGED")
   val SELLER_BID_CONFIRMED = new Success("SELLER_BID_CONFIRMED")
   val SELLER_FEEDBACK_SET = new Success("SELLER_FEEDBACK_SET")
@@ -101,6 +102,9 @@ object Response {
   val INVALID_USERNAME = new Failure("INVALID_USERNAME")
   val INVALID_PASSWORD = new Failure("INVALID_PASSWORD")
   val NO_FILE = new Failure("NO_FILE")
+  val PASSWORD_NOT_GIVEN =  new Failure("PASSWORD_NOT_GIVEN")
+  val GAS_NOT_GIVEN =  new Failure("GAS_NOT_GIVEN")
+  val ALL_KYC_FILES_NOT_VERIFIED = new Failure("ALL_KYC_FILES_NOT_VERIFIED")
 
   class Failure(private val response: String, private val actionController: JavaScriptReverseRoute = null) {
     val message: String = PREFIX + FAILURE_PREFIX + response

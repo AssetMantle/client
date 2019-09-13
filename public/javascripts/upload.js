@@ -1,8 +1,13 @@
 function getFileTypes(documentType) {
     let fileTypes = [];
     switch (documentType) {
-        case "BANK_DETAILS":
+        case "BANK_ACCOUNT_DETAIL":
         case "IDENTIFICATION":
+        case "LATEST_AUDITED_FINANCIAL_REPORT":
+        case "LAST_YEAR_AUDITED_FINANCIAL_REPORT":
+        case "MANAGEMENT":
+        case "ACRA":
+        case "SHARE_STRUCTURE":
             fileTypes = ['jpg', 'png', 'jpeg', 'pdf', 'doc', 'txt', 'docx'];
             break;
         case "PROFILE_PICTURE":
@@ -56,6 +61,9 @@ function uploadFile(uploadRoute, storeRoute, documentType) {
                     const newDocument = document.open("text/html", "replace");
                     newDocument.write(data.responseText);
                     newDocument.close();
+                },
+                206: function (data) {
+                    $('#commonModalContent').html(data);
                 }
             }
         });
@@ -109,6 +117,9 @@ function updateFile(uploadRoute, updateRoute, documentType) {
                     const newDocument = document.open("text/html", "replace");
                     newDocument.write(data.responseText);
                     newDocument.close();
+                },
+                206: function (data) {
+                    $('#commonModalContent').html(data);
                 }
             }
         });

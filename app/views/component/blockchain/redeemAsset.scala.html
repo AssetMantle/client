@@ -7,23 +7,21 @@
         <h4 class="latest_card-title">@Messages(constants.Form.REDEEM_ASSET)</h4>
     </div>
     <div class="latest_card-body">
-    @CSRF.formField
-    @inputText(redeemAssetForm(constants.FormField.FROM.name), '_label -> Messages(constants.FormField.FROM.name),'class -> "cmuk-input", 'placeholder->Messages(constants.FormField.FROM.name),'required->true)
-    @inputText(redeemAssetForm(constants.FormField.TO.name), '_label -> Messages(constants.FormField.TO.name),'class -> "cmuk-input", 'placeholder->Messages(constants.FormField.TO.name),'required->true)
-    @inputText(redeemAssetForm(constants.FormField.PEG_HASH.name), '_label -> Messages(constants.FormField.PEG_HASH.name), 'class -> "cmuk-input",'placeholder->Messages(constants.FormField.PEG_HASH.name),'required->true)
-    @inputText(redeemAssetForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "cmuk-input",'placeholder->Messages(constants.FormField.GAS.name),'required->true)
-    @inputText(redeemAssetForm(constants.FormField.MODE.name), '_label -> Messages(constants.FormField.MODE.name),'class -> "cmuk-input", 'placeholder->Messages(constants.FormField.MODE.name),'required->true)
-    @inputPassword(redeemAssetForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "cmuk-input",'placeholder->Messages(constants.FormField.PASSWORD.name),'required->true)
+        @CSRF.formField
+        @inputText(redeemAssetForm(constants.FormField.FROM.name), '_label -> Messages(constants.FormField.FROM.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.FROM.name), 'required -> true)
+        @inputText(redeemAssetForm(constants.FormField.TO.name), '_label -> Messages(constants.FormField.TO.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.TO.name), 'required -> true)
+        @inputText(redeemAssetForm(constants.FormField.PEG_HASH.name), '_label -> Messages(constants.FormField.PEG_HASH.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PEG_HASH.name), 'required -> true)
+        @inputText(redeemAssetForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.GAS.name), 'required -> true)
+        @inputText(redeemAssetForm(constants.FormField.MODE.name), '_label -> Messages(constants.FormField.MODE.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.MODE.name), 'required -> true)
+        @inputPassword(redeemAssetForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PASSWORD.name), 'required -> true)
 
-    @if(redeemAssetForm.hasGlobalErrors) {
-        <ul>
-        @for(error <- redeemAssetForm.globalErrors) {
-            <li>@error.format</li>
+        @if(redeemAssetForm.hasGlobalErrors) {
+            <ul>
+            @for(error <- redeemAssetForm.globalErrors) {
+                <li>@error.format</li>
+            }
+            </ul>
         }
-        </ul>
-    }
-    <button type="button" class="btn btn-primary btn-sm" onclick="submitForm(this)">@Messages(constants.Form.REDEEM_ASSET)</button>
+        <button type="button" class="btn btn-primary btn-sm" onclick="submitForm(this)">@Messages(constants.Form.REDEEM_ASSET)</button>
     </div>
-    </div>
-
-    }
+}
