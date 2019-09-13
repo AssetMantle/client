@@ -11,7 +11,7 @@
     @CSRF.formField
     @inputText(approveFaucetRequestForm(constants.FormField.REQUEST_ID.name).copy(value = Some(requestID)), '_label -> Messages(constants.FormField.REQUEST_ID.name),'placeholder->Messages(constants.FormField.REQUEST_ID.name),'required->true,'class -> "form-control")
     @inputText(approveFaucetRequestForm(constants.FormField.ACCOUNT_ID.name).copy(value = Some(accountID)), '_label -> Messages(constants.FormField.ACCOUNT_ID.name),'placeholder->Messages(constants.FormField.ACCOUNT_ID.name),'required->true,'class -> "form-control")
-    @inputText(approveFaucetRequestForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.GAS.name),'required->true)
+        @inputText(approveFaucetRequestForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.GAS.name), 'required -> true, 'type -> "number")
     @inputPassword(approveFaucetRequestForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'placeholder->Messages(constants.FormField.PASSWORD.name),'required->true,'class -> "form-control")
 
     @if(approveFaucetRequestForm.hasGlobalErrors) {

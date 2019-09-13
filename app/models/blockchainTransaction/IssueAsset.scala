@@ -48,7 +48,9 @@ class IssueAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tra
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
   private def add(issueAsset: IssueAsset): Future[String] = db.run((issueAssetTable returning issueAssetTable.map(_.ticketID) += issueAsset).asTry).map {
-    case Success(result) => result
+    case Success(result) =>
+      println(Thread.currentThread().getName)
+      result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
         throw new BaseException(constants.Response.PSQL_EXCEPTION)

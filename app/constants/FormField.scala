@@ -45,7 +45,7 @@ object FormField {
   val DOCUMENT_HASH = new StringFormField("DOCUMENT_HASH", 4, 50, RegularExpression.HASH)
   val FROM = new StringFormField("FROM", 45, 45)
   val MODE = new StringFormField("MODE", 4, 5)
-  val TAKER_ADDRESS = new StringFormField( "TAKER_ADDRESS", 0, 45)
+  val TAKER_ADDRESS = new StringFormField("TAKER_ADDRESS", 0, 45, RegularExpression.ALL_NUMBERS_ALL_LETTERS)
 
   val OLD_PASSWORD = new StringFormField("OLD_PASSWORD", 1, 128)
   val NEW_PASSWORD = new StringFormField("NEW_PASSWORD", 1, 128, RegularExpression.PASSWORD, Response.INVALID_PASSWORD.message)
@@ -65,7 +65,7 @@ object FormField {
   //TODO: Error Response through Messages
   class StringFormField (fieldName: String, minimumLength: Int, maximumLength: Int, regex: Regex = """.*""".r, errorMessage: String = "Error Response") {
     val name: String = fieldName
-    val field: Mapping[String] =  text(minLength = minimumLength, maxLength = maximumLength).verifying(Constraints.pattern(regex = regex, error = errorMessage))
+    val field: Mapping[String] = text(minLength = minimumLength, maxLength = maximumLength).verifying(Constraints.pattern(regex = regex, name = regex.pattern.toString, error = errorMessage))
   }
 
   class IntFormField (fieldName: String, minimumValue: Int, maximumValue: Int) {

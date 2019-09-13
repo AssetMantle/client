@@ -1,0 +1,72 @@
+@import controllers.actions.LoginState
+@(title: String, failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(left: Html)(center: Html = Html(""))(right: Html = Html(""))(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>@title</title>
+
+
+    </head>
+    <body>
+        <header>
+            <div cmuk-sticky="sel-target: .cmuk-navbar-container; cls-active: cmuk-navbar-sticky; bottom: #transparent-sticky-navbar">
+
+                <nav class="cmuk-navbar-container" cmuk-navbar>
+                    <div class="cmuk-navbar-left">
+                        <a class="cmuk-navbar-item cmuk-logo" href="@controllers.routes.IndexController.index()">
+                            <img src="@routes.Assets.versioned("images/commitLogo.png")" class="navigationBarLogo">
+                        </a>
+                    </div>
+                    <div class="cmuk-navbar-right">
+
+
+                    </div>
+                </nav>
+            </div>
+
+        </header>
+        <div class="centerText">
+
+        </div>
+        <div class="pageContent">
+            <div class="left_side">
+            @left
+            </div>
+            <div class="middle">
+            @center
+            </div>
+            <div class="right_side">
+            @right
+            </div>
+        </div>
+
+
+        <div class="modal" id="commonModal">
+
+            <div class="latest_card latest_card-login modalContent" id="commonModalContent">
+            </div>
+
+
+        </div>
+
+        <div class = "modal centerScreen" id="loading">
+            <img src="@routes.Assets.versioned("images/loading.gif")" alt = "@Messages(constants.Form.LOADING)"/>
+        </div>
+        <footer class="footer cmuk-margin-medium-top">
+            <div class="container">
+                <div class="copyright float-right">
+                            &copy;
+                    <script>
+                            document.write(new Date().getFullYear())
+                    </script>
+                    <a href="" target="_blank">Commit</a>
+                </div>
+            </div>
+        </footer>
+        <script src="@routes.Assets.versioned("javascripts/style/ajaxLoading.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.versioned("javascripts/style/alert.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.versioned("javascripts/style/modal.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.versioned("javascripts/style/hideElement.js")" type="text/javascript"></script>
+
+    </body>
+</html>

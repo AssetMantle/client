@@ -29,7 +29,9 @@ class IssueAssetRequests @Inject()(protected val databaseConfigProvider: Databas
   private[models] val issueAssetRequestTable = TableQuery[IssueAssetRequestTable]
 
   private def add(issueAssetRequest: IssueAssetRequest): Future[String] = db.run((issueAssetRequestTable returning issueAssetRequestTable.map(_.id) += issueAssetRequest).asTry).map {
-    case Success(result) => result
+    case Success(result) =>
+      println(Thread.currentThread().getName + "inside add")
+      result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
         throw new BaseException(constants.Response.PSQL_EXCEPTION)
@@ -116,8 +118,10 @@ class IssueAssetRequests @Inject()(protected val databaseConfigProvider: Databas
 
   object Service {
 
-    def create(accountID: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, takerAddress: Option[String]): String = Await.result(add(IssueAssetRequest(id = utilities.IDGenerator.requestID(), null, accountID = accountID, documentHash = documentHash, assetType = assetType, assetPrice = assetPrice, quantityUnit = quantityUnit, assetQuantity = assetQuantity, takerAddress = takerAddress, null, null)), Duration.Inf)
-
+    def create(accountID: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, takerAddress: Option[String]): String = {
+      println(Thread.currentThread().getName + "whatthefuck")
+      Await.result(add(IssueAssetRequest(id = utilities.IDGenerator.requestID(), null, accountID = accountID, documentHash = documentHash, assetType = assetType, assetPrice = assetPrice, quantityUnit = quantityUnit, assetQuantity = assetQuantity, takerAddress = takerAddress, null, null)), Duration.Inf)
+    }
     def accept(id: String, ticketID: String): Int = Await.result(updateTicketIDAndStatusByID(id, ticketID, status = true), Duration.Inf)
 
     def reject(id: String, comment: String): Int = Await.result(updateStatusAndCommentByID(id = id, status = Option(false), comment = comment), Duration.Inf)

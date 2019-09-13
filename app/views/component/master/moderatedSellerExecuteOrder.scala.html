@@ -15,7 +15,7 @@
     @inputText(moderatedSellerExecuteOrderForm(constants.FormField.SELLER_ADDRESS.name).copy(value = Some(sellerAddress)), '_label -> Messages(constants.FormField.SELLER_ADDRESS.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.SELLER_ADDRESS.name),'required->true)
     @inputText(moderatedSellerExecuteOrderForm(constants.FormField.AWB_PROOF_HASH.name), '_label -> Messages(constants.FormField.AWB_PROOF_HASH.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.AWB_PROOF_HASH.name),'required->true)
     @inputText(moderatedSellerExecuteOrderForm(constants.FormField.PEG_HASH.name).copy(value = Some(pegHash)), '_label -> Messages(constants.FormField.PEG_HASH.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.PEG_HASH.name),'required->true)
-    @inputText(moderatedSellerExecuteOrderForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.GAS.name),'required->true)
+        @inputText(moderatedSellerExecuteOrderForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.GAS.name), 'required -> true, 'type -> "number")
     @inputPassword(moderatedSellerExecuteOrderForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "form-control",'placeholder->Messages(constants.FormField.PASSWORD.name),'required->true)
 
     @if(moderatedSellerExecuteOrderForm.hasGlobalErrors) {

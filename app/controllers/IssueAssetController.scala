@@ -33,6 +33,7 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
         issueAssetRequestData => {
           try {
             if (!issueAssetRequestData.moderated) {
+
               transaction.process[blockchainTransaction.IssueAsset, transactionsIssueAsset.Request](
                 entity = blockchainTransaction.IssueAsset(from = loginState.address, to = loginState.address, documentHash = issueAssetRequestData.documentHash, assetType = issueAssetRequestData.assetType, assetPrice = issueAssetRequestData.assetPrice, quantityUnit = issueAssetRequestData.quantityUnit, assetQuantity = issueAssetRequestData.assetQuantity, moderated = issueAssetRequestData.moderated,gas=issueAssetRequestData.gas ,takerAddress = if (issueAssetRequestData.takerAddress == "") null else Option(issueAssetRequestData.takerAddress), status = null, txHash = null, ticketID = "", mode = transactionMode, code = null),
                 blockchainTransactionCreate = blockchainTransactionIssueAssets.Service.create,
@@ -44,7 +45,9 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
               )
               withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ASSET_ISSUED)))
             } else {
+              println(Thread.currentThread().getName)
               masterTransactionIssueAssetRequests.Service.create(accountID = loginState.username, documentHash = issueAssetRequestData.documentHash, assetPrice = issueAssetRequestData.assetPrice, assetType = issueAssetRequestData.assetType, quantityUnit = issueAssetRequestData.quantityUnit, assetQuantity = issueAssetRequestData.assetQuantity, takerAddress = if (issueAssetRequestData.takerAddress == "") null else Option(issueAssetRequestData.takerAddress))
+              println(Thread.currentThread().getName)
               withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ISSUE_ASSET_REQUEST_SENT)))
             }
           }
