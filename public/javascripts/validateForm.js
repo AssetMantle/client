@@ -6,7 +6,8 @@ function validateForm(event, source) {
         event.preventDefault();
         const form = $(source).closest("form");
 
-        let inputElements = form[0].getElementsByTagName("INPUT");
+        let inputElements = form.find(":input");
+
         for (let i = 1; i < inputElements.length; i++) {
             $("#" + inputElements[i].id).css('border-color', 'transparent');
             let errorElements = $("#" + inputElements[i].id + '_field').find(".error")

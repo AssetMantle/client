@@ -85,7 +85,7 @@
                 @for(organizationKYC <- organizationKYCs) {
                     @component.master.commonDocumentViewer(organizationKYC) {
                         @routes.AddOrganizationController.userAccessedOrganizationKYCFile(organizationKYC.documentType)
-                    } {} {
+                    } { } {
                         <span>@organizationKYC.documentType</span>
                     }
                 }
