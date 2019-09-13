@@ -4,7 +4,7 @@ import actors.{MainAccountActor, ShutdownActor}
 import akka.actor.{ActorRef, ActorSystem}
 import akka.stream.scaladsl.Source
 import akka.stream.{ActorMaterializer, OverflowStrategy}
-import exceptions.{BaseException, BlockChainException}
+import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.master
 import org.postgresql.util.PSQLException
@@ -164,7 +164,6 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
         }
       } catch {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
-        case blockChainException: BlockChainException => logger.error(blockChainException.failure.message, blockChainException)
       }
     }(schedulerExecutionContext)
   }

@@ -4,7 +4,7 @@ import actors.{MainOrderActor, ShutdownActor}
 import akka.actor.{ActorRef, ActorSystem}
 import akka.stream.scaladsl.Source
 import akka.stream.{ActorMaterializer, OverflowStrategy}
-import exceptions.{BaseException, BlockChainException}
+import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.master
 import org.postgresql.util.PSQLException
@@ -177,7 +177,6 @@ class Orders @Inject()(shutdownActors: ShutdownActor, masterAccounts: master.Acc
           mainOrderActor ! OrderCometMessage(username = masterAccounts.Service.getId(negotiation.sellerAddress), message = Json.toJson(constants.Comet.PING))
         }
         catch {
-          case blockChainException: BlockChainException => logger.error(blockChainException.failure.message, blockChainException)
           case baseException: BaseException => logger.error(baseException.failure.message, baseException)
         }
       }

@@ -3,7 +3,7 @@ package controllers
 import actors.ShutdownActor
 import controllers.actions.{LoginState, WithLoginAction}
 import controllers.results.WithUsernameToken
-import exceptions.{BaseException, BlockChainException}
+import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.{blockchain, master, masterTransaction}
 import play.api.i18n.I18nSupport
@@ -65,12 +65,10 @@ class AccountController @Inject()(
       signUpData => {
         try {
           val addKeyResponse = transactionAddKey.Service.post(transactionAddKey.Request(signUpData.username, signUpData.password))
-          logger.info(addKeyResponse.toString)
           masterAccounts.Service.addLogin(signUpData.username, signUpData.password, blockchainAccounts.Service.create(address = addKeyResponse.address, pubkey = addKeyResponse.pubkey), request.lang.toString.stripPrefix("Lang(").stripSuffix(")").trim.split("_")(0))
           Ok(views.html.index(successes = Seq(constants.Response.SIGNED_UP)))
         } catch {
           case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-          case blockChainException: BlockChainException => InternalServerError(views.html.index(failures = Seq(blockChainException.failure)))
         }
       }
     )
@@ -176,7 +174,6 @@ class AccountController @Inject()(
             }
           }
           catch {
-            case blockChainException: BlockChainException => InternalServerError(views.html.index(failures = Seq(blockChainException.failure)))
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
         }
@@ -227,7 +224,6 @@ class AccountController @Inject()(
           }
         }
         catch {
-          case blockChainException: BlockChainException => InternalServerError(views.html.index(failures = Seq(blockChainException.failure)))
           case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
         }
       }

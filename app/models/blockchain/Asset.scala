@@ -4,7 +4,7 @@ import actors.{MainAssetActor, ShutdownActor}
 import akka.actor.{ActorRef, ActorSystem}
 import akka.stream.scaladsl.Source
 import akka.stream.{ActorMaterializer, OverflowStrategy}
-import exceptions.{BaseException, BlockChainException}
+import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.master
 import models.masterTransaction.AccountTokens
@@ -201,7 +201,6 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
               Service.deleteAssetPegWallet(dirtyAsset.ownerAddress)
               mainAssetActor ! AssetCometMessage(username = masterAccounts.Service.getId(dirtyAsset.ownerAddress), message = Json.toJson(constants.Comet.PING))
             }
-          case blockChainException: BlockChainException => logger.error(blockChainException.failure.message, blockChainException)
         }
       }
     }(schedulerExecutionContext)
