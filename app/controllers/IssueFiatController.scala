@@ -91,7 +91,7 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
               val ticketID = transaction.process[blockchainTransaction.IssueFiat, transactionsIssueFiat.Request](
                 entity = blockchainTransaction.IssueFiat(from = loginState.address, to = toAddress, transactionID = issueFiatData.transactionID, transactionAmount = issueFiatData.transactionAmount, gas = issueFiatData.gas, ticketID = "", mode = transactionMode),
                 blockchainTransactionCreate = blockchainTransactionIssueFiats.Service.create,
-                request = transactionsIssueFiat.Request(transactionsIssueFiat.BaseRequest(from = loginState.address, gas = issueFiatData.gas.toString), to = toAddress, password = issueFiatData.password, transactionID = issueFiatData.transactionID, transactionAmount = issueFiatData.transactionAmount.toString, mode = transactionMode),
+                request = transactionsIssueFiat.Request(transactionsIssueFiat.BaseReq(from = loginState.address, gas = issueFiatData.gas.toString), to = toAddress, password = issueFiatData.password, transactionID = issueFiatData.transactionID, transactionAmount = issueFiatData.transactionAmount.toString, mode = transactionMode),
                 action = transactionsIssueFiat.Service.post,
                 onSuccess = blockchainTransactionIssueFiats.Utility.onSuccess,
                 onFailure = blockchainTransactionIssueFiats.Utility.onFailure,
@@ -122,7 +122,7 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
       },
       issueFiatData => {
         try {
-          transactionsIssueFiat.Service.post(transactionsIssueFiat.Request(transactionsIssueFiat.BaseRequest(from = issueFiatData.from, gas = issueFiatData.gas.toString), to = issueFiatData.to, password = issueFiatData.password, transactionID = issueFiatData.transactionID, transactionAmount = issueFiatData.transactionAmount.toString, mode = issueFiatData.mode))
+          transactionsIssueFiat.Service.post(transactionsIssueFiat.Request(transactionsIssueFiat.BaseReq(from = issueFiatData.from, gas = issueFiatData.gas.toString), to = issueFiatData.to, password = issueFiatData.password, transactionID = issueFiatData.transactionID, transactionAmount = issueFiatData.transactionAmount.toString, mode = issueFiatData.mode))
           Ok(views.html.index(successes = Seq(constants.Response.FIAT_ISSUED)))
         }
         catch {

@@ -76,7 +76,7 @@ class Traders @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
     }
   }
 
-  private def getIDByAccountID(accountID: String): Future[String] = db.run(traderTable.filter(_.accountID === accountID).map(_.id).result.head.asTry).map {
+  private def getIDByAccountID(accountID: String): Future[Option[String]] = db.run(traderTable.filter(_.accountID === accountID).map(_.id.?).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -102,9 +102,9 @@ class Traders @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
     }
   }
 
-  private def getTradersWithCompletedStatusNullVerificationStatusByZoneID(zoneID: String): Future[Seq[Trader]] = db.run(traderTable.filter(_.zoneID === zoneID).filter(_.completionStatus === true).filter(_.verificationStatus.?.isEmpty).result)
+  private def getTradersByCompletionStatusVerificationStatusAndZoneID(zoneID: String, completionStatus: Boolean, verificationStatus: Option[Boolean]): Future[Seq[Trader]] = db.run(traderTable.filter(_.zoneID === zoneID).filter(_.completionStatus === completionStatus).filter(_.verificationStatus.? === verificationStatus).result)
 
-  private def getTradersWithCompletedStatusNullVerificationStatusByOrganizationID(organizationID: String): Future[Seq[Trader]] = db.run(traderTable.filter(_.organizationID === organizationID).filter(_.completionStatus === true).filter(_.verificationStatus.?.isEmpty).result)
+  private def getTradersByCompletedStatusVerificationStatusByOrganizationID(organizationID: String, completionStatus: Boolean, verificationStatus: Option[Boolean]): Future[Seq[Trader]] = db.run(traderTable.filter(_.organizationID === organizationID).filter(_.completionStatus === completionStatus).filter(_.verificationStatus.? === verificationStatus).result)
 
   private def getVerifiedTradersByOrganizationID(organizationID: String): Future[Seq[Trader]] = db.run(traderTable.filter(_.organizationID === organizationID).filter(_.verificationStatus === true).result)
 
@@ -167,20 +167,12 @@ class Traders @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
     def create(zoneID: String, organizationID: String, accountID: String, name: String): String = Await.result(add(Trader(utilities.IDGenerator.hexadecimal, zoneID, organizationID, accountID, name)), Duration.Inf)
 
     def insertOrUpdateTraderDetails(zoneID: String, organizationID: String, accountID: String, name: String): String = {
-      val id = try {
-        getID(accountID)
-      } catch {
-        case baseException: BaseException => if (baseException.failure == constants.Response.NO_SUCH_ELEMENT_EXCEPTION) {
-          utilities.IDGenerator.hexadecimal
-        } else {
-          throw new BaseException(baseException.failure)
-        }
-      }
+      val id = Await.result(getIDByAccountID(accountID), Duration.Inf).getOrElse(utilities.IDGenerator.hexadecimal)
       Await.result(upsert(Trader(id = id, zoneID = zoneID, organizationID = organizationID, accountID = accountID, name = name)), Duration.Inf)
       id
     }
 
-    def getID(accountID: String): String = Await.result(getIDByAccountID(accountID), Duration.Inf)
+    def getID(accountID: String): String = Await.result(getIDByAccountID(accountID), Duration.Inf).getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION))
 
     def get(id: String): Trader = Await.result(findById(id), Duration.Inf)
 
@@ -198,9 +190,9 @@ class Traders @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
 
     def getAccountId(id: String): String = Await.result(getAccountIdById(id), Duration.Inf)
 
-    def getVerifyTraderRequestsForZone(zoneID: String): Seq[Trader] = Await.result(getTradersWithCompletedStatusNullVerificationStatusByZoneID(zoneID), Duration.Inf)
+    def getVerifyTraderRequestsForZone(zoneID: String): Seq[Trader] = Await.result(getTradersByCompletionStatusVerificationStatusAndZoneID(zoneID = zoneID, completionStatus = true, verificationStatus = None), Duration.Inf)
 
-    def getVerifyTraderRequestsForOrganization(organizationID: String): Seq[Trader] = Await.result(getTradersWithCompletedStatusNullVerificationStatusByOrganizationID(organizationID), Duration.Inf)
+    def getVerifyTraderRequestsForOrganization(organizationID: String): Seq[Trader] = Await.result(getTradersByCompletedStatusVerificationStatusByOrganizationID(organizationID = organizationID, completionStatus = true, verificationStatus = None), Duration.Inf)
 
     def getVerifiedTradersForOrganization(organizationID: String): Seq[Trader] = Await.result(getVerifiedTradersByOrganizationID(organizationID), Duration.Inf)
 

@@ -92,11 +92,11 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
     }
   }
 
-  private def getIDByAccountID(accountID: String): Future[Option[String]] = db.run(organizationTable.filter(_.accountID === accountID).map(_.id).result.head.asTry).map {
-    case Success(result) => Option(result)
+  private def getIDByAccountID(accountID: String): Future[Option[String]] = db.run(organizationTable.filter(_.accountID === accountID).map(_.id.?).result.head.asTry).map {
+    case Success(result) => result
     case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => logger.info(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        None
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }
   }
 
@@ -150,7 +150,6 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
     }
   }
 
-  //TODO: Find if result have None
   private def getUBOsOnID(id: String): Future[String] = db.run(organizationTable.filter(_.id === id).map(_.ubos.?).result.head.asTry).map {
     case Success(result) => result.getOrElse(Json.toJson(UBOs()).toString)
     case Failure(exception) => exception match {

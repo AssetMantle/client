@@ -1,6 +1,9 @@
 package constants
 
 object File {
+
+  val KEY_FILE = "file"
+
   val IMAGE = "IMAGES"
   val DOCUMENT = "DOCUMENT"
   val FILE = "FILE"

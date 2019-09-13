@@ -35,7 +35,7 @@ class ReleaseAssetController @Inject()(messagesControllerComponents: MessagesCon
             transaction.process[blockchainTransaction.ReleaseAsset, transactionsReleaseAsset.Request](
               entity = blockchainTransaction.ReleaseAsset(from = loginState.address, to = releaseAssetData.address, pegHash = releaseAssetData.pegHash, gas = releaseAssetData.gas, ticketID = "", mode = transactionMode),
               blockchainTransactionCreate = blockchainTransactionReleaseAssets.Service.create,
-              request = transactionsReleaseAsset.Request(transactionsReleaseAsset.BaseRequest(from = loginState.address, gas = releaseAssetData.gas.toString), to = releaseAssetData.address, password = releaseAssetData.password, pegHash = releaseAssetData.pegHash, mode = transactionMode),
+              request = transactionsReleaseAsset.Request(transactionsReleaseAsset.BaseReq(from = loginState.address, gas = releaseAssetData.gas.toString), to = releaseAssetData.address, password = releaseAssetData.password, pegHash = releaseAssetData.pegHash, mode = transactionMode),
               action = transactionsReleaseAsset.Service.post,
               onSuccess = blockchainTransactionReleaseAssets.Utility.onSuccess,
               onFailure = blockchainTransactionReleaseAssets.Utility.onFailure,
@@ -71,7 +71,7 @@ class ReleaseAssetController @Inject()(messagesControllerComponents: MessagesCon
       },
       releaseAssetData => {
         try {
-          transactionsReleaseAsset.Service.post(transactionsReleaseAsset.Request(transactionsReleaseAsset.BaseRequest(from = releaseAssetData.from, gas = releaseAssetData.gas.toString), to = releaseAssetData.to, password = releaseAssetData.password, pegHash = releaseAssetData.pegHash, mode = releaseAssetData.mode))
+          transactionsReleaseAsset.Service.post(transactionsReleaseAsset.Request(transactionsReleaseAsset.BaseReq(from = releaseAssetData.from, gas = releaseAssetData.gas.toString), to = releaseAssetData.to, password = releaseAssetData.password, pegHash = releaseAssetData.pegHash, mode = releaseAssetData.mode))
           Ok(views.html.index(successes = Seq(constants.Response.ASSET_RELEASED)))
         }
         catch {
