@@ -21,7 +21,7 @@ import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class SendAsset(from: String, to: String, pegHash: String, gas: Int,  status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None) extends BaseTransaction[SendAsset] {
+case class SendAsset(from: String, to: String, pegHash: String, gas: Int, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None) extends BaseTransaction[SendAsset] {
   def mutateTicketID(newTicketID: String): SendAsset = SendAsset(from = from, to = to, pegHash = pegHash, gas = gas, status = status, txHash, ticketID = newTicketID, mode = mode, code = code)
 }
 
@@ -161,7 +161,7 @@ class SendAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
 
   object Service {
 
-    def create(sendAsset: SendAsset): String = Await.result(add(SendAsset(from = sendAsset.from, to = sendAsset.to, pegHash = sendAsset.pegHash, gas=sendAsset.gas, status = sendAsset.status, txHash = sendAsset.txHash, ticketID = sendAsset.ticketID, mode = sendAsset.mode, code = sendAsset.code)), Duration.Inf)
+    def create(sendAsset: SendAsset): String = Await.result(add(SendAsset(from = sendAsset.from, to = sendAsset.to, pegHash = sendAsset.pegHash, gas = sendAsset.gas, status = sendAsset.status, txHash = sendAsset.txHash, ticketID = sendAsset.ticketID, mode = sendAsset.mode, code = sendAsset.code)), Duration.Inf)
 
     def markTransactionSuccessful(ticketID: String, txHash: String): Int = Await.result(updateTxHashAndStatusOnTicketID(ticketID, Option(txHash), status = Option(true)), Duration.Inf)
 

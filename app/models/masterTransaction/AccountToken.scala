@@ -1,6 +1,6 @@
 package models.masterTransaction
 
-import actors.ShutdownActors
+import actors.ShutdownActor
 import akka.actor.ActorSystem
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
@@ -18,7 +18,7 @@ import scala.util.{Failure, Success}
 case class AccountToken(id: String, notificationToken: Option[String], sessionTokenHash: Option[String], sessionTokenTime: Option[Long])
 
 @Singleton
-class AccountTokens @Inject()(actorSystem: ActorSystem, shutdownActors: ShutdownActors, masterAccounts: master.Accounts, protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext, configuration: Configuration) {
+class AccountTokens @Inject()(actorSystem: ActorSystem, shutdownActors: ShutdownActor, masterAccounts: master.Accounts, protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
   private implicit val module: String = constants.Module.MASTER_TRANSACTION_ACCOUNT_TOKEN
 

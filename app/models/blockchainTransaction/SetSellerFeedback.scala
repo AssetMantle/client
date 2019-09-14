@@ -154,7 +154,7 @@ class SetSellerFeedbacks @Inject()(actorSystem: ActorSystem, transaction: utilit
 
   object Service {
 
-    def create(setSellerFeedback: SetSellerFeedback): String = Await.result(add(SetSellerFeedback(from = setSellerFeedback.from, to = setSellerFeedback.to, pegHash = setSellerFeedback.pegHash, rating = setSellerFeedback.rating, gas=setSellerFeedback.gas, status = setSellerFeedback.status, txHash = setSellerFeedback.txHash, ticketID = setSellerFeedback.ticketID, mode = setSellerFeedback.mode, code = setSellerFeedback.code)), Duration.Inf)
+    def create(setSellerFeedback: SetSellerFeedback): String = Await.result(add(SetSellerFeedback(from = setSellerFeedback.from, to = setSellerFeedback.to, pegHash = setSellerFeedback.pegHash, rating = setSellerFeedback.rating, gas = setSellerFeedback.gas, status = setSellerFeedback.status, txHash = setSellerFeedback.txHash, ticketID = setSellerFeedback.ticketID, mode = setSellerFeedback.mode, code = setSellerFeedback.code)), Duration.Inf)
 
     def getTicketIDsOnStatus(): Seq[String] = Await.result(getTicketIDsWithNullStatus, Duration.Inf)
 

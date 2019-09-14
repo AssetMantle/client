@@ -4,7 +4,7 @@ import java.nio.file.Files
 
 import controllers.actions._
 import controllers.results.WithUsernameToken
-import exceptions.{BaseException, BlockChainException, SerializationException}
+import exceptions.{BaseException, SerializationException}
 import javax.inject.{Inject, Singleton}
 import models.{blockchain, blockchainTransaction, master, masterTransaction}
 import play.api.i18n.{I18nSupport, Messages}
@@ -272,7 +272,6 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
           }
           catch {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-            case blockChainException: BlockChainException => InternalServerError(views.html.index(failures = Seq(blockChainException.failure)))
           }
         }
       )
@@ -378,7 +377,6 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
           }
           catch {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-            case blockChainException: BlockChainException => InternalServerError(views.html.index(failures = Seq(blockChainException.failure)))
           }
         }
       )
@@ -563,7 +561,6 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
         }
         catch {
           case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-          case blockChainException: BlockChainException => InternalServerError(views.html.index(failures = Seq(blockChainException.failure)))
         }
       }
     )

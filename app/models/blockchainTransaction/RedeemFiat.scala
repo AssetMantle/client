@@ -17,7 +17,7 @@ import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class RedeemFiat(from: String, to: String, redeemAmount: Int, gas: Int,  status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None) extends BaseTransaction[RedeemFiat] {
+case class RedeemFiat(from: String, to: String, redeemAmount: Int, gas: Int, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None) extends BaseTransaction[RedeemFiat] {
   def mutateTicketID(newTicketID: String): RedeemFiat = RedeemFiat(from = from, to = to, redeemAmount = redeemAmount, gas = gas, status = status, txHash, ticketID = newTicketID, mode = mode, code = code)
 }
 
@@ -152,7 +152,7 @@ class RedeemFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Tra
 
   object Service {
 
-    def create(redeemFiat: RedeemFiat): String = Await.result(add(RedeemFiat(from = redeemFiat.from, to = redeemFiat.to, redeemAmount = redeemFiat.redeemAmount, gas=redeemFiat.gas, status = redeemFiat.status, txHash = redeemFiat.txHash, ticketID = redeemFiat.ticketID, mode = redeemFiat.mode, code = redeemFiat.code)), Duration.Inf)
+    def create(redeemFiat: RedeemFiat): String = Await.result(add(RedeemFiat(from = redeemFiat.from, to = redeemFiat.to, redeemAmount = redeemFiat.redeemAmount, gas = redeemFiat.gas, status = redeemFiat.status, txHash = redeemFiat.txHash, ticketID = redeemFiat.ticketID, mode = redeemFiat.mode, code = redeemFiat.code)), Duration.Inf)
 
     def markTransactionSuccessful(ticketID: String, txHash: String): Int = Await.result(updateTxHashAndStatusOnTicketID(ticketID, Option(txHash), status = Option(true)), Duration.Inf)
 

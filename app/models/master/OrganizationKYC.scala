@@ -12,7 +12,7 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class OrganizationKYC(id: String, documentType: String, fileName: String, file: Option[Array[Byte]], status: Option[Boolean] = None) extends Document[OrganizationKYC]{
+case class OrganizationKYC(id: String, documentType: String, fileName: String, file: Option[Array[Byte]], status: Option[Boolean] = None) extends Document[OrganizationKYC] {
 
   def updateFile(newFile: Option[Array[Byte]]): OrganizationKYC = OrganizationKYC(id = id, documentType = documentType, fileName = fileName, file = newFile, status = status)
 

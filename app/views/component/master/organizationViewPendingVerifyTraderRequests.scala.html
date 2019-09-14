@@ -14,8 +14,8 @@
             <span id = "kycDocuments@traderVerificationRequest.accountID">
                 <script>componentResource('kycDocuments@traderVerificationRequest.accountID', jsRoutes.controllers.SetACLController.organizationViewKycDocuments('@traderVerificationRequest.id'))</script>
             </span><br>
-            <button class=" btn btn-sm btn-success" onclick="getForm(jsRoutes.controllers.SetACLController.organizationVerifyTraderForm('@traderVerificationRequest.accountID', '@traderVerificationRequest.organizationID'))">@Messages(constants.Form.APPROVE)</button>
-            <button class=" btn btn-sm btn-danger" onclick="getForm(jsRoutes.controllers.SetACLController.organizationRejectVerifyTraderRequestForm('@traderVerificationRequest.id'))">@Messages(constants.Form.REJECT)</button>
+          <button class="cmuk-button cmuk-button-success cmuk-button-small" onclick="getForm(jsRoutes.controllers.SetACLController.organizationVerifyTraderForm('@traderVerificationRequest.accountID', '@traderVerificationRequest.organizationID'))">@Messages(constants.Form.APPROVE)</button>
+          <button class="cmuk-button cmuk-button-danger cmuk-button-small" onclick="getForm(jsRoutes.controllers.SetACLController.organizationRejectVerifyTraderRequestForm('@traderVerificationRequest.id'))">@Messages(constants.Form.REJECT)</button>
         </div>
     </div>
     <br>

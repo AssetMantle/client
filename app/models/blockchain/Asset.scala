@@ -1,10 +1,10 @@
 package models.blockchain
 
-import actors.{MainAssetActor, ShutdownActors}
+import actors.{MainAssetActor, ShutdownActor}
 import akka.actor.{ActorRef, ActorSystem}
 import akka.stream.scaladsl.Source
 import akka.stream.{ActorMaterializer, OverflowStrategy}
-import exceptions.{BaseException, BlockChainException}
+import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.master
 import models.masterTransaction.AccountTokens
@@ -25,7 +25,7 @@ case class Asset(pegHash: String, documentHash: String, assetType: String, asset
 case class AssetCometMessage(username: String, message: JsValue)
 
 @Singleton
-class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, actorSystem: ActorSystem, shutdownActors: ShutdownActors, accountTokens: AccountTokens, getAccount: GetAccount, masterAccounts: master.Accounts, implicit val pushNotification: PushNotification)(implicit executionContext: ExecutionContext, configuration: Configuration) {
+class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, actorSystem: ActorSystem, shutdownActors: ShutdownActor, accountTokens: AccountTokens, getAccount: GetAccount, masterAccounts: master.Accounts, implicit val pushNotification: PushNotification)(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -199,7 +199,6 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
               Service.deleteAssetPegWallet(dirtyAsset.ownerAddress)
               mainAssetActor ! AssetCometMessage(username = masterAccounts.Service.getId(dirtyAsset.ownerAddress), message = Json.toJson(constants.Comet.PING))
             }
-          case blockChainException: BlockChainException => logger.error(blockChainException.failure.message, blockChainException)
         }
       }
     }(schedulerExecutionContext)

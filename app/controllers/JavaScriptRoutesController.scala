@@ -10,19 +10,21 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
   def javascriptRoutes = Action { implicit request =>
     Ok(
       JavaScriptReverseRouter("jsRoutes")(
-
         routes.javascript.BlockExplorerController.lastBlockHeight,
         routes.javascript.BlockExplorerController.blockDetails,
         routes.javascript.BlockExplorerController.stakingValidators,
-
+        routes.javascript.AccountController.signUpForm,
+        routes.javascript.AccountController.loginForm,
+        routes.javascript.AccountController.logoutForm,
+        routes.javascript.AccountController.changePasswordForm,
         routes.javascript.AccountController.checkUsernameAvailable,
+        routes.javascript.AccountController.emailOTPForgotPasswordForm,
+        routes.javascript.AccountController.forgotPasswordForm,
+
         routes.javascript.ConfigurationController.queryConfigurationVariable,
         routes.javascript.NotificationController.notificationPage,
         routes.javascript.NotificationController.unreadNotificationCount,
         routes.javascript.NotificationController.markNotificationRead,
-        routes.javascript.LoginController.loginForm,
-        routes.javascript.LogoutController.logoutForm,
-        routes.javascript.AccountController.signUpForm,
         routes.javascript.ContactController.updateContactForm,
         routes.javascript.VerifyMobileNumberController.verifyMobileNumberForm,
         routes.javascript.VerifyEmailAddressController.verifyEmailAddressForm,
@@ -208,11 +210,16 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.AddZoneController.verifyKycDocument,
         routes.javascript.AddZoneController.rejectKycDocument,
         //profile
+
+        routes.javascript.SetACLController.zoneViewKycDocuments,
+        routes.javascript.SetACLController.zoneVerifyKycDocument,
+        routes.javascript.SetACLController.zoneRejectKycDocument,
+        routes.javascript.SetACLController.organizationViewKycDocuments,
+        routes.javascript.SetACLController.organizationVerifyKycDocument,
+        routes.javascript.SetACLController.organizationRejectKycDocument,
+
         routes.javascript.ContactController.contact,
 
-        routes.javascript.AccountController.changePasswordForm,
-        routes.javascript.AccountController.emailOTPForgotPasswordForm,
-        routes.javascript.AccountController.forgotPasswordForm,
       )
     ).as("text/javascript")
   }

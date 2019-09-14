@@ -3,7 +3,8 @@
 
 @(organizationBankAccountDetail: OrganizationBankAccountDetail)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 <div>
-    <span class="red">@Messages(constants.Form.ACCOUNT_HOLDER_NAME)</span>: @organizationBankAccountDetail.accountHolder <br>
+    <span class="red">@Messages(constants.Form.ACCOUNT_HOLDER_NAME)</span>
+    : @organizationBankAccountDetail.accountHolder <br>
     <span class="red">@Messages(constants.Form.NICK_NAME)</span>: @organizationBankAccountDetail.nickName <br>
     <span class="red">@Messages(constants.Form.ACCOUNT_NUMBER)</span>: @organizationBankAccountDetail.accountNumber <br>
     <span class="red">@Messages(constants.Form.BANK_NAME)</span>: @organizationBankAccountDetail.bankName <br>

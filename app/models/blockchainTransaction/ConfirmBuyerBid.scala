@@ -21,7 +21,7 @@ import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 case class ConfirmBuyerBid(from: String, to: String, bid: Int, time: Int, pegHash: String, buyerContractHash: String, gas: Int, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None) extends BaseTransaction[ConfirmBuyerBid] {
-  def mutateTicketID(newTicketID: String): ConfirmBuyerBid = ConfirmBuyerBid(from = from, to = to, bid = bid, time = time, pegHash = pegHash, buyerContractHash = buyerContractHash, gas = gas,status = status, txHash, ticketID = newTicketID, mode = mode, code = code)
+  def mutateTicketID(newTicketID: String): ConfirmBuyerBid = ConfirmBuyerBid(from = from, to = to, bid = bid, time = time, pegHash = pegHash, buyerContractHash = buyerContractHash, gas = gas, status = status, txHash, ticketID = newTicketID, mode = mode, code = code)
 }
 
 
@@ -161,7 +161,7 @@ class ConfirmBuyerBids @Inject()(actorSystem: ActorSystem, transaction: utilitie
 
   object Service {
 
-    def create(confirmBuyerBid: ConfirmBuyerBid): String = Await.result(add(ConfirmBuyerBid(from = confirmBuyerBid.from, to = confirmBuyerBid.to, bid = confirmBuyerBid.bid, time = confirmBuyerBid.time, pegHash = confirmBuyerBid.pegHash, gas=confirmBuyerBid.gas, buyerContractHash = confirmBuyerBid.buyerContractHash, status = confirmBuyerBid.status, txHash = confirmBuyerBid.txHash, ticketID = confirmBuyerBid.ticketID, mode = confirmBuyerBid.mode, code = confirmBuyerBid.code)), Duration.Inf)
+    def create(confirmBuyerBid: ConfirmBuyerBid): String = Await.result(add(ConfirmBuyerBid(from = confirmBuyerBid.from, to = confirmBuyerBid.to, bid = confirmBuyerBid.bid, time = confirmBuyerBid.time, pegHash = confirmBuyerBid.pegHash, gas = confirmBuyerBid.gas, buyerContractHash = confirmBuyerBid.buyerContractHash, status = confirmBuyerBid.status, txHash = confirmBuyerBid.txHash, ticketID = confirmBuyerBid.ticketID, mode = confirmBuyerBid.mode, code = confirmBuyerBid.code)), Duration.Inf)
 
     def markTransactionSuccessful(ticketID: String, txHash: String): Int = Await.result(updateTxHashAndStatusOnTicketID(ticketID, Option(txHash), status = Option(true)), Duration.Inf)
 

@@ -52,7 +52,7 @@ class OrganizationBankAccountDetails @Inject()(protected val databaseConfigProvi
     }
   }
 
-  private def deleteById(id: String)= db.run(organizationBankAccountDetailTable.filter(_.id === id).delete.asTry).map {
+  private def deleteById(id: String) = db.run(organizationBankAccountDetailTable.filter(_.id === id).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)

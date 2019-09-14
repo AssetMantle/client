@@ -2,7 +2,7 @@ package transactions
 
 import java.net.ConnectException
 
-import exceptions.BlockChainException
+import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import play.api.libs.ws.{WSClient, WSResponse}
 import play.api.{Configuration, Logger}
@@ -34,7 +34,7 @@ class GetResponse @Inject()()(implicit wsClient: WSClient, configuration: Config
         Await.result(action(ticketID), Duration.Inf)
       } catch {
         case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
-          throw new BlockChainException(constants.Response.CONNECT_EXCEPTION)
+          throw new BaseException(constants.Response.CONNECT_EXCEPTION)
       }
     }
   }

@@ -1,10 +1,10 @@
 package models.blockchain
 
-import actors.{MainAccountActor, ShutdownActors}
+import actors.{MainAccountActor, ShutdownActor}
 import akka.actor.{ActorRef, ActorSystem}
 import akka.stream.scaladsl.Source
 import akka.stream.{ActorMaterializer, OverflowStrategy}
-import exceptions.{BaseException, BlockChainException}
+import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.master
 import org.postgresql.util.PSQLException
@@ -24,7 +24,7 @@ case class Account(address: String, coins: String = "", publicKey: String, accou
 case class AccountCometMessage(username: String, message: JsValue)
 
 @Singleton
-class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, actorSystem: ActorSystem, shutdownActors: ShutdownActors, getAccount: GetAccount, masterAccounts: master.Accounts, implicit val pushNotification: PushNotification)(implicit executionContext: ExecutionContext, configuration: Configuration) {
+class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, actorSystem: ActorSystem, shutdownActors: ShutdownActor, getAccount: GetAccount, masterAccounts: master.Accounts, implicit val pushNotification: PushNotification)(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -164,7 +164,6 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
         }
       } catch {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
-        case blockChainException: BlockChainException => logger.error(blockChainException.failure.message, blockChainException)
       }
     }(schedulerExecutionContext)
   }

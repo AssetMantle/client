@@ -1,10 +1,10 @@
 package models.blockchain
 
-import actors.{MainFiatActor, ShutdownActors}
+import actors.{MainFiatActor, ShutdownActor}
 import akka.actor.{ActorRef, ActorSystem}
 import akka.stream.scaladsl.Source
 import akka.stream.{ActorMaterializer, OverflowStrategy}
-import exceptions.{BaseException, BlockChainException}
+import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.{master, masterTransaction}
 import org.postgresql.util.PSQLException
@@ -23,7 +23,7 @@ case class Fiat(pegHash: String, ownerAddress: String, transactionID: String, tr
 case class FiatCometMessage(username: String, message: JsValue)
 
 @Singleton
-class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, actorSystem: ActorSystem, shutdownActors: ShutdownActors, blockchainNegotiations: Negotiations, getAccount: GetAccount, masterTransactionIssueFiatRequests: masterTransaction.IssueFiatRequests, masterAccounts: master.Accounts, getOrder: GetOrder)(implicit executionContext: ExecutionContext, configuration: Configuration) {
+class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, actorSystem: ActorSystem, shutdownActors: ShutdownActor, blockchainNegotiations: Negotiations, getAccount: GetAccount, masterTransactionIssueFiatRequests: masterTransaction.IssueFiatRequests, masterAccounts: master.Accounts, getOrder: GetOrder)(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -169,7 +169,6 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
               Service.deleteFiatPegWallet(dirtyFiat.ownerAddress)
               mainFiatActor ! FiatCometMessage(username = masterAccounts.Service.getId(dirtyFiat.ownerAddress), message = Json.toJson("0"))
             }
-          case blockChainException: BlockChainException => logger.error(blockChainException.failure.message, blockChainException)
         }
       }
     }(schedulerExecutionContext)

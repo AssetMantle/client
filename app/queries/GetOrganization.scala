@@ -2,7 +2,7 @@ package queries
 
 import java.net.ConnectException
 
-import exceptions.BlockChainException
+import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
@@ -35,7 +35,7 @@ class GetOrganization @Inject()(wsClient: WSClient)(implicit configuration: Conf
     } catch {
       case connectException: ConnectException =>
         logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
-        throw new BlockChainException(constants.Response.CONNECT_EXCEPTION)
+        throw new BaseException(constants.Response.CONNECT_EXCEPTION)
     }
   }
 }

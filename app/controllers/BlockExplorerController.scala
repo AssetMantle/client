@@ -10,7 +10,15 @@ import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerC
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class BlockExplorerController@Inject()(messagesControllerComponents: MessagesControllerComponents, queriesGetABCIINfo: queries.GetABCIInfo, queriesStakingValidators: queries.GetStakingValidators, queriesGetBlockDetails: queries.GetBlockDetails)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class BlockExplorerController@Inject()(messagesControllerComponents: MessagesControllerComponents,
+                                       queriesGetABCIINfo: queries.GetABCIInfo,
+                                       queriesStakingValidators: queries.GetStakingValidators,
+                                       queriesGetBlockDetails: queries.GetBlockDetails
+                                      )
+                                      (implicit
+                                       exec: ExecutionContext,
+                                       configuration: Configuration
+                                      ) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   def lastBlockHeight(): Action[AnyContent] = Action { implicit request =>
     try {
