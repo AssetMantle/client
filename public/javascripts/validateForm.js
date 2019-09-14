@@ -3,9 +3,9 @@ function validateForm(form) {
     let formValidationBoolean = true;
 
     form.find("dl").each(function () {
-            let dlElement = $(this);
-            let inputElement = dlElement.find("input")[0];
-            let inputValue = inputElement.value;
+            const dlElement = $(this);
+            const inputElement = dlElement.find("input")[0];
+            const inputValue = inputElement.value;
             inputElement.style.borderColor = "transparent";
             try {
                 dlElement.find(".error").remove();
@@ -22,8 +22,8 @@ function validateForm(form) {
                     if (errorStatement !== "") {
                         return;
                     }
-                    let ddInfoElement = $(this)[0];
-                    let ddValidationInfo = ddInfoElement.innerHTML.split(": ");
+                    const ddInfoElement = $(this)[0];
+                    const ddValidationInfo = ddInfoElement.innerHTML.split(": ");
 
                     switch (ddValidationInfo[0]) {
                         case "Numeric":
@@ -63,16 +63,11 @@ function validateForm(form) {
                             }
                             break;
                         default :
-                            let regEx = ddInfoElement.innerHTML;
-                            let newRegEx = new RegExp(regEx);
+                            const newRegEx = new RegExp(ddInfoElement.innerHTML);
                             if (!(newRegEx.test(inputValue))) {
                                 errorStatement = "Invalid Input";
-
                             }
-
                     }
-
-
                 }
             );
             if (errorStatement !== "") {
@@ -80,7 +75,6 @@ function validateForm(form) {
                 inputElement.style.borderColor = "red";
                 dlElement.append("<dd class=\"error\">" + errorStatement + "</dd>")
             }
-
         }
     );
     return formValidationBoolean;
