@@ -7,50 +7,51 @@ GET         /javascriptRoutes                                            control
 GET         /firebase-messaging-sw.js                                    controllers.Assets.at(path="/public/javascripts", file="firebase-messaging-sw.js")
 
 
-GET         /genesisRequest                                              controllers.ViewController.genesisRequest
-GET         /genesisInformation                                          controllers.ViewController.genesisInformation
-GET         /zoneRequest                                                 controllers.ViewController.zoneRequest
-GET         /zoneInformation                                             controllers.ViewController.zoneInformation
-GET         /organizationRequest                                         controllers.ViewController.organizationRequest
-GET         /organizationInformation               controllers.ViewController.organizationInformation
-GET         /market                                controllers.ViewController.market
-GET         /profile                               controllers.ViewController.profile
+GET         /genesisRequest                                 controllers.ViewController.genesisRequest
+GET         /genesisInformation                             controllers.ViewController.genesisInformation
+GET         /zoneRequest                                    controllers.ViewController.zoneRequest
+GET         /zoneInformation                                controllers.ViewController.zoneInformation
+GET         /organizationRequest                            controllers.ViewController.organizationRequest
+GET         /organizationInformation                        controllers.ViewController.organizationInformation
+GET         /market                                         controllers.ViewController.market
+GET         /profile                                        controllers.ViewController.profile
 
-GET         /profileDocuments                      controllers.ComponentViewController.profileDocuments
-GET         /profilePicture                        controllers.ComponentViewController.profilePicture
+GET         /profileDocuments                               controllers.ComponentViewController.profileDocuments
+GET         /profilePicture                                 controllers.ComponentViewController.profilePicture
 
-GET         /account/signUp                        controllers.AccountController.signUpForm
-POST        /account/signUp                        controllers.AccountController.signUp
+GET         /account/signUp                                 controllers.AccountController.signUpForm
+POST        /account/signUp                                 controllers.AccountController.signUp
 
-GET         /account/login                         controllers.AccountController.loginForm
-POST        /account/login                         controllers.AccountController.login
+GET         /account/login                                  controllers.AccountController.loginForm
+POST        /account/login                                  controllers.AccountController.login
 
-GET         /account/logout                        controllers.AccountController.logoutForm
-POST        /account/logout                        controllers.AccountController.logout
+GET         /account/logout                                 controllers.AccountController.logoutForm
+POST        /account/logout                                 controllers.AccountController.logout
 
-GET         /account/changePassword                controllers.AccountController.changePasswordForm
-POST        /account/changePassword                controllers.AccountController.changePassword
+GET         /account/changePassword                         controllers.AccountController.changePasswordForm
+POST        /account/changePassword                         controllers.AccountController.changePassword
 
-GET         /account/forgotPasswordUsername        controllers.AccountController.emailOTPForgotPasswordForm
-POST        /account/forgotPasswordUsername        controllers.AccountController.emailOTPForgotPassword
+GET         /account/forgotPasswordUsername                 controllers.AccountController.emailOTPForgotPasswordForm
+POST        /account/forgotPasswordUsername                 controllers.AccountController.emailOTPForgotPassword
 
-GET         /account/forgotPassword                controllers.AccountController.forgotPasswordForm(username: String)
-POST        /account/forgotPassword                controllers.AccountController.forgotPassword(username: String)
+GET         /account/forgotPassword                         controllers.AccountController.forgotPasswordForm(username: String)
+POST        /account/forgotPassword                         controllers.AccountController.forgotPassword(username: String)
 
-GET         /account/checkUsernameAvailable        controllers.AccountController.checkUsernameAvailable(username: String)
-
-
-GET         /contact                               controllers.ContactController.contact
-
-GET         /master/notifications                  controllers.NotificationController.notificationPage(pageNumber:Int)
-GET         /master/unreadNotificationCount        controllers.NotificationController.unreadNotificationCount()
-GET         /master/markNotificationAsRead                               controllers.NotificationController.markNotificationRead(notificationID: String)
-
-GET         /master/queryConfigurationVariable:query                     controllers.ConfigurationController.queryConfigurationVariable(query: String)
+GET         /account/checkUsernameAvailable                 controllers.AccountController.checkUsernameAvailable(username: String)
+POST        /acccount/noteNewKeyDetails                     controllers.AccountController.noteNewKeyDetails(name:String,blockchainAddress:String ,publicKey:String ,seed:String)
 
 
-GET         /master/component/commonHome                                 controllers.ComponentViewController.commonHome
-GET         /master/component/genesisDetails                             controllers.ComponentViewController.genesisDetails
+GET         /contact                                        controllers.ContactController.contact
+
+GET         /master/notifications                           controllers.NotificationController.notificationPage(pageNumber:Int)
+GET         /master/unreadNotificationCount                 controllers.NotificationController.unreadNotificationCount()
+GET         /master/markNotificationAsRead                  controllers.NotificationController.markNotificationRead(notificationID: String)
+
+GET         /master/queryConfigurationVariable:query        controllers.ConfigurationController.queryConfigurationVariable(query: String)
+
+
+GET         /master/component/commonHome                    controllers.ComponentViewController.commonHome
+GET         /master/component/genesisDetails                controllers.ComponentViewController.genesisDetails
 GET         /master/component/zoneDetails                                controllers.ComponentViewController.zoneDetails
 GET         /master/component/organizationDetails                        controllers.ComponentViewController.organizationDetails
 GET         /master/component/assetList                                  controllers.ComponentViewController.assetList

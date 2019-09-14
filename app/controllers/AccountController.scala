@@ -11,7 +11,7 @@ import play.api.libs.ws.WSClient
 import play.api.mvc._
 import play.api.{Configuration, Logger}
 import utilities.{Email, PushNotification}
-import views.companion.master.{Login, Logout, SignUp}
+import views.companion.master.{Login, Logout, NoteNewKeyDetails, SignUp}
 
 import scala.concurrent.ExecutionContext
 
@@ -66,7 +66,7 @@ class AccountController @Inject()(
         try {
           val addKeyResponse = transactionAddKey.Service.post(transactionAddKey.Request(signUpData.username, signUpData.password))
           masterAccounts.Service.addLogin(signUpData.username, signUpData.password, blockchainAccounts.Service.create(address = addKeyResponse.address, pubkey = addKeyResponse.pubkey), request.lang.toString.stripPrefix("Lang(").stripSuffix(")").trim.split("_")(0))
-          Ok(views.html.index(successes = Seq(constants.Response.SIGNED_UP)))
+          PartialContent(views.html.component.master.noteNewKeyDetails(NoteNewKeyDetails.form, addKeyResponse.name, addKeyResponse.address, addKeyResponse.pubkey, addKeyResponse.mnemonic))
         } catch {
           case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
         }
@@ -235,4 +235,18 @@ class AccountController @Inject()(
     if (masterAccounts.Service.checkUsernameAvailable(username)) Ok else NoContent
   }
 
+  def noteNewKeyDetails(name: String, blockchainAddress: String, publicKey: String, seed: String): Action[AnyContent] = Action { implicit request =>
+    views.companion.master.NoteNewKeyDetails.form.bindFromRequest().fold(
+      formWithErrors => {
+        BadRequest(views.html.component.master.noteNewKeyDetails(formWithErrors, name, blockchainAddress, publicKey, seed))
+      },
+      noteNewKeyDetailsData => {
+        if (noteNewKeyDetailsData.confirmNoteNewKeyDetails) {
+          Ok(views.html.index(successes = Seq(constants.Response.SIGNED_UP)))
+        }
+        else {
+          BadRequest(views.html.component.master.noteNewKeyDetails(NoteNewKeyDetails.form, name, blockchainAddress, publicKey, seed))
+        }
+      })
+  }
 }

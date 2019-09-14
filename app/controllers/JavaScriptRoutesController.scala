@@ -15,9 +15,10 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.AccountController.loginForm,
         routes.javascript.AccountController.logoutForm,
         routes.javascript.AccountController.changePasswordForm,
-        routes.javascript.AccountController.checkUsernameAvailable,
         routes.javascript.AccountController.emailOTPForgotPasswordForm,
         routes.javascript.AccountController.forgotPasswordForm,
+        routes.javascript.AccountController.checkUsernameAvailable,
+        routes.javascript.AccountController.noteNewKeyDetails,
 
         routes.javascript.ConfigurationController.queryConfigurationVariable,
         routes.javascript.NotificationController.notificationPage,
