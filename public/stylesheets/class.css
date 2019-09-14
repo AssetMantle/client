@@ -1,27 +1,3 @@
-body {
-    margin: auto;
-}
-
-h2 {
-    color: rgba(0, 0, 0, 0.87) !important;
-    font-size: 1.5625rem !important;
-}
-/* Notification*/
-
-.badge {
-    padding: 0.2em 0.5em;
-    border-radius: 1em;
-    background-color: red;
-    font-size: 0.8em;
-    color: white;
-}
-
-.navbar a .read {
-    background-color: #aaaaaa;
-}
-
-/* Notification*/
-
 /* Modal*/
 .modal {
     display: none;
@@ -44,13 +20,40 @@ h2 {
         width: 200px !important;
         left: 15%;
         max-height: 60%;
-
         overflow: auto;
     }
 
     table thead {
         font-size: 12px;
     }
+
+    .mobileNavigationBar {
+        background: #10292e;
+    }
+
+    .mobileNavigationBar li {
+        list-style: none;
+    }
+
+    .mobileNavigationBar a {
+        color: white;
+        padding: 14px 16px;
+        text-decoration: none;
+        font-size: 17px;
+        display: block;
+    }
+
+    .mobileNavigationBar a.NavigationBarMenuButton {
+        display: block;
+        position: absolute;
+        right: 0;
+        top: 0;
+    }
+
+    .navigationBarLinks {
+        display: none;
+    }
+
 }
 
 @media (min-width: 500px) {
@@ -63,9 +66,12 @@ h2 {
         max-height: 60%;
         overflow: auto;
         max-width: 500px;
+        width: 300px;
     }
 
-
+    .NavigationBarMenuButton {
+        display: none;
+    }
 }
 
 .form {
@@ -219,14 +225,15 @@ h2 {
 /*Navbar*/
 
 
-.left_side {
+.leftSide {
     width: 20%;
     margin-right: 1vw;
 }
 .middle {
     width: 60%;
 }
-.right_side {
+
+.rightSide {
     width: 20%;
     margin-left: 1vw;
 }
@@ -270,6 +277,11 @@ h2 {
 .flexItem {
     text-align: center;
     padding-top: 15px;
+}
+
+.flexBox {
+    padding: 5px;
+    margin: 10px;
 }
 
 .flex-row {
@@ -356,6 +368,14 @@ h2 {
     background-color: #149f98;
 }
 
+.showToggleElement {
+    background-color: #149f98;
+}
+
+.showToggleElement {
+    cursor: pointer;
+    color: #10292e;
+}
 .toggleElement:hover {
     cursor: pointer;
     color: #10292e;
@@ -546,21 +566,6 @@ dl .info::after {
     margin-bottom: 1.5rem;
 }
 
-.form-control-placeholder {
-    position: absolute;
-    top: 0;
-    padding: 7px 0 0 13px;
-    transition: all 200ms;
-    opacity: 0.5;
-}
-
-.form-control:focus + .form-control-placeholder,
-.form-control:valid + .form-control-placeholder {
-    font-size: 75%;
-    transform: translate3d(0, -100%, 0);
-    opacity: 1;
-}
-
 .hash_code {
     width: 100px;
     overflow: hidden;
@@ -569,10 +574,6 @@ dl .info::after {
     white-space: nowrap;
     height: 1.2em;
     margin-left: 20px;
-}
-
-.fa {
-    cursor: pointer;
 }
 .issue_asset {
     margin-right: -1px;
@@ -649,51 +650,23 @@ dl .info::after {
     box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.07);
 }
 
+.searchForm dl {
+    width: 100%;
+    margin: 0px;
+}
 /* sidebar */
+.sideBarOptions {
+    margin-top: 20px;
+}
 .sideBarOpenButton {
-    top: 80px;
-    color: #fff;
-    cursor: pointer;
     background: linear-gradient(60deg, #149f98, #102923);
-    padding: 5px 5px 5px 15px;
-    border-radius: 10px;
-    transition-delay: 0.3s;
-    position: fixed;
-    left: -10px;
-    z-index: 100;
 }
 
-.sideBarCloseButton {
-    position: relative;
-    right: -85%;
-    font-size: 20px;
-}
-
-.sideBar {
-    height: 100%;
-    width: 0;
-    position: fixed;
-    z-index: 101;
-    top: 40px;
-    left: 0;
-    background-color: #8faa9d;
-    overflow-x: hidden;
-    transition: 0.5s;
-}
-
-.sideBar ul {
-    padding-left: 0px;
-}
-
-.sideBar li {
+.sideBarOptions li {
     list-style-type: none;
 }
 
-.sideBar a {
-    color: #fff;
-}
-
-.sideBar li a {
+.sideBarOptions li a {
     padding: 8px 0px 0px 20px;
     text-decoration: none;
     transition: 0.3s;
@@ -701,11 +674,39 @@ dl .info::after {
     margin-bottom: 10px;
 }
 
-.sideBar a:hover, li a:hover {
+.sideBarOptions a:hover, li a:hover {
     text-decoration: none;
     color: #31353D;
 }
 
 .sideBarSearch {
     border: 1px solid #ddd;
+}
+
+.mainSection {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.dataContainer {
+    flex: 1 1;
+}
+
+.footer {
+    margin-top: 20px;
+    width: 100%;
+    padding: 5px 0px 5px 0px;
+    background: #333333;
+    text-align: center;
+
+}
+
+.cardHeight {
+    height: 200px;
+    overflow: auto;
+}
+
+.error {
+    color: #f0506e;
 }

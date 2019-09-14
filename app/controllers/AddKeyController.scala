@@ -1,6 +1,6 @@
 package controllers
 
-import exceptions.{BaseException, BlockChainException}
+import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import play.api.Configuration
 import play.api.i18n.I18nSupport
@@ -28,7 +28,6 @@ class AddKeyController @Inject()(messagesControllerComponents: MessagesControlle
         }
         catch {
           case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-          case blockChainException: BlockChainException => InternalServerError(views.html.index(failures = Seq(blockChainException.failure)))
         }
       }
     )

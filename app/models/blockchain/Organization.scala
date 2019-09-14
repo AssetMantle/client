@@ -1,7 +1,7 @@
 package models.blockchain
 
 import akka.actor.ActorSystem
-import exceptions.{BaseException, BlockChainException}
+import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
@@ -127,7 +127,6 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
           Service.refreshDirty(dirtyOrganization.id, responseAddress.address)
         }
         catch {
-          case blockChainException: BlockChainException => logger.error(blockChainException.failure.message, blockChainException)
           case baseException: BaseException => logger.error(baseException.failure.message, baseException)
         }
       }

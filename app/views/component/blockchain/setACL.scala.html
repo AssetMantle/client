@@ -8,10 +8,10 @@
     </div>
     <div class="latest_card-body ml-cb">
         @CSRF.formField
-        @inputText(setACLForm(constants.FormField.FROM.name), '_label -> Messages(constants.FormField.FROM.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.FROM.name), 'required -> true)
-        @inputText(setACLForm(constants.FormField.ACL_ADDRESS.name), '_label -> Messages(constants.FormField.ACL_ADDRESS.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.ACL_ADDRESS.name), 'required -> true)
-        @inputText(setACLForm(constants.FormField.ORGANIZATION_ID.name), '_label -> Messages(constants.FormField.ORGANIZATION_ID.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.ORGANIZATION_ID.name), 'required -> true)
-        @inputText(setACLForm(constants.FormField.ZONE_ID.name), '_label -> Messages(constants.FormField.ZONE_ID.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.ZONE_ID.name), 'required -> true)
+      @inputText(setACLForm(constants.FormField.FROM.name), '_label -> Messages(constants.FormField.FROM.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.FROM.name), 'required -> true)
+      @inputText(setACLForm(constants.FormField.ACL_ADDRESS.name), '_label -> Messages(constants.FormField.ACL_ADDRESS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.ACL_ADDRESS.name), 'required -> true)
+      @inputText(setACLForm(constants.FormField.ORGANIZATION_ID.name), '_label -> Messages(constants.FormField.ORGANIZATION_ID.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.ORGANIZATION_ID.name), 'required -> true)
+      @inputText(setACLForm(constants.FormField.ZONE_ID.name), '_label -> Messages(constants.FormField.ZONE_ID.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.ZONE_ID.name), 'required -> true)
         <div class="input-group-prepend">
             @checkbox(setACLForm(constants.Form.ISSUE_ASSET), '_label -> Messages(constants.Form.ISSUE_ASSET))
             <span class="input-group-text">
@@ -106,8 +106,8 @@
             </span>
 
         </div>
-        @inputText(setACLForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.GAS.name), 'required -> true)
-        @inputPassword(setACLForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.PASSWORD.name), 'required -> true)
+      @inputText(setACLForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.GAS.name), 'required -> true, 'type -> "number")
+      @inputPassword(setACLForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PASSWORD.name), 'required -> true)
 
         @if(setACLForm.hasGlobalErrors) {
             <ul>
