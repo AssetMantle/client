@@ -1,7 +1,5 @@
-function validateForm(source) {
+function validateForm(source,form) {
 
-
-    const form = $(source).closest("form");
     let formValidationBoolean = true;
 
     form.find("dl").each(function () {
