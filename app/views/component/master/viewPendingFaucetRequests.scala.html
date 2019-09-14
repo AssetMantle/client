@@ -2,15 +2,17 @@
 @import models.masterTransaction.FaucetRequest
 
 @(faucetRequests: Seq[FaucetRequest])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
-@for(faucetRequest <- faucetRequests) {
-    <div class="col-md-6">
-        <br>
-        <div class="flexItem card-body leftText lightBlue">
+<div class="cmuk-container">
+    <div class="cmuk-grid-medium cmuk-child-width-1-2@@s cmuk-child-width-1-2@@m cmuk-child-width-1-3@@l cmuk-child-width-1-4@@xl cmuk-grid-match" cmuk-grid>
+    @for(faucetRequest <- faucetRequests) {
+    <div>
+        <div class="flexBox lightBlue">
             <span class="red">@Messages(constants.Form.ACCOUNT_ID)</span>:@faucetRequest.accountID <br>
             <span class="red">@Messages(constants.Form.AMOUNT)</span>: @faucetRequest.amount <br>
-            <button class="btn btn-sm btn-success" onclick="getForm(jsRoutes.controllers.SendCoinController.approveFaucetRequestsForm('@faucetRequest.id', '@faucetRequest.accountID'))">@Messages(constants.Form.APPROVE)</button>
-            <button class="btn btn-sm btn-danger" onclick="getForm(jsRoutes.controllers.SendCoinController.rejectFaucetRequestForm('@faucetRequest.id'))">@Messages(constants.Form.REJECT)</button>
+            <button class="cmuk-button cmuk-button-success cmuk-button-small" onclick="getForm(jsRoutes.controllers.SendCoinController.approveFaucetRequestsForm('@faucetRequest.id', '@faucetRequest.accountID'))">@Messages(constants.Form.APPROVE)</button>
+            <button class="cmuk-button cmuk-button-danger cmuk-button-small" onclick="getForm(jsRoutes.controllers.SendCoinController.rejectFaucetRequestForm('@faucetRequest.id'))">@Messages(constants.Form.REJECT)</button>
         </div>
     </div>
-    <br>
-}
+    }
+</div>
+</div>

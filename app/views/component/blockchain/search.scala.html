@@ -5,7 +5,7 @@
 
 <form id="searchForm" class="searchForm">
     @inputText(Field(form = Form(constants.FormField.SEARCH_TX_HASH_HEIGHT.field), name = constants.FormField.SEARCH_TX_HASH_HEIGHT.name, constraints = Seq(), format = None, errors = Seq(), value = None), 'id -> "searchValue", 'placeholder -> Messages(constants.FormField.SEARCH_TX_HASH_HEIGHT.name), 'class -> "cmuk-input")
-    <button class="btn btn-primary" onclick='searchFunction()'>@Messages(constants.Form.SEARCH)</button>
+    <button class="btn btn-primary" onclick='searchFunction()'><span cmuk-icon="search"></span></button>
 </form>
 
 <script src="@routes.Assets.versioned("javascripts/search.js")" type="text/javascript"></script>

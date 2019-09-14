@@ -8,24 +8,24 @@
     </div>
     <div class="latest_card-body ml-cb">
         @CSRF.formField
-        @inputText(issueAssetForm(constants.FormField.FROM.name), '_label -> Messages(constants.FormField.FROM.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.FROM.name), 'required -> true)
-        @inputText(issueAssetForm(constants.FormField.TO.name), '_label -> Messages(constants.FormField.TO.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.TO.name), 'required -> true)
-        @inputText(issueAssetForm(constants.FormField.DOCUMENT_HASH.name), '_label -> Messages(constants.FormField.DOCUMENT_HASH.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.DOCUMENT_HASH.name), 'required -> true)
-        @inputText(issueAssetForm(constants.FormField.ASSET_TYPE.name), '_label -> Messages(constants.FormField.ASSET_TYPE.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.ASSET_TYPE.name), 'required -> true)
-        @inputText(issueAssetForm(constants.FormField.ASSET_PRICE.name), '_label -> Messages(constants.FormField.ASSET_PRICE.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.ASSET_PRICE.name), 'required -> true)
-        @inputText(issueAssetForm(constants.FormField.QUANTITY_UNIT.name), '_label -> Messages(constants.FormField.QUANTITY_UNIT.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.QUANTITY_UNIT.name), 'required -> true)
-        @inputText(issueAssetForm(constants.FormField.ASSET_QUANTITY.name), '_label -> Messages(constants.FormField.ASSET_QUANTITY.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.ASSET_QUANTITY.name), 'required -> true)
+        @inputText(issueAssetForm(constants.FormField.FROM.name), '_label -> Messages(constants.FormField.FROM.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.FROM.name), 'required -> true)
+        @inputText(issueAssetForm(constants.FormField.TO.name), '_label -> Messages(constants.FormField.TO.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.TO.name), 'required -> true)
+        @inputText(issueAssetForm(constants.FormField.DOCUMENT_HASH.name), '_label -> Messages(constants.FormField.DOCUMENT_HASH.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.DOCUMENT_HASH.name), 'required -> true)
+        @inputText(issueAssetForm(constants.FormField.ASSET_TYPE.name), '_label -> Messages(constants.FormField.ASSET_TYPE.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.ASSET_TYPE.name), 'required -> true)
+        @inputText(issueAssetForm(constants.FormField.ASSET_PRICE.name), '_label -> Messages(constants.FormField.ASSET_PRICE.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.ASSET_PRICE.name), 'required -> true)
+        @inputText(issueAssetForm(constants.FormField.QUANTITY_UNIT.name), '_label -> Messages(constants.FormField.QUANTITY_UNIT.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.QUANTITY_UNIT.name), 'required -> true)
+        @inputText(issueAssetForm(constants.FormField.ASSET_QUANTITY.name), '_label -> Messages(constants.FormField.ASSET_QUANTITY.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.ASSET_QUANTITY.name), 'required -> true)
         <div class="input-group-prepend">
             @checkbox(issueAssetForm(constants.Form.MODERATED))
             <span class="input-group-text">
             @Messages(constants.Form.MODERATED)
             </span>
         </div>
-            @inputText(issueAssetForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.GAS.name), 'required -> true)
-            @inputText(issueAssetForm(constants.FormField.TAKER_ADDRESS.name), '_label -> Messages(constants.FormField.TAKER_ADDRESS.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.TAKER_ADDRESS.name), 'required -> true)
+            @inputText(issueAssetForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.GAS.name), 'required -> true)
+            @inputText(issueAssetForm(constants.FormField.TAKER_ADDRESS.name), '_label -> Messages(constants.FormField.TAKER_ADDRESS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.TAKER_ADDRESS.name), 'required -> true)
         )
-        @inputText(issueAssetForm(constants.FormField.MODE.name), '_label -> Messages(constants.FormField.MODE.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.MODE.name), 'required -> true)
-        @inputPassword(issueAssetForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.PASSWORD.name), 'required -> true)
+        @inputText(issueAssetForm(constants.FormField.MODE.name), '_label -> Messages(constants.FormField.MODE.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.MODE.name), 'required -> true)
+        @inputPassword(issueAssetForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PASSWORD.name), 'required -> true)
 
         @if(issueAssetForm.hasGlobalErrors) {
             <ul>

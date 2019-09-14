@@ -10,12 +10,12 @@
         <h4 class="latest_card-title">@Messages(constants.Form.ISSUE_ASSET_REQUEST)</h4>
     </div>
     <div class="latest_card-body ml-cb">
-        @inputText(issueAssetRequestForm(constants.FormField.DOCUMENT_HASH.name), '_label -> Messages(constants.FormField.DOCUMENT_HASH.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.DOCUMENT_HASH.name), 'required -> true)
-        @inputText(issueAssetRequestForm(constants.FormField.ASSET_TYPE.name), '_label -> Messages(constants.FormField.ASSET_TYPE.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.ASSET_TYPE.name), 'required -> true)
-        @inputText(issueAssetRequestForm(constants.FormField.ASSET_PRICE.name), '_label -> Messages(constants.FormField.ASSET_PRICE.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.ASSET_PRICE.name), 'required -> true)
-        @inputText(issueAssetRequestForm(constants.FormField.QUANTITY_UNIT.name), '_label -> Messages(constants.FormField.QUANTITY_UNIT.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.QUANTITY_UNIT.name), 'required -> true)
-        @inputText(issueAssetRequestForm(constants.FormField.ASSET_QUANTITY.name), '_label -> Messages(constants.FormField.ASSET_QUANTITY.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.ASSET_QUANTITY.name), 'required -> true)
-        @inputText(issueAssetRequestForm(constants.FormField.TAKER_ADDRESS.name), '_label -> Messages(constants.FormField.TAKER_ADDRESS.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.TAKER_ADDRESS.name), 'required -> false)
+        @inputText(issueAssetRequestForm(constants.FormField.DOCUMENT_HASH.name), '_label -> Messages(constants.FormField.DOCUMENT_HASH.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.DOCUMENT_HASH.name), 'required -> true)
+        @inputText(issueAssetRequestForm(constants.FormField.ASSET_TYPE.name), '_label -> Messages(constants.FormField.ASSET_TYPE.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.ASSET_TYPE.name), 'required -> true)
+        @inputText(issueAssetRequestForm(constants.FormField.ASSET_PRICE.name), '_label -> Messages(constants.FormField.ASSET_PRICE.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.ASSET_PRICE.name), 'required -> true)
+        @inputText(issueAssetRequestForm(constants.FormField.QUANTITY_UNIT.name), '_label -> Messages(constants.FormField.QUANTITY_UNIT.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.QUANTITY_UNIT.name), 'required -> true)
+        @inputText(issueAssetRequestForm(constants.FormField.ASSET_QUANTITY.name), '_label -> Messages(constants.FormField.ASSET_QUANTITY.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.ASSET_QUANTITY.name), 'required -> true)
+        @inputText(issueAssetRequestForm(constants.FormField.TAKER_ADDRESS.name), '_label -> Messages(constants.FormField.TAKER_ADDRESS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.TAKER_ADDRESS.name), 'required -> false)
         <div class="input-group-prepend">
             @checkbox(issueAssetRequestForm(constants.Form.MODERATED), '_label -> Messages(constants.Form.MODERATED), 'id -> "moderated")
             <span class="input-group-text">
@@ -24,8 +24,8 @@
         </div>
 
         <div id="moderatedIssueAssetRequestFormFields">
-            @inputText(issueAssetRequestForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.GAS.name), 'required -> false)
-            @inputPassword(issueAssetRequestForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.PASSWORD.name), 'required -> false)
+            @inputText(issueAssetRequestForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.GAS.name), 'required -> false)
+            @inputPassword(issueAssetRequestForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PASSWORD.name), 'required -> false)
         </div>
 
         @if(issueAssetRequestForm.hasGlobalErrors) {

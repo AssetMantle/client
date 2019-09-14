@@ -25,25 +25,25 @@
 
     </head>
     <body>
+        @* Header *@
         <header>
-            <div cmuk-sticky="sel-target: .cmuk-navbar-container; cls-active: cmuk-navbar-sticky; bottom: #transparent-sticky-navbar">
+            @* pc navbar *@
+            <div class="pcNav" cmuk-sticky="sel-target: .cmuk-navbar-container; cls-active: cmuk-navbar-sticky; bottom: #transparent-sticky-navbar">
 
                 <nav class="cmuk-navbar-container" cmuk-navbar>
+
                     <div class="cmuk-navbar-left">
                         <a class="cmuk-navbar-item cmuk-logo" href="@controllers.routes.IndexController.index()">
                             <img src="@routes.Assets.versioned("images/commitLogo.png")" class="navigationBarLogo">
                         </a>
                     </div>
-                    <div class="cmuk-navbar-right">
-                        <ul class="cmuk-navbar-nav">
+                    <div class="cmuk-navbar-right" >
+                        <ul class="cmuk-navbar-nav navigationBarLinks" id="navigationBarLinks">
                         @loginState match {
                             case null => {
-                                <li>
-                                    <a onclick="getForm(jsRoutes.controllers.AccountController.signUpForm())">
-                                        <span cmuk-icon="users"></span>
-                                        @Messages(constants.Form.SIGNUP)</a></li>
-                                        <li>
-                                            <a onclick="getForm(jsRoutes.controllers.AccountController.loginForm())">
+                                <li> <a onclick="getForm(jsRoutes.controllers.AccountController.signUpForm())"><span cmuk-icon="users"></span>
+                                    @Messages(constants.Form.SIGNUP)</a></li>
+                                <li> <a onclick="getForm(jsRoutes.controllers.AccountController.loginForm())">
                                                 <span cmuk-icon="sign-in"></span>
                                     @Messages(constants.Form.LOGIN)</a>
                                 </li>
@@ -69,7 +69,7 @@
                                 }
                                 <li><a class="notification" onclick="getForm(jsRoutes.controllers.NotificationController.notificationPage(0))"><i class="fa fa-bell" aria-hidden="true"></i>
                                     @Messages(constants.Form.INBOX)
-                                    <span class="badge" id="notificationBadge">0</span>
+                                    <span class="cmuk-badge" id="notificationBadge">0</span>
                                 </a>
                                 </li>
                                 <li>
@@ -78,13 +78,13 @@
                                     </a>
                                     <div class="cmuk-navbar-dropdown">
                                         <ul class="cmuk-nav cmuk-navbar-dropdown-nav">
-                                            <li><a href="@controllers.routes.ViewController.profile()"><i class="fa fa-user-circle-o" aria-hidden="true"></i>
+                                            <li><a href="@controllers.routes.ViewController.profile()"><span cmuk-icon="user"></span>
                                                     &nbsp;
                                                 @Messages(constants.Form.PROFILE)</a>
                                             </li>
                                             <li>
                                                 <a onclick="getForm(jsRoutes.controllers.AccountController.logoutForm())">
-                                                    <i class="fa fa-sign-out" aria-hidden="true"></i>
+                                                    <span cmuk-icon="sign-out"></span>
                                                     &nbsp;
                                                 @Messages(constants.Form.LOGOUT)</a>
                                             </li>
@@ -98,84 +98,104 @@
                         </ul>
 
                     </div>
+                    <a id="NavigationBarMenuButton" class="NavigationBarMenuButton">
+                        <span cmuk-icon="menu"></span>
+                    </a>
                 </nav>
             </div>
-
         </header>
-        <div class="centerText">
-            @for(failure <- failures) {
-                <div class="alert failure" onclick="getForm(@failure.action)">
-                    <span class="closeButton">x</span>
-                    <strong>@Messages(constants.Form.FAILURE)</strong>
-                    @Messages(failure.message)
+
+        @*  End of Header   *@
+
+        @*  Main Container *@
+        <div class="mainSection">
+            @*  Data container *@
+            <div class="dataContainer">
+
+                <div class="centerText">
+                    @for(failure <- failures) {
+                        <div class="cmuk-alert-danger" onclick="getForm(@failure.action)" cmuk-alert>
+                            <a class="cmuk-alert-close" cmuk-close></a>
+                            <p>@Messages(constants.Form.FAILURE) @Messages(failure.message)</p>
+                        </div>
+                    }
+                    @for(warning <- warnings) {
+                        <div class="cmuk-alert-warning" onclick="getForm(@warning.action)" cmuk-alert>
+                            <a class="cmuk-alert-close" cmuk-close></a>
+                            <p>@Messages(constants.Form.WARNING)
+                                @Messages(warning.message)</p>
+                        </div>
+                    }
+
+                    @for(success <- successes) {
+                        <div class="cmuk-alert-success" onclick="getForm(@success.action)" cmuk-alert>
+                            <a class="cmuk-alert-close" cmuk-close></a>
+                            <p>@Messages(constants.Form.SUCCESS) @Messages(success.message)</p>
+                        </div>
+                    }
+                    @for(info <- infos) {
+                        <div class="cmuk-alert-primary" onclick="getForm(@info.action)" cmuk-alert>
+                            <a class="cmuk-alert-close" cmuk-close></a>
+                            <p>>@Messages(constants.Form.INFORMATION) @Messages(info.message)</p>
+                        </div>
+
+                    }
                 </div>
-            }
-            @for(warning <- warnings) {
-                <div class="alert warning" onclick="getForm(@warning.action)">
-                    <span class="closeButton">x</span>
-                    <strong>@Messages(constants.Form.WARNING)</strong>
-                    @Messages(warning.message)
+                <div class="pageContent">
+                    <div class="leftSide">
+                    @left
+                    </div>
+                    <div class="middle">
+                    @center
+                    </div>
+                    <div class="rightSide">
+                    @right
+                    </div>
                 </div>
-            }
 
-            @for(success <- successes) {
-                <div class="alert success" onclick="getForm(@success.action)">
-                    <span class="closeButton">x</span>
-                    <strong>@Messages(constants.Form.SUCCESS)</strong>
-                    @Messages(success.message)
+                <div class="modal" id="commonModal">
+                    <div class="modalContent" id="commonModalContent">
+                    </div>
                 </div>
-            }
-            @for(info <- infos) {
-                <div class="alert information" onclick="getForm(@info.action)">
-                    <span class="closeButton">x</span>
-                    <strong>@Messages(constants.Form.INFORMATION)</strong>
-                    @Messages(info.message)
+
+
+                <div class = "modal centerScreen" id="loading">
+                    <img src="@routes.Assets.versioned("images/loading.gif")" alt = "@Messages(constants.Form.LOADING)"/>
                 </div>
-            }
-        </div>
-        <div class="pageContent">
-            <div class="left_side">
-            @left
-            </div>
-            <div class="middle">
-            @center
-            </div>
-            <div class="right_side">
-            @right
-            </div>
-        </div>
 
+            </div>
+            @*  End of Data container  *@
 
-        <div class="modal" id="commonModal">
-
-            <div class="latest_card latest_card-login modalContent" id="commonModalContent">
+            <div class = "modal centerScreen hidden" id="connectionError">
+                <img src="@routes.Assets.versioned("images/exclamation.png")" alt = "@Messages(constants.Form.CONNECTION_ERROR)"/>
+                <div>@Messages(constants.Form.CONNECTION_ERROR)</div>
             </div>
 
-        </div>
-
-        <div class = "modal centerScreen" id="loading">
-            <img src="@routes.Assets.versioned("images/loading.gif")" alt = "@Messages(constants.Form.LOADING)"/>
-        </div>
-
-        <div class = "modal centerScreen hidden" id="connectionError">
-            <img src="@routes.Assets.versioned("images/exclamation.png")" alt = "@Messages(constants.Form.CONNECTION_ERROR)"/>
-            <div>@Messages(constants.Form.CONNECTION_ERROR)</div>
-        </div>
-
-        <footer class="footer cmuk-margin-medium-top">
-            <div class="container">
-                <div class="copyright float-right">
-                            &copy;
-                    <script>
-                            document.write(new Date().getFullYear())
-                    </script>
-                    <a href="" target="_blank">Commit</a>
+            @*   Footer *@
+            <div class="footer">
+                <div class="container">
+                    <div class="copyright float-right">
+                                &copy;
+                        <script>
+                                document.write(new Date().getFullYear())
+                        </script>
+                        <a href="" target="_blank">Commit</a>
+                    </div>
                 </div>
             </div>
-        </footer>
+            @*     End of Footer   *@
+
+        </div>
+
+        @* End of MainContainer *@
+
+
         <script src="@routes.Assets.versioned("javascripts/style/ajaxLoading.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/style/alert.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/style/modal.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.versioned("javascripts/style/sideBar.js")" type="text/javascript"></script>
+    <script src="@routes.Assets.versioned("javascripts/style/copyText.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.versioned("javascripts/style/navigationBar.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/style/hideElement.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/style/delete.js")" type="text/javascript"></script>
     </body>

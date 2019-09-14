@@ -9,7 +9,7 @@
     </div>
     <div class="latest_card-body">
         @CSRF.formField
-        @inputText(verifyEmailAddressForm(constants.FormField.OTP.name), '_label -> Messages(constants.FormField.OTP.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.OTP.name), 'required -> true)
+        @inputText(verifyEmailAddressForm(constants.FormField.OTP.name), '_label -> Messages(constants.FormField.OTP.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.OTP.name), 'required -> true)
 
         @if(verifyEmailAddressForm.hasGlobalErrors) {
             <ul>
