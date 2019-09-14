@@ -3,7 +3,7 @@
 
 @(changeBuyerBidForm: Form[ChangeBuyerBid.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 
-@form(action = routes.ChangeBuyerBidController.blockchainChangeBuyerBid, 'onkeypress -> "validateForm(event,this)") {
+@form(action = routes.ChangeBuyerBidController.blockchainChangeBuyerBid, 'onkeypress -> "submitFormOnEnter(event,this)") {
     <div class="latest_card-header latest_card-header-primary text-center">
         <h4 class="latest_card-title">@Messages(constants.Form.CHANGE_BUYER_BID)</h4>
     </div>
@@ -25,7 +25,7 @@
             }
             </ul>
         }
-        <button type="button" class="btn btn-primary btn-sm" onclick="validateForm(event,this)">@Messages(constants.Form.CHANGE_BUYER_BID)</button>
+        <button type="button" class="btn btn-primary btn-sm" onclick="validateForm(this)">@Messages(constants.Form.CHANGE_BUYER_BID)</button>
     </div>
 }
 

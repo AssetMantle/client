@@ -91,7 +91,7 @@
                 }
             </div>
             <br>
-            @form(action = routes.AddOrganizationController.reviewOrganizationCompletion, 'onkeypress -> "validateForm(event,this)") {
+            @form(action = routes.AddOrganizationController.reviewOrganizationCompletion, 'onkeypress -> "submitFormOnEnter(event,this)") {
                 @CSRF.formField
                 @Messages(constants.Form.COMPLETION):
                 <span>@checkbox(organizationCompletionForm(constants.Form.COMPLETION), '_label -> Messages(constants.Form.COMPLETION), 'class -> "form-control", 'placeholder -> Messages(constants.Form.COMPLETION), 'required -> true)</span>
@@ -103,7 +103,7 @@
                     </ul>
                 }
                 <button type="button" class="btn-sm btn btn-primary" onclick="getForm(jsRoutes.controllers.AddOrganizationController.userUploadOrUpdateOrganizationKYCView())">@Messages(constants.Form.BACK)</button>
-                <button type="button" class="btn-sm btn btn-primary" onclick="validateForm(event,this)">@Messages(constants.Form.SUBMIT)</button>
+                <button type="button" class="btn-sm btn btn-primary" onclick="validateForm(this)">@Messages(constants.Form.SUBMIT)</button>
             }
         </div>
     </div>

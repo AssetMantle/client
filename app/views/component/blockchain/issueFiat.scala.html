@@ -2,7 +2,7 @@
 @import views.companion.blockchain.IssueFiat
 
 @(issueFiatForm: Form[IssueFiat.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@form(action = routes.IssueFiatController.blockchainIssueFiat, 'onkeypress -> "validateForm(event,this)") {
+@form(action = routes.IssueFiatController.blockchainIssueFiat, 'onkeypress -> "submitFormOnEnter(event,this)") {
     <div class="latest_card-header latest_card-header-primary text-center">
         <h4 class="latest_card-title">@Messages(constants.Form.ISSUE_FIAT)</h4>
     </div>
@@ -23,6 +23,6 @@
             }
             </ul>
         }
-        <button type="button" class="btn btn-primary btn-sm" onclick="validateForm(event,this)">@Messages(constants.Form.ISSUE_FIAT)</button>
+        <button type="button" class="btn btn-primary btn-sm" onclick="validateForm(this)">@Messages(constants.Form.ISSUE_FIAT)</button>
     </div>
 }

@@ -3,7 +3,7 @@
 
 @(sendFiatForm: Form[SendFiat.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 
-@form(action = routes.SendFiatController.blockchainSendFiat, 'onkeypress -> "validateForm(event,this)") {
+@form(action = routes.SendFiatController.blockchainSendFiat, 'onkeypress -> "submitFormOnEnter(event,this)") {
     <div class="latest_card-header latest_card-header-primary text-center">
         <h4 class="latest_card-title">@Messages(constants.Form.SEND_FIAT)</h4>
     </div>
@@ -24,6 +24,6 @@
             }
             </ul>
         }
-        <button type="button" class="btn btn-primary btn-sm" onclick="validateForm(event,this)">@Messages(constants.Form.SEND_FIAT)</button>
+        <button type="button" class="btn btn-primary btn-sm" onclick="validateForm(this)">@Messages(constants.Form.SEND_FIAT)</button>
     </div>
 }

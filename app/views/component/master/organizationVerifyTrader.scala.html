@@ -4,7 +4,7 @@
 
 @(verifyTraderForm: Form[VerifyTrader.Data], aclAddress: String, organizationID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 
-@form(action = routes.SetACLController.organizationVerifyTrader, 'onkeypress -> "validateForm(event,this)") {
+@form(action = routes.SetACLController.organizationVerifyTrader, 'onkeypress -> "submitFormOnEnter(event,this)") {
     <div class="latest_card-header latest_card-header-primary text-center">
         <h4 class="latest_card-title">@Messages(constants.Form.VERIFY_TRADER)</h4>
     </div>
@@ -122,6 +122,6 @@
             }
             </ul>
         }
-        <button type="button" class="btn btn-sm btn-primary" onclick="validateForm(event,this)">@Messages(constants.Form.VERIFY_TRADER)</button>
+        <button type="button" class="btn btn-sm btn-primary" onclick="validateForm(this)">@Messages(constants.Form.VERIFY_TRADER)</button>
     </div>
 }

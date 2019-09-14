@@ -4,7 +4,7 @@
 
 @(redeemFiatForm: Form[RedeemFiat.Data], zoneID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 
-@form(action = routes.RedeemFiatController.redeemFiat, 'onkeypress -> "validateForm(event,this)") {
+@form(action = routes.RedeemFiatController.redeemFiat, 'onkeypress -> "submitFormOnEnter(event,this)") {
     <div class="latest_card-header latest_card-header-primary text-center">
         <h4 class="latest_card-title">@Messages(constants.Form.REDEEM_FIAT)</h4>
     </div>
@@ -22,6 +22,6 @@
             }
             </ul>
         }
-        <button type="button" class="btn btn-sm btn-primary" onclick="validateForm(event,this)">@Messages(constants.Form.REDEEM_FIAT)</button>
+        <button type="button" class="btn btn-sm btn-primary" onclick="validateForm(this)">@Messages(constants.Form.REDEEM_FIAT)</button>
     </div>
 }

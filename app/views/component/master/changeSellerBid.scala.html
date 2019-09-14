@@ -3,7 +3,7 @@
 @import views.companion.master.ChangeSellerBid
 
 @(changeSellerBidForm: Form[ChangeSellerBid.Data], buyerAddress: String, pegHash: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
-@form(action = routes.ChangeSellerBidController.changeSellerBid, 'onkeypress -> "validateForm(event,this)") {
+@form(action = routes.ChangeSellerBidController.changeSellerBid, 'onkeypress -> "submitFormOnEnter(event,this)") {
     <div class="latest_card-header latest_card-header-primary text-center">
         <h4 class="latest_card-title">@Messages(constants.Form.CHANGE_SELLER_BID)</h4>
     </div>
@@ -23,7 +23,7 @@
             }
             </ul>
         }
-        <button type="button" class="btn btn-sm btn-primary" onclick="validateForm(event,this)">@Messages(constants.Form.CHANGE_SELLER_BID)</button>
+        <button type="button" class="btn btn-sm btn-primary" onclick="validateForm(this)">@Messages(constants.Form.CHANGE_SELLER_BID)</button>
     </div>
 }
 

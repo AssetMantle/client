@@ -4,7 +4,7 @@
 
 @(organizationBankAccountDetailForm: Form[OrganizationBankAccountDetail.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
-@form(action = routes.AddOrganizationController.organizationBankAccountDetail, 'onkeypress -> "validateForm(event,this)") {
+@form(action = routes.AddOrganizationController.organizationBankAccountDetail, 'onkeypress -> "submitFormOnEnter(event,this)") {
     <div class="latest_card-header latest_card-header-primary text-center">
         <h4 class="latest_card-title">@Messages(constants.Form.ORGANIZATION_BANK_ACCOUNT_DETAIL)</h4>
     </div>
@@ -27,6 +27,6 @@
             </ul>
         }
         <button type="button" class="btn-sm btn btn-primary" onclick="getForm(jsRoutes.controllers.AddOrganizationController.userUpdateUBOsForm())">@Messages(constants.Form.BACK)</button>
-        <button type="button" class="btn-sm btn btn-primary" onclick="validateForm(event,this)">@Messages(constants.Form.NEXT)</button>
+        <button type="button" class="btn-sm btn btn-primary" onclick="validateForm(this)">@Messages(constants.Form.NEXT)</button>
     </div>
 }

@@ -4,7 +4,7 @@
 
 @(issueAssetRequestForm: Form[IssueAssetRequest.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 
-    @form(action = routes.IssueAssetController.issueAssetRequest, 'onkeypress -> "validateForm(event,this)") {
+    @form(action = routes.IssueAssetController.issueAssetRequest, 'onkeypress -> "submitFormOnEnter(event,this)") {
         @CSRF.formField
         <div class="latest_card-header latest_card-header-primary text-center">
             <h4 class="latest_card-title">@Messages(constants.Form.ISSUE_ASSET_REQUEST)</h4>
@@ -35,7 +35,7 @@
                 }
                 </ul>
             }
-            <button type="button" class="btn btn-primary btn-sm" onclick="validateForm(event,this)">@Messages(constants.Form.ISSUE_ASSET_REQUEST)</button>
+            <button type="button" class="btn btn-primary btn-sm" onclick="validateForm(this)">@Messages(constants.Form.ISSUE_ASSET_REQUEST)</button>
             <script src="@routes.Assets.versioned("javascripts/showIssueAssetRequestFormFields.js")" type="text/javascript"></script>
         </div>
     }

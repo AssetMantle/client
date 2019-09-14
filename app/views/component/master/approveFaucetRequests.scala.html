@@ -3,7 +3,7 @@
 @import views.companion.master.ApproveFaucetRequest
 
 @(approveFaucetRequestForm: Form[ApproveFaucetRequest.Data], requestID: String, accountID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
-@form(action = routes.SendCoinController.approveFaucetRequests, 'onkeypress -> "validateForm(event,this)") {
+@form(action = routes.SendCoinController.approveFaucetRequests, 'onkeypress -> "submitFormOnEnter(event,this)") {
     <div class="latest_card-header latest_card-header-primary text-center">
         <h4 class="latest_card-title">@Messages(constants.Form.SEND_COIN)</h4>
     </div>
@@ -21,6 +21,6 @@
             }
             </ul>
         }
-        <button type="button" class="btn btn-primary btn-sm" onclick="validateForm(event,this)">@Messages(constants.Form.SEND_COIN)</button>
+        <button type="button" class="btn btn-primary btn-sm" onclick="validateForm(this)">@Messages(constants.Form.SEND_COIN)</button>
     </div>
 }

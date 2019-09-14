@@ -5,7 +5,7 @@
 @(requestCoinFormForm: Form[RequestCoin.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 
 <div class="request_coin">
-    @form(action = routes.SendCoinController.requestCoins, 'onkeypress -> "validateForm(event,this)") {
+    @form(action = routes.SendCoinController.requestCoins, 'onkeypress -> "submitFormOnEnter(event,this)") {
         @CSRF.formField
         @inputText(requestCoinFormForm(constants.FormField.COUPON.name), '_label -> Messages(constants.FormField.COUPON.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.COUPON.name), 'required -> true)
 
@@ -16,6 +16,6 @@
             }
             </ul>
         }
-        <button type="button" class="btn btn-primary btn-sm" onclick="validateForm(event,this)">@Messages(constants.Form.REQUEST_COIN)</button>
+        <button type="button" class="btn btn-primary btn-sm" onclick="validateForm(this)">@Messages(constants.Form.REQUEST_COIN)</button>
     </div>
 }

@@ -3,7 +3,7 @@
 @import views.companion.master.BuyerExecuteOrder
 
 @(buyerExecuteOrderForm: Form[BuyerExecuteOrder.Data], sellerAddress: String, pegHash: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
-@form(action = routes.BuyerExecuteOrderController.buyerExecuteOrder, 'onkeypress -> "validateForm(event,this)") {
+@form(action = routes.BuyerExecuteOrderController.buyerExecuteOrder, 'onkeypress -> "submitFormOnEnter(event,this)") {
     <div class="latest_card-header latest_card-header-primary text-center">
         <h4 class="latest_card-title">@Messages(constants.Form.BUYER_EXECUTE_ORDER)</h4>
     </div>
@@ -22,6 +22,6 @@
             }
             </ul>
         }
-        <button type="button" class="btn btn-primary btn-sm" onclick="validateForm(event,this)">@Messages(constants.Form.BUYER_EXECUTE_ORDER)</button>
+        <button type="button" class="btn btn-primary btn-sm" onclick="validateForm(this)">@Messages(constants.Form.BUYER_EXECUTE_ORDER)</button>
     </div>
 }

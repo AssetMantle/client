@@ -4,7 +4,7 @@
 
 @(confirmBuyerBidForm: Form[ConfirmBuyerBid.Data], sellerAddress: String, pegHash: String, bid: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 
-@form(action = routes.ConfirmBuyerBidController.confirmBuyerBid, 'onkeypress -> "validateForm(event,this)") {
+@form(action = routes.ConfirmBuyerBidController.confirmBuyerBid, 'onkeypress -> "submitFormOnEnter(event,this)") {
     <div class="latest_card-header latest_card-header-primary text-center">
         <h4 class="latest_card-title">@Messages(constants.Form.CONFIRM_BUYER_BID)</h4>
     </div>
@@ -25,6 +25,6 @@
             }
             </ul>
         }
-        <button type="button" class="btn btn-primary btn-sm" onclick="validateForm(event,this)">@Messages(constants.Form.CONFIRM_BUYER_BID)</button>
+        <button type="button" class="btn btn-primary btn-sm" onclick="validateForm(this)">@Messages(constants.Form.CONFIRM_BUYER_BID)</button>
     </div>
 }

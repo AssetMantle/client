@@ -3,7 +3,7 @@
 @import views.companion.master.RejectVerifyZoneRequest
 
 @(rejectVerifyZoneRequestForm: Form[RejectVerifyZoneRequest.Data], zoneID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
-@form(action = routes.AddZoneController.rejectVerifyZoneRequest, 'onkeypress -> "validateForm(event,this)") {
+@form(action = routes.AddZoneController.rejectVerifyZoneRequest, 'onkeypress -> "submitFormOnEnter(event,this)") {
     <div class="latest_card-header latest_card-header-primary text-center">
         <h4 class="latest_card-title">@Messages(constants.Form.REJECT_VERIFY_ZONE_REQUEST)</h4>
     </div>
@@ -18,6 +18,6 @@
             }
             </ul>
         }
-        <button type="button" class="btn btn-sm btn-primary" onclick="validateForm(event,this)">@Messages(constants.Form.REJECT_VERIFY_ZONE_REQUEST)</button>
+        <button type="button" class="btn btn-sm btn-primary" onclick="validateForm(this)">@Messages(constants.Form.REJECT_VERIFY_ZONE_REQUEST)</button>
     </div>
 }

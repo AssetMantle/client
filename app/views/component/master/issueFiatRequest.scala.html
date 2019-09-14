@@ -3,7 +3,7 @@
 @import views.companion.master.IssueFiatRequest
 
 @(issueFiatRequestForm: Form[IssueFiatRequest.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
-@form(action = routes.IssueFiatController.issueFiatRequest, 'onkeypress -> "validateForm(event,this)") {
+@form(action = routes.IssueFiatController.issueFiatRequest, 'onkeypress -> "submitFormOnEnter(event,this)") {
     <div class="latest_card-header latest_card-header-primary text-center">
         <h4 class="latest_card-title">@Messages(constants.Form.ISSUE_FIAT)</h4>
     </div>
@@ -19,7 +19,7 @@
             }
             </ul>
         }
-        <button type="button" class="btn btn-sm btn-primary" onclick="validateForm(event,this)">@Messages(constants.Form.ISSUE_FIAT)</button>
+        <button type="button" class="btn btn-sm btn-primary" onclick="validateForm(this)">@Messages(constants.Form.ISSUE_FIAT)</button>
     </div>
 
 }

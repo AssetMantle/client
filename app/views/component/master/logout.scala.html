@@ -5,7 +5,7 @@
 @(logoutForm: Form[Logout.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 
 
-@form(action = routes.AccountController.logout, 'onkeypress -> "validateForm(event,this)") {
+@form(action = routes.AccountController.logout, 'onkeypress -> "submitFormOnEnter(event,this)") {
     @CSRF.formField
     <div class="latest_card-body ml-cb">
         <div class="input-group-prepend">
@@ -20,7 +20,7 @@
             }
             </ul>
         }
-        <button type="button" class="btn btn-primary btn-sm" onclick="validateForm(event,this)">@Messages(constants.Form.LOGOUT)</button>
+        <button type="button" class="btn btn-primary btn-sm" onclick="validateForm(this)">@Messages(constants.Form.LOGOUT)</button>
     </div>
 }
 

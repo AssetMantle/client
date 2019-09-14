@@ -7,7 +7,7 @@
 <div class="">
     <h4 class="">@Messages(constants.Form.LOGIN)</h4>
 </div>
-@form(action = routes.AccountController.login, 'onkeypress -> "validateForm(event,this)") {
+@form(action = routes.AccountController.login, 'onkeypress -> "submitFormOnEnter(event,this)") {
     @CSRF.formField
     <div class="input-group">
         <div class="input-group-prepend">
@@ -34,7 +34,7 @@
         }
         </ul>
     }
-    <button type="button" class="btn btn-primary " onclick="validateForm(event,this)">@Messages(constants.Form.LOGIN)</button>
+    <button type="button" class="btn btn-primary " onclick="validateForm(this)">@Messages(constants.Form.LOGIN)</button>
     <button type="button" class="btn btn-primary" onclick="getForm(jsRoutes.controllers.AccountController.emailOTPForgotPasswordForm())">@Messages(constants.Form.FORGOT_PASSWORD)</button>
 }
 
