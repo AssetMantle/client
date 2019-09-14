@@ -2,7 +2,7 @@
 
 @()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
-@common(Messages(constants.Form.PROFILE))(Html(""))(center)(Html(""))
+@views.html.common(Messages(constants.Form.PROFILE))(Html(""))(center)(Html(""))
 
 @center = {
     <div class="container">

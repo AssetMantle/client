@@ -14,7 +14,7 @@ import scala.concurrent.{Await, ExecutionContext, Future}
 @Singleton
 class GetNegotiation @Inject()()(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
-  private implicit val module: String = constants.Module.TRANSACTIONS_GET_NEGOTIATION
+  private implicit val module: String = constants.Module.QUERIES_GET_NEGOTIATION
 
   private implicit val logger: Logger = Logger(this.getClass)
 

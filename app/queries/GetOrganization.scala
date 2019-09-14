@@ -14,7 +14,7 @@ import scala.concurrent.{Await, ExecutionContext, Future}
 @Singleton
 class GetOrganization @Inject()(wsClient: WSClient)(implicit configuration: Configuration, executionContext: ExecutionContext) {
 
-  private implicit val module: String = constants.Module.TRANSACTIONS_GET_ORGANIZATION
+  private implicit val module: String = constants.Module.QUERIES_GET_ORGANIZATION
 
   private implicit val logger: Logger = Logger(this.getClass)
 

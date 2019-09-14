@@ -6,6 +6,9 @@ GET         /javascriptRoutes                                                   
 
 GET         /firebase-messaging-sw.js                                              controllers.Assets.at(path="/public/javascripts", file="firebase-messaging-sw.js")
 
+GET         /blockExplorer/lastBlockHeight                                         controllers.BlockExplorerController.lastBlockHeight
+GET         /blockExplorer/blockDetails                                            controllers.BlockExplorerController.blockDetails(minimumHeight: Int, maximumHeight: Int)
+GET         /blockExplorer/stakingValidators                                       controllers.BlockExplorerController.stakingValidators
 
 GET         /genesisRequest                                                        controllers.ViewController.genesisRequest
 GET         /genesisInformation                                                    controllers.ViewController.genesisInformation

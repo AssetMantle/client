@@ -38,7 +38,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
         addTraderRequestData => {
           try {
             val requestID = masterTransactionAddTraderRequests.Service.create(accountID = addTraderRequestData.accountID, organizationID = masterOrganizations.Service.getID(loginState.username))
-            email.sendEmail(subject = Messages(constants.Email.TRADER_INVITATION), toAccountID = addTraderRequestData.accountID, bodyHtml = views.html.mail.traderInvitation(username = addTraderRequestData.accountID, url = routes.SetACLController.addTraderRequestForm(requestID).url))
+            email.sendEmail(toAccountID = addTraderRequestData.accountID, email = constants.Email.TRADER_INVITATION, messageParameters =  Seq(routes.SetACLController.addTraderRequestForm(requestID).url))
             withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.INVITATION_EMAIL_SENT)))
           }
           catch {

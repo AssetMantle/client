@@ -10,6 +10,11 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
   def javascriptRoutes = Action { implicit request =>
     Ok(
       JavaScriptReverseRouter("jsRoutes")(
+
+        routes.javascript.BlockExplorerController.lastBlockHeight,
+        routes.javascript.BlockExplorerController.blockDetails,
+        routes.javascript.BlockExplorerController.stakingValidators,
+
         routes.javascript.AccountController.checkUsernameAvailable,
         routes.javascript.ConfigurationController.queryConfigurationVariable,
         routes.javascript.NotificationController.notificationPage,

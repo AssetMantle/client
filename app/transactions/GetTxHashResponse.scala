@@ -13,7 +13,7 @@ import scala.concurrent.{Await, ExecutionContext, Future}
 @Singleton
 class GetTxHashResponse @Inject()()(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
-  private implicit val module: String = constants.Module.TRANSACTIONS_GET_RESPONSE
+  private implicit val module: String = constants.Module.QUERIES_GET__TRANSACTION_HASH_RESPONSE
 
   private implicit val logger: Logger = Logger(this.getClass)
 

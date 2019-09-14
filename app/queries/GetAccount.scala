@@ -14,7 +14,7 @@ import scala.concurrent.{Await, ExecutionContext, Future}
 @Singleton
 class GetAccount @Inject()()(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
-  private implicit val module: String = constants.Module.TRANSACTIONS_GET_ACCOUNT
+  private implicit val module: String = constants.Module.QUERIES_GET_ACCOUNT
 
   private implicit val logger: Logger = Logger(this.getClass)
 

@@ -2,13 +2,12 @@ function searchFunction(searchData) {
     let invalidBlockHeight = getCookie("blockHeightError");
     let invalidTransactionHash = getCookie("transactionHashError");
 
-    $("#searchForm").submit(function(e) {
+    $("#searchForm").submit(function (e) {
         e.preventDefault();
     });
 
     let heightPattern = /^[0-9]*$/;
     let txHashPattern = /^[A-F0-9]{40}$/;
-    let blockHeightUrl = getConfiguration("blockchain.main.ip") + ":" + getConfiguration("blockchain.main.abciPort") + "/block?height=";
     let txHashUrl = getConfiguration("blockchain.main.ip") + ":" + getConfiguration("blockchain.main.restPort") + "/txs/";
 
     if (searchData === undefined) {
@@ -16,28 +15,23 @@ function searchFunction(searchData) {
     }
     let height = heightPattern.exec(searchData);
     if (height != null) {
+        let blockDetails = jsRoutes.controllers.BlockExplorerController.blockDetails(height, height);
         $.ajax({
-            url: blockHeightUrl + height.input,
-            type: "GET",
+            url: blockDetails.url,
+            type: blockDetails.type,
             async: true,
             statusCode: {
-                200: function (heightData) {
-                    if (heightData.hasOwnProperty("error")) {
-                        document.getElementById('blockHeightPageHeight').innerHTML = invalidBlockHeight;
-                        document.getElementById('blockHeightPageTime').innerHTML = "";
-                        document.getElementById('blockHeightPageDataHash').innerHTML = "";
-                        document.getElementById('blockHeightPageNumTxs').innerHTML = "";
-                        document.getElementById('blockHeightPageEvidenceHash').innerHTML = "";
-                        document.getElementById('blockHeightPageValidatorsHash').innerHTML = "";
-                    } else {
-                        document.getElementById('blockHeightPageHeight').innerHTML = heightData.result.block.header.height;
-                        document.getElementById('blockHeightPageTime').innerHTML = heightData.result.block.header.time;
-                        document.getElementById('blockHeightPageDataHash').innerHTML = heightData.result.block.header.data_hash;
-                        document.getElementById('blockHeightPageNumTxs').innerHTML = heightData.result.block.header.num_txs;
-                        document.getElementById('blockHeightPageEvidenceHash').innerHTML = heightData.result.block.header.evidence_hash;
-                        document.getElementById('blockHeightPageValidatorsHash').innerHTML = heightData.result.block.header.validators_hash;
-                    }
-                }
+                200: function (blockDetailsData) {
+                    let block = JSON.parse(blockDetailsData);
+                    document.getElementById('blockHeightPageHeight').innerHTML = block[0].header.height;
+                    document.getElementById('blockHeightPageTime').innerHTML = block[0].header.time;
+                    document.getElementById('blockHeightPageDataHash').innerHTML = block[0].header.data_hash;
+                    document.getElementById('blockHeightPageNumTxs').innerHTML = block[0].header.num_txs;
+                    document.getElementById('blockHeightPageEvidenceHash').innerHTML = block[0].header.evidence_hash;
+                    document.getElementById('blockHeightPageValidatorsHash').innerHTML = block[0].header.validators_hash;
+
+                },
+                500: {}
             }
         });
         $('#indexBottomDivision').hide();
@@ -78,6 +72,6 @@ function searchFunction(searchData) {
 }
 
 function setSearchErrorValues(blockHeightError, transactionHashError) {
-    setCookie("blockHeightError", blockHeightError,1);
-    setCookie("transactionHashError", transactionHashError,1);
+    setCookie("blockHeightError", blockHeightError, 1);
+    setCookie("transactionHashError", transactionHashError, 1);
 }
