@@ -12,7 +12,7 @@ import views.companion.master.FileUpload.FileUploadInfo
 
 import scala.concurrent.ExecutionContext
 import scala.util.{Failure, Success}
-import play.api.libs.json.{Json, OWrites, Reads}
+
 
 object FileOperations {
 
@@ -21,11 +21,6 @@ object FileOperations {
   private val uploadedParts: ConcurrentMap[String, Set[FileUploadInfo]] = new ConcurrentHashMap(8, 0.9f, 1)
 
   private val logger: Logger = Logger(this.getClass)
-
-  case class DocumentBlockchainDetails(documentType: String, documentHash: String)
-
-  implicit val oblReads: Reads[DocumentBlockchainDetails] = Json.reads[DocumentBlockchainDetails]
-  implicit val oblWrites: OWrites[DocumentBlockchainDetails] = Json.writes[DocumentBlockchainDetails]
 
   def savePartialFile(filePart: Array[Byte], fileInfo: FileUploadInfo, uploadPath: String) {
     try {
@@ -80,14 +75,6 @@ object FileOperations {
       case e: Exception => logger.error(constants.Response.GENERIC_EXCEPTION.message, e)
         throw new BaseException(constants.Response.GENERIC_EXCEPTION)
     }
-  }
-
-  def combinedHash[T <: Document[T]](documents: Seq[T]): String = {
-
-    Json.toJson(documents.map { doc =>
-      DocumentBlockchainDetails(doc.documentType, doc.fileName)
-    }).toString()
-
   }
 
   def renameFile(directory: String, currentName: String, newName: String)(implicit exec: ExecutionContext): Boolean = newFile(directory, currentName).renameTo(newFile(directory, newName))

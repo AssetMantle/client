@@ -28,8 +28,8 @@
                 </div>
             }
             case constants.User.USER => {
-                <button id="userUploadButton@loginState.username @document.documentType" class="hidden" onclick="getForm(jsRoutes.controllers.FileController.uploadUserKycForm('@document.documentType'))">@Messages(constants.Form.UPLOAD)</button>
-                <button id="userUpdateButton@loginState.username @document.documentType" class="hidden" onclick="getForm(jsRoutes.controllers.FileController.updateUserKycForm('@document.documentType'))">@Messages(constants.Form.UPDATE)</button>
+                <button id="userUploadButton@loginState.username@document.documentType" class="hidden" onclick="getForm(jsRoutes.controllers.FileController.uploadUserKycForm('@document.documentType'))">@Messages(constants.Form.UPLOAD)</button>
+                <button id="userUpdateButton@loginState.username@document.documentType" class="hidden" onclick="getForm(jsRoutes.controllers.FileController.updateUserKycForm('@document.documentType'))">@Messages(constants.Form.UPDATE)</button>
                 <script>checkFileExists(jsRoutes.controllers.FileController.checkAccountKycFileExists('@loginState.username', '@document.documentType'), 'userUploadButton@loginState.username@document.documentType', 'userUpdateButton@loginState.username@document.documentType')</script>
             }
             case constants.User.UNKNOWN => {}
