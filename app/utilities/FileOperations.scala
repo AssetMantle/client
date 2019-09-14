@@ -6,11 +6,13 @@ import java.util.concurrent.{ConcurrentHashMap, ConcurrentMap}
 import akka.stream.scaladsl.{FileIO, Source}
 import akka.util.ByteString
 import exceptions.BaseException
+import models.Trait.Document
 import play.api.Logger
 import views.companion.master.FileUpload.FileUploadInfo
 
 import scala.concurrent.ExecutionContext
 import scala.util.{Failure, Success}
+
 
 object FileOperations {
 
@@ -130,8 +132,8 @@ object FileOperations {
   }
 
   def fetchFile(path: String, fileName: String): File = {
-      val file = new java.io.File(path + fileName)
-      if (!file.exists()) throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION) else file
+    val file = new java.io.File(path + fileName)
+    if (!file.exists()) throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION) else file
   }
 
 }

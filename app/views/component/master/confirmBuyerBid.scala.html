@@ -4,18 +4,18 @@
 
 @(confirmBuyerBidForm: Form[ConfirmBuyerBid.Data], sellerAddress: String, pegHash: String, bid: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 
-@form(action = routes.ConfirmBuyerBidController.confirmBuyerBid, 'onkeypress -> "validateForm(event,this)") {
+@form(action = routes.ConfirmBuyerBidController.confirmBuyerBid, 'onkeypress -> "submitFormOnEnter(event,this)") {
     <div class="latest_card-header latest_card-header-primary text-center">
         <h4 class="latest_card-title">@Messages(constants.Form.CONFIRM_BUYER_BID)</h4>
     </div>
     <div class="latest_card-body">
         @CSRF.formField
       @inputText(confirmBuyerBidForm(constants.FormField.SELLER_ADDRESS.name).copy(value = Some(sellerAddress)), '_label -> Messages(constants.FormField.SELLER_ADDRESS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.SELLER_ADDRESS.name), 'required -> true)
-      @inputText(confirmBuyerBidForm(constants.FormField.BID.name) copy (value = Some(bid.toString)), '_label -> Messages(constants.FormField.BID.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.BID.name), 'required -> true)
-      @inputText(confirmBuyerBidForm(constants.FormField.TIME.name), '_label -> Messages(constants.FormField.TIME.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.TIME.name), 'required -> true)
+      @inputText(confirmBuyerBidForm(constants.FormField.BID.name) copy (value = Some(bid.toString)), '_label -> Messages(constants.FormField.BID.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.BID.name), 'required -> true, 'type -> "number")
+      @inputText(confirmBuyerBidForm(constants.FormField.TIME.name), '_label -> Messages(constants.FormField.TIME.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.TIME.name), 'required -> true, 'type -> "number")
       @inputText(confirmBuyerBidForm(constants.FormField.PEG_HASH.name).copy(value = Some(pegHash)), '_label -> Messages(constants.FormField.PEG_HASH.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PEG_HASH.name), 'required -> true)
       @inputText(confirmBuyerBidForm(constants.FormField.BUYER_CONTRACT_HASH.name), '_label -> Messages(constants.FormField.BUYER_CONTRACT_HASH.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.BUYER_CONTRACT_HASH.name), 'required -> true)
-      @inputText(confirmBuyerBidForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.GAS.name), 'required -> true)
+      @inputText(confirmBuyerBidForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.GAS.name), 'required -> true, 'type -> "number")
       @inputPassword(confirmBuyerBidForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PASSWORD.name), 'required -> true)
 
         @if(confirmBuyerBidForm.hasGlobalErrors) {

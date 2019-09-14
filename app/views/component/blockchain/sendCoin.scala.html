@@ -2,7 +2,7 @@
 @import views.companion.blockchain.SendCoin
 
 @(sendCoinForm: Form[SendCoin.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@form(action = routes.SendCoinController.blockchainSendCoin, 'onkeypress -> "validateForm(event,this)") {
+@form(action = routes.SendCoinController.blockchainSendCoin, 'onkeypress -> "submitFormOnEnter(event,this)") {
     <div class="latest_card-header latest_card-header-primary text-center">
         <h4 class="latest_card-title">@Messages(constants.Form.SEND_COIN)</h4>
     </div>
@@ -10,9 +10,9 @@
         @CSRF.formField
       @inputText(sendCoinForm(constants.FormField.FROM.name), '_label -> Messages(constants.FormField.FROM.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.FROM.name), 'required -> true)
       @inputText(sendCoinForm(constants.FormField.TO.name), '_label -> Messages(constants.FormField.TO.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.TO.name), 'required -> true)
-      @inputText(sendCoinForm(constants.FormField.AMOUNT.name), '_label -> Messages(constants.FormField.AMOUNT.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.AMOUNT.name), 'required -> true)
+      @inputText(sendCoinForm(constants.FormField.AMOUNT.name), '_label -> Messages(constants.FormField.AMOUNT.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.AMOUNT.name), 'required -> true, 'type -> "number")
       @inputText(sendCoinForm(constants.FormField.MODE.name), '_label -> Messages(constants.FormField.MODE.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.MODE.name), 'required -> true)
-      @inputText(sendCoinForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.GAS.name), 'required -> true)
+      @inputText(sendCoinForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.GAS.name), 'required -> true, 'type -> "number")
       @inputPassword(sendCoinForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PASSWORD.name), 'required -> true)
 
         @if(sendCoinForm.hasGlobalErrors) {

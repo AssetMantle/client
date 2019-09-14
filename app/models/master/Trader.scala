@@ -11,7 +11,7 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Random, Success}
 
-case class Trader(id: String, zoneID: String, organizationID:String, accountID: String, name: String, status: Option[Boolean] = None)
+case class Trader(id: String, zoneID: String, organizationID: String, accountID: String, name: String, status: Option[Boolean] = None)
 
 @Singleton
 class Traders @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {

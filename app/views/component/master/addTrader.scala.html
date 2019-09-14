@@ -3,7 +3,7 @@
 @import views.companion.master.AddTrader
 
 @(addTraderForm: Form[AddTrader.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
-@form(action = routes.SetACLController.addTrader, 'onkeypress -> "validateForm(event,this)") {
+@form(action = routes.SetACLController.addTrader, 'onkeypress -> "submitFormOnEnter(event,this)") {
     <div class="latest_card-header latest_card-header-primary text-center">
         <h4 class="latest_card-title">@Messages(constants.Form.ADD_TRADER)</h4>
     </div>

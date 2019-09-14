@@ -4,7 +4,7 @@
 
 @(verifyMobileNumberForm: Form[VerifyMobileNumber.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 
-@form(action = routes.VerifyMobileNumberController.verifyMobileNumber, 'onkeypress -> "validateForm(event,this)") {
+@form(action = routes.VerifyMobileNumberController.verifyMobileNumber, 'onkeypress -> "submitFormOnEnter(event,this)") {
     <div class="latest_card-header latest_card-header-primary text-center">
         <h4 class="latest_card-title">@Messages(constants.Form.VERIFY_MOBILE_NUMBER)</h4>
     </div>

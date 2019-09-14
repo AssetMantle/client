@@ -4,7 +4,7 @@
 
 @(issueFiatForm: Form[IssueFiat.Data], requestID: String, accountID: String, transactionID: String, transactionAmount: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 
-@form(action = routes.IssueFiatController.issueFiat, 'onkeypress -> "validateForm(event,this)") {
+@form(action = routes.IssueFiatController.issueFiat, 'onkeypress -> "submitFormOnEnter(event,this)") {
     <div class="latest_card-header latest_card-header-primary text-center">
         <h4 class="latest_card-title">@Messages(constants.Form.ISSUE_FIAT)</h4>
     </div>
@@ -13,8 +13,8 @@
       @inputText(issueFiatForm(constants.FormField.REQUEST_ID.name).copy(value = Some(requestID)), '_label -> Messages(constants.FormField.REQUEST_ID.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.REQUEST_ID.name), 'required -> true)
       @inputText(issueFiatForm(constants.FormField.ACCOUNT_ID.name).copy(value = Some(accountID)), '_label -> Messages(constants.FormField.ACCOUNT_ID.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.ACCOUNT_ID.name), 'required -> true)
       @inputText(issueFiatForm(constants.FormField.TRANSACTION_ID.name).copy(value = Some(transactionID)), '_label -> Messages(constants.FormField.TRANSACTION_ID.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.TRANSACTION_ID.name), 'required -> true)
-      @inputText(issueFiatForm(constants.FormField.TRANSACTION_AMOUNT.name).copy(value = Some(transactionAmount.toString)), '_label -> Messages(constants.FormField.TRANSACTION_AMOUNT.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.TRANSACTION_AMOUNT.name), 'required -> true)
-      @inputText(issueFiatForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.GAS.name), 'required -> true)
+      @inputText(issueFiatForm(constants.FormField.TRANSACTION_AMOUNT.name).copy(value = Some(transactionAmount.toString)), '_label -> Messages(constants.FormField.TRANSACTION_AMOUNT.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.TRANSACTION_AMOUNT.name), 'required -> true, 'type -> "number")
+      @inputText(issueFiatForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.GAS.name), 'required -> true, 'type -> "number")
         @inputPassword(issueFiatForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name),
           'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PASSWORD.name), 'required -> true)
 
