@@ -4,7 +4,7 @@
 @import views.companion.master.AddOrganization
 
 @(addOrganizationForm: Form[AddOrganization.Data], zones: Seq[Zone])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
-@form(action = routes.AddOrganizationController.addOrganization, 'onkeypress -> "validateForm(event,this)") {
+@form(action = routes.AddOrganizationController.addOrganization, 'onkeypress -> "submitFormOnEnter(event,this)") {
     <div class="latest_card-header latest_card-header-primary text-center">
         <h4 class="latest_card-title">@Messages(constants.Form.ADD_ORGANIZATION)</h4>
     </div>
@@ -12,10 +12,12 @@
         @CSRF.formField
         <div id="allZones">
         @for(zone <- zones) {
-            <button type="button" class="btn-sm btn btn-primary" onclick="fillZoneIDField('@zone.id')">@Messages(constants.Form.NAME): @zone.name <br>
+          <button type="button" class="btn-sm btn btn-primary" onclick="fillZoneIDField('@zone.id')">@Messages(constants.Form.NAME)
+            : @zone.name <br>
                 @Messages(constants.Form.CURRENCY): @zone.currency <br>
                 @Messages(constants.Form.ZONE_ID): @zone.id <br>
-            </button><br>
+          </button>
+          <br>
             }
         </div>
       @inputText(addOrganizationForm(constants.FormField.ZONE_ID.name), '_label -> Messages(constants.FormField.ZONE_ID.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.ZONE_ID.name), 'id -> "zoneID", 'required -> true)

@@ -18,7 +18,7 @@ import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 case class ReleaseAsset(from: String, to: String, pegHash: String, gas: Int, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None) extends BaseTransaction[ReleaseAsset] {
-  def mutateTicketID(newTicketID: String): ReleaseAsset = ReleaseAsset(from = from, to = to, pegHash = pegHash, gas = gas ,status = status, txHash, ticketID = newTicketID, mode = mode, code = code)
+  def mutateTicketID(newTicketID: String): ReleaseAsset = ReleaseAsset(from = from, to = to, pegHash = pegHash, gas = gas, status = status, txHash, ticketID = newTicketID, mode = mode, code = code)
 }
 
 
@@ -135,7 +135,7 @@ class ReleaseAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.T
 
   object Service {
 
-    def create(releaseAsset: ReleaseAsset): String = Await.result(add(ReleaseAsset(from = releaseAsset.from, to = releaseAsset.to, pegHash = releaseAsset.pegHash, gas=releaseAsset.gas, status = releaseAsset.status, txHash = releaseAsset.txHash, ticketID = releaseAsset.ticketID, mode = releaseAsset.mode, code = releaseAsset.code)), Duration.Inf)
+    def create(releaseAsset: ReleaseAsset): String = Await.result(add(ReleaseAsset(from = releaseAsset.from, to = releaseAsset.to, pegHash = releaseAsset.pegHash, gas = releaseAsset.gas, status = releaseAsset.status, txHash = releaseAsset.txHash, ticketID = releaseAsset.ticketID, mode = releaseAsset.mode, code = releaseAsset.code)), Duration.Inf)
 
     def getTicketIDsOnStatus(): Seq[String] = Await.result(getTicketIDsWithNullStatus, Duration.Inf)
 

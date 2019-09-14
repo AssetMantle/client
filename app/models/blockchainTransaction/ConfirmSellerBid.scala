@@ -145,7 +145,7 @@ class ConfirmSellerBids @Inject()(actorSystem: ActorSystem, transaction: utiliti
 
   object Service {
 
-    def create(confirmSellerBid: ConfirmSellerBid): String = Await.result(add(ConfirmSellerBid(from = confirmSellerBid.from, to = confirmSellerBid.to, bid = confirmSellerBid.bid, time = confirmSellerBid.time, pegHash = confirmSellerBid.pegHash, sellerContractHash = confirmSellerBid.sellerContractHash, gas=confirmSellerBid.gas, status = confirmSellerBid.status, txHash = confirmSellerBid.txHash, ticketID = confirmSellerBid.ticketID, mode = confirmSellerBid.mode, code = confirmSellerBid.code)), Duration.Inf)
+    def create(confirmSellerBid: ConfirmSellerBid): String = Await.result(add(ConfirmSellerBid(from = confirmSellerBid.from, to = confirmSellerBid.to, bid = confirmSellerBid.bid, time = confirmSellerBid.time, pegHash = confirmSellerBid.pegHash, sellerContractHash = confirmSellerBid.sellerContractHash, gas = confirmSellerBid.gas, status = confirmSellerBid.status, txHash = confirmSellerBid.txHash, ticketID = confirmSellerBid.ticketID, mode = confirmSellerBid.mode, code = confirmSellerBid.code)), Duration.Inf)
 
     def markTransactionSuccessful(ticketID: String, txHash: String): Int = Await.result(updateTxHashAndStatusOnTicketID(ticketID, Option(txHash), status = Option(true)), Duration.Inf)
 

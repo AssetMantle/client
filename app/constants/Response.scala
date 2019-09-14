@@ -102,8 +102,8 @@ object Response {
   val INVALID_USERNAME = new Failure("INVALID_USERNAME")
   val INVALID_PASSWORD = new Failure("INVALID_PASSWORD")
   val NO_FILE = new Failure("NO_FILE")
-  val PASSWORD_NOT_GIVEN =  new Failure("PASSWORD_NOT_GIVEN")
-  val GAS_NOT_GIVEN =  new Failure("GAS_NOT_GIVEN")
+  val PASSWORD_NOT_GIVEN = new Failure("PASSWORD_NOT_GIVEN")
+  val GAS_NOT_GIVEN = new Failure("GAS_NOT_GIVEN")
   val ALL_KYC_FILES_NOT_VERIFIED = new Failure("ALL_KYC_FILES_NOT_VERIFIED")
 
   class Failure(private val response: String, private val actionController: JavaScriptReverseRoute = null) {

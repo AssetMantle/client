@@ -2,7 +2,7 @@
 @import views.companion.blockchain.ChangeSellerBid
 
 @(changeSellerBidForm: Form[ChangeSellerBid.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@form(action = routes.ChangeSellerBidController.blockchainChangeSellerBid, 'onkeypress -> "validateForm(event,this)") {
+@form(action = routes.ChangeSellerBidController.blockchainChangeSellerBid, 'onkeypress -> "submitFormOnEnter(event,this)") {
     <div class="latest_card-header latest_card-header-primary text-center">
         <h4 class="latest_card-title">@Messages(constants.Form.CHANGE_SELLER_BID)</h4>
     </div>
@@ -10,10 +10,10 @@
         @CSRF.formField
       @inputText(changeSellerBidForm(constants.FormField.FROM.name), '_label -> Messages(constants.FormField.FROM.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.FROM.name), 'required -> true)
       @inputText(changeSellerBidForm(constants.FormField.TO.name), '_label -> Messages(constants.FormField.TO.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.TO.name), 'required -> true)
-      @inputText(changeSellerBidForm(constants.FormField.BID.name), '_label -> Messages(constants.FormField.BID.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.BID.name), 'required -> true)
-      @inputText(changeSellerBidForm(constants.FormField.TIME.name), '_label -> Messages(constants.FormField.TIME.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.TIME.name), 'required -> true)
+      @inputText(changeSellerBidForm(constants.FormField.BID.name), '_label -> Messages(constants.FormField.BID.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.BID.name), 'required -> true, 'type -> "number")
+      @inputText(changeSellerBidForm(constants.FormField.TIME.name), '_label -> Messages(constants.FormField.TIME.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.TIME.name), 'required -> true, 'type -> "number")
       @inputText(changeSellerBidForm(constants.FormField.PEG_HASH.name), '_label -> Messages(constants.FormField.PEG_HASH.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PEG_HASH.name), 'required -> true)
-      @inputText(changeSellerBidForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.GAS.name), 'required -> true)
+      @inputText(changeSellerBidForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.GAS.name), 'required -> true, 'type -> "number")
       @inputText(changeSellerBidForm(constants.FormField.MODE.name), '_label -> Messages(constants.FormField.MODE.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.MODE.name), 'required -> true)
       @inputPassword(changeSellerBidForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PASSWORD.name), 'required -> true)
 

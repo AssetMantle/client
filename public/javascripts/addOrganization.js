@@ -8,8 +8,7 @@ $(document).ready(function () {
             document.getElementById("postalCountry").value = "";
             document.getElementById("postalZipCode").value = "";
             document.getElementById("postalPhone").value = "";
-        }
-        else {
+        } else {
             document.getElementById("postalAddressLine1").value = document.getElementById("registeredAddressLine1").value;
             document.getElementById("postalAddressLine2").value = document.getElementById("registeredAddressLine2").value;
             document.getElementById("postalLandmark").value = document.getElementById("registeredLandmark").value;

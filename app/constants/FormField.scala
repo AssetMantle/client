@@ -2,10 +2,11 @@ package constants
 
 import java.util.Date
 
-import play.api.data.Forms.{number, text, date, of}
+import play.api.data.Forms.{date, number, of, text}
 import play.api.data.Mapping
-import play.api.data.validation.Constraints
 import play.api.data.format.Formats._
+import play.api.data.validation.Constraints
+
 import scala.util.matching.Regex
 
 object FormField {
@@ -48,7 +49,7 @@ object FormField {
   val DOCUMENT_HASH = new StringFormField("DOCUMENT_HASH", 4, 50, RegularExpression.HASH)
   val FROM = new StringFormField("FROM", 45, 45)
   val MODE = new StringFormField("MODE", 4, 5)
-  val TAKER_ADDRESS = new StringFormField( "TAKER_ADDRESS", 45, 45)
+  val TAKER_ADDRESS = new StringFormField("TAKER_ADDRESS", 45, 45)
   val REGISTERED_ADDRESS_LINE_1 = new StringFormField("REGISTERED_ADDRESS_LINE_1", 4, 200)
   val REGISTERED_ADDRESS_LINE_2 = new StringFormField("REGISTERED_ADDRESS_LINE_2", 4, 200)
   val REGISTERED_LANDMARK = new StringFormField("REGISTERED_LANDMARK", 4, 100)
@@ -97,7 +98,7 @@ object FormField {
   //TODO: Error Response through Messages
   class StringFormField (fieldName: String, minimumLength: Int, maximumLength: Int, regex: Regex = """.*""".r, errorMessage: String = "Error Response") {
     val name: String = fieldName
-    val field: Mapping[String] =  text(minLength = minimumLength, maxLength = maximumLength).verifying(Constraints.pattern(regex = regex, name = regex.pattern.toString, error = errorMessage))
+    val field: Mapping[String] = text(minLength = minimumLength, maxLength = maximumLength).verifying(Constraints.pattern(regex = regex, name = regex.pattern.toString, error = errorMessage))
   }
 
   class IntFormField (fieldName: String, minimumValue: Int, maximumValue: Int) {
@@ -105,9 +106,9 @@ object FormField {
     val field: Mapping[Int] =  number(min = minimumValue, max = maximumValue)
   }
 
-  class DateFormField (fieldName: String) {
+  class DateFormField(fieldName: String) {
     val name: String = fieldName
-    val field: Mapping[Date] =  date
+    val field: Mapping[Date] = date
   }
 
   class DoubleFormField(fieldName: String, minimumValue: Double, maximumValue: Double) {

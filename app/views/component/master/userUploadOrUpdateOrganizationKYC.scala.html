@@ -24,8 +24,7 @@
     }
 </div>
 <button type="button" class="btn-sm btn btn-primary" onclick="getForm(jsRoutes.controllers.AddOrganizationController.organizationBankAccountDetailForm())">@Messages(constants.Form.BACK)</button>
-
-@*//TODO whether database should contain constants.File.TRADER_KYC_DOCUMENT_TYPES (current scenario) OR constants.File.TRADER_KYC_DOCUMENT_TYPES should contain all database file type*@
+@ */ /TODO whether database should contain constants.File.TRADER_KYC_DOCUMENT_TYPES (current scenario) OR constants.File.TRADER_KYC_DOCUMENT_TYPES should contain all database file type*@
 @if(constants.File.ORGANIZATION_KYC_DOCUMENT_TYPES.forall(organizationKYCs.map(_.documentType).contains)) {
     <button type="button" class="btn-sm btn btn-primary" id="getOrganizationKYCReviewForm" onclick="getForm(jsRoutes.controllers.AddOrganizationController.reviewOrganizationCompletionForm())">@Messages(constants.Form.NEXT)</button>
 }

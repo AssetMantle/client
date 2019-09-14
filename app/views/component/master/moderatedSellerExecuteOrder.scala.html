@@ -4,7 +4,7 @@
 
 @(moderatedSellerExecuteOrderForm: Form[ModeratedSellerExecuteOrder.Data], buyerAddress: String, sellerAddress: String, pegHash: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 
-@form(action = routes.SellerExecuteOrderController.moderatedSellerExecuteOrder, 'onkeypress -> "validateForm(event,this)") {
+@form(action = routes.SellerExecuteOrderController.moderatedSellerExecuteOrder, 'onkeypress -> "submitFormOnEnter(event,this)") {
     <div class="latest_card-header latest_card-header-primary text-center">
         <h4 class="latest_card-title">@Messages(constants.Form.MODERATED_SELLER_EXECUTE_ORDER)</h4>
     </div>
@@ -14,7 +14,7 @@
       @inputText(moderatedSellerExecuteOrderForm(constants.FormField.SELLER_ADDRESS.name).copy(value = Some(sellerAddress)), '_label -> Messages(constants.FormField.SELLER_ADDRESS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.SELLER_ADDRESS.name), 'required -> true)
       @inputText(moderatedSellerExecuteOrderForm(constants.FormField.AWB_PROOF_HASH.name), '_label -> Messages(constants.FormField.AWB_PROOF_HASH.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.AWB_PROOF_HASH.name), 'required -> true)
       @inputText(moderatedSellerExecuteOrderForm(constants.FormField.PEG_HASH.name).copy(value = Some(pegHash)), '_label -> Messages(constants.FormField.PEG_HASH.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PEG_HASH.name), 'required -> true)
-      @inputText(moderatedSellerExecuteOrderForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.GAS.name), 'required -> true)
+        @inputText(moderatedSellerExecuteOrderForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.GAS.name), 'required -> true, 'type -> "number")
       @inputPassword(moderatedSellerExecuteOrderForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PASSWORD.name), 'required -> true)
 
         @if(moderatedSellerExecuteOrderForm.hasGlobalErrors) {

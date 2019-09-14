@@ -2,7 +2,7 @@
 @import views.companion.blockchain.AddOrganization
 
 @(addOrganizationForm: Form[AddOrganization.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-    @form(action = routes.AddOrganizationController.blockchainAddOrganization, 'onkeypress -> "validateForm(event,this)") {
+@form(action = routes.AddOrganizationController.blockchainAddOrganization, 'onkeypress -> "submitFormOnEnter(event,this)") {
         <div class="latest_card-header latest_card-header-primary text-center">
             <h4 class="latest_card-title">@Messages(constants.Form.ADD_ORGANIZATION)</h4>
         </div>
@@ -12,17 +12,17 @@
           @inputText(addOrganizationForm(constants.FormField.TO.name), '_label -> Messages(constants.FormField.TO.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.TO.name), 'required -> true)
           @inputText(addOrganizationForm(constants.FormField.ORGANIZATION_ID.name), '_label -> Messages(constants.FormField.ORGANIZATION_ID.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.ORGANIZATION_ID.name), 'required -> true)
           @inputText(addOrganizationForm(constants.FormField.ZONE_ID.name), '_label -> Messages(constants.FormField.ZONE_ID.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.ZONE_ID.name), 'required -> true)
-          @inputText(addOrganizationForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.GAS.name), 'required -> true)
+          @inputText(addOrganizationForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.GAS.name), 'required -> true, 'type -> "number")
           @inputPassword(addOrganizationForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PASSWORD.name), 'required -> true)
 
-            @if(addOrganizationForm.hasGlobalErrors) {
-                <ul>
-                @for(error <- addOrganizationForm.globalErrors) {
-                    <li>@error.format</li>
-                }
-                </ul>
+          @if(addOrganizationForm.hasGlobalErrors) {
+            <ul>
+            @for(error <- addOrganizationForm.globalErrors) {
+              <li>@error.format</li>
             }
-            <button type="button" class="btn btn-primary btn-sm" onclick="submitForm(this)">@Messages(constants.Form.ADD_ORGANIZATION)</button>
+            </ul>
+          }
+          <button type="button" class="btn btn-primary btn-sm" onclick="submitForm(this)">@Messages(constants.Form.ADD_ORGANIZATION)</button>
         </div>
     }
 

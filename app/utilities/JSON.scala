@@ -33,7 +33,7 @@ object JSON {
         throw new BaseException(constants.Response.NO_RESPONSE)
     }
   }
-  
+
   def getInstance[T <: BaseCaseClass](jsonString: String)(implicit module: String, logger: Logger, reads: Reads[T]): T = {
     try {
       Json.fromJson[T](Json.parse(jsonString)) match {

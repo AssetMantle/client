@@ -12,6 +12,7 @@ import views.companion.master.FileUpload.FileUploadInfo
 import scala.concurrent.ExecutionContext
 import scala.util.{Failure, Success}
 
+
 object FileOperations {
 
   private implicit val module: String = constants.Module.FILE_OPERATIONS
@@ -130,8 +131,8 @@ object FileOperations {
   }
 
   def fetchFile(path: String, fileName: String): File = {
-      val file = new java.io.File(path + fileName)
-      if (!file.exists()) throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION) else file
+    val file = new java.io.File(path + fileName)
+    if (!file.exists()) throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION) else file
   }
 
 }

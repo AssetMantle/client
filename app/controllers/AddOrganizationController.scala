@@ -66,7 +66,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
 
   def userUpdateUBOsForm(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      try{
+      try {
         Ok(views.html.component.master.userUpdateUBOs(views.companion.master.AddUBOs.form.fill(views.companion.master.AddUBOs.Data(masterOrganizations.Service.getUBOs(masterOrganizations.Service.getID(loginState.username)).ubos.map(ubo => Option(views.companion.master.AddUBOs.UBOData(personName = ubo.personName, sharePercentage = ubo.sharePercentage, relationship = ubo.relationship, title = ubo.title)))))))
       } catch {
         case _: BaseException => Ok(views.html.component.master.userUpdateUBOs(views.companion.master.AddUBOs.form))
@@ -81,8 +81,8 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
         },
         updateUBOsData => {
           try {
-            val id =masterOrganizations.Service.getID(loginState.username)
-            masterOrganizations.Service.updateUBOs(id = id, ubos = updateUBOsData.ubos.filter(_.isDefined).map ( uboData => master.utils.UBO(personName = uboData.get.personName, sharePercentage = uboData.get.sharePercentage, relationship = uboData.get.relationship, title = uboData.get.title)))
+            val id = masterOrganizations.Service.getID(loginState.username)
+            masterOrganizations.Service.updateUBOs(id = id, ubos = updateUBOsData.ubos.filter(_.isDefined).map(uboData => master.utils.UBO(personName = uboData.get.personName, sharePercentage = uboData.get.sharePercentage, relationship = uboData.get.relationship, title = uboData.get.title)))
             PartialContent(views.html.component.master.userUpdateUBOs(views.companion.master.AddUBOs.form.fill(views.companion.master.AddUBOs.Data(masterOrganizations.Service.getUBOs(id).ubos.map(ubo => Option(views.companion.master.AddUBOs.UBOData(personName = ubo.personName, sharePercentage = ubo.sharePercentage, relationship = ubo.relationship, title = ubo.title)))))))
           }
           catch {
@@ -255,7 +255,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
         },
         verifyOrganizationData => {
           try {
-            if (masterOrganizationKYCs.Service.checkAllKYCFilesVerified(verifyOrganizationData.organizationID)){
+            if (masterOrganizationKYCs.Service.checkAllKYCFilesVerified(verifyOrganizationData.organizationID)) {
               val organizationAccountAddress = masterAccounts.Service.getAddress(masterOrganizations.Service.getAccountId(verifyOrganizationData.organizationID))
               transaction.process[AddOrganization, transactionsAddOrganization.Request](
                 entity = AddOrganization(from = loginState.address, to = organizationAccountAddress, organizationID = verifyOrganizationData.organizationID, zoneID = verifyOrganizationData.zoneID, gas = verifyOrganizationData.gas, ticketID = "", mode = transactionMode),
@@ -334,11 +334,11 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
 
   def viewOrganizationVerificationBankAccountDetail(organizationID: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
-    try {
-      withUsernameToken.Ok(views.html.component.master.viewVerificationOrganizationBankAccountDetail(masterOrganizationBankAccountDetails.Service.get(organizationID)))
-    } catch {
-      case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-    }
+      try {
+        withUsernameToken.Ok(views.html.component.master.viewVerificationOrganizationBankAccountDetail(masterOrganizationBankAccountDetails.Service.get(organizationID)))
+      } catch {
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
   }
 
   def viewPendingVerifyOrganizationRequests: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
