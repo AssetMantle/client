@@ -346,9 +346,15 @@
 /*Table*/
 
 .toggleElement {
+
+}
+.showToggleElement{
     background-color: #149f98;
 }
-
+.showToggleElement{
+    cursor: pointer;
+    color: #10292e;
+}
 .toggleElement:hover {
     cursor: pointer;
     color: #10292e;
@@ -609,7 +615,10 @@ margin-left: 50px;
     display: flex;
     box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.07);
 }
-
+.searchForm dl{
+    width:100%;
+    margin: 0px;
+}
 /* sidebar */
 .sideBarOptions{
     margin-top: 20px;
@@ -653,7 +662,9 @@ margin-left: 50px;
 
 }
 .cardHeight{
-    height: 300px;
+    height: 200px;
     overflow: auto;
 }
-
+.error{
+    color:#f0506e;
+}
