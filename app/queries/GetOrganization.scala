@@ -33,8 +33,7 @@ class GetOrganization @Inject()(wsClient: WSClient)(implicit configuration: Conf
     def get(organizationID: String): Response = try {
       Await.result(action(organizationID), Duration.Inf)
     } catch {
-      case connectException: ConnectException =>
-        logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
+      case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
         throw new BaseException(constants.Response.CONNECT_EXCEPTION)
     }
   }

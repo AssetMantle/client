@@ -22,31 +22,31 @@ GET         /profile                                                            
 GET         /profileDocuments                                                      controllers.ComponentViewController.profileDocuments
 GET         /profilePicture                                                        controllers.ComponentViewController.profilePicture
 
-GET         /account/signUp                                              controllers.AccountController.signUpForm
-POST        /account/signUp                                              controllers.AccountController.signUp
+GET         /account/signUp                                                        controllers.AccountController.signUpForm
+POST        /account/signUp                                                        controllers.AccountController.signUp
 
-GET         /account/login                                               controllers.AccountController.loginForm
-POST        /account/login                                               controllers.AccountController.login
+GET         /account/login                                                         controllers.AccountController.loginForm
+POST        /account/login                                                         controllers.AccountController.login
 
-GET         /account/logout                                              controllers.AccountController.logoutForm
-POST        /account/logout                                              controllers.AccountController.logout
+GET         /account/logout                                                        controllers.AccountController.logoutForm
+POST        /account/logout                                                        controllers.AccountController.logout
 
-GET         /account/changePassword                                      controllers.AccountController.changePasswordForm
-POST        /account/changePassword                                      controllers.AccountController.changePassword
+GET         /account/changePassword                                                controllers.AccountController.changePasswordForm
+POST        /account/changePassword                                                controllers.AccountController.changePassword
 
-GET         /account/forgotPasswordUsername                              controllers.AccountController.emailOTPForgotPasswordForm
-POST        /account/forgotPasswordUsername                              controllers.AccountController.emailOTPForgotPassword
+GET         /account/forgotPasswordUsername                                        controllers.AccountController.emailOTPForgotPasswordForm
+POST        /account/forgotPasswordUsername                                        controllers.AccountController.emailOTPForgotPassword
 
-GET         /account/forgotPassword                                      controllers.AccountController.forgotPasswordForm(username: String)
-POST        /account/forgotPassword                                      controllers.AccountController.forgotPassword(username: String)
+GET         /account/forgotPassword                                                controllers.AccountController.forgotPasswordForm(username: String)
+POST        /account/forgotPassword                                                controllers.AccountController.forgotPassword(username: String)
 
-GET         /account/checkUsernameAvailable                              controllers.AccountController.checkUsernameAvailable(username: String)
+GET         /account/checkUsernameAvailable                                        controllers.AccountController.checkUsernameAvailable(username: String)
 
 GET         /contact                                                               controllers.ContactController.contact
 
 GET         /master/notifications                                                  controllers.NotificationController.notificationPage(pageNumber:Int)
 GET         /master/unreadNotificationCount                                        controllers.NotificationController.unreadNotificationCount()
-GET         /master/markNotificationAsRead                                         controllers.NotificationController.markNotificationRead(notificationID: String)
+GET         /master/markNotificationAsRead                                             controllers.NotificationController.markNotificationRead(notificationID: String)
 
 GET         /master/queryConfigurationVariable:query                               controllers.ConfigurationController.queryConfigurationVariable(query: String)
 
@@ -115,13 +115,6 @@ POST        /zoneUpload/file                                                    
 GET         /zoneUpload/storeFile                                                  controllers.FileController.storeZoneKyc(name: String, documentType: String)
 GET         /zoneUpdate                                                            controllers.FileController.updateZoneKycForm(documentType: String)
 GET         /zoneUpload/updateFile                                                 controllers.FileController.updateZoneKyc(name: String, documentType: String)
-
-GET         /traderUpload                                                controllers.FileController.uploadTraderKycForm(documentType: String)
-POST        /traderUpload/file                                           controllers.FileController.uploadTraderKyc(documentType: String)
-GET         /traderUpload/storeFile                                      controllers.FileController.storeTraderKyc(name: String, documentType: String)
-GET         /traderUpdate                                                controllers.FileController.updateTraderKycForm(documentType: String)
-GET         /traderUpload/updateFile                                     controllers.FileController.updateTraderKyc(name: String, documentType: String)
-
 
 GET         /master/updateContact                                                  controllers.ContactController.updateContactForm
 POST        /master/updateContact                                                  controllers.ContactController.updateContact

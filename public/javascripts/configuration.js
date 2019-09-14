@@ -1,4 +1,4 @@
-`function getConfiguration(configuration) {
+function getConfiguration(configuration) {
     let configurationValue = getCookie(configuration);
     if (configurationValue !== "") {
         return configurationValue;

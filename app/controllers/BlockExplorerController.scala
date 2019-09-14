@@ -1,6 +1,6 @@
 package controllers
 
-import exceptions.BlockChainException
+import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import play.api.Configuration
 import play.api.i18n.I18nSupport
@@ -24,7 +24,7 @@ class BlockExplorerController@Inject()(messagesControllerComponents: MessagesCon
     try {
       Ok(queriesGetABCIINfo.Service.get().result.response.last_block_height)
     } catch {
-      case _: BlockChainException => InternalServerError
+      case _: BaseException => InternalServerError
     }
   }
 
@@ -32,7 +32,7 @@ class BlockExplorerController@Inject()(messagesControllerComponents: MessagesCon
     try {
       Ok(Json.toJson(queriesGetBlockDetails.Service.get(minimumHeight = minimumHeight, maximumHeight = maximumHeight).result.block_metas).toString)
     } catch {
-      case _: BlockChainException => InternalServerError
+      case _: BaseException => InternalServerError
     }
   }
 
@@ -40,7 +40,7 @@ class BlockExplorerController@Inject()(messagesControllerComponents: MessagesCon
     try {
       Ok(Json.toJson(queriesStakingValidators.Service.get()))
     } catch {
-      case _: BlockChainException => InternalServerError
+      case _: BaseException => InternalServerError
     }
   }
 }

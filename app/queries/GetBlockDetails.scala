@@ -2,7 +2,7 @@ package queries
 
 import java.net.ConnectException
 
-import exceptions.BlockChainException
+import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
@@ -36,7 +36,7 @@ class GetBlockDetails @Inject()()(implicit wsClient: WSClient, configuration: Co
       Await.result(action(minimumHeight = minimumHeight, maximumHeight = maximumHeight), Duration.Inf)
     } catch {
       case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
-        throw new BlockChainException(constants.Response.CONNECT_EXCEPTION)
+        throw new BaseException(constants.Response.CONNECT_EXCEPTION)
     }
   }
 

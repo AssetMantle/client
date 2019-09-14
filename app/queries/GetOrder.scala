@@ -34,8 +34,7 @@ class GetOrder @Inject()()(implicit wsClient: WSClient, configuration: Configura
     def get(negotiationID: String): Response = try {
       Await.result(action(negotiationID), Duration.Inf)
     } catch {
-      case connectException: ConnectException =>
-        logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
+      case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
         throw new BaseException(constants.Response.CONNECT_EXCEPTION)
     }
   }

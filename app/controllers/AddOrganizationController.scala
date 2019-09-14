@@ -4,7 +4,7 @@ import java.nio.file.Files
 
 import controllers.actions.{WithGenesisLoginAction, WithOrganizationLoginAction, WithUserLoginAction, WithZoneLoginAction}
 import controllers.results.WithUsernameToken
-import exceptions.{BaseException, BlockChainException, SerializationException}
+import exceptions.{BaseException, SerializationException}
 import javax.inject.{Inject, Singleton}
 import models.blockchainTransaction.AddOrganization
 import models.common.Entity.Address
@@ -45,7 +45,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
         addOrganizationData => {
           try {
             if (masterZones.Service.getVerificationStatus(addOrganizationData.zoneID)) {
-              val id = masterOrganizations.Service.insertOrUpdateOrganizationDetails(zoneID = addOrganizationData.zoneID, accountID = loginState.username, name = addOrganizationData.name, abbreviation = addOrganizationData.abbreviation, establishmentDate = utilities.Date.utilDateToSQLDate(addOrganizationData.establishmentDate), email = addOrganizationData.email, registeredAddress = Address(addressLine1 = addOrganizationData.registeredAddress.addressLine1, addressLine2 = addOrganizationData.registeredAddress.addressLine2, landmark = addOrganizationData.registeredAddress.Landmark, city = addOrganizationData.registeredAddress.City, country = addOrganizationData.registeredAddress.Country, zipCode = addOrganizationData.registeredAddress.ZipCode, phone = addOrganizationData.registeredAddress.Phone), postalAddress = Address(addressLine1 = addOrganizationData.postalAddress.addressLine1, addressLine2 = addOrganizationData.postalAddress.addressLine2, landmark = addOrganizationData.postalAddress.Landmark, city = addOrganizationData.postalAddress.City, country = addOrganizationData.postalAddress.Country, zipCode = addOrganizationData.postalAddress.ZipCode, phone = addOrganizationData.postalAddress.Phone))
+              val id = masterOrganizations.Service.insertOrUpdateOrganizationWithoutUBO(zoneID = addOrganizationData.zoneID, accountID = loginState.username, name = addOrganizationData.name, abbreviation = addOrganizationData.abbreviation, establishmentDate = utilities.Date.utilDateToSQLDate(addOrganizationData.establishmentDate), email = addOrganizationData.email, registeredAddress = Address(addressLine1 = addOrganizationData.registeredAddress.addressLine1, addressLine2 = addOrganizationData.registeredAddress.addressLine2, landmark = addOrganizationData.registeredAddress.Landmark, city = addOrganizationData.registeredAddress.City, country = addOrganizationData.registeredAddress.Country, zipCode = addOrganizationData.registeredAddress.ZipCode, phone = addOrganizationData.registeredAddress.Phone), postalAddress = Address(addressLine1 = addOrganizationData.postalAddress.addressLine1, addressLine2 = addOrganizationData.postalAddress.addressLine2, landmark = addOrganizationData.postalAddress.Landmark, city = addOrganizationData.postalAddress.City, country = addOrganizationData.postalAddress.Country, zipCode = addOrganizationData.postalAddress.ZipCode, phone = addOrganizationData.postalAddress.Phone))
               try {
                 PartialContent(views.html.component.master.userUpdateUBOs(views.companion.master.AddUBOs.form.fill(views.companion.master.AddUBOs.Data(masterOrganizations.Service.getUBOs(id).data.map(ubo => Option(views.companion.master.AddUBOs.UBOData(personName = ubo.personName, sharePercentage = ubo.sharePercentage, relationship = ubo.relationship, title = ubo.title)))))))
               } catch {

@@ -33,8 +33,7 @@ class GetNegotiationID @Inject()()(implicit wsClient: WSClient, configuration: C
     def get(buyerAddress: String, sellerAddress: String, pegHash: String): Response = try {
       Await.result(action(buyerAddress + "/" + sellerAddress + "/" + pegHash), Duration.Inf)
     } catch {
-      case connectException: ConnectException =>
-        logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
+      case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
         throw new BaseException(constants.Response.CONNECT_EXCEPTION)
     }
   }

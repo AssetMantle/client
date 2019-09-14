@@ -71,7 +71,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
         addTraderData => {
           try {
             if (masterOrganizations.Service.getVerificationStatus(addTraderData.organizationID)) {
-              val id = masterTraders.Service.insertOrUpdateTraderDetails(zoneID = addTraderData.zoneID, organizationID = addTraderData.organizationID, accountID = loginState.username, name = addTraderData.name)
+              val id = masterTraders.Service.insertOrUpdateTrader(zoneID = addTraderData.zoneID, organizationID = addTraderData.organizationID, accountID = loginState.username, name = addTraderData.name)
               PartialContent(views.html.component.master.userUploadOrUpdateTraderKYC(masterTraderKYCs.Service.getAllDocuments(id)))
             } else {
               Unauthorized(views.html.index(failures = Seq(constants.Response.UNVERIFIED_ORGANIZATION)))
@@ -103,7 +103,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
         addTraderData => {
           try {
             if (masterOrganizations.Service.getVerificationStatus(addTraderData.organizationID)) {
-              val id = masterTraders.Service.insertOrUpdateTraderDetails(zoneID = addTraderData.zoneID, organizationID = addTraderData.organizationID, accountID = loginState.username, name = addTraderData.name)
+              val id = masterTraders.Service.insertOrUpdateTrader(zoneID = addTraderData.zoneID, organizationID = addTraderData.organizationID, accountID = loginState.username, name = addTraderData.name)
               PartialContent(views.html.component.master.userUploadOrUpdateTraderKYC(masterTraderKYCs.Service.getAllDocuments(id)))
             } else {
               Unauthorized(views.html.index(failures = Seq(constants.Response.UNVERIFIED_ORGANIZATION)))

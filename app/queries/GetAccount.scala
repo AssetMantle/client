@@ -33,8 +33,7 @@ class GetAccount @Inject()()(implicit wsClient: WSClient, configuration: Configu
     def get(address: String): Response = try {
       Await.result(action(address), Duration.Inf)
     } catch {
-      case connectException: ConnectException =>
-        logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
+      case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
         throw new BaseException(constants.Response.CONNECT_EXCEPTION)
     }
   }
