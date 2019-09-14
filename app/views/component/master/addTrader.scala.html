@@ -9,9 +9,9 @@
     </div>
     <div class="latest_card-body">
         @CSRF.formField
-        @inputText(addTraderForm(constants.FormField.ZONE_ID.name), '_label -> Messages(constants.FormField.ZONE_ID.name), 'placeholder -> Messages(constants.FormField.ZONE_ID.name), 'required -> true, 'class -> "form-control")
-        @inputText(addTraderForm(constants.FormField.ORGANIZATION_ID.name), '_label -> Messages(constants.FormField.ORGANIZATION_ID.name), 'placeholder -> Messages(constants.FormField.ORGANIZATION_ID.name), 'required -> true, 'class -> "form-control")
-        @inputText(addTraderForm(constants.FormField.NAME.name), '_label -> Messages(constants.FormField.NAME.name), 'placeholder -> Messages(constants.FormField.NAME.name), 'required -> true, 'class -> "form-control")
+      @inputText(addTraderForm(constants.FormField.ZONE_ID.name), '_label -> Messages(constants.FormField.ZONE_ID.name), 'placeholder -> Messages(constants.FormField.ZONE_ID.name), 'required -> true, 'class -> "cmuk-input")
+      @inputText(addTraderForm(constants.FormField.ORGANIZATION_ID.name), '_label -> Messages(constants.FormField.ORGANIZATION_ID.name), 'placeholder -> Messages(constants.FormField.ORGANIZATION_ID.name), 'required -> true, 'class -> "cmuk-input")
+      @inputText(addTraderForm(constants.FormField.NAME.name), '_label -> Messages(constants.FormField.NAME.name), 'placeholder -> Messages(constants.FormField.NAME.name), 'required -> true, 'class -> "cmuk-input")
 
         @if(addTraderForm.hasGlobalErrors) {
             <ul>

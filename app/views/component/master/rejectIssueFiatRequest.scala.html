@@ -9,8 +9,8 @@
     </div>
     <div class="latest_card-body">
         @CSRF.formField
-        @inputText(rejectIssueFiatRequestForm(constants.FormField.REQUEST_ID.name).copy(value = Some(requestID)), '_label -> Messages(constants.FormField.REQUEST_ID.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.REQUEST_ID.name), 'required -> true)
-        @inputText(rejectIssueFiatRequestForm(constants.FormField.COMMENT.name), '_label -> Messages(constants.FormField.COMMENT.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.COMMENT.name), 'required -> true)
+      @inputText(rejectIssueFiatRequestForm(constants.FormField.REQUEST_ID.name).copy(value = Some(requestID)), '_label -> Messages(constants.FormField.REQUEST_ID.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.REQUEST_ID.name), 'required -> true)
+      @inputText(rejectIssueFiatRequestForm(constants.FormField.COMMENT.name), '_label -> Messages(constants.FormField.COMMENT.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.COMMENT.name), 'required -> true)
 
         @if(rejectIssueFiatRequestForm.hasGlobalErrors) {
             <ul>

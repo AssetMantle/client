@@ -7,11 +7,10 @@
 
   @form(action = routes.AccountController.logout, 'onkeypress -> "validateForm(event,this)") {
     @CSRF.formField
-    <div class="latest_card-body ml-cb">
-        <div class="input-group-prepend">
+
+    <div class="latest_card-body">
             @checkbox(logoutForm(constants.Form.RECEIVE_NOTIFICATIONS), '_label -> Messages(constants.Form.RECEIVE_NOTIFICATIONS))
-            <span class="input-group-text">@Messages(constants.Form.RECEIVE_NOTIFICATIONS)</span>
-        </div>
+      @Messages(constants.Form.RECEIVE_NOTIFICATIONS)
 
         @if(logoutForm.hasGlobalErrors) {
             <ul>

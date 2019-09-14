@@ -9,8 +9,8 @@
     </div>
     <div class="latest_card-body">
         @CSRF.formField
-        @inputText(addZoneForm(constants.FormField.NAME.name), '_label -> Messages(constants.FormField.NAME.name), 'placeholder -> Messages(constants.FormField.NAME.name), 'required -> true, 'class -> "form-control")
-        @inputText(addZoneForm(constants.FormField.CURRENCY.name), '_label -> Messages(constants.FormField.CURRENCY.name), 'placeholder -> Messages(constants.FormField.CURRENCY.name), 'required -> true, 'class -> "form-control")
+      @inputText(addZoneForm(constants.FormField.NAME.name), '_label -> Messages(constants.FormField.NAME.name), 'placeholder -> Messages(constants.FormField.NAME.name), 'required -> true, 'class -> "cmuk-input")
+      @inputText(addZoneForm(constants.FormField.CURRENCY.name), '_label -> Messages(constants.FormField.CURRENCY.name), 'placeholder -> Messages(constants.FormField.CURRENCY.name), 'required -> true, 'class -> "cmuk-input")
 
         @if(addZoneForm.hasGlobalErrors) {
             <ul>
