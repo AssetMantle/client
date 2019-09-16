@@ -2,15 +2,15 @@ getConfigurationAsynchronously("blockchain.main.wsIP");
 getConfigurationAsynchronously("blockchain.main.abciPort");
 
 function blockExplorer() {
-    let blockExplorerTableBody = "blockContainer";
-    let wsURL = getConfiguration("blockchain.main.wsIP") + ":" + getConfiguration("blockchain.main.abciPort") + "/websocket";
+    const blockExplorerTableBody = "blockContainer";
+    const wsURL = getConfiguration("blockchain.main.wsIP") + ":" + getConfiguration("blockchain.main.abciPort") + "/websocket";
 
     setFirstBlockTime();
 
-    let maxNumberOfItems = 8;
+    const maxNumberOfItems = 8;
 
     window.addEventListener("load", function (evt) {
-        let wsNewBlock = new WebSocket(wsURL);
+        const wsNewBlock = new WebSocket(wsURL);
         wsNewBlock.onopen = () => {
             initializeBlockExplorer(blockExplorerTableBody, maxNumberOfItems);
             showAllBlocksInitialTableContent();
@@ -64,7 +64,7 @@ function updateBlockExplorer(blockExplorerTableBody, receivedData, maxNumberOfIt
 
 function initializeBlockExplorer(blockExplorerTableBody, maxNumberOfItems) {
 
-    let lastBlockHeightURL = jsRoutes.controllers.BlockExplorerController.lastBlockHeight();
+    const lastBlockHeightURL = jsRoutes.controllers.BlockExplorerController.lastBlockHeight();
 
     $.ajax({
         url: lastBlockHeightURL.url,

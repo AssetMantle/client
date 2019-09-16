@@ -2,7 +2,7 @@ getConfigurationAsynchronously("blockchain.main.wsIP");
 getConfigurationAsynchronously("blockchain.main.abciPort");
 
 function transactionExplorer() {
-    let wsUrl = getConfiguration("blockchain.main.wsIP") + ":" + getConfiguration("blockchain.main.abciPort") + "/websocket";
+    const wsUrl = getConfiguration("blockchain.main.wsIP") + ":" + getConfiguration("blockchain.main.abciPort") + "/websocket";
 
     let content = '';
     for (let i = 0; i < 7; i++) {
@@ -10,7 +10,7 @@ function transactionExplorer() {
     }
     $('#transactionContainer').prepend(content);
     window.addEventListener("load", function (evt) {
-        let wsTx = new WebSocket(wsUrl);
+        const wsTx = new WebSocket(wsUrl);
         let transactionContainerList = document.getElementById("transactionContainer");
         wsTx.onopen = () => {
             let requestTx = `{"method":"subscribe", "id":"dontcare","jsonrpc":"2.0","params":["tm.event='Tx'"]}`;
