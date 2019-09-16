@@ -4,33 +4,21 @@ import java.sql.Date
 
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import models.common.Entity.Address
+import models.common.Serializable._
 import org.postgresql.util.PSQLException
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
-import play.api.libs.json.{Json, OWrites, Reads}
+import play.api.libs.json.Json
 import slick.jdbc.JdbcProfile
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class UBO(personName: String, sharePercentage: Double, relationship: String, title: String)
-
-case class UBOs(data: Seq[UBO])
-
 case class Organization(id: String, zoneID: String, accountID: String, name: String, abbreviation: Option[String] = None, establishmentDate: Date, email: String, registeredAddress: Address, postalAddress: Address, ubos: UBOs, completionStatus: Boolean = false, verificationStatus: Option[Boolean] = None)
 
 @Singleton
 class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
-
-  private implicit val uboReads: Reads[UBO] = Json.reads[UBO]
-
-  private implicit val ubosReads: Reads[UBOs] = Json.reads[UBOs]
-
-  private implicit val uboWrites: OWrites[UBO] = Json.writes[UBO]
-
-  private implicit val ubosWrites: OWrites[UBOs] = Json.writes[UBOs]
 
   case class OrganizationSerialized(id: String, zoneID: String, accountID: String, name: String, abbreviation: Option[String] = None, establishmentDate: Date, email: String, registeredAddress: String, postalAddress: String, ubos: Option[String] = None, completionStatus: Boolean = false, verificationStatus: Option[Boolean] = None) {
 
@@ -239,6 +227,11 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
     def getOrganizationsInZone(zoneID: String): Seq[Organization] = Await.result(getOrganizationsByZoneID(zoneID), Duration.Inf).map(organizationSerialized => organizationSerialized.deserialize)
 
     def getVerificationStatus(id: String): Boolean = Await.result(getVerificationStatusById(id), Duration.Inf).getOrElse(false)
+
+    def getVerificationStatusWithTry(id: String): Boolean = {
+      val verificationStatus = Await.result(getVerificationStatusById(id), Duration.Inf).getOrElse(false)
+      if (!verificationStatus) throw new BaseException(constants.Response.UNVERIFIED_ORGANIZATION) else true
+    }
 
     def markOrganizationFormCompleted(id: String): Int = Await.result(updateCompletionStatusOnID(id = id, completionStatus = true), Duration.Inf)
 

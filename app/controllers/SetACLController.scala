@@ -239,7 +239,6 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
     Ok(views.html.component.master.zoneVerifyTrader(views.companion.master.VerifyTrader.form.fill(views.companion.master.VerifyTrader.Data(accountID = accountID, organizationID = organizationID, gas = constants.FormField.GAS.minimumValue, password = ""))))
   }
 
-  //TODO: verify organizationID under same zone
   def zoneVerifyTrader: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       views.companion.master.VerifyTrader.form.bindFromRequest().fold(
@@ -248,8 +247,8 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
         },
         verifyTraderData => {
           try {
-            if (masterOrganizations.Service.getVerificationStatus(verifyTraderData.organizationID) && masterTraderKYCs.Service.checkAllKYCFilesVerified(masterTraders.Service.getID(verifyTraderData.accountID))) {
-              val zoneID = masterZones.Service.getZoneId(loginState.username)
+            if (masterOrganizations.Service.getVerificationStatusWithTry(verifyTraderData.organizationID) && masterTraderKYCs.Service.checkAllKYCFilesVerified(masterTraders.Service.getID(verifyTraderData.accountID))) {
+              val zoneID = masterOrganizations.Service.getZoneID(verifyTraderData.organizationID)
               val aclAddress = masterAccounts.Service.getAddress(verifyTraderData.accountID)
               val acl = blockchain.ACL(issueAsset = verifyTraderData.issueAsset, issueFiat = verifyTraderData.issueFiat, sendAsset = verifyTraderData.sendAsset, sendFiat = verifyTraderData.sendFiat, redeemAsset = verifyTraderData.redeemAsset, redeemFiat = verifyTraderData.redeemFiat, sellerExecuteOrder = verifyTraderData.sellerExecuteOrder, buyerExecuteOrder = verifyTraderData.buyerExecuteOrder, changeBuyerBid = verifyTraderData.changeBuyerBid, changeSellerBid = verifyTraderData.changeSellerBid, confirmBuyerBid = verifyTraderData.confirmBuyerBid, confirmSellerBid = verifyTraderData.changeSellerBid, negotiation = verifyTraderData.negotiation, releaseAsset = verifyTraderData.releaseAsset)
               blockchainAclHashes.Service.create(acl)
@@ -264,7 +263,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
               )
               withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ACL_SET)))
             } else {
-              PreconditionFailed(views.html.index(failures = Seq(constants.Response.UNVERIFIED_ORGANIZATION, constants.Response.ALL_KYC_FILES_NOT_VERIFIED)))
+              PreconditionFailed(views.html.index(failures = Seq(constants.Response.ALL_KYC_FILES_NOT_VERIFIED)))
             }
           }
           catch {
@@ -343,8 +342,6 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
     Ok(views.html.component.master.organizationVerifyTrader(views.companion.master.VerifyTrader.form.fill(views.companion.master.VerifyTrader.Data(accountID = accountID, organizationID = organizationID, gas = constants.FormField.GAS.minimumValue, password = ""))))
   }
 
-  //TODO: withOrganizationLoginAction and get organizationID instead of from FORM using login State so other organization cannot do something OR REMOVE VERIFY END POINT FOR ORGANIZATION
-  //TODO: Alternative to multiple nested if else to show errors
   def organizationVerifyTrader: Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
     implicit request =>
       views.companion.master.VerifyTrader.form.bindFromRequest().fold(
@@ -353,7 +350,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
         },
         verifyTraderData => {
           try {
-            if (masterOrganizations.Service.getVerificationStatus(verifyTraderData.organizationID) && masterTraderKYCs.Service.checkAllKYCFilesVerified(masterTraders.Service.getID(verifyTraderData.accountID))) {
+            if (masterTraderKYCs.Service.checkAllKYCFilesVerified(masterTraders.Service.getID(verifyTraderData.accountID))) {
               val zoneID = masterOrganizations.Service.getZoneID(verifyTraderData.organizationID)
               val aclAddress = masterAccounts.Service.getAddress(verifyTraderData.accountID)
               val acl = blockchain.ACL(issueAsset = verifyTraderData.issueAsset, issueFiat = verifyTraderData.issueFiat, sendAsset = verifyTraderData.sendAsset, sendFiat = verifyTraderData.sendFiat, redeemAsset = verifyTraderData.redeemAsset, redeemFiat = verifyTraderData.redeemFiat, sellerExecuteOrder = verifyTraderData.sellerExecuteOrder, buyerExecuteOrder = verifyTraderData.buyerExecuteOrder, changeBuyerBid = verifyTraderData.changeBuyerBid, changeSellerBid = verifyTraderData.changeSellerBid, confirmBuyerBid = verifyTraderData.confirmBuyerBid, confirmSellerBid = verifyTraderData.changeSellerBid, negotiation = verifyTraderData.negotiation, releaseAsset = verifyTraderData.releaseAsset)
@@ -369,7 +366,46 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
               )
               withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ACL_SET)))
             } else {
-              PreconditionFailed(views.html.index(failures = Seq(constants.Response.UNVERIFIED_ORGANIZATION, constants.Response.ALL_KYC_FILES_NOT_VERIFIED)))
+              PreconditionFailed(views.html.index(failures = Seq(constants.Response.ALL_KYC_FILES_NOT_VERIFIED)))
+            }
+          }
+          catch {
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+          }
+        }
+      )
+  }
+
+  def organizationModifyTraderForm(accountID: String): Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.organizationModifyTrader(views.companion.master.ModifyTrader.form.fill(views.companion.master.ModifyTrader.Data(accountID = accountID, gas = constants.FormField.GAS.minimumValue, password = ""))))
+  }
+
+  def organizationModifyTrader: Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      views.companion.master.ModifyTrader.form.bindFromRequest().fold(
+        formWithErrors => {
+          BadRequest(views.html.component.master.organizationModifyTrader(formWithErrors))
+        },
+        verifyTraderData => {
+          try {
+            if (masterTraderKYCs.Service.checkAllKYCFilesVerified(masterTraders.Service.getID(verifyTraderData.accountID))) {
+              val zoneID = masterOrganizations.Service.getZoneIDByAccountID(loginState.username)
+              val organizationID = masterOrganizations.Service.getID(loginState.username)
+              val aclAddress = masterAccounts.Service.getAddress(verifyTraderData.accountID)
+              val acl = blockchain.ACL(issueAsset = verifyTraderData.issueAsset, issueFiat = verifyTraderData.issueFiat, sendAsset = verifyTraderData.sendAsset, sendFiat = verifyTraderData.sendFiat, redeemAsset = verifyTraderData.redeemAsset, redeemFiat = verifyTraderData.redeemFiat, sellerExecuteOrder = verifyTraderData.sellerExecuteOrder, buyerExecuteOrder = verifyTraderData.buyerExecuteOrder, changeBuyerBid = verifyTraderData.changeBuyerBid, changeSellerBid = verifyTraderData.changeSellerBid, confirmBuyerBid = verifyTraderData.confirmBuyerBid, confirmSellerBid = verifyTraderData.changeSellerBid, negotiation = verifyTraderData.negotiation, releaseAsset = verifyTraderData.releaseAsset)
+              blockchainAclHashes.Service.create(acl)
+              transaction.process[blockchainTransaction.SetACL, transactionsSetACL.Request](
+                entity = blockchainTransaction.SetACL(from = loginState.address, aclAddress = aclAddress, organizationID = organizationID, zoneID = zoneID, aclHash = util.hashing.MurmurHash3.stringHash(acl.toString).toString, gas = verifyTraderData.gas, ticketID = "", mode = transactionMode),
+                blockchainTransactionCreate = blockchainTransactionSetACLs.Service.create,
+                request = transactionsSetACL.Request(transactionsSetACL.BaseReq(from = loginState.address, gas = verifyTraderData.gas.toString), password = verifyTraderData.password, aclAddress = aclAddress, organizationID = organizationID, zoneID = zoneID, issueAsset = verifyTraderData.issueAsset.toString, issueFiat = verifyTraderData.issueFiat.toString, sendAsset = verifyTraderData.sendAsset.toString, sendFiat = verifyTraderData.sendFiat.toString, redeemAsset = verifyTraderData.redeemAsset.toString, redeemFiat = verifyTraderData.redeemFiat.toString, sellerExecuteOrder = verifyTraderData.sellerExecuteOrder.toString, buyerExecuteOrder = verifyTraderData.buyerExecuteOrder.toString, changeBuyerBid = verifyTraderData.changeBuyerBid.toString, changeSellerBid = verifyTraderData.changeSellerBid.toString, confirmBuyerBid = verifyTraderData.confirmBuyerBid.toString, confirmSellerBid = verifyTraderData.confirmSellerBid.toString, negotiation = verifyTraderData.negotiation.toString, releaseAsset = verifyTraderData.releaseAsset.toString, mode = transactionMode),
+                action = transactionsSetACL.Service.post,
+                onSuccess = blockchainTransactionSetACLs.Utility.onSuccess,
+                onFailure = blockchainTransactionSetACLs.Utility.onFailure,
+                updateTransactionHash = blockchainTransactionSetACLs.Service.updateTransactionHash
+              )
+              withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ACL_SET)))
+            } else {
+              PreconditionFailed(views.html.index(failures = Seq(constants.Response.ALL_KYC_FILES_NOT_VERIFIED)))
             }
           }
           catch {

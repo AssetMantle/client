@@ -7,7 +7,7 @@ import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.blockchainTransaction.AddOrganization
-import models.common.Entity.Address
+import models.common.Serializable._
 import models.{blockchain, blockchainTransaction, master}
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
@@ -230,7 +230,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
               withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ORGANIZATION_ADDED_FOR_VERIFICATION)))
             } else {
               val organization = masterOrganizations.Service.getByAccountID(loginState.username)
-              PartialContent(views.html.component.master.reviewOrganizationCompletion(views.companion.master.OrganizationCompletion.form, organization = organization, zone = masterZones.Service.get(organization.zoneID), organizationBankAccountDetail = masterOrganizationBankAccountDetails.Service.get(organization.id), organizationKYCs = masterOrganizationKYCs.Service.getAllDocuments(organization.id)))
+              BadRequest(views.html.component.master.reviewOrganizationCompletion(views.companion.master.OrganizationCompletion.form, organization = organization, zone = masterZones.Service.get(organization.zoneID), organizationBankAccountDetail = masterOrganizationBankAccountDetails.Service.get(organization.id), organizationKYCs = masterOrganizationKYCs.Service.getAllDocuments(organization.id)))
             }
           }
           catch {

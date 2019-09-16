@@ -146,6 +146,8 @@ POST        /master/zoneRejectVerifyTraderRequest                               
 
 GET         /master/organizationVerifyTrader                                       controllers.SetACLController.organizationVerifyTraderForm(accountID: String, organizationID: String)
 POST        /master/organizationVerifyTrader                                       controllers.SetACLController.organizationVerifyTrader
+GET         /master/organizationModifyTrader                                       controllers.SetACLController.organizationModifyTraderForm(accountID: String)
+POST        /master/organizationModifyTrader                                       controllers.SetACLController.organizationModifyTrader
 GET         /master/organzationViewTraderKycDocuments                              controllers.SetACLController.organizationViewKycDocuments(traderID: String)
 GET         /master/organizationVerifyTraderKycDocument                            controllers.SetACLController.organizationVerifyKycDocument(traderID: String, documentType: String)
 GET         /master/organizationRejectTraderKycDocument                            controllers.SetACLController.organizationRejectKycDocument(traderID: String, documentType: String)
