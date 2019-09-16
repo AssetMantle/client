@@ -7,7 +7,7 @@ function getValidators(bodyID) {
         async: true,
         statusCode: {
             200: function (data) {
-                document.getElementById(bodyID).innerHTML = "" + JSON.parse(data).result.length;
+                document.getElementById(bodyID).innerHTML = "" + data.length;
             },
             500: {},
         }
@@ -23,7 +23,7 @@ function validatorsTable(bodyID) {
         async: true,
         statusCode: {
             200: function (validatorListData) {
-                Array.prototype.forEach.call(JSON.parse(validatorListData).result, validator => {
+                Array.prototype.forEach.call(validatorListData, validator => {
                     content = content + "<tr><td> <p>" + validator.operator_address + "</p></td><td>" + validator.status + "</td><td >" + validator.tokens + "</div></td></td><td >" + validator.delegator_shares + "</td></tr>";
                 });
                 $("#" + bodyID).append(content);

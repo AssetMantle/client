@@ -26,11 +26,12 @@ class GetStakingValidators @Inject()()(implicit wsClient: WSClient, configuratio
 
   private val url = ip + ":" + port + "/" + path
 
-  private def action(): Future[Response] = wsClient.url(url).get.map { response => utilities.JSON.getResponseFromJson[Response](response)}
+  //TODO Special case because of response type received
+  private def action(): Future[Seq[Response]] = wsClient.url(url).get.map { response => utilities.JSON.convertJsonStringToObject[Seq[Response]](response.body)}
 
   object Service {
 
-    def get(): Response = try {
+    def get(): Seq[Response] = try {
       Await.result(action(), Duration.Inf)
     } catch {
       case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
