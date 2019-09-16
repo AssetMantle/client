@@ -2,10 +2,11 @@ package constants
 
 import java.util.Date
 
-import play.api.data.Forms.{number, text, date, of}
+import play.api.data.Forms.{date, number, of, text}
 import play.api.data.Mapping
-import play.api.data.validation.Constraints
 import play.api.data.format.Formats._
+import play.api.data.validation.Constraints
+
 import scala.util.matching.Regex
 
 object FormField {
