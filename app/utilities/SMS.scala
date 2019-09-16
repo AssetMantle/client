@@ -11,7 +11,7 @@ import play.api.i18n.{Lang, MessagesApi}
 
 import scala.concurrent.ExecutionContext
 
-class SMS @Inject()(contacts: Contacts, accounts: Accounts, messagesApi: MessagesApi)(implicit exec: ExecutionContext, configuration: Configuration) {
+class SMS @Inject()(contacts: Contacts, accounts: Accounts, messagesApi: MessagesApi)(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
   private implicit val module: String = constants.Module.UTILITIES_SMS
 

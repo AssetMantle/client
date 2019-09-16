@@ -10,7 +10,7 @@ import play.api.libs.mailer._
 
 import scala.concurrent.ExecutionContext
 
-class Email @Inject()(mailerClient: MailerClient, contacts: Contacts, accounts: Accounts, messagesApi: MessagesApi)(implicit exec: ExecutionContext, configuration: Configuration) {
+class Email @Inject()(mailerClient: MailerClient, contacts: Contacts, accounts: Accounts, messagesApi: MessagesApi)(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
   private implicit val module: String = constants.Module.UTILITIES_EMAIL
 

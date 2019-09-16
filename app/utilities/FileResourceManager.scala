@@ -1,14 +1,14 @@
 package utilities
 
 import exceptions.BaseException
-import org.apache.commons.codec.binary.Base64
 import javax.inject.Inject
 import models.Trait.Document
+import org.apache.commons.codec.binary.Base64
 import play.api.{Configuration, Logger}
 
 import scala.concurrent.ExecutionContext
 
-class FileResourceManager @Inject()()(implicit exec: ExecutionContext, configuration: Configuration){
+class FileResourceManager @Inject()()(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
   private implicit val module: String = constants.Module.FILE_RESOURCE_MANAGER
 

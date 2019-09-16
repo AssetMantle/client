@@ -12,7 +12,7 @@ import play.api.{Configuration, Logger}
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class ConfirmSellerBidController @Inject()(messagesControllerComponents: MessagesControllerComponents, transaction: utilities.Transaction, blockchainAccounts: blockchain.Accounts, withTraderLoginAction: WithTraderLoginAction, transactionsConfirmSellerBid: transactions.ConfirmSellerBid, blockchainTransactionConfirmSellerBids: blockchainTransaction.ConfirmSellerBids, withUsernameToken: WithUsernameToken)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class ConfirmSellerBidController @Inject()(messagesControllerComponents: MessagesControllerComponents, transaction: utilities.Transaction, blockchainAccounts: blockchain.Accounts, withTraderLoginAction: WithTraderLoginAction, transactionsConfirmSellerBid: transactions.ConfirmSellerBid, blockchainTransactionConfirmSellerBids: blockchainTransaction.ConfirmSellerBids, withUsernameToken: WithUsernameToken)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 

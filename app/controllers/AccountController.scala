@@ -43,7 +43,7 @@ class AccountController @Inject()(
                                    messagesControllerComponents: MessagesControllerComponents,
                                  )
                                  (implicit
-                                  exec: ExecutionContext,
+                                  executionContext: ExecutionContext,
                                   configuration: Configuration,
                                   wsClient: WSClient,
                                  ) extends AbstractController(messagesControllerComponents) with I18nSupport {

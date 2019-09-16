@@ -10,7 +10,7 @@ import views.companion.blockchain.AddKey
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class AddKeyController @Inject()(messagesControllerComponents: MessagesControllerComponents, transactionsAddKey: transactions.AddKey)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class AddKeyController @Inject()(messagesControllerComponents: MessagesControllerComponents, transactionsAddKey: transactions.AddKey)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   def blockchainAddKeyForm: Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.blockchain.addKey(AddKey.form))

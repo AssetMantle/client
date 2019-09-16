@@ -53,7 +53,7 @@ object FileOperations {
     else ""
   }
 
-  def removeSpacesFromName(name: String)(implicit exec: ExecutionContext): String = {
+  def removeSpacesFromName(name: String)(implicit executionContext: ExecutionContext): String = {
     try {
       name.replaceAll("\\s", "")
     } catch {
@@ -64,7 +64,7 @@ object FileOperations {
     }
   }
 
-  def hashExtractor(hashedName: String)(implicit exec: ExecutionContext): String = {
+  def hashExtractor(hashedName: String)(implicit executionContext: ExecutionContext): String = {
     try {
       hashedName.split("""\.""")(0)
     }
@@ -76,20 +76,9 @@ object FileOperations {
     }
   }
 
-  def renameFile(directory: String, currentName: String, newName: String)(implicit exec: ExecutionContext): Boolean = newFile(directory, currentName).renameTo(newFile(directory, newName))
+  def renameFile(directory: String, currentName: String, newName: String)(implicit executionContext: ExecutionContext): Boolean = newFile(directory, currentName).renameTo(newFile(directory, newName))
 
-  def newFile(directoryName: String, fileName: String)(implicit exec: ExecutionContext): File = {
-    try {
-      new File(directoryName, fileName)
-    } catch {
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-      case e: Exception => logger.error(constants.Response.GENERIC_EXCEPTION.message, e)
-        throw new BaseException(constants.Response.GENERIC_EXCEPTION)
-    }
-  }
-
-  def fileStreamer(file: File, directoryName: String, fileName: String)(implicit exec: ExecutionContext): Source[ByteString, _] = {
+  def fileStreamer(file: File, directoryName: String, fileName: String)(implicit executionContext: ExecutionContext): Source[ByteString, _] = {
     val source: Source[ByteString, _] = FileIO.fromPath(file.toPath)
       .watchTermination()((_, downloadDone) => downloadDone.onComplete {
         case Success(_)
@@ -100,7 +89,7 @@ object FileOperations {
     source
   }
 
-  def deleteFile(directoryName: String, name: String)(implicit exec: ExecutionContext): Boolean = {
+  def deleteFile(directoryName: String, name: String)(implicit executionContext: ExecutionContext): Boolean = {
     try {
       newFile(directoryName, name).delete()
     } catch {
@@ -111,9 +100,20 @@ object FileOperations {
     }
   }
 
-  def moveFile(fileName: String, oldPath: String, newPath: String)(implicit exec: ExecutionContext): Boolean = newFile(directoryName = oldPath, fileName = fileName).renameTo(newFile(directoryName = newPath, fileName = fileName))
+  def moveFile(fileName: String, oldPath: String, newPath: String)(implicit executionContext: ExecutionContext): Boolean = newFile(directoryName = oldPath, fileName = fileName).renameTo(newFile(directoryName = newPath, fileName = fileName))
 
-  def convertToByteArray(file: File)(implicit exec: ExecutionContext): Array[Byte] = {
+  def newFile(directoryName: String, fileName: String)(implicit executionContext: ExecutionContext): File = {
+    try {
+      new File(directoryName, fileName)
+    } catch {
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+      case e: Exception => logger.error(constants.Response.GENERIC_EXCEPTION.message, e)
+        throw new BaseException(constants.Response.GENERIC_EXCEPTION)
+    }
+  }
+
+  def convertToByteArray(file: File)(implicit executionContext: ExecutionContext): Array[Byte] = {
     try {
       val fileInputStreamReader = new FileInputStream(file)
       val bytes = new Array[Byte](file.length.asInstanceOf[Int])
