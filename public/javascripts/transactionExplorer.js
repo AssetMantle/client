@@ -11,40 +11,31 @@ function transactionExplorer() {
     $('#transactionContainer').prepend(content);
     window.addEventListener("load", function (evt) {
         let wsTx = new WebSocket(wsUrl);
+        let transactionContainerList = document.getElementById("transactionContainer");
         wsTx.onopen = () => {
             let requestTx = `{"method":"subscribe", "id":"dontcare","jsonrpc":"2.0","params":["tm.event='Tx'"]}`;
             wsTx.send(requestTx)
         };
 
-        wsTx.onmessage = function (evt) {
-            let receivedData =JSON.parse(evt.data);
-            if (receivedData.result.data !== undefined) {
-                let height = receivedData.result.data.value.TxResult.height;
-                let blockDetails = jsRoutes.controllers.BlockExplorerController.blockDetails(height, height);
-                $.ajax({
-                    url: blockDetails.url,
-                    type: blockDetails.type,
-                    async: true,
-                    statusCode: {
-                        200: function (blockDetailsData) {
-                            let blocks = JSON.parse(blockDetailsData);
-                            let dataHash = blocks[0].header.data_hash;
-                            let transactionContainerList = document.getElementById("transactionContainer");
-                            let transactionContainerListLength = transactionContainerList.childNodes.length;
-                            if (transactionContainerListLength > 8) {
-                                transactionContainerList.removeChild(transactionContainerList.childNodes[transactionContainerListLength - 1]);
-                            }
-                            $('#transactionContainer').prepend("<tr><td><button onclick='searchFunction(" + JSON.stringify(height) + ")'>" + height + "<td>" + dataHash + "</span></button></td></button></td><td >" + "TODO" + "</td></tr>");
-                        }
-                    },
-                    500: {}
+        wsTx.onmessage = function (message) {
+            let receivedData =JSON.parse(message.data);
+            if (receivedData.result.events !== undefined) {
+                Array.prototype.forEach.call(receivedData.result.events['tx.hash'], (txHash, index) => {
+                    let height = receivedData.result.events['tx.height'][index];
+                    let transactionType = receivedData.result.events['message.action'][index];
+                    let transactionContainerListLength = transactionContainerList.childNodes.length;
+                    if (transactionContainerListLength > 8) {
+                        transactionContainerList.removeChild(transactionContainerList.childNodes[transactionContainerListLength - 1]);
+                    }
+                    $('#transactionContainer').prepend("<tr><td><button onclick='searchFunction(" + JSON.stringify(height) + ")'>" + height + "</button></td><td><button onclick='searchFunction("+ JSON.stringify(txHash) +")'>"+ txHash +"</button></td></button></td><td>" + transactionType + "</td></tr>");
                 });
             }
         };
-        wsTx.onerror = function (evt) {
-            document.getElementById("transactionContainer").appendChild(document.createElement("div").innerHTML = "ERROR: " + evt.data);
+
+        wsTx.onerror = function (message) {
+            document.getElementById("transactionContainer").appendChild(document.createElement("div").innerHTML = "ERROR: " + message.data);
         };
     });
 }
 
-window.onload = transactionExplorer();
+$(document).ready = transactionExplorer();

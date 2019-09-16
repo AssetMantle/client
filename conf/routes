@@ -9,6 +9,7 @@ GET         /firebase-messaging-sw.js                                    control
 GET         /blockExplorer/lastBlockHeight                               controllers.BlockExplorerController.lastBlockHeight
 GET         /blockExplorer/blockDetails                                  controllers.BlockExplorerController.blockDetails(minimumHeight: Int, maximumHeight: Int)
 GET         /blockExplorer/stakingValidators                             controllers.BlockExplorerController.stakingValidators
+GET         /blockExplorer/transactionHash                               controllers.BlockExplorerController.transactionHash(txHash: String)
 
 GET         /genesisRequest                                              controllers.ViewController.genesisRequest
 GET         /genesisInformation                                          controllers.ViewController.genesisInformation

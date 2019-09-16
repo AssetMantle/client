@@ -13,7 +13,8 @@ import scala.concurrent.ExecutionContext
 class BlockExplorerController@Inject()(messagesControllerComponents: MessagesControllerComponents,
                                        queriesGetABCIINfo: queries.GetABCIInfo,
                                        queriesStakingValidators: queries.GetStakingValidators,
-                                       queriesGetBlockDetails: queries.GetBlockDetails
+                                       queriesGetBlockDetails: queries.GetBlockDetails,
+                                       queriesGetTransactionHash: queries.GetTransactionHashResponse
                                       )
                                       (implicit
                                        exec: ExecutionContext,
@@ -39,6 +40,14 @@ class BlockExplorerController@Inject()(messagesControllerComponents: MessagesCon
   def stakingValidators(): Action[AnyContent] = Action { implicit request =>
     try {
       Ok(Json.toJson(queriesStakingValidators.Service.get()))
+    } catch {
+      case _: BaseException => InternalServerError
+    }
+  }
+
+  def transactionHash(txHash: String): Action[AnyContent] = Action { implicit request =>
+    try {
+      Ok(Json.toJson(queriesGetTransactionHash.Service.get(txHash).json))
     } catch {
       case _: BaseException => InternalServerError
     }

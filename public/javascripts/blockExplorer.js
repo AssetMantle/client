@@ -145,4 +145,4 @@ function setFirstBlockTime() {
     });
 }
 
-window.onload = blockExplorer();
+$(document).ready = blockExplorer();

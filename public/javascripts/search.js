@@ -1,3 +1,5 @@
+getConfigurationAsynchronously("blockchain.transaction.hashLength");
+
 function searchFunction(searchData) {
     let invalidBlockHeight = getCookie("blockHeightError");
     let invalidTransactionHash = getCookie("transactionHashError");
@@ -6,8 +8,11 @@ function searchFunction(searchData) {
         e.preventDefault();
     });
 
+    let hashLength = parseInt(getConfigurationAsynchronously("blockchain.transaction.hashLength"), 10);
+
     let heightPattern = /^[0-9]*$/;
-    let txHashPattern = /^[A-F0-9]{40}$/;
+    //TODO pattern with config
+    let txHashPattern = /^[A-F0-9]{64}$/;
 
     if (searchData === undefined) {
         searchData = document.getElementById("searchValue").value;
@@ -39,16 +44,15 @@ function searchFunction(searchData) {
         $('#blockHeightBottomDivision').show();
     }
     let txHash = txHashPattern.exec(searchData);
+    let transactionHashUrl = jsRoutes.controllers.BlockExplorerController.transactionHash(txHash);
     if (txHash != null) {
-
         $.ajax({
-            url: txHashUrl + txHash.input,
-            type: "GET",
+            url: transactionHashUrl.url,
+            type: transactionHashUrl.type,
             async: true,
             statusCode: {
-                200: function (data) {
-                    let transactionData = JSON.parse(data);
-                    document.getElementById('txHashPageHash').innerHTML = transactionData.hash;
+                200: function (transactionData) {
+                    document.getElementById('txHashPageHash').innerHTML = transactionData.txhash;
                     document.getElementById('txHashPageHeight').innerHTML = transactionData.height;
                     document.getElementById('txHashPageFee').innerHTML = transactionData.tx.value.fee.gas;
 

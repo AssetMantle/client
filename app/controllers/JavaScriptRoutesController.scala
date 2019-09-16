@@ -60,6 +60,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.BlockExplorerController.lastBlockHeight,
         routes.javascript.BlockExplorerController.blockDetails,
         routes.javascript.BlockExplorerController.stakingValidators,
+        routes.javascript.BlockExplorerController.transactionHash,
 
         routes.javascript.BuyerExecuteOrderController.buyerExecuteOrderForm,
         routes.javascript.BuyerExecuteOrderController.moderatedBuyerExecuteOrderForm,

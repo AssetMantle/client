@@ -1,6 +1,5 @@
 function getValidators(bodyID) {
     let urlGetValidators = jsRoutes.controllers.BlockExplorerController.stakingValidators();
-    console.log("Asdas");
     $.ajax({
         url: urlGetValidators.url,
         type: urlGetValidators.type,
@@ -31,13 +30,15 @@ function validatorsTable(bodyID) {
             500: {}
         }
     });
-
 }
 
-function seeValidatorsTable() {
+    function seeValidatorsTable() {
     $('#blockHeightBottomDivision').hide();
     $('#allBlocksTable').hide();
     $('#txHashBottomDivision').hide();
     $('#indexBottomDivision').hide();
     $('#validatorsTable').show();
 }
+
+$(document).ready = getValidators("validator");
+$(document).ready = validatorsTable("validatorsTableBody");
