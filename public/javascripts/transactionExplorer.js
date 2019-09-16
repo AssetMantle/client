@@ -22,12 +22,11 @@ function transactionExplorer() {
             if (receivedData.result.events !== undefined) {
                 Array.prototype.forEach.call(receivedData.result.events['tx.hash'], (txHash, index) => {
                     let height = receivedData.result.events['tx.height'][index];
-                    let transactionType = receivedData.result.events['message.action'][index];
                     let transactionContainerListLength = transactionContainerList.childNodes.length;
                     if (transactionContainerListLength > 8) {
                         transactionContainerList.removeChild(transactionContainerList.childNodes[transactionContainerListLength - 1]);
                     }
-                    $('#transactionContainer').prepend("<tr><td><button onclick='searchFunction(" + JSON.stringify(height) + ")'>" + height + "</button></td><td><button onclick='searchFunction("+ JSON.stringify(txHash) +")'>"+ txHash +"</button></td></button></td><td>" + transactionType + "</td></tr>");
+                    $('#transactionContainer').prepend("<tr><td><button onclick='searchFunction(" + JSON.stringify(height) + ")'>" + height + "</button></td><td><button onclick='searchFunction("+ JSON.stringify(txHash) +")'>"+ txHash +"</button></td></button></td></tr>");
                 });
             }
         };
