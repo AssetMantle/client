@@ -1,10 +1,10 @@
 package models.blockchain
 
-import actors.{MainOrderActor, ShutdownActors}
+import actors.{MainOrderActor, ShutdownActor}
 import akka.actor.{ActorRef, ActorSystem}
 import akka.stream.scaladsl.Source
 import akka.stream.{ActorMaterializer, OverflowStrategy}
-import exceptions.{BaseException, BlockChainException}
+import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.master
 import org.postgresql.util.PSQLException
@@ -23,7 +23,7 @@ case class Order(id: String, fiatProofHash: Option[String], awbProofHash: Option
 case class OrderCometMessage(username: String, message: JsValue)
 
 @Singleton
-class Orders @Inject()(shutdownActors: ShutdownActors, masterAccounts: master.Accounts, actorSystem: ActorSystem, protected val databaseConfigProvider: DatabaseConfigProvider, getAccount: queries.GetAccount, blockchainNegotiations: Negotiations, blockchainTraderFeedbackHistories: TraderFeedbackHistories, blockchainAssets: Assets, blockchainFiats: Fiats, getOrder: queries.GetOrder, implicit val pushNotification: PushNotification)(implicit executionContext: ExecutionContext, configuration: Configuration) {
+class Orders @Inject()(shutdownActors: ShutdownActor, masterAccounts: master.Accounts, actorSystem: ActorSystem, protected val databaseConfigProvider: DatabaseConfigProvider, getAccount: queries.GetAccount, blockchainNegotiations: Negotiations, blockchainTraderFeedbackHistories: TraderFeedbackHistories, blockchainAssets: Assets, blockchainFiats: Fiats, getOrder: queries.GetOrder, implicit val pushNotification: PushNotification)(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -177,7 +177,6 @@ class Orders @Inject()(shutdownActors: ShutdownActors, masterAccounts: master.Ac
           mainOrderActor ! OrderCometMessage(username = masterAccounts.Service.getId(negotiation.sellerAddress), message = Json.toJson(constants.Comet.PING))
         }
         catch {
-          case blockChainException: BlockChainException => logger.error(blockChainException.failure.message, blockChainException)
           case baseException: BaseException => logger.error(baseException.failure.message, baseException)
         }
       }

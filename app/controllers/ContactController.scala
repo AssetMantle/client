@@ -10,7 +10,6 @@ import play.api.libs.json.{Json, OWrites}
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
 import views.companion.master.UpdateContact
-
 import scala.concurrent.ExecutionContext
 
 @Singleton

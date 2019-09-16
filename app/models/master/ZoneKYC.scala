@@ -12,7 +12,7 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class ZoneKYC(id: String, documentType: String, fileName: String, file: Option[Array[Byte]], status: Option[Boolean] = None) extends Document[ZoneKYC]{
+case class ZoneKYC(id: String, documentType: String, fileName: String, file: Option[Array[Byte]], status: Option[Boolean] = None) extends Document[ZoneKYC] {
 
   def updateFile(newFile: Option[Array[Byte]]): ZoneKYC = ZoneKYC(id = id, documentType = documentType, fileName = fileName, file = newFile, status = status)
 

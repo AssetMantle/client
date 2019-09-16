@@ -14,8 +14,10 @@
             <span class="red">@Messages(constants.Form.ZONE_ID)</span>: @organizationVerificationRequest.zoneID <br>
             <span class="red">@Messages(constants.Form.ACCOUNT_ID)</span>: @organizationVerificationRequest.accountID <br>
             <span class="red">@Messages(constants.Form.NAME)</span>: @organizationVerificationRequest.name <br>
-            <span class="red">@Messages(constants.Form.ABBREVIATION)</span>: @organizationVerificationRequest.abbreviation.getOrElse("") <br>
-            <span class="red">@Messages(constants.Form.ESTABLISHMENT_DATE)</span>: @organizationVerificationRequest.establishmentDate <br>
+            <span class="red">@Messages(constants.Form.ABBREVIATION)</span>
+                : @organizationVerificationRequest.abbreviation.getOrElse("") <br>
+            <span class="red">@Messages(constants.Form.ESTABLISHMENT_DATE)</span>
+                : @organizationVerificationRequest.establishmentDate <br>
             <span class="red">@Messages(constants.Form.EMAIL)</span>: @organizationVerificationRequest.email <br>
             </div>
             <br>
@@ -27,7 +29,8 @@
                 <span class="red">@Messages(constants.Form.CITY)</span>: @registeredAddress.city <br>
                 <span class="red">@Messages(constants.Form.COUNTRY)</span>: @registeredAddress.country <br>
                 <span class="red">@Messages(constants.Form.ZIP_CODE)</span>: @registeredAddress.zipCode <br>
-                <span class="red">@Messages(constants.Form.PHONE)</span>: @registeredAddress.phone <br>
+                <span class="red">@Messages(constants.Form.PHONE)</span>: @registeredAddress.phone
+                    <br>
                 </div>
             }
             <br>
@@ -39,7 +42,8 @@
                 <span class="red">@Messages(constants.Form.CITY)</span>: @postalAddress.city <br>
                 <span class="red">@Messages(constants.Form.COUNTRY)</span>: @postalAddress.country <br>
                 <span class="red">@Messages(constants.Form.ZIP_CODE)</span>: @postalAddress.zipCode <br>
-                <span class="red">@Messages(constants.Form.PHONE)</span>: @postalAddress.phone <br>
+                <span class="red">@Messages(constants.Form.PHONE)</span>: @postalAddress.phone
+                    <br>
                 </div>
             }
             <br>
@@ -67,8 +71,8 @@
             </div>
             <br>
             <div class="final_verify_buttons">
-                <button class="btn btn-sm btn-success" onclick="getForm(jsRoutes.controllers.AddOrganizationController.verifyOrganizationForm('@organizationVerificationRequest.id', '@organizationVerificationRequest.zoneID'))">@Messages(constants.Form.APPROVE)</button>
-                <button class="btn btn-sm btn-danger" onclick="getForm(jsRoutes.controllers.AddOrganizationController.rejectVerifyOrganizationRequestForm('@organizationVerificationRequest.id'))">@Messages(constants.Form.REJECT)</button>
+              <button class="cmuk-button cmuk-button-success cmuk-button-small" onclick="getForm(jsRoutes.controllers.AddOrganizationController.verifyOrganizationForm('@organizationVerificationRequest.id', '@organizationVerificationRequest.zoneID'))">@Messages(constants.Form.APPROVE)</button>
+              <button class="cmuk-button cmuk-button-danger cmuk-button-small" onclick="getForm(jsRoutes.controllers.AddOrganizationController.rejectVerifyOrganizationRequestForm('@organizationVerificationRequest.id'))">@Messages(constants.Form.REJECT)</button>
             </div>
             <br>
         </div>

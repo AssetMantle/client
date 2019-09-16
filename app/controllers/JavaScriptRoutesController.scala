@@ -10,14 +10,19 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
   def javascriptRoutes = Action { implicit request =>
     Ok(
       JavaScriptReverseRouter("jsRoutes")(
+
+        routes.javascript.AccountController.signUpForm,
+        routes.javascript.AccountController.loginForm,
+        routes.javascript.AccountController.logoutForm,
+        routes.javascript.AccountController.changePasswordForm,
         routes.javascript.AccountController.checkUsernameAvailable,
+        routes.javascript.AccountController.emailOTPForgotPasswordForm,
+        routes.javascript.AccountController.forgotPasswordForm,
+
         routes.javascript.ConfigurationController.queryConfigurationVariable,
         routes.javascript.NotificationController.notificationPage,
         routes.javascript.NotificationController.unreadNotificationCount,
         routes.javascript.NotificationController.markNotificationRead,
-        routes.javascript.LoginController.loginForm,
-        routes.javascript.LogoutController.logoutForm,
-        routes.javascript.AccountController.signUpForm,
         routes.javascript.ContactController.updateContactForm,
         routes.javascript.VerifyMobileNumberController.verifyMobileNumberForm,
         routes.javascript.VerifyEmailAddressController.verifyEmailAddressForm,
@@ -218,12 +223,8 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.SetACLController.organizationVerifyKycDocument,
         routes.javascript.SetACLController.organizationRejectKycDocument,
 
-        //profile
         routes.javascript.ContactController.contact,
 
-        routes.javascript.AccountController.changePasswordForm,
-        routes.javascript.AccountController.emailOTPForgotPasswordForm,
-        routes.javascript.AccountController.forgotPasswordForm,
       )
     ).as("text/javascript")
   }

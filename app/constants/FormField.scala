@@ -116,7 +116,7 @@ object FormField {
   //TODO: Error Response through Messages
   class StringFormField (fieldName: String, minimumLength: Int, maximumLength: Int, regex: Regex = """.*""".r, errorMessage: String = "Error Response") {
     val name: String = fieldName
-    val field: Mapping[String] =  text(minLength = minimumLength, maxLength = maximumLength).verifying(Constraints.pattern(regex = regex, name = regex.pattern.toString, error = errorMessage))
+    val field: Mapping[String] = text(minLength = minimumLength, maxLength = maximumLength).verifying(Constraints.pattern(regex = regex, name = regex.pattern.toString, error = errorMessage))
   }
 
   class StringFormFieldOption(fieldName: String, option: Seq[String], errorMessage: String = "Error Response") {
@@ -129,9 +129,9 @@ object FormField {
     val field: Mapping[Int] =  number(min = minimumValue, max = maximumValue)
   }
 
-  class DateFormField (fieldName: String) {
+  class DateFormField(fieldName: String) {
     val name: String = fieldName
-    val field: Mapping[Date] =  date
+    val field: Mapping[Date] = date
   }
 
   class DoubleFormField(fieldName: String, minimumValue: Double, maximumValue: Double) {

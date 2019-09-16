@@ -5,9 +5,9 @@
 @(requestCoinFormForm: Form[RequestCoin.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 
 <div class="request_coin">
-    @form(action = routes.SendCoinController.requestCoins, 'onkeypress -> "validateForm(event,this)") {
+    @form(action = routes.SendCoinController.requestCoins, 'onkeypress -> "submitFormOnEnter(event,this)") {
         @CSRF.formField
-        @inputText(requestCoinFormForm(constants.FormField.COUPON.name), '_label -> Messages(constants.FormField.COUPON.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.COUPON.name), 'required -> true)
+      @inputText(requestCoinFormForm(constants.FormField.COUPON.name), '_label -> Messages(constants.FormField.COUPON.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.COUPON.name), 'required -> true)
 
         @if(requestCoinFormForm.hasGlobalErrors) {
             <ul>

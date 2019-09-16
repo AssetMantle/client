@@ -2,7 +2,7 @@ package controllers
 
 import controllers.actions.WithTraderLoginAction
 import controllers.results.WithUsernameToken
-import exceptions.{BaseException, BlockChainException}
+import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.{blockchain, blockchainTransaction}
 import play.api.i18n.I18nSupport
@@ -45,7 +45,6 @@ class ConfirmSellerBidController @Inject()(messagesControllerComponents: Message
           }
           catch {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-            case blockChainException: BlockChainException => InternalServerError(views.html.index(failures = Seq(blockChainException.failure)))
           }
         }
       )
@@ -67,7 +66,6 @@ class ConfirmSellerBidController @Inject()(messagesControllerComponents: Message
         }
         catch {
           case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-          case blockChainException: BlockChainException => InternalServerError(views.html.index(failures = Seq(blockChainException.failure)))
         }
       }
     )

@@ -4,20 +4,20 @@
 
 @(organizationBankAccountDetailForm: Form[OrganizationBankAccountDetail.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
-@form(action = routes.AddOrganizationController.organizationBankAccountDetail, 'onkeypress -> "validateForm(event,this)") {
+@form(action = routes.AddOrganizationController.organizationBankAccountDetail, 'onkeypress -> "submitFormOnEnter(event,this)") {
     <div class="latest_card-header latest_card-header-primary text-center">
         <h4 class="latest_card-title">@Messages(constants.Form.ORGANIZATION_BANK_ACCOUNT_DETAIL)</h4>
     </div>
     <div class="latest_card-body">
         @CSRF.formField
-        @inputText(organizationBankAccountDetailForm(constants.FormField.ACCOUNT_HOLDER_NAME.name), '_label -> Messages(constants.FormField.ACCOUNT_HOLDER_NAME.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.ACCOUNT_HOLDER_NAME.name), 'required -> true)
-        @inputText(organizationBankAccountDetailForm(constants.FormField.NICK_NAME.name), '_label -> Messages(constants.FormField.NICK_NAME.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.NICK_NAME.name), 'required -> true)
-        @inputText(organizationBankAccountDetailForm(constants.FormField.ACCOUNT_NUMBER.name), '_label -> Messages(constants.FormField.ACCOUNT_NUMBER.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.ACCOUNT_NUMBER.name), 'required -> true)
-        @inputText(organizationBankAccountDetailForm(constants.FormField.BANK_NAME.name), '_label -> Messages(constants.FormField.BANK_NAME.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.BANK_NAME.name), 'required -> true)
-        @inputText(organizationBankAccountDetailForm(constants.FormField.SWIFT_CODE.name), '_label -> Messages(constants.FormField.SWIFT_CODE.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.SWIFT_CODE.name), 'required -> true)
-        @inputText(organizationBankAccountDetailForm(constants.FormField.ADDRESS.name), '_label -> Messages(constants.FormField.ADDRESS.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.ADDRESS.name), 'required -> true)
-        @inputText(organizationBankAccountDetailForm(constants.FormField.COUNTRY.name), '_label -> Messages(constants.FormField.COUNTRY.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.COUNTRY.name), 'required -> true)
-        @inputText(organizationBankAccountDetailForm(constants.FormField.ZIP_CODE.name), '_label -> Messages(constants.FormField.ZIP_CODE.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.ZIP_CODE.name), 'required -> true)
+      @inputText(organizationBankAccountDetailForm(constants.FormField.ACCOUNT_HOLDER_NAME.name), '_label -> Messages(constants.FormField.ACCOUNT_HOLDER_NAME.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.ACCOUNT_HOLDER_NAME.name), 'required -> true)
+      @inputText(organizationBankAccountDetailForm(constants.FormField.NICK_NAME.name), '_label -> Messages(constants.FormField.NICK_NAME.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.NICK_NAME.name), 'required -> true)
+      @inputText(organizationBankAccountDetailForm(constants.FormField.ACCOUNT_NUMBER.name), '_label -> Messages(constants.FormField.ACCOUNT_NUMBER.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.ACCOUNT_NUMBER.name), 'required -> true)
+      @inputText(organizationBankAccountDetailForm(constants.FormField.BANK_NAME.name), '_label -> Messages(constants.FormField.BANK_NAME.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.BANK_NAME.name), 'required -> true)
+      @inputText(organizationBankAccountDetailForm(constants.FormField.SWIFT_CODE.name), '_label -> Messages(constants.FormField.SWIFT_CODE.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.SWIFT_CODE.name), 'required -> true)
+      @inputText(organizationBankAccountDetailForm(constants.FormField.ADDRESS.name), '_label -> Messages(constants.FormField.ADDRESS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.ADDRESS.name), 'required -> true)
+      @inputText(organizationBankAccountDetailForm(constants.FormField.COUNTRY.name), '_label -> Messages(constants.FormField.COUNTRY.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.COUNTRY.name), 'required -> true)
+      @inputText(organizationBankAccountDetailForm(constants.FormField.ZIP_CODE.name), '_label -> Messages(constants.FormField.ZIP_CODE.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.ZIP_CODE.name), 'required -> true)
 
         @if(organizationBankAccountDetailForm.hasGlobalErrors) {
             <ul>

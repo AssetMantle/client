@@ -2,14 +2,14 @@ package controllers
 
 import controllers.actions.{WithGenesisLoginAction, WithUserLoginAction}
 import controllers.results.WithUsernameToken
-import exceptions.{BaseException, BlockChainException}
+import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.{blockchain, blockchainTransaction, master}
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
 import utilities.PushNotification
-
+import scala.util.{Failure, Random, Success}
 import scala.concurrent.ExecutionContext
 
 @Singleton
@@ -69,7 +69,6 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
           }
           catch {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-            case blockChainException: BlockChainException => InternalServerError(views.html.index(failures = Seq(blockChainException.failure)))
           }
         }
       )
@@ -139,6 +138,7 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
       )
   }
 
+
   def viewZonesInGenesis: Action[AnyContent] = withGenesisLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
@@ -165,7 +165,6 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
         }
         catch {
           case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-          case blockChainException: BlockChainException => InternalServerError(views.html.index(failures = Seq(blockChainException.failure)))
         }
       }
     )

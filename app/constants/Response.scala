@@ -45,7 +45,7 @@ object Response {
   val ISSUE_ASSET_REQUEST_REJECTED = new Success("ISSUE_ASSET_REQUEST_REJECTED")
   val ISSUE_FIAT_REQUEST_REJECTED = new Success("ISSUE_FIAT_REQUEST_REJECTED")
   val LOGGED_IN = new Success("LOGGED_IN")
-  val SIGNED_UP = new Success("SIGNED_UP", routes.javascript.LoginController.loginForm)
+  val SIGNED_UP = new Success("SIGNED_UP", routes.javascript.AccountController.loginForm)
   val LOGGED_OUT = new Success("LOGGED_OUT")
   val KEY_ADDED = new Success("KEY_ADDED")
   val MOBILE_NUMBER_VERIFIED = new Success("MOBILE_NUMBER_VERIFIED")
@@ -102,8 +102,8 @@ object Response {
   val INVALID_USERNAME = new Failure("INVALID_USERNAME")
   val INVALID_PASSWORD = new Failure("INVALID_PASSWORD")
   val NO_FILE = new Failure("NO_FILE")
-  val PASSWORD_NOT_GIVEN =  new Failure("PASSWORD_NOT_GIVEN")
-  val GAS_NOT_GIVEN =  new Failure("GAS_NOT_GIVEN")
+  val PASSWORD_NOT_GIVEN = new Failure("PASSWORD_NOT_GIVEN")
+  val GAS_NOT_GIVEN = new Failure("GAS_NOT_GIVEN")
   val ALL_KYC_FILES_NOT_VERIFIED = new Failure("ALL_KYC_FILES_NOT_VERIFIED")
 
   class Failure(private val response: String, private val actionController: JavaScriptReverseRoute = null) {
