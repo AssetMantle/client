@@ -1,5 +1,5 @@
 function getValidators() {
-    let urlGetValidators = jsRoutes.controllers.BlockExplorerController.stakingValidators();
+    const urlGetValidators = jsRoutes.controllers.BlockExplorerController.stakingValidators();
     $.ajax({
         url: urlGetValidators.url,
         type: urlGetValidators.type,
