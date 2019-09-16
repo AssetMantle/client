@@ -30,7 +30,7 @@ class Email @Inject()(mailerClient: MailerClient, masterContacts: master.Contact
         to = Seq(toEmailAddress),
         cc = masterContacts.Service.getVerifiedEmailAddresses(ccAccountIDs),
         bcc = masterContacts.Service.getVerifiedEmailAddresses(bccAccountIDs),
-        bodyHtml = Option(views.html.mail(messagesApi(email.title), messagesApi(email.message(messageParameters))).toString),
+        bodyHtml = Option(views.html.mail(messagesApi(email.message + messageParameters)).toString),
         charset = Option(charset),
         replyTo = Seq(replyTo),
         bounceAddress = Option(bounceAddress),

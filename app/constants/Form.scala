@@ -3,6 +3,7 @@ package constants
 object Form {
 
   val INDEX = "INDEX"
+  val COMMIT = "COMMIT"
   val PROFILE = "PROFILE"
   val MARKET = "MARKET"
   val REQUEST = "REQUEST"

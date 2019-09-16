@@ -4,21 +4,19 @@ object Email {
   val LOGIN = "LOGIN"
   val OTP = "OTP"
 
-  val VERIFY_EMAIL_OTP: Email = new Email("SUBJECT_VERIFY_EMAIL_OTP", "TITLE_VERIFY_EMAIL_OTP") {
-    def message(messageParameters: Seq[String]): String = messageParameters.head
-  }
+  lazy val PREFIX = "EMAIL."
+  lazy val SUBJECT_SUFFIX = ".SUBJECT"
+  lazy val MESSAGE_SUFFIX = ".MESSAGE"
 
-  val TRADER_INVITATION: Email = new Email("SUBJECT_TRADER_INVITATION", "TITLE_TRADER_INVITATION") {
-    def message(messageParameters: Seq[String]): String = messageParameters.head
-  }
+  val VERIFY_EMAIL_OTP: Email = new Email("VERIFY_EMAIL_OTP")
 
-  val FORGOT_PASSWORD_EMAIL_OTP: Email = new Email("SUBJECT_FORGOT_PASSWORD_EMAIL_OTP", "TITLE_FORGOT_PASSWORD_EMAIL_OTP") {
-    def message(messageParameters: Seq[String]): String = messageParameters.head
-  }
+  val TRADER_INVITATION: Email = new Email("TRADER_INVITATION")
 
-  abstract class Email(val subject: String, val title: String) {
+  val FORGOT_PASSWORD_EMAIL_OTP: Email = new Email("FORGOT_PASSWORD_EMAIL_OTP")
 
-    def message(messageParameters: Seq[String]): String
+  class Email(private val title: String) {
+    val subject: String = PREFIX + title + SUBJECT_SUFFIX
+    val message: String = PREFIX + title + MESSAGE_SUFFIX
 
   }
 }
