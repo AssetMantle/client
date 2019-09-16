@@ -5,9 +5,7 @@ function blockExplorer() {
     let blockExplorerTableBody = "blockContainer";
     let wsURL = getConfiguration("blockchain.main.wsIP") + ":" + getConfiguration("blockchain.main.abciPort") + "/websocket";
 
-    setCookie("blockExplorerCounter", 0, 1);
-    setCookie("blockExplorerLastBlockTime", "", 1);
-    setCookie("blockExplorerAverageBlockTime", 6.0, 1);
+    setFirstBlockTime();
 
     let maxNumberOfItems = 8;
 
@@ -39,42 +37,34 @@ function blockExplorer() {
 
 function updateBlockExplorer(blockExplorerTableBody, receivedData, maxNumberOfItems) {
 
-    let counter = parseInt(getCookie("blockExplorerCounter"), 10);
-    let lastBlockTime = getCookie("blockExplorerLastBlockTime");
-    let averageBlockTime = parseFloat(getCookie("blockExplorerAverageBlockTime"));
-
-    let height = parseInt(receivedData.result.data.value.block.header.height, 10);
+    let lastBlockTime = getCookie("lastBlockTime");
+    let averageBlockTime = parseFloat(getCookie("averageBlockTime"));
+    let latestBlockHeight = parseInt(receivedData.result.data.value.block.header.height, 10);
     let numTxs = receivedData.result.data.value.block.header.num_txs;
     let time = receivedData.result.data.value.block.header.time;
-    let timerID = "timer" + counter.toString(10);
+    let timerID = "timer" + latestBlockHeight.toString(10);
     let blockTime = new Date(time);
     let differenceBetweenBlockTime = (blockTime.getTime() - new Date(lastBlockTime).getTime()) / 1000;
     let blockContainerList = document.getElementById(blockExplorerTableBody);
     blockContainerList.removeChild(blockContainerList.childNodes[blockContainerList.childNodes.length - 2]);
-    $('#' + blockExplorerTableBody).prepend("<tr><td><button onclick='searchFunction(" + JSON.stringify(height) + ")'>" + height + "</button></td><td>" + numTxs + "</td><td ><div id='" + timerID + "'></div></td></tr>");
+    $('#' + blockExplorerTableBody).prepend("<tr><td><button onclick='searchFunction(" + JSON.stringify(latestBlockHeight) + ")'>" + latestBlockHeight + "</button></td><td>" + numTxs + "</td><td ><div id='" + timerID + "'></div></td></tr>");
     getBlockTime(time, timerID);
-    updateGraph("blockTimes", [height + "::" + blockTime.getHours() + ":" + blockTime.getMinutes() + ":" + blockTime.getSeconds()], [differenceBetweenBlockTime], maxNumberOfItems - 1);
+    updateGraph("blockTimes", [latestBlockHeight + "::" + blockTime.getHours() + ":" + blockTime.getMinutes() + ":" + blockTime.getSeconds()], [differenceBetweenBlockTime], maxNumberOfItems - 1);
     lastBlockTime = time;
-    if (counter > 0) {
-        averageBlockTime = (averageBlockTime * counter + differenceBetweenBlockTime) / (counter + 1);
-    }
-    counter += 1;
-    averageBlockTimeUpdater(averageBlockTime);
-    updateLastBlock(height, lastBlockTime);
+    averageBlockTime = (averageBlockTime * (latestBlockHeight - 1) + differenceBetweenBlockTime) / latestBlockHeight;
 
-    setCookie("blockExplorerCounter", counter, 1);
-    setCookie("blockExplorerLastBlockTime", lastBlockTime, 1);
-    setCookie("blockExplorerAverageBlockTime", averageBlockTime, 1);
+    averageBlockTimeUpdater(averageBlockTime);
+    updateLastBlock(latestBlockHeight, lastBlockTime);
+
+    setCookie("latestBlockHeight", latestBlockHeight, 1);
+    setCookie("lastBlockTime", lastBlockTime, 1);
+    setCookie("averageBlockTime", averageBlockTime, 1);
 }
 
 
 function initializeBlockExplorer(blockExplorerTableBody, maxNumberOfItems) {
 
     let lastBlockHeightURL = jsRoutes.controllers.BlockExplorerController.lastBlockHeight();
-
-    let counter = parseInt(getCookie("blockExplorerCounter"), 10);
-    let lastBlockTime = getCookie("blockExplorerLastBlockTime");
-    let averageBlockTime = parseFloat(getCookie("blockExplorerAverageBlockTime"));
 
     $.ajax({
         url: lastBlockHeightURL.url,
@@ -83,6 +73,7 @@ function initializeBlockExplorer(blockExplorerTableBody, maxNumberOfItems) {
         statusCode: {
             200: function (latestBlockHeightData) {
                 let latestBlockHeight = parseInt(latestBlockHeightData);
+                setCookie("latestBlockHeight", latestBlockHeight, 1);
                 let blockDetails = jsRoutes.controllers.BlockExplorerController.blockDetails((latestBlockHeight - maxNumberOfItems), latestBlockHeight);
                 $.ajax({
                     url: blockDetails.url,
@@ -95,37 +86,35 @@ function initializeBlockExplorer(blockExplorerTableBody, maxNumberOfItems) {
                             let initialTimeData = [];
                             let initialGraphTime = [];
                             let initialGraphData = [];
-                            let lastBlockHeight = 0;
-                            Array.prototype.forEach.call(blocks.reverse(), block => {
+                            let lastBlockTime = "";
+                            Array.prototype.forEach.call(blocks.reverse(), (block, index) => {
                                 let height = parseInt(block.header.height, 10);
                                 let numTxs = block.header.num_txs;
                                 let time = block.header.time;
-                                let timerID = "timer" + counter.toString(10);
+                                let timerID = "timer" + (latestBlockHeight - index).toString(10);
                                 let blockTime = new Date(time);
                                 initialTimeData[initialTimeData.length] = time;
                                 let differenceBetweenBlockTime = (blockTime.getTime() - new Date(lastBlockTime).getTime()) / 1000;
                                 content = "<tr><td><button onclick='searchFunction(" + JSON.stringify(height) + ")'>" + height + "</button></td><td>" + numTxs + "</td><td><div id='" + timerID + "'></div> </td></tr>" + content;
                                 lastBlockTime = time;
-                                if (counter > 0) {
+                                if (index > 0) {
                                     initialGraphTime[initialGraphTime.length] = height + "::" + blockTime.getHours() + ":" + blockTime.getMinutes() + ":" + blockTime.getSeconds();
                                     initialGraphData[initialGraphData.length] = differenceBetweenBlockTime;
-                                    averageBlockTime = (averageBlockTime * counter + differenceBetweenBlockTime) / (counter + 1);
                                 }
-                                counter += 1;
-                                lastBlockHeight = height;
                             });
+                            let averageBlockTime = (new Date(lastBlockTime).getTime() - new Date(getCookie("firstBlockTime")).getTime()) / (1000 * (latestBlockHeight - 1));
                             averageBlockTimeUpdater(averageBlockTime);
-                            updateLastBlock(lastBlockHeight, lastBlockTime);
+                            updateLastBlock(latestBlockHeight, lastBlockTime);
                             $('#' + blockExplorerTableBody).prepend(content);
                             for (let i = 0; i < initialTimeData.length; i++) {
-                                getBlockTime(initialTimeData[i], "timer" + i.toString(10));
+                                getBlockTime(initialTimeData[i], "timer" + (latestBlockHeight - i).toString(10));
                             }
-                            updateGraph("blockTimes", initialGraphTime, initialGraphData, maxNumberOfItems - 1);
+                            updateGraph("blockTimes", initialGraphTime, initialGraphData, maxNumberOfItems);
                             lastBlockTime = initialTimeData[initialTimeData.length - 1];
 
-                            setCookie("blockExplorerCounter", counter, 1);
-                            setCookie("blockExplorerLastBlockTime", lastBlockTime, 1);
-                            setCookie("blockExplorerAverageBlockTime", averageBlockTime, 1);
+                            setCookie("latestBlockHeight", latestBlockHeight, 1);
+                            setCookie("lastBlockTime", lastBlockTime, 1);
+                            setCookie("averageBlockTime", averageBlockTime, 1);
                         },
                         500: {}
                     }
@@ -139,4 +128,21 @@ function initializeBlockExplorer(blockExplorerTableBody, maxNumberOfItems) {
 function blockExplorerErrorEvent(event) {
     document.getElementById(blockExplorerTableBody).appendChild(document.createElement("div").innerHTML = "ERROR: " + evt.data);
 }
+
+function setFirstBlockTime() {
+    let blockDetails = jsRoutes.controllers.BlockExplorerController.blockDetails(1, 1);
+    $.ajax({
+        url: blockDetails.url,
+        type: blockDetails.type,
+        async: true,
+        statusCode: {
+            200: function (blockDetailsData) {
+                let blocks = JSON.parse(blockDetailsData);
+                let firstBlockTime = blocks[0].header.time;
+                setCookie("firstBlockTime", firstBlockTime, 1);
+            },
+        }
+    });
+}
+
 window.onload = blockExplorer();
