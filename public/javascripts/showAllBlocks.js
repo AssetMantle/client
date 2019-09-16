@@ -1,10 +1,6 @@
-getConfigurationAsynchronously("blockchain.main.wsIP");
-getConfigurationAsynchronously("blockchain.main.abciPort");
-getConfigurationAsynchronously("blockchain.main.ip");
-
 setCookie("showAllBlocksTableClick", 0, 1);
 
-function initialShowAllBlocksTableContent() {
+function showAllBlocksInitialTableContent() {
     setCookie("showAllBlocksTableClick", 0, 1);
     changeTableContent(parseInt(getCookie("showAllBlocksTableClick"), 10));
 }
@@ -21,7 +17,7 @@ function onShowAllBlocksClickPrevious() {
         setCookie("showAllBlocksTableClick", click, 1);
         changeTableContent(click);
     } else {
-        initialShowAllBlocksTableContent();
+        showAllBlocksInitialTableContent();
     }
 }
 
@@ -78,6 +74,6 @@ function showAllBlocksTable() {
     $('#txHashBottomDivision').hide();
     $('#indexBottomDivision').hide();
     $('#validatorsTable').hide();
-    initialShowAllBlocksTableContent();
+    showAllBlocksInitialTableContent();
     $('#allBlocksTable').show();
 }

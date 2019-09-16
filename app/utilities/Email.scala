@@ -15,11 +15,11 @@ class Email @Inject()(mailerClient: MailerClient, masterContacts: master.Contact
 
   private val fromAddress = configuration.get[String]("play.mailer.user")
 
-  private val bounceAddress = configuration.get[String]("play.mailer.user")
+  private val bounceAddress = configuration.get[String]("play.mailer.bounceAddress")
 
-  private val replyTo = configuration.get[String]("play.mailer.user")
+  private val replyTo = configuration.get[String]("play.mailer.replyTo")
 
-  private val charset = "UTF-8"
+  private val charset = configuration.get[String]("play.mailer.charset")
 
   def sendEmail(toAccountID: String, email: constants.Email.Email, messageParameters: Seq[String], ccAccountIDs: Seq[String] = Seq.empty, bccAccountIDs: Seq[String] = Seq.empty, attachments: Seq[Attachment] = Seq.empty, headers: Seq[(String, String)] = Seq.empty)(implicit lang: Lang = Lang(masterAccounts.Service.getLanguage(toAccountID))) {
     try {

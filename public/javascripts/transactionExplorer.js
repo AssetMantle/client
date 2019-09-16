@@ -1,7 +1,5 @@
 getConfigurationAsynchronously("blockchain.main.wsIP");
 getConfigurationAsynchronously("blockchain.main.abciPort");
-getConfigurationAsynchronously("blockchain.main.ip");
-getConfigurationAsynchronously("blockchain.main.restPort");
 
 function transactionExplorer() {
     let wsUrl = getConfiguration("blockchain.main.wsIP") + ":" + getConfiguration("blockchain.main.abciPort") + "/websocket";

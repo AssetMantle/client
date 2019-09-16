@@ -8,7 +8,6 @@ function searchFunction(searchData) {
 
     let heightPattern = /^[0-9]*$/;
     let txHashPattern = /^[A-F0-9]{40}$/;
-    let txHashUrl = getConfiguration("blockchain.main.ip") + ":" + getConfiguration("blockchain.main.restPort") + "/txs/";
 
     if (searchData === undefined) {
         searchData = document.getElementById("searchValue").value;
@@ -29,7 +28,6 @@ function searchFunction(searchData) {
                     document.getElementById('blockHeightPageNumTxs').innerHTML = block[0].header.num_txs;
                     document.getElementById('blockHeightPageEvidenceHash').innerHTML = block[0].header.evidence_hash;
                     document.getElementById('blockHeightPageValidatorsHash').innerHTML = block[0].header.validators_hash;
-
                 },
                 500: {}
             }
@@ -39,7 +37,6 @@ function searchFunction(searchData) {
         $('#validatorsTable').hide();
         $('#txHashBottomDivision').hide();
         $('#blockHeightBottomDivision').show();
-
     }
     let txHash = txHashPattern.exec(searchData);
     if (txHash != null) {

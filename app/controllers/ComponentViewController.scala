@@ -2,7 +2,7 @@ package controllers
 
 import controllers.actions.{WithLoginAction, WithOrganizationLoginAction, WithTraderLoginAction, WithZoneLoginAction}
 import controllers.results.WithUsernameToken
-import exceptions.{BaseException, SerializationException}
+import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Trait.Document
 import models.blockchain.{ACLAccounts, Negotiation}
@@ -21,6 +21,8 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
 
   private implicit val logger: Logger = Logger(this.getClass)
 
+  private val genesisAccountName: String = configuration.get[String]("blockchain.genesis.accountName")
+
   def commonHome: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
@@ -38,7 +40,7 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
   def genesisDetails: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        withUsernameToken.Ok(views.html.component.master.genesisDetails(masterAccounts.Service.getAddress("main")))
+        withUsernameToken.Ok(views.html.component.master.genesisDetails(masterAccounts.Service.getAddress(genesisAccountName)))
       } catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
@@ -48,13 +50,12 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
     implicit request =>
       try {
         loginState.userType match {
-          case constants.User.ZONE => withUsernameToken.Ok(views.html.component.master.zoneDetails(masterZones.Service.get(blockchainZones.Service.getID(loginState.address))))
-          case constants.User.ORGANIZATION => withUsernameToken.Ok(views.html.component.master.zoneDetails(masterZones.Service.get(masterOrganizations.Service.getByAccountID(loginState.username).zoneID)))
-          case constants.User.TRADER => withUsernameToken.Ok(views.html.component.master.zoneDetails(masterZones.Service.get(blockchainAclAccounts.Service.get(loginState.address).zoneID)))
+          case constants.User.ZONE => withUsernameToken.Ok(views.html.component.master.zoneDetails(masterZones.Service.getZoneByAccountID(loginState.username)))
+          case constants.User.ORGANIZATION => withUsernameToken.Ok(views.html.component.master.zoneDetails(masterZones.Service.get(masterOrganizations.Service.getZoneIDByAccountID(loginState.username))))
+          case constants.User.TRADER => withUsernameToken.Ok(views.html.component.master.zoneDetails(masterZones.Service.get(masterTraders.Service.getZoneIDByAccountID(loginState.username))))
         }
       } catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-        case serializationException: SerializationException => InternalServerError(views.html.index(failures = Seq(serializationException.failure)))
       }
   }
 
@@ -62,10 +63,8 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
     implicit request =>
       try {
         loginState.userType match {
-          case constants.User.ORGANIZATION =>
-            withUsernameToken.Ok(views.html.component.master.organizationDetails(masterOrganizations.Service.get(blockchainOrganizations.Service.getID(loginState.address))))
-          case constants.User.TRADER =>
-            withUsernameToken.Ok(views.html.component.master.organizationDetails(masterOrganizations.Service.get(blockchainAclAccounts.Service.get(loginState.address).organizationID)))
+          case constants.User.ORGANIZATION => withUsernameToken.Ok(views.html.component.master.organizationDetails(masterOrganizations.Service.getByAccountID(loginState.username)))
+          case constants.User.TRADER => withUsernameToken.Ok(views.html.component.master.organizationDetails(masterOrganizations.Service.getByAccountID(loginState.username)))
         }
       } catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -194,84 +193,6 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
     implicit request =>
       try {
         withUsernameToken.Ok(views.html.component.master.organizationViewTradersList(masterTraders.Service.getTradersListInOrganization(masterOrganizations.Service.getID(loginState.username))))
-      } catch {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-      }
-  }
-
-  def traderAssetListLengthInOrganization(traderID: String): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
-    implicit request =>
-      try {
-        if (masterTraders.Service.verifyOrganizationTrader(traderID = traderID, masterOrganizations.Service.getID(loginState.username))) {
-          withUsernameToken.Ok(blockchainAssets.Service.getAssetPegWallet(masterAccounts.Service.getAddress(masterTraders.Service.getAccountId(traderID))).length.toString)
-        } else {
-          Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
-        }
-      } catch {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-      }
-  }
-
-  def traderTotalFiatInOrganization(traderID: String): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
-    implicit request =>
-      try {
-        if (masterTraders.Service.verifyOrganizationTrader(traderID = traderID, masterOrganizations.Service.getID(loginState.username))) {
-          withUsernameToken.Ok(blockchainFiats.Service.getFiatPegWallet(masterAccounts.Service.getAddress(masterTraders.Service.getAccountId(traderID))).map(_.transactionAmount.toInt).sum.toString)
-        } else {
-          Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
-        }
-      } catch {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-      }
-  }
-
-  def traderBuyNegotiationListLengthInOrganization(traderID: String): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
-    implicit request =>
-      try {
-        if (masterTraders.Service.verifyOrganizationTrader(traderID = traderID, masterOrganizations.Service.getID(loginState.username))) {
-          withUsernameToken.Ok(blockchainNegotiations.Service.getNegotiationsForBuyerAddress(masterAccounts.Service.getAddress(masterTraders.Service.getAccountId(traderID))).length.toString)
-        } else {
-          Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
-        }
-      } catch {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-      }
-  }
-
-  def traderSellNegotiationListLengthInOrganization(traderID: String): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
-    implicit request =>
-      try {
-        if (masterTraders.Service.verifyOrganizationTrader(traderID = traderID, masterOrganizations.Service.getID(loginState.username))) {
-          withUsernameToken.Ok(blockchainNegotiations.Service.getNegotiationsForSellerAddress(masterAccounts.Service.getAddress(masterTraders.Service.getAccountId(traderID))).length.toString)
-        } else {
-          Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
-        }
-      } catch {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-      }
-  }
-
-  def traderBuyOrderListLengthInOrganization(traderID: String): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
-    implicit request =>
-      try {
-        if (masterTraders.Service.verifyOrganizationTrader(traderID = traderID, masterOrganizations.Service.getID(loginState.username))) {
-          withUsernameToken.Ok(blockchainOrders.Service.getOrders(blockchainNegotiations.Service.getNegotiationIDsForBuyerAddress(masterAccounts.Service.getAddress(masterTraders.Service.getAccountId(traderID)))).length.toString)
-        } else {
-          Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
-        }
-      } catch {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-      }
-  }
-
-  def traderSellOrderListLengthInOrganization(traderID: String): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
-    implicit request =>
-      try {
-        if (masterTraders.Service.verifyOrganizationTrader(traderID = traderID, masterOrganizations.Service.getID(loginState.username))) {
-          withUsernameToken.Ok(blockchainOrders.Service.getOrders(blockchainNegotiations.Service.getNegotiationIDsForSellerAddress(masterAccounts.Service.getAddress(masterTraders.Service.getAccountId(traderID)))).length.toString)
-        } else {
-          Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
-        }
       } catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }

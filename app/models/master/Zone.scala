@@ -9,7 +9,7 @@ import slick.jdbc.JdbcProfile
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
-import scala.util.{Failure, Random, Success}
+import scala.util.{Failure, Success}
 
 case class Zone(id: String, accountID: String, name: String, currency: String, verificationStatus: Option[Boolean] = None)
 
@@ -37,6 +37,14 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
   }
 
   private def findById(id: String): Future[Zone] = db.run(zoneTable.filter(_.id === id).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def findByAccountID(accountID: String): Future[Zone] = db.run(zoneTable.filter(_.accountID === accountID).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -114,6 +122,8 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
     def create(accountID: String, name: String, currency: String): String = Await.result(add(Zone(id = utilities.IDGenerator.hexadecimal, accountID = accountID, name = name, currency = currency)), Duration.Inf)
 
     def get(id: String): Zone = Await.result(findById(id), Duration.Inf)
+
+    def getZoneByAccountID(accountID: String): Zone = Await.result(findByAccountID(accountID), Duration.Inf)
 
     def getAll: Seq[Zone] = Await.result(findAll, Duration.Inf)
 

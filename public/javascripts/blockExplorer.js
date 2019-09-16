@@ -1,3 +1,6 @@
+getConfigurationAsynchronously("blockchain.main.wsIP");
+getConfigurationAsynchronously("blockchain.main.abciPort");
+
 function blockExplorer() {
     let blockExplorerTableBody = "blockContainer";
     let wsURL = getConfiguration("blockchain.main.wsIP") + ":" + getConfiguration("blockchain.main.abciPort") + "/websocket";
@@ -12,7 +15,7 @@ function blockExplorer() {
         let wsNewBlock = new WebSocket(wsURL);
         wsNewBlock.onopen = () => {
             initializeBlockExplorer(blockExplorerTableBody, maxNumberOfItems);
-            initialShowAllBlocksTableContent();
+            showAllBlocksInitialTableContent();
             let requestNewBlock = `{"method":"subscribe", "id":"dontcare","jsonrpc":"2.0","params":["tm.event='NewBlock'"]}`;
             wsNewBlock.send(requestNewBlock)
         };

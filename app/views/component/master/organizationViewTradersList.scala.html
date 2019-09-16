@@ -11,25 +11,11 @@
             <span class="red">@Messages(constants.Form.ACCOUNT_ID)</span>: @trader.accountID<br>
             <span class="red">@Messages(constants.Form.COMPLETION_STATUS)</span>: @trader.completionStatus<br>
             <span class="red">@Messages(constants.Form.VERIFIED_STATUS)</span>: @trader.verificationStatus.getOrElse(Messages(constants.Form.PENDING))<br>
-            @if(trader.verificationStatus.getOrElse(false)) {
-                <span class="red">@Messages(constants.Form.TOTAL_ASSETS_OWNED)</span>: <span id="totalAssetsOwnedValue@trader.id"></span><br>
-                <span class="red">@Messages(constants.Form.TOTAL_FIATS)</span>: <span id="totalFiatsOwnedValue@trader.id"></span><br>
-                <span class="red">@Messages(constants.Form.ON_GOING_BUY_NEGOTIATIONS)</span>: <span id = "onGoingBuyNegotiationListValue@trader.id"></span><br>
-                <span class="red">@Messages(constants.Form.ON_GOING_SELL_NEGOTIATIONS)</span>: <span id = "onGoingSellNegotiationListValue@trader.id"></span><br>
-                <span class="red">@Messages(constants.Form.ON_GOING_BUY_ORDERS)</span>: <span id = "onGoingBuyOrdersListValue@trader.id"></span><br>
-                <span class="red">@Messages(constants.Form.ON_GOING_SELL_ORDERS)</span>: <span id = "onGoingSellOrdersListValue@trader.id"></span><br>
-                <script>
-                        componentResource('totalAssetsOwnedValue@trader.id', jsRoutes.controllers.ComponentViewController.traderAssetListLengthInOrganization('@trader.id'));
-                        componentResource('totalFiatsOwnedValue@trader.id', jsRoutes.controllers.ComponentViewController.traderTotalFiatInOrganization('@trader.id'));
-                        componentResource('onGoingBuyNegotiationListValue@trader.id', jsRoutes.controllers.ComponentViewController.traderBuyNegotiationListLengthInOrganization('@trader.id'));
-                        componentResource('onGoingSellNegotiationListValue@trader.id', jsRoutes.controllers.ComponentViewController.traderSellNegotiationListLengthInOrganization('@trader.id'));
-                        componentResource('onGoingBuyOrdersListValue@trader.id', jsRoutes.controllers.ComponentViewController.traderBuyOrderListLengthInOrganization('@trader.id'));
-                        componentResource('onGoingSellOrdersListValue@trader.id', jsRoutes.controllers.ComponentViewController.traderSellOrderListLengthInOrganization('@trader.id'));
-                </script>
-            }
         </div>
-        <div class="centerText">
-            <button onclick="getForm(jsRoutes.controllers.ComponentViewController.organizationViewTrader('@trader.id'))">@Messages(constants.Form.VIEW)</button>
-        </div>
+        @if(trader.verificationStatus.getOrElse(false)) {
+            <div class="centerText">
+                <button onclick="getForm(jsRoutes.controllers.ComponentViewController.organizationViewTrader('@trader.id'))">@Messages(constants.Form.VIEW)</button>
+            </div>
+        }
     </div>
 }

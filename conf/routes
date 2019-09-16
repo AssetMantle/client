@@ -63,12 +63,6 @@ GET         /master/component/orderList                                         
 GET         /master/component/availableAssetList                                   controllers.ComponentViewController.availableAssetList
 GET         /master/component/availableAssetListWithLogin                          controllers.ComponentViewController.availableAssetListWithLogin
 GET         /master/component/organizationViewTraderList                           controllers.ComponentViewController.organizationViewTraderList
-GET         /master/component/traderAssetListLengthInOrganization                  controllers.ComponentViewController.traderAssetListLengthInOrganization(traderID: String)
-GET         /master/component/traderTotalFiatInOrganization                        controllers.ComponentViewController.traderTotalFiatInOrganization(traderID: String)
-GET         /master/component/traderBuyNegotiationListLengthInOrganization         controllers.ComponentViewController.traderBuyNegotiationListLengthInOrganization(traderID: String)
-GET         /master/component/traderSellNegotiationListLengthInOrganization        controllers.ComponentViewController.traderSellNegotiationListLengthInOrganization(traderID: String)
-GET         /master/component/traderBuyOrderListLengthInOrganization               controllers.ComponentViewController.traderBuyOrderListLengthInOrganization(traderID: String)
-GET         /master/component/traderSellOrderListLengthInOrganization              controllers.ComponentViewController.traderSellOrderListLengthInOrganization(traderID: String)
 GET         /master/component/organizationViewTrader                               controllers.ComponentViewController.organizationViewTrader(traderID: String)
 
 GET         /master/component/releaseAssetList                                     controllers.ReleaseAssetController.releaseAssetList

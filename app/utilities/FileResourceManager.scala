@@ -1,14 +1,14 @@
 package utilities
 
 import exceptions.BaseException
-import org.apache.commons.codec.binary.Base64
 import javax.inject.Inject
 import models.Trait.Document
+import org.apache.commons.codec.binary.Base64
 import play.api.{Configuration, Logger}
 
 import scala.concurrent.ExecutionContext
 
-class FileResourceManager @Inject()()(implicit exec: ExecutionContext, configuration: Configuration){
+class FileResourceManager @Inject()()(implicit exec: ExecutionContext, configuration: Configuration) {
 
   private implicit val module: String = constants.Module.FILE_RESOURCE_MANAGER
 
@@ -23,6 +23,8 @@ class FileResourceManager @Inject()()(implicit exec: ExecutionContext, configura
   private val uploadZoneKycBankDetailsPath = configuration.get[String]("upload.zone.bankDetailsPath")
 
   private val uploadZoneKycIdentificationPath = configuration.get[String]("upload.zone.identificationPath")
+
+  private val uploadOrganizationAgreementPath = configuration.get[String]("upload.organization.agreementPath")
 
   private val uploadOrganizationKYCBankAccountDetailPath = configuration.get[String]("upload.organization.bankAccountDetailPath")
 
@@ -39,6 +41,8 @@ class FileResourceManager @Inject()()(implicit exec: ExecutionContext, configura
   private val uploadOrganizationKycShareStructurePath = configuration.get[String]("upload.organization.shareStructurePath")
 
   private val uploadTraderKycIdentificationPath = configuration.get[String]("upload.trader.identificationPath")
+
+  private val uploadTraderAgreementPath = configuration.get[String]("upload.trader.agreementPath")
 
   def getAccountKycFilePath(documentType: String): String = {
     documentType match {
@@ -65,6 +69,7 @@ class FileResourceManager @Inject()()(implicit exec: ExecutionContext, configura
       case constants.File.MANAGEMENT => uploadOrganizationKycManagementPath
       case constants.File.ACRA => uploadOrganizationKYCACRAPath
       case constants.File.SHARE_STRUCTURE => uploadOrganizationKycShareStructurePath
+      case constants.File.ORGANIZATION_AGREEMENT => uploadOrganizationAgreementPath
       case _ => constants.File.UNKNOWN_TYPE
     }
   }
@@ -72,6 +77,7 @@ class FileResourceManager @Inject()()(implicit exec: ExecutionContext, configura
   def getTraderKycFilePath(documentType: String): String = {
     documentType match {
       case constants.File.TRADER_IDENTIFICATION => uploadTraderKycIdentificationPath
+      case constants.File.TRADER_AGREEMENT => uploadTraderAgreementPath
       case _ => constants.File.UNKNOWN_TYPE
     }
   }

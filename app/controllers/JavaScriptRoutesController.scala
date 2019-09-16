@@ -60,12 +60,6 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ComponentViewController.availableAssetListWithLogin,
 
         routes.javascript.ComponentViewController.organizationViewTraderList,
-        routes.javascript.ComponentViewController.traderAssetListLengthInOrganization,
-        routes.javascript.ComponentViewController.traderTotalFiatInOrganization,
-        routes.javascript.ComponentViewController.traderBuyNegotiationListLengthInOrganization,
-        routes.javascript.ComponentViewController.traderSellNegotiationListLengthInOrganization,
-        routes.javascript.ComponentViewController.traderBuyOrderListLengthInOrganization,
-        routes.javascript.ComponentViewController.traderSellOrderListLengthInOrganization,
         routes.javascript.ComponentViewController.organizationViewTrader,
 
         routes.javascript.ComponentViewController.profileDocuments,

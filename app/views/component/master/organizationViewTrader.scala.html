@@ -18,7 +18,7 @@
 </div> <br>
 
 @if(trader.verificationStatus.getOrElse(false)) {
-    <div id = "traderAssetDetails@trader.id"><span class="centerText">@Messages(constants.Form.ASSETS): </span><br>
+    <div id = "traderAssetDetails@trader.id">@Messages(constants.Form.ASSETS): <br>
         @for(asset <- assets) {
             <div class="flexItem box thirdBox lightBlue">
                 <div class="leftText">
@@ -37,8 +37,7 @@
     </div>
     <br>
 
-    <div id="traderFiatDetail"><span class="centerText">@Messages(constants.Form.TOTAL_FIATS)
-        : @fiats.map(_.transactionAmount.toInt).sum.toString</span><br>
+    <div id="traderFiatDetail">@Messages(constants.Form.TOTAL_FIATS): @fiats.map(_.transactionAmount.toInt).sum.toString<br>
         @for(fiat <- fiats) {
             <div class="flexItem box thirdBox lightBlue">
                 <div class="leftText">
@@ -52,8 +51,7 @@
     </div>
     <br>
 
-    <div id="traderNegotiationDetails@trader.id">
-        <span class="centerText">@Messages(constants.Form.ON_GOING_BUY_NEGOTIATIONS): </span><br>
+    <div id="traderNegotiationDetails@trader.id">@Messages(constants.Form.ON_GOING_BUY_NEGOTIATIONS): <br>
         @for(buyNegotiation <- buyNegotiations) {
             <div class="flexItem box thirdBox lightBlue">
                 <div class="leftText">
@@ -101,8 +99,7 @@
     </div>
     <br>
 
-    <div id="traderOrderDetails@trader.id">
-        <span class="centerText">@Messages(constants.Form.ON_GOING_BUY_ORDERS): </span><br>
+    <div id="traderOrderDetails@trader.id">@Messages(constants.Form.ON_GOING_BUY_ORDERS):<br>
         @for(buyOrder <- buyOrders) {
             <div class="flexItem box thirdBox lightBlue">
                 <div class="leftText">

@@ -22,21 +22,9 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
 
   private implicit val module: String = constants.Module.FILE_CONTROLLER
 
-  private val uploadAccountKycBankDetailsPath: String = configuration.get[String]("upload.account.bankDetailsPath")
-
-  private val uploadAccountKycIdentificationPath: String = configuration.get[String]("upload.account.identificationPath")
-
-  private val uploadAccountProfilePicturePath: String = configuration.get[String]("upload.account.profilePicturePath")
-
   private val uploadZoneKycBankDetailsPath: String = configuration.get[String]("upload.zone.bankDetailsPath")
 
   private val uploadZoneKycIdentificationPath: String = configuration.get[String]("upload.zone.identificationPath")
-
-  private val uploadOrganizationKYCbankAccountDetailPath: String = configuration.get[String]("upload.organization.bankAccountDetailPath")
-
-  private val uploadOrganizationKycIdentificationPath: String = configuration.get[String]("upload.organization.identificationPath")
-
-  private val uploadTraderKycIdentificationPath: String = configuration.get[String]("upload.trader.identificationPath")
 
   def checkAccountKycFileExists(accountID: String, documentType: String): Action[AnyContent] = Action { implicit request =>
     if (masterAccountKYCs.Service.checkFileExists(id = accountID, documentType = documentType)) Ok else NoContent

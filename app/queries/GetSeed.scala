@@ -1,4 +1,4 @@
-package transactions
+package queries
 
 import java.net.ConnectException
 

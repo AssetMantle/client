@@ -108,6 +108,14 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
     }
   }
 
+  private def getZoneIDOnAccountID(accountID: String): Future[String] = db.run(organizationTable.filter(_.accountID === accountID).map(_.zoneID).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
   private def getVerificationStatusById(id: String): Future[Option[Boolean]] = db.run(organizationTable.filter(_.id === id).map(_.verificationStatus.?).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -202,7 +210,7 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
 
     def create(zoneID: String, accountID: String, name: String, abbreviation: Option[String], establishmentDate: Date, email: String, registeredAddress: Address, postalAddress: Address, ubos: UBOs): String = Await.result(add(serialize(Organization(id = utilities.IDGenerator.hexadecimal, zoneID = zoneID, accountID = accountID, name = name, abbreviation = abbreviation, establishmentDate = establishmentDate, registeredAddress = registeredAddress, postalAddress = postalAddress, email = email, ubos = ubos))), Duration.Inf)
 
-    def insertOrUpdateOrganizationWithoutUBO(zoneID: String, accountID: String, name: String, abbreviation: Option[String], establishmentDate: Date, email: String, registeredAddress: Address, postalAddress: Address): String = {
+    def insertOrUpdateOrganizationWithoutUBOs(zoneID: String, accountID: String, name: String, abbreviation: Option[String], establishmentDate: Date, email: String, registeredAddress: Address, postalAddress: Address): String = {
       val id = Await.result(getIDByAccountID(accountID), Duration.Inf).getOrElse(utilities.IDGenerator.hexadecimal)
       Await.result(upsert(serialize(Organization(id = id, zoneID = zoneID, accountID = accountID, name = name, abbreviation = abbreviation, establishmentDate = establishmentDate, registeredAddress = registeredAddress, postalAddress = postalAddress, email = email, ubos = getUBOs(id)))), Duration.Inf)
       id
@@ -217,6 +225,8 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
     def getByAccountID(accountID: String): Organization = Await.result(findByAccountID(accountID), Duration.Inf).deserialize
 
     def getZoneID(id: String): String = Await.result(getZoneIDByID(id), Duration.Inf)
+
+    def getZoneIDByAccountID(accountID: String): String = Await.result(getZoneIDOnAccountID(accountID), Duration.Inf)
 
     def rejectOrganization(id: String): Int = Await.result(updateVerificationStatusOnID(id, Option(false)), Duration.Inf)
 

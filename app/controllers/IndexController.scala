@@ -2,7 +2,7 @@ package controllers
 
 import controllers.actions.WithLoginAction
 import controllers.results.WithUsernameToken
-import exceptions.{BaseException, SerializationException}
+import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.blockchain
 import models.blockchain.ACLAccounts
@@ -43,7 +43,6 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
       }
       catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-        case serializationException: SerializationException => InternalServerError(views.html.index(failures = Seq(serializationException.failure)))
       }
   }
 }

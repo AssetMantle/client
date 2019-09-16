@@ -4,7 +4,7 @@ import java.nio.file.Files
 
 import controllers.actions._
 import controllers.results.WithUsernameToken
-import exceptions.{BaseException, SerializationException}
+import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.{blockchain, blockchainTransaction, master, masterTransaction}
 import play.api.i18n.{I18nSupport, Messages}
@@ -203,7 +203,6 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
         Ok(views.html.component.master.reviewTraderCompletion(views.companion.master.TraderCompletion.form, trader = trader, organization = masterOrganizations.Service.get(trader.organizationID), zone = masterZones.Service.get(trader.zoneID), traderKYCs = masterTraderKYCs.Service.getAllDocuments(trader.id)))
       } catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-        case serializationException: SerializationException => InternalServerError(views.html.index(failures = Seq(serializationException.failure)))
       }
   }
 
@@ -216,7 +215,6 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
             BadRequest(views.html.component.master.reviewTraderCompletion(formWithErrors, trader = trader, organization = masterOrganizations.Service.get(trader.organizationID), zone = masterZones.Service.get(trader.zoneID), traderKYCs = masterTraderKYCs.Service.getAllDocuments(trader.id)))
           } catch {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-            case serializationException: SerializationException => InternalServerError(views.html.index(failures = Seq(serializationException.failure)))
           }
         },
         reviewTraderCompletionData => {
@@ -232,7 +230,6 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
           }
           catch {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-            case serializationException: SerializationException => InternalServerError(views.html.index(failures = Seq(serializationException.failure)))
           }
         }
       )
@@ -443,7 +440,6 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
       }
       catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-        case serializationException: SerializationException => InternalServerError(views.html.index(failures = Seq(serializationException.failure)))
       }
   }
 
@@ -516,7 +512,6 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
       }
       catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-        case serializationException: SerializationException => InternalServerError(views.html.index(failures = Seq(serializationException.failure)))
       }
   }
 
@@ -531,7 +526,6 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
       }
       catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-        case serializationException: SerializationException => InternalServerError(views.html.index(failures = Seq(serializationException.failure)))
       }
   }
 

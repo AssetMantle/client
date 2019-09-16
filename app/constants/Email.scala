@@ -4,15 +4,15 @@ object Email {
   val LOGIN = "LOGIN"
   val OTP = "OTP"
 
-  val VERIFY_EMAIL_OTP: Email = new Email("VERIFY_EMAIL_OTP", "VERIFY_EMAIL_OTP") {
+  val VERIFY_EMAIL_OTP: Email = new Email("SUBJECT_VERIFY_EMAIL_OTP", "TITLE_VERIFY_EMAIL_OTP") {
     def message(messageParameters: Seq[String]): String = messageParameters.head
   }
 
-  val TRADER_INVITATION: Email = new Email("TRADER_INVITATION", "TRADER_INVITATION") {
+  val TRADER_INVITATION: Email = new Email("SUBJECT_TRADER_INVITATION", "TITLE_TRADER_INVITATION") {
     def message(messageParameters: Seq[String]): String = messageParameters.head
   }
 
-  val FORGOT_PASSWORD_EMAIL_OTP: Email = new Email("FORGOT_PASSWORD_EMAIL_OTP", "FORGOT_PASSWORD_EMAIL_OTP") {
+  val FORGOT_PASSWORD_EMAIL_OTP: Email = new Email("SUBJECT_FORGOT_PASSWORD_EMAIL_OTP", "TITLE_FORGOT_PASSWORD_EMAIL_OTP") {
     def message(messageParameters: Seq[String]): String = messageParameters.head
   }
 
