@@ -33,26 +33,23 @@ class Notification @Inject()(masterContacts: master.Contacts,
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  //Email constants
-  private val fromAddress = configuration.get[String]("play.mailer.user")
+  private val emailFromAddress = configuration.get[String]("play.mailer.user")
 
-  private val bounceAddress = configuration.get[String]("play.mailer.bounceAddress")
+  private val emailBounceAddress = configuration.get[String]("play.mailer.bounceAddress")
 
-  private val replyTo = configuration.get[String]("play.mailer.replyTo")
+  private val emailReplyTo = configuration.get[String]("play.mailer.replyTo")
 
-  private val charset = configuration.get[String]("play.mailer.charset")
+  private val emailCharset = configuration.get[String]("play.mailer.charset")
 
-  //SMS Constants
-  private val accountSID = configuration.get[String]("twilio.accountSID")
+  private val smsAccountSID = configuration.get[String]("twilio.accountSID")
 
-  private val authToken = configuration.get[String]("twilio.authToken")
+  private val smsAuthToken = configuration.get[String]("twilio.authToken")
 
-  private val fromNumber = new PhoneNumber(configuration.get[String]("twilio.fromNumber"))
+  private val smsFromNumber = new PhoneNumber(configuration.get[String]("twilio.fromNumber"))
 
-  //PushNotification Constants
-  private val url = configuration.get[String]("notification.url")
+  private val pushNotificationURL = configuration.get[String]("notification.url")
 
-  private val authorizationKey = configuration.get[String]("notification.authorizationKey")
+  private val pushNotificationAuthorizationKey = configuration.get[String]("notification.authorizationKey")
 
   private case class Notification(title: String, body: String)
 
@@ -64,8 +61,8 @@ class Notification @Inject()(masterContacts: master.Contacts,
 
   private def sendSMS(accountID: String, sms: constants.Notification.SMS, messageParameters: String*)(implicit lang: Lang) = {
     try {
-      Twilio.init(accountSID, authToken)
-      Message.creator(new PhoneNumber(masterContacts.Service.getMobileNumber(accountID)), fromNumber, messagesApi(sms.message, messageParameters: _*)).create()
+      Twilio.init(smsAccountSID, smsAuthToken)
+      Message.creator(new PhoneNumber(masterContacts.Service.getMobileNumber(accountID)), smsFromNumber, messagesApi(sms.message, messageParameters: _*)).create()
     }
     catch {
       case baseException: BaseException => logger.error(baseException.failure.message, baseException)
@@ -82,7 +79,7 @@ class Notification @Inject()(masterContacts: master.Contacts,
       val title = messagesApi(pushNotification.title)
       val message = messagesApi(pushNotification.message, messageParameters: _*)
       masterTransactionNotifications.Service.create(accountID, title, message)
-      masterTransactionAccountTokens.Service.getTokenById(accountID).foreach(notificationToken => wsClient.url(url).withHttpHeaders(constants.Header.CONTENT_TYPE -> constants.Header.APPLICATION_JSON).withHttpHeaders(constants.Header.AUTHORIZATION -> authorizationKey).post(Json.toJson(Data(notificationToken, Notification(title, message)))))
+      masterTransactionAccountTokens.Service.getTokenById(accountID).foreach(notificationToken => wsClient.url(pushNotificationURL).withHttpHeaders(constants.Header.CONTENT_TYPE -> constants.Header.APPLICATION_JSON).withHttpHeaders(constants.Header.AUTHORIZATION -> pushNotificationAuthorizationKey).post(Json.toJson(Data(notificationToken, Notification(title, message)))))
     } catch {
       case baseException: BaseException => logger.error(baseException.failure.message, baseException)
         throw baseException
@@ -94,12 +91,12 @@ class Notification @Inject()(masterContacts: master.Contacts,
       val toEmailAddress = if (email == constants.Notification.VERIFY_EMAIL.email.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION))) masterContacts.Service.getUnverifiedEmailAddress(toAccountID) else masterContacts.Service.getVerifiedEmailAddress(toAccountID)
       mailerClient.send(Email(
         subject = messagesApi(email.subject),
-        from = fromAddress,
+        from = emailFromAddress,
         to = Seq(toEmailAddress),
         bodyHtml = Option(views.html.mail(messagesApi(email.message, messageParameters: _*)).toString),
-        charset = Option(charset),
-        replyTo = Seq(replyTo),
-        bounceAddress = Option(bounceAddress),
+        charset = Option(emailCharset),
+        replyTo = Seq(emailReplyTo),
+        bounceAddress = Option(emailBounceAddress),
       ))
     }
     catch {
