@@ -13,7 +13,7 @@ function validateForm(form) {
             }
 
             let errorStatement = "";
-            if (inputElement.type === "date" || inputElement.type === "checkbox") {
+            if (inputElement.type === "date" || inputElement.type === "checkbox" || (inputElement.getAttribute("required")==="false" && inputValue==="")) {
                 return;
             }
 
