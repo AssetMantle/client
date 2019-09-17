@@ -12,7 +12,6 @@ import play.api.{Configuration, Logger}
 import queries.responses.TraderReputationResponse
 import slick.jdbc.JdbcProfile
 import transactions.responses.TransactionResponse.BlockResponse
-import utilities.PushNotification
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
@@ -23,7 +22,7 @@ case class SetACL(from: String, aclAddress: String, organizationID: String, zone
 }
 
 @Singleton
-class SetACLs @Inject()(actorSystem: ActorSystem, transaction: utilities.Transaction, protected val databaseConfigProvider: DatabaseConfigProvider, blockchainTransactionFeedbacks: blockchain.TransactionFeedbacks, transactionSetACL: transactions.SetACL, blockchainAccounts: blockchain.Accounts, blockchainAclHashes: blockchain.ACLHashes, blockchainAclAccounts: blockchain.ACLAccounts, pushNotification: PushNotification, masterAccounts: master.Accounts, masterTraders: master.Traders, masterTraderKYCs: master.TraderKYCs)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
+class SetACLs @Inject()(actorSystem: ActorSystem, transaction: utilities.Transaction, protected val databaseConfigProvider: DatabaseConfigProvider, blockchainTransactionFeedbacks: blockchain.TransactionFeedbacks, transactionSetACL: transactions.SetACL, blockchainAccounts: blockchain.Accounts, blockchainAclHashes: blockchain.ACLHashes, blockchainAclAccounts: blockchain.ACLAccounts, utilitiesNotification: utilities.Notification, masterAccounts: master.Accounts, masterTraders: master.Traders, masterTraderKYCs: master.TraderKYCs)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_SET_ACL
 
@@ -186,8 +185,8 @@ class SetACLs @Inject()(actorSystem: ActorSystem, transaction: utilities.Transac
         masterTraderKYCs.Service.zoneVerifyAll(aclAccountID)
         blockchainAccounts.Service.markDirty(setACL.from)
         blockchainTransactionFeedbacks.Service.insertOrUpdate(setACL.aclAddress, TraderReputationResponse.TransactionFeedbackResponse("0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"), dirtyBit = true)
-        pushNotification.send(aclAccountID, constants.Notification.PUSH_NOTIFICATION_SUCCESS, blockResponse.txhash)
-        pushNotification.send(masterAccounts.Service.getId(setACL.from), constants.Notification.PUSH_NOTIFICATION_SUCCESS, blockResponse.txhash)
+        utilitiesNotification.send(aclAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
+        utilitiesNotification.send(masterAccounts.Service.getId(setACL.from), constants.Notification.SUCCESS, blockResponse.txhash)
       } catch {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
           throw new BaseException(constants.Response.PSQL_EXCEPTION)
@@ -198,8 +197,8 @@ class SetACLs @Inject()(actorSystem: ActorSystem, transaction: utilities.Transac
       try {
         Service.markTransactionFailed(ticketID, message)
         val setACL = Service.getTransaction(ticketID)
-        pushNotification.send(masterAccounts.Service.getId(setACL.aclAddress), constants.Notification.PUSH_NOTIFICATION_FAILURE, message)
-        pushNotification.send(masterAccounts.Service.getId(setACL.from), constants.Notification.PUSH_NOTIFICATION_FAILURE, message)
+        utilitiesNotification.send(masterAccounts.Service.getId(setACL.aclAddress), constants.Notification.FAILURE, message)
+        utilitiesNotification.send(masterAccounts.Service.getId(setACL.from), constants.Notification.FAILURE, message)
       } catch {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }

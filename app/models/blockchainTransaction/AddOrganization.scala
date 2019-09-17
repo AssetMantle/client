@@ -10,7 +10,6 @@ import play.api.db.slick.DatabaseConfigProvider
 import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
 import transactions.responses.TransactionResponse.BlockResponse
-import utilities.PushNotification
 
 import scala.concurrent.duration.{Duration, _}
 import scala.concurrent.{Await, ExecutionContext, Future}
@@ -21,7 +20,7 @@ case class AddOrganization(from: String, to: String, organizationID: String, zon
 }
 
 @Singleton
-class AddOrganizations @Inject()(actorSystem: ActorSystem, transaction: utilities.Transaction, protected val databaseConfigProvider: DatabaseConfigProvider, masterOrganizationKYCs: master.OrganizationKYCs, transactionAddOrganization: transactions.AddOrganization, pushNotification: PushNotification, masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts, blockchainOrganizations: blockchain.Organizations, masterOrganizations: master.Organizations)(implicit configuration: Configuration, executionContext: ExecutionContext) {
+class AddOrganizations @Inject()(actorSystem: ActorSystem, transaction: utilities.Transaction, protected val databaseConfigProvider: DatabaseConfigProvider, masterOrganizationKYCs: master.OrganizationKYCs, transactionAddOrganization: transactions.AddOrganization, utilitiesNotification: utilities.Notification, masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts, blockchainOrganizations: blockchain.Organizations, masterOrganizations: master.Organizations)(implicit configuration: Configuration, executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_ADD_ORGANIZATION
 
@@ -179,8 +178,8 @@ class AddOrganizations @Inject()(actorSystem: ActorSystem, transaction: utilitie
         val organizationAccountId = masterAccounts.Service.getId(addOrganization.to)
         masterOrganizationKYCs.Service.verifyAll(organizationAccountId)
         blockchainAccounts.Service.markDirty(addOrganization.from)
-        pushNotification.send(organizationAccountId, constants.Notification.PUSH_NOTIFICATION_SUCCESS, blockResponse.txhash)
-        pushNotification.send(masterAccounts.Service.getId(addOrganization.from), constants.Notification.PUSH_NOTIFICATION_SUCCESS, blockResponse.txhash)
+        utilitiesNotification.send(organizationAccountId, constants.Notification.SUCCESS, blockResponse.txhash)
+        utilitiesNotification.send(masterAccounts.Service.getId(addOrganization.from), constants.Notification.SUCCESS, blockResponse.txhash)
       } catch {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
           throw new BaseException(constants.Response.PSQL_EXCEPTION)
@@ -191,8 +190,8 @@ class AddOrganizations @Inject()(actorSystem: ActorSystem, transaction: utilitie
       try {
         Service.markTransactionFailed(ticketID, message)
         val addOrganization = Service.getTransaction(ticketID)
-        pushNotification.send(masterAccounts.Service.getId(addOrganization.to), constants.Notification.PUSH_NOTIFICATION_FAILURE, message)
-        pushNotification.send(masterAccounts.Service.getId(addOrganization.from), constants.Notification.PUSH_NOTIFICATION_FAILURE, message)
+        utilitiesNotification.send(masterAccounts.Service.getId(addOrganization.to), constants.Notification.FAILURE, message)
+        utilitiesNotification.send(masterAccounts.Service.getId(addOrganization.from), constants.Notification.FAILURE, message)
       } catch {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
