@@ -49,7 +49,7 @@ class Notification @Inject()(masterContacts: master.Contacts,
 
   private val fromNumber = new PhoneNumber(configuration.get[String]("twilio.fromNumber"))
 
-  //PushNotification
+  //PushNotification Constants
   private val url = configuration.get[String]("notification.url")
 
   private val authorizationKey = configuration.get[String]("notification.authorizationKey")
