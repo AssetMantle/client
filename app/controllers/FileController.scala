@@ -8,6 +8,7 @@ import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject._
 import models.{blockchain, master, masterTransaction}
+import models.common.Serializable
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.libs.json.Json
 import play.api.libs.ws.WSClient
@@ -18,7 +19,7 @@ import views.companion.master.FileUpload
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class FileController @Inject()(messagesControllerComponents: MessagesControllerComponents, withLoginAction: WithLoginAction, masterAccountFiles: master.AccountFiles, masterTransactionAssetFiles: masterTransaction.AssetFiles, masterTransactionNegotiationFiles: masterTransaction.NegotiationFiles, masterTransactionIssueAssetRequests: masterTransaction.IssueAssetRequests, blockchainACLs: blockchain.ACLAccounts, masterAccounts: master.Accounts, masterZones: master.Zones, masterOrganizations: master.Organizations, masterTraders: master.Traders, masterAccountKYCs: master.AccountKYCs, fileResourceManager: utilities.FileResourceManager, withGenesisLoginAction: WithGenesisLoginAction, withUserLoginAction: WithUserLoginAction, masterZoneKYCs: master.ZoneKYCs, withZoneLoginAction: WithZoneLoginAction, masterOrganizationKYCs: master.OrganizationKYCs, withOrganizationLoginAction: WithOrganizationLoginAction, masterTraderKYCs: master.TraderKYCs, withTraderLoginAction: WithTraderLoginAction, withUsernameToken: WithUsernameToken)(implicit exec: ExecutionContext, configuration: Configuration, wsClient: WSClient) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class FileController @Inject()(messagesControllerComponents: MessagesControllerComponents, withLoginAction: WithLoginAction, masterAccountFiles: master.AccountFiles, masterTransactionAssetFiles: masterTransaction.AssetFiles, masterTransactionNegotiationFiles: masterTransaction.NegotiationFiles, masterTransactionIssueAssetRequests: masterTransaction.IssueAssetRequests, masterTransactionNegotiationRequests: masterTransaction.NegotiationRequests, blockchainACLs: blockchain.ACLAccounts, masterAccounts: master.Accounts, masterZones: master.Zones, masterOrganizations: master.Organizations, masterTraders: master.Traders, masterAccountKYCs: master.AccountKYCs, fileResourceManager: utilities.FileResourceManager, withGenesisLoginAction: WithGenesisLoginAction, withUserLoginAction: WithUserLoginAction, masterZoneKYCs: master.ZoneKYCs, withZoneLoginAction: WithZoneLoginAction, masterOrganizationKYCs: master.OrganizationKYCs, withOrganizationLoginAction: WithOrganizationLoginAction, masterTraderKYCs: master.TraderKYCs, withTraderLoginAction: WithTraderLoginAction, withUsernameToken: WithUsernameToken)(implicit exec: ExecutionContext, configuration: Configuration, wsClient: WSClient) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -427,20 +428,14 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
         )
         documentType match {
           case constants.File.OBL =>
-            PartialContent(views.html.component.master.issueAssetOBL(views.companion.master.IssueAssetOBL.form.fill(views.companion.master.IssueAssetOBL.Data(id, "", "", "", "", "", "",  new Date(0), "", 0, 0))))
-
+            PartialContent(views.html.component.master.issueAssetOBL(views.companion.master.IssueAssetOBL.form.fill(views.companion.master.IssueAssetOBL.Data(id, "", "", "", "", "", "",  new Date, "", 0, 0)), masterTransactionAssetFiles.Service.getOrNone(id, constants.File.OBL)))
           case constants.File.INVOICE =>
-            PartialContent(views.html.component.master.issueAssetInvoice(views.companion.master.IssueAssetInvoice.form.fill(views.companion.master.IssueAssetInvoice.Data(id, "",  new Date(0)))))
-
-          case constants.File.CONTRACT => PartialContent(views.html.component.master.issueAssetDocument(id))
-          case constants.File.PACKING_LIST => PartialContent(views.html.component.master.issueAssetDocument(id))
-          case constants.File.COO => PartialContent(views.html.component.master.issueAssetDocument(id))
-          case constants.File.COA => PartialContent(views.html.component.master.issueAssetDocument(id))
-          case constants.File.OTHER => PartialContent(views.html.component.master.issueAssetDocument(id))
+            PartialContent(views.html.component.master.issueAssetInvoice(views.companion.master.IssueAssetInvoice.form.fill(views.companion.master.IssueAssetInvoice.Data(id, "",  new Date)), masterTransactionAssetFiles.Service.getOrNone(id, constants.File.INVOICE)))
+          case constants.File.CONTRACT | constants.File.PACKING_LIST | constants.File.COO | constants.File.COA | constants.File.OTHER => PartialContent(views.html.component.master.issueAssetDocument(id, masterTransactionAssetFiles.Service.getDocuments(id, constants.File.TRADER_ASSET_DOCUMENT_TYPES_UPLOAD_PAGE)))
           case _ => Ok(views.html.index())
         }
       } catch {
-        case baseException: BaseException => InternalServerError(Messages(baseException.failure.message))
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
@@ -457,22 +452,16 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
         )
         documentType match {
           case constants.File.OBL =>
-            val obl = Json.parse(masterTransactionAssetFiles.Service.getOrEmpty(id, constants.File.OBL).context.getOrElse(Json.toJson(masterTransaction.AssetFileTypeContext.OBL("", "", "", "", "", "",  new Date(0), "", 0, 0)).toString)).as[masterTransaction.AssetFileTypeContext.OBL]
-            PartialContent(views.html.component.master.issueAssetOBL(views.companion.master.IssueAssetOBL.form.fill(views.companion.master.IssueAssetOBL.Data(id, obl.billOfLadingId, obl.portOfLoading, obl.shipperName, obl.shipperAddress, obl.notifyPartyName, obl.notifyPartyAddress, obl.dateOfShipping, obl.deliveryTerm, obl.weightOfConsignment, obl.declaredAssetValue))))
-
+            val obl = Json.parse(masterTransactionAssetFiles.Service.getOrEmpty(id, constants.File.OBL).context.getOrElse(Json.toJson(Serializable.OBL("", "", "", "", "", "",  new Date, "", 0, 0)).toString)).as[Serializable.OBL]
+            PartialContent(views.html.component.master.issueAssetOBL(views.companion.master.IssueAssetOBL.form.fill(views.companion.master.IssueAssetOBL.Data(id, obl.billOfLadingID, obl.portOfLoading, obl.shipperName, obl.shipperAddress, obl.notifyPartyName, obl.notifyPartyAddress, obl.dateOfShipping, obl.deliveryTerm, obl.weightOfConsignment, obl.declaredAssetValue)), masterTransactionAssetFiles.Service.getOrNone(id, constants.File.OBL)))
           case constants.File.INVOICE =>
-            val invoice = Json.parse(masterTransactionAssetFiles.Service.getOrEmpty(id, constants.File.INVOICE).context.getOrElse(Json.toJson(masterTransaction.AssetFileTypeContext.Invoice("",  new Date(0))).toString)).as[masterTransaction.AssetFileTypeContext.Invoice]
-            PartialContent(views.html.component.master.issueAssetInvoice(views.companion.master.IssueAssetInvoice.form.fill(views.companion.master.IssueAssetInvoice.Data(id, invoice.invoiceNumber, invoice.invoiceDate))))
-
-          case constants.File.CONTRACT => PartialContent(views.html.component.master.issueAssetDocument(id))
-          case constants.File.PACKING_LIST => PartialContent(views.html.component.master.issueAssetDocument(id))
-          case constants.File.COO => PartialContent(views.html.component.master.issueAssetDocument(id))
-          case constants.File.COA => PartialContent(views.html.component.master.issueAssetDocument(id))
-          case constants.File.OTHER => PartialContent(views.html.component.master.issueAssetDocument(id))
+            val invoice = Json.parse(masterTransactionAssetFiles.Service.getOrEmpty(id, constants.File.INVOICE).context.getOrElse(Json.toJson(Serializable.Invoice("",  new Date)).toString)).as[Serializable.Invoice]
+            PartialContent(views.html.component.master.issueAssetInvoice(views.companion.master.IssueAssetInvoice.form.fill(views.companion.master.IssueAssetInvoice.Data(id, invoice.invoiceNumber, invoice.invoiceDate)), masterTransactionAssetFiles.Service.getOrNone(id, constants.File.INVOICE)))
+          case constants.File.CONTRACT | constants.File.PACKING_LIST | constants.File.COO | constants.File.COA | constants.File.OTHER => PartialContent(views.html.component.master.issueAssetDocument(id, masterTransactionAssetFiles.Service.getDocuments(id, constants.File.TRADER_ASSET_DOCUMENT_TYPES_UPLOAD_PAGE)))
           case _ => Ok(views.html.index())
         }
       } catch {
-        case baseException: BaseException => InternalServerError(Messages(baseException.failure.message))
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
@@ -519,7 +508,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
           case _ => Ok(views.html.index())
         }
       } catch {
-        case baseException: BaseException => InternalServerError(Messages(baseException.failure.message))
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
@@ -539,7 +528,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
           case _ => Ok(views.html.index())
         }
       } catch {
-        case baseException: BaseException => InternalServerError(Messages(baseException.failure.message))
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
@@ -699,6 +688,20 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
           case constants.User.USER => if (masterAccountKYCs.Service.checkFileNameExists(id = loginState.username, fileName = fileName)) fileResourceManager.getAccountKycFilePath(documentType) else throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION)
           case _ => if (masterAccountFiles.Service.checkFileNameExists(id = loginState.username, fileName = fileName)) fileResourceManager.getAccountFilePath(documentType) else throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION)
         }
+        Ok.sendFile(utilities.FileOperations.fetchFile(path = path, fileName = fileName))
+      } catch {
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+        case _: NoSuchFileException => InternalServerError(views.html.index(failures = Seq(constants.Response.NO_SUCH_FILE_EXCEPTION)))
+      }
+  }
+
+  def tradingFile(id: String, fileName: String, documentType: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      try {
+        val path: String = documentType match {
+          case constants.File.CONTRACT | constants.File.OBL | constants.File.PACKING_LIST | constants.File.INVOICE| constants.File.COO| constants.File.COA| constants.File.OTHER => if (masterTransactionIssueAssetRequests.Service.getAccountID(id) == loginState.username) fileResourceManager.getTraderAssetFilePath(documentType) else throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION)
+          case constants.File.BUYER_CONTRACT | constants.File.SELLER_CONTRACT | constants.File.FIAT_PROOF | constants.File.AWB_PROOF => if (masterTransactionNegotiationRequests.Service.checkNegotiationAndAccountIDExists(id, loginState.username)) fileResourceManager.getTraderNegotiationFilePath(documentType) else throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION)
+       }
         Ok.sendFile(utilities.FileOperations.fetchFile(path = path, fileName = fileName))
       } catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))

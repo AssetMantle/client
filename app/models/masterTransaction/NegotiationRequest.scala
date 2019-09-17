@@ -44,6 +44,8 @@ class NegotiationRequests @Inject()(protected val databaseConfigProvider: Databa
     }
   }
 
+  private def checkByIDAndAccountID(id: String, accountID: String) = db.run(negotiationRequestTable.filter(_.id === id).filter(negotiationRequest => negotiationRequest.buyerAccountID === accountID || negotiationRequest.sellerAccountID === accountID).exists.result)
+
   private def getNegotiationRequestsWithNullStatus: Future[Seq[NegotiationRequest]] = db.run(negotiationRequestTable.filter(_.status.?.isEmpty).result)
 
   private def updateTicketIDAndStatusByID(id: String, pegHash: String, status: String): Future[Int] = db.run(negotiationRequestTable.filter(_.id === id).map(negotiation => (negotiation.pegHash, negotiation.status)).update((pegHash, status)).asTry).map {
@@ -108,18 +110,15 @@ class NegotiationRequests @Inject()(protected val databaseConfigProvider: Databa
 
   object Service {
 
-    def create(accountID: String, amount: Int): String = Await.result(add(NegotiationRequest(utilities.IDGenerator.requestID(), null, null, null,null ,amount, null, null)), Duration.Inf)
-
-//    def accept(requestID: String, ticketID: String): Int = Await.result(updateTicketIDAndStatusByID(requestID, ticketID, status = Option(true)), Duration.Inf)
-//
-//    def reject(id: String, comment: String): Int = Await.result(updateStatusAndCommentByID(id = id, status = Option(false), comment = comment), Duration.Inf)
+    def create(id: String, negotiationID, amount: Int): String = Await.result(add(NegotiationRequest(utilities.IDGenerator.requestID(), null, null, null,null ,amount, null, null)), Duration.Inf)
 
     def getPendingNegotiationRequests: Seq[NegotiationRequest] = Await.result(getNegotiationRequestsWithNullStatus, Duration.Inf)
 
     def delete(id: String): Int = Await.result(deleteByID(id), Duration.Inf)
 
     def getStatus(id: String): Option[String] = Await.result(getStatusByID(id), Duration.Inf)
-    
+
+    def checkNegotiationAndAccountIDExists(id: String ,accountID: String) = Await.result(checkByIDAndAccountID(id, accountID), Duration.Inf)
   }
 
 }

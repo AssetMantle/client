@@ -16,8 +16,8 @@
 
             @asset.physicalDocumentsHandledVia match {
                 case constants.Option.COMDEX => {
-                    @inputText(confirmTransactionForm(constants.FormField.GAS.name).copy(value = Some(20000.toString)), '_label -> Messages(constants.FormField.GAS.name), 'class -> "cmuk-input hidden", 'type -> "number", 'placeholder -> Messages(constants.FormField.GAS.name), 'required -> true)
-                    @inputPassword(confirmTransactionForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "cmuk-input hidden", 'placeholder -> Messages(constants.FormField.PASSWORD.name), 'required -> true)
+@*//                    @inputText(confirmTransactionForm(constants.FormField.GAS.name).copy(value = Some(20000.toString)), '_label -> Messages(constants.FormField.GAS.name), 'class -> "hidden cmuk-input", 'type -> "number", 'placeholder -> Messages(constants.FormField.GAS.name), 'required -> true)*@
+@*//                    @inputPassword(confirmTransactionForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "hidden cmuk-input", 'placeholder -> Messages(constants.FormField.PASSWORD.name), 'required -> true)*@
                 }
                 case _ => {
                     @inputText(confirmTransactionForm(constants.FormField.GAS.name).copy(value = Some(20000.toString)), '_label -> Messages(constants.FormField.GAS.name), 'class -> "cmuk-input", 'type -> "number", 'placeholder -> Messages(constants.FormField.GAS.name), 'required -> false)
@@ -32,9 +32,9 @@
                 }
                 </ul>
             }
-            <button type="button" class="btn btn-primary btn-sm" onclick="submitForm(this)">@Messages(constants.Form.ISSUE_ASSET_REQUEST)</button>
+            <button type="button" class="btn btn-primary btn-sm" onclick="submitForm(this)">@Messages(constants.Form.SUBMIT)</button>
             <script src="@routes.Assets.versioned("javascripts/showIssueAssetRequestFormFields.js")" type="text/javascript"></script>
         </div>
     </div>
 }
-<script>componentResource('assetDetail', jsRoutes.controllers.IssueAssetController.assetDetail('@asset.id'))</script>
+<script>componentResource('assetDetail', jsRoutes.controllers.IssueAssetController.assetDetail('@confirmTransactionForm.data(constants.FormField.REQUEST_ID.name)'))</script>

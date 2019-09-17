@@ -11,29 +11,30 @@
         } {
             <span class="red">@Messages(constants.Form.STATUS)
                 @if(file.status.getOrElse(false)) {
-                    <span id="verifiedDocumentStatus@file.id @file.documentType" class="result success"><img src="@routes.Assets.versioned("images/success.jpg")"></span>
-                    <span id="unverifiedDocumentStatus@file.id @file.documentType" class="result failure hidden"><img src="@routes.Assets.versioned("images/unverified.png")"></span>
+                    <span id="verifiedDocumentStatus@file.id@file.documentType" class="result success"><img src="@routes.Assets.versioned("images/success.jpg")"></span>
+                    <span id="unverifiedDocumentStatus@file.id@file.documentType" class="result failure hidden"><img src="@routes.Assets.versioned("images/unverified.png")"></span>
                 } else {
-                    <span id="unverifiedDocumentStatus@file.id @file.documentType" class="result failure"><img src="@routes.Assets.versioned("images/unverified.png")"></span>
-                    <span id="verifiedDocumentStatus@file.id @file.documentType" class="result success hidden"><img src="@routes.Assets.versioned("images/success.jpg")">
+                    <span id="unverifiedDocumentStatus@file.id@file.documentType" class="result failure"><img src="@routes.Assets.versioned("images/unverified.png")"></span>
+                    <span id="verifiedDocumentStatus@file.id@file.documentType" class="result success hidden"><img src="@routes.Assets.versioned("images/success.jpg")">
                     }
             </span>
             </span>
-            <div id="organizationKycDocumentStatus@file.id @file.documentType"></div>
+            <div id="traderAssetDocumentStatus@file.id@file.documentType"></div>
             @file.status.getOrElse(None) match {
                 case true => {
-                    <div id="buttonOrganizationKycDocumentStatus@file.id@file.documentType"><button class="btn btn-sm btn-danger" onclick="rejectTraderAssetDocument('@file.id', '@file.documentType')">@Messages(constants.Form.REJECT)</button></div>
+                    <div id="buttonTraderAssetDocumentStatus@file.id@file.documentType"><button class="cmuk-button cmuk-button-danger cmuk-button-small" onclick="rejectTraderAssetDocument('@file.id', '@file.documentType')">@Messages(constants.Form.REJECT)</button></div>
                 }
                 case false => {
-                    <div id="buttonOrganizationKycDocumentStatus@file.id@file.documentType"><button class="btn btn-sm btn-success" onclick="verifyTraderAssetDocument('@file.id', '@file.documentType')">@Messages(constants.Form.APPROVE)</button></div>
+                    <div id="buttonTraderAssetDocumentStatus@file.id@file.documentType"><button class="cmuk-button cmuk-button-success cmuk-button-small" onclick="verifyTraderAssetDocument('@file.id', '@file.documentType')">@Messages(constants.Form.APPROVE)</button></div>
                 }
                 case _ => {
-                    <div id="buttonOrganizationKycDocumentStatus@file.id@file.documentType">
-                        <button class="btn btn-sm btn-success" onclick="verifyTraderAssetDocument('@file.id', '@file.documentType')">@Messages(constants.Form.APPROVE)</button>
-                        <button class="btn btn-sm btn-danger" onclick="rejectTraderAssetDocument('@file.id', '@file.documentType')">@Messages(constants.Form.REJECT)</button>
+                    <div id="buttonTraderAssetDocumentStatus@file.id@file.documentType">
+                        <button class="cmuk-button cmuk-button-danger cmuk-button-small" onclick="verifyTraderAssetDocument('@file.id', '@file.documentType')">@Messages(constants.Form.APPROVE)</button>
+                        <button class="cmuk-button cmuk-button-success cmuk-button-small" onclick="rejectTraderAssetDocument('@file.id', '@file.documentType')">@Messages(constants.Form.REJECT)</button>
                     </div>
                 }
             }
         }
     }
 </div>
+<script src="@routes.Assets.versioned("javascripts/kycVerification.js")" type="text/javascript"></script>

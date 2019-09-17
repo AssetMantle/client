@@ -38,7 +38,7 @@ function verifyTraderAssetDocument(id, documentType) {
         url: route.url,
         type: route.type,
         success: function (result) {
-            document.getElementById('TraderAssetDocumentStatus' + id + documentType).innerHTML = result;
+            document.getElementById('traderAssetDocumentStatus' + id + documentType).innerHTML = result;
             $('#buttonTraderAssetDocumentStatus' + id + documentType).hide();
             document.getElementById('unverifiedDocumentStatus' + id + documentType).style.display = "none";
             document.getElementById('verifiedDocumentStatus' + id + documentType).style.display = "block";
