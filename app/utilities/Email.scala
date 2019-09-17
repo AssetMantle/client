@@ -3,7 +3,7 @@ package utilities
 import exceptions.BaseException
 import javax.inject.Inject
 import models.master
-import play.api.Configuration
+import play.api.{Configuration, Logger}
 import play.api.i18n.{Lang, MessagesApi}
 import play.api.libs.mailer._
 
@@ -12,6 +12,8 @@ import scala.concurrent.ExecutionContext
 class Email @Inject()(mailerClient: MailerClient, masterContacts: master.Contacts, masterAccounts: master.Accounts, messagesApi: MessagesApi)(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
   private implicit val module: String = constants.Module.UTILITIES_EMAIL
+
+  private implicit val logger: Logger = Logger(this.getClass)
 
   private val fromAddress = configuration.get[String]("play.mailer.user")
 
@@ -35,7 +37,8 @@ class Email @Inject()(mailerClient: MailerClient, masterContacts: master.Contact
       ))
     }
     catch {
-      case baseException: BaseException => throw new BaseException(baseException.failure)
+      case baseException: BaseException => logger.error(baseException.failure.message, baseException)
+        throw baseException
     }
   }
 }

@@ -18,6 +18,7 @@ import scala.concurrent.ExecutionContext
 @Singleton
 class AccountController @Inject()(
                                    email: Email,
+                                   utilitiesNotification: utilities.Notification,
                                    shutdownActor: ShutdownActor,
                                    withLoginAction: WithLoginAction,
                                    pushNotification: PushNotification,

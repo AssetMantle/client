@@ -10,6 +10,7 @@ object Notification {
 
 
   //Email
+  val EMAIL_LOGIN = new Email("EMAIL_LOGIN")
   val EMAIL_VERIFY_OTP: Email = new Email("EMAIL_VERIFY_OTP")
   val EMAIL_TRADER_INVITATION: Email = new Email("EMAIL_TRADER_INVITATION")
   val EMAIL_FORGOT_PASSWORD_OTP: Email = new Email("EMAIL_FORGOT_PASSWORD_OTP")
@@ -24,7 +25,7 @@ object Notification {
   val PUSH_NOTIFICATION_FAILURE = new PushNotification("PUSH_NOTIFICATION_FAILURE")
 
   //Notification
-  val SEND_OTP = new Notification()
+  val NOTIFICATION_LOGIN = new Notification(Option(EMAIL_LOGIN), Option(PUSH_NOTIFICATION_LOGIN))
 
   class SMS(private val title: String) {
     val message: String = title + SMS_MESSAGE_SUFFIX
