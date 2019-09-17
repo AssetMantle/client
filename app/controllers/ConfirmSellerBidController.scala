@@ -35,7 +35,7 @@ class ConfirmSellerBidController @Inject()(messagesControllerComponents: Message
             transaction.process[blockchainTransaction.ConfirmSellerBid, transactionsConfirmSellerBid.Request](
               entity = blockchainTransaction.ConfirmSellerBid(from = loginState.address, to = confirmSellerBidData.buyerAddress, bid = confirmSellerBidData.bid, time = confirmSellerBidData.time, pegHash = confirmSellerBidData.pegHash, sellerContractHash = confirmSellerBidData.sellerContractHash, gas = confirmSellerBidData.gas, ticketID = "", mode = transactionMode),
               blockchainTransactionCreate = blockchainTransactionConfirmSellerBids.Service.create,
-              request = transactionsConfirmSellerBid.Request(transactionsConfirmSellerBid.BaseRequest(from = loginState.address, gas = confirmSellerBidData.gas.toString), to = confirmSellerBidData.buyerAddress, password = confirmSellerBidData.password, bid = confirmSellerBidData.bid.toString, time = confirmSellerBidData.time.toString, pegHash = confirmSellerBidData.pegHash, sellerContractHash = confirmSellerBidData.sellerContractHash, mode = transactionMode),
+              request = transactionsConfirmSellerBid.Request(transactionsConfirmSellerBid.BaseReq(from = loginState.address, gas = confirmSellerBidData.gas.toString), to = confirmSellerBidData.buyerAddress, password = confirmSellerBidData.password, bid = confirmSellerBidData.bid.toString, time = confirmSellerBidData.time.toString, pegHash = confirmSellerBidData.pegHash, sellerContractHash = confirmSellerBidData.sellerContractHash, mode = transactionMode),
               action = transactionsConfirmSellerBid.Service.post,
               onSuccess = blockchainTransactionConfirmSellerBids.Utility.onSuccess,
               onFailure = blockchainTransactionConfirmSellerBids.Utility.onFailure,
@@ -61,7 +61,7 @@ class ConfirmSellerBidController @Inject()(messagesControllerComponents: Message
       },
       confirmSellerBidData => {
         try {
-          transactionsConfirmSellerBid.Service.post(transactionsConfirmSellerBid.Request(transactionsConfirmSellerBid.BaseRequest(from = confirmSellerBidData.from, gas = confirmSellerBidData.gas.toString), to = confirmSellerBidData.to, password = confirmSellerBidData.password, bid = confirmSellerBidData.bid.toString, time = confirmSellerBidData.time.toString, pegHash = confirmSellerBidData.pegHash, sellerContractHash = confirmSellerBidData.sellerContractHash, mode = confirmSellerBidData.mode))
+          transactionsConfirmSellerBid.Service.post(transactionsConfirmSellerBid.Request(transactionsConfirmSellerBid.BaseReq(from = confirmSellerBidData.from, gas = confirmSellerBidData.gas.toString), to = confirmSellerBidData.to, password = confirmSellerBidData.password, bid = confirmSellerBidData.bid.toString, time = confirmSellerBidData.time.toString, pegHash = confirmSellerBidData.pegHash, sellerContractHash = confirmSellerBidData.sellerContractHash, mode = confirmSellerBidData.mode))
           Ok(views.html.index(successes = Seq(constants.Response.SELLER_BID_CONFIRMED)))
         }
         catch {

@@ -455,11 +455,11 @@ CREATE TABLE IF NOT EXISTS BLOCKCHAIN_TRANSACTION."SetSellerFeedback"
 
 CREATE TABLE IF NOT EXISTS MASTER."Zone"
 (
-    "id"        VARCHAR NOT NULL,
-    "accountID" VARCHAR NOT NULL UNIQUE,
-    "name"      VARCHAR NOT NULL,
-    "currency"  VARCHAR NOT NULL,
-    "status"    BOOLEAN,
+    "id"                 VARCHAR NOT NULL,
+    "accountID"          VARCHAR NOT NULL UNIQUE,
+    "name"               VARCHAR NOT NULL,
+    "currency"           VARCHAR NOT NULL,
+    "verificationStatus" BOOLEAN,
     PRIMARY KEY ("id")
 );
 
@@ -482,12 +482,13 @@ CREATE TABLE IF NOT EXISTS MASTER."Organization"
 
 CREATE TABLE IF NOT EXISTS MASTER."Trader"
 (
-    "id"             VARCHAR NOT NULL,
-    "zoneID"         VARCHAR NOT NULL,
-    "organizationID" VARCHAR NOT NULL,
-    "accountID"      VARCHAR NOT NULL UNIQUE,
-    "name"           VARCHAR NOT NULL,
-    "status"         BOOLEAN,
+    "id"                 VARCHAR NOT NULL,
+    "zoneID"             VARCHAR NOT NULL,
+    "organizationID"     VARCHAR NOT NULL,
+    "accountID"          VARCHAR NOT NULL UNIQUE,
+    "name"               VARCHAR NOT NULL,
+    "completionStatus"   BOOLEAN NOT NULL,
+    "verificationStatus" BOOLEAN,
     PRIMARY KEY ("id")
 );
 
@@ -584,6 +585,15 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."AccountToken"
     "notificationToken" VARCHAR,
     "sessionTokenHash"  VARCHAR,
     "sessionTokenTime"  BIGINT,
+    PRIMARY KEY ("id")
+);
+
+CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."AddTraderRequest"
+(
+    "id"             VARCHAR NOT NULL,
+    "accountID"      VARCHAR NOT NULL,
+    "traderID"       VARCHAR NOT NULL,
+    "organizationID" VARCHAR NOT NULL,
     PRIMARY KEY ("id")
 );
 
@@ -706,6 +716,8 @@ ALTER TABLE MASTER."AccountKYC"
     ADD CONSTRAINT AccountKYC_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER."OrganizationKYC"
     ADD CONSTRAINT OrganizationKYC_Organization_id FOREIGN KEY ("id") REFERENCES MASTER."Organization" ("id");
+ALTER TABLE MASTER."TraderKYC"
+    ADD CONSTRAINT TraderKYC_Trader_id FOREIGN KEY ("id") REFERENCES MASTER."Trader" ("id");
 ALTER TABLE MASTER."OrganizationBankAccountDetail"
     ADD CONSTRAINT OrganizationBankAccountDetail_Organization_id FOREIGN KEY ("id") REFERENCES MASTER."Organization" ("id");
 ALTER TABLE MASTER."AccountFile"
@@ -713,6 +725,10 @@ ALTER TABLE MASTER."AccountFile"
 
 ALTER TABLE MASTER_TRANSACTION."AccountToken"
     ADD CONSTRAINT AccountToken_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
+ALTER TABLE MASTER_TRANSACTION."AddTraderRequest"
+    ADD CONSTRAINT AddTraderRequest_Account_accountID FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");
+ALTER TABLE MASTER_TRANSACTION."AddTraderRequest"
+    ADD CONSTRAINT AddTraderRequest_Organization_organizationID FOREIGN KEY ("organizationID") REFERENCES MASTER."Organization" ("id");
 ALTER TABLE MASTER_TRANSACTION."FaucetRequest"
     ADD CONSTRAINT FaucetRequest_MasterAccount_AccountID FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER_TRANSACTION."IssueAssetRequest"
@@ -787,6 +803,7 @@ DROP TABLE IF EXISTS MASTER."OrganizationBankAccountDetail" CASCADE;
 DROP TABLE IF EXISTS MASTER."AccountFile" CASCADE;
 
 DROP TABLE IF EXISTS MASTER_TRANSACTION."AccountToken" CASCADE;
+DROP TABLE IF EXISTS MASTER_TRANSACTION."AddTraderRequest" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."FaucetRequest" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."IssueAssetRequest" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."IssueFiatRequest" CASCADE;

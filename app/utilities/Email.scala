@@ -1,31 +1,42 @@
 package utilities
 
-
 import exceptions.BaseException
 import javax.inject.Inject
-import models.master.{Accounts, Contacts}
+import models.master
 import play.api.Configuration
 import play.api.i18n.{Lang, MessagesApi}
 import play.api.libs.mailer._
 
 import scala.concurrent.ExecutionContext
 
-class Email @Inject()(mailerClient: MailerClient, contacts: Contacts, accounts: Accounts, messagesApi: MessagesApi)(implicit executionContext: ExecutionContext, configuration: Configuration) {
+class Email @Inject()(mailerClient: MailerClient, masterContacts: master.Contacts, masterAccounts: master.Accounts, messagesApi: MessagesApi)(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
   private implicit val module: String = constants.Module.UTILITIES_EMAIL
 
   private val fromAddress = configuration.get[String]("play.mailer.user")
 
-  def sendEmail(accountID: String, messageType: String, passedData: Seq[String] = Seq(""))(implicit lang: Lang = Lang(accounts.Service.getLanguage(accountID))) {
+  private val bounceAddress = configuration.get[String]("play.mailer.bounceAddress")
+
+  private val replyTo = configuration.get[String]("play.mailer.replyTo")
+
+  private val charset = configuration.get[String]("play.mailer.charset")
+
+  def sendEmail(toAccountID: String, email: constants.Email.Email, messageParameters: Seq[String], ccAccountIDs: Seq[String] = Seq.empty, bccAccountIDs: Seq[String] = Seq.empty, attachments: Seq[Attachment] = Seq.empty, headers: Seq[(String, String)] = Seq.empty)(implicit lang: Lang = Lang(masterAccounts.Service.getLanguage(toAccountID))) {
     try {
-      val email = Email(
-        subject = messagesApi(module + "Subject" + "." + messageType),
+      val toEmailAddress = if(email == constants.Email.VERIFY_EMAIL_OTP) masterContacts.Service.getUnverifiedEmailAddress(toAccountID) else masterContacts.Service.getVerifiedEmailAddress(toAccountID)
+      mailerClient.send(Email(
+        subject = messagesApi(email.subject),
         from = fromAddress,
-        to = Seq(contacts.Service.getEmailAddress(accountID)),
-        attachments = Seq(),
-        bodyHtml = Some(messagesApi(module + "Message" + "." + messageType + " " + passedData(0))),
-      )
-      mailerClient.send(email)
+        to = Seq(toEmailAddress),
+        cc = masterContacts.Service.getVerifiedEmailAddresses(ccAccountIDs),
+        bcc = masterContacts.Service.getVerifiedEmailAddresses(bccAccountIDs),
+        bodyHtml = Option(views.html.mail(messagesApi(email.message, messageParameters: _*)).toString),
+        charset = Option(charset),
+        replyTo = Seq(replyTo),
+        bounceAddress = Option(bounceAddress),
+        attachments = attachments,
+        headers = headers,
+      ))
     }
     catch {
       case baseException: BaseException => throw new BaseException(baseException.failure)

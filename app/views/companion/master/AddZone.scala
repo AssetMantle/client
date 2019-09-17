@@ -8,7 +8,6 @@ object AddZone {
     mapping(
       constants.FormField.NAME.name -> constants.FormField.NAME.field,
       constants.FormField.CURRENCY.name -> constants.FormField.CURRENCY.field
-
     )(Data.apply)(Data.unapply)
   )
 

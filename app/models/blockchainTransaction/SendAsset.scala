@@ -78,6 +78,22 @@ class SendAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
     }
   }
 
+  private def findTransactionHashByTicketID(ticketID: String): Future[Option[String]] = db.run(sendAssetTable.filter(_.ticketID === ticketID).map(_.txHash.?).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def findModeByTicketID(ticketID: String): Future[String] = db.run(sendAssetTable.filter(_.ticketID === ticketID).map(_.mode).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
   private def updateStatusAndCodeOnTicketID(ticketID: String, status: Option[Boolean], code: String): Future[Int] = db.run(sendAssetTable.filter(_.ticketID === ticketID).map(x => (x.status.?, x.code)).update((status, code)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -155,7 +171,9 @@ class SendAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
 
     def getTransaction(ticketID: String): SendAsset = Await.result(findByTicketID(ticketID), Duration.Inf)
 
-    def getTransactionHash(ticketID: String): Option[String] = Await.result(findByTicketID(ticketID), Duration.Inf).txHash
+    def getTransactionHash(ticketID: String): Option[String] = Await.result(findTransactionHashByTicketID(ticketID), Duration.Inf)
+
+    def getMode(ticketID: String): String = Await.result(findModeByTicketID(ticketID), Duration.Inf)
 
     def updateTransactionHash(ticketID: String, txHash: String): Int = Await.result(updateTxHashOnTicketID(ticketID = ticketID, txHash = Option(txHash)), Duration.Inf)
 
@@ -197,7 +215,7 @@ class SendAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
 
   if (kafkaEnabled || transactionMode != constants.Transactions.BLOCK_MODE) {
     actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
-      transaction.ticketUpdater(Service.getTicketIDsOnStatus, Service.getTransactionHash, Utility.onSuccess, Utility.onFailure)
+      transaction.ticketUpdater(Service.getTicketIDsOnStatus, Service.getTransactionHash, Service.getMode, Utility.onSuccess, Utility.onFailure)
     }(schedulerExecutionContext)
   }
 }

@@ -66,8 +66,6 @@ class TraderFeedbackHistories @Inject()(protected val databaseConfigProvider: Da
 
     def * = (address, buyerAddress, sellerAddress, pegHash, rating) <> (TraderFeedbackHistory.tupled, TraderFeedbackHistory.unapply)
 
-    def ? = (address.?, buyerAddress.?, sellerAddress.?, pegHash.?, rating.?).shaped.<>({ r => import r._; _1.map(_ => TraderFeedbackHistory.tupled((_1.get, _2.get, _3.get, _4.get, _5.get))) }, (_: Any) => throw new Exception("Inserting into ? projection not supported."))
-
     def address = column[String]("address", O.PrimaryKey)
 
     def buyerAddress = column[String]("buyerAddress", O.PrimaryKey)
@@ -76,7 +74,7 @@ class TraderFeedbackHistories @Inject()(protected val databaseConfigProvider: Da
 
     def pegHash = column[String]("pegHash", O.PrimaryKey)
 
-    def rating = column[String]("rating", O.PrimaryKey)
+    def rating = column[String]("rating")
 
   }
 

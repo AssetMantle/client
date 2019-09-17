@@ -1,5 +1,4 @@
 @import controllers.actions.LoginState
-@import master.utils.{Address, UBO, UBOs}
 @import models.master.Organization
 @import play.api.Logger
 @import play.api.libs.json.Json
@@ -14,49 +13,41 @@
             <span class="red">@Messages(constants.Form.ZONE_ID)</span>: @organizationVerificationRequest.zoneID <br>
             <span class="red">@Messages(constants.Form.ACCOUNT_ID)</span>: @organizationVerificationRequest.accountID <br>
             <span class="red">@Messages(constants.Form.NAME)</span>: @organizationVerificationRequest.name <br>
-            <span class="red">@Messages(constants.Form.ABBREVIATION)</span>
-              : @organizationVerificationRequest.abbreviation.getOrElse("") <br>
-            <span class="red">@Messages(constants.Form.ESTABLISHMENT_DATE)</span>
-              : @organizationVerificationRequest.establishmentDate <br>
+            <span class="red">@Messages(constants.Form.ABBREVIATION)</span>: @organizationVerificationRequest.abbreviation.getOrElse("") <br>
+            <span class="red">@Messages(constants.Form.ESTABLISHMENT_DATE)</span>: @organizationVerificationRequest.establishmentDate <br>
             <span class="red">@Messages(constants.Form.EMAIL)</span>: @organizationVerificationRequest.email <br>
             </div>
             <br>
-            @defining(utilities.JSON.getInstance[Address](organizationVerificationRequest.registeredAddress)) { registeredAddress: Address =>
                 <div>@Messages(constants.Form.REGISTERED_ADDRESS) : <br>
-                <span class="red">@Messages(constants.Form.ADDRESS_LINE_1)</span>: @registeredAddress.addressLine1 <br>
-                <span class="red">@Messages(constants.Form.ADDRESS_LINE_2)</span>: @registeredAddress.addressLine2 <br>
-                <span class="red">@Messages(constants.Form.LANDMARK)</span>: @registeredAddress.landmark.getOrElse("") <br>
-                <span class="red">@Messages(constants.Form.CITY)</span>: @registeredAddress.city <br>
-                <span class="red">@Messages(constants.Form.COUNTRY)</span>: @registeredAddress.country <br>
-                <span class="red">@Messages(constants.Form.ZIP_CODE)</span>: @registeredAddress.zipCode <br>
-                <span class="red">@Messages(constants.Form.PHONE)</span>: @registeredAddress.phone
+                <span class="red">@Messages(constants.Form.ADDRESS_LINE_1)</span>: @organizationVerificationRequest.registeredAddress.addressLine1 <br>
+                <span class="red">@Messages(constants.Form.ADDRESS_LINE_2)</span>: @organizationVerificationRequest.registeredAddress.addressLine2 <br>
+                <span class="red">@Messages(constants.Form.LANDMARK)</span>: @organizationVerificationRequest.registeredAddress.landmark.getOrElse("") <br>
+                <span class="red">@Messages(constants.Form.CITY)</span>: @organizationVerificationRequest.registeredAddress.city <br>
+                <span class="red">@Messages(constants.Form.COUNTRY)</span>: @organizationVerificationRequest.registeredAddress.country <br>
+                <span class="red">@Messages(constants.Form.ZIP_CODE)</span>: @organizationVerificationRequest.registeredAddress.zipCode <br>
+                <span class="red">@Messages(constants.Form.PHONE)</span>: @organizationVerificationRequest.registeredAddress.phone
                   <br>
                 </div>
-            }
             <br>
-            @defining(utilities.JSON.getInstance[Address](organizationVerificationRequest.postalAddress)) { postalAddress: Address =>
                 <div>@Messages(constants.Form.POSTAL_ADDRESS) : <br>
-                <span class="red">@Messages(constants.Form.ADDRESS_LINE_1)</span>: @postalAddress.addressLine1 <br>
-                <span class="red">@Messages(constants.Form.ADDRESS_LINE_2)</span>: @postalAddress.addressLine2 <br>
-                <span class="red">@Messages(constants.Form.LANDMARK)</span>: @postalAddress.landmark.getOrElse("") <br>
-                <span class="red">@Messages(constants.Form.CITY)</span>: @postalAddress.city <br>
-                <span class="red">@Messages(constants.Form.COUNTRY)</span>: @postalAddress.country <br>
-                <span class="red">@Messages(constants.Form.ZIP_CODE)</span>: @postalAddress.zipCode <br>
-                <span class="red">@Messages(constants.Form.PHONE)</span>: @postalAddress.phone
+                <span class="red">@Messages(constants.Form.ADDRESS_LINE_1)</span>: @organizationVerificationRequest.postalAddress.addressLine1 <br>
+                <span class="red">@Messages(constants.Form.ADDRESS_LINE_2)</span>: @organizationVerificationRequest.postalAddress.addressLine2 <br>
+                <span class="red">@Messages(constants.Form.LANDMARK)</span>: @organizationVerificationRequest.postalAddress.landmark.getOrElse("") <br>
+                <span class="red">@Messages(constants.Form.CITY)</span>: @organizationVerificationRequest.postalAddress.city <br>
+                <span class="red">@Messages(constants.Form.COUNTRY)</span>: @organizationVerificationRequest.postalAddress.country <br>
+                <span class="red">@Messages(constants.Form.ZIP_CODE)</span>: @organizationVerificationRequest.postalAddress.zipCode <br>
+                <span class="red">@Messages(constants.Form.PHONE)</span>: @organizationVerificationRequest.postalAddress.phone
                   <br>
                 </div>
-            }
             <br>
-            @defining(utilities.JSON.getInstance[UBOs](organizationVerificationRequest.ubos.getOrElse(Json.toJson[UBOs](UBOs()).toString)).ubos) { ubos: Seq[UBO] =>
                 <div>@Messages(constants.Form.ORGANIZATION_UBO_DETAIL): <br>
-                    @for(ubo <- ubos) {
+                    @for(ubo <- organizationVerificationRequest.ubos.data) {
                         <span class="red">@Messages(constants.Form.PERSON_NAME)</span>: @ubo.personName <br>
                         <span class="red">@Messages(constants.Form.SHARE_PERCENTAGE)</span>: @ubo.sharePercentage <br>
                         <span class="red">@Messages(constants.Form.RELATIONSHIP)</span>: @ubo.relationship <br>
                         <span class="red">@Messages(constants.Form.TITLE)</span>: @ubo.title <br>
                         }
                 </div>
-            }
             <br>
             <div>@Messages(constants.Form.ORGANIZATION_BANK_ACCOUNT_DETAIL): <br>
             <div id = "organizationBankAccountDetail@organizationVerificationRequest.accountID">

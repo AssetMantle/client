@@ -193,7 +193,7 @@ class AccountController @Inject()(
       emailOTPForgotPasswordData => {
         try {
           val otp = masterTransactionEmailOTP.Service.sendOTP(emailOTPForgotPasswordData.username)
-          email.sendEmail(emailOTPForgotPasswordData.username, constants.Email.OTP, Seq(otp))
+          email.sendEmail(toAccountID = emailOTPForgotPasswordData.username, email = constants.Email.FORGOT_PASSWORD_EMAIL_OTP, messageParameters = Seq(otp) )
           PartialContent(views.html.component.master.forgotPassword(views.companion.master.ForgotPassword.form, emailOTPForgotPasswordData.username))
         }
         catch {

@@ -1,82 +1,72 @@
-getConfigurationAsynchronously("blockchain.main.wsIP");
-getConfigurationAsynchronously("blockchain.main.abciPort");
-getConfigurationAsynchronously("blockchain.main.ip");
-
 setCookie("showAllBlocksTableClick", 0, 1);
 
-function initialTableContent() {
-    let wsURL = getConfiguration("blockchain.main.wsIP") + ":" + getConfiguration("blockchain.main.abciPort") + "/websocket";
+function showAllBlocksInitialTableContent() {
     setCookie("showAllBlocksTableClick", 0, 1);
     changeTableContent(parseInt(getCookie("showAllBlocksTableClick"), 10));
-
-    window.addEventListener("load", function (evt) {
-        let wsNewBlock = new WebSocket(wsURL);
-        wsNewBlock.onopen = () => {
-            let requestNewBlock = `{"method":"subscribe", "id":"dontcare","jsonrpc":"2.0","params":["tm.event='NewBlock'"]}`;
-            wsNewBlock.send(requestNewBlock)
-        };
-
-        wsNewBlock.onmessage = function (message) {
-            if (parseInt(getCookie("showAllBlocksTableClick"), 10) === 0) {
-                let dataNewBlock = JSON.parse(message.data);
-                let blockContainerList = document.getElementById("allBlocksTableBody");
-                let height = parseInt(dataNewBlock["result"]["data"]["value"]["block"]["header"]["height"], 10);
-                blockContainerList.removeChild(blockContainerList.childNodes[(blockContainerList.childNodes.length - 1)]);
-                $('#allBlocksTableBody').prepend("<tr><td>" + height + "</td><td>" + dataNewBlock["result"]["data"]["value"]["block"]["header"]["time"] + "</td><td>" + dataNewBlock["result"]["data"]["value"]["block"]["header"]["num_txs"] + "</td></td></tr>");
-            }
-        };
-
-        wsNewBlock.onerror = function (evt) {
-            if (parseInt(getCookie("showAllBlocksTableClick"), 10) === 0) {
-                document.getElementById("allBlocksTableBody").appendChild(document.createElement("div").innerHTML = "ERROR: " + evt.data);
-            }
-        };
-    });
 }
 
-function onClickNext() {
+function onShowAllBlocksClickNext() {
     let click = parseInt(getCookie("showAllBlocksTableClick"), 10) + 1;
     setCookie("showAllBlocksTableClick", click, 1);
     changeTableContent(click);
 }
 
-function onClickPrevious() {
+function onShowAllBlocksClickPrevious() {
     let click = parseInt(getCookie("showAllBlocksTableClick"), 10) - 1;
-    setCookie("showAllBlocksTableClick", click, 1);
     if (click > 0) {
+        setCookie("showAllBlocksTableClick", click, 1);
         changeTableContent(click);
     } else {
-        initialTableContent();
+        showAllBlocksInitialTableContent();
     }
 }
 
 function changeTableContent(clickValue) {
-    let abciIpPort = getConfiguration("blockchain.main.ip") + ":" + getConfiguration("blockchain.main.abciPort");
+    let lastBlockHeightURL = jsRoutes.controllers.BlockExplorerController.lastBlockHeight();
     $.ajax({
-        url: abciIpPort + "/abci_info",
-        type: "GET",
+        url: lastBlockHeightURL.url,
+        type: lastBlockHeightURL.type,
         async: true,
         statusCode: {
-            200: function (lastBlockHeightData) {
-                let lastBlockHeight = lastBlockHeightData.result.response.last_block_height;
+            200: function (lastBlockHeight) {
+                let blockDetails = jsRoutes.controllers.BlockExplorerController.blockDetails((lastBlockHeight - 10 * (clickValue + 1)), (lastBlockHeight - 10 * clickValue));
                 $.ajax({
-                    url: abciIpPort + "/blockchain?minHeight=" + (lastBlockHeight - 10 * (clickValue + 1)).toString(10) + "&maxHeight=" + (lastBlockHeight - 10 * clickValue).toString(10),
-                    type: "GET",
+                    url: blockDetails.url,
+                    type: blockDetails.type,
                     async: true,
                     statusCode: {
-                        200: function (blocksData) {
-                            let blocks = blocksData.result.block_metas;
+                        200: function (blockDetailsData) {
+                            let blocks = JSON.parse(blockDetailsData);
                             let content = '';
                             Array.prototype.forEach.call(blocks, block => {
-                                content = content + "<tr><td>" + block["header"]["height"] + "</td><td>" + block["header"]["time"] + "</td><td>" + block["header"]["num_txs"] + "</td></td></tr>";
+                                content = content + "<tr><td>" + block.header.height + "</td><td>" + block.header.time + "</td><td>" + block.header.num_txs + "</td></td></tr>";
                             });
                             $('#allBlocksTableBody').empty().append(content);
                         }
-                    }
+                    },
                 });
             }
         }
     });
+}
+
+function showAllBlocksTableErrorEvent(event) {
+    if (parseInt(getCookie("showAllBlocksTableClick"), 10) === 0) {
+        document.getElementById("allBlocksTableBody").appendChild(document.createElement("div").innerHTML = "ERROR: " + evt.data);
+    }
+}
+
+function updateShowAllBlocksTable(receivedData) {
+    if (parseInt(getCookie("showAllBlocksTableClick"), 10) === 0) {
+        let height = receivedData.result.data.value.block.header.height;
+        let time = receivedData.result.data.value.block.header.time;
+        let blockContainerList = document.getElementById("allBlocksTableBody");
+        if (!((receivedData.result.data) === undefined)) {
+            let numberOfTransactions = receivedData.result.data.value.block.header.num_txs;
+            blockContainerList.removeChild(blockContainerList.childNodes[(blockContainerList.childNodes.length - 1)]);
+            $('#allBlocksTableBody').prepend("<tr><td>" + height + "</td><td>" + time + "</td><td>" + numberOfTransactions + "</td></td></tr>");
+        }
+    }
 }
 
 function showAllBlocksTable() {
@@ -84,6 +74,6 @@ function showAllBlocksTable() {
     $('#txHashBottomDivision').hide();
     $('#indexBottomDivision').hide();
     $('#validatorsTable').hide();
-    initialTableContent();
+    showAllBlocksInitialTableContent();
     $('#allBlocksTable').show();
 }

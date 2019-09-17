@@ -1,4 +1,4 @@
-package transactions
+package queries
 
 import java.net.ConnectException
 
@@ -13,7 +13,7 @@ import scala.concurrent.{Await, ExecutionContext, Future}
 @Singleton
 class GetSeed @Inject()(wsClient: WSClient)(implicit configuration: Configuration, executionContext: ExecutionContext) {
 
-  private implicit val module: String = constants.Module.TRANSACTIONS_GET_SEED
+  private implicit val module: String = constants.Module.QUERIES_GET_SEED
 
   private implicit val logger: Logger = Logger(this.getClass)
 

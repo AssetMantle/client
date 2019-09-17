@@ -1,3 +1,3 @@
 function averageBlockTimeUpdater(averagBlockTime){
-    document.getElementById("averageBlockTime").innerHTML = averagBlockTime.toFixed(3) + "s"
+    $('#averageBlockTime').html(averagBlockTime.toFixed(3) + "s");
 }

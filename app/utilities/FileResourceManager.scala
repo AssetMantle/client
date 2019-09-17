@@ -24,6 +24,8 @@ class FileResourceManager @Inject()()(implicit executionContext: ExecutionContex
 
   private val uploadZoneKycIdentificationPath = configuration.get[String]("upload.zone.identificationPath")
 
+  private val uploadOrganizationAgreementPath = configuration.get[String]("upload.organization.agreementPath")
+
   private val uploadOrganizationKYCBankAccountDetailPath = configuration.get[String]("upload.organization.bankAccountDetailPath")
 
   private val uploadOrganizationKycAdminProfileIdentificationPath = configuration.get[String]("upload.organization.adminProfileIdentificationPath")
@@ -34,11 +36,13 @@ class FileResourceManager @Inject()()(implicit executionContext: ExecutionContex
 
   private val uploadOrganizationKycManagementPath = configuration.get[String]("upload.organization.managementPath")
 
-  private val uploadOrganizationKYCACRAPath = configuration.get[String]("upload.organization.ACRAPath")
+  private val uploadOrganizationKYCACRAPath = configuration.get[String]("upload.organization.acraPath")
 
   private val uploadOrganizationKycShareStructurePath = configuration.get[String]("upload.organization.shareStructurePath")
 
   private val uploadTraderKycIdentificationPath = configuration.get[String]("upload.trader.identificationPath")
+
+  private val uploadTraderAgreementPath = configuration.get[String]("upload.trader.agreementPath")
 
   def getAccountKycFilePath(documentType: String): String = {
     documentType match {
@@ -65,13 +69,15 @@ class FileResourceManager @Inject()()(implicit executionContext: ExecutionContex
       case constants.File.MANAGEMENT => uploadOrganizationKycManagementPath
       case constants.File.ACRA => uploadOrganizationKYCACRAPath
       case constants.File.SHARE_STRUCTURE => uploadOrganizationKycShareStructurePath
+      case constants.File.ORGANIZATION_AGREEMENT => uploadOrganizationAgreementPath
       case _ => constants.File.UNKNOWN_TYPE
     }
   }
 
   def getTraderKycFilePath(documentType: String): String = {
     documentType match {
-      case constants.File.IDENTIFICATION => uploadTraderKycIdentificationPath
+      case constants.File.TRADER_IDENTIFICATION => uploadTraderKycIdentificationPath
+      case constants.File.TRADER_AGREEMENT => uploadTraderAgreementPath
       case _ => constants.File.UNKNOWN_TYPE
     }
   }
