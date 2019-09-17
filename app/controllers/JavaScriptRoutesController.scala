@@ -122,6 +122,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.FileController.updateZoneKycForm,
         routes.javascript.FileController.updateZoneKyc,
         routes.javascript.FileController.genesisAccessedFile,
+        routes.javascript.FileController.organizationAccessedTraderKYCFile,
         routes.javascript.FileController.zoneAccessedOrganizationKYCFile,
         routes.javascript.FileController.zoneAccessedTraderKYCFile,
         routes.javascript.FileController.uploadTraderAssetForm,
