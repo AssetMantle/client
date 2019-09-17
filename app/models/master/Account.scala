@@ -198,11 +198,17 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
     def getId(accountAddress: String): String = Await.result(getIdByAddress(accountAddress), Duration.Inf)
 
+    def getIdAsync(accountAddress: String) = getIdByAddress(accountAddress)
+
     def getAccountByAddress(accountAddress: String): Account = Await.result(findByAddress(accountAddress), Duration.Inf)
+
+    def getAccountByAddressAsync(accountAddress: String)=findByAddress(accountAddress)
 
     def getAddress(id: String): String = Await.result(getAddressById(id), Duration.Inf)
 
     def updateUserType(id: String, userType: String): Int = Await.result(updateUserTypeById(id, userType), Duration.Inf)
+
+    def updateUserTypeAsync(id: String, userType: String) = updateUserTypeById(id, userType)
 
     def updateUserTypeOnAddress(address: String, userType: String): Int = Await.result(updateUserTypeByAddress(address, userType), Duration.Inf)
 

@@ -6,6 +6,7 @@ GET         /javascriptRoutes                                            control
 
 GET         /firebase-messaging-sw.js                                    controllers.Assets.at(path="/public/javascripts", file="firebase-messaging-sw.js")
 
+POST        /master/sendCoinAsync                                        controllers.SendCoinController.sendCoinAsync
 
 GET         /genesisRequest                                              controllers.ViewController.genesisRequest
 GET         /genesisInformation                                          controllers.ViewController.genesisInformation

@@ -22,6 +22,8 @@ class Transaction @Inject()(getTxHashResponse: GetTxHashResponse, getResponse: G
 
     val ticketID: String = if (kafkaEnabled) utilities.JSON.getResponseFromJson[KafkaResponse](action(request)).ticketID else utilities.IDGenerator.ticketID
     blockchainTransactionCreate(entity.mutateTicketID(ticketID))
+    println(ticketID)
+    println(System.currentTimeMillis())
     if (!kafkaEnabled) {
       Future {
         try {
@@ -38,6 +40,40 @@ class Transaction @Inject()(getTxHashResponse: GetTxHashResponse, getResponse: G
     }
     ticketID
   }
+
+  def processAsync[T1 <: BaseTransaction[T1], T2 <: BaseRequestEntity](entity: T1, blockchainTransactionCreate: T1 => Future[String], request: T2, action: T2 => Future[WSResponse], onSuccess: (String, BlockResponse) => Future[Unit], onFailure: (String, String) => Future[Unit], updateTransactionHash: (String, String) => Future[Int])(implicit module: String, logger: Logger) = {
+
+    val ticketID2: Future[String] = if (kafkaEnabled) utilities.JSON.getResponseFromJsonAsync[KafkaResponse](action(request)).map(res=> res.ticketID) else Future{utilities.IDGenerator.ticketID}
+    ticketID2.map{ticketID=>
+
+        blockchainTransactionCreate(entity.mutateTicketID(ticketID))
+        println(ticketID)
+        println(System.currentTimeMillis())
+        if (!kafkaEnabled){
+          try {
+            transactionMode match {
+              case constants.Transactions.BLOCK_MODE => utilities.JSON.getResponseFromJsonAsync[BlockResponse](action(request)).map{blockResponse=>
+                onSuccess(ticketID,blockResponse)
+              }
+
+              case constants.Transactions.ASYNC_MODE => utilities.JSON.getResponseFromJsonAsync[AsyncResponse](action(request)).map{asyncResponse=>
+                updateTransactionHash(ticketID,asyncResponse.txhash)
+              }
+              case constants.Transactions.SYNC_MODE =>utilities.JSON.getResponseFromJsonAsync[SyncResponse](action(request)).map{asyncResponse=>
+                updateTransactionHash(ticketID,asyncResponse.txhash)
+              }
+
+            }
+          } catch {
+            case baseException: BaseException => logger.error(baseException.failure.message, baseException)
+              onFailure(ticketID, baseException.failure.message)
+          }
+    }
+   }
+    ticketID2
+  }
+
+
 
 
   def ticketUpdater(getTickets: () => Seq[String], getTransactionHash: String => Option[String], onSuccess: (String, BlockResponse) => Unit, onFailure: (String, String) => Unit)(implicit module: String, logger: Logger) {

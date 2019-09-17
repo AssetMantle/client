@@ -74,6 +74,33 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
       )
   }
 
+  def verifyZoneAsync: Action[AnyContent] = withGenesisLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      views.companion.master.VerifyZone.form.bindFromRequest().fold(
+        formWithErrors => {
+          BadRequest(views.html.component.master.verifyZone(formWithErrors, formWithErrors.data(constants.Form.ZONE_ID)))
+        },
+        verifyZoneData => {
+          try {
+            val zoneAccountAddress = masterAccounts.Service.getAddress(masterZones.Service.getAccountId(verifyZoneData.zoneID))
+            transaction.process[blockchainTransaction.AddZone, transactionsAddZone.Request](
+              entity = blockchainTransaction.AddZone(from = loginState.address, to = zoneAccountAddress, zoneID = verifyZoneData.zoneID, gas = verifyZoneData.gas, ticketID = "", mode = transactionMode),
+              blockchainTransactionCreate = blockchainTransactionAddZones.Service.create,
+              request = transactionsAddZone.Request(transactionsAddZone.BaseRequest(from = loginState.address, gas = verifyZoneData.gas.toString), to = zoneAccountAddress, zoneID = verifyZoneData.zoneID, password = verifyZoneData.password, mode = transactionMode),
+              action = transactionsAddZone.Service.post,
+              onSuccess = blockchainTransactionAddZones.Utility.onSuccess,
+              onFailure = blockchainTransactionAddZones.Utility.onFailure,
+              updateTransactionHash = blockchainTransactionAddZones.Service.updateTransactionHash
+            )
+            withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ZONE_VERIFIED)))
+          }
+          catch {
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+          }
+        }
+      )
+  }
+
   def viewPendingVerifyZoneRequests: Action[AnyContent] = withGenesisLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {

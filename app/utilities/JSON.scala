@@ -11,7 +11,10 @@ import play.api.libs.ws.WSResponse
 import transactions.Abstract.BaseResponse
 import transactions.responses.TransactionResponse.ErrorResponse
 
+import scala.concurrent.Future
+import scala.concurrent.ExecutionContext
 object JSON {
+
 
   def getResponseFromJson[T <: BaseResponse](response: WSResponse)(implicit logger: Logger, module: String, reads: Reads[T]): T = {
     try {
@@ -32,6 +35,24 @@ object JSON {
       case jsonMappingException: JsonMappingException => logger.info(jsonMappingException.getMessage, jsonMappingException)
         throw new BaseException(constants.Response.NO_RESPONSE)
     }
+  }
+
+  def getResponseFromJsonAsync[T <: BaseResponse](response: Future[WSResponse])(implicit exec:ExecutionContext,logger: Logger, module: String, reads: Reads[T]): Future[T]={
+    response.map{ res=>
+      Json.fromJson[T](res.json) match{
+        case JsSuccess(value: T, _: JsPath) => value
+        case _: JsError =>
+          val errorResponse: ErrorResponse = Json.fromJson[ErrorResponse](res.json) match {
+            case JsSuccess(value: ErrorResponse, _: JsPath) => value
+            case error: JsError => logger.info(res.body.toString)
+              throw new BaseException(new Failure(error.toString, null))
+          }
+          logger.info(errorResponse.error)
+          throw new BaseException(new Failure(errorResponse.error, null))
+      }
+
+    }
+
   }
 
   def getInstance[T <: BaseCaseClass](jsonString: String)(implicit module: String, logger: Logger, reads: Reads[T]): T = {

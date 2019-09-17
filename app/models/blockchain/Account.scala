@@ -143,6 +143,8 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
     def markDirty(address: String): Int = Await.result(updateDirtyBitByAddress(address, dirtyBit = true), Duration.Inf)
 
+    def markDirtyAsync(address: String)=updateDirtyBitByAddress(address, dirtyBit = true)
+
     def accountCometSource(username: String) = {
       shutdownActors.shutdown(constants.Module.ACTOR_MAIN_ACCOUNT, username)
       Thread.sleep(cometActorSleepTime)

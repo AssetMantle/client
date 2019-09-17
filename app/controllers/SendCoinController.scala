@@ -30,6 +30,7 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
 
   def sendCoin: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
+      logger.info(System.currentTimeMillis().toString)
       views.companion.master.SendCoin.form.bindFromRequest().fold(
         formWithErrors => {
           BadRequest(views.html.component.master.sendCoin(formWithErrors))
@@ -44,6 +45,34 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
               onSuccess = blockchainTransactionSendCoins.Utility.onSuccess,
               onFailure = blockchainTransactionSendCoins.Utility.onFailure,
               updateTransactionHash = blockchainTransactionSendCoins.Service.updateTransactionHash
+            )
+            withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.COINS_SENT)))
+          }
+          catch {
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+          }
+        }
+      )
+  }
+
+
+  def sendCoinAsync: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      logger.info(System.currentTimeMillis().toString)
+      views.companion.master.SendCoin.form.bindFromRequest().fold(
+        formWithErrors => {
+          BadRequest(views.html.component.master.sendCoin(formWithErrors))
+        },
+        sendCoinData => {
+          try {
+              transaction.processAsync[blockchainTransaction.SendCoin, transactionsSendCoin.Request](
+              entity = blockchainTransaction.SendCoin(from = loginState.address, to = sendCoinData.to, amount = sendCoinData.amount, gas = sendCoinData.gas, ticketID = "", mode = transactionMode),
+              blockchainTransactionCreate = blockchainTransactionSendCoins.Service.createAsync,
+              request = transactionsSendCoin.Request(transactionsSendCoin.BaseRequest(from = loginState.address, gas = sendCoinData.gas.toString), password = sendCoinData.password, to = sendCoinData.to, amount = Seq(transactionsSendCoin.Amount(denominationOfGasToken, sendCoinData.amount.toString)), mode = transactionMode),
+              action = transactionsSendCoin.Service.postAsync,
+              onSuccess = blockchainTransactionSendCoins.Utility.onSuccessAsync,
+              onFailure = blockchainTransactionSendCoins.Utility.onFailureAsync,
+              updateTransactionHash = blockchainTransactionSendCoins.Service.updateTransactionHashAsync
             )
             withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.COINS_SENT)))
           }
