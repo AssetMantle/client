@@ -12,7 +12,7 @@ import play.api.{Configuration, Logger}
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class SendAssetController @Inject()(messagesControllerComponents: MessagesControllerComponents, transaction: utilities.Transaction, blockchainAssets: blockchain.Assets, blockchainOrders: blockchain.Orders, blockchainAccounts: blockchain.Accounts, withTraderLoginAction: WithTraderLoginAction, transactionsSendAsset: transactions.SendAsset, blockchainTransactionSendAssets: blockchainTransaction.SendAssets, withUsernameToken: WithUsernameToken)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class SendAssetController @Inject()(messagesControllerComponents: MessagesControllerComponents, transaction: utilities.Transaction, blockchainAssets: blockchain.Assets, blockchainOrders: blockchain.Orders, blockchainAccounts: blockchain.Accounts, withTraderLoginAction: WithTraderLoginAction, transactionsSendAsset: transactions.SendAsset, blockchainTransactionSendAssets: blockchainTransaction.SendAssets, withUsernameToken: WithUsernameToken)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -35,7 +35,7 @@ class SendAssetController @Inject()(messagesControllerComponents: MessagesContro
             transaction.process[blockchainTransaction.SendAsset, transactionsSendAsset.Request](
               entity = blockchainTransaction.SendAsset(from = loginState.address, to = sendAssetData.buyerAddress, pegHash = sendAssetData.pegHash, gas = sendAssetData.gas, ticketID = "", mode = transactionMode),
               blockchainTransactionCreate = blockchainTransactionSendAssets.Service.create,
-              request = transactionsSendAsset.Request(transactionsSendAsset.BaseRequest(from = loginState.address, gas = sendAssetData.gas.toString), to = sendAssetData.buyerAddress, password = sendAssetData.password, pegHash = sendAssetData.pegHash, mode = transactionMode),
+              request = transactionsSendAsset.Request(transactionsSendAsset.BaseReq(from = loginState.address, gas = sendAssetData.gas.toString), to = sendAssetData.buyerAddress, password = sendAssetData.password, pegHash = sendAssetData.pegHash, mode = transactionMode),
               action = transactionsSendAsset.Service.post,
               onSuccess = blockchainTransactionSendAssets.Utility.onSuccess,
               onFailure = blockchainTransactionSendAssets.Utility.onFailure,
@@ -61,7 +61,7 @@ class SendAssetController @Inject()(messagesControllerComponents: MessagesContro
       },
       sendAssetData => {
         try {
-          transactionsSendAsset.Service.post(transactionsSendAsset.Request(transactionsSendAsset.BaseRequest(from = sendAssetData.from, gas = sendAssetData.gas.toString), to = sendAssetData.to, password = sendAssetData.password, pegHash = sendAssetData.pegHash, mode = sendAssetData.mode))
+          transactionsSendAsset.Service.post(transactionsSendAsset.Request(transactionsSendAsset.BaseReq(from = sendAssetData.from, gas = sendAssetData.gas.toString), to = sendAssetData.to, password = sendAssetData.password, pegHash = sendAssetData.pegHash, mode = sendAssetData.mode))
           Ok(views.html.index(successes = Seq(constants.Response.ASSET_SENT)))
 
         }

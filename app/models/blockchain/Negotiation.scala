@@ -93,9 +93,13 @@ class Negotiations @Inject()(shutdownActors: ShutdownActor, masterAccounts: mast
 
   private def getNegotiationsByAddress(address: String): Future[Seq[Negotiation]] = db.run(negotiationTable.filter(negotiation => negotiation.buyerAddress === address || negotiation.sellerAddress === address).result)
 
-  private def getNegotiationsByBuyerAddress(address: String): Future[Seq[Negotiation]] = db.run(negotiationTable.filter(negotiation => negotiation.buyerAddress === address ).result)
+  private def getNegotiationsByBuyerAddress(address: String): Future[Seq[Negotiation]] = db.run(negotiationTable.filter(negotiation => negotiation.buyerAddress === address).result)
 
   private def getNegotiationsBySellerAddress(address: String): Future[Seq[Negotiation]] = db.run(negotiationTable.filter(negotiation =>  negotiation.sellerAddress === address).result)
+
+  private def getNegotiationIDsByBuyerAddress(address: String): Future[Seq[String]] = db.run(negotiationTable.filter(negotiation => negotiation.buyerAddress === address).map(_.id).result)
+
+  private def getNegotiationIDsBySellerAddress(address: String): Future[Seq[String]] = db.run(negotiationTable.filter(negotiation =>  negotiation.sellerAddress === address).map(_.id).result)
 
   private def deleteNegotiationsByPegHash(pegHash: String) = db.run(negotiationTable.filter(_.assetPegHash === pegHash).delete.asTry).map {
     case Success(result) => result
@@ -194,6 +198,10 @@ class Negotiations @Inject()(shutdownActors: ShutdownActor, masterAccounts: mast
     def getNegotiationsForBuyerAddress(address: String): Seq[Negotiation] = Await.result(getNegotiationsByBuyerAddress(address), Duration.Inf)
 
     def getNegotiationsForSellerAddress(address: String): Seq[Negotiation] = Await.result(getNegotiationsBySellerAddress(address), Duration.Inf)
+
+    def getNegotiationIDsForBuyerAddress(address: String): Seq[String] = Await.result(getNegotiationIDsByBuyerAddress(address), Duration.Inf)
+
+    def getNegotiationIDsForSellerAddress(address: String): Seq[String] = Await.result(getNegotiationIDsBySellerAddress(address), Duration.Inf)
 
     def deleteNegotiations(pegHash: String): Int = Await.result(deleteNegotiationsByPegHash(pegHash), Duration.Inf)
 

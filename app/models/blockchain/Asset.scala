@@ -80,9 +80,7 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
   }
   private def findAllAssetsByPublic(excludedAssets:Seq[String]):Future[Seq[Asset]] = db.run(assetTable.filter(assets => !(assets.ownerAddress inSet excludedAssets)).result)
 
-  private def findAllAssetsByModerated(excludedAssets:Seq[String], moderated: Boolean): Future[Seq[Asset]] = db.run(assetTable.filter(_.moderated === moderated).filter(assets => !(assets.ownerAddress inSet excludedAssets)).result)
-
-  private def findAllUnLocked(ownerAddresses:Seq[String]):Future[Seq[Asset]] = db.run(assetTable.filter(_.locked === true).filter(asset => asset.ownerAddress inSet ownerAddresses).result)
+  private def findAllAssetsByLockedStatus(ownerAddresses:Seq[String], locked: Boolean):Future[Seq[Asset]] = db.run(assetTable.filter(_.locked === locked).filter(asset => asset.ownerAddress inSet ownerAddresses).result)
 
   private def findByPegHashes(pegHashes:Seq[String]):Future[Seq[Asset]] = db.run(assetTable.filter(asset => asset.pegHash inSet pegHashes).result)
 
@@ -158,7 +156,7 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
 
     def getAllPublic(excludedAssets:Seq[String]):Seq[Asset] = Await.result(findAllAssetsByPublic(excludedAssets),Duration.Inf)
 
-    def getAllLocked(ownerAddresses:Seq[String]):Seq[Asset] = Await.result(findAllUnLocked(ownerAddresses),Duration.Inf)
+    def getAllLocked(ownerAddresses:Seq[String]):Seq[Asset] = Await.result(findAllAssetsByLockedStatus(ownerAddresses = ownerAddresses, locked = true),Duration.Inf)
 
     def getByPegHashes(pegHashes:Seq[String]):Seq[Asset] = Await.result(findByPegHashes(pegHashes),Duration.Inf)
 

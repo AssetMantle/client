@@ -1,0 +1,22 @@
+@import controllers.actions.LoginState
+@import models.master.Trader
+
+@(traders: Seq[Trader])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+
+@for(trader <- traders) {
+    <div class="flexItem box thirdBox lightBlue">
+        <div class="leftText">
+            <span class="red">@Messages(constants.Form.TRADER_ID)</span>: @trader.id<br>
+            <span class="red">@Messages(constants.Form.NAME)</span>: @trader.name<br>
+            <span class="red">@Messages(constants.Form.ACCOUNT_ID)</span>: @trader.accountID<br>
+            <span class="red">@Messages(constants.Form.COMPLETION_STATUS)</span>: @trader.completionStatus<br>
+            <span class="red">@Messages(constants.Form.VERIFIED_STATUS)</span>: @trader.verificationStatus.getOrElse(Messages(constants.Form.PENDING))<br>
+        </div>
+        @if(trader.verificationStatus.getOrElse(false)) {
+            <div class="centerText">
+                <button onclick="getForm(jsRoutes.controllers.ComponentViewController.organizationViewTrader('@trader.id'))">@Messages(constants.Form.VIEW)</button>
+                <button onclick="getForm(jsRoutes.controllers.SetACLController.organizationModifyTraderForm('@trader.accountID'))">@Messages(constants.Form.MODIFY_TRADER)</button>
+            </div>
+        }
+    </div>
+}

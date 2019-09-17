@@ -2,10 +2,11 @@ package constants
 
 import java.util.Date
 
-import play.api.data.Forms.{date, number, text, of}
+import play.api.data.Forms.{date, number, of, text}
 import play.api.data.Mapping
-import play.api.data.validation.Constraints
 import play.api.data.format.Formats._
+import play.api.data.validation.Constraints
+
 import scala.util.matching.Regex
 
 object FormField {
@@ -71,6 +72,11 @@ object FormField {
   val POSTAL_ZIP_CODE = new StringFormField("POSTAL_ZIP_CODE", 2, 100)
   val POSTAL_COUNTRY = new StringFormField("POSTAL_COUNTRY", 2, 100)
   val POSTAL_PHONE = new StringFormField("POSTAL_PHONE", 2, 100, RegularExpression.MOBILE_NUMBER)
+  val ADDRESS_LINE_1 = new StringFormField("ADDRESS_LINE_1", 4, 200)
+  val ADDRESS_LINE_2 = new StringFormField("ADDRESS_LINE_2", 4, 200)
+  val LANDMARK = new StringFormField("LANDMARK", 4, 100)
+  val CITY = new StringFormField("CITY", 2, 100)
+  val PHONE = new StringFormField("PHONE", 2, 100, RegularExpression.MOBILE_NUMBER)
   val RELATIONSHIP = new StringFormField("RELATIONSHIP", 2, 100)
   val TITLE = new StringFormField("TITLE", 2, 100)
   val ACCOUNT_HOLDER_NAME = new StringFormField("ACCOUNT_HOLDER_NAME", 2, 100)
@@ -124,7 +130,7 @@ object FormField {
     val field: Mapping[String] = text.verifying(constraint = field => option contains field, error = errorMessage)
   }
 
-  class IntFormField(fieldName: String, minimumValue: Int, maximumValue: Int) {
+  class IntFormField (fieldName: String, val minimumValue: Int, val maximumValue: Int) {
     val name: String = fieldName
     val field: Mapping[Int] =  number(min = minimumValue, max = maximumValue)
   }

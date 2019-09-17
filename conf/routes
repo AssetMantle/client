@@ -6,6 +6,10 @@ GET         /javascriptRoutes                                            control
 
 GET         /firebase-messaging-sw.js                                    controllers.Assets.at(path="/public/javascripts", file="firebase-messaging-sw.js")
 
+GET         /blockExplorer/lastBlockHeight                               controllers.BlockExplorerController.lastBlockHeight
+GET         /blockExplorer/blockDetails                                  controllers.BlockExplorerController.blockDetails(minimumHeight: Int, maximumHeight: Int)
+GET         /blockExplorer/stakingValidators                             controllers.BlockExplorerController.stakingValidators
+GET         /blockExplorer/transactionHash                               controllers.BlockExplorerController.transactionHash(txHash: String)
 
 GET         /genesisRequest                                              controllers.ViewController.genesisRequest
 GET         /genesisInformation                                          controllers.ViewController.genesisInformation
@@ -38,7 +42,7 @@ GET         /account/forgotPassword                                      control
 POST        /account/forgotPassword                                      controllers.AccountController.forgotPassword(username: String)
 
 GET         /account/checkUsernameAvailable                              controllers.AccountController.checkUsernameAvailable(username: String)
-
+POST        /acccount/noteNewKeyDetails                                  controllers.AccountController.noteNewKeyDetails(name:String,blockchainAddress:String ,publicKey:String ,seed:String)
 
 GET         /contact                                                     controllers.ContactController.contact
 
@@ -47,7 +51,6 @@ GET         /master/unreadNotificationCount                              control
 GET         /master/markNotificationAsRead                               controllers.NotificationController.markNotificationRead(notificationID: String)
 
 GET         /master/queryConfigurationVariable:query                     controllers.ConfigurationController.queryConfigurationVariable(query: String)
-
 
 GET         /master/component/commonHome                                 controllers.ComponentViewController.commonHome
 GET         /master/component/genesisDetails                             controllers.ComponentViewController.genesisDetails
@@ -60,6 +63,9 @@ GET         /master/component/sellNegotiationList                        control
 GET         /master/component/orderList                                  controllers.ComponentViewController.orderList
 GET         /master/component/availableAssetList                         controllers.ComponentViewController.availableAssetList
 GET         /master/component/availableAssetListWithLogin                controllers.ComponentViewController.availableAssetListWithLogin
+GET         /master/component/organizationViewTraderList                 controllers.ComponentViewController.organizationViewTraderList
+GET         /master/component/organizationViewTrader                     controllers.ComponentViewController.organizationViewTrader(traderID: String)
+
 GET         /master/component/releaseAssetList                           controllers.ReleaseAssetController.releaseAssetList
 GET         /master/component/buyerExecuteOrderList                      controllers.BuyerExecuteOrderController.moderatedBuyerExecuteOrderList
 GET         /master/component/sellerExecuteOrderList                     controllers.SellerExecuteOrderController.moderatedSellerExecuteOrderList
@@ -72,12 +78,11 @@ GET         /master/component/viewOrganizationsInZone                    control
 GET         /master/component/viewOrganizationsInZoneForGenesis          controllers.AddOrganizationController.viewOrganizationsInZoneForGenesis(zoneID: String)
 GET         /master/component/viewZonesInGenesis                         controllers.AddZoneController.viewZonesInGenesis
 
-
 GET         /master/getGenesisAccessedFile                               controllers.FileController.genesisAccessedFile(fileName: String, documentType: String)
 GET         /master/zoneAccessedOrganizationKYCFile                      controllers.FileController.zoneAccessedOrganizationKYCFile(organizationID: String, fileName: String, documentType: String)
 GET         /master/getZoneAccessedTraderFile                            controllers.FileController.zoneAccessedTraderFile(accountID: String, fileName: String, documentType: String)
-GET         /master/getZoneAccessedAssetFile                             controllers.FileController.zoneAccessedAssetFile(id: String, fileName: String, documentType: String)
-GET         /master/getOrganizationAccessedFile                          controllers.FileController.organizationAccessedFile(accountID: String, fileName: String, documentType: String)
+GET         /master/getZoneAccessedTraderFile                            controllers.FileController.zoneAccessedTraderKYCFile(accountID: String, fileName: String, documentType: String)
+GET         /master/getOrganizationAccessedFile                          controllers.FileController.organizationAccessedTraderKYCFile(accountID: String, fileName: String, documentType: String)
 GET         /master/file                                                 controllers.FileController.file(fileName: String, documentType: String)
 GET         /master/tradingFile                                          controllers.FileController.tradingFile(id: String, fileName: String, documentType: String)
 
@@ -105,23 +110,62 @@ GET         /userUpload/storeUserZoneKycDocument                         control
 GET         /userUpdate/zoneKyc                                          controllers.FileController.updateUserZoneKycForm(documentType: String)
 GET         /userUpdate/updateUserZoneKycDocument                        controllers.FileController.updateUserZoneKyc(name: String, documentType: String, id: String)
 
-GET         /userUpload/traderKyc                                        controllers.FileController.uploadUserTraderKycForm(documentType: String)
-POST        /userUpload/userTraderKycDocument                            controllers.FileController.uploadUserTraderKyc(documentType: String)
-GET         /userUpload/storeUserTraderKycDocument                       controllers.FileController.storeUserTraderKyc(name: String, documentType: String, id: String)
-GET         /userUpdate/traderKyc                                        controllers.FileController.updateUserTraderKycForm(documentType: String)
-GET         /userUpload/updateUserTraderKycDocument                      controllers.FileController.updateUserTraderKyc(name: String, documentType: String, id: String)
-
 GET         /zoneUpload                                                  controllers.FileController.uploadZoneKycForm(documentType: String)
 POST        /zoneUpload/file                                             controllers.FileController.uploadZoneKyc(documentType: String)
 GET         /zoneUpload/storeFile                                        controllers.FileController.storeZoneKyc(name: String, documentType: String, id: String)
 GET         /zoneUpdate                                                  controllers.FileController.updateZoneKycForm(documentType: String)
 GET         /zoneUpload/updateFile                                       controllers.FileController.updateZoneKyc(name: String, documentType: String, id: String)
 
-GET         /traderUpload                                                controllers.FileController.uploadTraderKycForm(documentType: String)
-POST        /traderUpload/file                                           controllers.FileController.uploadTraderKyc(documentType: String)
-GET         /traderUpload/storeFile                                      controllers.FileController.storeTraderKyc(name: String, documentType: String, id: String)
-GET         /traderUpdate                                                controllers.FileController.updateTraderKycForm(documentType: String)
-GET         /traderUpload/updateFile                                     controllers.FileController.updateTraderKyc(name: String, documentType: String, id: String)
+GET         /master/updateContact                                        controllers.ContactController.updateContactForm
+POST        /master/updateContact                                        controllers.ContactController.updateContact
+
+GET         /master/verifyMobileNumber                                   controllers.VerifyMobileNumberController.verifyMobileNumberForm
+POST        /master/verifyMobileNumber                                   controllers.VerifyMobileNumberController.verifyMobileNumber
+
+GET         /master/verifyEmailAddress                                   controllers.VerifyEmailAddressController.verifyEmailAddressForm
+POST        /master/verifyEmailAddress                                   controllers.VerifyEmailAddressController.verifyEmailAddress
+
+GET         /master/traderInvitation                                     controllers.SetACLController.traderInvitationForm
+POST        /master/traderInvitation                                     controllers.SetACLController.traderInvitation
+GET         /master/addTraderRequest                                     controllers.SetACLController.addTraderRequestForm(requestID: String)
+POST        /master/addTraderRequest                                     controllers.SetACLController.addTraderRequest
+GET         /master/addTrader                                            controllers.SetACLController.addTraderForm
+POST        /master/addTrader                                            controllers.SetACLController.addTrader
+GET         /master/userUploadOrUpdateTraderKYCView                      controllers.SetACLController.userUploadOrUpdateTraderKYCView
+GET         /master/userAccessedTraderKYCFile                            controllers.SetACLController.userAccessedTraderKYCFile(documentType: String)
+GET         /master/userUploadTraderKYCForm                              controllers.SetACLController.userUploadTraderKYCForm(documentType: String)
+POST        /master/userUploadTraderKYC                                  controllers.SetACLController.userUploadTraderKYC(documentType: String)
+GET         /master/userStoreTraderKYC                                   controllers.SetACLController.userStoreTraderKYC(name: String, documentType: String)
+GET         /master/userUpdateTraderKYCForm                              controllers.SetACLController.userUpdateTraderKYCForm(documentType: String)
+GET         /master/userUpdateTraderKYC                                  controllers.SetACLController.userUpdateTraderKYC(name: String, documentType: String)
+GET         /master/reviewTraderCompletion                               controllers.SetACLController.reviewTraderCompletionForm
+POST        /master/reviewTraderCompletion                               controllers.SetACLController.reviewTraderCompletion
+
+GET         /master/zoneVerifyTrader                                     controllers.SetACLController.zoneVerifyTraderForm(accountID: String, organizationID: String)
+POST        /master/zoneVerifyTrader                                     controllers.SetACLController.zoneVerifyTrader
+GET         /master/zoneViewTraderKycDocuments                           controllers.SetACLController.zoneViewKycDocuments(traderID: String)
+GET         /master/zoneVerifyTraderKycDocument                          controllers.SetACLController.zoneVerifyKycDocument(traderID: String, documentType: String)
+GET         /master/zoneRejectTraderKycDocument                          controllers.SetACLController.zoneRejectKycDocument(traderID: String, documentType: String)
+GET         /master/zoneViewVerifyTraderRequests                         controllers.SetACLController.zoneViewPendingVerifyTraderRequests
+GET         /master/zoneRejectVerifyTraderRequest                        controllers.SetACLController.zoneRejectVerifyTraderRequestForm(traderID: String)
+POST        /master/zoneRejectVerifyTraderRequest                        controllers.SetACLController.zoneRejectVerifyTraderRequest
+
+GET         /master/organizationVerifyTrader                             controllers.SetACLController.organizationVerifyTraderForm(accountID: String, organizationID: String)
+POST        /master/organizationVerifyTrader                             controllers.SetACLController.organizationVerifyTrader
+GET         /master/organizationModifyTrader                             controllers.SetACLController.organizationModifyTraderForm(accountID: String)
+POST        /master/organizationModifyTrader                             controllers.SetACLController.organizationModifyTrader
+GET         /master/organzationViewTraderKycDocuments                    controllers.SetACLController.organizationViewKycDocuments(traderID: String)
+GET         /master/organizationVerifyTraderKycDocument                  controllers.SetACLController.organizationVerifyKycDocument(traderID: String, documentType: String)
+GET         /master/organizationRejectTraderKycDocument                  controllers.SetACLController.organizationRejectKycDocument(traderID: String, documentType: String)
+GET         /master/organizationViewVerifyTraderRequests                 controllers.SetACLController.organizationViewPendingVerifyTraderRequests
+GET         /master/organizationRejectVerifyTraderRequest                controllers.SetACLController.organizationRejectVerifyTraderRequestForm(traderID: String)
+POST        /master/organizationRejectVerifyTraderRequest                controllers.SetACLController.organizationRejectVerifyTraderRequest
+
+GET         /traderUpload                                                controllers.SetACLController.uploadTraderKycForm(documentType: String)
+POST        /traderUpload/file                                           controllers.SetACLController.uploadTraderKyc(documentType: String)
+GET         /traderUpload/storeFile                                      controllers.SetACLController.storeTraderKyc(name: String, documentType: String)
+GET         /traderUpdate                                                controllers.SetACLController.updateTraderKycForm(documentType: String)
+GET         /traderUpload/updateFile                                     controllers.SetACLController.updateTraderKyc(name: String, documentType: String)
 
 GET         /traderUpload/assetForm                                      controllers.FileController.uploadTraderAssetForm(documentType: String, id: String)
 POST        /traderUpload/assetDocument                                  controllers.FileController.uploadTraderAsset(documentType: String)
@@ -134,38 +178,6 @@ POST        /traderUpload/negotiationDocument                            control
 GET         /traderUpload/storeNegotiationDocument                       controllers.FileController.storeTraderNegotiation(name: String, documentType: String, id: String)
 GET         /traderUpdate/negotiationForm                                controllers.FileController.updateTraderNegotiationForm(documentType: String, id :String)
 GET         /traderUpdate/negotiationDocument                            controllers.FileController.updateTraderNegotiation(name: String, documentType: String, id: String)
-
-
-GET         /master/updateContact                                        controllers.ContactController.updateContactForm
-POST        /master/updateContact                                        controllers.ContactController.updateContact
-
-GET         /master/verifyMobileNumber                                   controllers.VerifyMobileNumberController.verifyMobileNumberForm
-POST        /master/verifyMobileNumber                                   controllers.VerifyMobileNumberController.verifyMobileNumber
-
-GET         /master/verifyEmailAddress                                   controllers.VerifyEmailAddressController.verifyEmailAddressForm
-POST        /master/verifyEmailAddress                                   controllers.VerifyEmailAddressController.verifyEmailAddress
-
-GET         /master/addTrader                                            controllers.SetACLController.addTraderForm
-POST        /master/addTrader                                            controllers.SetACLController.addTrader
-
-
-GET         /master/zoneVerifyTrader                                     controllers.SetACLController.zoneVerifyTraderForm(accountID: String, organizationID: String)
-POST        /master/zoneVerifyTrader                                     controllers.SetACLController.zoneVerifyTrader
-GET         /master/zoneViewTraderKycDocuments                           controllers.SetACLController.zoneViewKycDocuments(accountID: String)
-GET         /master/zoneVerifyTraderKycDocument                          controllers.SetACLController.zoneVerifyKycDocument(accountID: String, documentType: String)
-GET         /master/zoneRejectTraderKycDocument                          controllers.SetACLController.zoneRejectKycDocument(accountID: String, documentType: String)
-GET         /master/zoneViewVerifyTraderRequests                         controllers.SetACLController.zoneViewPendingVerifyTraderRequests
-GET         /master/zoneRejectVerifyTraderRequest                        controllers.SetACLController.zoneRejectVerifyTraderRequestForm(traderID: String)
-POST        /master/zoneRejectVerifyTraderRequest                        controllers.SetACLController.zoneRejectVerifyTraderRequest
-
-GET         /master/organizationVerifyTrader                             controllers.SetACLController.organizationVerifyTraderForm(accountID: String, organizationID: String)
-POST        /master/organizationVerifyTrader                             controllers.SetACLController.organizationVerifyTrader
-GET         /master/organzationViewTraderKycDocuments                    controllers.SetACLController.organizationViewKycDocuments(accountID: String)
-GET         /master/organizationVerifyTraderKycDocument                  controllers.SetACLController.organizationVerifyKycDocument(accountID: String, documentType: String)
-GET         /master/organizationRejectTraderKycDocument                  controllers.SetACLController.organizationRejectKycDocument(accountID: String, documentType: String)
-GET         /master/organizationViewVerifyTraderRequests                 controllers.SetACLController.organizationViewPendingVerifyTraderRequests
-GET         /master/organizationRejectVerifyTraderRequest                controllers.SetACLController.organizationRejectVerifyTraderRequestForm(traderID: String)
-POST        /master/organizationRejectVerifyTraderRequest                controllers.SetACLController.organizationRejectVerifyTraderRequest
 
 GET         /master/addOrganization                                      controllers.AddOrganizationController.addOrganizationForm
 POST        /master/addOrganization                                      controllers.AddOrganizationController.addOrganization

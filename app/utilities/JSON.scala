@@ -27,25 +27,25 @@ object JSON {
       }
     } catch {
       case jsonParseException: JsonParseException => logger.info(jsonParseException.getMessage, jsonParseException)
-        throw new BaseException(new Failure(jsonParseException.getMessage, null))
+        throw new BaseException(constants.Response.JSON_PARSE_EXCEPTION)
       case jsonMappingException: JsonMappingException => logger.info(jsonMappingException.getMessage, jsonMappingException)
         throw new BaseException(constants.Response.NO_RESPONSE)
     }
   }
 
-  def getInstance[T](jsonString: String)(implicit module: String, logger: Logger, reads: Reads[T]): T = {
+  def convertJsonStringToObject[T](jsonString: String)(implicit module: String, logger: Logger, reads: Reads[T]): T = {
     try {
       Json.fromJson[T](Json.parse(jsonString)) match {
         case JsSuccess(value: T, _: JsPath) => value
-        case errors: JsError => logger.info(errors.toString)
-          throw new BaseException(new Failure(jsonString, null))
+        case errors: JsError => logger.error(errors.toString)
+          throw new BaseException(constants.Response.JSON_PARSE_EXCEPTION)
       }
     }
     catch {
-      case jsonParseException: JsonParseException => logger.info(jsonParseException.getMessage, jsonParseException)
-        throw new BaseException(new Failure(jsonParseException.getMessage, null))
-      case jsonMappingException: JsonMappingException => logger.info(jsonMappingException.getMessage, jsonMappingException)
-        throw new BaseException(new Failure(jsonMappingException.getMessage, null))
+      case jsonParseException: JsonParseException => logger.error(jsonParseException.getMessage, jsonParseException)
+        throw new BaseException(constants.Response.JSON_PARSE_EXCEPTION)
+      case jsonMappingException: JsonMappingException => logger.error(jsonMappingException.getMessage, jsonMappingException)
+        throw new BaseException(constants.Response.JSON_MAPPING_EXCEPTION)
     }
   }
 }

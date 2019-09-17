@@ -49,44 +49,44 @@ function verifyTraderAssetDocument(id, documentType) {
     });
 }
 
-function organizationVerifyTraderKycDocument(accountID, documentType) {
-    let route = jsRoutes.controllers.SetACLController.organizationVerifyKycDocument(accountID, documentType);
+function organizationVerifyTraderKycDocument(traderID, documentType) {
+    let route = jsRoutes.controllers.SetACLController.organizationVerifyKycDocument(traderID, documentType);
     $.ajax({
         url: route.url,
         type: route.type,
         success: function (result) {
-            document.getElementById('traderKycDocumentStatus' + accountID + documentType).innerHTML = result;
-            $('#buttonTraderKycDocumentStatus' + accountID + documentType).hide();
-            document.getElementById('organizationViewUnverifiedTraderKYCDocumentOrganizationStatus' + accountID + documentType).style.display = "none";
-            document.getElementById('organizationViewVerifiedTraderKYCDocumentOrganizationStatus' + accountID + documentType).style.display = "block";
-            if ($('#organizationViewUnverifiedTraderKYCDocumentZoneStatus' + accountID + documentType).hasClass("hidden") && document.getElementById('organizationViewVerifiedTraderKYCDocumentOrganizationStatus' + accountID + documentType).style.display !== "none") {
-                document.getElementById('verifiedDocumentStatus' + accountID + documentType).style.display = "block";
-                document.getElementById('unverifiedDocumentStatus' + accountID + documentType).style.display = "none"
+            document.getElementById('traderKycDocumentStatus' + traderID + documentType).innerHTML = result;
+            $('#buttonTraderKycDocumentStatus' + traderID + documentType).hide();
+            document.getElementById('organizationViewUnverifiedTraderKYCDocumentOrganizationStatus' + traderID + documentType).style.display = "none";
+            document.getElementById('organizationViewVerifiedTraderKYCDocumentOrganizationStatus' + traderID + documentType).style.display = "block";
+            if ($('#organizationViewUnverifiedTraderKYCDocumentZoneStatus' + traderID + documentType).hasClass("hidden") && document.getElementById('organizationViewVerifiedTraderKYCDocumentOrganizationStatus' + traderID + documentType).style.display !== "none") {
+                document.getElementById('verifiedDocumentStatus' + traderID + documentType).style.display = "block";
+                document.getElementById('unverifiedDocumentStatus' + traderID + documentType).style.display = "none"
             }
         },
         error: function (error) {
-            document.getElementById('traderKycDocumentStatus' + accountID + documentType).innerHTML = error.responseText;
+            document.getElementById('traderKycDocumentStatus' + traderID + documentType).innerHTML = error.responseText;
         }
     });
 }
 
-function zoneVerifyTraderKycDocument(accountID, documentType) {
-    let route = jsRoutes.controllers.SetACLController.zoneVerifyKycDocument(accountID, documentType);
+function zoneVerifyTraderKycDocument(traderID, documentType) {
+    let route = jsRoutes.controllers.SetACLController.zoneVerifyKycDocument(traderID, documentType);
     $.ajax({
         url: route.url,
         type: route.type,
         success: function (result) {
-            document.getElementById('traderKycDocumentStatus' + accountID + documentType).innerHTML = result;
-            $('#buttonTraderKycDocumentStatus' + accountID + documentType).hide();
-            document.getElementById('zoneViewUnverifiedTraderKYCDocumentZoneStatus' + accountID + documentType).style.display = "none";
-            document.getElementById('zoneViewVerifiedTraderKYCDocumentZoneStatus' + accountID + documentType).style.display = "block";
-            if ($('#zoneViewUnverifiedTraderKYCDocumentOrganizationStatus' + accountID + documentType).hasClass("hidden") && document.getElementById('zoneViewVerifiedTraderKYCDocumentZoneStatus' + accountID + documentType).style.display !== "none") {
-                document.getElementById('verifiedDocumentStatus' + accountID + documentType).style.display = "block";
-                document.getElementById('unverifiedDocumentStatus' + accountID + documentType).style.display = "none"
+            document.getElementById('traderKycDocumentStatus' + traderID + documentType).innerHTML = result;
+            $('#buttonTraderKycDocumentStatus' + traderID + documentType).hide();
+            document.getElementById('zoneViewUnverifiedTraderKYCDocumentZoneStatus' + traderID + documentType).style.display = "none";
+            document.getElementById('zoneViewVerifiedTraderKYCDocumentZoneStatus' + traderID + documentType).style.display = "block";
+            if ($('#zoneViewUnverifiedTraderKYCDocumentOrganizationStatus' + traderID + documentType).hasClass("hidden") && document.getElementById('zoneViewVerifiedTraderKYCDocumentZoneStatus' + traderID + documentType).style.display !== "none") {
+                document.getElementById('verifiedDocumentStatus' + traderID + documentType).style.display = "block";
+                document.getElementById('unverifiedDocumentStatus' + traderID + documentType).style.display = "none"
             }
         },
         error: function (error) {
-            document.getElementById('traderKycDocumentStatus' + accountID + documentType).innerHTML = error.responseText;
+            document.getElementById('traderKycDocumentStatus' + traderID + documentType).innerHTML = error.responseText;
         }
     });
 }
@@ -110,7 +110,6 @@ function rejectZoneKycDocument(accountID, documentType) {
 
 function rejectOrganizationKycDocument(organizationID, documentType) {
     let route = jsRoutes.controllers.AddOrganizationController.rejectKycDocument(organizationID, documentType);
-    console.log('buttonOrganizationKycDocumentStatus' + organizationID + documentType);
     $.ajax({
         url: route.url,
         type: route.type,
@@ -122,6 +121,44 @@ function rejectOrganizationKycDocument(organizationID, documentType) {
         },
         error: function (error) {
             document.getElementById('organizationKycDocumentStatus' + organizationID + documentType).innerHTML = error.responseText;
+        }
+    });
+}
+
+function organizationRejectTraderKycDocument(traderID, documentType) {
+    let route = jsRoutes.controllers.SetACLController.organizationRejectKycDocument(traderID, documentType);
+    $.ajax({
+        url: route.url,
+        type: route.type,
+        success: function (result) {
+            document.getElementById('traderKycDocumentStatus' + traderID + documentType).innerHTML = result;
+            $('#buttonTraderKycDocumentStatus' + traderID + documentType).hide();
+            document.getElementById('organizationViewVerifiedTraderKYCDocumentOrganizationStatus' + traderID + documentType).style.display = "none";
+            document.getElementById('organizationViewUnverifiedTraderKYCDocumentOrganizationStatus' + traderID + documentType).style.display = "block";
+            document.getElementById('verifiedDocumentStatus' + traderID + documentType).style.display = "none";
+            document.getElementById('unverifiedDocumentStatus' + traderID + documentType).style.display = "block"
+        },
+        error: function (error) {
+            document.getElementById('traderKycDocumentStatus' + traderID + documentType).innerHTML = error.responseText;
+        }
+    });
+}
+
+function zoneRejectTraderKycDocument(traderID, documentType) {
+    let route = jsRoutes.controllers.SetACLController.zoneRejectKycDocument(traderID, documentType);
+    $.ajax({
+        url: route.url,
+        type: route.type,
+        success: function (result) {
+            document.getElementById('traderKycDocumentStatus' + traderID + documentType).innerHTML = result;
+            $('#buttonTraderKycDocumentStatus' + traderID + documentType).hide();
+            document.getElementById('zoneViewVerifiedTraderKYCDocumentZoneStatus' + traderID + documentType).style.display = "none";
+            document.getElementById('zoneViewUnverifiedTraderKYCDocumentZoneStatus' + traderID + documentType).style.display = "block";
+            document.getElementById('verifiedDocumentStatus' + traderID + documentType).style.display = "none";
+            document.getElementById('unverifiedDocumentStatus' + traderID + documentType).style.display = "block"
+        },
+        error: function (error) {
+            document.getElementById('traderKycDocumentStatus' + traderID + documentType).innerHTML = error.responseText;
         }
     });
 }
@@ -140,44 +177,6 @@ function rejectTraderAssetDocument(id, documentType) {
         },
         error: function (error) {
             document.getElementById('traderAssetDocumentStatus' + id + documentType).innerHTML = error.responseText;
-        }
-    });
-}
-
-function organizationRejectTraderKycDocument(accountID, documentType) {
-    let route = jsRoutes.controllers.SetACLController.organizationRejectKycDocument(accountID, documentType);
-    $.ajax({
-        url: route.url,
-        type: route.type,
-        success: function (result) {
-            document.getElementById('traderKycDocumentStatus' + accountID + documentType).innerHTML = result;
-            $('#buttonTraderKycDocumentStatus' + accountID + documentType).hide();
-            document.getElementById('organizationViewVerifiedTraderKYCDocumentOrganizationStatus' + accountID + documentType).style.display = "none";
-            document.getElementById('organizationViewUnverifiedTraderKYCDocumentOrganizationStatus' + accountID + documentType).style.display = "block";
-            document.getElementById('verifiedDocumentStatus' + accountID + documentType).style.display = "none";
-            document.getElementById('unverifiedDocumentStatus' + accountID + documentType).style.display = "block"
-        },
-        error: function (error) {
-            document.getElementById('traderKycDocumentStatus' + accountID + documentType).innerHTML = error.responseText;
-        }
-    });
-}
-
-function zoneRejectTraderKycDocument(accountID, documentType) {
-    let route = jsRoutes.controllers.SetACLController.zoneRejectKycDocument(accountID, documentType);
-    $.ajax({
-        url: route.url,
-        type: route.type,
-        success: function (result) {
-            document.getElementById('traderKycDocumentStatus' + accountID + documentType).innerHTML = result;
-            $('#buttonTraderKycDocumentStatus' + accountID + documentType).hide();
-            document.getElementById('zoneViewVerifiedTraderKYCDocumentZoneStatus' + accountID + documentType).style.display = "none";
-            document.getElementById('zoneViewUnverifiedTraderKYCDocumentZoneStatus' + accountID + documentType).style.display = "block";
-            document.getElementById('verifiedDocumentStatus' + accountID + documentType).style.display = "none";
-            document.getElementById('unverifiedDocumentStatus' + accountID + documentType).style.display = "block"
-        },
-        error: function (error) {
-            document.getElementById('traderKycDocumentStatus' + accountID + documentType).innerHTML = error.responseText;
         }
     });
 }

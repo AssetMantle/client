@@ -24,6 +24,13 @@ import scala.util.{Failure, Success}
 //  def updateFileName(newFileName: String): AssetFile[T] = AssetFile[T](id = id, documentType = documentType, fileName = newFileName, file = file, context = context, status = status)
 //}
 
+case class AssetFileTrait(id: String, documentType: String, fileName: String, file: Option[Array[Byte]], context: Option[models.Trait.Context], status: Option[Boolean]) extends Document[AssetFileTrait] {
+  def updateFile(newFile: Option[Array[Byte]]): AssetFileTrait = AssetFileTrait(id = id, documentType = documentType, fileName = fileName, file = newFile, context = context, status = status)
+
+  def updateFileName(newFileName: String): AssetFileTrait = AssetFileTrait(id = id, documentType = documentType, fileName = newFileName, file = file, context = context, status = status)
+}
+
+
 case class AssetFile(id: String, documentType: String, fileName: String, file: Option[Array[Byte]], context: Option[String], status: Option[Boolean]) extends Document[AssetFile] {
   def updateFile(newFile: Option[Array[Byte]]): AssetFile = AssetFile(id = id, documentType = documentType, fileName = fileName, file = newFile, context = context, status = status)
 
@@ -38,20 +45,29 @@ class AssetFiles @Inject()(protected val databaseConfigProvider: DatabaseConfigP
 
   private implicit val module: String = constants.Module.MASTER_TRANSACTION_ASSET_FILE
 
-//  case class AssetFileSerializable(id: String, documentType: String, fileName: String, file: Option[Array[Byte]], context: Option[String], status: Option[Boolean]) {
-//    //def updateFile(newFile: Option[Array[Byte]]): AssetFile = AssetFile(id = id, documentType = documentType, fileName = fileName, file = newFile, context = context, status = status)
-//
-//    //def updateFileName(newFileName: String): AssetFile = AssetFile(id = id, documentType = documentType, fileName = newFileName, file = file, context = context, status = status)
-//
-//    def deserialize[T](implicit reads: Reads[T]): AssetFile[T] = {
-//      documentType match {
-//        case "OBL" => AssetFile[T]( id, documentType, fileName, file, context = Option(utilities.JSON.getInstance[T](context.getOrElse(Json.toJson(Serializable.OBL("", "", "", "", "", "", new Date, "", 0, 0)).toString))), status)
-//      }
-//    }
-//  }
+  case class AssetFileSerializable(id: String, documentType: String, fileName: String, file: Option[Array[Byte]], context: Option[String], status: Option[Boolean]) {
+    def deserialize : models.Trait.Context = documentType match {
+      case "OBL" => utilities.JSON.getInstance[Serializable.OBL](context.getOrElse(Serializable.OBL("","","","","","",new Date, "", 0, 0)))
+    }
+  }
 
-//  private def serialize[T](assetFile: AssetFile[T])(implicit jsonWrites: OWrites[T]): AssetFileSerializable = AssetFileSerializable(assetFile.id, assetFile.documentType, assetFile.fileName, assetFile.file, Option(Json.toJson[T](assetFile.context.get).toString()), assetFile.status)
+  def serialize(assetFileTrait: AssetFileTrait): AssetFileSerializable = assetFileTrait.documentType match {
+    case "OBL" => AssetFileSerializable(assetFileTrait.id, assetFileTrait.documentType, assetFileTrait.fileName, assetFileTrait.file, Option (Json.toJson(assetFileTrait.context.getOrElse ("")).toString), assetFileTrait.status)
+  }
 
+  //  case class AssetFileSerializable(id: String, documentType: String, fileName: String, file: Option[Array[Byte]], context: Option[String], status: Option[Boolean]) {
+  //    //def updateFile(newFile: Option[Array[Byte]]): AssetFile = AssetFile(id = id, documentType = documentType, fileName = fileName, file = newFile, context = context, status = status)
+  //
+  //    //def updateFileName(newFileName: String): AssetFile = AssetFile(id = id, documentType = documentType, fileName = newFileName, file = file, context = context, status = status)
+  //
+  //    def deserialize[T](implicit reads: Reads[T]): AssetFile[T] = {
+  //      documentType match {
+  //        case "OBL" => AssetFile[T]( id, documentType, fileName, file, context = Option(utilities.JSON.getInstance[T](context.getOrElse(Json.toJson(Serializable.OBL("", "", "", "", "", "", new Date, "", 0, 0)).toString))), status)
+  //      }
+  //    }
+  //  }
+
+  //  private def serialize[T](assetFile: AssetFile[T])(implicit jsonWrites: OWrites[T]): AssetFileSerializable = AssetFileSerializable(assetFile.id, assetFile.documentType, assetFile.fileName, assetFile.file, Option(Json.toJson[T](assetFile.context.get).toString()), assetFile.status)
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
   val db = databaseConfig.db

@@ -1,43 +1,40 @@
-function searchFunction(searchData) {
-    let invalidBlockHeight = getCookie("blockHeightError");
-    let invalidTransactionHash = getCookie("transactionHashError");
+getConfigurationAsynchronously("blockchain.transaction.hashLength");
 
-    $("#searchForm").submit(function(e) {
+function searchFunction(searchData) {
+    const invalidBlockHeight = getCookie("blockHeightError");
+    const invalidTransactionHash = getCookie("transactionHashError");
+
+    $("#searchForm").submit(function (e) {
         e.preventDefault();
     });
 
-    let heightPattern = /^[0-9]*$/;
-    let txHashPattern = /^[A-F0-9]{40}$/;
-    let blockHeightUrl = getConfiguration("blockchain.main.ip") + ":" + getConfiguration("blockchain.main.abciPort") + "/block?height=";
-    let txHashUrl = getConfiguration("blockchain.main.ip") + ":" + getConfiguration("blockchain.main.restPort") + "/txs/";
+    const hashLength = parseInt(getConfigurationAsynchronously("blockchain.transaction.hashLength"), 10);
+
+    const heightPattern = /^[0-9]*$/;
+    //TODO pattern with config
+    const txHashPattern = /^[A-F0-9]{64}$/;
 
     if (searchData === undefined) {
-        searchData = document.getElementById("searchValue").value;
+        searchData = $("#searchValue").val();
     }
     let height = heightPattern.exec(searchData);
     if (height != null) {
+        let blockDetails = jsRoutes.controllers.BlockExplorerController.blockDetails(height, height);
         $.ajax({
-            url: blockHeightUrl + height.input,
-            type: "GET",
+            url: blockDetails.url,
+            type: blockDetails.type,
             async: true,
             statusCode: {
-                200: function (heightData) {
-                    if (heightData.hasOwnProperty("error")) {
-                        document.getElementById('blockHeightPageHeight').innerHTML = invalidBlockHeight;
-                        document.getElementById('blockHeightPageTime').innerHTML = "";
-                        document.getElementById('blockHeightPageDataHash').innerHTML = "";
-                        document.getElementById('blockHeightPageNumTxs').innerHTML = "";
-                        document.getElementById('blockHeightPageEvidenceHash').innerHTML = "";
-                        document.getElementById('blockHeightPageValidatorsHash').innerHTML = "";
-                    } else {
-                        document.getElementById('blockHeightPageHeight').innerHTML = heightData.result.block.header.height;
-                        document.getElementById('blockHeightPageTime').innerHTML = heightData.result.block.header.time;
-                        document.getElementById('blockHeightPageDataHash').innerHTML = heightData.result.block.header.data_hash;
-                        document.getElementById('blockHeightPageNumTxs').innerHTML = heightData.result.block.header.num_txs;
-                        document.getElementById('blockHeightPageEvidenceHash').innerHTML = heightData.result.block.header.evidence_hash;
-                        document.getElementById('blockHeightPageValidatorsHash').innerHTML = heightData.result.block.header.validators_hash;
-                    }
-                }
+                200: function (blockDetailsData) {
+                    let block = JSON.parse(blockDetailsData);
+                    $('#blockHeightPageHeight').html(block[0].header.height);
+                    $('#blockHeightPageTime').html(block[0].header.time);
+                    $('#blockHeightPageDataHash').html(block[0].header.data_hash);
+                    $('#blockHeightPageNumTxs').html(block[0].header.num_txs);
+                    $('#blockHeightPageEvidenceHash').html(block[0].header.evidence_hash);
+                    $('#blockHeightPageValidatorsHash').html(block[0].header.validators_hash);
+                },
+                500: {}
             }
         });
         $('#indexBottomDivision').hide();
@@ -45,27 +42,25 @@ function searchFunction(searchData) {
         $('#validatorsTable').hide();
         $('#txHashBottomDivision').hide();
         $('#blockHeightBottomDivision').show();
-
     }
     let txHash = txHashPattern.exec(searchData);
+    let transactionHashUrl = jsRoutes.controllers.BlockExplorerController.transactionHash(txHash);
     if (txHash != null) {
-
         $.ajax({
-            url: txHashUrl + txHash.input,
-            type: "GET",
+            url: transactionHashUrl.url,
+            type: transactionHashUrl.type,
             async: true,
             statusCode: {
-                200: function (data) {
-                    let transactionData = JSON.parse(data);
-                    document.getElementById('txHashPageHash').innerHTML = transactionData.hash;
-                    document.getElementById('txHashPageHeight').innerHTML = transactionData.height;
-                    document.getElementById('txHashPageFee').innerHTML = transactionData.tx.value.fee.gas;
+                200: function (transactionData) {
+                    $('#txHashPageHash').html(transactionData.txhash);
+                    $('#txHashPageHeight').html(transactionData.height);
+                    $('#txHashPageFee').html(transactionData.tx.value.fee.gas);
 
                 },
                 500: function (data) {
-                    document.getElementById('txHashPageHash').innerHTML = invalidTransactionHash;
-                    document.getElementById('txHashPageHeight').innerHTML = "";
-                    document.getElementById('txHashPageFee').innerHTML = "";
+                    $('#txHashPageHash').html(invalidTransactionHash);
+                    $('#txHashPageHeight').html("");
+                    $('#txHashPageFee').html("");
                 }
             }
         });
@@ -78,6 +73,6 @@ function searchFunction(searchData) {
 }
 
 function setSearchErrorValues(blockHeightError, transactionHashError) {
-    setCookie("blockHeightError", blockHeightError,1);
-    setCookie("transactionHashError", transactionHashError,1);
+    setCookie("blockHeightError", blockHeightError, 1);
+    setCookie("transactionHashError", transactionHashError, 1);
 }

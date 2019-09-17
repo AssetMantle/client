@@ -12,7 +12,7 @@ import play.api.{Configuration, Logger}
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class ReleaseAssetController @Inject()(messagesControllerComponents: MessagesControllerComponents, transaction: utilities.Transaction, blockchainAssets: blockchain.Assets, blockchainACLAccounts: blockchain.ACLAccounts, blockchainZones: blockchain.Zones, blockchainAccounts: blockchain.Accounts, withZoneLoginAction: WithZoneLoginAction, transactionsReleaseAsset: transactions.ReleaseAsset, blockchainTransactionReleaseAssets: blockchainTransaction.ReleaseAssets, withUsernameToken: WithUsernameToken)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class ReleaseAssetController @Inject()(messagesControllerComponents: MessagesControllerComponents, transaction: utilities.Transaction, blockchainAssets: blockchain.Assets, blockchainACLAccounts: blockchain.ACLAccounts, blockchainZones: blockchain.Zones, blockchainAccounts: blockchain.Accounts, withZoneLoginAction: WithZoneLoginAction, transactionsReleaseAsset: transactions.ReleaseAsset, blockchainTransactionReleaseAssets: blockchainTransaction.ReleaseAssets, withUsernameToken: WithUsernameToken)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -35,7 +35,7 @@ class ReleaseAssetController @Inject()(messagesControllerComponents: MessagesCon
             transaction.process[blockchainTransaction.ReleaseAsset, transactionsReleaseAsset.Request](
               entity = blockchainTransaction.ReleaseAsset(from = loginState.address, to = releaseAssetData.address, pegHash = releaseAssetData.pegHash, gas = releaseAssetData.gas, ticketID = "", mode = transactionMode),
               blockchainTransactionCreate = blockchainTransactionReleaseAssets.Service.create,
-              request = transactionsReleaseAsset.Request(transactionsReleaseAsset.BaseRequest(from = loginState.address, gas = releaseAssetData.gas.toString), to = releaseAssetData.address, password = releaseAssetData.password, pegHash = releaseAssetData.pegHash, mode = transactionMode),
+              request = transactionsReleaseAsset.Request(transactionsReleaseAsset.BaseReq(from = loginState.address, gas = releaseAssetData.gas.toString), to = releaseAssetData.address, password = releaseAssetData.password, pegHash = releaseAssetData.pegHash, mode = transactionMode),
               action = transactionsReleaseAsset.Service.post,
               onSuccess = blockchainTransactionReleaseAssets.Utility.onSuccess,
               onFailure = blockchainTransactionReleaseAssets.Utility.onFailure,
@@ -70,7 +70,7 @@ class ReleaseAssetController @Inject()(messagesControllerComponents: MessagesCon
       },
       releaseAssetData => {
         try {
-          transactionsReleaseAsset.Service.post(transactionsReleaseAsset.Request(transactionsReleaseAsset.BaseRequest(from = releaseAssetData.from, gas = releaseAssetData.gas.toString), to = releaseAssetData.to, password = releaseAssetData.password, pegHash = releaseAssetData.pegHash, mode = releaseAssetData.mode))
+          transactionsReleaseAsset.Service.post(transactionsReleaseAsset.Request(transactionsReleaseAsset.BaseReq(from = releaseAssetData.from, gas = releaseAssetData.gas.toString), to = releaseAssetData.to, password = releaseAssetData.password, pegHash = releaseAssetData.pegHash, mode = releaseAssetData.mode))
           Ok(views.html.index(successes = Seq(constants.Response.ASSET_RELEASED)))
         }
         catch {

@@ -14,7 +14,7 @@ import scala.concurrent.{Await, ExecutionContext, Future}
 @Singleton
 class GetNegotiation @Inject()()(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
-  private implicit val module: String = constants.Module.TRANSACTIONS_GET_NEGOTIATION
+  private implicit val module: String = constants.Module.QUERIES_GET_NEGOTIATION
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -33,8 +33,7 @@ class GetNegotiation @Inject()()(implicit wsClient: WSClient, configuration: Con
     def get(negotiationID: String): Response = try {
       Await.result(action(negotiationID), Duration.Inf)
     } catch {
-      case connectException: ConnectException =>
-        logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
+      case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
         throw new BaseException(constants.Response.CONNECT_EXCEPTION)
     }
   }
