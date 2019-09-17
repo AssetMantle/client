@@ -130,6 +130,8 @@ class IssueAssetRequests @Inject()(protected val databaseConfigProvider: Databas
     }
   }
 
+  private def verifyStatusByID(id: String, status: String): Future[Boolean] = db.run(issueAssetRequestTable.filter(_.id === id).filter(_.status === status).exists.result)
+
   private def getAccountIDByID(id: String): Future[String] = db.run(issueAssetRequestTable.filter(_.id === id).map(_.accountID).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -205,6 +207,8 @@ class IssueAssetRequests @Inject()(protected val databaseConfigProvider: Databas
     def delete(id: String): Int = Await.result(deleteByID(id), Duration.Inf)
 
     def getStatus(id: String): String = Await.result(getStatusByID(id), Duration.Inf)
+
+    def verifyRequestedStatus(id: String): Boolean = Await.result(verifyStatusByID(id, constants.Status.Asset.REQUESTED), Duration.Inf)
 
   }
 

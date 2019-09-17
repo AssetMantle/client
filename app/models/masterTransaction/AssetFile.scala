@@ -58,9 +58,9 @@ class AssetFiles @Inject()(protected val databaseConfigProvider: DatabaseConfigP
 
   import databaseConfig.profile.api._
 
-  private[models] val fileTable = TableQuery[AssetFileTable]
+  private[models] val assetFileTable = TableQuery[AssetFileTable]
 
-  private def add(file: AssetFile): Future[String] = db.run((fileTable returning fileTable.map(_.id) += file).asTry).map {
+  private def add(file: AssetFile): Future[String] = db.run((assetFileTable returning assetFileTable.map(_.id) += file).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -68,17 +68,7 @@ class AssetFiles @Inject()(protected val databaseConfigProvider: DatabaseConfigP
     }
   }
 
-  private def upsert(file: AssetFile): Future[Int] = db.run(fileTable.insertOrUpdate(file).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case e: Exception => logger.error(constants.Response.GENERIC_EXCEPTION.message, e)
-        throw new BaseException(constants.Response.GENERIC_EXCEPTION)
-    }
-  }
-
-  private def upsertFile(file: AssetFile): Future[Int] = db.run(fileTable.map(x => (x.id, x.documentType, x.fileName, x.file.?)).insertOrUpdate(file.id, file.documentType, file.fileName, file.file).asTry).map {
+  private def upsert(file: AssetFile): Future[Int] = db.run(assetFileTable.insertOrUpdate(file).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -88,7 +78,7 @@ class AssetFiles @Inject()(protected val databaseConfigProvider: DatabaseConfigP
     }
   }
 
-  private def upsertContext(file: AssetFile): Future[Int] = db.run(fileTable.map(x => (x.id, x.documentType, x.context.?)).insertOrUpdate(file.id, file.documentType, file.context).asTry).map {
+  private def upsertFile(file: AssetFile): Future[Int] = db.run(assetFileTable.map(x => (x.id, x.documentType, x.fileName, x.file.?)).insertOrUpdate(file.id, file.documentType, file.fileName, file.file).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -98,7 +88,7 @@ class AssetFiles @Inject()(protected val databaseConfigProvider: DatabaseConfigP
     }
   }
 
-  private def updateAllFilesStatus(id: String, status: Boolean) = db.run(fileTable.map(x => (x.id, status)).update(id, status).asTry).map {
+  private def upsertContext(file: AssetFile): Future[Int] = db.run(assetFileTable.map(x => (x.id, x.documentType, x.context.?)).insertOrUpdate(file.id, file.documentType, file.context).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -108,7 +98,7 @@ class AssetFiles @Inject()(protected val databaseConfigProvider: DatabaseConfigP
     }
   }
 
-  private def updateDocument(id: String, documentType: String, fileName: String, file: Option[Array[Byte]], status: Option[Boolean]): Future[Int] = db.run(fileTable.filter(_.id === id).filter(_.documentType === documentType).map(x => (x.fileName, x.file.?, x.status.?)).update((fileName, file, status)).asTry).map {
+  private def updateAllFilesStatus(id: String, status: Boolean) = db.run(assetFileTable.map(x => (x.id, status)).update(id, status).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -118,7 +108,7 @@ class AssetFiles @Inject()(protected val databaseConfigProvider: DatabaseConfigP
     }
   }
 
-  private def updateStatus(id: String, documentType: String, status: Boolean): Future[Int] = db.run(fileTable.filter(_.id === id).filter(_.documentType === documentType).map(_.status).update(status).asTry).map {
+  private def updateDocument(id: String, documentType: String, fileName: String, file: Option[Array[Byte]], status: Option[Boolean]): Future[Int] = db.run(assetFileTable.filter(_.id === id).filter(_.documentType === documentType).map(x => (x.fileName, x.file.?, x.status.?)).update((fileName, file, status)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -128,7 +118,17 @@ class AssetFiles @Inject()(protected val databaseConfigProvider: DatabaseConfigP
     }
   }
 
-  private def findByIdDocumentType(id: String, documentType: String): Future[AssetFile] = db.run(fileTable.filter(_.id === id).filter(_.documentType === documentType).result.head.asTry).map {
+  private def updateStatus(id: String, documentType: String, status: Boolean): Future[Int] = db.run(assetFileTable.filter(_.id === id).filter(_.documentType === documentType).map(_.status).update(status).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case e: Exception => logger.error(constants.Response.GENERIC_EXCEPTION.message, e)
+        throw new BaseException(constants.Response.GENERIC_EXCEPTION)
+    }
+  }
+
+  private def findByIdDocumentType(id: String, documentType: String): Future[AssetFile] = db.run(assetFileTable.filter(_.id === id).filter(_.documentType === documentType).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -136,21 +136,21 @@ class AssetFiles @Inject()(protected val databaseConfigProvider: DatabaseConfigP
     }
   }
 
-  private def findByIdDocumentTypeOrEmpty(id: String, documentType: String): Future[AssetFile] = db.run(fileTable.filter(_.id === id).filter(_.documentType === documentType).result.head.asTry).map {
+  private def findByIdDocumentTypeOrEmpty(id: String, documentType: String): Future[AssetFile] = db.run(assetFileTable.filter(_.id === id).filter(_.documentType === documentType).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case _: NoSuchElementException => AssetFile("", "", "", None, None, None)
     }
   }
 
-  private def findByIdDocumentTypeOrNone(id: String, documentType: String): Future[Option[AssetFile]] = db.run(fileTable.filter(_.id === id).filter(_.documentType === documentType).result.head.asTry).map {
+  private def findByIdDocumentTypeOrNone(id: String, documentType: String): Future[Option[AssetFile]] = db.run(assetFileTable.filter(_.id === id).filter(_.documentType === documentType).result.head.asTry).map {
     case Success(result) => Option(result)
     case Failure(exception) => exception match {
       case _: NoSuchElementException => None
     }
   }
 
-  private def getFileByIdDocumentType(id: String, documentType: String): Future[Array[Byte]] = db.run(fileTable.filter(_.id === id).filter(_.documentType === documentType).map(_.file).result.head.asTry).map {
+  private def getFileByIdDocumentType(id: String, documentType: String): Future[Array[Byte]] = db.run(assetFileTable.filter(_.id === id).filter(_.documentType === documentType).map(_.file).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => documentType match {
@@ -161,7 +161,7 @@ class AssetFiles @Inject()(protected val databaseConfigProvider: DatabaseConfigP
     }
   }
 
-  private def getFileNameByIdDocumentType(id: String, documentType: String): Future[String] = db.run(fileTable.filter(_.id === id).filter(_.documentType === documentType).map(_.fileName).result.head.asTry).map {
+  private def getFileNameByIdDocumentType(id: String, documentType: String): Future[String] = db.run(assetFileTable.filter(_.id === id).filter(_.documentType === documentType).map(_.fileName).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -169,11 +169,13 @@ class AssetFiles @Inject()(protected val databaseConfigProvider: DatabaseConfigP
     }
   }
 
-  private def getAllDocumentsById(id: String): Future[Seq[AssetFile]] = db.run(fileTable.filter(_.id === id).result)
+  private def getStatusForAllDocumentsById(id: String): Future[Seq[Option[Boolean]]] = db.run(assetFileTable.filter(_.id === id).map(_.status.?).result)
 
-  private def getDocumentsByID(id: String, documents: Seq[String]): Future[Seq[AssetFile]] = db.run(fileTable.filter(_.id === id).filter(_.documentType inSet documents).result)
+  private def getAllDocumentsById(id: String): Future[Seq[AssetFile]] = db.run(assetFileTable.filter(_.id === id).result)
 
-  private def deleteById(id: String) = db.run(fileTable.filter(_.id === id).delete.asTry).map {
+  private def getDocumentsByID(id: String, documents: Seq[String]): Future[Seq[AssetFile]] = db.run(assetFileTable.filter(_.id === id).filter(_.documentType inSet documents).result)
+
+  private def deleteById(id: String) = db.run(assetFileTable.filter(_.id === id).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -183,9 +185,9 @@ class AssetFiles @Inject()(protected val databaseConfigProvider: DatabaseConfigP
     }
   }
 
-  private def getIDAndDocumentType(id: String, documentType: String): Future[Boolean] = db.run(fileTable.filter(_.id === id).filter(_.documentType === documentType).exists.result)
+  private def getIDAndDocumentType(id: String, documentType: String): Future[Boolean] = db.run(assetFileTable.filter(_.id === id).filter(_.documentType === documentType).exists.result)
 
-  private def checkByIdAndFileName(id: String, fileName: String): Future[Boolean] = db.run(fileTable.filter(_.id === id).filter(_.fileName === fileName).exists.result)
+  private def checkByIdAndFileName(id: String, fileName: String): Future[Boolean] = db.run(assetFileTable.filter(_.id === id).filter(_.fileName === fileName).exists.result)
 
   private[models] class AssetFileTable(tag: Tag) extends Table[AssetFile](tag, "AssetFile") {
 
@@ -233,6 +235,11 @@ class AssetFiles @Inject()(protected val databaseConfigProvider: DatabaseConfigP
     def checkFileExists(id: String, documentType: String): Boolean = Await.result(getIDAndDocumentType(id, documentType), Duration.Inf)
 
     def checkFileNameExists(id: String, fileName: String): Boolean = Await.result(checkByIdAndFileName(id = id, fileName = fileName), Duration.Inf)
+
+    def checkAllAssetFilesVerified(id: String): Boolean = {
+      val documentStatuses = Await.result(getStatusForAllDocumentsById(id), Duration.Inf)
+      if (documentStatuses.nonEmpty) documentStatuses.forall(status => status.getOrElse(false)) else false
+    }
   }
 
 }
