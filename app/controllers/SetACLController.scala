@@ -438,7 +438,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
     implicit request =>
       try {
         masterTraderKYCs.Service.organizationReject(id = traderID, documentType = documentType)
-        utilitiesNotification.send(accountID = masterTraders.Service.getAccountId(traderID), notification = constants.Notification.FAILURE,  Messages(constants.Response.DOCUMENT_REJECTED.message))
+        utilitiesNotification.send(accountID = masterTraders.Service.getAccountId(traderID), notification = constants.Notification.FAILURE, Messages(constants.Response.DOCUMENT_REJECTED.message))
         withUsernameToken.Ok(Messages(constants.Response.SUCCESS.message))
       } catch {
         case baseException: BaseException => InternalServerError(Messages(baseException.failure.message))
