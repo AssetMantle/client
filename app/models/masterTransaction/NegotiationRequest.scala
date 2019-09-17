@@ -110,7 +110,7 @@ class NegotiationRequests @Inject()(protected val databaseConfigProvider: Databa
 
   object Service {
 
-    def create(id: String, negotiationID, amount: Int): String = Await.result(add(NegotiationRequest(utilities.IDGenerator.requestID(), null, null, null,null ,amount, null, null)), Duration.Inf)
+    def create(id: String, negotiationID: String, amount: Int): String = Await.result(add(NegotiationRequest(utilities.IDGenerator.requestID(), null, null, null,null ,amount, null, null)), Duration.Inf)
 
     def getPendingNegotiationRequests: Seq[NegotiationRequest] = Await.result(getNegotiationRequestsWithNullStatus, Duration.Inf)
 
