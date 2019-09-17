@@ -178,8 +178,8 @@ class AddZones @Inject()(actorSystem: ActorSystem, transaction: utilities.Transa
         val zoneAccountId = masterAccounts.Service.getId(addZone.to)
         masterZoneKYCs.Service.verifyAll(zoneAccountId)
         blockchainAccounts.Service.markDirty(addZone.from)
-        pushNotification.sendNotification(zoneAccountId, constants.Notification.SUCCESS, blockResponse.txhash)
-        pushNotification.sendNotification(masterAccounts.Service.getId(addZone.from), constants.Notification.SUCCESS, blockResponse.txhash)
+        pushNotification.send(zoneAccountId, constants.Notification.PUSH_NOTIFICATION_SUCCESS, blockResponse.txhash)
+        pushNotification.send(masterAccounts.Service.getId(addZone.from), constants.Notification.PUSH_NOTIFICATION_SUCCESS, blockResponse.txhash)
       } catch {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
           throw new BaseException(constants.Response.PSQL_EXCEPTION)
@@ -190,8 +190,8 @@ class AddZones @Inject()(actorSystem: ActorSystem, transaction: utilities.Transa
       try {
         Service.markTransactionFailed(ticketID, message)
         val addZone = Service.getTransaction(ticketID)
-        pushNotification.sendNotification(masterAccounts.Service.getId(addZone.to), constants.Notification.FAILURE, message)
-        pushNotification.sendNotification(masterAccounts.Service.getId(addZone.from), constants.Notification.FAILURE, message)
+        pushNotification.send(masterAccounts.Service.getId(addZone.to), constants.Notification.PUSH_NOTIFICATION_FAILURE, message)
+        pushNotification.send(masterAccounts.Service.getId(addZone.from), constants.Notification.PUSH_NOTIFICATION_FAILURE, message)
       } catch {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }

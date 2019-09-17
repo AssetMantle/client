@@ -182,8 +182,8 @@ class IssueFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
         Thread.sleep(sleepTime)
         getAccount.Service.get(issueFiat.to).value.fiatPegWallet.foreach(fiats => fiats.foreach(fiatPeg => blockchainFiats.Service.insertOrUpdate(fiatPeg.pegHash, issueFiat.to, fiatPeg.transactionID, fiatPeg.transactionAmount, fiatPeg.redeemedAmount, dirtyBit = true)))
         blockchainAccounts.Service.markDirty(issueFiat.from)
-        pushNotification.sendNotification(masterAccounts.Service.getId(issueFiat.to), constants.Notification.SUCCESS, blockResponse.txhash)
-        pushNotification.sendNotification(masterAccounts.Service.getId(issueFiat.from), constants.Notification.SUCCESS, blockResponse.txhash)
+        pushNotification.send(masterAccounts.Service.getId(issueFiat.to), constants.Notification.PUSH_NOTIFICATION_SUCCESS, blockResponse.txhash)
+        pushNotification.send(masterAccounts.Service.getId(issueFiat.from), constants.Notification.PUSH_NOTIFICATION_SUCCESS, blockResponse.txhash)
       }
       catch {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
@@ -196,8 +196,8 @@ class IssueFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
       try {
         Service.markTransactionFailed(ticketID, message)
         val issueFiat = Service.getTransaction(ticketID)
-        pushNotification.sendNotification(masterAccounts.Service.getId(issueFiat.to), constants.Notification.FAILURE, message)
-        pushNotification.sendNotification(masterAccounts.Service.getId(issueFiat.from), constants.Notification.FAILURE, message)
+        pushNotification.send(masterAccounts.Service.getId(issueFiat.to), constants.Notification.PUSH_NOTIFICATION_FAILURE, message)
+        pushNotification.send(masterAccounts.Service.getId(issueFiat.from), constants.Notification.PUSH_NOTIFICATION_FAILURE, message)
       } catch {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }

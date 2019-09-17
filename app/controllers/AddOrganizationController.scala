@@ -288,7 +288,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
     implicit request =>
       try {
         masterOrganizationKYCs.Service.verify(id = organizationID, documentType = documentType)
-        pushNotification.sendNotification(username = masterOrganizations.Service.getAccountId(organizationID), notification = constants.Notification.SUCCESS, messageParameters = Messages(constants.Response.DOCUMENT_APPROVED.message))
+        pushNotification.send(username = masterOrganizations.Service.getAccountId(organizationID), notification = constants.Notification.PUSH_NOTIFICATION_SUCCESS, messageParameters = Messages(constants.Response.DOCUMENT_APPROVED.message))
         withUsernameToken.Ok(Messages(constants.Response.SUCCESS.message))
       } catch {
         case baseException: BaseException => InternalServerError(Messages(baseException.failure.message))
@@ -299,7 +299,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
     implicit request =>
       try {
         masterOrganizationKYCs.Service.reject(id = organizationID, documentType = documentType)
-        pushNotification.sendNotification(username = masterOrganizations.Service.getAccountId(organizationID), notification = constants.Notification.FAILURE, messageParameters = Messages(constants.Response.DOCUMENT_REJECTED.message))
+        pushNotification.send(username = masterOrganizations.Service.getAccountId(organizationID), notification = constants.Notification.PUSH_NOTIFICATION_FAILURE, messageParameters = Messages(constants.Response.DOCUMENT_REJECTED.message))
         withUsernameToken.Ok(Messages(constants.Response.SUCCESS.message))
       } catch {
         case baseException: BaseException => InternalServerError(Messages(baseException.failure.message))

@@ -25,7 +25,7 @@ class VerifyEmailAddressController @Inject()(messagesControllerComponents: Messa
     implicit request =>
       try {
         val otp = emailOTPs.Service.sendOTP(loginState.username)
-        email.sendEmail(toAccountID = loginState.username, email = constants.Email.VERIFY_EMAIL_OTP, messageParameters = Seq(otp))
+        email.send(toAccountID = loginState.username, email = constants.Notification.EMAIL_VERIFY_OTP, otp)
         withUsernameToken.Ok(views.html.component.master.verifyEmailAddress(VerifyEmailAddress.form))
       }
       catch {

@@ -97,7 +97,7 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
     implicit request =>
       try {
         masterZoneKYCs.Service.verify(id = accountID, documentType = documentType)
-        pushNotification.sendNotification(accountID, constants.Notification.SUCCESS, Messages(constants.Response.DOCUMENT_APPROVED.message))
+        pushNotification.send(accountID, constants.Notification.PUSH_NOTIFICATION_SUCCESS, Messages(constants.Response.DOCUMENT_APPROVED.message))
         withUsernameToken.Ok(Messages(constants.Response.SUCCESS.message))
       } catch {
         case baseException: BaseException => InternalServerError(Messages(baseException.failure.message))
@@ -108,7 +108,7 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
     implicit request =>
       try {
         masterZoneKYCs.Service.reject(id = accountID, documentType = documentType)
-        pushNotification.sendNotification(accountID, constants.Notification.FAILURE, Messages(constants.Response.DOCUMENT_REJECTED.message))
+        pushNotification.send(accountID, constants.Notification.PUSH_NOTIFICATION_FAILURE, Messages(constants.Response.DOCUMENT_REJECTED.message))
         withUsernameToken.Ok(Messages(constants.Response.SUCCESS.message))
       } catch {
         case baseException: BaseException => InternalServerError(Messages(baseException.failure.message))

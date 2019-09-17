@@ -179,8 +179,8 @@ class AddOrganizations @Inject()(actorSystem: ActorSystem, transaction: utilitie
         val organizationAccountId = masterAccounts.Service.getId(addOrganization.to)
         masterOrganizationKYCs.Service.verifyAll(organizationAccountId)
         blockchainAccounts.Service.markDirty(addOrganization.from)
-        pushNotification.sendNotification(organizationAccountId, constants.Notification.SUCCESS, blockResponse.txhash)
-        pushNotification.sendNotification(masterAccounts.Service.getId(addOrganization.from), constants.Notification.SUCCESS, blockResponse.txhash)
+        pushNotification.send(organizationAccountId, constants.Notification.PUSH_NOTIFICATION_SUCCESS, blockResponse.txhash)
+        pushNotification.send(masterAccounts.Service.getId(addOrganization.from), constants.Notification.PUSH_NOTIFICATION_SUCCESS, blockResponse.txhash)
       } catch {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
           throw new BaseException(constants.Response.PSQL_EXCEPTION)
@@ -191,8 +191,8 @@ class AddOrganizations @Inject()(actorSystem: ActorSystem, transaction: utilitie
       try {
         Service.markTransactionFailed(ticketID, message)
         val addOrganization = Service.getTransaction(ticketID)
-        pushNotification.sendNotification(masterAccounts.Service.getId(addOrganization.to), constants.Notification.FAILURE, message)
-        pushNotification.sendNotification(masterAccounts.Service.getId(addOrganization.from), constants.Notification.FAILURE, message)
+        pushNotification.send(masterAccounts.Service.getId(addOrganization.to), constants.Notification.PUSH_NOTIFICATION_FAILURE, message)
+        pushNotification.send(masterAccounts.Service.getId(addOrganization.from), constants.Notification.PUSH_NOTIFICATION_FAILURE, message)
       } catch {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }

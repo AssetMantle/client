@@ -188,8 +188,8 @@ class ChangeSellerBids @Inject()(actorSystem: ActorSystem, transaction: utilitie
         blockchainAccounts.Service.markDirty(changeSellerBid.from)
         blockchainTransactionFeedbacks.Service.markDirty(changeSellerBid.from)
         blockchainTransactionFeedbacks.Service.markDirty(changeSellerBid.to)
-        pushNotification.sendNotification(masterAccounts.Service.getId(changeSellerBid.from), constants.Notification.SUCCESS, blockResponse.txhash)
-        pushNotification.sendNotification(masterAccounts.Service.getId(changeSellerBid.to), constants.Notification.SUCCESS, blockResponse.txhash)
+        pushNotification.send(masterAccounts.Service.getId(changeSellerBid.from), constants.Notification.PUSH_NOTIFICATION_SUCCESS, blockResponse.txhash)
+        pushNotification.send(masterAccounts.Service.getId(changeSellerBid.to), constants.Notification.PUSH_NOTIFICATION_SUCCESS, blockResponse.txhash)
       } catch {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
           throw new BaseException(constants.Response.PSQL_EXCEPTION)
@@ -203,8 +203,8 @@ class ChangeSellerBids @Inject()(actorSystem: ActorSystem, transaction: utilitie
         val changeSellerBid = Service.getTransaction(ticketID)
         blockchainTransactionFeedbacks.Service.markDirty(changeSellerBid.from)
         blockchainTransactionFeedbacks.Service.markDirty(changeSellerBid.to)
-        pushNotification.sendNotification(masterAccounts.Service.getId(changeSellerBid.to), constants.Notification.FAILURE, message)
-        pushNotification.sendNotification(masterAccounts.Service.getId(changeSellerBid.from), constants.Notification.FAILURE, message)
+        pushNotification.send(masterAccounts.Service.getId(changeSellerBid.to), constants.Notification.PUSH_NOTIFICATION_FAILURE, message)
+        pushNotification.send(masterAccounts.Service.getId(changeSellerBid.from), constants.Notification.PUSH_NOTIFICATION_FAILURE, message)
       } catch {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }

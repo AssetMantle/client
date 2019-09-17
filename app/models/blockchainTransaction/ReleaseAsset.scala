@@ -176,8 +176,8 @@ class ReleaseAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.T
         val releaseAsset = Service.getTransaction(ticketID)
         blockchainAssets.Service.markDirty(releaseAsset.pegHash)
         blockchainAccounts.Service.markDirty(releaseAsset.from)
-        pushNotification.sendNotification(masterAccounts.Service.getId(releaseAsset.to), constants.Notification.SUCCESS, blockResponse.txhash)
-        pushNotification.sendNotification(masterAccounts.Service.getId(releaseAsset.from), constants.Notification.SUCCESS, blockResponse.txhash)
+        pushNotification.send(masterAccounts.Service.getId(releaseAsset.to), constants.Notification.PUSH_NOTIFICATION_SUCCESS, blockResponse.txhash)
+        pushNotification.send(masterAccounts.Service.getId(releaseAsset.from), constants.Notification.PUSH_NOTIFICATION_SUCCESS, blockResponse.txhash)
       }
       catch {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
@@ -189,8 +189,8 @@ class ReleaseAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.T
       try {
         Service.markTransactionFailed(ticketID, message)
         val releaseAsset = Service.getTransaction(ticketID)
-        pushNotification.sendNotification(masterAccounts.Service.getId(releaseAsset.to), constants.Notification.FAILURE, message)
-        pushNotification.sendNotification(masterAccounts.Service.getId(releaseAsset.from), constants.Notification.FAILURE, message)
+        pushNotification.send(masterAccounts.Service.getId(releaseAsset.to), constants.Notification.PUSH_NOTIFICATION_FAILURE, message)
+        pushNotification.send(masterAccounts.Service.getId(releaseAsset.from), constants.Notification.PUSH_NOTIFICATION_FAILURE, message)
       } catch {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }

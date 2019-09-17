@@ -195,8 +195,8 @@ class IssueAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tra
         val responseAccount = getAccount.Service.get(issueAsset.to)
         responseAccount.value.assetPegWallet.foreach(assets => assets.foreach(asset => blockchainAssets.Service.insertOrUpdate(pegHash = asset.pegHash, documentHash = asset.documentHash, assetType = asset.assetType, assetPrice = asset.assetPrice, assetQuantity = asset.assetQuantity, quantityUnit = asset.quantityUnit, locked = asset.locked, moderated = asset.moderated, takerAddress = if (asset.takerAddress == "") None else Option(asset.takerAddress), ownerAddress = issueAsset.to, dirtyBit = true)))
         blockchainAccounts.Service.markDirty(issueAsset.from)
-        pushNotification.sendNotification(masterAccounts.Service.getId(issueAsset.to), constants.Notification.SUCCESS, blockResponse.txhash)
-        pushNotification.sendNotification(masterAccounts.Service.getId(issueAsset.from), constants.Notification.SUCCESS, blockResponse.txhash)
+        pushNotification.send(masterAccounts.Service.getId(issueAsset.to), constants.Notification.PUSH_NOTIFICATION_SUCCESS, blockResponse.txhash)
+        pushNotification.send(masterAccounts.Service.getId(issueAsset.from), constants.Notification.PUSH_NOTIFICATION_SUCCESS, blockResponse.txhash)
       } catch {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
           throw new BaseException(constants.Response.PSQL_EXCEPTION)
@@ -208,8 +208,8 @@ class IssueAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tra
       try {
         Service.markTransactionFailed(ticketID, message)
         val issueAsset = Service.getTransaction(ticketID)
-        pushNotification.sendNotification(masterAccounts.Service.getId(issueAsset.to), constants.Notification.FAILURE, message)
-        pushNotification.sendNotification(masterAccounts.Service.getId(issueAsset.from), constants.Notification.FAILURE, message)
+        pushNotification.send(masterAccounts.Service.getId(issueAsset.to), constants.Notification.PUSH_NOTIFICATION_FAILURE, message)
+        pushNotification.send(masterAccounts.Service.getId(issueAsset.from), constants.Notification.PUSH_NOTIFICATION_FAILURE, message)
       } catch {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }

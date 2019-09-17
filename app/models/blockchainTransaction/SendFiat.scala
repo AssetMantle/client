@@ -188,8 +188,8 @@ class SendFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
         blockchainTransactionFeedbacks.Service.markDirty(sendFiat.from)
         orderResponse.value.fiatPegWallet.foreach(fiats => fiats.foreach(fiatPeg => blockchainFiats.Service.insertOrUpdate(pegHash = fiatPeg.pegHash, ownerAddress = negotiationID, transactionID = fiatPeg.transactionID, transactionAmount = fiatPeg.transactionAmount, redeemedAmount = fiatPeg.redeemedAmount, dirtyBit = false)))
         blockchainAccounts.Service.markDirty(sendFiat.from)
-        pushNotification.sendNotification(masterAccounts.Service.getId(sendFiat.to), constants.Notification.SUCCESS, blockResponse.txhash)
-        pushNotification.sendNotification(masterAccounts.Service.getId(sendFiat.from), constants.Notification.SUCCESS, blockResponse.txhash)
+        pushNotification.send(masterAccounts.Service.getId(sendFiat.to), constants.Notification.PUSH_NOTIFICATION_SUCCESS, blockResponse.txhash)
+        pushNotification.send(masterAccounts.Service.getId(sendFiat.from), constants.Notification.PUSH_NOTIFICATION_SUCCESS, blockResponse.txhash)
       }
       catch {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
@@ -203,8 +203,8 @@ class SendFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
         Service.markTransactionFailed(ticketID, message)
         val sendFiat = Service.getTransaction(ticketID)
         blockchainTransactionFeedbacks.Service.markDirty(sendFiat.from)
-        pushNotification.sendNotification(masterAccounts.Service.getId(sendFiat.to), constants.Notification.FAILURE, message)
-        pushNotification.sendNotification(masterAccounts.Service.getId(sendFiat.from), constants.Notification.FAILURE, message)
+        pushNotification.send(masterAccounts.Service.getId(sendFiat.to), constants.Notification.PUSH_NOTIFICATION_FAILURE, message)
+        pushNotification.send(masterAccounts.Service.getId(sendFiat.from), constants.Notification.PUSH_NOTIFICATION_FAILURE, message)
       } catch {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }

@@ -131,8 +131,6 @@ class Contacts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
     def getUnverifiedEmailAddress(id: String): String = Await.result(getEmailAddressById(id = id, emailAddressVerified = Option(false)), Duration.Inf)
 
-    def getVerifiedEmailAddresses(ids: Seq[String]): Seq[String] = Await.result(getVerifiedEmailAddressesByIDs(ids), Duration.Inf)
-
     def getMobileNumber(id: String): String = Await.result(findMobileNumberById(id), Duration.Inf)
 
   }

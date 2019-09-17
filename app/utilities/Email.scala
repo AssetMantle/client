@@ -21,21 +21,17 @@ class Email @Inject()(mailerClient: MailerClient, masterContacts: master.Contact
 
   private val charset = configuration.get[String]("play.mailer.charset")
 
-  def sendEmail(toAccountID: String, email: constants.Email.Email, messageParameters: Seq[String], ccAccountIDs: Seq[String] = Seq.empty, bccAccountIDs: Seq[String] = Seq.empty, attachments: Seq[Attachment] = Seq.empty, headers: Seq[(String, String)] = Seq.empty)(implicit lang: Lang = Lang(masterAccounts.Service.getLanguage(toAccountID))) {
+  def send(toAccountID: String, email: constants.Notification.Email, messageParameters: String*)(implicit lang: Lang = Lang(masterAccounts.Service.getLanguage(toAccountID))) {
     try {
-      val toEmailAddress = if(email == constants.Email.VERIFY_EMAIL_OTP) masterContacts.Service.getUnverifiedEmailAddress(toAccountID) else masterContacts.Service.getVerifiedEmailAddress(toAccountID)
+      val toEmailAddress = if(email == constants.Notification.EMAIL_VERIFY_OTP) masterContacts.Service.getUnverifiedEmailAddress(toAccountID) else masterContacts.Service.getVerifiedEmailAddress(toAccountID)
       mailerClient.send(Email(
         subject = messagesApi(email.subject),
         from = fromAddress,
         to = Seq(toEmailAddress),
-        cc = masterContacts.Service.getVerifiedEmailAddresses(ccAccountIDs),
-        bcc = masterContacts.Service.getVerifiedEmailAddresses(bccAccountIDs),
         bodyHtml = Option(views.html.mail(messagesApi(email.message, messageParameters: _*)).toString),
         charset = Option(charset),
         replyTo = Seq(replyTo),
         bounceAddress = Option(bounceAddress),
-        attachments = attachments,
-        headers = headers,
       ))
     }
     catch {

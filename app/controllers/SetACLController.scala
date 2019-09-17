@@ -38,7 +38,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
         addTraderRequestData => {
           try {
             val requestID = masterTransactionAddTraderRequests.Service.create(accountID = addTraderRequestData.accountID, organizationID = masterOrganizations.Service.getID(loginState.username))
-            email.sendEmail(toAccountID = addTraderRequestData.accountID, email = constants.Email.TRADER_INVITATION, messageParameters =  Seq(routes.SetACLController.addTraderRequestForm(requestID).url))
+            email.send(toAccountID = addTraderRequestData.accountID, email = constants.Notification.EMAIL_TRADER_INVITATION, routes.SetACLController.addTraderRequestForm(requestID).url)
             withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.INVITATION_EMAIL_SENT)))
           }
           catch {
@@ -286,7 +286,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
     implicit request =>
       try {
         masterTraderKYCs.Service.zoneVerify(id = traderID, documentType = documentType)
-        pushNotification.sendNotification(username = masterTraders.Service.getAccountId(traderID), notification = constants.Notification.SUCCESS, messageParameters = Messages(constants.Response.DOCUMENT_APPROVED.message))
+        pushNotification.send(username = masterTraders.Service.getAccountId(traderID), notification = constants.Notification.PUSH_NOTIFICATION_SUCCESS, messageParameters = Messages(constants.Response.DOCUMENT_APPROVED.message))
         withUsernameToken.Ok(Messages(constants.Response.SUCCESS.message))
       } catch {
         case baseException: BaseException => InternalServerError(Messages(baseException.failure.message))
@@ -297,7 +297,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
     implicit request =>
       try {
         masterTraderKYCs.Service.zoneReject(id = traderID, documentType = documentType)
-        pushNotification.sendNotification(username = masterTraders.Service.getAccountId(traderID), notification = constants.Notification.FAILURE, messageParameters = Messages(constants.Response.DOCUMENT_REJECTED.message))
+        pushNotification.send(username = masterTraders.Service.getAccountId(traderID), notification = constants.Notification.PUSH_NOTIFICATION_FAILURE, messageParameters = Messages(constants.Response.DOCUMENT_REJECTED.message))
         withUsernameToken.Ok(Messages(constants.Response.SUCCESS.message))
       } catch {
         case baseException: BaseException => InternalServerError(Messages(baseException.failure.message))
@@ -428,7 +428,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
     implicit request =>
       try {
         masterTraderKYCs.Service.organizationVerify(id = traderID, documentType = documentType)
-        pushNotification.sendNotification(username = masterTraders.Service.getAccountId(traderID), notification = constants.Notification.SUCCESS, messageParameters = Messages(constants.Response.DOCUMENT_APPROVED.message))
+        pushNotification.send(username = masterTraders.Service.getAccountId(traderID), notification = constants.Notification.PUSH_NOTIFICATION_SUCCESS, messageParameters = Messages(constants.Response.DOCUMENT_APPROVED.message))
         withUsernameToken.Ok(Messages(constants.Response.SUCCESS.message))
       } catch {
         case baseException: BaseException => InternalServerError(Messages(baseException.failure.message))
@@ -439,7 +439,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
     implicit request =>
       try {
         masterTraderKYCs.Service.organizationReject(id = traderID, documentType = documentType)
-        pushNotification.sendNotification(username = masterTraders.Service.getAccountId(traderID), notification = constants.Notification.FAILURE, messageParameters = Messages(constants.Response.DOCUMENT_REJECTED.message))
+        pushNotification.send(username = masterTraders.Service.getAccountId(traderID), notification = constants.Notification.PUSH_NOTIFICATION_FAILURE, messageParameters = Messages(constants.Response.DOCUMENT_REJECTED.message))
         withUsernameToken.Ok(Messages(constants.Response.SUCCESS.message))
       } catch {
         case baseException: BaseException => InternalServerError(Messages(baseException.failure.message))

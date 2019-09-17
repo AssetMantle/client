@@ -186,8 +186,8 @@ class SetACLs @Inject()(actorSystem: ActorSystem, transaction: utilities.Transac
         masterTraderKYCs.Service.zoneVerifyAll(aclAccountID)
         blockchainAccounts.Service.markDirty(setACL.from)
         blockchainTransactionFeedbacks.Service.insertOrUpdate(setACL.aclAddress, TraderReputationResponse.TransactionFeedbackResponse("0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"), dirtyBit = true)
-        pushNotification.sendNotification(aclAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
-        pushNotification.sendNotification(masterAccounts.Service.getId(setACL.from), constants.Notification.SUCCESS, blockResponse.txhash)
+        pushNotification.send(aclAccountID, constants.Notification.PUSH_NOTIFICATION_SUCCESS, blockResponse.txhash)
+        pushNotification.send(masterAccounts.Service.getId(setACL.from), constants.Notification.PUSH_NOTIFICATION_SUCCESS, blockResponse.txhash)
       } catch {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
           throw new BaseException(constants.Response.PSQL_EXCEPTION)
@@ -198,8 +198,8 @@ class SetACLs @Inject()(actorSystem: ActorSystem, transaction: utilities.Transac
       try {
         Service.markTransactionFailed(ticketID, message)
         val setACL = Service.getTransaction(ticketID)
-        pushNotification.sendNotification(masterAccounts.Service.getId(setACL.aclAddress), constants.Notification.FAILURE, message)
-        pushNotification.sendNotification(masterAccounts.Service.getId(setACL.from), constants.Notification.FAILURE, message)
+        pushNotification.send(masterAccounts.Service.getId(setACL.aclAddress), constants.Notification.PUSH_NOTIFICATION_FAILURE, message)
+        pushNotification.send(masterAccounts.Service.getId(setACL.from), constants.Notification.PUSH_NOTIFICATION_FAILURE, message)
       } catch {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }

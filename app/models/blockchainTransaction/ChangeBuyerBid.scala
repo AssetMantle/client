@@ -189,8 +189,8 @@ class ChangeBuyerBids @Inject()(actorSystem: ActorSystem, transaction: utilities
         blockchainAccounts.Service.markDirty(changeBuyerBid.from)
         blockchainTransactionFeedbacks.Service.markDirty(changeBuyerBid.from)
         blockchainTransactionFeedbacks.Service.markDirty(changeBuyerBid.to)
-        pushNotification.sendNotification(masterAccounts.Service.getId(changeBuyerBid.to), constants.Notification.SUCCESS, blockResponse.txhash)
-        pushNotification.sendNotification(masterAccounts.Service.getId(changeBuyerBid.from), constants.Notification.SUCCESS, blockResponse.txhash)
+        pushNotification.send(masterAccounts.Service.getId(changeBuyerBid.to), constants.Notification.PUSH_NOTIFICATION_SUCCESS, blockResponse.txhash)
+        pushNotification.send(masterAccounts.Service.getId(changeBuyerBid.from), constants.Notification.PUSH_NOTIFICATION_SUCCESS, blockResponse.txhash)
       } catch {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
           throw new BaseException(constants.Response.PSQL_EXCEPTION)
@@ -204,8 +204,8 @@ class ChangeBuyerBids @Inject()(actorSystem: ActorSystem, transaction: utilities
         val changeBuyerBid = Service.getTransaction(ticketID)
         blockchainTransactionFeedbacks.Service.markDirty(changeBuyerBid.from)
         blockchainTransactionFeedbacks.Service.markDirty(changeBuyerBid.to)
-        pushNotification.sendNotification(masterAccounts.Service.getId(changeBuyerBid.to), constants.Notification.FAILURE, message)
-        pushNotification.sendNotification(masterAccounts.Service.getId(changeBuyerBid.from), constants.Notification.FAILURE, message)
+        pushNotification.send(masterAccounts.Service.getId(changeBuyerBid.to), constants.Notification.PUSH_NOTIFICATION_FAILURE, message)
+        pushNotification.send(masterAccounts.Service.getId(changeBuyerBid.from), constants.Notification.PUSH_NOTIFICATION_FAILURE, message)
       } catch {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }

@@ -181,8 +181,8 @@ class SendCoins @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
         if (toAccount.userType == constants.User.UNKNOWN) {
           masterAccounts.Service.updateUserType(toAccount.id, constants.User.USER)
         }
-        pushNotification.sendNotification(toAccount.id, constants.Notification.SUCCESS, blockResponse.txhash)
-        pushNotification.sendNotification(masterAccounts.Service.getId(sendCoin.from), constants.Notification.SUCCESS, blockResponse.txhash)
+        pushNotification.send(toAccount.id, constants.Notification.PUSH_NOTIFICATION_SUCCESS, blockResponse.txhash)
+        pushNotification.send(masterAccounts.Service.getId(sendCoin.from), constants.Notification.PUSH_NOTIFICATION_SUCCESS, blockResponse.txhash)
       }
       catch {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
@@ -194,8 +194,8 @@ class SendCoins @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
       try {
         Service.markTransactionFailed(ticketID, message)
         val sendCoin = Service.getTransaction(ticketID)
-        pushNotification.sendNotification(masterAccounts.Service.getId(sendCoin.to), constants.Notification.FAILURE, message)
-        pushNotification.sendNotification(masterAccounts.Service.getId(sendCoin.from), constants.Notification.FAILURE, message)
+        pushNotification.send(masterAccounts.Service.getId(sendCoin.to), constants.Notification.PUSH_NOTIFICATION_FAILURE, message)
+        pushNotification.send(masterAccounts.Service.getId(sendCoin.from), constants.Notification.PUSH_NOTIFICATION_FAILURE, message)
       } catch {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
