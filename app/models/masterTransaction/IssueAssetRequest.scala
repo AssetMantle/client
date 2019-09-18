@@ -191,7 +191,9 @@ class IssueAssetRequests @Inject()(protected val databaseConfigProvider: Databas
 
     def updateTicketID(id: String, ticketID: String) :Int = Await.result(updateTicketIDByID(id = id, ticketID = ticketID), Duration.Inf)
 
-    def updatePegHashAndStatusByTicketID(ticketID: String, pegHash: Option[String], status: String) :Int = Await.result(updatePegHashAndStatusWithTicketID(ticketID = ticketID, pegHash = pegHash, status = status), Duration.Inf)
+    def markFailed(ticketID: String) :Int = Await.result(updatePegHashAndStatusWithTicketID(ticketID = ticketID, pegHash = None, status = constants.Status.Asset.FAILED), Duration.Inf)
+
+    def markListedForTrade(ticketID: String, peghash: Option[String]) :Int = Await.result(updatePegHashAndStatusWithTicketID(ticketID = ticketID, pegHash = peghash, status = constants.Status.Asset.LISTED_FOR_TRADE), Duration.Inf)
 
     def getPendingIssueAssetRequests(accountIDs: Seq[String], status: String): Seq[IssueAssetRequest] = Await.result(getIssueAssetRequestsWithStatus(accountIDs, status), Duration.Inf).map(_.deSerialize)
 

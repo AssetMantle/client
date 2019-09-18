@@ -1,6 +1,6 @@
 function submitForm(source, target = '#commonModalContent') {
     const form = $(source).closest("form");
-    // if (validateForm(form)) {
+    if (validateForm(form)) {
         const result = $(target);
         $.ajax({
             type: 'POST',
@@ -42,5 +42,5 @@ function submitForm(source, target = '#commonModalContent') {
                 $('#connectionError').fadeIn(100);
             }
         });
-    // }
+    }
 }
