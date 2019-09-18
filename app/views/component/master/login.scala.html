@@ -7,7 +7,7 @@
 <div class="">
     <h4 class="">@Messages(constants.Form.LOGIN)</h4>
 </div>
-  @form(action = routes.AccountController.login, 'onkeypress -> "submitFormOnEnter(event,this)") {
+@form(action = routes.AccountController.login, 'onkeypress -> "submitFormOnEnter(event,this)") {
 
     @CSRF.formField
 

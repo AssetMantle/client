@@ -14,7 +14,7 @@ import scala.concurrent.{Await, ExecutionContext, Future}
 @Singleton
 class GetTraderReputation @Inject()(wsClient: WSClient)(implicit configuration: Configuration, executionContext: ExecutionContext) {
 
-  private implicit val module: String = constants.Module.TRANSACTIONS_GET_TRADER_REPUTATION
+  private implicit val module: String = constants.Module.QUERIES_GET_TRADER_REPUTATION
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -33,8 +33,7 @@ class GetTraderReputation @Inject()(wsClient: WSClient)(implicit configuration: 
     def get(address: String): Response = try {
       Await.result(action(address), Duration.Inf)
     } catch {
-      case connectException: ConnectException =>
-        logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
+      case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
         throw new BaseException(constants.Response.CONNECT_EXCEPTION)
     }
   }

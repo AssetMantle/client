@@ -21,10 +21,10 @@ object loginControllerTest {
     .exec(controllersTest.signUpControllerTest.signUpScenario)
 
     .exec(http("Login_GET")
-      .get(routes.LoginController.loginForm().url)
+      .get(routes.AccountController.loginForm().url)
       .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
     .exec(http("Login_POST")
-      .post(routes.LoginController.login().url)
+      .post(routes.AccountController.login().url)
       .formParamMap(Map(
         Form.USERNAME -> "${%s}".format(Test.TEST_USERNAME),
         Form.PASSWORD -> "${%s}".format(Test.TEST_PASSWORD),
@@ -35,10 +35,10 @@ object loginControllerTest {
 
   val loginWithoutSignUpScenario: ScenarioBuilder = scenario("Login Before SignUp")
     .exec(http("Login_GET")
-      .get(routes.LoginController.loginForm().url)
+      .get(routes.AccountController.loginForm().url)
       .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
     .exec(http("Login_POST")
-      .post(routes.LoginController.login().url)
+      .post(routes.AccountController.login().url)
       .formParamMap(Map(
         Form.USERNAME -> "${%s}".format(Test.TEST_USERNAME),
         Form.PASSWORD -> "${%s}".format(Test.TEST_PASSWORD),
@@ -57,10 +57,10 @@ object loginControllerTest {
     }
     }
     .exec(http("Login_GET")
-      .get(routes.LoginController.loginForm().url)
+      .get(routes.AccountController.loginForm().url)
       .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
     .exec(http("Login_POST")
-      .post(routes.LoginController.login().url)
+      .post(routes.AccountController.login().url)
       .formParamMap(Map(
         Form.USERNAME -> "${%s}".format(Test.TEST_USERNAME),
         Form.PASSWORD -> "${%s}".format(Test.TEST_PASSWORD),

@@ -21,11 +21,11 @@ object logoutControllerTest {
     .exec(controllersTest.loginControllerTest.loginAfterSignUpScenario)
 
     .exec(http("Logout_GET")
-      .get(routes.LogoutController.logoutForm().url)
+      .get(routes.AccountController.logoutForm().url)
       .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
     .pause(2)
     .exec(http("Logout_POST")
-      .post(routes.LogoutController.logout().url)
+      .post(routes.AccountController.logout().url)
       .formParamMap(Map(
         Form.RECEIVE_NOTIFICATIONS -> "${%s}".format(Test.TEST_RECEIVE_NOTIFICATIONS),
         Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))

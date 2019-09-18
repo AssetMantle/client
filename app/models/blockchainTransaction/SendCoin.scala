@@ -89,6 +89,22 @@ class SendCoins @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
     }
   }
 
+  private def findTransactionHashByTicketID(ticketID: String): Future[Option[String]] = db.run(sendCoinTable.filter(_.ticketID === ticketID).map(_.txHash.?).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def findModeByTicketID(ticketID: String): Future[String] = db.run(sendCoinTable.filter(_.ticketID === ticketID).map(_.mode).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
   private def getTicketIDsWithNullStatus: Future[Seq[String]] = db.run(sendCoinTable.filter(_.status.?.isEmpty).map(_.ticketID).result)
 
   private def deleteByTicketID(ticketID: String) = db.run(sendCoinTable.filter(_.ticketID === ticketID).delete.asTry).map {
@@ -154,7 +170,9 @@ class SendCoins @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
 
     def getTransactionAsync(ticketID: String)=findByTicketID(ticketID)
 
-    def getTransactionHash(ticketID: String): Option[String] = Await.result(findByTicketID(ticketID), Duration.Inf).txHash
+    def getTransactionHash(ticketID: String): Option[String] = Await.result(findTransactionHashByTicketID(ticketID), Duration.Inf)
+
+    def getMode(ticketID: String): String = Await.result(findModeByTicketID(ticketID), Duration.Inf)
 
     def updateTransactionHash(ticketID: String, txHash: String): Int = Await.result(updateTxHashOnTicketID(ticketID = ticketID, txHash = Option(txHash)), Duration.Inf)
 
@@ -195,13 +213,13 @@ class SendCoins @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
     def onSuccessAsync(ticketID: String, blockResponse: BlockResponse) = {
 
 
-        val _=Service.markTransactionSuccessfulAsync(ticketID, blockResponse.txhash)
+        Service.markTransactionSuccessfulAsync(ticketID, blockResponse.txhash)
         Service.getTransactionAsync(ticketID).flatMap { sendCoin =>
-          val _ = blockchainAccounts.Service.markDirtyAsync(sendCoin.to)
-          val some2 = blockchainAccounts.Service.markDirtyAsync(sendCoin.from)
+           blockchainAccounts.Service.markDirtyAsync(sendCoin.to)
+           blockchainAccounts.Service.markDirtyAsync(sendCoin.from)
            masterAccounts.Service.getAccountByAddressAsync(sendCoin.to).flatMap{toAccount=>
             if (toAccount.userType == constants.User.UNKNOWN) {
-              masterAccounts.Service.updateUserType(toAccount.id, constants.User.USER)
+              masterAccounts.Service.updateUserTypeAsync(toAccount.id, constants.User.USER)
             }
             pushNotification.sendNotification(toAccount.id, constants.Notification.SUCCESS, blockResponse.txhash)
             pushNotification.sendNotification(masterAccounts.Service.getId(sendCoin.from), constants.Notification.SUCCESS, blockResponse.txhash)
@@ -209,8 +227,6 @@ class SendCoins @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
           }
 
         }
-
-
     }
 
 
@@ -229,7 +245,7 @@ class SendCoins @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
 
   if (kafkaEnabled || transactionMode != constants.Transactions.BLOCK_MODE) {
     actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
-      transaction.ticketUpdater(Service.getTicketIDsOnStatus, Service.getTransactionHash, Utility.onSuccess, Utility.onFailure)
+      transaction.ticketUpdater(Service.getTicketIDsOnStatus, Service.getTransactionHash, Service.getMode, Utility.onSuccess, Utility.onFailure)
     }(schedulerExecutionContext)
   }
 }

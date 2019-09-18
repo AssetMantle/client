@@ -112,6 +112,10 @@ class TraderKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfigP
 
   private def getAllDocumentsById(id: String): Future[Seq[TraderKYC]] = db.run(traderKYCTable.filter(_.id === id).result)
 
+  private def getAllDocumentTypesByIDAndDocumentSet(id: String, documentTypes: Seq[String]): Future[Seq[String]] = db.run(traderKYCTable.filter(_.id === id).filter(_.documentType.inSet(documentTypes)).map(_.documentType).result)
+
+  private def getAllDocumentTypesByIDStatusAndDocumentSet(id: String, documentTypes: Seq[String], status: Boolean): Future[Seq[String]] = db.run(traderKYCTable.filter(_.id === id).filter(_.documentType.inSet(documentTypes)).filter(traderKYC => traderKYC.organizationStatus && traderKYC.zoneStatus && status).map(_.documentType).result)
+
   private def deleteById(id: String) = db.run(traderKYCTable.filter(_.id === id).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -129,7 +133,7 @@ class TraderKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfigP
   private[models] class TraderKYCTable(tag: Tag) extends Table[TraderKYC](tag, "TraderKYC") {
 
     def * = (id, documentType, fileName, file.?, zoneStatus.?, organizationStatus.?) <> (TraderKYC.tupled, TraderKYC.unapply)
-    
+
     def id = column[String]("id", O.PrimaryKey)
 
     def documentType = column[String]("documentType", O.PrimaryKey)
@@ -178,6 +182,10 @@ class TraderKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfigP
 
     def checkFileNameExists(id: String, fileName: String): Boolean = Await.result(checkByIdAndFileName(id = id, fileName = fileName), Duration.Inf)
 
+    def checkAllKYCFileTypesExists(id: String): Boolean = constants.File.TRADER_KYC_DOCUMENT_TYPES.diff(Await.result(getAllDocumentTypesByIDAndDocumentSet(id = id, documentTypes = constants.File.TRADER_KYC_DOCUMENT_TYPES), Duration.Inf)).isEmpty
+
+    def checkAllKYCFilesVerified(id: String): Boolean = constants.File.TRADER_KYC_DOCUMENT_TYPES.diff(Await.result(getAllDocumentTypesByIDStatusAndDocumentSet(id = id, documentTypes = constants.File.TRADER_KYC_DOCUMENT_TYPES, status = true), Duration.Inf)).isEmpty
+
   }
-  
+
 }

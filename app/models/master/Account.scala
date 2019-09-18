@@ -185,7 +185,9 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
     def updatePassword(username:String, newPassword: String): Int = Await.result(updatePasswordByID(id = username, secretHash = util.hashing.MurmurHash3.stringHash(newPassword).toString), Duration.Inf)
 
-    def checkUsernameAvailable(username: String): Boolean = !Await.result(checkById(username), Duration.Inf)
+    def checkUsernameAvailable(username: String): Boolean = Await.result(checkById(username), Duration.Inf)
+
+    def checkUsernameAvailableAsync(username: String) = checkById(username)
 
     def addLogin(username: String, password: String, accountAddress: String, language: String): String = {
       Await.result(add(Account(username, util.hashing.MurmurHash3.stringHash(password).toString, accountAddress, language, constants.User.WITHOUT_LOGIN, constants.Status.Account.NO_CONTACT)), Duration.Inf)
@@ -194,7 +196,11 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
     def getAccount(username: String): Account = Await.result(findById(username), Duration.Inf)
 
+    def getAccountAsync(username: String)= findById(username)
+
     def getLanguage(id: String): String = Await.result(getLanguageById(id), Duration.Inf)
+
+    def getLanguageAsync(id: String) = getLanguageById(id)
 
     def getId(accountAddress: String): String = Await.result(getIdByAddress(accountAddress), Duration.Inf)
 
@@ -206,6 +212,8 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
     def getAddress(id: String): String = Await.result(getAddressById(id), Duration.Inf)
 
+    def getAddressAsync(id: String) = getAddressById(id)
+
     def updateUserType(id: String, userType: String): Int = Await.result(updateUserTypeById(id, userType), Duration.Inf)
 
     def updateUserTypeAsync(id: String, userType: String) = updateUserTypeById(id, userType)
@@ -213,6 +221,8 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     def updateUserTypeOnAddress(address: String, userType: String): Int = Await.result(updateUserTypeByAddress(address, userType), Duration.Inf)
 
     def getUserType(id: String): String = Await.result(getUserTypeById(id), Duration.Inf)
+
+    def getUserTypeAsync(id: String) =getUserTypeById(id)
 
     def tryVerifyingUserType(id: String, userType: String): Boolean = {
       if (Await.result(getUserTypeById(id), Duration.Inf) == userType) true
