@@ -195,7 +195,7 @@ class IssueAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tra
         val assetRequest = masterTransactionIssueAssetRequests.Service.getIssueAssetByTicketID(ticketID)
         responseAccount.value.assetPegWallet.foreach(assets => assets.foreach(asset => {
           blockchainAssets.Service.insertOrUpdate(pegHash = asset.pegHash, documentHash = asset.documentHash, assetType = asset.assetType, assetPrice = asset.assetPrice, assetQuantity = asset.assetQuantity, quantityUnit = asset.quantityUnit, locked = asset.locked, moderated = asset.moderated, takerAddress = if (asset.takerAddress == "") null else Option(asset.takerAddress), ownerAddress = issueAsset.to, dirtyBit = true)
-          if(assetRequest.documentHash == asset.documentHash){
+          if(assetRequest.documentHash.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)) == asset.documentHash){
             masterTransactionIssueAssetRequests.Service.markListedForTrade(ticketID, Option(asset.pegHash))
           }
         }))

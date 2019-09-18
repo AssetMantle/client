@@ -615,7 +615,7 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."IssueAssetRequest"
     "ticketID"                    VARCHAR,
     "pegHash"                     VARCHAR,
     "accountID"                   VARCHAR NOT NULL,
-    "documentHash"                VARCHAR NOT NULL,
+    "documentHash"                VARCHAR,
     "assetType"                   VARCHAR NOT NULL,
     "quantityUnit"                VARCHAR NOT NULL,
     "assetQuantity"               INT     NOT NULL,

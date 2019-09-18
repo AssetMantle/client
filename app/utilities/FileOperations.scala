@@ -6,7 +6,9 @@ import java.util.concurrent.{ConcurrentHashMap, ConcurrentMap}
 import akka.stream.scaladsl.{FileIO, Source}
 import akka.util.ByteString
 import exceptions.BaseException
+import models.Trait.Document
 import play.api.Logger
+import play.api.libs.json.{Json, OWrites, Reads}
 import views.companion.master.FileUpload.FileUploadInfo
 
 import scala.concurrent.ExecutionContext
@@ -134,5 +136,17 @@ object FileOperations {
     val file = new java.io.File(path + fileName)
     if (!file.exists()) throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION) else file
   }
+
+
+  def combinedHash(documents: Seq[Document[_]])(implicit executionContext: ExecutionContext):String={
+    Json.toJson(documents.map{doc=>
+      DocumentBlockchainDetails(doc.documentType, hashExtractor(doc.fileName))
+    }).toString()
+
+  }
+  case class DocumentBlockchainDetails(documentType: String, documentHash:String)
+
+  implicit val oblReads: Reads[DocumentBlockchainDetails] = Json.reads[DocumentBlockchainDetails]
+  implicit val oblWrites: OWrites[DocumentBlockchainDetails] = Json.writes[DocumentBlockchainDetails]
 
 }
