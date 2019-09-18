@@ -303,4 +303,6 @@ object Form {
   val ISSUE_ASSET_OBL = "ISSUE_ASSET_OBL"
   val SHIPMENT_DETAILS = "SHIPMENT_DETAILS"
 
+  //Sequences
+
 }

@@ -17,26 +17,11 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-//case class AssetFile[T](id: String, documentType: String, fileName: String, file: Option[Array[Byte]], context: Option[T] , status: Option[Boolean]) extends Document[AssetFile[T]] {
-//
-//  def updateFile(newFile: Option[Array[Byte]]): AssetFile[T] = AssetFile[T](id = id, documentType = documentType, fileName = fileName, file = newFile, context = context, status = status)
-//
-//  def updateFileName(newFileName: String): AssetFile[T] = AssetFile[T](id = id, documentType = documentType, fileName = newFileName, file = file, context = context, status = status)
-//}
-
 case class AssetFile(id: String, documentType: String, fileName: String, file: Option[Array[Byte]], context: Option[models.Trait.Context], status: Option[Boolean]) extends Document[AssetFile] {
   def updateFile(newFile: Option[Array[Byte]]): AssetFile = AssetFile(id = id, documentType = documentType, fileName = fileName, file = newFile, context = context, status = status)
 
   def updateFileName(newFileName: String): AssetFile = AssetFile(id = id, documentType = documentType, fileName = newFileName, file = file, context = context, status = status)
 }
-
-
-//case class AssetFile(id: String, documentType: String, fileName: String, file: Option[Array[Byte]], context: Option[String], status: Option[Boolean]) extends Document[AssetFile] {
-//  def updateFile(newFile: Option[Array[Byte]]): AssetFile = AssetFile(id = id, documentType = documentType, fileName = fileName, file = newFile, context = context, status = status)
-//
-//  def updateFileName(newFileName: String): AssetFile = AssetFile(id = id, documentType = documentType, fileName = newFileName, file = file, context = context, status = status)
-//}
-
 
 @Singleton
 class AssetFiles @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {

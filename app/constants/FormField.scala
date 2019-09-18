@@ -92,13 +92,12 @@ object FormField {
   val SEED = new StringFormField("SEED", 1, 200)
   val SEARCH_TX_HASH_HEIGHT = new StringFormField("SEARCH_TX_HASH_HEIGHT", 1, 1000)
 
-  val ASSET_TYPE = new StringFormFieldOption("ASSET_TYPE", constants.SelectOption.ASSET_TYPE.options)
-  val DELIVERY_TERM = new StringFormFieldOption("DELIVERY_TERM", constants.SelectOption.DELIVERY_TERM.options)
-  val QUALITY = new StringFormFieldOption("QUALITY", constants.SelectOption.QUALITY.options)
-  val TRADE_TYPE = new StringFormFieldOption("TRADE_TYPE", constants.SelectOption.TRADE_TYPE.options)
-//  val COUNTRY = new StringFormFieldOption("COUNTRY", constants.Option.COUNTRY.options)
-  val PHYSICAL_DOCUMENTS_HANDLED_VIA = new StringFormFieldOption("PHYSICAL_DOCUMENTS_HANDLED_VIA", constants.SelectOption.PHYSICAL_DOCUMENTS_HANDLED_VIA.options)
-  val COMDEX_PAYMENT_TERMS = new StringFormFieldOption("COMDEX_PAYMENT_TERMS", constants.SelectOption.COMDEX_PAYMENT_TERMS.options)
+  val ASSET_TYPE = new StringOptionFormField("ASSET_TYPE", constants.SelectOption.ASSET_TYPE.options)
+  val DELIVERY_TERM = new StringOptionFormField("DELIVERY_TERM", constants.SelectOption.DELIVERY_TERM.options)
+  val QUALITY = new StringOptionFormField("QUALITY", constants.SelectOption.QUALITY.options)
+  val TRADE_TYPE = new StringOptionFormField("TRADE_TYPE", constants.SelectOption.TRADE_TYPE.options)
+  val PHYSICAL_DOCUMENTS_HANDLED_VIA = new StringOptionFormField("PHYSICAL_DOCUMENTS_HANDLED_VIA", constants.SelectOption.PHYSICAL_DOCUMENTS_HANDLED_VIA.options)
+  val COMDEX_PAYMENT_TERMS = new StringOptionFormField("COMDEX_PAYMENT_TERMS", constants.SelectOption.COMDEX_PAYMENT_TERMS.options)
 
   val SHIPMENT_DATE = new DateFormField("SHIPMENT_DATE")
   val INVOICE_DATE = new DateFormField("INVOICE_DATE")
@@ -125,7 +124,7 @@ object FormField {
     val field: Mapping[String] = text(minLength = minimumLength, maxLength = maximumLength).verifying(Constraints.pattern(regex = regex, name = regex.pattern.toString, error = errorMessage))
   }
 
-  class StringFormFieldOption(fieldName: String, option: Seq[String], errorMessage: String = "Error Response") {
+  class StringOptionFormField(fieldName: String, option: Seq[String], errorMessage: String = "Error Response") {
     val name: String = fieldName
     val field: Mapping[String] = text.verifying(constraint = field => option contains field, error = errorMessage)
   }
