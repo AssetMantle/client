@@ -1,6 +1,8 @@
 package controllers
 
-import controllers.actions.{WithGenesisLoginAction, WithUserLoginAction}
+import java.nio.file.Files
+
+import controllers.actions.{WithGenesisLoginAction, WithUserLoginAction, WithZoneLoginAction}
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
@@ -9,12 +11,12 @@ import models.common.Serializable._
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
-import utilities.PushNotification
+import views.companion.master.FileUpload
 
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class AddZoneController @Inject()(messagesControllerComponents: MessagesControllerComponents, transaction: utilities.Transaction, pushNotification: PushNotification, blockchainAccounts: blockchain.Accounts, masterZoneKYCs: master.ZoneKYCs, masterOrganizations: master.Organizations, transactionsAddZone: transactions.AddZone, blockchainZones: models.blockchain.Zones, blockchainTransactionAddZones: blockchainTransaction.AddZones, masterAccounts: master.Accounts, masterZones: master.Zones, withUserLoginAction: WithUserLoginAction, withGenesisLoginAction: WithGenesisLoginAction, withUsernameToken: WithUsernameToken)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class AddZoneController @Inject()(messagesControllerComponents: MessagesControllerComponents, fileResourceManager: utilities.FileResourceManager, withZoneLoginAction: WithZoneLoginAction, transaction: utilities.Transaction, utilitiesNotification: utilities.Notification, blockchainAccounts: blockchain.Accounts, masterZoneKYCs: master.ZoneKYCs, transactionsAddZone: transactions.AddZone, blockchainZones: models.blockchain.Zones, blockchainTransactionAddZones: blockchainTransaction.AddZones, masterAccounts: master.Accounts, masterZones: master.Zones, withUserLoginAction: WithUserLoginAction, withGenesisLoginAction: WithGenesisLoginAction, withUsernameToken: WithUsernameToken)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
@@ -59,14 +61,105 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
       }
   }
 
-  def reviewAddZoneCompletionForm(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
+  def userUploadZoneKYCForm(documentType: String): Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.uploadFileForm(utilities.String.getJsRouteFunction(routes.javascript.AddZoneController.userUploadZoneKYC), utilities.String.getJsRouteFunction(routes.javascript.AddZoneController.userStoreZoneKYC), documentType))
+  }
+
+  def userUploadZoneKYC(documentType: String) = Action(parse.multipartFormData) { implicit request =>
+    FileUpload.form.bindFromRequest.fold(
+      formWithErrors => {
+        BadRequest
+      },
+      fileUploadInfo => {
+        try {
+          request.body.file(constants.File.KEY_FILE) match {
+            case None => BadRequest(views.html.index(failures = Seq(constants.Response.NO_FILE)))
+            case Some(file) => utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, fileResourceManager.getZoneKycFilePath(documentType))
+              Ok
+          }
+        }
+        catch {
+          case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+        }
+      }
+    )
+  }
+
+  def userStoreZoneKYC(name: String, documentType: String): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        val zone = masterZones.Service.getByAccountID(loginState.username)
-        Ok(views.html.component.master.reviewTraderCompletion(views.companion.master.TraderCompletion.form, trader = trader, organization = masterOrganizations.Service.get(trader.organizationID), zone = masterZones.Service.get(trader.zoneID), traderKYCs = masterTraderKYCs.Service.getAllDocuments(trader.id)))
+        fileResourceManager.storeFile[master.ZoneKYC](
+          name = name,
+          documentType = documentType,
+          path = fileResourceManager.getZoneKycFilePath(documentType),
+          document = master.ZoneKYC(id = masterZones.Service.getID(loginState.username), documentType = documentType, status = None, fileName = name, file = None),
+          masterCreate = masterZoneKYCs.Service.create
+        )
+        PartialContent(views.html.component.master.userUploadOrUpdateZoneKYC(masterZoneKYCs.Service.getAllDocuments(masterZones.Service.getID(loginState.username))))
       } catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
+  }
+
+  def userUpdateZoneKYCForm(documentType: String): Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.updateFileForm(utilities.String.getJsRouteFunction(routes.javascript.AddZoneController.userUploadZoneKYC), utilities.String.getJsRouteFunction(routes.javascript.AddZoneController.userUpdateZoneKYC), documentType))
+  }
+
+  def userUpdateZoneKYC(name: String, documentType: String): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      try {
+        val id = masterZones.Service.getID(loginState.username)
+        fileResourceManager.updateFile[master.ZoneKYC](
+          name = name,
+          documentType = documentType,
+          path = fileResourceManager.getZoneKycFilePath(documentType),
+          oldDocumentFileName = masterZoneKYCs.Service.getFileName(id = id, documentType = documentType),
+          document = master.ZoneKYC(id = id, documentType = documentType, status = None, fileName = name, file = None),
+          updateOldDocument = masterZoneKYCs.Service.updateOldDocument
+        )
+        PartialContent(views.html.component.master.userUploadOrUpdateZoneKYC(masterZoneKYCs.Service.getAllDocuments(masterZones.Service.getID(loginState.username))))
+      } catch {
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
+  }
+
+  def reviewZoneCompletionForm(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      try {
+        val zone = masterZones.Service.getByAccountID(loginState.username)
+        Ok(views.html.component.master.reviewZoneCompletion(views.companion.master.ZoneCompletion.form, zone = zone, zoneKYCs = masterZoneKYCs.Service.getAllDocuments(zone.id)))
+      } catch {
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
+  }
+
+  def reviewZoneCompletion(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      views.companion.master.ZoneCompletion.form.bindFromRequest().fold(
+        formWithErrors => {
+          try {
+            val zone = masterZones.Service.getByAccountID(loginState.username)
+            BadRequest(views.html.component.master.reviewZoneCompletion(formWithErrors, zone = zone, zoneKYCs = masterZoneKYCs.Service.getAllDocuments(zone.id)))
+          } catch {
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+          }
+        },
+        reviewZoneCompletionData => {
+          try {
+            val id = masterZones.Service.getID(loginState.username)
+            if (reviewZoneCompletionData.completion && masterZoneKYCs.Service.checkAllKYCFileTypesExists(id)) {
+              masterZones.Service.markZoneFormCompleted(id)
+              withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ZONE_ADDED_FOR_VERIFICATION)))
+            } else {
+              val zone = masterZones.Service.getByAccountID(loginState.username)
+              BadRequest(views.html.component.master.reviewZoneCompletion(views.companion.master.ZoneCompletion.form, zone = zone, zoneKYCs = masterZoneKYCs.Service.getAllDocuments(zone.id)))
+            }
+          }
+          catch {
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+          }
+        }
+      )
   }
 
   def verifyZoneForm(zoneID: String): Action[AnyContent] = Action { implicit request =>
@@ -81,17 +174,21 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
         },
         verifyZoneData => {
           try {
-            val zoneAccountAddress = masterAccounts.Service.getAddress(masterZones.Service.getAccountId(verifyZoneData.zoneID))
-            transaction.process[blockchainTransaction.AddZone, transactionsAddZone.Request](
-              entity = blockchainTransaction.AddZone(from = loginState.address, to = zoneAccountAddress, zoneID = verifyZoneData.zoneID, gas = verifyZoneData.gas, ticketID = "", mode = transactionMode),
-              blockchainTransactionCreate = blockchainTransactionAddZones.Service.create,
-              request = transactionsAddZone.Request(transactionsAddZone.BaseReq(from = loginState.address, gas = verifyZoneData.gas.toString), to = zoneAccountAddress, zoneID = verifyZoneData.zoneID, password = verifyZoneData.password, mode = transactionMode),
-              action = transactionsAddZone.Service.post,
-              onSuccess = blockchainTransactionAddZones.Utility.onSuccess,
-              onFailure = blockchainTransactionAddZones.Utility.onFailure,
-              updateTransactionHash = blockchainTransactionAddZones.Service.updateTransactionHash
-            )
-            withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ZONE_VERIFIED)))
+            if (masterZoneKYCs.Service.checkAllKYCFilesVerified(verifyZoneData.zoneID)) {
+              val zoneAccountAddress = masterAccounts.Service.getAddress(masterZones.Service.getAccountId(verifyZoneData.zoneID))
+              transaction.process[blockchainTransaction.AddZone, transactionsAddZone.Request](
+                entity = blockchainTransaction.AddZone(from = loginState.address, to = zoneAccountAddress, zoneID = verifyZoneData.zoneID, gas = verifyZoneData.gas, ticketID = "", mode = transactionMode),
+                blockchainTransactionCreate = blockchainTransactionAddZones.Service.create,
+                request = transactionsAddZone.Request(transactionsAddZone.BaseReq(from = loginState.address, gas = verifyZoneData.gas.toString), to = zoneAccountAddress, zoneID = verifyZoneData.zoneID, password = verifyZoneData.password, mode = transactionMode),
+                action = transactionsAddZone.Service.post,
+                onSuccess = blockchainTransactionAddZones.Utility.onSuccess,
+                onFailure = blockchainTransactionAddZones.Utility.onFailure,
+                updateTransactionHash = blockchainTransactionAddZones.Service.updateTransactionHash
+              )
+              withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ZONE_VERIFIED)))
+            } else {
+              PreconditionFailed(views.html.index(failures = Seq(constants.Response.ALL_KYC_FILES_NOT_VERIFIED)))
+            }
           }
           catch {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -110,31 +207,31 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
       }
   }
 
-  def viewKycDocuments(accountID: String): Action[AnyContent] = withGenesisLoginAction.authenticated { implicit loginState =>
+  def viewKycDocuments(zoneID: String): Action[AnyContent] = withGenesisLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        withUsernameToken.Ok(views.html.component.master.viewVerificationZoneKycDouments(masterZoneKYCs.Service.getAllDocuments(accountID)))
+        withUsernameToken.Ok(views.html.component.master.viewVerificationZoneKycDouments(masterZoneKYCs.Service.getAllDocuments(zoneID)))
       } catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
-  def verifyKycDocument(accountID: String, documentType: String): Action[AnyContent] = withGenesisLoginAction.authenticated { implicit loginState =>
+  def verifyKycDocument(zoneID: String, documentType: String): Action[AnyContent] = withGenesisLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        masterZoneKYCs.Service.verify(id = accountID, documentType = documentType)
-        pushNotification.send(accountID, constants.Notification.PUSH_NOTIFICATION_SUCCESS, Messages(constants.Response.DOCUMENT_APPROVED.message))
+        masterZoneKYCs.Service.verify(id = zoneID, documentType = documentType)
+        utilitiesNotification.send(masterZones.Service.getAccountId(zoneID), constants.Notification.SUCCESS, Messages(constants.Response.DOCUMENT_APPROVED.message))
         withUsernameToken.Ok(Messages(constants.Response.SUCCESS.message))
       } catch {
         case baseException: BaseException => InternalServerError(Messages(baseException.failure.message))
       }
   }
 
-  def rejectKycDocument(accountID: String, documentType: String): Action[AnyContent] = withGenesisLoginAction.authenticated { implicit loginState =>
+  def rejectKycDocument(zoneID: String, documentType: String): Action[AnyContent] = withGenesisLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        masterZoneKYCs.Service.reject(id = accountID, documentType = documentType)
-        pushNotification.send(accountID, constants.Notification.PUSH_NOTIFICATION_FAILURE, Messages(constants.Response.DOCUMENT_REJECTED.message))
+        masterZoneKYCs.Service.reject(id = zoneID, documentType = documentType)
+        utilitiesNotification.send(masterZones.Service.getAccountId(zoneID), constants.Notification.FAILURE, Messages(constants.Response.DOCUMENT_REJECTED.message))
         withUsernameToken.Ok(Messages(constants.Response.SUCCESS.message))
       } catch {
         case baseException: BaseException => InternalServerError(Messages(baseException.failure.message))
@@ -171,6 +268,68 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
         withUsernameToken.Ok(views.html.component.master.viewZonesInGenesis(masterZones.Service.getAllVerified))
       }
       catch {
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
+  }
+
+  def uploadZoneKYCForm(documentType: String): Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.uploadFileForm(utilities.String.getJsRouteFunction(routes.javascript.AddZoneController.uploadZoneKYC), utilities.String.getJsRouteFunction(routes.javascript.AddZoneController.storeZoneKYC), documentType))
+  }
+
+  def uploadZoneKYC(documentType: String) = Action(parse.multipartFormData) { implicit request =>
+    FileUpload.form.bindFromRequest.fold(
+      formWithErrors => {
+        BadRequest
+      },
+      fileUploadInfo => {
+        try {
+          request.body.file(constants.File.KEY_FILE) match {
+            case None => BadRequest(views.html.index(failures = Seq(constants.Response.NO_FILE)))
+            case Some(file) => utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, fileResourceManager.getZoneKycFilePath(documentType))
+              Ok
+          }
+        }
+        catch {
+          case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+        }
+      }
+    )
+  }
+
+  def storeZoneKYC(name: String, documentType: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      try {
+        fileResourceManager.storeFile[master.ZoneKYC](
+          name = name,
+          documentType = documentType,
+          path = fileResourceManager.getZoneKycFilePath(documentType),
+          document = master.ZoneKYC(id = masterZones.Service.getID(loginState.username), documentType = documentType, fileName = name, file = None, status = None),
+          masterCreate = masterZoneKYCs.Service.create
+        )
+        withUsernameToken.Ok(Messages(constants.Response.FILE_UPLOAD_SUCCESSFUL.message))
+      } catch {
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
+  }
+
+  def updateZoneKYCForm(documentType: String): Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.updateFileForm(utilities.String.getJsRouteFunction(routes.javascript.AddZoneController.uploadZoneKYC), utilities.String.getJsRouteFunction(routes.javascript.AddZoneController.updateZoneKYC), documentType))
+  }
+
+  def updateZoneKYC(name: String, documentType: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      try {
+        val id = masterZones.Service.getID(loginState.username)
+        fileResourceManager.updateFile[master.ZoneKYC](
+          name = name,
+          documentType = documentType,
+          path = fileResourceManager.getZoneKycFilePath(documentType),
+          oldDocumentFileName = masterZoneKYCs.Service.getFileName(id = id, documentType = documentType),
+          document = master.ZoneKYC(id = id, documentType = documentType, status = None, fileName = name, file = None),
+          updateOldDocument = masterZoneKYCs.Service.updateOldDocument
+        )
+        withUsernameToken.Ok(Messages(constants.Response.FILE_UPDATE_SUCCESSFUL.message))
+      } catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }

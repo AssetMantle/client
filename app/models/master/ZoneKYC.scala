@@ -90,6 +90,10 @@ class ZoneKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   private def getAllDocumentsById(id: String): Future[Seq[ZoneKYC]] = db.run(zoneKYCTable.filter(_.id === id).result)
 
+  private def getAllDocumentTypesByIDAndDocumentSet(id: String, documentTypes: Seq[String]): Future[Seq[String]] = db.run(zoneKYCTable.filter(_.id === id).filter(_.documentType.inSet(documentTypes)).map(_.documentType).result)
+
+  private def getAllDocumentTypesByIDStatusAndDocumentSet(id: String, documentTypes: Seq[String], status: Boolean): Future[Seq[String]] = db.run(zoneKYCTable.filter(_.id === id).filter(_.documentType.inSet(documentTypes)).filter(_.status === status).map(_.documentType).result)
+
   private def deleteById(id: String) = db.run(zoneKYCTable.filter(_.id === id).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -145,6 +149,10 @@ class ZoneKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     def checkFileExists(id: String, documentType: String): Boolean = Await.result(checkByIdAndDocumentType(id = id, documentType = documentType), Duration.Inf)
 
     def checkFileNameExists(id: String, fileName: String): Boolean = Await.result(checkByIdAndFileName(id = id, fileName = fileName), Duration.Inf)
+
+    def checkAllKYCFileTypesExists(id: String): Boolean = constants.File.ZONE_KYC_DOCUMENT_TYPES.diff(Await.result(getAllDocumentTypesByIDAndDocumentSet(id = id, documentTypes = constants.File.ZONE_KYC_DOCUMENT_TYPES), Duration.Inf)).isEmpty
+
+    def checkAllKYCFilesVerified(id: String): Boolean = constants.File.ZONE_KYC_DOCUMENT_TYPES.diff(Await.result(getAllDocumentTypesByIDStatusAndDocumentSet(id = id, documentTypes = constants.File.ZONE_KYC_DOCUMENT_TYPES, status = true), Duration.Inf)).isEmpty
 
   }
 

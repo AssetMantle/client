@@ -14,7 +14,6 @@ import play.api.{Configuration, Logger}
 import queries.GetOrder
 import slick.jdbc.JdbcProfile
 import transactions.responses.TransactionResponse.BlockResponse
-import utilities.PushNotification
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
@@ -26,7 +25,7 @@ case class SendFiat(from: String, to: String, amount: Int, pegHash: String, gas:
 
 
 @Singleton
-class SendFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Transaction, protected val databaseConfigProvider: DatabaseConfigProvider, blockchainTransactionFeedbacks: blockchain.TransactionFeedbacks, getOrder: GetOrder, transactionSendFiat: transactions.SendFiat, blockchainFiats: blockchain.Fiats, blockchainOrders: blockchain.Orders, blockchainNegotiations: blockchain.Negotiations, pushNotification: PushNotification, masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
+class SendFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Transaction, protected val databaseConfigProvider: DatabaseConfigProvider, blockchainTransactionFeedbacks: blockchain.TransactionFeedbacks, getOrder: GetOrder, transactionSendFiat: transactions.SendFiat, blockchainFiats: blockchain.Fiats, blockchainOrders: blockchain.Orders, blockchainNegotiations: blockchain.Negotiations, utilitiesNotification: utilities.Notification, masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_SEND_FIAT
 
@@ -188,8 +187,8 @@ class SendFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
         blockchainTransactionFeedbacks.Service.markDirty(sendFiat.from)
         orderResponse.value.fiatPegWallet.foreach(fiats => fiats.foreach(fiatPeg => blockchainFiats.Service.insertOrUpdate(pegHash = fiatPeg.pegHash, ownerAddress = negotiationID, transactionID = fiatPeg.transactionID, transactionAmount = fiatPeg.transactionAmount, redeemedAmount = fiatPeg.redeemedAmount, dirtyBit = false)))
         blockchainAccounts.Service.markDirty(sendFiat.from)
-        pushNotification.send(masterAccounts.Service.getId(sendFiat.to), constants.Notification.PUSH_NOTIFICATION_SUCCESS, blockResponse.txhash)
-        pushNotification.send(masterAccounts.Service.getId(sendFiat.from), constants.Notification.PUSH_NOTIFICATION_SUCCESS, blockResponse.txhash)
+        utilitiesNotification.send(masterAccounts.Service.getId(sendFiat.to), constants.Notification.SUCCESS, blockResponse.txhash)
+        utilitiesNotification.send(masterAccounts.Service.getId(sendFiat.from), constants.Notification.SUCCESS, blockResponse.txhash)
       }
       catch {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
@@ -203,8 +202,8 @@ class SendFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
         Service.markTransactionFailed(ticketID, message)
         val sendFiat = Service.getTransaction(ticketID)
         blockchainTransactionFeedbacks.Service.markDirty(sendFiat.from)
-        pushNotification.send(masterAccounts.Service.getId(sendFiat.to), constants.Notification.PUSH_NOTIFICATION_FAILURE, message)
-        pushNotification.send(masterAccounts.Service.getId(sendFiat.from), constants.Notification.PUSH_NOTIFICATION_FAILURE, message)
+        utilitiesNotification.send(masterAccounts.Service.getId(sendFiat.to), constants.Notification.FAILURE, message)
+        utilitiesNotification.send(masterAccounts.Service.getId(sendFiat.from), constants.Notification.FAILURE, message)
       } catch {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }

@@ -98,17 +98,17 @@ GET         /userUpload/storeFile                                        control
 GET         /userUpdate                                                  controllers.FileController.updateUserKycForm(documentType: String)
 GET         /userUpdate/updateFile                                       controllers.FileController.updateUserKyc(name: String, documentType: String)
 
-GET         /userUpload/zoneKyc                                          controllers.FileController.uploadUserZoneKycForm(documentType: String)
-POST        /userUpload/userZoneKycDocument                              controllers.FileController.uploadUserZoneKyc(documentType: String)
-GET         /userUpload/storeUserZoneKycDocument                         controllers.FileController.storeUserZoneKyc(name: String, documentType: String)
-GET         /userUpdate/zoneKyc                                          controllers.FileController.updateUserZoneKycForm(documentType: String)
-GET         /userUpdate/updateUserZoneKycDocument                        controllers.FileController.updateUserZoneKyc(name: String, documentType: String)
+GET         /userUpload/zoneKyc                                          controllers.AddZoneController.userUploadZoneKYCForm(documentType: String)
+POST        /userUpload/userZoneKycDocument                              controllers.AddZoneController.userUploadZoneKYC(documentType: String)
+GET         /userUpload/storeUserZoneKycDocument                         controllers.AddZoneController.userStoreZoneKYC(name: String, documentType: String)
+GET         /userUpdate/zoneKyc                                          controllers.AddZoneController.userUpdateZoneKYCForm(documentType: String)
+GET         /userUpdate/updateUserZoneKycDocument                        controllers.AddZoneController.userUpdateZoneKYC(name: String, documentType: String)
+GET         /zoneUpload                                                  controllers.AddZoneController.uploadZoneKYCForm(documentType: String)
+POST        /zoneUpload/file                                             controllers.AddZoneController.uploadZoneKYC(documentType: String)
+GET         /zoneUpload/storeFile                                        controllers.AddZoneController.storeZoneKYC(name: String, documentType: String)
+GET         /zoneUpdate                                                  controllers.AddZoneController.updateZoneKYCForm(documentType: String)
+GET         /zoneUpload/updateFile                                       controllers.AddZoneController.updateZoneKYC(name: String, documentType: String)
 
-GET         /zoneUpload                                                  controllers.FileController.uploadZoneKycForm(documentType: String)
-POST        /zoneUpload/file                                             controllers.FileController.uploadZoneKyc(documentType: String)
-GET         /zoneUpload/storeFile                                        controllers.FileController.storeZoneKyc(name: String, documentType: String)
-GET         /zoneUpdate                                                  controllers.FileController.updateZoneKycForm(documentType: String)
-GET         /zoneUpload/updateFile                                       controllers.FileController.updateZoneKyc(name: String, documentType: String)
 GET         /master/userAccessedOrganizationKYCFile                      controllers.FileController.userAccessedOrganizationKYCFile(documentType: String)
 GET         /master/userAccessedTraderKYCFile                            controllers.FileController.userAccessedTraderKYCFile(documentType: String)
 GET         /master/userAccessedZoneKYCFile                              controllers.FileController.userAccessedZoneKYCFile(documentType: String)
@@ -195,7 +195,9 @@ GET         /organizationUpload/updateFile                               control
 
 GET         /master/addZone                                              controllers.AddZoneController.addZoneForm
 POST        /master/addZone                                              controllers.AddZoneController.addZone
-GET         /master/addZone                                              controllers.AddZoneController.userUploadOrUpdateZoneKYCView
+GET         /master/userUploadOrUpdateZoneKYCView                        controllers.AddZoneController.userUploadOrUpdateZoneKYCView
+GET         /master/reviewZoneCompletion                                 controllers.AddZoneController.reviewZoneCompletionForm
+POST        /master/reviewZoneCompletion                                 controllers.AddZoneController.reviewZoneCompletion
 
 GET         /master/verifyZone                                           controllers.AddZoneController.verifyZoneForm(zoneID: String)
 POST        /master/verifyZone                                           controllers.AddZoneController.verifyZone

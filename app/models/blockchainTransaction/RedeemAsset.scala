@@ -12,7 +12,6 @@ import play.api.{Configuration, Logger}
 import queries.GetAccount
 import slick.jdbc.JdbcProfile
 import transactions.responses.TransactionResponse.BlockResponse
-import utilities.PushNotification
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
@@ -24,7 +23,7 @@ case class RedeemAsset(from: String, to: String, pegHash: String, gas: Int, stat
 
 
 @Singleton
-class RedeemAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Transaction, protected val databaseConfigProvider: DatabaseConfigProvider, getAccount: GetAccount, blockchainAssets: blockchain.Assets, transactionRedeemAsset: transactions.RedeemAsset, blockchainAccounts: blockchain.Accounts, pushNotification: PushNotification, masterAccounts: master.Accounts)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
+class RedeemAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Transaction, protected val databaseConfigProvider: DatabaseConfigProvider, getAccount: GetAccount, blockchainAssets: blockchain.Assets, transactionRedeemAsset: transactions.RedeemAsset, blockchainAccounts: blockchain.Accounts, utilitiesNotification: utilities.Notification, masterAccounts: master.Accounts)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_REDEEM_ASSET
 
@@ -176,8 +175,8 @@ class RedeemAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tr
         val redeemAsset = Service.getTransaction(ticketID)
         blockchainAssets.Service.markDirty(redeemAsset.pegHash)
         blockchainAccounts.Service.markDirty(redeemAsset.from)
-        pushNotification.send(masterAccounts.Service.getId(redeemAsset.to), constants.Notification.PUSH_NOTIFICATION_SUCCESS, blockResponse.txhash)
-        pushNotification.send(masterAccounts.Service.getId(redeemAsset.from), constants.Notification.PUSH_NOTIFICATION_SUCCESS, blockResponse.txhash)
+        utilitiesNotification.send(masterAccounts.Service.getId(redeemAsset.to), constants.Notification.SUCCESS, blockResponse.txhash)
+        utilitiesNotification.send(masterAccounts.Service.getId(redeemAsset.from), constants.Notification.SUCCESS, blockResponse.txhash)
       } catch {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
           throw new BaseException(constants.Response.PSQL_EXCEPTION)
@@ -188,8 +187,8 @@ class RedeemAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tr
       try {
         Service.markTransactionFailed(ticketID, message)
         val redeemAsset = Service.getTransaction(ticketID)
-        pushNotification.send(masterAccounts.Service.getId(redeemAsset.from), constants.Notification.PUSH_NOTIFICATION_FAILURE, message)
-        pushNotification.send(masterAccounts.Service.getId(redeemAsset.to), constants.Notification.PUSH_NOTIFICATION_FAILURE, message)
+        utilitiesNotification.send(masterAccounts.Service.getId(redeemAsset.from), constants.Notification.FAILURE, message)
+        utilitiesNotification.send(masterAccounts.Service.getId(redeemAsset.to), constants.Notification.FAILURE, message)
       } catch {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }

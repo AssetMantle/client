@@ -16,13 +16,13 @@
             <span class="red">@Messages(constants.Form.NAME)</span>: @zone.name <br>
             <span class="red">@Messages(constants.Form.CURRENCY)</span>: @zone.currency <br>
             @Messages(constants.Form.ADDRESS): <br>
-            <span class="red">@Messages(constants.Form.ADDRESS_LINE_1)</span>: @zone.postalAddress.addressLine1 <br>
-            <span class="red">@Messages(constants.Form.ADDRESS_LINE_2)</span>: @zone.postalAddress.addressLine2 <br>
-            <span class="red">@Messages(constants.Form.LANDMARK)</span>: @zone.postalAddress.landmark.getOrElse("") <br>
-            <span class="red">@Messages(constants.Form.CITY)</span>: @zone.postalAddress.city <br>
-            <span class="red">@Messages(constants.Form.COUNTRY)</span>: @zone.postalAddress.country <br>
-            <span class="red">@Messages(constants.Form.ZIP_CODE)</span>: @zone.postalAddress.zipCode <br>
-            <span class="red">@Messages(constants.Form.PHONE)</span>: @zone.postalAddress.phone
+            <span class="red">@Messages(constants.Form.ADDRESS_LINE_1)</span>: @zone.address.addressLine1 <br>
+            <span class="red">@Messages(constants.Form.ADDRESS_LINE_2)</span>: @zone.address.addressLine2 <br>
+            <span class="red">@Messages(constants.Form.LANDMARK)</span>: @zone.address.landmark.getOrElse("") <br>
+            <span class="red">@Messages(constants.Form.CITY)</span>: @zone.address.city <br>
+            <span class="red">@Messages(constants.Form.COUNTRY)</span>: @zone.address.country <br>
+            <span class="red">@Messages(constants.Form.ZIP_CODE)</span>: @zone.address.zipCode <br>
+            <span class="red">@Messages(constants.Form.PHONE)</span>: @zone.address.phone
         </div>
         <br>
         <div id="zoneKYCs">@Messages(constants.Form.ZONE_KYC_FILES): <br>

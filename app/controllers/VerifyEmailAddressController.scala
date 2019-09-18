@@ -9,13 +9,12 @@ import models.masterTransaction.EmailOTPs
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
-import utilities.Email
 import views.companion.master.VerifyEmailAddress
 
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class VerifyEmailAddressController @Inject()(messagesControllerComponents: MessagesControllerComponents, masterAccounts: master.Accounts, emailOTPs: EmailOTPs, masterContacts: master.Contacts, withLoginAction: WithLoginAction, email: Email, withUsernameToken: WithUsernameToken)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class VerifyEmailAddressController @Inject()(messagesControllerComponents: MessagesControllerComponents, masterAccounts: master.Accounts, emailOTPs: EmailOTPs, masterContacts: master.Contacts, withLoginAction: WithLoginAction, utilitiesNotification: utilities.Notification, withUsernameToken: WithUsernameToken)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val module: String = constants.Module.CONTROLLERS_EMAIL
 
@@ -25,7 +24,7 @@ class VerifyEmailAddressController @Inject()(messagesControllerComponents: Messa
     implicit request =>
       try {
         val otp = emailOTPs.Service.sendOTP(loginState.username)
-        email.send(toAccountID = loginState.username, email = constants.Notification.EMAIL_VERIFY_OTP, otp)
+        utilitiesNotification.send(accountID = loginState.username, notification = constants.Notification.VERIFY_EMAIL, otp)
         withUsernameToken.Ok(views.html.component.master.verifyEmailAddress(VerifyEmailAddress.form))
       }
       catch {

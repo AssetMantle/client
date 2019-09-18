@@ -10,13 +10,12 @@ import models.{blockchain, blockchainTransaction, master, masterTransaction}
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
-import utilities.PushNotification
 import views.companion.master.FileUpload
 
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class SetACLController @Inject()(messagesControllerComponents: MessagesControllerComponents, email: utilities.Email, masterTransactionAddTraderRequests: masterTransaction.AddTraderRequests, withTraderLoginAction: WithTraderLoginAction, transaction: utilities.Transaction, fileResourceManager: utilities.FileResourceManager, blockchainAccounts: blockchain.Accounts, masterZones: master.Zones, masterOrganizations: master.Organizations, masterTraders: master.Traders, masterTraderKYCs: master.TraderKYCs, withZoneLoginAction: WithZoneLoginAction, withOrganizationLoginAction: WithOrganizationLoginAction, withUserLoginAction: WithUserLoginAction, withGenesisLoginAction: WithGenesisLoginAction, masterAccounts: master.Accounts, transactionsSetACL: transactions.SetACL, blockchainAclAccounts: blockchain.ACLAccounts, blockchainTransactionSetACLs: blockchainTransaction.SetACLs, blockchainAclHashes: blockchain.ACLHashes, pushNotification: PushNotification, withUsernameToken: WithUsernameToken)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class SetACLController @Inject()(messagesControllerComponents: MessagesControllerComponents, masterTransactionAddTraderRequests: masterTransaction.AddTraderRequests, withTraderLoginAction: WithTraderLoginAction, transaction: utilities.Transaction, fileResourceManager: utilities.FileResourceManager, blockchainAccounts: blockchain.Accounts, masterZones: master.Zones, masterOrganizations: master.Organizations, masterTraders: master.Traders, masterTraderKYCs: master.TraderKYCs, withZoneLoginAction: WithZoneLoginAction, withOrganizationLoginAction: WithOrganizationLoginAction, withUserLoginAction: WithUserLoginAction, withGenesisLoginAction: WithGenesisLoginAction, masterAccounts: master.Accounts, transactionsSetACL: transactions.SetACL, blockchainAclAccounts: blockchain.ACLAccounts, blockchainTransactionSetACLs: blockchainTransaction.SetACLs, blockchainAclHashes: blockchain.ACLHashes, utilitiesNotification: utilities.Notification, withUsernameToken: WithUsernameToken)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -38,7 +37,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
         addTraderRequestData => {
           try {
             val requestID = masterTransactionAddTraderRequests.Service.create(accountID = addTraderRequestData.accountID, organizationID = masterOrganizations.Service.getID(loginState.username))
-            email.send(toAccountID = addTraderRequestData.accountID, email = constants.Notification.EMAIL_TRADER_INVITATION, routes.SetACLController.addTraderRequestForm(requestID).url)
+            utilitiesNotification.send(accountID = addTraderRequestData.accountID, notification = constants.Notification.TRADER_INVITATION, routes.SetACLController.addTraderRequestForm(requestID).url)
             withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.INVITATION_EMAIL_SENT)))
           }
           catch {
@@ -277,7 +276,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
     implicit request =>
       try {
         masterTraderKYCs.Service.zoneVerify(id = traderID, documentType = documentType)
-        pushNotification.send(username = masterTraders.Service.getAccountId(traderID), notification = constants.Notification.PUSH_NOTIFICATION_SUCCESS, messageParameters = Messages(constants.Response.DOCUMENT_APPROVED.message))
+        utilitiesNotification.send(accountID = masterTraders.Service.getAccountId(traderID), notification = constants.Notification.SUCCESS, Messages(constants.Response.DOCUMENT_APPROVED.message))
         withUsernameToken.Ok(Messages(constants.Response.SUCCESS.message))
       } catch {
         case baseException: BaseException => InternalServerError(Messages(baseException.failure.message))
@@ -288,7 +287,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
     implicit request =>
       try {
         masterTraderKYCs.Service.zoneReject(id = traderID, documentType = documentType)
-        pushNotification.send(username = masterTraders.Service.getAccountId(traderID), notification = constants.Notification.PUSH_NOTIFICATION_FAILURE, messageParameters = Messages(constants.Response.DOCUMENT_REJECTED.message))
+        utilitiesNotification.send(accountID = masterTraders.Service.getAccountId(traderID), notification = constants.Notification.FAILURE,  Messages(constants.Response.DOCUMENT_REJECTED.message))
         withUsernameToken.Ok(Messages(constants.Response.SUCCESS.message))
       } catch {
         case baseException: BaseException => InternalServerError(Messages(baseException.failure.message))
@@ -322,7 +321,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
   def zoneViewPendingVerifyTraderRequests: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        withUsernameToken.Ok(views.html.component.master.zoneViewPendingVerifyTraderRequests(masterTraders.Service.getVerifyTraderRequestsForZone(masterZones.Service.getZoneId(loginState.username))))
+        withUsernameToken.Ok(views.html.component.master.zoneViewPendingVerifyTraderRequests(masterTraders.Service.getVerifyTraderRequestsForZone(masterZones.Service.getID(loginState.username))))
       }
       catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -419,7 +418,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
     implicit request =>
       try {
         masterTraderKYCs.Service.organizationVerify(id = traderID, documentType = documentType)
-        pushNotification.send(username = masterTraders.Service.getAccountId(traderID), notification = constants.Notification.PUSH_NOTIFICATION_SUCCESS, messageParameters = Messages(constants.Response.DOCUMENT_APPROVED.message))
+        utilitiesNotification.send(accountID = masterTraders.Service.getAccountId(traderID), notification = constants.Notification.SUCCESS, Messages(constants.Response.DOCUMENT_APPROVED.message))
         withUsernameToken.Ok(Messages(constants.Response.SUCCESS.message))
       } catch {
         case baseException: BaseException => InternalServerError(Messages(baseException.failure.message))
@@ -430,7 +429,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
     implicit request =>
       try {
         masterTraderKYCs.Service.organizationReject(id = traderID, documentType = documentType)
-        pushNotification.send(username = masterTraders.Service.getAccountId(traderID), notification = constants.Notification.PUSH_NOTIFICATION_FAILURE, messageParameters = Messages(constants.Response.DOCUMENT_REJECTED.message))
+        utilitiesNotification.send(accountID = masterTraders.Service.getAccountId(traderID), notification = constants.Notification.FAILURE, Messages(constants.Response.DOCUMENT_REJECTED.message))
         withUsernameToken.Ok(Messages(constants.Response.SUCCESS.message))
       } catch {
         case baseException: BaseException => InternalServerError(Messages(baseException.failure.message))
@@ -545,7 +544,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
   def viewTradersInOrganizationForZone(organizationID: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        if (masterOrganizations.Service.getZoneID(organizationID) == masterZones.Service.getZoneId(loginState.username)) {
+        if (masterOrganizations.Service.getZoneID(organizationID) == masterZones.Service.getID(loginState.username)) {
           withUsernameToken.Ok(views.html.component.master.viewTradersInOrganization(masterTraders.Service.getVerifiedTradersForOrganization(organizationID)))
         } else {
           Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))

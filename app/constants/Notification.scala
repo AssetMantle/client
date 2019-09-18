@@ -1,46 +1,46 @@
 package constants
 
+import constants.Notification.{Email, PushNotification, SMS}
+
+class Notification(notificationType: String, sendEmail: Boolean, sendPushNotification: Boolean, sendSMS: Boolean) {
+
+  val email: Option[Email] = if (sendEmail) Option(new Email(notificationType)) else None
+
+  val pushNotification: Option[PushNotification] = if (sendPushNotification) Option(new PushNotification(notificationType)) else None
+
+  val sms: Option[SMS] = if (sendSMS) Option(new SMS(notificationType)) else None
+
+}
+
 object Notification {
 
-  private val EMAIL_SUBJECT_SUFFIX = ".SUBJECT"
-  private val EMAIL_MESSAGE_SUFFIX = ".MESSAGE"
-  private val SMS_MESSAGE_SUFFIX = ".MESSAGE"
-  private val PUSH_NOTIFICATION_TITLE_SUFFIX = ".TITLE"
-  private val PUSH_NOTIFICATION_MESSAGE_SUFFIX = ".MESSAGE"
+  private val EMAIL_PREFIX = "EMAIL"
+  private val PUSH_NOTIFICATION_PREFIX = "PUSH_NOTIFICATION"
+  private val SMS_PREFIX = "SMS"
+  private val SUBJECT_SUFFIX = "SUBJECT"
+  private val MESSAGE_SUFFIX = "MESSAGE"
+  private val TITLE_SUFFIX = "TITLE"
 
+  val LOGIN = new Notification(notificationType = "LOGIN", sendEmail = false, sendPushNotification = true, sendSMS = false)
+  val VERIFY_PHONE = new Notification(notificationType = "VERIFY_PHONE", sendEmail = false, sendPushNotification = false, sendSMS = true)
+  val VERIFY_EMAIL = new Notification(notificationType = "VERIFY_EMAIL", sendEmail = true, sendPushNotification = false, sendSMS = false)
+  val TRADER_INVITATION = new Notification(notificationType = "TRADER_INVITATION", sendEmail = true, sendPushNotification = false, sendSMS = false)
+  val FORGOT_PASSWORD_OTP = new Notification(notificationType = "FORGOT_PASSWORD_OTP", sendEmail = true, sendPushNotification = false, sendSMS = false)
+  val SUCCESS = new Notification(notificationType = "SUCCESS", sendEmail = false, sendPushNotification = true, sendSMS = false)
+  val FAILURE = new Notification(notificationType = "FAILURE", sendEmail = false, sendPushNotification = true, sendSMS = false)
 
-  //Email
-  val EMAIL_LOGIN = new Email("EMAIL_LOGIN")
-  val EMAIL_VERIFY_OTP: Email = new Email("EMAIL_VERIFY_OTP")
-  val EMAIL_TRADER_INVITATION: Email = new Email("EMAIL_TRADER_INVITATION")
-  val EMAIL_FORGOT_PASSWORD_OTP: Email = new Email("EMAIL_FORGOT_PASSWORD_OTP")
-
-  //SMS
-  val SMS_OTP = new SMS("SMS_OTP")
-
-  //PushNotification
-  val PUSH_NOTIFICATION_LOGIN = new PushNotification("PUSH_NOTIFICATION_LOGIN")
-  val PUSH_NOTIFICATION_OTP = new PushNotification("PUSH_NOTIFICATION_OTP")
-  val PUSH_NOTIFICATION_SUCCESS = new PushNotification("PUSH_NOTIFICATION_SUCCESS")
-  val PUSH_NOTIFICATION_FAILURE = new PushNotification("PUSH_NOTIFICATION_FAILURE")
-
-  //Notification
-  val NOTIFICATION_LOGIN = new Notification(Option(EMAIL_LOGIN), Option(PUSH_NOTIFICATION_LOGIN))
-
-  class SMS(private val title: String) {
-    val message: String = title + SMS_MESSAGE_SUFFIX
+  class SMS(private val notificationType: String) {
+    val message: String = Seq(SMS_PREFIX, notificationType, MESSAGE_SUFFIX).mkString(".")
   }
 
-  class PushNotification(private val id: String) {
-    val title: String = id + PUSH_NOTIFICATION_TITLE_SUFFIX
-    val message: String = id + PUSH_NOTIFICATION_MESSAGE_SUFFIX
+  class PushNotification(private val notificationType: String) {
+    val title: String = Seq(PUSH_NOTIFICATION_PREFIX, notificationType, TITLE_SUFFIX).mkString(".")
+    val message: String = Seq(PUSH_NOTIFICATION_PREFIX, notificationType, MESSAGE_SUFFIX).mkString(".")
   }
 
-  class Email(private val title: String) {
-    val subject: String = title + EMAIL_SUBJECT_SUFFIX
-    val message: String = title + EMAIL_MESSAGE_SUFFIX
+  class Email(private val notificationType: String) {
+    val subject: String = Seq(EMAIL_PREFIX, notificationType, SUBJECT_SUFFIX).mkString(".")
+    val message: String = Seq(EMAIL_PREFIX, notificationType, MESSAGE_SUFFIX).mkString(".")
   }
-
-  class Notification(val email: Option[Email] = None, val pushNotification: Option[PushNotification] = None, val sms: Option[SMS] = None)
 
 }

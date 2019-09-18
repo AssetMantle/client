@@ -96,17 +96,19 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
     }
   }
 
-  private def getZoneIdByAccountId(accountID: String): Future[String] = db.run(zoneTable.filter(_.accountID === accountID).map(_.id).result.head.asTry).map {
+  private def getZonesByCompletionStatusVerificationStatus(completionStatus: Boolean, verificationStatus: Option[Boolean]): Future[Seq[ZoneSerialized]] = db.run(zoneTable.filter(_.completionStatus === completionStatus).filter(_.verificationStatus.? === verificationStatus).result)
+  
+  private def updateVerificationStatusOnID(id: String, verificationStatus: Option[Boolean]) = db.run(zoneTable.filter(_.id === id).map(_.verificationStatus.?).update(verificationStatus).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }
   }
 
-  private def getZonesByCompletionStatusVerificationStatus(completionStatus: Boolean, verificationStatus: Option[Boolean]): Future[Seq[ZoneSerialized]] = db.run(zoneTable.filter(_.completionStatus === completionStatus).filter(_.verificationStatus.? === verificationStatus).result)
-  
-  private def updateVerificationStatusOnID(id: String, verificationStatus: Option[Boolean]) = db.run(zoneTable.filter(_.id === id).map(_.verificationStatus.?).update(verificationStatus).asTry).map {
+  private def updateCompletionStatusOnID(id: String, completionStatus: Boolean) = db.run(zoneTable.filter(_.id === id).map(_.completionStatus).update(completionStatus).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -169,9 +171,9 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
     def getAccountId(id: String): String = Await.result(getAccountIdById(id), Duration.Inf)
 
-    def getZoneId(accountID: String): String = Await.result(getZoneIdByAccountId(accountID), Duration.Inf)
+    def markZoneFormCompleted(id: String): Int = Await.result(updateCompletionStatusOnID(id = id, completionStatus = true), Duration.Inf)
 
-    def getVerifyZoneRequests: Seq[Zone] = Await.result(getZonesByCompletionStatusVerificationStatus(completionStatus = true, verificationStatus = None), Duration.Inf).map(_.deserialize)
+    def getVerifyZoneRequests: Seq[Zone] = Await.result(getZonesByCompletionStatusVerificationStatus(completionStatus = true, verificationStatus = null), Duration.Inf).map(_.deserialize)
 
     def getVerificationStatus(id: String): Boolean = Await.result(getVerificationStatusByID(id), Duration.Inf).getOrElse(false)
 

@@ -1,13 +1,14 @@
 package utilities
 
 import exceptions.BaseException
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 import models.Trait.Document
 import org.apache.commons.codec.binary.Base64
 import play.api.{Configuration, Logger}
 
 import scala.concurrent.ExecutionContext
 
+@Singleton
 class FileResourceManager @Inject()()(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
   private implicit val module: String = constants.Module.FILE_RESOURCE_MANAGER
@@ -20,9 +21,9 @@ class FileResourceManager @Inject()()(implicit executionContext: ExecutionContex
 
   private val uploadAccountProfilePicturePath = configuration.get[String]("upload.account.profilePicturePath")
 
-  private val uploadZoneKycBankAccountDetailPath = configuration.get[String]("upload.zone.bankAccountDetailPath")
+  private val uploadZoneKYCBankAccountDetailPath = configuration.get[String]("upload.zone.bankAccountDetailPath")
 
-  private val uploadZoneKycIdentificationPath = configuration.get[String]("upload.zone.identificationPath")
+  private val uploadZoneKYCIdentificationPath = configuration.get[String]("upload.zone.identificationPath")
 
   private val uploadOrganizationAgreementPath = configuration.get[String]("upload.organization.agreementPath")
 
@@ -54,8 +55,8 @@ class FileResourceManager @Inject()()(implicit executionContext: ExecutionContex
 
   def getZoneKycFilePath(documentType: String): String = {
     documentType match {
-      case constants.File.BANK_ACCOUNT_DETAIL => uploadZoneKycBankAccountDetailPath
-      case constants.File.IDENTIFICATION => uploadZoneKycIdentificationPath
+      case constants.File.BANK_ACCOUNT_DETAIL => uploadZoneKYCBankAccountDetailPath
+      case constants.File.IDENTIFICATION => uploadZoneKYCIdentificationPath
       case _ => constants.File.UNKNOWN_TYPE
     }
   }

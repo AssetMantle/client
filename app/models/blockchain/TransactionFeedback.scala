@@ -221,7 +221,7 @@ class TransactionFeedbacks @Inject()(protected val databaseConfigProvider: Datab
           Service.refreshDirty(response.value.address, response.value.transactionFeedback)
         }
         catch {
-          case baseException: BaseException => if (baseException.failure.message == constants.Response.NO_RESPONSE.message) {
+          case baseException: BaseException => if (baseException.failure == constants.Response.NO_RESPONSE) {
             Service.insertOrUpdate(dirtyAddress, TraderReputationResponse.TransactionFeedbackResponse("0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"), dirtyBit = false)
           } else {
             logger.error(baseException.failure.message, baseException)
