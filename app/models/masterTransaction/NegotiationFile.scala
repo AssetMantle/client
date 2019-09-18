@@ -1,7 +1,5 @@
 package models.masterTransaction
 
-import java.util.Date
-
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Trait.Document
@@ -15,31 +13,22 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class File(id: String, documentType: String, fileName: String, file: Option[Array[Byte]], context: Option[String], status: Option[Boolean]) extends Document[File] {
-  def updateFile(newFile: Option[Array[Byte]]): File = File(id = id, documentType = documentType, fileName = fileName, file = newFile, context = context, status = status)
+case class NegotiationFile(id: String, documentType: String, fileName: String, file: Option[Array[Byte]], documentContent: Option[String], status: Option[Boolean]) extends Document[NegotiationFile] {
+  def updateFile(newFile: Option[Array[Byte]]): NegotiationFile = NegotiationFile(id = id, documentType = documentType, fileName = fileName, file = newFile, documentContent = documentContent, status = status)
 
-  def updateFileName(newFileName: String): File = File(id = id, documentType = documentType, fileName = newFileName, file = file, context = context, status = status)
+  def updateFileName(newFileName: String): NegotiationFile = NegotiationFile(id = id, documentType = documentType, fileName = newFileName, file = file, documentContent = documentContent, status = status)
 }
 
-object FileTypeContext {
+object NegotiationFileTypeContext {
 
-  case class OBL(billOfLadingId: String, portOfLoading: String, shipperName: String, shipperAddress: String, notifyPartyName: String, notifyPartyAddress: String, dateOfShipping: Date, deliveryTerm: String, weightOfConsignment: Int, declaredAssetValue: Int)
-
-  implicit val oblReads: Reads[OBL] = Json.reads[OBL]
-  implicit val oblWrites: OWrites[OBL] = Json.writes[OBL]
-
-  case class Invoice(invoiceNumber: String, invoiceDate: Date)
-
-  implicit val invoiceReads: Reads[Invoice] = Json.reads[Invoice]
-  implicit val invoiceWrites: OWrites[Invoice] = Json.writes[Invoice]
 }
 
 @Singleton
-class Files @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
+class NegotiationFiles @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private implicit val module: String = constants.Module.MASTER_ACCOUNT_FILE
+  private implicit val module: String = constants.Module.MASTER_TRANSACTION_NEGOTIATION_FILE
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -47,9 +36,9 @@ class Files @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
   import databaseConfig.profile.api._
 
-  private[models] val fileTable = TableQuery[FileTable]
+  private[models] val fileTable = TableQuery[NegotiationFileTable]
 
-  private def add(file: File): Future[String] = db.run((fileTable returning fileTable.map(_.id) += file).asTry).map {
+  private def add(file: NegotiationFile): Future[String] = db.run((fileTable returning fileTable.map(_.id) += file).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -57,17 +46,7 @@ class Files @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
     }
   }
 
-  private def upsert(file: File): Future[Int] = db.run(fileTable.insertOrUpdate(file).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case e: Exception => logger.error(constants.Response.GENERIC_EXCEPTION.message, e)
-        throw new BaseException(constants.Response.GENERIC_EXCEPTION)
-    }
-  }
-
-  private def upsertFile(file: File): Future[Int] = db.run(fileTable.map(x => (x.id, x.documentType, x.fileName, x.file.?)).insertOrUpdate(file.id, file.documentType, file.fileName, file.file).asTry).map {
+  private def upsert(file: NegotiationFile): Future[Int] = db.run(fileTable.insertOrUpdate(file).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -77,7 +56,17 @@ class Files @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
     }
   }
 
-  private def upsertContext(file: File): Future[Int] = db.run(fileTable.map(x => (x.id, x.documentType, x.fileName, x.context.?)).insertOrUpdate(file.id, file.documentType, file.fileName, file.context).asTry).map {
+  private def upsertFile(file: NegotiationFile): Future[Int] = db.run(fileTable.map(x => (x.id, x.documentType, x.fileName, x.file.?)).insertOrUpdate(file.id, file.documentType, file.fileName, file.file).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case e: Exception => logger.error(constants.Response.GENERIC_EXCEPTION.message, e)
+        throw new BaseException(constants.Response.GENERIC_EXCEPTION)
+    }
+  }
+
+  private def upsertContext(file: NegotiationFile): Future[Int] = db.run(fileTable.map(x => (x.id, x.documentType, x.fileName, x.documentContent.?)).insertOrUpdate(file.id, file.documentType, file.fileName, file.documentContent).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -117,7 +106,7 @@ class Files @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
     }
   }
 
-  private def findByIdDocumentType(id: String, documentType: String): Future[File] = db.run(fileTable.filter(_.id === id).filter(_.documentType === documentType).result.head.asTry).map {
+  private def findByIdDocumentType(id: String, documentType: String): Future[NegotiationFile] = db.run(fileTable.filter(_.id === id).filter(_.documentType === documentType).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -125,10 +114,10 @@ class Files @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
     }
   }
 
-  private def findByIdDocumentTypeOrEmpty(id: String, documentType: String): Future[File] = db.run(fileTable.filter(_.id === id).filter(_.documentType === documentType).result.head.asTry).map {
+  private def findByIdDocumentTypeOrEmpty(id: String, documentType: String): Future[NegotiationFile] = db.run(fileTable.filter(_.id === id).filter(_.documentType === documentType).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
-      case _: NoSuchElementException => File("", "", "", None, None, None)
+      case _: NoSuchElementException => NegotiationFile("", "", "", None, None, None)
     }
   }
 
@@ -151,7 +140,7 @@ class Files @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
     }
   }
 
-  private def getAllDocumentsById(id: String): Future[Seq[File]] = db.run(fileTable.filter(_.id === id).result)
+  private def getAllDocumentsById(id: String): Future[Seq[NegotiationFile]] = db.run(fileTable.filter(_.id === id).result)
 
   private def deleteById(id: String) = db.run(fileTable.filter(_.id === id).delete.asTry).map {
     case Success(result) => result
@@ -167,42 +156,40 @@ class Files @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
   private def checkByIdAndFileName(id: String, fileName: String): Future[Boolean] = db.run(fileTable.filter(_.id === id).filter(_.fileName === fileName).exists.result)
 
-  private[models] class FileTable(tag: Tag) extends Table[File](tag, "File") {
+  private[models] class NegotiationFileTable(tag: Tag) extends Table[NegotiationFile](tag, "NegotiationFile") {
 
-    def * = (id, documentType, fileName, file.?, context.?, status.?) <> (File.tupled, File.unapply)
+    def * = (id, documentType, fileName, file.?, documentContent.?, status.?) <> (NegotiationFile.tupled, NegotiationFile.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
     def documentType = column[String]("documentType", O.PrimaryKey)
 
-    def fileName = column[String]("fileName")
+    def fileName = column[String]("fileName", O.Unique)
 
     def file = column[Array[Byte]]("file")
 
-    def context = column[String]("context")
+    def documentContent = column[String]("documentContent")
 
     def status = column[Boolean]("status")
   }
 
   object Service {
 
-    def create(file: File): String = Await.result(add(File(id = file.id, documentType = file.documentType, fileName = file.fileName, file = file.file, context = None, status = None)), Duration.Inf)
+    def create(file: NegotiationFile): String = Await.result(add(NegotiationFile(id = file.id, documentType = file.documentType, fileName = file.fileName, file = file.file, documentContent = None, status = None)), Duration.Inf)
 
-    def getOrEmpty(id: String, documentType: String): File = Await.result(findByIdDocumentTypeOrEmpty(id = id, documentType = documentType), Duration.Inf)
+    def getOrEmpty(id: String, documentType: String): NegotiationFile = Await.result(findByIdDocumentTypeOrEmpty(id = id, documentType = documentType), Duration.Inf)
 
-    def get(id: String, documentType: String): File = Await.result(findByIdDocumentType(id = id, documentType = documentType), Duration.Inf)
+    def get(id: String, documentType: String): NegotiationFile = Await.result(findByIdDocumentType(id = id, documentType = documentType), Duration.Inf)
 
-    def createOrUpdateOldDocument(file: File): String = Await.result(upsertFile(File(id = file.id, documentType = file.documentType, fileName = file.fileName, file = file.file, context = None, status = None)), Duration.Inf).toString
+    def insertOrUpdateOldDocument(file: NegotiationFile): Int = Await.result(upsertFile(NegotiationFile(id = file.id, documentType = file.documentType, fileName = file.fileName, file = file.file, documentContent = None, status = None)), Duration.Inf)
 
-    def insertOrUpdateOldDocument(file: File): Int = Await.result(upsertFile(File(id = file.id, documentType = file.documentType, fileName = file.fileName, file = file.file, context = None, status = None)), Duration.Inf)
-
-    def insertOrUpdateContext(file: File): String = Await.result(upsertContext(file), Duration.Inf).toString
+    def insertOrUpdateContext(file: NegotiationFile): String = Await.result(upsertContext(file), Duration.Inf).toString
 
     def updateFileStatus(id: String, documentType: String, status: Boolean) = Await.result(updateStatus(id, documentType, status), Duration.Inf)
 
     def getFileName(id: String, documentType: String): String = Await.result(getFileNameByIdDocumentType(id = id, documentType = documentType), Duration.Inf)
 
-    def getAllDocuments(id: String): Seq[File] = Await.result(getAllDocumentsById(id = id), Duration.Inf)
+    def getAllDocuments(id: String): Seq[NegotiationFile] = Await.result(getAllDocumentsById(id = id), Duration.Inf)
 
     def deleteAllDocuments(id: String): Int = Await.result(deleteById(id = id), Duration.Inf)
 

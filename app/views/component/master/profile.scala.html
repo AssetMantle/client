@@ -2,196 +2,228 @@
 
 @()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
-@common(Messages(constants.Form.PROFILE))(Html(""))(center)(Html(""))
+@views.html.common(Messages(constants.Form.PROFILE))(Html(""))(center)(Html(""))
 
 @center = {
-<div class="container">
-    <div class="card">
-        <div class="row ">
-
-            <div class="col-md-4">
-                <div id="profilePhoto" class="centerText"></div>
+    <div class="cmuk-container">
+        <div class="cmuk-grid-medium cmuk-grid cmuk-grid-match" cmuk-grid>
+            <div class="cmuk-width-1-1 cmuk-width-1-4@@m cmuk-first-column">
+                <div class="cmuk-card cmuk-card-default cmuk-card-small cmuk-sticky cmuk-card-body">
+                    <div id="profilePhoto" class="centerText"></div>
+                </div>
             </div>
 
-            <div class="col-md-8 px-3">
-                <div class="card-block px-3">
-
-                        <h2 class="card-title">@loginState.username</h2>
+            <div class="cmuk-width-1-1 cmuk-width-expand@@m">
+                <div class="cmuk-card cmuk-card-default cmuk-card-small cmuk-card-body">
+                    <h2 class="card-title">@loginState.username</h2>
                     <div class="ur-change-password">
-                        <p>@Messages(constants.User.USER_TYPE): <span id="userTypeValue">@loginState.userType </span></p>
+                        <p>
+                            @Messages(constants.User.USER_TYPE) :
+                            <span id="userTypeValue">@loginState.userType</span>
+                        </p>
                         <button onclick="getForm(jsRoutes.controllers.AccountController.changePasswordForm())">@Messages(constants.Form.CHANGE_PASSWORD)</button>
                     </div>
 
 
-                    <p>@Messages(constants.Form.BLOCKCHAIN_ADDRESS)
-                        : <span id="blockchainAddressValue"><span id="text_element" class="hash_code">@loginState.address</span> <span onclick="copyToClipboard('text_element')"> <i class="fa fa-clipboard"></i></span></span></p>
+                    <p>
+                        @Messages(constants.Form.BLOCKCHAIN_ADDRESS) :
+                        <span id="blockchainAddressValue"><span id="text_element" class="hash_code">@loginState.address</span> <span onclick="copyToClipboard('text_element')"><i class="fa fa-clipboard"></i></span></span>
+                    </p>
 
                     <div id="profileContact"></div>
                 </div>
             </div>
         </div>
     </div>
-</div>
+    <section class="cmuk-section cmuk-section-small">
+        <div class="cmuk-container">
+            <div class="cmuk-card cmuk-card-default cmuk-card-small cmuk-card-body">
+                <div class="cmuk-child-width-1-2@@s" cmuk-grid>
+                    <div>
+                        <div cmuk-grid>
+                            <div class="cmuk-width-auto@@m">
+                                <ul class="cmuk-tab-left" cmuk-tab="connect: #component-tab-left; animation: cmuk-animation-fade">
+                                    <li><a href="#">@Messages(constants.Form.DOCUMENTS)</a></li>
+                                    <li><a href="#">@Messages(constants.Form.ACL)</a></li>
+                                </ul>
+                            </div>
+                            <div class="cmuk-width-expand@@m">
+                                <ul id="component-tab-left" class="cmuk-switcher">
+                                    <li>
+                                        <div id="profileDocuments">
+                                            @loginState.userType match {
+                                                case constants.User.GENESIS => {}
+                                                case constants.User.ZONE => {
+                                                    <div class="centerText">
+                                                        <button onclick="getForm(jsRoutes.controllers.FileController.updateZoneKycForm('@constants.File.BANK_DETAILS'))">@Messages(constants.Form.UPDATE_ZONE_BANK_DETAILS)</button>
+                                                        <button onclick="getForm(jsRoutes.controllers.FileController.updateZoneKycForm('@constants.File.IDENTIFICATION'))">@Messages(constants.Form.UPDATE_ZONE_IDENTIFICATION)</button>
+                                                    </div>
+                                                }
+                                                case constants.User.ORGANIZATION => {
+                                                    <div class="centerText">
+                                                        <button onclick="getForm(jsRoutes.controllers.FileController.updateOrganizationKycForm('@constants.File.BANK_DETAILS'))">@Messages(constants.Form.UPDATE_ORGANIZATION_BANK_DETAILS)</button>
+                                                        <button onclick="getForm(jsRoutes.controllers.FileController.updateOrganizationKycForm('@constants.File.IDENTIFICATION'))">@Messages(constants.Form.UPDATE_ORGANIZATION_IDENTIFICATION)</button>
+                                                    </div>
+                                                }
+                                                case constants.User.TRADER => {
+                                                    <div class="centerText">
+                                                        <button onclick="getForm(jsRoutes.controllers.FileController.updateTraderKycForm('@constants.File.IDENTIFICATION'))">@Messages(constants.Form.UPDATE_TRADER_IDENTIFICATION)</button>
+                                                    </div>
+                                                }
+                                                case constants.User.USER => {
+                                                    <script src="@routes.Assets.versioned(" javascripts/showHideUploadUpdateButton.js")" type = "text/javascript" ></script>
+                                                    <div class="centerText">
+                                                        <button id="userButtonUploadBankDetailsUser" class="hidden" onclick="getForm(jsRoutes.controllers.FileController.uploadUserKycForm('@constants.File.BANK_DETAILS'))">@Messages(constants.Form.UPLOAD_BANK_DETAILS)</button>
+                                                        <button id="userButtonUpdateBankDetailsUser" class="hidden" onclick="getForm(jsRoutes.controllers.FileController.updateUserKycForm('@constants.File.BANK_DETAILS'))">@Messages(constants.Form.UPDATE_BANK_DETAILS)</button>
+                                                        <script>checkFileExists(jsRoutes.controllers.FileController.checkAccountKycFileExists('@loginState.username', '@constants.File.BANK_DETAILS'), "userButtonUploadBankDetailsUser", "userButtonUpdateBankDetailsUser")</script>
+                                                        <button id="userButtonUploadIdentificationUser" class="hidden" onclick="getForm(jsRoutes.controllers.FileController.uploadUserKycForm('@constants.File.IDENTIFICATION'))">@Messages(constants.Form.UPLOAD_IDENTIFICATION)</button>
+                                                        <button id="userButtonUpdateIdentificationUser" class="hidden" onclick="getForm(jsRoutes.controllers.FileController.updateUserKycForm('@constants.File.IDENTIFICATION'))">@Messages(constants.Form.UPDATE_IDENTIFICATION)</button>
+                                                        <script>checkFileExists(jsRoutes.controllers.FileController.checkAccountKycFileExists('@loginState.username', '@constants.File.IDENTIFICATION'), "userButtonUploadIdentificationUser", "userButtonUpdateIdentificationUser")</script>
+                                                    </div>
+                                                }
+                                                case constants.User.UNKNOWN => {}
+                                                case constants.User.WITHOUT_LOGIN => {}
+                                            }
+                                            <div id="viewDocuments"></div>
+                                        </div>
 
-    <div class="container">
-        <div class="card">
-        <div class="row">
-            <div class="col-md-3">
-                <ul class="nav nav-pills nav-pills-icons flex-column" role="tablist">
-                       <li class="nav-item">
-                        <a class="nav-link active" href="#dashboard-2" role="tab" data-toggle="tab">
-                        @Messages(constants.Form.DOCUMENTS)
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#schedule-2" role="tab" data-toggle="tab">
-                        @Messages(constants.Form.ACL)
-                        </a>
-                    </li>
-                </ul>
-            </div>
-            <div class="col-md-8">
-                <div class="tab-content">
-                    <div class="tab-pane active" id="dashboard-2">
-                        <div id="profileDocuments">
-                            @loginState.userType match {
-                                case constants.User.GENESIS => {}
-                                case constants.User.ZONE => {
-                                    <div class="centerText">
-                                        <button onclick="getForm(jsRoutes.controllers.FileController.updateZoneKycForm('@constants.File.BANK_DETAILS'))">@Messages(constants.Form.UPDATE_ZONE_BANK_DETAILS)</button>
-                                        <button onclick="getForm(jsRoutes.controllers.FileController.updateZoneKycForm('@constants.File.IDENTIFICATION'))">@Messages(constants.Form.UPDATE_ZONE_IDENTIFICATION)</button>
-                                    </div>
-                                }
-                                case constants.User.ORGANIZATION => {
-                                    <div class="centerText">
-                                        <button onclick="getForm(jsRoutes.controllers.FileController.updateOrganizationKycForm('@constants.File.BANK_DETAILS'))">@Messages(constants.Form.UPDATE_ORGANIZATION_BANK_DETAILS)</button>
-                                        <button onclick="getForm(jsRoutes.controllers.FileController.updateOrganizationKycForm('@constants.File.IDENTIFICATION'))">@Messages(constants.Form.UPDATE_ORGANIZATION_IDENTIFICATION)</button>
-                                    </div>
-                                }
-                                case constants.User.TRADER => {
-                                    <div class="centerText">
-                                        <button onclick="getForm(jsRoutes.controllers.FileController.updateTraderKycForm('@constants.File.IDENTIFICATION'))">@Messages(constants.Form.UPDATE_TRADER_IDENTIFICATION)</button>
-                                    </div>
-                                }
-                                case constants.User.USER => {
-                                    <script src="@routes.Assets.versioned("javascripts/showHideUploadUpdateButton.js")" type="text/javascript"></script>
-                                    <div class="centerText">
-                                        <button id="userButtonUploadBankDetailsUser" class="hidden" onclick="getForm(jsRoutes.controllers.FileController.uploadUserKycForm('@constants.File.BANK_DETAILS'))">@Messages(constants.Form.UPLOAD_BANK_DETAILS)</button>
-                                        <button id="userButtonUpdateBankDetailsUser" class="hidden" onclick="getForm(jsRoutes.controllers.FileController.updateUserKycForm('@constants.File.BANK_DETAILS'))">@Messages(constants.Form.UPDATE_BANK_DETAILS)</button>
-                                        <script>checkFileExists(jsRoutes.controllers.FileController.checkAccountKycFileExists('@loginState.username', '@constants.File.BANK_DETAILS'), "userButtonUploadBankDetailsUser", "userButtonUpdateBankDetailsUser")</script>
-                                        <button id="userButtonUploadIdentificationUser" class="hidden" onclick="getForm(jsRoutes.controllers.FileController.uploadUserKycForm('@constants.File.IDENTIFICATION'))">@Messages(constants.Form.UPLOAD_IDENTIFICATION)</button>
-                                        <button id="userButtonUpdateIdentificationUser" class="hidden" onclick="getForm(jsRoutes.controllers.FileController.updateUserKycForm('@constants.File.IDENTIFICATION'))">@Messages(constants.Form.UPDATE_IDENTIFICATION)</button>
-                                        <script>checkFileExists(jsRoutes.controllers.FileController.checkAccountKycFileExists('@loginState.username', '@constants.File.IDENTIFICATION'), "userButtonUploadIdentificationUser", "userButtonUpdateIdentificationUser")</script>
-                                    </div>
-                                }
-                                case constants.User.UNKNOWN => {}
-                                case constants.User.WITHOUT_LOGIN => {}
-                            }
-                            <div id="viewDocuments"></div>
+                                    </li>
+                                    <li>
+                                        <div id="profileACL">
+                                        @loginState.acl match {
+                                            case Some(acl) => {
+                                                <p>@Messages(constants.Form.ISSUE_ASSET): @if(acl.issueAsset) {
+                                                    <span class="result success"><i class="fa fa-check " aria-hidden="true"></i></span>
+                                                } else {
+                                                    <span class="result failure"><i class="fa fa-times-circle-o" aria-hidden="true"></i></span>
+                                                }
+                                                </p>
+                                                <p>
 
-                        </div>
-                    </div>
-                    <div class="tab-pane" id="schedule-2">
-                        <div id="profileACL" class="tab_acl">
-                        @loginState.acl match {
-                            case Some(acl) => {
-                                <p>@Messages(constants.Form.ISSUE_ASSET): @if(acl.issueAsset) {
-                                    <span class="result success"><i class="fa fa-check " aria-hidden="true"></i></span>
-                                } else {
-                                    <span class="result failure"><i class="fa fa-times-circle-o" aria-hidden="true"></i></span>
-                                    }</p>
+                                                    @Messages(constants.Form.ISSUE_FIAT) : @if(acl.issueFiat) {
+                                                    <span class="result success"><i class="fa fa-check " aria-hidden="true"></i></span>
+                                                } else {
+                                                    <span class="result failure"><i class="fa fa-times-circle-o" aria-hidden="true"></i></span>
+                                                }
+                                                </p>
+                                                <p>
+                                                    @Messages(constants.Form.SEND_ASSET): @if(acl.sendAsset) {
+                                                    <span class="result success"><i class="fa fa-check " aria-hidden="true"></i></span>
+                                                } else {
+                                                    <span class="result failure"><i class="fa fa-times-circle-o" aria-hidden="true"></i></span>
+                                                }
+                                                </p>
 
-                                <p>@Messages(constants.Form.ISSUE_FIAT): @if(acl.issueFiat) {
-                                    <span class="result success"><i class="fa fa-check " aria-hidden="true"></i></span>
-                                } else {
-                                    <span class="result failure"><i class="fa fa-times-circle-o" aria-hidden="true"></i></span>
-                                    }</p>
+                                                <p>
+                                                    @Messages(constants.Form.SEND_FIAT): @if(acl.sendFiat) {
+                                                    <span class="result success"><i class="fa fa-check " aria-hidden="true"></i></span>
+                                                } else {
+                                                    <span class="result failure"><i class="fa fa-times-circle-o" aria-hidden="true"></i></span>
+                                                }
+                                                </p>
 
-                                <p>@Messages(constants.Form.SEND_ASSET): @if(acl.sendAsset) {
-                                    <span class="result success"><i class="fa fa-check " aria-hidden="true"></i></span>
-                                } else {
-                                    <span class="result failure"><i class="fa fa-times-circle-o" aria-hidden="true"></i></span>
-                                    }</p>
+                                                <p>
+                                                    @Messages(constants.Form.REDEEM_ASSET): @if(acl.redeemAsset) {
+                                                    <span class="result success"><i class="fa fa-check " aria-hidden="true"></i></span>
+                                                } else {
+                                                    <span class="result failure"><i class="fa fa-times-circle-o" aria-hidden="true"></i></span>
+                                                }
+                                                </p>
 
-                                <p>@Messages(constants.Form.SEND_FIAT): @if(acl.sendFiat) {
-                                    <span class="result success"><i class="fa fa-check " aria-hidden="true"></i></span>
-                                } else {
-                                    <span class="result failure"><i class="fa fa-times-circle-o" aria-hidden="true"></i></span>
-                                    }</p>
+                                                <p>
+                                                    @Messages(constants.Form.REDEEM_FIAT):@if(acl.redeemFiat) {
+                                                    <span class="result success"><i class="fa fa-check " aria-hidden="true"></i></span>
+                                                } else {
+                                                    <span class="result failure"><i class="fa fa-times-circle-o" aria-hidden="true"></i></span>
+                                                }
+                                                </p>
 
-                                <p>@Messages(constants.Form.REDEEM_ASSET): @if(acl.redeemAsset) {
-                                    <span class="result success"><i class="fa fa-check " aria-hidden="true"></i></span>
-                                } else {
-                                    <span class="result failure"><i class="fa fa-times-circle-o" aria-hidden="true"></i></span>
-                                    }</p>
+                                                <p>
+                                                    @Messages(constants.Form.BUYER_EXECUTE_ORDER)
+                                                    : @if(acl.buyerExecuteOrder) {
+                                                    <span class="result success"><i class="fa fa-check " aria-hidden="true"></i></span>
+                                                } else {
+                                                    <span class="result failure"><i class="fa fa-times-circle-o" aria-hidden="true"></i></span>
+                                                }
+                                                </p>
 
-                                <p>@Messages(constants.Form.REDEEM_FIAT):@if(acl.redeemFiat) {
-                                    <span class="result success"><i class="fa fa-check " aria-hidden="true"></i></span>
-                                } else {
-                                    <span class="result failure"><i class="fa fa-times-circle-o" aria-hidden="true"></i></span>
-                                    }</p>
+                                                <p>
+                                                    @Messages(constants.Form.SELLER_EXECUTE_ORDER)
+                                                    : @if(acl.sellerExecuteOrder) {
+                                                    <span class="result success"><i class="fa fa-check " aria-hidden="true"></i></span>
+                                                } else {
+                                                    <span class="result failure"><i class="fa fa-times-circle-o" aria-hidden="true"></i></span>
+                                                }
+                                                </p>
 
-                                <p>@Messages(constants.Form.BUYER_EXECUTE_ORDER): @if(acl.buyerExecuteOrder) {
-                                    <span class="result success"><i class="fa fa-check " aria-hidden="true"></i></span>
-                                } else {
-                                    <span class="result failure"><i class="fa fa-times-circle-o" aria-hidden="true"></i></span>
-                                    }</p>
+                                                <p>
+                                                    @Messages(constants.Form.NEGOTIATION): @if(acl.negotiation) {
+                                                    <span class="result success"><i class="fa fa-check " aria-hidden="true"></i></span>
+                                                } else {
+                                                    <span class="result failure"><i class="fa fa-times-circle-o" aria-hidden="true"></i></span>
+                                                }
+                                                </p>
 
-                                <p>@Messages(constants.Form.SELLER_EXECUTE_ORDER): @if(acl.sellerExecuteOrder) {
-                                    <span class="result success"><i class="fa fa-check " aria-hidden="true"></i></span>
-                                } else {
-                                    <span class="result failure"><i class="fa fa-times-circle-o" aria-hidden="true"></i></span>
-                                    }</p>
+                                                <p>
+                                                    @Messages(constants.Form.CHANGE_BUYER_BID)
+                                                    : @if(acl.changeBuyerBid) {
+                                                    <span class="result success"><i class="fa fa-check " aria-hidden="true"></i></span>
+                                                } else {
+                                                    <span class="result failure"><i class="fa fa-times-circle-o" aria-hidden="true"></i></span>
+                                                }
+                                                </p>
 
-                                <p>@Messages(constants.Form.NEGOTIATION): @if(acl.negotiation) {
-                                    <span class="result success"><i class="fa fa-check " aria-hidden="true"></i></span>
-                                } else {
-                                    <span class="result failure"><i class="fa fa-times-circle-o" aria-hidden="true"></i></span>
-                                    }</p>
+                                                <p>
+                                                    @Messages(constants.Form.CHANGE_SELLER_BID)
+                                                    : @if(acl.changeSellerBid) {
+                                                    <span class="result success"><i class="fa fa-check " aria-hidden="true"></i></span>
+                                                } else {
+                                                    <span class="result failure"><i class="fa fa-times-circle-o" aria-hidden="true"></i></span>
+                                                }
+                                                </p>
 
-                                <p>@Messages(constants.Form.CHANGE_BUYER_BID): @if(acl.changeBuyerBid) {
-                                    <span class="result success"><i class="fa fa-check " aria-hidden="true"></i></span>
-                                } else {
-                                    <span class="result failure"><i class="fa fa-times-circle-o" aria-hidden="true"></i></span>
-                                    }</p>
+                                                <p>
+                                                    @Messages(constants.Form.CONFIRM_BUYER_BID)
+                                                    : @if(acl.confirmBuyerBid) {
+                                                    <span class="result success"><i class="fa fa-check " aria-hidden="true"></i></span>
+                                                } else {
+                                                    <span class="result failure"><i class="fa fa-times-circle-o" aria-hidden="true"></i></span>
+                                                }
+                                                </p>
 
-                                <p>@Messages(constants.Form.CHANGE_SELLER_BID): @if(acl.changeSellerBid) {
-                                    <span class="result success"><i class="fa fa-check " aria-hidden="true"></i></span>
-                                } else {
-                                    <span class="result failure"><i class="fa fa-times-circle-o" aria-hidden="true"></i></span>
-                                    }</p>
+                                                <p>
+                                                    @Messages(constants.Form.CONFIRM_SELLER_BID)
+                                                    : @if(acl.confirmSellerBid) {
+                                                    <span class="result success"><i class="fa fa-check " aria-hidden="true"></i></span>
+                                                } else {
+                                                    <span class="result failure"><i class="fa fa-times-circle-o" aria-hidden="true"></i></span>
+                                                }
+                                                </p>
 
-                                <p>@Messages(constants.Form.CONFIRM_BUYER_BID): @if(acl.confirmBuyerBid) {
-                                    <span class="result success"><i class="fa fa-check " aria-hidden="true"></i></span>
-                                } else {
-                                    <span class="result failure"><i class="fa fa-times-circle-o" aria-hidden="true"></i></span>
-                                    }</p>
+                                                <p>
+                                                    @Messages(constants.Form.RELEASE_ASSET): @if(acl.releaseAsset) {
+                                                    <span class="result success"><i class="fa fa-check " aria-hidden="true"></i></span>
+                                                } else {
+                                                    <span class="result failure"><i class="fa fa-times-circle-o" aria-hidden="true"></i></span>
+                                                }
+                                                </p>
+                                            }
+                                            case _ => {}
+                                        }
+                                        </div >
+                                    </li >
+                                </ul >
+                            </div >
+                        </div >
+                    </div >
 
-                                <p>@Messages(constants.Form.CONFIRM_SELLER_BID): @if(acl.confirmSellerBid) {
-                                    <span class="result success"><i class="fa fa-check " aria-hidden="true"></i></span>
-                                } else {
-                                    <span class="result failure"><i class="fa fa-times-circle-o" aria-hidden="true"></i></span>
-                                    }</p>
-
-                                <p>@Messages(constants.Form.RELEASE_ASSET): @if(acl.releaseAsset) {
-                                    <span class="result success"><i class="fa fa-check " aria-hidden="true"></i></span>
-                                } else {
-                                    <span class="result failure"><i class="fa fa-times-circle-o" aria-hidden="true"></i></span>
-                                    }</p>
-                            }
-                            case _ => {}
-                        }
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        </div>
-    </div>
-
-<script>
-    componentResource('profilePhoto', jsRoutes.controllers.ComponentViewController.profilePicture());
-    componentResource('profileContact', jsRoutes.controllers.ContactController.contact());
-    componentResource('viewDocuments', jsRoutes.controllers.ComponentViewController.profileDocuments())
-</script>
+                </div >
+            </div >
+        </div >
+    </section >
+    <script>
+            componentResource('profilePhoto', jsRoutes.controllers.ComponentViewController.profilePicture());
+            componentResource('profileContact', jsRoutes.controllers.ContactController.contact());
+            componentResource('profileDocuments', jsRoutes.controllers.ComponentViewController.profileDocuments())
+    </script>
 }

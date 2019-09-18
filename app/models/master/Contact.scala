@@ -37,15 +37,15 @@ class Contacts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     }
   }
 
-  private def findById(id: String): Future[Contact] = db.run(contactTable.filter(_.id === id).result.head.asTry).map {
-    case Success(result) => result
+  private def findById(id: String): Future[Option[Contact]] = db.run(contactTable.filter(_.id === id).result.head.asTry).map {
+    case Success(result) => Option(result)
     case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        null
+      case noSuchElementException: NoSuchElementException => logger.info(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        None
     }
   }
 
-  private def findEmailAddressById(id: String): Future[String] = db.run(contactTable.filter(_.id === id).map(_.emailAddress).result.head.asTry).map {
+  private def getEmailAddressById(id: String, emailAddressVerified: Option[Boolean]): Future[String] = db.run(contactTable.filter(_.id === id).filter(_.emailAddressVerified.? === emailAddressVerified).map(_.emailAddress).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -117,7 +117,7 @@ class Contacts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   object Service {
 
-    def getContact(id: String): Option[Contact] = Option(Await.result(findById(id), Duration.Inf))
+    def getContact(id: String): Option[Contact] = Await.result(findById(id), Duration.Inf)
 
     def insertOrUpdateContact(id: String, mobileNumber: String, emailAddress: String): Boolean = if (0 < Await.result(upsert(Contact(id, mobileNumber, mobileNumberVerified =  false, emailAddress, emailAddressVerified = false)), Duration.Inf)) true else false
 
@@ -125,13 +125,11 @@ class Contacts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
     def verifyEmailAddress(id: String): Int = Await.result(updateEmailVerificationStatusOnId(id, verificationStatus = true), Duration.Inf)
 
-    def getEmailAddress(id: String): String = Await.result(findEmailAddressById(id), Duration.Inf)
+    def getVerifiedEmailAddress(id: String): String = Await.result(getEmailAddressById(id = id, emailAddressVerified = Option(true)), Duration.Inf)
+
+    def getUnverifiedEmailAddress(id: String): String = Await.result(getEmailAddressById(id = id, emailAddressVerified = Option(false)), Duration.Inf)
 
     def getMobileNumber(id: String): String = Await.result(findMobileNumberById(id), Duration.Inf)
-
-    def getMobileVerificationStatus(id: String): Boolean = Await.result(findById(id), Duration.Inf).mobileNumberVerified
-
-    def getEmailVerificationStatus(id: String): Boolean = Await.result(findById(id), Duration.Inf).emailAddressVerified
 
   }
 

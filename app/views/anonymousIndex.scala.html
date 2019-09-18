@@ -2,12 +2,12 @@
 @(failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
 @common(Messages(constants.User.HOME), failures, warnings, successes, infos)(Html(""))(center)(Html(""))
-    @center = {
+@center = {
     <div class="flexContainer">
         <div id="commonHome" class="box flexItem flexGrowth"></div>
         <button class="btn btn-primary btn-sm" onclick="getForm(jsRoutes.controllers.SendCoinController.requestCoinsForm())">@Messages(constants.Form.REQUEST_COIN)</button>
     </div>
-        <script>
-                componentResource('commonHome', jsRoutes.controllers.ComponentViewController.commonHome())
-        </script>
+    <script>
+            componentResource('commonHome', jsRoutes.controllers.ComponentViewController.commonHome('@loginState.username'))
+    </script>
 }

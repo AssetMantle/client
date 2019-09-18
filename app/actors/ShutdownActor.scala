@@ -12,7 +12,7 @@ import scala.util.{Failure, Success}
 case class ShutdownActorMessage()
 
 @Singleton
-class ShutdownActors @Inject()(actorSystem: ActorSystem)(implicit executionContext: ExecutionContext, configuration: Configuration) {
+class ShutdownActor @Inject()(actorSystem: ActorSystem)(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
   private val actorTimeout = configuration.get[Int]("akka.actors.timeout").seconds
 

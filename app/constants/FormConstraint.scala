@@ -2,13 +2,23 @@ package constants
 
 import play.api.data.validation._
 import views.companion.master.SignUp
+import views.companion.master.ConfirmTransaction
 
 object FormConstraint {
   //TODO: Error Response through Messages
-  val signUpCheckConstraint: Constraint[SignUp.Data] = Constraint("constraints.signUpCheck")({ signUp: SignUp.Data =>
+  val signUpCheckConstraint: Constraint[SignUp.Data] = Constraint("constraints.signUpCheck")({ signUpData: SignUp.Data =>
     val errors = {
-      if (signUp.password != signUp.confirmPassword) Seq(ValidationError(constants.Response.PASSWORDS_DO_NOT_MATCH.message))
-      else if (!signUp.usernameAvailable) Seq(ValidationError(constants.Response.USERNAME_UNAVAILABLE.message))
+      if (signUpData.password != signUpData.confirmPassword) Seq(ValidationError(constants.Response.PASSWORDS_DO_NOT_MATCH.message))
+      else if (!signUpData.usernameAvailable) Seq(ValidationError(constants.Response.USERNAME_UNAVAILABLE.message))
+      else Nil
+    }
+    if (errors.isEmpty) Valid else Invalid(errors)
+  })
+
+  val issueAssetRequestCheckConstraint: Constraint[ConfirmTransaction.Data] = Constraint("constraints.issueAssetRequestCheck")({ confirmTransactionData: ConfirmTransaction.Data =>
+    val errors = {
+      if (confirmTransactionData.password.isEmpty && confirmTransactionData.gas.isDefined) Seq(ValidationError(constants.Response.PASSWORD_NOT_GIVEN.message))
+      else if (confirmTransactionData.password.isDefined && confirmTransactionData.gas.isEmpty) Seq(ValidationError(constants.Response.GAS_NOT_GIVEN.message))
       else Nil
     }
     if (errors.isEmpty) Valid else Invalid(errors)

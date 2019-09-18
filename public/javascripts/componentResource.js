@@ -8,6 +8,11 @@ function componentResource(source, route){
             200: function (data) {
                 div.html(data)
             },
+            401: function (data) {
+                const newDocument = document.open("text/html", "replace");
+                newDocument.write(data);
+                newDocument.close();
+            },
             500: function (data) {
                 const newDocument = document.open("text/html", "replace");
                 newDocument.write(data);

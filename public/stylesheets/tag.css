@@ -1,10 +1,9 @@
-
 html {
     height: 100%;
 }
-
 body {
-    margin: auto;
+    height: 100%;
+    background: #f4f4f4;
 }
 
 h2 {
@@ -12,12 +11,12 @@ h2 {
     font-size: 1.5625rem !important;
     color: white;
 }
-
 input {
     width: 100%;
     padding: 10px;
     background: #e2e2e2;
 }
+
 
 input:focus {
     background-color: #ddd;
@@ -32,7 +31,6 @@ button {
     color: #1B7FBD;
     padding: 10px 15px;
     border-radius: 5px;
-    margin: 5px 0;
     border: none;
     cursor: pointer;
     opacity: 0.8;

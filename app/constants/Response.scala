@@ -45,7 +45,7 @@ object Response {
   val ISSUE_ASSET_REQUEST_REJECTED = new Success("ISSUE_ASSET_REQUEST_REJECTED")
   val ISSUE_FIAT_REQUEST_REJECTED = new Success("ISSUE_FIAT_REQUEST_REJECTED")
   val LOGGED_IN = new Success("LOGGED_IN")
-  val SIGNED_UP = new Success("SIGNED_UP", routes.javascript.LoginController.loginForm)
+  val SIGNED_UP = new Success("SIGNED_UP", routes.javascript.AccountController.loginForm)
   val LOGGED_OUT = new Success("LOGGED_OUT")
   val KEY_ADDED = new Success("KEY_ADDED")
   val MOBILE_NUMBER_VERIFIED = new Success("MOBILE_NUMBER_VERIFIED")
@@ -53,6 +53,8 @@ object Response {
   val ZONE_VERIFIED = new Success("ZONE_VERIFIED")
   val VERIFY_ZONE_REJECTED = new Success("VERIFY_ZONE_REJECTED")
   val ORGANIZATION_ADDED = new Success("ORGANIZATION_ADDED")
+  val ORGANIZATION_ADDED_FOR_VERIFICATION = new Success("ORGANIZATION_ADDED_FOR_VERIFICATION")
+  val TRADER_ADDED_FOR_VERIFICATION = new Success("TRADER_ADDED_FOR_VERIFICATION")
   val SELLER_BID_CHANGED = new Success("SELLER_BID_CHANGED")
   val SELLER_BID_CONFIRMED = new Success("SELLER_BID_CONFIRMED")
   val SELLER_FEEDBACK_SET = new Success("SELLER_FEEDBACK_SET")
@@ -68,6 +70,7 @@ object Response {
   val DOCUMENT_APPROVED = new Success("DOCUMENT_APPROVED")
   val PASSWORD_UPDATED = new Success("PASSWORD_UPDATED")
   val OTP_SENT = new Success("OTP_SENT")
+  val INVITATION_EMAIL_SENT = new Success("INVITATION_EMAIL_SENT")
 
   //Warning- for telling that something important is not done and ask to do it
   val VERIFY_MOBILE_NUMBER = new Warning("VERIFY_MOBILE_NUMBER", routes.javascript.VerifyMobileNumberController.verifyMobileNumberForm)
@@ -79,6 +82,8 @@ object Response {
   val NO_SUCH_ELEMENT_EXCEPTION = new Failure("NO_SUCH_ELEMENT_EXCEPTION")
   val NO_SUCH_FILE_EXCEPTION = new Failure("NO_SUCH_FILE_EXCEPTION")
   val PSQL_EXCEPTION = new Failure("PSQL_EXCEPTION")
+  val JSON_PARSE_EXCEPTION = new Failure("JSON_PARSE_EXCEPTION")
+  val JSON_MAPPING_EXCEPTION = new Failure("JSON_MAPPING_EXCEPTION")
   val INVALID_OTP = new Failure("INVALID_OTP")
   val EMAIL_ADDRESS_NOT_FOUND = new Failure("EMAIL_ADDRESS_NOT_FOUND")
   val MOBILE_NUMBER_NOT_FOUND = new Failure("MOBILE_NUMBER_NOT_FOUND")
@@ -96,11 +101,18 @@ object Response {
   val INVALID_TOKEN = new Failure("INVALID_TOKEN")
   val UNAUTHORIZED = new Failure("UNAUTHORIZED")
   val DOCUMENT_REJECTED = new Failure("DOCUMENT_REJECTED")
+  val DOCUMENT_NOT_FOUND = new Failure("DOCUMENT_NOT_FOUND")
   val PASSWORDS_DO_NOT_MATCH = new Failure("PASSWORDS_DO_NOT_MATCH")
   val USERNAME_UNAVAILABLE = new Failure("USERNAME_UNAVAILABLE")
   val INVALID_USERNAME = new Failure("INVALID_USERNAME")
   val INVALID_PASSWORD = new Failure("INVALID_PASSWORD")
   val NO_FILE = new Failure("NO_FILE")
+  val PASSWORD_NOT_GIVEN = new Failure("PASSWORD_NOT_GIVEN")
+  val GAS_NOT_GIVEN = new Failure("GAS_NOT_GIVEN")
+  val ALL_KYC_FILES_NOT_VERIFIED = new Failure("ALL_KYC_FILES_NOT_VERIFIED")
+  val ALL_ASSET_FILES_NOT_VERIFIED = new Failure("ALL_KYC_FILES_NOT_VERIFIED")
+  val SMS_SEND_FAILED = new Failure("SMS_SEND_FAILED")
+  val SMS_SERVICE_CONNECTION_FAILURE = new Failure("SMS_SERVICE_CONNECTION_FAILURE")
 
   class Failure(private val response: String, private val actionController: JavaScriptReverseRoute = null) {
     val message: String = PREFIX + FAILURE_PREFIX + response

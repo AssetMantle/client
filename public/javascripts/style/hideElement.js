@@ -9,5 +9,16 @@ $(document).click(function (e) {
 
 function showHide(element){
     element.parent().next().slideToggle("fast");
+}
 
+function showHideByID(source){
+    $('#' + source).toggle();
+}
+
+function hideElement(element) {
+    $('#' + element).hide();
+}
+
+function showElement(element) {
+    $('#' + element).show();
 }

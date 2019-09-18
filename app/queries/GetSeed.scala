@@ -1,8 +1,8 @@
-package transactions
+package queries
 
 import java.net.ConnectException
 
-import exceptions.BlockChainException
+import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import play.api.libs.ws.{WSClient, WSResponse}
 import play.api.{Configuration, Logger}
@@ -13,7 +13,7 @@ import scala.concurrent.{Await, ExecutionContext, Future}
 @Singleton
 class GetSeed @Inject()(wsClient: WSClient)(implicit configuration: Configuration, executionContext: ExecutionContext) {
 
-  private implicit val module: String = constants.Module.TRANSACTIONS_GET_SEED
+  private implicit val module: String = constants.Module.QUERIES_GET_SEED
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -38,7 +38,7 @@ class GetSeed @Inject()(wsClient: WSClient)(implicit configuration: Configuratio
     } catch {
       case connectException: ConnectException =>
         logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
-        throw new BlockChainException(constants.Response.CONNECT_EXCEPTION)
+        throw new BaseException(constants.Response.CONNECT_EXCEPTION)
     }
   }
 

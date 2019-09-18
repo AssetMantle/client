@@ -4,7 +4,7 @@
 
 @(confirmTransactionForm: Form[ConfirmTransaction.Data], asset: masterTransaction.IssueAssetRequest)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 
-@form(action = routes.IssueAssetController.issueAssetRequest, 'onkeypress -> "validateForm(event,this)") {
+@form(action = routes.IssueAssetController.issueAssetRequest, 'onkeypress -> "submitFormOnEnter(event,this)") {
     <div id="assetDetail"></div>
     @CSRF.formField
     <div class="latest_card-header latest_card-header-primary text-center">
@@ -12,16 +12,13 @@
     </div>
     <div >
         <div class="latest_card-body ml-cb">
-            @inputText(confirmTransactionForm(constants.FormField.REQUEST_ID.name), '_label -> Messages(constants.FormField.REQUEST_ID.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.REQUEST_ID.name), 'required -> true)
+            @inputText(confirmTransactionForm(constants.FormField.REQUEST_ID.name), '_label -> Messages(constants.FormField.REQUEST_ID.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.REQUEST_ID.name), 'required -> true)
 
             @asset.physicalDocumentsHandledVia match {
-                case constants.Option.COMDEX => {
-                    @inputText(confirmTransactionForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "form-control hidden", 'type -> "number", 'placeholder -> Messages(constants.FormField.GAS.name), 'required -> true)
-                    @inputPassword(confirmTransactionForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "form-control hidden", 'placeholder -> Messages(constants.FormField.PASSWORD.name), 'required -> true)
-                }
+                case constants.Form.COMDEX => {}
                 case _ => {
-                    @inputText(confirmTransactionForm(constants.FormField.GAS.name).copy(value = Some(0.toString)), '_label -> Messages(constants.FormField.GAS.name), 'class -> "form-control", 'type -> "number", 'placeholder -> Messages(constants.FormField.GAS.name), 'required -> true)
-                    @inputPassword(confirmTransactionForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.PASSWORD.name), 'required -> true)
+                    @inputText(confirmTransactionForm(constants.FormField.GAS.name).copy(value = Some(20000.toString)), '_label -> Messages(constants.FormField.GAS.name), 'class -> "cmuk-input", 'type -> "number", 'placeholder -> Messages(constants.FormField.GAS.name), 'required -> false)
+                    @inputPassword(confirmTransactionForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PASSWORD.name), 'required -> false)
                 }
             }
 
@@ -32,9 +29,9 @@
                 }
                 </ul>
             }
-            <button type="button" class="btn btn-primary btn-sm" onclick="submitForm(this)">@Messages(constants.Form.ISSUE_ASSET_REQUEST)</button>
+            <button type="button" class="btn btn-primary btn-sm" onclick="submitForm(this)">@Messages(constants.Form.SUBMIT)</button>
             <script src="@routes.Assets.versioned("javascripts/showIssueAssetRequestFormFields.js")" type="text/javascript"></script>
         </div>
     </div>
 }
-<script>componentResource('assetDetail', jsRoutes.controllers.IssueAssetController.assetDetail('@asset.id'))</script>
+<script>componentResource('assetDetail', jsRoutes.controllers.IssueAssetController.assetDetail('@confirmTransactionForm.data(constants.FormField.REQUEST_ID.name)'))</script>

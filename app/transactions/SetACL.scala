@@ -2,12 +2,12 @@ package transactions
 
 import java.net.ConnectException
 
-import exceptions.BlockChainException
+import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import play.api.libs.json.{Json, OWrites}
 import play.api.libs.ws.{WSClient, WSResponse}
 import play.api.{Configuration, Logger}
-import transactions.Abstract.BaseRequestEntity
+import transactions.Abstract.BaseRequest
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
@@ -29,22 +29,22 @@ class SetACL @Inject()(wsClient: WSClient)(implicit configuration: Configuration
 
   private val chainID = configuration.get[String]("blockchain.main.chainID")
 
-  private implicit val baseRequestWrites: OWrites[BaseRequest] = Json.writes[BaseRequest]
+  private implicit val baseRequestWrites: OWrites[BaseReq] = Json.writes[BaseReq]
 
   private implicit val requestWrites: OWrites[Request] = Json.writes[Request]
 
   private def action(request: Request): Future[WSResponse] = wsClient.url(url).post(Json.toJson(request))
 
-  case class BaseRequest(from: String, chain_id: String = chainID)
+  case class BaseReq(from: String, chain_id: String = chainID, gas: String)
 
-  case class Request(base_req: BaseRequest, password: String, aclAddress: String, organizationID: String, zoneID: String, mode: String, issueAsset: String, issueFiat: String, sendAsset: String, sendFiat: String, redeemAsset: String, redeemFiat: String, buyerExecuteOrder: String, sellerExecuteOrder: String, changeBuyerBid: String, changeSellerBid: String, confirmBuyerBid: String, confirmSellerBid: String, negotiation: String, releaseAsset: String) extends BaseRequestEntity
+  case class Request(base_req: BaseReq, password: String, aclAddress: String, organizationID: String, zoneID: String, mode: String, issueAsset: String, issueFiat: String, sendAsset: String, sendFiat: String, redeemAsset: String, redeemFiat: String, buyerExecuteOrder: String, sellerExecuteOrder: String, changeBuyerBid: String, changeSellerBid: String, confirmBuyerBid: String, confirmSellerBid: String, negotiation: String, releaseAsset: String) extends BaseRequest
 
   object Service {
     def post(request: Request): WSResponse = try {
       Await.result(action(request), Duration.Inf)
     } catch {
       case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
-        throw new BlockChainException(constants.Response.CONNECT_EXCEPTION)
+        throw new BaseException(constants.Response.CONNECT_EXCEPTION)
     }
   }
 

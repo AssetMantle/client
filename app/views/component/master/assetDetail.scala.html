@@ -1,6 +1,6 @@
 @import controllers.actions.LoginState
 
-@(asset: masterTransaction.IssueAssetRequest, documents: Seq[masterTransaction.File])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@(asset: masterTransaction.IssueAssetRequest, files: Seq[masterTransaction.AssetFile])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 
 @if(asset.status != constants.Status.Asset.LISTED_FOR_TRADE) {
     <span class="red">@Messages(constants.Form.PEG_HASH)</span> : @asset.pegHash <br>
@@ -17,14 +17,24 @@
 <span class="red">@Messages(constants.FormField.COMDEX_PAYMENT_TERMS.name)</span> : @asset.paymentTerms <br>
 <span class="red">@Messages(constants.Form.STATUS)</span> : @asset.status <br>
 
-@for(document <- documents) {
-    @document.documentType match {
-        case constants.File.OBL => {
-            @document.context.get
+@for(file <- files) {
+    @component.master.commonDocumentViewer(file) {
+        @routes.FileController.tradingFile(file.id, file.fileName, file.documentType)
+    } {
+        <a href="@routes.FileController.tradingFile(file.id, file.fileName, file.documentType)">@Messages(file.documentType)</a>
+    } {
+        @file.documentType match {
+            case constants.File.OBL => {
+                @file.documentType
+                @file.documentContent.get
+            }
+            case constants.File.INVOICE => {
+                @file.documentType
+                @file.documentContent.get
+            }
+            case _ => {
+                @file.documentType
+            }
         }
-        case constants.File.INVOICE => {
-            @document.context.get
-        }
-        case _ => {}
     }
 }

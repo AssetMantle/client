@@ -2,14 +2,28 @@
 
 @(profilePicture: Array[Byte] = Array[Byte]())(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
 
-<div class="profile_hover">
+
     @if(profilePicture sameElements Array[Byte]()) {
-        <img id="profilePicture" class="profilePicture" src="@routes.Assets.versioned("images/defaultProfilePicture.jpg")" alt="@constants.Form.PROFILE_PICTURE">
-        <br>
-        <button id="profilePictureBottomUploadButton" class="bottom btn btn-default btn-sm" onclick="getForm(jsRoutes.controllers.FileController.uploadAccountFileForm('@constants.File.PROFILE_PICTURE'))">@Messages(constants.Form.UPLOAD)</button>
+    <div class="cmuk-text-center">
+        <div class="cmuk-inline-clip cmuk-transition-toggle" tabindex="0">
+            <img id="profilePicture" class="profilePicture" src="@routes.Assets.versioned("images/defaultProfilePicture.jpg")" alt="">
+            <div class="cmuk-transition-slide-bottom cmuk-position-bottom cmuk-overlay-default">
+                <p class="cmuk-h4 cmuk-margin-remove">
+                    <button id="profilePictureBottomUploadButton" class="btn btn-default btn-sm" onclick="getForm(jsRoutes.controllers.FileController.uploadAccountFileForm('@constants.File.PROFILE_PICTURE'))">@Messages(constants.Form.UPLOAD)</button>
+                </p>
+            </div>
+        </div>
+    </div>
+
     } else {
-        <img id="profilePicture" class="profilePicture" src="data:image/jpg;base64,@utilities.ImageProcess.decodeImageThumbnailData(profilePicture)" alt="@constants.Form.PROFILE_PICTURE">
-        <br>
-        <button id="profilePictureBottomUpdateButton" class="bottom btn btn-default btn-sm" onclick="getForm(jsRoutes.controllers.FileController.updateAccountFileForm('@constants.File.PROFILE_PICTURE'))">@Messages(constants.Form.UPDATE)</button>
-    }
-</div>
+    <div class="cmuk-text-center">
+        <div class="cmuk-inline-clip cmuk-transition-toggle" tabindex="0">
+            <img id="profilePicture" class="profilePicture" src="data:image/jpg;base64,@utilities.ImageProcess.decodeImageThumbnailData(profilePicture)" alt="@constants.Form.PROFILE_PICTURE">
+            <div class="cmuk-transition-slide-bottom cmuk-position-bottom cmuk-overlay-default">
+                <p class="cmuk-h4 cmuk-margin-remove">
+                    <button id="profilePictureBottomUpdateButton" class="btn btn-default btn-sm" onclick="getForm(jsRoutes.controllers.FileController.updateAccountFileForm('@constants.File.PROFILE_PICTURE'))">@Messages(constants.Form.UPDATE)</button>
+                </p>
+            </div>
+        </div>
+    </div>
+}

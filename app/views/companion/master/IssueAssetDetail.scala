@@ -15,7 +15,7 @@ object IssueAssetDetail {
       constants.FormField.QUANTITY_UNIT.name -> constants.FormField.QUANTITY_UNIT.field,
       constants.FormField.ASSET_QUANTITY.name -> constants.FormField.ASSET_QUANTITY.field,
       constants.FormField.ASSET_PRICE.name -> constants.FormField.ASSET_PRICE.field,
-      constants.FormField.TAKER_ADDRESS.name -> constants.FormField.TAKER_ADDRESS.field,
+      constants.FormField.TAKER_ADDRESS.name -> optional(constants.FormField.TAKER_ADDRESS.field),
       constants.FormField.COMMODITY_NAME.name -> constants.FormField.COMMODITY_NAME.field,
       constants.FormField.QUALITY.name -> constants.FormField.QUALITY.field,
       constants.FormField.DELIVERY_TERM.name -> constants.FormField.DELIVERY_TERM.field,
@@ -28,7 +28,7 @@ object IssueAssetDetail {
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(requestID: Option[String], documentHash: String, assetType: String, quantityUnit: String, assetQuantity: Int, assetPrice: Int, takerAddress: String, commodityName: String, quality: String, deliveryTerm: String, tradeType: String, portOfLoading: String, portOfDischarge: String, shipmentDate: Date, physicalDocumentsHandledVia: String, comdexPaymentTerms: String)
+  case class Data(requestID: Option[String], documentHash: String, assetType: String, quantityUnit: String, assetQuantity: Int, assetPrice: Int, takerAddress: Option[String], commodityName: String, quality: String, deliveryTerm: String, tradeType: String, portOfLoading: String, portOfDischarge: String, shipmentDate: Date, physicalDocumentsHandledVia: String, comdexPaymentTerms: String)
 
 }
 

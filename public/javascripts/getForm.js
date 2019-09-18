@@ -14,5 +14,9 @@ function getForm(route, modalContent = '#commonModalContent', modal = '#commonMo
                 newDocument.close();
             }
         }
+    }).fail(function (XMLHttpRequest) {
+        if (XMLHttpRequest.readyState === 0) {
+            $('#connectionError').fadeIn(100);
+        }
     });
 }

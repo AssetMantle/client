@@ -11,7 +11,7 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class FaucetRequest(id: String, ticketID: Option[String], accountID: String, amount: Int,gas: Option[Int], status: Option[Boolean], comment: Option[String])
+case class FaucetRequest(id: String, ticketID: Option[String] = None, accountID: String, amount: Int, gas: Option[Int] = None, status: Option[Boolean] = None, comment: Option[String] = None)
 
 @Singleton
 class FaucetRequests @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
@@ -46,7 +46,7 @@ class FaucetRequests @Inject()(protected val databaseConfigProvider: DatabaseCon
 
   private def getFaucetRequestsWithNullStatus: Future[Seq[FaucetRequest]] = db.run(faucetRequestTable.filter(_.status.?.isEmpty).result)
 
-  private def updateTicketIDAndStatusByID(id: String, ticketID: String, status: Option[Boolean]): Future[Int] = db.run(faucetRequestTable.filter(_.id === id).map(faucet => (faucet.ticketID, faucet.status.?)).update(ticketID, status).asTry).map {
+  private def updateTicketIDGasAndStatusByID(id: String, ticketID: String, gas: Option[Int], status: Option[Boolean]): Future[Int] = db.run(faucetRequestTable.filter(_.id === id).map(faucet => (faucet.ticketID, faucet.gas.?, faucet.status.?)).update(ticketID, gas, status).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -108,9 +108,9 @@ class FaucetRequests @Inject()(protected val databaseConfigProvider: DatabaseCon
 
   object Service {
 
-    def create(accountID: String, amount: Int): String = Await.result(add(FaucetRequest(utilities.IDGenerator.requestID(), null, accountID, amount, null, null, null)), Duration.Inf)
+    def create(accountID: String, amount: Int): String = Await.result(add(FaucetRequest(id = utilities.IDGenerator.requestID, accountID = accountID, amount = amount)), Duration.Inf)
 
-    def accept(requestID: String, ticketID: String): Int = Await.result(updateTicketIDAndStatusByID(requestID, ticketID, status = Option(true)), Duration.Inf)
+    def accept(requestID: String, gas: Int, ticketID: String): Int = Await.result(updateTicketIDGasAndStatusByID(id = requestID, ticketID = ticketID, gas = Option(gas), status = Option(true)), Duration.Inf)
 
     def reject(id: String, comment: String): Int = Await.result(updateStatusAndCommentByID(id = id, status = Option(false), comment = comment), Duration.Inf)
 
