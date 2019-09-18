@@ -39,7 +39,7 @@ object Serializable {
   implicit val invoiceReads: Reads[Invoice] = Json.reads[Invoice]
 
   implicit val documentContentWrites = new Writes[DocumentContent] {
-    override def writes(context: DocumentContent): JsValue = context match {
+    override def writes(documentContent: DocumentContent): JsValue = documentContent match {
       case obl: Serializable.OBL => Json.toJson(obl)(Json.writes[OBL])
       case invoice: Serializable.Invoice => Json.toJson(invoice)(Json.writes[Invoice])
     }
