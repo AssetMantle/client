@@ -517,7 +517,7 @@ CREATE TABLE IF NOT EXISTS MASTER."ZoneKYC"
 (
     "id"           VARCHAR NOT NULL,
     "documentType" VARCHAR NOT NULL,
-    "fileName"     VARCHAR NOT NULL,
+    "fileName"     VARCHAR NOT NULL UNIQUE,
     "file"         BYTEA,
     "status"       BOOLEAN,
     PRIMARY KEY ("id", "documentType")
@@ -536,7 +536,7 @@ CREATE TABLE IF NOT EXISTS MASTER."OrganizationKYC"
 (
     "id"           VARCHAR NOT NULL,
     "documentType" VARCHAR NOT NULL,
-    "fileName"     VARCHAR NOT NULL,
+    "fileName"     VARCHAR NOT NULL UNIQUE,
     "file"         BYTEA,
     "status"       BOOLEAN,
     PRIMARY KEY ("id", "documentType")
@@ -546,7 +546,7 @@ CREATE TABLE IF NOT EXISTS MASTER."AccountKYC"
 (
     "id"           VARCHAR NOT NULL,
     "documentType" VARCHAR NOT NULL,
-    "fileName"     VARCHAR NOT NULL,
+    "fileName"     VARCHAR NOT NULL UNIQUE,
     "file"         BYTEA,
     "status"       BOOLEAN,
     PRIMARY KEY ("id", "documentType")
@@ -556,7 +556,7 @@ CREATE TABLE IF NOT EXISTS MASTER."TraderKYC"
 (
     "id"                 VARCHAR NOT NULL,
     "documentType"       VARCHAR NOT NULL,
-    "fileName"           VARCHAR NOT NULL,
+    "fileName"           VARCHAR NOT NULL UNIQUE,
     "file"               BYTEA,
     "zoneStatus"         BOOLEAN,
     "organizationStatus" BOOLEAN,
@@ -611,19 +611,57 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."FaucetRequest"
 
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."IssueAssetRequest"
 (
-    "id"            VARCHAR NOT NULL,
-    "ticketID"      VARCHAR,
-    "accountID"     VARCHAR NOT NULL,
-    "documentHash"  VARCHAR NOT NULL,
-    "assetType"     VARCHAR NOT NULL,
-    "assetPrice"    INT     NOT NULL,
-    "quantityUnit"  VARCHAR NOT NULL,
-    "assetQuantity" INT     NOT NULL,
-    "takerAddress"  VARCHAR,
-    "gas"           INT,
-    "status"        BOOLEAN,
-    "comment"       VARCHAR,
+    "id"                          VARCHAR NOT NULL,
+    "ticketID"                    VARCHAR,
+    "pegHash"                     VARCHAR,
+    "accountID"                   VARCHAR NOT NULL,
+    "documentHash"                VARCHAR NOT NULL,
+    "assetType"                   VARCHAR NOT NULL,
+    "quantityUnit"                VARCHAR NOT NULL,
+    "assetQuantity"               INT     NOT NULL,
+    "assetPrice"                  INT     NOT NULL,
+    "takerAddress"                VARCHAR,
+    "shipmentDetails"             VARCHAR NOT NULL,
+    "physicalDocumentsHandledVia" VARCHAR,
+    "paymentTerms"                VARCHAR NOT NULL,
+    "status"                      VARCHAR NOT NULL,
+    "comment"                     VARCHAR,
     PRIMARY KEY ("id")
+);
+
+CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."AssetFile"
+(
+    "id"           VARCHAR NOT NULL,
+    "documentType" VARCHAR NOT NULL,
+    "fileName"     VARCHAR NOT NULL UNIQUE,
+    "file"         BYTEA,
+    "context"      VARCHAR,
+    "status"       BOOLEAN,
+    PRIMARY KEY ("id", "documentType")
+);
+
+CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."NegotiationRequest"
+(
+    "id"                 VARCHAR NOT NULL,
+    "negotiationID"      VARCHAR,
+    "buyerAccountID"     VARCHAR NOT NULL,
+    "sellerAccountID" VARCHAR NOT NULL,
+    "pegHash"          VARCHAR NOT NULL,
+    "amount"           VARCHAR NOT NULL,
+    "status"             VARCHAR NOT NULL,
+    "comment"           VARCHAR,
+    PRIMARY KEY ("id")
+);
+
+CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."NegotiationFile"
+(
+    "id"           VARCHAR NOT NULL,
+    "documentType" VARCHAR NOT NULL,
+    "fileName"     VARCHAR NOT NULL UNIQUE,
+    "file"         BYTEA,
+    "context"      VARCHAR,
+    "status"       BOOLEAN,
+    PRIMARY KEY ("id", "documentType")
 );
 
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."IssueFiatRequest"
@@ -734,9 +772,17 @@ ALTER TABLE MASTER_TRANSACTION."FaucetRequest"
 ALTER TABLE MASTER_TRANSACTION."IssueAssetRequest"
     ADD CONSTRAINT IssueAssetRequest_MasterAccount_AccountID FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER_TRANSACTION."IssueAssetRequest"
+    ADD CONSTRAINT IssueAssetRequest_MasterAccount_PegHash FOREIGN KEY ("pegHash") REFERENCES BLOCKCHAIN."Asset_BC" ("pegHash");
+ALTER TABLE MASTER_TRANSACTION."IssueAssetRequest"
     ADD CONSTRAINT IssueAssetRequest_Taker_Address FOREIGN KEY ("takerAddress") REFERENCES BLOCKCHAIN."Account_BC" ("address");
 ALTER TABLE MASTER_TRANSACTION."IssueFiatRequest"
     ADD CONSTRAINT IssueFiatRequest_MasterAccount_AccountID FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");
+ALTER TABLE MASTER_TRANSACTION."AssetFile"
+    ADD CONSTRAINT AssetFile_IssueAssetRequest_id FOREIGN KEY ("id") REFERENCES MASTER_TRANSACTION."IssueAssetRequest" ("id");
+ALTER TABLE MASTER_TRANSACTION."NegotiationFile"
+    ADD CONSTRAINT NegotiationFile_NegotiationRequest_id FOREIGN KEY ("id") REFERENCES MASTER_TRANSACTION."NegotiationRequest" ("id");
+ALTER TABLE MASTER_TRANSACTION."NegotiationRequest"
+    ADD CONSTRAINT NegotiationFile_NegotiationRequest_negotiationID FOREIGN KEY ("negotiationID") REFERENCES BLOCKCHAIN."Negotiation_BC" ("id");
 ALTER TABLE MASTER_TRANSACTION."Notification"
     ADD CONSTRAINT Notification_Account_id FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER_TRANSACTION."SMSOTP"
@@ -806,6 +852,9 @@ DROP TABLE IF EXISTS MASTER_TRANSACTION."AccountToken" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."AddTraderRequest" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."FaucetRequest" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."IssueAssetRequest" CASCADE;
+DROP TABLE IF EXISTS MASTER_TRANSACTION."AssetFile" CASCADE;
+DROP TABLE IF EXISTS MASTER_TRANSACTION."NegotiationRequest" CASCADE;
+DROP TABLE IF EXISTS MASTER_TRANSACTION."NegotiationFile" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."IssueFiatRequest" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."Notification" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."SMSOTP" CASCADE;

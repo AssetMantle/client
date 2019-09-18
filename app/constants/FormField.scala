@@ -34,7 +34,7 @@ object FormField {
   val FIAT_PROOF_HASH = new StringFormField("FIAT_PROOF_HASH", 4, 50, RegularExpression.HASH)
   val AWB_PROOF_HASH = new StringFormField("AWB_PROOF_HASH", 4, 50, RegularExpression.HASH)
   val PEG_HASH = new StringFormField("PEG_HASH", 2, 50, RegularExpression.PEG_HASH)
-  val ASSET_TYPE = new StringFormField("ASSET_TYPE", 2, 20, RegularExpression.ALL_NUMBERS_ALL_LETTERS)
+  val COMMODITY_NAME = new StringFormField("COMMODITY_NAME", 2, 20, RegularExpression.ALL_NUMBERS_ALL_LETTERS)
   val QUANTITY_UNIT = new StringFormField("QUANTITY_UNIT", 2, 10, RegularExpression.ALL_LETTERS)
   val TRANSACTION_ID = new StringFormField("TRANSACTION_ID", 2, 50, RegularExpression.ALL_NUMBERS_ALL_LETTERS)
   val NOTIFICATION_TOKEN = new StringFormField("NOTIFICATION_TOKEN", 0, 200)
@@ -49,7 +49,29 @@ object FormField {
   val DOCUMENT_HASH = new StringFormField("DOCUMENT_HASH", 4, 50, RegularExpression.HASH)
   val FROM = new StringFormField("FROM", 45, 45)
   val MODE = new StringFormField("MODE", 4, 5)
-  val TAKER_ADDRESS = new StringFormField("TAKER_ADDRESS", 45, 45)
+  val PORT_OF_LOADING = new StringFormField("PORT_OF_LOADING", 0, 100)
+  val PORT_OF_DISCHARGE = new StringFormField("PORT_OF_DISCHARGE", 0, 100)
+  val BILL_OF_LADING_NUMBER = new StringFormField("COMMODITY_NAME", 2, 20, RegularExpression.ALL_NUMBERS_ALL_LETTERS)
+  val SHIPPER_NAME = new StringFormField("SHIPPER_NAME", 2, 20, RegularExpression.ALL_NUMBERS_ALL_LETTERS)
+  val SHIPPER_ADDRESS = new StringFormField("SHIPPER_ADDRESS", 2, 100, RegularExpression.ALL_NUMBERS_ALL_LETTERS)
+  val NOTIFY_PARTY_NAME = new StringFormField("NOTIFY_PARTY_NAME", 2, 20, RegularExpression.ALL_NUMBERS_ALL_LETTERS)
+  val NOTIFY_PARTY_ADDRESS = new StringFormField("NOTIFY_PARTY_ADDRESS", 2, 100, RegularExpression.ALL_NUMBERS_ALL_LETTERS)
+  val INVOICE_NUMBER = new StringFormField("INVOICE_NUMBER", 2, 32)
+  val TAKER_ADDRESS = new StringFormField( "TAKER_ADDRESS", 45, 45)
+  val REGISTERED_ADDRESS_LINE_1 = new StringFormField("REGISTERED_ADDRESS_LINE_1", 4, 200)
+  val REGISTERED_ADDRESS_LINE_2 = new StringFormField("REGISTERED_ADDRESS_LINE_2", 4, 200)
+  val REGISTERED_LANDMARK = new StringFormField("REGISTERED_LANDMARK", 4, 100)
+  val REGISTERED_CITY = new StringFormField("REGISTERED_CITY", 2, 100)
+  val REGISTERED_ZIP_CODE = new StringFormField("REGISTERED_ZIP_CODE", 2, 100)
+  val REGISTERED_COUNTRY = new StringFormField("REGISTERED_COUNTRY", 2, 100)
+  val REGISTERED_PHONE = new StringFormField("REGISTERED_PHONE", 2, 100, RegularExpression.MOBILE_NUMBER)
+  val POSTAL_ADDRESS_LINE_1 = new StringFormField("POSTAL_ADDRESS_LINE_1", 4, 200)
+  val POSTAL_ADDRESS_LINE_2 = new StringFormField("POSTAL_ADDRESS_LINE_2", 4, 200)
+  val POSTAL_LANDMARK = new StringFormField("POSTAL_LANDMARK", 4, 100)
+  val POSTAL_CITY = new StringFormField("POSTAL_CITY", 2, 100)
+  val POSTAL_ZIP_CODE = new StringFormField("POSTAL_ZIP_CODE", 2, 100)
+  val POSTAL_COUNTRY = new StringFormField("POSTAL_COUNTRY", 2, 100)
+  val POSTAL_PHONE = new StringFormField("POSTAL_PHONE", 2, 100, RegularExpression.MOBILE_NUMBER)
   val ADDRESS_LINE_1 = new StringFormField("ADDRESS_LINE_1", 4, 200)
   val ADDRESS_LINE_2 = new StringFormField("ADDRESS_LINE_2", 4, 200)
   val LANDMARK = new StringFormField("LANDMARK", 4, 100)
@@ -69,6 +91,16 @@ object FormField {
   val CONFIRM_NEW_PASSWORD = new StringFormField("CONFIRM_NEW_PASSWORD", 1, 128, RegularExpression.PASSWORD, Response.INVALID_PASSWORD.message)
   val SEED = new StringFormField("SEED", 1, 200)
   val SEARCH_TX_HASH_HEIGHT = new StringFormField("SEARCH_TX_HASH_HEIGHT", 1, 1000)
+
+  val ASSET_TYPE = new StringOptionFormField("ASSET_TYPE", constants.Form.ASSET_TYPE_OPTIONS)
+  val DELIVERY_TERM = new StringOptionFormField("DELIVERY_TERM", constants.Form.DELIVERY_TERM_OPTIONS)
+  val QUALITY = new StringOptionFormField("QUALITY", constants.Form.QUALITY_OPTIONS)
+  val TRADE_TYPE = new StringOptionFormField("TRADE_TYPE", constants.Form.TRADE_TYPE_OPTIONS)
+  val PHYSICAL_DOCUMENTS_HANDLED_VIA = new StringOptionFormField("PHYSICAL_DOCUMENTS_HANDLED_VIA", constants.Form.PHYSICAL_DOCUMENTS_HANDLED_VIA_OPTIONS)
+  val COMDEX_PAYMENT_TERMS = new StringOptionFormField("COMDEX_PAYMENT_TERMS", constants.Form.COMDEX_PAYMENT_TERMS_OPTIONS)
+
+  val SHIPMENT_DATE = new DateFormField("SHIPMENT_DATE")
+  val INVOICE_DATE = new DateFormField("INVOICE_DATE")
 
   //IntFormField
   val GAS = new IntFormField("GAS", 20000, 1000000)
@@ -90,6 +122,11 @@ object FormField {
   class StringFormField (fieldName: String, minimumLength: Int, maximumLength: Int, regex: Regex = """.*""".r, errorMessage: String = "Error Response") {
     val name: String = fieldName
     val field: Mapping[String] = text(minLength = minimumLength, maxLength = maximumLength).verifying(Constraints.pattern(regex = regex, name = regex.pattern.toString, error = errorMessage))
+  }
+
+  class StringOptionFormField(fieldName: String, option: Seq[String], errorMessage: String = "Error Response") {
+    val name: String = fieldName
+    val field: Mapping[String] = text.verifying(constraint = field => option contains field, error = errorMessage)
   }
 
   class IntFormField (fieldName: String, val minimumValue: Int, val maximumValue: Int) {

@@ -32,6 +32,23 @@ function verifyOrganizationKycDocument(organizationID, documentType) {
     });
 }
 
+function verifyTraderAssetDocument(id, documentType) {
+    let route = jsRoutes.controllers.IssueAssetController.verifyAssetDocument(id, documentType);
+    $.ajax({
+        url: route.url,
+        type: route.type,
+        success: function (result) {
+            document.getElementById('traderAssetDocumentStatus' + id + documentType).innerHTML = result;
+            $('#buttonTraderAssetDocumentStatus' + id + documentType).hide();
+            document.getElementById('unverifiedDocumentStatus' + id + documentType).style.display = "none";
+            document.getElementById('verifiedDocumentStatus' + id + documentType).style.display = "block";
+        },
+        error: function (error) {
+            document.getElementById('traderAssetDocumentStatus' + id + documentType).innerHTML = error;
+        }
+    });
+}
+
 function organizationVerifyTraderKycDocument(traderID, documentType) {
     let route = jsRoutes.controllers.SetACLController.organizationVerifyKycDocument(traderID, documentType);
     $.ajax({
@@ -142,6 +159,24 @@ function zoneRejectTraderKycDocument(traderID, documentType) {
         },
         error: function (error) {
             document.getElementById('traderKycDocumentStatus' + traderID + documentType).innerHTML = error.responseText;
+        }
+    });
+}
+
+function rejectTraderAssetDocument(id, documentType) {
+    let route = jsRoutes.controllers.IssueAssetController.rejectAssetDocument(id, documentType);
+    console.log('buttonTraderAssetDocumentStatus' + id + documentType);
+    $.ajax({
+        url: route.url,
+        type: route.type,
+        success: function (result) {
+            document.getElementById('traderAssetDocumentStatus' + id + documentType).innerHTML = result;
+            $('#buttonTraderAssetDocumentStatus' + id + documentType).hide();
+            document.getElementById('verifiedDocumentStatus' + id + documentType).style.display = "none";
+            document.getElementById('unverifiedDocumentStatus' + id + documentType).style.display = "block";
+        },
+        error: function (error) {
+            document.getElementById('traderAssetDocumentStatus' + id + documentType).innerHTML = error.responseText;
         }
     });
 }

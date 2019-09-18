@@ -8,7 +8,7 @@ class Notification(notificationType: String, sendEmail: Boolean, sendPushNotific
 
   val pushNotification: Option[PushNotification] = if (sendPushNotification) Option(new PushNotification(notificationType)) else None
 
-  val sms: Option[SMS] = if (sendPushNotification) Option(new SMS(notificationType)) else None
+  val sms: Option[SMS] = if (sendSMS) Option(new SMS(notificationType)) else None
 
 }
 

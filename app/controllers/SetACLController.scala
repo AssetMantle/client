@@ -125,7 +125,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
   }
 
   def userUploadTraderKYCForm(documentType: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.uploadFileForm(utilities.String.getJsRouteFunction(routes.javascript.SetACLController.userUploadTraderKYC), utilities.String.getJsRouteFunction(routes.javascript.SetACLController.userStoreTraderKYC), documentType))
+    Ok(views.html.component.master.uploadFile(utilities.String.getJsRouteFunction(routes.javascript.SetACLController.userUploadTraderKYC), utilities.String.getJsRouteFunction(routes.javascript.SetACLController.userStoreTraderKYC), documentType))
   }
 
   def userUploadTraderKYC(documentType: String) = Action(parse.multipartFormData) { implicit request =>
@@ -165,7 +165,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
   }
 
   def userUpdateTraderKYCForm(documentType: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.updateFileForm(utilities.String.getJsRouteFunction(routes.javascript.SetACLController.userUploadTraderKYC), utilities.String.getJsRouteFunction(routes.javascript.SetACLController.userUpdateTraderKYC), documentType))
+    Ok(views.html.component.master.updateFile(utilities.String.getJsRouteFunction(routes.javascript.SetACLController.userUploadTraderKYC), utilities.String.getJsRouteFunction(routes.javascript.SetACLController.userUpdateTraderKYC), documentType))
   }
 
   def userUpdateTraderKYC(name: String, documentType: String): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
@@ -479,7 +479,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
   }
 
   def uploadTraderKycForm(documentType: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.uploadFileForm(utilities.String.getJsRouteFunction(routes.javascript.SetACLController.uploadTraderKyc), utilities.String.getJsRouteFunction(routes.javascript.SetACLController.storeTraderKyc), documentType))
+    Ok(views.html.component.master.uploadFile(utilities.String.getJsRouteFunction(routes.javascript.SetACLController.uploadTraderKyc), utilities.String.getJsRouteFunction(routes.javascript.SetACLController.storeTraderKyc), documentType))
   }
 
   def uploadTraderKyc(documentType: String) = Action(parse.multipartFormData) { implicit request =>
@@ -519,7 +519,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
   }
 
   def updateTraderKycForm(documentType: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.updateFileForm(utilities.String.getJsRouteFunction(routes.javascript.SetACLController.uploadTraderKyc), utilities.String.getJsRouteFunction(routes.javascript.SetACLController.updateTraderKyc), documentType))
+    Ok(views.html.component.master.updateFile(utilities.String.getJsRouteFunction(routes.javascript.SetACLController.uploadTraderKyc), utilities.String.getJsRouteFunction(routes.javascript.SetACLController.updateTraderKyc), documentType))
   }
 
   def updateTraderKyc(name: String, documentType: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>

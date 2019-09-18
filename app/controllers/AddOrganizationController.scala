@@ -129,7 +129,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
   }
 
   def userUploadOrganizationKycForm(documentType: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.uploadFileForm(utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.userUploadOrganizationKyc), utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.userStoreOrganizationKyc), documentType))
+    Ok(views.html.component.master.uploadFile(utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.userUploadOrganizationKyc), utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.userStoreOrganizationKyc), documentType))
   }
 
   def userUploadOrganizationKyc(documentType: String) = Action(parse.multipartFormData) { implicit request =>
@@ -170,22 +170,22 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
   }
 
   def userUpdateOrganizationKycForm(documentType: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.updateFileForm(utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.userUploadOrganizationKyc), utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.userUpdateOrganizationKyc), documentType))
+    Ok(views.html.component.master.updateFile(utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.userUploadOrganizationKyc), utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.userUpdateOrganizationKyc), documentType))
   }
 
   def userUpdateOrganizationKyc(name: String, documentType: String): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        val id = masterOrganizations.Service.getID(loginState.username)
+        val organizationID = masterOrganizations.Service.getID(loginState.username)
         fileResourceManager.updateFile[master.OrganizationKYC](
           name = name,
           documentType = documentType,
           path = fileResourceManager.getOrganizationKycFilePath(documentType),
-          oldDocumentFileName = masterOrganizationKYCs.Service.getFileName(id = id, documentType = documentType),
-          document = master.OrganizationKYC(id = id, documentType = documentType, status = None, fileName = name, file = None),
+          oldDocumentFileName = masterOrganizationKYCs.Service.getFileName(id = organizationID, documentType = documentType),
+          document = master.OrganizationKYC(id = organizationID, documentType = documentType, status = None, fileName = name, file = None),
           updateOldDocument = masterOrganizationKYCs.Service.updateOldDocument
         )
-        PartialContent(views.html.component.master.userUploadOrUpdateOrganizationKYC(masterOrganizationKYCs.Service.getAllDocuments(id)))
+        PartialContent(views.html.component.master.userUploadOrUpdateOrganizationKYC(masterOrganizationKYCs.Service.getAllDocuments(organizationID)))
       } catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
@@ -348,11 +348,11 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
   }
 
   def uploadOrganizationKycForm(documentType: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.uploadFileForm(utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.uploadOrganizationKyc), utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.storeOrganizationKyc), documentType))
+    Ok(views.html.component.master.uploadFile(utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.uploadOrganizationKyc), utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.storeOrganizationKyc), documentType))
   }
 
   def updateOrganizationKycForm(documentType: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.updateFileForm(utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.uploadOrganizationKyc), utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.updateOrganizationKyc), documentType))
+    Ok(views.html.component.master.updateFile(utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.uploadOrganizationKyc), utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.updateOrganizationKyc), documentType))
   }
 
   def uploadOrganizationKyc(documentType: String) = Action(parse.multipartFormData) { implicit request =>
@@ -394,13 +394,13 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
   def updateOrganizationKyc(name: String, documentType: String): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        val id = masterOrganizations.Service.getID(loginState.username)
+        val organizationID = masterOrganizations.Service.getID(loginState.username)
         fileResourceManager.updateFile[master.OrganizationKYC](
           name = name,
           documentType = documentType,
           path = fileResourceManager.getOrganizationKycFilePath(documentType),
-          oldDocumentFileName = masterOrganizationKYCs.Service.getFileName(id = id, documentType = documentType),
-          document = master.OrganizationKYC(id = id, documentType = documentType, status = None, fileName = name, file = None),
+          oldDocumentFileName = masterOrganizationKYCs.Service.getFileName(id = organizationID, documentType = documentType),
+          document = master.OrganizationKYC(id = organizationID, documentType = documentType, status = None, fileName = name, file = None),
           updateOldDocument = masterOrganizationKYCs.Service.updateOldDocument
         )
         withUsernameToken.Ok(Messages(constants.Response.FILE_UPDATE_SUCCESSFUL.message))
