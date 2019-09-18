@@ -15,7 +15,7 @@
             @inputText(confirmTransactionForm(constants.FormField.REQUEST_ID.name), '_label -> Messages(constants.FormField.REQUEST_ID.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.REQUEST_ID.name), 'required -> true)
 
             @asset.physicalDocumentsHandledVia match {
-                case constants.SelectOption.COMDEX => {}
+                case constants.Form.COMDEX => {}
                 case _ => {
                     @inputText(confirmTransactionForm(constants.FormField.GAS.name).copy(value = Some(20000.toString)), '_label -> Messages(constants.FormField.GAS.name), 'class -> "cmuk-input", 'type -> "number", 'placeholder -> Messages(constants.FormField.GAS.name), 'required -> false)
                     @inputPassword(confirmTransactionForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PASSWORD.name), 'required -> false)

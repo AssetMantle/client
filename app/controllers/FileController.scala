@@ -93,7 +93,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
     )
   }
 
-  def storeUserKyc(name: String, documentType: String, id: String = ""): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
+  def storeUserKyc(name: String, documentType: String): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
         fileResourceManager.storeFile[master.AccountKYC](
@@ -109,7 +109,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
       }
   }
 
-  def updateUserKyc(name: String, documentType: String, id: String = ""): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
+  def updateUserKyc(name: String, documentType: String): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
         fileResourceManager.updateFile[master.AccountKYC](
@@ -154,7 +154,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
     )
   }
 
-  def storeUserZoneKyc(name: String, documentType: String, id: String = ""): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
+  def storeUserZoneKyc(name: String, documentType: String): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
         fileResourceManager.storeFile[master.ZoneKYC](
@@ -170,7 +170,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
       }
   }
 
-  def updateUserZoneKyc(name: String, documentType: String, id: String = ""): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
+  def updateUserZoneKyc(name: String, documentType: String): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
         fileResourceManager.updateFile[master.ZoneKYC](
@@ -215,7 +215,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
     )
   }
 
-  def storeZoneKyc(name: String, documentType: String, id: String = ""): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+  def storeZoneKyc(name: String, documentType: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
         fileResourceManager.storeFile[master.ZoneKYC](
@@ -231,7 +231,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
       }
   }
 
-  def updateZoneKyc(name: String, documentType: String, id: String = ""): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+  def updateZoneKyc(name: String, documentType: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
         fileResourceManager.updateFile[master.ZoneKYC](
@@ -248,22 +248,22 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
       }
   }
 
-  def uploadTraderAssetForm(documentType: String, id: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.uploadFile(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadTraderAsset), utilities.String.getJsRouteFunction(routes.javascript.FileController.storeTraderAsset), documentType, id))
+  def uploadTraderAssetForm(documentType: String, issueAssetRequestID: String): Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.uploadFile(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadTraderAsset), utilities.String.getJsRouteFunction(routes.javascript.FileController.storeTraderAsset), documentType, issueAssetRequestID))
   }
 
-  def updateTraderAssetForm(documentType: String, id: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.updateFile(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadTraderAsset), utilities.String.getJsRouteFunction(routes.javascript.FileController.updateTraderAsset), documentType, id))
+  def updateTraderAssetForm(documentType: String, issueAssetRequestID: String): Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.updateFile(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadTraderAsset), utilities.String.getJsRouteFunction(routes.javascript.FileController.updateTraderAsset), documentType, issueAssetRequestID))
   }
 
   def uploadTraderAsset(documentType: String) = Action(parse.multipartFormData) { implicit request =>
     FileUpload.form.bindFromRequest.fold(
       formWithErrors => {
-        BadRequest(formWithErrors.errors.mkString("\n"))
+          BadRequest
       },
       fileUploadInfo => {
         try {
-          request.body.file("file") match {
+          request.body.file(constants.File.KEY_FILE) match {
             case None => BadRequest(Messages(constants.Response.NO_FILE.message))
             case Some(file) => utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, fileResourceManager.getTraderAssetFilePath(documentType))
               Ok
@@ -276,24 +276,24 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
     )
   }
 
-  def storeTraderAsset(name: String, documentType: String, id: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def storeTraderAsset(name: String, documentType: String, issueAssetRequestID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
         fileResourceManager.storeFile[masterTransaction.AssetFile](
           name = name,
           documentType = documentType,
           path = fileResourceManager.getTraderAssetFilePath(documentType),
-          document = masterTransaction.AssetFile(id = id, documentType = documentType, fileName = name, file = None, context = None, status = None),
+          document = masterTransaction.AssetFile(id = issueAssetRequestID, documentType = documentType, fileName = name, file = None, context = None, status = None),
           masterCreate = masterTransactionAssetFiles.Service.create
         )
         documentType match {
           case constants.File.OBL =>
-            val obl = masterTransactionAssetFiles.Service.getOrEmpty(id, constants.File.OBL).context.getOrElse(Serializable.OBL("", "", "", "", "", "", new Date, "", 0, 0)).asInstanceOf[Serializable.OBL]
-            PartialContent(views.html.component.master.issueAssetOBL(views.companion.master.IssueAssetOBL.form.fill(views.companion.master.IssueAssetOBL.Data(id, obl.billOfLadingID, obl.portOfLoading, obl.shipperName, obl.shipperAddress, obl.notifyPartyName, obl.notifyPartyAddress, obl.dateOfShipping, obl.deliveryTerm, obl.weightOfConsignment, obl.declaredAssetValue)), masterTransactionAssetFiles.Service.getOrNone(id, constants.File.OBL)))
+            val obl = masterTransactionAssetFiles.Service.getOrEmpty(issueAssetRequestID, constants.File.OBL).context.getOrElse(Serializable.OBL("", "", "", "", "", "", new Date, "", 0, 0)).asInstanceOf[Serializable.OBL]
+            PartialContent(views.html.component.master.issueAssetOBL(views.companion.master.IssueAssetOBL.form.fill(views.companion.master.IssueAssetOBL.Data(issueAssetRequestID, obl.billOfLadingID, obl.portOfLoading, obl.shipperName, obl.shipperAddress, obl.notifyPartyName, obl.notifyPartyAddress, obl.dateOfShipping, obl.deliveryTerm, obl.weightOfConsignment, obl.declaredAssetValue)), masterTransactionAssetFiles.Service.getOrNone(issueAssetRequestID, constants.File.OBL)))
           case constants.File.INVOICE =>
-            val invoice = masterTransactionAssetFiles.Service.getOrEmpty(id, constants.File.INVOICE).context.getOrElse(Serializable.Invoice("", new Date)).asInstanceOf[Serializable.Invoice]
-            PartialContent(views.html.component.master.issueAssetInvoice(views.companion.master.IssueAssetInvoice.form.fill(views.companion.master.IssueAssetInvoice.Data(id, invoice.invoiceNumber, invoice.invoiceDate)), masterTransactionAssetFiles.Service.getOrNone(id, constants.File.INVOICE)))
-          case constants.File.CONTRACT | constants.File.PACKING_LIST | constants.File.COO | constants.File.COA | constants.File.OTHER => PartialContent(views.html.component.master.issueAssetDocument(id, masterTransactionAssetFiles.Service.getDocuments(id, constants.File.TRADER_ASSET_DOCUMENT_TYPES_UPLOAD_PAGE)))
+            val invoice = masterTransactionAssetFiles.Service.getOrEmpty(issueAssetRequestID, constants.File.INVOICE).context.getOrElse(Serializable.Invoice("", new Date)).asInstanceOf[Serializable.Invoice]
+            PartialContent(views.html.component.master.issueAssetInvoice(views.companion.master.IssueAssetInvoice.form.fill(views.companion.master.IssueAssetInvoice.Data(issueAssetRequestID, invoice.invoiceNumber, invoice.invoiceDate)), masterTransactionAssetFiles.Service.getOrNone(issueAssetRequestID, constants.File.INVOICE)))
+          case constants.File.CONTRACT | constants.File.PACKING_LIST | constants.File.COO | constants.File.COA | constants.File.OTHER => PartialContent(views.html.component.master.issueAssetDocument(issueAssetRequestID, masterTransactionAssetFiles.Service.getDocuments(issueAssetRequestID, constants.File.TRADER_ASSET_DOCUMENT_TYPES_UPLOAD_PAGE)))
           case _ => Ok(views.html.index())
         }
       } catch {
@@ -301,25 +301,25 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
       }
   }
 
-  def updateTraderAsset(name: String, documentType: String, id: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def updateTraderAsset(name: String, documentType: String, issueAssetRequestID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
         fileResourceManager.updateFile[masterTransaction.AssetFile](
           name = name,
           documentType = documentType,
           path = fileResourceManager.getTraderAssetFilePath(documentType),
-          oldDocumentFileName = masterTransactionAssetFiles.Service.getFileName(id = id, documentType = documentType),
-          document = masterTransaction.AssetFile(id = id, documentType = documentType, fileName = name, file = None, context = None, status = None),
+          oldDocumentFileName = masterTransactionAssetFiles.Service.getFileName(id = issueAssetRequestID, documentType = documentType),
+          document = masterTransaction.AssetFile(id = issueAssetRequestID, documentType = documentType, fileName = name, file = None, context = None, status = None),
           updateOldDocument = masterTransactionAssetFiles.Service.insertOrUpdateOldDocument
         )
         documentType match {
           case constants.File.OBL =>
-            val obl = masterTransactionAssetFiles.Service.getOrEmpty(id, constants.File.OBL).context.getOrElse(Serializable.OBL("", "", "", "", "", "", new Date, "", 0, 0)).asInstanceOf[Serializable.OBL]
-            PartialContent(views.html.component.master.issueAssetOBL(views.companion.master.IssueAssetOBL.form.fill(views.companion.master.IssueAssetOBL.Data(id, obl.billOfLadingID, obl.portOfLoading, obl.shipperName, obl.shipperAddress, obl.notifyPartyName, obl.notifyPartyAddress, obl.dateOfShipping, obl.deliveryTerm, obl.weightOfConsignment, obl.declaredAssetValue)), masterTransactionAssetFiles.Service.getOrNone(id, constants.File.OBL)))
+            val obl = masterTransactionAssetFiles.Service.getOrEmpty(issueAssetRequestID, constants.File.OBL).context.getOrElse(Serializable.OBL("", "", "", "", "", "", new Date, "", 0, 0)).asInstanceOf[Serializable.OBL]
+            PartialContent(views.html.component.master.issueAssetOBL(views.companion.master.IssueAssetOBL.form.fill(views.companion.master.IssueAssetOBL.Data(issueAssetRequestID, obl.billOfLadingID, obl.portOfLoading, obl.shipperName, obl.shipperAddress, obl.notifyPartyName, obl.notifyPartyAddress, obl.dateOfShipping, obl.deliveryTerm, obl.weightOfConsignment, obl.declaredAssetValue)), masterTransactionAssetFiles.Service.getOrNone(issueAssetRequestID, constants.File.OBL)))
           case constants.File.INVOICE =>
-            val invoice = masterTransactionAssetFiles.Service.getOrEmpty(id, constants.File.INVOICE).context.getOrElse(Serializable.Invoice("", new Date)).asInstanceOf[Serializable.Invoice]
-            PartialContent(views.html.component.master.issueAssetInvoice(views.companion.master.IssueAssetInvoice.form.fill(views.companion.master.IssueAssetInvoice.Data(id, invoice.invoiceNumber, invoice.invoiceDate)), masterTransactionAssetFiles.Service.getOrNone(id, constants.File.INVOICE)))
-          case constants.File.CONTRACT | constants.File.PACKING_LIST | constants.File.COO | constants.File.COA | constants.File.OTHER => PartialContent(views.html.component.master.issueAssetDocument(id, masterTransactionAssetFiles.Service.getDocuments(id, constants.File.TRADER_ASSET_DOCUMENT_TYPES_UPLOAD_PAGE)))
+            val invoice = masterTransactionAssetFiles.Service.getOrEmpty(issueAssetRequestID, constants.File.INVOICE).context.getOrElse(Serializable.Invoice("", new Date)).asInstanceOf[Serializable.Invoice]
+            PartialContent(views.html.component.master.issueAssetInvoice(views.companion.master.IssueAssetInvoice.form.fill(views.companion.master.IssueAssetInvoice.Data(issueAssetRequestID, invoice.invoiceNumber, invoice.invoiceDate)), masterTransactionAssetFiles.Service.getOrNone(issueAssetRequestID, constants.File.INVOICE)))
+          case constants.File.CONTRACT | constants.File.PACKING_LIST | constants.File.COO | constants.File.COA | constants.File.OTHER => PartialContent(views.html.component.master.issueAssetDocument(issueAssetRequestID, masterTransactionAssetFiles.Service.getDocuments(issueAssetRequestID, constants.File.TRADER_ASSET_DOCUMENT_TYPES_UPLOAD_PAGE)))
           case _ => Ok(views.html.index())
         }
       } catch {
@@ -327,22 +327,22 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
       }
   }
 
-  def uploadTraderNegotiationForm(documentType: String, id: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.uploadFile(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadTraderNegotiation), utilities.String.getJsRouteFunction(routes.javascript.FileController.storeTraderNegotiation), documentType, id))
+  def uploadTraderNegotiationForm(documentType: String, negotiationRequestID: String): Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.uploadFile(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadTraderNegotiation), utilities.String.getJsRouteFunction(routes.javascript.FileController.storeTraderNegotiation), documentType, negotiationRequestID))
   }
 
-  def updateTraderNegotiationForm(documentType: String, id: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.updateFile(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadTraderNegotiation), utilities.String.getJsRouteFunction(routes.javascript.FileController.updateTraderNegotiation), documentType, id))
+  def updateTraderNegotiationForm(documentType: String, negotiationRequestID: String): Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.updateFile(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadTraderNegotiation), utilities.String.getJsRouteFunction(routes.javascript.FileController.updateTraderNegotiation), documentType, negotiationRequestID))
   }
 
   def uploadTraderNegotiation(documentType: String) = Action(parse.multipartFormData) { implicit request =>
     FileUpload.form.bindFromRequest.fold(
       formWithErrors => {
-        BadRequest(formWithErrors.errors.mkString("\n"))
+        BadRequest
       },
       fileUploadInfo => {
         try {
-          request.body.file("file") match {
+          request.body.file(constants.File.KEY_FILE) match {
             case None => BadRequest(Messages(constants.Response.NO_FILE.message))
             case Some(file) => utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, fileResourceManager.getTraderNegotiationFilePath(documentType))
               Ok
@@ -355,14 +355,14 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
     )
   }
 
-  def storeTraderNegotiation(name: String, documentType: String, id: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def storeTraderNegotiation(name: String, documentType: String, negotiationRequestID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
         fileResourceManager.storeFile[masterTransaction.NegotiationFile](
           name = name,
           documentType = documentType,
           path = fileResourceManager.getTraderNegotiationFilePath(documentType),
-          document = masterTransaction.NegotiationFile(id = id, documentType = documentType, fileName = name, file = None, context = None, status = None),
+          document = masterTransaction.NegotiationFile(id = negotiationRequestID, documentType = documentType, fileName = name, file = None, context = None, status = None),
           masterCreate = masterTransactionNegotiationFiles.Service.create
         )
         documentType match {
@@ -374,15 +374,15 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
       }
   }
 
-  def updateTraderNegotiation(name: String, documentType: String, id: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def updateTraderNegotiation(name: String, documentType: String, negotiationRequestID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
         fileResourceManager.updateFile[masterTransaction.NegotiationFile](
           name = name,
           documentType = documentType,
           path = fileResourceManager.getTraderNegotiationFilePath(documentType),
-          oldDocumentFileName = masterTransactionAssetFiles.Service.getFileName(id = id, documentType = documentType),
-          document = masterTransaction.NegotiationFile(id = id, documentType = documentType, fileName = name, file = None, context = None, status = None),
+          oldDocumentFileName = masterTransactionAssetFiles.Service.getFileName(id = negotiationRequestID, documentType = documentType),
+          document = masterTransaction.NegotiationFile(id = negotiationRequestID, documentType = documentType, fileName = name, file = None, context = None, status = None),
           updateOldDocument = masterTransactionNegotiationFiles.Service.insertOrUpdateOldDocument
         )
         documentType match {
@@ -517,7 +517,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
     )
   }
 
-  def storeAccountFile(name: String, documentType: String, id: String = ""): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def storeAccountFile(name: String, documentType: String): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
         fileResourceManager.storeFile[master.AccountFile](
@@ -533,7 +533,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
       }
   }
 
-  def updateAccountFile(name: String, documentType: String, id: String = ""): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+  def updateAccountFile(name: String, documentType: String): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
         fileResourceManager.updateFile[master.AccountFile](

@@ -92,12 +92,12 @@ object FormField {
   val SEED = new StringFormField("SEED", 1, 200)
   val SEARCH_TX_HASH_HEIGHT = new StringFormField("SEARCH_TX_HASH_HEIGHT", 1, 1000)
 
-  val ASSET_TYPE = new StringOptionFormField("ASSET_TYPE", constants.SelectOption.ASSET_TYPE.options)
-  val DELIVERY_TERM = new StringOptionFormField("DELIVERY_TERM", constants.SelectOption.DELIVERY_TERM.options)
-  val QUALITY = new StringOptionFormField("QUALITY", constants.SelectOption.QUALITY.options)
-  val TRADE_TYPE = new StringOptionFormField("TRADE_TYPE", constants.SelectOption.TRADE_TYPE.options)
-  val PHYSICAL_DOCUMENTS_HANDLED_VIA = new StringOptionFormField("PHYSICAL_DOCUMENTS_HANDLED_VIA", constants.SelectOption.PHYSICAL_DOCUMENTS_HANDLED_VIA.options)
-  val COMDEX_PAYMENT_TERMS = new StringOptionFormField("COMDEX_PAYMENT_TERMS", constants.SelectOption.COMDEX_PAYMENT_TERMS.options)
+  val ASSET_TYPE = new StringOptionFormField("ASSET_TYPE", constants.Form.ASSET_TYPE_OPTIONS)
+  val DELIVERY_TERM = new StringOptionFormField("DELIVERY_TERM", constants.Form.DELIVERY_TERM_OPTIONS)
+  val QUALITY = new StringOptionFormField("QUALITY", constants.Form.QUALITY_OPTIONS)
+  val TRADE_TYPE = new StringOptionFormField("TRADE_TYPE", constants.Form.TRADE_TYPE_OPTIONS)
+  val PHYSICAL_DOCUMENTS_HANDLED_VIA = new StringOptionFormField("PHYSICAL_DOCUMENTS_HANDLED_VIA", constants.Form.PHYSICAL_DOCUMENTS_HANDLED_VIA_OPTIONS)
+  val COMDEX_PAYMENT_TERMS = new StringOptionFormField("COMDEX_PAYMENT_TERMS", constants.Form.COMDEX_PAYMENT_TERMS_OPTIONS)
 
   val SHIPMENT_DATE = new DateFormField("SHIPMENT_DATE")
   val INVOICE_DATE = new DateFormField("INVOICE_DATE")

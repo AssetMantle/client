@@ -92,27 +92,27 @@ GET         /checkTraderNegotiationFileExists                            control
 
 GET         /accountUpload                                               controllers.FileController.uploadAccountFileForm(documentType: String)
 POST        /accountUpload/file                                          controllers.FileController.uploadAccountFile(documentType: String)
-GET         /accountUpload/storeFile                                     controllers.FileController.storeAccountFile(name: String, documentType: String, id: String)
+GET         /accountUpload/storeFile                                     controllers.FileController.storeAccountFile(name: String, documentType: String)
 GET         /accountUpdate                                               controllers.FileController.updateAccountFileForm(documentType: String)
-GET         /accountUpdate/updateFile                                    controllers.FileController.updateAccountFile(name: String, documentType: String, id: String)
+GET         /accountUpdate/updateFile                                    controllers.FileController.updateAccountFile(name: String, documentType: String)
 
 GET         /userUpload                                                  controllers.FileController.uploadUserKycForm(documentType: String)
 POST        /userUpload/file                                             controllers.FileController.uploadUserKyc(documentType: String)
-GET         /userUpload/storeFile                                        controllers.FileController.storeUserKyc(name: String, documentType: String, id: String)
+GET         /userUpload/storeFile                                        controllers.FileController.storeUserKyc(name: String, documentType: String)
 GET         /userUpdate                                                  controllers.FileController.updateUserKycForm(documentType: String)
-GET         /userUpdate/updateFile                                       controllers.FileController.updateUserKyc(name: String, documentType: String, id: String)
+GET         /userUpdate/updateFile                                       controllers.FileController.updateUserKyc(name: String, documentType: String)
 
 GET         /userUpload/zoneKyc                                          controllers.FileController.uploadUserZoneKycForm(documentType: String)
 POST        /userUpload/userZoneKycDocument                              controllers.FileController.uploadUserZoneKyc(documentType: String)
-GET         /userUpload/storeUserZoneKycDocument                         controllers.FileController.storeUserZoneKyc(name: String, documentType: String, id: String)
+GET         /userUpload/storeUserZoneKycDocument                         controllers.FileController.storeUserZoneKyc(name: String, documentType: String)
 GET         /userUpdate/zoneKyc                                          controllers.FileController.updateUserZoneKycForm(documentType: String)
-GET         /userUpdate/updateUserZoneKycDocument                        controllers.FileController.updateUserZoneKyc(name: String, documentType: String, id: String)
+GET         /userUpdate/updateUserZoneKycDocument                        controllers.FileController.updateUserZoneKyc(name: String, documentType: String)
 
 GET         /zoneUpload                                                  controllers.FileController.uploadZoneKycForm(documentType: String)
 POST        /zoneUpload/file                                             controllers.FileController.uploadZoneKyc(documentType: String)
-GET         /zoneUpload/storeFile                                        controllers.FileController.storeZoneKyc(name: String, documentType: String, id: String)
+GET         /zoneUpload/storeFile                                        controllers.FileController.storeZoneKyc(name: String, documentType: String)
 GET         /zoneUpdate                                                  controllers.FileController.updateZoneKycForm(documentType: String)
-GET         /zoneUpload/updateFile                                       controllers.FileController.updateZoneKyc(name: String, documentType: String, id: String)
+GET         /zoneUpload/updateFile                                       controllers.FileController.updateZoneKyc(name: String, documentType: String)
 
 GET         /master/updateContact                                        controllers.ContactController.updateContactForm
 POST        /master/updateContact                                        controllers.ContactController.updateContact
@@ -165,17 +165,17 @@ GET         /traderUpload/storeFile                                      control
 GET         /traderUpdate                                                controllers.SetACLController.updateTraderKycForm(documentType: String)
 GET         /traderUpload/updateFile                                     controllers.SetACLController.updateTraderKyc(name: String, documentType: String)
 
-GET         /traderUpload/assetForm                                      controllers.FileController.uploadTraderAssetForm(documentType: String, id: String)
+GET         /traderUpload/assetForm                                      controllers.FileController.uploadTraderAssetForm(documentType: String, issueAssetRequestID: String)
 POST        /traderUpload/assetDocument                                  controllers.FileController.uploadTraderAsset(documentType: String)
-GET         /traderUpload/storeAssetDocument                             controllers.FileController.storeTraderAsset(name: String, documentType: String, id: String)
-GET         /traderUpdate/assetForm                                      controllers.FileController.updateTraderAssetForm(documentType: String, id :String)
-GET         /traderUpdate/assetDocument                                  controllers.FileController.updateTraderAsset(name: String, documentType: String, id: String)
+GET         /traderUpload/storeAssetDocument                             controllers.FileController.storeTraderAsset(name: String, documentType: String, issueAssetRequestID: String)
+GET         /traderUpdate/assetForm                                      controllers.FileController.updateTraderAssetForm(documentType: String, issueAssetRequestID :String)
+GET         /traderUpdate/assetDocument                                  controllers.FileController.updateTraderAsset(name: String, documentType: String, issueAssetRequestID: String)
 
-GET         /traderUpload/negotiationForm                                controllers.FileController.uploadTraderNegotiationForm(documentType: String, id: String)
+GET         /traderUpload/negotiationForm                                controllers.FileController.uploadTraderNegotiationForm(documentType: String, negotiationRequestID: String)
 POST        /traderUpload/negotiationDocument                            controllers.FileController.uploadTraderNegotiation(documentType: String)
-GET         /traderUpload/storeNegotiationDocument                       controllers.FileController.storeTraderNegotiation(name: String, documentType: String, id: String)
-GET         /traderUpdate/negotiationForm                                controllers.FileController.updateTraderNegotiationForm(documentType: String, id :String)
-GET         /traderUpdate/negotiationDocument                            controllers.FileController.updateTraderNegotiation(name: String, documentType: String, id: String)
+GET         /traderUpload/storeNegotiationDocument                       controllers.FileController.storeTraderNegotiation(name: String, documentType: String, negotiationRequestID: String)
+GET         /traderUpdate/negotiationForm                                controllers.FileController.updateTraderNegotiationForm(documentType: String, negotiationRequestID :String)
+GET         /traderUpdate/negotiationDocument                            controllers.FileController.updateTraderNegotiation(name: String, documentType: String, negotiationRequestID: String)
 
 GET         /master/addOrganization                                      controllers.AddOrganizationController.addOrganizationForm
 POST        /master/addOrganization                                      controllers.AddOrganizationController.addOrganization
@@ -186,9 +186,9 @@ POST        /master/organizationBankAccountDetail                        control
 GET         /master/userUploadOrUpdateOrganizationKYCView                controllers.AddOrganizationController.userUploadOrUpdateOrganizationKYCView
 GET         /master/userUploadOrganizationKYC                            controllers.AddOrganizationController.userUploadOrganizationKycForm(documentType: String)
 POST        /master/userUploadOrganizationKYCDocument                    controllers.AddOrganizationController.userUploadOrganizationKyc(documentType: String)
-GET         /master/storeUserOrganizationKYCDocument                     controllers.AddOrganizationController.userStoreOrganizationKyc(name: String, documentType: String, id: String)
+GET         /master/storeUserOrganizationKYCDocument                     controllers.AddOrganizationController.userStoreOrganizationKyc(name: String, documentType: String)
 GET         /master/userUpdateOrganizationKYC                            controllers.AddOrganizationController.userUpdateOrganizationKycForm(documentType: String)
-GET         /master/userUpdateOrganizationKYCDocument                    controllers.AddOrganizationController.userUpdateOrganizationKyc(name: String, documentType: String, id: String)
+GET         /master/userUpdateOrganizationKYCDocument                    controllers.AddOrganizationController.userUpdateOrganizationKyc(name: String, documentType: String)
 GET         /master/userAccessedOrganizationKYCFile                      controllers.AddOrganizationController.userAccessedOrganizationKYCFile(documentType: String)
 GET         /master/reviewOrganizationKYC                                controllers.AddOrganizationController.reviewOrganizationCompletionForm
 POST        /master/reviewOrganizationKYC                                controllers.AddOrganizationController.reviewOrganizationCompletion
@@ -203,9 +203,9 @@ GET         /master/verifyOrganization                                   control
 POST        /master/verifyOrganization                                   controllers.AddOrganizationController.verifyOrganization
 GET         /organizationUpload                                          controllers.AddOrganizationController.uploadOrganizationKycForm(documentType: String)
 POST        /organizationUpload/file                                     controllers.AddOrganizationController.uploadOrganizationKyc(documentType: String)
-GET         /organizationUpload/storeFile                                controllers.AddOrganizationController.storeOrganizationKyc(name: String, documentType: String, id: String)
+GET         /organizationUpload/storeFile                                controllers.AddOrganizationController.storeOrganizationKyc(name: String, documentType: String)
 GET         /organizationUpdate                                          controllers.AddOrganizationController.updateOrganizationKycForm(documentType: String)
-GET         /organizationUpload/updateFile                               controllers.AddOrganizationController.updateOrganizationKyc(name: String, documentType: String, id: String)
+GET         /organizationUpload/updateFile                               controllers.AddOrganizationController.updateOrganizationKyc(name: String, documentType: String)
 
 GET         /master/addZone                                              controllers.AddZoneController.addZoneForm
 POST        /master/addZone                                              controllers.AddZoneController.addZone

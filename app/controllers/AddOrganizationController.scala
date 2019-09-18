@@ -152,7 +152,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
     )
   }
 
-  def userStoreOrganizationKyc(name: String, documentType: String, id: String = ""): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
+  def userStoreOrganizationKyc(name: String, documentType: String): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
         val id = masterOrganizations.Service.getID(loginState.username)
@@ -173,7 +173,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
     Ok(views.html.component.master.updateFile(utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.userUploadOrganizationKyc), utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.userUpdateOrganizationKyc), documentType))
   }
 
-  def userUpdateOrganizationKyc(name: String, documentType: String, id: String = ""): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
+  def userUpdateOrganizationKyc(name: String, documentType: String): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
         val organizationID = masterOrganizations.Service.getID(loginState.username)
@@ -185,7 +185,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
           document = master.OrganizationKYC(id = organizationID, documentType = documentType, status = None, fileName = name, file = None),
           updateOldDocument = masterOrganizationKYCs.Service.updateOldDocument
         )
-        PartialContent(views.html.component.master.userUploadOrUpdateOrganizationKYC(masterOrganizationKYCs.Service.getAllDocuments(id)))
+        PartialContent(views.html.component.master.userUploadOrUpdateOrganizationKYC(masterOrganizationKYCs.Service.getAllDocuments(organizationID)))
       } catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
@@ -375,7 +375,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
     )
   }
 
-  def storeOrganizationKyc(name: String, documentType: String, id: String = ""): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+  def storeOrganizationKyc(name: String, documentType: String): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
         fileResourceManager.storeFile[master.OrganizationKYC](
@@ -391,7 +391,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
       }
   }
 
-  def updateOrganizationKyc(name: String, documentType: String, id: String = ""): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+  def updateOrganizationKyc(name: String, documentType: String): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
         val organizationID = masterOrganizations.Service.getID(loginState.username)

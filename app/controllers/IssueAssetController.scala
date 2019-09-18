@@ -42,7 +42,7 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
         confirmTransactionData => {
           try {
             val asset = masterTransactionIssueAssetRequests.Service.getIssueAssetByID(confirmTransactionData.requestID)
-            if (asset.physicalDocumentsHandledVia == constants.SelectOption.COMDEX) {
+            if (asset.physicalDocumentsHandledVia == constants.Form.COMDEX) {
               masterTransactionIssueAssetRequests.Service.updateStatusAndComment(confirmTransactionData.requestID, constants.Status.Asset.REQUESTED)
               Ok(views.html.index(successes = Seq(constants.Response.ISSUE_ASSET_REQUEST_SENT)))
             } else {
