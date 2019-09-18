@@ -1,7 +1,8 @@
 package constants
 
 
-object Option {
+object SelectOption {
+
   class DropdownOption(val options: Seq[String])
 
   val ASSET_TYPE = new DropdownOption(Seq("Oil", "Coal", "Gold", "Wheat"))
