@@ -68,7 +68,7 @@
         <div id="organizationKYCs">@Messages(constants.Form.ORGANIZATION_KYC_FILES): <br>
             @for(organizationKYC <- organizationKYCs) {
                 @component.master.commonDocumentViewer(organizationKYC) {
-                    @routes.AddOrganizationController.userAccessedOrganizationKYCFile(organizationKYC.documentType)
+                    @routes.FileController.userAccessedOrganizationKYCFile(organizationKYC.documentType)
                 } { } {
                     <span>@organizationKYC.documentType</span>
                 }

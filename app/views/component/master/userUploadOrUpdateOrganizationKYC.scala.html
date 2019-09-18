@@ -14,9 +14,9 @@
     }
     @for(organizationKYC <- organizationKYCs) {
         @component.master.commonDocumentViewer(organizationKYC) {
-            @routes.AddOrganizationController.userAccessedOrganizationKYCFile(organizationKYC.documentType)
+            @routes.FileController.userAccessedOrganizationKYCFile(organizationKYC.documentType)
         } {
-            <a href="@routes.AddOrganizationController.userAccessedOrganizationKYCFile(organizationKYC.documentType)">@Messages(organizationKYC.documentType)</a>
+            <a href="@routes.FileController.userAccessedOrganizationKYCFile(organizationKYC.documentType)">@Messages(organizationKYC.documentType)</a>
         } {
             <button onclick="getForm(jsRoutes.controllers.AddOrganizationController.userUpdateOrganizationKycForm('@organizationKYC.documentType'))">@Messages(constants.Form.UPDATE) @Messages(organizationKYC.documentType)</button>
             <script>hideElement('upload@organizationKYC.documentType')</script>

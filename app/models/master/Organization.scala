@@ -20,7 +20,7 @@ case class Organization(id: String, zoneID: String, accountID: String, name: Str
 @Singleton
 class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
 
-  case class OrganizationSerialized(id: String, zoneID: String, accountID: String, name: String, abbreviation: Option[String] = None, establishmentDate: Date, email: String, registeredAddress: String, postalAddress: String, ubos: Option[String] = None, completionStatus: Boolean = false, verificationStatus: Option[Boolean] = None) {
+  case class OrganizationSerialized(id: String, zoneID: String, accountID: String, name: String, abbreviation: Option[String] = None, establishmentDate: Date, email: String, registeredAddress: String, postalAddress: String, ubos: Option[String] = None, completionStatus: Boolean, verificationStatus: Option[Boolean]) {
 
     def deserialize: Organization = Organization(id = id, zoneID = zoneID, accountID = accountID, name = name, abbreviation = abbreviation, establishmentDate = establishmentDate, email = email, registeredAddress = utilities.JSON.convertJsonStringToObject[Address](registeredAddress), postalAddress = utilities.JSON.convertJsonStringToObject[Address](postalAddress), ubos = utilities.JSON.convertJsonStringToObject[UBOs](ubos.getOrElse(Json.toJson(UBOs(Seq())).toString)), completionStatus = completionStatus, verificationStatus = verificationStatus)
 
@@ -198,7 +198,7 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
 
     def create(zoneID: String, accountID: String, name: String, abbreviation: Option[String], establishmentDate: Date, email: String, registeredAddress: Address, postalAddress: Address, ubos: UBOs): String = Await.result(add(serialize(Organization(id = utilities.IDGenerator.hexadecimal, zoneID = zoneID, accountID = accountID, name = name, abbreviation = abbreviation, establishmentDate = establishmentDate, registeredAddress = registeredAddress, postalAddress = postalAddress, email = email, ubos = ubos))), Duration.Inf)
 
-    def insertOrUpdateOrganizationWithoutUBOs(zoneID: String, accountID: String, name: String, abbreviation: Option[String], establishmentDate: Date, email: String, registeredAddress: Address, postalAddress: Address): String = {
+    def insertOrUpdateWithoutUBOs(zoneID: String, accountID: String, name: String, abbreviation: Option[String], establishmentDate: Date, email: String, registeredAddress: Address, postalAddress: Address): String = {
       val id = Await.result(getIDByAccountID(accountID), Duration.Inf).getOrElse(utilities.IDGenerator.hexadecimal)
       Await.result(upsert(serialize(Organization(id = id, zoneID = zoneID, accountID = accountID, name = name, abbreviation = abbreviation, establishmentDate = establishmentDate, registeredAddress = registeredAddress, postalAddress = postalAddress, email = email, ubos = getUBOs(id)))), Duration.Inf)
       id

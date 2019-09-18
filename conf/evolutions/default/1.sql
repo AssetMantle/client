@@ -459,6 +459,8 @@ CREATE TABLE IF NOT EXISTS MASTER."Zone"
     "accountID"          VARCHAR NOT NULL UNIQUE,
     "name"               VARCHAR NOT NULL,
     "currency"           VARCHAR NOT NULL,
+    "address"            VARCHAR NOT NULL,
+    "completionStatus"   BOOLEAN NOT NULL,
     "verificationStatus" BOOLEAN,
     PRIMARY KEY ("id")
 );
@@ -696,32 +698,34 @@ ALTER TABLE BLOCKCHAIN."TraderFeedbackHistory_BC"
 ALTER TABLE BLOCKCHAIN_TRANSACTION."SetACL"
     ADD CONSTRAINT SetACL_ACL_hash FOREIGN KEY ("aclHash") REFERENCES BLOCKCHAIN."ACLHash_BC" ("hash");
 
+ALTER TABLE MASTER."Account"
+    ADD CONSTRAINT Account_BCAccount_address FOREIGN KEY ("accountAddress") REFERENCES BLOCKCHAIN."Account_BC" ("address");
+ALTER TABLE MASTER."AccountFile"
+    ADD CONSTRAINT AccountFile_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
+ALTER TABLE MASTER."AccountKYC"
+    ADD CONSTRAINT AccountKYC_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
+ALTER TABLE MASTER."Contact"
+    ADD CONSTRAINT Contact_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
+ALTER TABLE MASTER."Organization"
+    ADD CONSTRAINT Organization_Account_accountID FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");
+ALTER TABLE MASTER."Organization"
+    ADD CONSTRAINT Organization_Zone_zoneID FOREIGN KEY ("zoneID") REFERENCES MASTER."Zone" ("id");
+ALTER TABLE MASTER."OrganizationBankAccountDetail"
+    ADD CONSTRAINT OrganizationBankAccountDetail_Organization_id FOREIGN KEY ("id") REFERENCES MASTER."Organization" ("id");
+ALTER TABLE MASTER."OrganizationKYC"
+    ADD CONSTRAINT OrganizationKYC_Organization_id FOREIGN KEY ("id") REFERENCES MASTER."Organization" ("id");
 ALTER TABLE MASTER."Trader"
     ADD CONSTRAINT Trader_Account_accountID FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER."Trader"
     ADD CONSTRAINT Trader_Organization_organizationID FOREIGN KEY ("organizationID") REFERENCES MASTER."Organization" ("id");
 ALTER TABLE MASTER."Trader"
     ADD CONSTRAINT Trader_Zone_zoneID FOREIGN KEY ("zoneID") REFERENCES MASTER."Zone" ("id");
-ALTER TABLE MASTER."Organization"
-    ADD CONSTRAINT Organization_Account_accountID FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");
-ALTER TABLE MASTER."Organization"
-    ADD CONSTRAINT Organization_Zone_zoneID FOREIGN KEY ("zoneID") REFERENCES MASTER."Zone" ("id");
-ALTER TABLE MASTER."Account"
-    ADD CONSTRAINT Account_BCAccount_address FOREIGN KEY ("accountAddress") REFERENCES BLOCKCHAIN."Account_BC" ("address");
-ALTER TABLE MASTER."Contact"
-    ADD CONSTRAINT Contact_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
-ALTER TABLE MASTER."Zone"
-    ADD CONSTRAINT Zone_Account_accountID FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");
-ALTER TABLE MASTER."AccountKYC"
-    ADD CONSTRAINT AccountKYC_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
-ALTER TABLE MASTER."OrganizationKYC"
-    ADD CONSTRAINT OrganizationKYC_Organization_id FOREIGN KEY ("id") REFERENCES MASTER."Organization" ("id");
 ALTER TABLE MASTER."TraderKYC"
     ADD CONSTRAINT TraderKYC_Trader_id FOREIGN KEY ("id") REFERENCES MASTER."Trader" ("id");
-ALTER TABLE MASTER."OrganizationBankAccountDetail"
-    ADD CONSTRAINT OrganizationBankAccountDetail_Organization_id FOREIGN KEY ("id") REFERENCES MASTER."Organization" ("id");
-ALTER TABLE MASTER."AccountFile"
-    ADD CONSTRAINT AccountFile_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
+ALTER TABLE MASTER."Zone"
+    ADD CONSTRAINT Zone_Account_accountID FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");
+ALTER TABLE MASTER."ZoneKYC"
+    ADD CONSTRAINT ZoneKYC_Zone_id FOREIGN KEY ("id") REFERENCES MASTER."Zone" ("id");
 
 ALTER TABLE MASTER_TRANSACTION."AccountToken"
     ADD CONSTRAINT AccountToken_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");

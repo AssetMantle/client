@@ -22,7 +22,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
 
   private implicit val module: String = constants.Module.FILE_CONTROLLER
 
-  private val uploadZoneKycBankDetailsPath: String = configuration.get[String]("upload.zone.bankDetailsPath")
+  private val uploadZoneKycBankAccountDetailPath: String = configuration.get[String]("upload.zone.bankAccountDetailPath")
 
   private val uploadZoneKycIdentificationPath: String = configuration.get[String]("upload.zone.identificationPath")
 
@@ -217,7 +217,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
     implicit request =>
       try {
         documentType match {
-          case constants.File.BANK_DETAILS => Ok.sendFile(utilities.FileOperations.fetchFile(path = uploadZoneKycBankDetailsPath, fileName = fileName))
+          case constants.File.BANK_ACCOUNT_DETAIL => Ok.sendFile(utilities.FileOperations.fetchFile(path = uploadZoneKycBankAccountDetailPath, fileName = fileName))
           case constants.File.IDENTIFICATION => Ok.sendFile(utilities.FileOperations.fetchFile(path = uploadZoneKycIdentificationPath, fileName = fileName))
           case _ => Unauthorized
         }
@@ -266,6 +266,33 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
       } catch {
         case _: NoSuchFileException => InternalServerError(views.html.index(failures = Seq(constants.Response.NO_SUCH_FILE_EXCEPTION)))
         case _: Exception => InternalServerError(views.html.index(failures = Seq(constants.Response.GENERIC_EXCEPTION)))
+      }
+  }
+
+  def userAccessedOrganizationKYCFile(documentType: String): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      try {
+        Ok.sendFile(utilities.FileOperations.fetchFile(path = fileResourceManager.getOrganizationKycFilePath(documentType), fileName = masterOrganizationKYCs.Service.getFileName(id = masterOrganizations.Service.getID(loginState.username), documentType = documentType)))
+      } catch {
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
+  }
+
+  def userAccessedTraderKYCFile(documentType: String): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      try {
+        Ok.sendFile(utilities.FileOperations.fetchFile(path = fileResourceManager.getOrganizationKycFilePath(documentType), fileName = masterTraderKYCs.Service.getFileName(id = masterTraders.Service.getID(loginState.username), documentType = documentType)))
+      } catch {
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
+  }
+
+  def userAccessedZoneKYCFile(documentType: String): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      try {
+        Ok.sendFile(utilities.FileOperations.fetchFile(path = fileResourceManager.getZoneKycFilePath(documentType), fileName = masterZoneKYCs.Service.getFileName(id = masterZones.Service.getID(loginState.username), documentType = documentType)))
+      } catch {
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 

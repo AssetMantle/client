@@ -1,20 +1,11 @@
 function getFileTypes(documentType) {
     let fileTypes = [];
     switch (documentType) {
-        case "BANK_ACCOUNT_DETAIL":
-        case "IDENTIFICATION":
-        case "LATEST_AUDITED_FINANCIAL_REPORT":
-        case "LAST_YEAR_AUDITED_FINANCIAL_REPORT":
-        case "MANAGEMENT":
-        case "ACRA":
-        case "SHARE_STRUCTURE":
-            fileTypes = ['jpg', 'png', 'jpeg', 'pdf', 'doc', 'txt', 'docx'];
-            break;
         case "PROFILE_PICTURE":
             fileTypes = ['jpg', 'png', 'jpeg'];
             break;
         default:
-            fileTypes = ['jpg', 'png', 'jpeg'];
+            fileTypes = ['jpg', 'png', 'jpeg', 'pdf', 'doc', 'docx'];
             break;
     }
     return fileTypes

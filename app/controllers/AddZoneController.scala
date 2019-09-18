@@ -5,6 +5,7 @@ import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.{blockchain, blockchainTransaction, master}
+import models.common.Serializable._
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
@@ -21,8 +22,14 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
 
   private implicit val module: String = constants.Module.CONTROLLERS_ADD_ZONE
 
-  def addZoneForm(): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.addZone(views.companion.master.AddZone.form))
+  def addZoneForm(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      try {
+        val zone = masterZones.Service.getByAccountID(loginState.username)
+        Ok(views.html.component.master.addZone(views.companion.master.AddZone.form.fill(views.companion.master.AddZone.Data(name = zone.name, currency = zone.currency, address = views.companion.master.AddZone.AddressData(addressLine1 = zone.address.addressLine1, addressLine2 = zone.address.addressLine2, landmark = zone.address.landmark, city = zone.address.city, country = zone.address.country, zipCode = zone.address.zipCode, phone = zone.address.phone)))))
+      } catch {
+        case _: BaseException => Ok(views.html.component.master.addZone(views.companion.master.AddZone.form))
+      }
   }
 
   def addZone(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
@@ -33,8 +40,8 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
         },
         addZoneData => {
           try {
-            masterZones.Service.create(accountID = loginState.username, name = addZoneData.name, currency = addZoneData.currency)
-            withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ZONE_REQUEST_SENT)))
+            val id = masterZones.Service.insertOrUpdate(accountID = loginState.username, name = addZoneData.name, currency = addZoneData.currency, address = Address(addressLine1 = addZoneData.address.addressLine1, addressLine2 = addZoneData.address.addressLine2, landmark = addZoneData.address.landmark, city = addZoneData.address.city, country = addZoneData.address.country, zipCode = addZoneData.address.zipCode, phone = addZoneData.address.phone))
+            PartialContent(views.html.component.master.userUploadOrUpdateZoneKYC(masterZoneKYCs.Service.getAllDocuments(id)))
           }
           catch {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -142,7 +149,7 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
   def viewZonesInGenesis: Action[AnyContent] = withGenesisLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        withUsernameToken.Ok(views.html.component.master.viewZonesInGenesis(masterZones.Service.getAll))
+        withUsernameToken.Ok(views.html.component.master.viewZonesInGenesis(masterZones.Service.getAllVerified))
       }
       catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))

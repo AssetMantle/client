@@ -14,13 +14,13 @@ class FileResourceManager @Inject()()(implicit executionContext: ExecutionContex
 
   private val logger: Logger = Logger(this.getClass)
 
-  private val uploadAccountKycBankDetailsPath = configuration.get[String]("upload.account.bankDetailsPath")
+  private val uploadAccountKycBankAccountDetailPath = configuration.get[String]("upload.account.bankAccountDetailPath")
 
   private val uploadAccountKycIdentificationPath = configuration.get[String]("upload.account.identificationPath")
 
   private val uploadAccountProfilePicturePath = configuration.get[String]("upload.account.profilePicturePath")
 
-  private val uploadZoneKycBankDetailsPath = configuration.get[String]("upload.zone.bankDetailsPath")
+  private val uploadZoneKycBankAccountDetailPath = configuration.get[String]("upload.zone.bankAccountDetailPath")
 
   private val uploadZoneKycIdentificationPath = configuration.get[String]("upload.zone.identificationPath")
 
@@ -46,7 +46,7 @@ class FileResourceManager @Inject()()(implicit executionContext: ExecutionContex
 
   def getAccountKycFilePath(documentType: String): String = {
     documentType match {
-      case constants.File.BANK_DETAILS => uploadAccountKycBankDetailsPath
+      case constants.File.BANK_ACCOUNT_DETAIL => uploadAccountKycBankAccountDetailPath
       case constants.File.IDENTIFICATION => uploadAccountKycIdentificationPath
       case _ => constants.File.UNKNOWN_TYPE
     }
@@ -54,7 +54,7 @@ class FileResourceManager @Inject()()(implicit executionContext: ExecutionContex
 
   def getZoneKycFilePath(documentType: String): String = {
     documentType match {
-      case constants.File.BANK_DETAILS => uploadZoneKycBankDetailsPath
+      case constants.File.BANK_ACCOUNT_DETAIL => uploadZoneKycBankAccountDetailPath
       case constants.File.IDENTIFICATION => uploadZoneKycIdentificationPath
       case _ => constants.File.UNKNOWN_TYPE
     }

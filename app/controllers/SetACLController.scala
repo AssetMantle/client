@@ -71,7 +71,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
         addTraderData => {
           try {
             if (masterOrganizations.Service.getVerificationStatus(addTraderData.organizationID)) {
-              val id = masterTraders.Service.insertOrUpdateTrader(zoneID = addTraderData.zoneID, organizationID = addTraderData.organizationID, accountID = loginState.username, name = addTraderData.name)
+              val id = masterTraders.Service.insertOrUpdate(zoneID = addTraderData.zoneID, organizationID = addTraderData.organizationID, accountID = loginState.username, name = addTraderData.name)
               PartialContent(views.html.component.master.userUploadOrUpdateTraderKYC(masterTraderKYCs.Service.getAllDocuments(id)))
             } else {
               Unauthorized(views.html.index(failures = Seq(constants.Response.UNVERIFIED_ORGANIZATION)))
@@ -103,7 +103,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
         addTraderData => {
           try {
             if (masterOrganizations.Service.getVerificationStatus(addTraderData.organizationID)) {
-              val id = masterTraders.Service.insertOrUpdateTrader(zoneID = addTraderData.zoneID, organizationID = addTraderData.organizationID, accountID = loginState.username, name = addTraderData.name)
+              val id = masterTraders.Service.insertOrUpdate(zoneID = addTraderData.zoneID, organizationID = addTraderData.organizationID, accountID = loginState.username, name = addTraderData.name)
               PartialContent(views.html.component.master.userUploadOrUpdateTraderKYC(masterTraderKYCs.Service.getAllDocuments(id)))
             } else {
               Unauthorized(views.html.index(failures = Seq(constants.Response.UNVERIFIED_ORGANIZATION)))
@@ -182,15 +182,6 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
           updateOldDocument = masterTraderKYCs.Service.updateOldDocument
         )
         PartialContent(views.html.component.master.userUploadOrUpdateTraderKYC(masterTraderKYCs.Service.getAllDocuments(masterTraders.Service.getID(loginState.username))))
-      } catch {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-      }
-  }
-
-  def userAccessedTraderKYCFile(documentType: String): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
-    implicit request =>
-      try {
-        Ok.sendFile(utilities.FileOperations.fetchFile(path = fileResourceManager.getOrganizationKycFilePath(documentType), fileName = masterTraderKYCs.Service.getFileName(id = masterTraders.Service.getID(loginState.username), documentType = documentType)))
       } catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }

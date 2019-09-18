@@ -32,7 +32,7 @@
             <div id="traderKYCs">@Messages(constants.Form.ORGANIZATION_KYC_FILES): <br>
             @for(traderKYC <- traderKYCs) {
                 @component.master.commonDocumentViewer(traderKYC) {
-                    @routes.AddOrganizationController.userAccessedOrganizationKYCFile(traderKYC.documentType)
+                    @routes.FileController.userAccessedTraderKYCFile(traderKYC.documentType)
                 } { } {
                     <span>@traderKYC.documentType</span>
                 }

@@ -14,9 +14,9 @@
     }
     @for(traderKYC <- traderKYCs) {
         @component.master.commonDocumentViewer(traderKYC) {
-            @routes.SetACLController.userAccessedTraderKYCFile(traderKYC.documentType)
+            @routes.FileController.userAccessedTraderKYCFile(traderKYC.documentType)
         } {
-            <a href="@routes.SetACLController.userAccessedTraderKYCFile(traderKYC.documentType)">@Messages(traderKYC.documentType)</a>
+            <a href="@routes.FileController.userAccessedTraderKYCFile(traderKYC.documentType)">@Messages(traderKYC.documentType)</a>
         } {
             <button onclick="getForm(jsRoutes.controllers.SetACLController.userUpdateTraderKYCForm('@traderKYC.documentType'))">@Messages(constants.Form.UPDATE) @Messages(traderKYC.documentType)</button>
             <script>hideElement('upload@traderKYC.documentType')</script>
