@@ -79,8 +79,6 @@ class Contacts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     }
   }
 
-  def getVerifiedEmailAddressesByIDs(ids: Seq[String]): Future[Seq[String]] = db.run(contactTable.filter(_.id.inSet(ids)).filter(_.emailAddressVerified.? === Option(true)).map(_.emailAddress).result)
-
   private def updateMobileNumberVerificationStatusOnId(id: String, verificationStatus: Boolean): Future[Int] = db.run(contactTable.filter(_.id === id).map(_.mobileNumberVerified).update(verificationStatus).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -130,8 +128,6 @@ class Contacts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     def getVerifiedEmailAddress(id: String): String = Await.result(getEmailAddressById(id = id, emailAddressVerified = Option(true)), Duration.Inf)
 
     def getUnverifiedEmailAddress(id: String): String = Await.result(getEmailAddressById(id = id, emailAddressVerified = Option(false)), Duration.Inf)
-
-    def getVerifiedEmailAddresses(ids: Seq[String]): Seq[String] = Await.result(getVerifiedEmailAddressesByIDs(ids), Duration.Inf)
 
     def getMobileNumber(id: String): String = Await.result(findMobileNumberById(id), Duration.Inf)
 

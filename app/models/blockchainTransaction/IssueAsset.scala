@@ -14,7 +14,6 @@ import play.api.{Configuration, Logger}
 import queries.GetAccount
 import slick.jdbc.JdbcProfile
 import transactions.responses.TransactionResponse.BlockResponse
-import utilities.PushNotification
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
@@ -26,7 +25,7 @@ case class IssueAsset(from: String, to: String, documentHash: String, assetType:
 
 
 @Singleton
-class IssueAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Transaction, protected val databaseConfigProvider: DatabaseConfigProvider, getAccount: GetAccount, blockchainAssets: blockchain.Assets, transactionIssueAsset: transactions.IssueAsset, pushNotification: PushNotification, masterAccounts: master.Accounts, masterTransactionIssueAssetRequests: masterTransaction.IssueAssetRequests, blockchainAccounts: blockchain.Accounts)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
+class IssueAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Transaction, protected val databaseConfigProvider: DatabaseConfigProvider, getAccount: GetAccount, blockchainAssets: blockchain.Assets, transactionIssueAsset: transactions.IssueAsset,utilitiesNotification: utilities.Notification, masterAccounts: master.Accounts, masterTransactionIssueAssetRequests: masterTransaction.IssueAssetRequests, blockchainAccounts: blockchain.Accounts)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_ISSUE_ASSET
 
@@ -201,8 +200,8 @@ class IssueAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tra
           }
         }))
         blockchainAccounts.Service.markDirty(issueAsset.from)
-        pushNotification.sendNotification(masterAccounts.Service.getId(issueAsset.to), constants.Notification.SUCCESS, blockResponse.txhash)
-        pushNotification.sendNotification(masterAccounts.Service.getId(issueAsset.from), constants.Notification.SUCCESS, blockResponse.txhash)
+        utilitiesNotification.send(masterAccounts.Service.getId(issueAsset.to), constants.Notification.SUCCESS, blockResponse.txhash)
+        utilitiesNotification.send(masterAccounts.Service.getId(issueAsset.from), constants.Notification.SUCCESS, blockResponse.txhash)
       } catch {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
           throw new BaseException(constants.Response.PSQL_EXCEPTION)
@@ -215,8 +214,8 @@ class IssueAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tra
         Service.markTransactionFailed(ticketID, message)
         val issueAsset = Service.getTransaction(ticketID)
         masterTransactionIssueAssetRequests.Service.updatePegHashAndStatusByTicketID(ticketID, None, constants.Status.Asset.FAILED)
-        pushNotification.sendNotification(masterAccounts.Service.getId(issueAsset.to), constants.Notification.FAILURE, message)
-        pushNotification.sendNotification(masterAccounts.Service.getId(issueAsset.from), constants.Notification.FAILURE, message)
+        utilitiesNotification.send(masterAccounts.Service.getId(issueAsset.to), constants.Notification.FAILURE, message)
+        utilitiesNotification.send(masterAccounts.Service.getId(issueAsset.from), constants.Notification.FAILURE, message)
       } catch {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }

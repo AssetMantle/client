@@ -111,6 +111,8 @@ object Response {
   val GAS_NOT_GIVEN = new Failure("GAS_NOT_GIVEN")
   val ALL_KYC_FILES_NOT_VERIFIED = new Failure("ALL_KYC_FILES_NOT_VERIFIED")
   val ALL_ASSET_FILES_NOT_VERIFIED = new Failure("ALL_KYC_FILES_NOT_VERIFIED")
+  val SMS_SEND_FAILED = new Failure("SMS_SEND_FAILED")
+  val SMS_SERVICE_CONNECTION_FAILURE = new Failure("SMS_SERVICE_CONNECTION_FAILURE")
 
   class Failure(private val response: String, private val actionController: JavaScriptReverseRoute = null) {
     val message: String = PREFIX + FAILURE_PREFIX + response

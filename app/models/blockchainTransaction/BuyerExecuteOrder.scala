@@ -11,7 +11,6 @@ import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
 import transactions.responses.TransactionResponse.BlockResponse
-import utilities.PushNotification
 
 import scala.concurrent.duration.{Duration, _}
 import scala.concurrent.{Await, ExecutionContext, Future}
@@ -22,7 +21,7 @@ case class BuyerExecuteOrder(from: String, buyerAddress: String, sellerAddress: 
 }
 
 @Singleton
-class BuyerExecuteOrders @Inject()(actorSystem: ActorSystem, transaction: utilities.Transaction, protected val databaseConfigProvider: DatabaseConfigProvider, blockchainTransactionFeedbacks: blockchain.TransactionFeedbacks, blockchainNegotiations: blockchain.Negotiations, blockchainOrders: blockchain.Orders, transactionBuyerExecuteOrder: transactions.BuyerExecuteOrder, pushNotification: PushNotification, masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
+class BuyerExecuteOrders @Inject()(actorSystem: ActorSystem, transaction: utilities.Transaction, protected val databaseConfigProvider: DatabaseConfigProvider, blockchainTransactionFeedbacks: blockchain.TransactionFeedbacks, blockchainNegotiations: blockchain.Negotiations, blockchainOrders: blockchain.Orders, transactionBuyerExecuteOrder: transactions.BuyerExecuteOrder, utilitiesNotification: utilities.Notification, masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_BUYER_EXECUTE_ORDER
 
@@ -183,11 +182,11 @@ class BuyerExecuteOrders @Inject()(actorSystem: ActorSystem, transaction: utilit
         blockchainAccounts.Service.markDirty(buyerExecuteOrder.buyerAddress)
         blockchainTransactionFeedbacks.Service.markDirty(buyerExecuteOrder.buyerAddress)
         blockchainTransactionFeedbacks.Service.markDirty(buyerExecuteOrder.sellerAddress)
-        pushNotification.sendNotification(masterAccounts.Service.getId(buyerExecuteOrder.sellerAddress), constants.Notification.SUCCESS, blockResponse.txhash)
-        pushNotification.sendNotification(masterAccounts.Service.getId(buyerExecuteOrder.buyerAddress), constants.Notification.SUCCESS, blockResponse.txhash)
+        utilitiesNotification.send(masterAccounts.Service.getId(buyerExecuteOrder.sellerAddress), constants.Notification.SUCCESS, blockResponse.txhash)
+        utilitiesNotification.send(masterAccounts.Service.getId(buyerExecuteOrder.buyerAddress), constants.Notification.SUCCESS, blockResponse.txhash)
         if (buyerExecuteOrder.from != buyerExecuteOrder.buyerAddress) {
           blockchainAccounts.Service.markDirty(buyerExecuteOrder.from)
-          pushNotification.sendNotification(masterAccounts.Service.getId(buyerExecuteOrder.from), constants.Notification.SUCCESS, blockResponse.txhash)
+          utilitiesNotification.send(masterAccounts.Service.getId(buyerExecuteOrder.from), constants.Notification.SUCCESS, blockResponse.txhash)
         }
       } catch {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
@@ -201,11 +200,11 @@ class BuyerExecuteOrders @Inject()(actorSystem: ActorSystem, transaction: utilit
         val buyerExecuteOrder = Service.getTransaction(ticketID)
         blockchainTransactionFeedbacks.Service.markDirty(buyerExecuteOrder.buyerAddress)
         blockchainTransactionFeedbacks.Service.markDirty(buyerExecuteOrder.sellerAddress)
-        pushNotification.sendNotification(masterAccounts.Service.getId(buyerExecuteOrder.sellerAddress), constants.Notification.FAILURE, message)
-        pushNotification.sendNotification(masterAccounts.Service.getId(buyerExecuteOrder.buyerAddress), constants.Notification.FAILURE, message)
+        utilitiesNotification.send(masterAccounts.Service.getId(buyerExecuteOrder.sellerAddress), constants.Notification.FAILURE, message)
+        utilitiesNotification.send(masterAccounts.Service.getId(buyerExecuteOrder.buyerAddress), constants.Notification.FAILURE, message)
         if (buyerExecuteOrder.from != buyerExecuteOrder.buyerAddress) {
           blockchainAccounts.Service.markDirty(buyerExecuteOrder.from)
-          pushNotification.sendNotification(masterAccounts.Service.getId(buyerExecuteOrder.from), constants.Notification.FAILURE, message)
+          utilitiesNotification.send(masterAccounts.Service.getId(buyerExecuteOrder.from), constants.Notification.FAILURE, message)
         }
       } catch {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)

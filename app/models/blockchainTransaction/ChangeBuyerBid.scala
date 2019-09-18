@@ -14,7 +14,6 @@ import play.api.{Configuration, Logger}
 import queries.{GetNegotiation, GetNegotiationID}
 import slick.jdbc.JdbcProfile
 import transactions.responses.TransactionResponse.BlockResponse
-import utilities.PushNotification
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
@@ -26,7 +25,7 @@ case class ChangeBuyerBid(from: String, to: String, bid: Int, time: Int, pegHash
 
 
 @Singleton
-class ChangeBuyerBids @Inject()(actorSystem: ActorSystem, transaction: utilities.Transaction, protected val databaseConfigProvider: DatabaseConfigProvider, blockchainTransactionFeedbacks: blockchain.TransactionFeedbacks, getNegotiation: GetNegotiation, getNegotiationID: GetNegotiationID, blockchainNegotiations: blockchain.Negotiations, transactionChangeBuyerBid: transactions.ChangeBuyerBid, pushNotification: PushNotification, masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
+class ChangeBuyerBids @Inject()(actorSystem: ActorSystem, transaction: utilities.Transaction, protected val databaseConfigProvider: DatabaseConfigProvider, blockchainTransactionFeedbacks: blockchain.TransactionFeedbacks, getNegotiation: GetNegotiation, getNegotiationID: GetNegotiationID, blockchainNegotiations: blockchain.Negotiations, transactionChangeBuyerBid: transactions.ChangeBuyerBid, utilitiesNotification: utilities.Notification, masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_CHANGE_BUYER_BID
 
@@ -189,8 +188,8 @@ class ChangeBuyerBids @Inject()(actorSystem: ActorSystem, transaction: utilities
         blockchainAccounts.Service.markDirty(changeBuyerBid.from)
         blockchainTransactionFeedbacks.Service.markDirty(changeBuyerBid.from)
         blockchainTransactionFeedbacks.Service.markDirty(changeBuyerBid.to)
-        pushNotification.sendNotification(masterAccounts.Service.getId(changeBuyerBid.to), constants.Notification.SUCCESS, blockResponse.txhash)
-        pushNotification.sendNotification(masterAccounts.Service.getId(changeBuyerBid.from), constants.Notification.SUCCESS, blockResponse.txhash)
+        utilitiesNotification.send(masterAccounts.Service.getId(changeBuyerBid.to), constants.Notification.SUCCESS, blockResponse.txhash)
+        utilitiesNotification.send(masterAccounts.Service.getId(changeBuyerBid.from), constants.Notification.SUCCESS, blockResponse.txhash)
       } catch {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
           throw new BaseException(constants.Response.PSQL_EXCEPTION)
@@ -204,8 +203,8 @@ class ChangeBuyerBids @Inject()(actorSystem: ActorSystem, transaction: utilities
         val changeBuyerBid = Service.getTransaction(ticketID)
         blockchainTransactionFeedbacks.Service.markDirty(changeBuyerBid.from)
         blockchainTransactionFeedbacks.Service.markDirty(changeBuyerBid.to)
-        pushNotification.sendNotification(masterAccounts.Service.getId(changeBuyerBid.to), constants.Notification.FAILURE, message)
-        pushNotification.sendNotification(masterAccounts.Service.getId(changeBuyerBid.from), constants.Notification.FAILURE, message)
+        utilitiesNotification.send(masterAccounts.Service.getId(changeBuyerBid.to), constants.Notification.FAILURE, message)
+        utilitiesNotification.send(masterAccounts.Service.getId(changeBuyerBid.from), constants.Notification.FAILURE, message)
       } catch {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }

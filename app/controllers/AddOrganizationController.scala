@@ -12,13 +12,12 @@ import models.{blockchain, blockchainTransaction, master}
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
-import utilities.PushNotification
 import views.companion.master.FileUpload
 
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class AddOrganizationController @Inject()(messagesControllerComponents: MessagesControllerComponents, withOrganizationLoginAction: WithOrganizationLoginAction, fileResourceManager: utilities.FileResourceManager, transaction: utilities.Transaction, masterOrganizationBankAccountDetails: master.OrganizationBankAccountDetails, pushNotification: PushNotification, blockchainAccounts: blockchain.Accounts, masterOrganizationKYCs: master.OrganizationKYCs, masterTraders: master.Traders, transactionsAddOrganization: transactions.AddOrganization, blockchainOrganizations: blockchain.Organizations, masterZones: master.Zones, blockchainTransactionAddOrganizations: blockchainTransaction.AddOrganizations, masterOrganizations: master.Organizations, masterAccounts: master.Accounts, withUserLoginAction: WithUserLoginAction, withZoneLoginAction: WithZoneLoginAction, withGenesisLoginAction: WithGenesisLoginAction, withUsernameToken: WithUsernameToken)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class AddOrganizationController @Inject()(messagesControllerComponents: MessagesControllerComponents, withOrganizationLoginAction: WithOrganizationLoginAction, fileResourceManager: utilities.FileResourceManager, transaction: utilities.Transaction, masterOrganizationBankAccountDetails: master.OrganizationBankAccountDetails, utilitiesNotification: utilities.Notification, blockchainAccounts: blockchain.Accounts, masterOrganizationKYCs: master.OrganizationKYCs, masterTraders: master.Traders, transactionsAddOrganization: transactions.AddOrganization, blockchainOrganizations: blockchain.Organizations, masterZones: master.Zones, blockchainTransactionAddOrganizations: blockchainTransaction.AddOrganizations, masterOrganizations: master.Organizations, masterAccounts: master.Accounts, withUserLoginAction: WithUserLoginAction, withZoneLoginAction: WithZoneLoginAction, withGenesisLoginAction: WithGenesisLoginAction, withUsernameToken: WithUsernameToken)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
@@ -288,7 +287,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
     implicit request =>
       try {
         masterOrganizationKYCs.Service.verify(id = organizationID, documentType = documentType)
-        pushNotification.sendNotification(username = masterOrganizations.Service.getAccountId(organizationID), notification = constants.Notification.SUCCESS, messageParameters = Messages(constants.Response.DOCUMENT_APPROVED.message))
+        utilitiesNotification.send(accountID = masterOrganizations.Service.getAccountId(organizationID), notification = constants.Notification.SUCCESS, Messages(constants.Response.DOCUMENT_APPROVED.message))
         withUsernameToken.Ok(Messages(constants.Response.SUCCESS.message))
       } catch {
         case baseException: BaseException => InternalServerError(Messages(baseException.failure.message))
@@ -299,7 +298,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
     implicit request =>
       try {
         masterOrganizationKYCs.Service.reject(id = organizationID, documentType = documentType)
-        pushNotification.sendNotification(username = masterOrganizations.Service.getAccountId(organizationID), notification = constants.Notification.FAILURE, messageParameters = Messages(constants.Response.DOCUMENT_REJECTED.message))
+        utilitiesNotification.send(accountID = masterOrganizations.Service.getAccountId(organizationID), notification = constants.Notification.FAILURE, Messages(constants.Response.DOCUMENT_REJECTED.message))
         withUsernameToken.Ok(Messages(constants.Response.SUCCESS.message))
       } catch {
         case baseException: BaseException => InternalServerError(Messages(baseException.failure.message))
