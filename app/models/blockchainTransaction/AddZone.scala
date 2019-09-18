@@ -10,7 +10,6 @@ import play.api.db.slick.DatabaseConfigProvider
 import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
 import transactions.responses.TransactionResponse.BlockResponse
-import utilities.PushNotification
 
 import scala.concurrent.duration.{Duration, _}
 import scala.concurrent.{Await, ExecutionContext, Future}
@@ -21,7 +20,7 @@ case class AddZone(from: String, to: String, zoneID: String, gas: Int, status: O
 }
 
 @Singleton
-class AddZones @Inject()(actorSystem: ActorSystem, transaction: utilities.Transaction, protected val databaseConfigProvider: DatabaseConfigProvider, masterZoneKYCs: master.ZoneKYCs, transactionAddZone: transactions.AddZone, pushNotification: PushNotification, masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts, blockchainZones: models.blockchain.Zones, masterZones: master.Zones)(implicit configuration: Configuration, executionContext: ExecutionContext) {
+class AddZones @Inject()(actorSystem: ActorSystem, transaction: utilities.Transaction, protected val databaseConfigProvider: DatabaseConfigProvider, masterZoneKYCs: master.ZoneKYCs, transactionAddZone: transactions.AddZone, utilitiesNotification: utilities.Notification, masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts, blockchainZones: models.blockchain.Zones, masterZones: master.Zones)(implicit configuration: Configuration, executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_ADD_ZONE
 
@@ -178,8 +177,8 @@ class AddZones @Inject()(actorSystem: ActorSystem, transaction: utilities.Transa
         val zoneAccountId = masterAccounts.Service.getId(addZone.to)
         masterZoneKYCs.Service.verifyAll(zoneAccountId)
         blockchainAccounts.Service.markDirty(addZone.from)
-        pushNotification.sendNotification(zoneAccountId, constants.Notification.SUCCESS, blockResponse.txhash)
-        pushNotification.sendNotification(masterAccounts.Service.getId(addZone.from), constants.Notification.SUCCESS, blockResponse.txhash)
+        utilitiesNotification.send(zoneAccountId, constants.Notification.SUCCESS, blockResponse.txhash)
+        utilitiesNotification.send(masterAccounts.Service.getId(addZone.from), constants.Notification.SUCCESS, blockResponse.txhash)
       } catch {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
           throw new BaseException(constants.Response.PSQL_EXCEPTION)
@@ -190,8 +189,8 @@ class AddZones @Inject()(actorSystem: ActorSystem, transaction: utilities.Transa
       try {
         Service.markTransactionFailed(ticketID, message)
         val addZone = Service.getTransaction(ticketID)
-        pushNotification.sendNotification(masterAccounts.Service.getId(addZone.to), constants.Notification.FAILURE, message)
-        pushNotification.sendNotification(masterAccounts.Service.getId(addZone.from), constants.Notification.FAILURE, message)
+        utilitiesNotification.send(masterAccounts.Service.getId(addZone.to), constants.Notification.FAILURE, message)
+        utilitiesNotification.send(masterAccounts.Service.getId(addZone.from), constants.Notification.FAILURE, message)
       } catch {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
