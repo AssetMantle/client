@@ -10,17 +10,15 @@ import play.api.i18n.I18nSupport
 import play.api.libs.ws.WSClient
 import play.api.mvc._
 import play.api.{Configuration, Logger}
-import utilities.{Email, PushNotification}
 import views.companion.master.{Login, Logout, NoteNewKeyDetails, SignUp}
 
 import scala.concurrent.ExecutionContext
 
 @Singleton
 class AccountController @Inject()(
-                                   email: Email,
+                                   utilitiesNotification: utilities.Notification,
                                    shutdownActor: ShutdownActor,
                                    withLoginAction: WithLoginAction,
-                                   pushNotification: PushNotification,
                                    withUsernameToken: WithUsernameToken,
                                    queryGetAccount: queries.GetAccount,
                                    blockchainFiats: blockchain.Fiats,
@@ -90,8 +88,8 @@ class AccountController @Inject()(
           val address = masterAccounts.Service.getAddress(loginData.username)
           implicit val loginState: LoginState = LoginState(loginData.username, userType, address, if (userType == constants.User.TRADER) Option(blockchainAclHashes.Service.getACL(blockchainAclAccounts.Service.getACLHash(address))) else None)
           val contactWarnings: Seq[constants.Response.Warning] = utilities.Contact.getWarnings(masterAccounts.Service.validateLoginAndGetStatus(loginData.username, loginData.password))
-          pushNotification.registerNotificationToken(loginData.username, loginData.notificationToken)
-          pushNotification.sendNotification(loginData.username, constants.Notification.LOGIN, loginData.username)
+          utilitiesNotification.registerNotificationToken(loginData.username, loginData.notificationToken)
+          utilitiesNotification.send(loginData.username, constants.Notification.LOGIN, loginData.username)
           loginState.userType match {
             case constants.User.GENESIS =>
               withUsernameToken.Ok(views.html.genesisIndex(warnings = contactWarnings))
@@ -193,7 +191,7 @@ class AccountController @Inject()(
       emailOTPForgotPasswordData => {
         try {
           val otp = masterTransactionEmailOTP.Service.sendOTP(emailOTPForgotPasswordData.username)
-          email.sendEmail(toAccountID = emailOTPForgotPasswordData.username, email = constants.Email.FORGOT_PASSWORD_EMAIL_OTP, messageParameters = Seq(otp) )
+          utilitiesNotification.send(accountID = emailOTPForgotPasswordData.username, notification = constants.Notification.FORGOT_PASSWORD_OTP, otp)
           PartialContent(views.html.component.master.forgotPassword(views.companion.master.ForgotPassword.form, emailOTPForgotPasswordData.username))
         }
         catch {

@@ -12,7 +12,6 @@ import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.{JsValue, Json}
 import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
-import utilities.PushNotification
 
 import scala.concurrent.duration.{Duration, _}
 import scala.concurrent.{Await, ExecutionContext, Future}
@@ -23,7 +22,7 @@ case class Order(id: String, fiatProofHash: Option[String], awbProofHash: Option
 case class OrderCometMessage(username: String, message: JsValue)
 
 @Singleton
-class Orders @Inject()(shutdownActors: ShutdownActor, masterAccounts: master.Accounts, actorSystem: ActorSystem, protected val databaseConfigProvider: DatabaseConfigProvider, getAccount: queries.GetAccount, blockchainNegotiations: Negotiations, blockchainTraderFeedbackHistories: TraderFeedbackHistories, blockchainAssets: Assets, blockchainFiats: Fiats, getOrder: queries.GetOrder, implicit val pushNotification: PushNotification)(implicit executionContext: ExecutionContext, configuration: Configuration) {
+class Orders @Inject()(shutdownActors: ShutdownActor, masterAccounts: master.Accounts, actorSystem: ActorSystem, protected val databaseConfigProvider: DatabaseConfigProvider, getAccount: queries.GetAccount, blockchainNegotiations: Negotiations, blockchainTraderFeedbackHistories: TraderFeedbackHistories, blockchainAssets: Assets, blockchainFiats: Fiats, getOrder: queries.GetOrder, implicit val utilitiesNotification: utilities.Notification)(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 

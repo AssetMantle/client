@@ -15,7 +15,6 @@ import play.api.{Configuration, Logger}
 import queries.{GetAccount, GetOrder}
 import slick.jdbc.JdbcProfile
 import transactions.responses.TransactionResponse.BlockResponse
-import utilities.PushNotification
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
@@ -27,7 +26,7 @@ case class SendAsset(from: String, to: String, pegHash: String, gas: Int, status
 
 
 @Singleton
-class SendAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Transaction, protected val databaseConfigProvider: DatabaseConfigProvider, getAccount: GetAccount, getOrder: GetOrder, blockchainTransactionFeedbacks: blockchain.TransactionFeedbacks, blockchainAssets: blockchain.Assets, blockchainOrders: blockchain.Orders, blockchainNegotiations: blockchain.Negotiations, transactionSendAsset: transactions.SendAsset, pushNotification: PushNotification, masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
+class SendAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Transaction, protected val databaseConfigProvider: DatabaseConfigProvider, getAccount: GetAccount, getOrder: GetOrder, blockchainTransactionFeedbacks: blockchain.TransactionFeedbacks, blockchainAssets: blockchain.Assets, blockchainOrders: blockchain.Orders, blockchainNegotiations: blockchain.Negotiations, transactionSendAsset: transactions.SendAsset, utilitiesNotification: utilities.Notification, masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_SEND_ASSET
 
@@ -191,8 +190,8 @@ class SendAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
         orderResponse.value.assetPegWallet.foreach(assets => assets.foreach(asset => blockchainAssets.Service.insertOrUpdate(pegHash = asset.pegHash, documentHash = asset.documentHash, assetType = asset.assetType, assetPrice = asset.assetPrice, assetQuantity = asset.assetQuantity, quantityUnit = asset.quantityUnit, locked = asset.locked, moderated = asset.moderated, ownerAddress = negotiationID, takerAddress = if (asset.takerAddress == "") None else Option(asset.takerAddress), dirtyBit = false)))
         blockchainAccounts.Service.markDirty(sendAsset.from)
         blockchainTransactionFeedbacks.Service.markDirty(sendAsset.from)
-        pushNotification.sendNotification(masterAccounts.Service.getId(sendAsset.to), constants.Notification.SUCCESS, blockResponse.txhash)
-        pushNotification.sendNotification(masterAccounts.Service.getId(sendAsset.from), constants.Notification.SUCCESS, blockResponse.txhash)
+        utilitiesNotification.send(masterAccounts.Service.getId(sendAsset.to), constants.Notification.SUCCESS, blockResponse.txhash)
+        utilitiesNotification.send(masterAccounts.Service.getId(sendAsset.from), constants.Notification.SUCCESS, blockResponse.txhash)
       } catch {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
           throw new BaseException(constants.Response.PSQL_EXCEPTION)
@@ -205,8 +204,8 @@ class SendAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
         Service.markTransactionFailed(ticketID, message)
         val sendAsset = Service.getTransaction(ticketID)
         blockchainTransactionFeedbacks.Service.markDirty(masterAccounts.Service.getAddress(sendAsset.from))
-        pushNotification.sendNotification(masterAccounts.Service.getId(sendAsset.to), constants.Notification.FAILURE, message)
-        pushNotification.sendNotification(masterAccounts.Service.getId(sendAsset.from), constants.Notification.FAILURE, message)
+        utilitiesNotification.send(masterAccounts.Service.getId(sendAsset.to), constants.Notification.FAILURE, message)
+        utilitiesNotification.send(masterAccounts.Service.getId(sendAsset.from), constants.Notification.FAILURE, message)
       } catch {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }

@@ -11,7 +11,6 @@ import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
 import transactions.responses.TransactionResponse.BlockResponse
-import utilities.PushNotification
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
@@ -23,7 +22,7 @@ case class SetSellerFeedback(from: String, to: String, pegHash: String, rating: 
 
 
 @Singleton
-class SetSellerFeedbacks @Inject()(actorSystem: ActorSystem, transaction: utilities.Transaction, protected val databaseConfigProvider: DatabaseConfigProvider, transactionSetSellerFeedback: transactions.SetSellerFeedback, pushNotification: PushNotification, masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts, blockchainTraderFeedbackHistories: blockchain.TraderFeedbackHistories)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
+class SetSellerFeedbacks @Inject()(actorSystem: ActorSystem, transaction: utilities.Transaction, protected val databaseConfigProvider: DatabaseConfigProvider, transactionSetSellerFeedback: transactions.SetSellerFeedback, utilitiesNotification: utilities.Notification, masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts, blockchainTraderFeedbackHistories: blockchain.TraderFeedbackHistories)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_SET_SELLER_FEEDBACK
 
@@ -179,8 +178,8 @@ class SetSellerFeedbacks @Inject()(actorSystem: ActorSystem, transaction: utilit
         val setSellerFeedback = Service.getTransaction(ticketID)
         blockchainTraderFeedbackHistories.Service.update(setSellerFeedback.to, setSellerFeedback.to, setSellerFeedback.from, setSellerFeedback.pegHash, setSellerFeedback.rating.toString)
         blockchainAccounts.Service.markDirty(setSellerFeedback.from)
-        pushNotification.sendNotification(masterAccounts.Service.getId(setSellerFeedback.to), constants.Notification.SUCCESS, blockResponse.txhash)
-        pushNotification.sendNotification(masterAccounts.Service.getId(setSellerFeedback.from), constants.Notification.SUCCESS, blockResponse.txhash)
+        utilitiesNotification.send(masterAccounts.Service.getId(setSellerFeedback.to), constants.Notification.SUCCESS, blockResponse.txhash)
+        utilitiesNotification.send(masterAccounts.Service.getId(setSellerFeedback.from), constants.Notification.SUCCESS, blockResponse.txhash)
       } catch {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
           throw new BaseException(constants.Response.PSQL_EXCEPTION)
@@ -191,8 +190,8 @@ class SetSellerFeedbacks @Inject()(actorSystem: ActorSystem, transaction: utilit
       try {
         Service.markTransactionFailed(ticketID, message)
         val setSellerFeedback = Service.getTransaction(ticketID)
-        pushNotification.sendNotification(masterAccounts.Service.getId(setSellerFeedback.to), constants.Notification.FAILURE, message)
-        pushNotification.sendNotification(masterAccounts.Service.getId(setSellerFeedback.from), constants.Notification.FAILURE, message)
+        utilitiesNotification.send(masterAccounts.Service.getId(setSellerFeedback.to), constants.Notification.FAILURE, message)
+        utilitiesNotification.send(masterAccounts.Service.getId(setSellerFeedback.from), constants.Notification.FAILURE, message)
       } catch {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }

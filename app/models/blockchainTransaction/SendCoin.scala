@@ -13,7 +13,6 @@ import play.api.{Configuration, Logger}
 import queries.GetAccount
 import slick.jdbc.JdbcProfile
 import transactions.responses.TransactionResponse.BlockResponse
-import utilities.PushNotification
 
 import scala.concurrent.duration.{Duration, _}
 import scala.concurrent.{Await, ExecutionContext, Future}
@@ -25,7 +24,7 @@ case class SendCoin(from: String, to: String, amount: Int, gas: Int, status: Opt
 
 
 @Singleton
-class SendCoins @Inject()(actorSystem: ActorSystem, transaction: utilities.Transaction, protected val databaseConfigProvider: DatabaseConfigProvider, transactionSendCoin: transactions.SendCoin, pushNotification: PushNotification, masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts, implicit val faucetRequests: FaucetRequests, implicit val getAccount: GetAccount)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
+class SendCoins @Inject()(actorSystem: ActorSystem, transaction: utilities.Transaction, protected val databaseConfigProvider: DatabaseConfigProvider, transactionSendCoin: transactions.SendCoin, utilitiesNotification: utilities.Notification, masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts, implicit val faucetRequests: FaucetRequests, implicit val getAccount: GetAccount)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -181,8 +180,8 @@ class SendCoins @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
         if (toAccount.userType == constants.User.UNKNOWN) {
           masterAccounts.Service.updateUserType(toAccount.id, constants.User.USER)
         }
-        pushNotification.sendNotification(toAccount.id, constants.Notification.SUCCESS, blockResponse.txhash)
-        pushNotification.sendNotification(masterAccounts.Service.getId(sendCoin.from), constants.Notification.SUCCESS, blockResponse.txhash)
+        utilitiesNotification.send(toAccount.id, constants.Notification.SUCCESS, blockResponse.txhash)
+        utilitiesNotification.send(masterAccounts.Service.getId(sendCoin.from), constants.Notification.SUCCESS, blockResponse.txhash)
       }
       catch {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
@@ -194,8 +193,8 @@ class SendCoins @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
       try {
         Service.markTransactionFailed(ticketID, message)
         val sendCoin = Service.getTransaction(ticketID)
-        pushNotification.sendNotification(masterAccounts.Service.getId(sendCoin.to), constants.Notification.FAILURE, message)
-        pushNotification.sendNotification(masterAccounts.Service.getId(sendCoin.from), constants.Notification.FAILURE, message)
+        utilitiesNotification.send(masterAccounts.Service.getId(sendCoin.to), constants.Notification.FAILURE, message)
+        utilitiesNotification.send(masterAccounts.Service.getId(sendCoin.from), constants.Notification.FAILURE, message)
       } catch {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
