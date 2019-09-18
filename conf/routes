@@ -80,6 +80,7 @@ GET         /master/component/viewZonesInGenesis                         control
 
 GET         /master/getGenesisAccessedFile                               controllers.FileController.genesisAccessedFile(fileName: String, documentType: String)
 GET         /master/zoneAccessedOrganizationKYCFile                      controllers.FileController.zoneAccessedOrganizationKYCFile(organizationID: String, fileName: String, documentType: String)
+GET         /master/zoneAccessedAssetFile                                controllers.FileController.zoneAccessedAssetFile(id: String, fileName: String, documentType: String)
 GET         /master/organizationAccessedTraderKYCFile                    controllers.FileController.organizationAccessedTraderKYCFile(accountID: String, fileName: String, documentType: String)
 GET         /master/getZoneAccessedTraderFile                            controllers.FileController.zoneAccessedTraderKYCFile(accountID: String, fileName: String, documentType: String)
 GET         /master/file                                                 controllers.FileController.file(fileName: String, documentType: String)

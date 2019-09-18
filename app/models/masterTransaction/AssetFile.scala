@@ -61,7 +61,7 @@ class AssetFiles @Inject()(protected val databaseConfigProvider: DatabaseConfigP
   }
   private def serialize(assetFileTrait: AssetFile): AssetFileSerialized = AssetFileSerialized(assetFileTrait.id, assetFileTrait.documentType, assetFileTrait.fileName, assetFileTrait.file, if(assetFileTrait.context.isDefined) Option (helper(assetFileTrait.context.get).toString) else None, assetFileTrait.status)
 
-  def helper(models: models.Trait.Context): Either[JsValue, String] =  Left(Json.toJson(models))
+  def helper(context: models.Trait.Context): Either[JsValue, String] =  Left(Json.toJson(context))
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 

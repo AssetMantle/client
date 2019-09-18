@@ -90,7 +90,8 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
           try {
             val id = if (issueAssetDetailData.requestID.isEmpty) utilities.IDGenerator.requestID() else issueAssetDetailData.requestID.get
             masterTransactionIssueAssetRequests.Service.insertOrUpdate(id = id, ticketID = None, pegHash = None, accountID = loginState.username, documentHash = issueAssetDetailData.documentHash, assetType = issueAssetDetailData.assetType, quantityUnit = issueAssetDetailData.quantityUnit, assetQuantity = issueAssetDetailData.assetQuantity, assetPrice = issueAssetDetailData.assetPrice, takerAddress = issueAssetDetailData.takerAddress, shipmentDetails = Serializable.ShipmentDetails(issueAssetDetailData.commodityName, issueAssetDetailData.quality, issueAssetDetailData.deliveryTerm, issueAssetDetailData.tradeType, issueAssetDetailData.portOfLoading, issueAssetDetailData.portOfDischarge, issueAssetDetailData.shipmentDate), physicalDocumentsHandledVia = issueAssetDetailData.physicalDocumentsHandledVia, paymentTerms = issueAssetDetailData.comdexPaymentTerms, status = constants.Status.Asset.INCOMPLETE_DETAILS)
-            val obl = utilities.JSON.convertJsonStringToObject[Serializable.OBL](masterTransactionAssetFiles.Service.getOrEmpty(id, constants.File.OBL).context.getOrElse(Json.toJson(Serializable.OBL("", "", "", "", "", "", new Date, "", 0, 0)).toString))
+            val oblFile = masterTransactionAssetFiles.Service.getOrEmpty(id, constants.File.OBL)
+            val obl = oblFile.context.getOrElse(Serializable.OBL("", "", "", "", "", "", new Date, "", 0, 0)).asInstanceOf[Serializable.OBL]
             PartialContent(views.html.component.master.issueAssetOBL(views.companion.master.IssueAssetOBL.form.fill(views.companion.master.IssueAssetOBL.Data(id, obl.billOfLadingID, obl.portOfLoading, obl.shipperName, obl.shipperAddress, obl.notifyPartyName, obl.notifyPartyAddress, obl.dateOfShipping, obl.deliveryTerm, obl.weightOfConsignment, obl.declaredAssetValue)), masterTransactionAssetFiles.Service.getOrNone(id, constants.File.OBL)))
           }
           catch {
@@ -103,7 +104,8 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
 
   def issueAssetOBLForm(id: String): Action[AnyContent] = Action {
     implicit request =>
-      val obl = Json.parse(masterTransactionAssetFiles.Service.getOrEmpty(id, constants.File.OBL).context.getOrElse(Json.toJson(Serializable.OBL("", "", "", "", "", "", new Date, "", 0, 0)).toString)).as[Serializable.OBL]
+      val oblFile = masterTransactionAssetFiles.Service.getOrEmpty(id, constants.File.OBL)
+      val obl = oblFile.context.getOrElse(Serializable.OBL("", "", "", "", "", "", new Date, "", 0, 0)).asInstanceOf[Serializable.OBL]
       Ok(views.html.component.master.issueAssetOBL(views.companion.master.IssueAssetOBL.form.fill(views.companion.master.IssueAssetOBL.Data(id, obl.billOfLadingID, obl.portOfLoading, obl.shipperName, obl.shipperAddress, obl.notifyPartyName, obl.notifyPartyAddress, obl.dateOfShipping, obl.deliveryTerm, obl.weightOfConsignment, obl.declaredAssetValue)), masterTransactionAssetFiles.Service.getOrNone(id, constants.File.OBL)))
   }
 
@@ -117,9 +119,9 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
           issueAssetOBLData => {
             try {
               if (masterTransactionAssetFiles.Service.checkFileExists(issueAssetOBLData.requestID, constants.File.OBL)) {
-                masterTransactionAssetFiles.Service.insertOrUpdateContext(masterTransaction.AssetFile(issueAssetOBLData.requestID, constants.File.OBL, "", None, Option(Json.toJson(Serializable.OBL(issueAssetOBLData.billOfLadingNumber, issueAssetOBLData.portOfLoading, issueAssetOBLData.shipperName, issueAssetOBLData.shipperAddress, issueAssetOBLData.notifyPartyName, issueAssetOBLData.notifyPartyAddress, issueAssetOBLData.shipmentDate, issueAssetOBLData.deliveryTerm, issueAssetOBLData.assetQuantity, issueAssetOBLData.assetPrice)).toString), None))
+                masterTransactionAssetFiles.Service.insertOrUpdateContext(masterTransaction.AssetFile(issueAssetOBLData.requestID, constants.File.OBL, "", None, Option(Serializable.OBL(issueAssetOBLData.billOfLadingNumber, issueAssetOBLData.portOfLoading, issueAssetOBLData.shipperName, issueAssetOBLData.shipperAddress, issueAssetOBLData.notifyPartyName, issueAssetOBLData.notifyPartyAddress, issueAssetOBLData.shipmentDate, issueAssetOBLData.deliveryTerm, issueAssetOBLData.assetQuantity, issueAssetOBLData.assetPrice)), None))
                 val invoiceFile = masterTransactionAssetFiles.Service.getOrEmpty(issueAssetOBLData.requestID, constants.File.INVOICE)
-                invoiceFile.context.asInstanceOf[Serializable.Invoice]
+                val invoice = invoiceFile.context.getOrElse(Serializable.Invoice("", new Date)).asInstanceOf[Serializable.Invoice]
                 PartialContent(views.html.component.master.issueAssetInvoice(views.companion.master.IssueAssetInvoice.form.fill(views.companion.master.IssueAssetInvoice.Data(issueAssetOBLData.requestID, invoice.invoiceNumber, invoice.invoiceDate)), masterTransactionAssetFiles.Service.getOrNone(issueAssetOBLData.requestID, constants.File.INVOICE)))
               } else {
                 InternalServerError(views.html.index(failures = Seq(constants.Response.DOCUMENT_NOT_FOUND)))
@@ -134,7 +136,8 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
 
   def issueAssetInvoiceForm(id: String): Action[AnyContent] = Action {
     implicit request =>
-      val invoice = Json.parse(masterTransactionAssetFiles.Service.getOrEmpty(id, constants.File.INVOICE).context.getOrElse(Json.toJson(Serializable.Invoice("", new Date)).toString)).as[Serializable.Invoice]
+      val invoiceFile = masterTransactionAssetFiles.Service.getOrEmpty(id, constants.File.INVOICE)
+      val invoice = invoiceFile.context.getOrElse(Serializable.Invoice("", new Date)).asInstanceOf[Serializable.Invoice]
       PartialContent(views.html.component.master.issueAssetInvoice(views.companion.master.IssueAssetInvoice.form.fill(views.companion.master.IssueAssetInvoice.Data(id, invoice.invoiceNumber, invoice.invoiceDate)), masterTransactionAssetFiles.Service.getOrNone(id, constants.File.INVOICE)))
   }
 
@@ -148,7 +151,7 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
           issueAssetInvoiceData => {
             try {
               if (masterTransactionAssetFiles.Service.checkFileExists(issueAssetInvoiceData.requestID, constants.File.INVOICE)) {
-                masterTransactionAssetFiles.Service.insertOrUpdateContext(masterTransaction.AssetFile(issueAssetInvoiceData.requestID, constants.File.INVOICE, "", None, Option(Json.toJson(Serializable.Invoice(issueAssetInvoiceData.invoiceNumber, issueAssetInvoiceData.invoiceDate)).toString()), None))
+                masterTransactionAssetFiles.Service.insertOrUpdateContext(masterTransaction.AssetFile(issueAssetInvoiceData.requestID, constants.File.INVOICE, "", None, Option(Serializable.Invoice(issueAssetInvoiceData.invoiceNumber, issueAssetInvoiceData.invoiceDate)), None))
                 PartialContent(views.html.component.master.issueAssetDocument(issueAssetInvoiceData.requestID, masterTransactionAssetFiles.Service.getDocuments(issueAssetInvoiceData.requestID, constants.File.TRADER_ASSET_DOCUMENT_TYPES_UPLOAD_PAGE)))
               } else {
                 InternalServerError(views.html.index(failures = Seq(constants.Response.DOCUMENT_NOT_FOUND)))

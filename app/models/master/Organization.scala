@@ -149,8 +149,8 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
   private def getUBOsOnID(id: String): Future[String] = db.run(organizationTable.filter(_.id === id).map(_.ubos.?).result.head.asTry).map {
     case Success(result) => result.getOrElse(Json.toJson(UBOs(Seq())).toString)
     case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.info(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        Json.toJson(UBOs(Seq())).toString
     }
   }
 
@@ -222,7 +222,7 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
 
     def getAccountId(id: String): String = Await.result(getAccountIdById(id), Duration.Inf)
 
-    def getVerifyOrganizationRequests(zoneID: String): Seq[Organization] = Await.result(getOrganizationsByCompletionStatusVerificationStatusAndZoneID(zoneID = zoneID, completionStatus = true, verificationStatus = None), Duration.Inf).map(_.deserialize)
+    def getVerifyOrganizationRequests(zoneID: String): Seq[Organization] = Await.result(getOrganizationsByCompletionStatusVerificationStatusAndZoneID(zoneID = zoneID, completionStatus = true, verificationStatus = null), Duration.Inf).map(_.deserialize)
 
     def getOrganizationsInZone(zoneID: String): Seq[Organization] = Await.result(getOrganizationsByZoneID(zoneID), Duration.Inf).map(_.deserialize)
 
