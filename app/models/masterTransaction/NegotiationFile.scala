@@ -13,10 +13,10 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class NegotiationFile(id: String, documentType: String, fileName: String, file: Option[Array[Byte]], context: Option[String], status: Option[Boolean]) extends Document[NegotiationFile] {
-  def updateFile(newFile: Option[Array[Byte]]): NegotiationFile = NegotiationFile(id = id, documentType = documentType, fileName = fileName, file = newFile, context = context, status = status)
+case class NegotiationFile(id: String, documentType: String, fileName: String, file: Option[Array[Byte]], documentContent: Option[String], status: Option[Boolean]) extends Document[NegotiationFile] {
+  def updateFile(newFile: Option[Array[Byte]]): NegotiationFile = NegotiationFile(id = id, documentType = documentType, fileName = fileName, file = newFile, documentContent = documentContent, status = status)
 
-  def updateFileName(newFileName: String): NegotiationFile = NegotiationFile(id = id, documentType = documentType, fileName = newFileName, file = file, context = context, status = status)
+  def updateFileName(newFileName: String): NegotiationFile = NegotiationFile(id = id, documentType = documentType, fileName = newFileName, file = file, documentContent = documentContent, status = status)
 }
 
 object NegotiationFileTypeContext {
@@ -66,7 +66,7 @@ class NegotiationFiles @Inject()(protected val databaseConfigProvider: DatabaseC
     }
   }
 
-  private def upsertContext(file: NegotiationFile): Future[Int] = db.run(fileTable.map(x => (x.id, x.documentType, x.fileName, x.context.?)).insertOrUpdate(file.id, file.documentType, file.fileName, file.context).asTry).map {
+  private def upsertContext(file: NegotiationFile): Future[Int] = db.run(fileTable.map(x => (x.id, x.documentType, x.fileName, x.documentContent.?)).insertOrUpdate(file.id, file.documentType, file.fileName, file.documentContent).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -158,7 +158,7 @@ class NegotiationFiles @Inject()(protected val databaseConfigProvider: DatabaseC
 
   private[models] class NegotiationFileTable(tag: Tag) extends Table[NegotiationFile](tag, "NegotiationFile") {
 
-    def * = (id, documentType, fileName, file.?, context.?, status.?) <> (NegotiationFile.tupled, NegotiationFile.unapply)
+    def * = (id, documentType, fileName, file.?, documentContent.?, status.?) <> (NegotiationFile.tupled, NegotiationFile.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
@@ -168,20 +168,20 @@ class NegotiationFiles @Inject()(protected val databaseConfigProvider: DatabaseC
 
     def file = column[Array[Byte]]("file")
 
-    def context = column[String]("context")
+    def documentContent = column[String]("documentContent")
 
     def status = column[Boolean]("status")
   }
 
   object Service {
 
-    def create(file: NegotiationFile): String = Await.result(add(NegotiationFile(id = file.id, documentType = file.documentType, fileName = file.fileName, file = file.file, context = None, status = None)), Duration.Inf)
+    def create(file: NegotiationFile): String = Await.result(add(NegotiationFile(id = file.id, documentType = file.documentType, fileName = file.fileName, file = file.file, documentContent = None, status = None)), Duration.Inf)
 
     def getOrEmpty(id: String, documentType: String): NegotiationFile = Await.result(findByIdDocumentTypeOrEmpty(id = id, documentType = documentType), Duration.Inf)
 
     def get(id: String, documentType: String): NegotiationFile = Await.result(findByIdDocumentType(id = id, documentType = documentType), Duration.Inf)
 
-    def insertOrUpdateOldDocument(file: NegotiationFile): Int = Await.result(upsertFile(NegotiationFile(id = file.id, documentType = file.documentType, fileName = file.fileName, file = file.file, context = None, status = None)), Duration.Inf)
+    def insertOrUpdateOldDocument(file: NegotiationFile): Int = Await.result(upsertFile(NegotiationFile(id = file.id, documentType = file.documentType, fileName = file.fileName, file = file.file, documentContent = None, status = None)), Duration.Inf)
 
     def insertOrUpdateContext(file: NegotiationFile): String = Await.result(upsertContext(file), Duration.Inf).toString
 

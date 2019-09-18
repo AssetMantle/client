@@ -4,7 +4,11 @@ function validateForm(form) {
 
     form.find("dl").each(function () {
             const dlElement = $(this);
+            if(dlElement.find(("select"))[0]!==undefined){
+                return;
+            }
             const inputElement = dlElement.find("input")[0];
+
             const inputValue = inputElement.value;
             inputElement.style.borderColor = "transparent";
             try {

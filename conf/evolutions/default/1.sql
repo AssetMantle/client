@@ -635,7 +635,7 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."AssetFile"
     "documentType" VARCHAR NOT NULL,
     "fileName"     VARCHAR NOT NULL UNIQUE,
     "file"         BYTEA,
-    "context"      VARCHAR,
+    "documentContent"      VARCHAR,
     "status"       BOOLEAN,
     PRIMARY KEY ("id", "documentType")
 );
@@ -659,7 +659,7 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."NegotiationFile"
     "documentType" VARCHAR NOT NULL,
     "fileName"     VARCHAR NOT NULL UNIQUE,
     "file"         BYTEA,
-    "context"      VARCHAR,
+    "documentContent"      VARCHAR,
     "status"       BOOLEAN,
     PRIMARY KEY ("id", "documentType")
 );

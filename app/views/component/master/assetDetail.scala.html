@@ -26,11 +26,11 @@
         @file.documentType match {
             case constants.File.OBL => {
                 @file.documentType
-                @file.context.get
+                @file.documentContent.get
             }
             case constants.File.INVOICE => {
                 @file.documentType
-                @file.context.get
+                @file.documentContent.get
             }
             case _ => {
                 @file.documentType
