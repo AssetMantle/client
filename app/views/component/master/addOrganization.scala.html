@@ -12,22 +12,22 @@
         @CSRF.formField
         <div id="allZones">
         @for(zone <- zones) {
-          <button type="button" class="btn-sm btn btn-primary" onclick="fillZoneIDField('@zone.id')">@Messages(constants.Form.NAME)
-            : @zone.name <br>
+            <button type="button" class="btn-sm btn btn-primary" onclick="fillZoneIDField('@zone.id')">
+                @Messages(constants.Form.NAME): @zone.name <br>
                 @Messages(constants.Form.CURRENCY): @zone.currency <br>
                 @Messages(constants.Form.ZONE_ID): @zone.id <br>
-          </button>
-          <br>
+            </button>
+            <br>
             }
         </div>
-      @inputText(addOrganizationForm(constants.FormField.ZONE_ID.name), '_label -> Messages(constants.FormField.ZONE_ID.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.ZONE_ID.name), 'id -> "zoneID", 'required -> true)
-      @inputText(addOrganizationForm(constants.FormField.NAME.name), '_label -> Messages(constants.FormField.NAME.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.NAME.name), 'required -> true)
-      @inputText(addOrganizationForm(constants.FormField.ABBREVIATION.name), '_label -> Messages(constants.FormField.ABBREVIATION.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.ABBREVIATION.name), 'required -> false)
-      @inputDate(addOrganizationForm(constants.FormField.ESTABLISHMENT_DATE.name), '_label -> Messages(constants.FormField.ESTABLISHMENT_DATE.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.ESTABLISHMENT_DATE.name), 'required -> true)
-      @inputText(addOrganizationForm(constants.FormField.EMAIL_ADDRESS.name), '_label -> Messages(constants.FormField.EMAIL_ADDRESS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.EMAIL_ADDRESS.name), 'required -> true)
+        @inputText(addOrganizationForm(constants.FormField.ZONE_ID.name), '_label -> Messages(constants.FormField.ZONE_ID.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.ZONE_ID.name), 'id -> "zoneID", 'required -> true)
+        @inputText(addOrganizationForm(constants.FormField.NAME.name), '_label -> Messages(constants.FormField.NAME.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.NAME.name), 'required -> true)
+        @inputText(addOrganizationForm(constants.FormField.ABBREVIATION.name), '_label -> Messages(constants.FormField.ABBREVIATION.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.ABBREVIATION.name), 'required -> false)
+        @inputDate(addOrganizationForm(constants.FormField.ESTABLISHMENT_DATE.name), '_label -> Messages(constants.FormField.ESTABLISHMENT_DATE.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.ESTABLISHMENT_DATE.name), 'required -> true)
+        @inputText(addOrganizationForm(constants.FormField.EMAIL_ADDRESS.name), '_label -> Messages(constants.FormField.EMAIL_ADDRESS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.EMAIL_ADDRESS.name), 'required -> true)
 
         @Messages(constants.Form.REGISTERED_ADDRESS):
-      @defining(constants.Form.REGISTERED_ADDRESS) { implicit prefix =>
+        @defining(constants.Form.REGISTERED_ADDRESS) { implicit prefix =>
             @inputText(addOrganizationForm(utilities.String.nestedFormField(constants.FormField.ADDRESS_LINE_1.name)), '_label -> Messages(constants.FormField.ADDRESS_LINE_1.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.ADDRESS_LINE_1.name), 'id -> "registeredAddressLine1", 'required -> true)
             @inputText(addOrganizationForm(utilities.String.nestedFormField(constants.FormField.ADDRESS_LINE_2.name)), '_label -> Messages(constants.FormField.ADDRESS_LINE_2.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.ADDRESS_LINE_2.name), 'id -> "registeredAddressLine2", 'required -> true)
             @inputText(addOrganizationForm(utilities.String.nestedFormField(constants.FormField.LANDMARK.name)), '_label -> Messages(constants.FormField.LANDMARK.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.LANDMARK.name), 'id -> "registeredLandmark", 'required -> false)
@@ -42,7 +42,7 @@
         </div>
 
         @Messages(constants.Form.POSTAL_ADDRESS):
-      @defining(constants.Form.POSTAL_ADDRESS) { implicit prefix =>
+        @defining(constants.Form.POSTAL_ADDRESS) { implicit prefix =>
             @inputText(addOrganizationForm(utilities.String.nestedFormField(constants.FormField.ADDRESS_LINE_1.name)), '_label -> Messages(constants.FormField.ADDRESS_LINE_1.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.ADDRESS_LINE_1.name), 'id -> "postalAddressLine1", 'required -> true)
             @inputText(addOrganizationForm(utilities.String.nestedFormField(constants.FormField.ADDRESS_LINE_2.name)), '_label -> Messages(constants.FormField.ADDRESS_LINE_2.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.ADDRESS_LINE_2.name), 'id -> "postalAddressLine2", 'required -> true)
             @inputText(addOrganizationForm(utilities.String.nestedFormField(constants.FormField.LANDMARK.name)), '_label -> Messages(constants.FormField.LANDMARK.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.LANDMARK.name), 'id -> "postalLandmark", 'required -> false)
