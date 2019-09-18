@@ -105,7 +105,7 @@ class Notification @Inject()(masterContacts: master.Contacts,
     }
   }
 
-  def send(accountID: String, notification: constants.Notification.Notification, messagesParameters: String*)(implicit lang: Lang = Lang(masterAccounts.Service.getLanguage(accountID))): Unit = {
+  def send(accountID: String, notification: constants.Notification, messagesParameters: String*)(implicit lang: Lang = Lang(masterAccounts.Service.getLanguage(accountID))): Unit = {
     try {
       if (notification.pushNotification.isDefined) sendPushNotification(accountID = accountID, pushNotification = notification.pushNotification.get, messageParameters = messagesParameters: _*)
       if (notification.email.isDefined) sendEmail(toAccountID = accountID, email = notification.email.get, messagesParameters: _*)
