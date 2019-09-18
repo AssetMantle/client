@@ -195,6 +195,7 @@ GET         /organizationUpload/updateFile                               control
 
 GET         /master/addZone                                              controllers.AddZoneController.addZoneForm
 POST        /master/addZone                                              controllers.AddZoneController.addZone
+GET         /master/addZone                                              controllers.AddZoneController.userUploadOrUpdateZoneKYCView
 
 GET         /master/verifyZone                                           controllers.AddZoneController.verifyZoneForm(zoneID: String)
 POST        /master/verifyZone                                           controllers.AddZoneController.verifyZone

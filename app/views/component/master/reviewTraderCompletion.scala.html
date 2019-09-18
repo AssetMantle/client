@@ -39,10 +39,10 @@
             }
             </div>
             <br>
-            @form(action = routes.SetACLController.reviewTraderCompletion, 'onkeypress -> "validateForm(event,this)") {
+            @form(action = routes.SetACLController.reviewTraderCompletion, 'onkeypress -> "submitFormOnEnter(event,this)") {
                 @CSRF.formField
                 @Messages(constants.Form.COMPLETION):
-                <span>@checkbox(traderCompletionForm(constants.Form.COMPLETION), '_label -> Messages(constants.Form.COMPLETION), 'class -> "form-control", 'placeholder -> Messages(constants.Form.COMPLETION), 'required -> true)</span>
+                <span>@checkbox(traderCompletionForm(constants.Form.COMPLETION), '_label -> Messages(constants.Form.COMPLETION), 'placeholder -> Messages(constants.Form.COMPLETION), 'required -> true)</span>
                 @if(traderCompletionForm.hasGlobalErrors) {
                     <ul>
                     @for(error <- traderCompletionForm.globalErrors) {

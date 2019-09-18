@@ -7,7 +7,7 @@
     <h4 class="latest_card-title">@Messages(constants.Form.TRADER_KYC_FILES)</h4>
 </div>
 <div class="centerText">
-    @for(documentType <- constants.File.TRADER_KYC_DOCUMENT_TYPES) {
+    @for(documentType <- constants.File.ZONE_KYC_DOCUMENT_TYPES) {
         <div id="upload@documentType">
             <button onclick="getForm(jsRoutes.controllers.AddZoneController.userUploadZoneKYCForm('@documentType'))">@Messages(constants.Form.UPLOAD) @Messages(documentType)</button>
         </div>
@@ -23,8 +23,8 @@
         }
     }
 </div>
-<button type="button" class="btn-sm btn btn-primary" onclick="getForm(jsRoutes.controllers.AddZoneController.addTraderForm())">@Messages(constants.Form.BACK)</button>
+<button type="button" class="btn-sm btn btn-primary" onclick="getForm(jsRoutes.controllers.AddZoneController.addZoneForm())">@Messages(constants.Form.BACK)</button>
 
 @if(constants.File.ZONE_KYC_DOCUMENT_TYPES.diff(zoneKYCs.map(_.documentType)).isEmpty) {
-    <button type="button" class="btn-sm btn btn-primary" id="getZoneKYCReviewForm" onclick="getForm(jsRoutes.controllers.AddZoneController.reviewTraderCompletionForm())">@Messages(constants.Form.NEXT)</button>
+    <button type="button" class="btn-sm btn btn-primary" id="getZoneKYCReviewForm" onclick="getForm(jsRoutes.controllers.AddZoneController.reviewZoneCompletionForm())">@Messages(constants.Form.NEXT)</button>
 }

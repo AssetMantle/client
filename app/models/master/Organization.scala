@@ -222,7 +222,7 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
 
     def getAccountId(id: String): String = Await.result(getAccountIdById(id), Duration.Inf)
 
-    def getVerifyOrganizationRequests(zoneID: String): Seq[Organization] = Await.result(getOrganizationsByCompletionStatusVerificationStatusAndZoneID(zoneID = zoneID, completionStatus = true, verificationStatus = None), Duration.Inf).map(_.deserialize)
+    def getVerifyOrganizationRequests(zoneID: String): Seq[Organization] = Await.result(getOrganizationsByCompletionStatusVerificationStatusAndZoneID(zoneID = zoneID, completionStatus = true, verificationStatus = null), Duration.Inf).map(_.deserialize)
 
     def getOrganizationsInZone(zoneID: String): Seq[Organization] = Await.result(getOrganizationsByZoneID(zoneID), Duration.Inf).map(_.deserialize)
 

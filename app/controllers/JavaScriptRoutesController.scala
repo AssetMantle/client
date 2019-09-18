@@ -49,6 +49,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
 
         routes.javascript.AddZoneController.viewPendingVerifyZoneRequests,
         routes.javascript.AddZoneController.addZoneForm,
+        routes.javascript.AddZoneController.userUploadOrUpdateZoneKYCView,
         routes.javascript.AddZoneController.verifyZoneForm,
         routes.javascript.AddZoneController.rejectVerifyZoneRequestForm,
         routes.javascript.AddZoneController.viewZonesInGenesis,
