@@ -1,9 +1,9 @@
 @import controllers.actions.LoginState
-
+@import models.common.Serializable._
 @(asset: masterTransaction.IssueAssetRequest, files: Seq[masterTransaction.AssetFile])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 
 @if(asset.status != constants.Status.Asset.LISTED_FOR_TRADE) {
-    <span class="red">@Messages(constants.Form.PEG_HASH)</span> : @asset.pegHash <br>
+    <span class="red">@Messages(constants.Form.PEG_HASH)</span> : asset.pegHash <br>
 }
 <span class="red">@Messages(constants.Form.ACCOUNT_ID)</span> : @asset.accountID <br>
 <span class="red">@Messages(constants.FormField.ASSET_TYPE.name)</span> : @asset.assetType <br>
@@ -25,7 +25,13 @@
         @file.documentType match {
             case constants.File.OBL => {
                 @file.documentType
-                @file.documentContent.get
+                @if(file.documentContent.isDefined){
+                    val oblContent = documentContent.get.asInstanceOf[OBL]
+                    <span class="red">@Messages(constants.FormField.NOTIFY_PARTY_NAME.name)</span> : oblContent.notifyPartyName <br>
+                    <span class="red">@Messages(constants.Form.STATUS)</span> : @asset.status <br>
+                    <span class="red">@Messages(constants.Form.STATUS)</span> : @asset.status <br>
+
+                }
             }
             case constants.File.INVOICE => {
                 @file.documentType
