@@ -26,10 +26,10 @@
             case constants.File.OBL => {
                 @file.documentType
                 @if(file.documentContent.isDefined){
-                    val oblContent = documentContent.get.asInstanceOf[OBL]
-                    <span class="red">@Messages(constants.FormField.NOTIFY_PARTY_NAME.name)</span> : oblContent.notifyPartyName <br>
-                    <span class="red">@Messages(constants.Form.STATUS)</span> : @asset.status <br>
-                    <span class="red">@Messages(constants.Form.STATUS)</span> : @asset.status <br>
+                    @{
+                        val oblContent = documentContent.get.asInstanceOf[OBL]
+                        <span>oblContent.notifyPartyAddress</span>
+                    }
 
                 }
             }
