@@ -18,22 +18,23 @@
             <span class="red">@Messages(constants.FormField.PHYSICAL_DOCUMENTS_HANDLED_VIA.name)</span> : @asset.physicalDocumentsHandledVia <br>
 
         </div>
-
-            @if(asset.status == constants.Status.Asset.INCOMPLETE_DETAILS){
-                <button class="width btn btn-primary btn-sm" onclick="getForm(jsRoutes.controllers.IssueAssetController.issueAssetDetailForm('@asset.id'))">@Messages(constants.Form.ISSUE_ASSET_REQUEST)</button>
-            }else {
-                <div class="centerText" >
-                @loginState.acl match {
-                    case Some(acl) => {
-                        @if(acl.redeemAsset) {
-                            <button class="width btn btn-primary btn-sm" onclick="getForm(jsRoutes.controllers.RedeemAssetController.redeemAssetForm('@loginState.address', '@asset.pegHash'))">@Messages(constants.Form.REDEEM_ASSET)</button>
-                            <br>
-                            }
-                    }
-                    case _ => {}
+            @asset.status match{
+                case constants.Status.Asset.INCOMPLETE_DETAILS => {
+                    <button class="width btn btn-primary btn-sm" onclick="getForm(jsRoutes.controllers.IssueAssetController.issueAssetDetailForm('@asset.id'))">@Messages(constants.Form.ISSUE_ASSET_REQUEST)</button>
                 }
-
-                </div>
+                case _ => {
+                    <div class="centerText" >
+                    @loginState.acl match {
+                        case Some(acl) => {
+                            @if(acl.redeemAsset) {
+                                <button class="width btn btn-primary btn-sm" onclick="getForm(jsRoutes.controllers.RedeemAssetController.redeemAssetForm('@loginState.address', '@asset.pegHash'))">@Messages(constants.Form.REDEEM_ASSET)</button>
+                                <br>
+                            }
+                        }
+                        case _ => {}
+                    }
+                    </div>
+                 }
             }
     </div>
 }
