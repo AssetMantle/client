@@ -1,41 +1,43 @@
 getConfigurationAsynchronously("blockchain.main.wsIP");
 getConfigurationAsynchronously("blockchain.main.abciPort");
 
-function blockExplorer() {
-    const blockExplorerTableBody = "blockContainer";
-    const wsURL = getConfiguration("blockchain.main.wsIP") + ":" + getConfiguration("blockchain.main.abciPort") + "/websocket";
+function blockExplorer(blockExplorerTableBody, maxNumberOfItems) {
+    let wsURL = getConfiguration("blockchain.main.wsIP") + ":" + getConfiguration("blockchain.main.abciPort") + "/websocket";
 
-    setFirstBlockTime();
+    let wsNewBlock = new WebSocket(wsURL);
+    wsNewBlock.onopen = () => {
+        let requestNewBlock = `{"method":"subscribe", "id":"dontcare","jsonrpc":"2.0","params":["tm.event='NewBlock'"]}`;
+        wsNewBlock.send(requestNewBlock)
+    };
 
-    const maxNumberOfItems = 8;
-
-    window.addEventListener("load", function (evt) {
-        const wsNewBlock = new WebSocket(wsURL);
-        wsNewBlock.onopen = () => {
-            initializeBlockExplorer(blockExplorerTableBody, maxNumberOfItems);
-            showAllBlocksInitialTableContent();
-            let requestNewBlock = `{"method":"subscribe", "id":"dontcare","jsonrpc":"2.0","params":["tm.event='NewBlock'"]}`;
-            wsNewBlock.send(requestNewBlock)
-        };
-
-        wsNewBlock.onmessage = function (message) {
+    wsNewBlock.onmessage = function (message) {
+        if ($('#indexBottomDivision').length === 0) {
+            let emptyArray = [""];
+            //setCookie("blockExplorerTimer", JSON.stringify(emptyArray), 1);
+            wsNewBlock.close();
+        } else {
             let receivedData = JSON.parse(message.data);
             if (receivedData.result.data !== undefined) {
-                updateBlockExplorer(blockExplorerTableBody, receivedData, maxNumberOfItems);
+                updateBlockExplorer(wsNewBlock, blockExplorerTableBody, receivedData, maxNumberOfItems);
                 updateShowAllBlocksTable(receivedData);
             }
-        };
+        }
+    };
 
-        wsNewBlock.onerror = function (event) {
-            blockExplorerErrorEvent(event);
-            showAllBlocksTableErrorEvent(event);
-        };
+    wsNewBlock.onerror = function (event) {
+    };
+
+    wsNewBlock.onclose = function (event) {
+    };
+
+    $(window).submit(function () {
+        //setCookie("blockExplorerTimer", "[]", 1);
+        wsNewBlock.close();
     });
-
 }
 
 
-function updateBlockExplorer(blockExplorerTableBody, receivedData, maxNumberOfItems) {
+function updateBlockExplorer(wsNewBlock, blockExplorerTableBody, receivedData, maxNumberOfItems) {
 
     let lastBlockTime = getCookie("lastBlockTime");
     let averageBlockTime = parseFloat(getCookie("averageBlockTime"));
@@ -45,31 +47,39 @@ function updateBlockExplorer(blockExplorerTableBody, receivedData, maxNumberOfIt
     let timerID = "timer" + latestBlockHeight.toString(10);
     let blockTime = new Date(time);
     let differenceBetweenBlockTime = (blockTime.getTime() - new Date(lastBlockTime).getTime()) / 1000;
-    let blockContainerList = document.getElementById(blockExplorerTableBody);
-    blockContainerList.removeChild(blockContainerList.childNodes[blockContainerList.childNodes.length - 2]);
-    $('#' + blockExplorerTableBody).prepend("<tr><td><button onclick='searchFunction(" + JSON.stringify(latestBlockHeight) + ")'>" + latestBlockHeight + "</button></td><td>" + numTxs + "</td><td ><div id='" + timerID + "'></div></td></tr>");
-    getBlockTime(time, timerID);
-    updateGraph("blockTimes", [latestBlockHeight + "::" + blockTime.getHours() + ":" + blockTime.getMinutes() + ":" + blockTime.getSeconds()], [differenceBetweenBlockTime], maxNumberOfItems - 1);
-    lastBlockTime = time;
     averageBlockTime = (averageBlockTime * (latestBlockHeight - 1) + differenceBetweenBlockTime) / latestBlockHeight;
-
-    averageBlockTimeUpdater(averageBlockTime);
-    updateLastBlock(latestBlockHeight, lastBlockTime);
+    lastBlockTime = time;
 
     setCookie("latestBlockHeight", latestBlockHeight, 1);
     setCookie("lastBlockTime", lastBlockTime, 1);
     setCookie("averageBlockTime", averageBlockTime, 1);
+
+    let blockContainerList = document.getElementById(blockExplorerTableBody);
+    blockContainerList.removeChild(blockContainerList.childNodes[blockContainerList.childNodes.length - 1]);
+    $('#' + blockExplorerTableBody).prepend("<tr><td><button onclick='searchFunction(" + JSON.stringify(latestBlockHeight) + ")'>" + latestBlockHeight + "</button></td><td>" + numTxs + "</td><td ><div id='" + timerID + "'></div></td></tr>");
+
+    getBlockTime(time, timerID);
+    let setTimeoutIDArray = JSON.parse(getCookie("blockExplorerTimer"));
+    setTimeoutIDArray.push(timerID);
+    setTimeoutIDArray.shift();
+    setCookie("blockExplorerTimer", JSON.stringify(setTimeoutIDArray), 1);
+
+    updateGraph("blockTimes", [latestBlockHeight + "::" + blockTime.getHours() + ":" + blockTime.getMinutes() + ":" + blockTime.getSeconds()], [differenceBetweenBlockTime], maxNumberOfItems - 1);
+
+    averageBlockTimeUpdater(averageBlockTime);
+    updateLastBlock(latestBlockHeight, lastBlockTime);
+
 }
 
 
 function initializeBlockExplorer(blockExplorerTableBody, maxNumberOfItems) {
 
     const lastBlockHeightURL = jsRoutes.controllers.BlockExplorerController.lastBlockHeight();
-
+    let setTimeoutIDArray = [""];
     $.ajax({
         url: lastBlockHeightURL.url,
         type: lastBlockHeightURL.ty1,
-        async: true,
+        async: false,
         statusCode: {
             200: function (latestBlockHeightData) {
                 let latestBlockHeight = parseInt(latestBlockHeightData);
@@ -78,7 +88,7 @@ function initializeBlockExplorer(blockExplorerTableBody, maxNumberOfItems) {
                 $.ajax({
                     url: blockDetails.url,
                     type: blockDetails.type,
-                    async: true,
+                    async: false,
                     statusCode: {
                         200: function (blockDetailsData) {
                             let blocks = JSON.parse(blockDetailsData);
@@ -106,9 +116,14 @@ function initializeBlockExplorer(blockExplorerTableBody, maxNumberOfItems) {
                             averageBlockTimeUpdater(averageBlockTime);
                             updateLastBlock(latestBlockHeight, lastBlockTime);
                             $('#' + blockExplorerTableBody).prepend(content);
+
                             for (let i = 0; i < initialTimeData.length; i++) {
                                 getBlockTime(initialTimeData[i], "timer" + (latestBlockHeight - i).toString(10));
+                                setTimeoutIDArray.push( "timer" + (latestBlockHeight - i).toString(10));
                             }
+                            setTimeoutIDArray.shift();
+                            setCookie("blockExplorerTimer", JSON.stringify(setTimeoutIDArray), 1);
+
                             updateGraph("blockTimes", initialGraphTime, initialGraphData, maxNumberOfItems);
                             lastBlockTime = initialTimeData[initialTimeData.length - 1];
 
@@ -125,16 +140,12 @@ function initializeBlockExplorer(blockExplorerTableBody, maxNumberOfItems) {
     });
 }
 
-function blockExplorerErrorEvent(event) {
-    document.getElementById(blockExplorerTableBody).appendChild(document.createElement("div").innerHTML = "ERROR: " + evt.data);
-}
-
 function setFirstBlockTime() {
     let blockDetails = jsRoutes.controllers.BlockExplorerController.blockDetails(1, 1);
     $.ajax({
         url: blockDetails.url,
         type: blockDetails.type,
-        async: true,
+        async: false,
         statusCode: {
             200: function (blockDetailsData) {
                 let blocks = JSON.parse(blockDetailsData);
@@ -145,4 +156,12 @@ function setFirstBlockTime() {
     });
 }
 
-$(document).ready = blockExplorer();
+$('#indexBottomDivision').ready(function (event) {
+    const blockExplorerTableBody = "blockContainer";
+    const maxNumberOfItems = 8;
+    setFirstBlockTime();
+    initializeBlockExplorer(blockExplorerTableBody, maxNumberOfItems);
+    showAllBlocksInitialTableContent();
+    blockExplorer(blockExplorerTableBody, maxNumberOfItems);
+    updateBlockTimes();
+});

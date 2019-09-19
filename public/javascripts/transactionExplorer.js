@@ -9,15 +9,17 @@ function transactionExplorer() {
         content = "<tr><td></td><td></td><td></td></tr>" + content;
     }
     $('#transactionContainer').prepend(content);
+
+    const wsNewTransaction = new WebSocket(wsUrl);
+
     window.addEventListener("load", function (evt) {
-        const wsTx = new WebSocket(wsUrl);
         let transactionContainerList = document.getElementById("transactionContainer");
-        wsTx.onopen = () => {
+        wsNewTransaction.onopen = () => {
             let requestTx = `{"method":"subscribe", "id":"dontcare","jsonrpc":"2.0","params":["tm.event='Tx'"]}`;
-            wsTx.send(requestTx)
+            wsNewTransaction.send(requestTx)
         };
 
-        wsTx.onmessage = function (message) {
+        wsNewTransaction.onmessage = function (message) {
             let receivedData =JSON.parse(message.data);
             if (receivedData.result.events !== undefined) {
                 Array.prototype.forEach.call(receivedData.result.events['tx.hash'], (txHash, index) => {
@@ -31,10 +33,20 @@ function transactionExplorer() {
             }
         };
 
-        wsTx.onerror = function (message) {
+        wsNewTransaction.onerror = function (message) {
             document.getElementById("transactionContainer").appendChild(document.createElement("div").innerHTML = "ERROR: " + message.data);
         };
+
+        wsNewTransaction.onclose = function (event) {
+
+        };
     });
+
+    // window.onbeforeunload = function() {
+    //     console.log("WEBSOCKET_TX_CLOSE_W");
+    //     setCookie("A_TX_WINDOW", getCookie("A_TX_WINDOW") + "W", 1);
+    //     wsNewTransaction.close();
+    // };
 }
 
 $(document).ready = transactionExplorer();

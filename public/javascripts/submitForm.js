@@ -13,25 +13,16 @@ function submitForm(source, target = '#commonModalContent') {
                     result.html(data.responseText);
                 },
                 401: function (data) {
-                    const newDocument = document.open("text/html", "replace");
-                    newDocument.write(data.responseText);
-                    newDocument.close();
+                    replaceDocument(data.responseText);
                 },
                 412: function (data) {
-                    const newDocument = document.open("text/html", "replace");
-                    newDocument.write(data.responseText);
-                    newDocument.close();
+                    replaceDocument(data.responseText);
                 },
                 500: function (data) {
-                    console.log(data);
-                    const newDocument = document.open("text/html", "replace");
-                    newDocument.write(data.responseText);
-                    newDocument.close();
+                    replaceDocument(data.responseText);
                 },
                 200: function (data) {
-                    const newDocument = document.open("text/html", "replace");
-                    newDocument.write(data);
-                    newDocument.close();
+                    replaceDocument(data);
                 },
                 206: function (data) {
                     $(target).html(data);
@@ -43,4 +34,11 @@ function submitForm(source, target = '#commonModalContent') {
             }
         });
     }
+}
+
+function replaceDocument(data) {
+    const newDocument = document.open("text/html", "replace");
+    newDocument.write(data);
+    newDocument.close();
+    $(window).trigger("submit");
 }

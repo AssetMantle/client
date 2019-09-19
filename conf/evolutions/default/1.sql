@@ -643,12 +643,12 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."IssueFiatRequest"
 
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."Notification"
 (
-    "accountID"           VARCHAR NOT NULL,
-    "notificationTitle"   VARCHAR NOT NULL,
-    "notificationMessage" VARCHAR NOT NULL,
-    "time"                BIGINT  NOT NULL,
-    "read"                BOOLEAN NOT NULL,
-    "id"                  VARCHAR NOT NULL UNIQUE,
+    "accountID"           VARCHAR   NOT NULL,
+    "notificationTitle"   VARCHAR   NOT NULL,
+    "notificationMessage" VARCHAR   NOT NULL,
+    "time"                TIMESTAMP NOT NULL,
+    "read"                BOOLEAN   NOT NULL,
+    "id"                  VARCHAR   NOT NULL UNIQUE,
     PRIMARY KEY ("id")
 );
 
