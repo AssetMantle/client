@@ -13,15 +13,18 @@
     <div id="upload@constants.File.INVOICE">
         <button onclick="getForm(jsRoutes.controllers.FileController.uploadTraderAssetForm('@constants.File.INVOICE', '@issueAssetInvoiceForm.data(constants.FormField.REQUEST_ID.name)'))">@Messages(constants.Form.UPLOAD) @Messages(constants.File.INVOICE)</button>
     </div>
-    @if(file.isDefined) {
-        @component.master.commonDocumentViewer(file.get) {
-            @routes.FileController.tradingFile(file.get.id, file.get.fileName, file.get.documentType)
-        } {
-            <a href="@routes.FileController.tradingFile(file.get.id, file.get.fileName, file.get.documentType)">@Messages(file.get.documentType)</a>
-        } {
-            <button onclick="getForm(jsRoutes.controllers.File.updateTraderAssetForm('@file.get.documentType', '@file.get.id'))">@Messages(constants.Form.UPDATE) @Messages(file.get.documentType)</button>
-            <script>hideElement('upload@file.get.documentType')</script>
+    @file match {
+        case fileView: scala.Some[_] => {
+            @component.master.commonDocumentViewer(fileView) {
+                @routes.FileController.tradingFile(fileView.id, fileView.fileName, fileView.documentType)
+            } {
+                <a href="@routes.FileController.tradingFile(fileView.id, fileView.fileName, fileView.documentType)">@Messages(fileView.documentType)</a>
+            } {
+                <button onclick="getForm(jsRoutes.controllers.File.updateTraderAssetForm('@fileView.documentType', '@fileView.id'))">@Messages(constants.Form.UPDATE) @Messages(fileView.documentType)</button>
+                        <script>hideElement('upload@fileView.documentType')</script>
+            }
         }
+        case _: scala.None.type => {}
     }
 </div>
 
@@ -39,10 +42,9 @@
                 }
                 </ul>
             }
-            @if(file.isDefined){
-            <button type="button" class="btn btn-primary btn-sm" onclick="submitForm(this)">@Messages(constants.Form.ISSUE_ASSET_INVOICE)</button>
-            } else {
-            <button type="button" class="btn btn-primary btn-sm" onclick="submitForm(this)" disabled="disabled">@Messages(constants.Form.ISSUE_ASSET_INVOICE)</button>
+            @file match {
+                case _: scala.Some[_] => {<button type="button" class="btn btn-primary btn-sm" onclick="submitForm(this)">@Messages(constants.Form.ISSUE_ASSET_INVOICE)</button>}
+                case _: scala.None.type => {<button type="button" class="btn btn-primary btn-sm" onclick="submitForm(this)" disabled="disabled">@Messages(constants.Form.ISSUE_ASSET_INVOICE)</button>}
             }
         </div>
 }
