@@ -44,7 +44,7 @@
             }
             @file match {
                 case Some(file) => {<button type="button" class="btn btn-primary btn-sm" onclick="submitForm(this)">@Messages(constants.Form.ISSUE_ASSET_INVOICE)</button>}
-                case _: scala.None.type => {<button type="button" class="btn btn-primary btn-sm" onclick="submitForm(this)" disabled="disabled">@Messages(constants.Form.ISSUE_ASSET_INVOICE)</button>}
+                case None => {<button type="button" class="btn btn-primary btn-sm" onclick="submitForm(this)" disabled="disabled">@Messages(constants.Form.ISSUE_ASSET_INVOICE)</button>}
             }
         </div>
 }
