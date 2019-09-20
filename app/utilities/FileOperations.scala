@@ -2,7 +2,7 @@ package utilities
 
 import java.io.{File, FileInputStream, IOException, RandomAccessFile}
 import java.util.concurrent.{ConcurrentHashMap, ConcurrentMap}
-
+import models.common.Serializable._
 import akka.stream.scaladsl.{FileIO, Source}
 import akka.util.ByteString
 import exceptions.BaseException
@@ -137,16 +137,11 @@ object FileOperations {
     if (!file.exists()) throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION) else file
   }
 
-
   def combinedHash(documents: Seq[Document[_]])(implicit executionContext: ExecutionContext):String={
     Json.toJson(documents.map{doc=>
       DocumentBlockchainDetails(doc.documentType, hashExtractor(doc.fileName))
     }).toString()
 
   }
-  case class DocumentBlockchainDetails(documentType: String, documentHash:String)
-
-  implicit val oblReads: Reads[DocumentBlockchainDetails] = Json.reads[DocumentBlockchainDetails]
-  implicit val oblWrites: OWrites[DocumentBlockchainDetails] = Json.writes[DocumentBlockchainDetails]
 
 }
