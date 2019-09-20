@@ -31,14 +31,20 @@ class AssetFiles @Inject()(protected val databaseConfigProvider: DatabaseConfigP
   private implicit val module: String = constants.Module.MASTER_TRANSACTION_ASSET_FILE
 
   case class AssetFileSerialized(id: String, documentType: String, fileName: String, file: Option[Array[Byte]], documentContent: Option[String], status: Option[Boolean]) {
-    def deserialize: AssetFile = documentType match {
-      case constants.File.OBL => AssetFile(id, documentType, fileName, file, Option(utilities.JSON.convertJsonStringToObject[OBL](documentContent.getOrElse(Json.toJson(OBL("", "", "", "", "", "", new Date, "", 0, 0)).toString))), status)
-      case constants.File.INVOICE => AssetFile(id, documentType, fileName, file, Option(utilities.JSON.convertJsonStringToObject[Invoice](documentContent.getOrElse(Json.toJson(Invoice("", new Date)).toString))), status)
-      case _ => AssetFile(id, documentType, fileName, file, None, status)
-    }
+    def deserialize: AssetFile =
+        documentContent match {
+          case Some(content) => AssetFile(id, documentType, fileName, file, Option(utilities.JSON.convertJsonStringToObject[DocumentContent](content.toString)), status)
+          case None =>AssetFile(id, documentType, fileName, file, None, status)
+        }
+
   }
 
-  private def serialize(assetFileTrait: AssetFile): AssetFileSerialized = AssetFileSerialized(assetFileTrait.id, assetFileTrait.documentType, assetFileTrait.fileName, assetFileTrait.file, if(assetFileTrait.documentContent.isDefined) Option (Json.toJson(assetFileTrait.documentContent.get).toString) else None, assetFileTrait.status)
+  private def serialize(assetFile: AssetFile): AssetFileSerialized = {
+    assetFile.documentContent match {
+      case Some(content) =>  AssetFileSerialized(assetFile.id, assetFile.documentType, assetFile.fileName, assetFile.file, Option (Json.toJson(content).toString), assetFile.status)
+      case None => AssetFileSerialized(assetFile.id, assetFile.documentType, assetFile.fileName, assetFile.file, None, assetFile.status)
+    }
+  }
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -187,8 +193,11 @@ class AssetFiles @Inject()(protected val databaseConfigProvider: DatabaseConfigP
     def getOrEmpty(id: String, documentType: String): AssetFile = Await.result(findByIdDocumentType(id = id, documentType = documentType), Duration.Inf).getOrElse(AssetFileSerialized("","","",None,None,None)).deserialize
 
     def getOrNone(id: String, documentType: String): Option[AssetFile] = {
-        val assetFile = Await.result(findByIdDocumentType(id = id, documentType = documentType), Duration.Inf)
-        if(assetFile.isDefined) Option(assetFile.get.deserialize) else None
+
+      Await.result(findByIdDocumentType(id = id, documentType = documentType), Duration.Inf) match {
+        case Some(assetFile) => Option(assetFile.deserialize)
+        case None => None
+      }
     }
 
     def get(id: String, documentType: String): AssetFile = Await.result(findByIdDocumentType(id = id, documentType = documentType), Duration.Inf).getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)).deserialize
