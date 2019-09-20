@@ -13,7 +13,7 @@
         <button onclick="getForm(jsRoutes.controllers.FileController.uploadTraderAssetForm('@constants.File.OBL', '@issueAssetOBLForm.data(constants.FormField.REQUEST_ID.name)'))">@Messages(constants.Form.UPLOAD) @Messages(constants.File.OBL)</button>
     </div>
     @file match {
-        case fileView: scala.Some[_] => {
+        case Some(fileView) => {
             @component.master.commonDocumentViewer(fileView) {
                 @routes.FileController.tradingFile(fileView.id, fileView.fileName, fileView.documentType)
             } {
@@ -23,7 +23,7 @@
                         <script>hideElement('upload@fileView.documentType')</script>
             }
         }
-        case _: scala.None.type => {}
+        case _ => {}
     }
 </div>
 
@@ -51,8 +51,8 @@
                 </ul>
             }
             @file match {
-                case _: scala.Some[_] => {<button type="button" class="btn btn-primary btn-sm" onclick="submitForm(this)">@Messages(constants.Form.ISSUE_ASSET_OBL)</button>}
-                case _: scala.None.type => {<button type="button" class="btn btn-primary btn-sm" onclick="submitForm(this)" disabled="disabled">@Messages(constants.Form.ISSUE_ASSET_OBL)</button>}
+                case Some(file) => {<button type="button" class="btn btn-primary btn-sm" onclick="submitForm(this)">@Messages(constants.Form.ISSUE_ASSET_OBL)</button>}
+                case _ => {<button type="button" class="btn btn-primary btn-sm" onclick="submitForm(this)" disabled="disabled">@Messages(constants.Form.ISSUE_ASSET_OBL)</button>}
             }
              </div>
 }
