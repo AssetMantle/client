@@ -119,7 +119,9 @@ class IssueAssetRequests @Inject()(protected val databaseConfigProvider: Databas
 
   private def getIssueAssetRequestsWithStatus(accountIDs: Seq[String], status: String): Future[Seq[IssueAssetRequestSerialized]] = db.run(issueAssetRequestTable.filter(_.accountID.inSet(accountIDs)).filter(_.status === status).result)
 
-  private def findIssueAssetsByAccountID(accountID: String): Future[Seq[IssueAssetRequestSerialized]] = db.run(issueAssetRequestTable.filter(_.accountID === accountID).result)
+  private def getAssetsByStatuses(statuses: Seq[String]): Future[Seq[IssueAssetRequestSerialized]] = db.run(issueAssetRequestTable.filter(_.status inSet statuses).result)
+
+  private def findIssueAssetsByAccountIDAndStatus(accountID: String, statuses: Seq[String]): Future[Seq[IssueAssetRequestSerialized]] = db.run(issueAssetRequestTable.filter(_.accountID === accountID).filter(_.status inSet statuses).result)
 
   private def deleteByID(id: String) = db.run(issueAssetRequestTable.filter(_.id === id).delete.asTry).map {
     case Success(result) => result
@@ -209,7 +211,9 @@ class IssueAssetRequests @Inject()(protected val databaseConfigProvider: Databas
 
     def getPendingIssueAssetRequests(accountIDs: Seq[String], status: String): Seq[IssueAssetRequest] = Await.result(getIssueAssetRequestsWithStatus(accountIDs, status), Duration.Inf).map(_.deSerialize)
 
-    def getIssueAssetsByAccountID(accountID: String): Seq[IssueAssetRequest] = Await.result(findIssueAssetsByAccountID(accountID), Duration.Inf).map(_.deSerialize)
+    def getTraderAssetList(accountID: String): Seq[IssueAssetRequest] = Await.result(findIssueAssetsByAccountIDAndStatus(accountID, Seq(constants.Status.Asset.INCOMPLETE_DETAILS, constants.Status.Asset.LISTED_FOR_TRADE, constants.Status.Asset.UNDER_NEGOTIATION)), Duration.Inf).map(_.deSerialize)
+
+    def getMarketAssets(): Seq[IssueAssetRequest] = Await.result(getAssetsByStatuses(Seq(constants.Status.Asset.LISTED_FOR_TRADE, constants.Status.Asset.UNDER_NEGOTIATION)), Duration.Inf).map(_.deSerialize)
 
     def getIssueAssetByID(id: String): IssueAssetRequest = Await.result(findByID(id), Duration.Inf).deSerialize
 

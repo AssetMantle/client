@@ -1,41 +1,33 @@
 @import controllers.actions.LoginState
-@import models.blockchain.Asset
 @import models.masterTransaction.IssueAssetRequest
+@import models.masterTransaction.AssetFile
 
-@(assetPegWallet: Seq[IssueAssetRequest])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+@(assetPegWallet: Seq[IssueAssetRequest], assetFiles: Seq[AssetFile])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
 @for(asset <- assetPegWallet) {
     <div class="flexItem box thirdBox lightBlue">
         <div class="leftText">
-            <span class="red">@Messages(constants.Form.PEG_HASH)</span> : @asset.pegHash <br>
-            <span class="red">@Messages(constants.Form.DOCUMENT_HASH)</span> : @asset.documentHash <br>
-            <span class="red">@Messages(constants.Form.ASSET_TYPE)</span> : @asset.assetType <br>
-            <span class="red">@Messages(constants.Form.ASSET_QUANTITY)</span> : @asset.assetQuantity <br>
-            <span class="red">@Messages(constants.Form.ASSET_PRICE)</span> : @asset.assetPrice <br>
-            <span class="red">@Messages(constants.Form.QUANTITY_UNIT)</span> : @asset.quantityUnit <br>
-            <span class="red">@Messages(constants.Form.TAKER_ADDRESS)</span> : @asset.takerAddress <br>
-            <span class="red">@Messages(constants.FormField.PHYSICAL_DOCUMENTS_HANDLED_VIA.name)</span> : @asset.physicalDocumentsHandledVia <br>
-            <span class="red">@Messages(constants.FormField.COMDEX_PAYMENT_TERMS.name)</span> : @asset.paymentTerms <br>
-            <span class="red">@Messages(constants.Form.STATUS)</span> : @asset.status <br>
-
+         @views.html.component.master.assetDetail(asset, assetFiles.filter(_.id == asset.id))
         </div>
             @asset.status match{
                 case constants.Status.Asset.INCOMPLETE_DETAILS => {
                     <button class="width btn btn-primary btn-sm" onclick="getForm(jsRoutes.controllers.IssueAssetController.issueAssetDetailForm('@asset.id'))">@Messages(constants.Form.ISSUE_ASSET_REQUEST)</button>
                 }
-                case _ => {
-        <div class="centerText" >
-        @loginState.acl match {
-            case Some(acl) => {
-                @if(acl.redeemAsset) {
-                    <button class="width btn btn-primary btn-sm" onclick="getForm(jsRoutes.controllers.RedeemAssetController.redeemAssetForm('@asset.ownerAddress', '@asset.pegHash'))">@Messages(constants.Form.REDEEM_ASSET)</button>
-                    <br>
+                case constants.Status.Asset.LISTED_FOR_TRADE | constants.Status.Asset.UNDER_NEGOTIATION => {
+                    <div class="centerText" >
+                    @loginState.acl match {
+                        case Some(acl) => {
+                            @if(acl.redeemAsset) {
+                                <button class="width btn btn-primary btn-sm" onclick="getForm(jsRoutes.controllers.RedeemAssetController.redeemAssetForm('@loginState.address', '@asset.pegHash'))">@Messages(constants.Form.REDEEM_ASSET)</button>
+                                <br>
+                                }
+                        }
+                        case _ => {}
+
                     }
-            }
-            case _ => {}
-        }
                     </div>
                  }
+                case _ => {}
             }
     </div>
 }

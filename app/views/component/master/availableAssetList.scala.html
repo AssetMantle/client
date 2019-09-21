@@ -1,20 +1,13 @@
 @import controllers.actions.LoginState
-@import models.blockchain.Asset
+@import models.masterTransaction.IssueAssetRequest
+@import models.masterTransaction.AssetFile
 
-@(assetList: Seq[Asset])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+@(assetList: Seq[IssueAssetRequest], assetFiles: Seq[AssetFile])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
 @for(asset <- assetList) {
     <div class="flexItem box firstBox lightBlue">
         <div class="leftText">
-            <span class="red">@Messages(constants.Form.PEG_HASH)</span>: @asset.pegHash <br>
-            <span class="red">@Messages(constants.Form.DOCUMENT_HASH)</span>: @asset.documentHash <br>
-            <span class="red">@Messages(constants.Form.ASSET_TYPE)</span>: @asset.assetType <br>
-            <span class="red">@Messages(constants.Form.ASSET_QUANTITY)</span>: @asset.assetQuantity <br>
-            <span class="red">@Messages(constants.Form.ASSET_PRICE)</span>: @asset.assetPrice <br>
-            <span class="red">@Messages(constants.Form.QUANTITY_UNIT)</span>: @asset.quantityUnit <br>
-            <span class="red">@Messages(constants.Form.MODERATED)</span>: @asset.moderated <br>
-            <span class="red">@Messages(constants.Form.TAKER_ADDRESS)</span>: @asset.takerAddress <br>
-            <span class="red">@Messages(constants.Form.LOCKED)</span>: @asset.locked <br>
+            @views.html.component.master.assetDetail(asset, assetFiles.filter(_.id == asset.id))
         </div>
     </div>
 }

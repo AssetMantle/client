@@ -153,6 +153,8 @@ class AssetFiles @Inject()(protected val databaseConfigProvider: DatabaseConfigP
 
   private def getAllDocumentsById(id: String): Future[Seq[AssetFileSerialized]] = db.run(assetFileTable.filter(_.id === id).result)
 
+  private def getAllDocumentsByIds(ids: Seq[String]): Future[Seq[AssetFileSerialized]] = db.run(assetFileTable.filter(_.id inSet ids).result)
+
   private def getDocumentsByID(id: String, documents: Seq[String]): Future[Seq[AssetFileSerialized]] = db.run(assetFileTable.filter(_.id === id).filter(_.documentType inSet documents).result)
 
   private def deleteById(id: String) = db.run(assetFileTable.filter(_.id === id).delete.asTry).map {
@@ -213,6 +215,8 @@ class AssetFiles @Inject()(protected val databaseConfigProvider: DatabaseConfigP
     def getFileName(id: String, documentType: String): String = Await.result(getFileNameByIdDocumentType(id = id, documentType = documentType), Duration.Inf)
 
     def getAllDocuments(id: String): Seq[AssetFile] = Await.result(getAllDocumentsById(id = id), Duration.Inf).map(_.deserialize)
+
+    def getAllDocumentsForAllAssets(ids: Seq[String]): Seq[AssetFile] = Await.result(getAllDocumentsByIds(ids = ids), Duration.Inf).map(_.deserialize)
 
     def getDocuments(id: String, documents: Seq[String]): Seq[AssetFile] = Await.result(getDocumentsByID(id, documents), Duration.Inf).map(_.deserialize)
 
