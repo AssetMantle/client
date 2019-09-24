@@ -146,11 +146,11 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
     }
   }
 
-  private def getUBOsOnID(id: String): Future[String] = db.run(organizationTable.filter(_.id === id).map(_.ubos.?).result.head.asTry).map {
-    case Success(result) => result.getOrElse(Json.toJson(UBOs(Seq())).toString)
+  private def getUBOsOnID(id: String): Future[Option[String]] = db.run(organizationTable.filter(_.id === id).map(_.ubos.?).result.head.asTry).map {
+    case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.info(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        Json.toJson(UBOs(Seq())).toString
+        None
     }
   }
 
@@ -206,7 +206,7 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
 
     def getID(accountID: String): String = Await.result(getIDByAccountID(accountID), Duration.Inf).getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION))
 
-    def getUBOs(id: String): UBOs = utilities.JSON.convertJsonStringToObject[UBOs](Await.result(getUBOsOnID(id), Duration.Inf))
+    def getUBOs(id: String): UBOs = utilities.JSON.convertJsonStringToObject[UBOs](Await.result(getUBOsOnID(id), Duration.Inf).getOrElse(Json.toJson(UBOs(Seq())).toString))
 
     def get(id: String): Organization = Await.result(findById(id), Duration.Inf).deserialize
 
