@@ -92,7 +92,6 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
   }
 
 
-
   def genesisAccessedFile(fileName: String, documentType: String): Action[AnyContent] = withGenesisLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
@@ -111,8 +110,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
           Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
         }
       } catch {
-        case _: NoSuchFileException => InternalServerError(views.html.index(failures = Seq(constants.Response.NO_SUCH_FILE_EXCEPTION)))
-        case _: NoSuchElementException => InternalServerError(views.html.index(failures = Seq(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)))
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
@@ -125,8 +123,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
           Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
         }
       } catch {
-        case _: NoSuchFileException => InternalServerError(views.html.index(failures = Seq(constants.Response.NO_SUCH_FILE_EXCEPTION)))
-        case _: Exception => InternalServerError(views.html.index(failures = Seq(constants.Response.GENERIC_EXCEPTION)))
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
@@ -139,8 +136,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
           Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
         }
       } catch {
-        case _: NoSuchFileException => InternalServerError(views.html.index(failures = Seq(constants.Response.NO_SUCH_FILE_EXCEPTION)))
-        case _: Exception => InternalServerError(views.html.index(failures = Seq(constants.Response.GENERIC_EXCEPTION)))
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
