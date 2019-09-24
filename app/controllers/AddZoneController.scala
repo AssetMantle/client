@@ -74,7 +74,7 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
         try {
           request.body.file(constants.File.KEY_FILE) match {
             case None => BadRequest(views.html.index(failures = Seq(constants.Response.NO_FILE)))
-            case Some(file) => utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, fileResourceManager.getZoneKycFilePath(documentType))
+            case Some(file) => utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, fileResourceManager.getZoneKYCFilePath(documentType))
               Ok
           }
         }
@@ -91,7 +91,7 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
         fileResourceManager.storeFile[master.ZoneKYC](
           name = name,
           documentType = documentType,
-          path = fileResourceManager.getZoneKycFilePath(documentType),
+          path = fileResourceManager.getZoneKYCFilePath(documentType),
           document = master.ZoneKYC(id = masterZones.Service.getID(loginState.username), documentType = documentType, status = None, fileName = name, file = None),
           masterCreate = masterZoneKYCs.Service.create
         )
@@ -112,7 +112,7 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
         fileResourceManager.updateFile[master.ZoneKYC](
           name = name,
           documentType = documentType,
-          path = fileResourceManager.getZoneKycFilePath(documentType),
+          path = fileResourceManager.getZoneKYCFilePath(documentType),
           oldDocumentFileName = masterZoneKYCs.Service.getFileName(id = id, documentType = documentType),
           document = master.ZoneKYC(id = id, documentType = documentType, status = None, fileName = name, file = None),
           updateOldDocument = masterZoneKYCs.Service.updateOldDocument
@@ -207,16 +207,16 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
       }
   }
 
-  def viewKycDocuments(zoneID: String): Action[AnyContent] = withGenesisLoginAction.authenticated { implicit loginState =>
+  def viewKYCDocuments(zoneID: String): Action[AnyContent] = withGenesisLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        withUsernameToken.Ok(views.html.component.master.viewVerificationZoneKycDouments(masterZoneKYCs.Service.getAllDocuments(zoneID)))
+        withUsernameToken.Ok(views.html.component.master.viewVerificationZoneKYCDouments(masterZoneKYCs.Service.getAllDocuments(zoneID)))
       } catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
-  def verifyKycDocument(zoneID: String, documentType: String): Action[AnyContent] = withGenesisLoginAction.authenticated { implicit loginState =>
+  def verifyKYCDocument(zoneID: String, documentType: String): Action[AnyContent] = withGenesisLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
         masterZoneKYCs.Service.verify(id = zoneID, documentType = documentType)
@@ -227,7 +227,7 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
       }
   }
 
-  def rejectKycDocument(zoneID: String, documentType: String): Action[AnyContent] = withGenesisLoginAction.authenticated { implicit loginState =>
+  def rejectKYCDocument(zoneID: String, documentType: String): Action[AnyContent] = withGenesisLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
         masterZoneKYCs.Service.reject(id = zoneID, documentType = documentType)
@@ -285,7 +285,7 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
         try {
           request.body.file(constants.File.KEY_FILE) match {
             case None => BadRequest(views.html.index(failures = Seq(constants.Response.NO_FILE)))
-            case Some(file) => utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, fileResourceManager.getZoneKycFilePath(documentType))
+            case Some(file) => utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, fileResourceManager.getZoneKYCFilePath(documentType))
               Ok
           }
         }
@@ -302,7 +302,7 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
         fileResourceManager.storeFile[master.ZoneKYC](
           name = name,
           documentType = documentType,
-          path = fileResourceManager.getZoneKycFilePath(documentType),
+          path = fileResourceManager.getZoneKYCFilePath(documentType),
           document = master.ZoneKYC(id = masterZones.Service.getID(loginState.username), documentType = documentType, fileName = name, file = None, status = None),
           masterCreate = masterZoneKYCs.Service.create
         )
@@ -323,7 +323,7 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
         fileResourceManager.updateFile[master.ZoneKYC](
           name = name,
           documentType = documentType,
-          path = fileResourceManager.getZoneKycFilePath(documentType),
+          path = fileResourceManager.getZoneKYCFilePath(documentType),
           oldDocumentFileName = masterZoneKYCs.Service.getFileName(id = id, documentType = documentType),
           document = master.ZoneKYC(id = id, documentType = documentType, status = None, fileName = name, file = None),
           updateOldDocument = masterZoneKYCs.Service.updateOldDocument

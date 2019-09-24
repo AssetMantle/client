@@ -137,7 +137,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
         try {
           request.body.file(constants.File.KEY_FILE) match {
             case None => BadRequest(views.html.index(failures = Seq(constants.Response.NO_FILE)))
-            case Some(file) => utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, fileResourceManager.getTraderKycFilePath(documentType))
+            case Some(file) => utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, fileResourceManager.getTraderKYCFilePath(documentType))
               Ok
           }
         }
@@ -154,7 +154,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
         fileResourceManager.storeFile[master.TraderKYC](
           name = name,
           documentType = documentType,
-          path = fileResourceManager.getTraderKycFilePath(documentType),
+          path = fileResourceManager.getTraderKYCFilePath(documentType),
           document = master.TraderKYC(id = masterTraders.Service.getID(loginState.username), documentType = documentType, fileName = name, file = None, zoneStatus = None, organizationStatus = None),
           masterCreate = masterTraderKYCs.Service.create
         )
@@ -175,7 +175,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
         fileResourceManager.updateFile[master.TraderKYC](
           name = name,
           documentType = documentType,
-          path = fileResourceManager.getTraderKycFilePath(documentType),
+          path = fileResourceManager.getTraderKYCFilePath(documentType),
           oldDocumentFileName = masterTraderKYCs.Service.getFileName(id = id, documentType = documentType),
           document = master.TraderKYC(id = id, documentType = documentType, fileName = name, file = None, zoneStatus = None, organizationStatus = None),
           updateOldDocument = masterTraderKYCs.Service.updateOldDocument
@@ -263,16 +263,16 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
       )
   }
 
-  def zoneViewKycDocuments(traderID: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+  def zoneViewKYCDocuments(traderID: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        withUsernameToken.Ok(views.html.component.master.zoneViewVerificationTraderKycDouments(masterTraderKYCs.Service.getAllDocuments(traderID)))
+        withUsernameToken.Ok(views.html.component.master.zoneViewVerificationTraderKYCDouments(masterTraderKYCs.Service.getAllDocuments(traderID)))
       } catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
-  def zoneVerifyKycDocument(traderID: String, documentType: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+  def zoneVerifyKYCDocument(traderID: String, documentType: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
         masterTraderKYCs.Service.zoneVerify(id = traderID, documentType = documentType)
@@ -283,7 +283,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
       }
   }
 
-  def zoneRejectKycDocument(traderID: String, documentType: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+  def zoneRejectKYCDocument(traderID: String, documentType: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
         masterTraderKYCs.Service.zoneReject(id = traderID, documentType = documentType)
@@ -405,16 +405,16 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
       )
   }
 
-  def organizationViewKycDocuments(traderID: String): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+  def organizationViewKYCDocuments(traderID: String): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        withUsernameToken.Ok(views.html.component.master.organizationViewVerificationTraderKycDouments(masterTraderKYCs.Service.getAllDocuments(traderID)))
+        withUsernameToken.Ok(views.html.component.master.organizationViewVerificationTraderKYCDouments(masterTraderKYCs.Service.getAllDocuments(traderID)))
       } catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
-  def organizationVerifyKycDocument(traderID: String, documentType: String): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+  def organizationVerifyKYCDocument(traderID: String, documentType: String): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
         masterTraderKYCs.Service.organizationVerify(id = traderID, documentType = documentType)
@@ -425,7 +425,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
       }
   }
 
-  def organizationRejectKycDocument(traderID: String, documentType: String): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+  def organizationRejectKYCDocument(traderID: String, documentType: String): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
         masterTraderKYCs.Service.organizationReject(id = traderID, documentType = documentType)
@@ -469,11 +469,11 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
       }
   }
 
-  def uploadTraderKycForm(documentType: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.uploadFileForm(utilities.String.getJsRouteFunction(routes.javascript.SetACLController.uploadTraderKyc), utilities.String.getJsRouteFunction(routes.javascript.SetACLController.storeTraderKyc), documentType))
+  def uploadTraderKYCForm(documentType: String): Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.uploadFileForm(utilities.String.getJsRouteFunction(routes.javascript.SetACLController.uploadTraderKYC), utilities.String.getJsRouteFunction(routes.javascript.SetACLController.storeTraderKYC), documentType))
   }
 
-  def uploadTraderKyc(documentType: String) = Action(parse.multipartFormData) { implicit request =>
+  def uploadTraderKYC(documentType: String) = Action(parse.multipartFormData) { implicit request =>
     FileUpload.form.bindFromRequest.fold(
       formWithErrors => {
         BadRequest
@@ -482,7 +482,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
         try {
           request.body.file(constants.File.KEY_FILE) match {
             case None => BadRequest(views.html.index(failures = Seq(constants.Response.NO_FILE)))
-            case Some(file) => utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, fileResourceManager.getTraderKycFilePath(documentType))
+            case Some(file) => utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, fileResourceManager.getTraderKYCFilePath(documentType))
               Ok
           }
         }
@@ -493,13 +493,13 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
     )
   }
 
-  def storeTraderKyc(name: String, documentType: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def storeTraderKYC(name: String, documentType: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
         fileResourceManager.storeFile[master.TraderKYC](
           name = name,
           documentType = documentType,
-          path = fileResourceManager.getTraderKycFilePath(documentType),
+          path = fileResourceManager.getTraderKYCFilePath(documentType),
           document = master.TraderKYC(id = masterTraders.Service.getID(loginState.username), documentType = documentType, fileName = name, file = None, zoneStatus = None, organizationStatus = None),
           masterCreate = masterTraderKYCs.Service.create
         )
@@ -509,18 +509,18 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
       }
   }
 
-  def updateTraderKycForm(documentType: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.updateFileForm(utilities.String.getJsRouteFunction(routes.javascript.SetACLController.uploadTraderKyc), utilities.String.getJsRouteFunction(routes.javascript.SetACLController.updateTraderKyc), documentType))
+  def updateTraderKYCForm(documentType: String): Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.updateFileForm(utilities.String.getJsRouteFunction(routes.javascript.SetACLController.uploadTraderKYC), utilities.String.getJsRouteFunction(routes.javascript.SetACLController.updateTraderKYC), documentType))
   }
 
-  def updateTraderKyc(name: String, documentType: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+  def updateTraderKYC(name: String, documentType: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
         val id = masterTraders.Service.getID(loginState.username)
         fileResourceManager.updateFile[master.TraderKYC](
           name = name,
           documentType = documentType,
-          path = fileResourceManager.getTraderKycFilePath(documentType),
+          path = fileResourceManager.getTraderKYCFilePath(documentType),
           oldDocumentFileName = masterTraderKYCs.Service.getFileName(id = id, documentType = documentType),
           document = master.TraderKYC(id = id, documentType = documentType, fileName = name, file = None, zoneStatus = None, organizationStatus = None),
           updateOldDocument = masterTraderKYCs.Service.updateOldDocument

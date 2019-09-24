@@ -128,11 +128,11 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
       }
   }
 
-  def userUploadOrganizationKycForm(documentType: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.uploadFileForm(utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.userUploadOrganizationKyc), utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.userStoreOrganizationKyc), documentType))
+  def userUploadOrganizationKYCForm(documentType: String): Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.uploadFileForm(utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.userUploadOrganizationKYC), utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.userStoreOrganizationKYC), documentType))
   }
 
-  def userUploadOrganizationKyc(documentType: String) = Action(parse.multipartFormData) { implicit request =>
+  def userUploadOrganizationKYC(documentType: String) = Action(parse.multipartFormData) { implicit request =>
     FileUpload.form.bindFromRequest.fold(
       formWithErrors => {
         BadRequest
@@ -141,7 +141,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
         try {
           request.body.file(constants.File.KEY_FILE) match {
             case None => BadRequest(views.html.index(failures = Seq(constants.Response.NO_FILE)))
-            case Some(file) => utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, fileResourceManager.getOrganizationKycFilePath(documentType))
+            case Some(file) => utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, fileResourceManager.getOrganizationKYCFilePath(documentType))
               Ok
           }
         }
@@ -152,14 +152,14 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
     )
   }
 
-  def userStoreOrganizationKyc(name: String, documentType: String): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
+  def userStoreOrganizationKYC(name: String, documentType: String): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
         val id = masterOrganizations.Service.getID(loginState.username)
         fileResourceManager.storeFile[master.OrganizationKYC](
           name = name,
           documentType = documentType,
-          path = fileResourceManager.getOrganizationKycFilePath(documentType),
+          path = fileResourceManager.getOrganizationKYCFilePath(documentType),
           document = master.OrganizationKYC(id = id, documentType = documentType, status = None, fileName = name, file = None),
           masterCreate = masterOrganizationKYCs.Service.create
         )
@@ -169,18 +169,18 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
       }
   }
 
-  def userUpdateOrganizationKycForm(documentType: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.updateFileForm(utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.userUploadOrganizationKyc), utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.userUpdateOrganizationKyc), documentType))
+  def userUpdateOrganizationKYCForm(documentType: String): Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.updateFileForm(utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.userUploadOrganizationKYC), utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.userUpdateOrganizationKYC), documentType))
   }
 
-  def userUpdateOrganizationKyc(name: String, documentType: String): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
+  def userUpdateOrganizationKYC(name: String, documentType: String): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
         val id = masterOrganizations.Service.getID(loginState.username)
         fileResourceManager.updateFile[master.OrganizationKYC](
           name = name,
           documentType = documentType,
-          path = fileResourceManager.getOrganizationKycFilePath(documentType),
+          path = fileResourceManager.getOrganizationKYCFilePath(documentType),
           oldDocumentFileName = masterOrganizationKYCs.Service.getFileName(id = id, documentType = documentType),
           document = master.OrganizationKYC(id = id, documentType = documentType, status = None, fileName = name, file = None),
           updateOldDocument = masterOrganizationKYCs.Service.updateOldDocument
@@ -265,16 +265,16 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
       )
   }
 
-  def viewKycDocuments(organizationID: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+  def viewKYCDocuments(organizationID: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        withUsernameToken.Ok(views.html.component.master.viewVerificationOrganizationKycDouments(masterOrganizationKYCs.Service.getAllDocuments(organizationID)))
+        withUsernameToken.Ok(views.html.component.master.viewVerificationOrganizationKYCDouments(masterOrganizationKYCs.Service.getAllDocuments(organizationID)))
       } catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
-  def verifyKycDocument(organizationID: String, documentType: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+  def verifyKYCDocument(organizationID: String, documentType: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
         masterOrganizationKYCs.Service.verify(id = organizationID, documentType = documentType)
@@ -285,7 +285,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
       }
   }
 
-  def rejectKycDocument(organizationID: String, documentType: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+  def rejectKYCDocument(organizationID: String, documentType: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
         masterOrganizationKYCs.Service.reject(id = organizationID, documentType = documentType)
@@ -338,15 +338,15 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
       }
   }
 
-  def uploadOrganizationKycForm(documentType: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.uploadFileForm(utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.uploadOrganizationKyc), utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.storeOrganizationKyc), documentType))
+  def uploadOrganizationKYCForm(documentType: String): Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.uploadFileForm(utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.uploadOrganizationKYC), utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.storeOrganizationKYC), documentType))
   }
 
-  def updateOrganizationKycForm(documentType: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.updateFileForm(utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.uploadOrganizationKyc), utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.updateOrganizationKyc), documentType))
+  def updateOrganizationKYCForm(documentType: String): Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.updateFileForm(utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.uploadOrganizationKYC), utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.updateOrganizationKYC), documentType))
   }
 
-  def uploadOrganizationKyc(documentType: String) = Action(parse.multipartFormData) { implicit request =>
+  def uploadOrganizationKYC(documentType: String) = Action(parse.multipartFormData) { implicit request =>
     FileUpload.form.bindFromRequest.fold(
       formWithErrors => {
         BadRequest
@@ -355,7 +355,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
         try {
           request.body.file(constants.File.KEY_FILE) match {
             case None => BadRequest(views.html.index(failures = Seq(constants.Response.NO_FILE)))
-            case Some(file) => utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, fileResourceManager.getOrganizationKycFilePath(documentType))
+            case Some(file) => utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, fileResourceManager.getOrganizationKYCFilePath(documentType))
               Ok
           }
         }
@@ -366,13 +366,13 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
     )
   }
 
-  def storeOrganizationKyc(name: String, documentType: String): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+  def storeOrganizationKYC(name: String, documentType: String): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
         fileResourceManager.storeFile[master.OrganizationKYC](
           name = name,
           documentType = documentType,
-          path = fileResourceManager.getOrganizationKycFilePath(documentType),
+          path = fileResourceManager.getOrganizationKYCFilePath(documentType),
           document = master.OrganizationKYC(id = masterOrganizations.Service.getID(loginState.username), documentType = documentType, status = None, fileName = name, file = None),
           masterCreate = masterOrganizationKYCs.Service.create
         )
@@ -382,14 +382,14 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
       }
   }
 
-  def updateOrganizationKyc(name: String, documentType: String): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+  def updateOrganizationKYC(name: String, documentType: String): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
         val id = masterOrganizations.Service.getID(loginState.username)
         fileResourceManager.updateFile[master.OrganizationKYC](
           name = name,
           documentType = documentType,
-          path = fileResourceManager.getOrganizationKycFilePath(documentType),
+          path = fileResourceManager.getOrganizationKYCFilePath(documentType),
           oldDocumentFileName = masterOrganizationKYCs.Service.getFileName(id = id, documentType = documentType),
           document = master.OrganizationKYC(id = id, documentType = documentType, status = None, fileName = name, file = None),
           updateOldDocument = masterOrganizationKYCs.Service.updateOldDocument

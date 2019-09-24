@@ -15,9 +15,9 @@ class FileResourceManager @Inject()()(implicit executionContext: ExecutionContex
 
   private val logger: Logger = Logger(this.getClass)
 
-  private val uploadAccountKycBankAccountDetailPath = configuration.get[String]("upload.account.bankAccountDetailPath")
+  private val uploadAccountKYCBankAccountDetailPath = configuration.get[String]("upload.account.bankAccountDetailPath")
 
-  private val uploadAccountKycIdentificationPath = configuration.get[String]("upload.account.identificationPath")
+  private val uploadAccountKYCIdentificationPath = configuration.get[String]("upload.account.identificationPath")
 
   private val uploadAccountProfilePicturePath = configuration.get[String]("upload.account.profilePicturePath")
 
@@ -29,31 +29,31 @@ class FileResourceManager @Inject()()(implicit executionContext: ExecutionContex
 
   private val uploadOrganizationKYCBankAccountDetailPath = configuration.get[String]("upload.organization.bankAccountDetailPath")
 
-  private val uploadOrganizationKycAdminProfileIdentificationPath = configuration.get[String]("upload.organization.adminProfileIdentificationPath")
+  private val uploadOrganizationKYCAdminProfileIdentificationPath = configuration.get[String]("upload.organization.adminProfileIdentificationPath")
 
-  private val uploadOrganizationKycLatestAuditedFinancialReportPath = configuration.get[String]("upload.organization.latestAuditedFinancialReportPath")
+  private val uploadOrganizationKYCLatestAuditedFinancialReportPath = configuration.get[String]("upload.organization.latestAuditedFinancialReportPath")
 
   private val uploadOrganizationKYCLastYearAuditedFinancialReportPath = configuration.get[String]("upload.organization.lastYearAuditedFinancialReportPath")
 
-  private val uploadOrganizationKycManagementPath = configuration.get[String]("upload.organization.managementPath")
+  private val uploadOrganizationKYCManagementPath = configuration.get[String]("upload.organization.managementPath")
 
   private val uploadOrganizationKYCACRAPath = configuration.get[String]("upload.organization.acraPath")
 
-  private val uploadOrganizationKycShareStructurePath = configuration.get[String]("upload.organization.shareStructurePath")
+  private val uploadOrganizationKYCShareStructurePath = configuration.get[String]("upload.organization.shareStructurePath")
 
-  private val uploadTraderKycIdentificationPath = configuration.get[String]("upload.trader.identificationPath")
+  private val uploadTraderKYCIdentificationPath = configuration.get[String]("upload.trader.identificationPath")
 
   private val uploadTraderAgreementPath = configuration.get[String]("upload.trader.agreementPath")
 
-  def getAccountKycFilePath(documentType: String): String = {
+  def getAccountKYCFilePath(documentType: String): String = {
     documentType match {
-      case constants.File.BANK_ACCOUNT_DETAIL => uploadAccountKycBankAccountDetailPath
-      case constants.File.IDENTIFICATION => uploadAccountKycIdentificationPath
+      case constants.File.BANK_ACCOUNT_DETAIL => uploadAccountKYCBankAccountDetailPath
+      case constants.File.IDENTIFICATION => uploadAccountKYCIdentificationPath
       case _ => constants.File.UNKNOWN_TYPE
     }
   }
 
-  def getZoneKycFilePath(documentType: String): String = {
+  def getZoneKYCFilePath(documentType: String): String = {
     documentType match {
       case constants.File.BANK_ACCOUNT_DETAIL => uploadZoneKYCBankAccountDetailPath
       case constants.File.IDENTIFICATION => uploadZoneKYCIdentificationPath
@@ -61,23 +61,23 @@ class FileResourceManager @Inject()()(implicit executionContext: ExecutionContex
     }
   }
 
-  def getOrganizationKycFilePath(documentType: String): String = {
+  def getOrganizationKYCFilePath(documentType: String): String = {
     documentType match {
       case constants.File.BANK_ACCOUNT_DETAIL => uploadOrganizationKYCBankAccountDetailPath
-      case constants.File.ADMIN_PROFILE_IDENTIFICATION => uploadOrganizationKycAdminProfileIdentificationPath
-      case constants.File.LATEST_AUDITED_FINANCIAL_REPORT => uploadOrganizationKycLatestAuditedFinancialReportPath
+      case constants.File.ADMIN_PROFILE_IDENTIFICATION => uploadOrganizationKYCAdminProfileIdentificationPath
+      case constants.File.LATEST_AUDITED_FINANCIAL_REPORT => uploadOrganizationKYCLatestAuditedFinancialReportPath
       case constants.File.LAST_YEAR_AUDITED_FINANCIAL_REPORT => uploadOrganizationKYCLastYearAuditedFinancialReportPath
-      case constants.File.MANAGEMENT => uploadOrganizationKycManagementPath
+      case constants.File.MANAGEMENT => uploadOrganizationKYCManagementPath
       case constants.File.ACRA => uploadOrganizationKYCACRAPath
-      case constants.File.SHARE_STRUCTURE => uploadOrganizationKycShareStructurePath
+      case constants.File.SHARE_STRUCTURE => uploadOrganizationKYCShareStructurePath
       case constants.File.ORGANIZATION_AGREEMENT => uploadOrganizationAgreementPath
       case _ => constants.File.UNKNOWN_TYPE
     }
   }
 
-  def getTraderKycFilePath(documentType: String): String = {
+  def getTraderKYCFilePath(documentType: String): String = {
     documentType match {
-      case constants.File.TRADER_IDENTIFICATION => uploadTraderKycIdentificationPath
+      case constants.File.TRADER_IDENTIFICATION => uploadTraderKYCIdentificationPath
       case constants.File.TRADER_AGREEMENT => uploadTraderAgreementPath
       case _ => constants.File.UNKNOWN_TYPE
     }
