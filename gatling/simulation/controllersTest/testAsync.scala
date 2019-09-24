@@ -15,7 +15,7 @@ class MasterTest9 extends Simulation {
         .exec(masterTest8.dbCalls)
 
   setUp(
-    scenarioBuilderTraders.inject(atOnceUsers(10))
+    scenarioBuilderTraders.inject(atOnceUsers(100))
   ).maxDuration(800)
     .protocols(http.baseUrl(Test.BASE_URL))
 
@@ -40,9 +40,8 @@ object masterTest8 {
     .pause(8)
 
   val dbCalls: ScenarioBuilder = scenario("dbOps")
-    .feed(UsernameFeeder.usernameFeed)
     .exec(http("testGet")
-        .get(routes.IndexController.testAction("${%s}".format(Test.TEST_USERNAME)).url))
+        .get(routes.IndexController.testActionAsync("SELL11HtBwtOyo").url))
     .pause(2)
 
 }

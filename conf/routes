@@ -52,7 +52,7 @@ POST        /acccount/noteNewKeyDetails                                  control
 GET         /contact                                                     controllers.ContactController.contact
 
 GET         /master/notifications                                        controllers.NotificationController.notificationPage(pageNumber:Int)
-GET         /master/unreadNotificationCount                              controllers.NotificationController.unreadNotificationCount()
+GET         /master/unreadNotificationCount                              controllers.NotificationController.unreadNotificationCount
 GET         /master/markNotificationAsRead                               controllers.NotificationController.markNotificationRead(notificationID: String)
 
 GET         /master/queryConfigurationVariable:query                     controllers.ConfigurationController.queryConfigurationVariable(query: String)

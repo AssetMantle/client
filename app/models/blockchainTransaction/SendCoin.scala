@@ -211,31 +211,35 @@ class SendCoins @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
 
     def onSuccessAsync(ticketID: String, blockResponse: BlockResponse) = {
 
-
         Service.markTransactionSuccessfulAsync(ticketID, blockResponse.txhash)
         Service.getTransactionAsync(ticketID).flatMap { sendCoin =>
            blockchainAccounts.Service.markDirtyAsync(sendCoin.to)
            blockchainAccounts.Service.markDirtyAsync(sendCoin.from)
-           masterAccounts.Service.getAccountByAddressAsync(sendCoin.to).flatMap{toAccount=>
+           masterAccounts.Service.getAccountByAddressAsync(sendCoin.to).map{toAccount=>
             if (toAccount.userType == constants.User.UNKNOWN) {
               masterAccounts.Service.updateUserTypeAsync(toAccount.id, constants.User.USER)
             }
-            pushNotification.sendNotification(toAccount.id, constants.Notification.SUCCESS, blockResponse.txhash)
-            pushNotification.sendNotification(masterAccounts.Service.getId(sendCoin.from), constants.Notification.SUCCESS, blockResponse.txhash)
+             utilitiesNotification.send(toAccount.id, constants.Notification.SUCCESS, blockResponse.txhash)
+             utilitiesNotification.send(masterAccounts.Service.getId(sendCoin.from), constants.Notification.SUCCESS, blockResponse.txhash)
 
-          }
+          }.recover{
+             case baseException: BaseException => logger.error(baseException.failure.message, baseException)
+               throw new BaseException(constants.Response.PSQL_EXCEPTION)
+           }
 
         }
     }
 
 
 
-    def onFailureAsync(ticketID: String, message: String): Future[Unit] = Future {
+    def onFailureAsync(ticketID: String, message: String) = Future {
       try {
         Service.markTransactionFailed(ticketID, message)
         val sendCoin = Service.getTransaction(ticketID)
-        pushNotification.sendNotification(masterAccounts.Service.getId(sendCoin.to), constants.Notification.FAILURE, message)
-        pushNotification.sendNotification(masterAccounts.Service.getId(sendCoin.from), constants.Notification.FAILURE, message)
+        //pushNotification.sendNotification(masterAccounts.Service.getId(sendCoin.to), constants.Notification.FAILURE, message)
+       // pushNotification.sendNotification(masterAccounts.Service.getId(sendCoin.from), constants.Notification.FAILURE, message)
+        utilitiesNotification.send(masterAccounts.Service.getId(sendCoin.to), constants.Notification.FAILURE, message)
+        utilitiesNotification.send(masterAccounts.Service.getId(sendCoin.from), constants.Notification.FAILURE, message)
       } catch {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }

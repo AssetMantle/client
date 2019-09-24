@@ -43,7 +43,7 @@ class Transaction @Inject()(getTxHashResponse: GetTransactionHashResponse, getRe
     ticketID
   }
 
-  def processAsync[T1 <: BaseTransaction[T1], T2 <: BaseRequest](entity: T1, blockchainTransactionCreate: T1 => Future[String], request: T2, action: T2 => Future[WSResponse], onSuccess: (String, BlockResponse) => Future[Unit], onFailure: (String, String) => Future[Unit], updateTransactionHash: (String, String) => Future[Int])(implicit module: String, logger: Logger) = {
+  def processAsync[T1 <: BaseTransaction[T1], T2 <: BaseRequest](entity: T1, blockchainTransactionCreate: T1 => Future[String], request: T2, action: T2 => Future[WSResponse], onSuccess: (String, BlockResponse) => Unit, onFailure: (String, String) => Future[Unit], updateTransactionHash: (String, String) => Future[Int])(implicit module: String, logger: Logger) = {
 
     val ticketID2: Future[String] = if (kafkaEnabled) utilities.JSON.getResponseFromJsonAsync[KafkaResponse](action(request)).map(res=> res.ticketID) else Future{utilities.IDGenerator.ticketID}
     ticketID2.map{ticketID=>

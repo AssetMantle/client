@@ -11,9 +11,9 @@ import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
 import queries.GetAccount
-
 import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{Await, ExecutionContext, Future, Promise}
+import scala.util.{Failure, Success}
 
 @Singleton
 class IndexController @Inject()(messagesControllerComponents: MessagesControllerComponents, withLoginAction: WithLoginAction, masterAccounts: Accounts, blockchainAclAccounts: ACLAccounts, blockchainZones: blockchain.Zones, blockchainOrganizations: blockchain.Organizations, blockchainAssets: blockchain.Assets, blockchainFiats: blockchain.Fiats, blockchainNegotiations: blockchain.Negotiations, masterOrganizations: Organizations, masterZones: Zones, blockchainAclHashes: blockchain.ACLHashes, blockchainOrders: blockchain.Orders, getAccount: GetAccount, blockchainAccounts: blockchain.Accounts, withUsernameToken: WithUsernameToken)(implicit configuration: Configuration, executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
@@ -48,44 +48,48 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
   }
 
   def testAction(username:String)=Action{
-      println(username)
+
       val timeInitial=System.currentTimeMillis()
       val account=masterAccounts.Service.getAccount(username)
       val address=masterAccounts.Service.getAddress(username)
-      val userType=masterAccounts.Service.getUserType(username)
-      val lang= masterAccounts.Service.getLanguage(username)
-      val availability=masterAccounts.Service.checkUsernameAvailable(username)
+
       val timeNow=System.currentTimeMillis()
-      println( "The user details are \n username -> buyer025 \n address-> "+address+"\n serretHash -> "+account.secretHash+"\n usertype ->"+userType+"\n lang-> "+lang+"\n availability->"+ !availability +"\n and time taken"+(timeNow-timeInitial))
-
-
+      println( "The user details are \n username -> buyer025 \n address-> "+address+"\n serretHash -> "+account.secretHash+"\n and time taken"+(timeNow-timeInitial))
      // val str= "The user details are \n username -> buyer025 \n address-> "+address+"\n serretHash -> "+account.secretHash+"\n usertype ->"+userType+"\n lang-> "+lang+"\n availability->"+ !availability +"\n and time taken"+(timeNow-timeInitial)
       Ok("Done")
-
-
   }
 
-  def testActionAsync(username:String)=Action.async{
+  def func(usr:String)={
+    usr+"sgsfs"
+  }
+
+  def testActionAsync(username:String="SELL11HtBwtOyo")=Action.async{
 
       val timeInitial = System.currentTimeMillis()
 
       val account = masterAccounts.Service.getAccountAsync(username)
       val address = masterAccounts.Service.getAddressAsync(username)
+
       val userType = masterAccounts.Service.getUserTypeAsync(username)
-      val lang = masterAccounts.Service.getLanguageAsync(username)
-      val availability = masterAccounts.Service.checkUsernameAvailableAsync(username)
-      for {
-        account1 <- account
-        address1 <- address
-        userType1 <- userType
-        lang1 <- lang
-        avail1 <- availability
-      } yield {
-        val timeNow = System.currentTimeMillis()
-        val str="The user details are    username -> buyer025     address-> " + address1 + "\n serretHash -> " + account1.secretHash + "  usertype ->" + userType1 + "       lang-> " + lang1 + "        availability->" + !avail1 + "      and time taken " + (timeNow - timeInitial)
-        println(str)
-        Ok("done")
+
+      val s2= Promise[String]()
+
+      val mylist:List[Future[Any]]=List(account,address,userType)
+
+     address.zip(address).map{case(add,ars)=>
+       println(add,ars)
+         func(ars)
+     }
+
+      val x=Future.sequence(mylist)
+
+      x.map{results=>
+
+        println(results)
+        Ok
+        }
+
       }
 
-  }
+
 }
