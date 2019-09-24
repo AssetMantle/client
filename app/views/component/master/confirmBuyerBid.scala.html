@@ -8,6 +8,12 @@
     <div class="latest_card-header latest_card-header-primary text-center">
         <h4 class="latest_card-title">@Messages(constants.Form.CONFIRM_BUYER_BID)</h4>
     </div>
+    <script src="@routes.Assets.versioned("javascripts/showHideUploadUpdateButton.js")" type="text/javascript"></script>
+    <div class="centerText">
+        <button id="traderButtonUploadBuyerContract" class="hidden" onclick="getForm(jsRoutes.controllers.FileController.uploadTraderNegotiationForm('@constants.File.BUYER_CONTRACT', '@confirmBuyerBidForm.data(constants.FormField.REQUEST_ID.name)'))">@Messages(constants.Form.UPLOAD_BUYER_CONTRACT)</button>
+        <button id="traderButtonUpdateBuyerContract" class="hidden" onclick="getForm(jsRoutes.controllers.FileController.updateTraderNegotiationForm('@constants.File.BUYER_CONTRACT', '@confirmBuyerBidForm.data(constants.FormField.REQUEST_ID.name)'))">@Messages(constants.Form.UPDATE_SELLER_CONTRACT)</button>
+        <script>checkFileExists(jsRoutes.controllers.FileController.checkTraderNegotiationFileExists('@confirmBuyerBidForm.data(constants.FormField.REQUEST_ID.name)', '@constants.File.BUYER_CONTRACT'), "traderButtonUploadBuyerContract", "traderButtonUpdateBuyerContract")</script>
+    </div>
     <div class="latest_card-body">
         @CSRF.formField
       @inputText(confirmBuyerBidForm(constants.FormField.SELLER_ADDRESS.name).copy(value = Some(sellerAddress)), '_label -> Messages(constants.FormField.SELLER_ADDRESS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.SELLER_ADDRESS.name), 'required -> true)

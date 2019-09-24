@@ -12,3 +12,18 @@ function checkFileExists(route, uploadButtonId, updateButtonId){
         }
     });
 }
+
+function checkFileExistsDisable(route, buttonID){
+    let button = $("#" + buttonID);
+    $.ajax({
+        url: route.url,
+        type: route.type,
+        statusCode: {
+            200: function () {
+            },
+            204: function () {
+                button.prop('disabled', true);
+            }
+        }
+    });
+}

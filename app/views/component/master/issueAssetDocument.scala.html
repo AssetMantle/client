@@ -1,0 +1,31 @@
+@import controllers.actions.LoginState
+@import helper._
+@import views.companion.master.IssueAssetOBL
+@import models.masterTransaction.AssetFile
+
+@(id: String, files: Seq[AssetFile])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+
+<div class="centerText">
+    @for(documentType <- constants.File.TRADER_ASSET_DOCUMENT_TYPES_UPLOAD_PAGE) {
+        <div id="upload@documentType">
+            <button onclick="getForm(jsRoutes.controllers.FileController.uploadTraderAssetForm('@documentType', '@id'))">@Messages(constants.Form.UPLOAD) @Messages(documentType)</button>
+        </div>
+    }
+    @for(file <- files) {
+        @component.master.commonDocumentViewer(file) {
+            @routes.FileController.tradingFile(id, file.fileName, file.documentType)
+        } {
+            <a href="@routes.FileController.tradingFile(id, file.fileName, file.documentType)">@Messages(file.documentType)</a>
+        } {
+            <button onclick="getForm(jsRoutes.controllers.File.updateTraderAssetForm('@file.documentType', '@id'))">@Messages(constants.Form.UPDATE) @Messages(file.documentType)</button>
+            <script>hideElement('upload@file.documentType')</script>
+        }
+    }
+</div>
+@*/ /TODO whether database should contain constants.File.TRADER_KYC_DOCUMENT_TYPES (current scenario) OR constants.File.TRADER_KYC_DOCUMENT_TYPES should contain all database file type*@
+@if(constants.File.TRADER_ASSET_DOCUMENT_TYPES_UPLOAD_PAGE_NEXT.forall(files.map(_.documentType).contains)) {
+    <button type="button" id="issueAssetDocuments" onclick="getForm(jsRoutes.controllers.IssueAssetController.issueAssetRequestForm('@id'))">@Messages(constants.Form.NEXT)</button>
+}else {
+    <button type="button" id="issueAssetDocuments" onclick="getForm(jsRoutes.controllers.IssueAssetController.issueAssetRequestForm('@id'))" disabled="disabled">@Messages(constants.Form.NEXT)</button>
+
+}

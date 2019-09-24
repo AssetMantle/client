@@ -78,7 +78,7 @@
         @form(action = routes.AddOrganizationController.reviewOrganizationCompletion, 'onkeypress -> "submitFormOnEnter(event,this)") {
             @CSRF.formField
             @Messages(constants.Form.COMPLETION):
-            <span>@checkbox(organizationCompletionForm(constants.Form.COMPLETION), '_label -> Messages(constants.Form.COMPLETION), 'placeholder -> Messages(constants.Form.COMPLETION), 'required -> true)</span>
+            <span>@checkbox(organizationCompletionForm(constants.Form.COMPLETION), '_label -> Messages(constants.Form.COMPLETION), 'class -> "cmuk-checkbox", 'placeholder -> Messages(constants.Form.COMPLETION), 'required -> true)</span>
             @if(organizationCompletionForm.hasGlobalErrors) {
                 <ul>
                 @for(error <- organizationCompletionForm.globalErrors) {

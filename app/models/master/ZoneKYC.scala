@@ -118,7 +118,7 @@ class ZoneKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
     def status = column[Boolean]("status")
 
-    def fileName = column[String]("fileName")
+    def fileName = column[String]("fileName", O.Unique)
 
     def file = column[Array[Byte]]("file")
 
