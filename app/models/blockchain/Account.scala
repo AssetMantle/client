@@ -140,7 +140,7 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
     def getDirtyAddresses: Seq[String] = Await.result(getAddressesByDirtyBit(dirtyBit = true), Duration.Inf)
 
-    def markDirty(address: String): Int = Await.result(updateDirtyBitByAddress(address, dirtyBit = true), Duration.Inf)
+    def markDirty(address: String): Future[Int] = updateDirtyBitByAddress(address, dirtyBit = true)
 
     def accountCometSource(username: String) = {
       shutdownActors.shutdown(constants.Module.ACTOR_MAIN_ACCOUNT, username)

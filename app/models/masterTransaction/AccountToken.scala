@@ -127,7 +127,7 @@ class AccountTokens @Inject()(actorSystem: ActorSystem, shutdownActors: Shutdown
 
     def updateToken(id: String, notificationToken: String): Int = Await.result(upsert(AccountToken(id, Option(notificationToken), None, Option(DateTime.now(DateTimeZone.UTC).getMillis))), Duration.Inf)
 
-    def getTokenById(id: String): Option[String] = Await.result(findById(id), Duration.Inf).notificationToken
+    def getTokenById(id: String): Future[Option[String]] = findById(id).map{acc=>acc.notificationToken}
 
     def getSessionTokenTimeById(id: String): Long = Await.result(findById(id), Duration.Inf).sessionTokenTime.getOrElse(0.toLong)
 

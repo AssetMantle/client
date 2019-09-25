@@ -198,7 +198,7 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
     def getId(accountAddress: String): String = Await.result(getIdByAddress(accountAddress), Duration.Inf)
 
-    def getAccountByAddress(accountAddress: String): Account = Await.result(findByAddress(accountAddress), Duration.Inf)
+    def getAccountByAddress(accountAddress: String): Future[Account] = findByAddress(accountAddress)
 
     def getAddress(id: String): String = Await.result(getAddressById(id), Duration.Inf)
 

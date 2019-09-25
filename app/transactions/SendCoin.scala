@@ -9,8 +9,7 @@ import play.api.libs.ws.{WSClient, WSResponse}
 import play.api.{Configuration, Logger}
 import transactions.Abstract.BaseRequest
 
-import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class SendCoin @Inject()(wsClient: WSClient)(implicit configuration: Configuration, executionContext: ExecutionContext) {
@@ -46,12 +45,13 @@ class SendCoin @Inject()(wsClient: WSClient)(implicit configuration: Configurati
   private def action(request: Request): Future[WSResponse] = wsClient.url(url + request.to + path2).post(Json.toJson(request))
 
   object Service {
-    def post(request: Request): WSResponse = try {
-      Await.result(action(request), Duration.Inf)
-    } catch {
-      case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
+
+    def post(request: Request):Future[WSResponse]=action(request).recover{
+      case connectException: ConnectException =>
+        logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
         throw new BaseException(constants.Response.CONNECT_EXCEPTION)
     }
+
   }
 
 }
