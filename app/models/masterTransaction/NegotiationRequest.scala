@@ -36,6 +36,14 @@ class NegotiationRequests @Inject()(protected val databaseConfigProvider: Databa
     }
   }
 
+  private def upsert(negotiationRequest: NegotiationRequest): Future[Int] = db.run(negotiationRequestTable.insertOrUpdate(negotiationRequest).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+    }
+  }
+
   private def find(id: String): Future[NegotiationRequest] = db.run(negotiationRequestTable.filter(_.id === id).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -44,6 +52,13 @@ class NegotiationRequests @Inject()(protected val databaseConfigProvider: Databa
     }
   }
 
+  private def findNegotiationByPegHashAndBuyerAccountID(pegHash: String, buyerAccountID: String): Future[Option[NegotiationRequest]] = db.run(negotiationRequestTable.filter(_.pegHash === pegHash).filter(_.buyerAccountID === buyerAccountID).result.head.asTry).map {
+    case Success(result) => Option(result)
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => logger.info(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        None
+    }
+  }
   private def checkByIDAndAccountID(id: String, accountID: String) = db.run(negotiationRequestTable.filter(_.id === id).filter(negotiationRequest => negotiationRequest.buyerAccountID === accountID || negotiationRequest.sellerAccountID === accountID).exists.result)
 
   private def getNegotiationRequestsWithNullStatus: Future[Seq[NegotiationRequest]] = db.run(negotiationRequestTable.filter(_.status.?.isEmpty).result)
@@ -112,13 +127,17 @@ class NegotiationRequests @Inject()(protected val databaseConfigProvider: Databa
 
     def create(id: String, negotiationID: String, amount: Int): String = Await.result(add(NegotiationRequest(utilities.IDGenerator.requestID(), null, null, null,null ,amount, null, null)), Duration.Inf)
 
+    def insertOrUpdateChangeBid(requestID: String, buyerAccountID: String, sellerAccountID: String, pegHash: String, amount: Int): Int = Await.result(upsert(NegotiationRequest(requestID, None, buyerAccountID, sellerAccountID, pegHash, amount, constants.Status.Asset.UNDER_NEGOTIATION, None)), Duration.Inf)
+
     def getPendingNegotiationRequests: Seq[NegotiationRequest] = Await.result(getNegotiationRequestsWithNullStatus, Duration.Inf)
 
     def delete(id: String): Int = Await.result(deleteByID(id), Duration.Inf)
 
     def getStatus(id: String): Option[String] = Await.result(getStatusByID(id), Duration.Inf)
 
-    def checkNegotiationAndAccountIDExists(id: String ,accountID: String) = Await.result(checkByIDAndAccountID(id, accountID), Duration.Inf)
+    def checkNegotiationAndAccountIDExists(id: String ,accountID: String): Boolean = Await.result(checkByIDAndAccountID(id, accountID), Duration.Inf)
+
+    def getNegotiationByPegHashAndBuyerAccountID(pegHash: String ,buyerAccountID: String): Option[NegotiationRequest] = Await.result(findNegotiationByPegHashAndBuyerAccountID(pegHash, buyerAccountID), Duration.Inf)
   }
 
 }
