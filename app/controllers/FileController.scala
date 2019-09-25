@@ -1,6 +1,6 @@
 package controllers
 
-import java.nio.file.{Files, NoSuchFileException}
+import java.nio.file.Files
 import java.util.Date
 
 import controllers.actions._
@@ -319,8 +319,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
           Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
         }
       } catch {
-        case _: NoSuchFileException => InternalServerError(views.html.index(failures = Seq(constants.Response.NO_SUCH_FILE_EXCEPTION)))
-        case _: Exception => InternalServerError(views.html.index(failures = Seq(constants.Response.GENERIC_EXCEPTION)))
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
@@ -333,8 +332,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
           Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
         }
       } catch {
-        case _: NoSuchFileException => InternalServerError(views.html.index(failures = Seq(constants.Response.NO_SUCH_FILE_EXCEPTION)))
-        case _: Exception => InternalServerError(views.html.index(failures = Seq(constants.Response.GENERIC_EXCEPTION)))
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
@@ -421,7 +419,6 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
         Ok.sendFile(utilities.FileOperations.fetchFile(path = path, fileName = fileName))
       } catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-        case _: NoSuchFileException => InternalServerError(views.html.index(failures = Seq(constants.Response.NO_SUCH_FILE_EXCEPTION)))
       }
   }
 
@@ -435,7 +432,6 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
         Ok.sendFile(utilities.FileOperations.fetchFile(path = path, fileName = fileName))
       } catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-        case _: NoSuchFileException => InternalServerError(views.html.index(failures = Seq(constants.Response.NO_SUCH_FILE_EXCEPTION)))
       }
   }
 

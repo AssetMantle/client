@@ -12,8 +12,6 @@ function blockExplorer(blockExplorerTableBody, maxNumberOfItems) {
 
     wsNewBlock.onmessage = function (message) {
         if ($('#indexBottomDivision').length === 0) {
-            let emptyArray = [""];
-            //setCookie("blockExplorerTimer", JSON.stringify(emptyArray), 1);
             wsNewBlock.close();
         } else {
             let receivedData = JSON.parse(message.data);
@@ -31,11 +29,9 @@ function blockExplorer(blockExplorerTableBody, maxNumberOfItems) {
     };
 
     $(window).submit(function () {
-        //setCookie("blockExplorerTimer", "[]", 1);
         wsNewBlock.close();
     });
 }
-
 
 function updateBlockExplorer(wsNewBlock, blockExplorerTableBody, receivedData, maxNumberOfItems) {
 
@@ -70,7 +66,6 @@ function updateBlockExplorer(wsNewBlock, blockExplorerTableBody, receivedData, m
     updateLastBlock(latestBlockHeight, lastBlockTime);
 
 }
-
 
 function initializeBlockExplorer(blockExplorerTableBody, maxNumberOfItems) {
 
@@ -156,7 +151,32 @@ function setFirstBlockTime() {
     });
 }
 
-$('#indexBottomDivision').ready(function (event) {
+function getBlockTime(dateTime, timerID) {
+    let timerElement = $('#' + timerID);
+    if (timerElement != null) {
+        timerElement.html(((new Date(new Date().toISOString()).getTime() - new Date(dateTime).getTime()) / 1000).toFixed(0) + "s");
+    }
+}
+
+function updateBlockTimes() {
+    let timeOutID = getCookie("timeOutID");
+    clearTimeout(timeOutID);
+    let setTimeoutIDArray = JSON.parse(getCookie("blockExplorerTimer"));
+    if (setTimeoutIDArray !== undefined) {
+        $.each(setTimeoutIDArray, function (index, value) {
+            let timerElement = $('#' + value);
+            if (timerElement.html() !== undefined) {
+                timerElement.html((parseInt(timerElement.html().match(/\d+/)[0], 10) + 1) + "s");
+            }
+        });
+    }
+    timeOutID = setTimeout(function () {
+        updateBlockTimes();
+    }, 1000);
+    setCookie("timeOutID", timeOutID, 1);
+}
+
+$('#indexBottomDivision').ready(function () {
     const blockExplorerTableBody = "blockContainer";
     const maxNumberOfItems = 8;
     setFirstBlockTime();
