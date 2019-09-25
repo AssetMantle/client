@@ -136,8 +136,9 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
   def availableAssetListWithLogin: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        val assets = masterTransactionIssueAssetRequests.Service.getMarketAssets()
-        withUsernameToken.Ok(views.html.component.master.availableAssetListWithLogin(assets, masterTransactionAssetFiles.Service.getAllDocumentsForAllAssets(assets.map(_.id))))
+        val masterTransactionAssets = masterTransactionIssueAssetRequests.Service.getMarketAssets()
+        val blockchainAssetList = blockchainAssets.Service.getAllPublic(blockchainOrders.Service.getAllOrderIds)
+        withUsernameToken.Ok(views.html.component.master.availableAssetListWithLogin(masterTransactionAssets, blockchainAssetList, masterTransactionAssetFiles.Service.getAllDocumentsForAllAssets(masterTransactionAssets.map(_.id))))
       } catch {
         case _: BaseException => NoContent
       }
