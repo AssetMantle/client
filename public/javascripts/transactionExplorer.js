@@ -11,7 +11,7 @@ function transactionExplorer() {
     $('#transactionContainer').prepend(content);
     let transactionContainerList = document.getElementById("transactionContainer");
 
-    const wsNewTransaction = new WebSocket(wsUrl);
+    let wsNewTransaction = new WebSocket(wsUrl);
     wsNewTransaction.onopen = () => {
         let requestTx = `{"method":"subscribe", "id":"dontcare","jsonrpc":"2.0","params":["tm.event='Tx'"]}`;
         wsNewTransaction.send(requestTx)
