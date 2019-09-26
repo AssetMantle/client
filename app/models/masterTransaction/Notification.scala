@@ -1,8 +1,9 @@
 package models.masterTransaction
 
+import java.sql.Timestamp
+
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import org.joda.time.{DateTime, DateTimeZone}
 import org.postgresql.util.PSQLException
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
@@ -12,7 +13,7 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Random, Success}
 
-case class Notification(accountID: String, notificationTitle: String, notificationMessage: String, time: Long, read: Boolean, id: String)
+case class Notification(accountID: String, notificationTitle: String, notificationMessage: String, time: Timestamp, read: Boolean, id: String)
 
 @Singleton
 class Notifications @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
@@ -85,7 +86,7 @@ class Notifications @Inject()(protected val databaseConfigProvider: DatabaseConf
 
     def read = column[Boolean]("read")
 
-    def time = column[Long]("time")
+    def time = column[Timestamp]("time")
 
     def id = column[String]("id", O.PrimaryKey)
 
@@ -93,7 +94,7 @@ class Notifications @Inject()(protected val databaseConfigProvider: DatabaseConf
 
   object Service {
 
-    def create(accountID: String, notificationTitle: String, notificationMessage: String): String = Await.result(add(Notification(accountID, notificationTitle, notificationMessage, DateTime.now(DateTimeZone.UTC).getMillis, false, Random.nextString(32))), Duration.Inf)
+    def create(accountID: String, notificationTitle: String, notificationMessage: String): String = Await.result(add(Notification(accountID, notificationTitle, notificationMessage, time = new Timestamp(System.currentTimeMillis), read = false, Random.nextString(32))), Duration.Inf)
 
     def get(accountID: String, offset: Int, limit: Int): Seq[Notification] = Await.result(findNotificationsByAccountId(accountID, offset, limit), Duration.Inf)
 

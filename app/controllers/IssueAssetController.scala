@@ -13,7 +13,6 @@ import play.api.libs.json.Json
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
 
-
 import scala.concurrent.ExecutionContext
 
 @Singleton
@@ -98,7 +97,6 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
         }
-
       )
   }
 
@@ -165,7 +163,7 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
     implicit loginState =>
       implicit request =>
         try {
-          withUsernameToken.Ok(views.html.component.master.viewPendingIssueAssetRequests(masterTransactionIssueAssetRequests.Service.getPendingIssueAssetRequests(masterAccounts.Service.getIDsForAddresses(blockchainAclAccounts.Service.getAddressesUnderZone(masterZones.Service.getZoneId(loginState.username))), constants.Status.Asset.REQUESTED)))
+          withUsernameToken.Ok(views.html.component.master.viewPendingIssueAssetRequests(masterTransactionIssueAssetRequests.Service.getPendingIssueAssetRequests(masterAccounts.Service.getIDsForAddresses(blockchainAclAccounts.Service.getAddressesUnderZone(masterZones.Service.getID(loginState.username))), constants.Status.Asset.REQUESTED)))
         }
         catch {
           case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))

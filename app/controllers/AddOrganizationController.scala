@@ -29,9 +29,9 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
     implicit request =>
       try {
         val organization = masterOrganizations.Service.getByAccountID(loginState.username)
-        Ok(views.html.component.master.addOrganization(views.companion.master.AddOrganization.form.fill(value = views.companion.master.AddOrganization.Data(zoneID = organization.zoneID, name = organization.name, abbreviation = organization.abbreviation, establishmentDate = utilities.Date.sqlDateToUtilDate(organization.establishmentDate), email = organization.email, registeredAddress = views.companion.master.AddOrganization.AddressData(addressLine1 = organization.registeredAddress.addressLine1, addressLine2 = organization.registeredAddress.addressLine2, Landmark = organization.registeredAddress.landmark, City = organization.registeredAddress.city, Country = organization.registeredAddress.country, ZipCode = organization.registeredAddress.zipCode, Phone = organization.registeredAddress.phone), postalAddress = views.companion.master.AddOrganization.AddressData(addressLine1 = organization.postalAddress.addressLine1, addressLine2 = organization.postalAddress.addressLine2, Landmark = organization.postalAddress.landmark, City = organization.postalAddress.city, Country = organization.postalAddress.country, ZipCode = organization.postalAddress.zipCode, Phone = organization.postalAddress.phone))), zones = masterZones.Service.getAll))
+        Ok(views.html.component.master.addOrganization(views.companion.master.AddOrganization.form.fill(value = views.companion.master.AddOrganization.Data(zoneID = organization.zoneID, name = organization.name, abbreviation = organization.abbreviation, establishmentDate = utilities.Date.sqlDateToUtilDate(organization.establishmentDate), email = organization.email, registeredAddress = views.companion.master.AddOrganization.AddressData(addressLine1 = organization.registeredAddress.addressLine1, addressLine2 = organization.registeredAddress.addressLine2, landmark = organization.registeredAddress.landmark, city = organization.registeredAddress.city, country = organization.registeredAddress.country, zipCode = organization.registeredAddress.zipCode, phone = organization.registeredAddress.phone), postalAddress = views.companion.master.AddOrganization.AddressData(addressLine1 = organization.postalAddress.addressLine1, addressLine2 = organization.postalAddress.addressLine2, landmark = organization.postalAddress.landmark, city = organization.postalAddress.city, country = organization.postalAddress.country, zipCode = organization.postalAddress.zipCode, phone = organization.postalAddress.phone))), zones = masterZones.Service.getAllVerified))
       } catch {
-        case _: BaseException => Ok(views.html.component.master.addOrganization(views.companion.master.AddOrganization.form, zones = masterZones.Service.getAll))
+        case _: BaseException => Ok(views.html.component.master.addOrganization(views.companion.master.AddOrganization.form, zones = masterZones.Service.getAllVerified))
       }
   }
 
@@ -39,12 +39,12 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
     implicit request =>
       views.companion.master.AddOrganization.form.bindFromRequest().fold(
         formWithErrors => {
-          BadRequest(views.html.component.master.addOrganization(formWithErrors, zones = masterZones.Service.getAll))
+          BadRequest(views.html.component.master.addOrganization(formWithErrors, zones = masterZones.Service.getAllVerified))
         },
         addOrganizationData => {
           try {
             if (masterZones.Service.getVerificationStatus(addOrganizationData.zoneID)) {
-              val id = masterOrganizations.Service.insertOrUpdateOrganizationWithoutUBOs(zoneID = addOrganizationData.zoneID, accountID = loginState.username, name = addOrganizationData.name, abbreviation = addOrganizationData.abbreviation, establishmentDate = utilities.Date.utilDateToSQLDate(addOrganizationData.establishmentDate), email = addOrganizationData.email, registeredAddress = Address(addressLine1 = addOrganizationData.registeredAddress.addressLine1, addressLine2 = addOrganizationData.registeredAddress.addressLine2, landmark = addOrganizationData.registeredAddress.Landmark, city = addOrganizationData.registeredAddress.City, country = addOrganizationData.registeredAddress.Country, zipCode = addOrganizationData.registeredAddress.ZipCode, phone = addOrganizationData.registeredAddress.Phone), postalAddress = Address(addressLine1 = addOrganizationData.postalAddress.addressLine1, addressLine2 = addOrganizationData.postalAddress.addressLine2, landmark = addOrganizationData.postalAddress.Landmark, city = addOrganizationData.postalAddress.City, country = addOrganizationData.postalAddress.Country, zipCode = addOrganizationData.postalAddress.ZipCode, phone = addOrganizationData.postalAddress.Phone))
+              val id = masterOrganizations.Service.insertOrUpdateWithoutUBOs(zoneID = addOrganizationData.zoneID, accountID = loginState.username, name = addOrganizationData.name, abbreviation = addOrganizationData.abbreviation, establishmentDate = utilities.Date.utilDateToSQLDate(addOrganizationData.establishmentDate), email = addOrganizationData.email, registeredAddress = Address(addressLine1 = addOrganizationData.registeredAddress.addressLine1, addressLine2 = addOrganizationData.registeredAddress.addressLine2, landmark = addOrganizationData.registeredAddress.landmark, city = addOrganizationData.registeredAddress.city, country = addOrganizationData.registeredAddress.country, zipCode = addOrganizationData.registeredAddress.zipCode, phone = addOrganizationData.registeredAddress.phone), postalAddress = Address(addressLine1 = addOrganizationData.postalAddress.addressLine1, addressLine2 = addOrganizationData.postalAddress.addressLine2, landmark = addOrganizationData.postalAddress.landmark, city = addOrganizationData.postalAddress.city, country = addOrganizationData.postalAddress.country, zipCode = addOrganizationData.postalAddress.zipCode, phone = addOrganizationData.postalAddress.phone))
               try {
                 PartialContent(views.html.component.master.userUpdateUBOs(views.companion.master.AddUBOs.form.fill(views.companion.master.AddUBOs.Data(masterOrganizations.Service.getUBOs(id).data.map(ubo => Option(views.companion.master.AddUBOs.UBOData(personName = ubo.personName, sharePercentage = ubo.sharePercentage, relationship = ubo.relationship, title = ubo.title)))))))
               } catch {
@@ -128,11 +128,11 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
       }
   }
 
-  def userUploadOrganizationKycForm(documentType: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.uploadFile(utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.userUploadOrganizationKyc), utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.userStoreOrganizationKyc), documentType))
+  def userUploadOrganizationKYCForm(documentType: String): Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.uploadFile(utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.userUploadOrganizationKYC), utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.userStoreOrganizationKYC), documentType))
   }
 
-  def userUploadOrganizationKyc(documentType: String) = Action(parse.multipartFormData) { implicit request =>
+  def userUploadOrganizationKYC(documentType: String) = Action(parse.multipartFormData) { implicit request =>
     FileUpload.form.bindFromRequest.fold(
       formWithErrors => {
         BadRequest
@@ -141,7 +141,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
         try {
           request.body.file(constants.File.KEY_FILE) match {
             case None => BadRequest(views.html.index(failures = Seq(constants.Response.NO_FILE)))
-            case Some(file) => utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, fileResourceManager.getOrganizationKycFilePath(documentType))
+            case Some(file) => utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, fileResourceManager.getOrganizationKYCFilePath(documentType))
               Ok
           }
         }
@@ -152,14 +152,14 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
     )
   }
 
-  def userStoreOrganizationKyc(name: String, documentType: String): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
+  def userStoreOrganizationKYC(name: String, documentType: String): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
         val id = masterOrganizations.Service.getID(loginState.username)
         fileResourceManager.storeFile[master.OrganizationKYC](
           name = name,
           documentType = documentType,
-          path = fileResourceManager.getOrganizationKycFilePath(documentType),
+          path = fileResourceManager.getOrganizationKYCFilePath(documentType),
           document = master.OrganizationKYC(id = id, documentType = documentType, status = None, fileName = name, file = None),
           masterCreate = masterOrganizationKYCs.Service.create
         )
@@ -169,32 +169,23 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
       }
   }
 
-  def userUpdateOrganizationKycForm(documentType: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.updateFile(utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.userUploadOrganizationKyc), utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.userUpdateOrganizationKyc), documentType))
+  def userUpdateOrganizationKYCForm(documentType: String): Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.updateFile(utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.userUploadOrganizationKYC), utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.userUpdateOrganizationKYC), documentType))
   }
 
-  def userUpdateOrganizationKyc(name: String, documentType: String): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
+  def userUpdateOrganizationKYC(name: String, documentType: String): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
         val organizationID = masterOrganizations.Service.getID(loginState.username)
         fileResourceManager.updateFile[master.OrganizationKYC](
           name = name,
           documentType = documentType,
-          path = fileResourceManager.getOrganizationKycFilePath(documentType),
+          path = fileResourceManager.getOrganizationKYCFilePath(documentType),
           oldDocumentFileName = masterOrganizationKYCs.Service.getFileName(id = organizationID, documentType = documentType),
           document = master.OrganizationKYC(id = organizationID, documentType = documentType, status = None, fileName = name, file = None),
           updateOldDocument = masterOrganizationKYCs.Service.updateOldDocument
         )
         PartialContent(views.html.component.master.userUploadOrUpdateOrganizationKYC(masterOrganizationKYCs.Service.getAllDocuments(organizationID)))
-      } catch {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-      }
-  }
-
-  def userAccessedOrganizationKYCFile(documentType: String): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
-    implicit request =>
-      try {
-        Ok.sendFile(utilities.FileOperations.fetchFile(path = fileResourceManager.getOrganizationKycFilePath(documentType), fileName = masterOrganizationKYCs.Service.getFileName(id = masterOrganizations.Service.getID(loginState.username), documentType = documentType)))
       } catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
@@ -274,16 +265,16 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
       )
   }
 
-  def viewKycDocuments(organizationID: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+  def viewKYCDocuments(organizationID: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        withUsernameToken.Ok(views.html.component.master.viewVerificationOrganizationKycDouments(masterOrganizationKYCs.Service.getAllDocuments(organizationID)))
+        withUsernameToken.Ok(views.html.component.master.viewVerificationOrganizationKYCDouments(masterOrganizationKYCs.Service.getAllDocuments(organizationID)))
       } catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
-  def verifyKycDocument(organizationID: String, documentType: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+  def verifyKYCDocument(organizationID: String, documentType: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
         masterOrganizationKYCs.Service.verify(id = organizationID, documentType = documentType)
@@ -294,7 +285,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
       }
   }
 
-  def rejectKycDocument(organizationID: String, documentType: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+  def rejectKYCDocument(organizationID: String, documentType: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
         masterOrganizationKYCs.Service.reject(id = organizationID, documentType = documentType)
@@ -340,22 +331,22 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
   def viewPendingVerifyOrganizationRequests: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        Ok(views.html.component.master.viewPendingVerifyOrgnizationRequests(masterOrganizations.Service.getVerifyOrganizationRequests(masterZones.Service.getZoneId(loginState.username))))
+        Ok(views.html.component.master.viewPendingVerifyOrgnizationRequests(masterOrganizations.Service.getVerifyOrganizationRequests(masterZones.Service.getID(loginState.username))))
       }
       catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
-  def uploadOrganizationKycForm(documentType: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.uploadFile(utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.uploadOrganizationKyc), utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.storeOrganizationKyc), documentType))
+  def uploadOrganizationKYCForm(documentType: String): Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.uploadFile(utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.uploadOrganizationKYC), utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.storeOrganizationKYC), documentType))
   }
 
-  def updateOrganizationKycForm(documentType: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.updateFile(utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.uploadOrganizationKyc), utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.updateOrganizationKyc), documentType))
+  def updateOrganizationKYCForm(documentType: String): Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.updateFile(utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.uploadOrganizationKYC), utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.updateOrganizationKYC), documentType))
   }
 
-  def uploadOrganizationKyc(documentType: String) = Action(parse.multipartFormData) { implicit request =>
+  def uploadOrganizationKYC(documentType: String) = Action(parse.multipartFormData) { implicit request =>
     FileUpload.form.bindFromRequest.fold(
       formWithErrors => {
         BadRequest
@@ -364,7 +355,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
         try {
           request.body.file(constants.File.KEY_FILE) match {
             case None => BadRequest(views.html.index(failures = Seq(constants.Response.NO_FILE)))
-            case Some(file) => utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, fileResourceManager.getOrganizationKycFilePath(documentType))
+            case Some(file) => utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, fileResourceManager.getOrganizationKYCFilePath(documentType))
               Ok
           }
         }
@@ -375,13 +366,13 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
     )
   }
 
-  def storeOrganizationKyc(name: String, documentType: String): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+  def storeOrganizationKYC(name: String, documentType: String): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
         fileResourceManager.storeFile[master.OrganizationKYC](
           name = name,
           documentType = documentType,
-          path = fileResourceManager.getOrganizationKycFilePath(documentType),
+          path = fileResourceManager.getOrganizationKYCFilePath(documentType),
           document = master.OrganizationKYC(id = masterOrganizations.Service.getID(loginState.username), documentType = documentType, status = None, fileName = name, file = None),
           masterCreate = masterOrganizationKYCs.Service.create
         )
@@ -391,14 +382,14 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
       }
   }
 
-  def updateOrganizationKyc(name: String, documentType: String): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+  def updateOrganizationKYC(name: String, documentType: String): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
         val organizationID = masterOrganizations.Service.getID(loginState.username)
         fileResourceManager.updateFile[master.OrganizationKYC](
           name = name,
           documentType = documentType,
-          path = fileResourceManager.getOrganizationKycFilePath(documentType),
+          path = fileResourceManager.getOrganizationKYCFilePath(documentType),
           oldDocumentFileName = masterOrganizationKYCs.Service.getFileName(id = organizationID, documentType = documentType),
           document = master.OrganizationKYC(id = organizationID, documentType = documentType, status = None, fileName = name, file = None),
           updateOldDocument = masterOrganizationKYCs.Service.updateOldDocument
@@ -412,7 +403,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
   def viewOrganizationsInZone: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        Ok(views.html.component.master.viewOrganizationsInZone(masterOrganizations.Service.getOrganizationsInZone(masterZones.Service.getZoneId(loginState.username))))
+        Ok(views.html.component.master.viewOrganizationsInZone(masterOrganizations.Service.getOrganizationsInZone(masterZones.Service.getID(loginState.username))))
       }
       catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))

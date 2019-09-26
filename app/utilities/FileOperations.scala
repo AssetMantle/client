@@ -123,7 +123,7 @@ object FileOperations {
 
   def fetchFile(path: String, fileName: String): File = {
     val file = new java.io.File(path + fileName)
-    if (!file.exists()) throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION) else file
+    if (!file.exists) throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION) else file
   }
 
   def combinedHash(documents: Seq[Document[_]])(implicit executionContext: ExecutionContext): String = {

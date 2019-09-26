@@ -50,12 +50,6 @@ function changeTableContent(clickValue) {
     });
 }
 
-function showAllBlocksTableErrorEvent(event) {
-    if (parseInt(getCookie("showAllBlocksTableClick"), 10) === 0) {
-        document.getElementById("allBlocksTableBody").appendChild(document.createElement("div").innerHTML = "ERROR: " + evt.data);
-    }
-}
-
 function updateShowAllBlocksTable(receivedData) {
     if (parseInt(getCookie("showAllBlocksTableClick"), 10) === 0) {
         let height = receivedData.result.data.value.block.header.height;

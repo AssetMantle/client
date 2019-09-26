@@ -174,7 +174,7 @@ class Traders @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
 
     def create(zoneID: String, organizationID: String, accountID: String, name: String): String = Await.result(add(Trader(utilities.IDGenerator.hexadecimal, zoneID, organizationID, accountID, name)), Duration.Inf)
 
-    def insertOrUpdateTrader(zoneID: String, organizationID: String, accountID: String, name: String): String = {
+    def insertOrUpdate(zoneID: String, organizationID: String, accountID: String, name: String): String = {
       val id = Await.result(getIDByAccountID(accountID), Duration.Inf).getOrElse(utilities.IDGenerator.hexadecimal)
       Await.result(upsert(Trader(id = id, zoneID = zoneID, organizationID = organizationID, accountID = accountID, name = name)), Duration.Inf)
       id

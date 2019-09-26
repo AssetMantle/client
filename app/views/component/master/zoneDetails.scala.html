@@ -5,4 +5,13 @@
 @Messages(constants.Form.NAME): @zone.name <br>
 @Messages(constants.Form.ZONE_ID): @zone.id <br>
 @Messages(constants.Form.CURRENCY): @zone.currency <br>
-@Messages(constants.Form.VERIFIED_STATUS): @zone.verificationStatus <br>
+@Messages(constants.Form.ADDRESS_LINE_1): @zone.address.addressLine1 <br>
+@Messages(constants.Form.ADDRESS_LINE_2): @zone.address.addressLine2 <br>
+@Messages(constants.Form.LANDMARK): @zone.address.landmark.getOrElse("") <br>
+@Messages(constants.Form.CITY): @zone.address.city <br>
+@Messages(constants.Form.COUNTRY): @zone.address.country <br>
+@Messages(constants.Form.ZIP_CODE): @zone.address.zipCode <br>
+@Messages(constants.Form.PHONE): @zone.address.phone <br>
+@Messages(constants.Form.COMPLETION_STATUS): @zone.completionStatus <br>
+@Messages(constants.Form.VERIFIED_STATUS): @zone.verificationStatus.getOrElse(false) <br>
+

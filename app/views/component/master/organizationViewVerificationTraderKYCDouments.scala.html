@@ -9,7 +9,7 @@
       } {
             <a href="@routes.FileController.organizationAccessedTraderKYCFile(traderKYC.id, traderKYC.fileName, traderKYC.documentType)">@Messages(traderKYC.documentType)</a>
         }{
-            <div id="traderKycDocumentStatus@traderKYC.id@traderKYC.documentType"></div>
+            <div id="traderKYCDocumentStatus@traderKYC.id@traderKYC.documentType"></div>
             <span class="red">@Messages(constants.Form.STATUS)
                 @if(traderKYC.status.getOrElse(false)) {
                   <span id="verifiedDocumentStatus@traderKYC.id @traderKYC.documentType" class="result success"><img src="@routes.Assets.versioned("images/success.jpg")"></span>
@@ -42,15 +42,15 @@
             </div>
             @traderKYC.organizationStatus.getOrElse(None) match {
                 case true => {
-                  <div id="buttonTraderKycDocumentStatus@traderKYC.id @traderKYC.documentType"><button class="cmuk-button cmuk-button-danger cmuk-button-small" onclick="organizationRejectTraderKycDocument('@traderKYC.id', '@traderKYC.documentType')">@Messages(constants.Form.REJECT)</button></div>
+                  <div id="buttonTraderKYCDocumentStatus@traderKYC.id @traderKYC.documentType"><button class="cmuk-button cmuk-button-danger cmuk-button-small" onclick="organizationRejectTraderKYCDocument('@traderKYC.id', '@traderKYC.documentType')">@Messages(constants.Form.REJECT)</button></div>
                 }
                 case false => {
-                  <div id="buttonTraderKycDocumentStatus@traderKYC.id @traderKYC.documentType"><button class="cmuk-button cmuk-button-success cmuk-button-small" onclick="organizationVerifyTraderKycDocument('@traderKYC.id', '@traderKYC.documentType')">@Messages(constants.Form.APPROVE)</button></div>
+                  <div id="buttonTraderKYCDocumentStatus@traderKYC.id @traderKYC.documentType"><button class="cmuk-button cmuk-button-success cmuk-button-small" onclick="organizationVerifyTraderKYCDocument('@traderKYC.id', '@traderKYC.documentType')">@Messages(constants.Form.APPROVE)</button></div>
                 }
                 case _ => {
-                    <div id="buttonTraderKycDocumentStatus@traderKYC.id@traderKYC.documentType">
-                      <button class="cmuk-button cmuk-button-success cmuk-button-small" onclick="organizationVerifyTraderKycDocument('@traderKYC.id', '@traderKYC.documentType')">@Messages(constants.Form.APPROVE)</button>
-                      <button class="cmuk-button cmuk-button-danger cmuk-button-small" onclick="organizationRejectTraderKycDocument('@traderKYC.id', '@traderKYC.documentType')">@Messages(constants.Form.REJECT)</button>
+                    <div id="buttonTraderKYCDocumentStatus@traderKYC.id@traderKYC.documentType">
+                      <button class="cmuk-button cmuk-button-success cmuk-button-small" onclick="organizationVerifyTraderKYCDocument('@traderKYC.id', '@traderKYC.documentType')">@Messages(constants.Form.APPROVE)</button>
+                      <button class="cmuk-button cmuk-button-danger cmuk-button-small" onclick="organizationRejectTraderKYCDocument('@traderKYC.id', '@traderKYC.documentType')">@Messages(constants.Form.REJECT)</button>
                     </div>
                 }
             }

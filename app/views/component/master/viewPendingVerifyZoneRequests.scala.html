@@ -13,15 +13,13 @@
         <span class="red">@Messages(constants.Form.ACCOUNT_ID)</span> : @zoneVerificationRequest.accountID <br>
         <span class="red">@Messages(constants.Form.NAME)</span> : @zoneVerificationRequest.name <br>
         <span class="red">@Messages(constants.Form.CURRENCY)</span> : @zoneVerificationRequest.currency <br>
-        <span class="red">@Messages(constants.Form.DOCUMENTS)</span>
-        : <span id = "kycDocuments@zoneVerificationRequest.accountID"><script>getFiles('kycDocuments@zoneVerificationRequest.accountID', jsRoutes.controllers.AddZoneController.viewKycDocuments('@zoneVerificationRequest.accountID'))</script></span>
+        <span class="red">@Messages(constants.Form.DOCUMENTS)</span>:<span id = "kycDocuments@zoneVerificationRequest.accountID">
+        <script>componentResource('kycDocuments@zoneVerificationRequest.accountID', jsRoutes.controllers.AddZoneController.viewKYCDocuments('@zoneVerificationRequest.id'))</script></span>
         <br>
         <button class="cmuk-button cmuk-button-success cmuk-button-small" onclick="getForm(jsRoutes.controllers.AddZoneController.verifyZoneForm('@zoneVerificationRequest.id'))">@Messages(constants.Form.APPROVE)</button>
         <button class="cmuk-button cmuk-button-danger cmuk-button-small" onclick="getForm(jsRoutes.controllers.AddZoneController.rejectVerifyZoneRequestForm('@zoneVerificationRequest.id'))">@Messages(constants.Form.REJECT)</button>
       </div>
         </div>
-
-
   }
   </div>
 </div>
