@@ -23,8 +23,8 @@ class ChangeBuyerBidController @Inject()(messagesControllerComponents: MessagesC
   def changeBuyerBidForm(sellerAddress: String, pegHash: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       masterTransactionNegotiationRequests.Service.getNegotiationByPegHashAndBuyerAccountID(pegHash, loginState.username) match {
-        case Some(negotiationRequest) => Ok(views.html.component.master.changeBuyerBid(views.companion.master.ChangeBuyerBid.form.fill(views.companion.master.ChangeBuyerBid.Data(Option(negotiationRequest.id), "", sellerAddress,negotiationRequest.amount , 0, pegHash, constants.FormField.GAS.minimumValue))))
-        case None => Ok(views.html.component.master.changeBuyerBid(views.companion.master.ChangeBuyerBid.form.fill(views.companion.master.ChangeBuyerBid.Data(None, "", sellerAddress,0 , 0, pegHash, constants.FormField.GAS.minimumValue))))
+        case Some(negotiationRequest) => withUsernameToken.Ok(views.html.component.master.changeBuyerBid(views.companion.master.ChangeBuyerBid.form.fill(views.companion.master.ChangeBuyerBid.Data(Option(negotiationRequest.id), "", sellerAddress,negotiationRequest.amount , 0, pegHash, constants.FormField.GAS.minimumValue))))
+        case None => withUsernameToken.Ok(views.html.component.master.changeBuyerBid(views.companion.master.ChangeBuyerBid.form.fill(views.companion.master.ChangeBuyerBid.Data(None, "", sellerAddress,0 , 0, pegHash, constants.FormField.GAS.minimumValue))))
       }
   }
 
