@@ -274,25 +274,25 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
       }
   }
 
-  def changeOrganizationKYCDocumentStatusForm(organizationID: String, documentType: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.changeOrganizationKYCDocumentStatus(views.companion.master.ChangeOrganizationKYCDocumentStatus.form.fill(views.companion.master.ChangeOrganizationKYCDocumentStatus.Data(organizationID = organizationID, documentType = documentType, status = false))))
+  def updateOrganizationKYCDocumentStatusForm(organizationID: String, documentType: String): Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.updateOrganizationKYCDocumentStatus(views.companion.master.UpdateOrganizationKYCDocumentStatus.form.fill(views.companion.master.UpdateOrganizationKYCDocumentStatus.Data(organizationID = organizationID, documentType = documentType, status = false))))
   }
 
-  def changeOrganizationKYCDocumentStatus(): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+  def updateOrganizationKYCDocumentStatus(): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      views.companion.master.ChangeOrganizationKYCDocumentStatus.form.bindFromRequest().fold(
+      views.companion.master.UpdateOrganizationKYCDocumentStatus.form.bindFromRequest().fold(
         formWithErrors => {
-          BadRequest(views.html.component.master.changeOrganizationKYCDocumentStatus(formWithErrors))
+          BadRequest(views.html.component.master.updateOrganizationKYCDocumentStatus(formWithErrors))
         },
-        changeOrganizationKYCDocumentStatusData => {
+        updateOrganizationKYCDocumentStatusData => {
           try {
-            if (masterZones.Service.getID(loginState.username) == masterOrganizations.Service.getZoneID(changeOrganizationKYCDocumentStatusData.organizationID)) {
-              if (changeOrganizationKYCDocumentStatusData.status) {
-                masterOrganizationKYCs.Service.verify(id = changeOrganizationKYCDocumentStatusData.organizationID, documentType = changeOrganizationKYCDocumentStatusData.documentType)
-                utilitiesNotification.send(masterOrganizations.Service.getAccountId(changeOrganizationKYCDocumentStatusData.organizationID), constants.Notification.SUCCESS, Messages(constants.Response.DOCUMENT_APPROVED.message))
+            if (masterZones.Service.getID(loginState.username) == masterOrganizations.Service.getZoneID(updateOrganizationKYCDocumentStatusData.organizationID)) {
+              if (updateOrganizationKYCDocumentStatusData.status) {
+                masterOrganizationKYCs.Service.verify(id = updateOrganizationKYCDocumentStatusData.organizationID, documentType = updateOrganizationKYCDocumentStatusData.documentType)
+                utilitiesNotification.send(masterOrganizations.Service.getAccountId(updateOrganizationKYCDocumentStatusData.organizationID), constants.Notification.SUCCESS, Messages(constants.Response.DOCUMENT_APPROVED.message))
               } else {
-                masterOrganizationKYCs.Service.reject(id = changeOrganizationKYCDocumentStatusData.organizationID, documentType = changeOrganizationKYCDocumentStatusData.documentType)
-                utilitiesNotification.send(masterOrganizations.Service.getAccountId(changeOrganizationKYCDocumentStatusData.organizationID), constants.Notification.FAILURE, Messages(constants.Response.DOCUMENT_REJECTED.message))
+                masterOrganizationKYCs.Service.reject(id = updateOrganizationKYCDocumentStatusData.organizationID, documentType = updateOrganizationKYCDocumentStatusData.documentType)
+                utilitiesNotification.send(masterOrganizations.Service.getAccountId(updateOrganizationKYCDocumentStatusData.organizationID), constants.Notification.FAILURE, Messages(constants.Response.DOCUMENT_REJECTED.message))
               }
               Redirect(routes.ViewController.zoneRequest())
             } else {

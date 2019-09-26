@@ -1,0 +1,25 @@
+@import controllers.actions.LoginState
+@import helper._
+@import views.companion.master.UpdateOrganizationKYCDocumentStatus
+
+@(updateOrganizationKYCDocumentStatusForm: Form[UpdateOrganizationKYCDocumentStatus.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@form(action = routes.AddOrganizationController.updateOrganizationKYCDocumentStatus, 'onkeypress -> "submitFormOnEnter(event,this)") {
+    <div class="latest_card-header latest_card-header-primary text-center">
+        <h4 class="latest_card-title">@Messages(constants.Form.UPDATE_ORGANIZATION_KYC_STATUS)</h4>
+    </div>
+    <div class="latest_card-body">
+        @CSRF.formField
+        @inputText(updateOrganizationKYCDocumentStatusForm(constants.FormField.ORGANIZATION_ID.name), '_label -> Messages(constants.FormField.ORGANIZATION_ID.name), 'placeholder -> Messages(constants.FormField.ORGANIZATION_ID.name), 'required -> true, 'class -> "cmuk-input", 'readonly -> true)
+        @inputText(updateOrganizationKYCDocumentStatusForm(constants.FormField.DOCUMENT_TYPE.name), '_label -> Messages(constants.FormField.DOCUMENT_TYPE.name), 'placeholder -> Messages(constants.FormField.DOCUMENT_TYPE.name), 'required -> true, 'class -> "cmuk-input", 'readonly -> true)
+        @checkbox(updateOrganizationKYCDocumentStatusForm(constants.Form.STATUS), '_label -> Messages(constants.Form.STATUS), 'class -> "cmuk-checkbox", 'placeholder -> Messages(constants.Form.STATUS), 'required -> true)
+
+        @if(updateOrganizationKYCDocumentStatusForm.hasGlobalErrors) {
+            <ul>
+            @for(error <- updateOrganizationKYCDocumentStatusForm.globalErrors) {
+                <li>@error.format</li>
+            }
+            </ul>
+        }
+        <button type="button" class="btn btn-primary btn-sm" onclick="submitForm(this)">@Messages(constants.Form.SUBMIT)</button>
+    </div>
+}

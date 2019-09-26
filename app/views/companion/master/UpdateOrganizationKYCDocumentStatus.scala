@@ -3,7 +3,7 @@ package views.companion.master
 import play.api.data.Form
 import play.api.data.Forms.{boolean, mapping}
 
-object ChangeOrganizationKYCDocumentStatus {
+object UpdateOrganizationKYCDocumentStatus {
   val form = Form(
     mapping(
       constants.FormField.ORGANIZATION_ID.name -> constants.FormField.ORGANIZATION_ID.field,

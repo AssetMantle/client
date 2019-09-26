@@ -3,7 +3,7 @@ package views.companion.master
 import play.api.data.Form
 import play.api.data.Forms.{boolean, mapping}
 
-object ChangeAssetDocumentStatus {
+object UpdateAssetDocumentStatus {
   val form = Form(
     mapping(
       constants.FormField.FILE_ID.name -> constants.FormField.FILE_ID.field,

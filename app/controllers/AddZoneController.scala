@@ -216,24 +216,24 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
       }
   }
 
-  def changeZoneKYCDocumentStatusForm(zoneID: String, documentType: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.changeZoneKYCDocumentStatus(views.companion.master.ChangeZoneKYCDocumentStatus.form.fill(views.companion.master.ChangeZoneKYCDocumentStatus.Data(zoneID = zoneID, documentType = documentType, status = false))))
+  def updateZoneKYCDocumentStatusForm(zoneID: String, documentType: String): Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.updateZoneKYCDocumentStatus(views.companion.master.UpdateZoneKYCDocumentStatus.form.fill(views.companion.master.UpdateZoneKYCDocumentStatus.Data(zoneID = zoneID, documentType = documentType, status = false))))
   }
 
-  def changeZoneKYCDocumentStatus(): Action[AnyContent] = withGenesisLoginAction.authenticated { implicit loginState =>
+  def updateZoneKYCDocumentStatus(): Action[AnyContent] = withGenesisLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      views.companion.master.ChangeZoneKYCDocumentStatus.form.bindFromRequest().fold(
+      views.companion.master.UpdateZoneKYCDocumentStatus.form.bindFromRequest().fold(
         formWithErrors => {
-          BadRequest(views.html.component.master.changeZoneKYCDocumentStatus(formWithErrors))
+          BadRequest(views.html.component.master.updateZoneKYCDocumentStatus(formWithErrors))
         },
-        changeZoneKYCDocumentStatusData => {
+        updateZoneKYCDocumentStatusData => {
           try {
-            if (changeZoneKYCDocumentStatusData.status) {
-              masterZoneKYCs.Service.verify(id = changeZoneKYCDocumentStatusData.zoneID, documentType = changeZoneKYCDocumentStatusData.documentType)
-              utilitiesNotification.send(masterZones.Service.getAccountId(changeZoneKYCDocumentStatusData.zoneID), constants.Notification.SUCCESS, Messages(constants.Response.DOCUMENT_APPROVED.message))
+            if (updateZoneKYCDocumentStatusData.status) {
+              masterZoneKYCs.Service.verify(id = updateZoneKYCDocumentStatusData.zoneID, documentType = updateZoneKYCDocumentStatusData.documentType)
+              utilitiesNotification.send(masterZones.Service.getAccountId(updateZoneKYCDocumentStatusData.zoneID), constants.Notification.SUCCESS, Messages(constants.Response.DOCUMENT_APPROVED.message))
             } else {
-              masterZoneKYCs.Service.reject(id = changeZoneKYCDocumentStatusData.zoneID, documentType = changeZoneKYCDocumentStatusData.documentType)
-              utilitiesNotification.send(masterZones.Service.getAccountId(changeZoneKYCDocumentStatusData.zoneID), constants.Notification.FAILURE, Messages(constants.Response.DOCUMENT_REJECTED.message))
+              masterZoneKYCs.Service.reject(id = updateZoneKYCDocumentStatusData.zoneID, documentType = updateZoneKYCDocumentStatusData.documentType)
+              utilitiesNotification.send(masterZones.Service.getAccountId(updateZoneKYCDocumentStatusData.zoneID), constants.Notification.FAILURE, Messages(constants.Response.DOCUMENT_REJECTED.message))
             }
             Redirect(routes.ViewController.genesisRequest())
           }

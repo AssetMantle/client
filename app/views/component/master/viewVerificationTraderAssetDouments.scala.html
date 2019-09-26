@@ -1,5 +1,6 @@
 @import controllers.actions.LoginState
 @import models.masterTransaction.AssetFile
+@import models.common.Serializable._
 
 @(files: Seq[AssetFile])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 @for(file <- files) {
@@ -14,7 +15,7 @@
             } else {
                 <span><img class="status" src="@routes.Assets.versioned("images/unverified.png")"></span>
             }
-            <button class="cmuk-button cmuk-button-small" onclick="getForm(jsRoutes.controllers.IssueAssetController.changeAssetDocumentStatusForm('@file.id', '@file.documentType'))">@Messages(constants.Form.CHANGE_STATUS)</button>
+            <button class="cmuk-button cmuk-button-small" onclick="getForm(jsRoutes.controllers.IssueAssetController.changeAssetDocumentStatusForm('@file.id', '@file.documentType'))">@Messages(constants.Form.UPDATE_STATUS)</button>
         </span>
         <br>
         @file.documentContent match {

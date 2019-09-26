@@ -22,7 +22,7 @@
             } else {
                 <span><img class="status" src="@routes.Assets.versioned("images/unverified.png")"></span>
             }
-            <button class="cmuk-button cmuk-button-small" onclick="getForm(jsRoutes.controllers.SetACLController.changeTraderKYCDocumentOrganizationStatusForm('@traderKYC.id', '@traderKYC.documentType'))">@Messages(constants.Form.CHANGE_STATUS)</button>
+            <button class="cmuk-button cmuk-button-small" onclick="getForm(jsRoutes.controllers.SetACLController.changeTraderKYCDocumentOrganizationStatusForm('@traderKYC.id', '@traderKYC.documentType'))">@Messages(constants.Form.UPDATE_STATUS)</button>
         </span>
         <br>
         <span class="red">@Messages(constants.Form.ZONE_VERIFICATION):

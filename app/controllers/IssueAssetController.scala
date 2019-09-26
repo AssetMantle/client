@@ -178,24 +178,24 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
       }
   }
 
-  def changeAssetDocumentStatusForm(fileID: String, documentType: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.changeAssetDocumentStatus(views.companion.master.ChangeAssetDocumentStatus.form.fill(views.companion.master.ChangeAssetDocumentStatus.Data(fileID = fileID, documentType = documentType, status = false))))
+  def updateAssetDocumentStatusForm(fileID: String, documentType: String): Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.updateAssetDocumentStatus(views.companion.master.UpdateAssetDocumentStatus.form.fill(views.companion.master.UpdateAssetDocumentStatus.Data(fileID = fileID, documentType = documentType, status = false))))
   }
 
-  def changeAssetDocumentStatus(): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+  def updateAssetDocumentStatus(): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      views.companion.master.ChangeAssetDocumentStatus.form.bindFromRequest().fold(
+      views.companion.master.UpdateAssetDocumentStatus.form.bindFromRequest().fold(
         formWithErrors => {
-          BadRequest(views.html.component.master.changeAssetDocumentStatus(formWithErrors))
+          BadRequest(views.html.component.master.updateAssetDocumentStatus(formWithErrors))
         },
-        changeAssetDocumentStatusData => {
+        updateAssetDocumentStatusData => {
           try {
-            if (changeAssetDocumentStatusData.status) {
-              masterTransactionAssetFiles.Service.accept(id = changeAssetDocumentStatusData.fileID, documentType = changeAssetDocumentStatusData.documentType)
-              utilitiesNotification.send(masterTransactionIssueAssetRequests.Service.getAccountID(changeAssetDocumentStatusData.fileID), constants.Notification.SUCCESS, Messages(constants.Response.DOCUMENT_APPROVED.message))
+            if (updateAssetDocumentStatusData.status) {
+              masterTransactionAssetFiles.Service.accept(id = updateAssetDocumentStatusData.fileID, documentType = updateAssetDocumentStatusData.documentType)
+              utilitiesNotification.send(masterTransactionIssueAssetRequests.Service.getAccountID(updateAssetDocumentStatusData.fileID), constants.Notification.SUCCESS, Messages(constants.Response.DOCUMENT_APPROVED.message))
             } else {
-              masterTransactionAssetFiles.Service.reject(id = changeAssetDocumentStatusData.fileID, documentType = changeAssetDocumentStatusData.documentType)
-              utilitiesNotification.send(masterTransactionIssueAssetRequests.Service.getAccountID(changeAssetDocumentStatusData.fileID), constants.Notification.FAILURE, Messages(constants.Response.DOCUMENT_REJECTED.message))
+              masterTransactionAssetFiles.Service.reject(id = updateAssetDocumentStatusData.fileID, documentType = updateAssetDocumentStatusData.documentType)
+              utilitiesNotification.send(masterTransactionIssueAssetRequests.Service.getAccountID(updateAssetDocumentStatusData.fileID), constants.Notification.FAILURE, Messages(constants.Response.DOCUMENT_REJECTED.message))
             }
             Redirect(routes.ViewController.zoneRequest())
           }
