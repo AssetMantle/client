@@ -6,8 +6,8 @@ import controllers.actions.{WithGenesisLoginAction, WithUserLoginAction, WithZon
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import models.{blockchain, blockchainTransaction, master}
 import models.common.Serializable._
+import models.{blockchain, blockchainTransaction, master}
 import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
@@ -216,15 +216,24 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
       }
   }
 
-  def updateZoneKYCDocumentStatusForm(zoneID: String, documentType: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.updateZoneKYCDocumentStatus(views.companion.master.UpdateZoneKYCDocumentStatus.form.fill(views.companion.master.UpdateZoneKYCDocumentStatus.Data(zoneID = zoneID, documentType = documentType, status = false))))
+  def updateZoneKYCDocumentStatusForm(zoneID: String, documentType: String): Action[AnyContent] = withGenesisLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      try {
+        Ok(views.html.component.master.updateZoneKYCDocumentStatus(masterZoneKYCs.Service.get(id = zoneID, documentType = documentType), views.companion.master.UpdateZoneKYCDocumentStatus.form.fill(views.companion.master.UpdateZoneKYCDocumentStatus.Data(zoneID = zoneID, documentType = documentType, status = false))))
+      } catch {
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
   }
 
   def updateZoneKYCDocumentStatus(): Action[AnyContent] = withGenesisLoginAction.authenticated { implicit loginState =>
     implicit request =>
       views.companion.master.UpdateZoneKYCDocumentStatus.form.bindFromRequest().fold(
         formWithErrors => {
-          BadRequest(views.html.component.master.updateZoneKYCDocumentStatus(formWithErrors))
+          try {
+            BadRequest(views.html.component.master.updateZoneKYCDocumentStatus(masterZoneKYCs.Service.get(id = formWithErrors(constants.FormField.ZONE_ID.name).value.get, documentType = formWithErrors(constants.FormField.DOCUMENT_TYPE.name).value.get), formWithErrors))
+          } catch {
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+          }
         },
         updateZoneKYCDocumentStatusData => {
           try {

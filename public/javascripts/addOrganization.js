@@ -21,5 +21,5 @@ $(document).ready(function () {
 });
 
 function fillZoneIDField(zoneID) {
-    document.getElementById("zoneID").value = zoneID;
+    $('#zoneID').val(zoneID);
 }

@@ -1,7 +1,7 @@
 @import controllers.actions.LoginState
 @import models.master.TraderKYC
 
-@(traderKYCs: Seq[TraderKYC])( implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+@(traderKYCs: Seq[TraderKYC])( implicit requestHeader: RequestHeader, flash: Flash, messagesProvider: MessagesProvider, loginState: LoginState = null)
 @for(traderKYC <- traderKYCs) {
     @component.master.commonDocumentViewer(traderKYC) {
         @routes.FileController.organizationAccessedTraderKYCFile(traderKYC.id, traderKYC.fileName, traderKYC.documentType)
@@ -9,27 +9,30 @@
         <a href="@routes.FileController.organizationAccessedTraderKYCFile(traderKYC.id, traderKYC.fileName, traderKYC.documentType)">@Messages(traderKYC.documentType)</a>
     } {
         <span class="red">@Messages(constants.Form.STATUS):
-            @if(traderKYC.status.getOrElse(false)) {
-                <span><img class="status" src="@routes.Assets.versioned("images/success.jpg")"></span>
-            } else {
-                <span><img class="status" src="@routes.Assets.versioned("images/unverified.png")"></span>
+            @traderKYC.status match {
+                case Some(true) => {
+                    <span class="result success"><img class="status" src="@routes.Assets.versioned("images/success.jpg")"></span>
+                }
+                case Some(false) => {
+                    <span class="result failure"><img class="status" src="@routes.Assets.versioned("images/unverified.png")"></span>
+                }
+                case _ => {}
             }
         </span>
         <br>
-        <span class="red">@Messages(constants.Form.ORGANIZATION_VERIFICATION):
-            @if(traderKYC.organizationStatus.getOrElse(false)) {
-                <span><img class="status" src="@routes.Assets.versioned("images/success.jpg")"></span>
-            } else {
-                <span><img class="status" src="@routes.Assets.versioned("images/unverified.png")"></span>
-            }
-            <button class="cmuk-button cmuk-button-small" onclick="getForm(jsRoutes.controllers.SetACLController.changeTraderKYCDocumentOrganizationStatusForm('@traderKYC.id', '@traderKYC.documentType'))">@Messages(constants.Form.UPDATE_STATUS)</button>
-        </span>
+        <div>
+            @views.html.component.master.updateTraderKYCDocumentOrganizationStatus(traderKYC, views.companion.master.UpdateTraderKYCDocumentOrganizationStatus.form)
+        </div>
         <br>
         <span class="red">@Messages(constants.Form.ZONE_VERIFICATION):
-            @if(traderKYC.zoneStatus.getOrElse(false)) {
-                <span><img class="status" src="@routes.Assets.versioned("images/success.jpg")"></span>
-            } else {
-                <span><img class="status" src="@routes.Assets.versioned("images/unverified.png")"></span>
+            @traderKYC.zoneStatus match {
+                case Some(true) => {
+                    <span class="result success"><img class="status" src="@routes.Assets.versioned("images/success.jpg")"></span>
+                }
+                case Some(false) => {
+                    <span class="result failure"><img class="status" src="@routes.Assets.versioned("images/unverified.png")"></span>
+                }
+                case _ => {}
             }
         </span>
     }

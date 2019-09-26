@@ -15,7 +15,7 @@ import play.api.{Configuration, Logger}
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class IssueAssetController @Inject()(messagesControllerComponents: MessagesControllerComponents, utilitiesNotification: utilities.Notification, transaction: utilities.Transaction, blockchainAclAccounts: blockchain.ACLAccounts, masterZones: master.Zones, masterAccounts: master.Accounts, masterTransactionAssetFiles: masterTransaction.AssetFiles, withTraderLoginAction: WithTraderLoginAction, withZoneLoginAction: WithZoneLoginAction, blockchainAssets: blockchain.Assets, transactionsIssueAsset: transactions.IssueAsset, blockchainTransactionIssueAssets: blockchainTransaction.IssueAssets, masterTransactionIssueAssetRequests: masterTransaction.IssueAssetRequests, withUsernameToken: WithUsernameToken)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class IssueAssetController @Inject()(messagesControllerComponents: MessagesControllerComponents, utilitiesNotification: utilities.Notification, masterTraders: master.Traders, transaction: utilities.Transaction, blockchainAclAccounts: blockchain.ACLAccounts, masterZones: master.Zones, masterAccounts: master.Accounts, masterTransactionAssetFiles: masterTransaction.AssetFiles, withTraderLoginAction: WithTraderLoginAction, withZoneLoginAction: WithZoneLoginAction, blockchainAssets: blockchain.Assets, transactionsIssueAsset: transactions.IssueAsset, blockchainTransactionIssueAssets: blockchainTransaction.IssueAssets, masterTransactionIssueAssetRequests: masterTransaction.IssueAssetRequests, withUsernameToken: WithUsernameToken)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
@@ -178,15 +178,28 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
       }
   }
 
-  def updateAssetDocumentStatusForm(fileID: String, documentType: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.updateAssetDocumentStatus(views.companion.master.UpdateAssetDocumentStatus.form.fill(views.companion.master.UpdateAssetDocumentStatus.Data(fileID = fileID, documentType = documentType, status = false))))
+  def updateAssetDocumentStatusForm(fileID: String, documentType: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      try {
+        if (masterZones.Service.getID(loginState.username) == masterTraders.Service.getZoneIDByAccountID(masterTransactionIssueAssetRequests.Service.getAccountID(fileID))) {
+          Ok(views.html.component.master.updateAssetDocumentStatus(masterTransactionAssetFiles.Service.get(id = fileID, documentType = documentType) ,views.companion.master.UpdateAssetDocumentStatus.form.fill(views.companion.master.UpdateAssetDocumentStatus.Data(fileID = fileID, documentType = documentType, status = false))))
+        } else {
+          Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
+        }
+      } catch {
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
   }
 
   def updateAssetDocumentStatus(): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       views.companion.master.UpdateAssetDocumentStatus.form.bindFromRequest().fold(
         formWithErrors => {
-          BadRequest(views.html.component.master.updateAssetDocumentStatus(formWithErrors))
+          try {
+            BadRequest(views.html.component.master.updateAssetDocumentStatus(masterTransactionAssetFiles.Service.get(id = formWithErrors(constants.FormField.FILE_ID.name).value.get, documentType = formWithErrors(constants.FormField.DOCUMENT_TYPE.name).value.get), formWithErrors))
+          } catch {
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+          }
         },
         updateAssetDocumentStatusData => {
           try {

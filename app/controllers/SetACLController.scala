@@ -272,15 +272,29 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
       }
   }
 
-  def updateTraderKYCDocumentZoneStatusForm(traderID: String, documentType: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.updateTraderKYCDocumentZoneStatus(views.companion.master.UpdateTraderKYCDocumentZoneStatus.form.fill(views.companion.master.UpdateTraderKYCDocumentZoneStatus.Data(traderID = traderID, documentType = documentType, zoneStatus = false))))
+  def updateTraderKYCDocumentZoneStatusForm(traderID: String, documentType: String): Action[AnyContent]  = withZoneLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      try {
+        if (masterZones.Service.getID(loginState.username) == masterTraders.Service.getZoneID(traderID)) {
+          Ok(views.html.component.master.updateTraderKYCDocumentZoneStatus(masterTraderKYCs.Service.get(id = traderID, documentType = documentType) , views.companion.master.UpdateTraderKYCDocumentZoneStatus.form.fill(views.companion.master.UpdateTraderKYCDocumentZoneStatus.Data(traderID = traderID, documentType = documentType, zoneStatus = false))))
+        }
+        else {
+          Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
+        }
+      } catch {
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
   }
 
   def updateTraderKYCDocumentZoneStatus(): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       views.companion.master.UpdateTraderKYCDocumentZoneStatus.form.bindFromRequest().fold(
         formWithErrors => {
-          BadRequest(views.html.component.master.updateTraderKYCDocumentZoneStatus(formWithErrors))
+          try {
+            BadRequest(views.html.component.master.updateTraderKYCDocumentZoneStatus(masterTraderKYCs.Service.get(id = formWithErrors(constants.FormField.TRADER_ID.name).value.get, documentType = formWithErrors(constants.FormField.DOCUMENT_TYPE.name).value.get), formWithErrors))
+          } catch {
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+          }
         },
         updateTraderKYCDocumentZoneStatusData => {
           try {
@@ -423,15 +437,29 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
       }
   }
 
-  def updateTraderKYCDocumentOrganizationStatusForm(traderID: String, documentType: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.updateTraderKYCDocumentOrganizationStatus(views.companion.master.UpdateTraderKYCDocumentOrganizationStatus.form.fill(views.companion.master.UpdateTraderKYCDocumentOrganizationStatus.Data(traderID = traderID, documentType = documentType, organizationStatus = false))))
-  }
+  def updateTraderKYCDocumentOrganizationStatusForm(traderID: String, documentType: String): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+      implicit request =>
+        try {
+          if (masterOrganizations.Service.getID(loginState.username) == masterTraders.Service.getOrganizationID(traderID)) {
+            Ok(views.html.component.master.updateTraderKYCDocumentOrganizationStatus(masterTraderKYCs.Service.get(id = traderID, documentType = documentType), views.companion.master.UpdateTraderKYCDocumentOrganizationStatus.form.fill(views.companion.master.UpdateTraderKYCDocumentOrganizationStatus.Data(traderID = traderID, documentType = documentType, organizationStatus = false))))
+          }
+          else {
+            Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
+          }
+        } catch {
+          case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+        }
+    }
 
   def updateTraderKYCDocumentOrganizationStatus(): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
     implicit request =>
       views.companion.master.UpdateTraderKYCDocumentOrganizationStatus.form.bindFromRequest().fold(
         formWithErrors => {
-          BadRequest(views.html.component.master.updateTraderKYCDocumentOrganizationStatus(formWithErrors))
+          try {
+            BadRequest(views.html.component.master.updateTraderKYCDocumentOrganizationStatus(masterTraderKYCs.Service.get(id = formWithErrors(constants.FormField.TRADER_ID.name).value.get, documentType = formWithErrors(constants.FormField.DOCUMENT_TYPE.name).value.get), formWithErrors))
+          } catch {
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+          }
         },
         updateTraderKYCDocumentOrganizationStatusData => {
           try {

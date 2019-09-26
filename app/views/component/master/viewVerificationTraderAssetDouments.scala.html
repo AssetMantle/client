@@ -2,21 +2,16 @@
 @import models.masterTransaction.AssetFile
 @import models.common.Serializable._
 
-@(files: Seq[AssetFile])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+@(files: Seq[AssetFile])(implicit requestHeader: RequestHeader, flash: Flash, messagesProvider: MessagesProvider, loginState: LoginState = null)
 @for(file <- files) {
     @component.master.commonDocumentViewer(file) {
         @routes.FileController.zoneAccessedAssetFile(file.id, file.fileName, file.documentType)
     } {
         <a href="@routes.FileController.zoneAccessedAssetFile(file.id, file.fileName, file.documentType)">@Messages(file.documentType)</a>
     } {
-        <span class="red">@Messages(constants.Form.STATUS):
-            @if(file.status.getOrElse(false)) {
-                <span><img class="status" src="@routes.Assets.versioned("images/success.jpg")"></span>
-            } else {
-                <span><img class="status" src="@routes.Assets.versioned("images/unverified.png")"></span>
-            }
-            <button class="cmuk-button cmuk-button-small" onclick="getForm(jsRoutes.controllers.IssueAssetController.changeAssetDocumentStatusForm('@file.id', '@file.documentType'))">@Messages(constants.Form.UPDATE_STATUS)</button>
-        </span>
+        <div>
+            @views.html.component.master.updateAssetDocumentStatus(file, views.companion.master.UpdateAssetDocumentStatus.form)
+        </div>
         <br>
         @file.documentContent match {
             case Some(oblContent: OBL) => {

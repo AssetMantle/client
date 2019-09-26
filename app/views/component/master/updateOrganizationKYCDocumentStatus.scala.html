@@ -1,25 +1,40 @@
 @import controllers.actions.LoginState
 @import helper._
+@import models.master.OrganizationKYC
 @import views.companion.master.UpdateOrganizationKYCDocumentStatus
 
-@(updateOrganizationKYCDocumentStatusForm: Form[UpdateOrganizationKYCDocumentStatus.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
-@form(action = routes.AddOrganizationController.updateOrganizationKYCDocumentStatus, 'onkeypress -> "submitFormOnEnter(event,this)") {
-    <div class="latest_card-header latest_card-header-primary text-center">
-        <h4 class="latest_card-title">@Messages(constants.Form.UPDATE_ORGANIZATION_KYC_STATUS)</h4>
-    </div>
-    <div class="latest_card-body">
-        @CSRF.formField
-        @inputText(updateOrganizationKYCDocumentStatusForm(constants.FormField.ORGANIZATION_ID.name), '_label -> Messages(constants.FormField.ORGANIZATION_ID.name), 'placeholder -> Messages(constants.FormField.ORGANIZATION_ID.name), 'required -> true, 'class -> "cmuk-input", 'readonly -> true)
-        @inputText(updateOrganizationKYCDocumentStatusForm(constants.FormField.DOCUMENT_TYPE.name), '_label -> Messages(constants.FormField.DOCUMENT_TYPE.name), 'placeholder -> Messages(constants.FormField.DOCUMENT_TYPE.name), 'required -> true, 'class -> "cmuk-input", 'readonly -> true)
-        @checkbox(updateOrganizationKYCDocumentStatusForm(constants.Form.STATUS), '_label -> Messages(constants.Form.STATUS), 'class -> "cmuk-checkbox", 'placeholder -> Messages(constants.Form.STATUS), 'required -> true)
+@(organizationKYC: OrganizationKYC, updateOrganizationKYCDocumentStatusForm: Form[UpdateOrganizationKYCDocumentStatus.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 
-        @if(updateOrganizationKYCDocumentStatusForm.hasGlobalErrors) {
-            <ul>
-            @for(error <- updateOrganizationKYCDocumentStatusForm.globalErrors) {
-                <li>@error.format</li>
-            }
-            </ul>
+<script src="@routes.Assets.versioned("javascripts/verifyReject.js")" type="text/javascript"></script>
+<div id="@Seq(organizationKYC.id, organizationKYC.documentType).mkString("")">
+@form(action = routes.AddOrganizationController.updateOrganizationKYCDocumentStatus, 'onkeypress -> "submitFormOnEnter(event,this)") {
+    @CSRF.formField
+    @inputText(updateOrganizationKYCDocumentStatusForm(constants.FormField.ORGANIZATION_ID.name).copy(value = Some(organizationKYC.id)), '_label -> Messages(constants.FormField.ORGANIZATION_ID.name), 'placeholder -> Messages(constants.FormField.ORGANIZATION_ID.name), 'required -> true, 'class -> "cmuk-input", 'readonly -> true)
+    @inputText(updateOrganizationKYCDocumentStatusForm(constants.FormField.DOCUMENT_TYPE.name).copy(value = Some(organizationKYC.documentType)), '_label -> Messages(constants.FormField.DOCUMENT_TYPE.name), 'placeholder -> Messages(constants.FormField.DOCUMENT_TYPE.name), 'required -> true, 'class -> "cmuk-input", 'readonly -> true)
+    @checkbox(updateOrganizationKYCDocumentStatusForm(constants.Form.STATUS), '_label -> Messages(constants.Form.STATUS), 'class -> "cmuk-checkbox", 'placeholder -> Messages(constants.Form.STATUS), 'required -> true, 'id -> Seq(organizationKYC.id, organizationKYC.documentType, "Status").mkString(""))
+
+    @if(updateOrganizationKYCDocumentStatusForm.hasGlobalErrors) {
+        <ul>
+        @for(error <- updateOrganizationKYCDocumentStatusForm.globalErrors) {
+            <li>@error.format</li>
         }
-        <button type="button" class="btn btn-primary btn-sm" onclick="submitForm(this)">@Messages(constants.Form.SUBMIT)</button>
-    </div>
+        </ul>
+    }
+    <span class="red">@Messages(constants.Form.STATUS):
+        @organizationKYC.status match {
+            case Some(true) => {
+                <span class="result success"><img class="status" src="@routes.Assets.versioned("images/success.jpg")"></span>
+                <button type="button" class="btn btn-primary btn-sm" onclick="verifyReject(this, '@Seq("#", organizationKYC.id, organizationKYC.documentType).mkString("")', '@Seq(organizationKYC.id, organizationKYC.documentType, "Status").mkString("")', false)">@Messages(constants.Form.REJECT)</button>
+            }
+            case Some(false) => {
+                <span class="result failure"><img class="status" src="@routes.Assets.versioned("images/unverified.png")"></span>
+                <button type="button" class="btn btn-primary btn-sm" onclick="verifyReject(this, '@Seq("#", organizationKYC.id, organizationKYC.documentType).mkString("")', '@Seq(organizationKYC.id, organizationKYC.documentType, "Status").mkString("")', true)">@Messages(constants.Form.APPROVE)</button>
+            }
+            case _ => {
+                <button type="button" class="btn btn-primary btn-sm" onclick="verifyReject(this, '@Seq("#", organizationKYC.id, organizationKYC.documentType).mkString("")', '@Seq(organizationKYC.id, organizationKYC.documentType, "Status").mkString("")', true)">@Messages(constants.Form.APPROVE)</button>
+                <button type="button" class="btn btn-primary btn-sm" onclick="verifyReject(this, '@Seq("#", organizationKYC.id, organizationKYC.documentType).mkString("")', '@Seq(organizationKYC.id, organizationKYC.documentType, "Status").mkString("")', false)">@Messages(constants.Form.REJECT)</button>
+            }
+        }
+    </span>
 }
+</div>

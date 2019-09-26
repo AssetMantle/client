@@ -1,20 +1,16 @@
 @import controllers.actions.LoginState
 @import models.master.OrganizationKYC
+@import helper._
 
-@(organizationKYCs: Seq[OrganizationKYC])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+@(organizationKYCs: Seq[OrganizationKYC])(implicit requestHeader: RequestHeader, flash: Flash, messagesProvider: MessagesProvider, loginState: LoginState = null)
 @for(organizationKYC <- organizationKYCs) {
     @component.master.commonDocumentViewer(organizationKYC) {
         @routes.FileController.zoneAccessedOrganizationKYCFile(organizationKYC.id, organizationKYC.fileName, organizationKYC.documentType)
     } {
         <a href="@routes.FileController.zoneAccessedOrganizationKYCFile(organizationKYC.id, organizationKYC.fileName, organizationKYC.documentType)">@Messages(organizationKYC.documentType)</a>
     } {
-        <span class="red">@Messages(constants.Form.STATUS):
-            @if(organizationKYC.status.getOrElse(false)) {
-                <span><img class="status" src="@routes.Assets.versioned("images/success.jpg")"></span>
-            } else {
-                <span><img class="status" src="@routes.Assets.versioned("images/unverified.png")"></span>
-            }
-            <button class="cmuk-button cmuk-button-small" onclick="getForm(jsRoutes.controllers.AddOrganizationController.changeOrganizationKYCDocumentStatusForm('@organizationKYC.id', '@organizationKYC.documentType'))">@Messages(constants.Form.UPDATE_STATUS)</button>
-        </span>
+        <div>
+            @views.html.component.master.updateOrganizationKYCDocumentStatus(organizationKYC, views.companion.master.UpdateOrganizationKYCDocumentStatus.form)
+        </div>
     }
 }
