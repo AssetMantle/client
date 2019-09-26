@@ -294,7 +294,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
                 masterOrganizationKYCs.Service.reject(id = updateOrganizationKYCDocumentStatusData.organizationID, documentType = updateOrganizationKYCDocumentStatusData.documentType)
                 utilitiesNotification.send(masterOrganizations.Service.getAccountId(updateOrganizationKYCDocumentStatusData.organizationID), constants.Notification.FAILURE, Messages(constants.Response.DOCUMENT_REJECTED.message))
               }
-              Redirect(routes.ViewController.zoneRequest())
+              withUsernameToken.Ok(views.html.zoneRequest())
             } else {
               Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
             }

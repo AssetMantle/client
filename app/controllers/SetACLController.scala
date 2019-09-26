@@ -292,7 +292,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
                 masterTraderKYCs.Service.zoneReject(id = updateTraderKYCDocumentZoneStatusData.traderID, documentType = updateTraderKYCDocumentZoneStatusData.documentType)
                 utilitiesNotification.send(masterTraders.Service.getAccountId(updateTraderKYCDocumentZoneStatusData.traderID), constants.Notification.FAILURE, Messages(constants.Response.DOCUMENT_REJECTED.message))
               }
-              Redirect(routes.ViewController.zoneRequest())
+              withUsernameToken.Ok(views.html.zoneRequest())
             } else {
               Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
             }
@@ -443,7 +443,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
                 masterTraderKYCs.Service.organizationReject(id = updateTraderKYCDocumentOrganizationStatusData.traderID, documentType = updateTraderKYCDocumentOrganizationStatusData.documentType)
                 utilitiesNotification.send(masterTraders.Service.getAccountId(updateTraderKYCDocumentOrganizationStatusData.traderID), constants.Notification.FAILURE, Messages(constants.Response.DOCUMENT_REJECTED.message))
               }
-              Redirect(routes.ViewController.organizationRequest())
+              withUsernameToken.Ok(views.html.organizationRequest())
             } else {
               Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
             }

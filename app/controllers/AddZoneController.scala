@@ -235,7 +235,7 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
               masterZoneKYCs.Service.reject(id = updateZoneKYCDocumentStatusData.zoneID, documentType = updateZoneKYCDocumentStatusData.documentType)
               utilitiesNotification.send(masterZones.Service.getAccountId(updateZoneKYCDocumentStatusData.zoneID), constants.Notification.FAILURE, Messages(constants.Response.DOCUMENT_REJECTED.message))
             }
-            Redirect(routes.ViewController.genesisRequest())
+            withUsernameToken.Ok(views.html.genesisRequest())
           }
           catch {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
