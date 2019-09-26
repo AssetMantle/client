@@ -8,18 +8,6 @@
     } {
         <a href="@routes.FileController.organizationAccessedTraderKYCFile(traderKYC.id, traderKYC.fileName, traderKYC.documentType)">@Messages(traderKYC.documentType)</a>
     } {
-        <span class="red">@Messages(constants.Form.STATUS):
-            @traderKYC.status match {
-                case Some(true) => {
-                    <span class="result success"><img class="status" src="@routes.Assets.versioned("images/success.jpg")"></span>
-                }
-                case Some(false) => {
-                    <span class="result failure"><img class="status" src="@routes.Assets.versioned("images/unverified.png")"></span>
-                }
-                case _ => {}
-            }
-        </span>
-        <br>
         <div>
             @views.html.component.master.updateTraderKYCDocumentOrganizationStatus(traderKYC, views.companion.master.UpdateTraderKYCDocumentOrganizationStatus.form)
         </div>

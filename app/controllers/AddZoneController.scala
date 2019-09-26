@@ -244,7 +244,7 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
               masterZoneKYCs.Service.reject(id = updateZoneKYCDocumentStatusData.zoneID, documentType = updateZoneKYCDocumentStatusData.documentType)
               utilitiesNotification.send(masterZones.Service.getAccountId(updateZoneKYCDocumentStatusData.zoneID), constants.Notification.FAILURE, Messages(constants.Response.DOCUMENT_REJECTED.message))
             }
-            withUsernameToken.Ok(views.html.genesisRequest())
+            PartialContent(views.html.component.master.updateZoneKYCDocumentStatus(masterZoneKYCs.Service.get(id = updateZoneKYCDocumentStatusData.zoneID, documentType = updateZoneKYCDocumentStatusData.documentType), views.companion.master.UpdateZoneKYCDocumentStatus.form))
           }
           catch {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))

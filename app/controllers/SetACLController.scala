@@ -306,7 +306,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
                 masterTraderKYCs.Service.zoneReject(id = updateTraderKYCDocumentZoneStatusData.traderID, documentType = updateTraderKYCDocumentZoneStatusData.documentType)
                 utilitiesNotification.send(masterTraders.Service.getAccountId(updateTraderKYCDocumentZoneStatusData.traderID), constants.Notification.FAILURE, Messages(constants.Response.DOCUMENT_REJECTED.message))
               }
-              withUsernameToken.Ok(views.html.zoneRequest())
+              Ok(views.html.component.master.updateTraderKYCDocumentZoneStatus(masterTraderKYCs.Service.get(id = updateTraderKYCDocumentZoneStatusData.traderID, documentType = updateTraderKYCDocumentZoneStatusData.documentType) , views.companion.master.UpdateTraderKYCDocumentZoneStatus.form))
             } else {
               Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
             }
@@ -471,7 +471,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
                 masterTraderKYCs.Service.organizationReject(id = updateTraderKYCDocumentOrganizationStatusData.traderID, documentType = updateTraderKYCDocumentOrganizationStatusData.documentType)
                 utilitiesNotification.send(masterTraders.Service.getAccountId(updateTraderKYCDocumentOrganizationStatusData.traderID), constants.Notification.FAILURE, Messages(constants.Response.DOCUMENT_REJECTED.message))
               }
-              withUsernameToken.Ok(views.html.organizationRequest())
+              PartialContent(views.html.component.master.updateTraderKYCDocumentOrganizationStatus(masterTraderKYCs.Service.get(id = updateTraderKYCDocumentOrganizationStatusData.traderID, documentType = updateTraderKYCDocumentOrganizationStatusData.documentType), views.companion.master.UpdateTraderKYCDocumentOrganizationStatus.form))
             } else {
               Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
             }

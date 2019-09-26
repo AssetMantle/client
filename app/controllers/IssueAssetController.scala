@@ -210,7 +210,7 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
               masterTransactionAssetFiles.Service.reject(id = updateAssetDocumentStatusData.fileID, documentType = updateAssetDocumentStatusData.documentType)
               utilitiesNotification.send(masterTransactionIssueAssetRequests.Service.getAccountID(updateAssetDocumentStatusData.fileID), constants.Notification.FAILURE, Messages(constants.Response.DOCUMENT_REJECTED.message))
             }
-            withUsernameToken.Ok(views.html.zoneRequest())
+            PartialContent(views.html.component.master.updateAssetDocumentStatus(masterTransactionAssetFiles.Service.get(id = updateAssetDocumentStatusData.fileID, documentType = updateAssetDocumentStatusData.documentType) ,views.companion.master.UpdateAssetDocumentStatus.form))
           }
           catch {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))

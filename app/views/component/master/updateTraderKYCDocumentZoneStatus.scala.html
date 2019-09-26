@@ -9,9 +9,9 @@
 <div id="@Seq(traderKYC.id, traderKYC.documentType).mkString("")">
 @form(action = routes.SetACLController.updateTraderKYCDocumentZoneStatus, 'onkeypress -> "submitFormOnEnter(event,this)") {
     @CSRF.formField
-    @inputText(updateTraderKYCDocumentZoneStatus(constants.FormField.TRADER_ID.name), '_label -> Messages(constants.FormField.TRADER_ID.name), 'placeholder -> Messages(constants.FormField.TRADER_ID.name), 'required -> true, 'class -> "cmuk-input", 'readonly -> true)
-    @inputText(updateTraderKYCDocumentZoneStatus(constants.FormField.DOCUMENT_TYPE.name), '_label -> Messages(constants.FormField.DOCUMENT_TYPE.name), 'placeholder -> Messages(constants.FormField.DOCUMENT_TYPE.name), 'required -> true, 'class -> "cmuk-input", 'readonly -> true)
-    @checkbox(updateTraderKYCDocumentZoneStatus(constants.Form.ZONE_STATUS), '_label -> Messages(constants.Form.ZONE_STATUS), 'placeholder -> Messages(constants.Form.ZONE_STATUS), 'required -> true, 'class -> "cmuk-checkbox")
+    @inputText(updateTraderKYCDocumentZoneStatus(constants.FormField.TRADER_ID.name).copy(value = Some(traderKYC.id)), '_label -> Messages(constants.FormField.TRADER_ID.name), 'placeholder -> Messages(constants.FormField.TRADER_ID.name), 'required -> true, 'class -> "cmuk-input hidden", 'readonly -> true)
+    @inputText(updateTraderKYCDocumentZoneStatus(constants.FormField.DOCUMENT_TYPE.name).copy(value = Some(traderKYC.documentType)), '_label -> Messages(constants.FormField.DOCUMENT_TYPE.name), 'placeholder -> Messages(constants.FormField.DOCUMENT_TYPE.name), 'required -> true, 'class -> "cmuk-input hidden", 'readonly -> true)
+    @checkbox(updateTraderKYCDocumentZoneStatus(constants.Form.ZONE_STATUS), '_label -> Messages(constants.Form.ZONE_STATUS), 'placeholder -> Messages(constants.Form.ZONE_STATUS), 'required -> true, 'class -> "cmuk-checkbox hidden", 'id -> Seq(traderKYC.id, traderKYC.documentType, constants.Form.STATUS).mkString(""))
 
     @if(updateTraderKYCDocumentZoneStatus.hasGlobalErrors) {
         <ul>
@@ -24,15 +24,15 @@
         @traderKYC.zoneStatus match {
             case Some(true) => {
                 <span class="result success"><img class="status" src="@routes.Assets.versioned("images/success.jpg")"></span>
-                <button type="button" class="btn btn-primary btn-sm" onclick="verifyReject(this, '@Seq("#", traderKYC.id, traderKYC.documentType).mkString("")', '@Seq(traderKYC.id, traderKYC.documentType, "Status").mkString("")', false)">@Messages(constants.Form.REJECT)</button>
+                <button type="button" class="btn btn-primary btn-sm" onclick="verifyReject(this, '@Seq("#", traderKYC.id, traderKYC.documentType).mkString("")', '@Seq(traderKYC.id, traderKYC.documentType, constants.Form.STATUS).mkString("")', false)">@Messages(constants.Form.REJECT)</button>
             }
             case Some(false) => {
                 <span class="result failure"><img class="status" src="@routes.Assets.versioned("images/unverified.png")"></span>
-                <button type="button" class="btn btn-primary btn-sm" onclick="verifyReject(this, '@Seq("#", traderKYC.id, traderKYC.documentType).mkString("")', '@Seq(traderKYC.id, traderKYC.documentType, "Status").mkString("")', true)">@Messages(constants.Form.APPROVE)</button>
+                <button type="button" class="btn btn-primary btn-sm" onclick="verifyReject(this, '@Seq("#", traderKYC.id, traderKYC.documentType).mkString("")', '@Seq(traderKYC.id, traderKYC.documentType, constants.Form.STATUS).mkString("")', true)">@Messages(constants.Form.APPROVE)</button>
             }
             case _ => {
-                <button type="button" class="btn btn-primary btn-sm" onclick="verifyReject(this, '@Seq("#", traderKYC.id, traderKYC.documentType).mkString("")', '@Seq(traderKYC.id, traderKYC.documentType, "Status").mkString("")', true)">@Messages(constants.Form.APPROVE)</button>
-                <button type="button" class="btn btn-primary btn-sm" onclick="verifyReject(this, '@Seq("#", traderKYC.id, traderKYC.documentType).mkString("")', '@Seq(traderKYC.id, traderKYC.documentType, "Status").mkString("")', false)">@Messages(constants.Form.REJECT)</button>
+                <button type="button" class="btn btn-primary btn-sm" onclick="verifyReject(this, '@Seq("#", traderKYC.id, traderKYC.documentType).mkString("")', '@Seq(traderKYC.id, traderKYC.documentType, constants.Form.STATUS).mkString("")', true)">@Messages(constants.Form.APPROVE)</button>
+                <button type="button" class="btn btn-primary btn-sm" onclick="verifyReject(this, '@Seq("#", traderKYC.id, traderKYC.documentType).mkString("")', '@Seq(traderKYC.id, traderKYC.documentType, constants.Form.STATUS).mkString("")', false)">@Messages(constants.Form.REJECT)</button>
             }
         }
     </span>
