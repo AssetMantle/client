@@ -274,26 +274,36 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
       }
   }
 
-  def verifyKYCDocument(organizationID: String, documentType: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
-    implicit request =>
-      try {
-        masterOrganizationKYCs.Service.verify(id = organizationID, documentType = documentType)
-        utilitiesNotification.send(accountID = masterOrganizations.Service.getAccountId(organizationID), notification = constants.Notification.SUCCESS, Messages(constants.Response.DOCUMENT_APPROVED.message))
-        withUsernameToken.Ok(Messages(constants.Response.SUCCESS.message))
-      } catch {
-        case baseException: BaseException => InternalServerError(Messages(baseException.failure.message))
-      }
+  def changeOrganizationKYCDocumentStatusForm(organizationID: String, documentType: String): Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.changeOrganizationKYCDocumentStatus(views.companion.master.ChangeOrganizationKYCDocumentStatus.form.fill(views.companion.master.ChangeOrganizationKYCDocumentStatus.Data(organizationID = organizationID, documentType = documentType, status = false))))
   }
 
-  def rejectKYCDocument(organizationID: String, documentType: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+  def changeOrganizationKYCDocumentStatus(): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      try {
-        masterOrganizationKYCs.Service.reject(id = organizationID, documentType = documentType)
-        utilitiesNotification.send(accountID = masterOrganizations.Service.getAccountId(organizationID), notification = constants.Notification.FAILURE, Messages(constants.Response.DOCUMENT_REJECTED.message))
-        withUsernameToken.Ok(Messages(constants.Response.SUCCESS.message))
-      } catch {
-        case baseException: BaseException => InternalServerError(Messages(baseException.failure.message))
-      }
+      views.companion.master.ChangeOrganizationKYCDocumentStatus.form.bindFromRequest().fold(
+        formWithErrors => {
+          BadRequest(views.html.component.master.changeOrganizationKYCDocumentStatus(formWithErrors))
+        },
+        changeOrganizationKYCDocumentStatusData => {
+          try {
+            if (masterZones.Service.getID(loginState.username) == masterOrganizations.Service.getZoneID(changeOrganizationKYCDocumentStatusData.organizationID)) {
+              if (changeOrganizationKYCDocumentStatusData.status) {
+                masterOrganizationKYCs.Service.verify(id = changeOrganizationKYCDocumentStatusData.organizationID, documentType = changeOrganizationKYCDocumentStatusData.documentType)
+                utilitiesNotification.send(masterOrganizations.Service.getAccountId(changeOrganizationKYCDocumentStatusData.organizationID), constants.Notification.SUCCESS, Messages(constants.Response.DOCUMENT_APPROVED.message))
+              } else {
+                masterOrganizationKYCs.Service.reject(id = changeOrganizationKYCDocumentStatusData.organizationID, documentType = changeOrganizationKYCDocumentStatusData.documentType)
+                utilitiesNotification.send(masterOrganizations.Service.getAccountId(changeOrganizationKYCDocumentStatusData.organizationID), constants.Notification.FAILURE, Messages(constants.Response.DOCUMENT_REJECTED.message))
+              }
+              Redirect(routes.ViewController.zoneRequest())
+            } else {
+              Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
+            }
+          }
+          catch {
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+          }
+        }
+      )
   }
 
   def rejectVerifyOrganizationRequestForm(organizationID: String): Action[AnyContent] = Action { implicit request =>
@@ -322,7 +332,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
   def viewOrganizationVerificationBankAccountDetail(organizationID: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        withUsernameToken.Ok(views.html.component.master.viewVerificationOrganizationBankAccountDetail(masterOrganizationBankAccountDetails.Service.get(organizationID)))
+        withUsernameToken.Ok(views.html.component.master.viewOrganizationBankAccountDetail(masterOrganizationBankAccountDetails.Service.get(organizationID)))
       } catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
@@ -331,7 +341,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
   def viewPendingVerifyOrganizationRequests: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        Ok(views.html.component.master.viewPendingVerifyOrgnizationRequests(masterOrganizations.Service.getVerifyOrganizationRequests(masterZones.Service.getID(loginState.username))))
+        Ok(views.html.component.master.viewPendingVerifyOrganizationRequests(masterOrganizations.Service.getVerifyOrganizationRequests(masterZones.Service.getID(loginState.username))))
       }
       catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))

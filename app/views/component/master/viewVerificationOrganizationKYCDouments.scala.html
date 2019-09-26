@@ -10,31 +10,14 @@
     } {
         <a href="@routes.FileController.zoneAccessedOrganizationKYCFile(organizationKYC.id, organizationKYC.fileName, organizationKYC.documentType)">@Messages(organizationKYC.documentType)</a>
     } {
-        <span class="red">@Messages(constants.Form.STATUS)
+        <span class="red">@Messages(constants.Form.STATUS):
             @if(organizationKYC.status.getOrElse(false)) {
-                <span id="verifiedDocumentStatus@organizationKYC.id@organizationKYC.documentType" class="result success"><img src="@routes.Assets.versioned("images/success.jpg")"></span>
-                <span id="unverifiedDocumentStatus@organizationKYC.id@organizationKYC.documentType" class="result failure hidden"><img src="@routes.Assets.versioned("images/unverified.png")"></span>
+                <span><img class="status" src="@routes.Assets.versioned("images/success.jpg")"></span>
             } else {
-                <span id="unverifiedDocumentStatus@organizationKYC.id@organizationKYC.documentType" class="result failure"><img src="@routes.Assets.versioned("images/unverified.png")"></span>
-                <span id="verifiedDocumentStatus@organizationKYC.id@organizationKYC.documentType" class="result success hidden"><img src="@routes.Assets.versioned("images/success.jpg")">
-                }
+                <span><img class="status" src="@routes.Assets.versioned("images/unverified.png")"></span>
+            }
         </span>
-        </span>
-        <div id="organizationKYCDocumentStatus@organizationKYC.id@organizationKYC.documentType"></div>
-        @organizationKYC.status.getOrElse(None) match {
-            case true => {
-              <div id="buttonOrganizationKYCDocumentStatus@organizationKYC.id @organizationKYC.documentType"><button class="cmuk-button cmuk-button-danger cmuk-button-small" onclick="rejectOrganizationKYCDocument('@organizationKYC.id', '@organizationKYC.documentType')">@Messages(constants.Form.REJECT)</button></div>
-            }
-            case false => {
-              <div id="buttonOrganizationKYCDocumentStatus@organizationKYC.id @organizationKYC.documentType"><button class="cmuk-button cmuk-button-success cmuk-button-small" onclick="verifyOrganizationKYCDocument('@organizationKYC.id', '@organizationKYC.documentType')">@Messages(constants.Form.APPROVE)</button></div>
-            }
-            case _ => {
-                <div id="buttonOrganizationKYCDocumentStatus@organizationKYC.id@organizationKYC.documentType">
-                  <button class="cmuk-button cmuk-button-success cmuk-button-small" onclick="verifyOrganizationKYCDocument('@organizationKYC.id', '@organizationKYC.documentType')">@Messages(constants.Form.APPROVE)</button>
-                  <button class="cmuk-button cmuk-button-danger cmuk-button-small" onclick="rejectOrganizationKYCDocument('@organizationKYC.id', '@organizationKYC.documentType')">@Messages(constants.Form.REJECT)</button>
-                </div>
-            }
-        }
+        <button class="cmuk-button cmuk-button-small" onclick="getForm(jsRoutes.controllers.AddOrganizationController.changeOrganizationKYCDocumentStatusForm('@organizationKYC.id', '@organizationKYC.documentType'))">@Messages(constants.Form.CHANGE_STATUS)</button>
     }
 }
 </div>

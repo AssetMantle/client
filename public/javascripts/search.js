@@ -5,7 +5,6 @@ function searchFunction(searchData) {
     const invalidTransactionHash = getCookie("transactionHashError");
 
     $("#searchForm").submit(function (e) {
-        e.stopPropagation();
         e.preventDefault();
     });
 

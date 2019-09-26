@@ -41,7 +41,7 @@ function transactionExplorer() {
     wsNewTransaction.onclose = function (event) {
     };
 
-    $(window).submit(function () {
+    $(window).on("replace", function () {
         wsNewTransaction.close();
     });
 }

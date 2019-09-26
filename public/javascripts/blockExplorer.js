@@ -28,7 +28,7 @@ function blockExplorer(blockExplorerTableBody, maxNumberOfItems) {
     wsNewBlock.onclose = function (event) {
     };
 
-    $(window).submit(function () {
+    $(window).on("replace", function () {
         wsNewBlock.close();
     });
 }

@@ -216,26 +216,32 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
       }
   }
 
-  def verifyKYCDocument(zoneID: String, documentType: String): Action[AnyContent] = withGenesisLoginAction.authenticated { implicit loginState =>
-    implicit request =>
-      try {
-        masterZoneKYCs.Service.verify(id = zoneID, documentType = documentType)
-        utilitiesNotification.send(masterZones.Service.getAccountId(zoneID), constants.Notification.SUCCESS, Messages(constants.Response.DOCUMENT_APPROVED.message))
-        withUsernameToken.Ok(Messages(constants.Response.SUCCESS.message))
-      } catch {
-        case baseException: BaseException => InternalServerError(Messages(baseException.failure.message))
-      }
+  def changeZoneKYCDocumentStatusForm(zoneID: String, documentType: String): Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.changeZoneKYCDocumentStatus(views.companion.master.ChangeZoneKYCDocumentStatus.form.fill(views.companion.master.ChangeZoneKYCDocumentStatus.Data(zoneID = zoneID, documentType = documentType, status = false))))
   }
 
-  def rejectKYCDocument(zoneID: String, documentType: String): Action[AnyContent] = withGenesisLoginAction.authenticated { implicit loginState =>
+  def changeZoneKYCDocumentStatus(): Action[AnyContent] = withGenesisLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      try {
-        masterZoneKYCs.Service.reject(id = zoneID, documentType = documentType)
-        utilitiesNotification.send(masterZones.Service.getAccountId(zoneID), constants.Notification.FAILURE, Messages(constants.Response.DOCUMENT_REJECTED.message))
-        withUsernameToken.Ok(Messages(constants.Response.SUCCESS.message))
-      } catch {
-        case baseException: BaseException => InternalServerError(Messages(baseException.failure.message))
-      }
+      views.companion.master.ChangeZoneKYCDocumentStatus.form.bindFromRequest().fold(
+        formWithErrors => {
+          BadRequest(views.html.component.master.changeZoneKYCDocumentStatus(formWithErrors))
+        },
+        changeZoneKYCDocumentStatusData => {
+          try {
+            if (changeZoneKYCDocumentStatusData.status) {
+              masterZoneKYCs.Service.verify(id = changeZoneKYCDocumentStatusData.zoneID, documentType = changeZoneKYCDocumentStatusData.documentType)
+              utilitiesNotification.send(masterZones.Service.getAccountId(changeZoneKYCDocumentStatusData.zoneID), constants.Notification.SUCCESS, Messages(constants.Response.DOCUMENT_APPROVED.message))
+            } else {
+              masterZoneKYCs.Service.reject(id = changeZoneKYCDocumentStatusData.zoneID, documentType = changeZoneKYCDocumentStatusData.documentType)
+              utilitiesNotification.send(masterZones.Service.getAccountId(changeZoneKYCDocumentStatusData.zoneID), constants.Notification.FAILURE, Messages(constants.Response.DOCUMENT_REJECTED.message))
+            }
+            Redirect(routes.ViewController.genesisRequest())
+          }
+          catch {
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+          }
+        }
+      )
   }
 
   def rejectVerifyZoneRequestForm(zoneID: String): Action[AnyContent] = Action { implicit request =>
