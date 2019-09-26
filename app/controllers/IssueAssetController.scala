@@ -9,7 +9,6 @@ import javax.inject.{Inject, Singleton}
 import models.common.Serializable
 import models.{blockchain, blockchainTransaction, master, masterTransaction}
 import play.api.i18n.{I18nSupport, Messages}
-import play.api.libs.json.Json
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
 
@@ -179,26 +178,32 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
       }
   }
 
-  def verifyAssetDocument(id: String, documentType: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
-    implicit request =>
-      try {
-        masterTransactionAssetFiles.Service.accept(id = id, documentType = documentType)
-        utilitiesNotification.send(masterTransactionIssueAssetRequests.Service.getAccountID(id), constants.Notification.SUCCESS, Messages(constants.Response.DOCUMENT_APPROVED.message))
-        withUsernameToken.Ok(Messages(constants.Response.SUCCESS.message))
-      } catch {
-        case baseException: BaseException => InternalServerError(Messages(baseException.failure.message))
-      }
+  def changeAssetDocumentStatusForm(fileID: String, documentType: String): Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.changeAssetDocumentStatus(views.companion.master.ChangeAssetDocumentStatus.form.fill(views.companion.master.ChangeAssetDocumentStatus.Data(fileID = fileID, documentType = documentType, status = false))))
   }
 
-  def rejectAssetDocument(id: String, documentType: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+  def changeAssetDocumentStatus(): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      try {
-        masterTransactionAssetFiles.Service.reject(id = id, documentType = documentType)
-        utilitiesNotification.send(masterTransactionIssueAssetRequests.Service.getAccountID(id), constants.Notification.FAILURE, Messages(constants.Response.DOCUMENT_REJECTED.message))
-        withUsernameToken.Ok(Messages(constants.Response.SUCCESS.message))
-      } catch {
-        case baseException: BaseException => InternalServerError(Messages(baseException.failure.message))
-      }
+      views.companion.master.ChangeAssetDocumentStatus.form.bindFromRequest().fold(
+        formWithErrors => {
+          BadRequest(views.html.component.master.changeAssetDocumentStatus(formWithErrors))
+        },
+        changeAssetDocumentStatusData => {
+          try {
+            if (changeAssetDocumentStatusData.status) {
+              masterTransactionAssetFiles.Service.accept(id = changeAssetDocumentStatusData.fileID, documentType = changeAssetDocumentStatusData.documentType)
+              utilitiesNotification.send(masterTransactionIssueAssetRequests.Service.getAccountID(changeAssetDocumentStatusData.fileID), constants.Notification.SUCCESS, Messages(constants.Response.DOCUMENT_APPROVED.message))
+            } else {
+              masterTransactionAssetFiles.Service.reject(id = changeAssetDocumentStatusData.fileID, documentType = changeAssetDocumentStatusData.documentType)
+              utilitiesNotification.send(masterTransactionIssueAssetRequests.Service.getAccountID(changeAssetDocumentStatusData.fileID), constants.Notification.FAILURE, Messages(constants.Response.DOCUMENT_REJECTED.message))
+            }
+            Redirect(routes.ViewController.zoneRequest())
+          }
+          catch {
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+          }
+        }
+      )
   }
 
   def rejectIssueAssetRequestForm(requestID: String): Action[AnyContent] = Action {

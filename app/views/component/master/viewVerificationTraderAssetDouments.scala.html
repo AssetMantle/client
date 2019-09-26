@@ -2,39 +2,19 @@
 @import models.masterTransaction.AssetFile
 
 @(files: Seq[AssetFile])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
-<div class="verify_buttons">
-    @for(file <- files) {
-        @component.master.commonDocumentViewer(file) {
-            @routes.FileController.zoneAccessedAssetFile(file.id, file.fileName, file.documentType)
-        } {
-            <a href="@routes.FileController.zoneAccessedAssetFile(file.id, file.fileName, file.documentType)">@Messages(file.documentType)</a>
-        } {
-            <span class="red">@Messages(constants.Form.STATUS)
-                @if(file.status.getOrElse(false)) {
-                    <span id="verifiedDocumentStatus@file.id@file.documentType" class="result success"><img src="@routes.Assets.versioned("images/success.jpg")"></span>
-                    <span id="unverifiedDocumentStatus@file.id@file.documentType" class="result failure hidden"><img src="@routes.Assets.versioned("images/unverified.png")"></span>
-                } else {
-                    <span id="unverifiedDocumentStatus@file.id@file.documentType" class="result failure"><img src="@routes.Assets.versioned("images/unverified.png")"></span>
-                    <span id="verifiedDocumentStatus@file.id@file.documentType" class="result success hidden"><img src="@routes.Assets.versioned("images/success.jpg")">
-                    }
-            </span>
-            </span>
-            <div id="traderAssetDocumentStatus@file.id@file.documentType"></div>
-            @file.status.getOrElse(None) match {
-                case true => {
-                    <div id="buttonTraderAssetDocumentStatus@file.id@file.documentType"><button class="cmuk-button cmuk-button-danger cmuk-button-small" onclick="rejectTraderAssetDocument('@file.id', '@file.documentType')">@Messages(constants.Form.REJECT)</button></div>
-                }
-                case false => {
-                    <div id="buttonTraderAssetDocumentStatus@file.id@file.documentType"><button class="cmuk-button cmuk-button-success cmuk-button-small" onclick="verifyTraderAssetDocument('@file.id', '@file.documentType')">@Messages(constants.Form.APPROVE)</button></div>
-                }
-                case _ => {
-                    <div id="buttonTraderAssetDocumentStatus@file.id@file.documentType">
-                        <button class="cmuk-button cmuk-button-success cmuk-button-small" onclick="verifyTraderAssetDocument('@file.id', '@file.documentType')">@Messages(constants.Form.APPROVE)</button>
-                        <button class="cmuk-button cmuk-button-danger cmuk-button-small" onclick="rejectTraderAssetDocument('@file.id', '@file.documentType')">@Messages(constants.Form.REJECT)</button>
-                    </div>
-                }
+@for(file <- files) {
+    @component.master.commonDocumentViewer(file) {
+        @routes.FileController.zoneAccessedAssetFile(file.id, file.fileName, file.documentType)
+    } {
+        <a href="@routes.FileController.zoneAccessedAssetFile(file.id, file.fileName, file.documentType)">@Messages(file.documentType)</a>
+    } {
+        <span class="red">@Messages(constants.Form.STATUS):
+            @if(file.status.getOrElse(false)) {
+                <span><img class="status" src="@routes.Assets.versioned("images/success.jpg")"></span>
+            } else {
+                <span><img class="status" src="@routes.Assets.versioned("images/unverified.png")"></span>
             }
-        }
+            <button class="cmuk-button cmuk-button-small" onclick="getForm(jsRoutes.controllers.IssueAssetController.changeAssetDocumentStatusForm('@file.id', '@file.documentType'))">@Messages(constants.Form.CHANGE_STATUS)</button>
+        </span>
     }
-</div>
-<script src="@routes.Assets.versioned("javascripts/kycVerification.js")" type="text/javascript"></script>
+}

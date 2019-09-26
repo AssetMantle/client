@@ -144,8 +144,8 @@ POST        /master/reviewTraderCompletion                               control
 GET         /master/zoneVerifyTrader                                     controllers.SetACLController.zoneVerifyTraderForm(accountID: String, organizationID: String)
 POST        /master/zoneVerifyTrader                                     controllers.SetACLController.zoneVerifyTrader
 GET         /master/zoneViewTraderKYCDocuments                           controllers.SetACLController.zoneViewKYCDocuments(traderID: String)
-GET         /master/zoneVerifyTraderKYCDocument                          controllers.SetACLController.zoneVerifyKYCDocument(traderID: String, documentType: String)
-GET         /master/zoneRejectTraderKYCDocument                          controllers.SetACLController.zoneRejectKYCDocument(traderID: String, documentType: String)
+GET         /master/changeTraderKYCDocumentZoneStatus                    controllers.SetACLController.changeTraderKYCDocumentZoneStatusForm(traderID: String, documentType: String)
+POST        /master/changeTraderKYCDocumentZoneStatus                    controllers.SetACLController.changeTraderKYCDocumentZoneStatus
 GET         /master/zoneViewVerifyTraderRequests                         controllers.SetACLController.zoneViewPendingVerifyTraderRequests
 GET         /master/zoneRejectVerifyTraderRequest                        controllers.SetACLController.zoneRejectVerifyTraderRequestForm(traderID: String)
 POST        /master/zoneRejectVerifyTraderRequest                        controllers.SetACLController.zoneRejectVerifyTraderRequest
@@ -155,8 +155,8 @@ POST        /master/organizationVerifyTrader                             control
 GET         /master/organizationModifyTrader                             controllers.SetACLController.organizationModifyTraderForm(accountID: String)
 POST        /master/organizationModifyTrader                             controllers.SetACLController.organizationModifyTrader
 GET         /master/organzationViewTraderKYCDocuments                    controllers.SetACLController.organizationViewKYCDocuments(traderID: String)
-GET         /master/organizationVerifyTraderKYCDocument                  controllers.SetACLController.organizationVerifyKYCDocument(traderID: String, documentType: String)
-GET         /master/organizationRejectTraderKYCDocument                  controllers.SetACLController.organizationRejectKYCDocument(traderID: String, documentType: String)
+GET         /master/changeTraderKYCDocumentOrganizationStatus            controllers.SetACLController.changeTraderKYCDocumentOrganizationStatusForm(traderID: String, documentType: String)
+POST        /master/changeTraderKYCDocumentOrganizationStatus            controllers.SetACLController.changeTraderKYCDocumentOrganizationStatus
 GET         /master/organizationViewVerifyTraderRequests                 controllers.SetACLController.organizationViewPendingVerifyTraderRequests
 GET         /master/organizationRejectVerifyTraderRequest                controllers.SetACLController.organizationRejectVerifyTraderRequestForm(traderID: String)
 POST        /master/organizationRejectVerifyTraderRequest                controllers.SetACLController.organizationRejectVerifyTraderRequest
@@ -260,8 +260,8 @@ GET         /master/viewPendingIssueAssetRequests                        control
 GET         /master/rejectIssueAssetRequest                              controllers.IssueAssetController.rejectIssueAssetRequestForm(requestID: String)
 POST        /master/rejectIssueAssetRequest                              controllers.IssueAssetController.rejectIssueAssetRequest
 GET         /master/viewTraderAssetDocuments                             controllers.IssueAssetController.viewAssetDocuments(id: String)
-GET         /master/verifyTraderAssetDocument                            controllers.IssueAssetController.verifyAssetDocument(id: String, documentType: String)
-GET         /master/rejectTraderAssetDocument                            controllers.IssueAssetController.rejectAssetDocument(id: String, documentType: String)
+GET         /master/changeAssetDocumentStatus                            controllers.IssueAssetController.changeAssetDocumentStatusForm(fileID: String, documentType: String)
+POST        /master/changeAssetDocumentStatus                            controllers.IssueAssetController.changeAssetDocumentStatus
 
 GET         /master/issueAsset                                           controllers.IssueAssetController.issueAssetForm(requestID: String, accountID: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, takerAddress: Option[String])
 POST        /master/issueAsset                                           controllers.IssueAssetController.issueAsset

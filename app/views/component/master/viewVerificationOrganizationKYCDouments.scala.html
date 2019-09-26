@@ -2,8 +2,6 @@
 @import models.master.OrganizationKYC
 
 @(organizationKYCs: Seq[OrganizationKYC])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
-<script src="@routes.Assets.versioned("javascripts/kycVerification.js")" type="text/javascript"></script>
-<div class="verify_buttons">
 @for(organizationKYC <- organizationKYCs) {
     @component.master.commonDocumentViewer(organizationKYC) {
         @routes.FileController.zoneAccessedOrganizationKYCFile(organizationKYC.id, organizationKYC.fileName, organizationKYC.documentType)
@@ -16,8 +14,7 @@
             } else {
                 <span><img class="status" src="@routes.Assets.versioned("images/unverified.png")"></span>
             }
+            <button class="cmuk-button cmuk-button-small" onclick="getForm(jsRoutes.controllers.AddOrganizationController.changeOrganizationKYCDocumentStatusForm('@organizationKYC.id', '@organizationKYC.documentType'))">@Messages(constants.Form.CHANGE_STATUS)</button>
         </span>
-        <button class="cmuk-button cmuk-button-small" onclick="getForm(jsRoutes.controllers.AddOrganizationController.changeOrganizationKYCDocumentStatusForm('@organizationKYC.id', '@organizationKYC.documentType'))">@Messages(constants.Form.CHANGE_STATUS)</button>
     }
 }
-</div>

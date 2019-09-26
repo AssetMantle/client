@@ -1,0 +1,25 @@
+@import controllers.actions.LoginState
+@import helper._
+@import views.companion.master.ChangeTraderKYCDocumentOrganizationStatus
+
+@(changeTraderKYCDocumentOrganizationStatusForm: Form[ChangeTraderKYCDocumentOrganizationStatus.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@form(action = routes.SetACLController.changeTraderKYCDocumentOrganizationStatus, 'onkeypress -> "submitFormOnEnter(event,this)") {
+    <div class="latest_card-header latest_card-header-primary text-center">
+        <h4 class="latest_card-title">@Messages(constants.Form.CHANGE_TRADER_KYC_ORGANIZATION_STATUS)</h4>
+    </div>
+    <div class="latest_card-body">
+        @CSRF.formField
+        @inputText(changeTraderKYCDocumentOrganizationStatusForm(constants.FormField.TRADER_ID.name), '_label -> Messages(constants.FormField.TRADER_ID.name), 'placeholder -> Messages(constants.FormField.TRADER_ID.name), 'required -> true, 'class -> "cmuk-input", 'readonly -> true)
+        @inputText(changeTraderKYCDocumentOrganizationStatusForm(constants.FormField.DOCUMENT_TYPE.name), '_label -> Messages(constants.FormField.DOCUMENT_TYPE.name), 'placeholder -> Messages(constants.FormField.DOCUMENT_TYPE.name), 'required -> true, 'class -> "cmuk-input", 'readonly -> true)
+        @checkbox(changeTraderKYCDocumentOrganizationStatusForm(constants.Form.ORGANIZATION_STATUS), '_label -> Messages(constants.Form.ORGANIZATION_STATUS),'placeholder -> Messages(constants.Form.ORGANIZATION_STATUS), 'required -> true, 'class -> "cmuk-checkbox")
+
+        @if(changeTraderKYCDocumentOrganizationStatusForm.hasGlobalErrors) {
+            <ul>
+            @for(error <- changeTraderKYCDocumentOrganizationStatusForm.globalErrors) {
+                <li>@error.format</li>
+            }
+            </ul>
+        }
+        <button type="button" class="btn btn-primary btn-sm" onclick="submitForm(this)">@Messages(constants.Form.SUBMIT)</button>
+    </div>
+}

@@ -1,0 +1,25 @@
+@import controllers.actions.LoginState
+@import helper._
+@import views.companion.master.ChangeAssetDocumentStatus
+
+@(changeAssetDocumentStatusForm: Form[ChangeAssetDocumentStatus.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@form(action = routes.IssueAssetController.changeAssetDocumentStatus, 'onkeypress -> "submitFormOnEnter(event,this)") {
+    <div class="latest_card-header latest_card-header-primary text-center">
+        <h4 class="latest_card-title">@Messages(constants.Form.CHANGE_ZONE_KYC_STATUS)</h4>
+    </div>
+    <div class="latest_card-body">
+        @CSRF.formField
+        @inputText(changeAssetDocumentStatusForm(constants.FormField.FILE_ID.name), '_label -> Messages(constants.FormField.FILE_ID.name), 'placeholder -> Messages(constants.FormField.FILE_ID.name), 'required -> true, 'class -> "cmuk-input", 'readonly -> true)
+        @inputText(changeAssetDocumentStatusForm(constants.FormField.DOCUMENT_TYPE.name), '_label -> Messages(constants.FormField.DOCUMENT_TYPE.name), 'placeholder -> Messages(constants.FormField.DOCUMENT_TYPE.name), 'required -> true, 'class -> "cmuk-input", 'readonly -> true)
+        @checkbox(changeAssetDocumentStatusForm(constants.Form.STATUS), '_label -> Messages(constants.Form.STATUS), 'placeholder -> Messages(constants.Form.STATUS), 'required -> true, 'class -> "cmuk-checkbox")
+
+        @if(changeAssetDocumentStatusForm.hasGlobalErrors) {
+            <ul>
+            @for(error <- changeAssetDocumentStatusForm.globalErrors) {
+                <li>@error.format</li>
+            }
+            </ul>
+        }
+        <button type="button" class="btn btn-primary btn-sm" onclick="submitForm(this)">@Messages(constants.Form.SUBMIT)</button>
+    </div>
+}
