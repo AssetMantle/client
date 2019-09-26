@@ -211,7 +211,7 @@ class IssueAssetRequests @Inject()(protected val databaseConfigProvider: Databas
 
     def getPendingIssueAssetRequests(accountIDs: Seq[String], status: String): Seq[IssueAssetRequest] = Await.result(getIssueAssetRequestsWithStatus(accountIDs, status), Duration.Inf).map(_.deSerialize)
 
-    def getTraderAssetList(accountID: String): Seq[IssueAssetRequest] = Await.result(findIssueAssetsByAccountIDAndStatus(accountID, Seq(constants.Status.Asset.INCOMPLETE_DETAILS, constants.Status.Asset.LISTED_FOR_TRADE, constants.Status.Asset.UNDER_NEGOTIATION)), Duration.Inf).map(_.deSerialize)
+    def getTraderAssetList(accountID: String): Seq[IssueAssetRequest] = Await.result(findIssueAssetsByAccountIDAndStatus(accountID, Seq(constants.Status.Asset.INCOMPLETE_DETAILS, constants.Status.Asset.REQUESTED, constants.Status.Asset.LISTED_FOR_TRADE, constants.Status.Asset.UNDER_NEGOTIATION)), Duration.Inf).map(_.deSerialize)
 
     def getMarketAssets(): Seq[IssueAssetRequest] = Await.result(getAssetsByStatuses(Seq(constants.Status.Asset.LISTED_FOR_TRADE, constants.Status.Asset.UNDER_NEGOTIATION)), Duration.Inf).map(_.deSerialize)
 

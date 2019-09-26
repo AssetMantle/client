@@ -187,19 +187,16 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
         documentType match {
           case constants.File.OBL =>
             masterTransactionAssetFiles.Service.getOrEmpty(issueAssetRequestID, constants.File.OBL).documentContent match {
-              case Some(obl) =>
-                val oblContent = obl.asInstanceOf[Serializable.OBL]
+              case Some(oblContent: Serializable.OBL) =>
                 PartialContent(views.html.component.master.issueAssetOBL(views.companion.master.IssueAssetOBL.form.fill(views.companion.master.IssueAssetOBL.Data(issueAssetRequestID, oblContent.billOfLadingID, oblContent.portOfLoading, oblContent.shipperName, oblContent.shipperAddress, oblContent.notifyPartyName, oblContent.notifyPartyAddress, oblContent.dateOfShipping, oblContent.deliveryTerm, oblContent.weightOfConsignment, oblContent.declaredAssetValue)), masterTransactionAssetFiles.Service.getOrNone(issueAssetRequestID, constants.File.OBL)))
               case None =>
-                PartialContent(views.html.component.master.issueAssetOBL(views.companion.master.IssueAssetOBL.form, masterTransactionAssetFiles.Service.getOrNone(issueAssetRequestID, constants.File.OBL)))
+                PartialContent(views.html.component.master.issueAssetOBL(views.companion.master.IssueAssetOBL.form.fill(views.companion.master.IssueAssetOBL.Data(issueAssetRequestID, "", "", "", "", "", "", new Date, "", 0, 0)), masterTransactionAssetFiles.Service.getOrNone(issueAssetRequestID, constants.File.OBL)))
             }
-
           case constants.File.INVOICE =>
             masterTransactionAssetFiles.Service.getOrEmpty(issueAssetRequestID, constants.File.INVOICE).documentContent match {
-              case Some(invoice) =>
-                val invoiceContent = invoice.asInstanceOf[Serializable.Invoice]
+              case Some(invoiceContent: Serializable.Invoice) =>
                 PartialContent(views.html.component.master.issueAssetInvoice(views.companion.master.IssueAssetInvoice.form.fill(views.companion.master.IssueAssetInvoice.Data(issueAssetRequestID, invoiceContent.invoiceNumber, invoiceContent.invoiceDate)), masterTransactionAssetFiles.Service.getOrNone(issueAssetRequestID, constants.File.INVOICE)))
-              case None => PartialContent(views.html.component.master.issueAssetInvoice(views.companion.master.IssueAssetInvoice.form, masterTransactionAssetFiles.Service.getOrNone(issueAssetRequestID, constants.File.INVOICE)))
+              case None => PartialContent(views.html.component.master.issueAssetInvoice(views.companion.master.IssueAssetInvoice.form.fill(views.companion.master.IssueAssetInvoice.Data(issueAssetRequestID, "", new Date)), masterTransactionAssetFiles.Service.getOrNone(issueAssetRequestID, constants.File.INVOICE)))
             }
           case constants.File.CONTRACT | constants.File.PACKING_LIST | constants.File.COO | constants.File.COA | constants.File.OTHER => PartialContent(views.html.component.master.issueAssetDocument(issueAssetRequestID, masterTransactionAssetFiles.Service.getDocuments(issueAssetRequestID, constants.File.TRADER_ASSET_DOCUMENT_TYPES_UPLOAD_PAGE)))
           case _ => Ok(views.html.index())
@@ -223,21 +220,17 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
         documentType match {
           case constants.File.OBL =>
             masterTransactionAssetFiles.Service.getOrEmpty(issueAssetRequestID, constants.File.OBL).documentContent match {
-              case Some(obl) =>
-                val oblContent = obl.asInstanceOf[Serializable.OBL]
+              case Some(oblContent: Serializable.OBL) =>
                 PartialContent(views.html.component.master.issueAssetOBL(views.companion.master.IssueAssetOBL.form.fill(views.companion.master.IssueAssetOBL.Data(issueAssetRequestID, oblContent.billOfLadingID, oblContent.portOfLoading, oblContent.shipperName, oblContent.shipperAddress, oblContent.notifyPartyName, oblContent.notifyPartyAddress, oblContent.dateOfShipping, oblContent.deliveryTerm, oblContent.weightOfConsignment, oblContent.declaredAssetValue)), masterTransactionAssetFiles.Service.getOrNone(issueAssetRequestID, constants.File.OBL)))
               case None =>
-                PartialContent(views.html.component.master.issueAssetOBL(views.companion.master.IssueAssetOBL.form, masterTransactionAssetFiles.Service.getOrNone(issueAssetRequestID, constants.File.OBL)))
+                PartialContent(views.html.component.master.issueAssetOBL(views.companion.master.IssueAssetOBL.form.fill(views.companion.master.IssueAssetOBL.Data(issueAssetRequestID, "", "", "", "", "", "", new Date, "", 0, 0)), masterTransactionAssetFiles.Service.getOrNone(issueAssetRequestID, constants.File.OBL)))
             }
-
           case constants.File.INVOICE =>
             masterTransactionAssetFiles.Service.getOrEmpty(issueAssetRequestID, constants.File.INVOICE).documentContent match {
-              case Some(invoice) =>
-                val invoiceContent = invoice.asInstanceOf[Serializable.Invoice]
+              case Some(invoiceContent: Serializable.Invoice) =>
                 PartialContent(views.html.component.master.issueAssetInvoice(views.companion.master.IssueAssetInvoice.form.fill(views.companion.master.IssueAssetInvoice.Data(issueAssetRequestID, invoiceContent.invoiceNumber, invoiceContent.invoiceDate)), masterTransactionAssetFiles.Service.getOrNone(issueAssetRequestID, constants.File.INVOICE)))
-              case None => PartialContent(views.html.component.master.issueAssetInvoice(views.companion.master.IssueAssetInvoice.form, masterTransactionAssetFiles.Service.getOrNone(issueAssetRequestID, constants.File.INVOICE)))
+              case None => PartialContent(views.html.component.master.issueAssetInvoice(views.companion.master.IssueAssetInvoice.form.fill(views.companion.master.IssueAssetInvoice.Data(issueAssetRequestID, "", new Date)), masterTransactionAssetFiles.Service.getOrNone(issueAssetRequestID, constants.File.INVOICE)))
             }
-
           case constants.File.CONTRACT | constants.File.PACKING_LIST | constants.File.COO | constants.File.COA | constants.File.OTHER => PartialContent(views.html.component.master.issueAssetDocument(issueAssetRequestID, masterTransactionAssetFiles.Service.getDocuments(issueAssetRequestID, constants.File.TRADER_ASSET_DOCUMENT_TYPES_UPLOAD_PAGE)))
           case _ => Ok(views.html.index())
         }
