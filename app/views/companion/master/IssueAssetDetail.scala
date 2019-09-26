@@ -10,7 +10,6 @@ object IssueAssetDetail {
   val form = Form(
     mapping(
       constants.FormField.REQUEST_ID.name -> optional(constants.FormField.REQUEST_ID.field),
-      constants.FormField.DOCUMENT_HASH.name -> constants.FormField.DOCUMENT_HASH.field,
       constants.FormField.ASSET_TYPE.name -> constants.FormField.ASSET_TYPE.field,
       constants.FormField.QUANTITY_UNIT.name -> constants.FormField.QUANTITY_UNIT.field,
       constants.FormField.ASSET_QUANTITY.name -> constants.FormField.ASSET_QUANTITY.field,
@@ -28,7 +27,7 @@ object IssueAssetDetail {
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(requestID: Option[String], documentHash: String, assetType: String, quantityUnit: String, assetQuantity: Int, assetPrice: Int, takerAddress: Option[String], commodityName: String, quality: String, deliveryTerm: String, tradeType: String, portOfLoading: String, portOfDischarge: String, shipmentDate: Date, physicalDocumentsHandledVia: String, comdexPaymentTerms: String)
+  case class Data(requestID: Option[String], assetType: String, quantityUnit: String, assetQuantity: Int, assetPrice: Int, takerAddress: Option[String], commodityName: String, quality: String, deliveryTerm: String, tradeType: String, portOfLoading: String, portOfDischarge: String, shipmentDate: Date, physicalDocumentsHandledVia: String, comdexPaymentTerms: String)
 
 }
 

@@ -5,22 +5,22 @@ import java.util.Date
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Trait.Document
-import models.Trait.Context
+import models.Trait.DocumentContent
 import org.postgresql.util.PSQLException
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.JdbcProfile
-import models.common.Serializable
+import models.common.Serializable._
 import play.api.libs.json.{JsValue, Json, OWrites, Reads, Writes}
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class AssetFile(id: String, documentType: String, fileName: String, file: Option[Array[Byte]], context: Option[models.Trait.Context], status: Option[Boolean]) extends Document[AssetFile] {
-  def updateFile(newFile: Option[Array[Byte]]): AssetFile = AssetFile(id = id, documentType = documentType, fileName = fileName, file = newFile, context = context, status = status)
+case class AssetFile(id: String, documentType: String, fileName: String, file: Option[Array[Byte]], documentContent: Option[DocumentContent], status: Option[Boolean]) extends Document[AssetFile] {
+  def updateFile(newFile: Option[Array[Byte]]): AssetFile = AssetFile(id = id, documentType = documentType, fileName = fileName, file = newFile, documentContent = documentContent, status = status)
 
-  def updateFileName(newFileName: String): AssetFile = AssetFile(id = id, documentType = documentType, fileName = newFileName, file = file, context = context, status = status)
+  def updateFileName(newFileName: String): AssetFile = AssetFile(id = id, documentType = documentType, fileName = newFileName, file = file, documentContent = documentContent, status = status)
 }
 
 @Singleton
@@ -30,23 +30,21 @@ class AssetFiles @Inject()(protected val databaseConfigProvider: DatabaseConfigP
 
   private implicit val module: String = constants.Module.MASTER_TRANSACTION_ASSET_FILE
 
-  case class AssetFileSerialized(id: String, documentType: String, fileName: String, file: Option[Array[Byte]], context: Option[String], status: Option[Boolean]) {
-    def deserialize: AssetFile = documentType match {
-      case constants.File.OBL => AssetFile(id, documentType, fileName, file, Option(utilities.JSON.convertJsonStringToObject[Serializable.OBL](context.getOrElse(Json.toJson(Serializable.OBL("", "", "", "", "", "", new Date, "", 0, 0)).toString))), status)
-      case constants.File.INVOICE => AssetFile(id, documentType, fileName, file, Option(utilities.JSON.convertJsonStringToObject[Serializable.Invoice](context.getOrElse(Json.toJson(Serializable.Invoice("", new Date)).toString))), status)
-      case _ => AssetFile(id, documentType, fileName, file, None, status)
-    }
+  case class AssetFileSerialized(id: String, documentType: String, fileName: String, file: Option[Array[Byte]], documentContent: Option[String], status: Option[Boolean]) {
+    def deserialize: AssetFile =
+        documentContent match {
+          case Some(content) => AssetFile(id, documentType, fileName, file, Option(utilities.JSON.convertJsonStringToObject[DocumentContent](content.toString)), status)
+          case None =>AssetFile(id, documentType, fileName, file, None, status)
+        }
+
   }
 
-  implicit val modelWrites = new Writes[models.Trait.Context] {
-    override def writes(o: models.Trait.Context): JsValue = o match {
-      case u: Serializable.OBL => Json.toJson(u)
-      case cl: Serializable.Invoice => Json.toJson(cl)
+  private def serialize(assetFile: AssetFile): AssetFileSerialized = {
+    assetFile.documentContent match {
+      case Some(content) =>  AssetFileSerialized(assetFile.id, assetFile.documentType, assetFile.fileName, assetFile.file, Option (Json.toJson(content).toString), assetFile.status)
+      case None => AssetFileSerialized(assetFile.id, assetFile.documentType, assetFile.fileName, assetFile.file, None, assetFile.status)
     }
   }
-  private def serialize(assetFileTrait: AssetFile): AssetFileSerialized = AssetFileSerialized(assetFileTrait.id, assetFileTrait.documentType, assetFileTrait.fileName, assetFileTrait.file, if(assetFileTrait.context.isDefined) Option (helper(assetFileTrait.context.get).toString) else None, assetFileTrait.status)
-
-  def helper(context: models.Trait.Context): JsValue =  Json.toJson(context)
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -84,7 +82,7 @@ class AssetFiles @Inject()(protected val databaseConfigProvider: DatabaseConfigP
     }
   }
 
-  private def upsertContext(file: AssetFileSerialized): Future[Int] = db.run(assetFileTable.map(x => (x.id, x.documentType, x.context.?)).insertOrUpdate(file.id, file.documentType, file.context).asTry).map {
+  private def upsertContext(file: AssetFileSerialized): Future[Int] = db.run(assetFileTable.map(x => (x.id, x.documentType, x.documentContent.?)).insertOrUpdate(file.id, file.documentType, file.documentContent).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -155,6 +153,8 @@ class AssetFiles @Inject()(protected val databaseConfigProvider: DatabaseConfigP
 
   private def getAllDocumentsById(id: String): Future[Seq[AssetFileSerialized]] = db.run(assetFileTable.filter(_.id === id).result)
 
+  private def getAllDocumentsByIds(ids: Seq[String]): Future[Seq[AssetFileSerialized]] = db.run(assetFileTable.filter(_.id inSet ids).result)
+
   private def getDocumentsByID(id: String, documents: Seq[String]): Future[Seq[AssetFileSerialized]] = db.run(assetFileTable.filter(_.id === id).filter(_.documentType inSet documents).result)
 
   private def deleteById(id: String) = db.run(assetFileTable.filter(_.id === id).delete.asTry).map {
@@ -173,7 +173,7 @@ class AssetFiles @Inject()(protected val databaseConfigProvider: DatabaseConfigP
 
   private[models] class AssetFileTable(tag: Tag) extends Table[AssetFileSerialized](tag, "AssetFile") {
 
-    def * = (id, documentType, fileName, file.?, context.?, status.?) <> (AssetFileSerialized.tupled, AssetFileSerialized.unapply)
+    def * = (id, documentType, fileName, file.?, documentContent.?, status.?) <> (AssetFileSerialized.tupled, AssetFileSerialized.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
@@ -183,25 +183,28 @@ class AssetFiles @Inject()(protected val databaseConfigProvider: DatabaseConfigP
 
     def file = column[Array[Byte]]("file")
 
-    def context = column[String]("context")
+    def documentContent = column[String]("documentContent")
 
     def status = column[Boolean]("status")
   }
 
   object Service {
 
-    def create(file: AssetFile): String = Await.result(add(serialize(AssetFile(id = file.id, documentType = file.documentType, fileName = file.fileName, file = file.file, context = None, status = None))), Duration.Inf)
+    def create(file: AssetFile): String = Await.result(add(serialize(AssetFile(id = file.id, documentType = file.documentType, fileName = file.fileName, file = file.file, documentContent = None, status = None))), Duration.Inf)
 
     def getOrEmpty(id: String, documentType: String): AssetFile = Await.result(findByIdDocumentType(id = id, documentType = documentType), Duration.Inf).getOrElse(AssetFileSerialized("","","",None,None,None)).deserialize
 
     def getOrNone(id: String, documentType: String): Option[AssetFile] = {
-        val assetFile = Await.result(findByIdDocumentType(id = id, documentType = documentType), Duration.Inf)
-        if(assetFile.isDefined) Option(assetFile.get.deserialize) else None
+
+      Await.result(findByIdDocumentType(id = id, documentType = documentType), Duration.Inf) match {
+        case Some(assetFile) => Option(assetFile.deserialize)
+        case None => None
+      }
     }
 
     def get(id: String, documentType: String): AssetFile = Await.result(findByIdDocumentType(id = id, documentType = documentType), Duration.Inf).getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)).deserialize
 
-    def insertOrUpdateOldDocument(file: AssetFile): Int = Await.result(upsertFile(AssetFile(id = file.id, documentType = file.documentType, fileName = file.fileName, file = file.file, context = None, status = None)), Duration.Inf)
+    def insertOrUpdateOldDocument(file: AssetFile): Int = Await.result(upsertFile(AssetFile(id = file.id, documentType = file.documentType, fileName = file.fileName, file = file.file, documentContent = None, status = None)), Duration.Inf)
 
     def insertOrUpdateContext(file: AssetFile): Int = Await.result(upsertContext(serialize(file)), Duration.Inf)
 
@@ -212,6 +215,8 @@ class AssetFiles @Inject()(protected val databaseConfigProvider: DatabaseConfigP
     def getFileName(id: String, documentType: String): String = Await.result(getFileNameByIdDocumentType(id = id, documentType = documentType), Duration.Inf)
 
     def getAllDocuments(id: String): Seq[AssetFile] = Await.result(getAllDocumentsById(id = id), Duration.Inf).map(_.deserialize)
+
+    def getAllDocumentsForAllAssets(ids: Seq[String]): Seq[AssetFile] = Await.result(getAllDocumentsByIds(ids = ids), Duration.Inf).map(_.deserialize)
 
     def getDocuments(id: String, documents: Seq[String]): Seq[AssetFile] = Await.result(getDocumentsByID(id, documents), Duration.Inf).map(_.deserialize)
 

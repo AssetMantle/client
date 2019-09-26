@@ -617,7 +617,7 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."IssueAssetRequest"
     "ticketID"                    VARCHAR,
     "pegHash"                     VARCHAR,
     "accountID"                   VARCHAR NOT NULL,
-    "documentHash"                VARCHAR NOT NULL,
+    "documentHash"                VARCHAR,
     "assetType"                   VARCHAR NOT NULL,
     "quantityUnit"                VARCHAR NOT NULL,
     "assetQuantity"               INT     NOT NULL,
@@ -637,7 +637,7 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."AssetFile"
     "documentType" VARCHAR NOT NULL,
     "fileName"     VARCHAR NOT NULL UNIQUE,
     "file"         BYTEA,
-    "context"      VARCHAR,
+    "documentContent"      VARCHAR,
     "status"       BOOLEAN,
     PRIMARY KEY ("id", "documentType")
 );
@@ -661,7 +661,7 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."NegotiationFile"
     "documentType" VARCHAR NOT NULL,
     "fileName"     VARCHAR NOT NULL UNIQUE,
     "file"         BYTEA,
-    "context"      VARCHAR,
+    "documentContent"      VARCHAR,
     "status"       BOOLEAN,
     PRIMARY KEY ("id", "documentType")
 );

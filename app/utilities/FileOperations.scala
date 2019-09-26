@@ -6,7 +6,10 @@ import java.util.concurrent.{ConcurrentHashMap, ConcurrentMap}
 import akka.stream.scaladsl.{FileIO, Source}
 import akka.util.ByteString
 import exceptions.BaseException
+import models.Trait.Document
+import models.common.Serializable._
 import play.api.Logger
+import play.api.libs.json.Json
 import views.companion.master.FileUpload.FileUploadInfo
 
 import scala.concurrent.ExecutionContext
@@ -64,19 +67,18 @@ object FileOperations {
     }
   }
 
-  def hashExtractor(hashedName: String)(implicit executionContext: ExecutionContext): String = {
+  def renameFile(directory: String, currentName: String, newName: String)(implicit executionContext: ExecutionContext): Boolean = newFile(directory, currentName).renameTo(newFile(directory, newName))
+
+  def newFile(directoryName: String, fileName: String)(implicit executionContext: ExecutionContext): File = {
     try {
-      hashedName.split("""\.""")(0)
-    }
-    catch {
-      case nullPointerException: NullPointerException => logger.error(constants.Response.NULL_POINTER_EXCEPTION.message, nullPointerException)
-        throw new BaseException(constants.Response.NULL_POINTER_EXCEPTION)
+      new File(directoryName, fileName)
+    } catch {
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
       case e: Exception => logger.error(constants.Response.GENERIC_EXCEPTION.message, e)
         throw new BaseException(constants.Response.GENERIC_EXCEPTION)
     }
   }
-
-  def renameFile(directory: String, currentName: String, newName: String)(implicit executionContext: ExecutionContext): Boolean = newFile(directory, currentName).renameTo(newFile(directory, newName))
 
   def fileStreamer(file: File, directoryName: String, fileName: String)(implicit executionContext: ExecutionContext): Source[ByteString, _] = {
     val source: Source[ByteString, _] = FileIO.fromPath(file.toPath)
@@ -102,17 +104,6 @@ object FileOperations {
 
   def moveFile(fileName: String, oldPath: String, newPath: String)(implicit executionContext: ExecutionContext): Boolean = newFile(directoryName = oldPath, fileName = fileName).renameTo(newFile(directoryName = newPath, fileName = fileName))
 
-  def newFile(directoryName: String, fileName: String)(implicit executionContext: ExecutionContext): File = {
-    try {
-      new File(directoryName, fileName)
-    } catch {
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-      case e: Exception => logger.error(constants.Response.GENERIC_EXCEPTION.message, e)
-        throw new BaseException(constants.Response.GENERIC_EXCEPTION)
-    }
-  }
-
   def convertToByteArray(file: File)(implicit executionContext: ExecutionContext): Array[Byte] = {
     try {
       val fileInputStreamReader = new FileInputStream(file)
@@ -133,6 +124,25 @@ object FileOperations {
   def fetchFile(path: String, fileName: String): File = {
     val file = new java.io.File(path + fileName)
     if (!file.exists) throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION) else file
+  }
+
+  def combinedHash(documents: Seq[Document[_]])(implicit executionContext: ExecutionContext): String = {
+    Json.toJson(documents.map { doc =>
+      DocumentBlockchainDetails(doc.documentType, hashExtractor(doc.fileName))
+    }).toString()
+
+  }
+
+  def hashExtractor(hashedName: String)(implicit executionContext: ExecutionContext): String = {
+    try {
+      hashedName.split("""\.""")(0)
+    }
+    catch {
+      case nullPointerException: NullPointerException => logger.error(constants.Response.NULL_POINTER_EXCEPTION.message, nullPointerException)
+        throw new BaseException(constants.Response.NULL_POINTER_EXCEPTION)
+      case e: Exception => logger.error(constants.Response.GENERIC_EXCEPTION.message, e)
+        throw new BaseException(constants.Response.GENERIC_EXCEPTION)
+    }
   }
 
 }
