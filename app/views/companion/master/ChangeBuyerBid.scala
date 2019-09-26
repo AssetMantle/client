@@ -6,6 +6,7 @@ import play.api.data.Forms._
 object ChangeBuyerBid {
   val form = Form(
     mapping(
+      constants.FormField.REQUEST_ID.name -> optional(constants.FormField.REQUEST_ID.field),
       constants.FormField.PASSWORD.name -> constants.FormField.PASSWORD.field,
       constants.FormField.SELLER_ADDRESS.name -> constants.FormField.SELLER_ADDRESS.field,
       constants.FormField.BID.name -> constants.FormField.BID.field,
@@ -15,6 +16,6 @@ object ChangeBuyerBid {
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(password: String, sellerAddress: String, bid: Int, time: Int, pegHash: String, gas: Int)
+  case class Data(requestID: Option[String], password: String, sellerAddress: String, bid: Int, time: Int, pegHash: String, gas: Int)
 
 }
