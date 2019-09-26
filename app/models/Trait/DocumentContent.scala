@@ -1,4 +1,4 @@
 package models.Trait
 
-trait Context { 
+trait DocumentContent {
 }

@@ -6,7 +6,6 @@
     <span class="red">@Messages(constants.Form.PEG_HASH)</span> : @asset.pegHash <br>
 }
 <span class="red">@Messages(constants.Form.ACCOUNT_ID)</span> : @asset.accountID <br>
-<span class="red">@Messages(constants.Form.DOCUMENT_HASH)</span> : @asset.documentHash <br>
 <span class="red">@Messages(constants.FormField.ASSET_TYPE.name)</span> : @asset.assetType <br>
 <span class="red">@Messages(constants.FormField.QUANTITY_UNIT.name)</span> : @asset.quantityUnit <br>
 <span class="red">@Messages(constants.FormField.ASSET_QUANTITY.name)</span> : @asset.assetQuantity <br>
@@ -25,12 +24,12 @@
     } {
         @file.documentType match {
             case constants.File.OBL => {
-                @file.documentType
-                @file.context.get
+                file.documentType
+                @file.documentContent.get
             }
             case constants.File.INVOICE => {
                 @file.documentType
-                @file.context.get
+                @file.documentContent.get
             }
             case _ => {
                 @file.documentType

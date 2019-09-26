@@ -1,7 +1,9 @@
 package models.common
-
+import play.api.libs.functional.syntax._
 import java.util.Date
-import play.api.libs.json.{Json, OWrites, Reads}
+
+import models.Trait.DocumentContent
+import play.api.libs.json.{JsResult, JsValue, Json, OWrites, Reads, Writes}
 
 object Serializable {
 
@@ -29,16 +31,23 @@ object Serializable {
 
   implicit val shipmentDetailsWrites: OWrites[ShipmentDetails] = Json.writes[ShipmentDetails]
 
-  case class OBL(billOfLadingID: String, portOfLoading: String, shipperName: String, shipperAddress: String, notifyPartyName: String, notifyPartyAddress: String, dateOfShipping: Date, deliveryTerm: String, weightOfConsignment: Int, declaredAssetValue: Int) extends models.Trait.Context
+  case class OBL(billOfLadingID: String, portOfLoading: String, shipperName: String, shipperAddress: String, notifyPartyName: String, notifyPartyAddress: String, dateOfShipping: Date, deliveryTerm: String, weightOfConsignment: Int, declaredAssetValue: Int) extends DocumentContent
 
-  implicit val oblReads: Reads[OBL] = Json.reads[OBL]
+  case class Invoice(invoiceNumber: String, invoiceDate: Date) extends DocumentContent
 
-  implicit val oblWrites: OWrites[OBL] = Json.writes[OBL]
+  implicit val documentContentWrites = new Writes[DocumentContent] {
+    override def writes(documentContent: DocumentContent): JsValue = documentContent match {
+      case obl: OBL => Json.toJson(obl)(Json.writes[OBL])
+      case invoice: Invoice => Json.toJson(invoice)(Json.writes[Invoice])
+    }
+  }
 
-  case class Invoice(invoiceNumber: String, invoiceDate: Date) extends models.Trait.Context
+  implicit val documentContentReads: Reads[DocumentContent] =
+    Json.format[OBL].map(x => x: DocumentContent) or
+      Json.format[Invoice].map(x => x: DocumentContent)
 
-  implicit val invoiceReads: Reads[Invoice] = Json.reads[Invoice]
+  case class DocumentBlockchainDetails(documentType: String, documentHash:String)
 
-  implicit val invoiceWrites: OWrites[Invoice] = Json.writes[Invoice]
-
+  implicit val documentBlockchainDetailsReads: Reads[DocumentBlockchainDetails] = Json.reads[DocumentBlockchainDetails]
+  implicit val documentBlockchainDetailsWrites: OWrites[DocumentBlockchainDetails] = Json.writes[DocumentBlockchainDetails]
 }
