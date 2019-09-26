@@ -21,7 +21,6 @@ object Notification {
   private val MESSAGE_SUFFIX = "MESSAGE"
   private val TITLE_SUFFIX = "TITLE"
 
-  //LOGIN: Send Notificiation
   val LOGIN = new Notification(notificationType = "LOGIN", sendEmail = false, sendPushNotification = true, sendSMS = false)
   val VERIFY_PHONE = new Notification(notificationType = "VERIFY_PHONE", sendEmail = false, sendPushNotification = false, sendSMS = true)
   val VERIFY_EMAIL = new Notification(notificationType = "VERIFY_EMAIL", sendEmail = true, sendPushNotification = false, sendSMS = false)

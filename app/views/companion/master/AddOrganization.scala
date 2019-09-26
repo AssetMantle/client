@@ -36,7 +36,7 @@ object AddOrganization {
     )(Data.apply)(Data.unapply)
   )
 
-  case class AddressData(addressLine1: String, addressLine2: String, Landmark: Option[String], City: String, Country: String, ZipCode: String, Phone: String)
+  case class AddressData(addressLine1: String, addressLine2: String, landmark: Option[String], city: String, country: String, zipCode: String, phone: String)
 
   case class Data(zoneID: String, name: String, abbreviation: Option[String], establishmentDate: Date, email: String, registeredAddress: AddressData, postalAddress: AddressData)
 

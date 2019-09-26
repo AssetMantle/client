@@ -20,18 +20,18 @@
                 }
         </span>
         </span>
-        <div id="organizationKycDocumentStatus@organizationKYC.id@organizationKYC.documentType"></div>
+        <div id="organizationKYCDocumentStatus@organizationKYC.id@organizationKYC.documentType"></div>
         @organizationKYC.status.getOrElse(None) match {
             case true => {
-              <div id="buttonOrganizationKycDocumentStatus@organizationKYC.id @organizationKYC.documentType"><button class="cmuk-button cmuk-button-danger cmuk-button-small" onclick="rejectOrganizationKycDocument('@organizationKYC.id', '@organizationKYC.documentType')">@Messages(constants.Form.REJECT)</button></div>
+              <div id="buttonOrganizationKYCDocumentStatus@organizationKYC.id @organizationKYC.documentType"><button class="cmuk-button cmuk-button-danger cmuk-button-small" onclick="rejectOrganizationKYCDocument('@organizationKYC.id', '@organizationKYC.documentType')">@Messages(constants.Form.REJECT)</button></div>
             }
             case false => {
-              <div id="buttonOrganizationKycDocumentStatus@organizationKYC.id @organizationKYC.documentType"><button class="cmuk-button cmuk-button-success cmuk-button-small" onclick="verifyOrganizationKycDocument('@organizationKYC.id', '@organizationKYC.documentType')">@Messages(constants.Form.APPROVE)</button></div>
+              <div id="buttonOrganizationKYCDocumentStatus@organizationKYC.id @organizationKYC.documentType"><button class="cmuk-button cmuk-button-success cmuk-button-small" onclick="verifyOrganizationKYCDocument('@organizationKYC.id', '@organizationKYC.documentType')">@Messages(constants.Form.APPROVE)</button></div>
             }
             case _ => {
-                <div id="buttonOrganizationKycDocumentStatus@organizationKYC.id@organizationKYC.documentType">
-                  <button class="cmuk-button cmuk-button-success cmuk-button-small" onclick="verifyOrganizationKycDocument('@organizationKYC.id', '@organizationKYC.documentType')">@Messages(constants.Form.APPROVE)</button>
-                  <button class="cmuk-button cmuk-button-danger cmuk-button-small" onclick="rejectOrganizationKycDocument('@organizationKYC.id', '@organizationKYC.documentType')">@Messages(constants.Form.REJECT)</button>
+                <div id="buttonOrganizationKYCDocumentStatus@organizationKYC.id@organizationKYC.documentType">
+                  <button class="cmuk-button cmuk-button-success cmuk-button-small" onclick="verifyOrganizationKYCDocument('@organizationKYC.id', '@organizationKYC.documentType')">@Messages(constants.Form.APPROVE)</button>
+                  <button class="cmuk-button cmuk-button-danger cmuk-button-small" onclick="rejectOrganizationKYCDocument('@organizationKYC.id', '@organizationKYC.documentType')">@Messages(constants.Form.REJECT)</button>
                 </div>
             }
         }

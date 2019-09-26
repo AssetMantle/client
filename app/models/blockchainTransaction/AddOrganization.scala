@@ -175,10 +175,8 @@ class AddOrganizations @Inject()(actorSystem: ActorSystem, transaction: utilitie
         blockchainOrganizations.Service.create(addOrganization.organizationID, addOrganization.to, dirtyBit = true)
         masterOrganizations.Service.verifyOrganization(addOrganization.organizationID)
         masterAccounts.Service.updateUserType(masterOrganizations.Service.getAccountId(addOrganization.organizationID), constants.User.ORGANIZATION)
-        val organizationAccountId = masterAccounts.Service.getId(addOrganization.to)
-        masterOrganizationKYCs.Service.verifyAll(organizationAccountId)
         blockchainAccounts.Service.markDirty(addOrganization.from)
-        utilitiesNotification.send(organizationAccountId, constants.Notification.SUCCESS, blockResponse.txhash)
+        utilitiesNotification.send(masterAccounts.Service.getId(addOrganization.to), constants.Notification.SUCCESS, blockResponse.txhash)
         utilitiesNotification.send(masterAccounts.Service.getId(addOrganization.from), constants.Notification.SUCCESS, blockResponse.txhash)
       } catch {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)

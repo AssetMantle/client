@@ -245,6 +245,7 @@ class AccountController @Inject()(
         else {
           BadRequest(views.html.component.master.noteNewKeyDetails(NoteNewKeyDetails.form, name, blockchainAddress, publicKey, seed))
         }
-      })
+      }
+    )
   }
 }
