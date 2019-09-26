@@ -160,56 +160,81 @@ class SendAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
 
   object Service {
 
-    def create(sendAsset: SendAsset): String = Await.result(add(SendAsset(from = sendAsset.from, to = sendAsset.to, pegHash = sendAsset.pegHash, gas = sendAsset.gas, status = sendAsset.status, txHash = sendAsset.txHash, ticketID = sendAsset.ticketID, mode = sendAsset.mode, code = sendAsset.code)), Duration.Inf)
+    def create(sendAsset: SendAsset): Future[String] = add(SendAsset(from = sendAsset.from, to = sendAsset.to, pegHash = sendAsset.pegHash, gas = sendAsset.gas, status = sendAsset.status, txHash = sendAsset.txHash, ticketID = sendAsset.ticketID, mode = sendAsset.mode, code = sendAsset.code))
 
-    def markTransactionSuccessful(ticketID: String, txHash: String): Int = Await.result(updateTxHashAndStatusOnTicketID(ticketID, Option(txHash), status = Option(true)), Duration.Inf)
+    def markTransactionSuccessful(ticketID: String, txHash: String): Future[Int] =updateTxHashAndStatusOnTicketID(ticketID, Option(txHash), status = Option(true))
 
-    def markTransactionFailed(ticketID: String, code: String): Int = Await.result(updateStatusAndCodeOnTicketID(ticketID, status = Option(false), code), Duration.Inf)
+    def markTransactionFailed(ticketID: String, code: String): Future[Int]  = updateStatusAndCodeOnTicketID(ticketID, status = Option(false), code)
 
     def getTicketIDsOnStatus(): Seq[String] = Await.result(getTicketIDsWithNullStatus, Duration.Inf)
 
-    def getTransaction(ticketID: String): SendAsset = Await.result(findByTicketID(ticketID), Duration.Inf)
+    def getTransaction(ticketID: String): Future[SendAsset] = findByTicketID(ticketID)
 
     def getTransactionHash(ticketID: String): Option[String] = Await.result(findTransactionHashByTicketID(ticketID), Duration.Inf)
 
     def getMode(ticketID: String): String = Await.result(findModeByTicketID(ticketID), Duration.Inf)
 
-    def updateTransactionHash(ticketID: String, txHash: String): Int = Await.result(updateTxHashOnTicketID(ticketID = ticketID, txHash = Option(txHash)), Duration.Inf)
+    def updateTransactionHash(ticketID: String, txHash: String): Future[Int] = updateTxHashOnTicketID(ticketID = ticketID, txHash = Option(txHash))
 
   }
 
   object Utility {
-    def onSuccess(ticketID: String, blockResponse: BlockResponse): Future[Unit] = Future {
-      try {
-        Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
-        val sendAsset = Service.getTransaction(ticketID)
-        val negotiationID = blockchainNegotiations.Service.getNegotiationID(buyerAddress = sendAsset.to, sellerAddress = sendAsset.from, pegHash = sendAsset.pegHash)
-        blockchainOrders.Service.insertOrUpdate(id = negotiationID, None, None, dirtyBit = true)
-        Thread.sleep(sleepTime)
-        val orderResponse = getOrder.Service.get(negotiationID)
-        orderResponse.value.assetPegWallet.foreach(assets => assets.foreach(asset => blockchainAssets.Service.insertOrUpdate(pegHash = asset.pegHash, documentHash = asset.documentHash, assetType = asset.assetType, assetPrice = asset.assetPrice, assetQuantity = asset.assetQuantity, quantityUnit = asset.quantityUnit, locked = asset.locked, moderated = asset.moderated, ownerAddress = negotiationID, takerAddress = if (asset.takerAddress == "") None else Option(asset.takerAddress), dirtyBit = false)))
-        blockchainAccounts.Service.markDirty(sendAsset.from)
-        blockchainTransactionFeedbacks.Service.markDirty(sendAsset.from)
-        utilitiesNotification.send(masterAccounts.Service.getId(sendAsset.to), constants.Notification.SUCCESS, blockResponse.txhash)
-        utilitiesNotification.send(masterAccounts.Service.getId(sendAsset.from), constants.Notification.SUCCESS, blockResponse.txhash)
-      } catch {
+    def onSuccess(ticketID: String, blockResponse: BlockResponse)=  {
+
+
+      val trxSuccess=Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
+      val sendAssetFuture = Service.getTransaction(ticketID)
+      val result= for{
+        _<- trxSuccess
+        sendAssetResult <- sendAssetFuture
+
+      }yield sendAssetResult
+      result.flatMap { sendAsset =>
+        blockchainNegotiations.Service.getNegotiationID(buyerAddress = sendAsset.to, sellerAddress = sendAsset.from, pegHash = sendAsset.pegHash).flatMap { negotiationID =>
+          blockchainOrders.Service.insertOrUpdate(id = negotiationID, None, None, dirtyBit = true).flatMap{_ =>
+          Thread.sleep(sleepTime)
+          val orderResponseResult = getOrder.Service.get(negotiationID).map { orderResponse =>
+            orderResponse.value.assetPegWallet.foreach(assets => assets.foreach(asset => blockchainAssets.Service.insertOrUpdate(pegHash = asset.pegHash, documentHash = asset.documentHash, assetType = asset.assetType, assetPrice = asset.assetPrice, assetQuantity = asset.assetQuantity, quantityUnit = asset.quantityUnit, locked = asset.locked, moderated = asset.moderated, ownerAddress = negotiationID, takerAddress = if (asset.takerAddress == "") None else Option(asset.takerAddress), dirtyBit = false)))
+          }
+          val markDirtyTo = blockchainAccounts.Service.markDirty(sendAsset.to)
+          val markDirtyFrom = blockchainAccounts.Service.markDirty(sendAsset.from)
+          for {
+              _ <- orderResponseResult
+              _ <- markDirtyTo
+              _ <- markDirtyFrom
+
+            } yield {
+              utilitiesNotification.send(masterAccounts.Service.getId(sendAsset.to), constants.Notification.SUCCESS, blockResponse.txhash)
+              utilitiesNotification.send(masterAccounts.Service.getId(sendAsset.from), constants.Notification.SUCCESS, blockResponse.txhash)
+
+            }
+
+          }
+
+
+      }
+      }
+
+
+    }
+
+    def onFailure(ticketID: String, message: String): Future[Unit] ={
+
+      val markFailed= Service.markTransactionFailed(ticketID, message)
+      val sendAssetFuture = Service.getTransaction(ticketID)
+      val result=for{
+        _ <- markFailed
+        sendAsset <- sendAssetFuture
+        _<- masterAccounts.Service.getAddress(sendAsset.from).map{address=>blockchainTransactionFeedbacks.Service.markDirty(address) }
+      }yield{
+        utilitiesNotification.send(masterAccounts.Service.getId(sendAsset.to), constants.Notification.FAILURE, message)
+        utilitiesNotification.send(masterAccounts.Service.getId(sendAsset.from), constants.Notification.FAILURE, message)
+      }
+      result.recover{
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
-          throw new BaseException(constants.Response.PSQL_EXCEPTION)
-        case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
       }
     }
 
-    def onFailure(ticketID: String, message: String): Future[Unit] = Future {
-      try {
-        Service.markTransactionFailed(ticketID, message)
-        val sendAsset = Service.getTransaction(ticketID)
-        blockchainTransactionFeedbacks.Service.markDirty(masterAccounts.Service.getAddress(sendAsset.from))
-        utilitiesNotification.send(masterAccounts.Service.getId(sendAsset.to), constants.Notification.FAILURE, message)
-        utilitiesNotification.send(masterAccounts.Service.getId(sendAsset.from), constants.Notification.FAILURE, message)
-      } catch {
-        case baseException: BaseException => logger.error(baseException.failure.message, baseException)
-      }
-    }
   }
 
   if (kafkaEnabled || transactionMode != constants.Transactions.BLOCK_MODE) {

@@ -7,27 +7,27 @@ import play.api.i18n.I18nSupport
 import play.api.mvc._
 import play.api.{Configuration, Logger}
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class WithLoginAction @Inject()(messagesControllerComponents: MessagesControllerComponents, masterAccounts: master.Accounts, blockchainACLHashes: blockchain.ACLHashes, blockchainACLAccounts: blockchain.ACLAccounts, masterTransactionAccountTokens: masterTransaction.AccountTokens)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val module: String = constants.Module.ACTIONS_WITH_LOGIN_ACTION
 
-  def authenticated(f: ⇒ LoginState => Request[AnyContent] => Result)(implicit logger: Logger): Action[AnyContent] = {
-    Action { implicit request ⇒
+  def authenticated(f: ⇒ LoginState => Request[AnyContent] => Future[Result])(implicit logger: Logger): Action[AnyContent] = {
+    Action.async { implicit request ⇒
       try {
         val username = request.session.get(constants.Security.USERNAME).getOrElse(throw new BaseException(constants.Response.USERNAME_NOT_FOUND))
         val sessionToken = request.session.get(constants.Security.TOKEN).getOrElse(throw new BaseException(constants.Response.TOKEN_NOT_FOUND))
-        masterTransactionAccountTokens.Service.tryVerifyingSessionToken(username, sessionToken)
-        masterTransactionAccountTokens.Service.tryVerifyingSessionTokenTime(username)
+        val sessionToken=masterTransactionAccountTokens.Service.tryVerifyingSessionToken(username, sessionToken)
+        val tokenTime=masterTransactionAccountTokens.Service.tryVerifyingSessionTokenTime(username)
         val address = masterAccounts.Service.getAddress(username)
         val userType = masterAccounts.Service.getUserType(username)
         f(LoginState(username, userType, address, if (userType == constants.User.TRADER) Option(blockchainACLHashes.Service.getACL(blockchainACLAccounts.Service.getACLHash(address))) else None))(request)
       }
       catch {
         case baseException: BaseException => logger.info(baseException.failure.message, baseException)
-          Results.Unauthorized(views.html.index()).withNewSession
+          Future{Results.Unauthorized(views.html.index()).withNewSession}
       }
     }
   }

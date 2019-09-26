@@ -151,21 +151,21 @@ class SendCoins @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
 
   object Service {
 
-    def create(sendCoin: SendCoin): String = Await.result(add(SendCoin(from = sendCoin.from, to = sendCoin.to, amount = sendCoin.amount, gas = sendCoin.gas, status = sendCoin.status, txHash = sendCoin.txHash, ticketID = sendCoin.ticketID, mode = sendCoin.mode, code = sendCoin.code)), Duration.Inf)
+    def create(sendCoin: SendCoin): Future[String] =add(SendCoin(from = sendCoin.from, to = sendCoin.to, amount = sendCoin.amount, gas = sendCoin.gas, status = sendCoin.status, txHash = sendCoin.txHash, ticketID = sendCoin.ticketID, mode = sendCoin.mode, code = sendCoin.code))
 
     def createAsync(sendCoin: SendCoin)=add(SendCoin(from = sendCoin.from, to = sendCoin.to, amount = sendCoin.amount, gas = sendCoin.gas, status = sendCoin.status, txHash = sendCoin.txHash, ticketID = sendCoin.ticketID, mode = sendCoin.mode, code = sendCoin.code))
 
-    def markTransactionFailed(ticketID: String, code: String): Int = Await.result(updateStatusAndCodeOnTicketID(ticketID, status = Option(false), code), Duration.Inf)
+    def markTransactionFailed(ticketID: String, code: String): Future[Int] =updateStatusAndCodeOnTicketID(ticketID, status = Option(false), code)
 
     def markTransactionFailedAsync(ticketID: String, code: String) = updateStatusAndCodeOnTicketID(ticketID, status = Option(false), code)
 
-    def markTransactionSuccessful(ticketID: String, txHash: String): Int = Await.result(updateTxHashAndStatusOnTicketID(ticketID, Option(txHash), status = Option(true)), Duration.Inf)
+    def markTransactionSuccessful(ticketID: String, txHash: String): Future[Int] = updateTxHashAndStatusOnTicketID(ticketID, Option(txHash), status = Option(true))
 
     def markTransactionSuccessfulAsync(ticketID: String, txHash: String)=updateTxHashAndStatusOnTicketID(ticketID, Option(txHash), status = Option(true))
 
     def getTicketIDsOnStatus(): Seq[String] = Await.result(getTicketIDsWithNullStatus, Duration.Inf)
 
-    def getTransaction(ticketID: String): SendCoin = Await.result(findByTicketID(ticketID), Duration.Inf)
+    def getTransaction(ticketID: String): Future[SendCoin] = findByTicketID(ticketID)
 
     def getTransactionAsync(ticketID: String)=findByTicketID(ticketID)
 
@@ -173,13 +173,13 @@ class SendCoins @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
 
     def getMode(ticketID: String): String = Await.result(findModeByTicketID(ticketID), Duration.Inf)
 
-    def updateTransactionHash(ticketID: String, txHash: String): Int = Await.result(updateTxHashOnTicketID(ticketID = ticketID, txHash = Option(txHash)), Duration.Inf)
+    def updateTransactionHash(ticketID: String, txHash: String): Future[Int] = updateTxHashOnTicketID(ticketID = ticketID, txHash = Option(txHash))
 
     def updateTransactionHashAsync(ticketID: String, txHash: String)=updateTxHashOnTicketID(ticketID = ticketID, txHash = Option(txHash))
   }
 
   object Utility {
-    def onSuccess(ticketID: String, blockResponse: BlockResponse): Future[Unit] = Future {
+   /* def onSuccess(ticketID: String, blockResponse: BlockResponse): Future[Unit] = Future {
       try {
         Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
         val sendCoin = Service.getTransaction(ticketID)
@@ -192,10 +192,37 @@ class SendCoins @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
         utilitiesNotification.send(toAccount.id, constants.Notification.SUCCESS, blockResponse.txhash)
         utilitiesNotification.send(masterAccounts.Service.getId(sendCoin.from), constants.Notification.SUCCESS, blockResponse.txhash)
       }
+      val trxSuccess=Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
+      val sendCoin = Service.getTransaction(ticketID)
+       val result= for{
+          _<- trxSuccess
+          sendCoinResult <- sendCoin
+          toAccount <- markDirty(sendCoinResult)
+        }yield(toAccount,sendCoinResult)
+
+      result.map{case (toAccount,sendCoin)=>
+        if (toAccount.userType == constants.User.UNKNOWN) {
+          masterAccounts.Service.updateUserType(toAccount.id, constants.User.USER)
+        }
+        val x=utilitiesNotification.send(toAccount.id, constants.Notification.SUCCESS, blockResponse.txhash)
+
+        utilitiesNotification.send(masterAccounts.Service.getId(sendCoin.from), constants.Notification.SUCCESS, blockResponse.txhash)
+      }
+
       catch {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
           throw new BaseException(constants.Response.PSQL_EXCEPTION)
       }
+    }
+    def markDirty(sendCoin: SendCoin)={
+      val markDirtyTo=blockchainAccounts.Service.markDirty(sendCoin.to)
+      val markDirtyFrom=blockchainAccounts.Service.markDirty(sendCoin.from)
+      val toAccount=masterAccounts.Service.getAccountByAddress(sendCoin.to)
+     for{
+       _<-markDirtyTo
+       _<-markDirtyFrom
+       toAccountResult<- toAccount
+     }yield (toAccountResult)
     }
 
     def onFailure(ticketID: String, message: String): Future[Unit] = Future {
@@ -207,7 +234,56 @@ class SendCoins @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
       } catch {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
+    }*/
+
+    def onFailure(ticketID: String, message: String) =  {
+
+      val markFailed=Service.markTransactionFailed(ticketID, message)
+      val sendCoinFuture = Service.getTransaction(ticketID)
+      val result=for{
+       _ <- markFailed
+       sendCoin <- sendCoinFuture
+      }yield{
+       utilitiesNotification.send(masterAccounts.Service.getId(sendCoin.to), constants.Notification.FAILURE, message)
+       utilitiesNotification.send(masterAccounts.Service.getId(sendCoin.from), constants.Notification.FAILURE, message)
+      }
+      result.recover{
+        case baseException: BaseException => logger.error(baseException.failure.message, baseException)
+      }
     }
+
+
+    def onSuccess(ticketID: String, blockResponse: BlockResponse) = {
+      val trxSuccess=Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
+      val sendCoinFuture = Service.getTransaction(ticketID)
+      val result= for{
+        _<- trxSuccess
+        sendCoinResult <- sendCoinFuture
+
+      }yield sendCoinResult
+      result.flatMap{sendCoin=>
+        val markDirtyTo=blockchainAccounts.Service.markDirty(sendCoin.to)
+        val markDirtyFrom=blockchainAccounts.Service.markDirty(sendCoin.from)
+        val toAccount=masterAccounts.Service.getAccountByAddress(sendCoin.to)
+        val toAccountFuture=for{
+                        _<-markDirtyTo
+                        _<-markDirtyFrom
+                        toAccountResult <- toAccount
+                         }yield toAccountResult
+       toAccountFuture.map{toAcc=>
+         if (toAcc.userType == constants.User.UNKNOWN) {
+           masterAccounts.Service.updateUserType(toAcc.id, constants.User.USER)
+         }
+         utilitiesNotification.send(toAcc.id, constants.Notification.SUCCESS, blockResponse.txhash)
+
+         utilitiesNotification.send(masterAccounts.Service.getId(sendCoin.from), constants.Notification.SUCCESS, blockResponse.txhash)
+
+
+       }
+      }
+
+    }
+
 
     def onSuccessAsync(ticketID: String, blockResponse: BlockResponse) = {
 

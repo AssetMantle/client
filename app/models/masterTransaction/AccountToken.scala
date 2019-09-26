@@ -127,7 +127,7 @@ class AccountTokens @Inject()(actorSystem: ActorSystem, shutdownActors: Shutdown
 
     def updateToken(id: String, notificationToken: String): Int = Await.result(upsert(AccountToken(id, Option(notificationToken), None, Option(DateTime.now(DateTimeZone.UTC).getMillis))), Duration.Inf)
 
-    def getTokenById(id: String): Option[String] = Await.result(findById(id), Duration.Inf).notificationToken
+    def getTokenById(id: String): Future[Option[String]] = findById(id).map{acc=>acc.notificationToken}
 
     def getSessionTokenTimeById(id: String): Long = Await.result(findById(id), Duration.Inf).sessionTokenTime.getOrElse(0.toLong)
 
@@ -140,6 +140,11 @@ class AccountTokens @Inject()(actorSystem: ActorSystem, shutdownActors: Shutdown
     def tryVerifyingSessionToken(username: String, sessionToken: String): Boolean = {
       if (Await.result(findById(username), Duration.Inf).sessionTokenHash.get == util.hashing.MurmurHash3.stringHash(sessionToken).toString) true
       else throw new BaseException(constants.Response.INVALID_TOKEN)
+    }
+
+    def tryVerifyingSessionToken2(username: String, sessionToken: String): Boolean={
+      findById(username).map{accountTaken=> accountTaken.sessionTokenHash.get}
+
     }
 
     def verifySessionTokenTime(username: Option[String]): Boolean = {

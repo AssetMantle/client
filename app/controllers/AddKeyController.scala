@@ -7,7 +7,7 @@ import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import views.companion.blockchain.AddKey
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class AddKeyController @Inject()(messagesControllerComponents: MessagesControllerComponents, transactionsAddKey: transactions.AddKey)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
@@ -16,19 +16,19 @@ class AddKeyController @Inject()(messagesControllerComponents: MessagesControlle
     Ok(views.html.component.blockchain.addKey(AddKey.form))
   }
 
-  def blockchainAddKey: Action[AnyContent] = Action { implicit request =>
+  def blockchainAddKey: Action[AnyContent] = Action.async { implicit request =>
     AddKey.form.bindFromRequest().fold(
       formWithErrors => {
-        BadRequest(views.html.component.blockchain.addKey(formWithErrors))
+        Future{BadRequest(views.html.component.blockchain.addKey(formWithErrors))}
       },
       addKeyData => {
-        try {
-          transactionsAddKey.Service.post(transactionsAddKey.Request(addKeyData.name, addKeyData.password))
-          Ok(views.html.index(successes = Seq(constants.Response.KEY_ADDED)))
-        }
-        catch {
-          case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-        }
+
+          transactionsAddKey.Service.post(transactionsAddKey.Request(addKeyData.name, addKeyData.password)).map{_=>
+            Ok(views.html.index(successes = Seq(constants.Response.KEY_ADDED)))
+          }.recover{
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+          }
+
       }
     )
   }

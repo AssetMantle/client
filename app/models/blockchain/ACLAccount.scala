@@ -117,7 +117,7 @@ class ACLAccounts @Inject()(protected val databaseConfigProvider: DatabaseConfig
 
     def get(address: String): ACLAccount = Await.result(findByAddress(address), Duration.Inf)
 
-    def getACLHash(address: String): String = Await.result(findACLHashByAddress(address), Duration.Inf)
+    def getACLHash(address: String): Future[String] = findACLHashByAddress(address)
 
     def getAddressesUnderZone(zoneID: String): Seq[String] = Await.result(getAddressesByZoneID(zoneID), Duration.Inf)
 

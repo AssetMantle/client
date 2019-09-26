@@ -12,7 +12,7 @@ import play.api.mvc._
 import play.api.{Configuration, Logger}
 import views.companion.master.{Login, Logout, NoteNewKeyDetails, SignUp}
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class AccountController @Inject()(
@@ -55,19 +55,27 @@ class AccountController @Inject()(
     Ok(views.html.component.master.signUp(SignUp.form))
   }
 
-  def signUp: Action[AnyContent] = Action { implicit request =>
+  def signUp: Action[AnyContent] = Action.async { implicit request =>
     SignUp.form.bindFromRequest().fold(
       formWithErrors => {
-        BadRequest(views.html.component.master.signUp(formWithErrors))
+        Future{BadRequest(views.html.component.master.signUp(formWithErrors))}
       },
       signUpData => {
-        try {
+       /* try {
           val addKeyResponse = transactionAddKey.Service.post(transactionAddKey.Request(signUpData.username, signUpData.password))
           masterAccounts.Service.addLogin(signUpData.username, signUpData.password, blockchainAccounts.Service.create(address = addKeyResponse.address, pubkey = addKeyResponse.pubkey), request.lang.toString.stripPrefix("Lang(").stripSuffix(")").trim.split("_")(0))
           PartialContent(views.html.component.master.noteNewKeyDetails(NoteNewKeyDetails.form, addKeyResponse.name, addKeyResponse.address, addKeyResponse.pubkey, addKeyResponse.mnemonic))
         } catch {
           case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+        }*/
+
+        transactionAddKey.Service.post(transactionAddKey.Request(signUpData.username, signUpData.password)).map{addKeyResponse=>
+          masterAccounts.Service.addLogin(signUpData.username, signUpData.password, blockchainAccounts.Service.create(address = addKeyResponse.address, pubkey = addKeyResponse.pubkey), request.lang.toString.stripPrefix("Lang(").stripSuffix(")").trim.split("_")(0))
+          PartialContent(views.html.component.master.noteNewKeyDetails(NoteNewKeyDetails.form, addKeyResponse.name, addKeyResponse.address, addKeyResponse.pubkey, addKeyResponse.mnemonic))
+        }.recover{
+          case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
         }
+
       }
     )
   }
@@ -77,17 +85,53 @@ class AccountController @Inject()(
     Ok(views.html.component.master.login(Login.form))
   }
 
-  def login: Action[AnyContent] = Action { implicit request =>
+  def login: Action[AnyContent] = Action.async { implicit request =>
     Login.form.bindFromRequest().fold(
       formWithErrors => {
-        BadRequest(views.html.component.master.login(formWithErrors))
+        Future{BadRequest(views.html.component.master.login(formWithErrors))}
       },
       loginData => {
-        try {
-          val userType = masterAccounts.Service.getUserType(loginData.username)
-          val address = masterAccounts.Service.getAddress(loginData.username)
-          implicit val loginState: LoginState = LoginState(loginData.username, userType, address, if (userType == constants.User.TRADER) Option(blockchainAclHashes.Service.getACL(blockchainAclAccounts.Service.getACLHash(address))) else None)
-          val contactWarnings: Seq[constants.Response.Warning] = utilities.Contact.getWarnings(masterAccounts.Service.validateLoginAndGetStatus(loginData.username, loginData.password))
+
+          val userTypeFuture = masterAccounts.Service.getUserType(loginData.username)
+          val addressFuture = masterAccounts.Service.getAddress(loginData.username)
+          val status=masterAccounts.Service.validateLoginAndGetStatus(loginData.username, loginData.password)
+          val result=for{
+            userType<- userTypeFuture
+            address<- addressFuture
+            contactWarnings<- status.map{stat=> utilities.Contact.getWarnings(stat)}
+            acl <- blockchainAclAccounts.Service.getACLHash(address).map{aclHash=> blockchainAclHashes.Service.getACL(aclHash)}
+          }yield{
+            implicit val loginState: LoginState = LoginState(loginData.username, userType, address, if (userType == constants.User.TRADER) Option(acl) else None)
+            utilitiesNotification.registerNotificationToken(loginData.username, loginData.notificationToken)
+            utilitiesNotification.send(loginData.username, constants.Notification.LOGIN, loginData.username)
+            loginState.userType match {
+              case constants.User.GENESIS =>
+                withUsernameToken.Ok(views.html.genesisIndex(warnings = contactWarnings))
+              case constants.User.ZONE =>
+                withUsernameToken.Ok(views.html.zoneIndex(zone = masterZones.Service.get(blockchainZones.Service.getID(loginState.address)), warnings = contactWarnings))
+              case constants.User.ORGANIZATION =>
+                withUsernameToken.Ok(views.html.organizationIndex(organization = masterOrganizations.Service.get(blockchainOrganizations.Service.getID(loginState.address)), warnings = contactWarnings))
+              case constants.User.TRADER =>
+                val aclAccount = blockchainAclAccounts.Service.get(loginState.address)
+                withUsernameToken.Ok(views.html.traderIndex(totalFiat = blockchainFiats.Service.getFiatPegWallet(loginState.address).map(_.transactionAmount.toInt).sum, zone = masterZones.Service.get(aclAccount.zoneID), organization = masterOrganizations.Service.get(aclAccount.organizationID), warnings = contactWarnings))
+              case constants.User.USER =>
+                withUsernameToken.Ok(views.html.userIndex(warnings = contactWarnings))
+              case constants.User.UNKNOWN =>
+                withUsernameToken.Ok(views.html.anonymousIndex(warnings = contactWarnings))
+              case constants.User.WITHOUT_LOGIN =>
+                masterAccounts.Service.updateUserType(loginData.username, constants.User.UNKNOWN)
+                withUsernameToken.Ok(views.html.anonymousIndex(warnings = contactWarnings))
+            }
+          }
+          result.recover{
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+          }
+
+
+
+
+         /* implicit val loginState: LoginState = LoginState(loginData.username, userType, address, if (userType == constants.User.TRADER) Option(blockchainAclHashes.Service.getACL(blockchainAclAccounts.Service.getACLHash(address))) else None)
+          //val contactWarnings: Seq[constants.Response.Warning] = utilities.Contact.getWarnings(masterAccounts.Service.validateLoginAndGetStatus(loginData.username, loginData.password))
           utilitiesNotification.registerNotificationToken(loginData.username, loginData.notificationToken)
           utilitiesNotification.send(loginData.username, constants.Notification.LOGIN, loginData.username)
           loginState.userType match {
@@ -111,7 +155,7 @@ class AccountController @Inject()(
         }
         catch {
           case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-        }
+        }*/
       }
     )
   }

@@ -84,6 +84,14 @@ class Notification @Inject()(masterContacts: master.Contacts,
       case baseException: BaseException => logger.error(baseException.failure.message, baseException)
         throw baseException
     }
+
+    val title = messagesApi(pushNotification.title)
+    val message = messagesApi(pushNotification.message, messageParameters: _*)
+    val create=masterTransactionNotifications.Service.create(accountID, title, message).map{_=>
+      val send= masterTransactionAccountTokens.Service.getTokenById(accountID).map(notificationTokenOption => notificationTokenOption.foreach(notificationToken=>wsClient.url(pushNotificationURL).withHttpHeaders(constants.Header.CONTENT_TYPE -> constants.Header.APPLICATION_JSON).withHttpHeaders(constants.Header.AUTHORIZATION -> pushNotificationAuthorizationKey).post(Json.toJson(Data(notificationToken, Notification(title, message))))))
+    }
+
+
   }
 
   private def sendEmail(toAccountID: String, email: constants.Notification.Email, messageParameters: String*)(implicit lang: Lang) = {
@@ -114,6 +122,7 @@ class Notification @Inject()(masterContacts: master.Contacts,
       case baseException: BaseException => logger.error(baseException.failure.message, baseException)
         throw baseException
     }
+
   }
 
   def registerNotificationToken(id: String, notificationToken: String): Int = {

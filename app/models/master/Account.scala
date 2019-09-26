@@ -179,15 +179,15 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   object Service {
 
-    def validateLoginAndGetStatus(username: String, password: String): String = Await.result(getStatusByIDAndSecretHash(username, util.hashing.MurmurHash3.stringHash(password).toString), Duration.Inf)
+    def validateLoginAndGetStatus(username: String, password: String): Future[String] = getStatusByIDAndSecretHash(username, util.hashing.MurmurHash3.stringHash(password).toString)
 
     def validateLogin(username: String, password: String): Boolean = Await.result(validateLoginByIDAndSecretHash(id = username, secretHash = util.hashing.MurmurHash3.stringHash(password).toString), Duration.Inf)
 
     def updatePassword(username:String, newPassword: String): Int = Await.result(updatePasswordByID(id = username, secretHash = util.hashing.MurmurHash3.stringHash(newPassword).toString), Duration.Inf)
 
-    def checkUsernameAvailable(username: String): Boolean = Await.result(checkById(username), Duration.Inf)
+    def checkUsernameAvailable(username: String): Boolean = !Await.result(checkById(username), Duration.Inf)
 
-    def checkUsernameAvailableAsync(username: String) = checkById(username)
+    def checkUsernameAvailableAsync(username: String): Future[Boolean] = checkById(username)
 
     def addLogin(username: String, password: String, accountAddress: String, language: String): String = {
       Await.result(add(Account(username, util.hashing.MurmurHash3.stringHash(password).toString, accountAddress, language, constants.User.WITHOUT_LOGIN, constants.Status.Account.NO_CONTACT)), Duration.Inf)
@@ -206,11 +206,11 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
     def getIdAsync(accountAddress: String) = getIdByAddress(accountAddress)
 
-    def getAccountByAddress(accountAddress: String): Account = Await.result(findByAddress(accountAddress), Duration.Inf)
+    def getAccountByAddress(accountAddress: String): Future[Account] = findByAddress(accountAddress)
 
     def getAccountByAddressAsync(accountAddress: String)=findByAddress(accountAddress)
 
-    def getAddress(id: String): String = Await.result(getAddressById(id), Duration.Inf)
+    def getAddress(id: String): Future[String] = getAddressById(id)
 
     def getAddressAsync(id: String) = getAddressById(id)
 
@@ -220,7 +220,7 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
     def updateUserTypeOnAddress(address: String, userType: String): Int = Await.result(updateUserTypeByAddress(address, userType), Duration.Inf)
 
-    def getUserType(id: String): String = Await.result(getUserTypeById(id), Duration.Inf)
+    def getUserType(id: String): Future[String] =getUserTypeById(id)
 
     def getUserTypeAsync(id: String) =getUserTypeById(id)
 

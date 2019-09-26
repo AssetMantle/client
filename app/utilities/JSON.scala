@@ -14,7 +14,7 @@ import scala.concurrent.Future
 import scala.concurrent.ExecutionContext
 object JSON {
 
-  def getResponseFromJson[T <: BaseResponse](response: WSResponse)(implicit logger: Logger, module: String, reads: Reads[T]): T = {
+ /* def getResponseFromJson[T <: BaseResponse](response: WSResponse)(implicit logger: Logger, module: String, reads: Reads[T]): T = {
     try {
       Json.fromJson[T](response.json) match {
         case JsSuccess(value: T, _: JsPath) => value
@@ -33,10 +33,10 @@ object JSON {
       case jsonMappingException: JsonMappingException => logger.info(jsonMappingException.getMessage, jsonMappingException)
         throw new BaseException(constants.Response.NO_RESPONSE)
     }
-  }
+  }*/
 
 
-  def getResponseFromJsonAsync[T <: BaseResponse](response: Future[WSResponse])(implicit exec:ExecutionContext,logger: Logger, module: String, reads: Reads[T]): Future[T]={
+  def getResponseFromJson[T <: BaseResponse](response: Future[WSResponse])(implicit exec:ExecutionContext,logger: Logger, module: String, reads: Reads[T]): Future[T]={
     response.map{ res=>
       Json.fromJson[T](res.json) match{
         case JsSuccess(value: T, _: JsPath) => value

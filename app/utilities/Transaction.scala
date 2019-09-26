@@ -20,13 +20,44 @@ class Transaction @Inject()(getTxHashResponse: GetTransactionHashResponse, getRe
 
   private val responseErrorTransactionHashNotFound: String = constants.Response.PREFIX + constants.Response.FAILURE_PREFIX + configuration.get[String]("blockchain.response.error.transactionHashNotFound")
 
-  def process[T1 <: BaseTransaction[T1], T2 <: BaseRequest](entity: T1, blockchainTransactionCreate: T1 => String, request: T2, action: T2 => WSResponse, onSuccess: (String, BlockResponse) => Unit, onFailure: (String, String) => Unit, updateTransactionHash: (String, String) => Int)(implicit module: String, logger: Logger): String = {
+  def process[T1 <: BaseTransaction[T1], T2 <: BaseRequest](entity: T1, blockchainTransactionCreate: T1 => Future[String], request: T2, action: T2 => Future[WSResponse], onSuccess: (String, BlockResponse) => Future[Unit], onFailure: (String, String) => Future[Unit], updateTransactionHash: (String, String) => Future[Int])(implicit module: String, logger: Logger): Future[String] = {
 
-    val ticketID: String = if (kafkaEnabled) utilities.JSON.getResponseFromJson[KafkaResponse](action(request)).ticketID else utilities.IDGenerator.ticketID
-    blockchainTransactionCreate(entity.mutateTicketID(ticketID))
-    println(ticketID)
-    println(System.currentTimeMillis())
-    if (!kafkaEnabled) {
+
+    val ticketIDFuture: Future[String] = if (kafkaEnabled) utilities.JSON.getResponseFromJson[KafkaResponse](action(request)).map(res=> res.ticketID) else Future{utilities.IDGenerator.ticketID}
+    val result=ticketIDFuture.flatMap{ticketID=>
+      blockchainTransactionCreate(entity.mutateTicketID(ticketID)).map{ _ =>
+     if(!kafkaEnabled){
+        transactionMode match {
+          case constants.Transactions.BLOCK_MODE => utilities.JSON.getResponseFromJson[BlockResponse](action(request)).flatMap{blockResponse=>
+            onSuccess(ticketID,blockResponse)
+          }
+          case constants.Transactions.ASYNC_MODE => utilities.JSON.getResponseFromJson[AsyncResponse](action(request)).flatMap{asyncResponse=>
+            updateTransactionHash(ticketID,asyncResponse.txhash)
+          }
+          case constants.Transactions.SYNC_MODE =>utilities.JSON.getResponseFromJson[SyncResponse](action(request)).flatMap{asyncResponse=>
+            updateTransactionHash(ticketID,asyncResponse.txhash)
+          }
+        }
+      }
+
+     }
+
+    }
+
+    result.recover{
+      case baseException: BaseException => logger.error(baseException.failure.message, baseException)
+       ticketIDFuture.map{ticketID=>
+         onFailure(ticketID, baseException.failure.message)
+       }
+    }
+
+    ticketIDFuture
+
+
+    //blockchainTransactionCreate(entity.mutateTicketID(ticketID))
+    //println(ticketID)
+    //println(System.currentTimeMillis())
+    /*if (!kafkaEnabled) {
       Future {
         try {
           transactionMode match {
@@ -39,13 +70,13 @@ class Transaction @Inject()(getTxHashResponse: GetTransactionHashResponse, getRe
             onFailure(ticketID, baseException.failure.message)
         }
       }
-    }
-    ticketID
+    }*/
+    //ticketID
   }
 
   def processAsync[T1 <: BaseTransaction[T1], T2 <: BaseRequest](entity: T1, blockchainTransactionCreate: T1 => Future[String], request: T2, action: T2 => Future[WSResponse], onSuccess: (String, BlockResponse) => Unit, onFailure: (String, String) => Future[Unit], updateTransactionHash: (String, String) => Future[Int])(implicit module: String, logger: Logger) = {
 
-    val ticketID2: Future[String] = if (kafkaEnabled) utilities.JSON.getResponseFromJsonAsync[KafkaResponse](action(request)).map(res=> res.ticketID) else Future{utilities.IDGenerator.ticketID}
+    val ticketID2: Future[String] = if (kafkaEnabled) utilities.JSON.getResponseFromJson[KafkaResponse](action(request)).map(res=> res.ticketID) else Future{utilities.IDGenerator.ticketID}
     ticketID2.map{ticketID=>
 
         blockchainTransactionCreate(entity.mutateTicketID(ticketID))
@@ -54,14 +85,14 @@ class Transaction @Inject()(getTxHashResponse: GetTransactionHashResponse, getRe
         if (!kafkaEnabled){
           try {
             val x=transactionMode match {
-              case constants.Transactions.BLOCK_MODE => utilities.JSON.getResponseFromJsonAsync[BlockResponse](action(request)).map{blockResponse=>
+              case constants.Transactions.BLOCK_MODE => utilities.JSON.getResponseFromJson[BlockResponse](action(request)).map{blockResponse=>
                 onSuccess(ticketID,blockResponse)
               }
 
-              case constants.Transactions.ASYNC_MODE => utilities.JSON.getResponseFromJsonAsync[AsyncResponse](action(request)).map{asyncResponse=>
+              case constants.Transactions.ASYNC_MODE => utilities.JSON.getResponseFromJson[AsyncResponse](action(request)).map{asyncResponse=>
                 updateTransactionHash(ticketID,asyncResponse.txhash)
               }
-              case constants.Transactions.SYNC_MODE =>utilities.JSON.getResponseFromJsonAsync[SyncResponse](action(request)).map{asyncResponse=>
+              case constants.Transactions.SYNC_MODE =>utilities.JSON.getResponseFromJson[SyncResponse](action(request)).map{asyncResponse=>
                 updateTransactionHash(ticketID,asyncResponse.txhash)
               }
 

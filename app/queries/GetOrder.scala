@@ -4,7 +4,7 @@ import java.net.ConnectException
 
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import play.api.libs.ws.WSClient
+import play.api.libs.ws.{WSClient, WSResponse}
 import play.api.{Configuration, Logger}
 import queries.responses.OrderResponse.Response
 
@@ -26,17 +26,14 @@ class GetOrder @Inject()()(implicit wsClient: WSClient, configuration: Configura
 
   private val url = ip + ":" + port + "/" + path + "/"
 
-  private def action(request: String): Future[Response] = wsClient.url(url + request).get.map { response => utilities.JSON.getResponseFromJson[Response](response) }
-
+  private def action(request: String): Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(url + request).get)
 
   object Service {
 
-    def get(negotiationID: String): Response = try {
-      Await.result(action(negotiationID), Duration.Inf)
-    } catch {
-      case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
-        throw new BaseException(constants.Response.CONNECT_EXCEPTION)
-    }
+  def get(negotiationID: String): Future[Response] =action(negotiationID).recover{
+    case connectException: ConnectException =>
+      logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
+      throw new BaseException(constants.Response.CONNECT_EXCEPTION)
   }
 
 }
