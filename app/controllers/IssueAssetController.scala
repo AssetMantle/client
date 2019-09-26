@@ -96,10 +96,10 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
             } else {
               Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
             }
-          case None => Ok(views.html.component.master.issueAssetDetail(views.companion.master.IssueAssetDetail.form))
+          case None => withUsernameToken.Ok(views.html.component.master.issueAssetDetail(views.companion.master.IssueAssetDetail.form))
         }
       } catch {
-        case _: BaseException => InternalServerError(views.html.component.master.issueAssetDetail(views.companion.master.IssueAssetDetail.form))
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
