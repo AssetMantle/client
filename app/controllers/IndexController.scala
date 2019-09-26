@@ -63,33 +63,32 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
     usr+"sgsfs"
   }
 
-  def testActionAsync(username:String="SELL11HtBwtOyo")=Action.async{
+  def testActionAsync=Action.async{
 
-      val timeInitial = System.currentTimeMillis()
+    val timeInitial = System.currentTimeMillis()
 
-      val account = masterAccounts.Service.getAccountAsync(username)
-      val address = masterAccounts.Service.getAddressAsync(username)
+    val account = masterAccounts.Service.getAccountAsync("SELL15B2A9cajl")
+    val address = masterAccounts.Service.getAddressAsync("SELL15B2A9cajl")
+    val userType = masterAccounts.Service.getUserTypeAsync("SELL15B2A9cajl")
+    val lang = masterAccounts.Service.getLanguageAsync("SELL15B2A9ca")
+    val availability = masterAccounts.Service.checkUsernameAvailableAsync("SELL15B2A9cajl")
 
-      val userType = masterAccounts.Service.getUserTypeAsync(username)
+    val somet=for {
+      _ <- account
+      _ <- address
+      _ <- userType
+      _ <- lang
+      _ <- availability
+    } yield()
 
-      val s2= Promise[String]()
+   somet.map{some=>
+     Ok("fwef")
+   }.recover{
+     case baseException: BaseException=> Ok(baseException.module+"   "+baseException.failure.message)
+     case e:Exception=> Ok("someOtherError")
+   }
 
-      val mylist:List[Future[Any]]=List(account,address,userType)
-
-     address.zip(address).map{case(add,ars)=>
-       println(add,ars)
-         func(ars)
-     }
-
-      val x=Future.sequence(mylist)
-
-      x.map{results=>
-
-        println(results)
-        Ok
-        }
-
-      }
+  }
 
 
 }

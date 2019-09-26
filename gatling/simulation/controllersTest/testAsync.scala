@@ -41,7 +41,7 @@ object masterTest8 {
 
   val dbCalls: ScenarioBuilder = scenario("dbOps")
     .exec(http("testGet")
-        .get(routes.IndexController.testActionAsync("SELL11HtBwtOyo").url))
+        .get(routes.IndexController.testActionAsync().url))
     .pause(2)
 
 }

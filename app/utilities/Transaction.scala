@@ -53,7 +53,7 @@ class Transaction @Inject()(getTxHashResponse: GetTransactionHashResponse, getRe
         println(System.currentTimeMillis())
         if (!kafkaEnabled){
           try {
-            transactionMode match {
+            val x=transactionMode match {
               case constants.Transactions.BLOCK_MODE => utilities.JSON.getResponseFromJsonAsync[BlockResponse](action(request)).map{blockResponse=>
                 onSuccess(ticketID,blockResponse)
               }
@@ -65,6 +65,10 @@ class Transaction @Inject()(getTxHashResponse: GetTransactionHashResponse, getRe
                 updateTransactionHash(ticketID,asyncResponse.txhash)
               }
 
+            }
+            x.recover{
+              case baseException: BaseException => logger.error(baseException.failure.message, baseException)
+                onFailure(ticketID, baseException.failure.message)
             }
           } catch {
             case baseException: BaseException => logger.error(baseException.failure.message, baseException)

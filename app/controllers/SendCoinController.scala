@@ -46,6 +46,7 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
               onFailure = blockchainTransactionSendCoins.Utility.onFailure,
               updateTransactionHash = blockchainTransactionSendCoins.Service.updateTransactionHash
             )
+
             withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.COINS_SENT)))
           }
           catch {
