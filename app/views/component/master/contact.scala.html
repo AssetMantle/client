@@ -7,16 +7,16 @@
     case Some(contact) => {
         <p>@Messages(constants.Form.EMAIL_ADDRESS): <span id="emailAddressValue">@contact.emailAddress</span>
             @if(contact.emailAddressVerified) {
-                <span class="result success"><i class="fa fa-check " aria-hidden="true"></i></span>
+                <span class="result success">@contact.emailAddressVerified</span>
             } else {
-                <span class="result warning"><i class="fa fa-exclamation-triangle" aria-hidden="true" onclick="getForm(jsRoutes.controllers.VerifyEmailAddressController.verifyEmailAddressForm())"></i></span>
+                <span class="result warning"><button onclick="getForm(jsRoutes.controllers.VerifyEmailAddressController.verifyEmailAddressForm())">@Messages(constants.Form.VERIFY)</button></span>
             }
         </p>
         <p>@Messages(constants.Form.MOBILE_NUMBER): <span id="phoneValue">@contact.mobileNumber</span>
             @if(contact.mobileNumberVerified) {
-                <span class="result success"><i class="fa fa-check " aria-hidden="true"></i></span>
+                <span class="result success">@contact.mobileNumberVerified</span>
             } else {
-                <span class="result warning"><i class="fa fa-exclamation-triangle" aria-hidden="true" onclick="getForm(jsRoutes.controllers.VerifyMobileNumberController.verifyMobileNumberForm())"></i></span>
+                <span class="result warning"><button onclick="getForm(jsRoutes.controllers.VerifyMobileNumberController.verifyMobileNumberForm())">@Messages(constants.Form.VERIFY)</button></span>
             }
         </p>
     }

@@ -1,7 +1,7 @@
 package models.blockchain
 
 import akka.actor.ActorSystem
-import exceptions.{BaseException, BlockChainException}
+import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
@@ -137,7 +137,6 @@ class ACLAccounts @Inject()(protected val databaseConfigProvider: DatabaseConfig
         }
       } catch {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
-        case blockChainException: BlockChainException => logger.error(blockChainException.failure.message, blockChainException)
       }
     }(schedulerExecutionContext)
   }

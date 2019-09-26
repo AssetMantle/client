@@ -10,9 +10,13 @@ function getForm(route, modalContent = '#commonModalContent', modal = '#commonMo
             },
             500: function (data) {
                 const newDocument = document.open("text/html", "replace");
-                newDocument.write(data);
+                newDocument.write(data.responseText);
                 newDocument.close();
             }
+        }
+    }).fail(function (XMLHttpRequest) {
+        if (XMLHttpRequest.readyState === 0) {
+            $('#connectionError').fadeIn(100);
         }
     });
 }

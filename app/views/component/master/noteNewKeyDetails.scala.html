@@ -1,0 +1,15 @@
+@import helper._
+@import views.companion.master.NoteNewKeyDetails
+
+@(noteNewKeyDetailsForm: Form[NoteNewKeyDetails.Data], name: String, blockchainAddress: String, publicKey: String, seed: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@Messages(constants.Form.NAME): @name <br/>
+@Messages(constants.Form.BLOCKCHAIN_ADDRESS): @blockchainAddress <br/>
+@Messages(constants.Form.PUBLIC_KEY): @publicKey <br/>
+@Messages(constants.Form.SEED): @seed <br/>
+
+@form(action = routes.AccountController.noteNewKeyDetails(name, blockchainAddress, publicKey, seed), 'onkeypress -> "submitFormOnEnter(event,this)") {
+    @CSRF.formField
+    @checkbox(noteNewKeyDetailsForm(constants.Form.CONFIRM_NOTE_NEW_KEY_DETAILS), '_label -> Messages(constants.Form.CONFIRM_NOTE_NEW_KEY_DETAILS))
+    <button type="button" onclick="submitForm(this)">@Messages(constants.Form.NOTE_NEW_KEY_DETAILS)</button>
+}

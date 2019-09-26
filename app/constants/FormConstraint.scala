@@ -2,7 +2,7 @@ package constants
 
 import play.api.data.validation._
 import views.companion.master.SignUp
-import views.companion.master.IssueAssetRequest
+import views.companion.master.ConfirmTransaction
 
 object FormConstraint {
   //TODO: Error Response through Messages
@@ -15,14 +15,15 @@ object FormConstraint {
     if (errors.isEmpty) Valid else Invalid(errors)
   })
 
-  val issueAssetRequestCheckConstraint: Constraint[IssueAssetRequest.Data] = Constraint("constraints.issueAssetRequestCheck")({ issueAssetRequestData: IssueAssetRequest.Data =>
+  val issueAssetRequestCheckConstraint: Constraint[ConfirmTransaction.Data] = Constraint("constraints.issueAssetRequestCheck")({ confirmTransactionData: ConfirmTransaction.Data =>
     val errors = {
-      if (!issueAssetRequestData.moderated && issueAssetRequestData.password.isEmpty && issueAssetRequestData.gas.isEmpty) Seq(ValidationError(constants.Response.PASSWORD_NOT_GIVEN.message), ValidationError(constants.Response.GAS_NOT_GIVEN.message))
-      else if (!issueAssetRequestData.moderated && issueAssetRequestData.password.isEmpty && issueAssetRequestData.gas.isDefined) Seq(ValidationError(constants.Response.PASSWORD_NOT_GIVEN.message))
-      else if (!issueAssetRequestData.moderated && issueAssetRequestData.password.isDefined && issueAssetRequestData.gas.isEmpty) Seq(ValidationError(constants.Response.GAS_NOT_GIVEN.message))
+      if (confirmTransactionData.password.isEmpty && confirmTransactionData.gas.isDefined) Seq(ValidationError(constants.Response.PASSWORD_NOT_GIVEN.message))
+      else if (confirmTransactionData.password.isDefined && confirmTransactionData.gas.isEmpty) Seq(ValidationError(constants.Response.GAS_NOT_GIVEN.message))
       else Nil
     }
     if (errors.isEmpty) Valid else Invalid(errors)
   })
+
+
 
 }

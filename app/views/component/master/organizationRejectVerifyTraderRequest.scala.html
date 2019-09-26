@@ -3,14 +3,14 @@
 @import views.companion.master.RejectVerifyTraderRequest
 
 @(rejectVerifyTraderRequestForm: Form[RejectVerifyTraderRequest.Data], traderID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
-@form(action = routes.SetACLController.organizationRejectVerifyTraderRequest, 'onkeypress -> "validateForm(event,this)") {
+@form(action = routes.SetACLController.organizationRejectVerifyTraderRequest, 'onkeypress -> "submitFormOnEnter(event,this)") {
     <div class="latest_card-header latest_card-header-primary text-center">
         <h4 class="latest_card-title">@Messages(constants.Form.REJECT_VERIFY_TRADER_REQUEST)</h4>
     </div>
     <div class="latest_card-body">
         @CSRF.formField
         @inputText(rejectVerifyTraderRequestForm(constants.FormField.TRADER_ID.name).copy(value = Some(traderID)), '_label -> Messages(constants.FormField.TRADER_ID.name),
-            'class -> "form-control", 'placeholder -> Messages(constants.FormField.TRADER_ID.name), 'required -> true)
+          'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.TRADER_ID.name), 'required -> true)
 
         @if(rejectVerifyTraderRequestForm.hasGlobalErrors) {
             <ul>

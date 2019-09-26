@@ -16,7 +16,7 @@ object ImageProcess {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  def convertToThumbnail(name: String, uploadPath: String)(implicit exec: ExecutionContext): (String, Option[Array[Byte]]) = {
+  def convertToThumbnail(name: String, uploadPath: String)(implicit executionContext: ExecutionContext): (String, Option[Array[Byte]]) = {
     try {
       val imageRes = ImageIO.read(FileOperations.newFile(uploadPath, name))
       implicit val writer: JpegWriter = JpegWriter().withCompression(100)

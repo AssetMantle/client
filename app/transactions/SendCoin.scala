@@ -2,12 +2,12 @@ package transactions
 
 import java.net.ConnectException
 
-import exceptions.BlockChainException
+import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import play.api.libs.json.{Json, OWrites}
 import play.api.libs.ws.{WSClient, WSResponse}
 import play.api.{Configuration, Logger}
-import transactions.Abstract.BaseRequestEntity
+import transactions.Abstract.BaseRequest
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
@@ -33,11 +33,11 @@ class SendCoin @Inject()(wsClient: WSClient)(implicit configuration: Configurati
 
   case class Amount(denom: String, amount: String)
 
-  case class BaseRequest(from: String, chain_id: String = chainID, gas: String)
+  case class BaseReq(from: String, chain_id: String = chainID, gas: String)
 
-  case class Request(base_req: BaseRequest, password: String, to: String, amount: Seq[Amount], mode: String) extends BaseRequestEntity
+  case class Request(base_req: BaseReq, password: String, to: String, amount: Seq[Amount], mode: String) extends BaseRequest
 
-  private implicit val baseRequestWrites: OWrites[BaseRequest] = Json.writes[BaseRequest]
+  private implicit val baseRequestWrites: OWrites[BaseReq] = Json.writes[BaseReq]
 
   private implicit val amountWrites: OWrites[Amount] = Json.writes[Amount]
 
@@ -50,7 +50,7 @@ class SendCoin @Inject()(wsClient: WSClient)(implicit configuration: Configurati
       Await.result(action(request), Duration.Inf)
     } catch {
       case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
-        throw new BlockChainException(constants.Response.CONNECT_EXCEPTION)
+        throw new BaseException(constants.Response.CONNECT_EXCEPTION)
     }
   }
 

@@ -1,0 +1,31 @@
+@import controllers.actions.LoginState
+@import helper._
+
+@(uploadRoute: String, storeRoute: String, documentType: String, id: String = "")(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+
+@CSRF.formField
+<div id="uploadSelector">
+    <button class="btn" id="browseUploadButton">@Messages(constants.Form.BROWSE)</button>
+    <p class="centerText"><small>@Messages(constants.Form.OR)</small></p>
+    <div class="dropBox">
+        <p class="centerText"><small>@Messages(constants.Form.DROP_FILE)</small></p>
+    </div>
+</div>
+
+<div id="uploader" class="hidden">
+    <a id = "fileName"></a>
+    <br>
+    <div id="uploadControls">
+        <div class="progressContainer">
+            <div class="progressBar" id="fileUploadProgressBar"></div>
+        </div>
+        <button class="btn" id="uploadButton" >@Messages(constants.Form.UPLOAD)</button>
+    </div>
+</div>
+
+<div id="uploadCompletionMessage" class="hidden"></div>
+
+<script src="@routes.Assets.versioned("javascripts/resumable.js")" type="text/javascript"></script>
+<script src="@routes.Assets.versioned("javascripts/upload.js")" type="text/javascript"></script>
+<script src="@routes.Assets.versioned("javascripts/style/progressBar.js")" type="text/javascript"></script>
+<script>uploadFile(@uploadRoute, @storeRoute,'@documentType', '@id')</script>

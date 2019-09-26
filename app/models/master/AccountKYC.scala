@@ -110,7 +110,7 @@ class AccountKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfig
 
     def status = column[Boolean]("status")
 
-    def fileName = column[String]("fileName")
+    def fileName = column[String]("fileName", O.Unique)
 
     def file = column[Array[Byte]]("file")
 

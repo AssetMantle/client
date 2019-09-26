@@ -4,7 +4,7 @@
 
 @(addUBOsForm: Form[AddUBOs.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
-@form(action = routes.AddOrganizationController.userUpdateUBOs, 'onkeypress -> "validateForm(event,this)") {
+@form(action = routes.AddOrganizationController.userUpdateUBOs, 'onkeypress -> "submitFormOnEnter(event,this)") {
     <div class="latest_card-header latest_card-header-primary text-center">
         <h4 class="latest_card-title">@Messages(constants.Form.ADD_UBOS)</h4>
     </div>
@@ -12,10 +12,10 @@
         @CSRF.formField
         @repeatWithIndex(addUBOsForm(constants.Form.UBOS), min = addUBOsForm(constants.Form.UBOS).indexes.length + 1) { (uboForm, i) =>
             <div id="@constants.Form.UBO @i">
-                @inputText(uboForm(constants.FormField.PERSON_NAME.name), '_label -> Messages(constants.FormField.PERSON_NAME.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.PERSON_NAME.name), 'required -> false)
-                @inputText(uboForm(constants.FormField.SHARE_PERCENTAGE.name), '_label -> Messages(constants.FormField.SHARE_PERCENTAGE.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.SHARE_PERCENTAGE.name), 'required -> false)
-                @inputText(uboForm(constants.FormField.RELATIONSHIP.name), '_label -> Messages(constants.FormField.RELATIONSHIP.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.RELATIONSHIP.name), 'required -> false)
-                @inputText(uboForm(constants.FormField.TITLE.name), '_label -> Messages(constants.FormField.TITLE.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.TITLE.name), 'required -> false)
+              @inputText(uboForm(constants.FormField.PERSON_NAME.name), '_label -> Messages(constants.FormField.PERSON_NAME.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PERSON_NAME.name), 'required -> false)
+              @inputText(uboForm(constants.FormField.SHARE_PERCENTAGE.name), '_label -> Messages(constants.FormField.SHARE_PERCENTAGE.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.SHARE_PERCENTAGE.name), 'required -> false)
+              @inputText(uboForm(constants.FormField.RELATIONSHIP.name), '_label -> Messages(constants.FormField.RELATIONSHIP.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.RELATIONSHIP.name), 'required -> false)
+              @inputText(uboForm(constants.FormField.TITLE.name), '_label -> Messages(constants.FormField.TITLE.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.TITLE.name), 'required -> false)
                 <button type="button" class="btn-sm btn btn-primary" onclick="deleteElementBySource(this)">@Messages(constants.Form.DELETE)</button>
             </div>
         }
@@ -26,7 +26,8 @@
             }
             </ul>
         }
-        <button type="button" class="btn-sm btn btn-primary" onclick="submitForm(this)">@Messages(constants.Form.ADD)/@Messages(constants.Form.UPDATE)</button>
+      <button type="button" class="btn-sm btn btn-primary" onclick="submitForm(this)">@Messages(constants.Form.ADD)
+        /@Messages(constants.Form.UPDATE)</button>
         <button type="button" class="btn-sm btn btn-primary" onclick="getForm(jsRoutes.controllers.AddOrganizationController.addOrganizationForm())">@Messages(constants.Form.BACK)</button>
         <button type="button" class="btn-sm btn btn-primary" onclick="getForm(jsRoutes.controllers.AddOrganizationController.organizationBankAccountDetailForm())">@Messages(constants.Form.NEXT)</button>
     </div>

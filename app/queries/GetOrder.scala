@@ -2,7 +2,7 @@ package queries
 
 import java.net.ConnectException
 
-import exceptions.BlockChainException
+import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
@@ -14,7 +14,7 @@ import scala.concurrent.{Await, ExecutionContext, Future}
 @Singleton
 class GetOrder @Inject()()(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
-  private implicit val module: String = constants.Module.TRANSACTIONS_GET_ORDER
+  private implicit val module: String = constants.Module.QUERIES_GET_ORDER
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -34,9 +34,8 @@ class GetOrder @Inject()()(implicit wsClient: WSClient, configuration: Configura
     def get(negotiationID: String): Response = try {
       Await.result(action(negotiationID), Duration.Inf)
     } catch {
-      case connectException: ConnectException =>
-        logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
-        throw new BlockChainException(constants.Response.CONNECT_EXCEPTION)
+      case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
+        throw new BaseException(constants.Response.CONNECT_EXCEPTION)
     }
   }
 

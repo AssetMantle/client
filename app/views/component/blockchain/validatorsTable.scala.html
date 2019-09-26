@@ -4,7 +4,7 @@
     <div class="cmuk-card
                 cmuk-card-default
                 cmuk-card-body">
-        <a class="back-button" onclick='back()' > <i class="fa fa-undo"></i> @Messages(constants.Form.BACK)</a>
+        <a class="back-button" onclick='back()' ><span cmuk-icon="arrow-left"></span> @Messages(constants.Form.BACK)</a>
         <table class="cmuk-table cmuk-table-divider">
             <thead>
                 <tr>
@@ -18,5 +18,3 @@
         </table>
     </div>
 </div>
-<script>validatorsTable("validatorsTableBody")</script>
-<script src="@routes.Assets.versioned("javascripts/validators.js")" type="text/javascript"></script>
