@@ -186,8 +186,7 @@ class ChangeBuyerBids @Inject()(actorSystem: ActorSystem, transaction: utilities
         val negotiationID = blockchainNegotiations.Service.getNegotiationID(buyerAddress = changeBuyerBid.from, sellerAddress = changeBuyerBid.to, pegHash = changeBuyerBid.pegHash)
         val negotiationResponse = if (negotiationID == "") getNegotiation.Service.get(getNegotiationID.Service.get(buyerAddress = changeBuyerBid.from, sellerAddress = changeBuyerBid.to, pegHash = changeBuyerBid.pegHash).negotiationID) else getNegotiation.Service.get(negotiationID)
         blockchainNegotiations.Service.insertOrUpdate(id = negotiationResponse.value.negotiationID, buyerAddress = negotiationResponse.value.buyerAddress, sellerAddress = negotiationResponse.value.sellerAddress, assetPegHash = negotiationResponse.value.pegHash, bid = negotiationResponse.value.bid, time = negotiationResponse.value.time, buyerSignature = negotiationResponse.value.buyerSignature, sellerSignature = negotiationResponse.value.sellerSignature, buyerBlockHeight = negotiationResponse.value.buyerBlockHeight, sellerBlockHeight = negotiationResponse.value.sellerBlockHeight, buyerContractHash = negotiationResponse.value.buyerContractHash, sellerContractHash = negotiationResponse.value.sellerContractHash, dirtyBit = true)
-        masterTransactionNegotiationRequests.Service.updateNegotiationID(negotiationID, buyerAccountID, changeBuyerBid.pegHash
-        )
+        masterTransactionNegotiationRequests.Service.updateNegotiationID(negotiationResponse.value.negotiationID, buyerAccountID, changeBuyerBid.pegHash)
         blockchainAccounts.Service.markDirty(changeBuyerBid.from)
         blockchainTransactionFeedbacks.Service.markDirty(changeBuyerBid.from)
         blockchainTransactionFeedbacks.Service.markDirty(changeBuyerBid.to)

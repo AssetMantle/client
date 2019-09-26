@@ -17,7 +17,7 @@
         } {
             <a href="@routes.FileController.tradingFile(id, file.fileName, file.documentType)">@Messages(file.documentType)</a>
         } {
-            <button onclick="getForm(jsRoutes.controllers.File.updateTraderAssetForm('@file.documentType', '@id'))">@Messages(constants.Form.UPDATE) @Messages(file.documentType)</button>
+            <button onclick="getForm(jsRoutes.controllers.FileController.updateTraderAssetForm('@file.documentType', '@id'))">@Messages(constants.Form.UPDATE) @Messages(file.documentType)</button>
             <script>hideElement('upload@file.documentType')</script>
         }
     }

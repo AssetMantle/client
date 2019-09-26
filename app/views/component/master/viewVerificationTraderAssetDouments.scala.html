@@ -1,6 +1,6 @@
 @import controllers.actions.LoginState
 @import models.masterTransaction.AssetFile
-
+@import models.common.Serializable._
 @(files: Seq[AssetFile])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 <div class="verify_buttons">
     @for(file <- files) {
@@ -33,6 +33,28 @@
                         <button class="cmuk-button cmuk-button-danger cmuk-button-small" onclick="rejectTraderAssetDocument('@file.id', '@file.documentType')">@Messages(constants.Form.REJECT)</button>
                     </div>
                 }
+            }
+            @file.documentContent match {
+                case Some(oblContent :OBL) => {
+                    <span class="red">@Messages(constants.FormField.BILL_OF_LADING_NUMBER.name)</span> : @oblContent.billOfLadingID <br>
+                    <span class="red">@Messages(constants.FormField.PORT_OF_LOADING.name)</span> : @oblContent.portOfLoading <br>
+                    <span class="red">@Messages(constants.FormField.SHIPPER_NAME.name)</span> : @oblContent.shipperName <br>
+                    <span class="red">@Messages(constants.FormField.SHIPPER_ADDRESS.name)</span> : @oblContent.shipperAddress <br>
+                    <span class="red">@Messages(constants.FormField.NOTIFY_PARTY_NAME.name)</span> : @oblContent.notifyPartyName <br>
+                    <span class="red">@Messages(constants.FormField.NOTIFY_PARTY_ADDRESS.name)</span> : @oblContent.notifyPartyAddress <br>
+                    <span class="red">@Messages(constants.FormField.SHIPMENT_DATE.name)</span> : @oblContent.dateOfShipping <br>
+                    <span class="red">@Messages(constants.FormField.DELIVERY_TERM.name)</span> : @oblContent.deliveryTerm <br>
+                    <span class="red">@Messages(constants.FormField.ASSET_QUANTITY.name)</span> : @oblContent.weightOfConsignment <br>
+                    <span class="red">@Messages(constants.FormField.ASSET_PRICE.name)</span> : @oblContent.declaredAssetValue <br>
+                }
+                case Some(invoiceContent :Invoice) => {
+                    <span class="red">@Messages(constants.FormField.INVOICE_NUMBER.name)</span> : @invoiceContent.invoiceNumber <br>
+                    <span class="red">@Messages(constants.FormField.INVOICE_DATE.name)</span> : @invoiceContent.invoiceDate <br>
+                }
+                case Some(content) => {
+                    <span>content</span>
+                }
+                case None => {}
             }
         }
     }
