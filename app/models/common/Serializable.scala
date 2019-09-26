@@ -48,6 +48,6 @@ object Serializable {
 
   case class DocumentBlockchainDetails(documentType: String, documentHash:String)
 
-  implicit val oblReads: Reads[DocumentBlockchainDetails] = Json.reads[DocumentBlockchainDetails]
-  implicit val oblWrites: OWrites[DocumentBlockchainDetails] = Json.writes[DocumentBlockchainDetails]
+  implicit val documentBlockchainDetailsReads: Reads[DocumentBlockchainDetails] = Json.reads[DocumentBlockchainDetails]
+  implicit val documentBlockchainDetailsWrites: OWrites[DocumentBlockchainDetails] = Json.writes[DocumentBlockchainDetails]
 }
