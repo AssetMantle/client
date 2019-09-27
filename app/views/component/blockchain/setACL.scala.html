@@ -3,10 +3,7 @@
 
 @(setACLForm: Form[SetACL.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @form(action = routes.SetACLController.blockchainSetACL, 'onkeypress -> "validateForm(event,this)") {
-    <div class="latest_card-header latest_card-header-primary text-center">
-        <h4 class="latest_card-title">@Messages(constants.Form.ISSUE_FIAT)</h4>
-    </div>
-    <div class="latest_card-body ml-cb">
+           <h4>@Messages(constants.Form.ISSUE_FIAT)</h4>
         @CSRF.formField
         @inputText(setACLForm(constants.FormField.FROM.name), '_label -> Messages(constants.FormField.FROM.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.FROM.name), 'required -> true)
         @inputText(setACLForm(constants.FormField.ACL_ADDRESS.name), '_label -> Messages(constants.FormField.ACL_ADDRESS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.ACL_ADDRESS.name), 'required -> true)
@@ -116,6 +113,5 @@
             }
             </ul>
         }
-        <button type="button" class="btn btn-primary btn-sm" onclick="submitForm(this)">@Messages(constants.Form.SET_ACL)</button>
-    </div>
+        <button type="button" onclick="submitForm(this)">@Messages(constants.Form.SET_ACL)</button>
 }

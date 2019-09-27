@@ -5,10 +5,7 @@
 @(confirmBuyerBidForm: Form[ConfirmBuyerBid.Data], sellerAddress: String, pegHash: String, bid: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 
 @form(action = routes.ConfirmBuyerBidController.confirmBuyerBid, 'onkeypress -> "validateForm(event,this)") {
-    <div class="latest_card-header latest_card-header-primary text-center">
-        <h4 class="latest_card-title">@Messages(constants.Form.CONFIRM_BUYER_BID)</h4>
-    </div>
-    <div class="latest_card-body">
+            <h4>@Messages(constants.Form.CONFIRM_BUYER_BID)</h4>
         @CSRF.formField
         @inputText(confirmBuyerBidForm(constants.FormField.SELLER_ADDRESS.name).copy(value = Some(sellerAddress)), '_label -> Messages(constants.FormField.SELLER_ADDRESS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.SELLER_ADDRESS.name), 'required -> true)
         @inputText(confirmBuyerBidForm(constants.FormField.BID.name) copy (value = Some(bid.toString)), '_label -> Messages(constants.FormField.BID.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.BID.name), 'required -> true)
@@ -25,6 +22,5 @@
             }
             </ul>
         }
-        <button type="button" class="btn btn-primary btn-sm" onclick="submitForm(this)">@Messages(constants.Form.CONFIRM_BUYER_BID)</button>
-    </div>
+        <button type="button"  onclick="submitForm(this)">@Messages(constants.Form.CONFIRM_BUYER_BID)</button>
 }

@@ -4,11 +4,8 @@
 
 @(changeBuyerBidForm: Form[ChangeBuyerBid.Data], sellerAddress: String, pegHash: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @form(action = routes.ChangeBuyerBidController.changeBuyerBid, 'onkeypress -> "validateForm(event,this)") {
-    <div class="latest_card-header latest_card-header-primary text-center">
-        <h4 class="latest_card-title">@Messages(constants.Form.CHANGE_BUYER_BID)</h4>
-    </div>
-    <div class="latest_card-body">
-        @CSRF.formField
+          <h4>@Messages(constants.Form.CHANGE_BUYER_BID)</h4>
+          @CSRF.formField
         @inputText(changeBuyerBidForm(constants.FormField.SELLER_ADDRESS.name).copy(value = Some(sellerAddress)), '_label -> Messages(constants.FormField.SELLER_ADDRESS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.SELLER_ADDRESS.name), 'required -> true)
         @inputText(changeBuyerBidForm(constants.FormField.BID.name), '_label -> Messages(constants.FormField.BID.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.BID.name), 'required -> true)
         @inputText(changeBuyerBidForm(constants.FormField.TIME.name), '_label -> Messages(constants.FormField.TIME.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.TIME.name), 'required -> true)
@@ -23,6 +20,5 @@
             }
             </ul>
         }
-        <button type="button" class="btn btn-sm btn-primary" onclick="submitForm(this)">@Messages(constants.Form.CHANGE_BUYER_BID)</button>
-    </div>
+        <button type="button" onclick="submitForm(this)">@Messages(constants.Form.CHANGE_BUYER_BID)</button>
 }

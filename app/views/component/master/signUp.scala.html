@@ -5,10 +5,7 @@
 @(signUpForm: Form[SignUp.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 
 @form(action = routes.AccountController.signUp, 'onkeypress -> "validateForm(event,this)") {
-    <div class="latest_card-header latest_card-header-primary text-center">
-        <h4 class="latest_card-title">@Messages(constants.Form.SIGNUP)</h4>
-    </div>
-    <div class="latest_card-body">
+        <h4>@Messages(constants.Form.SIGNUP)</h4>
         @CSRF.formField
         <div class="input-group">
             <div class="input-group-prepend">

@@ -5,10 +5,7 @@
 @(redeemFiatForm: Form[RedeemFiat.Data], zoneID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 
 @form(action = routes.RedeemFiatController.redeemFiat, 'onkeypress -> "validateForm(event,this)") {
-    <div class="latest_card-header latest_card-header-primary text-center">
-        <h4 class="latest_card-title">@Messages(constants.Form.REDEEM_FIAT)</h4>
-    </div>
-    <div class="latest_card-body">
+        <h4 >@Messages(constants.Form.REDEEM_FIAT)</h4>
         @CSRF.formField
         @inputText(redeemFiatForm(constants.FormField.ZONE_ID.name).copy(value = Some(zoneID)), '_label -> Messages(constants.FormField.ZONE_ID.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.ZONE_ID.name), 'required -> true)
         @inputText(redeemFiatForm(constants.FormField.REDEEM_AMOUNT.name), '_label -> Messages(constants.FormField.REDEEM_AMOUNT.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.REDEEM_AMOUNT.name), 'required -> true)
@@ -22,6 +19,6 @@
             }
             </ul>
         }
-        <button type="button" class="btn btn-sm btn-primary" onclick="submitForm(this)">@Messages(constants.Form.REDEEM_FIAT)</button>
-    </div>
+        <button type="button" onclick="submitForm(this)">@Messages(constants.Form.REDEEM_FIAT)</button>
+
 }

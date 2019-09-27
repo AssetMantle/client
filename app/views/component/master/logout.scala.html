@@ -8,7 +8,6 @@
   @form(action = routes.AccountController.logout, 'onkeypress -> "validateForm(event,this)") {
     @CSRF.formField
 
-    <div class="latest_card-body">
             @checkbox(logoutForm(constants.Form.RECEIVE_NOTIFICATIONS), '_label -> Messages(constants.Form.RECEIVE_NOTIFICATIONS))
             @Messages(constants.Form.RECEIVE_NOTIFICATIONS)
 
@@ -19,7 +18,6 @@
             }
             </ul>
         }
-        <button type="button" class="btn btn-primary btn-sm" onclick="submitForm(this)">@Messages(constants.Form.LOGOUT)</button>
-    </div>
+        <button type="button" onclick="submitForm(this)">@Messages(constants.Form.LOGOUT)</button>
 }
 

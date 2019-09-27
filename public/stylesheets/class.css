@@ -290,7 +290,6 @@
 }
 
 .firstBox {
-    width: 30%;
     margin-left: 10px;
     margin-bottom: 10px;
     padding-right: 10px;
@@ -556,6 +555,15 @@ dl .info::after {
     margin-bottom: -40px !important;
     padding-top: 20px !important;
 }
+.input-group-prepend{
+    display:grid;
+    margin-left: 50px;
+}
+.input-group-text{
+    margin-top: -50px;
+    margin-left: -40px;
+}
+
 .input-group-prepend span{
     color:#aaa !important;
 }

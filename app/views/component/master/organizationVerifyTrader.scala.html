@@ -5,15 +5,10 @@
 @(verifyTraderForm: Form[VerifyTrader.Data], aclAddress: String, organizationID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 
 @form(action = routes.SetACLController.organizationVerifyTrader, 'onkeypress -> "validateForm(event,this)") {
-    <div class="latest_card-header latest_card-header-primary text-center">
-        <h4 class="latest_card-title">@Messages(constants.Form.VERIFY_TRADER)</h4>
-    </div>
-    <div class="latest_card-body ml-cb">
+        <h4 >@Messages(constants.Form.VERIFY_TRADER)</h4>
         @CSRF.formField
-        @inputText(verifyTraderForm(constants.FormField.ACL_ADDRESS.name).copy(value = Some(aclAddress)), '_label -> Messages(constants.FormField.ACL_ADDRESS.name),
-            'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.ACL_ADDRESS.name), 'required -> true)
-        @inputText(verifyTraderForm(constants.FormField.ORGANIZATION_ID.name).copy(value = Some(organizationID)), '_label -> Messages(constants.FormField.ORGANIZATION_ID.name),
-            'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.ORGANIZATION_ID.name), 'required -> true)
+        @inputText(verifyTraderForm(constants.FormField.ACL_ADDRESS.name).copy(value = Some(aclAddress)), '_label -> Messages(constants.FormField.ACL_ADDRESS.name),'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.ACL_ADDRESS.name), 'required -> true)
+        @inputText(verifyTraderForm(constants.FormField.ORGANIZATION_ID.name).copy(value = Some(organizationID)), '_label -> Messages(constants.FormField.ORGANIZATION_ID.name),'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.ORGANIZATION_ID.name), 'required -> true)
         <div class="input-group-prepend">
             @checkbox(verifyTraderForm(constants.Form.ISSUE_ASSET), '_label -> Messages(constants.Form.ISSUE_ASSET))
             <span class="input-group-text">
@@ -122,6 +117,6 @@
             }
             </ul>
         }
-        <button type="button" class="btn btn-sm btn-primary" onclick="submitForm(this)">@Messages(constants.Form.VERIFY_TRADER)</button>
+        <button type="button"  onclick="submitForm(this)">@Messages(constants.Form.VERIFY_TRADER)</button>
     </div>
 }

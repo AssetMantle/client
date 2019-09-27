@@ -5,10 +5,8 @@
 @(organizationBankAccountDetailForm: Form[OrganizationBankAccountDetail.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
 @form(action = routes.AddOrganizationController.organizationBankAccountDetail, 'onkeypress -> "validateForm(event,this)") {
-    <div class="latest_card-header latest_card-header-primary text-center">
-        <h4 class="latest_card-title">@Messages(constants.Form.ORGANIZATION_BANK_ACCOUNT_DETAIL)</h4>
-    </div>
-    <div class="latest_card-body">
+
+        <h4 >@Messages(constants.Form.ORGANIZATION_BANK_ACCOUNT_DETAIL)</h4>
         @CSRF.formField
         @inputText(organizationBankAccountDetailForm(constants.FormField.ACCOUNT_HOLDER_NAME.name), '_label -> Messages(constants.FormField.ACCOUNT_HOLDER_NAME.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.ACCOUNT_HOLDER_NAME.name), 'required -> true)
         @inputText(organizationBankAccountDetailForm(constants.FormField.NICK_NAME.name), '_label -> Messages(constants.FormField.NICK_NAME.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.NICK_NAME.name), 'required -> true)
@@ -26,7 +24,6 @@
             }
             </ul>
         }
-        <button type="button" class="btn-sm btn btn-primary" onclick="getForm(jsRoutes.controllers.AddOrganizationController.userUpdateUBOsForm())">@Messages(constants.Form.BACK)</button>
-        <button type="button" class="btn-sm btn btn-primary" onclick="submitForm(this)">@Messages(constants.Form.NEXT)</button>
-    </div>
+        <button type="button" onclick="getForm(jsRoutes.controllers.AddOrganizationController.userUpdateUBOsForm())">@Messages(constants.Form.BACK)</button>
+        <button type="button" onclick="submitForm(this)">@Messages(constants.Form.NEXT)</button>
 }

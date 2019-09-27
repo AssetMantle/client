@@ -3,10 +3,7 @@
 
 @(addKeyFrom: Form[AddKey.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @form(action = routes.AddKeyController.blockchainAddKey, 'onkeypress -> "validateForm(event,this)") {
-    <div class="latest_card-header latest_card-header-primary text-center">
-        <h4 class="latest_card-title">@Messages(constants.Form.ADD_KEY)</h4>
-    </div>
-    <div class="latest_card-body">
+        <h4>@Messages(constants.Form.ADD_KEY)</h4>
         @CSRF.formField
         @inputText(addKeyFrom(constants.FormField.NAME.name), '_label -> Messages(constants.FormField.NAME.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.NAME.name), 'required -> true)
         @inputPassword(addKeyFrom(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PASSWORD.name), 'required -> true)
@@ -18,6 +15,5 @@
             }
             </ul>
         }
-        <button type="button" class="btn btn-primary btn-sm" onclick="submitForm(this)">@Messages(constants.Form.ADD_KEY)</button>
-    </div>
+        <button type="button"  onclick="submitForm(this)">@Messages(constants.Form.ADD_KEY)</button>
 }

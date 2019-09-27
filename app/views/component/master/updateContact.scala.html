@@ -5,10 +5,8 @@
 @(updateContactForm: Form[UpdateContact.Data], countryCallingCodes: Seq[(String, String)])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 
 @form(action = routes.ContactController.updateContact, 'onkeypress -> "validateForm(event,this)") {
-    <div class="latest_card-header latest_card-header-primary text-center">
-        <h4 class="latest_card-title">@Messages(constants.Form.UPDATE_CONTACT)</h4>
-    </div>
-    <div class="latest_card-body">
+
+        <h4 >@Messages(constants.Form.UPDATE_CONTACT)</h4>
         @CSRF.formField
         @inputText(updateContactForm(constants.FormField.MOBILE_NUMBER.name), '_label -> Messages(constants.FormField.MOBILE_NUMBER.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.MOBILE_NUMBER.name), 'required -> true)
         @inputText(updateContactForm(constants.FormField.EMAIL_ADDRESS.name), '_label -> Messages(constants.FormField.EMAIL_ADDRESS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.EMAIL_ADDRESS.name), 'required -> true)
@@ -20,6 +18,5 @@
             }
             </ul>
         }
-        <button type="button" class="btn btn-primary btn-sm" onclick="submitForm(this)">@Messages(constants.Form.UPDATE_CONTACT)</button>
-    </div>
+        <button type="button" onclick="submitForm(this)">@Messages(constants.Form.UPDATE_CONTACT)</button>
 }

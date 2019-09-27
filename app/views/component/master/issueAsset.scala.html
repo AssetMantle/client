@@ -4,10 +4,8 @@
 
 @(issueAssetForm: Form[IssueAsset.Data], requestID: String, accountID: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, takerAddress: Option[String])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @form(action = routes.IssueAssetController.issueAsset, 'onkeypress -> "validateForm(event,this)") {
-    <div class="latest_card-header latest_card-header-primary text-center">
-        <h4 class="latest_card-title">@Messages(constants.Form.ISSUE_ASSET)</h4>
-    </div>
-    <div class="latest_card-body">
+
+        <h4 >@Messages(constants.Form.ISSUE_ASSET)</h4>
         @CSRF.formField
         @inputText(issueAssetForm(constants.FormField.REQUEST_ID.name).copy(value = Some(requestID)), '_label -> Messages(constants.FormField.REQUEST_ID.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.REQUEST_ID.name), 'required -> true)
         @inputText(issueAssetForm(constants.FormField.ACCOUNT_ID.name).copy(value = Some(accountID)), '_label -> Messages(constants.FormField.ACCOUNT_ID.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.ACCOUNT_ID.name), 'required -> true)
@@ -27,7 +25,6 @@
             }
             </ul>
         }
-        <button type="button" class="btn btn-sm btn-primary" onclick="submitForm(this)">@Messages(constants.Form.ISSUE_ASSET)</button>
+        <button type="button" onclick="submitForm(this)">@Messages(constants.Form.ISSUE_ASSET)</button>
 
-    </div>
 }

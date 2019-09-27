@@ -5,10 +5,7 @@
 
 @(addOrganizationForm: Form[AddOrganization.Data], zones: Seq[Zone])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 @form(action = routes.AddOrganizationController.addOrganization, 'onkeypress -> "validateForm(event,this)") {
-    <div class="latest_card-header latest_card-header-primary text-center">
-        <h4 class="latest_card-title">@Messages(constants.Form.ADD_ORGANIZATION)</h4>
-    </div>
-    <div class="latest_card-body">
+           <h4 >@Messages(constants.Form.ADD_ORGANIZATION)</h4>
         @CSRF.formField
         <div id="allZones">
         @for(zone <- zones) {
@@ -54,7 +51,7 @@
             }
             </ul>
         }
-        <button type="button" class="btn-sm btn btn-primary" onclick="submitForm(this)">@Messages(constants.Form.NEXT)</button>
-    </div>
+        <button type="button" onclick="submitForm(this)">@Messages(constants.Form.NEXT)</button>
+
     <script src="@routes.Assets.versioned("javascripts/addOrganization.js")" type="text/javascript"></script>
 }

@@ -5,10 +5,8 @@
 @(addUBOsForm: Form[AddUBOs.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
 @form(action = routes.AddOrganizationController.userUpdateUBOs, 'onkeypress -> "validateForm(event,this)") {
-    <div class="latest_card-header latest_card-header-primary text-center">
-        <h4 class="latest_card-title">@Messages(constants.Form.ADD_UBOS)</h4>
-    </div>
-    <div class="latest_card-body">
+
+        <h4>@Messages(constants.Form.ADD_UBOS)</h4>
         @CSRF.formField
         @repeatWithIndex(addUBOsForm(constants.Form.UBOS), min = addUBOsForm(constants.Form.UBOS).indexes.length + 1) { (uboForm, i) =>
             <div id="@constants.Form.UBO @i">
@@ -26,8 +24,8 @@
             }
             </ul>
         }
-        <button type="button" class="btn-sm btn btn-primary" onclick="submitForm(this)">@Messages(constants.Form.ADD)/@Messages(constants.Form.UPDATE)</button>
-        <button type="button" class="btn-sm btn btn-primary" onclick="getForm(jsRoutes.controllers.AddOrganizationController.addOrganizationForm())">@Messages(constants.Form.BACK)</button>
-        <button type="button" class="btn-sm btn btn-primary" onclick="getForm(jsRoutes.controllers.AddOrganizationController.organizationBankAccountDetailForm())">@Messages(constants.Form.NEXT)</button>
-    </div>
+        <button type="button" onclick="submitForm(this)">@Messages(constants.Form.ADD)/@Messages(constants.Form.UPDATE)</button>
+        <button type="button" onclick="getForm(jsRoutes.controllers.AddOrganizationController.addOrganizationForm())">@Messages(constants.Form.BACK)</button>
+        <button type="button" onclick="getForm(jsRoutes.controllers.AddOrganizationController.organizationBankAccountDetailForm())">@Messages(constants.Form.NEXT)</button>
+
 }

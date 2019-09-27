@@ -4,10 +4,7 @@
 @(confirmSellerBidForm: Form[ConfirmSellerBid.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 
 @form(action = routes.ConfirmSellerBidController.blockchainConfirmSellerBid, 'onkeypress -> "validateForm(event,this)") {
-    <div class="latest_card-header latest_card-header-primary text-center">
-        <h4 class="latest_card-title">@Messages(constants.Form.CONFIRM_SELLER_BID)</h4>
-    </div>
-    <div class="latest_card-body">
+           <h4>@Messages(constants.Form.CONFIRM_SELLER_BID)</h4>
         @CSRF.formField
         @inputText(confirmSellerBidForm(constants.FormField.FROM.name), '_label -> Messages(constants.FormField.FROM.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.FROM.name), 'required -> true)
         @inputText(confirmSellerBidForm(constants.FormField.TO.name), '_label -> Messages(constants.FormField.TO.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.TO.name), 'required -> true)
@@ -26,7 +23,5 @@
             }
             </ul>
         }
-        <button type="button" class="btn btn-primary btn-sm" onclick="submitForm(this)">@Messages(constants.Form.CONFIRM_SELLER_BID)</button>
-    </div>
-    </div>
+        <button type="button" onclick="submitForm(this)">@Messages(constants.Form.CONFIRM_SELLER_BID)</button>
 }

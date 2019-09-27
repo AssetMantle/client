@@ -8,10 +8,7 @@
 
 @(organizationCompletionForm: Form[OrganizationCompletion.Data], organization: Organization, zone: Zone, organizationBankAccountDetail: OrganizationBankAccountDetail, organizationKYCs: Seq[OrganizationKYC])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, module: String, logger: Logger, loginState: LoginState = null)
 
-<div class="latest_card-header latest_card-header-primary text-center">
-    <h4 class="latest_card-title">@Messages(constants.Form.REVIEW)</h4>
-</div>
-<div class="latest_card-body">
+    <h4>@Messages(constants.Form.REVIEW)</h4>
     <div id="organization" class="flexItem thirdBox box lightBlue">
         <div class="leftText">
             <div>@Messages(constants.Form.ZONE_DETAILS): <br>
@@ -94,9 +91,8 @@
                     }
                     </ul>
                 }
-                <button type="button" class="btn-sm btn btn-primary" onclick="getForm(jsRoutes.controllers.AddOrganizationController.userUploadOrUpdateOrganizationKYCView())">@Messages(constants.Form.BACK)</button>
-                <button type="button" class="btn-sm btn btn-primary" onclick="submitForm(this)">@Messages(constants.Form.SUBMIT)</button>
+                <button type="button" onclick="getForm(jsRoutes.controllers.AddOrganizationController.userUploadOrUpdateOrganizationKYCView())">@Messages(constants.Form.BACK)</button>
+                <button type="button" onclick="submitForm(this)">@Messages(constants.Form.SUBMIT)</button>
             }
         </div>
     </div>
-</div>

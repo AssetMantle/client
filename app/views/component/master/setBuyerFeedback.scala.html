@@ -5,10 +5,8 @@
 @(setBuyerFeedbackForm: Form[SetBuyerFeedback.Data], sellerAddress: String, pegHash: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 
 @form(action = routes.SetBuyerFeedbackController.setBuyerFeedback, 'onkeypress -> "validateForm(event,this)") {
-    <div class="latest_card-header latest_card-header-primary text-center">
-        <h4 class="latest_card-title">@Messages(constants.Form.SET_BUYER_FEEDBACK)</h4>
-    </div>
-    <div class="latest_card-body">
+
+        <h4>@Messages(constants.Form.SET_BUYER_FEEDBACK)</h4>
         @CSRF.formField
         @inputText(setBuyerFeedbackForm(constants.FormField.SELLER_ADDRESS.name).copy(value = Some(sellerAddress)), '_label -> Messages(constants.FormField.SELLER_ADDRESS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.SELLER_ADDRESS.name), 'required -> true)
         @inputText(setBuyerFeedbackForm(constants.FormField.PEG_HASH.name).copy(value = Some(pegHash)), '_label -> Messages(constants.FormField.PEG_HASH.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PEG_HASH.name), 'required -> true)
@@ -23,6 +21,6 @@
             }
             </ul>
         }
-        <button type="button" class="btn btn-sm btn-primary" onclick="submitForm(this)">@Messages(constants.Form.SET_BUYER_FEEDBACK)</button>
-    </div>
+        <button type="button" onclick="submitForm(this)">@Messages(constants.Form.SET_BUYER_FEEDBACK)</button>
+
 }

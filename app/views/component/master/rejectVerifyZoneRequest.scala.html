@@ -4,10 +4,7 @@
 
 @(rejectVerifyZoneRequestForm: Form[RejectVerifyZoneRequest.Data], zoneID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @form(action = routes.AddZoneController.rejectVerifyZoneRequest, 'onkeypress -> "validateForm(event,this)") {
-    <div class="latest_card-header latest_card-header-primary text-center">
-        <h4 class="latest_card-title">@Messages(constants.Form.REJECT_VERIFY_ZONE_REQUEST)</h4>
-    </div>
-    <div class="latest_card-body">
+        <h4 >@Messages(constants.Form.REJECT_VERIFY_ZONE_REQUEST)</h4>
         @CSRF.formField
         @inputText(rejectVerifyZoneRequestForm(constants.FormField.ZONE_ID.name).copy(value = Some(zoneID)), '_label -> Messages(constants.FormField.ZONE_ID.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.ZONE_ID.name), 'required -> true)
 
@@ -18,6 +15,5 @@
             }
             </ul>
         }
-        <button type="button" class="btn btn-sm btn-primary" onclick="submitForm(this)">@Messages(constants.Form.REJECT_VERIFY_ZONE_REQUEST)</button>
-    </div>
+        <button type="button" onclick="submitForm(this)">@Messages(constants.Form.REJECT_VERIFY_ZONE_REQUEST)</button>
 }

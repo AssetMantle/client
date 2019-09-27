@@ -5,10 +5,7 @@
 @(redeemAssetForm: Form[RedeemAsset.Data], zoneID: String, pegHash: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 
 @form(action = routes.RedeemAssetController.redeemAsset, 'onkeypress -> "validateForm(event,this)") {
-    <div class="latest_card-header latest_card-header-primary text-center">
-        <h4 class="latest_card-title">@Messages(constants.Form.REDEEM_ASSET)</h4>
-    </div>
-    <div class="latest_card-body">
+        <h4>@Messages(constants.Form.REDEEM_ASSET)</h4>
         @CSRF.formField
         @inputText(redeemAssetForm(constants.FormField.ZONE_ID.name).copy(value = Some(zoneID)), '_label -> Messages(constants.FormField.ZONE_ID.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.ZONE_ID.name), 'required -> true)
         @inputText(redeemAssetForm(constants.FormField.PEG_HASH.name).copy(value = Some(pegHash)), '_label -> Messages(constants.FormField.PEG_HASH.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PEG_HASH.name), 'required -> true)
@@ -22,6 +19,5 @@
             }
             </ul>
         }
-        <button type="button" class="btn btn-sm btn-primary" onclick="submitForm(this)">@Messages(constants.Form.REDEEM_ASSET)</button>
-    </div>
+        <button type="button" onclick="submitForm(this)">@Messages(constants.Form.REDEEM_ASSET)</button>
 }

@@ -4,7 +4,7 @@
 @(uploadRoute: String, updateRoute: String, documentType: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
 @CSRF.formField
-<div id="updateSelector">
+<div id="updateSelector" class="centerText">
     <button class="btn" id="browseUpdateButton">@Messages(constants.Form.BROWSE)</button>
     <p class="centerText"><small>@Messages(constants.Form.OR)</small></p>
     <div class="dropBox">
@@ -12,7 +12,7 @@
     </div>
 </div>
 
-<div id="updater" class="hidden">
+<div id="updater" class="hidden centerText">
     <a id = "fileName"></a>
     <br>
     <div id="updateControls">

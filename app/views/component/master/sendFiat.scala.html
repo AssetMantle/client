@@ -5,10 +5,8 @@
 @(sendFiatForm: Form[SendFiat.Data], sellerAddress: String, pegHash: String, bid: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 
 @form(action = routes.SendFiatController.sendFiat, 'onkeypress -> "validateForm(event,this)") {
-    <div class="latest_card-header latest_card-header-primary text-center">
-        <h4 class="latest_card-title">@Messages(constants.Form.SEND_FIAT)</h4>
-    </div>
-    <div class="latest_card-body">
+
+        <h4>@Messages(constants.Form.SEND_FIAT)</h4>
         @CSRF.formField
         @inputText(sendFiatForm(constants.FormField.SELLER_ADDRESS.name).copy(value = Some(sellerAddress)), '_label -> Messages(constants.FormField.SELLER_ADDRESS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.SELLER_ADDRESS.name), 'required -> true)
         @inputText(sendFiatForm(constants.FormField.AMOUNT.name).copy(value = Some(bid.toString)), '_label -> Messages(constants.FormField.AMOUNT.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.AMOUNT.name), 'required -> true)
@@ -23,6 +21,5 @@
             }
             </ul>
         }
-        <button type="button" class="btn btn-primary btn-sm" onclick="submitForm(this)">@Messages(constants.Form.SEND_FIAT)</button>
-    </div>
+        <button type="button" onclick="submitForm(this)">@Messages(constants.Form.SEND_FIAT)</button>
 }
