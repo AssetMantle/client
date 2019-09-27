@@ -24,7 +24,7 @@ class ChangeSellerBidController @Inject()(messagesControllerComponents: Messages
     implicit request =>
       try {
         val negotiationRequest = masterTransactionNegotiationRequests.Service.getNegotiationByPegHashBuyerAccountIDAndSellerAccountID(pegHash, masterAccounts.Service.getId(buyerAddress), loginState.username)
-        Ok(views.html.component.master.changeSellerBid(views.companion.master.ChangeSellerBid.form.fill(views.companion.master.ChangeSellerBid.Data(negotiationRequest.id, "", buyerAddress, negotiationRequest.amount, 0, pegHash, constants.FormField.GAS.minimumValue))))
+        withUsernameToken.Ok(views.html.component.master.changeSellerBid(views.companion.master.ChangeSellerBid.form.fill(views.companion.master.ChangeSellerBid.Data(negotiationRequest.id, "", buyerAddress, negotiationRequest.amount, 0, pegHash, constants.FormField.GAS.minimumValue))))
       } catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }

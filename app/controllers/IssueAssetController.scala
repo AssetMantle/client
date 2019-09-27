@@ -23,12 +23,32 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
 
   private implicit val module: String = constants.Module.CONTROLLERS_ISSUE_ASSET
 
-  def issueAssetRequestForm(id: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.issueAssetRequest(views.companion.master.ConfirmTransaction.form.fill(views.companion.master.ConfirmTransaction.Data(id, Option(0), Option(""))), masterTransactionIssueAssetRequests.Service.getIssueAssetByID(id)))
+  def issueAssetRequestForm(id: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      try {
+        val asset = masterTransactionIssueAssetRequests.Service.getIssueAssetByID(id)
+        if (asset.accountID == loginState.username) {
+          withUsernameToken.Ok(views.html.component.master.issueAssetRequest(views.companion.master.ConfirmTransaction.form.fill(views.companion.master.ConfirmTransaction.Data(id, Option(0), Option(""))), asset))
+        } else {
+          Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
+        }
+      } catch {
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
   }
 
-  def assetDetail(id: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.assetDetail(masterTransactionIssueAssetRequests.Service.getIssueAssetByID(id), masterTransactionAssetFiles.Service.getAllDocuments(id)))
+  def assetDetail(id: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      try {
+        val asset = masterTransactionIssueAssetRequests.Service.getIssueAssetByID(id)
+        if (asset.accountID == loginState.username) {
+          withUsernameToken.Ok(views.html.component.master.assetDetail(asset, masterTransactionAssetFiles.Service.getAllDocuments(id)))
+        } else {
+          Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
+        }
+      } catch {
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
   }
 
   def issueAssetRequest: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
@@ -43,7 +63,7 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
             val asset = masterTransactionIssueAssetRequests.Service.getIssueAssetByID(confirmTransactionData.requestID)
             if (asset.physicalDocumentsHandledVia == constants.Form.COMDEX) {
               masterTransactionIssueAssetRequests.Service.updateStatusAndComment(confirmTransactionData.requestID, constants.Status.Asset.REQUESTED)
-              Ok(views.html.index(successes = Seq(constants.Response.ISSUE_ASSET_REQUEST_SENT)))
+              withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ISSUE_ASSET_REQUEST_SENT)))
             } else {
               val ticketID = transaction.process[blockchainTransaction.IssueAsset, transactionsIssueAsset.Request](
                 entity = blockchainTransaction.IssueAsset(from = loginState.address, to = loginState.address, documentHash = asset.documentHash.getOrElse(throw new BaseException(constants.Response.DOCUMENT_NOT_FOUND)), assetType = asset.assetType, assetPrice = asset.assetPrice, quantityUnit = asset.quantityUnit, assetQuantity = asset.assetQuantity, moderated = false, takerAddress = asset.takerAddress, gas = confirmTransactionData.gas.getOrElse(throw new BaseException(constants.Response.GAS_NOT_GIVEN)), ticketID = "", mode = transactionMode),
@@ -66,17 +86,21 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
       )
   }
 
-  def issueAssetDetailForm(id: Option[String]): Action[AnyContent] = Action { implicit request =>
-    try {
-      if (id.isDefined) {
-        val assetRequest = masterTransactionIssueAssetRequests.Service.getIssueAssetByID(id.get)
-        Ok(views.html.component.master.issueAssetDetail(views.companion.master.IssueAssetDetail.form.fill(views.companion.master.IssueAssetDetail.Data(Option(assetRequest.id), assetRequest.assetType, assetRequest.quantityUnit, assetRequest.assetQuantity, assetRequest.assetPrice, assetRequest.takerAddress, assetRequest.shipmentDetails.commodityName, assetRequest.shipmentDetails.quality, assetRequest.shipmentDetails.deliveryTerm, assetRequest.shipmentDetails.tradeType, assetRequest.shipmentDetails.portOfLoading, assetRequest.shipmentDetails.portOfDischarge, assetRequest.shipmentDetails.shipmentDate, assetRequest.physicalDocumentsHandledVia, assetRequest.paymentTerms))))
-      } else {
-        Ok(views.html.component.master.issueAssetDetail(views.companion.master.IssueAssetDetail.form))
+  def issueAssetDetailForm(id: Option[String]): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      try {
+        id match {
+          case Some(requestID) => val assetRequest = masterTransactionIssueAssetRequests.Service.getIssueAssetByID(requestID)
+            if (assetRequest.accountID == loginState.username) {
+              withUsernameToken.Ok(views.html.component.master.issueAssetDetail(views.companion.master.IssueAssetDetail.form.fill(views.companion.master.IssueAssetDetail.Data(Option(assetRequest.id), assetRequest.assetType, assetRequest.quantityUnit, assetRequest.assetQuantity, assetRequest.assetPrice, assetRequest.takerAddress, assetRequest.shipmentDetails.commodityName, assetRequest.shipmentDetails.quality, assetRequest.shipmentDetails.deliveryTerm, assetRequest.shipmentDetails.tradeType, assetRequest.shipmentDetails.portOfLoading, assetRequest.shipmentDetails.portOfDischarge, assetRequest.shipmentDetails.shipmentDate, assetRequest.physicalDocumentsHandledVia, assetRequest.paymentTerms))))
+            } else {
+              Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
+            }
+          case None => withUsernameToken.Ok(views.html.component.master.issueAssetDetail(views.companion.master.IssueAssetDetail.form))
+        }
+      } catch {
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
-    } catch {
-      case _: BaseException => InternalServerError(views.html.component.master.issueAssetDetail(views.companion.master.IssueAssetDetail.form))
-    }
   }
 
   def issueAssetDetail: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
@@ -99,10 +123,18 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
       )
   }
 
-  def issueAssetOBLForm(id: String): Action[AnyContent] = Action {
+  def issueAssetOBLForm(id: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val obl = masterTransactionAssetFiles.Service.getOrEmpty(id, constants.File.OBL).documentContent.getOrElse(Serializable.OBL("", "", "", "", "", "", new Date, "", 0, 0)).asInstanceOf[Serializable.OBL]
-      Ok(views.html.component.master.issueAssetOBL(views.companion.master.IssueAssetOBL.form.fill(views.companion.master.IssueAssetOBL.Data(id, obl.billOfLadingID, obl.portOfLoading, obl.shipperName, obl.shipperAddress, obl.notifyPartyName, obl.notifyPartyAddress, obl.dateOfShipping, obl.deliveryTerm, obl.weightOfConsignment, obl.declaredAssetValue)), masterTransactionAssetFiles.Service.getOrNone(id, constants.File.OBL)))
+      try {
+        if (masterTransactionIssueAssetRequests.Service.getAccountID(id) == loginState.username) {
+          val obl = masterTransactionAssetFiles.Service.getOrEmpty(id, constants.File.OBL).documentContent.getOrElse(Serializable.OBL("", "", "", "", "", "", new Date, "", 0, 0)).asInstanceOf[Serializable.OBL]
+          PartialContent(views.html.component.master.issueAssetOBL(views.companion.master.IssueAssetOBL.form.fill(views.companion.master.IssueAssetOBL.Data(id, obl.billOfLadingID, obl.portOfLoading, obl.shipperName, obl.shipperAddress, obl.notifyPartyName, obl.notifyPartyAddress, obl.dateOfShipping, obl.deliveryTerm, obl.weightOfConsignment, obl.declaredAssetValue)), masterTransactionAssetFiles.Service.getOrNone(id, constants.File.OBL)))
+        } else {
+          Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
+        }
+      } catch {
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
   }
 
   def issueAssetOBL: Action[AnyContent] = withTraderLoginAction.authenticated {
@@ -129,10 +161,18 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
         )
   }
 
-  def issueAssetInvoiceForm(id: String): Action[AnyContent] = Action {
+  def issueAssetInvoiceForm(id: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val invoice = masterTransactionAssetFiles.Service.getOrEmpty(id, constants.File.INVOICE).documentContent.getOrElse(Serializable.Invoice("", new Date)).asInstanceOf[Serializable.Invoice]
-      PartialContent(views.html.component.master.issueAssetInvoice(views.companion.master.IssueAssetInvoice.form.fill(views.companion.master.IssueAssetInvoice.Data(id, invoice.invoiceNumber, invoice.invoiceDate)), masterTransactionAssetFiles.Service.getOrNone(id, constants.File.INVOICE)))
+      try {
+        if (masterTransactionIssueAssetRequests.Service.getAccountID(id) == loginState.username) {
+          val invoice = masterTransactionAssetFiles.Service.getOrEmpty(id, constants.File.INVOICE).documentContent.getOrElse(Serializable.Invoice("", new Date)).asInstanceOf[Serializable.Invoice]
+          PartialContent(views.html.component.master.issueAssetInvoice(views.companion.master.IssueAssetInvoice.form.fill(views.companion.master.IssueAssetInvoice.Data(id, invoice.invoiceNumber, invoice.invoiceDate)), masterTransactionAssetFiles.Service.getOrNone(id, constants.File.INVOICE)))
+        } else {
+          Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
+        }
+      } catch {
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
   }
 
   def issueAssetInvoice: Action[AnyContent] = withTraderLoginAction.authenticated {
@@ -245,7 +285,8 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
 
   def issueAssetForm(requestID: String, accountID: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, takerAddress: Option[String]): Action[AnyContent] = Action {
     implicit request =>
-      Ok(views.html.component.master.issueAsset(views.companion.master.IssueAsset.form.fill(views.companion.master.IssueAsset.Data(requestID = requestID, accountID = accountID, documentHash = documentHash, assetType = assetType, assetPrice = assetPrice, quantityUnit = quantityUnit, assetQuantity = assetQuantity, takerAddress = takerAddress, gas = constants.FormField.GAS.minimumValue, password = ""))))  }
+      Ok(views.html.component.master.issueAsset(views.companion.master.IssueAsset.form.fill(views.companion.master.IssueAsset.Data(requestID = requestID, accountID = accountID, documentHash = documentHash, assetType = assetType, assetPrice = assetPrice, quantityUnit = quantityUnit, assetQuantity = assetQuantity, takerAddress = takerAddress, gas = constants.FormField.GAS.minimumValue, password = ""))))
+  }
 
   def issueAsset: Action[AnyContent] = withZoneLoginAction.authenticated {
     implicit loginState =>
