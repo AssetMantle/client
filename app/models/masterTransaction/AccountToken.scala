@@ -164,7 +164,7 @@ class AccountTokens @Inject()(actorSystem: ActorSystem, shutdownActors: Shutdown
     }
 
     def refreshSessionToken(username: String): String = {
-      val sessionToken: String = "constant token"
+      val sessionToken: String = utilities.IDGenerator.hexadecimal
       Await.result(refreshSessionTokenOnId(username, Some(util.hashing.MurmurHash3.stringHash(sessionToken).toString), DateTime.now(DateTimeZone.UTC).getMillis), Duration.Inf)
       sessionToken
     }
