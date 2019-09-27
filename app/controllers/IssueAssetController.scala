@@ -311,7 +311,7 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
                 masterTransactionIssueAssetRequests.Service.updateTicketID(issueAssetData.requestID, ticketID)
                 withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ASSET_ISSUED)))
               } else {
-                PreconditionFailed(views.html.index(failures = Seq(constants.Response.ALL_ASSET_FILES_NOT_VERIFIED, constants.Response.REQUEST_ALREADY_APPROVED_OR_REJECTED)))
+                PreconditionFailed(views.html.index(failures = Seq(constants.Response.ALL_ASSET_FILES_NOT_VERIFIED)))
               }
             }
             catch {

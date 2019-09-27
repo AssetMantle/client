@@ -219,7 +219,7 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
   def updateZoneKYCDocumentStatusForm(zoneID: String, documentType: String): Action[AnyContent] = withGenesisLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        Ok(views.html.component.master.updateZoneKYCDocumentStatus(masterZoneKYCs.Service.get(id = zoneID, documentType = documentType), views.companion.master.UpdateZoneKYCDocumentStatus.form.fill(views.companion.master.UpdateZoneKYCDocumentStatus.Data(zoneID = zoneID, documentType = documentType, status = false))))
+        Ok(views.html.component.master.updateZoneKYCDocumentStatus(zoneKYC = masterZoneKYCs.Service.get(id = zoneID, documentType = documentType)))
       } catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
@@ -230,7 +230,7 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
       views.companion.master.UpdateZoneKYCDocumentStatus.form.bindFromRequest().fold(
         formWithErrors => {
           try {
-            BadRequest(views.html.component.master.updateZoneKYCDocumentStatus(masterZoneKYCs.Service.get(id = formWithErrors(constants.FormField.ZONE_ID.name).value.get, documentType = formWithErrors(constants.FormField.DOCUMENT_TYPE.name).value.get), formWithErrors))
+            BadRequest(views.html.component.master.updateZoneKYCDocumentStatus(formWithErrors, masterZoneKYCs.Service.get(id = formWithErrors(constants.FormField.ZONE_ID.name).value.get, documentType = formWithErrors(constants.FormField.DOCUMENT_TYPE.name).value.get)))
           } catch {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
@@ -244,7 +244,7 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
               masterZoneKYCs.Service.reject(id = updateZoneKYCDocumentStatusData.zoneID, documentType = updateZoneKYCDocumentStatusData.documentType)
               utilitiesNotification.send(masterZones.Service.getAccountId(updateZoneKYCDocumentStatusData.zoneID), constants.Notification.FAILURE, Messages(constants.Response.DOCUMENT_REJECTED.message))
             }
-            PartialContent(views.html.component.master.updateZoneKYCDocumentStatus(masterZoneKYCs.Service.get(id = updateZoneKYCDocumentStatusData.zoneID, documentType = updateZoneKYCDocumentStatusData.documentType), views.companion.master.UpdateZoneKYCDocumentStatus.form))
+            PartialContent(views.html.component.master.updateZoneKYCDocumentStatus(zoneKYC = masterZoneKYCs.Service.get(id = updateZoneKYCDocumentStatusData.zoneID, documentType = updateZoneKYCDocumentStatusData.documentType)))
           }
           catch {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))

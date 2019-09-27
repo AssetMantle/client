@@ -6,7 +6,6 @@ import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Trait.Document
 import models.blockchain.{ACLAccounts, Negotiation}
-import models.master.{Accounts, Organizations, Zones}
 import models.{blockchain, master, masterTransaction}
 import play.api.http.ContentTypes
 import play.api.i18n.I18nSupport
@@ -173,7 +172,7 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
     implicit request =>
       try {
         val documents: Seq[Document[_]] = loginState.userType match {
-          case constants.User.ZONE => masterZoneKYC.Service.getAllDocuments(loginState.username)
+          case constants.User.ZONE => masterZoneKYC.Service.getAllDocuments(masterZones.Service.getID(loginState.username))
           case constants.User.ORGANIZATION => masterOrganizationKYCs.Service.getAllDocuments(masterOrganizations.Service.getID(loginState.username))
           case constants.User.TRADER => masterTraderKYCs.Service.getAllDocuments(masterTraders.Service.getID(loginState.username))
           case constants.User.USER => masterAccountKYC.Service.getAllDocuments(loginState.username)

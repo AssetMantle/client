@@ -306,7 +306,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
                 masterTraderKYCs.Service.zoneReject(id = updateTraderKYCDocumentZoneStatusData.traderID, documentType = updateTraderKYCDocumentZoneStatusData.documentType)
                 utilitiesNotification.send(masterTraders.Service.getAccountId(updateTraderKYCDocumentZoneStatusData.traderID), constants.Notification.FAILURE, Messages(constants.Response.DOCUMENT_REJECTED.message))
               }
-              Ok(views.html.component.master.updateTraderKYCDocumentZoneStatus(masterTraderKYCs.Service.get(id = updateTraderKYCDocumentZoneStatusData.traderID, documentType = updateTraderKYCDocumentZoneStatusData.documentType) , views.companion.master.UpdateTraderKYCDocumentZoneStatus.form))
+              PartialContent(views.html.component.master.updateTraderKYCDocumentZoneStatus(masterTraderKYCs.Service.get(id = updateTraderKYCDocumentZoneStatusData.traderID, documentType = updateTraderKYCDocumentZoneStatusData.documentType) , views.companion.master.UpdateTraderKYCDocumentZoneStatus.form))
             } else {
               Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
             }

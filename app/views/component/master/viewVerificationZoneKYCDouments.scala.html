@@ -9,7 +9,7 @@
         <a href="@routes.FileController.genesisAccessedFile(zoneKYC.fileName, zoneKYC.documentType)">@Messages(zoneKYC.documentType)</a>
     } {
         <div>
-            @views.html.component.master.updateZoneKYCDocumentStatus(zoneKYC, views.companion.master.UpdateZoneKYCDocumentStatus.form)
+            @views.html.component.master.updateZoneKYCDocumentStatus(zoneKYC = zoneKYC)
         </div>
     }
 }

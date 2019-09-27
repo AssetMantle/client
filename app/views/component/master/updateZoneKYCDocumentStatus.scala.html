@@ -3,7 +3,7 @@
 @import helper._
 @import views.companion.master.UpdateZoneKYCDocumentStatus
 
-@(zoneKYC: ZoneKYC, updateZoneKYCDocumentStatusForm: Form[UpdateZoneKYCDocumentStatus.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@(updateZoneKYCDocumentStatusForm: Form[UpdateZoneKYCDocumentStatus.Data] = views.companion.master.UpdateZoneKYCDocumentStatus.form, zoneKYC: ZoneKYC)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 
 <script src="@routes.Assets.versioned("javascripts/verifyReject.js")" type="text/javascript"></script>
 <div id="@Seq(zoneKYC.id, zoneKYC.documentType).mkString("")">
