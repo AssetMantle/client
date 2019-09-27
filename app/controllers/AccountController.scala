@@ -88,7 +88,8 @@ class AccountController @Inject()(
           val address = masterAccounts.Service.getAddress(loginData.username)
           implicit val loginState: LoginState = LoginState(loginData.username, userType, address, if (userType == constants.User.TRADER) Option(blockchainAclHashes.Service.getACL(blockchainAclAccounts.Service.getACLHash(address))) else None)
           val contactWarnings: Seq[constants.Response.Warning] = utilities.Contact.getWarnings(masterAccounts.Service.validateLoginAndGetStatus(loginData.username, loginData.password))
-          utilitiesNotification.registerNotificationToken(loginData.username, loginData.notificationToken)
+          masterTransactionAccountTokens.Service.insertOrUpdate(username = loginState.username, notificationToken = Some(loginData.notificationToken))
+          //utilitiesNotification.registerNotificationToken(loginData.username, loginData.notificationToken)
           utilitiesNotification.send(loginData.username, constants.Notification.LOGIN, loginData.username)
           loginState.userType match {
             case constants.User.GENESIS =>
@@ -127,15 +128,15 @@ class AccountController @Inject()(
         formWithErrors => {
           BadRequest(views.html.component.master.logout(formWithErrors))
         },
-        loginData => {
+        logoutData => {
           try {
-            if (!loginData.receiveNotifications) {
+            if (!logoutData.receiveNotifications) {
               masterTransactionAccountTokens.Service.deleteToken(loginState.username)
             } else {
               masterTransactionAccountTokens.Service.resetSessionTokenTime(loginState.username)
             }
             shutdownActor.onLogOut(constants.Module.ACTOR_MAIN_ACCOUNT, loginState.username)
-            if (masterAccounts.Service.getUserType(loginState.username) == constants.User.TRADER) {
+            if (loginState.userType == constants.User.TRADER) {
               shutdownActor.onLogOut(constants.Module.ACTOR_MAIN_ASSET, loginState.username)
               shutdownActor.onLogOut(constants.Module.ACTOR_MAIN_FIAT, loginState.username)
               shutdownActor.onLogOut(constants.Module.ACTOR_MAIN_NEGOTIATION, loginState.username)

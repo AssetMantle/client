@@ -116,9 +116,9 @@ class Notification @Inject()(masterContacts: master.Contacts,
     }
   }
 
-  def registerNotificationToken(id: String, notificationToken: String): Int = {
+  def registerNotificationToken(id: String, notificationToken: String): String = {
     try {
-      masterTransactionAccountTokens.Service.updateToken(id, notificationToken)
+      masterTransactionAccountTokens.Service.insertOrUpdate(username = id, notificationToken = Option(notificationToken))
     } catch {
       case baseException: BaseException => logger.error(baseException.failure.message, baseException)
         throw baseException

@@ -18,8 +18,7 @@ class WithUnknownLoginAction @Inject()(messagesControllerComponents: MessagesCon
     Action { implicit request ⇒
       try {
         val username = request.session.get(constants.Security.USERNAME).getOrElse(throw new BaseException(constants.Response.USERNAME_NOT_FOUND))
-        val sessionToken = request.session.get(constants.Security.TOKEN).getOrElse(throw new BaseException(constants.Response.TOKEN_NOT_FOUND))
-        masterTransactionAccountTokens.Service.tryVerifyingSessionToken(username, sessionToken)
+        masterTransactionAccountTokens.Service.tryVerifyingSessionToken(username, request.session.get(constants.Security.TOKEN).getOrElse(throw new BaseException(constants.Response.TOKEN_NOT_FOUND)))
         masterTransactionAccountTokens.Service.tryVerifyingSessionTokenTime(username)
         masterAccounts.Service.tryVerifyingUserType(username, constants.User.UNKNOWN)
         f(LoginState(username, constants.User.UNKNOWN, masterAccounts.Service.getAddress(username)))(request)

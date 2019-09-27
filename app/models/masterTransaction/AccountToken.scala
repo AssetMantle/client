@@ -88,7 +88,7 @@ class AccountTokens @Inject()(actorSystem: ActorSystem, shutdownActors: Shutdown
     }
   }
 
-  private def refreshSessionTokenOnId(id: String, tokenHash: Option[String], tokenTime: Long) = db.run(accountTokenTable.filter(_.id === id).map(accountTokenTable => (accountTokenTable.sessionTokenHash.?, accountTokenTable.sessionTokenTime)).update(tokenHash, tokenTime).asTry).map {
+  private def refreshSessionTokenOnID(id: String, tokenHash: Option[String], tokenTime: Long) = db.run(accountTokenTable.filter(_.id === id).map(accountTokenTable => (accountTokenTable.sessionTokenHash.?, accountTokenTable.sessionTokenTime)).update(tokenHash, tokenTime).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -145,9 +145,11 @@ class AccountTokens @Inject()(actorSystem: ActorSystem, shutdownActors: Shutdown
   }
 
   object Service {
-    def insertOrUpdate(username: String, notificationToken: String): Int = Await.result(upsert(AccountToken(username, None, Option(notificationToken), Option(DateTime.now(DateTimeZone.UTC).getMillis))), Duration.Inf)
-
-    def updateToken(id: String, notificationToken: String): Int = Await.result(upsert(AccountToken(id, Option(notificationToken), None, Option(DateTime.now(DateTimeZone.UTC).getMillis))), Duration.Inf)
+    def insertOrUpdate(username: String, notificationToken: Option[String]): String = {
+      val sessionToken: String = "constant token"
+      Await.result(upsert(AccountToken(username, notificationToken = notificationToken, sessionTokenHash = Some(util.hashing.MurmurHash3.stringHash(sessionToken).toString), sessionTokenTime = Option(DateTime.now(DateTimeZone.UTC).getMillis))), Duration.Inf)
+      sessionToken
+    }
 
     def getNotificationTokenById(id: String): Option[String] = Await.result(getNotificationTokenByID(id), Duration.Inf)
 
@@ -159,13 +161,13 @@ class AccountTokens @Inject()(actorSystem: ActorSystem, shutdownActors: Shutdown
     }
 
     def tryVerifyingSessionTokenTime(username: String): Boolean = {
-      if ((DateTime.now(DateTimeZone.UTC).getMillis - Await.result(getSessionTokenTimeByID(username), Duration.Inf).getOrElse(return false)) < sessionTokenTimeout) true
+      if (DateTime.now(DateTimeZone.UTC).getMillis - Await.result(getSessionTokenTimeByID(username), Duration.Inf).getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)) < sessionTokenTimeout) true
       else throw new BaseException(constants.Response.TOKEN_TIMEOUT)
     }
 
     def refreshSessionToken(username: String): String = {
       val sessionToken: String = "constant token"
-      Await.result(refreshSessionTokenOnId(username, Some(util.hashing.MurmurHash3.stringHash(sessionToken).toString), DateTime.now(DateTimeZone.UTC).getMillis), Duration.Inf)
+      Await.result(refreshSessionTokenOnID(username, Some(util.hashing.MurmurHash3.stringHash(sessionToken).toString), DateTime.now(DateTimeZone.UTC).getMillis), Duration.Inf)
       sessionToken
     }
 
@@ -175,7 +177,7 @@ class AccountTokens @Inject()(actorSystem: ActorSystem, shutdownActors: Shutdown
 
     def getTimedOutIds: Seq[String] = Await.result(getSessionTimedOutIds, Duration.Inf)
 
-    def deleteToken(username: String): Boolean = if (Await.result(deleteById(username), Duration.Inf) == 1) true else false
+    def deleteToken(username: String): Int = Await.result(deleteById(username), Duration.Inf)
   }
 
   actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {

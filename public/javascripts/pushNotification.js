@@ -6,7 +6,7 @@ getConfigurationAsynchronously("notification.storageBucket");
 getConfigurationAsynchronously("notification.senderID");
 
 $(document).ready(function () {
-
+    console.log("PUSH_NOTIFICATION");
     let config = {
         apiKey: getConfiguration("notification.apiKey"),
         authDomain: getConfiguration("notification.authDomain"),
@@ -23,9 +23,7 @@ $(document).ready(function () {
             return messaging.getToken()
         })
         .then(function (token) {
-            if ($("#" + "NOTIFICATION_TOKEN").length !== 0) {
-                document.getElementById("NOTIFICATION_TOKEN").value = token
-            }
+            $('#NOTIFICATION_TOKEN').val(token);
         })
 
         .catch(function (err) {
