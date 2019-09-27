@@ -56,6 +56,30 @@ class AccountTokens @Inject()(actorSystem: ActorSystem, shutdownActors: Shutdown
     }
   }
 
+  private def getNotificationTokenByID(id: String): Future[Option[String]] = db.run(accountTokenTable.filter(_.id === id).map(_.notificationToken.?).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => logger.info(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        None
+    }
+  }
+
+  private def getSessionTokenTimeByID(id: String): Future[Option[Long]] = db.run(accountTokenTable.filter(_.id === id).map(_.sessionTokenTime.?).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => logger.info(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        None
+    }
+  }
+
+  private def getSessionTokenHashByID(id: String): Future[Option[String]] = db.run(accountTokenTable.filter(_.id === id).map(_.sessionTokenHash.?).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => logger.info(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        None
+    }
+  }
+
   private def upsert(accountToken: AccountToken) = db.run(accountTokenTable.insertOrUpdate(accountToken).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -96,8 +120,6 @@ class AccountTokens @Inject()(actorSystem: ActorSystem, shutdownActors: Shutdown
     }
   }
 
-  private def checkById(id: String): Future[Boolean] = db.run(accountTokenTable.filter(_.id === id).exists.result)
-
   private def deleteById(id: String) = db.run(accountTokenTable.filter(_.id === id).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -127,27 +149,17 @@ class AccountTokens @Inject()(actorSystem: ActorSystem, shutdownActors: Shutdown
 
     def updateToken(id: String, notificationToken: String): Int = Await.result(upsert(AccountToken(id, Option(notificationToken), None, Option(DateTime.now(DateTimeZone.UTC).getMillis))), Duration.Inf)
 
-    def getTokenById(id: String): Option[String] = Await.result(findById(id), Duration.Inf).notificationToken
+    def getNotificationTokenById(id: String): Option[String] = Await.result(getNotificationTokenByID(id), Duration.Inf)
 
-    def getSessionTokenTimeById(id: String): Long = Await.result(findById(id), Duration.Inf).sessionTokenTime.getOrElse(0.toLong)
-
-    def ifExists(id: String): Boolean = Await.result(checkById(id), Duration.Inf)
-
-    def verifySessionToken(username: Option[String], sessionToken: Option[String]): Boolean = {
-      Await.result(findById(username.getOrElse(return false)), Duration.Inf).sessionTokenHash.get == util.hashing.MurmurHash3.stringHash(sessionToken.getOrElse(return false)).toString
-    }
+    def getSessionTokenTimeById(id: String): Long = Await.result(getSessionTokenTimeByID(id), Duration.Inf).getOrElse(0.toLong)
 
     def tryVerifyingSessionToken(username: String, sessionToken: String): Boolean = {
-      if (Await.result(findById(username), Duration.Inf).sessionTokenHash.get == util.hashing.MurmurHash3.stringHash(sessionToken).toString) true
+      if (Await.result(getSessionTokenHashByID(username), Duration.Inf).getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)) == util.hashing.MurmurHash3.stringHash(sessionToken).toString) true
       else throw new BaseException(constants.Response.INVALID_TOKEN)
     }
 
-    def verifySessionTokenTime(username: Option[String]): Boolean = {
-      (DateTime.now(DateTimeZone.UTC).getMillis - Await.result(findById(username.getOrElse(return false)), Duration.Inf).sessionTokenTime.getOrElse(return false)) < sessionTokenTimeout
-    }
-
     def tryVerifyingSessionTokenTime(username: String): Boolean = {
-      if ((DateTime.now(DateTimeZone.UTC).getMillis - Await.result(findById(username), Duration.Inf).sessionTokenTime.getOrElse(return false)) < sessionTokenTimeout) true
+      if ((DateTime.now(DateTimeZone.UTC).getMillis - Await.result(getSessionTokenTimeByID(username), Duration.Inf).getOrElse(return false)) < sessionTokenTimeout) true
       else throw new BaseException(constants.Response.TOKEN_TIMEOUT)
     }
 

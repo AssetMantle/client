@@ -79,9 +79,9 @@ class Notification @Inject()(masterContacts: master.Contacts,
       val title = messagesApi(pushNotification.title)
       val message = messagesApi(pushNotification.message, messageParameters: _*)
       masterTransactionNotifications.Service.create(accountID, title, message)
-      masterTransactionAccountTokens.Service.getTokenById(accountID).foreach(notificationToken => wsClient.url(pushNotificationURL).withHttpHeaders(constants.Header.CONTENT_TYPE -> constants.Header.APPLICATION_JSON).withHttpHeaders(constants.Header.AUTHORIZATION -> pushNotificationAuthorizationKey).post(Json.toJson(Data(notificationToken, Notification(title, message)))))
+      wsClient.url(pushNotificationURL).withHttpHeaders(constants.Header.CONTENT_TYPE -> constants.Header.APPLICATION_JSON).withHttpHeaders(constants.Header.AUTHORIZATION -> pushNotificationAuthorizationKey).post(Json.toJson(Data(masterTransactionAccountTokens.Service.getNotificationTokenById(accountID).getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)), Notification(title, message))))
     } catch {
-      case baseException: BaseException => logger.error(baseException.failure.message, baseException)
+      case baseException: BaseException => logger.info(baseException.failure.message, baseException)
         throw baseException
     }
   }
