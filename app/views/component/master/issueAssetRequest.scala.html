@@ -1,8 +1,8 @@
 @import controllers.actions.LoginState
 @import helper._
-@import views.companion.master.ConfirmTransaction
+@import views.companion.master.ConfirmIssueAssetTransaction
 
-@(confirmTransactionForm: Form[ConfirmTransaction.Data], asset: masterTransaction.IssueAssetRequest)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@(confirmTransactionForm: Form[ConfirmIssueAssetTransaction.Data], asset: masterTransaction.IssueAssetRequest)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 
 <div id="assetDetail"></div>
 

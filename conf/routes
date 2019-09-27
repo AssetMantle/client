@@ -237,8 +237,11 @@ POST        /master/changeBuyerBid                                       control
 GET         /master/changeSellerBid                                      controllers.ChangeSellerBidController.changeSellerBidForm(buyerAddress:String, pegHash: String)
 POST        /master/changeSellerBid                                      controllers.ChangeSellerBidController.changeSellerBid
 
-GET         /master/confirmBuyerBid                                      controllers.ConfirmBuyerBidController.confirmBuyerBidForm(sellerAddress:String, pegHash: String, bid:Int)
+GET         /master/confirmBuyerBid                                      controllers.ConfirmBuyerBidController.confirmBuyerBidForm(requestID: String)
 POST        /master/confirmBuyerBid                                      controllers.ConfirmBuyerBidController.confirmBuyerBid
+
+GET         /master/confirmBuyerBidDetail                                controllers.ConfirmBuyerBidController.confirmBuyerBidDetailForm(sellerAddress:String, pegHash: String, bid:Int)
+POST        /master/confirmBuyerBidDetail                                controllers.ConfirmBuyerBidController.confirmBuyerBidDetail
 
 GET         /master/confirmSellerBid                                     controllers.ConfirmSellerBidController.confirmSellerBidForm(buyerAddress:String, pegHash: String, bid:Int)
 POST        /master/confirmSellerBid                                     controllers.ConfirmSellerBidController.confirmSellerBid

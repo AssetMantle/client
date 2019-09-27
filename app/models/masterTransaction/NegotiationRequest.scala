@@ -76,6 +76,14 @@ class NegotiationRequests @Inject()(protected val databaseConfigProvider: Databa
     }
   }
 
+  private def findIDByPegHashAndBuyerAccountID(pegHash: String, buyerAccountID: String): Future[Option[String]] = db.run(negotiationRequestTable.filter(_.pegHash === pegHash).filter(_.buyerAccountID === buyerAccountID).map(_.id).result.head.asTry).map {
+    case Success(result) => Option(result)
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => logger.info(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        None
+    }
+  }
+
   private def findNegotiationByPegHashBuyerAccountIDAndSellerAccountID(pegHash: String, buyerAccountID: String, sellerAccountID: String): Future[NegotiationRequest] = db.run(negotiationRequestTable.filter(_.pegHash === pegHash).filter(_.buyerAccountID === buyerAccountID).filter(_.sellerAccountID === sellerAccountID).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -152,6 +160,8 @@ class NegotiationRequests @Inject()(protected val databaseConfigProvider: Databa
 
     def insertOrUpdateChangeBid(requestID: String, buyerAccountID: String, sellerAccountID: String, pegHash: String, amount: Int): Int = Await.result(upsert(NegotiationRequest(requestID, None, buyerAccountID, sellerAccountID, pegHash, amount, constants.Status.Asset.UNDER_NEGOTIATION, None)), Duration.Inf)
 
+    def getNegotiationByID(id: String): NegotiationRequest = Await.result(find(id), Duration.Inf)
+
     def updateNegotiationID(negotiationID: String, buyerAccountID: String, pegHash: String): Int = Await.result(updateNegotiationIDByBuyerAccountIDAndPegHash(Option(negotiationID), buyerAccountID, pegHash), Duration.Inf)
 
     def updateAmount(negotiationID: String, amount: Int): Int = Await.result(updateAmountByNegotiationID(negotiationID, amount), Duration.Inf)
@@ -163,6 +173,8 @@ class NegotiationRequests @Inject()(protected val databaseConfigProvider: Databa
     def checkNegotiationAndAccountIDExists(id: String ,accountID: String): Boolean = Await.result(checkByIDAndAccountID(id, accountID), Duration.Inf)
 
     def getNegotiationByPegHashAndBuyerAccountID(pegHash: String ,buyerAccountID: String): Option[NegotiationRequest] = Await.result(findNegotiationByPegHashAndBuyerAccountID(pegHash, buyerAccountID), Duration.Inf)
+
+    def getIDByPegHashAndBuyerAccountID(pegHash: String ,buyerAccountID: String): Option[String] = Await.result(findIDByPegHashAndBuyerAccountID(pegHash, buyerAccountID), Duration.Inf)
 
     def getNegotiationByPegHashBuyerAccountIDAndSellerAccountID(pegHash: String ,buyerAccountID: String, sellerAccountID: String): NegotiationRequest = Await.result(findNegotiationByPegHashBuyerAccountIDAndSellerAccountID(pegHash, buyerAccountID, sellerAccountID), Duration.Inf)
   }
