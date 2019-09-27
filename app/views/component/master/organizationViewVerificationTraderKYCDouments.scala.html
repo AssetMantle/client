@@ -9,7 +9,7 @@
         <a href="@routes.FileController.organizationAccessedTraderKYCFile(traderKYC.id, traderKYC.fileName, traderKYC.documentType)">@Messages(traderKYC.documentType)</a>
     } {
         <div>
-            @views.html.component.master.updateTraderKYCDocumentOrganizationStatus(traderKYC, views.companion.master.UpdateTraderKYCDocumentOrganizationStatus.form)
+            @views.html.component.master.updateTraderKYCDocumentOrganizationStatus(traderKYC = traderKYC)
         </div>
         <br>
         <span class="red">@Messages(constants.Form.ZONE_VERIFICATION):

@@ -278,7 +278,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
     implicit request =>
       try {
         if (masterZones.Service.getID(loginState.username) == masterOrganizations.Service.getZoneID(organizationID)) {
-          Ok(views.html.component.master.updateOrganizationKYCDocumentStatus(masterOrganizationKYCs.Service.get(id = organizationID, documentType = documentType), views.companion.master.UpdateOrganizationKYCDocumentStatus.form.fill(views.companion.master.UpdateOrganizationKYCDocumentStatus.Data(organizationID = organizationID, documentType = documentType, status = false))))
+          Ok(views.html.component.master.updateOrganizationKYCDocumentStatus(organizationKYC = masterOrganizationKYCs.Service.get(id = organizationID, documentType = documentType)))
         }
         else {
           Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
@@ -293,7 +293,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
       views.companion.master.UpdateOrganizationKYCDocumentStatus.form.bindFromRequest().fold(
         formWithErrors => {
           try {
-            BadRequest(views.html.component.master.updateOrganizationKYCDocumentStatus(masterOrganizationKYCs.Service.get(id = formWithErrors(constants.FormField.ORGANIZATION_ID.name).value.get, documentType = formWithErrors(constants.FormField.DOCUMENT_TYPE.name).value.get), formWithErrors))
+            BadRequest(views.html.component.master.updateOrganizationKYCDocumentStatus(formWithErrors, masterOrganizationKYCs.Service.get(id = formWithErrors(constants.FormField.ORGANIZATION_ID.name).value.get, documentType = formWithErrors(constants.FormField.DOCUMENT_TYPE.name).value.get)))
           } catch {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
@@ -308,7 +308,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
                 masterOrganizationKYCs.Service.reject(id = updateOrganizationKYCDocumentStatusData.organizationID, documentType = updateOrganizationKYCDocumentStatusData.documentType)
                 utilitiesNotification.send(masterOrganizations.Service.getAccountId(updateOrganizationKYCDocumentStatusData.organizationID), constants.Notification.FAILURE, Messages(constants.Response.DOCUMENT_REJECTED.message))
               }
-              PartialContent(views.html.component.master.updateOrganizationKYCDocumentStatus(masterOrganizationKYCs.Service.get(updateOrganizationKYCDocumentStatusData.organizationID, updateOrganizationKYCDocumentStatusData.documentType), views.companion.master.UpdateOrganizationKYCDocumentStatus.form))
+              PartialContent(views.html.component.master.updateOrganizationKYCDocumentStatus(organizationKYC = masterOrganizationKYCs.Service.get(updateOrganizationKYCDocumentStatusData.organizationID, updateOrganizationKYCDocumentStatusData.documentType)))
             } else {
               Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
             }

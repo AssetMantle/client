@@ -222,7 +222,7 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
     implicit request =>
       try {
         if (masterZones.Service.getID(loginState.username) == masterTraders.Service.getZoneIDByAccountID(masterTransactionIssueAssetRequests.Service.getAccountID(fileID))) {
-          Ok(views.html.component.master.updateAssetDocumentStatus(masterTransactionAssetFiles.Service.get(id = fileID, documentType = documentType) ,views.companion.master.UpdateAssetDocumentStatus.form.fill(views.companion.master.UpdateAssetDocumentStatus.Data(fileID = fileID, documentType = documentType, status = false))))
+          Ok(views.html.component.master.updateAssetDocumentStatus(file = masterTransactionAssetFiles.Service.get(id = fileID, documentType = documentType) ))
         } else {
           Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
         }
@@ -236,7 +236,7 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
       views.companion.master.UpdateAssetDocumentStatus.form.bindFromRequest().fold(
         formWithErrors => {
           try {
-            BadRequest(views.html.component.master.updateAssetDocumentStatus(masterTransactionAssetFiles.Service.get(id = formWithErrors(constants.FormField.FILE_ID.name).value.get, documentType = formWithErrors(constants.FormField.DOCUMENT_TYPE.name).value.get), formWithErrors))
+            BadRequest(views.html.component.master.updateAssetDocumentStatus(formWithErrors, masterTransactionAssetFiles.Service.get(id = formWithErrors(constants.FormField.FILE_ID.name).value.get, documentType = formWithErrors(constants.FormField.DOCUMENT_TYPE.name).value.get)))
           } catch {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
@@ -250,7 +250,7 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
               masterTransactionAssetFiles.Service.reject(id = updateAssetDocumentStatusData.fileID, documentType = updateAssetDocumentStatusData.documentType)
               utilitiesNotification.send(masterTransactionIssueAssetRequests.Service.getAccountID(updateAssetDocumentStatusData.fileID), constants.Notification.FAILURE, Messages(constants.Response.DOCUMENT_REJECTED.message))
             }
-            PartialContent(views.html.component.master.updateAssetDocumentStatus(masterTransactionAssetFiles.Service.get(id = updateAssetDocumentStatusData.fileID, documentType = updateAssetDocumentStatusData.documentType) ,views.companion.master.UpdateAssetDocumentStatus.form))
+            PartialContent(views.html.component.master.updateAssetDocumentStatus(file = masterTransactionAssetFiles.Service.get(id = updateAssetDocumentStatusData.fileID, documentType = updateAssetDocumentStatusData.documentType) ))
           }
           catch {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))

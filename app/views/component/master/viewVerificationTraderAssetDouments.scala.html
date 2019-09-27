@@ -10,7 +10,7 @@
         <a href="@routes.FileController.zoneAccessedAssetFile(file.id, file.fileName, file.documentType)">@Messages(file.documentType)</a>
     } {
         <div>
-            @views.html.component.master.updateAssetDocumentStatus(file, views.companion.master.UpdateAssetDocumentStatus.form)
+            @views.html.component.master.updateAssetDocumentStatus(file = file)
         </div>
         <br>
         @file.documentContent match {

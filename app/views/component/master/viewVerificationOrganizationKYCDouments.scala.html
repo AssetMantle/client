@@ -10,7 +10,7 @@
         <a href="@routes.FileController.zoneAccessedOrganizationKYCFile(organizationKYC.id, organizationKYC.fileName, organizationKYC.documentType)">@Messages(organizationKYC.documentType)</a>
     } {
         <div>
-            @views.html.component.master.updateOrganizationKYCDocumentStatus(organizationKYC, views.companion.master.UpdateOrganizationKYCDocumentStatus.form)
+            @views.html.component.master.updateOrganizationKYCDocumentStatus(organizationKYC = organizationKYC)
         </div>
     }
 }

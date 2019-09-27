@@ -276,7 +276,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
     implicit request =>
       try {
         if (masterZones.Service.getID(loginState.username) == masterTraders.Service.getZoneID(traderID)) {
-          Ok(views.html.component.master.updateTraderKYCDocumentZoneStatus(masterTraderKYCs.Service.get(id = traderID, documentType = documentType) , views.companion.master.UpdateTraderKYCDocumentZoneStatus.form.fill(views.companion.master.UpdateTraderKYCDocumentZoneStatus.Data(traderID = traderID, documentType = documentType, zoneStatus = false))))
+          Ok(views.html.component.master.updateTraderKYCDocumentZoneStatus(traderKYC = masterTraderKYCs.Service.get(id = traderID, documentType = documentType)))
         }
         else {
           Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
@@ -291,7 +291,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
       views.companion.master.UpdateTraderKYCDocumentZoneStatus.form.bindFromRequest().fold(
         formWithErrors => {
           try {
-            BadRequest(views.html.component.master.updateTraderKYCDocumentZoneStatus(masterTraderKYCs.Service.get(id = formWithErrors(constants.FormField.TRADER_ID.name).value.get, documentType = formWithErrors(constants.FormField.DOCUMENT_TYPE.name).value.get), formWithErrors))
+            BadRequest(views.html.component.master.updateTraderKYCDocumentZoneStatus(formWithErrors, masterTraderKYCs.Service.get(id = formWithErrors(constants.FormField.TRADER_ID.name).value.get, documentType = formWithErrors(constants.FormField.DOCUMENT_TYPE.name).value.get)))
           } catch {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
@@ -306,7 +306,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
                 masterTraderKYCs.Service.zoneReject(id = updateTraderKYCDocumentZoneStatusData.traderID, documentType = updateTraderKYCDocumentZoneStatusData.documentType)
                 utilitiesNotification.send(masterTraders.Service.getAccountId(updateTraderKYCDocumentZoneStatusData.traderID), constants.Notification.FAILURE, Messages(constants.Response.DOCUMENT_REJECTED.message))
               }
-              PartialContent(views.html.component.master.updateTraderKYCDocumentZoneStatus(masterTraderKYCs.Service.get(id = updateTraderKYCDocumentZoneStatusData.traderID, documentType = updateTraderKYCDocumentZoneStatusData.documentType) , views.companion.master.UpdateTraderKYCDocumentZoneStatus.form))
+              PartialContent(views.html.component.master.updateTraderKYCDocumentZoneStatus( traderKYC = masterTraderKYCs.Service.get(id = updateTraderKYCDocumentZoneStatusData.traderID, documentType = updateTraderKYCDocumentZoneStatusData.documentType) ))
             } else {
               Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
             }
@@ -441,7 +441,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
       implicit request =>
         try {
           if (masterOrganizations.Service.getID(loginState.username) == masterTraders.Service.getOrganizationID(traderID)) {
-            Ok(views.html.component.master.updateTraderKYCDocumentOrganizationStatus(masterTraderKYCs.Service.get(id = traderID, documentType = documentType), views.companion.master.UpdateTraderKYCDocumentOrganizationStatus.form.fill(views.companion.master.UpdateTraderKYCDocumentOrganizationStatus.Data(traderID = traderID, documentType = documentType, organizationStatus = false))))
+            Ok(views.html.component.master.updateTraderKYCDocumentOrganizationStatus(traderKYC = masterTraderKYCs.Service.get(id = traderID, documentType = documentType)))
           }
           else {
             Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
@@ -456,7 +456,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
       views.companion.master.UpdateTraderKYCDocumentOrganizationStatus.form.bindFromRequest().fold(
         formWithErrors => {
           try {
-            BadRequest(views.html.component.master.updateTraderKYCDocumentOrganizationStatus(masterTraderKYCs.Service.get(id = formWithErrors(constants.FormField.TRADER_ID.name).value.get, documentType = formWithErrors(constants.FormField.DOCUMENT_TYPE.name).value.get), formWithErrors))
+            BadRequest(views.html.component.master.updateTraderKYCDocumentOrganizationStatus(formWithErrors, masterTraderKYCs.Service.get(id = formWithErrors(constants.FormField.TRADER_ID.name).value.get, documentType = formWithErrors(constants.FormField.DOCUMENT_TYPE.name).value.get)))
           } catch {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
@@ -471,7 +471,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
                 masterTraderKYCs.Service.organizationReject(id = updateTraderKYCDocumentOrganizationStatusData.traderID, documentType = updateTraderKYCDocumentOrganizationStatusData.documentType)
                 utilitiesNotification.send(masterTraders.Service.getAccountId(updateTraderKYCDocumentOrganizationStatusData.traderID), constants.Notification.FAILURE, Messages(constants.Response.DOCUMENT_REJECTED.message))
               }
-              PartialContent(views.html.component.master.updateTraderKYCDocumentOrganizationStatus(masterTraderKYCs.Service.get(id = updateTraderKYCDocumentOrganizationStatusData.traderID, documentType = updateTraderKYCDocumentOrganizationStatusData.documentType), views.companion.master.UpdateTraderKYCDocumentOrganizationStatus.form))
+              PartialContent(views.html.component.master.updateTraderKYCDocumentOrganizationStatus(traderKYC = masterTraderKYCs.Service.get(id = updateTraderKYCDocumentOrganizationStatusData.traderID, documentType = updateTraderKYCDocumentOrganizationStatusData.documentType)))
             } else {
               Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
             }
