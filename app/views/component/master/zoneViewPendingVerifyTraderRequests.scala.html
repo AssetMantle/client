@@ -1,7 +1,6 @@
 @import controllers.actions.LoginState
 @import models.master.Trader
 @(traderVerificationRequests: Seq[Trader])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
-<script src="@routes.Assets.versioned("javascripts/kycVerification.js")" type="text/javascript"></script>
 @for(traderVerificationRequest <- traderVerificationRequests) {
     <div class="col-md-12">
         <br>
@@ -18,5 +17,4 @@
           <button class="cmuk-button cmuk-button-danger cmuk-button-small" onclick="getForm(jsRoutes.controllers.SetACLController.zoneRejectVerifyTraderRequestForm('@traderVerificationRequest.id'))">@Messages(constants.Form.REJECT)</button>
         </div>
     </div>
-    <br>
 }
