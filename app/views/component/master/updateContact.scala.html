@@ -10,8 +10,8 @@
     </div>
     <div class="latest_card-body">
         @CSRF.formField
-      @inputText(updateContactForm(constants.FormField.MOBILE_NUMBER.name), '_label -> Messages(constants.FormField.MOBILE_NUMBER.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.MOBILE_NUMBER.name), 'required -> true)
-      @inputText(updateContactForm(constants.FormField.EMAIL_ADDRESS.name), '_label -> Messages(constants.FormField.EMAIL_ADDRESS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.EMAIL_ADDRESS.name), 'required -> true)
+        @inputText(updateContactForm(constants.FormField.MOBILE_NUMBER.name), '_label -> Messages(constants.FormField.MOBILE_NUMBER.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.MOBILE_NUMBER.name), 'required -> true)
+        @inputText(updateContactForm(constants.FormField.EMAIL_ADDRESS.name), '_label -> Messages(constants.FormField.EMAIL_ADDRESS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.EMAIL_ADDRESS.name), 'required -> true)
         @select(updateContactForm(constants.FormField.COUNTRY_CODE.name), options = countryCallingCodes, '_label -> Messages(constants.FormField.COUNTRY_CODE.name))
         @if(updateContactForm.hasGlobalErrors) {
             <ul>

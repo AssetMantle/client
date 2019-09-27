@@ -41,9 +41,10 @@ function transactionExplorer() {
     wsNewTransaction.onclose = function (event) {
     };
 
-    $(window).submit(function () {
+    $(window).replaceAll(function () {
         wsNewTransaction.close();
     });
+
 }
 
 $('#indexBottomDivision').ready(function () {

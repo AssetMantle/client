@@ -225,7 +225,7 @@ class IssueAssetRequests @Inject()(protected val databaseConfigProvider: Databas
 
     def getStatus(id: String): String = Await.result(getStatusByID(id), Duration.Inf)
 
-    def verifyRequestedStatus(id: String): Boolean = Await.result(verifyStatusByID(id, constants.Status.Asset.REQUESTED), Duration.Inf)
+    def verifyRequestedStatus(id: String): Boolean = if (Await.result(verifyStatusByID(id, constants.Status.Asset.REQUESTED), Duration.Inf)) true else throw new BaseException(constants.Response.REQUEST_ALREADY_APPROVED_OR_REJECTED)
 
   }
 

@@ -144,8 +144,8 @@ POST        /master/reviewTraderCompletion                               control
 GET         /master/zoneVerifyTrader                                     controllers.SetACLController.zoneVerifyTraderForm(accountID: String, organizationID: String)
 POST        /master/zoneVerifyTrader                                     controllers.SetACLController.zoneVerifyTrader
 GET         /master/zoneViewTraderKYCDocuments                           controllers.SetACLController.zoneViewKYCDocuments(traderID: String)
-GET         /master/zoneVerifyTraderKYCDocument                          controllers.SetACLController.zoneVerifyKYCDocument(traderID: String, documentType: String)
-GET         /master/zoneRejectTraderKYCDocument                          controllers.SetACLController.zoneRejectKYCDocument(traderID: String, documentType: String)
+GET         /master/updateTraderKYCDocumentZoneStatus                    controllers.SetACLController.updateTraderKYCDocumentZoneStatusForm(traderID: String, documentType: String)
+POST        /master/updateTraderKYCDocumentZoneStatus                    controllers.SetACLController.updateTraderKYCDocumentZoneStatus
 GET         /master/zoneViewVerifyTraderRequests                         controllers.SetACLController.zoneViewPendingVerifyTraderRequests
 GET         /master/zoneRejectVerifyTraderRequest                        controllers.SetACLController.zoneRejectVerifyTraderRequestForm(traderID: String)
 POST        /master/zoneRejectVerifyTraderRequest                        controllers.SetACLController.zoneRejectVerifyTraderRequest
@@ -155,8 +155,8 @@ POST        /master/organizationVerifyTrader                             control
 GET         /master/organizationModifyTrader                             controllers.SetACLController.organizationModifyTraderForm(accountID: String)
 POST        /master/organizationModifyTrader                             controllers.SetACLController.organizationModifyTrader
 GET         /master/organzationViewTraderKYCDocuments                    controllers.SetACLController.organizationViewKYCDocuments(traderID: String)
-GET         /master/organizationVerifyTraderKYCDocument                  controllers.SetACLController.organizationVerifyKYCDocument(traderID: String, documentType: String)
-GET         /master/organizationRejectTraderKYCDocument                  controllers.SetACLController.organizationRejectKYCDocument(traderID: String, documentType: String)
+GET         /master/updateTraderKYCDocumentOrganizationStatus            controllers.SetACLController.updateTraderKYCDocumentOrganizationStatusForm(traderID: String, documentType: String)
+POST        /master/updateTraderKYCDocumentOrganizationStatus            controllers.SetACLController.updateTraderKYCDocumentOrganizationStatus
 GET         /master/organizationViewVerifyTraderRequests                 controllers.SetACLController.organizationViewPendingVerifyTraderRequests
 GET         /master/organizationRejectVerifyTraderRequest                controllers.SetACLController.organizationRejectVerifyTraderRequestForm(traderID: String)
 POST        /master/organizationRejectVerifyTraderRequest                controllers.SetACLController.organizationRejectVerifyTraderRequest
@@ -197,8 +197,8 @@ POST        /master/reviewOrganizationKYC                                control
 GET         /master/viewVerifyOrganizationRequests                       controllers.AddOrganizationController.viewPendingVerifyOrganizationRequests
 GET         /master/viewOrganizationVerificationBankAccountDetail        controllers.AddOrganizationController.viewOrganizationVerificationBankAccountDetail(organizationID: String)
 GET         /master/viewOrganizationKYCDocuments                         controllers.AddOrganizationController.viewKYCDocuments(organizationID: String)
-GET         /master/verifyOrganizationKYCDocument                        controllers.AddOrganizationController.verifyKYCDocument(organizationID: String, documentType: String)
-GET         /master/rejectOrganizationKYCDocument                        controllers.AddOrganizationController.rejectKYCDocument(organizationID: String, documentType: String)
+GET         /master/updateOrganizationKYCDocumentStatus                  controllers.AddOrganizationController.updateOrganizationKYCDocumentStatusForm(organizationID: String, documentType: String)
+POST        /master/updateOrganizationKYCDocumentStatus                  controllers.AddOrganizationController.updateOrganizationKYCDocumentStatus
 GET         /master/rejectVerifyOrganizationRequest                      controllers.AddOrganizationController.rejectVerifyOrganizationRequestForm(organizationID: String)
 POST        /master/rejectVerifyOrganizationRequest                      controllers.AddOrganizationController.rejectVerifyOrganizationRequest
 GET         /master/verifyOrganization                                   controllers.AddOrganizationController.verifyOrganizationForm(organizationID: String, zoneID: String)
@@ -218,8 +218,8 @@ POST        /master/reviewZoneCompletion                                 control
 GET         /master/verifyZone                                           controllers.AddZoneController.verifyZoneForm(zoneID: String)
 POST        /master/verifyZone                                           controllers.AddZoneController.verifyZone
 GET         /master/viewZoneKYCDocuments                                 controllers.AddZoneController.viewKYCDocuments(accountID: String)
-GET         /master/verifyZoneKYCDocument                                controllers.AddZoneController.verifyKYCDocument(accountID: String, documentType: String)
-GET         /master/rejectZoneKYCDocument                                controllers.AddZoneController.rejectKYCDocument(accountID: String, documentType: String)
+GET         /master/updateZoneKYCDocumentStatus                          controllers.AddZoneController.updateZoneKYCDocumentStatusForm(zoneID: String, documentType: String)
+POST        /master/updateZoneKYCDocumentStatus                          controllers.AddZoneController.updateZoneKYCDocumentStatus
 
 GET         /master/viewVerifyZoneRequests                               controllers.AddZoneController.viewPendingVerifyZoneRequests
 GET         /master/rejectVerifyZoneRequest                              controllers.AddZoneController.rejectVerifyZoneRequestForm(zoneID: String)
@@ -263,8 +263,8 @@ GET         /master/viewPendingIssueAssetRequests                        control
 GET         /master/rejectIssueAssetRequest                              controllers.IssueAssetController.rejectIssueAssetRequestForm(requestID: String)
 POST        /master/rejectIssueAssetRequest                              controllers.IssueAssetController.rejectIssueAssetRequest
 GET         /master/viewTraderAssetDocuments                             controllers.IssueAssetController.viewAssetDocuments(id: String)
-GET         /master/verifyTraderAssetDocument                            controllers.IssueAssetController.verifyAssetDocument(id: String, documentType: String)
-GET         /master/rejectTraderAssetDocument                            controllers.IssueAssetController.rejectAssetDocument(id: String, documentType: String)
+GET         /master/updateAssetDocumentStatus                            controllers.IssueAssetController.updateAssetDocumentStatusForm(fileID: String, documentType: String)
+POST        /master/updateAssetDocumentStatus                            controllers.IssueAssetController.updateAssetDocumentStatus
 
 GET         /master/issueAsset                                           controllers.IssueAssetController.issueAssetForm(requestID: String, accountID: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, takerAddress: Option[String])
 POST        /master/issueAsset                                           controllers.IssueAssetController.issueAsset
