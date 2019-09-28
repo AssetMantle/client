@@ -116,7 +116,7 @@
                               @loginState match {
                                   case null => {
                                       <li> <a onclick="getForm(jsRoutes.controllers.AccountController.signUpForm())"><span cmuk-icon="users"></span>
-                                          @Messages(constants.Form.SIGNUP)</a></li>
+                                          @Messages(constants.Form.SIGN_UP.legend)</a></li>
                                       <li> <a onclick="getForm(jsRoutes.controllers.AccountController.loginForm())">
                                           <span cmuk-icon="sign-in"></span>
                                           @Messages(constants.Form.LOGIN)</a>
@@ -153,13 +153,13 @@
                                           <div class="cmuk-navbar-dropdown">
                                               <ul class="cmuk-nav cmuk-navbar-dropdown-nav">
                                                   <li><a href="@controllers.routes.ViewController.profile()"><span cmuk-icon="user"></span>
-                                                      &nbsp;
+                                                          &nbsp;
                                                       @Messages(constants.Form.PROFILE)</a>
                                                   </li>
                                                   <li>
                                                       <a onclick="getForm(jsRoutes.controllers.AccountController.logoutForm())">
                                                           <span cmuk-icon="sign-out"></span>
-                                                          &nbsp;
+                                                              &nbsp;
                                                           @Messages(constants.Form.LOGOUT)</a>
                                                   </li>
 
@@ -212,7 +212,6 @@
           <a class="cmuk-alert-close" cmuk-close></a>
           <p>>@Messages(constants.Form.INFORMATION) @Messages(info.message)</p>
         </div>
-
       }
     </div>
     <div class="pageContent">
