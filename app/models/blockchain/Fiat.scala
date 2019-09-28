@@ -4,7 +4,7 @@ import actors.{MainFiatActor, ShutdownActor}
 import akka.actor.{ActorRef, ActorSystem}
 import akka.stream.scaladsl.Source
 import akka.stream.{ActorMaterializer, OverflowStrategy}
-import exceptions.{BaseException, BlockChainException}
+import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.{master, masterTransaction}
 import org.postgresql.util.PSQLException
@@ -169,7 +169,6 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
               Service.deleteFiatPegWallet(dirtyFiat.ownerAddress)
               mainFiatActor ! FiatCometMessage(username = masterAccounts.Service.getId(dirtyFiat.ownerAddress), message = Json.toJson("0"))
             }
-          case blockChainException: BlockChainException => logger.error(blockChainException.failure.message, blockChainException)
         }
       }
     }(schedulerExecutionContext)

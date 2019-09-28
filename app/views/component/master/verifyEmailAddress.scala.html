@@ -3,11 +3,11 @@
 @import views.companion.master.VerifyEmailAddress
 
 @(verifyEmailAddressForm: Form[VerifyEmailAddress.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
-@form(action = routes.VerifyEmailAddressController.verifyEmailAddress, 'onkeypress -> "validateForm(event,this)") {
+@form(action = routes.VerifyEmailAddressController.verifyEmailAddress, 'onkeypress -> "submitFormOnEnter(event,this)") {
 
         <h4>@Messages(constants.Form.VERIFY_EMAIL_ADDRESS)</h4>
         @CSRF.formField
-        @inputText(verifyEmailAddressForm(constants.FormField.OTP.name), '_label -> Messages(constants.FormField.OTP.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.OTP.name), 'required -> true)
+      @inputText(verifyEmailAddressForm(constants.FormField.OTP.name), '_label -> Messages(constants.FormField.OTP.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.OTP.name), 'required -> true)
 
         @if(verifyEmailAddressForm.hasGlobalErrors) {
             <ul>

@@ -3,10 +3,10 @@
 @import views.companion.master.RejectVerifyOrganizationRequest
 
 @(rejectVerifyOrganizationRequestForm: Form[RejectVerifyOrganizationRequest.Data], organizationID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
-@form(action = routes.AddOrganizationController.rejectVerifyOrganizationRequest, 'onkeypress -> "validateForm(event,this)") {
+@form(action = routes.AddOrganizationController.rejectVerifyOrganizationRequest, 'onkeypress -> "submitFormOnEnter(event,this)") {
         <h4>@Messages(constants.Form.REJECT_VERIFY_ORGANIZATION_REQUEST)</h4>
         @CSRF.formField
-        @inputText(rejectVerifyOrganizationRequestForm(constants.FormField.ORGANIZATION_ID.name).copy(value = Some(organizationID)), '_label -> Messages(constants.FormField.ORGANIZATION_ID.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.ORGANIZATION_ID.name), 'required -> true)
+      @inputText(rejectVerifyOrganizationRequestForm(constants.FormField.ORGANIZATION_ID.name).copy(value = Some(organizationID)), '_label -> Messages(constants.FormField.ORGANIZATION_ID.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.ORGANIZATION_ID.name), 'required -> true)
 
         @if(rejectVerifyOrganizationRequestForm.hasGlobalErrors) {
             <ul>

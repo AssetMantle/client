@@ -9,13 +9,12 @@ import models.masterTransaction.SMSOTPs
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
-import utilities.SMS
 import views.companion.master.VerifyMobileNumber
 
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class VerifyMobileNumberController @Inject()(messagesControllerComponents: MessagesControllerComponents, masterAccounts: master.Accounts, smsOTPs: SMSOTPs, masterContacts: master.Contacts, withLoginAction: WithLoginAction, SMS: SMS, withUsernameToken: WithUsernameToken)(implicit exec: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class VerifyMobileNumberController @Inject()(messagesControllerComponents: MessagesControllerComponents, masterAccounts: master.Accounts, smsOTPs: SMSOTPs, masterContacts: master.Contacts, withLoginAction: WithLoginAction, utilitiesNotification: utilities.Notification, withUsernameToken: WithUsernameToken)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val module: String = constants.Module.CONTROLLERS_SMS
 
@@ -25,7 +24,7 @@ class VerifyMobileNumberController @Inject()(messagesControllerComponents: Messa
     implicit request =>
       try {
         val otp = smsOTPs.Service.sendOTP(loginState.username)
-        SMS.sendSMS(loginState.username, constants.SMS.OTP, Seq(otp))
+        utilitiesNotification.send(accountID = loginState.username, notification = constants.Notification.VERIFY_PHONE, otp)
         withUsernameToken.Ok(views.html.component.master.verifyMobileNumber(VerifyMobileNumber.form))
       }
       catch {

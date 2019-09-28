@@ -5,7 +5,7 @@
 @(loginForm: Form[Login.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 
 
-  @form(action = routes.AccountController.login, 'onkeypress -> "validateForm(event,this)") {
+@form(action = routes.AccountController.login, 'onkeypress -> "submitFormOnEnter(event,this)") {
     <h4>@Messages(constants.Form.LOGIN)</h4>
         @CSRF.formField
         @inputText(loginForm(constants.FormField.USERNAME.name), '_label -> Messages(constants.FormField.USERNAME.name), 'class -> "cmuk-input", 'placeholder -> "Username", 'required -> true)

@@ -3,24 +3,22 @@ package controllers
 import actors.ShutdownActor
 import controllers.actions.{LoginState, WithLoginAction}
 import controllers.results.WithUsernameToken
-import exceptions.{BaseException, BlockChainException}
+import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.{blockchain, master, masterTransaction}
 import play.api.i18n.I18nSupport
 import play.api.libs.ws.WSClient
 import play.api.mvc._
 import play.api.{Configuration, Logger}
-import utilities.{Email, PushNotification}
-import views.companion.master.{Login, Logout, SignUp}
+import views.companion.master.{Login, Logout, NoteNewKeyDetails, SignUp}
 
 import scala.concurrent.ExecutionContext
 
 @Singleton
 class AccountController @Inject()(
-                                   email: Email,
+                                   utilitiesNotification: utilities.Notification,
                                    shutdownActor: ShutdownActor,
                                    withLoginAction: WithLoginAction,
-                                   pushNotification: PushNotification,
                                    withUsernameToken: WithUsernameToken,
                                    queryGetAccount: queries.GetAccount,
                                    blockchainFiats: blockchain.Fiats,
@@ -43,7 +41,7 @@ class AccountController @Inject()(
                                    messagesControllerComponents: MessagesControllerComponents,
                                  )
                                  (implicit
-                                  exec: ExecutionContext,
+                                  executionContext: ExecutionContext,
                                   configuration: Configuration,
                                   wsClient: WSClient,
                                  ) extends AbstractController(messagesControllerComponents) with I18nSupport {
@@ -65,12 +63,10 @@ class AccountController @Inject()(
       signUpData => {
         try {
           val addKeyResponse = transactionAddKey.Service.post(transactionAddKey.Request(signUpData.username, signUpData.password))
-          logger.info(addKeyResponse.toString)
           masterAccounts.Service.addLogin(signUpData.username, signUpData.password, blockchainAccounts.Service.create(address = addKeyResponse.address, pubkey = addKeyResponse.pubkey), request.lang.toString.stripPrefix("Lang(").stripSuffix(")").trim.split("_")(0))
-          Ok(views.html.index(successes = Seq(constants.Response.SIGNED_UP)))
+          PartialContent(views.html.component.master.noteNewKeyDetails(NoteNewKeyDetails.form, addKeyResponse.name, addKeyResponse.address, addKeyResponse.pubkey, addKeyResponse.mnemonic))
         } catch {
           case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-          case blockChainException: BlockChainException => InternalServerError(views.html.index(failures = Seq(blockChainException.failure)))
         }
       }
     )
@@ -92,8 +88,8 @@ class AccountController @Inject()(
           val address = masterAccounts.Service.getAddress(loginData.username)
           implicit val loginState: LoginState = LoginState(loginData.username, userType, address, if (userType == constants.User.TRADER) Option(blockchainAclHashes.Service.getACL(blockchainAclAccounts.Service.getACLHash(address))) else None)
           val contactWarnings: Seq[constants.Response.Warning] = utilities.Contact.getWarnings(masterAccounts.Service.validateLoginAndGetStatus(loginData.username, loginData.password))
-          pushNotification.registerNotificationToken(loginData.username, loginData.notificationToken)
-          pushNotification.sendNotification(loginData.username, constants.Notification.LOGIN, loginData.username)
+          utilitiesNotification.registerNotificationToken(loginData.username, loginData.notificationToken)
+          utilitiesNotification.send(loginData.username, constants.Notification.LOGIN, loginData.username)
           loginState.userType match {
             case constants.User.GENESIS =>
               withUsernameToken.Ok(views.html.genesisIndex(warnings = contactWarnings))
@@ -176,7 +172,6 @@ class AccountController @Inject()(
             }
           }
           catch {
-            case blockChainException: BlockChainException => InternalServerError(views.html.index(failures = Seq(blockChainException.failure)))
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
         }
@@ -196,7 +191,7 @@ class AccountController @Inject()(
       emailOTPForgotPasswordData => {
         try {
           val otp = masterTransactionEmailOTP.Service.sendOTP(emailOTPForgotPasswordData.username)
-          email.sendEmail(emailOTPForgotPasswordData.username, constants.Email.OTP, Seq(otp))
+          utilitiesNotification.send(accountID = emailOTPForgotPasswordData.username, notification = constants.Notification.FORGOT_PASSWORD_OTP, otp)
           PartialContent(views.html.component.master.forgotPassword(views.companion.master.ForgotPassword.form, emailOTPForgotPasswordData.username))
         }
         catch {
@@ -227,7 +222,6 @@ class AccountController @Inject()(
           }
         }
         catch {
-          case blockChainException: BlockChainException => InternalServerError(views.html.index(failures = Seq(blockChainException.failure)))
           case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
         }
       }
@@ -239,4 +233,19 @@ class AccountController @Inject()(
     if (masterAccounts.Service.checkUsernameAvailable(username)) Ok else NoContent
   }
 
+  def noteNewKeyDetails(name: String, blockchainAddress: String, publicKey: String, seed: String): Action[AnyContent] = Action { implicit request =>
+    views.companion.master.NoteNewKeyDetails.form.bindFromRequest().fold(
+      formWithErrors => {
+        BadRequest(views.html.component.master.noteNewKeyDetails(formWithErrors, name, blockchainAddress, publicKey, seed))
+      },
+      noteNewKeyDetailsData => {
+        if (noteNewKeyDetailsData.confirmNoteNewKeyDetails) {
+          Ok(views.html.index(successes = Seq(constants.Response.SIGNED_UP)))
+        }
+        else {
+          BadRequest(views.html.component.master.noteNewKeyDetails(NoteNewKeyDetails.form, name, blockchainAddress, publicKey, seed))
+        }
+      }
+    )
+  }
 }

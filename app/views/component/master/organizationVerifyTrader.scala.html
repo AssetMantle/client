@@ -2,13 +2,13 @@
 @import helper._
 @import views.companion.master.VerifyTrader
 
-@(verifyTraderForm: Form[VerifyTrader.Data], aclAddress: String, organizationID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@(verifyTraderForm: Form[VerifyTrader.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 
-@form(action = routes.SetACLController.organizationVerifyTrader, 'onkeypress -> "validateForm(event,this)") {
+@form(action = routes.SetACLController.organizationVerifyTrader, 'onkeypress -> "submitFormOnEnter(event,this)") {
         <h4 >@Messages(constants.Form.VERIFY_TRADER)</h4>
         @CSRF.formField
-        @inputText(verifyTraderForm(constants.FormField.ACL_ADDRESS.name).copy(value = Some(aclAddress)), '_label -> Messages(constants.FormField.ACL_ADDRESS.name),'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.ACL_ADDRESS.name), 'required -> true)
-        @inputText(verifyTraderForm(constants.FormField.ORGANIZATION_ID.name).copy(value = Some(organizationID)), '_label -> Messages(constants.FormField.ORGANIZATION_ID.name),'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.ORGANIZATION_ID.name), 'required -> true)
+        @inputText(verifyTraderForm(constants.FormField.ACCOUNT_ID.name), '_label -> Messages(constants.FormField.ACCOUNT_ID.name),'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.ACCOUNT_ID.name), 'required -> true)
+        @inputText(verifyTraderForm(constants.FormField.ORGANIZATION_ID.name), '_label -> Messages(constants.FormField.ORGANIZATION_ID.name),'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.ORGANIZATION_ID.name), 'required -> true)
         <div class="input-group-prepend">
             @checkbox(verifyTraderForm(constants.Form.ISSUE_ASSET), '_label -> Messages(constants.Form.ISSUE_ASSET))
             <span class="input-group-text">
@@ -107,8 +107,8 @@
             </span>
 
         </div>
-        @inputText(verifyTraderForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.GAS.name), 'required -> true)
-        @inputPassword(verifyTraderForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PASSWORD.name), 'required -> true)
+      @inputText(verifyTraderForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.GAS.name), 'required -> true)
+      @inputPassword(verifyTraderForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PASSWORD.name), 'required -> true)
 
         @if(verifyTraderForm.hasGlobalErrors) {
             <ul>

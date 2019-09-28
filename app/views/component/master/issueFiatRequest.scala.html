@@ -3,12 +3,12 @@
 @import views.companion.master.IssueFiatRequest
 
 @(issueFiatRequestForm: Form[IssueFiatRequest.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
-@form(action = routes.IssueFiatController.issueFiatRequest, 'onkeypress -> "validateForm(event,this)") {
+@form(action = routes.IssueFiatController.issueFiatRequest, 'onkeypress -> "submitFormOnEnter(event,this)") {
 
         <h4>@Messages(constants.Form.ISSUE_FIAT)</h4>
         @CSRF.formField
-        @inputText(issueFiatRequestForm(constants.FormField.TRANSACTION_ID.name), '_label -> Messages(constants.FormField.TRANSACTION_ID.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.TRANSACTION_ID.name), 'required -> true)
-        @inputText(issueFiatRequestForm(constants.FormField.TRANSACTION_AMOUNT.name), '_label -> Messages(constants.FormField.TRANSACTION_AMOUNT.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.TRANSACTION_AMOUNT.name), 'required -> true)
+      @inputText(issueFiatRequestForm(constants.FormField.TRANSACTION_ID.name), '_label -> Messages(constants.FormField.TRANSACTION_ID.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.TRANSACTION_ID.name), 'required -> true)
+      @inputText(issueFiatRequestForm(constants.FormField.TRANSACTION_AMOUNT.name), '_label -> Messages(constants.FormField.TRANSACTION_AMOUNT.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.TRANSACTION_AMOUNT.name), 'required -> true, 'type -> "number")
 
         @if(issueFiatRequestForm.hasGlobalErrors) {
             <ul>

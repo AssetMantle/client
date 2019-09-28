@@ -3,11 +3,11 @@
 @import views.companion.master.RejectIssueAssetRequest
 
 @(rejectIssueAssetRequestForm: Form[RejectIssueAssetRequest.Data], requestID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
-@form(action = routes.IssueAssetController.rejectIssueAssetRequest, 'onkeypress -> "validateForm(event,this)") {
+@form(action = routes.IssueAssetController.rejectIssueAssetRequest, 'onkeypress -> "submitFormOnEnter(event,this)") {
         <h4>@Messages(constants.Form.REJECT_ISSUE_ASSET_REQUEST)</h4>
         @CSRF.formField
-        @inputText(rejectIssueAssetRequestForm(constants.FormField.REQUEST_ID.name).copy(value = Some(requestID)), '_label -> Messages(constants.FormField.REQUEST_ID.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.REQUEST_ID.name), 'required -> true)
-        @inputText(rejectIssueAssetRequestForm(constants.FormField.COMMENT.name), '_label -> Messages(constants.FormField.COMMENT.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.COMMENT.name), 'required -> true)
+      @inputText(rejectIssueAssetRequestForm(constants.FormField.REQUEST_ID.name).copy(value = Some(requestID)), '_label -> Messages(constants.FormField.REQUEST_ID.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.REQUEST_ID.name), 'required -> true)
+      @inputText(rejectIssueAssetRequestForm(constants.FormField.COMMENT.name), '_label -> Messages(constants.FormField.COMMENT.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.COMMENT.name), 'required -> true)
 
         @if(rejectIssueAssetRequestForm.hasGlobalErrors) {
             <ul>

@@ -3,13 +3,13 @@
 @import views.companion.master.ApproveFaucetRequest
 
 @(approveFaucetRequestForm: Form[ApproveFaucetRequest.Data], requestID: String, accountID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
-@form(action = routes.SendCoinController.approveFaucetRequests, 'onkeypress -> "validateForm(event,this)") {
+@form(action = routes.SendCoinController.approveFaucetRequests, 'onkeypress -> "submitFormOnEnter(event,this)") {
          <h4>@Messages(constants.Form.SEND_COIN)</h4>
          @CSRF.formField
-        @inputText(approveFaucetRequestForm(constants.FormField.REQUEST_ID.name).copy(value = Some(requestID)), '_label -> Messages(constants.FormField.REQUEST_ID.name), 'placeholder -> Messages(constants.FormField.REQUEST_ID.name), 'required -> true, 'class -> "cmuk-input")
-        @inputText(approveFaucetRequestForm(constants.FormField.ACCOUNT_ID.name).copy(value = Some(accountID)), '_label -> Messages(constants.FormField.ACCOUNT_ID.name), 'placeholder -> Messages(constants.FormField.ACCOUNT_ID.name), 'required -> true, 'class -> "cmuk-input")
-        @inputText(approveFaucetRequestForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.GAS.name), 'required -> true)
-        @inputPassword(approveFaucetRequestForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'placeholder -> Messages(constants.FormField.PASSWORD.name), 'required -> true, 'class -> "cmuk-input")
+      @inputText(approveFaucetRequestForm(constants.FormField.REQUEST_ID.name).copy(value = Some(requestID)), '_label -> Messages(constants.FormField.REQUEST_ID.name), 'placeholder -> Messages(constants.FormField.REQUEST_ID.name), 'required -> true, 'class -> "cmuk-input")
+      @inputText(approveFaucetRequestForm(constants.FormField.ACCOUNT_ID.name).copy(value = Some(accountID)), '_label -> Messages(constants.FormField.ACCOUNT_ID.name), 'placeholder -> Messages(constants.FormField.ACCOUNT_ID.name), 'required -> true, 'class -> "cmuk-input")
+      @inputText(approveFaucetRequestForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.GAS.name), 'required -> true, 'type -> "number")
+      @inputPassword(approveFaucetRequestForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'placeholder -> Messages(constants.FormField.PASSWORD.name), 'required -> true, 'class -> "cmuk-input")
 
         @if(approveFaucetRequestForm.hasGlobalErrors) {
             <ul>

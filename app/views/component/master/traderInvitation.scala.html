@@ -1,0 +1,22 @@
+@import helper._
+@import views.companion.master.TraderInvitation
+
+@(addTraderRequestForm: Form[TraderInvitation.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@form(action = routes.SetACLController.traderInvitation, 'onkeypress -> "submitFormOnEnter(event,this)") {
+    <div class="latest_card-header latest_card-header-primary text-center">
+        <h4 class="latest_card-title">@Messages(constants.Form.ADD_TRADER)</h4>
+    </div>
+    <div class="latest_card-body">
+        @CSRF.formField
+        @inputText(addTraderRequestForm(constants.FormField.ACCOUNT_ID.name), '_label -> Messages(constants.FormField.ACCOUNT_ID.name), 'placeholder -> Messages(constants.FormField.ACCOUNT_ID.name), 'required -> true, 'class -> "cmuk-input")
+
+        @if(addTraderRequestForm.hasGlobalErrors) {
+            <ul>
+            @for(error <- addTraderRequestForm.globalErrors) {
+                <li>@error.format</li>
+            }
+            </ul>
+        }
+        <button type="button" class="btn btn-primary btn-sm" onclick="submitForm(this)">@Messages(constants.Form.INVITE)</button>
+    </div>
+}

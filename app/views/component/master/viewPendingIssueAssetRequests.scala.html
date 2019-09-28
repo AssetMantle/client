@@ -14,9 +14,23 @@
             <span class="red">@Messages(constants.Form.ASSET_PRICE)</span>: @issueAssetRequest.assetPrice <br>
             <span class="red">@Messages(constants.Form.QUANTITY_UNIT)</span>: @issueAssetRequest.quantityUnit <br>
             <span class="red">@Messages(constants.Form.TAKER_ADDRESS)</span>: @issueAssetRequest.takerAddress <br>
-            <button class="cmuk-button cmuk-button-success cmuk-button-small" onclick="getForm(jsRoutes.controllers.IssueAssetController.issueAssetForm('@issueAssetRequest.id', '@issueAssetRequest.accountID', '@issueAssetRequest.documentHash', '@issueAssetRequest.assetType', @issueAssetRequest.assetPrice, '@issueAssetRequest.quantityUnit', @issueAssetRequest.assetQuantity, '@issueAssetRequest.takerAddress'))">@Messages(constants.Form.APPROVE)</button>
-            <button class="cmuk-button cmuk-button-danger cmuk-button-small" onclick="getForm(jsRoutes.controllers.IssueAssetController.rejectIssueAssetRequestForm('@issueAssetRequest.id'))">@Messages(constants.Form.REJECT)</button>
+            <span class="red">@Messages(constants.FormField.PHYSICAL_DOCUMENTS_HANDLED_VIA.name)</span> : @issueAssetRequest.physicalDocumentsHandledVia <br>
+            <span class="red">@Messages(constants.FormField.COMDEX_PAYMENT_TERMS.name)</span> : @issueAssetRequest.paymentTerms <br>
+            <span class="red">@Messages(constants.Form.STATUS)</span> : @issueAssetRequest.status <br>
+            <span class="red">@Messages(constants.Form.SHIPMENT_DETAILS)</span> <br>
+            <span class="red">@Messages(constants.FormField.COMMODITY_NAME.name)</span> : @issueAssetRequest.shipmentDetails.commodityName <br>
+            <span class="red">@Messages(constants.FormField.QUALITY.name)</span> : @issueAssetRequest.shipmentDetails.quality <br>
+            <span class="red">@Messages(constants.FormField.DELIVERY_TERM.name)</span> : @issueAssetRequest.shipmentDetails.deliveryTerm <br>
+            <span class="red">@Messages(constants.FormField.TRADE_TYPE.name)</span> : @issueAssetRequest.shipmentDetails.tradeType <br>
+            <span class="red">@Messages(constants.FormField.PORT_OF_LOADING.name)</span> : @issueAssetRequest.shipmentDetails.portOfLoading <br>
+            <span class="red">@Messages(constants.FormField.PORT_OF_DISCHARGE.name)</span> : @issueAssetRequest.shipmentDetails.portOfDischarge <br>
+            <span class="red">@Messages(constants.FormField.SHIPMENT_DATE.name)</span> : @issueAssetRequest.shipmentDetails.shipmentDate <br>
+          <button class="cmuk-button cmuk-button-success cmuk-button-small" onclick="getForm(jsRoutes.controllers.IssueAssetController.issueAssetForm('@issueAssetRequest.id', '@issueAssetRequest.accountID', '@issueAssetRequest.documentHash', '@issueAssetRequest.assetType', @issueAssetRequest.assetPrice, '@issueAssetRequest.quantityUnit', @issueAssetRequest.assetQuantity, '@issueAssetRequest.takerAddress'))">@Messages(constants.Form.APPROVE)</button>
+          <button class="cmuk-button cmuk-button-danger cmuk-button-small" onclick="getForm(jsRoutes.controllers.IssueAssetController.rejectIssueAssetRequestForm('@issueAssetRequest.id'))">@Messages(constants.Form.REJECT)</button>
         </div>
     </div>
     <br>
+    <div id = "assetDocuments@issueAssetRequest.id">
+        <script>componentResource('assetDocuments@issueAssetRequest.id', jsRoutes.controllers.IssueAssetController.viewAssetDocuments('@issueAssetRequest.id'))</script>
+    </div>
 }

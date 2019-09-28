@@ -3,7 +3,7 @@
 @import views.companion.master.AddTrader
 
 @(addTraderForm: Form[AddTrader.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
-@form(action = routes.SetACLController.addTrader, 'onkeypress -> "validateForm(event,this)") {
+@form(action = routes.SetACLController.addTrader, 'onkeypress -> "submitFormOnEnter(event,this)") {
            <h4>@Messages(constants.Form.ADD_TRADER)</h4>
         @CSRF.formField
         @inputText(addTraderForm(constants.FormField.ZONE_ID.name), '_label -> Messages(constants.FormField.ZONE_ID.name), 'placeholder -> Messages(constants.FormField.ZONE_ID.name), 'required -> true, 'class -> "cmuk-input")
@@ -17,6 +17,5 @@
             }
             </ul>
         }
-        <button type="button" onclick="submitForm(this)">@Messages(constants.Form.ADD_TRADER)</button>
-
+        <button type="button" onclick="submitForm(this)">@Messages(constants.Form.NEXT)</button>
 }

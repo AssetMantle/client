@@ -2,7 +2,7 @@
 @import views.companion.blockchain.AddKey
 
 @(addKeyFrom: Form[AddKey.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@form(action = routes.AddKeyController.blockchainAddKey, 'onkeypress -> "validateForm(event,this)") {
+@form(action = routes.AddKeyController.blockchainAddKey, 'onkeypress -> "submitFormOnEnter(event,this)") {
         <h4>@Messages(constants.Form.ADD_KEY)</h4>
         @CSRF.formField
         @inputText(addKeyFrom(constants.FormField.NAME.name), '_label -> Messages(constants.FormField.NAME.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.NAME.name), 'required -> true)

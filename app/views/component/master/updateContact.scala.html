@@ -4,12 +4,12 @@
 
 @(updateContactForm: Form[UpdateContact.Data], countryCallingCodes: Seq[(String, String)])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 
-@form(action = routes.ContactController.updateContact, 'onkeypress -> "validateForm(event,this)") {
+@form(action = routes.ContactController.updateContact, 'onkeypress -> "submitFormOnEnter(event,this)") {
 
         <h4 >@Messages(constants.Form.UPDATE_CONTACT)</h4>
         @CSRF.formField
-        @inputText(updateContactForm(constants.FormField.MOBILE_NUMBER.name), '_label -> Messages(constants.FormField.MOBILE_NUMBER.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.MOBILE_NUMBER.name), 'required -> true)
-        @inputText(updateContactForm(constants.FormField.EMAIL_ADDRESS.name), '_label -> Messages(constants.FormField.EMAIL_ADDRESS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.EMAIL_ADDRESS.name), 'required -> true)
+      @inputText(updateContactForm(constants.FormField.MOBILE_NUMBER.name), '_label -> Messages(constants.FormField.MOBILE_NUMBER.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.MOBILE_NUMBER.name), 'required -> true)
+      @inputText(updateContactForm(constants.FormField.EMAIL_ADDRESS.name), '_label -> Messages(constants.FormField.EMAIL_ADDRESS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.EMAIL_ADDRESS.name), 'required -> true)
         @select(updateContactForm(constants.FormField.COUNTRY_CODE.name), options = countryCallingCodes, '_label -> Messages(constants.FormField.COUNTRY_CODE.name))
         @if(updateContactForm.hasGlobalErrors) {
             <ul>

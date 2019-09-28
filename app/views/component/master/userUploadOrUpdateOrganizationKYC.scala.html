@@ -7,22 +7,20 @@
     <h4 >@Messages(constants.Form.ORGANIZATION_KYC_FILES)</h4>
     @for(documentType <- constants.File.ORGANIZATION_KYC_DOCUMENT_TYPES) {
         <div id="upload@documentType">
-            <button onclick="getForm(jsRoutes.controllers.AddOrganizationController.userUploadOrganizationKycForm('@documentType'))">@Messages(constants.Form.UPLOAD) @Messages(documentType)</button>
+            <button onclick="getForm(jsRoutes.controllers.AddOrganizationController.userUploadOrganizationKYCForm('@documentType'))">@Messages(constants.Form.UPLOAD) @Messages(documentType)</button>
         </div>
     }
     @for(organizationKYC <- organizationKYCs) {
         @component.master.commonDocumentViewer(organizationKYC) {
-            @routes.AddOrganizationController.userAccessedOrganizationKYCFile(organizationKYC.documentType)
+            @routes.FileController.userAccessedOrganizationKYCFile(organizationKYC.documentType)
         } {
-            <a href="@routes.AddOrganizationController.userAccessedOrganizationKYCFile(organizationKYC.documentType)">@Messages(organizationKYC.documentType)</a>
+            <a href="@routes.FileController.userAccessedOrganizationKYCFile(organizationKYC.documentType)">@Messages(organizationKYC.documentType)</a>
         } {
-            <button onclick="getForm(jsRoutes.controllers.AddOrganizationController.userUpdateOrganizationKycForm('@organizationKYC.documentType'))">@Messages(constants.Form.UPDATE) @Messages(organizationKYC.documentType)</button>
+            <button onclick="getForm(jsRoutes.controllers.AddOrganizationController.userUpdateOrganizationKYCForm('@organizationKYC.documentType'))">@Messages(constants.Form.UPDATE) @Messages(organizationKYC.documentType)</button>
             <script>hideElement('upload@organizationKYC.documentType')</script>
         }
     }
 <button type="button" onclick="getForm(jsRoutes.controllers.AddOrganizationController.organizationBankAccountDetailForm())">@Messages(constants.Form.BACK)</button>
-
-@*//TODO whether database should contain constants.File.TRADER_KYC_DOCUMENT_TYPES (current scenario) OR constants.File.TRADER_KYC_DOCUMENT_TYPES should contain all database file type*@
-@if(constants.File.ORGANIZATION_KYC_DOCUMENT_TYPES.forall(organizationKYCs.map(_.documentType).contains)) {
-    <button type="button" class="btn-sm btn btn-primary" id="getOrganizationKYCReviewForm" onclick="getForm(jsRoutes.controllers.AddOrganizationController.reviewOrganizationCompletionForm())">@Messages(constants.Form.NEXT)</button>
+@if(constants.File.ORGANIZATION_KYC_DOCUMENT_TYPES.diff(organizationKYCs.map(_.documentType)).isEmpty) {
+    <button type="button" id="getOrganizationKYCReviewForm" onclick="getForm(jsRoutes.controllers.AddOrganizationController.reviewOrganizationCompletionForm())">@Messages(constants.Form.NEXT)</button>
 }

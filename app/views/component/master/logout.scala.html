@@ -5,11 +5,11 @@
 @(logoutForm: Form[Logout.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 
 
-  @form(action = routes.AccountController.logout, 'onkeypress -> "validateForm(event,this)") {
+    @form(action = routes.AccountController.logout, 'onkeypress -> "submitFormOnEnter(event,this)") {
     @CSRF.formField
 
             @checkbox(logoutForm(constants.Form.RECEIVE_NOTIFICATIONS), '_label -> Messages(constants.Form.RECEIVE_NOTIFICATIONS))
-            @Messages(constants.Form.RECEIVE_NOTIFICATIONS)
+      @Messages(constants.Form.RECEIVE_NOTIFICATIONS)
 
         @if(logoutForm.hasGlobalErrors) {
             <ul>

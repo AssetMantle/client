@@ -1,26 +1,17 @@
 function getFileTypes(documentType) {
     let fileTypes = [];
     switch (documentType) {
-        case "BANK_ACCOUNT_DETAIL":
-        case "IDENTIFICATION":
-        case "LATEST_AUDITED_FINANCIAL_REPORT":
-        case "LAST_YEAR_AUDITED_FINANCIAL_REPORT":
-        case "MANAGEMENT":
-        case "ACRA":
-        case "SHARE_STRUCTURE":
-            fileTypes = ['jpg', 'png', 'jpeg', 'pdf', 'doc', 'txt', 'docx'];
-            break;
         case "PROFILE_PICTURE":
             fileTypes = ['jpg', 'png', 'jpeg'];
             break;
         default:
-            fileTypes = ['jpg', 'png', 'jpeg'];
+            fileTypes = ['jpg', 'png', 'jpeg', 'pdf', 'doc', 'docx'];
             break;
     }
     return fileTypes
 }
 
-function uploadFile(uploadRoute, storeRoute, documentType) {
+function uploadFile(uploadRoute, storeRoute, documentType, id) {
     const rFile = new Resumable({
         target: uploadRoute(documentType).url,
         fileType: getFileTypes(documentType),
@@ -44,7 +35,7 @@ function uploadFile(uploadRoute, storeRoute, documentType) {
     let uploadCompletionMessage = document.getElementById('uploadCompletionMessage');
     rFile.on('fileSuccess', function (file) {
         $("#uploadControls").delay(1000).fadeOut(1000);
-        let storeDbRoute = storeRoute(file.fileName, documentType);
+        let storeDbRoute = storeRoute(file.fileName, documentType, id);
         $.ajax({
             url: storeDbRoute.url,
             type: storeDbRoute.type,
@@ -52,6 +43,9 @@ function uploadFile(uploadRoute, storeRoute, documentType) {
                 200: function (data) {
                     $("#uploadCompletionMessage").show();
                     uploadCompletionMessage.textContent  = data;
+                },
+                206: function (data) {
+                    $("#commonModalContent").html(data);
                 },
                 400: function (error) {
                     $("#uploadCompletionMessage").show();
@@ -61,9 +55,6 @@ function uploadFile(uploadRoute, storeRoute, documentType) {
                     const newDocument = document.open("text/html", "replace");
                     newDocument.write(data.responseText);
                     newDocument.close();
-                },
-                206: function (data) {
-                    $('#commonModalContent').html(data);
                 }
             }
         });
@@ -75,8 +66,7 @@ function uploadFile(uploadRoute, storeRoute, documentType) {
 
 }
 
-function updateFile(uploadRoute, updateRoute, documentType) {
-
+function updateFile(uploadRoute, updateRoute, documentType, id) {
     const rFile = new Resumable({
         target: uploadRoute(documentType).url,
         fileType: getFileTypes(documentType),
@@ -100,7 +90,7 @@ function updateFile(uploadRoute, updateRoute, documentType) {
     let updateCompletionMessage = document.getElementById('updateCompletionMessage');
     rFile.on('fileSuccess', function (file) {
         $("#updateControls").delay(1000).fadeOut(1000);
-        let updateDbRoute = updateRoute(file.fileName, documentType);
+        let updateDbRoute = updateRoute(file.fileName, documentType, id);
         $.ajax({
             url: updateDbRoute.url,
             type: updateDbRoute.type,
@@ -108,6 +98,9 @@ function updateFile(uploadRoute, updateRoute, documentType) {
                 200: function (data) {
                     $("#updateCompletionMessage").show();
                     updateCompletionMessage.textContent  = data;
+                },
+                206: function (data) {
+                    $("#commonModalContent").html(data);
                 },
                 400: function (error) {
                     $("#updateCompletionMessage").show();
@@ -117,9 +110,6 @@ function updateFile(uploadRoute, updateRoute, documentType) {
                     const newDocument = document.open("text/html", "replace");
                     newDocument.write(data.responseText);
                     newDocument.close();
-                },
-                206: function (data) {
-                    $('#commonModalContent').html(data);
                 }
             }
         });

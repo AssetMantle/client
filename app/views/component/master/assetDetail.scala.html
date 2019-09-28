@@ -1,0 +1,66 @@
+@import controllers.actions.LoginState
+@import models.common.Serializable._
+@(asset: masterTransaction.IssueAssetRequest, files: Seq[masterTransaction.AssetFile])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+
+<div>
+    @if(asset.status != constants.Status.Asset.INCOMPLETE_DETAILS) {
+        <span class="red">@Messages(constants.Form.PEG_HASH)</span> : @asset.pegHash <br>
+    }
+    <span class="red">@Messages(constants.FormField.ASSET_TYPE.name)</span> : @asset.assetType <br>
+    <span class="red">@Messages(constants.FormField.QUANTITY_UNIT.name)</span> : @asset.quantityUnit <br>
+    <span class="red">@Messages(constants.FormField.ASSET_QUANTITY.name)</span> : @asset.assetQuantity <br>
+    <span class="red">@Messages(constants.FormField.ASSET_PRICE.name)</span> : @asset.assetPrice <br>
+    <span class="red">@Messages(constants.Form.STATUS)</span> : @asset.status <br>
+    <button class="showHide">@Messages(constants.Form.SHOW_HIDE)</button>
+</div>
+<div class="hidden">
+    @asset.takerAddress match{
+     case Some(takerAddress) => {
+        <span class="red">@Messages(constants.FormField.TAKER_ADDRESS.name)</span> : @asset.takerAddress <br>
+     }
+    case None => {}
+    }
+    <span class="red">@Messages(constants.FormField.PHYSICAL_DOCUMENTS_HANDLED_VIA.name)</span> : @asset.physicalDocumentsHandledVia <br>
+    <span class="red">@Messages(constants.FormField.COMDEX_PAYMENT_TERMS.name)</span> : @asset.paymentTerms <br>
+    <span class="red">@Messages(constants.Form.STATUS)</span> : @asset.status <br>
+    <span class="red">@Messages(constants.Form.SHIPMENT_DETAILS)</span> <br>
+    <span class="red">@Messages(constants.FormField.COMMODITY_NAME.name)</span> : @asset.shipmentDetails.commodityName <br>
+    <span class="red">@Messages(constants.FormField.QUALITY.name)</span> : @asset.shipmentDetails.quality <br>
+    <span class="red">@Messages(constants.FormField.DELIVERY_TERM.name)</span> : @asset.shipmentDetails.deliveryTerm <br>
+    <span class="red">@Messages(constants.FormField.TRADE_TYPE.name)</span> : @asset.shipmentDetails.tradeType <br>
+    <span class="red">@Messages(constants.FormField.PORT_OF_LOADING.name)</span> : @asset.shipmentDetails.portOfLoading <br>
+    <span class="red">@Messages(constants.FormField.PORT_OF_DISCHARGE.name)</span> : @asset.shipmentDetails.portOfDischarge <br>
+    <span class="red">@Messages(constants.FormField.SHIPMENT_DATE.name)</span> : @asset.shipmentDetails.shipmentDate <br>
+
+
+    @for(file <- files) {
+        @component.master.commonDocumentViewer(file) {
+            @routes.FileController.tradingFile(file.id, file.fileName, file.documentType)
+        } {
+            <a href="@routes.FileController.tradingFile(file.id, file.fileName, file.documentType)">@Messages(file.documentType)</a>
+        } {
+            @file.documentContent match {
+                case Some(oblContent :OBL) => {
+                    <span class="red">@Messages(constants.FormField.BILL_OF_LADING_NUMBER.name)</span> : @oblContent.billOfLadingID <br>
+                    <span class="red">@Messages(constants.FormField.PORT_OF_LOADING.name)</span> : @oblContent.portOfLoading <br>
+                    <span class="red">@Messages(constants.FormField.SHIPPER_NAME.name)</span> : @oblContent.shipperName <br>
+                    <span class="red">@Messages(constants.FormField.SHIPPER_ADDRESS.name)</span> : @oblContent.shipperAddress <br>
+                    <span class="red">@Messages(constants.FormField.NOTIFY_PARTY_NAME.name)</span> : @oblContent.notifyPartyName <br>
+                    <span class="red">@Messages(constants.FormField.NOTIFY_PARTY_ADDRESS.name)</span> : @oblContent.notifyPartyAddress <br>
+                    <span class="red">@Messages(constants.FormField.SHIPMENT_DATE.name)</span> : @oblContent.dateOfShipping <br>
+                    <span class="red">@Messages(constants.FormField.DELIVERY_TERM.name)</span> : @oblContent.deliveryTerm <br>
+                    <span class="red">@Messages(constants.FormField.ASSET_QUANTITY.name)</span> : @oblContent.weightOfConsignment <br>
+                    <span class="red">@Messages(constants.FormField.ASSET_PRICE.name)</span> : @oblContent.declaredAssetValue <br>
+                }
+                case Some(invoiceContent :Invoice) => {
+                    <span class="red">@Messages(constants.FormField.INVOICE_NUMBER.name)</span> : @invoiceContent.invoiceNumber <br>
+                    <span class="red">@Messages(constants.FormField.INVOICE_DATE.name)</span> : @invoiceContent.invoiceDate <br>
+                }
+                case Some(content) => {
+                    <span>content</span>
+                }
+                case None => {}
+            }
+        }
+    }
+</div>

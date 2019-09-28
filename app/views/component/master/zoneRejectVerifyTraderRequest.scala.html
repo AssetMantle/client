@@ -4,10 +4,10 @@
 
 @(rejectVerifyTraderRequestForm: Form[RejectVerifyTraderRequest.Data], traderID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 
-@form(action = routes.SetACLController.zoneRejectVerifyTraderRequest, 'onkeypress -> "validateForm(event,this)") {
+@form(action = routes.SetACLController.zoneRejectVerifyTraderRequest, 'onkeypress -> "submitFormOnEnter(event,this)") {
         <h4>@Messages(constants.Form.REJECT_VERIFY_TRADER_REQUEST)</h4>
         @CSRF.formField
-        @inputText(rejectVerifyTraderRequestForm(constants.Form.TRADER_ID).copy(value = Some(traderID)), '_label -> Messages(constants.Form.TRADER_ID), 'class -> "cmuk-input", 'placeholder -> Messages(constants.Form.TRADER_ID), 'required -> true)
+      @inputText(rejectVerifyTraderRequestForm(constants.Form.TRADER_ID).copy(value = Some(traderID)), '_label -> Messages(constants.Form.TRADER_ID), 'class -> "cmuk-input", 'placeholder -> Messages(constants.Form.TRADER_ID), 'required -> true)
 
         @if(rejectVerifyTraderRequestForm.hasGlobalErrors) {
             <ul>

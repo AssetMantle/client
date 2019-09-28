@@ -1,7 +1,7 @@
 package models.blockchain
 
 import akka.actor.ActorSystem
-import exceptions.{BaseException, BlockChainException}
+import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
@@ -221,12 +221,11 @@ class TransactionFeedbacks @Inject()(protected val databaseConfigProvider: Datab
           Service.refreshDirty(response.value.address, response.value.transactionFeedback)
         }
         catch {
-          case blockChainException: BlockChainException => if (blockChainException.failure.message == constants.Response.NO_RESPONSE.message) {
+          case baseException: BaseException => if (baseException.failure == constants.Response.NO_RESPONSE) {
             Service.insertOrUpdate(dirtyAddress, TraderReputationResponse.TransactionFeedbackResponse("0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"), dirtyBit = false)
           } else {
-            logger.error(blockChainException.failure.message, blockChainException)
+            logger.error(baseException.failure.message, baseException)
           }
-          case baseException: BaseException => logger.error(baseException.failure.message, baseException)
         }
       }
     }(schedulerExecutionContext)

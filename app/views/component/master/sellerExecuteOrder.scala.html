@@ -4,14 +4,14 @@
 
 @(sellerExecuteOrderForm: Form[SellerExecuteOrder.Data], buyerAddress: String, pegHash: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 
-@form(action = routes.SellerExecuteOrderController.sellerExecuteOrder, 'onkeypress -> "validateForm(event,this)") {
+@form(action = routes.SellerExecuteOrderController.sellerExecuteOrder, 'onkeypress -> "submitFormOnEnter(event,this)") {
         <h4>@Messages(constants.Form.SELLER_EXECUTE_ORDER)</h4>
         @CSRF.formField
-        @inputText(sellerExecuteOrderForm(constants.FormField.BUYER_ADDRESS.name).copy(value = Some(buyerAddress)), '_label -> Messages(constants.FormField.BUYER_ADDRESS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.BUYER_ADDRESS.name), 'required -> true)
-        @inputText(sellerExecuteOrderForm(constants.FormField.AWB_PROOF_HASH.name), '_label -> Messages(constants.FormField.AWB_PROOF_HASH.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.AWB_PROOF_HASH.name), 'required -> true)
-        @inputText(sellerExecuteOrderForm(constants.FormField.PEG_HASH.name).copy(value = Some(pegHash)), '_label -> Messages(constants.FormField.PEG_HASH.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PEG_HASH.name), 'required -> true)
-        @inputText(sellerExecuteOrderForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.GAS.name), 'required -> true)
-        @inputPassword(sellerExecuteOrderForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PASSWORD.name), 'required -> true)
+      @inputText(sellerExecuteOrderForm(constants.FormField.BUYER_ADDRESS.name).copy(value = Some(buyerAddress)), '_label -> Messages(constants.FormField.BUYER_ADDRESS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.BUYER_ADDRESS.name), 'required -> true)
+      @inputText(sellerExecuteOrderForm(constants.FormField.AWB_PROOF_HASH.name), '_label -> Messages(constants.FormField.AWB_PROOF_HASH.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.AWB_PROOF_HASH.name), 'required -> true)
+      @inputText(sellerExecuteOrderForm(constants.FormField.PEG_HASH.name).copy(value = Some(pegHash)), '_label -> Messages(constants.FormField.PEG_HASH.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PEG_HASH.name), 'required -> true)
+      @inputText(sellerExecuteOrderForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.GAS.name), 'required -> true, 'type -> "number")
+      @inputPassword(sellerExecuteOrderForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PASSWORD.name), 'required -> true)
 
         @if(sellerExecuteOrderForm.hasGlobalErrors) {
             <ul>

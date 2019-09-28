@@ -4,7 +4,7 @@
 
 @(signUpForm: Form[SignUp.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 
-@form(action = routes.AccountController.signUp, 'onkeypress -> "validateForm(event,this)") {
+@form(action = routes.AccountController.signUp, 'onkeypress -> "submitFormOnEnter(event,this)") {
         <h4>@Messages(constants.Form.SIGNUP)</h4>
         @CSRF.formField
         <div class="input-group">

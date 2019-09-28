@@ -1,0 +1,58 @@
+@import controllers.actions.LoginState
+@import helper._
+@import views.companion.master.IssueAssetOBL
+
+@(issueAssetOBLForm: Form[IssueAssetOBL.Data], file: Option[masterTransaction.AssetFile] = None)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+
+<div class="latest_card-header latest_card-header-primary text-center">
+    <h4 class="latest_card-title">@Messages(constants.Form.DOCUMENTS)</h4>
+</div>
+
+<div class="centerText">
+    <div id="upload@constants.File.OBL">
+        <button onclick="getForm(jsRoutes.controllers.FileController.uploadTraderAssetForm('@constants.File.OBL', '@issueAssetOBLForm.data(constants.FormField.REQUEST_ID.name)'))">@Messages(constants.Form.UPLOAD) @Messages(constants.File.OBL)</button>
+    </div>
+    @file match {
+        case Some(fileView) => {
+            @component.master.commonDocumentViewer(fileView) {
+                @routes.FileController.tradingFile(fileView.id, fileView.fileName, fileView.documentType)
+            } {
+                <a href="@routes.FileController.tradingFile(fileView.id, fileView.fileName, fileView.documentType)">@Messages(fileView.documentType)</a>
+            } {
+                <button onclick="getForm(jsRoutes.controllers.FileController.updateTraderAssetForm('@fileView.documentType', '@fileView.id'))">@Messages(constants.Form.UPDATE) @Messages(fileView.documentType)</button>
+                        <script>hideElement('upload@fileView.documentType')</script>
+            }
+        }
+        case _ => {}
+    }
+</div>
+
+@form(action = routes.IssueAssetController.issueAssetOBL(), 'onkeypress -> "submitFormOnEnter(event,this)") {
+    @CSRF.formField
+
+    <script src="@routes.Assets.versioned("javascripts/showHideUploadUpdateButton.js")" type="text/javascript"></script>
+        <div class="latest_card-body ml-cb">
+            @inputText(issueAssetOBLForm(constants.FormField.REQUEST_ID.name), '_label -> Messages(constants.FormField.REQUEST_ID.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.REQUEST_ID.name), 'required -> true)
+            @inputText(issueAssetOBLForm(constants.FormField.BILL_OF_LADING_NUMBER.name), '_label -> Messages(constants.FormField.BILL_OF_LADING_NUMBER.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.BILL_OF_LADING_NUMBER.name), 'required -> true)
+            @inputText(issueAssetOBLForm(constants.FormField.PORT_OF_LOADING.name), '_label -> Messages(constants.FormField.PORT_OF_LOADING.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.PORT_OF_LOADING.name), 'required -> true)
+            @inputText(issueAssetOBLForm(constants.FormField.SHIPPER_NAME.name), '_label -> Messages(constants.FormField.SHIPPER_NAME.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.SHIPPER_NAME.name), 'required -> true)
+            @inputText(issueAssetOBLForm(constants.FormField.SHIPPER_ADDRESS.name), '_label -> Messages(constants.FormField.SHIPPER_ADDRESS.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.SHIPPER_ADDRESS.name), 'required -> true)
+            @inputText(issueAssetOBLForm(constants.FormField.NOTIFY_PARTY_NAME.name), '_label -> Messages(constants.FormField.NOTIFY_PARTY_NAME.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.NOTIFY_PARTY_NAME.name), 'required -> true)
+            @inputText(issueAssetOBLForm(constants.FormField.NOTIFY_PARTY_ADDRESS.name), '_label -> Messages(constants.FormField.NOTIFY_PARTY_ADDRESS.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.NOTIFY_PARTY_ADDRESS.name), 'required -> true)
+            @inputDate(issueAssetOBLForm(constants.FormField.SHIPMENT_DATE.name), '_label -> Messages(constants.FormField.SHIPMENT_DATE.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.SHIPMENT_DATE.name), '_name -> Messages(constants.FormField.SHIPMENT_DATE.name), 'required -> true)
+            @select(issueAssetOBLForm(constants.FormField.DELIVERY_TERM.name), for(option <- constants.Form.DELIVERY_TERM_OPTIONS) yield (option, Messages(option)), '_label -> Messages(constants.FormField.DELIVERY_TERM.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.DELIVERY_TERM.name), '_default -> Messages(constants.FormField.DELIVERY_TERM.name), 'required -> true)
+            @inputText(issueAssetOBLForm(constants.FormField.ASSET_QUANTITY.name), '_label -> Messages(constants.FormField.ASSET_QUANTITY.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.ASSET_QUANTITY.name), 'required -> true)
+            @inputText(issueAssetOBLForm(constants.FormField.ASSET_PRICE.name), '_label -> Messages(constants.FormField.ASSET_PRICE.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.ASSET_PRICE.name), 'required -> true)
+            @if(issueAssetOBLForm.hasGlobalErrors) {
+                <ul>
+                @for(error <- issueAssetOBLForm.globalErrors) {
+                    <li>@error.format</li>
+                }
+                </ul>
+            }
+            @file match {
+                case Some(file) => {<button type="button" class="btn btn-primary btn-sm" onclick="submitForm(this)">@Messages(constants.Form.ISSUE_ASSET_OBL)</button>}
+                case None => {<button type="button" class="btn btn-primary btn-sm" onclick="submitForm(this)" disabled="disabled">@Messages(constants.Form.ISSUE_ASSET_OBL)</button>}
+            }
+             </div>
+}
