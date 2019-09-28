@@ -54,7 +54,7 @@ class SetBuyerFeedbackController @Inject()(messagesControllerComponents: Message
     implicit request =>
       try {
         val a = blockchainTraderFeedbackHistories.Service.getNullRatingsForBuyerFeedback(loginState.address)
-        withUsernameToken.Ok(views.html.component.master.setBuyerFeedbackList(a))
+        Ok(views.html.component.master.setBuyerFeedbackList(a))
       } catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }

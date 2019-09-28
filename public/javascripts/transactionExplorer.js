@@ -41,12 +41,15 @@ function transactionExplorer() {
     wsNewTransaction.onclose = function (event) {
     };
 
-    $(window).replaceAll(function () {
-        wsNewTransaction.close();
-    });
+    return wsNewTransaction
 
 }
 
 $('#indexBottomDivision').ready(function () {
-    transactionExplorer();
+    let wsNewTransaction = transactionExplorer();
+    $(window).replaceAll(function () {
+        if (wsNewTransaction.readyState === WebSocket.OPEN) {
+            wsNewTransaction.close();
+        }
+    });
 });

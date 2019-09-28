@@ -21,7 +21,7 @@ class ViewController @Inject()(messagesControllerComponents: MessagesControllerC
   def market: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        withUsernameToken.Ok(views.html.market())
+        Ok(views.html.market())
       }
       catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -31,7 +31,7 @@ class ViewController @Inject()(messagesControllerComponents: MessagesControllerC
   def genesisRequest: Action[AnyContent] = withGenesisLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        withUsernameToken.Ok(views.html.genesisRequest())
+        Ok(views.html.genesisRequest())
       }
       catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -41,7 +41,7 @@ class ViewController @Inject()(messagesControllerComponents: MessagesControllerC
   def genesisInformation: Action[AnyContent] = withGenesisLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        withUsernameToken.Ok(views.html.genesisInformation())
+        Ok(views.html.genesisInformation())
       }
       catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -51,7 +51,7 @@ class ViewController @Inject()(messagesControllerComponents: MessagesControllerC
   def zoneRequest: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        withUsernameToken.Ok(views.html.zoneRequest())
+        Ok(views.html.zoneRequest())
       }
       catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -61,7 +61,7 @@ class ViewController @Inject()(messagesControllerComponents: MessagesControllerC
   def zoneInformation: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        withUsernameToken.Ok(views.html.zoneInformation())
+        Ok(views.html.zoneInformation())
       }
       catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -71,7 +71,7 @@ class ViewController @Inject()(messagesControllerComponents: MessagesControllerC
   def organizationRequest: Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        withUsernameToken.Ok(views.html.organizationRequest())
+        Ok(views.html.organizationRequest())
       }
       catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -81,7 +81,7 @@ class ViewController @Inject()(messagesControllerComponents: MessagesControllerC
   def organizationInformation: Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        withUsernameToken.Ok(views.html.organizationInformation())
+        Ok(views.html.organizationInformation())
       }
       catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))

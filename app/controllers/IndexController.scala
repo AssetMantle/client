@@ -19,6 +19,8 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
 
   private implicit val logger: Logger = Logger(this.getClass)
 
+  private implicit val module: String = constants.Module.CONTROLLERS_INDEX
+
   def index: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {

@@ -20,7 +20,7 @@ case class SessionToken(id: String, sessionTokenHash: String, sessionTokenTime: 
 @Singleton
 class SessionTokens @Inject()(actorSystem: ActorSystem, shutdownActors: ShutdownActor, masterAccounts: master.Accounts, protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
-  private implicit val module: String = constants.Module.MASTER_TRANSACTION_ACCOUNT_TOKEN
+  private implicit val module: String = constants.Module.MASTER_TRANSACTION_SESSION_TOKEN
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -117,7 +117,7 @@ class SessionTokens @Inject()(actorSystem: ActorSystem, shutdownActors: Shutdown
   object Service {
 
     def insertOrUpdate(id: String): String = {
-      val sessionToken: String = "constant token"
+      val sessionToken: String = utilities.IDGenerator.hexadecimal
       Await.result(upsert(SessionToken(id, util.hashing.MurmurHash3.stringHash(sessionToken).toString, DateTime.now(DateTimeZone.UTC).getMillis)), Duration.Inf)
       sessionToken
     }

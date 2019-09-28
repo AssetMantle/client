@@ -89,7 +89,6 @@ class AccountController @Inject()(
           val address = masterAccounts.Service.getAddress(loginData.username)
           implicit val loginState: LoginState = LoginState(loginData.username, userType, address, if (userType == constants.User.TRADER) Option(blockchainAclHashes.Service.getACL(blockchainAclAccounts.Service.getACLHash(address))) else None)
           val contactWarnings: Seq[constants.Response.Warning] = utilities.Contact.getWarnings(masterAccounts.Service.validateLoginAndGetStatus(loginData.username, loginData.password))
-          masterTransactionSessionTokens.Service.insertOrUpdate(id = loginState.username)
           masterTransactionPushNotificationTokens.Service.insertOrUpdate(id = loginState.username, token = loginData.pushNotificationToken)
           utilitiesNotification.send(loginData.username, constants.Notification.LOGIN, loginData.username)
           loginState.userType match {
@@ -167,7 +166,7 @@ class AccountController @Inject()(
             if (masterAccounts.Service.validateLogin(loginState.username, changePasswordData.oldPassword)) {
               transactionChangePassword.Service.post(username = loginState.username, transactionChangePassword.Request(oldPassword = changePasswordData.oldPassword, newPassword = changePasswordData.newPassword, confirmNewPassword = changePasswordData.confirmNewPassword))
               masterAccounts.Service.updatePassword(username = loginState.username, newPassword = changePasswordData.newPassword)
-              Ok(views.html.index(successes = Seq(constants.Response.PASSWORD_UPDATED)))
+              withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.PASSWORD_UPDATED)))
             } else {
               BadRequest(views.html.index(failures = Seq(constants.Response.INVALID_PASSWORD)))
             }

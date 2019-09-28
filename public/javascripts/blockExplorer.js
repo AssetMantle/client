@@ -28,10 +28,7 @@ function blockExplorer(blockExplorerTableBody, maxNumberOfItems) {
     wsNewBlock.onclose = function (event) {
     };
 
-    $(window).replaceAll(function () {
-        wsNewBlock.close();
-    });
-
+    return wsNewBlock;
 }
 
 function updateBlockExplorer(wsNewBlock, blockExplorerTableBody, receivedData, maxNumberOfItems) {
@@ -75,7 +72,7 @@ function initializeBlockExplorer(blockExplorerTableBody, maxNumberOfItems) {
     $.ajax({
         url: lastBlockHeightURL.url,
         type: lastBlockHeightURL.ty1,
-        async: false,
+        async: true,
         statusCode: {
             200: function (latestBlockHeightData) {
                 let latestBlockHeight = parseInt(latestBlockHeightData);
@@ -84,7 +81,7 @@ function initializeBlockExplorer(blockExplorerTableBody, maxNumberOfItems) {
                 $.ajax({
                     url: blockDetails.url,
                     type: blockDetails.type,
-                    async: false,
+                    async: true,
                     statusCode: {
                         200: function (blockDetailsData) {
                             let blocks = JSON.parse(blockDetailsData);
@@ -141,7 +138,7 @@ function setFirstBlockTime() {
     $.ajax({
         url: blockDetails.url,
         type: blockDetails.type,
-        async: false,
+        async: true,
         statusCode: {
             200: function (blockDetailsData) {
                 let blocks = JSON.parse(blockDetailsData);
@@ -160,7 +157,7 @@ function getBlockTime(dateTime, timerID) {
 }
 
 function updateBlockTimes() {
-    let timeOutID = getCookie("timeOutID");
+    let timeOutID = parseInt(getCookie("timeOutID"), 10);
     clearTimeout(timeOutID);
     let setTimeoutIDArray = JSON.parse(getCookie("blockExplorerTimer"));
     if (setTimeoutIDArray !== undefined) {
@@ -183,6 +180,11 @@ $('#indexBottomDivision').ready(function () {
     setFirstBlockTime();
     initializeBlockExplorer(blockExplorerTableBody, maxNumberOfItems);
     showAllBlocksInitialTableContent();
-    blockExplorer(blockExplorerTableBody, maxNumberOfItems);
     updateBlockTimes();
+    let wsNewBlock = blockExplorer(blockExplorerTableBody, maxNumberOfItems);
+    $(window).replaceAll(function () {
+        if (wsNewBlock.readyState === WebSocket.OPEN) {
+            wsNewBlock.close();
+        }
+    });
 });
