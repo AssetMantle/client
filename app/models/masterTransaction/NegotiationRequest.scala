@@ -158,7 +158,7 @@ class NegotiationRequests @Inject()(protected val databaseConfigProvider: Databa
 
     def create(id: String, negotiationID: String, amount: Int): String = Await.result(add(NegotiationRequest(utilities.IDGenerator.requestID(), null, null, null,null ,amount, null, null)), Duration.Inf)
 
-    def insertOrUpdateChangeBid(requestID: String, buyerAccountID: String, sellerAccountID: String, pegHash: String, amount: Int): Int = Await.result(upsert(NegotiationRequest(requestID, None, buyerAccountID, sellerAccountID, pegHash, amount, constants.Status.Asset.UNDER_NEGOTIATION, None)), Duration.Inf)
+    def insertOrUpdate(requestID: String, buyerAccountID: String, sellerAccountID: String, pegHash: String, amount: Int): Int = Await.result(upsert(NegotiationRequest(requestID, None, buyerAccountID, sellerAccountID, pegHash, amount, constants.Status.Asset.UNDER_NEGOTIATION, None)), Duration.Inf)
 
     def getNegotiationByID(id: String): NegotiationRequest = Await.result(find(id), Duration.Inf)
 

@@ -239,7 +239,7 @@
 }
 
 .hidden {
-    display: none !important;
+    display: none;
 }
 
 .width70Percent {
