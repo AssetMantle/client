@@ -7,7 +7,7 @@ import akka.stream.{ActorMaterializer, OverflowStrategy}
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.master
-import models.masterTransaction.AccountTokens
+import models.masterTransaction.SessionTokens
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.{JsValue, Json}
@@ -24,7 +24,7 @@ case class Asset(pegHash: String, documentHash: String, assetType: String, asset
 case class AssetCometMessage(username: String, message: JsValue)
 
 @Singleton
-class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, actorSystem: ActorSystem, shutdownActors: ShutdownActor, accountTokens: AccountTokens, getAccount: GetAccount, masterAccounts: master.Accounts, implicit val utilitiesNotification: utilities.Notification)(implicit executionContext: ExecutionContext, configuration: Configuration) {
+class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, actorSystem: ActorSystem, shutdownActors: ShutdownActor, sessionTokens: SessionTokens, getAccount: GetAccount, masterAccounts: master.Accounts, implicit val utilitiesNotification: utilities.Notification)(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 

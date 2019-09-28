@@ -581,12 +581,18 @@ CREATE TABLE IF NOT EXISTS MASTER."OrganizationBankAccountDetail"
 );
 
 
-CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."AccountToken"
+CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."SessionToken"
+(
+    "id"               VARCHAR NOT NULL,
+    "sessionTokenHash" VARCHAR NOT NULL,
+    "sessionTokenTime" BIGINT  NOT NULL,
+    PRIMARY KEY ("id")
+);
+
+CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."PushNotificationToken"
 (
     "id"                VARCHAR NOT NULL,
-    "notificationToken" VARCHAR,
-    "sessionTokenHash"  VARCHAR,
-    "sessionTokenTime"  BIGINT,
+    "token" VARCHAR NOT NULL,
     PRIMARY KEY ("id")
 );
 
@@ -633,36 +639,36 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."IssueAssetRequest"
 
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."AssetFile"
 (
-    "id"           VARCHAR NOT NULL,
-    "documentType" VARCHAR NOT NULL,
-    "fileName"     VARCHAR NOT NULL UNIQUE,
-    "file"         BYTEA,
-    "documentContent"      VARCHAR,
-    "status"       BOOLEAN,
+    "id"              VARCHAR NOT NULL,
+    "documentType"    VARCHAR NOT NULL,
+    "fileName"        VARCHAR NOT NULL UNIQUE,
+    "file"            BYTEA,
+    "documentContent" VARCHAR,
+    "status"          BOOLEAN,
     PRIMARY KEY ("id", "documentType")
 );
 
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."NegotiationRequest"
 (
-    "id"                 VARCHAR NOT NULL,
-    "negotiationID"      VARCHAR,
-    "buyerAccountID"     VARCHAR NOT NULL,
+    "id"              VARCHAR NOT NULL,
+    "negotiationID"   VARCHAR,
+    "buyerAccountID"  VARCHAR NOT NULL,
     "sellerAccountID" VARCHAR NOT NULL,
-    "pegHash"          VARCHAR NOT NULL,
-    "amount"           VARCHAR NOT NULL,
-    "status"             VARCHAR NOT NULL,
-    "comment"           VARCHAR,
+    "pegHash"         VARCHAR NOT NULL,
+    "amount"          VARCHAR NOT NULL,
+    "status"          VARCHAR NOT NULL,
+    "comment"         VARCHAR,
     PRIMARY KEY ("id")
 );
 
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."NegotiationFile"
 (
-    "id"           VARCHAR NOT NULL,
-    "documentType" VARCHAR NOT NULL,
-    "fileName"     VARCHAR NOT NULL UNIQUE,
-    "file"         BYTEA,
-    "documentContent"      VARCHAR,
-    "status"       BOOLEAN,
+    "id"              VARCHAR NOT NULL,
+    "documentType"    VARCHAR NOT NULL,
+    "fileName"        VARCHAR NOT NULL UNIQUE,
+    "file"            BYTEA,
+    "documentContent" VARCHAR,
+    "status"          BOOLEAN,
     PRIMARY KEY ("id", "documentType")
 );
 
@@ -681,12 +687,12 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."IssueFiatRequest"
 
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."Notification"
 (
+    "id"                  VARCHAR   NOT NULL,
     "accountID"           VARCHAR   NOT NULL,
     "notificationTitle"   VARCHAR   NOT NULL,
     "notificationMessage" VARCHAR   NOT NULL,
     "time"                TIMESTAMP NOT NULL,
     "read"                BOOLEAN   NOT NULL,
-    "id"                  VARCHAR   NOT NULL UNIQUE,
     PRIMARY KEY ("id")
 );
 
@@ -765,8 +771,10 @@ ALTER TABLE MASTER."Zone"
 ALTER TABLE MASTER."ZoneKYC"
     ADD CONSTRAINT ZoneKYC_Zone_id FOREIGN KEY ("id") REFERENCES MASTER."Zone" ("id");
 
-ALTER TABLE MASTER_TRANSACTION."AccountToken"
-    ADD CONSTRAINT AccountToken_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
+ALTER TABLE MASTER_TRANSACTION."SessionToken"
+    ADD CONSTRAINT SessionToken_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
+ALTER TABLE MASTER_TRANSACTION."PushNotificationToken"
+    ADD CONSTRAINT PushNotificationToken_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER_TRANSACTION."AddTraderRequest"
     ADD CONSTRAINT AddTraderRequest_Account_accountID FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER_TRANSACTION."AddTraderRequest"
@@ -852,7 +860,7 @@ DROP TABLE IF EXISTS MASTER."AccountKYC" CASCADE;
 DROP TABLE IF EXISTS MASTER."OrganizationBankAccountDetail" CASCADE;
 DROP TABLE IF EXISTS MASTER."AccountFile" CASCADE;
 
-DROP TABLE IF EXISTS MASTER_TRANSACTION."AccountToken" CASCADE;
+DROP TABLE IF EXISTS MASTER_TRANSACTION."SessionToken" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."AddTraderRequest" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."FaucetRequest" CASCADE;
 DROP TABLE IF EXISTS MASTER_TRANSACTION."IssueAssetRequest" CASCADE;

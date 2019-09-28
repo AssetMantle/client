@@ -15,10 +15,10 @@ import scala.concurrent.duration.{Duration, _}
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class AccountToken(id: String, notificationToken: Option[String], sessionTokenHash: Option[String], sessionTokenTime: Option[Long])
+case class SessionToken(id: String, sessionTokenHash: String, sessionTokenTime: Long)
 
 @Singleton
-class AccountTokens @Inject()(actorSystem: ActorSystem, shutdownActors: ShutdownActor, masterAccounts: master.Accounts, protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext, configuration: Configuration) {
+class SessionTokens @Inject()(actorSystem: ActorSystem, shutdownActors: ShutdownActor, masterAccounts: master.Accounts, protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
   private implicit val module: String = constants.Module.MASTER_TRANSACTION_ACCOUNT_TOKEN
 
@@ -26,7 +26,7 @@ class AccountTokens @Inject()(actorSystem: ActorSystem, shutdownActors: Shutdown
 
   val db = databaseConfig.db
 
-  private val schedulerExecutionContext:ExecutionContext= actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
+  private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
 
   private val sessionTokenTimeout: Long = configuration.get[Long]("sessionToken.timeout")
 
@@ -38,9 +38,9 @@ class AccountTokens @Inject()(actorSystem: ActorSystem, shutdownActors: Shutdown
 
   private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
 
-  private[models] val accountTokenTable = TableQuery[AccountTokenTable]
+  private[models] val sessionTokenTable = TableQuery[SessionTokenTable]
 
-  private def add(accountToken: AccountToken): Future[String] = db.run((accountTokenTable returning accountTokenTable.map(_.id) += accountToken).asTry).map {
+  private def add(sessionToken: SessionToken): Future[String] = db.run((sessionTokenTable returning sessionTokenTable.map(_.id) += sessionToken).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -48,7 +48,7 @@ class AccountTokens @Inject()(actorSystem: ActorSystem, shutdownActors: Shutdown
     }
   }
 
-  private def findById(id: String): Future[AccountToken] = db.run(accountTokenTable.filter(_.id === id).result.head.asTry).map {
+  private def findByID(id: String): Future[SessionToken] = db.run(sessionTokenTable.filter(_.id === id).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -56,39 +56,33 @@ class AccountTokens @Inject()(actorSystem: ActorSystem, shutdownActors: Shutdown
     }
   }
 
-  private def getNotificationTokenByID(id: String): Future[Option[String]] = db.run(accountTokenTable.filter(_.id === id).map(_.notificationToken.?).result.head.asTry).map {
+  private def upsert(sessionToken: SessionToken) = db.run(sessionTokenTable.insertOrUpdate(sessionToken).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+    }
+  }
+
+  private def getSessionTokenTimeByID(id: String): Future[Long] = db.run(sessionTokenTable.filter(_.id === id).map(_.sessionTokenTime).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.info(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        None
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }
   }
 
-  private def getSessionTokenTimeByID(id: String): Future[Option[Long]] = db.run(accountTokenTable.filter(_.id === id).map(_.sessionTokenTime.?).result.head.asTry).map {
+  private def getSessionTokenHashByID(id: String): Future[String] = db.run(sessionTokenTable.filter(_.id === id).map(_.sessionTokenHash).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.info(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        None
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }
   }
 
-  private def getSessionTokenHashByID(id: String): Future[Option[String]] = db.run(accountTokenTable.filter(_.id === id).map(_.sessionTokenHash.?).result.head.asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => logger.info(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        None
-    }
-  }
-
-  private def upsert(accountToken: AccountToken) = db.run(accountTokenTable.insertOrUpdate(accountToken).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-    }
-  }
-
-  private def refreshSessionTokenOnID(id: String, tokenHash: Option[String], tokenTime: Long) = db.run(accountTokenTable.filter(_.id === id).map(accountTokenTable => (accountTokenTable.sessionTokenHash.?, accountTokenTable.sessionTokenTime)).update(tokenHash, tokenTime).asTry).map {
+  private def getSessionTimedOutIDs: Future[Seq[String]] = db.run(sessionTokenTable.filter(_.sessionTokenTime < DateTime.now(DateTimeZone.UTC).getMillis - sessionTokenTimeout).map(_.id).result)
+  
+  private def deleteByID(id: String) = db.run(sessionTokenTable.filter(_.id === id).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -98,9 +92,7 @@ class AccountTokens @Inject()(actorSystem: ActorSystem, shutdownActors: Shutdown
     }
   }
 
-  private def getSessionTimedOutIds: Future[Seq[String]] = db.run(accountTokenTable.filter(_.sessionTokenTime.?.isDefined).filter(_.sessionTokenTime < DateTime.now(DateTimeZone.UTC).getMillis - sessionTokenTimeout).map(_.id).result)
-
-  private def setSessionTokenTimeByIds(ids: Seq[String], sessionTokenTime: Option[Long]) = db.run(accountTokenTable.filter(_.id.inSet(ids)).map(_.sessionTokenTime.?).update(sessionTokenTime).asTry).map {
+  private def deleteByIDs(ids: Seq[String]) = db.run(sessionTokenTable.filter(_.id.inSet(ids)).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -110,33 +102,11 @@ class AccountTokens @Inject()(actorSystem: ActorSystem, shutdownActors: Shutdown
     }
   }
 
-  private def setSessionTokenTimeById(id: String, sessionTokenTime: Option[Long]) = db.run(accountTokenTable.filter(_.id === id).map(_.sessionTokenTime.?).update(sessionTokenTime).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
+  private[models] class SessionTokenTable(tag: Tag) extends Table[SessionToken](tag, "SessionToken") {
 
-  private def deleteById(id: String) = db.run(accountTokenTable.filter(_.id === id).delete.asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
-
-  private[models] class AccountTokenTable(tag: Tag) extends Table[AccountToken](tag, "AccountToken") {
-
-    def * = (id, notificationToken.?, sessionTokenHash.?, sessionTokenTime.?) <> (AccountToken.tupled, AccountToken.unapply)
+    def * = (id, sessionTokenHash, sessionTokenTime) <> (SessionToken.tupled, SessionToken.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
-
-    def notificationToken = column[String]("notificationToken")
 
     def sessionTokenHash = column[String]("sessionTokenHash")
 
@@ -145,53 +115,42 @@ class AccountTokens @Inject()(actorSystem: ActorSystem, shutdownActors: Shutdown
   }
 
   object Service {
-    def insertOrUpdate(username: String, notificationToken: Option[String]): String = {
+
+    def insertOrUpdate(id: String): String = {
       val sessionToken: String = "constant token"
-      Await.result(upsert(AccountToken(username, notificationToken = notificationToken, sessionTokenHash = Some(util.hashing.MurmurHash3.stringHash(sessionToken).toString), sessionTokenTime = Option(DateTime.now(DateTimeZone.UTC).getMillis))), Duration.Inf)
+      Await.result(upsert(SessionToken(id, util.hashing.MurmurHash3.stringHash(sessionToken).toString, DateTime.now(DateTimeZone.UTC).getMillis)), Duration.Inf)
       sessionToken
     }
 
-    def getNotificationTokenById(id: String): Option[String] = Await.result(getNotificationTokenByID(id), Duration.Inf)
-
-    def getSessionTokenTimeById(id: String): Long = Await.result(getSessionTokenTimeByID(id), Duration.Inf).getOrElse(0.toLong)
-
-    def tryVerifyingSessionToken(username: String, sessionToken: String): Boolean = {
-      if (Await.result(getSessionTokenHashByID(username), Duration.Inf).getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)) == util.hashing.MurmurHash3.stringHash(sessionToken).toString) true
+    def tryVerifyingSessionToken(id: String, sessionToken: String): Boolean = {
+      if (Await.result(getSessionTokenHashByID(id), Duration.Inf) == util.hashing.MurmurHash3.stringHash(sessionToken).toString) true
       else throw new BaseException(constants.Response.INVALID_TOKEN)
     }
 
-    def tryVerifyingSessionTokenTime(username: String): Boolean = {
-      if (DateTime.now(DateTimeZone.UTC).getMillis - Await.result(getSessionTokenTimeByID(username), Duration.Inf).getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)) < sessionTokenTimeout) true
+    def tryVerifyingSessionTokenTime(id: String): Boolean = {
+      if (DateTime.now(DateTimeZone.UTC).getMillis - Await.result(getSessionTokenTimeByID(id), Duration.Inf) < sessionTokenTimeout) true
       else throw new BaseException(constants.Response.TOKEN_TIMEOUT)
     }
 
-    def refreshSessionToken(username: String): String = {
-      val sessionToken: String = "constant token"
-      Await.result(refreshSessionTokenOnID(username, Some(util.hashing.MurmurHash3.stringHash(sessionToken).toString), DateTime.now(DateTimeZone.UTC).getMillis), Duration.Inf)
-      sessionToken
-    }
+    def getTimedOutIDs: Seq[String] = Await.result(getSessionTimedOutIDs, Duration.Inf)
 
-    def resetSessionTokenTime(username: String): Int = Await.result(setSessionTokenTimeById(username, None), Duration.Inf)
+    def delete(id: String): Int = Await.result(deleteByID(id), Duration.Inf)
 
-    def resetSessionTokenTimeByIds(usernames: Seq[String]): Int = Await.result(setSessionTokenTimeByIds(usernames, None), Duration.Inf)
-
-    def getTimedOutIds: Seq[String] = Await.result(getSessionTimedOutIds, Duration.Inf)
-
-    def deleteToken(username: String): Int = Await.result(deleteById(username), Duration.Inf)
+    def deleteSessionTokens(ids: Seq[String]): Int = Await.result(deleteByIDs(ids), Duration.Inf)
   }
 
   actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
-    val ids = Service.getTimedOutIds
+    val ids = Service.getTimedOutIDs
     ids.foreach { id =>
       shutdownActors.shutdown(constants.Module.ACTOR_MAIN_ACCOUNT, id)
     }
-    masterAccounts.Service.filterTraderIds(ids).foreach{ id =>
+    masterAccounts.Service.filterTraderIDs(ids).foreach { id =>
       shutdownActors.shutdown(constants.Module.ACTOR_MAIN_ASSET, id)
       shutdownActors.shutdown(constants.Module.ACTOR_MAIN_FIAT, id)
       shutdownActors.shutdown(constants.Module.ACTOR_MAIN_NEGOTIATION, id)
       shutdownActors.shutdown(constants.Module.ACTOR_MAIN_ORDER, id)
     }
-    Service.resetSessionTokenTimeByIds(ids)
+    Service.deleteSessionTokens(ids)
   }(schedulerExecutionContext)
 }
 

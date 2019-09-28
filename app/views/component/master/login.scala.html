@@ -15,7 +15,7 @@
     <div class="input-group">
     @inputPassword(loginForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "cmuk-input", 'placeholder -> "Password", 'required -> true)
     </div>
-    <div class = "hidden">@inputText(loginForm(constants.FormField.NOTIFICATION_TOKEN.name), 'id -> constants.FormField.NOTIFICATION_TOKEN.name, 'readonly -> true)</div>
+    <div class = "hidden">@inputText(loginForm(constants.FormField.PUSH_NOTIFICATION_TOKEN.name), 'id -> constants.FormField.PUSH_NOTIFICATION_TOKEN.name, 'readonly -> true)</div>
     @if(loginForm.hasGlobalErrors) {
         <ul>
         @for(error <- loginForm.globalErrors) {

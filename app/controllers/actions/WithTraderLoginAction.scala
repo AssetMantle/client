@@ -10,7 +10,7 @@ import play.api.{Configuration, Logger}
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class WithTraderLoginAction @Inject()(messagesControllerComponents: MessagesControllerComponents, masterAccounts: master.Accounts, blockchainACLHashes: blockchain.ACLHashes, blockchainACLAccounts: blockchain.ACLAccounts, masterTransactionAccountTokens: masterTransaction.AccountTokens)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class WithTraderLoginAction @Inject()(messagesControllerComponents: MessagesControllerComponents, masterAccounts: master.Accounts, blockchainACLHashes: blockchain.ACLHashes, blockchainACLAccounts: blockchain.ACLAccounts, masterTransactionSessionTokens: masterTransaction.SessionTokens)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val module: String = constants.Module.ACTIONS_WITH_TRADER_LOGIN_ACTION
 
@@ -18,8 +18,8 @@ class WithTraderLoginAction @Inject()(messagesControllerComponents: MessagesCont
     Action { implicit request ⇒
       try {
         val username = request.session.get(constants.Security.USERNAME).getOrElse(throw new BaseException(constants.Response.USERNAME_NOT_FOUND))
-        masterTransactionAccountTokens.Service.tryVerifyingSessionToken(username, request.session.get(constants.Security.TOKEN).getOrElse(throw new BaseException(constants.Response.TOKEN_NOT_FOUND)))
-        masterTransactionAccountTokens.Service.tryVerifyingSessionTokenTime(username)
+        masterTransactionSessionTokens.Service.tryVerifyingSessionToken(username, request.session.get(constants.Security.TOKEN).getOrElse(throw new BaseException(constants.Response.TOKEN_NOT_FOUND)))
+        masterTransactionSessionTokens.Service.tryVerifyingSessionTokenTime(username)
         masterAccounts.Service.tryVerifyingUserType(username, constants.User.TRADER)
         val address = masterAccounts.Service.getAddress(username)
         f(LoginState(username, constants.User.TRADER, address, Option(blockchainACLHashes.Service.getACL(blockchainACLAccounts.Service.getACLHash(address)))))(request)
