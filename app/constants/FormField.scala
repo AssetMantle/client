@@ -91,6 +91,8 @@ object FormField {
   val CONFIRM_NEW_PASSWORD = new StringFormField("CONFIRM_NEW_PASSWORD", 1, 128, RegularExpression.PASSWORD, Response.INVALID_PASSWORD.message)
   val SEED = new StringFormField("SEED", 1, 200)
   val SEARCH_TX_HASH_HEIGHT = new StringFormField("SEARCH_TX_HASH_HEIGHT", 1, 1000)
+  val DOCUMENT_TYPE = new StringFormField("DOCUMENT_TYPE", 2, 500)
+  val FILE_ID = new StringFormField("FILE_ID", 2, 500)
 
   val ASSET_TYPE = new StringOptionFormField("ASSET_TYPE", constants.Form.ASSET_TYPE_OPTIONS)
   val DELIVERY_TERM = new StringOptionFormField("DELIVERY_TERM", constants.Form.DELIVERY_TERM_OPTIONS)

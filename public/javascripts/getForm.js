@@ -9,9 +9,7 @@ function getForm(route, modalContent = '#commonModalContent', modal = '#commonMo
                 $(modalContent).html(data);
             },
             500: function (data) {
-                const newDocument = document.open("text/html", "replace");
-                newDocument.write(data.responseText);
-                newDocument.close();
+                replaceDocument(data.responseText);
             }
         }
     }).fail(function (XMLHttpRequest) {

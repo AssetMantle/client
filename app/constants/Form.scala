@@ -1,6 +1,16 @@
 package constants
 
+import controllers.routes
+import play.api.mvc.Call
+
+class Form(private val template: String, val route: Call) {
+  val legend: String = Seq("FORM", template, "LEGEND").mkString(".")
+  val submit: String = Seq("FORM", template, "SUBMIT").mkString(".")
+}
+
 object Form {
+
+  val SIGN_UP = new Form("SIGN_UP", routes.AccountController.signUp)
 
   val INDEX = "INDEX"
   val COMMIT = "COMMIT"
@@ -76,7 +86,16 @@ object Form {
   val INVITE_TRADER = "INVITE_TRADER"
   val VERIFY = "VERIFY"
   val ZONE_KYC_FILES = "ZONE_KYC_FILES"
+  val UPDATE_ZONE_KYC_STATUS = "UPDATE_ZONE_KYC_STATUS"
+  val UPDATE_ORGANIZATION_KYC_STATUS = "UPDATE_ORGANIZATION_KYC_STATUS"
+  val UPDATE_TRADER_KYC_ZONE_STATUS = "UPDATE_TRADER_KYC_ZONE_STATUS"
+  val UPDATE_TRADER_KYC_ORGANIZATION_STATUS = "UPDATE_TRADER_KYC_ORGANIZATION_STATUS"
+  val UPDATE_ASSET_DOCUMENT_STATUS = "UPDATE_ASSET_DOCUMENT_STATUS"
   val INVITE = "INVITE"
+  val UPDATE_STATUS = "UPDATE_STATUS"
+  val ZONE_STATUS = "ZONE_STATUS"
+  val ORGANIZATION_STATUS= "ORGANIZATION_STATUS"
+  val STATUS_UPDATED = "STATUS_UPDATED"
 
   //File Upload
   val BROWSE = "BROWSE"
@@ -242,7 +261,6 @@ object Form {
   val USERNAME_AVAILABLE = "USERNAME_AVAILABLE"
   val NOTIFICATION_TOKEN = "NOTIFICATION_TOKEN"
   val CSRF_TOKEN = "csrfToken"
-  val SIGNUP = "SIGNUP"
   val UPDATE_CONTACT = "UPDATE_CONTACT"
   val MOBILE_NUMBER = "MOBILE_NUMBER"
   val EMAIL_ADDRESS = "EMAIL_ADDRESS"

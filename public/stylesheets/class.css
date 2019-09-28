@@ -239,7 +239,7 @@
 }
 
 .hidden {
-    display: none;
+    display: none !important;
 }
 
 .width70Percent {
@@ -719,6 +719,12 @@ dl .info::after {
 .error {
     color: #f0506e;
 }
+
+.status {
+    width: 20px;
+    height: 20px;
+}
+
 @media  (max-width: 639px) {
 .cmuk-navbar-nav{
     display: block !important;
