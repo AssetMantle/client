@@ -28,11 +28,12 @@ function blockExplorer(blockExplorerTableBody, maxNumberOfItems) {
     wsNewBlock.onclose = function (event) {
     };
 
-    $(window).replaceAll(function () {
-        if (wsNewBlock.readyState === WebSocket.OPEN) {
-            wsNewBlock.close();
-        }
+    window.addEventListener("replaceAll", function () {
+        console.log("AAAAA");
+        //wsNewBlock.close();
     });
+
+    return wsNewBlock;
 }
 
 function updateBlockExplorer(wsNewBlock, blockExplorerTableBody, receivedData, maxNumberOfItems) {
@@ -185,5 +186,8 @@ $('#indexBottomDivision').ready(function () {
     initializeBlockExplorer(blockExplorerTableBody, maxNumberOfItems);
     showAllBlocksInitialTableContent();
     updateBlockTimes();
-    blockExplorer(blockExplorerTableBody, maxNumberOfItems);
+    let wsNewBlock = blockExplorer(blockExplorerTableBody, maxNumberOfItems);
+    $(window).on('replace', function (e) {
+        wsNewBlock.close();
+    });
 });
