@@ -6,7 +6,6 @@ getConfigurationAsynchronously("pushNotification.storageBucket");
 getConfigurationAsynchronously("pushNotification.senderID");
 
 $(document).ready(function () {
-    console.log("PUSH_NOTIFICATION");
     let config = {
         apiKey: getConfiguration("pushNotification.apiKey"),
         authDomain: getConfiguration("pushNotification.authDomain"),

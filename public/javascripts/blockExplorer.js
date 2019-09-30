@@ -28,7 +28,11 @@ function blockExplorer(blockExplorerTableBody, maxNumberOfItems) {
     wsNewBlock.onclose = function (event) {
     };
 
-    return wsNewBlock;
+    $(window).replaceAll(function () {
+        if (wsNewBlock.readyState === WebSocket.OPEN) {
+            wsNewBlock.close();
+        }
+    });
 }
 
 function updateBlockExplorer(wsNewBlock, blockExplorerTableBody, receivedData, maxNumberOfItems) {
@@ -112,7 +116,7 @@ function initializeBlockExplorer(blockExplorerTableBody, maxNumberOfItems) {
 
                             for (let i = 0; i < initialTimeData.length; i++) {
                                 getBlockTime(initialTimeData[i], "timer" + (latestBlockHeight - i).toString(10));
-                                setTimeoutIDArray.push( "timer" + (latestBlockHeight - i).toString(10));
+                                setTimeoutIDArray.push("timer" + (latestBlockHeight - i).toString(10));
                             }
                             setTimeoutIDArray.shift();
                             setCookie("blockExplorerTimer", JSON.stringify(setTimeoutIDArray), 1);
@@ -181,10 +185,5 @@ $('#indexBottomDivision').ready(function () {
     initializeBlockExplorer(blockExplorerTableBody, maxNumberOfItems);
     showAllBlocksInitialTableContent();
     updateBlockTimes();
-    let wsNewBlock = blockExplorer(blockExplorerTableBody, maxNumberOfItems);
-    $(window).replaceAll(function () {
-        if (wsNewBlock.readyState === WebSocket.OPEN) {
-            wsNewBlock.close();
-        }
-    });
+    blockExplorer(blockExplorerTableBody, maxNumberOfItems);
 });

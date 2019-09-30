@@ -41,15 +41,14 @@ function transactionExplorer() {
     wsNewTransaction.onclose = function (event) {
     };
 
-    return wsNewTransaction
-
-}
-
-$('#indexBottomDivision').ready(function () {
-    let wsNewTransaction = transactionExplorer();
     $(window).replaceAll(function () {
         if (wsNewTransaction.readyState === WebSocket.OPEN) {
             wsNewTransaction.close();
         }
     });
+
+}
+
+$('#indexBottomDivision').ready(function () {
+    transactionExplorer();
 });
