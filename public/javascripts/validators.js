@@ -9,7 +9,7 @@ function getValidators() {
                 $('#validator').html(validatorListData.length);
                 let content = "";
                 Array.prototype.forEach.call(validatorListData, validator => {
-                    content = content + "<tr><td><p>" + validator.operator_address + "</p></td><td>" + validator.status + "</td><td >" + validator.tokens + "</div></td></td><td >" + validator.delegator_shares + "</td></tr>";
+                    content = content + "<tr><td><p> <span id=\"text_element\" class=\"hash_code\"> "+ validator.operator_address + "</span><span onclick=\"copyToClipboard('text_element')\"><span class='copyIcon' cmuk-icon=\"copy\"></span></span></p></td><td>" + validator.status + "</td><td >" + validator.tokens + "</div></td></td><td ><span class=\"hash_code\" title='" + validator.delegator_shares + "'>" + validator.delegator_shares + "</span></td></tr>";
                 });
                 $('#validatorsTableBody').append(content);
             },

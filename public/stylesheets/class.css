@@ -730,3 +730,6 @@ dl .info::after {
     display: block !important;
 }
 }
+.copyIcon{
+    cursor: pointer;
+}
