@@ -9,9 +9,9 @@
 <div id="@Seq(traderKYC.id, traderKYC.documentType).mkString("")">
 @form(action = routes.SetACLController.updateTraderKYCDocumentOrganizationStatus, 'onkeypress -> "submitFormOnEnter(event,this)") {
     @CSRF.formField
-    @inputText(updateTraderKYCDocumentOrganizationStatusForm(constants.FormField.TRADER_ID.name).copy(value = Some(traderKYC.id)), '_label -> Messages(constants.FormField.TRADER_ID.name), 'placeholder -> Messages(constants.FormField.TRADER_ID.name), 'required -> true, 'class -> "cmuk-input hidden", 'readonly -> true)
-    @inputText(updateTraderKYCDocumentOrganizationStatusForm(constants.FormField.DOCUMENT_TYPE.name).copy(value = Some(traderKYC.documentType)), '_label -> Messages(constants.FormField.DOCUMENT_TYPE.name), 'placeholder -> Messages(constants.FormField.DOCUMENT_TYPE.name), 'required -> true, 'class -> "cmuk-input hidden", 'readonly -> true)
-    @checkbox(updateTraderKYCDocumentOrganizationStatusForm(constants.Form.ORGANIZATION_STATUS), '_label -> Messages(constants.Form.ORGANIZATION_STATUS), 'placeholder -> Messages(constants.Form.ORGANIZATION_STATUS), 'required -> true, 'class -> "cmuk-checkbox hidden", 'id -> Seq(traderKYC.id, traderKYC.documentType, constants.Form.STATUS).mkString(""))
+    @inputText(updateTraderKYCDocumentOrganizationStatusForm(constants.FormField.TRADER_ID.name).copy(value = Some(traderKYC.id)), '_label -> Messages(constants.FormField.TRADER_ID.name), 'placeholder -> Messages(constants.FormField.TRADER_ID.name), 'required -> true, 'class -> "hidden", 'readonly -> true)
+    @inputText(updateTraderKYCDocumentOrganizationStatusForm(constants.FormField.DOCUMENT_TYPE.name).copy(value = Some(traderKYC.documentType)), '_label -> Messages(constants.FormField.DOCUMENT_TYPE.name), 'placeholder -> Messages(constants.FormField.DOCUMENT_TYPE.name), 'required -> true, 'class -> "hidden", 'readonly -> true)
+    @checkbox(updateTraderKYCDocumentOrganizationStatusForm(constants.Form.ORGANIZATION_STATUS), '_label -> Messages(constants.Form.ORGANIZATION_STATUS), 'placeholder -> Messages(constants.Form.ORGANIZATION_STATUS), 'required -> true, 'class -> "hidden", 'id -> Seq(traderKYC.id, traderKYC.documentType, constants.Form.STATUS).mkString(""))
 
     @if(updateTraderKYCDocumentOrganizationStatusForm.hasGlobalErrors) {
         <ul>

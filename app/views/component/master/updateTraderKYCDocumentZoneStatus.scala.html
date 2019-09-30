@@ -9,9 +9,9 @@
 <div id="@Seq(traderKYC.id, traderKYC.documentType).mkString("")">
 @form(action = routes.SetACLController.updateTraderKYCDocumentZoneStatus, 'onkeypress -> "submitFormOnEnter(event,this)") {
     @CSRF.formField
-    @inputText(updateTraderKYCDocumentZoneStatus(constants.FormField.TRADER_ID.name).copy(value = Some(traderKYC.id)), '_label -> Messages(constants.FormField.TRADER_ID.name), 'placeholder -> Messages(constants.FormField.TRADER_ID.name), 'required -> true, 'class -> "cmuk-input hidden", 'readonly -> true)
-    @inputText(updateTraderKYCDocumentZoneStatus(constants.FormField.DOCUMENT_TYPE.name).copy(value = Some(traderKYC.documentType)), '_label -> Messages(constants.FormField.DOCUMENT_TYPE.name), 'placeholder -> Messages(constants.FormField.DOCUMENT_TYPE.name), 'required -> true, 'class -> "cmuk-input hidden", 'readonly -> true)
-    @checkbox(updateTraderKYCDocumentZoneStatus(constants.Form.ZONE_STATUS), '_label -> Messages(constants.Form.ZONE_STATUS), 'placeholder -> Messages(constants.Form.ZONE_STATUS), 'required -> true, 'class -> "cmuk-checkbox hidden", 'id -> Seq(traderKYC.id, traderKYC.documentType, constants.Form.STATUS).mkString(""))
+    @inputText(updateTraderKYCDocumentZoneStatus(constants.FormField.TRADER_ID.name).copy(value = Some(traderKYC.id)), '_label -> Messages(constants.FormField.TRADER_ID.name), 'placeholder -> Messages(constants.FormField.TRADER_ID.name), 'required -> true, 'class -> "hidden", 'readonly -> true)
+    @inputText(updateTraderKYCDocumentZoneStatus(constants.FormField.DOCUMENT_TYPE.name).copy(value = Some(traderKYC.documentType)), '_label -> Messages(constants.FormField.DOCUMENT_TYPE.name), 'placeholder -> Messages(constants.FormField.DOCUMENT_TYPE.name), 'required -> true, 'class -> "hidden", 'readonly -> true)
+    @checkbox(updateTraderKYCDocumentZoneStatus(constants.Form.ZONE_STATUS), '_label -> Messages(constants.Form.ZONE_STATUS), 'placeholder -> Messages(constants.Form.ZONE_STATUS), 'required -> true, 'class -> "hidden", 'id -> Seq(traderKYC.id, traderKYC.documentType, constants.Form.STATUS).mkString(""))
 
     @if(updateTraderKYCDocumentZoneStatus.hasGlobalErrors) {
         <ul>
