@@ -1,29 +1,15 @@
 @import helper._
 @import views.companion.blockchain.SellerExecuteOrder
+@import views.html.base._
 
 @(sellerExecuteOrderForm: Form[SellerExecuteOrder.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@form(action = routes.SellerExecuteOrderController.blockchainSellerExecuteOrder, 'onkeypress -> "submitFormOnEnter(event,this)") {
-    <div class="latest_card-header latest_card-header-primary text-center">
-        <h4 class="latest_card-title">@Messages(constants.Form.SELLER_EXECUTE_ORDER)</h4>
-    </div>
-    <div class="latest_card-body">
-        @CSRF.formField
-      @inputText(sellerExecuteOrderForm(constants.FormField.FROM.name), '_label -> Messages(constants.FormField.FROM.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.FROM.name), 'required -> true)
-      @inputText(sellerExecuteOrderForm(constants.FormField.BUYER_ADDRESS.name), '_label -> Messages(constants.FormField.BUYER_ADDRESS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.BUYER_ADDRESS.name), 'required -> true)
-      @inputText(sellerExecuteOrderForm(constants.FormField.SELLER_ADDRESS.name), '_label -> Messages(constants.FormField.SELLER_ADDRESS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.SELLER_ADDRESS.name), 'required -> true)
-      @inputText(sellerExecuteOrderForm(constants.FormField.AWB_PROOF_HASH.name), '_label -> Messages(constants.FormField.AWB_PROOF_HASH.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.AWB_PROOF_HASH.name), 'required -> true)
-      @inputText(sellerExecuteOrderForm(constants.FormField.PEG_HASH.name), '_label -> Messages(constants.FormField.PEG_HASH.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PEG_HASH.name), 'required -> true)
-      @inputText(sellerExecuteOrderForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.GAS.name), 'required -> true, 'type -> "number")
-      @inputText(sellerExecuteOrderForm(constants.FormField.MODE.name), '_label -> Messages(constants.FormField.MODE.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.MODE.name), 'required -> true)
-      @inputPassword(sellerExecuteOrderForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PASSWORD.name), 'required -> true)
-
-        @if(sellerExecuteOrderForm.hasGlobalErrors) {
-            <ul>
-            @for(error <- sellerExecuteOrderForm.globalErrors) {
-                <li>@error.format</li>
-            }
-            </ul>
-        }
-        <button type="button" class="btn btn-primary btn-sm" onclick="submitForm(this)">@Messages(constants.Form.SELLER_EXECUTE_ORDER)</button>
-    </div>
+@baseForm(constants.Form.BLOCKCHAIN_SELLER_EXECUTE_ORDER, sellerExecuteOrderForm) {
+    @inputText(sellerExecuteOrderForm(constants.FormField.FROM.name), '_label -> Messages(constants.FormField.FROM.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.FROM.name), 'required -> true)
+    @inputText(sellerExecuteOrderForm(constants.FormField.BUYER_ADDRESS.name), '_label -> Messages(constants.FormField.BUYER_ADDRESS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.BUYER_ADDRESS.name), 'required -> true)
+    @inputText(sellerExecuteOrderForm(constants.FormField.SELLER_ADDRESS.name), '_label -> Messages(constants.FormField.SELLER_ADDRESS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.SELLER_ADDRESS.name), 'required -> true)
+    @inputText(sellerExecuteOrderForm(constants.FormField.AWB_PROOF_HASH.name), '_label -> Messages(constants.FormField.AWB_PROOF_HASH.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.AWB_PROOF_HASH.name), 'required -> true)
+    @inputText(sellerExecuteOrderForm(constants.FormField.PEG_HASH.name), '_label -> Messages(constants.FormField.PEG_HASH.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PEG_HASH.name), 'required -> true)
+    @inputText(sellerExecuteOrderForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.GAS.name), 'required -> true, 'type -> "number")
+    @inputText(sellerExecuteOrderForm(constants.FormField.MODE.name), '_label -> Messages(constants.FormField.MODE.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.MODE.name), 'required -> true)
+    @inputPassword(sellerExecuteOrderForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PASSWORD.name), 'required -> true)
 }

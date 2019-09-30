@@ -6,7 +6,6 @@
 @(signUpForm: Form[SignUp.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 
 @baseForm(constants.Form.SIGN_UP, signUpForm){
-
     @inputText(signUpForm(constants.FormField.USERNAME.name), 'placeholder -> Messages(constants.FormField.USERNAME.name), 'id -> "username", 'class -> "cmuk-input", 'required -> true, 'onkeyup -> """checkUsernameAvailable(this, "#checkUsernameAvailableResult", "#usernameAvailable")""")
     @inputPassword(signUpForm(constants.FormField.SIGNUP_PASSWORD.name), 'id -> "password", 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.SIGNUP_PASSWORD.name), 'required -> true)
     @inputPassword(signUpForm(constants.FormField.SIGNUP_CONFIRM_PASSWORD.name), 'id -> "confirmPassword", 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.SIGNUP_CONFIRM_PASSWORD.name), 'required -> true)
