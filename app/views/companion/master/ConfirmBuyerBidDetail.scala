@@ -16,4 +16,3 @@ object ConfirmBuyerBidDetail {
   case class Data(requestID: Option[String], sellerAddress: String, bid: Int, pegHash: String)
 
 }
-//      constants.FormField.BUYER_CONTRACT_HASH.name -> constants.FormField.BUYER_CONTRACT_HASH.field,
