@@ -2,7 +2,7 @@
 @import views.companion.blockchain.AddZone
 @import views.html.base._
 
-@(addZoneForm: Form[AddZone.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@(addZoneForm: Form[AddZone.Data] = AddZone.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @baseForm(constants.Form.BLOCKCHAIN_ADD_ZONE, addZoneForm) {
     @inputText(addZoneForm(constants.FormField.FROM.name), '_label -> Messages(constants.FormField.FROM.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.FROM.name), 'required -> true)
     @inputText(addZoneForm(constants.FormField.TO.name), '_label -> Messages(constants.FormField.TO.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.TO.name), 'required -> true)

@@ -2,7 +2,7 @@
 @import views.companion.blockchain.SendFiat
 @import views.html.base._
 
-@(sendFiatForm: Form[SendFiat.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@(sendFiatForm: Form[SendFiat.Data] = SendFiat.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @baseForm(constants.Form.BLOCKCHAIN_SEND_FIAT, sendFiatForm) {
     @inputText(sendFiatForm(constants.FormField.FROM.name), '_label -> Messages(constants.FormField.FROM.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.FROM.name), 'required -> true)
     @inputText(sendFiatForm(constants.FormField.TO.name), '_label -> Messages(constants.FormField.TO.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.TO.name), 'required -> true)

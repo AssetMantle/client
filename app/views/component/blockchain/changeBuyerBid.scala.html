@@ -2,7 +2,7 @@
 @import views.companion.blockchain.ChangeBuyerBid
 @import views.html.base._
 
-@(changeBuyerBidForm: Form[ChangeBuyerBid.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@(changeBuyerBidForm: Form[ChangeBuyerBid.Data] = ChangeBuyerBid.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @baseForm(constants.Form.BLOCKCHAIN_CHANGE_BUYER_BID, changeBuyerBidForm) {
     @inputText(changeBuyerBidForm(constants.FormField.FROM.name), '_label -> Messages(constants.FormField.FROM.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.FROM.name), 'required -> true)
     @inputText(changeBuyerBidForm(constants.FormField.TO.name), '_label -> Messages(constants.FormField.TO.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.TO.name), 'required -> true)

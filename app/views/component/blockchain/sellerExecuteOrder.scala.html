@@ -2,7 +2,7 @@
 @import views.companion.blockchain.SellerExecuteOrder
 @import views.html.base._
 
-@(sellerExecuteOrderForm: Form[SellerExecuteOrder.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@(sellerExecuteOrderForm: Form[SellerExecuteOrder.Data] = SellerExecuteOrder.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @baseForm(constants.Form.BLOCKCHAIN_SELLER_EXECUTE_ORDER, sellerExecuteOrderForm) {
     @inputText(sellerExecuteOrderForm(constants.FormField.FROM.name), '_label -> Messages(constants.FormField.FROM.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.FROM.name), 'required -> true)
     @inputText(sellerExecuteOrderForm(constants.FormField.BUYER_ADDRESS.name), '_label -> Messages(constants.FormField.BUYER_ADDRESS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.BUYER_ADDRESS.name), 'required -> true)

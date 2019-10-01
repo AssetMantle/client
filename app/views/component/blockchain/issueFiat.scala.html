@@ -2,7 +2,7 @@
 @import views.companion.blockchain.IssueFiat
 @import views.html.base._
 
-@(issueFiatForm: Form[IssueFiat.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@(issueFiatForm: Form[IssueFiat.Data] = IssueFiat.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @baseForm(constants.Form.BLOCKCHAIN_ISSUE_FIAT, issueFiatForm) {
     @inputText(issueFiatForm(constants.FormField.FROM.name), '_label -> Messages(constants.FormField.FROM.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.FROM.name), 'required -> true)
     @inputText(issueFiatForm(constants.FormField.TO.name), '_label -> Messages(constants.FormField.TO.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.TO.name), 'required -> true)

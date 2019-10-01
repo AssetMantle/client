@@ -2,7 +2,7 @@
 @import views.companion.blockchain.ConfirmSellerBid
 @import views.html.base._
 
-@(confirmSellerBidForm: Form[ConfirmSellerBid.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@(confirmSellerBidForm: Form[ConfirmSellerBid.Data] = ConfirmSellerBid.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @baseForm(constants.Form.BLOCKCHAIN_CONFIRM_SELLER_BID, confirmSellerBidForm) {
     @inputText(confirmSellerBidForm(constants.FormField.FROM.name), '_label -> Messages(constants.FormField.FROM.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.FROM.name), 'required -> true)
     @inputText(confirmSellerBidForm(constants.FormField.TO.name), '_label -> Messages(constants.FormField.TO.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.TO.name), 'required -> true)

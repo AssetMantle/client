@@ -2,7 +2,7 @@
 @import views.companion.blockchain.RedeemAsset
 @import views.html.base._
 
-@(redeemAssetForm: Form[RedeemAsset.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@(redeemAssetForm: Form[RedeemAsset.Data] = RedeemAsset.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @baseForm(constants.Form.BLOCKCHAIN_REDEEM_ASSET, redeemAssetForm) {
     @inputText(redeemAssetForm(constants.FormField.FROM.name), '_label -> Messages(constants.FormField.FROM.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.FROM.name), 'required -> true)
     @inputText(redeemAssetForm(constants.FormField.TO.name), '_label -> Messages(constants.FormField.TO.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.TO.name), 'required -> true)
