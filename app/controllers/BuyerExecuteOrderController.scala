@@ -96,7 +96,7 @@ class BuyerExecuteOrderController @Inject()(messagesControllerComponents: Messag
   }
 
   def blockchainBuyerExecuteOrderForm: Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.blockchain.buyerExecuteOrder(views.companion.blockchain.BuyerExecuteOrder.form))
+    Ok(views.html.component.blockchain.buyerExecuteOrder())
   }
 
   def blockchainBuyerExecuteOrder: Action[AnyContent] = Action { implicit request =>

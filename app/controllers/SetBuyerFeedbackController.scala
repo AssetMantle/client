@@ -61,7 +61,7 @@ class SetBuyerFeedbackController @Inject()(messagesControllerComponents: Message
   }
 
   def blockchainSetBuyerFeedbackForm: Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.blockchain.setBuyerFeedback(views.companion.blockchain.SetBuyerFeedback.form))
+    Ok(views.html.component.blockchain.setBuyerFeedback())
   }
 
   def blockchainSetBuyerFeedback: Action[AnyContent] = Action { implicit request =>

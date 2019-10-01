@@ -92,7 +92,7 @@ class SellerExecuteOrderController @Inject()(messagesControllerComponents: Messa
   }
 
   def blockchainSellerExecuteOrderForm: Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.blockchain.sellerExecuteOrder(views.companion.blockchain.SellerExecuteOrder.form))
+    Ok(views.html.component.blockchain.sellerExecuteOrder())
   }
 
   def blockchainSellerExecuteOrder: Action[AnyContent] = Action { implicit request =>

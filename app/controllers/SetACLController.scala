@@ -613,7 +613,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
   }
 
   def blockchainSetACLForm: Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.blockchain.setACL(views.companion.blockchain.SetACL.form))
+    Ok(views.html.component.blockchain.setACL())
   }
 
   def blockchainSetACL: Action[AnyContent] = Action { implicit request =>
