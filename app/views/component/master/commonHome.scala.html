@@ -12,10 +12,10 @@
         <div class="cmuk-width-1-1 cmuk-width-expand@@m leftText">
             <div class="cmuk-card cmuk-card-default cmuk-card-small cmuk-card-body">
                 <h2 class="card-title">@loginState.username</h2>
-                <p> @Messages(constants.User.COINS): @coins</p>
+                <p> @Messages(constants.Form.COINS): @coins</p>
                 <button class="text-center btn btn-primary btn-sm" onclick="getForm(jsRoutes.controllers.SendCoinController.sendCoinForm())">@Messages(constants.Form.SEND_COIN)</button>
                 <p> @Messages(constants.User.USER_TYPE): @loginState.userType </p>
-                <p> @Messages(constants.User.ADDRESS): @loginState.address
+                <p> @Messages(constants.Form.BLOCKCHAIN_ADDRESS): @loginState.address
                 </p>
             </div>
         </div>
