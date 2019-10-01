@@ -99,7 +99,7 @@ class ConfirmBuyerBidController @Inject()(messagesControllerComponents: Messages
             val masterNegotiation = masterTransactionNegotiationRequests.Service.getNegotiationByID(confirmBidTransaction.requestID)
             if (masterNegotiation.buyerAccountID == loginState.username) {
               val sellerAddress = masterAccounts.Service.getAddress(masterNegotiation.sellerAccountID)
-              val buyerContractHash = utilities.FileOperations.hashExtractor(masterTransactionNegotiationFiles.Service.getFileName(confirmBidTransaction.requestID, constants.File.BUYER_CONTRACT))
+              val buyerContractHash = utilities.FileOperations.combinedHash(masterTransactionNegotiationFiles.Service.getDocuments(confirmBidTransaction.requestID, Seq(constants.File.BUYER_CONTRACT)))
               transaction.process[blockchainTransaction.ConfirmBuyerBid, transactionsConfirmBuyerBid.Request](
                   entity = blockchainTransaction.ConfirmBuyerBid(from = loginState.address, to = sellerAddress, bid = masterNegotiation.amount, time = confirmBidTransaction.time, pegHash = masterNegotiation.pegHash, buyerContractHash = buyerContractHash, gas = confirmBidTransaction.gas, ticketID = "", mode = transactionMode),
                   blockchainTransactionCreate = blockchainTransactionConfirmBuyerBids.Service.create,

@@ -280,6 +280,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
 
         documentType match {
           case constants.File.BUYER_CONTRACT => PartialContent(views.html.component.master.confirmBuyerBidDocument(masterTransactionNegotiationFiles.Service.getOrNone(negotiationRequestID, constants.File.BUYER_CONTRACT), negotiationRequestID, constants.File.BUYER_CONTRACT))
+          case constants.File.SELLER_CONTRACT => PartialContent(views.html.component.master.confirmSellerBidDocument(masterTransactionNegotiationFiles.Service.getOrNone(negotiationRequestID, constants.File.SELLER_CONTRACT), negotiationRequestID, constants.File.SELLER_CONTRACT))
           case _ => withUsernameToken.Ok(views.html.index())
         }
       } catch {
@@ -300,6 +301,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
         )
         documentType match {
           case constants.File.BUYER_CONTRACT => PartialContent(views.html.component.master.confirmBuyerBidDocument(masterTransactionNegotiationFiles.Service.getOrNone(negotiationRequestID, constants.File.BUYER_CONTRACT), negotiationRequestID, constants.File.BUYER_CONTRACT))
+          case constants.File.SELLER_CONTRACT => PartialContent(views.html.component.master.confirmSellerBidDocument(masterTransactionNegotiationFiles.Service.getOrNone(negotiationRequestID, constants.File.SELLER_CONTRACT), negotiationRequestID, constants.File.SELLER_CONTRACT))
           case _ => withUsernameToken.Ok(views.html.index())
         }
       } catch {

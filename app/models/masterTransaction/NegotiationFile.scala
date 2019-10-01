@@ -200,6 +200,8 @@ class NegotiationFiles @Inject()(protected val databaseConfigProvider: DatabaseC
 
     def getAllDocuments(id: String): Seq[NegotiationFile] = Await.result(getAllDocumentsById(id = id), Duration.Inf)
 
+    def getDocuments(id: String, documents: Seq[String]): Seq[NegotiationFile] = Await.result(getDocumentsByID(id, documents), Duration.Inf)
+
     def deleteAllDocuments(id: String): Int = Await.result(deleteById(id = id), Duration.Inf)
 
     def checkFileExists(id: String, documentType: String): Boolean =  Await.result(getIDAndDocumentType(id, documentType), Duration.Inf)
