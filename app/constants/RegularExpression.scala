@@ -3,7 +3,7 @@ package constants
 import scala.util.matching.Regex
 
 object RegularExpression {
-
+  val GENERIC = """.*""".r
   val ALL_NUMBERS_ALL_LETTERS: Regex = """^[A-Za-z0-9]*$""".r
   val PASSWORD: Regex = """^[A-Za-z0-9]*$""".r
   val ACCOUNT_ID: Regex = """^[a-zA-Z0-9]*$""".r
