@@ -31,36 +31,6 @@ class ConfirmSellerBidController @Inject()(messagesControllerComponents: Message
 
   private implicit val module: String = constants.Module.CONTROLLERS_CONFIRM_SELLER_BID
 
-  /*def confirmSellerBidForm(buyerAddress: String, pegHash: String, bid: Int): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.confirmSellerBid(views.companion.master.ConfirmSellerBidDetail.form, buyerAddress, pegHash, bid))
-  }
-
-  def confirmSellerBid: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
-    implicit request =>
-      views.companion.master.ConfirmSellerBidDetail.form.bindFromRequest().fold(
-        formWithErrors => {
-          BadRequest(views.html.component.master.confirmSellerBid(formWithErrors, formWithErrors.data(constants.Form.BUYER_ADDRESS), formWithErrors.data(constants.Form.PEG_HASH), formWithErrors.data(constants.Form.BID).toInt))
-        },
-        confirmSellerBidData => {
-          try {
-            transaction.process[blockchainTransaction.ConfirmSellerBid, transactionsConfirmSellerBid.Request](
-              entity = blockchainTransaction.ConfirmSellerBid(from = loginState.address, to = confirmSellerBidData.buyerAddress, bid = confirmSellerBidData.bid, time = confirmSellerBidData.time, pegHash = confirmSellerBidData.pegHash, sellerContractHash = confirmSellerBidData.sellerContractHash, gas = confirmSellerBidData.gas, ticketID = "", mode = transactionMode),
-              blockchainTransactionCreate = blockchainTransactionConfirmSellerBids.Service.create,
-              request = transactionsConfirmSellerBid.Request(transactionsConfirmSellerBid.BaseReq(from = loginState.address, gas = confirmSellerBidData.gas.toString), to = confirmSellerBidData.buyerAddress, password = confirmSellerBidData.password, bid = confirmSellerBidData.bid.toString, time = confirmSellerBidData.time.toString, pegHash = confirmSellerBidData.pegHash, sellerContractHash = confirmSellerBidData.sellerContractHash, mode = transactionMode),
-              action = transactionsConfirmSellerBid.Service.post,
-              onSuccess = blockchainTransactionConfirmSellerBids.Utility.onSuccess,
-              onFailure = blockchainTransactionConfirmSellerBids.Utility.onFailure,
-              updateTransactionHash = blockchainTransactionConfirmSellerBids.Service.updateTransactionHash
-            )
-            withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.SELLER_BID_CONFIRMED)))
-          }
-          catch {
-            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-          }
-        }
-      )
-  }*/
-
   def confirmSellerBidDetailForm(buyerAddress: String, pegHash: String, bid: Int): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
