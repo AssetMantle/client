@@ -42,14 +42,11 @@ function transactionExplorer() {
     };
 
     return wsNewTransaction
-
 }
 
 $('#indexBottomDivision').ready(function () {
     let wsNewTransaction = transactionExplorer();
-    $(window).replaceAll(function () {
-        if (wsNewTransaction.readyState === WebSocket.OPEN) {
-            wsNewTransaction.close();
-        }
+    $(window).on('replace', function (e) {
+        wsNewTransaction.close();
     });
 });

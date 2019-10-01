@@ -89,7 +89,7 @@ class AccountController @Inject()(
           val address = masterAccounts.Service.getAddress(loginData.username)
           implicit val loginState: LoginState = LoginState(loginData.username, userType, address, if (userType == constants.User.TRADER) Option(blockchainAclHashes.Service.getACL(blockchainAclAccounts.Service.getACLHash(address))) else None)
           val contactWarnings: Seq[constants.Response.Warning] = utilities.Contact.getWarnings(masterAccounts.Service.validateLoginAndGetStatus(loginData.username, loginData.password))
-          masterTransactionPushNotificationTokens.Service.insertOrUpdate(id = loginState.username, token = loginData.pushNotificationToken)
+          masterTransactionPushNotificationTokens.Service.update(id = loginState.username, token = loginData.pushNotificationToken)
           utilitiesNotification.send(loginData.username, constants.Notification.LOGIN, loginData.username)
           loginState.userType match {
             case constants.User.GENESIS =>

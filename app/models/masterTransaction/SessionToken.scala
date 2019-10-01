@@ -116,7 +116,7 @@ class SessionTokens @Inject()(actorSystem: ActorSystem, shutdownActors: Shutdown
 
   object Service {
 
-    def insertOrRefresh(id: String): String = {
+    def refresh(id: String): String = {
       val sessionToken: String = utilities.IDGenerator.hexadecimal
       Await.result(upsert(SessionToken(id, util.hashing.MurmurHash3.stringHash(sessionToken).toString, DateTime.now(DateTimeZone.UTC).getMillis)), Duration.Inf)
       sessionToken

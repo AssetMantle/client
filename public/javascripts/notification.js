@@ -9,6 +9,10 @@ $('#notificationBadge').ready(function () {
         statusCode: {
             200: function (data) {
                 notificationBadge.html(data);
+            },
+            204: function (data) {
+            },
+            401: function (data) {
             }
         }
     });
