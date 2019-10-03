@@ -7,7 +7,6 @@ import akka.stream.{ActorMaterializer, OverflowStrategy}
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.master
-import models.masterTransaction.AccountTokens
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.{JsValue, Json}
@@ -24,15 +23,15 @@ case class Asset(pegHash: String, documentHash: String, assetType: String, asset
 case class AssetCometMessage(username: String, message: JsValue)
 
 @Singleton
-class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, actorSystem: ActorSystem, shutdownActors: ShutdownActor, accountTokens: AccountTokens, getAccount: GetAccount, masterAccounts: master.Accounts, implicit val utilitiesNotification: utilities.Notification)(implicit executionContext: ExecutionContext, configuration: Configuration) {
+class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider, actorSystem: ActorSystem, shutdownActors: ShutdownActor, getAccount: GetAccount, masterAccounts: master.Accounts, implicit val utilitiesNotification: utilities.Notification)(implicit executionContext: ExecutionContext, configuration: Configuration) {
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
   val db = databaseConfig.db
 
-  private val schedulerExecutionContext:ExecutionContext= actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
-
   private implicit val materializer: ActorMaterializer = ActorMaterializer()(actorSystem)
+
+  private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
 
   private val cometActorSleepTime = configuration.get[Long]("akka.actors.cometActorSleepTime")
 
@@ -45,7 +44,6 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
   private implicit val module: String = constants.Module.BLOCKCHAIN_ASSET
 
   import databaseConfig.profile.api._
-
   private[models] val assetTable = TableQuery[AssetTable]
 
   private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
@@ -77,11 +75,12 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
         throw new BaseException(constants.Response.PSQL_EXCEPTION)
     }
   }
-  private def findAllAssetsByPublic(excludedAssets:Seq[String]):Future[Seq[Asset]] = db.run(assetTable.filter(assets => !(assets.ownerAddress inSet excludedAssets)).result)
 
-  private def findAllAssetsByLockedStatus(ownerAddresses:Seq[String], locked: Boolean):Future[Seq[Asset]] = db.run(assetTable.filter(_.locked === locked).filter(asset => asset.ownerAddress inSet ownerAddresses).result)
+  private def findAllAssetsByPublic(excludedAssets: Seq[String]): Future[Seq[Asset]] = db.run(assetTable.filter(assets => !(assets.ownerAddress inSet excludedAssets)).result)
 
-  private def findByPegHashes(pegHashes:Seq[String]):Future[Seq[Asset]] = db.run(assetTable.filter(asset => asset.pegHash inSet pegHashes).result)
+  private def findAllAssetsByLockedStatus(ownerAddresses: Seq[String], locked: Boolean): Future[Seq[Asset]] = db.run(assetTable.filter(_.locked === locked).filter(asset => asset.ownerAddress inSet ownerAddresses).result)
+
+  private def findByPegHashes(pegHashes: Seq[String]): Future[Seq[Asset]] = db.run(assetTable.filter(asset => asset.pegHash inSet pegHashes).result)
 
   private def getAssetPegWalletByAddress(address: String): Future[Seq[Asset]] = db.run(assetTable.filter(_.ownerAddress === address).result)
 
@@ -109,7 +108,7 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
     }
   }
 
-  private def deleteAssetPegWalletByAddress(ownerAddress: String)= db.run(assetTable.filter(_.ownerAddress === ownerAddress).delete.asTry).map {
+  private def deleteAssetPegWalletByAddress(ownerAddress: String) = db.run(assetTable.filter(_.ownerAddress === ownerAddress).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -153,11 +152,11 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
 
     def get(pegHash: String): Asset = Await.result(findByPegHash(pegHash), Duration.Inf)
 
-    def getAllPublic(excludedAssets:Seq[String]):Seq[Asset] = Await.result(findAllAssetsByPublic(excludedAssets),Duration.Inf)
+    def getAllPublic(excludedAssets: Seq[String]): Seq[Asset] = Await.result(findAllAssetsByPublic(excludedAssets), Duration.Inf)
 
-    def getAllLocked(ownerAddresses:Seq[String]):Seq[Asset] = Await.result(findAllAssetsByLockedStatus(ownerAddresses = ownerAddresses, locked = true),Duration.Inf)
+    def getAllLocked(ownerAddresses: Seq[String]): Seq[Asset] = Await.result(findAllAssetsByLockedStatus(ownerAddresses = ownerAddresses, locked = true), Duration.Inf)
 
-    def getByPegHashes(pegHashes:Seq[String]):Seq[Asset] = Await.result(findByPegHashes(pegHashes),Duration.Inf)
+    def getByPegHashes(pegHashes: Seq[String]): Seq[Asset] = Await.result(findByPegHashes(pegHashes), Duration.Inf)
 
     def getAssetPegWallet(address: String): Seq[Asset] = Await.result(getAssetPegWalletByAddress(address), Duration.Inf)
 

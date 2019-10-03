@@ -8,10 +8,10 @@ object Login {
     mapping(
       constants.FormField.USERNAME.name -> constants.FormField.USERNAME.field,
       constants.FormField.PASSWORD.name -> constants.FormField.PASSWORD.field,
-      constants.FormField.NOTIFICATION_TOKEN.name -> constants.FormField.NOTIFICATION_TOKEN.field
+      constants.FormField.PUSH_NOTIFICATION_TOKEN.name -> constants.FormField.PUSH_NOTIFICATION_TOKEN.field
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(username: String, password: String, notificationToken: String)
+  case class Data(username: String, password: String, pushNotificationToken: String)
 
 }

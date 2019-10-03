@@ -18,6 +18,8 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
 
   private implicit val logger: Logger = Logger(this.getClass)
 
+  private implicit val module: String = constants.Module.CONTROLLERS_CONTACT
+
   implicit val contactWrites: OWrites[master.Contact] = Json.writes[master.Contact]
 
   def updateContactForm: Action[AnyContent] = Action { implicit request =>

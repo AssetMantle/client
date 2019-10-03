@@ -22,3 +22,11 @@ function hideElement(element) {
 function showElement(element) {
     $('#' + element).show();
 }
+
+function fetchOrShowHide(source, route, e) {
+    const div = $('#' + source);
+    if (!$.trim(div.html()).length) {
+        componentResource(source, route);
+        showHide($(e));
+    }
+}
