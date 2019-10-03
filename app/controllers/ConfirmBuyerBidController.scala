@@ -35,8 +35,8 @@ class ConfirmBuyerBidController @Inject()(messagesControllerComponents: Messages
     implicit request =>
       try {
         masterTransactionNegotiationRequests.Service.getIDByPegHashAndBuyerAccountID(pegHash, loginState.username) match {
-          case Some(id) => Ok(views.html.component.master.confirmBuyerBidDetail(views.companion.master.ConfirmBuyerBidDetail.form.fill(views.companion.master.ConfirmBuyerBidDetail.Data(Option(id), sellerAddress, bid, pegHash))))
-          case None => Ok(views.html.component.master.confirmBuyerBidDetail(views.companion.master.ConfirmBuyerBidDetail.form.fill(views.companion.master.ConfirmBuyerBidDetail.Data(None, sellerAddress, bid, pegHash))))
+          case Some(id) => withUsernameToken.Ok(views.html.component.master.confirmBuyerBidDetail(views.companion.master.ConfirmBuyerBidDetail.form.fill(views.companion.master.ConfirmBuyerBidDetail.Data(Option(id), sellerAddress, bid, pegHash))))
+          case None => withUsernameToken.Ok(views.html.component.master.confirmBuyerBidDetail(views.companion.master.ConfirmBuyerBidDetail.form.fill(views.companion.master.ConfirmBuyerBidDetail.Data(None, sellerAddress, bid, pegHash))))
         }
       } catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -56,7 +56,7 @@ class ConfirmBuyerBidController @Inject()(messagesControllerComponents: Messages
               case None => utilities.IDGenerator.requestID()
             }
             masterTransactionNegotiationRequests.Service.insertOrUpdate(requestID, loginState.username, masterAccounts.Service.getId(confirmBuyerBidData.sellerAddress), confirmBuyerBidData.pegHash, confirmBuyerBidData.bid)
-            PartialContent(views.html.component.master.confirmBuyerBidDocument(masterTransactionNegotiationFiles.Service.getOrNone(requestID, constants.File.BUYER_CONTRACT), requestID, constants.File.BUYER_CONTRACT))
+            withUsernameToken.PartialContent(views.html.component.master.confirmBuyerBidDocument(masterTransactionNegotiationFiles.Service.getOrNone(requestID, constants.File.BUYER_CONTRACT), requestID, constants.File.BUYER_CONTRACT))
           }
           catch {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))

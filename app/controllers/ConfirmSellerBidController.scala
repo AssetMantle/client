@@ -34,7 +34,7 @@ class ConfirmSellerBidController @Inject()(messagesControllerComponents: Message
   def confirmSellerBidDetailForm(buyerAddress: String, pegHash: String, bid: Int): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        Ok(views.html.component.master.confirmSellerBidDetail(views.companion.master.ConfirmSellerBidDetail.form.fill(views.companion.master.ConfirmSellerBidDetail.Data(masterTransactionNegotiationRequests.Service.getIDByPegHashBuyerAccountIDAndSellerAccountID(pegHash, masterAccounts.Service.getId(buyerAddress), loginState.username), buyerAddress, bid, pegHash))))
+        withUsernameToken.Ok(views.html.component.master.confirmSellerBidDetail(views.companion.master.ConfirmSellerBidDetail.form.fill(views.companion.master.ConfirmSellerBidDetail.Data(masterTransactionNegotiationRequests.Service.getIDByPegHashBuyerAccountIDAndSellerAccountID(pegHash, masterAccounts.Service.getId(buyerAddress), loginState.username), buyerAddress, bid, pegHash))))
       } catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
@@ -50,7 +50,7 @@ class ConfirmSellerBidController @Inject()(messagesControllerComponents: Message
           try {
             if(loginState.username == masterTransactionNegotiationRequests.Service.getSellerAccountID(confirmSellerBidData.requestID))
             masterTransactionNegotiationRequests.Service.updateAmountForID(confirmSellerBidData.requestID, confirmSellerBidData.bid)
-            PartialContent(views.html.component.master.confirmSellerBidDocument(masterTransactionNegotiationFiles.Service.getOrNone(confirmSellerBidData.requestID, constants.File.SELLER_CONTRACT), confirmSellerBidData.requestID, constants.File.SELLER_CONTRACT))
+            withUsernameToken.PartialContent(views.html.component.master.confirmSellerBidDocument(masterTransactionNegotiationFiles.Service.getOrNone(confirmSellerBidData.requestID, constants.File.SELLER_CONTRACT), confirmSellerBidData.requestID, constants.File.SELLER_CONTRACT))
           } catch {
           case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
