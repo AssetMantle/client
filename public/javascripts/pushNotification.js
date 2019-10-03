@@ -1,19 +1,18 @@
-getConfigurationAsynchronously("notification.apiKey");
-getConfigurationAsynchronously("notification.authDomain");
-getConfigurationAsynchronously("notification.databaseURL");
-getConfigurationAsynchronously("notification.projectId");
-getConfigurationAsynchronously("notification.storageBucket");
-getConfigurationAsynchronously("notification.senderID");
+getConfigurationAsynchronously("pushNotification.apiKey");
+getConfigurationAsynchronously("pushNotification.authDomain");
+getConfigurationAsynchronously("pushNotification.databaseURL");
+getConfigurationAsynchronously("pushNotification.projectId");
+getConfigurationAsynchronously("pushNotification.storageBucket");
+getConfigurationAsynchronously("pushNotification.senderID");
 
 $(document).ready(function () {
-
     let config = {
-        apiKey: getConfiguration("notification.apiKey"),
-        authDomain: getConfiguration("notification.authDomain"),
-        databaseURL: getConfiguration("notification.databaseURL"),
-        projectId: getConfiguration("notification.projectId"),
-        storageBucket: getConfiguration("notification.storageBucket"),
-        messagingSenderId: getConfiguration("notification.senderID")
+        apiKey: getConfiguration("pushNotification.apiKey"),
+        authDomain: getConfiguration("pushNotification.authDomain"),
+        databaseURL: getConfiguration("pushNotification.databaseURL"),
+        projectId: getConfiguration("pushNotification.projectId"),
+        storageBucket: getConfiguration("pushNotification.storageBucket"),
+        messagingSenderId: getConfiguration("pushNotification.senderID")
     };
     firebase.initializeApp(config);
     const messaging = firebase.messaging();
@@ -23,13 +22,10 @@ $(document).ready(function () {
             return messaging.getToken()
         })
         .then(function (token) {
-            if ($("#" + "NOTIFICATION_TOKEN").length !== 0) {
-                document.getElementById("NOTIFICATION_TOKEN").value = token
-            }
+            $('#PUSH_NOTIFICATION_TOKEN').val(token);
         })
 
         .catch(function (err) {
-            console.log("Unable to get permission to notify.", err);
         });
     messaging.onMessage(function (payload) {
         alert(JSON.parse(JSON.stringify(payload)).notification.title + " + " + JSON.parse(JSON.stringify(payload)).notification.body);

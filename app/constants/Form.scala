@@ -10,7 +10,7 @@ class Form(private val template: String, val route: Call) {
 
 object Form {
 
-  val SIGN_UP = new Form("SIGN_UP", routes.AccountController.signUp)
+  val SIGN_UP = new Form("SIGN_UP", routes.AccountController.signUp())
 
   val INDEX = "INDEX"
   val COMMIT = "COMMIT"
@@ -263,7 +263,7 @@ object Form {
   val LOGOUT = "LOGOUT"
   val USERNAME = "USERNAME"
   val USERNAME_AVAILABLE = "USERNAME_AVAILABLE"
-  val NOTIFICATION_TOKEN = "NOTIFICATION_TOKEN"
+  val PUSH_NOTIFICATION_TOKEN = "PUSH_NOTIFICATION_TOKEN"
   val CSRF_TOKEN = "csrfToken"
   val UPDATE_CONTACT = "UPDATE_CONTACT"
   val MOBILE_NUMBER = "MOBILE_NUMBER"

@@ -55,7 +55,7 @@ class SellerExecuteOrderController @Inject()(messagesControllerComponents: Messa
   def moderatedSellerExecuteOrderList: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        withUsernameToken.Ok(views.html.component.master.moderatedSellerExecuteOrderList(blockchainNegotiations.Service.getSellerNegotiationsByOrderAndZone(blockchainOrders.Service.getAllOrderIdsWithoutAWBProofHash, blockchainACLAccounts.Service.getAddressesUnderZone(blockchainZones.Service.getID(loginState.address)))))
+        Ok(views.html.component.master.moderatedSellerExecuteOrderList(blockchainNegotiations.Service.getSellerNegotiationsByOrderAndZone(blockchainOrders.Service.getAllOrderIdsWithoutAWBProofHash, blockchainACLAccounts.Service.getAddressesUnderZone(blockchainZones.Service.getID(loginState.address)))))
       } catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
@@ -82,7 +82,7 @@ class SellerExecuteOrderController @Inject()(messagesControllerComponents: Messa
               onFailure = blockchainTransactionSellerExecuteOrders.Utility.onFailure,
               updateTransactionHash = blockchainTransactionSellerExecuteOrders.Service.updateTransactionHash
             )
-            Ok(views.html.index(successes = Seq(constants.Response.SELLER_ORDER_EXECUTED)))
+            withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.SELLER_ORDER_EXECUTED)))
           }
           catch {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))

@@ -9,9 +9,9 @@
 <div id="@Seq(file.id, file.documentType).mkString("")">
 @form(action = routes.IssueAssetController.updateAssetDocumentStatus, 'onkeypress -> "submitFormOnEnter(event,this)") {
     @CSRF.formField
-    @inputText(updateAssetDocumentStatusForm(constants.FormField.FILE_ID.name).copy(value = Some(file.id)), '_label -> Messages(constants.FormField.FILE_ID.name), 'placeholder -> Messages(constants.FormField.FILE_ID.name), 'required -> true, 'class -> "cmuk-input hidden", 'readonly -> true)
-    @inputText(updateAssetDocumentStatusForm(constants.FormField.DOCUMENT_TYPE.name).copy(value = Some(file.documentType)), '_label -> Messages(constants.FormField.DOCUMENT_TYPE.name), 'placeholder -> Messages(constants.FormField.DOCUMENT_TYPE.name), 'required -> true, 'class -> "cmuk-input hidden", 'readonly -> true)
-    @checkbox(updateAssetDocumentStatusForm(constants.Form.STATUS), '_label -> Messages(constants.Form.STATUS), 'placeholder -> Messages(constants.Form.STATUS), 'required -> true, 'class -> "cmuk-checkbox hidden", 'id -> Seq(file.id, file.documentType, constants.Form.STATUS).mkString(""))
+    @inputText(updateAssetDocumentStatusForm(constants.FormField.FILE_ID.name).copy(value = Some(file.id)), '_label -> Messages(constants.FormField.FILE_ID.name), 'placeholder -> Messages(constants.FormField.FILE_ID.name), 'required -> true, 'class -> "hidden", 'readonly -> true)
+    @inputText(updateAssetDocumentStatusForm(constants.FormField.DOCUMENT_TYPE.name).copy(value = Some(file.documentType)), '_label -> Messages(constants.FormField.DOCUMENT_TYPE.name), 'placeholder -> Messages(constants.FormField.DOCUMENT_TYPE.name), 'required -> true, 'class -> "hidden", 'readonly -> true)
+    @checkbox(updateAssetDocumentStatusForm(constants.Form.STATUS), '_label -> Messages(constants.Form.STATUS), 'placeholder -> Messages(constants.Form.STATUS), 'required -> true, 'class -> "hidden", 'id -> Seq(file.id, file.documentType, constants.Form.STATUS).mkString(""))
 
     @if(updateAssetDocumentStatusForm.hasGlobalErrors) {
         <ul>

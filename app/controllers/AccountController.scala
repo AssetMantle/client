@@ -34,7 +34,8 @@ class AccountController @Inject()(
                                    masterZones: master.Zones,
                                    masterAccounts: master.Accounts,
                                    masterTransactionEmailOTP: masterTransaction.EmailOTPs,
-                                   masterTransactionAccountTokens: masterTransaction.AccountTokens,
+                                   masterTransactionSessionTokens: masterTransaction.SessionTokens,
+                                   masterTransactionPushNotificationTokens: masterTransaction.PushNotificationTokens,
                                    transactionAddKey: transactions.AddKey,
                                    transactionForgotPassword: transactions.ForgotPassword,
                                    transactionChangePassword: transactions.ChangePassword,
@@ -88,7 +89,7 @@ class AccountController @Inject()(
           val address = masterAccounts.Service.getAddress(loginData.username)
           implicit val loginState: LoginState = LoginState(loginData.username, userType, address, if (userType == constants.User.TRADER) Option(blockchainAclHashes.Service.getACL(blockchainAclAccounts.Service.getACLHash(address))) else None)
           val contactWarnings: Seq[constants.Response.Warning] = utilities.Contact.getWarnings(masterAccounts.Service.validateLoginAndGetStatus(loginData.username, loginData.password))
-          utilitiesNotification.registerNotificationToken(loginData.username, loginData.notificationToken)
+          masterTransactionPushNotificationTokens.Service.update(id = loginState.username, token = loginData.pushNotificationToken)
           utilitiesNotification.send(loginData.username, constants.Notification.LOGIN, loginData.username)
           loginState.userType match {
             case constants.User.GENESIS =>
@@ -127,15 +128,14 @@ class AccountController @Inject()(
         formWithErrors => {
           BadRequest(views.html.component.master.logout(formWithErrors))
         },
-        loginData => {
+        logoutData => {
           try {
-            if (!loginData.receiveNotifications) {
-              masterTransactionAccountTokens.Service.deleteToken(loginState.username)
-            } else {
-              masterTransactionAccountTokens.Service.resetSessionTokenTime(loginState.username)
+            if (!logoutData.receiveNotifications) {
+              masterTransactionPushNotificationTokens.Service.delete(loginState.username)
             }
+            masterTransactionSessionTokens.Service.delete(loginState.username)
             shutdownActor.onLogOut(constants.Module.ACTOR_MAIN_ACCOUNT, loginState.username)
-            if (masterAccounts.Service.getUserType(loginState.username) == constants.User.TRADER) {
+            if (loginState.userType == constants.User.TRADER) {
               shutdownActor.onLogOut(constants.Module.ACTOR_MAIN_ASSET, loginState.username)
               shutdownActor.onLogOut(constants.Module.ACTOR_MAIN_FIAT, loginState.username)
               shutdownActor.onLogOut(constants.Module.ACTOR_MAIN_NEGOTIATION, loginState.username)
@@ -166,7 +166,7 @@ class AccountController @Inject()(
             if (masterAccounts.Service.validateLogin(loginState.username, changePasswordData.oldPassword)) {
               transactionChangePassword.Service.post(username = loginState.username, transactionChangePassword.Request(oldPassword = changePasswordData.oldPassword, newPassword = changePasswordData.newPassword, confirmNewPassword = changePasswordData.confirmNewPassword))
               masterAccounts.Service.updatePassword(username = loginState.username, newPassword = changePasswordData.newPassword)
-              Ok(views.html.index(successes = Seq(constants.Response.PASSWORD_UPDATED)))
+              withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.PASSWORD_UPDATED)))
             } else {
               BadRequest(views.html.index(failures = Seq(constants.Response.INVALID_PASSWORD)))
             }
