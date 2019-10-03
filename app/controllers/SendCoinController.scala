@@ -9,7 +9,7 @@ import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class SendCoinController @Inject()(messagesControllerComponents: MessagesControllerComponents, transaction: utilities.Transaction, masterAccounts: master.Accounts, withLoginAction: WithLoginAction, withGenesisLoginAction: WithGenesisLoginAction, blockchainAccounts: blockchain.Accounts, masterTransactionFaucetRequests: masterTransaction.FaucetRequests, withUnknownLoginAction: WithUnknownLoginAction, transactionsSendCoin: transactions.SendCoin, blockchainTransactionSendCoins: blockchainTransaction.SendCoins, withUserLoginAction: WithUserLoginAction, withUsernameToken: WithUsernameToken)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
@@ -33,7 +33,7 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
       logger.info(System.currentTimeMillis().toString)
       views.companion.master.SendCoin.form.bindFromRequest().fold(
         formWithErrors => {
-          BadRequest(views.html.component.master.sendCoin(formWithErrors))
+          Future{BadRequest(views.html.component.master.sendCoin(formWithErrors))}
         },
         sendCoinData => {
           try {
@@ -47,17 +47,17 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
               updateTransactionHash = blockchainTransactionSendCoins.Service.updateTransactionHash
             )
 
-            withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.COINS_SENT)))
+            Future{withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.COINS_SENT)))}
           }
           catch {
-            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+            case baseException: BaseException => Future{InternalServerError(views.html.index(failures = Seq(baseException.failure)))}
           }
         }
       )
   }
 
 
-  def sendCoinAsync: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
+ /* def sendCoinAsync: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       logger.info(System.currentTimeMillis().toString)
       views.companion.master.SendCoin.form.bindFromRequest().fold(
@@ -82,7 +82,7 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
           }
         }
       )
-  }
+  }*/
 
   def blockchainSendCoinForm: Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.blockchain.sendCoin(views.companion.blockchain.SendCoin.form))

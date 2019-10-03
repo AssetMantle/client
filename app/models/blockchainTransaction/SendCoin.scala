@@ -240,10 +240,7 @@ class SendCoins @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
 
       val markFailed=Service.markTransactionFailed(ticketID, message)
       val sendCoinFuture = Service.getTransaction(ticketID)
-      val result=for{
-       _ <- markFailed
-       sendCoin <- sendCoinFuture
-      }yield{
+      val result=for{_ <- markFailed ; sendCoin <- sendCoinFuture}yield{
        utilitiesNotification.send(masterAccounts.Service.getId(sendCoin.to), constants.Notification.FAILURE, message)
        utilitiesNotification.send(masterAccounts.Service.getId(sendCoin.from), constants.Notification.FAILURE, message)
       }
@@ -256,12 +253,7 @@ class SendCoins @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
     def onSuccess(ticketID: String, blockResponse: BlockResponse) = {
       val trxSuccess=Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
       val sendCoinFuture = Service.getTransaction(ticketID)
-      val result= for{
-        _<- trxSuccess
-        sendCoinResult <- sendCoinFuture
-
-      }yield sendCoinResult
-      result.flatMap{sendCoin=>
+      val result={for {_<- trxSuccess; sendCoinResult <- sendCoinFuture} yield sendCoinResult}.flatMap{ sendCoin=>
         val markDirtyTo=blockchainAccounts.Service.markDirty(sendCoin.to)
         val markDirtyFrom=blockchainAccounts.Service.markDirty(sendCoin.from)
         val toAccount=masterAccounts.Service.getAccountByAddress(sendCoin.to)
@@ -275,12 +267,13 @@ class SendCoins @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
            masterAccounts.Service.updateUserType(toAcc.id, constants.User.USER)
          }
          utilitiesNotification.send(toAcc.id, constants.Notification.SUCCESS, blockResponse.txhash)
-
          utilitiesNotification.send(masterAccounts.Service.getId(sendCoin.from), constants.Notification.SUCCESS, blockResponse.txhash)
-
-
        }
+      }.recover{
+        case baseException: BaseException => logger.error(baseException.failure.message, baseException)
+          throw new BaseException(constants.Response.PSQL_EXCEPTION)
       }
+      result
 
     }
 

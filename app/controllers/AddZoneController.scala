@@ -9,7 +9,7 @@ import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class AddZoneController @Inject()(messagesControllerComponents: MessagesControllerComponents, transaction: utilities.Transaction, utilitiesNotification: utilities.Notification, blockchainAccounts: blockchain.Accounts, masterZoneKYCs: master.ZoneKYCs, masterOrganizations: master.Organizations, transactionsAddZone: transactions.AddZone, blockchainZones: models.blockchain.Zones, blockchainTransactionAddZones: blockchainTransaction.AddZones, masterAccounts: master.Accounts, masterZones: master.Zones, withUserLoginAction: WithUserLoginAction, withGenesisLoginAction: WithGenesisLoginAction, withUsernameToken: WithUsernameToken)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
@@ -28,14 +28,15 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
     implicit request =>
       views.companion.master.AddZone.form.bindFromRequest().fold(
         formWithErrors => {
-          BadRequest(views.html.component.master.addZone(formWithErrors))
+          Future{BadRequest(views.html.component.master.addZone(formWithErrors))}
         },
         addZoneData => {
-          try {
-            masterZones.Service.create(accountID = loginState.username, name = addZoneData.name, currency = addZoneData.currency)
-            withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ZONE_REQUEST_SENT)))
-          }
-          catch {
+
+          val create=masterZones.Service.create(accountID = loginState.username, name = addZoneData.name, currency = addZoneData.currency)
+          (for{
+            _<-create
+          }yield  withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ZONE_REQUEST_SENT)))
+            ).recover{
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
         }
@@ -50,10 +51,10 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
     implicit request =>
       views.companion.master.VerifyZone.form.bindFromRequest().fold(
         formWithErrors => {
-          BadRequest(views.html.component.master.verifyZone(formWithErrors, formWithErrors.data(constants.Form.ZONE_ID)))
+          Future{BadRequest(views.html.component.master.verifyZone(formWithErrors, formWithErrors.data(constants.Form.ZONE_ID)))}
         },
         verifyZoneData => {
-          try {
+        /*  try {
             val zoneAccountAddress = masterAccounts.Service.getAddress(masterZones.Service.getAccountId(verifyZoneData.zoneID))
             transaction.process[blockchainTransaction.AddZone, transactionsAddZone.Request](
               entity = blockchainTransaction.AddZone(from = loginState.address, to = zoneAccountAddress, zoneID = verifyZoneData.zoneID, gas = verifyZoneData.gas, ticketID = "", mode = transactionMode),
@@ -67,6 +68,26 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
             withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ZONE_VERIFIED)))
           }
           catch {
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+          }*/
+
+          val accountID=masterZones.Service.getAccountId(verifyZoneData.zoneID)
+          def zoneAccountAddress(accountID:String) = masterAccounts.Service.getAddress(accountID)
+          def transactionProcess(zoneAccountAddress:String)= transaction.process[blockchainTransaction.AddZone, transactionsAddZone.Request](
+            entity = blockchainTransaction.AddZone(from = loginState.address, to = zoneAccountAddress, zoneID = verifyZoneData.zoneID, gas = verifyZoneData.gas, ticketID = "", mode = transactionMode),
+            blockchainTransactionCreate = blockchainTransactionAddZones.Service.create,
+            request = transactionsAddZone.Request(transactionsAddZone.BaseReq(from = loginState.address, gas = verifyZoneData.gas.toString), to = zoneAccountAddress, zoneID = verifyZoneData.zoneID, password = verifyZoneData.password, mode = transactionMode),
+            action = transactionsAddZone.Service.post,
+            onSuccess = blockchainTransactionAddZones.Utility.onSuccess,
+            onFailure = blockchainTransactionAddZones.Utility.onFailure,
+            updateTransactionHash = blockchainTransactionAddZones.Service.updateTransactionHash
+          )
+          (for{
+            accountID<-accountID
+            zoneAccountAddress<-zoneAccountAddress(accountID)
+            _<- transactionProcess(zoneAccountAddress)
+          }yield  withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ZONE_VERIFIED)))
+            ).recover{
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
         }

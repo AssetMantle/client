@@ -23,12 +23,13 @@ class AddKeyController @Inject()(messagesControllerComponents: MessagesControlle
       },
       addKeyData => {
 
-          transactionsAddKey.Service.post(transactionsAddKey.Request(addKeyData.name, addKeyData.password)).map{_=>
-            Ok(views.html.index(successes = Seq(constants.Response.KEY_ADDED)))
-          }.recover{
-            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-          }
-
+        val postRequest=transactionsAddKey.Service.post(transactionsAddKey.Request(addKeyData.name, addKeyData.password))
+        (for{
+          _<- postRequest
+        }yield  Ok(views.html.index(successes = Seq(constants.Response.KEY_ADDED)))
+          ).recover{
+          case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+        }
       }
     )
   }

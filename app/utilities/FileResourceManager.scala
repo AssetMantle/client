@@ -6,7 +6,7 @@ import models.Trait.Document
 import org.apache.commons.codec.binary.Base64
 import play.api.{Configuration, Logger}
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class FileResourceManager @Inject()()(implicit executionContext: ExecutionContext, configuration: Configuration) {
@@ -135,14 +135,16 @@ class FileResourceManager @Inject()()(implicit executionContext: ExecutionContex
     }
   }
 
-  def storeFile[T <: Document[T]](name: String, documentType: String, path: String, document: T, masterCreate: T => String): Unit = {
+  def storeFile[T <: Document[T]](name: String, documentType: String, path: String, document: T, masterCreate: T => Future[String]):Future[String] = {
     try {
       val (fileName, encodedBase64): (String, Option[Array[Byte]]) = utilities.FileOperations.fileExtensionFromName(name) match {
         case constants.File.JPEG | constants.File.JPG | constants.File.PNG => utilities.ImageProcess.convertToThumbnail(name, path)
         case _ => (List(util.hashing.MurmurHash3.stringHash(Base64.encodeBase64String(utilities.FileOperations.convertToByteArray(utilities.FileOperations.newFile(path, name)))).toString, utilities.FileOperations.fileExtensionFromName(name)).mkString("."), None)
       }
-      masterCreate(document.updateFileName(fileName).updateFile(encodedBase64))
       utilities.FileOperations.renameFile(path, name, fileName)
+      masterCreate(document.updateFileName(fileName).updateFile(encodedBase64))
+
+
     } catch {
       case baseException: BaseException => logger.error(baseException.failure.message)
         utilities.FileOperations.deleteFile(path, name)
@@ -153,22 +155,24 @@ class FileResourceManager @Inject()()(implicit executionContext: ExecutionContex
     }
   }
 
-  def updateFile[T <: Document[T]](name: String, documentType: String, path: String, oldDocumentFileName: String, document: T, updateOldDocument: T => Int): Unit = {
-    try {
+  def updateFile[T <: Document[T]](name: String, documentType: String, path: String, oldDocumentFileName: String, document: T, updateOldDocument: T => Future[Int]):Future[Int] = {
+
+
       val (fileName, encodedBase64): (String, Option[Array[Byte]]) = utilities.FileOperations.fileExtensionFromName(name) match {
         case constants.File.JPEG | constants.File.JPG | constants.File.PNG => utilities.ImageProcess.convertToThumbnail(name, path)
         case _ => (List(util.hashing.MurmurHash3.stringHash(Base64.encodeBase64String(utilities.FileOperations.convertToByteArray(utilities.FileOperations.newFile(path, name)))).toString, utilities.FileOperations.fileExtensionFromName(name)).mkString("."), None)
       }
-      updateOldDocument(document.updateFileName(fileName).updateFile(encodedBase64))
+
       utilities.FileOperations.deleteFile(path, oldDocumentFileName)
       utilities.FileOperations.renameFile(path, name, fileName)
-    } catch {
+      updateOldDocument(document.updateFileName(fileName).updateFile(encodedBase64))
+    }.recover{
       case baseException: BaseException => logger.error(baseException.failure.message)
         utilities.FileOperations.deleteFile(path, name)
         throw new BaseException(baseException.failure)
       case e: Exception => logger.error(e.getMessage)
         utilities.FileOperations.deleteFile(path, name)
         throw new BaseException(constants.Response.GENERIC_EXCEPTION)
-    }
+
   }
 }

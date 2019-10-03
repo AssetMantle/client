@@ -137,13 +137,11 @@ class AccountTokens @Inject()(actorSystem: ActorSystem, shutdownActors: Shutdown
       Await.result(findById(username.getOrElse(return false)), Duration.Inf).sessionTokenHash.get == util.hashing.MurmurHash3.stringHash(sessionToken.getOrElse(return false)).toString
     }
 
-    def tryVerifyingSessionToken(username: String, sessionToken: String): Boolean = {
-      if (Await.result(findById(username), Duration.Inf).sessionTokenHash.get == util.hashing.MurmurHash3.stringHash(sessionToken).toString) true
-      else throw new BaseException(constants.Response.INVALID_TOKEN)
-    }
 
-    def tryVerifyingSessionToken2(username: String, sessionToken: String): Boolean={
-      findById(username).map{accountTaken=> accountTaken.sessionTokenHash.get}
+    def tryVerifyingSessionToken(username: String, sessionToken: String):Future[Boolean]={
+      findById(username).map{accountToken=>
+        if(accountToken.sessionTokenHash.get==util.hashing.MurmurHash3.stringHash(sessionToken).toString) true else throw new BaseException(constants.Response.INVALID_TOKEN)
+      }
 
     }
 
@@ -151,10 +149,14 @@ class AccountTokens @Inject()(actorSystem: ActorSystem, shutdownActors: Shutdown
       (DateTime.now(DateTimeZone.UTC).getMillis - Await.result(findById(username.getOrElse(return false)), Duration.Inf).sessionTokenTime.getOrElse(return false)) < sessionTokenTimeout
     }
 
-    def tryVerifyingSessionTokenTime(username: String): Boolean = {
-      if ((DateTime.now(DateTimeZone.UTC).getMillis - Await.result(findById(username), Duration.Inf).sessionTokenTime.getOrElse(return false)) < sessionTokenTimeout) true
-      else throw new BaseException(constants.Response.TOKEN_TIMEOUT)
-    }
+
+
+    def tryVerifyingSessionTokenTime(username: String):Future[Boolean] ={
+      findById(username).map{accountToken=>
+        if ((DateTime.now(DateTimeZone.UTC).getMillis -accountToken.sessionTokenTime.getOrElse(return false)) < sessionTokenTimeout) true
+        else throw new BaseException(constants.Response.TOKEN_TIMEOUT)
+      }
+      }
 
     def refreshSessionToken(username: String): String = {
       val sessionToken: String = "constant token"
@@ -162,13 +164,13 @@ class AccountTokens @Inject()(actorSystem: ActorSystem, shutdownActors: Shutdown
       sessionToken
     }
 
-    def resetSessionTokenTime(username: String): Int = Await.result(setSessionTokenTimeById(username, None), Duration.Inf)
+    def resetSessionTokenTime(username: String): Future[Int] = setSessionTokenTimeById(username, None)
 
     def resetSessionTokenTimeByIds(usernames: Seq[String]): Int = Await.result(setSessionTokenTimeByIds(usernames, None), Duration.Inf)
 
     def getTimedOutIds: Seq[String] = Await.result(getSessionTimedOutIds, Duration.Inf)
 
-    def deleteToken(username: String): Boolean = if (Await.result(deleteById(username), Duration.Inf) == 1) true else false
+    def deleteToken(username: String):Future[Boolean]= deleteById(username).map{result=> if(result==1) true else false }
   }
 
   actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {

@@ -148,21 +148,21 @@ class AddZones @Inject()(actorSystem: ActorSystem, transaction: utilities.Transa
 
   object Service {
 
-    def create(addZone: AddZone): String = Await.result(add(AddZone(from = addZone.from, to = addZone.to, zoneID = addZone.zoneID, gas = addZone.gas, status = addZone.status, txHash = addZone.txHash, ticketID = addZone.ticketID, mode = addZone.mode, code = addZone.code)), Duration.Inf)
+    def create(addZone: AddZone): Future[String] = add(AddZone(from = addZone.from, to = addZone.to, zoneID = addZone.zoneID, gas = addZone.gas, status = addZone.status, txHash = addZone.txHash, ticketID = addZone.ticketID, mode = addZone.mode, code = addZone.code))
 
-    def markTransactionSuccessful(ticketID: String, txHash: String): Int = Await.result(updateTxHashAndStatusOnTicketID(ticketID, Option(txHash), status = Option(true)), Duration.Inf)
+    def markTransactionSuccessful(ticketID: String, txHash: String): Future[Int] = updateTxHashAndStatusOnTicketID(ticketID, Option(txHash), status = Option(true))
 
-    def markTransactionFailed(ticketID: String, code: String): Int = Await.result(updateStatusAndCodeOnTicketID(ticketID, status = Option(false), code), Duration.Inf)
+    def markTransactionFailed(ticketID: String, code: String): Future[Int] = updateStatusAndCodeOnTicketID(ticketID, status = Option(false), code)
 
     def getTicketIDsOnStatus(): Seq[String] = Await.result(getTicketIDsWithNullStatus, Duration.Inf)
 
-    def getTransaction(ticketID: String): AddZone = Await.result(findByTicketID(ticketID), Duration.Inf)
+    def getTransaction(ticketID: String): Future[AddZone] =findByTicketID(ticketID)
 
     def getTransactionHash(ticketID: String): Option[String] = Await.result(findTransactionHashByTicketID(ticketID), Duration.Inf)
 
     def getMode(ticketID: String): String = Await.result(findModeByTicketID(ticketID), Duration.Inf)
 
-    def updateTransactionHash(ticketID: String, txHash: String): Int = Await.result(updateTxHashOnTicketID(ticketID = ticketID, txHash = Option(txHash)), Duration.Inf)
+    def updateTransactionHash(ticketID: String, txHash: String): Future[Int] = updateTxHashOnTicketID(ticketID = ticketID, txHash = Option(txHash))
 
   }
 
@@ -183,15 +183,59 @@ class AddZones @Inject()(actorSystem: ActorSystem, transaction: utilities.Transa
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
           throw new BaseException(constants.Response.PSQL_EXCEPTION)
       }
+
+      val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
+      val addZone = Service.getTransaction(ticketID)
+      def getResult(addZone:AddZone)={
+        val create=blockchainZones.Service.create(addZone.zoneID, addZone.to, dirtyBit = true)
+        val verifyZone=masterZones.Service.verifyZone(addZone.zoneID)
+        val zoneAccountId = masterAccounts.Service.getId(addZone.to)
+
+        def updateUserTypeOnAddress= masterAccounts.Service.updateUserTypeOnAddress(addZone.to, constants.User.ZONE)
+        def verifyAll (zoneAccountId:String)= masterZoneKYCs.Service.verifyAll(zoneAccountId)
+        def markDirty= blockchainAccounts.Service.markDirty(addZone.from)
+
+
+        for{
+          _ <- create
+          _ <- verifyZone
+          _<-updateUserTypeOnAddress
+          _<- markDirty
+          zoneAccountId <- zoneAccountId
+          _<-verifyAll(zoneAccountId)
+          addZoneFrom <-  masterAccounts.Service.getId(addZone.from)
+        }yield{
+          utilitiesNotification.send(zoneAccountId, constants.Notification.SUCCESS, blockResponse.txhash)
+          utilitiesNotification.send(addZoneFrom, constants.Notification.SUCCESS, blockResponse.txhash)
+        }
+      }
+
+      (for{
+        _<- markTransactionSuccessful
+        addZone <- addZone
+        result<- getResult(addZone)
+      } yield result).recover{
+        case baseException: BaseException => logger.error(baseException.failure.message, baseException)
+          throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      }
     }
 
     def onFailure(ticketID: String, message: String): Future[Unit] = Future {
-      try {
-        Service.markTransactionFailed(ticketID, message)
-        val addZone = Service.getTransaction(ticketID)
-        utilitiesNotification.send(masterAccounts.Service.getId(addZone.to), constants.Notification.FAILURE, message)
-        utilitiesNotification.send(masterAccounts.Service.getId(addZone.from), constants.Notification.FAILURE, message)
-      } catch {
+
+      val markTransactionFailed=Service.markTransactionFailed(ticketID, message)
+      val addZone = Service.getTransaction(ticketID)
+      def toAccountId(addZone: AddZone)=masterAccounts.Service.getId(addZone.to)
+      def fromAccountId(addZone: AddZone)=masterAccounts.Service.getId(addZone.from)
+      (for{
+        _<- markTransactionFailed
+        addZone<- addZone
+        toAccountID<-toAccountId(addZone)
+        fromAccountId<-fromAccountId(addZone)
+      }yield{
+        utilitiesNotification.send(toAccountID, constants.Notification.FAILURE, message)
+        utilitiesNotification.send(fromAccountId, constants.Notification.FAILURE, message)
+
+      }).recover{
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
     }

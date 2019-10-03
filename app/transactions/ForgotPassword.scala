@@ -39,12 +39,14 @@ class ForgotPassword @Inject()(wsClient: WSClient)(implicit configuration: Confi
   private def action(username: String, request: Request): Future[Response] = wsClient.url(url + username).post(Json.toJson(request)).map { response => utilities.JSON.getResponseFromJson[Response](response) }
 
   object Service {
-    def post(username: String, request: Request): Response = try {
-      Await.result(action(username = username, request = request), Duration.Inf)
-    } catch {
-      case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
-        throw new BaseException(constants.Response.CONNECT_EXCEPTION)
+
+    def post(username: String, request: Request): Future[Response] ={
+      action(username = username, request = request).recover{
+        case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
+          throw new BaseException(constants.Response.CONNECT_EXCEPTION)
+      }
     }
+
   }
 
 }

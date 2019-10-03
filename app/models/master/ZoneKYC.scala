@@ -132,7 +132,7 @@ class ZoneKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
     def getAllDocuments(id: String): Seq[ZoneKYC] = Await.result(getAllDocumentsById(id = id), Duration.Inf)
 
-    def verifyAll(id: String): Int = Await.result(updateStatusById(id = id, status = Option(true)), Duration.Inf)
+    def verifyAll(id: String): Future[Int] =updateStatusById(id = id, status = Option(true))
 
     def verify(id: String, documentType: String): Int = Await.result(updateStatusByIdAndDocumentType(id = id, documentType = documentType, status = Option(true)), Duration.Inf)
 

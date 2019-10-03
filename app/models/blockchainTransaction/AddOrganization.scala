@@ -150,32 +150,35 @@ class AddOrganizations @Inject()(actorSystem: ActorSystem, transaction: utilitie
 
   object Service {
 
-    def create(addOrganization: AddOrganization): String = Await.result(add(AddOrganization(from = addOrganization.from, to = addOrganization.to, organizationID = addOrganization.organizationID, zoneID = addOrganization.zoneID, gas = addOrganization.gas, status = addOrganization.status, txHash = addOrganization.txHash, ticketID = addOrganization.ticketID, mode = addOrganization.mode, code = addOrganization.code)), Duration.Inf)
+    def create(addOrganization: AddOrganization): Future[String] = add(AddOrganization(from = addOrganization.from, to = addOrganization.to, organizationID = addOrganization.organizationID, zoneID = addOrganization.zoneID, gas = addOrganization.gas, status = addOrganization.status, txHash = addOrganization.txHash, ticketID = addOrganization.ticketID, mode = addOrganization.mode, code = addOrganization.code))
 
-    def markTransactionSuccessful(ticketID: String, txHash: String): Int = Await.result(updateTxHashAndStatusOnTicketID(ticketID, txHash = Option(txHash), status = Option(true)), Duration.Inf)
+    def markTransactionSuccessful(ticketID: String, txHash: String): Future[Int] = updateTxHashAndStatusOnTicketID(ticketID, txHash = Option(txHash), status = Option(true))
 
-    def markTransactionFailed(ticketID: String, code: String): Int = Await.result(updateStatusAndCodeOnTicketID(ticketID, status = Option(false), code), Duration.Inf)
+    def markTransactionFailed(ticketID: String, code: String): Future[Int] = updateStatusAndCodeOnTicketID(ticketID, status = Option(false), code)
 
     def getTicketIDsOnStatus(): Seq[String] = Await.result(getTicketIDsWithNullStatus, Duration.Inf)
 
-    def getTransaction(ticketID: String): AddOrganization = Await.result(findByTicketID(ticketID), Duration.Inf)
+    def getTransaction(ticketID: String): Future[AddOrganization] = findByTicketID(ticketID)
 
     def getTransactionHash(ticketID: String): Option[String] = Await.result(findTransactionHashByTicketID(ticketID), Duration.Inf)
 
     def getMode(ticketID: String): String = Await.result(findModeByTicketID(ticketID), Duration.Inf)
 
-    def updateTransactionHash(ticketID: String, txHash: String): Int = Await.result(updateTxHashOnTicketID(ticketID = ticketID, txHash = Option(txHash)), Duration.Inf)
+    def updateTransactionHash(ticketID: String, txHash: String): Future[Int] = updateTxHashOnTicketID(ticketID = ticketID, txHash = Option(txHash))
   }
 
   object Utility {
     def onSuccess(ticketID: String, blockResponse: BlockResponse): Future[Unit] = Future {
-      try {
+     /* try {
         Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
         val addOrganization = Service.getTransaction(ticketID)
         blockchainOrganizations.Service.create(addOrganization.organizationID, addOrganization.to, dirtyBit = true)
         masterOrganizations.Service.verifyOrganization(addOrganization.organizationID)
-        masterAccounts.Service.updateUserType(masterOrganizations.Service.getAccountId(addOrganization.organizationID), constants.User.ORGANIZATION)
         val organizationAccountId = masterAccounts.Service.getId(addOrganization.to)
+
+        masterAccounts.Service.updateUserType(organizationAccountId, constants.User.ORGANIZATION)
+
+        //val organizationAccountId = masterAccounts.Service.getId(addOrganization.to)
         masterOrganizationKYCs.Service.verifyAll(organizationAccountId)
         blockchainAccounts.Service.markDirty(addOrganization.from)
         utilitiesNotification.send(organizationAccountId, constants.Notification.SUCCESS, blockResponse.txhash)
@@ -183,16 +186,60 @@ class AddOrganizations @Inject()(actorSystem: ActorSystem, transaction: utilitie
       } catch {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
           throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      }*/
+
+      val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
+      val addOrganization = Service.getTransaction(ticketID)
+      def getResult(addOrganization:AddOrganization)={
+        val create=blockchainOrganizations.Service.create(addOrganization.organizationID, addOrganization.to, dirtyBit = true)
+        val verifyOrganization=masterOrganizations.Service.verifyOrganization(addOrganization.organizationID)
+        val organizationAccountId=masterOrganizations.Service.getAccountId(addOrganization.organizationID)
+
+        def updateUserType(organizationAccountId:String)= masterAccounts.Service.updateUserType(organizationAccountId, constants.User.ORGANIZATION)
+        def verifyAll (organizationAccountId:String)= masterOrganizationKYCs.Service.verifyAll(organizationAccountId)
+        def markDirty= blockchainAccounts.Service.markDirty(addOrganization.from)
+
+
+        for{
+          _ <- create
+          _ <- verifyOrganization
+          organizationAccountId <- organizationAccountId
+          _<-updateUserType(organizationAccountId)
+          _<-verifyAll(organizationAccountId)
+          _<- markDirty
+          accountIDFrom <-  masterAccounts.Service.getId(addOrganization.from)
+        }yield{
+          utilitiesNotification.send(organizationAccountId, constants.Notification.SUCCESS, blockResponse.txhash)
+          utilitiesNotification.send(accountIDFrom, constants.Notification.SUCCESS, blockResponse.txhash)
+        }
       }
+
+      (for{
+        _<- markTransactionSuccessful
+        addOrganization <- addOrganization
+        result<- getResult(addOrganization)
+      } yield result).recover{
+        case baseException: BaseException => logger.error(baseException.failure.message, baseException)
+          throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      }
+
     }
 
     def onFailure(ticketID: String, message: String): Future[Unit] = Future {
-      try {
-        Service.markTransactionFailed(ticketID, message)
-        val addOrganization = Service.getTransaction(ticketID)
-        utilitiesNotification.send(masterAccounts.Service.getId(addOrganization.to), constants.Notification.FAILURE, message)
-        utilitiesNotification.send(masterAccounts.Service.getId(addOrganization.from), constants.Notification.FAILURE, message)
-      } catch {
+
+      val markTransactionFailed= Service.markTransactionFailed(ticketID, message)
+      val addOrganization = Service.getTransaction(ticketID)
+      def toAccountId(addOrganization: AddOrganization)= masterAccounts.Service.getId(addOrganization.to)
+      def fromAccountId(addOrganization: AddOrganization)=masterAccounts.Service.getId(addOrganization.from)
+      (for{
+        _<- markTransactionFailed
+        addOrganization<-addOrganization
+       toAccountId<-toAccountId(addOrganization)
+        fromAccountId<-fromAccountId(addOrganization)
+      }yield{
+        utilitiesNotification.send(toAccountId, constants.Notification.FAILURE, message)
+        utilitiesNotification.send(fromAccountId, constants.Notification.FAILURE, message)
+      }).recover{
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
     }

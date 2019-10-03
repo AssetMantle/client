@@ -73,13 +73,13 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
     val lang = masterAccounts.Service.getLanguageAsync("SELL15B2A9ca")
     val availability = masterAccounts.Service.checkUsernameAvailableAsync("SELL15B2A9cajl")
 
-    val somet=for {
+    for {
       _ <- account
       _ <- address
       _ <- userType
       _ <- lang
       _ <- availability
-    } yield()
+    } yield {}
 
    somet.map{some=>
      Ok("fwef")

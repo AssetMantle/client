@@ -119,25 +119,25 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
   object Service {
 
-    def create(accountID: String, name: String, currency: String): String = Await.result(add(Zone(id = utilities.IDGenerator.hexadecimal, accountID = accountID, name = name, currency = currency)), Duration.Inf)
+    def create(accountID: String, name: String, currency: String): Future[String] = add(Zone(id = utilities.IDGenerator.hexadecimal, accountID = accountID, name = name, currency = currency))
 
-    def get(id: String): Zone = Await.result(findById(id), Duration.Inf)
+    def get(id: String): Future[Zone] =findById(id)
 
     def getZoneByAccountID(accountID: String): Zone = Await.result(findByAccountID(accountID), Duration.Inf)
 
     def getAll: Seq[Zone] = Await.result(findAll, Duration.Inf)
 
-    def verifyZone(id: String): Int = Await.result(updateVerificationStatusOnID(id, Option(true)), Duration.Inf)
+    def verifyZone(id: String): Future[Int] = updateVerificationStatusOnID(id, Option(true))
 
     def rejectZone(id: String): Int = Await.result(updateVerificationStatusOnID(id, Option(false)), Duration.Inf)
 
-    def getAccountId(id: String): String = Await.result(getAccountIdById(id), Duration.Inf)
+    def getAccountId(id: String): Future[String] = getAccountIdById(id)
 
-    def getZoneId(accountID: String): String = Await.result(getZoneIdByAccountId(accountID), Duration.Inf)
+    def getZoneId(accountID: String): Future[String] = getZoneIdByAccountId(accountID)
 
     def getVerifyZoneRequests: Seq[Zone] = Await.result(getZonesWithNullVerificationStatus, Duration.Inf)
 
-    def getVerificationStatus(id: String): Boolean = Await.result(getVerificationStatusByID(id), Duration.Inf).getOrElse(false)
+    def getVerificationStatus(id: String): Future[Boolean] = getVerificationStatusByID(id).map{status=>status.getOrElse(false)}
 
   }
 

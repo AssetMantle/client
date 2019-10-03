@@ -23,8 +23,9 @@ class Transaction @Inject()(getTxHashResponse: GetTransactionHashResponse, getRe
   def process[T1 <: BaseTransaction[T1], T2 <: BaseRequest](entity: T1, blockchainTransactionCreate: T1 => Future[String], request: T2, action: T2 => Future[WSResponse], onSuccess: (String, BlockResponse) => Future[Unit], onFailure: (String, String) => Future[Unit], updateTransactionHash: (String, String) => Future[Int])(implicit module: String, logger: Logger): Future[String] = {
 
 
-    val ticketIDFuture: Future[String] = if (kafkaEnabled) utilities.JSON.getResponseFromJson[KafkaResponse](action(request)).map(res=> res.ticketID) else Future{utilities.IDGenerator.ticketID}
-    val result=ticketIDFuture.flatMap{ticketID=>
+    val ticketID: Future[String] = if (kafkaEnabled) utilities.JSON.getResponseFromJson[KafkaResponse](action(request)).map(res=> res.ticketID) else Future{utilities.IDGenerator.ticketID}
+
+    ticketID.flatMap{ticketID=>
       blockchainTransactionCreate(entity.mutateTicketID(ticketID)).map{ _ =>
      if(!kafkaEnabled){
         transactionMode match {
@@ -39,17 +40,15 @@ class Transaction @Inject()(getTxHashResponse: GetTransactionHashResponse, getRe
           }
         }
       }
-
      }
 
+    }.recover{
+      case baseException: BaseException => logger.error(baseException.failure.message, baseException)
+        ticketID.map{ticketID=>
+          onFailure(ticketID, baseException.failure.message)
+        }
     }
 
-    result.recover{
-      case baseException: BaseException => logger.error(baseException.failure.message, baseException)
-       ticketIDFuture.map{ticketID=>
-         onFailure(ticketID, baseException.failure.message)
-       }
-    }
 
     ticketIDFuture
 

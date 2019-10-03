@@ -25,6 +25,7 @@ class SendAssetController @Inject()(messagesControllerComponents: MessagesContro
   }
 
   def sendAsset: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+
     implicit request =>
       views.companion.master.SendAsset.form.bindFromRequest().fold(
         formWithErrors => {

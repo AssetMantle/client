@@ -106,7 +106,7 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
 
   object Service {
 
-    def create(id: String, address: String, dirtyBit: Boolean): String = Await.result(add(Organization(id = id, address = address, dirtyBit = dirtyBit)), Duration.Inf)
+    def create(id: String, address: String, dirtyBit: Boolean): Future[String] = add(Organization(id = id, address = address, dirtyBit = dirtyBit))
 
     def getAddress(id: String): String = Await.result(getAddressById(id), Duration.Inf)
 

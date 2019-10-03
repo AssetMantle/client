@@ -198,33 +198,39 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
 
     def create(zoneID: String, accountID: String, name: String, abbreviation: Option[String], establishmentDate: Date, email: String, registeredAddress: Address, postalAddress: Address, ubos: UBOs): String = Await.result(add(serialize(Organization(id = utilities.IDGenerator.hexadecimal, zoneID = zoneID, accountID = accountID, name = name, abbreviation = abbreviation, establishmentDate = establishmentDate, registeredAddress = registeredAddress, postalAddress = postalAddress, email = email, ubos = ubos))), Duration.Inf)
 
-    def insertOrUpdateOrganizationWithoutUBOs(zoneID: String, accountID: String, name: String, abbreviation: Option[String], establishmentDate: Date, email: String, registeredAddress: Address, postalAddress: Address): String = {
-      val id = Await.result(getIDByAccountID(accountID), Duration.Inf).getOrElse(utilities.IDGenerator.hexadecimal)
-      Await.result(upsert(serialize(Organization(id = id, zoneID = zoneID, accountID = accountID, name = name, abbreviation = abbreviation, establishmentDate = establishmentDate, registeredAddress = registeredAddress, postalAddress = postalAddress, email = email, ubos = getUBOs(id)))), Duration.Inf)
-      id
+    def insertOrUpdateOrganizationWithoutUBOs(zoneID: String, accountID: String, name: String, abbreviation: Option[String], establishmentDate: Date, email: String, registeredAddress: Address, postalAddress: Address):Future[String] = {
+
+      val id=getIDByAccountID(accountID)
+      for{
+        id<-id
+        ubos<- getUBOs(id.getOrElse(utilities.IDGenerator.hexadecimal))
+        _ <- upsert(serialize(Organization(id = id.getOrElse(utilities.IDGenerator.hexadecimal), zoneID = zoneID, accountID = accountID, name = name, abbreviation = abbreviation, establishmentDate = establishmentDate, registeredAddress = registeredAddress, postalAddress = postalAddress, email = email, ubos = ubos)))
+      }yield id.getOrElse(utilities.IDGenerator.hexadecimal)
     }
 
-    def getID(accountID: String): String = Await.result(getIDByAccountID(accountID), Duration.Inf).getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION))
+    def getID(accountID: String): Future[String] = getIDByAccountID(accountID).map{id=> id.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION))}
 
-    def getUBOs(id: String): UBOs = utilities.JSON.convertJsonStringToObject[UBOs](Await.result(getUBOsOnID(id), Duration.Inf))
+    def getUBOs(id: String):Future[UBOs]=getUBOsOnID(id).map{UBOs=> utilities.JSON.convertJsonStringToObject[UBOs](UBOs)}
 
     def get(id: String): Organization = Await.result(findById(id), Duration.Inf).deserialize
 
-    def getByAccountID(accountID: String): Organization = Await.result(findByAccountID(accountID), Duration.Inf).deserialize
+    def getByAccountID(accountID: String): Future[Organization] = findByAccountID(accountID).map{organizationSerialized=> organizationSerialized.deserialize}
 
     def getZoneID(id: String): String = Await.result(getZoneIDByID(id), Duration.Inf)
 
     def getZoneIDByAccountID(accountID: String): String = Await.result(getZoneIDOnAccountID(accountID), Duration.Inf)
 
-    def rejectOrganization(id: String): Int = Await.result(updateVerificationStatusOnID(id, Option(false)), Duration.Inf)
+    def rejectOrganization(id: String): Future[Int] = updateVerificationStatusOnID(id, Option(false))
 
-    def verifyOrganization(id: String): Int = Await.result(updateVerificationStatusOnID(id, Option(true)), Duration.Inf)
+    def verifyOrganization(id: String): Future[Int] = updateVerificationStatusOnID(id, Option(true))
 
-    def getAccountId(id: String): String = Await.result(getAccountIdById(id), Duration.Inf)
+    def getAccountId(id: String): Future[String] = getAccountIdById(id)
 
-    def getVerifyOrganizationRequests(zoneID: String): Seq[Organization] = Await.result(getOrganizationsByCompletionStatusVerificationStatusAndZoneID(zoneID = zoneID, completionStatus = true, verificationStatus = null), Duration.Inf).map(_.deserialize)
+    def getVerifyOrganizationRequests(zoneID: String): Future[Seq[Organization]] = getOrganizationsByCompletionStatusVerificationStatusAndZoneID(zoneID = zoneID, completionStatus = true, verificationStatus = null).map{organizations=> organizations.map(_.deserialize)}
 
-    def getOrganizationsInZone(zoneID: String): Seq[Organization] = Await.result(getOrganizationsByZoneID(zoneID), Duration.Inf).map(_.deserialize)
+
+
+    def getOrganizationsInZone(zoneID: String): Future[Seq[Organization]] = getOrganizationsByZoneID(zoneID).map{organizations=>organizations.map(_.deserialize)}
 
     def getVerificationStatus(id: String): Boolean = Await.result(getVerificationStatusById(id), Duration.Inf).getOrElse(false)
 
@@ -233,9 +239,9 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
       if (!verificationStatus) throw new BaseException(constants.Response.UNVERIFIED_ORGANIZATION) else true
     }
 
-    def markOrganizationFormCompleted(id: String): Int = Await.result(updateCompletionStatusOnID(id = id, completionStatus = true), Duration.Inf)
+    def markOrganizationFormCompleted(id: String): Future[Int] = updateCompletionStatusOnID(id = id, completionStatus = true)
 
-    def updateUBOs(id: String, ubos: Seq[UBO]): Int = Await.result(updateUBOsOnID(id, Option(Json.toJson(UBOs(data = ubos)).toString)), Duration.Inf)
+    def updateUBOs(id: String, ubos: Seq[UBO]): Future[Int] = updateUBOsOnID(id, Option(Json.toJson(UBOs(data = ubos)).toString))
 
   }
 
