@@ -9,7 +9,6 @@ import models.masterTransaction.EmailOTPs
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
-import views.companion.master.VerifyEmailAddress
 
 import scala.concurrent.ExecutionContext
 
@@ -25,7 +24,7 @@ class VerifyEmailAddressController @Inject()(messagesControllerComponents: Messa
       try {
         val otp = emailOTPs.Service.sendOTP(loginState.username)
         utilitiesNotification.send(accountID = loginState.username, notification = constants.Notification.VERIFY_EMAIL, otp)
-        withUsernameToken.Ok(views.html.component.master.verifyEmailAddress(VerifyEmailAddress.form))
+        withUsernameToken.Ok(views.html.component.master.verifyEmailAddress(views.companion.master.VerifyEmailAddress.form))
       }
       catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -34,7 +33,7 @@ class VerifyEmailAddressController @Inject()(messagesControllerComponents: Messa
 
   def verifyEmailAddress: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      VerifyEmailAddress.form.bindFromRequest().fold(
+      views.companion.master.VerifyEmailAddress.form.bindFromRequest().fold(
         formWithErrors => {
           BadRequest(views.html.component.master.verifyEmailAddress(formWithErrors))
         },

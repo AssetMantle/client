@@ -51,7 +51,7 @@ class SendFiatController @Inject()(messagesControllerComponents: MessagesControl
   }
 
   def blockchainSendFiatForm: Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.blockchain.sendFiat(views.companion.blockchain.SendFiat.form))
+    Ok(views.html.component.blockchain.sendFiat())
   }
 
   def blockchainSendFiat: Action[AnyContent] = Action { implicit request =>

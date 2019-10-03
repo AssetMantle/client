@@ -23,7 +23,4 @@ object FormConstraint {
     }
     if (errors.isEmpty) Valid else Invalid(errors)
   })
-
-
-
 }

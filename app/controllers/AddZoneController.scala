@@ -349,7 +349,7 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
   }
 
   def blockchainAddZoneForm: Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.blockchain.addZone(views.companion.blockchain.AddZone.form))
+    Ok(views.html.component.blockchain.addZone())
   }
 
   def blockchainAddZone: Action[AnyContent] = Action { implicit request =>

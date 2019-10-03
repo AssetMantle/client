@@ -11,7 +11,7 @@ import slick.jdbc.JdbcProfile
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
-import scala.util.{Failure, Random, Success}
+import scala.util.{Failure, Success}
 
 case class Notification(id: String, accountID: String, notificationTitle: String, notificationMessage: String, time: Timestamp, read: Boolean)
 
@@ -94,7 +94,7 @@ class Notifications @Inject()(protected val databaseConfigProvider: DatabaseConf
 
   object Service {
 
-    def create(accountID: String, notificationTitle: String, notificationMessage: String): String = Await.result(add(Notification(id = Random.nextString(32), accountID = accountID, notificationTitle = notificationTitle, notificationMessage = notificationMessage, time = new Timestamp(System.currentTimeMillis), read = false)), Duration.Inf)
+    def create(accountID: String, notificationTitle: String, notificationMessage: String): String = Await.result(add(Notification(id = utilities.IDGenerator.hexadecimal, accountID = accountID, notificationTitle = notificationTitle, notificationMessage = notificationMessage, time = new Timestamp(System.currentTimeMillis), read = false)), Duration.Inf)
 
     def get(accountID: String, offset: Int, limit: Int): Seq[Notification] = Await.result(findNotificationsByAccountId(accountID = accountID, offset = offset, limit = limit), Duration.Inf)
 

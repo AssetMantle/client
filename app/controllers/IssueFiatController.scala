@@ -111,7 +111,7 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
   }
 
   def blockchainIssueFiatForm: Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.blockchain.issueFiat(views.companion.blockchain.IssueFiat.form))
+    Ok(views.html.component.blockchain.issueFiat())
   }
 
   def blockchainIssueFiat: Action[AnyContent] = Action { implicit request =>
