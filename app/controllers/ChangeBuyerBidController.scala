@@ -53,7 +53,7 @@ class ChangeBuyerBidController @Inject()(messagesControllerComponents: MessagesC
               onFailure = blockchainTransactionChangeBuyerBids.Utility.onFailure,
               updateTransactionHash = blockchainTransactionChangeBuyerBids.Service.updateTransactionHash
             )
-            masterTransactionNegotiationRequests.Service.insertOrUpdateChangeBid(requestID, loginState.username, masterAccounts.Service.getId(changeBuyerBidData.sellerAddress), changeBuyerBidData.pegHash, changeBuyerBidData.bid)
+            masterTransactionNegotiationRequests.Service.insertOrUpdate(requestID, loginState.username, masterAccounts.Service.getId(changeBuyerBidData.sellerAddress), changeBuyerBidData.pegHash, changeBuyerBidData.bid)
             withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.BUYER_BID_CHANGED)))
           }
           catch {

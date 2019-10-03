@@ -237,11 +237,17 @@ POST        /master/changeBuyerBid                                       control
 GET         /master/changeSellerBid                                      controllers.ChangeSellerBidController.changeSellerBidForm(buyerAddress:String, pegHash: String)
 POST        /master/changeSellerBid                                      controllers.ChangeSellerBidController.changeSellerBid
 
-GET         /master/confirmBuyerBid                                      controllers.ConfirmBuyerBidController.confirmBuyerBidForm(sellerAddress:String, pegHash: String, bid:Int)
+GET         /master/confirmBuyerBid                                      controllers.ConfirmBuyerBidController.confirmBuyerBidForm(requestID: String)
 POST        /master/confirmBuyerBid                                      controllers.ConfirmBuyerBidController.confirmBuyerBid
 
-GET         /master/confirmSellerBid                                     controllers.ConfirmSellerBidController.confirmSellerBidForm(buyerAddress:String, pegHash: String, bid:Int)
+GET         /master/confirmBuyerBidDetail                                controllers.ConfirmBuyerBidController.confirmBuyerBidDetailForm(sellerAddress:String, pegHash: String, bid:Int)
+POST        /master/confirmBuyerBidDetail                                controllers.ConfirmBuyerBidController.confirmBuyerBidDetail
+
+GET         /master/confirmSellerBid                                     controllers.ConfirmSellerBidController.confirmSellerBidForm(requestID: String)
 POST        /master/confirmSellerBid                                     controllers.ConfirmSellerBidController.confirmSellerBid
+
+GET         /master/confirmSellerBidDetail                                controllers.ConfirmSellerBidController.confirmSellerBidDetailForm(buyerAddress: String, pegHash: String, bid:Int)
+POST        /master/confirmSellerBidDetail                                controllers.ConfirmSellerBidController.confirmSellerBidDetail
 
 GET         /master/issueAssetRequest                                    controllers.IssueAssetController.issueAssetRequestForm(id: String)
 POST        /master/issueAssetRequest                                    controllers.IssueAssetController.issueAssetRequest

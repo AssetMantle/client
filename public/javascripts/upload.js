@@ -33,9 +33,12 @@ function uploadFile(uploadRoute, storeRoute, documentType, id) {
     });
 
     let uploadCompletionMessage = document.getElementById('uploadCompletionMessage');
+
     rFile.on('fileSuccess', function (file) {
         $("#uploadControls").delay(1000).fadeOut(1000);
         let storeDbRoute = storeRoute(file.fileName, documentType, id);
+        console.log(documentType, id, uploadRoute, storeRoute);
+
         $.ajax({
             url: storeDbRoute.url,
             type: storeDbRoute.type,

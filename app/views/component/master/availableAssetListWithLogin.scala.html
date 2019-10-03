@@ -16,7 +16,7 @@
                     <button class="btn btn-sm btn-primary" onclick="getForm(jsRoutes.controllers.ChangeBuyerBidController.changeBuyerBidForm('@blockchainAssetList.filter(_.pegHash == asset.pegHash.get).head.ownerAddress', '@asset.pegHash'))">@Messages(constants.Form.NEGOTIATE)</button>
                 } <br>
                 @if(acl.confirmBuyerBid) {
-                    <button class="btn btn-sm btn-primary" onclick="getForm(jsRoutes.controllers.ConfirmBuyerBidController.confirmBuyerBidForm('@blockchainAssetList.filter(_.pegHash == asset.pegHash.get).head.ownerAddress', '@asset.pegHash', @asset.assetPrice))">@Messages(constants.Form.ACCEPT_OFFER)</button>
+                    <button class="btn btn-sm btn-primary" onclick="getForm(jsRoutes.controllers.ConfirmBuyerBidController.confirmBuyerBidDetailForm('@blockchainAssetList.filter(_.pegHash == asset.pegHash.get).head.ownerAddress', '@asset.pegHash', @asset.assetPrice))">@Messages(constants.Form.ACCEPT_OFFER)</button>
                 } <br>
                 }
             case _ => {}

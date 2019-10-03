@@ -1,0 +1,27 @@
+@import controllers.actions.LoginState
+@import helper._
+@import views.companion.master.ConfirmBuyerBidDetail
+
+@(confirmBuyerBidDetailForm: Form[ConfirmBuyerBidDetail.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+
+@form(action = routes.ConfirmBuyerBidController.confirmBuyerBidDetail, 'onkeypress -> "submitFormOnEnter(event,this)") {
+    <div class="latest_card-header latest_card-header-primary text-center">
+        <h4 class="latest_card-title">@Messages(constants.Form.CONFIRM_BUYER_BID_DETAIL)</h4>
+    </div>
+    <div class="latest_card-body">
+        @CSRF.formField
+      @inputText(confirmBuyerBidDetailForm(constants.FormField.REQUEST_ID.name), '_label -> Messages(constants.FormField.REQUEST_ID.name), 'class -> "form-control hidden", 'placeholder -> Messages(constants.FormField.REQUEST_ID.name), 'required -> false)
+      @inputText(confirmBuyerBidDetailForm(constants.FormField.SELLER_ADDRESS.name), '_label -> Messages(constants.FormField.SELLER_ADDRESS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.SELLER_ADDRESS.name), 'required -> true)
+      @inputText(confirmBuyerBidDetailForm(constants.FormField.BID.name), '_label -> Messages(constants.FormField.BID.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.BID.name), 'required -> true, 'type -> "number")
+      @inputText(confirmBuyerBidDetailForm(constants.FormField.PEG_HASH.name), '_label -> Messages(constants.FormField.PEG_HASH.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PEG_HASH.name), 'required -> true)
+
+        @if(confirmBuyerBidDetailForm.hasGlobalErrors) {
+            <ul>
+            @for(error <- confirmBuyerBidDetailForm.globalErrors) {
+                <li>@error.format</li>
+            }
+            </ul>
+        }
+        <button type="button" class="btn btn-primary btn-sm" onclick="submitForm(this)">@Messages(constants.Form.CONFIRM_BUYER_BID_DETAIL)</button>
+    </div>
+}

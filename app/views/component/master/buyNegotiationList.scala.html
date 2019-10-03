@@ -16,7 +16,7 @@
                                 <button class="width btn btn-primary btn-sm" onclick="getForm(jsRoutes.controllers.ChangeBuyerBidController.changeBuyerBidForm('@negotiation.sellerAddress', '@negotiation.assetPegHash'))">@Messages(constants.Form.NEGOTIATE)</button>
                             } <br>
                             @if(acl.confirmBuyerBid) {
-                                <button class="width btn btn-primary btn-sm" onclick="getForm(jsRoutes.controllers.ConfirmBuyerBidController.confirmBuyerBidForm('@negotiation.sellerAddress', '@negotiation.assetPegHash', @negotiation.bid))">@Messages(constants.Form.ACCEPT_OFFER)</button>
+                                <button class="width btn btn-primary btn-sm" onclick="getForm(jsRoutes.controllers.ConfirmBuyerBidController.confirmBuyerBidDetailForm('@negotiation.sellerAddress', '@negotiation.assetPegHash', @negotiation.bid))">@Messages(constants.Form.ACCEPT_OFFER)</button>
                             } <br>
                         }
                         case _ => {}
