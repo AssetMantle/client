@@ -2,7 +2,7 @@
 @import models.master.{Organization, Zone}
 @(totalFiat: Int, zone: Zone, organization: Organization, failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
-@common(Messages(constants.User.HOME), failures, warnings, successes, infos)(Html(""))(center)(Html(""))
+@common(Messages(constants.Form.HOME), failures, warnings, successes, infos)(Html(""))(center)(Html(""))
 
 @center = {
     <div class="flexContainer">
@@ -25,7 +25,7 @@
     <div class="flexContainer">
         <div class="flexGrowth flexItem box leftText">
             <div>
-                <h2 class="showHide toggleElement centerText" onclick="fetchOrShowHide('assetList', jsRoutes.controllers.ComponentViewController.assetList(), this)">@Messages(constants.User.ASSETS_OWNED) </h2>
+                <h2 class="showHide toggleElement centerText" onclick="fetchOrShowHide('assetList', jsRoutes.controllers.ComponentViewController.assetList(), this)">@Messages(constants.Form.ASSETS_OWNED) </h2>
                 <div class="centerText">
                 @loginState.acl match {
                     case Some(acl) => {
@@ -48,7 +48,7 @@
 
         <div class="flexGrowth flexItem box leftText">
             <div>
-                <h2 class="showHide toggleElement centerText" onclick="fetchOrShowHide('fiatList', jsRoutes.controllers.ComponentViewController.fiatList(), this)">@Messages(constants.User.FIATS_OWNED)
+                <h2 class="showHide toggleElement centerText" onclick="fetchOrShowHide('fiatList', jsRoutes.controllers.ComponentViewController.fiatList(), this)">@Messages(constants.Form.FIATS_OWNED)
                     : <span id="totalFiat">@totalFiat</span></h2>
                 <div class="centerText">
                 @loginState.acl match {

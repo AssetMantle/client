@@ -445,7 +445,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
   }
 
   def blockchainAddOrganizationForm: Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.blockchain.addOrganization(views.companion.blockchain.AddOrganization.form))
+    Ok(views.html.component.blockchain.addOrganization())
   }
 
   def blockchainAddOrganization: Action[AnyContent] = Action { implicit request =>

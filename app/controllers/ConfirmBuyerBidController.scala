@@ -51,7 +51,7 @@ class ConfirmBuyerBidController @Inject()(messagesControllerComponents: Messages
   }
 
   def blockchainConfirmBuyerBidForm: Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.blockchain.confirmBuyerBid(views.companion.blockchain.ConfirmBuyerBid.form))
+    Ok(views.html.component.blockchain.confirmBuyerBid())
   }
 
   def blockchainConfirmBuyerBid: Action[AnyContent] = Action { implicit request =>

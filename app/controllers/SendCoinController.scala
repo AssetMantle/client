@@ -145,7 +145,7 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
   }
 
   def blockchainSendCoinForm: Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.blockchain.sendCoin(views.companion.blockchain.SendCoin.form))
+    Ok(views.html.component.blockchain.sendCoin())
   }
 
   def blockchainSendCoin: Action[AnyContent] = Action { implicit request =>

@@ -9,7 +9,6 @@ import models.masterTransaction.SMSOTPs
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
-import views.companion.master.VerifyMobileNumber
 
 import scala.concurrent.ExecutionContext
 
@@ -25,7 +24,7 @@ class VerifyMobileNumberController @Inject()(messagesControllerComponents: Messa
       try {
         val otp = smsOTPs.Service.sendOTP(loginState.username)
         utilitiesNotification.send(accountID = loginState.username, notification = constants.Notification.VERIFY_PHONE, otp)
-        withUsernameToken.Ok(views.html.component.master.verifyMobileNumber(VerifyMobileNumber.form))
+        withUsernameToken.Ok(views.html.component.master.verifyMobileNumber(views.companion.master.VerifyMobileNumber.form))
       }
       catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -34,7 +33,7 @@ class VerifyMobileNumberController @Inject()(messagesControllerComponents: Messa
 
   def verifyMobileNumber: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      VerifyMobileNumber.form.bindFromRequest().fold(
+      views.companion.master.VerifyMobileNumber.form.bindFromRequest().fold(
         formWithErrors => {
           BadRequest(views.html.component.master.verifyMobileNumber(formWithErrors))
         },

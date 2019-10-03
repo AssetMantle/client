@@ -60,7 +60,7 @@ class ReleaseAssetController @Inject()(messagesControllerComponents: MessagesCon
   }
 
   def blockchainReleaseAssetForm: Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.blockchain.releaseAsset(views.companion.blockchain.ReleaseAsset.form))
+    Ok(views.html.component.blockchain.releaseAsset())
   }
 
   def blockchainReleaseAsset: Action[AnyContent] = Action { implicit request =>

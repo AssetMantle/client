@@ -322,7 +322,7 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
   }
 
   def blockchainIssueAssetForm: Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.blockchain.issueAsset(views.companion.blockchain.IssueAsset.form))
+    Ok(views.html.component.blockchain.issueAsset())
   }
 
   def blockchainIssueAsset: Action[AnyContent] = Action { implicit request =>

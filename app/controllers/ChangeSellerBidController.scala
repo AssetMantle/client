@@ -57,7 +57,7 @@ class ChangeSellerBidController @Inject()(messagesControllerComponents: Messages
   }
 
   def blockchainChangeSellerBidForm: Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.blockchain.changeSellerBid(views.companion.blockchain.ChangeSellerBid.form))
+    Ok(views.html.component.blockchain.changeSellerBid())
   }
 
   def blockchainChangeSellerBid: Action[AnyContent] = Action { implicit request =>
