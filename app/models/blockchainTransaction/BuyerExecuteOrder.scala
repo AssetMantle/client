@@ -154,15 +154,15 @@ class BuyerExecuteOrders @Inject()(actorSystem: ActorSystem, transaction: utilit
 
   object Service {
 
-    def create(buyerExecuteOrder: BuyerExecuteOrder): String = Await.result(add(BuyerExecuteOrder(from = buyerExecuteOrder.from, buyerAddress = buyerExecuteOrder.buyerAddress, sellerAddress = buyerExecuteOrder.sellerAddress, fiatProofHash = buyerExecuteOrder.fiatProofHash, pegHash = buyerExecuteOrder.pegHash, gas=buyerExecuteOrder.gas, status = buyerExecuteOrder.status, txHash = buyerExecuteOrder.txHash, ticketID = buyerExecuteOrder.ticketID, mode = buyerExecuteOrder.mode, code = buyerExecuteOrder.code)), Duration.Inf)
+    def create(buyerExecuteOrder: BuyerExecuteOrder): Future[String] = add(BuyerExecuteOrder(from = buyerExecuteOrder.from, buyerAddress = buyerExecuteOrder.buyerAddress, sellerAddress = buyerExecuteOrder.sellerAddress, fiatProofHash = buyerExecuteOrder.fiatProofHash, pegHash = buyerExecuteOrder.pegHash, gas=buyerExecuteOrder.gas, status = buyerExecuteOrder.status, txHash = buyerExecuteOrder.txHash, ticketID = buyerExecuteOrder.ticketID, mode = buyerExecuteOrder.mode, code = buyerExecuteOrder.code))
 
-    def markTransactionSuccessful(ticketID: String, txHash: String): Int = Await.result(updateTxHashAndStatusOnTicketID(ticketID, Option(txHash), status = Option(true)), Duration.Inf)
+    def markTransactionSuccessful(ticketID: String, txHash: String): Future[Int] = updateTxHashAndStatusOnTicketID(ticketID, Option(txHash), status = Option(true))
 
     def markTransactionFailed(ticketID: String, code: String): Int = Await.result(updateStatusAndCodeOnTicketID(ticketID, status = Option(false), code), Duration.Inf)
 
     def getTicketIDsOnStatus(): Seq[String] = Await.result(getTicketIDsWithNullStatus, Duration.Inf)
 
-    def getTransaction(ticketID: String): BuyerExecuteOrder = Await.result(findByTicketID(ticketID), Duration.Inf)
+    def getTransaction(ticketID: String): Future[BuyerExecuteOrder] =findByTicketID(ticketID)
 
     def getTransactionHash(ticketID: String): Option[String] = Await.result(findTransactionHashByTicketID(ticketID), Duration.Inf)
 
@@ -192,6 +192,35 @@ class BuyerExecuteOrders @Inject()(actorSystem: ActorSystem, transaction: utilit
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
           throw new BaseException(constants.Response.PSQL_EXCEPTION)
       }
+
+      val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
+      val buyerExecuteOrder = Service.getTransaction(ticketID)
+      def negotiationID(buyerExecuteOrder:BuyerExecuteOrder)=blockchainNegotiations.Service.getNegotiationID(buyerAddress = buyerExecuteOrder.buyerAddress, sellerAddress = buyerExecuteOrder.sellerAddress, pegHash = buyerExecuteOrder.pegHash)
+      def markDirty(negotiationID:String,buyerExecuteOrder:BuyerExecuteOrder)= {
+        val markDirtyNegotiationID= blockchainOrders.Service.markDirty(id = negotiationID)
+        val markDirtyBuyerAddressAccount=blockchainAccounts.Service.markDirty(buyerExecuteOrder.buyerAddress)
+        val markDirtyBuyerAddressTransactionFeedbacks=blockchainTransactionFeedbacks.Service.markDirty(buyerExecuteOrder.buyerAddress)
+        val markDirtySellerAddressTransactionFeedbacks=blockchainTransactionFeedbacks.Service.markDirty(buyerExecuteOrder.sellerAddress)
+        def markDirtyFromAddress:Future[Unit]={
+          if (buyerExecuteOrder.from != buyerExecuteOrder.buyerAddress) {
+            val markDirtyFromAddress=blockchainAccounts.Service.markDirty(buyerExecuteOrder.from)
+          val id= masterAccounts.Service.getId(buyerExecuteOrder.from)
+            (for{
+            _<- markDirtyFromAddress
+            id<-id
+          }yield utilitiesNotification.send(id, constants.Notification.SUCCESS, blockResponse.txhash)
+              )
+          }
+
+        for{
+          _<-markDirtyNegotiationID
+          _<-markDirtyBuyerAddressAccount
+          _<-markDirtyBuyerAddressTransactionFeedbacks
+          _<-markDirtySellerAddressTransactionFeedbacks
+          _<- markDirtyFromAddress
+        }yield {}
+      }
+
     }
 
     def onFailure(ticketID: String, message: String): Future[Unit] = Future {

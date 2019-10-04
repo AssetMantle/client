@@ -65,21 +65,34 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
 
   def testActionAsync=Action.async{
 
-    val timeInitial = System.currentTimeMillis()
+   // val account = masterAccounts.Service.getAccountAsync("buyer014789")
+   // val address = masterAccounts.Service.getAddressAsync("buyer014789")
+  //  val userType = masterAccounts.Service.getUserTypeAsync("buyer014789")
+    val lang = masterAccounts.Service.getLanguageAsync("buyer014789")
+    val availability = masterAccounts.Service.checkUsernameAvailableAsync("buyer014789")
 
-    val account = masterAccounts.Service.getAccountAsync("SELL15B2A9cajl")
-    val address = masterAccounts.Service.getAddressAsync("SELL15B2A9cajl")
-    val userType = masterAccounts.Service.getUserTypeAsync("SELL15B2A9cajl")
-    val lang = masterAccounts.Service.getLanguageAsync("SELL15B2A9ca")
-    val availability = masterAccounts.Service.checkUsernameAvailableAsync("SELL15B2A9cajl")
 
-    for {
-      _ <- account
-      _ <- address
-      _ <- userType
+
+    def markDirtyFromAddress= {
+      if (3 == 4) {
+        val account = masterAccounts.Service.getAccountAsync("buyer014789")
+        val address = masterAccounts.Service.getAddressAsync("buyer014789")
+        val userType = masterAccounts.Service.getUserTypeAsync("buyer014789123")
+        for {
+          account <- account
+          address <- address
+          userType <- userType
+        } yield {}
+      }else{Future{Unit}}
+
+    }
+
+    val somet=for {
       _ <- lang
       _ <- availability
+      _<- markDirtyFromAddress
     } yield {}
+
 
    somet.map{some=>
      Ok("fwef")

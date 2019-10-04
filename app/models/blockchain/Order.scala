@@ -136,7 +136,7 @@ class Orders @Inject()(shutdownActors: ShutdownActor, masterAccounts: master.Acc
 
     def getAllOrderIdsWithoutAWBProofHash: Seq[String] = Await.result(getOrderIDsWithoutAWBProofHash, Duration.Inf)
 
-    def markDirty(id: String): Int = Await.result(updateDirtyBitById(id, dirtyBit = true), Duration.Inf)
+    def markDirty(id: String): Future[Int] = updateDirtyBitById(id, dirtyBit = true)
 
     def orderCometSource(username: String) = {
       shutdownActors.shutdown(constants.Module.ACTOR_MAIN_ORDER, username)

@@ -125,17 +125,17 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
     def getZoneByAccountID(accountID: String): Zone = Await.result(findByAccountID(accountID), Duration.Inf)
 
-    def getAll: Seq[Zone] = Await.result(findAll, Duration.Inf)
+    def getAll: Future[Seq[Zone]] =findAll
 
     def verifyZone(id: String): Future[Int] = updateVerificationStatusOnID(id, Option(true))
 
-    def rejectZone(id: String): Int = Await.result(updateVerificationStatusOnID(id, Option(false)), Duration.Inf)
+    def rejectZone(id: String): Future[Int] =updateVerificationStatusOnID(id, Option(false))
 
     def getAccountId(id: String): Future[String] = getAccountIdById(id)
 
     def getZoneId(accountID: String): Future[String] = getZoneIdByAccountId(accountID)
 
-    def getVerifyZoneRequests: Seq[Zone] = Await.result(getZonesWithNullVerificationStatus, Duration.Inf)
+    def getVerifyZoneRequests: Future[Seq[Zone]] = getZonesWithNullVerificationStatus
 
     def getVerificationStatus(id: String): Future[Boolean] = getVerificationStatusByID(id).map{status=>status.getOrElse(false)}
 

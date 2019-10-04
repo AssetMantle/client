@@ -74,7 +74,7 @@ class Notification @Inject()(masterContacts: master.Contacts,
     }
   }
 
-  private def sendPushNotification(accountID: String, pushNotification: constants.Notification.PushNotification, messageParameters: String*)(implicit lang: Lang) = Future {
+  private def sendPushNotification(accountID: String, pushNotification: constants.Notification.PushNotification, messageParameters: String*)(implicit lang: Lang)= Future {
     try {
       val title = messagesApi(pushNotification.title)
       val message = messagesApi(pushNotification.message, messageParameters: _*)

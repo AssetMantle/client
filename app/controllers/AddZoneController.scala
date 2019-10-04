@@ -97,43 +97,55 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
 
   def viewPendingVerifyZoneRequests: Action[AnyContent] = withGenesisLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      try {
-        withUsernameToken.Ok(views.html.component.master.viewPendingVerifyZoneRequests(masterZones.Service.getVerifyZoneRequests))
-      }
-      catch {
+
+    val verifyZoneRequests=masterZones.Service.getVerifyZoneRequests
+      (for{
+      verifyZoneRequests<-verifyZoneRequests
+    }yield withUsernameToken.Ok(views.html.component.master.viewPendingVerifyZoneRequests(verifyZoneRequests))
+        ).recover{
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
+
   def viewKycDocuments(accountID: String): Action[AnyContent] = withGenesisLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      try {
-        withUsernameToken.Ok(views.html.component.master.viewVerificationZoneKycDouments(masterZoneKYCs.Service.getAllDocuments(accountID)))
-      } catch {
+
+    val allDocuments=masterZoneKYCs.Service.getAllDocuments(accountID)
+      (for{
+        allDocuments<-allDocuments
+      }yield withUsernameToken.Ok(views.html.component.master.viewVerificationZoneKycDouments(allDocuments))
+        ).recover{
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
   def verifyKycDocument(accountID: String, documentType: String): Action[AnyContent] = withGenesisLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      try {
-        masterZoneKYCs.Service.verify(id = accountID, documentType = documentType)
-        utilitiesNotification.send(accountID, constants.Notification.SUCCESS, Messages(constants.Response.DOCUMENT_APPROVED.message))
-        withUsernameToken.Ok(Messages(constants.Response.SUCCESS.message))
-      } catch {
+
+    val verify=masterZoneKYCs.Service.verify(id = accountID, documentType = documentType)
+      (for{
+      _<- verify
+    }yield{
+      utilitiesNotification.send(accountID, constants.Notification.SUCCESS, Messages(constants.Response.DOCUMENT_APPROVED.message))
+      withUsernameToken.Ok(Messages(constants.Response.SUCCESS.message))
+    }).recover{
         case baseException: BaseException => InternalServerError(Messages(baseException.failure.message))
       }
   }
 
   def rejectKycDocument(accountID: String, documentType: String): Action[AnyContent] = withGenesisLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      try {
-        masterZoneKYCs.Service.reject(id = accountID, documentType = documentType)
-        utilitiesNotification.send(accountID, constants.Notification.FAILURE, Messages(constants.Response.DOCUMENT_REJECTED.message))
-        withUsernameToken.Ok(Messages(constants.Response.SUCCESS.message))
-      } catch {
+    val reject=masterZoneKYCs.Service.reject(id = accountID, documentType = documentType)
+      (for{
+      _<- reject
+    }yield{
+      utilitiesNotification.send(accountID, constants.Notification.FAILURE, Messages(constants.Response.DOCUMENT_REJECTED.message))
+      withUsernameToken.Ok(Messages(constants.Response.SUCCESS.message))
+    }).recover{
         case baseException: BaseException => InternalServerError(Messages(baseException.failure.message))
       }
+
   }
 
   def rejectVerifyZoneRequestForm(zoneID: String): Action[AnyContent] = Action { implicit request =>
@@ -144,15 +156,19 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
     implicit request =>
       views.companion.master.RejectVerifyZoneRequest.form.bindFromRequest().fold(
         formWithErrors => {
-          BadRequest(views.html.component.master.rejectVerifyZoneRequest(formWithErrors, formWithErrors.data(constants.Form.ZONE_ID)))
+          Future{BadRequest(views.html.component.master.rejectVerifyZoneRequest(formWithErrors, formWithErrors.data(constants.Form.ZONE_ID)))}
         },
         rejectVerifyZoneRequestData => {
-          try {
-            masterZones.Service.rejectZone(rejectVerifyZoneRequestData.zoneID)
-            masterZoneKYCs.Service.rejectAll(masterZones.Service.getAccountId(rejectVerifyZoneRequestData.zoneID))
-            withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.VERIFY_ZONE_REJECTED)))
-          }
-          catch {
+
+          val rejectZone=masterZones.Service.rejectZone(rejectVerifyZoneRequestData.zoneID)
+          val accountID=masterZones.Service.getAccountId(rejectVerifyZoneRequestData.zoneID)
+          def rejectAll(accountID:String)= masterZoneKYCs.Service.rejectAll(accountID)
+          (for{
+          _<- rejectZone
+          accountID<-accountID
+          _<- rejectAll(accountID)
+        }yield withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.VERIFY_ZONE_REJECTED)))
+            ).recover{
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
         }
@@ -162,10 +178,12 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
 
   def viewZonesInGenesis: Action[AnyContent] = withGenesisLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      try {
-        withUsernameToken.Ok(views.html.component.master.viewZonesInGenesis(masterZones.Service.getAll))
-      }
-      catch {
+
+    val allZones=masterZones.Service.getAll
+      (for{
+      allZones<-allZones
+    }yield  withUsernameToken.Ok(views.html.component.master.viewZonesInGenesis(allZones))
+        ).recover{
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
@@ -174,17 +192,18 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
     Ok(views.html.component.blockchain.addZone(views.companion.blockchain.AddZone.form))
   }
 
-  def blockchainAddZone: Action[AnyContent] = Action { implicit request =>
+  def blockchainAddZone: Action[AnyContent] = Action.async { implicit request =>
     views.companion.blockchain.AddZone.form.bindFromRequest().fold(
       formWithErrors => {
-        BadRequest(views.html.component.blockchain.addZone(formWithErrors))
+        Future{BadRequest(views.html.component.blockchain.addZone(formWithErrors))}
       },
       addZoneData => {
-        try {
-          transactionsAddZone.Service.post(transactionsAddZone.Request(transactionsAddZone.BaseReq(from = addZoneData.from, gas = addZoneData.gas.toString), to = addZoneData.to, zoneID = addZoneData.zoneID, password = addZoneData.password, mode = transactionMode))
-          Ok(views.html.index(successes = Seq(constants.Response.ZONE_ADDED)))
-        }
-        catch {
+
+        val post=transactionsAddZone.Service.post(transactionsAddZone.Request(transactionsAddZone.BaseReq(from = addZoneData.from, gas = addZoneData.gas.toString), to = addZoneData.to, zoneID = addZoneData.zoneID, password = addZoneData.password, mode = transactionMode))
+        (for{
+          _<- post
+        }yield Ok(views.html.index(successes = Seq(constants.Response.ZONE_ADDED)))
+          ).recover{
           case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
         }
       }
