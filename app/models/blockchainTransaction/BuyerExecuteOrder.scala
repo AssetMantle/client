@@ -201,16 +201,17 @@ class BuyerExecuteOrders @Inject()(actorSystem: ActorSystem, transaction: utilit
         val markDirtyBuyerAddressAccount=blockchainAccounts.Service.markDirty(buyerExecuteOrder.buyerAddress)
         val markDirtyBuyerAddressTransactionFeedbacks=blockchainTransactionFeedbacks.Service.markDirty(buyerExecuteOrder.buyerAddress)
         val markDirtySellerAddressTransactionFeedbacks=blockchainTransactionFeedbacks.Service.markDirty(buyerExecuteOrder.sellerAddress)
-        def markDirtyFromAddress:Future[Unit]={
+        def markDirtyFromAddress= {
           if (buyerExecuteOrder.from != buyerExecuteOrder.buyerAddress) {
-            val markDirtyFromAddress=blockchainAccounts.Service.markDirty(buyerExecuteOrder.from)
-          val id= masterAccounts.Service.getId(buyerExecuteOrder.from)
-            (for{
-            _<- markDirtyFromAddress
-            id<-id
-          }yield utilitiesNotification.send(id, constants.Notification.SUCCESS, blockResponse.txhash)
-              )
-          }
+            val markDirtyFromAddress = blockchainAccounts.Service.markDirty(buyerExecuteOrder.from)
+            val id = masterAccounts.Service.getId(buyerExecuteOrder.from)
+            for {
+              _ <- markDirtyFromAddress
+              id <- id
+            } yield utilitiesNotification.send(id, constants.Notification.SUCCESS, blockResponse.txhash)
+
+          } else Future {Unit}
+        }
 
         for{
           _<-markDirtyNegotiationID
@@ -219,6 +220,22 @@ class BuyerExecuteOrders @Inject()(actorSystem: ActorSystem, transaction: utilit
           _<-markDirtySellerAddressTransactionFeedbacks
           _<- markDirtyFromAddress
         }yield {}
+      }
+      def getIDs(buyerExecuteOrder:BuyerExecuteOrder)={
+        val sellerAddress=masterAccounts.Service.getId(buyerExecuteOrder.sellerAddress)
+        val buyerAddress=masterAccounts.Service.getId(buyerExecuteOrder.buyerAddress)
+        (sellerAddress,buyerAddress)
+      }
+      for{
+        _<-markTransactionSuccessful
+        buyerExecuteOrder<-buyerExecuteOrder
+        negotiationID<-negotiationID(buyerExecuteOrder)
+        _<- markDirty(negotiationID,buyerExecuteOrder)
+        (buyerAddress,sellerAddress) <- getIDs(buyerExecuteOrder)
+      }yield{
+        utilitiesNotification.send(masterAccounts.Service.getId(buyerExecuteOrder.sellerAddress), constants.Notification.SUCCESS, blockResponse.txhash)
+        utilitiesNotification.send(masterAccounts.Service.getId(buyerExecuteOrder.buyerAddress), constants.Notification.SUCCESS, blockResponse.txhash)
+
       }
 
     }
