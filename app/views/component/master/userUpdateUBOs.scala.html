@@ -1,5 +1,6 @@
 @import controllers.actions.LoginState
 @import helper._
+@import views.html.base._
 @import views.companion.master.AddUBOs
 
 @(addUBOsForm: Form[AddUBOs.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)

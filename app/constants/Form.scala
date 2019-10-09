@@ -3,7 +3,7 @@ package constants
 import controllers.routes
 import play.api.mvc.Call
 
-class Form(private val template: String, val route: Call) {
+class Form(template: String, val route: Call) {
   val legend: String = Seq("FORM", template, "LEGEND").mkString(".")
   val submit: String = Seq("FORM", template, "SUBMIT").mkString(".")
 }
@@ -11,7 +11,12 @@ class Form(private val template: String, val route: Call) {
 object Form {
 
   val SIGN_UP = new Form("SIGN_UP", routes.AccountController.signUp())
-  
+  val LOGIN = new Form("LOGIN", routes.AccountController.login())
+  val LOGOUT = new Form("LOGOUT", routes.AccountController.logout())
+  val CHANGE_PASSWORD = new Form("CHANGE_PASSWORD", routes.AccountController.changePassword())
+  val EMAIL_OTP_FORGOT_PASSWORD = new Form("EMAIL_OTP_FORGOT_PASSWORD", routes.AccountController.emailOTPForgotPassword())
+  val FORGOT_PASSWORD = new Form("FORGOT_PASSWORD", routes.AccountController.forgotPassword())
+
   //BLOCKCHAIN_FORMS
   val BLOCKCHAIN_ADD_KEY = new Form("BLOCKCHAIN_ADD_KEY", routes.AddKeyController.blockchainAddKey())
   val BLOCKCHAIN_ADD_ORGANIZATION = new Form("BLOCKCHAIN_ADD_ORGANIZATION", routes.AddOrganizationController.blockchainAddOrganization())
@@ -73,8 +78,6 @@ object Form {
   val SELL_ORDER_FEEDBACKS = "SELL_ORDER_FEEDBACKS"
   val SELL = "SELL"
   val PROFILE_PICTURE = "PROFILE_PICTURE"
-  val CHANGE_PASSWORD = "CHANGE_PASSWORD"
-  val FORGOT_PASSWORD = "FORGOT_PASSWORD"
   val GET_OTP = "GET_OTP"
   val SET_PASSWORD = "SET_PASSWORD"
   val COMPLETION = "COMPLETION"
@@ -287,8 +290,6 @@ object Form {
   val TRADER_ID = "TRADER_ID"
   val ORGANIZATION_ID = "ORGANIZATION_ID"
   val CURRENCY = "CURRENCY"
-  val LOGIN = "LOGIN"
-  val LOGOUT = "LOGOUT"
   val USERNAME = "USERNAME"
   val USERNAME_AVAILABLE = "USERNAME_AVAILABLE"
   val PUSH_NOTIFICATION_TOKEN = "PUSH_NOTIFICATION_TOKEN"

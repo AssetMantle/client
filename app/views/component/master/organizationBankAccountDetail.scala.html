@@ -1,5 +1,6 @@
 @import controllers.actions.LoginState
 @import helper._
+@import views.html.base._
 @import views.companion.master.OrganizationBankAccountDetail
 
 @(organizationBankAccountDetailForm: Form[OrganizationBankAccountDetail.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)

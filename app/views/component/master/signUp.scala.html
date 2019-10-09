@@ -1,9 +1,9 @@
 @import controllers.actions.LoginState
 @import helper._
-@import views.companion.master.SignUp
 @import views.html.base._
+@import views.companion.master.SignUp
 
-@(signUpForm: Form[SignUp.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@(signUpForm: Form[SignUp.Data] = SignUp.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 
 @baseForm(constants.Form.SIGN_UP, signUpForm){
     @inputText(signUpForm(constants.FormField.USERNAME.name), 'placeholder -> Messages(constants.FormField.USERNAME.name), 'id -> "username", 'class -> "cmuk-input", 'required -> true, 'oninput -> """checkUsernameAvailable(this, "#checkUsernameAvailableResult", "#usernameAvailable")""")

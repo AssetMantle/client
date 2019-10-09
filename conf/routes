@@ -39,7 +39,7 @@ GET         /account/forgotPasswordUsername                              control
 POST        /account/forgotPasswordUsername                              controllers.AccountController.emailOTPForgotPassword
 
 GET         /account/forgotPassword                                      controllers.AccountController.forgotPasswordForm(username: String)
-POST        /account/forgotPassword                                      controllers.AccountController.forgotPassword(username: String)
+POST        /account/forgotPassword                                      controllers.AccountController.forgotPassword
 
 GET         /account/checkUsernameAvailable                              controllers.AccountController.checkUsernameAvailable(username: String)
 POST        /acccount/noteNewKeyDetails                                  controllers.AccountController.noteNewKeyDetails(name:String,blockchainAddress:String ,publicKey:String ,seed:String)

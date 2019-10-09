@@ -53,7 +53,7 @@ class AccountController @Inject()(
 
 
   def signUpForm: Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.signUp(SignUp.form))
+    Ok(views.html.component.master.signUp())
   }
 
   def signUp: Action[AnyContent] = Action { implicit request =>
@@ -75,7 +75,7 @@ class AccountController @Inject()(
 
 
   def loginForm: Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.login(Login.form))
+    Ok(views.html.component.master.login())
   }
 
   def login: Action[AnyContent] = Action { implicit request =>
@@ -119,7 +119,7 @@ class AccountController @Inject()(
 
 
   def logoutForm: Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.logout(Logout.form))
+    Ok(views.html.component.master.logout())
   }
 
   def logout: Action[AnyContent] = withLoginAction.authenticated { loginState =>
@@ -152,7 +152,7 @@ class AccountController @Inject()(
 
 
   def changePasswordForm: Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.changePassword(views.companion.master.ChangePassword.form))
+    Ok(views.html.component.master.changePassword())
   }
 
   def changePassword: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
@@ -180,7 +180,7 @@ class AccountController @Inject()(
 
 
   def emailOTPForgotPasswordForm: Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.emailOTPForgotPassword(views.companion.master.EmailOTPForgotPassword.form))
+    Ok(views.html.component.master.emailOTPForgotPassword())
   }
 
   def emailOTPForgotPassword: Action[AnyContent] = Action { implicit request =>
@@ -203,19 +203,19 @@ class AccountController @Inject()(
 
 
   def forgotPasswordForm(username: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.forgotPassword(views.companion.master.ForgotPassword.form, username))
+    Ok(views.html.component.master.forgotPassword(username = username))
   }
 
-  def forgotPassword(username: String): Action[AnyContent] = Action { implicit request =>
+  def forgotPassword(): Action[AnyContent] = Action { implicit request =>
     views.companion.master.ForgotPassword.form.bindFromRequest().fold(
       formWithErrors => {
-        BadRequest(views.html.component.master.forgotPassword(formWithErrors, username))
+        BadRequest(views.html.component.master.forgotPassword(formWithErrors, formWithErrors(constants.FormField.USERNAME.name).value.getOrElse("")))
       },
       forgotPasswordData => {
         try {
-          if (masterTransactionEmailOTP.Service.verifyOTP(username, forgotPasswordData.otp)) {
-            transactionForgotPassword.Service.post(username = username, transactionForgotPassword.Request(seed = forgotPasswordData.mnemonic, newPassword = forgotPasswordData.newPassword, confirmNewPassword = forgotPasswordData.confirmNewPassword))
-            masterAccounts.Service.updatePassword(username = username, newPassword = forgotPasswordData.newPassword)
+          if (masterTransactionEmailOTP.Service.verifyOTP(forgotPasswordData.username, forgotPasswordData.otp)) {
+            transactionForgotPassword.Service.post(username = forgotPasswordData.username, transactionForgotPassword.Request(seed = forgotPasswordData.mnemonic, newPassword = forgotPasswordData.newPassword, confirmNewPassword = forgotPasswordData.confirmNewPassword))
+            masterAccounts.Service.updatePassword(username = forgotPasswordData.username, newPassword = forgotPasswordData.newPassword)
             Ok(views.html.index(successes = Seq(constants.Response.PASSWORD_UPDATED)))
           } else {
             BadRequest(views.html.index(failures = Seq(constants.Response.INVALID_PASSWORD)))

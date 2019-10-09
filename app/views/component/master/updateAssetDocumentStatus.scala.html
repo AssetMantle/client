@@ -1,5 +1,6 @@
 @import controllers.actions.LoginState
 @import helper._
+@import views.html.base._
 @import models.masterTransaction.AssetFile
 @import views.companion.master.UpdateAssetDocumentStatus
 
@@ -24,12 +25,11 @@
         @file.status match {
             case Some(status: Boolean) => {
                 @if(status) {
-                    <span class="result success"><img class="status" src="@routes.Assets.versioned("images/success.jpg")"></span>
+                    <span cmuk-icon="check"></span>
                     <button type="button" class="cmuk-button cmuk-button-danger cmuk-button-small" onclick="verifyReject(this, '@Seq("#", file.id, file.documentType).mkString("")', '@Seq(file.id, file.documentType, constants.Form.STATUS).mkString("")', false)">@Messages(constants.Form.REJECT)</button>
                 } else {
-                    <span class="result failure"><img class="status" src="@routes.Assets.versioned("images/unverified.png")"></span>
-                    <button type="button" class="cmuk-button cmuk-button-success cmuk-button-small" onclick="verifyReject(this, '@Seq("#", file.id, file.documentType).mkString("")', '@Seq(file.id, file.documentType, constants.Form.STATUS).mkString("")', true)">@Messages
-                        (constants.Form.APPROVE)</button>
+                    <span cmuk-icon="ban"></span>
+                    <button type="button" class="cmuk-button cmuk-button-success cmuk-button-small" onclick="verifyReject(this, '@Seq("#", file.id, file.documentType).mkString("")', '@Seq(file.id, file.documentType, constants.Form.STATUS).mkString("")', true)">@Messages(constants.Form.APPROVE)</button>
                 }
             }
             case None => {

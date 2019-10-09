@@ -1,21 +1,21 @@
 $(document).ready(function () {
     $('#organizationKYCSameAsRegisteredAddress').click(function () {
         if ($(this).prop("checked") === false) {
-            document.getElementById("postalAddressLine1").value = "";
-            document.getElementById("postalAddressLine2").value = "";
-            document.getElementById("postalLandmark").value = "";
-            document.getElementById("postalCity").value = "";
-            document.getElementById("postalCountry").value = "";
-            document.getElementById("postalZipCode").value = "";
-            document.getElementById("postalPhone").value = "";
+            $('#postalAddressLine1').val("");
+            $('#postalAddressLine2').val("");
+            $('#postalLandmark').val("");
+            $('#postalCity').val("");
+            $('#postalCountry').val("");
+            $('#postalZipCode').val("");
+            $('#postalPhone').val("");
         } else {
-            document.getElementById("postalAddressLine1").value = document.getElementById("registeredAddressLine1").value;
-            document.getElementById("postalAddressLine2").value = document.getElementById("registeredAddressLine2").value;
-            document.getElementById("postalLandmark").value = document.getElementById("registeredLandmark").value;
-            document.getElementById("postalCity").value = document.getElementById("registeredCity").value;
-            document.getElementById("postalCountry").value = document.getElementById("registeredCountry").value;
-            document.getElementById("postalZipCode").value = document.getElementById("registeredZipCode").value;
-            document.getElementById("postalPhone").value = document.getElementById("registeredPhone").value;
+            $('#postalAddressLine1').val($('#registeredAddressLine1').val());
+            $('#postalAddressLine2').val($('#registeredAddressLine2').val());
+            $('#postalLandmark').val($('#registeredLandmark').val());
+            $('#postalCity').val($('#registeredCity').val());
+            $('#postalCountry').val($('#registeredCountry').val());
+            $('#postalZipCode').val($('#registeredZipCode').val());
+            $('#postalPhone').val($('#registeredPhone').val());
         }
     });
 });

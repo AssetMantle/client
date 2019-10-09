@@ -1,5 +1,6 @@
 @import controllers.actions.LoginState
 @import helper._
+@import views.html.base._
 @import views.companion.master.ModeratedSellerExecuteOrder
 
 @(moderatedSellerExecuteOrderForm: Form[ModeratedSellerExecuteOrder.Data], buyerAddress: String, sellerAddress: String, pegHash: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
