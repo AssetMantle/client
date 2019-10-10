@@ -1,17 +1,28 @@
 @import controllers.actions.LoginState
 @import helper._
 @import views.companion.master.BuyerExecuteOrder
+@import models.masterTransaction.NegotiationFile
 
-@(buyerExecuteOrderForm: Form[BuyerExecuteOrder.Data], sellerAddress: String, pegHash: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@(buyerExecuteOrderForm: Form[BuyerExecuteOrder.Data], files: Seq[NegotiationFile])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+
+    @for(file <- files) {
+        @component.master.commonDocumentViewer(file) {
+            @routes.FileController.tradingFile(file.id, file.fileName, file.documentType)
+        } {
+            <a href="@routes.FileController.tradingFile(file.id, file.fileName, file.documentType)">@Messages(file.documentType)</a>
+        } {
+            <span>@file.documentType</span>
+        }
+    }
 @form(action = routes.BuyerExecuteOrderController.buyerExecuteOrder, 'onkeypress -> "submitFormOnEnter(event,this)") {
     <div class="latest_card-header latest_card-header-primary text-center">
         <h4 class="latest_card-title">@Messages(constants.Form.BUYER_EXECUTE_ORDER)</h4>
     </div>
     <div class="latest_card-body">
         @CSRF.formField
-      @inputText(buyerExecuteOrderForm(constants.FormField.SELLER_ADDRESS.name).copy(value = Some(sellerAddress)), '_label -> Messages(constants.FormField.SELLER_ADDRESS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.SELLER_ADDRESS.name), 'required -> true)
-      @inputText(buyerExecuteOrderForm(constants.FormField.FIAT_PROOF_HASH.name), '_label -> Messages(constants.FormField.FIAT_PROOF_HASH.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.FIAT_PROOF_HASH.name), 'required -> true)
-      @inputText(buyerExecuteOrderForm(constants.FormField.PEG_HASH.name).copy(value = Some(pegHash)), '_label -> Messages(constants.FormField.PEG_HASH.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PEG_HASH.name), 'required -> true)
+      @inputText(buyerExecuteOrderForm(constants.FormField.SELLER_ADDRESS.name), '_label -> Messages(constants.FormField.SELLER_ADDRESS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.SELLER_ADDRESS.name), 'required -> true)
+      @inputText(buyerExecuteOrderForm(constants.FormField.FIAT_PROOF_HASH.name), '_label -> Messages(constants.FormField.FIAT_PROOF_HASH.name), 'class -> "cmuk-input hidden", 'placeholder -> Messages(constants.FormField.FIAT_PROOF_HASH.name), 'required -> true)
+      @inputText(buyerExecuteOrderForm(constants.FormField.PEG_HASH.name), '_label -> Messages(constants.FormField.PEG_HASH.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PEG_HASH.name), 'required -> true)
       @inputText(buyerExecuteOrderForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.GAS.name), 'required -> true, 'type -> "number")
       @inputPassword(buyerExecuteOrderForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PASSWORD.name), 'required -> true)
 

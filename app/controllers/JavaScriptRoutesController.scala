@@ -72,7 +72,9 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.BlockExplorerController.stakingValidators,
         routes.javascript.BlockExplorerController.transactionHash,
 
+        routes.javascript.BuyerExecuteOrderController.buyerExecuteOrderDocument,
         routes.javascript.BuyerExecuteOrderController.buyerExecuteOrderForm,
+        routes.javascript.BuyerExecuteOrderController.moderatedBuyerExecuteOrderDocument,
         routes.javascript.BuyerExecuteOrderController.moderatedBuyerExecuteOrderForm,
         routes.javascript.BuyerExecuteOrderController.moderatedBuyerExecuteOrderList,
         routes.javascript.BuyerExecuteOrderController.blockchainBuyerExecuteOrderForm,
@@ -133,6 +135,11 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.FileController.storeTraderNegotiation,
         routes.javascript.FileController.updateTraderNegotiationForm,
         routes.javascript.FileController.updateTraderNegotiation,
+        routes.javascript.FileController.uploadZoneNegotiationForm,
+        routes.javascript.FileController.uploadZoneNegotiation,
+        routes.javascript.FileController.storeZoneNegotiation,
+        routes.javascript.FileController.updateZoneNegotiationForm,
+        routes.javascript.FileController.updateZoneNegotiation,
         routes.javascript.FileController.file,
 
         routes.javascript.IssueAssetController.viewPendingIssueAssetRequests,
@@ -173,9 +180,10 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ReleaseAssetController.blockchainReleaseAssetForm,
 
         routes.javascript.SellerExecuteOrderController.moderatedSellerExecuteOrderList,
-        routes.javascript.SellerExecuteOrderController.sellerExecuteOrderForm,
+        routes.javascript.SellerExecuteOrderController.sellerExecuteOrderDocument,
         routes.javascript.SellerExecuteOrderController.sellerExecuteOrderForm,
         routes.javascript.SellerExecuteOrderController.moderatedSellerExecuteOrderForm,
+        routes.javascript.SellerExecuteOrderController.moderatedSellerExecuteOrderDocument,
         routes.javascript.SellerExecuteOrderController.blockchainSellerExecuteOrderForm,
 
         routes.javascript.SendAssetController.sendAssetForm,
