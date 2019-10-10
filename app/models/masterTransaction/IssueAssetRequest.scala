@@ -115,7 +115,7 @@ class IssueAssetRequests @Inject()(protected val databaseConfigProvider: Databas
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }
-  }updateStatusByPegHash
+  }
 
   private def updateStatusByPegHash(pegHash: Option[String], status: String): Future[Int] = db.run(issueAssetRequestTable.filter(_.pegHash === pegHash).map(_.status).update(status).asTry).map {
     case Success(result) => result

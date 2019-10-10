@@ -275,6 +275,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
           case constants.File.BUYER_CONTRACT => withUsernameToken.PartialContent(views.html.component.master.confirmBuyerBidDocument(masterTransactionNegotiationFiles.Service.getOrNone(negotiationRequestID, constants.File.BUYER_CONTRACT), negotiationRequestID, constants.File.BUYER_CONTRACT))
           case constants.File.SELLER_CONTRACT => withUsernameToken.PartialContent(views.html.component.master.confirmSellerBidDocument(masterTransactionNegotiationFiles.Service.getOrNone(negotiationRequestID, constants.File.SELLER_CONTRACT), negotiationRequestID, constants.File.SELLER_CONTRACT))
           case constants.File.FIAT_PROOF => withUsernameToken.PartialContent(views.html.component.master.buyerExecuteOrderDocument(masterTransactionNegotiationFiles.Service.getOrNone(negotiationRequestID, constants.File.FIAT_PROOF), negotiationRequestID, constants.File.FIAT_PROOF))
+          case constants.File.AWB_PROOF => withUsernameToken.PartialContent(views.html.component.master.buyerExecuteOrderDocument(masterTransactionNegotiationFiles.Service.getOrNone(negotiationRequestID, constants.File.AWB_PROOF), negotiationRequestID, constants.File.AWB_PROOF))
           case _ => withUsernameToken.Ok(views.html.index())
         }
       } catch {
@@ -297,6 +298,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
           case constants.File.BUYER_CONTRACT => withUsernameToken.PartialContent(views.html.component.master.confirmBuyerBidDocument(masterTransactionNegotiationFiles.Service.getOrNone(negotiationRequestID, constants.File.BUYER_CONTRACT), negotiationRequestID, constants.File.BUYER_CONTRACT))
           case constants.File.SELLER_CONTRACT => withUsernameToken.PartialContent(views.html.component.master.confirmSellerBidDocument(masterTransactionNegotiationFiles.Service.getOrNone(negotiationRequestID, constants.File.SELLER_CONTRACT), negotiationRequestID, constants.File.SELLER_CONTRACT))
           case constants.File.FIAT_PROOF => withUsernameToken.PartialContent(views.html.component.master.buyerExecuteOrderDocument(masterTransactionNegotiationFiles.Service.getOrNone(negotiationRequestID, constants.File.FIAT_PROOF), negotiationRequestID, constants.File.FIAT_PROOF))
+          case constants.File.AWB_PROOF => withUsernameToken.PartialContent(views.html.component.master.buyerExecuteOrderDocument(masterTransactionNegotiationFiles.Service.getOrNone(negotiationRequestID, constants.File.AWB_PROOF), negotiationRequestID, constants.File.AWB_PROOF))
           case _ => withUsernameToken.Ok(views.html.index())
         }
       } catch {

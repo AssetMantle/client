@@ -37,7 +37,7 @@ class SellerExecuteOrderController @Inject()(messagesControllerComponents: Messa
       try {
         val negotiation = blockchainNegotiations.Service.get(masterTransactionNegotiationRequests.Service.getNegotiationIDByID(requestID))
         val awbProofDocument = masterTransactionNegotiationFiles.Service.getDocuments(requestID, Seq(constants.File.AWB_PROOF))
-        withUsernameToken.PartialContent(views.html.component.master.sellerExecuteOrder(views.companion.master.SellerExecuteOrder.form.fill(views.companion.master.SellerExecuteOrder.Data("", negotiation.buyerAddress, utilities.FileOperations.combinedHash(awbProofDocument), negotiation.assetPegHash, 0)), awbProofDocument))
+        withUsernameToken.Ok(views.html.component.master.sellerExecuteOrder(views.companion.master.SellerExecuteOrder.form.fill(views.companion.master.SellerExecuteOrder.Data("", negotiation.buyerAddress, utilities.FileOperations.combinedHash(awbProofDocument), negotiation.assetPegHash, 0)), awbProofDocument))
       } catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
@@ -99,7 +99,7 @@ class SellerExecuteOrderController @Inject()(messagesControllerComponents: Messa
       try {
         val negotiation = blockchainNegotiations.Service.get(masterTransactionNegotiationRequests.Service.getNegotiationIDByID(requestID))
         val awbProofDocument = masterTransactionNegotiationFiles.Service.getDocuments(requestID, Seq(constants.File.AWB_PROOF))
-        withUsernameToken.PartialContent(views.html.component.master.moderatedSellerExecuteOrder(views.companion.master.ModeratedSellerExecuteOrder.form.fill(views.companion.master.ModeratedSellerExecuteOrder.Data("", negotiation.buyerAddress, negotiation.sellerAddress, utilities.FileOperations.combinedHash(awbProofDocument), negotiation.assetPegHash, 0)), awbProofDocument))
+        withUsernameToken.Ok(views.html.component.master.moderatedSellerExecuteOrder(views.companion.master.ModeratedSellerExecuteOrder.form.fill(views.companion.master.ModeratedSellerExecuteOrder.Data("", negotiation.buyerAddress, negotiation.sellerAddress, utilities.FileOperations.combinedHash(awbProofDocument), negotiation.assetPegHash, 0)), awbProofDocument))
       }catch{
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }

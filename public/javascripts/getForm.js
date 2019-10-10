@@ -10,7 +10,7 @@ function getForm(route, modalContent = '#commonModalContent', modal = '#commonMo
             },
             500: function (data) {
                 replaceDocument(data.responseText);
-            }
+            },
         }
     }).fail(function (XMLHttpRequest) {
         if (XMLHttpRequest.readyState === 0) {
