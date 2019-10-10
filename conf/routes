@@ -212,8 +212,8 @@ GET         /organizationUpload/updateFile                               control
 GET         /master/addZone                                              controllers.AddZoneController.addZoneForm
 POST        /master/addZone                                              controllers.AddZoneController.addZone
 GET         /master/userUploadOrUpdateZoneKYCView                        controllers.AddZoneController.userUploadOrUpdateZoneKYCView
-GET         /master/reviewZoneCompletion                                 controllers.AddZoneController.reviewZoneCompletionForm
-POST        /master/reviewZoneCompletion                                 controllers.AddZoneController.reviewZoneCompletion
+GET         /master/reviewAddZoneOnCompletion                            controllers.AddZoneController.reviewAddZoneOnCompletionForm
+POST        /master/reviewAddZoneOnCompletion                            controllers.AddZoneController.reviewAddZoneOnCompletion
 
 GET         /master/verifyZone                                           controllers.AddZoneController.verifyZoneForm(zoneID: String)
 POST        /master/verifyZone                                           controllers.AddZoneController.verifyZone

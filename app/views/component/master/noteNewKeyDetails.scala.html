@@ -11,6 +11,6 @@
 
 @form(action = routes.AccountController.noteNewKeyDetails(name, blockchainAddress, publicKey, seed), 'onkeypress -> "submitFormOnEnter(event,this)") {
     @CSRF.formField
-    @checkbox(noteNewKeyDetailsForm(constants.Form.CONFIRM_NOTE_NEW_KEY_DETAILS), '_label -> Messages(constants.Form.CONFIRM_NOTE_NEW_KEY_DETAILS))
+    @checkbox(noteNewKeyDetailsForm(constants.Form.CONFIRM_NOTE_NEW_KEY_DETAILS), '_label -> Messages(constants.Form.CONFIRM_NOTE_NEW_KEY_DETAILS), 'class -> "cmuk-checkbox")
     <button type="button" onclick="submitForm(this)">@Messages(constants.Form.NOTE_NEW_KEY_DETAILS)</button>
 }

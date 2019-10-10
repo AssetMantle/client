@@ -30,7 +30,7 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
         val zone = masterZones.Service.getByAccountID(loginState.username)
         withUsernameToken.Ok(views.html.component.master.addZone(views.companion.master.AddZone.form.fill(views.companion.master.AddZone.Data(name = zone.name, currency = zone.currency, address = views.companion.master.AddZone.AddressData(addressLine1 = zone.address.addressLine1, addressLine2 = zone.address.addressLine2, landmark = zone.address.landmark, city = zone.address.city, country = zone.address.country, zipCode = zone.address.zipCode, phone = zone.address.phone)))))
       } catch {
-        case _: BaseException => withUsernameToken.Ok(views.html.component.master.addZone(views.companion.master.AddZone.form))
+        case _: BaseException => withUsernameToken.Ok(views.html.component.master.addZone())
       }
   }
 
@@ -123,36 +123,36 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
       }
   }
 
-  def reviewZoneCompletionForm(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
+  def reviewAddZoneOnCompletionForm(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
         val zone = masterZones.Service.getByAccountID(loginState.username)
-        withUsernameToken.Ok(views.html.component.master.reviewZoneCompletion(views.companion.master.ZoneCompletion.form, zone = zone, zoneKYCs = masterZoneKYCs.Service.getAllDocuments(zone.id)))
+        withUsernameToken.Ok(views.html.component.master.reviewAddZoneOnCompletion(zone = zone, zoneKYCs = masterZoneKYCs.Service.getAllDocuments(zone.id)))
       } catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
-  def reviewZoneCompletion(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
+  def reviewAddZoneOnCompletion(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      views.companion.master.ZoneCompletion.form.bindFromRequest().fold(
+      views.companion.master.ReviewAddZoneOnCompletion.form.bindFromRequest().fold(
         formWithErrors => {
           try {
             val zone = masterZones.Service.getByAccountID(loginState.username)
-            BadRequest(views.html.component.master.reviewZoneCompletion(formWithErrors, zone = zone, zoneKYCs = masterZoneKYCs.Service.getAllDocuments(zone.id)))
+            BadRequest(views.html.component.master.reviewAddZoneOnCompletion(formWithErrors, zone = zone, zoneKYCs = masterZoneKYCs.Service.getAllDocuments(zone.id)))
           } catch {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
         },
-        reviewZoneCompletionData => {
+        reviewAddZoneOnCompletionData => {
           try {
             val id = masterZones.Service.getID(loginState.username)
-            if (reviewZoneCompletionData.completion && masterZoneKYCs.Service.checkAllKYCFileTypesExists(id)) {
+            if (reviewAddZoneOnCompletionData.completion && masterZoneKYCs.Service.checkAllKYCFileTypesExists(id)) {
               masterZones.Service.markZoneFormCompleted(id)
               withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ZONE_ADDED_FOR_VERIFICATION)))
             } else {
               val zone = masterZones.Service.getByAccountID(loginState.username)
-              BadRequest(views.html.component.master.reviewZoneCompletion(views.companion.master.ZoneCompletion.form, zone = zone, zoneKYCs = masterZoneKYCs.Service.getAllDocuments(zone.id)))
+              BadRequest(views.html.component.master.reviewAddZoneOnCompletion(zone = zone, zoneKYCs = masterZoneKYCs.Service.getAllDocuments(zone.id)))
             }
           }
           catch {
@@ -163,7 +163,7 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
   }
 
   def verifyZoneForm(zoneID: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.verifyZone(views.companion.master.VerifyZone.form, zoneID))
+    Ok(views.html.component.master.verifyZone(zoneID = zoneID))
   }
 
   def verifyZone: Action[AnyContent] = withGenesisLoginAction.authenticated { implicit loginState =>
@@ -254,7 +254,7 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
   }
 
   def rejectVerifyZoneRequestForm(zoneID: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.rejectVerifyZoneRequest(views.companion.master.RejectVerifyZoneRequest.form, zoneID))
+    Ok(views.html.component.master.rejectVerifyZoneRequest(zoneID = zoneID))
   }
 
   def rejectVerifyZoneRequest: Action[AnyContent] = withGenesisLoginAction.authenticated { implicit loginState =>

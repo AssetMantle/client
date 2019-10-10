@@ -26,6 +26,13 @@ object Form {
   val VERIFY_ORGANIZATION = new Form("VERIFY_ORGANIZATION", routes.AddOrganizationController.verifyOrganization())
   val REJECT_VERIFY_ORGANIZATION_REQUEST = new Form("REJECT_VERIFY_ORGANIZATION_REQUEST", routes.AddOrganizationController.rejectVerifyOrganizationRequest())
 
+  //AddZone
+  val ADD_ZONE = new Form("ADD_ZONE", routes.AddZoneController.addZone())
+  val REVIEW_ADD_ZONE_ON_COMPLETION = new Form("REVIEW_ADD_ZONE_ON_COMPLETION", routes.AddZoneController.reviewAddZoneOnCompletion())
+  val VERIFY_ZONE = new Form("VERIFY_ZONE", routes.AddZoneController.verifyZone())
+  val REJECT_VERIFY_ZONE_REQUEST = new Form("REJECT_VERIFY_ZONE_REQUEST", routes.AddZoneController.rejectVerifyZoneRequest())
+
+
   //BLOCKCHAIN_FORMS
   val BLOCKCHAIN_ADD_KEY = new Form("BLOCKCHAIN_ADD_KEY", routes.AddKeyController.blockchainAddKey())
   val BLOCKCHAIN_ADD_ORGANIZATION = new Form("BLOCKCHAIN_ADD_ORGANIZATION", routes.AddOrganizationController.blockchainAddOrganization())
@@ -213,7 +220,6 @@ object Form {
 
   //Blockchain
   val ADD_KEY = "ADD_KEY"
-  val ADD_ZONE = "ADD_ZONE"
   val ADD_TRADER = "ADD_TRADER"
   val SEND_COIN = "SEND_COIN"
   val SET_ACL = "SET_ACL"
@@ -312,7 +318,6 @@ object Form {
   val MODIFY_TRADER = "MODIFY_TRADER"
   val VERIFIED_STATUS = "VERIFIED_STATUS"
   val COMPLETION_STATUS = "COMPLETION_STATUS"
-  val VERIFY_ZONE = "VERIFY_ZONE"
   val LOADING = "LOADING"
   val CONNECTION_ERROR = "CONNECTION_ERROR"
   val FAILURE = "FAILURE"
@@ -354,7 +359,6 @@ object Form {
   val REJECT_ISSUE_ASSET_REQUEST = "REJECT_ISSUE_ASSET_REQUEST"
   val REJECT_ISSUE_FIAT_REQUEST = "REJECT_ISSUE_FIAT_REQUEST"
   val REJECT_VERIFY_TRADER_REQUEST = "REJECT_VERIFY_TRADER_REQUEST"
-  val REJECT_VERIFY_ZONE_REQUEST = "REJECT_VERIFY_ZONE_REQUEST"
   val ISSUE_ASSET_INVOICE = "ISSUE_ASSET_INVOICE"
   val ISSUE_ASSET_OBL = "ISSUE_ASSET_OBL"
   val SHIPMENT_DETAILS = "SHIPMENT_DETAILS"
