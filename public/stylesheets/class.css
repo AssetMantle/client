@@ -668,6 +668,7 @@ dl .info::after {
     margin-top: 20px;
 }
 .sideBarOpenButton {
+    position: fixed;
     background: linear-gradient(60deg, #149f98, #102923);
 }
 
@@ -732,4 +733,30 @@ dl .info::after {
 }
 .copyIcon{
     cursor: pointer;
+}
+.leftSide .leftSideMenuIcon{
+    color:#fff;
+}
+.cmuk-tab{
+    box-shadow: 0 5px 15px rgba(0,0,0,.08);
+}
+.cmuk-tab>.cmuk-active>a::before{
+    content: ' ';
+    position: absolute;
+    width: 0;
+    height: 0;
+    left: auto;
+    right: -15px;
+    top:38% ;
+    bottom: -19px;
+    border: 8px solid;
+    border-color: transparent transparent transparent  #149f98;
+    z-index: -1000;
+    animation-fill-mode: forwards;
+}
+.cmuk-tab>.cmuk-active>a{
+    background: #149f98;
+}
+.cmuk-tab>li>a{
+    padding: 15px;
 }
