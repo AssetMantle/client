@@ -237,7 +237,7 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
     def filterTraderIds(ids: Seq[String]): Seq[String] = Await.result(filterIdsOnUserType(ids, constants.User.TRADER), Duration.Inf)
 
-    def updateStatusUnverifiedContact(id: String): Int = Await.result(updateStatusById(id, constants.Status.Account.CONTACT_UNVERIFIED), Duration.Inf)
+    def updateStatusUnverifiedContact(id: String): Future[Int] = updateStatusById(id, constants.Status.Account.CONTACT_UNVERIFIED)
 
     def updateStatusUnverifiedMobile(id: String): Int = Await.result(updateStatusById(id, constants.Status.Account.MOBILE_NUMBER_UNVERIFIED), Duration.Inf)
 

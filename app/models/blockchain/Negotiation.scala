@@ -176,13 +176,13 @@ class Negotiations @Inject()(shutdownActors: ShutdownActor, masterAccounts: mast
 
     def create(id: String, buyerAddress: String, sellerAddress: String, assetPegHash: String, bid: String, time: String, buyerSignature: Option[String], sellerSignature: Option[String]): String = Await.result(add(Negotiation(id = id, buyerAddress = buyerAddress, sellerAddress = sellerAddress, assetPegHash = assetPegHash, bid = bid, time = time, buyerSignature = buyerSignature, sellerSignature = sellerSignature, dirtyBit = false)), Duration.Inf)
 
-    def insertOrUpdate(id: String, buyerAddress: String, sellerAddress: String, assetPegHash: String, bid: String, time: String, buyerSignature: Option[String], sellerSignature: Option[String], buyerBlockHeight: Option[String], sellerBlockHeight: Option[String], buyerContractHash: Option[String], sellerContractHash: Option[String], dirtyBit: Boolean): Int = Await.result(upsert(Negotiation(id = id, buyerAddress = buyerAddress, sellerAddress = sellerAddress, assetPegHash = assetPegHash, bid = bid, time = time, buyerSignature = buyerSignature, sellerSignature = sellerSignature, buyerBlockHeight = buyerBlockHeight, sellerBlockHeight = sellerBlockHeight, buyerContractHash = buyerContractHash, sellerContractHash = sellerContractHash, dirtyBit = dirtyBit)), Duration.Inf)
+    def insertOrUpdate(id: String, buyerAddress: String, sellerAddress: String, assetPegHash: String, bid: String, time: String, buyerSignature: Option[String], sellerSignature: Option[String], buyerBlockHeight: Option[String], sellerBlockHeight: Option[String], buyerContractHash: Option[String], sellerContractHash: Option[String], dirtyBit: Boolean): Future[Int] = upsert(Negotiation(id = id, buyerAddress = buyerAddress, sellerAddress = sellerAddress, assetPegHash = assetPegHash, bid = bid, time = time, buyerSignature = buyerSignature, sellerSignature = sellerSignature, buyerBlockHeight = buyerBlockHeight, sellerBlockHeight = sellerBlockHeight, buyerContractHash = buyerContractHash, sellerContractHash = sellerContractHash, dirtyBit = dirtyBit))
 
     def getDirtyNegotiations: Seq[Negotiation] = Await.result(getNegotiationsByDirtyBit(dirtyBit = true), Duration.Inf)
 
     def get(id: String): Negotiation = Await.result(findById(id), Duration.Inf)
 
-    def getBuyerNegotiationsByOrderAndZone(ids:Seq[String], addresses:Seq[String]): Seq[Negotiation] = Await.result(findBuyerOrdersInZone(ids, addresses), Duration.Inf)
+    def getBuyerNegotiationsByOrderAndZone(ids:Seq[String], addresses:Seq[String]): Future[Seq[Negotiation]] = findBuyerOrdersInZone(ids, addresses)
 
     def getSellerNegotiationsByOrderAndZone(ids:Seq[String], addresses:Seq[String]): Seq[Negotiation] = Await.result(findSellerOrdersInZone(ids, addresses), Duration.Inf)
 
@@ -192,11 +192,11 @@ class Negotiations @Inject()(shutdownActors: ShutdownActor, masterAccounts: mast
 
     def getNegotiationID(buyerAddress: String, sellerAddress: String, pegHash: String): Future[String] = getIdByBuyerAddressSellerAddressAndPegHash(buyerAddress = buyerAddress, sellerAddress = sellerAddress, pegHash = pegHash)
 
-    def getNegotiationsForAddress(address: String): Seq[Negotiation] = Await.result(getNegotiationsByAddress(address), Duration.Inf)
+    def getNegotiationsForAddress(address: String): Future[Seq[Negotiation]] = getNegotiationsByAddress(address)
 
-    def getNegotiationsForBuyerAddress(address: String): Seq[Negotiation] = Await.result(getNegotiationsByBuyerAddress(address), Duration.Inf)
+    def getNegotiationsForBuyerAddress(address: String): Future[Seq[Negotiation]] =getNegotiationsByBuyerAddress(address)
 
-    def getNegotiationsForSellerAddress(address: String): Seq[Negotiation] = Await.result(getNegotiationsBySellerAddress(address), Duration.Inf)
+    def getNegotiationsForSellerAddress(address: String): Future[Seq[Negotiation]] = getNegotiationsBySellerAddress(address)
 
     def getNegotiationIDsForBuyerAddress(address: String): Seq[String] = Await.result(getNegotiationIDsByBuyerAddress(address), Duration.Inf)
 

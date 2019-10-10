@@ -9,7 +9,7 @@ import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext,Future}
 
 @Singleton
 class BuyerExecuteOrderController @Inject()(messagesControllerComponents: MessagesControllerComponents, transaction: utilities.Transaction, masterAccounts: master.Accounts, blockchainOrders: blockchain.Orders, blockchainAccounts: blockchain.Accounts, withZoneLoginAction: WithZoneLoginAction, withTraderLoginAction: WithTraderLoginAction, transactionsBuyerExecuteOrder: transactions.BuyerExecuteOrder, blockchainTransactionBuyerExecuteOrders: blockchainTransaction.BuyerExecuteOrders, blockchainACLAccounts: blockchain.ACLAccounts, blockchainZones: blockchain.Zones, blockchainNegotiations: blockchain.Negotiations, withUsernameToken: WithUsernameToken)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
@@ -29,10 +29,10 @@ class BuyerExecuteOrderController @Inject()(messagesControllerComponents: Messag
     implicit request =>
       views.companion.master.BuyerExecuteOrder.form.bindFromRequest().fold(
         formWithErrors => {
-          BadRequest(views.html.component.master.buyerExecuteOrder(formWithErrors, formWithErrors.data(constants.Form.SELLER_ADDRESS), formWithErrors.data(constants.Form.PEG_HASH)))
+          Future{BadRequest(views.html.component.master.buyerExecuteOrder(formWithErrors, formWithErrors.data(constants.Form.SELLER_ADDRESS), formWithErrors.data(constants.Form.PEG_HASH)))}
         },
         buyerExecuteOrderData => {
-          try {
+         /* try {
             transaction.process[blockchainTransaction.BuyerExecuteOrder, transactionsBuyerExecuteOrder.Request](
               entity = blockchainTransaction.BuyerExecuteOrder(from = loginState.address, buyerAddress = loginState.address, sellerAddress = buyerExecuteOrderData.sellerAddress, fiatProofHash = buyerExecuteOrderData.fiatProofHash, pegHash = buyerExecuteOrderData.pegHash, gas = buyerExecuteOrderData.gas, ticketID = "", mode = transactionMode),
               blockchainTransactionCreate = blockchainTransactionBuyerExecuteOrders.Service.create,
@@ -46,16 +46,44 @@ class BuyerExecuteOrderController @Inject()(messagesControllerComponents: Messag
           }
           catch {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-          }
+          }*/
+
+          val transactionProcess= transaction.process[blockchainTransaction.BuyerExecuteOrder, transactionsBuyerExecuteOrder.Request](
+            entity = blockchainTransaction.BuyerExecuteOrder(from = loginState.address, buyerAddress = loginState.address, sellerAddress = buyerExecuteOrderData.sellerAddress, fiatProofHash = buyerExecuteOrderData.fiatProofHash, pegHash = buyerExecuteOrderData.pegHash, gas = buyerExecuteOrderData.gas, ticketID = "", mode = transactionMode),
+            blockchainTransactionCreate = blockchainTransactionBuyerExecuteOrders.Service.create,
+            request = transactionsBuyerExecuteOrder.Request(transactionsBuyerExecuteOrder.BaseReq(from = loginState.address, gas = buyerExecuteOrderData.gas.toString), password = buyerExecuteOrderData.password, buyerAddress = loginState.address, sellerAddress = buyerExecuteOrderData.sellerAddress, fiatProofHash = buyerExecuteOrderData.fiatProofHash, pegHash = buyerExecuteOrderData.pegHash, mode = transactionMode),
+            action = transactionsBuyerExecuteOrder.Service.post,
+            onSuccess = blockchainTransactionBuyerExecuteOrders.Utility.onSuccess,
+            onFailure = blockchainTransactionBuyerExecuteOrders.Utility.onFailure,
+            updateTransactionHash = blockchainTransactionBuyerExecuteOrders.Service.updateTransactionHash
+          )
+         Future{withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.BUYER_ORDER_EXECUTED)))}
+            .recover{
+              case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+            }
         }
       )
   }
 
   def moderatedBuyerExecuteOrderList: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      try {
+     /* try {
         withUsernameToken.Ok(views.html.component.master.moderatedBuyerExecuteOrderList(blockchainNegotiations.Service.getBuyerNegotiationsByOrderAndZone(blockchainOrders.Service.getAllOrderIdsWithoutFiatProofHash, blockchainACLAccounts.Service.getAddressesUnderZone(blockchainZones.Service.getID(loginState.address)))))
       } catch {
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }*/
+
+    val id=blockchainZones.Service.getID(loginState.address)
+    val allOrderIdsWithoutFiatProofHash=blockchainOrders.Service.getAllOrderIdsWithoutFiatProofHash
+    def addressesUnderZone(id:String)=blockchainACLAccounts.Service.getAddressesUnderZone(id)
+    def getBuyerNegotiationsByOrderAndZone(ids:Seq[String], addresses:Seq[String])=blockchainNegotiations.Service.getBuyerNegotiationsByOrderAndZone(ids,addresses)
+      (for{
+      id<-id
+      allOrderIdsWithoutFiatProofHash<-allOrderIdsWithoutFiatProofHash
+      addressesUnderZone<-addressesUnderZone(id)
+      getBuyerNegotiationsByOrderAndZone<-getBuyerNegotiationsByOrderAndZone(allOrderIdsWithoutFiatProofHash,addressesUnderZone)
+    }yield withUsernameToken.Ok(views.html.component.master.moderatedBuyerExecuteOrderList(getBuyerNegotiationsByOrderAndZone))
+        ).recover{
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
@@ -68,7 +96,7 @@ class BuyerExecuteOrderController @Inject()(messagesControllerComponents: Messag
     implicit request =>
       views.companion.master.ModeratedBuyerExecuteOrder.form.bindFromRequest().fold(
         formWithErrors => {
-          BadRequest(views.html.component.master.moderatedBuyerExecuteOrder(formWithErrors, formWithErrors.data(constants.Form.BUYER_ADDRESS), formWithErrors.data(constants.Form.SELLER_ADDRESS), formWithErrors.data(constants.Form.PEG_HASH)))
+         Future{BadRequest(views.html.component.master.moderatedBuyerExecuteOrder(formWithErrors, formWithErrors.data(constants.Form.BUYER_ADDRESS), formWithErrors.data(constants.Form.SELLER_ADDRESS), formWithErrors.data(constants.Form.PEG_HASH)))}
         },
         moderatedBuyerExecuteOrderData => {
           try {
@@ -86,6 +114,20 @@ class BuyerExecuteOrderController @Inject()(messagesControllerComponents: Messag
           catch {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
+
+          val transactionProcess= transaction.process[blockchainTransaction.BuyerExecuteOrder, transactionsBuyerExecuteOrder.Request](
+            entity = blockchainTransaction.BuyerExecuteOrder(from = loginState.address, buyerAddress = moderatedBuyerExecuteOrderData.buyerAddress, sellerAddress = moderatedBuyerExecuteOrderData.sellerAddress, fiatProofHash = moderatedBuyerExecuteOrderData.fiatProofHash, pegHash = moderatedBuyerExecuteOrderData.pegHash, gas = moderatedBuyerExecuteOrderData.gas, ticketID = "", mode = transactionMode),
+            blockchainTransactionCreate = blockchainTransactionBuyerExecuteOrders.Service.create,
+            request = transactionsBuyerExecuteOrder.Request(transactionsBuyerExecuteOrder.BaseReq(from = loginState.address, gas = moderatedBuyerExecuteOrderData.gas.toString), password = moderatedBuyerExecuteOrderData.password, buyerAddress = moderatedBuyerExecuteOrderData.buyerAddress, sellerAddress = moderatedBuyerExecuteOrderData.sellerAddress, fiatProofHash = moderatedBuyerExecuteOrderData.fiatProofHash, pegHash = moderatedBuyerExecuteOrderData.pegHash, mode = transactionMode),
+            action = transactionsBuyerExecuteOrder.Service.post,
+            onSuccess = blockchainTransactionBuyerExecuteOrders.Utility.onSuccess,
+            onFailure = blockchainTransactionBuyerExecuteOrders.Utility.onFailure,
+            updateTransactionHash = blockchainTransactionBuyerExecuteOrders.Service.updateTransactionHash
+          )
+          Future{withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.BUYER_ORDER_EXECUTED)))}
+            .recover{
+              case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+            }
         }
       )
   }

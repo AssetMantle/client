@@ -197,7 +197,7 @@ class IssueAssetRequests @Inject()(protected val databaseConfigProvider: Databas
 
     def getPendingIssueAssetRequests(accountIDs: Seq[String], status: String): Seq[IssueAssetRequest] = Await.result(getIssueAssetRequestsWithStatus(accountIDs, status), Duration.Inf).map(_.deSerialize)
 
-    def getIssueAssetsByAccountID(accountID: String): Seq[IssueAssetRequest] = Await.result(findIssueAssetsByAccountID(accountID), Duration.Inf).map(_.deSerialize)
+    def getIssueAssetsByAccountID(accountID: String): Future[Seq[IssueAssetRequest]] =  findIssueAssetsByAccountID(accountID).map{issueAssetRequestSerialized=> issueAssetRequestSerialized.map(_.deSerialize)}
 
     def getIssueAssetByID(id: String): IssueAssetRequest = Await.result(findByID(id), Duration.Inf).deSerialize
 

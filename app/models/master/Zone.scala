@@ -123,7 +123,7 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
     def get(id: String): Future[Zone] =findById(id)
 
-    def getZoneByAccountID(accountID: String): Zone = Await.result(findByAccountID(accountID), Duration.Inf)
+    def getZoneByAccountID(accountID: String): Future[Zone] = findByAccountID(accountID)
 
     def getAll: Future[Seq[Zone]] =findAll
 

@@ -126,7 +126,7 @@ class AccountKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfig
 
     def getFileName(id: String, documentType: String): String = Await.result(getFileNameByIdDocumentType(id = id, documentType = documentType), Duration.Inf)
 
-    def getAllDocuments(id: String): Seq[AccountKYC] = Await.result(getAllDocumentsById(id = id), Duration.Inf)
+    def getAllDocuments(id: String): Future[Seq[AccountKYC]] = getAllDocumentsById(id = id)
 
     def verifyAll(id: String): Int = Await.result(updateStatusById(id = id, status = Option(true)), Duration.Inf)
 

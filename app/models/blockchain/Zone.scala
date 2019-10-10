@@ -120,7 +120,7 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
     def getAddress(id: String): String = Await.result(getAddressById(id), Duration.Inf)
 
-    def getID(address: String): String = Await.result(getIdByAddress(address), Duration.Inf)
+    def getID(address: String): Future[String] = getIdByAddress(address)
 
     def getDirtyZones: Seq[Zone] = Await.result(getZonesByDirtyBit(dirtyBit = true), Duration.Inf)
 

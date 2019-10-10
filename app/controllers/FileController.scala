@@ -124,6 +124,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
       } catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
+
   }
 
   def uploadUserZoneKycForm(documentType: String): Action[AnyContent] = Action { implicit request =>

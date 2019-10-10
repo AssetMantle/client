@@ -180,15 +180,15 @@ class Traders @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
       id
     }
 
-    def getID(accountID: String): String = Await.result(getIDByAccountID(accountID), Duration.Inf).getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION))
+    def getID(accountID: String): Future[String] = getIDByAccountID(accountID).map{id=> id.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION))}
 
-    def get(id: String): Trader = Await.result(findById(id), Duration.Inf)
+    def get(id: String): Future[Trader] = findById(id)
 
     def getByAccountID(accountID: String): Trader = Await.result(findByAccountId(accountID), Duration.Inf)
 
-    def getZoneIDByAccountID(accountID: String): String = Await.result(getZoneIDOnAccountID(accountID), Duration.Inf)
+    def getZoneIDByAccountID(accountID: String): Future[String] = getZoneIDOnAccountID(accountID)
 
-    def getOrganizationIDByAccountID(accountID: String): String = Await.result(findOrganizationIDByAccountId(accountID), Duration.Inf)
+    def getOrganizationIDByAccountID(accountID: String): Future[String] = findOrganizationIDByAccountId(accountID)
 
     def rejectTrader(id: String): Int = Await.result(updateVerificationStatusOnID(id = id, verificationStatus = Option(false)), Duration.Inf)
 
@@ -198,7 +198,7 @@ class Traders @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
 
     def verifyTraderByAccountID(accountID: String): Int = Await.result(updateVerificationStatusOnAccountID(accountID = accountID, verificationStatus = Option(true)), Duration.Inf)
 
-    def getAccountId(id: String): String = Await.result(getAccountIdById(id), Duration.Inf)
+    def getAccountId(id: String): Future[String] = getAccountIdById(id)
 
     def getVerifyTraderRequestsForZone(zoneID: String): Seq[Trader] = Await.result(getTradersByCompletionStatusVerificationStatusAndZoneID(zoneID = zoneID, completionStatus = true, verificationStatus = null), Duration.Inf)
 
@@ -210,9 +210,9 @@ class Traders @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
 
     def markTraderFormCompleted(id: String): Int = Await.result(updateCompletionStatusOnID(id = id, completionStatus = true), Duration.Inf)
 
-    def getTradersListInOrganization(organizationID: String): Seq[Trader] = Await.result(getTradersByOrganizationID(organizationID), Duration.Inf)
+    def getTradersListInOrganization(organizationID: String): Future[Seq[Trader]] =getTradersByOrganizationID(organizationID)
 
-    def verifyOrganizationTrader(traderID: String, organizationID: String): Boolean = Await.result(checkOrganizationIDTraderIDExists(traderID = traderID, organizationID = organizationID), Duration.Inf)
+    def verifyOrganizationTrader(traderID: String, organizationID: String): Future[Boolean] = checkOrganizationIDTraderIDExists(traderID = traderID, organizationID = organizationID)
 
   }
 

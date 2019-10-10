@@ -153,15 +153,15 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
 
     def get(pegHash: String): Asset = Await.result(findByPegHash(pegHash), Duration.Inf)
 
-    def getAllPublic(excludedAssets:Seq[String]):Seq[Asset] = Await.result(findAllAssetsByPublic(excludedAssets),Duration.Inf)
+    def getAllPublic(excludedAssets:Seq[String]):Future[Seq[Asset]] = findAllAssetsByPublic(excludedAssets)
 
     def getAllLocked(ownerAddresses:Seq[String]):Seq[Asset] = Await.result(findAllAssetsByLockedStatus(ownerAddresses = ownerAddresses, locked = true),Duration.Inf)
 
-    def getByPegHashes(pegHashes:Seq[String]):Seq[Asset] = Await.result(findByPegHashes(pegHashes),Duration.Inf)
+    def getByPegHashes(pegHashes:Seq[String]):Future[Seq[Asset]] = findByPegHashes(pegHashes)
 
-    def getAssetPegWallet(address: String): Seq[Asset] = Await.result(getAssetPegWalletByAddress(address), Duration.Inf)
+    def getAssetPegWallet(address: String): Future[Seq[Asset]] =getAssetPegWalletByAddress(address)
 
-    def getAssetPegHashes(address: String)(implicit executionContext: ExecutionContext): Seq[String] = Await.result(getAssetPegHashesByAddress(address), Duration.Inf)
+    def getAssetPegHashes(address: String)(implicit executionContext: ExecutionContext): Future[Seq[String]] = getAssetPegHashesByAddress(address)
 
     def insertOrUpdate(pegHash: String, documentHash: String, assetType: String, assetQuantity: String, assetPrice: String, quantityUnit: String, ownerAddress: String, moderated: Boolean, takerAddress: Option[String], locked: Boolean, dirtyBit: Boolean): Int = Await.result(upsert(Asset(pegHash = pegHash, documentHash = documentHash, assetType = assetType, assetQuantity = assetQuantity, assetPrice = assetPrice, quantityUnit = quantityUnit, ownerAddress = ownerAddress, moderated = moderated, takerAddress = takerAddress, locked = locked, dirtyBit = dirtyBit)), Duration.Inf)
 

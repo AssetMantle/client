@@ -136,7 +136,7 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
     def get(address: String): Account = Await.result(findByAddress(address), Duration.Inf)
 
-    def getCoins(address: String): String = Await.result(getCoinsByAddress(address), Duration.Inf)
+    def getCoins(address: String): Future[String] =getCoinsByAddress(address)
 
     def getDirtyAddresses: Seq[String] = Await.result(getAddressesByDirtyBit(dirtyBit = true), Duration.Inf)
 

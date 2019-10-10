@@ -84,7 +84,7 @@ class TraderFeedbackHistories @Inject()(protected val databaseConfigProvider: Da
 
     def update(address: String, buyerAddress: String, sellerAddress: String, pegHash: String, rating: String): Int = Await.result(updateTraderFeedbackHistory(TraderFeedbackHistory(address, buyerAddress, sellerAddress, pegHash, rating)), Duration.Inf)
 
-    def get(address: String): Seq[TraderFeedbackHistory] = Await.result(findById(address), Duration.Inf)
+    def get(address: String): Future[Seq[TraderFeedbackHistory]] = findById(address)
 
     def getNullRatingsForBuyerFeedback(buyerAddress: String): Seq[TraderFeedbackHistory] = Await.result(findBuyersByNullRating(buyerAddress), Duration.Inf)
 

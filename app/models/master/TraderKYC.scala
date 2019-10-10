@@ -158,7 +158,7 @@ class TraderKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfigP
 
     def getFileName(id: String, documentType: String): String = Await.result(getFileNameByIdDocumentType(id = id, documentType = documentType), Duration.Inf)
 
-    def getAllDocuments(id: String): Seq[TraderKYC] = Await.result(getAllDocumentsById(id = id), Duration.Inf)
+    def getAllDocuments(id: String): Future[Seq[TraderKYC]] = getAllDocumentsById(id = id)
 
     def zoneVerifyAll(id: String): Int = Await.result(zoneUpdateStatusById(id = id, zoneStatus = Option(true)), Duration.Inf)
 

@@ -128,11 +128,11 @@ class Orders @Inject()(shutdownActors: ShutdownActor, masterAccounts: master.Acc
 
     def getDirtyOrders: Seq[Order] = Await.result(getOrdersByDirtyBit(dirtyBit = true), Duration.Inf)
 
-    def getOrders(ids: Seq[String]): Seq[Order] = Await.result(getOrdersByIDs(ids), Duration.Inf)
+    def getOrders(ids: Seq[String]): Future[Seq[Order]] =getOrdersByIDs(ids)
 
-    def getAllOrderIds: Seq[String] = Await.result(getOrderIDs, Duration.Inf)
+    def getAllOrderIds: Future[Seq[String]] = getOrderIDs
 
-    def getAllOrderIdsWithoutFiatProofHash: Seq[String] = Await.result(getOrderIDsWithoutFiatProofHash, Duration.Inf)
+    def getAllOrderIdsWithoutFiatProofHash: Future[Seq[String]] = getOrderIDsWithoutFiatProofHash
 
     def getAllOrderIdsWithoutAWBProofHash: Seq[String] = Await.result(getOrderIDsWithoutAWBProofHash, Duration.Inf)
 

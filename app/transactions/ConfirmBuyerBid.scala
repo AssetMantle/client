@@ -40,9 +40,7 @@ class ConfirmBuyerBid @Inject()(wsClient: WSClient)(implicit configuration: Conf
   case class Request(base_req: BaseReq, password: String, to: String, bid: String, time: String, pegHash: String, buyerContractHash: String, mode: String) extends BaseRequest
 
   object Service {
-    def post(request: Request): WSResponse = try {
-      Await.result(action(request), Duration.Inf)
-    } catch {
+    def post(request: Request): Future[WSResponse] =action(request).recover{
       case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
         throw new BaseException(constants.Response.CONNECT_EXCEPTION)
     }

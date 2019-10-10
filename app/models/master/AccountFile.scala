@@ -121,13 +121,13 @@ class AccountFiles @Inject()(protected val databaseConfigProvider: DatabaseConfi
 
     def getFileName(id: String, documentType: String): String = Await.result(getFileNameByIdDocumentType(id = id, documentType = documentType), Duration.Inf)
 
-    def getAllDocuments(id: String): Seq[AccountFile] = Await.result(getAllDocumentsById(id = id), Duration.Inf)
+    def getAllDocuments(id: String): Future[Seq[AccountFile]] = getAllDocumentsById(id = id)
 
     def deleteAllDocuments(id: String): Int = Await.result(deleteById(id = id), Duration.Inf)
 
     def checkFileExists(id: String, documentType: String): Boolean = Await.result(checkByIdAndDocumentType(id = id, documentType = documentType), Duration.Inf)
 
-    def getProfilePicture(id: String): Array[Byte] = Await.result(getFileByIdDocumentType(id = id, documentType = constants.File.PROFILE_PICTURE), Duration.Inf)
+    def getProfilePicture(id: String): Future[Array[Byte]] = getFileByIdDocumentType(id = id, documentType = constants.File.PROFILE_PICTURE)
 
     def checkFileNameExists(id: String, fileName: String): Boolean = Await.result(checkByIdAndFileName(id = id, fileName = fileName), Duration.Inf)
   }

@@ -117,9 +117,9 @@ class Contacts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   object Service {
 
-    def getContact(id: String): Option[Contact] = Await.result(findById(id), Duration.Inf)
+    def getContact(id: String): Future[Option[Contact]] =findById(id)
 
-    def insertOrUpdateContact(id: String, mobileNumber: String, emailAddress: String): Boolean = if (0 < Await.result(upsert(Contact(id, mobileNumber, mobileNumberVerified =  false, emailAddress, emailAddressVerified = false)), Duration.Inf)) true else false
+    def insertOrUpdateContact(id: String, mobileNumber: String, emailAddress: String): Future[Boolean] =upsert(Contact(id, mobileNumber, mobileNumberVerified =  false, emailAddress, emailAddressVerified = false)).map{value=> if(value>0) true else false }
 
     def verifyMobileNumber(id: String): Int = Await.result(updateMobileNumberVerificationStatusOnId(id, verificationStatus = true), Duration.Inf)
 

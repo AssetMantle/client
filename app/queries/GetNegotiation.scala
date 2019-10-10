@@ -30,9 +30,7 @@ class GetNegotiation @Inject()()(implicit wsClient: WSClient, configuration: Con
 
   object Service {
 
-    def get(negotiationID: String): Response = try {
-      Await.result(action(negotiationID), Duration.Inf)
-    } catch {
+    def get(negotiationID: String): Future[Response] = action(negotiationID).recover{
       case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
         throw new BaseException(constants.Response.CONNECT_EXCEPTION)
     }

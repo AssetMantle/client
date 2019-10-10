@@ -132,7 +132,7 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
     def create(pegHash: String, ownerAddress: String, transactionID: String, transactionAmount: String, redeemedAmount: String, dirtyBit: Boolean): String = Await.result(add(Fiat(pegHash, ownerAddress, transactionID, transactionAmount, redeemedAmount, dirtyBit)), Duration.Inf)
 
-    def getFiatPegWallet(address: String): Seq[Fiat] = Await.result(getFiatPegWalletByAddress(address), Duration.Inf)
+    def getFiatPegWallet(address: String): Future[Seq[Fiat]] =getFiatPegWalletByAddress(address)
 
     def insertOrUpdate(pegHash: String, ownerAddress: String, transactionID: String, transactionAmount: String, redeemedAmount: String, dirtyBit: Boolean): Int = Await.result(upsert(Fiat(pegHash = pegHash, ownerAddress, transactionID = transactionID, transactionAmount = transactionAmount, redeemedAmount = redeemedAmount, dirtyBit)), Duration.Inf)
 

@@ -9,7 +9,7 @@ import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class ChangeSellerBidController @Inject()(messagesControllerComponents: MessagesControllerComponents, transaction: utilities.Transaction, blockchainNegotiations: blockchain.Negotiations, blockchainAccounts: blockchain.Accounts, withTraderLoginAction: WithTraderLoginAction, transactionsChangeSellerBid: transactions.ChangeSellerBid, blockchainTransactionChangeSellerBids: blockchainTransaction.ChangeSellerBids)(implicit executionContext: ExecutionContext, configuration: Configuration, withUsernameToken: WithUsernameToken) extends AbstractController(messagesControllerComponents) with I18nSupport {
@@ -28,10 +28,10 @@ class ChangeSellerBidController @Inject()(messagesControllerComponents: Messages
     implicit request =>
       views.companion.master.ChangeSellerBid.form.bindFromRequest().fold(
         formWithErrors => {
-          BadRequest(views.html.component.master.changeSellerBid(formWithErrors, formWithErrors.data(constants.Form.BUYER_ADDRESS), formWithErrors.data(constants.Form.PEG_HASH)))
+          Future{BadRequest(views.html.component.master.changeSellerBid(formWithErrors, formWithErrors.data(constants.Form.BUYER_ADDRESS), formWithErrors.data(constants.Form.PEG_HASH)))}
         },
         changeSellerBidData => {
-          try {
+        /*  try {
             transaction.process[blockchainTransaction.ChangeSellerBid, transactionsChangeSellerBid.Request](
               entity = blockchainTransaction.ChangeSellerBid(from = loginState.address, to = changeSellerBidData.buyerAddress, bid = changeSellerBidData.bid, time = changeSellerBidData.time, pegHash = changeSellerBidData.pegHash, gas = changeSellerBidData.gas, ticketID = "", mode = transactionMode),
               blockchainTransactionCreate = blockchainTransactionChangeSellerBids.Service.create,
@@ -45,7 +45,18 @@ class ChangeSellerBidController @Inject()(messagesControllerComponents: Messages
           }
           catch {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-          }
+          }*/
+
+          transaction.process[blockchainTransaction.ChangeSellerBid, transactionsChangeSellerBid.Request](
+            entity = blockchainTransaction.ChangeSellerBid(from = loginState.address, to = changeSellerBidData.buyerAddress, bid = changeSellerBidData.bid, time = changeSellerBidData.time, pegHash = changeSellerBidData.pegHash, gas = changeSellerBidData.gas, ticketID = "", mode = transactionMode),
+            blockchainTransactionCreate = blockchainTransactionChangeSellerBids.Service.create,
+            request = transactionsChangeSellerBid.Request(transactionsChangeSellerBid.BaseReq(from = loginState.address, gas = changeSellerBidData.gas.toString), to = changeSellerBidData.buyerAddress, password = changeSellerBidData.password, bid = changeSellerBidData.bid.toString, time = changeSellerBidData.time.toString, pegHash = changeSellerBidData.pegHash, mode = transactionMode),
+            action = transactionsChangeSellerBid.Service.post,
+            onSuccess = blockchainTransactionChangeSellerBids.Utility.onSuccess,
+            onFailure = blockchainTransactionChangeSellerBids.Utility.onFailure,
+            updateTransactionHash = blockchainTransactionChangeSellerBids.Service.updateTransactionHash
+          )
+         Future{withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.SELLER_BID_CHANGED)))}
         }
       )
   }
@@ -54,17 +65,24 @@ class ChangeSellerBidController @Inject()(messagesControllerComponents: Messages
     Ok(views.html.component.blockchain.changeSellerBid(views.companion.blockchain.ChangeSellerBid.form))
   }
 
-  def blockchainChangeSellerBid: Action[AnyContent] = Action { implicit request =>
+  def blockchainChangeSellerBid: Action[AnyContent] = Action.async { implicit request =>
     views.companion.blockchain.ChangeSellerBid.form.bindFromRequest().fold(
       formWithErrors => {
-        BadRequest(views.html.component.blockchain.changeSellerBid(formWithErrors))
+        Future{BadRequest(views.html.component.blockchain.changeSellerBid(formWithErrors))}
       },
       changeSellerBidData => {
-        try {
+       /* try {
           transactionsChangeSellerBid.Service.post(transactionsChangeSellerBid.Request(transactionsChangeSellerBid.BaseReq(from = changeSellerBidData.from, gas = changeSellerBidData.gas.toString), to = changeSellerBidData.to, password = changeSellerBidData.password, bid = changeSellerBidData.bid.toString, time = changeSellerBidData.time.toString, pegHash = changeSellerBidData.pegHash, mode = changeSellerBidData.mode))
           Ok(views.html.index(successes = Seq(constants.Response.SELLER_BID_CHANGED)))
         }
         catch {
+          case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+        }*/
+        val transactionsChangeSellerBidPost=transactionsChangeSellerBid.Service.post(transactionsChangeSellerBid.Request(transactionsChangeSellerBid.BaseReq(from = changeSellerBidData.from, gas = changeSellerBidData.gas.toString), to = changeSellerBidData.to, password = changeSellerBidData.password, bid = changeSellerBidData.bid.toString, time = changeSellerBidData.time.toString, pegHash = changeSellerBidData.pegHash, mode = changeSellerBidData.mode))
+        (for{
+          _<- transactionsChangeSellerBidPost
+        }yield Ok(views.html.index(successes = Seq(constants.Response.SELLER_BID_CHANGED)))
+          ).recover{
           case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
         }
       }

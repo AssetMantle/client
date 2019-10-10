@@ -25,7 +25,7 @@ class Transaction @Inject()(getTxHashResponse: GetTransactionHashResponse, getRe
 
     val ticketID: Future[String] = if (kafkaEnabled) utilities.JSON.getResponseFromJson[KafkaResponse](action(request)).map(res=> res.ticketID) else Future{utilities.IDGenerator.ticketID}
 
-    ticketID.flatMap{ticketID=>
+    ticketID.flatMap{ticketID =>
       blockchainTransactionCreate(entity.mutateTicketID(ticketID)).map{ _ =>
      if(!kafkaEnabled){
         transactionMode match {
@@ -50,7 +50,7 @@ class Transaction @Inject()(getTxHashResponse: GetTransactionHashResponse, getRe
     }
 
 
-    ticketIDFuture
+    ticketID
 
 
     //blockchainTransactionCreate(entity.mutateTicketID(ticketID))

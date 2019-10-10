@@ -212,13 +212,13 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
 
     def getUBOs(id: String):Future[UBOs]=getUBOsOnID(id).map{UBOs=> utilities.JSON.convertJsonStringToObject[UBOs](UBOs)}
 
-    def get(id: String): Organization = Await.result(findById(id), Duration.Inf).deserialize
+    def get(id: String): Future[Organization] = findById(id).map{organizationSerialized=> organizationSerialized.deserialize}
 
     def getByAccountID(accountID: String): Future[Organization] = findByAccountID(accountID).map{organizationSerialized=> organizationSerialized.deserialize}
 
     def getZoneID(id: String): String = Await.result(getZoneIDByID(id), Duration.Inf)
 
-    def getZoneIDByAccountID(accountID: String): String = Await.result(getZoneIDOnAccountID(accountID), Duration.Inf)
+    def getZoneIDByAccountID(accountID: String): Future[String] = getZoneIDOnAccountID(accountID)
 
     def rejectOrganization(id: String): Future[Int] = updateVerificationStatusOnID(id, Option(false))
 
