@@ -28,9 +28,9 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
     implicit request =>
       try {
         val zone = masterZones.Service.getByAccountID(loginState.username)
-        Ok(views.html.component.master.addZone(views.companion.master.AddZone.form.fill(views.companion.master.AddZone.Data(name = zone.name, currency = zone.currency, address = views.companion.master.AddZone.AddressData(addressLine1 = zone.address.addressLine1, addressLine2 = zone.address.addressLine2, landmark = zone.address.landmark, city = zone.address.city, country = zone.address.country, zipCode = zone.address.zipCode, phone = zone.address.phone)))))
+        withUsernameToken.Ok(views.html.component.master.addZone(views.companion.master.AddZone.form.fill(views.companion.master.AddZone.Data(name = zone.name, currency = zone.currency, address = views.companion.master.AddZone.AddressData(addressLine1 = zone.address.addressLine1, addressLine2 = zone.address.addressLine2, landmark = zone.address.landmark, city = zone.address.city, country = zone.address.country, zipCode = zone.address.zipCode, phone = zone.address.phone)))))
       } catch {
-        case _: BaseException => Ok(views.html.component.master.addZone(views.companion.master.AddZone.form))
+        case _: BaseException => withUsernameToken.Ok(views.html.component.master.addZone(views.companion.master.AddZone.form))
       }
   }
 
@@ -43,7 +43,7 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
         addZoneData => {
           try {
             val id = masterZones.Service.insertOrUpdate(accountID = loginState.username, name = addZoneData.name, currency = addZoneData.currency, address = Address(addressLine1 = addZoneData.address.addressLine1, addressLine2 = addZoneData.address.addressLine2, landmark = addZoneData.address.landmark, city = addZoneData.address.city, country = addZoneData.address.country, zipCode = addZoneData.address.zipCode, phone = addZoneData.address.phone))
-            PartialContent(views.html.component.master.userUploadOrUpdateZoneKYC(masterZoneKYCs.Service.getAllDocuments(id)))
+            withUsernameToken.PartialContent(views.html.component.master.userUploadOrUpdateZoneKYC(masterZoneKYCs.Service.getAllDocuments(id)))
           }
           catch {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -95,7 +95,7 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
           document = master.ZoneKYC(id = masterZones.Service.getID(loginState.username), documentType = documentType, status = None, fileName = name, file = None),
           masterCreate = masterZoneKYCs.Service.create
         )
-        PartialContent(views.html.component.master.userUploadOrUpdateZoneKYC(masterZoneKYCs.Service.getAllDocuments(masterZones.Service.getID(loginState.username))))
+        withUsernameToken.PartialContent(views.html.component.master.userUploadOrUpdateZoneKYC(masterZoneKYCs.Service.getAllDocuments(masterZones.Service.getID(loginState.username))))
       } catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
@@ -117,7 +117,7 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
           document = master.ZoneKYC(id = id, documentType = documentType, status = None, fileName = name, file = None),
           updateOldDocument = masterZoneKYCs.Service.updateOldDocument
         )
-        PartialContent(views.html.component.master.userUploadOrUpdateZoneKYC(masterZoneKYCs.Service.getAllDocuments(masterZones.Service.getID(loginState.username))))
+        withUsernameToken.PartialContent(views.html.component.master.userUploadOrUpdateZoneKYC(masterZoneKYCs.Service.getAllDocuments(masterZones.Service.getID(loginState.username))))
       } catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
@@ -127,7 +127,7 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
     implicit request =>
       try {
         val zone = masterZones.Service.getByAccountID(loginState.username)
-        Ok(views.html.component.master.reviewZoneCompletion(views.companion.master.ZoneCompletion.form, zone = zone, zoneKYCs = masterZoneKYCs.Service.getAllDocuments(zone.id)))
+        withUsernameToken.Ok(views.html.component.master.reviewZoneCompletion(views.companion.master.ZoneCompletion.form, zone = zone, zoneKYCs = masterZoneKYCs.Service.getAllDocuments(zone.id)))
       } catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
@@ -200,7 +200,7 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
   def viewPendingVerifyZoneRequests: Action[AnyContent] = withGenesisLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        withUsernameToken.Ok(views.html.component.master.viewPendingVerifyZoneRequests(masterZones.Service.getVerifyZoneRequests))
+        Ok(views.html.component.master.viewPendingVerifyZoneRequests(masterZones.Service.getVerifyZoneRequests))
       }
       catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -210,7 +210,7 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
   def viewKYCDocuments(zoneID: String): Action[AnyContent] = withGenesisLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        withUsernameToken.Ok(views.html.component.master.viewVerificationZoneKYCDouments(masterZoneKYCs.Service.getAllDocuments(zoneID)))
+        Ok(views.html.component.master.viewVerificationZoneKYCDouments(masterZoneKYCs.Service.getAllDocuments(zoneID)))
       } catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
@@ -349,7 +349,7 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
   }
 
   def blockchainAddZoneForm: Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.blockchain.addZone(views.companion.blockchain.AddZone.form))
+    Ok(views.html.component.blockchain.addZone())
   }
 
   def blockchainAddZone: Action[AnyContent] = Action { implicit request =>

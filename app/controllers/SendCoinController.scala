@@ -54,27 +54,6 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
       )
   }
 
-  def blockchainSendCoinForm: Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.blockchain.sendCoin(views.companion.blockchain.SendCoin.form))
-  }
-
-  def blockchainSendCoin: Action[AnyContent] = Action { implicit request =>
-    views.companion.blockchain.SendCoin.form.bindFromRequest().fold(
-      formWithErrors => {
-        BadRequest(views.html.component.blockchain.sendCoin(formWithErrors))
-      },
-      sendCoinData => {
-        try {
-          transactionsSendCoin.Service.post(transactionsSendCoin.Request(transactionsSendCoin.BaseReq(from = sendCoinData.from, gas = sendCoinData.gas.toString), password = sendCoinData.password, to = sendCoinData.to, amount = Seq(transactionsSendCoin.Amount(denominationOfGasToken, sendCoinData.amount.toString)), mode = sendCoinData.mode))
-          Ok(views.html.index(successes = Seq(constants.Response.COINS_SENT)))
-        }
-        catch {
-          case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-        }
-      }
-    )
-  }
-
   def requestCoinsForm: Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.master.requestCoin(views.companion.master.RequestCoin.form))
   }
@@ -100,7 +79,7 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
   def viewPendingFaucetRequests: Action[AnyContent] = withGenesisLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        withUsernameToken.Ok(views.html.component.master.viewPendingFaucetRequests(masterTransactionFaucetRequests.Service.getPendingFaucetRequests))
+        Ok(views.html.component.master.viewPendingFaucetRequests(masterTransactionFaucetRequests.Service.getPendingFaucetRequests))
       }
       catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -163,6 +142,27 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
           }
         }
       )
+  }
+
+  def blockchainSendCoinForm: Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.blockchain.sendCoin())
+  }
+
+  def blockchainSendCoin: Action[AnyContent] = Action { implicit request =>
+    views.companion.blockchain.SendCoin.form.bindFromRequest().fold(
+      formWithErrors => {
+        BadRequest(views.html.component.blockchain.sendCoin(formWithErrors))
+      },
+      sendCoinData => {
+        try {
+          transactionsSendCoin.Service.post(transactionsSendCoin.Request(transactionsSendCoin.BaseReq(from = sendCoinData.from, gas = sendCoinData.gas.toString), password = sendCoinData.password, to = sendCoinData.to, amount = Seq(transactionsSendCoin.Amount(denominationOfGasToken, sendCoinData.amount.toString)), mode = sendCoinData.mode))
+          Ok(views.html.index(successes = Seq(constants.Response.COINS_SENT)))
+        }
+        catch {
+          case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+        }
+      }
+    )
   }
 
 }

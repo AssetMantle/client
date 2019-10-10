@@ -11,9 +11,9 @@ import slick.jdbc.JdbcProfile
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
-import scala.util.{Failure, Random, Success}
+import scala.util.{Failure, Success}
 
-case class Notification(accountID: String, notificationTitle: String, notificationMessage: String, time: Timestamp, read: Boolean, id: String)
+case class Notification(id: String, accountID: String, notificationTitle: String, notificationMessage: String, time: Timestamp, read: Boolean)
 
 @Singleton
 class Notifications @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
@@ -76,7 +76,9 @@ class Notifications @Inject()(protected val databaseConfigProvider: DatabaseConf
 
   private[models] class NotificationTable(tag: Tag) extends Table[Notification](tag, "Notification") {
 
-    def * = (accountID, notificationTitle, notificationMessage, time, read, id) <> (Notification.tupled, Notification.unapply)
+    def * = (id, accountID, notificationTitle, notificationMessage, time, read) <> (Notification.tupled, Notification.unapply)
+
+    def id = column[String]("id", O.PrimaryKey)
 
     def accountID = column[String]("accountID")
 
@@ -88,19 +90,17 @@ class Notifications @Inject()(protected val databaseConfigProvider: DatabaseConf
 
     def time = column[Timestamp]("time")
 
-    def id = column[String]("id", O.PrimaryKey)
-
   }
 
   object Service {
 
-    def create(accountID: String, notificationTitle: String, notificationMessage: String): String = Await.result(add(Notification(accountID, notificationTitle, notificationMessage, time = new Timestamp(System.currentTimeMillis), read = false, Random.nextString(32))), Duration.Inf)
+    def create(accountID: String, notificationTitle: String, notificationMessage: String): String = Await.result(add(Notification(id = utilities.IDGenerator.hexadecimal, accountID = accountID, notificationTitle = notificationTitle, notificationMessage = notificationMessage, time = new Timestamp(System.currentTimeMillis), read = false)), Duration.Inf)
 
-    def get(accountID: String, offset: Int, limit: Int): Seq[Notification] = Await.result(findNotificationsByAccountId(accountID, offset, limit), Duration.Inf)
+    def get(accountID: String, offset: Int, limit: Int): Seq[Notification] = Await.result(findNotificationsByAccountId(accountID = accountID, offset = offset, limit = limit), Duration.Inf)
 
-    def markAsRead(id: String): Int = Await.result(updateReadById(id, status = true), Duration.Inf)
+    def markAsRead(id: String): Int = Await.result(updateReadById(id = id, status = true), Duration.Inf)
 
-    def getNumberOfUnread(accountID: String): Int = Await.result(findNumberOfReadOnStatusByAccountId(accountID, status = false), Duration.Inf)
+    def getNumberOfUnread(accountID: String): Int = Await.result(findNumberOfReadOnStatusByAccountId(accountID = accountID, status = false), Duration.Inf)
 
   }
 

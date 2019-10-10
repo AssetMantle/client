@@ -52,7 +52,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
       try {
         val addTraderRequest = masterTransactionAddTraderRequests.Service.get(requestID)
         if (addTraderRequest.accountID == loginState.username) {
-          Ok(views.html.component.master.addTrader(views.companion.master.AddTrader.form.fill(views.companion.master.AddTrader.Data(zoneID = masterOrganizations.Service.getZoneID(addTraderRequest.organizationID), organizationID = addTraderRequest.organizationID, name = ""))))
+          withUsernameToken.Ok(views.html.component.master.addTrader(views.companion.master.AddTrader.form.fill(views.companion.master.AddTrader.Data(zoneID = masterOrganizations.Service.getZoneID(addTraderRequest.organizationID), organizationID = addTraderRequest.organizationID, name = ""))))
         } else {
           Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
         }
@@ -71,7 +71,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
           try {
             if (masterOrganizations.Service.getVerificationStatus(addTraderData.organizationID)) {
               val id = masterTraders.Service.insertOrUpdate(zoneID = addTraderData.zoneID, organizationID = addTraderData.organizationID, accountID = loginState.username, name = addTraderData.name)
-              PartialContent(views.html.component.master.userUploadOrUpdateTraderKYC(masterTraderKYCs.Service.getAllDocuments(id)))
+              withUsernameToken.PartialContent(views.html.component.master.userUploadOrUpdateTraderKYC(masterTraderKYCs.Service.getAllDocuments(id)))
             } else {
               Unauthorized(views.html.index(failures = Seq(constants.Response.UNVERIFIED_ORGANIZATION)))
             }
@@ -87,7 +87,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
     implicit request =>
       try {
         val trader = masterTraders.Service.getByAccountID(loginState.username)
-        Ok(views.html.component.master.addTrader(views.companion.master.AddTrader.form.fill(views.companion.master.AddTrader.Data(zoneID = trader.zoneID, organizationID = trader.organizationID, name = trader.name))))
+        withUsernameToken.Ok(views.html.component.master.addTrader(views.companion.master.AddTrader.form.fill(views.companion.master.AddTrader.Data(zoneID = trader.zoneID, organizationID = trader.organizationID, name = trader.name))))
       } catch {
         case _: BaseException => Ok(views.html.component.master.addTrader(views.companion.master.AddTrader.form))
       }
@@ -103,7 +103,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
           try {
             if (masterOrganizations.Service.getVerificationStatus(addTraderData.organizationID)) {
               val id = masterTraders.Service.insertOrUpdate(zoneID = addTraderData.zoneID, organizationID = addTraderData.organizationID, accountID = loginState.username, name = addTraderData.name)
-              PartialContent(views.html.component.master.userUploadOrUpdateTraderKYC(masterTraderKYCs.Service.getAllDocuments(id)))
+              withUsernameToken.PartialContent(views.html.component.master.userUploadOrUpdateTraderKYC(masterTraderKYCs.Service.getAllDocuments(id)))
             } else {
               Unauthorized(views.html.index(failures = Seq(constants.Response.UNVERIFIED_ORGANIZATION)))
             }
@@ -158,7 +158,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
           document = master.TraderKYC(id = masterTraders.Service.getID(loginState.username), documentType = documentType, fileName = name, file = None, zoneStatus = None, organizationStatus = None),
           masterCreate = masterTraderKYCs.Service.create
         )
-        PartialContent(views.html.component.master.userUploadOrUpdateTraderKYC(masterTraderKYCs.Service.getAllDocuments(masterTraders.Service.getID(loginState.username))))
+        withUsernameToken.PartialContent(views.html.component.master.userUploadOrUpdateTraderKYC(masterTraderKYCs.Service.getAllDocuments(masterTraders.Service.getID(loginState.username))))
       } catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
@@ -180,7 +180,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
           document = master.TraderKYC(id = id, documentType = documentType, fileName = name, file = None, zoneStatus = None, organizationStatus = None),
           updateOldDocument = masterTraderKYCs.Service.updateOldDocument
         )
-        PartialContent(views.html.component.master.userUploadOrUpdateTraderKYC(masterTraderKYCs.Service.getAllDocuments(masterTraders.Service.getID(loginState.username))))
+        withUsernameToken.PartialContent(views.html.component.master.userUploadOrUpdateTraderKYC(masterTraderKYCs.Service.getAllDocuments(masterTraders.Service.getID(loginState.username))))
       } catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
@@ -190,7 +190,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
     implicit request =>
       try {
         val trader = masterTraders.Service.getByAccountID(loginState.username)
-        Ok(views.html.component.master.reviewTraderCompletion(views.companion.master.TraderCompletion.form, trader = trader, organization = masterOrganizations.Service.get(trader.organizationID), zone = masterZones.Service.get(trader.zoneID), traderKYCs = masterTraderKYCs.Service.getAllDocuments(trader.id)))
+        withUsernameToken.Ok(views.html.component.master.reviewTraderCompletion(views.companion.master.TraderCompletion.form, trader = trader, organization = masterOrganizations.Service.get(trader.organizationID), zone = masterZones.Service.get(trader.zoneID), traderKYCs = masterTraderKYCs.Service.getAllDocuments(trader.id)))
       } catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
@@ -263,20 +263,30 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
       )
   }
 
+  def zoneViewPendingVerifyTraderRequests: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      try {
+        Ok(views.html.component.master.zoneViewPendingVerifyTraderRequests(masterTraders.Service.getVerifyTraderRequestsForZone(masterZones.Service.getID(loginState.username))))
+      }
+      catch {
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
+  }
+
   def zoneViewKYCDocuments(traderID: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        withUsernameToken.Ok(views.html.component.master.zoneViewVerificationTraderKYCDouments(masterTraderKYCs.Service.getAllDocuments(traderID)))
+        Ok(views.html.component.master.zoneViewVerificationTraderKYCDouments(masterTraderKYCs.Service.getAllDocuments(traderID)))
       } catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
-  def updateTraderKYCDocumentZoneStatusForm(traderID: String, documentType: String): Action[AnyContent]  = withZoneLoginAction.authenticated { implicit loginState =>
+  def updateTraderKYCDocumentZoneStatusForm(traderID: String, documentType: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
         if (masterZones.Service.getID(loginState.username) == masterTraders.Service.getZoneID(traderID)) {
-          Ok(views.html.component.master.updateTraderKYCDocumentZoneStatus(traderKYC = masterTraderKYCs.Service.get(id = traderID, documentType = documentType)))
+          withUsernameToken.Ok(views.html.component.master.updateTraderKYCDocumentZoneStatus(traderKYC = masterTraderKYCs.Service.get(id = traderID, documentType = documentType)))
         }
         else {
           Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
@@ -306,7 +316,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
                 masterTraderKYCs.Service.zoneReject(id = updateTraderKYCDocumentZoneStatusData.traderID, documentType = updateTraderKYCDocumentZoneStatusData.documentType)
                 utilitiesNotification.send(masterTraders.Service.getAccountId(updateTraderKYCDocumentZoneStatusData.traderID), constants.Notification.FAILURE, Messages(constants.Response.DOCUMENT_REJECTED.message))
               }
-              PartialContent(views.html.component.master.updateTraderKYCDocumentZoneStatus( traderKYC = masterTraderKYCs.Service.get(id = updateTraderKYCDocumentZoneStatusData.traderID, documentType = updateTraderKYCDocumentZoneStatusData.documentType) ))
+              withUsernameToken.PartialContent(views.html.component.master.updateTraderKYCDocumentZoneStatus(traderKYC = masterTraderKYCs.Service.get(id = updateTraderKYCDocumentZoneStatusData.traderID, documentType = updateTraderKYCDocumentZoneStatusData.documentType)))
             } else {
               Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
             }
@@ -339,16 +349,6 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
           }
         }
       )
-  }
-
-  def zoneViewPendingVerifyTraderRequests: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
-    implicit request =>
-      try {
-        withUsernameToken.Ok(views.html.component.master.zoneViewPendingVerifyTraderRequests(masterTraders.Service.getVerifyTraderRequestsForZone(masterZones.Service.getID(loginState.username))))
-      }
-      catch {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-      }
   }
 
   def organizationVerifyTraderForm(accountID: String, organizationID: String): Action[AnyContent] = Action { implicit request =>
@@ -431,25 +431,25 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
   def organizationViewKYCDocuments(traderID: String): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        withUsernameToken.Ok(views.html.component.master.organizationViewVerificationTraderKYCDouments(masterTraderKYCs.Service.getAllDocuments(traderID)))
+        Ok(views.html.component.master.organizationViewVerificationTraderKYCDouments(masterTraderKYCs.Service.getAllDocuments(traderID)))
       } catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
   def updateTraderKYCDocumentOrganizationStatusForm(traderID: String, documentType: String): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
-      implicit request =>
-        try {
-          if (masterOrganizations.Service.getID(loginState.username) == masterTraders.Service.getOrganizationID(traderID)) {
-            Ok(views.html.component.master.updateTraderKYCDocumentOrganizationStatus(traderKYC = masterTraderKYCs.Service.get(id = traderID, documentType = documentType)))
-          }
-          else {
-            Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
-          }
-        } catch {
-          case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+    implicit request =>
+      try {
+        if (masterOrganizations.Service.getID(loginState.username) == masterTraders.Service.getOrganizationID(traderID)) {
+          withUsernameToken.Ok(views.html.component.master.updateTraderKYCDocumentOrganizationStatus(traderKYC = masterTraderKYCs.Service.get(id = traderID, documentType = documentType)))
         }
-    }
+        else {
+          Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
+        }
+      } catch {
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
+  }
 
   def updateTraderKYCDocumentOrganizationStatus(): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
     implicit request =>
@@ -471,7 +471,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
                 masterTraderKYCs.Service.organizationReject(id = updateTraderKYCDocumentOrganizationStatusData.traderID, documentType = updateTraderKYCDocumentOrganizationStatusData.documentType)
                 utilitiesNotification.send(masterTraders.Service.getAccountId(updateTraderKYCDocumentOrganizationStatusData.traderID), constants.Notification.FAILURE, Messages(constants.Response.DOCUMENT_REJECTED.message))
               }
-              PartialContent(views.html.component.master.updateTraderKYCDocumentOrganizationStatus(traderKYC = masterTraderKYCs.Service.get(id = updateTraderKYCDocumentOrganizationStatusData.traderID, documentType = updateTraderKYCDocumentOrganizationStatusData.documentType)))
+              withUsernameToken.PartialContent(views.html.component.master.updateTraderKYCDocumentOrganizationStatus(traderKYC = masterTraderKYCs.Service.get(id = updateTraderKYCDocumentOrganizationStatusData.traderID, documentType = updateTraderKYCDocumentOrganizationStatusData.documentType)))
             } else {
               Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
             }
@@ -509,7 +509,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
   def organizationViewPendingVerifyTraderRequests: Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        withUsernameToken.Ok(views.html.component.master.organizationViewPendingVerifyTraderRequests(masterTraders.Service.getVerifyTraderRequestsForOrganization(masterOrganizations.Service.getByAccountID(loginState.username).id)))
+        Ok(views.html.component.master.organizationViewPendingVerifyTraderRequests(masterTraders.Service.getVerifyTraderRequestsForOrganization(masterOrganizations.Service.getByAccountID(loginState.username).id)))
       }
       catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -581,7 +581,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
   def viewTradersInOrganization: Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        withUsernameToken.Ok(views.html.component.master.viewTradersInOrganizationForOrganization(masterTraders.Service.getVerifiedTradersForOrganization(masterOrganizations.Service.getByAccountID(loginState.username).id)))
+        Ok(views.html.component.master.viewTradersInOrganizationForOrganization(masterTraders.Service.getVerifiedTradersForOrganization(masterOrganizations.Service.getByAccountID(loginState.username).id)))
       }
       catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -592,7 +592,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
     implicit request =>
       try {
         if (masterOrganizations.Service.getZoneID(organizationID) == masterZones.Service.getID(loginState.username)) {
-          withUsernameToken.Ok(views.html.component.master.viewTradersInOrganization(masterTraders.Service.getVerifiedTradersForOrganization(organizationID)))
+          Ok(views.html.component.master.viewTradersInOrganization(masterTraders.Service.getVerifiedTradersForOrganization(organizationID)))
         } else {
           Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
         }
@@ -605,7 +605,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
   def viewTradersInOrganizationForGenesis(organizationID: String): Action[AnyContent] = withGenesisLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        withUsernameToken.Ok(views.html.component.master.viewTradersInOrganization(masterTraders.Service.getVerifiedTradersForOrganization(organizationID)))
+        Ok(views.html.component.master.viewTradersInOrganization(masterTraders.Service.getVerifiedTradersForOrganization(organizationID)))
       }
       catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -613,7 +613,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
   }
 
   def blockchainSetACLForm: Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.blockchain.setACL(views.companion.blockchain.SetACL.form))
+    Ok(views.html.component.blockchain.setACL())
   }
 
   def blockchainSetACL: Action[AnyContent] = Action { implicit request =>

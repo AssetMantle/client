@@ -187,19 +187,16 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
         documentType match {
           case constants.File.OBL =>
             masterTransactionAssetFiles.Service.getOrEmpty(issueAssetRequestID, constants.File.OBL).documentContent match {
-              case Some(oblContent: Serializable.OBL) =>
-                PartialContent(views.html.component.master.issueAssetOBL(views.companion.master.IssueAssetOBL.form.fill(views.companion.master.IssueAssetOBL.Data(issueAssetRequestID, oblContent.billOfLadingID, oblContent.portOfLoading, oblContent.shipperName, oblContent.shipperAddress, oblContent.notifyPartyName, oblContent.notifyPartyAddress, oblContent.dateOfShipping, oblContent.deliveryTerm, oblContent.weightOfConsignment, oblContent.declaredAssetValue)), masterTransactionAssetFiles.Service.getOrNone(issueAssetRequestID, constants.File.OBL)))
-              case None =>
-                PartialContent(views.html.component.master.issueAssetOBL(views.companion.master.IssueAssetOBL.form.fill(views.companion.master.IssueAssetOBL.Data(issueAssetRequestID, "", "", "", "", "", "", new Date, "", 0, 0)), masterTransactionAssetFiles.Service.getOrNone(issueAssetRequestID, constants.File.OBL)))
+              case Some(oblContent: Serializable.OBL) => withUsernameToken.PartialContent(views.html.component.master.issueAssetOBL(views.companion.master.IssueAssetOBL.form.fill(views.companion.master.IssueAssetOBL.Data(issueAssetRequestID, oblContent.billOfLadingID, oblContent.portOfLoading, oblContent.shipperName, oblContent.shipperAddress, oblContent.notifyPartyName, oblContent.notifyPartyAddress, oblContent.dateOfShipping, oblContent.deliveryTerm, oblContent.weightOfConsignment, oblContent.declaredAssetValue)), masterTransactionAssetFiles.Service.getOrNone(issueAssetRequestID, constants.File.OBL)))
+              case None => withUsernameToken.PartialContent(views.html.component.master.issueAssetOBL(views.companion.master.IssueAssetOBL.form.fill(views.companion.master.IssueAssetOBL.Data(issueAssetRequestID, "", "", "", "", "", "", new Date, "", 0, 0)), masterTransactionAssetFiles.Service.getOrNone(issueAssetRequestID, constants.File.OBL)))
             }
           case constants.File.INVOICE =>
             masterTransactionAssetFiles.Service.getOrEmpty(issueAssetRequestID, constants.File.INVOICE).documentContent match {
-              case Some(invoiceContent: Serializable.Invoice) =>
-                PartialContent(views.html.component.master.issueAssetInvoice(views.companion.master.IssueAssetInvoice.form.fill(views.companion.master.IssueAssetInvoice.Data(issueAssetRequestID, invoiceContent.invoiceNumber, invoiceContent.invoiceDate)), masterTransactionAssetFiles.Service.getOrNone(issueAssetRequestID, constants.File.INVOICE)))
-              case None => PartialContent(views.html.component.master.issueAssetInvoice(views.companion.master.IssueAssetInvoice.form.fill(views.companion.master.IssueAssetInvoice.Data(issueAssetRequestID, "", new Date)), masterTransactionAssetFiles.Service.getOrNone(issueAssetRequestID, constants.File.INVOICE)))
+              case Some(invoiceContent: Serializable.Invoice) => withUsernameToken.PartialContent(views.html.component.master.issueAssetInvoice(views.companion.master.IssueAssetInvoice.form.fill(views.companion.master.IssueAssetInvoice.Data(issueAssetRequestID, invoiceContent.invoiceNumber, invoiceContent.invoiceDate)), masterTransactionAssetFiles.Service.getOrNone(issueAssetRequestID, constants.File.INVOICE)))
+              case None => withUsernameToken.PartialContent(views.html.component.master.issueAssetInvoice(views.companion.master.IssueAssetInvoice.form.fill(views.companion.master.IssueAssetInvoice.Data(issueAssetRequestID, "", new Date)), masterTransactionAssetFiles.Service.getOrNone(issueAssetRequestID, constants.File.INVOICE)))
             }
-          case constants.File.CONTRACT | constants.File.PACKING_LIST | constants.File.COO | constants.File.COA | constants.File.OTHER => PartialContent(views.html.component.master.issueAssetDocument(issueAssetRequestID, masterTransactionAssetFiles.Service.getDocuments(issueAssetRequestID, constants.File.TRADER_ASSET_DOCUMENT_TYPES_UPLOAD_PAGE)))
-          case _ => Ok(views.html.index())
+          case constants.File.CONTRACT | constants.File.PACKING_LIST | constants.File.COO | constants.File.COA | constants.File.OTHER => withUsernameToken.PartialContent(views.html.component.master.issueAssetDocument(issueAssetRequestID, masterTransactionAssetFiles.Service.getDocuments(issueAssetRequestID, constants.File.TRADER_ASSET_DOCUMENT_TYPES_UPLOAD_PAGE)))
+          case _ => withUsernameToken.Ok(views.html.index())
         }
       } catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -220,19 +217,16 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
         documentType match {
           case constants.File.OBL =>
             masterTransactionAssetFiles.Service.getOrEmpty(issueAssetRequestID, constants.File.OBL).documentContent match {
-              case Some(oblContent: Serializable.OBL) =>
-                PartialContent(views.html.component.master.issueAssetOBL(views.companion.master.IssueAssetOBL.form.fill(views.companion.master.IssueAssetOBL.Data(issueAssetRequestID, oblContent.billOfLadingID, oblContent.portOfLoading, oblContent.shipperName, oblContent.shipperAddress, oblContent.notifyPartyName, oblContent.notifyPartyAddress, oblContent.dateOfShipping, oblContent.deliveryTerm, oblContent.weightOfConsignment, oblContent.declaredAssetValue)), masterTransactionAssetFiles.Service.getOrNone(issueAssetRequestID, constants.File.OBL)))
-              case None =>
-                PartialContent(views.html.component.master.issueAssetOBL(views.companion.master.IssueAssetOBL.form.fill(views.companion.master.IssueAssetOBL.Data(issueAssetRequestID, "", "", "", "", "", "", new Date, "", 0, 0)), masterTransactionAssetFiles.Service.getOrNone(issueAssetRequestID, constants.File.OBL)))
+              case Some(oblContent: Serializable.OBL) => withUsernameToken.PartialContent(views.html.component.master.issueAssetOBL(views.companion.master.IssueAssetOBL.form.fill(views.companion.master.IssueAssetOBL.Data(issueAssetRequestID, oblContent.billOfLadingID, oblContent.portOfLoading, oblContent.shipperName, oblContent.shipperAddress, oblContent.notifyPartyName, oblContent.notifyPartyAddress, oblContent.dateOfShipping, oblContent.deliveryTerm, oblContent.weightOfConsignment, oblContent.declaredAssetValue)), masterTransactionAssetFiles.Service.getOrNone(issueAssetRequestID, constants.File.OBL)))
+              case None => withUsernameToken.PartialContent(views.html.component.master.issueAssetOBL(views.companion.master.IssueAssetOBL.form.fill(views.companion.master.IssueAssetOBL.Data(issueAssetRequestID, "", "", "", "", "", "", new Date, "", 0, 0)), masterTransactionAssetFiles.Service.getOrNone(issueAssetRequestID, constants.File.OBL)))
             }
           case constants.File.INVOICE =>
             masterTransactionAssetFiles.Service.getOrEmpty(issueAssetRequestID, constants.File.INVOICE).documentContent match {
-              case Some(invoiceContent: Serializable.Invoice) =>
-                PartialContent(views.html.component.master.issueAssetInvoice(views.companion.master.IssueAssetInvoice.form.fill(views.companion.master.IssueAssetInvoice.Data(issueAssetRequestID, invoiceContent.invoiceNumber, invoiceContent.invoiceDate)), masterTransactionAssetFiles.Service.getOrNone(issueAssetRequestID, constants.File.INVOICE)))
-              case None => PartialContent(views.html.component.master.issueAssetInvoice(views.companion.master.IssueAssetInvoice.form.fill(views.companion.master.IssueAssetInvoice.Data(issueAssetRequestID, "", new Date)), masterTransactionAssetFiles.Service.getOrNone(issueAssetRequestID, constants.File.INVOICE)))
+              case Some(invoiceContent: Serializable.Invoice) => withUsernameToken.PartialContent(views.html.component.master.issueAssetInvoice(views.companion.master.IssueAssetInvoice.form.fill(views.companion.master.IssueAssetInvoice.Data(issueAssetRequestID, invoiceContent.invoiceNumber, invoiceContent.invoiceDate)), masterTransactionAssetFiles.Service.getOrNone(issueAssetRequestID, constants.File.INVOICE)))
+              case None => withUsernameToken.PartialContent(views.html.component.master.issueAssetInvoice(views.companion.master.IssueAssetInvoice.form.fill(views.companion.master.IssueAssetInvoice.Data(issueAssetRequestID, "", new Date)), masterTransactionAssetFiles.Service.getOrNone(issueAssetRequestID, constants.File.INVOICE)))
             }
-          case constants.File.CONTRACT | constants.File.PACKING_LIST | constants.File.COO | constants.File.COA | constants.File.OTHER => PartialContent(views.html.component.master.issueAssetDocument(issueAssetRequestID, masterTransactionAssetFiles.Service.getDocuments(issueAssetRequestID, constants.File.TRADER_ASSET_DOCUMENT_TYPES_UPLOAD_PAGE)))
-          case _ => Ok(views.html.index())
+          case constants.File.CONTRACT | constants.File.PACKING_LIST | constants.File.COO | constants.File.COA | constants.File.OTHER => withUsernameToken.PartialContent(views.html.component.master.issueAssetDocument(issueAssetRequestID, masterTransactionAssetFiles.Service.getDocuments(issueAssetRequestID, constants.File.TRADER_ASSET_DOCUMENT_TYPES_UPLOAD_PAGE)))
+          case _ => withUsernameToken.Ok(views.html.index())
         }
       } catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -278,7 +272,9 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
           masterCreate = masterTransactionNegotiationFiles.Service.create
         )
         documentType match {
-          case _ => Ok(views.html.index())
+          case constants.File.BUYER_CONTRACT => withUsernameToken.PartialContent(views.html.component.master.confirmBuyerBidDocument(masterTransactionNegotiationFiles.Service.getOrNone(negotiationRequestID, constants.File.BUYER_CONTRACT), negotiationRequestID, constants.File.BUYER_CONTRACT))
+          case constants.File.SELLER_CONTRACT => withUsernameToken.PartialContent(views.html.component.master.confirmSellerBidDocument(masterTransactionNegotiationFiles.Service.getOrNone(negotiationRequestID, constants.File.SELLER_CONTRACT), negotiationRequestID, constants.File.SELLER_CONTRACT))
+          case _ => withUsernameToken.Ok(views.html.index())
         }
       } catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -292,12 +288,14 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
           name = name,
           documentType = documentType,
           path = fileResourceManager.getTraderNegotiationFilePath(documentType),
-          oldDocumentFileName = masterTransactionAssetFiles.Service.getFileName(id = negotiationRequestID, documentType = documentType),
+          oldDocumentFileName = masterTransactionNegotiationFiles.Service.getFileName(id = negotiationRequestID, documentType = documentType),
           document = masterTransaction.NegotiationFile(id = negotiationRequestID, documentType = documentType, fileName = name, file = None, documentContent = None, status = None),
           updateOldDocument = masterTransactionNegotiationFiles.Service.insertOrUpdateOldDocument
         )
         documentType match {
-          case _ => Ok(views.html.index())
+          case constants.File.BUYER_CONTRACT => withUsernameToken.PartialContent(views.html.component.master.confirmBuyerBidDocument(masterTransactionNegotiationFiles.Service.getOrNone(negotiationRequestID, constants.File.BUYER_CONTRACT), negotiationRequestID, constants.File.BUYER_CONTRACT))
+          case constants.File.SELLER_CONTRACT => withUsernameToken.PartialContent(views.html.component.master.confirmSellerBidDocument(masterTransactionNegotiationFiles.Service.getOrNone(negotiationRequestID, constants.File.SELLER_CONTRACT), negotiationRequestID, constants.File.SELLER_CONTRACT))
+          case _ => withUsernameToken.Ok(views.html.index())
         }
       } catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -438,9 +436,9 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
     implicit request =>
       try {
         val path: String = documentType match {
-          case constants.File.CONTRACT | constants.File.OBL | constants.File.PACKING_LIST | constants.File.INVOICE| constants.File.COO| constants.File.COA| constants.File.OTHER => if (masterTransactionIssueAssetRequests.Service.getAccountID(id) == loginState.username) fileResourceManager.getTraderAssetFilePath(documentType) else throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION)
+          case constants.File.CONTRACT | constants.File.OBL | constants.File.PACKING_LIST | constants.File.INVOICE | constants.File.COO | constants.File.COA | constants.File.OTHER => if (masterTransactionIssueAssetRequests.Service.getAccountID(id) == loginState.username) fileResourceManager.getTraderAssetFilePath(documentType) else throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION)
           case constants.File.BUYER_CONTRACT | constants.File.SELLER_CONTRACT | constants.File.FIAT_PROOF | constants.File.AWB_PROOF => if (masterTransactionNegotiationRequests.Service.checkNegotiationAndAccountIDExists(id, loginState.username)) fileResourceManager.getTraderNegotiationFilePath(documentType) else throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION)
-       }
+        }
         Ok.sendFile(utilities.FileOperations.fetchFile(path = path, fileName = fileName))
       } catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))

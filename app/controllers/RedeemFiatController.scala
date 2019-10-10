@@ -8,8 +8,6 @@ import models.{blockchain, blockchainTransaction}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
-import views.companion.blockchain.RedeemFiat
-import views.companion.master
 
 import scala.concurrent.ExecutionContext
 
@@ -23,12 +21,12 @@ class RedeemFiatController @Inject()(messagesControllerComponents: MessagesContr
   private implicit val module: String = constants.Module.CONTROLLERS_REDEEM_FIAT
 
   def redeemFiatForm(ownerAddress: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.redeemFiat(master.RedeemFiat.form, blockchainACLAccounts.Service.get(ownerAddress).zoneID))
+    Ok(views.html.component.master.redeemFiat(views.companion.master.RedeemFiat.form, blockchainACLAccounts.Service.get(ownerAddress).zoneID))
   }
 
   def redeemFiat: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      master.RedeemFiat.form.bindFromRequest().fold(
+      views.companion.master.RedeemFiat.form.bindFromRequest().fold(
         formWithErrors => {
           BadRequest(views.html.component.master.redeemFiat(formWithErrors, formWithErrors.data(constants.Form.ZONE_ID)))
         },
@@ -54,11 +52,11 @@ class RedeemFiatController @Inject()(messagesControllerComponents: MessagesContr
   }
 
   def blockchainRedeemFiatForm: Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.blockchain.redeemFiat(RedeemFiat.form))
+    Ok(views.html.component.blockchain.redeemFiat())
   }
 
   def blockchainRedeemFiat: Action[AnyContent] = Action { implicit request =>
-    RedeemFiat.form.bindFromRequest().fold(
+    views.companion.blockchain.RedeemFiat.form.bindFromRequest().fold(
       formWithErrors => {
         BadRequest(views.html.component.blockchain.redeemFiat(formWithErrors))
       },

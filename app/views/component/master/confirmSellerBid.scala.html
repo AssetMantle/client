@@ -1,26 +1,43 @@
 @import controllers.actions.LoginState
 @import helper._
-@import views.companion.master.ConfirmSellerBid
+@import views.companion.master.ConfirmBidTransaction
+@import models.masterTransaction.NegotiationRequest
+@import models.masterTransaction.NegotiationFile
 
-@(confirmSellerBidForm: Form[ConfirmSellerBid.Data], buyerAddress: String, pegHash: String, bid: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@(confirmBidTransactionForm: Form[ConfirmBidTransaction.Data], negotiation: NegotiationRequest, files: Seq[NegotiationFile])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+
+<span class="red">@Messages(constants.Form.BUYER_ID)</span> : @negotiation.buyerAccountID <br>
+<span class="red">@Messages(constants.FormField.BID.name)</span> : @negotiation.amount <br>
+<span class="red">@Messages(constants.FormField.PEG_HASH.name)</span> : @negotiation.pegHash <br>
+
+@for(file <- files) {
+    @component.master.commonDocumentViewer(file) {
+        @routes.FileController.tradingFile(file.id, file.fileName, file.documentType)
+    } {
+        <a href="@routes.FileController.tradingFile(file.id, file.fileName, file.documentType)">@Messages(file.documentType)</a>
+    } {
+        <span>@file.documentType</span>
+    }
+}
 
 @form(action = routes.ConfirmSellerBidController.confirmSellerBid, 'onkeypress -> "submitFormOnEnter(event,this)") {
-        <h4>@Messages(constants.Form.CONFIRM_SELLER_BID)</h4>
+    <div class="latest_card-header latest_card-header-primary text-center">
+        <h4 class="latest_card-title">@Messages(constants.Form.CONFIRM_SELLER_BID)</h4>
+    </div>
+    <div class="latest_card-body">
         @CSRF.formField
-      @inputText(confirmSellerBidForm(constants.FormField.BUYER_ADDRESS.name).copy(value = Some(buyerAddress)), '_label -> Messages(constants.FormField.BUYER_ADDRESS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.BUYER_ADDRESS.name), 'required -> true)
-      @inputText(confirmSellerBidForm(constants.FormField.BID.name).copy(value = Some(bid.toString)), '_label -> Messages(constants.FormField.BID.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.BID.name), 'required -> true, 'type -> "number")
-      @inputText(confirmSellerBidForm(constants.FormField.TIME.name), '_label -> Messages(constants.FormField.TIME.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.TIME.name), 'required -> true, 'type -> "number")
-      @inputText(confirmSellerBidForm(constants.FormField.PEG_HASH.name).copy(value = Some(pegHash)), '_label -> Messages(constants.FormField.PEG_HASH.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PEG_HASH.name), 'required -> true)
-      @inputText(confirmSellerBidForm(constants.FormField.SELLER_CONTRACT_HASH.name), '_label -> Messages(constants.FormField.SELLER_CONTRACT_HASH.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.SELLER_CONTRACT_HASH.name), 'required -> true)
-      @inputText(confirmSellerBidForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.GAS.name), 'required -> true, 'type -> "number")
-      @inputPassword(confirmSellerBidForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PASSWORD.name), 'required -> true)
+        @inputText(confirmBidTransactionForm(constants.FormField.REQUEST_ID.name), '_label -> Messages(constants.FormField.REQUEST_ID.name), 'class -> "form-control hidden", 'placeholder -> Messages(constants.FormField.REQUEST_ID.name), 'required -> false)
+        @inputText(confirmBidTransactionForm(constants.FormField.TIME.name), '_label -> Messages(constants.FormField.TIME.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.TIME.name), 'type -> "number", 'required -> true)
+        @inputText(confirmBidTransactionForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.GAS.name), 'type -> "number", 'required -> true)
+        @inputPassword(confirmBidTransactionForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PASSWORD.name), 'required -> true)
 
-        @if(confirmSellerBidForm.hasGlobalErrors) {
+        @if(confirmBidTransactionForm.hasGlobalErrors) {
             <ul>
-            @for(error <- confirmSellerBidForm.globalErrors) {
+            @for(error <- confirmBidTransactionForm.globalErrors) {
                 <li>@error.format</li>
             }
             </ul>
         }
-        <button type="button"  onclick="submitForm(this)">@Messages(constants.Form.CONFIRM_SELLER_BID)</button>
+        <button type="button" class="btn btn-primary btn-sm" onclick="submitForm(this)">@Messages(constants.Form.CONFIRM_SELLER_BID)</button>
+    </div>
 }

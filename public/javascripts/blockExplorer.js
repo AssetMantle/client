@@ -28,10 +28,12 @@ function blockExplorer(blockExplorerTableBody, maxNumberOfItems) {
     wsNewBlock.onclose = function (event) {
     };
 
-    $(window).replaceAll(function () {
-        wsNewBlock.close();
+    window.addEventListener("replaceAll", function () {
+        console.log("AAAAA");
+        //wsNewBlock.close();
     });
 
+    return wsNewBlock;
 }
 
 function updateBlockExplorer(wsNewBlock, blockExplorerTableBody, receivedData, maxNumberOfItems) {
@@ -75,7 +77,7 @@ function initializeBlockExplorer(blockExplorerTableBody, maxNumberOfItems) {
     $.ajax({
         url: lastBlockHeightURL.url,
         type: lastBlockHeightURL.ty1,
-        async: false,
+        async: true,
         statusCode: {
             200: function (latestBlockHeightData) {
                 let latestBlockHeight = parseInt(latestBlockHeightData);
@@ -84,7 +86,7 @@ function initializeBlockExplorer(blockExplorerTableBody, maxNumberOfItems) {
                 $.ajax({
                     url: blockDetails.url,
                     type: blockDetails.type,
-                    async: false,
+                    async: true,
                     statusCode: {
                         200: function (blockDetailsData) {
                             let blocks = JSON.parse(blockDetailsData);
@@ -115,7 +117,7 @@ function initializeBlockExplorer(blockExplorerTableBody, maxNumberOfItems) {
 
                             for (let i = 0; i < initialTimeData.length; i++) {
                                 getBlockTime(initialTimeData[i], "timer" + (latestBlockHeight - i).toString(10));
-                                setTimeoutIDArray.push( "timer" + (latestBlockHeight - i).toString(10));
+                                setTimeoutIDArray.push("timer" + (latestBlockHeight - i).toString(10));
                             }
                             setTimeoutIDArray.shift();
                             setCookie("blockExplorerTimer", JSON.stringify(setTimeoutIDArray), 1);
@@ -141,7 +143,7 @@ function setFirstBlockTime() {
     $.ajax({
         url: blockDetails.url,
         type: blockDetails.type,
-        async: false,
+        async: true,
         statusCode: {
             200: function (blockDetailsData) {
                 let blocks = JSON.parse(blockDetailsData);
@@ -160,7 +162,7 @@ function getBlockTime(dateTime, timerID) {
 }
 
 function updateBlockTimes() {
-    let timeOutID = getCookie("timeOutID");
+    let timeOutID = parseInt(getCookie("timeOutID"), 10);
     clearTimeout(timeOutID);
     let setTimeoutIDArray = JSON.parse(getCookie("blockExplorerTimer"));
     if (setTimeoutIDArray !== undefined) {
@@ -183,6 +185,9 @@ $('#indexBottomDivision').ready(function () {
     setFirstBlockTime();
     initializeBlockExplorer(blockExplorerTableBody, maxNumberOfItems);
     showAllBlocksInitialTableContent();
-    blockExplorer(blockExplorerTableBody, maxNumberOfItems);
     updateBlockTimes();
+    let wsNewBlock = blockExplorer(blockExplorerTableBody, maxNumberOfItems);
+    $(window).on('replace', function (e) {
+        wsNewBlock.close();
+    });
 });

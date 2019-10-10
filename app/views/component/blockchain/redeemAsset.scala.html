@@ -1,24 +1,13 @@
 @import helper._
 @import views.companion.blockchain.RedeemAsset
+@import views.html.base._
 
-@(redeemAssetForm: Form[RedeemAsset.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@form(action = routes.RedeemAssetController.blockchainRedeemAsset, 'onkeypress -> "submitFormOnEnter(event,this)") {
-          <h4>@Messages(constants.Form.REDEEM_ASSET)</h4>
-        @CSRF.formField
-      @inputText(redeemAssetForm(constants.FormField.FROM.name), '_label -> Messages(constants.FormField.FROM.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.FROM.name), 'required -> true)
-      @inputText(redeemAssetForm(constants.FormField.TO.name), '_label -> Messages(constants.FormField.TO.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.TO.name), 'required -> true)
-      @inputText(redeemAssetForm(constants.FormField.PEG_HASH.name), '_label -> Messages(constants.FormField.PEG_HASH.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PEG_HASH.name), 'required -> true)
-      @inputText(redeemAssetForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.GAS.name), 'required -> true, 'type -> "number")
-      @inputText(redeemAssetForm(constants.FormField.MODE.name), '_label -> Messages(constants.FormField.MODE.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.MODE.name), 'required -> true)
-      @inputPassword(redeemAssetForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PASSWORD.name), 'required -> true)
-
-        @if(redeemAssetForm.hasGlobalErrors) {
-            <ul>
-            @for(error <- redeemAssetForm.globalErrors) {
-                <li>@error.format</li>
-            }
-            </ul>
-        }
-        <button type="button" onclick="submitForm(this)">@Messages(constants.Form.REDEEM_ASSET)</button>
-
+@(redeemAssetForm: Form[RedeemAsset.Data] = RedeemAsset.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@baseForm(constants.Form.BLOCKCHAIN_REDEEM_ASSET, redeemAssetForm) {
+    @inputText(redeemAssetForm(constants.FormField.FROM.name), '_label -> Messages(constants.FormField.FROM.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.FROM.name), 'required -> true)
+    @inputText(redeemAssetForm(constants.FormField.TO.name), '_label -> Messages(constants.FormField.TO.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.TO.name), 'required -> true)
+    @inputText(redeemAssetForm(constants.FormField.PEG_HASH.name), '_label -> Messages(constants.FormField.PEG_HASH.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PEG_HASH.name), 'required -> true)
+    @inputText(redeemAssetForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.GAS.name), 'required -> true, 'type -> "number")
+    @inputText(redeemAssetForm(constants.FormField.MODE.name), '_label -> Messages(constants.FormField.MODE.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.MODE.name), 'required -> true)
+    @inputPassword(redeemAssetForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PASSWORD.name), 'required -> true)
 }

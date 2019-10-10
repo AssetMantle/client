@@ -19,7 +19,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class Notification @Inject()(masterContacts: master.Contacts,
                              masterTransactionNotifications: masterTransaction.Notifications,
                              mailerClient: MailerClient,
-                             masterTransactionAccountTokens: masterTransaction.AccountTokens,
+                             masterTransactionPushNotificationTokens: masterTransaction.PushNotificationTokens,
                              wsClient: WSClient,
                              masterAccounts: master.Accounts,
                              messagesApi: MessagesApi
@@ -47,17 +47,17 @@ class Notification @Inject()(masterContacts: master.Contacts,
 
   private val smsFromNumber = new PhoneNumber(configuration.get[String]("twilio.fromNumber"))
 
-  private val pushNotificationURL = configuration.get[String]("notification.url")
+  private val pushNotificationURL = configuration.get[String]("pushNotification.url")
 
-  private val pushNotificationAuthorizationKey = configuration.get[String]("notification.authorizationKey")
+  private val pushNotificationAuthorizationKey = configuration.get[String]("pushNotification.authorizationKey")
 
   private case class Notification(title: String, body: String)
 
   private case class Data(to: String, notification: Notification)
 
-  private implicit val dataWrites: OWrites[Data] = Json.writes[Data]
-
   private implicit val notificationWrites: OWrites[Notification] = Json.writes[Notification]
+
+  private implicit val dataWrites: OWrites[Data] = Json.writes[Data]
 
   private def sendSMS(accountID: String, sms: constants.Notification.SMS, messageParameters: String*)(implicit lang: Lang) = {
     try {
@@ -79,7 +79,7 @@ class Notification @Inject()(masterContacts: master.Contacts,
       val title = messagesApi(pushNotification.title)
       val message = messagesApi(pushNotification.message, messageParameters: _*)
       masterTransactionNotifications.Service.create(accountID, title, message)
-      wsClient.url(pushNotificationURL).withHttpHeaders(constants.Header.CONTENT_TYPE -> constants.Header.APPLICATION_JSON).withHttpHeaders(constants.Header.AUTHORIZATION -> pushNotificationAuthorizationKey).post(Json.toJson(Data(masterTransactionAccountTokens.Service.getNotificationTokenById(accountID).getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)), Notification(title, message))))
+      wsClient.url(pushNotificationURL).withHttpHeaders(constants.Header.CONTENT_TYPE -> constants.Header.APPLICATION_JSON).withHttpHeaders(constants.Header.AUTHORIZATION -> pushNotificationAuthorizationKey).post(Json.toJson(Data(masterTransactionPushNotificationTokens.Service.getPushNotificationToken(accountID), Notification(title, message))))
     } catch {
       case baseException: BaseException => logger.info(baseException.failure.message, baseException)
         throw baseException
@@ -116,12 +116,4 @@ class Notification @Inject()(masterContacts: master.Contacts,
     }
   }
 
-  def registerNotificationToken(id: String, notificationToken: String): Int = {
-    try {
-      masterTransactionAccountTokens.Service.updateToken(id, notificationToken)
-    } catch {
-      case baseException: BaseException => logger.error(baseException.failure.message, baseException)
-        throw baseException
-    }
-  }
 }

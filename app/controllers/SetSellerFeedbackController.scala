@@ -8,8 +8,6 @@ import models.{blockchain, blockchainTransaction}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
-import views.companion.blockchain.SetSellerFeedback
-import views.companion.master
 
 import scala.concurrent.ExecutionContext
 
@@ -23,12 +21,12 @@ class SetSellerFeedbackController @Inject()(messagesControllerComponents: Messag
   private implicit val module: String = constants.Module.CONTROLLERS_SET_SELLER_FEEDBACK
 
   def setSellerFeedbackForm(buyerAddress: String, pegHash: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.setSellerFeedback(master.SetSellerFeedback.form, buyerAddress, pegHash))
+    Ok(views.html.component.master.setSellerFeedback(views.companion.master.SetSellerFeedback.form, buyerAddress, pegHash))
   }
 
   def setSellerFeedback(): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      master.SetSellerFeedback.form.bindFromRequest().fold(
+      views.companion.master.SetSellerFeedback.form.bindFromRequest().fold(
         formWithErrors => {
           BadRequest(views.html.component.master.setSellerFeedback(formWithErrors, formWithErrors.data(constants.Form.BUYER_ADDRESS), formWithErrors.data(constants.Form.PEG_HASH)))
         },
@@ -55,18 +53,18 @@ class SetSellerFeedbackController @Inject()(messagesControllerComponents: Messag
   def sellerFeedbackList: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        withUsernameToken.Ok(views.html.component.master.setSellerFeedbackList(blockchainTraderFeedbackHistories.Service.getNullRatingsForSellerFeedback(loginState.address)))
+        Ok(views.html.component.master.setSellerFeedbackList(blockchainTraderFeedbackHistories.Service.getNullRatingsForSellerFeedback(loginState.address)))
       } catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
   def blockchainSetSellerFeedbackForm: Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.blockchain.setSellerFeedback(SetSellerFeedback.form))
+    Ok(views.html.component.blockchain.setSellerFeedback())
   }
 
   def blockchainSetSellerFeedback: Action[AnyContent] = Action { implicit request =>
-    SetSellerFeedback.form.bindFromRequest().fold(
+    views.companion.blockchain.SetSellerFeedback.form.bindFromRequest().fold(
       formWithErrors => {
         BadRequest(views.html.component.blockchain.setSellerFeedback(formWithErrors))
       },

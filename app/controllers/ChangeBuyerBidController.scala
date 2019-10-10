@@ -53,7 +53,7 @@ class ChangeBuyerBidController @Inject()(messagesControllerComponents: MessagesC
               onFailure = blockchainTransactionChangeBuyerBids.Utility.onFailure,
               updateTransactionHash = blockchainTransactionChangeBuyerBids.Service.updateTransactionHash
             )
-            masterTransactionNegotiationRequests.Service.insertOrUpdateChangeBid(requestID, loginState.username, masterAccounts.Service.getId(changeBuyerBidData.sellerAddress), changeBuyerBidData.pegHash, changeBuyerBidData.bid)
+            masterTransactionNegotiationRequests.Service.insertOrUpdate(requestID, loginState.username, masterAccounts.Service.getId(changeBuyerBidData.sellerAddress), changeBuyerBidData.pegHash, changeBuyerBidData.bid)
             withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.BUYER_BID_CHANGED)))
           }
           catch {
@@ -64,7 +64,7 @@ class ChangeBuyerBidController @Inject()(messagesControllerComponents: MessagesC
   }
 
   def blockchainChangeBuyerBidForm: Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.blockchain.changeBuyerBid(views.companion.blockchain.ChangeBuyerBid.form))
+    Ok(views.html.component.blockchain.changeBuyerBid())
   }
 
   def blockchainChangeBuyerBid: Action[AnyContent] = Action { implicit request =>

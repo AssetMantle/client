@@ -37,7 +37,7 @@ object FormField {
   val COMMODITY_NAME = new StringFormField("COMMODITY_NAME", 2, 20, RegularExpression.ALL_NUMBERS_ALL_LETTERS)
   val QUANTITY_UNIT = new StringFormField("QUANTITY_UNIT", 2, 10, RegularExpression.ALL_LETTERS)
   val TRANSACTION_ID = new StringFormField("TRANSACTION_ID", 2, 50, RegularExpression.ALL_NUMBERS_ALL_LETTERS)
-  val NOTIFICATION_TOKEN = new StringFormField("NOTIFICATION_TOKEN", 0, 200)
+  val PUSH_NOTIFICATION_TOKEN = new StringFormField("PUSH_NOTIFICATION_TOKEN", 0, 200)
   val COMMENT = new StringFormField("COMMENT", 0, 200)
   val COUPON = new StringFormField("COUPON", 0, 50)
   val COUNTRY_CODE = new StringFormField("COUNTRY_CODE", 1, 5)
@@ -121,7 +121,7 @@ object FormField {
   //DoubleFormField
   val SHARE_PERCENTAGE = new DoubleFormField("SHARE_PERCENTAGE", 0.0, 100.0)
   //TODO: Error Response through Messages
-  class StringFormField (fieldName: String, minimumLength: Int, maximumLength: Int, regex: Regex = """.*""".r, errorMessage: String = "Error Response") {
+  class StringFormField (fieldName: String, minimumLength: Int, maximumLength: Int, regex: Regex = RegularExpression.ANY_STRING, errorMessage: String = "Error Response") {
     val name: String = fieldName
     val field: Mapping[String] = text(minLength = minimumLength, maxLength = maximumLength).verifying(Constraints.pattern(regex = regex, name = regex.pattern.toString, error = errorMessage))
   }

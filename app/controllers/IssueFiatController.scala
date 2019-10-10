@@ -45,7 +45,7 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
   def viewPendingIssueFiatRequests: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        withUsernameToken.Ok(views.html.component.master.viewPendingIssueFiatRequests(masterTransactionIssueFiatRequests.Service.getPendingIssueFiatRequests(masterAccounts.Service.getIDsForAddresses(blockchainAclAccounts.Service.getAddressesUnderZone(masterZones.Service.getID(loginState.username))))))
+        Ok(views.html.component.master.viewPendingIssueFiatRequests(masterTransactionIssueFiatRequests.Service.getPendingIssueFiatRequests(masterAccounts.Service.getIDsForAddresses(blockchainAclAccounts.Service.getAddressesUnderZone(masterZones.Service.getID(loginState.username))))))
       }
       catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -111,7 +111,7 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
   }
 
   def blockchainIssueFiatForm: Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.blockchain.issueFiat(views.companion.blockchain.IssueFiat.form))
+    Ok(views.html.component.blockchain.issueFiat())
   }
 
   def blockchainIssueFiat: Action[AnyContent] = Action { implicit request =>

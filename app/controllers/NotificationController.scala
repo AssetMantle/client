@@ -23,7 +23,7 @@ class NotificationController @Inject()(messagesControllerComponents: MessagesCon
   def notificationPage(pageNumber: Int = 0): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        withUsernameToken.Ok(views.html.component.master.notifications(notifications.Service.get(loginState.username, pageNumber * limit, limit)))
+        Ok(views.html.component.master.notifications(notifications.Service.get(loginState.username, pageNumber * limit, limit)))
       }
       catch {
         case baseException: BaseException => InternalServerError(baseException.failure.message)
@@ -33,7 +33,7 @@ class NotificationController @Inject()(messagesControllerComponents: MessagesCon
   def unreadNotificationCount(): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        withUsernameToken.Ok(notifications.Service.getNumberOfUnread(loginState.username).toString)
+        Ok(notifications.Service.getNumberOfUnread(loginState.username).toString)
       }
       catch {
         case _: BaseException => NoContent
@@ -44,7 +44,7 @@ class NotificationController @Inject()(messagesControllerComponents: MessagesCon
     implicit request =>
       try {
         notifications.Service.markAsRead(notificationID)
-        withUsernameToken.Ok(notifications.Service.getNumberOfUnread(loginState.username).toString)
+        Ok(notifications.Service.getNumberOfUnread(loginState.username).toString)
       }
       catch {
         case _: BaseException => NoContent

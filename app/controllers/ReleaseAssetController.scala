@@ -53,14 +53,14 @@ class ReleaseAssetController @Inject()(messagesControllerComponents: MessagesCon
   def releaseAssetList(): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        withUsernameToken.Ok(views.html.component.master.releaseAssetList(blockchainAssets.Service.getAllLocked(blockchainACLAccounts.Service.getAddressesUnderZone(blockchainZones.Service.getID(loginState.address)))))
+        Ok(views.html.component.master.releaseAssetList(blockchainAssets.Service.getAllLocked(blockchainACLAccounts.Service.getAddressesUnderZone(blockchainZones.Service.getID(loginState.address)))))
       } catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
   def blockchainReleaseAssetForm: Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.blockchain.releaseAsset(views.companion.blockchain.ReleaseAsset.form))
+    Ok(views.html.component.blockchain.releaseAsset())
   }
 
   def blockchainReleaseAsset: Action[AnyContent] = Action { implicit request =>

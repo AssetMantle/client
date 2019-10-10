@@ -26,10 +26,10 @@
         <script src="@routes.Assets.versioned("javascripts/js-uk/uikit-icons.min.js")" type="text/javascript"></script>
 
     </head>
-  <body>
-    @* Header *@
+    <body>
+        @* Header *@
         <header>
-        <div cmuk-sticky="sel-target: .cmuk-navbar-container; cls-active: cmuk-navbar-sticky; bottom: #transparent-sticky-navbar">
+            <div cmuk-sticky="sel-target: .cmuk-navbar-container; cls-active: cmuk-navbar-sticky; bottom: #transparent-sticky-navbar">
 
                 <nav class="cmuk-navbar-container" cmuk-navbar="mode: click">
                     <div class="cmuk-navbar-left">
@@ -37,236 +37,236 @@
                             <img src="@routes.Assets.versioned("images/commitLogo.png")" class="navigationBarLogo">
                         </a>
                     </div>
-                  <div class="cmuk-navbar-right">
+                    <div class="cmuk-navbar-right">
 
-                @*        PC Navigationbar         *@
+                        @*        PC Navigationbar         *@
 
-                      <div class="cmuk-visible@@s">
-                          <ul class="cmuk-navbar-nav">
-                          @loginState match {
-                              case null => {
-                                  <li> <a onclick="getForm(jsRoutes.controllers.AccountController.signUpForm())"><span cmuk-icon="users"></span>
-                                      @Messages(constants.Form.SIGN_UP.legend)</a></li>
-                                  <li> <a onclick="getForm(jsRoutes.controllers.AccountController.loginForm())">
-                                      <span cmuk-icon="sign-in"></span>
-                                      @Messages(constants.Form.LOGIN)</a>
-                                  </li>
-                              }
-                              case default => {
-                                  @loginState.userType match {
-                                      case constants.User.TRADER => {
-                                          <li><a href="@controllers.routes.ViewController.market()">@Messages(constants.Form.MARKET)</a></li>
-                                      }
-                                      case constants.User.ZONE => {
-                                          <li><a href="@controllers.routes.ViewController.zoneRequest()">@Messages(constants.Form.REQUEST)</a></li>
-                                          <li><a href="@controllers.routes.ViewController.zoneInformation()">@Messages(constants.Form.INFORMATION)</a></li>
-                                      }
-                                      case constants.User.ORGANIZATION => {
-                                          <li><a href="@controllers.routes.ViewController.organizationRequest()">@Messages(constants.Form.REQUEST)</a></li>
-                                          <li><a href="@controllers.routes.ViewController.organizationInformation()">@Messages(constants.Form.INFORMATION)</a></li>
-                                      }
-                                      case constants.User.GENESIS => {
-                                          <li><a href="@controllers.routes.ViewController.genesisRequest()">@Messages(constants.Form.REQUEST)</a></li>
-                                          <li><a href="@controllers.routes.ViewController.genesisInformation()">@Messages(constants.Form.INFORMATION)</a></li>
-                                      }
-                                      case _ => {}
-                                  }
-                                  <li><a class="notification" onclick="getForm(jsRoutes.controllers.NotificationController.notificationPage(0))"><i class="fa fa-bell" aria-hidden="true"></i>
-                                      @Messages(constants.Form.INBOX)
-                                      <span class="cmuk-badge" id="notificationBadge">0</span>
-                                  </a>
-                                  </li>
-                                  <li>
-                                      <a href="#">
-                                      @loginState.username
-                                      </a>
-                                      <div class="cmuk-navbar-dropdown">
-                                          <ul class="cmuk-nav cmuk-navbar-dropdown-nav">
-                                              <li><a href="@controllers.routes.ViewController.profile()"><span cmuk-icon="user"></span>
-                                                      &nbsp;
-                                                  @Messages(constants.Form.PROFILE)</a>
-                                              </li>
-                                              <li>
-                                                  <a onclick="getForm(jsRoutes.controllers.AccountController.logoutForm())">
-                                                      <span cmuk-icon="sign-out"></span>
-                                                          &nbsp;
-                                                      @Messages(constants.Form.LOGOUT)</a>
-                                              </li>
+                        <div class="cmuk-visible@@s">
+                            <ul class="cmuk-navbar-nav">
+                            @loginState match {
+                                case null => {
+                                    <li> <a onclick="getForm(jsRoutes.controllers.AccountController.signUpForm())"><span cmuk-icon="users"></span>
+                                        @Messages(constants.Form.SIGN_UP.legend)</a></li>
+                                    <li> <a onclick="getForm(jsRoutes.controllers.AccountController.loginForm())">
+                                        <span cmuk-icon="sign-in"></span>
+                                        @Messages(constants.Form.LOGIN)</a>
+                                    </li>
+                                }
+                                case default => {
+                                    @loginState.userType match {
+                                        case constants.User.TRADER => {
+                                            <li><a href="@controllers.routes.ViewController.market()">@Messages(constants.Form.MARKET)</a></li>
+                                        }
+                                        case constants.User.ZONE => {
+                                            <li><a href="@controllers.routes.ViewController.zoneRequest()">@Messages(constants.Form.REQUEST)</a></li>
+                                            <li><a href="@controllers.routes.ViewController.zoneInformation()">@Messages(constants.Form.INFORMATION)</a></li>
+                                        }
+                                        case constants.User.ORGANIZATION => {
+                                            <li><a href="@controllers.routes.ViewController.organizationRequest()">@Messages(constants.Form.REQUEST)</a></li>
+                                            <li><a href="@controllers.routes.ViewController.organizationInformation()">@Messages(constants.Form.INFORMATION)</a></li>
+                                        }
+                                        case constants.User.GENESIS => {
+                                            <li><a href="@controllers.routes.ViewController.genesisRequest()">@Messages(constants.Form.REQUEST)</a></li>
+                                            <li><a href="@controllers.routes.ViewController.genesisInformation()">@Messages(constants.Form.INFORMATION)</a></li>
+                                        }
+                                        case _ => {}
+                                    }
+                                    <li><a class="notification" onclick="getForm(jsRoutes.controllers.NotificationController.notificationPage(0))"><i class="fa fa-bell" aria-hidden="true"></i>
+                                        @Messages(constants.Form.INBOX)
+                                        <span class="cmuk-badge" id="notificationBadge">0</span>
+                                    </a>
+                                    </li>
+                                    <li>
+                                        <a href="#">
+                                        @loginState.username
+                                        </a>
+                                        <div class="cmuk-navbar-dropdown">
+                                            <ul class="cmuk-nav cmuk-navbar-dropdown-nav">
+                                                <li><a href="@controllers.routes.ViewController.profile()"><span cmuk-icon="user"></span>
+                                                        &nbsp;
+                                                    @Messages(constants.Form.PROFILE)</a>
+                                                </li>
+                                                <li>
+                                                    <a onclick="getForm(jsRoutes.controllers.AccountController.logoutForm())">
+                                                        <span cmuk-icon="sign-out"></span>
+                                                            &nbsp;
+                                                        @Messages(constants.Form.LOGOUT)</a>
+                                                </li>
 
-                                          </ul>
-                                      </div>
-                                  </li>
-                              }
-                          }
-                          </ul>
-                      </div>
+                                            </ul>
+                                        </div>
+                                    </li>
+                                }
+                            }
+                            </ul>
+                        </div>
 
-                 @*       End of PC Navigationbar    *@
+                        @*       End of PC Navigationbar    *@
 
-                 @*     Mobile Navigationbar*@
+                        @*     Mobile Navigationbar*@
 
-                      <a class="cmuk-navbar-toggle cmuk-hidden@@s" href="#" cmuk-toggle="target: #offcanvas-flip">
-                          <span cmuk-navbar-toggle-icon></span>
-                      </a>
+                        <a class="cmuk-navbar-toggle cmuk-hidden@@s" href="#" cmuk-toggle="target: #offcanvas-flip">
+                            <span cmuk-navbar-toggle-icon></span>
+                        </a>
 
-                      <div id="offcanvas-flip" cmuk-offcanvas="flip: true; overlay: true">
-                          <div class="cmuk-offcanvas-bar">
-                              <button class="cmuk-offcanvas-close" type="button" cmuk-close></button>
-                              <ul class="cmuk-navbar-nav">
-                              @loginState match {
-                                  case null => {
-                                      <li> <a onclick="getForm(jsRoutes.controllers.AccountController.signUpForm())"><span cmuk-icon="users"></span>
-                                          @Messages(constants.Form.SIGN_UP.legend)</a></li>
-                                      <li> <a onclick="getForm(jsRoutes.controllers.AccountController.loginForm())">
-                                          <span cmuk-icon="sign-in"></span>
-                                          @Messages(constants.Form.LOGIN)</a>
-                                      </li>
-                                  }
-                                  case default => {
-                                      @loginState.userType match {
-                                          case constants.User.TRADER => {
-                                              <li><a href="@controllers.routes.ViewController.market()">@Messages(constants.Form.MARKET)</a></li>
-                                          }
-                                          case constants.User.ZONE => {
-                                              <li><a href="@controllers.routes.ViewController.zoneRequest()">@Messages(constants.Form.REQUEST)</a></li>
-                                              <li><a href="@controllers.routes.ViewController.zoneInformation()">@Messages(constants.Form.INFORMATION)</a></li>
-                                          }
-                                          case constants.User.ORGANIZATION => {
-                                              <li><a href="@controllers.routes.ViewController.organizationRequest()">@Messages(constants.Form.REQUEST)</a></li>
-                                              <li><a href="@controllers.routes.ViewController.organizationInformation()">@Messages(constants.Form.INFORMATION)</a></li>
-                                          }
-                                          case constants.User.GENESIS => {
-                                              <li><a href="@controllers.routes.ViewController.genesisRequest()">@Messages(constants.Form.REQUEST)</a></li>
-                                              <li><a href="@controllers.routes.ViewController.genesisInformation()">@Messages(constants.Form.INFORMATION)</a></li>
-                                          }
-                                          case _ => {}
-                                      }
-                                      <li><a class="notification" onclick="getForm(jsRoutes.controllers.NotificationController.notificationPage(0))"><i class="fa fa-bell" aria-hidden="true"></i>
-                                          @Messages(constants.Form.INBOX)
-                                          <span class="cmuk-badge mobileNotification" id="notificationBadge">0</span>
-                                      </a>
-                                      </li>
-                                      <li>
-                                          <a href="#">
-                                          @loginState.username
-                                          </a>
-                                          <div class="cmuk-navbar-dropdown">
-                                              <ul class="cmuk-nav cmuk-navbar-dropdown-nav">
-                                                  <li><a href="@controllers.routes.ViewController.profile()"><span cmuk-icon="user"></span>
-                                                          &nbsp;
-                                                      @Messages(constants.Form.PROFILE)</a>
-                                                  </li>
-                                                  <li>
-                                                      <a onclick="getForm(jsRoutes.controllers.AccountController.logoutForm())">
-                                                          <span cmuk-icon="sign-out"></span>
-                                                              &nbsp;
-                                                          @Messages(constants.Form.LOGOUT)</a>
-                                                  </li>
+                        <div id="offcanvas-flip" cmuk-offcanvas="flip: true; overlay: true">
+                            <div class="cmuk-offcanvas-bar">
+                                <button class="cmuk-offcanvas-close" type="button" cmuk-close></button>
+                                <ul class="cmuk-navbar-nav">
+                                @loginState match {
+                                    case null => {
+                                        <li> <a onclick="getForm(jsRoutes.controllers.AccountController.signUpForm())"><span cmuk-icon="users"></span>
+                                            @Messages(constants.Form.SIGN_UP.legend)</a></li>
+                                        <li> <a onclick="getForm(jsRoutes.controllers.AccountController.loginForm())">
+                                            <span cmuk-icon="sign-in"></span>
+                                            @Messages(constants.Form.LOGIN)</a>
+                                        </li>
+                                    }
+                                    case default => {
+                                        @loginState.userType match {
+                                            case constants.User.TRADER => {
+                                                <li><a href="@controllers.routes.ViewController.market()">@Messages(constants.Form.MARKET)</a></li>
+                                            }
+                                            case constants.User.ZONE => {
+                                                <li><a href="@controllers.routes.ViewController.zoneRequest()">@Messages(constants.Form.REQUEST)</a></li>
+                                                <li><a href="@controllers.routes.ViewController.zoneInformation()">@Messages(constants.Form.INFORMATION)</a></li>
+                                            }
+                                            case constants.User.ORGANIZATION => {
+                                                <li><a href="@controllers.routes.ViewController.organizationRequest()">@Messages(constants.Form.REQUEST)</a></li>
+                                                <li><a href="@controllers.routes.ViewController.organizationInformation()">@Messages(constants.Form.INFORMATION)</a></li>
+                                            }
+                                            case constants.User.GENESIS => {
+                                                <li><a href="@controllers.routes.ViewController.genesisRequest()">@Messages(constants.Form.REQUEST)</a></li>
+                                                <li><a href="@controllers.routes.ViewController.genesisInformation()">@Messages(constants.Form.INFORMATION)</a></li>
+                                            }
+                                            case _ => {}
+                                        }
+                                        <li><a class="notification" onclick="getForm(jsRoutes.controllers.NotificationController.notificationPage(0))"><i class="fa fa-bell" aria-hidden="true"></i>
+                                            @Messages(constants.Form.INBOX)
+                                            <span class="cmuk-badge mobileNotification" id="notificationBadge">0</span>
+                                        </a>
+                                        </li>
+                                        <li>
+                                            <a href="#">
+                                            @loginState.username
+                                            </a>
+                                            <div class="cmuk-navbar-dropdown">
+                                                <ul class="cmuk-nav cmuk-navbar-dropdown-nav">
+                                                    <li><a href="@controllers.routes.ViewController.profile()"><span cmuk-icon="user"></span>
+                                                            &nbsp;
+                                                        @Messages(constants.Form.PROFILE)</a>
+                                                    </li>
+                                                    <li>
+                                                        <a onclick="getForm(jsRoutes.controllers.AccountController.logoutForm())">
+                                                            <span cmuk-icon="sign-out"></span>
+                                                                &nbsp;
+                                                            @Messages(constants.Form.LOGOUT)</a>
+                                                    </li>
 
-                                              </ul>
-                                          </div>
-                                      </li>
-                                  }
-                              }
-                              </ul>
-                          </div>
-                      </div>
-                @*        End of Mobile Navigation bar *@
+                                                </ul>
+                                            </div>
+                                        </li>
+                                    }
+                                }
+                                </ul>
+                            </div>
+                        </div>
+                        @*        End of Mobile Navigation bar *@
 
 
-                  </div>
+                    </div>
                 </nav>
             </div>
         </header>
 
-    @* End of Header *@
+        @* End of Header *@
 
-    @* Main Container *@
-  <div class="mainSection">
-    @* Data container *@
-  <div class="dataContainer">
+        @* Main Container *@
+        <div class="mainSection">
+            @* Data container *@
+            <div class="dataContainer">
 
-    <div class="centerText">
-      @for(failure <- failures) {
-        <div class="cmuk-alert-danger" onclick="getForm(@failure.action)" cmuk-alert>
-          <a class="cmuk-alert-close" cmuk-close></a>
-          <p>@Messages(constants.Form.FAILURE) @Messages(failure.message)</p>
-        </div>
-      }
-      @for(warning <- warnings) {
-        <div class="cmuk-alert-warning" onclick="getForm(@warning.action)" cmuk-alert>
-          <a class="cmuk-alert-close" cmuk-close></a>
-          <p>@Messages(constants.Form.WARNING)
-            @Messages(warning.message)</p>
-        </div>
-      }
+                <div class="centerText">
+                    @for(failure <- failures) {
+                        <div class="cmuk-alert-danger" onclick="getForm(@failure.action)" cmuk-alert>
+                            <a class="cmuk-alert-close" cmuk-close></a>
+                            <p>@Messages(constants.Form.FAILURE) @Messages(failure.message)</p>
+                        </div>
+                    }
+                    @for(warning <- warnings) {
+                        <div class="cmuk-alert-warning" onclick="getForm(@warning.action)" cmuk-alert>
+                            <a class="cmuk-alert-close" cmuk-close></a>
+                            <p>@Messages(constants.Form.WARNING)
+                                @Messages(warning.message)</p>
+                        </div>
+                    }
 
-      @for(success <- successes) {
-        <div class="cmuk-alert-success" onclick="getForm(@success.action)" cmuk-alert>
-          <a class="cmuk-alert-close" cmuk-close></a>
-          <p>@Messages(constants.Form.SUCCESS) @Messages(success.message)</p>
-        </div>
-      }
-      @for(info <- infos) {
-        <div class="cmuk-alert-primary" onclick="getForm(@info.action)" cmuk-alert>
-          <a class="cmuk-alert-close" cmuk-close></a>
-          <p>>@Messages(constants.Form.INFORMATION) @Messages(info.message)</p>
-        </div>
-      }
-    </div>
-    <div class="pageContent">
-      <div class="leftSide">
-      @left
-      </div>
-      <div class="middle">
-      @center
-      </div>
-      <div class="rightSide">
-      @right
-      </div>
-    </div>
-
-    <div class="modal" id="commonModal">
-      <div class="modalContent" id="commonModalContent">
+                    @for(success <- successes) {
+                        <div class="cmuk-alert-success" onclick="getForm(@success.action)" cmuk-alert>
+                            <a class="cmuk-alert-close" cmuk-close></a>
+                            <p>@Messages(constants.Form.SUCCESS) @Messages(success.message)</p>
+                        </div>
+                    }
+                    @for(info <- infos) {
+                        <div class="cmuk-alert-primary" onclick="getForm(@info.action)" cmuk-alert>
+                            <a class="cmuk-alert-close" cmuk-close></a>
+                            <p>>@Messages(constants.Form.INFORMATION) @Messages(info.message)</p>
+                        </div>
+                    }
+                </div>
+                <div class="pageContent">
+                    <div class="leftSide">
+                    @left
                     </div>
-    </div>
+                    <div class="middle">
+                    @center
+                    </div>
+                    <div class="rightSide">
+                    @right
+                    </div>
+                </div>
+
+                <div class="modal" id="commonModal">
+                    <div class="modalContent" id="commonModalContent">
+                    </div>
+                </div>
 
 
-    <div class = "modal centerScreen" id="loading">
-      <img src="@routes.Assets.versioned("images/loading.gif")" alt = "@Messages(constants.Form.LOADING)"/>
-    </div>
+                <div class = "modal centerScreen" id="loading">
+                    <img src="@routes.Assets.versioned("images/loading.gif")" alt = "@Messages(constants.Form.LOADING)"/>
+                </div>
 
-  </div>
-    @* End of Data container *@
+            </div>
+            @* End of Data container *@
 
-  <div class = "modal centerScreen hidden" id="connectionError">
-    <img src="@routes.Assets.versioned("images/exclamation.png")" alt = "@Messages(constants.Form.CONNECTION_ERROR)"/>
-    <div>@Messages(constants.Form.CONNECTION_ERROR)</div>
-  </div>
+            <div class = "modal centerScreen hidden" id="connectionError">
+                <img src="@routes.Assets.versioned("images/exclamation.png")" alt = "@Messages(constants.Form.CONNECTION_ERROR)"/>
+                <div>@Messages(constants.Form.CONNECTION_ERROR)</div>
+            </div>
 
-    @* Footer *@
-  <div class="footer">
-    <div class="container">
-      <div class="copyright float-right">
-            &copy;
-        <script>document.write(new Date().getFullYear())</script>
-        <a href="" target="_blank">Commit</a>
-      </div>
-    </div>
-  </div>
-    @* End of Footer *@
+            @* Footer *@
+            <div class="footer">
+                <div class="container">
+                    <div class="copyright float-right">
+                                &copy;
+                        <script>document.write(new Date().getFullYear())</script>
+                        <a href="" target="_blank">Commit</a>
+                    </div>
+                </div>
+            </div>
+            @* End of Footer *@
 
-  </div>
+        </div>
 
-    @* End of MainContainer *@
+        @* End of MainContainer *@
 
 
         <script src="@routes.Assets.versioned("javascripts/style/ajaxLoading.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/style/alert.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/style/modal.js")" type="text/javascript"></script>
-  <script src="@routes.Assets.versioned("javascripts/style/sideBar.js")" type="text/javascript"></script>
-  <script src="@routes.Assets.versioned("javascripts/style/copyText.js")" type="text/javascript"></script>
-  <script src="@routes.Assets.versioned("javascripts/style/navigationBar.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.versioned("javascripts/style/sideBar.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.versioned("javascripts/style/copyText.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.versioned("javascripts/style/navigationBar.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/style/hideElement.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/style/delete.js")" type="text/javascript"></script>
     </body>

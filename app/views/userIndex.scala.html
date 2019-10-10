@@ -1,13 +1,12 @@
 @import controllers.actions.LoginState
 @(failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
-@common(Messages(constants.User.HOME), failures, warnings, successes, infos)(Html(""))(center)(Html(""))
+@common(Messages(constants.Form.HOME), failures, warnings, successes, infos)(Html(""))(center)(Html(""))
 
 @center = {
     <div class="flexContainer">
         <div id="commonHome" class="flexItem flexGrowth"></div>
     </div>
-    <script src="@routes.Assets.versioned("javascripts/showHideUploadUpdateButton.js")" type="text/javascript"></script>
     <div class="centerText">
         <button onclick="getForm(jsRoutes.controllers.AddOrganizationController.addOrganizationForm())">@Messages(constants.Form.ADD_ORGANIZATION)</button>
         <button onclick="getForm(jsRoutes.controllers.AddZoneController.addZoneForm())">@Messages(constants.Form.ADD_ZONE)</button>

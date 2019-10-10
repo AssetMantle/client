@@ -52,7 +52,7 @@ class RedeemAssetController @Inject()(messagesControllerComponents: MessagesCont
   }
 
   def blockchainRedeemAssetForm: Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.blockchain.redeemAsset(views.companion.blockchain.RedeemAsset.form))
+    Ok(views.html.component.blockchain.redeemAsset())
   }
 
   def blockchainRedeemAsset: Action[AnyContent] = Action { implicit request =>

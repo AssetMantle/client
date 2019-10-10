@@ -9,9 +9,9 @@
 <div id="@Seq(zoneKYC.id, zoneKYC.documentType).mkString("")">
 @form(action = routes.AddZoneController.updateZoneKYCDocumentStatus, 'onkeypress -> "submitFormOnEnter(event,this)") {
         @CSRF.formField
-        @inputText(updateZoneKYCDocumentStatusForm(constants.FormField.ZONE_ID.name).copy(value = Some(zoneKYC.id)), '_label -> Messages(constants.FormField.ZONE_ID.name), 'placeholder -> Messages(constants.FormField.ZONE_ID.name), 'required -> true, 'class -> "cmuk-input hidden", 'readonly -> true)
-        @inputText(updateZoneKYCDocumentStatusForm(constants.FormField.DOCUMENT_TYPE.name).copy(value = Some(zoneKYC.documentType)), '_label -> Messages(constants.FormField.DOCUMENT_TYPE.name), 'placeholder -> Messages(constants.FormField.DOCUMENT_TYPE.name), 'required -> true, 'class -> "cmuk-input hidden", 'readonly -> true)
-        @checkbox(updateZoneKYCDocumentStatusForm(constants.Form.STATUS), '_label -> Messages(constants.Form.STATUS), 'placeholder -> Messages(constants.Form.STATUS), 'required -> true, 'class -> "cmuk-checkbox hidden", 'id -> Seq(zoneKYC.id, zoneKYC.documentType, constants.Form.STATUS).mkString(""))
+        @inputText(updateZoneKYCDocumentStatusForm(constants.FormField.ZONE_ID.name).copy(value = Some(zoneKYC.id)), '_label -> Messages(constants.FormField.ZONE_ID.name), 'placeholder -> Messages(constants.FormField.ZONE_ID.name), 'required -> true, 'class -> "hidden", 'readonly -> true)
+        @inputText(updateZoneKYCDocumentStatusForm(constants.FormField.DOCUMENT_TYPE.name).copy(value = Some(zoneKYC.documentType)), '_label -> Messages(constants.FormField.DOCUMENT_TYPE.name), 'placeholder -> Messages(constants.FormField.DOCUMENT_TYPE.name), 'required -> true, 'class -> "hidden", 'readonly -> true)
+        @checkbox(updateZoneKYCDocumentStatusForm(constants.Form.STATUS), '_label -> Messages(constants.Form.STATUS), 'placeholder -> Messages(constants.Form.STATUS), 'required -> true, 'class -> "hidden", 'id -> Seq(zoneKYC.id, zoneKYC.documentType, constants.Form.STATUS).mkString(""))
 
         @if(updateZoneKYCDocumentStatusForm.hasGlobalErrors) {
             <ul>
