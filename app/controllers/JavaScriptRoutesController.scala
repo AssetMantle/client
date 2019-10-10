@@ -30,7 +30,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.AddOrganizationController.userStoreOrganizationKYC,
         routes.javascript.AddOrganizationController.userUpdateOrganizationKYCForm,
         routes.javascript.AddOrganizationController.userUpdateOrganizationKYC,
-        routes.javascript.AddOrganizationController.reviewOrganizationCompletionForm,
+        routes.javascript.AddOrganizationController.reviewAddOrganizationOnCompletionForm,
         routes.javascript.AddOrganizationController.viewPendingVerifyOrganizationRequests,
         routes.javascript.AddOrganizationController.viewOrganizationVerificationBankAccountDetail,
         routes.javascript.AddOrganizationController.viewKYCDocuments,

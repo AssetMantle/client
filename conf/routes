@@ -192,8 +192,8 @@ GET         /master/storeUserOrganizationKYCDocument                     control
 GET         /master/userUpdateOrganizationKYC                            controllers.AddOrganizationController.userUpdateOrganizationKYCForm(documentType: String)
 GET         /master/userUpdateOrganizationKYCDocument                    controllers.AddOrganizationController.userUpdateOrganizationKYC(name: String, documentType: String)
 
-GET         /master/reviewOrganizationKYC                                controllers.AddOrganizationController.reviewOrganizationCompletionForm
-POST        /master/reviewOrganizationKYC                                controllers.AddOrganizationController.reviewOrganizationCompletion
+GET         /master/reviewAddOrganizationOnCompletion                    controllers.AddOrganizationController.reviewAddOrganizationOnCompletionForm
+POST        /master/reviewAddOrganizationOnCompletion                    controllers.AddOrganizationController.reviewAddOrganizationOnCompletion
 GET         /master/viewVerifyOrganizationRequests                       controllers.AddOrganizationController.viewPendingVerifyOrganizationRequests
 GET         /master/viewOrganizationVerificationBankAccountDetail        controllers.AddOrganizationController.viewOrganizationVerificationBankAccountDetail(organizationID: String)
 GET         /master/viewOrganizationKYCDocuments                         controllers.AddOrganizationController.viewKYCDocuments(organizationID: String)
@@ -246,8 +246,8 @@ POST        /master/confirmBuyerBidDetail                                control
 GET         /master/confirmSellerBid                                     controllers.ConfirmSellerBidController.confirmSellerBidForm(requestID: String)
 POST        /master/confirmSellerBid                                     controllers.ConfirmSellerBidController.confirmSellerBid
 
-GET         /master/confirmSellerBidDetail                                controllers.ConfirmSellerBidController.confirmSellerBidDetailForm(buyerAddress: String, pegHash: String, bid:Int)
-POST        /master/confirmSellerBidDetail                                controllers.ConfirmSellerBidController.confirmSellerBidDetail
+GET         /master/confirmSellerBidDetail                               controllers.ConfirmSellerBidController.confirmSellerBidDetailForm(buyerAddress: String, pegHash: String, bid:Int)
+POST        /master/confirmSellerBidDetail                               controllers.ConfirmSellerBidController.confirmSellerBidDetail
 
 GET         /master/issueAssetRequest                                    controllers.IssueAssetController.issueAssetRequestForm(id: String)
 POST        /master/issueAssetRequest                                    controllers.IssueAssetController.issueAssetRequest

@@ -10,12 +10,21 @@ class Form(template: String, val route: Call) {
 
 object Form {
 
+  //Account
   val SIGN_UP = new Form("SIGN_UP", routes.AccountController.signUp())
   val LOGIN = new Form("LOGIN", routes.AccountController.login())
   val LOGOUT = new Form("LOGOUT", routes.AccountController.logout())
   val CHANGE_PASSWORD = new Form("CHANGE_PASSWORD", routes.AccountController.changePassword())
   val EMAIL_OTP_FORGOT_PASSWORD = new Form("EMAIL_OTP_FORGOT_PASSWORD", routes.AccountController.emailOTPForgotPassword())
   val FORGOT_PASSWORD = new Form("FORGOT_PASSWORD", routes.AccountController.forgotPassword())
+
+  //AddOrganization
+  val ADD_ORGANIZATION = new Form("ADD_ORGANIZATION", routes.AddOrganizationController.addOrganization())
+  val USER_UPDATE_UBOS = new Form("USER_UPDATE_UBOS", routes.AddOrganizationController.userUpdateUBOs())
+  val ORGANIZATION_BANK_ACCOUNT_DETAIL = new Form("ORGANIZATION_BANK_ACCOUNT_DETAIL", routes.AddOrganizationController.organizationBankAccountDetail())
+  val REVIEW_ADD_ORGANIZATION_ON_COMPLETION = new Form("REVIEW_ADD_ORGANIZATION_ON_COMPLETION", routes.AddOrganizationController.reviewAddOrganizationOnCompletion())
+  val VERIFY_ORGANIZATION = new Form("VERIFY_ORGANIZATION", routes.AddOrganizationController.verifyOrganization())
+  val REJECT_VERIFY_ORGANIZATION_REQUEST = new Form("REJECT_VERIFY_ORGANIZATION_REQUEST", routes.AddOrganizationController.rejectVerifyOrganizationRequest())
 
   //BLOCKCHAIN_FORMS
   val BLOCKCHAIN_ADD_KEY = new Form("BLOCKCHAIN_ADD_KEY", routes.AddKeyController.blockchainAddKey())
@@ -119,7 +128,7 @@ object Form {
   val INVITE = "INVITE"
   val UPDATE_STATUS = "UPDATE_STATUS"
   val ZONE_STATUS = "ZONE_STATUS"
-  val ORGANIZATION_STATUS= "ORGANIZATION_STATUS"
+  val ORGANIZATION_STATUS = "ORGANIZATION_STATUS"
   val STATUS_UPDATED = "STATUS_UPDATED"
   val UNAUTHORIZED_TRANSACTION = "UNAUTHORIZED_TRANSACTION"
   val HOME = "HOME"
@@ -205,7 +214,6 @@ object Form {
   //Blockchain
   val ADD_KEY = "ADD_KEY"
   val ADD_ZONE = "ADD_ZONE"
-  val ADD_ORGANIZATION = "ADD_ORGANIZATION"
   val ADD_TRADER = "ADD_TRADER"
   val SEND_COIN = "SEND_COIN"
   val SET_ACL = "SET_ACL"
@@ -302,7 +310,6 @@ object Form {
   val VERIFY_MOBILE_NUMBER = "VERIFY_MOBILE_NUMBER"
   val VERIFY_TRADER = "VERIFY_TRADER"
   val MODIFY_TRADER = "MODIFY_TRADER"
-  val VERIFY_ORGANIZATION = "VERIFY_ORGANIZATION"
   val VERIFIED_STATUS = "VERIFIED_STATUS"
   val COMPLETION_STATUS = "COMPLETION_STATUS"
   val VERIFY_ZONE = "VERIFY_ZONE"
@@ -328,7 +335,6 @@ object Form {
   val BANK_NAME = "BANK_NAME"
   val SWIFT_CODE = "SWIFT_CODE"
   val BANK_ADDRESS = "BANK_ADDRESS"
-  val ORGANIZATION_BANK_ACCOUNT_DETAIL = "ORGANIZATION_BANK_ACCOUNT_DETAIL"
   val ORGANIZATION_UBO_DETAIL = "ORGANIZATION_UBO_DETAIL"
   val NOTE_NEW_KEY_DETAILS = "NOTE_NEW_KEY_DETAILS"
   val CONFIRM_NOTE_NEW_KEY_DETAILS = "CONFIRM_NOTE_NEW_KEY_DETAILS"
@@ -347,7 +353,6 @@ object Form {
   val REJECT = "REJECT"
   val REJECT_ISSUE_ASSET_REQUEST = "REJECT_ISSUE_ASSET_REQUEST"
   val REJECT_ISSUE_FIAT_REQUEST = "REJECT_ISSUE_FIAT_REQUEST"
-  val REJECT_VERIFY_ORGANIZATION_REQUEST = "REJECT_VERIFY_ORGANIZATION_REQUEST"
   val REJECT_VERIFY_TRADER_REQUEST = "REJECT_VERIFY_TRADER_REQUEST"
   val REJECT_VERIFY_ZONE_REQUEST = "REJECT_VERIFY_ZONE_REQUEST"
   val ISSUE_ASSET_INVOICE = "ISSUE_ASSET_INVOICE"
