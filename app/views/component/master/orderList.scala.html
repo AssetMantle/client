@@ -13,7 +13,7 @@
             @loginState.acl match {
                 case Some(acl) => {
                     @if(acl.buyerExecuteOrder) {
-                        <button class="width btn btn-primary btn-sm" onclick="getForm(jsRoutes.controllers.BuyerExecuteOrderController.buyerExecuteOrderForm('@unModeratedBuyOrder.id'))">@Messages(constants.Form.BUYER_EXECUTE_ORDER)</button>
+                        <button class="width btn btn-primary btn-sm" onclick="getForm(jsRoutes.controllers.BuyerExecuteOrderController.buyerExecuteOrderForm('@unModeratedBuyOrder.id'))">@Messages(constants.Form.BUYER_EXECUTE_ORDER.button)</button>
                     } <br>
                     }
                 case _ => {}

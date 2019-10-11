@@ -28,7 +28,7 @@
                         <span cmuk-icon="check"></span><br>
                         <button type="button" class="cmuk-button cmuk-button-danger cmuk-button-small" onclick="verifyReject(this, '@Seq("#", zoneKYC.id, zoneKYC.documentType).mkString("")', '@Seq(zoneKYC.id, zoneKYC.documentType, constants.Form.STATUS).mkString("")', false)">@Messages(constants.Form.REJECT)</button>
                     } else {
-                        <span cmuk-icon="ban"></span><br>
+                        <span cmuk-icon="close"></span><br>
                         <button type="button" class="cmuk-button cmuk-button-success cmuk-button-small" onclick="verifyReject(this, '@Seq("#", zoneKYC.id, zoneKYC.documentType).mkString("")', '@Seq(zoneKYC.id, zoneKYC.documentType, constants.Form.STATUS).mkString("")', true)">@Messages(constants.Form.APPROVE)</button>
                     }
                 }

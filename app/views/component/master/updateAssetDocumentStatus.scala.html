@@ -28,7 +28,7 @@
                     <span cmuk-icon="check"></span>
                     <button type="button" class="cmuk-button cmuk-button-danger cmuk-button-small" onclick="verifyReject(this, '@Seq("#", file.id, file.documentType).mkString("")', '@Seq(file.id, file.documentType, constants.Form.STATUS).mkString("")', false)">@Messages(constants.Form.REJECT)</button>
                 } else {
-                    <span cmuk-icon="ban"></span>
+                    <span cmuk-icon="close"></span>
                     <button type="button" class="cmuk-button cmuk-button-success cmuk-button-small" onclick="verifyReject(this, '@Seq("#", file.id, file.documentType).mkString("")', '@Seq(file.id, file.documentType, constants.Form.STATUS).mkString("")', true)">@Messages(constants.Form.APPROVE)</button>
                 }
             }

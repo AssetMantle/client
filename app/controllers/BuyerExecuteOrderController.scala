@@ -24,7 +24,7 @@ class BuyerExecuteOrderController @Inject()(messagesControllerComponents: Messag
     implicit request =>
       try {
         val negotiation = blockchainNegotiations.Service.get(orderID)
-        withUsernameToken.Ok(views.html.component.master.buyerExecuteOrder(views.companion.master.BuyerExecuteOrder.form, negotiation.sellerAddress, negotiation.assetPegHash))
+        withUsernameToken.Ok(views.html.component.master.buyerExecuteOrder(sellerAddress = negotiation.sellerAddress, pegHash = negotiation.assetPegHash))
       } catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
@@ -66,7 +66,7 @@ class BuyerExecuteOrderController @Inject()(messagesControllerComponents: Messag
   }
 
   def moderatedBuyerExecuteOrderForm(buyerAddress: String, sellerAddress: String, pegHash: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.moderatedBuyerExecuteOrder(views.companion.master.ModeratedBuyerExecuteOrder.form, buyerAddress, sellerAddress, pegHash))
+    Ok(views.html.component.master.moderatedBuyerExecuteOrder(buyerAddress = buyerAddress, sellerAddress = sellerAddress, pegHash = pegHash))
   }
 
   def moderatedBuyerExecuteOrder: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>

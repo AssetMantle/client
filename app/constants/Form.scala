@@ -4,6 +4,7 @@ import controllers.routes
 import play.api.mvc.Call
 
 class Form(template: String, val route: Call) {
+  val button: String = Seq("FORM", template, "BUTTON").mkString(".")
   val legend: String = Seq("FORM", template, "LEGEND").mkString(".")
   val submit: String = Seq("FORM", template, "SUBMIT").mkString(".")
 }
@@ -32,6 +33,9 @@ object Form {
   val VERIFY_ZONE = new Form("VERIFY_ZONE", routes.AddZoneController.verifyZone())
   val REJECT_VERIFY_ZONE_REQUEST = new Form("REJECT_VERIFY_ZONE_REQUEST", routes.AddZoneController.rejectVerifyZoneRequest())
 
+  //BuyerExecuteOrder
+  val BUYER_EXECUTE_ORDER = new Form("BUYER_EXECUTE_ORDER", routes.BuyerExecuteOrderController.buyerExecuteOrder())
+  val MODERATED_BUYER_EXECUTE_ORDER = new Form("MODERATED_BUYER_EXECUTE_ORDER", routes.BuyerExecuteOrderController.moderatedBuyerExecuteOrder())
 
   //BLOCKCHAIN_FORMS
   val BLOCKCHAIN_ADD_KEY = new Form("BLOCKCHAIN_ADD_KEY", routes.AddKeyController.blockchainAddKey())
@@ -143,6 +147,7 @@ object Form {
   val ASSETS_OWNED = "ASSETS OWNED"
   val FIATS_OWNED = "FIATS OWNED"
   val FIATS_TOTAL_VALUE = "FIATS TOTAL VALUE"
+  val BUYER_EXECUTE_ORDER_LIST = "BUYER_EXECUTE_ORDER_LIST"
 
   //File Upload
   val BROWSE = "BROWSE"
@@ -280,9 +285,7 @@ object Form {
   val REDEEM_FIAT = "REDEEM_FIAT"
   val RECEIVE_NOTIFICATIONS = "RECEIVE_NOTIFICATIONS"
   val SELLER_EXECUTE_ORDER = "SELLER_EXECUTE_ORDER"
-  val BUYER_EXECUTE_ORDER = "BUYER_EXECUTE_ORDER"
   val MODERATED_SELLER_EXECUTE_ORDER = "MODERATED_SELLER_EXECUTE_ORDER"
-  val MODERATED_BUYER_EXECUTE_ORDER = "MODERATED_BUYER_EXECUTE_ORDER"
   val CHANGE_BUYER_BID = "CHANGE_BUYER_BID"
   val CHANGE_SELLER_BID = "CHANGE_SELLER_BID"
   val CONFIRM_BUYER_BID = "CONFIRM_BUYER_BID"
