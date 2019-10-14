@@ -100,7 +100,14 @@ object Form {
   val SEND_ASSET = new Form("SEND_ASSET", routes.SendAssetController.sendAsset())
   val BLOCKCHAIN_SEND_ASSET = new Form("BLOCKCHAIN_SEND_ASSET", routes.SendAssetController.blockchainSendAsset())
 
+  //SendCoinController
+  val SEND_COIN = new Form("SEND_COIN", routes.SendCoinController.sendCoin())
+  val FAUCET_REQUEST = new Form("FAUCET_REQUEST", routes.SendCoinController.faucetRequest())
+  val REJECT_FAUCET_REQUEST = new Form("REJECT_FAUCET_REQUEST", routes.SendCoinController.rejectFaucetRequest())
+  val APPROVE_FAUCET_REQUEST = new Form("APPROVE_FAUCET_REQUEST", routes.SendCoinController.approveFaucetRequests())
   val BLOCKCHAIN_SEND_COIN = new Form("BLOCKCHAIN_SEND_COIN", routes.SendCoinController.blockchainSendCoin())
+
+
   val BLOCKCHAIN_SEND_FIAT = new Form("BLOCKCHAIN_SEND_FIAT", routes.SendFiatController.blockchainSendFiat())
   val BLOCKCHAIN_SET_ACL = new Form("BLOCKCHAIN_SET_ACL", routes.SetACLController.blockchainSetACL())
   val BLOCKCHAIN_SET_BUYER_FEEDBACK = new Form("BLOCKCHAIN_SET_BUYER_FEEDBACK", routes.SetBuyerFeedbackController.blockchainSetBuyerFeedback())
@@ -272,7 +279,6 @@ object Form {
   //Blockchain
   val ADD_KEY = "ADD_KEY"
   val ADD_TRADER = "ADD_TRADER"
-  val SEND_COIN = "SEND_COIN"
   val SET_BUYER_FEEDBACK = "SET_BUYER_FEEDBACK"
   val SET_SELLER_FEEDBACK = "SET_SELLER_FEEDBACK"
   val TAKER_ADDRESS = "TAKER_ADDRESS"
@@ -375,11 +381,7 @@ object Form {
   val CONFIRM_NOTE_NEW_KEY_DETAILS = "CONFIRM_NOTE_NEW_KEY_DETAILS"
 
   //MasterTransaction
-  val APPROVE_FAUCET_REQUEST = "APPROVE_FAUCET_REQUEST"
-  val REJECT_FAUCET_REQUEST = "REJECT_FAUCET_REQUEST"
-  val PENDING_VERIFY_ZONE_REQUESTS = "PENDING_VERIFY_ZONE_REQUESTS"
   val COUPON = "COUPON"
-  val REQUEST_COIN = "REQUEST_COIN"
   val REQUEST_ID = "REQUEST_ID"
   val APPROVE = "APPROVE"
   val REJECT = "REJECT"

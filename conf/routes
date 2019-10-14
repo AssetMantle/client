@@ -309,8 +309,8 @@ POST        /master/sendAsset                                            control
 GET         /master/sendCoin                                             controllers.SendCoinController.sendCoinForm
 POST        /master/sendCoin                                             controllers.SendCoinController.sendCoin
 
-GET         /master/requestCoins                                         controllers.SendCoinController.requestCoinsForm
-POST        /master/requestCoins                                         controllers.SendCoinController.requestCoins
+GET         /master/faucetRequest                                        controllers.SendCoinController.faucetRequestForm
+POST        /master/faucetRequest                                        controllers.SendCoinController.faucetRequest
 
 GET         /master/viewPendingFaucetRequests                            controllers.SendCoinController.viewPendingFaucetRequests
 GET         /master/approveFaucetRequests                                controllers.SendCoinController.approveFaucetRequestsForm(requestID: String, accountID: String)

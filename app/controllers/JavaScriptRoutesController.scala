@@ -181,7 +181,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.SendAssetController.sendAssetForm,
         routes.javascript.SendAssetController.blockchainSendAssetForm,
 
-        routes.javascript.SendCoinController.requestCoinsForm,
+        routes.javascript.SendCoinController.faucetRequestForm,
         routes.javascript.SendCoinController.approveFaucetRequestsForm,
         routes.javascript.SendCoinController.rejectFaucetRequestForm,
         routes.javascript.SendCoinController.viewPendingFaucetRequests,
