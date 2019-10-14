@@ -126,10 +126,9 @@ POST        /master/verifyMobileNumber                                   control
 GET         /master/verifyEmailAddress                                   controllers.VerifyEmailAddressController.verifyEmailAddressForm
 POST        /master/verifyEmailAddress                                   controllers.VerifyEmailAddressController.verifyEmailAddress
 
-GET         /master/traderInvitation                                     controllers.SetACLController.traderInvitationForm
-POST        /master/traderInvitation                                     controllers.SetACLController.traderInvitation
+GET         /master/inviteTrader                                         controllers.SetACLController.inviteTraderForm
+POST        /master/inviteTrader                                         controllers.SetACLController.inviteTrader
 GET         /master/addTraderRequest                                     controllers.SetACLController.addTraderRequestForm(requestID: String)
-POST        /master/addTraderRequest                                     controllers.SetACLController.addTraderRequest
 GET         /master/addTrader                                            controllers.SetACLController.addTraderForm
 POST        /master/addTrader                                            controllers.SetACLController.addTrader
 GET         /master/userUploadOrUpdateTraderKYCView                      controllers.SetACLController.userUploadOrUpdateTraderKYCView
@@ -138,8 +137,8 @@ POST        /master/userUploadTraderKYC                                  control
 GET         /master/userStoreTraderKYC                                   controllers.SetACLController.userStoreTraderKYC(name: String, documentType: String)
 GET         /master/userUpdateTraderKYCForm                              controllers.SetACLController.userUpdateTraderKYCForm(documentType: String)
 GET         /master/userUpdateTraderKYC                                  controllers.SetACLController.userUpdateTraderKYC(name: String, documentType: String)
-GET         /master/reviewTraderCompletion                               controllers.SetACLController.reviewTraderCompletionForm
-POST        /master/reviewTraderCompletion                               controllers.SetACLController.reviewTraderCompletion
+GET         /master/reviewAddTraderOnCompletion                          controllers.SetACLController.reviewAddTraderOnCompletionForm
+POST        /master/reviewAddTraderOnCompletion                          controllers.SetACLController.reviewAddTraderOnCompletion
 
 GET         /master/zoneVerifyTrader                                     controllers.SetACLController.zoneVerifyTraderForm(accountID: String, organizationID: String)
 POST        /master/zoneVerifyTrader                                     controllers.SetACLController.zoneVerifyTrader

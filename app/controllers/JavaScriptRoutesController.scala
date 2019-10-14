@@ -191,7 +191,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.SendFiatController.sendFiatForm,
         routes.javascript.SendFiatController.blockchainSendFiatForm,
 
-        routes.javascript.SetACLController.traderInvitationForm,
+        routes.javascript.SetACLController.inviteTraderForm,
         routes.javascript.SetACLController.addTraderForm,
         routes.javascript.SetACLController.userUploadOrUpdateTraderKYCView,
         routes.javascript.SetACLController.userUploadTraderKYCForm,
@@ -199,7 +199,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.SetACLController.userStoreTraderKYC,
         routes.javascript.SetACLController.userUpdateTraderKYCForm,
         routes.javascript.SetACLController.userUpdateTraderKYC,
-        routes.javascript.SetACLController.reviewTraderCompletionForm,
+        routes.javascript.SetACLController.reviewAddTraderOnCompletionForm,
         routes.javascript.SetACLController.viewTradersInOrganization,
         routes.javascript.SetACLController.viewTradersInOrganizationForZone,
         routes.javascript.SetACLController.viewTradersInOrganizationForGenesis,

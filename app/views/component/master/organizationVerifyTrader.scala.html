@@ -3,83 +3,65 @@
 @import views.html.base._
 @import views.companion.master.VerifyTrader
 
-@(verifyTraderForm: Form[VerifyTrader.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@(verifyTraderForm: Form[VerifyTrader.Data] = VerifyTrader.form)( implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@baseForm(constants.Form.ORGANIZATION_VERIFY_TRADER, verifyTraderForm) {
+    @inputText(verifyTraderForm(constants.FormField.ACCOUNT_ID.name), '_label -> Messages(constants.FormField.ACCOUNT_ID.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.ACCOUNT_ID.name), 'required -> true)
+    @inputText(verifyTraderForm(constants.FormField.ORGANIZATION_ID.name), '_label -> Messages(constants.FormField.ORGANIZATION_ID.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.ORGANIZATION_ID.name), 'required -> true)
+    <span>
+        @Messages(constants.FormField.ISSUE_ASSET.name)
+        @checkbox(verifyTraderForm(constants.FormField.ISSUE_ASSET.name), '_label -> Messages(constants.FormField.ISSUE_ASSET.name), 'class -> "cmuk-checkbox")
+    </span>
+    <span>
+        @Messages(constants.FormField.ISSUE_FIAT.name)
+        @checkbox(verifyTraderForm(constants.FormField.ISSUE_FIAT.name), '_label -> Messages(constants.FormField.ISSUE_FIAT.name), 'class -> "cmuk-checkbox")
+    </span>
+    <span>
+        @Messages(constants.FormField.SEND_ASSET.name)
+        @checkbox(verifyTraderForm(constants.FormField.SEND_ASSET.name), '_label -> Messages(constants.FormField.SEND_ASSET.name), 'class -> "cmuk-checkbox")
+    </span>
 
-@form(action = routes.SetACLController.organizationVerifyTrader, 'onkeypress -> "submitFormOnEnter(event,this)") {
-    <div class="latest_card-header latest_card-header-primary text-center">
-        <h4 class="latest_card-title">@Messages(constants.Form.VERIFY_TRADER)</h4>
-    </div>
-    <div class="latest_card-body ml-cb">
-        @CSRF.formField
-        @inputText(verifyTraderForm(constants.FormField.ACCOUNT_ID.name), '_label -> Messages(constants.FormField.ACCOUNT_ID.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.ACCOUNT_ID.name), 'required -> true)
-        @inputText(verifyTraderForm(constants.FormField.ORGANIZATION_ID.name), '_label -> Messages(constants.FormField.ORGANIZATION_ID.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.ORGANIZATION_ID.name), 'required -> true)
-        <span>
-            @Messages(constants.FormField.ISSUE_ASSET.name)
-            @checkbox(verifyTraderForm(constants.FormField.ISSUE_ASSET.name), '_label -> Messages(constants.FormField.ISSUE_ASSET.name), 'class -> "cmuk-checkbox")
-        </span>
-        <span>
-            @Messages(constants.FormField.ISSUE_FIAT.name)
-            @checkbox(verifyTraderForm(constants.FormField.ISSUE_FIAT.name), '_label -> Messages(constants.FormField.ISSUE_FIAT.name), 'class -> "cmuk-checkbox")
-        </span>
-        <span>
-            @Messages(constants.FormField.SEND_ASSET.name)
-            @checkbox(verifyTraderForm(constants.FormField.SEND_ASSET.name), '_label -> Messages(constants.FormField.SEND_ASSET.name), 'class -> "cmuk-checkbox")
-        </span>
-
-        <span>
-            @Messages(constants.FormField.SEND_FIAT.name)
-            @checkbox(verifyTraderForm(constants.FormField.SEND_FIAT.name), '_label -> Messages(constants.FormField.SEND_FIAT.name), 'class -> "cmuk-checkbox")
-        </span>
-        <span>
-            @Messages(constants.FormField.REDEEM_ASSET.name)
-            @checkbox(verifyTraderForm(constants.FormField.REDEEM_ASSET.name), '_label -> Messages(constants.FormField.REDEEM_ASSET.name), 'class -> "cmuk-checkbox")
-        </span>
-        <span>
-            @Messages(constants.FormField.REDEEM_FIAT.name)
-            @checkbox(verifyTraderForm(constants.FormField.REDEEM_FIAT.name), '_label -> Messages(constants.FormField.REDEEM_FIAT.name), 'class -> "cmuk-checkbox")
-        </span>
-        <span>
-            @Messages(constants.FormField.SELLER_EXECUTE_ORDER.name)
-            @checkbox(verifyTraderForm(constants.FormField.SELLER_EXECUTE_ORDER.name), '_label -> Messages(constants.FormField.SELLER_EXECUTE_ORDER.name), 'class -> "cmuk-checkbox")
-        </span>
-        <span>
-            @Messages(constants.FormField.BUYER_EXECUTE_ORDER.name)
-            @checkbox(verifyTraderForm(constants.FormField.BUYER_EXECUTE_ORDER.name), '_label -> Messages(constants.FormField.BUYER_EXECUTE_ORDER.name), 'class -> "cmuk-checkbox")
-        </span>
-        <span>
-            @Messages(constants.FormField.CHANGE_BUYER_BID.name)
-            @checkbox(verifyTraderForm(constants.FormField.CHANGE_BUYER_BID.name), '_label -> Messages(constants.FormField.CHANGE_BUYER_BID.name), 'class -> "cmuk-checkbox")
-        </span>
-        <span>
-            @Messages(constants.FormField.CHANGE_SELLER_BID.name)
-            @checkbox(verifyTraderForm(constants.FormField.CHANGE_SELLER_BID.name), '_label -> Messages(constants.FormField.CHANGE_SELLER_BID.name), 'class -> "cmuk-checkbox")
-        </span>
-        <span>
-            @Messages(constants.FormField.CONFIRM_BUYER_BID.name)
-            @checkbox(verifyTraderForm(constants.FormField.CONFIRM_BUYER_BID.name), '_label -> Messages(constants.FormField.CONFIRM_BUYER_BID.name), 'class -> "cmuk-checkbox")
-        </span>
-        <span>
-            @Messages(constants.FormField.CONFIRM_SELLER_BID.name)
-            @checkbox(verifyTraderForm(constants.FormField.CONFIRM_SELLER_BID.name), '_label -> Messages(constants.FormField.CONFIRM_SELLER_BID.name), 'class -> "cmuk-checkbox")
-        </span>
-        <span>
-            @Messages(constants.FormField.NEGOTIATION.name)
-            @checkbox(verifyTraderForm(constants.FormField.NEGOTIATION.name), '_label -> Messages(constants.FormField.NEGOTIATION.name), 'class -> "cmuk-checkbox")
-        </span>
-        <span>
-            @Messages(constants.FormField.RELEASE_ASSET.name)
-            @checkbox(verifyTraderForm(constants.FormField.RELEASE_ASSET.name), '_label -> Messages(constants.FormField.RELEASE_ASSET.name), 'class -> "cmuk-checkbox")
-        </span>
-      @inputText(verifyTraderForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.GAS.name), 'required -> true)
-      @inputPassword(verifyTraderForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PASSWORD.name), 'required -> true)
-
-        @if(verifyTraderForm.hasGlobalErrors) {
-            <ul>
-            @for(error <- verifyTraderForm.globalErrors) {
-                <li>@error.format</li>
-            }
-            </ul>
-        }
-        <button type="button" class="btn btn-sm btn-primary" onclick="submitForm(this)">@Messages(constants.Form.VERIFY_TRADER)</button>
-    </div>
+    <span>
+        @Messages(constants.FormField.SEND_FIAT.name)
+        @checkbox(verifyTraderForm(constants.FormField.SEND_FIAT.name), '_label -> Messages(constants.FormField.SEND_FIAT.name), 'class -> "cmuk-checkbox")
+    </span>
+    <span>
+        @Messages(constants.FormField.REDEEM_ASSET.name)
+        @checkbox(verifyTraderForm(constants.FormField.REDEEM_ASSET.name), '_label -> Messages(constants.FormField.REDEEM_ASSET.name), 'class -> "cmuk-checkbox")
+    </span>
+    <span>
+        @Messages(constants.FormField.REDEEM_FIAT.name)
+        @checkbox(verifyTraderForm(constants.FormField.REDEEM_FIAT.name), '_label -> Messages(constants.FormField.REDEEM_FIAT.name), 'class -> "cmuk-checkbox")
+    </span>
+    <span>
+        @Messages(constants.FormField.SELLER_EXECUTE_ORDER.name)
+        @checkbox(verifyTraderForm(constants.FormField.SELLER_EXECUTE_ORDER.name), '_label -> Messages(constants.FormField.SELLER_EXECUTE_ORDER.name), 'class -> "cmuk-checkbox")
+    </span>
+    <span>
+        @Messages(constants.FormField.BUYER_EXECUTE_ORDER.name)
+        @checkbox(verifyTraderForm(constants.FormField.BUYER_EXECUTE_ORDER.name), '_label -> Messages(constants.FormField.BUYER_EXECUTE_ORDER.name), 'class -> "cmuk-checkbox")
+    </span>
+    <span>
+        @Messages(constants.FormField.CHANGE_BUYER_BID.name)
+        @checkbox(verifyTraderForm(constants.FormField.CHANGE_BUYER_BID.name), '_label -> Messages(constants.FormField.CHANGE_BUYER_BID.name), 'class -> "cmuk-checkbox")
+    </span>
+    <span>
+        @Messages(constants.FormField.CHANGE_SELLER_BID.name)
+        @checkbox(verifyTraderForm(constants.FormField.CHANGE_SELLER_BID.name), '_label -> Messages(constants.FormField.CHANGE_SELLER_BID.name), 'class -> "cmuk-checkbox")
+    </span>
+    <span>
+        @Messages(constants.FormField.CONFIRM_BUYER_BID.name)
+        @checkbox(verifyTraderForm(constants.FormField.CONFIRM_BUYER_BID.name), '_label -> Messages(constants.FormField.CONFIRM_BUYER_BID.name), 'class -> "cmuk-checkbox")
+    </span>
+    <span>
+        @Messages(constants.FormField.CONFIRM_SELLER_BID.name)
+        @checkbox(verifyTraderForm(constants.FormField.CONFIRM_SELLER_BID.name), '_label -> Messages(constants.FormField.CONFIRM_SELLER_BID.name), 'class -> "cmuk-checkbox")
+    </span>
+    <span>
+        @Messages(constants.FormField.NEGOTIATION.name)
+        @checkbox(verifyTraderForm(constants.FormField.NEGOTIATION.name), '_label -> Messages(constants.FormField.NEGOTIATION.name), 'class -> "cmuk-checkbox")
+    </span>
+    <span>
+        @Messages(constants.FormField.RELEASE_ASSET.name)
+        @checkbox(verifyTraderForm(constants.FormField.RELEASE_ASSET.name), '_label -> Messages(constants.FormField.RELEASE_ASSET.name), 'class -> "cmuk-checkbox")
+    </span>
 }

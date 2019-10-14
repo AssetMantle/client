@@ -1,0 +1,42 @@
+@import controllers.actions.LoginState
+@import helper._
+@import models.master.{Organization, Trader, TraderKYC, Zone}
+@import play.api.Logger
+@import views.companion.master.ReviewAddTraderOnCompletion
+@import views.html.base._
+
+@(reviewAddTraderOnCompletionForm: Form[ReviewAddTraderOnCompletion.Data] = ReviewAddTraderOnCompletion.form, trader: Trader, organization: Organization, zone: Zone, traderKYCs: Seq[TraderKYC])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, module: String, logger: Logger, loginState: LoginState = null)
+@baseForm(constants.Form.REVIEW_ADD_TRADER_ON_COMPLETION, reviewAddTraderOnCompletionForm) {
+    <div>@Messages(constants.Form.TRADER_DETAILS):<br>
+        <span class="red">@Messages(constants.Form.NAME)</span>: @trader.name <br>
+    </div>
+    <br>
+    <div>@Messages(constants.Form.ORGANIZATION_DETAILS):<br>
+        <span class="red">@Messages(constants.Form.ORGANIZATION_ID)</span>: @organization.id <br>
+        <span class="red">@Messages(constants.Form.NAME)</span>: @organization.name <br>
+        <span class="red">@Messages(constants.Form.ABBREVIATION)</span>: @organization.abbreviation.getOrElse("") <br>
+        <span class="red">@Messages(constants.Form.ESTABLISHMENT_DATE)</span>: @organization.establishmentDate <br>
+        <span class="red">@Messages(constants.Form.EMAIL)</span>: @organization.email <br>
+    </div>
+    <br>
+    <div>@Messages(constants.Form.ZONE_DETAILS):<br>
+        <span class="red">@Messages(constants.Form.NAME)</span>: @zone.name <br>
+        <span class="red">@Messages(constants.Form.CURRENCY)</span>: @zone.currency <br>
+    </div>
+    <br>
+    <div id="traderKYCs">@Messages(constants.Form.ORGANIZATION_KYC_FILES): <br>
+        @for(traderKYC <- traderKYCs) {
+            @component.master.commonDocumentViewer(traderKYC) {
+                @routes.FileController.userAccessedTraderKYCFile(traderKYC.documentType)
+            } {
+
+            } {
+                <span>@traderKYC.documentType</span>
+            }
+        }
+    </div>
+    <br>
+    @Messages(constants.Form.COMPLETION):
+    <span>@checkbox(reviewAddTraderOnCompletionForm(constants.Form.COMPLETION), '_label -> Messages(constants.Form.COMPLETION), 'placeholder -> Messages(constants.Form.COMPLETION), 'class -> "cmuk-checkbox", 'required -> true)</span>
+    <button type="button" class="btn-sm btn btn-primary" onclick="getForm(jsRoutes.controllers.SetACLController.userUploadOrUpdateTraderKYCView())">@Messages(constants.Form.BACK)</button>
+}

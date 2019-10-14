@@ -111,7 +111,17 @@ object Form {
   val SEND_FIAT = new Form("SEND_FIAT", routes.SendFiatController.sendFiat())
   val BLOCKCHAIN_SEND_FIAT = new Form("BLOCKCHAIN_SEND_FIAT", routes.SendFiatController.blockchainSendFiat())
 
+  //SetACLController
+  val INVITE_TRADER = new Form("INVITE_TRADER", routes.SetACLController.inviteTrader())
+  val ADD_TRADER = new Form("ADD_TRADER", routes.SetACLController.addTrader())
+  val REVIEW_ADD_TRADER_ON_COMPLETION = new Form("REVIEW_ADD_TRADER_ON_COMPLETION", routes.SetACLController.reviewAddTraderOnCompletion())
+  val ZONE_VERIFY_TRADER = new Form("ZONE_VERIFY_TRADER", routes.SetACLController.zoneVerifyTrader())
+  val ZONE_REJECT_VERIFY_TRADER_REQUEST = new Form("ZONE_REJECT_VERIFY_TRADER_REQUEST", routes.SetACLController.zoneRejectVerifyTraderRequest())
+  val ORGANIZATION_VERIFY_TRADER = new Form("ORGANIZATION_VERIFY_TRADER", routes.SetACLController.organizationVerifyTrader())
+  val MODIFY_TRADER = new Form("MODIFY_TRADER", routes.SetACLController.organizationModifyTrader())
+  val ORGANIZATION_REJECT_VERIFY_TRADER_REQUEST = new Form("ORGANIZATION_REJECT_VERIFY_TRADER_REQUEST", routes.SetACLController.organizationRejectVerifyTraderRequest())
   val BLOCKCHAIN_SET_ACL = new Form("BLOCKCHAIN_SET_ACL", routes.SetACLController.blockchainSetACL())
+
   val BLOCKCHAIN_SET_BUYER_FEEDBACK = new Form("BLOCKCHAIN_SET_BUYER_FEEDBACK", routes.SetBuyerFeedbackController.blockchainSetBuyerFeedback())
   val BLOCKCHAIN_SET_SELLER_FEEDBACK = new Form("BLOCKCHAIN_SET_SELLER_FEEDBACK", routes.SetSellerFeedbackController.blockchainSetSellerFeedback())
 
@@ -184,15 +194,11 @@ object Form {
   val VIEW = "VIEW"
   val TEAM = "TEAM"
   val PENDING = "PENDING"
-  val INVITE_TRADER = "INVITE_TRADER"
   val VERIFY = "VERIFY"
   val ZONE_KYC_FILES = "ZONE_KYC_FILES"
   val UPDATE_ZONE_KYC_STATUS = "UPDATE_ZONE_KYC_STATUS"
   val UPDATE_ORGANIZATION_KYC_STATUS = "UPDATE_ORGANIZATION_KYC_STATUS"
-  val UPDATE_TRADER_KYC_ZONE_STATUS = "UPDATE_TRADER_KYC_ZONE_STATUS"
-  val UPDATE_TRADER_KYC_ORGANIZATION_STATUS = "UPDATE_TRADER_KYC_ORGANIZATION_STATUS"
   val UPDATE_ASSET_DOCUMENT_STATUS = "UPDATE_ASSET_DOCUMENT_STATUS"
-  val INVITE = "INVITE"
   val UPDATE_STATUS = "UPDATE_STATUS"
   val ZONE_STATUS = "ZONE_STATUS"
   val ORGANIZATION_STATUS = "ORGANIZATION_STATUS"
@@ -279,8 +285,6 @@ object Form {
   val DELEGATOR_SHARES = "DELEGATOR_SHARES"
 
   //Blockchain
-  val ADD_KEY = "ADD_KEY"
-  val ADD_TRADER = "ADD_TRADER"
   val SET_BUYER_FEEDBACK = "SET_BUYER_FEEDBACK"
   val SET_SELLER_FEEDBACK = "SET_SELLER_FEEDBACK"
   val TAKER_ADDRESS = "TAKER_ADDRESS"
@@ -351,8 +355,6 @@ object Form {
   val VERIFY_EMAIL_ADDRESS = "VERIFY_EMAIL_ADDRESS"
   val OTP = "OTP"
   val VERIFY_MOBILE_NUMBER = "VERIFY_MOBILE_NUMBER"
-  val VERIFY_TRADER = "VERIFY_TRADER"
-  val MODIFY_TRADER = "MODIFY_TRADER"
   val VERIFIED_STATUS = "VERIFIED_STATUS"
   val COMPLETION_STATUS = "COMPLETION_STATUS"
   val LOADING = "LOADING"
@@ -386,7 +388,6 @@ object Form {
   val REQUEST_ID = "REQUEST_ID"
   val APPROVE = "APPROVE"
   val REJECT = "REJECT"
-  val REJECT_VERIFY_TRADER_REQUEST = "REJECT_VERIFY_TRADER_REQUEST"
   val SHIPMENT_DETAILS = "SHIPMENT_DETAILS"
   val COMDEX = "COMDEX"
   val ONLY_SUPPLIER = "ONLY_SUPPLIER"

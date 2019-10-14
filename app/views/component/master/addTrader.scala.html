@@ -3,24 +3,9 @@
 @import views.html.base._
 @import views.companion.master.AddTrader
 
-@(addTraderForm: Form[AddTrader.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
-@form(action = routes.SetACLController.addTrader, 'onkeypress -> "submitFormOnEnter(event,this)") {
-    <div class="latest_card-header latest_card-header-primary text-center">
-        <h4 class="latest_card-title">@Messages(constants.Form.ADD_TRADER)</h4>
-    </div>
-    <div class="latest_card-body">
-        @CSRF.formField
-        @inputText(addTraderForm(constants.FormField.ZONE_ID.name), '_label -> Messages(constants.FormField.ZONE_ID.name), 'placeholder -> Messages(constants.FormField.ZONE_ID.name), 'required -> true, 'class -> "cmuk-input")
-        @inputText(addTraderForm(constants.FormField.ORGANIZATION_ID.name), '_label -> Messages(constants.FormField.ORGANIZATION_ID.name), 'placeholder -> Messages(constants.FormField.ORGANIZATION_ID.name), 'required -> true, 'class -> "cmuk-input")
-        @inputText(addTraderForm(constants.FormField.NAME.name), '_label -> Messages(constants.FormField.NAME.name), 'placeholder -> Messages(constants.FormField.NAME.name), 'required -> true, 'class -> "cmuk-input")
-
-        @if(addTraderForm.hasGlobalErrors) {
-            <ul>
-            @for(error <- addTraderForm.globalErrors) {
-                <li>@error.format</li>
-            }
-            </ul>
-        }
-        <button type="button" class="btn btn-primary btn-sm" onclick="submitForm(this)">@Messages(constants.Form.NEXT)</button>
-    </div>
+@(addTraderForm: Form[AddTrader.Data] = AddTrader.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@baseForm(constants.Form.ADD_TRADER, addTraderForm) {
+    @inputText(addTraderForm(constants.FormField.ZONE_ID.name), '_label -> Messages(constants.FormField.ZONE_ID.name), 'placeholder -> Messages(constants.FormField.ZONE_ID.name), 'required -> true, 'class -> "cmuk-input")
+    @inputText(addTraderForm(constants.FormField.ORGANIZATION_ID.name), '_label -> Messages(constants.FormField.ORGANIZATION_ID.name), 'placeholder -> Messages(constants.FormField.ORGANIZATION_ID.name), 'required -> true, 'class -> "cmuk-input")
+    @inputText(addTraderForm(constants.FormField.NAME.name), '_label -> Messages(constants.FormField.NAME.name), 'placeholder -> Messages(constants.FormField.NAME.name), 'required -> true, 'class -> "cmuk-input")
 }
