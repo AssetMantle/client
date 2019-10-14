@@ -30,7 +30,7 @@
                 @loginState.acl match {
                     case Some(acl) => {
                         @if(acl.issueAsset) {
-                            <button onclick="getForm(jsRoutes.controllers.IssueAssetController.issueAssetDetailForm())">@Messages(constants.Form.ISSUE_ASSET_REQUEST)</button>
+                            <button onclick="getForm(jsRoutes.controllers.IssueAssetController.issueAssetDetailForm())">@Messages(constants.Form.ISSUE_ASSET_REQUEST.button)</button>
                         }
                     }
                     case _ => {}

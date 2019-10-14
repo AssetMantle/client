@@ -3,36 +3,16 @@
 @import views.html.base._
 @import views.companion.master.ConfirmIssueAssetTransaction
 
-@(confirmTransactionForm: Form[ConfirmIssueAssetTransaction.Data], asset: masterTransaction.IssueAssetRequest)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
-
+@(confirmIssueAssetTransactionForm: Form[ConfirmIssueAssetTransaction.Data] = ConfirmIssueAssetTransaction.form, asset: masterTransaction.IssueAssetRequest)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 <div id="assetDetail"></div>
-
-@form(action = routes.IssueAssetController.issueAssetRequest, 'onkeypress -> "submitFormOnEnter(event,this)") {
-    @CSRF.formField
-    <div class="latest_card-header latest_card-header-primary text-center">
-        <h4 class="latest_card-title">@Messages(constants.Form.ISSUE_ASSET_REQUEST)</h4>
-    </div>
-    <div >
-        <div class="latest_card-body ml-cb">
-            @inputText(confirmTransactionForm(constants.FormField.REQUEST_ID.name), '_label -> Messages(constants.FormField.REQUEST_ID.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.REQUEST_ID.name), 'required -> true)
-
-            @asset.physicalDocumentsHandledVia match {
-                case constants.Form.COMDEX => {}
-                case _ => {
-                    @inputText(confirmTransactionForm(constants.FormField.GAS.name).copy(value = Some(20000.toString)), '_label -> Messages(constants.FormField.GAS.name), 'class -> "cmuk-input", 'type -> "number", 'placeholder -> Messages(constants.FormField.GAS.name), 'required -> false)
-                    @inputPassword(confirmTransactionForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PASSWORD.name), 'required -> false)
-                }
-            }
-
-            @if(confirmTransactionForm.hasGlobalErrors) {
-                <ul>
-                @for(error <- confirmTransactionForm.globalErrors) {
-                    <li>@error.format</li>
-                }
-                </ul>
-            }
-            <button type="button" class="btn btn-primary btn-sm" onclick="submitForm(this)">@Messages(constants.Form.SUBMIT)</button>
-        </div>
-    </div>
+@baseForm(constants.Form.ISSUE_ASSET_REQUEST, confirmIssueAssetTransactionForm) {
+    @inputText(confirmIssueAssetTransactionForm(constants.FormField.REQUEST_ID.name), '_label -> Messages(constants.FormField.REQUEST_ID.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.REQUEST_ID.name), 'required -> true)
+    @asset.physicalDocumentsHandledVia match {
+        case constants.Form.COMDEX => {}
+        case _ => {
+            @inputText(confirmIssueAssetTransactionForm(constants.FormField.GAS.name).copy(value = Some(20000.toString)), '_label -> Messages(constants.FormField.GAS.name), 'class -> "cmuk-input", 'type -> "number", 'placeholder -> Messages(constants.FormField.GAS.name), 'required -> false)
+            @inputPassword(confirmIssueAssetTransactionForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PASSWORD.name), 'required -> false)
+        }
+    }
 }
-<script>componentResource('assetDetail', jsRoutes.controllers.IssueAssetController.assetDetail('@confirmTransactionForm.data(constants.FormField.REQUEST_ID.name)'))</script>
+<script>componentResource('assetDetail', jsRoutes.controllers.IssueAssetController.assetDetail('@confirmIssueAssetTransactionForm.data(constants.FormField.REQUEST_ID.name)'))</script>

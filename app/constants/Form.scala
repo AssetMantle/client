@@ -64,6 +64,14 @@ object Form {
   //ContactController
   val UPDATE_CONTACT = new Form("UPDATE_CONTACT", routes.ContactController.updateContact())
 
+  //IssueAssetController
+  val ISSUE_ASSET_REQUEST = new Form("ISSUE_ASSET_REQUEST", routes.IssueAssetController.issueAssetRequest())
+  val ISSUE_ASSET_DETAIL = new Form("ISSUE_ASSET_DETAIL", routes.IssueAssetController.issueAssetDetail())
+  val ISSUE_ASSET_OBL = new Form("ISSUE_ASSET_OBL", routes.IssueAssetController.issueAssetOBL())
+  val ISSUE_ASSET_INVOICE = new Form("ISSUE_ASSET_INVOICE", routes.IssueAssetController.issueAssetInvoice())
+  val REJECT_ISSUE_ASSET_REQUEST = new Form("REJECT_ISSUE_ASSET_REQUEST", routes.IssueAssetController.rejectIssueAssetRequest())
+  val ISSUE_ASSET = new Form("ISSUE_ASSET", routes.IssueAssetController.issueAsset())
+
 
   val BLOCKCHAIN_ISSUE_ASSET = new Form("BLOCKCHAIN_ISSUE_ASSET", routes.IssueAssetController.blockchainIssueAsset())
   val BLOCKCHAIN_ISSUE_FIAT = new Form("BLOCKCHAIN_ISSUE_FIAT", routes.IssueFiatController.blockchainIssueFiat())
@@ -293,9 +301,6 @@ object Form {
   val AWB_PROOF_HASH = "AWB_PROOF_HASH"
   val AMOUNT = "AMOUNT"
   val ACL_ADDRESS = "ACL_ADDRESS"
-  val ISSUE_ASSET = "ISSUE_ASSET"
-  val ISSUE_ASSET_REQUEST = "ISSUE_ASSET_REQUEST"
-  val ISSUE_ASSET_DOCUMENT = "ISSUE_ASSET_DOCUMENT"
   val ISSUE_FIAT = "ISSUE_FIAT"
   val ISSUE_FIAT_REQUEST = "ISSUE_FIAT_REQUEST"
   val SEND_ASSET = "SEND_ASSET"
@@ -371,11 +376,8 @@ object Form {
   val REQUEST_ID = "REQUEST_ID"
   val APPROVE = "APPROVE"
   val REJECT = "REJECT"
-  val REJECT_ISSUE_ASSET_REQUEST = "REJECT_ISSUE_ASSET_REQUEST"
   val REJECT_ISSUE_FIAT_REQUEST = "REJECT_ISSUE_FIAT_REQUEST"
   val REJECT_VERIFY_TRADER_REQUEST = "REJECT_VERIFY_TRADER_REQUEST"
-  val ISSUE_ASSET_INVOICE = "ISSUE_ASSET_INVOICE"
-  val ISSUE_ASSET_OBL = "ISSUE_ASSET_OBL"
   val SHIPMENT_DETAILS = "SHIPMENT_DETAILS"
   val COMDEX = "COMDEX"
   val ONLY_SUPPLIER = "ONLY_SUPPLIER"
