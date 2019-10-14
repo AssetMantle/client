@@ -133,6 +133,9 @@ object Form {
   //VerifyEmailAddressController
   val VERIFY_EMAIL_ADDRESS = new Form("VERIFY_EMAIL_ADDRESS", routes.VerifyEmailAddressController.verifyEmailAddress())
 
+  //VerifyMobileNumberController
+  val VERIFY_MOBILE_NUMBER = new Form("VERIFY_MOBILE_NUMBER", routes.VerifyMobileNumberController.verifyMobileNumber())
+
   val INDEX = "INDEX"
   val COMMIT = "COMMIT"
   val PROFILE = "PROFILE"
@@ -359,7 +362,6 @@ object Form {
   val MOBILE_NUMBER = "MOBILE_NUMBER"
   val EMAIL_ADDRESS = "EMAIL_ADDRESS"
   val OTP = "OTP"
-  val VERIFY_MOBILE_NUMBER = "VERIFY_MOBILE_NUMBER"
   val VERIFIED_STATUS = "VERIFIED_STATUS"
   val COMPLETION_STATUS = "COMPLETION_STATUS"
   val LOADING = "LOADING"
