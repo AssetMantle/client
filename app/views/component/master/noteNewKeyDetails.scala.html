@@ -2,7 +2,7 @@
 @import views.html.base._
 @import views.companion.master.NoteNewKeyDetails
 
-@(noteNewKeyDetailsForm: Form[NoteNewKeyDetails.Data], name: String, blockchainAddress: String, publicKey: String, seed: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(noteNewKeyDetailsForm: Form[NoteNewKeyDetails.Data] = NoteNewKeyDetails.form, name: String, blockchainAddress: String, publicKey: String, seed: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @Messages(constants.Form.NAME): @name <br/>
 @Messages(constants.Form.BLOCKCHAIN_ADDRESS): @blockchainAddress <br/>
