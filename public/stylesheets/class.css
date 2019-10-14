@@ -22,34 +22,9 @@
         max-height: 60%;
         overflow: auto;
     }
-
     table thead {
         font-size: 12px;
     }
-
-    .mobileNavigationBar {
-        background: #10292e;
-    }
-
-    .mobileNavigationBar li {
-        list-style: none;
-    }
-
-    .mobileNavigationBar a {
-        color: white;
-        padding: 14px 16px;
-        text-decoration: none;
-        font-size: 17px;
-        display: block;
-    }
-
-    .mobileNavigationBar a.NavigationBarMenuButton {
-        display: block;
-        position: absolute;
-        right: 0;
-        top: 0;
-    }
-
     .navigationBarLinks {
         display: none;
     }
@@ -66,7 +41,7 @@
         max-height: 60%;
         overflow: auto;
         max-width: 500px;
-        width: 300px;
+        min-width: 300px;
     }
 
     .NavigationBarMenuButton {
@@ -593,8 +568,7 @@ dl .info::after {
 .input-group-prepend span {
     color: #aaa !important;
 }
-
-.input-group input {
+.input-group input{
     width: 350px;
 }
 
@@ -759,4 +733,41 @@ dl .info::after {
 }
 .cmuk-tab>li>a{
     padding: 15px;
+}
+.tooltip {
+    position: relative;
+    display: inline-block;
+}
+
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: 140px;
+    background-color: #555;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px;
+    position: absolute;
+    z-index: 1;
+    bottom: 150%;
+    left: 50%;
+    margin-left: -75px;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.tooltip .tooltiptext::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #555 transparent transparent transparent;
+}
+
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
 }
