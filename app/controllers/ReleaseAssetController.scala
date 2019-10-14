@@ -21,7 +21,7 @@ class ReleaseAssetController @Inject()(messagesControllerComponents: MessagesCon
   private implicit val module: String = constants.Module.CONTROLLERS_RELEASE_ASSET
 
   def releaseAssetForm(ownerAddress: String, pegHash: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.releaseAsset(views.companion.master.ReleaseAsset.form, ownerAddress, pegHash))
+    Ok(views.html.component.master.releaseAsset(ownerAddress = ownerAddress, pegHash = pegHash))
   }
 
   def releaseAsset(): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
