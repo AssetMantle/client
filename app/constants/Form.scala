@@ -107,8 +107,10 @@ object Form {
   val APPROVE_FAUCET_REQUEST = new Form("APPROVE_FAUCET_REQUEST", routes.SendCoinController.approveFaucetRequests())
   val BLOCKCHAIN_SEND_COIN = new Form("BLOCKCHAIN_SEND_COIN", routes.SendCoinController.blockchainSendCoin())
 
-
+  //SendFiatController
+  val SEND_FIAT = new Form("SEND_FIAT", routes.SendFiatController.sendFiat())
   val BLOCKCHAIN_SEND_FIAT = new Form("BLOCKCHAIN_SEND_FIAT", routes.SendFiatController.blockchainSendFiat())
+
   val BLOCKCHAIN_SET_ACL = new Form("BLOCKCHAIN_SET_ACL", routes.SetACLController.blockchainSetACL())
   val BLOCKCHAIN_SET_BUYER_FEEDBACK = new Form("BLOCKCHAIN_SET_BUYER_FEEDBACK", routes.SetBuyerFeedbackController.blockchainSetBuyerFeedback())
   val BLOCKCHAIN_SET_SELLER_FEEDBACK = new Form("BLOCKCHAIN_SET_SELLER_FEEDBACK", routes.SetSellerFeedbackController.blockchainSetSellerFeedback())
@@ -325,7 +327,6 @@ object Form {
   val AWB_PROOF_HASH = "AWB_PROOF_HASH"
   val AMOUNT = "AMOUNT"
   val ACL_ADDRESS = "ACL_ADDRESS"
-  val SEND_FIAT = "SEND_FIAT"
   val RECEIVE_NOTIFICATIONS = "RECEIVE_NOTIFICATIONS"
   val NEGOTIATION = "NEGOTIATION"
   val NEGOTIATION_ID = "NEGOTIATION_ID"
