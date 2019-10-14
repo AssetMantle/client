@@ -11,7 +11,7 @@
         </div>
             @asset.status match{
                 case constants.Status.Asset.INCOMPLETE_DETAILS => {
-                    <button class="width btn btn-primary btn-sm" onclick="getForm(jsRoutes.controllers.IssueAssetController.issueAssetDetailForm('@asset.id'))">@Messages(constants.Form.ISSUE_ASSET_REQUEST.button)</button>
+                    <button class="width btn btn-primary btn-sm" onclick="getForm(jsRoutes.controllers.IssueAssetController.issueAssetDetailForm('@asset.id'))">@Messages(constants.Form.ISSUE_ASSET_REQUEST.legend)</button>
                 }
                 case constants.Status.Asset.LISTED_FOR_TRADE | constants.Status.Asset.UNDER_NEGOTIATION => {
                     <div class="centerText" >

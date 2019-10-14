@@ -4,7 +4,6 @@ import controllers.routes
 import play.api.mvc.Call
 
 class Form(template: String, val route: Call) {
-  val button: String = Seq("FORM", template, "BUTTON").mkString(".")
   val legend: String = Seq("FORM", template, "LEGEND").mkString(".")
   val submit: String = Seq("FORM", template, "SUBMIT").mkString(".")
 }
