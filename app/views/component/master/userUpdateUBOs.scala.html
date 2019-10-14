@@ -11,9 +11,9 @@
             @inputText(uboForm(constants.FormField.SHARE_PERCENTAGE.name), '_label -> Messages(constants.FormField.SHARE_PERCENTAGE.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.SHARE_PERCENTAGE.name), 'required -> false)
             @inputText(uboForm(constants.FormField.RELATIONSHIP.name), '_label -> Messages(constants.FormField.RELATIONSHIP.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.RELATIONSHIP.name), 'required -> false)
             @inputText(uboForm(constants.FormField.TITLE.name), '_label -> Messages(constants.FormField.TITLE.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.TITLE.name), 'required -> false)
-            <button type="button" class="cmuk-button cmuk-button-primary" onclick="deleteElementBySource(this)">@Messages(constants.Form.DELETE)</button>
+            <button class="cmuk-button cmuk-button-primary" onclick="deleteElementBySource(this)">@Messages(constants.Form.DELETE)</button>
         </div>
     }
 }
-<button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.AddOrganizationController.addOrganizationForm())">@Messages(constants.Form.BACK)</button>
-<button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.AddOrganizationController.organizationBankAccountDetailForm())">@Messages(constants.Form.NEXT)</button>
+<button class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.AddOrganizationController.addOrganizationForm())">@Messages(constants.Form.BACK)</button>
+<button class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.AddOrganizationController.organizationBankAccountDetailForm())">@Messages(constants.Form.NEXT)</button>

@@ -25,8 +25,8 @@
 </div>
 
 @if(constants.File.TRADER_ASSET_DOCUMENT_TYPES_UPLOAD_PAGE_NEXT.forall(files.map(_.documentType).contains)) {
-    <button type="button" id="issueAssetDocuments" onclick="getForm(jsRoutes.controllers.IssueAssetController.issueAssetRequestForm('@id'))">@Messages(constants.Form.NEXT)</button>
+    <button id="issueAssetDocuments" onclick="getForm(jsRoutes.controllers.IssueAssetController.issueAssetRequestForm('@id'))">@Messages(constants.Form.NEXT)</button>
 }else {
-    <button type="button" id="issueAssetDocuments" onclick="getForm(jsRoutes.controllers.IssueAssetController.issueAssetRequestForm('@id'))" disabled="disabled">@Messages(constants.Form.NEXT)</button>
+    <button id="issueAssetDocuments" onclick="getForm(jsRoutes.controllers.IssueAssetController.issueAssetRequestForm('@id'))" disabled="disabled">@Messages(constants.Form.NEXT)</button>
 
 }

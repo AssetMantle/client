@@ -11,8 +11,8 @@
     } {
       <span class="red">@Messages(constants.Form.ACCOUNT_ID)</span>: @faucetRequest.accountID <br>
       <span class="red">@Messages(constants.Form.AMOUNT)</span>: @faucetRequest.amount <br>
-      <button type="button" class="cmuk-button cmuk-button-success cmuk-button-small" onclick="getForm(jsRoutes.controllers.SendCoinController.approveFaucetRequestsForm('@faucetRequest.id', '@faucetRequest.accountID'))">@Messages(constants.Form.APPROVE)</button>
-      <button type="button" class="cmuk-button cmuk-button-danger cmuk-button-small" onclick="getForm(jsRoutes.controllers.SendCoinController.rejectFaucetRequestForm('@faucetRequest.id'))">@Messages(constants.Form.REJECT)</button>
+      <button class="cmuk-button cmuk-button-success cmuk-button-small" onclick="getForm(jsRoutes.controllers.SendCoinController.approveFaucetRequestsForm('@faucetRequest.id', '@faucetRequest.accountID'))">@Messages(constants.Form.APPROVE)</button>
+      <button class="cmuk-button cmuk-button-danger cmuk-button-small" onclick="getForm(jsRoutes.controllers.SendCoinController.rejectFaucetRequestForm('@faucetRequest.id'))">@Messages(constants.Form.REJECT)</button>
     }
   }
   </div>

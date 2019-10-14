@@ -10,7 +10,7 @@
             <div class="leftText">
                 <span class="red">@Messages(constants.Form.OWNER_ADDRESS)</span>: @releaseAsset.ownerAddress <br>
                 <span class="red">@Messages(constants.Form.PEG_HASH)</span>: @releaseAsset.pegHash <br>
-                <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.ReleaseAssetController.releaseAssetForm('@releaseAsset.ownerAddress', '@releaseAsset.pegHash'))">@Messages(constants.Form.RELEASE_ASSET.legend)</button>
+                <button class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.ReleaseAssetController.releaseAssetForm('@releaseAsset.ownerAddress', '@releaseAsset.pegHash'))">@Messages(constants.Form.RELEASE_ASSET.legend)</button>
             </div>
         </div>
     </div>
