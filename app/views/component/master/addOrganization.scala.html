@@ -8,12 +8,11 @@
 @commonForm(constants.Form.ADD_ORGANIZATION, addOrganizationForm) {
     <div>
     @for(zone <- zones) {
-        <button class="cmuk-button cmuk-button-primary" onclick="fillZoneIDField('@zone.id')">
-            @Messages(constants.Form.NAME): @zone.name <br>
-            @Messages(constants.Form.CURRENCY): @zone.currency <br>
-            @Messages(constants.Form.ZONE_ID): @zone.id <br>
-        </button>
-        <br>
+        <button class="cmuk-button cmuk-button-secondary cmuk-button-small" onclick="fillZoneIDField('@zone.id')">
+            @Messages(constants.Form.NAME): @zone.name<br>
+            @Messages(constants.Form.CURRENCY): @zone.currency<br>
+            @Messages(constants.Form.ZONE_ID): @zone.id<br>
+        </button><br>
         }
     </div>
     @inputText(addOrganizationForm(constants.FormField.ZONE_ID.name), '_label -> Messages(constants.FormField.ZONE_ID.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.ZONE_ID.name), 'id -> "zoneID", 'required -> true)
