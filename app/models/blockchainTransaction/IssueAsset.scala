@@ -6,12 +6,14 @@ import akka.actor.ActorSystem
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Abstract.BaseTransaction
+import models.masterTransaction.IssueAssetRequest
 import models.{blockchain, master, masterTransaction}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
 import queries.GetAccount
+import queries.responses.AccountResponse.Response
 import slick.jdbc.JdbcProfile
 import transactions.responses.TransactionResponse.BlockResponse
 
@@ -167,27 +169,27 @@ class IssueAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tra
 
   object Service {
 
-    def create(issueAsset: IssueAsset): String = Await.result(add(IssueAsset(from = issueAsset.from, to = issueAsset.to, documentHash = issueAsset.documentHash, assetType = issueAsset.assetType, assetPrice = issueAsset.assetPrice, quantityUnit = issueAsset.quantityUnit, assetQuantity = issueAsset.assetQuantity, status = issueAsset.status, txHash = issueAsset.txHash, ticketID = issueAsset.ticketID, mode = issueAsset.mode, code = issueAsset.code, moderated = issueAsset.moderated, gas = issueAsset.gas, takerAddress = issueAsset.takerAddress)), Duration.Inf)
+    def create(issueAsset: IssueAsset): Future[String] = add(IssueAsset(from = issueAsset.from, to = issueAsset.to, documentHash = issueAsset.documentHash, assetType = issueAsset.assetType, assetPrice = issueAsset.assetPrice, quantityUnit = issueAsset.quantityUnit, assetQuantity = issueAsset.assetQuantity, status = issueAsset.status, txHash = issueAsset.txHash, ticketID = issueAsset.ticketID, mode = issueAsset.mode, code = issueAsset.code, moderated = issueAsset.moderated, gas = issueAsset.gas, takerAddress = issueAsset.takerAddress))
 
-    def markTransactionSuccessful(ticketID: String, txHash: String): Int = Await.result(updateTxHashAndStatusOnTicketID(ticketID, Option(txHash), status = Option(true)), Duration.Inf)
+    def markTransactionSuccessful(ticketID: String, txHash: String): Future[Int] = updateTxHashAndStatusOnTicketID(ticketID, Option(txHash), status = Option(true))
 
-    def markTransactionFailed(ticketID: String, code: String): Int = Await.result(updateStatusAndCodeOnTicketID(ticketID, status = Option(false), code), Duration.Inf)
+    def markTransactionFailed(ticketID: String, code: String): Future[Int] = updateStatusAndCodeOnTicketID(ticketID, status = Option(false), code)
 
     def getTicketIDsOnStatus(): Seq[String] = Await.result(getTicketIDsWithNullStatus, Duration.Inf)
 
-    def getTransaction(ticketID: String): IssueAsset = Await.result(findByTicketID(ticketID), Duration.Inf)
+    def getTransaction(ticketID: String): Future[IssueAsset] = findByTicketID(ticketID)
 
     def getTransactionHash(ticketID: String): Option[String] = Await.result(findTransactionHashByTicketID(ticketID), Duration.Inf)
 
     def getMode(ticketID: String): String = Await.result(findModeByTicketID(ticketID), Duration.Inf)
 
-    def updateTransactionHash(ticketID: String, txHash: String): Int = Await.result(updateTxHashOnTicketID(ticketID = ticketID, txHash = Option(txHash)), Duration.Inf)
+    def updateTransactionHash(ticketID: String, txHash: String): Future[Int] =updateTxHashOnTicketID(ticketID = ticketID, txHash = Option(txHash))
 
   }
 
   object Utility {
-    def onSuccess(ticketID: String, blockResponse: BlockResponse): Future[Unit] = Future {
-      try {
+    def onSuccess(ticketID: String, blockResponse: BlockResponse): Future[Unit] =  {
+      /*try {
         Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
         val issueAsset = Service.getTransaction(ticketID)
         Thread.sleep(sleepTime)
@@ -206,17 +208,74 @@ class IssueAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tra
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
           throw new BaseException(constants.Response.PSQL_EXCEPTION)
         case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
+      }*/
+      val markTransactionSuccessful=Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
+      val issueAsset = Service.getTransaction(ticketID)
+      Thread.sleep(sleepTime)
+      def responseAccount(issueAsset:IssueAsset)=getAccount.Service.get(issueAsset.to)
+      val assetRequest = masterTransactionIssueAssetRequests.Service.getIssueAssetByTicketID(ticketID)
+      def addresses(issueAsset:IssueAsset)={
+        val to=masterAccounts.Service.getId(issueAsset.to)
+        val from=masterAccounts.Service.getId(issueAsset.from)
+        for{
+          to<-to
+          from<-from
+        }yield (to,from)
+      }
+
+      (for{
+        _<-markTransactionSuccessful
+        issueAsset<-issueAsset
+        responseAccount<-responseAccount(issueAsset)
+        assetRequest<-assetRequest
+        (to,from)<- addresses(issueAsset)
+      }yield{
+        responseAccount.value.assetPegWallet.foreach(assets => assets.foreach(asset => {
+          blockchainAssets.Service.insertOrUpdate(pegHash = asset.pegHash, documentHash = asset.documentHash, assetType = asset.assetType, assetPrice = asset.assetPrice, assetQuantity = asset.assetQuantity, quantityUnit = asset.quantityUnit, locked = asset.locked, moderated = asset.moderated, takerAddress = if (asset.takerAddress == "") null else Option(asset.takerAddress), ownerAddress = issueAsset.to, dirtyBit = true)
+          if(assetRequest.documentHash == asset.documentHash){
+            masterTransactionIssueAssetRequests.Service.markListedForTrade(ticketID, Option(asset.pegHash))
+          }
+        }))
+        blockchainAccounts.Service.markDirty(issueAsset.from)
+        utilitiesNotification.send(to, constants.Notification.SUCCESS, blockResponse.txhash)
+        utilitiesNotification.send(from, constants.Notification.SUCCESS, blockResponse.txhash)
+
+      }).recover{
+        case baseException: BaseException => logger.error(baseException.failure.message, baseException)
+          throw new BaseException(constants.Response.PSQL_EXCEPTION)
+        case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
       }
     }
-
-    def onFailure(ticketID: String, message: String): Future[Unit] = Future {
-      try {
+    def onFailure(ticketID: String, message: String): Future[Unit] =  {
+      /*try {
         Service.markTransactionFailed(ticketID, message)
         val issueAsset = Service.getTransaction(ticketID)
         masterTransactionIssueAssetRequests.Service.markFailed(ticketID)
         utilitiesNotification.send(masterAccounts.Service.getId(issueAsset.to), constants.Notification.FAILURE, message)
         utilitiesNotification.send(masterAccounts.Service.getId(issueAsset.from), constants.Notification.FAILURE, message)
       } catch {
+        case baseException: BaseException => logger.error(baseException.failure.message, baseException)
+      }*/
+      val markTransactionFailed=Service.markTransactionFailed(ticketID, message)
+      val issueAsset = Service.getTransaction(ticketID)
+      val markFailed = masterTransactionIssueAssetRequests.Service.markFailed(ticketID)
+      def addresses(issueAsset:IssueAsset)={
+        val to=masterAccounts.Service.getId(issueAsset.to)
+        val from=masterAccounts.Service.getId(issueAsset.from)
+        for{
+          to<-to
+          from<-from
+        }yield (to,from)
+      }
+      (for{
+        _<-markTransactionFailed
+        _<-markFailed
+        issueAsset<-issueAsset
+        (to,from) <-  addresses(issueAsset)
+      }yield{
+        utilitiesNotification.send(to, constants.Notification.FAILURE, message)
+        utilitiesNotification.send(from, constants.Notification.FAILURE, message)
+      }).recover{
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
     }

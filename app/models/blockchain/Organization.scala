@@ -110,7 +110,7 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
 
     def getAddress(id: String): String = Await.result(getAddressById(id), Duration.Inf)
 
-    def getID(address: String): String = Await.result(getIdByAddress(address), Duration.Inf)
+    def getID(address: String): Future[String] = getIdByAddress(address)
 
     def getDirtyOrganizations: Seq[Organization] = Await.result(getOrganizationsByDirtyBit(dirtyBit = true), Duration.Inf)
 

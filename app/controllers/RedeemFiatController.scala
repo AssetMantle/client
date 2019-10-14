@@ -11,7 +11,7 @@ import play.api.{Configuration, Logger}
 import views.companion.blockchain.RedeemFiat
 import views.companion.master
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class RedeemFiatController @Inject()(messagesControllerComponents: MessagesControllerComponents, transaction: utilities.Transaction, blockchainZones: blockchain.Zones, blockchainACLAccounts: blockchain.ACLAccounts, withTraderLoginAction: WithTraderLoginAction, transactionsRedeemFiat: transactions.RedeemFiat, blockchainTransactionRedeemFiats: blockchainTransaction.RedeemFiats, withUsernameToken: WithUsernameToken)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
@@ -22,15 +22,19 @@ class RedeemFiatController @Inject()(messagesControllerComponents: MessagesContr
 
   private implicit val module: String = constants.Module.CONTROLLERS_REDEEM_FIAT
 
-  def redeemFiatForm(ownerAddress: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.redeemFiat(master.RedeemFiat.form, blockchainACLAccounts.Service.get(ownerAddress).zoneID))
+  def redeemFiatForm(ownerAddress: String): Action[AnyContent] = Action.async { implicit request =>
+
+    val address=blockchainACLAccounts.Service.get(ownerAddress)
+    for{
+      address<-address
+    }yield Ok(views.html.component.master.redeemFiat(master.RedeemFiat.form, address.zoneID))
   }
 
   def redeemFiat: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       master.RedeemFiat.form.bindFromRequest().fold(
         formWithErrors => {
-          BadRequest(views.html.component.master.redeemFiat(formWithErrors, formWithErrors.data(constants.Form.ZONE_ID)))
+          Future{BadRequest(views.html.component.master.redeemFiat(formWithErrors, formWithErrors.data(constants.Form.ZONE_ID)))}
         },
         redeemFiatData => {
           try {
@@ -47,6 +51,23 @@ class RedeemFiatController @Inject()(messagesControllerComponents: MessagesContr
             withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.FIAT_REDEEMED)))
           }
           catch {
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+          }
+          val toAddress = blockchainZones.Service.getAddress(redeemFiatData.zoneID)
+          def transactionProcess(toAddress:String)=transaction.process[blockchainTransaction.RedeemFiat, transactionsRedeemFiat.Request](
+            entity = blockchainTransaction.RedeemFiat(from = loginState.address, to = toAddress, redeemAmount = redeemFiatData.redeemAmount, gas = redeemFiatData.gas, ticketID = "", mode = transactionMode),
+            blockchainTransactionCreate = blockchainTransactionRedeemFiats.Service.create,
+            request = transactionsRedeemFiat.Request(transactionsRedeemFiat.BaseReq(from = loginState.address, gas = redeemFiatData.gas.toString), to = toAddress, password = redeemFiatData.password, redeemAmount = redeemFiatData.redeemAmount.toString, mode = transactionMode),
+            action = transactionsRedeemFiat.Service.post,
+            onSuccess = blockchainTransactionRedeemFiats.Utility.onSuccess,
+            onFailure = blockchainTransactionRedeemFiats.Utility.onFailure,
+            updateTransactionHash = blockchainTransactionRedeemFiats.Service.updateTransactionHash
+          )
+          (for{
+            toAddress<-toAddress
+            _<-transactionProcess(toAddress)
+          }yield withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ASSET_REDEEMED)))
+            ).recover{
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
         }

@@ -11,7 +11,7 @@ import play.api.{Configuration, Logger}
 import views.companion.blockchain.SetSellerFeedback
 import views.companion.master
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext,Future}
 
 @Singleton
 class SetSellerFeedbackController @Inject()(messagesControllerComponents: MessagesControllerComponents, transaction: utilities.Transaction, withTraderLoginAction: WithTraderLoginAction, transactionsSetSellerFeedback: transactions.SetSellerFeedback, blockchainTransactionSetSellerFeedbacks: blockchainTransaction.SetSellerFeedbacks, blockchainTraderFeedbackHistories: blockchain.TraderFeedbackHistories, withUsernameToken: WithUsernameToken)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
@@ -30,7 +30,7 @@ class SetSellerFeedbackController @Inject()(messagesControllerComponents: Messag
     implicit request =>
       master.SetSellerFeedback.form.bindFromRequest().fold(
         formWithErrors => {
-          BadRequest(views.html.component.master.setSellerFeedback(formWithErrors, formWithErrors.data(constants.Form.BUYER_ADDRESS), formWithErrors.data(constants.Form.PEG_HASH)))
+          Future{BadRequest(views.html.component.master.setSellerFeedback(formWithErrors, formWithErrors.data(constants.Form.BUYER_ADDRESS), formWithErrors.data(constants.Form.PEG_HASH)))}
         },
         setSellerFeedbackData => {
           try {
@@ -48,6 +48,15 @@ class SetSellerFeedbackController @Inject()(messagesControllerComponents: Messag
           catch {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
+          transaction.process[blockchainTransaction.SetSellerFeedback, transactionsSetSellerFeedback.Request](
+            entity = blockchainTransaction.SetSellerFeedback(from = loginState.address, to = setSellerFeedbackData.buyerAddress, pegHash = setSellerFeedbackData.pegHash, rating = setSellerFeedbackData.rating, gas = setSellerFeedbackData.gas, ticketID = "", mode = transactionMode),
+            blockchainTransactionCreate = blockchainTransactionSetSellerFeedbacks.Service.create,
+            request = transactionsSetSellerFeedback.Request(transactionsSetSellerFeedback.BaseReq(from = loginState.address, gas = setSellerFeedbackData.gas.toString), to = setSellerFeedbackData.buyerAddress, password = setSellerFeedbackData.password, pegHash = setSellerFeedbackData.pegHash, rating = setSellerFeedbackData.rating.toString, mode = transactionMode),
+            action = transactionsSetSellerFeedback.Service.post,
+            onSuccess = blockchainTransactionSetSellerFeedbacks.Utility.onSuccess,
+            onFailure = blockchainTransactionSetSellerFeedbacks.Utility.onFailure,
+            updateTransactionHash = blockchainTransactionSetSellerFeedbacks.Service.updateTransactionHash
+          )
         }
       )
   }

@@ -180,11 +180,11 @@ class Negotiations @Inject()(shutdownActors: ShutdownActor, masterAccounts: mast
 
     def getDirtyNegotiations: Seq[Negotiation] = Await.result(getNegotiationsByDirtyBit(dirtyBit = true), Duration.Inf)
 
-    def get(id: String): Negotiation = Await.result(findById(id), Duration.Inf)
+    def get(id: String): Future[Negotiation] = findById(id)
 
     def getBuyerNegotiationsByOrderAndZone(ids:Seq[String], addresses:Seq[String]): Future[Seq[Negotiation]] = findBuyerOrdersInZone(ids, addresses)
 
-    def getSellerNegotiationsByOrderAndZone(ids:Seq[String], addresses:Seq[String]): Seq[Negotiation] = Await.result(findSellerOrdersInZone(ids, addresses), Duration.Inf)
+    def getSellerNegotiationsByOrderAndZone(ids:Seq[String], addresses:Seq[String]):Future[Seq[Negotiation]] = findSellerOrdersInZone(ids, addresses)
 
     def markDirty(id: String): Int = Await.result(updateDirtyBitById(id, dirtyBit = true), Duration.Inf)
 

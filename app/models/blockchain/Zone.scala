@@ -118,7 +118,7 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
     def create(id: String, address: String, dirtyBit: Boolean): Future[String] =add(Zone(id = id, address = address, dirtyBit = dirtyBit))
 
-    def getAddress(id: String): String = Await.result(getAddressById(id), Duration.Inf)
+    def getAddress(id: String): Future[String] = getAddressById(id)
 
     def getID(address: String): Future[String] = getIdByAddress(address)
 

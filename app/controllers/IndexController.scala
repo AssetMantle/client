@@ -5,12 +5,13 @@ import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.blockchain
-import models.blockchain.ACLAccounts
+import models.blockchain.{ACLAccount, ACLAccounts}
 import models.master.{Accounts, Organizations, Zones}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
 import queries.GetAccount
+
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future, Promise}
 import scala.util.{Failure, Success}
@@ -22,7 +23,7 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
 
   def index: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      try {
+    /*  try {
         loginState.userType match {
           case constants.User.GENESIS =>
             withUsernameToken.Ok(views.html.genesisIndex())
@@ -43,6 +44,55 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
         }
       }
       catch {
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }*/
+      (loginState.userType match {
+        case constants.User.GENESIS =>
+          Future{withUsernameToken.Ok(views.html.genesisIndex())}
+        case constants.User.ZONE =>
+          val id=blockchainZones.Service.getID(loginState.address)
+          def zone(id:String)=masterZones.Service.get(id)
+          for{
+            id<-id
+            zone<-zone(id)
+          }yield withUsernameToken.Ok(views.html.zoneIndex(zone = zone))
+
+        case constants.User.ORGANIZATION =>
+          //withUsernameToken.Ok(views.html.organizationIndex(organization = masterOrganizations.Service.get(blockchainOrganizations.Service.getID(loginState.address))))
+          val id=blockchainOrganizations.Service.getID(loginState.address)
+          def organization(id:String)=masterOrganizations.Service.get(id)
+          for{
+            id<-id
+            organization<-organization(id)
+          }yield withUsernameToken.Ok(views.html.organizationIndex(organization = organization))
+        case constants.User.TRADER =>
+          val aclAccount = blockchainAclAccounts.Service.get(loginState.address)
+          val totalFiat=blockchainFiats.Service.getFiatPegWallet(loginState.address)
+          def getZoneAndOrganization(aclAccount:ACLAccount)={
+            val zone=masterZones.Service.get(aclAccount.zoneID)
+            val organization=masterOrganizations.Service.get(aclAccount.organizationID)
+            for{
+              zone<-zone
+              organization<-organization
+            }yield{(zone,organization)}
+          }
+          for{
+            aclAccount<-aclAccount
+            totalFiat<-totalFiat
+            (zone,organization)<- getZoneAndOrganization(aclAccount)
+          }yield withUsernameToken.Ok(views.html.traderIndex(totalFiat = totalFiat.map(_.transactionAmount.toInt).sum, zone = zone, organization = organization))
+
+        case constants.User.USER =>
+          Future{withUsernameToken.Ok(views.html.userIndex())}
+        case constants.User.UNKNOWN =>
+          Future{withUsernameToken.Ok(views.html.anonymousIndex())}
+        case constants.User.WITHOUT_LOGIN =>
+          val updateUserType=masterAccounts.Service.updateUserType(loginState.username, constants.User.UNKNOWN)
+          for{
+            _<-updateUserType
+          }yield withUsernameToken.Ok(views.html.anonymousIndex())
+
+      }).recover{
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }

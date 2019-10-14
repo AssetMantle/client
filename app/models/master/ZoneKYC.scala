@@ -122,13 +122,13 @@ class ZoneKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   object Service {
 
-    def create(zoneKYC: ZoneKYC): String = Await.result(add(ZoneKYC(id = zoneKYC.id, documentType = zoneKYC.documentType, fileName = zoneKYC.fileName, file = zoneKYC.file)), Duration.Inf)
+    def create(zoneKYC: ZoneKYC): Future[String] = add(ZoneKYC(id = zoneKYC.id, documentType = zoneKYC.documentType, fileName = zoneKYC.fileName, file = zoneKYC.file))
 
-    def updateOldDocument(zoneKYC: ZoneKYC): Int = Await.result(upsert(ZoneKYC(id = zoneKYC.id, documentType = zoneKYC.documentType, fileName = zoneKYC.fileName, file = zoneKYC.file)), Duration.Inf)
+    def updateOldDocument(zoneKYC: ZoneKYC): Future[Int] = upsert(ZoneKYC(id = zoneKYC.id, documentType = zoneKYC.documentType, fileName = zoneKYC.fileName, file = zoneKYC.file))
 
     def get(id: String, documentType: String): ZoneKYC = Await.result(findByIdDocumentType(id = id, documentType = documentType), Duration.Inf)
 
-    def getFileName(id: String, documentType: String): String = Await.result(getFileNameByIdDocumentType(id = id, documentType = documentType), Duration.Inf)
+    def getFileName(id: String, documentType: String): Future[String] = getFileNameByIdDocumentType(id = id, documentType = documentType)
 
     def getAllDocuments(id: String): Future[Seq[ZoneKYC]] =getAllDocumentsById(id = id)
 
@@ -144,7 +144,7 @@ class ZoneKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
     def checkFileExists(id: String, documentType: String): Boolean = Await.result(checkByIdAndDocumentType(id = id, documentType = documentType), Duration.Inf)
 
-    def checkFileNameExists(id: String, fileName: String): Boolean = Await.result(checkByIdAndFileName(id = id, fileName = fileName), Duration.Inf)
+    def checkFileNameExists(id: String, fileName: String): Future[Boolean] =checkByIdAndFileName(id = id, fileName = fileName)
 
   }
 

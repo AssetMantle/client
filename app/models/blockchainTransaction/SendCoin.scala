@@ -4,6 +4,7 @@ import akka.actor.ActorSystem
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Abstract.BaseTransaction
+import models.master.Account
 import models.masterTransaction.FaucetRequests
 import models.{blockchain, master}
 import org.postgresql.util.PSQLException
@@ -237,82 +238,89 @@ class SendCoins @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
     }*/
 
     def onFailure(ticketID: String, message: String) =  {
+      /*try {
+        Service.markTransactionFailed(ticketID, message)
+        val sendCoin = Service.getTransaction(ticketID)
+        utilitiesNotification.send(masterAccounts.Service.getId(sendCoin.to), constants.Notification.FAILURE, message)
+        utilitiesNotification.send(masterAccounts.Service.getId(sendCoin.from), constants.Notification.FAILURE, message)
+      } catch {
+        case baseException: BaseException => logger.error(baseException.failure.message, baseException)
+      }*/
 
-      val markFailed=Service.markTransactionFailed(ticketID, message)
-      val sendCoinFuture = Service.getTransaction(ticketID)
-      val result=for{_ <- markFailed ; sendCoin <- sendCoinFuture}yield{
-       utilitiesNotification.send(masterAccounts.Service.getId(sendCoin.to), constants.Notification.FAILURE, message)
-       utilitiesNotification.send(masterAccounts.Service.getId(sendCoin.from), constants.Notification.FAILURE, message)
+      val markTransactionFailed=Service.markTransactionFailed(ticketID, message)
+      val sendCoin = Service.getTransaction(ticketID)
+      def addresses(sendCoin:SendCoin)={
+        val to=masterAccounts.Service.getId(sendCoin.to)
+        val from=masterAccounts.Service.getId(sendCoin.from)
+        for{
+          to<-to
+          from<-from
+        }yield (to,from)
       }
-      result.recover{
+      (for{
+        _<-markTransactionFailed
+        sendCoin<-sendCoin
+        (to,from)<-addresses(sendCoin)
+      }yield{
+        utilitiesNotification.send(to, constants.Notification.FAILURE, message)
+        utilitiesNotification.send(from, constants.Notification.FAILURE, message)
+      }).recover{
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
     }
 
 
     def onSuccess(ticketID: String, blockResponse: BlockResponse) = {
-      val trxSuccess=Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
-      val sendCoinFuture = Service.getTransaction(ticketID)
-      val result={for {_<- trxSuccess; sendCoinResult <- sendCoinFuture} yield sendCoinResult}.flatMap{ sendCoin=>
+     /* try {
+        Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
+        val sendCoin = Service.getTransaction(ticketID)
+        blockchainAccounts.Service.markDirty(sendCoin.to)
+        blockchainAccounts.Service.markDirty(sendCoin.from)
+        val toAccount = masterAccounts.Service.getAccountByAddress(sendCoin.to)
+        if (toAccount.userType == constants.User.UNKNOWN) {
+          masterAccounts.Service.updateUserType(toAccount.id, constants.User.USER)
+        }
+        utilitiesNotification.send(toAccount.id, constants.Notification.SUCCESS, blockResponse.txhash)
+        utilitiesNotification.send(masterAccounts.Service.getId(sendCoin.from), constants.Notification.SUCCESS, blockResponse.txhash)
+      }
+      catch {
+        case baseException: BaseException => logger.error(baseException.failure.message, baseException)
+          throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      }*/
+
+      val markTransactionSuccessful=Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
+      val sendCoin = Service.getTransaction(ticketID)
+      def markDirty(sendCoin:SendCoin)={
         val markDirtyTo=blockchainAccounts.Service.markDirty(sendCoin.to)
         val markDirtyFrom=blockchainAccounts.Service.markDirty(sendCoin.from)
-        val toAccount=masterAccounts.Service.getAccountByAddress(sendCoin.to)
-        val toAccountFuture=for{
-                        _<-markDirtyTo
-                        _<-markDirtyFrom
-                        toAccountResult <- toAccount
-                         }yield toAccountResult
-       toAccountFuture.map{toAcc=>
-         if (toAcc.userType == constants.User.UNKNOWN) {
-           masterAccounts.Service.updateUserType(toAcc.id, constants.User.USER)
-         }
-         utilitiesNotification.send(toAcc.id, constants.Notification.SUCCESS, blockResponse.txhash)
-         utilitiesNotification.send(masterAccounts.Service.getId(sendCoin.from), constants.Notification.SUCCESS, blockResponse.txhash)
-       }
-      }.recover{
+        for{
+          _<-markDirtyTo
+          _<-markDirtyFrom
+        }yield {}
+      }
+      def toAccount(sendCoin:SendCoin)=masterAccounts.Service.getAccountByAddress(sendCoin.to)
+      def updateUserType(toAccount:Account)={
+        if (toAccount.userType == constants.User.UNKNOWN) {
+          masterAccounts.Service.updateUserType(toAccount.id, constants.User.USER)
+        }else Future{Unit}
+      }
+      def fromId(sendCoin:SendCoin)=masterAccounts.Service.getId(sendCoin.from)
+      (for{
+        _<-markTransactionSuccessful
+        sendCoin<-sendCoin
+        _<-markDirty(sendCoin)
+        toAccount<-toAccount(sendCoin)
+        _<-updateUserType(toAccount)
+        fromId<-fromId(sendCoin)
+      }yield{
+        utilitiesNotification.send(toAccount.id, constants.Notification.SUCCESS, blockResponse.txhash)
+        utilitiesNotification.send(fromId, constants.Notification.SUCCESS, blockResponse.txhash)
+      }).recover{
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
           throw new BaseException(constants.Response.PSQL_EXCEPTION)
       }
-      result
-
     }
 
-
-    def onSuccessAsync(ticketID: String, blockResponse: BlockResponse) = {
-
-        Service.markTransactionSuccessfulAsync(ticketID, blockResponse.txhash)
-        Service.getTransactionAsync(ticketID).flatMap { sendCoin =>
-           blockchainAccounts.Service.markDirtyAsync(sendCoin.to)
-           blockchainAccounts.Service.markDirtyAsync(sendCoin.from)
-           masterAccounts.Service.getAccountByAddressAsync(sendCoin.to).map{toAccount=>
-            if (toAccount.userType == constants.User.UNKNOWN) {
-              masterAccounts.Service.updateUserTypeAsync(toAccount.id, constants.User.USER)
-            }
-             utilitiesNotification.send(toAccount.id, constants.Notification.SUCCESS, blockResponse.txhash)
-             utilitiesNotification.send(masterAccounts.Service.getId(sendCoin.from), constants.Notification.SUCCESS, blockResponse.txhash)
-
-          }.recover{
-             case baseException: BaseException => logger.error(baseException.failure.message, baseException)
-               throw new BaseException(constants.Response.PSQL_EXCEPTION)
-           }
-
-        }
-    }
-
-
-
-    def onFailureAsync(ticketID: String, message: String) = Future {
-      try {
-        Service.markTransactionFailed(ticketID, message)
-        val sendCoin = Service.getTransaction(ticketID)
-        //pushNotification.sendNotification(masterAccounts.Service.getId(sendCoin.to), constants.Notification.FAILURE, message)
-       // pushNotification.sendNotification(masterAccounts.Service.getId(sendCoin.from), constants.Notification.FAILURE, message)
-        utilitiesNotification.send(masterAccounts.Service.getId(sendCoin.to), constants.Notification.FAILURE, message)
-        utilitiesNotification.send(masterAccounts.Service.getId(sendCoin.from), constants.Notification.FAILURE, message)
-      } catch {
-        case baseException: BaseException => logger.error(baseException.failure.message, baseException)
-      }
-    }
   }
 
   if (kafkaEnabled || transactionMode != constants.Transactions.BLOCK_MODE) {

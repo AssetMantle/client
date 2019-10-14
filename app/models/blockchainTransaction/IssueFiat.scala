@@ -11,6 +11,7 @@ import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
+import queries.responses.AccountResponse.Response
 import slick.jdbc.JdbcProfile
 import transactions.responses.TransactionResponse.BlockResponse
 
@@ -155,27 +156,27 @@ class IssueFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
 
   object Service {
 
-    def create(issueFiat: IssueFiat): String = Await.result(add(IssueFiat(from = issueFiat.from, to = issueFiat.to, transactionID = issueFiat.transactionID, transactionAmount = issueFiat.transactionAmount, gas=issueFiat.gas,status = issueFiat.status, txHash = issueFiat.txHash, ticketID = issueFiat.ticketID, mode = issueFiat.mode, code = issueFiat.code)), Duration.Inf)
+    def create(issueFiat: IssueFiat): Future[String] =add(IssueFiat(from = issueFiat.from, to = issueFiat.to, transactionID = issueFiat.transactionID, transactionAmount = issueFiat.transactionAmount, gas=issueFiat.gas,status = issueFiat.status, txHash = issueFiat.txHash, ticketID = issueFiat.ticketID, mode = issueFiat.mode, code = issueFiat.code))
 
-    def markTransactionSuccessful(ticketID: String, txHash: String): Int = Await.result(updateTxHashAndStatusOnTicketID(ticketID, Option(txHash), status = Option(true)), Duration.Inf)
+    def markTransactionSuccessful(ticketID: String, txHash: String): Future[Int] = updateTxHashAndStatusOnTicketID(ticketID, Option(txHash), status = Option(true))
 
-    def markTransactionFailed(ticketID: String, code: String): Int = Await.result(updateStatusAndCodeOnTicketID(ticketID, status = Option(false), code), Duration.Inf)
+    def markTransactionFailed(ticketID: String, code: String): Future[Int] = updateStatusAndCodeOnTicketID(ticketID, status = Option(false), code)
 
     def getTicketIDsOnStatus(): Seq[String] = Await.result(getTicketIDsWithNullStatus, Duration.Inf)
 
-    def getTransaction(ticketID: String): IssueFiat = Await.result(findByTicketID(ticketID), Duration.Inf)
+    def getTransaction(ticketID: String): Future[IssueFiat] = findByTicketID(ticketID)
 
     def getTransactionHash(ticketID: String): Option[String] = Await.result(findTransactionHashByTicketID(ticketID), Duration.Inf)
 
     def getMode(ticketID: String): String = Await.result(findModeByTicketID(ticketID), Duration.Inf)
 
-    def updateTransactionHash(ticketID: String, txHash: String): Int = Await.result(updateTxHashOnTicketID(ticketID = ticketID, txHash = Option(txHash)), Duration.Inf)
+    def updateTransactionHash(ticketID: String, txHash: String): Future[Int] = updateTxHashOnTicketID(ticketID = ticketID, txHash = Option(txHash))
 
   }
 
   object Utility {
-    def onSuccess(ticketID: String, blockResponse: BlockResponse): Future[Unit] = Future {
-      try {
+    def onSuccess(ticketID: String, blockResponse: BlockResponse): Future[Unit] =  {
+     /* try {
         Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
         val issueFiat = Service.getTransaction(ticketID)
         Thread.sleep(sleepTime)
@@ -188,18 +189,65 @@ class IssueFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
           throw new BaseException(constants.Response.PSQL_EXCEPTION)
         case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
+      }*/
+
+      val markTransactionSuccessful=Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
+      val issueFiat = Service.getTransaction(ticketID)
+      Thread.sleep(sleepTime)
+      def response(issueFiat:IssueFiat)=getAccount.Service.get(issueFiat.to)
+      def markDirty(issueFiat:IssueFiat)=blockchainAccounts.Service.markDirty(issueFiat.from)
+      def addresses(issueFiat:IssueFiat)={
+        val to=masterAccounts.Service.getId(issueFiat.to)
+        val from=masterAccounts.Service.getId(issueFiat.from)
+        for{
+          to<-to
+          from<-from
+        }yield (to,from)
+      }
+      for{
+        _<-markTransactionSuccessful
+        issueFiat<-issueFiat
+        response<-response(issueFiat)
+        _<-markDirty(issueFiat)
+        (to,from)<-addresses(issueFiat)
+      }yield{
+        response.value.fiatPegWallet.foreach(fiats => fiats.foreach(fiatPeg => blockchainFiats.Service.insertOrUpdate(fiatPeg.pegHash, issueFiat.to, fiatPeg.transactionID, fiatPeg.transactionAmount, fiatPeg.redeemedAmount, dirtyBit = true)))
+        utilitiesNotification.send(to, constants.Notification.SUCCESS, blockResponse.txhash)
+        utilitiesNotification.send(from, constants.Notification.SUCCESS, blockResponse.txhash)
+
       }
     }
 
-    def onFailure(ticketID: String, message: String): Future[Unit] = Future {
-      try {
+    def onFailure(ticketID: String, message: String): Future[Unit] =  {
+     /* try {
         Service.markTransactionFailed(ticketID, message)
         val issueFiat = Service.getTransaction(ticketID)
         utilitiesNotification.send(masterAccounts.Service.getId(issueFiat.to), constants.Notification.FAILURE, message)
         utilitiesNotification.send(masterAccounts.Service.getId(issueFiat.from), constants.Notification.FAILURE, message)
       } catch {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
+      }*/
+      val markTransactionFailed=Service.markTransactionFailed(ticketID, message)
+      val issueFiat = Service.getTransaction(ticketID)
+      def addresses(issueFiat:IssueFiat)={
+        val to=masterAccounts.Service.getId(issueFiat.to)
+        val from=masterAccounts.Service.getId(issueFiat.from)
+        for{
+          to<-to
+          from<-from
+        }yield (to,from)
       }
+      (for{
+        _<-markTransactionFailed
+        issueFiat<-issueFiat
+        (to,from) <-  addresses(issueFiat)
+      }yield{
+        utilitiesNotification.send(to, constants.Notification.FAILURE, message)
+        utilitiesNotification.send(from, constants.Notification.FAILURE, message)
+      }).recover{
+        case baseException: BaseException => logger.error(baseException.failure.message, baseException)
+      }
+
     }
   }
 

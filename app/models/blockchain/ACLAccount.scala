@@ -115,7 +115,7 @@ class ACLAccounts @Inject()(protected val databaseConfigProvider: DatabaseConfig
 
     def insertOrUpdate(address: String, zoneID: String, organizationID: String, acl: ACL, dirtyBit: Boolean): Int = Await.result(upsert(ACLAccount(address, zoneID, organizationID, util.hashing.MurmurHash3.stringHash(acl.toString).toString, dirtyBit)), Duration.Inf)
 
-    def get(address: String): ACLAccount = Await.result(findByAddress(address), Duration.Inf)
+    def get(address: String): Future[ACLAccount] = findByAddress(address)
 
     def getACLHash(address: String): Future[String] = findACLHashByAddress(address)
 

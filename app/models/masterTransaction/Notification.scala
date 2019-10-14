@@ -95,11 +95,11 @@ class Notifications @Inject()(protected val databaseConfigProvider: DatabaseConf
 
     def create(accountID: String, notificationTitle: String, notificationMessage: String): Future[String] = add(Notification(accountID, notificationTitle, notificationMessage, DateTime.now(DateTimeZone.UTC).getMillis, false, Random.nextString(32)))
 
-    def get(accountID: String, offset: Int, limit: Int): Seq[Notification] = Await.result(findNotificationsByAccountId(accountID, offset, limit), Duration.Inf)
+    def get(accountID: String, offset: Int, limit: Int): Future[Seq[Notification]] = findNotificationsByAccountId(accountID, offset, limit)
 
-    def markAsRead(id: String): Int = Await.result(updateReadById(id, status = true), Duration.Inf)
+    def markAsRead(id: String): Future[Int] =updateReadById(id, status = true)
 
-    def getNumberOfUnread(accountID: String): Int = Await.result(findNumberOfReadOnStatusByAccountId(accountID, status = false), Duration.Inf)
+    def getNumberOfUnread(accountID: String): Future[Int] =findNumberOfReadOnStatusByAccountId(accountID, status = false)
 
   }
 

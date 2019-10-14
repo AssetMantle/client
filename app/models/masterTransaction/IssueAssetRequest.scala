@@ -180,36 +180,36 @@ class IssueAssetRequests @Inject()(protected val databaseConfigProvider: Databas
     def create(id: String, ticketID: Option[String], pegHash: Option[String], accountID: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, takerAddress: Option[String], shipmentDetails: Serializable.ShipmentDetails, physicalDocumentsHandledVia: String, paymentTerms: String, status: String): String =
       Await.result(add(serialize(IssueAssetRequest(id = id, ticketID = ticketID, pegHash = pegHash, accountID = accountID, documentHash = documentHash, assetType = assetType, quantityUnit = quantityUnit, assetQuantity = assetQuantity, assetPrice = assetPrice, takerAddress = takerAddress, shipmentDetails = shipmentDetails, physicalDocumentsHandledVia = physicalDocumentsHandledVia, paymentTerms = paymentTerms, status = status, comment = null))), Duration.Inf)
 
-    def insertOrUpdate(id: String, ticketID: Option[String], pegHash: Option[String], accountID: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, takerAddress: Option[String], shipmentDetails: Serializable.ShipmentDetails, physicalDocumentsHandledVia: String, paymentTerms: String, status: String): Int =
-      Await.result(upsert(serialize(IssueAssetRequest(id = id, ticketID = ticketID, pegHash = pegHash, accountID = accountID, documentHash = documentHash, assetType = assetType, quantityUnit = quantityUnit, assetQuantity = assetQuantity, assetPrice = assetPrice, takerAddress = takerAddress, shipmentDetails = shipmentDetails, physicalDocumentsHandledVia = physicalDocumentsHandledVia, paymentTerms = paymentTerms, status = status, comment = null))), Duration.Inf)
+    def insertOrUpdate(id: String, ticketID: Option[String], pegHash: Option[String], accountID: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, takerAddress: Option[String], shipmentDetails: Serializable.ShipmentDetails, physicalDocumentsHandledVia: String, paymentTerms: String, status: String): Future[Int] =
+      upsert(serialize(IssueAssetRequest(id = id, ticketID = ticketID, pegHash = pegHash, accountID = accountID, documentHash = documentHash, assetType = assetType, quantityUnit = quantityUnit, assetQuantity = assetQuantity, assetPrice = assetPrice, takerAddress = takerAddress, shipmentDetails = shipmentDetails, physicalDocumentsHandledVia = physicalDocumentsHandledVia, paymentTerms = paymentTerms, status = status, comment = null)))
 
     def accept(id: String, ticketID: String): Int = Await.result(updateTicketIDAndStatusByID(id, ticketID, status = constants.Status.Asset.LISTED_FOR_TRADE), Duration.Inf)
 
-    def reject(id: String, comment: String): Int = Await.result(updateStatusAndCommentByID(id = id, status = constants.Status.Asset.REJECTED, comment = Option(comment)), Duration.Inf)
+    def reject(id: String, comment: String): Future[Int] = updateStatusAndCommentByID(id = id, status = constants.Status.Asset.REJECTED, comment = Option(comment))
 
-    def updateStatusAndComment(id: String, status: String, comment: Option[String] = None) :Int = Await.result(updateStatusAndCommentByID(id = id, status = status, comment = comment), Duration.Inf)
+    def updateStatusAndComment(id: String, status: String, comment: Option[String] = None) :Future[Int] =updateStatusAndCommentByID(id = id, status = status, comment = comment)
 
-    def updateTicketID(id: String, ticketID: String) :Int = Await.result(updateTicketIDByID(id = id, ticketID = ticketID), Duration.Inf)
+    def updateTicketID(id: String, ticketID: String) :Future[Int] = updateTicketIDByID(id = id, ticketID = ticketID)
 
-    def markFailed(ticketID: String) :Int = Await.result(updatePegHashAndStatusWithTicketID(ticketID = ticketID, pegHash = None, status = constants.Status.Asset.FAILED), Duration.Inf)
+    def markFailed(ticketID: String) :Future[Int] = updatePegHashAndStatusWithTicketID(ticketID = ticketID, pegHash = None, status = constants.Status.Asset.FAILED)
 
     def markListedForTrade(ticketID: String, peghash: Option[String]) :Int = Await.result(updatePegHashAndStatusWithTicketID(ticketID = ticketID, pegHash = peghash, status = constants.Status.Asset.LISTED_FOR_TRADE), Duration.Inf)
 
-    def getPendingIssueAssetRequests(accountIDs: Seq[String], status: String): Seq[IssueAssetRequest] = Await.result(getIssueAssetRequestsWithStatus(accountIDs, status), Duration.Inf).map(_.deSerialize)
+    def getPendingIssueAssetRequests(accountIDs: Seq[String], status: String): Future[Seq[IssueAssetRequest]] = getIssueAssetRequestsWithStatus(accountIDs, status).map{_.map(_.deSerialize)}
 
     def getIssueAssetsByAccountID(accountID: String): Future[Seq[IssueAssetRequest]] =  findIssueAssetsByAccountID(accountID).map{issueAssetRequestSerialized=> issueAssetRequestSerialized.map(_.deSerialize)}
 
-    def getIssueAssetByID(id: String): IssueAssetRequest = Await.result(findByID(id), Duration.Inf).deSerialize
+    def getIssueAssetByID(id: String): Future[IssueAssetRequest] = findByID(id).map{_.deSerialize}
 
-    def getIssueAssetByTicketID(ticketID: String): IssueAssetRequest = Await.result(findByTicektID(ticketID), Duration.Inf).deSerialize
+    def getIssueAssetByTicketID(ticketID: String): Future[IssueAssetRequest] =findByTicektID(ticketID).map{_.deSerialize}
 
-    def getAccountID(id: String): String = Await.result(getAccountIDByID(id), Duration.Inf)
+    def getAccountID(id: String): Future[String] = getAccountIDByID(id)
 
     def delete(id: String): Int = Await.result(deleteByID(id), Duration.Inf)
 
     def getStatus(id: String): String = Await.result(getStatusByID(id), Duration.Inf)
 
-    def verifyRequestedStatus(id: String): Boolean = Await.result(verifyStatusByID(id, constants.Status.Asset.REQUESTED), Duration.Inf)
+    def verifyRequestedStatus(id: String): Future[Boolean] =verifyStatusByID(id, constants.Status.Asset.REQUESTED)
 
   }
 

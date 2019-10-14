@@ -145,7 +145,7 @@ class OrganizationKYCs @Inject()(protected val databaseConfigProvider: DatabaseC
 
     def checkFileExists(id: String, documentType: String): Boolean = Await.result(checkByIdAndDocumentType(id = id, documentType = documentType), Duration.Inf)
 
-    def checkFileNameExists(id: String, fileName: String): Boolean = Await.result(checkByIdAndFileName(id = id, fileName = fileName), Duration.Inf)
+    def checkFileNameExists(id: String, fileName: String): Future[Boolean]  = checkByIdAndFileName(id = id, fileName = fileName)
 
     def checkAllKYCFileTypesExists(id: String): Future[Boolean] =getAllDocumentTypesByIDAndDocumentSet(id = id, documentTypes = constants.File.ORGANIZATION_KYC_DOCUMENT_TYPES).map{documents=> constants.File.ORGANIZATION_KYC_DOCUMENT_TYPES.diff(documents).isEmpty }
 

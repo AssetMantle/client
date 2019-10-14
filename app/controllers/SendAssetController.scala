@@ -9,7 +9,7 @@ import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class SendAssetController @Inject()(messagesControllerComponents: MessagesControllerComponents, transaction: utilities.Transaction, blockchainAssets: blockchain.Assets, blockchainOrders: blockchain.Orders, blockchainAccounts: blockchain.Accounts, withTraderLoginAction: WithTraderLoginAction, transactionsSendAsset: transactions.SendAsset, blockchainTransactionSendAssets: blockchainTransaction.SendAssets, withUsernameToken: WithUsernameToken)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
@@ -29,10 +29,10 @@ class SendAssetController @Inject()(messagesControllerComponents: MessagesContro
     implicit request =>
       views.companion.master.SendAsset.form.bindFromRequest().fold(
         formWithErrors => {
-          BadRequest(views.html.component.master.sendAsset(formWithErrors, formWithErrors.data(constants.Form.BUYER_ADDRESS), formWithErrors.data(constants.Form.PEG_HASH)))
+          Future{BadRequest(views.html.component.master.sendAsset(formWithErrors, formWithErrors.data(constants.Form.BUYER_ADDRESS), formWithErrors.data(constants.Form.PEG_HASH)))}
         },
         sendAssetData => {
-          try {
+         /* try {
             transaction.process[blockchainTransaction.SendAsset, transactionsSendAsset.Request](
               entity = blockchainTransaction.SendAsset(from = loginState.address, to = sendAssetData.buyerAddress, pegHash = sendAssetData.pegHash, gas = sendAssetData.gas, ticketID = "", mode = transactionMode),
               blockchainTransactionCreate = blockchainTransactionSendAssets.Service.create,
@@ -46,7 +46,20 @@ class SendAssetController @Inject()(messagesControllerComponents: MessagesContro
           }
           catch {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-          }
+          }*/
+          transaction.process[blockchainTransaction.SendAsset, transactionsSendAsset.Request](
+            entity = blockchainTransaction.SendAsset(from = loginState.address, to = sendAssetData.buyerAddress, pegHash = sendAssetData.pegHash, gas = sendAssetData.gas, ticketID = "", mode = transactionMode),
+            blockchainTransactionCreate = blockchainTransactionSendAssets.Service.create,
+            request = transactionsSendAsset.Request(transactionsSendAsset.BaseReq(from = loginState.address, gas = sendAssetData.gas.toString), to = sendAssetData.buyerAddress, password = sendAssetData.password, pegHash = sendAssetData.pegHash, mode = transactionMode),
+            action = transactionsSendAsset.Service.post,
+            onSuccess = blockchainTransactionSendAssets.Utility.onSuccess,
+            onFailure = blockchainTransactionSendAssets.Utility.onFailure,
+            updateTransactionHash = blockchainTransactionSendAssets.Service.updateTransactionHash
+          )
+          Future{withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ASSET_SENT)))}
+            .recover{
+              case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+            }
         }
       )
   }
@@ -55,18 +68,25 @@ class SendAssetController @Inject()(messagesControllerComponents: MessagesContro
     Ok(views.html.component.blockchain.sendAsset(views.companion.blockchain.SendAsset.form))
   }
 
-  def blockchainSendAsset: Action[AnyContent] = Action { implicit request =>
+  def blockchainSendAsset: Action[AnyContent] = Action.async { implicit request =>
     views.companion.blockchain.SendAsset.form.bindFromRequest().fold(
       formWithErrors => {
-        BadRequest(views.html.component.blockchain.sendAsset(formWithErrors))
+        Future{BadRequest(views.html.component.blockchain.sendAsset(formWithErrors))}
       },
       sendAssetData => {
-        try {
+       /* try {
           transactionsSendAsset.Service.post(transactionsSendAsset.Request(transactionsSendAsset.BaseReq(from = sendAssetData.from, gas = sendAssetData.gas.toString), to = sendAssetData.to, password = sendAssetData.password, pegHash = sendAssetData.pegHash, mode = sendAssetData.mode))
           Ok(views.html.index(successes = Seq(constants.Response.ASSET_SENT)))
 
         }
         catch {
+          case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+        }*/
+        val post= transactionsSendAsset.Service.post(transactionsSendAsset.Request(transactionsSendAsset.BaseReq(from = sendAssetData.from, gas = sendAssetData.gas.toString), to = sendAssetData.to, password = sendAssetData.password, pegHash = sendAssetData.pegHash, mode = sendAssetData.mode))
+        (for{
+          _<-post
+        }yield Ok(views.html.index(successes = Seq(constants.Response.ASSET_SENT)))
+          ).recover{
           case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
         }
       }

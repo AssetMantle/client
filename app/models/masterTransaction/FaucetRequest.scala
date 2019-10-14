@@ -108,17 +108,17 @@ class FaucetRequests @Inject()(protected val databaseConfigProvider: DatabaseCon
 
   object Service {
 
-    def create(accountID: String, amount: Int): String = Await.result(add(FaucetRequest(id = utilities.IDGenerator.requestID, accountID = accountID, amount = amount)), Duration.Inf)
+    def create(accountID: String, amount: Int): Future[String] = add(FaucetRequest(id = utilities.IDGenerator.requestID, accountID = accountID, amount = amount))
 
-    def accept(requestID: String, gas: Int, ticketID: String): Int = Await.result(updateTicketIDGasAndStatusByID(id = requestID, ticketID = ticketID, gas = Option(gas), status = Option(true)), Duration.Inf)
+    def accept(requestID: String, gas: Int, ticketID: String): Future[Int] =updateTicketIDGasAndStatusByID(id = requestID, ticketID = ticketID, gas = Option(gas), status = Option(true))
 
-    def reject(id: String, comment: String): Int = Await.result(updateStatusAndCommentByID(id = id, status = Option(false), comment = comment), Duration.Inf)
+    def reject(id: String, comment: String): Future[Int] = updateStatusAndCommentByID(id = id, status = Option(false), comment = comment)
 
-    def getPendingFaucetRequests: Seq[FaucetRequest] = Await.result(getFaucetRequestsWithNullStatus, Duration.Inf)
+    def getPendingFaucetRequests: Future[Seq[FaucetRequest]] = getFaucetRequestsWithNullStatus
 
     def delete(id: String): Int = Await.result(deleteByID(id), Duration.Inf)
 
-    def getStatus(id: String): Option[Boolean] = Await.result(getStatusByID(id), Duration.Inf)
+    def getStatus(id: String): Future[Option[Boolean]] = getStatusByID(id)
 
     def verifyREquest(id: String, accountID: String): Boolean = Await.result(verifyRequestById(id = id, accountID = accountID), Duration.Inf)
 

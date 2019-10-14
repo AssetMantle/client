@@ -152,27 +152,36 @@ class SetBuyerFeedbacks @Inject()(actorSystem: ActorSystem, transaction: utiliti
 
   object Service {
 
-    def create(setBuyerFeedback: SetBuyerFeedback): String = Await.result(add(SetBuyerFeedback(from = setBuyerFeedback.from, to = setBuyerFeedback.to, pegHash = setBuyerFeedback.pegHash, rating = setBuyerFeedback.rating, gas = setBuyerFeedback.gas, status = setBuyerFeedback.status, txHash = setBuyerFeedback.txHash, ticketID = setBuyerFeedback.ticketID, mode = setBuyerFeedback.mode, code = setBuyerFeedback.code)), Duration.Inf)
+    def create(setBuyerFeedback: SetBuyerFeedback): Future[String] = add(SetBuyerFeedback(from = setBuyerFeedback.from, to = setBuyerFeedback.to, pegHash = setBuyerFeedback.pegHash, rating = setBuyerFeedback.rating, gas = setBuyerFeedback.gas, status = setBuyerFeedback.status, txHash = setBuyerFeedback.txHash, ticketID = setBuyerFeedback.ticketID, mode = setBuyerFeedback.mode, code = setBuyerFeedback.code))
 
     def getTicketIDsOnStatus(): Seq[String] = Await.result(getTicketIDsWithNullStatus, Duration.Inf)
 
-    def getTransaction(ticketID: String): SetBuyerFeedback = Await.result(findByTicketID(ticketID), Duration.Inf)
+    def getTransaction(ticketID: String): Future[SetBuyerFeedback] = findByTicketID(ticketID)
 
-    def markTransactionSuccessful(ticketID: String, txHash: String): Int = Await.result(updateTxHashAndStatusOnTicketID(ticketID, Option(txHash), status = Option(true)), Duration.Inf)
+    def markTransactionSuccessful(ticketID: String, txHash: String): Future[Int] =updateTxHashAndStatusOnTicketID(ticketID, Option(txHash), status = Option(true))
 
-    def markTransactionFailed(ticketID: String, code: String): Int = Await.result(updateStatusAndCodeOnTicketID(ticketID, status = Option(false), code), Duration.Inf)
+    def markTransactionFailed(ticketID: String, code: String): Future[Int] = updateStatusAndCodeOnTicketID(ticketID, status = Option(false), code)
 
     def getTransactionHash(ticketID: String): Option[String] = Await.result(findTransactionHashByTicketID(ticketID), Duration.Inf)
 
     def getMode(ticketID: String): String = Await.result(findModeByTicketID(ticketID), Duration.Inf)
 
-    def updateTransactionHash(ticketID: String, txHash: String): Int = Await.result(updateTxHashOnTicketID(ticketID = ticketID, txHash = Option(txHash)), Duration.Inf)
+    def updateTransactionHash(ticketID: String, txHash: String):Future[Int] = updateTxHashOnTicketID(ticketID = ticketID, txHash = Option(txHash))
 
   }
 
   object Utility {
-    def onSuccess(ticketID: String, blockResponse: BlockResponse): Future[Unit] = Future {
-      try {
+    def addresses(setBuyerFeedback:SetBuyerFeedback)={
+      val to=masterAccounts.Service.getId(setBuyerFeedback.to)
+      val from=masterAccounts.Service.getId(setBuyerFeedback.from)
+      for{
+        to<-to
+        from<-from
+      }yield (to,from)
+    }
+
+    def onSuccess(ticketID: String, blockResponse: BlockResponse): Future[Unit] =  {
+     /* try {
         Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
         val setBuyerFeedback = Service.getTransaction(ticketID)
         blockchainTraderFeedbackHistories.Service.update(setBuyerFeedback.to, setBuyerFeedback.from, setBuyerFeedback.to, setBuyerFeedback.pegHash, setBuyerFeedback.rating.toString)
@@ -182,18 +191,54 @@ class SetBuyerFeedbacks @Inject()(actorSystem: ActorSystem, transaction: utiliti
       } catch {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
           throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      }*/
+
+      val markTransactionSuccessful= Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
+      val setBuyerFeedback = Service.getTransaction(ticketID)
+       def updateAndMarkDirty(setBuyerFeedback:SetBuyerFeedback)={
+        val update= blockchainTraderFeedbackHistories.Service.update(setBuyerFeedback.to, setBuyerFeedback.from, setBuyerFeedback.to, setBuyerFeedback.pegHash, setBuyerFeedback.rating.toString)
+        val markDirtyFrom=blockchainAccounts.Service.markDirty(setBuyerFeedback.from)
+        for {
+          _<-update
+          _<-markDirtyFrom
+        }yield{}
       }
+      (for{
+        _<-markTransactionSuccessful
+        setBuyerFeedback<-setBuyerFeedback
+        _<-updateAndMarkDirty(setBuyerFeedback)
+        (to,from)<-addresses(setBuyerFeedback)
+      }yield {
+        utilitiesNotification.send(to, constants.Notification.SUCCESS, blockResponse.txhash)
+        utilitiesNotification.send(from, constants.Notification.SUCCESS, blockResponse.txhash)
+
+      }).recover{
+        case baseException: BaseException => logger.error(baseException.failure.message, baseException)
+          throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      }
+
     }
 
-    def onFailure(ticketID: String, message: String): Future[Unit] = Future {
-      try {
+    def onFailure(ticketID: String, message: String): Future[Unit] =  {
+      /*try {
         Service.markTransactionFailed(ticketID, message)
         val setBuyerFeedback = Service.getTransaction(ticketID)
         utilitiesNotification.send(masterAccounts.Service.getId(setBuyerFeedback.to), constants.Notification.FAILURE, message)
         utilitiesNotification.send(masterAccounts.Service.getId(setBuyerFeedback.from), constants.Notification.FAILURE, message)
       } catch {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
+      }*/
+      val markTransactionFailed= Service.markTransactionFailed(ticketID, message)
+      val setBuyerFeedback = Service.getTransaction(ticketID)
+      for{
+        _<-markTransactionFailed
+        setBuyerFeedback<-setBuyerFeedback
+        (to,from)<-addresses(setBuyerFeedback)
+      }yield{
+        utilitiesNotification.send(to, constants.Notification.FAILURE, message)
+        utilitiesNotification.send(from, constants.Notification.FAILURE, message)
       }
+
     }
   }
 

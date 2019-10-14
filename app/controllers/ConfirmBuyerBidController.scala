@@ -83,7 +83,7 @@ class ConfirmBuyerBidController @Inject()(messagesControllerComponents: Messages
 
         val post=transactionsConfirmBuyerBid.Service.post(transactionsConfirmBuyerBid.Request(transactionsConfirmBuyerBid.BaseReq(from = confirmBuyerBidData.from, gas = confirmBuyerBidData.gas.toString), to = confirmBuyerBidData.to, password = confirmBuyerBidData.password, bid = confirmBuyerBidData.bid.toString, time = confirmBuyerBidData.time.toString, pegHash = confirmBuyerBidData.pegHash, buyerContractHash = confirmBuyerBidData.buyerContractHash, mode = confirmBuyerBidData.mode))
         (for{
-          post<-post
+          _<-post
         }yield Ok(views.html.index(successes = Seq(constants.Response.BUYER_BID_CONFIRMED)))
           ).recover{
           case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))

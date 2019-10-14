@@ -113,13 +113,13 @@ class AccountFiles @Inject()(protected val databaseConfigProvider: DatabaseConfi
 
   object Service {
 
-    def create(accountFile: AccountFile): String = Await.result(add(AccountFile(id = accountFile.id, documentType = accountFile.documentType, fileName = accountFile.fileName, file = accountFile.file)), Duration.Inf)
+    def create(accountFile: AccountFile): Future[String] = add(AccountFile(id = accountFile.id, documentType = accountFile.documentType, fileName = accountFile.fileName, file = accountFile.file))
 
-    def updateOldDocument(accountFile: AccountFile): Int = Await.result(upsert(AccountFile(id = accountFile.id, documentType = accountFile.documentType, fileName = accountFile.fileName, file = accountFile.file)), Duration.Inf)
+    def updateOldDocument(accountFile: AccountFile): Future[Int] =upsert(AccountFile(id = accountFile.id, documentType = accountFile.documentType, fileName = accountFile.fileName, file = accountFile.file))
 
     def get(id: String, documentType: String): AccountFile = Await.result(findByIdDocumentType(id = id, documentType = documentType), Duration.Inf)
 
-    def getFileName(id: String, documentType: String): String = Await.result(getFileNameByIdDocumentType(id = id, documentType = documentType), Duration.Inf)
+    def getFileName(id: String, documentType: String): Future[String] = getFileNameByIdDocumentType(id = id, documentType = documentType)
 
     def getAllDocuments(id: String): Future[Seq[AccountFile]] = getAllDocumentsById(id = id)
 
@@ -129,7 +129,7 @@ class AccountFiles @Inject()(protected val databaseConfigProvider: DatabaseConfi
 
     def getProfilePicture(id: String): Future[Array[Byte]] = getFileByIdDocumentType(id = id, documentType = constants.File.PROFILE_PICTURE)
 
-    def checkFileNameExists(id: String, fileName: String): Boolean = Await.result(checkByIdAndFileName(id = id, fileName = fileName), Duration.Inf)
+    def checkFileNameExists(id: String, fileName: String): Future[Boolean] = checkByIdAndFileName(id = id, fileName = fileName)
   }
 
 }

@@ -118,7 +118,7 @@ class NegotiationRequests @Inject()(protected val databaseConfigProvider: Databa
 
     def getStatus(id: String): Option[String] = Await.result(getStatusByID(id), Duration.Inf)
 
-    def checkNegotiationAndAccountIDExists(id: String ,accountID: String) = Await.result(checkByIDAndAccountID(id, accountID), Duration.Inf)
+    def checkNegotiationAndAccountIDExists(id: String ,accountID: String) = checkByIDAndAccountID(id, accountID)
   }
 
 }

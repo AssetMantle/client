@@ -220,7 +220,6 @@ class BuyerExecuteOrders @Inject()(actorSystem: ActorSystem, transaction: utilit
           _<-markDirtySellerAddressTransactionFeedbacks
           _<- markDirtyFromAddress
         }yield {}
-
       }
       def getAddresses(buyerExecuteOrder:BuyerExecuteOrder)={
 

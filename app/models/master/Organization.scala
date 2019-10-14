@@ -216,7 +216,7 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
 
     def getByAccountID(accountID: String): Future[Organization] = findByAccountID(accountID).map{organizationSerialized=> organizationSerialized.deserialize}
 
-    def getZoneID(id: String): String = Await.result(getZoneIDByID(id), Duration.Inf)
+    def getZoneID(id: String): Future[String]= getZoneIDByID(id)
 
     def getZoneIDByAccountID(accountID: String): Future[String] = getZoneIDOnAccountID(accountID)
 

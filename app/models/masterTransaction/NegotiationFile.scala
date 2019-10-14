@@ -175,13 +175,13 @@ class NegotiationFiles @Inject()(protected val databaseConfigProvider: DatabaseC
 
   object Service {
 
-    def create(file: NegotiationFile): String = Await.result(add(NegotiationFile(id = file.id, documentType = file.documentType, fileName = file.fileName, file = file.file, context = None, status = None)), Duration.Inf)
+    def create(file: NegotiationFile): Future[String] = add(NegotiationFile(id = file.id, documentType = file.documentType, fileName = file.fileName, file = file.file, context = None, status = None))
 
     def getOrEmpty(id: String, documentType: String): NegotiationFile = Await.result(findByIdDocumentTypeOrEmpty(id = id, documentType = documentType), Duration.Inf)
 
     def get(id: String, documentType: String): NegotiationFile = Await.result(findByIdDocumentType(id = id, documentType = documentType), Duration.Inf)
 
-    def insertOrUpdateOldDocument(file: NegotiationFile): Int = Await.result(upsertFile(NegotiationFile(id = file.id, documentType = file.documentType, fileName = file.fileName, file = file.file, context = None, status = None)), Duration.Inf)
+    def insertOrUpdateOldDocument(file: NegotiationFile): Future[Int] =upsertFile(NegotiationFile(id = file.id, documentType = file.documentType, fileName = file.fileName, file = file.file, context = None, status = None))
 
     def insertOrUpdateContext(file: NegotiationFile): String = Await.result(upsertContext(file), Duration.Inf).toString
 

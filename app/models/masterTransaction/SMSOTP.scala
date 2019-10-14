@@ -72,15 +72,19 @@ class SMSOTPs @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
 
   object Service {
 
-    def sendOTP(id: String): String = {
+    def sendOTP(id: String): Future[String] = {
       val otp = (Random.nextInt(899999) + 100000).toString
-      Await.result(upsert(SMSOTP(id, util.hashing.MurmurHash3.stringHash(otp).toString)), Duration.Inf)
-      otp
+      val upsertOtp =upsert(SMSOTP(id, util.hashing.MurmurHash3.stringHash(otp).toString))
+      for{
+        _<-upsertOtp
+      } yield otp
+
     }
 
-    def verifyOTP(id: String, otp: String): Boolean = {
-      if (Await.result(findById(id), Duration.Inf).secretHash != util.hashing.MurmurHash3.stringHash(otp).toString) throw new BaseException(constants.Response.INVALID_OTP)
-      true
+    def verifyOTP(id: String, otp: String): Future[Boolean] = {
+      findById(id).map{smsOTP=>
+        if(smsOTP.secretHash!=util.hashing.MurmurHash3.stringHash(otp).toString)throw new BaseException(constants.Response.INVALID_OTP) else true
+      }
     }
 
   }

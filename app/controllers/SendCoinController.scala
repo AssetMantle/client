@@ -36,7 +36,7 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
           Future{BadRequest(views.html.component.master.sendCoin(formWithErrors))}
         },
         sendCoinData => {
-          try {
+          /*try {
             transaction.process[blockchainTransaction.SendCoin, transactionsSendCoin.Request](
               entity = blockchainTransaction.SendCoin(from = loginState.address, to = sendCoinData.to, amount = sendCoinData.amount, gas = sendCoinData.gas, ticketID = "", mode = transactionMode),
               blockchainTransactionCreate = blockchainTransactionSendCoins.Service.create,
@@ -51,38 +51,27 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
           }
           catch {
             case baseException: BaseException => Future{InternalServerError(views.html.index(failures = Seq(baseException.failure)))}
+          }*/
+
+            transaction.process[blockchainTransaction.SendCoin, transactionsSendCoin.Request](
+              entity = blockchainTransaction.SendCoin(from = loginState.address, to = sendCoinData.to, amount = sendCoinData.amount, gas = sendCoinData.gas, ticketID = "", mode = transactionMode),
+              blockchainTransactionCreate = blockchainTransactionSendCoins.Service.create,
+              request = transactionsSendCoin.Request(transactionsSendCoin.BaseReq(from = loginState.address, gas = sendCoinData.gas.toString), password = sendCoinData.password, to = sendCoinData.to, amount = Seq(transactionsSendCoin.Amount(denominationOfGasToken, sendCoinData.amount.toString)), mode = transactionMode),
+              action = transactionsSendCoin.Service.post,
+              onSuccess = blockchainTransactionSendCoins.Utility.onSuccess,
+              onFailure = blockchainTransactionSendCoins.Utility.onFailure,
+              updateTransactionHash = blockchainTransactionSendCoins.Service.updateTransactionHash
+            )
+          Future{withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.COINS_SENT)))}
+            .recover{
+              case baseException: BaseException => Future{InternalServerError(views.html.index(failures = Seq(baseException.failure)))}
+            }
+
           }
-        }
+
       )
   }
 
-
- /* def sendCoinAsync: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
-    implicit request =>
-      logger.info(System.currentTimeMillis().toString)
-      views.companion.master.SendCoin.form.bindFromRequest().fold(
-        formWithErrors => {
-          BadRequest(views.html.component.master.sendCoin(formWithErrors))
-        },
-        sendCoinData => {
-          try {
-              transaction.processAsync[blockchainTransaction.SendCoin, transactionsSendCoin.Request](
-              entity = blockchainTransaction.SendCoin(from = loginState.address, to = sendCoinData.to, amount = sendCoinData.amount, gas = sendCoinData.gas, ticketID = "", mode = transactionMode),
-              blockchainTransactionCreate = blockchainTransactionSendCoins.Service.createAsync,
-              request = transactionsSendCoin.Request(transactionsSendCoin.BaseReq(from = loginState.address, gas = sendCoinData.gas.toString), password = sendCoinData.password, to = sendCoinData.to, amount = Seq(transactionsSendCoin.Amount(denominationOfGasToken, sendCoinData.amount.toString)), mode = transactionMode),
-              action = transactionsSendCoin.Service.postAsync,
-              onSuccess = blockchainTransactionSendCoins.Utility.onSuccessAsync,
-              onFailure = blockchainTransactionSendCoins.Utility.onFailureAsync,
-              updateTransactionHash = blockchainTransactionSendCoins.Service.updateTransactionHashAsync
-            )
-            withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.COINS_SENT)))
-          }
-          catch {
-            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-          }
-        }
-      )
-  }*/
 
   def blockchainSendCoinForm: Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.blockchain.sendCoin(views.companion.blockchain.SendCoin.form))
@@ -113,14 +102,21 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
     implicit request =>
       views.companion.master.RequestCoin.form.bindFromRequest().fold(
         formWithErrors => {
-          BadRequest(views.html.component.master.requestCoin(formWithErrors))
+          Future{BadRequest(views.html.component.master.requestCoin(formWithErrors))}
         },
         requestCoinFormData => {
-          try {
+          /*try {
             masterTransactionFaucetRequests.Service.create(loginState.username, defaultFaucetToken)
             withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.COINS_REQUESTED)))
           }
           catch {
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+          }*/
+          val create=masterTransactionFaucetRequests.Service.create(loginState.username, defaultFaucetToken)
+          (for{
+            _<-create
+          }yield withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.COINS_REQUESTED)))
+            ).recover{
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
         }
@@ -129,10 +125,17 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
 
   def viewPendingFaucetRequests: Action[AnyContent] = withGenesisLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      try {
+     /* try {
         withUsernameToken.Ok(views.html.component.master.viewPendingFaucetRequests(masterTransactionFaucetRequests.Service.getPendingFaucetRequests))
       }
       catch {
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }*/
+    val pendingFaucetRequests=masterTransactionFaucetRequests.Service.getPendingFaucetRequests
+      (for{
+        pendingFaucetRequests<-pendingFaucetRequests
+    }yield  withUsernameToken.Ok(views.html.component.master.viewPendingFaucetRequests(pendingFaucetRequests))
+        ).recover{
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
@@ -145,14 +148,21 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
     implicit request =>
       views.companion.master.RejectFaucetRequest.form.bindFromRequest().fold(
         formWithErrors => {
-          BadRequest(views.html.component.master.rejectFaucetRequest(formWithErrors, formWithErrors.data(constants.Form.REQUEST_ID)))
+          Future{BadRequest(views.html.component.master.rejectFaucetRequest(formWithErrors, formWithErrors.data(constants.Form.REQUEST_ID)))}
         },
         rejectFaucetRequestData => {
-          try {
+         /* try {
             masterTransactionFaucetRequests.Service.reject(rejectFaucetRequestData.requestID, comment = rejectFaucetRequestData.comment)
             withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.FAUCET_REQUEST_REJECTED)))
           }
           catch {
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+          }*/
+          val reject=masterTransactionFaucetRequests.Service.reject(rejectFaucetRequestData.requestID, comment = rejectFaucetRequestData.comment)
+          (for{
+            _<-reject
+          }yield withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.FAUCET_REQUEST_REJECTED)))
+            ).recover{
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
         }
@@ -167,10 +177,10 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
     implicit request =>
       views.companion.master.ApproveFaucetRequest.form.bindFromRequest().fold(
         formWithErrors => {
-          BadRequest(views.html.component.master.approveFaucetRequests(formWithErrors, formWithErrors.data(constants.Form.REQUEST_ID), formWithErrors.data(constants.Form.ACCOUNT_ID)))
+          Future{BadRequest(views.html.component.master.approveFaucetRequests(formWithErrors, formWithErrors.data(constants.Form.REQUEST_ID), formWithErrors.data(constants.Form.ACCOUNT_ID)))}
         },
         approveFaucetRequestFormData => {
-          try {
+          /*try {
             if (masterTransactionFaucetRequests.Service.getStatus(approveFaucetRequestFormData.requestID).isEmpty) {
               val toAddress = masterAccounts.Service.getAddress(approveFaucetRequestFormData.accountID)
               val ticketID = transaction.process[blockchainTransaction.SendCoin, transactionsSendCoin.Request](
@@ -189,6 +199,37 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
             }
           }
           catch {
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+          }*/
+          val status=masterTransactionFaucetRequests.Service.getStatus(approveFaucetRequestFormData.requestID)
+          def getResult(status:Option[Boolean])={
+            if(status.isEmpty){
+              val toAddress = masterAccounts.Service.getAddress(approveFaucetRequestFormData.accountID)
+              def ticketID(toAddress:String)=transaction.process[blockchainTransaction.SendCoin, transactionsSendCoin.Request](
+                entity = blockchainTransaction.SendCoin(from = loginState.address, to = toAddress, amount = defaultFaucetToken, gas = approveFaucetRequestFormData.gas, ticketID = "", mode = transactionMode),
+                blockchainTransactionCreate = blockchainTransactionSendCoins.Service.create,
+                request = transactionsSendCoin.Request(transactionsSendCoin.BaseReq(from = loginState.address, gas = approveFaucetRequestFormData.gas.toString), password = approveFaucetRequestFormData.password, to = toAddress, amount = Seq(transactionsSendCoin.Amount(denominationOfGasToken, defaultFaucetToken.toString)), mode = transactionMode),
+                action = transactionsSendCoin.Service.post,
+                onSuccess = blockchainTransactionSendCoins.Utility.onSuccess,
+                onFailure = blockchainTransactionSendCoins.Utility.onFailure,
+                updateTransactionHash = blockchainTransactionSendCoins.Service.updateTransactionHash
+              )
+              def accept(ticketID:String)=masterTransactionFaucetRequests.Service.accept(requestID = approveFaucetRequestFormData.requestID, ticketID = ticketID, gas = approveFaucetRequestFormData.gas)
+              for{
+              toAddress<-toAddress
+              ticketID<-ticketID(toAddress)
+              _<-accept(ticketID)
+            }yield withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.FAUCET_REQUEST_APPROVED)))
+
+            }else{
+              Future{Unauthorized(views.html.index(failures = Seq(constants.Response.REQUEST_ALREADY_APPROVED_OR_REJECTED)))}
+            }
+          }
+          (for{
+            status<-status
+            result<-getResult(status)
+          }yield result
+            ).recover{
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
         }

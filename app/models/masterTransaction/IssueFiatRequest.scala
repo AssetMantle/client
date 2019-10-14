@@ -110,17 +110,17 @@ class IssueFiatRequests @Inject()(protected val databaseConfigProvider: Database
 
   object Service {
 
-    def create(accountID: String, transactionID: String, transactionAmount: Int): String = Await.result(add(IssueFiatRequest(id = utilities.IDGenerator.requestID, accountID = accountID, transactionID = transactionID, transactionAmount = transactionAmount)), Duration.Inf)
+    def create(accountID: String, transactionID: String, transactionAmount: Int): Future[String] = add(IssueFiatRequest(id = utilities.IDGenerator.requestID, accountID = accountID, transactionID = transactionID, transactionAmount = transactionAmount))
 
-    def reject(id: String, comment: String): Int = Await.result(updateStatusAndCommentByID(id = id, status = Option(false), comment = comment), Duration.Inf)
+    def reject(id: String, comment: String): Future[Int] = updateStatusAndCommentByID(id = id, status = Option(false), comment = comment)
 
-    def accept(requestID: String, ticketID: String, gas: Int): Int = Await.result(updateTicketIDGasAndStatusByID(requestID, ticketID, gas = Option(gas), status = Option(true)), Duration.Inf)
+    def accept(requestID: String, ticketID: String, gas: Int): Future[Int] = updateTicketIDGasAndStatusByID(requestID, ticketID, gas = Option(gas), status = Option(true))
 
-    def getPendingIssueFiatRequests(accountIDs: Seq[String]): Seq[IssueFiatRequest] = Await.result(getIssueFiatRequestsWithNullStatus(accountIDs), Duration.Inf)
+    def getPendingIssueFiatRequests(accountIDs: Seq[String]): Future[Seq[IssueFiatRequest]] = getIssueFiatRequestsWithNullStatus(accountIDs)
 
     def delete(id: String): Int = Await.result(deleteByID(id), Duration.Inf)
 
-    def getStatus(id: String): Option[Boolean] = Await.result(getStatusByID(id), Duration.Inf)
+    def getStatus(id: String): Future[Option[Boolean]] = getStatusByID(id)
 
   }
 

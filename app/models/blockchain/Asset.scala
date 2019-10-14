@@ -155,7 +155,7 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
 
     def getAllPublic(excludedAssets:Seq[String]):Future[Seq[Asset]] = findAllAssetsByPublic(excludedAssets)
 
-    def getAllLocked(ownerAddresses:Seq[String]):Seq[Asset] = Await.result(findAllAssetsByLockedStatus(ownerAddresses = ownerAddresses, locked = true),Duration.Inf)
+    def getAllLocked(ownerAddresses:Seq[String]):Future[Seq[Asset]] = findAllAssetsByLockedStatus(ownerAddresses = ownerAddresses, locked = true)
 
     def getByPegHashes(pegHashes:Seq[String]):Future[Seq[Asset]] = findByPegHashes(pegHashes)
 
@@ -171,7 +171,7 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
 
     def getDirtyAssets: Seq[Asset] = Await.result(getAssetsByDirtyBit(dirtyBit = true), Duration.Inf)
 
-    def markDirty(pegHash: String): Int = Await.result(updateDirtyBitByPegHash(pegHash, dirtyBit = true), Duration.Inf)
+    def markDirty(pegHash: String): Future[Int] = updateDirtyBitByPegHash(pegHash, dirtyBit = true)
 
     def assetCometSource(username: String) = {
       shutdownActors.shutdown(constants.Module.ACTOR_MAIN_ASSET, username)

@@ -190,40 +190,36 @@ class AssetFiles @Inject()(protected val databaseConfigProvider: DatabaseConfigP
 
   object Service {
 
-    def create(file: AssetFile): String = Await.result(add(serialize(AssetFile(id = file.id, documentType = file.documentType, fileName = file.fileName, file = file.file, context = None, status = None))), Duration.Inf)
+    def create(file: AssetFile): Future[String] = add(serialize(AssetFile(id = file.id, documentType = file.documentType, fileName = file.fileName, file = file.file, context = None, status = None)))
 
-    def getOrEmpty(id: String, documentType: String): AssetFile = Await.result(findByIdDocumentType(id = id, documentType = documentType), Duration.Inf).getOrElse(AssetFileSerialized("","","",None,None,None)).deserialize
+    def getOrEmpty(id: String, documentType: String): Future[AssetFile] =findByIdDocumentType(id = id, documentType = documentType).map{documentType=> documentType.getOrElse(AssetFileSerialized("","","",None,None,None)).deserialize }
 
-    def getOrNone(id: String, documentType: String): Option[AssetFile] = {
-        val assetFile = Await.result(findByIdDocumentType(id = id, documentType = documentType), Duration.Inf)
-        if(assetFile.isDefined) Option(assetFile.get.deserialize) else None
-    }
+    def getOrNone(id: String, documentType: String):Future[Option[AssetFile]] = findByIdDocumentType(id = id, documentType = documentType).map{assetFile=>if(assetFile.isDefined) Option(assetFile.get.deserialize) else None }
 
     def get(id: String, documentType: String): AssetFile = Await.result(findByIdDocumentType(id = id, documentType = documentType), Duration.Inf).getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)).deserialize
 
-    def insertOrUpdateOldDocument(file: AssetFile): Int = Await.result(upsertFile(AssetFile(id = file.id, documentType = file.documentType, fileName = file.fileName, file = file.file, context = None, status = None)), Duration.Inf)
+    def insertOrUpdateOldDocument(file: AssetFile): Future[Int] = upsertFile(AssetFile(id = file.id, documentType = file.documentType, fileName = file.fileName, file = file.file, context = None, status = None))
 
-    def insertOrUpdateContext(file: AssetFile): Int = Await.result(upsertContext(serialize(file)), Duration.Inf)
+    def insertOrUpdateContext(file: AssetFile): Future[Int] = upsertContext(serialize(file))
 
-    def accept(id: String, documentType: String): Int = Await.result(updateStatus(id, documentType, status = true), Duration.Inf)
+    def accept(id: String, documentType: String): Future[Int] =updateStatus(id, documentType, status = true)
 
-    def reject(id: String, documentType: String): Int = Await.result(updateStatus(id, documentType, status = false), Duration.Inf)
+    def reject(id: String, documentType: String): Future[Int] =updateStatus(id, documentType, status = false)
 
-    def getFileName(id: String, documentType: String): String = Await.result(getFileNameByIdDocumentType(id = id, documentType = documentType), Duration.Inf)
+    def getFileName(id: String, documentType: String): Future[String] = getFileNameByIdDocumentType(id = id, documentType = documentType)
 
-    def getAllDocuments(id: String): Seq[AssetFile] = Await.result(getAllDocumentsById(id = id), Duration.Inf).map(_.deserialize)
+    def getAllDocuments(id: String): Future[Seq[AssetFile]] = getAllDocumentsById(id = id).map{_.map(_.deserialize)}
 
-    def getDocuments(id: String, documents: Seq[String]): Seq[AssetFile] = Await.result(getDocumentsByID(id, documents), Duration.Inf).map(_.deserialize)
+    def getDocuments(id: String, documents: Seq[String]): Future[Seq[AssetFile]] =getDocumentsByID(id, documents).map{documents=> documents.map(_.deserialize)}
 
     def deleteAllDocuments(id: String): Int = Await.result(deleteById(id = id), Duration.Inf)
 
-    def checkFileExists(id: String, documentType: String): Boolean = Await.result(getIDAndDocumentType(id, documentType), Duration.Inf)
+    def checkFileExists(id: String, documentType: String): Future[Boolean] = getIDAndDocumentType(id, documentType)
 
     def checkFileNameExists(id: String, fileName: String): Boolean = Await.result(checkByIdAndFileName(id = id, fileName = fileName), Duration.Inf)
 
-    def checkAllAssetFilesVerified(id: String): Boolean = {
-      val documentStatuses = Await.result(getStatusForAllDocumentsById(id), Duration.Inf)
-      if (documentStatuses.nonEmpty) documentStatuses.forall(status => status.getOrElse(false)) else false
+    def checkAllAssetFilesVerified(id: String):  Future[Boolean] = {
+      getStatusForAllDocumentsById(id).map{documentStatuses=>if (documentStatuses.nonEmpty) documentStatuses.forall(status => status.getOrElse(false)) else false }
     }
   }
 
