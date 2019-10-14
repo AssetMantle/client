@@ -50,7 +50,7 @@
                                     <li>
                                         <div id="profileACL"> @loginState.acl match {
                                             case Some(acl) => {
-                                                <p>@Messages(constants.Form.ISSUE_ASSET): @if(acl.issueAsset) {
+                                                <p>@Messages(constants.FormField.ISSUE_ASSET.name): @if(acl.issueAsset) {
                                                     <span cmuk-icon="check"></span>
                                                 } else {
                                                     <span cmuk-icon="close"></span>
@@ -59,7 +59,7 @@
                                                 </p>
                                                 <p>
 
-                                                    @Messages(constants.Form.ISSUE_FIAT) : @if(acl.issueFiat) {
+                                                    @Messages(constants.FormField.ISSUE_FIAT.name) : @if(acl.issueFiat) {
                                                     <span cmuk-icon="check"></span>
                                                 } else {
                                                     <span cmuk-icon="close"></span>
@@ -67,16 +67,7 @@
                                                     }
                                                 </p>
                                                 <p>
-                                                    @Messages(constants.Form.SEND_ASSET): @if(acl.sendAsset) {
-                                                    <span cmuk-icon="check"></span>
-                                                } else {
-                                                    <span cmuk-icon="close"></span>
-                                                    <br>
-                                                    }
-                                                </p>
-
-                                                <p>
-                                                    @Messages(constants.Form.SEND_FIAT): @if(acl.sendFiat) {
+                                                    @Messages(constants.FormField.SEND_ASSET.name): @if(acl.sendAsset) {
                                                     <span cmuk-icon="check"></span>
                                                 } else {
                                                     <span cmuk-icon="close"></span>
@@ -85,7 +76,7 @@
                                                 </p>
 
                                                 <p>
-                                                    @Messages(constants.Form.REDEEM_ASSET): @if(acl.redeemAsset) {
+                                                    @Messages(constants.FormField.SEND_FIAT.name): @if(acl.sendFiat) {
                                                     <span cmuk-icon="check"></span>
                                                 } else {
                                                     <span cmuk-icon="close"></span>
@@ -94,7 +85,16 @@
                                                 </p>
 
                                                 <p>
-                                                    @Messages(constants.Form.REDEEM_FIAT):@if(acl.redeemFiat) {
+                                                    @Messages(constants.FormField.REDEEM_ASSET.name): @if(acl.redeemAsset) {
+                                                    <span cmuk-icon="check"></span>
+                                                } else {
+                                                    <span cmuk-icon="close"></span>
+                                                    <br>
+                                                    }
+                                                </p>
+
+                                                <p>
+                                                    @Messages(constants.FormField.REDEEM_FIAT.name):@if(acl.redeemFiat) {
                                                     <span cmuk-icon="check"></span>
                                                 } else {
                                                     <span cmuk-icon="close"></span>
@@ -112,7 +112,7 @@
                                                 </p>
 
                                                 <p>
-                                                    @Messages(constants.Form.SELLER_EXECUTE_ORDER): @if(acl.sellerExecuteOrder) {
+                                                    @Messages(constants.FormField.SELLER_EXECUTE_ORDER.name): @if(acl.sellerExecuteOrder) {
                                                     <span cmuk-icon="check"></span>
                                                 } else {
                                                     <span cmuk-icon="close"></span>
@@ -121,7 +121,7 @@
                                                 </p>
 
                                                 <p>
-                                                    @Messages(constants.Form.NEGOTIATION): @if(acl.negotiation) {
+                                                    @Messages(constants.FormField.NEGOTIATION.name): @if(acl.negotiation) {
                                                     <span cmuk-icon="check"></span>
                                                 } else {
                                                     <span cmuk-icon="close"></span>
@@ -139,7 +139,7 @@
                                                 </p>
 
                                                 <p>
-                                                    @Messages(constants.Form.CHANGE_SELLER_BID): @if(acl.changeSellerBid) {
+                                                    @Messages(constants.FormField.CHANGE_SELLER_BID.name): @if(acl.changeSellerBid) {
                                                     <span cmuk-icon="check"></span>
                                                 } else {
                                                     <span cmuk-icon="close"></span>
@@ -148,7 +148,7 @@
                                                 </p>
 
                                                 <p>
-                                                    @Messages(constants.Form.CONFIRM_BUYER_BID): @if(acl.confirmBuyerBid) {
+                                                    @Messages(constants.FormField.CONFIRM_BUYER_BID.name): @if(acl.confirmBuyerBid) {
                                                     <span cmuk-icon="check"></span>
                                                 } else {
                                                     <span cmuk-icon="close"></span>
@@ -157,7 +157,7 @@
                                                 </p>
 
                                                 <p>
-                                                    @Messages(constants.Form.CONFIRM_SELLER_BID): @if(acl.confirmSellerBid) {
+                                                    @Messages(constants.FormField.CONFIRM_SELLER_BID.name): @if(acl.confirmSellerBid) {
                                                     <span cmuk-icon="check"></span>
                                                 } else {
                                                     <span cmuk-icon="close"></span>
@@ -166,7 +166,7 @@
                                                 </p>
 
                                                 <p>
-                                                    @Messages(constants.Form.RELEASE_ASSET): @if(acl.releaseAsset) {
+                                                    @Messages(constants.FormField.RELEASE_ASSET.name): @if(acl.releaseAsset) {
                                                     <span cmuk-icon="check"></span>
                                                 } else {
                                                     <span cmuk-icon="close"></span>

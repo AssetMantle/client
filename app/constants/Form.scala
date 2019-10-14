@@ -40,6 +40,8 @@ object Form {
   //ChangeBuyerBid
   val CHANGE_BUYER_BID = new Form("CHANGE_BUYER_BID", routes.ChangeBuyerBidController.changeBuyerBid())
 
+  val CHANGE_SELLER_BID = new Form("CHANGE_SELLER_BID", routes.ChangeSellerBidController.changeSellerBid())
+
   //BLOCKCHAIN_FORMS
   val BLOCKCHAIN_ADD_KEY = new Form("BLOCKCHAIN_ADD_KEY", routes.AddKeyController.blockchainAddKey())
   val BLOCKCHAIN_ADD_ORGANIZATION = new Form("BLOCKCHAIN_ADD_ORGANIZATION", routes.AddOrganizationController.blockchainAddOrganization())
@@ -289,7 +291,6 @@ object Form {
   val RECEIVE_NOTIFICATIONS = "RECEIVE_NOTIFICATIONS"
   val SELLER_EXECUTE_ORDER = "SELLER_EXECUTE_ORDER"
   val MODERATED_SELLER_EXECUTE_ORDER = "MODERATED_SELLER_EXECUTE_ORDER"
-  val CHANGE_SELLER_BID = "CHANGE_SELLER_BID"
   val CONFIRM_BUYER_BID = "CONFIRM_BUYER_BID"
   val CONFIRM_BUYER_BID_DETAIL = "CONFIRM_BUYER_BID_DETAIL"
   val CONFIRM_SELLER_BID = "CONFIRM_SELLER_BID"
