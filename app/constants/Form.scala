@@ -79,7 +79,11 @@ object Form {
   val ISSUE_FIAT = new Form("ISSUE_FIAT", routes.IssueFiatController.issueFiat())
   val BLOCKCHAIN_ISSUE_FIAT = new Form("BLOCKCHAIN_ISSUE_FIAT", routes.IssueFiatController.blockchainIssueFiat())
 
+  //RedeemAssetController
+  val REDEEM_ASSET = new Form("REDEEM_ASSET", routes.RedeemAssetController.redeemAsset())
   val BLOCKCHAIN_REDEEM_ASSET = new Form("BLOCKCHAIN_REDEEM_ASSET", routes.RedeemAssetController.blockchainRedeemAsset())
+
+
   val BLOCKCHAIN_REDEEM_FIAT = new Form("BLOCKCHAIN_REDEEM_FIAT", routes.RedeemFiatController.blockchainRedeemFiat())
   val BLOCKCHAIN_RELEASE_ASSET = new Form("BLOCKCHAIN_RELEASE_ASSET", routes.ReleaseAssetController.blockchainReleaseAsset())
   val BLOCKCHAIN_SELLER_EXECUTE_ORDER = new Form("BLOCKCHAIN_SELLER_EXECUTE_ORDER", routes.SellerExecuteOrderController.blockchainSellerExecuteOrder())
@@ -307,7 +311,6 @@ object Form {
   val ACL_ADDRESS = "ACL_ADDRESS"
   val SEND_ASSET = "SEND_ASSET"
   val SEND_FIAT = "SEND_FIAT"
-  val REDEEM_ASSET = "REDEEM_ASSET"
   val REDEEM_FIAT = "REDEEM_FIAT"
   val RECEIVE_NOTIFICATIONS = "RECEIVE_NOTIFICATIONS"
   val SELLER_EXECUTE_ORDER = "SELLER_EXECUTE_ORDER"
