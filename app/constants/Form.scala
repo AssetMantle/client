@@ -11,7 +11,7 @@ class Form(template: String, val route: Call) {
 
 object Form {
 
-  //Account
+  //ACCOUNT
   val SIGN_UP = new Form("SIGN_UP", routes.AccountController.signUp())
   val LOGIN = new Form("LOGIN", routes.AccountController.login())
   val LOGOUT = new Form("LOGOUT", routes.AccountController.logout())
@@ -19,7 +19,7 @@ object Form {
   val EMAIL_OTP_FORGOT_PASSWORD = new Form("EMAIL_OTP_FORGOT_PASSWORD", routes.AccountController.emailOTPForgotPassword())
   val FORGOT_PASSWORD = new Form("FORGOT_PASSWORD", routes.AccountController.forgotPassword())
 
-  //AddOrganization
+  //ADD_ORGANIZATION
   val ADD_ORGANIZATION = new Form("ADD_ORGANIZATION", routes.AddOrganizationController.addOrganization())
   val USER_UPDATE_UBOS = new Form("USER_UPDATE_UBOS", routes.AddOrganizationController.userUpdateUBOs())
   val ORGANIZATION_BANK_ACCOUNT_DETAIL = new Form("ORGANIZATION_BANK_ACCOUNT_DETAIL", routes.AddOrganizationController.organizationBankAccountDetail())
@@ -27,20 +27,25 @@ object Form {
   val VERIFY_ORGANIZATION = new Form("VERIFY_ORGANIZATION", routes.AddOrganizationController.verifyOrganization())
   val REJECT_VERIFY_ORGANIZATION_REQUEST = new Form("REJECT_VERIFY_ORGANIZATION_REQUEST", routes.AddOrganizationController.rejectVerifyOrganizationRequest())
 
-  //AddZone
+  //ADD_ZONE
   val ADD_ZONE = new Form("ADD_ZONE", routes.AddZoneController.addZone())
   val REVIEW_ADD_ZONE_ON_COMPLETION = new Form("REVIEW_ADD_ZONE_ON_COMPLETION", routes.AddZoneController.reviewAddZoneOnCompletion())
   val VERIFY_ZONE = new Form("VERIFY_ZONE", routes.AddZoneController.verifyZone())
   val REJECT_VERIFY_ZONE_REQUEST = new Form("REJECT_VERIFY_ZONE_REQUEST", routes.AddZoneController.rejectVerifyZoneRequest())
 
-  //BuyerExecuteOrder
+  //BUYER_EXECUTE_ORDER
   val BUYER_EXECUTE_ORDER = new Form("BUYER_EXECUTE_ORDER", routes.BuyerExecuteOrderController.buyerExecuteOrder())
   val MODERATED_BUYER_EXECUTE_ORDER = new Form("MODERATED_BUYER_EXECUTE_ORDER", routes.BuyerExecuteOrderController.moderatedBuyerExecuteOrder())
 
-  //ChangeBuyerBid
+  //CHANGE_BUYER_BID
   val CHANGE_BUYER_BID = new Form("CHANGE_BUYER_BID", routes.ChangeBuyerBidController.changeBuyerBid())
 
+  //CHANGE_SELLER_BID
   val CHANGE_SELLER_BID = new Form("CHANGE_SELLER_BID", routes.ChangeSellerBidController.changeSellerBid())
+
+  //CONFIRM_BUYER_BID
+  val CONFIRM_BUYER_BID = new Form("CONFIRM_BUYER_BID", routes.ConfirmBuyerBidController.confirmBuyerBid())
+  val CONFIRM_BUYER_BID_DETAIL = new Form("CONFIRM_BUYER_BID_DETAIL", routes.ConfirmBuyerBidController.confirmBuyerBidDetail())
 
   //BLOCKCHAIN_FORMS
   val BLOCKCHAIN_ADD_KEY = new Form("BLOCKCHAIN_ADD_KEY", routes.AddKeyController.blockchainAddKey())
@@ -291,8 +296,6 @@ object Form {
   val RECEIVE_NOTIFICATIONS = "RECEIVE_NOTIFICATIONS"
   val SELLER_EXECUTE_ORDER = "SELLER_EXECUTE_ORDER"
   val MODERATED_SELLER_EXECUTE_ORDER = "MODERATED_SELLER_EXECUTE_ORDER"
-  val CONFIRM_BUYER_BID = "CONFIRM_BUYER_BID"
-  val CONFIRM_BUYER_BID_DETAIL = "CONFIRM_BUYER_BID_DETAIL"
   val CONFIRM_SELLER_BID = "CONFIRM_SELLER_BID"
   val CONFIRM_SELLER_BID_DETAIL = "CONFIRM_SELLER_BID_DETAIL"
   val NEGOTIATION = "NEGOTIATION"
