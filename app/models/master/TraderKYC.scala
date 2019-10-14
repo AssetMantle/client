@@ -150,31 +150,31 @@ class TraderKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfigP
 
   object Service {
 
-    def create(traderKYC: TraderKYC): String = Await.result(add(TraderKYC(id = traderKYC.id, documentType = traderKYC.documentType, fileName = traderKYC.fileName, file = traderKYC.file)), Duration.Inf)
+    def create(traderKYC: TraderKYC): Future[String] = add(TraderKYC(id = traderKYC.id, documentType = traderKYC.documentType, fileName = traderKYC.fileName, file = traderKYC.file))
 
-    def updateOldDocument(traderKYC: TraderKYC): Int = Await.result(upsert(TraderKYC(id = traderKYC.id, documentType = traderKYC.documentType, fileName = traderKYC.fileName, file = traderKYC.file)), Duration.Inf)
+    def updateOldDocument(traderKYC: TraderKYC): Future[Int] =upsert(TraderKYC(id = traderKYC.id, documentType = traderKYC.documentType, fileName = traderKYC.fileName, file = traderKYC.file))
 
     def get(id: String, documentType: String): TraderKYC = Await.result(findByIdDocumentType(id = id, documentType = documentType), Duration.Inf)
 
-    def getFileName(id: String, documentType: String): String = Await.result(getFileNameByIdDocumentType(id = id, documentType = documentType), Duration.Inf)
+    def getFileName(id: String, documentType: String): Future[String] = getFileNameByIdDocumentType(id = id, documentType = documentType)
 
     def getAllDocuments(id: String): Future[Seq[TraderKYC]] = getAllDocumentsById(id = id)
 
-    def zoneVerifyAll(id: String): Int = Await.result(zoneUpdateStatusById(id = id, zoneStatus = Option(true)), Duration.Inf)
+    def zoneVerifyAll(id: String): Future[Int] = zoneUpdateStatusById(id = id, zoneStatus = Option(true))
 
-    def zoneVerify(id: String, documentType: String): Int = Await.result(zoneUpdateStatusByIdAndDocumentType(id = id, documentType = documentType, zoneStatus = Option(true)), Duration.Inf)
+    def zoneVerify(id: String, documentType: String): Future[Int] = zoneUpdateStatusByIdAndDocumentType(id = id, documentType = documentType, zoneStatus = Option(true))
 
-    def zoneReject(id: String, documentType: String): Int = Await.result(zoneUpdateStatusByIdAndDocumentType(id = id, documentType = documentType, zoneStatus = Option(false)), Duration.Inf)
+    def zoneReject(id: String, documentType: String): Future[Int] = zoneUpdateStatusByIdAndDocumentType(id = id, documentType = documentType, zoneStatus = Option(false))
 
-    def zoneRejectAll(id: String): Int = Await.result(zoneUpdateStatusById(id = id, zoneStatus = Option(false)), Duration.Inf)
+    def zoneRejectAll(id: String): Future[Int] = zoneUpdateStatusById(id = id, zoneStatus = Option(false))
 
-    def organizationVerifyAll(id: String): Int = Await.result(organizationUpdateStatusById(id = id, status = Option(true)), Duration.Inf)
+    def organizationVerifyAll(id: String): Future[Int] = organizationUpdateStatusById(id = id, status = Option(true))
 
-    def organizationVerify(id: String, documentType: String): Int = Await.result(organizationUpdateStatusByIdAndDocumentType(id = id, documentType = documentType, status = Option(true)), Duration.Inf)
+    def organizationVerify(id: String, documentType: String): Future[Int] = organizationUpdateStatusByIdAndDocumentType(id = id, documentType = documentType, status = Option(true))
 
-    def organizationReject(id: String, documentType: String): Int = Await.result(organizationUpdateStatusByIdAndDocumentType(id = id, documentType = documentType, status = Option(false)), Duration.Inf)
+    def organizationReject(id: String, documentType: String): Future[Int] = organizationUpdateStatusByIdAndDocumentType(id = id, documentType = documentType, status = Option(false))
 
-    def organizationRejectAll(id: String): Int = Await.result(organizationUpdateStatusById(id = id, status = Option(false)), Duration.Inf)
+    def organizationRejectAll(id: String): Future[Int] = organizationUpdateStatusById(id = id, status = Option(false))
 
     def deleteAllDocuments(id: String): Int = Await.result(deleteById(id = id), Duration.Inf)
 
@@ -182,9 +182,9 @@ class TraderKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfigP
 
     def checkFileNameExists(id: String, fileName: String): Future[Boolean] = checkByIdAndFileName(id = id, fileName = fileName)
 
-    def checkAllKYCFileTypesExists(id: String): Boolean = constants.File.TRADER_KYC_DOCUMENT_TYPES.diff(Await.result(getAllDocumentTypesByIDAndDocumentSet(id = id, documentTypes = constants.File.TRADER_KYC_DOCUMENT_TYPES), Duration.Inf)).isEmpty
+    def checkAllKYCFileTypesExists(id: String): Future[Boolean] =getAllDocumentTypesByIDAndDocumentSet(id = id, documentTypes = constants.File.TRADER_KYC_DOCUMENT_TYPES).map{constants.File.TRADER_KYC_DOCUMENT_TYPES.diff(_).isEmpty}
 
-    def checkAllKYCFilesVerified(id: String): Boolean = constants.File.TRADER_KYC_DOCUMENT_TYPES.diff(Await.result(getAllDocumentTypesByIDStatusAndDocumentSet(id = id, documentTypes = constants.File.TRADER_KYC_DOCUMENT_TYPES, status = true), Duration.Inf)).isEmpty
+    def checkAllKYCFilesVerified(id: String): Future[Boolean] = getAllDocumentTypesByIDStatusAndDocumentSet(id = id, documentTypes = constants.File.TRADER_KYC_DOCUMENT_TYPES, status = true).map{constants.File.TRADER_KYC_DOCUMENT_TYPES.diff(_).isEmpty}
 
   }
 

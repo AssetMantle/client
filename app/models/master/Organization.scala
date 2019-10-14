@@ -232,11 +232,18 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
 
     def getOrganizationsInZone(zoneID: String): Future[Seq[Organization]] = getOrganizationsByZoneID(zoneID).map{organizations=>organizations.map(_.deserialize)}
 
-    def getVerificationStatus(id: String): Boolean = Await.result(getVerificationStatusById(id), Duration.Inf).getOrElse(false)
+    def getVerificationStatus(id: String): Future[Boolean] =getVerificationStatusById(id).map{_.getOrElse(false)}
 
-    def getVerificationStatusWithTry(id: String): Boolean = {
-      val verificationStatus = Await.result(getVerificationStatusById(id), Duration.Inf).getOrElse(false)
-      if (!verificationStatus) throw new BaseException(constants.Response.UNVERIFIED_ORGANIZATION) else true
+    def getVerificationStatusWithTry(id: String): Future[Boolean] = {
+      //val verificationStatus = Await.result(getVerificationStatusById(id), Duration.Inf).getOrElse(false)
+      //if (!verificationStatus) throw new BaseException(constants.Response.UNVERIFIED_ORGANIZATION) else true
+
+      val verificationStatus=getVerificationStatusById(id)
+      for{
+        verificationStatus<-verificationStatus
+      }yield{
+        if(!verificationStatus.getOrElse(false)) throw new BaseException(constants.Response.UNVERIFIED_ORGANIZATION) else true
+      }
     }
 
     def markOrganizationFormCompleted(id: String): Future[Int] = updateCompletionStatusOnID(id = id, completionStatus = true)

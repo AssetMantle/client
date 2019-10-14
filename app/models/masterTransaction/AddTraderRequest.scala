@@ -78,9 +78,9 @@ class AddTraderRequests @Inject()(protected val databaseConfigProvider: Database
 
   object Service {
 
-    def create(accountID: String, organizationID: String): String = Await.result(add(AddTraderRequest(id = utilities.IDGenerator.requestID, accountID = accountID, traderID = utilities.IDGenerator.hexadecimal, organizationID = organizationID)), Duration.Inf)
+    def create(accountID: String, organizationID: String): Future[String] =add(AddTraderRequest(id = utilities.IDGenerator.requestID, accountID = accountID, traderID = utilities.IDGenerator.hexadecimal, organizationID = organizationID))
 
-    def get(id: String): AddTraderRequest = Await.result(findById(id), Duration.Inf)
+    def get(id: String): Future[AddTraderRequest] = findById(id)
   }
 
 }

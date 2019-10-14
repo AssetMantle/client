@@ -40,9 +40,7 @@ class SetACL @Inject()(wsClient: WSClient)(implicit configuration: Configuration
   case class Request(base_req: BaseReq, password: String, aclAddress: String, organizationID: String, zoneID: String, mode: String, issueAsset: String, issueFiat: String, sendAsset: String, sendFiat: String, redeemAsset: String, redeemFiat: String, buyerExecuteOrder: String, sellerExecuteOrder: String, changeBuyerBid: String, changeSellerBid: String, confirmBuyerBid: String, confirmSellerBid: String, negotiation: String, releaseAsset: String) extends BaseRequest
 
   object Service {
-    def post(request: Request): WSResponse = try {
-      Await.result(action(request), Duration.Inf)
-    } catch {
+    def post(request: Request): Future[WSResponse] =action(request).recover{
       case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
         throw new BaseException(constants.Response.CONNECT_EXCEPTION)
     }

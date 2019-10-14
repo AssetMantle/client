@@ -174,10 +174,14 @@ class Traders @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
 
     def create(zoneID: String, organizationID: String, accountID: String, name: String): String = Await.result(add(Trader(utilities.IDGenerator.hexadecimal, zoneID, organizationID, accountID, name)), Duration.Inf)
 
-    def insertOrUpdateTrader(zoneID: String, organizationID: String, accountID: String, name: String): String = {
-      val id = Await.result(getIDByAccountID(accountID), Duration.Inf).getOrElse(utilities.IDGenerator.hexadecimal)
-      Await.result(upsert(Trader(id = id, zoneID = zoneID, organizationID = organizationID, accountID = accountID, name = name)), Duration.Inf)
-      id
+    def insertOrUpdateTrader(zoneID: String, organizationID: String, accountID: String, name: String): Future[String] = {
+
+      val id=getIDByAccountID(accountID).map{_.getOrElse(utilities.IDGenerator.hexadecimal)}
+      def upsertTrader(id:String)=upsert(Trader(id = id, zoneID = zoneID, organizationID = organizationID, accountID = accountID, name = name))
+      for{
+        id<-id
+        _<-upsertTrader(id)
+      }yield id
     }
 
     def getID(accountID: String): Future[String] = getIDByAccountID(accountID).map{id=> id.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION))}
@@ -190,25 +194,25 @@ class Traders @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
 
     def getOrganizationIDByAccountID(accountID: String): Future[String] = findOrganizationIDByAccountId(accountID)
 
-    def rejectTrader(id: String): Int = Await.result(updateVerificationStatusOnID(id = id, verificationStatus = Option(false)), Duration.Inf)
+    def rejectTrader(id: String): Future[Int] = updateVerificationStatusOnID(id = id, verificationStatus = Option(false))
 
     def verifyTrader(id: String): Int = Await.result(updateVerificationStatusOnID(id = id, verificationStatus = Option(true)), Duration.Inf)
 
     def rejectTraderByAccountID(accountID: String): Int = Await.result(updateVerificationStatusOnAccountID(accountID = accountID, verificationStatus = Option(false)), Duration.Inf)
 
-    def verifyTraderByAccountID(accountID: String): Int = Await.result(updateVerificationStatusOnAccountID(accountID = accountID, verificationStatus = Option(true)), Duration.Inf)
+    def verifyTraderByAccountID(accountID: String): Future[Int] = updateVerificationStatusOnAccountID(accountID = accountID, verificationStatus = Option(true))
 
     def getAccountId(id: String): Future[String] = getAccountIdById(id)
 
-    def getVerifyTraderRequestsForZone(zoneID: String): Seq[Trader] = Await.result(getTradersByCompletionStatusVerificationStatusAndZoneID(zoneID = zoneID, completionStatus = true, verificationStatus = null), Duration.Inf)
+    def getVerifyTraderRequestsForZone(zoneID: String): Future[Seq[Trader]] = getTradersByCompletionStatusVerificationStatusAndZoneID(zoneID = zoneID, completionStatus = true, verificationStatus = null)
 
-    def getVerifyTraderRequestsForOrganization(organizationID: String): Seq[Trader] = Await.result(getTradersByCompletedStatusVerificationStatusByOrganizationID(organizationID = organizationID, completionStatus = true, verificationStatus = null), Duration.Inf)
+    def getVerifyTraderRequestsForOrganization(organizationID: String): Future[Seq[Trader]] = getTradersByCompletedStatusVerificationStatusByOrganizationID(organizationID = organizationID, completionStatus = true, verificationStatus = null)
 
-    def getVerifiedTradersForOrganization(organizationID: String): Seq[Trader] = Await.result(getVerifiedTradersByOrganizationID(organizationID), Duration.Inf)
+    def getVerifiedTradersForOrganization(organizationID: String): Future[Seq[Trader]] = getVerifiedTradersByOrganizationID(organizationID)
 
     def getVerificationStatus(id: String): Boolean = Await.result(getVerificationStatusById(id), Duration.Inf).getOrElse(false)
 
-    def markTraderFormCompleted(id: String): Int = Await.result(updateCompletionStatusOnID(id = id, completionStatus = true), Duration.Inf)
+    def markTraderFormCompleted(id: String): Future[Int] = updateCompletionStatusOnID(id = id, completionStatus = true)
 
     def getTradersListInOrganization(organizationID: String): Future[Seq[Trader]] =getTradersByOrganizationID(organizationID)
 

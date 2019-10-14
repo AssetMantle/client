@@ -166,7 +166,7 @@ class FileResourceManager @Inject()()(implicit executionContext: ExecutionContex
       (fileName, encodedBase64) <- convertToThumbnailOrHash
       _<- renameFile(fileName)
       _<- create(fileName,encodedBase64)
-    }yield{}
+    }yield {}
       ).recover{
       case baseException: BaseException => logger.error(baseException.failure.message)
         utilities.FileOperations.deleteFile(path, name)
