@@ -122,7 +122,12 @@ object Form {
   val ORGANIZATION_REJECT_VERIFY_TRADER_REQUEST = new Form("ORGANIZATION_REJECT_VERIFY_TRADER_REQUEST", routes.SetACLController.organizationRejectVerifyTraderRequest())
   val BLOCKCHAIN_SET_ACL = new Form("BLOCKCHAIN_SET_ACL", routes.SetACLController.blockchainSetACL())
 
+  //SetBuyerFeedbackController
+  val SET_BUYER_FEEDBACK = new Form("SET_BUYER_FEEDBACK", routes.SetBuyerFeedbackController.setBuyerFeedback())
   val BLOCKCHAIN_SET_BUYER_FEEDBACK = new Form("BLOCKCHAIN_SET_BUYER_FEEDBACK", routes.SetBuyerFeedbackController.blockchainSetBuyerFeedback())
+
+  //SetSellerFeedbackController
+  val SET_SELLER_FEEDBACK = new Form("SET_SELLER_FEEDBACK", routes.SetSellerFeedbackController.setSellerFeedback())
   val BLOCKCHAIN_SET_SELLER_FEEDBACK = new Form("BLOCKCHAIN_SET_SELLER_FEEDBACK", routes.SetSellerFeedbackController.blockchainSetSellerFeedback())
 
   val INDEX = "INDEX"
@@ -285,8 +290,6 @@ object Form {
   val DELEGATOR_SHARES = "DELEGATOR_SHARES"
 
   //Blockchain
-  val SET_BUYER_FEEDBACK = "SET_BUYER_FEEDBACK"
-  val SET_SELLER_FEEDBACK = "SET_SELLER_FEEDBACK"
   val TAKER_ADDRESS = "TAKER_ADDRESS"
   val BLOCKCHAIN_ADDRESS = "BLOCKCHAIN_ADDRESS"
   val PUBLIC_KEY = "PUBLIC_KEY"
