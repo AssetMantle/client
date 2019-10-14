@@ -28,7 +28,7 @@
                     @loginState.acl match {
                         case Some(acl) => {
                             @if(acl.sendAsset) {
-                                <button class="width btn btn-primary btn-sm" onclick="getForm(jsRoutes.controllers.SendAssetController.sendAssetForm('@negotiation.buyerAddress', '@negotiation.assetPegHash'))">@Messages(constants.Form.SEND_ASSET)</button>
+                                <button class="width btn btn-primary btn-sm" onclick="getForm(jsRoutes.controllers.SendAssetController.sendAssetForm('@negotiation.buyerAddress', '@negotiation.assetPegHash'))">@Messages(constants.Form.SEND_ASSET.legend)</button>
                             } <br>
                         }
                         case _ => {}

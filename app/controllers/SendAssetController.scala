@@ -21,7 +21,7 @@ class SendAssetController @Inject()(messagesControllerComponents: MessagesContro
   private implicit val module: String = constants.Module.CONTROLLERS_SEND_ASSET
 
   def sendAssetForm(buyerAddress: String, pegHash: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.sendAsset(views.companion.master.SendAsset.form, buyerAddress, pegHash))
+    Ok(views.html.component.master.sendAsset(buyerAddress = buyerAddress, pegHash = pegHash))
   }
 
   def sendAsset: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>

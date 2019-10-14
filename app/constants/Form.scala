@@ -96,7 +96,10 @@ object Form {
   val MODERATED_SELLER_EXECUTE_ORDER = new Form("MODERATED_SELLER_EXECUTE_ORDER", routes.SellerExecuteOrderController.moderatedSellerExecuteOrder())
   val BLOCKCHAIN_SELLER_EXECUTE_ORDER = new Form("BLOCKCHAIN_SELLER_EXECUTE_ORDER", routes.SellerExecuteOrderController.blockchainSellerExecuteOrder())
 
+  //SendAssetController
+  val SEND_ASSET = new Form("SEND_ASSET", routes.SendAssetController.sendAsset())
   val BLOCKCHAIN_SEND_ASSET = new Form("BLOCKCHAIN_SEND_ASSET", routes.SendAssetController.blockchainSendAsset())
+
   val BLOCKCHAIN_SEND_COIN = new Form("BLOCKCHAIN_SEND_COIN", routes.SendCoinController.blockchainSendCoin())
   val BLOCKCHAIN_SEND_FIAT = new Form("BLOCKCHAIN_SEND_FIAT", routes.SendFiatController.blockchainSendFiat())
   val BLOCKCHAIN_SET_ACL = new Form("BLOCKCHAIN_SET_ACL", routes.SetACLController.blockchainSetACL())
@@ -316,7 +319,6 @@ object Form {
   val AWB_PROOF_HASH = "AWB_PROOF_HASH"
   val AMOUNT = "AMOUNT"
   val ACL_ADDRESS = "ACL_ADDRESS"
-  val SEND_ASSET = "SEND_ASSET"
   val SEND_FIAT = "SEND_FIAT"
   val RECEIVE_NOTIFICATIONS = "RECEIVE_NOTIFICATIONS"
   val NEGOTIATION = "NEGOTIATION"
