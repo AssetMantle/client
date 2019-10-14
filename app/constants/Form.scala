@@ -11,7 +11,7 @@ class Form(template: String, val route: Call) {
 
 object Form {
 
-  //ACCOUNT
+  //AccountController
   val SIGN_UP = new Form("SIGN_UP", routes.AccountController.signUp())
   val LOGIN = new Form("LOGIN", routes.AccountController.login())
   val LOGOUT = new Form("LOGOUT", routes.AccountController.logout())
@@ -19,43 +19,50 @@ object Form {
   val EMAIL_OTP_FORGOT_PASSWORD = new Form("EMAIL_OTP_FORGOT_PASSWORD", routes.AccountController.emailOTPForgotPassword())
   val FORGOT_PASSWORD = new Form("FORGOT_PASSWORD", routes.AccountController.forgotPassword())
 
-  //ADD_ORGANIZATION
+  //AddKeyController
+  val BLOCKCHAIN_ADD_KEY = new Form("BLOCKCHAIN_ADD_KEY", routes.AddKeyController.blockchainAddKey())
+
+  //AddOrganizationController
   val ADD_ORGANIZATION = new Form("ADD_ORGANIZATION", routes.AddOrganizationController.addOrganization())
   val USER_UPDATE_UBOS = new Form("USER_UPDATE_UBOS", routes.AddOrganizationController.userUpdateUBOs())
   val ORGANIZATION_BANK_ACCOUNT_DETAIL = new Form("ORGANIZATION_BANK_ACCOUNT_DETAIL", routes.AddOrganizationController.organizationBankAccountDetail())
   val REVIEW_ADD_ORGANIZATION_ON_COMPLETION = new Form("REVIEW_ADD_ORGANIZATION_ON_COMPLETION", routes.AddOrganizationController.reviewAddOrganizationOnCompletion())
   val VERIFY_ORGANIZATION = new Form("VERIFY_ORGANIZATION", routes.AddOrganizationController.verifyOrganization())
   val REJECT_VERIFY_ORGANIZATION_REQUEST = new Form("REJECT_VERIFY_ORGANIZATION_REQUEST", routes.AddOrganizationController.rejectVerifyOrganizationRequest())
+  val BLOCKCHAIN_ADD_ORGANIZATION = new Form("BLOCKCHAIN_ADD_ORGANIZATION", routes.AddOrganizationController.blockchainAddOrganization())
 
-  //ADD_ZONE
+  //AddZoneController
   val ADD_ZONE = new Form("ADD_ZONE", routes.AddZoneController.addZone())
   val REVIEW_ADD_ZONE_ON_COMPLETION = new Form("REVIEW_ADD_ZONE_ON_COMPLETION", routes.AddZoneController.reviewAddZoneOnCompletion())
   val VERIFY_ZONE = new Form("VERIFY_ZONE", routes.AddZoneController.verifyZone())
   val REJECT_VERIFY_ZONE_REQUEST = new Form("REJECT_VERIFY_ZONE_REQUEST", routes.AddZoneController.rejectVerifyZoneRequest())
+  val BLOCKCHAIN_ADD_ZONE = new Form("BLOCKCHAIN_ADD_ZONE", routes.AddZoneController.blockchainAddZone())
 
-  //BUYER_EXECUTE_ORDER
+  //BuyerExecuteOrderController
   val BUYER_EXECUTE_ORDER = new Form("BUYER_EXECUTE_ORDER", routes.BuyerExecuteOrderController.buyerExecuteOrder())
   val MODERATED_BUYER_EXECUTE_ORDER = new Form("MODERATED_BUYER_EXECUTE_ORDER", routes.BuyerExecuteOrderController.moderatedBuyerExecuteOrder())
+  val BLOCKCHAIN_BUYER_EXECUTE_ORDER = new Form("BLOCKCHAIN_BUYER_EXECUTE_ORDER", routes.BuyerExecuteOrderController.blockchainBuyerExecuteOrder())
 
-  //CHANGE_BUYER_BID
+  //ChangeBuyerBidController
   val CHANGE_BUYER_BID = new Form("CHANGE_BUYER_BID", routes.ChangeBuyerBidController.changeBuyerBid())
+  val BLOCKCHAIN_CHANGE_BUYER_BID = new Form("BLOCKCHAIN_CHANGE_BUYER_BID", routes.ChangeBuyerBidController.blockchainChangeBuyerBid())
 
-  //CHANGE_SELLER_BID
+  //ChangeSellerBidController
   val CHANGE_SELLER_BID = new Form("CHANGE_SELLER_BID", routes.ChangeSellerBidController.changeSellerBid())
+  val BLOCKCHAIN_CHANGE_SELLER_BID = new Form("BLOCKCHAIN_CHANGE_SELLER_BID", routes.ChangeSellerBidController.blockchainChangeSellerBid())
 
-  //CONFIRM_BUYER_BID
+  //ConfirmBuyerBidController
   val CONFIRM_BUYER_BID = new Form("CONFIRM_BUYER_BID", routes.ConfirmBuyerBidController.confirmBuyerBid())
   val CONFIRM_BUYER_BID_DETAIL = new Form("CONFIRM_BUYER_BID_DETAIL", routes.ConfirmBuyerBidController.confirmBuyerBidDetail())
-
-  //BLOCKCHAIN_FORMS
-  val BLOCKCHAIN_ADD_KEY = new Form("BLOCKCHAIN_ADD_KEY", routes.AddKeyController.blockchainAddKey())
-  val BLOCKCHAIN_ADD_ORGANIZATION = new Form("BLOCKCHAIN_ADD_ORGANIZATION", routes.AddOrganizationController.blockchainAddOrganization())
-  val BLOCKCHAIN_ADD_ZONE = new Form("BLOCKCHAIN_ADD_ZONE", routes.AddZoneController.blockchainAddZone())
-  val BLOCKCHAIN_BUYER_EXECUTE_ORDER = new Form("BLOCKCHAIN_BUYER_EXECUTE_ORDER", routes.BuyerExecuteOrderController.blockchainBuyerExecuteOrder())
-  val BLOCKCHAIN_CHANGE_BUYER_BID = new Form("BLOCKCHAIN_CHANGE_BUYER_BID", routes.ChangeBuyerBidController.blockchainChangeBuyerBid())
-  val BLOCKCHAIN_CHANGE_SELLER_BID = new Form("BLOCKCHAIN_CHANGE_SELLER_BID", routes.ChangeSellerBidController.blockchainChangeSellerBid())
   val BLOCKCHAIN_CONFIRM_BUYER_BID = new Form("BLOCKCHAIN_CONFIRM_BUYER_BID", routes.ConfirmBuyerBidController.blockchainConfirmBuyerBid())
+
+  //ConfirmSellerBidController
+  val CONFIRM_SELLER_BID = new Form("CONFIRM_SELLER_BID", routes.ConfirmSellerBidController.confirmSellerBid())
+  val CONFIRM_SELLER_BID_DETAIL = new Form("CONFIRM_SELLER_BID_DETAIL", routes.ConfirmSellerBidController.confirmSellerBidDetail())
   val BLOCKCHAIN_CONFIRM_SELLER_BID = new Form("BLOCKCHAIN_CONFIRM_SELLER_BID", routes.ConfirmSellerBidController.blockchainConfirmSellerBid())
+
+
+
   val BLOCKCHAIN_ISSUE_ASSET = new Form("BLOCKCHAIN_ISSUE_ASSET", routes.IssueAssetController.blockchainIssueAsset())
   val BLOCKCHAIN_ISSUE_FIAT = new Form("BLOCKCHAIN_ISSUE_FIAT", routes.IssueFiatController.blockchainIssueFiat())
   val BLOCKCHAIN_REDEEM_ASSET = new Form("BLOCKCHAIN_REDEEM_ASSET", routes.RedeemAssetController.blockchainRedeemAsset())
@@ -296,8 +303,6 @@ object Form {
   val RECEIVE_NOTIFICATIONS = "RECEIVE_NOTIFICATIONS"
   val SELLER_EXECUTE_ORDER = "SELLER_EXECUTE_ORDER"
   val MODERATED_SELLER_EXECUTE_ORDER = "MODERATED_SELLER_EXECUTE_ORDER"
-  val CONFIRM_SELLER_BID = "CONFIRM_SELLER_BID"
-  val CONFIRM_SELLER_BID_DETAIL = "CONFIRM_SELLER_BID_DETAIL"
   val NEGOTIATION = "NEGOTIATION"
   val RELEASE_ASSET = "RELEASE_ASSET"
   val NEGOTIATION_ID = "NEGOTIATION_ID"
