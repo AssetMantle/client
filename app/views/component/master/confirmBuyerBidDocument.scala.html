@@ -20,7 +20,7 @@
                 <button onclick="getForm(jsRoutes.controllers.FileController.updateTraderNegotiationForm('@file.documentType','@file.id'))">@Messages(constants.Form.UPDATE) @Messages(file.documentType)</button>
                         <script>hideElement('upload@file.documentType')</script>
             }
-            <button type="button" class="btn-sm btn btn-primary" onclick="getForm(jsRoutes.controllers.ConfirmBuyerBidController.confirmBuyerBidForm('@file.id'))">@Messages(constants.Form.NEXT)</button>
+            <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.ConfirmBuyerBidController.confirmBuyerBidForm('@file.id'))">@Messages(constants.Form.NEXT)</button>
         }
         case None => {}
     }
