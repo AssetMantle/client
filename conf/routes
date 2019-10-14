@@ -86,10 +86,6 @@ GET         /master/getZoneAccessedTraderKYCFile                         control
 GET         /master/file                                                 controllers.FileController.file(fileName: String, documentType: String)
 GET         /master/tradingFile                                          controllers.FileController.tradingFile(id: String, fileName: String, documentType: String)
 
-GET         /checkAccountKYCFileExists                                   controllers.FileController.checkAccountKYCFileExists(accountID: String, documentType: String)
-GET         /checkTraderAssetFileExists                                  controllers.FileController.checkTraderAssetFileExists(id: String, documentType: String)
-GET         /checkTraderNegotiationFileExists                            controllers.FileController.checkTraderNegotiationFileExists(id: String, documentType: String)
-
 GET         /accountUpload                                               controllers.FileController.uploadAccountFileForm(documentType: String)
 POST        /accountUpload/file                                          controllers.FileController.uploadAccountFile(documentType: String)
 GET         /accountUpload/storeFile                                     controllers.FileController.storeAccountFile(name: String, documentType: String)
