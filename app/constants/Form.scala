@@ -91,8 +91,11 @@ object Form {
   val RELEASE_ASSET = new Form("RELEASE_ASSET", routes.ReleaseAssetController.releaseAsset())
   val BLOCKCHAIN_RELEASE_ASSET = new Form("BLOCKCHAIN_RELEASE_ASSET", routes.ReleaseAssetController.blockchainReleaseAsset())
 
-
+  //SellerExecuteOrderController
+  val SELLER_EXECUTE_ORDER = new Form("SELLER_EXECUTE_ORDER", routes.SellerExecuteOrderController.sellerExecuteOrder())
+  val MODERATED_SELLER_EXECUTE_ORDER = new Form("MODERATED_SELLER_EXECUTE_ORDER", routes.SellerExecuteOrderController.moderatedSellerExecuteOrder())
   val BLOCKCHAIN_SELLER_EXECUTE_ORDER = new Form("BLOCKCHAIN_SELLER_EXECUTE_ORDER", routes.SellerExecuteOrderController.blockchainSellerExecuteOrder())
+
   val BLOCKCHAIN_SEND_ASSET = new Form("BLOCKCHAIN_SEND_ASSET", routes.SendAssetController.blockchainSendAsset())
   val BLOCKCHAIN_SEND_COIN = new Form("BLOCKCHAIN_SEND_COIN", routes.SendCoinController.blockchainSendCoin())
   val BLOCKCHAIN_SEND_FIAT = new Form("BLOCKCHAIN_SEND_FIAT", routes.SendFiatController.blockchainSendFiat())
@@ -316,8 +319,6 @@ object Form {
   val SEND_ASSET = "SEND_ASSET"
   val SEND_FIAT = "SEND_FIAT"
   val RECEIVE_NOTIFICATIONS = "RECEIVE_NOTIFICATIONS"
-  val SELLER_EXECUTE_ORDER = "SELLER_EXECUTE_ORDER"
-  val MODERATED_SELLER_EXECUTE_ORDER = "MODERATED_SELLER_EXECUTE_ORDER"
   val NEGOTIATION = "NEGOTIATION"
   val NEGOTIATION_ID = "NEGOTIATION_ID"
   val BUYER_SIGNATURE = "BUYER_SIGNATURE"
