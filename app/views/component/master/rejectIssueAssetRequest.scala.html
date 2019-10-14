@@ -4,7 +4,7 @@
 @import views.companion.master.RejectIssueAssetRequest
 
 @(rejectIssueAssetRequestForm: Form[RejectIssueAssetRequest.Data] = RejectIssueAssetRequest.form, requestID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
-@baseForm(constants.Form.REJECT_ISSUE_ASSET_REQUEST, rejectIssueAssetRequestForm) {
+@commonForm(constants.Form.REJECT_ISSUE_ASSET_REQUEST, rejectIssueAssetRequestForm) {
     @inputText(rejectIssueAssetRequestForm(constants.FormField.REQUEST_ID.name).copy(value = Some(requestID)), '_label -> Messages(constants.FormField.REQUEST_ID.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.REQUEST_ID.name), 'required -> true)
     @inputText(rejectIssueAssetRequestForm(constants.FormField.COMMENT.name), '_label -> Messages(constants.FormField.COMMENT.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.COMMENT.name), 'required -> true)
 }

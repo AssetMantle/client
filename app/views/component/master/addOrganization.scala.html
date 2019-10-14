@@ -5,7 +5,7 @@
 @import views.companion.master.AddOrganization
 
 @(addOrganizationForm: Form[AddOrganization.Data] = AddOrganization.form, zones: Seq[Zone])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
-@baseForm(constants.Form.ADD_ORGANIZATION, addOrganizationForm) {
+@commonForm(constants.Form.ADD_ORGANIZATION, addOrganizationForm) {
     <div>
     @for(zone <- zones) {
         <button type="button" class="btn-sm btn btn-primary" onclick="fillZoneIDField('@zone.id')">

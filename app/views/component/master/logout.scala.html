@@ -4,7 +4,7 @@
 @import views.html.base._
 
 @(logoutForm: Form[Logout.Data] = Logout.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
-@baseForm(constants.Form.LOGOUT, logoutForm) {
+@commonForm(constants.Form.LOGOUT, logoutForm) {
     @Messages(constants.Form.RECEIVE_NOTIFICATIONS)
     @checkbox(logoutForm(constants.Form.RECEIVE_NOTIFICATIONS), '_label -> Messages(constants.Form.RECEIVE_NOTIFICATIONS), 'class -> "cmuk-checkbox")
 }

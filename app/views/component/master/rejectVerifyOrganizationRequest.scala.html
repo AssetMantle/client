@@ -4,6 +4,6 @@
 @import views.companion.master.RejectVerifyOrganizationRequest
 
 @(rejectVerifyOrganizationRequestForm: Form[RejectVerifyOrganizationRequest.Data] = RejectVerifyOrganizationRequest.form, organizationID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
-@baseForm(constants.Form.REJECT_VERIFY_ORGANIZATION_REQUEST, rejectVerifyOrganizationRequestForm) {
+@commonForm(constants.Form.REJECT_VERIFY_ORGANIZATION_REQUEST, rejectVerifyOrganizationRequestForm) {
     @inputText(rejectVerifyOrganizationRequestForm(constants.FormField.ORGANIZATION_ID.name).copy(value = Some(organizationID)), '_label -> Messages(constants.FormField.ORGANIZATION_ID.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.ORGANIZATION_ID.name), 'required -> true)
 }

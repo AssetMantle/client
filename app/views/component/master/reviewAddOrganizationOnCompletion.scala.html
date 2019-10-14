@@ -6,7 +6,7 @@
 @import views.companion.master.ReviewAddOrganizationOnCompletion
 
 @(reviewAddOrganizationOnCompletionForm: Form[ReviewAddOrganizationOnCompletion.Data] = ReviewAddOrganizationOnCompletion.form, organization: Organization, zone: Zone, organizationBankAccountDetail: OrganizationBankAccountDetail, organizationKYCs: Seq[OrganizationKYC])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, module: String, logger: Logger, loginState: LoginState = null)
-@baseForm(constants.Form.REVIEW_ADD_ORGANIZATION_ON_COMPLETION, reviewAddOrganizationOnCompletionForm) {
+@commonForm(constants.Form.REVIEW_ADD_ORGANIZATION_ON_COMPLETION, reviewAddOrganizationOnCompletionForm) {
     <div>@Messages(constants.Form.ZONE_DETAILS): <br>
         <span class="red">@Messages(constants.Form.NAME)</span>: @zone.name <br>
         <span class="red">@Messages(constants.Form.CURRENCY)</span>: @zone.currency <br>

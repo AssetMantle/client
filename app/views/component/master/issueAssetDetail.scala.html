@@ -4,7 +4,7 @@
 @import views.html.base._
 
 @(issueAssetDetailForm: Form[IssueAssetDetail.Data] = IssueAssetDetail.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
-@baseForm(constants.Form.ISSUE_ASSET_DETAIL, issueAssetDetailForm) {
+@commonForm(constants.Form.ISSUE_ASSET_DETAIL, issueAssetDetailForm) {
     @inputText(issueAssetDetailForm(constants.FormField.REQUEST_ID.name), '_label -> Messages(constants.FormField.REQUEST_ID.name), 'class -> "form-control hidden", 'placeholder -> Messages(constants.FormField.REQUEST_ID.name), 'required -> false)
     @select(issueAssetDetailForm(constants.FormField.ASSET_TYPE.name), for(option <- constants.Form.ASSET_TYPE_OPTIONS) yield (option, Messages(option)), '_label -> Messages(constants.FormField.ASSET_TYPE.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.ASSET_TYPE.name), '_default -> Messages(constants.FormField.ASSET_TYPE.name), 'required -> true)
     @inputText(issueAssetDetailForm(constants.FormField.QUANTITY_UNIT.name), '_label -> Messages(constants.FormField.QUANTITY_UNIT.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.QUANTITY_UNIT.name), 'required -> true)

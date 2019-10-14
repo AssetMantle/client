@@ -4,6 +4,6 @@
 @import views.companion.master.RejectVerifyTraderRequest
 
 @(rejectVerifyTraderRequestForm: Form[RejectVerifyTraderRequest.Data] = RejectVerifyTraderRequest.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
-@baseForm(constants.Form.ORGANIZATION_REJECT_VERIFY_TRADER_REQUEST, rejectVerifyTraderRequestForm) {
+@commonForm(constants.Form.ORGANIZATION_REJECT_VERIFY_TRADER_REQUEST, rejectVerifyTraderRequestForm) {
     @inputText(rejectVerifyTraderRequestForm(constants.FormField.TRADER_ID.name), '_label -> Messages(constants.FormField.TRADER_ID.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.TRADER_ID.name), 'required -> true)
 }

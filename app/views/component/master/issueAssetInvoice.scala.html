@@ -5,7 +5,7 @@
 @import views.companion.master.IssueAssetInvoice
 
 @(issueAssetInvoiceForm: Form[IssueAssetInvoice.Data] = IssueAssetInvoice.form, file: Option[masterTransaction.AssetFile] = None)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
-@baseForm(constants.Form.ISSUE_ASSET_INVOICE, issueAssetInvoiceForm) {
+@commonForm(constants.Form.ISSUE_ASSET_INVOICE, issueAssetInvoiceForm) {
     <div class="centerText">
         <div id='@Seq("upload", constants.File.INVOICE).mkString("")'>
             <button onclick="getForm(jsRoutes.controllers.FileController.uploadTraderAssetForm('@constants.File.INVOICE', '@issueAssetInvoiceForm.data(constants.FormField.REQUEST_ID.name)'))">@Messages(constants.Form.UPLOAD) @Messages(constants.File.INVOICE)</button>

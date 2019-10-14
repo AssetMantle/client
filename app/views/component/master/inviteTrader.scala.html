@@ -3,6 +3,6 @@
 @import views.companion.master.InviteTrader
 
 @(inviteTraderForm: Form[InviteTrader.Data] = InviteTrader.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@baseForm(constants.Form.INVITE_TRADER, inviteTraderForm) {
+@commonForm(constants.Form.INVITE_TRADER, inviteTraderForm) {
     @inputText(inviteTraderForm(constants.FormField.ACCOUNT_ID.name), '_label -> Messages(constants.FormField.ACCOUNT_ID.name), 'placeholder -> Messages(constants.FormField.ACCOUNT_ID.name), 'required -> true, 'class -> "cmuk-input")
 }

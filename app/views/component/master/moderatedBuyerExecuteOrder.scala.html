@@ -4,7 +4,7 @@
 @import views.companion.master.ModeratedBuyerExecuteOrder
 
 @(moderatedBuyerExecuteOrderForm: Form[ModeratedBuyerExecuteOrder.Data] = ModeratedBuyerExecuteOrder.form, buyerAddress: String, sellerAddress: String, pegHash: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
-@baseForm(constants.Form.MODERATED_BUYER_EXECUTE_ORDER, moderatedBuyerExecuteOrderForm) {
+@commonForm(constants.Form.MODERATED_BUYER_EXECUTE_ORDER, moderatedBuyerExecuteOrderForm) {
     @inputText(moderatedBuyerExecuteOrderForm(constants.FormField.BUYER_ADDRESS.name).copy(value = Some(buyerAddress)), '_label -> Messages(constants.FormField.BUYER_ADDRESS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.BUYER_ADDRESS.name), 'required -> true)
     @inputText(moderatedBuyerExecuteOrderForm(constants.FormField.SELLER_ADDRESS.name).copy(value = Some(sellerAddress)), '_label -> Messages(constants.FormField.SELLER_ADDRESS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.SELLER_ADDRESS.name), 'required -> true)
     @inputText(moderatedBuyerExecuteOrderForm(constants.FormField.FIAT_PROOF_HASH.name), '_label -> Messages(constants.FormField.FIAT_PROOF_HASH.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.FIAT_PROOF_HASH.name), 'required -> true)

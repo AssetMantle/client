@@ -4,7 +4,7 @@
 @import views.companion.master.SendCoin
 
 @(sendCoinForm: Form[SendCoin.Data] = SendCoin.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
-@baseForm(constants.Form.SEND_COIN, sendCoinForm) {
+@commonForm(constants.Form.SEND_COIN, sendCoinForm) {
     @inputText(sendCoinForm(constants.FormField.TO.name), '_label -> Messages(constants.FormField.TO.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.TO.name), 'required -> true)
     @inputText(sendCoinForm(constants.FormField.AMOUNT.name), '_label -> Messages(constants.FormField.AMOUNT.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.AMOUNT.name), 'required -> true, 'type -> "number")
     @inputText(sendCoinForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.GAS.name), 'required -> true, 'type -> "number")

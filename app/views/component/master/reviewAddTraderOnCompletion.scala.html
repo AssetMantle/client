@@ -6,7 +6,7 @@
 @import views.html.base._
 
 @(reviewAddTraderOnCompletionForm: Form[ReviewAddTraderOnCompletion.Data] = ReviewAddTraderOnCompletion.form, trader: Trader, organization: Organization, zone: Zone, traderKYCs: Seq[TraderKYC])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, module: String, logger: Logger, loginState: LoginState = null)
-@baseForm(constants.Form.REVIEW_ADD_TRADER_ON_COMPLETION, reviewAddTraderOnCompletionForm) {
+@commonForm(constants.Form.REVIEW_ADD_TRADER_ON_COMPLETION, reviewAddTraderOnCompletionForm) {
     <div>@Messages(constants.Form.TRADER_DETAILS):<br>
         <span class="red">@Messages(constants.Form.NAME)</span>: @trader.name <br>
     </div>

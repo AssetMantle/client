@@ -4,6 +4,6 @@
 @import views.companion.master.FaucetRequest
 
 @(faucetRequestForm: Form[FaucetRequest.Data] = FaucetRequest.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
-    @baseForm(constants.Form.FAUCET_REQUEST, faucetRequestForm) {
+    @commonForm(constants.Form.FAUCET_REQUEST, faucetRequestForm) {
     @inputText(faucetRequestForm(constants.FormField.COUPON.name), '_label -> Messages(constants.FormField.COUPON.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.COUPON.name), 'required -> true)
 }

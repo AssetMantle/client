@@ -4,7 +4,7 @@
 @import views.html.base._
 
 @(issueAssetOBLForm: Form[IssueAssetOBL.Data] = IssueAssetOBL.form, file: Option[masterTransaction.AssetFile] = None)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
-@baseForm(constants.Form.ISSUE_ASSET_OBL, issueAssetOBLForm) {
+@commonForm(constants.Form.ISSUE_ASSET_OBL, issueAssetOBLForm) {
     <div class="centerText">
         <div id='@Seq("upload", constants.File.OBL).mkString("")'>
             <button onclick="getForm(jsRoutes.controllers.FileController.uploadTraderAssetForm('@constants.File.OBL', '@issueAssetOBLForm.data(constants.FormField.REQUEST_ID.name)'))">@Messages(constants.Form.UPLOAD) @Messages(constants.File.OBL)</button>

@@ -3,7 +3,7 @@
 @import views.html.base._
 
 @(sendCoinForm: Form[SendCoin.Data] = SendCoin.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@baseForm(constants.Form.BLOCKCHAIN_SEND_COIN, sendCoinForm) {
+@commonForm(constants.Form.BLOCKCHAIN_SEND_COIN, sendCoinForm) {
     @inputText(sendCoinForm(constants.FormField.FROM.name), '_label -> Messages(constants.FormField.FROM.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.FROM.name), 'required -> true)
     @inputText(sendCoinForm(constants.FormField.TO.name), '_label -> Messages(constants.FormField.TO.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.TO.name), 'required -> true)
     @inputText(sendCoinForm(constants.FormField.AMOUNT.name), '_label -> Messages(constants.FormField.AMOUNT.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.AMOUNT.name), 'required -> true, 'type -> "number")

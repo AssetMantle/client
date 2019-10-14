@@ -4,7 +4,7 @@
 @import views.html.base._
 
 @(loginForm: Form[Login.Data] = Login.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
-@baseForm(constants.Form.LOGIN, loginForm) {
+@commonForm(constants.Form.LOGIN, loginForm) {
     @inputText(loginForm(constants.FormField.USERNAME.name), '_label -> Messages(constants.FormField.USERNAME.name), 'class -> "cmuk-input", 'placeholder -> "Username", 'required -> true)
     @inputPassword(loginForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "cmuk-input", 'placeholder -> "Password", 'required -> true)
     @inputText(loginForm(constants.FormField.PUSH_NOTIFICATION_TOKEN.name), 'class -> "hidden", 'id -> constants.FormField.PUSH_NOTIFICATION_TOKEN.name, 'readonly -> true)

@@ -4,6 +4,6 @@
 @import views.companion.master.VerifyMobileNumber
 
 @(verifyMobileNumberForm: Form[VerifyMobileNumber.Data] = VerifyMobileNumber.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
-@baseForm(constants.Form.VERIFY_MOBILE_NUMBER, verifyMobileNumberForm) {
+@commonForm(constants.Form.VERIFY_MOBILE_NUMBER, verifyMobileNumberForm) {
     @inputText(verifyMobileNumberForm(constants.FormField.OTP.name), '_label -> Messages(constants.FormField.OTP.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.OTP.name), 'required -> true)
 }

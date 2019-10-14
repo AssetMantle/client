@@ -4,7 +4,7 @@
 @import views.companion.master.ConfirmBuyerBidDetail
 
 @(confirmBuyerBidDetailForm: Form[ConfirmBuyerBidDetail.Data] = ConfirmBuyerBidDetail.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
-@baseForm(constants.Form.CONFIRM_BUYER_BID_DETAIL, confirmBuyerBidDetailForm) {
+@commonForm(constants.Form.CONFIRM_BUYER_BID_DETAIL, confirmBuyerBidDetailForm) {
     @inputText(confirmBuyerBidDetailForm(constants.FormField.REQUEST_ID.name), '_label -> Messages(constants.FormField.REQUEST_ID.name), 'class -> "form-control hidden", 'placeholder -> Messages(constants.FormField.REQUEST_ID.name), 'required -> false)
     @inputText(confirmBuyerBidDetailForm(constants.FormField.SELLER_ADDRESS.name), '_label -> Messages(constants.FormField.SELLER_ADDRESS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.SELLER_ADDRESS.name), 'required -> true)
     @inputText(confirmBuyerBidDetailForm(constants.FormField.BID.name), '_label -> Messages(constants.FormField.BID.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.BID.name), 'required -> true, 'type -> "number")

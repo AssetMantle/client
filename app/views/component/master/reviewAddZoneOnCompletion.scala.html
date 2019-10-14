@@ -6,7 +6,7 @@
 @import views.html.base._
 
 @(zoneCompletionForm: Form[ReviewAddZoneOnCompletion.Data] = ReviewAddZoneOnCompletion.form, zone: Zone, zoneKYCs: Seq[ZoneKYC])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, module: String, logger: Logger, loginState: LoginState = null)
-@baseForm(constants.Form.REVIEW_ADD_ZONE_ON_COMPLETION, zoneCompletionForm) {
+@commonForm(constants.Form.REVIEW_ADD_ZONE_ON_COMPLETION, zoneCompletionForm) {
     <div>@Messages(constants.Form.ZONE_DETAILS):<br>
         <span class="red">@Messages(constants.Form.NAME)</span>: @zone.name <br>
         <span class="red">@Messages(constants.Form.CURRENCY)</span>: @zone.currency <br>

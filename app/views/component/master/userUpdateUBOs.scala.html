@@ -4,7 +4,7 @@
 @import views.html.base._
 
 @(addUBOsForm: Form[AddUBOs.Data] = AddUBOs.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
-@baseForm(constants.Form.USER_UPDATE_UBOS, addUBOsForm) {
+@commonForm(constants.Form.USER_UPDATE_UBOS, addUBOsForm) {
     @repeatWithIndex(addUBOsForm(constants.Form.UBOS), min = addUBOsForm(constants.Form.UBOS).indexes.length + 1) { (uboForm, i) =>
         <div id='@Seq(constants.Form.UBO, i).mkString("")'>
             @inputText(uboForm(constants.FormField.PERSON_NAME.name), '_label -> Messages(constants.FormField.PERSON_NAME.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PERSON_NAME.name), 'required -> false)

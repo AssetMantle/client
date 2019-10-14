@@ -5,7 +5,7 @@
 
 @(confirmIssueAssetTransactionForm: Form[ConfirmIssueAssetTransaction.Data] = ConfirmIssueAssetTransaction.form, asset: masterTransaction.IssueAssetRequest)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 <div id="assetDetail"></div>
-@baseForm(constants.Form.ISSUE_ASSET_REQUEST, confirmIssueAssetTransactionForm) {
+@commonForm(constants.Form.ISSUE_ASSET_REQUEST, confirmIssueAssetTransactionForm) {
     @inputText(confirmIssueAssetTransactionForm(constants.FormField.REQUEST_ID.name), '_label -> Messages(constants.FormField.REQUEST_ID.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.REQUEST_ID.name), 'required -> true)
     @asset.physicalDocumentsHandledVia match {
         case constants.Form.COMDEX => {}

@@ -6,7 +6,7 @@
 @import models.masterTransaction.NegotiationFile
 
 @(confirmBidTransactionForm: Form[ConfirmBidTransaction.Data] = ConfirmBidTransaction.form, negotiation: NegotiationRequest, files: Seq[NegotiationFile])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
-@baseForm(constants.Form.CONFIRM_SELLER_BID, confirmBidTransactionForm) {
+@commonForm(constants.Form.CONFIRM_SELLER_BID, confirmBidTransactionForm) {
 
     <span class="red">@Messages(constants.Form.BUYER_ID)</span> : @negotiation.buyerAccountID <br>
     <span class="red">@Messages(constants.FormField.BID.name)</span> : @negotiation.amount <br>

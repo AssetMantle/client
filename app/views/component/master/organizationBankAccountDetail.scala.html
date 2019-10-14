@@ -4,7 +4,7 @@
 @import views.html.base._
 
 @(organizationBankAccountDetailForm: Form[OrganizationBankAccountDetail.Data] = OrganizationBankAccountDetail.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
-@baseForm(constants.Form.ORGANIZATION_BANK_ACCOUNT_DETAIL, organizationBankAccountDetailForm) {
+@commonForm(constants.Form.ORGANIZATION_BANK_ACCOUNT_DETAIL, organizationBankAccountDetailForm) {
     @inputText(organizationBankAccountDetailForm(constants.FormField.ACCOUNT_HOLDER_NAME.name), '_label -> Messages(constants.FormField.ACCOUNT_HOLDER_NAME.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.ACCOUNT_HOLDER_NAME.name), 'required -> true)
     @inputText(organizationBankAccountDetailForm(constants.FormField.NICK_NAME.name), '_label -> Messages(constants.FormField.NICK_NAME.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.NICK_NAME.name), 'required -> true)
     @inputText(organizationBankAccountDetailForm(constants.FormField.ACCOUNT_NUMBER.name), '_label -> Messages(constants.FormField.ACCOUNT_NUMBER.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.ACCOUNT_NUMBER.name), 'required -> true)

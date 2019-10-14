@@ -4,7 +4,7 @@
 @import views.companion.master.SetSellerFeedback
 
 @(setSellerFeedbackForm: Form[SetSellerFeedback.Data] = SetSellerFeedback.form, buyerAddress: String, pegHash: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
-@baseForm(constants.Form.SET_SELLER_FEEDBACK, setSellerFeedbackForm) {
+@commonForm(constants.Form.SET_SELLER_FEEDBACK, setSellerFeedbackForm) {
     @inputText(setSellerFeedbackForm(constants.FormField.BUYER_ADDRESS.name).copy(value = Some(buyerAddress)), '_label -> Messages(constants.FormField.BUYER_ADDRESS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.BUYER_ADDRESS.name), 'required -> true)
     @inputText(setSellerFeedbackForm(constants.FormField.PEG_HASH.name).copy(value = Some(pegHash)), '_label -> Messages(constants.FormField.PEG_HASH.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PEG_HASH.name), 'required -> true)
     @inputText(setSellerFeedbackForm(constants.FormField.RATING.name), '_label -> Messages(constants.FormField.RATING.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.RATING.name), 'required -> true, 'type -> "number")

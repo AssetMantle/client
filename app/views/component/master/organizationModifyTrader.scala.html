@@ -4,7 +4,7 @@
 @import views.companion.master.ModifyTrader
 
 @(modifyTraderForm: Form[ModifyTrader.Data] = ModifyTrader.form)( implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
-@baseForm(constants.Form.MODIFY_TRADER, modifyTraderForm) {
+@commonForm(constants.Form.MODIFY_TRADER, modifyTraderForm) {
     @inputText(modifyTraderForm(constants.FormField.ACCOUNT_ID.name), '_label -> Messages(constants.FormField.ACCOUNT_ID.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.ACCOUNT_ID.name), 'required -> true)
     <span>
         @Messages(constants.FormField.ISSUE_ASSET.name)
