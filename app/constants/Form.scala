@@ -61,6 +61,8 @@ object Form {
   val CONFIRM_SELLER_BID_DETAIL = new Form("CONFIRM_SELLER_BID_DETAIL", routes.ConfirmSellerBidController.confirmSellerBidDetail())
   val BLOCKCHAIN_CONFIRM_SELLER_BID = new Form("BLOCKCHAIN_CONFIRM_SELLER_BID", routes.ConfirmSellerBidController.blockchainConfirmSellerBid())
 
+  //ContactController
+  val UPDATE_CONTACT = new Form("UPDATE_CONTACT", routes.ContactController.updateContact())
 
 
   val BLOCKCHAIN_ISSUE_ASSET = new Form("BLOCKCHAIN_ISSUE_ASSET", routes.IssueAssetController.blockchainIssueAsset())
@@ -322,7 +324,6 @@ object Form {
   val USERNAME_AVAILABLE = "USERNAME_AVAILABLE"
   val PUSH_NOTIFICATION_TOKEN = "PUSH_NOTIFICATION_TOKEN"
   val CSRF_TOKEN = "csrfToken"
-  val UPDATE_CONTACT = "UPDATE_CONTACT"
   val MOBILE_NUMBER = "MOBILE_NUMBER"
   val EMAIL_ADDRESS = "EMAIL_ADDRESS"
   val VERIFY_EMAIL_ADDRESS = "VERIFY_EMAIL_ADDRESS"

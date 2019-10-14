@@ -23,7 +23,7 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
   implicit val contactWrites: OWrites[master.Contact] = Json.writes[master.Contact]
 
   def updateContactForm: Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.updateContact(UpdateContact.form, constants.CountryCallingCode.COUNTRY_CODES))
+    Ok(views.html.component.master.updateContact(countryCallingCodes = constants.CountryCallingCode.COUNTRY_CODES))
   }
 
   def updateContact: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
