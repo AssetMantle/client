@@ -3,26 +3,10 @@
 @import views.html.base._
 @import views.companion.master.RedeemFiat
 
-@(redeemFiatForm: Form[RedeemFiat.Data], zoneID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
-
-@form(action = routes.RedeemFiatController.redeemFiat, 'onkeypress -> "submitFormOnEnter(event,this)") {
-    <div class="latest_card-header latest_card-header-primary text-center">
-        <h4 class="latest_card-title">@Messages(constants.Form.REDEEM_FIAT)</h4>
-    </div>
-    <div class="latest_card-body">
-        @CSRF.formField
-      @inputText(redeemFiatForm(constants.FormField.ZONE_ID.name).copy(value = Some(zoneID)), '_label -> Messages(constants.FormField.ZONE_ID.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.ZONE_ID.name), 'required -> true)
-      @inputText(redeemFiatForm(constants.FormField.REDEEM_AMOUNT.name), '_label -> Messages(constants.FormField.REDEEM_AMOUNT.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.REDEEM_AMOUNT.name), 'required -> true, 'type -> "number")
-      @inputText(redeemFiatForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.GAS.name), 'required -> true, 'type -> "number")
-      @inputPassword(redeemFiatForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PASSWORD.name), 'required -> true)
-
-        @if(redeemFiatForm.hasGlobalErrors) {
-            <ul>
-            @for(error <- redeemFiatForm.globalErrors) {
-                <li>@error.format</li>
-            }
-            </ul>
-        }
-        <button type="button" class="btn btn-sm btn-primary" onclick="submitForm(this)">@Messages(constants.Form.REDEEM_FIAT)</button>
-    </div>
+@(redeemFiatForm: Form[RedeemFiat.Data] = RedeemFiat.form, zoneID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@baseForm(constants.Form.REDEEM_FIAT, redeemFiatForm) {
+    @inputText(redeemFiatForm(constants.FormField.ZONE_ID.name).copy(value = Some(zoneID)), '_label -> Messages(constants.FormField.ZONE_ID.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.ZONE_ID.name), 'required -> true)
+    @inputText(redeemFiatForm(constants.FormField.REDEEM_AMOUNT.name), '_label -> Messages(constants.FormField.REDEEM_AMOUNT.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.REDEEM_AMOUNT.name), 'required -> true, 'type -> "number")
+    @inputText(redeemFiatForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.GAS.name), 'required -> true, 'type -> "number")
+    @inputPassword(redeemFiatForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PASSWORD.name), 'required -> true)
 }

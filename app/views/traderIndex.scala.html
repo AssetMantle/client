@@ -57,7 +57,7 @@
                             <button onclick="getForm(jsRoutes.controllers.IssueFiatController.issueFiatRequestForm())">@Messages(constants.Form.ISSUE_FIAT_REQUEST.legend)</button>
                         }
                         @if(acl.redeemFiat) {
-                            <button onclick="getForm(jsRoutes.controllers.RedeemFiatController.redeemFiatForm('@loginState.address'))">@Messages(constants.Form.REDEEM_FIAT)</button>
+                            <button onclick="getForm(jsRoutes.controllers.RedeemFiatController.redeemFiatForm('@loginState.address'))">@Messages(constants.Form.REDEEM_FIAT.legend)</button>
                         }
                     }
                     case _ => {}
