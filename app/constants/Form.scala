@@ -71,10 +71,14 @@ object Form {
   val ISSUE_ASSET_INVOICE = new Form("ISSUE_ASSET_INVOICE", routes.IssueAssetController.issueAssetInvoice())
   val REJECT_ISSUE_ASSET_REQUEST = new Form("REJECT_ISSUE_ASSET_REQUEST", routes.IssueAssetController.rejectIssueAssetRequest())
   val ISSUE_ASSET = new Form("ISSUE_ASSET", routes.IssueAssetController.issueAsset())
-
-
   val BLOCKCHAIN_ISSUE_ASSET = new Form("BLOCKCHAIN_ISSUE_ASSET", routes.IssueAssetController.blockchainIssueAsset())
+
+  //IssueFiatController
+  val ISSUE_FIAT_REQUEST = new Form("ISSUE_FIAT_REQUEST", routes.IssueFiatController.issueFiatRequest())
+  val REJECT_ISSUE_FIAT_REQUEST = new Form("REJECT_ISSUE_FIAT_REQUEST", routes.IssueFiatController.rejectIssueFiatRequest())
+  val ISSUE_FIAT = new Form("ISSUE_FIAT", routes.IssueFiatController.issueFiat())
   val BLOCKCHAIN_ISSUE_FIAT = new Form("BLOCKCHAIN_ISSUE_FIAT", routes.IssueFiatController.blockchainIssueFiat())
+
   val BLOCKCHAIN_REDEEM_ASSET = new Form("BLOCKCHAIN_REDEEM_ASSET", routes.RedeemAssetController.blockchainRedeemAsset())
   val BLOCKCHAIN_REDEEM_FIAT = new Form("BLOCKCHAIN_REDEEM_FIAT", routes.RedeemFiatController.blockchainRedeemFiat())
   val BLOCKCHAIN_RELEASE_ASSET = new Form("BLOCKCHAIN_RELEASE_ASSET", routes.ReleaseAssetController.blockchainReleaseAsset())
@@ -301,8 +305,6 @@ object Form {
   val AWB_PROOF_HASH = "AWB_PROOF_HASH"
   val AMOUNT = "AMOUNT"
   val ACL_ADDRESS = "ACL_ADDRESS"
-  val ISSUE_FIAT = "ISSUE_FIAT"
-  val ISSUE_FIAT_REQUEST = "ISSUE_FIAT_REQUEST"
   val SEND_ASSET = "SEND_ASSET"
   val SEND_FIAT = "SEND_FIAT"
   val REDEEM_ASSET = "REDEEM_ASSET"
@@ -376,7 +378,6 @@ object Form {
   val REQUEST_ID = "REQUEST_ID"
   val APPROVE = "APPROVE"
   val REJECT = "REJECT"
-  val REJECT_ISSUE_FIAT_REQUEST = "REJECT_ISSUE_FIAT_REQUEST"
   val REJECT_VERIFY_TRADER_REQUEST = "REJECT_VERIFY_TRADER_REQUEST"
   val SHIPMENT_DETAILS = "SHIPMENT_DETAILS"
   val COMDEX = "COMDEX"

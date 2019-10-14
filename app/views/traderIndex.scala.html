@@ -54,7 +54,7 @@
                 @loginState.acl match {
                     case Some(acl) => {
                         @if(acl.issueFiat) {
-                            <button onclick="getForm(jsRoutes.controllers.IssueFiatController.issueFiatRequestForm())">@Messages(constants.Form.ISSUE_FIAT_REQUEST)</button>
+                            <button onclick="getForm(jsRoutes.controllers.IssueFiatController.issueFiatRequestForm())">@Messages(constants.Form.ISSUE_FIAT_REQUEST.legend)</button>
                         }
                         @if(acl.redeemFiat) {
                             <button onclick="getForm(jsRoutes.controllers.RedeemFiatController.redeemFiatForm('@loginState.address'))">@Messages(constants.Form.REDEEM_FIAT)</button>
