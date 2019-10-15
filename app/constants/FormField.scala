@@ -135,6 +135,12 @@ object FormField {
   val CONFIRM_SELLER_BID = new BooleanFormField("CONFIRM_SELLER_BID")
   val NEGOTIATION = new BooleanFormField("NEGOTIATION")
   val RELEASE_ASSET = new BooleanFormField("RELEASE_ASSET")
+  val RECEIVE_NOTIFICATIONS = new BooleanFormField("RECEIVE_NOTIFICATIONS")
+  val USERNAME_AVAILABLE = new BooleanFormField("USERNAME_AVAILABLE")
+  val MODERATED = new BooleanFormField("MODERATED")
+  val COMPLETION = new BooleanFormField("COMPLETION")
+  val STATUS = new BooleanFormField("STATUS")
+  val CONFIRM_NOTE_NEW_KEY_DETAILS = new BooleanFormField("CONFIRM_NOTE_NEW_KEY_DETAILS")
 
   class StringFormField (fieldName: String, minimumLength: Int, maximumLength: Int, regex: Regex = RegularExpression.ANY_STRING, errorMessage: String = "Error Response") {
     val name: String = fieldName

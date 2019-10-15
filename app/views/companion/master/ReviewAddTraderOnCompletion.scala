@@ -1,12 +1,12 @@
 package views.companion.master
 
 import play.api.data.Form
-import play.api.data.Forms.{boolean, mapping}
+import play.api.data.Forms.mapping
 
 object ReviewAddTraderOnCompletion {
   val form = Form(
     mapping(
-      constants.Form.COMPLETION -> boolean
+      constants.FormField.COMPLETION.name -> constants.FormField.COMPLETION.field
     )(Data.apply)(Data.unapply)
   )
 

@@ -12,8 +12,8 @@
     @inputText(issueAssetForm(constants.FormField.QUANTITY_UNIT.name), '_label -> Messages(constants.FormField.QUANTITY_UNIT.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.QUANTITY_UNIT.name), 'required -> true)
     @inputText(issueAssetForm(constants.FormField.ASSET_QUANTITY.name), '_label -> Messages(constants.FormField.ASSET_QUANTITY.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.ASSET_QUANTITY.name), 'required -> true, 'type -> "number")
     <span>
-        @Messages(constants.Form.MODERATED)
-        @checkbox(issueAssetForm(constants.Form.MODERATED), '_label -> Messages(constants.Form.MODERATED), 'class -> "cmuk-checkbox")
+        @Messages(constants.FormField.MODERATED.name)
+        @checkbox(issueAssetForm(constants.FormField.MODERATED.name), '_label -> Messages(constants.FormField.MODERATED.name), 'class -> "cmuk-checkbox")
     </span>
     @inputText(issueAssetForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.GAS.name), 'required -> true, 'type -> "number")
     @inputText(issueAssetForm(constants.FormField.TAKER_ADDRESS.name), '_label -> Messages(constants.FormField.TAKER_ADDRESS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.TAKER_ADDRESS.name), 'required -> false)
