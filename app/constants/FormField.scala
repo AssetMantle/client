@@ -102,7 +102,7 @@ object FormField {
   val COMDEX_PAYMENT_TERMS = new StringOptionFormField("COMDEX_PAYMENT_TERMS", constants.Form.COMDEX_PAYMENT_TERMS_OPTIONS)
 
   //IntFormField
-  val GAS = new IntFormField("GAS", 20000, 1000000)
+  val GAS = new IntFormField("GAS", 20000, 1000000, Option(1))
   val BID = new IntFormField("BID", 0, Int.MaxValue)
   val TIME = new IntFormField("TIME", 0, Int.MaxValue)
   val ASSET_QUANTITY = new IntFormField("ASSET_QUANTITY", 1, Int.MaxValue)
@@ -152,7 +152,7 @@ object FormField {
     val field: Mapping[String] = text.verifying(constraint = field => option contains field, error = errorMessage)
   }
 
-  class IntFormField (fieldName: String, val minimumValue: Int, val maximumValue: Int) {
+  class IntFormField (fieldName: String, val minimumValue: Int, val maximumValue: Int, val step: Option[Int] = None) {
     val name: String = fieldName
     val field: Mapping[Int] =  number(min = minimumValue, max = maximumValue)
   }
