@@ -4,10 +4,10 @@
 
 @(addOrganizationForm: Form[AddOrganization.Data] = AddOrganization.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @commonForm(constants.Form.BLOCKCHAIN_ADD_ORGANIZATION, addOrganizationForm) {
-    @textField(addOrganizationForm, constants.FormField.FROM.name)
-    @textField(addOrganizationForm, constants.FormField.TO.name)
-    @textField(addOrganizationForm, constants.FormField.ORGANIZATION_ID.name)
-    @textField(addOrganizationForm, constants.FormField.ZONE_ID.name)
-    @textField(addOrganizationForm, constants.FormField.GAS.name)
-    @passwordField(addOrganizationForm, constants.FormField.PASSWORD.name)
+    @commonInputText(addOrganizationForm, constants.FormField.FROM.name)
+    @commonInputText(addOrganizationForm, constants.FormField.TO.name)
+    @commonInputText(addOrganizationForm, constants.FormField.ORGANIZATION_ID.name)
+    @commonInputText(addOrganizationForm, constants.FormField.ZONE_ID.name)
+    @commonInputText(addOrganizationForm, constants.FormField.GAS.name)
+    @commonInputPassword(addOrganizationForm, constants.FormField.PASSWORD.name)
 }
