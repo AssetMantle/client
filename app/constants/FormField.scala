@@ -136,6 +136,7 @@ object FormField {
   val NEGOTIATION = new BooleanFormField("NEGOTIATION")
   val RELEASE_ASSET = new BooleanFormField("RELEASE_ASSET")
 
+  //TODO: Error Response through Messages
   class StringFormField (fieldName: String, minimumLength: Int, maximumLength: Int, regex: Regex = RegularExpression.ANY_STRING, errorMessage: String = "Error Response") {
     val name: String = fieldName
     val field: Mapping[String] = text(minLength = minimumLength, maxLength = maximumLength).verifying(Constraints.pattern(regex = regex, name = regex.pattern.toString, error = errorMessage))
