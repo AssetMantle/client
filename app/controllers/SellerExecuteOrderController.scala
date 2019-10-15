@@ -23,7 +23,7 @@ class SellerExecuteOrderController @Inject()(messagesControllerComponents: Messa
 
   def sellerExecuteOrderForm(orderID: String): Action[AnyContent] = Action { implicit request =>
     val negotiation = blockchainNegotiations.Service.get(orderID)
-    Ok(views.html.component.master.sellerExecuteOrder(views.companion.master.SellerExecuteOrder.form, negotiation.buyerAddress, negotiation.assetPegHash))
+    Ok(views.html.component.master.sellerExecuteOrder(buyerAddress = negotiation.buyerAddress, pegHash = negotiation.assetPegHash))
   }
 
   def sellerExecuteOrder: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
@@ -62,7 +62,7 @@ class SellerExecuteOrderController @Inject()(messagesControllerComponents: Messa
   }
 
   def moderatedSellerExecuteOrderForm(buyerAddress: String, sellerAddress: String, pegHash: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.moderatedSellerExecuteOrder(views.companion.master.ModeratedSellerExecuteOrder.form, buyerAddress, sellerAddress, pegHash))
+    Ok(views.html.component.master.moderatedSellerExecuteOrder(buyerAddress = buyerAddress, sellerAddress = sellerAddress, pegHash = pegHash))
   }
 
   def moderatedSellerExecuteOrder: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>

@@ -21,7 +21,7 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
   private implicit val module: String = constants.Module.CONTROLLERS_ISSUE_FIAT
 
   def issueFiatRequestForm: Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.issueFiatRequest(views.companion.master.IssueFiatRequest.form))
+    Ok(views.html.component.master.issueFiatRequest())
   }
 
   def issueFiatRequest: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
@@ -53,7 +53,7 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
   }
 
   def rejectIssueFiatRequestForm(requestID: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.rejectIssueFiatRequest(views.companion.master.RejectIssueFiatRequest.form, requestID))
+    Ok(views.html.component.master.rejectIssueFiatRequest(requestID = requestID))
   }
 
   def rejectIssueFiatRequest: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>

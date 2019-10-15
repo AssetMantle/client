@@ -24,7 +24,7 @@ class VerifyEmailAddressController @Inject()(messagesControllerComponents: Messa
       try {
         val otp = emailOTPs.Service.sendOTP(loginState.username)
         utilitiesNotification.send(accountID = loginState.username, notification = constants.Notification.VERIFY_EMAIL, otp)
-        withUsernameToken.Ok(views.html.component.master.verifyEmailAddress(views.companion.master.VerifyEmailAddress.form))
+        withUsernameToken.Ok(views.html.component.master.verifyEmailAddress())
       }
       catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))

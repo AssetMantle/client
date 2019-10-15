@@ -13,10 +13,10 @@
                     @loginState.acl match {
                         case Some(acl) => {
                             @if(acl.changeBuyerBid) {
-                                <button class="width btn btn-primary btn-sm" onclick="getForm(jsRoutes.controllers.ChangeBuyerBidController.changeBuyerBidForm('@negotiation.sellerAddress', '@negotiation.assetPegHash'))">@Messages(constants.Form.NEGOTIATE)</button>
+                                <button class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.ChangeBuyerBidController.changeBuyerBidForm('@negotiation.sellerAddress', '@negotiation.assetPegHash'))">@Messages(constants.Form.NEGOTIATE)</button>
                             } <br>
                             @if(acl.confirmBuyerBid) {
-                                <button class="width btn btn-primary btn-sm" onclick="getForm(jsRoutes.controllers.ConfirmBuyerBidController.confirmBuyerBidDetailForm('@negotiation.sellerAddress', '@negotiation.assetPegHash', @negotiation.bid))">@Messages(constants.Form.ACCEPT_OFFER)</button>
+                                <button class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.ConfirmBuyerBidController.confirmBuyerBidDetailForm('@negotiation.sellerAddress', '@negotiation.assetPegHash', @negotiation.bid))">@Messages(constants.Form.ACCEPT_OFFER)</button>
                             } <br>
                         }
                         case _ => {}
@@ -26,7 +26,7 @@
                     @loginState.acl match {
                         case Some(acl) => {
                             @if(acl.sendFiat) {
-                                <button onclick="getForm(jsRoutes.controllers.SendFiatController.sendFiatForm('@negotiation.sellerAddress', '@negotiation.assetPegHash', @negotiation.bid))">@Messages(constants.Form.SEND_FIAT)</button>
+                                <button onclick="getForm(jsRoutes.controllers.SendFiatController.sendFiatForm('@negotiation.sellerAddress', '@negotiation.assetPegHash', @negotiation.bid))">@Messages(constants.Form.SEND_FIAT.legend)</button>
                             } <br>
                         }
                         case _ => {}

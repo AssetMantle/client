@@ -3,7 +3,7 @@
 @import views.html.base._
 
 @(redeemFiatForm: Form[RedeemFiat.Data] = RedeemFiat.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@baseForm(constants.Form.BLOCKCHAIN_REDEEM_FIAT, redeemFiatForm) {
+@commonForm(constants.Form.BLOCKCHAIN_REDEEM_FIAT, redeemFiatForm) {
     @inputText(redeemFiatForm(constants.FormField.FROM.name), '_label -> Messages(constants.FormField.FROM.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.FROM.name), 'required -> true)
     @inputText(redeemFiatForm(constants.FormField.TO.name), '_label -> Messages(constants.FormField.TO.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.TO.name), 'required -> true)
     @inputText(redeemFiatForm(constants.FormField.REDEEM_AMOUNT.name), '_label -> Messages(constants.FormField.REDEEM_AMOUNT.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.REDEEM_AMOUNT.name), 'required -> true, 'type -> "number")

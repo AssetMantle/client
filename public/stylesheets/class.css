@@ -541,7 +541,7 @@ dl .info::after {
     margin-bottom: 1.5rem;
 }
 
-.hash_code {
+.hashCode {
     width: 100px;
     overflow: hidden;
     display: inline-block;
@@ -553,15 +553,6 @@ dl .info::after {
     margin-right: -1px;
     margin-bottom: -40px !important;
     padding-top: 20px !important;
-}
-
-.input-group-prepend{
-    display:grid;
-    margin-left: 50px;
-}
-.input-group-text{
-    margin-top: -50px;
-    margin-left: -40px;
 }
 
 .input-group-prepend span {

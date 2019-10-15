@@ -1,21 +1,9 @@
 @import controllers.actions.LoginState
 @import helper._
+@import views.html.base._
 @import views.companion.master.VerifyMobileNumber
 
-@(verifyMobileNumberForm: Form[VerifyMobileNumber.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
-
-@form(action = routes.VerifyMobileNumberController.verifyMobileNumber, 'onkeypress -> "submitFormOnEnter(event,this)") {
-        <h4>@Messages(constants.Form.VERIFY_MOBILE_NUMBER)</h4>
-        @CSRF.formField
-      @inputText(verifyMobileNumberForm(constants.FormField.OTP.name), '_label -> Messages(constants.FormField.OTP.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.OTP.name), 'required -> true)
-
-        @if(verifyMobileNumberForm.hasGlobalErrors) {
-            <ul>
-            @for(error <- verifyMobileNumberForm.globalErrors) {
-                <li>@error.format</li>
-            }
-            </ul>
-        }
-        <button type="button" onclick="submitForm(this)">@Messages(constants.Form.VERIFY_MOBILE_NUMBER)</button>
-
+@(verifyMobileNumberForm: Form[VerifyMobileNumber.Data] = VerifyMobileNumber.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@commonForm(constants.Form.VERIFY_MOBILE_NUMBER, verifyMobileNumberForm) {
+    @inputText(verifyMobileNumberForm(constants.FormField.OTP.name), '_label -> Messages(constants.FormField.OTP.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.OTP.name), 'required -> true)
 }

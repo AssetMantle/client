@@ -1,20 +1,10 @@
 @import controllers.actions.LoginState
 @import helper._
+@import views.html.base._
 @import views.companion.master.RejectIssueFiatRequest
 
-@(rejectIssueFiatRequestForm: Form[RejectIssueFiatRequest.Data], requestID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
-@form(action = routes.IssueFiatController.rejectIssueFiatRequest, 'onkeypress -> "submitFormOnEnter(event,this)") {
-        <h4>@Messages(constants.Form.REJECT_ISSUE_FIAT_REQUEST)</h4>
-        @CSRF.formField
-      @inputText(rejectIssueFiatRequestForm(constants.FormField.REQUEST_ID.name).copy(value = Some(requestID)), '_label -> Messages(constants.FormField.REQUEST_ID.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.REQUEST_ID.name), 'required -> true)
-      @inputText(rejectIssueFiatRequestForm(constants.FormField.COMMENT.name), '_label -> Messages(constants.FormField.COMMENT.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.COMMENT.name), 'required -> true)
-
-        @if(rejectIssueFiatRequestForm.hasGlobalErrors) {
-            <ul>
-            @for(error <- rejectIssueFiatRequestForm.globalErrors) {
-                <li>@error.format</li>
-            }
-            </ul>
-        }
-        <button type="button"  onclick="submitForm(this)">@Messages(constants.Form.REJECT_ISSUE_FIAT_REQUEST)</button>
+@(rejectIssueFiatRequestForm: Form[RejectIssueFiatRequest.Data] = RejectIssueFiatRequest.form, requestID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@commonForm(constants.Form.REJECT_ISSUE_FIAT_REQUEST, rejectIssueFiatRequestForm) {
+    @inputText(rejectIssueFiatRequestForm(constants.FormField.REQUEST_ID.name).copy(value = Some(requestID)), '_label -> Messages(constants.FormField.REQUEST_ID.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.REQUEST_ID.name), 'required -> true)
+    @inputText(rejectIssueFiatRequestForm(constants.FormField.COMMENT.name), '_label -> Messages(constants.FormField.COMMENT.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.COMMENT.name), 'required -> true)
 }

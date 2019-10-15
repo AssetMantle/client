@@ -1,30 +1,18 @@
 @import controllers.actions.LoginState
 @import helper._
+@import views.html.base._
 @import views.companion.master.IssueAsset
 
-@(issueAssetForm: Form[IssueAsset.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
-@form(action = routes.IssueAssetController.issueAsset, 'onkeypress -> "submitFormOnEnter(event,this)") {
-
-        <h4 >@Messages(constants.Form.ISSUE_ASSET)</h4>
-        @CSRF.formField
-        @inputText(issueAssetForm(constants.FormField.REQUEST_ID.name), '_label -> Messages(constants.FormField.REQUEST_ID.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.REQUEST_ID.name), 'required -> true)
-        @inputText(issueAssetForm(constants.FormField.ACCOUNT_ID.name), '_label -> Messages(constants.FormField.ACCOUNT_ID.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.ACCOUNT_ID.name), 'required -> true)
-        @inputText(issueAssetForm(constants.FormField.DOCUMENT_HASH.name), '_label -> Messages(constants.FormField.DOCUMENT_HASH.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.DOCUMENT_HASH.name), 'required -> true)
-        @inputText(issueAssetForm(constants.FormField.ASSET_TYPE.name), '_label -> Messages(constants.FormField.ASSET_TYPE.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.ASSET_TYPE.name), 'required -> true)
-        @inputText(issueAssetForm(constants.FormField.ASSET_PRICE.name), '_label -> Messages(constants.FormField.ASSET_PRICE.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.ASSET_PRICE.name), 'required -> true, 'type -> "number")
-        @inputText(issueAssetForm(constants.FormField.QUANTITY_UNIT.name), '_label -> Messages(constants.FormField.QUANTITY_UNIT.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.QUANTITY_UNIT.name), 'required -> true)
-        @inputText(issueAssetForm(constants.FormField.ASSET_QUANTITY.name), '_label -> Messages(constants.FormField.ASSET_QUANTITY.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.ASSET_QUANTITY.name), 'required -> true, 'type -> "number")
-        @inputText(issueAssetForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.GAS.name), 'required -> true, 'type -> "number")
-        @inputText(issueAssetForm(constants.FormField.TAKER_ADDRESS.name), '_label -> Messages(constants.FormField.TAKER_ADDRESS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.TAKER_ADDRESS.name), 'required -> false)
-        @inputPassword(issueAssetForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PASSWORD.name), 'required -> true)
-
-        @if(issueAssetForm.hasGlobalErrors) {
-            <ul>
-            @for(error <- issueAssetForm.globalErrors) {
-                <li>@error.format</li>
-            }
-            </ul>
-        }
-        <button type="button" onclick="submitForm(this)">@Messages(constants.Form.ISSUE_ASSET)</button>
-
+@(issueAssetForm: Form[IssueAsset.Data] = IssueAsset.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@commonForm(constants.Form.ISSUE_ASSET, issueAssetForm) {
+    @inputText(issueAssetForm(constants.FormField.REQUEST_ID.name), '_label -> Messages(constants.FormField.REQUEST_ID.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.REQUEST_ID.name), 'required -> true)
+    @inputText(issueAssetForm(constants.FormField.ACCOUNT_ID.name), '_label -> Messages(constants.FormField.ACCOUNT_ID.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.ACCOUNT_ID.name), 'required -> true)
+    @inputText(issueAssetForm(constants.FormField.DOCUMENT_HASH.name), '_label -> Messages(constants.FormField.DOCUMENT_HASH.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.DOCUMENT_HASH.name), 'required -> true)
+    @inputText(issueAssetForm(constants.FormField.ASSET_TYPE.name), '_label -> Messages(constants.FormField.ASSET_TYPE.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.ASSET_TYPE.name), 'required -> true)
+    @inputText(issueAssetForm(constants.FormField.ASSET_PRICE.name), '_label -> Messages(constants.FormField.ASSET_PRICE.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.ASSET_PRICE.name), 'required -> true, 'type -> "number")
+    @inputText(issueAssetForm(constants.FormField.QUANTITY_UNIT.name), '_label -> Messages(constants.FormField.QUANTITY_UNIT.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.QUANTITY_UNIT.name), 'required -> true)
+    @inputText(issueAssetForm(constants.FormField.ASSET_QUANTITY.name), '_label -> Messages(constants.FormField.ASSET_QUANTITY.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.ASSET_QUANTITY.name), 'required -> true, 'type -> "number")
+    @inputText(issueAssetForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.GAS.name), 'required -> true, 'type -> "number")
+    @inputText(issueAssetForm(constants.FormField.TAKER_ADDRESS.name), '_label -> Messages(constants.FormField.TAKER_ADDRESS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.TAKER_ADDRESS.name), 'required -> false)
+    @inputPassword(issueAssetForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PASSWORD.name), 'required -> true)
 }

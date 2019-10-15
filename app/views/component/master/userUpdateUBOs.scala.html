@@ -1,31 +1,19 @@
 @import controllers.actions.LoginState
 @import helper._
 @import views.companion.master.AddUBOs
+@import views.html.base._
 
-@(addUBOsForm: Form[AddUBOs.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
-
-@form(action = routes.AddOrganizationController.userUpdateUBOs, 'onkeypress -> "submitFormOnEnter(event,this)") {
-
-        <h4>@Messages(constants.Form.ADD_UBOS)</h4>
-        @CSRF.formField
-        @repeatWithIndex(addUBOsForm(constants.Form.UBOS), min = addUBOsForm(constants.Form.UBOS).indexes.length + 1) { (uboForm, i) =>
-            <div id="@constants.Form.UBO @i">
-              @inputText(uboForm(constants.FormField.PERSON_NAME.name), '_label -> Messages(constants.FormField.PERSON_NAME.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PERSON_NAME.name), 'required -> false)
-              @inputText(uboForm(constants.FormField.SHARE_PERCENTAGE.name), '_label -> Messages(constants.FormField.SHARE_PERCENTAGE.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.SHARE_PERCENTAGE.name), 'required -> false)
-              @inputText(uboForm(constants.FormField.RELATIONSHIP.name), '_label -> Messages(constants.FormField.RELATIONSHIP.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.RELATIONSHIP.name), 'required -> false)
-              @inputText(uboForm(constants.FormField.TITLE.name), '_label -> Messages(constants.FormField.TITLE.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.TITLE.name), 'required -> false)
-                <button type="button" class="btn-sm btn btn-primary" onclick="deleteElementBySource(this)">@Messages(constants.Form.DELETE)</button>
-            </div>
-        }
-        @if(addUBOsForm.hasGlobalErrors) {
-            <ul>
-            @for(error <- addUBOsForm.globalErrors) {
-                <li>@error.format</li>
-            }
-            </ul>
-        }
-      <button type="button" onclick="submitForm(this)">@Messages(constants.Form.ADD)
-        /@Messages(constants.Form.UPDATE)</button>
-        <button type="button" onclick="getForm(jsRoutes.controllers.AddOrganizationController.addOrganizationForm())">@Messages(constants.Form.BACK)</button>
-        <button type="button" onclick="getForm(jsRoutes.controllers.AddOrganizationController.organizationBankAccountDetailForm())">@Messages(constants.Form.NEXT)</button>
+@(addUBOsForm: Form[AddUBOs.Data] = AddUBOs.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+@commonForm(constants.Form.USER_UPDATE_UBOS, addUBOsForm) {
+    @repeatWithIndex(addUBOsForm(constants.Form.UBOS), min = addUBOsForm(constants.Form.UBOS).indexes.length + 1) { (uboForm, i) =>
+        <div id='@Seq(constants.Form.UBO, i).mkString("")'>
+            @inputText(uboForm(constants.FormField.PERSON_NAME.name), '_label -> Messages(constants.FormField.PERSON_NAME.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PERSON_NAME.name), 'required -> false)
+            @inputText(uboForm(constants.FormField.SHARE_PERCENTAGE.name), '_label -> Messages(constants.FormField.SHARE_PERCENTAGE.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.SHARE_PERCENTAGE.name), 'required -> false)
+            @inputText(uboForm(constants.FormField.RELATIONSHIP.name), '_label -> Messages(constants.FormField.RELATIONSHIP.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.RELATIONSHIP.name), 'required -> false)
+            @inputText(uboForm(constants.FormField.TITLE.name), '_label -> Messages(constants.FormField.TITLE.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.TITLE.name), 'required -> false)
+            <button class="cmuk-button cmuk-button-primary" onclick="deleteElementBySource(this)">@Messages(constants.Form.DELETE)</button>
+        </div>
+    }
 }
+<button class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.AddOrganizationController.addOrganizationForm())">@Messages(constants.Form.BACK)</button>
+<button class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.AddOrganizationController.organizationBankAccountDetailForm())">@Messages(constants.Form.NEXT)</button>

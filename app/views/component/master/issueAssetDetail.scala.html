@@ -1,13 +1,10 @@
 @import controllers.actions.LoginState
 @import helper._
 @import views.companion.master.IssueAssetDetail
+@import views.html.base._
 
-@(issueAssetDetailForm: Form[IssueAssetDetail.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
-
-@form(action = routes.IssueAssetController.issueAssetDetail, 'onkeypress -> "submitFormOnEnter(event,this)") {
-    <h4 class="latest_card-title">@Messages(constants.Form.ISSUE_ASSET_REQUEST)</h4>
-
-    @CSRF.formField
+@(issueAssetDetailForm: Form[IssueAssetDetail.Data] = IssueAssetDetail.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@commonForm(constants.Form.ISSUE_ASSET_DETAIL, issueAssetDetailForm) {
     @inputText(issueAssetDetailForm(constants.FormField.REQUEST_ID.name), '_label -> Messages(constants.FormField.REQUEST_ID.name), 'class -> "form-control hidden", 'placeholder -> Messages(constants.FormField.REQUEST_ID.name), 'required -> false)
     @select(issueAssetDetailForm(constants.FormField.ASSET_TYPE.name), for(option <- constants.Form.ASSET_TYPE_OPTIONS) yield (option, Messages(option)), '_label -> Messages(constants.FormField.ASSET_TYPE.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.ASSET_TYPE.name), '_default -> Messages(constants.FormField.ASSET_TYPE.name), 'required -> true)
     @inputText(issueAssetDetailForm(constants.FormField.QUANTITY_UNIT.name), '_label -> Messages(constants.FormField.QUANTITY_UNIT.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.QUANTITY_UNIT.name), 'required -> true)
@@ -23,13 +20,4 @@
     @inputDate(issueAssetDetailForm(constants.FormField.SHIPMENT_DATE.name), '_label -> Messages(constants.FormField.SHIPMENT_DATE.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.SHIPMENT_DATE.name), '_name -> Messages(constants.FormField.SHIPMENT_DATE.name), 'required -> true)
     @select(issueAssetDetailForm(constants.FormField.PHYSICAL_DOCUMENTS_HANDLED_VIA.name), for(option <- constants.Form.PHYSICAL_DOCUMENTS_HANDLED_VIA_OPTIONS) yield (option, Messages(option)), '_label -> Messages(constants.FormField.PHYSICAL_DOCUMENTS_HANDLED_VIA.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.PHYSICAL_DOCUMENTS_HANDLED_VIA.name), '_default -> Messages(constants.FormField.PHYSICAL_DOCUMENTS_HANDLED_VIA.name), 'required -> true)
     @select(issueAssetDetailForm(constants.FormField.COMDEX_PAYMENT_TERMS.name), for(option <- constants.Form.COMDEX_PAYMENT_TERMS_OPTIONS) yield (option, Messages(option)), '_label -> Messages(constants.FormField.COMDEX_PAYMENT_TERMS.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.COMDEX_PAYMENT_TERMS.name), '_default -> Messages(constants.FormField.COMDEX_PAYMENT_TERMS.name), 'required -> true)
-
-    @if(issueAssetDetailForm.hasGlobalErrors) {
-        <ul>
-        @for(error <- issueAssetDetailForm.globalErrors) {
-            <li>@error.format</li>
-        }
-        </ul>
-    }
-    <button type="button" class="btn btn-primary btn-sm" onclick="submitForm(this)">@Messages(constants.Form.ISSUE_ASSET_REQUEST)</button>
 }

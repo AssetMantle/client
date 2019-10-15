@@ -24,7 +24,7 @@ class VerifyMobileNumberController @Inject()(messagesControllerComponents: Messa
       try {
         val otp = smsOTPs.Service.sendOTP(loginState.username)
         utilitiesNotification.send(accountID = loginState.username, notification = constants.Notification.VERIFY_PHONE, otp)
-        withUsernameToken.Ok(views.html.component.master.verifyMobileNumber(views.companion.master.VerifyMobileNumber.form))
+        withUsernameToken.Ok(views.html.component.master.verifyMobileNumber())
       }
       catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))

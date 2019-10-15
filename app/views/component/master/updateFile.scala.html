@@ -1,11 +1,12 @@
 @import controllers.actions.LoginState
 @import helper._
+@import views.html.base._
 
 @(uploadRoute:String, updateRoute:String, documentType: String, id: String = "")(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
 @CSRF.formField
 <div id="updateSelector" class="centerText">
-    <button class="btn" id="browseUpdateButton">@Messages(constants.Form.BROWSE)</button>
+    <button class="cmuk-button cmuk-button-primary" id="browseUpdateButton">@Messages(constants.Form.BROWSE)</button>
     <p class="centerText"><small>@Messages(constants.Form.OR)</small></p>
     <div class="dropBox">
         <p class="centerText"><small>@Messages(constants.Form.DROP_FILE)</small></p>
@@ -19,7 +20,7 @@
         <div class="progressContainer">
             <div class="progressBar" id="fileUpdateProgressBar"></div>
         </div>
-        <button class="btn" id="updateButton" >@Messages(constants.Form.UPDATE)</button>
+        <button class="cmuk-button cmuk-button-primary" id="updateButton" >@Messages(constants.Form.UPDATE)</button>
     </div>
 </div>
 

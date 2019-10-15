@@ -1,8 +1,8 @@
 function copyToClipboard(elementId) {
     // Create an auxiliary hidden input
-    var aux = document.createElement("input");
+    let aux = document.createElement("input");
     // Get the text from the element passed into the input
-    aux.setAttribute("value", document.getElementById(elementId).innerHTML);
+    aux.setAttribute("value", $('#' + elementId).html());
     // Append the aux input to the body
     document.body.appendChild(aux);
     // Highlight the content

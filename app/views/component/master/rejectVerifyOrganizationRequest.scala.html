@@ -1,20 +1,9 @@
 @import controllers.actions.LoginState
 @import helper._
+@import views.html.base._
 @import views.companion.master.RejectVerifyOrganizationRequest
 
-@(rejectVerifyOrganizationRequestForm: Form[RejectVerifyOrganizationRequest.Data], organizationID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
-@form(action = routes.AddOrganizationController.rejectVerifyOrganizationRequest, 'onkeypress -> "submitFormOnEnter(event,this)") {
-        <h4>@Messages(constants.Form.REJECT_VERIFY_ORGANIZATION_REQUEST)</h4>
-        @CSRF.formField
-      @inputText(rejectVerifyOrganizationRequestForm(constants.FormField.ORGANIZATION_ID.name).copy(value = Some(organizationID)), '_label -> Messages(constants.FormField.ORGANIZATION_ID.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.ORGANIZATION_ID.name), 'required -> true)
-
-        @if(rejectVerifyOrganizationRequestForm.hasGlobalErrors) {
-            <ul>
-            @for(error <- rejectVerifyOrganizationRequestForm.globalErrors) {
-                <li>@error.format</li>
-            }
-            </ul>
-        }
-        <button type="button" onclick="submitForm(this)">@Messages(constants.Form.REJECT_VERIFY_ORGANIZATION_REQUEST)</button>
-
+@(rejectVerifyOrganizationRequestForm: Form[RejectVerifyOrganizationRequest.Data] = RejectVerifyOrganizationRequest.form, organizationID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@commonForm(constants.Form.REJECT_VERIFY_ORGANIZATION_REQUEST, rejectVerifyOrganizationRequestForm) {
+    @inputText(rejectVerifyOrganizationRequestForm(constants.FormField.ORGANIZATION_ID.name).copy(value = Some(organizationID)), '_label -> Messages(constants.FormField.ORGANIZATION_ID.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.ORGANIZATION_ID.name), 'required -> true)
 }
