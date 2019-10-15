@@ -5,7 +5,6 @@ import views.companion.master.SignUp
 import views.companion.master.ConfirmIssueAssetTransaction
 
 object FormConstraint {
-  
   //TODO: Error Response through Messages
   val signUpCheckConstraint: Constraint[SignUp.Data] = Constraint("constraints.signUpCheck")({ signUpData: SignUp.Data =>
     val errors = {
