@@ -28,11 +28,6 @@ function blockExplorer(blockExplorerTableBody, maxNumberOfItems) {
     wsNewBlock.onclose = function (event) {
     };
 
-    window.addEventListener("replaceAll", function () {
-        console.log("AAAAA");
-        //wsNewBlock.close();
-    });
-
     return wsNewBlock;
 }
 

@@ -25,7 +25,7 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
   private val denominationOfGasToken = configuration.get[String]("blockchain.denom.gas")
 
   def sendCoinForm: Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.sendCoin(views.companion.master.SendCoin.form))
+    Ok(views.html.component.master.sendCoin())
   }
 
   def sendCoin: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
@@ -54,17 +54,17 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
       )
   }
 
-  def requestCoinsForm: Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.requestCoin(views.companion.master.RequestCoin.form))
+  def faucetRequestForm: Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.faucetRequest())
   }
 
-  def requestCoins: Action[AnyContent] = withUnknownLoginAction.authenticated { implicit loginState =>
+  def faucetRequest: Action[AnyContent] = withUnknownLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      views.companion.master.RequestCoin.form.bindFromRequest().fold(
+      views.companion.master.FaucetRequest.form.bindFromRequest().fold(
         formWithErrors => {
-          BadRequest(views.html.component.master.requestCoin(formWithErrors))
+          BadRequest(views.html.component.master.faucetRequest(formWithErrors))
         },
-        requestCoinFormData => {
+        faucetRequestFormData => {
           try {
             masterTransactionFaucetRequests.Service.create(loginState.username, defaultFaucetToken)
             withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.COINS_REQUESTED)))
@@ -87,7 +87,7 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
   }
 
   def rejectFaucetRequestForm(requestID: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.rejectFaucetRequest(views.companion.master.RejectFaucetRequest.form, requestID))
+    Ok(views.html.component.master.rejectFaucetRequest(requestID = requestID))
   }
 
   def rejectFaucetRequest: Action[AnyContent] = withGenesisLoginAction.authenticated { implicit loginState =>
@@ -109,7 +109,7 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
   }
 
   def approveFaucetRequestsForm(requestID: String, accountID: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.approveFaucetRequests(views.companion.master.ApproveFaucetRequest.form, requestID, accountID))
+    Ok(views.html.component.master.approveFaucetRequests(requestID = requestID, accountID = accountID))
   }
 
   def approveFaucetRequests: Action[AnyContent] = withGenesisLoginAction.authenticated { implicit loginState =>

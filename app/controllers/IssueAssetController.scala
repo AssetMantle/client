@@ -23,6 +23,7 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
 
   private implicit val module: String = constants.Module.CONTROLLERS_ISSUE_ASSET
 
+  //TODO why issueAssetRequestForm is sending ConfirmIssueAssetTransaction.form
   def issueAssetRequestForm(id: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
@@ -100,7 +101,7 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
             } else {
               Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
             }
-          case None => withUsernameToken.Ok(views.html.component.master.issueAssetDetail(views.companion.master.IssueAssetDetail.form))
+          case None => withUsernameToken.Ok(views.html.component.master.issueAssetDetail())
         }
       } catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -265,7 +266,7 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
 
   def rejectIssueAssetRequestForm(requestID: String): Action[AnyContent] = Action {
     implicit request =>
-      Ok(views.html.component.master.rejectIssueAssetRequest(views.companion.master.RejectIssueAssetRequest.form, requestID))
+      Ok(views.html.component.master.rejectIssueAssetRequest(requestID = requestID))
   }
 
   def rejectIssueAssetRequest: Action[AnyContent] = withZoneLoginAction.authenticated {

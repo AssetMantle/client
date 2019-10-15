@@ -3,7 +3,6 @@
 
 @(documents: Seq[Document[_]])(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
 
-<script src="@routes.Assets.versioned("javascripts/showHideUploadUpdateButton.js")" type="text/javascript"></script>
 @for(document <- documents) {
     @component.master.commonDocumentViewer(document) {
         @routes.FileController.file(document.fileName, document.documentType)
@@ -28,9 +27,9 @@
                 </div>
             }
             case constants.User.USER => {
-                <button id="userUploadButton@loginState.username@document.documentType" class="hidden" onclick="getForm(jsRoutes.controllers.FileController.uploadAccountKYCForm('@document.documentType'))">@Messages(constants.Form.UPLOAD)</button>
-                <button id="userUpdateButton@loginState.username@document.documentType" class="hidden" onclick="getForm(jsRoutes.controllers.FileController.updateAccountKYCForm('@document.documentType'))">@Messages(constants.Form.UPDATE)</button>
-                <script>checkFileExists(jsRoutes.controllers.FileController.checkAccountKYCFileExists('@loginState.username', '@document.documentType'), 'userUploadButton@loginState.username@document.documentType', 'userUpdateButton@loginState.username@document.documentType')</script>
+                <div class="centerText">
+                    <button onclick="getForm(jsRoutes.controllers.FileController.updateAccountKYCForm('@document.documentType'))">@Messages(constants.Form.UPDATE)</button>
+                </div>
             }
             case constants.User.UNKNOWN => {}
             case constants.User.WITHOUT_LOGIN => {}

@@ -4,7 +4,7 @@
 @(negotiationFile: Option[NegotiationFile] = None, negotiationID: String, documentType: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
 <div class="latest_card-header latest_card-header-primary text-center">
-    <h4 class="latest_card-title">@Messages(constants.Form.CONFIRM_BUYER_BID)</h4>
+    <h4 class="latest_card-title">@Messages(constants.View.CONFIRM_BUYER_BID)</h4>
 </div>
 <div class="centerText">
         <div id="upload@documentType">
@@ -20,7 +20,7 @@
                 <button onclick="getForm(jsRoutes.controllers.FileController.updateTraderNegotiationForm('@file.documentType','@file.id'))">@Messages(constants.Form.UPDATE) @Messages(file.documentType)</button>
                         <script>hideElement('upload@file.documentType')</script>
             }
-            <button type="button" class="btn-sm btn btn-primary" onclick="getForm(jsRoutes.controllers.ConfirmBuyerBidController.confirmBuyerBidForm('@file.id'))">@Messages(constants.Form.NEXT)</button>
+            <button class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.ConfirmBuyerBidController.confirmBuyerBidForm('@file.id'))">@Messages(constants.Form.NEXT)</button>
         }
         case None => {}
     }

@@ -21,7 +21,12 @@ class RedeemAssetController @Inject()(messagesControllerComponents: MessagesCont
   private implicit val module: String = constants.Module.CONTROLLERS_REDEEM_ASSET
 
   def redeemAssetForm(ownerAddress: String, pegHash: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.redeemAsset(views.companion.master.RedeemAsset.form, blockchainACLAccounts.Service.get(ownerAddress).zoneID, pegHash))
+    try {
+      Ok(views.html.component.master.redeemAsset(zoneID = blockchainACLAccounts.Service.get(ownerAddress).zoneID, pegHash = pegHash))
+    }
+    catch {
+      case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+    }
   }
 
   def redeemAsset: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>

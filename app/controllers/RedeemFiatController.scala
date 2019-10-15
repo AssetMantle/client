@@ -21,7 +21,12 @@ class RedeemFiatController @Inject()(messagesControllerComponents: MessagesContr
   private implicit val module: String = constants.Module.CONTROLLERS_REDEEM_FIAT
 
   def redeemFiatForm(ownerAddress: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.redeemFiat(views.companion.master.RedeemFiat.form, blockchainACLAccounts.Service.get(ownerAddress).zoneID))
+    try {
+      Ok(views.html.component.master.redeemFiat(zoneID = blockchainACLAccounts.Service.get(ownerAddress).zoneID))
+    }
+    catch {
+      case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+    }
   }
 
   def redeemFiat: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>

@@ -1,6 +1,7 @@
 @import controllers.actions.LoginState
 @import models.master.OrganizationKYC
 @import helper._
+@import views.html.base._
 
 @(organizationKYCs: Seq[OrganizationKYC])(implicit requestHeader: RequestHeader, flash: Flash, messagesProvider: MessagesProvider, loginState: LoginState = null)
 @for(organizationKYC <- organizationKYCs) {

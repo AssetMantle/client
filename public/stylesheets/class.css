@@ -566,7 +566,7 @@ dl .info::after {
     margin-bottom: 1.5rem;
 }
 
-.hash_code {
+.hashCode {
     width: 100px;
     overflow: hidden;
     display: inline-block;
@@ -629,11 +629,6 @@ dl .info::after {
 
 .failure .fa {
     color: red;
-}
-
-.ur-change-password {
-    display: flex;
-    margin-bottom: 10px;
 }
 
 .ur-change-password button {

@@ -5,7 +5,7 @@
 @center = {
     <div class="flexContainer">
         <div id="commonHome" class="box flexItem flexGrowth"></div>
-        <button class="btn btn-primary btn-sm" onclick="getForm(jsRoutes.controllers.SendCoinController.requestCoinsForm())">@Messages(constants.Form.REQUEST_COIN)</button>
+        <button class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.SendCoinController.faucetRequestForm())">@Messages(constants.Form.FAUCET_REQUEST.legend)</button>
     </div>
     <script>
             componentResource('commonHome', jsRoutes.controllers.ComponentViewController.commonHome('@loginState.username'))

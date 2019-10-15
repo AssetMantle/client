@@ -28,7 +28,7 @@ class SessionTokens @Inject()(actorSystem: ActorSystem, shutdownActors: Shutdown
 
   private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
 
-  private val sessionTokenTimeout: Long = configuration.get[Long]("sessionToken.timeout")
+  private val sessionTokenTimeout: Long = configuration.get[Long]("play.http.session.token.timeout")
 
   private val logger: Logger = Logger(this.getClass)
 

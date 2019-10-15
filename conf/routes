@@ -39,7 +39,7 @@ GET         /account/forgotPasswordUsername                              control
 POST        /account/forgotPasswordUsername                              controllers.AccountController.emailOTPForgotPassword
 
 GET         /account/forgotPassword                                      controllers.AccountController.forgotPasswordForm(username: String)
-POST        /account/forgotPassword                                      controllers.AccountController.forgotPassword(username: String)
+POST        /account/forgotPassword                                      controllers.AccountController.forgotPassword
 
 GET         /account/checkUsernameAvailable                              controllers.AccountController.checkUsernameAvailable(username: String)
 POST        /acccount/noteNewKeyDetails                                  controllers.AccountController.noteNewKeyDetails(name:String,blockchainAddress:String ,publicKey:String ,seed:String)
@@ -86,10 +86,6 @@ GET         /master/getZoneAccessedTraderKYCFile                         control
 GET         /master/file                                                 controllers.FileController.file(fileName: String, documentType: String)
 GET         /master/tradingFile                                          controllers.FileController.tradingFile(id: String, fileName: String, documentType: String)
 
-GET         /checkAccountKYCFileExists                                   controllers.FileController.checkAccountKYCFileExists(accountID: String, documentType: String)
-GET         /checkTraderAssetFileExists                                  controllers.FileController.checkTraderAssetFileExists(id: String, documentType: String)
-GET         /checkTraderNegotiationFileExists                            controllers.FileController.checkTraderNegotiationFileExists(id: String, documentType: String)
-
 GET         /accountUpload                                               controllers.FileController.uploadAccountFileForm(documentType: String)
 POST        /accountUpload/file                                          controllers.FileController.uploadAccountFile(documentType: String)
 GET         /accountUpload/storeFile                                     controllers.FileController.storeAccountFile(name: String, documentType: String)
@@ -126,10 +122,9 @@ POST        /master/verifyMobileNumber                                   control
 GET         /master/verifyEmailAddress                                   controllers.VerifyEmailAddressController.verifyEmailAddressForm
 POST        /master/verifyEmailAddress                                   controllers.VerifyEmailAddressController.verifyEmailAddress
 
-GET         /master/traderInvitation                                     controllers.SetACLController.traderInvitationForm
-POST        /master/traderInvitation                                     controllers.SetACLController.traderInvitation
+GET         /master/inviteTrader                                         controllers.SetACLController.inviteTraderForm
+POST        /master/inviteTrader                                         controllers.SetACLController.inviteTrader
 GET         /master/addTraderRequest                                     controllers.SetACLController.addTraderRequestForm(requestID: String)
-POST        /master/addTraderRequest                                     controllers.SetACLController.addTraderRequest
 GET         /master/addTrader                                            controllers.SetACLController.addTraderForm
 POST        /master/addTrader                                            controllers.SetACLController.addTrader
 GET         /master/userUploadOrUpdateTraderKYCView                      controllers.SetACLController.userUploadOrUpdateTraderKYCView
@@ -138,8 +133,8 @@ POST        /master/userUploadTraderKYC                                  control
 GET         /master/userStoreTraderKYC                                   controllers.SetACLController.userStoreTraderKYC(name: String, documentType: String)
 GET         /master/userUpdateTraderKYCForm                              controllers.SetACLController.userUpdateTraderKYCForm(documentType: String)
 GET         /master/userUpdateTraderKYC                                  controllers.SetACLController.userUpdateTraderKYC(name: String, documentType: String)
-GET         /master/reviewTraderCompletion                               controllers.SetACLController.reviewTraderCompletionForm
-POST        /master/reviewTraderCompletion                               controllers.SetACLController.reviewTraderCompletion
+GET         /master/reviewAddTraderOnCompletion                          controllers.SetACLController.reviewAddTraderOnCompletionForm
+POST        /master/reviewAddTraderOnCompletion                          controllers.SetACLController.reviewAddTraderOnCompletion
 
 GET         /master/zoneVerifyTrader                                     controllers.SetACLController.zoneVerifyTraderForm(accountID: String, organizationID: String)
 POST        /master/zoneVerifyTrader                                     controllers.SetACLController.zoneVerifyTrader
@@ -192,8 +187,8 @@ GET         /master/storeUserOrganizationKYCDocument                     control
 GET         /master/userUpdateOrganizationKYC                            controllers.AddOrganizationController.userUpdateOrganizationKYCForm(documentType: String)
 GET         /master/userUpdateOrganizationKYCDocument                    controllers.AddOrganizationController.userUpdateOrganizationKYC(name: String, documentType: String)
 
-GET         /master/reviewOrganizationKYC                                controllers.AddOrganizationController.reviewOrganizationCompletionForm
-POST        /master/reviewOrganizationKYC                                controllers.AddOrganizationController.reviewOrganizationCompletion
+GET         /master/reviewAddOrganizationOnCompletion                    controllers.AddOrganizationController.reviewAddOrganizationOnCompletionForm
+POST        /master/reviewAddOrganizationOnCompletion                    controllers.AddOrganizationController.reviewAddOrganizationOnCompletion
 GET         /master/viewVerifyOrganizationRequests                       controllers.AddOrganizationController.viewPendingVerifyOrganizationRequests
 GET         /master/viewOrganizationVerificationBankAccountDetail        controllers.AddOrganizationController.viewOrganizationVerificationBankAccountDetail(organizationID: String)
 GET         /master/viewOrganizationKYCDocuments                         controllers.AddOrganizationController.viewKYCDocuments(organizationID: String)
@@ -212,8 +207,8 @@ GET         /organizationUpload/updateFile                               control
 GET         /master/addZone                                              controllers.AddZoneController.addZoneForm
 POST        /master/addZone                                              controllers.AddZoneController.addZone
 GET         /master/userUploadOrUpdateZoneKYCView                        controllers.AddZoneController.userUploadOrUpdateZoneKYCView
-GET         /master/reviewZoneCompletion                                 controllers.AddZoneController.reviewZoneCompletionForm
-POST        /master/reviewZoneCompletion                                 controllers.AddZoneController.reviewZoneCompletion
+GET         /master/reviewAddZoneOnCompletion                            controllers.AddZoneController.reviewAddZoneOnCompletionForm
+POST        /master/reviewAddZoneOnCompletion                            controllers.AddZoneController.reviewAddZoneOnCompletion
 
 GET         /master/verifyZone                                           controllers.AddZoneController.verifyZoneForm(zoneID: String)
 POST        /master/verifyZone                                           controllers.AddZoneController.verifyZone
@@ -246,8 +241,8 @@ POST        /master/confirmBuyerBidDetail                                control
 GET         /master/confirmSellerBid                                     controllers.ConfirmSellerBidController.confirmSellerBidForm(requestID: String)
 POST        /master/confirmSellerBid                                     controllers.ConfirmSellerBidController.confirmSellerBid
 
-GET         /master/confirmSellerBidDetail                                controllers.ConfirmSellerBidController.confirmSellerBidDetailForm(buyerAddress: String, pegHash: String, bid:Int)
-POST        /master/confirmSellerBidDetail                                controllers.ConfirmSellerBidController.confirmSellerBidDetail
+GET         /master/confirmSellerBidDetail                               controllers.ConfirmSellerBidController.confirmSellerBidDetailForm(buyerAddress: String, pegHash: String, bid:Int)
+POST        /master/confirmSellerBidDetail                               controllers.ConfirmSellerBidController.confirmSellerBidDetail
 
 GET         /master/issueAssetRequest                                    controllers.IssueAssetController.issueAssetRequestForm(id: String)
 POST        /master/issueAssetRequest                                    controllers.IssueAssetController.issueAssetRequest
@@ -309,8 +304,8 @@ POST        /master/sendAsset                                            control
 GET         /master/sendCoin                                             controllers.SendCoinController.sendCoinForm
 POST        /master/sendCoin                                             controllers.SendCoinController.sendCoin
 
-GET         /master/requestCoins                                         controllers.SendCoinController.requestCoinsForm
-POST        /master/requestCoins                                         controllers.SendCoinController.requestCoins
+GET         /master/faucetRequest                                        controllers.SendCoinController.faucetRequestForm
+POST        /master/faucetRequest                                        controllers.SendCoinController.faucetRequest
 
 GET         /master/viewPendingFaucetRequests                            controllers.SendCoinController.viewPendingFaucetRequests
 GET         /master/approveFaucetRequests                                controllers.SendCoinController.approveFaucetRequestsForm(requestID: String, accountID: String)

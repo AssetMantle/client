@@ -3,7 +3,7 @@
 @import views.html.base._
 
 @(changeSellerBidForm: Form[ChangeSellerBid.Data] = ChangeSellerBid.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@baseForm(constants.Form.BLOCKCHAIN_CHANGE_SELLER_BID, changeSellerBidForm) {
+@commonForm(constants.Form.BLOCKCHAIN_CHANGE_SELLER_BID, changeSellerBidForm) {
     @inputText(changeSellerBidForm(constants.FormField.FROM.name), '_label -> Messages(constants.FormField.FROM.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.FROM.name), 'required -> true)
     @inputText(changeSellerBidForm(constants.FormField.TO.name), '_label -> Messages(constants.FormField.TO.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.TO.name), 'required -> true)
     @inputText(changeSellerBidForm(constants.FormField.BID.name), '_label -> Messages(constants.FormField.BID.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.BID.name), 'required -> true, 'type -> "number")

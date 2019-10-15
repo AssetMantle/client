@@ -3,14 +3,13 @@ package views.companion.master
 import play.api.data.Form
 import play.api.data.Forms.mapping
 
-object TraderInvitation {
-
+object FaucetRequest {
   val form = Form(
     mapping(
-      constants.FormField.ACCOUNT_ID.name -> constants.FormField.ACCOUNT_ID.field
+      constants.FormField.COUPON.name -> constants.FormField.COUPON.field
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(accountID: String)
+  case class Data(coupon: String)
 
 }

@@ -1,5 +1,6 @@
 @import controllers.actions.LoginState
 @import helper._
+@import views.html.base._
 @import models.master.OrganizationKYC
 @import views.companion.master.UpdateOrganizationKYCDocumentStatus
 
@@ -20,22 +21,22 @@
         }
         </ul>
     }
-    <span class="red">@Messages(constants.Form.STATUS):
+    <span class="red">@Messages(constants.Form.STATUS):</span>
         @organizationKYC.status match {
             case Some(status: Boolean) => {
                 @if(status) {
-                    <span class="result success"><img class="status" src="@routes.Assets.versioned("images/success.jpg")"></span>
-                    <button type="button" class="cmuk-button cmuk-button-danger cmuk-button-small" onclick="verifyReject(this, '@Seq("#", organizationKYC.id, organizationKYC.documentType).mkString("")', '@Seq(organizationKYC.id, organizationKYC.documentType, constants.Form.STATUS).mkString("")', false)">@Messages(constants.Form.REJECT)</button>
+                    <span cmuk-icon="check"></span><br>
+                    <button class="cmuk-button cmuk-button-danger cmuk-button-small" onclick="verifyReject(this, '@Seq("#", organizationKYC.id, organizationKYC.documentType).mkString("")', '@Seq(organizationKYC.id, organizationKYC.documentType, constants.Form.STATUS).mkString("")', false)">@Messages(constants.Form.REJECT)</button>
                 } else {
-                    <span class="result failure"><img class="status" src="@routes.Assets.versioned("images/unverified.png")"></span>
-                    <button type="button" class="cmuk-button cmuk-button-success cmuk-button-small" onclick="verifyReject(this, '@Seq("#", organizationKYC.id, organizationKYC.documentType).mkString("")', '@Seq(organizationKYC.id, organizationKYC.documentType, constants.Form.STATUS).mkString("")', true)">@Messages(constants.Form.APPROVE)</button>
+                    <span cmuk-icon="close"></span><br>
+                    <button class="cmuk-button cmuk-button-success cmuk-button-small" onclick="verifyReject(this, '@Seq("#", organizationKYC.id, organizationKYC.documentType).mkString("")', '@Seq(organizationKYC.id, organizationKYC.documentType, constants.Form.STATUS).mkString("")', true)">@Messages(constants.Form.APPROVE)</button>
                 }
             }
             case None => {
-                <button type="button" class="cmuk-button cmuk-button-success cmuk-button-small" onclick="verifyReject(this, '@Seq("#", organizationKYC.id, organizationKYC.documentType).mkString("")', '@Seq(organizationKYC.id, organizationKYC.documentType, constants.Form.STATUS).mkString("")', true)">@Messages(constants.Form.APPROVE)</button>
-                <button type="button" class="cmuk-button cmuk-button-danger cmuk-button-small" onclick="verifyReject(this, '@Seq("#", organizationKYC.id, organizationKYC.documentType).mkString("")', '@Seq(organizationKYC.id, organizationKYC.documentType, constants.Form.STATUS).mkString("")', false)">@Messages(constants.Form.REJECT)</button>
+                <br>
+                <button class="cmuk-button cmuk-button-success cmuk-button-small" onclick="verifyReject(this, '@Seq("#", organizationKYC.id, organizationKYC.documentType).mkString("")', '@Seq(organizationKYC.id, organizationKYC.documentType, constants.Form.STATUS).mkString("")', true)">@Messages(constants.Form.APPROVE)</button>
+                <button class="cmuk-button cmuk-button-danger cmuk-button-small" onclick="verifyReject(this, '@Seq("#", organizationKYC.id, organizationKYC.documentType).mkString("")', '@Seq(organizationKYC.id, organizationKYC.documentType, constants.Form.STATUS).mkString("")', false)">@Messages(constants.Form.REJECT)</button>
             }
         }
-    </span>
 }
 </div>

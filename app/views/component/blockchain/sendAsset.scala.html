@@ -3,7 +3,7 @@
 @import views.html.base._
 
 @(sendAssetForm: Form[SendAsset.Data] = SendAsset.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@baseForm(constants.Form.BLOCKCHAIN_SEND_ASSET, sendAssetForm) {
+@commonForm(constants.Form.BLOCKCHAIN_SEND_ASSET, sendAssetForm) {
     @inputText(sendAssetForm(constants.FormField.FROM.name), '_label -> Messages(constants.FormField.FROM.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.FROM.name), 'required -> true)
     @inputText(sendAssetForm(constants.FormField.TO.name), '_label -> Messages(constants.FormField.TO.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.TO.name), 'required -> true)
     @inputText(sendAssetForm(constants.FormField.PEG_HASH.name), '_label -> Messages(constants.FormField.PEG_HASH.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PEG_HASH.name), 'required -> true)

@@ -1,0 +1,37 @@
+@import controllers.actions.LoginState
+@import helper._
+@import models.master.{Zone, ZoneKYC}
+@import play.api.Logger
+@import views.companion.master.ReviewAddZoneOnCompletion
+@import views.html.base._
+
+@(zoneCompletionForm: Form[ReviewAddZoneOnCompletion.Data] = ReviewAddZoneOnCompletion.form, zone: Zone, zoneKYCs: Seq[ZoneKYC])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, module: String, logger: Logger, loginState: LoginState = null)
+@commonForm(constants.Form.REVIEW_ADD_ZONE_ON_COMPLETION, zoneCompletionForm) {
+    <div>@Messages(constants.Form.ZONE_DETAILS):<br>
+        <span class="red">@Messages(constants.Form.NAME)</span>: @zone.name <br>
+        <span class="red">@Messages(constants.Form.CURRENCY)</span>: @zone.currency <br>
+        @Messages(constants.Form.ADDRESS): <br>
+        <span class="red">@Messages(constants.Form.ADDRESS_LINE_1)</span>: @zone.address.addressLine1 <br>
+        <span class="red">@Messages(constants.Form.ADDRESS_LINE_2)</span>: @zone.address.addressLine2 <br>
+        <span class="red">@Messages(constants.Form.LANDMARK)</span>: @zone.address.landmark.getOrElse("") <br>
+        <span class="red">@Messages(constants.Form.CITY)</span>: @zone.address.city <br>
+        <span class="red">@Messages(constants.Form.COUNTRY)</span>: @zone.address.country <br>
+        <span class="red">@Messages(constants.Form.ZIP_CODE)</span>: @zone.address.zipCode <br>
+        <span class="red">@Messages(constants.Form.PHONE)</span>: @zone.address.phone
+    </div>
+    <br>
+    <div id="zoneKYCs">@Messages(constants.Form.ZONE_KYC_FILES): <br>
+        @for(zoneKYC <- zoneKYCs) {
+            @component.master.commonDocumentViewer(zoneKYC) {
+                @routes.FileController.userAccessedZoneKYCFile(zoneKYC.documentType)
+            } {
+
+            } {
+                <span>@zoneKYC.documentType</span>
+            }
+        }
+    </div>
+    <br>
+    <span>@checkbox(zoneCompletionForm(constants.Form.COMPLETION), '_label -> Messages(constants.Form.COMPLETION), 'placeholder -> Messages(constants.Form.COMPLETION), 'class -> "cmuk-checkbox", 'required -> true)</span>
+    <button class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.AddZoneController.userUploadOrUpdateZoneKYCView())">@Messages(constants.Form.BACK)</button>
+}
