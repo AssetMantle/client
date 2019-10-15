@@ -401,6 +401,7 @@ object Form {
   val BOTH_PARTIES = "BOTH_PARTIES"
 
   //Sequences
+  //TODO Should be in assets constants
   val ASSET_TYPE_OPTIONS: Seq[String] = Seq("Oil", "Coal", "Gold", "Wheat")
   val DELIVERY_TERM_OPTIONS: Seq[String] = Seq("FOB", "CIF", "CFR")
   val QUALITY_OPTIONS: Seq[String] = Seq("A+", "A", "B")
