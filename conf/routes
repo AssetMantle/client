@@ -133,8 +133,8 @@ POST        /master/userUploadTraderKYC                                  control
 GET         /master/userStoreTraderKYC                                   controllers.SetACLController.userStoreTraderKYC(name: String, documentType: String)
 GET         /master/userUpdateTraderKYCForm                              controllers.SetACLController.userUpdateTraderKYCForm(documentType: String)
 GET         /master/userUpdateTraderKYC                                  controllers.SetACLController.userUpdateTraderKYC(name: String, documentType: String)
-GET         /master/reviewAddTraderOnCompletion                          controllers.SetACLController.reviewAddTraderOnCompletionForm
-POST        /master/reviewAddTraderOnCompletion                          controllers.SetACLController.reviewAddTraderOnCompletion
+GET         /master/userReviewAddTraderRequest                           controllers.SetACLController.userReviewAddTraderRequestForm
+POST        /master/userReviewAddTraderRequest                           controllers.SetACLController.userReviewAddTraderRequest
 
 GET         /master/zoneVerifyTrader                                     controllers.SetACLController.zoneVerifyTraderForm(accountID: String, organizationID: String)
 POST        /master/zoneVerifyTrader                                     controllers.SetACLController.zoneVerifyTrader
@@ -187,8 +187,8 @@ GET         /master/storeUserOrganizationKYCDocument                     control
 GET         /master/userUpdateOrganizationKYC                            controllers.AddOrganizationController.userUpdateOrganizationKYCForm(documentType: String)
 GET         /master/userUpdateOrganizationKYCDocument                    controllers.AddOrganizationController.userUpdateOrganizationKYC(name: String, documentType: String)
 
-GET         /master/reviewAddOrganizationOnCompletion                    controllers.AddOrganizationController.reviewAddOrganizationOnCompletionForm
-POST        /master/reviewAddOrganizationOnCompletion                    controllers.AddOrganizationController.reviewAddOrganizationOnCompletion
+GET         /master/userReviewAddOrganizationRequest                     controllers.AddOrganizationController.userReviewAddOrganizationRequestForm
+POST        /master/userReviewAddOrganizationRequest                     controllers.AddOrganizationController.userReviewAddOrganizationRequest
 GET         /master/viewVerifyOrganizationRequests                       controllers.AddOrganizationController.viewPendingVerifyOrganizationRequests
 GET         /master/viewOrganizationVerificationBankAccountDetail        controllers.AddOrganizationController.viewOrganizationVerificationBankAccountDetail(organizationID: String)
 GET         /master/viewOrganizationKYCDocuments                         controllers.AddOrganizationController.viewKYCDocuments(organizationID: String)
@@ -207,8 +207,8 @@ GET         /organizationUpload/updateFile                               control
 GET         /master/addZone                                              controllers.AddZoneController.addZoneForm
 POST        /master/addZone                                              controllers.AddZoneController.addZone
 GET         /master/userUploadOrUpdateZoneKYCView                        controllers.AddZoneController.userUploadOrUpdateZoneKYCView
-GET         /master/reviewAddZoneOnCompletion                            controllers.AddZoneController.reviewAddZoneOnCompletionForm
-POST        /master/reviewAddZoneOnCompletion                            controllers.AddZoneController.reviewAddZoneOnCompletion
+GET         /master/userReviewAddZoneRequest                             controllers.AddZoneController.userReviewAddZoneRequestForm
+POST        /master/userReviewAddZoneRequest                             controllers.AddZoneController.userReviewAddZoneRequest
 
 GET         /master/verifyZone                                           controllers.AddZoneController.verifyZoneForm(zoneID: String)
 POST        /master/verifyZone                                           controllers.AddZoneController.verifyZone

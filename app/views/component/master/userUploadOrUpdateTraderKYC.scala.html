@@ -26,5 +26,5 @@
 <button class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.SetACLController.addTraderForm())">@Messages(constants.Form.BACK)</button>
 
 @if(constants.File.TRADER_KYC_DOCUMENT_TYPES.diff(traderKYCs.map(_.documentType)).isEmpty) {
-    <button class="cmuk-button cmuk-button-primary" id="getTraderKYCReviewForm" onclick="getForm(jsRoutes.controllers.SetACLController.reviewAddTraderOnCompletionForm())">@Messages(constants.Form.NEXT)</button>
+    <button class="cmuk-button cmuk-button-primary" id="getTraderKYCReviewForm" onclick="getForm(jsRoutes.controllers.SetACLController.userReviewAddTraderRequestForm())">@Messages(constants.Form.NEXT)</button>
 }

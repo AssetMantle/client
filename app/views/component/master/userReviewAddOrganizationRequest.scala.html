@@ -3,10 +3,10 @@
 @import views.html.base._
 @import models.master.{Organization, OrganizationBankAccountDetail, OrganizationKYC, Zone}
 @import play.api.Logger
-@import views.companion.master.ReviewAddOrganizationOnCompletion
+@import views.companion.master.UserReviewAddOrganizationRequest
 
-@(reviewAddOrganizationOnCompletionForm: Form[ReviewAddOrganizationOnCompletion.Data] = ReviewAddOrganizationOnCompletion.form, organization: Organization, zone: Zone, organizationBankAccountDetail: OrganizationBankAccountDetail, organizationKYCs: Seq[OrganizationKYC])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, module: String, logger: Logger, loginState: LoginState = null)
-@commonForm(constants.Form.REVIEW_ADD_ORGANIZATION_ON_COMPLETION, reviewAddOrganizationOnCompletionForm) {
+@(userReviewAddOrganizationRequestForm: Form[UserReviewAddOrganizationRequest.Data] = UserReviewAddOrganizationRequest.form, organization: Organization, zone: Zone, organizationBankAccountDetail: OrganizationBankAccountDetail, organizationKYCs: Seq[OrganizationKYC])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, module: String, logger: Logger, loginState: LoginState = null)
+@commonForm(constants.Form.USER_REVIEW_ADD_ORGANIZATION_REQUEST, userReviewAddOrganizationRequestForm) {
     <div>@Messages(constants.Form.ZONE_DETAILS): <br>
         <span class="red">@Messages(constants.Form.NAME)</span>: @zone.name <br>
         <span class="red">@Messages(constants.Form.CURRENCY)</span>: @zone.currency <br>
@@ -73,6 +73,6 @@
     </div>
     <br>
     @Messages(constants.FormField.COMPLETION.name):
-    <span>@checkbox(reviewAddOrganizationOnCompletionForm(constants.FormField.COMPLETION.name), '_label -> Messages(constants.FormField.COMPLETION.name), 'class -> "cmuk-checkbox", 'placeholder -> Messages(constants.FormField.COMPLETION.name), 'required -> true)</span>
+    <span>@checkbox(userReviewAddOrganizationRequestForm(constants.FormField.COMPLETION.name), '_label -> Messages(constants.FormField.COMPLETION.name), 'class -> "cmuk-checkbox", 'placeholder -> Messages(constants.FormField.COMPLETION.name), 'required -> true)</span>
     <button class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.AddOrganizationController.userUploadOrUpdateOrganizationKYCView())">@Messages(constants.Form.BACK)</button>
 }

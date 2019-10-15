@@ -25,14 +25,14 @@ object Form {
   val ADD_ORGANIZATION = new Form("ADD_ORGANIZATION", routes.AddOrganizationController.addOrganization())
   val USER_UPDATE_UBOS = new Form("USER_UPDATE_UBOS", routes.AddOrganizationController.userUpdateUBOs())
   val ORGANIZATION_BANK_ACCOUNT_DETAIL = new Form("ORGANIZATION_BANK_ACCOUNT_DETAIL", routes.AddOrganizationController.organizationBankAccountDetail())
-  val REVIEW_ADD_ORGANIZATION_ON_COMPLETION = new Form("REVIEW_ADD_ORGANIZATION_ON_COMPLETION", routes.AddOrganizationController.reviewAddOrganizationOnCompletion())
+  val USER_REVIEW_ADD_ORGANIZATION_REQUEST = new Form("USER_REVIEW_ADD_ORGANIZATION_REQUEST", routes.AddOrganizationController.userReviewAddOrganizationRequest())
   val VERIFY_ORGANIZATION = new Form("VERIFY_ORGANIZATION", routes.AddOrganizationController.verifyOrganization())
   val REJECT_VERIFY_ORGANIZATION_REQUEST = new Form("REJECT_VERIFY_ORGANIZATION_REQUEST", routes.AddOrganizationController.rejectVerifyOrganizationRequest())
   val BLOCKCHAIN_ADD_ORGANIZATION = new Form("BLOCKCHAIN_ADD_ORGANIZATION", routes.AddOrganizationController.blockchainAddOrganization())
 
   //AddZoneController
   val ADD_ZONE = new Form("ADD_ZONE", routes.AddZoneController.addZone())
-  val REVIEW_ADD_ZONE_ON_COMPLETION = new Form("REVIEW_ADD_ZONE_ON_COMPLETION", routes.AddZoneController.reviewAddZoneOnCompletion())
+  val REVIEW_ADD_ZONE_ON_COMPLETION = new Form("REVIEW_ADD_ZONE_ON_COMPLETION", routes.AddZoneController.userReviewAddZoneRequest())
   val VERIFY_ZONE = new Form("VERIFY_ZONE", routes.AddZoneController.verifyZone())
   val REJECT_VERIFY_ZONE_REQUEST = new Form("REJECT_VERIFY_ZONE_REQUEST", routes.AddZoneController.rejectVerifyZoneRequest())
   val BLOCKCHAIN_ADD_ZONE = new Form("BLOCKCHAIN_ADD_ZONE", routes.AddZoneController.blockchainAddZone())
@@ -113,7 +113,7 @@ object Form {
   //SetACLController
   val INVITE_TRADER = new Form("INVITE_TRADER", routes.SetACLController.inviteTrader())
   val ADD_TRADER = new Form("ADD_TRADER", routes.SetACLController.addTrader())
-  val REVIEW_ADD_TRADER_ON_COMPLETION = new Form("REVIEW_ADD_TRADER_ON_COMPLETION", routes.SetACLController.reviewAddTraderOnCompletion())
+  val REVIEW_ADD_TRADER_ON_COMPLETION = new Form("REVIEW_ADD_TRADER_ON_COMPLETION", routes.SetACLController.userReviewAddTraderRequest())
   val ZONE_VERIFY_TRADER = new Form("ZONE_VERIFY_TRADER", routes.SetACLController.zoneVerifyTrader())
   val ZONE_REJECT_VERIFY_TRADER_REQUEST = new Form("ZONE_REJECT_VERIFY_TRADER_REQUEST", routes.SetACLController.zoneRejectVerifyTraderRequest())
   val ORGANIZATION_VERIFY_TRADER = new Form("ORGANIZATION_VERIFY_TRADER", routes.SetACLController.organizationVerifyTrader())
