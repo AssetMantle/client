@@ -142,6 +142,7 @@ object FormField {
   val STATUS = new BooleanFormField("STATUS")
   val CONFIRM_NOTE_NEW_KEY_DETAILS = new BooleanFormField("CONFIRM_NOTE_NEW_KEY_DETAILS")
 
+  //TODO: Error Response through Messages
   class StringFormField (fieldName: String, minimumLength: Int, maximumLength: Int, regex: Regex = RegularExpression.ANY_STRING, errorMessage: String = "Error Response") {
     val name: String = fieldName
     val field: Mapping[String] = text(minLength = minimumLength, maxLength = maximumLength).verifying(Constraints.pattern(regex = regex, name = regex.pattern.toString, error = errorMessage))
