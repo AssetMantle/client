@@ -16,16 +16,12 @@
             <div class="cmuk-width-1-1 cmuk-width-expand@@m">
                 <div class="cmuk-card cmuk-card-default cmuk-card-small cmuk-card-body">
                     <h2 class="card-title">@loginState.username</h2>
-                    <div class="ur-change-password">
                         <p>
                             @Messages(constants.User.USER_TYPE) :
                             <span id="userTypeValue">@loginState.userType</span>
+                            <span><button onclick="getForm(jsRoutes.controllers.AccountController.changePasswordForm())">@Messages(constants.Form.CHANGE_PASSWORD)</button></span>
                         </p>
-                        <button onclick="getForm(jsRoutes.controllers.AccountController.changePasswordForm())">@Messages(constants.Form.CHANGE_PASSWORD)</button>
-                    </div>
-
-
-                    <p>
+                       <p>
                         @Messages(constants.Form.BLOCKCHAIN_ADDRESS) :
                         <span id="blockchainAddressValue"><span id="text_element" class="hash_code">@loginState.address</span> <span onclick="copyToClipboard('text_element')"><i class="fa fa-clipboard"></i></span></span>
                     </p>

@@ -548,7 +548,6 @@ dl .info::after {
     text-overflow: ellipsis;
     white-space: nowrap;
     height: 1.2em;
-    margin-left: 20px;
 }
 .issue_asset {
     margin-right: -1px;
@@ -587,7 +586,6 @@ dl .info::after {
     margin-left: -5px;
 }
 
-
 .pageContent {
     display: flex;
     margin-top: 20px;
@@ -612,16 +610,6 @@ dl .info::after {
 
 .failure .fa {
     color: red;
-}
-
-.ur-change-password {
-    display: flex;
-    margin-bottom: 10px;
-}
-
-.ur-change-password button {
-    margin-left: 50px;
-    margin-top: -20px;
 }
 
 /* Main search field*/
@@ -699,12 +687,6 @@ dl .info::after {
     width: 20px;
     height: 20px;
 }
-
-@media  (max-width: 639px) {
-.cmuk-navbar-nav{
-    display: block !important;
-}
-}
 .copyIcon{
     cursor: pointer;
 }
@@ -770,4 +752,12 @@ dl .info::after {
 .tooltip:hover .tooltiptext {
     visibility: visible;
     opacity: 1;
+}
+.tableName{
+    background:#d2edef;
+}
+.backButton{
+    background: #fff;
+    padding: 2px 10px;
+    border-radius: 4px;
 }

@@ -16,7 +16,7 @@ function copyToClipboard(elementId) {
     tooltip.innerHTML = "Copied";
 
 }
-function outFunc() {
+function afterCopy() {
     var tooltip = document.getElementById("myTooltip");
     tooltip.innerHTML = "Copy to clipboard";
 }

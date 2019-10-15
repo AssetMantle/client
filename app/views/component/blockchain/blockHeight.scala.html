@@ -3,17 +3,17 @@
 
 <div id="blockHeightBottomDivision" >
     <div class="cmuk-card
-                cmuk-card-default
-                cmuk-card-body">
-        <a class="back-button" onclick='back()' > <span cmuk-icon="arrow-left"></span> @Messages(constants.Form.BACK)</a><br>
-        @Messages(constants.Form.BLOCK): <p id="blockHeightPageHeight"></p>
-        @Messages(constants.Form.TIME): <p id="blockHeightPageTime"></p>
-        @Messages(constants.Form.NUM_TXS): <p id="blockHeightPageNumTxs"></p>
-        @Messages(constants.Form.DATA_HASH):
-        <p id="blockHeightPageDataHash"></p>
-        @Messages(constants.Form.EVIDENCE_HASH):
-        <p id="blockHeightPageEvidenceHash"></p>
-        @Messages(constants.Form.VALIDATORS_HASH):
-        <p id="blockHeightPageValidatorsHash"></p>
+                cmuk-card-default">
+        <div class="cmuk-card-header tableName">
+            <a class="backButton cmuk-float-right" onclick='back()' > <span cmuk-icon="timecircle"></span><span cmuk-icon="arrow-left" title="Back"></span></a><br>
+        </div>
+        <div class="cmuk-card-body">
+            <p><span class="cmuk-text-bold">@Messages(constants.Form.BLOCK):</span> <span id="blockHeightPageHeight"></span></p>
+            <p><span class="cmuk-text-bold">@Messages(constants.Form.TIME):</span> <span id="blockHeightPageTime"></span></p>
+            <p><span class="cmuk-text-bold">@Messages(constants.Form.NUM_TXS):</span> <span id="blockHeightPageNumTxs"></span></p>
+            <p><span class="cmuk-text-bold">@Messages(constants.Form.DATA_HASH):</span> <span id="blockHeightPageDataHash"></span></p>
+            <p><span class="cmuk-text-bold">@Messages(constants.Form.EVIDENCE_HASH):</span> <span id="blockHeightPageEvidenceHash"></span></p>
+            <p><span class="cmuk-text-bold">@Messages(constants.Form.VALIDATORS_HASH):</span> <span id="blockHeightPageValidatorsHash"></span></p>
+        </div>
     </div>
 </div>
