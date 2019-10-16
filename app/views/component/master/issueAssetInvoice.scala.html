@@ -29,7 +29,7 @@
     @inputText(issueAssetInvoiceForm(constants.FormField.INVOICE_NUMBER.name), '_label -> Messages(constants.FormField.INVOICE_NUMBER.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.INVOICE_NUMBER.name), 'required -> true)
     @inputDate(issueAssetInvoiceForm(constants.FormField.INVOICE_DATE.name), '_label -> Messages(constants.FormField.INVOICE_DATE.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.INVOICE_DATE.name), '_name -> Messages(constants.FormField.INVOICE_DATE.name), 'required -> true)
     @file match {
-        case Some(file) => {<button class="cmuk-button cmuk-button-primary" onclick="submitForm(this)">@Messages(constants.Form.ISSUE_ASSET_INVOICE.submit)</button>}
-        case None => {<button class="cmuk-button cmuk-button-primary" onclick="submitForm(this)" disabled="disabled">@Messages(constants.Form.ISSUE_ASSET_INVOICE.submit)</button>}
+        case Some(file) => {<button type="button" class="cmuk-button cmuk-button-primary" onclick="submitForm(this)">@Messages(constants.Form.ISSUE_ASSET_INVOICE.submit)</button>}
+        case None => {<button type="button" class="cmuk-button cmuk-button-primary" onclick="submitForm(this)" disabled="disabled">@Messages(constants.Form.ISSUE_ASSET_INVOICE.submit)</button>}
     }
 }

@@ -38,10 +38,10 @@
     @*// TODO Correct this as per commonForm *@
     @file match {
         case Some(file) => {
-            <button class="cmuk-button cmuk-button-primary" onclick="submitForm(this)">@Messages(constants.Form.ISSUE_ASSET_OBL.submit)</button>
+            <button type="button" class="cmuk-button cmuk-button-primary" onclick="submitForm(this)">@Messages(constants.Form.ISSUE_ASSET_OBL.submit)</button>
         }
         case None => {
-            <button class="cmuk-button cmuk-button-primary" onclick="submitForm(this)" disabled="disabled">@Messages(constants.Form.ISSUE_ASSET_OBL.submit)</button>
+            <button type="button" class="cmuk-button cmuk-button-primary" onclick="submitForm(this)" disabled="disabled">@Messages(constants.Form.ISSUE_ASSET_OBL.submit)</button>
         }
     }
 }

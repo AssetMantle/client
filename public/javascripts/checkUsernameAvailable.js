@@ -5,7 +5,7 @@ function checkUsernameAvailable(source, resultID, usernameAvailableCheckBoxID) {
     if (timeoutFlag) {
         timeoutFlag = false;
         clearTimeout(timer);
-        setTimeout(function () {
+        timer = setTimeout(function () {
             timeoutFlag = true;
             const username = $(source).val();
             const result = $(resultID);
