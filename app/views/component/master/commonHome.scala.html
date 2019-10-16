@@ -13,7 +13,7 @@
             <div class="cmuk-card cmuk-card-default cmuk-card-small cmuk-card-body">
                 <h2 class="card-title">@loginState.username</h2>
                 <p> @Messages(constants.Form.COINS): @coins</p>
-                <button class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.SendCoinController.sendCoinForm())">@Messages(constants.Form.SEND_COIN.legend)</button>
+                <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.SendCoinController.sendCoinForm())">@Messages(constants.Form.SEND_COIN.legend)</button>
                 <p> @Messages(constants.User.USER_TYPE): @loginState.userType </p>
                 <p> @Messages(constants.Form.BLOCKCHAIN_ADDRESS): @loginState.address
                 </p>

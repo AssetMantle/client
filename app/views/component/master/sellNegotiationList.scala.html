@@ -15,10 +15,10 @@
                     @loginState.acl match {
                         case Some(acl) => {
                             @if(acl.changeSellerBid) {
-                                <button class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.ChangeSellerBidController.changeSellerBidForm('@negotiation.buyerAddress', '@negotiation.assetPegHash'))">@Messages(constants.Form.NEGOTIATE)</button>
+                                <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.ChangeSellerBidController.changeSellerBidForm('@negotiation.buyerAddress', '@negotiation.assetPegHash'))">@Messages(constants.Form.NEGOTIATE)</button>
                             } <br>
                             @if(acl.confirmSellerBid) {
-                                <button class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.ConfirmSellerBidController.confirmSellerBidDetailForm('@negotiation.buyerAddress', '@negotiation.assetPegHash', @negotiation.bid))">@Messages(constants.Form.ACCEPT_OFFER)</button>
+                                <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.ConfirmSellerBidController.confirmSellerBidDetailForm('@negotiation.buyerAddress', '@negotiation.assetPegHash', @negotiation.bid))">@Messages(constants.Form.ACCEPT_OFFER)</button>
                             } <br>
                         }
                         case _ => {}
@@ -28,13 +28,13 @@
                     @loginState.acl match {
                         case Some(acl) => {
                             @if(acl.sendAsset) {
-                                <button class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.SendAssetController.sendAssetForm('@negotiation.buyerAddress', '@negotiation.assetPegHash'))">@Messages(constants.Form.SEND_ASSET.legend)</button>
+                                <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.SendAssetController.sendAssetForm('@negotiation.buyerAddress', '@negotiation.assetPegHash'))">@Messages(constants.Form.SEND_ASSET.legend)</button>
                             } <br>
                         }
                         case _ => {}
                     }
                 }
-            <button class="cmuk-button cmuk-button-primary">@Messages(constants.Form.SHOW_HIDE)</button>
+            <button type="button" class="cmuk-button cmuk-button-primary">@Messages(constants.Form.SHOW_HIDE)</button>
             </div>
             <div class="hidden">
                 <span class="red">@Messages(constants.Form.BUYER_ADDRESS)</span>: @negotiation.buyerAddress <br>

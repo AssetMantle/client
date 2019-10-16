@@ -23,7 +23,7 @@
         }
     }
 </div>
-<button class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.AddOrganizationController.organizationBankAccountDetailForm())">@Messages(constants.Form.BACK)</button>
+<button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.AddOrganizationController.organizationBankAccountDetailForm())">@Messages(constants.Form.BACK)</button>
 @if(constants.File.ORGANIZATION_KYC_DOCUMENT_TYPES.diff(organizationKYCs.map(_.documentType)).isEmpty) {
-    <button class="cmuk-button cmuk-button-primary" id="getOrganizationKYCReviewForm" onclick="getForm(jsRoutes.controllers.AddOrganizationController.userReviewAddOrganizationRequestForm())">@Messages(constants.Form.NEXT)</button>
+    <button type="button" class="cmuk-button cmuk-button-primary" id="getOrganizationKYCReviewForm" onclick="getForm(jsRoutes.controllers.AddOrganizationController.userReviewAddOrganizationRequestForm())">@Messages(constants.Form.NEXT)</button>
 }
