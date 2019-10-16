@@ -50,7 +50,7 @@ function updateBlockExplorer(wsNewBlock, blockExplorerTableBody, receivedData, m
 
     let blockContainerList = document.getElementById(blockExplorerTableBody);
     blockContainerList.removeChild(blockContainerList.childNodes[blockContainerList.childNodes.length - 1]);
-    $('#' + blockExplorerTableBody).prepend("<tr><td><button onclick='searchFunction(" + JSON.stringify(latestBlockHeight) + ")'>" + latestBlockHeight + "</button></td><td>" + numTxs + "</td><td ><div id='" + timerID + "'></div></td></tr>");
+    $('#' + blockExplorerTableBody).prepend("<tr><td><button class='cmuk-button cmuk-button-text' onclick='searchFunction(" + JSON.stringify(latestBlockHeight) + ")'>" + latestBlockHeight + "</button></td><td>" + numTxs + "</td><td ><div id='" + timerID + "'></div></td></tr>");
 
     getBlockTime(time, timerID);
     let setTimeoutIDArray = JSON.parse(getCookie("blockExplorerTimer"));
@@ -98,7 +98,7 @@ function initializeBlockExplorer(blockExplorerTableBody, maxNumberOfItems) {
                                 let blockTime = new Date(time);
                                 initialTimeData[initialTimeData.length] = time;
                                 let differenceBetweenBlockTime = (blockTime.getTime() - new Date(lastBlockTime).getTime()) / 1000;
-                                content = "<tr><td><button onclick='searchFunction(" + JSON.stringify(height) + ")'>" + height + "</button></td><td>" + numTxs + "</td><td><div id='" + timerID + "'></div> </td></tr>" + content;
+                                content = "<tr><td><button class='cmuk-button cmuk-button-text' onclick='searchFunction(" + JSON.stringify(height) + ")'>" + height + "</button></td><td>" + numTxs + "</td><td><div id='" + timerID + "'></div> </td></tr>" + content;
                                 lastBlockTime = time;
                                 if (index > 0) {
                                     initialGraphTime[initialGraphTime.length] = height + "::" + blockTime.getHours() + ":" + blockTime.getMinutes() + ":" + blockTime.getSeconds();

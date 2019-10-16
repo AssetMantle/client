@@ -123,36 +123,36 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
       }
   }
 
-  def reviewAddZoneOnCompletionForm(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
+  def userReviewAddZoneRequestForm(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
         val zone = masterZones.Service.getByAccountID(loginState.username)
-        withUsernameToken.Ok(views.html.component.master.reviewAddZoneOnCompletion(zone = zone, zoneKYCs = masterZoneKYCs.Service.getAllDocuments(zone.id)))
+        withUsernameToken.Ok(views.html.component.master.userReviewAddZoneRequest(zone = zone, zoneKYCs = masterZoneKYCs.Service.getAllDocuments(zone.id)))
       } catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
-  def reviewAddZoneOnCompletion(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
+  def userReviewAddZoneRequest(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      views.companion.master.ReviewAddZoneOnCompletion.form.bindFromRequest().fold(
+      views.companion.master.ReviewAddZoneRequest.form.bindFromRequest().fold(
         formWithErrors => {
           try {
             val zone = masterZones.Service.getByAccountID(loginState.username)
-            BadRequest(views.html.component.master.reviewAddZoneOnCompletion(formWithErrors, zone = zone, zoneKYCs = masterZoneKYCs.Service.getAllDocuments(zone.id)))
+            BadRequest(views.html.component.master.userReviewAddZoneRequest(formWithErrors, zone = zone, zoneKYCs = masterZoneKYCs.Service.getAllDocuments(zone.id)))
           } catch {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
         },
-        reviewAddZoneOnCompletionData => {
+        userReviewAddZoneRequestData => {
           try {
             val id = masterZones.Service.getID(loginState.username)
-            if (reviewAddZoneOnCompletionData.completion && masterZoneKYCs.Service.checkAllKYCFileTypesExists(id)) {
+            if (userReviewAddZoneRequestData.completion && masterZoneKYCs.Service.checkAllKYCFileTypesExists(id)) {
               masterZones.Service.markZoneFormCompleted(id)
               withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ZONE_ADDED_FOR_VERIFICATION)))
             } else {
               val zone = masterZones.Service.getByAccountID(loginState.username)
-              BadRequest(views.html.component.master.reviewAddZoneOnCompletion(zone = zone, zoneKYCs = masterZoneKYCs.Service.getAllDocuments(zone.id)))
+              BadRequest(views.html.component.master.userReviewAddZoneRequest(zone = zone, zoneKYCs = masterZoneKYCs.Service.getAllDocuments(zone.id)))
             }
           }
           catch {

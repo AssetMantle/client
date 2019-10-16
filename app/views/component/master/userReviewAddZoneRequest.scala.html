@@ -2,10 +2,10 @@
 @import helper._
 @import models.master.{Zone, ZoneKYC}
 @import play.api.Logger
-@import views.companion.master.ReviewAddZoneOnCompletion
+@import views.companion.master.ReviewAddZoneRequest
 @import views.html.base._
 
-@(zoneCompletionForm: Form[ReviewAddZoneOnCompletion.Data] = ReviewAddZoneOnCompletion.form, zone: Zone, zoneKYCs: Seq[ZoneKYC])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, module: String, logger: Logger, loginState: LoginState = null)
+@(zoneCompletionForm: Form[ReviewAddZoneRequest.Data] = ReviewAddZoneRequest.form, zone: Zone, zoneKYCs: Seq[ZoneKYC])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, module: String, logger: Logger, loginState: LoginState = null)
 @commonForm(constants.Form.REVIEW_ADD_ZONE_ON_COMPLETION, zoneCompletionForm) {
     <div>@Messages(constants.Form.ZONE_DETAILS):<br>
         <span class="red">@Messages(constants.Form.NAME)</span>: @zone.name <br>
@@ -32,6 +32,6 @@
         }
     </div>
     <br>
-    <span>@checkbox(zoneCompletionForm(constants.Form.COMPLETION), '_label -> Messages(constants.Form.COMPLETION), 'placeholder -> Messages(constants.Form.COMPLETION), 'class -> "cmuk-checkbox", 'required -> true)</span>
+    <span>@checkbox(zoneCompletionForm(constants.FormField.COMPLETION.name), '_label -> Messages(constants.FormField.COMPLETION.name), 'placeholder -> Messages(constants.FormField.COMPLETION.name), 'class -> "cmuk-checkbox", 'required -> true)</span>
     <button class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.AddZoneController.userUploadOrUpdateZoneKYCView())">@Messages(constants.Form.BACK)</button>
 }

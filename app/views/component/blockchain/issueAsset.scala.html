@@ -4,19 +4,16 @@
 
 @(issueAssetForm: Form[IssueAsset.Data] = IssueAsset.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @commonForm(constants.Form.BLOCKCHAIN_ISSUE_ASSET, issueAssetForm) {
-    @inputText(issueAssetForm(constants.FormField.FROM.name), '_label -> Messages(constants.FormField.FROM.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.FROM.name), 'required -> true)
-    @inputText(issueAssetForm(constants.FormField.TO.name), '_label -> Messages(constants.FormField.TO.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.TO.name), 'required -> true)
-    @inputText(issueAssetForm(constants.FormField.DOCUMENT_HASH.name), '_label -> Messages(constants.FormField.DOCUMENT_HASH.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.DOCUMENT_HASH.name), 'required -> true)
-    @inputText(issueAssetForm(constants.FormField.ASSET_TYPE.name), '_label -> Messages(constants.FormField.ASSET_TYPE.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.ASSET_TYPE.name), 'required -> true)
-    @inputText(issueAssetForm(constants.FormField.ASSET_PRICE.name), '_label -> Messages(constants.FormField.ASSET_PRICE.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.ASSET_PRICE.name), 'required -> true, 'type -> "number")
-    @inputText(issueAssetForm(constants.FormField.QUANTITY_UNIT.name), '_label -> Messages(constants.FormField.QUANTITY_UNIT.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.QUANTITY_UNIT.name), 'required -> true)
-    @inputText(issueAssetForm(constants.FormField.ASSET_QUANTITY.name), '_label -> Messages(constants.FormField.ASSET_QUANTITY.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.ASSET_QUANTITY.name), 'required -> true, 'type -> "number")
-    <span>
-        @Messages(constants.Form.MODERATED)
-        @checkbox(issueAssetForm(constants.Form.MODERATED), '_label -> Messages(constants.Form.MODERATED), 'class -> "cmuk-checkbox")
-    </span>
-    @inputText(issueAssetForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.GAS.name), 'required -> true, 'type -> "number")
-    @inputText(issueAssetForm(constants.FormField.TAKER_ADDRESS.name), '_label -> Messages(constants.FormField.TAKER_ADDRESS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.TAKER_ADDRESS.name), 'required -> false)
-    @inputText(issueAssetForm(constants.FormField.MODE.name), '_label -> Messages(constants.FormField.MODE.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.MODE.name), 'required -> true)
-    @inputPassword(issueAssetForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PASSWORD.name), 'required -> true)
+    @commonInputText(issueAssetForm, constants.FormField.FROM.name)
+    @commonInputText(issueAssetForm, constants.FormField.TO.name)
+    @commonInputText(issueAssetForm, constants.FormField.DOCUMENT_HASH.name)
+    @commonInputText(issueAssetForm, constants.FormField.ASSET_TYPE.name)
+    @commonInputText(issueAssetForm, constants.FormField.ASSET_PRICE.name)
+    @commonInputText(issueAssetForm, constants.FormField.QUANTITY_UNIT.name)
+    @commonInputText(issueAssetForm, constants.FormField.ASSET_QUANTITY.name)
+    @commonCheckbox(issueAssetForm, constants.FormField.MODERATED.name)
+    @commonInputText(issueAssetForm, constants.FormField.GAS.name)
+    @commonInputText(issueAssetForm, constants.FormField.TAKER_ADDRESS.name, required = false)
+    @commonInputText(issueAssetForm, constants.FormField.MODE.name)
+    @commonInputPassword(issueAssetForm, constants.FormField.PASSWORD.name)
 }

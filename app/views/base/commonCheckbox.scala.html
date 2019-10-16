@@ -1,0 +1,6 @@
+@import helper._
+
+@(formData: Form[_], keyName: String, fieldClass: Option[String] = None, fieldID: Option[String] = None)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@Messages(keyName)
+@checkbox(formData(keyName), '_label -> Messages(keyName), 'id -> fieldID.getOrElse(keyName), 'class -> fieldClass.getOrElse("cmuk-checkbox"))

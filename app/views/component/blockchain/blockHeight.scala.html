@@ -1,19 +1,13 @@
 @()(implicit messagesProvider: MessagesProvider)
 
-
 <div id="blockHeightBottomDivision" >
-    <div class="cmuk-card
-                cmuk-card-default
-                cmuk-card-body">
-        <a class="back-button" onclick='back()' > <span cmuk-icon="arrow-left"></span> @Messages(constants.Form.BACK)</a><br>
+    <div class="cmuk-card cmuk-card-default cmuk-card-body">
         @Messages(constants.Form.BLOCK): <p id="blockHeightPageHeight"></p>
         @Messages(constants.Form.TIME): <p id="blockHeightPageTime"></p>
         @Messages(constants.Form.NUM_TXS): <p id="blockHeightPageNumTxs"></p>
-        @Messages(constants.Form.DATA_HASH):
-        <p id="blockHeightPageDataHash"></p>
-        @Messages(constants.Form.EVIDENCE_HASH):
-        <p id="blockHeightPageEvidenceHash"></p>
-        @Messages(constants.Form.VALIDATORS_HASH):
-        <p id="blockHeightPageValidatorsHash"></p>
+        @Messages(constants.Form.DATA_HASH): <p id="blockHeightPageDataHash"></p>
+        @Messages(constants.Form.EVIDENCE_HASH): <p id="blockHeightPageEvidenceHash"></p>
+        @Messages(constants.Form.VALIDATORS_HASH): <p id="blockHeightPageValidatorsHash"></p>
+        <button class='cmuk-button cmuk-button-link' onclick='back()'><span cmuk-icon="arrow-left"></span>@Messages(constants.Form.BACK)</button><br>
     </div>
 </div>

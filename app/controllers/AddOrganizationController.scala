@@ -191,36 +191,36 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
       }
   }
 
-  def reviewAddOrganizationOnCompletionForm(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
+  def userReviewAddOrganizationRequestForm(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
         val organization = masterOrganizations.Service.getByAccountID(loginState.username)
-        withUsernameToken.Ok(views.html.component.master.reviewAddOrganizationOnCompletion(organization = organization, zone = masterZones.Service.get(organization.zoneID), organizationBankAccountDetail = masterOrganizationBankAccountDetails.Service.get(organization.id), organizationKYCs = masterOrganizationKYCs.Service.getAllDocuments(organization.id)))
+        withUsernameToken.Ok(views.html.component.master.userReviewAddOrganizationRequest(organization = organization, zone = masterZones.Service.get(organization.zoneID), organizationBankAccountDetail = masterOrganizationBankAccountDetails.Service.get(organization.id), organizationKYCs = masterOrganizationKYCs.Service.getAllDocuments(organization.id)))
       } catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
-  def reviewAddOrganizationOnCompletion(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
+  def userReviewAddOrganizationRequest(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      views.companion.master.ReviewAddOrganizationOnCompletion.form.bindFromRequest().fold(
+      views.companion.master.UserReviewAddOrganizationRequest.form.bindFromRequest().fold(
         formWithErrors => {
           try {
             val organization = masterOrganizations.Service.getByAccountID(loginState.username)
-            BadRequest(views.html.component.master.reviewAddOrganizationOnCompletion(formWithErrors, organization = organization, zone = masterZones.Service.get(organization.zoneID), organizationBankAccountDetail = masterOrganizationBankAccountDetails.Service.get(organization.id), organizationKYCs = masterOrganizationKYCs.Service.getAllDocuments(organization.id)))
+            BadRequest(views.html.component.master.userReviewAddOrganizationRequest(formWithErrors, organization = organization, zone = masterZones.Service.get(organization.zoneID), organizationBankAccountDetail = masterOrganizationBankAccountDetails.Service.get(organization.id), organizationKYCs = masterOrganizationKYCs.Service.getAllDocuments(organization.id)))
           } catch {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
         },
-        reviewAddOrganizationOnCompletionData => {
+        userReviewAddOrganizationRequestData => {
           try {
             val id = masterOrganizations.Service.getID(loginState.username)
-            if (reviewAddOrganizationOnCompletionData.completion && masterOrganizationKYCs.Service.checkAllKYCFileTypesExists(id)) {
+            if (userReviewAddOrganizationRequestData.completion && masterOrganizationKYCs.Service.checkAllKYCFileTypesExists(id)) {
               masterOrganizations.Service.markOrganizationFormCompleted(id)
               withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ORGANIZATION_ADDED_FOR_VERIFICATION)))
             } else {
               val organization = masterOrganizations.Service.getByAccountID(loginState.username)
-              BadRequest(views.html.component.master.reviewAddOrganizationOnCompletion(organization = organization, zone = masterZones.Service.get(organization.zoneID), organizationBankAccountDetail = masterOrganizationBankAccountDetails.Service.get(organization.id), organizationKYCs = masterOrganizationKYCs.Service.getAllDocuments(organization.id)))
+              BadRequest(views.html.component.master.userReviewAddOrganizationRequest(organization = organization, zone = masterZones.Service.get(organization.zoneID), organizationBankAccountDetail = masterOrganizationBankAccountDetails.Service.get(organization.id), organizationKYCs = masterOrganizationKYCs.Service.getAllDocuments(organization.id)))
             }
           }
           catch {
