@@ -12,11 +12,11 @@ function copyToClipboard(elementId) {
     // Remove the input from the body
     document.body.removeChild(aux);
 
-    var tooltip = document.getElementById("myTooltip");
+    var tooltip = document.getElementById("toolTip");
     tooltip.innerHTML = "Copied";
 
 }
 function afterCopy() {
-    var tooltip = document.getElementById("myTooltip");
+    var tooltip = document.getElementById("toolTip");
     tooltip.innerHTML = "Copy to clipboard";
 }
