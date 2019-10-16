@@ -109,9 +109,9 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
       Ok("Done")
   }
 
-  def func(usr:String)={
+  /*def func(usr:String)={
     usr+"sgsfs"
-  }
+  }*/
 
   def testActionAsync=Action.async{
 

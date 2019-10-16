@@ -122,16 +122,28 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
     def getID(address: String): Future[String] = getIdByAddress(address)
 
-    def getDirtyZones: Seq[Zone] = Await.result(getZonesByDirtyBit(dirtyBit = true), Duration.Inf)
+    def getDirtyZones: Future[Seq[Zone]] = getZonesByDirtyBit(dirtyBit = true)
 
-    def refreshDirty(zoneID: String, address: String): Int = Await.result(updateAddressAndDirtyBitByID(zoneID, address, dirtyBit = false), Duration.Inf)
+    def refreshDirty(zoneID: String, address: String): Future[Int] = updateAddressAndDirtyBitByID(zoneID, address, dirtyBit = false)
 
     def markDirty(zoneID: String): Int = Await.result(updateDirtyBitByID(zoneID, dirtyBit = true), Duration.Inf)
   }
 
   object Utility {
-    def dirtyEntityUpdater(): Future[Unit] = Future {
-      val dirtyZone = Service.getDirtyZones
+    def refreshDirtyZones(dirtyZones:Seq[Zone])={
+      Future.sequence{
+        dirtyZones.map { dirtyZone =>
+          val responseAddress = getZone.Service.get(dirtyZone.id)
+          def refreshDirty(responseAddress: queries.responses.ZoneResponse.Response) = Service.refreshDirty(dirtyZone.id, responseAddress.body)
+          for {
+            responseAddress <- responseAddress
+            _ <- refreshDirty(responseAddress)
+          } yield {}
+        }
+      }
+    }
+    def dirtyEntityUpdater(): Future[Unit] =  {
+      /*val dirtyZone = Service.getDirtyZones
       Thread.sleep(sleepTime)
       for (dirtyZone <- dirtyZone) {
         try {
@@ -141,8 +153,14 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
         catch {
           case baseException: BaseException => logger.error(baseException.failure.message, baseException)
         }
-      }
-    }(schedulerExecutionContext)
+      }*/
+      val dirtyZones = Service.getDirtyZones
+      Thread.sleep(sleepTime)
+      for{
+        dirtyZones<-dirtyZones
+        _<-refreshDirtyZones(dirtyZones)
+      }yield {}
+    }
   }
 
   actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {

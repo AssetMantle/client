@@ -134,7 +134,7 @@ class AccountKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfig
 
     def deleteAllDocuments(id: String): Int = Await.result(deleteById(id = id), Duration.Inf)
 
-    def checkFileExists(id: String, documentType: String): Boolean = Await.result(checkFileExistsByIdAndDocumentType(id = id, documentType = documentType), Duration.Inf)
+    def checkFileExists(id: String, documentType: String): Future[Boolean] = checkFileExistsByIdAndDocumentType(id = id, documentType = documentType)
 
     def checkFileNameExists(id: String, fileName: String): Future[Boolean] = checkByIdAndFileName(id = id, fileName = fileName)
   }

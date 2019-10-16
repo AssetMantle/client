@@ -418,7 +418,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
                   organization<-organization
                   zone<-zone
                   traderKYCs<-traderKYCs
-                }yield  BadRequest(views.html.component.master.reviewTraderCompletion(views.companion.master.TraderCompletion.form, trader = trader, organization = masterOrganizations.Service.get(trader.organizationID), zone = masterZones.Service.get(trader.zoneID), traderKYCs = masterTraderKYCs.Service.getAllDocuments(trader.id)))
+                }yield  BadRequest(views.html.component.master.reviewTraderCompletion(views.companion.master.TraderCompletion.form, trader = trader, organization = organization, zone =zone, traderKYCs = traderKYCs))
               }
               for{
                 trader<-trader
@@ -610,12 +610,12 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
 
   def zoneViewPendingVerifyTraderRequests: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      try {
+      /*try {
         withUsernameToken.Ok(views.html.component.master.zoneViewPendingVerifyTraderRequests(masterTraders.Service.getVerifyTraderRequestsForZone(masterZones.Service.getZoneId(loginState.username))))
       }
       catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-      }
+      }*/
       val zoneID=masterZones.Service.getZoneId(loginState.username)
       def verifyTraderRequestsForZone(zoneID:String)=masterTraders.Service.getVerifyTraderRequestsForZone(zoneID)
       for{
@@ -709,7 +709,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
           Future{BadRequest(views.html.component.master.organizationModifyTrader(formWithErrors))}
         },
         verifyTraderData => {
-          try {
+         /* try {
             if (masterTraderKYCs.Service.checkAllKYCFilesVerified(masterTraders.Service.getID(verifyTraderData.accountID))) {
               val zoneID = masterOrganizations.Service.getZoneIDByAccountID(loginState.username)
               val organizationID = masterOrganizations.Service.getID(loginState.username)
@@ -732,7 +732,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
           }
           catch {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-          }
+          }*/
           val id=masterTraders.Service.getID(verifyTraderData.accountID)
           def checkAllKYCFilesVerified(id:String)= masterTraderKYCs.Service.checkAllKYCFilesVerified(id)
           def getResult(checkAllKYCFilesVerified:Boolean)={
@@ -870,12 +870,12 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
 
   def organizationViewPendingVerifyTraderRequests: Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      try {
+      /*try {
         withUsernameToken.Ok(views.html.component.master.organizationViewPendingVerifyTraderRequests(masterTraders.Service.getVerifyTraderRequestsForOrganization(masterOrganizations.Service.getByAccountID(loginState.username).id)))
       }
       catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-      }
+      }*/
       val organizationAccount=masterOrganizations.Service.getByAccountID(loginState.username)
       def verifyTraderRequestsForOrganization(organizationAccount:Organization)=masterTraders.Service.getVerifyTraderRequestsForOrganization(organizationAccount.id)
       (for{
@@ -1017,7 +1017,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
       val zoneID=masterZones.Service.getZoneId(loginState.username)
       def getResult(organizationZoneID:String,zoneID:String)={
         if (organizationZoneID == zoneID) {
-          withUsernameToken.Ok(views.html.component.master.viewTradersInOrganization(masterTraders.Service.getVerifiedTradersForOrganization(organizationID)))
+          //withUsernameToken.Ok(views.html.component.master.viewTradersInOrganization(masterTraders.Service.getVerifiedTradersForOrganization(organizationID)))
           val verifiedTradersForOrganization=masterTraders.Service.getVerifiedTradersForOrganization(organizationID)
           for{
             verifiedTradersForOrganization<-verifiedTradersForOrganization

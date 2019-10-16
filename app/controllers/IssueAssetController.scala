@@ -25,18 +25,22 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
 
   private implicit val module: String = constants.Module.CONTROLLERS_ISSUE_ASSET
 
-  def issueAssetRequestForm(id: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.issueAssetRequest(views.companion.master.ConfirmTransaction.form.fill(views.companion.master.ConfirmTransaction.Data(id, Option(0), Option(""))), masterTransactionIssueAssetRequests.Service.getIssueAssetByID(id)))
+  def issueAssetRequestForm(id: String): Action[AnyContent] = Action.async { implicit request =>
+
+    val issueAssetRequest=masterTransactionIssueAssetRequests.Service.getIssueAssetByID(id)
+    for{
+      issueAssetRequest<-issueAssetRequest
+    }yield Ok(views.html.component.master.issueAssetRequest(views.companion.master.ConfirmTransaction.form.fill(views.companion.master.ConfirmTransaction.Data(id, Option(0), Option(""))), issueAssetRequest))
   }
 
   def assetDetail(id: String): Action[AnyContent] = Action.async { implicit request =>
   //  Ok(views.html.component.master.assetDetail(masterTransactionIssueAssetRequests.Service.getIssueAssetByID(id), masterTransactionAssetFiles.Service.getAllDocuments(id)))
     val issueAsset=masterTransactionIssueAssetRequests.Service.getIssueAssetByID(id)
-    val allDocuments=masterTransactionAssetFiles.Service.getAllDocuments(id)
+    val transactionAssetFiles=masterTransactionAssetFiles.Service.getAllDocuments(id)
     for{
       issueAsset<-issueAsset
-      allDocuments<-allDocuments
-    }yield Ok(views.html.component.master.assetDetail(issueAsset, allDocuments))
+      transactionAssetFiles<-transactionAssetFiles
+    }yield Ok(views.html.component.master.assetDetail(issueAsset, transactionAssetFiles))
   }
 
   def issueAssetRequest: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
@@ -79,7 +83,7 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
             if(asset.physicalDocumentsHandledVia == constants.Form.COMDEX){
               val updateStatusAndComment=masterTransactionIssueAssetRequests.Service.updateStatusAndComment(confirmTransactionData.requestID, constants.Status.Asset.REQUESTED)
               for{
-                updateStatusAndComment<-updateStatusAndComment
+                _<-updateStatusAndComment
               }yield Ok(views.html.index(successes = Seq(constants.Response.ISSUE_ASSET_REQUEST_SENT)))
             }else{
               val ticketID = transaction.process[blockchainTransaction.IssueAsset, transactionsIssueAsset.Request](
@@ -108,8 +112,8 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
       )
   }
 
-  def issueAssetDetailForm(id: Option[String]): Action[AnyContent] = Action { implicit request =>
-    try {
+  def issueAssetDetailForm(id: Option[String]): Action[AnyContent] = Action.async { implicit request =>
+    /*try {
       if (id.isDefined) {
         val assetRequest = masterTransactionIssueAssetRequests.Service.getIssueAssetByID(id.get)
         Ok(views.html.component.master.issueAssetDetail(views.companion.master.IssueAssetDetail.form.fill(views.companion.master.IssueAssetDetail.Data(Option(assetRequest.id), assetRequest.documentHash, assetRequest.assetType, assetRequest.quantityUnit, assetRequest.assetQuantity, assetRequest.assetPrice, assetRequest.takerAddress, assetRequest.shipmentDetails.commodityName, assetRequest.shipmentDetails.quality, assetRequest.shipmentDetails.deliveryTerm, assetRequest.shipmentDetails.tradeType, assetRequest.shipmentDetails.portOfLoading, assetRequest.shipmentDetails.portOfDischarge, assetRequest.shipmentDetails.shipmentDate, assetRequest.physicalDocumentsHandledVia, assetRequest.paymentTerms))))
@@ -117,6 +121,16 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
         Ok(views.html.component.master.issueAssetDetail(views.companion.master.IssueAssetDetail.form))
       }
     } catch {
+      case _: BaseException => InternalServerError(views.html.component.master.issueAssetDetail(views.companion.master.IssueAssetDetail.form))
+    }*/
+    (if (id.isDefined){
+      val assetRequest = masterTransactionIssueAssetRequests.Service.getIssueAssetByID(id.get)
+      for{
+        assetRequest<-assetRequest
+      }yield  Ok(views.html.component.master.issueAssetDetail(views.companion.master.IssueAssetDetail.form.fill(views.companion.master.IssueAssetDetail.Data(Option(assetRequest.id), assetRequest.documentHash, assetRequest.assetType, assetRequest.quantityUnit, assetRequest.assetQuantity, assetRequest.assetPrice, assetRequest.takerAddress, assetRequest.shipmentDetails.commodityName, assetRequest.shipmentDetails.quality, assetRequest.shipmentDetails.deliveryTerm, assetRequest.shipmentDetails.tradeType, assetRequest.shipmentDetails.portOfLoading, assetRequest.shipmentDetails.portOfDischarge, assetRequest.shipmentDetails.shipmentDate, assetRequest.physicalDocumentsHandledVia, assetRequest.paymentTerms))))
+    }else {
+      Future{Ok(views.html.component.master.issueAssetDetail(views.companion.master.IssueAssetDetail.form))}
+    }).recover{
       case _: BaseException => InternalServerError(views.html.component.master.issueAssetDetail(views.companion.master.IssueAssetDetail.form))
     }
   }
@@ -184,7 +198,7 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
       implicit request =>
         views.companion.master.IssueAssetOBL.form.bindFromRequest().fold(
           formWithErrors => {
-            BadRequest(views.html.component.master.issueAssetOBL(formWithErrors, masterTransactionAssetFiles.Service.getOrNone(formWithErrors.data(constants.FormField.REQUEST_ID.name), constants.File.OBL)))
+           // BadRequest(views.html.component.master.issueAssetOBL(formWithErrors, masterTransactionAssetFiles.Service.getOrNone(formWithErrors.data(constants.FormField.REQUEST_ID.name), constants.File.OBL)))
            val optionAssetFile=masterTransactionAssetFiles.Service.getOrNone(formWithErrors.data(constants.FormField.REQUEST_ID.name), constants.File.OBL)
             for{
               optionAssetFile<-optionAssetFile
@@ -232,10 +246,20 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
         )
   }
 
-  def issueAssetInvoiceForm(id: String): Action[AnyContent] = Action {
+  def issueAssetInvoiceForm(id: String): Action[AnyContent] = Action.async {
     implicit request =>
-      val invoice = masterTransactionAssetFiles.Service.getOrEmpty(id, constants.File.INVOICE).context.getOrElse(Serializable.Invoice("", new Date)).asInstanceOf[Serializable.Invoice]
+      /*val invoice = masterTransactionAssetFiles.Service.getOrEmpty(id, constants.File.INVOICE).context.getOrElse(Serializable.Invoice("", new Date)).asInstanceOf[Serializable.Invoice]
       PartialContent(views.html.component.master.issueAssetInvoice(views.companion.master.IssueAssetInvoice.form.fill(views.companion.master.IssueAssetInvoice.Data(id, invoice.invoiceNumber, invoice.invoiceDate)), masterTransactionAssetFiles.Service.getOrNone(id, constants.File.INVOICE)))
+    */  val assetFile=masterTransactionAssetFiles.Service.getOrEmpty(id, constants.File.INVOICE)
+      val optionAssetFile=masterTransactionAssetFiles.Service.getOrNone(id, constants.File.INVOICE)
+
+      for{
+        assetFile<-assetFile
+        optionAssetFile<-optionAssetFile
+      }yield {
+        val invoice=assetFile.context.getOrElse(Serializable.Invoice("", new Date)).asInstanceOf[Serializable.Invoice]
+        PartialContent(views.html.component.master.issueAssetInvoice(views.companion.master.IssueAssetInvoice.form.fill(views.companion.master.IssueAssetInvoice.Data(id, invoice.invoiceNumber, invoice.invoiceDate)), optionAssetFile))
+      }
   }
 
   def issueAssetInvoice: Action[AnyContent] = withTraderLoginAction.authenticated {
@@ -243,7 +267,7 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
       implicit request =>
         views.companion.master.IssueAssetInvoice.form.bindFromRequest().fold(
           formWithErrors => {
-            BadRequest(views.html.component.master.issueAssetInvoice(formWithErrors, masterTransactionAssetFiles.Service.getOrNone(formWithErrors.data(constants.FormField.REQUEST_ID.name), constants.File.INVOICE)))
+        //    BadRequest(views.html.component.master.issueAssetInvoice(formWithErrors, masterTransactionAssetFiles.Service.getOrNone(formWithErrors.data(constants.FormField.REQUEST_ID.name), constants.File.INVOICE)))
             val optionAssetFiles=masterTransactionAssetFiles.Service.getOrNone(formWithErrors.data(constants.FormField.REQUEST_ID.name), constants.File.INVOICE)
             for{
               optionAssetFiles<-optionAssetFiles
@@ -289,16 +313,16 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
   def viewPendingIssueAssetRequests: Action[AnyContent] = withZoneLoginAction.authenticated {
     implicit loginState =>
       implicit request =>
-        try {
+       /* try {
           withUsernameToken.Ok(views.html.component.master.viewPendingIssueAssetRequests(masterTransactionIssueAssetRequests.Service.getPendingIssueAssetRequests(masterAccounts.Service.getIDsForAddresses(blockchainAclAccounts.Service.getAddressesUnderZone(masterZones.Service.getZoneId(loginState.username))), constants.Status.Asset.REQUESTED)))
         }
         catch {
           case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-        }
+        }*/
       val zoneID=masterZones.Service.getZoneId(loginState.username)
       def addressesUnderZone(zoneID:String)= blockchainAclAccounts.Service.getAddressesUnderZone(zoneID)
       def iDsForAddresses(addresses:Seq[String])=  masterAccounts.Service.getIDsForAddresses(addresses)
-      def pendingIssueAssetRequests(iDs:Seq[String])=masterTransactionIssueAssetRequests.Service.getPendingIssueAssetRequests(iDs)
+      def pendingIssueAssetRequests(iDs:Seq[String])=masterTransactionIssueAssetRequests.Service.getPendingIssueAssetRequests(iDs,constants.Status.Asset.REQUESTED)
         (for{
         zoneID<-zoneID
         addressesUnderZone<-addressesUnderZone(zoneID)

@@ -45,11 +45,11 @@ class BlockExplorerController@Inject()(messagesControllerComponents: MessagesCon
     }
   }
 
-  def transactionHash(txHash: String): Action[AnyContent] = Action { implicit request =>
-    try {
-      Ok(Json.toJson(queriesGetTransactionHash.Service.get(txHash).json))
-    } catch {
-      case _: BaseException => InternalServerError
-    }
+  def transactionHash(txHash: String): Action[AnyContent] = Action.async { implicit request =>
+
+    val transactionHash=queriesGetTransactionHash.Service.get(txHash)
+    for{
+      transactionHash<-transactionHash
+    }yield Ok(Json.toJson(transactionHash.json))
   }
 }

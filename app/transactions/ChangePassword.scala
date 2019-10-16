@@ -36,7 +36,7 @@ class ChangePassword @Inject()(wsClient: WSClient)(implicit configuration: Confi
 
   private implicit val responseReads: Reads[Response] = Json.reads[Response]
 
-  private def action(username: String, request: Request): Future[Response] = wsClient.url(url + username).put(Json.toJson(request)).map { response => utilities.JSON.getResponseFromJson[Response](response) }
+  private def action(username: String, request: Request): Future[Response] =  utilities.JSON.getResponseFromJson[Response](wsClient.url(url + username).put(Json.toJson(request)))
 
   object Service {
 

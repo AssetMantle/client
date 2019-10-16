@@ -37,19 +37,24 @@ object JSON {
 
 
   def getResponseFromJson[T <: BaseResponse](response: Future[WSResponse])(implicit exec:ExecutionContext,logger: Logger, module: String, reads: Reads[T]): Future[T]={
-    response.map{ res=>
-      Json.fromJson[T](res.json) match{
+    response.map{ responseVal=>
+      Json.fromJson[T](responseVal.json) match{
         case JsSuccess(value: T, _: JsPath) => value
         case _: JsError =>
-          val errorResponse: ErrorResponse = Json.fromJson[ErrorResponse](res.json) match {
+          val errorResponse: ErrorResponse = Json.fromJson[ErrorResponse](responseVal.json) match {
             case JsSuccess(value: ErrorResponse, _: JsPath) => value
-            case error: JsError => logger.info(res.body.toString)
+            case error: JsError => logger.info(responseVal.body.toString)
               throw new BaseException(new Failure(error.toString, null))
           }
           logger.info(errorResponse.error)
           throw new BaseException(new Failure(errorResponse.error, null))
       }
 
+    }.recover{
+      case jsonParseException: JsonParseException => logger.info(jsonParseException.getMessage, jsonParseException)
+        throw new BaseException(constants.Response.JSON_PARSE_EXCEPTION)
+      case jsonMappingException: JsonMappingException => logger.info(jsonMappingException.getMessage, jsonMappingException)
+        throw new BaseException(constants.Response.NO_RESPONSE)
     }
 
   }

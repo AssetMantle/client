@@ -14,7 +14,7 @@ import play.api.libs.json.{JsValue, Json}
 import play.api.{Configuration, Logger}
 import queries.GetAccount
 import slick.jdbc.JdbcProfile
-
+import queries.responses.AccountResponse.Response
 import scala.concurrent.duration.{Duration, _}
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
@@ -163,13 +163,13 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
 
     def getAssetPegHashes(address: String)(implicit executionContext: ExecutionContext): Future[Seq[String]] = getAssetPegHashesByAddress(address)
 
-    def insertOrUpdate(pegHash: String, documentHash: String, assetType: String, assetQuantity: String, assetPrice: String, quantityUnit: String, ownerAddress: String, moderated: Boolean, takerAddress: Option[String], locked: Boolean, dirtyBit: Boolean): Int = Await.result(upsert(Asset(pegHash = pegHash, documentHash = documentHash, assetType = assetType, assetQuantity = assetQuantity, assetPrice = assetPrice, quantityUnit = quantityUnit, ownerAddress = ownerAddress, moderated = moderated, takerAddress = takerAddress, locked = locked, dirtyBit = dirtyBit)), Duration.Inf)
+    def insertOrUpdate(pegHash: String, documentHash: String, assetType: String, assetQuantity: String, assetPrice: String, quantityUnit: String, ownerAddress: String, moderated: Boolean, takerAddress: Option[String], locked: Boolean, dirtyBit: Boolean): Future[Int] = upsert(Asset(pegHash = pegHash, documentHash = documentHash, assetType = assetType, assetQuantity = assetQuantity, assetPrice = assetPrice, quantityUnit = quantityUnit, ownerAddress = ownerAddress, moderated = moderated, takerAddress = takerAddress, locked = locked, dirtyBit = dirtyBit))
 
-    def deleteAsset(pegHash: String): Int = Await.result(deleteByPegHash(pegHash), Duration.Inf)
+    def deleteAsset(pegHash: String): Future[Int] =deleteByPegHash(pegHash)
 
     def deleteAssetPegWallet(ownerAddress: String): Int = Await.result(deleteAssetPegWalletByAddress(ownerAddress), Duration.Inf)
 
-    def getDirtyAssets: Seq[Asset] = Await.result(getAssetsByDirtyBit(dirtyBit = true), Duration.Inf)
+    def getDirtyAssets: Future[Seq[Asset]] = getAssetsByDirtyBit(dirtyBit = true)
 
     def markDirty(pegHash: String): Future[Int] = updateDirtyBitByPegHash(pegHash, dirtyBit = true)
 
@@ -183,8 +183,37 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
   }
 
   object Utility {
-    def dirtyEntityUpdater(): Future[Unit] = Future {
-      val dirtyAssets = Service.getDirtyAssets
+
+    def insertOrUpdateAndCometMessage(dirtyAssets:Seq[Asset])={
+     Future.sequence {
+       dirtyAssets.map { dirtyAsset =>
+         /*try {
+          val assetPegWallet = getAccount.Service.get(dirtyAsset.ownerAddress).value.assetPegWallet.getOrElse(throw new BaseException(constants.Response.NO_RESPONSE))
+          assetPegWallet.foreach(assetPeg => if (assetPegWallet.map(_.pegHash) contains dirtyAsset.pegHash) Service.insertOrUpdate(pegHash = assetPeg.pegHash, documentHash = assetPeg.documentHash, assetType = assetPeg.assetType, assetPrice = assetPeg.assetPrice, assetQuantity = assetPeg.assetQuantity, quantityUnit = assetPeg.quantityUnit, ownerAddress = dirtyAsset.ownerAddress, locked = assetPeg.locked, moderated = assetPeg.moderated, takerAddress = if (assetPeg.takerAddress == "") None else Option(assetPeg.takerAddress), dirtyBit = false) else Service.deleteAsset(dirtyAsset.pegHash))
+          mainAssetActor ! AssetCometMessage(username = masterAccounts.Service.getId(dirtyAsset.ownerAddress), message = Json.toJson(constants.Comet.PING))
+        }*/
+
+         val accountOwnerAddress = getAccount.Service.get(dirtyAsset.ownerAddress)
+         val accountID = masterAccounts.Service.getId(dirtyAsset.ownerAddress)
+
+         def insertOrUpdate(accountOwnerAddress: Response) = {
+           val assetPegWallet = accountOwnerAddress.value.assetPegWallet.getOrElse(throw new BaseException(constants.Response.NO_RESPONSE))
+           val upsert = Future.sequence(assetPegWallet.map { assetPeg => if (assetPegWallet.map(_.pegHash) contains dirtyAsset.pegHash) Service.insertOrUpdate(pegHash = assetPeg.pegHash, documentHash = assetPeg.documentHash, assetType = assetPeg.assetType, assetPrice = assetPeg.assetPrice, assetQuantity = assetPeg.assetQuantity, quantityUnit = assetPeg.quantityUnit, ownerAddress = dirtyAsset.ownerAddress, locked = assetPeg.locked, moderated = assetPeg.moderated, takerAddress = if (assetPeg.takerAddress == "") None else Option(assetPeg.takerAddress), dirtyBit = false) else Service.deleteAsset(dirtyAsset.pegHash) })
+           for {
+             _ <- upsert
+           } yield {}
+         }
+
+         for {
+           accountOwnerAddress <- accountOwnerAddress
+           _ <- insertOrUpdate(accountOwnerAddress)
+           accountID <- accountID
+         } yield mainAssetActor ! AssetCometMessage(username = accountID, message = Json.toJson(constants.Comet.PING))
+       }
+     }
+    }
+    def dirtyEntityUpdater() =  {
+     /* val dirtyAssets = Service.getDirtyAssets
       Thread.sleep(sleepTime)
       for (dirtyAsset <- dirtyAssets) {
         try {
@@ -199,8 +228,15 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
               mainAssetActor ! AssetCometMessage(username = masterAccounts.Service.getId(dirtyAsset.ownerAddress), message = Json.toJson(constants.Comet.PING))
             }
         }
-      }
-    }(schedulerExecutionContext)
+      }*/
+
+      val dirtyAssets = Service.getDirtyAssets
+      Thread.sleep(sleepTime)
+      for{
+        dirtyAssets<-dirtyAssets
+        _<- insertOrUpdateAndCometMessage(dirtyAssets)
+      }yield {}
+    }
   }
 
   actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {

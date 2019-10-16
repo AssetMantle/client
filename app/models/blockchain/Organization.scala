@@ -112,15 +112,27 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
 
     def getID(address: String): Future[String] = getIdByAddress(address)
 
-    def getDirtyOrganizations: Seq[Organization] = Await.result(getOrganizationsByDirtyBit(dirtyBit = true), Duration.Inf)
+    def getDirtyOrganizations: Future[Seq[Organization]] = getOrganizationsByDirtyBit(dirtyBit = true)
 
-    def refreshDirty(id: String, address: String): Int = Await.result(updateAddressAndDirtyBitByID(id, address, dirtyBit = false), Duration.Inf)
+    def refreshDirty(id: String, address: String): Future[Int] =updateAddressAndDirtyBitByID(id, address, dirtyBit = false)
   }
 
   object Utility {
-    def dirtyEntityUpdater(): Future[Unit] = Future {
-      val dirtyOrganizations = Service.getDirtyOrganizations
-      Thread.sleep(sleepTime)
+    def refreshDirtyOrganizations(dirtyOrganizations:Seq[Organization])={
+      Future.sequence{
+        dirtyOrganizations.map { dirtyOrganization =>
+          val responseAddress = getOrganization.Service.get(dirtyOrganization.id)
+          def refreshDirty(responseAddress: queries.responses.OrganizationResponse.Response) = Service.refreshDirty(dirtyOrganization.id, responseAddress.address)
+          for {
+            responseAddress <- responseAddress
+            _ <- refreshDirty(responseAddress)
+          } yield {}
+        }
+      }
+    }
+    def dirtyEntityUpdater(): Future[Unit] =  {
+     // val dirtyOrganizations = Service.getDirtyOrganizations
+     /* Thread.sleep(sleepTime)
       for (dirtyOrganization <- dirtyOrganizations) {
         try {
           val responseAddress = getOrganization.Service.get(dirtyOrganization.id)
@@ -130,7 +142,14 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
           case baseException: BaseException => logger.error(baseException.failure.message, baseException)
         }
       }
-    }(schedulerExecutionContext)
+*/
+      val dirtyOrganizations = Service.getDirtyOrganizations
+      Thread.sleep(sleepTime)
+      for{
+        dirtyOrganizations<-dirtyOrganizations
+        _<-refreshDirtyOrganizations(dirtyOrganizations)
+      }yield {}
+    }
   }
 
   actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {

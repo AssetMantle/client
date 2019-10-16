@@ -56,16 +56,34 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
 
   private val uploadTraderNegotiationFiatProofPath: String = configuration.get[String]("upload.negotiation.fiatProof")
 
-  def checkAccountKycFileExists(accountID: String, documentType: String): Action[AnyContent] = Action { implicit request =>
-    if (masterAccountKYCs.Service.checkFileExists(id = accountID, documentType = documentType)) Ok else NoContent
+  def checkAccountKycFileExists(accountID: String, documentType: String): Action[AnyContent] = Action.async { implicit request =>
+   /* if (masterAccountKYCs.Service.checkFileExists(id = accountID, documentType = documentType)) Ok else NoContent*/
+    val checkFileExists=masterAccountKYCs.Service.checkFileExists(id = accountID, documentType = documentType)
+    for{
+      checkFileExists<-checkFileExists
+    }yield {
+      if(checkFileExists) Ok else NoContent
+    }
   }
 
-  def checkTraderAssetFileExists(id: String, documentType: String): Action[AnyContent] = Action { implicit request =>
-    if (masterTransactionAssetFiles.Service.checkFileExists(id = id, documentType = documentType)) Ok else NoContent
+  def checkTraderAssetFileExists(id: String, documentType: String): Action[AnyContent] = Action.async { implicit request =>
+   // if (masterTransactionAssetFiles.Service.checkFileExists(id = id, documentType = documentType)) Ok else NoContent
+    val checkFileExists=masterTransactionAssetFiles.Service.checkFileExists(id = id, documentType = documentType)
+    for{
+      checkFileExists<-checkFileExists
+    }yield {
+      if(checkFileExists) Ok else NoContent
+    }
   }
 
-  def checkTraderNegotiationFileExists(id: String, documentType: String): Action[AnyContent] = Action { implicit request =>
-    if (masterTransactionAssetFiles.Service.checkFileExists(id = id, documentType = documentType)) Ok else NoContent
+  def checkTraderNegotiationFileExists(id: String, documentType: String): Action[AnyContent] = Action.async { implicit request =>
+    //if (masterTransactionAssetFiles.Service.checkFileExists(id = id, documentType = documentType)) Ok else NoContent
+    val checkFileExists=masterTransactionAssetFiles.Service.checkFileExists(id = id, documentType = documentType)
+    for{
+      checkFileExists<-checkFileExists
+    }yield {
+      if(checkFileExists) Ok else NoContent
+    }
   }
 
   def uploadUserKycForm(documentType: String): Action[AnyContent] = Action { implicit request =>
@@ -928,7 +946,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
 
         case constants.User.ORGANIZATION =>
           val organizationID=masterOrganizations.Service.getID(loginState.username)
-          def checkFileNameExistsOrganizationKYCs(organizationID:String)=masterOrganizationKYCs.Service.checkFileNameExists(id = organizationID,, fileName = fileName)
+          def checkFileNameExistsOrganizationKYCs(organizationID:String)=masterOrganizationKYCs.Service.checkFileNameExists(id = organizationID, fileName = fileName)
           for{
           organizationID<-organizationID
           checkFileNameExistsOrganizationKYCs<-checkFileNameExistsOrganizationKYCs(organizationID)

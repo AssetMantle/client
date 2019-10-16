@@ -11,6 +11,7 @@ import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.{JsValue, Json}
 import play.api.{Configuration, Logger}
+import queries.responses.AccountResponse.Response
 import queries.{GetAccount, GetOrder}
 import slick.jdbc.JdbcProfile
 
@@ -134,13 +135,13 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
     def getFiatPegWallet(address: String): Future[Seq[Fiat]] =getFiatPegWalletByAddress(address)
 
-    def insertOrUpdate(pegHash: String, ownerAddress: String, transactionID: String, transactionAmount: String, redeemedAmount: String, dirtyBit: Boolean): Int = Await.result(upsert(Fiat(pegHash = pegHash, ownerAddress, transactionID = transactionID, transactionAmount = transactionAmount, redeemedAmount = redeemedAmount, dirtyBit)), Duration.Inf)
+    def insertOrUpdate(pegHash: String, ownerAddress: String, transactionID: String, transactionAmount: String, redeemedAmount: String, dirtyBit: Boolean): Future[Int] = upsert(Fiat(pegHash = pegHash, ownerAddress, transactionID = transactionID, transactionAmount = transactionAmount, redeemedAmount = redeemedAmount, dirtyBit))
 
-    def deleteFiat(pegHash: String, address: String): Int = Await.result(deleteByPegHashAndAddress(pegHash, address), Duration.Inf)
+    def deleteFiat(pegHash: String, address: String): Future[Int] = deleteByPegHashAndAddress(pegHash, address)
 
-    def deleteFiatPegWallet(address: String): Int = Await.result(deleteByAddress(address), Duration.Inf)
+    def deleteFiatPegWallet(address: String): Future[Int] =deleteByAddress(address)
 
-    def getDirtyFiats: Seq[Fiat] = Await.result(getFiatsByDirtyBit(dirtyBit = true), Duration.Inf)
+    def getDirtyFiats: Future[Seq[Fiat]] =getFiatsByDirtyBit(dirtyBit = true)
 
     def markDirty(address: String): Future[Int] = updateDirtyBitByAddress(address, dirtyBit = true)
 
@@ -154,9 +155,35 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
   }
 
   object Utility {
-    def dirtyEntityUpdater(): Future[Unit] = Future {
-      val dirtyFiats = Service.getDirtyFiats
-      Thread.sleep(sleepTime)
+
+    def insertOrUpdateAndCometMessage(dirtyFiats:Seq[Fiat])={
+
+      Future.sequence {
+        dirtyFiats.map { dirtyFiat =>
+          val accountOwnerAddress = getAccount.Service.get(dirtyFiat.ownerAddress)
+          val accountID = masterAccounts.Service.getId(dirtyFiat.ownerAddress)
+
+          def insertOrUpdate(accountOwnerAddress: Response) = {
+            val fiatPegWallet = accountOwnerAddress.value.fiatPegWallet.getOrElse(throw new BaseException(constants.Response.NO_RESPONSE))
+            val upsert = Future.sequence(fiatPegWallet.map { fiatPeg => if (fiatPegWallet.map(_.pegHash) contains dirtyFiat.pegHash) Service.insertOrUpdate(fiatPeg.pegHash, dirtyFiat.ownerAddress, fiatPeg.transactionID, fiatPeg.transactionAmount, fiatPeg.redeemedAmount, dirtyBit = false) else Service.deleteFiat(dirtyFiat.pegHash, dirtyFiat.ownerAddress) })
+            for {
+              _ <- upsert
+            } yield fiatPegWallet
+          }
+
+          for {
+            accountOwnerAddress <- accountOwnerAddress
+            fiatPegWallet <- insertOrUpdate(accountOwnerAddress)
+            accountID <- accountID
+
+          } yield {mainFiatActor ! FiatCometMessage(username = accountID, message = Json.toJson(fiatPegWallet.map(_.transactionAmount.toInt).sum.toString))}
+
+        }
+      }
+    }
+    def dirtyEntityUpdater(): Future[Unit] =  {
+      //val dirtyFiats = Service.getDirtyFiats
+      /*Thread.sleep(sleepTime)
       for (dirtyFiat <- dirtyFiats) {
         try {
           val fiatPegWallet = getAccount.Service.get(dirtyFiat.ownerAddress).value.fiatPegWallet.getOrElse(throw new BaseException(constants.Response.NO_RESPONSE))
@@ -170,8 +197,14 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
               mainFiatActor ! FiatCometMessage(username = masterAccounts.Service.getId(dirtyFiat.ownerAddress), message = Json.toJson("0"))
             }
         }
-      }
-    }(schedulerExecutionContext)
+      }*/
+      val dirtyFiats = Service.getDirtyFiats
+      Thread.sleep(sleepTime)
+      for{
+        dirtyFiats<-dirtyFiats
+        _<- insertOrUpdateAndCometMessage(dirtyFiats)
+      }yield {}
+    }
   }
 
   actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {

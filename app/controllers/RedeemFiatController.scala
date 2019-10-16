@@ -37,7 +37,7 @@ class RedeemFiatController @Inject()(messagesControllerComponents: MessagesContr
           Future{BadRequest(views.html.component.master.redeemFiat(formWithErrors, formWithErrors.data(constants.Form.ZONE_ID)))}
         },
         redeemFiatData => {
-          try {
+          /*try {
             val toAddress = blockchainZones.Service.getAddress(redeemFiatData.zoneID)
             transaction.process[blockchainTransaction.RedeemFiat, transactionsRedeemFiat.Request](
               entity = blockchainTransaction.RedeemFiat(from = loginState.address, to = toAddress, redeemAmount = redeemFiatData.redeemAmount, gas = redeemFiatData.gas, ticketID = "", mode = transactionMode),
@@ -52,7 +52,7 @@ class RedeemFiatController @Inject()(messagesControllerComponents: MessagesContr
           }
           catch {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-          }
+          }*/
           val toAddress = blockchainZones.Service.getAddress(redeemFiatData.zoneID)
           def transactionProcess(toAddress:String)=transaction.process[blockchainTransaction.RedeemFiat, transactionsRedeemFiat.Request](
             entity = blockchainTransaction.RedeemFiat(from = loginState.address, to = toAddress, redeemAmount = redeemFiatData.redeemAmount, gas = redeemFiatData.gas, ticketID = "", mode = transactionMode),

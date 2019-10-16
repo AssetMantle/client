@@ -142,7 +142,6 @@ class AccountTokens @Inject()(actorSystem: ActorSystem, shutdownActors: Shutdown
       findById(username).map{accountToken=>
         if(accountToken.sessionTokenHash.get==util.hashing.MurmurHash3.stringHash(sessionToken).toString) true else throw new BaseException(constants.Response.INVALID_TOKEN)
       }
-
     }
 
     def verifySessionTokenTime(username: Option[String]): Boolean = {
@@ -150,13 +149,20 @@ class AccountTokens @Inject()(actorSystem: ActorSystem, shutdownActors: Shutdown
     }
 
 
+    def tryVerifyingSessionTokenTime(username: String) ={
 
-    def tryVerifyingSessionTokenTime(username: String):Future[Boolean] ={
-      findById(username).map{accountToken=>
-        if ((DateTime.now(DateTimeZone.UTC).getMillis -accountToken.sessionTokenTime.getOrElse(return false)) < sessionTokenTimeout) true
-        else throw new BaseException(constants.Response.TOKEN_TIMEOUT)
+       def verify(accountToken:AccountToken):Boolean= {
+         if ((DateTime.now(DateTimeZone.UTC).getMillis - accountToken.sessionTokenTime.getOrElse(return false)) < sessionTokenTimeout) true
+         else throw new BaseException(constants.Response.TOKEN_TIMEOUT)
+       }
+      for{
+        accountToken<-findById(username)
+      }yield verify(accountToken)
       }
-      }
+    def tryVerifyingSessionTokenTime2(username: String): Boolean = {
+      if ((DateTime.now(DateTimeZone.UTC).getMillis - Await.result(findById(username), Duration.Inf).sessionTokenTime.getOrElse(return false)) < sessionTokenTimeout) true
+      else throw new BaseException(constants.Response.TOKEN_TIMEOUT)
+    }
 
     def refreshSessionToken(username: String): String = {
       val sessionToken: String = "constant token"

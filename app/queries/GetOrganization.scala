@@ -26,15 +26,14 @@ class GetOrganization @Inject()(wsClient: WSClient)(implicit configuration: Conf
 
   private val url = ip + ":" + port + "/" + path + "/"
 
-  private def action(request: String): Future[Response] = wsClient.url(url + request).get.map { response => utilities.JSON.getResponseFromJson[Response](response) }
+  private def action(request: String): Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(url + request).get)
 
   object Service {
 
-    def get(organizationID: String): Response = try {
-      Await.result(action(organizationID), Duration.Inf)
-    } catch {
+    def get(organizationID: String): Future[Response] =action(organizationID).recover{
       case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
         throw new BaseException(constants.Response.CONNECT_EXCEPTION)
     }
+
   }
 }

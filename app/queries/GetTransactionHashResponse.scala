@@ -29,13 +29,9 @@ class GetTransactionHashResponse @Inject()()(implicit wsClient: WSClient, config
 
   object Service {
 
-    def get(txHash: String): WSResponse = {
-      try {
-        Await.result(action(txHash), Duration.Inf)
-      } catch {
-        case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
-          throw new BaseException(constants.Response.CONNECT_EXCEPTION)
-      }
+    def get(txHash: String): Future[WSResponse] = action(txHash).recover{
+      case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
+        throw new BaseException(constants.Response.CONNECT_EXCEPTION)
     }
   }
 

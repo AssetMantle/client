@@ -204,17 +204,36 @@ class TransactionFeedbacks @Inject()(protected val databaseConfigProvider: Datab
 
     def getAddress(address: String): TransactionFeedback = Await.result(findById(address), Duration.Inf)
 
-    def getDirtyAddresses: Seq[String] = Await.result(getTransactionFeedbacksByDirtyBit(dirtyBit = true), Duration.Inf)
+    def getDirtyAddresses: Future[Seq[String]] = getTransactionFeedbacksByDirtyBit(dirtyBit = true)
 
-    def refreshDirty(address: String, transactionFeedbackResponse: TransactionFeedbackResponse): Int = Await.result(updateTransactionFeedbackByAddress(address, TransactionFeedback(address = address, SendAssetCounts(transactionFeedbackResponse.sendAssetsPositiveTx, transactionFeedbackResponse.sendAssetsNegativeTx), SendFiatCounts(transactionFeedbackResponse.sendFiatsPositiveTx, transactionFeedbackResponse.sendFiatsNegativeTx), IBCIssueAssetCounts(transactionFeedbackResponse.ibcIssueAssetsPositiveTx, transactionFeedbackResponse.ibcIssueAssetsNegativeTx), IBCIssueFiatCounts(transactionFeedbackResponse.ibcIssueFiatsPositiveTx, transactionFeedbackResponse.ibcIssueFiatsNegativeTx), BuyerExecuteOrderCounts(transactionFeedbackResponse.buyerExecuteOrderPositiveTx, transactionFeedbackResponse.buyerExecuteOrderNegativeTx), SellerExecuteOrderCounts(transactionFeedbackResponse.sellerExecuteOrderPositiveTx, transactionFeedbackResponse.sellerExecuteOrderNegativeTx), ChangeBuyerBidCounts(transactionFeedbackResponse.changeBuyerBidPositiveTx, transactionFeedbackResponse.changeBuyerBidNegativeTx), ChangeSellerBidCounts(transactionFeedbackResponse.changeSellerBidPositiveTx, transactionFeedbackResponse.changeSellerBidNegativeTx), ConfirmBuyerBidCounts(transactionFeedbackResponse.confirmBuyerBidPositiveTx, transactionFeedbackResponse.confirmBuyerBidNegativeTx), ConfirmSellerBidCounts(transactionFeedbackResponse.confirmSellerBidPositiveTx, transactionFeedbackResponse.confirmSellerBidNegativeTx), NegotiationCounts(transactionFeedbackResponse.negotiationPositiveTx, transactionFeedbackResponse.negotiationNegativeTx), dirtyBit = false)), Duration.Inf)
+    def refreshDirty(address: String, transactionFeedbackResponse: TransactionFeedbackResponse): Future[Int] = updateTransactionFeedbackByAddress(address, TransactionFeedback(address = address, SendAssetCounts(transactionFeedbackResponse.sendAssetsPositiveTx, transactionFeedbackResponse.sendAssetsNegativeTx), SendFiatCounts(transactionFeedbackResponse.sendFiatsPositiveTx, transactionFeedbackResponse.sendFiatsNegativeTx), IBCIssueAssetCounts(transactionFeedbackResponse.ibcIssueAssetsPositiveTx, transactionFeedbackResponse.ibcIssueAssetsNegativeTx), IBCIssueFiatCounts(transactionFeedbackResponse.ibcIssueFiatsPositiveTx, transactionFeedbackResponse.ibcIssueFiatsNegativeTx), BuyerExecuteOrderCounts(transactionFeedbackResponse.buyerExecuteOrderPositiveTx, transactionFeedbackResponse.buyerExecuteOrderNegativeTx), SellerExecuteOrderCounts(transactionFeedbackResponse.sellerExecuteOrderPositiveTx, transactionFeedbackResponse.sellerExecuteOrderNegativeTx), ChangeBuyerBidCounts(transactionFeedbackResponse.changeBuyerBidPositiveTx, transactionFeedbackResponse.changeBuyerBidNegativeTx), ChangeSellerBidCounts(transactionFeedbackResponse.changeSellerBidPositiveTx, transactionFeedbackResponse.changeSellerBidNegativeTx), ConfirmBuyerBidCounts(transactionFeedbackResponse.confirmBuyerBidPositiveTx, transactionFeedbackResponse.confirmBuyerBidNegativeTx), ConfirmSellerBidCounts(transactionFeedbackResponse.confirmSellerBidPositiveTx, transactionFeedbackResponse.confirmSellerBidNegativeTx), NegotiationCounts(transactionFeedbackResponse.negotiationPositiveTx, transactionFeedbackResponse.negotiationNegativeTx), dirtyBit = false))
 
     def markDirty(address: String): Future[Int] = updateDirtyBitByAddress(address, dirtyBit = true)
   }
 
   object Utility {
-    def dirtyEntityUpdater(): Future[Unit] = Future {
-      val dirtyAddresses = Service.getDirtyAddresses
-      Thread.sleep(sleepTime)
+    def refreshDirtyAddresses(dirtyAddresses:Seq[String])={
+      Future.sequence{
+        dirtyAddresses.map { dirtyAddress =>
+          val response = getTraderReputation.Service.get(dirtyAddress)
+          def refreshDirty(response:  queries.responses.TraderReputationResponse.Response) = Service.refreshDirty(response.value.address, response.value.transactionFeedback)
+          (for {
+            response <- response
+            _ <- refreshDirty(response)
+          } yield {}
+            ).recover{
+            case baseException: BaseException => if (baseException.failure == constants.Response.NO_RESPONSE) {
+              Service.insertOrUpdate(dirtyAddress, TraderReputationResponse.TransactionFeedbackResponse("0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"), dirtyBit = false)
+            } else {
+              logger.error(baseException.failure.message, baseException)
+            }
+          }
+        }
+      }
+    }
+    def dirtyEntityUpdater(): Future[Unit] =  {
+      //val dirtyAddresses = Service.getDirtyAddresses
+      /*Thread.sleep(sleepTime)
       for (dirtyAddress <- dirtyAddresses) {
         try {
           val response = getTraderReputation.Service.get(dirtyAddress)
@@ -227,8 +246,14 @@ class TransactionFeedbacks @Inject()(protected val databaseConfigProvider: Datab
             logger.error(baseException.failure.message, baseException)
           }
         }
-      }
-    }(schedulerExecutionContext)
+      }*/
+      val dirtyAddresses = Service.getDirtyAddresses
+      Thread.sleep(sleepTime)
+      for{
+        dirtyAddresses<-dirtyAddresses
+        _<-refreshDirtyAddresses(dirtyAddresses)
+      }yield {}
+    }
   }
 
   actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {

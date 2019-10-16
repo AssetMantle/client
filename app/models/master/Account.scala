@@ -185,7 +185,7 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
     def updatePassword(username:String, newPassword: String): Future[Int] = updatePasswordByID(id = username, secretHash = util.hashing.MurmurHash3.stringHash(newPassword).toString)
 
-    def checkUsernameAvailable(username: String): Boolean = !Await.result(checkById(username), Duration.Inf)
+    def checkUsernameAvailable(username: String): Future[Boolean] =checkById(username).map{!_}
 
     def checkUsernameAvailableAsync(username: String): Future[Boolean] = checkById(username)
 

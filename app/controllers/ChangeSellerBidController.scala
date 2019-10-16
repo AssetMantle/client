@@ -57,6 +57,9 @@ class ChangeSellerBidController @Inject()(messagesControllerComponents: Messages
             updateTransactionHash = blockchainTransactionChangeSellerBids.Service.updateTransactionHash
           )
          Future{withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.SELLER_BID_CHANGED)))}
+            .recover{
+              case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+            }
         }
       )
   }

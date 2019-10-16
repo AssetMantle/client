@@ -30,9 +30,7 @@ class GetZone @Inject()(wsClient: WSClient)(implicit configuration: Configuratio
 
   object Service {
 
-    def get(zoneID : String): Response = try {
-      Await.result(action(zoneID), Duration.Inf)
-    } catch {
+    def get(zoneID : String): Future[Response] = action(zoneID).recover{
       case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
         throw new BaseException(constants.Response.CONNECT_EXCEPTION)
     }

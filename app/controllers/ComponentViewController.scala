@@ -73,7 +73,7 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
 
   def zoneDetails: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      try {
+      /*try {
         loginState.userType match {
           case constants.User.ZONE => withUsernameToken.Ok(views.html.component.master.zoneDetails(masterZones.Service.getZoneByAccountID(loginState.username)))
           case constants.User.ORGANIZATION => withUsernameToken.Ok(views.html.component.master.zoneDetails(masterZones.Service.get(masterOrganizations.Service.getZoneIDByAccountID(loginState.username))))
@@ -81,7 +81,7 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
         }
       } catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-      }
+      }*/
       (loginState.userType match {
         case constants.User.ZONE =>
           val zone = masterZones.Service.getZoneByAccountID(loginState.username)
@@ -90,18 +90,14 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
           } yield withUsernameToken.Ok(views.html.component.master.zoneDetails(zone))
         case constants.User.ORGANIZATION =>
           val zoneID = masterOrganizations.Service.getZoneIDByAccountID(loginState.username)
-
           def zone(zoneID: String) = masterZones.Service.get(zoneID)
-
           for {
             zoneID <- zoneID
             zone <- zone(zoneID)
           } yield withUsernameToken.Ok(views.html.component.master.zoneDetails(zone))
         case constants.User.TRADER =>
           val zoneID = masterTraders.Service.getZoneIDByAccountID(loginState.username)
-
           def zone(zoneID: String) = masterZones.Service.get(zoneID)
-
           for {
             zoneID <- zoneID
             zone <- zone(zoneID)
@@ -131,9 +127,7 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
           } yield withUsernameToken.Ok(views.html.component.master.organizationDetails(organization))
         case constants.User.TRADER =>
           val organizationID = masterTraders.Service.getOrganizationIDByAccountID(loginState.username)
-
           def organization(organizationID: String) = masterOrganizations.Service.get(organizationID)
-
           for {
             organizationID <- organizationID
             organization <- organization(organizationID)
@@ -228,21 +222,16 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
        }*/
 
       val negotiations = blockchainNegotiations.Service.getNegotiationsForAddress(loginState.address)
-
       def orders(negotiations: Seq[Negotiation]) = blockchainOrders.Service.getOrders(negotiations.map(_.id))
-
-      def negotiationsOfOrders(negotiations: Seq[Negotiation], orders: Seq[Order]): Seq[Negotiation] = negotiations.filter(negotiation => orders.map(_.id) contains negotiation.id)
-
+      def getNegotiationsOfOrders(negotiations: Seq[Negotiation], orders: Seq[Order]): Seq[Negotiation] = negotiations.filter(negotiation => orders.map(_.id) contains negotiation.id)
       def assets(negotiationsOfOrders: Seq[Negotiation]) = blockchainAssets.Service.getByPegHashes(negotiationsOfOrders.map(_.assetPegHash))
 
       for {
         negotiations <- negotiations
         orders <- orders(negotiations)
-        negotiationsOfOrders <- Future {
-          negotiationsOfOrders(negotiations, orders)
-        }
-        assets <- assets(negotiationsOfOrders)
+        assets <- assets(getNegotiationsOfOrders(negotiations, orders))
       } yield {
+        val negotiationsOfOrders=getNegotiationsOfOrders(negotiations, orders)
         withUsernameToken.Ok(views.html.component.master.orderList(orders.filter(order => (for (negotiationsOfOrder <- negotiationsOfOrders; if negotiationsOfOrder.buyerAddress == loginState.address && !assets.find(asset => asset.pegHash == negotiationsOfOrder.assetPegHash).orNull.moderated) yield negotiationsOfOrder).map(_.id) contains order.id),
           orders.filter(order => (for (negotiationsOfOrder <- negotiationsOfOrders; if negotiationsOfOrder.sellerAddress == loginState.address && !assets.find(asset => asset.pegHash == negotiationsOfOrder.assetPegHash).orNull.moderated) yield negotiationsOfOrder).map(_.id) contains order.id),
           orders.filter(order => (for (negotiationsOfOrder <- negotiationsOfOrders; if assets.find(asset => asset.pegHash == negotiationsOfOrder.assetPegHash).orNull.moderated) yield negotiationsOfOrder).map(_.id) contains order.id)))
@@ -258,7 +247,6 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
      }*/
 
     val allOrderIDs = blockchainOrders.Service.getAllOrderIds
-
     def allPublicAssets(allOrderIDs: Seq[String]) = blockchainAssets.Service.getAllPublic(allOrderIDs)
 
     (for {
@@ -279,7 +267,6 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
         }*/
 
       val allOrderIDs = blockchainOrders.Service.getAllOrderIds
-
       def availableAssetListWithLogin(allOrderIDs: Seq[String]) = blockchainAssets.Service.getAllPublic(allOrderIDs)
 
       (for {
@@ -341,32 +328,29 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
            case _: BaseException => InternalServerError
          }
    */
-      val documents: Future[Seq[Document[_]]] = loginState.userType match {
+      val kycDocuments: Future[Seq[Document[_]]] = loginState.userType match {
         case constants.User.ZONE => masterZoneKYC.Service.getAllDocuments(loginState.username)
         case constants.User.ORGANIZATION =>
           val id = masterOrganizations.Service.getID(loginState.username)
-
-          def allDocuments(id: String) = masterOrganizationKYCs.Service.getAllDocuments(id)
-
+          def organizationKYCs(id: String) = masterOrganizationKYCs.Service.getAllDocuments(id)
           for {
             id <- id
-            allDocuments <- allDocuments(id)
-          } yield allDocuments
+            organizationKYCs <- organizationKYCs(id)
+          } yield organizationKYCs
         case constants.User.TRADER =>
           val id = masterTraders.Service.getID(loginState.username)
 
-          def allDocuments(id: String) = masterTraderKYCs.Service.getAllDocuments(id)
-
+          def traderKYCs(id: String) = masterTraderKYCs.Service.getAllDocuments(id)
           for {
             id <- id
-            allDocuments <- allDocuments(id)
-          } yield allDocuments
+            traderKYCs <- traderKYCs(id)
+          } yield traderKYCs
         case constants.User.USER => masterAccountKYC.Service.getAllDocuments(loginState.username)
         case _ => masterAccountFile.Service.getAllDocuments(loginState.username)
       }
       (for {
-        documents <- documents
-      } yield withUsernameToken.Ok(views.html.component.master.profileDocuments(documents))
+        kycDocuments <- kycDocuments
+      } yield withUsernameToken.Ok(views.html.component.master.profileDocuments(kycDocuments))
         ).recover {
         case _: BaseException => InternalServerError
       }
@@ -396,13 +380,12 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
       } catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }*/
-      val id = masterOrganizations.Service.getID(loginState.username)
-
-      def tradersListInOrganization(id: String) = masterTraders.Service.getTradersListInOrganization(id)
+      val organizationid = masterOrganizations.Service.getID(loginState.username)
+      def tradersListInOrganization(organizationid: String) = masterTraders.Service.getTradersListInOrganization(organizationid)
 
       (for {
-        id <- id
-        tradersListInOrganization <- tradersListInOrganization(id)
+        organizationid <- organizationid
+        tradersListInOrganization <- tradersListInOrganization(organizationid)
       } yield withUsernameToken.Ok(views.html.component.master.organizationViewTradersList(tradersListInOrganization))
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -424,9 +407,9 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }*/
 
-      val id = masterOrganizations.Service.getID(loginState.username)
+      val organizationid = masterOrganizations.Service.getID(loginState.username)
 
-      def verifyOrganizationTrader(id: String) = masterTraders.Service.verifyOrganizationTrader(traderID = traderID, id)
+      def verifyOrganizationTrader(organizationid: String) = masterTraders.Service.verifyOrganizationTrader(traderID = traderID, organizationid)
 
       def getViewTraderResult(verifyOrganizationTrader: Boolean) = {
         if (verifyOrganizationTrader) {
@@ -470,8 +453,8 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
       }
 
       (for {
-        id <- id
-        verifyOrganizationTrader <- verifyOrganizationTrader(id)
+        organizationid <- organizationid
+        verifyOrganizationTrader <- verifyOrganizationTrader(organizationid)
         result <- getViewTraderResult(verifyOrganizationTrader)
       } yield result
         ).recover {

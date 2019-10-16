@@ -5,8 +5,10 @@ import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
+import play.api.libs.json.Json
 import play.api.{Configuration, Logger}
 import queries.GetACL
+import queries.responses.ACLResponse.Response
 import slick.jdbc.JdbcProfile
 
 import scala.concurrent.duration.{Duration, _}
@@ -121,14 +123,25 @@ class ACLAccounts @Inject()(protected val databaseConfigProvider: DatabaseConfig
 
     def getAddressesUnderZone(zoneID: String): Future[Seq[String]] = getAddressesByZoneID(zoneID)
 
-    def getDirtyAddresses: Seq[String] = Await.result(getAddressesByDirtyBit(dirtyBit = true), Duration.Inf)
+    def getDirtyAddresses: Future[Seq[String]] = getAddressesByDirtyBit(dirtyBit = true)
 
     def markDirty(address: String): Int = Await.result(updateDirtyBitByAddress(address, dirtyBit = true), Duration.Inf)
   }
 
   object Utility {
-    def dirtyEntityUpdater(): Future[Unit] = Future {
-      try {
+    def refreshDirtyAndSendCometMessage(dirtyAddresses:Seq[String])={
+      Future.sequence{dirtyAddresses.map{dirtyAddress=>
+        val responseAccount =getACL.Service.get(dirtyAddress)
+        def insertOrUpdate(responseAccount:Response)=Service.insertOrUpdate(responseAccount.value.address, responseAccount.value.zoneID, responseAccount.value.organizationID, responseAccount.value.acl, dirtyBit = false)
+        for{
+          responseAccount<-responseAccount
+          _<-insertOrUpdate(responseAccount)
+        }yield {}
+      }}
+
+    }
+    def dirtyEntityUpdater() =  {
+     /* try {
         val dirtyAddresses = Service.getDirtyAddresses
         Thread.sleep(sleepTime)
         for (dirtyAddress <- dirtyAddresses) {
@@ -137,8 +150,18 @@ class ACLAccounts @Inject()(protected val databaseConfigProvider: DatabaseConfig
         }
       } catch {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
+      }*/
+
+      val dirtyAddresses = Service.getDirtyAddresses
+      Thread.sleep(sleepTime)
+      (for {
+        dirtyAddresses<-dirtyAddresses
+        _<- refreshDirtyAndSendCometMessage(dirtyAddresses)
+      }yield {}
+        ).recover{
+        case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
-    }(schedulerExecutionContext)
+    }
   }
 
   actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {

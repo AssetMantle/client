@@ -74,8 +74,8 @@ class Notification @Inject()(masterContacts: master.Contacts,
     }
   }
 
-  private def sendPushNotification(accountID: String, pushNotification: constants.Notification.PushNotification, messageParameters: String*)(implicit lang: Lang)= Future {
-    try {
+  private def sendPushNotification(accountID: String, pushNotification: constants.Notification.PushNotification, messageParameters: String*)(implicit lang: Lang)=  {
+   /* try {
       val title = messagesApi(pushNotification.title)
       val message = messagesApi(pushNotification.message, messageParameters: _*)
       masterTransactionNotifications.Service.create(accountID, title, message)
@@ -83,15 +83,18 @@ class Notification @Inject()(masterContacts: master.Contacts,
     } catch {
       case baseException: BaseException => logger.error(baseException.failure.message, baseException)
         throw baseException
-    }
-
-   /* val title = messagesApi(pushNotification.title)
-    val message = messagesApi(pushNotification.message, messageParameters: _*)
-    val create=masterTransactionNotifications.Service.create(accountID, title, message).map{_=>
-      val send= masterTransactionAccountTokens.Service.getTokenById(accountID).map(notificationTokenOption => notificationTokenOption.foreach(notificationToken=>wsClient.url(pushNotificationURL).withHttpHeaders(constants.Header.CONTENT_TYPE -> constants.Header.APPLICATION_JSON).withHttpHeaders(constants.Header.AUTHORIZATION -> pushNotificationAuthorizationKey).post(Json.toJson(Data(notificationToken, Notification(title, message))))))
     }*/
 
-
+    val title = messagesApi(pushNotification.title)
+    val message = messagesApi(pushNotification.message, messageParameters: _*)
+    val create=masterTransactionNotifications.Service.create(accountID, title, message)
+    val token=masterTransactionAccountTokens.Service.getTokenById(accountID)
+    def wsSend(notificationToken:Option[String])=notificationToken.map{notificationToken=>wsClient.url(pushNotificationURL).withHttpHeaders(constants.Header.CONTENT_TYPE -> constants.Header.APPLICATION_JSON).withHttpHeaders(constants.Header.AUTHORIZATION -> pushNotificationAuthorizationKey).post(Json.toJson(Data(notificationToken, Notification(title, message))))}
+    for{
+      _<-create
+      token<-token
+      _<- wsSend(token).getOrElse(Future.successful())
+    }yield{}
   }
 
   private def sendEmail(toAccountID: String, email: constants.Notification.Email, messageParameters: String*)(implicit lang: Lang) = {

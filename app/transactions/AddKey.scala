@@ -26,7 +26,7 @@ class AddKey @Inject()(wsClient: WSClient)(implicit configuration: Configuration
 
   private val url = ip + ":" + port + "/" + path
 
-  private def action(request: Request): Future[Response] = wsClient.url(url).post(Json.toJson(request)).map { response => utilities.JSON.getResponseFromJson[Response](response) }
+  private def action(request: Request): Future[Response] =utilities.JSON.getResponseFromJson[Response]( wsClient.url(url).post(Json.toJson(request)))
 
   private implicit val requestWrites: OWrites[Request] = Json.writes[Request]
 

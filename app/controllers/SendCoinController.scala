@@ -64,7 +64,7 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
             )
           Future{withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.COINS_SENT)))}
             .recover{
-              case baseException: BaseException => Future{InternalServerError(views.html.index(failures = Seq(baseException.failure)))}
+              case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
             }
 
           }

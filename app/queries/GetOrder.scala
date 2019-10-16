@@ -37,3 +37,4 @@ class GetOrder @Inject()()(implicit wsClient: WSClient, configuration: Configura
   }
 
 }
+}

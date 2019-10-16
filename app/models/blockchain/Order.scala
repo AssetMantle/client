@@ -12,7 +12,7 @@ import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.{JsValue, Json}
 import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
-
+import queries.responses.OrderResponse.Response
 import scala.concurrent.duration.{Duration, _}
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
@@ -126,7 +126,7 @@ class Orders @Inject()(shutdownActors: ShutdownActor, masterAccounts: master.Acc
 
     def insertOrUpdate(id: String, fiatProofHash: Option[String], awbProofHash: Option[String], dirtyBit: Boolean): Future[Int] = upsert(Order(id = id, fiatProofHash = fiatProofHash, awbProofHash = awbProofHash, dirtyBit = dirtyBit))
 
-    def getDirtyOrders: Seq[Order] = Await.result(getOrdersByDirtyBit(dirtyBit = true), Duration.Inf)
+    def getDirtyOrders: Future[Seq[Order]] = getOrdersByDirtyBit(dirtyBit = true)
 
     def getOrders(ids: Seq[String]): Future[Seq[Order]] =getOrdersByIDs(ids)
 
@@ -148,9 +148,11 @@ class Orders @Inject()(shutdownActors: ShutdownActor, masterAccounts: master.Acc
   }
 
   object Utility {
-    def dirtyEntityUpdater(): Future[Unit] = Future {
-      val dirtyOrders = Service.getDirtyOrders
-      Thread.sleep(sleepTime)
+
+
+    def dirtyEntityUpdater()=  {
+      //val dirtyOrders = Service.getDirtyOrders
+      /*Thread.sleep(sleepTime)
       for (dirtyOrder <- dirtyOrders) {
         try {
           val orderResponse = getOrder.Service.get(dirtyOrder.id)
@@ -178,8 +180,79 @@ class Orders @Inject()(shutdownActors: ShutdownActor, masterAccounts: master.Acc
         catch {
           case baseException: BaseException => logger.error(baseException.failure.message, baseException)
         }
+      }*/
+
+      def insertOrUpdateAsset(account:queries.responses.AccountResponse.Response,negotiation: Negotiation)=Future.sequence(account.value.assetPegWallet.map(assets => assets.map(asset => blockchainAssets.Service.insertOrUpdate(pegHash = asset.pegHash, documentHash = asset.documentHash, assetType = asset.assetType, assetQuantity = asset.assetQuantity, quantityUnit = asset.quantityUnit, assetPrice = asset.assetPrice, ownerAddress = negotiation.sellerAddress, moderated = asset.moderated, takerAddress = if (asset.takerAddress == "") None else Option(asset.takerAddress), locked = asset.locked, dirtyBit = true))).getOrElse(Seq(Future.successful())))
+      def insertOrUpdateFiat(account:queries.responses.AccountResponse.Response,negotiation: Negotiation)=Future.sequence(account.value.fiatPegWallet.map(fiats => fiats.map(fiatPeg => blockchainFiats.Service.insertOrUpdate(fiatPeg.pegHash, negotiation.sellerAddress, fiatPeg.transactionID, fiatPeg.transactionAmount, fiatPeg.redeemedAmount, dirtyBit = true))).getOrElse(Seq(Future.successful())))
+      def sellerOrBuyerInsertOrUpdateAssetsOrFiats(orderResponse:queries.responses.OrderResponse.Response,negotiation: Negotiation,dirtyOrder:Order)={
+        if ((orderResponse.value.awbProofHash != "" && orderResponse.value.fiatProofHash != "") || (orderResponse.value.awbProofHash == "" && orderResponse.value.fiatProofHash == "")) {
+
+          val sellerAccount = getAccount.Service.get(negotiation.sellerAddress)
+          val buyerAccount= getAccount.Service.get(negotiation.buyerAddress)
+          def deleteFiatPegWallet=blockchainFiats.Service.deleteFiatPegWallet(dirtyOrder.id)
+          for{
+            sellerAccount<-sellerAccount
+            _<- insertOrUpdateAsset(sellerAccount,negotiation)
+            _<- insertOrUpdateFiat(sellerAccount,negotiation)
+            buyerAccount<-buyerAccount
+            _<- insertOrUpdateAsset(buyerAccount,negotiation)
+            _<- insertOrUpdateFiat(buyerAccount,negotiation)
+            _<- deleteFiatPegWallet
+          }yield {}
+        }else Future{Unit}
       }
-    }(schedulerExecutionContext)
+      def createTraderFeedbackHistories(orderResponse:queries.responses.OrderResponse.Response,negotiation: Negotiation)={
+        if (orderResponse.value.awbProofHash != "" && orderResponse.value.fiatProofHash != "") {
+           val createSellerTraderFeedbackHistories=blockchainTraderFeedbackHistories.Service.create(negotiation.sellerAddress, negotiation.buyerAddress, negotiation.sellerAddress, negotiation.assetPegHash, rating = "")
+          val createBuyerTraderFeedbackHistories= blockchainTraderFeedbackHistories.Service.create(negotiation.buyerAddress, negotiation.buyerAddress, negotiation.sellerAddress, negotiation.assetPegHash, rating = "")
+          def deleteNegotiations=blockchainNegotiations.Service.deleteNegotiations(negotiation.assetPegHash)
+          for{
+            _<-createSellerTraderFeedbackHistories
+            _<-createBuyerTraderFeedbackHistories
+            _<-deleteNegotiations
+          }yield{}
+        }else Future{Unit}
+      }
+      def insertOrUpdateAndSendCometMessage(dirtyOrders:Seq[Order])= {
+        Future.sequence {
+          dirtyOrders.map { dirtyOrder =>
+
+            val orderResponse = getOrder.Service.get(dirtyOrder.id)
+            val negotiation = blockchainNegotiations.Service.get(dirtyOrder.id)
+
+            def insertOrUpdateOrder(orderResponse: queries.responses.OrderResponse.Response) = Service.insertOrUpdate(dirtyOrder.id, awbProofHash = if (orderResponse.value.awbProofHash == "") None else Option(orderResponse.value.awbProofHash), fiatProofHash = if (orderResponse.value.fiatProofHash == "") None else Option(orderResponse.value.fiatProofHash), dirtyBit = false)
+
+            def ids(negotiation: Negotiation) = {
+              val buyerAddressID = masterAccounts.Service.getId(negotiation.buyerAddress)
+              val sellerAddressID = masterAccounts.Service.getId(negotiation.sellerAddress)
+              for {
+                buyerAddressID <- buyerAddressID
+                sellerAddressID <- sellerAddressID
+              } yield (buyerAddressID, sellerAddressID)
+            }
+
+            for {
+              orderResponse <- orderResponse
+              negotiation <- negotiation
+              _ <- sellerOrBuyerInsertOrUpdateAssetsOrFiats(orderResponse, negotiation, dirtyOrder)
+              _ <- createTraderFeedbackHistories(orderResponse, negotiation)
+              _ <- insertOrUpdateOrder(orderResponse)
+              (buyerAddressID, sellerAddressID) <- ids(negotiation)
+            } yield {
+              mainOrderActor ! OrderCometMessage(username = buyerAddressID, message = Json.toJson(constants.Comet.PING))
+              mainOrderActor ! OrderCometMessage(username = sellerAddressID, message = Json.toJson(constants.Comet.PING))
+            }
+          }
+        }
+      }
+      val dirtyOrders = Service.getDirtyOrders
+      Thread.sleep(sleepTime)
+      for{
+        dirtyOrders<-dirtyOrders
+        _<-insertOrUpdateAndSendCometMessage(dirtyOrders)
+      }yield {}
+
+    }
   }
 
   actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {

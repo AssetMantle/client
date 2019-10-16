@@ -26,7 +26,7 @@ class GetABCIInfo @Inject()()(implicit wsClient: WSClient, configuration: Config
 
   private val url = ip + ":" + port + "/" + path
 
-  private def action(): Future[Response] = wsClient.url(url).get.map { response => utilities.JSON.getResponseFromJson[Response](response)}
+  private def action(): Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(url).get)
 
   object Service {
 

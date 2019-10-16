@@ -152,7 +152,7 @@ class ReleaseAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.T
 
     def create(releaseAsset: ReleaseAsset): Future[String] = add(ReleaseAsset(from = releaseAsset.from, to = releaseAsset.to, pegHash = releaseAsset.pegHash, gas = releaseAsset.gas, status = releaseAsset.status, txHash = releaseAsset.txHash, ticketID = releaseAsset.ticketID, mode = releaseAsset.mode, code = releaseAsset.code))
 
-    def getTicketIDsOnStatus(): Seq[String] = Await.result(getTicketIDsWithNullStatus, Duration.Inf)
+    def getTicketIDsOnStatus(): Future[Seq[String]] = getTicketIDsWithNullStatus
 
     def markTransactionSuccessful(ticketID: String, txHash: String): Future[Int] = updateTxHashAndStatusOnTicketID(ticketID, Option(txHash), status = Option(true))
 
@@ -160,9 +160,9 @@ class ReleaseAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.T
 
     def getTransaction(ticketID: String): Future[ReleaseAsset] = findByTicketID(ticketID)
 
-    def getTransactionHash(ticketID: String): Option[String] = Await.result(findTransactionHashByTicketID(ticketID), Duration.Inf)
+    def getTransactionHash(ticketID: String): Future[Option[String]] = findTransactionHashByTicketID(ticketID)
 
-    def getMode(ticketID: String): String = Await.result(findModeByTicketID(ticketID), Duration.Inf)
+    def getMode(ticketID: String): Future[String] = findModeByTicketID(ticketID)
 
     def updateTransactionHash(ticketID: String, txHash: String): Future[Int] = updateTxHashOnTicketID(ticketID = ticketID, txHash = Option(txHash))
 

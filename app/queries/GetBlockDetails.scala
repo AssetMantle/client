@@ -28,7 +28,7 @@ class GetBlockDetails @Inject()()(implicit wsClient: WSClient, configuration: Co
 
   private val url = ip + ":" + port + "/"
 
-  private def action(minimumHeight: Int, maximumHeight: Int): Future[Response] = wsClient.url(url + minimumHeightQuery + minimumHeight.toString + maximumHeightQuery + maximumHeight.toString).get.map { response => utilities.JSON.getResponseFromJson[Response](response)}
+  private def action(minimumHeight: Int, maximumHeight: Int): Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(url + minimumHeightQuery + minimumHeight.toString + maximumHeightQuery + maximumHeight.toString).get)
 
   object Service {
 

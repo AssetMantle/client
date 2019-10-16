@@ -80,7 +80,7 @@ class TraderFeedbackHistories @Inject()(protected val databaseConfigProvider: Da
 
   object Service {
 
-    def create(address: String, buyerAddress: String, sellerAddress: String, pegHash: String, rating: String): String = Await.result(add(TraderFeedbackHistory(address, buyerAddress, sellerAddress, pegHash, rating)), Duration.Inf)
+    def create(address: String, buyerAddress: String, sellerAddress: String, pegHash: String, rating: String): Future[String] =add(TraderFeedbackHistory(address, buyerAddress, sellerAddress, pegHash, rating))
 
     def update(address: String, buyerAddress: String, sellerAddress: String, pegHash: String, rating: String): Future[Int] = updateTraderFeedbackHistory(TraderFeedbackHistory(address, buyerAddress, sellerAddress, pegHash, rating))
 
@@ -88,7 +88,7 @@ class TraderFeedbackHistories @Inject()(protected val databaseConfigProvider: Da
 
     def getNullRatingsForBuyerFeedback(buyerAddress: String): Future[Seq[TraderFeedbackHistory]] =findBuyersByNullRating(buyerAddress)
 
-    def getNullRatingsForSellerFeedback(sellerAddress: String): Seq[TraderFeedbackHistory] = Await.result(findSellersByNullRating(sellerAddress), Duration.Inf)
+    def getNullRatingsForSellerFeedback(sellerAddress: String): Future[Seq[TraderFeedbackHistory]] =findSellersByNullRating(sellerAddress)
   }
 
 }
