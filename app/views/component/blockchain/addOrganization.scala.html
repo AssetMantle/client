@@ -4,10 +4,10 @@
 
 @(addOrganizationForm: Form[AddOrganization.Data] = AddOrganization.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @commonForm(constants.Form.BLOCKCHAIN_ADD_ORGANIZATION, addOrganizationForm) {
-    @inputText(addOrganizationForm(constants.FormField.FROM.name), '_label -> Messages(constants.FormField.FROM.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.FROM.name), 'required -> true)
-    @inputText(addOrganizationForm(constants.FormField.TO.name), '_label -> Messages(constants.FormField.TO.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.TO.name), 'required -> true)
-    @inputText(addOrganizationForm(constants.FormField.ORGANIZATION_ID.name), '_label -> Messages(constants.FormField.ORGANIZATION_ID.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.ORGANIZATION_ID.name), 'required -> true)
-    @inputText(addOrganizationForm(constants.FormField.ZONE_ID.name), '_label -> Messages(constants.FormField.ZONE_ID.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.ZONE_ID.name), 'required -> true)
-    @inputText(addOrganizationForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.GAS.name), 'required -> true, 'type -> "number")
-    @inputPassword(addOrganizationForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PASSWORD.name), 'required -> true)
+    @commonInputText(addOrganizationForm, constants.FormField.FROM.name)
+    @commonInputText(addOrganizationForm, constants.FormField.TO.name)
+    @commonInputText(addOrganizationForm, constants.FormField.ORGANIZATION_ID.name)
+    @commonInputText(addOrganizationForm, constants.FormField.ZONE_ID.name)
+    @commonInputText(addOrganizationForm, constants.FormField.GAS.name)
+    @commonInputPassword(addOrganizationForm, constants.FormField.PASSWORD.name)
 }

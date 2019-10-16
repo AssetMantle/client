@@ -1,0 +1,5 @@
+@import helper._
+
+@(formData: Form[_], keyName: String, fieldClass: Option[String] = None, fieldID: Option[String] = None, required: Boolean = true)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@inputDate(formData(keyName), '_label -> Messages(keyName), 'placeholder -> Messages(keyName), 'id -> fieldID.getOrElse(keyName), 'class -> fieldClass.getOrElse("cmuk-input"), 'required -> required)

@@ -1,70 +1,26 @@
-@import helper._
 @import views.companion.blockchain.SetACL
 @import views.html.base._
 
 @(setACLForm: Form[SetACL.Data] = SetACL.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @commonForm(constants.Form.BLOCKCHAIN_SET_ACL, setACLForm) {
-    @inputText(setACLForm(constants.FormField.FROM.name), '_label -> Messages(constants.FormField.FROM.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.FROM.name), 'required -> true)
-    @inputText(setACLForm(constants.FormField.ACL_ADDRESS.name), '_label -> Messages(constants.FormField.ACL_ADDRESS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.ACL_ADDRESS.name), 'required -> true)
-    @inputText(setACLForm(constants.FormField.ORGANIZATION_ID.name), '_label -> Messages(constants.FormField.ORGANIZATION_ID.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.ORGANIZATION_ID.name), 'required -> true)
-    @inputText(setACLForm(constants.FormField.ZONE_ID.name), '_label -> Messages(constants.FormField.ZONE_ID.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.ZONE_ID.name), 'required -> true)
-    <span>
-        @Messages(constants.FormField.ISSUE_ASSET.name)
-        @checkbox(setACLForm(constants.FormField.ISSUE_ASSET.name), '_label -> Messages(constants.FormField.ISSUE_ASSET.name), 'class -> "cmuk-checkbox")
-    </span>
-    <span>
-        @Messages(constants.FormField.ISSUE_FIAT.name)
-        @checkbox(setACLForm(constants.FormField.ISSUE_FIAT.name), '_label -> Messages(constants.FormField.ISSUE_FIAT.name), 'class -> "cmuk-checkbox")
-    </span>
-    <span>
-        @Messages(constants.FormField.SEND_ASSET.name)
-        @checkbox(setACLForm(constants.FormField.SEND_ASSET.name), '_label -> Messages(constants.FormField.SEND_ASSET.name), 'class -> "cmuk-checkbox")
-    </span>
-
-    <span>
-        @Messages(constants.FormField.SEND_FIAT.name)
-        @checkbox(setACLForm(constants.FormField.SEND_FIAT.name), '_label -> Messages(constants.FormField.SEND_FIAT.name), 'class -> "cmuk-checkbox")
-    </span>
-    <span>
-        @Messages(constants.FormField.REDEEM_ASSET.name)
-        @checkbox(setACLForm(constants.FormField.REDEEM_ASSET.name), '_label -> Messages(constants.FormField.REDEEM_ASSET.name), 'class -> "cmuk-checkbox")
-    </span>
-    <span>
-        @Messages(constants.FormField.REDEEM_FIAT.name)
-        @checkbox(setACLForm(constants.FormField.REDEEM_FIAT.name), '_label -> Messages(constants.FormField.REDEEM_FIAT.name), 'class -> "cmuk-checkbox")
-    </span>
-    <span>
-        @Messages(constants.FormField.SELLER_EXECUTE_ORDER.name)
-        @checkbox(setACLForm(constants.FormField.SELLER_EXECUTE_ORDER.name), '_label -> Messages(constants.FormField.SELLER_EXECUTE_ORDER.name), 'class -> "cmuk-checkbox")
-    </span>
-    <span>
-        @Messages(constants.FormField.BUYER_EXECUTE_ORDER.name)
-        @checkbox(setACLForm(constants.FormField.BUYER_EXECUTE_ORDER.name), '_label -> Messages(constants.FormField.BUYER_EXECUTE_ORDER.name), 'class -> "cmuk-checkbox")
-    </span>
-    <span>
-        @Messages(constants.FormField.CHANGE_BUYER_BID.name)
-        @checkbox(setACLForm(constants.FormField.CHANGE_BUYER_BID.name), '_label -> Messages(constants.FormField.CHANGE_BUYER_BID.name), 'class -> "cmuk-checkbox")
-    </span>
-    <span>
-        @Messages(constants.FormField.CHANGE_SELLER_BID.name)
-        @checkbox(setACLForm(constants.FormField.CHANGE_SELLER_BID.name), '_label -> Messages(constants.FormField.CHANGE_SELLER_BID.name), 'class -> "cmuk-checkbox")
-    </span>
-    <span>
-        @Messages(constants.FormField.CONFIRM_BUYER_BID.name)
-        @checkbox(setACLForm(constants.FormField.CONFIRM_BUYER_BID.name), '_label -> Messages(constants.FormField.CONFIRM_BUYER_BID.name), 'class -> "cmuk-checkbox")
-    </span>
-    <span>
-        @Messages(constants.FormField.CONFIRM_SELLER_BID.name)
-        @checkbox(setACLForm(constants.FormField.CONFIRM_SELLER_BID.name), '_label -> Messages(constants.FormField.CONFIRM_SELLER_BID.name), 'class -> "cmuk-checkbox")
-    </span>
-    <span>
-        @Messages(constants.FormField.NEGOTIATION.name)
-        @checkbox(setACLForm(constants.FormField.NEGOTIATION.name), '_label -> Messages(constants.FormField.NEGOTIATION.name), 'class -> "cmuk-checkbox")
-    </span>
-    <span>
-        @Messages(constants.FormField.RELEASE_ASSET.name)
-        @checkbox(setACLForm(constants.FormField.RELEASE_ASSET.name), '_label -> Messages(constants.FormField.RELEASE_ASSET.name), 'class -> "cmuk-checkbox")
-    </span>
-    @inputText(setACLForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.GAS.name), 'required -> true, 'type -> "number")
-    @inputPassword(setACLForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PASSWORD.name), 'required -> true)
+    @commonInputText(setACLForm, constants.FormField.FROM.name)
+    @commonInputText(setACLForm, constants.FormField.ACL_ADDRESS.name)
+    @commonInputText(setACLForm, constants.FormField.ORGANIZATION_ID.name)
+    @commonInputText(setACLForm, constants.FormField.ZONE_ID.name)
+    @commonCheckbox(setACLForm, constants.FormField.ISSUE_ASSET.name)
+    @commonCheckbox(setACLForm, constants.FormField.ISSUE_FIAT.name)
+    @commonCheckbox(setACLForm, constants.FormField.SEND_ASSET.name)
+    @commonCheckbox(setACLForm, constants.FormField.SEND_FIAT.name)
+    @commonCheckbox(setACLForm, constants.FormField.REDEEM_ASSET.name)
+    @commonCheckbox(setACLForm, constants.FormField.REDEEM_FIAT.name)
+    @commonCheckbox(setACLForm, constants.FormField.SELLER_EXECUTE_ORDER.name)
+    @commonCheckbox(setACLForm, constants.FormField.BUYER_EXECUTE_ORDER.name)
+    @commonCheckbox(setACLForm, constants.FormField.CHANGE_BUYER_BID.name)
+    @commonCheckbox(setACLForm, constants.FormField.CHANGE_SELLER_BID.name)
+    @commonCheckbox(setACLForm, constants.FormField.CONFIRM_BUYER_BID.name)
+    @commonCheckbox(setACLForm, constants.FormField.CONFIRM_SELLER_BID.name)
+    @commonCheckbox(setACLForm, constants.FormField.NEGOTIATION.name)
+    @commonCheckbox(setACLForm, constants.FormField.RELEASE_ASSET.name)
+    @commonInputText(setACLForm, constants.FormField.GAS.name)
+    @commonInputPassword(setACLForm, constants.FormField.PASSWORD.name)
 }

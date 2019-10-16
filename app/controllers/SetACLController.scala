@@ -164,36 +164,36 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
       }
   }
 
-  def reviewAddTraderOnCompletionForm(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
+  def userReviewAddTraderRequestForm(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
         val trader = masterTraders.Service.getByAccountID(loginState.username)
-        withUsernameToken.Ok(views.html.component.master.reviewAddTraderOnCompletion(trader = trader, organization = masterOrganizations.Service.get(trader.organizationID), zone = masterZones.Service.get(trader.zoneID), traderKYCs = masterTraderKYCs.Service.getAllDocuments(trader.id)))
+        withUsernameToken.Ok(views.html.component.master.userReviewAddTraderRequest(trader = trader, organization = masterOrganizations.Service.get(trader.organizationID), zone = masterZones.Service.get(trader.zoneID), traderKYCs = masterTraderKYCs.Service.getAllDocuments(trader.id)))
       } catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
-  def reviewAddTraderOnCompletion(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
+  def userReviewAddTraderRequest(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      views.companion.master.ReviewAddTraderOnCompletion.form.bindFromRequest().fold(
+      views.companion.master.ReviewAddTraderRequest.form.bindFromRequest().fold(
         formWithErrors => {
           try {
             val trader = masterTraders.Service.getByAccountID(loginState.username)
-            BadRequest(views.html.component.master.reviewAddTraderOnCompletion(formWithErrors, trader = trader, organization = masterOrganizations.Service.get(trader.organizationID), zone = masterZones.Service.get(trader.zoneID), traderKYCs = masterTraderKYCs.Service.getAllDocuments(trader.id)))
+            BadRequest(views.html.component.master.userReviewAddTraderRequest(formWithErrors, trader = trader, organization = masterOrganizations.Service.get(trader.organizationID), zone = masterZones.Service.get(trader.zoneID), traderKYCs = masterTraderKYCs.Service.getAllDocuments(trader.id)))
           } catch {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
         },
-        reviewAddTraderOnCompletionData => {
+        userReviewAddTraderRequestData => {
           try {
             val id = masterTraders.Service.getID(loginState.username)
-            if (reviewAddTraderOnCompletionData.completion && masterTraderKYCs.Service.checkAllKYCFileTypesExists(id)) {
+            if (userReviewAddTraderRequestData.completion && masterTraderKYCs.Service.checkAllKYCFileTypesExists(id)) {
               masterTraders.Service.markTraderFormCompleted(id)
               withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.TRADER_ADDED_FOR_VERIFICATION)))
             } else {
               val trader = masterTraders.Service.getByAccountID(loginState.username)
-              BadRequest(views.html.component.master.reviewAddTraderOnCompletion(trader = trader, organization = masterOrganizations.Service.get(trader.organizationID), zone = masterZones.Service.get(trader.zoneID), traderKYCs = masterTraderKYCs.Service.getAllDocuments(trader.id)))
+              BadRequest(views.html.component.master.userReviewAddTraderRequest(trader = trader, organization = masterOrganizations.Service.get(trader.organizationID), zone = masterZones.Service.get(trader.zoneID), traderKYCs = masterTraderKYCs.Service.getAllDocuments(trader.id)))
             }
           }
           catch {

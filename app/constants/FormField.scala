@@ -102,7 +102,7 @@ object FormField {
   val COMDEX_PAYMENT_TERMS = new StringOptionFormField("COMDEX_PAYMENT_TERMS", constants.Form.COMDEX_PAYMENT_TERMS_OPTIONS)
 
   //IntFormField
-  val GAS = new IntFormField("GAS", 20000, 1000000)
+  val GAS = new IntFormField("GAS", 20000, 1000000, Option(1))
   val BID = new IntFormField("BID", 0, Int.MaxValue)
   val TIME = new IntFormField("TIME", 0, Int.MaxValue)
   val ASSET_QUANTITY = new IntFormField("ASSET_QUANTITY", 1, Int.MaxValue)
@@ -135,6 +135,12 @@ object FormField {
   val CONFIRM_SELLER_BID = new BooleanFormField("CONFIRM_SELLER_BID")
   val NEGOTIATION = new BooleanFormField("NEGOTIATION")
   val RELEASE_ASSET = new BooleanFormField("RELEASE_ASSET")
+  val RECEIVE_NOTIFICATIONS = new BooleanFormField("RECEIVE_NOTIFICATIONS")
+  val USERNAME_AVAILABLE = new BooleanFormField("USERNAME_AVAILABLE")
+  val MODERATED = new BooleanFormField("MODERATED")
+  val COMPLETION = new BooleanFormField("COMPLETION")
+  val STATUS = new BooleanFormField("STATUS")
+  val CONFIRM_NOTE_NEW_KEY_DETAILS = new BooleanFormField("CONFIRM_NOTE_NEW_KEY_DETAILS")
 
   //TODO: Error Response through Messages
   class StringFormField (fieldName: String, minimumLength: Int, maximumLength: Int, regex: Regex = RegularExpression.ANY_STRING, errorMessage: String = "Error Response") {
@@ -147,7 +153,7 @@ object FormField {
     val field: Mapping[String] = text.verifying(constraint = field => option contains field, error = errorMessage)
   }
 
-  class IntFormField (fieldName: String, val minimumValue: Int, val maximumValue: Int) {
+  class IntFormField (fieldName: String, val minimumValue: Int, val maximumValue: Int, val step: Option[Int] = None) {
     val name: String = fieldName
     val field: Mapping[Int] =  number(min = minimumValue, max = maximumValue)
   }

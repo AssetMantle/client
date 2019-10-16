@@ -25,14 +25,14 @@ object Form {
   val ADD_ORGANIZATION = new Form("ADD_ORGANIZATION", routes.AddOrganizationController.addOrganization())
   val USER_UPDATE_UBOS = new Form("USER_UPDATE_UBOS", routes.AddOrganizationController.userUpdateUBOs())
   val ORGANIZATION_BANK_ACCOUNT_DETAIL = new Form("ORGANIZATION_BANK_ACCOUNT_DETAIL", routes.AddOrganizationController.organizationBankAccountDetail())
-  val REVIEW_ADD_ORGANIZATION_ON_COMPLETION = new Form("REVIEW_ADD_ORGANIZATION_ON_COMPLETION", routes.AddOrganizationController.reviewAddOrganizationOnCompletion())
+  val USER_REVIEW_ADD_ORGANIZATION_REQUEST = new Form("USER_REVIEW_ADD_ORGANIZATION_REQUEST", routes.AddOrganizationController.userReviewAddOrganizationRequest())
   val VERIFY_ORGANIZATION = new Form("VERIFY_ORGANIZATION", routes.AddOrganizationController.verifyOrganization())
   val REJECT_VERIFY_ORGANIZATION_REQUEST = new Form("REJECT_VERIFY_ORGANIZATION_REQUEST", routes.AddOrganizationController.rejectVerifyOrganizationRequest())
   val BLOCKCHAIN_ADD_ORGANIZATION = new Form("BLOCKCHAIN_ADD_ORGANIZATION", routes.AddOrganizationController.blockchainAddOrganization())
 
   //AddZoneController
   val ADD_ZONE = new Form("ADD_ZONE", routes.AddZoneController.addZone())
-  val REVIEW_ADD_ZONE_ON_COMPLETION = new Form("REVIEW_ADD_ZONE_ON_COMPLETION", routes.AddZoneController.reviewAddZoneOnCompletion())
+  val REVIEW_ADD_ZONE_ON_COMPLETION = new Form("REVIEW_ADD_ZONE_ON_COMPLETION", routes.AddZoneController.userReviewAddZoneRequest())
   val VERIFY_ZONE = new Form("VERIFY_ZONE", routes.AddZoneController.verifyZone())
   val REJECT_VERIFY_ZONE_REQUEST = new Form("REJECT_VERIFY_ZONE_REQUEST", routes.AddZoneController.rejectVerifyZoneRequest())
   val BLOCKCHAIN_ADD_ZONE = new Form("BLOCKCHAIN_ADD_ZONE", routes.AddZoneController.blockchainAddZone())
@@ -113,7 +113,7 @@ object Form {
   //SetACLController
   val INVITE_TRADER = new Form("INVITE_TRADER", routes.SetACLController.inviteTrader())
   val ADD_TRADER = new Form("ADD_TRADER", routes.SetACLController.addTrader())
-  val REVIEW_ADD_TRADER_ON_COMPLETION = new Form("REVIEW_ADD_TRADER_ON_COMPLETION", routes.SetACLController.reviewAddTraderOnCompletion())
+  val REVIEW_ADD_TRADER_ON_COMPLETION = new Form("REVIEW_ADD_TRADER_ON_COMPLETION", routes.SetACLController.userReviewAddTraderRequest())
   val ZONE_VERIFY_TRADER = new Form("ZONE_VERIFY_TRADER", routes.SetACLController.zoneVerifyTrader())
   val ZONE_REJECT_VERIFY_TRADER_REQUEST = new Form("ZONE_REJECT_VERIFY_TRADER_REQUEST", routes.SetACLController.zoneRejectVerifyTraderRequest())
   val ORGANIZATION_VERIFY_TRADER = new Form("ORGANIZATION_VERIFY_TRADER", routes.SetACLController.organizationVerifyTrader())
@@ -176,7 +176,6 @@ object Form {
   val PROFILE_PICTURE = "PROFILE_PICTURE"
   val GET_OTP = "GET_OTP"
   val SET_PASSWORD = "SET_PASSWORD"
-  val COMPLETION = "COMPLETION"
   val REVIEW = "REVIEW"
   val SAME_AS_REGISTERED_ADDRESS = "SAME_AS_REGISTERED_ADDRESS"
   val SUBMIT = "SUBMIT"
@@ -319,7 +318,6 @@ object Form {
   val FIAT_PROOF_HASH = "FIAT_PROOF_HASH"
   val PEG_HASH = "PEG_HASH"
   val GAS = "GAS"
-  val STATUS = "STATUS"
   val BID = "BID"
   val TIME = "TIME"
   val BUYER_CONTRACT_HASH = "BUYER_CONTRACT_HASH"
@@ -332,14 +330,12 @@ object Form {
   val ASSET_PRICE = "ASSET_PRICE"
   val QUANTITY_UNIT = "QUANTITY_UNIT"
   val ASSET_QUANTITY = "ASSET_QUANTITY"
-  val MODERATED = "MODERATED"
   val TRANSACTION_ID = "TRANSACTION_ID"
   val TRANSACTION_AMOUNT = "TRANSACTION_AMOUNT"
   val REDEEM_AMOUNT = "REDEEM_AMOUNT"
   val AWB_PROOF_HASH = "AWB_PROOF_HASH"
   val AMOUNT = "AMOUNT"
   val ACL_ADDRESS = "ACL_ADDRESS"
-  val RECEIVE_NOTIFICATIONS = "RECEIVE_NOTIFICATIONS"
   val NEGOTIATION = "NEGOTIATION"
   val NEGOTIATION_ID = "NEGOTIATION_ID"
   val BUYER_SIGNATURE = "BUYER_SIGNATURE"
@@ -355,7 +351,6 @@ object Form {
   val ORGANIZATION_ID = "ORGANIZATION_ID"
   val CURRENCY = "CURRENCY"
   val USERNAME = "USERNAME"
-  val USERNAME_AVAILABLE = "USERNAME_AVAILABLE"
   val PUSH_NOTIFICATION_TOKEN = "PUSH_NOTIFICATION_TOKEN"
   val CSRF_TOKEN = "csrfToken"
   val MOBILE_NUMBER = "MOBILE_NUMBER"
@@ -387,7 +382,6 @@ object Form {
   val BANK_ADDRESS = "BANK_ADDRESS"
   val ORGANIZATION_UBO_DETAIL = "ORGANIZATION_UBO_DETAIL"
   val NOTE_NEW_KEY_DETAILS = "NOTE_NEW_KEY_DETAILS"
-  val CONFIRM_NOTE_NEW_KEY_DETAILS = "CONFIRM_NOTE_NEW_KEY_DETAILS"
 
   //MasterTransaction
   val COUPON = "COUPON"
@@ -401,6 +395,7 @@ object Form {
   val BOTH_PARTIES = "BOTH_PARTIES"
 
   //Sequences
+  //TODO Should be in assets constants
   val ASSET_TYPE_OPTIONS: Seq[String] = Seq("Oil", "Coal", "Gold", "Wheat")
   val DELIVERY_TERM_OPTIONS: Seq[String] = Seq("FOB", "CIF", "CFR")
   val QUALITY_OPTIONS: Seq[String] = Seq("A+", "A", "B")

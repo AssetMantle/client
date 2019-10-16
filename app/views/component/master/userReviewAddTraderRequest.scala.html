@@ -2,11 +2,11 @@
 @import helper._
 @import models.master.{Organization, Trader, TraderKYC, Zone}
 @import play.api.Logger
-@import views.companion.master.ReviewAddTraderOnCompletion
+@import views.companion.master.ReviewAddTraderRequest
 @import views.html.base._
 
-@(reviewAddTraderOnCompletionForm: Form[ReviewAddTraderOnCompletion.Data] = ReviewAddTraderOnCompletion.form, trader: Trader, organization: Organization, zone: Zone, traderKYCs: Seq[TraderKYC])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, module: String, logger: Logger, loginState: LoginState = null)
-@commonForm(constants.Form.REVIEW_ADD_TRADER_ON_COMPLETION, reviewAddTraderOnCompletionForm) {
+@(userReviewAddTraderRequestForm: Form[ReviewAddTraderRequest.Data] = ReviewAddTraderRequest.form, trader: Trader, organization: Organization, zone: Zone, traderKYCs: Seq[TraderKYC])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, module: String, logger: Logger, loginState: LoginState = null)
+@commonForm(constants.Form.REVIEW_ADD_TRADER_ON_COMPLETION, userReviewAddTraderRequestForm) {
     <div>@Messages(constants.Form.TRADER_DETAILS):<br>
         <span class="red">@Messages(constants.Form.NAME)</span>: @trader.name <br>
     </div>
@@ -36,7 +36,7 @@
         }
     </div>
     <br>
-    @Messages(constants.Form.COMPLETION):
-    <span>@checkbox(reviewAddTraderOnCompletionForm(constants.Form.COMPLETION), '_label -> Messages(constants.Form.COMPLETION), 'placeholder -> Messages(constants.Form.COMPLETION), 'class -> "cmuk-checkbox", 'required -> true)</span>
+    @Messages(constants.FormField.COMPLETION.name):
+    <span>@checkbox(userReviewAddTraderRequestForm(constants.FormField.COMPLETION.name), '_label -> Messages(constants.FormField.COMPLETION.name), 'placeholder -> Messages(constants.FormField.COMPLETION.name), 'class -> "cmuk-checkbox", 'required -> true)</span>
     <button class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.SetACLController.userUploadOrUpdateTraderKYCView())">@Messages(constants.Form.BACK)</button>
 }
