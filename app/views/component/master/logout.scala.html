@@ -5,7 +5,6 @@
 
 @(logoutForm: Form[Logout.Data] = Logout.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @commonForm(constants.Form.LOGOUT, logoutForm) {
-    @Messages(constants.FormField.RECEIVE_NOTIFICATIONS.name)
-    @checkbox(logoutForm(constants.FormField.RECEIVE_NOTIFICATIONS.name), '_label -> Messages(constants.FormField.RECEIVE_NOTIFICATIONS.name), 'class -> "cmuk-checkbox")
+    @commonCheckbox(logoutForm, constants.FormField.RECEIVE_NOTIFICATIONS)
 }
 
