@@ -13,5 +13,5 @@
     @inputText(organizationBankAccountDetailForm(constants.FormField.ADDRESS.name), '_label -> Messages(constants.FormField.ADDRESS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.ADDRESS.name), 'required -> true)
     @inputText(organizationBankAccountDetailForm(constants.FormField.COUNTRY.name), '_label -> Messages(constants.FormField.COUNTRY.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.COUNTRY.name), 'required -> true)
     @inputText(organizationBankAccountDetailForm(constants.FormField.ZIP_CODE.name), '_label -> Messages(constants.FormField.ZIP_CODE.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.ZIP_CODE.name), 'required -> true)
-    <button class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.AddOrganizationController.userUpdateUBOsForm())">@Messages(constants.Form.BACK)</button>
+    <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.AddOrganizationController.userUpdateUBOsForm())">@Messages(constants.Form.BACK)</button>
 }

@@ -29,7 +29,7 @@ function transactionExplorer() {
                     if (transactionContainerListLength > 8) {
                         transactionContainerList.removeChild(transactionContainerList.childNodes[transactionContainerListLength - 1]);
                     }
-                    $('#transactionContainer').prepend("<tr><td><button onclick='searchFunction(" + JSON.stringify(height) + ")'>" + height + "</button></td><td><button onclick='searchFunction(" + JSON.stringify(txHash) + ")'>" + txHash + "</button></td></button></td></tr>");
+                    $('#transactionContainer').prepend("<tr><td><button type='button' onclick='searchFunction(" + JSON.stringify(height) + ")'>" + height + "</button></td><td><button onclick='searchFunction(" + JSON.stringify(txHash) + ")'>" + txHash + "</button></td></button></td></tr>");
                 });
             }
         }
