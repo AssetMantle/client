@@ -18,7 +18,7 @@
                     <h2 class="card-title">@loginState.username</h2>
                     <p>
                         @Messages(constants.User.USER_TYPE): <span>@loginState.userType</span>
-                        <button class="cmuk-button cmuk-button-link" onclick="getForm(jsRoutes.controllers.AccountController.changePasswordForm())">@Messages(constants.Form.CHANGE_PASSWORD.legend)</button>
+                       <span><button class="cmuk-button cmuk-button-link" onclick="getForm(jsRoutes.controllers.AccountController.changePasswordForm())">@Messages(constants.Form.CHANGE_PASSWORD.legend)</button></span>
                     </p>
                     <p>
                         @Messages(constants.Form.BLOCKCHAIN_ADDRESS)

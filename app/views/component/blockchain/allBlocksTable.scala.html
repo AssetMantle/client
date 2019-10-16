@@ -1,10 +1,12 @@
 @()(implicit messagesProvider: MessagesProvider)
 <div id="allBlocksTable">
     <div class="cmuk-card
-                cmuk-card-default
-                cmuk-card-body">
-        <a class="back-button" onclick='back()' ><span cmuk-icon="arrow-left"></span>
-            @Messages(constants.Form.BACK)</a>
+                cmuk-card-default">
+        <div class="cmuk-card-header tableName">
+        <a class="backButton cmuk-float-right" onclick='back()' ><span title="Back" cmuk-icon="arrow-left"></span></a>
+        </div>
+        <div class="cmuk-card-body">
+        <div class="cmuk-overflow-auto">
         <table class="cmuk-table cmuk-table-divider">
             <thead>
                 <tr>
@@ -19,6 +21,8 @@
             </td>
             </tr>
         </table>
+        </div>
+    </div>
     </div>
 </div>
 <script src="@routes.Assets.versioned("javascripts/showAllBlocks.js")" type="text/javascript"></script>

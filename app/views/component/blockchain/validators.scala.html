@@ -1,6 +1,6 @@
 @()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
 <div>
-    <p id="validator" class="heading"></p>
-    <h5> <a onclick='seeValidatorsTable()' >@Messages(constants.Form.VALIDATORS)</a></h5>
+    <p id="validator" ></p>
+    <a onclick='seeValidatorsTable()' class="cmuk-text-bold">@Messages(constants.Form.VALIDATORS)</a>
 </div>
 <script src="@routes.Assets.versioned("javascripts/validators.js")" type="text/javascript"></script>

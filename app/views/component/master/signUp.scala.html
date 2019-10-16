@@ -10,7 +10,7 @@
     @inputPassword(signUpForm(constants.FormField.SIGNUP_PASSWORD.name), 'id -> "password", 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.SIGNUP_PASSWORD.name), 'required -> true)
     @inputPassword(signUpForm(constants.FormField.SIGNUP_CONFIRM_PASSWORD.name), 'id -> "confirmPassword", 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.SIGNUP_CONFIRM_PASSWORD.name), 'required -> true)
     <span id="matchPasswordsResult">
-        <span id="matchPasswordsImageResult" class="result warning hidden"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i></span>
+        <span id="matchPasswordsImageResult" class="result warning hidden"><span cmuk-icon="warning"></span></span>
     </span>
     @checkbox(signUpForm(constants.FormField.USERNAME_AVAILABLE.name), 'id -> "usernameAvailable", 'class -> "hidden", 'required -> true)
 }
