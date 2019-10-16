@@ -4,10 +4,10 @@
 
 @(releaseAssetForm: Form[ReleaseAsset.Data] = ReleaseAsset.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @commonForm(constants.Form.BLOCKCHAIN_RELEASE_ASSET, releaseAssetForm) {
-    @commonInputText(releaseAssetForm, constants.FormField.FROM.name)
-    @commonInputText(releaseAssetForm, constants.FormField.TO.name)
-    @commonInputText(releaseAssetForm, constants.FormField.PEG_HASH.name)
-    @commonInputText(releaseAssetForm, constants.FormField.GAS.name)
-    @commonInputText(releaseAssetForm, constants.FormField.MODE.name)
-    @commonInputPassword(releaseAssetForm, constants.FormField.PASSWORD.name)
+    @commonInputText(releaseAssetForm, constants.FormField.FROM)
+    @commonInputText(releaseAssetForm, constants.FormField.TO)
+    @commonInputText(releaseAssetForm, constants.FormField.PEG_HASH)
+    @commonInputInt(releaseAssetForm, constants.FormField.GAS)
+    @commonInputText(releaseAssetForm, constants.FormField.MODE)
+    @commonInputPassword(releaseAssetForm, constants.FormField.PASSWORD)
 }

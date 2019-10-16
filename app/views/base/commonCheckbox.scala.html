@@ -1,6 +1,11 @@
 @import helper._
+@import constants.FormField.BooleanFormField
 
-@(formData: Form[_], keyName: String, fieldClass: Option[String] = None, fieldID: Option[String] = None)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(formData: Form[_], formField: BooleanFormField, fieldClass: Option[String] = None, arguments: Seq[(Symbol, Any)] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
-@Messages(keyName)
-@checkbox(formData(keyName), '_label -> Messages(keyName), 'id -> fieldID.getOrElse(keyName), 'class -> fieldClass.getOrElse("cmuk-checkbox"))
+<div class='@fieldClass.getOrElse("")'>
+    @Messages(formField.name)
+    @defining(Seq('_label -> Messages(formField.name), 'class -> "cmuk-checkbox") ++ arguments) { htmlArguments =>
+        @checkbox(formData(formField.name), htmlArguments: _*)
+    }
+</div>

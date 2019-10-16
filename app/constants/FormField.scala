@@ -94,15 +94,15 @@ object FormField {
   val DOCUMENT_TYPE = new StringFormField("DOCUMENT_TYPE", 2, 500)
   val FILE_ID = new StringFormField("FILE_ID", 2, 500)
 
-  val ASSET_TYPE = new StringOptionFormField("ASSET_TYPE", constants.Form.ASSET_TYPE_OPTIONS)
-  val DELIVERY_TERM = new StringOptionFormField("DELIVERY_TERM", constants.Form.DELIVERY_TERM_OPTIONS)
-  val QUALITY = new StringOptionFormField("QUALITY", constants.Form.QUALITY_OPTIONS)
-  val TRADE_TYPE = new StringOptionFormField("TRADE_TYPE", constants.Form.TRADE_TYPE_OPTIONS)
-  val PHYSICAL_DOCUMENTS_HANDLED_VIA = new StringOptionFormField("PHYSICAL_DOCUMENTS_HANDLED_VIA", constants.Form.PHYSICAL_DOCUMENTS_HANDLED_VIA_OPTIONS)
-  val COMDEX_PAYMENT_TERMS = new StringOptionFormField("COMDEX_PAYMENT_TERMS", constants.Form.COMDEX_PAYMENT_TERMS_OPTIONS)
+  val ASSET_TYPE = new SelectFormField("ASSET_TYPE", constants.Form.ASSET_TYPE_OPTIONS)
+  val DELIVERY_TERM = new SelectFormField("DELIVERY_TERM", constants.Form.DELIVERY_TERM_OPTIONS)
+  val QUALITY = new SelectFormField("QUALITY", constants.Form.QUALITY_OPTIONS)
+  val TRADE_TYPE = new SelectFormField("TRADE_TYPE", constants.Form.TRADE_TYPE_OPTIONS)
+  val PHYSICAL_DOCUMENTS_HANDLED_VIA = new SelectFormField("PHYSICAL_DOCUMENTS_HANDLED_VIA", constants.Form.PHYSICAL_DOCUMENTS_HANDLED_VIA_OPTIONS)
+  val COMDEX_PAYMENT_TERMS = new SelectFormField("COMDEX_PAYMENT_TERMS", constants.Form.COMDEX_PAYMENT_TERMS_OPTIONS)
 
   //IntFormField
-  val GAS = new IntFormField("GAS", 20000, 1000000, Some(1))
+  val GAS = new IntFormField("GAS", 20000, 1000000)
   val BID = new IntFormField("BID", 0, Int.MaxValue)
   val TIME = new IntFormField("TIME", 0, Int.MaxValue)
   val ASSET_QUANTITY = new IntFormField("ASSET_QUANTITY", 1, Int.MaxValue)
@@ -148,12 +148,12 @@ object FormField {
     val field: Mapping[String] = text(minLength = minimumLength, maxLength = maximumLength).verifying(Constraints.pattern(regex = regex, name = regex.pattern.toString, error = errorMessage))
   }
 
-  class StringOptionFormField(fieldName: String, option: Seq[String], errorMessage: String = "Error Response") {
+  class SelectFormField(fieldName: String, val options: Seq[String], errorMessage: String = "Error Response") {
     val name: String = fieldName
-    val field: Mapping[String] = text.verifying(constraint = field => option contains field, error = errorMessage)
+    val field: Mapping[String] = text.verifying(constraint = field => options contains field, error = errorMessage)
   }
 
-  class IntFormField (fieldName: String, val minimumValue: Int, val maximumValue: Int, val rangeSliderStep: Option[Int] = None) {
+  class IntFormField (fieldName: String, val minimumValue: Int, val maximumValue: Int) {
     val name: String = fieldName
     val field: Mapping[Int] =  number(min = minimumValue, max = maximumValue)
   }
@@ -163,7 +163,7 @@ object FormField {
     val field: Mapping[Date] = date
   }
 
-  class DoubleFormField(fieldName: String, minimumValue: Double, maximumValue: Double) {
+  class DoubleFormField(fieldName: String, val minimumValue: Double, val maximumValue: Double) {
     val name: String = fieldName
     val field: Mapping[Double] = of(doubleFormat).verifying(Constraints.max[Double](maximumValue), Constraints.min[Double](minimumValue))
   }

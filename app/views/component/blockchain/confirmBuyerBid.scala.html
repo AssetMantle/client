@@ -4,13 +4,13 @@
 
 @(confirmBuyerBidForm: Form[ConfirmBuyerBid.Data] = ConfirmBuyerBid.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @commonForm(constants.Form.BLOCKCHAIN_CONFIRM_BUYER_BID, confirmBuyerBidForm) {
-    @commonInputText(confirmBuyerBidForm, constants.FormField.FROM.name)
-    @commonInputText(confirmBuyerBidForm, constants.FormField.TO.name)
-    @commonInputText(confirmBuyerBidForm, constants.FormField.BID.name)
-    @commonInputText(confirmBuyerBidForm, constants.FormField.TIME.name)
-    @commonInputText(confirmBuyerBidForm, constants.FormField.PEG_HASH.name)
-    @commonInputText(confirmBuyerBidForm, constants.FormField.MODE.name)
-    @commonInputText(confirmBuyerBidForm, constants.FormField.BUYER_CONTRACT_HASH.name)
-    @commonInputText(confirmBuyerBidForm, constants.FormField.GAS.name)
-    @commonInputPassword(confirmBuyerBidForm, constants.FormField.PASSWORD.name)
+    @commonInputText(confirmBuyerBidForm, constants.FormField.FROM)
+    @commonInputText(confirmBuyerBidForm, constants.FormField.TO)
+    @commonInputInt(confirmBuyerBidForm, constants.FormField.BID)
+    @commonInputInt(confirmBuyerBidForm, constants.FormField.TIME)
+    @commonInputText(confirmBuyerBidForm, constants.FormField.PEG_HASH)
+    @commonInputText(confirmBuyerBidForm, constants.FormField.MODE)
+    @commonInputText(confirmBuyerBidForm, constants.FormField.BUYER_CONTRACT_HASH)
+    @commonInputInt(confirmBuyerBidForm, constants.FormField.GAS)
+    @commonInputPassword(confirmBuyerBidForm, constants.FormField.PASSWORD)
 }

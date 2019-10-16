@@ -4,10 +4,10 @@
 
 @(redeemFiatForm: Form[RedeemFiat.Data] = RedeemFiat.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @commonForm(constants.Form.BLOCKCHAIN_REDEEM_FIAT, redeemFiatForm) {
-    @commonInputText(redeemFiatForm, constants.FormField.FROM.name)
-    @commonInputText(redeemFiatForm, constants.FormField.TO.name)
-    @commonInputText(redeemFiatForm, constants.FormField.REDEEM_AMOUNT.name)
-    @commonInputText(redeemFiatForm, constants.FormField.GAS.name)
-    @commonInputText(redeemFiatForm, constants.FormField.MODE.name)
-    @commonInputPassword(redeemFiatForm, constants.FormField.PASSWORD.name)
+    @commonInputText(redeemFiatForm, constants.FormField.FROM)
+    @commonInputText(redeemFiatForm, constants.FormField.TO)
+    @commonInputInt(redeemFiatForm, constants.FormField.REDEEM_AMOUNT)
+    @commonInputInt(redeemFiatForm, constants.FormField.GAS)
+    @commonInputText(redeemFiatForm, constants.FormField.MODE)
+    @commonInputPassword(redeemFiatForm, constants.FormField.PASSWORD)
 }

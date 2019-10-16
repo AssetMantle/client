@@ -4,13 +4,13 @@
 
 @(buyerExecuteOrderForm: Form[BuyerExecuteOrder.Data] = BuyerExecuteOrder.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @commonForm(constants.Form.BLOCKCHAIN_BUYER_EXECUTE_ORDER, buyerExecuteOrderForm) {
-    @commonInputText(buyerExecuteOrderForm, constants.FormField.FROM.name)
-    @commonInputText(buyerExecuteOrderForm, constants.FormField.BUYER_ADDRESS.name)
-    @commonInputText(buyerExecuteOrderForm, constants.FormField.SELLER_ADDRESS.name)
-    @commonInputText(buyerExecuteOrderForm, constants.FormField.FIAT_PROOF_HASH.name)
-    @commonInputText(buyerExecuteOrderForm, constants.FormField.PEG_HASH.name)
-    @commonInputText(buyerExecuteOrderForm, constants.FormField.GAS.name)
-    @commonInputText(buyerExecuteOrderForm, constants.FormField.MODE.name)
-    @commonInputPassword(buyerExecuteOrderForm, constants.FormField.PASSWORD.name)
+    @commonInputText(buyerExecuteOrderForm, constants.FormField.FROM)
+    @commonInputText(buyerExecuteOrderForm, constants.FormField.BUYER_ADDRESS)
+    @commonInputText(buyerExecuteOrderForm, constants.FormField.SELLER_ADDRESS)
+    @commonInputText(buyerExecuteOrderForm, constants.FormField.FIAT_PROOF_HASH)
+    @commonInputText(buyerExecuteOrderForm, constants.FormField.PEG_HASH)
+    @commonInputInt(buyerExecuteOrderForm, constants.FormField.GAS)
+    @commonInputText(buyerExecuteOrderForm, constants.FormField.MODE)
+    @commonInputPassword(buyerExecuteOrderForm, constants.FormField.PASSWORD)
 }
 

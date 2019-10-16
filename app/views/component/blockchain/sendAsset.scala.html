@@ -4,11 +4,11 @@
 
 @(sendAssetForm: Form[SendAsset.Data] = SendAsset.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @commonForm(constants.Form.BLOCKCHAIN_SEND_ASSET, sendAssetForm) {
-    @commonInputText(sendAssetForm, constants.FormField.FROM.name)
-    @commonInputText(sendAssetForm, constants.FormField.TO.name)
-    @commonInputText(sendAssetForm, constants.FormField.PEG_HASH.name)
-    @commonInputText(sendAssetForm, constants.FormField.GAS.name)
-    @commonInputText(sendAssetForm, constants.FormField.MODE.name)
-    @commonInputPassword(sendAssetForm, constants.FormField.PASSWORD.name)
+    @commonInputText(sendAssetForm, constants.FormField.FROM)
+    @commonInputText(sendAssetForm, constants.FormField.TO)
+    @commonInputText(sendAssetForm, constants.FormField.PEG_HASH)
+    @commonInputInt(sendAssetForm, constants.FormField.GAS)
+    @commonInputText(sendAssetForm, constants.FormField.MODE)
+    @commonInputPassword(sendAssetForm, constants.FormField.PASSWORD)
 }
 

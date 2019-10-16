@@ -4,12 +4,12 @@
 
 @(changeSellerBidForm: Form[ChangeSellerBid.Data] = ChangeSellerBid.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @commonForm(constants.Form.BLOCKCHAIN_CHANGE_SELLER_BID, changeSellerBidForm) {
-    @commonInputText(changeSellerBidForm, constants.FormField.FROM.name)
-    @commonInputText(changeSellerBidForm, constants.FormField.TO.name)
-    @commonInputText(changeSellerBidForm, constants.FormField.BID.name)
-    @commonInputText(changeSellerBidForm, constants.FormField.TIME.name)
-    @commonInputText(changeSellerBidForm, constants.FormField.PEG_HASH.name)
-    @commonInputText(changeSellerBidForm, constants.FormField.GAS.name)
-    @commonInputText(changeSellerBidForm, constants.FormField.MODE.name)
-    @commonInputPassword(changeSellerBidForm, constants.FormField.PASSWORD.name)
+    @commonInputText(changeSellerBidForm, constants.FormField.FROM)
+    @commonInputText(changeSellerBidForm, constants.FormField.TO)
+    @commonInputInt(changeSellerBidForm, constants.FormField.BID)
+    @commonInputInt(changeSellerBidForm, constants.FormField.TIME)
+    @commonInputText(changeSellerBidForm, constants.FormField.PEG_HASH)
+    @commonInputInt(changeSellerBidForm, constants.FormField.GAS)
+    @commonInputText(changeSellerBidForm, constants.FormField.MODE)
+    @commonInputPassword(changeSellerBidForm, constants.FormField.PASSWORD)
 }

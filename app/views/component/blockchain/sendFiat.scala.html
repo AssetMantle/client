@@ -4,11 +4,11 @@
 
 @(sendFiatForm: Form[SendFiat.Data] = SendFiat.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @commonForm(constants.Form.BLOCKCHAIN_SEND_FIAT, sendFiatForm) {
-    @commonInputText(sendFiatForm, constants.FormField.FROM.name)
-    @commonInputText(sendFiatForm, constants.FormField.TO.name)
-    @commonInputText(sendFiatForm, constants.FormField.AMOUNT.name)
-    @commonInputText(sendFiatForm, constants.FormField.PEG_HASH.name)
-    @commonInputText(sendFiatForm, constants.FormField.GAS.name)
-    @commonInputText(sendFiatForm, constants.FormField.MODE.name)
-    @commonInputPassword(sendFiatForm, constants.FormField.PASSWORD.name)
+    @commonInputText(sendFiatForm, constants.FormField.FROM)
+    @commonInputText(sendFiatForm, constants.FormField.TO)
+    @commonInputInt(sendFiatForm, constants.FormField.AMOUNT)
+    @commonInputText(sendFiatForm, constants.FormField.PEG_HASH)
+    @commonInputInt(sendFiatForm, constants.FormField.GAS)
+    @commonInputText(sendFiatForm, constants.FormField.MODE)
+    @commonInputPassword(sendFiatForm, constants.FormField.PASSWORD)
 }

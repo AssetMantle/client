@@ -4,9 +4,9 @@
 
 @(addZoneForm: Form[AddZone.Data] = AddZone.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @commonForm(constants.Form.BLOCKCHAIN_ADD_ZONE, addZoneForm) {
-    @commonInputText(addZoneForm, constants.FormField.FROM.name)
-    @commonInputText(addZoneForm, constants.FormField.TO.name)
-    @commonInputText(addZoneForm, constants.FormField.ZONE_ID.name)
-    @commonRangeSlider(addZoneForm, constants.FormField.GAS)
-    @commonInputPassword(addZoneForm, constants.FormField.PASSWORD.name)
+    @commonInputText(addZoneForm, constants.FormField.FROM)
+    @commonInputText(addZoneForm, constants.FormField.TO)
+    @commonInputText(addZoneForm, constants.FormField.ZONE_ID)
+    @commonInputInt(addZoneForm, constants.FormField.GAS)
+    @commonInputPassword(addZoneForm, constants.FormField.PASSWORD)
 }
