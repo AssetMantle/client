@@ -38,7 +38,7 @@
                     }
                 </div>
                 <div class="cmuk-accordion-content">
-                    <div id="assetList"></div>
+                    <div id="assetList" class="flexContainer"></div>
                         <script type="text/javascript">
                                 var assetCometMessage = function (event) {
                                     console.log(event.toString());
@@ -66,7 +66,7 @@
                 }
             </div>
             <div class="cmuk-accordion-content">
-                <div id="fiatList"></div>
+                <div id="fiatList" class="flexContainer"></div>
                 <script type="text/javascript">
                         var fiatCometMessage = function (event) {
                             console.log(event.toString());
@@ -85,13 +85,13 @@
                     <li>
                         <a class="cmuk-accordion-title" href="#" onclick="fetchOrShowHide('buyNegotiationList', jsRoutes.controllers.ComponentViewController.buyNegotiationList(), this)">@Messages(constants.Form.BUY)</a>
                         <div class="cmuk-accordion-content">
-                            <div id="buyNegotiationList"></div>
+                            <div id="buyNegotiationList" class="flexContainer"></div>
                         </div>
                     </li>
                     <li>
                         <a class="cmuk-accordion-title" href="#" onclick="fetchOrShowHide('sellNegotiationList', jsRoutes.controllers.ComponentViewController.sellNegotiationList(), this)">@Messages(constants.Form.SELL)</a>
                         <div class="cmuk-accordion-content">
-                            <div id="sellNegotiationList"></div>
+                            <div id="sellNegotiationList" class="flexContainer"></div>
                         </div>
                     </li>
 
@@ -99,6 +99,7 @@
             </div>
              <script type="text/javascript">
                 var negotiationCometMessage = function (event) {
+                    console.log(event.toString());
                     componentResource('buyNegotiationList', jsRoutes.controllers.ComponentViewController.buyNegotiationList());
                     componentResource('sellNegotiationList', jsRoutes.controllers.ComponentViewController.sellNegotiationList());
                 }
@@ -138,12 +139,6 @@
                     </li>
                 </ul>
             </div>
-            <script type="text/javascript">
-                    var negotiationCometMessage = function (event) {
-                        componentResource('buyNegotiationList', jsRoutes.controllers.ComponentViewController.buyNegotiationList());
-                        componentResource('sellNegotiationList', jsRoutes.controllers.ComponentViewController.sellNegotiationList());
-                    }
-            </script>
         </li>
     </ul>
     <script>
