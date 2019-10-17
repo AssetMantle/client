@@ -125,12 +125,10 @@
             }
             @for(warning <- warnings) {
                 <div class="cmuk-alert-warning" onclick="getForm(@warning.action)" cmuk-alert>
-                    <a class="cmuk-alert-close" cmuk-close></a>
-                    <p>@Messages(constants.Form.WARNING)
-                        @Messages(warning.message)</p>
+                    <a href="javascript:void(0)" class="cmuk-alert-close" cmuk-close></a>
+                    <p>@Messages(constants.Form.WARNING) @Messages(warning.message)</p>
                 </div>
             }
-
             @for(success <- successes) {
                 <div class="cmuk-alert-success" onclick="getForm(@success.action)" cmuk-alert>
                     <a class="cmuk-alert-close" cmuk-close></a>

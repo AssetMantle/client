@@ -3,18 +3,16 @@
 
 @common(Messages(constants.Form.INDEX))(Html(""))(center)(Html(""))
 
-
 @center = {
-    <div class="flexContainer">
-
-        <div class="flexGrowth box leftText">
-            <div>
-                <h2 class="showHide toggleElement centerText">@Messages(constants.Form.ASSETS) </h2>
+    <ul class="flexContainer" cmuk-accordion>
+        <li>
+            <a class="cmuk-accordion-title" href="#" >@Messages(constants.Form.ASSETS)</a>
+            <div class="cmuk-accordion-content">
+                <div id="availableAssetListWithLogin" class="flexContainer">
+                </div>
             </div>
-            <div id="availableAssetListWithLogin" class="flexContainer">
-            </div>
-        </div>
-    </div>
+        </li>
+    </ul>
     <script>
             componentResource('availableAssetListWithLogin', jsRoutes.controllers.ComponentViewController.availableAssetListWithLogin('@loginState.username'));
     </script>

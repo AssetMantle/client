@@ -6,51 +6,53 @@
 
 @center = {
     <div class="flexContainer">
-        <div id="commonHome" class="box flexItem flexGrowth"></div>
-        <div class="flexGrowth flexItem box leftText">
-            <div>
-                <h2 class="showHide toggleElement centerText">@Messages(constants.Form.ZONE):</h2>
-            </div>
-            <div id="zone">
-            </div>
-        </div>
-        <div class="flexGrowth flexItem box leftText">
-            <div>
-                <h2 class="showHide toggleElement centerText">@Messages(constants.Form.ORGANIZATION):</h2>
-            </div>
-            <div id="organization">
-            </div>
-        </div>
+        <div id="commonHome" class="flexItem flexGrowth"></div>
     </div>
-    <div class="flexContainer">
-        <div class="flexGrowth flexItem box leftText">
-            <div>
-                <h2 class="showHide toggleElement centerText" onclick="fetchOrShowHide('assetList', jsRoutes.controllers.ComponentViewController.assetList(), this)">@Messages(constants.Form.ASSETS_OWNED) </h2>
-                <div class="centerText">
-                @loginState.acl match {
-                    case Some(acl) => {
-                        @if(acl.issueAsset) {
-                            <button onclick="getForm(jsRoutes.controllers.IssueAssetController.issueAssetDetailForm())">@Messages(constants.Form.ISSUE_ASSET_REQUEST.legend)</button>
-                        }
-                    }
-                    case _ => {}
-                }
+    <ul cmuk-accordion="multiple: true" class="flexContainer">
+        <li>
+            <a class="cmuk-accordion-title" href="#">@Messages(constants.Form.ZONE):</a>
+            <div class="cmuk-accordion-content">
+                <div id="organization">
+                </div>
+              </div>
+        </li>
+        <li>
+            <a class="cmuk-accordion-title" href="#">@Messages(constants.Form.ORGANIZATION):</a>
+            <div class="cmuk-accordion-content">
+                <div id="zone">
                 </div>
             </div>
-            <div id="assetList" class="flexContainer"></div>
-            <script type="text/javascript">
-                    var assetCometMessage = function (event) {
-                        console.log(event.toString());
-                        componentResource('assetList', jsRoutes.controllers.ComponentViewController.assetList());
+        </li>
+    </ul>
+     <ul cmuk-accordion class="flexContainer">
+         <li>
+             <a class="cmuk-accordion-title" href="#" onclick="fetchOrShowHide('assetList', jsRoutes.controllers.ComponentViewController.assetList(), this)">@Messages(constants.Form.ASSETS_OWNED)</a>
+                <div class="cmuk-accordion-buttons">
+                    @loginState.acl match {
+                        case Some(acl) => {
+                            @if(acl.issueAsset) {
+                                <button onclick="getForm(jsRoutes.controllers.IssueAssetController.issueAssetDetailForm())">@Messages(constants.Form.ISSUE_ASSET_REQUEST.legend)</button>
+                            }
+                        }
+                        case _ => {}
                     }
-            </script>
-        </div>
-
-        <div class="flexGrowth flexItem box leftText">
-            <div>
-                <h2 class="showHide toggleElement centerText" onclick="fetchOrShowHide('fiatList', jsRoutes.controllers.ComponentViewController.fiatList(), this)">@Messages(constants.Form.FIATS_OWNED)
-                    : <span id="totalFiat">@totalFiat</span></h2>
-                <div class="centerText">
+                </div>
+                <div class="cmuk-accordion-content">
+                    <div id="assetList" class="flexContainer"></div>
+                        <script type="text/javascript">
+                                var assetCometMessage = function (event) {
+                                    console.log(event.toString());
+                                    componentResource('assetList', jsRoutes.controllers.ComponentViewController.assetList());
+                                }
+                        </script>
+                </div>
+          </li>
+    </ul>
+    <ul cmuk-accordion class="flexContainer">
+        <li>
+            <a class="cmuk-accordion-title" href="#" onclick="fetchOrShowHide('fiatList', jsRoutes.controllers.ComponentViewController.fiatList(), this)">@Messages(constants.Form.FIATS_OWNED)
+                : <span id="totalFiat">@totalFiat</span></a>
+            <div class="cmuk-accordion-buttons">
                 @loginState.acl match {
                     case Some(acl) => {
                         @if(acl.issueFiat) {
@@ -62,78 +64,83 @@
                     }
                     case _ => {}
                 }
-                </div>
             </div>
-            <div id="fiatList" class="flexContainer"></div>
-            <script type="text/javascript">
-                    var fiatCometMessage = function (event) {
-                        console.log(event.toString());
-                        $('#totalFiat').html(event);
-                        componentResource('fiatList', jsRoutes.controllers.ComponentViewController.fiatList());
-                    }
-            </script>
-        </div>
-
-        <div class="flexGrowth flexItem box leftText">
-            <div>
-                <h2 class="showHide toggleElement centerText">@Messages(constants.Form.ON_GOING_NEGOTIATIONS)</h2>
-            </div>
-            <div class ="flexContainer">
-                <div class="box">
-                    <div>
-                        <h2 class="showHide toggleElement centerText" onclick="fetchOrShowHide('buyNegotiationList', jsRoutes.controllers.ComponentViewController.buyNegotiationList(), this)">@Messages(constants.Form.BUY)</h2>
-                    </div>
-                    <div id="buyNegotiationList" class ="flexContainer"></div>
-                </div>
-                <div class="box">
-                    <div>
-                        <h2 class="showHide toggleElement centerText" onclick="fetchOrShowHide('sellNegotiationList', jsRoutes.controllers.ComponentViewController.sellNegotiationList(), this)">@Messages(constants.Form.SELL)</h2>
-                    </div>
-                    <div id="sellNegotiationList" class ="flexContainer"></div>
-                </div>
+            <div class="cmuk-accordion-content">
+                <div id="fiatList" class="flexContainer"></div>
                 <script type="text/javascript">
-                        var negotiationCometMessage = function (event) {
+                        var fiatCometMessage = function (event) {
                             console.log(event.toString());
-                            componentResource('buyNegotiationList', jsRoutes.controllers.ComponentViewController.buyNegotiationList());
-                            componentResource('sellNegotiationList', jsRoutes.controllers.ComponentViewController.sellNegotiationList());
+                            $('#totalFiat').html(event);
+                            componentResource('fiatList', jsRoutes.controllers.ComponentViewController.fiatList());
                         }
                 </script>
             </div>
-        </div>
+        </li>
+    </ul>
+    <ul class="flexContainer" cmuk-accordion>
+        <li class="cmuk-open">
+            <a class="cmuk-accordion-title" href="#">@Messages(constants.Form.ON_GOING_NEGOTIATIONS)</a>
+            <div class="cmuk-accordion-content">
+                <ul class="flexContainer" cmuk-accordion="multiple: true">
+                    <li>
+                        <a class="cmuk-accordion-title" href="#" onclick="fetchOrShowHide('buyNegotiationList', jsRoutes.controllers.ComponentViewController.buyNegotiationList(), this)">@Messages(constants.Form.BUY)</a>
+                        <div class="cmuk-accordion-content">
+                            <div id="buyNegotiationList" class="flexContainer"></div>
+                        </div>
+                    </li>
+                    <li>
+                        <a class="cmuk-accordion-title" href="#" onclick="fetchOrShowHide('sellNegotiationList', jsRoutes.controllers.ComponentViewController.sellNegotiationList(), this)">@Messages(constants.Form.SELL)</a>
+                        <div class="cmuk-accordion-content">
+                            <div id="sellNegotiationList" class="flexContainer"></div>
+                        </div>
+                    </li>
 
-        <div class="flexGrowth flexItem box leftText">
-            <div>
-                <h2 class="showHide toggleElement centerText" onclick="fetchOrShowHide('orderList', jsRoutes.controllers.ComponentViewController.orderList(), this)">@Messages(constants.Form.ON_GOING_ORDERS)</h2>
+                </ul>
             </div>
-            <div id="orderList" class="flexContainer"></div>
-            <script type="text/javascript">
-                    var orderCometMessage = function (event) {
-                        console.log(event.toString());
-                        componentResource('orderList', jsRoutes.controllers.ComponentViewController.orderList());
-                    }
+             <script type="text/javascript">
+                var negotiationCometMessage = function (event) {
+                    console.log(event.toString());
+                    componentResource('buyNegotiationList', jsRoutes.controllers.ComponentViewController.buyNegotiationList());
+                    componentResource('sellNegotiationList', jsRoutes.controllers.ComponentViewController.sellNegotiationList());
+                }
             </script>
-        </div>
-
-        <div class="flexGrowth flexItem box leftText">
-            <div>
-                <h2 class="showHide toggleElement centerText">@Messages(constants.Form.SUBMIT_FEEDBACK)</h2>
+        </li>
+    </ul>
+    <ul class="flexContainer" cmuk-accordion>
+        <li>
+            <a class="cmuk-accordion-title" href="#" onclick="fetchOrShowHide('orderList', jsRoutes.controllers.ComponentViewController.orderList(), this)">@Messages(constants.Form.ON_GOING_ORDERS)</a>
+            <div class="cmuk-accordion-content">
+                <div id="orderList" class="flexContainer"></div>
+                <script type="text/javascript">            <script type="text/javascript">
+                var orderCometMessage = function (event) {
+                    console.log(event.toString());
+                    componentResource('orderList', jsRoutes.controllers.ComponentViewController.orderList());
+                }
+                </script>
             </div>
-            <div class ="flexContainer">
-                <div class="box">
-                    <div>
-                        <h2 class="showHide toggleElement centerText" onclick="fetchOrShowHide('setBuyerFeedbackList', jsRoutes.controllers.SetBuyerFeedbackController.buyerFeedbackList(), this)">@Messages(constants.Form.BUY_ORDER_FEEDBACKS)</h2>
-                    </div>
-                    <div id="setBuyerFeedbackList" class="flexContainer"></div>
-                </div>
-                <div class="box">
-                    <div>
-                        <h2 class="showHide toggleElement centerText" onclick="fetchOrShowHide('setSellerFeedbackList', jsRoutes.controllers.SetSellerFeedbackController.sellerFeedbackList(), this)">@Messages(constants.Form.SELL_ORDER_FEEDBACKS)</h2>
-                    </div>
-                    <div id="setSellerFeedbackList" class="flexContainer"></div>
-                </div>
+        </li>
+    </ul>
+    <ul class="flexContainer" cmuk-accordion>
+        <li class="cmuk-open">
+            <a class="cmuk-accordion-title" href="#">@Messages(constants.Form.SUBMIT_FEEDBACK)</a>
+            <div class="cmuk-accordion-content">
+                <ul class="flexContainer" cmuk-accordion="multiple: true">
+                    <li>
+                        <a class="cmuk-accordion-title" href="#" onclick="fetchOrShowHide('setBuyerFeedbackList', jsRoutes.controllers.SetBuyerFeedbackController.buyerFeedbackList(), this)">@Messages(constants.Form.BUY_ORDER_FEEDBACKS)</a>
+                        <div class="cmuk-accordion-content">
+                            <div id="setBuyerFeedbackList" class="flexContainer"></div>
+                        </div>
+                    </li>
+                    <li>
+                        <a class="cmuk-accordion-title" href="#" onclick="fetchOrShowHide('setSellerFeedbackList', jsRoutes.controllers.SetSellerFeedbackController.sellerFeedbackList(), this)">@Messages(constants.Form.SELL_ORDER_FEEDBACKS)</a>
+                        <div class="cmuk-accordion-content">
+                            <div id="setSellerFeedbackList" class="flexContainer"></div>
+                        </div>
+                    </li>
+                </ul>
             </div>
-        </div>
-    </div>
+        </li>
+    </ul>
     <script>
             componentResource('commonHome', jsRoutes.controllers.ComponentViewController.commonHome());
             componentResource('zone', jsRoutes.controllers.ComponentViewController.zoneDetails());
