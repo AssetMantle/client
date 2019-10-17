@@ -752,3 +752,35 @@ dl .info::after {
     padding: 2px 10px;
     border-radius: 4px;
 }
+.cmuk-accordion>:nth-child(n+2){
+    margin-top:0px !important;
+}
+.cmuk-accordion li{
+    margin:0px 20px 10px 20px;
+    background: #009688;
+    flex-grow: 1;
+    padding: 0px;
+    color: #Fff;
+    border-radius: 3px;
+    box-shadow: 0 5px 15px rgba(0,0,0,.08);
+}
+.cmuk-accordion-title{
+    padding: 8px;
+    color:#fff !important;
+}
+.cmuk-accordion-content{
+    margin-top: 0px !important;
+    background: #fff;
+    color: black;
+    padding: 8px;
+}
+.cmuk-accordion-title:focus, .cmuk-accordion-title:hover{
+    color:#fff !important;
+}
+.cmuk-accordion-title::before{
+    background-color:#fff;
+}
+.cmuk-accordion-buttons{
+    background: #fff;
+    padding:10px;
+}
