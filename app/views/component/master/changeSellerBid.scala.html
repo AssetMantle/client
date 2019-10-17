@@ -5,6 +5,7 @@
 
 @(changeSellerBidForm: Form[ChangeSellerBid.Data] = ChangeSellerBid.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @commonForm(constants.Form.CHANGE_SELLER_BID, changeSellerBidForm) {
+    @*//TODO why requestID is hidden and not optional when no default value*@
     @inputText(changeSellerBidForm(constants.FormField.REQUEST_ID.name), '_label -> Messages(constants.FormField.REQUEST_ID.name), 'class -> "form-control hidden", 'placeholder -> Messages(constants.FormField.REQUEST_ID.name), 'required -> false)
     @inputText(changeSellerBidForm(constants.FormField.BUYER_ADDRESS.name), '_label -> Messages(constants.FormField.BUYER_ADDRESS.name), 'class -> "cmuk-input", 'placeholder -> "Buyer Address", 'required -> true)
     @inputText(changeSellerBidForm(constants.FormField.BID.name), '_label -> Messages(constants.FormField.BID.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.BID.name), 'required -> true, 'type -> "number")
