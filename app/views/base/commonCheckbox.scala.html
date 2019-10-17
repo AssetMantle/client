@@ -4,7 +4,7 @@
 
 @(formData: Form[_], formField: BooleanFormField, arguments: (Symbol, Any)*)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, nestedFormField: Option[NestedFormField] = None, field: Option[Field] = None)
 
-<div class='@arguments.toMap.get(constants.View.FIELD_CLASS).map(_.toString).getOrElse("")'>
+<div class='@arguments.toMap.get('overallClass).map(_.toString).getOrElse("")'>
     @Messages(formField.name)
     @defining(Seq('_label -> Messages(formField.name), 'class -> "cmuk-checkbox")) { defaultArguments =>
         @if(field.isDefined) {
