@@ -26,7 +26,7 @@
                     @loginState.acl match {
                         case Some(acl) => {
                             @if(acl.sendFiat) {
-                                <button onclick="getForm(jsRoutes.controllers.SendFiatController.sendFiatForm('@negotiation.sellerAddress', '@negotiation.assetPegHash', @negotiation.bid))">@Messages(constants.Form.SEND_FIAT.legend)</button>
+                                <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.SendFiatController.sendFiatForm('@negotiation.sellerAddress', '@negotiation.assetPegHash', @negotiation.bid))">@Messages(constants.Form.SEND_FIAT.legend)</button>
                             } <br>
                         }
                         case _ => {}

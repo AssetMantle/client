@@ -8,7 +8,7 @@
 @commonForm(constants.Form.ISSUE_ASSET_INVOICE, issueAssetInvoiceForm) {
     <div class="centerText">
         <div id='@Seq("upload", constants.File.INVOICE).mkString("")'>
-            <button onclick="getForm(jsRoutes.controllers.FileController.uploadTraderAssetForm('@constants.File.INVOICE', '@issueAssetInvoiceForm.data(constants.FormField.REQUEST_ID.name)'))">@Messages(constants.Form.UPLOAD) @Messages(constants.File.INVOICE)</button>
+            <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.FileController.uploadTraderAssetForm('@constants.File.INVOICE', '@issueAssetInvoiceForm.data(constants.FormField.REQUEST_ID.name)'))">@Messages(constants.Form.UPLOAD) @Messages(constants.File.INVOICE)</button>
         </div>
         @file match {
     case Some(fileView) => {
@@ -17,7 +17,7 @@
         } {
             <a href="@routes.FileController.tradingFile(fileView.id, fileView.fileName, fileView.documentType)">@Messages(fileView.documentType)</a>
         } {
-            <button onclick="getForm(jsRoutes.controllers.FileController.updateTraderAssetForm('@fileView.documentType', '@fileView.id'))">@Messages(constants.Form.UPDATE) @Messages(fileView.documentType)</button>
+            <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.FileController.updateTraderAssetForm('@fileView.documentType', '@fileView.id'))">@Messages(constants.Form.UPDATE) @Messages(fileView.documentType)</button>
                     <script>hideElement('@Seq("upload", fileView.documentType).mkString("")')</script>
         }
     }

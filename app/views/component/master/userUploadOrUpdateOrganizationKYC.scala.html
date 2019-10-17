@@ -7,7 +7,7 @@
     <h4 >@Messages(constants.Form.ORGANIZATION_KYC_FILES)</h4>
     @for(documentType <- constants.File.ORGANIZATION_KYC_DOCUMENT_TYPES) {
         <div id="upload@documentType">
-            <button onclick="getForm(jsRoutes.controllers.AddOrganizationController.userUploadOrganizationKYCForm('@documentType'))">@Messages(constants.Form.UPLOAD) @Messages(documentType)</button>
+            <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.AddOrganizationController.userUploadOrganizationKYCForm('@documentType'))">@Messages(constants.Form.UPLOAD) @Messages(documentType)</button>
         </div>
     }
     @for(organizationKYC <- organizationKYCs) {
@@ -16,7 +16,7 @@
         } {
             <a href="@routes.FileController.userAccessedOrganizationKYCFile(organizationKYC.documentType)">@Messages(organizationKYC.documentType)</a>
         } {
-            <button onclick="getForm(jsRoutes.controllers.AddOrganizationController.userUpdateOrganizationKYCForm('@organizationKYC.documentType'))">@Messages(constants.Form.UPDATE) @Messages(organizationKYC.documentType)</button>
+            <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.AddOrganizationController.userUpdateOrganizationKYCForm('@organizationKYC.documentType'))">@Messages(constants.Form.UPDATE) @Messages(organizationKYC.documentType)</button>
             <script>hideElement('upload@organizationKYC.documentType')</script>
         }
     }
