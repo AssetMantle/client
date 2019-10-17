@@ -1,9 +1,0 @@
-@import helper._
-@import play.api.data.Field
-@import constants.FormField.DateFormField
-
-@(field: Field, formField: DateFormField, arguments: Seq[(Symbol, Any)] = Seq(), value: Option[String] = None)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
-
-@defining(Seq('_label -> Messages(formField.name), 'placeholder -> Messages(formField.name), 'class -> "cmuk-input", 'required -> true, 'value -> value.getOrElse("")) ++ arguments) { htmlArguments =>
-    @inputDate(field(formField.name), htmlArguments: _*)
-}

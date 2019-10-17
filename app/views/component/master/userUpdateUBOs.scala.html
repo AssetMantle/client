@@ -5,14 +5,17 @@
 
 @(addUBOsForm: Form[AddUBOs.Data] = AddUBOs.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 @commonForm(constants.Form.USER_UPDATE_UBOS, addUBOsForm) {
-    @repeatWithIndex(addUBOsForm(constants.Form.UBOS), min = addUBOsForm(constants.Form.UBOS).indexes.length + 1) { (uboFormField, i) =>
-        <div id='@Seq(constants.Form.UBOS, i).mkString("_")'>
-            @commonSequenceInputText(uboFormField, constants.FormField.PERSON_NAME)
-            @commonSequenceInputDouble(uboFormField, constants.FormField.SHARE_PERCENTAGE)
-            @commonSequenceInputText(uboFormField, constants.FormField.RELATIONSHIP)
-            @commonSequenceInputText(uboFormField, constants.FormField.TITLE)
-            <button type="button" class="cmuk-button cmuk-button-link" onclick="deleteElementBySource(this)">@Messages(constants.Form.DELETE)</button>
-        </div>
+    @repeatWithIndex(addUBOsForm(constants.Form.UBOS), min = addUBOsForm(constants.Form.UBOS).indexes.length + 1) { (uboForm, i) =>
+        @defining(Option(uboForm)) { implicit uboFormField =>
+            <div id='@Seq(constants.Form.UBOS, i).mkString("_")'>
+                @commonInputText(addUBOsForm, constants.FormField.PERSON_NAME)
+                @commonInputDouble(addUBOsForm, constants.FormField.SHARE_PERCENTAGE)
+                @commonInputText(addUBOsForm, constants.FormField.RELATIONSHIP)
+                @commonInputText(addUBOsForm, constants.FormField.TITLE)
+                <button type="button" class="cmuk-button cmuk-button-link" onclick="deleteElementBySource(this)">@Messages(constants.Form.DELETE)</button>
+            </div>
+        }
+
     }
 }
 <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.AddOrganizationController.addOrganizationForm())">@Messages(constants.Form.BACK)</button>

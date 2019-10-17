@@ -13,7 +13,7 @@
     @commonInputInt(issueAssetForm, constants.FormField.ASSET_QUANTITY)
     @commonCheckbox(issueAssetForm, constants.FormField.MODERATED)
     @commonInputInt(issueAssetForm, constants.FormField.GAS)
-    @commonInputText(issueAssetForm, constants.FormField.TAKER_ADDRESS, arguments = Seq('required -> false))
+    @commonInputText(issueAssetForm, constants.FormField.TAKER_ADDRESS, 'required -> false)
     @commonInputText(issueAssetForm, constants.FormField.MODE)
     @commonInputPassword(issueAssetForm, constants.FormField.PASSWORD)
 }

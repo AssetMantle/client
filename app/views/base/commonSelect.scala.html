@@ -1,8 +1,13 @@
-@import helper._
 @import constants.FormField.SelectFormField
+@import helper._
+@import play.api.data.Field
 
-@(formData: Form[_], formField: SelectFormField, arguments: Seq[(Symbol, Any)] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(formData: Form[_], formField: SelectFormField, arguments: (Symbol, Any)*)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, field: Option[Field] = None)
 
-@defining( Seq('_label -> Messages(formField.name), 'placeholder -> Messages(formField.name), 'class -> "cmuk-input", 'required -> true) ++ arguments ) { htmlArguments =>
-    @select(formData(formField.name), for(option <- formField.options) yield (option, Messages(option)), htmlArguments: _*)
+@defining(Seq('_label -> Messages(formField.name), 'placeholder -> Messages(formField.name), 'class -> "cmuk-input", 'required -> true)) { defaultArguments =>
+    @if(field.isDefined) {
+        @select(field.get.apply(formField.name), for(option <- formField.options) yield (option, Messages(option)), defaultArguments ++ arguments: _*)
+    } else {
+        @select(formData(if(arguments.toMap.get(constants.View.NESTED_PREFIX).isDefined) Seq(arguments.toMap.get(constants.View.NESTED_PREFIX).map(_.toString).get, formField.name).mkString(".") else formField.name), for(option <- formField.options) yield (option, Messages(option)), defaultArguments ++ arguments: _*)
+    }
 }

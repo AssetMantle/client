@@ -9,7 +9,7 @@ $(document).ready(function () {
             $('#POSTAL_ADDRESS_ZIP_CODE').val("");
             $('#POSTAL_ADDRESS_PHONE').val("");
         } else {
-            $('#POSTAL_ADDRESS_ADDRESS_LINE_1').val($('#REGISTERED_ADDRESS_PHONE').val());
+            $('#POSTAL_ADDRESS_ADDRESS_LINE_1').val($('#REGISTERED_ADDRESS_ADDRESS_LINE_1').val());
             $('#POSTAL_ADDRESS_ADDRESS_LINE_2').val($('#REGISTERED_ADDRESS_ADDRESS_LINE_2').val());
             $('#POSTAL_ADDRESS_LANDMARK').val($('#REGISTERED_ADDRESS_LANDMARK').val());
             $('#POSTAL_ADDRESS_CITY').val($('#REGISTERED_ADDRESS_CITY').val());
