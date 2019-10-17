@@ -14,9 +14,7 @@ h2 {
 input, select {
     width: 100%;
     padding: 10px;
-    background: #e2e2e2;
 }
-
 
 input:focus {
     background-color: #ddd;
