@@ -1,5 +1,4 @@
 @import controllers.actions.LoginState
-@import helper._
 @import views.html.base._
 @import views.companion.master.ConfirmBidTransaction
 @import models.masterTransaction.NegotiationRequest
@@ -22,8 +21,8 @@
         }
     }
     @*//TODO why requestID is hidden and not optional when no default value*@
-    @inputText(confirmBidTransactionForm(constants.FormField.REQUEST_ID.name), '_label -> Messages(constants.FormField.REQUEST_ID.name), 'class -> "form-control hidden", 'placeholder -> Messages(constants.FormField.REQUEST_ID.name), 'required -> false)
-    @inputText(confirmBidTransactionForm(constants.FormField.TIME.name), '_label -> Messages(constants.FormField.TIME.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.TIME.name), 'type -> "number", 'required -> true)
-    @inputText(confirmBidTransactionForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.GAS.name), 'type -> "number", 'required -> true)
-    @inputPassword(confirmBidTransactionForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PASSWORD.name), 'required -> true)
+    @commonInputText(confirmBidTransactionForm, constants.FormField.REQUEST_ID)
+    @commonInputInt(confirmBidTransactionForm, constants.FormField.TIME)
+    @commonInputInt(confirmBidTransactionForm, constants.FormField.GAS)
+    @commonInputPassword(confirmBidTransactionForm, constants.FormField.PASSWORD)
 }

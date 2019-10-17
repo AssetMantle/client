@@ -1,22 +1,22 @@
 @import controllers.actions.LoginState
-@import helper._
 @import views.html.base._
+@import helper._
 @import models.master.TraderKYC
 @import views.companion.master.UpdateTraderKYCDocumentZoneStatus
 
-@(updateTraderKYCDocumentZoneStatus: Form[UpdateTraderKYCDocumentZoneStatus.Data] = views.companion.master.UpdateTraderKYCDocumentZoneStatus.form, traderKYC: TraderKYC)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@(updateTraderKYCDocumentZoneStatusForm: Form[UpdateTraderKYCDocumentZoneStatus.Data] = views.companion.master.UpdateTraderKYCDocumentZoneStatus.form, traderKYC: TraderKYC)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 
 <script src="@routes.Assets.versioned("javascripts/verifyReject.js")" type="text/javascript"></script>
 <div id="@Seq(traderKYC.id, traderKYC.documentType).mkString("")">
 @form(action = routes.SetACLController.updateTraderKYCDocumentZoneStatus, 'onkeypress -> "submitFormOnEnter(event,this)") {
     @CSRF.formField
-    @inputText(updateTraderKYCDocumentZoneStatus(constants.FormField.TRADER_ID.name).copy(value = Some(traderKYC.id)), '_label -> Messages(constants.FormField.TRADER_ID.name), 'placeholder -> Messages(constants.FormField.TRADER_ID.name), 'required -> true, 'class -> "hidden", 'readonly -> true)
-    @inputText(updateTraderKYCDocumentZoneStatus(constants.FormField.DOCUMENT_TYPE.name).copy(value = Some(traderKYC.documentType)), '_label -> Messages(constants.FormField.DOCUMENT_TYPE.name), 'placeholder -> Messages(constants.FormField.DOCUMENT_TYPE.name), 'required -> true, 'class -> "hidden", 'readonly -> true)
-    @checkbox(updateTraderKYCDocumentZoneStatus(constants.Form.ZONE_STATUS), '_label -> Messages(constants.Form.ZONE_STATUS), 'placeholder -> Messages(constants.Form.ZONE_STATUS), 'required -> true, 'class -> "hidden", 'id -> Seq(traderKYC.id, traderKYC.documentType, constants.FormField.STATUS.name).mkString(""))
+    @commonInputText(updateTraderKYCDocumentZoneStatusForm, constants.FormField.TRADER_ID, 'value -> traderKYC.id, 'class -> "hidden", 'readonly -> true)
+    @commonInputText(updateTraderKYCDocumentZoneStatusForm, constants.FormField.DOCUMENT_TYPE, 'value -> traderKYC.documentType, 'class -> "hidden", 'readonly -> true)
+    @commonCheckbox(updateTraderKYCDocumentZoneStatusForm, constants.FormField.STATUS), 'class -> "hidden", 'id -> Seq(traderKYC.id, traderKYC.documentType, constants.FormField.STATUS.name).mkString(""))
 
-    @if(updateTraderKYCDocumentZoneStatus.hasGlobalErrors) {
+    @if(updateTraderKYCDocumentZoneStatusForm.hasGlobalErrors) {
         <ul>
-        @for(error <- updateTraderKYCDocumentZoneStatus.globalErrors) {
+        @for(error <- updateTraderKYCDocumentZoneStatusForm.globalErrors) {
             <li>@error.format</li>
         }
         </ul>

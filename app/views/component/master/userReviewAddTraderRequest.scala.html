@@ -1,5 +1,4 @@
 @import controllers.actions.LoginState
-@import helper._
 @import models.master.{Organization, Trader, TraderKYC, Zone}
 @import play.api.Logger
 @import views.companion.master.ReviewAddTraderRequest
@@ -36,7 +35,6 @@
         }
     </div>
     <br>
-    @Messages(constants.FormField.COMPLETION.name):
-    <span>@checkbox(userReviewAddTraderRequestForm(constants.FormField.COMPLETION.name), '_label -> Messages(constants.FormField.COMPLETION.name), 'placeholder -> Messages(constants.FormField.COMPLETION.name), 'class -> "cmuk-checkbox", 'required -> true)</span>
+    @commonCheckbox(userReviewAddTraderRequestForm, constants.FormField.COMPLETION)
     <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.SetACLController.userUploadOrUpdateTraderKYCView())">@Messages(constants.Form.BACK)</button>
 }

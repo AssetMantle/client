@@ -1,9 +1,8 @@
 @import controllers.actions.LoginState
-@import helper._
 @import views.html.base._
 @import views.companion.master.RejectVerifyOrganizationRequest
 
 @(rejectVerifyOrganizationRequestForm: Form[RejectVerifyOrganizationRequest.Data] = RejectVerifyOrganizationRequest.form, organizationID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @commonForm(constants.Form.REJECT_VERIFY_ORGANIZATION_REQUEST, rejectVerifyOrganizationRequestForm) {
-    @inputText(rejectVerifyOrganizationRequestForm(constants.FormField.ORGANIZATION_ID.name).copy(value = Some(organizationID)), '_label -> Messages(constants.FormField.ORGANIZATION_ID.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.ORGANIZATION_ID.name), 'required -> true)
+    @commonInputText(rejectVerifyOrganizationRequestForm, constants.FormField.ORGANIZATION_ID, 'value -> organizationID))
 }

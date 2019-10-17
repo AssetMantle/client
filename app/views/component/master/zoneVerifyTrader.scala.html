@@ -1,68 +1,25 @@
 @import controllers.actions.LoginState
-@import helper._
 @import views.html.base._
 @import views.companion.master.VerifyTrader
 
 @(verifyTraderForm: Form[VerifyTrader.Data] = VerifyTrader.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @commonForm(constants.Form.ZONE_VERIFY_TRADER, verifyTraderForm) {
-    @inputText(verifyTraderForm(constants.FormField.ACCOUNT_ID.name), '_label -> Messages(constants.FormField.ACCOUNT_ID.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.ACCOUNT_ID.name), 'required -> true)
-    @inputText(verifyTraderForm(constants.FormField.ORGANIZATION_ID.name), '_label -> Messages(constants.FormField.ORGANIZATION_ID.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.ORGANIZATION_ID.name), 'required -> true)
-    <span>
-        @Messages(constants.FormField.ISSUE_ASSET.name)
-        @checkbox(verifyTraderForm(constants.FormField.ISSUE_ASSET.name), '_label -> Messages(constants.FormField.ISSUE_ASSET.name), 'class -> "cmuk-checkbox")
-    </span>
-    <span>
-        @Messages(constants.FormField.ISSUE_FIAT.name)
-        @checkbox(verifyTraderForm(constants.FormField.ISSUE_FIAT.name), '_label -> Messages(constants.FormField.ISSUE_FIAT.name), 'class -> "cmuk-checkbox")
-    </span>
-    <span>
-        @Messages(constants.FormField.SEND_ASSET.name)
-        @checkbox(verifyTraderForm(constants.FormField.SEND_ASSET.name), '_label -> Messages(constants.FormField.SEND_ASSET.name), 'class -> "cmuk-checkbox")
-    </span>
-    <span>
-        @Messages(constants.FormField.SEND_FIAT.name)
-        @checkbox(verifyTraderForm(constants.FormField.SEND_FIAT.name), '_label -> Messages(constants.FormField.SEND_FIAT.name), 'class -> "cmuk-checkbox")
-    </span>
-    <span>
-        @Messages(constants.FormField.REDEEM_ASSET.name)
-        @checkbox(verifyTraderForm(constants.FormField.REDEEM_ASSET.name), '_label -> Messages(constants.FormField.REDEEM_ASSET.name), 'class -> "cmuk-checkbox")
-    </span>
-    <span>
-        @Messages(constants.FormField.REDEEM_FIAT.name)
-        @checkbox(verifyTraderForm(constants.FormField.REDEEM_FIAT.name), '_label -> Messages(constants.FormField.REDEEM_FIAT.name), 'class -> "cmuk-checkbox")
-    </span>
-    <span>
-        @Messages(constants.FormField.SELLER_EXECUTE_ORDER.name)
-        @checkbox(verifyTraderForm(constants.FormField.SELLER_EXECUTE_ORDER.name), '_label -> Messages(constants.FormField.SELLER_EXECUTE_ORDER.name), 'class -> "cmuk-checkbox")
-    </span>
-    <span>
-        @Messages(constants.FormField.BUYER_EXECUTE_ORDER.name)
-        @checkbox(verifyTraderForm(constants.FormField.BUYER_EXECUTE_ORDER.name), '_label -> Messages(constants.FormField.BUYER_EXECUTE_ORDER.name), 'class -> "cmuk-checkbox")
-    </span>
-    <span>
-        @Messages(constants.FormField.CHANGE_BUYER_BID.name)
-        @checkbox(verifyTraderForm(constants.FormField.CHANGE_BUYER_BID.name), '_label -> Messages(constants.FormField.CHANGE_BUYER_BID.name), 'class -> "cmuk-checkbox")
-    </span>
-    <span>
-        @Messages(constants.FormField.CHANGE_SELLER_BID.name)
-        @checkbox(verifyTraderForm(constants.FormField.CHANGE_SELLER_BID.name), '_label -> Messages(constants.FormField.CHANGE_SELLER_BID.name), 'class -> "cmuk-checkbox")
-    </span>
-    <span>
-        @Messages(constants.FormField.CONFIRM_BUYER_BID.name)
-        @checkbox(verifyTraderForm(constants.FormField.CONFIRM_BUYER_BID.name), '_label -> Messages(constants.FormField.CONFIRM_BUYER_BID.name), 'class -> "cmuk-checkbox")
-    </span>
-    <span>
-        @Messages(constants.FormField.CONFIRM_SELLER_BID.name)
-        @checkbox(verifyTraderForm(constants.FormField.CONFIRM_SELLER_BID.name), '_label -> Messages(constants.FormField.CONFIRM_SELLER_BID.name), 'class -> "cmuk-checkbox")
-    </span>
-    <span>
-        @Messages(constants.FormField.NEGOTIATION.name)
-        @checkbox(verifyTraderForm(constants.FormField.NEGOTIATION.name), '_label -> Messages(constants.FormField.NEGOTIATION.name), 'class -> "cmuk-checkbox")
-    </span>
-    <span>
-        @Messages(constants.FormField.RELEASE_ASSET.name)
-        @checkbox(verifyTraderForm(constants.FormField.RELEASE_ASSET.name), '_label -> Messages(constants.FormField.RELEASE_ASSET.name), 'class -> "cmuk-checkbox")
-    </span>
-    @inputText(verifyTraderForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.GAS.name), 'required -> true)
-    @inputPassword(verifyTraderForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PASSWORD.name), 'required -> true)
+    @commonInputText(verifyTraderForm, constants.FormField.ACCOUNT_ID)
+    @commonInputText(verifyTraderForm, constants.FormField.ORGANIZATION_ID)
+    @commonCheckbox(verifyTraderForm, constants.FormField.ISSUE_ASSET)
+    @commonCheckbox(verifyTraderForm, constants.FormField.ISSUE_FIAT)
+    @commonCheckbox(verifyTraderForm, constants.FormField.SEND_ASSET)
+    @commonCheckbox(verifyTraderForm, constants.FormField.SEND_FIAT)
+    @commonCheckbox(verifyTraderForm, constants.FormField.REDEEM_ASSET)
+    @commonCheckbox(verifyTraderForm, constants.FormField.REDEEM_FIAT)
+    @commonCheckbox(verifyTraderForm, constants.FormField.SELLER_EXECUTE_ORDER)
+    @commonCheckbox(verifyTraderForm, constants.FormField.BUYER_EXECUTE_ORDER)
+    @commonCheckbox(verifyTraderForm, constants.FormField.CHANGE_BUYER_BID)
+    @commonCheckbox(verifyTraderForm, constants.FormField.CHANGE_SELLER_BID)
+    @commonCheckbox(verifyTraderForm, constants.FormField.CONFIRM_BUYER_BID)
+    @commonCheckbox(verifyTraderForm, constants.FormField.CONFIRM_SELLER_BID)
+    @commonCheckbox(verifyTraderForm, constants.FormField.NEGOTIATION)
+    @commonCheckbox(verifyTraderForm, constants.FormField.RELEASE_ASSET)
+    @commonInputInt(verifyTraderForm, constants.FormField.GAS)
+    @commonInputPassword(verifyTraderForm, constants.FormField.PASSWORD)
 }

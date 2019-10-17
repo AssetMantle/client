@@ -1,8 +1,8 @@
 @import controllers.actions.LoginState
-@import helper._
 @import views.html.base._
 @import models.masterTransaction.AssetFile
 @import views.companion.master.UpdateAssetDocumentStatus
+@import helper._
 
 @(updateAssetDocumentStatusForm: Form[UpdateAssetDocumentStatus.Data] = views.companion.master.UpdateAssetDocumentStatus.form, file: AssetFile)( implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 
@@ -10,9 +10,9 @@
 <div id="@Seq(file.id, file.documentType).mkString("")">
 @form(action = routes.IssueAssetController.updateAssetDocumentStatus, 'onkeypress -> "submitFormOnEnter(event,this)") {
     @CSRF.formField
-    @inputText(updateAssetDocumentStatusForm(constants.FormField.FILE_ID.name).copy(value = Some(file.id)), '_label -> Messages(constants.FormField.FILE_ID.name), 'placeholder -> Messages(constants.FormField.FILE_ID.name), 'required -> true, 'class -> "hidden", 'readonly -> true)
-    @inputText(updateAssetDocumentStatusForm(constants.FormField.DOCUMENT_TYPE.name).copy(value = Some(file.documentType)), '_label -> Messages(constants.FormField.DOCUMENT_TYPE.name), 'placeholder -> Messages(constants.FormField.DOCUMENT_TYPE.name), 'required -> true, 'class -> "hidden", 'readonly -> true)
-    @checkbox(updateAssetDocumentStatusForm(constants.FormField.STATUS.name), '_label -> Messages(constants.FormField.STATUS.name), 'placeholder -> Messages(constants.FormField.STATUS.name), 'required -> true, 'class -> "hidden", 'id -> Seq(file.id, file.documentType, constants.FormField.STATUS.name).mkString(""))
+    @commonInputText(updateAssetDocumentStatusForm, constants.FormField.FILE_ID, 'value -> file.id, 'class -> "hidden", 'readonly -> true)
+    @commonInputText(updateAssetDocumentStatusForm, constants.FormField.DOCUMENT_TYPE, 'value -> file.documentType, 'class -> "hidden", 'readonly -> true)
+    @commonCheckbox(updateAssetDocumentStatusForm, constants.FormField.STATUS, 'class -> "hidden", 'id -> Seq(file.id, file.documentType, constants.FormField.STATUS.name).mkString(""))
 
     @if(updateAssetDocumentStatusForm.hasGlobalErrors) {
         <ul>
