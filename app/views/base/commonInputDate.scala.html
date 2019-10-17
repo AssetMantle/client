@@ -1,13 +1,13 @@
-@import constants.FormField.DateFormField
+@import constants.FormField.{DateFormField, NestedFormField}
 @import helper._
 @import play.api.data.Field
 
-@(formData: Form[_], formField: DateFormField, arguments: (Symbol, Any)*)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, field: Option[Field] = None)
+@(formData: Form[_], formField: DateFormField, arguments: (Symbol, Any)*)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, nestedFormField: Option[NestedFormField] = None, field: Option[Field] = None)
 
 @defining(Seq('_label -> Messages(formField.name), 'placeholder -> Messages(formField.name), 'class -> "cmuk-input", 'required -> true)) { defaultArguments =>
     @if(field.isDefined) {
         @inputDate(field.get.apply(formField.name), defaultArguments ++ arguments: _*)
     } else {
-        @inputDate(formData(if (arguments.toMap.get(constants.View.NESTED_PREFIX).isDefined) Seq(arguments.toMap.get(constants.View.NESTED_PREFIX).map(_.toString).get, formField.name).mkString(".") else formField.name), defaultArguments ++ arguments: _*)
+        @inputDate(formData(if (nestedFormField.isDefined) Seq(nestedFormField.get.name, formField.name).mkString(".") else formField.name), defaultArguments ++ arguments: _*)
     }
 }

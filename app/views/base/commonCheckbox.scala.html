@@ -1,8 +1,8 @@
-@import constants.FormField.BooleanFormField
+@import constants.FormField.{BooleanFormField, NestedFormField}
 @import helper._
 @import play.api.data.Field
 
-@(formData: Form[_], formField: BooleanFormField, arguments: (Symbol, Any)*)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, field: Option[Field] = None)
+@(formData: Form[_], formField: BooleanFormField, arguments: (Symbol, Any)*)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, nestedFormField: Option[NestedFormField] = None, field: Option[Field] = None)
 
 <div class='@arguments.toMap.get(constants.View.FIELD_CLASS).map(_.toString).getOrElse("")'>
     @Messages(formField.name)
@@ -10,7 +10,7 @@
         @if(field.isDefined) {
             @checkbox(field.get.apply(formField.name), defaultArguments ++ arguments: _*)
         } else {
-            @checkbox(formData(if (arguments.toMap.get(constants.View.NESTED_PREFIX).isDefined) Seq(arguments.toMap.get(constants.View.NESTED_PREFIX).map(_.toString).get, formField.name).mkString(".") else formField.name), defaultArguments ++ arguments: _*)
+            @checkbox(formData(if(nestedFormField.isDefined) Seq(nestedFormField.get.name, formField.name).mkString(".") else formField.name), defaultArguments ++ arguments: _*)
         }
     }
 </div>

@@ -1,13 +1,13 @@
-@import constants.FormField.IntFormField
+@import constants.FormField.{IntFormField, NestedFormField}
 @import helper._
 @import play.api.data.Field
 
-@(formData: Form[_], formField: IntFormField, arguments: (Symbol, Any)*)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, field: Option[Field] = None)
+@(formData: Form[_], formField: IntFormField, arguments: (Symbol, Any)*)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, nestedFormField: Option[NestedFormField] = None, field: Option[Field] = None)
 
 @defining(Seq('type -> "number", '_label -> Messages(formField.name), 'placeholder -> Messages(formField.name), 'min -> formField.minimumValue, 'max -> formField.maximumValue, 'class -> "cmuk-input", 'required -> true)) { defaultArguments =>
     @if(field.isDefined) {
         @inputText(field.get.apply(formField.name), defaultArguments ++ arguments: _*)
     } else {
-        @inputText(formData(if(arguments.toMap.get(constants.View.NESTED_PREFIX).isDefined) Seq(arguments.toMap.get(constants.View.NESTED_PREFIX).map(_.toString).get, formField.name).mkString(".") else formField.name), defaultArguments ++ arguments: _*)
+        @inputText(formData(if(nestedFormField.isDefined) Seq(nestedFormField.get.name, formField.name).mkString(".") else formField.name), defaultArguments ++ arguments: _*)
     }
 }

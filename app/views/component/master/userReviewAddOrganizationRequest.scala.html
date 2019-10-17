@@ -20,23 +20,23 @@
         <span class="red">@Messages(constants.Form.EMAIL)</span>: @organization.email <br>
     </div>
     <br>
-    <div>@Messages(constants.Form.REGISTERED_ADDRESS) : <br>
-        <span class="red">@Messages(constants.Form.ADDRESS_LINE_1)</span>: @organization.registeredAddress.addressLine1 <br>
-        <span class="red">@Messages(constants.Form.ADDRESS_LINE_2)</span>: @organization.registeredAddress.addressLine2 <br>
-        <span class="red">@Messages(constants.Form.LANDMARK)</span>: @organization.registeredAddress.landmark.getOrElse("") <br>
-        <span class="red">@Messages(constants.Form.CITY)</span>: @organization.registeredAddress.city <br>
-        <span class="red">@Messages(constants.Form.COUNTRY)</span>: @organization.registeredAddress.country <br>
-        <span class="red">@Messages(constants.Form.ZIP_CODE)</span>: @organization.registeredAddress.zipCode <br>
+    <div>@Messages(constants.FormField.REGISTERED_ADDRESS.name) : <br>
+        <span class="red">@Messages(constants.FormField.ADDRESS_LINE_1.name)</span>: @organization.registeredAddress.addressLine1 <br>
+        <span class="red">@Messages(constants.FormField.ADDRESS_LINE_2.name)</span>: @organization.registeredAddress.addressLine2 <br>
+        <span class="red">@Messages(constants.FormField.LANDMARK.name)</span>: @organization.registeredAddress.landmark.getOrElse("") <br>
+        <span class="red">@Messages(constants.FormField.CITY.name)</span>: @organization.registeredAddress.city <br>
+        <span class="red">@Messages(constants.FormField.COUNTRY.name)</span>: @organization.registeredAddress.country <br>
+        <span class="red">@Messages(constants.FormField.ZIP_CODE.name)</span>: @organization.registeredAddress.zipCode <br>
         <span class="red">@Messages(constants.Form.PHONE)</span>: @organization.registeredAddress.phone
     </div>
     <br>
-    <div>@Messages(constants.Form.POSTAL_ADDRESS) : <br>
-        <span class="red">@Messages(constants.Form.ADDRESS_LINE_1)</span>: @organization.postalAddress.addressLine1 <br>
-        <span class="red">@Messages(constants.Form.ADDRESS_LINE_2)</span>: @organization.postalAddress.addressLine2 <br>
-        <span class="red">@Messages(constants.Form.LANDMARK)</span>: @organization.postalAddress.landmark.getOrElse("") <br>
-        <span class="red">@Messages(constants.Form.CITY)</span>: @organization.postalAddress.city <br>
-        <span class="red">@Messages(constants.Form.COUNTRY)</span>: @organization.postalAddress.country <br>
-        <span class="red">@Messages(constants.Form.ZIP_CODE)</span>: @organization.postalAddress.zipCode <br>
+    <div>@Messages(constants.FormField.POSTAL_ADDRESS.name) : <br>
+        <span class="red">@Messages(constants.FormField.ADDRESS_LINE_1.name)</span>: @organization.postalAddress.addressLine1 <br>
+        <span class="red">@Messages(constants.FormField.ADDRESS_LINE_2.name)</span>: @organization.postalAddress.addressLine2 <br>
+        <span class="red">@Messages(constants.FormField.LANDMARK.name)</span>: @organization.postalAddress.landmark.getOrElse("") <br>
+        <span class="red">@Messages(constants.FormField.CITY.name)</span>: @organization.postalAddress.city <br>
+        <span class="red">@Messages(constants.FormField.COUNTRY.name)</span>: @organization.postalAddress.country <br>
+        <span class="red">@Messages(constants.FormField.ZIP_CODE.name)</span>: @organization.postalAddress.zipCode <br>
         <span class="red">@Messages(constants.Form.PHONE)</span>: @organization.postalAddress.phone
     </div>
     <br>
@@ -56,8 +56,8 @@
         <span class="red">@Messages(constants.Form.BANK_NAME)</span>: @organizationBankAccountDetail.bankName <br>
         <span class="red">@Messages(constants.Form.SWIFT_CODE)</span>: @organizationBankAccountDetail.swiftAddress <br>
         <span class="red">@Messages(constants.Form.BANK_ADDRESS)</span>: @organizationBankAccountDetail.swiftAddress <br>
-        <span class="red">@Messages(constants.Form.COUNTRY)</span>: @organizationBankAccountDetail.country <br>
-        <span class="red">@Messages(constants.Form.ZIP_CODE)</span>: @organizationBankAccountDetail.zipCode <br>
+        <span class="red">@Messages(constants.FormField.COUNTRY.name)</span>: @organizationBankAccountDetail.country <br>
+        <span class="red">@Messages(constants.FormField.ZIP_CODE.name)</span>: @organizationBankAccountDetail.zipCode <br>
     </div>
     <br>
     <div id="organizationKYCs">@Messages(constants.Form.ORGANIZATION_KYC_FILES): <br>

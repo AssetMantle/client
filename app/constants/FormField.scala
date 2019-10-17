@@ -143,6 +143,10 @@ object FormField {
   val CONFIRM_NOTE_NEW_KEY_DETAILS = new BooleanFormField("CONFIRM_NOTE_NEW_KEY_DETAILS")
   val SAME_AS_REGISTERED_ADDRESS = new BooleanFormField("SAME_AS_REGISTERED_ADDRESS")
 
+  //NestedFormField
+  val REGISTERED_ADDRESS = new NestedFormField("REGISTERED_ADDRESS")
+  val POSTAL_ADDRESS = new NestedFormField("POSTAL_ADDRESS")
+
   //TODO: Error Response through Messages
   class StringFormField (fieldName: String, minimumLength: Int, maximumLength: Int, regex: Regex = RegularExpression.ANY_STRING, errorMessage: String = "Error Response") {
     val name: String = fieldName
@@ -172,5 +176,9 @@ object FormField {
   class BooleanFormField(fieldName: String) {
     val name: String = fieldName
     val field: Mapping[Boolean] = boolean
+  }
+
+  class NestedFormField(fieldName: String) {
+    val name: String = fieldName
   }
 }
