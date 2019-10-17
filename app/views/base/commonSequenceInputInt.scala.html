@@ -1,8 +1,9 @@
 @import helper._
+@import play.api.data.Field
 @import constants.FormField.IntFormField
 
-@(formData: Form[_], formField: IntFormField, arguments: Seq[(Symbol, Any)] = Seq(), value: Option[String] = None)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(field: Field, formField: IntFormField, arguments: Seq[(Symbol, Any)] = Seq(), value: Option[String] = None)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
 @defining(Seq('type -> "number", '_label -> Messages(formField.name), 'placeholder -> Messages(formField.name), 'min -> formField.minimumValue, 'max -> formField.maximumValue, 'class -> "cmuk-input", 'required -> true, 'value -> value.getOrElse("")) ++ arguments) {htmlArguments =>
-    @inputText(formData(formField.name), htmlArguments: _*)
+    @inputText(field(formField.name), htmlArguments: _*)
 }

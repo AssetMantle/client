@@ -1,0 +1,9 @@
+@import helper._
+@import play.api.data.Field
+@import constants.FormField.SelectFormField
+
+@(field: Field, formField: SelectFormField, arguments: Seq[(Symbol, Any)] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+
+@defining( Seq('_label -> Messages(formField.name), 'placeholder -> Messages(formField.name), 'class -> "cmuk-input", 'required -> true) ++ arguments ) { htmlArguments =>
+    @select(field(formField.name), for(option <- formField.options) yield (option, Messages(option)), htmlArguments: _*)
+}

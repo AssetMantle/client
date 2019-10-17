@@ -1,25 +1,25 @@
 $(document).ready(function () {
-    $('#organizationKYCSameAsRegisteredAddress').click(function () {
+    $('#SAME_AS_REGISTERED_ADDRESS').click(function () {
         if ($(this).prop("checked") === false) {
-            $('#postalAddressLine1').val("");
-            $('#postalAddressLine2').val("");
-            $('#postalLandmark').val("");
-            $('#postalCity').val("");
-            $('#postalCountry').val("");
-            $('#postalZipCode').val("");
-            $('#postalPhone').val("");
+            $('#POSTAL_ADDRESS_ADDRESS_LINE_1').val("");
+            $('#POSTAL_ADDRESS_ADDRESS_LINE_2').val("");
+            $('#POSTAL_ADDRESS_LANDMARK').val("");
+            $('#POSTAL_ADDRESS_CITY').val("");
+            $('#POSTAL_ADDRESS_COUNTRY').val("");
+            $('#POSTAL_ADDRESS_ZIP_CODE').val("");
+            $('#POSTAL_ADDRESS_PHONE').val("");
         } else {
-            $('#postalAddressLine1').val($('#registeredAddressLine1').val());
-            $('#postalAddressLine2').val($('#registeredAddressLine2').val());
-            $('#postalLandmark').val($('#registeredLandmark').val());
-            $('#postalCity').val($('#registeredCity').val());
-            $('#postalCountry').val($('#registeredCountry').val());
-            $('#postalZipCode').val($('#registeredZipCode').val());
-            $('#postalPhone').val($('#registeredPhone').val());
+            $('#POSTAL_ADDRESS_ADDRESS_LINE_1').val($('#REGISTERED_ADDRESS_PHONE').val());
+            $('#POSTAL_ADDRESS_ADDRESS_LINE_2').val($('#REGISTERED_ADDRESS_ADDRESS_LINE_2').val());
+            $('#POSTAL_ADDRESS_LANDMARK').val($('#REGISTERED_ADDRESS_LANDMARK').val());
+            $('#POSTAL_ADDRESS_CITY').val($('#REGISTERED_ADDRESS_CITY').val());
+            $('#POSTAL_ADDRESS_COUNTRY').val($('#REGISTERED_ADDRESS_COUNTRY').val());
+            $('#POSTAL_ADDRESS_ZIP_CODE').val($('#REGISTERED_ADDRESS_ZIP_CODE').val());
+            $('#POSTAL_ADDRESS_PHONE').val($('#REGISTERED_ADDRESS_PHONE').val());
         }
     });
 });
 
 function fillZoneIDField(zoneID) {
-    $('#zoneID').val(zoneID);
+    $('#ZONE_ID').val(zoneID);
 }

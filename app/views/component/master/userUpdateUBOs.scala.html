@@ -5,13 +5,13 @@
 
 @(addUBOsForm: Form[AddUBOs.Data] = AddUBOs.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 @commonForm(constants.Form.USER_UPDATE_UBOS, addUBOsForm) {
-    @repeatWithIndex(addUBOsForm(constants.Form.UBOS), min = addUBOsForm(constants.Form.UBOS).indexes.length + 1) { (uboForm, i) =>
-        <div id='@Seq(constants.Form.UBO, i).mkString("")'>
-            @inputText(uboForm(constants.FormField.PERSON_NAME.name), '_label -> Messages(constants.FormField.PERSON_NAME.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PERSON_NAME.name), 'required -> false)
-            @inputText(uboForm(constants.FormField.SHARE_PERCENTAGE.name), '_label -> Messages(constants.FormField.SHARE_PERCENTAGE.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.SHARE_PERCENTAGE.name), 'required -> false)
-            @inputText(uboForm(constants.FormField.RELATIONSHIP.name), '_label -> Messages(constants.FormField.RELATIONSHIP.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.RELATIONSHIP.name), 'required -> false)
-            @inputText(uboForm(constants.FormField.TITLE.name), '_label -> Messages(constants.FormField.TITLE.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.TITLE.name), 'required -> false)
-            <button type="button" class="cmuk-button cmuk-button-primary" onclick="deleteElementBySource(this)">@Messages(constants.Form.DELETE)</button>
+    @repeatWithIndex(addUBOsForm(constants.Form.UBOS), min = addUBOsForm(constants.Form.UBOS).indexes.length + 1) { (uboFormField, i) =>
+        <div id='@Seq(constants.Form.UBOS, i).mkString("_")'>
+            @commonSequenceInputText(uboFormField, constants.FormField.PERSON_NAME)
+            @commonSequenceInputDouble(uboFormField, constants.FormField.SHARE_PERCENTAGE)
+            @commonSequenceInputText(uboFormField, constants.FormField.RELATIONSHIP)
+            @commonSequenceInputText(uboFormField, constants.FormField.TITLE)
+            <button type="button" class="cmuk-button cmuk-button-link" onclick="deleteElementBySource(this)">@Messages(constants.Form.DELETE)</button>
         </div>
     }
 }
