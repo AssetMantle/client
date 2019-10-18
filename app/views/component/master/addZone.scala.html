@@ -6,7 +6,7 @@
 @commonForm(constants.Form.ADD_ZONE, addZoneForm) {
     @commonInputText(addZoneForm, constants.FormField.NAME)
     @commonInputText(addZoneForm, constants.FormField.CURRENCY)
-    @defining(constants.Form.ADDRESS) { implicit prefix =>
+    @defining(Option(constants.FormField.ADDRESS)) { implicit nestedFormField =>
         @commonInputText(addZoneForm, constants.FormField.ADDRESS_LINE_1)
         @commonInputText(addZoneForm, constants.FormField.ADDRESS_LINE_2)
         @commonInputText(addZoneForm, constants.FormField.LANDMARK, 'required -> false)

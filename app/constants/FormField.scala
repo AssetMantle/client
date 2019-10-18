@@ -28,7 +28,7 @@ object FormField {
   val NAME = new StringFormField("NAME", 2, 50)
   val PERSON_NAME = new StringFormField("PERSON_NAME", 2, 50)
   val ABBREVIATION = new StringFormField("ABBREVIATION", 2, 10)
-  val ADDRESS = new StringFormField("ADDRESS", 6, 100)
+  val STREET_ADDRESS = new StringFormField("ADDRESS", 6, 100)
   val REQUEST_ID = new StringFormField("REQUEST_ID", 32, 32)
   val ACCOUNT_ID = new StringFormField("ACCOUNT_ID", 3, 50)
   val FIAT_PROOF_HASH = new StringFormField("FIAT_PROOF_HASH", 4, 50, RegularExpression.HASH)
@@ -147,6 +147,7 @@ object FormField {
   //NestedFormField
   val REGISTERED_ADDRESS = new NestedFormField("REGISTERED_ADDRESS")
   val POSTAL_ADDRESS = new NestedFormField("POSTAL_ADDRESS")
+  val ADDRESS = new NestedFormField("ADDRESS")
 
   //TODO: Error Response through Messages
   class StringFormField (fieldName: String, minimumLength: Int, maximumLength: Int, regex: Regex = RegularExpression.ANY_STRING, errorMessage: String = "Error Response") {

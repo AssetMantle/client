@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<module external.linked.project.id="root [file:/home/deepanshutr/IdeaProjects/commitCentral/]" external.linked.project.path="$MODULE_DIR$/../.." external.root.project.path="$MODULE_DIR$/../.." external.system.id="SBT" type="JAVA_MODULE" version="4">
+<module external.linked.project.id="root [file:/C:/Users/Akash/IntellijIdea/commitCentral/]" external.linked.project.path="$MODULE_DIR$/../.." external.root.project.path="$MODULE_DIR$/../.." external.system.id="SBT" type="JAVA_MODULE" version="4">
   <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_11">
     <output url="file://$MODULE_DIR$/../../target/scala-2.12/classes" />
     <output-test url="file://$MODULE_DIR$/../../target/scala-2.12/gatling-classes" />
@@ -9,8 +9,6 @@
       <sourceFolder url="file://$MODULE_DIR$/../../gatling/simulation" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/../../conf" type="java-resource" />
       <sourceFolder url="file://$MODULE_DIR$/../../public" type="java-resource" />
-      <sourceFolder url="file://$MODULE_DIR$/../../target/scala-2.12/routes/main" isTestSource="false" generated="true" />
-      <sourceFolder url="file://$MODULE_DIR$/../../target/scala-2.12/twirl/main" isTestSource="false" generated="true" />
       <excludeFolder url="file://$MODULE_DIR$/../../target/streams" />
     </content>
     <orderEntry type="inheritedJdk" />
