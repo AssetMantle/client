@@ -9,6 +9,8 @@
       <sourceFolder url="file://$MODULE_DIR$/../../gatling/simulation" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/../../conf" type="java-resource" />
       <sourceFolder url="file://$MODULE_DIR$/../../public" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/../../target/scala-2.12/routes/main" isTestSource="false" generated="true" />
+      <sourceFolder url="file://$MODULE_DIR$/../../target/scala-2.12/twirl/main" isTestSource="false" generated="true" />
       <excludeFolder url="file://$MODULE_DIR$/../../target/streams" />
     </content>
     <orderEntry type="inheritedJdk" />
