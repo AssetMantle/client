@@ -1,25 +1,26 @@
 @import controllers.actions.LoginState
 @import helper._
+@import views.html.base._
 
 @(uploadRoute: String, storeRoute: String, documentType: String, id: String = "")(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 
 @CSRF.formField
-<div id="uploadSelector">
-    <button class="btn" id="browseUploadButton">@Messages(constants.Form.BROWSE)</button>
+<div id="uploadSelector"  class="centerText">
+    <button type="button" class="cmuk-button cmuk-button-primary" id="browseUploadButton">@Messages(constants.Form.BROWSE)</button>
     <p class="centerText"><small>@Messages(constants.Form.OR)</small></p>
     <div class="dropBox">
         <p class="centerText"><small>@Messages(constants.Form.DROP_FILE)</small></p>
     </div>
 </div>
 
-<div id="uploader" class="hidden">
+<div id="uploader" class="hidden centerText">
     <a id = "fileName"></a>
     <br>
     <div id="uploadControls">
         <div class="progressContainer">
             <div class="progressBar" id="fileUploadProgressBar"></div>
         </div>
-        <button class="btn" id="uploadButton" >@Messages(constants.Form.UPLOAD)</button>
+        <button type="button" class="cmuk-button cmuk-button-primary" id="uploadButton" >@Messages(constants.Form.UPLOAD)</button>
     </div>
 </div>
 

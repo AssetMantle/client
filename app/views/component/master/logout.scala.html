@@ -1,25 +1,11 @@
 @import controllers.actions.LoginState
 @import helper._
 @import views.companion.master.Logout
+@import views.html.base._
 
-@(logoutForm: Form[Logout.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
-
-
-    @form(action = routes.AccountController.logout, 'onkeypress -> "submitFormOnEnter(event,this)") {
-    @CSRF.formField
-
-    <div class="latest_card-body">
-            @checkbox(logoutForm(constants.Form.RECEIVE_NOTIFICATIONS), '_label -> Messages(constants.Form.RECEIVE_NOTIFICATIONS))
-      @Messages(constants.Form.RECEIVE_NOTIFICATIONS)
-
-        @if(logoutForm.hasGlobalErrors) {
-            <ul>
-            @for(error <- logoutForm.globalErrors) {
-                <li>@error.format</li>
-            }
-            </ul>
-        }
-        <button type="button" class="btn btn-primary btn-sm" onclick="submitForm(this)">@Messages(constants.Form.LOGOUT)</button>
-    </div>
+@(logoutForm: Form[Logout.Data] = Logout.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@commonForm(constants.Form.LOGOUT, logoutForm) {
+    @Messages(constants.FormField.RECEIVE_NOTIFICATIONS.name)
+    @checkbox(logoutForm(constants.FormField.RECEIVE_NOTIFICATIONS.name), '_label -> Messages(constants.FormField.RECEIVE_NOTIFICATIONS.name), 'class -> "cmuk-checkbox")
 }
 

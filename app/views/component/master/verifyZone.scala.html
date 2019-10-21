@@ -1,24 +1,11 @@
 @import controllers.actions.LoginState
 @import helper._
+@import views.html.base._
 @import views.companion.master.VerifyZone
 
-@(verifyZoneForm: Form[VerifyZone.Data], zoneID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
-@form(action = routes.AddZoneController.verifyZone, 'onkeypress -> "submitFormOnEnter(event,this)") {
-    <div class="latest_card-header latest_card-header-primary text-center">
-        <h4 class="latest_card-title">@Messages(constants.Form.VERIFY_ZONE)</h4>
-    </div>
-    <div class="latest_card-body">
-        @CSRF.formField
-      @inputText(verifyZoneForm(constants.FormField.ZONE_ID.name).copy(value = Some(zoneID)), '_label -> Messages(constants.FormField.ZONE_ID.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.ZONE_ID.name), 'required -> true)
-      @inputText(verifyZoneForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.GAS.name), 'type -> "number", 'required -> true)
-      @inputPassword(verifyZoneForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PASSWORD.name), 'required -> true)
-        @if(verifyZoneForm.hasGlobalErrors) {
-            <ul>
-            @for(error <- verifyZoneForm.globalErrors) {
-                <li>@error.format</li>
-            }
-            </ul>
-        }
-        <button type="button" class="btn btn-sm btn-primary" onclick="submitForm(this)">@Messages(constants.Form.VERIFY_ZONE)</button>
-    </div>
+@(verifyZoneForm: Form[VerifyZone.Data] = VerifyZone.form, zoneID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@commonForm(constants.Form.VERIFY_ZONE, verifyZoneForm) {
+    @inputText(verifyZoneForm(constants.FormField.ZONE_ID.name).copy(value = Some(zoneID)), '_label -> Messages(constants.FormField.ZONE_ID.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.ZONE_ID.name), 'required -> true)
+    @inputText(verifyZoneForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.GAS.name), 'type -> "number", 'required -> true)
+    @inputPassword(verifyZoneForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PASSWORD.name), 'required -> true)
 }

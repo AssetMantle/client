@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="sbt: com.softwaremill.quicklens:quicklens_2.12:1.4.12:jar">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.ivy2/cache/com.softwaremill.quicklens/quicklens_2.12/jars/quicklens_2.12-1.4.12.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.ivy2/cache/com.softwaremill.quicklens/quicklens_2.12/srcs/quicklens_2.12-1.4.12-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

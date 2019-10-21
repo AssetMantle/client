@@ -14,13 +14,14 @@
         <br>
         <span class="red">@Messages(constants.Form.ZONE_VERIFICATION):
             @traderKYC.zoneStatus match {
-                case Some(true) => {
-                    <span class="result success"><img class="status" src="@routes.Assets.versioned("images/success.jpg")"></span>
+                case Some(status: Boolean) => {
+                    @if(status) {
+                        <span cmuk-icon="check"></span>
+                    } else {
+                        <span cmuk-icon="close"></span>
+                    }
                 }
-                case Some(false) => {
-                    <span class="result failure"><img class="status" src="@routes.Assets.versioned("images/unverified.png")"></span>
-                }
-                case _ => {}
+                case None => {}
             }
         </span>
     }

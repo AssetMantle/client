@@ -24,18 +24,6 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
 
   private implicit val module: String = constants.Module.FILE_CONTROLLER
 
-  def checkAccountKYCFileExists(accountID: String, documentType: String): Action[AnyContent] = Action { implicit request =>
-    if (masterAccountKYCs.Service.checkFileExists(id = accountID, documentType = documentType)) Ok else NoContent
-  }
-
-  def checkTraderAssetFileExists(id: String, documentType: String): Action[AnyContent] = Action { implicit request =>
-    if (masterTransactionAssetFiles.Service.checkFileExists(id = id, documentType = documentType)) Ok else NoContent
-  }
-
-  def checkTraderNegotiationFileExists(id: String, documentType: String): Action[AnyContent] = Action { implicit request =>
-    if (masterTransactionAssetFiles.Service.checkFileExists(id = id, documentType = documentType)) Ok else NoContent
-  }
-
   def uploadAccountKYCForm(documentType: String): Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.master.uploadFile(utilities.String.getJsRouteFunction(routes.javascript.FileController.uploadAccountKYC), utilities.String.getJsRouteFunction(routes.javascript.FileController.storeAccountKYC), documentType))
   }

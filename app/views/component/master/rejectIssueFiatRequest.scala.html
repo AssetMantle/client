@@ -1,24 +1,10 @@
 @import controllers.actions.LoginState
 @import helper._
+@import views.html.base._
 @import views.companion.master.RejectIssueFiatRequest
 
-@(rejectIssueFiatRequestForm: Form[RejectIssueFiatRequest.Data], requestID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
-@form(action = routes.IssueFiatController.rejectIssueFiatRequest, 'onkeypress -> "submitFormOnEnter(event,this)") {
-    <div class="latest_card-header latest_card-header-primary text-center">
-        <h4 class="latest_card-title">@Messages(constants.Form.REJECT_ISSUE_FIAT_REQUEST)</h4>
-    </div>
-    <div class="latest_card-body">
-        @CSRF.formField
-      @inputText(rejectIssueFiatRequestForm(constants.FormField.REQUEST_ID.name).copy(value = Some(requestID)), '_label -> Messages(constants.FormField.REQUEST_ID.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.REQUEST_ID.name), 'required -> true)
-      @inputText(rejectIssueFiatRequestForm(constants.FormField.COMMENT.name), '_label -> Messages(constants.FormField.COMMENT.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.COMMENT.name), 'required -> true)
-
-        @if(rejectIssueFiatRequestForm.hasGlobalErrors) {
-            <ul>
-            @for(error <- rejectIssueFiatRequestForm.globalErrors) {
-                <li>@error.format</li>
-            }
-            </ul>
-        }
-        <button type="button" class="btn btn-sm btn-primary" onclick="submitForm(this)">@Messages(constants.Form.REJECT_ISSUE_FIAT_REQUEST)</button>
-    </div>
+@(rejectIssueFiatRequestForm: Form[RejectIssueFiatRequest.Data] = RejectIssueFiatRequest.form, requestID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@commonForm(constants.Form.REJECT_ISSUE_FIAT_REQUEST, rejectIssueFiatRequestForm) {
+    @inputText(rejectIssueFiatRequestForm(constants.FormField.REQUEST_ID.name).copy(value = Some(requestID)), '_label -> Messages(constants.FormField.REQUEST_ID.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.REQUEST_ID.name), 'required -> true)
+    @inputText(rejectIssueFiatRequestForm(constants.FormField.COMMENT.name), '_label -> Messages(constants.FormField.COMMENT.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.COMMENT.name), 'required -> true)
 }

@@ -26,7 +26,7 @@ class GetStakingValidators @Inject()()(implicit wsClient: WSClient, configuratio
 
   private val url = ip + ":" + port + "/" + path
 
-  //TODO Special case because of response type received
+  //Special case because of response type received
   private def action(): Future[Seq[Response]] = wsClient.url(url).get.map { response => utilities.JSON.convertJsonStringToObject[Seq[Response]](response.body)}
 
   object Service {

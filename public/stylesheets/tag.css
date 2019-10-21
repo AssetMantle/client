@@ -11,12 +11,10 @@ h2 {
     font-size: 1.5625rem !important;
     color: white;
 }
-input {
+input, select {
     width: 100%;
     padding: 10px;
-    background: #e2e2e2;
 }
-
 
 input:focus {
     background-color: #ddd;
@@ -44,12 +42,6 @@ a {
     color: #3a53bc;
     opacity: 0.8;
 }
-a:hover {
-    cursor: pointer;
-    color: #3a53bc;
-    opacity: 1.0;
-}
-
 label{
     display: none !important;
 }

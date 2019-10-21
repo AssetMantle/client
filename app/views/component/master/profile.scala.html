@@ -16,21 +16,16 @@
             <div class="cmuk-width-1-1 cmuk-width-expand@@m">
                 <div class="cmuk-card cmuk-card-default cmuk-card-small cmuk-card-body">
                     <h2 class="card-title">@loginState.username</h2>
-                    <div class="ur-change-password">
-                        <p>
-                            @Messages(constants.User.USER_TYPE) :
-                            <span id="userTypeValue">@loginState.userType</span>
-                        </p>
-                        <button onclick="getForm(jsRoutes.controllers.AccountController.changePasswordForm())">@Messages(constants.Form.CHANGE_PASSWORD)</button>
-                    </div>
-
-
                     <p>
-                        @Messages(constants.Form.BLOCKCHAIN_ADDRESS) :
-                        <span id="blockchainAddressValue"><span id="text_element" class="hash_code">@loginState.address</span> <span onclick="copyToClipboard('text_element')"><i class="fa fa-clipboard"></i></span></span>
+                        @Messages(constants.User.USER_TYPE): <span>@loginState.userType</span>
+                       <span><button class="cmuk-button cmuk-button-link" onclick="getForm(jsRoutes.controllers.AccountController.changePasswordForm())">@Messages(constants.Form.CHANGE_PASSWORD.legend)</button></span>
                     </p>
-
-                    <div id="profileContact"></div>
+                    <p>
+                        @Messages(constants.Form.BLOCKCHAIN_ADDRESS)
+                        : <span id="blockchainAddress" class="hashCode">@loginState.address</span>
+                        <a class="cmuk-icon-button" cmuk-icon="copy" onclick="copyToClipboard('blockchainAddress')"></a>
+                    </p>
+                    <p id="profileContact"></p>
                 </div>
             </div>
         </div>
@@ -53,123 +48,130 @@
                                         <div id="profileDocuments"></div>
                                     </li>
                                     <li>
-                                        <div id="profileACL">
-                                        @loginState.acl match {
+                                        <div id="profileACL"> @loginState.acl match {
                                             case Some(acl) => {
-                                                <p>@Messages(constants.Form.ISSUE_ASSET): @if(acl.issueAsset) {
-                                                    <span class="result success"><i class="fa fa-check " aria-hidden="true"></i></span>
+                                                <p>@Messages(constants.FormField.ISSUE_ASSET.name): @if(acl.issueAsset) {
+                                                    <span cmuk-icon="check"></span>
                                                 } else {
-                                                    <span class="result failure"><i class="fa fa-times-circle-o" aria-hidden="true"></i></span>
-                                                }
+                                                    <span cmuk-icon="close"></span>
+                                                    <br>
+                                                    }
                                                 </p>
                                                 <p>
 
-                                                    @Messages(constants.Form.ISSUE_FIAT) : @if(acl.issueFiat) {
-                                                    <span class="result success"><i class="fa fa-check " aria-hidden="true"></i></span>
+                                                    @Messages(constants.FormField.ISSUE_FIAT.name) : @if(acl.issueFiat) {
+                                                    <span cmuk-icon="check"></span>
                                                 } else {
-                                                    <span class="result failure"><i class="fa fa-times-circle-o" aria-hidden="true"></i></span>
-                                                }
+                                                    <span cmuk-icon="close"></span>
+                                                    <br>
+                                                    }
                                                 </p>
                                                 <p>
-                                                    @Messages(constants.Form.SEND_ASSET): @if(acl.sendAsset) {
-                                                    <span class="result success"><i class="fa fa-check " aria-hidden="true"></i></span>
+                                                    @Messages(constants.FormField.SEND_ASSET.name): @if(acl.sendAsset) {
+                                                    <span cmuk-icon="check"></span>
                                                 } else {
-                                                    <span class="result failure"><i class="fa fa-times-circle-o" aria-hidden="true"></i></span>
-                                                }
-                                                </p>
-
-                                                <p>
-                                                    @Messages(constants.Form.SEND_FIAT): @if(acl.sendFiat) {
-                                                    <span class="result success"><i class="fa fa-check " aria-hidden="true"></i></span>
-                                                } else {
-                                                    <span class="result failure"><i class="fa fa-times-circle-o" aria-hidden="true"></i></span>
-                                                }
+                                                    <span cmuk-icon="close"></span>
+                                                    <br>
+                                                    }
                                                 </p>
 
                                                 <p>
-                                                    @Messages(constants.Form.REDEEM_ASSET): @if(acl.redeemAsset) {
-                                                    <span class="result success"><i class="fa fa-check " aria-hidden="true"></i></span>
+                                                    @Messages(constants.FormField.SEND_FIAT.name): @if(acl.sendFiat) {
+                                                    <span cmuk-icon="check"></span>
                                                 } else {
-                                                    <span class="result failure"><i class="fa fa-times-circle-o" aria-hidden="true"></i></span>
-                                                }
+                                                    <span cmuk-icon="close"></span>
+                                                    <br>
+                                                    }
                                                 </p>
 
                                                 <p>
-                                                    @Messages(constants.Form.REDEEM_FIAT):@if(acl.redeemFiat) {
-                                                    <span class="result success"><i class="fa fa-check " aria-hidden="true"></i></span>
+                                                    @Messages(constants.FormField.REDEEM_ASSET.name): @if(acl.redeemAsset) {
+                                                    <span cmuk-icon="check"></span>
                                                 } else {
-                                                    <span class="result failure"><i class="fa fa-times-circle-o" aria-hidden="true"></i></span>
-                                                }
+                                                    <span cmuk-icon="close"></span>
+                                                    <br>
+                                                    }
                                                 </p>
 
                                                 <p>
-                                                    @Messages(constants.Form.BUYER_EXECUTE_ORDER)
-                                                    : @if(acl.buyerExecuteOrder) {
-                                                    <span class="result success"><i class="fa fa-check " aria-hidden="true"></i></span>
+                                                    @Messages(constants.FormField.REDEEM_FIAT.name):@if(acl.redeemFiat) {
+                                                    <span cmuk-icon="check"></span>
                                                 } else {
-                                                    <span class="result failure"><i class="fa fa-times-circle-o" aria-hidden="true"></i></span>
-                                                }
+                                                    <span cmuk-icon="close"></span>
+                                                    <br>
+                                                    }
                                                 </p>
 
                                                 <p>
-                                                    @Messages(constants.Form.SELLER_EXECUTE_ORDER)
-                                                    : @if(acl.sellerExecuteOrder) {
-                                                    <span class="result success"><i class="fa fa-check " aria-hidden="true"></i></span>
+                                                    @Messages(constants.FormField.BUYER_EXECUTE_ORDER.name): @if(acl.buyerExecuteOrder) {
+                                                    <span cmuk-icon="check"></span>
                                                 } else {
-                                                    <span class="result failure"><i class="fa fa-times-circle-o" aria-hidden="true"></i></span>
-                                                }
+                                                    <span cmuk-icon="close"></span>
+                                                    <br>
+                                                    }
                                                 </p>
 
                                                 <p>
-                                                    @Messages(constants.Form.NEGOTIATION): @if(acl.negotiation) {
-                                                    <span class="result success"><i class="fa fa-check " aria-hidden="true"></i></span>
+                                                    @Messages(constants.FormField.SELLER_EXECUTE_ORDER.name): @if(acl.sellerExecuteOrder) {
+                                                    <span cmuk-icon="check"></span>
                                                 } else {
-                                                    <span class="result failure"><i class="fa fa-times-circle-o" aria-hidden="true"></i></span>
-                                                }
+                                                    <span cmuk-icon="close"></span>
+                                                    <br>
+                                                    }
                                                 </p>
 
                                                 <p>
-                                                    @Messages(constants.Form.CHANGE_BUYER_BID)
-                                                    : @if(acl.changeBuyerBid) {
-                                                    <span class="result success"><i class="fa fa-check " aria-hidden="true"></i></span>
+                                                    @Messages(constants.FormField.NEGOTIATION.name): @if(acl.negotiation) {
+                                                    <span cmuk-icon="check"></span>
                                                 } else {
-                                                    <span class="result failure"><i class="fa fa-times-circle-o" aria-hidden="true"></i></span>
-                                                }
+                                                    <span cmuk-icon="close"></span>
+                                                    <br>
+                                                    }
                                                 </p>
 
                                                 <p>
-                                                    @Messages(constants.Form.CHANGE_SELLER_BID)
-                                                    : @if(acl.changeSellerBid) {
-                                                    <span class="result success"><i class="fa fa-check " aria-hidden="true"></i></span>
+                                                    @Messages(constants.FormField.CHANGE_BUYER_BID.name): @if(acl.changeBuyerBid) {
+                                                    <span cmuk-icon="check"></span>
                                                 } else {
-                                                    <span class="result failure"><i class="fa fa-times-circle-o" aria-hidden="true"></i></span>
-                                                }
+                                                    <span cmuk-icon="close"></span>
+                                                    <br>
+                                                    }
                                                 </p>
 
                                                 <p>
-                                                    @Messages(constants.Form.CONFIRM_BUYER_BID)
-                                                    : @if(acl.confirmBuyerBid) {
-                                                    <span class="result success"><i class="fa fa-check " aria-hidden="true"></i></span>
+                                                    @Messages(constants.FormField.CHANGE_SELLER_BID.name): @if(acl.changeSellerBid) {
+                                                    <span cmuk-icon="check"></span>
                                                 } else {
-                                                    <span class="result failure"><i class="fa fa-times-circle-o" aria-hidden="true"></i></span>
-                                                }
+                                                    <span cmuk-icon="close"></span>
+                                                    <br>
+                                                    }
                                                 </p>
 
                                                 <p>
-                                                    @Messages(constants.Form.CONFIRM_SELLER_BID)
-                                                    : @if(acl.confirmSellerBid) {
-                                                    <span class="result success"><i class="fa fa-check " aria-hidden="true"></i></span>
+                                                    @Messages(constants.FormField.CONFIRM_BUYER_BID.name): @if(acl.confirmBuyerBid) {
+                                                    <span cmuk-icon="check"></span>
                                                 } else {
-                                                    <span class="result failure"><i class="fa fa-times-circle-o" aria-hidden="true"></i></span>
-                                                }
+                                                    <span cmuk-icon="close"></span>
+                                                    <br>
+                                                    }
                                                 </p>
 
                                                 <p>
-                                                    @Messages(constants.Form.RELEASE_ASSET): @if(acl.releaseAsset) {
-                                                    <span class="result success"><i class="fa fa-check " aria-hidden="true"></i></span>
+                                                    @Messages(constants.FormField.CONFIRM_SELLER_BID.name): @if(acl.confirmSellerBid) {
+                                                    <span cmuk-icon="check"></span>
                                                 } else {
-                                                    <span class="result failure"><i class="fa fa-times-circle-o" aria-hidden="true"></i></span>
-                                                }
+                                                    <span cmuk-icon="close"></span>
+                                                    <br>
+                                                    }
+                                                </p>
+
+                                                <p>
+                                                    @Messages(constants.FormField.RELEASE_ASSET.name): @if(acl.releaseAsset) {
+                                                    <span cmuk-icon="check"></span>
+                                                } else {
+                                                    <span cmuk-icon="close"></span>
+                                                    <br>
+                                                    }
                                                 </p>
                                             }
                                             case _ => {}
@@ -180,7 +182,6 @@
                             </div >
                         </div >
                     </div >
-
                 </div >
             </div >
         </div >

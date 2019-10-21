@@ -3,14 +3,14 @@
 @import views.html.base._
 
 @(changeBuyerBidForm: Form[ChangeBuyerBid.Data] = ChangeBuyerBid.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@baseForm(constants.Form.BLOCKCHAIN_CHANGE_BUYER_BID, changeBuyerBidForm) {
-    @inputText(changeBuyerBidForm(constants.FormField.FROM.name), '_label -> Messages(constants.FormField.FROM.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.FROM.name), 'required -> true)
-    @inputText(changeBuyerBidForm(constants.FormField.TO.name), '_label -> Messages(constants.FormField.TO.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.TO.name), 'required -> true)
-    @inputText(changeBuyerBidForm(constants.FormField.BID.name), '_label -> Messages(constants.FormField.BID.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.BID.name), 'required -> true, 'type -> "number")
-    @inputText(changeBuyerBidForm(constants.FormField.TIME.name), '_label -> Messages(constants.FormField.TIME.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.TIME.name), 'required -> true, 'type -> "number")
-    @inputText(changeBuyerBidForm(constants.FormField.PEG_HASH.name), '_label -> Messages(constants.FormField.PEG_HASH.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PEG_HASH.name), 'required -> true)
-    @inputText(changeBuyerBidForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.GAS.name), 'required -> true, 'type -> "number")
-    @inputText(changeBuyerBidForm(constants.FormField.MODE.name), '_label -> Messages(constants.FormField.MODE.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.MODE.name), 'required -> true)
-    @inputPassword(changeBuyerBidForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PASSWORD.name), 'required -> true)
+@commonForm(constants.Form.BLOCKCHAIN_CHANGE_BUYER_BID, changeBuyerBidForm) {
+    @commonInputText(changeBuyerBidForm, constants.FormField.FROM.name)
+    @commonInputText(changeBuyerBidForm, constants.FormField.TO.name)
+    @commonInputText(changeBuyerBidForm, constants.FormField.BID.name)
+    @commonInputText(changeBuyerBidForm, constants.FormField.TIME.name)
+    @commonInputText(changeBuyerBidForm, constants.FormField.PEG_HASH.name)
+    @commonInputText(changeBuyerBidForm, constants.FormField.GAS.name)
+    @commonInputText(changeBuyerBidForm, constants.FormField.MODE.name)
+    @commonInputPassword(changeBuyerBidForm, constants.FormField.PASSWORD.name)
 }
 

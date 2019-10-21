@@ -15,7 +15,7 @@
         @if(trader.verificationStatus.getOrElse(false)) {
             <div class="centerText">
                 <button onclick="getForm(jsRoutes.controllers.ComponentViewController.organizationViewTrader('@trader.id'))">@Messages(constants.Form.VIEW)</button>
-                <button onclick="getForm(jsRoutes.controllers.SetACLController.organizationModifyTraderForm('@trader.accountID'))">@Messages(constants.Form.MODIFY_TRADER)</button>
+                <button onclick="getForm(jsRoutes.controllers.SetACLController.organizationModifyTraderForm('@trader.accountID'))">@Messages(constants.Form.MODIFY_TRADER.legend)</button>
             </div>
         }
     </div>

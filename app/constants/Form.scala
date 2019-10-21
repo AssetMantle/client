@@ -3,36 +3,137 @@ package constants
 import controllers.routes
 import play.api.mvc.Call
 
-class Form(private val template: String, val route: Call) {
+class Form(template: String, val route: Call) {
   val legend: String = Seq("FORM", template, "LEGEND").mkString(".")
   val submit: String = Seq("FORM", template, "SUBMIT").mkString(".")
 }
 
 object Form {
 
+  //AccountController
   val SIGN_UP = new Form("SIGN_UP", routes.AccountController.signUp())
-  
-  //BLOCKCHAIN_FORMS
+  val LOGIN = new Form("LOGIN", routes.AccountController.login())
+  val LOGOUT = new Form("LOGOUT", routes.AccountController.logout())
+  val CHANGE_PASSWORD = new Form("CHANGE_PASSWORD", routes.AccountController.changePassword())
+  val EMAIL_OTP_FORGOT_PASSWORD = new Form("EMAIL_OTP_FORGOT_PASSWORD", routes.AccountController.emailOTPForgotPassword())
+  val FORGOT_PASSWORD = new Form("FORGOT_PASSWORD", routes.AccountController.forgotPassword())
+
+  //AddKeyController
   val BLOCKCHAIN_ADD_KEY = new Form("BLOCKCHAIN_ADD_KEY", routes.AddKeyController.blockchainAddKey())
+
+  //AddOrganizationController
+  val ADD_ORGANIZATION = new Form("ADD_ORGANIZATION", routes.AddOrganizationController.addOrganization())
+  val USER_UPDATE_UBOS = new Form("USER_UPDATE_UBOS", routes.AddOrganizationController.userUpdateUBOs())
+  val ORGANIZATION_BANK_ACCOUNT_DETAIL = new Form("ORGANIZATION_BANK_ACCOUNT_DETAIL", routes.AddOrganizationController.organizationBankAccountDetail())
+  val USER_REVIEW_ADD_ORGANIZATION_REQUEST = new Form("USER_REVIEW_ADD_ORGANIZATION_REQUEST", routes.AddOrganizationController.userReviewAddOrganizationRequest())
+  val VERIFY_ORGANIZATION = new Form("VERIFY_ORGANIZATION", routes.AddOrganizationController.verifyOrganization())
+  val REJECT_VERIFY_ORGANIZATION_REQUEST = new Form("REJECT_VERIFY_ORGANIZATION_REQUEST", routes.AddOrganizationController.rejectVerifyOrganizationRequest())
   val BLOCKCHAIN_ADD_ORGANIZATION = new Form("BLOCKCHAIN_ADD_ORGANIZATION", routes.AddOrganizationController.blockchainAddOrganization())
+
+  //AddZoneController
+  val ADD_ZONE = new Form("ADD_ZONE", routes.AddZoneController.addZone())
+  val REVIEW_ADD_ZONE_ON_COMPLETION = new Form("REVIEW_ADD_ZONE_ON_COMPLETION", routes.AddZoneController.userReviewAddZoneRequest())
+  val VERIFY_ZONE = new Form("VERIFY_ZONE", routes.AddZoneController.verifyZone())
+  val REJECT_VERIFY_ZONE_REQUEST = new Form("REJECT_VERIFY_ZONE_REQUEST", routes.AddZoneController.rejectVerifyZoneRequest())
   val BLOCKCHAIN_ADD_ZONE = new Form("BLOCKCHAIN_ADD_ZONE", routes.AddZoneController.blockchainAddZone())
+
+  //BuyerExecuteOrderController
+  val BUYER_EXECUTE_ORDER = new Form("BUYER_EXECUTE_ORDER", routes.BuyerExecuteOrderController.buyerExecuteOrder())
+  val MODERATED_BUYER_EXECUTE_ORDER = new Form("MODERATED_BUYER_EXECUTE_ORDER", routes.BuyerExecuteOrderController.moderatedBuyerExecuteOrder())
   val BLOCKCHAIN_BUYER_EXECUTE_ORDER = new Form("BLOCKCHAIN_BUYER_EXECUTE_ORDER", routes.BuyerExecuteOrderController.blockchainBuyerExecuteOrder())
+
+  //ChangeBuyerBidController
+  val CHANGE_BUYER_BID = new Form("CHANGE_BUYER_BID", routes.ChangeBuyerBidController.changeBuyerBid())
   val BLOCKCHAIN_CHANGE_BUYER_BID = new Form("BLOCKCHAIN_CHANGE_BUYER_BID", routes.ChangeBuyerBidController.blockchainChangeBuyerBid())
+
+  //ChangeSellerBidController
+  val CHANGE_SELLER_BID = new Form("CHANGE_SELLER_BID", routes.ChangeSellerBidController.changeSellerBid())
   val BLOCKCHAIN_CHANGE_SELLER_BID = new Form("BLOCKCHAIN_CHANGE_SELLER_BID", routes.ChangeSellerBidController.blockchainChangeSellerBid())
+
+  //ConfirmBuyerBidController
+  val CONFIRM_BUYER_BID = new Form("CONFIRM_BUYER_BID", routes.ConfirmBuyerBidController.confirmBuyerBid())
+  val CONFIRM_BUYER_BID_DETAIL = new Form("CONFIRM_BUYER_BID_DETAIL", routes.ConfirmBuyerBidController.confirmBuyerBidDetail())
   val BLOCKCHAIN_CONFIRM_BUYER_BID = new Form("BLOCKCHAIN_CONFIRM_BUYER_BID", routes.ConfirmBuyerBidController.blockchainConfirmBuyerBid())
+
+  //ConfirmSellerBidController
+  val CONFIRM_SELLER_BID = new Form("CONFIRM_SELLER_BID", routes.ConfirmSellerBidController.confirmSellerBid())
+  val CONFIRM_SELLER_BID_DETAIL = new Form("CONFIRM_SELLER_BID_DETAIL", routes.ConfirmSellerBidController.confirmSellerBidDetail())
   val BLOCKCHAIN_CONFIRM_SELLER_BID = new Form("BLOCKCHAIN_CONFIRM_SELLER_BID", routes.ConfirmSellerBidController.blockchainConfirmSellerBid())
+
+  //ContactController
+  val UPDATE_CONTACT = new Form("UPDATE_CONTACT", routes.ContactController.updateContact())
+
+  //IssueAssetController
+  val ISSUE_ASSET_REQUEST = new Form("ISSUE_ASSET_REQUEST", routes.IssueAssetController.issueAssetRequest())
+  val ISSUE_ASSET_DETAIL = new Form("ISSUE_ASSET_DETAIL", routes.IssueAssetController.issueAssetDetail())
+  val ISSUE_ASSET_OBL = new Form("ISSUE_ASSET_OBL", routes.IssueAssetController.issueAssetOBL())
+  val ISSUE_ASSET_INVOICE = new Form("ISSUE_ASSET_INVOICE", routes.IssueAssetController.issueAssetInvoice())
+  val REJECT_ISSUE_ASSET_REQUEST = new Form("REJECT_ISSUE_ASSET_REQUEST", routes.IssueAssetController.rejectIssueAssetRequest())
+  val ISSUE_ASSET = new Form("ISSUE_ASSET", routes.IssueAssetController.issueAsset())
   val BLOCKCHAIN_ISSUE_ASSET = new Form("BLOCKCHAIN_ISSUE_ASSET", routes.IssueAssetController.blockchainIssueAsset())
+
+  //IssueFiatController
+  val ISSUE_FIAT_REQUEST = new Form("ISSUE_FIAT_REQUEST", routes.IssueFiatController.issueFiatRequest())
+  val REJECT_ISSUE_FIAT_REQUEST = new Form("REJECT_ISSUE_FIAT_REQUEST", routes.IssueFiatController.rejectIssueFiatRequest())
+  val ISSUE_FIAT = new Form("ISSUE_FIAT", routes.IssueFiatController.issueFiat())
   val BLOCKCHAIN_ISSUE_FIAT = new Form("BLOCKCHAIN_ISSUE_FIAT", routes.IssueFiatController.blockchainIssueFiat())
+
+  //RedeemAssetController
+  val REDEEM_ASSET = new Form("REDEEM_ASSET", routes.RedeemAssetController.redeemAsset())
   val BLOCKCHAIN_REDEEM_ASSET = new Form("BLOCKCHAIN_REDEEM_ASSET", routes.RedeemAssetController.blockchainRedeemAsset())
+
+  //RedeemFiatController
+  val REDEEM_FIAT = new Form("REDEEM_FIAT", routes.RedeemFiatController.redeemFiat())
   val BLOCKCHAIN_REDEEM_FIAT = new Form("BLOCKCHAIN_REDEEM_FIAT", routes.RedeemFiatController.blockchainRedeemFiat())
+
+  //ReleaseAssetController
+  val RELEASE_ASSET = new Form("RELEASE_ASSET", routes.ReleaseAssetController.releaseAsset())
   val BLOCKCHAIN_RELEASE_ASSET = new Form("BLOCKCHAIN_RELEASE_ASSET", routes.ReleaseAssetController.blockchainReleaseAsset())
+
+  //SellerExecuteOrderController
+  val SELLER_EXECUTE_ORDER = new Form("SELLER_EXECUTE_ORDER", routes.SellerExecuteOrderController.sellerExecuteOrder())
+  val MODERATED_SELLER_EXECUTE_ORDER = new Form("MODERATED_SELLER_EXECUTE_ORDER", routes.SellerExecuteOrderController.moderatedSellerExecuteOrder())
   val BLOCKCHAIN_SELLER_EXECUTE_ORDER = new Form("BLOCKCHAIN_SELLER_EXECUTE_ORDER", routes.SellerExecuteOrderController.blockchainSellerExecuteOrder())
+
+  //SendAssetController
+  val SEND_ASSET = new Form("SEND_ASSET", routes.SendAssetController.sendAsset())
   val BLOCKCHAIN_SEND_ASSET = new Form("BLOCKCHAIN_SEND_ASSET", routes.SendAssetController.blockchainSendAsset())
+
+  //SendCoinController
+  val SEND_COIN = new Form("SEND_COIN", routes.SendCoinController.sendCoin())
+  val FAUCET_REQUEST = new Form("FAUCET_REQUEST", routes.SendCoinController.faucetRequest())
+  val REJECT_FAUCET_REQUEST = new Form("REJECT_FAUCET_REQUEST", routes.SendCoinController.rejectFaucetRequest())
+  val APPROVE_FAUCET_REQUEST = new Form("APPROVE_FAUCET_REQUEST", routes.SendCoinController.approveFaucetRequests())
   val BLOCKCHAIN_SEND_COIN = new Form("BLOCKCHAIN_SEND_COIN", routes.SendCoinController.blockchainSendCoin())
+
+  //SendFiatController
+  val SEND_FIAT = new Form("SEND_FIAT", routes.SendFiatController.sendFiat())
   val BLOCKCHAIN_SEND_FIAT = new Form("BLOCKCHAIN_SEND_FIAT", routes.SendFiatController.blockchainSendFiat())
+
+  //SetACLController
+  val INVITE_TRADER = new Form("INVITE_TRADER", routes.SetACLController.inviteTrader())
+  val ADD_TRADER = new Form("ADD_TRADER", routes.SetACLController.addTrader())
+  val REVIEW_ADD_TRADER_ON_COMPLETION = new Form("REVIEW_ADD_TRADER_ON_COMPLETION", routes.SetACLController.userReviewAddTraderRequest())
+  val ZONE_VERIFY_TRADER = new Form("ZONE_VERIFY_TRADER", routes.SetACLController.zoneVerifyTrader())
+  val ZONE_REJECT_VERIFY_TRADER_REQUEST = new Form("ZONE_REJECT_VERIFY_TRADER_REQUEST", routes.SetACLController.zoneRejectVerifyTraderRequest())
+  val ORGANIZATION_VERIFY_TRADER = new Form("ORGANIZATION_VERIFY_TRADER", routes.SetACLController.organizationVerifyTrader())
+  val MODIFY_TRADER = new Form("MODIFY_TRADER", routes.SetACLController.organizationModifyTrader())
+  val ORGANIZATION_REJECT_VERIFY_TRADER_REQUEST = new Form("ORGANIZATION_REJECT_VERIFY_TRADER_REQUEST", routes.SetACLController.organizationRejectVerifyTraderRequest())
   val BLOCKCHAIN_SET_ACL = new Form("BLOCKCHAIN_SET_ACL", routes.SetACLController.blockchainSetACL())
+
+  //SetBuyerFeedbackController
+  val SET_BUYER_FEEDBACK = new Form("SET_BUYER_FEEDBACK", routes.SetBuyerFeedbackController.setBuyerFeedback())
   val BLOCKCHAIN_SET_BUYER_FEEDBACK = new Form("BLOCKCHAIN_SET_BUYER_FEEDBACK", routes.SetBuyerFeedbackController.blockchainSetBuyerFeedback())
+
+  //SetSellerFeedbackController
+  val SET_SELLER_FEEDBACK = new Form("SET_SELLER_FEEDBACK", routes.SetSellerFeedbackController.setSellerFeedback())
   val BLOCKCHAIN_SET_SELLER_FEEDBACK = new Form("BLOCKCHAIN_SET_SELLER_FEEDBACK", routes.SetSellerFeedbackController.blockchainSetSellerFeedback())
+
+  //VerifyEmailAddressController
+  val VERIFY_EMAIL_ADDRESS = new Form("VERIFY_EMAIL_ADDRESS", routes.VerifyEmailAddressController.verifyEmailAddress())
+
+  //VerifyMobileNumberController
+  val VERIFY_MOBILE_NUMBER = new Form("VERIFY_MOBILE_NUMBER", routes.VerifyMobileNumberController.verifyMobileNumber())
 
   val INDEX = "INDEX"
   val COMMIT = "COMMIT"
@@ -73,11 +174,8 @@ object Form {
   val SELL_ORDER_FEEDBACKS = "SELL_ORDER_FEEDBACKS"
   val SELL = "SELL"
   val PROFILE_PICTURE = "PROFILE_PICTURE"
-  val CHANGE_PASSWORD = "CHANGE_PASSWORD"
-  val FORGOT_PASSWORD = "FORGOT_PASSWORD"
   val GET_OTP = "GET_OTP"
   val SET_PASSWORD = "SET_PASSWORD"
-  val COMPLETION = "COMPLETION"
   val REVIEW = "REVIEW"
   val SAME_AS_REGISTERED_ADDRESS = "SAME_AS_REGISTERED_ADDRESS"
   val SUBMIT = "SUBMIT"
@@ -105,18 +203,14 @@ object Form {
   val VIEW = "VIEW"
   val TEAM = "TEAM"
   val PENDING = "PENDING"
-  val INVITE_TRADER = "INVITE_TRADER"
   val VERIFY = "VERIFY"
   val ZONE_KYC_FILES = "ZONE_KYC_FILES"
   val UPDATE_ZONE_KYC_STATUS = "UPDATE_ZONE_KYC_STATUS"
   val UPDATE_ORGANIZATION_KYC_STATUS = "UPDATE_ORGANIZATION_KYC_STATUS"
-  val UPDATE_TRADER_KYC_ZONE_STATUS = "UPDATE_TRADER_KYC_ZONE_STATUS"
-  val UPDATE_TRADER_KYC_ORGANIZATION_STATUS = "UPDATE_TRADER_KYC_ORGANIZATION_STATUS"
   val UPDATE_ASSET_DOCUMENT_STATUS = "UPDATE_ASSET_DOCUMENT_STATUS"
-  val INVITE = "INVITE"
   val UPDATE_STATUS = "UPDATE_STATUS"
   val ZONE_STATUS = "ZONE_STATUS"
-  val ORGANIZATION_STATUS= "ORGANIZATION_STATUS"
+  val ORGANIZATION_STATUS = "ORGANIZATION_STATUS"
   val STATUS_UPDATED = "STATUS_UPDATED"
   val UNAUTHORIZED_TRANSACTION = "UNAUTHORIZED_TRANSACTION"
   val HOME = "HOME"
@@ -200,14 +294,6 @@ object Form {
   val DELEGATOR_SHARES = "DELEGATOR_SHARES"
 
   //Blockchain
-  val ADD_KEY = "ADD_KEY"
-  val ADD_ZONE = "ADD_ZONE"
-  val ADD_ORGANIZATION = "ADD_ORGANIZATION"
-  val ADD_TRADER = "ADD_TRADER"
-  val SEND_COIN = "SEND_COIN"
-  val SET_ACL = "SET_ACL"
-  val SET_BUYER_FEEDBACK = "SET_BUYER_FEEDBACK"
-  val SET_SELLER_FEEDBACK = "SET_SELLER_FEEDBACK"
   val TAKER_ADDRESS = "TAKER_ADDRESS"
   val BLOCKCHAIN_ADDRESS = "BLOCKCHAIN_ADDRESS"
   val PUBLIC_KEY = "PUBLIC_KEY"
@@ -232,7 +318,6 @@ object Form {
   val FIAT_PROOF_HASH = "FIAT_PROOF_HASH"
   val PEG_HASH = "PEG_HASH"
   val GAS = "GAS"
-  val STATUS = "STATUS"
   val BID = "BID"
   val TIME = "TIME"
   val BUYER_CONTRACT_HASH = "BUYER_CONTRACT_HASH"
@@ -245,35 +330,13 @@ object Form {
   val ASSET_PRICE = "ASSET_PRICE"
   val QUANTITY_UNIT = "QUANTITY_UNIT"
   val ASSET_QUANTITY = "ASSET_QUANTITY"
-  val MODERATED = "MODERATED"
   val TRANSACTION_ID = "TRANSACTION_ID"
   val TRANSACTION_AMOUNT = "TRANSACTION_AMOUNT"
   val REDEEM_AMOUNT = "REDEEM_AMOUNT"
   val AWB_PROOF_HASH = "AWB_PROOF_HASH"
   val AMOUNT = "AMOUNT"
   val ACL_ADDRESS = "ACL_ADDRESS"
-  val ISSUE_ASSET = "ISSUE_ASSET"
-  val ISSUE_ASSET_REQUEST = "ISSUE_ASSET_REQUEST"
-  val ISSUE_ASSET_DOCUMENT = "ISSUE_ASSET_DOCUMENT"
-  val ISSUE_FIAT = "ISSUE_FIAT"
-  val ISSUE_FIAT_REQUEST = "ISSUE_FIAT_REQUEST"
-  val SEND_ASSET = "SEND_ASSET"
-  val SEND_FIAT = "SEND_FIAT"
-  val REDEEM_ASSET = "REDEEM_ASSET"
-  val REDEEM_FIAT = "REDEEM_FIAT"
-  val RECEIVE_NOTIFICATIONS = "RECEIVE_NOTIFICATIONS"
-  val SELLER_EXECUTE_ORDER = "SELLER_EXECUTE_ORDER"
-  val BUYER_EXECUTE_ORDER = "BUYER_EXECUTE_ORDER"
-  val MODERATED_SELLER_EXECUTE_ORDER = "MODERATED_SELLER_EXECUTE_ORDER"
-  val MODERATED_BUYER_EXECUTE_ORDER = "MODERATED_BUYER_EXECUTE_ORDER"
-  val CHANGE_BUYER_BID = "CHANGE_BUYER_BID"
-  val CHANGE_SELLER_BID = "CHANGE_SELLER_BID"
-  val CONFIRM_BUYER_BID = "CONFIRM_BUYER_BID"
-  val CONFIRM_BUYER_BID_DETAIL = "CONFIRM_BUYER_BID_DETAIL"
-  val CONFIRM_SELLER_BID = "CONFIRM_SELLER_BID"
-  val CONFIRM_SELLER_BID_DETAIL = "CONFIRM_SELLER_BID_DETAIL"
   val NEGOTIATION = "NEGOTIATION"
-  val RELEASE_ASSET = "RELEASE_ASSET"
   val NEGOTIATION_ID = "NEGOTIATION_ID"
   val BUYER_SIGNATURE = "BUYER_SIGNATURE"
   val SELLER_SIGNATURE = "SELLER_SIGNATURE"
@@ -287,24 +350,14 @@ object Form {
   val TRADER_ID = "TRADER_ID"
   val ORGANIZATION_ID = "ORGANIZATION_ID"
   val CURRENCY = "CURRENCY"
-  val LOGIN = "LOGIN"
-  val LOGOUT = "LOGOUT"
   val USERNAME = "USERNAME"
-  val USERNAME_AVAILABLE = "USERNAME_AVAILABLE"
   val PUSH_NOTIFICATION_TOKEN = "PUSH_NOTIFICATION_TOKEN"
   val CSRF_TOKEN = "csrfToken"
-  val UPDATE_CONTACT = "UPDATE_CONTACT"
   val MOBILE_NUMBER = "MOBILE_NUMBER"
   val EMAIL_ADDRESS = "EMAIL_ADDRESS"
-  val VERIFY_EMAIL_ADDRESS = "VERIFY_EMAIL_ADDRESS"
   val OTP = "OTP"
-  val VERIFY_MOBILE_NUMBER = "VERIFY_MOBILE_NUMBER"
-  val VERIFY_TRADER = "VERIFY_TRADER"
-  val MODIFY_TRADER = "MODIFY_TRADER"
-  val VERIFY_ORGANIZATION = "VERIFY_ORGANIZATION"
   val VERIFIED_STATUS = "VERIFIED_STATUS"
   val COMPLETION_STATUS = "COMPLETION_STATUS"
-  val VERIFY_ZONE = "VERIFY_ZONE"
   val LOADING = "LOADING"
   val CONNECTION_ERROR = "CONNECTION_ERROR"
   val FAILURE = "FAILURE"
@@ -327,30 +380,14 @@ object Form {
   val BANK_NAME = "BANK_NAME"
   val SWIFT_CODE = "SWIFT_CODE"
   val BANK_ADDRESS = "BANK_ADDRESS"
-  val ORGANIZATION_BANK_ACCOUNT_DETAIL = "ORGANIZATION_BANK_ACCOUNT_DETAIL"
   val ORGANIZATION_UBO_DETAIL = "ORGANIZATION_UBO_DETAIL"
   val NOTE_NEW_KEY_DETAILS = "NOTE_NEW_KEY_DETAILS"
-  val CONFIRM_NOTE_NEW_KEY_DETAILS = "CONFIRM_NOTE_NEW_KEY_DETAILS"
 
   //MasterTransaction
-  val APPROVE_FAUCET_REQUEST = "APPROVE_FAUCET_REQUEST"
-  val REJECT_FAUCET_REQUEST = "REJECT_FAUCET_REQUEST"
-  val PENDING_ISSUE_ASSET_REQUESTS = "PENDING_ISSUE_ASSET_REQUESTS"
-  val PENDING_ISSUE_FIAT_REQUESTS = "PENDING_ISSUE_FIAT_REQUESTS"
-  val PENDING_VERIFY_ORGANIZATION_REQUESTS = "PENDING_VERIFY_ORGANIZATION_REQUESTS"
-  val PENDING_VERIFY_ZONE_REQUESTS = "PENDING_VERIFY_ZONE_REQUESTS"
   val COUPON = "COUPON"
-  val REQUEST_COIN = "REQUEST_COIN"
   val REQUEST_ID = "REQUEST_ID"
   val APPROVE = "APPROVE"
   val REJECT = "REJECT"
-  val REJECT_ISSUE_ASSET_REQUEST = "REJECT_ISSUE_ASSET_REQUEST"
-  val REJECT_ISSUE_FIAT_REQUEST = "REJECT_ISSUE_FIAT_REQUEST"
-  val REJECT_VERIFY_ORGANIZATION_REQUEST = "REJECT_VERIFY_ORGANIZATION_REQUEST"
-  val REJECT_VERIFY_TRADER_REQUEST = "REJECT_VERIFY_TRADER_REQUEST"
-  val REJECT_VERIFY_ZONE_REQUEST = "REJECT_VERIFY_ZONE_REQUEST"
-  val ISSUE_ASSET_INVOICE = "ISSUE_ASSET_INVOICE"
-  val ISSUE_ASSET_OBL = "ISSUE_ASSET_OBL"
   val SHIPMENT_DETAILS = "SHIPMENT_DETAILS"
   val COMDEX = "COMDEX"
   val ONLY_SUPPLIER = "ONLY_SUPPLIER"
@@ -358,6 +395,7 @@ object Form {
   val BOTH_PARTIES = "BOTH_PARTIES"
 
   //Sequences
+  //TODO Should be in assets constants
   val ASSET_TYPE_OPTIONS: Seq[String] = Seq("Oil", "Coal", "Gold", "Wheat")
   val DELIVERY_TERM_OPTIONS: Seq[String] = Seq("FOB", "CIF", "CFR")
   val QUALITY_OPTIONS: Seq[String] = Seq("A+", "A", "B")

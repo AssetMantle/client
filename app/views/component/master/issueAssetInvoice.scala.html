@@ -1,50 +1,35 @@
 @import controllers.actions.LoginState
 @import helper._
+@import views.html.base._
 @import models.masterTransaction
 @import views.companion.master.IssueAssetInvoice
 
-@(issueAssetInvoiceForm: Form[IssueAssetInvoice.Data], file: Option[masterTransaction.AssetFile] = None)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
-
-<div class="latest_card-header latest_card-header-primary text-center">
-    <h4 class="latest_card-title">@Messages(constants.Form.DOCUMENTS)</h4>
-</div>
-
-<div class="centerText">
-    <div id="upload@constants.File.INVOICE">
-        <button onclick="getForm(jsRoutes.controllers.FileController.uploadTraderAssetForm('@constants.File.INVOICE', '@issueAssetInvoiceForm.data(constants.FormField.REQUEST_ID.name)'))">@Messages(constants.Form.UPLOAD) @Messages(constants.File.INVOICE)</button>
-    </div>
-    @file match {
-        case Some(fileView) => {
-            @component.master.commonDocumentViewer(fileView) {
-                @routes.FileController.tradingFile(fileView.id, fileView.fileName, fileView.documentType)
-            } {
-                <a href="@routes.FileController.tradingFile(fileView.id, fileView.fileName, fileView.documentType)">@Messages(fileView.documentType)</a>
-            } {
-                <button onclick="getForm(jsRoutes.controllers.FileController.updateTraderAssetForm('@fileView.documentType', '@fileView.id'))">@Messages(constants.Form.UPDATE) @Messages(fileView.documentType)</button>
-                        <script>hideElement('upload@fileView.documentType')</script>
-            }
-        }
-        case _ => {}
-    }
-</div>
-
-@form(action = routes.IssueAssetController.issueAssetInvoice(), 'onkeypress -> "submitFormOnEnter(event,this)") {
-    @CSRF.formField
-        <div class="latest_card-body ml-cb">
-            @inputText(issueAssetInvoiceForm(constants.FormField.REQUEST_ID.name), '_label -> Messages(constants.FormField.REQUEST_ID.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.REQUEST_ID.name), 'required -> true)
-            @inputText(issueAssetInvoiceForm(constants.FormField.INVOICE_NUMBER.name), '_label -> Messages(constants.FormField.INVOICE_NUMBER.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.INVOICE_NUMBER.name), 'required -> true)
-            @inputDate(issueAssetInvoiceForm(constants.FormField.INVOICE_DATE.name), '_label -> Messages(constants.FormField.INVOICE_DATE.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.INVOICE_DATE.name), '_name -> Messages(constants.FormField.INVOICE_DATE.name), 'required -> true)
-
-            @if(issueAssetInvoiceForm.hasGlobalErrors) {
-                <ul>
-                @for(error <- issueAssetInvoiceForm.globalErrors) {
-                    <li>@error.format</li>
-                }
-                </ul>
-            }
-            @file match {
-                case Some(file) => {<button type="button" class="btn btn-primary btn-sm" onclick="submitForm(this)">@Messages(constants.Form.ISSUE_ASSET_INVOICE)</button>}
-                case None => {<button type="button" class="btn btn-primary btn-sm" onclick="submitForm(this)" disabled="disabled">@Messages(constants.Form.ISSUE_ASSET_INVOICE)</button>}
-            }
+@(issueAssetInvoiceForm: Form[IssueAssetInvoice.Data] = IssueAssetInvoice.form, file: Option[masterTransaction.AssetFile] = None)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@commonForm(constants.Form.ISSUE_ASSET_INVOICE, issueAssetInvoiceForm) {
+    <div class="centerText">
+        <div id='@Seq("upload", constants.File.INVOICE).mkString("")'>
+            <button onclick="getForm(jsRoutes.controllers.FileController.uploadTraderAssetForm('@constants.File.INVOICE', '@issueAssetInvoiceForm.data(constants.FormField.REQUEST_ID.name)'))">@Messages(constants.Form.UPLOAD) @Messages(constants.File.INVOICE)</button>
         </div>
+        @file match {
+    case Some(fileView) => {
+        @component.master.commonDocumentViewer(fileView) {
+            @routes.FileController.tradingFile(fileView.id, fileView.fileName, fileView.documentType)
+        } {
+            <a href="@routes.FileController.tradingFile(fileView.id, fileView.fileName, fileView.documentType)">@Messages(fileView.documentType)</a>
+        } {
+            <button onclick="getForm(jsRoutes.controllers.FileController.updateTraderAssetForm('@fileView.documentType', '@fileView.id'))">@Messages(constants.Form.UPDATE) @Messages(fileView.documentType)</button>
+                    <script>hideElement('@Seq("upload", fileView.documentType).mkString("")')</script>
+        }
+    }
+    case _ => {}
+    }
+    </div>
+
+    @inputText(issueAssetInvoiceForm(constants.FormField.REQUEST_ID.name), '_label -> Messages(constants.FormField.REQUEST_ID.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.REQUEST_ID.name), 'required -> true)
+    @inputText(issueAssetInvoiceForm(constants.FormField.INVOICE_NUMBER.name), '_label -> Messages(constants.FormField.INVOICE_NUMBER.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.INVOICE_NUMBER.name), 'required -> true)
+    @inputDate(issueAssetInvoiceForm(constants.FormField.INVOICE_DATE.name), '_label -> Messages(constants.FormField.INVOICE_DATE.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.INVOICE_DATE.name), '_name -> Messages(constants.FormField.INVOICE_DATE.name), 'required -> true)
+    @file match {
+        case Some(file) => {<button type="button" class="cmuk-button cmuk-button-primary" onclick="submitForm(this)">@Messages(constants.Form.ISSUE_ASSET_INVOICE.submit)</button>}
+        case None => {<button type="button" class="cmuk-button cmuk-button-primary" onclick="submitForm(this)" disabled="disabled">@Messages(constants.Form.ISSUE_ASSET_INVOICE.submit)</button>}
+    }
 }

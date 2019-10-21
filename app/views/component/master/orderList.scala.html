@@ -13,7 +13,7 @@
             @loginState.acl match {
                 case Some(acl) => {
                     @if(acl.buyerExecuteOrder) {
-                        <button class="width btn btn-primary btn-sm" onclick="getForm(jsRoutes.controllers.BuyerExecuteOrderController.buyerExecuteOrderDocument('@unModeratedBuyOrder.id'))">@Messages(constants.Form.BUYER_EXECUTE_ORDER)</button>
+                        <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.BuyerExecuteOrderController.buyerExecuteOrderDocument('@unModeratedBuyOrder.id'))">@Messages(constants.Form.BUYER_EXECUTE_ORDER.legend)</button>
                     } <br>
                     }
                 case _ => {}
@@ -33,7 +33,7 @@
             @loginState.acl match {
                 case Some(acl) => {
                     @if(acl.sellerExecuteOrder) {
-                        <button class="width btn btn-primary btn-sm" onclick="getForm(jsRoutes.controllers.SellerExecuteOrderController.sellerExecuteOrderDocument('@unModeratedSellOrder.id'))">@Messages(constants.Form.SELLER_EXECUTE_ORDER)</button>
+                        <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.SellerExecuteOrderController.sellerExecuteOrderDocument('@unModeratedSellOrder.id'))">@Messages(constants.Form.SELLER_EXECUTE_ORDER.legend)</button>
                     } <br>}
                 case _ => {}
             }

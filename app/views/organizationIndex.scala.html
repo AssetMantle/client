@@ -4,37 +4,38 @@
 
 @common(Messages(constants.Form.HOME), failures, warnings, successes, infos)(Html(""))(center)(Html(""))
 @center = {
-    <div class="flexContainer">
-        <div id="commonHome" class="flexItem flexGrowth"></div>
-        <div class="row">
-            <div class="col-md-6 flexItem flexGrowth leftText d-flex align-items-stretch">
-                <div class="card">
-                    <div class="card-header ">
+    <div id="commonHome" class="flexItem flexGrowth"></div>
+    <div class="cmuk-container">
+        <div class="cmuk-grid-match cmuk-grid" cmuk-sortable="handle: .cmuk-card" cmuk-grid>
+            <div class="cmuk-width-expand@@m">
+                <div class="cmuk-card cmuk-card-default">
+                    <div class="cmuk-card-header">
                         <span class="heading">@Messages(constants.Form.ORGANIZATION):</span>
                     </div>
-                    <div class="card-body">
+                    <div class="cmuk-card-body">
                         <div id="organization"></div>
                     </div>
                 </div>
             </div>
-            <div class="col-md-6 flexItem flexGrowth leftText d-flex align-items-stretch">
-                <div class="card">
-                    <div class="card-header">
+            <div class="cmuk-width-expand@@m">
+                <div class="cmuk-card cmuk-card-default">
+                    <div class="cmuk-card-header">
                         <span class="heading">@Messages(constants.Form.ZONE):</span>
                     </div>
-                    <div class="card-body">
+                    <div class="cmuk-card-body">
                         <div id="zone"></div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
+    <div class="cmuk-container">
     <div>
-        <button onclick="getForm(jsRoutes.controllers.SetACLController.traderInvitationForm())">@Messages(constants.Form.INVITE_TRADER)</button>
+        <button onclick="getForm(jsRoutes.controllers.SetACLController.inviteTraderForm())">@Messages(constants.Form.INVITE_TRADER.legend)</button>
     </div>
     <div class="flexContainer"><span class="centerText">@Messages(constants.Form.TEAM)</span><br>
         <div id="organizationTraders" class="flexItem flexGrowth"></div>
+    </div>
     </div>
 
     <script>
