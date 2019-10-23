@@ -1,8 +1,6 @@
 package controllers
 
 import java.util.Locale
-
-import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents, PlayBodyParsers}
@@ -27,7 +25,6 @@ class WesternUnionController @Inject()(messagesControllerComponents: MessagesCon
   def westernUnion = Action(xmlOrAny) {
     request =>
       try {
-        println("yo")
         request.body match {
           case xml: NodeSeq => new Status(200)(<message status="200">SUCCESS</message>).as("application/xml")
           case _ => InternalServerError(<message status="500">FAILURE</message>).as("application/xml")
