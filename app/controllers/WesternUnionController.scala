@@ -1,15 +1,18 @@
 package controllers
 
+import java.util.Locale
+
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import play.api.i18n.I18nSupport
-import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents, PlayBodyParsers}
 import play.api.{Configuration, Logger}
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
+import scala.xml.NodeSeq
 
 @Singleton
-class WesternUnionController @Inject()(messagesControllerComponents: MessagesControllerComponents)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class WesternUnionController @Inject()(messagesControllerComponents: MessagesControllerComponents, playBodyParsers: PlayBodyParsers)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
@@ -21,30 +24,29 @@ class WesternUnionController @Inject()(messagesControllerComponents: MessagesCon
     Ok(views.html.component.master.westernUnion())
   }
 
-  def sayHello = Action(parse.xml) { request =>
-    (request.body \\ "name" headOption)
-      .map(_.text)
-      .map { _ =>
-        Ok(<message status="OK">SUCCESS</message>).as("application/xml")
+  def westernUnion = Action(xmlOrAny) {
+    request =>
+      try {
+        println("yo")
+        request.body match {
+          case xml: NodeSeq => new Status(200)(<message status="200">SUCCESS</message>).as("application/xml")
+          case _ => InternalServerError(<message status="500">FAILURE</message>).as("application/xml")
+        }
       }
-      .getOrElse {
-        BadRequest(<message status="KO"></message>).as("application/xml")
+      catch {
+        case _: Exception => Ok(<message status="500">FAILURE</message>).as("application/xml")
       }
   }
 
-  def westernUnion: Action[AnyContent] = Action { implicit request =>
-    views.companion.blockchain.ChangeBuyerBid.form.bindFromRequest().fold(
-      formWithErrors => {
-        BadRequest(views.html.component.blockchain.changeBuyerBid(formWithErrors))
-      },
-      changeBuyerBidData => {
-        try {
-          Ok(views.html.index(successes = Seq(constants.Response.BUYER_BID_CHANGED)))
-        }
-        catch {
-          case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-        }
+  val xmlOrAny = parse.using {
+    request =>
+      request.contentType.map(_.toLowerCase(Locale.ENGLISH)) match {
+        case Some("application/xml") | Some("text/xml") =>
+          try {play.api.mvc.BodyParsers.parse.xml }catch {
+            case _: Exception => play.api.mvc.BodyParsers.parse.error(Future.successful(InternalServerError(<message status="500">FAILURE</message>).as("application/xml")))
+          }
+        case _ => play.api.mvc.BodyParsers.parse.error(Future.successful(UnsupportedMediaType(<message status="415">FAILURE</message>).as("application/xml")))
       }
-    )
   }
+
 }

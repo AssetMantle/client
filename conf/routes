@@ -324,7 +324,7 @@ GET         /master/setSellerFeedback                                    control
 POST        /master/setSellerFeedback                                    controllers.SetSellerFeedbackController.setSellerFeedback
 
 GET         /master/westernUnion                                         controllers.WesternUnionController.westernUnionForm
-POST        /master/westernUnion                                         controllers.WesternUnionController.sayHello
+POST        /master/westernUnion                                         controllers.WesternUnionController.westernUnion
 
 GET         /blockchain/addKey                                           controllers.AddKeyController.blockchainAddKeyForm
 POST        /blockchain/addKey                                           controllers.AddKeyController.blockchainAddKey
