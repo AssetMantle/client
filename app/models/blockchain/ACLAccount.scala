@@ -141,16 +141,6 @@ class ACLAccounts @Inject()(protected val databaseConfigProvider: DatabaseConfig
 
     }
     def dirtyEntityUpdater() =  {
-     /* try {
-        val dirtyAddresses = Service.getDirtyAddresses
-        Thread.sleep(sleepTime)
-        for (dirtyAddress <- dirtyAddresses) {
-          val responseAccount = getACL.Service.get(dirtyAddress)
-          Service.insertOrUpdate(responseAccount.value.address, responseAccount.value.zoneID, responseAccount.value.organizationID, responseAccount.value.acl, dirtyBit = false)
-        }
-      } catch {
-        case baseException: BaseException => logger.error(baseException.failure.message, baseException)
-      }*/
 
       val dirtyAddresses = Service.getDirtyAddresses
       Thread.sleep(sleepTime)

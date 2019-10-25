@@ -10,7 +10,7 @@ import play.api.{Configuration, Logger}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class WithOrganizationLoginAction @Inject()(messagesControllerComponents: MessagesControllerComponents, masterAccounts: master.Accounts, masterTransactionAccountTokens: masterTransaction.AccountTokens)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class WithOrganizationLoginAction @Inject()(messagesControllerComponents: MessagesControllerComponents, masterAccounts: master.Accounts, masterTransactionSessionTokens: masterTransaction.SessionTokens)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val module: String = constants.Module.ACTIONS_WITH_ORGANIZATION_LOGIN_ACTION
 
@@ -19,8 +19,8 @@ class WithOrganizationLoginAction @Inject()(messagesControllerComponents: Messag
     try {
       val username = request.session.get(constants.Security.USERNAME).getOrElse(throw new BaseException(constants.Response.USERNAME_NOT_FOUND))
       val sessionToken = request.session.get(constants.Security.TOKEN).getOrElse(throw new BaseException(constants.Response.TOKEN_NOT_FOUND))
-      val sessionTokenVerify = masterTransactionAccountTokens.Service.tryVerifyingSessionToken(username, sessionToken)
-      val tokenTimeVerify = masterTransactionAccountTokens.Service.tryVerifyingSessionTokenTime(username)
+      val sessionTokenVerify = masterTransactionSessionTokens.Service.tryVerifyingSessionToken(username, sessionToken)
+      val tokenTimeVerify = masterTransactionSessionTokens.Service.tryVerifyingSessionTokenTime(username)
       val verifyUserType = masterAccounts.Service.tryVerifyingUserType(username, constants.User.ORGANIZATION)
       val address = masterAccounts.Service.getAddress(username)
 

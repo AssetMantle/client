@@ -1,0 +1,17 @@
+@import controllers.actions.LoginState
+@import models.master.OrganizationKYC
+@import helper._
+@import views.html.base._
+
+@(organizationKYCs: Seq[OrganizationKYC])(implicit requestHeader: RequestHeader, flash: Flash, messagesProvider: MessagesProvider, loginState: LoginState = null)
+@for(organizationKYC <- organizationKYCs) {
+    @component.master.commonDocumentViewer(organizationKYC) {
+        @routes.FileController.zoneAccessedOrganizationKYCFile(organizationKYC.id, organizationKYC.fileName, organizationKYC.documentType)
+    } {
+        <a href="@routes.FileController.zoneAccessedOrganizationKYCFile(organizationKYC.id, organizationKYC.fileName, organizationKYC.documentType)">@Messages(organizationKYC.documentType)</a>
+    } {
+        <div>
+            @views.html.component.master.updateOrganizationKYCDocumentStatus(organizationKYC = organizationKYC)
+        </div>
+    }
+}

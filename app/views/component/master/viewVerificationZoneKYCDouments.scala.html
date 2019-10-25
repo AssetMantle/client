@@ -1,0 +1,15 @@
+@import controllers.actions.LoginState
+@import models.master.ZoneKYC
+
+@(zoneKYCs: Seq[ZoneKYC])(implicit requestHeader: RequestHeader, flash: Flash, messagesProvider: MessagesProvider, loginState: LoginState = null)
+@for(zoneKYC <- zoneKYCs) {
+    @component.master.commonDocumentViewer(zoneKYC) {
+        @routes.FileController.genesisAccessedFile(zoneKYC.fileName, zoneKYC.documentType)
+    } {
+        <a href="@routes.FileController.genesisAccessedFile(zoneKYC.fileName, zoneKYC.documentType)">@Messages(zoneKYC.documentType)</a>
+    } {
+        <div>
+            @views.html.component.master.updateZoneKYCDocumentStatus(zoneKYC = zoneKYC)
+        </div>
+    }
+}

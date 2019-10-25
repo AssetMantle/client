@@ -9,7 +9,7 @@ import slick.jdbc.JdbcProfile
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
-import scala.util.{Failure, Random, Success}
+import scala.util.{Failure, Success}
 
 case class AddTraderRequest(id: String, accountID: String, traderID: String, organizationID: String)
 
@@ -25,7 +25,7 @@ class AddTraderRequests @Inject()(protected val databaseConfigProvider: Database
   private val logger: Logger = Logger(this.getClass)
 
   import databaseConfig.profile.api._
-  
+
   private[models] val addTraderRequestTable = TableQuery[AddTraderRequestTable]
 
   private def add(addTraderRequest: AddTraderRequest): Future[String] = db.run((addTraderRequestTable returning addTraderRequestTable.map(_.id) += addTraderRequest).asTry).map {

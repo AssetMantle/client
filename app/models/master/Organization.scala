@@ -20,7 +20,7 @@ case class Organization(id: String, zoneID: String, accountID: String, name: Str
 @Singleton
 class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
 
-  case class OrganizationSerialized(id: String, zoneID: String, accountID: String, name: String, abbreviation: Option[String] = None, establishmentDate: Date, email: String, registeredAddress: String, postalAddress: String, ubos: Option[String] = None, completionStatus: Boolean = false, verificationStatus: Option[Boolean] = None) {
+  case class OrganizationSerialized(id: String, zoneID: String, accountID: String, name: String, abbreviation: Option[String] = None, establishmentDate: Date, email: String, registeredAddress: String, postalAddress: String, ubos: Option[String] = None, completionStatus: Boolean, verificationStatus: Option[Boolean]) {
 
     def deserialize: Organization = Organization(id = id, zoneID = zoneID, accountID = accountID, name = name, abbreviation = abbreviation, establishmentDate = establishmentDate, email = email, registeredAddress = utilities.JSON.convertJsonStringToObject[Address](registeredAddress), postalAddress = utilities.JSON.convertJsonStringToObject[Address](postalAddress), ubos = utilities.JSON.convertJsonStringToObject[UBOs](ubos.getOrElse(Json.toJson(UBOs(Seq())).toString)), completionStatus = completionStatus, verificationStatus = verificationStatus)
 
@@ -146,11 +146,11 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
     }
   }
 
-  private def getUBOsOnID(id: String): Future[String] = db.run(organizationTable.filter(_.id === id).map(_.ubos.?).result.head.asTry).map {
-    case Success(result) => result.getOrElse(Json.toJson(UBOs(Seq())).toString)
+  private def getUBOsOnID(id: String): Future[Option[String]] = db.run(organizationTable.filter(_.id === id).map(_.ubos.?).result.head.asTry).map {
+    case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.info(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        Json.toJson(UBOs(Seq())).toString
+        None
     }
   }
 
@@ -198,19 +198,23 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
 
     def create(zoneID: String, accountID: String, name: String, abbreviation: Option[String], establishmentDate: Date, email: String, registeredAddress: Address, postalAddress: Address, ubos: UBOs): String = Await.result(add(serialize(Organization(id = utilities.IDGenerator.hexadecimal, zoneID = zoneID, accountID = accountID, name = name, abbreviation = abbreviation, establishmentDate = establishmentDate, registeredAddress = registeredAddress, postalAddress = postalAddress, email = email, ubos = ubos))), Duration.Inf)
 
-    def insertOrUpdateOrganizationWithoutUBOs(zoneID: String, accountID: String, name: String, abbreviation: Option[String], establishmentDate: Date, email: String, registeredAddress: Address, postalAddress: Address):Future[String] = {
+    def insertOrUpdateWithoutUBOs(zoneID: String, accountID: String, name: String, abbreviation: Option[String], establishmentDate: Date, email: String, registeredAddress: Address, postalAddress: Address): Future[String] = {
+      /*val id = Await.result(getIDByAccountID(accountID), Duration.Inf).getOrElse(utilities.IDGenerator.hexadecimal)
+      Await.result(upsert(serialize(Organization(id = id, zoneID = zoneID, accountID = accountID, name = name, abbreviation = abbreviation, establishmentDate = establishmentDate, registeredAddress = registeredAddress, postalAddress = postalAddress, email = email, ubos = getUBOs(id)))), Duration.Inf)
+      id*/
 
-      val id=getIDByAccountID(accountID)
-      for{
-        id<-id
-        ubos<- getUBOs(id.getOrElse(utilities.IDGenerator.hexadecimal))
-        _ <- upsert(serialize(Organization(id = id.getOrElse(utilities.IDGenerator.hexadecimal), zoneID = zoneID, accountID = accountID, name = name, abbreviation = abbreviation, establishmentDate = establishmentDate, registeredAddress = registeredAddress, postalAddress = postalAddress, email = email, ubos = ubos)))
-      }yield id.getOrElse(utilities.IDGenerator.hexadecimal)
+      val id=getIDByAccountID(accountID).map{_.getOrElse(utilities.IDGenerator.hexadecimal)}
+      def upsertOrganization(id:String,ubos:UBOs)=upsert(serialize(Organization(id = id, zoneID = zoneID, accountID = accountID, name = name, abbreviation = abbreviation, establishmentDate = establishmentDate, registeredAddress = registeredAddress, postalAddress = postalAddress, email = email, ubos = ubos)))
+        for{
+          id<-id
+          ubos<- getUBOs(id)
+          _<-upsertOrganization(id,ubos)
+        }yield id
     }
 
     def getID(accountID: String): Future[String] = getIDByAccountID(accountID).map{id=> id.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION))}
 
-    def getUBOs(id: String):Future[UBOs]=getUBOsOnID(id).map{UBOs=> utilities.JSON.convertJsonStringToObject[UBOs](UBOs)}
+    def getUBOs(id: String): Future[UBOs] =getUBOsOnID(id).map(_.getOrElse(Json.toJson(UBOs(Seq())).toString)).map{utilities.JSON.convertJsonStringToObject[UBOs](_)}
 
     def get(id: String): Future[Organization] = findById(id).map{organizationSerialized=> organizationSerialized.deserialize}
 
@@ -227,8 +231,6 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
     def getAccountId(id: String): Future[String] = getAccountIdById(id)
 
     def getVerifyOrganizationRequests(zoneID: String): Future[Seq[Organization]] = getOrganizationsByCompletionStatusVerificationStatusAndZoneID(zoneID = zoneID, completionStatus = true, verificationStatus = null).map{organizations=> organizations.map(_.deserialize)}
-
-
 
     def getOrganizationsInZone(zoneID: String): Future[Seq[Organization]] = getOrganizationsByZoneID(zoneID).map{organizations=>organizations.map(_.deserialize)}
 

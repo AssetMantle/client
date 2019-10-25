@@ -1,36 +1,28 @@
 @import controllers.actions.LoginState
 @import helper._
-@import views.companion.master.ConfirmBuyerBid
+@import views.html.base._
+@import views.companion.master.ConfirmBidTransaction
+@import models.masterTransaction.NegotiationRequest
+@import models.masterTransaction.NegotiationFile
 
-@(confirmBuyerBidForm: Form[ConfirmBuyerBid.Data], sellerAddress: String, pegHash: String, bid: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@(confirmBidTransactionForm: Form[ConfirmBidTransaction.Data] = ConfirmBidTransaction.form, negotiation: NegotiationRequest, files: Seq[NegotiationFile])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@commonForm(constants.Form.CONFIRM_BUYER_BID, confirmBidTransactionForm) {
+    <span class="red">@Messages(constants.Form.SELLER_ID)</span> : @negotiation.sellerAccountID <br>
+    <span class="red">@Messages(constants.FormField.BID.name)</span> : @negotiation.amount <br>
+    <span class="red">@Messages(constants.FormField.PEG_HASH.name)</span> : @negotiation.pegHash <br>
 
-@form(action = routes.ConfirmBuyerBidController.confirmBuyerBid, 'onkeypress -> "submitFormOnEnter(event,this)") {
-    <div class="latest_card-header latest_card-header-primary text-center">
-        <h4 class="latest_card-title">@Messages(constants.Form.CONFIRM_BUYER_BID)</h4>
-    </div>
-    <script src="@routes.Assets.versioned("javascripts/showHideUploadUpdateButton.js")" type="text/javascript"></script>
-    <div class="centerText">
-        <button id="traderButtonUploadBuyerContract" class="hidden" onclick="getForm(jsRoutes.controllers.FileController.uploadTraderNegotiationForm('@constants.File.BUYER_CONTRACT', '@confirmBuyerBidForm.data(constants.FormField.REQUEST_ID.name)'))">@Messages(constants.Form.UPLOAD_BUYER_CONTRACT)</button>
-        <button id="traderButtonUpdateBuyerContract" class="hidden" onclick="getForm(jsRoutes.controllers.FileController.updateTraderNegotiationForm('@constants.File.BUYER_CONTRACT', '@confirmBuyerBidForm.data(constants.FormField.REQUEST_ID.name)'))">@Messages(constants.Form.UPDATE_SELLER_CONTRACT)</button>
-        <script>checkFileExists(jsRoutes.controllers.FileController.checkTraderNegotiationFileExists('@confirmBuyerBidForm.data(constants.FormField.REQUEST_ID.name)', '@constants.File.BUYER_CONTRACT'), "traderButtonUploadBuyerContract", "traderButtonUpdateBuyerContract")</script>
-    </div>
-    <div class="latest_card-body">
-        @CSRF.formField
-      @inputText(confirmBuyerBidForm(constants.FormField.SELLER_ADDRESS.name).copy(value = Some(sellerAddress)), '_label -> Messages(constants.FormField.SELLER_ADDRESS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.SELLER_ADDRESS.name), 'required -> true)
-      @inputText(confirmBuyerBidForm(constants.FormField.BID.name) copy (value = Some(bid.toString)), '_label -> Messages(constants.FormField.BID.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.BID.name), 'required -> true, 'type -> "number")
-      @inputText(confirmBuyerBidForm(constants.FormField.TIME.name), '_label -> Messages(constants.FormField.TIME.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.TIME.name), 'required -> true, 'type -> "number")
-      @inputText(confirmBuyerBidForm(constants.FormField.PEG_HASH.name).copy(value = Some(pegHash)), '_label -> Messages(constants.FormField.PEG_HASH.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PEG_HASH.name), 'required -> true)
-      @inputText(confirmBuyerBidForm(constants.FormField.BUYER_CONTRACT_HASH.name), '_label -> Messages(constants.FormField.BUYER_CONTRACT_HASH.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.BUYER_CONTRACT_HASH.name), 'required -> true)
-      @inputText(confirmBuyerBidForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.GAS.name), 'required -> true, 'type -> "number")
-      @inputPassword(confirmBuyerBidForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PASSWORD.name), 'required -> true)
-
-        @if(confirmBuyerBidForm.hasGlobalErrors) {
-            <ul>
-            @for(error <- confirmBuyerBidForm.globalErrors) {
-                <li>@error.format</li>
-            }
-            </ul>
+    @for(file <- files) {
+        @component.master.commonDocumentViewer(file) {
+            @routes.FileController.tradingFile(file.id, file.fileName, file.documentType)
+        } {
+            <a href="@routes.FileController.tradingFile(file.id, file.fileName, file.documentType)">@Messages(file.documentType)</a>
+        } {
+            <span>@file.documentType</span>
         }
-        <button type="button" class="btn btn-primary btn-sm" onclick="submitForm(this)">@Messages(constants.Form.CONFIRM_BUYER_BID)</button>
-    </div>
+    }
+
+    @inputText(confirmBidTransactionForm(constants.FormField.REQUEST_ID.name), '_label -> Messages(constants.FormField.REQUEST_ID.name), 'class -> "form-control hidden", 'placeholder -> Messages(constants.FormField.REQUEST_ID.name), 'required -> false)
+    @inputText(confirmBidTransactionForm(constants.FormField.TIME.name), '_label -> Messages(constants.FormField.TIME.name), 'class -> "form-control", 'placeholder -> Messages(constants.FormField.TIME.name), 'type -> "number", 'required -> true)
+    @inputText(confirmBidTransactionForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.GAS.name), 'type -> "number", 'required -> true)
+    @inputPassword(confirmBidTransactionForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PASSWORD.name), 'required -> true)
 }

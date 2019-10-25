@@ -174,10 +174,8 @@ class AddZones @Inject()(actorSystem: ActorSystem, transaction: utilities.Transa
         blockchainZones.Service.create(addZone.zoneID, addZone.to, dirtyBit = true)
         masterZones.Service.verifyZone(addZone.zoneID)
         masterAccounts.Service.updateUserTypeOnAddress(addZone.to, constants.User.ZONE)
-        val zoneAccountId = masterAccounts.Service.getId(addZone.to)
-        masterZoneKYCs.Service.verifyAll(zoneAccountId)
         blockchainAccounts.Service.markDirty(addZone.from)
-        utilitiesNotification.send(zoneAccountId, constants.Notification.SUCCESS, blockResponse.txhash)
+        utilitiesNotification.send(masterAccounts.Service.getId(addZone.to), constants.Notification.SUCCESS, blockResponse.txhash)
         utilitiesNotification.send(masterAccounts.Service.getId(addZone.from), constants.Notification.SUCCESS, blockResponse.txhash)
       } catch {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)

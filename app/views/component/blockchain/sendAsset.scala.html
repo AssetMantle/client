@@ -1,29 +1,14 @@
 @import helper._
 @import views.companion.blockchain.SendAsset
+@import views.html.base._
 
-@(sendAssetForm: Form[SendAsset.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-
-@form(action = routes.SendAssetController.blockchainSendAsset, 'onkeypress -> "submitFormOnEnter(event,this)") {
-    <div class="latest_card-header latest_card-header-primary text-center">
-        <h4 class="latest_card-title">@Messages(constants.Form.SEND_ASSET)</h4>
-    </div>
-    <div class="latest_card-body">
-        @CSRF.formField
-      @inputText(sendAssetForm(constants.FormField.FROM.name), '_label -> Messages(constants.FormField.FROM.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.FROM.name), 'required -> true)
-      @inputText(sendAssetForm(constants.FormField.TO.name), '_label -> Messages(constants.FormField.TO.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.TO.name), 'required -> true)
-      @inputText(sendAssetForm(constants.FormField.PEG_HASH.name), '_label -> Messages(constants.FormField.PEG_HASH.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PEG_HASH.name), 'required -> true)
-      @inputText(sendAssetForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.GAS.name), 'required -> true, 'type -> "number")
-      @inputText(sendAssetForm(constants.FormField.MODE.name), '_label -> Messages(constants.FormField.MODE.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.MODE.name), 'required -> true)
-      @inputPassword(sendAssetForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PASSWORD.name), 'required -> true)
-
-        @if(sendAssetForm.hasGlobalErrors) {
-            <ul>
-            @for(error <- sendAssetForm.globalErrors) {
-                <li>@error.format</li>
-            }
-            </ul>
-        }
-        <button type="button" class="btn btn-primary btn-sm" onclick="submitForm(this)">@Messages(constants.Form.SEND_ASSET)</button>
-    </div>
+@(sendAssetForm: Form[SendAsset.Data] = SendAsset.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@commonForm(constants.Form.BLOCKCHAIN_SEND_ASSET, sendAssetForm) {
+    @commonInputText(sendAssetForm, constants.FormField.FROM.name)
+    @commonInputText(sendAssetForm, constants.FormField.TO.name)
+    @commonInputText(sendAssetForm, constants.FormField.PEG_HASH.name)
+    @commonInputText(sendAssetForm, constants.FormField.GAS.name)
+    @commonInputText(sendAssetForm, constants.FormField.MODE.name)
+    @commonInputPassword(sendAssetForm, constants.FormField.PASSWORD.name)
 }
 

@@ -12,7 +12,6 @@ import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerC
 import play.api.{Configuration, Logger}
 import queries.GetAccount
 
-import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future, Promise}
 import scala.util.{Failure, Success}
 
@@ -20,6 +19,8 @@ import scala.util.{Failure, Success}
 class IndexController @Inject()(messagesControllerComponents: MessagesControllerComponents, withLoginAction: WithLoginAction, masterAccounts: Accounts, blockchainAclAccounts: ACLAccounts, blockchainZones: blockchain.Zones, blockchainOrganizations: blockchain.Organizations, blockchainAssets: blockchain.Assets, blockchainFiats: blockchain.Fiats, blockchainNegotiations: blockchain.Negotiations, masterOrganizations: Organizations, masterZones: Zones, blockchainAclHashes: blockchain.ACLHashes, blockchainOrders: blockchain.Orders, getAccount: GetAccount, blockchainAccounts: blockchain.Accounts, withUsernameToken: WithUsernameToken)(implicit configuration: Configuration, executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
+
+  private implicit val module: String = constants.Module.CONTROLLERS_INDEX
 
   def index: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
@@ -118,20 +119,18 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
    // val account = masterAccounts.Service.getAccountAsync("buyer014789")
    // val address = masterAccounts.Service.getAddressAsync("buyer014789")
   //  val userType = masterAccounts.Service.getUserTypeAsync("buyer014789")
-    val lang = masterAccounts.Service.getLanguageAsync("buyer014789")
-    val availability = masterAccounts.Service.checkUsernameAvailableAsync("buyer014789")
-
-
+    val lang = masterAccounts.Service.getLanguageAsync("minijoker123")
+    val availability = masterAccounts.Service.checkUsernameAvailableAsync("minijoker123")
 
     def markDirtyFromAddress= {
       if (3 == 4) {
-        val account = masterAccounts.Service.getAccountAsync("buyer014789")
-        val address = masterAccounts.Service.getAddressAsync("buyer014789")
-        val userType = masterAccounts.Service.getUserTypeAsync("buyer014789123")
+        val account = masterAccounts.Service.getAccountAsync("minijoker123")
+        val address = masterAccounts.Service.getAddressAsync("minijoker123")
+
         for {
           account <- account
           address <- address
-          userType <- userType
+
         } yield {}
       }else{Future{Unit}}
 
@@ -144,12 +143,30 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
     } yield {}
 
 
-   somet.map{some=>
+    val x=Future{
+      println("Future running")
+      Thread.sleep(10000)
+      println("Future Complete")
+      throw new BaseException(constants.Response.DOCUMENT_NOT_FOUND)
+    }
+
+
+    val userType = masterAccounts.Service.getUserTypeAsync("minijoker123")
+
+    (for{
+      _<-somet
+      _ <- userType
+    }yield Ok("fwef")
+      ).recover{
+      case baseException: BaseException=> Ok(baseException.module+"   "+baseException.failure.message)
+      case e:Exception=> Ok("someOtherError")
+    }
+   /*somet.map{some=>
      Ok("fwef")
    }.recover{
      case baseException: BaseException=> Ok(baseException.module+"   "+baseException.failure.message)
      case e:Exception=> Ok("someOtherError")
-   }
+   }*/
 
   }
 

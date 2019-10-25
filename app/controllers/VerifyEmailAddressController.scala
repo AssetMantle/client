@@ -10,7 +10,6 @@ import models.masterTransaction.EmailOTPs
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
-import views.companion.master.VerifyEmailAddress
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -23,44 +22,23 @@ class VerifyEmailAddressController @Inject()(messagesControllerComponents: Messa
 
   def verifyEmailAddressForm: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-     /* try {
-        val otp = emailOTPs.Service.sendOTP(loginState.username)
-        utilitiesNotification.send(accountID = loginState.username, notification = constants.Notification.VERIFY_EMAIL, otp)
-        withUsernameToken.Ok(views.html.component.master.verifyEmailAddress(VerifyEmailAddress.form))
-      }
-      catch {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-      }*/
+
       val otp =  emailOTPs.Service.sendOTP(loginState.username)
       for{
         otp<-otp
       }yield {
         utilitiesNotification.send(accountID = loginState.username, notification = constants.Notification.VERIFY_EMAIL, otp)
-        withUsernameToken.Ok(views.html.component.master.verifyEmailAddress(VerifyEmailAddress.form))
+        withUsernameToken.Ok(views.html.component.master.verifyEmailAddress())
       }
   }
 
   def verifyEmailAddress: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      VerifyEmailAddress.form.bindFromRequest().fold(
+      views.companion.master.VerifyEmailAddress.form.bindFromRequest().fold(
         formWithErrors => {
           Future{BadRequest(views.html.component.master.verifyEmailAddress(formWithErrors))}
         },
         verifyEmailAddressData => {
-          /*try {
-            emailOTPs.Service.verifyOTP(loginState.username, verifyEmailAddressData.otp)
-            masterContacts.Service.verifyEmailAddress(loginState.username)
-            val contact = masterContacts.Service.getContact(loginState.username).getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION))
-            if (contact.emailAddressVerified && contact.mobileNumberVerified) {
-              masterAccounts.Service.updateStatusComplete(loginState.username)
-            } else {
-              masterAccounts.Service.updateStatusUnverifiedMobile(loginState.username)
-            }
-            withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.EMAIL_ADDRESS_VERIFIED)))
-          }
-          catch {
-            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-          }*/
           val verifyOTP=emailOTPs.Service.verifyOTP(loginState.username, verifyEmailAddressData.otp)
           val verifyEmailAddress=masterContacts.Service.verifyEmailAddress(loginState.username)
           val contact=masterContacts.Service.getContact(loginState.username).map{contactVal=> contactVal.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)) }

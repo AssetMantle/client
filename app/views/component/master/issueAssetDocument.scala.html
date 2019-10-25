@@ -1,5 +1,6 @@
 @import controllers.actions.LoginState
 @import helper._
+@import views.html.base._
 @import views.companion.master.IssueAssetOBL
 @import models.masterTransaction.AssetFile
 
@@ -17,15 +18,15 @@
         } {
             <a href="@routes.FileController.tradingFile(id, file.fileName, file.documentType)">@Messages(file.documentType)</a>
         } {
-            <button onclick="getForm(jsRoutes.controllers.File.updateTraderAssetForm('@file.documentType', '@id'))">@Messages(constants.Form.UPDATE) @Messages(file.documentType)</button>
+            <button onclick="getForm(jsRoutes.controllers.FileController.updateTraderAssetForm('@file.documentType', '@id'))">@Messages(constants.Form.UPDATE) @Messages(file.documentType)</button>
             <script>hideElement('upload@file.documentType')</script>
         }
     }
 </div>
-@*/ /TODO whether database should contain constants.File.TRADER_KYC_DOCUMENT_TYPES (current scenario) OR constants.File.TRADER_KYC_DOCUMENT_TYPES should contain all database file type*@
+
 @if(constants.File.TRADER_ASSET_DOCUMENT_TYPES_UPLOAD_PAGE_NEXT.forall(files.map(_.documentType).contains)) {
-    <button type="button" id="issueAssetDocuments" onclick="getForm(jsRoutes.controllers.IssueAssetController.issueAssetRequestForm('@id'))">@Messages(constants.Form.NEXT)</button>
+    <button id="issueAssetDocuments" onclick="getForm(jsRoutes.controllers.IssueAssetController.issueAssetRequestForm('@id'))">@Messages(constants.Form.NEXT)</button>
 }else {
-    <button type="button" id="issueAssetDocuments" onclick="getForm(jsRoutes.controllers.IssueAssetController.issueAssetRequestForm('@id'))" disabled="disabled">@Messages(constants.Form.NEXT)</button>
+    <button id="issueAssetDocuments" onclick="getForm(jsRoutes.controllers.IssueAssetController.issueAssetRequestForm('@id'))" disabled="disabled">@Messages(constants.Form.NEXT)</button>
 
 }

@@ -25,7 +25,7 @@ class RedeemAssetController @Inject()(messagesControllerComponents: MessagesCont
     val account=blockchainACLAccounts.Service.get(ownerAddress)
     for{
       account<-account
-    }yield Ok(views.html.component.master.redeemAsset(views.companion.master.RedeemAsset.form, account.zoneID, pegHash))
+    }yield Ok(views.html.component.master.redeemAsset(zoneID = account.zoneID, pegHash = pegHash))
 
   }
 
@@ -36,22 +36,7 @@ class RedeemAssetController @Inject()(messagesControllerComponents: MessagesCont
           Future{BadRequest(views.html.component.master.redeemAsset(formWithErrors, formWithErrors.data(constants.Form.ZONE_ID), formWithErrors.data(constants.Form.PEG_HASH)))}
         },
         redeemAssetData => {
-         /* try {
-            val toAddress = blockchainZones.Service.getAddress(redeemAssetData.zoneID)
-            transaction.process[blockchainTransaction.RedeemAsset, transactionsRedeemAsset.Request](
-              entity = blockchainTransaction.RedeemAsset(from = loginState.address, to = toAddress, pegHash = redeemAssetData.pegHash, gas = redeemAssetData.gas, ticketID = "", mode = transactionMode),
-              blockchainTransactionCreate = blockchainTransactionRedeemAssets.Service.create,
-              request = transactionsRedeemAsset.Request(transactionsRedeemAsset.BaseReq(from = loginState.address, gas = redeemAssetData.gas.toString), to = toAddress, password = redeemAssetData.password, pegHash = redeemAssetData.pegHash, mode = transactionMode),
-              action = transactionsRedeemAsset.Service.post,
-              onSuccess = blockchainTransactionRedeemAssets.Utility.onSuccess,
-              onFailure = blockchainTransactionRedeemAssets.Utility.onFailure,
-              updateTransactionHash = blockchainTransactionRedeemAssets.Service.updateTransactionHash
-            )
-            withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ASSET_REDEEMED)))
-          }
-          catch {
-            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-          }*/
+
           val toAddress = blockchainZones.Service.getAddress(redeemAssetData.zoneID)
           def transactionProcess(toAddress:String)=transaction.process[blockchainTransaction.RedeemAsset, transactionsRedeemAsset.Request](
             entity = blockchainTransaction.RedeemAsset(from = loginState.address, to = toAddress, pegHash = redeemAssetData.pegHash, gas = redeemAssetData.gas, ticketID = "", mode = transactionMode),
@@ -74,7 +59,7 @@ class RedeemAssetController @Inject()(messagesControllerComponents: MessagesCont
   }
 
   def blockchainRedeemAssetForm: Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.blockchain.redeemAsset(views.companion.blockchain.RedeemAsset.form))
+    Ok(views.html.component.blockchain.redeemAsset())
   }
 
   def blockchainRedeemAsset: Action[AnyContent] = Action.async { implicit request =>
@@ -84,13 +69,7 @@ class RedeemAssetController @Inject()(messagesControllerComponents: MessagesCont
         Future{BadRequest(views.html.component.blockchain.redeemAsset(formWithErrors))}
       },
       redeemAssetData => {
-        /*try {
-          transactionsRedeemAsset.Service.post(transactionsRedeemAsset.Request(transactionsRedeemAsset.BaseReq(from = redeemAssetData.from, gas = redeemAssetData.gas.toString), to = redeemAssetData.to, password = redeemAssetData.password, pegHash = redeemAssetData.pegHash, mode = redeemAssetData.mode))
-          Ok(views.html.index(successes = Seq(constants.Response.ASSET_REDEEMED)))
-        }
-        catch {
-          case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-        }*/
+
         val post=transactionsRedeemAsset.Service.post(transactionsRedeemAsset.Request(transactionsRedeemAsset.BaseReq(from = redeemAssetData.from, gas = redeemAssetData.gas.toString), to = redeemAssetData.to, password = redeemAssetData.password, pegHash = redeemAssetData.pegHash, mode = redeemAssetData.mode))
         (for{
           _<-post

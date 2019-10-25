@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="sbt: io.pebbletemplates:pebble:3.0.8:jar">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.ivy2/cache/io.pebbletemplates/pebble/jars/pebble-3.0.8.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.ivy2/cache/io.pebbletemplates/pebble/srcs/pebble-3.0.8-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

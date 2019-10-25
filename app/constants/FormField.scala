@@ -2,7 +2,7 @@ package constants
 
 import java.util.Date
 
-import play.api.data.Forms.{date, number, of, text}
+import play.api.data.Forms.{date, number, of, text, boolean}
 import play.api.data.Mapping
 import play.api.data.format.Formats._
 import play.api.data.validation.Constraints
@@ -37,7 +37,7 @@ object FormField {
   val COMMODITY_NAME = new StringFormField("COMMODITY_NAME", 2, 20, RegularExpression.ALL_NUMBERS_ALL_LETTERS)
   val QUANTITY_UNIT = new StringFormField("QUANTITY_UNIT", 2, 10, RegularExpression.ALL_LETTERS)
   val TRANSACTION_ID = new StringFormField("TRANSACTION_ID", 2, 50, RegularExpression.ALL_NUMBERS_ALL_LETTERS)
-  val NOTIFICATION_TOKEN = new StringFormField("NOTIFICATION_TOKEN", 0, 200)
+  val PUSH_NOTIFICATION_TOKEN = new StringFormField("PUSH_NOTIFICATION_TOKEN", 0, 200)
   val COMMENT = new StringFormField("COMMENT", 0, 200)
   val COUPON = new StringFormField("COUPON", 0, 50)
   val COUNTRY_CODE = new StringFormField("COUNTRY_CODE", 1, 5)
@@ -46,7 +46,7 @@ object FormField {
   val EMAIL_ADDRESS = new StringFormField("EMAIL_ADDRESS", 6, 100, RegularExpression.EMAIL_ADDRESS)
   val BUYER_CONTRACT_HASH = new StringFormField("BUYER_CONTRACT_HASH", 40, 40, RegularExpression.HASH)
   val SELLER_CONTRACT_HASH = new StringFormField("SELLER_CONTRACT_HASH", 40, 40, RegularExpression.HASH)
-  val DOCUMENT_HASH = new StringFormField("DOCUMENT_HASH", 4, 50, RegularExpression.HASH)
+  val DOCUMENT_HASH = new StringFormField("DOCUMENT_HASH", 4, 500)
   val FROM = new StringFormField("FROM", 45, 45)
   val MODE = new StringFormField("MODE", 4, 5)
   val PORT_OF_LOADING = new StringFormField("PORT_OF_LOADING", 0, 100)
@@ -91,6 +91,8 @@ object FormField {
   val CONFIRM_NEW_PASSWORD = new StringFormField("CONFIRM_NEW_PASSWORD", 1, 128, RegularExpression.PASSWORD, Response.INVALID_PASSWORD.message)
   val SEED = new StringFormField("SEED", 1, 200)
   val SEARCH_TX_HASH_HEIGHT = new StringFormField("SEARCH_TX_HASH_HEIGHT", 1, 1000)
+  val DOCUMENT_TYPE = new StringFormField("DOCUMENT_TYPE", 2, 500)
+  val FILE_ID = new StringFormField("FILE_ID", 2, 500)
 
   val ASSET_TYPE = new StringOptionFormField("ASSET_TYPE", constants.Form.ASSET_TYPE_OPTIONS)
   val DELIVERY_TERM = new StringOptionFormField("DELIVERY_TERM", constants.Form.DELIVERY_TERM_OPTIONS)
@@ -99,11 +101,8 @@ object FormField {
   val PHYSICAL_DOCUMENTS_HANDLED_VIA = new StringOptionFormField("PHYSICAL_DOCUMENTS_HANDLED_VIA", constants.Form.PHYSICAL_DOCUMENTS_HANDLED_VIA_OPTIONS)
   val COMDEX_PAYMENT_TERMS = new StringOptionFormField("COMDEX_PAYMENT_TERMS", constants.Form.COMDEX_PAYMENT_TERMS_OPTIONS)
 
-  val SHIPMENT_DATE = new DateFormField("SHIPMENT_DATE")
-  val INVOICE_DATE = new DateFormField("INVOICE_DATE")
-
   //IntFormField
-  val GAS = new IntFormField("GAS", 20000, 1000000)
+  val GAS = new IntFormField("GAS", 20000, 1000000, Some(1))
   val BID = new IntFormField("BID", 0, Int.MaxValue)
   val TIME = new IntFormField("TIME", 0, Int.MaxValue)
   val ASSET_QUANTITY = new IntFormField("ASSET_QUANTITY", 1, Int.MaxValue)
@@ -115,11 +114,36 @@ object FormField {
 
   //DateFormField
   val ESTABLISHMENT_DATE = new DateFormField("ESTABLISHMENT_DATE")
+  val SHIPMENT_DATE = new DateFormField("SHIPMENT_DATE")
+  val INVOICE_DATE = new DateFormField("INVOICE_DATE")
 
   //DoubleFormField
   val SHARE_PERCENTAGE = new DoubleFormField("SHARE_PERCENTAGE", 0.0, 100.0)
+
+  //BooleanFormField
+  val ISSUE_ASSET = new BooleanFormField("ISSUE_ASSET")
+  val ISSUE_FIAT = new BooleanFormField("ISSUE_FIAT")
+  val SEND_ASSET = new BooleanFormField("SEND_ASSET")
+  val SEND_FIAT = new BooleanFormField("SEND_FIAT")
+  val REDEEM_ASSET = new BooleanFormField("REDEEM_ASSET")
+  val REDEEM_FIAT = new BooleanFormField("REDEEM_FIAT")
+  val SELLER_EXECUTE_ORDER = new BooleanFormField("SELLER_EXECUTE_ORDER")
+  val BUYER_EXECUTE_ORDER = new BooleanFormField("BUYER_EXECUTE_ORDER")
+  val CHANGE_BUYER_BID = new BooleanFormField("CHANGE_BUYER_BID")
+  val CHANGE_SELLER_BID = new BooleanFormField("CHANGE_SELLER_BID")
+  val CONFIRM_BUYER_BID = new BooleanFormField("CONFIRM_BUYER_BID")
+  val CONFIRM_SELLER_BID = new BooleanFormField("CONFIRM_SELLER_BID")
+  val NEGOTIATION = new BooleanFormField("NEGOTIATION")
+  val RELEASE_ASSET = new BooleanFormField("RELEASE_ASSET")
+  val RECEIVE_NOTIFICATIONS = new BooleanFormField("RECEIVE_NOTIFICATIONS")
+  val USERNAME_AVAILABLE = new BooleanFormField("USERNAME_AVAILABLE")
+  val MODERATED = new BooleanFormField("MODERATED")
+  val COMPLETION = new BooleanFormField("COMPLETION")
+  val STATUS = new BooleanFormField("STATUS")
+  val CONFIRM_NOTE_NEW_KEY_DETAILS = new BooleanFormField("CONFIRM_NOTE_NEW_KEY_DETAILS")
+
   //TODO: Error Response through Messages
-  class StringFormField (fieldName: String, minimumLength: Int, maximumLength: Int, regex: Regex = """.*""".r, errorMessage: String = "Error Response") {
+  class StringFormField (fieldName: String, minimumLength: Int, maximumLength: Int, regex: Regex = RegularExpression.ANY_STRING, errorMessage: String = "Error Response") {
     val name: String = fieldName
     val field: Mapping[String] = text(minLength = minimumLength, maxLength = maximumLength).verifying(Constraints.pattern(regex = regex, name = regex.pattern.toString, error = errorMessage))
   }
@@ -129,7 +153,7 @@ object FormField {
     val field: Mapping[String] = text.verifying(constraint = field => option contains field, error = errorMessage)
   }
 
-  class IntFormField (fieldName: String, val minimumValue: Int, val maximumValue: Int) {
+  class IntFormField (fieldName: String, val minimumValue: Int, val maximumValue: Int, val rangeSliderStep: Option[Int] = None) {
     val name: String = fieldName
     val field: Mapping[Int] =  number(min = minimumValue, max = maximumValue)
   }
@@ -142,5 +166,10 @@ object FormField {
   class DoubleFormField(fieldName: String, minimumValue: Double, maximumValue: Double) {
     val name: String = fieldName
     val field: Mapping[Double] = of(doubleFormat).verifying(Constraints.max[Double](maximumValue), Constraints.min[Double](minimumValue))
+  }
+
+  class BooleanFormField(fieldName: String) {
+    val name: String = fieldName
+    val field: Mapping[Boolean] = boolean
   }
 }

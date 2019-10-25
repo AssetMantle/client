@@ -1,8 +1,9 @@
 package models.masterTransaction
 
+import java.sql.Timestamp
+
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import org.joda.time.{DateTime, DateTimeZone}
 import org.postgresql.util.PSQLException
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
@@ -10,9 +11,9 @@ import slick.jdbc.JdbcProfile
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
-import scala.util.{Failure, Random, Success}
+import scala.util.{Failure, Success}
 
-case class Notification(accountID: String, notificationTitle: String, notificationMessage: String, time: Long, read: Boolean, id: String)
+case class Notification(id: String, accountID: String, notificationTitle: String, notificationMessage: String, time: Timestamp, read: Boolean)
 
 @Singleton
 class Notifications @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
@@ -75,7 +76,9 @@ class Notifications @Inject()(protected val databaseConfigProvider: DatabaseConf
 
   private[models] class NotificationTable(tag: Tag) extends Table[Notification](tag, "Notification") {
 
-    def * = (accountID, notificationTitle, notificationMessage, time, read, id) <> (Notification.tupled, Notification.unapply)
+    def * = (id, accountID, notificationTitle, notificationMessage, time, read) <> (Notification.tupled, Notification.unapply)
+
+    def id = column[String]("id", O.PrimaryKey)
 
     def accountID = column[String]("accountID")
 
@@ -85,21 +88,19 @@ class Notifications @Inject()(protected val databaseConfigProvider: DatabaseConf
 
     def read = column[Boolean]("read")
 
-    def time = column[Long]("time")
-
-    def id = column[String]("id", O.PrimaryKey)
+    def time = column[Timestamp]("time")
 
   }
 
   object Service {
 
-    def create(accountID: String, notificationTitle: String, notificationMessage: String): Future[String] = add(Notification(accountID, notificationTitle, notificationMessage, DateTime.now(DateTimeZone.UTC).getMillis, false, Random.nextString(32)))
+    def create(accountID: String, notificationTitle: String, notificationMessage: String): Future[String] =add(Notification(id = utilities.IDGenerator.hexadecimal, accountID = accountID, notificationTitle = notificationTitle, notificationMessage = notificationMessage, time = new Timestamp(System.currentTimeMillis), read = false))
 
-    def get(accountID: String, offset: Int, limit: Int): Future[Seq[Notification]] = findNotificationsByAccountId(accountID, offset, limit)
+    def get(accountID: String, offset: Int, limit: Int): Future[Seq[Notification]] = findNotificationsByAccountId(accountID = accountID, offset = offset, limit = limit)
 
-    def markAsRead(id: String): Future[Int] =updateReadById(id, status = true)
+    def markAsRead(id: String): Future[Int] =updateReadById(id = id, status = true)
 
-    def getNumberOfUnread(accountID: String): Future[Int] =findNumberOfReadOnStatusByAccountId(accountID, status = false)
+    def getNumberOfUnread(accountID: String): Future[Int] = findNumberOfReadOnStatusByAccountId(accountID = accountID, status = false)
 
   }
 

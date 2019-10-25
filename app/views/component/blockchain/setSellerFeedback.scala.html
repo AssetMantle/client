@@ -1,29 +1,14 @@
 @import helper._
 @import views.companion.blockchain.SetSellerFeedback
+@import views.html.base._
 
-@(setSellerFeedbackForm: Form[SetSellerFeedback.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-
-@form(action = routes.SetSellerFeedbackController.blockchainSetSellerFeedback, 'onkeypress -> "submitFormOnEnter(event,this)") {
-    <div class="latest_card-header latest_card-header-primary text-center">
-        <h4 class="latest_card-title">@Messages(constants.Form.SET_SELLER_FEEDBACK)</h4>
-    </div>
-    <div class="latest_card-body">
-        @CSRF.formField
-        @inputText(setSellerFeedbackForm(constants.FormField.FROM.name), '_label -> Messages(constants.FormField.FROM.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.FROM.name), 'required -> true)
-        @inputText(setSellerFeedbackForm(constants.FormField.TO.name), '_label -> Messages(constants.FormField.TO.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.TO.name), 'required -> true)
-        @inputText(setSellerFeedbackForm(constants.FormField.PEG_HASH.name), '_label -> Messages(constants.FormField.PEG_HASH.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PEG_HASH.name), 'required -> true)
-      @inputText(setSellerFeedbackForm(constants.FormField.RATING.name), '_label -> Messages(constants.FormField.RATING.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.RATING.name), 'required -> true, 'type -> "number")
-      @inputText(setSellerFeedbackForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.GAS.name), 'required -> true, 'type -> "number")
-        @inputText(setSellerFeedbackForm(constants.FormField.MODE.name), '_label -> Messages(constants.FormField.MODE.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.MODE.name), 'required -> true)
-        @inputPassword(setSellerFeedbackForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PASSWORD.name), 'required -> true)
-
-        @if(setSellerFeedbackForm.hasGlobalErrors) {
-            <ul>
-            @for(error <- setSellerFeedbackForm.globalErrors) {
-                <li>@error.format</li>
-            }
-            </ul>
-        }
-        <button type="button" class="btn btn-primary btn-sm" onclick="submitForm(this)">@Messages(constants.Form.SET_SELLER_FEEDBACK)</button>
-    </div>
+@(setSellerFeedbackForm: Form[SetSellerFeedback.Data] = SetSellerFeedback.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@commonForm(constants.Form.BLOCKCHAIN_SET_SELLER_FEEDBACK, setSellerFeedbackForm) {
+    @commonInputText(setSellerFeedbackForm, constants.FormField.FROM.name)
+    @commonInputText(setSellerFeedbackForm, constants.FormField.TO.name)
+    @commonInputText(setSellerFeedbackForm, constants.FormField.PEG_HASH.name)
+    @commonInputText(setSellerFeedbackForm, constants.FormField.RATING.name)
+    @commonInputText(setSellerFeedbackForm, constants.FormField.GAS.name)
+    @commonInputText(setSellerFeedbackForm, constants.FormField.MODE.name)
+    @commonInputPassword(setSellerFeedbackForm, constants.FormField.PASSWORD.name)
 }

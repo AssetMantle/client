@@ -21,7 +21,7 @@ class SendFiatController @Inject()(messagesControllerComponents: MessagesControl
   private implicit val module: String = constants.Module.CONTROLLERS_SEND_FIAT
 
   def sendFiatForm(sellerAddress: String, pegHash: String, bid: Int): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.sendFiat(views.companion.master.SendFiat.form, sellerAddress, pegHash, bid))
+    Ok(views.html.component.master.sendFiat(sellerAddress = sellerAddress, pegHash = pegHash, bid= bid))
   }
 
   def sendFiat: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
@@ -64,7 +64,7 @@ class SendFiatController @Inject()(messagesControllerComponents: MessagesControl
   }
 
   def blockchainSendFiatForm: Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.blockchain.sendFiat(views.companion.blockchain.SendFiat.form))
+    Ok(views.html.component.blockchain.sendFiat())
   }
 
   def blockchainSendFiat: Action[AnyContent] = Action.async { implicit request =>

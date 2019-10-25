@@ -1,0 +1,28 @@
+@import controllers.actions.LoginState
+@import models.masterTransaction.NegotiationFile
+
+@(negotiationFile: Option[NegotiationFile] = None, negotiationID: String, documentType: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+
+<div class="latest_card-header latest_card-header-primary text-center">
+    <h4 class="latest_card-title">@Messages(constants.View.CONFIRM_BUYER_BID)</h4>
+</div>
+<div class="centerText">
+        <div id="upload@documentType">
+            <button onclick="getForm(jsRoutes.controllers.FileController.uploadTraderNegotiationForm('@documentType', '@negotiationID'))">@Messages(constants.Form.UPLOAD) @Messages(documentType)</button>
+        </div>
+    @negotiationFile match {
+        case Some(file) => {
+            @component.master.commonDocumentViewer(file) {
+                @routes.FileController.tradingFile(file.id, file.fileName, file.documentType)
+            } {
+                <a href="@routes.FileController.tradingFile(file.id, file.fileName, file.documentType)">@Messages(file.documentType)</a>
+            } {
+                <button onclick="getForm(jsRoutes.controllers.FileController.updateTraderNegotiationForm('@file.documentType','@file.id'))">@Messages(constants.Form.UPDATE) @Messages(file.documentType)</button>
+                        <script>hideElement('upload@file.documentType')</script>
+            }
+            <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.ConfirmBuyerBidController.confirmBuyerBidForm('@file.id'))">@Messages(constants.Form.NEXT)</button>
+        }
+        case None => {}
+    }
+
+</div>

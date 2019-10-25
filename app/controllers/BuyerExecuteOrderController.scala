@@ -98,7 +98,7 @@ class BuyerExecuteOrderController @Inject()(messagesControllerComponents: Messag
   }
 
   def moderatedBuyerExecuteOrderForm(buyerAddress: String, sellerAddress: String, pegHash: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.moderatedBuyerExecuteOrder(views.companion.master.ModeratedBuyerExecuteOrder.form, buyerAddress, sellerAddress, pegHash))
+    Ok(views.html.component.master.moderatedBuyerExecuteOrder(buyerAddress = buyerAddress, sellerAddress = sellerAddress, pegHash = pegHash))
   }
 
   def moderatedBuyerExecuteOrder: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
@@ -146,7 +146,7 @@ class BuyerExecuteOrderController @Inject()(messagesControllerComponents: Messag
   }
 
   def blockchainBuyerExecuteOrderForm: Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.blockchain.buyerExecuteOrder(views.companion.blockchain.BuyerExecuteOrder.form))
+    Ok(views.html.component.blockchain.buyerExecuteOrder())
   }
 
   def blockchainBuyerExecuteOrder: Action[AnyContent] = Action.async { implicit request =>

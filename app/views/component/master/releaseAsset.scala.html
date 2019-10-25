@@ -1,27 +1,12 @@
 @import controllers.actions.LoginState
 @import helper._
+@import views.html.base._
 @import views.companion.master.ReleaseAsset
 
-@(releaseAssetForm: Form[ReleaseAsset.Data], ownerAddress: String, pegHash: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
-
-@form(action = routes.ReleaseAssetController.releaseAsset, 'onkeypress -> "submitFormOnEnter(event,this)") {
-    <div class="latest_card-header latest_card-header-primary text-center">
-        <h4 class="latest_card-title">@Messages(constants.Form.REJECT_VERIFY_ZONE_REQUEST)</h4>
-    </div>
-    <div class="latest_card-body">
-        @CSRF.formField
-      @inputText(releaseAssetForm(constants.FormField.BLOCKCHAIN_ADDRESS.name).copy(value = Some(ownerAddress)), '_label -> Messages(constants.FormField.BLOCKCHAIN_ADDRESS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.BLOCKCHAIN_ADDRESS.name), 'required -> true)
-      @inputText(releaseAssetForm(constants.FormField.PEG_HASH.name).copy(value = Some(pegHash)), '_label -> Messages(constants.FormField.PEG_HASH.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PEG_HASH.name), 'required -> true)
-      @inputText(releaseAssetForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.GAS.name), 'required -> true, 'type -> "number")
-      @inputPassword(releaseAssetForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PASSWORD.name), 'required -> true)
-
-        @if(releaseAssetForm.hasGlobalErrors) {
-            <ul>
-            @for(error <- releaseAssetForm.globalErrors) {
-                <li>@error.format</li>
-            }
-            </ul>
-        }
-        <button type="button" class="btn btn-sm btn-primary" onclick="submitForm(this)">@Messages(constants.Form.RELEASE_ASSET)</button>
-    </div>
+@(releaseAssetForm: Form[ReleaseAsset.Data] = ReleaseAsset.form, ownerAddress: String, pegHash: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@commonForm(constants.Form.RELEASE_ASSET, releaseAssetForm) {
+    @inputText(releaseAssetForm(constants.FormField.BLOCKCHAIN_ADDRESS.name).copy(value = Some(ownerAddress)), '_label -> Messages(constants.FormField.BLOCKCHAIN_ADDRESS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.BLOCKCHAIN_ADDRESS.name), 'required -> true)
+    @inputText(releaseAssetForm(constants.FormField.PEG_HASH.name).copy(value = Some(pegHash)), '_label -> Messages(constants.FormField.PEG_HASH.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PEG_HASH.name), 'required -> true)
+    @inputText(releaseAssetForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.GAS.name), 'required -> true, 'type -> "number")
+    @inputPassword(releaseAssetForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PASSWORD.name), 'required -> true)
 }

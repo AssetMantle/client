@@ -1,27 +1,13 @@
 @import helper._
 @import views.companion.blockchain.ReleaseAsset
+@import views.html.base._
 
-@(releaseAssetForm: Form[ReleaseAsset.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@form(action = routes.ReleaseAssetController.blockchainReleaseAsset, 'onkeypress -> "submitFormOnEnter(event,this)") {
-    <div class="latest_card-header latest_card-header-primary text-center">
-        <h4 class="latest_card-title">@Messages(constants.Form.RELEASE_ASSET)</h4>
-    </div>
-    <div class="latest_card-body">
-        @CSRF.formField
-      @inputText(releaseAssetForm(constants.FormField.FROM.name), '_label -> Messages(constants.FormField.FROM.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.FROM.name), 'required -> true)
-      @inputText(releaseAssetForm(constants.FormField.TO.name), '_label -> Messages(constants.FormField.TO.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.TO.name), 'required -> true)
-      @inputText(releaseAssetForm(constants.FormField.PEG_HASH.name), '_label -> Messages(constants.FormField.PEG_HASH.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PEG_HASH.name), 'required -> true)
-      @inputText(releaseAssetForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.GAS.name), 'required -> true, 'type -> "number")
-      @inputText(releaseAssetForm(constants.FormField.MODE.name), '_label -> Messages(constants.FormField.MODE.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.MODE.name), 'required -> true)
-      @inputPassword(releaseAssetForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PASSWORD.name), 'required -> true)
-
-        @if(releaseAssetForm.hasGlobalErrors) {
-            <ul>
-            @for(error <- releaseAssetForm.globalErrors) {
-                <li>@error.format</li>
-            }
-            </ul>
-        }
-        <button type="button" class="btn btn-primary" onclick="submitForm(this)">@Messages(constants.Form.RELEASE_ASSET)</button>
-    </div>
+@(releaseAssetForm: Form[ReleaseAsset.Data] = ReleaseAsset.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@commonForm(constants.Form.BLOCKCHAIN_RELEASE_ASSET, releaseAssetForm) {
+    @commonInputText(releaseAssetForm, constants.FormField.FROM.name)
+    @commonInputText(releaseAssetForm, constants.FormField.TO.name)
+    @commonInputText(releaseAssetForm, constants.FormField.PEG_HASH.name)
+    @commonInputText(releaseAssetForm, constants.FormField.GAS.name)
+    @commonInputText(releaseAssetForm, constants.FormField.MODE.name)
+    @commonInputPassword(releaseAssetForm, constants.FormField.PASSWORD.name)
 }

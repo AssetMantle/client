@@ -1,27 +1,13 @@
 @import controllers.actions.LoginState
 @import helper._
+@import views.html.base._
 @import views.companion.master.SetSellerFeedback
 
-@(setSellerFeedbackForm: Form[SetSellerFeedback.Data], buyerAddress: String, pegHash: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
-@form(action = routes.SetSellerFeedbackController.setSellerFeedback, 'onkeypress -> "submitFormOnEnter(event,this)") {
-    <div class="latest_card-header latest_card-header-primary text-center">
-        <h4 class="latest_card-title">@Messages(constants.Form.SET_SELLER_FEEDBACK)</h4>
-    </div>
-    <div class="latest_card-body">
-        @CSRF.formField
-      @inputText(setSellerFeedbackForm(constants.FormField.BUYER_ADDRESS.name).copy(value = Some(buyerAddress)), '_label -> Messages(constants.FormField.BUYER_ADDRESS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.BUYER_ADDRESS.name), 'required -> true)
-      @inputText(setSellerFeedbackForm(constants.FormField.PEG_HASH.name).copy(value = Some(pegHash)), '_label -> Messages(constants.FormField.PEG_HASH.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PEG_HASH.name), 'required -> true)
-      @inputText(setSellerFeedbackForm(constants.FormField.RATING.name), '_label -> Messages(constants.FormField.RATING.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.RATING.name), 'required -> true, 'type -> "number")
-      @inputText(setSellerFeedbackForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.GAS.name), 'required -> true, 'type -> "number")
-      @inputPassword(setSellerFeedbackForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PASSWORD.name), 'required -> true)
-
-        @if(setSellerFeedbackForm.hasGlobalErrors) {
-            <ul>
-            @for(error <- setSellerFeedbackForm.globalErrors) {
-                <li>@error.format</li>
-            }
-            </ul>
-        }
-        <button type="button" class="btn btn-sm btn-primary" onclick="submitForm(this)">@Messages(constants.Form.SET_SELLER_FEEDBACK)</button>
-    </div>
+@(setSellerFeedbackForm: Form[SetSellerFeedback.Data] = SetSellerFeedback.form, buyerAddress: String, pegHash: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@commonForm(constants.Form.SET_SELLER_FEEDBACK, setSellerFeedbackForm) {
+    @inputText(setSellerFeedbackForm(constants.FormField.BUYER_ADDRESS.name).copy(value = Some(buyerAddress)), '_label -> Messages(constants.FormField.BUYER_ADDRESS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.BUYER_ADDRESS.name), 'required -> true)
+    @inputText(setSellerFeedbackForm(constants.FormField.PEG_HASH.name).copy(value = Some(pegHash)), '_label -> Messages(constants.FormField.PEG_HASH.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PEG_HASH.name), 'required -> true)
+    @inputText(setSellerFeedbackForm(constants.FormField.RATING.name), '_label -> Messages(constants.FormField.RATING.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.RATING.name), 'required -> true, 'type -> "number")
+    @inputText(setSellerFeedbackForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.GAS.name), 'required -> true, 'type -> "number")
+    @inputPassword(setSellerFeedbackForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PASSWORD.name), 'required -> true)
 }

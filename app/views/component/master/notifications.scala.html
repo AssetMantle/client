@@ -7,7 +7,7 @@
             <div @if(notification.read) {
                 class="read"
             } else {
-                onclick="markNotificationRead(this, jsRoutes.controllers.NotificationController.markNotificationRead('@notification.id'))"
+                onclick="markNotificationRead(this, '@notification.id')"
                 }>
                 <div>@notification.notificationTitle @notification.time</div>
                 <div>@notification.notificationMessage</div>
@@ -16,5 +16,3 @@
     }
 <div class = "notification"> <a onclick="loadMoreNotifications()">@Messages(constants.Form.LOAD_MORE_NOTIFICATIONS)</a></div>
 </div>
-<script src="@routes.Assets.versioned("javascripts/markNotificationRead.js")" type="text/javascript"></script>
-<script src="@routes.Assets.versioned("javascripts/loadMoreNotifications.js")" type="text/javascript"></script>

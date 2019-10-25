@@ -1,27 +1,13 @@
 @import helper._
 @import views.companion.blockchain.SendCoin
+@import views.html.base._
 
-@(sendCoinForm: Form[SendCoin.Data])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
-@form(action = routes.SendCoinController.blockchainSendCoin, 'onkeypress -> "submitFormOnEnter(event,this)") {
-    <div class="latest_card-header latest_card-header-primary text-center">
-        <h4 class="latest_card-title">@Messages(constants.Form.SEND_COIN)</h4>
-    </div>
-    <div class="latest_card-body">
-        @CSRF.formField
-      @inputText(sendCoinForm(constants.FormField.FROM.name), '_label -> Messages(constants.FormField.FROM.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.FROM.name), 'required -> true)
-      @inputText(sendCoinForm(constants.FormField.TO.name), '_label -> Messages(constants.FormField.TO.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.TO.name), 'required -> true)
-      @inputText(sendCoinForm(constants.FormField.AMOUNT.name), '_label -> Messages(constants.FormField.AMOUNT.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.AMOUNT.name), 'required -> true, 'type -> "number")
-      @inputText(sendCoinForm(constants.FormField.MODE.name), '_label -> Messages(constants.FormField.MODE.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.MODE.name), 'required -> true)
-      @inputText(sendCoinForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.GAS.name), 'required -> true, 'type -> "number")
-      @inputPassword(sendCoinForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PASSWORD.name), 'required -> true)
-
-        @if(sendCoinForm.hasGlobalErrors) {
-            <ul>
-            @for(error <- sendCoinForm.globalErrors) {
-                <li>@error.format</li>
-            }
-            </ul>
-        }
-        <button type="button" class="btn btn-primary btn-sm" onclick="submitForm(this)">@Messages(constants.Form.SEND_COIN)</button>
-    </div>
+@(sendCoinForm: Form[SendCoin.Data] = SendCoin.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
+@commonForm(constants.Form.BLOCKCHAIN_SEND_COIN, sendCoinForm) {
+    @commonInputText(sendCoinForm, constants.FormField.FROM.name)
+    @commonInputText(sendCoinForm, constants.FormField.TO.name)
+    @commonInputText(sendCoinForm, constants.FormField.AMOUNT.name)
+    @commonInputText(sendCoinForm, constants.FormField.MODE.name)
+    @commonInputText(sendCoinForm, constants.FormField.GAS.name)
+    @commonInputPassword(sendCoinForm, constants.FormField.PASSWORD.name)
 }

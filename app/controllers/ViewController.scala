@@ -20,12 +20,6 @@ class ViewController @Inject()(messagesControllerComponents: MessagesControllerC
 
   def market: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      /*try {
-        withUsernameToken.Ok(views.html.market())
-      }
-      catch {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-      }*/
     Future{withUsernameToken.Ok(views.html.market())}
         .recover{
           case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -35,12 +29,6 @@ class ViewController @Inject()(messagesControllerComponents: MessagesControllerC
 
   def genesisRequest: Action[AnyContent] = withGenesisLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      /*try {
-        withUsernameToken.Ok(views.html.genesisRequest())
-      }
-      catch {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-      }*/
       Future{withUsernameToken.Ok(views.html.genesisRequest())}
         .recover{
           case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -49,12 +37,6 @@ class ViewController @Inject()(messagesControllerComponents: MessagesControllerC
 
   def genesisInformation: Action[AnyContent] = withGenesisLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      /*try {
-        withUsernameToken.Ok(views.html.genesisInformation())
-      }
-      catch {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-      }*/
       Future{withUsernameToken.Ok(views.html.genesisInformation())}
         .recover{
           case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -64,12 +46,6 @@ class ViewController @Inject()(messagesControllerComponents: MessagesControllerC
 
   def zoneRequest: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      /*try {
-        withUsernameToken.Ok(views.html.zoneRequest())
-      }
-      catch {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-      }*/
       Future{withUsernameToken.Ok(views.html.zoneRequest())}
         .recover{
           case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -79,12 +55,6 @@ class ViewController @Inject()(messagesControllerComponents: MessagesControllerC
 
   def zoneInformation: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
-     /* try {
-        withUsernameToken.Ok(views.html.zoneInformation())
-      }
-      catch {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-      }*/
       Future{withUsernameToken.Ok(views.html.zoneInformation())}
         .recover{
           case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -93,12 +63,6 @@ class ViewController @Inject()(messagesControllerComponents: MessagesControllerC
 
   def organizationRequest: Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
     implicit request =>
-     /* try {
-        withUsernameToken.Ok(views.html.organizationRequest())
-      }
-      catch {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-      }*/
       Future{withUsernameToken.Ok(views.html.organizationRequest())}
         .recover{
           case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -107,12 +71,6 @@ class ViewController @Inject()(messagesControllerComponents: MessagesControllerC
 
   def organizationInformation: Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      /*try {
-        withUsernameToken.Ok(views.html.organizationInformation())
-      }
-      catch {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-      }*/
       Future{withUsernameToken.Ok(views.html.organizationInformation())}
         .recover{
           case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -121,12 +79,6 @@ class ViewController @Inject()(messagesControllerComponents: MessagesControllerC
 
   def profile: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      /*try {
-        Ok(views.html.component.master.profile())
-      }
-      catch {
-        case baseException: BaseException => Ok(views.html.index(failures = Seq(baseException.failure)))
-      }*/
       Future{Ok(views.html.component.master.profile())}
         .recover{
           case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))

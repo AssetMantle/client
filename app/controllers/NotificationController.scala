@@ -22,16 +22,11 @@ class NotificationController @Inject()(messagesControllerComponents: MessagesCon
 
   def notificationPage(pageNumber: Int = 0): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-    /*  try {
-        withUsernameToken.Ok(views.html.component.master.notifications(notifications.Service.get(loginState.username, pageNumber * limit, limit)))
-      }
-      catch {
-        case baseException: BaseException => InternalServerError(baseException.failure.message)
-      }*/
-    val notification=notifications.Service.get(loginState.username, pageNumber * limit, limit)
+
+      val notification=notifications.Service.get(loginState.username, pageNumber * limit, limit)
       (for{
       notification<-notification
-    }yield withUsernameToken.Ok(views.html.component.master.notifications(notification))
+       }yield Ok(views.html.component.master.notifications(notification))
         ).recover{
         case baseException: BaseException => InternalServerError(baseException.failure.message)
       }
@@ -39,12 +34,7 @@ class NotificationController @Inject()(messagesControllerComponents: MessagesCon
 
   def unreadNotificationCount(): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-     /* try {
-        withUsernameToken.Ok(notifications.Service.getNumberOfUnread(loginState.username).toString)
-      }
-      catch {
-        case _: BaseException => NoContent
-      }*/
+
     val unreadNotificationCount=notifications.Service.getNumberOfUnread(loginState.username)
       (for{
       unreadNotificationCount<-unreadNotificationCount
@@ -56,13 +46,7 @@ class NotificationController @Inject()(messagesControllerComponents: MessagesCon
 
   def markNotificationRead(notificationID: String): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      /*try {
-        notifications.Service.markAsRead(notificationID)
-        withUsernameToken.Ok(notifications.Service.getNumberOfUnread(loginState.username).toString)
-      }
-      catch {
-        case _: BaseException => NoContent
-      }*/
+
     val markAsRead=notifications.Service.markAsRead(notificationID)
     val unreadNotificationCount=notifications.Service.getNumberOfUnread(loginState.username)
       (for{

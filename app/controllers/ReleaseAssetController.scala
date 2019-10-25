@@ -21,7 +21,7 @@ class ReleaseAssetController @Inject()(messagesControllerComponents: MessagesCon
   private implicit val module: String = constants.Module.CONTROLLERS_RELEASE_ASSET
 
   def releaseAssetForm(ownerAddress: String, pegHash: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.releaseAsset(views.companion.master.ReleaseAsset.form, ownerAddress, pegHash))
+    Ok(views.html.component.master.releaseAsset(ownerAddress = ownerAddress, pegHash = pegHash))
   }
 
   def releaseAsset(): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
@@ -31,22 +31,8 @@ class ReleaseAssetController @Inject()(messagesControllerComponents: MessagesCon
           Future{BadRequest(views.html.component.master.releaseAsset(formWithErrors, formWithErrors.data(constants.Form.OWNER_ADDRESS), formWithErrors.data(constants.Form.PEG_HASH)))}
         },
         releaseAssetData => {
-          /*try {
-            transaction.process[blockchainTransaction.ReleaseAsset, transactionsReleaseAsset.Request](
-              entity = blockchainTransaction.ReleaseAsset(from = loginState.address, to = releaseAssetData.address, pegHash = releaseAssetData.pegHash, gas = releaseAssetData.gas, ticketID = "", mode = transactionMode),
-              blockchainTransactionCreate = blockchainTransactionReleaseAssets.Service.create,
-              request = transactionsReleaseAsset.Request(transactionsReleaseAsset.BaseReq(from = loginState.address, gas = releaseAssetData.gas.toString), to = releaseAssetData.address, password = releaseAssetData.password, pegHash = releaseAssetData.pegHash, mode = transactionMode),
-              action = transactionsReleaseAsset.Service.post,
-              onSuccess = blockchainTransactionReleaseAssets.Utility.onSuccess,
-              onFailure = blockchainTransactionReleaseAssets.Utility.onFailure,
-              updateTransactionHash = blockchainTransactionReleaseAssets.Service.updateTransactionHash
-            )
-            withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ASSET_RELEASED)))
-          }
-          catch {
-            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-          }*/
-          val transactionProcess=transaction.process[blockchainTransaction.ReleaseAsset, transactionsReleaseAsset.Request](
+
+          transaction.process[blockchainTransaction.ReleaseAsset, transactionsReleaseAsset.Request](
             entity = blockchainTransaction.ReleaseAsset(from = loginState.address, to = releaseAssetData.address, pegHash = releaseAssetData.pegHash, gas = releaseAssetData.gas, ticketID = "", mode = transactionMode),
             blockchainTransactionCreate = blockchainTransactionReleaseAssets.Service.create,
             request = transactionsReleaseAsset.Request(transactionsReleaseAsset.BaseReq(from = loginState.address, gas = releaseAssetData.gas.toString), to = releaseAssetData.address, password = releaseAssetData.password, pegHash = releaseAssetData.pegHash, mode = transactionMode),
@@ -55,9 +41,11 @@ class ReleaseAssetController @Inject()(messagesControllerComponents: MessagesCon
             onFailure = blockchainTransactionReleaseAssets.Utility.onFailure,
             updateTransactionHash = blockchainTransactionReleaseAssets.Service.updateTransactionHash
           )
-          for{
-            _<-transactionProcess
-          }yield withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ASSET_RELEASED)))
+
+         Future{ withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ASSET_RELEASED)))}
+            .recover{
+              case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+            }
         }
       )
   }
@@ -66,6 +54,8 @@ class ReleaseAssetController @Inject()(messagesControllerComponents: MessagesCon
     implicit request =>
       /*try {
         withUsernameToken.Ok(views.html.component.master.releaseAssetList(blockchainAssets.Service.getAllLocked(blockchainACLAccounts.Service.getAddressesUnderZone(blockchainZones.Service.getID(loginState.address)))))
+      try {
+        Ok(views.html.component.master.releaseAssetList(blockchainAssets.Service.getAllLocked(blockchainACLAccounts.Service.getAddressesUnderZone(blockchainZones.Service.getID(loginState.address)))))
       } catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }*/
@@ -76,14 +66,14 @@ class ReleaseAssetController @Inject()(messagesControllerComponents: MessagesCon
       zoneID<-zoneID
       addressesUnderZone<-addressesUnderZone(zoneID)
       allLockedAssets<-allLockedAssets(addressesUnderZone)
-    }yield withUsernameToken.Ok(views.html.component.master.releaseAssetList(allLockedAssets))
+    }yield Ok(views.html.component.master.releaseAssetList(allLockedAssets))
         ).recover{
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
   def blockchainReleaseAssetForm: Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.blockchain.releaseAsset(views.companion.blockchain.ReleaseAsset.form))
+    Ok(views.html.component.blockchain.releaseAsset())
   }
 
   def blockchainReleaseAsset: Action[AnyContent] = Action.async { implicit request =>
@@ -92,13 +82,7 @@ class ReleaseAssetController @Inject()(messagesControllerComponents: MessagesCon
         Future{BadRequest(views.html.component.blockchain.releaseAsset(formWithErrors))}
       },
       releaseAssetData => {
-       /* try {
-          transactionsReleaseAsset.Service.post(transactionsReleaseAsset.Request(transactionsReleaseAsset.BaseReq(from = releaseAssetData.from, gas = releaseAssetData.gas.toString), to = releaseAssetData.to, password = releaseAssetData.password, pegHash = releaseAssetData.pegHash, mode = releaseAssetData.mode))
-          Ok(views.html.index(successes = Seq(constants.Response.ASSET_RELEASED)))
-        }
-        catch {
-          case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-        }*/
+
         val post=transactionsReleaseAsset.Service.post(transactionsReleaseAsset.Request(transactionsReleaseAsset.BaseReq(from = releaseAssetData.from, gas = releaseAssetData.gas.toString), to = releaseAssetData.to, password = releaseAssetData.password, pegHash = releaseAssetData.pegHash, mode = releaseAssetData.mode))
         (for{
           _<-post

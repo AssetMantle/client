@@ -24,15 +24,15 @@ class RedeemFiatController @Inject()(messagesControllerComponents: MessagesContr
 
   def redeemFiatForm(ownerAddress: String): Action[AnyContent] = Action.async { implicit request =>
 
-    val address=blockchainACLAccounts.Service.get(ownerAddress)
+    val aclAccount=blockchainACLAccounts.Service.get(ownerAddress)
     for{
-      address<-address
-    }yield Ok(views.html.component.master.redeemFiat(master.RedeemFiat.form, address.zoneID))
+      aclAccount<-aclAccount
+    }yield Ok(views.html.component.master.redeemFiat(zoneID = aclAccount.zoneID))
   }
 
   def redeemFiat: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      master.RedeemFiat.form.bindFromRequest().fold(
+      views.companion.master.RedeemFiat.form.bindFromRequest().fold(
         formWithErrors => {
           Future{BadRequest(views.html.component.master.redeemFiat(formWithErrors, formWithErrors.data(constants.Form.ZONE_ID)))}
         },
@@ -75,20 +75,20 @@ class RedeemFiatController @Inject()(messagesControllerComponents: MessagesContr
   }
 
   def blockchainRedeemFiatForm: Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.blockchain.redeemFiat(RedeemFiat.form))
+    Ok(views.html.component.blockchain.redeemFiat())
   }
 
-  def blockchainRedeemFiat: Action[AnyContent] = Action { implicit request =>
-    RedeemFiat.form.bindFromRequest().fold(
+  def blockchainRedeemFiat: Action[AnyContent] = Action.async { implicit request =>
+    views.companion.blockchain.RedeemFiat.form.bindFromRequest().fold(
       formWithErrors => {
-        BadRequest(views.html.component.blockchain.redeemFiat(formWithErrors))
+        Future{BadRequest(views.html.component.blockchain.redeemFiat(formWithErrors))}
       },
       redeemFiatData => {
-        try {
-          transactionsRedeemFiat.Service.post(transactionsRedeemFiat.Request(transactionsRedeemFiat.BaseReq(from = redeemFiatData.from, gas = redeemFiatData.gas.toString), to = redeemFiatData.to, password = redeemFiatData.password, redeemAmount = redeemFiatData.redeemAmount.toString, mode = redeemFiatData.mode))
-          Ok(views.html.index(successes = Seq(constants.Response.FIAT_REDEEMED)))
-        }
-        catch {
+        val post=transactionsRedeemFiat.Service.post(transactionsRedeemFiat.Request(transactionsRedeemFiat.BaseReq(from = redeemFiatData.from, gas = redeemFiatData.gas.toString), to = redeemFiatData.to, password = redeemFiatData.password, redeemAmount = redeemFiatData.redeemAmount.toString, mode = redeemFiatData.mode))
+        (for{
+          _<-post
+        }yield Ok(views.html.index(successes = Seq(constants.Response.FIAT_REDEEMED)))
+          ).recover{
           case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
         }
       }

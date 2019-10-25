@@ -25,7 +25,7 @@ class SellerExecuteOrderController @Inject()(messagesControllerComponents: Messa
     val negotiation = blockchainNegotiations.Service.get(orderID)
     for{
       negotiation<-negotiation
-    }yield Ok(views.html.component.master.sellerExecuteOrder(views.companion.master.SellerExecuteOrder.form, negotiation.buyerAddress, negotiation.assetPegHash))
+    }yield Ok(views.html.component.master.sellerExecuteOrder(buyerAddress =negotiation.buyerAddress,pegHash =  negotiation.assetPegHash))
   }
 
   def sellerExecuteOrder: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
@@ -68,6 +68,8 @@ class SellerExecuteOrderController @Inject()(messagesControllerComponents: Messa
     implicit request =>
       /*try {
         withUsernameToken.Ok(views.html.component.master.moderatedSellerExecuteOrderList(blockchainNegotiations.Service.getSellerNegotiationsByOrderAndZone(blockchainOrders.Service.getAllOrderIdsWithoutAWBProofHash, blockchainACLAccounts.Service.getAddressesUnderZone(blockchainZones.Service.getID(loginState.address)))))
+      try {
+        Ok(views.html.component.master.moderatedSellerExecuteOrderList(blockchainNegotiations.Service.getSellerNegotiationsByOrderAndZone(blockchainOrders.Service.getAllOrderIdsWithoutAWBProofHash, blockchainACLAccounts.Service.getAddressesUnderZone(blockchainZones.Service.getID(loginState.address)))))
       } catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }*/
@@ -87,7 +89,7 @@ class SellerExecuteOrderController @Inject()(messagesControllerComponents: Messa
   }
 
   def moderatedSellerExecuteOrderForm(buyerAddress: String, sellerAddress: String, pegHash: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.moderatedSellerExecuteOrder(views.companion.master.ModeratedSellerExecuteOrder.form, buyerAddress, sellerAddress, pegHash))
+    Ok(views.html.component.master.moderatedSellerExecuteOrder(buyerAddress = buyerAddress, sellerAddress = sellerAddress, pegHash = pegHash))
   }
 
   def moderatedSellerExecuteOrder: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
@@ -97,21 +99,6 @@ class SellerExecuteOrderController @Inject()(messagesControllerComponents: Messa
           Future{BadRequest(views.html.component.master.moderatedSellerExecuteOrder(formWithErrors, formWithErrors.data(constants.Form.BUYER_ADDRESS), formWithErrors.data(constants.Form.SELLER_ADDRESS), formWithErrors.data(constants.Form.PEG_HASH)))}
         },
         moderatedSellerExecuteOrderData => {
-          /*try {
-            transaction.process[blockchainTransaction.SellerExecuteOrder, transactionsSellerExecuteOrder.Request](
-              entity = blockchainTransaction.SellerExecuteOrder(from = loginState.address, buyerAddress = moderatedSellerExecuteOrderData.buyerAddress, sellerAddress = moderatedSellerExecuteOrderData.sellerAddress, awbProofHash = moderatedSellerExecuteOrderData.awbProofHash, pegHash = moderatedSellerExecuteOrderData.pegHash, gas = moderatedSellerExecuteOrderData.gas, ticketID = "", mode = transactionMode),
-              blockchainTransactionCreate = blockchainTransactionSellerExecuteOrders.Service.create,
-              request = transactionsSellerExecuteOrder.Request(transactionsSellerExecuteOrder.BaseReq(from = loginState.address, gas = moderatedSellerExecuteOrderData.gas.toString), password = moderatedSellerExecuteOrderData.password, buyerAddress = moderatedSellerExecuteOrderData.buyerAddress, sellerAddress = moderatedSellerExecuteOrderData.sellerAddress, awbProofHash = moderatedSellerExecuteOrderData.awbProofHash, pegHash = moderatedSellerExecuteOrderData.pegHash, mode = transactionMode),
-              action = transactionsSellerExecuteOrder.Service.post,
-              onSuccess = blockchainTransactionSellerExecuteOrders.Utility.onSuccess,
-              onFailure = blockchainTransactionSellerExecuteOrders.Utility.onFailure,
-              updateTransactionHash = blockchainTransactionSellerExecuteOrders.Service.updateTransactionHash
-            )
-            Ok(views.html.index(successes = Seq(constants.Response.SELLER_ORDER_EXECUTED)))
-          }
-          catch {
-            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-          }*/
           transaction.process[blockchainTransaction.SellerExecuteOrder, transactionsSellerExecuteOrder.Request](
             entity = blockchainTransaction.SellerExecuteOrder(from = loginState.address, buyerAddress = moderatedSellerExecuteOrderData.buyerAddress, sellerAddress = moderatedSellerExecuteOrderData.sellerAddress, awbProofHash = moderatedSellerExecuteOrderData.awbProofHash, pegHash = moderatedSellerExecuteOrderData.pegHash, gas = moderatedSellerExecuteOrderData.gas, ticketID = "", mode = transactionMode),
             blockchainTransactionCreate = blockchainTransactionSellerExecuteOrders.Service.create,
@@ -127,7 +114,7 @@ class SellerExecuteOrderController @Inject()(messagesControllerComponents: Messa
   }
 
   def blockchainSellerExecuteOrderForm: Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.blockchain.sellerExecuteOrder(views.companion.blockchain.SellerExecuteOrder.form))
+    Ok(views.html.component.blockchain.sellerExecuteOrder())
   }
 
   def blockchainSellerExecuteOrder: Action[AnyContent] = Action.async { implicit request =>
@@ -136,13 +123,6 @@ class SellerExecuteOrderController @Inject()(messagesControllerComponents: Messa
         Future{BadRequest(views.html.component.blockchain.sellerExecuteOrder(formWithErrors))}
       },
       sellerExecuteOrderData => {
-       /* try {
-          transactionsSellerExecuteOrder.Service.post(transactionsSellerExecuteOrder.Request(transactionsSellerExecuteOrder.BaseReq(from = sellerExecuteOrderData.from, gas = sellerExecuteOrderData.gas.toString), password = sellerExecuteOrderData.password, buyerAddress = sellerExecuteOrderData.buyerAddress, sellerAddress = sellerExecuteOrderData.sellerAddress, awbProofHash = sellerExecuteOrderData.awbProofHash, pegHash = sellerExecuteOrderData.pegHash, mode = sellerExecuteOrderData.mode))
-          Ok(views.html.index(successes = Seq(constants.Response.SELLER_ORDER_EXECUTED)))
-        }
-        catch {
-          case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-        }*/
         val post=transactionsSellerExecuteOrder.Service.post(transactionsSellerExecuteOrder.Request(transactionsSellerExecuteOrder.BaseReq(from = sellerExecuteOrderData.from, gas = sellerExecuteOrderData.gas.toString), password = sellerExecuteOrderData.password, buyerAddress = sellerExecuteOrderData.buyerAddress, sellerAddress = sellerExecuteOrderData.sellerAddress, awbProofHash = sellerExecuteOrderData.awbProofHash, pegHash = sellerExecuteOrderData.pegHash, mode = sellerExecuteOrderData.mode))
         (for{
           _<-post

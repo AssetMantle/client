@@ -22,34 +22,9 @@
         max-height: 60%;
         overflow: auto;
     }
-
     table thead {
         font-size: 12px;
     }
-
-    .mobileNavigationBar {
-        background: #10292e;
-    }
-
-    .mobileNavigationBar li {
-        list-style: none;
-    }
-
-    .mobileNavigationBar a {
-        color: white;
-        padding: 14px 16px;
-        text-decoration: none;
-        font-size: 17px;
-        display: block;
-    }
-
-    .mobileNavigationBar a.NavigationBarMenuButton {
-        display: block;
-        position: absolute;
-        right: 0;
-        top: 0;
-    }
-
     .navigationBarLinks {
         display: none;
     }
@@ -66,7 +41,7 @@
         max-height: 60%;
         overflow: auto;
         max-width: 500px;
-        width: 300px;
+        min-width: 300px;
     }
 
     .NavigationBarMenuButton {
@@ -566,14 +541,13 @@ dl .info::after {
     margin-bottom: 1.5rem;
 }
 
-.hash_code {
+.hashCode {
     width: 100px;
     overflow: hidden;
     display: inline-block;
     text-overflow: ellipsis;
     white-space: nowrap;
     height: 1.2em;
-    margin-left: 20px;
 }
 .issue_asset {
     margin-right: -1px;
@@ -584,8 +558,7 @@ dl .info::after {
 .input-group-prepend span {
     color: #aaa !important;
 }
-
-.input-group input {
+.input-group input{
     width: 350px;
 }
 
@@ -603,7 +576,6 @@ dl .info::after {
     margin-top: -50px;
     margin-left: -5px;
 }
-
 
 .pageContent {
     display: flex;
@@ -631,16 +603,6 @@ dl .info::after {
     color: red;
 }
 
-.ur-change-password {
-    display: flex;
-    margin-bottom: 10px;
-}
-
-.ur-change-password button {
-    margin-left: 50px;
-    margin-top: -20px;
-}
-
 /* Main search field*/
 .searchForm {
     background: #fff;
@@ -659,6 +621,7 @@ dl .info::after {
     margin-top: 20px;
 }
 .sideBarOpenButton {
+    position: fixed;
     background: linear-gradient(60deg, #149f98, #102923);
 }
 
@@ -699,14 +662,93 @@ dl .info::after {
     padding: 5px 0px 5px 0px;
     background: #333333;
     text-align: center;
-
 }
-
+.footer a{
+    color:#149f98;
+}
 .cardHeight {
     height: 200px;
     overflow: auto;
 }
-
 .error {
     color: #f0506e;
+}
+
+.status {
+    width: 20px;
+    height: 20px;
+}
+.copyIcon{
+    cursor: pointer;
+}
+.leftSide .leftSideMenuIcon{
+    color:#fff;
+}
+.cmuk-tab{
+    box-shadow: 0 5px 15px rgba(0,0,0,.08);
+}
+.cmuk-tab>.cmuk-active>a::before{
+    content: ' ';
+    position: absolute;
+    width: 0;
+    height: 0;
+    left: auto;
+    right: -15px;
+    top:38% ;
+    bottom: -19px;
+    border: 8px solid;
+    border-color: transparent transparent transparent  #149f98;
+    z-index: -1000;
+    animation-fill-mode: forwards;
+}
+.cmuk-tab>.cmuk-active>a{
+    background: #149f98;
+}
+.cmuk-tab>li>a{
+    padding: 15px;
+}
+.toolTip {
+    position: relative;
+    display: inline-block;
+}
+
+.toolTip .toolTipText {
+    visibility: hidden;
+    width: 140px;
+    background-color: #555;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px;
+    position: absolute;
+    z-index: 1;
+    bottom: 150%;
+    left: 50%;
+    margin-left: -75px;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.toolTip .toolTipText::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #555 transparent transparent transparent;
+}
+
+.toolTip:hover .toolTipText {
+    visibility: visible;
+    opacity: 1;
+}
+.tableName{
+    background:#d2edef;
+}
+.backButton{
+    background: #fff;
+    padding: 2px 10px;
+    border-radius: 4px;
 }

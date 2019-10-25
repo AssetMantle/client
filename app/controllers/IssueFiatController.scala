@@ -21,7 +21,7 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
   private implicit val module: String = constants.Module.CONTROLLERS_ISSUE_FIAT
 
   def issueFiatRequestForm: Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.issueFiatRequest(views.companion.master.IssueFiatRequest.form))
+    Ok(views.html.component.master.issueFiatRequest())
   }
 
   def issueFiatRequest: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
@@ -57,7 +57,7 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
       catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }*/
-      val zoneID=masterZones.Service.getZoneId(loginState.username)
+      val zoneID=masterZones.Service.getID(loginState.username)
       def addressesUnderZone(zoneID:String)= blockchainAclAccounts.Service.getAddressesUnderZone(zoneID)
       def iDsForAddresses(addresses:Seq[String])=  masterAccounts.Service.getIDsForAddresses(addresses)
       def pendingIssueFiatRequests(iDs:Seq[String])=masterTransactionIssueFiatRequests.Service.getPendingIssueFiatRequests(iDs)
@@ -73,7 +73,7 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
   }
 
   def rejectIssueFiatRequestForm(requestID: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.rejectIssueFiatRequest(views.companion.master.RejectIssueFiatRequest.form, requestID))
+    Ok(views.html.component.master.rejectIssueFiatRequest(requestID = requestID))
   }
 
   def rejectIssueFiatRequest: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
@@ -112,28 +112,6 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
           Future{BadRequest(views.html.component.master.issueFiat(formWithErrors))}
         },
         issueFiatData => {
-        /*  try {
-            if (masterTransactionIssueFiatRequests.Service.getStatus(issueFiatData.requestID).isEmpty) {
-              val toAddress = masterAccounts.Service.getAddress(issueFiatData.accountID)
-              val ticketID = transaction.process[blockchainTransaction.IssueFiat, transactionsIssueFiat.Request](
-                entity = blockchainTransaction.IssueFiat(from = loginState.address, to = toAddress, transactionID = issueFiatData.transactionID, transactionAmount = issueFiatData.transactionAmount, gas = issueFiatData.gas, ticketID = "", mode = transactionMode),
-                blockchainTransactionCreate = blockchainTransactionIssueFiats.Service.create,
-                request = transactionsIssueFiat.Request(transactionsIssueFiat.BaseReq(from = loginState.address, gas = issueFiatData.gas.toString), to = toAddress, password = issueFiatData.password, transactionID = issueFiatData.transactionID, transactionAmount = issueFiatData.transactionAmount.toString, mode = transactionMode),
-                action = transactionsIssueFiat.Service.post,
-                onSuccess = blockchainTransactionIssueFiats.Utility.onSuccess,
-                onFailure = blockchainTransactionIssueFiats.Utility.onFailure,
-                updateTransactionHash = blockchainTransactionIssueFiats.Service.updateTransactionHash
-              )
-              masterTransactionIssueFiatRequests.Service.accept(requestID = issueFiatData.requestID, ticketID = ticketID, gas = issueFiatData.gas)
-              withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.FIAT_ISSUED)))
-            } else {
-              Unauthorized(views.html.index(failures = Seq(constants.Response.REQUEST_ALREADY_APPROVED_OR_REJECTED)))
-            }
-          }
-          catch {
-            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-          }*/
-
           val status=masterTransactionIssueFiatRequests.Service.getStatus(issueFiatData.requestID)
           def getResult(status:Option[Boolean])={
             if(status.isEmpty){
@@ -169,7 +147,7 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
   }
 
   def blockchainIssueFiatForm: Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.blockchain.issueFiat(views.companion.blockchain.IssueFiat.form))
+    Ok(views.html.component.blockchain.issueFiat())
   }
 
   def blockchainIssueFiat: Action[AnyContent] = Action.async { implicit request =>
@@ -178,13 +156,7 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
         Future{BadRequest(views.html.component.blockchain.issueFiat(formWithErrors))}
       },
       issueFiatData => {
-       /* try {
-          transactionsIssueFiat.Service.post(transactionsIssueFiat.Request(transactionsIssueFiat.BaseReq(from = issueFiatData.from, gas = issueFiatData.gas.toString), to = issueFiatData.to, password = issueFiatData.password, transactionID = issueFiatData.transactionID, transactionAmount = issueFiatData.transactionAmount.toString, mode = issueFiatData.mode))
-          Ok(views.html.index(successes = Seq(constants.Response.FIAT_ISSUED)))
-        }
-        catch {
-          case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-        }*/
+
         val post= transactionsIssueFiat.Service.post(transactionsIssueFiat.Request(transactionsIssueFiat.BaseReq(from = issueFiatData.from, gas = issueFiatData.gas.toString), to = issueFiatData.to, password = issueFiatData.password, transactionID = issueFiatData.transactionID, transactionAmount = issueFiatData.transactionAmount.toString, mode = issueFiatData.mode))
         (for{
           _<-post

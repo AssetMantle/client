@@ -127,7 +127,7 @@ class OrganizationKYCs @Inject()(protected val databaseConfigProvider: DatabaseC
 
     def updateOldDocument(organizationKYC: OrganizationKYC): Future[Int] = upsert(OrganizationKYC(id = organizationKYC.id, documentType = organizationKYC.documentType, fileName = organizationKYC.fileName, file = organizationKYC.file))
 
-    def get(id: String, documentType: String): OrganizationKYC = Await.result(findByIdDocumentType(id = id, documentType = documentType), Duration.Inf)
+    def get(id: String, documentType: String): Future[OrganizationKYC] =findByIdDocumentType(id = id, documentType = documentType)
 
     def getFileName(id: String, documentType: String): Future[String] = getFileNameByIdDocumentType(id = id, documentType = documentType)
 

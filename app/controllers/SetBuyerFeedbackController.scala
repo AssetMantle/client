@@ -21,7 +21,7 @@ class SetBuyerFeedbackController @Inject()(messagesControllerComponents: Message
   private implicit val module: String = constants.Module.CONTROLLERS_SET_BUYER_FEEDBACK
 
   def setBuyerFeedbackForm(sellerAddress: String, pegHash: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.setBuyerFeedback(views.companion.master.SetBuyerFeedback.form, sellerAddress, pegHash))
+    Ok(views.html.component.master.setBuyerFeedback(sellerAddress = sellerAddress, pegHash = pegHash))
   }
 
   def setBuyerFeedback(): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
@@ -31,21 +31,6 @@ class SetBuyerFeedbackController @Inject()(messagesControllerComponents: Message
           Future{BadRequest(views.html.component.master.setBuyerFeedback(formWithErrors, formWithErrors.data(constants.Form.SELLER_ADDRESS), formWithErrors.data(constants.Form.PEG_HASH)))}
         },
         setBuyerFeedbackData => {
-       /*   try {
-            transaction.process[blockchainTransaction.SetBuyerFeedback, transactionsSetBuyerFeedback.Request](
-              entity = blockchainTransaction.SetBuyerFeedback(from = loginState.address, to = setBuyerFeedbackData.sellerAddress, pegHash = setBuyerFeedbackData.pegHash, rating = setBuyerFeedbackData.rating, gas = setBuyerFeedbackData.gas, ticketID = "", mode = transactionMode),
-              blockchainTransactionCreate = blockchainTransactionSetBuyerFeedbacks.Service.create,
-              request = transactionsSetBuyerFeedback.Request(transactionsSetBuyerFeedback.BaseReq(from = loginState.address, gas = setBuyerFeedbackData.gas.toString), to = setBuyerFeedbackData.sellerAddress, password = setBuyerFeedbackData.password, pegHash = setBuyerFeedbackData.pegHash, rating = setBuyerFeedbackData.rating.toString, mode = transactionMode),
-              action = transactionsSetBuyerFeedback.Service.post,
-              onSuccess = blockchainTransactionSetBuyerFeedbacks.Utility.onSuccess,
-              onFailure = blockchainTransactionSetBuyerFeedbacks.Utility.onFailure,
-              updateTransactionHash = blockchainTransactionSetBuyerFeedbacks.Service.updateTransactionHash
-            )
-            withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.BUYER_FEEDBACK_SET)))
-          }
-          catch {
-            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-          }*/
           transaction.process[blockchainTransaction.SetBuyerFeedback, transactionsSetBuyerFeedback.Request](
             entity = blockchainTransaction.SetBuyerFeedback(from = loginState.address, to = setBuyerFeedbackData.sellerAddress, pegHash = setBuyerFeedbackData.pegHash, rating = setBuyerFeedbackData.rating, gas = setBuyerFeedbackData.gas, ticketID = "", mode = transactionMode),
             blockchainTransactionCreate = blockchainTransactionSetBuyerFeedbacks.Service.create,
@@ -65,12 +50,7 @@ class SetBuyerFeedbackController @Inject()(messagesControllerComponents: Message
 
   def buyerFeedbackList: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-     /* try {
-        val a = blockchainTraderFeedbackHistories.Service.getNullRatingsForBuyerFeedback(loginState.address)
-        withUsernameToken.Ok(views.html.component.master.setBuyerFeedbackList(a))
-      } catch {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-      }*/
+
     val nullRatingsForBuyerFeedback=blockchainTraderFeedbackHistories.Service.getNullRatingsForBuyerFeedback(loginState.address)
       (for{
       nullRatingsForBuyerFeedback<-nullRatingsForBuyerFeedback
@@ -81,7 +61,7 @@ class SetBuyerFeedbackController @Inject()(messagesControllerComponents: Message
   }
 
   def blockchainSetBuyerFeedbackForm: Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.blockchain.setBuyerFeedback(views.companion.blockchain.SetBuyerFeedback.form))
+    Ok(views.html.component.blockchain.setBuyerFeedback())
   }
 
   def blockchainSetBuyerFeedback: Action[AnyContent] = Action.async { implicit request =>
@@ -90,13 +70,7 @@ class SetBuyerFeedbackController @Inject()(messagesControllerComponents: Message
         Future{BadRequest(views.html.component.blockchain.setBuyerFeedback(formWithErrors))}
       },
       setBuyerFeedbackData => {
-       /* try {
-          transactionsSetBuyerFeedback.Service.post(transactionsSetBuyerFeedback.Request(transactionsSetBuyerFeedback.BaseReq(from = setBuyerFeedbackData.from, gas = setBuyerFeedbackData.gas.toString), to = setBuyerFeedbackData.to, password = setBuyerFeedbackData.password, pegHash = setBuyerFeedbackData.pegHash, rating = setBuyerFeedbackData.rating.toString, mode = setBuyerFeedbackData.mode))
-          Ok(views.html.index(successes = Seq(constants.Response.BUYER_FEEDBACK_SET)))
-        }
-        catch {
-          case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-        } */
+
         val post=transactionsSetBuyerFeedback.Service.post(transactionsSetBuyerFeedback.Request(transactionsSetBuyerFeedback.BaseReq(from = setBuyerFeedbackData.from, gas = setBuyerFeedbackData.gas.toString), to = setBuyerFeedbackData.to, password = setBuyerFeedbackData.password, pegHash = setBuyerFeedbackData.pegHash, rating = setBuyerFeedbackData.rating.toString, mode = setBuyerFeedbackData.mode))
         (for{
           _<-post

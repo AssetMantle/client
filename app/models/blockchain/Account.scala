@@ -171,17 +171,6 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
     }
     def dirtyEntityUpdater() =  {
-     /* try {
-        val dirtyAddresses = Service.getDirtyAddresses
-        Thread.sleep(sleepTime)
-        for (dirtyAddress <- dirtyAddresses) {
-          val responseAccount = getAccount.Service.get(dirtyAddress)
-          Service.refreshDirty(responseAccount.value.address, responseAccount.value.sequence, responseAccount.value.coins.get.filter(_.denom == denominationOfGasToken).map(_.amount).head)
-          mainAccountActor ! AccountCometMessage(username = masterAccounts.Service.getId(dirtyAddress), message = Json.toJson(constants.Comet.PING))
-        }
-      } catch {
-        case baseException: BaseException => logger.error(baseException.failure.message, baseException)
-      }*/
 
       val dirtyAddresses = Service.getDirtyAddresses
       Thread.sleep(sleepTime)

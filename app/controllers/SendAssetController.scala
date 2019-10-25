@@ -21,7 +21,7 @@ class SendAssetController @Inject()(messagesControllerComponents: MessagesContro
   private implicit val module: String = constants.Module.CONTROLLERS_SEND_ASSET
 
   def sendAssetForm(buyerAddress: String, pegHash: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.sendAsset(views.companion.master.SendAsset.form, buyerAddress, pegHash))
+    Ok(views.html.component.master.sendAsset(buyerAddress = buyerAddress, pegHash = pegHash))
   }
 
   def sendAsset: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
@@ -32,21 +32,6 @@ class SendAssetController @Inject()(messagesControllerComponents: MessagesContro
           Future{BadRequest(views.html.component.master.sendAsset(formWithErrors, formWithErrors.data(constants.Form.BUYER_ADDRESS), formWithErrors.data(constants.Form.PEG_HASH)))}
         },
         sendAssetData => {
-         /* try {
-            transaction.process[blockchainTransaction.SendAsset, transactionsSendAsset.Request](
-              entity = blockchainTransaction.SendAsset(from = loginState.address, to = sendAssetData.buyerAddress, pegHash = sendAssetData.pegHash, gas = sendAssetData.gas, ticketID = "", mode = transactionMode),
-              blockchainTransactionCreate = blockchainTransactionSendAssets.Service.create,
-              request = transactionsSendAsset.Request(transactionsSendAsset.BaseReq(from = loginState.address, gas = sendAssetData.gas.toString), to = sendAssetData.buyerAddress, password = sendAssetData.password, pegHash = sendAssetData.pegHash, mode = transactionMode),
-              action = transactionsSendAsset.Service.post,
-              onSuccess = blockchainTransactionSendAssets.Utility.onSuccess,
-              onFailure = blockchainTransactionSendAssets.Utility.onFailure,
-              updateTransactionHash = blockchainTransactionSendAssets.Service.updateTransactionHash
-            )
-            withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ASSET_SENT)))
-          }
-          catch {
-            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-          }*/
           transaction.process[blockchainTransaction.SendAsset, transactionsSendAsset.Request](
             entity = blockchainTransaction.SendAsset(from = loginState.address, to = sendAssetData.buyerAddress, pegHash = sendAssetData.pegHash, gas = sendAssetData.gas, ticketID = "", mode = transactionMode),
             blockchainTransactionCreate = blockchainTransactionSendAssets.Service.create,
@@ -65,7 +50,7 @@ class SendAssetController @Inject()(messagesControllerComponents: MessagesContro
   }
 
   def blockchainSendAssetForm: Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.blockchain.sendAsset(views.companion.blockchain.SendAsset.form))
+    Ok(views.html.component.blockchain.sendAsset())
   }
 
   def blockchainSendAsset: Action[AnyContent] = Action.async { implicit request =>
@@ -74,14 +59,7 @@ class SendAssetController @Inject()(messagesControllerComponents: MessagesContro
         Future{BadRequest(views.html.component.blockchain.sendAsset(formWithErrors))}
       },
       sendAssetData => {
-       /* try {
-          transactionsSendAsset.Service.post(transactionsSendAsset.Request(transactionsSendAsset.BaseReq(from = sendAssetData.from, gas = sendAssetData.gas.toString), to = sendAssetData.to, password = sendAssetData.password, pegHash = sendAssetData.pegHash, mode = sendAssetData.mode))
-          Ok(views.html.index(successes = Seq(constants.Response.ASSET_SENT)))
 
-        }
-        catch {
-          case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-        }*/
         val post= transactionsSendAsset.Service.post(transactionsSendAsset.Request(transactionsSendAsset.BaseReq(from = sendAssetData.from, gas = sendAssetData.gas.toString), to = sendAssetData.to, password = sendAssetData.password, pegHash = sendAssetData.pegHash, mode = sendAssetData.mode))
         (for{
           _<-post

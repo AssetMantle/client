@@ -1,9 +1,10 @@
 @()(implicit messagesProvider: MessagesProvider)
-<div id="txHashBottomDivision" class="box">
-    <div class="transactionHash">
+
+<div id="txHashBottomDivision">
+    <div class="cmuk-card cmuk-card-default cmuk-card-body">
         <h4><p id="txHashPageHash"></p></h4>
         <h3>@Messages(constants.Form.HEIGHT) : <p id="txHashPageHeight"></p></h3>
         <h3>@Messages(constants.Form.FEE) : <p id="txHashPageFee"></p></h3>
+        <button class='cmuk-button cmuk-button-link' onclick='back()'><span cmuk-icon="arrow-left"></span>@Messages(constants.Form.BACK)</button><br>
     </div>
-    <button onclick='back()' >@Messages(constants.Form.BACK)</button>
 </div>
