@@ -76,6 +76,7 @@ function validateForm(form) {
             );
             if (errorStatement !== "") {
                 formValidationBoolean = false;
+                //TODO do by add class
                 inputElement.style.borderColor = "red";
                 dlElement.append("<dd class=\"error\">" + errorStatement + "</dd>")
             }
