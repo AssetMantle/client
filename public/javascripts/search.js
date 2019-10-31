@@ -15,7 +15,7 @@ function searchFunction(searchData) {
     const txHashPattern = /^[A-F0-9]{64}$/;
 
     if (searchData === undefined) {
-        searchData = $("#searchValue").val();
+        searchData = $("#SEARCH_TX_HASH_HEIGHT").val();
     }
     let height = heightPattern.exec(searchData);
     if (height != null) {
