@@ -1,12 +1,15 @@
 getConfigurationAsynchronously("blockchain.transaction.hashLength");
 
+function searchOnEnter(event) {
+    if (event.keyCode === 13) {
+        event.preventDefault();
+        searchFunction();
+    }
+}
+
 function searchFunction(searchData) {
     const invalidBlockHeight = getCookie("blockHeightError");
     const invalidTransactionHash = getCookie("transactionHashError");
-
-    $("#searchForm").submit(function (e) {
-        e.preventDefault();
-    });
 
     const hashLength = parseInt(getConfigurationAsynchronously("blockchain.transaction.hashLength"), 10);
 
