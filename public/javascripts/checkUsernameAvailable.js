@@ -26,7 +26,7 @@ function checkUsernameAvailable(source, resultID, usernameAvailableCheckBoxID) {
                         204: function () {
                             usernameAvailableCheckBox[0].checked = false;
                             result.html('taken');
-                        }
+                        },
                     }
                 });
             } else {
