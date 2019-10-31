@@ -4,5 +4,5 @@
 
 @(rejectVerifyZoneRequestForm: Form[RejectVerifyZoneRequest.Data] = RejectVerifyZoneRequest.form, zoneID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @commonForm(constants.Form.REJECT_VERIFY_ZONE_REQUEST, rejectVerifyZoneRequestForm) {
-    @commonInputText(rejectVerifyZoneRequestForm, constants.FormField.ZONE_ID, 'value -> zoneID))
+    @commonInputText(rejectVerifyZoneRequestForm, constants.FormField.ZONE_ID, 'value -> zoneID)
 }
