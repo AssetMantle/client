@@ -58,7 +58,7 @@
                     <span class="red">@Messages(constants.Form.PEG_HASH)</span>: @buyNegotiation.assetPegHash <br>
                     <span class="red">@Messages(constants.Form.BID)</span>: @buyNegotiation.bid <br>
                     <span class="red">@Messages(constants.Form.TIME)</span>: @buyNegotiation.time <br>
-                    <button onclick="showHideByID('traderBuyNegotiationDetails@trader.id')">@Messages(constants.Form.SHOW_HIDE)</button>
+                    <button type="button" class="cmuk-button cmuk-button-primary" onclick="showHideByID('traderBuyNegotiationDetails@trader.id')">@Messages(constants.Form.SHOW_HIDE)</button>
                     <div class="hidden" id="traderBuyNegotiationDetails@trader.id">
                         <span class="red">@Messages(constants.Form.BUYER_ADDRESS)</span>: @buyNegotiation.buyerAddress <br>
                         <span class="red">@Messages(constants.Form.SELLER_ADDRESS)</span>: @buyNegotiation.sellerAddress <br>
@@ -81,7 +81,7 @@
                     <span class="red">@Messages(constants.Form.PEG_HASH)</span>: @sellNegotiation.assetPegHash <br>
                     <span class="red">@Messages(constants.Form.BID)</span>: @sellNegotiation.bid <br>
                     <span class="red">@Messages(constants.Form.TIME)</span>: @sellNegotiation.time <br>
-                    <button onclick="showHideByID('traderSellNegotiationDetails@trader.id')">@Messages(constants.Form.SHOW_HIDE)</button>
+                    <button type="button" class="cmuk-button cmuk-button-primary" onclick="showHideByID('traderSellNegotiationDetails@trader.id')">@Messages(constants.Form.SHOW_HIDE)</button>
                     <div class="hidden" id="traderSellNegotiationDetails@trader.id">
                         <span class="red">@Messages(constants.Form.BUYER_ADDRESS)</span>: @sellNegotiation.buyerAddress <br>
                         <span class="red">@Messages(constants.Form.SELLER_ADDRESS)</span>: @sellNegotiation.sellerAddress <br>

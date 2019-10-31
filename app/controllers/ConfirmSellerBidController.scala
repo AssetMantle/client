@@ -87,16 +87,16 @@ class ConfirmSellerBidController @Inject()(messagesControllerComponents: Message
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
         },
-        confirmBidTransaction => {
+        confirmBidTransactionData => {
           try {
-            val masterNegotiation = masterTransactionNegotiationRequests.Service.getNegotiationByID(confirmBidTransaction.requestID)
+            val masterNegotiation = masterTransactionNegotiationRequests.Service.getNegotiationByID(confirmBidTransactionData.requestID)
             if (masterNegotiation.sellerAccountID == loginState.username) {
               val buyerAddress = masterAccounts.Service.getAddress(masterNegotiation.buyerAccountID)
-              val sellerContractHash = utilities.FileOperations.combinedHash(masterTransactionNegotiationFiles.Service.getDocuments(confirmBidTransaction.requestID, Seq(constants.File.SELLER_CONTRACT)))
+              val sellerContractHash = utilities.FileOperations.combinedHash(masterTransactionNegotiationFiles.Service.getDocuments(confirmBidTransactionData.requestID, Seq(constants.File.SELLER_CONTRACT)))
               transaction.process[blockchainTransaction.ConfirmSellerBid, transactionsConfirmSellerBid.Request](
-                entity = blockchainTransaction.ConfirmSellerBid(from = loginState.address, to = buyerAddress, bid = masterNegotiation.amount, time = confirmBidTransaction.time, pegHash = masterNegotiation.pegHash, sellerContractHash = sellerContractHash, gas = confirmBidTransaction.gas, ticketID = "", mode = transactionMode),
+                entity = blockchainTransaction.ConfirmSellerBid(from = loginState.address, to = buyerAddress, bid = masterNegotiation.amount, time = confirmBidTransactionData.time, pegHash = masterNegotiation.pegHash, sellerContractHash = sellerContractHash, gas = confirmBidTransactionData.gas, ticketID = "", mode = transactionMode),
                 blockchainTransactionCreate = blockchainTransactionConfirmSellerBids.Service.create,
-                request = transactionsConfirmSellerBid.Request(transactionsConfirmSellerBid.BaseReq(from = loginState.address, gas = confirmBidTransaction.gas.toString), to = buyerAddress, password = confirmBidTransaction.password, bid = masterNegotiation.amount.toString, time = confirmBidTransaction.time.toString, pegHash = masterNegotiation.pegHash, sellerContractHash = sellerContractHash, mode = transactionMode),
+                request = transactionsConfirmSellerBid.Request(transactionsConfirmSellerBid.BaseReq(from = loginState.address, gas = confirmBidTransactionData.gas.toString), to = buyerAddress, password = confirmBidTransactionData.password, bid = masterNegotiation.amount.toString, time = confirmBidTransactionData.time.toString, pegHash = masterNegotiation.pegHash, sellerContractHash = sellerContractHash, mode = transactionMode),
                 action = transactionsConfirmSellerBid.Service.post,
                 onSuccess = blockchainTransactionConfirmSellerBids.Utility.onSuccess,
                 onFailure = blockchainTransactionConfirmSellerBids.Utility.onFailure,

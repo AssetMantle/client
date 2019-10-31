@@ -1,0 +1,13 @@
+@import constants.FormField.{SelectFormField, NestedFormField}
+@import helper._
+@import play.api.data.Field
+
+@(formData: Form[_], formField: SelectFormField, arguments: (Symbol, Any)*)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, nestedFormField: Option[NestedFormField] = None, field: Option[Field] = None)
+
+@defining(Seq('_label -> Messages(formField.name), 'placeholder -> Messages(formField.name), 'class -> "cmuk-input", '_default -> Messages(formField.name))) { defaultArguments =>
+    @if(field.isDefined) {
+        @select(field.get.apply(formField.name), for(option <- formField.options) yield (option, Messages(option)), defaultArguments ++ arguments: _*)
+    } else {
+        @select(formData(if(nestedFormField.isDefined) Seq(nestedFormField.get.name, formField.name).mkString(".") else formField.name), for(option <- formField.options) yield (option, Messages(option)), defaultArguments ++ arguments: _*)
+    }
+}

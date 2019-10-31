@@ -1,13 +1,12 @@
 @import controllers.actions.LoginState
-@import helper._
 @import views.html.base._
 @import views.companion.master.SendFiat
 
 @(sendFiatForm: Form[SendFiat.Data] = SendFiat.form, sellerAddress: String, pegHash: String, bid: Int)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @commonForm(constants.Form.SEND_FIAT, sendFiatForm) {
-    @inputText(sendFiatForm(constants.FormField.SELLER_ADDRESS.name).copy(value = Some(sellerAddress)), '_label -> Messages(constants.FormField.SELLER_ADDRESS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.SELLER_ADDRESS.name), 'required -> true)
-    @inputText(sendFiatForm(constants.FormField.AMOUNT.name).copy(value = Some(bid.toString)), '_label -> Messages(constants.FormField.AMOUNT.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.AMOUNT.name), 'required -> true, 'type -> "number")
-    @inputText(sendFiatForm(constants.FormField.PEG_HASH.name).copy(value = Some(pegHash)), '_label -> Messages(constants.FormField.PEG_HASH.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PEG_HASH.name), 'required -> true)
-    @inputText(sendFiatForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.GAS.name), 'required -> true, 'type -> "number")
-    @inputPassword(sendFiatForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PASSWORD.name), 'required -> true)
+    @commonInputText(sendFiatForm, constants.FormField.SELLER_ADDRESS, 'value -> sellerAddress))
+    @commonInputInt(sendFiatForm, constants.FormField.AMOUNT, 'value -> bid.toString))
+    @commonInputText(sendFiatForm, constants.FormField.PEG_HASH, 'value -> pegHash))
+    @commonInputInt(sendFiatForm, constants.FormField.GAS)
+    @commonInputPassword(sendFiatForm, constants.FormField.PASSWORD)
 }

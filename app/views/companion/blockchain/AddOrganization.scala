@@ -1,9 +1,9 @@
 package views.companion.blockchain
 
-object AddOrganization {
+import play.api.data.Form
+import play.api.data.Forms._
 
-  import play.api.data.Form
-  import play.api.data.Forms._
+object AddOrganization {
 
   val form = Form(
     mapping(

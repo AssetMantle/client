@@ -1,15 +1,14 @@
-@import helper._
 @import views.companion.blockchain.SellerExecuteOrder
 @import views.html.base._
 
 @(sellerExecuteOrderForm: Form[SellerExecuteOrder.Data] = SellerExecuteOrder.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @commonForm(constants.Form.BLOCKCHAIN_SELLER_EXECUTE_ORDER, sellerExecuteOrderForm) {
-    @commonInputText(sellerExecuteOrderForm, constants.FormField.FROM.name)
-    @commonInputText(sellerExecuteOrderForm, constants.FormField.BUYER_ADDRESS.name)
-    @commonInputText(sellerExecuteOrderForm, constants.FormField.SELLER_ADDRESS.name)
-    @commonInputText(sellerExecuteOrderForm, constants.FormField.AWB_PROOF_HASH.name)
-    @commonInputText(sellerExecuteOrderForm, constants.FormField.PEG_HASH.name)
-    @commonInputText(sellerExecuteOrderForm, constants.FormField.GAS.name)
-    @commonInputText(sellerExecuteOrderForm, constants.FormField.MODE.name)
-    @commonInputPassword(sellerExecuteOrderForm, constants.FormField.PASSWORD.name)
+    @commonInputText(sellerExecuteOrderForm, constants.FormField.FROM)
+    @commonInputText(sellerExecuteOrderForm, constants.FormField.BUYER_ADDRESS)
+    @commonInputText(sellerExecuteOrderForm, constants.FormField.SELLER_ADDRESS)
+    @commonInputText(sellerExecuteOrderForm, constants.FormField.AWB_PROOF_HASH)
+    @commonInputText(sellerExecuteOrderForm, constants.FormField.PEG_HASH)
+    @commonInputInt(sellerExecuteOrderForm, constants.FormField.GAS)
+    @commonInputText(sellerExecuteOrderForm, constants.FormField.MODE)
+    @commonInputPassword(sellerExecuteOrderForm, constants.FormField.PASSWORD)
 }

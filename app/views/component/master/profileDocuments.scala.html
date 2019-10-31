@@ -13,22 +13,22 @@
             case constants.User.GENESIS => {}
             case constants.User.ZONE => {
                 <div class="centerText">
-                    <button onclick="getForm(jsRoutes.controllers.FileController.updateZoneKYCForm('@document.documentType'))">@Messages(constants.Form.UPDATE)</button>
+                    <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.FileController.updateZoneKYCForm('@document.documentType'))">@Messages(constants.Form.UPDATE)</button>
                 </div>
             }
             case constants.User.ORGANIZATION => {
                 <div class="centerText">
-                    <button onclick="getForm(jsRoutes.controllers.AddOrganizationController.updateOrganizationKYCForm('@document.documentType'))">@Messages(constants.Form.UPDATE)</button>
+                    <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.AddOrganizationController.updateOrganizationKYCForm('@document.documentType'))">@Messages(constants.Form.UPDATE)</button>
                 </div>
             }
             case constants.User.TRADER => {
                 <div class="centerText">
-                    <button onclick="getForm(jsRoutes.controllers.SetACLController.updateTraderKYCForm('@document.documentType'))">@Messages(constants.Form.UPDATE)</button>
+                    <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.SetACLController.updateTraderKYCForm('@document.documentType'))">@Messages(constants.Form.UPDATE)</button>
                 </div>
             }
             case constants.User.USER => {
                 <div class="centerText">
-                    <button onclick="getForm(jsRoutes.controllers.FileController.updateAccountKYCForm('@document.documentType'))">@Messages(constants.Form.UPDATE)</button>
+                    <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.FileController.updateAccountKYCForm('@document.documentType'))">@Messages(constants.Form.UPDATE)</button>
                 </div>
             }
             case constants.User.UNKNOWN => {}
