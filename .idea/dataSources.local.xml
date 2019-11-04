@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project version="4">
-  <component name="dataSourceStorageLocal">
-    <data-source name="PostgreSQL - postgres@localhost" uuid="93adaf8f-4b23-484d-8e39-3b08b452dddd">
-      <database-info product="" version="" jdbc-version="" driver-name="" driver-version="" />
-    </data-source>
-  </component>
-</project>

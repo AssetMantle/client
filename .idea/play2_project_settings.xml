@@ -3,7 +3,7 @@
   <component name="Play2ExcludedModulesSettings">
     <option name="INFO">
       <map>
-        <entry key="commitcentral">
+        <entry key="commitCentral">
           <value>
             <ProjectSettingsEntry>
               <option name="playDistrPath" value="$USER_HOME$/.ivy2/cache/com.typesafe.play/play_2.12/jars/play_2.12-2.7.2.jar" />
@@ -13,7 +13,8 @@
         <entry key="root">
           <value>
             <ProjectSettingsEntry>
-              <option name="confDir" value="C:\Users\Akash\IntellijIdea\commitCentral\app" />
+              <option name="sourceDir" value="$PROJECT_DIR$/app" />
+              <option name="confDir" value="$PROJECT_DIR$/app" />
               <option name="templateImports">
                 <list>
                   <option value="_root_.play.twirl.api.TwirlFeatureImports._" />
@@ -36,7 +37,7 @@
                   <option value="controllers.Assets.Asset" />
                 </list>
               </option>
-              <option name="uri" value="/C:/Users/Akash/IntellijIdea/commitCentral" />
+              <option name="uri" value="$PROJECT_DIR$" />
             </ProjectSettingsEntry>
           </value>
         </entry>
