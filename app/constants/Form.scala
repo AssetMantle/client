@@ -385,7 +385,4 @@ object Form {
   val ONLY_BUYER = "ONLY_BUYER"
   val BOTH_PARTIES = "BOTH_PARTIES"
 
-  //Sequences
-  //TODO Should be in assets constants
-
 }
