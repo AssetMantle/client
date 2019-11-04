@@ -1,12 +1,12 @@
 @import controllers.actions.LoginState
-@import helper._
 @import views.html.base._
 @import views.companion.master.ConfirmBuyerBidDetail
 
 @(confirmBuyerBidDetailForm: Form[ConfirmBuyerBidDetail.Data] = ConfirmBuyerBidDetail.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @commonForm(constants.Form.CONFIRM_BUYER_BID_DETAIL, confirmBuyerBidDetailForm) {
-    @inputText(confirmBuyerBidDetailForm(constants.FormField.REQUEST_ID.name), '_label -> Messages(constants.FormField.REQUEST_ID.name), 'class -> "form-control hidden", 'placeholder -> Messages(constants.FormField.REQUEST_ID.name), 'required -> false)
-    @inputText(confirmBuyerBidDetailForm(constants.FormField.SELLER_ADDRESS.name), '_label -> Messages(constants.FormField.SELLER_ADDRESS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.SELLER_ADDRESS.name), 'required -> true)
-    @inputText(confirmBuyerBidDetailForm(constants.FormField.BID.name), '_label -> Messages(constants.FormField.BID.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.BID.name), 'required -> true, 'type -> "number")
-    @inputText(confirmBuyerBidDetailForm(constants.FormField.PEG_HASH.name), '_label -> Messages(constants.FormField.PEG_HASH.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PEG_HASH.name), 'required -> true)
+    @*//TODO why requestID is hidden and not optional when no default value*@
+    @commonInputText(confirmBuyerBidDetailForm, constants.FormField.REQUEST_ID)
+    @commonInputText(confirmBuyerBidDetailForm, constants.FormField.SELLER_ADDRESS)
+    @commonInputInt(confirmBuyerBidDetailForm, constants.FormField.BID)
+    @commonInputText(confirmBuyerBidDetailForm, constants.FormField.PEG_HASH)
 }

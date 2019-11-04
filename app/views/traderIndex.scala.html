@@ -56,10 +56,10 @@
                 @loginState.acl match {
                     case Some(acl) => {
                         @if(acl.issueFiat) {
-                            <button onclick="getForm(jsRoutes.controllers.IssueFiatController.issueFiatRequestForm())">@Messages(constants.Form.ISSUE_FIAT_REQUEST.legend)</button>
+                            <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.IssueFiatController.issueFiatRequestForm())">@Messages(constants.Form.ISSUE_FIAT_REQUEST.legend)</button>
                         }
                         @if(acl.redeemFiat) {
-                            <button onclick="getForm(jsRoutes.controllers.RedeemFiatController.redeemFiatForm('@loginState.address'))">@Messages(constants.Form.REDEEM_FIAT.legend)</button>
+                            <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.RedeemFiatController.redeemFiatForm('@loginState.address'))">@Messages(constants.Form.REDEEM_FIAT.legend)</button>
                         }
                     }
                     case _ => {}
@@ -111,7 +111,7 @@
             <a class="cmuk-accordion-title" href="#" onclick="fetchOrShowHide('orderList', jsRoutes.controllers.ComponentViewController.orderList(), this)">@Messages(constants.Form.ON_GOING_ORDERS)</a>
             <div class="cmuk-accordion-content">
                 <div id="orderList" class="flexContainer"></div>
-                <script type="text/javascript">            <script type="text/javascript">
+                <script type="text/javascript">            <script; type="text/javascript">;
                 var orderCometMessage = function (event) {
                     console.log(event.toString());
                     componentResource('orderList', jsRoutes.controllers.ComponentViewController.orderList());

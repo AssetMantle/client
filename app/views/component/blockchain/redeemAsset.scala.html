@@ -1,13 +1,12 @@
-@import helper._
 @import views.companion.blockchain.RedeemAsset
 @import views.html.base._
 
 @(redeemAssetForm: Form[RedeemAsset.Data] = RedeemAsset.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @commonForm(constants.Form.BLOCKCHAIN_REDEEM_ASSET, redeemAssetForm) {
-    @commonInputText(redeemAssetForm, constants.FormField.FROM.name)
-    @commonInputText(redeemAssetForm, constants.FormField.TO.name)
-    @commonInputText(redeemAssetForm, constants.FormField.PEG_HASH.name)
-    @commonInputText(redeemAssetForm, constants.FormField.GAS.name)
-    @commonInputText(redeemAssetForm, constants.FormField.MODE.name)
-    @commonInputPassword(redeemAssetForm, constants.FormField.PASSWORD.name)
+    @commonInputText(redeemAssetForm, constants.FormField.FROM)
+    @commonInputText(redeemAssetForm, constants.FormField.TO)
+    @commonInputText(redeemAssetForm, constants.FormField.PEG_HASH)
+    @commonInputInt(redeemAssetForm, constants.FormField.GAS)
+    @commonInputText(redeemAssetForm, constants.FormField.MODE)
+    @commonInputPassword(redeemAssetForm, constants.FormField.PASSWORD)
 }
