@@ -387,11 +387,5 @@ object Form {
 
   //Sequences
   //TODO Should be in assets constants
-  val ASSET_TYPE_OPTIONS: Seq[String] = Seq("Oil", "Coal", "Gold", "Wheat")
-  val DELIVERY_TERM_OPTIONS: Seq[String] = Seq("FOB", "CIF", "CFR")
-  val QUALITY_OPTIONS: Seq[String] = Seq("A+", "A", "B")
-  val TRADE_TYPE_OPTIONS: Seq[String] = Seq("POST TRADE")
-  val COUNTRY_OPTIONS: Seq[String] = Seq("INDIA", "BHUTAN", "NEPAL", "PAKISTAN", "BANGLADESH", "SRI LANKA", "CHINA")
-  val PHYSICAL_DOCUMENTS_HANDLED_VIA_OPTIONS: Seq[String] = Seq(COMDEX, "BANK", "TRUST")
-  val COMDEX_PAYMENT_TERMS_OPTIONS: Seq[String] = Seq(ONLY_SUPPLIER, ONLY_BUYER, BOTH_PARTIES)
+
 }
