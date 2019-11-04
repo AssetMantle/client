@@ -8,17 +8,17 @@
     @sequentialNestedFormfield match {
         case Some(field: Field) => {
             @* //This case handles sequential subForms under a nested field. See UserUpdateUBOs for example.*@
-            @inputText(field.apply(formField.name), defaultArguments ++ arguments: _*)
+            @inputText(field.apply(formField.name).copy(value = arguments.toMap.get('value).map(_.toString)), defaultArguments ++ arguments: _*)
         }
         case None => {
             @nestedFormField match {
                 case Some(field: NestedFormField) => {
                     @* //This case handles nested fields. See AddOrganization for example.*@
-                    @inputText(formData(Seq(field.name, formField.name).mkString(".")), defaultArguments ++ arguments: _*)
+                    @inputText(formData(Seq(field.name, formField.name).mkString(".")).copy(value = arguments.toMap.get('value).map(_.toString)), defaultArguments ++ arguments: _*)
                 }
                 case None => {
                     @* //This case handles generic fields.*@
-                    @inputText(formData(formField.name), defaultArguments ++ arguments: _*)
+                    @inputText(formData(formField.name).copy(value = arguments.toMap.get('value).map(_.toString)), defaultArguments ++ arguments: _*)
                 }
             }
         }
