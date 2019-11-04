@@ -1,5 +1,4 @@
 @import controllers.actions.LoginState
-@import helper._
 @import models.master.{Zone, ZoneKYC}
 @import play.api.Logger
 @import views.companion.master.ReviewAddZoneRequest
@@ -11,12 +10,12 @@
         <span class="red">@Messages(constants.Form.NAME)</span>: @zone.name <br>
         <span class="red">@Messages(constants.Form.CURRENCY)</span>: @zone.currency <br>
         @Messages(constants.Form.ADDRESS): <br>
-        <span class="red">@Messages(constants.Form.ADDRESS_LINE_1)</span>: @zone.address.addressLine1 <br>
-        <span class="red">@Messages(constants.Form.ADDRESS_LINE_2)</span>: @zone.address.addressLine2 <br>
-        <span class="red">@Messages(constants.Form.LANDMARK)</span>: @zone.address.landmark.getOrElse("") <br>
-        <span class="red">@Messages(constants.Form.CITY)</span>: @zone.address.city <br>
-        <span class="red">@Messages(constants.Form.COUNTRY)</span>: @zone.address.country <br>
-        <span class="red">@Messages(constants.Form.ZIP_CODE)</span>: @zone.address.zipCode <br>
+        <span class="red">@Messages(constants.FormField.ADDRESS_LINE_1.name)</span>: @zone.address.addressLine1 <br>
+        <span class="red">@Messages(constants.FormField.ADDRESS_LINE_2.name)</span>: @zone.address.addressLine2 <br>
+        <span class="red">@Messages(constants.FormField.LANDMARK.name)</span>: @zone.address.landmark.getOrElse("") <br>
+        <span class="red">@Messages(constants.FormField.CITY.name)</span>: @zone.address.city <br>
+        <span class="red">@Messages(constants.FormField.COUNTRY.name)</span>: @zone.address.country <br>
+        <span class="red">@Messages(constants.FormField.ZIP_CODE.name)</span>: @zone.address.zipCode <br>
         <span class="red">@Messages(constants.Form.PHONE)</span>: @zone.address.phone
     </div>
     <br>
@@ -32,6 +31,6 @@
         }
     </div>
     <br>
-    <span>@checkbox(zoneCompletionForm(constants.FormField.COMPLETION.name), '_label -> Messages(constants.FormField.COMPLETION.name), 'placeholder -> Messages(constants.FormField.COMPLETION.name), 'class -> "cmuk-checkbox", 'required -> true)</span>
+    @commonCheckbox(zoneCompletionForm, constants.FormField.COMPLETION)
     <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.AddZoneController.userUploadOrUpdateZoneKYCView())">@Messages(constants.Form.BACK)</button>
 }

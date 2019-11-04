@@ -8,7 +8,7 @@ object AddZone {
     mapping(
       constants.FormField.NAME.name -> constants.FormField.NAME.field,
       constants.FormField.CURRENCY.name -> constants.FormField.CURRENCY.field,
-      constants.Form.ADDRESS -> mapping(
+      constants.FormField.ADDRESS.name -> mapping(
         constants.FormField.ADDRESS_LINE_1.name -> constants.FormField.ADDRESS_LINE_1.field,
         constants.FormField.ADDRESS_LINE_2.name -> constants.FormField.ADDRESS_LINE_2.field,
         constants.FormField.LANDMARK.name -> optional(constants.FormField.LANDMARK.field),

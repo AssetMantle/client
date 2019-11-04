@@ -28,7 +28,7 @@ object FormField {
   val NAME = new StringFormField("NAME", 2, 50)
   val PERSON_NAME = new StringFormField("PERSON_NAME", 2, 50)
   val ABBREVIATION = new StringFormField("ABBREVIATION", 2, 10)
-  val ADDRESS = new StringFormField("ADDRESS", 6, 100)
+  val STREET_ADDRESS = new StringFormField("STREET_ADDRESS", 6, 100)
   val REQUEST_ID = new StringFormField("REQUEST_ID", 32, 32)
   val ACCOUNT_ID = new StringFormField("ACCOUNT_ID", 3, 50)
   val FIAT_PROOF_HASH = new StringFormField("FIAT_PROOF_HASH", 4, 50, RegularExpression.HASH)
@@ -40,7 +40,6 @@ object FormField {
   val PUSH_NOTIFICATION_TOKEN = new StringFormField("PUSH_NOTIFICATION_TOKEN", 0, 200)
   val COMMENT = new StringFormField("COMMENT", 0, 200)
   val COUPON = new StringFormField("COUPON", 0, 50)
-  val COUNTRY_CODE = new StringFormField("COUNTRY_CODE", 1, 5)
   val OTP = new StringFormField("OTP", 4, 10, RegularExpression.ALL_NUMBERS_ALL_LETTERS)
   val CURRENCY = new StringFormField("CURRENCY", 2, 30, RegularExpression.ALL_LETTERS)
   val EMAIL_ADDRESS = new StringFormField("EMAIL_ADDRESS", 6, 100, RegularExpression.EMAIL_ADDRESS)
@@ -94,15 +93,17 @@ object FormField {
   val DOCUMENT_TYPE = new StringFormField("DOCUMENT_TYPE", 2, 500)
   val FILE_ID = new StringFormField("FILE_ID", 2, 500)
 
-  val ASSET_TYPE = new StringOptionFormField("ASSET_TYPE", constants.Form.ASSET_TYPE_OPTIONS)
-  val DELIVERY_TERM = new StringOptionFormField("DELIVERY_TERM", constants.Form.DELIVERY_TERM_OPTIONS)
-  val QUALITY = new StringOptionFormField("QUALITY", constants.Form.QUALITY_OPTIONS)
-  val TRADE_TYPE = new StringOptionFormField("TRADE_TYPE", constants.Form.TRADE_TYPE_OPTIONS)
-  val PHYSICAL_DOCUMENTS_HANDLED_VIA = new StringOptionFormField("PHYSICAL_DOCUMENTS_HANDLED_VIA", constants.Form.PHYSICAL_DOCUMENTS_HANDLED_VIA_OPTIONS)
-  val COMDEX_PAYMENT_TERMS = new StringOptionFormField("COMDEX_PAYMENT_TERMS", constants.Form.COMDEX_PAYMENT_TERMS_OPTIONS)
+  //SelectFormField
+  val ASSET_TYPE = new SelectFormField("ASSET_TYPE", constants.Form.ASSET_TYPE_OPTIONS)
+  val DELIVERY_TERM = new SelectFormField("DELIVERY_TERM", constants.Form.DELIVERY_TERM_OPTIONS)
+  val QUALITY = new SelectFormField("QUALITY", constants.Form.QUALITY_OPTIONS)
+  val TRADE_TYPE = new SelectFormField("TRADE_TYPE", constants.Form.TRADE_TYPE_OPTIONS)
+  val PHYSICAL_DOCUMENTS_HANDLED_VIA = new SelectFormField("PHYSICAL_DOCUMENTS_HANDLED_VIA", constants.Form.PHYSICAL_DOCUMENTS_HANDLED_VIA_OPTIONS)
+  val COMDEX_PAYMENT_TERMS = new SelectFormField("COMDEX_PAYMENT_TERMS", constants.Form.COMDEX_PAYMENT_TERMS_OPTIONS)
+  val COUNTRY_CODE = new SelectFormField("COUNTRY_CODE", constants.CountryCallingCode.COUNTRY_CODES)
 
   //IntFormField
-  val GAS = new IntFormField("GAS", 20000, 1000000, Some(1))
+  val GAS = new IntFormField("GAS", 20000, 1000000)
   val BID = new IntFormField("BID", 0, Int.MaxValue)
   val TIME = new IntFormField("TIME", 0, Int.MaxValue)
   val ASSET_QUANTITY = new IntFormField("ASSET_QUANTITY", 1, Int.MaxValue)
@@ -141,6 +142,12 @@ object FormField {
   val COMPLETION = new BooleanFormField("COMPLETION")
   val STATUS = new BooleanFormField("STATUS")
   val CONFIRM_NOTE_NEW_KEY_DETAILS = new BooleanFormField("CONFIRM_NOTE_NEW_KEY_DETAILS")
+  val SAME_AS_REGISTERED_ADDRESS = new BooleanFormField("SAME_AS_REGISTERED_ADDRESS")
+
+  //NestedFormField
+  val REGISTERED_ADDRESS = new NestedFormField("REGISTERED_ADDRESS")
+  val POSTAL_ADDRESS = new NestedFormField("POSTAL_ADDRESS")
+  val ADDRESS = new NestedFormField("ADDRESS")
 
   //TODO: Error Response through Messages
   class StringFormField (fieldName: String, minimumLength: Int, maximumLength: Int, regex: Regex = RegularExpression.ANY_STRING, errorMessage: String = "Error Response") {
@@ -148,12 +155,12 @@ object FormField {
     val field: Mapping[String] = text(minLength = minimumLength, maxLength = maximumLength).verifying(Constraints.pattern(regex = regex, name = regex.pattern.toString, error = errorMessage))
   }
 
-  class StringOptionFormField(fieldName: String, option: Seq[String], errorMessage: String = "Error Response") {
+  class SelectFormField(fieldName: String, val options: Seq[String], errorMessage: String = "Error Response") {
     val name: String = fieldName
-    val field: Mapping[String] = text.verifying(constraint = field => option contains field, error = errorMessage)
+    val field: Mapping[String] = text.verifying(constraint = field => options contains field, error = errorMessage)
   }
 
-  class IntFormField (fieldName: String, val minimumValue: Int, val maximumValue: Int, val rangeSliderStep: Option[Int] = None) {
+  class IntFormField (fieldName: String, val minimumValue: Int, val maximumValue: Int) {
     val name: String = fieldName
     val field: Mapping[Int] =  number(min = minimumValue, max = maximumValue)
   }
@@ -163,7 +170,7 @@ object FormField {
     val field: Mapping[Date] = date
   }
 
-  class DoubleFormField(fieldName: String, minimumValue: Double, maximumValue: Double) {
+  class DoubleFormField(fieldName: String, val minimumValue: Double, val maximumValue: Double) {
     val name: String = fieldName
     val field: Mapping[Double] = of(doubleFormat).verifying(Constraints.max[Double](maximumValue), Constraints.min[Double](minimumValue))
   }
@@ -171,5 +178,9 @@ object FormField {
   class BooleanFormField(fieldName: String) {
     val name: String = fieldName
     val field: Mapping[Boolean] = boolean
+  }
+
+  class NestedFormField(fieldName: String) {
+    val name: String = fieldName
   }
 }

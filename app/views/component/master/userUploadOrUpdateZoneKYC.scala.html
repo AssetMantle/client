@@ -9,7 +9,7 @@
 <div class="centerText">
     @for(documentType <- constants.File.ZONE_KYC_DOCUMENT_TYPES) {
         <div id="upload@documentType">
-            <button onclick="getForm(jsRoutes.controllers.AddZoneController.userUploadZoneKYCForm('@documentType'))">@Messages(constants.Form.UPLOAD) @Messages(documentType)</button>
+            <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.AddZoneController.userUploadZoneKYCForm('@documentType'))">@Messages(constants.Form.UPLOAD) @Messages(documentType)</button>
         </div>
     }
     @for(zoneKYC <- zoneKYCs) {
@@ -18,7 +18,7 @@
         } {
             <a href="@routes.FileController.userAccessedZoneKYCFile(zoneKYC.documentType)">@Messages(zoneKYC.documentType)</a>
         } {
-            <button onclick="getForm(jsRoutes.controllers.AddZoneController.userUpdateZoneKYCForm('@zoneKYC.documentType'))">@Messages(constants.Form.UPDATE) @Messages(zoneKYC.documentType)</button>
+            <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.AddZoneController.userUpdateZoneKYCForm('@zoneKYC.documentType'))">@Messages(constants.Form.UPDATE) @Messages(zoneKYC.documentType)</button>
             <script>hideElement('upload@zoneKYC.documentType')</script>
         }
     }

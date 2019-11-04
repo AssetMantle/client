@@ -1,17 +1,16 @@
 @import controllers.actions.LoginState
-@import helper._
 @import views.html.base._
 @import views.companion.master.ConfirmIssueAssetTransaction
 
 @(confirmIssueAssetTransactionForm: Form[ConfirmIssueAssetTransaction.Data] = ConfirmIssueAssetTransaction.form, asset: masterTransaction.IssueAssetRequest)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 <div id="assetDetail"></div>
 @commonForm(constants.Form.ISSUE_ASSET_REQUEST, confirmIssueAssetTransactionForm) {
-    @inputText(confirmIssueAssetTransactionForm(constants.FormField.REQUEST_ID.name), '_label -> Messages(constants.FormField.REQUEST_ID.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.REQUEST_ID.name), 'required -> true)
+    @commonInputText(confirmIssueAssetTransactionForm, constants.FormField.REQUEST_ID)
     @asset.physicalDocumentsHandledVia match {
         case constants.Form.COMDEX => {}
         case _ => {
-            @inputText(confirmIssueAssetTransactionForm(constants.FormField.GAS.name).copy(value = Some(20000.toString)), '_label -> Messages(constants.FormField.GAS.name), 'class -> "cmuk-input", 'type -> "number", 'placeholder -> Messages(constants.FormField.GAS.name), 'required -> false)
-            @inputPassword(confirmIssueAssetTransactionForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PASSWORD.name), 'required -> false)
+            @commonInputInt(confirmIssueAssetTransactionForm, constants.FormField.GAS)
+            @commonInputPassword(confirmIssueAssetTransactionForm, constants.FormField.PASSWORD)
         }
     }
 }
