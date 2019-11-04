@@ -125,7 +125,7 @@
             }
             @for(warning <- warnings) {
                 <div class="cmuk-alert-warning" onclick="getForm(@warning.action)" cmuk-alert>
-                    <a href="javascript:void(0)" class="cmuk-alert-close" cmuk-close></a>
+                    <a class="cmuk-alert-close" cmuk-close></a>
                     <p>@Messages(constants.Form.WARNING) @Messages(warning.message)</p>
                 </div>
             }
@@ -162,7 +162,7 @@
 
 
         <div class = "modal centerScreen" id="loading">
-            <img src="@routes.Assets.versioned("images/loading.gif")" alt = "@Messages(constants.Form.LOADING)"/>
+            <div cmuk-spinner="ratio: 2.5"></div>
         </div>
 
     </div>

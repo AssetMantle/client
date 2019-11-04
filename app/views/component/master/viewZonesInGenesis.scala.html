@@ -11,11 +11,11 @@
         <span class="red">@Messages(constants.Form.ACCOUNT_ID)</span> :@zone.accountID <br>
         <span class="red">@Messages(constants.Form.NAME)</span> :@zone.name <br>
         <span class="red">@Messages(constants.Form.CURRENCY)</span> :@zone.currency <br>
-        <div class="leftMargin">
+        <div>
           <div>
             <h4 class="showHide toggleElement centerText" onclick="fetchOrShowHide('@zone.id', jsRoutes.controllers.AddOrganizationController.viewOrganizationsInZoneForGenesis('@zone.id'), this)">@Messages(constants.Form.ORGANIZATIONS)</h4>
           </div>
-          <div id="@zone.id" class="rightPadding scrollableSecond"></div>
+          <div id="@zone.id" class="scrollableSecond"></div>
         </div>
       </div>
     </div>

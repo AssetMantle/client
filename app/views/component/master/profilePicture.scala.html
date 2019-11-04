@@ -6,8 +6,8 @@
     @if(profilePicture sameElements Array[Byte]()) {
     <div class="cmuk-text-center">
         <div class="cmuk-inline-clip cmuk-transition-toggle" tabindex="0">
-            <img id="profilePicture" class="profilePicture" src="@routes.Assets.versioned("images/defaultProfilePicture.jpg")" alt="">
-            <div class="cmuk-transition-slide-bottom cmuk-position-bottom cmuk-overlay-default">
+            <span cmuk-icon="icon: user; ratio: 10"></span> &nbsp;
+            <div class="cmuk-transition-slide-bottom cmuk-overlay-primary cmuk-position-bottom cmuk-overlay-default">
                 <p class="cmuk-h4 cmuk-margin-remove">
                     <button class="cmuk-button cmuk-button-link" onclick="getForm(jsRoutes.controllers.FileController.uploadAccountFileForm('@constants.File.PROFILE_PICTURE'))">@Messages(constants.Form.UPLOAD)</button>
                 </p>
