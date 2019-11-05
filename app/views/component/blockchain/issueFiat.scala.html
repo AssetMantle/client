@@ -1,14 +1,13 @@
-@import helper._
 @import views.companion.blockchain.IssueFiat
 @import views.html.base._
 
 @(issueFiatForm: Form[IssueFiat.Data] = IssueFiat.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @commonForm(constants.Form.BLOCKCHAIN_ISSUE_FIAT, issueFiatForm) {
-    @commonInputText(issueFiatForm, constants.FormField.FROM.name)
-    @commonInputText(issueFiatForm, constants.FormField.TO.name)
-    @commonInputText(issueFiatForm, constants.FormField.TRANSACTION_ID.name)
-    @commonInputText(issueFiatForm, constants.FormField.TRANSACTION_AMOUNT.name)
-    @commonInputText(issueFiatForm, constants.FormField.GAS.name)
-    @commonInputText(issueFiatForm, constants.FormField.MODE.name)
-    @commonInputPassword(issueFiatForm, constants.FormField.PASSWORD.name)
+    @commonInputText(issueFiatForm, constants.FormField.FROM)
+    @commonInputText(issueFiatForm, constants.FormField.TO)
+    @commonInputText(issueFiatForm, constants.FormField.TRANSACTION_ID)
+    @commonInputInt(issueFiatForm, constants.FormField.TRANSACTION_AMOUNT)
+    @commonInputInt(issueFiatForm, constants.FormField.GAS)
+    @commonInputText(issueFiatForm, constants.FormField.MODE)
+    @commonInputPassword(issueFiatForm, constants.FormField.PASSWORD)
 }

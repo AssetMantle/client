@@ -9,7 +9,7 @@
 <div class="centerText">
     @for(documentType <- constants.File.TRADER_KYC_DOCUMENT_TYPES) {
         <div id="upload@documentType">
-            <button onclick="getForm(jsRoutes.controllers.SetACLController.userUploadTraderKYCForm('@documentType'))">@Messages(constants.Form.UPLOAD) @Messages(documentType)</button>
+            <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.SetACLController.userUploadTraderKYCForm('@documentType'))">@Messages(constants.Form.UPLOAD) @Messages(documentType)</button>
         </div>
     }
     @for(traderKYC <- traderKYCs) {
@@ -18,7 +18,7 @@
         } {
             <a href="@routes.FileController.userAccessedTraderKYCFile(traderKYC.documentType)">@Messages(traderKYC.documentType)</a>
         } {
-            <button onclick="getForm(jsRoutes.controllers.SetACLController.userUpdateTraderKYCForm('@traderKYC.documentType'))">@Messages(constants.Form.UPDATE) @Messages(traderKYC.documentType)</button>
+            <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.SetACLController.userUpdateTraderKYCForm('@traderKYC.documentType'))">@Messages(constants.Form.UPDATE) @Messages(traderKYC.documentType)</button>
             <script>hideElement('upload@traderKYC.documentType')</script>
         }
     }

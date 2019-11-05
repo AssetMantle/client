@@ -1,5 +1,15 @@
+@import constants.FormField.{BooleanFormField, NestedFormField}
 @import helper._
+@import play.api.data.Field
 
-@(formData: Form[_], keyName: String, fieldClass: Option[String] = None, fieldID: Option[String] = None)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(formData: Form[_], formField: BooleanFormField, arguments: (Symbol, Any)*)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, nestedFormField: Option[NestedFormField] = None, field: Option[Field] = None)
 
-@checkbox(formData(keyName), '_label -> Messages(keyName), 'id -> fieldID.getOrElse(keyName), 'class -> fieldClass.getOrElse("cmuk-checkbox"))
+<div class='@arguments.toMap.get('overallClass).map(_.toString).getOrElse("")'>
+    @defining(Seq('_label -> Messages(formField.name), 'class -> "cmuk-checkbox")) { defaultArguments =>
+        @if(field.isDefined) {
+            @checkbox(field.get.apply(formField.name), defaultArguments ++ arguments: _*)
+        } else {
+            @checkbox(formData(if(nestedFormField.isDefined) Seq(nestedFormField.get.name, formField.name).mkString(".") else formField.name), defaultArguments ++ arguments: _*)
+        }
+    }
+</div>

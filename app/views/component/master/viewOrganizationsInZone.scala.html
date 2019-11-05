@@ -2,8 +2,7 @@
 @import models.master.Organization
 
 @(organizations: Seq[Organization])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
-<div class="cmuk-container">
-    <div class="cmuk-grid-expand cmuk-width-auto cmuk-grid-match" cmuk-sortable="handle: .cmuk-card" cmuk-grid>
+ <div class="cmuk-width-auto" cmuk-sortable="handle: .cmuk-card" cmuk-grid>
 @for(organization <- organizations) {
     <div>
         <div class="cmuk-card cmuk-card-default cmuk-card-body lightBlue">
@@ -20,7 +19,5 @@
             </div>
         </div>
     </div>
-
 }
-  </div>
-</div>
+ </div>

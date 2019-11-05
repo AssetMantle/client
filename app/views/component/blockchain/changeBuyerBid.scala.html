@@ -1,16 +1,15 @@
-@import helper._
 @import views.companion.blockchain.ChangeBuyerBid
 @import views.html.base._
 
 @(changeBuyerBidForm: Form[ChangeBuyerBid.Data] = ChangeBuyerBid.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash)
 @commonForm(constants.Form.BLOCKCHAIN_CHANGE_BUYER_BID, changeBuyerBidForm) {
-    @commonInputText(changeBuyerBidForm, constants.FormField.FROM.name)
-    @commonInputText(changeBuyerBidForm, constants.FormField.TO.name)
-    @commonInputText(changeBuyerBidForm, constants.FormField.BID.name)
-    @commonInputText(changeBuyerBidForm, constants.FormField.TIME.name)
-    @commonInputText(changeBuyerBidForm, constants.FormField.PEG_HASH.name)
-    @commonInputText(changeBuyerBidForm, constants.FormField.GAS.name)
-    @commonInputText(changeBuyerBidForm, constants.FormField.MODE.name)
-    @commonInputPassword(changeBuyerBidForm, constants.FormField.PASSWORD.name)
+    @commonInputText(changeBuyerBidForm, constants.FormField.FROM)
+    @commonInputText(changeBuyerBidForm, constants.FormField.TO)
+    @commonInputInt(changeBuyerBidForm, constants.FormField.BID)
+    @commonInputInt(changeBuyerBidForm, constants.FormField.TIME)
+    @commonInputText(changeBuyerBidForm, constants.FormField.PEG_HASH)
+    @commonInputInt(changeBuyerBidForm, constants.FormField.GAS)
+    @commonInputText(changeBuyerBidForm, constants.FormField.MODE)
+    @commonInputPassword(changeBuyerBidForm, constants.FormField.PASSWORD)
 }
 

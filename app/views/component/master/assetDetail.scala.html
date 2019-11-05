@@ -11,7 +11,7 @@
     <span class="red">@Messages(constants.FormField.ASSET_QUANTITY.name)</span> : @asset.assetQuantity <br>
     <span class="red">@Messages(constants.FormField.ASSET_PRICE.name)</span> : @asset.assetPrice <br>
     <span class="red">@Messages(constants.FormField.STATUS.name)</span> : @asset.status <br>
-    <button class="showHide">@Messages(constants.Form.SHOW_HIDE)</button>
+    <button type="button" class="cmuk-button cmuk-button-primary showHide">@Messages(constants.Form.SHOW_HIDE)</button>
 </div>
 <div class="hidden">
     @asset.takerAddress match{

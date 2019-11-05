@@ -3,13 +3,21 @@
 
 @(traders: Seq[Trader])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
-@for(trader <- traders) {
-    <div class="col-md-3">
-        <br>
-        <div class="flexItem card-body leftText lightBlue">
-            <span class="red">@Messages(constants.Form.ID)</span>:@trader.id <br>
-            <span class="red">@Messages(constants.Form.ACCOUNT_ID)</span>:@trader.accountID <br>
-            <span class="red">@Messages(constants.Form.NAME)</span>:@trader.name <br>
-        </div>
-    </div>
+    <div class="cmuk-width-auto" cmuk-sortable="handle: .cmuk-card" cmuk-grid>
+        @for(trader <- traders) {
+            <div>
+                <div class="cmuk-card cmuk-card-default cmuk-card-body">
+                    <span class="red">@Messages(constants.Form.ID)</span>:@trader.id <br>
+                    <span class="red">@Messages(constants.Form.ACCOUNT_ID)</span>:@trader.accountID <br>
+                    <span class="red">@Messages(constants.Form.NAME)</span>:@trader.name <br>
+                </div>
+            </div>
+            <div>
+                <div class="cmuk-card cmuk-card-default cmuk-card-body ">
+                    <span class="red">@Messages(constants.Form.ID)</span>:@trader.id <br>
+                    <span class="red">@Messages(constants.Form.ACCOUNT_ID)</span>:@trader.accountID <br>
+                    <span class="red">@Messages(constants.Form.NAME)</span>:@trader.name <br>
+                </div>
+            </div>
 }
+    </div>

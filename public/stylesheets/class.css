@@ -302,7 +302,7 @@ dl .info::after {
 
 /* color */
 .lightBlue {
-    background-color: #a8b1ff;
+    background-color: #a8b1ff !important;
 }
 
 .red {
@@ -337,6 +337,9 @@ dl .info::after {
 .searchForm dl {
     width: 100%;
     margin: 0px;
+}
+.searchForm dl dt  label{
+    display:none;
 }
 .searchFormButton{
     height: 40px;
@@ -423,7 +426,6 @@ dl .info::after {
     bottom: -19px;
     border: 8px solid;
     border-color: transparent transparent transparent  #149f98;
-    z-index: -1000;
     animation-fill-mode: forwards;
 }
 .cmuk-tab>.cmuk-active>a{

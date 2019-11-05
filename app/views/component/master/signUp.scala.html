@@ -1,18 +1,14 @@
 @import controllers.actions.LoginState
-@import helper._
 @import views.html.base._
 @import views.companion.master.SignUp
 
 @(signUpForm: Form[SignUp.Data] = SignUp.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 
-@commonForm(constants.Form.SIGN_UP, signUpForm){
-    @inputText(signUpForm(constants.FormField.USERNAME.name), 'placeholder -> Messages(constants.FormField.USERNAME.name), 'id -> "username", 'class -> "cmuk-input", 'required -> true, 'oninput -> """checkUsernameAvailable(this, "#checkUsernameAvailableResult", "#usernameAvailable")""")
-    @inputPassword(signUpForm(constants.FormField.SIGNUP_PASSWORD.name), 'id -> "password", 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.SIGNUP_PASSWORD.name), 'required -> true)
-    @inputPassword(signUpForm(constants.FormField.SIGNUP_CONFIRM_PASSWORD.name), 'id -> "confirmPassword", 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.SIGNUP_CONFIRM_PASSWORD.name), 'required -> true)
-    <span id="matchPasswordsResult">
-        <span id="matchPasswordsImageResult" class="result warning hidden"><span cmuk-icon="warning"></span></span>
-    </span>
-    @checkbox(signUpForm(constants.FormField.USERNAME_AVAILABLE.name), 'id -> "usernameAvailable", 'class -> "hidden", 'required -> true)
+@commonForm(constants.Form.SIGN_UP, signUpForm) {
+    @commonInputText(signUpForm, constants.FormField.USERNAME, 'id -> "username", 'oninput -> """checkUsernameAvailable(this, "#checkUsernameAvailableResult", "#USERNAME_AVAILABLE")""")
+    @commonInputPassword(signUpForm, constants.FormField.SIGNUP_PASSWORD)
+    @commonInputPassword(signUpForm, constants.FormField.SIGNUP_CONFIRM_PASSWORD)
+    @commonCheckbox(signUpForm, constants.FormField.USERNAME_AVAILABLE, 'overallClass -> "hidden")
 }
 <script src="@routes.Assets.versioned("javascripts/checkUsernameAvailable.js")" type="text/javascript"></script>
 <script src="@routes.Assets.versioned("javascripts/checkPasswords.js")" type="text/javascript"></script>

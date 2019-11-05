@@ -1,10 +1,9 @@
 @import controllers.actions.LoginState
-@import helper._
 @import views.html.base._
 @import views.companion.master.IssueFiatRequest
 
 @(issueFiatRequestForm: Form[IssueFiatRequest.Data] = IssueFiatRequest.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @commonForm(constants.Form.ISSUE_FIAT_REQUEST, issueFiatRequestForm) {
-    @inputText(issueFiatRequestForm(constants.FormField.TRANSACTION_ID.name), '_label -> Messages(constants.FormField.TRANSACTION_ID.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.TRANSACTION_ID.name), 'required -> true)
-    @inputText(issueFiatRequestForm(constants.FormField.TRANSACTION_AMOUNT.name), '_label -> Messages(constants.FormField.TRANSACTION_AMOUNT.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.TRANSACTION_AMOUNT.name), 'required -> true, 'type -> "number")
+    @commonInputText(issueFiatRequestForm, constants.FormField.TRANSACTION_ID)
+    @commonInputInt(issueFiatRequestForm, constants.FormField.TRANSACTION_AMOUNT)
 }

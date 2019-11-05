@@ -1,5 +1,4 @@
 @import controllers.actions.LoginState
-@import helper._
 @import views.companion.master.IssueAssetOBL
 @import views.html.base._
 
@@ -7,7 +6,7 @@
 @commonForm(constants.Form.ISSUE_ASSET_OBL, issueAssetOBLForm) {
     <div class="centerText">
         <div id='@Seq("upload", constants.File.OBL).mkString("")'>
-            <button onclick="getForm(jsRoutes.controllers.FileController.uploadTraderAssetForm('@constants.File.OBL', '@issueAssetOBLForm.data(constants.FormField.REQUEST_ID.name)'))">@Messages(constants.Form.UPLOAD) @Messages(constants.File.OBL)</button>
+            <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.FileController.uploadTraderAssetForm('@constants.File.OBL', '@issueAssetOBLForm.data(constants.FormField.REQUEST_ID.name)'))">@Messages(constants.Form.UPLOAD) @Messages(constants.File.OBL)</button>
         </div>
         @file match {
             case Some(fileView) => {
@@ -16,7 +15,7 @@
                 } {
                     <a href="@routes.FileController.tradingFile(fileView.id, fileView.fileName, fileView.documentType)">@Messages(fileView.documentType)</a>
                 } {
-                    <button onclick="getForm(jsRoutes.controllers.FileController.updateTraderAssetForm('@fileView.documentType', '@fileView.id'))">@Messages(constants.Form.UPDATE) @Messages(fileView.documentType)</button>
+                    <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.FileController.updateTraderAssetForm('@fileView.documentType', '@fileView.id'))">@Messages(constants.Form.UPDATE) @Messages(fileView.documentType)</button>
                     <script>hideElement('@Seq("upload", fileView.documentType).mkString("")')</script>
                 }
             }
@@ -24,17 +23,17 @@
             }
     </div>
 
-    @inputText(issueAssetOBLForm(constants.FormField.REQUEST_ID.name), '_label -> Messages(constants.FormField.REQUEST_ID.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.REQUEST_ID.name), 'required -> true)
-    @inputText(issueAssetOBLForm(constants.FormField.BILL_OF_LADING_NUMBER.name), '_label -> Messages(constants.FormField.BILL_OF_LADING_NUMBER.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.BILL_OF_LADING_NUMBER.name), 'required -> true)
-    @inputText(issueAssetOBLForm(constants.FormField.PORT_OF_LOADING.name), '_label -> Messages(constants.FormField.PORT_OF_LOADING.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PORT_OF_LOADING.name), 'required -> true)
-    @inputText(issueAssetOBLForm(constants.FormField.SHIPPER_NAME.name), '_label -> Messages(constants.FormField.SHIPPER_NAME.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.SHIPPER_NAME.name), 'required -> true)
-    @inputText(issueAssetOBLForm(constants.FormField.SHIPPER_ADDRESS.name), '_label -> Messages(constants.FormField.SHIPPER_ADDRESS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.SHIPPER_ADDRESS.name), 'required -> true)
-    @inputText(issueAssetOBLForm(constants.FormField.NOTIFY_PARTY_NAME.name), '_label -> Messages(constants.FormField.NOTIFY_PARTY_NAME.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.NOTIFY_PARTY_NAME.name), 'required -> true)
-    @inputText(issueAssetOBLForm(constants.FormField.NOTIFY_PARTY_ADDRESS.name), '_label -> Messages(constants.FormField.NOTIFY_PARTY_ADDRESS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.NOTIFY_PARTY_ADDRESS.name), 'required -> true)
-    @inputDate(issueAssetOBLForm(constants.FormField.SHIPMENT_DATE.name), '_label -> Messages(constants.FormField.SHIPMENT_DATE.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.SHIPMENT_DATE.name), '_name -> Messages(constants.FormField.SHIPMENT_DATE.name), 'required -> true)
-    @select(issueAssetOBLForm(constants.FormField.DELIVERY_TERM.name), for(option <- constants.Form.DELIVERY_TERM_OPTIONS) yield (option, Messages(option)), '_label -> Messages(constants.FormField.DELIVERY_TERM.name), 'class -> "cmuk-select", 'placeholder -> Messages(constants.FormField.DELIVERY_TERM.name), '_default -> Messages(constants.FormField.DELIVERY_TERM.name), 'required -> true)
-    @inputText(issueAssetOBLForm(constants.FormField.ASSET_QUANTITY.name), '_label -> Messages(constants.FormField.ASSET_QUANTITY.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.ASSET_QUANTITY.name), 'required -> true)
-    @inputText(issueAssetOBLForm(constants.FormField.ASSET_PRICE.name), '_label -> Messages(constants.FormField.ASSET_PRICE.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.ASSET_PRICE.name), 'required -> true)
+    @commonInputText(issueAssetOBLForm, constants.FormField.REQUEST_ID)
+    @commonInputText(issueAssetOBLForm, constants.FormField.BILL_OF_LADING_NUMBER)
+    @commonInputText(issueAssetOBLForm, constants.FormField.PORT_OF_LOADING)
+    @commonInputText(issueAssetOBLForm, constants.FormField.SHIPPER_NAME)
+    @commonInputText(issueAssetOBLForm, constants.FormField.SHIPPER_ADDRESS)
+    @commonInputText(issueAssetOBLForm, constants.FormField.NOTIFY_PARTY_NAME)
+    @commonInputText(issueAssetOBLForm, constants.FormField.NOTIFY_PARTY_ADDRESS)
+    @commonInputDate(issueAssetOBLForm, constants.FormField.SHIPMENT_DATE)
+    @commonSelect(issueAssetOBLForm, constants.FormField.DELIVERY_TERM)
+    @commonInputInt(issueAssetOBLForm, constants.FormField.ASSET_QUANTITY)
+    @commonInputInt(issueAssetOBLForm, constants.FormField.ASSET_PRICE)
     @*// TODO Correct this as per commonForm *@
     @file match {
         case Some(file) => {
