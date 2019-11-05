@@ -94,13 +94,13 @@ object FormField {
   val FILE_ID = new StringFormField("FILE_ID", 2, 500)
 
   //SelectFormField
-  val ASSET_TYPE = new SelectFormField("ASSET_TYPE", constants.SelectFieldSequence.ASSET_TYPE_OPTIONS)
-  val DELIVERY_TERM = new SelectFormField("DELIVERY_TERM", constants.SelectFieldSequence.DELIVERY_TERM_OPTIONS)
-  val QUALITY = new SelectFormField("QUALITY", constants.SelectFieldSequence.QUALITY_OPTIONS)
-  val TRADE_TYPE = new SelectFormField("TRADE_TYPE", constants.SelectFieldSequence.TRADE_TYPE_OPTIONS)
-  val PHYSICAL_DOCUMENTS_HANDLED_VIA = new SelectFormField("PHYSICAL_DOCUMENTS_HANDLED_VIA", constants.SelectFieldSequence.PHYSICAL_DOCUMENTS_HANDLED_VIA_OPTIONS)
-  val COMDEX_PAYMENT_TERMS = new SelectFormField("COMDEX_PAYMENT_TERMS", constants.SelectFieldSequence.COMDEX_PAYMENT_TERMS_OPTIONS)
-  val COUNTRY_CODE = new SelectFormField("COUNTRY_CODE", constants.SelectFieldSequence.COUNTRY_CODES)
+  val ASSET_TYPE = new SelectFormField("ASSET_TYPE", constants.SelectFieldOptions.ASSET_TYPES)
+  val DELIVERY_TERM = new SelectFormField("DELIVERY_TERM", constants.SelectFieldOptions.DELIVERY_TERMS)
+  val QUALITY = new SelectFormField("QUALITY", constants.SelectFieldOptions.QUALITIES)
+  val TRADE_TYPE = new SelectFormField("TRADE_TYPE", constants.SelectFieldOptions.TRADE_TYPES)
+  val PHYSICAL_DOCUMENTS_HANDLED_VIA = new SelectFormField("PHYSICAL_DOCUMENTS_HANDLED_VIA", constants.SelectFieldOptions.PHYSICAL_DOCUMENTS_HANDLED_VIA)
+  val COMDEX_PAYMENT_TERMS = new SelectFormField("COMDEX_PAYMENT_TERMS", constants.SelectFieldOptions.PAYMENT_TERMS)
+  val COUNTRY_CODE = new SelectFormField("COUNTRY_CODE", constants.SelectFieldOptions.COUNTRY_CODES)
 
   //IntFormField
   val GAS = new IntFormField("GAS", 20000, 1000000)
