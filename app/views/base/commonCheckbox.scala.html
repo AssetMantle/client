@@ -2,15 +2,28 @@
 @import helper._
 @import play.api.data.Field
 
-@(formData: Form[_], formField: BooleanFormField, arguments: (Symbol, Any)*)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, nestedFormField: Option[NestedFormField] = None, field: Option[Field] = None)
+@(formData: Form[_], formField: BooleanFormField, arguments: (Symbol, Any)*)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, nestedFormField: Option[NestedFormField] = None, sequentialNestedFormfield: Option[Field] = None)
 
-<div class='@arguments.toMap.get('overallClass).map(_.toString).getOrElse("")'>
+<div class='@arguments.toMap.get('containerDivClass).map(_.toString).getOrElse("")'>
     @Messages(formField.name)
     @defining(Seq('_label -> Messages(formField.name), 'class -> "cmuk-checkbox")) { defaultArguments =>
-        @if(field.isDefined) {
-            @checkbox(field.get.apply(formField.name), defaultArguments ++ arguments: _*)
-        } else {
-            @checkbox(formData(if(nestedFormField.isDefined) Seq(nestedFormField.get.name, formField.name).mkString(".") else formField.name), defaultArguments ++ arguments: _*)
+        @sequentialNestedFormfield match {
+            case Some(field: Field) => {
+                @* //This case handles sequential subForms under a nested field. See UserUpdateUBOs for example.*@
+                @checkbox(field.apply(formField.name), defaultArguments ++ arguments: _*)
+            }
+            case None => {
+                @nestedFormField match {
+                    case Some(field: NestedFormField) => {
+                        @* //This case handles nested fields. See AddOrganization for example.*@
+                        @checkbox(formData(Seq(field.name, formField.name).mkString(".")), defaultArguments ++ arguments: _*)
+                    }
+                    case None => {
+                        @* //This case handles generic fields.*@
+                        @checkbox(formData(formField.name), defaultArguments ++ arguments: _*)
+                    }
+                }
+            }
         }
     }
 </div>

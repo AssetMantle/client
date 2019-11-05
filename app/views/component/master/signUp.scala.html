@@ -5,10 +5,10 @@
 @(signUpForm: Form[SignUp.Data] = SignUp.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 
 @commonForm(constants.Form.SIGN_UP, signUpForm) {
-    @commonInputText(signUpForm, constants.FormField.USERNAME, 'id -> "username", 'oninput -> """checkUsernameAvailable(this, "#checkUsernameAvailableResult", "#USERNAME_AVAILABLE")""")
+    @commonInputText(signUpForm, constants.FormField.USERNAME, 'oninput -> """checkUsernameAvailable(this, "#checkUsernameAvailableResult", "#USERNAME_AVAILABLE")""")
     @commonInputPassword(signUpForm, constants.FormField.SIGNUP_PASSWORD)
     @commonInputPassword(signUpForm, constants.FormField.SIGNUP_CONFIRM_PASSWORD)
-    @commonCheckbox(signUpForm, constants.FormField.USERNAME_AVAILABLE, 'overallClass -> "hidden")
+    @commonCheckbox(signUpForm, constants.FormField.USERNAME_AVAILABLE, 'containerDivClass -> "hidden")
 }
 <script src="@routes.Assets.versioned("javascripts/checkUsernameAvailable.js")" type="text/javascript"></script>
 <script src="@routes.Assets.versioned("javascripts/checkPasswords.js")" type="text/javascript"></script>
