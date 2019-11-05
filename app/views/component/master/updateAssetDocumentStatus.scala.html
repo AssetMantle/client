@@ -12,7 +12,7 @@
     @CSRF.formField
     @commonInputText(updateAssetDocumentStatusForm, constants.FormField.FILE_ID, 'value -> file.id, 'class -> "hidden", 'readonly -> true)
     @commonInputText(updateAssetDocumentStatusForm, constants.FormField.DOCUMENT_TYPE, 'value -> file.documentType, 'class -> "hidden", 'readonly -> true)
-    @commonCheckbox(updateAssetDocumentStatusForm, constants.FormField.STATUS, 'class -> "hidden", 'id -> Seq(file.id, file.documentType, constants.FormField.STATUS.name).mkString(""))
+    @commonCheckbox(updateAssetDocumentStatusForm, constants.FormField.STATUS, 'containerDivClass -> "hidden", 'id -> Seq(file.id, file.documentType, constants.FormField.STATUS.name).mkString(""))
 
     @if(updateAssetDocumentStatusForm.hasGlobalErrors) {
         <ul>

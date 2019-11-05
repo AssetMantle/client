@@ -12,7 +12,7 @@
     @CSRF.formField
     @commonInputText(updateTraderKYCDocumentZoneStatusForm, constants.FormField.TRADER_ID, 'value -> traderKYC.id, 'class -> "hidden", 'readonly -> true)
     @commonInputText(updateTraderKYCDocumentZoneStatusForm, constants.FormField.DOCUMENT_TYPE, 'value -> traderKYC.documentType, 'class -> "hidden", 'readonly -> true)
-    @commonCheckbox(updateTraderKYCDocumentZoneStatusForm, constants.FormField.STATUS), 'class -> "hidden", 'id -> Seq(traderKYC.id, traderKYC.documentType, constants.FormField.STATUS.name).mkString(""))
+    @commonCheckbox(updateTraderKYCDocumentZoneStatusForm, constants.FormField.STATUS, 'containerDivClass -> "hidden", 'id -> Seq(traderKYC.id, traderKYC.documentType, constants.FormField.STATUS.name).mkString(""))
 
     @if(updateTraderKYCDocumentZoneStatusForm.hasGlobalErrors) {
         <ul>
