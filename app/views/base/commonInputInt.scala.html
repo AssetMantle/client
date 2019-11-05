@@ -2,12 +2,25 @@
 @import helper._
 @import play.api.data.Field
 
-@(formData: Form[_], formField: IntFormField, arguments: (Symbol, Any)*)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, nestedFormField: Option[NestedFormField] = None, field: Option[Field] = None)
+@(formData: Form[_], formField: IntFormField, arguments: (Symbol, Any)*)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, nestedFormField: Option[NestedFormField] = None, sequentialNestedFormfield: Option[Field] = None)
 
 @defining(Seq('type -> "number", '_label -> Messages(formField.name), 'placeholder -> Messages(formField.name), 'min -> formField.minimumValue, 'max -> formField.maximumValue, 'class -> "cmuk-input")) { defaultArguments =>
-    @if(field.isDefined) {
-        @inputText(field.get.apply(formField.name), defaultArguments ++ arguments: _*)
-    } else {
-        @inputText(formData(if(nestedFormField.isDefined) Seq(nestedFormField.get.name, formField.name).mkString(".") else formField.name), defaultArguments ++ arguments: _*)
+    @sequentialNestedFormfield match {
+        case Some(field: Field) => {
+            @* //This case handles sequential subForms under a nested field. See UserUpdateUBOs for example.*@
+            @inputText(field.apply(formField.name).copy(value = arguments.toMap.get('value).map(_.toString)), defaultArguments ++ arguments: _*)
+        }
+        case None => {
+            @nestedFormField match {
+                case Some(field: NestedFormField) => {
+                    @* //This case handles nested fields. See AddOrganization for example.*@
+                    @inputText(formData(Seq(field.name, formField.name).mkString(".")).copy(value = arguments.toMap.get('value).map(_.toString)), defaultArguments ++ arguments: _*)
+                }
+                case None => {
+                    @* //This case handles generic fields.*@
+                    @inputText(formData(formField.name).copy(value = arguments.toMap.get('value).map(_.toString)), defaultArguments ++ arguments: _*)
+                }
+            }
+        }
     }
 }

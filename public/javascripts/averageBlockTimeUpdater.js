@@ -1,3 +1,3 @@
-function averageBlockTimeUpdater(averagBlockTime){
-    $('#averageBlockTime').html(averagBlockTime.toFixed(3) + "s");
+function averageBlockTimeUpdater(averageBlockTime){
+    $('#averageBlockTime').html(averageBlockTime.toFixed(3) + "s");
 }

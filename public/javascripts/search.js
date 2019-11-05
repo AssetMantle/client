@@ -1,12 +1,15 @@
 getConfigurationAsynchronously("blockchain.transaction.hashLength");
 
+function searchOnEnter(event) {
+    if (event.keyCode === 13) {
+        event.preventDefault();
+        searchFunction();
+    }
+}
+
 function searchFunction(searchData) {
     const invalidBlockHeight = getCookie("blockHeightError");
     const invalidTransactionHash = getCookie("transactionHashError");
-
-    $("#searchForm").submit(function (e) {
-        e.preventDefault();
-    });
 
     const hashLength = parseInt(getConfigurationAsynchronously("blockchain.transaction.hashLength"), 10);
 
@@ -15,7 +18,7 @@ function searchFunction(searchData) {
     const txHashPattern = /^[A-F0-9]{64}$/;
 
     if (searchData === undefined) {
-        searchData = $("#searchValue").val();
+        searchData = $("#SEARCH_TX_HASH_HEIGHT").val();
     }
     let height = heightPattern.exec(searchData);
     if (height != null) {

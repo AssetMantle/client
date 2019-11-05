@@ -4,8 +4,8 @@
 
 @(releaseAssetForm: Form[ReleaseAsset.Data] = ReleaseAsset.form, ownerAddress: String, pegHash: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @commonForm(constants.Form.RELEASE_ASSET, releaseAssetForm) {
-    @commonInputText(releaseAssetForm, constants.FormField.BLOCKCHAIN_ADDRESS, 'value -> ownerAddress))
-    @commonInputText(releaseAssetForm, constants.FormField.PEG_HASH, 'value -> pegHash))
+    @commonInputText(releaseAssetForm, constants.FormField.BLOCKCHAIN_ADDRESS, 'value -> ownerAddress)
+    @commonInputText(releaseAssetForm, constants.FormField.PEG_HASH, 'value -> pegHash)
     @commonInputInt(releaseAssetForm, constants.FormField.GAS)
     @commonInputPassword(releaseAssetForm, constants.FormField.PASSWORD)
 }
