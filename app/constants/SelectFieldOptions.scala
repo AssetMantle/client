@@ -1,13 +1,13 @@
 package constants
 
-object SelectFieldSequence {
-  val ASSET_TYPE_OPTIONS: Seq[String] = Seq("Oil", "Coal", "Gold", "Wheat")
-  val DELIVERY_TERM_OPTIONS: Seq[String] = Seq("FOB", "CIF", "CFR")
-  val QUALITY_OPTIONS: Seq[String] = Seq("A+", "A", "B")
-  val TRADE_TYPE_OPTIONS: Seq[String] = Seq("POST TRADE")
-  val COUNTRY_OPTIONS: Seq[String] = Seq("INDIA", "BHUTAN", "NEPAL", "PAKISTAN", "BANGLADESH", "SRI LANKA", "CHINA")
-  val PHYSICAL_DOCUMENTS_HANDLED_VIA_OPTIONS: Seq[String] = Seq(constants.Form.COMDEX, "BANK", "TRUST")
-  val COMDEX_PAYMENT_TERMS_OPTIONS: Seq[String] = Seq(constants.Form.ONLY_SUPPLIER, constants.Form.ONLY_BUYER, constants.Form.BOTH_PARTIES)
+object SelectFieldOptions {
+  val ASSET_TYPES: Seq[String] = Seq("Oil", "Coal", "Gold", "Wheat")
+  val DELIVERY_TERMS: Seq[String] = Seq("FOB", "CIF", "CFR")
+  val QUALITIES: Seq[String] = Seq("A+", "A", "B")
+  val TRADE_TYPES: Seq[String] = Seq("POST TRADE")
+  val COUNTRIES: Seq[String] = Seq("INDIA", "BHUTAN", "NEPAL", "PAKISTAN", "BANGLADESH", "SRI LANKA", "CHINA")
+  val PHYSICAL_DOCUMENTS_HANDLED_VIA: Seq[String] = Seq(constants.Form.COMDEX, "BANK", "TRUST")
+  val PAYMENT_TERMS: Seq[String] = Seq(constants.Form.ONLY_SUPPLIER, constants.Form.ONLY_BUYER, constants.Form.BOTH_PARTIES)
 
   val COUNTRY_CODES: Seq[String] = Seq(
     "+1",
