@@ -24,7 +24,6 @@ case class ConfirmBuyerBid(from: String, to: String, bid: Int, time: Int, pegHas
   def mutateTicketID(newTicketID: String): ConfirmBuyerBid = ConfirmBuyerBid(from = from, to = to, bid = bid, time = time, pegHash = pegHash, buyerContractHash = buyerContractHash, gas = gas, status = status, txHash, ticketID = newTicketID, mode = mode, code = code)
 }
 
-
 @Singleton
 class ConfirmBuyerBids @Inject()(actorSystem: ActorSystem, transaction: utilities.Transaction, protected val databaseConfigProvider: DatabaseConfigProvider, blockchainTransactionFeedbacks: blockchain.TransactionFeedbacks, getNegotiationID: GetNegotiationID, blockchainNegotiations: blockchain.Negotiations, getNegotiation: GetNegotiation, transactionConfirmBuyerBid: transactions.ConfirmBuyerBid, utilitiesNotification: utilities.Notification, masterAccounts: master.Accounts, blockchainAccounts: blockchain.Accounts)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 

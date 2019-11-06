@@ -11,14 +11,14 @@ import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
+import queries.responses.NegotiationResponse
 import queries.{GetNegotiation, GetNegotiationID}
 import slick.jdbc.JdbcProfile
 import transactions.responses.TransactionResponse.BlockResponse
 
 import scala.concurrent.duration._
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
-import queries.responses.NegotiationResponse
 
 case class ChangeBuyerBid(from: String, to: String, bid: Int, time: Int, pegHash: String, gas: Int, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None) extends BaseTransaction[ChangeBuyerBid] {
   def mutateTicketID(newTicketID: String): ChangeBuyerBid = ChangeBuyerBid(from = from, to = to, bid = bid, time = time, pegHash = pegHash, gas = gas, status = status, txHash, ticketID = newTicketID, mode = mode, code = code)
@@ -31,15 +31,11 @@ class ChangeBuyerBids @Inject()(actorSystem: ActorSystem, transaction: utilities
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_CHANGE_BUYER_BID
 
   private implicit val logger: Logger = Logger(this.getClass)
-
-  private val schedulerExecutionContext:ExecutionContext= actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
-
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
-
   val db = databaseConfig.db
+  private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
 
   import databaseConfig.profile.api._
-
   private[models] val changeBuyerBidTable = TableQuery[ChangeBuyerBidTable]
 
   private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
@@ -161,9 +157,9 @@ class ChangeBuyerBids @Inject()(actorSystem: ActorSystem, transaction: utilities
 
     def create(changeBuyerBid: ChangeBuyerBid): Future[String] = add(ChangeBuyerBid(from = changeBuyerBid.from, to = changeBuyerBid.to, bid = changeBuyerBid.bid, time = changeBuyerBid.time, pegHash = changeBuyerBid.pegHash, gas = changeBuyerBid.gas, status = changeBuyerBid.status, txHash = changeBuyerBid.txHash, ticketID = changeBuyerBid.ticketID, mode = changeBuyerBid.mode, code = changeBuyerBid.code))
 
-    def markTransactionSuccessful(ticketID: String, txHash: String): Future[Int] =updateTxHashAndStatusOnTicketID(ticketID, Option(txHash), status = Option(true))
+    def markTransactionSuccessful(ticketID: String, txHash: String): Future[Int] = updateTxHashAndStatusOnTicketID(ticketID, Option(txHash), status = Option(true))
 
-    def markTransactionFailed(ticketID: String, code: String):  Future[Int] = updateStatusAndCodeOnTicketID(ticketID, status = Option(false), code)
+    def markTransactionFailed(ticketID: String, code: String): Future[Int] = updateStatusAndCodeOnTicketID(ticketID, status = Option(false), code)
 
     def getTicketIDsOnStatus(): Future[Seq[String]] = getTicketIDsWithNullStatus
 
@@ -173,67 +169,79 @@ class ChangeBuyerBids @Inject()(actorSystem: ActorSystem, transaction: utilities
 
     def getMode(ticketID: String): Future[String] = findModeByTicketID(ticketID)
 
-    def updateTransactionHash(ticketID: String, txHash: String): Future[Int] =updateTxHashOnTicketID(ticketID = ticketID, txHash = Option(txHash))
+    def updateTransactionHash(ticketID: String, txHash: String): Future[Int] = updateTxHashOnTicketID(ticketID = ticketID, txHash = Option(txHash))
 
   }
 
   object Utility {
-    def onSuccess(ticketID: String, blockResponse: BlockResponse):Future[Unit] ={
+    def onSuccess(ticketID: String, blockResponse: BlockResponse): Future[Unit] = {
 
-      val markTransactionSuccessful= Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
+      val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
       val changeBuyerBid = Service.getTransaction(ticketID)
-      Thread.sleep(sleepTime)x
-      def negotiationID(changeBuyerBid:ChangeBuyerBid)=blockchainNegotiations.Service.getNegotiationID(buyerAddress = changeBuyerBid.from, sellerAddress = changeBuyerBid.to, pegHash = changeBuyerBid.pegHash)
-      def negotiationResponse(negotiationID:String,changeBuyerBid:ChangeBuyerBid)=if (negotiationID == "") getNegotiation.Service.get(getNegotiationID.Service.get(buyerAddress = changeBuyerBid.from, sellerAddress = changeBuyerBid.to, pegHash = changeBuyerBid.pegHash).negotiationID) else getNegotiation.Service.get(negotiationID)
-      def insertOrUpdate(negotiationResponse:NegotiationResponse.Response)= blockchainNegotiations.Service.insertOrUpdate(id = negotiationResponse.value.negotiationID, buyerAddress = negotiationResponse.value.buyerAddress, sellerAddress = negotiationResponse.value.sellerAddress, assetPegHash = negotiationResponse.value.pegHash, bid = negotiationResponse.value.bid, time = negotiationResponse.value.time, buyerSignature = negotiationResponse.value.buyerSignature, sellerSignature = negotiationResponse.value.sellerSignature, buyerBlockHeight = negotiationResponse.value.buyerBlockHeight, sellerBlockHeight = negotiationResponse.value.sellerBlockHeight, buyerContractHash = negotiationResponse.value.buyerContractHash, sellerContractHash = negotiationResponse.value.sellerContractHash, dirtyBit = true)
-      def markDirty(changeBuyerBid:ChangeBuyerBid)={
-        val markDirtyFromAddressBlockchainAccounts=blockchainAccounts.Service.markDirty(changeBuyerBid.from)
-        val markDirtyFromAddressInBlockchainTransactionFeedbacks =blockchainTransactionFeedbacks.Service.markDirty(changeBuyerBid.from)
-        val markDirtyToAddressInBlockchainTransactionFeedbacks =blockchainTransactionFeedbacks.Service.markDirty(changeBuyerBid.to)
-      for{
-        _<- markDirtyFromAddressBlockchainAccounts
-        _<- markDirtyFromAddressInBlockchainTransactionFeedbacks
-        _<- markDirtyToAddressInBlockchainTransactionFeedbacks
-      }yield{}
+      Thread.sleep(sleepTime)
+
+      def negotiationID(changeBuyerBid: ChangeBuyerBid) = blockchainNegotiations.Service.getNegotiationID(buyerAddress = changeBuyerBid.from, sellerAddress = changeBuyerBid.to, pegHash = changeBuyerBid.pegHash)
+
+      def negotiationResponse(negotiationID: String, changeBuyerBid: ChangeBuyerBid) = if (negotiationID == "") getNegotiation.Service.get(getNegotiationID.Service.get(buyerAddress = changeBuyerBid.from, sellerAddress = changeBuyerBid.to, pegHash = changeBuyerBid.pegHash).negotiationID) else getNegotiation.Service.get(negotiationID)
+
+      def insertOrUpdate(negotiationResponse: NegotiationResponse.Response) = blockchainNegotiations.Service.insertOrUpdate(id = negotiationResponse.value.negotiationID, buyerAddress = negotiationResponse.value.buyerAddress, sellerAddress = negotiationResponse.value.sellerAddress, assetPegHash = negotiationResponse.value.pegHash, bid = negotiationResponse.value.bid, time = negotiationResponse.value.time, buyerSignature = negotiationResponse.value.buyerSignature, sellerSignature = negotiationResponse.value.sellerSignature, buyerBlockHeight = negotiationResponse.value.buyerBlockHeight, sellerBlockHeight = negotiationResponse.value.sellerBlockHeight, buyerContractHash = negotiationResponse.value.buyerContractHash, sellerContractHash = negotiationResponse.value.sellerContractHash, dirtyBit = true)
+
+      def markDirty(changeBuyerBid: ChangeBuyerBid) = {
+        val markDirtyFromAddressBlockchainAccounts = blockchainAccounts.Service.markDirty(changeBuyerBid.from)
+        val markDirtyFromAddressInBlockchainTransactionFeedbacks = blockchainTransactionFeedbacks.Service.markDirty(changeBuyerBid.from)
+        val markDirtyToAddressInBlockchainTransactionFeedbacks = blockchainTransactionFeedbacks.Service.markDirty(changeBuyerBid.to)
+        for {
+          _ <- markDirtyFromAddressBlockchainAccounts
+          _ <- markDirtyFromAddressInBlockchainTransactionFeedbacks
+          _ <- markDirtyToAddressInBlockchainTransactionFeedbacks
+        } yield {}
       }
 
-      def getAddresses(changeBuyerBid:ChangeBuyerBid)=Future.sequence(List(masterAccounts.Service.getId(changeBuyerBid.to),masterAccounts.Service.getId(changeBuyerBid.from)))
-
-      (for{
-        _<- markTransactionSuccessful
-        changeBuyerBid<-changeBuyerBid
-        negotiationID<-negotiationID(changeBuyerBid)
-        negotiationResponse<-negotiationResponse(negotiationID,changeBuyerBid)
-        _<- insertOrUpdate(negotiationResponse)
-        _<- markDirty(changeBuyerBid)
-        addressList<-getAddresses(changeBuyerBid)
-      }yield{
-        for(address <- addressList){
-          utilitiesNotification.send(address, constants.Notification.SUCCESS, blockResponse.txhash)
-        }
-      }).recover{
+      (for {
+        _ <- markTransactionSuccessful
+        changeBuyerBid <- changeBuyerBid
+        negotiationID <- negotiationID(changeBuyerBid)
+        negotiationResponse <- negotiationResponse(negotiationID, changeBuyerBid)
+        _ <- insertOrUpdate(negotiationResponse)
+        _ <- markDirty(changeBuyerBid)
+        (toAddressID, fromAddressID) <- getIDs(changeBuyerBid)
+      } yield {
+        utilitiesNotification.send(toAddressID, constants.Notification.SUCCESS, blockResponse.txhash)
+        utilitiesNotification.send(fromAddressID, constants.Notification.SUCCESS, blockResponse.txhash)
+      }).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
           throw new BaseException(constants.Response.PSQL_EXCEPTION)
         case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
       }
     }
 
-    def onFailure(ticketID: String, message: String): Future[Unit] =  {
+    def getIDs(changeBuyerBid: ChangeBuyerBid) = {
+      val toAddressID = masterAccounts.Service.getId(changeBuyerBid.to)
+      val fromAddressID = masterAccounts.Service.getId(changeBuyerBid.from)
+      for {
+        toAddressID <- toAddressID
+        fromAddressID <- fromAddressID
+      } yield (toAddressID, fromAddressID)
+    }
 
-      val markTransactionFailed=Service.markTransactionFailed(ticketID, message)
+    def onFailure(ticketID: String, message: String): Future[Unit] = {
+
+      val markTransactionFailed = Service.markTransactionFailed(ticketID, message)
       val changeBuyerBid = Service.getTransaction(ticketID)
-      def markDirty(changeBuyerBid:ChangeBuyerBid)=Future.sequence(List(blockchainTransactionFeedbacks.Service.markDirty(changeBuyerBid.from),blockchainTransactionFeedbacks.Service.markDirty(changeBuyerBid.to)))
-      def getAddresses(changeBuyerBid:ChangeBuyerBid)=Future.sequence(List(masterAccounts.Service.getId(changeBuyerBid.to),masterAccounts.Service.getId(changeBuyerBid.from)))
-      (for{
-        _<-markTransactionFailed
-        changeBuyerBid<-changeBuyerBid
-        _<-markDirty(changeBuyerBid)
-        addressList<- getAddresses(changeBuyerBid)
-      }yield{
-        for(address <- addressList){
-          utilitiesNotification.send(address, constants.Notification.FAILURE, message)
-        }
-      }).recover{
+
+      def markDirty(changeBuyerBid: ChangeBuyerBid) = Future.sequence(List(blockchainTransactionFeedbacks.Service.markDirty(changeBuyerBid.from), blockchainTransactionFeedbacks.Service.markDirty(changeBuyerBid.to)))
+
+      def getAddresses(changeBuyerBid: ChangeBuyerBid) = Future.sequence(List(masterAccounts.Service.getId(changeBuyerBid.to), masterAccounts.Service.getId(changeBuyerBid.from)))
+
+      (for {
+        _ <- markTransactionFailed
+        changeBuyerBid <- changeBuyerBid
+        _ <- markDirty(changeBuyerBid)
+        (toAddressID, fromAddressID) <- getIDs(changeBuyerBid)
+      } yield {
+        utilitiesNotification.send(toAddressID, constants.Notification.FAILURE, message)
+        utilitiesNotification.send(fromAddressID, constants.Notification.FAILURE, message)
+      }).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
     }

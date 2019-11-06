@@ -178,24 +178,6 @@ class ChangeSellerBids @Inject()(actorSystem: ActorSystem, transaction: utilitie
 
   object Utility {
     def onSuccess(ticketID: String, blockResponse: BlockResponse): Future[Unit] =  {
-    /*  try {
-        Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
-        val changeSellerBid = Service.getTransaction(ticketID)
-        Thread.sleep(sleepTime)
-        val negotiationID = blockchainNegotiations.Service.getNegotiationID(buyerAddress = changeSellerBid.to, sellerAddress = changeSellerBid.from, pegHash = changeSellerBid.pegHash)
-        val negotiationResponse = if (negotiationID == "") getNegotiation.Service.get(getNegotiationID.Service.get(buyerAddress = changeSellerBid.to, sellerAddress = changeSellerBid.from, pegHash = changeSellerBid.pegHash).negotiationID) else getNegotiation.Service.get(negotiationID)
-        blockchainNegotiations.Service.insertOrUpdate(id = negotiationResponse.value.negotiationID, buyerAddress = negotiationResponse.value.buyerAddress, sellerAddress = negotiationResponse.value.sellerAddress, assetPegHash = negotiationResponse.value.pegHash, bid = negotiationResponse.value.bid, time = negotiationResponse.value.time, buyerSignature = negotiationResponse.value.buyerSignature, sellerSignature = negotiationResponse.value.sellerSignature, buyerBlockHeight = negotiationResponse.value.buyerBlockHeight, sellerBlockHeight = negotiationResponse.value.sellerBlockHeight, buyerContractHash = negotiationResponse.value.buyerContractHash, sellerContractHash = negotiationResponse.value.sellerContractHash, dirtyBit = true)
-        masterTransactionNegotiationRequests.Service.updateAmountForNegotiationID(negotiationResponse.value.negotiationID, changeSellerBid.bid)
-        blockchainAccounts.Service.markDirty(changeSellerBid.from)
-        blockchainTransactionFeedbacks.Service.markDirty(changeSellerBid.from)
-        blockchainTransactionFeedbacks.Service.markDirty(changeSellerBid.to)
-        utilitiesNotification.send(masterAccounts.Service.getId(changeSellerBid.from), constants.Notification.SUCCESS, blockResponse.txhash)
-        utilitiesNotification.send(masterAccounts.Service.getId(changeSellerBid.to), constants.Notification.SUCCESS, blockResponse.txhash)
-      } catch {
-        case baseException: BaseException => logger.error(baseException.failure.message, baseException)
-          throw new BaseException(constants.Response.PSQL_EXCEPTION)
-        case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
-      }*/
 
       val markTransactionSuccessful= Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
       val changeSellerBid = Service.getTransaction(ticketID)
