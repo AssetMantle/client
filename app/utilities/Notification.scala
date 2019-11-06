@@ -76,17 +76,15 @@ class Notification @Inject()(masterContacts: master.Contacts,
 
   private def sendPushNotification(accountID: String, pushNotification: constants.Notification.PushNotification, messageParameters: String*)(implicit lang: Lang)=  {
 
-    val title = messagesApi(pushNotification.title)
-    val message = messagesApi(pushNotification.message, messageParameters: _*)
-    val create=masterTransactionNotifications.Service.create(accountID, title, message)
-    val createToken=masterTransactionNotifications.Service.create(accountID, title, message)
-    def wsSend=wsClient.url(pushNotificationURL).withHttpHeaders(constants.Header.CONTENT_TYPE -> constants.Header.APPLICATION_JSON).withHttpHeaders(constants.Header.AUTHORIZATION -> pushNotificationAuthorizationKey).post(Json.toJson(Data(masterTransactionPushNotificationTokens.Service.getPushNotificationToken(accountID), Notification(title, message))))
-
-    for{
-      _<-create
-      _<-createToken
-      _<- wsSend
-    }yield{}
+    try {
+      val title = messagesApi(pushNotification.title)
+      val message = messagesApi(pushNotification.message, messageParameters: _*)
+      masterTransactionNotifications.Service.create(accountID, title, message)
+      wsClient.url(pushNotificationURL).withHttpHeaders(constants.Header.CONTENT_TYPE -> constants.Header.APPLICATION_JSON).withHttpHeaders(constants.Header.AUTHORIZATION -> pushNotificationAuthorizationKey).post(Json.toJson(Data(masterTransactionPushNotificationTokens.Service.getPushNotificationToken(accountID), Notification(title, message))))
+    } catch {
+      case baseException: BaseException => logger.info(baseException.failure.message, baseException)
+        throw baseException
+    }
   }
 
   private def sendEmail(toAccountID: String, email: constants.Notification.Email, messageParameters: String*)(implicit lang: Lang) = {
@@ -117,7 +115,5 @@ class Notification @Inject()(masterContacts: master.Contacts,
       case baseException: BaseException => logger.error(baseException.failure.message, baseException)
         throw baseException
     }
-
   }
-
 }

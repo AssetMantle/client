@@ -173,25 +173,16 @@ class BuyerExecuteOrders @Inject()(actorSystem: ActorSystem, transaction: utilit
   }
 
   object Utility {
+    def getIDs(buyerExecuteOrder:BuyerExecuteOrder) = {
+      val buyerAddressID = masterAccounts.Service.getId(buyerExecuteOrder.buyerAddress)
+      val sellerAddressID = masterAccounts.Service.getId(buyerExecuteOrder.sellerAddress)
+      for {
+        buyerAddressID <- buyerAddressID
+        sellerAddressID <- sellerAddressID
+      } yield (buyerAddressID, sellerAddressID)
+    }
+
     def onSuccess(ticketID: String, blockResponse: BlockResponse): Future[Unit] = {
-    /*  try {
-        Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
-        val buyerExecuteOrder = Service.getTransaction(ticketID)
-        val negotiationID = blockchainNegotiations.Service.getNegotiationID(buyerAddress = buyerExecuteOrder.buyerAddress, sellerAddress = buyerExecuteOrder.sellerAddress, pegHash = buyerExecuteOrder.pegHash)
-        blockchainOrders.Service.markDirty(id = negotiationID)
-        blockchainAccounts.Service.markDirty(buyerExecuteOrder.buyerAddress)
-        blockchainTransactionFeedbacks.Service.markDirty(buyerExecuteOrder.buyerAddress)
-        blockchainTransactionFeedbacks.Service.markDirty(buyerExecuteOrder.sellerAddress)
-        utilitiesNotification.send(masterAccounts.Service.getId(buyerExecuteOrder.sellerAddress), constants.Notification.SUCCESS, blockResponse.txhash)
-        utilitiesNotification.send(masterAccounts.Service.getId(buyerExecuteOrder.buyerAddress), constants.Notification.SUCCESS, blockResponse.txhash)
-        if (buyerExecuteOrder.from != buyerExecuteOrder.buyerAddress) {
-          blockchainAccounts.Service.markDirty(buyerExecuteOrder.from)
-          utilitiesNotification.send(masterAccounts.Service.getId(buyerExecuteOrder.from), constants.Notification.SUCCESS, blockResponse.txhash)
-        }
-      } catch {
-        case baseException: BaseException => logger.error(baseException.failure.message, baseException)
-          throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      }*/
 
       val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
       val buyerExecuteOrder = Service.getTransaction(ticketID)
@@ -221,42 +212,21 @@ class BuyerExecuteOrders @Inject()(actorSystem: ActorSystem, transaction: utilit
           _<- markDirtyFromAddress
         }yield {}
       }
-      def getAddresses(buyerExecuteOrder:BuyerExecuteOrder)={
-
-        val addressList=List(masterAccounts.Service.getId(buyerExecuteOrder.sellerAddress),masterAccounts.Service.getId(buyerExecuteOrder.buyerAddress))
-        val addressListFuture=Future.sequence(addressList)
-        addressListFuture
-      }
 
       for{
         _<-markTransactionSuccessful
         buyerExecuteOrder<-buyerExecuteOrder
         negotiationID<-negotiationID(buyerExecuteOrder)
         _<- markDirty(negotiationID,buyerExecuteOrder)
-        addressList <- getAddresses(buyerExecuteOrder)
+        (buyerAddressID, sellerAddressID) <- getIDs(buyerExecuteOrder)
       }yield{
-        for(address<- addressList){
-          utilitiesNotification.send(address, constants.Notification.SUCCESS, blockResponse.txhash)
-        }
+        utilitiesNotification.send(sellerAddressID, constants.Notification.SUCCESS, blockResponse.txhash)
+        utilitiesNotification.send(buyerAddressID, constants.Notification.SUCCESS, blockResponse.txhash)
       }
 
     }
 
     def onFailure(ticketID: String, message: String): Future[Unit] = {
-      /*try {
-        Service.markTransactionFailed(ticketID, message)
-        val buyerExecuteOrder = Service.getTransaction(ticketID)
-        blockchainTransactionFeedbacks.Service.markDirty(buyerExecuteOrder.buyerAddress)
-        blockchainTransactionFeedbacks.Service.markDirty(buyerExecuteOrder.sellerAddress)
-        utilitiesNotification.send(masterAccounts.Service.getId(buyerExecuteOrder.sellerAddress), constants.Notification.FAILURE, message)
-        utilitiesNotification.send(masterAccounts.Service.getId(buyerExecuteOrder.buyerAddress), constants.Notification.FAILURE, message)
-        if (buyerExecuteOrder.from != buyerExecuteOrder.buyerAddress) {
-          blockchainAccounts.Service.markDirty(buyerExecuteOrder.from)
-          utilitiesNotification.send(masterAccounts.Service.getId(buyerExecuteOrder.from), constants.Notification.FAILURE, message)
-        }
-      } catch {
-        case baseException: BaseException => logger.error(baseException.failure.message, baseException)
-      }*/
 
       val markTransactionFailed=Service.markTransactionFailed(ticketID, message)
       val buyerExecuteOrder = Service.getTransaction(ticketID)
@@ -279,24 +249,15 @@ class BuyerExecuteOrders @Inject()(actorSystem: ActorSystem, transaction: utilit
         _<- markDirtyFromAddress
       }yield{}
       }
-
-      def getAddresses(buyerExecuteOrder:BuyerExecuteOrder)={
-
-        val addressList=List(masterAccounts.Service.getId(buyerExecuteOrder.sellerAddress),masterAccounts.Service.getId(buyerExecuteOrder.buyerAddress))
-        val addressListFuture=Future.sequence(addressList)
-        addressListFuture
-      }
       for{
         _<- markTransactionFailed
         buyerExecuteOrder<- buyerExecuteOrder
         _<- markDirty(buyerExecuteOrder)
-        addressList<-getAddresses(buyerExecuteOrder)
+        (buyerAddressID, sellerAddressID) <-getIDs(buyerExecuteOrder)
       }yield{
-        for(address<- addressList){
-          utilitiesNotification.send(address, constants.Notification.FAILURE, message)
-        }
+        utilitiesNotification.send(sellerAddressID, constants.Notification.FAILURE, message)
+        utilitiesNotification.send(buyerAddressID, constants.Notification.FAILURE, message)
       }
-
     }
   }
 

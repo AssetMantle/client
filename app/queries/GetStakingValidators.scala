@@ -31,9 +31,7 @@ class GetStakingValidators @Inject()()(implicit wsClient: WSClient, configuratio
 
   object Service {
 
-    def get(): Seq[Response] = try {
-      Await.result(action(), Duration.Inf)
-    } catch {
+    def get(): Future[Seq[Response]] = action().recover{
       case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
         throw new BaseException(constants.Response.CONNECT_EXCEPTION)
     }

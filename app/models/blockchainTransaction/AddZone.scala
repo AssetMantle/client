@@ -168,42 +168,25 @@ class AddZones @Inject()(actorSystem: ActorSystem, transaction: utilities.Transa
 
   object Utility {
     def onSuccess(ticketID: String, blockResponse: BlockResponse): Future[Unit] = Future {
-     /* try {
-        Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
-        val addZone = Service.getTransaction(ticketID)
-        blockchainZones.Service.create(addZone.zoneID, addZone.to, dirtyBit = true)
-        masterZones.Service.verifyZone(addZone.zoneID)
-        masterAccounts.Service.updateUserTypeOnAddress(addZone.to, constants.User.ZONE)
-        blockchainAccounts.Service.markDirty(addZone.from)
-        utilitiesNotification.send(masterAccounts.Service.getId(addZone.to), constants.Notification.SUCCESS, blockResponse.txhash)
-        utilitiesNotification.send(masterAccounts.Service.getId(addZone.from), constants.Notification.SUCCESS, blockResponse.txhash)
-      } catch {
-        case baseException: BaseException => logger.error(baseException.failure.message, baseException)
-          throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      }*/
 
       val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
       val addZone = Service.getTransaction(ticketID)
       def getResult(addZone:AddZone)={
         val create=blockchainZones.Service.create(addZone.zoneID, addZone.to, dirtyBit = true)
         val verifyZone=masterZones.Service.verifyZone(addZone.zoneID)
-        val zoneAccountId = masterAccounts.Service.getId(addZone.to)
-
+        val toAccountId = masterAccounts.Service.getId(addZone.to)
         def updateUserTypeOnAddress= masterAccounts.Service.updateUserTypeOnAddress(addZone.to, constants.User.ZONE)
-        def verifyAll (zoneAccountId:String)= masterZoneKYCs.Service.verifyAll(zoneAccountId)
         def markDirty= blockchainAccounts.Service.markDirty(addZone.from)
-
 
         for{
           _ <- create
           _ <- verifyZone
           _<-updateUserTypeOnAddress
           _<- markDirty
-          zoneAccountId <- zoneAccountId
-          _<-verifyAll(zoneAccountId)
+          toAccountId <- toAccountId
           addZoneFrom <-  masterAccounts.Service.getId(addZone.from)
         }yield{
-          utilitiesNotification.send(zoneAccountId, constants.Notification.SUCCESS, blockResponse.txhash)
+          utilitiesNotification.send(toAccountId, constants.Notification.SUCCESS, blockResponse.txhash)
           utilitiesNotification.send(addZoneFrom, constants.Notification.SUCCESS, blockResponse.txhash)
         }
       }

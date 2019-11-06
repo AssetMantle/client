@@ -183,57 +183,34 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
 
   object Utility {
 
-    def insertOrUpdateAndCometMessage(dirtyAssets:Seq[Asset])={
-     Future.sequence {
-       dirtyAssets.map { dirtyAsset =>
-         /*try {
-          val assetPegWallet = getAccount.Service.get(dirtyAsset.ownerAddress).value.assetPegWallet.getOrElse(throw new BaseException(constants.Response.NO_RESPONSE))
-          assetPegWallet.foreach(assetPeg => if (assetPegWallet.map(_.pegHash) contains dirtyAsset.pegHash) Service.insertOrUpdate(pegHash = assetPeg.pegHash, documentHash = assetPeg.documentHash, assetType = assetPeg.assetType, assetPrice = assetPeg.assetPrice, assetQuantity = assetPeg.assetQuantity, quantityUnit = assetPeg.quantityUnit, ownerAddress = dirtyAsset.ownerAddress, locked = assetPeg.locked, moderated = assetPeg.moderated, takerAddress = if (assetPeg.takerAddress == "") None else Option(assetPeg.takerAddress), dirtyBit = false) else Service.deleteAsset(dirtyAsset.pegHash))
-          mainAssetActor ! AssetCometMessage(username = masterAccounts.Service.getId(dirtyAsset.ownerAddress), message = Json.toJson(constants.Comet.PING))
-        }*/
 
-         val accountOwnerAddress = getAccount.Service.get(dirtyAsset.ownerAddress)
-         val accountID = masterAccounts.Service.getId(dirtyAsset.ownerAddress)
-
-         def insertOrUpdate(accountOwnerAddress: Response) = {
-           val assetPegWallet = accountOwnerAddress.value.assetPegWallet.getOrElse(throw new BaseException(constants.Response.NO_RESPONSE))
-           val upsert = Future.sequence(assetPegWallet.map { assetPeg => if (assetPegWallet.map(_.pegHash) contains dirtyAsset.pegHash) Service.insertOrUpdate(pegHash = assetPeg.pegHash, documentHash = assetPeg.documentHash, assetType = assetPeg.assetType, assetPrice = assetPeg.assetPrice, assetQuantity = assetPeg.assetQuantity, quantityUnit = assetPeg.quantityUnit, ownerAddress = dirtyAsset.ownerAddress, locked = assetPeg.locked, moderated = assetPeg.moderated, takerAddress = if (assetPeg.takerAddress == "") None else Option(assetPeg.takerAddress), dirtyBit = false) else Service.deleteAsset(dirtyAsset.pegHash) })
-           for {
-             _ <- upsert
-           } yield {}
-         }
-
-         for {
-           accountOwnerAddress <- accountOwnerAddress
-           _ <- insertOrUpdate(accountOwnerAddress)
-           accountID <- accountID
-         } yield mainAssetActor ! AssetCometMessage(username = accountID, message = Json.toJson(constants.Comet.PING))
-       }
-     }
-    }
     def dirtyEntityUpdater() =  {
-     /* val dirtyAssets = Service.getDirtyAssets
-      Thread.sleep(sleepTime)
-      for (dirtyAsset <- dirtyAssets) {
-        try {
-          val assetPegWallet = getAccount.Service.get(dirtyAsset.ownerAddress).value.assetPegWallet.getOrElse(throw new BaseException(constants.Response.NO_RESPONSE))
-          assetPegWallet.foreach(assetPeg => if (assetPegWallet.map(_.pegHash) contains dirtyAsset.pegHash) Service.insertOrUpdate(pegHash = assetPeg.pegHash, documentHash = assetPeg.documentHash, assetType = assetPeg.assetType, assetPrice = assetPeg.assetPrice, assetQuantity = assetPeg.assetQuantity, quantityUnit = assetPeg.quantityUnit, ownerAddress = dirtyAsset.ownerAddress, locked = assetPeg.locked, moderated = assetPeg.moderated, takerAddress = if (assetPeg.takerAddress == "") None else Option(assetPeg.takerAddress), dirtyBit = false) else Service.deleteAsset(dirtyAsset.pegHash))
-          mainAssetActor ! AssetCometMessage(username = masterAccounts.Service.getId(dirtyAsset.ownerAddress), message = Json.toJson(constants.Comet.PING))
-        }
-        catch {
-          case baseException: BaseException => logger.info(baseException.failure.message, baseException)
-            if (baseException.failure == constants.Response.NO_RESPONSE) {
-              Service.deleteAssetPegWallet(dirtyAsset.ownerAddress)
-              mainAssetActor ! AssetCometMessage(username = masterAccounts.Service.getId(dirtyAsset.ownerAddress), message = Json.toJson(constants.Comet.PING))
-            }
-        }
-      }*/
 
       val dirtyAssets = Service.getDirtyAssets
       Thread.sleep(sleepTime)
+      def insertOrUpdateAndSendCometMessage(dirtyAssets:Seq[Asset])={
+        Future.sequence {
+          dirtyAssets.map { dirtyAsset =>
+            val accountOwnerAddress = getAccount.Service.get(dirtyAsset.ownerAddress)
+            def accountID = masterAccounts.Service.getId(dirtyAsset.ownerAddress)
+            def insertOrUpdate(accountOwnerAddress: Response) = {
+              val assetPegWallet = accountOwnerAddress.value.assetPegWallet.getOrElse(throw new BaseException(constants.Response.NO_RESPONSE))
+              val upsert = Future.sequence(assetPegWallet.map { assetPeg => if (assetPegWallet.map(_.pegHash) contains dirtyAsset.pegHash) Service.insertOrUpdate(pegHash = assetPeg.pegHash, documentHash = assetPeg.documentHash, assetType = assetPeg.assetType, assetPrice = assetPeg.assetPrice, assetQuantity = assetPeg.assetQuantity, quantityUnit = assetPeg.quantityUnit, ownerAddress = dirtyAsset.ownerAddress, locked = assetPeg.locked, moderated = assetPeg.moderated, takerAddress = if (assetPeg.takerAddress == "") None else Option(assetPeg.takerAddress), dirtyBit = false) else Service.deleteAsset(dirtyAsset.pegHash) })
+              for {
+                _ <- upsert
+              } yield {}
+            }
+            for {
+              accountOwnerAddress <- accountOwnerAddress
+              _ <- insertOrUpdate(accountOwnerAddress)
+              accountID <- accountID
+            } yield mainAssetActor ! AssetCometMessage(username = accountID, message = Json.toJson(constants.Comet.PING))
+          }
+        }
+      }
       for{
         dirtyAssets<-dirtyAssets
-        _<- insertOrUpdateAndCometMessage(dirtyAssets)
+        _<- insertOrUpdateAndSendCometMessage(dirtyAssets)
       }yield {}
     }
   }

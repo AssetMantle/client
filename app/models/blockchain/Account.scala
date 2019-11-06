@@ -143,8 +143,6 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
     def markDirty(address: String): Future[Int] = updateDirtyBitByAddress(address, dirtyBit = true)
 
-    def markDirtyAsync(address: String)=updateDirtyBitByAddress(address, dirtyBit = true)
-
     def accountCometSource(username: String) = {
       shutdownActors.shutdown(constants.Module.ACTOR_MAIN_ACCOUNT, username)
       Thread.sleep(cometActorSleepTime)
@@ -156,35 +154,36 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   object Utility {
 
-    def refreshDirtyAndSendCometMessage(dirtyAddresses:Seq[String])={
-      Future.sequence{dirtyAddresses.map{dirtyAddress=>
 
-        val responseAccount = getAccount.Service.get(dirtyAddress)
-        val accountID=masterAccounts.Service.getId(dirtyAddress)
-        def refreshDirty(responseAccount:Response)=Service.refreshDirty(responseAccount.value.address, responseAccount.value.sequence, responseAccount.value.coins.get.filter(_.denom == denominationOfGasToken).map(_.amount).head)
-        for{
-          responseAccount<-responseAccount
-          accountID<-accountID
-          _<-refreshDirty(responseAccount)
-        }yield  mainAccountActor ! AccountCometMessage(username = accountID, message = Json.toJson(constants.Comet.PING))
-      }}
 
-    }
     def dirtyEntityUpdater() =  {
-
       val dirtyAddresses = Service.getDirtyAddresses
       Thread.sleep(sleepTime)
+      def refreshDirtyAndSendCometMessage(dirtyAddresses:Seq[String])={
+
+        Future.sequence{dirtyAddresses.map{dirtyAddress=>
+          val responseAccount = getAccount.Service.get(dirtyAddress)
+          val accountID=masterAccounts.Service.getId(dirtyAddress)
+          def refreshDirty(responseAccount:Response)=Service.refreshDirty(responseAccount.value.address, responseAccount.value.sequence, responseAccount.value.coins.get.filter(_.denom == denominationOfGasToken).map(_.amount).head)
+          for{
+            responseAccount<-responseAccount
+            accountID<-accountID
+            _<-refreshDirty(responseAccount)
+          }yield  mainAccountActor ! AccountCometMessage(username = accountID, message = Json.toJson(constants.Comet.PING))
+        }}
+      }
       (for {
         dirtyAddresses<-dirtyAddresses
         _<- refreshDirtyAndSendCometMessage(dirtyAddresses)
       }yield {}
         ).recover{
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
-      }
+      }(schedulerExecutionContext)
     }
   }
 
   actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
     Utility.dirtyEntityUpdater()
   }(schedulerExecutionContext)
+
 }

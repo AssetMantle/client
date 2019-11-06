@@ -130,32 +130,23 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
   }
 
   object Utility {
-    def refreshDirtyZones(dirtyZones:Seq[Zone])={
-      Future.sequence{
-        dirtyZones.map { dirtyZone =>
-          val responseAddress = getZone.Service.get(dirtyZone.id)
-          def refreshDirty(responseAddress: queries.responses.ZoneResponse.Response) = Service.refreshDirty(dirtyZone.id, responseAddress.body)
-          for {
-            responseAddress <- responseAddress
-            _ <- refreshDirty(responseAddress)
-          } yield {}
-        }
-      }
-    }
+
     def dirtyEntityUpdater(): Future[Unit] =  {
-      /*val dirtyZone = Service.getDirtyZones
-      Thread.sleep(sleepTime)
-      for (dirtyZone <- dirtyZone) {
-        try {
-          val responseAddress = getZone.Service.get(dirtyZone.id)
-          Service.refreshDirty(dirtyZone.id, responseAddress.body)
-        }
-        catch {
-          case baseException: BaseException => logger.error(baseException.failure.message, baseException)
-        }
-      }*/
+
       val dirtyZones = Service.getDirtyZones
       Thread.sleep(sleepTime)
+      def refreshDirtyZones(dirtyZones:Seq[Zone])={
+        Future.sequence{
+          dirtyZones.map { dirtyZone =>
+            val responseAddress = getZone.Service.get(dirtyZone.id)
+            def refreshDirty(responseAddress: queries.responses.ZoneResponse.Response) = Service.refreshDirty(dirtyZone.id, responseAddress.body)
+            for {
+              responseAddress <- responseAddress
+              _ <- refreshDirty(responseAddress)
+            } yield {}
+          }
+        }
+      }
       for{
         dirtyZones<-dirtyZones
         _<-refreshDirtyZones(dirtyZones)

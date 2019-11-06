@@ -32,12 +32,11 @@ class GetBlockDetails @Inject()()(implicit wsClient: WSClient, configuration: Co
 
   object Service {
 
-    def get(minimumHeight: Int, maximumHeight: Int): Response = try {
-      Await.result(action(minimumHeight = minimumHeight, maximumHeight = maximumHeight), Duration.Inf)
-    } catch {
-      case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
-        throw new BaseException(constants.Response.CONNECT_EXCEPTION)
-    }
+    def get(minimumHeight: Int, maximumHeight: Int):  Future[Response] =action(minimumHeight = minimumHeight, maximumHeight = maximumHeight)
+      .recover{
+        case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
+          throw new BaseException(constants.Response.CONNECT_EXCEPTION)
+      }
   }
 
 }

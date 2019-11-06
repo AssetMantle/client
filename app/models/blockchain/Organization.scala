@@ -118,33 +118,23 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
   }
 
   object Utility {
-    def refreshDirtyOrganizations(dirtyOrganizations:Seq[Organization])={
-      Future.sequence{
-        dirtyOrganizations.map { dirtyOrganization =>
-          val responseAddress = getOrganization.Service.get(dirtyOrganization.id)
-          def refreshDirty(responseAddress: queries.responses.OrganizationResponse.Response) = Service.refreshDirty(dirtyOrganization.id, responseAddress.address)
-          for {
-            responseAddress <- responseAddress
-            _ <- refreshDirty(responseAddress)
-          } yield {}
-        }
-      }
-    }
+
     def dirtyEntityUpdater(): Future[Unit] =  {
-     // val dirtyOrganizations = Service.getDirtyOrganizations
-     /* Thread.sleep(sleepTime)
-      for (dirtyOrganization <- dirtyOrganizations) {
-        try {
-          val responseAddress = getOrganization.Service.get(dirtyOrganization.id)
-          Service.refreshDirty(dirtyOrganization.id, responseAddress.address)
-        }
-        catch {
-          case baseException: BaseException => logger.error(baseException.failure.message, baseException)
-        }
-      }
-*/
+
       val dirtyOrganizations = Service.getDirtyOrganizations
       Thread.sleep(sleepTime)
+      def refreshDirtyOrganizations(dirtyOrganizations:Seq[Organization])={
+        Future.sequence{
+          dirtyOrganizations.map { dirtyOrganization =>
+            val responseAddress = getOrganization.Service.get(dirtyOrganization.id)
+            def refreshDirty(responseAddress: queries.responses.OrganizationResponse.Response) = Service.refreshDirty(dirtyOrganization.id, responseAddress.address)
+            for {
+              responseAddress <- responseAddress
+              _ <- refreshDirty(responseAddress)
+            } yield {}
+          }
+        }
+      }
       for{
         dirtyOrganizations<-dirtyOrganizations
         _<-refreshDirtyOrganizations(dirtyOrganizations)

@@ -78,9 +78,7 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
   }
 
   private def getUserTypeById(id: String): Future[String] = db.run(accountTable.filter(_.id === id).map(_.userType).result.head.asTry).map {
-    case Success(result) =>
-      println("Got User Type")
-      result
+    case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
         throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
@@ -216,8 +214,6 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     def getAddressAsync(id: String) = getAddressById(id)
 
     def updateUserType(id: String, userType: String): Future[Int] = updateUserTypeById(id, userType)
-
-    def updateUserTypeAsync(id: String, userType: String) = updateUserTypeById(id, userType)
 
     def updateUserTypeOnAddress(address: String, userType: String): Future[Int] =updateUserTypeByAddress(address, userType)
 

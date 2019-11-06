@@ -30,9 +30,7 @@ class GetABCIInfo @Inject()()(implicit wsClient: WSClient, configuration: Config
 
   object Service {
 
-    def get(): Response = try {
-      Await.result(action(), Duration.Inf)
-    } catch {
+    def get(): Future[Response] = action().recover{
       case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
         throw new BaseException(constants.Response.CONNECT_EXCEPTION)
     }

@@ -114,6 +114,35 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
     usr+"sgsfs"
   }*/
 
+  def futureTest={
+
+
+    val lang = masterAccounts.Service.getLanguageAsync("minijoker123")
+    lang.map{lan=>
+      println("future running")
+      Thread.sleep(10000)
+      println(lan+"got Value jdfbnielkergwelkgnmwelgkmseormse")
+      println("Future complete")
+    }
+    lang
+  }
+  def futureTest2={
+    val lang = masterAccounts.Service.getLanguageAsync("minijoker123")
+
+    val y=Future{
+      println("future running")
+      Thread.sleep(10000)
+      println("got Value jdfbnielkergwelkgnmwelgkmseormse")
+      println("Future complete")
+      val str="akjsnfaknfr"
+      str
+    }
+    y.map{value=>
+      println(value)
+    }
+    lang
+  }
+
   def testActionAsync=Action.async{
 
    // val account = masterAccounts.Service.getAccountAsync("buyer014789")
@@ -126,14 +155,11 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
       if (3 == 4) {
         val account = masterAccounts.Service.getAccountAsync("minijoker123")
         val address = masterAccounts.Service.getAddressAsync("minijoker123")
-
         for {
           account <- account
           address <- address
-
         } yield {}
       }else{Future{Unit}}
-
     }
 
     val somet=for {
@@ -142,15 +168,16 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
       _<- markDirtyFromAddress
     } yield {}
 
+    futureTest2
 
-    val x=Future{
+   /* val x=Future{
       println("Future running")
       Thread.sleep(10000)
       println("Future Complete")
       throw new BaseException(constants.Response.DOCUMENT_NOT_FOUND)
     }
 
-
+    Future{Ok("what!!!")}*/
     val userType = masterAccounts.Service.getUserTypeAsync("minijoker123")
 
     (for{

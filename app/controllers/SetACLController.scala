@@ -722,8 +722,8 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
         },
         updateTraderKYCDocumentOrganizationStatusData => {
 
-          val userOrganizationID=masterZones.Service.getID(loginState.username)
-          val traderOrganizationID= masterTraders.Service.getZoneID(updateTraderKYCDocumentOrganizationStatusData.traderID)
+          val userOrganizationID=masterOrganizations.Service.getID(loginState.username)
+          val traderOrganizationID= masterTraders.Service.getOrganizationID(updateTraderKYCDocumentOrganizationStatusData.traderID)
           def getResult(userOrganizationID:String,traderOrganizationID:String)={
             val traderID=masterTraders.Service.getAccountId(updateTraderKYCDocumentOrganizationStatusData.traderID)
 

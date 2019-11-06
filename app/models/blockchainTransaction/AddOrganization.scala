@@ -169,24 +169,6 @@ class AddOrganizations @Inject()(actorSystem: ActorSystem, transaction: utilitie
 
   object Utility {
     def onSuccess(ticketID: String, blockResponse: BlockResponse) =  {
-     /* try {
-        Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
-        val addOrganization = Service.getTransaction(ticketID)
-        blockchainOrganizations.Service.create(addOrganization.organizationID, addOrganization.to, dirtyBit = true)
-        masterOrganizations.Service.verifyOrganization(addOrganization.organizationID)
-        val organizationAccountId = masterAccounts.Service.getId(addOrganization.to)
-
-        masterAccounts.Service.updateUserType(organizationAccountId, constants.User.ORGANIZATION)
-
-        //val organizationAccountId = masterAccounts.Service.getId(addOrganization.to)
-        masterOrganizationKYCs.Service.verifyAll(organizationAccountId)
-        blockchainAccounts.Service.markDirty(addOrganization.from)
-        utilitiesNotification.send(organizationAccountId, constants.Notification.SUCCESS, blockResponse.txhash)
-        utilitiesNotification.send(masterAccounts.Service.getId(addOrganization.from), constants.Notification.SUCCESS, blockResponse.txhash)
-      } catch {
-        case baseException: BaseException => logger.error(baseException.failure.message, baseException)
-          throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      }*/
 
       val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
       val addOrganization = Service.getTransaction(ticketID)
@@ -196,16 +178,13 @@ class AddOrganizations @Inject()(actorSystem: ActorSystem, transaction: utilitie
         val organizationAccountId=masterOrganizations.Service.getAccountId(addOrganization.organizationID)
 
         def updateUserType(organizationAccountId:String)= masterAccounts.Service.updateUserType(organizationAccountId, constants.User.ORGANIZATION)
-        def verifyAll (organizationAccountId:String)= masterOrganizationKYCs.Service.verifyAll(organizationAccountId)
         def markDirty= blockchainAccounts.Service.markDirty(addOrganization.from)
-
 
         for{
           _ <- create
           _ <- verifyOrganization
           organizationAccountId <- organizationAccountId
           _<-updateUserType(organizationAccountId)
-          _<-verifyAll(organizationAccountId)
           _<- markDirty
           accountIDFrom <-  masterAccounts.Service.getId(addOrganization.from)
         }yield{

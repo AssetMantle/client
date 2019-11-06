@@ -212,43 +212,30 @@ class TransactionFeedbacks @Inject()(protected val databaseConfigProvider: Datab
   }
 
   object Utility {
-    def refreshDirtyAddresses(dirtyAddresses:Seq[String])={
-      Future.sequence{
-        dirtyAddresses.map { dirtyAddress =>
-          val response = getTraderReputation.Service.get(dirtyAddress)
-          def refreshDirty(response:  queries.responses.TraderReputationResponse.Response) = Service.refreshDirty(response.value.address, response.value.transactionFeedback)
-          (for {
-            response <- response
-            _ <- refreshDirty(response)
-          } yield {}
-            ).recover{
-            case baseException: BaseException => if (baseException.failure == constants.Response.NO_RESPONSE) {
-              Service.insertOrUpdate(dirtyAddress, TraderReputationResponse.TransactionFeedbackResponse("0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"), dirtyBit = false)
-            } else {
-              logger.error(baseException.failure.message, baseException)
+
+    def dirtyEntityUpdater(): Future[Unit] =  {
+
+      val dirtyAddresses = Service.getDirtyAddresses
+      Thread.sleep(sleepTime)
+      def refreshDirtyAddresses(dirtyAddresses:Seq[String])={
+        Future.sequence{
+          dirtyAddresses.map { dirtyAddress =>
+            val response = getTraderReputation.Service.get(dirtyAddress)
+            def refreshDirty(response:  queries.responses.TraderReputationResponse.Response) = Service.refreshDirty(response.value.address, response.value.transactionFeedback)
+            (for {
+              response <- response
+              _ <- refreshDirty(response)
+            } yield {}
+              ).recover{
+              case baseException: BaseException => if (baseException.failure == constants.Response.NO_RESPONSE) {
+                Service.insertOrUpdate(dirtyAddress, TraderReputationResponse.TransactionFeedbackResponse("0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"), dirtyBit = false)
+              } else {
+                logger.error(baseException.failure.message, baseException)
+              }
             }
           }
         }
       }
-    }
-    def dirtyEntityUpdater(): Future[Unit] =  {
-      //val dirtyAddresses = Service.getDirtyAddresses
-      /*Thread.sleep(sleepTime)
-      for (dirtyAddress <- dirtyAddresses) {
-        try {
-          val response = getTraderReputation.Service.get(dirtyAddress)
-          Service.refreshDirty(response.value.address, response.value.transactionFeedback)
-        }
-        catch {
-          case baseException: BaseException => if (baseException.failure == constants.Response.NO_RESPONSE) {
-            Service.insertOrUpdate(dirtyAddress, TraderReputationResponse.TransactionFeedbackResponse("0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"), dirtyBit = false)
-          } else {
-            logger.error(baseException.failure.message, baseException)
-          }
-        }
-      }*/
-      val dirtyAddresses = Service.getDirtyAddresses
-      Thread.sleep(sleepTime)
       for{
         dirtyAddresses<-dirtyAddresses
         _<-refreshDirtyAddresses(dirtyAddresses)

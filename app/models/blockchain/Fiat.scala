@@ -156,53 +156,38 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
   object Utility {
 
-    def insertOrUpdateAndCometMessage(dirtyFiats:Seq[Fiat])={
 
-      Future.sequence {
-        dirtyFiats.map { dirtyFiat =>
-          val accountOwnerAddress = getAccount.Service.get(dirtyFiat.ownerAddress)
-          val accountID = masterAccounts.Service.getId(dirtyFiat.ownerAddress)
-
-          def insertOrUpdate(accountOwnerAddress: Response) = {
-            val fiatPegWallet = accountOwnerAddress.value.fiatPegWallet.getOrElse(throw new BaseException(constants.Response.NO_RESPONSE))
-            val upsert = Future.sequence(fiatPegWallet.map { fiatPeg => if (fiatPegWallet.map(_.pegHash) contains dirtyFiat.pegHash) Service.insertOrUpdate(fiatPeg.pegHash, dirtyFiat.ownerAddress, fiatPeg.transactionID, fiatPeg.transactionAmount, fiatPeg.redeemedAmount, dirtyBit = false) else Service.deleteFiat(dirtyFiat.pegHash, dirtyFiat.ownerAddress) })
-            for {
-              _ <- upsert
-            } yield fiatPegWallet
-          }
-
-          for {
-            accountOwnerAddress <- accountOwnerAddress
-            fiatPegWallet <- insertOrUpdate(accountOwnerAddress)
-            accountID <- accountID
-
-          } yield {mainFiatActor ! FiatCometMessage(username = accountID, message = Json.toJson(fiatPegWallet.map(_.transactionAmount.toInt).sum.toString))}
-
-        }
-      }
-    }
     def dirtyEntityUpdater(): Future[Unit] =  {
-      //val dirtyFiats = Service.getDirtyFiats
-      /*Thread.sleep(sleepTime)
-      for (dirtyFiat <- dirtyFiats) {
-        try {
-          val fiatPegWallet = getAccount.Service.get(dirtyFiat.ownerAddress).value.fiatPegWallet.getOrElse(throw new BaseException(constants.Response.NO_RESPONSE))
-          fiatPegWallet.foreach(fiatPeg => if (fiatPegWallet.map(_.pegHash) contains dirtyFiat.pegHash) Service.insertOrUpdate(fiatPeg.pegHash, dirtyFiat.ownerAddress, fiatPeg.transactionID, fiatPeg.transactionAmount, fiatPeg.redeemedAmount, dirtyBit = false) else Service.deleteFiat(dirtyFiat.pegHash, dirtyFiat.ownerAddress))
-          mainFiatActor ! FiatCometMessage(username = masterAccounts.Service.getId(dirtyFiat.ownerAddress), message = Json.toJson(fiatPegWallet.map(_.transactionAmount.toInt).sum.toString))
-        }
-        catch {
-          case baseException: BaseException => logger.info(baseException.failure.message, baseException)
-            if (baseException.failure == constants.Response.NO_RESPONSE) {
-              Service.deleteFiatPegWallet(dirtyFiat.ownerAddress)
-              mainFiatActor ! FiatCometMessage(username = masterAccounts.Service.getId(dirtyFiat.ownerAddress), message = Json.toJson("0"))
-            }
-        }
-      }*/
       val dirtyFiats = Service.getDirtyFiats
       Thread.sleep(sleepTime)
+      def insertOrUpdateAndSendCometMessage(dirtyFiats:Seq[Fiat])={
+
+        Future.sequence {
+          dirtyFiats.map { dirtyFiat =>
+            val accountOwnerAddress = getAccount.Service.get(dirtyFiat.ownerAddress)
+            val accountID = masterAccounts.Service.getId(dirtyFiat.ownerAddress)
+
+            def insertOrUpdate(accountOwnerAddress: Response) = {
+              val fiatPegWallet = accountOwnerAddress.value.fiatPegWallet.getOrElse(throw new BaseException(constants.Response.NO_RESPONSE))
+              val upsert = Future.sequence(fiatPegWallet.map { fiatPeg => if (fiatPegWallet.map(_.pegHash) contains dirtyFiat.pegHash) Service.insertOrUpdate(fiatPeg.pegHash, dirtyFiat.ownerAddress, fiatPeg.transactionID, fiatPeg.transactionAmount, fiatPeg.redeemedAmount, dirtyBit = false) else Service.deleteFiat(dirtyFiat.pegHash, dirtyFiat.ownerAddress) })
+              for {
+                _ <- upsert
+              } yield fiatPegWallet
+            }
+
+            for {
+              accountOwnerAddress <- accountOwnerAddress
+              fiatPegWallet <- insertOrUpdate(accountOwnerAddress)
+              accountID <- accountID
+
+            } yield {mainFiatActor ! FiatCometMessage(username = accountID, message = Json.toJson(fiatPegWallet.map(_.transactionAmount.toInt).sum.toString))}
+
+          }
+        }
+      }
       for{
         dirtyFiats<-dirtyFiats
-        _<- insertOrUpdateAndCometMessage(dirtyFiats)
+        _<- insertOrUpdateAndSendCometMessage(dirtyFiats)
       }yield {}
     }
   }

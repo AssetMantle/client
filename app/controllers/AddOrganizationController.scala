@@ -53,7 +53,6 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
           } yield BadRequest(views.html.component.master.addOrganization(formWithErrors, zones = zones))
         },
         addOrganizationData => {
-
           val verificationStatus = masterZones.Service.getVerificationStatus(addOrganizationData.zoneID)
 
           def insertOrUpdateOrganizationWithoutUBOsAndGetResult(verificationStatus: Boolean) = {
@@ -80,7 +79,6 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
           } yield result).recover {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
-
         }
       )
   }
@@ -129,19 +127,17 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
 
   def organizationBankAccountDetailForm(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
-
       val id = masterOrganizations.Service.getID(loginState.username)
 
-      def organizationBankAccountDetail(id: String) = masterOrganizationBankAccountDetails.Service.get(id)
+      def getOrganizationBankAccountDetail(id: String) = masterOrganizationBankAccountDetails.Service.get(id)
 
       (for {
         id <- id
-        organizationBankAccountDetail <- organizationBankAccountDetail(id)
+        organizationBankAccountDetail <- getOrganizationBankAccountDetail(id)
       } yield withUsernameToken.Ok(views.html.component.master.organizationBankAccountDetail(views.companion.master.OrganizationBankAccountDetail.form.fill(views.companion.master.OrganizationBankAccountDetail.Data(accountHolder = organizationBankAccountDetail.accountHolder, nickName = organizationBankAccountDetail.nickName, accountNumber = organizationBankAccountDetail.accountNumber, bankName = organizationBankAccountDetail.bankName, swiftAddress = organizationBankAccountDetail.swiftAddress, address = organizationBankAccountDetail.address, country = organizationBankAccountDetail.country, zipCode = organizationBankAccountDetail.zipCode))))
         ).recover {
         case _: BaseException => withUsernameToken.Ok(views.html.component.master.organizationBankAccountDetail())
       }
-
   }
 
   def organizationBankAccountDetail(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
@@ -157,12 +153,12 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
 
           def insertOrUpdate(id: String) = masterOrganizationBankAccountDetails.Service.insertOrUpdate(id = id, accountHolder = organizationBankAccountDetailData.accountHolder, nickName = organizationBankAccountDetailData.nickName, accountNumber = organizationBankAccountDetailData.accountNumber, bankName = organizationBankAccountDetailData.bankName, swiftAddress = organizationBankAccountDetailData.swiftAddress, address = organizationBankAccountDetailData.address, country = organizationBankAccountDetailData.country, zipCode = organizationBankAccountDetailData.zipCode)
 
-          def organizationKYCs(id: String) = masterOrganizationKYCs.Service.getAllDocuments(id)
+          def getOrganizationKYCs(id: String) = masterOrganizationKYCs.Service.getAllDocuments(id)
 
           (for {
             id <- id
             _ <- insertOrUpdate(id)
-            organizationKYCs <- organizationKYCs(id)
+            organizationKYCs <- getOrganizationKYCs(id)
           } yield withUsernameToken.PartialContent(views.html.component.master.userUploadOrUpdateOrganizationKYC(organizationKYCs))
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -176,16 +172,15 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
     implicit request =>
       val id = masterOrganizations.Service.getID(loginState.username)
 
-      def organizationKYCs(id: String) = masterOrganizationKYCs.Service.getAllDocuments(id)
+      def getOrganizationKYCs(id: String) = masterOrganizationKYCs.Service.getAllDocuments(id)
 
       (for {
         id <- id
-        organizationKYCs <- organizationKYCs(id)
+        organizationKYCs <- getOrganizationKYCs(id)
       } yield Ok(views.html.component.master.userUploadOrUpdateOrganizationKYC(organizationKYCs))
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
-
   }
 
   def userUploadOrganizationKYCForm(documentType: String): Action[AnyContent] = Action { implicit request =>
@@ -224,12 +219,12 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
         masterCreate = masterOrganizationKYCs.Service.create
       )
 
-      def organizationKYCs(organizationID: String) = masterOrganizationKYCs.Service.getAllDocuments(organizationID)
+      def getOrganizationKYCs(organizationID: String) = masterOrganizationKYCs.Service.getAllDocuments(organizationID)
 
       (for {
         organizationID <- organizationID
         _ <- storeFile(organizationID)
-        organizationKYCs <- organizationKYCs(organizationID)
+        organizationKYCs <- getOrganizationKYCs(organizationID)
       } yield withUsernameToken.PartialContent(views.html.component.master.userUploadOrUpdateOrganizationKYC(organizationKYCs))
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -257,34 +252,22 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
         updateOldDocument = masterOrganizationKYCs.Service.updateOldDocument
       )
 
-      def organizationKYCs(id: String) = masterOrganizationKYCs.Service.getAllDocuments(id)
+      def getOrganizationKYCs(id: String) = masterOrganizationKYCs.Service.getAllDocuments(id)
 
       (for {
         organizationID <- organizationID
         oldDocumentFileName <- oldDocumentFileName(organizationID)
         _ <- updateFile(organizationID, oldDocumentFileName)
-        organizationKYCs <- organizationKYCs(organizationID)
+        organizationKYCs <- getOrganizationKYCs(organizationID)
       } yield withUsernameToken.PartialContent(views.html.component.master.userUploadOrUpdateOrganizationKYC(organizationKYCs))
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
-
   }
 
   def userReviewAddOrganizationRequestForm(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val organization = masterOrganizations.Service.getByAccountID(loginState.username)
-
-      def getZoneOrganizationDetails(organization: Organization) = {
-        val zone = masterZones.Service.get(organization.zoneID)
-        val organizationBankAccountDetail = masterOrganizationBankAccountDetails.Service.get(organization.id)
-        val organizationKYCs = masterOrganizationKYCs.Service.getAllDocuments(organization.id)
-        for {
-          zone <- zone
-          organizationBankAccountDetail <- organizationBankAccountDetail
-          organizationKYCs <- organizationKYCs
-        } yield (zone, organizationBankAccountDetail, organizationKYCs)
-      }
 
       (for {
         organization <- organization
@@ -295,46 +278,33 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
       }
   }
 
+  def getZoneOrganizationDetails(organization: Organization) = {
+    val zone = masterZones.Service.get(organization.zoneID)
+    val organizationBankAccountDetail = masterOrganizationBankAccountDetails.Service.get(organization.id)
+    val organizationKYCs = masterOrganizationKYCs.Service.getAllDocuments(organization.id)
+    for {
+      zone <- zone
+      organizationBankAccountDetail <- organizationBankAccountDetail
+      organizationKYCs <- organizationKYCs
+    } yield (zone, organizationBankAccountDetail, organizationKYCs)
+  }
+
   def userReviewAddOrganizationRequest(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
       views.companion.master.UserReviewAddOrganizationRequest.form.bindFromRequest().fold(
         formWithErrors => {
           val organization = masterOrganizations.Service.getByAccountID(loginState.username)
-
-          def getZoneOrganizationDetails(organization: Organization) = {
-            val zone = masterZones.Service.get(organization.zoneID)
-            val organizationBankAccountDetail = masterOrganizationBankAccountDetails.Service.get(organization.id)
-            val organizationKYCs = masterOrganizationKYCs.Service.getAllDocuments(organization.id)
-            for {
-              zone <- zone
-              organizationBankAccountDetail <- organizationBankAccountDetail
-              organizationKYCs <- organizationKYCs
-            } yield BadRequest(views.html.component.master.userReviewAddOrganizationRequest(formWithErrors, organization = organization, zone = zone, organizationBankAccountDetail = organizationBankAccountDetail, organizationKYCs = organizationKYCs))
-          }
-
           (for {
             organization <- organization
-            result <- getZoneOrganizationDetails(organization)
-          } yield result).recover {
+            (zone, organizationBankAccountDetail, organizationKYCs) <- getZoneOrganizationDetails(organization)
+          } yield BadRequest(views.html.component.master.userReviewAddOrganizationRequest(formWithErrors, organization = organization, zone = zone, organizationBankAccountDetail = organizationBankAccountDetail, organizationKYCs = organizationKYCs))).recover {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
-
         },
         userReviewAddOrganizationRequestData => {
           val id = masterOrganizations.Service.getID(loginState.username)
 
-          def allKYCFileTypesExists(id: String) = masterOrganizationKYCs.Service.checkAllKYCFileTypesExists(id)
-
-          def getDetailsOrganization(organization: Organization) = {
-            val zone = masterZones.Service.get(organization.zoneID)
-            val organizationBankAccountDetail = masterOrganizationBankAccountDetails.Service.get(organization.id)
-            val organizationKYCs = masterOrganizationKYCs.Service.getAllDocuments(organization.id)
-            for {
-              zone <- zone
-              organizationBankAccountDetail <- organizationBankAccountDetail
-              organizationKYCs <- organizationKYCs
-            } yield (zone, organizationBankAccountDetail, organizationKYCs)
-          }
+          def checkAllKYCFileTypesExists(id: String) = masterOrganizationKYCs.Service.checkAllKYCFileTypesExists(id)
 
           def markOrganizationFormCompletedAndGetResult(id: String, allKYCFileTypesExists: Boolean) = {
             if (userReviewAddOrganizationRequestData.completion && allKYCFileTypesExists) {
@@ -342,20 +312,18 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
               for {
                 _ <- markOrganizationFormCompleted
               } yield withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ORGANIZATION_ADDED_FOR_VERIFICATION)))
-
             } else {
               val organization = masterOrganizations.Service.getByAccountID(loginState.username)
               for {
                 organization <- organization
-                (zone, organizationBankAccountDetail, organizationKYCs) <- getDetailsOrganization(organization)
+                (zone, organizationBankAccountDetail, organizationKYCs) <- getZoneOrganizationDetails(organization)
               } yield BadRequest(views.html.component.master.userReviewAddOrganizationRequest(organization = organization, zone = zone, organizationBankAccountDetail = organizationBankAccountDetail, organizationKYCs = organizationKYCs))
-
             }
           }
 
           (for {
             id <- id
-            allKYCFileTypesExists <- allKYCFileTypesExists(id)
+            allKYCFileTypesExists <- checkAllKYCFileTypesExists(id)
             result <- markOrganizationFormCompletedAndGetResult(id, allKYCFileTypesExists)
           } yield result).recover {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -378,10 +346,10 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
           }
         },
         verifyOrganizationData => {
-          val checkAllKYCFilesVerified = masterOrganizationKYCs.Service.checkAllKYCFilesVerified(verifyOrganizationData.organizationID)
+          val allKYCFilesVerified = masterOrganizationKYCs.Service.checkAllKYCFilesVerified(verifyOrganizationData.organizationID)
 
-          def processTransactionAndGetResult(checkAllKYCFilesVerified: Boolean) = {
-            if (checkAllKYCFilesVerified) {
+          def processTransactionAndGetResult(allKYCFilesVerified: Boolean) = {
+            if (allKYCFilesVerified) {
               val accountId = masterOrganizations.Service.getAccountId(verifyOrganizationData.organizationID)
 
               def organizationAccountAddress(accountId: String) = masterAccounts.Service.getAddress(accountId)
@@ -409,8 +377,8 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
           }
 
           (for {
-            checkAllKYCFilesVerified <- checkAllKYCFilesVerified
-            result <- processTransactionAndGetResult(checkAllKYCFilesVerified)
+            allKYCFilesVerified <- allKYCFilesVerified
+            result <- processTransactionAndGetResult(allKYCFilesVerified)
           } yield result
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -442,11 +410,9 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
           for {
             organizationKYC <- organizationKYC
           } yield withUsernameToken.Ok(views.html.component.master.updateOrganizationKYCDocumentStatus(organizationKYC = organizationKYC))
-
         } else Future {
           Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
         }
-
       }
 
       (for {
@@ -467,10 +433,8 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
           for {
             organizationKYC <- organizationKYC
           } yield BadRequest(views.html.component.master.updateOrganizationKYCDocumentStatus(formWithErrors, organizationKYC))
-
         },
         updateOrganizationKYCDocumentStatusData => {
-
           val userZoneID = masterZones.Service.getID(loginState.username)
           val organizationZoneID = masterOrganizations.Service.getZoneID(updateOrganizationKYCDocumentStatusData.organizationID)
 
@@ -492,6 +456,8 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
             }
           }
 
+          def organizationKYC = masterOrganizationKYCs.Service.get(updateOrganizationKYCDocumentStatusData.organizationID, updateOrganizationKYCDocumentStatusData.documentType)
+
           def getResult(userZoneID: String, organizationZoneID: String) = {
             if (userZoneID == organizationZoneID) {
               for {
@@ -504,8 +470,6 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
               }
             }
           }
-
-          def organizationKYC = masterOrganizationKYCs.Service.get(updateOrganizationKYCDocumentStatusData.organizationID, updateOrganizationKYCDocumentStatusData.documentType)
 
           (for {
             userZoneID <- userZoneID
@@ -532,7 +496,6 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
           }
         },
         rejectVerifyOrganizationRequestData => {
-
           val rejectOrganization = masterOrganizations.Service.rejectOrganization(rejectVerifyOrganizationRequestData.organizationID)
           val organizationAccountID = masterOrganizations.Service.getAccountId(rejectVerifyOrganizationRequestData.organizationID)
 
@@ -546,7 +509,6 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
-
         }
       )
   }
@@ -565,7 +527,6 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
 
   def viewPendingVerifyOrganizationRequests: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
-
       val zoneID = masterZones.Service.getID(loginState.username)
 
       def verifyOrganizationRequests(zoneID: String) = masterOrganizations.Service.getVerifyOrganizationRequests(zoneID)
@@ -627,7 +588,6 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
-
   }
 
   def updateOrganizationKYC(name: String, documentType: String): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
@@ -658,7 +618,6 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
 
   def viewOrganizationsInZone: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
-
       val zoneID = masterZones.Service.getID(loginState.username)
 
       def organizationsInZone(zoneID: String) = masterOrganizations.Service.getOrganizationsInZone(zoneID)
@@ -675,7 +634,6 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
 
   def viewOrganizationsInZoneForGenesis(zoneID: String): Action[AnyContent] = withGenesisLoginAction.authenticated { implicit loginState =>
     implicit request =>
-
       val organizationsInZone = masterOrganizations.Service.getOrganizationsInZone(zoneID)
       (for {
         organizationsInZone <- organizationsInZone
@@ -698,7 +656,6 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
         }
       },
       addOrganizationData => {
-
         val postRequest = transactionsAddOrganization.Service.post(transactionsAddOrganization.Request(transactionsAddOrganization.BaseReq(from = addOrganizationData.from, gas = addOrganizationData.gas.toString), to = addOrganizationData.to, organizationID = addOrganizationData.organizationID, zoneID = addOrganizationData.zoneID, password = addOrganizationData.password, mode = transactionMode))
         (for {
           _ <- postRequest

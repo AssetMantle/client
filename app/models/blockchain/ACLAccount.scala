@@ -129,24 +129,25 @@ class ACLAccounts @Inject()(protected val databaseConfigProvider: DatabaseConfig
   }
 
   object Utility {
-    def refreshDirtyAndSendCometMessage(dirtyAddresses:Seq[String])={
-      Future.sequence{dirtyAddresses.map{dirtyAddress=>
-        val responseAccount =getACL.Service.get(dirtyAddress)
-        def insertOrUpdate(responseAccount:Response)=Service.insertOrUpdate(responseAccount.value.address, responseAccount.value.zoneID, responseAccount.value.organizationID, responseAccount.value.acl, dirtyBit = false)
-        for{
-          responseAccount<-responseAccount
-          _<-insertOrUpdate(responseAccount)
-        }yield {}
-      }}
 
-    }
     def dirtyEntityUpdater() =  {
 
       val dirtyAddresses = Service.getDirtyAddresses
       Thread.sleep(sleepTime)
+      def insertOrUpdateAll(dirtyAddresses:Seq[String])={
+        Future.sequence{dirtyAddresses.map{dirtyAddress=>
+          val responseAccount =getACL.Service.get(dirtyAddress)
+          def insertOrUpdate(responseAccount:Response)= Service.insertOrUpdate(responseAccount.value.address, responseAccount.value.zoneID, responseAccount.value.organizationID, responseAccount.value.acl, dirtyBit = false)
+          for{
+            responseAccount<-responseAccount
+            _<-insertOrUpdate(responseAccount)
+          }yield {}
+        }
+        }
+      }
       (for {
         dirtyAddresses<-dirtyAddresses
-        _<- refreshDirtyAndSendCometMessage(dirtyAddresses)
+        _<- insertOrUpdateAll(dirtyAddresses)
       }yield {}
         ).recover{
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)

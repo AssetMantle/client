@@ -15,7 +15,6 @@ import views.companion.master.FileUpload.FileUploadInfo
 import scala.concurrent.ExecutionContext
 import scala.util.{Failure, Success}
 
-
 object FileOperations {
 
   private implicit val module: String = constants.Module.FILE_OPERATIONS
@@ -54,17 +53,6 @@ object FileOperations {
   def fileExtensionFromName(fileName: String): String = {
     if (fileName.lastIndexOf(".") != -1 && fileName.lastIndexOf(".") != 0) fileName.substring(fileName.lastIndexOf(".") + 1)
     else ""
-  }
-
-  def removeSpacesFromName(name: String)(implicit executionContext: ExecutionContext): String = {
-    try {
-      name.replaceAll("\\s", "")
-    } catch {
-      case nullPointerException: NullPointerException => logger.error(constants.Response.NULL_POINTER_EXCEPTION.message, nullPointerException)
-        throw new BaseException(constants.Response.NULL_POINTER_EXCEPTION)
-      case e: Exception => logger.error(constants.Response.GENERIC_EXCEPTION.message, e)
-        throw new BaseException(constants.Response.GENERIC_EXCEPTION)
-    }
   }
 
   def renameFile(directory: String, currentName: String, newName: String)(implicit executionContext: ExecutionContext): Boolean = newFile(directory, currentName).renameTo(newFile(directory, newName))
