@@ -1,9 +1,8 @@
 @import controllers.actions.LoginState
-@import helper._
 @import views.html.base._
 @import views.companion.master.RejectVerifyTraderRequest
 
 @(rejectVerifyTraderRequestForm: Form[RejectVerifyTraderRequest.Data] = RejectVerifyTraderRequest.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @commonForm(constants.Form.ZONE_REJECT_VERIFY_TRADER_REQUEST, rejectVerifyTraderRequestForm) {
-    @inputText(rejectVerifyTraderRequestForm(constants.Form.TRADER_ID), '_label -> Messages(constants.Form.TRADER_ID), 'class -> "cmuk-input", 'placeholder -> Messages(constants.Form.TRADER_ID), 'required -> true)
+    @commonInputText(rejectVerifyTraderRequestForm, constants.FormField.TRADER_ID)
 }

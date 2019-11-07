@@ -171,27 +171,16 @@ class SetBuyerFeedbacks @Inject()(actorSystem: ActorSystem, transaction: utiliti
   }
 
   object Utility {
-    def addresses(setBuyerFeedback:SetBuyerFeedback)={
-      val to=masterAccounts.Service.getId(setBuyerFeedback.to)
-      val from=masterAccounts.Service.getId(setBuyerFeedback.from)
-      for{
-        to<-to
-        from<-from
-      }yield (to,from)
+    def getIDs(setBuyerFeedback:SetBuyerFeedback) = {
+      val toAccountID = masterAccounts.Service.getId(setBuyerFeedback.to)
+      val fromAccountID = masterAccounts.Service.getId(setBuyerFeedback.from)
+      for {
+        toAccountID <- toAccountID
+        fromAccountID <- fromAccountID
+      } yield (toAccountID, fromAccountID)
     }
 
     def onSuccess(ticketID: String, blockResponse: BlockResponse): Future[Unit] =  {
-     /* try {
-        Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
-        val setBuyerFeedback = Service.getTransaction(ticketID)
-        blockchainTraderFeedbackHistories.Service.update(setBuyerFeedback.to, setBuyerFeedback.from, setBuyerFeedback.to, setBuyerFeedback.pegHash, setBuyerFeedback.rating.toString)
-        blockchainAccounts.Service.markDirty(setBuyerFeedback.from)
-        utilitiesNotification.send(masterAccounts.Service.getId(setBuyerFeedback.to), constants.Notification.SUCCESS, blockResponse.txhash)
-        utilitiesNotification.send(masterAccounts.Service.getId(setBuyerFeedback.from), constants.Notification.SUCCESS, blockResponse.txhash)
-      } catch {
-        case baseException: BaseException => logger.error(baseException.failure.message, baseException)
-          throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      }*/
 
       val markTransactionSuccessful= Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
       val setBuyerFeedback = Service.getTransaction(ticketID)
@@ -207,36 +196,28 @@ class SetBuyerFeedbacks @Inject()(actorSystem: ActorSystem, transaction: utiliti
         _<-markTransactionSuccessful
         setBuyerFeedback<-setBuyerFeedback
         _<-updateAndMarkDirty(setBuyerFeedback)
-        (to,from)<-addresses(setBuyerFeedback)
+        (toAccountID, fromAccountID)<-getIDs(setBuyerFeedback)
       }yield {
-        utilitiesNotification.send(to, constants.Notification.SUCCESS, blockResponse.txhash)
-        utilitiesNotification.send(from, constants.Notification.SUCCESS, blockResponse.txhash)
+        utilitiesNotification.send(toAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
+        utilitiesNotification.send(fromAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
 
       }).recover{
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
           throw new BaseException(constants.Response.PSQL_EXCEPTION)
       }
-
     }
 
     def onFailure(ticketID: String, message: String): Future[Unit] =  {
-      /*try {
-        Service.markTransactionFailed(ticketID, message)
-        val setBuyerFeedback = Service.getTransaction(ticketID)
-        utilitiesNotification.send(masterAccounts.Service.getId(setBuyerFeedback.to), constants.Notification.FAILURE, message)
-        utilitiesNotification.send(masterAccounts.Service.getId(setBuyerFeedback.from), constants.Notification.FAILURE, message)
-      } catch {
-        case baseException: BaseException => logger.error(baseException.failure.message, baseException)
-      }*/
+
       val markTransactionFailed= Service.markTransactionFailed(ticketID, message)
       val setBuyerFeedback = Service.getTransaction(ticketID)
       for{
         _<-markTransactionFailed
         setBuyerFeedback<-setBuyerFeedback
-        (to,from)<-addresses(setBuyerFeedback)
+        (toAccountID, fromAccountID)<-getIDs(setBuyerFeedback)
       }yield{
-        utilitiesNotification.send(to, constants.Notification.FAILURE, message)
-        utilitiesNotification.send(from, constants.Notification.FAILURE, message)
+        utilitiesNotification.send(toAccountID, constants.Notification.FAILURE, message)
+        utilitiesNotification.send(fromAccountID, constants.Notification.FAILURE, message)
       }
 
     }

@@ -169,19 +169,17 @@ class ReleaseAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.T
   }
 
   object Utility {
+    def getIDs(releaseAsset:ReleaseAsset) = {
+      val toAccountID = masterAccounts.Service.getId(releaseAsset.to)
+      val fromAccountID = masterAccounts.Service.getId(releaseAsset.from)
+      for {
+        toAccountID <- toAccountID
+        fromAccountID <- fromAccountID
+      } yield (toAccountID, fromAccountID)
+    }
+
     def onSuccess(ticketID: String, blockResponse: BlockResponse): Future[Unit] = {
-    /*  try {
-        Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
-        val releaseAsset = Service.getTransaction(ticketID)
-        blockchainAssets.Service.markDirty(releaseAsset.pegHash)
-        blockchainAccounts.Service.markDirty(releaseAsset.from)
-        utilitiesNotification.send(masterAccounts.Service.getId(releaseAsset.to), constants.Notification.SUCCESS, blockResponse.txhash)
-        utilitiesNotification.send(masterAccounts.Service.getId(releaseAsset.from), constants.Notification.SUCCESS, blockResponse.txhash)
-      }
-      catch {
-        case baseException: BaseException => logger.error(baseException.failure.message, baseException)
-          throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      }*/
+
       val markTransactionSuccessful=Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
       val releaseAsset = Service.getTransaction(ticketID)
       def markDirty(releaseAsset:ReleaseAsset)={
@@ -192,22 +190,14 @@ class ReleaseAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.T
           _<-markDirtyFrom
         }yield {}
       }
-      def addresses(releaseAsset:ReleaseAsset)={
-        val to=masterAccounts.Service.getId(releaseAsset.to)
-        val from=masterAccounts.Service.getId(releaseAsset.from)
-        for{
-          to<-to
-          from<-from
-        }yield (to,from)
-      }
       (for{
         _<-markTransactionSuccessful
         releaseAsset<-releaseAsset
         _<-markDirty(releaseAsset)
-        (to,from)<-addresses(releaseAsset)
+        (toAccountID, fromAccountID) <- getIDs(releaseAsset)
       }yield {
-        utilitiesNotification.send(to, constants.Notification.SUCCESS, blockResponse.txhash)
-        utilitiesNotification.send(from, constants.Notification.SUCCESS, blockResponse.txhash)
+        utilitiesNotification.send(toAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
+        utilitiesNotification.send(fromAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
       }).recover{
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
           throw new BaseException(constants.Response.PSQL_EXCEPTION)
@@ -215,31 +205,16 @@ class ReleaseAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.T
     }
 
     def onFailure(ticketID: String, message: String): Future[Unit] =  {
-     /* try {
-        Service.markTransactionFailed(ticketID, message)
-        val releaseAsset = Service.getTransaction(ticketID)
-        utilitiesNotification.send(masterAccounts.Service.getId(releaseAsset.to), constants.Notification.FAILURE, message)
-        utilitiesNotification.send(masterAccounts.Service.getId(releaseAsset.from), constants.Notification.FAILURE, message)
-      } catch {
-        case baseException: BaseException => logger.error(baseException.failure.message, baseException)
-      }*/
+
       val markTransactionFailed=Service.markTransactionFailed(ticketID, message)
       val releaseAsset = Service.getTransaction(ticketID)
-      def addresses(releaseAsset:ReleaseAsset)={
-        val to=masterAccounts.Service.getId(releaseAsset.to)
-        val from=masterAccounts.Service.getId(releaseAsset.from)
-        for{
-          to<-to
-          from<-from
-        }yield (to,from)
-      }
       (for{
         _<-markTransactionFailed
         releaseAsset<-releaseAsset
-        (to,from)<- addresses(releaseAsset)
+        (toAccountID, fromAccountID) <- getIDs(releaseAsset)
       }yield{
-        utilitiesNotification.send(from, constants.Notification.FAILURE, message)
-        utilitiesNotification.send(to, constants.Notification.FAILURE, message)
+        utilitiesNotification.send(fromAccountID, constants.Notification.FAILURE, message)
+        utilitiesNotification.send(toAccountID, constants.Notification.FAILURE, message)
       }).recover{
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }

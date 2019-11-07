@@ -4,14 +4,12 @@
 @common(Messages(constants.Form.INDEX))(Html(""))(center)(Html(""))
 
 @center = {
-    <div class="flexContainer">
-
-        <div class="flexGrowth flexItem box leftText">
-            <div>
-                <h2 class="showHide toggleElement centerText" onclick="fetchOrShowHide('setACLList', jsRoutes.controllers.SetACLController.organizationViewPendingVerifyTraderRequests(), this)">@Messages(constants.View.PENDING_SET_ACL) </h2>
+    <ul cmuk-accordion="multiple: true" class="flexContainer">
+        <li>
+            <a class="cmuk-accordion-title" href="#" onclick="fetchOrShowHide('setACLList', jsRoutes.controllers.SetACLController.organizationViewPendingVerifyTraderRequests(), this)">@Messages(constants.View.PENDING_SET_ACL)</a>
+            <div class="cmuk-accordion-content">
+                <div id="setACLList" class="flexContainer"></div>
             </div>
-            <div id="setACLList" class="flexContainer">
-            </div>
-        </div>
-    </div>
+        </li>
+    </ul>
 }

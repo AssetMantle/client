@@ -1,10 +1,10 @@
-@import constants.FormField.{NestedFormField, StringFormField}
+@import constants.FormField.{IntFormField, NestedFormField}
 @import helper._
 @import play.api.data.Field
 
-@(formData: Form[_], formField: StringFormField, arguments: (Symbol, Any)*)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, nestedFormField: Option[NestedFormField] = None, sequentialNestedFormfield: Option[Field] = None)
+@(formData: Form[_], formField: IntFormField, arguments: (Symbol, Any)*)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, nestedFormField: Option[NestedFormField] = None, sequentialNestedFormfield: Option[Field] = None)
 
-@defining(Seq('_label -> Messages(formField.name), 'placeholder -> Messages(formField.name), 'class -> "cmuk-input")) { defaultArguments =>
+@defining(Seq('type -> "number", '_label -> Messages(formField.name), 'placeholder -> Messages(formField.name), 'min -> formField.minimumValue, 'max -> formField.maximumValue, 'class -> "cmuk-input")) { defaultArguments =>
     @sequentialNestedFormfield match {
         case Some(field: Field) => {
             @* //This case handles sequential subForms under a nested field. See UserUpdateUBOs for example.*@

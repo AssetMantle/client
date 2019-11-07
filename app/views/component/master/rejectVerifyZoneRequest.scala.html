@@ -1,9 +1,8 @@
 @import controllers.actions.LoginState
-@import helper._
 @import views.html.base._
 @import views.companion.master.RejectVerifyZoneRequest
 
 @(rejectVerifyZoneRequestForm: Form[RejectVerifyZoneRequest.Data] = RejectVerifyZoneRequest.form, zoneID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @commonForm(constants.Form.REJECT_VERIFY_ZONE_REQUEST, rejectVerifyZoneRequestForm) {
-    @inputText(rejectVerifyZoneRequestForm(constants.FormField.ZONE_ID.name).copy(value = Some(zoneID)), '_label -> Messages(constants.FormField.ZONE_ID.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.ZONE_ID.name), 'required -> true)
+    @commonInputText(rejectVerifyZoneRequestForm, constants.FormField.ZONE_ID, 'value -> zoneID)
 }

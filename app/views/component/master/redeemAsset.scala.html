@@ -1,12 +1,11 @@
 @import controllers.actions.LoginState
-@import helper._
 @import views.html.base._
 @import views.companion.master.RedeemAsset
 
 @(redeemAssetForm: Form[RedeemAsset.Data] = RedeemAsset.form, zoneID: String, pegHash: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @commonForm(constants.Form.REDEEM_ASSET, redeemAssetForm) {
-    @inputText(redeemAssetForm(constants.FormField.ZONE_ID.name).copy(value = Some(zoneID)), '_label -> Messages(constants.FormField.ZONE_ID.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.ZONE_ID.name), 'required -> true)
-    @inputText(redeemAssetForm(constants.FormField.PEG_HASH.name).copy(value = Some(pegHash)), '_label -> Messages(constants.FormField.PEG_HASH.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PEG_HASH.name), 'required -> true)
-    @inputText(redeemAssetForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.GAS.name), 'required -> true, 'type -> "number")
-    @inputPassword(redeemAssetForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PASSWORD.name), 'required -> true)
+    @commonInputText(redeemAssetForm, constants.FormField.ZONE_ID, 'value -> zoneID)
+    @commonInputText(redeemAssetForm, constants.FormField.PEG_HASH, 'value -> pegHash)
+    @commonInputInt(redeemAssetForm, constants.FormField.GAS)
+    @commonInputPassword(redeemAssetForm, constants.FormField.PASSWORD)
 }

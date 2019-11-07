@@ -1,13 +1,12 @@
 @import controllers.actions.LoginState
-@import helper._
 @import views.html.base._
 @import views.companion.master.SetBuyerFeedback
 
 @(setBuyerFeedbackForm: Form[SetBuyerFeedback.Data] = SetBuyerFeedback.form, sellerAddress: String, pegHash: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @commonForm(constants.Form.SET_BUYER_FEEDBACK, setBuyerFeedbackForm) {
-    @inputText(setBuyerFeedbackForm(constants.FormField.SELLER_ADDRESS.name).copy(value = Some(sellerAddress)), '_label -> Messages(constants.FormField.SELLER_ADDRESS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.SELLER_ADDRESS.name), 'required -> true)
-    @inputText(setBuyerFeedbackForm(constants.FormField.PEG_HASH.name).copy(value = Some(pegHash)), '_label -> Messages(constants.FormField.PEG_HASH.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PEG_HASH.name), 'required -> true)
-    @inputText(setBuyerFeedbackForm(constants.FormField.RATING.name), '_label -> Messages(constants.FormField.RATING.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.RATING.name), 'required -> true, 'type -> "number")
-    @inputText(setBuyerFeedbackForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.GAS.name), 'required -> true, 'type -> "number")
-    @inputPassword(setBuyerFeedbackForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PASSWORD.name), 'required -> true)
+    @commonInputText(setBuyerFeedbackForm, constants.FormField.SELLER_ADDRESS, 'value -> sellerAddress)
+    @commonInputText(setBuyerFeedbackForm, constants.FormField.PEG_HASH, 'value -> pegHash)
+    @commonInputInt(setBuyerFeedbackForm, constants.FormField.RATING)
+    @commonInputInt(setBuyerFeedbackForm, constants.FormField.GAS)
+    @commonInputPassword(setBuyerFeedbackForm, constants.FormField.PASSWORD)
 }

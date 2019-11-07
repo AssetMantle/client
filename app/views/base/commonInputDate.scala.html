@@ -1,5 +1,26 @@
+@import constants.FormField.{DateFormField, NestedFormField}
 @import helper._
+@import play.api.data.Field
 
-@(formData: Form[_], keyName: String, fieldClass: Option[String] = None, fieldID: Option[String] = None, required: Boolean = true)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(formData: Form[_], formField: DateFormField, arguments: (Symbol, Any)*)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, nestedFormField: Option[NestedFormField] = None, sequentialNestedFormfield: Option[Field] = None)
 
-@inputDate(formData(keyName), '_label -> Messages(keyName), 'placeholder -> Messages(keyName), 'id -> fieldID.getOrElse(keyName), 'class -> fieldClass.getOrElse("cmuk-input"), 'required -> required)
+@defining(Seq('_label -> Messages(formField.name), 'placeholder -> Messages(formField.name), 'class -> "cmuk-input")) { defaultArguments =>
+    @sequentialNestedFormfield match {
+        case Some(field: Field) => {
+            @* //This case handles sequential subForms under a nested field. See UserUpdateUBOs for example.*@
+            @inputDate(field.apply(formField.name).copy(value = arguments.toMap.get('value).map(_.toString)), defaultArguments ++ arguments: _*)
+        }
+        case None => {
+            @nestedFormField match {
+                case Some(field: NestedFormField) => {
+                    @* //This case handles nested fields. See AddOrganization for example.*@
+                    @inputDate(formData(Seq(field.name, formField.name).mkString(".")).copy(value = arguments.toMap.get('value).map(_.toString)), defaultArguments ++ arguments: _*)
+                }
+                case None => {
+                    @* //This case handles generic fields.*@
+                    @inputDate(formData(formField.name).copy(value = arguments.toMap.get('value).map(_.toString)), defaultArguments ++ arguments: _*)
+                }
+            }
+        }
+    }
+}

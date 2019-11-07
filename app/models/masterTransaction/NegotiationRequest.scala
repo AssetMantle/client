@@ -176,9 +176,9 @@ class NegotiationRequests @Inject()(protected val databaseConfigProvider: Databa
 
     def getNegotiationByID(id: String): Future[NegotiationRequest] = find(id)
 
-    def updateNegotiationID(negotiationID: String, buyerAccountID: String, pegHash: String): Int = Await.result(updateNegotiationIDByBuyerAccountIDAndPegHash(Option(negotiationID), buyerAccountID, pegHash), Duration.Inf)
+    def updateNegotiationID(negotiationID: String, buyerAccountID: String, pegHash: String): Future[Int] = updateNegotiationIDByBuyerAccountIDAndPegHash(Option(negotiationID), buyerAccountID, pegHash)
 
-    def updateAmountForNegotiationID(negotiationID: String, amount: Int): Int = Await.result(updateAmountByNegotiationID(negotiationID, amount), Duration.Inf)
+    def updateAmountForNegotiationID(negotiationID: String, amount: Int): Future[Int] = updateAmountByNegotiationID(negotiationID, amount)
 
     def updateAmountForID(id: String, amount: Int): Future[Int] = updateAmountByID(id, amount)
 

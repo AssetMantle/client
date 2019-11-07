@@ -1,18 +1,21 @@
 @import controllers.actions.LoginState
-@import helper._
 @import views.companion.master.AddUBOs
 @import views.html.base._
+@import helper._
 
 @(addUBOsForm: Form[AddUBOs.Data] = AddUBOs.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
 @commonForm(constants.Form.USER_UPDATE_UBOS, addUBOsForm) {
     @repeatWithIndex(addUBOsForm(constants.Form.UBOS), min = addUBOsForm(constants.Form.UBOS).indexes.length + 1) { (uboForm, i) =>
-        <div id='@Seq(constants.Form.UBO, i).mkString("")'>
-            @inputText(uboForm(constants.FormField.PERSON_NAME.name), '_label -> Messages(constants.FormField.PERSON_NAME.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PERSON_NAME.name), 'required -> false)
-            @inputText(uboForm(constants.FormField.SHARE_PERCENTAGE.name), '_label -> Messages(constants.FormField.SHARE_PERCENTAGE.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.SHARE_PERCENTAGE.name), 'required -> false)
-            @inputText(uboForm(constants.FormField.RELATIONSHIP.name), '_label -> Messages(constants.FormField.RELATIONSHIP.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.RELATIONSHIP.name), 'required -> false)
-            @inputText(uboForm(constants.FormField.TITLE.name), '_label -> Messages(constants.FormField.TITLE.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.TITLE.name), 'required -> false)
-            <button type="button" class="cmuk-button cmuk-button-primary" onclick="deleteElementBySource(this)">@Messages(constants.Form.DELETE)</button>
-        </div>
+        @defining(Option(uboForm)) { implicit uboFormField =>
+            <div id='@Seq(constants.Form.UBOS, i).mkString("_")'>
+                @commonInputText(addUBOsForm, constants.FormField.PERSON_NAME)
+                @commonInputDouble(addUBOsForm, constants.FormField.SHARE_PERCENTAGE)
+                @commonInputText(addUBOsForm, constants.FormField.RELATIONSHIP)
+                @commonInputText(addUBOsForm, constants.FormField.TITLE)
+                <button type="button" class="cmuk-button cmuk-button-link" onclick="deleteElementBySource(this)">@Messages(constants.Form.DELETE)</button>
+            </div>
+        }
+
     }
 }
 <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.AddOrganizationController.addOrganizationForm())">@Messages(constants.Form.BACK)</button>

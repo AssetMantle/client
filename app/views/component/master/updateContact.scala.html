@@ -1,11 +1,10 @@
 @import controllers.actions.LoginState
-@import helper._
 @import views.html.base._
 @import views.companion.master.UpdateContact
 
-@(updateContactForm: Form[UpdateContact.Data] = UpdateContact.form, countryCallingCodes: Seq[(String, String)])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@(updateContactForm: Form[UpdateContact.Data] = UpdateContact.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @commonForm(constants.Form.UPDATE_CONTACT, updateContactForm) {
-    @inputText(updateContactForm(constants.FormField.MOBILE_NUMBER.name), '_label -> Messages(constants.FormField.MOBILE_NUMBER.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.MOBILE_NUMBER.name), 'required -> true)
-    @inputText(updateContactForm(constants.FormField.EMAIL_ADDRESS.name), '_label -> Messages(constants.FormField.EMAIL_ADDRESS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.EMAIL_ADDRESS.name), 'required -> true)
-    @select(updateContactForm(constants.FormField.COUNTRY_CODE.name), options = countryCallingCodes, '_label -> Messages(constants.FormField.COUNTRY_CODE.name))
+    @commonInputText(updateContactForm, constants.FormField.MOBILE_NUMBER)
+    @commonInputText(updateContactForm, constants.FormField.EMAIL_ADDRESS)
+    @commonSelect(updateContactForm, constants.FormField.COUNTRY_CODE)
 }

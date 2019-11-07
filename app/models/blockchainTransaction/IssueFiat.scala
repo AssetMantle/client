@@ -1,7 +1,5 @@
 package models.blockchainTransaction
 
-import java.net.ConnectException
-
 import akka.actor.ActorSystem
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
@@ -11,12 +9,11 @@ import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
-import queries.responses.AccountResponse.Response
 import slick.jdbc.JdbcProfile
 import transactions.responses.TransactionResponse.BlockResponse
 
 import scala.concurrent.duration._
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 case class IssueFiat(from: String, to: String, transactionID: String, transactionAmount: Int, gas: Int, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None) extends BaseTransaction[IssueFiat] {
@@ -30,12 +27,9 @@ class IssueFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_ISSUE_FIAT
 
   private implicit val logger: Logger = Logger(this.getClass)
-
-  private val schedulerExecutionContext:ExecutionContext= actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
-
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
-
   val db = databaseConfig.db
+  private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
 
   import databaseConfig.profile.api._
 
@@ -131,7 +125,7 @@ class IssueFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
 
   private[models] class IssueFiatTable(tag: Tag) extends Table[IssueFiat](tag, "IssueFiat") {
 
-    def * = (from, to, transactionID, transactionAmount, gas,status.?, txHash.?, ticketID, mode, code.?) <> (IssueFiat.tupled, IssueFiat.unapply)
+    def * = (from, to, transactionID, transactionAmount, gas, status.?, txHash.?, ticketID, mode, code.?) <> (IssueFiat.tupled, IssueFiat.unapply)
 
     def from = column[String]("from")
 
@@ -156,7 +150,7 @@ class IssueFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
 
   object Service {
 
-    def create(issueFiat: IssueFiat): Future[String] =add(IssueFiat(from = issueFiat.from, to = issueFiat.to, transactionID = issueFiat.transactionID, transactionAmount = issueFiat.transactionAmount, gas=issueFiat.gas,status = issueFiat.status, txHash = issueFiat.txHash, ticketID = issueFiat.ticketID, mode = issueFiat.mode, code = issueFiat.code))
+    def create(issueFiat: IssueFiat): Future[String] = add(IssueFiat(from = issueFiat.from, to = issueFiat.to, transactionID = issueFiat.transactionID, transactionAmount = issueFiat.transactionAmount, gas = issueFiat.gas, status = issueFiat.status, txHash = issueFiat.txHash, ticketID = issueFiat.ticketID, mode = issueFiat.mode, code = issueFiat.code))
 
     def markTransactionSuccessful(ticketID: String, txHash: String): Future[Int] = updateTxHashAndStatusOnTicketID(ticketID, Option(txHash), status = Option(true))
 
@@ -175,79 +169,58 @@ class IssueFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
   }
 
   object Utility {
-    def onSuccess(ticketID: String, blockResponse: BlockResponse): Future[Unit] =  {
-     /* try {
-        Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
-        val issueFiat = Service.getTransaction(ticketID)
-        Thread.sleep(sleepTime)
-        getAccount.Service.get(issueFiat.to).value.fiatPegWallet.foreach(fiats => fiats.foreach(fiatPeg => blockchainFiats.Service.insertOrUpdate(fiatPeg.pegHash, issueFiat.to, fiatPeg.transactionID, fiatPeg.transactionAmount, fiatPeg.redeemedAmount, dirtyBit = true)))
-        blockchainAccounts.Service.markDirty(issueFiat.from)
-        utilitiesNotification.send(masterAccounts.Service.getId(issueFiat.to), constants.Notification.SUCCESS, blockResponse.txhash)
-        utilitiesNotification.send(masterAccounts.Service.getId(issueFiat.from), constants.Notification.SUCCESS, blockResponse.txhash)
-      }
-      catch {
-        case baseException: BaseException => logger.error(baseException.failure.message, baseException)
-          throw new BaseException(constants.Response.PSQL_EXCEPTION)
-        case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
-      }*/
+    def onSuccess(ticketID: String, blockResponse: BlockResponse): Future[Unit] = {
 
-      val markTransactionSuccessful=Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
+      val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
       val issueFiat = Service.getTransaction(ticketID)
       Thread.sleep(sleepTime)
-      def response(issueFiat:IssueFiat)=getAccount.Service.get(issueFiat.to)
-      def markDirty(issueFiat:IssueFiat)=blockchainAccounts.Service.markDirty(issueFiat.from)
-      def addresses(issueFiat:IssueFiat)={
-        val to=masterAccounts.Service.getId(issueFiat.to)
-        val from=masterAccounts.Service.getId(issueFiat.from)
-        for{
-          to<-to
-          from<-from
-        }yield (to,from)
+
+      def account(issueFiat: IssueFiat) = getAccount.Service.get(issueFiat.to)
+
+      def insertOrUpdate(account: queries.responses.AccountResponse.Response, issueFiat: IssueFiat) = Future {
+        account.value.fiatPegWallet.foreach(fiats => fiats.foreach(fiatPeg => blockchainFiats.Service.insertOrUpdate(fiatPeg.pegHash, issueFiat.to, fiatPeg.transactionID, fiatPeg.transactionAmount, fiatPeg.redeemedAmount, dirtyBit = true)))
       }
-      for{
-        _<-markTransactionSuccessful
-        issueFiat<-issueFiat
-        response<-response(issueFiat)
-        _<-markDirty(issueFiat)
-        (to,from)<-addresses(issueFiat)
-      }yield{
-        response.value.fiatPegWallet.foreach(fiats => fiats.foreach(fiatPeg => blockchainFiats.Service.insertOrUpdate(fiatPeg.pegHash, issueFiat.to, fiatPeg.transactionID, fiatPeg.transactionAmount, fiatPeg.redeemedAmount, dirtyBit = true)))
-        utilitiesNotification.send(to, constants.Notification.SUCCESS, blockResponse.txhash)
-        utilitiesNotification.send(from, constants.Notification.SUCCESS, blockResponse.txhash)
+
+      def markDirty(issueFiat: IssueFiat) = blockchainAccounts.Service.markDirty(issueFiat.from)
+
+      for {
+        _ <- markTransactionSuccessful
+        issueFiat <- issueFiat
+        account <- account(issueFiat)
+        _ <- insertOrUpdate(account, issueFiat)
+        _ <- markDirty(issueFiat)
+        (toAccountID, fromAccountID) <- getIDs(issueFiat)
+      } yield {
+        utilitiesNotification.send(toAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
+        utilitiesNotification.send(fromAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
 
       }
     }
 
-    def onFailure(ticketID: String, message: String): Future[Unit] =  {
-     /* try {
-        Service.markTransactionFailed(ticketID, message)
-        val issueFiat = Service.getTransaction(ticketID)
-        utilitiesNotification.send(masterAccounts.Service.getId(issueFiat.to), constants.Notification.FAILURE, message)
-        utilitiesNotification.send(masterAccounts.Service.getId(issueFiat.from), constants.Notification.FAILURE, message)
-      } catch {
-        case baseException: BaseException => logger.error(baseException.failure.message, baseException)
-      }*/
-      val markTransactionFailed=Service.markTransactionFailed(ticketID, message)
+    def onFailure(ticketID: String, message: String): Future[Unit] = {
+
+      val markTransactionFailed = Service.markTransactionFailed(ticketID, message)
       val issueFiat = Service.getTransaction(ticketID)
-      def addresses(issueFiat:IssueFiat)={
-        val to=masterAccounts.Service.getId(issueFiat.to)
-        val from=masterAccounts.Service.getId(issueFiat.from)
-        for{
-          to<-to
-          from<-from
-        }yield (to,from)
-      }
-      (for{
-        _<-markTransactionFailed
-        issueFiat<-issueFiat
-        (to,from) <-  addresses(issueFiat)
-      }yield{
-        utilitiesNotification.send(to, constants.Notification.FAILURE, message)
-        utilitiesNotification.send(from, constants.Notification.FAILURE, message)
-      }).recover{
+      (for {
+        _ <- markTransactionFailed
+        issueFiat <- issueFiat
+        (toAccountID, fromAccountID) <- getIDs(issueFiat)
+      } yield {
+        utilitiesNotification.send(toAccountID, constants.Notification.FAILURE, message)
+        utilitiesNotification.send(fromAccountID, constants.Notification.FAILURE, message)
+      }).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
 
+    }
+
+    def getIDs(issueFiat: IssueFiat) = {
+      val toAccountID = masterAccounts.Service.getId(issueFiat.to)
+      val fromAccountID = masterAccounts.Service.getId(issueFiat.from)
+      for {
+        toAccountID <- toAccountID
+        fromAccountID <- fromAccountID
+      } yield (toAccountID, fromAccountID)
     }
   }
 

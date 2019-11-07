@@ -167,14 +167,24 @@ class AddZones @Inject()(actorSystem: ActorSystem, transaction: utilities.Transa
   }
 
   object Utility {
-    def onSuccess(ticketID: String, blockResponse: BlockResponse): Future[Unit] = Future {
+    def getIDs(addZone: AddZone) = {
+      val toAccountID = masterAccounts.Service.getId(addZone.to)
+      val fromAccountID = masterAccounts.Service.getId(addZone.from)
+      for {
+        toAccountID <- toAccountID
+        fromAccountID <- fromAccountID
+      } yield (toAccountID, fromAccountID)
+    }
+
+
+    def onSuccess(ticketID: String, blockResponse: BlockResponse) =  {
 
       val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
       val addZone = Service.getTransaction(ticketID)
       def getResult(addZone:AddZone)={
         val create=blockchainZones.Service.create(addZone.zoneID, addZone.to, dirtyBit = true)
         val verifyZone=masterZones.Service.verifyZone(addZone.zoneID)
-        val toAccountId = masterAccounts.Service.getId(addZone.to)
+
         def updateUserTypeOnAddress= masterAccounts.Service.updateUserTypeOnAddress(addZone.to, constants.User.ZONE)
         def markDirty= blockchainAccounts.Service.markDirty(addZone.from)
 
@@ -183,11 +193,10 @@ class AddZones @Inject()(actorSystem: ActorSystem, transaction: utilities.Transa
           _ <- verifyZone
           _<-updateUserTypeOnAddress
           _<- markDirty
-          toAccountId <- toAccountId
-          addZoneFrom <-  masterAccounts.Service.getId(addZone.from)
+          (toAccountID, fromAccountID)<-getIDs(addZone)
         }yield{
-          utilitiesNotification.send(toAccountId, constants.Notification.SUCCESS, blockResponse.txhash)
-          utilitiesNotification.send(addZoneFrom, constants.Notification.SUCCESS, blockResponse.txhash)
+          utilitiesNotification.send(toAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
+          utilitiesNotification.send(fromAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
         }
       }
 
@@ -201,20 +210,17 @@ class AddZones @Inject()(actorSystem: ActorSystem, transaction: utilities.Transa
       }
     }
 
-    def onFailure(ticketID: String, message: String): Future[Unit] = Future {
+    def onFailure(ticketID: String, message: String) =  {
 
       val markTransactionFailed=Service.markTransactionFailed(ticketID, message)
       val addZone = Service.getTransaction(ticketID)
-      def toAccountId(addZone: AddZone)=masterAccounts.Service.getId(addZone.to)
-      def fromAccountId(addZone: AddZone)=masterAccounts.Service.getId(addZone.from)
       (for{
         _<- markTransactionFailed
         addZone<- addZone
-        toAccountID<-toAccountId(addZone)
-        fromAccountId<-fromAccountId(addZone)
+        (toAccountID, fromAccountID)<-getIDs(addZone)
       }yield{
         utilitiesNotification.send(toAccountID, constants.Notification.FAILURE, message)
-        utilitiesNotification.send(fromAccountId, constants.Notification.FAILURE, message)
+        utilitiesNotification.send(fromAccountID, constants.Notification.FAILURE, message)
 
       }).recover{
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)

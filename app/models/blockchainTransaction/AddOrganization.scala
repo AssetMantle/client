@@ -179,17 +179,17 @@ class AddOrganizations @Inject()(actorSystem: ActorSystem, transaction: utilitie
 
         def updateUserType(organizationAccountId:String)= masterAccounts.Service.updateUserType(organizationAccountId, constants.User.ORGANIZATION)
         def markDirty= blockchainAccounts.Service.markDirty(addOrganization.from)
-
+        def fromAccountID(address:String)=masterAccounts.Service.getId(addOrganization.from)
         for{
           _ <- create
           _ <- verifyOrganization
           organizationAccountId <- organizationAccountId
           _<-updateUserType(organizationAccountId)
           _<- markDirty
-          accountIDFrom <-  masterAccounts.Service.getId(addOrganization.from)
+          fromAccountID <- fromAccountID(addOrganization.from)
         }yield{
           utilitiesNotification.send(organizationAccountId, constants.Notification.SUCCESS, blockResponse.txhash)
-          utilitiesNotification.send(accountIDFrom, constants.Notification.SUCCESS, blockResponse.txhash)
+          utilitiesNotification.send(fromAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
         }
       }
 
@@ -201,23 +201,27 @@ class AddOrganizations @Inject()(actorSystem: ActorSystem, transaction: utilitie
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
           throw new BaseException(constants.Response.PSQL_EXCEPTION)
       }
-
     }
 
     def onFailure(ticketID: String, message: String)=  {
 
       val markTransactionFailed= Service.markTransactionFailed(ticketID, message)
       val addOrganization = Service.getTransaction(ticketID)
-      def toAccountId(addOrganization: AddOrganization)= masterAccounts.Service.getId(addOrganization.to)
-      def fromAccountId(addOrganization: AddOrganization)=masterAccounts.Service.getId(addOrganization.from)
+      def getIDs(addOrganization: AddOrganization) = {
+        val toAccountID = masterAccounts.Service.getId(addOrganization.to)
+        val fromAccountID = masterAccounts.Service.getId(addOrganization.from)
+        for {
+          toAccountID <- toAccountID
+          fromAccountID <- fromAccountID
+        } yield (toAccountID, fromAccountID)
+      }
       (for{
         _<- markTransactionFailed
         addOrganization<-addOrganization
-       toAccountId<-toAccountId(addOrganization)
-        fromAccountId<-fromAccountId(addOrganization)
+        (toAccountID, fromAccountID)<- getIDs(addOrganization)
       }yield{
-        utilitiesNotification.send(toAccountId, constants.Notification.FAILURE, message)
-        utilitiesNotification.send(fromAccountId, constants.Notification.FAILURE, message)
+        utilitiesNotification.send(toAccountID, constants.Notification.FAILURE, message)
+        utilitiesNotification.send(fromAccountID, constants.Notification.FAILURE, message)
       }).recover{
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }

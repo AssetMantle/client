@@ -1,6 +1,29 @@
+@import constants.FormField.{BooleanFormField, NestedFormField}
 @import helper._
+@import play.api.data.Field
 
-@(formData: Form[_], keyName: String, fieldClass: Option[String] = None, fieldID: Option[String] = None)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+@(formData: Form[_], formField: BooleanFormField, arguments: (Symbol, Any)*)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, nestedFormField: Option[NestedFormField] = None, sequentialNestedFormfield: Option[Field] = None)
 
-@Messages(keyName)
-@checkbox(formData(keyName), '_label -> Messages(keyName), 'id -> fieldID.getOrElse(keyName), 'class -> fieldClass.getOrElse("cmuk-checkbox"))
+<div class='@arguments.toMap.get('containerDivClass).map(_.toString).getOrElse("")'>
+    @Messages(formField.name)
+    @defining(Seq('_label -> Messages(formField.name), 'class -> "cmuk-checkbox")) { defaultArguments =>
+        @sequentialNestedFormfield match {
+            case Some(field: Field) => {
+                @* //This case handles sequential subForms under a nested field. See UserUpdateUBOs for example.*@
+                @checkbox(field.apply(formField.name), defaultArguments ++ arguments: _*)
+            }
+            case None => {
+                @nestedFormField match {
+                    case Some(field: NestedFormField) => {
+                        @* //This case handles nested fields. See AddOrganization for example.*@
+                        @checkbox(formData(Seq(field.name, formField.name).mkString(".")), defaultArguments ++ arguments: _*)
+                    }
+                    case None => {
+                        @* //This case handles generic fields.*@
+                        @checkbox(formData(formField.name), defaultArguments ++ arguments: _*)
+                    }
+                }
+            }
+        }
+    }
+</div>

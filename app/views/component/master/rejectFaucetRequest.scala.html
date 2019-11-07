@@ -1,10 +1,9 @@
 @import controllers.actions.LoginState
-@import helper._
 @import views.html.base._
 @import views.companion.master.RejectFaucetRequest
 
 @(rejectFaucetRequestForm: Form[RejectFaucetRequest.Data] = RejectFaucetRequest.form, requestID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @commonForm(constants.Form.REJECT_FAUCET_REQUEST, rejectFaucetRequestForm) {
-    @inputText(rejectFaucetRequestForm(constants.FormField.REQUEST_ID.name).copy(value = Some(requestID)), '_label -> Messages(constants.FormField.REQUEST_ID.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.REQUEST_ID.name), 'required -> true)
-    @inputText(rejectFaucetRequestForm(constants.FormField.COMMENT.name), '_label -> Messages(constants.FormField.COMMENT.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.COMMENT.name), 'required -> true)
+    @commonInputText(rejectFaucetRequestForm, constants.FormField.REQUEST_ID, 'value -> requestID)
+    @commonInputText(rejectFaucetRequestForm, constants.FormField.COMMENT)
 }

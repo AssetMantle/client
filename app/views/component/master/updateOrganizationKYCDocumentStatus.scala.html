@@ -1,6 +1,6 @@
 @import controllers.actions.LoginState
-@import helper._
 @import views.html.base._
+@import helper._
 @import models.master.OrganizationKYC
 @import views.companion.master.UpdateOrganizationKYCDocumentStatus
 
@@ -10,9 +10,9 @@
 <div id="@Seq(organizationKYC.id, organizationKYC.documentType).mkString("")">
 @form(action = routes.AddOrganizationController.updateOrganizationKYCDocumentStatus, 'onkeypress -> "submitFormOnEnter(event,this)") {
     @CSRF.formField
-    @inputText(updateOrganizationKYCDocumentStatusForm(constants.FormField.ORGANIZATION_ID.name).copy(value = Some(organizationKYC.id)), '_label -> Messages(constants.FormField.ORGANIZATION_ID.name), 'placeholder -> Messages(constants.FormField.ORGANIZATION_ID.name), 'required -> true, 'class -> "hidden", 'readonly -> true)
-    @inputText(updateOrganizationKYCDocumentStatusForm(constants.FormField.DOCUMENT_TYPE.name).copy(value = Some(organizationKYC.documentType)), '_label -> Messages(constants.FormField.DOCUMENT_TYPE.name), 'placeholder -> Messages(constants.FormField.DOCUMENT_TYPE.name), 'required -> true, 'class -> "hidden", 'readonly -> true)
-    @checkbox(updateOrganizationKYCDocumentStatusForm(constants.FormField.STATUS.name), '_label -> Messages(constants.FormField.STATUS.name), 'class -> "hidden", 'placeholder -> Messages(constants.FormField.STATUS.name), 'required -> true, 'id -> Seq(organizationKYC.id, organizationKYC.documentType, constants.FormField.STATUS.name).mkString(""))
+    @commonInputText(updateOrganizationKYCDocumentStatusForm, constants.FormField.ORGANIZATION_ID, 'value -> organizationKYC.id, 'class -> "hidden", 'readonly -> true)
+    @commonInputText(updateOrganizationKYCDocumentStatusForm, constants.FormField.DOCUMENT_TYPE, 'value -> organizationKYC.documentType, 'class -> "hidden", 'readonly -> true)
+    @commonCheckbox(updateOrganizationKYCDocumentStatusForm, constants.FormField.STATUS, 'containerDivClass -> "hidden", 'id -> Seq(organizationKYC.id, organizationKYC.documentType, constants.FormField.STATUS.name).mkString(""))
 
     @if(updateOrganizationKYCDocumentStatusForm.hasGlobalErrors) {
         <ul>
@@ -26,16 +26,16 @@
             case Some(status: Boolean) => {
                 @if(status) {
                     <span cmuk-icon="check"></span><br>
-                    <button class="cmuk-button cmuk-button-danger cmuk-button-small" onclick="verifyReject(this, '@Seq("#", organizationKYC.id, organizationKYC.documentType).mkString("")', '@Seq(organizationKYC.id, organizationKYC.documentType, constants.FormField.STATUS.name).mkString("")', false)">@Messages(constants.Form.REJECT)</button>
+                    <button type="button" class="cmuk-button cmuk-button-danger cmuk-button-small" onclick="verifyReject(this, '@Seq("#", organizationKYC.id, organizationKYC.documentType).mkString("")', '@Seq(organizationKYC.id, organizationKYC.documentType, constants.FormField.STATUS.name).mkString("")', false)">@Messages(constants.Form.REJECT)</button>
                 } else {
                     <span cmuk-icon="close"></span><br>
-                    <button class="cmuk-button cmuk-button-success cmuk-button-small" onclick="verifyReject(this, '@Seq("#", organizationKYC.id, organizationKYC.documentType).mkString("")', '@Seq(organizationKYC.id, organizationKYC.documentType, constants.FormField.STATUS.name).mkString("")', true)">@Messages(constants.Form.APPROVE)</button>
+                    <button type="button" class="cmuk-button cmuk-button-success cmuk-button-small" onclick="verifyReject(this, '@Seq("#", organizationKYC.id, organizationKYC.documentType).mkString("")', '@Seq(organizationKYC.id, organizationKYC.documentType, constants.FormField.STATUS.name).mkString("")', true)">@Messages(constants.Form.APPROVE)</button>
                 }
             }
             case None => {
                 <br>
-                <button class="cmuk-button cmuk-button-success cmuk-button-small" onclick="verifyReject(this, '@Seq("#", organizationKYC.id, organizationKYC.documentType).mkString("")', '@Seq(organizationKYC.id, organizationKYC.documentType, constants.FormField.STATUS.name).mkString("")', true)">@Messages(constants.Form.APPROVE)</button>
-                <button class="cmuk-button cmuk-button-danger cmuk-button-small" onclick="verifyReject(this, '@Seq("#", organizationKYC.id, organizationKYC.documentType).mkString("")', '@Seq(organizationKYC.id, organizationKYC.documentType, constants.FormField.STATUS.name).mkString("")', false)">@Messages(constants.Form.REJECT)</button>
+                <button type="button" class="cmuk-button cmuk-button-success cmuk-button-small" onclick="verifyReject(this, '@Seq("#", organizationKYC.id, organizationKYC.documentType).mkString("")', '@Seq(organizationKYC.id, organizationKYC.documentType, constants.FormField.STATUS.name).mkString("")', true)">@Messages(constants.Form.APPROVE)</button>
+                <button type="button" class="cmuk-button cmuk-button-danger cmuk-button-small" onclick="verifyReject(this, '@Seq("#", organizationKYC.id, organizationKYC.documentType).mkString("")', '@Seq(organizationKYC.id, organizationKYC.documentType, constants.FormField.STATUS.name).mkString("")', false)">@Messages(constants.Form.REJECT)</button>
             }
         }
 }

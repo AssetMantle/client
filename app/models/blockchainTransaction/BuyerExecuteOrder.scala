@@ -203,7 +203,6 @@ class BuyerExecuteOrders @Inject()(actorSystem: ActorSystem, transaction: utilit
 
           } else Future {Unit}
         }
-
         for{
           _<-markDirtyNegotiationID
           _<-markDirtyBuyerAddressAccount
@@ -212,7 +211,6 @@ class BuyerExecuteOrders @Inject()(actorSystem: ActorSystem, transaction: utilit
           _<- markDirtyFromAddress
         }yield {}
       }
-
       for{
         _<-markTransactionSuccessful
         buyerExecuteOrder<-buyerExecuteOrder
@@ -223,7 +221,6 @@ class BuyerExecuteOrders @Inject()(actorSystem: ActorSystem, transaction: utilit
         utilitiesNotification.send(sellerAddressID, constants.Notification.SUCCESS, blockResponse.txhash)
         utilitiesNotification.send(buyerAddressID, constants.Notification.SUCCESS, blockResponse.txhash)
       }
-
     }
 
     def onFailure(ticketID: String, message: String): Future[Unit] = {

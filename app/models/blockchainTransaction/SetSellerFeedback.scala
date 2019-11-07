@@ -172,6 +172,14 @@ class SetSellerFeedbacks @Inject()(actorSystem: ActorSystem, transaction: utilit
   }
 
   object Utility {
+    def getIDs(setSellerFeedback:SetSellerFeedback) = {
+      val toAccountID = masterAccounts.Service.getId(setSellerFeedback.to)
+      val fromAccountID = masterAccounts.Service.getId(setSellerFeedback.from)
+      for {
+        toAccountID <- toAccountID
+        fromAccountID <- fromAccountID
+      } yield (toAccountID, fromAccountID)
+    }
     def addresses(setSellerFeedback:SetSellerFeedback)={
       val to=masterAccounts.Service.getId(setSellerFeedback.to)
       val from=masterAccounts.Service.getId(setSellerFeedback.from)
@@ -181,19 +189,8 @@ class SetSellerFeedbacks @Inject()(actorSystem: ActorSystem, transaction: utilit
       }yield (to,from)
     }
 
-    def onSuccess(ticketID: String, blockResponse: BlockResponse): Future[Unit] = Future {
-      /*try {
-        Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
-        val setSellerFeedback = Service.getTransaction(ticketID)
-        blockchainTraderFeedbackHistories.Service.update(setSellerFeedback.to, setSellerFeedback.to, setSellerFeedback.from, setSellerFeedback.pegHash, setSellerFeedback.rating.toString)
-        blockchainAccounts.Service.markDirty(setSellerFeedback.from)
-        utilitiesNotification.send(masterAccounts.Service.getId(setSellerFeedback.to), constants.Notification.SUCCESS, blockResponse.txhash)
-        utilitiesNotification.send(masterAccounts.Service.getId(setSellerFeedback.from), constants.Notification.SUCCESS, blockResponse.txhash)
-      } catch {
-        case baseException: BaseException => logger.error(baseException.failure.message, baseException)
-          throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      }
-*/
+    def onSuccess(ticketID: String, blockResponse: BlockResponse): Future[Unit] = {
+
       val markTransactionSuccessful= Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
       val setSellerFeedback = Service.getTransaction(ticketID)
       def updateAndMarkDirty(setSellerFeedback:SetSellerFeedback)={
@@ -208,10 +205,10 @@ class SetSellerFeedbacks @Inject()(actorSystem: ActorSystem, transaction: utilit
         _<-markTransactionSuccessful
         setSellerFeedback<-setSellerFeedback
         _<-updateAndMarkDirty(setSellerFeedback)
-        (to,from)<-addresses(setSellerFeedback)
+        (toAccountID, fromAccountID)<-getIDs(setSellerFeedback)
       }yield {
-        utilitiesNotification.send(to, constants.Notification.SUCCESS, blockResponse.txhash)
-        utilitiesNotification.send(from, constants.Notification.SUCCESS, blockResponse.txhash)
+        utilitiesNotification.send(toAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
+        utilitiesNotification.send(fromAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
 
       }).recover{
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
@@ -220,23 +217,16 @@ class SetSellerFeedbacks @Inject()(actorSystem: ActorSystem, transaction: utilit
     }
 
     def onFailure(ticketID: String, message: String): Future[Unit] = Future {
-     /* try {
-        Service.markTransactionFailed(ticketID, message)
-        val setSellerFeedback = Service.getTransaction(ticketID)
-        utilitiesNotification.send(masterAccounts.Service.getId(setSellerFeedback.to), constants.Notification.FAILURE, message)
-        utilitiesNotification.send(masterAccounts.Service.getId(setSellerFeedback.from), constants.Notification.FAILURE, message)
-      } catch {
-        case baseException: BaseException => logger.error(baseException.failure.message, baseException)
-      }*/
+
       val markTransactionFailed= Service.markTransactionFailed(ticketID, message)
       val setSellerFeedback = Service.getTransaction(ticketID)
       for{
         _<-markTransactionFailed
         setSellerFeedback<-setSellerFeedback
-        (to,from)<-addresses(setSellerFeedback)
+        (toAccountID, fromAccountID)<-getIDs(setSellerFeedback)
       }yield{
-        utilitiesNotification.send(to, constants.Notification.FAILURE, message)
-        utilitiesNotification.send(from, constants.Notification.FAILURE, message)
+        utilitiesNotification.send(toAccountID, constants.Notification.FAILURE, message)
+        utilitiesNotification.send(fromAccountID, constants.Notification.FAILURE, message)
       }
     }
   }

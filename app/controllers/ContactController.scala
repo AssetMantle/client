@@ -23,7 +23,7 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
   implicit val contactWrites: OWrites[master.Contact] = Json.writes[master.Contact]
 
   def updateContactForm: Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.updateContact(countryCallingCodes = constants.CountryCallingCode.COUNTRY_CODES))
+    Ok(views.html.component.master.updateContact())
   }
 
   def updateContact: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
@@ -31,7 +31,7 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
       UpdateContact.form.bindFromRequest().fold(
         formWithErrors => {
           Future {
-            BadRequest(views.html.component.master.updateContact(formWithErrors, constants.CountryCallingCode.COUNTRY_CODES))
+            BadRequest(views.html.component.master.updateContact(formWithErrors))
           }
         },
         updateContactData => {

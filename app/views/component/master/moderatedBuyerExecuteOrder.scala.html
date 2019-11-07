@@ -1,14 +1,13 @@
 @import controllers.actions.LoginState
-@import helper._
 @import views.html.base._
 @import views.companion.master.ModeratedBuyerExecuteOrder
 
 @(moderatedBuyerExecuteOrderForm: Form[ModeratedBuyerExecuteOrder.Data] = ModeratedBuyerExecuteOrder.form, buyerAddress: String, sellerAddress: String, pegHash: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @commonForm(constants.Form.MODERATED_BUYER_EXECUTE_ORDER, moderatedBuyerExecuteOrderForm) {
-    @inputText(moderatedBuyerExecuteOrderForm(constants.FormField.BUYER_ADDRESS.name).copy(value = Some(buyerAddress)), '_label -> Messages(constants.FormField.BUYER_ADDRESS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.BUYER_ADDRESS.name), 'required -> true)
-    @inputText(moderatedBuyerExecuteOrderForm(constants.FormField.SELLER_ADDRESS.name).copy(value = Some(sellerAddress)), '_label -> Messages(constants.FormField.SELLER_ADDRESS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.SELLER_ADDRESS.name), 'required -> true)
-    @inputText(moderatedBuyerExecuteOrderForm(constants.FormField.FIAT_PROOF_HASH.name), '_label -> Messages(constants.FormField.FIAT_PROOF_HASH.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.FIAT_PROOF_HASH.name), 'required -> true)
-    @inputText(moderatedBuyerExecuteOrderForm(constants.FormField.PEG_HASH.name).copy(value = Some(pegHash)), '_label -> Messages(constants.FormField.PEG_HASH.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PEG_HASH.name), 'required -> true)
-    @inputText(moderatedBuyerExecuteOrderForm(constants.FormField.GAS.name), '_label -> Messages(constants.FormField.GAS.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.GAS.name), 'required -> true, 'type -> "number")
-    @inputPassword(moderatedBuyerExecuteOrderForm(constants.FormField.PASSWORD.name), '_label -> Messages(constants.FormField.PASSWORD.name), 'class -> "cmuk-input", 'placeholder -> Messages(constants.FormField.PASSWORD.name), 'required -> true)
+    @commonInputText(moderatedBuyerExecuteOrderForm, constants.FormField.BUYER_ADDRESS, 'value -> buyerAddress)
+    @commonInputText(moderatedBuyerExecuteOrderForm, constants.FormField.SELLER_ADDRESS, 'value -> sellerAddress)
+    @commonInputText(moderatedBuyerExecuteOrderForm, constants.FormField.FIAT_PROOF_HASH)
+    @commonInputText(moderatedBuyerExecuteOrderForm, constants.FormField.PEG_HASH, 'value -> pegHash)
+    @commonInputInt(moderatedBuyerExecuteOrderForm, constants.FormField.GAS)
+    @commonInputPassword(moderatedBuyerExecuteOrderForm, constants.FormField.PASSWORD)
 }

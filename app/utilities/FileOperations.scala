@@ -118,7 +118,6 @@ object FileOperations {
     Json.toJson(documents.map { doc =>
       DocumentBlockchainDetails(doc.documentType, hashExtractor(doc.fileName))
     }).toString()
-
   }
 
   def hashExtractor(hashedName: String)(implicit executionContext: ExecutionContext): String = {
@@ -132,5 +131,4 @@ object FileOperations {
         throw new BaseException(constants.Response.GENERIC_EXCEPTION)
     }
   }
-
 }

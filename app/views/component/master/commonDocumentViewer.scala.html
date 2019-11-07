@@ -9,10 +9,10 @@
     @if(document.documentType != constants.File.PROFILE_PICTURE) {
         @utilities.FileOperations.fileExtensionFromName(document.fileName) match {
             case constants.File.PNG | constants.File.JPEG | constants.File.JPG => {
-                <a href="@documentLink"><img src="data:image/jpg;base64,@utilities.ImageProcess.decodeImageThumbnailData(document.file.get)" alt="@document.documentType"></a>
+                   <a href="@documentLink"><img src="data:image/jpg;base64,@utilities.ImageProcess.decodeImageThumbnailData(document.file.get)" alt="@document.documentType"></a>
             }
             case _ => {
-                <a href="@documentLink"><img src="@routes.Assets.versioned("images/document.png")" alt="@document.documentType"></a>
+                    <a href="@documentLink"><img src="@routes.Assets.versioned("images/document.png")" alt="@document.documentType"></a>
             }
         }
     }
