@@ -4,7 +4,7 @@ import controllers.actions.WithTraderLoginAction
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import models.{blockchain, blockchainTransaction}
+import models.{blockchain, blockchainTransaction, master}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
@@ -12,7 +12,7 @@ import play.api.{Configuration, Logger}
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class RedeemFiatController @Inject()(messagesControllerComponents: MessagesControllerComponents, transaction: utilities.Transaction, blockchainZones: blockchain.Zones, blockchainACLAccounts: blockchain.ACLAccounts, withTraderLoginAction: WithTraderLoginAction, transactionsRedeemFiat: transactions.RedeemFiat, blockchainTransactionRedeemFiats: blockchainTransaction.RedeemFiats, withUsernameToken: WithUsernameToken)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class RedeemFiatController @Inject()(messagesControllerComponents: MessagesControllerComponents, transaction: utilities.Transaction, masterTraders: master.Traders, blockchainZones: blockchain.Zones, blockchainACLAccounts: blockchain.ACLAccounts, withTraderLoginAction: WithTraderLoginAction, transactionsRedeemFiat: transactions.RedeemFiat, blockchainTransactionRedeemFiats: blockchainTransaction.RedeemFiats, withUsernameToken: WithUsernameToken)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -20,9 +20,9 @@ class RedeemFiatController @Inject()(messagesControllerComponents: MessagesContr
 
   private implicit val module: String = constants.Module.CONTROLLERS_REDEEM_FIAT
 
-  def redeemFiatForm(ownerAddress: String): Action[AnyContent] = Action { implicit request =>
+  def redeemFiatForm(username: String): Action[AnyContent] = Action { implicit request =>
     try {
-      Ok(views.html.component.master.redeemFiat(zoneID = blockchainACLAccounts.Service.get(ownerAddress).zoneID))
+      Ok(views.html.component.master.redeemFiat(views.companion.master.RedeemFiat.form.fill(views.companion.master.RedeemFiat.Data(zoneID = masterTraders.Service.getZoneIDByAccountID(username)))))
     }
     catch {
       case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -33,7 +33,7 @@ class RedeemFiatController @Inject()(messagesControllerComponents: MessagesContr
     implicit request =>
       views.companion.master.RedeemFiat.form.bindFromRequest().fold(
         formWithErrors => {
-          BadRequest(views.html.component.master.redeemFiat(formWithErrors, formWithErrors.data(constants.Form.ZONE_ID)))
+          BadRequest(views.html.component.master.redeemFiat(formWithErrors))
         },
         redeemFiatData => {
           try {

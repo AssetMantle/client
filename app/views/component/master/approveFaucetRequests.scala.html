@@ -2,10 +2,10 @@
 @import views.html.base._
 @import views.companion.master.ApproveFaucetRequest
 
-@(approveFaucetRequestForm: Form[ApproveFaucetRequest.Data] = ApproveFaucetRequest.form, requestID: String, accountID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@(approveFaucetRequestForm: Form[ApproveFaucetRequest.Data] = ApproveFaucetRequest.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @commonForm(constants.Form.APPROVE_FAUCET_REQUEST, approveFaucetRequestForm) {
-    @commonInputText(approveFaucetRequestForm, constants.FormField.REQUEST_ID, 'value -> requestID)
-    @commonInputText(approveFaucetRequestForm, constants.FormField.ACCOUNT_ID, 'value -> accountID)
+    @commonInputText(approveFaucetRequestForm, constants.FormField.REQUEST_ID)
+    @commonInputText(approveFaucetRequestForm, constants.FormField.ACCOUNT_ID)
     @commonInputInt(approveFaucetRequestForm, constants.FormField.GAS)
     @commonInputPassword(approveFaucetRequestForm, constants.FormField.PASSWORD)
 }

@@ -2,8 +2,8 @@
 @import views.html.base._
 @import views.companion.master.RejectIssueFiatRequest
 
-@(rejectIssueFiatRequestForm: Form[RejectIssueFiatRequest.Data] = RejectIssueFiatRequest.form, requestID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@(rejectIssueFiatRequestForm: Form[RejectIssueFiatRequest.Data] = RejectIssueFiatRequest.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @commonForm(constants.Form.REJECT_ISSUE_FIAT_REQUEST, rejectIssueFiatRequestForm) {
-    @commonInputText(rejectIssueFiatRequestForm, constants.FormField.REQUEST_ID, 'value -> requestID)
+    @commonInputText(rejectIssueFiatRequestForm, constants.FormField.REQUEST_ID)
     @commonInputText(rejectIssueFiatRequestForm, constants.FormField.COMMENT)
 }

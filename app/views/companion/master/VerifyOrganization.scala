@@ -14,6 +14,6 @@ object VerifyOrganization {
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(organizationID: String, zoneID: String, gas: Int, password: String)
+  case class Data(organizationID: String, zoneID: String, gas: Int = 0, password: String = "")
 
 }

@@ -2,11 +2,11 @@
 @import views.html.base._
 @import views.companion.master.BuyerExecuteOrder
 
-@(buyerExecuteOrderForm: Form[BuyerExecuteOrder.Data] = BuyerExecuteOrder.form, sellerAddress: String, pegHash: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@(buyerExecuteOrderForm: Form[BuyerExecuteOrder.Data] = BuyerExecuteOrder.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @commonForm(constants.Form.BUYER_EXECUTE_ORDER, buyerExecuteOrderForm) {
-    @commonInputText(buyerExecuteOrderForm, constants.FormField.SELLER_ADDRESS, 'value -> sellerAddress)
+    @commonInputText(buyerExecuteOrderForm, constants.FormField.SELLER_ADDRESS)
     @commonInputText(buyerExecuteOrderForm, constants.FormField.FIAT_PROOF_HASH)
-    @commonInputText(buyerExecuteOrderForm, constants.FormField.PEG_HASH, 'value -> pegHash)
+    @commonInputText(buyerExecuteOrderForm, constants.FormField.PEG_HASH)
     @commonInputInt(buyerExecuteOrderForm, constants.FormField.GAS)
     @commonInputPassword(buyerExecuteOrderForm, constants.FormField.PASSWORD)
 }

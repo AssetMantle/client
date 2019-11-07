@@ -12,6 +12,6 @@ object UpdateOrganizationKYCDocumentStatus {
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(organizationID: String, documentType: String, status: Boolean)
+  case class Data(organizationID: String, documentType: String, status: Boolean = false)
 
 }

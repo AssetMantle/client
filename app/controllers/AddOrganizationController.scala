@@ -231,14 +231,14 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
   }
 
   def verifyOrganizationForm(organizationID: String, zoneID: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.verifyOrganization(organizationID = organizationID, zoneID = zoneID))
+    Ok(views.html.component.master.verifyOrganization(views.companion.master.VerifyOrganization.form.fill(views.companion.master.VerifyOrganization.Data(organizationID = organizationID, zoneID = zoneID))))
   }
 
   def verifyOrganization: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       views.companion.master.VerifyOrganization.form.bindFromRequest().fold(
         formWithErrors => {
-          BadRequest(views.html.component.master.verifyOrganization(formWithErrors, formWithErrors.data(constants.Form.ORGANIZATION_ID), formWithErrors.data(constants.Form.ZONE_ID)))
+          BadRequest(views.html.component.master.verifyOrganization(formWithErrors))
         },
         verifyOrganizationData => {
           try {
@@ -278,7 +278,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
     implicit request =>
       try {
         if (masterZones.Service.getID(loginState.username) == masterOrganizations.Service.getZoneID(organizationID)) {
-          withUsernameToken.Ok(views.html.component.master.updateOrganizationKYCDocumentStatus(organizationKYC = masterOrganizationKYCs.Service.get(id = organizationID, documentType = documentType)))
+          withUsernameToken.Ok(views.html.component.master.updateOrganizationKYCDocumentStatus(updateOrganizationKYCDocumentStatusForm = views.companion.master.UpdateOrganizationKYCDocumentStatus.form.fill(views.companion.master.UpdateOrganizationKYCDocumentStatus.Data(organizationID = organizationID, documentType = documentType)), organizationKYC = masterOrganizationKYCs.Service.get(id = organizationID, documentType = documentType)))
         }
         else {
           Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
@@ -321,14 +321,14 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
   }
 
   def rejectVerifyOrganizationRequestForm(organizationID: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.rejectVerifyOrganizationRequest(organizationID = organizationID))
+    Ok(views.html.component.master.rejectVerifyOrganizationRequest(views.companion.master.RejectVerifyOrganizationRequest.form.fill(views.companion.master.RejectVerifyOrganizationRequest.Data(organizationID = organizationID))))
   }
 
   def rejectVerifyOrganizationRequest(): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       views.companion.master.RejectVerifyOrganizationRequest.form.bindFromRequest().fold(
         formWithErrors => {
-          BadRequest(views.html.component.master.rejectVerifyOrganizationRequest(formWithErrors, formWithErrors.data(constants.Form.ORGANIZATION_ID)))
+          BadRequest(views.html.component.master.rejectVerifyOrganizationRequest(formWithErrors))
         },
         rejectVerifyOrganizationRequestData => {
           try {

@@ -2,12 +2,12 @@
 @import views.html.base._
 @import views.companion.master.ModeratedBuyerExecuteOrder
 
-@(moderatedBuyerExecuteOrderForm: Form[ModeratedBuyerExecuteOrder.Data] = ModeratedBuyerExecuteOrder.form, buyerAddress: String, sellerAddress: String, pegHash: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@(moderatedBuyerExecuteOrderForm: Form[ModeratedBuyerExecuteOrder.Data] = ModeratedBuyerExecuteOrder.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @commonForm(constants.Form.MODERATED_BUYER_EXECUTE_ORDER, moderatedBuyerExecuteOrderForm) {
-    @commonInputText(moderatedBuyerExecuteOrderForm, constants.FormField.BUYER_ADDRESS, 'value -> buyerAddress)
-    @commonInputText(moderatedBuyerExecuteOrderForm, constants.FormField.SELLER_ADDRESS, 'value -> sellerAddress)
+    @commonInputText(moderatedBuyerExecuteOrderForm, constants.FormField.BUYER_ADDRESS)
+    @commonInputText(moderatedBuyerExecuteOrderForm, constants.FormField.SELLER_ADDRESS)
     @commonInputText(moderatedBuyerExecuteOrderForm, constants.FormField.FIAT_PROOF_HASH)
-    @commonInputText(moderatedBuyerExecuteOrderForm, constants.FormField.PEG_HASH, 'value -> pegHash)
+    @commonInputText(moderatedBuyerExecuteOrderForm, constants.FormField.PEG_HASH)
     @commonInputInt(moderatedBuyerExecuteOrderForm, constants.FormField.GAS)
     @commonInputPassword(moderatedBuyerExecuteOrderForm, constants.FormField.PASSWORD)
 }

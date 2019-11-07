@@ -19,16 +19,16 @@ class ReleaseAssetController @Inject()(messagesControllerComponents: MessagesCon
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
   private implicit val module: String = constants.Module.CONTROLLERS_RELEASE_ASSET
-
+  //TODO username instead of address
   def releaseAssetForm(ownerAddress: String, pegHash: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.releaseAsset(ownerAddress = ownerAddress, pegHash = pegHash))
+    Ok(views.html.component.master.releaseAsset(views.companion.master.ReleaseAsset.form.fill(views.companion.master.ReleaseAsset.Data(address = ownerAddress, pegHash = pegHash))))
   }
 
   def releaseAsset(): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       views.companion.master.ReleaseAsset.form.bindFromRequest().fold(
         formWithErrors => {
-          BadRequest(views.html.component.master.releaseAsset(formWithErrors, formWithErrors.data(constants.Form.OWNER_ADDRESS), formWithErrors.data(constants.Form.PEG_HASH)))
+          BadRequest(views.html.component.master.releaseAsset(formWithErrors))
         },
         releaseAssetData => {
           try {
@@ -49,7 +49,7 @@ class ReleaseAssetController @Inject()(messagesControllerComponents: MessagesCon
         }
       )
   }
-
+  //TODO releaseAsset request, it's getting all locked
   def releaseAssetList(): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {

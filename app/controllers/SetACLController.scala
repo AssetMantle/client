@@ -264,7 +264,8 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
     implicit request =>
       try {
         if (masterZones.Service.getID(loginState.username) == masterTraders.Service.getZoneID(traderID)) {
-          withUsernameToken.Ok(views.html.component.master.updateTraderKYCDocumentZoneStatus(traderKYC = masterTraderKYCs.Service.get(id = traderID, documentType = documentType)))
+          val traderKYC = masterTraderKYCs.Service.get(id = traderID, documentType = documentType)
+          withUsernameToken.Ok(views.html.component.master.updateTraderKYCDocumentZoneStatus(updateTraderKYCDocumentZoneStatusForm = views.companion.master.UpdateTraderKYCDocumentZoneStatus.form.fill(views.companion.master.UpdateTraderKYCDocumentZoneStatus.Data(traderID = traderKYC.id, documentType = traderKYC.documentType)), traderKYC = traderKYC))
         }
         else {
           Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
@@ -419,7 +420,8 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
     implicit request =>
       try {
         if (masterOrganizations.Service.getID(loginState.username) == masterTraders.Service.getOrganizationID(traderID)) {
-          withUsernameToken.Ok(views.html.component.master.updateTraderKYCDocumentOrganizationStatus(traderKYC = masterTraderKYCs.Service.get(id = traderID, documentType = documentType)))
+          val traderKYC = masterTraderKYCs.Service.get(id = traderID, documentType = documentType)
+          Ok(views.html.component.master.updateTraderKYCDocumentOrganizationStatus(updateTraderKYCDocumentOrganizationStatusForm = views.companion.master.UpdateTraderKYCDocumentOrganizationStatus.form.fill(views.companion.master.UpdateTraderKYCDocumentOrganizationStatus.Data(traderID = traderKYC.id, documentType = traderKYC.documentType)), traderKYC = traderKYC))
         }
         else {
           Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
@@ -444,7 +446,9 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
             if (masterOrganizations.Service.getID(loginState.username) == masterTraders.Service.getOrganizationID(updateTraderKYCDocumentOrganizationStatusData.traderID)) {
               if (updateTraderKYCDocumentOrganizationStatusData.organizationStatus) {
                 masterTraderKYCs.Service.organizationVerify(id = updateTraderKYCDocumentOrganizationStatusData.traderID, documentType = updateTraderKYCDocumentOrganizationStatusData.documentType)
+                logger.info("1st PASS")
                 utilitiesNotification.send(masterTraders.Service.getAccountId(updateTraderKYCDocumentOrganizationStatusData.traderID), constants.Notification.SUCCESS, Messages(constants.Response.DOCUMENT_APPROVED.message))
+                logger.info("2nd PASS")
               } else {
                 masterTraderKYCs.Service.organizationReject(id = updateTraderKYCDocumentOrganizationStatusData.traderID, documentType = updateTraderKYCDocumentOrganizationStatusData.documentType)
                 utilitiesNotification.send(masterTraders.Service.getAccountId(updateTraderKYCDocumentOrganizationStatusData.traderID), constants.Notification.FAILURE, Messages(constants.Response.DOCUMENT_REJECTED.message))

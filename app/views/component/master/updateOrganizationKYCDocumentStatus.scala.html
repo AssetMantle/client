@@ -8,10 +8,11 @@
 
 <script src="@routes.Assets.versioned("javascripts/verifyReject.js")" type="text/javascript"></script>
 <div id="@Seq(organizationKYC.id, organizationKYC.documentType).mkString("")">
+    @*// No get form is used here, so form.fill cannot be used, inputText used to autofill using copy value *@
 @form(action = routes.AddOrganizationController.updateOrganizationKYCDocumentStatus, 'onkeypress -> "submitFormOnEnter(event,this)") {
     @CSRF.formField
-    @commonInputText(updateOrganizationKYCDocumentStatusForm, constants.FormField.ORGANIZATION_ID, 'value -> organizationKYC.id, 'class -> "hidden", 'readonly -> true)
-    @commonInputText(updateOrganizationKYCDocumentStatusForm, constants.FormField.DOCUMENT_TYPE, 'value -> organizationKYC.documentType, 'class -> "hidden", 'readonly -> true)
+    @inputText(updateOrganizationKYCDocumentStatusForm(constants.FormField.ORGANIZATION_ID.name).copy(value = Some(organizationKYC.id)), 'class -> "hidden", 'readonly -> true)
+    @inputText(updateOrganizationKYCDocumentStatusForm(constants.FormField.DOCUMENT_TYPE.name).copy(value = Some(organizationKYC.documentType)), 'class -> "hidden", 'readonly -> true)
     @commonCheckbox(updateOrganizationKYCDocumentStatusForm, constants.FormField.STATUS, 'containerDivClass -> "hidden", 'id -> Seq(organizationKYC.id, organizationKYC.documentType, constants.FormField.STATUS.name).mkString(""))
 
     @if(updateOrganizationKYCDocumentStatusForm.hasGlobalErrors) {

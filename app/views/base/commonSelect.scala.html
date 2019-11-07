@@ -8,17 +8,17 @@
     @sequentialNestedFormfield match {
         case Some(field: Field) => {
             @* //This case handles sequential subForms under a nested field. See UserUpdateUBOs for example.*@
-            @select(field.apply(formField.name).copy(value = arguments.toMap.get('value).map(_.toString)), for(option <- formField.options) yield (option, Messages(option)), defaultArguments ++ arguments: _*)
+            @select(field.apply(formField.name), for(option <- formField.options) yield (option, Messages(option)), defaultArguments ++ arguments: _*)
         }
         case None => {
             @nestedFormField match {
                 case Some(field: NestedFormField) => {
                     @* //This case handles nested fields. See AddOrganization for example.*@
-                    @select(formData(Seq(field.name, formField.name).mkString(".")).copy(value = arguments.toMap.get('value).map(_.toString)), for(option <- formField.options) yield (option, Messages(option)), defaultArguments ++ arguments: _*)
+                    @select(formData(Seq(field.name, formField.name).mkString(".")), for(option <- formField.options) yield (option, Messages(option)), defaultArguments ++ arguments: _*)
                 }
                 case None => {
                     @* //This case handles generic fields.*@
-                    @select(formData(formField.name).copy(value = arguments.toMap.get('value).map(_.toString)), for(option <- formField.options) yield (option, Messages(option)), defaultArguments ++ arguments: _*)
+                    @select(formData(formField.name), for(option <- formField.options) yield (option, Messages(option)), defaultArguments ++ arguments: _*)
                 }
             }
         }

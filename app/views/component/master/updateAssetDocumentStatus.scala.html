@@ -8,10 +8,11 @@
 
 <script src="@routes.Assets.versioned("javascripts/verifyReject.js")" type="text/javascript"></script>
 <div id="@Seq(file.id, file.documentType).mkString("")">
+    @*// No get form is used here, so form.fill cannot be used, inputText used to autofill using copy value *@
 @form(action = routes.IssueAssetController.updateAssetDocumentStatus, 'onkeypress -> "submitFormOnEnter(event,this)") {
     @CSRF.formField
-    @commonInputText(updateAssetDocumentStatusForm, constants.FormField.FILE_ID, 'value -> file.id, 'class -> "hidden", 'readonly -> true)
-    @commonInputText(updateAssetDocumentStatusForm, constants.FormField.DOCUMENT_TYPE, 'value -> file.documentType, 'class -> "hidden", 'readonly -> true)
+    @inputText(updateAssetDocumentStatusForm(constants.FormField.FILE_ID.name).copy(value = Some(file.id)), 'class -> "hidden", 'readonly -> true)
+    @inputText(updateAssetDocumentStatusForm(constants.FormField.DOCUMENT_TYPE.name).copy(value = Some(file.documentType)), 'class -> "hidden", 'readonly -> true)
     @commonCheckbox(updateAssetDocumentStatusForm, constants.FormField.STATUS, 'containerDivClass -> "hidden", 'id -> Seq(file.id, file.documentType, constants.FormField.STATUS.name).mkString(""))
 
     @if(updateAssetDocumentStatusForm.hasGlobalErrors) {

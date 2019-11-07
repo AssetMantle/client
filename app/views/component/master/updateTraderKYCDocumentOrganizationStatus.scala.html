@@ -8,10 +8,11 @@
 
 <script src="@routes.Assets.versioned("javascripts/verifyReject.js")" type="text/javascript"></script>
 <div id="@Seq(traderKYC.id, traderKYC.documentType).mkString("")">
+    @*// No get form is used here, so form.fill cannot be used, inputText used to autofill using copy value *@
 @form(action = routes.SetACLController.updateTraderKYCDocumentOrganizationStatus, 'onkeypress -> "submitFormOnEnter(event,this)") {
     @CSRF.formField
-    @commonInputText(updateTraderKYCDocumentOrganizationStatusForm, constants.FormField.TRADER_ID, 'value -> traderKYC.id, 'class -> "hidden", 'readonly -> true)
-    @commonInputText(updateTraderKYCDocumentOrganizationStatusForm, constants.FormField.DOCUMENT_TYPE, 'value -> traderKYC.documentType, 'class -> "hidden", 'readonly -> true)
+    @inputText(updateTraderKYCDocumentOrganizationStatusForm(constants.FormField.TRADER_ID.name).copy(value = Some(traderKYC.id)), 'class -> "hidden", 'readonly -> true)
+    @inputText(updateTraderKYCDocumentOrganizationStatusForm(constants.FormField.DOCUMENT_TYPE.name).copy(value = Some(traderKYC.documentType)), 'class -> "hidden", 'readonly -> true)
     @commonCheckbox(updateTraderKYCDocumentOrganizationStatusForm, constants.FormField.STATUS, 'containerDivClass -> "hidden", 'id -> Seq(traderKYC.id, traderKYC.documentType, constants.FormField.STATUS.name).mkString(""))
 
     @if(updateTraderKYCDocumentOrganizationStatusForm.hasGlobalErrors) {
@@ -22,7 +23,7 @@
         </ul>
     }
     <span class="red">@Messages(constants.Form.ORGANIZATION_STATUS):
-        @traderKYC.status match {
+        @traderKYC.organizationStatus match {
             case Some(status: Boolean) => {
                 @if(status) {
                     <span cmuk-icon="check"></span>

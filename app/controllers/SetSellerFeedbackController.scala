@@ -8,7 +8,6 @@ import models.{blockchain, blockchainTransaction}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
-
 import scala.concurrent.ExecutionContext
 
 @Singleton
@@ -21,14 +20,14 @@ class SetSellerFeedbackController @Inject()(messagesControllerComponents: Messag
   private implicit val module: String = constants.Module.CONTROLLERS_SET_SELLER_FEEDBACK
 
   def setSellerFeedbackForm(buyerAddress: String, pegHash: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.setSellerFeedback(buyerAddress = buyerAddress, pegHash = pegHash))
+    Ok(views.html.component.master.setSellerFeedback(views.companion.master.SetSellerFeedback.form.fill(views.companion.master.SetSellerFeedback.Data(buyerAddress = buyerAddress, pegHash = pegHash))))
   }
 
   def setSellerFeedback(): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       views.companion.master.SetSellerFeedback.form.bindFromRequest().fold(
         formWithErrors => {
-          BadRequest(views.html.component.master.setSellerFeedback(formWithErrors, formWithErrors.data(constants.Form.BUYER_ADDRESS), formWithErrors.data(constants.Form.PEG_HASH)))
+          BadRequest(views.html.component.master.setSellerFeedback(formWithErrors))
         },
         setSellerFeedbackData => {
           try {

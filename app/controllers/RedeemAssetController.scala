@@ -4,7 +4,7 @@ import controllers.actions.WithTraderLoginAction
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import models.{blockchain, blockchainTransaction}
+import models.{blockchain, blockchainTransaction, master}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
@@ -12,7 +12,7 @@ import play.api.{Configuration, Logger}
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class RedeemAssetController @Inject()(messagesControllerComponents: MessagesControllerComponents, transaction: utilities.Transaction, blockchainZones: blockchain.Zones, withTraderLoginAction: WithTraderLoginAction, transactionsRedeemAsset: transactions.RedeemAsset, blockchainACLAccounts: blockchain.ACLAccounts, blockchainTransactionRedeemAssets: blockchainTransaction.RedeemAssets, withUsernameToken: WithUsernameToken)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class RedeemAssetController @Inject()(messagesControllerComponents: MessagesControllerComponents, transaction: utilities.Transaction, masterTraders: master.Traders, blockchainZones: blockchain.Zones, withTraderLoginAction: WithTraderLoginAction, transactionsRedeemAsset: transactions.RedeemAsset, blockchainACLAccounts: blockchain.ACLAccounts, blockchainTransactionRedeemAssets: blockchainTransaction.RedeemAssets, withUsernameToken: WithUsernameToken)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -20,9 +20,9 @@ class RedeemAssetController @Inject()(messagesControllerComponents: MessagesCont
 
   private implicit val module: String = constants.Module.CONTROLLERS_REDEEM_ASSET
 
-  def redeemAssetForm(ownerAddress: String, pegHash: String): Action[AnyContent] = Action { implicit request =>
+  def redeemAssetForm(username: String, pegHash: String): Action[AnyContent] = Action { implicit request =>
     try {
-      Ok(views.html.component.master.redeemAsset(zoneID = blockchainACLAccounts.Service.get(ownerAddress).zoneID, pegHash = pegHash))
+      Ok(views.html.component.master.redeemAsset(views.companion.master.RedeemAsset.form.fill(views.companion.master.RedeemAsset.Data(zoneID = masterTraders.Service.getZoneIDByAccountID(username), pegHash = pegHash))))
     }
     catch {
       case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -33,7 +33,7 @@ class RedeemAssetController @Inject()(messagesControllerComponents: MessagesCont
     implicit request =>
       views.companion.master.RedeemAsset.form.bindFromRequest().fold(
         formWithErrors => {
-          BadRequest(views.html.component.master.redeemAsset(formWithErrors, formWithErrors.data(constants.Form.ZONE_ID), formWithErrors.data(constants.Form.PEG_HASH)))
+          BadRequest(views.html.component.master.redeemAsset(formWithErrors))
         },
         redeemAssetData => {
           try {

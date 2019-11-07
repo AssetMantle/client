@@ -12,6 +12,6 @@ object UpdateAssetDocumentStatus {
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(fileID: String, documentType: String, status: Boolean)
+  case class Data(fileID: String, documentType: String, status: Boolean = false)
 
 }
