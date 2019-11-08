@@ -192,7 +192,7 @@ class AccountController @Inject()(
         try {
           val otp = masterTransactionEmailOTP.Service.sendOTP(emailOTPForgotPasswordData.username)
           utilitiesNotification.send(accountID = emailOTPForgotPasswordData.username, notification = constants.Notification.FORGOT_PASSWORD_OTP, otp)
-          PartialContent(views.html.component.master.forgotPassword(views.companion.master.ForgotPassword.form.fill(views.companion.master.ForgotPassword.Data(username = emailOTPForgotPasswordData.username))))
+          PartialContent(views.html.component.master.forgotPassword(username = emailOTPForgotPasswordData.username))
         }
         catch {
           case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -203,13 +203,13 @@ class AccountController @Inject()(
 
 
   def forgotPasswordForm(username: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.forgotPassword(views.companion.master.ForgotPassword.form.fill(views.companion.master.ForgotPassword.Data(username = username))))
+    Ok(views.html.component.master.forgotPassword(username = username))
   }
 
   def forgotPassword(): Action[AnyContent] = Action { implicit request =>
     views.companion.master.ForgotPassword.form.bindFromRequest().fold(
       formWithErrors => {
-        BadRequest(views.html.component.master.forgotPassword(formWithErrors))
+        BadRequest(views.html.component.master.forgotPassword(formWithErrors, formWithErrors(constants.FormField.USERNAME.name).value.getOrElse("")))
       },
       forgotPasswordData => {
         try {

@@ -14,6 +14,6 @@ object ForgotPassword {
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(username: String, mnemonic: String = "", otp: String = "", newPassword: String = "", confirmNewPassword: String = "")
+  case class Data(username: String, mnemonic: String, otp: String, newPassword: String, confirmNewPassword: String)
 
 }
