@@ -8,35 +8,35 @@
 
 <script src="@routes.Assets.versioned("javascripts/verifyReject.js")" type="text/javascript"></script>
 <div id="@Seq(file.id, file.documentType).mkString("")">
-    @form(action = routes.IssueAssetController.updateAssetDocumentStatus, 'onkeypress -> "submitFormOnEnter(event,this)") {
-        @CSRF.formField
-        @commonInputText(updateAssetDocumentStatusForm, constants.FormField.FILE_ID, 'value -> file.id, 'class -> "hidden", 'readonly -> true)
-        @commonInputText(updateAssetDocumentStatusForm, constants.FormField.DOCUMENT_TYPE, 'value -> file.documentType, 'class -> "hidden", 'readonly -> true)
-        @commonCheckbox(updateAssetDocumentStatusForm, constants.FormField.STATUS, 'containerDivClass -> "hidden", 'id -> Seq(file.id, file.documentType, constants.FormField.STATUS.name).mkString(""))
+@form(action = routes.IssueAssetController.updateAssetDocumentStatus, 'onkeypress -> "submitFormOnEnter(event,this)") {
+    @CSRF.formField
+    @commonInputText(updateAssetDocumentStatusForm, constants.FormField.FILE_ID, 'value -> file.id, 'class -> "hidden", 'readonly -> true)
+    @commonInputText(updateAssetDocumentStatusForm, constants.FormField.DOCUMENT_TYPE, 'value -> file.documentType, 'class -> "hidden", 'readonly -> true)
+    @commonCheckbox(updateAssetDocumentStatusForm, constants.FormField.STATUS, 'containerDivClass -> "hidden", 'id -> Seq(file.id, file.documentType, constants.FormField.STATUS.name).mkString(""))
 
-        @if(updateAssetDocumentStatusForm.hasGlobalErrors) {
-            <ul>
-            @for(error <- updateAssetDocumentStatusForm.globalErrors) {
-                <li>@error.format</li>
-            }
-            </ul>
+    @if(updateAssetDocumentStatusForm.hasGlobalErrors) {
+        <ul>
+        @for(error <- updateAssetDocumentStatusForm.globalErrors) {
+            <li>@error.format</li>
         }
-        <span class="red">@Messages(constants.FormField.STATUS.name):
-            @file.status match {
-                case Some(status: Boolean) => {
-                    @if(status) {
-                        <span cmuk-icon="check"></span>
-                        <button type="button" class="cmuk-button cmuk-button-danger cmuk-button-small" onclick="verifyReject(this, '@Seq("#", file.id, file.documentType).mkString("")', '@Seq(file.id, file.documentType, constants.FormField.STATUS.name).mkString("")', false)">@Messages(constants.Form.REJECT)</button>
-                    } else {
-                        <span cmuk-icon="close"></span>
-                        <button type="button" class="cmuk-button cmuk-button-success cmuk-button-small" onclick="verifyReject(this, '@Seq("#", file.id, file.documentType).mkString("")', '@Seq(file.id, file.documentType, constants.FormField.STATUS.name).mkString("")', true)">@Messages(constants.Form.APPROVE)</button>
-                    }
-                }
-                case None => {
-                    <button type="button" class="cmuk-button cmuk-button-success cmuk-button-small" onclick="verifyReject(this, '@Seq("#", file.id, file.documentType).mkString("")', '@Seq(file.id, file.documentType, constants.FormField.STATUS.name).mkString("")', true)">@Messages(constants.Form.APPROVE)</button>
+        </ul>
+    }
+    <span class="red">@Messages(constants.FormField.STATUS.name):
+        @file.status match {
+            case Some(status: Boolean) => {
+                @if(status) {
+                    <span cmuk-icon="check"></span>
                     <button type="button" class="cmuk-button cmuk-button-danger cmuk-button-small" onclick="verifyReject(this, '@Seq("#", file.id, file.documentType).mkString("")', '@Seq(file.id, file.documentType, constants.FormField.STATUS.name).mkString("")', false)">@Messages(constants.Form.REJECT)</button>
+                } else {
+                    <span cmuk-icon="close"></span>
+                    <button type="button" class="cmuk-button cmuk-button-success cmuk-button-small" onclick="verifyReject(this, '@Seq("#", file.id, file.documentType).mkString("")', '@Seq(file.id, file.documentType, constants.FormField.STATUS.name).mkString("")', true)">@Messages(constants.Form.APPROVE)</button>
                 }
             }
-        </span>
-    }
+            case None => {
+                <button type="button" class="cmuk-button cmuk-button-success cmuk-button-small" onclick="verifyReject(this, '@Seq("#", file.id, file.documentType).mkString("")', '@Seq(file.id, file.documentType, constants.FormField.STATUS.name).mkString("")', true)">@Messages(constants.Form.APPROVE)</button>
+                <button type="button" class="cmuk-button cmuk-button-danger cmuk-button-small" onclick="verifyReject(this, '@Seq("#", file.id, file.documentType).mkString("")', '@Seq(file.id, file.documentType, constants.FormField.STATUS.name).mkString("")', false)">@Messages(constants.Form.REJECT)</button>
+            }
+        }
+    </span>
+}
 </div>
