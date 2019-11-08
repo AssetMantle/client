@@ -5,22 +5,26 @@
 @(formData: Form[_], formField: DoubleFormField, arguments: (Symbol, Any)*)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, nestedFormField: Option[NestedFormField] = None, sequentialNestedFormfield: Option[Field] = None)
 
 @defining(Seq('type -> "number", '_label -> Messages(formField.name), 'placeholder -> Messages(formField.name), 'min -> formField.minimumValue, 'max -> formField.maximumValue, 'class -> "cmuk-input")) { defaultArguments =>
-    @sequentialNestedFormfield match {
-        case Some(field: Field) => {
-            @* //This case handles sequential subForms under a nested field. See UserUpdateUBOs for example.*@
-            @inputText(field.apply(formField.name), defaultArguments ++ arguments: _*)
-        }
-        case None => {
-            @nestedFormField match {
-                case Some(field: NestedFormField) => {
-                    @* //This case handles nested fields. See AddOrganization for example.*@
-                    @inputText(formData(Seq(field.name, formField.name).mkString(".")), defaultArguments ++ arguments: _*)
-                }
-                case None => {
-                    @* //This case handles generic fields.*@
-                    @inputText(formData(formField.name), defaultArguments ++ arguments: _*)
+    @defining(
+        sequentialNestedFormfield match {
+            case Some(field: Field) => {
+                //This case handles sequential subForms under a nested field. See UserUpdateUBOs for example.
+                field.apply(formField.name)
+            }
+            case None => {
+                nestedFormField match {
+                    case Some(field: NestedFormField) => {
+                        //This case handles nested fields. See AddOrganization for example.
+                        formData(Seq(field.name, formField.name).mkString("."))
+                    }
+                    case None => {
+                        //This case handles generic fields.
+                        formData(formField.name)
+                    }
                 }
             }
         }
+    ) { field =>
+        @inputText(if(arguments.toMap.get('value).map(_.toString).isDefined) field.copy(value = arguments.toMap.get('value).map(_.toString)) else field, defaultArguments ++ arguments: _*)
     }
 }
