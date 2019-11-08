@@ -320,7 +320,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
   def zoneAccessedAssetFile(id: String, fileName: String, documentType: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        if (masterTraders.Service.getZoneID(masterTransactionIssueAssetRequests.Service.getAccountID(id)) == masterZones.Service.getID(loginState.username)) {
+        if (masterTraders.Service.getZoneIDByAccountID(masterTransactionIssueAssetRequests.Service.getAccountID(id)) == masterZones.Service.getID(loginState.username)) {
           Ok.sendFile(utilities.FileOperations.fetchFile(path = fileResourceManager.getTraderAssetFilePath(documentType), fileName = fileName))
         } else {
           Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))

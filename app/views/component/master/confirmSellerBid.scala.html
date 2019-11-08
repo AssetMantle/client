@@ -20,8 +20,7 @@
             <span>@file.documentType</span>
         }
     }
-    @*//TODO why requestID is hidden and not optional when no default value*@
-    @commonInputText(confirmBidTransactionForm, constants.FormField.REQUEST_ID)
+    @commonInputText(confirmBidTransactionForm, constants.FormField.REQUEST_ID, 'class -> "hidden", 'readonly -> true, 'required -> false)
     @commonInputInt(confirmBidTransactionForm, constants.FormField.TIME)
     @commonInputInt(confirmBidTransactionForm, constants.FormField.GAS)
     @commonInputPassword(confirmBidTransactionForm, constants.FormField.PASSWORD)

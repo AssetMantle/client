@@ -60,7 +60,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
-
+  //TODO Change form it sshould only contain organization ID
   def addTraderForm(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {

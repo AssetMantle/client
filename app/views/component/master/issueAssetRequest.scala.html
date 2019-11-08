@@ -5,7 +5,7 @@
 @(confirmIssueAssetTransactionForm: Form[ConfirmIssueAssetTransaction.Data] = ConfirmIssueAssetTransaction.form, asset: masterTransaction.IssueAssetRequest)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 <div id="assetDetail"></div>
 @commonForm(constants.Form.ISSUE_ASSET_REQUEST, confirmIssueAssetTransactionForm) {
-    @commonInputText(confirmIssueAssetTransactionForm, constants.FormField.REQUEST_ID)
+    @commonInputText(confirmIssueAssetTransactionForm, constants.FormField.REQUEST_ID, 'class -> "hidden")
     @asset.physicalDocumentsHandledVia match {
         case constants.Form.COMDEX => {}
         case _ => {

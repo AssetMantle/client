@@ -4,8 +4,7 @@
 
 @(changeSellerBidForm: Form[ChangeSellerBid.Data] = ChangeSellerBid.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @commonForm(constants.Form.CHANGE_SELLER_BID, changeSellerBidForm) {
-    @*//TODO why requestID is hidden and not optional when no default value*@
-    @commonInputText(changeSellerBidForm, constants.FormField.REQUEST_ID)
+    @commonInputText(changeSellerBidForm, constants.FormField.REQUEST_ID, 'class -> "hidden", 'readonly -> true, 'required -> false)
     @commonInputText(changeSellerBidForm, constants.FormField.BUYER_ADDRESS)
     @commonInputInt(changeSellerBidForm, constants.FormField.BID)
     @commonInputInt(changeSellerBidForm, constants.FormField.TIME)
