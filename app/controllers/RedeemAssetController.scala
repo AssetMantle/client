@@ -19,10 +19,10 @@ class RedeemAssetController @Inject()(messagesControllerComponents: MessagesCont
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
   private implicit val module: String = constants.Module.CONTROLLERS_REDEEM_ASSET
-
+  //TODO Shall we fetch username from login state using withTraderLoginAction and also verify pegHash?
   def redeemAssetForm(username: String, pegHash: String): Action[AnyContent] = Action { implicit request =>
     try {
-      Ok(views.html.component.master.redeemAsset(views.companion.master.RedeemAsset.form.fill(views.companion.master.RedeemAsset.Data(zoneID = masterTraders.Service.getZoneIDByAccountID(username), pegHash = pegHash))))
+      Ok(views.html.component.master.redeemAsset(zoneID = masterTraders.Service.getZoneIDByAccountID(username), pegHash = pegHash))
     }
     catch {
       case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -33,7 +33,7 @@ class RedeemAssetController @Inject()(messagesControllerComponents: MessagesCont
     implicit request =>
       views.companion.master.RedeemAsset.form.bindFromRequest().fold(
         formWithErrors => {
-          BadRequest(views.html.component.master.redeemAsset(formWithErrors))
+          BadRequest(views.html.component.master.redeemAsset(formWithErrors, formWithErrors.data(constants.FormField.ZONE_ID.name), formWithErrors.data(constants.FormField.PEG_HASH.name)))
         },
         redeemAssetData => {
           try {

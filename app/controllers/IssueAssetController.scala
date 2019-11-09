@@ -43,7 +43,7 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
       try {
         val asset = masterTransactionIssueAssetRequests.Service.getIssueAssetByID(id)
         if (asset.accountID == loginState.username) {
-          Ok(views.html.component.master.issueAssetRequest(views.companion.master.ConfirmIssueAssetTransaction.form.fill(views.companion.master.ConfirmIssueAssetTransaction.Data(id, Option(0), Option(""))), asset))
+          Ok(views.html.component.master.issueAssetRequest(asset = asset, requestID = id))
         } else {
           Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
         }
@@ -57,7 +57,7 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
       views.companion.master.ConfirmIssueAssetTransaction.form.bindFromRequest().fold(
         formWithErrors => {
           try {
-            BadRequest(views.html.component.master.issueAssetRequest(formWithErrors, masterTransactionIssueAssetRequests.Service.getIssueAssetByID(formWithErrors.data(constants.FormField.REQUEST_ID.name))))
+            BadRequest(views.html.component.master.issueAssetRequest(formWithErrors, asset = masterTransactionIssueAssetRequests.Service.getIssueAssetByID(formWithErrors.data(constants.FormField.REQUEST_ID.name)), requestID = formWithErrors.data(constants.FormField.REQUEST_ID.name)))
           } catch {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
@@ -231,7 +231,7 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
       try {
         if (masterZones.Service.getID(loginState.username) == masterTraders.Service.getZoneIDByAccountID(masterTransactionIssueAssetRequests.Service.getAccountID(fileID))) {
           val assetFile = masterTransactionAssetFiles.Service.get(id = fileID, documentType = documentType)
-          withUsernameToken.Ok(views.html.component.master.updateAssetDocumentStatus(updateAssetDocumentStatusForm = views.companion.master.UpdateAssetDocumentStatus.form.fill(views.companion.master.UpdateAssetDocumentStatus.Data(fileID = assetFile.id, documentType = assetFile.documentType)), file = assetFile))
+          Ok(views.html.component.master.updateAssetDocumentStatus(file = masterTransactionAssetFiles.Service.get(id = fileID, documentType = documentType)))
         } else {
           Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
         }
@@ -270,7 +270,7 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
 
   def rejectIssueAssetRequestForm(requestID: String): Action[AnyContent] = Action {
     implicit request =>
-      Ok(views.html.component.master.rejectIssueAssetRequest(views.companion.master.RejectIssueAssetRequest.form.fill(views.companion.master.RejectIssueAssetRequest.Data(requestID = requestID))))
+      Ok(views.html.component.master.rejectIssueAssetRequest(requestID = requestID))
   }
 
   def rejectIssueAssetRequest: Action[AnyContent] = withZoneLoginAction.authenticated {
@@ -278,7 +278,7 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
       implicit request =>
         views.companion.master.RejectIssueAssetRequest.form.bindFromRequest().fold(
           formWithErrors => {
-            BadRequest(views.html.component.master.rejectIssueAssetRequest(formWithErrors))
+            BadRequest(views.html.component.master.rejectIssueAssetRequest(formWithErrors, formWithErrors.data(constants.FormField.REQUEST_ID.name)))
           },
           rejectIssueAssetRequestData => {
             try {

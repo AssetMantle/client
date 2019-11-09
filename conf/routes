@@ -289,7 +289,7 @@ POST        /master/redeemAsset                                          control
 GET         /master/redeemFiat                                           controllers.RedeemFiatController.redeemFiatForm(username: String)
 POST        /master/redeemFiat                                           controllers.RedeemFiatController.redeemFiat
 
-GET         /master/releaseAsset                                         controllers.ReleaseAssetController.releaseAssetForm(ownerAddress: String, pegHash: String)
+GET         /master/releaseAsset                                         controllers.ReleaseAssetController.releaseAssetForm(blockchainAddress: String, pegHash: String)
 POST        /master/releaseAsset                                         controllers.ReleaseAssetController.releaseAsset
 
 GET         /master/sellerExecuteOrder                                   controllers.SellerExecuteOrderController.sellerExecuteOrderForm(orderID:String)

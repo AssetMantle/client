@@ -20,15 +20,15 @@ class ReleaseAssetController @Inject()(messagesControllerComponents: MessagesCon
 
   private implicit val module: String = constants.Module.CONTROLLERS_RELEASE_ASSET
   //TODO username instead of address
-  def releaseAssetForm(ownerAddress: String, pegHash: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.releaseAsset(views.companion.master.ReleaseAsset.form.fill(views.companion.master.ReleaseAsset.Data(address = ownerAddress, pegHash = pegHash))))
+  def releaseAssetForm(blockchainAddress: String, pegHash: String): Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.releaseAsset(blockchainAddress = blockchainAddress, pegHash = pegHash))
   }
 
   def releaseAsset(): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       views.companion.master.ReleaseAsset.form.bindFromRequest().fold(
         formWithErrors => {
-          BadRequest(views.html.component.master.releaseAsset(formWithErrors))
+          BadRequest(views.html.component.master.releaseAsset(formWithErrors, formWithErrors.data(constants.FormField.BLOCKCHAIN_ADDRESS.name), formWithErrors.data(constants.FormField.PEG_HASH.name)))
         },
         releaseAssetData => {
           try {

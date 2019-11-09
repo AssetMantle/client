@@ -19,10 +19,10 @@ class RedeemFiatController @Inject()(messagesControllerComponents: MessagesContr
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
   private implicit val module: String = constants.Module.CONTROLLERS_REDEEM_FIAT
-
+  //TODO Shall we fetch username from login state using withTraderLoginAction?
   def redeemFiatForm(username: String): Action[AnyContent] = Action { implicit request =>
     try {
-      Ok(views.html.component.master.redeemFiat(views.companion.master.RedeemFiat.form.fill(views.companion.master.RedeemFiat.Data(zoneID = masterTraders.Service.getZoneIDByAccountID(username)))))
+      Ok(views.html.component.master.redeemFiat(zoneID = masterTraders.Service.getZoneIDByAccountID(username)))
     }
     catch {
       case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -33,7 +33,7 @@ class RedeemFiatController @Inject()(messagesControllerComponents: MessagesContr
     implicit request =>
       views.companion.master.RedeemFiat.form.bindFromRequest().fold(
         formWithErrors => {
-          BadRequest(views.html.component.master.redeemFiat(formWithErrors))
+          BadRequest(views.html.component.master.redeemFiat(formWithErrors, formWithErrors.data(constants.FormField.ZONE_ID.name)))
         },
         redeemFiatData => {
           try {

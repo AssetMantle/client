@@ -1,11 +1,11 @@
 @import controllers.actions.LoginState
-@import views.html.base._
 @import views.companion.master.ConfirmIssueAssetTransaction
+@import views.html.base._
 
-@(confirmIssueAssetTransactionForm: Form[ConfirmIssueAssetTransaction.Data] = ConfirmIssueAssetTransaction.form, asset: masterTransaction.IssueAssetRequest)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@(confirmIssueAssetTransactionForm: Form[ConfirmIssueAssetTransaction.Data] = ConfirmIssueAssetTransaction.form, asset: masterTransaction.IssueAssetRequest, requestID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 <div id="assetDetail"></div>
 @commonForm(constants.Form.ISSUE_ASSET_REQUEST, confirmIssueAssetTransactionForm) {
-    @commonInputText(confirmIssueAssetTransactionForm, constants.FormField.REQUEST_ID, 'class -> "hidden")
+    @commonInputText(confirmIssueAssetTransactionForm, constants.FormField.REQUEST_ID, 'value -> requestID, 'class -> "hidden", 'readonly -> true)
     @asset.physicalDocumentsHandledVia match {
         case constants.Form.COMDEX => {}
         case _ => {
