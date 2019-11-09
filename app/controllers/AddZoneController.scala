@@ -163,14 +163,14 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
   }
 
   def verifyZoneForm(zoneID: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.verifyZone(views.companion.master.VerifyZone.form.fill(views.companion.master.VerifyZone.Data(zoneID = zoneID))))
+    Ok(views.html.component.master.verifyZone(zoneID = zoneID))
   }
 
   def verifyZone: Action[AnyContent] = withGenesisLoginAction.authenticated { implicit loginState =>
     implicit request =>
       views.companion.master.VerifyZone.form.bindFromRequest().fold(
         formWithErrors => {
-          BadRequest(views.html.component.master.verifyZone(formWithErrors))
+          BadRequest(views.html.component.master.verifyZone(formWithErrors, formWithErrors.data(constants.Form.ZONE_ID)))
         },
         verifyZoneData => {
           try {
@@ -219,7 +219,7 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
   def updateZoneKYCDocumentStatusForm(zoneID: String, documentType: String): Action[AnyContent] = withGenesisLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        Ok(views.html.component.master.updateZoneKYCDocumentStatus(updateZoneKYCDocumentStatusForm = views.companion.master.UpdateZoneKYCDocumentStatus.form.fill(views.companion.master.UpdateZoneKYCDocumentStatus.Data(zoneID = zoneID, documentType = documentType)), zoneKYC = masterZoneKYCs.Service.get(id = zoneID, documentType = documentType)))
+        Ok(views.html.component.master.updateZoneKYCDocumentStatus(zoneKYC = masterZoneKYCs.Service.get(id = zoneID, documentType = documentType)))
       } catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
@@ -254,14 +254,14 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
   }
 
   def rejectVerifyZoneRequestForm(zoneID: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.rejectVerifyZoneRequest(views.companion.master.RejectVerifyZoneRequest.form.fill(views.companion.master.RejectVerifyZoneRequest.Data(zoneID = zoneID))))
+    Ok(views.html.component.master.rejectVerifyZoneRequest(zoneID = zoneID))
   }
 
   def rejectVerifyZoneRequest: Action[AnyContent] = withGenesisLoginAction.authenticated { implicit loginState =>
     implicit request =>
       views.companion.master.RejectVerifyZoneRequest.form.bindFromRequest().fold(
         formWithErrors => {
-          BadRequest(views.html.component.master.rejectVerifyZoneRequest(formWithErrors))
+          BadRequest(views.html.component.master.rejectVerifyZoneRequest(formWithErrors, formWithErrors.data(constants.Form.ZONE_ID)))
         },
         rejectVerifyZoneRequestData => {
           try {

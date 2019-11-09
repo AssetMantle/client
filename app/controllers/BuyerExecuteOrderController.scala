@@ -24,7 +24,7 @@ class BuyerExecuteOrderController @Inject()(messagesControllerComponents: Messag
     implicit request =>
       try {
         val negotiation = blockchainNegotiations.Service.get(orderID)
-        withUsernameToken.Ok(views.html.component.master.buyerExecuteOrder(views.companion.master.BuyerExecuteOrder.form.fill(views.companion.master.BuyerExecuteOrder.Data(sellerAddress = negotiation.sellerAddress, pegHash = negotiation.assetPegHash))))
+        Ok(views.html.component.master.buyerExecuteOrder(sellerAddress = negotiation.sellerAddress, pegHash = negotiation.assetPegHash))
       } catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
@@ -34,7 +34,7 @@ class BuyerExecuteOrderController @Inject()(messagesControllerComponents: Messag
     implicit request =>
       views.companion.master.BuyerExecuteOrder.form.bindFromRequest().fold(
         formWithErrors => {
-          BadRequest(views.html.component.master.buyerExecuteOrder(formWithErrors))
+          BadRequest(views.html.component.master.buyerExecuteOrder(formWithErrors, formWithErrors.data(constants.Form.SELLER_ADDRESS), formWithErrors.data(constants.Form.PEG_HASH)))
         },
         buyerExecuteOrderData => {
           try {
@@ -66,14 +66,14 @@ class BuyerExecuteOrderController @Inject()(messagesControllerComponents: Messag
   }
   //TODO username instead of Addresses
   def moderatedBuyerExecuteOrderForm(buyerAddress: String, sellerAddress: String, pegHash: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.moderatedBuyerExecuteOrder(views.companion.master.ModeratedBuyerExecuteOrder.form.fill(views.companion.master.ModeratedBuyerExecuteOrder.Data(buyerAddress = buyerAddress, sellerAddress = sellerAddress, pegHash = pegHash))))
+    Ok(views.html.component.master.moderatedBuyerExecuteOrder(buyerAddress = buyerAddress, sellerAddress = sellerAddress, pegHash = pegHash))
   }
 
   def moderatedBuyerExecuteOrder: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       views.companion.master.ModeratedBuyerExecuteOrder.form.bindFromRequest().fold(
         formWithErrors => {
-          BadRequest(views.html.component.master.moderatedBuyerExecuteOrder(formWithErrors))
+          BadRequest(views.html.component.master.moderatedBuyerExecuteOrder(formWithErrors, formWithErrors.data(constants.Form.BUYER_ADDRESS), formWithErrors.data(constants.Form.SELLER_ADDRESS), formWithErrors.data(constants.Form.PEG_HASH)))
         },
         moderatedBuyerExecuteOrderData => {
           try {
