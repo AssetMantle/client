@@ -14,6 +14,6 @@ object ApproveFaucetRequest {
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(requestID: String, accountID: String, gas: Int = 0, password: String = "")
+  case class Data(requestID: String, accountID: String, gas: Int, password: String)
 
 }

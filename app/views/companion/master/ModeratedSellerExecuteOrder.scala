@@ -15,6 +15,6 @@ object ModeratedSellerExecuteOrder {
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(buyerAddress: String, sellerAddress: String, awbProofHash: String = "", pegHash: String, gas: Int = 0, password: String = "")
+  case class Data(buyerAddress: String, sellerAddress: String, awbProofHash: String, pegHash: String, gas: Int, password: String)
 
 }

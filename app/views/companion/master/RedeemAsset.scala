@@ -13,6 +13,6 @@ object RedeemAsset {
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(zoneID: String, pegHash: String, gas: Int = 0, password: String = "")
+  case class Data(zoneID: String, pegHash: String, gas: Int, password: String)
 
 }

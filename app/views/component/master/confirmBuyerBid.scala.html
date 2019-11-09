@@ -20,7 +20,7 @@
         }
     }
 
-    @commonInputText(confirmBidTransactionForm, constants.FormField.REQUEST_ID, 'class -> "hidden", 'readonly -> true, 'required -> false)
+    @commonInputText(confirmBidTransactionForm, constants.FormField.REQUEST_ID, 'value -> negotiation.id, 'class -> "hidden", 'readonly -> true, 'required -> false)
     @commonInputInt(confirmBidTransactionForm, constants.FormField.TIME)
     @commonInputInt(confirmBidTransactionForm, constants.FormField.GAS)
     @commonInputPassword(confirmBidTransactionForm, constants.FormField.PASSWORD)

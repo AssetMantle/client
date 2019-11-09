@@ -12,6 +12,6 @@ object RejectIssueFiatRequest {
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(requestID: String, comment: String = "")
+  case class Data(requestID: String, comment: String)
 
 }

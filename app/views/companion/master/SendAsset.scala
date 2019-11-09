@@ -13,6 +13,6 @@ object SendAsset {
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(buyerAddress: String, pegHash: String, gas: Int = 0, password: String = "")
+  case class Data(buyerAddress: String, pegHash: String, gas: Int, password: String)
 
 }

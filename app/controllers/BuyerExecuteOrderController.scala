@@ -34,7 +34,7 @@ class BuyerExecuteOrderController @Inject()(messagesControllerComponents: Messag
     implicit request =>
       views.companion.master.BuyerExecuteOrder.form.bindFromRequest().fold(
         formWithErrors => {
-          BadRequest(views.html.component.master.buyerExecuteOrder(formWithErrors, formWithErrors.data(constants.Form.SELLER_ADDRESS), formWithErrors.data(constants.Form.PEG_HASH)))
+          BadRequest(views.html.component.master.buyerExecuteOrder(formWithErrors, sellerAddress = formWithErrors.data(constants.FormField.SELLER_ADDRESS.name), pegHash = formWithErrors.data(constants.FormField.PEG_HASH.name)))
         },
         buyerExecuteOrderData => {
           try {
@@ -73,7 +73,7 @@ class BuyerExecuteOrderController @Inject()(messagesControllerComponents: Messag
     implicit request =>
       views.companion.master.ModeratedBuyerExecuteOrder.form.bindFromRequest().fold(
         formWithErrors => {
-          BadRequest(views.html.component.master.moderatedBuyerExecuteOrder(formWithErrors, formWithErrors.data(constants.Form.BUYER_ADDRESS), formWithErrors.data(constants.Form.SELLER_ADDRESS), formWithErrors.data(constants.Form.PEG_HASH)))
+          BadRequest(views.html.component.master.moderatedBuyerExecuteOrder(formWithErrors, buyerAddress = formWithErrors.data(constants.FormField.BUYER_ADDRESS.name), sellerAddress = formWithErrors.data(constants.FormField.SELLER_ADDRESS.name), pegHash = formWithErrors.data(constants.FormField.PEG_HASH.name)))
         },
         moderatedBuyerExecuteOrderData => {
           try {

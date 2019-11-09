@@ -170,7 +170,7 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
     implicit request =>
       views.companion.master.VerifyZone.form.bindFromRequest().fold(
         formWithErrors => {
-          BadRequest(views.html.component.master.verifyZone(formWithErrors, formWithErrors.data(constants.Form.ZONE_ID)))
+          BadRequest(views.html.component.master.verifyZone(formWithErrors, zoneID = formWithErrors.data(constants.FormField.ZONE_ID.name)))
         },
         verifyZoneData => {
           try {
@@ -261,7 +261,7 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
     implicit request =>
       views.companion.master.RejectVerifyZoneRequest.form.bindFromRequest().fold(
         formWithErrors => {
-          BadRequest(views.html.component.master.rejectVerifyZoneRequest(formWithErrors, formWithErrors.data(constants.Form.ZONE_ID)))
+          BadRequest(views.html.component.master.rejectVerifyZoneRequest(formWithErrors, zoneID = formWithErrors.data(constants.FormField.ZONE_ID.name)))
         },
         rejectVerifyZoneRequestData => {
           try {
@@ -359,7 +359,7 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
       },
       addZoneData => {
         try {
-          transactionsAddZone.Service.post(transactionsAddZone.Request(transactionsAddZone.BaseReq(from = addZoneData.from, gas = addZoneData.gas.toString), to = addZoneData.to, zoneID = addZoneData.zoneID, password = addZoneData.password, mode = transactionMode))
+          transactionsAddZone.Service.post(transactionsAddZone.Request(transactionsAddZone.BaseReq(from = addZoneData.from, gas = addZoneData.gas.toString), to = addZoneData.to, zoneID = addZoneData.zoneID, password = addZoneData.password, mode = addZoneData.mode))
           Ok(views.html.index(successes = Seq(constants.Response.ZONE_ADDED)))
         }
         catch {
