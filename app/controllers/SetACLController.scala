@@ -60,7 +60,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
-  //TODO Change form it sshould only contain organization ID
+  //TODO Change form it should only contain organization ID
   def addTraderForm(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
@@ -264,8 +264,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
     implicit request =>
       try {
         if (masterZones.Service.getID(loginState.username) == masterTraders.Service.getZoneID(traderID)) {
-          val traderKYC = masterTraderKYCs.Service.get(id = traderID, documentType = documentType)
-          withUsernameToken.Ok(views.html.component.master.updateTraderKYCDocumentZoneStatus(updateTraderKYCDocumentZoneStatusForm = views.companion.master.UpdateTraderKYCDocumentZoneStatus.form.fill(views.companion.master.UpdateTraderKYCDocumentZoneStatus.Data(traderID = traderKYC.id, documentType = traderKYC.documentType)), traderKYC = traderKYC))
+          Ok(views.html.component.master.updateTraderKYCDocumentZoneStatus(traderKYC = masterTraderKYCs.Service.get(id = traderID, documentType = documentType)))
         }
         else {
           Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
@@ -420,8 +419,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
     implicit request =>
       try {
         if (masterOrganizations.Service.getID(loginState.username) == masterTraders.Service.getOrganizationID(traderID)) {
-          val traderKYC = masterTraderKYCs.Service.get(id = traderID, documentType = documentType)
-          Ok(views.html.component.master.updateTraderKYCDocumentOrganizationStatus(updateTraderKYCDocumentOrganizationStatusForm = views.companion.master.UpdateTraderKYCDocumentOrganizationStatus.form.fill(views.companion.master.UpdateTraderKYCDocumentOrganizationStatus.Data(traderID = traderKYC.id, documentType = traderKYC.documentType)), traderKYC = traderKYC))
+          Ok(views.html.component.master.updateTraderKYCDocumentOrganizationStatus(traderKYC = masterTraderKYCs.Service.get(id = traderID, documentType = documentType)))
         }
         else {
           Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))

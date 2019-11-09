@@ -20,14 +20,14 @@ class SetSellerFeedbackController @Inject()(messagesControllerComponents: Messag
   private implicit val module: String = constants.Module.CONTROLLERS_SET_SELLER_FEEDBACK
 
   def setSellerFeedbackForm(buyerAddress: String, pegHash: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.setSellerFeedback(views.companion.master.SetSellerFeedback.form.fill(views.companion.master.SetSellerFeedback.Data(buyerAddress = buyerAddress, pegHash = pegHash))))
+    Ok(views.html.component.master.setSellerFeedback(buyerAddress = buyerAddress, pegHash = pegHash))
   }
 
   def setSellerFeedback(): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       views.companion.master.SetSellerFeedback.form.bindFromRequest().fold(
         formWithErrors => {
-          BadRequest(views.html.component.master.setSellerFeedback(formWithErrors))
+          BadRequest(views.html.component.master.setSellerFeedback(formWithErrors, buyerAddress = formWithErrors.data(constants.FormField.BUYER_ADDRESS.name), pegHash = formWithErrors.data(constants.FormField.PEG_HASH.name)))
         },
         setSellerFeedbackData => {
           try {

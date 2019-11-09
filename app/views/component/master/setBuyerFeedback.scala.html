@@ -2,10 +2,10 @@
 @import views.html.base._
 @import views.companion.master.SetBuyerFeedback
 
-@(setBuyerFeedbackForm: Form[SetBuyerFeedback.Data] = SetBuyerFeedback.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@(setBuyerFeedbackForm: Form[SetBuyerFeedback.Data] = SetBuyerFeedback.form, sellerAddress: String, pegHash: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @commonForm(constants.Form.SET_BUYER_FEEDBACK, setBuyerFeedbackForm) {
-    @commonInputText(setBuyerFeedbackForm, constants.FormField.SELLER_ADDRESS)
-    @commonInputText(setBuyerFeedbackForm, constants.FormField.PEG_HASH)
+    @commonInputText(setBuyerFeedbackForm, constants.FormField.SELLER_ADDRESS, 'value -> sellerAddress)
+    @commonInputText(setBuyerFeedbackForm, constants.FormField.PEG_HASH, 'value -> pegHash)
     @commonInputInt(setBuyerFeedbackForm, constants.FormField.RATING)
     @commonInputInt(setBuyerFeedbackForm, constants.FormField.GAS)
     @commonInputPassword(setBuyerFeedbackForm, constants.FormField.PASSWORD)
