@@ -33,9 +33,9 @@ class ReleaseAssetController @Inject()(messagesControllerComponents: MessagesCon
         releaseAssetData => {
           try {
             transaction.process[blockchainTransaction.ReleaseAsset, transactionsReleaseAsset.Request](
-              entity = blockchainTransaction.ReleaseAsset(from = loginState.address, to = releaseAssetData.address, pegHash = releaseAssetData.pegHash, gas = releaseAssetData.gas, ticketID = "", mode = transactionMode),
+              entity = blockchainTransaction.ReleaseAsset(from = loginState.address, to = releaseAssetData.blockchainAddress, pegHash = releaseAssetData.pegHash, gas = releaseAssetData.gas, ticketID = "", mode = transactionMode),
               blockchainTransactionCreate = blockchainTransactionReleaseAssets.Service.create,
-              request = transactionsReleaseAsset.Request(transactionsReleaseAsset.BaseReq(from = loginState.address, gas = releaseAssetData.gas.toString), to = releaseAssetData.address, password = releaseAssetData.password, pegHash = releaseAssetData.pegHash, mode = transactionMode),
+              request = transactionsReleaseAsset.Request(transactionsReleaseAsset.BaseReq(from = loginState.address, gas = releaseAssetData.gas.toString), to = releaseAssetData.blockchainAddress, password = releaseAssetData.password, pegHash = releaseAssetData.pegHash, mode = transactionMode),
               action = transactionsReleaseAsset.Service.post,
               onSuccess = blockchainTransactionReleaseAssets.Utility.onSuccess,
               onFailure = blockchainTransactionReleaseAssets.Utility.onFailure,

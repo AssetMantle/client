@@ -21,14 +21,14 @@ class SendAssetController @Inject()(messagesControllerComponents: MessagesContro
   private implicit val module: String = constants.Module.CONTROLLERS_SEND_ASSET
 
   def sendAssetForm(buyerAddress: String, pegHash: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.sendAsset(views.companion.master.SendAsset.form.fill(views.companion.master.SendAsset.Data(buyerAddress = buyerAddress, pegHash = pegHash))))
+    Ok(views.html.component.master.sendAsset(buyerAddress = buyerAddress, pegHash = pegHash))
   }
 
   def sendAsset: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       views.companion.master.SendAsset.form.bindFromRequest().fold(
         formWithErrors => {
-          BadRequest(views.html.component.master.sendAsset(formWithErrors))
+          BadRequest(views.html.component.master.sendAsset(formWithErrors, formWithErrors.data(constants.FormField.BUYER_ADDRESS.name), formWithErrors.data(constants.FormField.PEG_HASH.name)))
         },
         sendAssetData => {
           try {

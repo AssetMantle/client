@@ -14,6 +14,6 @@ object ReleaseAsset {
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(address: String, pegHash: String, gas: Int = 0, password: String = "")
+  case class Data(blockchainAddress: String, pegHash: String, gas: Int, password: String)
 
 }

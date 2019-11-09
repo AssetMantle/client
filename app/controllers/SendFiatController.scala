@@ -21,14 +21,14 @@ class SendFiatController @Inject()(messagesControllerComponents: MessagesControl
   private implicit val module: String = constants.Module.CONTROLLERS_SEND_FIAT
 
   def sendFiatForm(sellerAddress: String, pegHash: String, amount: Int): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.sendFiat(views.companion.master.SendFiat.form.fill(views.companion.master.SendFiat.Data(sellerAddress = sellerAddress, pegHash = pegHash, amount = amount))))
+    Ok(views.html.component.master.sendFiat(sellerAddress = sellerAddress, pegHash = pegHash, amount = amount))
   }
 
   def sendFiat: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       views.companion.master.SendFiat.form.bindFromRequest().fold(
         formWithErrors => {
-          BadRequest(views.html.component.master.sendFiat(formWithErrors))
+          BadRequest(views.html.component.master.sendFiat(formWithErrors, sellerAddress = formWithErrors.data(constants.Form.SELLER_ADDRESS), pegHash = formWithErrors.data(constants.Form.PEG_HASH), amount = formWithErrors.data(constants.FormField.AMOUNT.name).toInt))
         },
         sendFiatData => {
           try {

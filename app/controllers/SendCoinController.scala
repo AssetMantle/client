@@ -87,14 +87,14 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
   }
 
   def rejectFaucetRequestForm(requestID: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.rejectFaucetRequest(views.companion.master.RejectFaucetRequest.form.fill(views.companion.master.RejectFaucetRequest.Data(requestID = requestID))))
+    Ok(views.html.component.master.rejectFaucetRequest(requestID = requestID))
   }
 
   def rejectFaucetRequest: Action[AnyContent] = withGenesisLoginAction.authenticated { implicit loginState =>
     implicit request =>
       views.companion.master.RejectFaucetRequest.form.bindFromRequest().fold(
         formWithErrors => {
-          BadRequest(views.html.component.master.rejectFaucetRequest(formWithErrors))
+          BadRequest(views.html.component.master.rejectFaucetRequest(formWithErrors, formWithErrors.data(constants.FormField.REQUEST_ID.name)))
         },
         rejectFaucetRequestData => {
           try {
@@ -109,14 +109,14 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
   }
 
   def approveFaucetRequestsForm(requestID: String, accountID: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.approveFaucetRequests(views.companion.master.ApproveFaucetRequest.form.fill(views.companion.master.ApproveFaucetRequest.Data(requestID = requestID, accountID = accountID))))
+    Ok(views.html.component.master.approveFaucetRequests(requestID = requestID, accountID = accountID))
   }
 
   def approveFaucetRequests: Action[AnyContent] = withGenesisLoginAction.authenticated { implicit loginState =>
     implicit request =>
       views.companion.master.ApproveFaucetRequest.form.bindFromRequest().fold(
         formWithErrors => {
-          BadRequest(views.html.component.master.approveFaucetRequests(formWithErrors))
+          BadRequest(views.html.component.master.approveFaucetRequests(formWithErrors, formWithErrors.data(constants.FormField.REQUEST_ID.name), formWithErrors.data(constants.FormField.ACCOUNT_ID.name)))
         },
         approveFaucetRequestFormData => {
           try {
