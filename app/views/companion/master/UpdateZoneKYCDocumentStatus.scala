@@ -12,5 +12,5 @@ object UpdateZoneKYCDocumentStatus {
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(zoneID: String, documentType: String, status: Boolean = false)
+  case class Data(zoneID: String, documentType: String, status: Boolean)
 }
