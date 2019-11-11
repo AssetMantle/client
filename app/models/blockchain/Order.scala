@@ -169,6 +169,7 @@ class Orders @Inject()(shutdownActors: ShutdownActor, masterAccounts: master.Acc
           if (orderResponse.value.awbProofHash != "" && orderResponse.value.fiatProofHash != "") {
             blockchainTraderFeedbackHistories.Service.create(negotiation.sellerAddress, negotiation.buyerAddress, negotiation.sellerAddress, negotiation.assetPegHash, rating = "")
             blockchainTraderFeedbackHistories.Service.create(negotiation.buyerAddress, negotiation.buyerAddress, negotiation.sellerAddress, negotiation.assetPegHash, rating = "")
+            // TODO: change implementation for masterTransactionIssueAssetRequests
             masterTransactionIssueAssetRequests.Service.updateAccountIDAndMarkListedForTradeByPegHash(Option(negotiation.assetPegHash), masterAccounts.Service.getId(negotiation.buyerAddress))
             blockchainNegotiations.Service.deleteNegotiations(negotiation.assetPegHash)
           }
