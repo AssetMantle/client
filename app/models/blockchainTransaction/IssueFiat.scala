@@ -178,7 +178,6 @@ class IssueFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
       try {
         Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
         val issueFiat = Service.getTransaction(ticketID)
-        //Thread.sleep(sleepTime)
         getAccount.Service.get(issueFiat.to).value.fiatPegWallet.foreach(fiats => fiats.foreach(fiatPeg => blockchainFiats.Service.insertOrUpdate(fiatPeg.pegHash, issueFiat.to, fiatPeg.transactionID, fiatPeg.transactionAmount, fiatPeg.redeemedAmount, dirtyBit = true)))
         blockchainAccounts.Service.markDirty(issueFiat.from)
         utilitiesNotification.send(masterAccounts.Service.getId(issueFiat.to), constants.Notification.SUCCESS, blockResponse.txhash)

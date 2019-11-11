@@ -181,7 +181,6 @@ class ChangeBuyerBids @Inject()(actorSystem: ActorSystem, transaction: utilities
       try {
         Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
         val changeBuyerBid = Service.getTransaction(ticketID)
-        //Thread.sleep(sleepTime)
         val buyerAccountID = masterAccounts.Service.getId(changeBuyerBid.from)
         val negotiationID = blockchainNegotiations.Service.getNegotiationID(buyerAddress = changeBuyerBid.from, sellerAddress = changeBuyerBid.to, pegHash = changeBuyerBid.pegHash)
         val negotiationResponse = if (negotiationID == "") getNegotiation.Service.get(getNegotiationID.Service.get(buyerAddress = changeBuyerBid.from, sellerAddress = changeBuyerBid.to, pegHash = changeBuyerBid.pegHash).negotiationID) else getNegotiation.Service.get(negotiationID)
