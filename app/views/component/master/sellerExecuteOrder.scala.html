@@ -1,12 +1,24 @@
 @import controllers.actions.LoginState
 @import views.html.base._
 @import views.companion.master.SellerExecuteOrder
+@import models.masterTransaction.NegotiationFile
 
-@(sellerExecuteOrderForm: Form[SellerExecuteOrder.Data] = SellerExecuteOrder.form, buyerAddress: String, pegHash: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@(sellerExecuteOrderForm: Form[SellerExecuteOrder.Data] = SellerExecuteOrder.form, files: Seq[NegotiationFile])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+
+    @for(file <- files) {
+        @component.master.commonDocumentViewer(file) {
+            @routes.FileController.tradingFile(file.id, file.fileName, file.documentType)
+        } {
+            <a href="@routes.FileController.tradingFile(file.id, file.fileName, file.documentType)">@Messages(file.documentType)</a>
+        } {
+            <span>@file.documentType</span>
+        }
+    }
+
 @commonForm(constants.Form.SELLER_EXECUTE_ORDER, sellerExecuteOrderForm) {
-    @commonInputText(sellerExecuteOrderForm, constants.FormField.BUYER_ADDRESS, 'value -> buyerAddress))
+    @commonInputText(sellerExecuteOrderForm, constants.FormField.BUYER_ADDRESS)
     @commonInputText(sellerExecuteOrderForm, constants.FormField.AWB_PROOF_HASH)
-    @commonInputText(sellerExecuteOrderForm, constants.FormField.PEG_HASH, 'value -> pegHash))
+    @commonInputText(sellerExecuteOrderForm, constants.FormField.PEG_HASH)
     @commonInputInt(sellerExecuteOrderForm, constants.FormField.GAS)
     @commonInputPassword(sellerExecuteOrderForm, constants.FormField.PASSWORD)
 }

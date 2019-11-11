@@ -1,10 +1,10 @@
 @import controllers.actions.LoginState
-@import views.html.base._
+@import helper._
 @import models.masterTransaction.AssetFile
 @import views.companion.master.UpdateAssetDocumentStatus
-@import helper._
+@import views.html.base._
 
-@(updateAssetDocumentStatusForm: Form[UpdateAssetDocumentStatus.Data] = views.companion.master.UpdateAssetDocumentStatus.form, file: AssetFile)( implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@(updateAssetDocumentStatusForm: Form[UpdateAssetDocumentStatus.Data] = views.companion.master.UpdateAssetDocumentStatus.form, file: AssetFile)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 
 <script src="@routes.Assets.versioned("javascripts/verifyReject.js")" type="text/javascript"></script>
 <div id="@Seq(file.id, file.documentType).mkString("")">
@@ -12,7 +12,7 @@
     @CSRF.formField
     @commonInputText(updateAssetDocumentStatusForm, constants.FormField.FILE_ID, 'value -> file.id, 'class -> "hidden", 'readonly -> true)
     @commonInputText(updateAssetDocumentStatusForm, constants.FormField.DOCUMENT_TYPE, 'value -> file.documentType, 'class -> "hidden", 'readonly -> true)
-    @commonCheckbox(updateAssetDocumentStatusForm, constants.FormField.STATUS, 'class -> "hidden", 'id -> Seq(file.id, file.documentType, constants.FormField.STATUS.name).mkString(""))
+    @commonCheckbox(updateAssetDocumentStatusForm, constants.FormField.STATUS, 'containerDivClass -> "hidden", 'id -> Seq(file.id, file.documentType, constants.FormField.STATUS.name).mkString(""))
 
     @if(updateAssetDocumentStatusForm.hasGlobalErrors) {
         <ul>

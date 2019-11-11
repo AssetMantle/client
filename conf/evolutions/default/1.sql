@@ -779,17 +779,11 @@ ALTER TABLE MASTER_TRANSACTION."FaucetRequest"
 ALTER TABLE MASTER_TRANSACTION."IssueAssetRequest"
     ADD CONSTRAINT IssueAssetRequest_MasterAccount_AccountID FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER_TRANSACTION."IssueAssetRequest"
-    ADD CONSTRAINT IssueAssetRequest_BC_Asset_PegHash FOREIGN KEY ("pegHash") REFERENCES BLOCKCHAIN."Asset_BC" ("pegHash");
-ALTER TABLE MASTER_TRANSACTION."IssueAssetRequest"
-    ADD CONSTRAINT IssueAssetRequest_Taker_Address FOREIGN KEY ("takerAddress") REFERENCES BLOCKCHAIN."Account_BC" ("address");
-ALTER TABLE MASTER_TRANSACTION."IssueFiatRequest"
     ADD CONSTRAINT IssueFiatRequest_MasterAccount_AccountID FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER_TRANSACTION."AssetFile"
     ADD CONSTRAINT AssetFile_IssueAssetRequest_id FOREIGN KEY ("id") REFERENCES MASTER_TRANSACTION."IssueAssetRequest" ("id");
 ALTER TABLE MASTER_TRANSACTION."NegotiationFile"
     ADD CONSTRAINT NegotiationFile_NegotiationRequest_id FOREIGN KEY ("id") REFERENCES MASTER_TRANSACTION."NegotiationRequest" ("id");
-ALTER TABLE MASTER_TRANSACTION."NegotiationRequest"
-    ADD CONSTRAINT NegotiationRequest_BC_Negotiation_negotiationID FOREIGN KEY ("negotiationID") REFERENCES BLOCKCHAIN."Negotiation_BC" ("id");
 ALTER TABLE MASTER_TRANSACTION."SessionToken"
     ADD CONSTRAINT SessionToken_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER_TRANSACTION."PushNotificationToken"

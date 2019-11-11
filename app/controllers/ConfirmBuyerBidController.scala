@@ -34,7 +34,7 @@ class ConfirmBuyerBidController @Inject()(messagesControllerComponents: Messages
   def confirmBuyerBidDetailForm(sellerAddress: String, pegHash: String, bid: Int): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        withUsernameToken.Ok(views.html.component.master.confirmBuyerBidDetail(views.companion.master.ConfirmBuyerBidDetail.form.fill(views.companion.master.ConfirmBuyerBidDetail.Data(masterTransactionNegotiationRequests.Service.getIDByPegHashAndBuyerAccountID(pegHash, loginState.username), sellerAddress, bid, pegHash))))
+        Ok(views.html.component.master.confirmBuyerBidDetail(views.companion.master.ConfirmBuyerBidDetail.form.fill(views.companion.master.ConfirmBuyerBidDetail.Data(masterTransactionNegotiationRequests.Service.getIDByPegHashAndBuyerAccountID(pegHash, loginState.username), sellerAddress, bid, pegHash))))
       } catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
@@ -67,7 +67,7 @@ class ConfirmBuyerBidController @Inject()(messagesControllerComponents: Messages
       try {
         val negotiation = masterTransactionNegotiationRequests.Service.getNegotiationByID(requestID)
         if (negotiation.buyerAccountID == loginState.username) {
-          withUsernameToken.Ok(views.html.component.master.confirmBuyerBid(views.companion.master.ConfirmBidTransaction.form.fill(views.companion.master.ConfirmBidTransaction.Data(negotiation.id,  0, constants.FormField.GAS.minimumValue, "")), negotiation, masterTransactionNegotiationFiles.Service.getConfirmBidDocuments(requestID)))
+          Ok(views.html.component.master.confirmBuyerBid(negotiation = negotiation, files = masterTransactionNegotiationFiles.Service.getConfirmBidDocuments(requestID)))
         } else {
           Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
         }
@@ -78,7 +78,7 @@ class ConfirmBuyerBidController @Inject()(messagesControllerComponents: Messages
 
   def confirmBuyerBid: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      views.companion.master.ConfirmBidTransaction.form.bindFromRequest().fold(
+      views.companion.master.ConfirmBid.form.bindFromRequest().fold(
         formWithErrors => {
           try {
             val negotiation = masterTransactionNegotiationRequests.Service.getNegotiationByID(formWithErrors.data(constants.FormField.REQUEST_ID.name))

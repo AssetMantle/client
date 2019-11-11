@@ -4,8 +4,8 @@
 
 @(redeemAssetForm: Form[RedeemAsset.Data] = RedeemAsset.form, zoneID: String, pegHash: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @commonForm(constants.Form.REDEEM_ASSET, redeemAssetForm) {
-    @commonInputText(redeemAssetForm, constants.FormField.ZONE_ID, 'value -> zoneID))
-    @commonInputText(redeemAssetForm, constants.FormField.PEG_HASH, 'value -> pegHash))
+    @commonInputText(redeemAssetForm, constants.FormField.ZONE_ID, 'value -> zoneID)
+    @commonInputText(redeemAssetForm, constants.FormField.PEG_HASH, 'value -> pegHash)
     @commonInputInt(redeemAssetForm, constants.FormField.GAS)
     @commonInputPassword(redeemAssetForm, constants.FormField.PASSWORD)
 }

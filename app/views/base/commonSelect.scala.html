@@ -1,13 +1,30 @@
-@import constants.FormField.{SelectFormField, NestedFormField}
+@import constants.FormField.{NestedFormField, SelectFormField}
 @import helper._
 @import play.api.data.Field
 
-@(formData: Form[_], formField: SelectFormField, arguments: (Symbol, Any)*)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, nestedFormField: Option[NestedFormField] = None, field: Option[Field] = None)
+@(formData: Form[_], formField: SelectFormField, arguments: (Symbol, Any)*)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, nestedFormField: Option[NestedFormField] = None, sequentialNestedFormfield: Option[Field] = None)
 
 @defining(Seq('_label -> Messages(formField.name), 'placeholder -> Messages(formField.name), 'class -> "cmuk-input", '_default -> Messages(formField.name))) { defaultArguments =>
-    @if(field.isDefined) {
-        @select(field.get.apply(formField.name), for(option <- formField.options) yield (option, Messages(option)), defaultArguments ++ arguments: _*)
-    } else {
-        @select(formData(if(nestedFormField.isDefined) Seq(nestedFormField.get.name, formField.name).mkString(".") else formField.name), for(option <- formField.options) yield (option, Messages(option)), defaultArguments ++ arguments: _*)
+        @defining(
+            sequentialNestedFormfield match {
+                case Some(field: Field) => {
+                    //This case handles sequential subForms under a nested field. See UserUpdateUBOs for example.
+                    field.apply(formField.name)
+                }
+                case None => {
+                    nestedFormField match {
+                        case Some(field: NestedFormField) => {
+                            //This case handles nested fields. See AddOrganization for example.
+                            formData(Seq(field.name, formField.name).mkString("."))
+                        }
+                        case None => {
+                            //This case handles generic fields.
+                            formData(formField.name)
+                        }
+                    }
+                }
+            }
+        ) { field =>
+            @select(if(arguments.toMap.get('value).map(_.toString).isDefined) field.copy(value = arguments.toMap.get('value).map(_.toString)) else field, for(option <- formField.options) yield (option, Messages(option)), defaultArguments ++ arguments: _*)
+        }
     }
-}

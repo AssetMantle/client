@@ -81,8 +81,8 @@ GET         /master/component/viewZonesInGenesis                         control
 GET         /master/getGenesisAccessedFile                               controllers.FileController.genesisAccessedFile(fileName: String, documentType: String)
 GET         /master/zoneAccessedOrganizationKYCFile                      controllers.FileController.zoneAccessedOrganizationKYCFile(organizationID: String, fileName: String, documentType: String)
 GET         /master/zoneAccessedAssetFile                                controllers.FileController.zoneAccessedAssetFile(id: String, fileName: String, documentType: String)
-GET         /master/organizationAccessedTraderKYCFile                    controllers.FileController.organizationAccessedTraderKYCFile(accountID: String, fileName: String, documentType: String)
-GET         /master/getZoneAccessedTraderKYCFile                         controllers.FileController.zoneAccessedTraderKYCFile(accountID: String, fileName: String, documentType: String)
+GET         /master/organizationAccessedTraderKYCFile                    controllers.FileController.organizationAccessedTraderKYCFile(traderID: String, fileName: String, documentType: String)
+GET         /master/getZoneAccessedTraderKYCFile                         controllers.FileController.zoneAccessedTraderKYCFile(traderID: String, fileName: String, documentType: String)
 GET         /master/file                                                 controllers.FileController.file(fileName: String, documentType: String)
 GET         /master/tradingFile                                          controllers.FileController.tradingFile(id: String, fileName: String, documentType: String)
 
@@ -174,6 +174,12 @@ GET         /traderUpload/storeNegotiationDocument                       control
 GET         /traderUpdate/negotiationForm                                controllers.FileController.updateTraderNegotiationForm(documentType: String, negotiationRequestID :String)
 GET         /traderUpdate/negotiationDocument                            controllers.FileController.updateTraderNegotiation(name: String, documentType: String, negotiationRequestID: String)
 
+GET         /zoneUpload/negotiationForm                                  controllers.FileController.uploadZoneNegotiationForm(documentType: String, negotiationRequestID: String)
+POST        /zoneUpload/negotiationDocument                              controllers.FileController.uploadZoneNegotiation(documentType: String)
+GET         /zoneUpload/storeNegotiationDocument                         controllers.FileController.storeZoneNegotiation(name: String, documentType: String, negotiationRequestID: String)
+GET         /zoneUpdate/negotiationForm                                  controllers.FileController.updateZoneNegotiationForm(documentType: String, negotiationRequestID :String)
+GET         /zoneUpdate/negotiationDocument                              controllers.FileController.updateZoneNegotiation(name: String, documentType: String, negotiationRequestID: String)
+
 GET         /master/addOrganization                                      controllers.AddOrganizationController.addOrganizationForm
 POST        /master/addOrganization                                      controllers.AddOrganizationController.addOrganization
 GET         /master/userUpdateUBOs                                       controllers.AddOrganizationController.userUpdateUBOsForm
@@ -220,10 +226,12 @@ GET         /master/viewVerifyZoneRequests                               control
 GET         /master/rejectVerifyZoneRequest                              controllers.AddZoneController.rejectVerifyZoneRequestForm(zoneID: String)
 POST        /master/rejectVerifyZoneRequest                              controllers.AddZoneController.rejectVerifyZoneRequest
 
-GET         /master/buyerExecuteOrder                                    controllers.BuyerExecuteOrderController.buyerExecuteOrderForm(orderID: String)
+GET         /master/buyerExecuteOrderDocument                            controllers.BuyerExecuteOrderController.buyerExecuteOrderDocument(orderID: String)
+GET         /master/buyerExecuteOrder                                    controllers.BuyerExecuteOrderController.buyerExecuteOrderForm(requestID: String)
 POST        /master/buyerExecuteOrder                                    controllers.BuyerExecuteOrderController.buyerExecuteOrder
 
-GET         /master/moderatedBuyerExecuteOrder                           controllers.BuyerExecuteOrderController.moderatedBuyerExecuteOrderForm(buyerAddress:String, sellerAddress:String, pegHash:String)
+GET         /master/moderatedBuyerExecuteOrderDocument                   controllers.BuyerExecuteOrderController.moderatedBuyerExecuteOrderDocument(buyerAddress:String, sellerAddress:String, pegHash:String)
+GET         /master/moderatedBuyerExecuteOrder                           controllers.BuyerExecuteOrderController.moderatedBuyerExecuteOrderForm(requestID: String)
 POST        /master/moderatedBuyerExecuteOrder                           controllers.BuyerExecuteOrderController.moderatedBuyerExecuteOrder
 
 GET         /master/changeBuyerBid                                       controllers.ChangeBuyerBidController.changeBuyerBidForm(sellerAddress:String, pegHash:String)
@@ -283,19 +291,21 @@ POST        /master/rejectIssueFiatRequest                               control
 GET         /master/issueFiat                                            controllers.IssueFiatController.issueFiatForm(requestID: String, accountID: String, transactionID: String, transactionAmount: Int)
 POST        /master/issueFiat                                            controllers.IssueFiatController.issueFiat
 
-GET         /master/redeemAsset                                          controllers.RedeemAssetController.redeemAssetForm(ownerAddress: String, pegHash: String)
+GET         /master/redeemAsset                                          controllers.RedeemAssetController.redeemAssetForm(username: String, pegHash: String)
 POST        /master/redeemAsset                                          controllers.RedeemAssetController.redeemAsset
 
-GET         /master/redeemFiat                                           controllers.RedeemFiatController.redeemFiatForm(ownerAddress: String)
+GET         /master/redeemFiat                                           controllers.RedeemFiatController.redeemFiatForm(username: String)
 POST        /master/redeemFiat                                           controllers.RedeemFiatController.redeemFiat
 
-GET         /master/releaseAsset                                         controllers.ReleaseAssetController.releaseAssetForm(ownerAddress: String, pegHash: String)
+GET         /master/releaseAsset                                         controllers.ReleaseAssetController.releaseAssetForm(blockchainAddress: String, pegHash: String)
 POST        /master/releaseAsset                                         controllers.ReleaseAssetController.releaseAsset
 
-GET         /master/sellerExecuteOrder                                   controllers.SellerExecuteOrderController.sellerExecuteOrderForm(orderID:String)
+GET         /master/sellerExecuteOrderDocument                           controllers.SellerExecuteOrderController.sellerExecuteOrderDocument(orderID:String)
+GET         /master/sellerExecuteOrder                                   controllers.SellerExecuteOrderController.sellerExecuteOrderForm(requestID:String)
 POST        /master/sellerExecuteOrder                                   controllers.SellerExecuteOrderController.sellerExecuteOrder
 
-GET         /master/moderatedSellerExecuteOrder                          controllers.SellerExecuteOrderController.moderatedSellerExecuteOrderForm(buyerAddress:String, sellerAddress:String, pegHash:String)
+GET         /master/moderatedSellerExecuteOrderDocument                  controllers.SellerExecuteOrderController.moderatedSellerExecuteOrderDocument(buyerAddress:String, sellerAddress:String, pegHash:String)
+GET         /master/moderatedSellerExecuteOrder                          controllers.SellerExecuteOrderController.moderatedSellerExecuteOrderForm(requestID: String)
 POST        /master/moderatedSellerExecuteOrder                          controllers.SellerExecuteOrderController.moderatedSellerExecuteOrder
 
 GET         /master/sendAsset                                            controllers.SendAssetController.sendAssetForm(buyerAddress:String, pegHash: String)
@@ -314,13 +324,13 @@ POST        /master/approveFaucetRequests                                control
 GET         /master/rejectFaucetRequest                                  controllers.SendCoinController.rejectFaucetRequestForm(requestID: String)
 POST        /master/rejectFaucetRequest                                  controllers.SendCoinController.rejectFaucetRequest
 
-GET         /master/sendFiat                                             controllers.SendFiatController.sendFiatForm(sellerAddress:String, pegHash: String, bid: Int)
+GET         /master/sendFiat                                             controllers.SendFiatController.sendFiatForm(sellerAddress: String, pegHash: String, amount: Int)
 POST        /master/sendFiat                                             controllers.SendFiatController.sendFiat
 
-GET         /master/setBuyerFeedback                                     controllers.SetBuyerFeedbackController.setBuyerFeedbackForm(buyerAddress:String, pegHash:String)
+GET         /master/setBuyerFeedback                                     controllers.SetBuyerFeedbackController.setBuyerFeedbackForm(buyerAddress: String, pegHash: String)
 POST        /master/setBuyerFeedback                                     controllers.SetBuyerFeedbackController.setBuyerFeedback
 
-GET         /master/setSellerFeedback                                    controllers.SetSellerFeedbackController.setSellerFeedbackForm(sellerAddress:String, pegHash:String)
+GET         /master/setSellerFeedback                                    controllers.SetSellerFeedbackController.setSellerFeedbackForm(sellerAddress: String, pegHash: String)
 POST        /master/setSellerFeedback                                    controllers.SetSellerFeedbackController.setSellerFeedback
 
 GET         /wurtcb                                                      controllers.WesternUnionController.westernUnionForm

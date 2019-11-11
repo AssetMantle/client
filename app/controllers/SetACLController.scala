@@ -60,7 +60,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
-
+  //TODO Change form it should only contain organization ID
   def addTraderForm(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
@@ -264,7 +264,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
     implicit request =>
       try {
         if (masterZones.Service.getID(loginState.username) == masterTraders.Service.getZoneID(traderID)) {
-          withUsernameToken.Ok(views.html.component.master.updateTraderKYCDocumentZoneStatus(traderKYC = masterTraderKYCs.Service.get(id = traderID, documentType = documentType)))
+          Ok(views.html.component.master.updateTraderKYCDocumentZoneStatus(traderKYC = masterTraderKYCs.Service.get(id = traderID, documentType = documentType)))
         }
         else {
           Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
@@ -419,7 +419,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
     implicit request =>
       try {
         if (masterOrganizations.Service.getID(loginState.username) == masterTraders.Service.getOrganizationID(traderID)) {
-          withUsernameToken.Ok(views.html.component.master.updateTraderKYCDocumentOrganizationStatus(traderKYC = masterTraderKYCs.Service.get(id = traderID, documentType = documentType)))
+          Ok(views.html.component.master.updateTraderKYCDocumentOrganizationStatus(traderKYC = masterTraderKYCs.Service.get(id = traderID, documentType = documentType)))
         }
         else {
           Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
@@ -444,7 +444,9 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
             if (masterOrganizations.Service.getID(loginState.username) == masterTraders.Service.getOrganizationID(updateTraderKYCDocumentOrganizationStatusData.traderID)) {
               if (updateTraderKYCDocumentOrganizationStatusData.organizationStatus) {
                 masterTraderKYCs.Service.organizationVerify(id = updateTraderKYCDocumentOrganizationStatusData.traderID, documentType = updateTraderKYCDocumentOrganizationStatusData.documentType)
+                logger.info("1st PASS")
                 utilitiesNotification.send(masterTraders.Service.getAccountId(updateTraderKYCDocumentOrganizationStatusData.traderID), constants.Notification.SUCCESS, Messages(constants.Response.DOCUMENT_APPROVED.message))
+                logger.info("2nd PASS")
               } else {
                 masterTraderKYCs.Service.organizationReject(id = updateTraderKYCDocumentOrganizationStatusData.traderID, documentType = updateTraderKYCDocumentOrganizationStatusData.documentType)
                 utilitiesNotification.send(masterTraders.Service.getAccountId(updateTraderKYCDocumentOrganizationStatusData.traderID), constants.Notification.FAILURE, Messages(constants.Response.DOCUMENT_REJECTED.message))
@@ -601,7 +603,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
       },
       setACLData => {
         try {
-          transactionsSetACL.Service.post(transactionsSetACL.Request(transactionsSetACL.BaseReq(from = setACLData.from, gas = setACLData.gas.toString), password = setACLData.password, aclAddress = setACLData.aclAddress, organizationID = setACLData.organizationID, zoneID = setACLData.zoneID, issueAsset = setACLData.issueAsset.toString, issueFiat = setACLData.issueFiat.toString, sendAsset = setACLData.sendAsset.toString, sendFiat = setACLData.sendFiat.toString, redeemAsset = setACLData.redeemAsset.toString, redeemFiat = setACLData.redeemFiat.toString, sellerExecuteOrder = setACLData.sellerExecuteOrder.toString, buyerExecuteOrder = setACLData.buyerExecuteOrder.toString, changeBuyerBid = setACLData.changeBuyerBid.toString, changeSellerBid = setACLData.changeSellerBid.toString, confirmBuyerBid = setACLData.confirmBuyerBid.toString, confirmSellerBid = setACLData.confirmSellerBid.toString, negotiation = setACLData.negotiation.toString, releaseAsset = setACLData.releaseAsset.toString, mode = transactionMode))
+          transactionsSetACL.Service.post(transactionsSetACL.Request(transactionsSetACL.BaseReq(from = setACLData.from, gas = setACLData.gas.toString), password = setACLData.password, aclAddress = setACLData.aclAddress, organizationID = setACLData.organizationID, zoneID = setACLData.zoneID, issueAsset = setACLData.issueAsset.toString, issueFiat = setACLData.issueFiat.toString, sendAsset = setACLData.sendAsset.toString, sendFiat = setACLData.sendFiat.toString, redeemAsset = setACLData.redeemAsset.toString, redeemFiat = setACLData.redeemFiat.toString, sellerExecuteOrder = setACLData.sellerExecuteOrder.toString, buyerExecuteOrder = setACLData.buyerExecuteOrder.toString, changeBuyerBid = setACLData.changeBuyerBid.toString, changeSellerBid = setACLData.changeSellerBid.toString, confirmBuyerBid = setACLData.confirmBuyerBid.toString, confirmSellerBid = setACLData.confirmSellerBid.toString, negotiation = setACLData.negotiation.toString, releaseAsset = setACLData.releaseAsset.toString, mode = setACLData.mode))
           Ok(views.html.index(successes = Seq(constants.Response.ACL_SET)))
         }
         catch {

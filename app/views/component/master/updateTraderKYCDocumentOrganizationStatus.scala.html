@@ -12,7 +12,7 @@
     @CSRF.formField
     @commonInputText(updateTraderKYCDocumentOrganizationStatusForm, constants.FormField.TRADER_ID, 'value -> traderKYC.id, 'class -> "hidden", 'readonly -> true)
     @commonInputText(updateTraderKYCDocumentOrganizationStatusForm, constants.FormField.DOCUMENT_TYPE, 'value -> traderKYC.documentType, 'class -> "hidden", 'readonly -> true)
-    @commonCheckbox(updateTraderKYCDocumentOrganizationStatusForm, constants.FormField.STATUS), 'class -> "hidden", 'id -> Seq(traderKYC.id, traderKYC.documentType, constants.FormField.STATUS.name).mkString(""))
+    @commonCheckbox(updateTraderKYCDocumentOrganizationStatusForm, constants.FormField.STATUS, 'containerDivClass -> "hidden", 'id -> Seq(traderKYC.id, traderKYC.documentType, constants.FormField.STATUS.name).mkString(""))
 
     @if(updateTraderKYCDocumentOrganizationStatusForm.hasGlobalErrors) {
         <ul>
@@ -22,7 +22,7 @@
         </ul>
     }
     <span class="red">@Messages(constants.Form.ORGANIZATION_STATUS):
-        @traderKYC.status match {
+        @traderKYC.organizationStatus match {
             case Some(status: Boolean) => {
                 @if(status) {
                     <span cmuk-icon="check"></span>

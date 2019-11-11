@@ -4,7 +4,7 @@ import akka.actor.ActorSystem
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Abstract.BaseTransaction
-import models.{blockchain, master}
+import models.{blockchain, master, masterTransaction}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.ws.WSClient
@@ -23,7 +23,7 @@ case class RedeemAsset(from: String, to: String, pegHash: String, gas: Int, stat
 
 
 @Singleton
-class RedeemAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Transaction, protected val databaseConfigProvider: DatabaseConfigProvider, getAccount: GetAccount, blockchainAssets: blockchain.Assets, transactionRedeemAsset: transactions.RedeemAsset, blockchainAccounts: blockchain.Accounts, utilitiesNotification: utilities.Notification, masterAccounts: master.Accounts)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
+class RedeemAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Transaction, protected val databaseConfigProvider: DatabaseConfigProvider, getAccount: GetAccount, masterTransactionIssueAssetRequests: masterTransaction.IssueAssetRequests, blockchainAssets: blockchain.Assets, transactionRedeemAsset: transactions.RedeemAsset, blockchainAccounts: blockchain.Accounts, utilitiesNotification: utilities.Notification, masterAccounts: master.Accounts)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_REDEEM_ASSET
 
@@ -187,6 +187,7 @@ class RedeemAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tr
       try {
         Service.markTransactionFailed(ticketID, message)
         val redeemAsset = Service.getTransaction(ticketID)
+        masterTransactionIssueAssetRequests.Service.markRedeemed(Option(redeemAsset.pegHash))
         utilitiesNotification.send(masterAccounts.Service.getId(redeemAsset.from), constants.Notification.FAILURE, message)
         utilitiesNotification.send(masterAccounts.Service.getId(redeemAsset.to), constants.Notification.FAILURE, message)
       } catch {

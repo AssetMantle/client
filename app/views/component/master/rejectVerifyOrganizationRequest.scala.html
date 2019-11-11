@@ -4,5 +4,5 @@
 
 @(rejectVerifyOrganizationRequestForm: Form[RejectVerifyOrganizationRequest.Data] = RejectVerifyOrganizationRequest.form, organizationID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @commonForm(constants.Form.REJECT_VERIFY_ORGANIZATION_REQUEST, rejectVerifyOrganizationRequestForm) {
-    @commonInputText(rejectVerifyOrganizationRequestForm, constants.FormField.ORGANIZATION_ID, 'value -> organizationID))
+    @commonInputText(rejectVerifyOrganizationRequestForm, constants.FormField.ORGANIZATION_ID, 'value -> organizationID)
 }
