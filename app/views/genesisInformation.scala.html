@@ -4,7 +4,7 @@
 @common(Messages(constants.Form.INDEX))(Html(""))(center)(Html(""))
 
 @center = {
-    <ul class="flexContainer" cmuk-accordion>
+    <ul cmuk-accordion>
         <li>
             <a class="cmuk-accordion-title" href="#" onclick="fetchOrShowHide('genesisInformation', jsRoutes.controllers.AddZoneController.viewZonesInGenesis(), this)">@Messages(constants.Form.ZONES)</a>
             <div class="cmuk-accordion-content">

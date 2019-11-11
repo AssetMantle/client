@@ -28,6 +28,7 @@ button {
     border: none;
     cursor: pointer;
     opacity: 0.8;
+    word-break: break-all;
 }
 
 button:hover {
