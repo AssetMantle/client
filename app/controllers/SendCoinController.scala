@@ -94,7 +94,7 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
     implicit request =>
       views.companion.master.RejectFaucetRequest.form.bindFromRequest().fold(
         formWithErrors => {
-          BadRequest(views.html.component.master.rejectFaucetRequest(formWithErrors, formWithErrors.data(constants.Form.REQUEST_ID)))
+          BadRequest(views.html.component.master.rejectFaucetRequest(formWithErrors, formWithErrors.data(constants.FormField.REQUEST_ID.name)))
         },
         rejectFaucetRequestData => {
           try {
@@ -116,7 +116,7 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
     implicit request =>
       views.companion.master.ApproveFaucetRequest.form.bindFromRequest().fold(
         formWithErrors => {
-          BadRequest(views.html.component.master.approveFaucetRequests(formWithErrors, formWithErrors.data(constants.Form.REQUEST_ID), formWithErrors.data(constants.Form.ACCOUNT_ID)))
+          BadRequest(views.html.component.master.approveFaucetRequests(formWithErrors, formWithErrors.data(constants.FormField.REQUEST_ID.name), formWithErrors.data(constants.FormField.ACCOUNT_ID.name)))
         },
         approveFaucetRequestFormData => {
           try {

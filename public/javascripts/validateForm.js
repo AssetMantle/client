@@ -4,7 +4,7 @@ function validateForm(form) {
 
     form.find("dl").each(function () {
             const dlElement = $(this);
-            if(dlElement.find(("select"))[0]!==undefined){
+            if (dlElement.find(("select"))[0] !== undefined) {
                 return;
             }
             const inputElement = dlElement.find("input")[0];
@@ -17,7 +17,8 @@ function validateForm(form) {
             }
 
             let errorStatement = "";
-            if (inputElement.type === "date" || inputElement.type === "checkbox" || (inputElement.getAttribute("required")==="false" && inputValue==="")) {
+            //TODO box disappears for required false
+            if (inputElement.type === "date" || inputElement.type === "checkbox" || (inputElement.getAttribute("required") === "false" && inputValue === "")) {
                 return;
             }
 

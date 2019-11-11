@@ -4,7 +4,7 @@
 
 @(issueAssetForm: Form[IssueAsset.Data] = IssueAsset.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @commonForm(constants.Form.ISSUE_ASSET, issueAssetForm) {
-    @commonInputText(issueAssetForm, constants.FormField.REQUEST_ID)
+    @commonInputText(issueAssetForm, constants.FormField.REQUEST_ID, 'readonly -> true)
     @commonInputText(issueAssetForm, constants.FormField.ACCOUNT_ID)
     @commonInputText(issueAssetForm, constants.FormField.DOCUMENT_HASH)
     @commonSelect(issueAssetForm, constants.FormField.ASSET_TYPE)

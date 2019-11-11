@@ -4,8 +4,7 @@
 
 @(issueAssetDetailForm: Form[IssueAssetDetail.Data] = IssueAssetDetail.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @commonForm(constants.Form.ISSUE_ASSET_DETAIL, issueAssetDetailForm) {
-    @*//TODO why requestID is hidden and not optional when no default value *@
-    @commonInputText(issueAssetDetailForm, constants.FormField.REQUEST_ID, 'required -> false)
+    @commonInputText(issueAssetDetailForm, constants.FormField.REQUEST_ID, 'required -> false, 'class -> "hidden")
     @commonSelect(issueAssetDetailForm, constants.FormField.ASSET_TYPE)
     @commonInputText(issueAssetDetailForm, constants.FormField.QUANTITY_UNIT)
     @commonInputInt(issueAssetDetailForm, constants.FormField.ASSET_QUANTITY)

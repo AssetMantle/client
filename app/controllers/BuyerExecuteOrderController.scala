@@ -20,6 +20,7 @@ class BuyerExecuteOrderController @Inject()(messagesControllerComponents: Messag
 
   private implicit val module: String = constants.Module.CONTROLLERS_BUYER_EXECUTE_ORDER
 
+  //TODO username instead of Addresses
   def buyerExecuteOrderDocument(orderID: String) = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
@@ -81,6 +82,7 @@ class BuyerExecuteOrderController @Inject()(messagesControllerComponents: Messag
       }
   }
 
+  //TODO username instead of Addresses
   def moderatedBuyerExecuteOrderDocument(buyerAddress: String, sellerAddress: String, pegHash: String) = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {

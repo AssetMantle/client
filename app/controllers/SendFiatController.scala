@@ -20,15 +20,15 @@ class SendFiatController @Inject()(messagesControllerComponents: MessagesControl
 
   private implicit val module: String = constants.Module.CONTROLLERS_SEND_FIAT
 
-  def sendFiatForm(sellerAddress: String, pegHash: String, bid: Int): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.sendFiat(sellerAddress = sellerAddress, pegHash = pegHash, bid= bid))
+  def sendFiatForm(sellerAddress: String, pegHash: String, amount: Int): Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.sendFiat(sellerAddress = sellerAddress, pegHash = pegHash, amount = amount))
   }
 
   def sendFiat: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       views.companion.master.SendFiat.form.bindFromRequest().fold(
         formWithErrors => {
-          BadRequest(views.html.component.master.sendFiat(formWithErrors, formWithErrors.data(constants.Form.SELLER_ADDRESS), formWithErrors.data(constants.Form.PEG_HASH), formWithErrors.data(constants.Form.BID).toInt))
+          BadRequest(views.html.component.master.sendFiat(formWithErrors, sellerAddress = formWithErrors.data(constants.FormField.SELLER_ADDRESS.name), pegHash = formWithErrors.data(constants.FormField.PEG_HASH.name), amount = formWithErrors.data(constants.FormField.AMOUNT.name).toInt))
         },
         sendFiatData => {
           try {

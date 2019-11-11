@@ -85,7 +85,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
       }
   }
 
-
+  //TODO Shall we verify for genesis
   def genesisAccessedFile(fileName: String, documentType: String): Action[AnyContent] = withGenesisLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
@@ -108,10 +108,10 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
       }
   }
 
-  def zoneAccessedTraderKYCFile(accountID: String, fileName: String, documentType: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
+  def zoneAccessedTraderKYCFile(traderID: String, fileName: String, documentType: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        if (masterTraders.Service.getByAccountID(accountID).zoneID == masterZones.Service.getID(loginState.username)) {
+        if (masterTraders.Service.getZoneID(traderID) == masterZones.Service.getID(loginState.username)) {
           Ok.sendFile(utilities.FileOperations.fetchFile(path = fileResourceManager.getTraderKYCFilePath(documentType), fileName = fileName))
         } else {
           Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
@@ -121,10 +121,10 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
       }
   }
 
-  def organizationAccessedTraderKYCFile(accountID: String, fileName: String, documentType: String): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
+  def organizationAccessedTraderKYCFile(traderID: String, fileName: String, documentType: String): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        if (masterTraders.Service.getOrganizationIDByAccountID(loginState.username) == masterOrganizations.Service.getID(loginState.username)) {
+        if (masterTraders.Service.getOrganizationID(traderID) == masterOrganizations.Service.getID(loginState.username)) {
           Ok.sendFile(utilities.FileOperations.fetchFile(path = fileResourceManager.getTraderKYCFilePath(documentType), fileName = fileName))
         } else {
           Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
@@ -362,7 +362,16 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
-
+  //TODO Shall we check if exists?
+  def userAccessedZoneKYCFile(documentType: String): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      try {
+        Ok.sendFile(utilities.FileOperations.fetchFile(path = fileResourceManager.getZoneKYCFilePath(documentType), fileName = masterZoneKYCs.Service.getFileName(id = masterZones.Service.getID(loginState.username), documentType = documentType)))
+      } catch {
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
+  }
+  //TODO Shall we check if exists?
   def userAccessedOrganizationKYCFile(documentType: String): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
@@ -371,11 +380,11 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
-
+  //TODO Shall we check if exists?
   def userAccessedTraderKYCFile(documentType: String): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        Ok.sendFile(utilities.FileOperations.fetchFile(path = fileResourceManager.getOrganizationKYCFilePath(documentType), fileName = masterTraderKYCs.Service.getFileName(id = masterTraders.Service.getID(loginState.username), documentType = documentType)))
+        Ok.sendFile(utilities.FileOperations.fetchFile(path = fileResourceManager.getTraderKYCFilePath(documentType), fileName = masterTraderKYCs.Service.getFileName(id = masterTraders.Service.getID(loginState.username), documentType = documentType)))
       } catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
@@ -384,7 +393,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
   def zoneAccessedAssetFile(id: String, fileName: String, documentType: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        if (masterTraders.Service.getByAccountID(masterTransactionIssueAssetRequests.Service.getAccountID(id)).zoneID == masterZones.Service.getID(loginState.username)) {
+        if (masterTraders.Service.getZoneIDByAccountID(masterTransactionIssueAssetRequests.Service.getAccountID(id)) == masterZones.Service.getID(loginState.username)) {
           Ok.sendFile(utilities.FileOperations.fetchFile(path = fileResourceManager.getTraderAssetFilePath(documentType), fileName = fileName))
         } else {
           Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
@@ -415,15 +424,6 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
         } else {
           Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
         }
-      } catch {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-      }
-  }
-
-  def userAccessedZoneKYCFile(documentType: String): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
-    implicit request =>
-      try {
-        Ok.sendFile(utilities.FileOperations.fetchFile(path = fileResourceManager.getZoneKYCFilePath(documentType), fileName = masterZoneKYCs.Service.getFileName(id = masterZones.Service.getID(loginState.username), documentType = documentType)))
       } catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }

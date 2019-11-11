@@ -34,7 +34,7 @@ class ConfirmSellerBidController @Inject()(messagesControllerComponents: Message
   def confirmSellerBidDetailForm(buyerAddress: String, pegHash: String, bid: Int): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
-        withUsernameToken.Ok(views.html.component.master.confirmSellerBidDetail(views.companion.master.ConfirmSellerBidDetail.form.fill(views.companion.master.ConfirmSellerBidDetail.Data(masterTransactionNegotiationRequests.Service.getIDByPegHashBuyerAccountIDAndSellerAccountID(pegHash, masterAccounts.Service.getId(buyerAddress), loginState.username), buyerAddress, bid, pegHash))))
+        Ok(views.html.component.master.confirmSellerBidDetail(views.companion.master.ConfirmSellerBidDetail.form.fill(views.companion.master.ConfirmSellerBidDetail.Data(masterTransactionNegotiationRequests.Service.getIDByPegHashBuyerAccountIDAndSellerAccountID(pegHash, masterAccounts.Service.getId(buyerAddress), loginState.username), buyerAddress, bid, pegHash))))
       } catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
@@ -63,7 +63,7 @@ class ConfirmSellerBidController @Inject()(messagesControllerComponents: Message
       try {
         val negotiation = masterTransactionNegotiationRequests.Service.getNegotiationByID(requestID)
         if (negotiation.sellerAccountID == loginState.username) {
-          withUsernameToken.Ok(views.html.component.master.confirmSellerBid(views.companion.master.ConfirmBidTransaction.form.fill(views.companion.master.ConfirmBidTransaction.Data(negotiation.id,  0, constants.FormField.GAS.minimumValue, "")), negotiation, masterTransactionNegotiationFiles.Service.getConfirmBidDocuments(requestID)))
+          Ok(views.html.component.master.confirmSellerBid(negotiation = negotiation, files =  masterTransactionNegotiationFiles.Service.getConfirmBidDocuments(requestID)))
         } else {
           Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
         }
