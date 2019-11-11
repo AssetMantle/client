@@ -23,21 +23,6 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
 
   private implicit val module: String = constants.Module.CONTROLLERS_ISSUE_ASSET
 
-  //TODO why issueAssetRequestForm is sending ConfirmIssueAssetTransaction.form
-  def issueAssetRequestForm(id: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
-    implicit request =>
-      try {
-        val asset = masterTransactionIssueAssetRequests.Service.getIssueAssetByID(id)
-        if (asset.accountID == loginState.username) {
-          withUsernameToken.Ok(views.html.component.master.issueAssetRequest(views.companion.master.ConfirmIssueAssetTransaction.form.fill(views.companion.master.ConfirmIssueAssetTransaction.Data(id, Option(0), Option(""))), asset))
-        } else {
-          Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
-        }
-      } catch {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-      }
-  }
-
   def assetDetail(id: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
@@ -52,16 +37,32 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
       }
   }
 
+  //TODO why issueAssetRequestForm is sending ConfirmIssueAssetTransaction.form
+  def issueAssetRequestForm(id: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      try {
+        val asset = masterTransactionIssueAssetRequests.Service.getIssueAssetByID(id)
+        if (asset.accountID == loginState.username) {
+          Ok(views.html.component.master.issueAssetRequest(asset = asset, requestID = id))
+        } else {
+          Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
+        }
+      } catch {
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
+  }
+
   def issueAssetRequest: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       views.companion.master.ConfirmIssueAssetTransaction.form.bindFromRequest().fold(
         formWithErrors => {
           try {
-            BadRequest(views.html.component.master.issueAssetRequest(formWithErrors, masterTransactionIssueAssetRequests.Service.getIssueAssetByID(formWithErrors.data(constants.FormField.REQUEST_ID.name))))
+            BadRequest(views.html.component.master.issueAssetRequest(formWithErrors, asset = masterTransactionIssueAssetRequests.Service.getIssueAssetByID(formWithErrors.data(constants.FormField.REQUEST_ID.name)), requestID = formWithErrors.data(constants.FormField.REQUEST_ID.name)))
           } catch {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
         },
+        //TODO confirmTransactionData? Search everywhere else
         confirmTransactionData => {
           try {
             masterTransactionIssueAssetRequests.Service.updateDocumentHash(confirmTransactionData.requestID, Option(utilities.FileOperations.combinedHash(masterTransactionAssetFiles.Service.getAllDocuments(confirmTransactionData.requestID))))
@@ -147,6 +148,7 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
       implicit request =>
         views.companion.master.IssueAssetOBL.form.bindFromRequest().fold(
           formWithErrors => {
+            //TODO try catch
             BadRequest(views.html.component.master.issueAssetOBL(formWithErrors, masterTransactionAssetFiles.Service.getOrNone(formWithErrors.data(constants.FormField.REQUEST_ID.name), constants.File.OBL)))
           },
           issueAssetOBLData => {
@@ -185,6 +187,7 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
       implicit request =>
         views.companion.master.IssueAssetInvoice.form.bindFromRequest().fold(
           formWithErrors => {
+            //TODO try catch
             BadRequest(views.html.component.master.issueAssetInvoice(formWithErrors, masterTransactionAssetFiles.Service.getOrNone(formWithErrors.data(constants.FormField.REQUEST_ID.name), constants.File.INVOICE)))
           },
           issueAssetInvoiceData => {
@@ -227,7 +230,8 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
     implicit request =>
       try {
         if (masterZones.Service.getID(loginState.username) == masterTraders.Service.getZoneIDByAccountID(masterTransactionIssueAssetRequests.Service.getAccountID(fileID))) {
-          withUsernameToken.Ok(views.html.component.master.updateAssetDocumentStatus(file = masterTransactionAssetFiles.Service.get(id = fileID, documentType = documentType) ))
+          val assetFile = masterTransactionAssetFiles.Service.get(id = fileID, documentType = documentType)
+          Ok(views.html.component.master.updateAssetDocumentStatus(file = masterTransactionAssetFiles.Service.get(id = fileID, documentType = documentType)))
         } else {
           Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
         }
@@ -274,7 +278,7 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
       implicit request =>
         views.companion.master.RejectIssueAssetRequest.form.bindFromRequest().fold(
           formWithErrors => {
-            BadRequest(views.html.component.master.rejectIssueAssetRequest(formWithErrors, formWithErrors.data(constants.Form.REQUEST_ID)))
+            BadRequest(views.html.component.master.rejectIssueAssetRequest(formWithErrors, formWithErrors.data(constants.FormField.REQUEST_ID.name)))
           },
           rejectIssueAssetRequestData => {
             try {

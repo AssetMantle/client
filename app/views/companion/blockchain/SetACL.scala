@@ -7,7 +7,6 @@ object SetACL {
   val form = Form(
     mapping(
       constants.FormField.FROM.name -> constants.FormField.FROM.field,
-      constants.FormField.PASSWORD.name -> constants.FormField.PASSWORD.field,
       constants.FormField.ACL_ADDRESS.name -> constants.FormField.ACL_ADDRESS.field,
       constants.FormField.ORGANIZATION_ID.name -> constants.FormField.ORGANIZATION_ID.field,
       constants.FormField.ZONE_ID.name -> constants.FormField.ZONE_ID.field,
@@ -26,9 +25,11 @@ object SetACL {
       constants.FormField.NEGOTIATION.name -> constants.FormField.NEGOTIATION.field,
       constants.FormField.RELEASE_ASSET.name -> constants.FormField.RELEASE_ASSET.field,
       constants.FormField.GAS.name -> constants.FormField.GAS.field,
+      constants.FormField.MODE.name -> constants.FormField.MODE.field,
+      constants.FormField.PASSWORD.name -> constants.FormField.PASSWORD.field
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(from: String, password: String, aclAddress: String, organizationID: String, zoneID: String, issueAsset: Boolean, issueFiat: Boolean, sendAsset: Boolean, sendFiat: Boolean, redeemAsset: Boolean, redeemFiat: Boolean, sellerExecuteOrder: Boolean, buyerExecuteOrder: Boolean, changeBuyerBid: Boolean, changeSellerBid: Boolean, confirmBuyerBid: Boolean, confirmSellerBid: Boolean, negotiation: Boolean, releaseAsset: Boolean, gas: Int)
+  case class Data(from: String, aclAddress: String, organizationID: String, zoneID: String, issueAsset: Boolean, issueFiat: Boolean, sendAsset: Boolean, sendFiat: Boolean, redeemAsset: Boolean, redeemFiat: Boolean, sellerExecuteOrder: Boolean, buyerExecuteOrder: Boolean, changeBuyerBid: Boolean, changeSellerBid: Boolean, confirmBuyerBid: Boolean, confirmSellerBid: Boolean, negotiation: Boolean, releaseAsset: Boolean, gas: Int, mode: String, password: String)
 
 }

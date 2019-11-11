@@ -24,7 +24,7 @@ class ChangeSellerBidController @Inject()(messagesControllerComponents: Messages
     implicit request =>
       try {
         val negotiationRequest = masterTransactionNegotiationRequests.Service.getNegotiationByPegHashBuyerAccountIDAndSellerAccountID(pegHash, masterAccounts.Service.getId(buyerAddress), loginState.username)
-        withUsernameToken.Ok(views.html.component.master.changeSellerBid(views.companion.master.ChangeSellerBid.form.fill(views.companion.master.ChangeSellerBid.Data(negotiationRequest.id, "", buyerAddress, negotiationRequest.amount, 0, pegHash, constants.FormField.GAS.minimumValue))))
+        Ok(views.html.component.master.changeSellerBid(requestID = negotiationRequest.id, buyerAddress = buyerAddress, bid = negotiationRequest.amount, pegHash = pegHash))
       } catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
@@ -34,7 +34,7 @@ class ChangeSellerBidController @Inject()(messagesControllerComponents: Messages
     implicit request =>
       views.companion.master.ChangeSellerBid.form.bindFromRequest().fold(
         formWithErrors => {
-          BadRequest(views.html.component.master.changeSellerBid(formWithErrors))
+          BadRequest(views.html.component.master.changeSellerBid(formWithErrors, requestID = formWithErrors.data(constants.FormField.REQUEST_ID.name), buyerAddress = formWithErrors.data(constants.FormField.BUYER_ADDRESS.name), bid = formWithErrors.data(constants.FormField.BID.name).toInt, pegHash = formWithErrors.data(constants.FormField.PEG_HASH.name)))
         },
         changeSellerBidData => {
           try {

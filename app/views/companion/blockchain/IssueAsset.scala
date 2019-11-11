@@ -14,13 +14,13 @@ object IssueAsset {
       constants.FormField.QUANTITY_UNIT.name -> constants.FormField.QUANTITY_UNIT.field,
       constants.FormField.ASSET_QUANTITY.name -> constants.FormField.ASSET_QUANTITY.field,
       constants.FormField.MODERATED.name -> constants.FormField.MODERATED.field,
-      constants.FormField.GAS.name -> constants.FormField.GAS.field,
       constants.FormField.TAKER_ADDRESS.name -> constants.FormField.TAKER_ADDRESS.field,
-      constants.FormField.PASSWORD.name -> constants.FormField.PASSWORD.field,
-      constants.FormField.MODE.name -> constants.FormField.MODE.field
+      constants.FormField.GAS.name -> constants.FormField.GAS.field,
+      constants.FormField.MODE.name -> constants.FormField.MODE.field,
+      constants.FormField.PASSWORD.name -> constants.FormField.PASSWORD.field
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(from: String, to: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, moderated: Boolean, gas: Int, takerAddress: String, password: String, mode: String)
+  case class Data(from: String, to: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, moderated: Boolean, takerAddress: String, gas: Int, mode: String, password: String)
 
 }

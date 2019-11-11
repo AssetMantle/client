@@ -19,23 +19,23 @@ class ReleaseAssetController @Inject()(messagesControllerComponents: MessagesCon
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
   private implicit val module: String = constants.Module.CONTROLLERS_RELEASE_ASSET
-
-  def releaseAssetForm(ownerAddress: String, pegHash: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.releaseAsset(ownerAddress = ownerAddress, pegHash = pegHash))
+  //TODO username instead of address
+  def releaseAssetForm(blockchainAddress: String, pegHash: String): Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.releaseAsset(blockchainAddress = blockchainAddress, pegHash = pegHash))
   }
 
   def releaseAsset(): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       views.companion.master.ReleaseAsset.form.bindFromRequest().fold(
         formWithErrors => {
-          BadRequest(views.html.component.master.releaseAsset(formWithErrors, formWithErrors.data(constants.Form.OWNER_ADDRESS), formWithErrors.data(constants.Form.PEG_HASH)))
+          BadRequest(views.html.component.master.releaseAsset(formWithErrors, formWithErrors.data(constants.FormField.BLOCKCHAIN_ADDRESS.name), formWithErrors.data(constants.FormField.PEG_HASH.name)))
         },
         releaseAssetData => {
           try {
             transaction.process[blockchainTransaction.ReleaseAsset, transactionsReleaseAsset.Request](
-              entity = blockchainTransaction.ReleaseAsset(from = loginState.address, to = releaseAssetData.address, pegHash = releaseAssetData.pegHash, gas = releaseAssetData.gas, ticketID = "", mode = transactionMode),
+              entity = blockchainTransaction.ReleaseAsset(from = loginState.address, to = releaseAssetData.blockchainAddress, pegHash = releaseAssetData.pegHash, gas = releaseAssetData.gas, ticketID = "", mode = transactionMode),
               blockchainTransactionCreate = blockchainTransactionReleaseAssets.Service.create,
-              request = transactionsReleaseAsset.Request(transactionsReleaseAsset.BaseReq(from = loginState.address, gas = releaseAssetData.gas.toString), to = releaseAssetData.address, password = releaseAssetData.password, pegHash = releaseAssetData.pegHash, mode = transactionMode),
+              request = transactionsReleaseAsset.Request(transactionsReleaseAsset.BaseReq(from = loginState.address, gas = releaseAssetData.gas.toString), to = releaseAssetData.blockchainAddress, password = releaseAssetData.password, pegHash = releaseAssetData.pegHash, mode = transactionMode),
               action = transactionsReleaseAsset.Service.post,
               onSuccess = blockchainTransactionReleaseAssets.Utility.onSuccess,
               onFailure = blockchainTransactionReleaseAssets.Utility.onFailure,
@@ -49,7 +49,7 @@ class ReleaseAssetController @Inject()(messagesControllerComponents: MessagesCon
         }
       )
   }
-
+  //TODO releaseAsset request, it's getting all locked
   def releaseAssetList(): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {

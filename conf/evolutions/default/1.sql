@@ -804,7 +804,7 @@ ALTER TABLE MASTER_TRANSACTION."EmailOTP"
 /*Initial State*/
 
 INSERT INTO blockchain."Account_BC" ("address", "coins", "publicKey", "accountNumber", "sequence", "dirtyBit")
-VALUES ('commit17jxmr4felwgeugmeu6c4gr4vq0hmeaxlamvxjg',
+VALUES ('commit1gkrp4y9r6p8fl0p5gldt7n8fhv8xut5uzxywvl',
         '1000',
         'commitpub1addwnpepqty3h2wuanwkjw5g2jn6p0rwcy7j7xm985t8kg8zpkp7ay83rrz2276x7qn',
         '0',
@@ -812,7 +812,7 @@ VALUES ('commit17jxmr4felwgeugmeu6c4gr4vq0hmeaxlamvxjg',
         true);
 
 INSERT INTO master."Account" ("id", "secretHash", "accountAddress", "language", "userType", "status")
-VALUES ('main', '-233904575', 'commit17jxmr4felwgeugmeu6c4gr4vq0hmeaxlamvxjg', 'en', 'GENESIS', 'NO_CONTACT');
+VALUES ('main', '-233904575', 'commit1gkrp4y9r6p8fl0p5gldt7n8fhv8xut5uzxywvl', 'en', 'GENESIS', 'NO_CONTACT');
 
 # --- !Downs
 

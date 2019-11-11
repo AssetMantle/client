@@ -22,7 +22,7 @@
         </ul>
     }
     <span class="red">@Messages(constants.Form.ORGANIZATION_STATUS):
-        @traderKYC.status match {
+        @traderKYC.organizationStatus match {
             case Some(status: Boolean) => {
                 @if(status) {
                     <span cmuk-icon="check"></span>
