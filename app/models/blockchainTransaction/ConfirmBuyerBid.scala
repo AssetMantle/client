@@ -183,7 +183,7 @@ class ConfirmBuyerBids @Inject()(actorSystem: ActorSystem, transaction: utilitie
       try {
         Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
         val confirmBuyerBid = Service.getTransaction(ticketID)
-        Thread.sleep(sleepTime)
+        //Thread.sleep(sleepTime)
         val buyerAccountID = masterAccounts.Service.getId(confirmBuyerBid.from)
         val negotiationID = blockchainNegotiations.Service.getNegotiationID(buyerAddress = confirmBuyerBid.from, sellerAddress = confirmBuyerBid.to, pegHash = confirmBuyerBid.pegHash)
         val negotiationResponse = if (negotiationID == "") getNegotiation.Service.get(getNegotiationID.Service.get(buyerAddress = confirmBuyerBid.from, sellerAddress = confirmBuyerBid.to, pegHash = confirmBuyerBid.pegHash).negotiationID) else getNegotiation.Service.get(negotiationID)

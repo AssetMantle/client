@@ -74,7 +74,7 @@ class ConfirmSellerBidController @Inject()(messagesControllerComponents: Message
 
   def confirmSellerBid: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      views.companion.master.ConfirmBidTransaction.form.bindFromRequest().fold(
+      views.companion.master.ConfirmBid.form.bindFromRequest().fold(
         formWithErrors => {
           try {
             val negotiation = masterTransactionNegotiationRequests.Service.getNegotiationByID(formWithErrors.data(constants.FormField.REQUEST_ID.name))

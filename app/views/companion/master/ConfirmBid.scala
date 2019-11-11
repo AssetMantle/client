@@ -3,8 +3,7 @@ package views.companion.master
 import play.api.data.Form
 import play.api.data.Forms._
 
-//TODO why Transaction
-object ConfirmBidTransaction {
+object ConfirmBid {
   val form = Form(
     mapping(
       constants.FormField.REQUEST_ID.name -> constants.FormField.REQUEST_ID.field,

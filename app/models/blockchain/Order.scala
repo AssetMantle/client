@@ -167,13 +167,12 @@ class Orders @Inject()(shutdownActors: ShutdownActor, masterAccounts: master.Acc
             blockchainFiats.Service.deleteFiatPegWallet(dirtyOrder.id)
           }
           if (orderResponse.value.awbProofHash != "" && orderResponse.value.fiatProofHash != "") {
-            blockchainTraderFeedbackHistories.Service.create(negotiation.sellerAddress, negotiation.buyerAddress, negotiation.sellerAddress, negotiation.assetPegHash, rating = "")
-            blockchainTraderFeedbackHistories.Service.create(negotiation.buyerAddress, negotiation.buyerAddress, negotiation.sellerAddress, negotiation.assetPegHash, rating = "")
-            // TODO: change implementation for masterTransactionIssueAssetRequests
+            blockchainTraderFeedbackHistories.Service.insertOrUpdate(negotiation.sellerAddress, negotiation.buyerAddress, negotiation.sellerAddress, negotiation.assetPegHash, rating = "")
+            blockchainTraderFeedbackHistories.Service.insertOrUpdate(negotiation.buyerAddress, negotiation.buyerAddress, negotiation.sellerAddress, negotiation.assetPegHash, rating = "")
+            //TODO Remove update of masterTransaction/IssueAssetRequest accountID and show assets from trader Index via blockchain
             masterTransactionIssueAssetRequests.Service.updateAccountIDAndMarkListedForTradeByPegHash(Option(negotiation.assetPegHash), masterAccounts.Service.getId(negotiation.buyerAddress))
             blockchainNegotiations.Service.deleteNegotiations(negotiation.assetPegHash)
           }
-          //TODO Remove update of masterTransaction/IssueAssetRequest accountID and show assets from trader Index via blockchain
           Service.insertOrUpdate(dirtyOrder.id, awbProofHash = if (orderResponse.value.awbProofHash == "") None else Option(orderResponse.value.awbProofHash), fiatProofHash = if (orderResponse.value.fiatProofHash == "") None else Option(orderResponse.value.fiatProofHash), dirtyBit = false)
           mainOrderActor ! OrderCometMessage(username = masterAccounts.Service.getId(negotiation.buyerAddress), message = Json.toJson(constants.Comet.PING))
           mainOrderActor ! OrderCometMessage(username = masterAccounts.Service.getId(negotiation.sellerAddress), message = Json.toJson(constants.Comet.PING))

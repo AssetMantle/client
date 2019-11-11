@@ -37,7 +37,7 @@ class BuyerExecuteOrderController @Inject()(messagesControllerComponents: Messag
       try {
         val negotiation = blockchainNegotiations.Service.get(masterTransactionNegotiationRequests.Service.getNegotiationIDByID(requestID))
         val fiatProofDocument = masterTransactionNegotiationFiles.Service.getDocuments(requestID, Seq(constants.File.FIAT_PROOF))
-        withUsernameToken.Ok(views.html.component.master.buyerExecuteOrder(views.companion.master.BuyerExecuteOrder.form.fill(views.companion.master.BuyerExecuteOrder.Data("", negotiation.sellerAddress, utilities.FileOperations.combinedHash(fiatProofDocument), negotiation.assetPegHash, 0)), fiatProofDocument))
+        withUsernameToken.Ok(views.html.component.master.buyerExecuteOrder(views.companion.master.BuyerExecuteOrder.form.fill(views.companion.master.BuyerExecuteOrder.Data(negotiation.sellerAddress, utilities.FileOperations.combinedHash(fiatProofDocument), negotiation.assetPegHash, 0, "")), fiatProofDocument))
       } catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
@@ -83,7 +83,7 @@ class BuyerExecuteOrderController @Inject()(messagesControllerComponents: Messag
   }
 
   //TODO username instead of Addresses
-  def moderatedBuyerExecuteOrderDocument(buyerAddress: String, sellerAddress: String, pegHash: String) = withTraderLoginAction.authenticated { implicit loginState =>
+  def moderatedBuyerExecuteOrderDocument(buyerAddress: String, sellerAddress: String, pegHash: String) = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       try {
         val requestID = masterTransactionNegotiationRequests.Service.getIDByNegotiationID(blockchainNegotiations.Service.getNegotiationID(buyerAddress,sellerAddress,pegHash))
@@ -100,7 +100,7 @@ class BuyerExecuteOrderController @Inject()(messagesControllerComponents: Messag
     try {
       val negotiation = blockchainNegotiations.Service.get(masterTransactionNegotiationRequests.Service.getNegotiationIDByID(requestID))
       val fiatProofDocument = masterTransactionNegotiationFiles.Service.getDocuments(requestID, Seq(constants.File.FIAT_PROOF))
-      withUsernameToken.Ok(views.html.component.master.moderatedBuyerExecuteOrder(views.companion.master.ModeratedBuyerExecuteOrder.form.fill(views.companion.master.ModeratedBuyerExecuteOrder.Data("", negotiation.buyerAddress, negotiation.sellerAddress, utilities.FileOperations.combinedHash(fiatProofDocument), negotiation.assetPegHash, 0)), fiatProofDocument))
+      withUsernameToken.Ok(views.html.component.master.moderatedBuyerExecuteOrder(views.companion.master.ModeratedBuyerExecuteOrder.form.fill(views.companion.master.ModeratedBuyerExecuteOrder.Data(negotiation.buyerAddress, negotiation.sellerAddress, utilities.FileOperations.combinedHash(fiatProofDocument), negotiation.assetPegHash, 0,"")), fiatProofDocument))
     }catch{
       case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
     }

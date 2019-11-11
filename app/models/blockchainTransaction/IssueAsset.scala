@@ -190,7 +190,7 @@ class IssueAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tra
       try {
         Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
         val issueAsset = Service.getTransaction(ticketID)
-        Thread.sleep(sleepTime)
+        //Thread.sleep(sleepTime)
         val responseAccount = getAccount.Service.get(issueAsset.to)
         val assetRequest = masterTransactionIssueAssetRequests.Service.getIssueAssetByTicketID(ticketID)
         responseAccount.value.assetPegWallet.foreach(assets => assets.foreach(asset => {
