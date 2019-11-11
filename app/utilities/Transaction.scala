@@ -18,6 +18,8 @@ class Transaction @Inject()(getTxHashResponse: GetTransactionHashResponse, getRe
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
+  private val sleepTime = configuration.get[Long]("blockchain.entityIterator.threadSleep")
+
   private val responseErrorTransactionHashNotFound: String = constants.Response.PREFIX + constants.Response.FAILURE_PREFIX + configuration.get[String]("blockchain.response.error.transactionHashNotFound")
 
   def process[T1 <: BaseTransaction[T1], T2 <: BaseRequest](entity: T1, blockchainTransactionCreate: T1 => String, request: T2, action: T2 => WSResponse, onSuccess: (String, BlockResponse) => Unit, onFailure: (String, String) => Unit, updateTransactionHash: (String, String) => Int)(implicit module: String, logger: Logger): String = {
@@ -44,6 +46,7 @@ class Transaction @Inject()(getTxHashResponse: GetTransactionHashResponse, getRe
 
   def ticketUpdater(getTickets: () => Seq[String], getTransactionHash: String => Option[String], getMode: String => String, onSuccess: (String, BlockResponse) => Unit, onFailure: (String, String) => Unit)(implicit module: String, logger: Logger) {
     val ticketIDsSeq: Seq[String] = getTickets()
+    Thread.sleep(sleepTime)
     for (ticketID <- ticketIDsSeq) {
       try {
         val blockResponse: BlockResponse = if (kafkaEnabled) {

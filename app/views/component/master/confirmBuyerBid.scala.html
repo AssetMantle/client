@@ -1,11 +1,11 @@
 @import controllers.actions.LoginState
 @import views.html.base._
-@import views.companion.master.ConfirmBidTransaction
+@import views.companion.master.ConfirmBid
 @import models.masterTransaction.NegotiationRequest
 @import models.masterTransaction.NegotiationFile
 
-@(confirmBidTransactionForm: Form[ConfirmBidTransaction.Data] = ConfirmBidTransaction.form, negotiation: NegotiationRequest, files: Seq[NegotiationFile])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
-@commonForm(constants.Form.CONFIRM_BUYER_BID, confirmBidTransactionForm) {
+@(confirmBidForm: Form[ConfirmBid.Data] = ConfirmBid.form, negotiation: NegotiationRequest, files: Seq[NegotiationFile])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@commonForm(constants.Form.CONFIRM_BUYER_BID, confirmBidForm) {
     <span class="red">@Messages(constants.Form.SELLER_ID)</span> : @negotiation.sellerAccountID <br>
     <span class="red">@Messages(constants.FormField.BID.name)</span> : @negotiation.amount <br>
     <span class="red">@Messages(constants.FormField.PEG_HASH.name)</span> : @negotiation.pegHash <br>
@@ -20,8 +20,8 @@
         }
     }
 
-    @commonInputText(confirmBidTransactionForm, constants.FormField.REQUEST_ID, 'value -> negotiation.id, 'class -> "hidden", 'readonly -> true, 'required -> false)
-    @commonInputInt(confirmBidTransactionForm, constants.FormField.TIME)
-    @commonInputInt(confirmBidTransactionForm, constants.FormField.GAS)
-    @commonInputPassword(confirmBidTransactionForm, constants.FormField.PASSWORD)
+    @commonInputText(confirmBidForm, constants.FormField.REQUEST_ID, 'value -> negotiation.id, 'class -> "hidden", 'readonly -> true, 'required -> false)
+    @commonInputInt(confirmBidForm, constants.FormField.TIME)
+    @commonInputInt(confirmBidForm, constants.FormField.GAS)
+    @commonInputPassword(confirmBidForm, constants.FormField.PASSWORD)
 }

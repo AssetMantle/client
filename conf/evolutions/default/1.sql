@@ -779,17 +779,11 @@ ALTER TABLE MASTER_TRANSACTION."FaucetRequest"
 ALTER TABLE MASTER_TRANSACTION."IssueAssetRequest"
     ADD CONSTRAINT IssueAssetRequest_MasterAccount_AccountID FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER_TRANSACTION."IssueAssetRequest"
-    ADD CONSTRAINT IssueAssetRequest_BC_Asset_PegHash FOREIGN KEY ("pegHash") REFERENCES BLOCKCHAIN."Asset_BC" ("pegHash");
-ALTER TABLE MASTER_TRANSACTION."IssueAssetRequest"
-    ADD CONSTRAINT IssueAssetRequest_Taker_Address FOREIGN KEY ("takerAddress") REFERENCES BLOCKCHAIN."Account_BC" ("address");
-ALTER TABLE MASTER_TRANSACTION."IssueFiatRequest"
     ADD CONSTRAINT IssueFiatRequest_MasterAccount_AccountID FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER_TRANSACTION."AssetFile"
     ADD CONSTRAINT AssetFile_IssueAssetRequest_id FOREIGN KEY ("id") REFERENCES MASTER_TRANSACTION."IssueAssetRequest" ("id");
 ALTER TABLE MASTER_TRANSACTION."NegotiationFile"
     ADD CONSTRAINT NegotiationFile_NegotiationRequest_id FOREIGN KEY ("id") REFERENCES MASTER_TRANSACTION."NegotiationRequest" ("id");
-ALTER TABLE MASTER_TRANSACTION."NegotiationRequest"
-    ADD CONSTRAINT NegotiationRequest_BC_Negotiation_negotiationID FOREIGN KEY ("negotiationID") REFERENCES BLOCKCHAIN."Negotiation_BC" ("id");
 ALTER TABLE MASTER_TRANSACTION."SessionToken"
     ADD CONSTRAINT SessionToken_Account_id FOREIGN KEY ("id") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER_TRANSACTION."PushNotificationToken"
@@ -804,7 +798,7 @@ ALTER TABLE MASTER_TRANSACTION."EmailOTP"
 /*Initial State*/
 
 INSERT INTO blockchain."Account_BC" ("address", "coins", "publicKey", "accountNumber", "sequence", "dirtyBit")
-VALUES ('commit1gkrp4y9r6p8fl0p5gldt7n8fhv8xut5uzxywvl',
+VALUES ('commit17jxmr4felwgeugmeu6c4gr4vq0hmeaxlamvxjg',
         '1000',
         'commitpub1addwnpepqty3h2wuanwkjw5g2jn6p0rwcy7j7xm985t8kg8zpkp7ay83rrz2276x7qn',
         '0',
@@ -812,7 +806,7 @@ VALUES ('commit1gkrp4y9r6p8fl0p5gldt7n8fhv8xut5uzxywvl',
         true);
 
 INSERT INTO master."Account" ("id", "secretHash", "accountAddress", "language", "userType", "status")
-VALUES ('main', '-233904575', 'commit1gkrp4y9r6p8fl0p5gldt7n8fhv8xut5uzxywvl', 'en', 'GENESIS', 'NO_CONTACT');
+VALUES ('main', '-233904575', 'commit17jxmr4felwgeugmeu6c4gr4vq0hmeaxlamvxjg', 'en', 'GENESIS', 'NO_CONTACT');
 
 # --- !Downs
 

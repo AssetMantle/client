@@ -128,6 +128,14 @@ class FileResourceManager @Inject()()(implicit executionContext: ExecutionContex
     }
   }
 
+  def getZoneNegotiationFilePath(documentType: String): String = {
+    documentType match {
+      case constants.File.AWB_PROOF => uploadTraderNegotiationAWBProofPath
+      case constants.File.FIAT_PROOF => uploadTraderNegotiationFiatProofPath
+      case _ => constants.File.UNKNOWN_TYPE
+    }
+  }
+
   def getAccountFilePath(documentType: String): String = {
     documentType match {
       case constants.File.PROFILE_PICTURE => uploadAccountProfilePicturePath
