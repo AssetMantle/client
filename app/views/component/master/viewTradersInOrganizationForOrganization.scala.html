@@ -1,23 +1,22 @@
 @import controllers.actions.LoginState
+@import views.html.base._
 @import models.master.Trader
 
-@(traders: Seq[Trader])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
-    <div class="cmuk-width-auto" cmuk-sortable="handle: .cmuk-card" cmuk-grid>
+@(traders: Seq[Trader])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+<div class="cmuk-container">
+    <div class="cmuk-flex-center cmuk-child-width-auto cmuk-grid-match" cmuk-grid>
         @for(trader <- traders) {
+            @commonCard() {
+                @trader.id
+            } {
             <div>
-                <div class="cmuk-card cmuk-card-default cmuk-card-body">
                     <span class="red">@Messages(constants.Form.ID)</span>:@trader.id <br>
                     <span class="red">@Messages(constants.Form.ACCOUNT_ID)</span>:@trader.accountID <br>
                     <span class="red">@Messages(constants.Form.NAME)</span>:@trader.name <br>
-                </div>
             </div>
-            <div>
-                <div class="cmuk-card cmuk-card-default cmuk-card-body ">
-                    <span class="red">@Messages(constants.Form.ID)</span>:@trader.id <br>
-                    <span class="red">@Messages(constants.Form.ACCOUNT_ID)</span>:@trader.accountID <br>
-                    <span class="red">@Messages(constants.Form.NAME)</span>:@trader.name <br>
-                </div>
-            </div>
-}
-    </div>
+
+            }
+        }
+ </div>
+</div>
