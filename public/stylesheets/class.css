@@ -2,7 +2,7 @@
 .modal {
     display: none;
     position: fixed;
-    z-index:981;
+    z-index:1010;
     left: 0;
     top: 0;
     bottom: 0;
@@ -51,10 +51,7 @@
         display: flex;
         margin: 20px;
     }
-
-
 }
-
 
 @media (min-width: 500px) {
 
@@ -64,7 +61,7 @@
     }
 
     .middle {
-        width: 60%;
+        width: 100%;
     }
 
     .rightSide {
@@ -95,10 +92,6 @@
     max-height: 30px;
     max-width: 130px;
 }
-
-/*Navbar*/
-
-
 
 .hidden {
     display: none;
@@ -364,6 +357,13 @@ dl .info::after {
 }
 .sideBarOpenButton {
     position: fixed;
+    left: 0px;
+    z-index:1;
+    background: linear-gradient(60deg, #149f98, #102923);
+    padding: 5px;
+    border-bottom-right-radius: 10px;
+    border-top-right-radius: 10px;
+    color:#fff;
     background: linear-gradient(60deg, #149f98, #102923);
 }
 

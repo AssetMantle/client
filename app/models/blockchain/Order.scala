@@ -171,6 +171,7 @@ class Orders @Inject()(shutdownActors: ShutdownActor, masterAccounts: master.Acc
             blockchainTraderFeedbackHistories.Service.create(negotiation.buyerAddress, negotiation.buyerAddress, negotiation.sellerAddress, negotiation.assetPegHash, rating = "")
             blockchainNegotiations.Service.deleteNegotiations(negotiation.assetPegHash)
           }
+          //TODO Remove update of masterTransaction/IssueAssetRequest accountID and show assets from trader Index via blockchain
           Service.insertOrUpdate(dirtyOrder.id, awbProofHash = if (orderResponse.value.awbProofHash == "") None else Option(orderResponse.value.awbProofHash), fiatProofHash = if (orderResponse.value.fiatProofHash == "") None else Option(orderResponse.value.fiatProofHash), dirtyBit = false)
           mainOrderActor ! OrderCometMessage(username = masterAccounts.Service.getId(negotiation.buyerAddress), message = Json.toJson(constants.Comet.PING))
           mainOrderActor ! OrderCometMessage(username = masterAccounts.Service.getId(negotiation.sellerAddress), message = Json.toJson(constants.Comet.PING))

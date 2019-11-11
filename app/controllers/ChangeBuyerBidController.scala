@@ -24,8 +24,8 @@ class ChangeBuyerBidController @Inject()(messagesControllerComponents: MessagesC
     implicit request =>
       try {
         masterTransactionNegotiationRequests.Service.getNegotiationByPegHashAndBuyerAccountID(pegHash, loginState.username) match {
-          case Some(negotiationRequest) => withUsernameToken.Ok(views.html.component.master.changeBuyerBid(views.companion.master.ChangeBuyerBid.form.fill(views.companion.master.ChangeBuyerBid.Data(Option(negotiationRequest.id), "", sellerAddress, negotiationRequest.amount, 0, pegHash, constants.FormField.GAS.minimumValue))))
-          case None => withUsernameToken.Ok(views.html.component.master.changeBuyerBid(views.companion.master.ChangeBuyerBid.form.fill(views.companion.master.ChangeBuyerBid.Data(None, "", sellerAddress, 0, 0, pegHash, constants.FormField.GAS.minimumValue))))
+          case Some(negotiationRequest) => Ok(views.html.component.master.changeBuyerBid(requestID = negotiationRequest.id, sellerAddress = sellerAddress, bid = negotiationRequest.amount, pegHash = pegHash))
+          case None => Ok(views.html.component.master.changeBuyerBid(requestID = "", sellerAddress = sellerAddress, bid = 0, pegHash = pegHash))
         }
       } catch {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -36,7 +36,7 @@ class ChangeBuyerBidController @Inject()(messagesControllerComponents: MessagesC
     implicit request =>
       views.companion.master.ChangeBuyerBid.form.bindFromRequest().fold(
         formWithErrors => {
-          BadRequest(views.html.component.master.changeBuyerBid(formWithErrors))
+          BadRequest(views.html.component.master.changeBuyerBid(formWithErrors, requestID = formWithErrors.data(constants.FormField.REQUEST_ID.name), sellerAddress = formWithErrors.data(constants.FormField.SELLER_ADDRESS.name), bid = formWithErrors.data(constants.FormField.BID.name).toInt, pegHash = formWithErrors.data(constants.FormField.PEG_HASH.name)))
         },
         changeBuyerBidData => {
           try {

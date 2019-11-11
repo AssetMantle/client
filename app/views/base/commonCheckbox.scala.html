@@ -6,23 +6,27 @@
 
 <div class='@arguments.toMap.get('containerDivClass).map(_.toString).getOrElse("")'>
     @defining(Seq('_label -> Messages(formField.name), 'class -> "cmuk-checkbox")) { defaultArguments =>
-        @sequentialNestedFormfield match {
-            case Some(field: Field) => {
-                @* //This case handles sequential subForms under a nested field. See UserUpdateUBOs for example.*@
-                @checkbox(field.apply(formField.name), defaultArguments ++ arguments: _*)
-            }
-            case None => {
-                @nestedFormField match {
-                    case Some(field: NestedFormField) => {
-                        @* //This case handles nested fields. See AddOrganization for example.*@
-                        @checkbox(formData(Seq(field.name, formField.name).mkString(".")), defaultArguments ++ arguments: _*)
-                    }
-                    case None => {
-                        @* //This case handles generic fields.*@
-                        @checkbox(formData(formField.name), defaultArguments ++ arguments: _*)
+        @defining(
+            sequentialNestedFormfield match {
+                case Some(field: Field) => {
+                    //This case handles sequential subForms under a nested field. See UserUpdateUBOs for example.
+                    field.apply(formField.name)
+                }
+                case None => {
+                    nestedFormField match {
+                        case Some(field: NestedFormField) => {
+                            //This case handles nested fields. See AddOrganization for example.
+                            formData(Seq(field.name, formField.name).mkString("."))
+                        }
+                        case None => {
+                            //This case handles generic fields.
+                            formData(formField.name)
+                        }
                     }
                 }
             }
+        ) { field =>
+            @checkbox(field, defaultArguments ++ arguments: _*)
         }
     }
 </div>

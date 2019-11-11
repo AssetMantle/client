@@ -1,21 +1,19 @@
-setCookie("showAllBlocksTableClick", 0, 1);
+let showAllBlocksTableClick = 0;
 
 function showAllBlocksInitialTableContent() {
-    setCookie("showAllBlocksTableClick", 0, 1);
-    changeTableContent(parseInt(getCookie("showAllBlocksTableClick"), 10));
+    showAllBlocksTableClick = 0;
+    changeTableContent(showAllBlocksTableClick);
 }
 
 function onShowAllBlocksClickNext() {
-    let click = parseInt(getCookie("showAllBlocksTableClick"), 10) + 1;
-    setCookie("showAllBlocksTableClick", click, 1);
-    changeTableContent(click);
+    showAllBlocksTableClick++;
+    changeTableContent(showAllBlocksTableClick);
 }
 
 function onShowAllBlocksClickPrevious() {
-    let click = parseInt(getCookie("showAllBlocksTableClick"), 10) - 1;
-    if (click > 0) {
-        setCookie("showAllBlocksTableClick", click, 1);
-        changeTableContent(click);
+    showAllBlocksTableClick--;
+    if (showAllBlocksTableClick > 0) {
+        changeTableContent(showAllBlocksTableClick);
     } else {
         showAllBlocksInitialTableContent();
     }
@@ -51,7 +49,7 @@ function changeTableContent(clickValue) {
 }
 
 function updateShowAllBlocksTable(receivedData) {
-    if (parseInt(getCookie("showAllBlocksTableClick"), 10) === 0) {
+    if (showAllBlocksTableClick === 0) {
         let height = receivedData.result.data.value.block.header.height;
         let time = receivedData.result.data.value.block.header.time;
         let blockContainerList = document.getElementById("allBlocksTableBody");

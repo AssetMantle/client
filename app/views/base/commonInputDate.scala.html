@@ -5,22 +5,26 @@
 @(formData: Form[_], formField: DateFormField, arguments: (Symbol, Any)*)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, nestedFormField: Option[NestedFormField] = None, sequentialNestedFormfield: Option[Field] = None)
 
 @defining(Seq('_label -> Messages(formField.name), 'placeholder -> Messages(formField.name), 'class -> "cmuk-input")) { defaultArguments =>
-    @sequentialNestedFormfield match {
-        case Some(field: Field) => {
-            @* //This case handles sequential subForms under a nested field. See UserUpdateUBOs for example.*@
-            @inputDate(field.apply(formField.name).copy(value = arguments.toMap.get('value).map(_.toString)), defaultArguments ++ arguments: _*)
-        }
-        case None => {
-            @nestedFormField match {
-                case Some(field: NestedFormField) => {
-                    @* //This case handles nested fields. See AddOrganization for example.*@
-                    @inputDate(formData(Seq(field.name, formField.name).mkString(".")).copy(value = arguments.toMap.get('value).map(_.toString)), defaultArguments ++ arguments: _*)
-                }
-                case None => {
-                    @* //This case handles generic fields.*@
-                    @inputDate(formData(formField.name).copy(value = arguments.toMap.get('value).map(_.toString)), defaultArguments ++ arguments: _*)
+    @defining(
+        sequentialNestedFormfield match {
+            case Some(field: Field) => {
+                //This case handles sequential subForms under a nested field. See UserUpdateUBOs for example.
+                field.apply(formField.name)
+            }
+            case None => {
+                nestedFormField match {
+                    case Some(field: NestedFormField) => {
+                        //This case handles nested fields. See AddOrganization for example.
+                        formData(Seq(field.name, formField.name).mkString("."))
+                    }
+                    case None => {
+                        //This case handles generic fields.
+                        formData(formField.name)
+                    }
                 }
             }
         }
+    ) { field =>
+        @inputDate(if(arguments.toMap.get('value).map(_.toString).isDefined) field.copy(value = arguments.toMap.get('value).map(_.toString)) else field, defaultArguments ++ arguments: _*)
     }
 }

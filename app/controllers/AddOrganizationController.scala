@@ -238,7 +238,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
     implicit request =>
       views.companion.master.VerifyOrganization.form.bindFromRequest().fold(
         formWithErrors => {
-          BadRequest(views.html.component.master.verifyOrganization(formWithErrors, formWithErrors.data(constants.Form.ORGANIZATION_ID), formWithErrors.data(constants.Form.ZONE_ID)))
+          BadRequest(views.html.component.master.verifyOrganization(formWithErrors, organizationID = formWithErrors.data(constants.FormField.ORGANIZATION_ID.name), zoneID = formWithErrors.data(constants.FormField.ZONE_ID.name)))
         },
         verifyOrganizationData => {
           try {
@@ -328,7 +328,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
     implicit request =>
       views.companion.master.RejectVerifyOrganizationRequest.form.bindFromRequest().fold(
         formWithErrors => {
-          BadRequest(views.html.component.master.rejectVerifyOrganizationRequest(formWithErrors, formWithErrors.data(constants.Form.ORGANIZATION_ID)))
+          BadRequest(views.html.component.master.rejectVerifyOrganizationRequest(formWithErrors, organizationID = formWithErrors.data(constants.FormField.ORGANIZATION_ID.name)))
         },
         rejectVerifyOrganizationRequestData => {
           try {
@@ -455,7 +455,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
       },
       addOrganizationData => {
         try {
-          transactionsAddOrganization.Service.post(transactionsAddOrganization.Request(transactionsAddOrganization.BaseReq(from = addOrganizationData.from, gas = addOrganizationData.gas.toString), to = addOrganizationData.to, organizationID = addOrganizationData.organizationID, zoneID = addOrganizationData.zoneID, password = addOrganizationData.password, mode = transactionMode))
+          transactionsAddOrganization.Service.post(transactionsAddOrganization.Request(transactionsAddOrganization.BaseReq(from = addOrganizationData.from, gas = addOrganizationData.gas.toString), to = addOrganizationData.to, organizationID = addOrganizationData.organizationID, zoneID = addOrganizationData.zoneID, password = addOrganizationData.password, mode = addOrganizationData.mode))
           Ok(views.html.index(successes = Seq(constants.Response.ORGANIZATION_ADDED)))
         }
         catch {

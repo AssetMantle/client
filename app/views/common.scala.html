@@ -27,8 +27,8 @@
     <body>
         @* Header *@
     <header>
-        @* pc navbar *@
-    <div class="pcNav" cmuk-sticky="sel-target: .cmuk-navbar-container; cls-active: cmuk-navbar-sticky; bottom: #transparent-sticky-navbar">
+
+    <div  cmuk-sticky="sel-target: .cmuk-navbar-container; cls-active: cmuk-navbar-sticky; bottom: #transparent-sticky-navbar">
 
         <nav class="cmuk-navbar-container" cmuk-navbar="mode: click">
 
@@ -38,16 +38,16 @@
                 </a>
             </div>
             <div class="cmuk-navbar-right">
-                <ul class="cmuk-navbar-nav navigationBarLinks cmuk-visible@@m" id="navigationBarLinks">
+                <ul class="cmuk-navbar-nav navigationBarLinks" id="navigationBarLinks">
                 @loginState match {
                     case null => {
-                        <li>
+                        <li class="cmuk-visible@@m">
                             <a onclick="getForm(jsRoutes.controllers.AccountController.signUpForm())">
                                 <span cmuk-icon="users"></span>
                                 @Messages(constants.Form.SIGN_UP.legend)
                             </a>
                         </li>
-                        <li>
+                        <li class="cmuk-visible@@m">
                             <a onclick="getForm(jsRoutes.controllers.AccountController.loginForm())">
                                 <span cmuk-icon="sign-in"></span>
                                 @Messages(constants.Form.LOGIN.legend)
@@ -57,19 +57,19 @@
                     case default => {
                         @loginState.userType match {
                             case constants.User.TRADER => {
-                                <li><a href="@controllers.routes.ViewController.market()">@Messages(constants.Form.MARKET)</a></li>
+                                <li class="cmuk-visible@@m"><a href="@controllers.routes.ViewController.market()">@Messages(constants.Form.MARKET)</a></li>
                             }
                             case constants.User.ZONE => {
-                                <li><a href="@controllers.routes.ViewController.zoneRequest()">@Messages(constants.Form.REQUEST)</a></li>
-                                        <li><a href="@controllers.routes.ViewController.zoneInformation()">@Messages(constants.Form.INFORMATION)</a></li>
+                                <li class="cmuk-visible@@m"><a href="@controllers.routes.ViewController.zoneRequest()">@Messages(constants.Form.REQUEST)</a></li>
+                                        <li class="cmuk-visible@@m"><a href="@controllers.routes.ViewController.zoneInformation()">@Messages(constants.Form.INFORMATION)</a></li>
                             }
                             case constants.User.ORGANIZATION => {
-                                <li><a href="@controllers.routes.ViewController.organizationRequest()">@Messages(constants.Form.REQUEST)</a></li>
-                                        <li><a href="@controllers.routes.ViewController.organizationInformation()">@Messages(constants.Form.INFORMATION)</a></li>
+                                <li class="cmuk-visible@@m"><a href="@controllers.routes.ViewController.organizationRequest()">@Messages(constants.Form.REQUEST)</a></li>
+                                        <li class="cmuk-visible@@m"><a href="@controllers.routes.ViewController.organizationInformation()">@Messages(constants.Form.INFORMATION)</a></li>
                             }
                             case constants.User.GENESIS => {
-                                <li><a href="@controllers.routes.ViewController.genesisRequest()">@Messages(constants.Form.REQUEST)</a></li>
-                                        <li><a href="@controllers.routes.ViewController.genesisInformation()">@Messages(constants.Form.INFORMATION)</a></li>
+                                <li class="cmuk-visible@@m"><a href="@controllers.routes.ViewController.genesisRequest()">@Messages(constants.Form.REQUEST)</a></li>
+                                        <li class="cmuk-visible@@m"><a href="@controllers.routes.ViewController.genesisInformation()">@Messages(constants.Form.INFORMATION)</a></li>
                             }
                             case _ => {}
                         }
@@ -79,7 +79,7 @@
                                 <span class="cmuk-badge" id="notificationBadge">0</span>
                             </a>
                         </li>
-                        <li>
+                        <li class="cmuk-visible@@m">
                             <a href="#">@loginState.username</a>
                             <div class="cmuk-navbar-dropdown">
                                 <ul class="cmuk-nav cmuk-navbar-dropdown-nav">
@@ -101,14 +101,17 @@
                     }
                 }
                 </ul>
-                <a href="#off" class="cmuk-hidden@@m" cmuk-toggle>
+
+                @*Mobile Navigationbar menu button *@
+
+                <a href="#mobileNavigationBar" class="cmuk-hidden@@m" cmuk-toggle>
                     <span cmuk-icon="menu"></span>
                 </a>
             </div>
 
-            <div id="off" cmuk-offcanvas="flip: true; overlay: true">
+            @* Mobile Navigationbar *@
+            <div id="mobileNavigationBar" cmuk-offcanvas="flip: true; overlay: true">
                 <div class="cmuk-offcanvas-bar">
-
                     <button class="cmuk-offcanvas-close" type="button" cmuk-close></button>
                     <ul class="cmuk-navbar-nav navigationBarLinks" id="navigationBarLinks">
                     @loginState match {
@@ -146,12 +149,6 @@
                                 case _ => {}
                             }
                             <li>
-                                <a onclick="getForm(jsRoutes.controllers.NotificationController.notificationPage(0))">
-                                    @Messages(constants.Form.INBOX)
-                                <span class="cmuk-badge" id="notificationBadge">0</span>
-                                </a>
-                            </li>
-                            <li>
                                 <a href="#">@loginState.username</a>
                                 <div class="cmuk-navbar-dropdown">
                                     <ul class="cmuk-nav cmuk-navbar-dropdown-nav">
@@ -173,10 +170,9 @@
                         }
                     }
                     </ul>
-
-
                 </div>
             </div>
+            @*   End of Mobile Navigationbar *@
         </nav>
     </div>
     </header>

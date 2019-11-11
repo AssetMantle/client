@@ -47,7 +47,6 @@ object FormField {
   val SELLER_CONTRACT_HASH = new StringFormField("SELLER_CONTRACT_HASH", 40, 40, RegularExpression.HASH)
   val DOCUMENT_HASH = new StringFormField("DOCUMENT_HASH", 4, 500)
   val FROM = new StringFormField("FROM", 45, 45)
-  val MODE = new StringFormField("MODE", 4, 5)
   val PORT_OF_LOADING = new StringFormField("PORT_OF_LOADING", 0, 100)
   val PORT_OF_DISCHARGE = new StringFormField("PORT_OF_DISCHARGE", 0, 100)
   val BILL_OF_LADING_NUMBER = new StringFormField("COMMODITY_NAME", 2, 20, RegularExpression.ALL_NUMBERS_ALL_LETTERS)
@@ -101,6 +100,7 @@ object FormField {
   val PHYSICAL_DOCUMENTS_HANDLED_VIA = new SelectFormField("PHYSICAL_DOCUMENTS_HANDLED_VIA", constants.SelectFieldOptions.PHYSICAL_DOCUMENTS_HANDLED_VIA)
   val COMDEX_PAYMENT_TERMS = new SelectFormField("COMDEX_PAYMENT_TERMS", constants.SelectFieldOptions.PAYMENT_TERMS)
   val COUNTRY_CODE = new SelectFormField("COUNTRY_CODE", constants.SelectFieldOptions.COUNTRY_CODES)
+  val MODE = new SelectFormField("MODE", constants.SelectFieldOptions.MODE)
 
   //IntFormField
   val GAS = new IntFormField("GAS", 20000, 1000000)

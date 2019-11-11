@@ -20,17 +20,22 @@ class SellerExecuteOrderController @Inject()(messagesControllerComponents: Messa
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
   private implicit val module: String = constants.Module.CONTROLLERS_SELLER_EXECUTE_ORDER
-
-  def sellerExecuteOrderForm(orderID: String): Action[AnyContent] = Action { implicit request =>
-    val negotiation = blockchainNegotiations.Service.get(orderID)
-    Ok(views.html.component.master.sellerExecuteOrder(buyerAddress = negotiation.buyerAddress, pegHash = negotiation.assetPegHash))
+  //TODO username instead of Addresses
+  def sellerExecuteOrderForm(orderID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+      try {
+        val negotiation = blockchainNegotiations.Service.get(orderID)
+        Ok(views.html.component.master.sellerExecuteOrder(buyerAddress = negotiation.buyerAddress, pegHash = negotiation.assetPegHash))
+      } catch {
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
   }
 
   def sellerExecuteOrder: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       views.companion.master.SellerExecuteOrder.form.bindFromRequest().fold(
         formWithErrors => {
-          BadRequest(views.html.component.master.sellerExecuteOrder(formWithErrors, formWithErrors.data(constants.Form.BUYER_ADDRESS), formWithErrors.data(constants.Form.PEG_HASH)))
+          BadRequest(views.html.component.master.sellerExecuteOrder(formWithErrors, formWithErrors.data(constants.FormField.BUYER_ADDRESS.name), formWithErrors.data(constants.FormField.PEG_HASH.name)))
         },
         sellerExecuteOrderData => {
           try {
@@ -60,7 +65,7 @@ class SellerExecuteOrderController @Inject()(messagesControllerComponents: Messa
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
-
+  //TODO username instead of Addresses
   def moderatedSellerExecuteOrderForm(buyerAddress: String, sellerAddress: String, pegHash: String): Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.master.moderatedSellerExecuteOrder(buyerAddress = buyerAddress, sellerAddress = sellerAddress, pegHash = pegHash))
   }
@@ -69,7 +74,7 @@ class SellerExecuteOrderController @Inject()(messagesControllerComponents: Messa
     implicit request =>
       views.companion.master.ModeratedSellerExecuteOrder.form.bindFromRequest().fold(
         formWithErrors => {
-          BadRequest(views.html.component.master.moderatedSellerExecuteOrder(formWithErrors, formWithErrors.data(constants.Form.BUYER_ADDRESS), formWithErrors.data(constants.Form.SELLER_ADDRESS), formWithErrors.data(constants.Form.PEG_HASH)))
+          BadRequest(views.html.component.master.moderatedSellerExecuteOrder(formWithErrors, buyerAddress = formWithErrors.data(constants.FormField.BUYER_ADDRESS.name), sellerAddress = formWithErrors.data(constants.FormField.SELLER_ADDRESS.name), pegHash = formWithErrors.data(constants.FormField.PEG_HASH.name)))
         },
         moderatedSellerExecuteOrderData => {
           try {

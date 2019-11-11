@@ -59,7 +59,7 @@
                             <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.IssueFiatController.issueFiatRequestForm())">@Messages(constants.Form.ISSUE_FIAT_REQUEST.legend)</button>
                         }
                         @if(acl.redeemFiat) {
-                            <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.RedeemFiatController.redeemFiatForm('@loginState.address'))">@Messages(constants.Form.REDEEM_FIAT.legend)</button>
+                            <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.RedeemFiatController.redeemFiatForm('@loginState.username'))">@Messages(constants.Form.REDEEM_FIAT.legend)</button>
                         }
                     }
                     case _ => {}
