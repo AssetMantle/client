@@ -24,13 +24,14 @@
 .modalBody{
     padding:20px;
 }
-
+.NavigationBarMenuButton{
+    display: none;
+}
 .cmuk-navbar-container{
     padding-right: 20px !important;
 }
 
 @media (max-width: 500px) {
-
     table thead {
         font-size: 12px;
     }
@@ -539,11 +540,4 @@ dl .info::after {
 
 .profileAcl p:first-child{
     margin-top:20px;
-}
-.cmuk-navbar-container .cmuk-offcanvas-bar{
-    padding: 20px !important;
-}
-.cmuk-offcanvas-bar .cmuk-navbar-nav {
-display: block;
- margin: 20px;
 }

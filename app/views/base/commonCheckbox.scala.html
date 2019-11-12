@@ -5,6 +5,7 @@
 @(formData: Form[_], formField: BooleanFormField, arguments: (Symbol, Any)*)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, nestedFormField: Option[NestedFormField] = None, sequentialNestedFormfield: Option[Field] = None)
 
 <div class='@arguments.toMap.get('containerDivClass).map(_.toString).getOrElse("")'>
+    @Messages(formField.name)
     @defining(Seq('_label -> Messages(formField.name), 'class -> "cmuk-checkbox")) { defaultArguments =>
         @defining(
             sequentialNestedFormfield match {
