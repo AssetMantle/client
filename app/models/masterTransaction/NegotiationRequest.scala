@@ -52,6 +52,14 @@ class NegotiationRequests @Inject()(protected val databaseConfigProvider: Databa
     }
   }
 
+  private def findNegotiationID(id: String): Future[String] = db.run(negotiationRequestTable.filter(_.id === id).map(_.negotiationID).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
   private def updateNegotiationIDByBuyerAccountIDAndPegHash(negotiationID: Option[String], buyerAccountID: String, pegHash: String): Future[Int] = db.run(negotiationRequestTable.filter(_.buyerAccountID === buyerAccountID).filter(_.pegHash === pegHash).map(_.negotiationID.?).update(negotiationID).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -108,6 +116,14 @@ class NegotiationRequests @Inject()(protected val databaseConfigProvider: Databa
     }
   }
 
+  private def findIDByNegotiationID(negotiationID: String): Future[String] = db.run(negotiationRequestTable.filter(_.negotiationID.? === negotiationID).map(_.id).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
   private def checkByIDAndAccountID(id: String, accountID: String) = db.run(negotiationRequestTable.filter(_.id === id).filter(negotiationRequest => negotiationRequest.buyerAccountID === accountID || negotiationRequest.sellerAccountID === accountID).exists.result)
 
   private def updateStatusAndCommentByID(id: String, status: Option[String], comment: String) = db.run(negotiationRequestTable.filter(_.id === id).map(negotiation => (negotiation.status.?, negotiation.comment)).update((status, comment)).asTry).map {
@@ -145,6 +161,14 @@ class NegotiationRequests @Inject()(protected val databaseConfigProvider: Databa
           throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
       }
   }
+
+  private def getBuyerAccountIDByID(id: String): Future[String] = db.run(negotiationRequestTable.filter(_.id === id).map(_.buyerAccountID).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
   
   private[models] class NegotiationRequestTable(tag: Tag) extends Table[NegotiationRequest](tag, "NegotiationRequest") {
 
@@ -176,6 +200,8 @@ class NegotiationRequests @Inject()(protected val databaseConfigProvider: Databa
 
     def getNegotiationByID(id: String): NegotiationRequest = Await.result(find(id), Duration.Inf)
 
+    def getNegotiationIDByID(id: String): String = Await.result(findNegotiationID(id), Duration.Inf)
+
     def updateNegotiationID(negotiationID: String, buyerAccountID: String, pegHash: String): Int = Await.result(updateNegotiationIDByBuyerAccountIDAndPegHash(Option(negotiationID), buyerAccountID, pegHash), Duration.Inf)
 
     def updateAmountForNegotiationID(negotiationID: String, amount: Int): Int = Await.result(updateAmountByNegotiationID(negotiationID, amount), Duration.Inf)
@@ -194,9 +220,13 @@ class NegotiationRequests @Inject()(protected val databaseConfigProvider: Databa
 
     def getNegotiationByPegHashBuyerAccountIDAndSellerAccountID(pegHash: String ,buyerAccountID: String, sellerAccountID: String): NegotiationRequest = Await.result(findNegotiationByPegHashBuyerAccountIDAndSellerAccountID(pegHash, buyerAccountID, sellerAccountID), Duration.Inf)
 
-    def getIDByPegHashBuyerAccountIDAndSellerAccountID(pegHash: String ,buyerAccountID: String, sellerAccountID: String): String = Await.result(findIDByPegHashBuyerAccountIDAndSellerAccountID(pegHash, buyerAccountID, sellerAccountID), Duration.Inf)
+    def getIDByPegHashBuyerAccountIDAndSellerAccountID(pegHash: String, buyerAccountID: String, sellerAccountID: String): String = Await.result(findIDByPegHashBuyerAccountIDAndSellerAccountID(pegHash, buyerAccountID, sellerAccountID), Duration.Inf)
+
+    def getIDByNegotiationID(negotiationID: String): String = Await.result(findIDByNegotiationID(negotiationID), Duration.Inf)
 
     def getSellerAccountID(id: String): String = Await.result(getSellerAccountIDByID(id), Duration.Inf)
+
+    def getBuyerAccountID(id: String): String = Await.result(getBuyerAccountIDByID(id), Duration.Inf)
   }
 
 }

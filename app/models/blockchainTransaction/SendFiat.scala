@@ -181,7 +181,6 @@ class SendFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
         val sendFiat = Service.getTransaction(ticketID)
         val negotiationID = blockchainNegotiations.Service.getNegotiationID(buyerAddress = sendFiat.from, sellerAddress = sendFiat.to, pegHash = sendFiat.pegHash)
         blockchainOrders.Service.insertOrUpdate(id = negotiationID, None, None, dirtyBit = true)
-        Thread.sleep(sleepTime)
         val orderResponse = getOrder.Service.get(negotiationID)
         blockchainFiats.Service.markDirty(sendFiat.from)
         blockchainTransactionFeedbacks.Service.markDirty(sendFiat.from)
