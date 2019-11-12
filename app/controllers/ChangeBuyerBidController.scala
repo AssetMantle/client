@@ -27,8 +27,8 @@ class ChangeBuyerBidController @Inject()(messagesControllerComponents: MessagesC
         negotiation <- negotiation
       } yield {
         negotiation match {
-          case Some(negotiationRequest) => withUsernameToken.Ok(views.html.component.master.changeBuyerBid(views.companion.master.ChangeBuyerBid.form.fill(views.companion.master.ChangeBuyerBid.Data(Option(negotiationRequest.id), "", sellerAddress, negotiationRequest.amount, 0, pegHash, constants.FormField.GAS.minimumValue))))
-          case None => withUsernameToken.Ok(views.html.component.master.changeBuyerBid(views.companion.master.ChangeBuyerBid.form.fill(views.companion.master.ChangeBuyerBid.Data(None, "", sellerAddress, 0, 0, pegHash, constants.FormField.GAS.minimumValue))))
+          case Some(negotiationRequest) => Ok(views.html.component.master.changeBuyerBid(requestID = negotiationRequest.id, sellerAddress = sellerAddress, bid = negotiationRequest.amount, pegHash = pegHash))
+          case None => Ok(views.html.component.master.changeBuyerBid(requestID = "", sellerAddress = sellerAddress, bid = 0, pegHash = pegHash))
         }
       }).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -40,7 +40,7 @@ class ChangeBuyerBidController @Inject()(messagesControllerComponents: MessagesC
       views.companion.master.ChangeBuyerBid.form.bindFromRequest().fold(
         formWithErrors => {
           Future {
-            BadRequest(views.html.component.master.changeBuyerBid(formWithErrors))
+            BadRequest(views.html.component.master.changeBuyerBid(formWithErrors, requestID = formWithErrors.data(constants.FormField.REQUEST_ID.name), sellerAddress = formWithErrors.data(constants.FormField.SELLER_ADDRESS.name), bid = formWithErrors.data(constants.FormField.BID.name).toInt, pegHash = formWithErrors.data(constants.FormField.PEG_HASH.name)))
           }
         },
         changeBuyerBidData => {
@@ -48,7 +48,7 @@ class ChangeBuyerBidController @Inject()(messagesControllerComponents: MessagesC
             case Some(id) => id
             case None => utilities.IDGenerator.requestID()
           }
-          transaction.process[blockchainTransaction.ChangeBuyerBid, transactionsChangeBuyerBid.Request](
+          val transactionProcess=transaction.process[blockchainTransaction.ChangeBuyerBid, transactionsChangeBuyerBid.Request](
             entity = blockchainTransaction.ChangeBuyerBid(from = loginState.address, to = changeBuyerBidData.sellerAddress, bid = changeBuyerBidData.bid, time = changeBuyerBidData.time, pegHash = changeBuyerBidData.pegHash, gas = changeBuyerBidData.gas, ticketID = "", mode = transactionMode),
             blockchainTransactionCreate = blockchainTransactionChangeBuyerBids.Service.create,
             request = transactionsChangeBuyerBid.Request(transactionsChangeBuyerBid.BaseReq(from = loginState.address, gas = changeBuyerBidData.gas.toString), to = changeBuyerBidData.sellerAddress, password = changeBuyerBidData.password, bid = changeBuyerBidData.bid.toString, time = changeBuyerBidData.time.toString, pegHash = changeBuyerBidData.pegHash, mode = transactionMode),
@@ -57,10 +57,10 @@ class ChangeBuyerBidController @Inject()(messagesControllerComponents: MessagesC
             onFailure = blockchainTransactionChangeBuyerBids.Utility.onFailure,
             updateTransactionHash = blockchainTransactionChangeBuyerBids.Service.updateTransactionHash
           )
-
           val id = masterAccounts.Service.getId(changeBuyerBidData.sellerAddress)
           def insertOrUpdate(id: String) = masterTransactionNegotiationRequests.Service.insertOrUpdate(requestID, loginState.username, id, changeBuyerBidData.pegHash, changeBuyerBidData.bid)
           (for {
+            _<-transactionProcess
             id <- id
             _ <- insertOrUpdate(id)
           } yield withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.BUYER_BID_CHANGED)))

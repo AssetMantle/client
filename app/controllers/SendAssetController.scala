@@ -29,7 +29,7 @@ class SendAssetController @Inject()(messagesControllerComponents: MessagesContro
     implicit request =>
       views.companion.master.SendAsset.form.bindFromRequest().fold(
         formWithErrors => {
-          Future{BadRequest(views.html.component.master.sendAsset(formWithErrors, formWithErrors.data(constants.Form.BUYER_ADDRESS), formWithErrors.data(constants.Form.PEG_HASH)))}
+          Future{BadRequest(views.html.component.master.sendAsset(formWithErrors, formWithErrors.data(constants.FormField.BUYER_ADDRESS.name), formWithErrors.data(constants.FormField.PEG_HASH.name)))}
         },
         sendAssetData => {
           transaction.process[blockchainTransaction.SendAsset, transactionsSendAsset.Request](

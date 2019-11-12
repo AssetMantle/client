@@ -19,6 +19,8 @@ class Transaction @Inject()(getTxHashResponse: GetTransactionHashResponse, getRe
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
+  private val sleepTime = configuration.get[Long]("blockchain.entityIterator.threadSleep")
+
   private val responseErrorTransactionHashNotFound: String = constants.Response.PREFIX + constants.Response.FAILURE_PREFIX + configuration.get[String]("blockchain.response.error.transactionHashNotFound")
 
   def process[T1 <: BaseTransaction[T1], T2 <: BaseRequest](entity: T1, blockchainTransactionCreate: T1 => Future[String], request: T2, action: T2 => Future[WSResponse], onSuccess: (String, BlockResponse) => Future[Unit], onFailure: (String, String) => Future[Unit], updateTransactionHash: (String, String) => Future[Int])(implicit module: String, logger: Logger): Future[String] = {

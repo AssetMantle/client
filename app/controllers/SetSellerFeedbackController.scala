@@ -28,7 +28,7 @@ class SetSellerFeedbackController @Inject()(messagesControllerComponents: Messag
     implicit request =>
       views.companion.master.SetSellerFeedback.form.bindFromRequest().fold(
         formWithErrors => {
-          Future{BadRequest(views.html.component.master.setSellerFeedback(formWithErrors, formWithErrors.data(constants.Form.BUYER_ADDRESS), formWithErrors.data(constants.Form.PEG_HASH)))}
+          Future{BadRequest(views.html.component.master.setSellerFeedback(formWithErrors, buyerAddress = formWithErrors.data(constants.FormField.BUYER_ADDRESS.name), pegHash = formWithErrors.data(constants.FormField.PEG_HASH.name)))}
         },
         setSellerFeedbackData => {
 

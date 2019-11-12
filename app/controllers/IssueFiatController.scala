@@ -80,7 +80,7 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
     implicit request =>
       views.companion.master.RejectIssueFiatRequest.form.bindFromRequest().fold(
         formWithErrors => {
-          Future{BadRequest(views.html.component.master.rejectIssueFiatRequest(formWithErrors, formWithErrors.data(constants.Form.REQUEST_ID)))}
+          Future{BadRequest(views.html.component.master.rejectIssueFiatRequest(formWithErrors, formWithErrors.data(constants.FormField.REQUEST_ID.name)))}
         },
         rejectIssueFiatRequestData => {
           /*try {

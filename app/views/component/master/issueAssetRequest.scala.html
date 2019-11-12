@@ -1,17 +1,17 @@
 @import controllers.actions.LoginState
+@import views.companion.master.IssueAssetRequest
 @import views.html.base._
-@import views.companion.master.ConfirmIssueAssetTransaction
 
-@(confirmIssueAssetTransactionForm: Form[ConfirmIssueAssetTransaction.Data] = ConfirmIssueAssetTransaction.form, asset: masterTransaction.IssueAssetRequest)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@(issueAssetRequestForm: Form[IssueAssetRequest.Data] = IssueAssetRequest.form, asset: masterTransaction.IssueAssetRequest, requestID: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 <div id="assetDetail"></div>
-@commonForm(constants.Form.ISSUE_ASSET_REQUEST, confirmIssueAssetTransactionForm) {
-    @commonInputText(confirmIssueAssetTransactionForm, constants.FormField.REQUEST_ID)
+@commonForm(constants.Form.ISSUE_ASSET_REQUEST, issueAssetRequestForm) {
+    @commonInputText(issueAssetRequestForm, constants.FormField.REQUEST_ID, 'value -> requestID, 'class -> "hidden", 'readonly -> true)
     @asset.physicalDocumentsHandledVia match {
         case constants.Form.COMDEX => {}
         case _ => {
-            @commonInputInt(confirmIssueAssetTransactionForm, constants.FormField.GAS)
-            @commonInputPassword(confirmIssueAssetTransactionForm, constants.FormField.PASSWORD)
+            @commonInputInt(issueAssetRequestForm, constants.FormField.GAS)
+            @commonInputPassword(issueAssetRequestForm, constants.FormField.PASSWORD)
         }
     }
 }
-<script>componentResource('assetDetail', jsRoutes.controllers.IssueAssetController.assetDetail('@confirmIssueAssetTransactionForm.data(constants.FormField.REQUEST_ID.name)'))</script>
+<script>componentResource('assetDetail', jsRoutes.controllers.IssueAssetController.assetDetail('@asset.id'))</script>

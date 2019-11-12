@@ -90,7 +90,6 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
             ).recover{
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
-
         }
       )
   }
@@ -115,7 +114,7 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
     implicit request =>
       views.companion.master.RejectFaucetRequest.form.bindFromRequest().fold(
         formWithErrors => {
-          Future{BadRequest(views.html.component.master.rejectFaucetRequest(formWithErrors, formWithErrors.data(constants.Form.REQUEST_ID)))}
+          Future{BadRequest(views.html.component.master.rejectFaucetRequest(formWithErrors, formWithErrors.data(constants.FormField.REQUEST_ID.name)))}
         },
         rejectFaucetRequestData => {
 
@@ -138,7 +137,7 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
     implicit request =>
       views.companion.master.ApproveFaucetRequest.form.bindFromRequest().fold(
         formWithErrors => {
-          Future{BadRequest(views.html.component.master.approveFaucetRequests(formWithErrors, formWithErrors.data(constants.Form.REQUEST_ID), formWithErrors.data(constants.Form.ACCOUNT_ID)))}
+          Future{BadRequest(views.html.component.master.approveFaucetRequests(formWithErrors, formWithErrors.data(constants.FormField.REQUEST_ID.name), formWithErrors.data(constants.FormField.ACCOUNT_ID.name)))}
         },
         approveFaucetRequestFormData => {
 

@@ -2,14 +2,13 @@
 @import views.html.base._
 @import views.companion.master.ChangeBuyerBid
 
-@(changeBuyerBidForm: Form[ChangeBuyerBid.Data] = ChangeBuyerBid.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@(changeBuyerBidForm: Form[ChangeBuyerBid.Data] = ChangeBuyerBid.form, requestID: String, sellerAddress: String, bid: Int, pegHash: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @commonForm(constants.Form.CHANGE_BUYER_BID, changeBuyerBidForm) {
-    @*//TODO why requestID is hidden and not optional when no default value*@
-    @commonInputText(changeBuyerBidForm, constants.FormField.REQUEST_ID)
-    @commonInputText(changeBuyerBidForm, constants.FormField.SELLER_ADDRESS)
-    @commonInputInt(changeBuyerBidForm, constants.FormField.BID)
+    @commonInputText(changeBuyerBidForm, constants.FormField.REQUEST_ID, 'value -> requestID, 'class -> "hidden", 'readonly -> true, 'required -> false)
+    @commonInputText(changeBuyerBidForm, constants.FormField.SELLER_ADDRESS, 'value -> sellerAddress)
+    @commonInputInt(changeBuyerBidForm, constants.FormField.BID, 'value -> bid.toString)
     @commonInputInt(changeBuyerBidForm, constants.FormField.TIME)
-    @commonInputText(changeBuyerBidForm, constants.FormField.PEG_HASH)
+    @commonInputText(changeBuyerBidForm, constants.FormField.PEG_HASH, 'value -> pegHash)
     @commonInputInt(changeBuyerBidForm, constants.FormField.GAS)
     @commonInputPassword(changeBuyerBidForm, constants.FormField.PASSWORD)
 }

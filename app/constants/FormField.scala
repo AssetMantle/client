@@ -31,8 +31,8 @@ object FormField {
   val STREET_ADDRESS = new StringFormField("STREET_ADDRESS", 6, 100)
   val REQUEST_ID = new StringFormField("REQUEST_ID", 32, 32)
   val ACCOUNT_ID = new StringFormField("ACCOUNT_ID", 3, 50)
-  val FIAT_PROOF_HASH = new StringFormField("FIAT_PROOF_HASH", 4, 50, RegularExpression.HASH)
-  val AWB_PROOF_HASH = new StringFormField("AWB_PROOF_HASH", 4, 50, RegularExpression.HASH)
+  val FIAT_PROOF_HASH = new StringFormField("FIAT_PROOF_HASH", 0, 1000)
+  val AWB_PROOF_HASH = new StringFormField("AWB_PROOF_HASH", 0, 1000)
   val PEG_HASH = new StringFormField("PEG_HASH", 2, 50, RegularExpression.PEG_HASH)
   val COMMODITY_NAME = new StringFormField("COMMODITY_NAME", 2, 20, RegularExpression.ALL_NUMBERS_ALL_LETTERS)
   val QUANTITY_UNIT = new StringFormField("QUANTITY_UNIT", 2, 10, RegularExpression.ALL_LETTERS)
@@ -47,7 +47,6 @@ object FormField {
   val SELLER_CONTRACT_HASH = new StringFormField("SELLER_CONTRACT_HASH", 40, 40, RegularExpression.HASH)
   val DOCUMENT_HASH = new StringFormField("DOCUMENT_HASH", 4, 500)
   val FROM = new StringFormField("FROM", 45, 45)
-  val MODE = new StringFormField("MODE", 4, 5)
   val PORT_OF_LOADING = new StringFormField("PORT_OF_LOADING", 0, 100)
   val PORT_OF_DISCHARGE = new StringFormField("PORT_OF_DISCHARGE", 0, 100)
   val BILL_OF_LADING_NUMBER = new StringFormField("COMMODITY_NAME", 2, 20, RegularExpression.ALL_NUMBERS_ALL_LETTERS)
@@ -101,6 +100,7 @@ object FormField {
   val PHYSICAL_DOCUMENTS_HANDLED_VIA = new SelectFormField("PHYSICAL_DOCUMENTS_HANDLED_VIA", constants.SelectFieldOptions.PHYSICAL_DOCUMENTS_HANDLED_VIA)
   val COMDEX_PAYMENT_TERMS = new SelectFormField("COMDEX_PAYMENT_TERMS", constants.SelectFieldOptions.PAYMENT_TERMS)
   val COUNTRY_CODE = new SelectFormField("COUNTRY_CODE", constants.SelectFieldOptions.COUNTRY_CODES)
+  val MODE = new SelectFormField("MODE", constants.SelectFieldOptions.MODE)
 
   //IntFormField
   val GAS = new IntFormField("GAS", 20000, 1000000)

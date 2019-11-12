@@ -117,6 +117,26 @@ class IssueAssetRequests @Inject()(protected val databaseConfigProvider: Databas
     }
   }
 
+  private def updateStatusByPegHash(pegHash: Option[String], status: String): Future[Int] = db.run(issueAssetRequestTable.filter(_.pegHash === pegHash).map(_.status).update(status).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def updateStatusAndAccountIDByPegHash(pegHash: Option[String], accountID: String, status: String): Future[Int] = db.run(issueAssetRequestTable.filter(_.pegHash === pegHash).map(issueAssetRequest => (issueAssetRequest.status, issueAssetRequest.accountID)).update((status, accountID)).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
   private def getIssueAssetRequestsWithStatus(accountIDs: Seq[String], status: String): Future[Seq[IssueAssetRequestSerialized]] = db.run(issueAssetRequestTable.filter(_.accountID.inSet(accountIDs)).filter(_.status === status).result)
 
   private def getAssetsByStatuses(statuses: Seq[String]): Future[Seq[IssueAssetRequestSerialized]] = db.run(issueAssetRequestTable.filter(_.status inSet statuses).result)
@@ -210,7 +230,11 @@ class IssueAssetRequests @Inject()(protected val databaseConfigProvider: Databas
 
     def markListedForTrade(ticketID: String, peghash: Option[String]) :Int = Await.result(updatePegHashAndStatusWithTicketID(ticketID = ticketID, pegHash = peghash, status = constants.Status.Asset.LISTED_FOR_TRADE), Duration.Inf)
 
-    def getPendingIssueAssetRequests(accountIDs: Seq[String], status: String): Future[Seq[IssueAssetRequest]] = getIssueAssetRequestsWithStatus(accountIDs, status).map{_.map(_.deSerialize)}
+    def markRedeemed(peghash: Option[String]) :Int = Await.result(updateStatusByPegHash(pegHash = peghash, status = constants.Status.Asset.REDEEMED), Duration.Inf)
+
+    def updateAccountIDAndMarkListedForTradeByPegHash(pegHash: Option[String], accountID: String) :Int = Await.result(updateStatusAndAccountIDByPegHash(pegHash = pegHash, accountID = accountID, status = constants.Status.Asset.LISTED_FOR_TRADE), Duration.Inf)
+
+    def getPendingIssueAssetRequests(accountIDs: Seq[String], status: String): Seq[IssueAssetRequest] = Await.result(getIssueAssetRequestsWithStatus(accountIDs, status), Duration.Inf).map(_.deSerialize)
 
     def getTraderAssetList(accountID: String): Future[Seq[IssueAssetRequest]] = findIssueAssetsByAccountIDAndStatus(accountID, Seq(constants.Status.Asset.INCOMPLETE_DETAILS, constants.Status.Asset.REQUESTED, constants.Status.Asset.LISTED_FOR_TRADE, constants.Status.Asset.UNDER_NEGOTIATION)).map(_.map(_.deSerialize))
 

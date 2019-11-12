@@ -118,7 +118,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
         }
       )
   }*/
-
+ //TODO Change form it should only contain organization ID
   def addTraderForm(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
 
@@ -469,9 +469,7 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
         ).recover{
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
-
   }
-
 
   def updateTraderKYCDocumentZoneStatus(): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>

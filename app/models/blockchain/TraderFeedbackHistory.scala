@@ -36,6 +36,14 @@ class TraderFeedbackHistories @Inject()(protected val databaseConfigProvider: Da
     }
   }
 
+  private def upsert(traderFeedbackHistory: TraderFeedbackHistory): Future[Int] = db.run(traderFeedbackHistoryTable.insertOrUpdate(traderFeedbackHistory).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+    }
+  }
+
   private def updateTraderFeedbackHistory(traderFeedbackHistory: TraderFeedbackHistory): Future[Int] = db.run(traderFeedbackHistoryTable.filter(_.address === traderFeedbackHistory.address).filter(_.buyerAddress === traderFeedbackHistory.buyerAddress).filter(_.sellerAddress === traderFeedbackHistory.sellerAddress).filter(_.pegHash === traderFeedbackHistory.pegHash).update(traderFeedbackHistory).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -82,7 +90,9 @@ class TraderFeedbackHistories @Inject()(protected val databaseConfigProvider: Da
 
     def create(address: String, buyerAddress: String, sellerAddress: String, pegHash: String, rating: String): Future[String] =add(TraderFeedbackHistory(address, buyerAddress, sellerAddress, pegHash, rating))
 
-    def update(address: String, buyerAddress: String, sellerAddress: String, pegHash: String, rating: String): Future[Int] = updateTraderFeedbackHistory(TraderFeedbackHistory(address, buyerAddress, sellerAddress, pegHash, rating))
+    def insertOrUpdate(address: String, buyerAddress: String, sellerAddress: String, pegHash: String, rating: String): Int = Await.result(upsert(TraderFeedbackHistory(address, buyerAddress, sellerAddress, pegHash, rating)), Duration.Inf)
+
+    def update(address: String, buyerAddress: String, sellerAddress: String, pegHash: String, rating: String): Int = Await.result(updateTraderFeedbackHistory(TraderFeedbackHistory(address, buyerAddress, sellerAddress, pegHash, rating)), Duration.Inf)
 
     def get(address: String): Future[Seq[TraderFeedbackHistory]] = findById(address)
 

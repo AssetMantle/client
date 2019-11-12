@@ -32,7 +32,7 @@ class ChangeSellerBids @Inject()(actorSystem: ActorSystem, transaction: utilitie
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
+  private val schedulerExecutionContext:ExecutionContext= actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
 
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
@@ -177,20 +177,12 @@ class ChangeSellerBids @Inject()(actorSystem: ActorSystem, transaction: utilitie
   }
 
   object Utility {
-    def getIDs(changeSellerBid: ChangeSellerBid) = {
-      val toAccountID = masterAccounts.Service.getId(changeSellerBid.to)
-      val fromAccountID = masterAccounts.Service.getId(changeSellerBid.from)
-      for {
-        toAccountID <- toAccountID
-        fromAccountID <- fromAccountID
-      } yield (toAccountID, fromAccountID)
-    }
+
 
     def onSuccess(ticketID: String, blockResponse: BlockResponse): Future[Unit] = {
 
       val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
       val changeSellerBid = Service.getTransaction(ticketID)
-      Thread.sleep(sleepTime)
 
       def negotiationID(changeSellerBid: ChangeSellerBid) = blockchainNegotiations.Service.getNegotiationID(buyerAddress = changeSellerBid.to, sellerAddress = changeSellerBid.from, pegHash = changeSellerBid.pegHash)
 
@@ -210,7 +202,14 @@ class ChangeSellerBids @Inject()(actorSystem: ActorSystem, transaction: utilitie
           _ <- markDirtyToAddressInBlockchainTransactionFeedbacks
         } yield {}
       }
-
+      def getIDs(changeSellerBid: ChangeSellerBid) = {
+        val toAccountID = masterAccounts.Service.getId(changeSellerBid.to)
+        val fromAccountID = masterAccounts.Service.getId(changeSellerBid.from)
+        for {
+          toAccountID <- toAccountID
+          fromAccountID <- fromAccountID
+        } yield (toAccountID, fromAccountID)
+      }
       (for {
         _ <- markTransactionSuccessful
         changeSellerBid <- changeSellerBid
@@ -236,8 +235,22 @@ class ChangeSellerBids @Inject()(actorSystem: ActorSystem, transaction: utilitie
       val markTransactionFailed = Service.markTransactionFailed(ticketID, message)
       val changeSellerBid = Service.getTransaction(ticketID)
 
-      def markDirty(changeSellerBid: ChangeSellerBid) = Future.sequence(List(blockchainTransactionFeedbacks.Service.markDirty(changeSellerBid.from), blockchainTransactionFeedbacks.Service.markDirty(changeSellerBid.to)))
-
+      def markDirty(changeSellerBid: ChangeSellerBid) = {
+        val markDirtyFromAddressInBlockchainTransactionFeedbacks = blockchainTransactionFeedbacks.Service.markDirty(changeSellerBid.from)
+        val markDirtyToAddressInBlockchainTransactionFeedbacks = blockchainTransactionFeedbacks.Service.markDirty(changeSellerBid.to)
+        for{
+          _<-markDirtyFromAddressInBlockchainTransactionFeedbacks
+          _<-markDirtyToAddressInBlockchainTransactionFeedbacks
+        }yield {}
+      }
+      def getIDs(changeSellerBid: ChangeSellerBid) = {
+        val toAccountID = masterAccounts.Service.getId(changeSellerBid.to)
+        val fromAccountID = masterAccounts.Service.getId(changeSellerBid.from)
+        for {
+          toAccountID <- toAccountID
+          fromAccountID <- fromAccountID
+        } yield (toAccountID, fromAccountID)
+      }
       (for {
         _ <- markTransactionFailed
         changeSellerBid <- changeSellerBid
@@ -251,7 +264,6 @@ class ChangeSellerBids @Inject()(actorSystem: ActorSystem, transaction: utilitie
       }
     }
   }
-
 
   if (kafkaEnabled || transactionMode != constants.Transactions.BLOCK_MODE) {
     actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {

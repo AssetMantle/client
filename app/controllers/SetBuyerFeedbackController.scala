@@ -28,7 +28,7 @@ class SetBuyerFeedbackController @Inject()(messagesControllerComponents: Message
     implicit request =>
       views.companion.master.SetBuyerFeedback.form.bindFromRequest().fold(
         formWithErrors => {
-          Future{BadRequest(views.html.component.master.setBuyerFeedback(formWithErrors, formWithErrors.data(constants.Form.SELLER_ADDRESS), formWithErrors.data(constants.Form.PEG_HASH)))}
+          Future{BadRequest(views.html.component.master.setBuyerFeedback(formWithErrors, sellerAddress = formWithErrors.data(constants.FormField.SELLER_ADDRESS.name), pegHash = formWithErrors.data(constants.FormField.PEG_HASH.name)))}
         },
         setBuyerFeedbackData => {
           transaction.process[blockchainTransaction.SetBuyerFeedback, transactionsSetBuyerFeedback.Request](

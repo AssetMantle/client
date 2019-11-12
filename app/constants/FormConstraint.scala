@@ -2,7 +2,7 @@ package constants
 
 import play.api.data.validation._
 import views.companion.master.SignUp
-import views.companion.master.ConfirmIssueAssetTransaction
+import views.companion.master.IssueAssetRequest
 
 object FormConstraint {
   //TODO: Error Response through Messages
@@ -15,7 +15,7 @@ object FormConstraint {
     if (errors.isEmpty) Valid else Invalid(errors)
   })
 
-  val issueAssetRequestCheckConstraint: Constraint[ConfirmIssueAssetTransaction.Data] = Constraint("constraints.issueAssetRequestCheck")({ confirmTransactionData: ConfirmIssueAssetTransaction.Data =>
+  val issueAssetRequestCheckConstraint: Constraint[IssueAssetRequest.Data] = Constraint("constraints.issueAssetRequestCheck")({ confirmTransactionData: IssueAssetRequest.Data =>
     val errors = {
       if (confirmTransactionData.password.isEmpty && confirmTransactionData.gas.isDefined) Seq(ValidationError(constants.Response.PASSWORD_NOT_GIVEN.message))
       else if (confirmTransactionData.password.isDefined && confirmTransactionData.gas.isEmpty) Seq(ValidationError(constants.Response.GAS_NOT_GIVEN.message))

@@ -163,7 +163,6 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
-
         }
       )
   }
@@ -229,7 +228,6 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
-
   }
 
   def userUpdateOrganizationKYCForm(documentType: String): Action[AnyContent] = Action { implicit request =>
@@ -328,7 +326,6 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
           } yield result).recover {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
-
         }
       )
   }
@@ -342,7 +339,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
       views.companion.master.VerifyOrganization.form.bindFromRequest().fold(
         formWithErrors => {
           Future {
-            BadRequest(views.html.component.master.verifyOrganization(formWithErrors, formWithErrors.data(constants.Form.ORGANIZATION_ID), formWithErrors.data(constants.Form.ZONE_ID)))
+            BadRequest(views.html.component.master.verifyOrganization(formWithErrors, organizationID = formWithErrors.data(constants.FormField.ORGANIZATION_ID.name), zoneID = formWithErrors.data(constants.FormField.ZONE_ID.name)))
           }
         },
         verifyOrganizationData => {
@@ -396,7 +393,6 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
-
   }
 
   def updateOrganizationKYCDocumentStatusForm(organizationID: String, documentType: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
@@ -492,7 +488,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
       views.companion.master.RejectVerifyOrganizationRequest.form.bindFromRequest().fold(
         formWithErrors => {
           Future {
-            BadRequest(views.html.component.master.rejectVerifyOrganizationRequest(formWithErrors, formWithErrors.data(constants.Form.ORGANIZATION_ID)))
+            BadRequest(views.html.component.master.rejectVerifyOrganizationRequest(formWithErrors, organizationID = formWithErrors.data(constants.FormField.ORGANIZATION_ID.name)))
           }
         },
         rejectVerifyOrganizationRequestData => {
@@ -522,7 +518,6 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
-
   }
 
   def viewPendingVerifyOrganizationRequests: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
@@ -538,7 +533,6 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
-
   }
 
   def uploadOrganizationKYCForm(documentType: String): Action[AnyContent] = Action { implicit request =>
@@ -613,7 +607,6 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
-
   }
 
   def viewOrganizationsInZone: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
@@ -629,7 +622,6 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
-
   }
 
   def viewOrganizationsInZoneForGenesis(zoneID: String): Action[AnyContent] = withGenesisLoginAction.authenticated { implicit loginState =>
@@ -641,7 +633,6 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
-
   }
 
   def blockchainAddOrganizationForm: Action[AnyContent] = Action { implicit request =>
@@ -656,16 +647,14 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
         }
       },
       addOrganizationData => {
-        val postRequest = transactionsAddOrganization.Service.post(transactionsAddOrganization.Request(transactionsAddOrganization.BaseReq(from = addOrganizationData.from, gas = addOrganizationData.gas.toString), to = addOrganizationData.to, organizationID = addOrganizationData.organizationID, zoneID = addOrganizationData.zoneID, password = addOrganizationData.password, mode = transactionMode))
+        val postRequest = transactionsAddOrganization.Service.post(transactionsAddOrganization.Request(transactionsAddOrganization.BaseReq(from = addOrganizationData.from, gas = addOrganizationData.gas.toString), to = addOrganizationData.to, organizationID = addOrganizationData.organizationID, zoneID = addOrganizationData.zoneID, password = addOrganizationData.password, mode = addOrganizationData.mode))
         (for {
           _ <- postRequest
         } yield Ok(views.html.index(successes = Seq(constants.Response.ORGANIZATION_ADDED)))
           ).recover {
           case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
         }
-
       }
     )
   }
 }
-

@@ -5,22 +5,26 @@
 @(formData: Form[_], formField: SelectFormField, arguments: (Symbol, Any)*)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, nestedFormField: Option[NestedFormField] = None, sequentialNestedFormfield: Option[Field] = None)
 
 @defining(Seq('_label -> Messages(formField.name), 'placeholder -> Messages(formField.name), 'class -> "cmuk-input", '_default -> Messages(formField.name))) { defaultArguments =>
-    @sequentialNestedFormfield match {
-        case Some(field: Field) => {
-            @* //This case handles sequential subForms under a nested field. See UserUpdateUBOs for example.*@
-            @select(field.apply(formField.name).copy(value = arguments.toMap.get('value).map(_.toString)), for(option <- formField.options) yield (option, Messages(option)), defaultArguments ++ arguments: _*)
-        }
-        case None => {
-            @nestedFormField match {
-                case Some(field: NestedFormField) => {
-                    @* //This case handles nested fields. See AddOrganization for example.*@
-                    @select(formData(Seq(field.name, formField.name).mkString(".")).copy(value = arguments.toMap.get('value).map(_.toString)), for(option <- formField.options) yield (option, Messages(option)), defaultArguments ++ arguments: _*)
+        @defining(
+            sequentialNestedFormfield match {
+                case Some(field: Field) => {
+                    //This case handles sequential subForms under a nested field. See UserUpdateUBOs for example.
+                    field.apply(formField.name)
                 }
                 case None => {
-                    @* //This case handles generic fields.*@
-                    @select(formData(formField.name).copy(value = arguments.toMap.get('value).map(_.toString)), for(option <- formField.options) yield (option, Messages(option)), defaultArguments ++ arguments: _*)
+                    nestedFormField match {
+                        case Some(field: NestedFormField) => {
+                            //This case handles nested fields. See AddOrganization for example.
+                            formData(Seq(field.name, formField.name).mkString("."))
+                        }
+                        case None => {
+                            //This case handles generic fields.
+                            formData(formField.name)
+                        }
+                    }
                 }
             }
+        ) { field =>
+            @select(if(arguments.toMap.get('value).map(_.toString).isDefined) field.copy(value = arguments.toMap.get('value).map(_.toString)) else field, for(option <- formField.options) yield (option, Messages(option)), defaultArguments ++ arguments: _*)
         }
     }
-}

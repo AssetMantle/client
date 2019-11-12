@@ -1,0 +1,28 @@
+@import controllers.actions.LoginState
+@import models.masterTransaction.NegotiationFile
+
+@(negotiationFile: Option[NegotiationFile] = None, negotiationRequestID: String, documentType: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+
+<div class="latest_card-header latest_card-header-primary text-center">
+    <h4 class="latest_card-title">@Messages(constants.Form.MODERATED_SELLER_EXECUTE_ORDER.legend)</h4>
+</div>
+<div class="centerText">
+        <div id="upload@documentType">
+            <button onclick="getForm(jsRoutes.controllers.FileController.uploadZoneNegotiationForm('@documentType', '@negotiationRequestID'))">@Messages(constants.Form.UPLOAD) @Messages(documentType)</button>
+        </div>
+    @negotiationFile match {
+        case Some(file) => {
+            @component.master.commonDocumentViewer(file) {
+                @routes.FileController.tradingFile(file.id, file.fileName, file.documentType)
+            } {
+                <a href="@routes.FileController.tradingFile(file.id, file.fileName, file.documentType)">@Messages(file.documentType)</a>
+            } {
+                <button onclick="getForm(jsRoutes.controllers.FileController.updateZoneNegotiationForm('@file.documentType','@file.id'))">@Messages(constants.Form.UPDATE) @Messages(file.documentType)</button>
+                        <script>hideElement('upload@file.documentType')</script>
+            }
+            <button type="button" class="btn-sm btn btn-primary" onclick="getForm(jsRoutes.controllers.SellerExecuteOrderController.moderatedSellerExecuteOrderForm('@file.id'))">@Messages(constants.Form.NEXT)</button>
+        }
+        case None => {}
+    }
+
+</div>

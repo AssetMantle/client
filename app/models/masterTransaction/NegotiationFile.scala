@@ -196,7 +196,7 @@ class NegotiationFiles @Inject()(protected val databaseConfigProvider: DatabaseC
 
     def updateFileStatus(id: String, documentType: String, status: Boolean) = Await.result(updateStatus(id, documentType, status), Duration.Inf)
 
-    def getFileName(id: String, documentType: String): String = Await.result(getFileNameByIdDocumentType(id = id, documentType = documentType), Duration.Inf)
+    def getFileName(id: String, documentType: String): Future[String] = getFileNameByIdDocumentType(id = id, documentType = documentType)
 
     def getAllDocuments(id: String): Seq[NegotiationFile] = Await.result(getAllDocumentsById(id = id), Duration.Inf)
 

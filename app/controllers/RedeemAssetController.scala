@@ -4,7 +4,7 @@ import controllers.actions.WithTraderLoginAction
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import models.{blockchain, blockchainTransaction}
+import models.{blockchain, blockchainTransaction, master}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
@@ -12,14 +12,14 @@ import play.api.{Configuration, Logger}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class RedeemAssetController @Inject()(messagesControllerComponents: MessagesControllerComponents, transaction: utilities.Transaction, blockchainZones: blockchain.Zones, withTraderLoginAction: WithTraderLoginAction, transactionsRedeemAsset: transactions.RedeemAsset, blockchainACLAccounts: blockchain.ACLAccounts, blockchainTransactionRedeemAssets: blockchainTransaction.RedeemAssets, withUsernameToken: WithUsernameToken)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class RedeemAssetController @Inject()(messagesControllerComponents: MessagesControllerComponents, transaction: utilities.Transaction, masterTraders: master.Traders, blockchainZones: blockchain.Zones, withTraderLoginAction: WithTraderLoginAction, transactionsRedeemAsset: transactions.RedeemAsset, blockchainACLAccounts: blockchain.ACLAccounts, blockchainTransactionRedeemAssets: blockchainTransaction.RedeemAssets, withUsernameToken: WithUsernameToken)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val logger: Logger = Logger(this.getClass)
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
   private implicit val module: String = constants.Module.CONTROLLERS_REDEEM_ASSET
-
+  //TODO Shall we fetch username from login state using withTraderLoginAction and also verify pegHash?
   def redeemAssetForm(ownerAddress: String, pegHash: String): Action[AnyContent] = Action.async { implicit request =>
 
     val account=blockchainACLAccounts.Service.get(ownerAddress)
@@ -33,7 +33,7 @@ class RedeemAssetController @Inject()(messagesControllerComponents: MessagesCont
     implicit request =>
       views.companion.master.RedeemAsset.form.bindFromRequest().fold(
         formWithErrors => {
-          Future{BadRequest(views.html.component.master.redeemAsset(formWithErrors, formWithErrors.data(constants.Form.ZONE_ID), formWithErrors.data(constants.Form.PEG_HASH)))}
+          Future{BadRequest(views.html.component.master.redeemAsset(formWithErrors, formWithErrors.data(constants.FormField.ZONE_ID.name), formWithErrors.data(constants.FormField.PEG_HASH.name)))}
         },
         redeemAssetData => {
 
