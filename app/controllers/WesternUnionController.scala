@@ -4,11 +4,11 @@ import javax.inject.{Inject, Singleton}
 import play.api.i18n.I18nSupport
 import play.api.mvc._
 import play.api.{Configuration, Logger}
-
+import models.masterTransaction
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class WesternUnionController @Inject()(messagesControllerComponents: MessagesControllerComponents, playBodyParsers: PlayBodyParsers)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class WesternUnionController @Inject()(messagesControllerComponents: MessagesControllerComponents, playBodyParsers: PlayBodyParsers, masterTransactionWURTCBRequests: masterTransaction.WURTCBRequests)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
@@ -23,16 +23,12 @@ class WesternUnionController @Inject()(messagesControllerComponents: MessagesCon
   def westernUnion = Action(parse.xml) {
     request =>
       try {
-        (request.body headOption).map(_.text)
-          .map { _ =>
-            Ok(<message status="0000">SUCESS</message>).as("application/xml")
-          }
-          .getOrElse {
-            InternalServerError(<message status="500">FAILURE</message>).as("application/xml")
-          }
+        val reqBody = (request.body \\ "request")
+        masterTransactionWURTCBRequests.Service.create(reqBody.mkString.replaceAll("[\\s\\n]+", ""))
+        Ok(<response><code>200</code><status>Success</status><message>Transaction update successful.</message></response>).as("application/xml")
       }
       catch {
-        case _: Exception => InternalServerError(<message status="500">FAILURE</message>).as("application/xml")
+        case _: Exception => Forbidden(<response><code>403</code><status>FORBIDDEN</status><message>Comdex validation failure – invalid request signature</message></response>).as("application/xml")
       }
   }
 
