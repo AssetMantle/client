@@ -3,19 +3,22 @@
 @()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
 @common(Messages(constants.Form.INDEX))(Html(""))(center)(Html(""))
+
 @center = {
-    <div class="flexContainer">
-        <div class="flexGrowth flexItem box leftText">
-            <div>
-                <h2 class="showHide showToggleElement centerText" onclick="fetchOrShowHide('pendingVerifyZoneRequests', jsRoutes.controllers.AddZoneController.viewPendingVerifyZoneRequests(), this)">@Messages(constants.View.PENDING_VERIFY_ZONE_REQUESTS)</h2>
+    <ul class="flexContainer" cmuk-accordion>
+        <li>
+            <a class="cmuk-accordion-title" href="#" onclick="fetchOrShowHide('pendingVerifyZoneRequests', jsRoutes.controllers.AddZoneController.viewPendingVerifyZoneRequests(), this)">@Messages(constants.View.PENDING_VERIFY_ZONE_REQUESTS)</a>
+            <div class="cmuk-accordion-content">
+                <div id="pendingVerifyZoneRequests" class="flexContainer"></div>
             </div>
-            <div id="pendingVerifyZoneRequests"></div>
-        </div>
-        <div class="flexGrowth flexItem box leftText">
-            <div>
-                <h2 class="showHide showToggleElement centerText" onclick="fetchOrShowHide('pendingFaucetRequests', jsRoutes.controllers.SendCoinController.viewPendingFaucetRequests(), this)">@Messages(constants.View.PENDING_FAUCET_REQUESTS)</h2>
+        </li>
+    </ul>
+    <ul cmuk-accordion class="flexContainer">
+        <li>
+            <a class="cmuk-accordion-title" href="#" onclick="fetchOrShowHide('pendingFaucetRequests', jsRoutes.controllers.SendCoinController.viewPendingFaucetRequests(), this)">@Messages(constants.View.PENDING_FAUCET_REQUESTS)</a>
+            <div class="cmuk-accordion-content">
+                <div id="pendingFaucetRequests" class="flexContainer"></div>
             </div>
-            <div id="pendingFaucetRequests"></div>
-        </div>
-    </div>
+        </li>
+    </ul>
 }

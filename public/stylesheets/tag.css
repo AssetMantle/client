@@ -6,11 +6,6 @@ body {
     background: #f4f4f4;
 }
 
-h2 {
-    color: rgba(0, 0, 0, 0.87) !important;
-    font-size: 1.5625rem !important;
-    color: white;
-}
 input, select {
     width: 100%;
     padding: 10px;
@@ -25,6 +20,7 @@ input:hover {
 }
 
 button {
+    margin-bottom: 5px !important;
     background-color:#EEF9FF;
     color: #1B7FBD;
     padding: 10px 15px;
@@ -32,15 +28,11 @@ button {
     border: none;
     cursor: pointer;
     opacity: 0.8;
+    word-break: break-all;
 }
 
 button:hover {
     opacity: 1;
-}
-
-a {
-    color: #3a53bc;
-    opacity: 0.8;
 }
 label{
     display: none !important;

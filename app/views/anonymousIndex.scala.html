@@ -4,7 +4,7 @@
 @common(Messages(constants.Form.HOME), failures, warnings, successes, infos)(Html(""))(center)(Html(""))
 @center = {
     <div class="flexContainer">
-        <div id="commonHome" class="box flexItem flexGrowth"></div>
+        <div id="commonHome" class="flexItem flexGrowth"></div>
         <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.SendCoinController.faucetRequestForm())">@Messages(constants.Form.FAUCET_REQUEST.legend)</button>
     </div>
     <script>
