@@ -215,7 +215,6 @@ class IssueAssetRequests @Inject()(protected val databaseConfigProvider: Databas
     def insertOrUpdate(id: String, ticketID: Option[String], pegHash: Option[String], accountID: String, documentHash: Option[String], assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, takerAddress: Option[String], shipmentDetails: Serializable.ShipmentDetails, physicalDocumentsHandledVia: String, paymentTerms: String, status: String) =
      upsert(serialize(IssueAssetRequest(id = id, ticketID = ticketID, pegHash = pegHash, accountID = accountID, documentHash = documentHash, assetType = assetType, quantityUnit = quantityUnit, assetQuantity = assetQuantity, assetPrice = assetPrice, takerAddress = takerAddress, shipmentDetails = shipmentDetails, physicalDocumentsHandledVia = physicalDocumentsHandledVia, paymentTerms = paymentTerms, status = status, comment = null)))
 
-
     def accept(id: String, ticketID: String): Int = Await.result(updateTicketIDAndStatusByID(id, ticketID, status = constants.Status.Asset.LISTED_FOR_TRADE), Duration.Inf)
 
     def reject(id: String, comment: String): Future[Int] = updateStatusAndCommentByID(id = id, status = constants.Status.Asset.REJECTED, comment = Option(comment))
@@ -230,11 +229,11 @@ class IssueAssetRequests @Inject()(protected val databaseConfigProvider: Databas
 
     def markListedForTrade(ticketID: String, peghash: Option[String]) :Int = Await.result(updatePegHashAndStatusWithTicketID(ticketID = ticketID, pegHash = peghash, status = constants.Status.Asset.LISTED_FOR_TRADE), Duration.Inf)
 
-    def markRedeemed(peghash: Option[String]) :Int = Await.result(updateStatusByPegHash(pegHash = peghash, status = constants.Status.Asset.REDEEMED), Duration.Inf)
+    def markRedeemed(peghash: Option[String]) :Future[Int] = updateStatusByPegHash(pegHash = peghash, status = constants.Status.Asset.REDEEMED)
 
-    def updateAccountIDAndMarkListedForTradeByPegHash(pegHash: Option[String], accountID: String) :Int = Await.result(updateStatusAndAccountIDByPegHash(pegHash = pegHash, accountID = accountID, status = constants.Status.Asset.LISTED_FOR_TRADE), Duration.Inf)
+    def updateAccountIDAndMarkListedForTradeByPegHash(pegHash: Option[String], accountID: String) :Future[Int] = updateStatusAndAccountIDByPegHash(pegHash = pegHash, accountID = accountID, status = constants.Status.Asset.LISTED_FOR_TRADE)
 
-    def getPendingIssueAssetRequests(accountIDs: Seq[String], status: String): Seq[IssueAssetRequest] = Await.result(getIssueAssetRequestsWithStatus(accountIDs, status), Duration.Inf).map(_.deSerialize)
+    def getPendingIssueAssetRequests(accountIDs: Seq[String], status: String): Future[Seq[IssueAssetRequest]] = getIssueAssetRequestsWithStatus(accountIDs, status).map(_.map(_.deSerialize))
 
     def getTraderAssetList(accountID: String): Future[Seq[IssueAssetRequest]] = findIssueAssetsByAccountIDAndStatus(accountID, Seq(constants.Status.Asset.INCOMPLETE_DETAILS, constants.Status.Asset.REQUESTED, constants.Status.Asset.LISTED_FOR_TRADE, constants.Status.Asset.UNDER_NEGOTIATION)).map(_.map(_.deSerialize))
 

@@ -4,12 +4,11 @@ import controllers.actions.WithTraderLoginAction
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import models.{blockchain, blockchainTransaction, master}
+import models.{blockchain, blockchainTransaction,master}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
-import views.companion.blockchain.RedeemFiat
-import views.companion.master
+
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -22,13 +21,17 @@ class RedeemFiatController @Inject()(messagesControllerComponents: MessagesContr
 
   private implicit val module: String = constants.Module.CONTROLLERS_REDEEM_FIAT
   //TODO Shall we fetch username from login state using withTraderLoginAction?
-  def redeemFiatForm(ownerAddress: String): Action[AnyContent] = Action.async { implicit request =>
+  def redeemFiatForm(username: String): Action[AnyContent] = Action.async { implicit request =>
 
-    val aclAccount=blockchainACLAccounts.Service.get(ownerAddress)
-    for{
-      aclAccount<-aclAccount
-    }yield Ok(views.html.component.master.redeemFiat(zoneID = aclAccount.zoneID))
+    val zoneID=masterTraders.Service.getZoneIDByAccountID(username)
+    (for{
+      zoneID<-zoneID
+    }yield Ok(views.html.component.master.redeemFiat(zoneID = zoneID))
+      ).recover{
+      case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+    }
   }
+
 
   def redeemFiat: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
@@ -37,22 +40,6 @@ class RedeemFiatController @Inject()(messagesControllerComponents: MessagesContr
           Future{BadRequest(views.html.component.master.redeemFiat(formWithErrors, formWithErrors.data(constants.FormField.ZONE_ID.name)))}
         },
         redeemFiatData => {
-          /*try {
-            val toAddress = blockchainZones.Service.getAddress(redeemFiatData.zoneID)
-            transaction.process[blockchainTransaction.RedeemFiat, transactionsRedeemFiat.Request](
-              entity = blockchainTransaction.RedeemFiat(from = loginState.address, to = toAddress, redeemAmount = redeemFiatData.redeemAmount, gas = redeemFiatData.gas, ticketID = "", mode = transactionMode),
-              blockchainTransactionCreate = blockchainTransactionRedeemFiats.Service.create,
-              request = transactionsRedeemFiat.Request(transactionsRedeemFiat.BaseReq(from = loginState.address, gas = redeemFiatData.gas.toString), to = toAddress, password = redeemFiatData.password, redeemAmount = redeemFiatData.redeemAmount.toString, mode = transactionMode),
-              action = transactionsRedeemFiat.Service.post,
-              onSuccess = blockchainTransactionRedeemFiats.Utility.onSuccess,
-              onFailure = blockchainTransactionRedeemFiats.Utility.onFailure,
-              updateTransactionHash = blockchainTransactionRedeemFiats.Service.updateTransactionHash
-            )
-            withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.FIAT_REDEEMED)))
-          }
-          catch {
-            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-          }*/
           val toAddress = blockchainZones.Service.getAddress(redeemFiatData.zoneID)
           def transactionProcess(toAddress:String)=transaction.process[blockchainTransaction.RedeemFiat, transactionsRedeemFiat.Request](
             entity = blockchainTransaction.RedeemFiat(from = loginState.address, to = toAddress, redeemAmount = redeemFiatData.redeemAmount, gas = redeemFiatData.gas, ticketID = "", mode = transactionMode),
@@ -66,7 +53,7 @@ class RedeemFiatController @Inject()(messagesControllerComponents: MessagesContr
           (for{
             toAddress<-toAddress
             _<-transactionProcess(toAddress)
-          }yield withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ASSET_REDEEMED)))
+          }yield withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.FIAT_REDEEMED)))
             ).recover{
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }

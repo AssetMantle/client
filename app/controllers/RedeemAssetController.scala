@@ -20,13 +20,15 @@ class RedeemAssetController @Inject()(messagesControllerComponents: MessagesCont
 
   private implicit val module: String = constants.Module.CONTROLLERS_REDEEM_ASSET
   //TODO Shall we fetch username from login state using withTraderLoginAction and also verify pegHash?
-  def redeemAssetForm(ownerAddress: String, pegHash: String): Action[AnyContent] = Action.async { implicit request =>
+  def redeemAssetForm(username: String, pegHash: String): Action[AnyContent] = Action.async { implicit request =>
 
-    val account=blockchainACLAccounts.Service.get(ownerAddress)
-    for{
-      account<-account
-    }yield Ok(views.html.component.master.redeemAsset(zoneID = account.zoneID, pegHash = pegHash))
-
+    val zoneID=masterTraders.Service.getZoneIDByAccountID(username)
+    (for{
+      zoneID<-zoneID
+    }yield Ok(views.html.component.master.redeemAsset(zoneID = zoneID, pegHash = pegHash))
+      ).recover{
+      case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+    }
   }
 
   def redeemAsset: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>

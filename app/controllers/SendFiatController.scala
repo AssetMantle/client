@@ -31,22 +31,8 @@ class SendFiatController @Inject()(messagesControllerComponents: MessagesControl
           Future{BadRequest(views.html.component.master.sendFiat(formWithErrors, sellerAddress = formWithErrors.data(constants.FormField.SELLER_ADDRESS.name), pegHash = formWithErrors.data(constants.FormField.PEG_HASH.name), amount = formWithErrors.data(constants.FormField.AMOUNT.name).toInt))}
         },
         sendFiatData => {
-         /* try {
-            transaction.process[blockchainTransaction.SendFiat, transactionsSendFiat.Request](
-              entity = blockchainTransaction.SendFiat(from = loginState.address, to = sendFiatData.sellerAddress, amount = sendFiatData.amount, pegHash = sendFiatData.pegHash, gas = sendFiatData.gas, ticketID = "", mode = transactionMode),
-              blockchainTransactionCreate = blockchainTransactionSendFiats.Service.create,
-              request = transactionsSendFiat.Request(transactionsSendFiat.BaseReq(from = loginState.address, gas = sendFiatData.gas.toString), to = sendFiatData.sellerAddress, password = sendFiatData.password, amount = sendFiatData.amount.toString, pegHash = sendFiatData.pegHash, mode = transactionMode),
-              action = transactionsSendFiat.Service.post,
-              onSuccess = blockchainTransactionSendFiats.Utility.onSuccess,
-              onFailure = blockchainTransactionSendFiats.Utility.onFailure,
-              updateTransactionHash = blockchainTransactionSendFiats.Service.updateTransactionHash
-            )
-            withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.FIAT_SENT)))
-          }
-          catch {
-            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-          }*/
-          transaction.process[blockchainTransaction.SendFiat, transactionsSendFiat.Request](
+
+          val transactionProcess=transaction.process[blockchainTransaction.SendFiat, transactionsSendFiat.Request](
             entity = blockchainTransaction.SendFiat(from = loginState.address, to = sendFiatData.sellerAddress, amount = sendFiatData.amount, pegHash = sendFiatData.pegHash, gas = sendFiatData.gas, ticketID = "", mode = transactionMode),
             blockchainTransactionCreate = blockchainTransactionSendFiats.Service.create,
             request = transactionsSendFiat.Request(transactionsSendFiat.BaseReq(from = loginState.address, gas = sendFiatData.gas.toString), to = sendFiatData.sellerAddress, password = sendFiatData.password, amount = sendFiatData.amount.toString, pegHash = sendFiatData.pegHash, mode = transactionMode),
@@ -55,8 +41,10 @@ class SendFiatController @Inject()(messagesControllerComponents: MessagesControl
             onFailure = blockchainTransactionSendFiats.Utility.onFailure,
             updateTransactionHash = blockchainTransactionSendFiats.Service.updateTransactionHash
           )
-          Future{withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.FIAT_SENT)))}
-            .recover{
+          (for{
+            _<-transactionProcess
+          }yield withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.FIAT_SENT)))
+          ).recover{
               case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
             }
         }
@@ -73,13 +61,7 @@ class SendFiatController @Inject()(messagesControllerComponents: MessagesControl
         Future{BadRequest(views.html.component.blockchain.sendFiat(formWithErrors))}
       },
       sendFiatData => {
-      /*  try {
-          transactionsSendFiat.Service.post(transactionsSendFiat.Request(transactionsSendFiat.BaseReq(from = sendFiatData.from, gas = sendFiatData.gas.toString), to = sendFiatData.to, password = sendFiatData.password, amount = sendFiatData.amount.toString, pegHash = sendFiatData.pegHash, mode = sendFiatData.mode))
-          Ok(views.html.index(successes = Seq(constants.Response.FIAT_SENT)))
-        }
-        catch {
-          case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-        }*/
+
         val post=transactionsSendFiat.Service.post(transactionsSendFiat.Request(transactionsSendFiat.BaseReq(from = sendFiatData.from, gas = sendFiatData.gas.toString), to = sendFiatData.to, password = sendFiatData.password, amount = sendFiatData.amount.toString, pegHash = sendFiatData.pegHash, mode = sendFiatData.mode))
         (for{
           _<-post

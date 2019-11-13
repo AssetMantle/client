@@ -202,7 +202,13 @@ class SendFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
           (sendFiat,negotiationID)
         }
       }
+      val markTransactionSuccessful=Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
+      val sendFiat = Service.getTransaction(ticketID)
+      def negotiationID(sendFiat:SendFiat) = blockchainNegotiations.Service.getNegotiationID(buyerAddress = sendFiat.from, sellerAddress = sendFiat.to, pegHash = sendFiat.pegHash)
+      def insertOrUpdate(negotiationID:String)=blockchainOrders.Service.insertOrUpdate(id = negotiationID, None, None, dirtyBit = true)
+
       def orderResponse(negotiationID:String) = getOrder.Service.get(negotiationID)
+      def insertOrUpdateFiats(orderResponse:queries.responses.OrderResponse.Response,negotiationID:String)=Future{orderResponse.value.fiatPegWallet.foreach(fiats => fiats.foreach(fiatPeg => blockchainFiats.Service.insertOrUpdate(pegHash = fiatPeg.pegHash, ownerAddress = negotiationID, transactionID = fiatPeg.transactionID, transactionAmount = fiatPeg.transactionAmount, redeemedAmount = fiatPeg.redeemedAmount, dirtyBit = false)))}
       def markDirty(sendFiat:SendFiat)={
         val markDirtyBlockchainFiats=blockchainFiats.Service.markDirty(sendFiat.from)
         val markDirtyBlockchainTransactionFeedbacks=blockchainTransactionFeedbacks.Service.markDirty(sendFiat.from)
@@ -215,12 +221,15 @@ class SendFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
       }
 
       (for{
-        (sendFiat,negotiationID)<-markTransactionSuccessfulAndGetNegotiationID
+        _<-markTransactionSuccessful
+        sendFiat<-sendFiat
+        negotiationID<-negotiationID(sendFiat)
+        _<-insertOrUpdate(negotiationID)
         orderResponse<-orderResponse(negotiationID)
+        _<-insertOrUpdateFiats(orderResponse,negotiationID)
         _<-markDirty(sendFiat)
         (toAccountID, fromAccountID) <- getIDs(sendFiat)
       }yield{
-        orderResponse.value.fiatPegWallet.foreach(fiats => fiats.foreach(fiatPeg => blockchainFiats.Service.insertOrUpdate(pegHash = fiatPeg.pegHash, ownerAddress = negotiationID, transactionID = fiatPeg.transactionID, transactionAmount = fiatPeg.transactionAmount, redeemedAmount = fiatPeg.redeemedAmount, dirtyBit = false)))
         utilitiesNotification.send(toAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
         utilitiesNotification.send(fromAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
       }).recover{

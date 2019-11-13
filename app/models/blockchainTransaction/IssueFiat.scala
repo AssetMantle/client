@@ -178,7 +178,6 @@ class IssueFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
 
       val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
       val issueFiat = Service.getTransaction(ticketID)
-      Thread.sleep(sleepTime)
 
       def account(issueFiat: IssueFiat) = getAccount.Service.get(issueFiat.to)
 
@@ -187,6 +186,14 @@ class IssueFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
       }
 
       def markDirty(issueFiat: IssueFiat) = blockchainAccounts.Service.markDirty(issueFiat.from)
+      def getIDs(issueFiat: IssueFiat) = {
+        val toAccountID = masterAccounts.Service.getId(issueFiat.to)
+        val fromAccountID = masterAccounts.Service.getId(issueFiat.from)
+        for {
+          toAccountID <- toAccountID
+          fromAccountID <- fromAccountID
+        } yield (toAccountID, fromAccountID)
+      }
 
       for {
         _ <- markTransactionSuccessful
@@ -198,7 +205,6 @@ class IssueFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
       } yield {
         utilitiesNotification.send(toAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
         utilitiesNotification.send(fromAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
-
       }
     }
 
@@ -206,6 +212,14 @@ class IssueFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
 
       val markTransactionFailed = Service.markTransactionFailed(ticketID, message)
       val issueFiat = Service.getTransaction(ticketID)
+      def getIDs(issueFiat: IssueFiat) = {
+        val toAccountID = masterAccounts.Service.getId(issueFiat.to)
+        val fromAccountID = masterAccounts.Service.getId(issueFiat.from)
+        for {
+          toAccountID <- toAccountID
+          fromAccountID <- fromAccountID
+        } yield (toAccountID, fromAccountID)
+      }
       (for {
         _ <- markTransactionFailed
         issueFiat <- issueFiat
@@ -219,14 +233,7 @@ class IssueFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
 
     }
 
-    def getIDs(issueFiat: IssueFiat) = {
-      val toAccountID = masterAccounts.Service.getId(issueFiat.to)
-      val fromAccountID = masterAccounts.Service.getId(issueFiat.from)
-      for {
-        toAccountID <- toAccountID
-        fromAccountID <- fromAccountID
-      } yield (toAccountID, fromAccountID)
-    }
+
   }
 
   if (kafkaEnabled || transactionMode != constants.Transactions.BLOCK_MODE) {

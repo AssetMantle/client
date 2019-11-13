@@ -203,10 +203,18 @@ class Traders @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
         _ <- upsertTrader(id)
       } yield id
     }
-      def insertOrUpdate(zoneID: String, organizationID: String, accountID: String, name: String): String = {
-        val id = Await.result(getIDByAccountID(accountID), Duration.Inf).getOrElse(utilities.IDGenerator.hexadecimal)
-        Await.result(upsert(Trader(id = id, zoneID = zoneID, organizationID = organizationID, accountID = accountID, name = name)), Duration.Inf)
-        id
+      def insertOrUpdate(zoneID: String, organizationID: String, accountID: String, name: String) = {
+        //val id = Await.result(getIDByAccountID(accountID), Duration.Inf).getOrElse(utilities.IDGenerator.hexadecimal)
+
+       // Await.result(upsert(Trader(id = id, zoneID = zoneID, organizationID = organizationID, accountID = accountID, name = name)), Duration.Inf)
+        //id
+
+        val id=getIDByAccountID(accountID)
+        def upsertTrader(id:String)=upsert(Trader(id = id, zoneID = zoneID, organizationID = organizationID, accountID = accountID, name = name))
+        for{
+          id<-id
+          _<-upsertTrader(id.getOrElse(utilities.IDGenerator.hexadecimal))
+        }yield id.getOrElse(utilities.IDGenerator.hexadecimal)
       }
 
       def getID(accountID: String): Future[String] = getIDByAccountID(accountID).map { id => id.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)) }

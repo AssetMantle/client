@@ -35,37 +35,21 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
           Future{BadRequest(views.html.component.master.sendCoin(formWithErrors))}
         },
         sendCoinData => {
-          /*try {
-            transaction.process[blockchainTransaction.SendCoin, transactionsSendCoin.Request](
-              entity = blockchainTransaction.SendCoin(from = loginState.address, to = sendCoinData.to, amount = sendCoinData.amount, gas = sendCoinData.gas, ticketID = "", mode = transactionMode),
-              blockchainTransactionCreate = blockchainTransactionSendCoins.Service.create,
-              request = transactionsSendCoin.Request(transactionsSendCoin.BaseReq(from = loginState.address, gas = sendCoinData.gas.toString), password = sendCoinData.password, to = sendCoinData.to, amount = Seq(transactionsSendCoin.Amount(denominationOfGasToken, sendCoinData.amount.toString)), mode = transactionMode),
-              action = transactionsSendCoin.Service.post,
-              onSuccess = blockchainTransactionSendCoins.Utility.onSuccess,
-              onFailure = blockchainTransactionSendCoins.Utility.onFailure,
-              updateTransactionHash = blockchainTransactionSendCoins.Service.updateTransactionHash
-            )
-
-            Future{withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.COINS_SENT)))}
+          val transactionProcess=transaction.process[blockchainTransaction.SendCoin, transactionsSendCoin.Request](
+            entity = blockchainTransaction.SendCoin(from = loginState.address, to = sendCoinData.to, amount = sendCoinData.amount, gas = sendCoinData.gas, ticketID = "", mode = transactionMode),
+            blockchainTransactionCreate = blockchainTransactionSendCoins.Service.create,
+            request = transactionsSendCoin.Request(transactionsSendCoin.BaseReq(from = loginState.address, gas = sendCoinData.gas.toString), password = sendCoinData.password, to = sendCoinData.to, amount = Seq(transactionsSendCoin.Amount(denominationOfGasToken, sendCoinData.amount.toString)), mode = transactionMode),
+            action = transactionsSendCoin.Service.post,
+            onSuccess = blockchainTransactionSendCoins.Utility.onSuccess,
+            onFailure = blockchainTransactionSendCoins.Utility.onFailure,
+            updateTransactionHash = blockchainTransactionSendCoins.Service.updateTransactionHash
+          )
+          (for{
+            _<-transactionProcess
+          }yield withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.COINS_SENT)))
+            ).recover{
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
-          catch {
-            case baseException: BaseException => Future{InternalServerError(views.html.index(failures = Seq(baseException.failure)))}
-          }*/
-
-            transaction.process[blockchainTransaction.SendCoin, transactionsSendCoin.Request](
-              entity = blockchainTransaction.SendCoin(from = loginState.address, to = sendCoinData.to, amount = sendCoinData.amount, gas = sendCoinData.gas, ticketID = "", mode = transactionMode),
-              blockchainTransactionCreate = blockchainTransactionSendCoins.Service.create,
-              request = transactionsSendCoin.Request(transactionsSendCoin.BaseReq(from = loginState.address, gas = sendCoinData.gas.toString), password = sendCoinData.password, to = sendCoinData.to, amount = Seq(transactionsSendCoin.Amount(denominationOfGasToken, sendCoinData.amount.toString)), mode = transactionMode),
-              action = transactionsSendCoin.Service.post,
-              onSuccess = blockchainTransactionSendCoins.Utility.onSuccess,
-              onFailure = blockchainTransactionSendCoins.Utility.onFailure,
-              updateTransactionHash = blockchainTransactionSendCoins.Service.updateTransactionHash
-            )
-          Future{withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.COINS_SENT)))}
-            .recover{
-              case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-            }
-
           }
 
       )
@@ -82,7 +66,6 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
           Future{BadRequest(views.html.component.master.faucetRequest(formWithErrors))}
         },
         faucetRequestFormData => {
-
           val create=masterTransactionFaucetRequests.Service.create(loginState.username, defaultFaucetToken)
           (for{
             _<-create
@@ -100,7 +83,7 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
     val pendingFaucetRequests=masterTransactionFaucetRequests.Service.getPendingFaucetRequests
       (for{
         pendingFaucetRequests<-pendingFaucetRequests
-    }yield  withUsernameToken.Ok(views.html.component.master.viewPendingFaucetRequests(pendingFaucetRequests))
+    }yield  Ok(views.html.component.master.viewPendingFaucetRequests(pendingFaucetRequests))
         ).recover{
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
@@ -180,17 +163,17 @@ class SendCoinController @Inject()(messagesControllerComponents: MessagesControl
     Ok(views.html.component.blockchain.sendCoin())
   }
 
-  def blockchainSendCoin: Action[AnyContent] = Action { implicit request =>
+  def blockchainSendCoin: Action[AnyContent] = Action.async { implicit request =>
     views.companion.blockchain.SendCoin.form.bindFromRequest().fold(
       formWithErrors => {
-        BadRequest(views.html.component.blockchain.sendCoin(formWithErrors))
+        Future{BadRequest(views.html.component.blockchain.sendCoin(formWithErrors))}
       },
       sendCoinData => {
-        try {
-          transactionsSendCoin.Service.post(transactionsSendCoin.Request(transactionsSendCoin.BaseReq(from = sendCoinData.from, gas = sendCoinData.gas.toString), password = sendCoinData.password, to = sendCoinData.to, amount = Seq(transactionsSendCoin.Amount(denominationOfGasToken, sendCoinData.amount.toString)), mode = sendCoinData.mode))
-          Ok(views.html.index(successes = Seq(constants.Response.COINS_SENT)))
-        }
-        catch {
+        val postRequest=transactionsSendCoin.Service.post(transactionsSendCoin.Request(transactionsSendCoin.BaseReq(from = sendCoinData.from, gas = sendCoinData.gas.toString), password = sendCoinData.password, to = sendCoinData.to, amount = Seq(transactionsSendCoin.Amount(denominationOfGasToken, sendCoinData.amount.toString)), mode = sendCoinData.mode))
+        (for{
+          _<-postRequest
+        }yield Ok(views.html.index(successes = Seq(constants.Response.COINS_SENT)))
+          ).recover{
           case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
         }
       }

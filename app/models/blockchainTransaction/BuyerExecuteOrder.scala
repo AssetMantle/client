@@ -173,14 +173,6 @@ class BuyerExecuteOrders @Inject()(actorSystem: ActorSystem, transaction: utilit
   }
 
   object Utility {
-    def getIDs(buyerExecuteOrder:BuyerExecuteOrder) = {
-      val buyerAddressID = masterAccounts.Service.getId(buyerExecuteOrder.buyerAddress)
-      val sellerAddressID = masterAccounts.Service.getId(buyerExecuteOrder.sellerAddress)
-      for {
-        buyerAddressID <- buyerAddressID
-        sellerAddressID <- sellerAddressID
-      } yield (buyerAddressID, sellerAddressID)
-    }
 
     def onSuccess(ticketID: String, blockResponse: BlockResponse): Future[Unit] = {
 
@@ -211,6 +203,14 @@ class BuyerExecuteOrders @Inject()(actorSystem: ActorSystem, transaction: utilit
           _<- markDirtyFromAddress
         }yield {}
       }
+      def getIDs(buyerExecuteOrder:BuyerExecuteOrder) = {
+        val buyerAddressID = masterAccounts.Service.getId(buyerExecuteOrder.buyerAddress)
+        val sellerAddressID = masterAccounts.Service.getId(buyerExecuteOrder.sellerAddress)
+        for {
+          buyerAddressID <- buyerAddressID
+          sellerAddressID <- sellerAddressID
+        } yield (buyerAddressID, sellerAddressID)
+      }
       for{
         _<-markTransactionSuccessful
         buyerExecuteOrder<-buyerExecuteOrder
@@ -230,7 +230,7 @@ class BuyerExecuteOrders @Inject()(actorSystem: ActorSystem, transaction: utilit
       def markDirty(buyerExecuteOrder:BuyerExecuteOrder)={
         val markDirtyBuyerAddress=blockchainTransactionFeedbacks.Service.markDirty(buyerExecuteOrder.buyerAddress)
         val markDirtySellerAddress=blockchainTransactionFeedbacks.Service.markDirty(buyerExecuteOrder.sellerAddress)
-        def markDirtyFromAddress={
+        val markDirtyFromAddress={
           if(buyerExecuteOrder.from != buyerExecuteOrder.buyerAddress){
             val markDirtyFromAddress= blockchainAccounts.Service.markDirty(buyerExecuteOrder.from)
             val id= masterAccounts.Service.getId(buyerExecuteOrder.from)
@@ -245,6 +245,14 @@ class BuyerExecuteOrders @Inject()(actorSystem: ActorSystem, transaction: utilit
         _<-markDirtySellerAddress
         _<- markDirtyFromAddress
       }yield{}
+      }
+      def getIDs(buyerExecuteOrder:BuyerExecuteOrder) = {
+        val buyerAddressID = masterAccounts.Service.getId(buyerExecuteOrder.buyerAddress)
+        val sellerAddressID = masterAccounts.Service.getId(buyerExecuteOrder.sellerAddress)
+        for {
+          buyerAddressID <- buyerAddressID
+          sellerAddressID <- sellerAddressID
+        } yield (buyerAddressID, sellerAddressID)
       }
       for{
         _<- markTransactionFailed

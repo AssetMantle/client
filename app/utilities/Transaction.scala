@@ -25,9 +25,7 @@ class Transaction @Inject()(getTxHashResponse: GetTransactionHashResponse, getRe
 
   def process[T1 <: BaseTransaction[T1], T2 <: BaseRequest](entity: T1, blockchainTransactionCreate: T1 => Future[String], request: T2, action: T2 => Future[WSResponse], onSuccess: (String, BlockResponse) => Future[Unit], onFailure: (String, String) => Future[Unit], updateTransactionHash: (String, String) => Future[Int])(implicit module: String, logger: Logger): Future[String] = {
 
-    val ticketID: Future[String] = if (kafkaEnabled) utilities.JSON.getResponseFromJson[KafkaResponse](action(request)).map(res => res.ticketID) else Future {
-      utilities.IDGenerator.ticketID
-    }
+    val ticketID: Future[String] = if (kafkaEnabled) utilities.JSON.getResponseFromJson[KafkaResponse](action(request)).map(res => res.ticketID) else Future {utilities.IDGenerator.ticketID}
 
     def create(ticketID: String) = blockchainTransactionCreate(entity.mutateTicketID(ticketID))
 
@@ -72,6 +70,7 @@ class Transaction @Inject()(getTxHashResponse: GetTransactionHashResponse, getRe
   def ticketUpdater(getTickets: () => Future[Seq[String]], getTransactionHash: String => Future[Option[String]], getMode: String => Future[String], onSuccess: (String, BlockResponse) => Future[Unit], onFailure: (String, String) => Future[Unit])(implicit module: String, logger: Logger) {
 
     val ticketIDsSeq: Future[Seq[String]] = getTickets()
+    Thread.sleep(sleepTime)
 
     def getBlockResponse(mode: String, ticketID: String) = {
       mode match {
@@ -100,7 +99,7 @@ class Transaction @Inject()(getTxHashResponse: GetTransactionHashResponse, getRe
 
     def successOrFailure(blockResponse: BlockResponse, ticketID: String) = if (blockResponse.code.isEmpty) onSuccess(ticketID, blockResponse) else onFailure(ticketID, blockResponse.code.get.toString)
 
-    def responseSuccessFaliure(ticketIDsSeq: Seq[String]) = Future.sequence {
+    def responseSuccessOrFaliure(ticketIDsSeq: Seq[String]) = Future.sequence {
       ticketIDsSeq.map { ticketID =>
         val blockResponse = if (kafkaEnabled) {
           val mode = getMode(ticketID)
@@ -131,7 +130,7 @@ class Transaction @Inject()(getTxHashResponse: GetTransactionHashResponse, getRe
 
     for {
       ticketIDsSeq <- ticketIDsSeq
-      _ <- responseSuccessFaliure(ticketIDsSeq)
+      _ <- responseSuccessOrFaliure(ticketIDsSeq)
     } yield {}
 
   }

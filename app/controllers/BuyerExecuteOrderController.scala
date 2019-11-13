@@ -54,9 +54,6 @@ class BuyerExecuteOrderController @Inject()(messagesControllerComponents: Messag
     implicit request =>
       views.companion.master.BuyerExecuteOrder.form.bindFromRequest().fold(
         formWithErrors => {
-          Future {
-            BadRequest(views.html.component.master.buyerExecuteOrder(formWithErrors, masterTransactionNegotiationFiles.Service.getDocuments(masterTransactionNegotiationRequests.Service.getIDByNegotiationID(blockchainNegotiations.Service.getNegotiationID(loginState.address, formWithErrors.data(constants.FormField.SELLER_ADDRESS.name), formWithErrors.data(constants.FormField.PEG_HASH.name))), Seq(constants.File.FIAT_PROOF))))
-          }
           val negotiationID=blockchainNegotiations.Service.getNegotiationID(loginState.address, formWithErrors.data(constants.FormField.SELLER_ADDRESS.name), formWithErrors.data(constants.FormField.PEG_HASH.name))
           def getNegotiationRequestID(negotiationID:String)=masterTransactionNegotiationRequests.Service.getIDByNegotiationID(negotiationID)
           def getNegotiationFiles(negotiationRequestID:String)=masterTransactionNegotiationFiles.Service.getDocuments(negotiationRequestID, Seq(constants.File.FIAT_PROOF))
@@ -112,14 +109,7 @@ class BuyerExecuteOrderController @Inject()(messagesControllerComponents: Messag
   //TODO username instead of Addresses
   def moderatedBuyerExecuteOrderDocument(buyerAddress: String, sellerAddress: String, pegHash: String) = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      try {
-        val requestID = masterTransactionNegotiationRequests.Service.getIDByNegotiationID(blockchainNegotiations.Service.getNegotiationID(buyerAddress,sellerAddress,pegHash))
-        withUsernameToken.Ok(views.html.component.master.moderatedBuyerExecuteOrderDocument(masterTransactionNegotiationFiles.Service.getOrNone(requestID, constants.File.FIAT_PROOF), requestID, constants.File.FIAT_PROOF))
 
-      }
-      catch {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-      }
       val negotiationID=blockchainNegotiations.Service.getNegotiationID(buyerAddress,sellerAddress,pegHash)
       def getNegotiationRequestID(negotiationID:String)=masterTransactionNegotiationRequests.Service.getIDByNegotiationID(negotiationID)
       def getNegotiationFiles(requestID:String)=masterTransactionNegotiationFiles.Service.getOrNone(requestID, constants.File.FIAT_PROOF)

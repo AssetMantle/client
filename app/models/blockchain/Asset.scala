@@ -191,18 +191,18 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
       def insertOrUpdateAndSendCometMessage(dirtyAssets:Seq[Asset])={
         Future.sequence {
           dirtyAssets.map { dirtyAsset =>
-            val accountOwnerAddress = getAccount.Service.get(dirtyAsset.ownerAddress)
-            def accountID = masterAccounts.Service.getId(dirtyAsset.ownerAddress)
-            def insertOrUpdate(accountOwnerAddress: Response) = {
-              val assetPegWallet = accountOwnerAddress.value.assetPegWallet.getOrElse(throw new BaseException(constants.Response.NO_RESPONSE))
+            val ownerAccount = getAccount.Service.get(dirtyAsset.ownerAddress)
+            def insertOrUpdate(ownerAccount: Response) = {
+              val assetPegWallet = ownerAccount.value.assetPegWallet.getOrElse(throw new BaseException(constants.Response.NO_RESPONSE))
               val upsert = Future.sequence(assetPegWallet.map { assetPeg => if (assetPegWallet.map(_.pegHash) contains dirtyAsset.pegHash) Service.insertOrUpdate(pegHash = assetPeg.pegHash, documentHash = assetPeg.documentHash, assetType = assetPeg.assetType, assetPrice = assetPeg.assetPrice, assetQuantity = assetPeg.assetQuantity, quantityUnit = assetPeg.quantityUnit, ownerAddress = dirtyAsset.ownerAddress, locked = assetPeg.locked, moderated = assetPeg.moderated, takerAddress = if (assetPeg.takerAddress == "") None else Option(assetPeg.takerAddress), dirtyBit = false) else Service.deleteAsset(dirtyAsset.pegHash) })
               for {
                 _ <- upsert
               } yield {}
             }
+            def accountID = masterAccounts.Service.getId(dirtyAsset.ownerAddress)
             for {
-              accountOwnerAddress <- accountOwnerAddress
-              _ <- insertOrUpdate(accountOwnerAddress)
+              ownerAccount <- ownerAccount
+              _ <- insertOrUpdate(ownerAccount)
               accountID <- accountID
             } yield mainAssetActor ! AssetCometMessage(username = accountID, message = Json.toJson(constants.Comet.PING))
           }

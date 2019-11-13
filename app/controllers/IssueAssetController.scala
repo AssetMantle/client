@@ -24,22 +24,6 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
 
   private implicit val module: String = constants.Module.CONTROLLERS_ISSUE_ASSET
 
-  //TODO why issueAssetRequestForm is sending ConfirmIssueAssetTransaction.form
-  def issueAssetRequestForm(id: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
-    implicit request =>
-
-      val asset = masterTransactionIssueAssetRequests.Service.getIssueAssetByID(id)
-      for{
-        asset<-asset
-      }yield {
-        if (asset.accountID == loginState.username) {
-          withUsernameToken.Ok(views.html.component.master.issueAssetRequest(views.companion.master.ConfirmIssueAssetTransaction.form.fill(views.companion.master.ConfirmIssueAssetTransaction.Data(id, Option(0), Option(""))), asset))
-        } else {
-          Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
-        }
-      }
-  }
-
   def assetDetail(id: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
 
@@ -56,10 +40,30 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
         }
 
       }
-    for{
-      asset<-asset
-      result<-getResult(asset)
-    }yield result
+      (for{
+        asset<-asset
+        result<-getResult(asset)
+      }yield result
+        ).recover{
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
+  }
+
+  def issueAssetRequestForm(id: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
+    implicit request =>
+
+      val asset = masterTransactionIssueAssetRequests.Service.getIssueAssetByID(id)
+      (for{
+        asset<-asset
+      }yield {
+        if (asset.accountID == loginState.username) {
+          Ok(views.html.component.master.issueAssetRequest(asset = asset, requestID = id))
+        } else {
+          Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
+        }
+      }).recover{
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
   }
 
   def issueAssetRequest: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
@@ -69,23 +73,23 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
           val issueAsset=masterTransactionIssueAssetRequests.Service.getIssueAssetByID(formWithErrors.data(constants.FormField.REQUEST_ID.name))
           for{
             issueAsset <- issueAsset
-          }yield BadRequest(views.html.component.master.issueAssetRequest(formWithErrors, issueAsset))
+          }yield BadRequest(views.html.component.master.issueAssetRequest(formWithErrors, asset = issueAsset, requestID = formWithErrors.data(constants.FormField.REQUEST_ID.name)))
         },
-        confirmTransactionData => {
+        issueAssetRequestData => {
 
-          val transactionAssetFiles=masterTransactionAssetFiles.Service.getAllDocuments(confirmTransactionData.requestID)
-          def updateDocumentHash(transactionAssetFiles:Seq[AssetFile])=masterTransactionIssueAssetRequests.Service.updateDocumentHash(confirmTransactionData.requestID, Option(utilities.FileOperations.combinedHash(transactionAssetFiles)))
-          val asset = masterTransactionIssueAssetRequests.Service.getIssueAssetByID(confirmTransactionData.requestID)
+          val transactionAssetFiles=masterTransactionAssetFiles.Service.getAllDocuments(issueAssetRequestData.requestID)
+          def updateDocumentHash(transactionAssetFiles:Seq[AssetFile])=masterTransactionIssueAssetRequests.Service.updateDocumentHash(issueAssetRequestData.requestID, Option(utilities.FileOperations.combinedHash(transactionAssetFiles)))
+          def asset = masterTransactionIssueAssetRequests.Service.getIssueAssetByID(issueAssetRequestData.requestID)
 
           def getResult(asset:IssueAssetRequest)={
             if(asset.physicalDocumentsHandledVia == constants.Form.COMDEX){
-              val updateStatusAndComment=masterTransactionIssueAssetRequests.Service.updateStatusAndComment(confirmTransactionData.requestID, constants.Status.Asset.REQUESTED)
+              val updateStatusAndComment=masterTransactionIssueAssetRequests.Service.updateStatusAndComment(issueAssetRequestData.requestID, constants.Status.Asset.REQUESTED)
               for{
                 _<-updateStatusAndComment
               }yield withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ISSUE_ASSET_REQUEST_SENT)))
             }else{
               val ticketID =transaction.process[blockchainTransaction.IssueAsset, transactionsIssueAsset.Request](
-                entity = blockchainTransaction.IssueAsset(from = loginState.address, to = loginState.address, documentHash = asset.documentHash.getOrElse(throw new BaseException(constants.Response.DOCUMENT_NOT_FOUND)), assetType = asset.assetType, assetPrice = asset.assetPrice, quantityUnit = asset.quantityUnit, assetQuantity = asset.assetQuantity, moderated = false, takerAddress = asset.takerAddress, gas = confirmTransactionData.gas.getOrElse(throw new BaseException(constants.Response.GAS_NOT_GIVEN)), ticketID = "", mode = transactionMode),
+                entity = blockchainTransaction.IssueAsset(from = loginState.address, to = loginState.address, documentHash = asset.documentHash.getOrElse(throw new BaseException(constants.Response.DOCUMENT_NOT_FOUND)), assetType = asset.assetType, assetPrice = asset.assetPrice, quantityUnit = asset.quantityUnit, assetQuantity = asset.assetQuantity, moderated = false, takerAddress = asset.takerAddress, gas = issueAssetRequestData.gas.getOrElse(throw new BaseException(constants.Response.GAS_NOT_GIVEN)), ticketID = "", mode = transactionMode),
                 blockchainTransactionCreate = blockchainTransactionIssueAssets.Service.create,
                 request = transactionsIssueAsset.Request(transactionsIssueAsset.BaseReq(from = loginState.address, gas = issueAssetRequestData.gas.getOrElse(throw new BaseException(constants.Response.GAS_NOT_GIVEN)).toString), to = loginState.address, password = issueAssetRequestData.password.getOrElse(throw new BaseException(constants.Response.PASSWORD_NOT_GIVEN)), documentHash = asset.documentHash.getOrElse(throw new BaseException(constants.Response.DOCUMENT_NOT_FOUND)), assetType = asset.assetType, assetPrice = asset.assetPrice.toString, quantityUnit = asset.quantityUnit, assetQuantity = asset.assetQuantity.toString, moderated = false, takerAddress = asset.takerAddress.getOrElse(""), mode = transactionMode),
                 action = transactionsIssueAsset.Service.post,
@@ -93,7 +97,7 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
                 onFailure = blockchainTransactionIssueAssets.Utility.onFailure,
                 updateTransactionHash = blockchainTransactionIssueAssets.Service.updateTransactionHash
               )
-              def updateTicketID(ticketID:String)=masterTransactionIssueAssetRequests.Service.updateTicketID(confirmTransactionData.requestID, ticketID)
+              def updateTicketID(ticketID:String)=masterTransactionIssueAssetRequests.Service.updateTicketID(issueAssetRequestData.requestID, ticketID)
               for{
                 ticketID<-ticketID
                 _<-updateTicketID(ticketID)
@@ -160,7 +164,7 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
             (assetFile , optionAssetFile)<- assetFiles
           }yield{
             val obl=assetFile.documentContent.getOrElse(Serializable.OBL("", "", "", "", "", "", new Date, "", 0, 0)).asInstanceOf[Serializable.OBL]
-            PartialContent(views.html.component.master.issueAssetOBL(views.companion.master.IssueAssetOBL.form.fill(views.companion.master.IssueAssetOBL.Data(id, obl.billOfLadingID, obl.portOfLoading, obl.shipperName, obl.shipperAddress, obl.notifyPartyName, obl.notifyPartyAddress, obl.dateOfShipping, obl.deliveryTerm, obl.weightOfConsignment, obl.declaredAssetValue)), optionAssetFile))
+            withUsernameToken.PartialContent(views.html.component.master.issueAssetOBL(views.companion.master.IssueAssetOBL.form.fill(views.companion.master.IssueAssetOBL.Data(id, obl.billOfLadingID, obl.portOfLoading, obl.shipperName, obl.shipperAddress, obl.notifyPartyName, obl.notifyPartyAddress, obl.dateOfShipping, obl.deliveryTerm, obl.weightOfConsignment, obl.declaredAssetValue)), optionAssetFile))
           }).recover{
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
@@ -198,25 +202,13 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
       implicit request =>
         views.companion.master.IssueAssetOBL.form.bindFromRequest().fold(
           formWithErrors => {
-           // BadRequest(views.html.component.master.issueAssetOBL(formWithErrors, masterTransactionAssetFiles.Service.getOrNone(formWithErrors.data(constants.FormField.REQUEST_ID.name), constants.File.OBL)))
            val optionAssetFile=masterTransactionAssetFiles.Service.getOrNone(formWithErrors.data(constants.FormField.REQUEST_ID.name), constants.File.OBL)
             for{
               optionAssetFile<-optionAssetFile
             }yield BadRequest(views.html.component.master.issueAssetOBL(formWithErrors,optionAssetFile))
           },
           issueAssetOBLData => {
-           /* try {
-              if (masterTransactionAssetFiles.Service.checkFileExists(issueAssetOBLData.requestID, constants.File.OBL)) {
-                masterTransactionAssetFiles.Service.insertOrUpdateContext(masterTransaction.AssetFile(issueAssetOBLData.requestID, constants.File.OBL, "", None, Option(Serializable.OBL(issueAssetOBLData.billOfLadingNumber, issueAssetOBLData.portOfLoading, issueAssetOBLData.shipperName, issueAssetOBLData.shipperAddress, issueAssetOBLData.notifyPartyName, issueAssetOBLData.notifyPartyAddress, issueAssetOBLData.shipmentDate, issueAssetOBLData.deliveryTerm, issueAssetOBLData.assetQuantity, issueAssetOBLData.assetPrice)), None))
-                val invoice = masterTransactionAssetFiles.Service.getOrEmpty(issueAssetOBLData.requestID, constants.File.INVOICE).documentContent.getOrElse(Serializable.Invoice("", new Date)).asInstanceOf[Serializable.Invoice]
-                withUsernameToken.PartialContent(views.html.component.master.issueAssetInvoice(views.companion.master.IssueAssetInvoice.form.fill(views.companion.master.IssueAssetInvoice.Data(issueAssetOBLData.requestID, invoice.invoiceNumber, invoice.invoiceDate)), masterTransactionAssetFiles.Service.getOrNone(issueAssetOBLData.requestID, constants.File.INVOICE)))
-              } else {
-                InternalServerError(views.html.index(failures = Seq(constants.Response.DOCUMENT_NOT_FOUND)))
-              }
-            }
-            catch {
-              case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-            }*/
+
            val checkFileExists=masterTransactionAssetFiles.Service.checkFileExists(issueAssetOBLData.requestID, constants.File.OBL)
            def getResult(checkFileExists:Boolean)={
             if(checkFileExists){
@@ -277,24 +269,14 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
       implicit request =>
         views.companion.master.IssueAssetInvoice.form.bindFromRequest().fold(
           formWithErrors => {
-        //    BadRequest(views.html.component.master.issueAssetInvoice(formWithErrors, masterTransactionAssetFiles.Service.getOrNone(formWithErrors.data(constants.FormField.REQUEST_ID.name), constants.File.INVOICE)))
+
             val optionAssetFiles=masterTransactionAssetFiles.Service.getOrNone(formWithErrors.data(constants.FormField.REQUEST_ID.name), constants.File.INVOICE)
             for{
               optionAssetFiles<-optionAssetFiles
             }yield BadRequest(views.html.component.master.issueAssetInvoice(formWithErrors, optionAssetFiles))
           },
           issueAssetInvoiceData => {
-           /* try {
-              if (masterTransactionAssetFiles.Service.checkFileExists(issueAssetInvoiceData.requestID, constants.File.INVOICE)) {
-                masterTransactionAssetFiles.Service.insertOrUpdateContext(masterTransaction.AssetFile(issueAssetInvoiceData.requestID, constants.File.INVOICE, "", None, Option(Serializable.Invoice(issueAssetInvoiceData.invoiceNumber, issueAssetInvoiceData.invoiceDate)), None))
-                withUsernameToken.PartialContent(views.html.component.master.issueAssetDocument(issueAssetInvoiceData.requestID, masterTransactionAssetFiles.Service.getDocuments(issueAssetInvoiceData.requestID, constants.File.TRADER_ASSET_DOCUMENT_TYPES_UPLOAD_PAGE)))
-              } else {
-                InternalServerError(views.html.index(failures = Seq(constants.Response.DOCUMENT_NOT_FOUND)))
-              }
-            }
-            catch {
-              case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-            }*/
+
             val checkFileExists=masterTransactionAssetFiles.Service.checkFileExists(issueAssetInvoiceData.requestID, constants.File.INVOICE)
             def getResult(checkFileExists:Boolean)={
               if(checkFileExists){
@@ -304,7 +286,7 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
                 for{
                   _<-insertOrUpdate
                   documents<-documents
-                }yield PartialContent(views.html.component.master.issueAssetDocument(issueAssetInvoiceData.requestID, documents))
+                }yield withUsernameToken.PartialContent(views.html.component.master.issueAssetDocument(issueAssetInvoiceData.requestID, documents))
               }else{
                 Future{InternalServerError(views.html.index(failures = Seq(constants.Response.DOCUMENT_NOT_FOUND)))}
               }
@@ -341,17 +323,11 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
 
   def viewAssetDocuments(id: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      /*try {
-        withUsernameToken.Ok(views.html.component.master.viewVerificationTraderAssetDouments(masterTransactionAssetFiles.Service.getAllDocuments(id)))
-      try {
-        Ok(views.html.component.master.viewVerificationTraderAssetDouments(masterTransactionAssetFiles.Service.getAllDocuments(id)))
-      } catch {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-      }*/
-        val allDocuments=masterTransactionAssetFiles.Service.getAllDocuments(id)
+
+        val verificationTraderAssetDouments=masterTransactionAssetFiles.Service.getAllDocuments(id)
       (for{
-          allDocuments<-allDocuments
-        }yield withUsernameToken.Ok(views.html.component.master.viewVerificationTraderAssetDouments(allDocuments))
+        verificationTraderAssetDouments<-verificationTraderAssetDouments
+        }yield withUsernameToken.Ok(views.html.component.master.viewVerificationTraderAssetDouments(verificationTraderAssetDouments))
         ).recover{
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
@@ -360,24 +336,24 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
   def updateAssetDocumentStatusForm(fileID: String, documentType: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
 
-      val zoneIDByLoginState= masterZones.Service.getID(loginState.username)
+      val userZoneID= masterZones.Service.getID(loginState.username)
       val id=masterTransactionIssueAssetRequests.Service.getAccountID(fileID)
-      def zoneIDByAccountID(id:String)=masterTraders.Service.getZoneIDByAccountID(id)
-      def getResult(zoneIDByLoginState:String,zoneIDByAccountID:String)={
-        if (zoneIDByLoginState == zoneIDByAccountID) {
+      def traderZoneID(id:String)=masterTraders.Service.getZoneIDByAccountID(id)
+      def getResult(userZoneID:String,traderZoneID:String)={
+        if (userZoneID == traderZoneID) {
           val file=masterTransactionAssetFiles.Service.get(id = fileID, documentType = documentType)
           for{
             file<-file
-          } yield withUsernameToken.Ok(views.html.component.master.updateAssetDocumentStatus(file = file ))
+          } yield Ok(views.html.component.master.updateAssetDocumentStatus(file = file))
         } else {
           Future{Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))}
         }
       }
       (for{
-        zoneIDByLoginState<-zoneIDByLoginState
+        userZoneID<-userZoneID
         id<-id
-        zoneIDByAccountID<-zoneIDByAccountID(id)
-        result<-getResult(zoneIDByLoginState,zoneIDByAccountID)
+        traderZoneID<-traderZoneID(id)
+        result<-getResult(userZoneID,traderZoneID)
       }yield result
         ).recover{
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -388,11 +364,7 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
     implicit request =>
       views.companion.master.UpdateAssetDocumentStatus.form.bindFromRequest().fold(
         formWithErrors => {
-         /* try {
-            BadRequest(views.html.component.master.updateAssetDocumentStatus(formWithErrors, masterTransactionAssetFiles.Service.get(id = formWithErrors(constants.FormField.FILE_ID.name).value.get, documentType = formWithErrors(constants.FormField.DOCUMENT_TYPE.name).value.get)))
-          } catch {
-            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-          }*/
+
           val file= masterTransactionAssetFiles.Service.get(id = formWithErrors(constants.FormField.FILE_ID.name).value.get, documentType = formWithErrors(constants.FormField.DOCUMENT_TYPE.name).value.get)
           (for{
             file<-file
@@ -403,26 +375,28 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
         },
         updateAssetDocumentStatusData => {
 
-          val id=masterTransactionIssueAssetRequests.Service.getAccountID(updateAssetDocumentStatusData.fileID)
-          def acceptOrReject(id:String)={
+          val acceptOrReject={
             if (updateAssetDocumentStatusData.status) {
              val accept= masterTransactionAssetFiles.Service.accept(id = updateAssetDocumentStatusData.fileID, documentType = updateAssetDocumentStatusData.documentType)
-             for{
+              val id=masterTransactionIssueAssetRequests.Service.getAccountID(updateAssetDocumentStatusData.fileID)
+              for{
                _<-accept
+               id<-id
              }yield utilitiesNotification.send(id, constants.Notification.SUCCESS, Messages(constants.Response.DOCUMENT_APPROVED.message))
 
             } else {
 
               val reject=masterTransactionAssetFiles.Service.reject(id = updateAssetDocumentStatusData.fileID, documentType = updateAssetDocumentStatusData.documentType)
+              val id=masterTransactionIssueAssetRequests.Service.getAccountID(updateAssetDocumentStatusData.fileID)
               for{
                 _<-reject
+                id<-id
               }yield utilitiesNotification.send(id, constants.Notification.FAILURE, Messages(constants.Response.DOCUMENT_REJECTED.message))
             }
           }
           def file=masterTransactionAssetFiles.Service.get(id = updateAssetDocumentStatusData.fileID, documentType = updateAssetDocumentStatusData.documentType)
           (for{
-            id<-id
-            _<-acceptOrReject(id)
+            _<-acceptOrReject
             file<-file
           }yield withUsernameToken.PartialContent(views.html.component.master.updateAssetDocumentStatus(file = file ))
             ).recover{
@@ -445,14 +419,6 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
             Future{BadRequest(views.html.component.master.rejectIssueAssetRequest(formWithErrors, formWithErrors.data(constants.FormField.REQUEST_ID.name)))}
           },
           rejectIssueAssetRequestData => {
-            /*try {
-              masterTransactionIssueAssetRequests.Service.reject(id = rejectIssueAssetRequestData.requestID, comment = rejectIssueAssetRequestData.comment)
-              withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ISSUE_ASSET_REQUEST_REJECTED)))
-            }
-            catch {
-              case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-            }*/
-
             val reject=masterTransactionIssueAssetRequests.Service.reject(id = rejectIssueAssetRequestData.requestID, comment = rejectIssueAssetRequestData.comment)
             (for{
               _<-reject
@@ -477,33 +443,13 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
             Future{BadRequest(views.html.component.master.issueAsset(formWithErrors))}
           },
           issueAssetData => {
-           /* try {
-              val toAddress = masterAccounts.Service.getAddress(issueAssetData.accountID)
-              if (masterTransactionIssueAssetRequests.Service.verifyRequestedStatus(issueAssetData.requestID) && masterTransactionAssetFiles.Service.checkAllAssetFilesVerified(issueAssetData.requestID)) {
-                val ticketID = transaction.process[blockchainTransaction.IssueAsset, transactionsIssueAsset.Request](
-                  entity = blockchainTransaction.IssueAsset(from = loginState.address, to = toAddress, documentHash = issueAssetData.documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.assetPrice, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.assetQuantity, moderated = true, gas = issueAssetData.gas, takerAddress = issueAssetData.takerAddress, ticketID = "", mode = transactionMode),
-                  blockchainTransactionCreate = blockchainTransactionIssueAssets.Service.create,
-                  request = transactionsIssueAsset.Request(transactionsIssueAsset.BaseReq(from = loginState.address, gas = issueAssetData.gas.toString), to = toAddress, password = issueAssetData.password, documentHash = issueAssetData.documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.assetPrice.toString, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.assetQuantity.toString, moderated = true, takerAddress = issueAssetData.takerAddress.getOrElse(""), mode = transactionMode),
-                  action = transactionsIssueAsset.Service.post,
-                  onSuccess = blockchainTransactionIssueAssets.Utility.onSuccess,
-                  onFailure = blockchainTransactionIssueAssets.Utility.onFailure,
-                  updateTransactionHash = blockchainTransactionIssueAssets.Service.updateTransactionHash
-                )
-                masterTransactionIssueAssetRequests.Service.updateTicketID(issueAssetData.requestID, ticketID)
-                withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ASSET_ISSUED)))
-              } else {
-                PreconditionFailed(views.html.index(failures = Seq(constants.Response.ALL_ASSET_FILES_NOT_VERIFIED)))
-              }
-            }
-            catch {
-              case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-            }*/
+
             val toAddress = masterAccounts.Service.getAddress(issueAssetData.accountID)
             val verifyRequestedStatus=masterTransactionIssueAssetRequests.Service.verifyRequestedStatus(issueAssetData.requestID)
             val checkAllAssetFilesVerified= masterTransactionAssetFiles.Service.checkAllAssetFilesVerified(issueAssetData.requestID)
             def getResult(toAddress:String,verifyRequestedStatus:Boolean,checkAllAssetFilesVerified:Boolean)={
               if(verifyRequestedStatus&& checkAllAssetFilesVerified){
-                val ticketID = transaction.process[blockchainTransaction.IssueAsset, transactionsIssueAsset.Request](
+                val ticketID =  transaction.process[blockchainTransaction.IssueAsset, transactionsIssueAsset.Request](
                   entity = blockchainTransaction.IssueAsset(from = loginState.address, to = toAddress, documentHash = issueAssetData.documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.assetPrice, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.assetQuantity, moderated = true, gas = issueAssetData.gas, takerAddress = issueAssetData.takerAddress, ticketID = "", mode = transactionMode),
                   blockchainTransactionCreate = blockchainTransactionIssueAssets.Service.create,
                   request = transactionsIssueAsset.Request(transactionsIssueAsset.BaseReq(from = loginState.address, gas = issueAssetData.gas.toString), to = toAddress, password = issueAssetData.password, documentHash = issueAssetData.documentHash, assetType = issueAssetData.assetType, assetPrice = issueAssetData.assetPrice.toString, quantityUnit = issueAssetData.quantityUnit, assetQuantity = issueAssetData.assetQuantity.toString, moderated = true, takerAddress = issueAssetData.takerAddress.getOrElse(""), mode = transactionMode),

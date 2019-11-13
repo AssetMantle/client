@@ -212,18 +212,17 @@ class Negotiations @Inject()(shutdownActors: ShutdownActor, masterAccounts: mast
 
   object Utility {
     def dirtyEntityUpdater(): Future[Unit] = {
-
       val dirtyNegotiations = Service.getDirtyNegotiations
       Thread.sleep(sleepTime)
-      def refreshDirtyAndSendCometMessage(dirtyNegotiations: Seq[Negotiation]) = {
 
+      def refreshDirtyAndSendCometMessage(dirtyNegotiations: Seq[Negotiation]) = {
         Future.sequence {
           dirtyNegotiations.map { dirtyNegotiation =>
             val negotiationResponse = getNegotiation.Service.get(dirtyNegotiation.id)
 
             def refreshDirty(negotiationResponse: Response) = Service.refreshDirty(id = negotiationResponse.value.negotiationID, bid = negotiationResponse.value.bid, time = negotiationResponse.value.time, buyerSignature = negotiationResponse.value.buyerSignature, sellerSignature = negotiationResponse.value.sellerSignature, buyerBlockHeight = negotiationResponse.value.buyerBlockHeight, sellerBlockHeight = negotiationResponse.value.sellerBlockHeight, buyerContractHash = negotiationResponse.value.buyerContractHash, sellerContractHash = negotiationResponse.value.sellerContractHash)
 
-            def addresses(dirtyNegotiation: Negotiation) = {
+            def getIDs(dirtyNegotiation: Negotiation) = {
               val sellerAddressID = masterAccounts.Service.getId(dirtyNegotiation.sellerAddress)
               val buyerAddressID = masterAccounts.Service.getId(dirtyNegotiation.buyerAddress)
               for {
@@ -235,7 +234,7 @@ class Negotiations @Inject()(shutdownActors: ShutdownActor, masterAccounts: mast
             for {
               negotiationResponse <- negotiationResponse
               _ <- refreshDirty(negotiationResponse)
-              (sellerAddressID, buyerAddressID) <- addresses(dirtyNegotiation)
+              (sellerAddressID, buyerAddressID) <- getIDs(dirtyNegotiation)
             } yield {
               mainNegotiationActor ! NegotiationCometMessage(username = sellerAddressID, message = Json.toJson(constants.Comet.PING))
               mainNegotiationActor ! NegotiationCometMessage(username = buyerAddressID, message = Json.toJson(constants.Comet.PING))
@@ -243,6 +242,7 @@ class Negotiations @Inject()(shutdownActors: ShutdownActor, masterAccounts: mast
           }
         }
       }
+
       for {
         dirtyNegotiations <- dirtyNegotiations
         _ <- refreshDirtyAndSendCometMessage(dirtyNegotiations)

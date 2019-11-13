@@ -223,7 +223,10 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
         allDocumentsForAllAssets <- allDocumentsForAllAssets(masterTransactionAssets)
       } yield Ok(views.html.component.master.availableAssetListWithLogin(masterTransactionAssets, blockchainAssetList, allDocumentsForAllAssets))
         ).recover {
-        case _: BaseException => NoContent
+        case _: BaseException => {
+        println("getiing noContent 2222222222222222")
+          NoContent
+        }
       }
   }
 

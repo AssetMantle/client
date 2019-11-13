@@ -156,7 +156,6 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
   object Utility {
 
-
     def dirtyEntityUpdater(): Future[Unit] =  {
       val dirtyFiats = Service.getDirtyFiats
       Thread.sleep(sleepTime)
@@ -165,8 +164,6 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
         Future.sequence {
           dirtyFiats.map { dirtyFiat =>
             val accountOwnerAddress = getAccount.Service.get(dirtyFiat.ownerAddress)
-            val accountID = masterAccounts.Service.getId(dirtyFiat.ownerAddress)
-
             def insertOrUpdate(accountOwnerAddress: Response) = {
               val fiatPegWallet = accountOwnerAddress.value.fiatPegWallet.getOrElse(throw new BaseException(constants.Response.NO_RESPONSE))
               val upsert = Future.sequence(fiatPegWallet.map { fiatPeg => if (fiatPegWallet.map(_.pegHash) contains dirtyFiat.pegHash) Service.insertOrUpdate(fiatPeg.pegHash, dirtyFiat.ownerAddress, fiatPeg.transactionID, fiatPeg.transactionAmount, fiatPeg.redeemedAmount, dirtyBit = false) else Service.deleteFiat(dirtyFiat.pegHash, dirtyFiat.ownerAddress) })
@@ -174,7 +171,7 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
                 _ <- upsert
               } yield fiatPegWallet
             }
-
+            val accountID = masterAccounts.Service.getId(dirtyFiat.ownerAddress)
             for {
               accountOwnerAddress <- accountOwnerAddress
               fiatPegWallet <- insertOrUpdate(accountOwnerAddress)

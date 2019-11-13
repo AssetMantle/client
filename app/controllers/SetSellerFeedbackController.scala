@@ -32,7 +32,7 @@ class SetSellerFeedbackController @Inject()(messagesControllerComponents: Messag
         },
         setSellerFeedbackData => {
 
-          transaction.process[blockchainTransaction.SetSellerFeedback, transactionsSetSellerFeedback.Request](
+          val transactionProcess=transaction.process[blockchainTransaction.SetSellerFeedback, transactionsSetSellerFeedback.Request](
             entity = blockchainTransaction.SetSellerFeedback(from = loginState.address, to = setSellerFeedbackData.buyerAddress, pegHash = setSellerFeedbackData.pegHash, rating = setSellerFeedbackData.rating, gas = setSellerFeedbackData.gas, ticketID = "", mode = transactionMode),
             blockchainTransactionCreate = blockchainTransactionSetSellerFeedbacks.Service.create,
             request = transactionsSetSellerFeedback.Request(transactionsSetSellerFeedback.BaseReq(from = loginState.address, gas = setSellerFeedbackData.gas.toString), to = setSellerFeedbackData.buyerAddress, password = setSellerFeedbackData.password, pegHash = setSellerFeedbackData.pegHash, rating = setSellerFeedbackData.rating.toString, mode = transactionMode),
@@ -41,11 +41,12 @@ class SetSellerFeedbackController @Inject()(messagesControllerComponents: Messag
             onFailure = blockchainTransactionSetSellerFeedbacks.Utility.onFailure,
             updateTransactionHash = blockchainTransactionSetSellerFeedbacks.Service.updateTransactionHash
           )
-          Future{withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.SELLER_FEEDBACK_SET)))}
-            .recover{
-              case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-            }
-
+          (for{
+            _<-transactionProcess
+          }yield withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.SELLER_FEEDBACK_SET)))
+            ).recover{
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+          }
         }
       )
   }

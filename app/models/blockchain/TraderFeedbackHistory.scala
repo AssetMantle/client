@@ -90,9 +90,9 @@ class TraderFeedbackHistories @Inject()(protected val databaseConfigProvider: Da
 
     def create(address: String, buyerAddress: String, sellerAddress: String, pegHash: String, rating: String): Future[String] =add(TraderFeedbackHistory(address, buyerAddress, sellerAddress, pegHash, rating))
 
-    def insertOrUpdate(address: String, buyerAddress: String, sellerAddress: String, pegHash: String, rating: String): Int = Await.result(upsert(TraderFeedbackHistory(address, buyerAddress, sellerAddress, pegHash, rating)), Duration.Inf)
+    def insertOrUpdate(address: String, buyerAddress: String, sellerAddress: String, pegHash: String, rating: String): Future[Int] = upsert(TraderFeedbackHistory(address, buyerAddress, sellerAddress, pegHash, rating))
 
-    def update(address: String, buyerAddress: String, sellerAddress: String, pegHash: String, rating: String): Int = Await.result(updateTraderFeedbackHistory(TraderFeedbackHistory(address, buyerAddress, sellerAddress, pegHash, rating)), Duration.Inf)
+    def update(address: String, buyerAddress: String, sellerAddress: String, pegHash: String, rating: String): Future[Int] = updateTraderFeedbackHistory(TraderFeedbackHistory(address, buyerAddress, sellerAddress, pegHash, rating))
 
     def get(address: String): Future[Seq[TraderFeedbackHistory]] = findById(address)
 

@@ -151,9 +151,11 @@ class Orders @Inject()(shutdownActors: ShutdownActor, masterAccounts: master.Acc
 
 
     def dirtyEntityUpdater()=  {
+      val dirtyOrders = Service.getDirtyOrders
+      Thread.sleep(sleepTime)
 
-      def insertOrUpdateAsset(account:queries.responses.AccountResponse.Response,negotiation: Negotiation)=Future.sequence(account.value.assetPegWallet.map(assets => assets.map(asset => blockchainAssets.Service.insertOrUpdate(pegHash = asset.pegHash, documentHash = asset.documentHash, assetType = asset.assetType, assetQuantity = asset.assetQuantity, quantityUnit = asset.quantityUnit, assetPrice = asset.assetPrice, ownerAddress = negotiation.sellerAddress, moderated = asset.moderated, takerAddress = if (asset.takerAddress == "") None else Option(asset.takerAddress), locked = asset.locked, dirtyBit = true))).getOrElse(Seq(Future.successful())))
-      def insertOrUpdateFiat(account:queries.responses.AccountResponse.Response,negotiation: Negotiation)=Future.sequence(account.value.fiatPegWallet.map(fiats => fiats.map(fiatPeg => blockchainFiats.Service.insertOrUpdate(fiatPeg.pegHash, negotiation.sellerAddress, fiatPeg.transactionID, fiatPeg.transactionAmount, fiatPeg.redeemedAmount, dirtyBit = true))).getOrElse(Seq(Future.successful())))
+      def insertOrUpdateAsset(account:queries.responses.AccountResponse.Response,negotiation: Negotiation)=Future{account.value.assetPegWallet.foreach(assets => assets.foreach(asset => blockchainAssets.Service.insertOrUpdate(pegHash = asset.pegHash, documentHash = asset.documentHash, assetType = asset.assetType, assetQuantity = asset.assetQuantity, quantityUnit = asset.quantityUnit, assetPrice = asset.assetPrice, ownerAddress = negotiation.sellerAddress, moderated = asset.moderated, takerAddress = if (asset.takerAddress == "") None else Option(asset.takerAddress), locked = asset.locked, dirtyBit = true)))}
+      def insertOrUpdateFiat(account:queries.responses.AccountResponse.Response,negotiation: Negotiation)=Future{account.value.fiatPegWallet.foreach(fiats => fiats.foreach(fiatPeg => blockchainFiats.Service.insertOrUpdate(fiatPeg.pegHash, negotiation.sellerAddress, fiatPeg.transactionID, fiatPeg.transactionAmount, fiatPeg.redeemedAmount, dirtyBit = true)))}
 
       def insertOrUpdateAndSendCometMessage(dirtyOrders:Seq[Order])= {
         Future.sequence {
@@ -180,12 +182,17 @@ class Orders @Inject()(shutdownActors: ShutdownActor, masterAccounts: master.Acc
             }
             def createTraderFeedbackHistories(orderResponse:queries.responses.OrderResponse.Response,negotiation: Negotiation)={
               if (orderResponse.value.awbProofHash != "" && orderResponse.value.fiatProofHash != "") {
-                val createSellerTraderFeedbackHistories=blockchainTraderFeedbackHistories.Service.create(negotiation.sellerAddress, negotiation.buyerAddress, negotiation.sellerAddress, negotiation.assetPegHash, rating = "")
-                val createBuyerTraderFeedbackHistories= blockchainTraderFeedbackHistories.Service.create(negotiation.buyerAddress, negotiation.buyerAddress, negotiation.sellerAddress, negotiation.assetPegHash, rating = "")
+                val insertOrUpdateSellerFeedbackHistories=blockchainTraderFeedbackHistories.Service.insertOrUpdate(negotiation.sellerAddress, negotiation.buyerAddress, negotiation.sellerAddress, negotiation.assetPegHash, rating = "")
+                val insertOrUpdateBuyerFeedbackHistories=blockchainTraderFeedbackHistories.Service.insertOrUpdate(negotiation.buyerAddress, negotiation.buyerAddress, negotiation.sellerAddress, negotiation.assetPegHash, rating = "")
+                //TODO Remove update of masterTransaction/IssueAssetRequest accountID and show assets from trader Index via blockchain
+                val id=masterAccounts.Service.getId(negotiation.buyerAddress)
+                def updateAccountIDAndMarkListedForTradeByPegHash(id:String)=masterTransactionIssueAssetRequests.Service.updateAccountIDAndMarkListedForTradeByPegHash(Option(negotiation.assetPegHash), id)
                 def deleteNegotiations=blockchainNegotiations.Service.deleteNegotiations(negotiation.assetPegHash)
                 for{
-                  _<-createSellerTraderFeedbackHistories
-                  _<-createBuyerTraderFeedbackHistories
+                  _<-insertOrUpdateSellerFeedbackHistories
+                  _<-insertOrUpdateBuyerFeedbackHistories
+                  id<-id
+                  _<-updateAccountIDAndMarkListedForTradeByPegHash(id)
                   _<-deleteNegotiations
                 }yield{}
               }else Future{Unit}
@@ -215,8 +222,7 @@ class Orders @Inject()(shutdownActors: ShutdownActor, masterAccounts: master.Acc
           }
         }
       }
-      val dirtyOrders = Service.getDirtyOrders
-      Thread.sleep(sleepTime)
+
       for{
         dirtyOrders<-dirtyOrders
         _<-insertOrUpdateAndSendCometMessage(dirtyOrders)

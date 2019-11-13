@@ -224,9 +224,9 @@ class NegotiationRequests @Inject()(protected val databaseConfigProvider: Databa
 
     def getIDByNegotiationID(negotiationID: String): Future[String] = findIDByNegotiationID(negotiationID)
 
-    def getSellerAccountID(id: String): String = Await.result(getSellerAccountIDByID(id), Duration.Inf)
+    def getSellerAccountID(id: String): Future[String] =getSellerAccountIDByID(id)
 
-    def getBuyerAccountID(id: String): String = Await.result(getBuyerAccountIDByID(id), Duration.Inf)
+    def getBuyerAccountID(id: String): Future[String]  = getBuyerAccountIDByID(id)
   }
 
 }

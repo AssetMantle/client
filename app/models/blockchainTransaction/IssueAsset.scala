@@ -188,22 +188,15 @@ class IssueAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tra
   }
 
   object Utility {
-    def getIDs(issueAsset:IssueAsset) = {
-      val toAccountID = masterAccounts.Service.getId(issueAsset.to)
-      val fromAccountID = masterAccounts.Service.getId(issueAsset.from)
-      for {
-        toAccountID <- toAccountID
-        fromAccountID <- fromAccountID
-      } yield (toAccountID, fromAccountID)
-    }
+
     def onSuccess(ticketID: String, blockResponse: BlockResponse)=  {
 
       val markTransactionSuccessful=Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
       val issueAsset = Service.getTransaction(ticketID)
-      Thread.sleep(sleepTime)
+
       def responseAccount(issueAsset:IssueAsset)=getAccount.Service.get(issueAsset.to)
       val assetRequest = masterTransactionIssueAssetRequests.Service.getIssueAssetByTicketID(ticketID)
-      def insertOrUpdate(responseAccount:queries.responses.AccountResponse.Response,assetRequest:IssueAssetRequest)=Future{
+      def insertOrUpdate(responseAccount:queries.responses.AccountResponse.Response,assetRequest:IssueAssetRequest,issueAsset:IssueAsset)=Future{
         responseAccount.value.assetPegWallet.foreach(assets => assets.foreach(asset => {
           blockchainAssets.Service.insertOrUpdate(pegHash = asset.pegHash, documentHash = asset.documentHash, assetType = asset.assetType, assetPrice = asset.assetPrice, assetQuantity = asset.assetQuantity, quantityUnit = asset.quantityUnit, locked = asset.locked, moderated = asset.moderated, takerAddress = if (asset.takerAddress == "") null else Option(asset.takerAddress), ownerAddress = issueAsset.to, dirtyBit = true)
           if(assetRequest.documentHash.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)) == asset.documentHash){
@@ -212,12 +205,20 @@ class IssueAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tra
         }))
       }
       def markDirty(issueAsset:IssueAsset)=blockchainAccounts.Service.markDirty(issueAsset.from)
+      def getIDs(issueAsset:IssueAsset) = {
+        val toAccountID = masterAccounts.Service.getId(issueAsset.to)
+        val fromAccountID = masterAccounts.Service.getId(issueAsset.from)
+        for {
+          toAccountID <- toAccountID
+          fromAccountID <- fromAccountID
+        } yield (toAccountID, fromAccountID)
+      }
       (for{
         _<-markTransactionSuccessful
         issueAsset<-issueAsset
         responseAccount<-responseAccount(issueAsset)
         assetRequest<-assetRequest
-        _<-insertOrUpdate(responseAccount,assetRequest)
+        _<-insertOrUpdate(responseAccount,assetRequest,issueAsset)
         _<-markDirty(issueAsset)
         (toAccountID, fromAccountID)<-getIDs(issueAsset)
       }yield{
@@ -234,6 +235,14 @@ class IssueAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tra
       val markTransactionFailed=Service.markTransactionFailed(ticketID, message)
       val issueAsset = Service.getTransaction(ticketID)
       val markFailed = masterTransactionIssueAssetRequests.Service.markFailed(ticketID)
+      def getIDs(issueAsset:IssueAsset) = {
+        val toAccountID = masterAccounts.Service.getId(issueAsset.to)
+        val fromAccountID = masterAccounts.Service.getId(issueAsset.from)
+        for {
+          toAccountID <- toAccountID
+          fromAccountID <- fromAccountID
+        } yield (toAccountID, fromAccountID)
+      }
       (for{
         _<-markTransactionFailed
         _<-markFailed

@@ -167,15 +167,6 @@ class AddZones @Inject()(actorSystem: ActorSystem, transaction: utilities.Transa
   }
 
   object Utility {
-    def getIDs(addZone: AddZone) = {
-      val toAccountID = masterAccounts.Service.getId(addZone.to)
-      val fromAccountID = masterAccounts.Service.getId(addZone.from)
-      for {
-        toAccountID <- toAccountID
-        fromAccountID <- fromAccountID
-      } yield (toAccountID, fromAccountID)
-    }
-
 
     def onSuccess(ticketID: String, blockResponse: BlockResponse) =  {
 
@@ -187,7 +178,14 @@ class AddZones @Inject()(actorSystem: ActorSystem, transaction: utilities.Transa
 
         def updateUserTypeOnAddress= masterAccounts.Service.updateUserTypeOnAddress(addZone.to, constants.User.ZONE)
         def markDirty= blockchainAccounts.Service.markDirty(addZone.from)
-
+        def getIDs(addZone: AddZone) = {
+          val toAccountID = masterAccounts.Service.getId(addZone.to)
+          val fromAccountID = masterAccounts.Service.getId(addZone.from)
+          for {
+            toAccountID <- toAccountID
+            fromAccountID <- fromAccountID
+          } yield (toAccountID, fromAccountID)
+        }
         for{
           _ <- create
           _ <- verifyZone
@@ -214,6 +212,14 @@ class AddZones @Inject()(actorSystem: ActorSystem, transaction: utilities.Transa
 
       val markTransactionFailed=Service.markTransactionFailed(ticketID, message)
       val addZone = Service.getTransaction(ticketID)
+      def getIDs(addZone: AddZone) = {
+        val toAccountID = masterAccounts.Service.getId(addZone.to)
+        val fromAccountID = masterAccounts.Service.getId(addZone.from)
+        for {
+          toAccountID <- toAccountID
+          fromAccountID <- fromAccountID
+        } yield (toAccountID, fromAccountID)
+      }
       (for{
         _<- markTransactionFailed
         addZone<- addZone

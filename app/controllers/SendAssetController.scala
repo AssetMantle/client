@@ -29,10 +29,12 @@ class SendAssetController @Inject()(messagesControllerComponents: MessagesContro
     implicit request =>
       views.companion.master.SendAsset.form.bindFromRequest().fold(
         formWithErrors => {
-          Future{BadRequest(views.html.component.master.sendAsset(formWithErrors, formWithErrors.data(constants.FormField.BUYER_ADDRESS.name), formWithErrors.data(constants.FormField.PEG_HASH.name)))}
+          Future{
+            BadRequest(views.html.component.master.sendAsset(formWithErrors, formWithErrors.data(constants.FormField.BUYER_ADDRESS.name), formWithErrors.data(constants.FormField.PEG_HASH.name)))
+          }
         },
         sendAssetData => {
-          transaction.process[blockchainTransaction.SendAsset, transactionsSendAsset.Request](
+          val transactionProcess=transaction.process[blockchainTransaction.SendAsset, transactionsSendAsset.Request](
             entity = blockchainTransaction.SendAsset(from = loginState.address, to = sendAssetData.buyerAddress, pegHash = sendAssetData.pegHash, gas = sendAssetData.gas, ticketID = "", mode = transactionMode),
             blockchainTransactionCreate = blockchainTransactionSendAssets.Service.create,
             request = transactionsSendAsset.Request(transactionsSendAsset.BaseReq(from = loginState.address, gas = sendAssetData.gas.toString), to = sendAssetData.buyerAddress, password = sendAssetData.password, pegHash = sendAssetData.pegHash, mode = transactionMode),
@@ -41,8 +43,10 @@ class SendAssetController @Inject()(messagesControllerComponents: MessagesContro
             onFailure = blockchainTransactionSendAssets.Utility.onFailure,
             updateTransactionHash = blockchainTransactionSendAssets.Service.updateTransactionHash
           )
-          Future{withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ASSET_SENT)))}
-            .recover{
+          (for{
+            _<-transactionProcess
+          }yield withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ASSET_SENT)))
+          ).recover{
               case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
             }
         }

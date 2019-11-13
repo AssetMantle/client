@@ -169,14 +169,7 @@ class RedeemAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tr
   }
 
   object Utility {
-    def getIDs(redeemAsset:RedeemAsset) = {
-      val toAccountID = masterAccounts.Service.getId(redeemAsset.to)
-      val fromAccountID = masterAccounts.Service.getId(redeemAsset.from)
-      for {
-        toAccountID <- toAccountID
-        fromAccountID <- fromAccountID
-      } yield (toAccountID, fromAccountID)
-    }
+
 
     def onSuccess(ticketID: String, blockResponse: BlockResponse): Future[Unit] =  {
 
@@ -191,6 +184,14 @@ class RedeemAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tr
         }yield {}
       }
 
+      def getIDs(redeemAsset:RedeemAsset) = {
+        val toAccountID = masterAccounts.Service.getId(redeemAsset.to)
+        val fromAccountID = masterAccounts.Service.getId(redeemAsset.from)
+        for {
+          toAccountID <- toAccountID
+          fromAccountID <- fromAccountID
+        } yield (toAccountID, fromAccountID)
+      }
       (for{
        _<-markTransactionSuccessful
         redeemAsset<-redeemAsset
@@ -209,10 +210,19 @@ class RedeemAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tr
 
       val markTransactionFailed=Service.markTransactionFailed(ticketID, message)
       val redeemAsset = Service.getTransaction(ticketID)
-
+      def markRedeemed(redeemAsset:RedeemAsset)=masterTransactionIssueAssetRequests.Service.markRedeemed(Option(redeemAsset.pegHash))
+      def getIDs(redeemAsset:RedeemAsset) = {
+        val toAccountID = masterAccounts.Service.getId(redeemAsset.to)
+        val fromAccountID = masterAccounts.Service.getId(redeemAsset.from)
+        for {
+          toAccountID <- toAccountID
+          fromAccountID <- fromAccountID
+        } yield (toAccountID, fromAccountID)
+      }
       (for{
         _<-markTransactionFailed
         redeemAsset<-redeemAsset
+        _<-markRedeemed(redeemAsset)
         (toAccountID, fromAccountID) <- getIDs(redeemAsset)
       }yield{
         utilitiesNotification.send(fromAccountID, constants.Notification.FAILURE, message)

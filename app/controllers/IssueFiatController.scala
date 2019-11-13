@@ -31,13 +31,7 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
           Future{BadRequest(views.html.component.master.issueFiatRequest(formWithErrors))}
         },
         issueFiatRequestData => {
-          /*try {
-            masterTransactionIssueFiatRequests.Service.create(accountID = loginState.username, transactionID = issueFiatRequestData.transactionID, transactionAmount = issueFiatRequestData.transactionAmount)
-            withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ISSUE_FIAT_REQUEST_SENT)))
-          }
-          catch {
-            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-          }*/
+
           val create=masterTransactionIssueFiatRequests.Service.create(accountID = loginState.username, transactionID = issueFiatRequestData.transactionID, transactionAmount = issueFiatRequestData.transactionAmount)
           (for{
             _<-create
@@ -51,12 +45,7 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
 
   def viewPendingIssueFiatRequests: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      /*try {
-        withUsernameToken.Ok(views.html.component.master.viewPendingIssueFiatRequests(masterTransactionIssueFiatRequests.Service.getPendingIssueFiatRequests(masterAccounts.Service.getIDsForAddresses(blockchainAclAccounts.Service.getAddressesUnderZone(masterZones.Service.getZoneId(loginState.username))))))
-      }
-      catch {
-        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-      }*/
+
       val zoneID=masterZones.Service.getID(loginState.username)
       def addressesUnderZone(zoneID:String)= blockchainAclAccounts.Service.getAddressesUnderZone(zoneID)
       def iDsForAddresses(addresses:Seq[String])=  masterAccounts.Service.getIDsForAddresses(addresses)
@@ -66,7 +55,7 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
         addressesUnderZone<-addressesUnderZone(zoneID)
         iDsForAddresses<-iDsForAddresses(addressesUnderZone)
         pendingIssueFiatRequests<-pendingIssueFiatRequests(iDsForAddresses)
-      }yield withUsernameToken.Ok(views.html.component.master.viewPendingIssueFiatRequests(pendingIssueFiatRequests))
+      }yield Ok(views.html.component.master.viewPendingIssueFiatRequests(pendingIssueFiatRequests))
         ).recover{
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
@@ -83,14 +72,8 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
           Future{BadRequest(views.html.component.master.rejectIssueFiatRequest(formWithErrors, formWithErrors.data(constants.FormField.REQUEST_ID.name)))}
         },
         rejectIssueFiatRequestData => {
-          /*try {
-            masterTransactionIssueFiatRequests.Service.reject(id = rejectIssueFiatRequestData.requestID, comment = rejectIssueFiatRequestData.comment)
-            withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ISSUE_FIAT_REQUEST_REJECTED)))
-          }
-          catch {
-            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-          }*/
-          val reject=masterTransactionIssueFiatRequests.Service.reject(id = rejectIssueFiatRequestData.requestID, comment = rejectIssueFiatRequestData.comment)
+
+          val reject= masterTransactionIssueFiatRequests.Service.reject(id = rejectIssueFiatRequestData.requestID, comment = rejectIssueFiatRequestData.comment)
           (for{
             _<-reject
           }yield withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ISSUE_FIAT_REQUEST_REJECTED)))

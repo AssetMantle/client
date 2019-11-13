@@ -23,6 +23,14 @@ class WithTraderLoginAction @Inject()(messagesControllerComponents: MessagesCont
       val tokenTimeVerify = masterTransactionSessionTokens.Service.tryVerifyingSessionTokenTime(username)
       val verifyUserType = masterAccounts.Service.tryVerifyingUserType(username, constants.User.TRADER)
       val address = masterAccounts.Service.getAddress(username)
+      def getLoginState(address:String)={
+          val aclHash = blockchainACLAccounts.Service.getACLHash(address)
+          def acl(aclHash: String) =blockchainACLHashes.Service.getACL(aclHash)
+          for{
+            aclHash<-aclHash
+            acl<-acl(aclHash)
+          }yield LoginState(username,  constants.User.TRADER, address,  Option(acl))
+        }
 
       def result(loginState: LoginState) = f(loginState)(request)
 
@@ -31,7 +39,8 @@ class WithTraderLoginAction @Inject()(messagesControllerComponents: MessagesCont
         _ <- tokenTimeVerify
         _ <- verifyUserType
         address <- address
-        result <- result(LoginState(username, constants.User.TRADER, address))
+        loginState<- getLoginState(address)
+        result <- result(loginState)
       } yield result).recover {
         case baseException: BaseException => logger.info(baseException.failure.message, baseException)
           Results.Unauthorized(views.html.index(failures = Seq(baseException.failure)))

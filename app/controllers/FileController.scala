@@ -224,9 +224,9 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
             optionAssetFile<-optionAssetFile
           }yield {
               assetFile.documentContent match {
-            case Some(invoiceContent: Serializable.Invoice) => withUsernameToken.PartialContent(views.html.component.master.issueAssetInvoice(views.companion.master.IssueAssetInvoice.form.fill(views.companion.master.IssueAssetInvoice.Data(issueAssetRequestID, invoiceContent.invoiceNumber, invoiceContent.invoiceDate)), optionAssetFile))
-            case None => withUsernameToken.PartialContent(views.html.component.master.issueAssetInvoice(views.companion.master.IssueAssetInvoice.form.fill(views.companion.master.IssueAssetInvoice.Data(issueAssetRequestID, "", new Date))))
-          }
+            case Some(invoiceContent: Serializable.Invoice) => withUsernameToken.PartialContent(views.html.component.master.issueAssetInvoice(views.companion.master.IssueAssetInvoice.form.fill(views.companion.master.IssueAssetInvoice.Data(issueAssetRequestID, invoiceContent.invoiceNumber, invoiceContent.invoiceDate)),optionAssetFile))
+            case None => withUsernameToken.PartialContent(views.html.component.master.issueAssetInvoice(views.companion.master.IssueAssetInvoice.form.fill(views.companion.master.IssueAssetInvoice.Data(issueAssetRequestID, "", new Date)), optionAssetFile))
+              }
           }
 
         case constants.File.CONTRACT | constants.File.PACKING_LIST | constants.File.COO | constants.File.COA | constants.File.OTHER =>
@@ -613,18 +613,21 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
 
   def zoneAccessedNegotiationFile(id: String, fileName: String, documentType: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
+      val userZoneID=masterZones.Service.getID(loginState.username)
+      val sellerAccountID=masterTransactionNegotiationRequests.Service.getSellerAccountID(id)
+      val buyerAccountID=masterTransactionNegotiationRequests.Service.getBuyerAccountID(id)
+      def trader(accountID:String)=masterTraders.Service.getByAccountID(accountID)
 
-      val userOrganizationID=masterTraders.Service.getOrganizationIDByAccountID(loginState.username)
-      val masterOrganizationsOrganizationID=masterOrganizations.Service.getID(loginState.username)
       (for{
-        masterTradersOrganizationID<-masterTradersOrganizationID
-        masterOrganizationsOrganizationID<-masterOrganizationsOrganizationID
+        userZoneID<-userZoneID
+        sellerAccountID<-sellerAccountID
+        buyerAccountID<-buyerAccountID
+        sellerTrader<-trader(sellerAccountID)
+        buyerTrader<-trader(buyerAccountID)
       }yield{
-        if(masterTradersOrganizationID==masterOrganizationsOrganizationID){
-          Ok.sendFile(utilities.FileOperations.fetchFile(path = fileResourceManager.getTraderKYCFilePath(documentType), fileName = fileName))
-        }else{
-          Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
-        }
+        if(sellerTrader.zoneID==userZoneID || buyerTrader.zoneID== userZoneID){
+          Ok.sendFile(utilities.FileOperations.fetchFile(path = fileResourceManager.getZoneNegotiationFilePath(documentType), fileName = fileName))
+        }else Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
       }).recover{
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
@@ -632,14 +635,18 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
 
   def organizationAccessedFile(accountID: String, fileName: String, documentType: String): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
     implicit request =>
-
-      val id=masterZones.Service.getID(loginState.username)
-      def fileName(id:String)  =masterZoneKYCs.Service.getFileName(id = id, documentType = documentType)
+      val userOrganizationID=masterOrganizations.Service.getID(loginState.username)
+      val traderOrganizationID=masterTraders.Service.getOrganizationIDByAccountID(loginState.username)
       (for{
-        id<-id
-        fileName<-fileName(id)
-      }yield Ok.sendFile(utilities.FileOperations.fetchFile(path = fileResourceManager.getZoneKYCFilePath(documentType), fileName = fileName))
-        ).recover{
+        userOrganizationID<-userOrganizationID
+        traderOrganizationID<-traderOrganizationID
+      }yield {
+        if(traderOrganizationID == userOrganizationID){
+          Ok.sendFile(utilities.FileOperations.fetchFile(path = fileResourceManager.getTraderKYCFilePath(documentType), fileName = fileName))
+        }else{
+          Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
+        }
+      }).recover{
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
