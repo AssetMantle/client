@@ -52,7 +52,6 @@ class AccountController @Inject()(
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-
   def signUpForm: Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.master.signUp())
   }
@@ -65,14 +64,16 @@ class AccountController @Inject()(
         }
       },
       signUpData => {
-
         val addKeyResponse = transactionAddKey.Service.post(transactionAddKey.Request(signUpData.username, signUpData.password))
+
         def createAccount(addKeyResponse: transactionAddKey.Response) = blockchainAccounts.Service.create(address = addKeyResponse.address, pubkey = addKeyResponse.pubkey)
-        def addLogin(addKeyResponse: transactionAddKey.Response, createAccountStr: String) = masterAccounts.Service.addLogin(signUpData.username, signUpData.password, createAccountStr, request.lang.toString.stripPrefix("Lang(").stripSuffix(")").trim.split("_")(0))
+
+        def addLogin(createAccount: String) = masterAccounts.Service.addLogin(signUpData.username, signUpData.password, createAccount, request.lang.toString.stripPrefix("Lang(").stripSuffix(")").trim.split("_")(0))
+
         (for {
           addKeyResponse <- addKeyResponse
-          createAccountStr <- createAccount(addKeyResponse)
-          _ <- addLogin(addKeyResponse, createAccountStr)
+          createAccount <- createAccount(addKeyResponse)
+          _ <- addLogin(createAccount)
         } yield PartialContent(views.html.component.master.noteNewKeyDetails(name = addKeyResponse.name, blockchainAddress = addKeyResponse.address, publicKey = addKeyResponse.pubkey, seed = addKeyResponse.mnemonic))
           ).recover {
           case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -94,14 +95,16 @@ class AccountController @Inject()(
         }
       },
       loginData => {
-
         val userType = masterAccounts.Service.getUserType(loginData.username)
         val address = masterAccounts.Service.getAddress(loginData.username)
         val status = masterAccounts.Service.validateLoginAndGetStatus(loginData.username, loginData.password)
+
         def getLoginState(address: String, userType: String) = {
           if (userType == constants.User.TRADER) {
             val aclHash = blockchainAclAccounts.Service.getACLHash(address)
+
             def acl(aclHash: String) = blockchainAclHashes.Service.getACL(aclHash)
+
             for {
               aclHash <- aclHash
               acl <- acl(aclHash)
@@ -117,7 +120,8 @@ class AccountController @Inject()(
             _ <- pushNotificationTokenUpdate
           } yield utilitiesNotification.send(loginData.username, constants.Notification.LOGIN, loginData.username)
         }
-// Discuss loginStateVal
+
+        // Discuss loginStateVal
         def getResult(status: String, loginStateVal: LoginState) = {
           implicit val loginState = loginStateVal
           val contactWarnings = utilities.Contact.getWarnings(status)
@@ -128,14 +132,18 @@ class AccountController @Inject()(
               }
             case constants.User.ZONE =>
               val zoneID = blockchainZones.Service.getID(loginState.address)
+
               def zone(zoneID: String) = masterZones.Service.get(zoneID)
+
               for {
                 zoneID <- zoneID
                 zone <- zone(zoneID)
               } yield withUsernameToken.Ok(views.html.zoneIndex(zone = zone, warnings = contactWarnings))
             case constants.User.ORGANIZATION =>
               val organizationID = blockchainOrganizations.Service.getID(loginState.address)
+
               def organization(organizationID: String) = masterOrganizations.Service.get(organizationID)
+
               for {
                 organizationID <- organizationID
                 organization <- organization(organizationID)
@@ -143,8 +151,11 @@ class AccountController @Inject()(
             case constants.User.TRADER =>
               val aclAccount = blockchainAclAccounts.Service.get(loginState.address)
               val fiatPegWallet = blockchainFiats.Service.getFiatPegWallet(loginState.address)
+
               def organization(aclAccount: ACLAccount) = masterOrganizations.Service.get(aclAccount.organizationID)
+
               def zone(aclAccount: ACLAccount) = masterZones.Service.get(aclAccount.zoneID)
+
               for {
                 aclAccount <- aclAccount
                 fiatPegWallet <- fiatPegWallet
@@ -198,9 +209,12 @@ class AccountController @Inject()(
         loginData => {
           val pushNotificationTokenDelete = if (!loginData.receiveNotifications) {
             masterTransactionPushNotificationTokens.Service.delete(loginState.username)
-          } else Future {Unit}
+          } else Future {
+            Unit
+          }
 
           def transactionSessionTokensDelete = masterTransactionSessionTokens.Service.delete(loginState.username)
+
           def shutdownActorsAndGetResult = {
             shutdownActor.onLogOut(constants.Module.ACTOR_MAIN_ACCOUNT, loginState.username)
             if (loginState.userType == constants.User.TRADER) {
@@ -211,6 +225,7 @@ class AccountController @Inject()(
             }
             Ok(views.html.index(successes = Seq(constants.Response.LOGGED_OUT))).withNewSession
           }
+
           (for {
             _ <- pushNotificationTokenDelete
             _ <- transactionSessionTokensDelete
@@ -235,11 +250,13 @@ class AccountController @Inject()(
           }
         },
         changePasswordData => {
-
           val validLogin = masterAccounts.Service.validateLogin(loginState.username, changePasswordData.oldPassword)
+
           def updateAndGetResult(validLogin: Boolean) = if (validLogin) {
             val postRequest = transactionChangePassword.Service.post(username = loginState.username, transactionChangePassword.Request(oldPassword = changePasswordData.oldPassword, newPassword = changePasswordData.newPassword, confirmNewPassword = changePasswordData.confirmNewPassword))
+
             def updatePassword = masterAccounts.Service.updatePassword(username = loginState.username, newPassword = changePasswordData.newPassword)
+
             for {
               _ <- postRequest
               _ <- updatePassword
@@ -249,6 +266,7 @@ class AccountController @Inject()(
               BadRequest(views.html.index(failures = Seq(constants.Response.INVALID_PASSWORD)))
             }
           }
+
           (for {
             validLogin <- validLogin
             result <- updateAndGetResult(validLogin)
@@ -272,7 +290,6 @@ class AccountController @Inject()(
         }
       },
       emailOTPForgotPasswordData => {
-
         val otp = masterTransactionEmailOTP.Service.sendOTP(emailOTPForgotPasswordData.username)
         (for {
           otp <- otp
@@ -299,8 +316,8 @@ class AccountController @Inject()(
         }
       },
       forgotPasswordData => {
-
         val validOTP = masterTransactionEmailOTP.Service.verifyOTP(forgotPasswordData.username, forgotPasswordData.otp)
+
         def updateAndGetResult(validOTP: Boolean) = {
           if (validOTP) {
             val post = transactionForgotPassword.Service.post(username = forgotPasswordData.username, transactionForgotPassword.Request(seed = forgotPasswordData.mnemonic, newPassword = forgotPasswordData.newPassword, confirmNewPassword = forgotPasswordData.confirmNewPassword))
@@ -322,8 +339,6 @@ class AccountController @Inject()(
         } yield result).recover {
           case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
         }
-
-
       }
     )
   }

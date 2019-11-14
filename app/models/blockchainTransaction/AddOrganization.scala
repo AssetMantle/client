@@ -11,8 +11,8 @@ import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
 import transactions.responses.TransactionResponse.BlockResponse
 
-import scala.concurrent.duration.{Duration, _}
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.duration._
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 case class AddOrganization(from: String, to: String, organizationID: String, zoneID: String, gas: Int, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None) extends BaseTransaction[AddOrganization] {
@@ -25,15 +25,11 @@ class AddOrganizations @Inject()(actorSystem: ActorSystem, transaction: utilitie
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_ADD_ORGANIZATION
 
   private implicit val logger: Logger = Logger(this.getClass)
-
-  private val schedulerExecutionContext:ExecutionContext= actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
-
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
-
   val db = databaseConfig.db
+  private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
 
   import databaseConfig.profile.api._
-
   private[models] val addOrganizationTable = TableQuery[AddOrganizationTable]
 
   private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
@@ -168,45 +164,50 @@ class AddOrganizations @Inject()(actorSystem: ActorSystem, transaction: utilitie
   }
 
   object Utility {
-    def onSuccess(ticketID: String, blockResponse: BlockResponse) =  {
+    def onSuccess(ticketID: String, blockResponse: BlockResponse) = {
 
       val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
       val addOrganization = Service.getTransaction(ticketID)
-      def createOrganizationAndSendNotification(addOrganization:AddOrganization)={
-        val create=blockchainOrganizations.Service.create(addOrganization.organizationID, addOrganization.to, dirtyBit = true)
-        val verifyOrganization=masterOrganizations.Service.verifyOrganization(addOrganization.organizationID)
-        val organizationAccountId=masterOrganizations.Service.getAccountId(addOrganization.organizationID)
 
-        def updateUserType(organizationAccountId:String)= masterAccounts.Service.updateUserType(organizationAccountId, constants.User.ORGANIZATION)
-        def markDirty= blockchainAccounts.Service.markDirty(addOrganization.from)
-        def fromAccountID(address:String)=masterAccounts.Service.getId(addOrganization.from)
-        for{
+      def createOrganizationAndSendNotification(addOrganization: AddOrganization) = {
+        val create = blockchainOrganizations.Service.create(addOrganization.organizationID, addOrganization.to, dirtyBit = true)
+        val verifyOrganization = masterOrganizations.Service.verifyOrganization(addOrganization.organizationID)
+        val organizationAccountId = masterOrganizations.Service.getAccountId(addOrganization.organizationID)
+
+        def updateUserType(organizationAccountId: String) = masterAccounts.Service.updateUserType(organizationAccountId, constants.User.ORGANIZATION)
+
+        def markDirty = blockchainAccounts.Service.markDirty(addOrganization.from)
+
+        def fromAccountID(address: String) = masterAccounts.Service.getId(addOrganization.from)
+
+        for {
           _ <- create
           _ <- verifyOrganization
           organizationAccountId <- organizationAccountId
-          _<-updateUserType(organizationAccountId)
-          _<- markDirty
+          _ <- updateUserType(organizationAccountId)
+          _ <- markDirty
           fromAccountID <- fromAccountID(addOrganization.from)
-        }yield{
+        } yield {
           utilitiesNotification.send(organizationAccountId, constants.Notification.SUCCESS, blockResponse.txhash)
           utilitiesNotification.send(fromAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
         }
       }
 
-      (for{
-        _<- markTransactionSuccessful
+      (for {
+        _ <- markTransactionSuccessful
         addOrganization <- addOrganization
-        result<- createOrganizationAndSendNotification(addOrganization)
-      } yield result).recover{
+        result <- createOrganizationAndSendNotification(addOrganization)
+      } yield result).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
           throw new BaseException(constants.Response.PSQL_EXCEPTION)
       }
     }
 
-    def onFailure(ticketID: String, message: String)=  {
+    def onFailure(ticketID: String, message: String) = {
 
-      val markTransactionFailed= Service.markTransactionFailed(ticketID, message)
+      val markTransactionFailed = Service.markTransactionFailed(ticketID, message)
       val addOrganization = Service.getTransaction(ticketID)
+
       def getIDs(addOrganization: AddOrganization) = {
         val toAccountID = masterAccounts.Service.getId(addOrganization.to)
         val fromAccountID = masterAccounts.Service.getId(addOrganization.from)
@@ -215,14 +216,15 @@ class AddOrganizations @Inject()(actorSystem: ActorSystem, transaction: utilitie
           fromAccountID <- fromAccountID
         } yield (toAccountID, fromAccountID)
       }
-      (for{
-        _<- markTransactionFailed
-        addOrganization<-addOrganization
-        (toAccountID, fromAccountID)<- getIDs(addOrganization)
-      }yield{
+
+      (for {
+        _ <- markTransactionFailed
+        addOrganization <- addOrganization
+        (toAccountID, fromAccountID) <- getIDs(addOrganization)
+      } yield {
         utilitiesNotification.send(toAccountID, constants.Notification.FAILURE, message)
         utilitiesNotification.send(fromAccountID, constants.Notification.FAILURE, message)
-      }).recover{
+      }).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
     }

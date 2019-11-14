@@ -5,7 +5,6 @@ import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
-import play.api.libs.json.Json
 import play.api.{Configuration, Logger}
 import queries.GetACL
 import queries.responses.ACLResponse.Response
@@ -26,7 +25,7 @@ class ACLAccounts @Inject()(protected val databaseConfigProvider: DatabaseConfig
 
   val db = databaseConfig.db
 
-  private val schedulerExecutionContext:ExecutionContext= actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
+  private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -115,7 +114,7 @@ class ACLAccounts @Inject()(protected val databaseConfigProvider: DatabaseConfig
 
     def create(address: String, zoneID: String, organizationID: String, acl: ACL, dirtyBit: Boolean): String = Await.result(add(ACLAccount(address, zoneID, organizationID, util.hashing.MurmurHash3.stringHash(acl.toString).toString, dirtyBit)), Duration.Inf)
 
-    def insertOrUpdate(address: String, zoneID: String, organizationID: String, acl: ACL, dirtyBit: Boolean): Future[Int] =upsert(ACLAccount(address, zoneID, organizationID, util.hashing.MurmurHash3.stringHash(acl.toString).toString, dirtyBit))
+    def insertOrUpdate(address: String, zoneID: String, organizationID: String, acl: ACL, dirtyBit: Boolean): Future[Int] = upsert(ACLAccount(address, zoneID, organizationID, util.hashing.MurmurHash3.stringHash(acl.toString).toString, dirtyBit))
 
     def get(address: String): Future[ACLAccount] = findByAddress(address)
 
@@ -130,26 +129,30 @@ class ACLAccounts @Inject()(protected val databaseConfigProvider: DatabaseConfig
 
   object Utility {
 
-    def dirtyEntityUpdater() =  {
-
+    def dirtyEntityUpdater() = {
       val dirtyAddresses = Service.getDirtyAddresses
       Thread.sleep(sleepTime)
-      def insertOrUpdateAll(dirtyAddresses:Seq[String])={
-        Future.sequence{dirtyAddresses.map{dirtyAddress=>
-          val responseAccount =getACL.Service.get(dirtyAddress)
-          def insertOrUpdate(responseAccount:Response)= Service.insertOrUpdate(responseAccount.value.address, responseAccount.value.zoneID, responseAccount.value.organizationID, responseAccount.value.acl, dirtyBit = false)
-          for{
-            responseAccount<-responseAccount
-            _<-insertOrUpdate(responseAccount)
-          }yield {}
-        }
+
+      def insertOrUpdateAll(dirtyAddresses: Seq[String]) = {
+        Future.sequence {
+          dirtyAddresses.map { dirtyAddress =>
+            val responseAccount = getACL.Service.get(dirtyAddress)
+
+            def insertOrUpdate(responseAccount: Response) = Service.insertOrUpdate(responseAccount.value.address, responseAccount.value.zoneID, responseAccount.value.organizationID, responseAccount.value.acl, dirtyBit = false)
+
+            for {
+              responseAccount <- responseAccount
+              _ <- insertOrUpdate(responseAccount)
+            } yield {}
+          }
         }
       }
+
       (for {
-        dirtyAddresses<-dirtyAddresses
-        _<- insertOrUpdateAll(dirtyAddresses)
-      }yield {}
-        ).recover{
+        dirtyAddresses <- dirtyAddresses
+        _ <- insertOrUpdateAll(dirtyAddresses)
+      } yield {}
+        ).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
     }

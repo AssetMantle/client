@@ -48,7 +48,7 @@ class ChangeBuyerBidController @Inject()(messagesControllerComponents: MessagesC
             case Some(id) => id
             case None => utilities.IDGenerator.requestID()
           }
-          val transactionProcess=transaction.process[blockchainTransaction.ChangeBuyerBid, transactionsChangeBuyerBid.Request](
+          val transactionProcess = transaction.process[blockchainTransaction.ChangeBuyerBid, transactionsChangeBuyerBid.Request](
             entity = blockchainTransaction.ChangeBuyerBid(from = loginState.address, to = changeBuyerBidData.sellerAddress, bid = changeBuyerBidData.bid, time = changeBuyerBidData.time, pegHash = changeBuyerBidData.pegHash, gas = changeBuyerBidData.gas, ticketID = "", mode = transactionMode),
             blockchainTransactionCreate = blockchainTransactionChangeBuyerBids.Service.create,
             request = transactionsChangeBuyerBid.Request(transactionsChangeBuyerBid.BaseReq(from = loginState.address, gas = changeBuyerBidData.gas.toString), to = changeBuyerBidData.sellerAddress, password = changeBuyerBidData.password, bid = changeBuyerBidData.bid.toString, time = changeBuyerBidData.time.toString, pegHash = changeBuyerBidData.pegHash, mode = transactionMode),
@@ -58,9 +58,11 @@ class ChangeBuyerBidController @Inject()(messagesControllerComponents: MessagesC
             updateTransactionHash = blockchainTransactionChangeBuyerBids.Service.updateTransactionHash
           )
           val id = masterAccounts.Service.getId(changeBuyerBidData.sellerAddress)
+
           def insertOrUpdate(id: String) = masterTransactionNegotiationRequests.Service.insertOrUpdate(requestID, loginState.username, id, changeBuyerBidData.pegHash, changeBuyerBidData.bid)
+
           (for {
-            _<-transactionProcess
+            _ <- transactionProcess
             id <- id
             _ <- insertOrUpdate(id)
           } yield withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.BUYER_BID_CHANGED)))

@@ -55,7 +55,6 @@ class ConfirmSellerBidController @Inject()(messagesControllerComponents: Message
           }
         },
         confirmSellerBidData => {
-
           val sellerAccountID = masterTransactionNegotiationRequests.Service.getSellerAccountID(confirmSellerBidData.requestID)
           def updateAmountForIDAndGetResult(sellerAccountID: String) = {
             if (loginState.username == sellerAccountID) {
@@ -65,7 +64,7 @@ class ConfirmSellerBidController @Inject()(messagesControllerComponents: Message
                 _ <- updateAmount
                 negotiationFiles <- negotiationFiles
               } yield withUsernameToken.PartialContent(views.html.component.master.confirmSellerBidDocument(negotiationFiles, confirmSellerBidData.requestID, constants.File.SELLER_CONTRACT))
-            } else Future {Ok}
+            } else Future {Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))}
           }
           for {
             sellerAccountID <- sellerAccountID

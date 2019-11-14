@@ -29,12 +29,12 @@ class SendAssetController @Inject()(messagesControllerComponents: MessagesContro
     implicit request =>
       views.companion.master.SendAsset.form.bindFromRequest().fold(
         formWithErrors => {
-          Future{
+          Future {
             BadRequest(views.html.component.master.sendAsset(formWithErrors, formWithErrors.data(constants.FormField.BUYER_ADDRESS.name), formWithErrors.data(constants.FormField.PEG_HASH.name)))
           }
         },
         sendAssetData => {
-          val transactionProcess=transaction.process[blockchainTransaction.SendAsset, transactionsSendAsset.Request](
+          val transactionProcess = transaction.process[blockchainTransaction.SendAsset, transactionsSendAsset.Request](
             entity = blockchainTransaction.SendAsset(from = loginState.address, to = sendAssetData.buyerAddress, pegHash = sendAssetData.pegHash, gas = sendAssetData.gas, ticketID = "", mode = transactionMode),
             blockchainTransactionCreate = blockchainTransactionSendAssets.Service.create,
             request = transactionsSendAsset.Request(transactionsSendAsset.BaseReq(from = loginState.address, gas = sendAssetData.gas.toString), to = sendAssetData.buyerAddress, password = sendAssetData.password, pegHash = sendAssetData.pegHash, mode = transactionMode),
@@ -43,12 +43,12 @@ class SendAssetController @Inject()(messagesControllerComponents: MessagesContro
             onFailure = blockchainTransactionSendAssets.Utility.onFailure,
             updateTransactionHash = blockchainTransactionSendAssets.Service.updateTransactionHash
           )
-          (for{
-            _<-transactionProcess
-          }yield withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ASSET_SENT)))
-          ).recover{
-              case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-            }
+          (for {
+            _ <- transactionProcess
+          } yield withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ASSET_SENT)))
+            ).recover {
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+          }
         }
       )
   }
@@ -60,15 +60,16 @@ class SendAssetController @Inject()(messagesControllerComponents: MessagesContro
   def blockchainSendAsset: Action[AnyContent] = Action.async { implicit request =>
     views.companion.blockchain.SendAsset.form.bindFromRequest().fold(
       formWithErrors => {
-        Future{BadRequest(views.html.component.blockchain.sendAsset(formWithErrors))}
+        Future {
+          BadRequest(views.html.component.blockchain.sendAsset(formWithErrors))
+        }
       },
       sendAssetData => {
-
-        val post= transactionsSendAsset.Service.post(transactionsSendAsset.Request(transactionsSendAsset.BaseReq(from = sendAssetData.from, gas = sendAssetData.gas.toString), to = sendAssetData.to, password = sendAssetData.password, pegHash = sendAssetData.pegHash, mode = sendAssetData.mode))
-        (for{
-          _<-post
-        }yield Ok(views.html.index(successes = Seq(constants.Response.ASSET_SENT)))
-          ).recover{
+        val post = transactionsSendAsset.Service.post(transactionsSendAsset.Request(transactionsSendAsset.BaseReq(from = sendAssetData.from, gas = sendAssetData.gas.toString), to = sendAssetData.to, password = sendAssetData.password, pegHash = sendAssetData.pegHash, mode = sendAssetData.mode))
+        (for {
+          _ <- post
+        } yield Ok(views.html.index(successes = Seq(constants.Response.ASSET_SENT)))
+          ).recover {
           case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
         }
       }

@@ -164,11 +164,11 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
 
       val zone = masterZones.Service.getByAccountID(loginState.username)
 
-      def zoneKYCs(zone: models.master.Zone) = masterZoneKYCs.Service.getAllDocuments(zone.id)
+      def zoneKYCs(id:String) = masterZoneKYCs.Service.getAllDocuments(id)
 
       (for {
         zone <- zone
-        zoneKYCs <- zoneKYCs(zone)
+        zoneKYCs <- zoneKYCs(zone.id)
       } yield withUsernameToken.Ok(views.html.component.master.userReviewAddZoneRequest(zone = zone, zoneKYCs = zoneKYCs))
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -182,11 +182,11 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
 
           val zone = masterZones.Service.getByAccountID(loginState.username)
 
-          def zoneKYCs(zone: models.master.Zone) = masterZoneKYCs.Service.getAllDocuments(zone.id)
+          def zoneKYCs(id:String) = masterZoneKYCs.Service.getAllDocuments(id)
 
           (for {
             zone <- zone
-            zoneKYCs <- zoneKYCs(zone)
+            zoneKYCs <- zoneKYCs(zone.id)
           } yield BadRequest(views.html.component.master.userReviewAddZoneRequest(formWithErrors, zone = zone, zoneKYCs = zoneKYCs))
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -206,11 +206,11 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
             } else {
               val zone = masterZones.Service.getByAccountID(loginState.username)
 
-              def zoneKYCs(zone: models.master.Zone) = masterZoneKYCs.Service.getAllDocuments(zone.id)
+              def zoneKYCs(id:String) = masterZoneKYCs.Service.getAllDocuments(id)
 
               for {
                 zone <- zone
-                zoneKYCs <- zoneKYCs(zone)
+                zoneKYCs <- zoneKYCs(zone.id)
               } yield BadRequest(views.html.component.master.userReviewAddZoneRequest(zone = zone, zoneKYCs = zoneKYCs))
             }
           }

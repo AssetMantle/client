@@ -13,12 +13,11 @@ import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
 import queries.GetAccount
-import queries.responses.AccountResponse.Response
 import slick.jdbc.JdbcProfile
 import transactions.responses.TransactionResponse.BlockResponse
 
 import scala.concurrent.duration._
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 case class IssueAsset(from: String, to: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, moderated: Boolean, gas: Int, takerAddress: Option[String] = None, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None) extends BaseTransaction[IssueAsset] {
@@ -27,20 +26,16 @@ case class IssueAsset(from: String, to: String, documentHash: String, assetType:
 
 
 @Singleton
-class IssueAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Transaction, protected val databaseConfigProvider: DatabaseConfigProvider, getAccount: GetAccount, blockchainAssets: blockchain.Assets, transactionIssueAsset: transactions.IssueAsset,utilitiesNotification: utilities.Notification, masterAccounts: master.Accounts, masterTransactionIssueAssetRequests: masterTransaction.IssueAssetRequests, blockchainAccounts: blockchain.Accounts)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
+class IssueAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Transaction, protected val databaseConfigProvider: DatabaseConfigProvider, getAccount: GetAccount, blockchainAssets: blockchain.Assets, transactionIssueAsset: transactions.IssueAsset, utilitiesNotification: utilities.Notification, masterAccounts: master.Accounts, masterTransactionIssueAssetRequests: masterTransaction.IssueAssetRequests, blockchainAccounts: blockchain.Accounts)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_ISSUE_ASSET
 
   private implicit val logger: Logger = Logger(this.getClass)
-
-  private val schedulerExecutionContext:ExecutionContext= actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
-
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
-
   val db = databaseConfig.db
+  private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
 
   import databaseConfig.profile.api._
-
   private[models] val issueAssetTable = TableQuery[IssueAssetTable]
   private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
   private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
@@ -133,7 +128,7 @@ class IssueAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tra
 
   private[models] class IssueAssetTable(tag: Tag) extends Table[IssueAsset](tag, "IssueAsset") {
 
-    def * = (from, to, documentHash, assetType, assetPrice, quantityUnit, assetQuantity, moderated, gas,takerAddress.?, status.?, txHash.?, ticketID, mode, code.?) <> (IssueAsset.tupled, IssueAsset.unapply)
+    def * = (from, to, documentHash, assetType, assetPrice, quantityUnit, assetQuantity, moderated, gas, takerAddress.?, status.?, txHash.?, ticketID, mode, code.?) <> (IssueAsset.tupled, IssueAsset.unapply)
 
     def from = column[String]("from")
 
@@ -178,35 +173,38 @@ class IssueAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tra
 
     def getTransaction(ticketID: String): Future[IssueAsset] = findByTicketID(ticketID)
 
-    def getTransactionHash(ticketID: String): Future[Option[String]] =findTransactionHashByTicketID(ticketID)
+    def getTransactionHash(ticketID: String): Future[Option[String]] = findTransactionHashByTicketID(ticketID)
 
     def getMode(ticketID: String): Future[String] = findModeByTicketID(ticketID)
 
-    def updateTransactionHash(ticketID: String, txHash: String): Future[Int] =updateTxHashOnTicketID(ticketID = ticketID, txHash = Option(txHash))
+    def updateTransactionHash(ticketID: String, txHash: String): Future[Int] = updateTxHashOnTicketID(ticketID = ticketID, txHash = Option(txHash))
 
   }
 
   object Utility {
 
-    def onSuccess(ticketID: String, blockResponse: BlockResponse)=  {
+    def onSuccess(ticketID: String, blockResponse: BlockResponse) = {
 
-      val markTransactionSuccessful=Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
+      val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
       val issueAsset = Service.getTransaction(ticketID)
 
-      def responseAccount(issueAsset:IssueAsset)=getAccount.Service.get(issueAsset.to)
+      def responseAccount(issueAsset: IssueAsset) = getAccount.Service.get(issueAsset.to)
 
       val assetRequest = masterTransactionIssueAssetRequests.Service.getIssueAssetByTicketID(ticketID)
-      def insertOrUpdate(responseAccount:queries.responses.AccountResponse.Response,assetRequest:IssueAssetRequest,issueAsset:IssueAsset)=Future{
+
+      def insertOrUpdate(responseAccount: queries.responses.AccountResponse.Response, assetRequest: IssueAssetRequest, issueAsset: IssueAsset) = Future {
         logger.info(responseAccount.value.assetPegWallet.toString)
         responseAccount.value.assetPegWallet.foreach(assets => assets.foreach(asset => {
           blockchainAssets.Service.insertOrUpdate(pegHash = asset.pegHash, documentHash = asset.documentHash, assetType = asset.assetType, assetPrice = asset.assetPrice, assetQuantity = asset.assetQuantity, quantityUnit = asset.quantityUnit, locked = asset.locked, moderated = asset.moderated, takerAddress = if (asset.takerAddress == "") null else Option(asset.takerAddress), ownerAddress = issueAsset.to, dirtyBit = true)
-          if(assetRequest.documentHash.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)) == asset.documentHash){
+          if (assetRequest.documentHash.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)) == asset.documentHash) {
             masterTransactionIssueAssetRequests.Service.markListedForTrade(ticketID, Option(asset.pegHash))
           }
         }))
       }
-      def markDirty(issueAsset:IssueAsset)=blockchainAccounts.Service.markDirty(issueAsset.from)
-      def getIDs(issueAsset:IssueAsset) = {
+
+      def markDirty(issueAsset: IssueAsset) = blockchainAccounts.Service.markDirty(issueAsset.from)
+
+      def getIDs(issueAsset: IssueAsset) = {
         val toAccountID = masterAccounts.Service.getId(issueAsset.to)
         val fromAccountID = masterAccounts.Service.getId(issueAsset.from)
         for {
@@ -214,30 +212,31 @@ class IssueAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tra
           fromAccountID <- fromAccountID
         } yield (toAccountID, fromAccountID)
       }
-      (for{
-        _<-markTransactionSuccessful
-        issueAsset<-issueAsset
-        responseAccount<-responseAccount(issueAsset)
-        assetRequest<-assetRequest
-        _<-insertOrUpdate(responseAccount,assetRequest,issueAsset)
-        _<-markDirty(issueAsset)
-        (toAccountID, fromAccountID)<-getIDs(issueAsset)
-      }yield{
 
+      (for {
+        _ <- markTransactionSuccessful
+        issueAsset <- issueAsset
+        responseAccount <- responseAccount(issueAsset)
+        assetRequest <- assetRequest
+        _ <- insertOrUpdate(responseAccount, assetRequest, issueAsset)
+        _ <- markDirty(issueAsset)
+        (toAccountID, fromAccountID) <- getIDs(issueAsset)
+      } yield {
         utilitiesNotification.send(toAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
         utilitiesNotification.send(fromAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
-      }).recover{
+      }).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
           throw new BaseException(constants.Response.PSQL_EXCEPTION)
         case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
       }
     }
-    def onFailure(ticketID: String, message: String): Future[Unit] =  {
 
-      val markTransactionFailed=Service.markTransactionFailed(ticketID, message)
+    def onFailure(ticketID: String, message: String): Future[Unit] = {
+      val markTransactionFailed = Service.markTransactionFailed(ticketID, message)
       val issueAsset = Service.getTransaction(ticketID)
       val markFailed = masterTransactionIssueAssetRequests.Service.markFailed(ticketID)
-      def getIDs(issueAsset:IssueAsset) = {
+
+      def getIDs(issueAsset: IssueAsset) = {
         val toAccountID = masterAccounts.Service.getId(issueAsset.to)
         val fromAccountID = masterAccounts.Service.getId(issueAsset.from)
         for {
@@ -245,15 +244,16 @@ class IssueAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tra
           fromAccountID <- fromAccountID
         } yield (toAccountID, fromAccountID)
       }
-      (for{
-        _<-markTransactionFailed
-        _<-markFailed
-        issueAsset<-issueAsset
-        (toAccountID, fromAccountID)<-getIDs(issueAsset)
-      }yield{
+
+      (for {
+        _ <- markTransactionFailed
+        _ <- markFailed
+        issueAsset <- issueAsset
+        (toAccountID, fromAccountID) <- getIDs(issueAsset)
+      } yield {
         utilitiesNotification.send(toAccountID, constants.Notification.FAILURE, message)
         utilitiesNotification.send(fromAccountID, constants.Notification.FAILURE, message)
-      }).recover{
+      }).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
     }

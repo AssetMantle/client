@@ -24,50 +24,56 @@ class BuyerExecuteOrderController @Inject()(messagesControllerComponents: Messag
   def buyerExecuteOrderDocument(orderID: String) = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val requestID = masterTransactionNegotiationRequests.Service.getIDByNegotiationID(orderID)
-      def negotiationFiles(requestID:String)=masterTransactionNegotiationFiles.Service.getOrNone(requestID, constants.File.FIAT_PROOF)
-      (for{
-        requestID<-requestID
-        negotiationFiles<-negotiationFiles(requestID)
-      }yield withUsernameToken.Ok(views.html.component.master.buyerExecuteOrderDocument(negotiationFiles, requestID, constants.File.FIAT_PROOF))
-        ).recover{
+
+      def negotiationFiles(requestID: String) = masterTransactionNegotiationFiles.Service.getOrNone(requestID, constants.File.FIAT_PROOF)
+
+      (for {
+        requestID <- requestID
+        negotiationFiles <- negotiationFiles(requestID)
+      } yield withUsernameToken.Ok(views.html.component.master.buyerExecuteOrderDocument(negotiationFiles, requestID, constants.File.FIAT_PROOF))
+        ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
-  def buyerExecuteOrderForm(requestID: String): Action[AnyContent] = withTraderLoginAction.authenticated  { implicit loginState =>
+  def buyerExecuteOrderForm(requestID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-    val negotiationID=masterTransactionNegotiationRequests.Service.getNegotiationIDByID(requestID)
-    val fiatProofDocument = masterTransactionNegotiationFiles.Service.getDocuments(requestID, Seq(constants.File.FIAT_PROOF))
-    def negotiation(negotiationID:String) = blockchainNegotiations.Service.get(negotiationID)
+      val negotiationID = masterTransactionNegotiationRequests.Service.getNegotiationIDByID(requestID)
+      val fiatProofDocument = masterTransactionNegotiationFiles.Service.getDocuments(requestID, Seq(constants.File.FIAT_PROOF))
 
-    (for {
-      negotiationID<-negotiationID
-      fiatProofDocument<-fiatProofDocument
-      negotiation <- negotiation(negotiationID)
-    } yield withUsernameToken.Ok(views.html.component.master.buyerExecuteOrder(views.companion.master.BuyerExecuteOrder.form.fill(views.companion.master.BuyerExecuteOrder.Data(negotiation.sellerAddress, utilities.FileOperations.combinedHash(fiatProofDocument), negotiation.assetPegHash, 0, "")), fiatProofDocument))
-      ).recover{
-      case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-    }
+      def negotiation(negotiationID: String) = blockchainNegotiations.Service.get(negotiationID)
+
+      (for {
+        negotiationID <- negotiationID
+        fiatProofDocument <- fiatProofDocument
+        negotiation <- negotiation(negotiationID)
+      } yield withUsernameToken.Ok(views.html.component.master.buyerExecuteOrder(views.companion.master.BuyerExecuteOrder.form.fill(views.companion.master.BuyerExecuteOrder.Data(negotiation.sellerAddress, utilities.FileOperations.combinedHash(fiatProofDocument), negotiation.assetPegHash, 0, "")), fiatProofDocument))
+        ).recover {
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
   }
 
   def buyerExecuteOrder: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       views.companion.master.BuyerExecuteOrder.form.bindFromRequest().fold(
         formWithErrors => {
-          val negotiationID=blockchainNegotiations.Service.getNegotiationID(loginState.address, formWithErrors.data(constants.FormField.SELLER_ADDRESS.name), formWithErrors.data(constants.FormField.PEG_HASH.name))
-          def getNegotiationRequestID(negotiationID:String)=masterTransactionNegotiationRequests.Service.getIDByNegotiationID(negotiationID)
-          def getNegotiationFiles(negotiationRequestID:String)=masterTransactionNegotiationFiles.Service.getDocuments(negotiationRequestID, Seq(constants.File.FIAT_PROOF))
-          (for{
-            negotiationID<-negotiationID
-            negotiationRequestID<-getNegotiationRequestID(negotiationID)
-            negotiationFiles<-getNegotiationFiles(negotiationRequestID)
-          }yield BadRequest(views.html.component.master.buyerExecuteOrder(formWithErrors, negotiationFiles))
-            ).recover{
+          val negotiationID = blockchainNegotiations.Service.getNegotiationID(loginState.address, formWithErrors.data(constants.FormField.SELLER_ADDRESS.name), formWithErrors.data(constants.FormField.PEG_HASH.name))
+
+          def getNegotiationRequestID(negotiationID: String) = masterTransactionNegotiationRequests.Service.getIDByNegotiationID(negotiationID)
+
+          def getNegotiationFiles(negotiationRequestID: String) = masterTransactionNegotiationFiles.Service.getDocuments(negotiationRequestID, Seq(constants.File.FIAT_PROOF))
+
+          (for {
+            negotiationID <- negotiationID
+            negotiationRequestID <- getNegotiationRequestID(negotiationID)
+            negotiationFiles <- getNegotiationFiles(negotiationRequestID)
+          } yield BadRequest(views.html.component.master.buyerExecuteOrder(formWithErrors, negotiationFiles))
+            ).recover {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
         },
         buyerExecuteOrderData => {
-          val transactionProcess=transaction.process[blockchainTransaction.BuyerExecuteOrder, transactionsBuyerExecuteOrder.Request](
+          val transactionProcess = transaction.process[blockchainTransaction.BuyerExecuteOrder, transactionsBuyerExecuteOrder.Request](
             entity = blockchainTransaction.BuyerExecuteOrder(from = loginState.address, buyerAddress = loginState.address, sellerAddress = buyerExecuteOrderData.sellerAddress, fiatProofHash = buyerExecuteOrderData.fiatProofHash, pegHash = buyerExecuteOrderData.pegHash, gas = buyerExecuteOrderData.gas, ticketID = "", mode = transactionMode),
             blockchainTransactionCreate = blockchainTransactionBuyerExecuteOrders.Service.create,
             request = transactionsBuyerExecuteOrder.Request(transactionsBuyerExecuteOrder.BaseReq(from = loginState.address, gas = buyerExecuteOrderData.gas.toString), password = buyerExecuteOrderData.password, buyerAddress = loginState.address, sellerAddress = buyerExecuteOrderData.sellerAddress, fiatProofHash = buyerExecuteOrderData.fiatProofHash, pegHash = buyerExecuteOrderData.pegHash, mode = transactionMode),
@@ -76,10 +82,10 @@ class BuyerExecuteOrderController @Inject()(messagesControllerComponents: Messag
             onFailure = blockchainTransactionBuyerExecuteOrders.Utility.onFailure,
             updateTransactionHash = blockchainTransactionBuyerExecuteOrders.Service.updateTransactionHash
           )
-          (for{
-            _<-transactionProcess
-          }yield withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.BUYER_ORDER_EXECUTED)))
-          ).recover {
+          (for {
+            _ <- transactionProcess
+          } yield withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.BUYER_ORDER_EXECUTED)))
+            ).recover {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
         }
@@ -110,15 +116,18 @@ class BuyerExecuteOrderController @Inject()(messagesControllerComponents: Messag
   def moderatedBuyerExecuteOrderDocument(buyerAddress: String, sellerAddress: String, pegHash: String) = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
 
-      val negotiationID=blockchainNegotiations.Service.getNegotiationID(buyerAddress,sellerAddress,pegHash)
-      def getNegotiationRequestID(negotiationID:String)=masterTransactionNegotiationRequests.Service.getIDByNegotiationID(negotiationID)
-      def getNegotiationFiles(requestID:String)=masterTransactionNegotiationFiles.Service.getOrNone(requestID, constants.File.FIAT_PROOF)
-      (for{
-        negotiationID<-negotiationID
-        requestID<-getNegotiationRequestID(negotiationID)
-        negotiationFiles<-getNegotiationFiles(requestID)
-      }yield withUsernameToken.Ok(views.html.component.master.moderatedBuyerExecuteOrderDocument(negotiationFiles, requestID, constants.File.FIAT_PROOF))
-        ).recover{
+      val negotiationID = blockchainNegotiations.Service.getNegotiationID(buyerAddress, sellerAddress, pegHash)
+
+      def getNegotiationRequestID(negotiationID: String) = masterTransactionNegotiationRequests.Service.getIDByNegotiationID(negotiationID)
+
+      def getNegotiationFiles(requestID: String) = masterTransactionNegotiationFiles.Service.getOrNone(requestID, constants.File.FIAT_PROOF)
+
+      (for {
+        negotiationID <- negotiationID
+        requestID <- getNegotiationRequestID(negotiationID)
+        negotiationFiles <- getNegotiationFiles(requestID)
+      } yield withUsernameToken.Ok(views.html.component.master.moderatedBuyerExecuteOrderDocument(negotiationFiles, requestID, constants.File.FIAT_PROOF))
+        ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
@@ -126,15 +135,17 @@ class BuyerExecuteOrderController @Inject()(messagesControllerComponents: Messag
   def moderatedBuyerExecuteOrderForm(requestID: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
 
-      val negotiationID=masterTransactionNegotiationRequests.Service.getNegotiationIDByID(requestID)
+      val negotiationID = masterTransactionNegotiationRequests.Service.getNegotiationIDByID(requestID)
       val fiatProofDocument = masterTransactionNegotiationFiles.Service.getDocuments(requestID, Seq(constants.File.FIAT_PROOF))
-      def negotiation(negotiationID:String) = blockchainNegotiations.Service.get(negotiationID)
+
+      def negotiation(negotiationID: String) = blockchainNegotiations.Service.get(negotiationID)
+
       (for {
-        negotiationID<-negotiationID
-        fiatProofDocument<-fiatProofDocument
+        negotiationID <- negotiationID
+        fiatProofDocument <- fiatProofDocument
         negotiation <- negotiation(negotiationID)
-      } yield withUsernameToken.Ok(views.html.component.master.moderatedBuyerExecuteOrder(views.companion.master.ModeratedBuyerExecuteOrder.form.fill(views.companion.master.ModeratedBuyerExecuteOrder.Data(negotiation.buyerAddress, negotiation.sellerAddress, utilities.FileOperations.combinedHash(fiatProofDocument), negotiation.assetPegHash, 0,"")), fiatProofDocument))
-        ).recover{
+      } yield withUsernameToken.Ok(views.html.component.master.moderatedBuyerExecuteOrder(views.companion.master.ModeratedBuyerExecuteOrder.form.fill(views.companion.master.ModeratedBuyerExecuteOrder.Data(negotiation.buyerAddress, negotiation.sellerAddress, utilities.FileOperations.combinedHash(fiatProofDocument), negotiation.assetPegHash, 0, "")), fiatProofDocument))
+        ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
@@ -144,20 +155,23 @@ class BuyerExecuteOrderController @Inject()(messagesControllerComponents: Messag
       views.companion.master.ModeratedBuyerExecuteOrder.form.bindFromRequest().fold(
         formWithErrors => {
 
-          val negotiationID=blockchainNegotiations.Service.getNegotiationID(formWithErrors.data(constants.FormField.BUYER_ADDRESS.name), formWithErrors.data(constants.FormField.SELLER_ADDRESS.name), formWithErrors.data(constants.FormField.PEG_HASH.name))
-          def getNegotiationRequestID(negotiationID:String)=masterTransactionNegotiationRequests.Service.getIDByNegotiationID(negotiationID)
-          def getNegotiationFiles(requestID:String)=masterTransactionNegotiationFiles.Service.getDocuments(requestID, Seq(constants.File.FIAT_PROOF))
-          (for{
-            negotiationID<-negotiationID
-            requestID<-getNegotiationRequestID(negotiationID)
+          val negotiationID = blockchainNegotiations.Service.getNegotiationID(formWithErrors.data(constants.FormField.BUYER_ADDRESS.name), formWithErrors.data(constants.FormField.SELLER_ADDRESS.name), formWithErrors.data(constants.FormField.PEG_HASH.name))
+
+          def getNegotiationRequestID(negotiationID: String) = masterTransactionNegotiationRequests.Service.getIDByNegotiationID(negotiationID)
+
+          def getNegotiationFiles(requestID: String) = masterTransactionNegotiationFiles.Service.getDocuments(requestID, Seq(constants.File.FIAT_PROOF))
+
+          (for {
+            negotiationID <- negotiationID
+            requestID <- getNegotiationRequestID(negotiationID)
             negotiationFiles <- getNegotiationFiles(requestID)
-          }yield BadRequest(views.html.component.master.moderatedBuyerExecuteOrder(formWithErrors, negotiationFiles))
-            ).recover{
+          } yield BadRequest(views.html.component.master.moderatedBuyerExecuteOrder(formWithErrors, negotiationFiles))
+            ).recover {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
         },
         moderatedBuyerExecuteOrderData => {
-          val transactionProcess=transaction.process[blockchainTransaction.BuyerExecuteOrder, transactionsBuyerExecuteOrder.Request](
+          val transactionProcess = transaction.process[blockchainTransaction.BuyerExecuteOrder, transactionsBuyerExecuteOrder.Request](
             entity = blockchainTransaction.BuyerExecuteOrder(from = loginState.address, buyerAddress = moderatedBuyerExecuteOrderData.buyerAddress, sellerAddress = moderatedBuyerExecuteOrderData.sellerAddress, fiatProofHash = moderatedBuyerExecuteOrderData.fiatProofHash, pegHash = moderatedBuyerExecuteOrderData.pegHash, gas = moderatedBuyerExecuteOrderData.gas, ticketID = "", mode = transactionMode),
             blockchainTransactionCreate = blockchainTransactionBuyerExecuteOrders.Service.create,
             request = transactionsBuyerExecuteOrder.Request(transactionsBuyerExecuteOrder.BaseReq(from = loginState.address, gas = moderatedBuyerExecuteOrderData.gas.toString), password = moderatedBuyerExecuteOrderData.password, buyerAddress = moderatedBuyerExecuteOrderData.buyerAddress, sellerAddress = moderatedBuyerExecuteOrderData.sellerAddress, fiatProofHash = moderatedBuyerExecuteOrderData.fiatProofHash, pegHash = moderatedBuyerExecuteOrderData.pegHash, mode = transactionMode),
@@ -166,12 +180,12 @@ class BuyerExecuteOrderController @Inject()(messagesControllerComponents: Messag
             onFailure = blockchainTransactionBuyerExecuteOrders.Utility.onFailure,
             updateTransactionHash = blockchainTransactionBuyerExecuteOrders.Service.updateTransactionHash
           )
-          (for{
-            _<-transactionProcess
-          }yield withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.BUYER_ORDER_EXECUTED)))
-          ).recover {
-              case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-            }
+          (for {
+            _ <- transactionProcess
+          } yield withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.BUYER_ORDER_EXECUTED)))
+            ).recover {
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+          }
         }
       )
   }

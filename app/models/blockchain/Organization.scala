@@ -22,7 +22,7 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
 
   val db = databaseConfig.db
 
-  private val schedulerExecutionContext:ExecutionContext= actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
+  private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -114,34 +114,37 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
 
     def getDirtyOrganizations: Future[Seq[Organization]] = getOrganizationsByDirtyBit(dirtyBit = true)
 
-    def refreshDirty(id: String, address: String): Future[Int] =updateAddressAndDirtyBitByID(id, address, dirtyBit = false)
+    def refreshDirty(id: String, address: String): Future[Int] = updateAddressAndDirtyBitByID(id, address, dirtyBit = false)
   }
 
   object Utility {
 
-    def dirtyEntityUpdater(): Future[Unit] =  {
-
+    def dirtyEntityUpdater(): Future[Unit] = {
       val dirtyOrganizations = Service.getDirtyOrganizations
       Thread.sleep(sleepTime)
-      def refreshDirtyOrganizations(dirtyOrganizations:Seq[Organization])={
-        Future.sequence{
+
+      def refreshDirtyOrganizations(dirtyOrganizations: Seq[Organization]) = {
+        Future.sequence {
           dirtyOrganizations.map { dirtyOrganization =>
             val responseAddress = getOrganization.Service.get(dirtyOrganization.id)
+
             def refreshDirty(responseAddress: queries.responses.OrganizationResponse.Response) = Service.refreshDirty(dirtyOrganization.id, responseAddress.address)
+
             (for {
               responseAddress <- responseAddress
               _ <- refreshDirty(responseAddress)
             } yield {}
-              ).recover{
+              ).recover {
               case baseException: BaseException => logger.error(baseException.failure.message, baseException)
             }
           }
         }
       }
-      for{
-        dirtyOrganizations<-dirtyOrganizations
-        _<-refreshDirtyOrganizations(dirtyOrganizations)
-      }yield {}
+
+      for {
+        dirtyOrganizations <- dirtyOrganizations
+        _ <- refreshDirtyOrganizations(dirtyOrganizations)
+      } yield {}
     }
   }
 

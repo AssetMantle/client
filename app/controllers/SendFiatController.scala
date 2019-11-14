@@ -28,11 +28,12 @@ class SendFiatController @Inject()(messagesControllerComponents: MessagesControl
     implicit request =>
       views.companion.master.SendFiat.form.bindFromRequest().fold(
         formWithErrors => {
-          Future{BadRequest(views.html.component.master.sendFiat(formWithErrors, sellerAddress = formWithErrors.data(constants.FormField.SELLER_ADDRESS.name), pegHash = formWithErrors.data(constants.FormField.PEG_HASH.name), amount = formWithErrors.data(constants.FormField.AMOUNT.name).toInt))}
+          Future {
+            BadRequest(views.html.component.master.sendFiat(formWithErrors, sellerAddress = formWithErrors.data(constants.FormField.SELLER_ADDRESS.name), pegHash = formWithErrors.data(constants.FormField.PEG_HASH.name), amount = formWithErrors.data(constants.FormField.AMOUNT.name).toInt))
+          }
         },
         sendFiatData => {
-
-          val transactionProcess=transaction.process[blockchainTransaction.SendFiat, transactionsSendFiat.Request](
+          val transactionProcess = transaction.process[blockchainTransaction.SendFiat, transactionsSendFiat.Request](
             entity = blockchainTransaction.SendFiat(from = loginState.address, to = sendFiatData.sellerAddress, amount = sendFiatData.amount, pegHash = sendFiatData.pegHash, gas = sendFiatData.gas, ticketID = "", mode = transactionMode),
             blockchainTransactionCreate = blockchainTransactionSendFiats.Service.create,
             request = transactionsSendFiat.Request(transactionsSendFiat.BaseReq(from = loginState.address, gas = sendFiatData.gas.toString), to = sendFiatData.sellerAddress, password = sendFiatData.password, amount = sendFiatData.amount.toString, pegHash = sendFiatData.pegHash, mode = transactionMode),
@@ -41,12 +42,12 @@ class SendFiatController @Inject()(messagesControllerComponents: MessagesControl
             onFailure = blockchainTransactionSendFiats.Utility.onFailure,
             updateTransactionHash = blockchainTransactionSendFiats.Service.updateTransactionHash
           )
-          (for{
-            _<-transactionProcess
-          }yield withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.FIAT_SENT)))
-          ).recover{
-              case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-            }
+          (for {
+            _ <- transactionProcess
+          } yield withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.FIAT_SENT)))
+            ).recover {
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+          }
         }
       )
   }
@@ -58,15 +59,16 @@ class SendFiatController @Inject()(messagesControllerComponents: MessagesControl
   def blockchainSendFiat: Action[AnyContent] = Action.async { implicit request =>
     views.companion.blockchain.SendFiat.form.bindFromRequest().fold(
       formWithErrors => {
-        Future{BadRequest(views.html.component.blockchain.sendFiat(formWithErrors))}
+        Future {
+          BadRequest(views.html.component.blockchain.sendFiat(formWithErrors))
+        }
       },
       sendFiatData => {
-
-        val post=transactionsSendFiat.Service.post(transactionsSendFiat.Request(transactionsSendFiat.BaseReq(from = sendFiatData.from, gas = sendFiatData.gas.toString), to = sendFiatData.to, password = sendFiatData.password, amount = sendFiatData.amount.toString, pegHash = sendFiatData.pegHash, mode = sendFiatData.mode))
-        (for{
-          _<-post
-        }yield Ok(views.html.index(successes = Seq(constants.Response.FIAT_SENT)))
-          ).recover{
+        val post = transactionsSendFiat.Service.post(transactionsSendFiat.Request(transactionsSendFiat.BaseReq(from = sendFiatData.from, gas = sendFiatData.gas.toString), to = sendFiatData.to, password = sendFiatData.password, amount = sendFiatData.amount.toString, pegHash = sendFiatData.pegHash, mode = sendFiatData.mode))
+        (for {
+          _ <- post
+        } yield Ok(views.html.index(successes = Seq(constants.Response.FIAT_SENT)))
+          ).recover {
           case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
         }
       }

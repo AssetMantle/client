@@ -16,7 +16,7 @@ import slick.jdbc.JdbcProfile
 import transactions.responses.TransactionResponse.BlockResponse
 
 import scala.concurrent.duration._
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 case class SendFiat(from: String, to: String, amount: Int, pegHash: String, gas: Int, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None) extends BaseTransaction[SendFiat] {
@@ -176,16 +176,7 @@ class SendFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
 
   object Utility {
 
-    def getIDs(sendFiat:SendFiat) = {
-      val toAccountID = masterAccounts.Service.getId(sendFiat.to)
-      val fromAccountID = masterAccounts.Service.getId(sendFiat.from)
-      for {
-        toAccountID <- toAccountID
-        fromAccountID <- fromAccountID
-      } yield (toAccountID, fromAccountID)
-    }
     def onSuccess(ticketID: String, blockResponse: BlockResponse)= {
-
       val markTransactionSuccessful=Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
       val sendFiat = Service.getTransaction(ticketID)
       def negotiationID(sendFiat:SendFiat) = blockchainNegotiations.Service.getNegotiationID(buyerAddress = sendFiat.from, sellerAddress = sendFiat.to, pegHash = sendFiat.pegHash)
@@ -203,7 +194,14 @@ class SendFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
           _<-markDirtyBlockchainAccounts
         }yield {}
       }
-
+      def getIDs(sendFiat:SendFiat) = {
+        val toAccountID = masterAccounts.Service.getId(sendFiat.to)
+        val fromAccountID = masterAccounts.Service.getId(sendFiat.from)
+        for {
+          toAccountID <- toAccountID
+          fromAccountID <- fromAccountID
+        } yield (toAccountID, fromAccountID)
+      }
       (for{
         _<-markTransactionSuccessful
         sendFiat<-sendFiat
@@ -224,14 +222,21 @@ class SendFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
     }
 
     def onFailure(ticketID: String, message: String): Future[Unit] = {
-
       val markTransactionFailed= Service.markTransactionFailed(ticketID, message)
       val sendFiat = Service.getTransaction(ticketID)
-      def markDirty(sendFiat:SendFiat)=blockchainTransactionFeedbacks.Service.markDirty(sendFiat.from)
+      def markDirty(fromAddress:String)=blockchainTransactionFeedbacks.Service.markDirty(fromAddress)
+      def getIDs(sendFiat:SendFiat) = {
+        val toAccountID = masterAccounts.Service.getId(sendFiat.to)
+        val fromAccountID = masterAccounts.Service.getId(sendFiat.from)
+        for {
+          toAccountID <- toAccountID
+          fromAccountID <- fromAccountID
+        } yield (toAccountID, fromAccountID)
+      }
       (for{
         _<-markTransactionFailed
         sendFiat<-sendFiat
-        _<-markDirty(sendFiat)
+        _<-markDirty(sendFiat.from)
         (toAccountID, fromAccountID) <- getIDs(sendFiat)
       }yield {
         utilitiesNotification.send(toAccountID, constants.Notification.FAILURE, message)

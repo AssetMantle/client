@@ -13,7 +13,7 @@ import slick.jdbc.JdbcProfile
 import transactions.responses.TransactionResponse.BlockResponse
 
 import scala.concurrent.duration._
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 case class SetSellerFeedback(from: String, to: String, pegHash: String, rating: Int, gas: Int, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None) extends BaseTransaction[SetSellerFeedback] {
@@ -27,12 +27,9 @@ class SetSellerFeedbacks @Inject()(actorSystem: ActorSystem, transaction: utilit
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_SET_SELLER_FEEDBACK
 
   private implicit val logger: Logger = Logger(this.getClass)
-
-  private val schedulerExecutionContext:ExecutionContext= actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
-
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
-
   val db = databaseConfig.db
+  private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
 
   import databaseConfig.profile.api._
 
@@ -157,7 +154,7 @@ class SetSellerFeedbacks @Inject()(actorSystem: ActorSystem, transaction: utilit
 
     def getTicketIDsOnStatus(): Future[Seq[String]] = getTicketIDsWithNullStatus
 
-    def getTransaction(ticketID: String): Future[SetSellerFeedback] =findByTicketID(ticketID)
+    def getTransaction(ticketID: String): Future[SetSellerFeedback] = findByTicketID(ticketID)
 
     def markTransactionSuccessful(ticketID: String, txHash: String): Future[Int] = updateTxHashAndStatusOnTicketID(ticketID, Option(txHash), status = Option(true))
 
@@ -175,18 +172,19 @@ class SetSellerFeedbacks @Inject()(actorSystem: ActorSystem, transaction: utilit
 
 
     def onSuccess(ticketID: String, blockResponse: BlockResponse): Future[Unit] = {
-
-      val markTransactionSuccessful= Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
+      val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
       val setSellerFeedback = Service.getTransaction(ticketID)
-      def updateAndMarkDirty(setSellerFeedback:SetSellerFeedback)={
-        val update= blockchainTraderFeedbackHistories.Service.update(setSellerFeedback.to, setSellerFeedback.to, setSellerFeedback.from, setSellerFeedback.pegHash, setSellerFeedback.rating.toString)
-        val markDirtyFrom= blockchainAccounts.Service.markDirty(setSellerFeedback.from)
+
+      def updateAndMarkDirty(setSellerFeedback: SetSellerFeedback) = {
+        val update = blockchainTraderFeedbackHistories.Service.update(setSellerFeedback.to, setSellerFeedback.to, setSellerFeedback.from, setSellerFeedback.pegHash, setSellerFeedback.rating.toString)
+        val markDirtyFrom = blockchainAccounts.Service.markDirty(setSellerFeedback.from)
         for {
-          _<-update
-          _<-markDirtyFrom
-        }yield{}
+          _ <- update
+          _ <- markDirtyFrom
+        } yield {}
       }
-      def getIDs(setSellerFeedback:SetSellerFeedback) = {
+
+      def getIDs(setSellerFeedback: SetSellerFeedback) = {
         val toAccountID = masterAccounts.Service.getId(setSellerFeedback.to)
         val fromAccountID = masterAccounts.Service.getId(setSellerFeedback.from)
         for {
@@ -194,26 +192,26 @@ class SetSellerFeedbacks @Inject()(actorSystem: ActorSystem, transaction: utilit
           fromAccountID <- fromAccountID
         } yield (toAccountID, fromAccountID)
       }
-      (for{
-        _<-markTransactionSuccessful
-        setSellerFeedback<-setSellerFeedback
-        _<-updateAndMarkDirty(setSellerFeedback)
-        (toAccountID, fromAccountID)<-getIDs(setSellerFeedback)
-      }yield {
+
+      (for {
+        _ <- markTransactionSuccessful
+        setSellerFeedback <- setSellerFeedback
+        _ <- updateAndMarkDirty(setSellerFeedback)
+        (toAccountID, fromAccountID) <- getIDs(setSellerFeedback)
+      } yield {
         utilitiesNotification.send(toAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
         utilitiesNotification.send(fromAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
-
-      }).recover{
+      }).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
           throw new BaseException(constants.Response.PSQL_EXCEPTION)
       }
     }
 
     def onFailure(ticketID: String, message: String): Future[Unit] = Future {
-
-      val markTransactionFailed= Service.markTransactionFailed(ticketID, message)
+      val markTransactionFailed = Service.markTransactionFailed(ticketID, message)
       val setSellerFeedback = Service.getTransaction(ticketID)
-      def getIDs(setSellerFeedback:SetSellerFeedback) = {
+
+      def getIDs(setSellerFeedback: SetSellerFeedback) = {
         val toAccountID = masterAccounts.Service.getId(setSellerFeedback.to)
         val fromAccountID = masterAccounts.Service.getId(setSellerFeedback.from)
         for {
@@ -221,13 +219,17 @@ class SetSellerFeedbacks @Inject()(actorSystem: ActorSystem, transaction: utilit
           fromAccountID <- fromAccountID
         } yield (toAccountID, fromAccountID)
       }
-      for{
-        _<-markTransactionFailed
-        setSellerFeedback<-setSellerFeedback
-        (toAccountID, fromAccountID)<-getIDs(setSellerFeedback)
-      }yield{
+
+      (for {
+        _ <- markTransactionFailed
+        setSellerFeedback <- setSellerFeedback
+        (toAccountID, fromAccountID) <- getIDs(setSellerFeedback)
+      } yield {
         utilitiesNotification.send(toAccountID, constants.Notification.FAILURE, message)
         utilitiesNotification.send(fromAccountID, constants.Notification.FAILURE, message)
+      }
+        ).recover {
+        case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
     }
   }

@@ -17,7 +17,7 @@ import slick.jdbc.JdbcProfile
 import transactions.responses.TransactionResponse.BlockResponse
 
 import scala.concurrent.duration._
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 case class SendAsset(from: String, to: String, pegHash: String, gas: Int, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None) extends BaseTransaction[SendAsset] {
@@ -30,15 +30,11 @@ class SendAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_SEND_ASSET
 
   private implicit val logger: Logger = Logger(this.getClass)
-
-  private val schedulerExecutionContext:ExecutionContext= actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
-
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
-
   val db = databaseConfig.db
+  private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
 
   import databaseConfig.profile.api._
-
   private[models] val sendAssetTable = TableQuery[SendAssetTable]
 
   private implicit val assetWrites: OWrites[blockchain.Asset] = Json.writes[blockchain.Asset]
@@ -180,15 +176,18 @@ class SendAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
   object Utility {
 
     def onSuccess(ticketID: String, blockResponse: BlockResponse) = {
-
       val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
       val sendAsset = Service.getTransaction(ticketID)
+
       def getNegotiationID(sendAsset: SendAsset) = blockchainNegotiations.Service.getNegotiationID(buyerAddress = sendAsset.to, sellerAddress = sendAsset.from, pegHash = sendAsset.pegHash)
 
       def insertOrUpdate(negotiationID: String) = blockchainOrders.Service.insertOrUpdate(id = negotiationID, None, None, dirtyBit = true)
 
       def orderResponse(negotiationID: String) = getOrder.Service.get(negotiationID)
-      def assetsInsertOrUpdate(orderResponse:queries.responses.OrderResponse.Response,negotiationID:String)=Future{orderResponse.value.assetPegWallet.foreach(assets => assets.foreach(asset => blockchainAssets.Service.insertOrUpdate(pegHash = asset.pegHash, documentHash = asset.documentHash, assetType = asset.assetType, assetPrice = asset.assetPrice, assetQuantity = asset.assetQuantity, quantityUnit = asset.quantityUnit, locked = asset.locked, moderated = asset.moderated, ownerAddress = negotiationID, takerAddress = if (asset.takerAddress == "") None else Option(asset.takerAddress), dirtyBit = false)))}
+
+      def assetsInsertOrUpdate(orderResponse: queries.responses.OrderResponse.Response, negotiationID: String) = Future {
+        orderResponse.value.assetPegWallet.foreach(assets => assets.foreach(asset => blockchainAssets.Service.insertOrUpdate(pegHash = asset.pegHash, documentHash = asset.documentHash, assetType = asset.assetType, assetPrice = asset.assetPrice, assetQuantity = asset.assetQuantity, quantityUnit = asset.quantityUnit, locked = asset.locked, moderated = asset.moderated, ownerAddress = negotiationID, takerAddress = if (asset.takerAddress == "") None else Option(asset.takerAddress), dirtyBit = false)))
+      }
 
       def markDirty(sendAsset: SendAsset) = {
         val markDirtyBlockchainAccounts = blockchainAccounts.Service.markDirty(sendAsset.from)
@@ -198,6 +197,7 @@ class SendAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
           _ <- markDirtyBlockchainTransactionFeedbacks
         } yield {}
       }
+
       def getIDs(sendAsset: SendAsset) = {
         val toAccountID = masterAccounts.Service.getId(sendAsset.to)
         val fromAccountID = masterAccounts.Service.getId(sendAsset.from)
@@ -208,14 +208,14 @@ class SendAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
       }
 
       (for {
-        _<-markTransactionSuccessful
-        sendAsset<-sendAsset
-        negotiationID<-getNegotiationID(sendAsset)
-        _<-insertOrUpdate(negotiationID)
+        _ <- markTransactionSuccessful
+        sendAsset <- sendAsset
+        negotiationID <- getNegotiationID(sendAsset)
+        _ <- insertOrUpdate(negotiationID)
         orderResponse <- orderResponse(negotiationID)
-        _<-assetsInsertOrUpdate(orderResponse,negotiationID)
+        _ <- assetsInsertOrUpdate(orderResponse, negotiationID)
         _ <- markDirty(sendAsset)
-        (toAccountID, fromAccountID)<- getIDs(sendAsset)
+        (toAccountID, fromAccountID) <- getIDs(sendAsset)
       } yield {
         utilitiesNotification.send(toAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
         utilitiesNotification.send(fromAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
@@ -227,7 +227,6 @@ class SendAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
     }
 
     def onFailure(ticketID: String, message: String): Future[Unit] = {
-
       val markTransactionFailed = Service.markTransactionFailed(ticketID, message)
       val sendAsset = Service.getTransaction(ticketID)
 
@@ -249,7 +248,7 @@ class SendAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
         sendAsset <- sendAsset
         address <- address(sendAsset)
         _ <- markDirty(address)
-        (toAccountID, fromAccountID)<- getIDs(sendAsset)
+        (toAccountID, fromAccountID) <- getIDs(sendAsset)
       } yield {
         utilitiesNotification.send(toAccountID, constants.Notification.FAILURE, message)
         utilitiesNotification.send(fromAccountID, constants.Notification.FAILURE, message)

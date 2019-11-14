@@ -34,7 +34,6 @@ class ConfirmBuyerBidController @Inject()(messagesControllerComponents: Messages
 
   def confirmBuyerBidDetailForm(sellerAddress: String, pegHash: String, bid: Int): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-
       val id = masterTransactionNegotiationRequests.Service.getIDByPegHashAndBuyerAccountID(pegHash, loginState.username)
       (for {
         id <- id
@@ -53,7 +52,6 @@ class ConfirmBuyerBidController @Inject()(messagesControllerComponents: Messages
           }
         },
         confirmBuyerBidData => {
-
           val requestID = confirmBuyerBidData.requestID match {
             case Some(id) => id
             case None => utilities.IDGenerator.requestID()
@@ -76,7 +74,6 @@ class ConfirmBuyerBidController @Inject()(messagesControllerComponents: Messages
 
   def confirmBuyerBidForm(requestID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-
       val negotiation = masterTransactionNegotiationRequests.Service.getNegotiationByID(requestID)
 
       def getResult(negotiation: NegotiationRequest) = {
@@ -105,7 +102,6 @@ class ConfirmBuyerBidController @Inject()(messagesControllerComponents: Messages
     implicit request =>
       views.companion.master.ConfirmBid.form.bindFromRequest().fold(
         formWithErrors => {
-
           val negotiation = masterTransactionNegotiationRequests.Service.getNegotiationByID(formWithErrors.data(constants.FormField.REQUEST_ID.name))
 
           def getResult(negotiation: NegotiationRequest) = {
@@ -125,12 +121,11 @@ class ConfirmBuyerBidController @Inject()(messagesControllerComponents: Messages
             negotiation <- negotiation
             result <- getResult(negotiation)
           } yield result
-            ).recover{
+            ).recover {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
         },
         confirmBidTransaction => {
-
           val masterNegotiation = masterTransactionNegotiationRequests.Service.getNegotiationByID(confirmBidTransaction.requestID)
 
           def getResult(masterNegotiation: NegotiationRequest) = {
@@ -156,13 +151,15 @@ class ConfirmBuyerBidController @Inject()(messagesControllerComponents: Messages
                 _ <- transactionProcess(sellerAddress, buyerContractHash(negotiationFiles))
               } yield withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.BUYER_BID_CONFIRMED)))
             } else {
-              Future{Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))}
+              Future {
+                Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
+              }
             }
           }
 
           (for {
             masterNegotiation <- masterNegotiation
-            result<-getResult(masterNegotiation)
+            result <- getResult(masterNegotiation)
           } yield result
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -183,7 +180,6 @@ class ConfirmBuyerBidController @Inject()(messagesControllerComponents: Messages
         }
       },
       confirmBuyerBidData => {
-
         val postRequest = transactionsConfirmBuyerBid.Service.post(transactionsConfirmBuyerBid.Request(transactionsConfirmBuyerBid.BaseReq(from = confirmBuyerBidData.from, gas = confirmBuyerBidData.gas.toString), to = confirmBuyerBidData.to, password = confirmBuyerBidData.password, bid = confirmBuyerBidData.bid.toString, time = confirmBuyerBidData.time.toString, pegHash = confirmBuyerBidData.pegHash, buyerContractHash = confirmBuyerBidData.buyerContractHash, mode = confirmBuyerBidData.mode))
         (for {
           _ <- postRequest

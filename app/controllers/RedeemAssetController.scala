@@ -19,14 +19,14 @@ class RedeemAssetController @Inject()(messagesControllerComponents: MessagesCont
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
   private implicit val module: String = constants.Module.CONTROLLERS_REDEEM_ASSET
+
   //TODO Shall we fetch username from login state using withTraderLoginAction and also verify pegHash?
   def redeemAssetForm(username: String, pegHash: String): Action[AnyContent] = Action.async { implicit request =>
-
-    val zoneID=masterTraders.Service.getZoneIDByAccountID(username)
-    (for{
-      zoneID<-zoneID
-    }yield Ok(views.html.component.master.redeemAsset(zoneID = zoneID, pegHash = pegHash))
-      ).recover{
+    val zoneID = masterTraders.Service.getZoneIDByAccountID(username)
+    (for {
+      zoneID <- zoneID
+    } yield Ok(views.html.component.master.redeemAsset(zoneID = zoneID, pegHash = pegHash))
+      ).recover {
       case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
     }
   }
@@ -35,12 +35,14 @@ class RedeemAssetController @Inject()(messagesControllerComponents: MessagesCont
     implicit request =>
       views.companion.master.RedeemAsset.form.bindFromRequest().fold(
         formWithErrors => {
-          Future{BadRequest(views.html.component.master.redeemAsset(formWithErrors, formWithErrors.data(constants.FormField.ZONE_ID.name), formWithErrors.data(constants.FormField.PEG_HASH.name)))}
+          Future {
+            BadRequest(views.html.component.master.redeemAsset(formWithErrors, formWithErrors.data(constants.FormField.ZONE_ID.name), formWithErrors.data(constants.FormField.PEG_HASH.name)))
+          }
         },
         redeemAssetData => {
-
           val toAddress = blockchainZones.Service.getAddress(redeemAssetData.zoneID)
-          def transactionProcess(toAddress:String)=transaction.process[blockchainTransaction.RedeemAsset, transactionsRedeemAsset.Request](
+
+          def transactionProcess(toAddress: String) = transaction.process[blockchainTransaction.RedeemAsset, transactionsRedeemAsset.Request](
             entity = blockchainTransaction.RedeemAsset(from = loginState.address, to = toAddress, pegHash = redeemAssetData.pegHash, gas = redeemAssetData.gas, ticketID = "", mode = transactionMode),
             blockchainTransactionCreate = blockchainTransactionRedeemAssets.Service.create,
             request = transactionsRedeemAsset.Request(transactionsRedeemAsset.BaseReq(from = loginState.address, gas = redeemAssetData.gas.toString), to = toAddress, password = redeemAssetData.password, pegHash = redeemAssetData.pegHash, mode = transactionMode),
@@ -49,11 +51,12 @@ class RedeemAssetController @Inject()(messagesControllerComponents: MessagesCont
             onFailure = blockchainTransactionRedeemAssets.Utility.onFailure,
             updateTransactionHash = blockchainTransactionRedeemAssets.Service.updateTransactionHash
           )
-          (for{
-            toAddress<-toAddress
-            _<-transactionProcess(toAddress)
-          }yield withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ASSET_REDEEMED)))
-            ).recover{
+
+          (for {
+            toAddress <- toAddress
+            _ <- transactionProcess(toAddress)
+          } yield withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ASSET_REDEEMED)))
+            ).recover {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
         }
@@ -68,15 +71,16 @@ class RedeemAssetController @Inject()(messagesControllerComponents: MessagesCont
     views.companion.blockchain.RedeemAsset
       .form.bindFromRequest().fold(
       formWithErrors => {
-        Future{BadRequest(views.html.component.blockchain.redeemAsset(formWithErrors))}
+        Future {
+          BadRequest(views.html.component.blockchain.redeemAsset(formWithErrors))
+        }
       },
       redeemAssetData => {
-
-        val post=transactionsRedeemAsset.Service.post(transactionsRedeemAsset.Request(transactionsRedeemAsset.BaseReq(from = redeemAssetData.from, gas = redeemAssetData.gas.toString), to = redeemAssetData.to, password = redeemAssetData.password, pegHash = redeemAssetData.pegHash, mode = redeemAssetData.mode))
-        (for{
-          _<-post
-        }yield Ok(views.html.index(successes = Seq(constants.Response.ASSET_REDEEMED)))
-          ).recover{
+        val post = transactionsRedeemAsset.Service.post(transactionsRedeemAsset.Request(transactionsRedeemAsset.BaseReq(from = redeemAssetData.from, gas = redeemAssetData.gas.toString), to = redeemAssetData.to, password = redeemAssetData.password, pegHash = redeemAssetData.pegHash, mode = redeemAssetData.mode))
+        (for {
+          _ <- post
+        } yield Ok(views.html.index(successes = Seq(constants.Response.ASSET_REDEEMED)))
+          ).recover {
           case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
         }
       }

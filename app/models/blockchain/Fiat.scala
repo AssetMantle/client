@@ -29,21 +29,16 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
   val db = databaseConfig.db
-
-  private val schedulerExecutionContext:ExecutionContext= actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
+  val mainFiatActor: ActorRef = actorSystem.actorOf(props = MainFiatActor.props(actorTimeout, actorSystem), name = constants.Module.ACTOR_MAIN_FIAT)
 
   private implicit val logger: Logger = Logger(this.getClass)
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_FIAT
-
+  private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
   private val actorTimeout = configuration.get[Int]("akka.actors.timeout").seconds
-
   private val cometActorSleepTime = configuration.get[Long]("akka.actors.cometActorSleepTime")
 
-  val mainFiatActor: ActorRef = actorSystem.actorOf(props = MainFiatActor.props(actorTimeout, actorSystem), name = constants.Module.ACTOR_MAIN_FIAT)
-
   import databaseConfig.profile.api._
-
   private[models] val fiatTable = TableQuery[FiatTable]
 
   private implicit val materializer: ActorMaterializer = ActorMaterializer()(actorSystem)
@@ -92,7 +87,7 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
     }
   }
 
-  private def deleteByPegHashAndAddress(pegHash: String, address: String)= db.run(fiatTable.filter(_.pegHash === pegHash).filter(_.ownerAddress === address).delete.asTry).map {
+  private def deleteByPegHashAndAddress(pegHash: String, address: String) = db.run(fiatTable.filter(_.pegHash === pegHash).filter(_.ownerAddress === address).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -102,7 +97,7 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
     }
   }
 
-  private def deleteByAddress(address: String)= db.run(fiatTable.filter(_.ownerAddress === address).delete.asTry).map {
+  private def deleteByAddress(address: String) = db.run(fiatTable.filter(_.ownerAddress === address).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -133,15 +128,15 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
     def create(pegHash: String, ownerAddress: String, transactionID: String, transactionAmount: String, redeemedAmount: String, dirtyBit: Boolean): String = Await.result(add(Fiat(pegHash, ownerAddress, transactionID, transactionAmount, redeemedAmount, dirtyBit)), Duration.Inf)
 
-    def getFiatPegWallet(address: String): Future[Seq[Fiat]] =getFiatPegWalletByAddress(address)
+    def getFiatPegWallet(address: String): Future[Seq[Fiat]] = getFiatPegWalletByAddress(address)
 
     def insertOrUpdate(pegHash: String, ownerAddress: String, transactionID: String, transactionAmount: String, redeemedAmount: String, dirtyBit: Boolean): Future[Int] = upsert(Fiat(pegHash = pegHash, ownerAddress, transactionID = transactionID, transactionAmount = transactionAmount, redeemedAmount = redeemedAmount, dirtyBit))
 
     def deleteFiat(pegHash: String, address: String): Future[Int] = deleteByPegHashAndAddress(pegHash, address)
 
-    def deleteFiatPegWallet(address: String): Future[Int] =deleteByAddress(address)
+    def deleteFiatPegWallet(address: String): Future[Int] = deleteByAddress(address)
 
-    def getDirtyFiats: Future[Seq[Fiat]] =getFiatsByDirtyBit(dirtyBit = true)
+    def getDirtyFiats: Future[Seq[Fiat]] = getFiatsByDirtyBit(dirtyBit = true)
 
     def markDirty(address: String): Future[Int] = updateDirtyBitByAddress(address, dirtyBit = true)
 
@@ -156,48 +151,48 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
   object Utility {
 
-    def dirtyEntityUpdater(): Future[Unit] =  {
+    def dirtyEntityUpdater(): Future[Unit] = {
       val dirtyFiats = Service.getDirtyFiats
       Thread.sleep(sleepTime)
-      def insertOrUpdateAndSendCometMessage(dirtyFiats:Seq[Fiat])={
 
+      def insertOrUpdateAndSendCometMessage(dirtyFiats: Seq[Fiat]) = {
         Future.sequence {
           dirtyFiats.map { dirtyFiat =>
             val accountOwnerAddress = getAccount.Service.get(dirtyFiat.ownerAddress)
+
             def insertOrUpdate(accountOwnerAddress: Response) = {
               val fiatPegWallet = accountOwnerAddress.value.fiatPegWallet.getOrElse(throw new BaseException(constants.Response.NO_RESPONSE))
-
               val upsert = Future.sequence(fiatPegWallet.map { fiatPeg => if (fiatPegWallet.map(_.pegHash) contains dirtyFiat.pegHash) Service.insertOrUpdate(fiatPeg.pegHash, dirtyFiat.ownerAddress, fiatPeg.transactionID, fiatPeg.transactionAmount, fiatPeg.redeemedAmount, dirtyBit = false) else Service.deleteFiat(dirtyFiat.pegHash, dirtyFiat.ownerAddress) })
               for {
                 _ <- upsert
               } yield fiatPegWallet
             }
+
             val accountID = masterAccounts.Service.getId(dirtyFiat.ownerAddress)
             (for {
               accountOwnerAddress <- accountOwnerAddress
               fiatPegWallet <- insertOrUpdate(accountOwnerAddress)
               accountID <- accountID
-
-            } yield {mainFiatActor ! FiatCometMessage(username = accountID, message = Json.toJson(fiatPegWallet.map(_.transactionAmount.toInt).sum.toString))}
-              ).recover{
+            } yield mainFiatActor ! FiatCometMessage(username = accountID, message = Json.toJson(fiatPegWallet.map(_.transactionAmount.toInt).sum.toString))
+              ).recover {
               case baseException: BaseException => logger.info(baseException.failure.message, baseException)
                 if (baseException.failure == constants.Response.NO_RESPONSE) {
-
-                val deleteFiatPegWallet= Service.deleteFiatPegWallet(dirtyFiat.ownerAddress)
-                  val id=masterAccounts.Service.getId(dirtyFiat.ownerAddress)
+                  val deleteFiatPegWallet = Service.deleteFiatPegWallet(dirtyFiat.ownerAddress)
+                  val id = masterAccounts.Service.getId(dirtyFiat.ownerAddress)
                   for {
                     _ <- deleteFiatPegWallet
                     id <- id
-                  }yield mainFiatActor ! FiatCometMessage(username = id, message = Json.toJson("0"))
+                  } yield mainFiatActor ! FiatCometMessage(username = id, message = Json.toJson("0"))
                 }
             }
           }
         }
       }
-      for{
-        dirtyFiats<-dirtyFiats
-        _<- insertOrUpdateAndSendCometMessage(dirtyFiats)
-      }yield {}
+
+      for {
+        dirtyFiats <- dirtyFiats
+        _ <- insertOrUpdateAndSendCometMessage(dirtyFiats)
+      } yield {}
     }
   }
 

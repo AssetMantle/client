@@ -13,7 +13,7 @@ import slick.jdbc.JdbcProfile
 import transactions.responses.TransactionResponse.BlockResponse
 
 import scala.concurrent.duration._
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 case class SetBuyerFeedback(from: String, to: String, pegHash: String, rating: Int, gas: Int, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None) extends BaseTransaction[SetBuyerFeedback] {
@@ -173,7 +173,6 @@ class SetBuyerFeedbacks @Inject()(actorSystem: ActorSystem, transaction: utiliti
   object Utility {
 
     def onSuccess(ticketID: String, blockResponse: BlockResponse): Future[Unit] =  {
-
       val markTransactionSuccessful= Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
       val setBuyerFeedback = Service.getTransaction(ticketID)
        def updateAndMarkDirty(setBuyerFeedback:SetBuyerFeedback)={
@@ -200,7 +199,6 @@ class SetBuyerFeedbacks @Inject()(actorSystem: ActorSystem, transaction: utiliti
       }yield {
         utilitiesNotification.send(toAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
         utilitiesNotification.send(fromAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
-
       }).recover{
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
           throw new BaseException(constants.Response.PSQL_EXCEPTION)
@@ -208,7 +206,6 @@ class SetBuyerFeedbacks @Inject()(actorSystem: ActorSystem, transaction: utiliti
     }
 
     def onFailure(ticketID: String, message: String): Future[Unit] =  {
-
       val markTransactionFailed= Service.markTransactionFailed(ticketID, message)
       val setBuyerFeedback = Service.getTransaction(ticketID)
       def getIDs(setBuyerFeedback:SetBuyerFeedback) = {
@@ -219,15 +216,16 @@ class SetBuyerFeedbacks @Inject()(actorSystem: ActorSystem, transaction: utiliti
           fromAccountID <- fromAccountID
         } yield (toAccountID, fromAccountID)
       }
-      for{
+      (for{
         _<-markTransactionFailed
         setBuyerFeedback<-setBuyerFeedback
         (toAccountID, fromAccountID)<-getIDs(setBuyerFeedback)
       }yield{
         utilitiesNotification.send(toAccountID, constants.Notification.FAILURE, message)
         utilitiesNotification.send(fromAccountID, constants.Notification.FAILURE, message)
+      }).recover{
+        case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
-
     }
   }
 

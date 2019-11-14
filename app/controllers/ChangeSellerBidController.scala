@@ -44,7 +44,7 @@ class ChangeSellerBidController @Inject()(messagesControllerComponents: Messages
           }
         },
         changeSellerBidData => {
-          val transactionProcess=transaction.process[blockchainTransaction.ChangeSellerBid, transactionsChangeSellerBid.Request](
+          val transactionProcess = transaction.process[blockchainTransaction.ChangeSellerBid, transactionsChangeSellerBid.Request](
             entity = blockchainTransaction.ChangeSellerBid(from = loginState.address, to = changeSellerBidData.buyerAddress, bid = changeSellerBidData.bid, time = changeSellerBidData.time, pegHash = changeSellerBidData.pegHash, gas = changeSellerBidData.gas, ticketID = "", mode = transactionMode),
             blockchainTransactionCreate = blockchainTransactionChangeSellerBids.Service.create,
             request = transactionsChangeSellerBid.Request(transactionsChangeSellerBid.BaseReq(from = loginState.address, gas = changeSellerBidData.gas.toString), to = changeSellerBidData.buyerAddress, password = changeSellerBidData.password, bid = changeSellerBidData.bid.toString, time = changeSellerBidData.time.toString, pegHash = changeSellerBidData.pegHash, mode = transactionMode),
@@ -53,12 +53,12 @@ class ChangeSellerBidController @Inject()(messagesControllerComponents: Messages
             onFailure = blockchainTransactionChangeSellerBids.Utility.onFailure,
             updateTransactionHash = blockchainTransactionChangeSellerBids.Service.updateTransactionHash
           )
-          (for{
-            _<-transactionProcess
-          }yield withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.SELLER_BID_CHANGED)))
-          ).recover {
-              case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-            }
+          (for {
+            _ <- transactionProcess
+          } yield withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.SELLER_BID_CHANGED)))
+            ).recover {
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+          }
         }
       )
   }
@@ -75,7 +75,6 @@ class ChangeSellerBidController @Inject()(messagesControllerComponents: Messages
         }
       },
       changeSellerBidData => {
-
         val postRequest = transactionsChangeSellerBid.Service.post(transactionsChangeSellerBid.Request(transactionsChangeSellerBid.BaseReq(from = changeSellerBidData.from, gas = changeSellerBidData.gas.toString), to = changeSellerBidData.to, password = changeSellerBidData.password, bid = changeSellerBidData.bid.toString, time = changeSellerBidData.time.toString, pegHash = changeSellerBidData.pegHash, mode = changeSellerBidData.mode))
         (for {
           _ <- postRequest

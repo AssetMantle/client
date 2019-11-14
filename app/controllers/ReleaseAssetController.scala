@@ -19,6 +19,7 @@ class ReleaseAssetController @Inject()(messagesControllerComponents: MessagesCon
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
   private implicit val module: String = constants.Module.CONTROLLERS_RELEASE_ASSET
+
   //TODO username instead of address
   def releaseAssetForm(blockchainAddress: String, pegHash: String): Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.master.releaseAsset(blockchainAddress = blockchainAddress, pegHash = pegHash))
@@ -28,13 +29,13 @@ class ReleaseAssetController @Inject()(messagesControllerComponents: MessagesCon
     implicit request =>
       views.companion.master.ReleaseAsset.form.bindFromRequest().fold(
         formWithErrors => {
-          Future{
+          Future {
             BadRequest(views.html.component.master.releaseAsset(formWithErrors, formWithErrors.data(constants.FormField.BLOCKCHAIN_ADDRESS.name), formWithErrors.data(constants.FormField.PEG_HASH.name)))
           }
         },
         releaseAssetData => {
 
-          val transactionProcess=transaction.process[blockchainTransaction.ReleaseAsset, transactionsReleaseAsset.Request](
+          val transactionProcess = transaction.process[blockchainTransaction.ReleaseAsset, transactionsReleaseAsset.Request](
             entity = blockchainTransaction.ReleaseAsset(from = loginState.address, to = releaseAssetData.blockchainAddress, pegHash = releaseAssetData.pegHash, gas = releaseAssetData.gas, ticketID = "", mode = transactionMode),
             blockchainTransactionCreate = blockchainTransactionReleaseAssets.Service.create,
             request = transactionsReleaseAsset.Request(transactionsReleaseAsset.BaseReq(from = loginState.address, gas = releaseAssetData.gas.toString), to = releaseAssetData.blockchainAddress, password = releaseAssetData.password, pegHash = releaseAssetData.pegHash, mode = transactionMode),
@@ -43,28 +44,32 @@ class ReleaseAssetController @Inject()(messagesControllerComponents: MessagesCon
             onFailure = blockchainTransactionReleaseAssets.Utility.onFailure,
             updateTransactionHash = blockchainTransactionReleaseAssets.Service.updateTransactionHash
           )
-          (for{
-            _<-transactionProcess
-          }yield withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ASSET_RELEASED)))
-            ).recover{
+          (for {
+            _ <- transactionProcess
+          } yield withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ASSET_RELEASED)))
+            ).recover {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
         }
       )
   }
+
   //TODO releaseAsset request, it's getting all locked
   def releaseAssetList(): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
 
-    val zoneID=blockchainZones.Service.getID(loginState.address)
-    def addressesUnderZone(zoneID:String)=blockchainACLAccounts.Service.getAddressesUnderZone(zoneID)
-    def allLockedAssets(addressesUnderZone:Seq[String])=blockchainAssets.Service.getAllLocked(addressesUnderZone)
-      (for{
-      zoneID<-zoneID
-      addressesUnderZone<-addressesUnderZone(zoneID)
-      allLockedAssets<-allLockedAssets(addressesUnderZone)
-     }yield Ok(views.html.component.master.releaseAssetList(allLockedAssets))
-        ).recover{
+      val zoneID = blockchainZones.Service.getID(loginState.address)
+
+      def addressesUnderZone(zoneID: String) = blockchainACLAccounts.Service.getAddressesUnderZone(zoneID)
+
+      def allLockedAssets(addressesUnderZone: Seq[String]) = blockchainAssets.Service.getAllLocked(addressesUnderZone)
+
+      (for {
+        zoneID <- zoneID
+        addressesUnderZone <- addressesUnderZone(zoneID)
+        allLockedAssets <- allLockedAssets(addressesUnderZone)
+      } yield Ok(views.html.component.master.releaseAssetList(allLockedAssets))
+        ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
@@ -76,17 +81,17 @@ class ReleaseAssetController @Inject()(messagesControllerComponents: MessagesCon
   def blockchainReleaseAsset: Action[AnyContent] = Action.async { implicit request =>
     views.companion.blockchain.ReleaseAsset.form.bindFromRequest().fold(
       formWithErrors => {
-        Future{
+        Future {
           BadRequest(views.html.component.blockchain.releaseAsset(formWithErrors))
         }
       },
       releaseAssetData => {
 
-        val post=transactionsReleaseAsset.Service.post(transactionsReleaseAsset.Request(transactionsReleaseAsset.BaseReq(from = releaseAssetData.from, gas = releaseAssetData.gas.toString), to = releaseAssetData.to, password = releaseAssetData.password, pegHash = releaseAssetData.pegHash, mode = releaseAssetData.mode))
-        (for{
-          _<-post
-        }yield Ok(views.html.index(successes = Seq(constants.Response.ASSET_RELEASED)))
-          ).recover{
+        val post = transactionsReleaseAsset.Service.post(transactionsReleaseAsset.Request(transactionsReleaseAsset.BaseReq(from = releaseAssetData.from, gas = releaseAssetData.gas.toString), to = releaseAssetData.to, password = releaseAssetData.password, pegHash = releaseAssetData.pegHash, mode = releaseAssetData.mode))
+        (for {
+          _ <- post
+        } yield Ok(views.html.index(successes = Seq(constants.Response.ASSET_RELEASED)))
+          ).recover {
           case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
         }
       }

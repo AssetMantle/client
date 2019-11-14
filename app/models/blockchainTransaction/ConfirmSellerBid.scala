@@ -36,6 +36,7 @@ class ConfirmSellerBids @Inject()(actorSystem: ActorSystem, transaction: utiliti
   private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
 
   import databaseConfig.profile.api._
+
   private[models] val confirmSellerBidTable = TableQuery[ConfirmSellerBidTable]
 
   private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
@@ -220,7 +221,6 @@ class ConfirmSellerBids @Inject()(actorSystem: ActorSystem, transaction: utiliti
       } yield {
         utilitiesNotification.send(fromAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
         utilitiesNotification.send(toAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
-
       }).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
           throw new BaseException(constants.Response.PSQL_EXCEPTION)
@@ -259,7 +259,6 @@ class ConfirmSellerBids @Inject()(actorSystem: ActorSystem, transaction: utiliti
       } yield {
         utilitiesNotification.send(fromAccountID, constants.Notification.FAILURE, message)
         utilitiesNotification.send(toAccountID, constants.Notification.FAILURE, message)
-
       }).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }

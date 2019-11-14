@@ -46,7 +46,7 @@ class TransactionFeedbacks @Inject()(protected val databaseConfigProvider: Datab
 
   val db = databaseConfig.db
 
-  private val schedulerExecutionContext:ExecutionContext= actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
+  private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -106,7 +106,7 @@ class TransactionFeedbacks @Inject()(protected val databaseConfigProvider: Datab
     }
   }
 
-  private def deleteById(address: String)= db.run(transactionFeedbackTable.filter(_.address === address).delete.asTry).map {
+  private def deleteById(address: String) = db.run(transactionFeedbackTable.filter(_.address === address).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -213,20 +213,22 @@ class TransactionFeedbacks @Inject()(protected val databaseConfigProvider: Datab
 
   object Utility {
 
-    def dirtyEntityUpdater(): Future[Unit] =  {
-
+    def dirtyEntityUpdater(): Future[Unit] = {
       val dirtyAddresses = Service.getDirtyAddresses
       Thread.sleep(sleepTime)
-      def refreshDirtyAddresses(dirtyAddresses:Seq[String])={
-        Future.sequence{
+
+      def refreshDirtyAddresses(dirtyAddresses: Seq[String]) = {
+        Future.sequence {
           dirtyAddresses.map { dirtyAddress =>
             val response = getTraderReputation.Service.get(dirtyAddress)
-            def refreshDirty(response:  queries.responses.TraderReputationResponse.Response) = Service.refreshDirty(response.value.address, response.value.transactionFeedback)
+
+            def refreshDirty(response: queries.responses.TraderReputationResponse.Response) = Service.refreshDirty(response.value.address, response.value.transactionFeedback)
+
             (for {
               response <- response
               _ <- refreshDirty(response)
             } yield {}
-              ).recover{
+              ).recover {
               case baseException: BaseException => if (baseException.failure == constants.Response.NO_RESPONSE) {
                 Service.insertOrUpdate(dirtyAddress, TraderReputationResponse.TransactionFeedbackResponse("0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"), dirtyBit = false)
               } else {
@@ -236,10 +238,11 @@ class TransactionFeedbacks @Inject()(protected val databaseConfigProvider: Datab
           }
         }
       }
-      for{
-        dirtyAddresses<-dirtyAddresses
-        _<-refreshDirtyAddresses(dirtyAddresses)
-      }yield {}
+
+      for {
+        dirtyAddresses <- dirtyAddresses
+        _ <- refreshDirtyAddresses(dirtyAddresses)
+      } yield {}
     }
   }
 

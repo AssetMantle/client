@@ -23,12 +23,12 @@ class VerifyMobileNumberController @Inject()(messagesControllerComponents: Messa
   def verifyMobileNumberForm: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val otp = smsOTPs.Service.sendOTP(loginState.username)
-      (for{
-        otp<-otp
-      }yield {
+      (for {
+        otp <- otp
+      } yield {
         utilitiesNotification.send(accountID = loginState.username, notification = constants.Notification.VERIFY_PHONE, otp)
         withUsernameToken.Ok(views.html.component.master.verifyMobileNumber())
-      }).recover{
+      }).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
@@ -37,26 +37,31 @@ class VerifyMobileNumberController @Inject()(messagesControllerComponents: Messa
     implicit request =>
       views.companion.master.VerifyMobileNumber.form.bindFromRequest().fold(
         formWithErrors => {
-          Future{BadRequest(views.html.component.master.verifyMobileNumber(formWithErrors))}
+          Future {
+            BadRequest(views.html.component.master.verifyMobileNumber(formWithErrors))
+          }
         },
         verifyMobileNumberData => {
-          val verifyOTP=smsOTPs.Service.verifyOTP(loginState.username, verifyMobileNumberData.otp)
-          val verifyMobileNumber=masterContacts.Service.verifyMobileNumber(loginState.username)
-          def contact=masterContacts.Service.getContact(loginState.username).map{contactVal=> contactVal.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)) }
-          def updateStatus(contact:Contact)={
+          val verifyOTP = smsOTPs.Service.verifyOTP(loginState.username, verifyMobileNumberData.otp)
+          val verifyMobileNumber = masterContacts.Service.verifyMobileNumber(loginState.username)
+
+          def contact = masterContacts.Service.getContact(loginState.username).map { contactVal => contactVal.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)) }
+
+          def updateStatus(contact: Contact) = {
             if (contact.emailAddressVerified && contact.mobileNumberVerified) {
               masterAccounts.Service.updateStatusComplete(loginState.username)
             } else {
               masterAccounts.Service.updateStatusUnverifiedEmail(loginState.username)
             }
           }
-          (for{
-            _<-verifyOTP
-            _<-verifyMobileNumber
-            contact<-contact
-            _<-updateStatus(contact)
-          }yield withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.SUCCESS)))
-            ).recover{
+
+          (for {
+            _ <- verifyOTP
+            _ <- verifyMobileNumber
+            contact <- contact
+            _ <- updateStatus(contact)
+          } yield withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.SUCCESS)))
+            ).recover {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
         }

@@ -13,7 +13,7 @@ import slick.jdbc.JdbcProfile
 import transactions.responses.TransactionResponse.BlockResponse
 
 import scala.concurrent.duration._
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 case class RedeemFiat(from: String, to: String, redeemAmount: Int, gas: Int, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None) extends BaseTransaction[RedeemFiat] {
@@ -27,15 +27,11 @@ class RedeemFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Tra
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_REDEEM_ASSET
 
   private implicit val logger: Logger = Logger(this.getClass)
-
-  private val schedulerExecutionContext:ExecutionContext= actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
-
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
-
   val db = databaseConfig.db
+  private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
 
   import databaseConfig.profile.api._
-
   private[models] val redeemFiatTable = TableQuery[RedeemFiatTable]
 
   private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
@@ -151,13 +147,13 @@ class RedeemFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Tra
 
   object Service {
 
-    def create(redeemFiat: RedeemFiat): Future[String] =add(RedeemFiat(from = redeemFiat.from, to = redeemFiat.to, redeemAmount = redeemFiat.redeemAmount, gas = redeemFiat.gas, status = redeemFiat.status, txHash = redeemFiat.txHash, ticketID = redeemFiat.ticketID, mode = redeemFiat.mode, code = redeemFiat.code))
+    def create(redeemFiat: RedeemFiat): Future[String] = add(RedeemFiat(from = redeemFiat.from, to = redeemFiat.to, redeemAmount = redeemFiat.redeemAmount, gas = redeemFiat.gas, status = redeemFiat.status, txHash = redeemFiat.txHash, ticketID = redeemFiat.ticketID, mode = redeemFiat.mode, code = redeemFiat.code))
 
     def markTransactionSuccessful(ticketID: String, txHash: String): Future[Int] = updateTxHashAndStatusOnTicketID(ticketID, Option(txHash), status = Option(true))
 
     def markTransactionFailed(ticketID: String, code: String): Future[Int] = updateStatusAndCodeOnTicketID(ticketID, status = Option(false), code)
 
-    def getTicketIDsOnStatus(): Future[Seq[String]] =getTicketIDsWithNullStatus
+    def getTicketIDsOnStatus(): Future[Seq[String]] = getTicketIDsWithNullStatus
 
     def getTransaction(ticketID: String): Future[RedeemFiat] = findByTicketID(ticketID)
 
@@ -172,18 +168,19 @@ class RedeemFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Tra
   object Utility {
 
     def onSuccess(ticketID: String, blockResponse: BlockResponse): Future[Unit] = {
-
-      val markTransactionSuccessful=Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
+      val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
       val redeemFiat = Service.getTransaction(ticketID)
-      def markDirty(redeemFiat:RedeemFiat)={
-        val markDirtyBlockchainFiatsFrom=blockchainFiats.Service.markDirty(redeemFiat.from)
-        val markDirtyBlockchainAccountsFrom=blockchainAccounts.Service.markDirty(redeemFiat.from)
-        for{
-          _<-markDirtyBlockchainFiatsFrom
-          _<-markDirtyBlockchainAccountsFrom
-        }yield {}
+
+      def markDirty(redeemFiat: RedeemFiat) = {
+        val markDirtyBlockchainFiatsFrom = blockchainFiats.Service.markDirty(redeemFiat.from)
+        val markDirtyBlockchainAccountsFrom = blockchainAccounts.Service.markDirty(redeemFiat.from)
+        for {
+          _ <- markDirtyBlockchainFiatsFrom
+          _ <- markDirtyBlockchainAccountsFrom
+        } yield {}
       }
-      def getIDs(redeemFiat:RedeemFiat) = {
+
+      def getIDs(redeemFiat: RedeemFiat) = {
         val toAccountID = masterAccounts.Service.getId(redeemFiat.to)
         val fromAccountID = masterAccounts.Service.getId(redeemFiat.from)
         for {
@@ -191,15 +188,16 @@ class RedeemFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Tra
           fromAccountID <- fromAccountID
         } yield (toAccountID, fromAccountID)
       }
-      (for{
-        _<-markTransactionSuccessful
-        redeemFiat<-redeemFiat
-        _<-markDirty(redeemFiat)
+
+      (for {
+        _ <- markTransactionSuccessful
+        redeemFiat <- redeemFiat
+        _ <- markDirty(redeemFiat)
         (toAccountID, fromAccountID) <- getIDs(redeemFiat)
-      }yield {
+      } yield {
         utilitiesNotification.send(toAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
         utilitiesNotification.send(fromAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
-      }).recover{
+      }).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
           throw new BaseException(constants.Response.PSQL_EXCEPTION)
       }
@@ -207,10 +205,10 @@ class RedeemFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Tra
     }
 
     def onFailure(ticketID: String, message: String): Future[Unit] = Future {
-
-      val markTransactionFailed=Service.markTransactionFailed(ticketID, message)
+      val markTransactionFailed = Service.markTransactionFailed(ticketID, message)
       val redeemFiat = Service.getTransaction(ticketID)
-      def getIDs(redeemFiat:RedeemFiat) = {
+
+      def getIDs(redeemFiat: RedeemFiat) = {
         val toAccountID = masterAccounts.Service.getId(redeemFiat.to)
         val fromAccountID = masterAccounts.Service.getId(redeemFiat.from)
         for {
@@ -218,14 +216,15 @@ class RedeemFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Tra
           fromAccountID <- fromAccountID
         } yield (toAccountID, fromAccountID)
       }
-      (for{
-        _<-markTransactionFailed
-        redeemFiat<-redeemFiat
+
+      (for {
+        _ <- markTransactionFailed
+        redeemFiat <- redeemFiat
         (toAccountID, fromAccountID) <- getIDs(redeemFiat)
-      }yield{
+      } yield {
         utilitiesNotification.send(fromAccountID, constants.Notification.FAILURE, message)
         utilitiesNotification.send(toAccountID, constants.Notification.FAILURE, message)
-      }).recover{
+      }).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
     }

@@ -25,7 +25,6 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
 
   def commonHome: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-
       (loginState.userType match {
         case constants.User.UNKNOWN =>
           val profilePicture = masterAccountFiles.Service.getProfilePicture(loginState.username)
@@ -46,7 +45,6 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
 
   def genesisDetails: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
-
       val address = masterAccounts.Service.getAddress(genesisAccountName)
       (for {
         address <- address
@@ -58,7 +56,6 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
 
   def zoneDetails: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-
       (loginState.userType match {
         case constants.User.ZONE =>
           val zone = masterZones.Service.getByAccountID(loginState.username)
@@ -86,12 +83,10 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
       }).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
-
   }
 
   def organizationDetails: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-
       (loginState.userType match {
         case constants.User.ORGANIZATION =>
           val organization = masterOrganizations.Service.getByAccountID(loginState.username)
@@ -129,7 +124,6 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
 
   def fiatList: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-
       val fiatPegWallet = blockchainFiats.Service.getFiatPegWallet(loginState.address)
       (for {
         fiatPegWallet <- fiatPegWallet
@@ -141,7 +135,6 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
 
   def buyNegotiationList: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-
       val negotiationsForBuyerAddress = blockchainNegotiations.Service.getNegotiationsForBuyerAddress(loginState.address)
       val assetPegHashes = blockchainAssets.Service.getAssetPegHashes(loginState.address)
       (for {
@@ -155,7 +148,6 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
 
   def sellNegotiationList: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-
       val negotiationsForSellerAddress = blockchainNegotiations.Service.getNegotiationsForSellerAddress(loginState.address)
       val assetPegHashes = blockchainAssets.Service.getAssetPegHashes(loginState.address)
       (for {
@@ -169,7 +161,6 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
 
   def orderList: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-
       val negotiations = blockchainNegotiations.Service.getNegotiationsForAddress(loginState.address)
 
       def orders(negotiations: Seq[Negotiation]) = blockchainOrders.Service.getOrders(negotiations.map(_.id))
@@ -192,7 +183,6 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
   }
 
   def availableAssetList: Action[AnyContent] = Action.async { implicit request =>
-
     val assets = masterTransactionIssueAssetRequests.Service.getMarketAssets()
 
     def allDocumentsForAllAssets(assets: Seq[IssueAssetRequest]) = masterTransactionAssetFiles.Service.getAllDocumentsForAllAssets(assets.map(_.id))
@@ -208,11 +198,10 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
 
   def availableAssetListWithLogin: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-
       val masterTransactionAssets = masterTransactionIssueAssetRequests.Service.getMarketAssets()
       val allOrderIDs = blockchainOrders.Service.getAllOrderIds
 
-      def blockchainAssetList(allOrderID2s: Seq[String]) = blockchainAssets.Service.getAllPublic(allOrderID2s)
+      def blockchainAssetList(allOrderIDs: Seq[String]) = blockchainAssets.Service.getAllPublic(allOrderIDs)
 
       def allDocumentsForAllAssets(masterTransactionAssets: Seq[IssueAssetRequest]) = masterTransactionAssetFiles.Service.getAllDocumentsForAllAssets(masterTransactionAssets.map(_.id))
 
@@ -268,19 +257,7 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
 
   def profileDocuments(): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      /*   try {
-           val documents: Seq[Document[_]] = loginState.userType match {
-             case constants.User.ZONE => masterZoneKYC.Service.getAllDocuments(loginState.username)
-             case constants.User.ORGANIZATION => masterOrganizationKYCs.Service.getAllDocuments(masterOrganizations.Service.getID(loginState.username))
-             case constants.User.TRADER => masterTraderKYCs.Service.getAllDocuments(masterTraders.Service.getID(loginState.username))
-             case constants.User.USER => masterAccountKYC.Service.getAllDocuments(loginState.username)
-             case _ => masterAccountFile.Service.getAllDocuments(loginState.username)
-           }
-           withUsernameToken.Ok(views.html.component.master.profileDocuments(documents))
-         } catch {
-           case _: BaseException => InternalServerError
-         }
-   */
+
       val documents: Future[Seq[Document[_]]] = loginState.userType match {
         case constants.User.ZONE => masterZoneKYC.Service.getAllDocuments(loginState.username)
         case constants.User.ORGANIZATION =>
@@ -314,7 +291,6 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
 
   def profilePicture(): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-
       val profilePicture = masterAccountFile.Service.getProfilePicture(loginState.username)
       (for {
         profilePicture <- profilePicture
@@ -326,7 +302,6 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
 
   def organizationViewTraderList(): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
     implicit request =>
-
       val organizationid = masterOrganizations.Service.getID(loginState.username)
 
       def tradersListInOrganization(organizationid: String) = masterTraders.Service.getTradersListInOrganization(organizationid)
@@ -342,7 +317,6 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
 
   def organizationViewTrader(traderID: String): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
     implicit request =>
-
       val organizationID = masterOrganizations.Service.getID(loginState.username)
 
       def verifyOrganizationTrader(organizationID: String) = masterTraders.Service.verifyOrganizationTrader(traderID = traderID, organizationID)

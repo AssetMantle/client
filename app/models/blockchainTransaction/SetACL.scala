@@ -4,6 +4,7 @@ import akka.actor.ActorSystem
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Abstract.BaseTransaction
+import models.blockchain.ACL
 import models.{blockchain, master}
 import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
@@ -12,9 +13,9 @@ import play.api.{Configuration, Logger}
 import queries.responses.TraderReputationResponse
 import slick.jdbc.JdbcProfile
 import transactions.responses.TransactionResponse.BlockResponse
-import models.blockchain.ACL
+
 import scala.concurrent.duration._
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 case class SetACL(from: String, aclAddress: String, organizationID: String, zoneID: String, aclHash: String, gas: Int, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None) extends BaseTransaction[SetACL] {
@@ -174,39 +175,29 @@ class SetACLs @Inject()(actorSystem: ActorSystem, transaction: utilities.Transac
 
   object Utility {
 
-
-    def getIDs(setACL:SetACL)={
-      val aclAddressID=masterAccounts.Service.getId(setACL.aclAddress)
-      val fromID=masterAccounts.Service.getId(setACL.from)
-      for{
-        aclAddressID<-aclAddressID
-        fromID<-fromID
-      }yield (aclAddressID,fromID)
-    }
-
     def onSuccess(ticketID: String, blockResponse: BlockResponse): Future[Unit] =  {
 
       val markTransactionSuccessful= Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
       val setACL = Service.getTransaction(ticketID)
-      def aclAccountID(setACL: SetACL)=masterAccounts.Service.getId(setACL.aclAddress)
-      def getAcl(setACL: SetACL)=blockchainAclHashes.Service.getACL(setACL.aclHash)
+      def aclAccountID(aclAddress: String)=masterAccounts.Service.getId(aclAddress)
+      def getAcl(aclHash: String)=blockchainAclHashes.Service.getACL(aclHash)
       def aclAccountInsertOrUpdate(setACL: SetACL,acl:ACL)=blockchainAclAccounts.Service.insertOrUpdate(setACL.aclAddress, setACL.zoneID, setACL.organizationID,acl, dirtyBit = true)
       def updateUserTypeOnAddress(setACL: SetACL)=masterAccounts.Service.updateUserTypeOnAddress(setACL.aclAddress, constants.User.TRADER)
       def verifyTraderByAccountID(aclAccountID:String)= masterTraders.Service.verifyTraderByAccountID(aclAccountID)
-      def markDirty(setACL: SetACL)=blockchainAccounts.Service.markDirty(setACL.from)
+      def markDirty(fromAddress: String)=blockchainAccounts.Service.markDirty(fromAddress)
       def transactionFeedbacksInsertOrUpdate(setACL: SetACL)=blockchainTransactionFeedbacks.Service.insertOrUpdate(setACL.aclAddress, TraderReputationResponse.TransactionFeedbackResponse("0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"), dirtyBit = true)
-      def fromAccountID(setACL: SetACL)=masterAccounts.Service.getId(setACL.from)
+      def fromAccountID(fromAddress: String)=masterAccounts.Service.getId(fromAddress)
       (for{
         _<-markTransactionSuccessful
         setACL<-setACL
-        aclAccountID<-aclAccountID(setACL)
-        acl<-getAcl(setACL)
+        aclAccountID<-aclAccountID(setACL.aclAddress)
+        acl<-getAcl(setACL.aclHash)
         _<-aclAccountInsertOrUpdate(setACL,acl)
         _<-updateUserTypeOnAddress(setACL)
         _<- verifyTraderByAccountID(aclAccountID)
-        _<-markDirty(setACL)
+        _<-markDirty(setACL.from)
         _<- transactionFeedbacksInsertOrUpdate(setACL)
-        fromAccountID<-fromAccountID(setACL)
+        fromAccountID<-fromAccountID(setACL.from)
       }yield {
         utilitiesNotification.send(aclAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
         utilitiesNotification.send(fromAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
@@ -220,13 +211,23 @@ class SetACLs @Inject()(actorSystem: ActorSystem, transaction: utilities.Transac
 
       val markTransactionFailed=Service.markTransactionFailed(ticketID, message)
       val setACL = Service.getTransaction(ticketID)
-      for{
+      def getIDs(setACL:SetACL)={
+        val aclAddressID=masterAccounts.Service.getId(setACL.aclAddress)
+        val fromID=masterAccounts.Service.getId(setACL.from)
+        for{
+          aclAddressID<-aclAddressID
+          fromID<-fromID
+        }yield (aclAddressID,fromID)
+      }
+      (for{
         _<-markTransactionFailed
         setACL<-setACL
         (aclAddressID,fromID)<-getIDs(setACL)
       }yield {
         utilitiesNotification.send(aclAddressID, constants.Notification.FAILURE, message)
         utilitiesNotification.send(fromID, constants.Notification.FAILURE, message)
+      }).recover{
+        case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
     }
   }

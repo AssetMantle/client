@@ -9,7 +9,7 @@ import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
 
-import scala.concurrent.{ExecutionContext,Future}
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class SetBuyerFeedbackController @Inject()(messagesControllerComponents: MessagesControllerComponents, transaction: utilities.Transaction, withTraderLoginAction: WithTraderLoginAction, transactionsSetBuyerFeedback: transactions.SetBuyerFeedback, blockchainTransactionSetBuyerFeedbacks: blockchainTransaction.SetBuyerFeedbacks, blockchainTraderFeedbackHistories: blockchain.TraderFeedbackHistories, withUsernameToken: WithUsernameToken)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
@@ -28,10 +28,12 @@ class SetBuyerFeedbackController @Inject()(messagesControllerComponents: Message
     implicit request =>
       views.companion.master.SetBuyerFeedback.form.bindFromRequest().fold(
         formWithErrors => {
-          Future{BadRequest(views.html.component.master.setBuyerFeedback(formWithErrors, sellerAddress = formWithErrors.data(constants.FormField.SELLER_ADDRESS.name), pegHash = formWithErrors.data(constants.FormField.PEG_HASH.name)))}
+          Future {
+            BadRequest(views.html.component.master.setBuyerFeedback(formWithErrors, sellerAddress = formWithErrors.data(constants.FormField.SELLER_ADDRESS.name), pegHash = formWithErrors.data(constants.FormField.PEG_HASH.name)))
+          }
         },
         setBuyerFeedbackData => {
-          val transactionProcess=transaction.process[blockchainTransaction.SetBuyerFeedback, transactionsSetBuyerFeedback.Request](
+          val transactionProcess = transaction.process[blockchainTransaction.SetBuyerFeedback, transactionsSetBuyerFeedback.Request](
             entity = blockchainTransaction.SetBuyerFeedback(from = loginState.address, to = setBuyerFeedbackData.sellerAddress, pegHash = setBuyerFeedbackData.pegHash, rating = setBuyerFeedbackData.rating, gas = setBuyerFeedbackData.gas, ticketID = "", mode = transactionMode),
             blockchainTransactionCreate = blockchainTransactionSetBuyerFeedbacks.Service.create,
             request = transactionsSetBuyerFeedback.Request(transactionsSetBuyerFeedback.BaseReq(from = loginState.address, gas = setBuyerFeedbackData.gas.toString), to = setBuyerFeedbackData.sellerAddress, password = setBuyerFeedbackData.password, pegHash = setBuyerFeedbackData.pegHash, rating = setBuyerFeedbackData.rating.toString, mode = transactionMode),
@@ -40,24 +42,23 @@ class SetBuyerFeedbackController @Inject()(messagesControllerComponents: Message
             onFailure = blockchainTransactionSetBuyerFeedbacks.Utility.onFailure,
             updateTransactionHash = blockchainTransactionSetBuyerFeedbacks.Service.updateTransactionHash
           )
-          (for{
-            _<-transactionProcess
-          }yield  withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.BUYER_FEEDBACK_SET)))
-          ).recover{
-              case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-            }
+          (for {
+            _ <- transactionProcess
+          } yield withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.BUYER_FEEDBACK_SET)))
+            ).recover {
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+          }
         }
       )
   }
 
   def buyerFeedbackList: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-
-    val nullRatingsForBuyerFeedback=blockchainTraderFeedbackHistories.Service.getNullRatingsForBuyerFeedback(loginState.address)
-      (for{
-      nullRatingsForBuyerFeedback<-nullRatingsForBuyerFeedback
-    }yield Ok(views.html.component.master.setBuyerFeedbackList(nullRatingsForBuyerFeedback))
-        ).recover{
+      val nullRatingsForBuyerFeedback = blockchainTraderFeedbackHistories.Service.getNullRatingsForBuyerFeedback(loginState.address)
+      (for {
+        nullRatingsForBuyerFeedback <- nullRatingsForBuyerFeedback
+      } yield Ok(views.html.component.master.setBuyerFeedbackList(nullRatingsForBuyerFeedback))
+        ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
@@ -69,15 +70,16 @@ class SetBuyerFeedbackController @Inject()(messagesControllerComponents: Message
   def blockchainSetBuyerFeedback: Action[AnyContent] = Action.async { implicit request =>
     views.companion.blockchain.SetBuyerFeedback.form.bindFromRequest().fold(
       formWithErrors => {
-        Future{BadRequest(views.html.component.blockchain.setBuyerFeedback(formWithErrors))}
+        Future {
+          BadRequest(views.html.component.blockchain.setBuyerFeedback(formWithErrors))
+        }
       },
       setBuyerFeedbackData => {
-
-        val post=transactionsSetBuyerFeedback.Service.post(transactionsSetBuyerFeedback.Request(transactionsSetBuyerFeedback.BaseReq(from = setBuyerFeedbackData.from, gas = setBuyerFeedbackData.gas.toString), to = setBuyerFeedbackData.to, password = setBuyerFeedbackData.password, pegHash = setBuyerFeedbackData.pegHash, rating = setBuyerFeedbackData.rating.toString, mode = setBuyerFeedbackData.mode))
-        (for{
-          _<-post
-        }yield Ok(views.html.index(successes = Seq(constants.Response.BUYER_FEEDBACK_SET)))
-          ).recover{
+        val post = transactionsSetBuyerFeedback.Service.post(transactionsSetBuyerFeedback.Request(transactionsSetBuyerFeedback.BaseReq(from = setBuyerFeedbackData.from, gas = setBuyerFeedbackData.gas.toString), to = setBuyerFeedbackData.to, password = setBuyerFeedbackData.password, pegHash = setBuyerFeedbackData.pegHash, rating = setBuyerFeedbackData.rating.toString, mode = setBuyerFeedbackData.mode))
+        (for {
+          _ <- post
+        } yield Ok(views.html.index(successes = Seq(constants.Response.BUYER_FEEDBACK_SET)))
+          ).recover {
           case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
         }
       }

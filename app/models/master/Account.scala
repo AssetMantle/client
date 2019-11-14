@@ -187,39 +187,25 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
     def checkUsernameAvailable(username: String): Future[Boolean] =checkById(username).map{!_}
 
-    def checkUsernameAvailableAsync(username: String): Future[Boolean] = checkById(username)
-
     def addLogin(username: String, password: String, accountAddress: String, language: String):Future[String] = {
       add(Account(username, util.hashing.MurmurHash3.stringHash(password).toString, accountAddress, language, constants.User.WITHOUT_LOGIN, constants.Status.Account.NO_CONTACT)).map{_=> accountAddress}
     }
 
     def getAccount(username: String): Account = Await.result(findById(username), Duration.Inf)
 
-    def getAccountAsync(username: String)= findById(username)
-
     def getLanguage(id: String): String = Await.result(getLanguageById(id), Duration.Inf)
-
-    def getLanguageAsync(id: String) = getLanguageById(id)
 
     def getId(accountAddress: String): Future[String] = getIdByAddress(accountAddress)
 
-    def getIdAsync(accountAddress: String) = getIdByAddress(accountAddress)
-
     def getAccountByAddress(accountAddress: String): Future[Account] = findByAddress(accountAddress)
 
-    def getAccountByAddressAsync(accountAddress: String)=findByAddress(accountAddress)
-
     def getAddress(id: String): Future[String] = getAddressById(id)
-
-    def getAddressAsync(id: String) = getAddressById(id)
 
     def updateUserType(id: String, userType: String): Future[Int] = updateUserTypeById(id, userType)
 
     def updateUserTypeOnAddress(address: String, userType: String): Future[Int] =updateUserTypeByAddress(address, userType)
 
     def getUserType(id: String): Future[String] =getUserTypeById(id)
-
-    def getUserTypeAsync(id: String) =getUserTypeById(id)
 
     def tryVerifyingUserType(id: String, userType: String):Future[Boolean] = {
          getUserTypeById(id).map{userTypeResult=>

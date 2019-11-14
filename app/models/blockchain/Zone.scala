@@ -22,7 +22,7 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
   val db = databaseConfig.db
 
-  private val schedulerExecutionContext:ExecutionContext= actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
+  private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -90,7 +90,7 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
     }
   }
 
-  private def deleteById(id: String)= db.run(zoneTable.filter(_.id === id).delete.asTry).map {
+  private def deleteById(id: String) = db.run(zoneTable.filter(_.id === id).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -116,7 +116,7 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
   object Service {
 
-    def create(id: String, address: String, dirtyBit: Boolean): Future[String] =add(Zone(id = id, address = address, dirtyBit = dirtyBit))
+    def create(id: String, address: String, dirtyBit: Boolean): Future[String] = add(Zone(id = id, address = address, dirtyBit = dirtyBit))
 
     def getAddress(id: String): Future[String] = getAddressById(id)
 
@@ -131,29 +131,32 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
   object Utility {
 
-    def dirtyEntityUpdater(): Future[Unit] =  {
-
+    def dirtyEntityUpdater(): Future[Unit] = {
       val dirtyZones = Service.getDirtyZones
       Thread.sleep(sleepTime)
-      def refreshDirtyZones(dirtyZones:Seq[Zone])={
-        Future.sequence{
+
+      def refreshDirtyZones(dirtyZones: Seq[Zone]) = {
+        Future.sequence {
           dirtyZones.map { dirtyZone =>
-            val responseAddress = getZone.Service.get(dirtyZone.id)
-            def refreshDirty(responseAddress: queries.responses.ZoneResponse.Response) = Service.refreshDirty(dirtyZone.id, responseAddress.body)
+            val response = getZone.Service.get(dirtyZone.id)
+
+            def refreshDirty(response: queries.responses.ZoneResponse.Response) = Service.refreshDirty(dirtyZone.id, response.body)
+
             (for {
-              responseAddress <- responseAddress
-              _ <- refreshDirty(responseAddress)
+              response <- response
+              _ <- refreshDirty(response)
             } yield {}
-              ).recover{
+              ).recover {
               case baseException: BaseException => logger.error(baseException.failure.message, baseException)
             }
           }
         }
       }
-      for{
-        dirtyZones<-dirtyZones
-        _<-refreshDirtyZones(dirtyZones)
-      }yield {}
+
+      for {
+        dirtyZones <- dirtyZones
+        _ <- refreshDirtyZones(dirtyZones)
+      } yield {}
     }
   }
 

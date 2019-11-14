@@ -1,7 +1,5 @@
 package models.blockchainTransaction
 
-import java.net.ConnectException
-
 import akka.actor.ActorSystem
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
@@ -15,7 +13,7 @@ import slick.jdbc.JdbcProfile
 import transactions.responses.TransactionResponse.BlockResponse
 
 import scala.concurrent.duration._
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 case class IssueFiat(from: String, to: String, transactionID: String, transactionAmount: Int, gas: Int, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None) extends BaseTransaction[IssueFiat] {
@@ -29,12 +27,9 @@ class IssueFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_ISSUE_FIAT
 
   private implicit val logger: Logger = Logger(this.getClass)
-
-  private val schedulerExecutionContext:ExecutionContext= actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
-
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
-
   val db = databaseConfig.db
+  private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
 
   import databaseConfig.profile.api._
 
@@ -175,7 +170,6 @@ class IssueFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
 
   object Utility {
     def onSuccess(ticketID: String, blockResponse: BlockResponse): Future[Unit] = {
-
       val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
       val issueFiat = Service.getTransaction(ticketID)
 
@@ -186,6 +180,7 @@ class IssueFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
       }
 
       def markDirty(issueFiat: IssueFiat) = blockchainAccounts.Service.markDirty(issueFiat.from)
+
       def getIDs(issueFiat: IssueFiat) = {
         val toAccountID = masterAccounts.Service.getId(issueFiat.to)
         val fromAccountID = masterAccounts.Service.getId(issueFiat.from)
@@ -212,6 +207,7 @@ class IssueFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
 
       val markTransactionFailed = Service.markTransactionFailed(ticketID, message)
       val issueFiat = Service.getTransaction(ticketID)
+
       def getIDs(issueFiat: IssueFiat) = {
         val toAccountID = masterAccounts.Service.getId(issueFiat.to)
         val fromAccountID = masterAccounts.Service.getId(issueFiat.from)
@@ -220,6 +216,7 @@ class IssueFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
           fromAccountID <- fromAccountID
         } yield (toAccountID, fromAccountID)
       }
+
       (for {
         _ <- markTransactionFailed
         issueFiat <- issueFiat
@@ -230,10 +227,7 @@ class IssueFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
       }).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
-
     }
-
-
   }
 
   if (kafkaEnabled || transactionMode != constants.Transactions.BLOCK_MODE) {

@@ -12,12 +12,12 @@ import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.{JsValue, Json}
 import play.api.{Configuration, Logger}
 import queries.GetAccount
+import queries.responses.AccountResponse.Response
 import slick.jdbc.JdbcProfile
 
 import scala.concurrent.duration.{Duration, _}
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
-import queries.responses.AccountResponse.Response
 
 case class Account(address: String, coins: String = "", publicKey: String, accountNumber: String = "", sequence: String = "", dirtyBit: Boolean)
 
@@ -29,8 +29,7 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
   val db = databaseConfig.db
-
-  private val schedulerExecutionContext:ExecutionContext= actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
+  val mainAccountActor: ActorRef = actorSystem.actorOf(props = MainAccountActor.props(actorTimeout, actorSystem), name = constants.Module.ACTOR_MAIN_ACCOUNT)
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -39,13 +38,9 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
   private implicit val materializer: ActorMaterializer = ActorMaterializer()(actorSystem)
 
   import databaseConfig.profile.api._
-
+  private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
   private val actorTimeout = configuration.get[Int]("akka.actors.timeout").seconds
-
   private val cometActorSleepTime = configuration.get[Long]("akka.actors.cometActorSleepTime")
-
-  val mainAccountActor: ActorRef = actorSystem.actorOf(props = MainAccountActor.props(actorTimeout, actorSystem), name = constants.Module.ACTOR_MAIN_ACCOUNT)
-
   private[models] val accountTable = TableQuery[AccountTable]
 
   private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
@@ -102,7 +97,7 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     }
   }
 
-  private def deleteByAddress(address: String)= db.run(accountTable.filter(_.address === address).delete.asTry).map {
+  private def deleteByAddress(address: String) = db.run(accountTable.filter(_.address === address).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -137,9 +132,9 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
     def get(address: String): Account = Await.result(findByAddress(address), Duration.Inf)
 
-    def getCoins(address: String): Future[String] =getCoinsByAddress(address)
+    def getCoins(address: String): Future[String] = getCoinsByAddress(address)
 
-    def getDirtyAddresses: Future[Seq[String]] =getAddressesByDirtyBit(dirtyBit = true)
+    def getDirtyAddresses: Future[Seq[String]] = getAddressesByDirtyBit(dirtyBit = true)
 
     def markDirty(address: String): Future[Int] = updateDirtyBitByAddress(address, dirtyBit = true)
 
@@ -154,29 +149,32 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   object Utility {
 
-
-
-    def dirtyEntityUpdater() =  {
+    def dirtyEntityUpdater() = {
       val dirtyAddresses = Service.getDirtyAddresses
       Thread.sleep(sleepTime)
-      def refreshDirtyAndSendCometMessage(dirtyAddresses:Seq[String])={
 
-        Future.sequence{dirtyAddresses.map{dirtyAddress=>
-          val responseAccount = getAccount.Service.get(dirtyAddress)
-          val accountID=masterAccounts.Service.getId(dirtyAddress)
-          def refreshDirty(responseAccount:Response)=Service.refreshDirty(responseAccount.value.address, responseAccount.value.sequence, responseAccount.value.coins.get.filter(_.denom == denominationOfGasToken).map(_.amount).head)
-          for{
-            responseAccount<-responseAccount
-            _<-refreshDirty(responseAccount)
-            accountID<-accountID
-          }yield  mainAccountActor ! AccountCometMessage(username = accountID, message = Json.toJson(constants.Comet.PING))
-        }}
+      def refreshDirtyAndSendCometMessage(dirtyAddresses: Seq[String]) = {
+        Future.sequence {
+          dirtyAddresses.map { dirtyAddress =>
+            val responseAccount = getAccount.Service.get(dirtyAddress)
+            val accountID = masterAccounts.Service.getId(dirtyAddress)
+
+            def refreshDirty(responseAccount: Response) = Service.refreshDirty(responseAccount.value.address, responseAccount.value.sequence, responseAccount.value.coins.get.filter(_.denom == denominationOfGasToken).map(_.amount).head)
+
+            for {
+              responseAccount <- responseAccount
+              _ <- refreshDirty(responseAccount)
+              accountID <- accountID
+            } yield mainAccountActor ! AccountCometMessage(username = accountID, message = Json.toJson(constants.Comet.PING))
+          }
+        }
       }
+
       (for {
-        dirtyAddresses<-dirtyAddresses
-        _<- refreshDirtyAndSendCometMessage(dirtyAddresses)
-      }yield {}
-        ).recover{
+        dirtyAddresses <- dirtyAddresses
+        _ <- refreshDirtyAndSendCometMessage(dirtyAddresses)
+      } yield {}
+        ).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }(schedulerExecutionContext)
     }

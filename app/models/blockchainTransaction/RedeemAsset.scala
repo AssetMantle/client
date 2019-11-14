@@ -14,7 +14,7 @@ import slick.jdbc.JdbcProfile
 import transactions.responses.TransactionResponse.BlockResponse
 
 import scala.concurrent.duration._
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 case class RedeemAsset(from: String, to: String, pegHash: String, gas: Int, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None) extends BaseTransaction[RedeemAsset] {
@@ -28,15 +28,11 @@ class RedeemAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tr
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_REDEEM_ASSET
 
   private implicit val logger: Logger = Logger(this.getClass)
-
-  private val schedulerExecutionContext:ExecutionContext= actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
-
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
-
   val db = databaseConfig.db
+  private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
 
   import databaseConfig.profile.api._
-
   private[models] val redeemAssetTable = TableQuery[RedeemAssetTable]
   private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
   private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
@@ -150,7 +146,7 @@ class RedeemAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tr
 
   object Service {
 
-    def create(redeemAsset: RedeemAsset): Future[String] =add(RedeemAsset(from = redeemAsset.from, to = redeemAsset.to, pegHash = redeemAsset.pegHash, gas = redeemAsset.gas, status = redeemAsset.status, txHash = redeemAsset.txHash, ticketID = redeemAsset.ticketID, mode = redeemAsset.mode, code = redeemAsset.code))
+    def create(redeemAsset: RedeemAsset): Future[String] = add(RedeemAsset(from = redeemAsset.from, to = redeemAsset.to, pegHash = redeemAsset.pegHash, gas = redeemAsset.gas, status = redeemAsset.status, txHash = redeemAsset.txHash, ticketID = redeemAsset.ticketID, mode = redeemAsset.mode, code = redeemAsset.code))
 
     def markTransactionSuccessful(ticketID: String, txHash: String): Future[Int] = updateTxHashAndStatusOnTicketID(ticketID, Option(txHash), status = Option(true))
 
@@ -170,21 +166,22 @@ class RedeemAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tr
 
   object Utility {
 
-    def onSuccess(ticketID: String, blockResponse: BlockResponse): Future[Unit] =  {
-
-      val markTransactionSuccessful=Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
+    def onSuccess(ticketID: String, blockResponse: BlockResponse): Future[Unit] = {
+      val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
       val redeemAsset = Service.getTransaction(ticketID)
-      def markRedeemed(redeemAsset:RedeemAsset)=masterTransactionIssueAssetRequests.Service.markRedeemed(Option(redeemAsset.pegHash))
-      def markDirty(redeemAsset:RedeemAsset)={
-        val markDirtyPegHash=blockchainAssets.Service.markDirty(redeemAsset.pegHash)
-        val markDirtyFrom=blockchainAccounts.Service.markDirty(redeemAsset.from)
-        for{
-          _<-markDirtyPegHash
-          _<-markDirtyFrom
-        }yield {}
+
+      def markRedeemed(pegHash: String) = masterTransactionIssueAssetRequests.Service.markRedeemed(Option(redeemAsset.pegHash))
+
+      def markDirty(redeemAsset: RedeemAsset) = {
+        val markDirtyPegHash = blockchainAssets.Service.markDirty(redeemAsset.pegHash)
+        val markDirtyFrom = blockchainAccounts.Service.markDirty(redeemAsset.from)
+        for {
+          _ <- markDirtyPegHash
+          _ <- markDirtyFrom
+        } yield {}
       }
 
-      def getIDs(redeemAsset:RedeemAsset) = {
+      def getIDs(redeemAsset: RedeemAsset) = {
         val toAccountID = masterAccounts.Service.getId(redeemAsset.to)
         val fromAccountID = masterAccounts.Service.getId(redeemAsset.from)
         for {
@@ -192,27 +189,29 @@ class RedeemAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tr
           fromAccountID <- fromAccountID
         } yield (toAccountID, fromAccountID)
       }
-      (for{
-       _<-markTransactionSuccessful
-        redeemAsset<-redeemAsset
-       _<-markRedeemed(redeemAsset)
-        _<-markDirty(redeemAsset)
-       (toAccountID, fromAccountID) <- getIDs(redeemAsset)
-      }yield {
+
+      (for {
+        _ <- markTransactionSuccessful
+        redeemAsset <- redeemAsset
+        _ <- markRedeemed(redeemAsset.pegHash)
+        _ <- markDirty(redeemAsset)
+        (toAccountID, fromAccountID) <- getIDs(redeemAsset)
+      } yield {
         utilitiesNotification.send(toAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
         utilitiesNotification.send(fromAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
-      }).recover{
+      }).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
           throw new BaseException(constants.Response.PSQL_EXCEPTION)
       }
     }
 
-    def onFailure(ticketID: String, message: String): Future[Unit] =  {
-
-      val markTransactionFailed=Service.markTransactionFailed(ticketID, message)
+    def onFailure(ticketID: String, message: String): Future[Unit] = {
+      val markTransactionFailed = Service.markTransactionFailed(ticketID, message)
       val redeemAsset = Service.getTransaction(ticketID)
-      def markRedeemed(redeemAsset:RedeemAsset)=masterTransactionIssueAssetRequests.Service.markRedeemed(Option(redeemAsset.pegHash))
-      def getIDs(redeemAsset:RedeemAsset) = {
+
+      def markRedeemed(pegHash: String) = masterTransactionIssueAssetRequests.Service.markRedeemed(Option(pegHash))
+
+      def getIDs(redeemAsset: RedeemAsset) = {
         val toAccountID = masterAccounts.Service.getId(redeemAsset.to)
         val fromAccountID = masterAccounts.Service.getId(redeemAsset.from)
         for {
@@ -220,15 +219,16 @@ class RedeemAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tr
           fromAccountID <- fromAccountID
         } yield (toAccountID, fromAccountID)
       }
-      (for{
-        _<-markTransactionFailed
-        redeemAsset<-redeemAsset
-        _<-markRedeemed(redeemAsset)
+
+      (for {
+        _ <- markTransactionFailed
+        redeemAsset <- redeemAsset
+        _ <- markRedeemed(redeemAsset.pegHash)
         (toAccountID, fromAccountID) <- getIDs(redeemAsset)
-      }yield{
+      } yield {
         utilitiesNotification.send(fromAccountID, constants.Notification.FAILURE, message)
         utilitiesNotification.send(toAccountID, constants.Notification.FAILURE, message)
-      }).recover{
+      }).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
     }
