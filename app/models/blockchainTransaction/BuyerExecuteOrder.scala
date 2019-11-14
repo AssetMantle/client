@@ -192,7 +192,6 @@ class BuyerExecuteOrders @Inject()(actorSystem: ActorSystem, transaction: utilit
               _ <- markDirtyFromAddress
               id <- id
             } yield utilitiesNotification.send(id, constants.Notification.SUCCESS, blockResponse.txhash)
-
           } else Future {Unit}
         }
         for{

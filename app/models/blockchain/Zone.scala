@@ -140,10 +140,13 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
           dirtyZones.map { dirtyZone =>
             val responseAddress = getZone.Service.get(dirtyZone.id)
             def refreshDirty(responseAddress: queries.responses.ZoneResponse.Response) = Service.refreshDirty(dirtyZone.id, responseAddress.body)
-            for {
+            (for {
               responseAddress <- responseAddress
               _ <- refreshDirty(responseAddress)
             } yield {}
+              ).recover{
+              case baseException: BaseException => logger.error(baseException.failure.message, baseException)
+            }
           }
         }
       }

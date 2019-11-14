@@ -169,14 +169,6 @@ class ReleaseAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.T
   }
 
   object Utility {
-    def getIDs(releaseAsset:ReleaseAsset) = {
-      val toAccountID = masterAccounts.Service.getId(releaseAsset.to)
-      val fromAccountID = masterAccounts.Service.getId(releaseAsset.from)
-      for {
-        toAccountID <- toAccountID
-        fromAccountID <- fromAccountID
-      } yield (toAccountID, fromAccountID)
-    }
 
     def onSuccess(ticketID: String, blockResponse: BlockResponse): Future[Unit] = {
 
@@ -189,6 +181,14 @@ class ReleaseAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.T
           _<-markDirtyPegHash
           _<-markDirtyFrom
         }yield {}
+      }
+      def getIDs(releaseAsset:ReleaseAsset) = {
+        val toAccountID = masterAccounts.Service.getId(releaseAsset.to)
+        val fromAccountID = masterAccounts.Service.getId(releaseAsset.from)
+        for {
+          toAccountID <- toAccountID
+          fromAccountID <- fromAccountID
+        } yield (toAccountID, fromAccountID)
       }
       (for{
         _<-markTransactionSuccessful
@@ -208,6 +208,14 @@ class ReleaseAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.T
 
       val markTransactionFailed=Service.markTransactionFailed(ticketID, message)
       val releaseAsset = Service.getTransaction(ticketID)
+      def getIDs(releaseAsset:ReleaseAsset) = {
+        val toAccountID = masterAccounts.Service.getId(releaseAsset.to)
+        val fromAccountID = masterAccounts.Service.getId(releaseAsset.from)
+        for {
+          toAccountID <- toAccountID
+          fromAccountID <- fromAccountID
+        } yield (toAccountID, fromAccountID)
+      }
       (for{
         _<-markTransactionFailed
         releaseAsset<-releaseAsset

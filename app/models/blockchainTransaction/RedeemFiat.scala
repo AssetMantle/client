@@ -170,14 +170,7 @@ class RedeemFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Tra
   }
 
   object Utility {
-    def getIDs(redeemFiat:RedeemFiat) = {
-      val toAccountID = masterAccounts.Service.getId(redeemFiat.to)
-      val fromAccountID = masterAccounts.Service.getId(redeemFiat.from)
-      for {
-        toAccountID <- toAccountID
-        fromAccountID <- fromAccountID
-      } yield (toAccountID, fromAccountID)
-    }
+
     def onSuccess(ticketID: String, blockResponse: BlockResponse): Future[Unit] = {
 
       val markTransactionSuccessful=Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
@@ -189,6 +182,14 @@ class RedeemFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Tra
           _<-markDirtyBlockchainFiatsFrom
           _<-markDirtyBlockchainAccountsFrom
         }yield {}
+      }
+      def getIDs(redeemFiat:RedeemFiat) = {
+        val toAccountID = masterAccounts.Service.getId(redeemFiat.to)
+        val fromAccountID = masterAccounts.Service.getId(redeemFiat.from)
+        for {
+          toAccountID <- toAccountID
+          fromAccountID <- fromAccountID
+        } yield (toAccountID, fromAccountID)
       }
       (for{
         _<-markTransactionSuccessful
@@ -209,6 +210,14 @@ class RedeemFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Tra
 
       val markTransactionFailed=Service.markTransactionFailed(ticketID, message)
       val redeemFiat = Service.getTransaction(ticketID)
+      def getIDs(redeemFiat:RedeemFiat) = {
+        val toAccountID = masterAccounts.Service.getId(redeemFiat.to)
+        val fromAccountID = masterAccounts.Service.getId(redeemFiat.from)
+        for {
+          toAccountID <- toAccountID
+          fromAccountID <- fromAccountID
+        } yield (toAccountID, fromAccountID)
+      }
       (for{
         _<-markTransactionFailed
         redeemFiat<-redeemFiat

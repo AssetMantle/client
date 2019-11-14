@@ -154,45 +154,48 @@ class Orders @Inject()(shutdownActors: ShutdownActor, masterAccounts: master.Acc
       val dirtyOrders = Service.getDirtyOrders
       Thread.sleep(sleepTime)
 
-      def insertOrUpdateAsset(account:queries.responses.AccountResponse.Response,negotiation: Negotiation)=Future{account.value.assetPegWallet.foreach(assets => assets.foreach(asset => blockchainAssets.Service.insertOrUpdate(pegHash = asset.pegHash, documentHash = asset.documentHash, assetType = asset.assetType, assetQuantity = asset.assetQuantity, quantityUnit = asset.quantityUnit, assetPrice = asset.assetPrice, ownerAddress = negotiation.sellerAddress, moderated = asset.moderated, takerAddress = if (asset.takerAddress == "") None else Option(asset.takerAddress), locked = asset.locked, dirtyBit = true)))}
-      def insertOrUpdateFiat(account:queries.responses.AccountResponse.Response,negotiation: Negotiation)=Future{account.value.fiatPegWallet.foreach(fiats => fiats.foreach(fiatPeg => blockchainFiats.Service.insertOrUpdate(fiatPeg.pegHash, negotiation.sellerAddress, fiatPeg.transactionID, fiatPeg.transactionAmount, fiatPeg.redeemedAmount, dirtyBit = true)))}
-
       def insertOrUpdateAndSendCometMessage(dirtyOrders:Seq[Order])= {
         Future.sequence {
           dirtyOrders.map { dirtyOrder =>
 
             val orderResponse = getOrder.Service.get(dirtyOrder.id)
             val negotiation = blockchainNegotiations.Service.get(dirtyOrder.id)
-            def sellerOrBuyerInsertOrUpdateAssetsOrFiats(orderResponse:queries.responses.OrderResponse.Response,negotiation: Negotiation,dirtyOrder:Order)={
+            def sellerOrBuyerUpsertAssetsOrFiats(orderResponse:queries.responses.OrderResponse.Response,negotiation: Negotiation,dirtyOrder:Order)={
               if ((orderResponse.value.awbProofHash != "" && orderResponse.value.fiatProofHash != "") || (orderResponse.value.awbProofHash == "" && orderResponse.value.fiatProofHash == "")) {
 
                 val sellerAccount = getAccount.Service.get(negotiation.sellerAddress)
+                def insertOrUpdateSellerAccountAsset(sellerAccount:queries.responses.AccountResponse.Response)=Future{sellerAccount.value.assetPegWallet.foreach(assets => assets.foreach(asset => blockchainAssets.Service.insertOrUpdate(pegHash = asset.pegHash, documentHash = asset.documentHash, assetType = asset.assetType, assetQuantity = asset.assetQuantity, quantityUnit = asset.quantityUnit, assetPrice = asset.assetPrice, ownerAddress = negotiation.sellerAddress, moderated = asset.moderated, takerAddress = if (asset.takerAddress == "") None else Option(asset.takerAddress), locked = asset.locked, dirtyBit = true)))}
+                def insertOrUpdateSellerAccountFiat(sellerAccount:queries.responses.AccountResponse.Response)=Future{sellerAccount.value.fiatPegWallet.foreach(fiats => fiats.foreach(fiatPeg => blockchainFiats.Service.insertOrUpdate(fiatPeg.pegHash, negotiation.sellerAddress, fiatPeg.transactionID, fiatPeg.transactionAmount, fiatPeg.redeemedAmount, dirtyBit = true)))}
+
                 val buyerAccount= getAccount.Service.get(negotiation.buyerAddress)
+                def insertOrUpdateBuyerAccountAsset(buyerAccount:queries.responses.AccountResponse.Response)=Future{buyerAccount.value.assetPegWallet.foreach(assets => assets.foreach(asset => blockchainAssets.Service.insertOrUpdate(pegHash = asset.pegHash, documentHash = asset.documentHash, assetType = asset.assetType, assetQuantity = asset.assetQuantity, quantityUnit = asset.quantityUnit, assetPrice = asset.assetPrice, ownerAddress = negotiation.buyerAddress, moderated = asset.moderated, takerAddress = if (asset.takerAddress == "") None else Option(asset.takerAddress), locked = asset.locked, dirtyBit = true)))}
+                def insertOrUpdateBuyerAccountFiat(buyerAccount:queries.responses.AccountResponse.Response)=Future{buyerAccount.value.fiatPegWallet.foreach(fiats => fiats.foreach(fiatPeg => blockchainFiats.Service.insertOrUpdate(fiatPeg.pegHash, negotiation.buyerAddress, fiatPeg.transactionID, fiatPeg.transactionAmount, fiatPeg.redeemedAmount, dirtyBit = true)))}
+
                 def deleteFiatPegWallet=blockchainFiats.Service.deleteFiatPegWallet(dirtyOrder.id)
                 for{
                   sellerAccount<-sellerAccount
-                  _<- insertOrUpdateAsset(sellerAccount,negotiation)
-                  _<- insertOrUpdateFiat(sellerAccount,negotiation)
+                  _<- insertOrUpdateSellerAccountAsset(sellerAccount)
+                  _<- insertOrUpdateSellerAccountFiat(sellerAccount)
                   buyerAccount<-buyerAccount
-                  _<- insertOrUpdateAsset(buyerAccount,negotiation)
-                  _<- insertOrUpdateFiat(buyerAccount,negotiation)
+                  _<- insertOrUpdateBuyerAccountAsset(buyerAccount)
+                  _<- insertOrUpdateBuyerAccountFiat(buyerAccount)
                   _<- deleteFiatPegWallet
                 }yield {}
               }else Future{Unit}
             }
-            def createTraderFeedbackHistories(orderResponse:queries.responses.OrderResponse.Response,negotiation: Negotiation)={
+            def insertOrUpdateTraderFeedbackHistories(orderResponse:queries.responses.OrderResponse.Response,negotiation: Negotiation)={
               if (orderResponse.value.awbProofHash != "" && orderResponse.value.fiatProofHash != "") {
                 val insertOrUpdateSellerFeedbackHistories=blockchainTraderFeedbackHistories.Service.insertOrUpdate(negotiation.sellerAddress, negotiation.buyerAddress, negotiation.sellerAddress, negotiation.assetPegHash, rating = "")
                 val insertOrUpdateBuyerFeedbackHistories=blockchainTraderFeedbackHistories.Service.insertOrUpdate(negotiation.buyerAddress, negotiation.buyerAddress, negotiation.sellerAddress, negotiation.assetPegHash, rating = "")
                 //TODO Remove update of masterTransaction/IssueAssetRequest accountID and show assets from trader Index via blockchain
                 val id=masterAccounts.Service.getId(negotiation.buyerAddress)
-                def updateAccountIDAndMarkListedForTradeByPegHash(id:String)=masterTransactionIssueAssetRequests.Service.updateAccountIDAndMarkListedForTradeByPegHash(Option(negotiation.assetPegHash), id)
+                def updateAccountIDAndMarkTradeCompletedByPegHash(id:String)=masterTransactionIssueAssetRequests.Service.updateAccountIDAndMarkTradeCompleted(Option(negotiation.assetPegHash), id)
                 def deleteNegotiations=blockchainNegotiations.Service.deleteNegotiations(negotiation.assetPegHash)
                 for{
                   _<-insertOrUpdateSellerFeedbackHistories
                   _<-insertOrUpdateBuyerFeedbackHistories
                   id<-id
-                  _<-updateAccountIDAndMarkListedForTradeByPegHash(id)
+                  _<-updateAccountIDAndMarkTradeCompletedByPegHash(id)
                   _<-deleteNegotiations
                 }yield{}
               }else Future{Unit}
@@ -208,16 +211,18 @@ class Orders @Inject()(shutdownActors: ShutdownActor, masterAccounts: master.Acc
               } yield (buyerAddressID, sellerAddressID)
             }
 
-            for {
+            (for {
               orderResponse <- orderResponse
               negotiation <- negotiation
-              _ <- sellerOrBuyerInsertOrUpdateAssetsOrFiats(orderResponse, negotiation, dirtyOrder)
-              _ <- createTraderFeedbackHistories(orderResponse, negotiation)
+              _ <- sellerOrBuyerUpsertAssetsOrFiats(orderResponse, negotiation, dirtyOrder)
+              _ <- insertOrUpdateTraderFeedbackHistories(orderResponse, negotiation)
               _ <- insertOrUpdateOrder(orderResponse)
               (buyerAddressID, sellerAddressID) <- ids(negotiation)
             } yield {
               mainOrderActor ! OrderCometMessage(username = buyerAddressID, message = Json.toJson(constants.Comet.PING))
               mainOrderActor ! OrderCometMessage(username = sellerAddressID, message = Json.toJson(constants.Comet.PING))
+            }).recover{
+              case baseException: BaseException => logger.error(baseException.failure.message, baseException)
             }
           }
         }

@@ -180,14 +180,7 @@ class SendCoins @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
   }
 
   object Utility {
-    def getIDs(sendCoin:SendCoin) = {
-      val toAccountID = masterAccounts.Service.getId(sendCoin.to)
-      val fromAccountID = masterAccounts.Service.getId(sendCoin.from)
-      for {
-        toAccountID <- toAccountID
-        fromAccountID <- fromAccountID
-      } yield (toAccountID, fromAccountID)
-    }
+
 
     def onSuccess(ticketID: String, blockResponse: BlockResponse) = {
 
@@ -228,6 +221,14 @@ class SendCoins @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
 
       val markTransactionFailed=Service.markTransactionFailed(ticketID, message)
       val sendCoin = Service.getTransaction(ticketID)
+      def getIDs(sendCoin:SendCoin) = {
+        val toAccountID = masterAccounts.Service.getId(sendCoin.to)
+        val fromAccountID = masterAccounts.Service.getId(sendCoin.from)
+        for {
+          toAccountID <- toAccountID
+          fromAccountID <- fromAccountID
+        } yield (toAccountID, fromAccountID)
+      }
       (for{
         _<-markTransactionFailed
         sendCoin<-sendCoin

@@ -231,26 +231,24 @@ class Negotiations @Inject()(shutdownActors: ShutdownActor, masterAccounts: mast
               } yield (sellerAddressID, buyerAddressID)
             }
 
-            for {
+            (for {
               negotiationResponse <- negotiationResponse
               _ <- refreshDirty(negotiationResponse)
               (sellerAddressID, buyerAddressID) <- getIDs(dirtyNegotiation)
             } yield {
               mainNegotiationActor ! NegotiationCometMessage(username = sellerAddressID, message = Json.toJson(constants.Comet.PING))
               mainNegotiationActor ! NegotiationCometMessage(username = buyerAddressID, message = Json.toJson(constants.Comet.PING))
+            }).recover{
+              case baseException: BaseException => logger.error(baseException.failure.message, baseException)
             }
           }
         }
       }
-
       for {
         dirtyNegotiations <- dirtyNegotiations
         _ <- refreshDirtyAndSendCometMessage(dirtyNegotiations)
       } yield {}
-
     }
-
-
   }
 
   actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {

@@ -181,23 +181,6 @@ class SendAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
 
     def onSuccess(ticketID: String, blockResponse: BlockResponse) = {
 
-      val markTransactionSuccessfulAndGetNegotiationID={
-        val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
-        val sendAsset = Service.getTransaction(ticketID)
-        def getNegotiationID(sendAsset: SendAsset) = blockchainNegotiations.Service.getNegotiationID(buyerAddress = sendAsset.to, sellerAddress = sendAsset.from, pegHash = sendAsset.pegHash)
-
-        def insertOrUpdate(negotiationID: String) = blockchainOrders.Service.insertOrUpdate(id = negotiationID, None, None, dirtyBit = true)
-
-        for{
-          _ <- markTransactionSuccessful
-          sendAsset <- sendAsset
-          negotiationID <- getNegotiationID(sendAsset)
-          _ <- insertOrUpdate(negotiationID)
-        }yield {
-          Thread.sleep(sleepTime)
-          (sendAsset,negotiationID)
-        }
-      }
       val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
       val sendAsset = Service.getTransaction(ticketID)
       def getNegotiationID(sendAsset: SendAsset) = blockchainNegotiations.Service.getNegotiationID(buyerAddress = sendAsset.to, sellerAddress = sendAsset.from, pegHash = sendAsset.pegHash)

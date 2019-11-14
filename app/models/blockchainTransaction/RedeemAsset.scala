@@ -170,11 +170,11 @@ class RedeemAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tr
 
   object Utility {
 
-
     def onSuccess(ticketID: String, blockResponse: BlockResponse): Future[Unit] =  {
 
       val markTransactionSuccessful=Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
       val redeemAsset = Service.getTransaction(ticketID)
+      def markRedeemed(redeemAsset:RedeemAsset)=masterTransactionIssueAssetRequests.Service.markRedeemed(Option(redeemAsset.pegHash))
       def markDirty(redeemAsset:RedeemAsset)={
         val markDirtyPegHash=blockchainAssets.Service.markDirty(redeemAsset.pegHash)
         val markDirtyFrom=blockchainAccounts.Service.markDirty(redeemAsset.from)
@@ -195,6 +195,7 @@ class RedeemAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tr
       (for{
        _<-markTransactionSuccessful
         redeemAsset<-redeemAsset
+       _<-markRedeemed(redeemAsset)
         _<-markDirty(redeemAsset)
        (toAccountID, fromAccountID) <- getIDs(redeemAsset)
       }yield {

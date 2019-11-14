@@ -108,13 +108,13 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
   def zoneAccessedOrganizationKYCFile(organizationID: String, fileName: String, documentType: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
 
-      val masterOrganizationsZoneID=masterOrganizations.Service.getZoneID(organizationID)
-      val masterZonesZoneID=masterZones.Service.getID(loginState.username)
+      val organizationZoneID=masterOrganizations.Service.getZoneID(organizationID)
+      val userZoneID=masterZones.Service.getID(loginState.username)
       (for{
-        masterOrganizationsZoneID<-masterOrganizationsZoneID
-        masterZonesZoneID<-masterZonesZoneID
+        organizationZoneID<-organizationZoneID
+        userZoneID<-userZoneID
       }yield {
-        if (masterOrganizationsZoneID == masterZonesZoneID) {
+        if (organizationZoneID == userZoneID) {
           Ok.sendFile(utilities.FileOperations.fetchFile(path = fileResourceManager.getOrganizationKYCFilePath(documentType), fileName = fileName))
         } else {
           Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
@@ -228,13 +228,12 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
             case None => withUsernameToken.PartialContent(views.html.component.master.issueAssetInvoice(views.companion.master.IssueAssetInvoice.form.fill(views.companion.master.IssueAssetInvoice.Data(issueAssetRequestID, "", new Date)), optionAssetFile))
               }
           }
-
         case constants.File.CONTRACT | constants.File.PACKING_LIST | constants.File.COO | constants.File.COA | constants.File.OTHER =>
           val documents=masterTransactionAssetFiles.Service.getDocuments(issueAssetRequestID, constants.File.TRADER_ASSET_DOCUMENT_TYPES_UPLOAD_PAGE)
           for{
             documents<-documents
-          }yield PartialContent(views.html.component.master.issueAssetDocument(issueAssetRequestID,documents))
-        case _ => Future{Ok(views.html.index())}
+          }yield withUsernameToken.PartialContent(views.html.component.master.issueAssetDocument(issueAssetRequestID,documents))
+        case _ => Future{withUsernameToken.Ok(views.html.index())}
       }
     }
       (for{
@@ -268,8 +267,8 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
             optionAssetFile <- optionAssetFile
           } yield {
             assetFile.documentContent match {
-              case Some(oblContent: Serializable.OBL) => withUsernameToken.PartialContent(views.html.component.master.issueAssetOBL(views.companion.master.IssueAssetOBL.form.fill(views.companion.master.IssueAssetOBL.Data(issueAssetRequestID, oblContent.billOfLadingID, oblContent.portOfLoading, oblContent.shipperName, oblContent.shipperAddress, oblContent.notifyPartyName, oblContent.notifyPartyAddress, oblContent.dateOfShipping, oblContent.deliveryTerm, oblContent.weightOfConsignment, oblContent.declaredAssetValue)), optionAssetFile))
-              case None => withUsernameToken.PartialContent(views.html.component.master.issueAssetOBL(views.companion.master.IssueAssetOBL.form.fill(views.companion.master.IssueAssetOBL.Data(issueAssetRequestID, "", "", "", "", "", "", new Date, "", 0, 0)), optionAssetFile))
+              case Some(invoiceContent: Serializable.Invoice) => withUsernameToken.PartialContent(views.html.component.master.issueAssetInvoice(views.companion.master.IssueAssetInvoice.form.fill(views.companion.master.IssueAssetInvoice.Data(issueAssetRequestID, invoiceContent.invoiceNumber, invoiceContent.invoiceDate)), optionAssetFile))
+              case None => withUsernameToken.PartialContent(views.html.component.master.issueAssetInvoice(views.companion.master.IssueAssetInvoice.form.fill(views.companion.master.IssueAssetInvoice.Data(issueAssetRequestID, "", new Date)), optionAssetFile))
             }
           }
         case constants.File.INVOICE =>
@@ -291,7 +290,7 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
               } yield withUsernameToken.PartialContent(views.html.component.master.issueAssetDocument(issueAssetRequestID, documents))
 
         case _ => Future {
-              Ok(views.html.index())
+          withUsernameToken.Ok(views.html.index())
             }
       }
     }
@@ -352,24 +351,23 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
               optionNegotiationFiles<-optionNegotiationFiles
             }yield withUsernameToken.PartialContent(views.html.component.master.confirmBuyerBidDocument(optionNegotiationFiles, negotiationRequestID, constants.File.BUYER_CONTRACT))
           case constants.File.SELLER_CONTRACT =>
-            val optionNegotiationFiles=masterTransactionNegotiationFiles.Service.getOrNone(negotiationRequestID, constants.File.BUYER_CONTRACT)
+            val optionNegotiationFiles=masterTransactionNegotiationFiles.Service.getOrNone(negotiationRequestID, constants.File.SELLER_CONTRACT)
             for{
               optionNegotiationFiles<-optionNegotiationFiles
             }yield withUsernameToken.PartialContent(views.html.component.master.confirmSellerBidDocument(optionNegotiationFiles, negotiationRequestID, constants.File.SELLER_CONTRACT))
           case constants.File.FIAT_PROOF =>
-            val optionNegotiationFiles=masterTransactionNegotiationFiles.Service.getOrNone(negotiationRequestID, constants.File.BUYER_CONTRACT)
+            val optionNegotiationFiles=masterTransactionNegotiationFiles.Service.getOrNone(negotiationRequestID, constants.File.FIAT_PROOF)
             for{
               optionNegotiationFiles<-optionNegotiationFiles
             }yield withUsernameToken.PartialContent(views.html.component.master.buyerExecuteOrderDocument(optionNegotiationFiles, negotiationRequestID, constants.File.FIAT_PROOF))
           case constants.File.AWB_PROOF =>
-            val optionNegotiationFiles=masterTransactionNegotiationFiles.Service.getOrNone(negotiationRequestID, constants.File.BUYER_CONTRACT)
+            val optionNegotiationFiles=masterTransactionNegotiationFiles.Service.getOrNone(negotiationRequestID, constants.File.AWB_PROOF)
             for{
               optionNegotiationFiles<-optionNegotiationFiles
             }yield withUsernameToken.PartialContent(views.html.component.master.sellerExecuteOrderDocument(optionNegotiationFiles, negotiationRequestID, constants.File.AWB_PROOF))
           case _ => Future{withUsernameToken.Ok(views.html.index())}
         }
       }
-      val optionNegotiationFiles=masterTransactionNegotiationFiles.Service.getOrNone(negotiationRequestID, constants.File.BUYER_CONTRACT)
       (for{
         _<-storeFile
         result<-getResult
@@ -399,17 +397,17 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
               optionNegotiationFiles<-optionNegotiationFiles
             }yield withUsernameToken.PartialContent(views.html.component.master.confirmBuyerBidDocument(optionNegotiationFiles, negotiationRequestID, constants.File.BUYER_CONTRACT))
           case constants.File.SELLER_CONTRACT =>
-            val optionNegotiationFiles=masterTransactionNegotiationFiles.Service.getOrNone(negotiationRequestID, constants.File.BUYER_CONTRACT)
+            val optionNegotiationFiles=masterTransactionNegotiationFiles.Service.getOrNone(negotiationRequestID, constants.File.SELLER_CONTRACT)
             for{
               optionNegotiationFiles<-optionNegotiationFiles
             }yield withUsernameToken.PartialContent(views.html.component.master.confirmSellerBidDocument(optionNegotiationFiles, negotiationRequestID, constants.File.SELLER_CONTRACT))
           case constants.File.FIAT_PROOF =>
-            val optionNegotiationFiles=masterTransactionNegotiationFiles.Service.getOrNone(negotiationRequestID, constants.File.BUYER_CONTRACT)
+            val optionNegotiationFiles=masterTransactionNegotiationFiles.Service.getOrNone(negotiationRequestID, constants.File.FIAT_PROOF)
             for{
               optionNegotiationFiles<-optionNegotiationFiles
             }yield withUsernameToken.PartialContent(views.html.component.master.buyerExecuteOrderDocument(optionNegotiationFiles, negotiationRequestID, constants.File.FIAT_PROOF))
           case constants.File.AWB_PROOF =>
-            val optionNegotiationFiles=masterTransactionNegotiationFiles.Service.getOrNone(negotiationRequestID, constants.File.BUYER_CONTRACT)
+            val optionNegotiationFiles=masterTransactionNegotiationFiles.Service.getOrNone(negotiationRequestID, constants.File.AWB_PROOF)
             for{
               optionNegotiationFiles<-optionNegotiationFiles
             }yield withUsernameToken.PartialContent(views.html.component.master.sellerExecuteOrderDocument(optionNegotiationFiles, negotiationRequestID, constants.File.AWB_PROOF))
@@ -474,17 +472,17 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
               optionNegotiationFiles<-optionNegotiationFiles
             }yield withUsernameToken.PartialContent(views.html.component.master.confirmBuyerBidDocument(optionNegotiationFiles, negotiationRequestID, constants.File.BUYER_CONTRACT))
           case constants.File.SELLER_CONTRACT =>
-            val optionNegotiationFiles=masterTransactionNegotiationFiles.Service.getOrNone(negotiationRequestID, constants.File.BUYER_CONTRACT)
+            val optionNegotiationFiles=masterTransactionNegotiationFiles.Service.getOrNone(negotiationRequestID, constants.File.SELLER_CONTRACT)
             for{
               optionNegotiationFiles<-optionNegotiationFiles
             }yield withUsernameToken.PartialContent(views.html.component.master.confirmSellerBidDocument(optionNegotiationFiles, negotiationRequestID, constants.File.SELLER_CONTRACT))
           case constants.File.FIAT_PROOF =>
-            val optionNegotiationFiles=masterTransactionNegotiationFiles.Service.getOrNone(negotiationRequestID, constants.File.BUYER_CONTRACT)
+            val optionNegotiationFiles=masterTransactionNegotiationFiles.Service.getOrNone(negotiationRequestID, constants.File.FIAT_PROOF)
             for{
               optionNegotiationFiles<-optionNegotiationFiles
-            }yield withUsernameToken.PartialContent(views.html.component.master.confirmSellerBidDocument(optionNegotiationFiles, negotiationRequestID, constants.File.SELLER_CONTRACT))
+            }yield withUsernameToken.PartialContent(views.html.component.master.moderatedBuyerExecuteOrderDocument(optionNegotiationFiles, negotiationRequestID, constants.File.FIAT_PROOF))
           case constants.File.AWB_PROOF =>
-            val optionNegotiationFiles=masterTransactionNegotiationFiles.Service.getOrNone(negotiationRequestID, constants.File.BUYER_CONTRACT)
+            val optionNegotiationFiles=masterTransactionNegotiationFiles.Service.getOrNone(negotiationRequestID, constants.File.AWB_PROOF)
             for{
               optionNegotiationFiles<-optionNegotiationFiles
             }yield withUsernameToken.PartialContent(views.html.component.master.moderatedSellerExecuteOrderDocument(optionNegotiationFiles, negotiationRequestID, constants.File.AWB_PROOF))
@@ -594,12 +592,12 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
     implicit request =>
 
       val userZoneID=masterZones.Service.getID(loginState.username)
-      val issueAssetRequestID=masterTransactionIssueAssetRequests.Service.getAccountID(id)
-       def traderZoneID(issueAssetRequestID:String)= masterTraders.Service.getZoneIDByAccountID(issueAssetRequestID)
+      val accountID=masterTransactionIssueAssetRequests.Service.getAccountID(id)
+       def traderZoneID(accountID:String)= masterTraders.Service.getZoneIDByAccountID(accountID)
       (for{
         userZoneID<-userZoneID
-        issueAssetRequestID<-issueAssetRequestID
-        traderZoneID<-traderZoneID(issueAssetRequestID)
+        accountID<-accountID
+        traderZoneID<-traderZoneID(accountID)
       }yield {
         if (traderZoneID == userZoneID) {
           Ok.sendFile(utilities.FileOperations.fetchFile(path = fileResourceManager.getTraderAssetFilePath(documentType), fileName = fileName))

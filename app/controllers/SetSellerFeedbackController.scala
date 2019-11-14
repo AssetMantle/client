@@ -31,7 +31,6 @@ class SetSellerFeedbackController @Inject()(messagesControllerComponents: Messag
           Future{BadRequest(views.html.component.master.setSellerFeedback(formWithErrors, buyerAddress = formWithErrors.data(constants.FormField.BUYER_ADDRESS.name), pegHash = formWithErrors.data(constants.FormField.PEG_HASH.name)))}
         },
         setSellerFeedbackData => {
-
           val transactionProcess=transaction.process[blockchainTransaction.SetSellerFeedback, transactionsSetSellerFeedback.Request](
             entity = blockchainTransaction.SetSellerFeedback(from = loginState.address, to = setSellerFeedbackData.buyerAddress, pegHash = setSellerFeedbackData.pegHash, rating = setSellerFeedbackData.rating, gas = setSellerFeedbackData.gas, ticketID = "", mode = transactionMode),
             blockchainTransactionCreate = blockchainTransactionSetSellerFeedbacks.Service.create,

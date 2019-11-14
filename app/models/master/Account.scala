@@ -237,7 +237,7 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
     def updateStatusUnverifiedContact(id: String): Future[Int] = updateStatusById(id, constants.Status.Account.CONTACT_UNVERIFIED)
 
-    def updateStatusUnverifiedMobile(id: String): Int = Await.result(updateStatusById(id, constants.Status.Account.MOBILE_NUMBER_UNVERIFIED), Duration.Inf)
+    def updateStatusUnverifiedMobile(id: String): Future[Int] = updateStatusById(id, constants.Status.Account.MOBILE_NUMBER_UNVERIFIED)
 
     def updateStatusUnverifiedEmail(id: String): Future[Int] = updateStatusById(id, constants.Status.Account.EMAIL_ADDRESS_UNVERIFIED)
 

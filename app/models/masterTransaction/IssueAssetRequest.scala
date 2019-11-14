@@ -233,9 +233,11 @@ class IssueAssetRequests @Inject()(protected val databaseConfigProvider: Databas
 
     def updateAccountIDAndMarkListedForTradeByPegHash(pegHash: Option[String], accountID: String) :Future[Int] = updateStatusAndAccountIDByPegHash(pegHash = pegHash, accountID = accountID, status = constants.Status.Asset.LISTED_FOR_TRADE)
 
+    def updateAccountIDAndMarkTradeCompleted(pegHash: Option[String], accountID: String) :Future[Int] = updateStatusAndAccountIDByPegHash(pegHash = pegHash, accountID = accountID, status = constants.Status.Asset.COMPLETED_TRADE)
+
     def getPendingIssueAssetRequests(accountIDs: Seq[String], status: String): Future[Seq[IssueAssetRequest]] = getIssueAssetRequestsWithStatus(accountIDs, status).map(_.map(_.deSerialize))
 
-    def getTraderAssetList(accountID: String): Future[Seq[IssueAssetRequest]] = findIssueAssetsByAccountIDAndStatus(accountID, Seq(constants.Status.Asset.INCOMPLETE_DETAILS, constants.Status.Asset.REQUESTED, constants.Status.Asset.LISTED_FOR_TRADE, constants.Status.Asset.UNDER_NEGOTIATION)).map(_.map(_.deSerialize))
+    def getTraderAssetList(accountID: String): Future[Seq[IssueAssetRequest]] = findIssueAssetsByAccountIDAndStatus(accountID, Seq(constants.Status.Asset.INCOMPLETE_DETAILS, constants.Status.Asset.REQUESTED, constants.Status.Asset.LISTED_FOR_TRADE, constants.Status.Asset.UNDER_NEGOTIATION,constants.Status.Asset.COMPLETED_TRADE)).map(_.map(_.deSerialize))
 
     def getMarketAssets(): Future[Seq[IssueAssetRequest]] =getAssetsByStatuses(Seq(constants.Status.Asset.LISTED_FOR_TRADE, constants.Status.Asset.UNDER_NEGOTIATION)).map(_.map(_.deSerialize))
 

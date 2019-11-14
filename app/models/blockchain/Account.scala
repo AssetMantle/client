@@ -167,8 +167,8 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
           def refreshDirty(responseAccount:Response)=Service.refreshDirty(responseAccount.value.address, responseAccount.value.sequence, responseAccount.value.coins.get.filter(_.denom == denominationOfGasToken).map(_.amount).head)
           for{
             responseAccount<-responseAccount
-            accountID<-accountID
             _<-refreshDirty(responseAccount)
+            accountID<-accountID
           }yield  mainAccountActor ! AccountCometMessage(username = accountID, message = Json.toJson(constants.Comet.PING))
         }}
       }

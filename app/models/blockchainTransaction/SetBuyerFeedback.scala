@@ -171,14 +171,6 @@ class SetBuyerFeedbacks @Inject()(actorSystem: ActorSystem, transaction: utiliti
   }
 
   object Utility {
-    def getIDs(setBuyerFeedback:SetBuyerFeedback) = {
-      val toAccountID = masterAccounts.Service.getId(setBuyerFeedback.to)
-      val fromAccountID = masterAccounts.Service.getId(setBuyerFeedback.from)
-      for {
-        toAccountID <- toAccountID
-        fromAccountID <- fromAccountID
-      } yield (toAccountID, fromAccountID)
-    }
 
     def onSuccess(ticketID: String, blockResponse: BlockResponse): Future[Unit] =  {
 
@@ -191,6 +183,14 @@ class SetBuyerFeedbacks @Inject()(actorSystem: ActorSystem, transaction: utiliti
           _<-update
           _<-markDirtyFrom
         }yield{}
+      }
+      def getIDs(setBuyerFeedback:SetBuyerFeedback) = {
+        val toAccountID = masterAccounts.Service.getId(setBuyerFeedback.to)
+        val fromAccountID = masterAccounts.Service.getId(setBuyerFeedback.from)
+        for {
+          toAccountID <- toAccountID
+          fromAccountID <- fromAccountID
+        } yield (toAccountID, fromAccountID)
       }
       (for{
         _<-markTransactionSuccessful
@@ -211,6 +211,14 @@ class SetBuyerFeedbacks @Inject()(actorSystem: ActorSystem, transaction: utiliti
 
       val markTransactionFailed= Service.markTransactionFailed(ticketID, message)
       val setBuyerFeedback = Service.getTransaction(ticketID)
+      def getIDs(setBuyerFeedback:SetBuyerFeedback) = {
+        val toAccountID = masterAccounts.Service.getId(setBuyerFeedback.to)
+        val fromAccountID = masterAccounts.Service.getId(setBuyerFeedback.from)
+        for {
+          toAccountID <- toAccountID
+          fromAccountID <- fromAccountID
+        } yield (toAccountID, fromAccountID)
+      }
       for{
         _<-markTransactionFailed
         setBuyerFeedback<-setBuyerFeedback

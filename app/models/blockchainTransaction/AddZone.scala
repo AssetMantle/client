@@ -172,7 +172,7 @@ class AddZones @Inject()(actorSystem: ActorSystem, transaction: utilities.Transa
 
       val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
       val addZone = Service.getTransaction(ticketID)
-      def getResult(addZone:AddZone)={
+      def createZoneAndSendNotification(addZone:AddZone)={
         val create=blockchainZones.Service.create(addZone.zoneID, addZone.to, dirtyBit = true)
         val verifyZone=masterZones.Service.verifyZone(addZone.zoneID)
 
@@ -201,7 +201,7 @@ class AddZones @Inject()(actorSystem: ActorSystem, transaction: utilities.Transa
       (for{
         _<- markTransactionSuccessful
         addZone <- addZone
-        result<- getResult(addZone)
+        result<- createZoneAndSendNotification(addZone)
       } yield result).recover{
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
           throw new BaseException(constants.Response.PSQL_EXCEPTION)

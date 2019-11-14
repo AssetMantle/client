@@ -172,22 +172,7 @@ class SetSellerFeedbacks @Inject()(actorSystem: ActorSystem, transaction: utilit
   }
 
   object Utility {
-    def getIDs(setSellerFeedback:SetSellerFeedback) = {
-      val toAccountID = masterAccounts.Service.getId(setSellerFeedback.to)
-      val fromAccountID = masterAccounts.Service.getId(setSellerFeedback.from)
-      for {
-        toAccountID <- toAccountID
-        fromAccountID <- fromAccountID
-      } yield (toAccountID, fromAccountID)
-    }
-    def addresses(setSellerFeedback:SetSellerFeedback)={
-      val to=masterAccounts.Service.getId(setSellerFeedback.to)
-      val from=masterAccounts.Service.getId(setSellerFeedback.from)
-      for{
-        to<-to
-        from<-from
-      }yield (to,from)
-    }
+
 
     def onSuccess(ticketID: String, blockResponse: BlockResponse): Future[Unit] = {
 
@@ -200,6 +185,14 @@ class SetSellerFeedbacks @Inject()(actorSystem: ActorSystem, transaction: utilit
           _<-update
           _<-markDirtyFrom
         }yield{}
+      }
+      def getIDs(setSellerFeedback:SetSellerFeedback) = {
+        val toAccountID = masterAccounts.Service.getId(setSellerFeedback.to)
+        val fromAccountID = masterAccounts.Service.getId(setSellerFeedback.from)
+        for {
+          toAccountID <- toAccountID
+          fromAccountID <- fromAccountID
+        } yield (toAccountID, fromAccountID)
       }
       (for{
         _<-markTransactionSuccessful
@@ -220,6 +213,14 @@ class SetSellerFeedbacks @Inject()(actorSystem: ActorSystem, transaction: utilit
 
       val markTransactionFailed= Service.markTransactionFailed(ticketID, message)
       val setSellerFeedback = Service.getTransaction(ticketID)
+      def getIDs(setSellerFeedback:SetSellerFeedback) = {
+        val toAccountID = masterAccounts.Service.getId(setSellerFeedback.to)
+        val fromAccountID = masterAccounts.Service.getId(setSellerFeedback.from)
+        for {
+          toAccountID <- toAccountID
+          fromAccountID <- fromAccountID
+        } yield (toAccountID, fromAccountID)
+      }
       for{
         _<-markTransactionFailed
         setSellerFeedback<-setSellerFeedback

@@ -174,14 +174,6 @@ class SellerExecuteOrders @Inject()(actorSystem: ActorSystem, transaction: utili
   }
 
   object Utility {
-    def getIDs(sellerExecuteOrder:SellerExecuteOrder) = {
-      val sellerAddressID = masterAccounts.Service.getId(sellerExecuteOrder.sellerAddress)
-      val buyerAddressID = masterAccounts.Service.getId(sellerExecuteOrder.buyerAddress)
-      for {
-        sellerAddressID <- sellerAddressID
-        buyerAddressID <- buyerAddressID
-      } yield (sellerAddressID, buyerAddressID)
-    }
 
     def onSuccess(ticketID: String, blockResponse: BlockResponse): Future[Unit] =  {
 
@@ -210,6 +202,14 @@ class SellerExecuteOrders @Inject()(actorSystem: ActorSystem, transaction: utili
           _<-markDirtySellerAddressTransactionFeedbacks
           _<- markDirtyFromAddress
         }yield {}
+      }
+      def getIDs(sellerExecuteOrder:SellerExecuteOrder) = {
+        val sellerAddressID = masterAccounts.Service.getId(sellerExecuteOrder.sellerAddress)
+        val buyerAddressID = masterAccounts.Service.getId(sellerExecuteOrder.buyerAddress)
+        for {
+          sellerAddressID <- sellerAddressID
+          buyerAddressID <- buyerAddressID
+        } yield (sellerAddressID, buyerAddressID)
       }
       (for{
         _<-markTransactionSuccessful
@@ -249,6 +249,14 @@ class SellerExecuteOrders @Inject()(actorSystem: ActorSystem, transaction: utili
           _<-markDirtySellerAddress
           _<- markDirtyFromAddress
         }yield{}
+      }
+      def getIDs(sellerExecuteOrder:SellerExecuteOrder) = {
+        val sellerAddressID = masterAccounts.Service.getId(sellerExecuteOrder.sellerAddress)
+        val buyerAddressID = masterAccounts.Service.getId(sellerExecuteOrder.buyerAddress)
+        for {
+          sellerAddressID <- sellerAddressID
+          buyerAddressID <- buyerAddressID
+        } yield (sellerAddressID, buyerAddressID)
       }
       (for{
         _<- markTransactionFailed

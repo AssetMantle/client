@@ -212,7 +212,7 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
       val masterTransactionAssets = masterTransactionIssueAssetRequests.Service.getMarketAssets()
       val allOrderIDs = blockchainOrders.Service.getAllOrderIds
 
-      def blockchainAssetList(allOrderIDs: Seq[String]) = blockchainAssets.Service.getAllPublic(allOrderIDs)
+      def blockchainAssetList(allOrderID2s: Seq[String]) = blockchainAssets.Service.getAllPublic(allOrderID2s)
 
       def allDocumentsForAllAssets(masterTransactionAssets: Seq[IssueAssetRequest]) = masterTransactionAssetFiles.Service.getAllDocumentsForAllAssets(masterTransactionAssets.map(_.id))
 
@@ -221,7 +221,13 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
         masterTransactionAssets <- masterTransactionAssets
         blockchainAssetList <- blockchainAssetList(allOrderIDs)
         allDocumentsForAllAssets <- allDocumentsForAllAssets(masterTransactionAssets)
-      } yield Ok(views.html.component.master.availableAssetListWithLogin(masterTransactionAssets, blockchainAssetList, allDocumentsForAllAssets))
+      } yield {
+        println(allOrderIDs)
+        println(masterTransactionAssets.map(_.pegHash.get))
+        println(blockchainAssetList.map(_.pegHash))
+        println(allDocumentsForAllAssets)
+        Ok(views.html.component.master.availableAssetListWithLogin(masterTransactionAssets, blockchainAssetList, allDocumentsForAllAssets))
+      }
         ).recover {
         case _: BaseException => {
         println("getiing noContent 2222222222222222")

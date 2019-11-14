@@ -128,10 +128,13 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
           dirtyOrganizations.map { dirtyOrganization =>
             val responseAddress = getOrganization.Service.get(dirtyOrganization.id)
             def refreshDirty(responseAddress: queries.responses.OrganizationResponse.Response) = Service.refreshDirty(dirtyOrganization.id, responseAddress.address)
-            for {
+            (for {
               responseAddress <- responseAddress
               _ <- refreshDirty(responseAddress)
             } yield {}
+              ).recover{
+              case baseException: BaseException => logger.error(baseException.failure.message, baseException)
+            }
           }
         }
       }

@@ -195,8 +195,10 @@ class IssueAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tra
       val issueAsset = Service.getTransaction(ticketID)
 
       def responseAccount(issueAsset:IssueAsset)=getAccount.Service.get(issueAsset.to)
+
       val assetRequest = masterTransactionIssueAssetRequests.Service.getIssueAssetByTicketID(ticketID)
       def insertOrUpdate(responseAccount:queries.responses.AccountResponse.Response,assetRequest:IssueAssetRequest,issueAsset:IssueAsset)=Future{
+        logger.info(responseAccount.value.assetPegWallet.toString)
         responseAccount.value.assetPegWallet.foreach(assets => assets.foreach(asset => {
           blockchainAssets.Service.insertOrUpdate(pegHash = asset.pegHash, documentHash = asset.documentHash, assetType = asset.assetType, assetPrice = asset.assetPrice, assetQuantity = asset.assetQuantity, quantityUnit = asset.quantityUnit, locked = asset.locked, moderated = asset.moderated, takerAddress = if (asset.takerAddress == "") null else Option(asset.takerAddress), ownerAddress = issueAsset.to, dirtyBit = true)
           if(assetRequest.documentHash.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)) == asset.documentHash){
@@ -222,6 +224,7 @@ class IssueAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tra
         _<-markDirty(issueAsset)
         (toAccountID, fromAccountID)<-getIDs(issueAsset)
       }yield{
+
         utilitiesNotification.send(toAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
         utilitiesNotification.send(fromAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
       }).recover{

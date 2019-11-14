@@ -172,7 +172,7 @@ class AddOrganizations @Inject()(actorSystem: ActorSystem, transaction: utilitie
 
       val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
       val addOrganization = Service.getTransaction(ticketID)
-      def getResult(addOrganization:AddOrganization)={
+      def createOrganizationAndSendNotification(addOrganization:AddOrganization)={
         val create=blockchainOrganizations.Service.create(addOrganization.organizationID, addOrganization.to, dirtyBit = true)
         val verifyOrganization=masterOrganizations.Service.verifyOrganization(addOrganization.organizationID)
         val organizationAccountId=masterOrganizations.Service.getAccountId(addOrganization.organizationID)
@@ -196,7 +196,7 @@ class AddOrganizations @Inject()(actorSystem: ActorSystem, transaction: utilitie
       (for{
         _<- markTransactionSuccessful
         addOrganization <- addOrganization
-        result<- getResult(addOrganization)
+        result<- createOrganizationAndSendNotification(addOrganization)
       } yield result).recover{
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
           throw new BaseException(constants.Response.PSQL_EXCEPTION)
