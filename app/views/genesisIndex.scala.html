@@ -3,8 +3,8 @@
 
 @common(Messages(constants.Form.HOME), failures, warnings, successes, infos)(Html(""))(center)(Html(""))
 @center = {
-    <div class="flexContainer">
-        <div id="commonHome" class=" flexItem flexGrowth"></div>
+    <div>
+        <div id="commonHome"></div>
     </div>
     <script>
             componentResource('commonHome', jsRoutes.controllers.ComponentViewController.commonHome())
