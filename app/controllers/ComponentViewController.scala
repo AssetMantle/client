@@ -222,15 +222,10 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
         blockchainAssetList <- blockchainAssetList(allOrderIDs)
         allDocumentsForAllAssets <- allDocumentsForAllAssets(masterTransactionAssets)
       } yield {
-        println(allOrderIDs)
-        println(masterTransactionAssets.map(_.pegHash.get))
-        println(blockchainAssetList.map(_.pegHash))
-        println(allDocumentsForAllAssets)
         Ok(views.html.component.master.availableAssetListWithLogin(masterTransactionAssets, blockchainAssetList, allDocumentsForAllAssets))
       }
         ).recover {
         case _: BaseException => {
-        println("getiing noContent 2222222222222222")
           NoContent
         }
       }
