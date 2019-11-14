@@ -1,15 +1,22 @@
 @import controllers.actions.LoginState
+@import views.html.base._
 @import models.master.Trader
 
-@(traders: Seq[Trader])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
-@for(trader <- traders) {
-    <div class="col-md-3">
-        <br>
-        <div class="flexItem card-body leftText lightBlue">
-            <span class="red">@Messages(constants.Form.ID)</span>:@trader.id <br>
-            <span class="red">@Messages(constants.Form.ACCOUNT_ID)</span>:@trader.accountID <br>
-            <span class="red">@Messages(constants.Form.NAME)</span>:@trader.name <br>
-        </div>
-    </div>
-}
+@(traders: Seq[Trader])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+<div class="cmuk-container">
+    <div class="cmuk-flex-center cmuk-child-width-auto cmuk-grid-match" cmuk-grid>
+        @for(trader <- traders) {
+            @commonCard() {
+                @trader.id
+            } {
+            <div>
+                    <span class="red">@Messages(constants.Form.ID)</span>:@trader.id <br>
+                    <span class="red">@Messages(constants.Form.ACCOUNT_ID)</span>:@trader.accountID <br>
+                    <span class="red">@Messages(constants.Form.NAME)</span>:@trader.name <br>
+            </div>
+
+            }
+        }
+ </div>
+</div>
