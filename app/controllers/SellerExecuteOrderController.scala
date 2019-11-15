@@ -74,7 +74,6 @@ class SellerExecuteOrderController @Inject()(messagesControllerComponents: Messa
           }
         },
         sellerExecuteOrderData => {
-
           val transactionProcess = transaction.process[blockchainTransaction.SellerExecuteOrder, transactionsSellerExecuteOrder.Request](
             entity = blockchainTransaction.SellerExecuteOrder(from = loginState.address, sellerAddress = loginState.address, buyerAddress = sellerExecuteOrderData.buyerAddress, awbProofHash = sellerExecuteOrderData.awbProofHash, pegHash = sellerExecuteOrderData.pegHash, gas = sellerExecuteOrderData.gas, ticketID = "", mode = transactionMode),
             blockchainTransactionCreate = blockchainTransactionSellerExecuteOrders.Service.create,
@@ -135,7 +134,6 @@ class SellerExecuteOrderController @Inject()(messagesControllerComponents: Messa
 
   def moderatedSellerExecuteOrderForm(requestID: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
-
       val negotiationID = masterTransactionNegotiationRequests.Service.getNegotiationIDByID(requestID)
 
       def negotiation(negotiationID: String) = blockchainNegotiations.Service.get(negotiationID)
@@ -155,7 +153,6 @@ class SellerExecuteOrderController @Inject()(messagesControllerComponents: Messa
     implicit request =>
       views.companion.master.ModeratedSellerExecuteOrder.form.bindFromRequest().fold(
         formWithErrors => {
-
           val negotiationID = blockchainNegotiations.Service.getNegotiationID(formWithErrors.data(constants.FormField.BUYER_ADDRESS.name), formWithErrors.data(constants.FormField.SELLER_ADDRESS.name), formWithErrors.data(constants.FormField.PEG_HASH.name))
 
           def getNegotiationRequestID(negotiationID: String) = masterTransactionNegotiationRequests.Service.getIDByNegotiationID(negotiationID)

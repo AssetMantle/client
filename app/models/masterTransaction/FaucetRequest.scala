@@ -88,7 +88,7 @@ class FaucetRequests @Inject()(protected val databaseConfigProvider: DatabaseCon
 
   private[models] class FaucetRequestTable(tag: Tag) extends Table[FaucetRequest](tag, "FaucetRequest") {
 
-    def * = (id, ticketID.?, accountID, amount, gas.?,status.?, comment.?) <> (FaucetRequest.tupled, FaucetRequest.unapply)
+    def * = (id, ticketID.?, accountID, amount, gas.?, status.?, comment.?) <> (FaucetRequest.tupled, FaucetRequest.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
@@ -110,7 +110,7 @@ class FaucetRequests @Inject()(protected val databaseConfigProvider: DatabaseCon
 
     def create(accountID: String, amount: Int): Future[String] = add(FaucetRequest(id = utilities.IDGenerator.requestID, accountID = accountID, amount = amount))
 
-    def accept(requestID: String, gas: Int, ticketID: String): Future[Int] =updateTicketIDGasAndStatusByID(id = requestID, ticketID = ticketID, gas = Option(gas), status = Option(true))
+    def accept(requestID: String, gas: Int, ticketID: String): Future[Int] = updateTicketIDGasAndStatusByID(id = requestID, ticketID = ticketID, gas = Option(gas), status = Option(true))
 
     def reject(id: String, comment: String): Future[Int] = updateStatusAndCommentByID(id = id, status = Option(false), comment = comment)
 

@@ -174,7 +174,6 @@ class SendAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
   }
 
   object Utility {
-
     def onSuccess(ticketID: String, blockResponse: BlockResponse) = {
       val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
       val sendAsset = Service.getTransaction(ticketID)

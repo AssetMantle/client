@@ -9,8 +9,7 @@ import play.api.libs.ws.{WSClient, WSResponse}
 import play.api.{Configuration, Logger}
 import transactions.Abstract.BaseRequest
 
-import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class IssueAsset @Inject()(wsClient: WSClient)(implicit configuration: Configuration, executionContext: ExecutionContext) {
@@ -29,18 +28,19 @@ class IssueAsset @Inject()(wsClient: WSClient)(implicit configuration: Configura
 
   private val chainID = configuration.get[String]("blockchain.main.chainID")
 
-  case class BaseReq(from: String, chain_id: String = chainID, gas: String)
+  private def action(request: Request): Future[WSResponse] = wsClient.url(url).post(Json.toJson(request))
 
-  case class Request(base_req: BaseReq, to: String, documentHash: String, assetType: String, assetPrice: String, quantityUnit: String, assetQuantity: String, takerAddress: String, mode: String, password: String, moderated: Boolean) extends BaseRequest
+  case class BaseReq(from: String, chain_id: String = chainID, gas: String)
 
   private implicit val baseRequestWrites: OWrites[BaseReq] = Json.writes[BaseReq]
 
   private implicit val requestWrites: OWrites[Request] = Json.writes[Request]
 
-  private def action(request: Request): Future[WSResponse] = wsClient.url(url).post(Json.toJson(request))
+  case class Request(base_req: BaseReq, to: String, documentHash: String, assetType: String, assetPrice: String, quantityUnit: String, assetQuantity: String, takerAddress: String, mode: String, password: String, moderated: Boolean) extends BaseRequest
 
   object Service {
-    def post(request: Request): Future[WSResponse] = action(request).recover{
+
+    def post(request: Request): Future[WSResponse] = action(request).recover {
       case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
         throw new BaseException(constants.Response.CONNECT_EXCEPTION)
     }

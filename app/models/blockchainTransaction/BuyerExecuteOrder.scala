@@ -31,6 +31,7 @@ class BuyerExecuteOrders @Inject()(actorSystem: ActorSystem, transaction: utilit
   private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
 
   import databaseConfig.profile.api._
+
   private[models] val buyerExecuteOrderTable = TableQuery[BuyerExecuteOrderTable]
 
   private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
@@ -169,7 +170,6 @@ class BuyerExecuteOrders @Inject()(actorSystem: ActorSystem, transaction: utilit
   }
 
   object Utility {
-
     def onSuccess(ticketID: String, blockResponse: BlockResponse): Future[Unit] = {
       val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
       val buyerExecuteOrder = Service.getTransaction(ticketID)
@@ -260,7 +260,7 @@ class BuyerExecuteOrders @Inject()(actorSystem: ActorSystem, transaction: utilit
         } yield (buyerAddressID, sellerAddressID)
       }
 
-      for {
+      (for {
         _ <- markTransactionFailed
         buyerExecuteOrder <- buyerExecuteOrder
         _ <- markDirty(buyerExecuteOrder)
@@ -268,6 +268,8 @@ class BuyerExecuteOrders @Inject()(actorSystem: ActorSystem, transaction: utilit
       } yield {
         utilitiesNotification.send(sellerAddressID, constants.Notification.FAILURE, message)
         utilitiesNotification.send(buyerAddressID, constants.Notification.FAILURE, message)
+      }).recover {
+        case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
     }
   }

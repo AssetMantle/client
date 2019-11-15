@@ -1,5 +1,7 @@
 package models.blockchainTransaction
 
+import java.net.ConnectException
+
 import akka.actor.ActorSystem
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
@@ -190,7 +192,7 @@ class IssueFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
         } yield (toAccountID, fromAccountID)
       }
 
-      for {
+      (for {
         _ <- markTransactionSuccessful
         issueFiat <- issueFiat
         account <- account(issueFiat)
@@ -200,6 +202,10 @@ class IssueFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
       } yield {
         utilitiesNotification.send(toAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
         utilitiesNotification.send(fromAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
+      }).recover {
+        case baseException: BaseException => logger.error(baseException.failure.message, baseException)
+          throw new BaseException(constants.Response.PSQL_EXCEPTION)
+        case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
       }
     }
 

@@ -4,12 +4,11 @@ import java.net.ConnectException
 
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import play.api.libs.ws.{WSClient, WSResponse}
+import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
 import queries.responses.OrderResponse.Response
 
-import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class GetOrder @Inject()()(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
@@ -30,11 +29,12 @@ class GetOrder @Inject()()(implicit wsClient: WSClient, configuration: Configura
 
   object Service {
 
-  def get(negotiationID: String): Future[Response] =action(negotiationID).recover{
-    case connectException: ConnectException =>
-      logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
-      throw new BaseException(constants.Response.CONNECT_EXCEPTION)
+    def get(negotiationID: String): Future[Response] = action(negotiationID).recover {
+      case connectException: ConnectException =>
+        logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
+        throw new BaseException(constants.Response.CONNECT_EXCEPTION)
+    }
+
   }
 
-}
 }

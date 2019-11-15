@@ -115,7 +115,7 @@ class AccountFiles @Inject()(protected val databaseConfigProvider: DatabaseConfi
 
     def create(accountFile: AccountFile): Future[String] = add(AccountFile(id = accountFile.id, documentType = accountFile.documentType, fileName = accountFile.fileName, file = accountFile.file))
 
-    def updateOldDocument(accountFile: AccountFile): Future[Int] =upsert(AccountFile(id = accountFile.id, documentType = accountFile.documentType, fileName = accountFile.fileName, file = accountFile.file))
+    def updateOldDocument(accountFile: AccountFile): Future[Int] = upsert(AccountFile(id = accountFile.id, documentType = accountFile.documentType, fileName = accountFile.fileName, file = accountFile.file))
 
     def get(id: String, documentType: String): AccountFile = Await.result(findByIdDocumentType(id = id, documentType = documentType), Duration.Inf)
 

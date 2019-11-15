@@ -58,7 +58,6 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
 
   def addTraderRequestForm(requestID: String): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
-
       val addTraderRequest = masterTransactionAddTraderRequests.Service.get(requestID)
 
       def getResult(addTraderRequest: AddTraderRequest) = {
@@ -88,7 +87,6 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
   //TODO Change form it should only contain organization ID
   def addTraderForm(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
-
       val trader = masterTraders.Service.getByAccountID(loginState.username)
       (for {
         trader <- trader
@@ -139,7 +137,6 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
 
   def userUploadOrUpdateTraderKYCView(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
-
       val id = masterTraders.Service.getID(loginState.username)
 
       def getTraderKYCs(id: String) = masterTraderKYCs.Service.getAllDocuments(id)
@@ -179,7 +176,6 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
 
   def userStoreTraderKYC(name: String, documentType: String): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
-
       val id = masterTraders.Service.getID(loginState.username)
 
       def storeFile(id: String) = fileResourceManager.storeFile[master.TraderKYC](
@@ -208,7 +204,6 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
 
   def userUpdateTraderKYC(name: String, documentType: String): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
-
       val id = masterTraders.Service.getID(loginState.username)
 
       def getOldDocumentFileName(id: String) = masterTraderKYCs.Service.getFileName(id = id, documentType = documentType)
@@ -237,7 +232,6 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
 
   def userReviewAddTraderRequestForm(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
-
       val trader = masterTraders.Service.getByAccountID(loginState.username)
 
       def getResult(trader: Trader) = {
@@ -392,7 +386,6 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
 
   def zoneViewPendingVerifyTraderRequests: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
-
       val zoneID = masterZones.Service.getID(loginState.username)
 
       def getVerifyTraderRequestsForZone(zoneID: String) = masterTraders.Service.getVerifyTraderRequestsForZone(zoneID)
@@ -405,7 +398,6 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
 
   def zoneViewKYCDocuments(traderID: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
-
       val traderKYCs = masterTraderKYCs.Service.getAllDocuments(traderID)
       (for {
         traderKYCs <- traderKYCs
@@ -417,7 +409,6 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
 
   def updateTraderKYCDocumentZoneStatusForm(traderID: String, documentType: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
-
       val userZoneID = masterZones.Service.getID(loginState.username)
       val traderZoneID = masterTraders.Service.getZoneID(traderID)
 
@@ -460,7 +451,6 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
           val traderZoneID = masterTraders.Service.getZoneID(updateTraderKYCDocumentZoneStatusData.traderID)
 
           def getResult(userZoneID: String, traderZoneID: String) = {
-
             if (userZoneID == traderZoneID) {
               val verifyOrReject = if (updateTraderKYCDocumentZoneStatusData.zoneStatus) {
                 val zoneVerify = masterTraderKYCs.Service.zoneVerify(id = updateTraderKYCDocumentZoneStatusData.traderID, documentType = updateTraderKYCDocumentZoneStatusData.documentType)
@@ -516,7 +506,6 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
           }
         },
         rejectVerifyTraderRequestData => {
-
           val rejectTrader = masterTraders.Service.rejectTrader(rejectVerifyTraderRequestData.traderID)
           val zoneAccountID = masterZones.Service.getAccountId(rejectVerifyTraderRequestData.traderID)
 
@@ -547,7 +536,6 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
           }
         },
         verifyTraderData => {
-
           val id = masterTraders.Service.getID(verifyTraderData.accountID)
 
           def checkAllKYCFilesVerified(id: String) = masterTraderKYCs.Service.checkAllKYCFilesVerified(id)
@@ -608,7 +596,6 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
           }
         },
         verifyTraderData => {
-
           val id = masterTraders.Service.getID(verifyTraderData.accountID)
 
           def checkAllKYCFilesVerified(id: String) = masterTraderKYCs.Service.checkAllKYCFilesVerified(id)
@@ -679,7 +666,6 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
           for {
             traderKYC <- traderKYC
           } yield Ok(views.html.component.master.updateTraderKYCDocumentOrganizationStatus(traderKYC = traderKYC))
-
         } else Future {
           Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
         }
@@ -850,7 +836,6 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
 
   def updateTraderKYC(name: String, documentType: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-
       val id = masterTraders.Service.getID(loginState.username)
 
       def getOldDocumentFileName(id: String) = masterTraderKYCs.Service.getFileName(id = id, documentType = documentType)

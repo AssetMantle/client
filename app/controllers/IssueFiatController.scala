@@ -156,7 +156,6 @@ class IssueFiatController @Inject()(messagesControllerComponents: MessagesContro
         }
       },
       issueFiatData => {
-
         val post = transactionsIssueFiat.Service.post(transactionsIssueFiat.Request(transactionsIssueFiat.BaseReq(from = issueFiatData.from, gas = issueFiatData.gas.toString), to = issueFiatData.to, password = issueFiatData.password, transactionID = issueFiatData.transactionID, transactionAmount = issueFiatData.transactionAmount.toString, mode = issueFiatData.mode))
         (for {
           _ <- post

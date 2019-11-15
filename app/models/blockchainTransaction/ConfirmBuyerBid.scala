@@ -176,13 +176,11 @@ class ConfirmBuyerBids @Inject()(actorSystem: ActorSystem, transaction: utilitie
   }
 
   object Utility {
-
     def onSuccess(ticketID: String, blockResponse: BlockResponse) = {
-
       val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
       val confirmBuyerBid = Service.getTransaction(ticketID)
 
-      def buyerAccountID(fromAddress: String) = masterAccounts.Service.getId(from)
+      def buyerAccountID(fromAddress: String) = masterAccounts.Service.getId(fromAddress)
 
       def negotiationID(confirmBuyerBid: ConfirmBuyerBid) = blockchainNegotiations.Service.getNegotiationID(buyerAddress = confirmBuyerBid.from, sellerAddress = confirmBuyerBid.to, pegHash = confirmBuyerBid.pegHash)
 
@@ -190,7 +188,7 @@ class ConfirmBuyerBids @Inject()(actorSystem: ActorSystem, transaction: utilitie
 
       def insertOrUpdate(negotiationResponse: NegotiationResponse.Response) = blockchainNegotiations.Service.insertOrUpdate(id = negotiationResponse.value.negotiationID, buyerAddress = negotiationResponse.value.buyerAddress, sellerAddress = negotiationResponse.value.sellerAddress, assetPegHash = negotiationResponse.value.pegHash, bid = negotiationResponse.value.bid, time = negotiationResponse.value.time, buyerSignature = negotiationResponse.value.buyerSignature, sellerSignature = negotiationResponse.value.sellerSignature, buyerBlockHeight = negotiationResponse.value.buyerBlockHeight, sellerBlockHeight = negotiationResponse.value.sellerBlockHeight, buyerContractHash = negotiationResponse.value.buyerContractHash, sellerContractHash = negotiationResponse.value.sellerContractHash, dirtyBit = true)
 
-      def updateNegotiationID(negotiationResponse: NegotiationResponse.Response, pegHash: String, buyerAccountID: String) = masterTransactionNegotiationRequests.Service.updateNegotiationID(negotiationResponse.value.negotiationID, buyerAccountID, confirmBuyerBid.pegHash)
+      def updateNegotiationID(negotiationResponse: NegotiationResponse.Response, pegHash: String, buyerAccountID: String) = masterTransactionNegotiationRequests.Service.updateNegotiationID(negotiationResponse.value.negotiationID, buyerAccountID, pegHash)
 
       def markDirty(confirmBuyerBid: ConfirmBuyerBid) = {
         val markDirtyFromAddressBlockchainAccounts = blockchainAccounts.Service.markDirty(confirmBuyerBid.from)

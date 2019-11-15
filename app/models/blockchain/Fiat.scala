@@ -39,6 +39,7 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
   private val cometActorSleepTime = configuration.get[Long]("akka.actors.cometActorSleepTime")
 
   import databaseConfig.profile.api._
+
   private[models] val fiatTable = TableQuery[FiatTable]
 
   private implicit val materializer: ActorMaterializer = ActorMaterializer()(actorSystem)
@@ -150,7 +151,6 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
   }
 
   object Utility {
-
     def dirtyEntityUpdater(): Future[Unit] = {
       val dirtyFiats = Service.getDirtyFiats
       Thread.sleep(sleepTime)
@@ -189,10 +189,10 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
         }
       }
 
-      for {
+      (for {
         dirtyFiats <- dirtyFiats
         _ <- insertOrUpdateAndSendCometMessage(dirtyFiats)
-      } yield {}
+      } yield {}) (schedulerExecutionContext)
     }
   }
 

@@ -134,9 +134,9 @@ class ZoneKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
     def getFileName(id: String, documentType: String): Future[String] = getFileNameByIdDocumentType(id = id, documentType = documentType)
 
-    def getAllDocuments(id: String): Future[Seq[ZoneKYC]] =getAllDocumentsById(id = id)
+    def getAllDocuments(id: String): Future[Seq[ZoneKYC]] = getAllDocumentsById(id = id)
 
-    def verifyAll(id: String): Future[Int] =updateStatusById(id = id, status = Option(true))
+    def verifyAll(id: String): Future[Int] = updateStatusById(id = id, status = Option(true))
 
     def verify(id: String, documentType: String): Future[Int] = updateStatusByIdAndDocumentType(id = id, documentType = documentType, status = Option(true))
 
@@ -148,11 +148,11 @@ class ZoneKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
     def checkFileExists(id: String, documentType: String): Boolean = Await.result(checkByIdAndDocumentType(id = id, documentType = documentType), Duration.Inf)
 
-    def checkFileNameExists(id: String, fileName: String): Future[Boolean] =checkByIdAndFileName(id = id, fileName = fileName)
+    def checkFileNameExists(id: String, fileName: String): Future[Boolean] = checkByIdAndFileName(id = id, fileName = fileName)
 
     def checkAllKYCFileTypesExists(id: String): Future[Boolean] = getAllDocumentTypesByIDAndDocumentSet(id = id, documentTypes = constants.File.ZONE_KYC_DOCUMENT_TYPES).map(constants.File.ZONE_KYC_DOCUMENT_TYPES.diff(_).isEmpty)
 
-    def checkAllKYCFilesVerified(id: String): Future[Boolean] =getAllDocumentTypesByIDStatusAndDocumentSet(id = id, documentTypes = constants.File.ZONE_KYC_DOCUMENT_TYPES, status = true).map(constants.File.ZONE_KYC_DOCUMENT_TYPES.diff(_).isEmpty)
+    def checkAllKYCFilesVerified(id: String): Future[Boolean] = getAllDocumentTypesByIDStatusAndDocumentSet(id = id, documentTypes = constants.File.ZONE_KYC_DOCUMENT_TYPES, status = true).map(constants.File.ZONE_KYC_DOCUMENT_TYPES.diff(_).isEmpty)
 
   }
 

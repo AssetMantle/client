@@ -8,8 +8,7 @@ import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
 import queries.responses.ABCIInfoResponse.Response
 
-import scala.concurrent.{Await, ExecutionContext, Future}
-import scala.concurrent.duration.Duration
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class GetABCIInfo @Inject()()(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
@@ -29,8 +28,7 @@ class GetABCIInfo @Inject()()(implicit wsClient: WSClient, configuration: Config
   private def action(): Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(url).get)
 
   object Service {
-
-    def get(): Future[Response] = action().recover{
+    def get(): Future[Response] = action().recover {
       case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
         throw new BaseException(constants.Response.CONNECT_EXCEPTION)
     }

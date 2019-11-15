@@ -8,8 +8,7 @@ import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
 import queries.responses.ZoneResponse.Response
 
-import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class GetZone @Inject()(wsClient: WSClient)(implicit configuration: Configuration, executionContext: ExecutionContext) {
@@ -30,7 +29,7 @@ class GetZone @Inject()(wsClient: WSClient)(implicit configuration: Configuratio
 
   object Service {
 
-    def get(zoneID : String): Future[Response] = action(zoneID).recover{
+    def get(zoneID: String): Future[Response] = action(zoneID).recover {
       case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
         throw new BaseException(constants.Response.CONNECT_EXCEPTION)
     }

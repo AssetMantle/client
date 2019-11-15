@@ -212,7 +212,6 @@ class TransactionFeedbacks @Inject()(protected val databaseConfigProvider: Datab
   }
 
   object Utility {
-
     def dirtyEntityUpdater(): Future[Unit] = {
       val dirtyAddresses = Service.getDirtyAddresses
       Thread.sleep(sleepTime)
@@ -239,10 +238,10 @@ class TransactionFeedbacks @Inject()(protected val databaseConfigProvider: Datab
         }
       }
 
-      for {
+      (for {
         dirtyAddresses <- dirtyAddresses
         _ <- refreshDirtyAddresses(dirtyAddresses)
-      } yield {}
+      } yield {}) (schedulerExecutionContext)
     }
   }
 

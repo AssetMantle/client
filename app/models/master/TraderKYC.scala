@@ -152,7 +152,7 @@ class TraderKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfigP
 
     def create(traderKYC: TraderKYC): Future[String] = add(TraderKYC(id = traderKYC.id, documentType = traderKYC.documentType, fileName = traderKYC.fileName, file = traderKYC.file))
 
-    def updateOldDocument(traderKYC: TraderKYC): Future[Int] =upsert(TraderKYC(id = traderKYC.id, documentType = traderKYC.documentType, fileName = traderKYC.fileName, file = traderKYC.file))
+    def updateOldDocument(traderKYC: TraderKYC): Future[Int] = upsert(TraderKYC(id = traderKYC.id, documentType = traderKYC.documentType, fileName = traderKYC.fileName, file = traderKYC.file))
 
     def get(id: String, documentType: String): Future[TraderKYC] = findByIdDocumentType(id = id, documentType = documentType)
 
@@ -182,9 +182,13 @@ class TraderKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfigP
 
     def checkFileNameExists(id: String, fileName: String): Future[Boolean] = checkByIdAndFileName(id = id, fileName = fileName)
 
-    def checkAllKYCFileTypesExists(id: String): Future[Boolean] =getAllDocumentTypesByIDAndDocumentSet(id = id, documentTypes = constants.File.TRADER_KYC_DOCUMENT_TYPES).map{constants.File.TRADER_KYC_DOCUMENT_TYPES.diff(_).isEmpty}
+    def checkAllKYCFileTypesExists(id: String): Future[Boolean] = getAllDocumentTypesByIDAndDocumentSet(id = id, documentTypes = constants.File.TRADER_KYC_DOCUMENT_TYPES).map {
+      constants.File.TRADER_KYC_DOCUMENT_TYPES.diff(_).isEmpty
+    }
 
-    def checkAllKYCFilesVerified(id: String): Future[Boolean] = getAllDocumentTypesByIDStatusAndDocumentSet(id = id, documentTypes = constants.File.TRADER_KYC_DOCUMENT_TYPES, status = true).map{constants.File.TRADER_KYC_DOCUMENT_TYPES.diff(_).isEmpty}
+    def checkAllKYCFilesVerified(id: String): Future[Boolean] = getAllDocumentTypesByIDStatusAndDocumentSet(id = id, documentTypes = constants.File.TRADER_KYC_DOCUMENT_TYPES, status = true).map {
+      constants.File.TRADER_KYC_DOCUMENT_TYPES.diff(_).isEmpty
+    }
 
   }
 

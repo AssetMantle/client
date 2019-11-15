@@ -117,9 +117,9 @@ class Contacts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   object Service {
 
-    def getContact(id: String): Future[Option[Contact]] =findById(id)
+    def getContact(id: String): Future[Option[Contact]] = findById(id)
 
-    def insertOrUpdateContact(id: String, mobileNumber: String, emailAddress: String): Future[Boolean] =upsert(Contact(id, mobileNumber, mobileNumberVerified =  false, emailAddress, emailAddressVerified = false)).map{value=> if(value>0) true else false }
+    def insertOrUpdateContact(id: String, mobileNumber: String, emailAddress: String): Future[Boolean] = upsert(Contact(id, mobileNumber, mobileNumberVerified = false, emailAddress, emailAddressVerified = false)).map { value => if (value > 0) true else false }
 
     def verifyMobileNumber(id: String): Future[Int] = updateMobileNumberVerificationStatusOnId(id, verificationStatus = true)
 
@@ -130,7 +130,6 @@ class Contacts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     def getUnverifiedEmailAddress(id: String): String = Await.result(getEmailAddressById(id = id, emailAddressVerified = Option(false)), Duration.Inf)
 
     def getMobileNumber(id: String): String = Await.result(findMobileNumberById(id), Duration.Inf)
-
   }
 
 }

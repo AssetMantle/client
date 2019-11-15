@@ -34,7 +34,6 @@ class ReleaseAssetController @Inject()(messagesControllerComponents: MessagesCon
           }
         },
         releaseAssetData => {
-
           val transactionProcess = transaction.process[blockchainTransaction.ReleaseAsset, transactionsReleaseAsset.Request](
             entity = blockchainTransaction.ReleaseAsset(from = loginState.address, to = releaseAssetData.blockchainAddress, pegHash = releaseAssetData.pegHash, gas = releaseAssetData.gas, ticketID = "", mode = transactionMode),
             blockchainTransactionCreate = blockchainTransactionReleaseAssets.Service.create,
@@ -57,7 +56,6 @@ class ReleaseAssetController @Inject()(messagesControllerComponents: MessagesCon
   //TODO releaseAsset request, it's getting all locked
   def releaseAssetList(): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
-
       val zoneID = blockchainZones.Service.getID(loginState.address)
 
       def addressesUnderZone(zoneID: String) = blockchainACLAccounts.Service.getAddressesUnderZone(zoneID)
@@ -86,10 +84,9 @@ class ReleaseAssetController @Inject()(messagesControllerComponents: MessagesCon
         }
       },
       releaseAssetData => {
-
-        val post = transactionsReleaseAsset.Service.post(transactionsReleaseAsset.Request(transactionsReleaseAsset.BaseReq(from = releaseAssetData.from, gas = releaseAssetData.gas.toString), to = releaseAssetData.to, password = releaseAssetData.password, pegHash = releaseAssetData.pegHash, mode = releaseAssetData.mode))
+        val postRequest = transactionsReleaseAsset.Service.post(transactionsReleaseAsset.Request(transactionsReleaseAsset.BaseReq(from = releaseAssetData.from, gas = releaseAssetData.gas.toString), to = releaseAssetData.to, password = releaseAssetData.password, pegHash = releaseAssetData.pegHash, mode = releaseAssetData.mode))
         (for {
-          _ <- post
+          _ <- postRequest
         } yield Ok(views.html.index(successes = Seq(constants.Response.ASSET_RELEASED)))
           ).recover {
           case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))

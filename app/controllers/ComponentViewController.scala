@@ -257,7 +257,6 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
 
   def profileDocuments(): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-
       val documents: Future[Seq[Document[_]]] = loginState.userType match {
         case constants.User.ZONE => masterZoneKYC.Service.getAllDocuments(loginState.username)
         case constants.User.ORGANIZATION =>
@@ -361,7 +360,6 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
           }
         }
       }
-
       (for {
         organizationID <- organizationID
         verifyOrganizationTrader <- verifyOrganizationTrader(organizationID)

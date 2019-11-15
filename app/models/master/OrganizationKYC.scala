@@ -127,7 +127,7 @@ class OrganizationKYCs @Inject()(protected val databaseConfigProvider: DatabaseC
 
     def updateOldDocument(organizationKYC: OrganizationKYC): Future[Int] = upsert(OrganizationKYC(id = organizationKYC.id, documentType = organizationKYC.documentType, fileName = organizationKYC.fileName, file = organizationKYC.file))
 
-    def get(id: String, documentType: String): Future[OrganizationKYC] =findByIdDocumentType(id = id, documentType = documentType)
+    def get(id: String, documentType: String): Future[OrganizationKYC] = findByIdDocumentType(id = id, documentType = documentType)
 
     def getFileName(id: String, documentType: String): Future[String] = getFileNameByIdDocumentType(id = id, documentType = documentType)
 
@@ -137,7 +137,7 @@ class OrganizationKYCs @Inject()(protected val databaseConfigProvider: DatabaseC
 
     def verify(id: String, documentType: String): Future[Int] = updateStatusByIdAndDocumentType(id = id, documentType = documentType, status = Option(true))
 
-    def reject(id: String, documentType: String): Future[Int] =updateStatusByIdAndDocumentType(id = id, documentType = documentType, status = Option(false))
+    def reject(id: String, documentType: String): Future[Int] = updateStatusByIdAndDocumentType(id = id, documentType = documentType, status = Option(false))
 
     def rejectAll(id: String): Future[Int] = updateStatusById(id = id, status = Option(false))
 
@@ -145,11 +145,11 @@ class OrganizationKYCs @Inject()(protected val databaseConfigProvider: DatabaseC
 
     def checkFileExists(id: String, documentType: String): Boolean = Await.result(checkByIdAndDocumentType(id = id, documentType = documentType), Duration.Inf)
 
-    def checkFileNameExists(id: String, fileName: String): Future[Boolean]  = checkByIdAndFileName(id = id, fileName = fileName)
+    def checkFileNameExists(id: String, fileName: String): Future[Boolean] = checkByIdAndFileName(id = id, fileName = fileName)
 
-    def checkAllKYCFileTypesExists(id: String): Future[Boolean] =getAllDocumentTypesByIDAndDocumentSet(id = id, documentTypes = constants.File.ORGANIZATION_KYC_DOCUMENT_TYPES).map{documents=> constants.File.ORGANIZATION_KYC_DOCUMENT_TYPES.diff(documents).isEmpty }
+    def checkAllKYCFileTypesExists(id: String): Future[Boolean] = getAllDocumentTypesByIDAndDocumentSet(id = id, documentTypes = constants.File.ORGANIZATION_KYC_DOCUMENT_TYPES).map { documents => constants.File.ORGANIZATION_KYC_DOCUMENT_TYPES.diff(documents).isEmpty }
 
-    def checkAllKYCFilesVerified(id: String): Future[Boolean]= getAllDocumentTypesByIDStatusAndDocumentSet(id = id, documentTypes = constants.File.ORGANIZATION_KYC_DOCUMENT_TYPES, status = true).map{ documents=>
+    def checkAllKYCFilesVerified(id: String): Future[Boolean] = getAllDocumentTypesByIDStatusAndDocumentSet(id = id, documentTypes = constants.File.ORGANIZATION_KYC_DOCUMENT_TYPES, status = true).map { documents =>
       constants.File.ORGANIZATION_KYC_DOCUMENT_TYPES.diff(documents).isEmpty
     }
   }

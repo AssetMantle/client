@@ -38,6 +38,7 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
   private implicit val materializer: ActorMaterializer = ActorMaterializer()(actorSystem)
 
   import databaseConfig.profile.api._
+
   private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
   private val actorTimeout = configuration.get[Int]("akka.actors.timeout").seconds
   private val cometActorSleepTime = configuration.get[Long]("akka.actors.cometActorSleepTime")
@@ -148,7 +149,6 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
   }
 
   object Utility {
-
     def dirtyEntityUpdater() = {
       val dirtyAddresses = Service.getDirtyAddresses
       Thread.sleep(sleepTime)
@@ -183,5 +183,4 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
   actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
     Utility.dirtyEntityUpdater()
   }(schedulerExecutionContext)
-
 }

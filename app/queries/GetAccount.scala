@@ -8,8 +8,7 @@ import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
 import queries.responses.AccountResponse.Response
 
-import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class GetAccount @Inject()()(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
@@ -30,9 +29,10 @@ class GetAccount @Inject()()(implicit wsClient: WSClient, configuration: Configu
 
   object Service {
 
-    def get(address: String):  Future[Response] =action(address).recover{
+    def get(address: String): Future[Response] = action(address).recover {
       case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
         throw new BaseException(constants.Response.CONNECT_EXCEPTION)
     }
   }
+
 }

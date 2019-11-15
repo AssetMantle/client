@@ -165,7 +165,6 @@ class AddOrganizations @Inject()(actorSystem: ActorSystem, transaction: utilitie
 
   object Utility {
     def onSuccess(ticketID: String, blockResponse: BlockResponse) = {
-
       val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
       val addOrganization = Service.getTransaction(ticketID)
 
@@ -204,7 +203,6 @@ class AddOrganizations @Inject()(actorSystem: ActorSystem, transaction: utilitie
     }
 
     def onFailure(ticketID: String, message: String) = {
-
       val markTransactionFailed = Service.markTransactionFailed(ticketID, message)
       val addOrganization = Service.getTransaction(ticketID)
 

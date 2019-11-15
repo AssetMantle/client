@@ -32,6 +32,7 @@ class SellerExecuteOrders @Inject()(actorSystem: ActorSystem, transaction: utili
   private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
 
   import databaseConfig.profile.api._
+
   private[models] val sellerExecuteOrderTable = TableQuery[SellerExecuteOrderTable]
 
   private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
@@ -274,8 +275,7 @@ class SellerExecuteOrders @Inject()(actorSystem: ActorSystem, transaction: utili
       } yield {
         utilitiesNotification.send(buyerAddressID, constants.Notification.FAILURE, message)
         utilitiesNotification.send(sellerAddressID, constants.Notification.FAILURE, message)
-      }
-        ).recover {
+      }).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
     }

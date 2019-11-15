@@ -144,7 +144,6 @@ class Orders @Inject()(shutdownActors: ShutdownActor, masterAccounts: master.Acc
   }
 
   object Utility {
-
     def dirtyEntityUpdater() = {
       val dirtyOrders = Service.getDirtyOrders
       Thread.sleep(sleepTime)
@@ -244,10 +243,10 @@ class Orders @Inject()(shutdownActors: ShutdownActor, masterAccounts: master.Acc
         }
       }
 
-      for {
+      (for {
         dirtyOrders <- dirtyOrders
         _ <- insertOrUpdateAndSendCometMessage(dirtyOrders)
-      } yield {}
+      } yield {}) (schedulerExecutionContext)
     }
   }
 

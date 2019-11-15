@@ -75,9 +75,9 @@ class SetBuyerFeedbackController @Inject()(messagesControllerComponents: Message
         }
       },
       setBuyerFeedbackData => {
-        val post = transactionsSetBuyerFeedback.Service.post(transactionsSetBuyerFeedback.Request(transactionsSetBuyerFeedback.BaseReq(from = setBuyerFeedbackData.from, gas = setBuyerFeedbackData.gas.toString), to = setBuyerFeedbackData.to, password = setBuyerFeedbackData.password, pegHash = setBuyerFeedbackData.pegHash, rating = setBuyerFeedbackData.rating.toString, mode = setBuyerFeedbackData.mode))
+        val postRequest = transactionsSetBuyerFeedback.Service.post(transactionsSetBuyerFeedback.Request(transactionsSetBuyerFeedback.BaseReq(from = setBuyerFeedbackData.from, gas = setBuyerFeedbackData.gas.toString), to = setBuyerFeedbackData.to, password = setBuyerFeedbackData.password, pegHash = setBuyerFeedbackData.pegHash, rating = setBuyerFeedbackData.rating.toString, mode = setBuyerFeedbackData.mode))
         (for {
-          _ <- post
+          _ <- postRequest
         } yield Ok(views.html.index(successes = Seq(constants.Response.BUYER_FEEDBACK_SET)))
           ).recover {
           case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))

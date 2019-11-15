@@ -32,6 +32,7 @@ class ReleaseAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.T
   private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
 
   import databaseConfig.profile.api._
+
   private[models] val releaseAssetTable = TableQuery[ReleaseAssetTable]
 
   private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
@@ -165,7 +166,6 @@ class ReleaseAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.T
   }
 
   object Utility {
-
     def onSuccess(ticketID: String, blockResponse: BlockResponse): Future[Unit] = {
       val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
       val releaseAsset = Service.getTransaction(ticketID)

@@ -50,14 +50,7 @@ class Notification @Inject()(masterContacts: master.Contacts,
   private val pushNotificationURL = configuration.get[String]("pushNotification.url")
 
   private val pushNotificationAuthorizationKey = configuration.get[String]("pushNotification.authorizationKey")
-
-  private case class Notification(title: String, body: String)
-
-  private case class Data(to: String, notification: Notification)
-
   private implicit val notificationWrites: OWrites[Notification] = Json.writes[Notification]
-
-  private implicit val dataWrites: OWrites[Data] = Json.writes[Data]
 
   private def sendSMS(accountID: String, sms: constants.Notification.SMS, messageParameters: String*)(implicit lang: Lang) = {
     try {
@@ -74,7 +67,20 @@ class Notification @Inject()(masterContacts: master.Contacts,
     }
   }
 
-  private def sendPushNotification(accountID: String, pushNotification: constants.Notification.PushNotification, messageParameters: String*)(implicit lang: Lang)= Future {
+  private implicit val dataWrites: OWrites[Data] = Json.writes[Data]
+
+  def send(accountID: String, notification: constants.Notification, messagesParameters: String*)(implicit lang: Lang = Lang(masterAccounts.Service.getLanguage(accountID))): Unit = {
+    try {
+      if (notification.pushNotification.isDefined) sendPushNotification(accountID = accountID, pushNotification = notification.pushNotification.get, messageParameters = messagesParameters: _*)
+      if (notification.email.isDefined) sendEmail(toAccountID = accountID, email = notification.email.get, messagesParameters: _*)
+      if (notification.sms.isDefined) sendSMS(accountID = accountID, sms = notification.sms.get, messageParameters = messagesParameters: _*)
+    } catch {
+      case baseException: BaseException => logger.error(baseException.failure.message, baseException)
+        throw baseException
+    }
+  }
+
+  private def sendPushNotification(accountID: String, pushNotification: constants.Notification.PushNotification, messageParameters: String*)(implicit lang: Lang) = Future {
 
     try {
       val title = messagesApi(pushNotification.title)
@@ -106,14 +112,8 @@ class Notification @Inject()(masterContacts: master.Contacts,
     }
   }
 
-  def send(accountID: String, notification: constants.Notification, messagesParameters: String*)(implicit lang: Lang = Lang(masterAccounts.Service.getLanguage(accountID))): Unit = {
-    try {
-      if (notification.pushNotification.isDefined) sendPushNotification(accountID = accountID, pushNotification = notification.pushNotification.get, messageParameters = messagesParameters: _*)
-      if (notification.email.isDefined) sendEmail(toAccountID = accountID, email = notification.email.get, messagesParameters: _*)
-      if (notification.sms.isDefined) sendSMS(accountID = accountID, sms = notification.sms.get, messageParameters = messagesParameters: _*)
-    } catch {
-      case baseException: BaseException => logger.error(baseException.failure.message, baseException)
-        throw baseException
-    }
-  }
+  private case class Notification(title: String, body: String)
+
+  private case class Data(to: String, notification: Notification)
+
 }

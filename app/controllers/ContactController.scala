@@ -36,7 +36,9 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
         },
         updateContactData => {
           val insertOrUpdateContact = masterContacts.Service.insertOrUpdateContact(loginState.username, updateContactData.countryCode + updateContactData.mobileNumber, updateContactData.emailAddress)
+
           def updateStatusUnverifiedContact = masterAccounts.Service.updateStatusUnverifiedContact(loginState.username)
+
           (for {
             _ <- insertOrUpdateContact
             _ <- updateStatusUnverifiedContact

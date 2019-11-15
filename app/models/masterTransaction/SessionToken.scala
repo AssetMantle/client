@@ -81,7 +81,7 @@ class SessionTokens @Inject()(actorSystem: ActorSystem, shutdownActors: Shutdown
   }
 
   private def getSessionTimedOutIDs: Future[Seq[String]] = db.run(sessionTokenTable.filter(_.sessionTokenTime < DateTime.now(DateTimeZone.UTC).getMillis - sessionTokenTimeout).map(_.id).result)
-  
+
   private def deleteByID(id: String) = db.run(sessionTokenTable.filter(_.id === id).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -123,7 +123,7 @@ class SessionTokens @Inject()(actorSystem: ActorSystem, shutdownActors: Shutdown
     }
 
     def tryVerifyingSessionToken(id: String, sessionToken: String): Future[Boolean] = {
-      getSessionTokenHashByID(id).map{token=>
+      getSessionTokenHashByID(id).map { token =>
         if (token == util.hashing.MurmurHash3.stringHash(sessionToken).toString) true
         else throw new BaseException(constants.Response.INVALID_TOKEN)
       }
@@ -131,7 +131,7 @@ class SessionTokens @Inject()(actorSystem: ActorSystem, shutdownActors: Shutdown
     }
 
     def tryVerifyingSessionTokenTime(id: String): Future[Boolean] = {
-      getSessionTokenTimeByID(id).map{sessionToken=>
+      getSessionTokenTimeByID(id).map { sessionToken =>
         if (DateTime.now(DateTimeZone.UTC).getMillis - sessionToken < sessionTokenTimeout) true
         else throw new BaseException(constants.Response.TOKEN_TIMEOUT)
       }

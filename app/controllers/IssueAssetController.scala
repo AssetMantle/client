@@ -26,12 +26,10 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
 
   def assetDetail(id: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-
       val asset = masterTransactionIssueAssetRequests.Service.getIssueAssetByID(id)
 
       def getResult(asset: IssueAssetRequest) = {
         if (asset.accountID == loginState.username) {
-
           val assetFiles = masterTransactionAssetFiles.Service.getAllDocuments(id)
           for {
             assetFiles <- assetFiles
@@ -41,7 +39,6 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
             Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
           }
         }
-
       }
 
       (for {
@@ -79,7 +76,6 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
           } yield BadRequest(views.html.component.master.issueAssetRequest(formWithErrors, asset = issueAsset, requestID = formWithErrors.data(constants.FormField.REQUEST_ID.name)))
         },
         issueAssetRequestData => {
-
           val transactionAssetFiles = masterTransactionAssetFiles.Service.getAllDocuments(issueAssetRequestData.requestID)
 
           def updateDocumentHash(transactionAssetFiles: Seq[AssetFile]) = masterTransactionIssueAssetRequests.Service.updateDocumentHash(issueAssetRequestData.requestID, Option(utilities.FileOperations.combinedHash(transactionAssetFiles)))
@@ -128,7 +124,6 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
 
   def issueAssetDetailForm(id: Option[String]): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-
       (id match {
         case Some(requestID) =>
           val assetRequest = masterTransactionIssueAssetRequests.Service.getIssueAssetByID(requestID)
@@ -144,8 +139,6 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
         case None => Future {
           withUsernameToken.Ok(views.html.component.master.issueAssetDetail())
         }
-
-
       }).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
@@ -160,7 +153,6 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
           }
         },
         issueAssetDetailData => {
-
           val id = if (issueAssetDetailData.requestID.isEmpty) utilities.IDGenerator.requestID() else issueAssetDetailData.requestID.get
           val insertOrUpdate = masterTransactionIssueAssetRequests.Service.insertOrUpdate(id = id, ticketID = None, pegHash = None, accountID = loginState.username, documentHash = None, assetType = issueAssetDetailData.assetType, quantityUnit = issueAssetDetailData.quantityUnit, assetQuantity = issueAssetDetailData.assetQuantity, assetPrice = issueAssetDetailData.assetPrice, takerAddress = issueAssetDetailData.takerAddress, shipmentDetails = Serializable.ShipmentDetails(issueAssetDetailData.commodityName, issueAssetDetailData.quality, issueAssetDetailData.deliveryTerm, issueAssetDetailData.tradeType, issueAssetDetailData.portOfLoading, issueAssetDetailData.portOfDischarge, issueAssetDetailData.shipmentDate), physicalDocumentsHandledVia = issueAssetDetailData.physicalDocumentsHandledVia, paymentTerms = issueAssetDetailData.comdexPaymentTerms, status = constants.Status.Asset.INCOMPLETE_DETAILS)
 
@@ -188,7 +180,6 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
 
   def issueAssetOBLForm(id: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-
       val accountID = masterTransactionIssueAssetRequests.Service.getAccountID(id)
 
       def getResult(accountID: String) = {
@@ -225,7 +216,6 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
           } yield BadRequest(views.html.component.master.issueAssetOBL(formWithErrors, optionAssetFile))
         },
         issueAssetOBLData => {
-
           val checkFileExists = masterTransactionAssetFiles.Service.checkFileExists(issueAssetOBLData.requestID, constants.File.OBL)
 
           def getResult(checkFileExists: Boolean) = {
@@ -261,7 +251,6 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
 
   def issueAssetInvoiceForm(id: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-
       val accountID = masterTransactionIssueAssetRequests.Service.getAccountID(id)
 
       def getResult(accountID: String) = {
@@ -362,7 +351,6 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
 
   def updateAssetDocumentStatusForm(fileID: String, documentType: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
-
       val userZoneID = masterZones.Service.getID(loginState.username)
       val id = masterTransactionIssueAssetRequests.Service.getAccountID(fileID)
 

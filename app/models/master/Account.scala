@@ -149,7 +149,7 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   private def checkById(id: String): Future[Boolean] = db.run(accountTable.filter(_.id === id).exists.result)
 
-  private def deleteById(id: String)= db.run(accountTable.filter(_.id === id).delete.asTry).map {
+  private def deleteById(id: String) = db.run(accountTable.filter(_.id === id).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -183,12 +183,14 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
     def validateLogin(username: String, password: String): Future[Boolean] = validateLoginByIDAndSecretHash(id = username, secretHash = util.hashing.MurmurHash3.stringHash(password).toString)
 
-    def updatePassword(username:String, newPassword: String): Future[Int] = updatePasswordByID(id = username, secretHash = util.hashing.MurmurHash3.stringHash(newPassword).toString)
+    def updatePassword(username: String, newPassword: String): Future[Int] = updatePasswordByID(id = username, secretHash = util.hashing.MurmurHash3.stringHash(newPassword).toString)
 
-    def checkUsernameAvailable(username: String): Future[Boolean] =checkById(username).map{!_}
+    def checkUsernameAvailable(username: String): Future[Boolean] = checkById(username).map {
+      !_
+    }
 
-    def addLogin(username: String, password: String, accountAddress: String, language: String):Future[String] = {
-      add(Account(username, util.hashing.MurmurHash3.stringHash(password).toString, accountAddress, language, constants.User.WITHOUT_LOGIN, constants.Status.Account.NO_CONTACT)).map{_=> accountAddress}
+    def addLogin(username: String, password: String, accountAddress: String, language: String): Future[String] = {
+      add(Account(username, util.hashing.MurmurHash3.stringHash(password).toString, accountAddress, language, constants.User.WITHOUT_LOGIN, constants.Status.Account.NO_CONTACT)).map { _ => accountAddress }
     }
 
     def getAccount(username: String): Account = Await.result(findById(username), Duration.Inf)
@@ -203,14 +205,14 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
     def updateUserType(id: String, userType: String): Future[Int] = updateUserTypeById(id, userType)
 
-    def updateUserTypeOnAddress(address: String, userType: String): Future[Int] =updateUserTypeByAddress(address, userType)
+    def updateUserTypeOnAddress(address: String, userType: String): Future[Int] = updateUserTypeByAddress(address, userType)
 
-    def getUserType(id: String): Future[String] =getUserTypeById(id)
+    def getUserType(id: String): Future[String] = getUserTypeById(id)
 
-    def tryVerifyingUserType(id: String, userType: String):Future[Boolean] = {
-         getUserTypeById(id).map{userTypeResult=>
-           if(userTypeResult==userType) true else throw new BaseException(constants.Response.UNAUTHORIZED)
-         }
+    def tryVerifyingUserType(id: String, userType: String): Future[Boolean] = {
+      getUserTypeById(id).map { userTypeResult =>
+        if (userTypeResult == userType) true else throw new BaseException(constants.Response.UNAUTHORIZED)
+      }
     }
 
     def getUserTypeOnAddress(address: String): String = Await.result(getUserTypeByAddress(address), Duration.Inf)

@@ -128,7 +128,6 @@ class ACLAccounts @Inject()(protected val databaseConfigProvider: DatabaseConfig
   }
 
   object Utility {
-
     def dirtyEntityUpdater() = {
       val dirtyAddresses = Service.getDirtyAddresses
       Thread.sleep(sleepTime)
@@ -154,7 +153,7 @@ class ACLAccounts @Inject()(protected val databaseConfigProvider: DatabaseConfig
       } yield {}
         ).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
-      }
+      }(schedulerExecutionContext)
     }
   }
 

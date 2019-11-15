@@ -2,12 +2,13 @@ package models.master
 
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
-import org.postgresql.util.PSQLException
 import models.common.Serializable._
+import org.postgresql.util.PSQLException
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
 import slick.jdbc.JdbcProfile
+import slick.lifted.TableQuery
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
@@ -17,26 +18,17 @@ case class Zone(id: String, accountID: String, name: String, currency: String, a
 
 @Singleton
 class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
-
-  case class ZoneSerialized(id: String, accountID: String, name: String, currency: String, address: String, completionStatus: Boolean, verificationStatus: Option[Boolean]) {
-
-    def deserialize: Zone = Zone(id = id, accountID = accountID, name = name, currency = currency, address = utilities.JSON.convertJsonStringToObject[Address](address), completionStatus = completionStatus, verificationStatus = verificationStatus)
-
-  }
+  val databaseConfig = databaseConfigProvider.get[JdbcProfile]
+  val db = databaseConfig.db
+  private[models] val zoneTable = TableQuery[ZoneTable]
 
   private def serialize(zone: Zone): ZoneSerialized = ZoneSerialized(id = zone.id, accountID = zone.accountID, name = zone.name, currency = zone.currency, address = Json.toJson(zone.address).toString, completionStatus = zone.completionStatus, verificationStatus = zone.verificationStatus)
-
-  val databaseConfig = databaseConfigProvider.get[JdbcProfile]
-
-  val db = databaseConfig.db
 
   private implicit val logger: Logger = Logger(this.getClass)
 
   private implicit val module: String = constants.Module.MASTER_ZONE
 
   import databaseConfig.profile.api._
-
-  private[models] val zoneTable = TableQuery[ZoneTable]
 
   private def add(zoneSerialized: ZoneSerialized): Future[String] = db.run((zoneTable returning zoneTable.map(_.id) += zoneSerialized).asTry).map {
     case Success(result) => result
@@ -126,6 +118,11 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
     }
   }
 
+  case class ZoneSerialized(id: String, accountID: String, name: String, currency: String, address: String, completionStatus: Boolean, verificationStatus: Option[Boolean]) {
+
+    def deserialize: Zone = Zone(id = id, accountID = accountID, name = name, currency = currency, address = utilities.JSON.convertJsonStringToObject[Address](address), completionStatus = completionStatus, verificationStatus = verificationStatus)
+
+  }
 
   private[models] class ZoneTable(tag: Tag) extends Table[ZoneSerialized](tag, "Zone") {
 
@@ -151,19 +148,22 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
     def create(accountID: String, name: String, currency: String, address: Address): String = Await.result(add(serialize(Zone(id = utilities.IDGenerator.hexadecimal, accountID = accountID, name = name, currency = currency, address = address))), Duration.Inf)
 
-    def insertOrUpdate(accountID: String, name: String, currency: String, address: Address):Future[String] = {
+    def insertOrUpdate(accountID: String, name: String, currency: String, address: Address): Future[String] = {
+      val id = getIDByAccountID(accountID).map(_.getOrElse(utilities.IDGenerator.hexadecimal))
 
-      val id=getIDByAccountID(accountID).map(_.getOrElse(utilities.IDGenerator.hexadecimal))
-      def upsertZone(id:String)=upsert(serialize(Zone(id = id, accountID = accountID, name = name, currency = currency, address = address)))
-      for{
-        id<-id
-        _<-upsertZone(id)
-      }yield id
+      def upsertZone(id: String) = upsert(serialize(Zone(id = id, accountID = accountID, name = name, currency = currency, address = address)))
+
+      for {
+        id <- id
+        _ <- upsertZone(id)
+      } yield id
     }
 
-    def get(id: String): Future[Zone] = findById(id).map{_.deserialize}
+    def get(id: String): Future[Zone] = findById(id).map {
+      _.deserialize
+    }
 
-    def getID(accountID: String): Future[String] =getIDByAccountID(accountID).map(_.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)))
+    def getID(accountID: String): Future[String] = getIDByAccountID(accountID).map(_.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)))
 
     def getByAccountID(accountID: String): Future[Zone] = findByAccountID(accountID).map(_.deserialize)
 
@@ -171,15 +171,15 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
     def verifyZone(id: String): Future[Int] = updateVerificationStatusOnID(id, Option(true))
 
-    def rejectZone(id: String): Future[Int] =updateVerificationStatusOnID(id, Option(false))
+    def rejectZone(id: String): Future[Int] = updateVerificationStatusOnID(id, Option(false))
 
     def getAccountId(id: String): Future[String] = getAccountIdById(id)
 
     def markZoneFormCompleted(id: String): Future[Int] = updateCompletionStatusOnID(id = id, completionStatus = true)
 
-    def getVerifyZoneRequests: Future[Seq[Zone]] =getZonesByCompletionStatusVerificationStatus(completionStatus = true, verificationStatus = null).map(_.map(_.deserialize))
+    def getVerifyZoneRequests: Future[Seq[Zone]] = getZonesByCompletionStatusVerificationStatus(completionStatus = true, verificationStatus = null).map(_.map(_.deserialize))
 
-    def getVerificationStatus(id: String): Future[Boolean] = getVerificationStatusByID(id).map{status=>status.getOrElse(false)}
+    def getVerificationStatus(id: String): Future[Boolean] = getVerificationStatusByID(id).map { status => status.getOrElse(false) }
 
   }
 

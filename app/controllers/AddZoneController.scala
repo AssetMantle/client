@@ -44,7 +44,6 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
           }
         },
         addZoneData => {
-
           val id = masterZones.Service.insertOrUpdate(accountID = loginState.username, name = addZoneData.name, currency = addZoneData.currency, address = Address(addressLine1 = addZoneData.address.addressLine1, addressLine2 = addZoneData.address.addressLine2, landmark = addZoneData.address.landmark, city = addZoneData.address.city, country = addZoneData.address.country, zipCode = addZoneData.address.zipCode, phone = addZoneData.address.phone))
 
           def zoneKYCs(id: String) = masterZoneKYCs.Service.getAllDocuments(id)
@@ -62,7 +61,6 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
 
   def userUploadOrUpdateZoneKYCView(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
-
       val zoneID = masterZones.Service.getID(loginState.username)
 
       def zoneKYCs(zoneID: String) = masterZoneKYCs.Service.getAllDocuments(zoneID)
@@ -103,7 +101,6 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
 
   def userStoreZoneKYC(name: String, documentType: String): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
-
       val id = masterZones.Service.getID(loginState.username)
 
       def storeFile(id: String) = fileResourceManager.storeFile[master.ZoneKYC](
@@ -132,7 +129,6 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
 
   def userUpdateZoneKYC(name: String, documentType: String): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
-
       val id = masterZones.Service.getID(loginState.username)
 
       def getOldDocumentFileName(id: String) = masterZoneKYCs.Service.getFileName(id = id, documentType = documentType)
@@ -161,10 +157,9 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
 
   def userReviewAddZoneRequestForm(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
-
       val zone = masterZones.Service.getByAccountID(loginState.username)
 
-      def zoneKYCs(id:String) = masterZoneKYCs.Service.getAllDocuments(id)
+      def zoneKYCs(id: String) = masterZoneKYCs.Service.getAllDocuments(id)
 
       (for {
         zone <- zone
@@ -179,10 +174,9 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
     implicit request =>
       views.companion.master.ReviewAddZoneRequest.form.bindFromRequest().fold(
         formWithErrors => {
-
           val zone = masterZones.Service.getByAccountID(loginState.username)
 
-          def zoneKYCs(id:String) = masterZoneKYCs.Service.getAllDocuments(id)
+          def zoneKYCs(id: String) = masterZoneKYCs.Service.getAllDocuments(id)
 
           (for {
             zone <- zone
@@ -206,7 +200,7 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
             } else {
               val zone = masterZones.Service.getByAccountID(loginState.username)
 
-              def zoneKYCs(id:String) = masterZoneKYCs.Service.getAllDocuments(id)
+              def zoneKYCs(id: String) = masterZoneKYCs.Service.getAllDocuments(id)
 
               for {
                 zone <- zone
@@ -281,7 +275,6 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
 
   def viewPendingVerifyZoneRequests: Action[AnyContent] = withGenesisLoginAction.authenticated { implicit loginState =>
     implicit request =>
-
       val verifyZoneRequests = masterZones.Service.getVerifyZoneRequests
       (for {
         verifyZoneRequests <- verifyZoneRequests
@@ -294,7 +287,6 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
 
   def viewKYCDocuments(accountID: String): Action[AnyContent] = withGenesisLoginAction.authenticated { implicit loginState =>
     implicit request =>
-
       val zoneKYCs = masterZoneKYCs.Service.getAllDocuments(accountID)
       (for {
         zoneKYCs <- zoneKYCs
@@ -306,12 +298,11 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
 
   def updateZoneKYCDocumentStatusForm(zoneID: String, documentType: String): Action[AnyContent] = withGenesisLoginAction.authenticated { implicit loginState =>
     implicit request =>
-
       val zoneKYC = masterZoneKYCs.Service.get(id = zoneID, documentType = documentType)
       (for {
         zoneKYC <- zoneKYC
       } yield Ok(views.html.component.master.updateZoneKYCDocumentStatus(zoneKYC = zoneKYC))
-        ).recover{
+        ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
@@ -320,7 +311,6 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
     implicit request =>
       views.companion.master.UpdateZoneKYCDocumentStatus.form.bindFromRequest().fold(
         formWithErrors => {
-
           val zoneKYC = masterZoneKYCs.Service.get(id = formWithErrors(constants.FormField.ZONE_ID.name).value.get, documentType = formWithErrors(constants.FormField.DOCUMENT_TYPE.name).value.get)
           (for {
             zoneKYC <- zoneKYC
@@ -330,7 +320,6 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
           }
         },
         updateZoneKYCDocumentStatusData => {
-
           val verifyOrRejectAndSendNotification = if (updateZoneKYCDocumentStatusData.status) {
             val verify = masterZoneKYCs.Service.verify(id = updateZoneKYCDocumentStatusData.zoneID, documentType = updateZoneKYCDocumentStatusData.documentType)
             val zoneId = masterZones.Service.getAccountId(updateZoneKYCDocumentStatusData.zoneID)
@@ -393,7 +382,6 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
 
   def viewZonesInGenesis: Action[AnyContent] = withGenesisLoginAction.authenticated { implicit loginState =>
     implicit request =>
-
       val zones = masterZones.Service.getAllVerified
       (for {
         zones <- zones
@@ -429,7 +417,6 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
 
   def storeZoneKYC(name: String, documentType: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
-
       val id = masterZones.Service.getID(loginState.username)
 
       def storeFile(id: String) = fileResourceManager.storeFile[master.ZoneKYC](
@@ -439,6 +426,7 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
         document = master.ZoneKYC(id = id, documentType = documentType, status = None, fileName = name, file = None),
         masterCreate = masterZoneKYCs.Service.create
       )
+
       (for {
         id <- id
         _ <- storeFile(id)
@@ -454,7 +442,6 @@ class AddZoneController @Inject()(messagesControllerComponents: MessagesControll
 
   def updateZoneKYC(name: String, documentType: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
-
       val id = masterZones.Service.getID(loginState.username)
 
       def getOldDocumentFileName(id: String) = masterZoneKYCs.Service.getFileName(id = id, documentType = documentType)

@@ -89,5 +89,6 @@ class PushNotificationTokens @Inject()(protected val databaseConfigProvider: Dat
     def delete(id: String): Future[Int] = deleteByID(id)
 
   }
+
 }
 

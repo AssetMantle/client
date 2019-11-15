@@ -6,7 +6,6 @@ import models.Trait.Document
 import org.postgresql.util.PSQLException
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
-import play.api.libs.json.{Json, OWrites, Reads}
 import slick.jdbc.JdbcProfile
 
 import scala.concurrent.duration.Duration
@@ -180,13 +179,13 @@ class NegotiationFiles @Inject()(protected val databaseConfigProvider: DatabaseC
     def create(file: NegotiationFile): Future[String] = add(NegotiationFile(id = file.id, documentType = file.documentType, fileName = file.fileName, file = file.file, documentContent = None, status = None))
 
     def getOrEmpty(id: String, documentType: String): NegotiationFile = Await.result(findByIdDocumentTypeOrNone(id = id, documentType = documentType), Duration.Inf) match {
-      case Some(negotiation) =>negotiation
+      case Some(negotiation) => negotiation
       case None => NegotiationFile("", "", "", None, None, None)
     }
 
     def get(id: String, documentType: String): NegotiationFile = Await.result(findByIdDocumentType(id = id, documentType = documentType), Duration.Inf)
 
-    def getOrNone(id: String, documentType: String): Future[Option[NegotiationFile]] =findByIdDocumentTypeOrNone(id = id, documentType = documentType)
+    def getOrNone(id: String, documentType: String): Future[Option[NegotiationFile]] = findByIdDocumentTypeOrNone(id = id, documentType = documentType)
 
     def getConfirmBidDocuments(id: String): Future[Seq[NegotiationFile]] = getDocumentsByID(id = id, documents = Seq(constants.File.BUYER_CONTRACT, constants.File.SELLER_CONTRACT))
 
@@ -204,7 +203,7 @@ class NegotiationFiles @Inject()(protected val databaseConfigProvider: DatabaseC
 
     def deleteAllDocuments(id: String): Int = Await.result(deleteById(id = id), Duration.Inf)
 
-    def checkFileExists(id: String, documentType: String): Boolean =  Await.result(getIDAndDocumentType(id, documentType), Duration.Inf)
+    def checkFileExists(id: String, documentType: String): Boolean = Await.result(getIDAndDocumentType(id, documentType), Duration.Inf)
 
     def checkFileNameExists(id: String, fileName: String): Boolean = Await.result(checkByIdAndFileName(id = id, fileName = fileName), Duration.Inf)
   }

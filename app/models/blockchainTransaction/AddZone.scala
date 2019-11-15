@@ -30,6 +30,7 @@ class AddZones @Inject()(actorSystem: ActorSystem, transaction: utilities.Transa
   private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
 
   import databaseConfig.profile.api._
+
   private[models] val addZoneTable = TableQuery[AddZoneTable]
 
   private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
@@ -163,7 +164,6 @@ class AddZones @Inject()(actorSystem: ActorSystem, transaction: utilities.Transa
   }
 
   object Utility {
-
     def onSuccess(ticketID: String, blockResponse: BlockResponse) = {
       val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
       val addZone = Service.getTransaction(ticketID)

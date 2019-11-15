@@ -7,8 +7,7 @@ import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.JdbcProfile
 
-import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 case class AddTraderRequest(id: String, accountID: String, traderID: String, organizationID: String)
@@ -78,7 +77,7 @@ class AddTraderRequests @Inject()(protected val databaseConfigProvider: Database
 
   object Service {
 
-    def create(accountID: String, organizationID: String): Future[String] =add(AddTraderRequest(id = utilities.IDGenerator.requestID, accountID = accountID, traderID = utilities.IDGenerator.hexadecimal, organizationID = organizationID))
+    def create(accountID: String, organizationID: String): Future[String] = add(AddTraderRequest(id = utilities.IDGenerator.requestID, accountID = accountID, traderID = utilities.IDGenerator.hexadecimal, organizationID = organizationID))
 
     def get(id: String): Future[AddTraderRequest] = findById(id)
   }

@@ -36,9 +36,11 @@ class WithUserLoginAction @Inject()(messagesControllerComponents: MessagesContro
           case baseException: BaseException => logger.info(baseException.failure.message, baseException)
             Results.Unauthorized(views.html.index(failures = Seq(baseException.failure)))
         }
-      }catch {
+      } catch {
         case baseException: BaseException => logger.info(baseException.failure.message, baseException)
-          Future{Results.Unauthorized(views.html.index(failures = Seq(baseException.failure)))}
+          Future {
+            Results.Unauthorized(views.html.index(failures = Seq(baseException.failure)))
+          }
       }
     }
   }

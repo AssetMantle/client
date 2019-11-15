@@ -36,6 +36,7 @@ class ChangeSellerBids @Inject()(actorSystem: ActorSystem, transaction: utilitie
   private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
 
   import databaseConfig.profile.api._
+
   private[models] val changeSellerBidTable = TableQuery[ChangeSellerBidTable]
 
   private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
@@ -173,10 +174,7 @@ class ChangeSellerBids @Inject()(actorSystem: ActorSystem, transaction: utilitie
   }
 
   object Utility {
-
-
     def onSuccess(ticketID: String, blockResponse: BlockResponse): Future[Unit] = {
-
       val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
       val changeSellerBid = Service.getTransaction(ticketID)
 
@@ -228,7 +226,6 @@ class ChangeSellerBids @Inject()(actorSystem: ActorSystem, transaction: utilitie
     }
 
     def onFailure(ticketID: String, message: String) = {
-
       val markTransactionFailed = Service.markTransactionFailed(ticketID, message)
       val changeSellerBid = Service.getTransaction(ticketID)
 

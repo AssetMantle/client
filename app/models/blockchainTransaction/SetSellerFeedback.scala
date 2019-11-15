@@ -169,8 +169,6 @@ class SetSellerFeedbacks @Inject()(actorSystem: ActorSystem, transaction: utilit
   }
 
   object Utility {
-
-
     def onSuccess(ticketID: String, blockResponse: BlockResponse): Future[Unit] = {
       val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
       val setSellerFeedback = Service.getTransaction(ticketID)

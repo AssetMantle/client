@@ -24,15 +24,19 @@ class WithLoginAction @Inject()(messagesControllerComponents: MessagesController
         val address = masterAccounts.Service.getAddress(username)
         val userType = masterAccounts.Service.getUserType(username)
 
-        def getLoginState(address:String,userType:String)={
-          if(userType == constants.User.TRADER){
+        def getLoginState(address: String, userType: String) = {
+          if (userType == constants.User.TRADER) {
             val aclHash = blockchainACLAccounts.Service.getACLHash(address)
-            def acl(aclHash: String) =blockchainACLHashes.Service.getACL(aclHash)
-            for{
-              aclHash<-aclHash
-              acl<-acl(aclHash)
-            }yield LoginState(username, userType, address,  Option(acl))
-          }else Future{LoginState(username, userType, address, None)}
+
+            def acl(aclHash: String) = blockchainACLHashes.Service.getACL(aclHash)
+
+            for {
+              aclHash <- aclHash
+              acl <- acl(aclHash)
+            } yield LoginState(username, userType, address, Option(acl))
+          } else Future {
+            LoginState(username, userType, address, None)
+          }
         }
 
         def result(loginState: LoginState) = f(loginState)(request)
@@ -42,7 +46,7 @@ class WithLoginAction @Inject()(messagesControllerComponents: MessagesController
           _ <- tokenTimeVerify
           userType <- userType
           address <- address
-          loginState<-getLoginState(address,userType)
+          loginState <- getLoginState(address, userType)
           result <- result(loginState)
         } yield result).recover {
           case baseException: BaseException => logger.info(baseException.failure.message, baseException)
@@ -51,7 +55,9 @@ class WithLoginAction @Inject()(messagesControllerComponents: MessagesController
       }
       catch {
         case baseException: BaseException => logger.info(baseException.failure.message, baseException)
-          Future{Results.Unauthorized(views.html.index()).withNewSession}
+          Future {
+            Results.Unauthorized(views.html.index()).withNewSession
+          }
       }
     }
   }

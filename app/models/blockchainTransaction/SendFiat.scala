@@ -30,15 +30,11 @@ class SendFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_SEND_FIAT
 
   private implicit val logger: Logger = Logger(this.getClass)
-
-  private val schedulerExecutionContext:ExecutionContext= actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
-
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
-
   val db = databaseConfig.db
+  private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
 
   import databaseConfig.profile.api._
-
   private[models] val sendFiatTable = TableQuery[SendFiatTable]
 
   private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
@@ -175,26 +171,32 @@ class SendFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
   }
 
   object Utility {
-
-    def onSuccess(ticketID: String, blockResponse: BlockResponse)= {
-      val markTransactionSuccessful=Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
+    def onSuccess(ticketID: String, blockResponse: BlockResponse) = {
+      val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
       val sendFiat = Service.getTransaction(ticketID)
-      def negotiationID(sendFiat:SendFiat) = blockchainNegotiations.Service.getNegotiationID(buyerAddress = sendFiat.from, sellerAddress = sendFiat.to, pegHash = sendFiat.pegHash)
-      def insertOrUpdate(negotiationID:String)=blockchainOrders.Service.insertOrUpdate(id = negotiationID, None, None, dirtyBit = true)
 
-      def orderResponse(negotiationID:String) = getOrder.Service.get(negotiationID)
-      def insertOrUpdateFiats(orderResponse:queries.responses.OrderResponse.Response,negotiationID:String)=Future{orderResponse.value.fiatPegWallet.foreach(fiats => fiats.foreach(fiatPeg => blockchainFiats.Service.insertOrUpdate(pegHash = fiatPeg.pegHash, ownerAddress = negotiationID, transactionID = fiatPeg.transactionID, transactionAmount = fiatPeg.transactionAmount, redeemedAmount = fiatPeg.redeemedAmount, dirtyBit = false)))}
-      def markDirty(sendFiat:SendFiat)={
-        val markDirtyBlockchainFiats=blockchainFiats.Service.markDirty(sendFiat.from)
-        val markDirtyBlockchainTransactionFeedbacks=blockchainTransactionFeedbacks.Service.markDirty(sendFiat.from)
-        val markDirtyBlockchainAccounts=blockchainAccounts.Service.markDirty(sendFiat.from)
-        for{
-          _<-markDirtyBlockchainFiats
-          _<-markDirtyBlockchainTransactionFeedbacks
-          _<-markDirtyBlockchainAccounts
-        }yield {}
+      def negotiationID(sendFiat: SendFiat) = blockchainNegotiations.Service.getNegotiationID(buyerAddress = sendFiat.from, sellerAddress = sendFiat.to, pegHash = sendFiat.pegHash)
+
+      def insertOrUpdate(negotiationID: String) = blockchainOrders.Service.insertOrUpdate(id = negotiationID, None, None, dirtyBit = true)
+
+      def orderResponse(negotiationID: String) = getOrder.Service.get(negotiationID)
+
+      def insertOrUpdateFiats(orderResponse: queries.responses.OrderResponse.Response, negotiationID: String) = Future {
+        orderResponse.value.fiatPegWallet.foreach(fiats => fiats.foreach(fiatPeg => blockchainFiats.Service.insertOrUpdate(pegHash = fiatPeg.pegHash, ownerAddress = negotiationID, transactionID = fiatPeg.transactionID, transactionAmount = fiatPeg.transactionAmount, redeemedAmount = fiatPeg.redeemedAmount, dirtyBit = false)))
       }
-      def getIDs(sendFiat:SendFiat) = {
+
+      def markDirty(sendFiat: SendFiat) = {
+        val markDirtyBlockchainFiats = blockchainFiats.Service.markDirty(sendFiat.from)
+        val markDirtyBlockchainTransactionFeedbacks = blockchainTransactionFeedbacks.Service.markDirty(sendFiat.from)
+        val markDirtyBlockchainAccounts = blockchainAccounts.Service.markDirty(sendFiat.from)
+        for {
+          _ <- markDirtyBlockchainFiats
+          _ <- markDirtyBlockchainTransactionFeedbacks
+          _ <- markDirtyBlockchainAccounts
+        } yield {}
+      }
+
+      def getIDs(sendFiat: SendFiat) = {
         val toAccountID = masterAccounts.Service.getId(sendFiat.to)
         val fromAccountID = masterAccounts.Service.getId(sendFiat.from)
         for {
@@ -202,19 +204,20 @@ class SendFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
           fromAccountID <- fromAccountID
         } yield (toAccountID, fromAccountID)
       }
-      (for{
-        _<-markTransactionSuccessful
-        sendFiat<-sendFiat
-        negotiationID<-negotiationID(sendFiat)
-        _<-insertOrUpdate(negotiationID)
-        orderResponse<-orderResponse(negotiationID)
-        _<-insertOrUpdateFiats(orderResponse,negotiationID)
-        _<-markDirty(sendFiat)
+
+      (for {
+        _ <- markTransactionSuccessful
+        sendFiat <- sendFiat
+        negotiationID <- negotiationID(sendFiat)
+        _ <- insertOrUpdate(negotiationID)
+        orderResponse <- orderResponse(negotiationID)
+        _ <- insertOrUpdateFiats(orderResponse, negotiationID)
+        _ <- markDirty(sendFiat)
         (toAccountID, fromAccountID) <- getIDs(sendFiat)
-      }yield{
+      } yield {
         utilitiesNotification.send(toAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
         utilitiesNotification.send(fromAccountID, constants.Notification.SUCCESS, blockResponse.txhash)
-      }).recover{
+      }).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
           throw new BaseException(constants.Response.PSQL_EXCEPTION)
         case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
@@ -222,10 +225,12 @@ class SendFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
     }
 
     def onFailure(ticketID: String, message: String): Future[Unit] = {
-      val markTransactionFailed= Service.markTransactionFailed(ticketID, message)
+      val markTransactionFailed = Service.markTransactionFailed(ticketID, message)
       val sendFiat = Service.getTransaction(ticketID)
-      def markDirty(fromAddress:String)=blockchainTransactionFeedbacks.Service.markDirty(fromAddress)
-      def getIDs(sendFiat:SendFiat) = {
+
+      def markDirty(fromAddress: String) = blockchainTransactionFeedbacks.Service.markDirty(fromAddress)
+
+      def getIDs(sendFiat: SendFiat) = {
         val toAccountID = masterAccounts.Service.getId(sendFiat.to)
         val fromAccountID = masterAccounts.Service.getId(sendFiat.from)
         for {
@@ -233,15 +238,16 @@ class SendFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
           fromAccountID <- fromAccountID
         } yield (toAccountID, fromAccountID)
       }
-      (for{
-        _<-markTransactionFailed
-        sendFiat<-sendFiat
-        _<-markDirty(sendFiat.from)
+
+      (for {
+        _ <- markTransactionFailed
+        sendFiat <- sendFiat
+        _ <- markDirty(sendFiat.from)
         (toAccountID, fromAccountID) <- getIDs(sendFiat)
-      }yield {
+      } yield {
         utilitiesNotification.send(toAccountID, constants.Notification.FAILURE, message)
         utilitiesNotification.send(fromAccountID, constants.Notification.FAILURE, message)
-      }).recover{
+      }).recover {
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
     }

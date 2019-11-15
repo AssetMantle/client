@@ -8,8 +8,7 @@ import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
 import queries.responses.BlockDetailsResponse.Response
 
-import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class GetBlockDetails @Inject()()(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
@@ -32,11 +31,10 @@ class GetBlockDetails @Inject()()(implicit wsClient: WSClient, configuration: Co
 
   object Service {
 
-    def get(minimumHeight: Int, maximumHeight: Int):  Future[Response] =action(minimumHeight = minimumHeight, maximumHeight = maximumHeight)
-      .recover{
-        case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
-          throw new BaseException(constants.Response.CONNECT_EXCEPTION)
-      }
+    def get(minimumHeight: Int, maximumHeight: Int): Future[Response] = action(minimumHeight = minimumHeight, maximumHeight = maximumHeight).recover {
+      case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
+        throw new BaseException(constants.Response.CONNECT_EXCEPTION)
+    }
   }
 
 }

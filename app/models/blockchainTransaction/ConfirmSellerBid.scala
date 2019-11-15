@@ -177,10 +177,7 @@ class ConfirmSellerBids @Inject()(actorSystem: ActorSystem, transaction: utiliti
   }
 
   object Utility {
-
-
     def onSuccess(ticketID: String, blockResponse: BlockResponse): Future[Unit] = {
-
       val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
       val confirmSellerBid = Service.getTransaction(ticketID)
 
@@ -229,7 +226,6 @@ class ConfirmSellerBids @Inject()(actorSystem: ActorSystem, transaction: utiliti
     }
 
     def onFailure(ticketID: String, message: String): Future[Unit] = {
-
       val markTransactionFailed = Service.markTransactionFailed(ticketID, message)
       val confirmSellerBid = Service.getTransaction(ticketID)
 

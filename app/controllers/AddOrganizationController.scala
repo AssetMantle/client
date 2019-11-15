@@ -266,6 +266,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
   def userReviewAddOrganizationRequestForm(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val organization = masterOrganizations.Service.getByAccountID(loginState.username)
+
       def getZoneOrganizationDetails(organization: Organization) = {
         val zone = masterZones.Service.get(organization.zoneID)
         val organizationBankAccountDetail = masterOrganizationBankAccountDetails.Service.get(organization.id)
@@ -276,6 +277,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
           organizationKYCs <- organizationKYCs
         } yield (zone, organizationBankAccountDetail, organizationKYCs)
       }
+
       (for {
         organization <- organization
         (zone, organizationBankAccountDetail, organizationKYCs) <- getZoneOrganizationDetails(organization)
@@ -286,12 +288,12 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
   }
 
 
-
   def userReviewAddOrganizationRequest(): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
       views.companion.master.UserReviewAddOrganizationRequest.form.bindFromRequest().fold(
         formWithErrors => {
           val organization = masterOrganizations.Service.getByAccountID(loginState.username)
+
           def getZoneOrganizationDetails(organization: Organization) = {
             val zone = masterZones.Service.get(organization.zoneID)
             val organizationBankAccountDetail = masterOrganizationBankAccountDetails.Service.get(organization.id)
@@ -302,6 +304,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
               organizationKYCs <- organizationKYCs
             } yield (zone, organizationBankAccountDetail, organizationKYCs)
           }
+
           (for {
             organization <- organization
             (zone, organizationBankAccountDetail, organizationKYCs) <- getZoneOrganizationDetails(organization)
@@ -322,6 +325,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
               } yield withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ORGANIZATION_ADDED_FOR_VERIFICATION)))
             } else {
               val organization = masterOrganizations.Service.getByAccountID(loginState.username)
+
               def getZoneOrganizationDetails(organization: Organization) = {
                 val zone = masterZones.Service.get(organization.zoneID)
                 val organizationBankAccountDetail = masterOrganizationBankAccountDetails.Service.get(organization.id)
@@ -332,6 +336,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
                   organizationKYCs <- organizationKYCs
                 } yield (zone, organizationBankAccountDetail, organizationKYCs)
               }
+
               for {
                 organization <- organization
                 (zone, organizationBankAccountDetail, organizationKYCs) <- getZoneOrganizationDetails(organization)

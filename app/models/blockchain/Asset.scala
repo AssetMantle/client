@@ -180,7 +180,6 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
   }
 
   object Utility {
-
     def dirtyEntityUpdater() = {
       val dirtyAssets = Service.getDirtyAssets
       Thread.sleep(sleepTime)
@@ -221,15 +220,14 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
         }
       }
 
-      for {
+      (for {
         dirtyAssets <- dirtyAssets
         _ <- insertOrUpdateAndSendCometMessage(dirtyAssets)
-      } yield {}
+      } yield {}) (schedulerExecutionContext)
     }
   }
 
   actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
     Utility.dirtyEntityUpdater()
   }(schedulerExecutionContext)
-
 }

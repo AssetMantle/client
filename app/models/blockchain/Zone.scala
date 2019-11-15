@@ -153,10 +153,10 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
         }
       }
 
-      for {
+      (for {
         dirtyZones <- dirtyZones
         _ <- refreshDirtyZones(dirtyZones)
-      } yield {}
+      } yield {}) (schedulerExecutionContext)
     }
   }
 

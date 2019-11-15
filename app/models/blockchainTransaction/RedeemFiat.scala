@@ -32,6 +32,7 @@ class RedeemFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Tra
   private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
 
   import databaseConfig.profile.api._
+
   private[models] val redeemFiatTable = TableQuery[RedeemFiatTable]
 
   private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
@@ -166,7 +167,6 @@ class RedeemFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Tra
   }
 
   object Utility {
-
     def onSuccess(ticketID: String, blockResponse: BlockResponse): Future[Unit] = {
       val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
       val redeemFiat = Service.getTransaction(ticketID)
@@ -201,7 +201,6 @@ class RedeemFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Tra
         case baseException: BaseException => logger.error(baseException.failure.message, baseException)
           throw new BaseException(constants.Response.PSQL_EXCEPTION)
       }
-
     }
 
     def onFailure(ticketID: String, message: String): Future[Unit] = Future {

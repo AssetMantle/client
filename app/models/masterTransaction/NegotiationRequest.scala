@@ -155,11 +155,11 @@ class NegotiationRequests @Inject()(protected val databaseConfigProvider: Databa
   }
 
   private def getSellerAccountIDByID(id: String): Future[String] = db.run(negotiationRequestTable.filter(_.id === id).map(_.sellerAccountID).result.head.asTry).map {
-      case Success(result) => result
-      case Failure(exception) => exception match {
-        case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-          throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-      }
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
   }
 
   private def getBuyerAccountIDByID(id: String): Future[String] = db.run(negotiationRequestTable.filter(_.id === id).map(_.buyerAccountID).result.head.asTry).map {
@@ -183,7 +183,7 @@ class NegotiationRequests @Inject()(protected val databaseConfigProvider: Databa
     def sellerAccountID = column[String]("sellerAccountID")
 
     def pegHash = column[String]("pegHash")
-    
+
     def amount = column[Int]("amount")
 
     def status = column[String]("status")
@@ -194,7 +194,7 @@ class NegotiationRequests @Inject()(protected val databaseConfigProvider: Databa
 
   object Service {
 
-    def create(id: String, negotiationID: String, amount: Int): String = Await.result(add(NegotiationRequest(utilities.IDGenerator.requestID(), null, null, null,null ,amount, null, null)), Duration.Inf)
+    def create(id: String, negotiationID: String, amount: Int): String = Await.result(add(NegotiationRequest(utilities.IDGenerator.requestID(), null, null, null, null, amount, null, null)), Duration.Inf)
 
     def insertOrUpdate(requestID: String, buyerAccountID: String, sellerAccountID: String, pegHash: String, amount: Int): Future[Int] = upsert(NegotiationRequest(requestID, None, buyerAccountID, sellerAccountID, pegHash, amount, constants.Status.Asset.UNDER_NEGOTIATION, None))
 
@@ -212,21 +212,21 @@ class NegotiationRequests @Inject()(protected val databaseConfigProvider: Databa
 
     def getStatus(id: String): Option[String] = Await.result(getStatusByID(id), Duration.Inf)
 
-    def checkNegotiationAndAccountIDExists(id: String ,accountID: String): Future[Boolean] = checkByIDAndAccountID(id, accountID)
+    def checkNegotiationAndAccountIDExists(id: String, accountID: String): Future[Boolean] = checkByIDAndAccountID(id, accountID)
 
-    def getNegotiationByPegHashAndBuyerAccountID(pegHash: String ,buyerAccountID: String): Future[Option[NegotiationRequest]] = findNegotiationByPegHashAndBuyerAccountID(pegHash, buyerAccountID)
+    def getNegotiationByPegHashAndBuyerAccountID(pegHash: String, buyerAccountID: String): Future[Option[NegotiationRequest]] = findNegotiationByPegHashAndBuyerAccountID(pegHash, buyerAccountID)
 
-    def getIDByPegHashAndBuyerAccountID(pegHash: String ,buyerAccountID: String): Future[Option[String]] = findIDByPegHashAndBuyerAccountID(pegHash, buyerAccountID)
+    def getIDByPegHashAndBuyerAccountID(pegHash: String, buyerAccountID: String): Future[Option[String]] = findIDByPegHashAndBuyerAccountID(pegHash, buyerAccountID)
 
-    def getNegotiationByPegHashBuyerAccountIDAndSellerAccountID(pegHash: String ,buyerAccountID: String, sellerAccountID: String): Future[NegotiationRequest] = findNegotiationByPegHashBuyerAccountIDAndSellerAccountID(pegHash, buyerAccountID, sellerAccountID)
+    def getNegotiationByPegHashBuyerAccountIDAndSellerAccountID(pegHash: String, buyerAccountID: String, sellerAccountID: String): Future[NegotiationRequest] = findNegotiationByPegHashBuyerAccountIDAndSellerAccountID(pegHash, buyerAccountID, sellerAccountID)
 
-    def getIDByPegHashBuyerAccountIDAndSellerAccountID(pegHash: String, buyerAccountID: String, sellerAccountID: String): Future[String] =findIDByPegHashBuyerAccountIDAndSellerAccountID(pegHash, buyerAccountID, sellerAccountID)
+    def getIDByPegHashBuyerAccountIDAndSellerAccountID(pegHash: String, buyerAccountID: String, sellerAccountID: String): Future[String] = findIDByPegHashBuyerAccountIDAndSellerAccountID(pegHash, buyerAccountID, sellerAccountID)
 
     def getIDByNegotiationID(negotiationID: String): Future[String] = findIDByNegotiationID(negotiationID)
 
-    def getSellerAccountID(id: String): Future[String] =getSellerAccountIDByID(id)
+    def getSellerAccountID(id: String): Future[String] = getSellerAccountIDByID(id)
 
-    def getBuyerAccountID(id: String): Future[String]  = getBuyerAccountIDByID(id)
+    def getBuyerAccountID(id: String): Future[String] = getBuyerAccountIDByID(id)
   }
 
 }

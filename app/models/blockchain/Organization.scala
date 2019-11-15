@@ -118,7 +118,6 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
   }
 
   object Utility {
-
     def dirtyEntityUpdater(): Future[Unit] = {
       val dirtyOrganizations = Service.getDirtyOrganizations
       Thread.sleep(sleepTime)
@@ -141,10 +140,10 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
         }
       }
 
-      for {
+      (for {
         dirtyOrganizations <- dirtyOrganizations
         _ <- refreshDirtyOrganizations(dirtyOrganizations)
-      } yield {}
+      } yield {}) (schedulerExecutionContext)
     }
   }
 

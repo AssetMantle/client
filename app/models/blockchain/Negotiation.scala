@@ -238,16 +238,17 @@ class Negotiations @Inject()(shutdownActors: ShutdownActor, masterAccounts: mast
             } yield {
               mainNegotiationActor ! NegotiationCometMessage(username = sellerAddressID, message = Json.toJson(constants.Comet.PING))
               mainNegotiationActor ! NegotiationCometMessage(username = buyerAddressID, message = Json.toJson(constants.Comet.PING))
-            }).recover{
+            }).recover {
               case baseException: BaseException => logger.error(baseException.failure.message, baseException)
             }
           }
         }
       }
-      for {
+
+      (for {
         dirtyNegotiations <- dirtyNegotiations
         _ <- refreshDirtyAndSendCometMessage(dirtyNegotiations)
-      } yield {}
+      } yield {}) (schedulerExecutionContext)
     }
   }
 

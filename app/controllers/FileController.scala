@@ -54,7 +54,6 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
 
   def storeAccountKYC(name: String, documentType: String): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
-
       val storeFile = fileResourceManager.storeFile[master.AccountKYC](
         name = name,
         documentType = documentType,
@@ -72,7 +71,6 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
 
   def updateAccountKYC(name: String, documentType: String): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
-
       val oldDocumentFileName = masterAccountKYCs.Service.getFileName(id = loginState.username, documentType = documentType)
 
       def updateFile(oldDocumentFileName: String) = fileResourceManager.updateFile[master.AccountKYC](
@@ -105,7 +103,6 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
 
   def zoneAccessedOrganizationKYCFile(organizationID: String, fileName: String, documentType: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
-
       val organizationZoneID = masterOrganizations.Service.getZoneID(organizationID)
       val userZoneID = masterZones.Service.getID(loginState.username)
       (for {
@@ -124,10 +121,8 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
 
   def zoneAccessedTraderKYCFile(traderID: String, fileName: String, documentType: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
-
       val traderZoneID = masterTraders.Service.getByAccountID(traderID)
       val userZoneID = masterZones.Service.getID(loginState.username)
-
       (for {
         traderZoneID <- traderZoneID
         userZoneID <- userZoneID
@@ -144,7 +139,6 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
 
   def organizationAccessedTraderKYCFile(traderID: String, fileName: String, documentType: String): Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
     implicit request =>
-
       val traderOrganizationID = masterTraders.Service.getOrganizationIDByAccountID(loginState.username)
       val userOrganizationID = masterOrganizations.Service.getID(loginState.username)
       (for {
@@ -191,7 +185,6 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
 
   def storeTraderAsset(name: String, documentType: String, issueAssetRequestID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-
       val storeFile = fileResourceManager.storeFile[masterTransaction.AssetFile](
         name = name,
         documentType = documentType,
@@ -249,7 +242,6 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
 
   def updateTraderAsset(name: String, documentType: String, issueAssetRequestID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-
       val oldDocumentFileName = masterTransactionAssetFiles.Service.getFileName(id = issueAssetRequestID, documentType = documentType)
 
       def updateFile(oldDocumentFileName: String) = fileResourceManager.updateFile[masterTransaction.AssetFile](
@@ -339,7 +331,6 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
 
   def storeTraderNegotiation(name: String, documentType: String, negotiationRequestID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-
       val storeFile = fileResourceManager.storeFile[masterTransaction.NegotiationFile](
         name = name,
         documentType = documentType,
@@ -387,7 +378,6 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
 
   def updateTraderNegotiation(name: String, documentType: String, negotiationRequestID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-
       val oldDocumentFileName = masterTransactionAssetFiles.Service.getFileName(id = negotiationRequestID, documentType = documentType)
 
       def updateFile(oldDocumentFileName: String) = fileResourceManager.updateFile[masterTransaction.NegotiationFile](
@@ -467,7 +457,6 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
 
   def storeZoneNegotiation(name: String, documentType: String, negotiationRequestID: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
-
       val storeFile = fileResourceManager.storeFile[masterTransaction.NegotiationFile](
         name = name,
         documentType = documentType,
@@ -515,7 +504,6 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
 
   def updateZoneNegotiation(name: String, documentType: String, negotiationRequestID: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
-
       val oldDocumentFileName = masterTransactionNegotiationFiles.Service.getFileName(id = negotiationRequestID, documentType = documentType)
 
       def updateFile(oldDocumentFileName: String) = fileResourceManager.updateFile[masterTransaction.NegotiationFile](
@@ -584,7 +572,6 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
   //TODO Shall we check if exists?
   def userAccessedOrganizationKYCFile(documentType: String): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
-
       val id = masterOrganizations.Service.getID(loginState.username)
 
       def fileName(id: String) = masterOrganizationKYCs.Service.getFileName(id = id, documentType = documentType)
@@ -601,7 +588,6 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
   //TODO Shall we check if exists?
   def userAccessedTraderKYCFile(documentType: String): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
     implicit request =>
-
       val id = masterTraders.Service.getID(loginState.username)
 
       def fileName(id: String) = masterTraderKYCs.Service.getFileName(id = id, documentType = documentType)
@@ -617,7 +603,6 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
 
   def zoneAccessedAssetFile(id: String, fileName: String, documentType: String): Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
-
       val userZoneID = masterZones.Service.getID(loginState.username)
       val accountID = masterTransactionIssueAssetRequests.Service.getAccountID(id)
 
@@ -715,7 +700,6 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
 
   def storeAccountFile(name: String, documentType: String): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-
       val storeFile = fileResourceManager.storeFile[master.AccountFile](
         name = name,
         documentType = documentType,
@@ -733,7 +717,6 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
 
   def updateAccountFile(name: String, documentType: String): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-
       val oldDocumentFileName = masterAccountFiles.Service.getFileName(id = loginState.username, documentType = documentType)
 
       def updateFile(oldDocumentFileName: String) = fileResourceManager.updateFile[master.AccountFile](
@@ -756,7 +739,6 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
 
   def file(fileName: String, documentType: String): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-
       val path: Future[String] = loginState.userType match {
         case constants.User.ZONE =>
           val checkFileNameExistsZoneKYCs = masterZoneKYCs.Service.checkFileNameExists(id = loginState.username, fileName = fileName)
@@ -792,7 +774,6 @@ class FileController @Inject()(messagesControllerComponents: MessagesControllerC
             checkFileNameExistsAccountFiles <- checkFileNameExistsAccountFiles
           } yield if (checkFileNameExistsAccountFiles) fileResourceManager.getAccountFilePath(documentType) else throw new BaseException(constants.Response.NO_SUCH_FILE_EXCEPTION)
       }
-
       (for {
         path <- path
       } yield Ok.sendFile(utilities.FileOperations.fetchFile(path = path, fileName = fileName))

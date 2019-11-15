@@ -35,6 +35,7 @@ class SendCoins @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
   private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
 
   import databaseConfig.profile.api._
+
   private[models] val sendCoinTable = TableQuery[SendCoinTable]
   private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
   private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
@@ -176,8 +177,6 @@ class SendCoins @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
   }
 
   object Utility {
-
-
     def onSuccess(ticketID: String, blockResponse: BlockResponse) = {
       val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
       val sendCoin = Service.getTransaction(ticketID)
@@ -201,7 +200,7 @@ class SendCoins @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
         }
       }
 
-      def fromAccountID(sendCoin: SendCoin) = masterAccounts.Service.getId(sendCoin.from)
+      def fromAccountID(fromAddress: String) = masterAccounts.Service.getId(fromAddress)
 
       (for {
         _ <- markTransactionSuccessful
@@ -209,7 +208,7 @@ class SendCoins @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
         _ <- markDirty(sendCoin)
         toAccount <- toAccount(sendCoin.to)
         _ <- updateUserType(toAccount)
-        fromAccountID <- fromAccountID(sendCoin)
+        fromAccountID <- fromAccountID(sendCoin.from)
       } yield {
         utilitiesNotification.send(toAccount.id, constants.Notification.SUCCESS, blockResponse.txhash)
         utilitiesNotification.send(fromAccountID, constants.Notification.SUCCESS, blockResponse.txhash)

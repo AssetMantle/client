@@ -25,7 +25,9 @@ class Transaction @Inject()(getTxHashResponse: GetTransactionHashResponse, getRe
 
   def process[T1 <: BaseTransaction[T1], T2 <: BaseRequest](entity: T1, blockchainTransactionCreate: T1 => Future[String], request: T2, action: T2 => Future[WSResponse], onSuccess: (String, BlockResponse) => Future[Unit], onFailure: (String, String) => Future[Unit], updateTransactionHash: (String, String) => Future[Int])(implicit module: String, logger: Logger): Future[String] = {
 
-    val ticketID: Future[String] = if (kafkaEnabled) utilities.JSON.getResponseFromJson[KafkaResponse](action(request)).map(res => res.ticketID) else Future {utilities.IDGenerator.ticketID}
+    val ticketID: Future[String] = if (kafkaEnabled) utilities.JSON.getResponseFromJson[KafkaResponse](action(request)).map(res => res.ticketID) else Future {
+      utilities.IDGenerator.ticketID
+    }
 
     def create(ticketID: String) = blockchainTransactionCreate(entity.mutateTicketID(ticketID))
 
@@ -110,12 +112,12 @@ class Transaction @Inject()(getTxHashResponse: GetTransactionHashResponse, getRe
         } else {
           val transactionHash = getTransactionHash(ticketID)
 
-          def jsonResponse(transactionHash: Option[String]) = utilities.JSON.getResponseFromJson[BlockResponse](getTxHashResponse.Service.get(transactionHash.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION))))
+          def jsonBlockResponse(transactionHash: Option[String]) = utilities.JSON.getResponseFromJson[BlockResponse](getTxHashResponse.Service.get(transactionHash.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION))))
 
           for {
             transactionHash <- transactionHash
-            jsonResponse <- jsonResponse(transactionHash)
-          } yield jsonResponse
+            jsonBlockResponse <- jsonBlockResponse(transactionHash)
+          } yield jsonBlockResponse
         }
 
         (for {
@@ -132,7 +134,6 @@ class Transaction @Inject()(getTxHashResponse: GetTransactionHashResponse, getRe
       ticketIDsSeq <- ticketIDsSeq
       _ <- responseSuccessOrFaliure(ticketIDsSeq)
     } yield {}
-
   }
 }
 
