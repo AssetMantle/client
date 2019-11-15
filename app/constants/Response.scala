@@ -79,7 +79,7 @@ object Response {
   val UPDATE_CONTACT_DETAILS = new Warning("UPDATE_CONTACT_DETAILS", routes.javascript.ContactController.updateContactForm)
 
   //Failure- for telling that something failed
-  val FAILURE = new Failure("FAILURE+eeeee")
+  val FAILURE = new Failure("FAILURE")
   val NO_SUCH_ELEMENT_EXCEPTION = new Failure("NO_SUCH_ELEMENT_EXCEPTION")
   val NO_SUCH_FILE_EXCEPTION = new Failure("NO_SUCH_FILE_EXCEPTION")
   val PSQL_EXCEPTION = new Failure("PSQL_EXCEPTION")
