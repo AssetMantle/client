@@ -211,7 +211,7 @@ class BuyerExecuteOrders @Inject()(actorSystem: ActorSystem, transaction: utilit
         } yield (buyerAddressID, sellerAddressID)
       }
 
-      for {
+      (for {
         _ <- markTransactionSuccessful
         buyerExecuteOrder <- buyerExecuteOrder
         negotiationID <- negotiationID(buyerExecuteOrder)
@@ -220,6 +220,9 @@ class BuyerExecuteOrders @Inject()(actorSystem: ActorSystem, transaction: utilit
       } yield {
         utilitiesNotification.send(sellerAddressID, constants.Notification.SUCCESS, blockResponse.txhash)
         utilitiesNotification.send(buyerAddressID, constants.Notification.SUCCESS, blockResponse.txhash)
+      }).recover {
+        case baseException: BaseException => logger.error(baseException.failure.message, baseException)
+          throw new BaseException(constants.Response.PSQL_EXCEPTION)
       }
     }
 

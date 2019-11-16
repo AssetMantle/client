@@ -31,7 +31,7 @@ class WithZoneLoginAction @Inject()(messagesControllerComponents: MessagesContro
           _ <- tokenTimeVerify
           _ <- verifyUserType
           address <- address
-          result <- result(LoginState(username, constants.User.USER, address))
+          result <- result(LoginState(username, constants.User.ZONE, address))
         } yield result).recover {
           case baseException: BaseException => logger.info(baseException.failure.message, baseException)
             Results.Unauthorized(views.html.index(failures = Seq(baseException.failure)))

@@ -34,8 +34,11 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
   private implicit val logger: Logger = Logger(this.getClass)
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_FIAT
+
   private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
+
   private val actorTimeout = configuration.get[Int]("akka.actors.timeout").seconds
+
   private val cometActorSleepTime = configuration.get[Long]("akka.actors.cometActorSleepTime")
 
   import databaseConfig.profile.api._

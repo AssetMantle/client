@@ -21,7 +21,7 @@ class ViewController @Inject()(messagesControllerComponents: MessagesControllerC
   def market: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
       Future {
-        withUsernameToken.Ok(views.html.market())
+        Ok(views.html.market())
       }.recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
@@ -30,7 +30,7 @@ class ViewController @Inject()(messagesControllerComponents: MessagesControllerC
   def genesisRequest: Action[AnyContent] = withGenesisLoginAction.authenticated { implicit loginState =>
     implicit request =>
       Future {
-        withUsernameToken.Ok(views.html.genesisRequest())
+        Ok(views.html.genesisRequest())
       }.recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
@@ -39,7 +39,7 @@ class ViewController @Inject()(messagesControllerComponents: MessagesControllerC
   def genesisInformation: Action[AnyContent] = withGenesisLoginAction.authenticated { implicit loginState =>
     implicit request =>
       Future {
-        withUsernameToken.Ok(views.html.genesisInformation())
+        Ok(views.html.genesisInformation())
       }.recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
@@ -48,7 +48,7 @@ class ViewController @Inject()(messagesControllerComponents: MessagesControllerC
   def zoneRequest: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       Future {
-        withUsernameToken.Ok(views.html.zoneRequest())
+        Ok(views.html.zoneRequest())
       }.recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
@@ -57,7 +57,7 @@ class ViewController @Inject()(messagesControllerComponents: MessagesControllerC
   def zoneInformation: Action[AnyContent] = withZoneLoginAction.authenticated { implicit loginState =>
     implicit request =>
       Future {
-        withUsernameToken.Ok(views.html.zoneInformation())
+        Ok(views.html.zoneInformation())
       }.recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
@@ -66,7 +66,7 @@ class ViewController @Inject()(messagesControllerComponents: MessagesControllerC
   def organizationRequest: Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
     implicit request =>
       Future {
-        withUsernameToken.Ok(views.html.organizationRequest())
+        Ok(views.html.organizationRequest())
       }.recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
@@ -75,7 +75,7 @@ class ViewController @Inject()(messagesControllerComponents: MessagesControllerC
   def organizationInformation: Action[AnyContent] = withOrganizationLoginAction.authenticated { implicit loginState =>
     implicit request =>
       Future {
-        withUsernameToken.Ok(views.html.organizationInformation())
+        Ok(views.html.organizationInformation())
       }.recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }

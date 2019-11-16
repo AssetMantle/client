@@ -36,7 +36,7 @@ class NotificationController @Inject()(messagesControllerComponents: MessagesCon
       val unreadNotificationCount = notifications.Service.getNumberOfUnread(loginState.username)
       (for {
         unreadNotificationCount <- unreadNotificationCount
-      } yield withUsernameToken.Ok(unreadNotificationCount.toString)
+      } yield Ok(unreadNotificationCount.toString)
         ).recover {
         case _: BaseException => NoContent
       }
@@ -49,7 +49,7 @@ class NotificationController @Inject()(messagesControllerComponents: MessagesCon
       (for {
         _ <- markAsRead
         unreadNotificationCount <- unreadNotificationCount
-      } yield withUsernameToken.Ok(unreadNotificationCount.toString)
+      } yield Ok(unreadNotificationCount.toString)
         ).recover {
         case _: BaseException => NoContent
       }

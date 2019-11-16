@@ -39,7 +39,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
           val zones = masterZones.Service.getAllVerified
           for {
             zones <- zones
-          } yield Ok(views.html.component.master.addOrganization(views.companion.master.AddOrganization.form, zones = zones))
+          } yield withUsernameToken.Ok(views.html.component.master.addOrganization(views.companion.master.AddOrganization.form, zones = zones))
       }
   }
 
@@ -61,10 +61,13 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
 
               def getUBOs(id: String) = masterOrganizations.Service.getUBOs(id)
 
-              for {
+              (for {
                 id <- id
                 ubos <- getUBOs(id)
               } yield withUsernameToken.PartialContent(views.html.component.master.userUpdateUBOs(views.companion.master.AddUBOs.form.fill(views.companion.master.AddUBOs.Data(ubos.data.map(ubo => Option(views.companion.master.AddUBOs.UBOData(personName = ubo.personName, sharePercentage = ubo.sharePercentage, relationship = ubo.relationship, title = ubo.title)))))))
+                ).recover {
+                case _: BaseException => withUsernameToken.PartialContent(views.html.component.master.userUpdateUBOs())
+              }
             }
             else {
               Future {

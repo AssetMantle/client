@@ -81,9 +81,11 @@ class SMSOTPs @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
     }
 
     def verifyOTP(id: String, otp: String): Future[Boolean] = {
-      findById(id).map { smsOTP =>
-        if (smsOTP.secretHash != util.hashing.MurmurHash3.stringHash(otp).toString) throw new BaseException(constants.Response.INVALID_OTP) else true
-      }
+      val smsOTP = findById(id)
+      for {
+        smsOTP <- smsOTP
+      } yield if (smsOTP.secretHash != util.hashing.MurmurHash3.stringHash(otp).toString) throw new BaseException(constants.Response.INVALID_OTP) else true
+
     }
 
   }

@@ -23,11 +23,13 @@ class VerifyEmailAddressController @Inject()(messagesControllerComponents: Messa
   def verifyEmailAddressForm: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val otp = emailOTPs.Service.sendOTP(loginState.username)
-      for {
+      (for {
         otp <- otp
       } yield {
         utilitiesNotification.send(accountID = loginState.username, notification = constants.Notification.VERIFY_EMAIL, otp)
         withUsernameToken.Ok(views.html.component.master.verifyEmailAddress())
+      }).recover {
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
 
@@ -43,7 +45,7 @@ class VerifyEmailAddressController @Inject()(messagesControllerComponents: Messa
           val verifyOTP = emailOTPs.Service.verifyOTP(loginState.username, verifyEmailAddressData.otp)
           val verifyEmailAddress = masterContacts.Service.verifyEmailAddress(loginState.username)
 
-          def contact = masterContacts.Service.getContact(loginState.username).map { contactVal => contactVal.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)) }
+          def contact = masterContacts.Service.getContact(loginState.username).map { contact => contact.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)) }
 
           def updateStatus(contact: Contact) = {
             if (contact.emailAddressVerified && contact.mobileNumberVerified) {
@@ -58,7 +60,7 @@ class VerifyEmailAddressController @Inject()(messagesControllerComponents: Messa
             _ <- verifyEmailAddress
             contact <- contact
             _ <- updateStatus(contact)
-          } yield withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.SUCCESS)))
+          } yield withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.EMAIL_ADDRESS_VERIFIED)))
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }

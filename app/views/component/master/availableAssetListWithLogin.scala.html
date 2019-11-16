@@ -1,6 +1,7 @@
-@import controllers.actions.LoginState
-@import models.masterTransaction.IssueAssetRequest
-@import models.masterTransaction.AssetFile
+@ @
+import controllers.actions.LoginState
+@
+import models.masterTransaction.{AssetFile, IssueAssetRequest}
 
 @(assetList: Seq[IssueAssetRequest], blockchainAssetList: Seq[blockchain.Asset], assetFiles: Seq[AssetFile])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
@@ -14,10 +15,10 @@
             @loginState.acl match {
                 case Some(acl) => {
                     @if(acl.changeBuyerBid) {
-                        <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.ChangeBuyerBidController.changeBuyerBidForm('@blockchainAssetList.filter(_.pegHash == asset.pegHash.get).head.ownerAddress', '@asset.pegHash.get'))">@Messages(constants.Form.NEGOTIATE)</button>
+                      <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.ChangeBuyerBidController.changeBuyerBidForm('@blockchainAssetList.filter(_.pegHash == asset.pegHash.get).head.ownerAddress', '@asset.pegHash'))">@Messages(constants.Form.NEGOTIATE)</button>
                     } <br>
                     @if(acl.confirmBuyerBid) {
-                        <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.ConfirmBuyerBidController.confirmBuyerBidDetailForm('@blockchainAssetList.filter(_.pegHash == asset.pegHash.get).head.ownerAddress', '@asset.pegHash.get', @asset.assetPrice))">@Messages(constants.Form.ACCEPT_OFFER)</button>
+                      <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.ConfirmBuyerBidController.confirmBuyerBidDetailForm('@blockchainAssetList.filter(_.pegHash == asset.pegHash.get).head.ownerAddress', '@asset.pegHash', @asset.assetPrice))">@Messages(constants.Form.ACCEPT_OFFER)</button>
                     } <br>
                     }
                 case _ => {}

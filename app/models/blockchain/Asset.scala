@@ -31,9 +31,13 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
   val db = databaseConfig.db
 
   private implicit val materializer: ActorMaterializer = ActorMaterializer()(actorSystem)
+
   val mainAssetActor: ActorRef = actorSystem.actorOf(props = MainAssetActor.props(actorTimeout, actorSystem), name = constants.Module.ACTOR_MAIN_ASSET)
+
   private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
+
   private val cometActorSleepTime = configuration.get[Long]("akka.actors.cometActorSleepTime")
+
   private val actorTimeout = configuration.get[Int]("akka.actors.timeout").seconds
 
   private implicit val logger: Logger = Logger(this.getClass)

@@ -109,14 +109,14 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
 
   def assetList: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      val issueAssets = masterTransactionIssueAssetRequests.Service.getTraderAssetList(loginState.username)
+      val assets = masterTransactionIssueAssetRequests.Service.getTraderAssetList(loginState.username)
 
-      def allDocumentsForAllAssets(issueAssets: Seq[IssueAssetRequest]) = masterTransactionAssetFiles.Service.getAllDocumentsForAllAssets(issueAssets.map(_.id))
+      def allDocumentsForAllAssets(assets: Seq[IssueAssetRequest]) = masterTransactionAssetFiles.Service.getAllDocumentsForAllAssets(assets.map(_.id))
 
       (for {
-        issueAssets <- issueAssets
-        allDocumentsForAllAssets <- allDocumentsForAllAssets(issueAssets)
-      } yield Ok(views.html.component.master.assetList(issueAssets, allDocumentsForAllAssets))
+        assets <- assets
+        allDocumentsForAllAssets <- allDocumentsForAllAssets(assets)
+      } yield Ok(views.html.component.master.assetList(assets, allDocumentsForAllAssets))
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
@@ -169,7 +169,7 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
 
       def assets(negotiationsOfOrders: Seq[Negotiation]) = blockchainAssets.Service.getByPegHashes(negotiationsOfOrders.map(_.assetPegHash))
 
-      for {
+      (for {
         negotiations <- negotiations
         orders <- orders(negotiations)
         assets <- assets(getNegotiationsOfOrders(negotiations, orders))
@@ -178,8 +178,9 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
         Ok(views.html.component.master.orderList(orders.filter(order => (for (negotiationsOfOrder <- negotiationsOfOrders; if negotiationsOfOrder.buyerAddress == loginState.address && !assets.find(asset => asset.pegHash == negotiationsOfOrder.assetPegHash).orNull.moderated) yield negotiationsOfOrder).map(_.id) contains order.id),
           orders.filter(order => (for (negotiationsOfOrder <- negotiationsOfOrders; if negotiationsOfOrder.sellerAddress == loginState.address && !assets.find(asset => asset.pegHash == negotiationsOfOrder.assetPegHash).orNull.moderated) yield negotiationsOfOrder).map(_.id) contains order.id),
           orders.filter(order => (for (negotiationsOfOrder <- negotiationsOfOrders; if assets.find(asset => asset.pegHash == negotiationsOfOrder.assetPegHash).orNull.moderated) yield negotiationsOfOrder).map(_.id) contains order.id)))
+      }).recover {
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
-
   }
 
   def availableAssetList: Action[AnyContent] = Action.async { implicit request =>
@@ -258,7 +259,15 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
   def profileDocuments(): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val documents: Future[Seq[Document[_]]] = loginState.userType match {
-        case constants.User.ZONE => masterZoneKYC.Service.getAllDocuments(loginState.username)
+        case constants.User.ZONE =>
+          val id = masterZones.Service.getID(loginState.username)
+
+          def zoneKYCs(id: String) = masterZoneKYC.Service.getAllDocuments(loginState.username)
+
+          for {
+            id <- id
+            zoneKYCs <- zoneKYCs(id)
+          } yield zoneKYCs
         case constants.User.ORGANIZATION =>
           val id = masterOrganizations.Service.getID(loginState.username)
 
@@ -360,6 +369,7 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
           }
         }
       }
+
       (for {
         organizationID <- organizationID
         verifyOrganizationTrader <- verifyOrganizationTrader(organizationID)

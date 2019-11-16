@@ -156,16 +156,18 @@ class ConfirmSellerBidController @Inject()(messagesControllerComponents: Message
                 buyerAddress <- buyerAddress
                 negotiationFiles <- negotiationFiles
                 _ <- transactionProcess(buyerAddress, sellerContractHash(negotiationFiles))
-              } yield {}
-              withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.SELLER_BID_CONFIRMED)))
+              } yield withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.SELLER_BID_CONFIRMED)))
             } else {
-              Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
+              Future {
+                Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
+              }
             }
           }
 
           (for {
             masterNegotiation <- masterNegotiation
-          } yield getResult(masterNegotiation)
+            result <- getResult(masterNegotiation)
+          } yield result
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
@@ -174,7 +176,7 @@ class ConfirmSellerBidController @Inject()(messagesControllerComponents: Message
   }
 
   def blockchainConfirmSellerBidForm: Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.blockchain.confirmSellerBid(views.companion.blockchain.ConfirmSellerBid.form))
+    Ok(views.html.component.blockchain.changeSellerBid())
   }
 
   def blockchainConfirmSellerBid: Action[AnyContent] = Action.async { implicit request =>

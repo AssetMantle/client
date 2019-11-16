@@ -74,13 +74,17 @@ class EmailOTPs @Inject()(protected val databaseConfigProvider: DatabaseConfigPr
   object Service {
     def sendOTP(id: String): Future[String] = {
       val otp = (Random.nextInt(899999) + 100000).toString
-      upsert(EmailOTP(id, util.hashing.MurmurHash3.stringHash(otp).toString)).map { _ =>
-        otp
-      }
+      val upsertEmailOTP = upsert(EmailOTP(id, util.hashing.MurmurHash3.stringHash(otp).toString))
+      for {
+        _ <- upsertEmailOTP
+      } yield otp
     }
 
     def verifyOTP(id: String, otp: String) = {
-      findById(id).map { emailOTP => if (emailOTP.secretHash != util.hashing.MurmurHash3.stringHash(otp).toString) throw new BaseException(constants.Response.INVALID_OTP) else true }
+      val emailOTP = findById(id)
+      for {
+        emailOTP <- emailOTP
+      } yield if (emailOTP.secretHash != util.hashing.MurmurHash3.stringHash(otp).toString) throw new BaseException(constants.Response.INVALID_OTP) else true
     }
   }
 

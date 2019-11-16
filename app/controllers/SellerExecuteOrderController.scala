@@ -106,8 +106,8 @@ class SellerExecuteOrderController @Inject()(messagesControllerComponents: Messa
         id <- id
         allOrderIdsWithoutAWBProofHash <- allOrderIdsWithoutAWBProofHash
         addressesUnderZone <- addressesUnderZone(id)
-        getSellerNegotiationsByOrderAndZone <- getSellerNegotiationsByOrderAndZone(allOrderIdsWithoutAWBProofHash, addressesUnderZone)
-      } yield Ok(views.html.component.master.moderatedSellerExecuteOrderList(getSellerNegotiationsByOrderAndZone))
+        sellerNegotiationsByOrderAndZone <- getSellerNegotiationsByOrderAndZone(allOrderIdsWithoutAWBProofHash, addressesUnderZone)
+      } yield Ok(views.html.component.master.moderatedSellerExecuteOrderList(sellerNegotiationsByOrderAndZone))
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }

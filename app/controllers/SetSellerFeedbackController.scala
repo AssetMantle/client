@@ -57,7 +57,7 @@ class SetSellerFeedbackController @Inject()(messagesControllerComponents: Messag
       val nullRatingsForSellerFeedback = blockchainTraderFeedbackHistories.Service.getNullRatingsForSellerFeedback(loginState.address)
       (for {
         nullRatingsForSellerFeedback <- nullRatingsForSellerFeedback
-      } yield withUsernameToken.Ok(views.html.component.master.setSellerFeedbackList(nullRatingsForSellerFeedback))
+      } yield Ok(views.html.component.master.setSellerFeedbackList(nullRatingsForSellerFeedback))
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }

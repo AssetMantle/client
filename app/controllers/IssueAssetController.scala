@@ -272,10 +272,13 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
         }
       }
 
-      for {
+      (for {
         accountID <- accountID
         result <- getResult(accountID)
       } yield result
+        ).recover {
+        case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+      }
   }
 
   def issueAssetInvoice: Action[AnyContent] = withTraderLoginAction.authenticated {
@@ -332,7 +335,7 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
         addressesUnderZone <- addressesUnderZone(zoneID)
         iDsForAddresses <- iDsForAddresses(addressesUnderZone)
         pendingIssueAssetRequests <- pendingIssueAssetRequests(iDsForAddresses)
-      } yield withUsernameToken.Ok(views.html.component.master.viewPendingIssueAssetRequests(pendingIssueAssetRequests))
+      } yield Ok(views.html.component.master.viewPendingIssueAssetRequests(pendingIssueAssetRequests))
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
@@ -343,7 +346,7 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
       val verificationTraderAssetDouments = masterTransactionAssetFiles.Service.getAllDocuments(id)
       (for {
         verificationTraderAssetDouments <- verificationTraderAssetDouments
-      } yield withUsernameToken.Ok(views.html.component.master.viewVerificationTraderAssetDouments(verificationTraderAssetDouments))
+      } yield Ok(views.html.component.master.viewVerificationTraderAssetDouments(verificationTraderAssetDouments))
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
@@ -490,17 +493,20 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
                 } yield withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ASSET_ISSUED)))
               } else {
                 Future {
-                  PreconditionFailed(views.html.index(failures = Seq(constants.Response.ALL_ASSET_FILES_NOT_VERIFIED, constants.Response.REQUEST_ALREADY_APPROVED_OR_REJECTED)))
+                  PreconditionFailed(views.html.index(failures = Seq(constants.Response.ALL_ASSET_FILES_NOT_VERIFIED)))
                 }
               }
             }
 
-            for {
+            (for {
               toAddress <- toAddress
               verifyRequestedStatus <- verifyRequestedStatus
               checkAllAssetFilesVerified <- checkAllAssetFilesVerified
               result <- getResult(toAddress, verifyRequestedStatus, checkAllAssetFilesVerified)
             } yield result
+              ).recover {
+              case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+            }
           }
         )
   }

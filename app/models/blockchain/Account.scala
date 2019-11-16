@@ -40,8 +40,11 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
   import databaseConfig.profile.api._
 
   private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
+
   private val actorTimeout = configuration.get[Int]("akka.actors.timeout").seconds
+
   private val cometActorSleepTime = configuration.get[Long]("akka.actors.cometActorSleepTime")
+
   private[models] val accountTable = TableQuery[AccountTable]
 
   private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
