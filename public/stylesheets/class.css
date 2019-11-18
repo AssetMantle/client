@@ -583,3 +583,27 @@ dl .info::after {
 .commonCheckBox input{
     margin-left: 10px;
 }
+.cmuk-navbar-dropdown::before {
+    content: ' ';
+    position: absolute;
+    width: 0;
+    height: 0;
+    left: auto;
+    right: 20px;
+    top: -13%;
+    bottom: -19px;
+    border: 8px solid;
+    border-color: transparent transparent rgba(0, 0, 0, .15) transparent;
+}
+.cmuk-navbar-dropdown::after{
+    content: ' ';
+    position: absolute;
+    width: 0;
+    height: 0;
+    left:auto;
+    right: 20px;
+    top: -12%;
+    bottom: -19px;
+    border: 8px solid;
+    border-color: transparent transparent #fff transparent;
+}
