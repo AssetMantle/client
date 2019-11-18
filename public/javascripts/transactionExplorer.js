@@ -5,9 +5,9 @@ function transactionExplorer() {
     const wsUrl = getConfiguration("blockchain.main.wsIP") + ":" + getConfiguration("blockchain.main.abciPort") + "/websocket";
 
     let content = '';
-    // for (let i = 0; i < 7; i++) {
+    for (let i = 0; i < 7; i++) {
         content = "<tr><td></td><td></td></tr>" + content;
-    // }
+     }
     $('#transactionContainer').prepend(content);
     let transactionContainerList = document.getElementById("transactionContainer");
 
