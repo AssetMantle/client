@@ -1,11 +1,8 @@
-@ @
-import controllers.actions.LoginState
-@
-import helper._
+@import controllers.actions.LoginState
+@import helper._
 @import models.master.TraderKYC
 @import views.companion.master.UpdateTraderKYCDocumentOrganizationStatus
-@
-import views.html.base._
+@import views.html.base._
 
 @(updateTraderKYCDocumentOrganizationStatusForm: Form[UpdateTraderKYCDocumentOrganizationStatus.Data] = views.companion.master.UpdateTraderKYCDocumentOrganizationStatus.form, traderKYC: TraderKYC)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 

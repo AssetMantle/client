@@ -17,7 +17,7 @@ import slick.jdbc.JdbcProfile
 import transactions.responses.TransactionResponse.BlockResponse
 
 import scala.concurrent.duration._
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 case class IssueAsset(from: String, to: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, moderated: Boolean, gas: Int, takerAddress: Option[String] = None, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None) extends BaseTransaction[IssueAsset] {
@@ -192,9 +192,8 @@ class IssueAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tra
       val assetRequest = masterTransactionIssueAssetRequests.Service.getIssueAssetByTicketID(ticketID)
 
       def insertOrUpdate(responseAccount: queries.responses.AccountResponse.Response, assetRequest: IssueAssetRequest, issueAsset: IssueAsset) = Future {
-        logger.info(responseAccount.value.assetPegWallet.toString)
         responseAccount.value.assetPegWallet.foreach(assets => assets.foreach(asset => {
-          blockchainAssets.Service.insertOrUpdate(pegHash = asset.pegHash, documentHash = asset.documentHash, assetType = asset.assetType, assetPrice = asset.assetPrice, assetQuantity = asset.assetQuantity, quantityUnit = asset.quantityUnit, locked = asset.locked, moderated = asset.moderated, takerAddress = if (asset.takerAddress == "") null else Option(asset.takerAddress), ownerAddress = issueAsset.to, dirtyBit = true)
+          Await.result(blockchainAssets.Service.insertOrUpdate(pegHash = asset.pegHash, documentHash = asset.documentHash, assetType = asset.assetType, assetPrice = asset.assetPrice, assetQuantity = asset.assetQuantity, quantityUnit = asset.quantityUnit, locked = asset.locked, moderated = asset.moderated, takerAddress = if (asset.takerAddress == "") null else Option(asset.takerAddress), ownerAddress = issueAsset.to, dirtyBit = true),Duration.Inf)
           if (assetRequest.documentHash.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)) == asset.documentHash) {
             masterTransactionIssueAssetRequests.Service.markListedForTrade(ticketID, Option(asset.pegHash))
           }

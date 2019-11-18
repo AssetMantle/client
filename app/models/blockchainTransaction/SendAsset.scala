@@ -17,7 +17,7 @@ import slick.jdbc.JdbcProfile
 import transactions.responses.TransactionResponse.BlockResponse
 
 import scala.concurrent.duration._
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 case class SendAsset(from: String, to: String, pegHash: String, gas: Int, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None) extends BaseTransaction[SendAsset] {
@@ -185,7 +185,7 @@ class SendAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
       def orderResponse(negotiationID: String) = getOrder.Service.get(negotiationID)
 
       def assetsInsertOrUpdate(orderResponse: queries.responses.OrderResponse.Response, negotiationID: String) = Future {
-        orderResponse.value.assetPegWallet.foreach(assets => assets.foreach(asset => blockchainAssets.Service.insertOrUpdate(pegHash = asset.pegHash, documentHash = asset.documentHash, assetType = asset.assetType, assetPrice = asset.assetPrice, assetQuantity = asset.assetQuantity, quantityUnit = asset.quantityUnit, locked = asset.locked, moderated = asset.moderated, ownerAddress = negotiationID, takerAddress = if (asset.takerAddress == "") None else Option(asset.takerAddress), dirtyBit = false)))
+        orderResponse.value.assetPegWallet.foreach(assets => assets.foreach(asset => Await.result(blockchainAssets.Service.insertOrUpdate(pegHash = asset.pegHash, documentHash = asset.documentHash, assetType = asset.assetType, assetPrice = asset.assetPrice, assetQuantity = asset.assetQuantity, quantityUnit = asset.quantityUnit, locked = asset.locked, moderated = asset.moderated, ownerAddress = negotiationID, takerAddress = if (asset.takerAddress == "") None else Option(asset.takerAddress), dirtyBit = false),Duration.Inf)))
       }
 
       def markDirty(sendAsset: SendAsset) = {

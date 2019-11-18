@@ -16,7 +16,7 @@ import slick.jdbc.JdbcProfile
 import transactions.responses.TransactionResponse.BlockResponse
 
 import scala.concurrent.duration._
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 case class SendFiat(from: String, to: String, amount: Int, pegHash: String, gas: Int, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None) extends BaseTransaction[SendFiat] {
@@ -182,7 +182,7 @@ class SendFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
       def orderResponse(negotiationID: String) = getOrder.Service.get(negotiationID)
 
       def insertOrUpdateFiats(orderResponse: queries.responses.OrderResponse.Response, negotiationID: String) = Future {
-        orderResponse.value.fiatPegWallet.foreach(fiats => fiats.foreach(fiatPeg => blockchainFiats.Service.insertOrUpdate(pegHash = fiatPeg.pegHash, ownerAddress = negotiationID, transactionID = fiatPeg.transactionID, transactionAmount = fiatPeg.transactionAmount, redeemedAmount = fiatPeg.redeemedAmount, dirtyBit = false)))
+        orderResponse.value.fiatPegWallet.foreach(fiats => fiats.foreach(fiatPeg => Await.result(blockchainFiats.Service.insertOrUpdate(pegHash = fiatPeg.pegHash, ownerAddress = negotiationID, transactionID = fiatPeg.transactionID, transactionAmount = fiatPeg.transactionAmount, redeemedAmount = fiatPeg.redeemedAmount, dirtyBit = false),Duration.Inf)))
       }
 
       def markDirty(sendFiat: SendFiat) = {

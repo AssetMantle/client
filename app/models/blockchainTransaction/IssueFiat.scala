@@ -15,7 +15,7 @@ import slick.jdbc.JdbcProfile
 import transactions.responses.TransactionResponse.BlockResponse
 
 import scala.concurrent.duration._
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 case class IssueFiat(from: String, to: String, transactionID: String, transactionAmount: Int, gas: Int, status: Option[Boolean] = None, txHash: Option[String] = None, ticketID: String, mode: String, code: Option[String] = None) extends BaseTransaction[IssueFiat] {
@@ -178,7 +178,7 @@ class IssueFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
       def account(issueFiat: IssueFiat) = getAccount.Service.get(issueFiat.to)
 
       def insertOrUpdate(account: queries.responses.AccountResponse.Response, issueFiat: IssueFiat) = Future {
-        account.value.fiatPegWallet.foreach(fiats => fiats.foreach(fiatPeg => blockchainFiats.Service.insertOrUpdate(fiatPeg.pegHash, issueFiat.to, fiatPeg.transactionID, fiatPeg.transactionAmount, fiatPeg.redeemedAmount, dirtyBit = true)))
+        account.value.fiatPegWallet.foreach(fiats => fiats.foreach(fiatPeg => Await.result(blockchainFiats.Service.insertOrUpdate(fiatPeg.pegHash, issueFiat.to, fiatPeg.transactionID, fiatPeg.transactionAmount, fiatPeg.redeemedAmount, dirtyBit = true),Duration.Inf)))
       }
 
       def markDirty(issueFiat: IssueFiat) = blockchainAccounts.Service.markDirty(issueFiat.from)
