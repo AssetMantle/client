@@ -563,33 +563,7 @@ dl .info::after {
 }
 
 /* cmuk classes*/
-.cmuk-card{
-    border: 1px solid #e7eaf3;
-    box-shadow: 0 0.5rem 1.2rem rgba(189,197,209,.2) !important;
-    border-radius: 0.25rem;
-}
-.cmuk-card-body, .cmuk-card-header{
-    padding: 15px 15px !important;
-}
-@media (min-width: 1200px){
-    .cmuk-card-body, .cmuk-card-header {
-        padding: 20px 20px !important;
-    }
-    }
-.cmuk-navbar-nav>li>a {
-    font-weight: 500;
-    font-size: 0.8125rem !important;
-}
-.cmuk-navbar-container{
-    padding-top: 5px;
-    padding-bottom: 5px;
-}
-.cmuk-button-text {
-    color:#1e87f0 !important;
-}
-.cmuk-button-text::before{
-    border-bottom: 1px solid #1e87f0 !important;
-}
+
 .cmuk-margin-extra-small-right{
     margin-right:5px !important;
 }
