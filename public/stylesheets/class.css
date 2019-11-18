@@ -331,6 +331,7 @@ dl .info::after {
 
 /* Main search field*/
 .searchForm {
+    border: 1px solid #e7eaf3;
     background: #fff;
     padding: 20px;
     justify-content: center;
@@ -391,6 +392,16 @@ dl .info::after {
     transition: 0.3s;
     display: inline-block;
     margin-bottom: 10px;
+}
+.cmuk-offcanvas-bar::-webkit-scrollbar{
+    width:6px;
+}
+.cmuk-offcanvas-bar:hover::-webkit-scrollbar {
+    width: 6px;
+}
+.cmuk-offcanvas-bar:hover::-webkit-scrollbar-thumb {
+    background: grey;
+    border-radius: 10px;
 }
 
 .sideBarOptions a:hover{
@@ -542,11 +553,6 @@ dl .info::after {
     stroke-width:2 !important;
     stroke:#102923 !important;
 }
-.cmuk-navbar-dropdown{
-    top:45px !important;
-    margin-top:5px !important;
-}
-
 .profileAcl{
     display: flex;
     flex-wrap: wrap;
@@ -602,7 +608,4 @@ dl .info::after {
 }
 .commonCheckBox input{
     margin-left: 10px;
-}
-.cmuk-input{
-    border-radius: 0.25rem !important;
 }
