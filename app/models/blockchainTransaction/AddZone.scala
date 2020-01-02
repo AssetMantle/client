@@ -25,8 +25,11 @@ class AddZones @Inject()(actorSystem: ActorSystem, transaction: utilities.Transa
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_ADD_ZONE
 
   private implicit val logger: Logger = Logger(this.getClass)
+
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
+
   val db = databaseConfig.db
+
   private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
 
   import databaseConfig.profile.api._
@@ -34,8 +37,11 @@ class AddZones @Inject()(actorSystem: ActorSystem, transaction: utilities.Transa
   private[models] val addZoneTable = TableQuery[AddZoneTable]
 
   private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
+
   private val schedulerInterval = configuration.get[Int]("blockchain.kafka.transactionIterator.interval").seconds
+
   private val kafkaEnabled = configuration.get[Boolean]("blockchain.kafka.enabled")
+
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
   private def add(addZone: AddZone): Future[String] = db.run((addZoneTable returning addZoneTable.map(_.ticketID) += addZone).asTry).map {
@@ -164,19 +170,19 @@ class AddZones @Inject()(actorSystem: ActorSystem, transaction: utilities.Transa
   }
 
   object Utility {
-    def onSuccess(ticketID: String, blockResponse: BlockResponse) = {
+    def onSuccess(ticketID: String, blockResponse: BlockResponse): Future[Unit] = {
       val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
       val addZone = Service.getTransaction(ticketID)
 
-      def createZoneAndSendNotification(addZone: AddZone) = {
+      def createZoneAndSendNotification(addZone: AddZone): Future[Unit] = {
         val create = blockchainZones.Service.create(addZone.zoneID, addZone.to, dirtyBit = true)
         val verifyZone = masterZones.Service.verifyZone(addZone.zoneID)
 
-        def updateUserTypeOnAddress = masterAccounts.Service.updateUserTypeOnAddress(addZone.to, constants.User.ZONE)
+        def updateUserTypeOnAddress: Future[Int] = masterAccounts.Service.updateUserTypeOnAddress(addZone.to, constants.User.ZONE)
 
-        def markDirty = blockchainAccounts.Service.markDirty(addZone.from)
+        def markDirty: Future[Int] = blockchainAccounts.Service.markDirty(addZone.from)
 
-        def getIDs(addZone: AddZone) = {
+        def getIDs(addZone: AddZone): Future[(String, String)] = {
           val toAccountID = masterAccounts.Service.getId(addZone.to)
           val fromAccountID = masterAccounts.Service.getId(addZone.from)
           for {
@@ -207,11 +213,11 @@ class AddZones @Inject()(actorSystem: ActorSystem, transaction: utilities.Transa
       }
     }
 
-    def onFailure(ticketID: String, message: String) = {
+    def onFailure(ticketID: String, message: String): Future[Unit] = {
       val markTransactionFailed = Service.markTransactionFailed(ticketID, message)
       val addZone = Service.getTransaction(ticketID)
 
-      def getIDs(addZone: AddZone) = {
+      def getIDs(addZone: AddZone): Future[(String,String)] = {
         val toAccountID = masterAccounts.Service.getId(addZone.to)
         val fromAccountID = masterAccounts.Service.getId(addZone.from)
         for {

@@ -118,7 +118,7 @@ class IssueFiatRequests @Inject()(protected val databaseConfigProvider: Database
 
     def getPendingIssueFiatRequests(accountIDs: Seq[String]): Future[Seq[IssueFiatRequest]] = getIssueFiatRequestsWithNullStatus(accountIDs)
 
-    def delete(id: String): Int = Await.result(deleteByID(id), Duration.Inf)
+    def delete(id: String): Future[Int] = deleteByID(id)
 
     def getStatus(id: String): Future[Option[Boolean]] = getStatusByID(id)
 

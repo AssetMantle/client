@@ -146,7 +146,7 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
   object Service {
 
-    def create(accountID: String, name: String, currency: String, address: Address): String = Await.result(add(serialize(Zone(id = utilities.IDGenerator.hexadecimal, accountID = accountID, name = name, currency = currency, address = address))), Duration.Inf)
+    def create(accountID: String, name: String, currency: String, address: Address): Future[String] = add(serialize(Zone(id = utilities.IDGenerator.hexadecimal, accountID = accountID, name = name, currency = currency, address = address)))
 
     def insertOrUpdate(accountID: String, name: String, currency: String, address: Address): Future[String] = {
       val id = getIDByAccountID(accountID).map(_.getOrElse(utilities.IDGenerator.hexadecimal))

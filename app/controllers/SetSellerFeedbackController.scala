@@ -28,9 +28,7 @@ class SetSellerFeedbackController @Inject()(messagesControllerComponents: Messag
     implicit request =>
       views.companion.master.SetSellerFeedback.form.bindFromRequest().fold(
         formWithErrors => {
-          Future {
-            BadRequest(views.html.component.master.setSellerFeedback(formWithErrors, buyerAddress = formWithErrors.data(constants.FormField.BUYER_ADDRESS.name), pegHash = formWithErrors.data(constants.FormField.PEG_HASH.name)))
-          }
+          Future (BadRequest(views.html.component.master.setSellerFeedback(formWithErrors, buyerAddress = formWithErrors.data(constants.FormField.BUYER_ADDRESS.name), pegHash = formWithErrors.data(constants.FormField.PEG_HASH.name))))
         },
         setSellerFeedbackData => {
           val transactionProcess = transaction.process[blockchainTransaction.SetSellerFeedback, transactionsSetSellerFeedback.Request](
@@ -44,7 +42,8 @@ class SetSellerFeedbackController @Inject()(messagesControllerComponents: Messag
           )
           (for {
             _ <- transactionProcess
-          } yield withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.SELLER_FEEDBACK_SET)))
+            result<-withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.SELLER_FEEDBACK_SET)))
+          } yield result
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
@@ -70,9 +69,7 @@ class SetSellerFeedbackController @Inject()(messagesControllerComponents: Messag
   def blockchainSetSellerFeedback: Action[AnyContent] = Action.async { implicit request =>
     views.companion.blockchain.SetSellerFeedback.form.bindFromRequest().fold(
       formWithErrors => {
-        Future {
-          BadRequest(views.html.component.blockchain.setSellerFeedback(formWithErrors))
-        }
+        Future (BadRequest(views.html.component.blockchain.setSellerFeedback(formWithErrors)))
       },
       setSellerFeedbackData => {
         val postRequest = transactionsSetSellerFeedback.Service.post(transactionsSetSellerFeedback.Request(transactionsSetSellerFeedback.BaseReq(from = setSellerFeedbackData.from, gas = setSellerFeedbackData.gas.toString), to = setSellerFeedbackData.to, password = setSellerFeedbackData.password, pegHash = setSellerFeedbackData.pegHash, rating = setSellerFeedbackData.rating.toString, mode = setSellerFeedbackData.mode))

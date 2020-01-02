@@ -174,21 +174,24 @@ class SendAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
   }
 
   object Utility {
-    def onSuccess(ticketID: String, blockResponse: BlockResponse) = {
+    def onSuccess(ticketID: String, blockResponse: BlockResponse): Future[Unit] = {
       val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
       val sendAsset = Service.getTransaction(ticketID)
 
-      def getNegotiationID(sendAsset: SendAsset) = blockchainNegotiations.Service.getNegotiationID(buyerAddress = sendAsset.to, sellerAddress = sendAsset.from, pegHash = sendAsset.pegHash)
+      def getNegotiationID(sendAsset: SendAsset): Future[String] = blockchainNegotiations.Service.getNegotiationID(buyerAddress = sendAsset.to, sellerAddress = sendAsset.from, pegHash = sendAsset.pegHash)
 
-      def insertOrUpdate(negotiationID: String) = blockchainOrders.Service.insertOrUpdate(id = negotiationID, None, None, dirtyBit = true)
+      def insertOrUpdate(negotiationID: String): Future[Int] = blockchainOrders.Service.insertOrUpdate(id = negotiationID, None, None, dirtyBit = true)
 
-      def orderResponse(negotiationID: String) = getOrder.Service.get(negotiationID)
+      def orderResponse(negotiationID: String): Future[queries.responses.OrderResponse.Response] = getOrder.Service.get(negotiationID)
 
-      def assetsInsertOrUpdate(orderResponse: queries.responses.OrderResponse.Response, negotiationID: String) = Future {
-        orderResponse.value.assetPegWallet.foreach(assets => assets.foreach(asset => Await.result(blockchainAssets.Service.insertOrUpdate(pegHash = asset.pegHash, documentHash = asset.documentHash, assetType = asset.assetType, assetPrice = asset.assetPrice, assetQuantity = asset.assetQuantity, quantityUnit = asset.quantityUnit, locked = asset.locked, moderated = asset.moderated, ownerAddress = negotiationID, takerAddress = if (asset.takerAddress == "") None else Option(asset.takerAddress), dirtyBit = false),Duration.Inf)))
+      def assetsInsertOrUpdate(orderResponse: queries.responses.OrderResponse.Response, negotiationID: String)= {
+        orderResponse.value.assetPegWallet match {
+          case Some(assets) => Future.sequence(assets.map(asset => blockchainAssets.Service.insertOrUpdate(pegHash = asset.pegHash, documentHash = asset.documentHash, assetType = asset.assetType, assetPrice = asset.assetPrice, assetQuantity = asset.assetQuantity, quantityUnit = asset.quantityUnit, locked = asset.locked, moderated = asset.moderated, ownerAddress = negotiationID, takerAddress = if (asset.takerAddress == "") None else Option(asset.takerAddress), dirtyBit = false)))
+          case None => Future{}
+        }
       }
 
-      def markDirty(sendAsset: SendAsset) = {
+      def markDirty(sendAsset: SendAsset): Future[Unit] = {
         val markDirtyBlockchainAccounts = blockchainAccounts.Service.markDirty(sendAsset.from)
         val markDirtyBlockchainTransactionFeedbacks = blockchainTransactionFeedbacks.Service.markDirty(sendAsset.from)
         for {
@@ -197,7 +200,7 @@ class SendAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
         } yield {}
       }
 
-      def getIDs(sendAsset: SendAsset) = {
+      def getIDs(sendAsset: SendAsset): Future[(String,String)] = {
         val toAccountID = masterAccounts.Service.getId(sendAsset.to)
         val fromAccountID = masterAccounts.Service.getId(sendAsset.from)
         for {
@@ -229,11 +232,11 @@ class SendAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
       val markTransactionFailed = Service.markTransactionFailed(ticketID, message)
       val sendAsset = Service.getTransaction(ticketID)
 
-      def address(sendAsset: SendAsset) = masterAccounts.Service.getAddress(sendAsset.from)
+      def address(sendAsset: SendAsset): Future[String] = masterAccounts.Service.getAddress(sendAsset.from)
 
-      def markDirty(address: String) = blockchainTransactionFeedbacks.Service.markDirty(address)
+      def markDirty(address: String): Future[Int] = blockchainTransactionFeedbacks.Service.markDirty(address)
 
-      def getIDs(sendAsset: SendAsset) = {
+      def getIDs(sendAsset: SendAsset): Future[(String,String)] = {
         val toAccountID = masterAccounts.Service.getId(sendAsset.to)
         val fromAccountID = masterAccounts.Service.getId(sendAsset.from)
         for {

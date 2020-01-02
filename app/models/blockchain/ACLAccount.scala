@@ -10,8 +10,8 @@ import queries.GetACL
 import queries.responses.ACLResponse.Response
 import slick.jdbc.JdbcProfile
 
-import scala.concurrent.duration.{Duration, _}
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.duration._
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 case class ACLAccount(address: String, zoneID: String, organizationID: String, aclHash: String, dirtyBit: Boolean)
@@ -112,7 +112,7 @@ class ACLAccounts @Inject()(protected val databaseConfigProvider: DatabaseConfig
 
   object Service {
 
-    def create(address: String, zoneID: String, organizationID: String, acl: ACL, dirtyBit: Boolean): String = Await.result(add(ACLAccount(address, zoneID, organizationID, util.hashing.MurmurHash3.stringHash(acl.toString).toString, dirtyBit)), Duration.Inf)
+    def create(address: String, zoneID: String, organizationID: String, acl: ACL, dirtyBit: Boolean): Future[String] = add(ACLAccount(address, zoneID, organizationID, util.hashing.MurmurHash3.stringHash(acl.toString).toString, dirtyBit))
 
     def insertOrUpdate(address: String, zoneID: String, organizationID: String, acl: ACL, dirtyBit: Boolean): Future[Int] = upsert(ACLAccount(address, zoneID, organizationID, util.hashing.MurmurHash3.stringHash(acl.toString).toString, dirtyBit))
 
@@ -124,20 +124,20 @@ class ACLAccounts @Inject()(protected val databaseConfigProvider: DatabaseConfig
 
     def getDirtyAddresses: Future[Seq[String]] = getAddressesByDirtyBit(dirtyBit = true)
 
-    def markDirty(address: String): Int = Await.result(updateDirtyBitByAddress(address, dirtyBit = true), Duration.Inf)
+    def markDirty(address: String): Future[Int] = updateDirtyBitByAddress(address, dirtyBit = true)
   }
 
   object Utility {
-    def dirtyEntityUpdater() = {
+    def dirtyEntityUpdater(): Future[Unit] = {
       val dirtyAddresses = Service.getDirtyAddresses
       Thread.sleep(sleepTime)
 
-      def insertOrUpdateAll(dirtyAddresses: Seq[String]) = {
+      def insertOrUpdateAll(dirtyAddresses: Seq[String]): Future[Seq[Unit]] = {
         Future.sequence {
           dirtyAddresses.map { dirtyAddress =>
             val responseAccount = getACL.Service.get(dirtyAddress)
 
-            def insertOrUpdate(responseAccount: Response) = Service.insertOrUpdate(responseAccount.value.address, responseAccount.value.zoneID, responseAccount.value.organizationID, responseAccount.value.acl, dirtyBit = false)
+            def insertOrUpdate(responseAccount: Response): Future[Int] = Service.insertOrUpdate(responseAccount.value.address, responseAccount.value.zoneID, responseAccount.value.organizationID, responseAccount.value.acl, dirtyBit = false)
 
             for {
               responseAccount <- responseAccount

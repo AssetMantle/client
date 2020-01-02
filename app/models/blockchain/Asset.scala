@@ -15,8 +15,8 @@ import queries.GetAccount
 import queries.responses.AccountResponse.Response
 import slick.jdbc.JdbcProfile
 
-import scala.concurrent.duration.{Duration, _}
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.duration._
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 case class Asset(pegHash: String, documentHash: String, assetType: String, assetQuantity: String, assetPrice: String, quantityUnit: String, ownerAddress: String, locked: Boolean, moderated: Boolean, takerAddress: Option[String], dirtyBit: Boolean)
@@ -31,14 +31,11 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
   val db = databaseConfig.db
 
   private implicit val materializer: ActorMaterializer = ActorMaterializer()(actorSystem)
-
+  private val actorTimeout = configuration.get[Int]("akka.actors.timeout").seconds
+  private val cometActorSleepTime = configuration.get[Long]("akka.actors.cometActorSleepTime")
   val mainAssetActor: ActorRef = actorSystem.actorOf(props = MainAssetActor.props(actorTimeout, actorSystem), name = constants.Module.ACTOR_MAIN_ASSET)
 
   private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
-
-  private val cometActorSleepTime = configuration.get[Long]("akka.actors.cometActorSleepTime")
-
-  private val actorTimeout = configuration.get[Int]("akka.actors.timeout").seconds
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -70,7 +67,7 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
     }
   }
 
-  private def findByPegHash(pegHash: String)(implicit executionContext: ExecutionContext): Future[Asset] = db.run(assetTable.filter(_.pegHash === pegHash).result.head.asTry).map {
+  private def findByPegHash(pegHash: String): Future[Asset] = db.run(assetTable.filter(_.pegHash === pegHash).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -150,9 +147,9 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
 
   object Service {
 
-    def create(pegHash: String, documentHash: String, assetType: String, assetQuantity: String, assetPrice: String, quantityUnit: String, ownerAddress: String, moderated: Boolean, takerAddress: Option[String], locked: Boolean, dirtyBit: Boolean): String = Await.result(add(Asset(pegHash = pegHash, documentHash = documentHash, assetType = assetType, assetPrice = assetPrice, assetQuantity = assetQuantity, quantityUnit = quantityUnit, ownerAddress = ownerAddress, moderated = moderated, takerAddress = takerAddress, locked = locked, dirtyBit = dirtyBit)), Duration.Inf)
+    def create(pegHash: String, documentHash: String, assetType: String, assetQuantity: String, assetPrice: String, quantityUnit: String, ownerAddress: String, moderated: Boolean, takerAddress: Option[String], locked: Boolean, dirtyBit: Boolean): Future[String] = add(Asset(pegHash = pegHash, documentHash = documentHash, assetType = assetType, assetPrice = assetPrice, assetQuantity = assetQuantity, quantityUnit = quantityUnit, ownerAddress = ownerAddress, moderated = moderated, takerAddress = takerAddress, locked = locked, dirtyBit = dirtyBit))
 
-    def get(pegHash: String): Asset = Await.result(findByPegHash(pegHash), Duration.Inf)
+    def get(pegHash: String): Future[Asset] = findByPegHash(pegHash)
 
     def getAllPublic(excludedAssets: Seq[String]): Future[Seq[Asset]] = findAllAssetsByPublic(excludedAssets)
 
@@ -162,7 +159,7 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
 
     def getAssetPegWallet(address: String): Future[Seq[Asset]] = getAssetPegWalletByAddress(address)
 
-    def getAssetPegHashes(address: String)(implicit executionContext: ExecutionContext): Future[Seq[String]] = getAssetPegHashesByAddress(address)
+    def getAssetPegHashes(address: String): Future[Seq[String]] = getAssetPegHashesByAddress(address)
 
     def insertOrUpdate(pegHash: String, documentHash: String, assetType: String, assetQuantity: String, assetPrice: String, quantityUnit: String, ownerAddress: String, moderated: Boolean, takerAddress: Option[String], locked: Boolean, dirtyBit: Boolean): Future[Int] = upsert(Asset(pegHash = pegHash, documentHash = documentHash, assetType = assetType, assetQuantity = assetQuantity, assetPrice = assetPrice, quantityUnit = quantityUnit, ownerAddress = ownerAddress, moderated = moderated, takerAddress = takerAddress, locked = locked, dirtyBit = dirtyBit))
 
@@ -184,7 +181,7 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
   }
 
   object Utility {
-    def dirtyEntityUpdater() = {
+    def dirtyEntityUpdater(): Future[Unit] = {
       val dirtyAssets = Service.getDirtyAssets
       Thread.sleep(sleepTime)
 
@@ -193,7 +190,7 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
           dirtyAssets.map { dirtyAsset =>
             val ownerAccount = getAccount.Service.get(dirtyAsset.ownerAddress)
 
-            def insertOrUpdate(ownerAccount: Response) = {
+            def insertOrUpdate(ownerAccount: Response): Future[Unit] = {
               val assetPegWallet = ownerAccount.value.assetPegWallet.getOrElse(throw new BaseException(constants.Response.NO_RESPONSE))
               val upsert = Future.sequence(assetPegWallet.map { assetPeg => if (assetPegWallet.map(_.pegHash) contains dirtyAsset.pegHash) Service.insertOrUpdate(pegHash = assetPeg.pegHash, documentHash = assetPeg.documentHash, assetType = assetPeg.assetType, assetPrice = assetPeg.assetPrice, assetQuantity = assetPeg.assetQuantity, quantityUnit = assetPeg.quantityUnit, ownerAddress = dirtyAsset.ownerAddress, locked = assetPeg.locked, moderated = assetPeg.moderated, takerAddress = if (assetPeg.takerAddress == "") None else Option(assetPeg.takerAddress), dirtyBit = false) else Service.deleteAsset(dirtyAsset.pegHash) })
               for {
@@ -201,7 +198,7 @@ class Assets @Inject()(protected val databaseConfigProvider: DatabaseConfigProvi
               } yield {}
             }
 
-            def accountID = masterAccounts.Service.getId(dirtyAsset.ownerAddress)
+            def accountID: Future[String] = masterAccounts.Service.getId(dirtyAsset.ownerAddress)
 
             (for {
               ownerAccount <- ownerAccount

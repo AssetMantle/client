@@ -11,12 +11,13 @@ import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.{JsValue, Json}
 import play.api.{Configuration, Logger}
+import queries.responses.AccountResponse
 import queries.responses.AccountResponse.Response
 import queries.{GetAccount, GetOrder}
 import slick.jdbc.JdbcProfile
 
 import scala.concurrent.duration.{Duration, _}
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 case class Fiat(pegHash: String, ownerAddress: String, transactionID: String, transactionAmount: String, redeemedAmount: String, dirtyBit: Boolean)
@@ -29,6 +30,9 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
   val databaseConfig = databaseConfigProvider.get[JdbcProfile]
 
   val db = databaseConfig.db
+
+  private val actorTimeout = configuration.get[Int]("akka.actors.timeout").seconds
+
   val mainFiatActor: ActorRef = actorSystem.actorOf(props = MainFiatActor.props(actorTimeout, actorSystem), name = constants.Module.ACTOR_MAIN_FIAT)
 
   private implicit val logger: Logger = Logger(this.getClass)
@@ -36,8 +40,6 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
   private implicit val module: String = constants.Module.BLOCKCHAIN_FIAT
 
   private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
-
-  private val actorTimeout = configuration.get[Int]("akka.actors.timeout").seconds
 
   private val cometActorSleepTime = configuration.get[Long]("akka.actors.cometActorSleepTime")
 
@@ -91,7 +93,7 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
     }
   }
 
-  private def deleteByPegHashAndAddress(pegHash: String, address: String) = db.run(fiatTable.filter(_.pegHash === pegHash).filter(_.ownerAddress === address).delete.asTry).map {
+  private def deleteByPegHashAndAddress(pegHash: String, address: String): Future[Int] = db.run(fiatTable.filter(_.pegHash === pegHash).filter(_.ownerAddress === address).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -101,7 +103,7 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
     }
   }
 
-  private def deleteByAddress(address: String) = db.run(fiatTable.filter(_.ownerAddress === address).delete.asTry).map {
+  private def deleteByAddress(address: String): Future[Int] = db.run(fiatTable.filter(_.ownerAddress === address).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -130,7 +132,7 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
   object Service {
 
-    def create(pegHash: String, ownerAddress: String, transactionID: String, transactionAmount: String, redeemedAmount: String, dirtyBit: Boolean): String = Await.result(add(Fiat(pegHash, ownerAddress, transactionID, transactionAmount, redeemedAmount, dirtyBit)), Duration.Inf)
+    def create(pegHash: String, ownerAddress: String, transactionID: String, transactionAmount: String, redeemedAmount: String, dirtyBit: Boolean): Future[String] = add(Fiat(pegHash, ownerAddress, transactionID, transactionAmount, redeemedAmount, dirtyBit))
 
     def getFiatPegWallet(address: String): Future[Seq[Fiat]] = getFiatPegWalletByAddress(address)
 
@@ -163,7 +165,7 @@ class Fiats @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
           dirtyFiats.map { dirtyFiat =>
             val accountOwnerAddress = getAccount.Service.get(dirtyFiat.ownerAddress)
 
-            def insertOrUpdate(accountOwnerAddress: Response) = {
+            def insertOrUpdate(accountOwnerAddress: Response): Future[Seq[AccountResponse.Fiat]] = {
               val fiatPegWallet = accountOwnerAddress.value.fiatPegWallet.getOrElse(throw new BaseException(constants.Response.NO_RESPONSE))
               val upsert = Future.sequence(fiatPegWallet.map { fiatPeg => if (fiatPegWallet.map(_.pegHash) contains dirtyFiat.pegHash) Service.insertOrUpdate(fiatPeg.pegHash, dirtyFiat.ownerAddress, fiatPeg.transactionID, fiatPeg.transactionAmount, fiatPeg.redeemedAmount, dirtyBit = false) else Service.deleteFiat(dirtyFiat.pegHash, dirtyFiat.ownerAddress) })
               for {

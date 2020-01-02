@@ -116,11 +116,11 @@ class FaucetRequests @Inject()(protected val databaseConfigProvider: DatabaseCon
 
     def getPendingFaucetRequests: Future[Seq[FaucetRequest]] = getFaucetRequestsWithNullStatus
 
-    def delete(id: String): Int = Await.result(deleteByID(id), Duration.Inf)
+    def delete(id: String): Future[Int] = deleteByID(id)
 
     def getStatus(id: String): Future[Option[Boolean]] = getStatusByID(id)
 
-    def verifyREquest(id: String, accountID: String): Boolean = Await.result(verifyRequestById(id = id, accountID = accountID), Duration.Inf)
+    def verifyRequest(id: String, accountID: String): Future[Boolean] = verifyRequestById(id = id, accountID = accountID)
 
   }
 

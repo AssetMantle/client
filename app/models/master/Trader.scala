@@ -188,13 +188,13 @@ class Traders @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
 
   object Service {
 
-    def create(zoneID: String, organizationID: String, accountID: String, name: String): String = Await.result(add(Trader(utilities.IDGenerator.hexadecimal, zoneID, organizationID, accountID, name)), Duration.Inf)
+    def create(zoneID: String, organizationID: String, accountID: String, name: String): Future[String] = add(Trader(utilities.IDGenerator.hexadecimal, zoneID, organizationID, accountID, name))
 
-    def insertOrUpdate(zoneID: String, organizationID: String, accountID: String, name: String) = {
+    def insertOrUpdate(zoneID: String, organizationID: String, accountID: String, name: String): Future[String] = {
 
       val id = getIDByAccountID(accountID)
 
-      def upsertTrader(id: String) = upsert(Trader(id = id, zoneID = zoneID, organizationID = organizationID, accountID = accountID, name = name))
+      def upsertTrader(id: String): Future[Int] = upsert(Trader(id = id, zoneID = zoneID, organizationID = organizationID, accountID = accountID, name = name))
 
       for {
         id <- id
@@ -218,9 +218,9 @@ class Traders @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
 
     def rejectTrader(id: String): Future[Int] = updateVerificationStatusOnID(id = id, verificationStatus = Option(false))
 
-    def verifyTrader(id: String): Int = Await.result(updateVerificationStatusOnID(id = id, verificationStatus = Option(true)), Duration.Inf)
+    def verifyTrader(id: String): Future[Int] = updateVerificationStatusOnID(id = id, verificationStatus = Option(true))
 
-    def rejectTraderByAccountID(accountID: String): Int = Await.result(updateVerificationStatusOnAccountID(accountID = accountID, verificationStatus = Option(false)), Duration.Inf)
+    def rejectTraderByAccountID(accountID: String): Future[Int] = updateVerificationStatusOnAccountID(accountID = accountID, verificationStatus = Option(false))
 
     def verifyTraderByAccountID(accountID: String): Future[Int] = updateVerificationStatusOnAccountID(accountID = accountID, verificationStatus = Option(true))
 
@@ -232,7 +232,7 @@ class Traders @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
 
     def getVerifiedTradersForOrganization(organizationID: String): Future[Seq[Trader]] = getVerifiedTradersByOrganizationID(organizationID)
 
-    def getVerificationStatus(id: String): Boolean = Await.result(getVerificationStatusById(id), Duration.Inf).getOrElse(false)
+    def getVerificationStatus(id: String): Future[Boolean] = getVerificationStatusById(id).map(_.getOrElse(false))
 
     def markTraderFormCompleted(id: String): Future[Int] = updateCompletionStatusOnID(id = id, completionStatus = true)
 

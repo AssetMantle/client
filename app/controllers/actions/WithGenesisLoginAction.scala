@@ -16,33 +16,33 @@ class WithGenesisLoginAction @Inject()(messagesControllerComponents: MessagesCon
 
   def authenticated(f: ⇒ LoginState => Request[AnyContent] => Future[Result])(implicit logger: Logger): Action[AnyContent] = {
     Action.async { implicit request ⇒
-      try {
-        val username = request.session.get(constants.Security.USERNAME).getOrElse(throw new BaseException(constants.Response.USERNAME_NOT_FOUND))
-        val sessionTokenVerify = masterTransactionSessionTokens.Service.tryVerifyingSessionToken(username, request.session.get(constants.Security.TOKEN).getOrElse(throw new BaseException(constants.Response.TOKEN_NOT_FOUND)))
+      val username = Future(request.session.get(constants.Security.USERNAME).getOrElse(throw new BaseException(constants.Response.USERNAME_NOT_FOUND)))
+      val sessionToken = Future(request.session.get(constants.Security.TOKEN).getOrElse(throw new BaseException(constants.Response.TOKEN_NOT_FOUND)))
+
+      def verifySessionTokenAndUserType(username: String, sessionToken: String): Future[String] = {
+        val sessionTokenVerify = masterTransactionSessionTokens.Service.tryVerifyingSessionToken(username, sessionToken)
         val tokenTimeVerify = masterTransactionSessionTokens.Service.tryVerifyingSessionTokenTime(username)
         val verifyUserType = masterAccounts.Service.tryVerifyingUserType(username, constants.User.GENESIS)
         val address = masterAccounts.Service.getAddress(username)
-
-        def result(loginState: LoginState) = f(loginState)(request)
-
-        (for {
+        for {
           _ <- sessionTokenVerify
           _ <- tokenTimeVerify
           _ <- verifyUserType
           address <- address
-          result <- result(LoginState(username, constants.User.GENESIS, address))
-        } yield result).recover {
-          case baseException: BaseException => logger.info(baseException.failure.message, baseException)
-            Results.Unauthorized(views.html.index(failures = Seq(baseException.failure)))
-        }
-
-      } catch {
-        case baseException: BaseException => logger.info(baseException.failure.message, baseException)
-          Future {
-            Results.Unauthorized(views.html.index(failures = Seq(baseException.failure)))
-          }
+        } yield address
       }
 
+      def result(loginState: LoginState): Future[Result] = f(loginState)(request)
+
+      (for {
+        username <- username
+        sessionToken <- sessionToken
+        address <- verifySessionTokenAndUserType(username, sessionToken)
+        result <- result(LoginState(username, constants.User.GENESIS, address))
+      } yield result).recover {
+        case baseException: BaseException => logger.info(baseException.failure.message, baseException)
+          Results.Unauthorized(views.html.index(failures = Seq(baseException.failure)))
+      }
     }
   }
 }

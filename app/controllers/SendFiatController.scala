@@ -28,9 +28,7 @@ class SendFiatController @Inject()(messagesControllerComponents: MessagesControl
     implicit request =>
       views.companion.master.SendFiat.form.bindFromRequest().fold(
         formWithErrors => {
-          Future {
-            BadRequest(views.html.component.master.sendFiat(formWithErrors, sellerAddress = formWithErrors.data(constants.FormField.SELLER_ADDRESS.name), pegHash = formWithErrors.data(constants.FormField.PEG_HASH.name), amount = formWithErrors.data(constants.FormField.AMOUNT.name).toInt))
-          }
+          Future(BadRequest(views.html.component.master.sendFiat(formWithErrors, sellerAddress = formWithErrors.data(constants.FormField.SELLER_ADDRESS.name), pegHash = formWithErrors.data(constants.FormField.PEG_HASH.name), amount = formWithErrors.data(constants.FormField.AMOUNT.name).toInt)))
         },
         sendFiatData => {
           val transactionProcess = transaction.process[blockchainTransaction.SendFiat, transactionsSendFiat.Request](
@@ -44,7 +42,8 @@ class SendFiatController @Inject()(messagesControllerComponents: MessagesControl
           )
           (for {
             _ <- transactionProcess
-          } yield withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.FIAT_SENT)))
+            result<-withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.FIAT_SENT)))
+          } yield result
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
@@ -59,9 +58,7 @@ class SendFiatController @Inject()(messagesControllerComponents: MessagesControl
   def blockchainSendFiat: Action[AnyContent] = Action.async { implicit request =>
     views.companion.blockchain.SendFiat.form.bindFromRequest().fold(
       formWithErrors => {
-        Future {
-          BadRequest(views.html.component.blockchain.sendFiat(formWithErrors))
-        }
+        Future(BadRequest(views.html.component.blockchain.sendFiat(formWithErrors)))
       },
       sendFiatData => {
         val postRequest = transactionsSendFiat.Service.post(transactionsSendFiat.Request(transactionsSendFiat.BaseReq(from = sendFiatData.from, gas = sendFiatData.gas.toString), to = sendFiatData.to, password = sendFiatData.password, amount = sendFiatData.amount.toString, pegHash = sendFiatData.pegHash, mode = sendFiatData.mode))

@@ -4,13 +4,14 @@ import controllers.actions.{WithLoginAction, WithOrganizationLoginAction, WithTr
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.Trait.Document
-import models.blockchain.{ACLAccounts, Negotiation, Order}
-import models.masterTransaction.IssueAssetRequest
+import models.blockchain._
+import models.master.{Organization => _, Zone => _, _}
+import models.masterTransaction.{AssetFile, IssueAssetRequest}
 import models.{blockchain, master, masterTransaction}
 import play.api.http.ContentTypes
 import play.api.i18n.I18nSupport
 import play.api.libs.Comet
-import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc._
 import play.api.{Configuration, Logger}
 import queries.GetAccount
 
@@ -65,7 +66,7 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
         case constants.User.ORGANIZATION =>
           val zoneID = masterOrganizations.Service.getZoneIDByAccountID(loginState.username)
 
-          def zone(zoneID: String) = masterZones.Service.get(zoneID)
+          def zone(zoneID: String): Future[models.master.Zone] = masterZones.Service.get(zoneID)
 
           for {
             zoneID <- zoneID
@@ -74,7 +75,7 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
         case constants.User.TRADER =>
           val zoneID = masterTraders.Service.getZoneIDByAccountID(loginState.username)
 
-          def zone(zoneID: String) = masterZones.Service.get(zoneID)
+          def zone(zoneID: String): Future[models.master.Zone] = masterZones.Service.get(zoneID)
 
           for {
             zoneID <- zoneID
@@ -96,7 +97,7 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
         case constants.User.TRADER =>
           val organizationID = masterTraders.Service.getOrganizationIDByAccountID(loginState.username)
 
-          def organization(organizationID: String) = masterOrganizations.Service.get(organizationID)
+          def organization(organizationID: String): Future[models.master.Organization] = masterOrganizations.Service.get(organizationID)
 
           for {
             organizationID <- organizationID
@@ -111,7 +112,7 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
     implicit request =>
       val assets = masterTransactionIssueAssetRequests.Service.getTraderAssetList(loginState.username)
 
-      def allDocumentsForAllAssets(assets: Seq[IssueAssetRequest]) = masterTransactionAssetFiles.Service.getAllDocumentsForAllAssets(assets.map(_.id))
+      def allDocumentsForAllAssets(assets: Seq[IssueAssetRequest]): Future[Seq[AssetFile]] = masterTransactionAssetFiles.Service.getAllDocumentsForAllAssets(assets.map(_.id))
 
       (for {
         assets <- assets
@@ -163,11 +164,11 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
     implicit request =>
       val negotiations = blockchainNegotiations.Service.getNegotiationsForAddress(loginState.address)
 
-      def orders(negotiations: Seq[Negotiation]) = blockchainOrders.Service.getOrders(negotiations.map(_.id))
+      def orders(negotiations: Seq[Negotiation]): Future[Seq[Order]] = blockchainOrders.Service.getOrders(negotiations.map(_.id))
 
       def getNegotiationsOfOrders(negotiations: Seq[Negotiation], orders: Seq[Order]): Seq[Negotiation] = negotiations.filter(negotiation => orders.map(_.id) contains negotiation.id)
 
-      def assets(negotiationsOfOrders: Seq[Negotiation]) = blockchainAssets.Service.getByPegHashes(negotiationsOfOrders.map(_.assetPegHash))
+      def assets(negotiationsOfOrders: Seq[Negotiation]): Future[Seq[Asset]] = blockchainAssets.Service.getByPegHashes(negotiationsOfOrders.map(_.assetPegHash))
 
       (for {
         negotiations <- negotiations
@@ -186,7 +187,7 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
   def availableAssetList: Action[AnyContent] = Action.async { implicit request =>
     val assets = masterTransactionIssueAssetRequests.Service.getMarketAssets()
 
-    def allDocumentsForAllAssets(assets: Seq[IssueAssetRequest]) = masterTransactionAssetFiles.Service.getAllDocumentsForAllAssets(assets.map(_.id))
+    def allDocumentsForAllAssets(assets: Seq[IssueAssetRequest]): Future[Seq[AssetFile]] = masterTransactionAssetFiles.Service.getAllDocumentsForAllAssets(assets.map(_.id))
 
     (for {
       assets <- assets
@@ -202,9 +203,9 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
       val masterTransactionAssets = masterTransactionIssueAssetRequests.Service.getMarketAssets()
       val allOrderIDs = blockchainOrders.Service.getAllOrderIds
 
-      def blockchainAssetList(allOrderIDs: Seq[String]) = blockchainAssets.Service.getAllPublic(allOrderIDs)
+      def blockchainAssetList(allOrderIDs: Seq[String]): Future[Seq[Asset]] = blockchainAssets.Service.getAllPublic(allOrderIDs)
 
-      def allDocumentsForAllAssets(masterTransactionAssets: Seq[IssueAssetRequest]) = masterTransactionAssetFiles.Service.getAllDocumentsForAllAssets(masterTransactionAssets.map(_.id))
+      def allDocumentsForAllAssets(masterTransactionAssets: Seq[IssueAssetRequest]): Future[Seq[AssetFile]] = masterTransactionAssetFiles.Service.getAllDocumentsForAllAssets(masterTransactionAssets.map(_.id))
 
       (for {
         allOrderIDs <- allOrderIDs
@@ -215,45 +216,33 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
         Ok(views.html.component.master.availableAssetListWithLogin(masterTransactionAssets, blockchainAssetList, allDocumentsForAllAssets))
       }
         ).recover {
-        case _: BaseException => {
-          NoContent
-        }
+        case _: BaseException => NoContent
       }
   }
 
   def accountComet: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      Future {
-        Ok.chunked(blockchainAccounts.Service.accountCometSource(loginState.username) via Comet.json("parent.accountCometMessage")).as(ContentTypes.HTML)
-      }
+      Future(Ok.chunked(blockchainAccounts.Service.accountCometSource(loginState.username) via Comet.json("parent.accountCometMessage")).as(ContentTypes.HTML))
   }
 
   def assetComet: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      Future {
-        Ok.chunked(blockchainAssets.Service.assetCometSource(loginState.username) via Comet.json("parent.assetCometMessage")).as(ContentTypes.HTML)
-      }
+      Future(Ok.chunked(blockchainAssets.Service.assetCometSource(loginState.username) via Comet.json("parent.assetCometMessage")).as(ContentTypes.HTML))
   }
 
   def fiatComet: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      Future {
-        Ok.chunked(blockchainFiats.Service.fiatCometSource(loginState.username) via Comet.json("parent.fiatCometMessage")).as(ContentTypes.HTML)
-      }
+      Future(Ok.chunked(blockchainFiats.Service.fiatCometSource(loginState.username) via Comet.json("parent.fiatCometMessage")).as(ContentTypes.HTML))
   }
 
   def negotiationComet: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      Future {
-        Ok.chunked(blockchainNegotiations.Service.negotiationCometSource(loginState.username) via Comet.json("parent.negotiationCometMessage")).as(ContentTypes.HTML)
-      }
+      Future(Ok.chunked(blockchainNegotiations.Service.negotiationCometSource(loginState.username) via Comet.json("parent.negotiationCometMessage")).as(ContentTypes.HTML))
   }
 
   def orderComet: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      Future {
-        Ok.chunked(blockchainOrders.Service.orderCometSource(loginState.username) via Comet.json("parent.orderCometMessage")).as(ContentTypes.HTML)
-      }
+      Future(Ok.chunked(blockchainOrders.Service.orderCometSource(loginState.username) via Comet.json("parent.orderCometMessage")).as(ContentTypes.HTML))
   }
 
   def profileDocuments(): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
@@ -262,7 +251,7 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
         case constants.User.ZONE =>
           val id = masterZones.Service.getID(loginState.username)
 
-          def zoneKYCs(id: String) = masterZoneKYC.Service.getAllDocuments(loginState.username)
+          def zoneKYCs(id: String): Future[Seq[ZoneKYC]] = masterZoneKYC.Service.getAllDocuments(loginState.username)
 
           for {
             id <- id
@@ -271,7 +260,7 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
         case constants.User.ORGANIZATION =>
           val id = masterOrganizations.Service.getID(loginState.username)
 
-          def organizationKYCs(id: String) = masterOrganizationKYCs.Service.getAllDocuments(id)
+          def organizationKYCs(id: String): Future[Seq[OrganizationKYC]] = masterOrganizationKYCs.Service.getAllDocuments(id)
 
           for {
             id <- id
@@ -280,7 +269,7 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
         case constants.User.TRADER =>
           val id = masterTraders.Service.getID(loginState.username)
 
-          def traderKYCs(id: String) = masterTraderKYCs.Service.getAllDocuments(id)
+          def traderKYCs(id: String): Future[Seq[TraderKYC]] = masterTraderKYCs.Service.getAllDocuments(id)
 
           for {
             id <- id
@@ -312,7 +301,7 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
     implicit request =>
       val organizationid = masterOrganizations.Service.getID(loginState.username)
 
-      def tradersListInOrganization(organizationid: String) = masterTraders.Service.getTradersListInOrganization(organizationid)
+      def tradersListInOrganization(organizationid: String): Future[Seq[Trader]] = masterTraders.Service.getTradersListInOrganization(organizationid)
 
       (for {
         organizationid <- organizationid
@@ -327,29 +316,29 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
     implicit request =>
       val organizationID = masterOrganizations.Service.getID(loginState.username)
 
-      def verifyOrganizationTrader(organizationID: String) = masterTraders.Service.verifyOrganizationTrader(traderID = traderID, organizationID)
+      def verifyOrganizationTrader(organizationID: String): Future[Boolean] = masterTraders.Service.verifyOrganizationTrader(traderID = traderID, organizationID)
 
-      def getViewTraderResult(verifyOrganizationTrader: Boolean) = {
+      def getViewTraderResult(verifyOrganizationTrader: Boolean): Future[Result] = {
         if (verifyOrganizationTrader) {
           val accountID = masterTraders.Service.getAccountId(traderID)
 
-          def address(accountID: String) = masterAccounts.Service.getAddress(accountID)
+          def address(accountID: String): Future[String] = masterAccounts.Service.getAddress(accountID)
 
-          def buyNegotiations(address: String) = blockchainNegotiations.Service.getNegotiationsForBuyerAddress(address)
+          def buyNegotiations(address: String): Future[Seq[Negotiation]] = blockchainNegotiations.Service.getNegotiationsForBuyerAddress(address)
 
-          def sellNegotiations(address: String) = blockchainNegotiations.Service.getNegotiationsForSellerAddress(address)
+          def sellNegotiations(address: String): Future[Seq[Negotiation]] = blockchainNegotiations.Service.getNegotiationsForSellerAddress(address)
 
           val trader = masterTraders.Service.get(traderID)
 
-          def assets(address: String) = blockchainAssets.Service.getAssetPegWallet(address)
+          def assets(address: String): Future[Seq[Asset]] = blockchainAssets.Service.getAssetPegWallet(address)
 
-          def fiats(address: String) = blockchainFiats.Service.getFiatPegWallet(address)
+          def fiats(address: String): Future[Seq[Fiat]] = blockchainFiats.Service.getFiatPegWallet(address)
 
-          def buyOrders(buyNegotiations: Seq[Negotiation]) = blockchainOrders.Service.getOrders(buyNegotiations.map(_.id))
+          def buyOrders(buyNegotiations: Seq[Negotiation]): Future[Seq[Order]] = blockchainOrders.Service.getOrders(buyNegotiations.map(_.id))
 
-          def sellOrders(sellNegotiations: Seq[Negotiation]) = blockchainOrders.Service.getOrders(sellNegotiations.map(_.id))
+          def sellOrders(sellNegotiations: Seq[Negotiation]): Future[Seq[Order]] = blockchainOrders.Service.getOrders(sellNegotiations.map(_.id))
 
-          def traderFeedbackHistories(address: String) = blockchainTraderFeedbackHistories.Service.get(address)
+          def traderFeedbackHistories(address: String): Future[Seq[TraderFeedbackHistory]] = blockchainTraderFeedbackHistories.Service.get(address)
 
           for {
             accountID <- accountID
@@ -364,9 +353,7 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
             trader <- trader
           } yield Ok(views.html.component.master.organizationViewTrader(trader = trader, assets = assets, fiats = fiats, buyNegotiations = buyNegotiations, sellNegotiations = sellNegotiations, buyOrders = buyOrders, sellOrders = sellOrders, traderFeedbackHistories = traderFeedbackHistories))
         } else {
-          Future {
-            Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
-          }
+          Future(Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED))))
         }
       }
 

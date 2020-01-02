@@ -3,7 +3,7 @@ package views.companion.master
 import play.api.data.Form
 import play.api.data.Forms._
 
-object ChangeBuyerBid {
+object  ChangeBuyerBid {
   val form = Form(
     mapping(
       constants.FormField.REQUEST_ID.name -> optional(constants.FormField.REQUEST_ID.field),

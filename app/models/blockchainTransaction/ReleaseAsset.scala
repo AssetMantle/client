@@ -170,7 +170,7 @@ class ReleaseAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.T
       val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
       val releaseAsset = Service.getTransaction(ticketID)
 
-      def markDirty(releaseAsset: ReleaseAsset) = {
+      def markDirty(releaseAsset: ReleaseAsset): Future[Unit] = {
         val markDirtyPegHash = blockchainAssets.Service.markDirty(releaseAsset.pegHash)
         val markDirtyFrom = blockchainAccounts.Service.markDirty(releaseAsset.from)
         for {
@@ -179,7 +179,7 @@ class ReleaseAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.T
         } yield {}
       }
 
-      def getIDs(releaseAsset: ReleaseAsset) = {
+      def getIDs(releaseAsset: ReleaseAsset): Future[(String,String)] = {
         val toAccountID = masterAccounts.Service.getId(releaseAsset.to)
         val fromAccountID = masterAccounts.Service.getId(releaseAsset.from)
         for {
@@ -206,7 +206,7 @@ class ReleaseAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.T
       val markTransactionFailed = Service.markTransactionFailed(ticketID, message)
       val releaseAsset = Service.getTransaction(ticketID)
 
-      def getIDs(releaseAsset: ReleaseAsset) = {
+      def getIDs(releaseAsset: ReleaseAsset): Future[(String,String)] = {
         val toAccountID = masterAccounts.Service.getId(releaseAsset.to)
         val fromAccountID = masterAccounts.Service.getId(releaseAsset.from)
         for {

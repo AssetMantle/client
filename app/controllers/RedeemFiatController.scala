@@ -36,14 +36,12 @@ class RedeemFiatController @Inject()(messagesControllerComponents: MessagesContr
     implicit request =>
       views.companion.master.RedeemFiat.form.bindFromRequest().fold(
         formWithErrors => {
-          Future {
-            BadRequest(views.html.component.master.redeemFiat(formWithErrors, formWithErrors.data(constants.FormField.ZONE_ID.name)))
-          }
+          Future (BadRequest(views.html.component.master.redeemFiat(formWithErrors, formWithErrors.data(constants.FormField.ZONE_ID.name))))
         },
         redeemFiatData => {
           val toAddress = blockchainZones.Service.getAddress(redeemFiatData.zoneID)
 
-          def transactionProcess(toAddress: String) = transaction.process[blockchainTransaction.RedeemFiat, transactionsRedeemFiat.Request](
+          def transactionProcess(toAddress: String): Future[String] = transaction.process[blockchainTransaction.RedeemFiat, transactionsRedeemFiat.Request](
             entity = blockchainTransaction.RedeemFiat(from = loginState.address, to = toAddress, redeemAmount = redeemFiatData.redeemAmount, gas = redeemFiatData.gas, ticketID = "", mode = transactionMode),
             blockchainTransactionCreate = blockchainTransactionRedeemFiats.Service.create,
             request = transactionsRedeemFiat.Request(transactionsRedeemFiat.BaseReq(from = loginState.address, gas = redeemFiatData.gas.toString), to = toAddress, password = redeemFiatData.password, redeemAmount = redeemFiatData.redeemAmount.toString, mode = transactionMode),
@@ -56,7 +54,8 @@ class RedeemFiatController @Inject()(messagesControllerComponents: MessagesContr
           (for {
             toAddress <- toAddress
             _ <- transactionProcess(toAddress)
-          } yield withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.FIAT_REDEEMED)))
+            result<-withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.FIAT_REDEEMED)))
+          } yield result
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
@@ -71,9 +70,7 @@ class RedeemFiatController @Inject()(messagesControllerComponents: MessagesContr
   def blockchainRedeemFiat: Action[AnyContent] = Action.async { implicit request =>
     views.companion.blockchain.RedeemFiat.form.bindFromRequest().fold(
       formWithErrors => {
-        Future {
-          BadRequest(views.html.component.blockchain.redeemFiat(formWithErrors))
-        }
+        Future (BadRequest(views.html.component.blockchain.redeemFiat(formWithErrors)))
       },
       redeemFiatData => {
         val post = transactionsRedeemFiat.Service.post(transactionsRedeemFiat.Request(transactionsRedeemFiat.BaseReq(from = redeemFiatData.from, gas = redeemFiatData.gas.toString), to = redeemFiatData.to, password = redeemFiatData.password, redeemAmount = redeemFiatData.redeemAmount.toString, mode = redeemFiatData.mode))

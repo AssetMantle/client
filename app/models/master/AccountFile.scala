@@ -117,15 +117,15 @@ class AccountFiles @Inject()(protected val databaseConfigProvider: DatabaseConfi
 
     def updateOldDocument(accountFile: AccountFile): Future[Int] = upsert(AccountFile(id = accountFile.id, documentType = accountFile.documentType, fileName = accountFile.fileName, file = accountFile.file))
 
-    def get(id: String, documentType: String): AccountFile = Await.result(findByIdDocumentType(id = id, documentType = documentType), Duration.Inf)
+    def get(id: String, documentType: String): Future[AccountFile] = findByIdDocumentType(id = id, documentType = documentType)
 
     def getFileName(id: String, documentType: String): Future[String] = getFileNameByIdDocumentType(id = id, documentType = documentType)
 
     def getAllDocuments(id: String): Future[Seq[AccountFile]] = getAllDocumentsById(id = id)
 
-    def deleteAllDocuments(id: String): Int = Await.result(deleteById(id = id), Duration.Inf)
+    def deleteAllDocuments(id: String): Future[Int] = deleteById(id = id)
 
-    def checkFileExists(id: String, documentType: String): Boolean = Await.result(checkByIdAndDocumentType(id = id, documentType = documentType), Duration.Inf)
+    def checkFileExists(id: String, documentType: String): Future[Boolean] =checkByIdAndDocumentType(id = id, documentType = documentType)
 
     def getProfilePicture(id: String): Future[Array[Byte]] = getFileByIdDocumentType(id = id, documentType = constants.File.PROFILE_PICTURE)
 

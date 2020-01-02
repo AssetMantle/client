@@ -27,7 +27,7 @@ class MainNegotiationActor @Inject()(actorTimeout: FiniteDuration, actorSystem: 
 
   private implicit val module: String = constants.Module.ACTOR_MAIN_NEGOTIATION
 
-  def receive = {
+  def receive: PartialFunction[Any, Unit] = {
     case negotiationCometMessage: blockchain.NegotiationCometMessage =>
       actorSystem.actorSelection("/user/" + constants.Module.ACTOR_MAIN_NEGOTIATION + "/" + negotiationCometMessage.username).resolveOne().onComplete {
         case Success(actorRef) => logger.info(module + " " + negotiationCometMessage.username + ": " + negotiationCometMessage.message)

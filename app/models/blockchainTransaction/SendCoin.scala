@@ -177,11 +177,11 @@ class SendCoins @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
   }
 
   object Utility {
-    def onSuccess(ticketID: String, blockResponse: BlockResponse) = {
+    def onSuccess(ticketID: String, blockResponse: BlockResponse): Future[Unit] = {
       val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
       val sendCoin = Service.getTransaction(ticketID)
 
-      def markDirty(sendCoin: SendCoin) = {
+      def markDirty(sendCoin: SendCoin): Future[Unit] = {
         val markDirtyTo = blockchainAccounts.Service.markDirty(sendCoin.to)
         val markDirtyFrom = blockchainAccounts.Service.markDirty(sendCoin.from)
         for {
@@ -190,17 +190,15 @@ class SendCoins @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
         } yield {}
       }
 
-      def toAccount(toAddress: String) = masterAccounts.Service.getAccountByAddress(toAddress)
+      def toAccount(toAddress: String): Future[Account] = masterAccounts.Service.getAccountByAddress(toAddress)
 
-      def updateUserType(toAccount: Account) = {
+      def updateUserType(toAccount: Account): Future[Any] = {
         if (toAccount.userType == constants.User.UNKNOWN) {
           masterAccounts.Service.updateUserType(toAccount.id, constants.User.USER)
-        } else Future {
-          Unit
-        }
+        } else Future ()
       }
 
-      def fromAccountID(fromAddress: String) = masterAccounts.Service.getId(fromAddress)
+      def fromAccountID(fromAddress: String): Future[String] = masterAccounts.Service.getId(fromAddress)
 
       (for {
         _ <- markTransactionSuccessful
@@ -218,11 +216,11 @@ class SendCoins @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
       }
     }
 
-    def onFailure(ticketID: String, message: String) = {
+    def onFailure(ticketID: String, message: String): Future[Unit] = {
       val markTransactionFailed = Service.markTransactionFailed(ticketID, message)
       val sendCoin = Service.getTransaction(ticketID)
 
-      def getIDs(sendCoin: SendCoin) = {
+      def getIDs(sendCoin: SendCoin): Future[(String,String)] = {
         val toAccountID = masterAccounts.Service.getId(sendCoin.to)
         val fromAccountID = masterAccounts.Service.getId(sendCoin.from)
         for {

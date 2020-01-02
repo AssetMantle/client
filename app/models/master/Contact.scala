@@ -125,11 +125,11 @@ class Contacts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
     def verifyEmailAddress(id: String): Future[Int] = updateEmailVerificationStatusOnId(id, verificationStatus = true)
 
-    def getVerifiedEmailAddress(id: String): String = Await.result(getEmailAddressById(id = id, emailAddressVerified = Option(true)), Duration.Inf)
+    def getVerifiedEmailAddress(id: String): Future[String] = getEmailAddressById(id = id, emailAddressVerified = Option(true))
 
-    def getUnverifiedEmailAddress(id: String): String = Await.result(getEmailAddressById(id = id, emailAddressVerified = Option(false)), Duration.Inf)
+    def getUnverifiedEmailAddress(id: String): Future[String] = getEmailAddressById(id = id, emailAddressVerified = Option(false))
 
-    def getMobileNumber(id: String): String = Await.result(findMobileNumberById(id), Duration.Inf)
+    def getMobileNumber(id: String): Future[String] = findMobileNumberById(id)
   }
 
 }

@@ -1,3 +1,4 @@
+/*
 package controllersTest
 
 import constants.{Form, Test}
@@ -26,4 +27,4 @@ object verifyMobileNumberControllerTest {
       .formParamMap(Map(
         Form.OTP -> "${%s}".format(Test.TEST_OTP),
         Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
-}
+}*/

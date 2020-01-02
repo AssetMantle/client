@@ -32,7 +32,7 @@ object blockchainTest {
       .formParamMap(Map(
         Form.USERNAME -> "${%s}".format(Test.TEST_MAIN_USERNAME),
         Form.PASSWORD -> "${%s}".format(Test.TEST_MAIN_PASSWORD),
-        Form.NOTIFICATION_TOKEN -> "",
+        Form.PUSH_NOTIFICATION_TOKEN -> "",
         Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
     .pause(5)
 

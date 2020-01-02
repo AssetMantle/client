@@ -27,16 +27,13 @@ object JSON {
           logger.info(errorResponse.error)
           throw new BaseException(new Failure(errorResponse.error, null))
       }
-
     }.recover {
       case jsonParseException: JsonParseException => logger.info(jsonParseException.getMessage, jsonParseException)
         throw new BaseException(constants.Response.JSON_PARSE_EXCEPTION)
       case jsonMappingException: JsonMappingException => logger.info(jsonMappingException.getMessage, jsonMappingException)
         throw new BaseException(constants.Response.NO_RESPONSE)
     }
-
   }
-
 
   def convertJsonStringToObject[T](jsonString: String)(implicit module: String, logger: Logger, reads: Reads[T]): T = {
     try {

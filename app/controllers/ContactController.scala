@@ -30,19 +30,18 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
     implicit request =>
       UpdateContact.form.bindFromRequest().fold(
         formWithErrors => {
-          Future {
-            BadRequest(views.html.component.master.updateContact(formWithErrors))
-          }
+          Future (BadRequest(views.html.component.master.updateContact(formWithErrors)))
         },
         updateContactData => {
           val insertOrUpdateContact = masterContacts.Service.insertOrUpdateContact(loginState.username, updateContactData.countryCode + updateContactData.mobileNumber, updateContactData.emailAddress)
 
-          def updateStatusUnverifiedContact = masterAccounts.Service.updateStatusUnverifiedContact(loginState.username)
+          def updateStatusUnverifiedContact: Future[Int] = masterAccounts.Service.updateStatusUnverifiedContact(loginState.username)
 
           (for {
             _ <- insertOrUpdateContact
             _ <- updateStatusUnverifiedContact
-          } yield withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.SUCCESS)))
+            result<-withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.SUCCESS)))
+          } yield result
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }

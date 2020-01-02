@@ -164,20 +164,20 @@ class AddOrganizations @Inject()(actorSystem: ActorSystem, transaction: utilitie
   }
 
   object Utility {
-    def onSuccess(ticketID: String, blockResponse: BlockResponse) = {
+    def onSuccess(ticketID: String, blockResponse: BlockResponse): Future[Unit] = {
       val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
       val addOrganization = Service.getTransaction(ticketID)
 
-      def createOrganizationAndSendNotification(addOrganization: AddOrganization) = {
+      def createOrganizationAndSendNotification(addOrganization: AddOrganization): Future[Unit] = {
         val create = blockchainOrganizations.Service.create(addOrganization.organizationID, addOrganization.to, dirtyBit = true)
         val verifyOrganization = masterOrganizations.Service.verifyOrganization(addOrganization.organizationID)
         val organizationAccountId = masterOrganizations.Service.getAccountId(addOrganization.organizationID)
 
-        def updateUserType(organizationAccountId: String) = masterAccounts.Service.updateUserType(organizationAccountId, constants.User.ORGANIZATION)
+        def updateUserType(organizationAccountId: String): Future[Int] = masterAccounts.Service.updateUserType(organizationAccountId, constants.User.ORGANIZATION)
 
-        def markDirty = blockchainAccounts.Service.markDirty(addOrganization.from)
+        def markDirty: Future[Int] = blockchainAccounts.Service.markDirty(addOrganization.from)
 
-        def fromAccountID(address: String) = masterAccounts.Service.getId(addOrganization.from)
+        def fromAccountID(address: String): Future[String] = masterAccounts.Service.getId(addOrganization.from)
 
         for {
           _ <- create
@@ -202,11 +202,11 @@ class AddOrganizations @Inject()(actorSystem: ActorSystem, transaction: utilitie
       }
     }
 
-    def onFailure(ticketID: String, message: String) = {
+    def onFailure(ticketID: String, message: String): Future[Unit] = {
       val markTransactionFailed = Service.markTransactionFailed(ticketID, message)
       val addOrganization = Service.getTransaction(ticketID)
 
-      def getIDs(addOrganization: AddOrganization) = {
+      def getIDs(addOrganization: AddOrganization): Future[(String,String)] = {
         val toAccountID = masterAccounts.Service.getId(addOrganization.to)
         val fromAccountID = masterAccounts.Service.getId(addOrganization.from)
         for {

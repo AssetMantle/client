@@ -12,6 +12,7 @@ import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
 import queries.GetOrder
+import queries.responses.OrderResponse
 import slick.jdbc.JdbcProfile
 import transactions.responses.TransactionResponse.BlockResponse
 
@@ -171,21 +172,24 @@ class SendFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
   }
 
   object Utility {
-    def onSuccess(ticketID: String, blockResponse: BlockResponse) = {
+    def onSuccess(ticketID: String, blockResponse: BlockResponse): Future[Unit] = {
       val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
       val sendFiat = Service.getTransaction(ticketID)
 
-      def negotiationID(sendFiat: SendFiat) = blockchainNegotiations.Service.getNegotiationID(buyerAddress = sendFiat.from, sellerAddress = sendFiat.to, pegHash = sendFiat.pegHash)
+      def negotiationID(sendFiat: SendFiat): Future[String] = blockchainNegotiations.Service.getNegotiationID(buyerAddress = sendFiat.from, sellerAddress = sendFiat.to, pegHash = sendFiat.pegHash)
 
-      def insertOrUpdate(negotiationID: String) = blockchainOrders.Service.insertOrUpdate(id = negotiationID, None, None, dirtyBit = true)
+      def insertOrUpdate(negotiationID: String): Future[Int] = blockchainOrders.Service.insertOrUpdate(id = negotiationID, None, None, dirtyBit = true)
 
-      def orderResponse(negotiationID: String) = getOrder.Service.get(negotiationID)
+      def orderResponse(negotiationID: String): Future[OrderResponse.Response] = getOrder.Service.get(negotiationID)
 
-      def insertOrUpdateFiats(orderResponse: queries.responses.OrderResponse.Response, negotiationID: String) = Future {
-        orderResponse.value.fiatPegWallet.foreach(fiats => fiats.foreach(fiatPeg => Await.result(blockchainFiats.Service.insertOrUpdate(pegHash = fiatPeg.pegHash, ownerAddress = negotiationID, transactionID = fiatPeg.transactionID, transactionAmount = fiatPeg.transactionAmount, redeemedAmount = fiatPeg.redeemedAmount, dirtyBit = false),Duration.Inf)))
+      def insertOrUpdateFiats(orderResponse: queries.responses.OrderResponse.Response, negotiationID: String) = {
+        orderResponse.value.fiatPegWallet match {
+          case Some(fiats) => Future.sequence(fiats.map(fiatPeg => blockchainFiats.Service.insertOrUpdate(pegHash = fiatPeg.pegHash, ownerAddress = negotiationID, transactionID = fiatPeg.transactionID, transactionAmount = fiatPeg.transactionAmount, redeemedAmount = fiatPeg.redeemedAmount, dirtyBit = false)))
+          case None => Future {}
+        }
       }
 
-      def markDirty(sendFiat: SendFiat) = {
+      def markDirty(sendFiat: SendFiat): Future[Unit] = {
         val markDirtyBlockchainFiats = blockchainFiats.Service.markDirty(sendFiat.from)
         val markDirtyBlockchainTransactionFeedbacks = blockchainTransactionFeedbacks.Service.markDirty(sendFiat.from)
         val markDirtyBlockchainAccounts = blockchainAccounts.Service.markDirty(sendFiat.from)
@@ -196,7 +200,7 @@ class SendFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
         } yield {}
       }
 
-      def getIDs(sendFiat: SendFiat) = {
+      def getIDs(sendFiat: SendFiat): Future[(String,String)] = {
         val toAccountID = masterAccounts.Service.getId(sendFiat.to)
         val fromAccountID = masterAccounts.Service.getId(sendFiat.from)
         for {
@@ -228,9 +232,9 @@ class SendFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Trans
       val markTransactionFailed = Service.markTransactionFailed(ticketID, message)
       val sendFiat = Service.getTransaction(ticketID)
 
-      def markDirty(fromAddress: String) = blockchainTransactionFeedbacks.Service.markDirty(fromAddress)
+      def markDirty(fromAddress: String): Future[Int] = blockchainTransactionFeedbacks.Service.markDirty(fromAddress)
 
-      def getIDs(sendFiat: SendFiat) = {
+      def getIDs(sendFiat: SendFiat): Future[(String,String)] = {
         val toAccountID = masterAccounts.Service.getId(sendFiat.to)
         val fromAccountID = masterAccounts.Service.getId(sendFiat.from)
         for {

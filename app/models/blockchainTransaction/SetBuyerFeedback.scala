@@ -172,7 +172,7 @@ class SetBuyerFeedbacks @Inject()(actorSystem: ActorSystem, transaction: utiliti
       val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
       val setBuyerFeedback = Service.getTransaction(ticketID)
 
-      def updateAndMarkDirty(setBuyerFeedback: SetBuyerFeedback) = {
+      def updateAndMarkDirty(setBuyerFeedback: SetBuyerFeedback): Future[Unit] = {
         val update = blockchainTraderFeedbackHistories.Service.update(setBuyerFeedback.to, setBuyerFeedback.from, setBuyerFeedback.to, setBuyerFeedback.pegHash, setBuyerFeedback.rating.toString)
         val markDirtyFrom = blockchainAccounts.Service.markDirty(setBuyerFeedback.from)
         for {
@@ -181,7 +181,7 @@ class SetBuyerFeedbacks @Inject()(actorSystem: ActorSystem, transaction: utiliti
         } yield {}
       }
 
-      def getIDs(setBuyerFeedback: SetBuyerFeedback) = {
+      def getIDs(setBuyerFeedback: SetBuyerFeedback): Future[(String,String)] = {
         val toAccountID = masterAccounts.Service.getId(setBuyerFeedback.to)
         val fromAccountID = masterAccounts.Service.getId(setBuyerFeedback.from)
         for {
@@ -208,7 +208,7 @@ class SetBuyerFeedbacks @Inject()(actorSystem: ActorSystem, transaction: utiliti
       val markTransactionFailed = Service.markTransactionFailed(ticketID, message)
       val setBuyerFeedback = Service.getTransaction(ticketID)
 
-      def getIDs(setBuyerFeedback: SetBuyerFeedback) = {
+      def getIDs(setBuyerFeedback: SetBuyerFeedback): Future[(String,String)] = {
         val toAccountID = masterAccounts.Service.getId(setBuyerFeedback.to)
         val fromAccountID = masterAccounts.Service.getId(setBuyerFeedback.from)
         for {

@@ -176,9 +176,9 @@ class TraderKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfigP
 
     def organizationRejectAll(id: String): Future[Int] = organizationUpdateStatusById(id = id, status = Option(false))
 
-    def deleteAllDocuments(id: String): Int = Await.result(deleteById(id = id), Duration.Inf)
+    def deleteAllDocuments(id: String): Future[Int] = deleteById(id = id)
 
-    def checkFileExists(id: String, documentType: String): Boolean = Await.result(checkByIdAndDocumentType(id = id, documentType = documentType), Duration.Inf)
+    def checkFileExists(id: String, documentType: String): Future[Boolean] = checkByIdAndDocumentType(id = id, documentType = documentType)
 
     def checkFileNameExists(id: String, fileName: String): Future[Boolean] = checkByIdAndFileName(id = id, fileName = fileName)
 

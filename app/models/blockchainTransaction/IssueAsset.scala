@@ -13,6 +13,7 @@ import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
 import queries.GetAccount
+import queries.responses.AccountResponse
 import slick.jdbc.JdbcProfile
 import transactions.responses.TransactionResponse.BlockResponse
 
@@ -183,26 +184,34 @@ class IssueAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tra
   }
 
   object Utility {
-    def onSuccess(ticketID: String, blockResponse: BlockResponse) = {
+    def onSuccess(ticketID: String, blockResponse: BlockResponse): Future[Unit] = {
       val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
       val issueAsset = Service.getTransaction(ticketID)
 
-      def responseAccount(issueAsset: IssueAsset) = getAccount.Service.get(issueAsset.to)
+      def responseAccount(issueAsset: IssueAsset): Future[AccountResponse.Response] = getAccount.Service.get(issueAsset.to)
 
       val assetRequest = masterTransactionIssueAssetRequests.Service.getIssueAssetByTicketID(ticketID)
 
-      def insertOrUpdate(responseAccount: queries.responses.AccountResponse.Response, assetRequest: IssueAssetRequest, issueAsset: IssueAsset) = Future {
-        responseAccount.value.assetPegWallet.foreach(assets => assets.foreach(asset => {
-          Await.result(blockchainAssets.Service.insertOrUpdate(pegHash = asset.pegHash, documentHash = asset.documentHash, assetType = asset.assetType, assetPrice = asset.assetPrice, assetQuantity = asset.assetQuantity, quantityUnit = asset.quantityUnit, locked = asset.locked, moderated = asset.moderated, takerAddress = if (asset.takerAddress == "") null else Option(asset.takerAddress), ownerAddress = issueAsset.to, dirtyBit = true),Duration.Inf)
-          if (assetRequest.documentHash.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)) == asset.documentHash) {
-            masterTransactionIssueAssetRequests.Service.markListedForTrade(ticketID, Option(asset.pegHash))
+      def insertOrUpdate(responseAccount: queries.responses.AccountResponse.Response, assetRequest: IssueAssetRequest, issueAsset: IssueAsset) ={
+        responseAccount.value.assetPegWallet match {
+          case Some(assets)=> Future.sequence{assets.map{asset=>
+            val upsert=blockchainAssets.Service.insertOrUpdate(pegHash = asset.pegHash, documentHash = asset.documentHash, assetType = asset.assetType, assetPrice = asset.assetPrice, assetQuantity = asset.assetQuantity, quantityUnit = asset.quantityUnit, locked = asset.locked, moderated = asset.moderated, takerAddress = if (asset.takerAddress == "") null else Option(asset.takerAddress), ownerAddress = issueAsset.to, dirtyBit = true)
+            def markListedForTrade: Future[Any]=if (assetRequest.documentHash.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)) == asset.documentHash) {
+              masterTransactionIssueAssetRequests.Service.markListedForTrade(ticketID, Option(asset.pegHash))
+            }else Future{}
+            for{
+              _<-upsert
+              _<-markListedForTrade
+            }yield {}
           }
-        }))
+          }
+          case None=> Future{}
+        }
       }
 
-      def markDirty(issueAsset: IssueAsset) = blockchainAccounts.Service.markDirty(issueAsset.from)
+      def markDirty(issueAsset: IssueAsset): Future[Int] = blockchainAccounts.Service.markDirty(issueAsset.from)
 
-      def getIDs(issueAsset: IssueAsset) = {
+      def getIDs(issueAsset: IssueAsset): Future[(String,String)] = {
         val toAccountID = masterAccounts.Service.getId(issueAsset.to)
         val fromAccountID = masterAccounts.Service.getId(issueAsset.from)
         for {
@@ -234,7 +243,7 @@ class IssueAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tra
       val issueAsset = Service.getTransaction(ticketID)
       val markFailed = masterTransactionIssueAssetRequests.Service.markFailed(ticketID)
 
-      def getIDs(issueAsset: IssueAsset) = {
+      def getIDs(issueAsset: IssueAsset): Future[(String,String)] = {
         val toAccountID = masterAccounts.Service.getId(issueAsset.to)
         val fromAccountID = masterAccounts.Service.getId(issueAsset.from)
         for {

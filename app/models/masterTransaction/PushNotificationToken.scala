@@ -84,7 +84,7 @@ class PushNotificationTokens @Inject()(protected val databaseConfigProvider: Dat
 
     def update(id: String, token: String): Future[Int] = upsert(PushNotificationToken(id, token = token))
 
-    def getPushNotificationToken(id: String): String = Await.result(getPushNotificationTokenByID(id), Duration.Inf)
+    def getPushNotificationToken(id: String): Future[String] = getPushNotificationTokenByID(id)
 
     def delete(id: String): Future[Int] = deleteByID(id)
 

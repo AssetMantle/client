@@ -20,9 +20,9 @@ class ViewController @Inject()(messagesControllerComponents: MessagesControllerC
 
   def market: Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      Future {
+      Future (
         Ok(views.html.market())
-      }.recover {
+        ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }

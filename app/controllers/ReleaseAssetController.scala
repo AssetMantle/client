@@ -4,6 +4,7 @@ import controllers.actions.WithZoneLoginAction
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
+import models.blockchain.Asset
 import models.{blockchain, blockchainTransaction}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
@@ -29,9 +30,7 @@ class ReleaseAssetController @Inject()(messagesControllerComponents: MessagesCon
     implicit request =>
       views.companion.master.ReleaseAsset.form.bindFromRequest().fold(
         formWithErrors => {
-          Future {
-            BadRequest(views.html.component.master.releaseAsset(formWithErrors, formWithErrors.data(constants.FormField.BLOCKCHAIN_ADDRESS.name), formWithErrors.data(constants.FormField.PEG_HASH.name)))
-          }
+          Future (BadRequest(views.html.component.master.releaseAsset(formWithErrors, formWithErrors.data(constants.FormField.BLOCKCHAIN_ADDRESS.name), formWithErrors.data(constants.FormField.PEG_HASH.name))))
         },
         releaseAssetData => {
           val transactionProcess = transaction.process[blockchainTransaction.ReleaseAsset, transactionsReleaseAsset.Request](
@@ -45,7 +44,8 @@ class ReleaseAssetController @Inject()(messagesControllerComponents: MessagesCon
           )
           (for {
             _ <- transactionProcess
-          } yield withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ASSET_RELEASED)))
+            result<-withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.ASSET_RELEASED)))
+          } yield result
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
@@ -58,9 +58,9 @@ class ReleaseAssetController @Inject()(messagesControllerComponents: MessagesCon
     implicit request =>
       val zoneID = blockchainZones.Service.getID(loginState.address)
 
-      def addressesUnderZone(zoneID: String) = blockchainACLAccounts.Service.getAddressesUnderZone(zoneID)
+      def addressesUnderZone(zoneID: String): Future[Seq[String]] = blockchainACLAccounts.Service.getAddressesUnderZone(zoneID)
 
-      def allLockedAssets(addressesUnderZone: Seq[String]) = blockchainAssets.Service.getAllLocked(addressesUnderZone)
+      def allLockedAssets(addressesUnderZone: Seq[String]): Future[Seq[Asset]] = blockchainAssets.Service.getAllLocked(addressesUnderZone)
 
       (for {
         zoneID <- zoneID
@@ -79,9 +79,7 @@ class ReleaseAssetController @Inject()(messagesControllerComponents: MessagesCon
   def blockchainReleaseAsset: Action[AnyContent] = Action.async { implicit request =>
     views.companion.blockchain.ReleaseAsset.form.bindFromRequest().fold(
       formWithErrors => {
-        Future {
-          BadRequest(views.html.component.blockchain.releaseAsset(formWithErrors))
-        }
+        Future (BadRequest(views.html.component.blockchain.releaseAsset(formWithErrors)))
       },
       releaseAssetData => {
         val postRequest = transactionsReleaseAsset.Service.post(transactionsReleaseAsset.Request(transactionsReleaseAsset.BaseReq(from = releaseAssetData.from, gas = releaseAssetData.gas.toString), to = releaseAssetData.to, password = releaseAssetData.password, pegHash = releaseAssetData.pegHash, mode = releaseAssetData.mode))

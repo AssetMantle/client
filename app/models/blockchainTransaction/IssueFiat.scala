@@ -11,6 +11,7 @@ import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
+import queries.responses.AccountResponse
 import slick.jdbc.JdbcProfile
 import transactions.responses.TransactionResponse.BlockResponse
 
@@ -175,15 +176,18 @@ class IssueFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
       val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
       val issueFiat = Service.getTransaction(ticketID)
 
-      def account(issueFiat: IssueFiat) = getAccount.Service.get(issueFiat.to)
+      def account(issueFiat: IssueFiat): Future[AccountResponse.Response] = getAccount.Service.get(issueFiat.to)
 
-      def insertOrUpdate(account: queries.responses.AccountResponse.Response, issueFiat: IssueFiat) = Future {
-        account.value.fiatPegWallet.foreach(fiats => fiats.foreach(fiatPeg => Await.result(blockchainFiats.Service.insertOrUpdate(fiatPeg.pegHash, issueFiat.to, fiatPeg.transactionID, fiatPeg.transactionAmount, fiatPeg.redeemedAmount, dirtyBit = true),Duration.Inf)))
+      def insertOrUpdate(account: queries.responses.AccountResponse.Response, issueFiat: IssueFiat) = {
+        account.value.fiatPegWallet match {
+          case Some(fiats) => Future.sequence(fiats.map(fiatPeg => blockchainFiats.Service.insertOrUpdate(fiatPeg.pegHash, issueFiat.to, fiatPeg.transactionID, fiatPeg.transactionAmount, fiatPeg.redeemedAmount, dirtyBit = true)))
+          case None => Future {}
+        }
       }
 
-      def markDirty(issueFiat: IssueFiat) = blockchainAccounts.Service.markDirty(issueFiat.from)
+      def markDirty(issueFiat: IssueFiat): Future[Int] = blockchainAccounts.Service.markDirty(issueFiat.from)
 
-      def getIDs(issueFiat: IssueFiat) = {
+      def getIDs(issueFiat: IssueFiat): Future[(String,String)] = {
         val toAccountID = masterAccounts.Service.getId(issueFiat.to)
         val fromAccountID = masterAccounts.Service.getId(issueFiat.from)
         for {
@@ -214,7 +218,7 @@ class IssueFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
       val markTransactionFailed = Service.markTransactionFailed(ticketID, message)
       val issueFiat = Service.getTransaction(ticketID)
 
-      def getIDs(issueFiat: IssueFiat) = {
+      def getIDs(issueFiat: IssueFiat): Future[(String,String)] = {
         val toAccountID = masterAccounts.Service.getId(issueFiat.to)
         val fromAccountID = masterAccounts.Service.getId(issueFiat.from)
         for {

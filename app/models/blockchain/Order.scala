@@ -1,6 +1,7 @@
 package models.blockchain
 
 import actors.{MainOrderActor, ShutdownActor}
+import akka.NotUsed
 import akka.actor.{ActorRef, ActorSystem}
 import akka.stream.scaladsl.Source
 import akka.stream.{ActorMaterializer, OverflowStrategy}
@@ -11,6 +12,7 @@ import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.{JsValue, Json}
 import play.api.{Configuration, Logger}
+import queries.responses.AccountResponse
 import slick.jdbc.JdbcProfile
 
 import scala.concurrent.duration.{Duration, _}
@@ -30,6 +32,8 @@ class Orders @Inject()(shutdownActors: ShutdownActor, masterAccounts: master.Acc
 
   import databaseConfig.profile.api._
 
+  private val actorTimeout = configuration.get[Int]("akka.actors.timeout").seconds
+
   val mainOrderActor: ActorRef = actorSystem.actorOf(props = MainOrderActor.props(actorTimeout, actorSystem), name = constants.Module.ACTOR_MAIN_ORDER)
 
   private implicit val logger: Logger = Logger(this.getClass)
@@ -37,9 +41,11 @@ class Orders @Inject()(shutdownActors: ShutdownActor, masterAccounts: master.Acc
   private implicit val materializer: ActorMaterializer = ActorMaterializer()(actorSystem)
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_ORDER
+
   private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
-  private val actorTimeout = configuration.get[Int]("akka.actors.timeout").seconds
+
   private val cometActorSleepTime = configuration.get[Long]("akka.actors.cometActorSleepTime")
+
   private[models] val orderTable = TableQuery[OrderTable]
 
   private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
@@ -118,7 +124,7 @@ class Orders @Inject()(shutdownActors: ShutdownActor, masterAccounts: master.Acc
 
   object Service {
 
-    def create(id: String, fiatProofHash: Option[String], awbProofHash: Option[String]): String = Await.result(add(Order(id = id, fiatProofHash = fiatProofHash, awbProofHash = awbProofHash, dirtyBit = true)), Duration.Inf)
+    def create(id: String, fiatProofHash: Option[String], awbProofHash: Option[String]): Future[String] = add(Order(id = id, fiatProofHash = fiatProofHash, awbProofHash = awbProofHash, dirtyBit = true))
 
     def insertOrUpdate(id: String, fiatProofHash: Option[String], awbProofHash: Option[String], dirtyBit: Boolean): Future[Int] = upsert(Order(id = id, fiatProofHash = fiatProofHash, awbProofHash = awbProofHash, dirtyBit = dirtyBit))
 
@@ -144,64 +150,59 @@ class Orders @Inject()(shutdownActors: ShutdownActor, masterAccounts: master.Acc
   }
 
   object Utility {
-    def dirtyEntityUpdater() = {
+    def dirtyEntityUpdater(): Future[Unit] = {
       val dirtyOrders = Service.getDirtyOrders
       Thread.sleep(sleepTime)
 
-      def insertOrUpdateAndSendCometMessage(dirtyOrders: Seq[Order]) = {
+      def insertOrUpdateAndSendCometMessage(dirtyOrders: Seq[Order]): Future[Seq[Unit]] = {
         Future.sequence {
           dirtyOrders.map { dirtyOrder =>
             val orderResponse = getOrder.Service.get(dirtyOrder.id)
             val negotiation = blockchainNegotiations.Service.get(dirtyOrder.id)
 
-            def sellerOrBuyerUpsertAssetsOrFiats(orderResponse: queries.responses.OrderResponse.Response, negotiation: Negotiation, dirtyOrder: Order) = {
+            def sellerOrBuyerUpsertAssetsOrFiats(orderResponse: queries.responses.OrderResponse.Response, negotiation: Negotiation, dirtyOrder: Order): Future[Unit] = {
               if ((orderResponse.value.awbProofHash != "" && orderResponse.value.fiatProofHash != "") || (orderResponse.value.awbProofHash == "" && orderResponse.value.fiatProofHash == "")) {
                 val sellerAccount = getAccount.Service.get(negotiation.sellerAddress)
-
-                def insertOrUpdateSellerAccountAsset(sellerAccount: queries.responses.AccountResponse.Response) = Future {
-                  sellerAccount.value.assetPegWallet.foreach(assets => assets.foreach(asset => Await.result(blockchainAssets.Service.insertOrUpdate(pegHash = asset.pegHash, documentHash = asset.documentHash, assetType = asset.assetType, assetQuantity = asset.assetQuantity, quantityUnit = asset.quantityUnit, assetPrice = asset.assetPrice, ownerAddress = negotiation.sellerAddress, moderated = asset.moderated, takerAddress = if (asset.takerAddress == "") None else Option(asset.takerAddress), locked = asset.locked, dirtyBit = true), Duration.Inf)))
-                }
-
-                def insertOrUpdateSellerAccountFiat(sellerAccount: queries.responses.AccountResponse.Response) = Future {
-                  sellerAccount.value.fiatPegWallet.foreach(fiats => fiats.foreach(fiatPeg => Await.result(blockchainFiats.Service.insertOrUpdate(fiatPeg.pegHash, negotiation.sellerAddress, fiatPeg.transactionID, fiatPeg.transactionAmount, fiatPeg.redeemedAmount, dirtyBit = true), Duration.Inf)))
-                }
-
                 val buyerAccount = getAccount.Service.get(negotiation.buyerAddress)
 
-                def insertOrUpdateBuyerAccountAsset(buyerAccount: queries.responses.AccountResponse.Response) = Future {
-                  buyerAccount.value.assetPegWallet.foreach(assets => assets.foreach(asset => Await.result(blockchainAssets.Service.insertOrUpdate(pegHash = asset.pegHash, documentHash = asset.documentHash, assetType = asset.assetType, assetQuantity = asset.assetQuantity, quantityUnit = asset.quantityUnit, assetPrice = asset.assetPrice, ownerAddress = negotiation.buyerAddress, moderated = asset.moderated, takerAddress = if (asset.takerAddress == "") None else Option(asset.takerAddress), locked = asset.locked, dirtyBit = true), Duration.Inf)))
+                def upsertAccountAssets(account: queries.responses.AccountResponse.Response)= {
+                  account.value.assetPegWallet match {
+                    case Some(assets) => Future.sequence(assets.map(asset => blockchainAssets.Service.insertOrUpdate(pegHash = asset.pegHash, documentHash = asset.documentHash, assetType = asset.assetType, assetQuantity = asset.assetQuantity, quantityUnit = asset.quantityUnit, assetPrice = asset.assetPrice, ownerAddress = negotiation.sellerAddress, moderated = asset.moderated, takerAddress = if (asset.takerAddress == "") None else Option(asset.takerAddress), locked = asset.locked, dirtyBit = true)))
+                    case None => Future{}
+                  }
                 }
 
-                def insertOrUpdateBuyerAccountFiat(buyerAccount: queries.responses.AccountResponse.Response) = Future {
-                  buyerAccount.value.fiatPegWallet.foreach(fiats => fiats.foreach(fiatPeg => Await.result(blockchainFiats.Service.insertOrUpdate(fiatPeg.pegHash, negotiation.buyerAddress, fiatPeg.transactionID, fiatPeg.transactionAmount, fiatPeg.redeemedAmount, dirtyBit = true), Duration.Inf)))
+                def upsertAccountFiats(account: queries.responses.AccountResponse.Response)= {
+                  account.value.fiatPegWallet match {
+                    case Some(fiats) => Future.sequence(fiats.map(fiatPeg => blockchainFiats.Service.insertOrUpdate(fiatPeg.pegHash, negotiation.sellerAddress, fiatPeg.transactionID, fiatPeg.transactionAmount, fiatPeg.redeemedAmount, dirtyBit = true)))
+                    case None => Future {}
+                  }
                 }
 
-                def deleteFiatPegWallet = blockchainFiats.Service.deleteFiatPegWallet(dirtyOrder.id)
+                def deleteFiatPegWallet: Future[Int] = blockchainFiats.Service.deleteFiatPegWallet(dirtyOrder.id)
 
                 for {
                   sellerAccount <- sellerAccount
-                  _ <- insertOrUpdateSellerAccountAsset(sellerAccount)
-                  _ <- insertOrUpdateSellerAccountFiat(sellerAccount)
+                  _ <- upsertAccountAssets(sellerAccount)
+                  _ <- upsertAccountFiats(sellerAccount)
                   buyerAccount <- buyerAccount
-                  _ <- insertOrUpdateBuyerAccountAsset(buyerAccount)
-                  _ <- insertOrUpdateBuyerAccountFiat(buyerAccount)
+                  _ <- upsertAccountAssets(buyerAccount)
+                  _ <- upsertAccountFiats(buyerAccount)
                   _ <- deleteFiatPegWallet
-                } yield {}
-              } else Future {
-                Unit
-              }
+                } yield Unit
+              } else Future (Unit)
             }
 
-            def insertOrUpdateTraderFeedbackHistories(orderResponse: queries.responses.OrderResponse.Response, negotiation: Negotiation) = {
+            def insertOrUpdateTraderFeedbackHistories(orderResponse: queries.responses.OrderResponse.Response, negotiation: Negotiation): Future[Unit] = {
               if (orderResponse.value.awbProofHash != "" && orderResponse.value.fiatProofHash != "") {
                 val insertOrUpdateSellerFeedbackHistories = blockchainTraderFeedbackHistories.Service.insertOrUpdate(negotiation.sellerAddress, negotiation.buyerAddress, negotiation.sellerAddress, negotiation.assetPegHash, rating = "")
                 val insertOrUpdateBuyerFeedbackHistories = blockchainTraderFeedbackHistories.Service.insertOrUpdate(negotiation.buyerAddress, negotiation.buyerAddress, negotiation.sellerAddress, negotiation.assetPegHash, rating = "")
                 //TODO Remove update of masterTransaction/IssueAssetRequest accountID and show assets from trader Index via blockchain
                 val id = masterAccounts.Service.getId(negotiation.buyerAddress)
 
-                def updateAccountIDAndMarkTradeCompletedByPegHash(id: String) = masterTransactionIssueAssetRequests.Service.updateAccountIDAndMarkTradeCompleted(Option(negotiation.assetPegHash), id)
+                def updateAccountIDAndMarkTradeCompletedByPegHash(id: String): Future[Int] = masterTransactionIssueAssetRequests.Service.updateAccountIDAndMarkTradeCompleted(Option(negotiation.assetPegHash), id)
 
-                def deleteNegotiations = blockchainNegotiations.Service.deleteNegotiations(negotiation.assetPegHash)
+                def deleteNegotiations: Future[Int] = blockchainNegotiations.Service.deleteNegotiations(negotiation.assetPegHash)
 
                 for {
                   _ <- insertOrUpdateSellerFeedbackHistories
@@ -209,15 +210,13 @@ class Orders @Inject()(shutdownActors: ShutdownActor, masterAccounts: master.Acc
                   id <- id
                   _ <- updateAccountIDAndMarkTradeCompletedByPegHash(id)
                   _ <- deleteNegotiations
-                } yield {}
-              } else Future {
-                Unit
-              }
+                } yield Unit
+              } else Future (Unit)
             }
 
-            def insertOrUpdateOrder(orderResponse: queries.responses.OrderResponse.Response) = Service.insertOrUpdate(dirtyOrder.id, awbProofHash = if (orderResponse.value.awbProofHash == "") None else Option(orderResponse.value.awbProofHash), fiatProofHash = if (orderResponse.value.fiatProofHash == "") None else Option(orderResponse.value.fiatProofHash), dirtyBit = false)
+            def insertOrUpdateOrder(orderResponse: queries.responses.OrderResponse.Response): Future[Int] = Service.insertOrUpdate(dirtyOrder.id, awbProofHash = if (orderResponse.value.awbProofHash == "") None else Option(orderResponse.value.awbProofHash), fiatProofHash = if (orderResponse.value.fiatProofHash == "") None else Option(orderResponse.value.fiatProofHash), dirtyBit = false)
 
-            def ids(negotiation: Negotiation) = {
+            def ids(negotiation: Negotiation): Future[(String,String)] = {
               val buyerAddressID = masterAccounts.Service.getId(negotiation.buyerAddress)
               val sellerAddressID = masterAccounts.Service.getId(negotiation.sellerAddress)
               for {

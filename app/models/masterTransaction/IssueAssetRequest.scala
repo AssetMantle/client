@@ -208,13 +208,13 @@ class IssueAssetRequests @Inject()(protected val databaseConfigProvider: Databas
 
   object Service {
 
-    def create(id: String, ticketID: Option[String], pegHash: Option[String], accountID: String, documentHash: Option[String], assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, takerAddress: Option[String], shipmentDetails: Serializable.ShipmentDetails, physicalDocumentsHandledVia: String, paymentTerms: String, status: String): String =
-      Await.result(add(serialize(IssueAssetRequest(id = id, ticketID = ticketID, pegHash = pegHash, accountID = accountID, documentHash = documentHash, assetType = assetType, quantityUnit = quantityUnit, assetQuantity = assetQuantity, assetPrice = assetPrice, takerAddress = takerAddress, shipmentDetails = shipmentDetails, physicalDocumentsHandledVia = physicalDocumentsHandledVia, paymentTerms = paymentTerms, status = status, comment = null))), Duration.Inf)
+    def create(id: String, ticketID: Option[String], pegHash: Option[String], accountID: String, documentHash: Option[String], assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, takerAddress: Option[String], shipmentDetails: Serializable.ShipmentDetails, physicalDocumentsHandledVia: String, paymentTerms: String, status: String): Future[String] =
+      add(serialize(IssueAssetRequest(id = id, ticketID = ticketID, pegHash = pegHash, accountID = accountID, documentHash = documentHash, assetType = assetType, quantityUnit = quantityUnit, assetQuantity = assetQuantity, assetPrice = assetPrice, takerAddress = takerAddress, shipmentDetails = shipmentDetails, physicalDocumentsHandledVia = physicalDocumentsHandledVia, paymentTerms = paymentTerms, status = status, comment = null)))
 
     def insertOrUpdate(id: String, ticketID: Option[String], pegHash: Option[String], accountID: String, documentHash: Option[String], assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, takerAddress: Option[String], shipmentDetails: Serializable.ShipmentDetails, physicalDocumentsHandledVia: String, paymentTerms: String, status: String) =
       upsert(serialize(IssueAssetRequest(id = id, ticketID = ticketID, pegHash = pegHash, accountID = accountID, documentHash = documentHash, assetType = assetType, quantityUnit = quantityUnit, assetQuantity = assetQuantity, assetPrice = assetPrice, takerAddress = takerAddress, shipmentDetails = shipmentDetails, physicalDocumentsHandledVia = physicalDocumentsHandledVia, paymentTerms = paymentTerms, status = status, comment = null)))
 
-    def accept(id: String, ticketID: String): Int = Await.result(updateTicketIDAndStatusByID(id, ticketID, status = constants.Status.Asset.LISTED_FOR_TRADE), Duration.Inf)
+    def accept(id: String, ticketID: String): Future[Int] = updateTicketIDAndStatusByID(id, ticketID, status = constants.Status.Asset.LISTED_FOR_TRADE)
 
     def reject(id: String, comment: String): Future[Int] = updateStatusAndCommentByID(id = id, status = constants.Status.Asset.REJECTED, comment = Option(comment))
 
@@ -226,7 +226,7 @@ class IssueAssetRequests @Inject()(protected val databaseConfigProvider: Databas
 
     def markFailed(ticketID: String): Future[Int] = updatePegHashAndStatusWithTicketID(ticketID = ticketID, pegHash = None, status = constants.Status.Asset.FAILED)
 
-    def markListedForTrade(ticketID: String, peghash: Option[String]): Int = Await.result(updatePegHashAndStatusWithTicketID(ticketID = ticketID, pegHash = peghash, status = constants.Status.Asset.LISTED_FOR_TRADE), Duration.Inf)
+    def markListedForTrade(ticketID: String, peghash: Option[String]): Future[Int] = updatePegHashAndStatusWithTicketID(ticketID = ticketID, pegHash = peghash, status = constants.Status.Asset.LISTED_FOR_TRADE)
 
     def markRedeemed(peghash: Option[String]): Future[Int] = updateStatusByPegHash(pegHash = peghash, status = constants.Status.Asset.REDEEMED)
 
@@ -250,9 +250,9 @@ class IssueAssetRequests @Inject()(protected val databaseConfigProvider: Databas
 
     def getAccountID(id: String): Future[String] = getAccountIDByID(id)
 
-    def delete(id: String): Int = Await.result(deleteByID(id), Duration.Inf)
+    def delete(id: String): Future[Int] = deleteByID(id)
 
-    def getStatus(id: String): String = Await.result(getStatusByID(id), Duration.Inf)
+    def getStatus(id: String): Future[String] = getStatusByID(id)
 
     def verifyRequestedStatus(id: String): Future[Boolean] = verifyStatusByID(id, constants.Status.Asset.REQUESTED).map {
       if (_) true else throw new BaseException(constants.Response.REQUEST_ALREADY_APPROVED_OR_REJECTED)

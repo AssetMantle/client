@@ -10,7 +10,7 @@ import queries.GetOrganization
 import slick.jdbc.JdbcProfile
 
 import scala.concurrent.duration.{Duration, _}
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 case class Organization(id: String, address: String, dirtyBit: Boolean)
@@ -108,7 +108,7 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
 
     def create(id: String, address: String, dirtyBit: Boolean): Future[String] = add(Organization(id = id, address = address, dirtyBit = dirtyBit))
 
-    def getAddress(id: String): String = Await.result(getAddressById(id), Duration.Inf)
+    def getAddress(id: String): Future[String] = getAddressById(id)
 
     def getID(address: String): Future[String] = getIdByAddress(address)
 
@@ -122,17 +122,17 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
       val dirtyOrganizations = Service.getDirtyOrganizations
       Thread.sleep(sleepTime)
 
-      def refreshDirtyOrganizations(dirtyOrganizations: Seq[Organization]) = {
+      def refreshDirtyOrganizations(dirtyOrganizations: Seq[Organization]): Future[Seq[Any]] = {
         Future.sequence {
           dirtyOrganizations.map { dirtyOrganization =>
             val responseAddress = getOrganization.Service.get(dirtyOrganization.id)
 
-            def refreshDirty(responseAddress: queries.responses.OrganizationResponse.Response) = Service.refreshDirty(dirtyOrganization.id, responseAddress.address)
+            def refreshDirty(responseAddress: queries.responses.OrganizationResponse.Response): Future[Int] = Service.refreshDirty(dirtyOrganization.id, responseAddress.address)
 
             (for {
               responseAddress <- responseAddress
               _ <- refreshDirty(responseAddress)
-            } yield {}
+            } yield Unit
               ).recover {
               case baseException: BaseException => logger.error(baseException.failure.message, baseException)
             }

@@ -181,13 +181,22 @@ class ConfirmSellerBids @Inject()(actorSystem: ActorSystem, transaction: utiliti
       val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
       val confirmSellerBid = Service.getTransaction(ticketID)
 
-      def negotiationID(confirmSellerBid: ConfirmSellerBid) = blockchainNegotiations.Service.getNegotiationID(buyerAddress = confirmSellerBid.to, sellerAddress = confirmSellerBid.from, pegHash = confirmSellerBid.pegHash)
+      def negotiationID(confirmSellerBid: ConfirmSellerBid): Future[String] = blockchainNegotiations.Service.getNegotiationID(buyerAddress = confirmSellerBid.to, sellerAddress = confirmSellerBid.from, pegHash = confirmSellerBid.pegHash)
 
-      def negotiationResponse(negotiationID: String, confirmSellerBid: ConfirmSellerBid) = if (negotiationID == "") getNegotiation.Service.get(getNegotiationID.Service.get(buyerAddress = confirmSellerBid.from, sellerAddress = confirmSellerBid.to, pegHash = confirmSellerBid.pegHash).negotiationID) else getNegotiation.Service.get(negotiationID)
+      def negotiationResponse(negotiationID: String, confirmSellerBid: ConfirmSellerBid): Future[NegotiationResponse.Response] = if (negotiationID == "") {
+        val negotiationIDResponse = getNegotiationID.Service.get(buyerAddress = confirmSellerBid.from, sellerAddress = confirmSellerBid.to, pegHash = confirmSellerBid.pegHash)
 
-      def insertOrUpdate(negotiationResponse: NegotiationResponse.Response) = blockchainNegotiations.Service.insertOrUpdate(id = negotiationResponse.value.negotiationID, buyerAddress = negotiationResponse.value.buyerAddress, sellerAddress = negotiationResponse.value.sellerAddress, assetPegHash = negotiationResponse.value.pegHash, bid = negotiationResponse.value.bid, time = negotiationResponse.value.time, buyerSignature = negotiationResponse.value.buyerSignature, sellerSignature = negotiationResponse.value.sellerSignature, buyerBlockHeight = negotiationResponse.value.buyerBlockHeight, sellerBlockHeight = negotiationResponse.value.sellerBlockHeight, buyerContractHash = negotiationResponse.value.buyerContractHash, sellerContractHash = negotiationResponse.value.sellerContractHash, dirtyBit = true)
+        def getBlockchainNegotiation(negotiationID: String): Future[NegotiationResponse.Response] = getNegotiation.Service.get(negotiationID)
 
-      def markDirty(confirmSellerBid: ConfirmSellerBid) = {
+        for {
+          negotiationIDResponse <- negotiationIDResponse
+          negotiation <- getBlockchainNegotiation(negotiationIDResponse.negotiationID)
+        } yield negotiation
+      } else getNegotiation.Service.get(negotiationID)
+
+      def insertOrUpdate(negotiationResponse: NegotiationResponse.Response): Future[Int] = blockchainNegotiations.Service.insertOrUpdate(id = negotiationResponse.value.negotiationID, buyerAddress = negotiationResponse.value.buyerAddress, sellerAddress = negotiationResponse.value.sellerAddress, assetPegHash = negotiationResponse.value.pegHash, bid = negotiationResponse.value.bid, time = negotiationResponse.value.time, buyerSignature = negotiationResponse.value.buyerSignature, sellerSignature = negotiationResponse.value.sellerSignature, buyerBlockHeight = negotiationResponse.value.buyerBlockHeight, sellerBlockHeight = negotiationResponse.value.sellerBlockHeight, buyerContractHash = negotiationResponse.value.buyerContractHash, sellerContractHash = negotiationResponse.value.sellerContractHash, dirtyBit = true)
+
+      def markDirty(confirmSellerBid: ConfirmSellerBid): Future[Unit] = {
         val markDirtyFromAddressBlockchainAccounts = blockchainAccounts.Service.markDirty(confirmSellerBid.from)
         val markDirtyFromAddressInBlockchainTransactionFeedbacks = blockchainTransactionFeedbacks.Service.markDirty(confirmSellerBid.from)
         val markDirtyToAddressInBlockchainTransactionFeedbacks = blockchainTransactionFeedbacks.Service.markDirty(confirmSellerBid.to)
@@ -195,10 +204,10 @@ class ConfirmSellerBids @Inject()(actorSystem: ActorSystem, transaction: utiliti
           _ <- markDirtyFromAddressBlockchainAccounts
           _ <- markDirtyFromAddressInBlockchainTransactionFeedbacks
           _ <- markDirtyToAddressInBlockchainTransactionFeedbacks
-        } yield {}
+        } yield Unit
       }
 
-      def getIDs(confirmSellerBid: ConfirmSellerBid) = {
+      def getIDs(confirmSellerBid: ConfirmSellerBid): Future[(String, String)] = {
         val toAccountID = masterAccounts.Service.getId(confirmSellerBid.to)
         val fromAccountID = masterAccounts.Service.getId(confirmSellerBid.from)
         for {
@@ -229,7 +238,7 @@ class ConfirmSellerBids @Inject()(actorSystem: ActorSystem, transaction: utiliti
       val markTransactionFailed = Service.markTransactionFailed(ticketID, message)
       val confirmSellerBid = Service.getTransaction(ticketID)
 
-      def markDirty(confirmSellerBid: ConfirmSellerBid) = {
+      def markDirty(confirmSellerBid: ConfirmSellerBid): Future[Unit] = {
         val markDirtyFromAddressInBlockchainTransactionFeedbacks = blockchainTransactionFeedbacks.Service.markDirty(confirmSellerBid.from)
         val markDirtyToAddressInBlockchainTransactionFeedbacks = blockchainTransactionFeedbacks.Service.markDirty(confirmSellerBid.to)
         for {
@@ -238,7 +247,7 @@ class ConfirmSellerBids @Inject()(actorSystem: ActorSystem, transaction: utiliti
         } yield {}
       }
 
-      def getIDs(confirmSellerBid: ConfirmSellerBid) = {
+      def getIDs(confirmSellerBid: ConfirmSellerBid): Future[(String,String)] = {
         val toAccountID = masterAccounts.Service.getId(confirmSellerBid.to)
         val fromAccountID = masterAccounts.Service.getId(confirmSellerBid.from)
         for {

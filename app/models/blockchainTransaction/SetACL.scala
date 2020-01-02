@@ -174,21 +174,21 @@ class SetACLs @Inject()(actorSystem: ActorSystem, transaction: utilities.Transac
       val markTransactionSuccessful = Service.markTransactionSuccessful(ticketID, blockResponse.txhash)
       val setACL = Service.getTransaction(ticketID)
 
-      def aclAccountID(aclAddress: String) = masterAccounts.Service.getId(aclAddress)
+      def aclAccountID(aclAddress: String): Future[String] = masterAccounts.Service.getId(aclAddress)
 
-      def getAcl(aclHash: String) = blockchainAclHashes.Service.getACL(aclHash)
+      def getAcl(aclHash: String): Future[ACL] = blockchainAclHashes.Service.getACL(aclHash)
 
-      def aclAccountInsertOrUpdate(setACL: SetACL, acl: ACL) = blockchainAclAccounts.Service.insertOrUpdate(setACL.aclAddress, setACL.zoneID, setACL.organizationID, acl, dirtyBit = true)
+      def aclAccountInsertOrUpdate(setACL: SetACL, acl: ACL): Future[Int] = blockchainAclAccounts.Service.insertOrUpdate(setACL.aclAddress, setACL.zoneID, setACL.organizationID, acl, dirtyBit = true)
 
-      def updateUserTypeOnAddress(setACL: SetACL) = masterAccounts.Service.updateUserTypeOnAddress(setACL.aclAddress, constants.User.TRADER)
+      def updateUserTypeOnAddress(setACL: SetACL): Future[Int] = masterAccounts.Service.updateUserTypeOnAddress(setACL.aclAddress, constants.User.TRADER)
 
-      def verifyTraderByAccountID(aclAccountID: String) = masterTraders.Service.verifyTraderByAccountID(aclAccountID)
+      def verifyTraderByAccountID(aclAccountID: String): Future[Int] = masterTraders.Service.verifyTraderByAccountID(aclAccountID)
 
-      def markDirty(fromAddress: String) = blockchainAccounts.Service.markDirty(fromAddress)
+      def markDirty(fromAddress: String): Future[Int] = blockchainAccounts.Service.markDirty(fromAddress)
 
-      def transactionFeedbacksInsertOrUpdate(setACL: SetACL) = blockchainTransactionFeedbacks.Service.insertOrUpdate(setACL.aclAddress, TraderReputationResponse.TransactionFeedbackResponse("0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"), dirtyBit = true)
+      def transactionFeedbacksInsertOrUpdate(setACL: SetACL): Future[Int] = blockchainTransactionFeedbacks.Service.insertOrUpdate(setACL.aclAddress, TraderReputationResponse.TransactionFeedbackResponse("0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"), dirtyBit = true)
 
-      def fromAccountID(fromAddress: String) = masterAccounts.Service.getId(fromAddress)
+      def fromAccountID(fromAddress: String): Future[String] = masterAccounts.Service.getId(fromAddress)
 
       (for {
         _ <- markTransactionSuccessful
@@ -214,7 +214,7 @@ class SetACLs @Inject()(actorSystem: ActorSystem, transaction: utilities.Transac
       val markTransactionFailed = Service.markTransactionFailed(ticketID, message)
       val setACL = Service.getTransaction(ticketID)
 
-      def getIDs(setACL: SetACL) = {
+      def getIDs(setACL: SetACL): Future[(String,String)] = {
         val aclAddressID = masterAccounts.Service.getId(setACL.aclAddress)
         val fromID = masterAccounts.Service.getId(setACL.from)
         for {

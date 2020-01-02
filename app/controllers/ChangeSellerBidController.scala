@@ -4,6 +4,7 @@ import controllers.actions.WithTraderLoginAction
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
+import models.masterTransaction.NegotiationRequest
 import models.{blockchain, blockchainTransaction, master, masterTransaction}
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
@@ -24,7 +25,7 @@ class ChangeSellerBidController @Inject()(messagesControllerComponents: Messages
     implicit request =>
       val id = masterAccounts.Service.getId(buyerAddress)
 
-      def negotiationRequest(id: String) = masterTransactionNegotiationRequests.Service.getNegotiationByPegHashBuyerAccountIDAndSellerAccountID(pegHash, id, loginState.username)
+      def negotiationRequest(id: String): Future[NegotiationRequest] = masterTransactionNegotiationRequests.Service.getNegotiationByPegHashBuyerAccountIDAndSellerAccountID(pegHash, id, loginState.username)
 
       (for {
         id <- id
@@ -39,9 +40,7 @@ class ChangeSellerBidController @Inject()(messagesControllerComponents: Messages
     implicit request =>
       views.companion.master.ChangeSellerBid.form.bindFromRequest().fold(
         formWithErrors => {
-          Future {
-            BadRequest(views.html.component.master.changeSellerBid(formWithErrors, requestID = formWithErrors.data(constants.FormField.REQUEST_ID.name), buyerAddress = formWithErrors.data(constants.FormField.BUYER_ADDRESS.name), bid = formWithErrors.data(constants.FormField.BID.name).toInt, pegHash = formWithErrors.data(constants.FormField.PEG_HASH.name)))
-          }
+          Future(BadRequest(views.html.component.master.changeSellerBid(formWithErrors, requestID = formWithErrors.data(constants.FormField.REQUEST_ID.name), buyerAddress = formWithErrors.data(constants.FormField.BUYER_ADDRESS.name), bid = formWithErrors.data(constants.FormField.BID.name).toInt, pegHash = formWithErrors.data(constants.FormField.PEG_HASH.name))))
         },
         changeSellerBidData => {
           val transactionProcess = transaction.process[blockchainTransaction.ChangeSellerBid, transactionsChangeSellerBid.Request](
@@ -55,7 +54,8 @@ class ChangeSellerBidController @Inject()(messagesControllerComponents: Messages
           )
           (for {
             _ <- transactionProcess
-          } yield withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.SELLER_BID_CHANGED)))
+            result <- withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.SELLER_BID_CHANGED)))
+          } yield result
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
@@ -70,9 +70,7 @@ class ChangeSellerBidController @Inject()(messagesControllerComponents: Messages
   def blockchainChangeSellerBid: Action[AnyContent] = Action.async { implicit request =>
     views.companion.blockchain.ChangeSellerBid.form.bindFromRequest().fold(
       formWithErrors => {
-        Future {
-          BadRequest(views.html.component.blockchain.changeSellerBid(formWithErrors))
-        }
+        Future(BadRequest(views.html.component.blockchain.changeSellerBid(formWithErrors)))
       },
       changeSellerBidData => {
         val postRequest = transactionsChangeSellerBid.Service.post(transactionsChangeSellerBid.Request(transactionsChangeSellerBid.BaseReq(from = changeSellerBidData.from, gas = changeSellerBidData.gas.toString), to = changeSellerBidData.to, password = changeSellerBidData.password, bid = changeSellerBidData.bid.toString, time = changeSellerBidData.time.toString, pegHash = changeSellerBidData.pegHash, mode = changeSellerBidData.mode))

@@ -7,7 +7,7 @@ import javax.inject.{Inject, Singleton}
 import models.masterTransaction.{NegotiationFile, NegotiationRequest}
 import models.{blockchain, blockchainTransaction, master, masterTransaction}
 import play.api.i18n.I18nSupport
-import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc._
 import play.api.{Configuration, Logger}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -36,7 +36,7 @@ class ConfirmSellerBidController @Inject()(messagesControllerComponents: Message
     implicit request =>
       val id = masterAccounts.Service.getId(buyerAddress)
 
-      def requestID(id: String) = masterTransactionNegotiationRequests.Service.getIDByPegHashBuyerAccountIDAndSellerAccountID(pegHash, id, loginState.username)
+      def requestID(id: String): Future[String] = masterTransactionNegotiationRequests.Service.getIDByPegHashBuyerAccountIDAndSellerAccountID(pegHash, id, loginState.username)
 
       (for {
         id <- id
@@ -51,24 +51,21 @@ class ConfirmSellerBidController @Inject()(messagesControllerComponents: Message
     implicit request =>
       views.companion.master.ConfirmSellerBidDetail.form.bindFromRequest().fold(
         formWithErrors => {
-          Future {
-            BadRequest(views.html.component.master.confirmSellerBidDetail(formWithErrors))
-          }
+          Future(BadRequest(views.html.component.master.confirmSellerBidDetail(formWithErrors)))
         },
         confirmSellerBidData => {
           val sellerAccountID = masterTransactionNegotiationRequests.Service.getSellerAccountID(confirmSellerBidData.requestID)
 
-          def updateAmountForIDAndGetResult(sellerAccountID: String) = {
+          def updateAmountForIDAndGetResult(sellerAccountID: String): Future[Result] = {
             if (loginState.username == sellerAccountID) {
               val updateAmount = masterTransactionNegotiationRequests.Service.updateAmountForID(confirmSellerBidData.requestID, confirmSellerBidData.bid)
               val negotiationFiles = masterTransactionNegotiationFiles.Service.getOrNone(confirmSellerBidData.requestID, constants.File.SELLER_CONTRACT)
               for {
                 _ <- updateAmount
                 negotiationFiles <- negotiationFiles
-              } yield withUsernameToken.PartialContent(views.html.component.master.confirmSellerBidDocument(negotiationFiles, confirmSellerBidData.requestID, constants.File.SELLER_CONTRACT))
-            } else Future {
-              Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
-            }
+                result<-withUsernameToken.PartialContent(views.html.component.master.confirmSellerBidDocument(negotiationFiles, confirmSellerBidData.requestID, constants.File.SELLER_CONTRACT))
+              } yield result
+            } else Future (Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED))))
           }
 
           for {
@@ -83,16 +80,14 @@ class ConfirmSellerBidController @Inject()(messagesControllerComponents: Message
     implicit request =>
       val negotiation = masterTransactionNegotiationRequests.Service.getNegotiationByID(requestID)
 
-      def getResult(negotiation: NegotiationRequest) = {
+      def getResult(negotiation: NegotiationRequest): Future[Result] = {
         if (negotiation.sellerAccountID == loginState.username) {
           val confirmBidDocuments = masterTransactionNegotiationFiles.Service.getConfirmBidDocuments(requestID)
           for {
             confirmBidDocuments <- confirmBidDocuments
           } yield Ok(views.html.component.master.confirmSellerBid(negotiation = negotiation, files = confirmBidDocuments))
         } else {
-          Future {
-            Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
-          }
+          Future(Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED))))
         }
       }
 
@@ -111,16 +106,14 @@ class ConfirmSellerBidController @Inject()(messagesControllerComponents: Message
         formWithErrors => {
           val negotiation = masterTransactionNegotiationRequests.Service.getNegotiationByID(formWithErrors.data(constants.FormField.REQUEST_ID.name))
 
-          def getResult(negotiation: NegotiationRequest) = {
+          def getResult(negotiation: NegotiationRequest): Future[Result] = {
             if (negotiation.sellerAccountID == loginState.username) {
               val confirmBidDocuments = masterTransactionNegotiationFiles.Service.getConfirmBidDocuments(negotiation.id)
               for {
                 confirmBidDocuments <- confirmBidDocuments
               } yield BadRequest(views.html.component.master.confirmSellerBid(formWithErrors, negotiation, confirmBidDocuments))
             } else {
-              Future {
-                Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
-              }
+              Future(Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED))))
             }
           }
 
@@ -135,14 +128,14 @@ class ConfirmSellerBidController @Inject()(messagesControllerComponents: Message
         confirmBidTransactionData => {
           val masterNegotiation = masterTransactionNegotiationRequests.Service.getNegotiationByID(confirmBidTransactionData.requestID)
 
-          def getResult(masterNegotiation: NegotiationRequest) = {
+          def getResult(masterNegotiation: NegotiationRequest): Future[Result] = {
             if (masterNegotiation.sellerAccountID == loginState.username) {
               val buyerAddress = masterAccounts.Service.getAddress(masterNegotiation.buyerAccountID)
               val negotiationFiles = masterTransactionNegotiationFiles.Service.getDocuments(confirmBidTransactionData.requestID, Seq(constants.File.SELLER_CONTRACT))
 
-              def sellerContractHash(negotiationFiles: Seq[NegotiationFile]) = utilities.FileOperations.combinedHash(negotiationFiles)
+              def sellerContractHash(negotiationFiles: Seq[NegotiationFile]): String = utilities.FileOperations.combinedHash(negotiationFiles)
 
-              def transactionProcess(buyerAddress: String, sellerContractHash: String) = transaction.process[blockchainTransaction.ConfirmSellerBid, transactionsConfirmSellerBid.Request](
+              def transactionProcess(buyerAddress: String, sellerContractHash: String): Future[String] = transaction.process[blockchainTransaction.ConfirmSellerBid, transactionsConfirmSellerBid.Request](
                 entity = blockchainTransaction.ConfirmSellerBid(from = loginState.address, to = buyerAddress, bid = masterNegotiation.amount, time = confirmBidTransactionData.time, pegHash = masterNegotiation.pegHash, sellerContractHash = sellerContractHash, gas = confirmBidTransactionData.gas, ticketID = "", mode = transactionMode),
                 blockchainTransactionCreate = blockchainTransactionConfirmSellerBids.Service.create,
                 request = transactionsConfirmSellerBid.Request(transactionsConfirmSellerBid.BaseReq(from = loginState.address, gas = confirmBidTransactionData.gas.toString), to = buyerAddress, password = confirmBidTransactionData.password, bid = masterNegotiation.amount.toString, time = confirmBidTransactionData.time.toString, pegHash = masterNegotiation.pegHash, sellerContractHash = sellerContractHash, mode = transactionMode),
@@ -156,11 +149,10 @@ class ConfirmSellerBidController @Inject()(messagesControllerComponents: Message
                 buyerAddress <- buyerAddress
                 negotiationFiles <- negotiationFiles
                 _ <- transactionProcess(buyerAddress, sellerContractHash(negotiationFiles))
-              } yield withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.SELLER_BID_CONFIRMED)))
+                result<-withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.SELLER_BID_CONFIRMED)))
+              } yield result
             } else {
-              Future {
-                Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
-              }
+              Future(Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED))))
             }
           }
 
@@ -181,11 +173,7 @@ class ConfirmSellerBidController @Inject()(messagesControllerComponents: Message
 
   def blockchainConfirmSellerBid: Action[AnyContent] = Action.async { implicit request =>
     views.companion.blockchain.ConfirmSellerBid.form.bindFromRequest().fold(
-      formWithErrors => {
-        Future {
-          BadRequest(views.html.component.blockchain.confirmSellerBid(formWithErrors))
-        }
-      },
+      formWithErrors => (Future(BadRequest(views.html.component.blockchain.confirmSellerBid(formWithErrors)))),
       confirmSellerBidData => {
         val postRequest = transactionsConfirmSellerBid.Service.post(transactionsConfirmSellerBid.Request(transactionsConfirmSellerBid.BaseReq(from = confirmSellerBidData.from, gas = confirmSellerBidData.gas.toString), to = confirmSellerBidData.to, password = confirmSellerBidData.password, bid = confirmSellerBidData.bid.toString, time = confirmSellerBidData.time.toString, pegHash = confirmSellerBidData.pegHash, sellerContractHash = confirmSellerBidData.sellerContractHash, mode = confirmSellerBidData.mode))
         (for {

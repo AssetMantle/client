@@ -194,7 +194,7 @@ class NegotiationRequests @Inject()(protected val databaseConfigProvider: Databa
 
   object Service {
 
-    def create(id: String, negotiationID: String, amount: Int): String = Await.result(add(NegotiationRequest(utilities.IDGenerator.requestID(), null, null, null, null, amount, null, null)), Duration.Inf)
+    def create(id: String, negotiationID: String, amount: Int): Future[String] = add(NegotiationRequest(utilities.IDGenerator.requestID(), null, null, null, null, amount, null, null))
 
     def insertOrUpdate(requestID: String, buyerAccountID: String, sellerAccountID: String, pegHash: String, amount: Int): Future[Int] = upsert(NegotiationRequest(requestID, None, buyerAccountID, sellerAccountID, pegHash, amount, constants.Status.Asset.UNDER_NEGOTIATION, None))
 
@@ -208,9 +208,9 @@ class NegotiationRequests @Inject()(protected val databaseConfigProvider: Databa
 
     def updateAmountForID(id: String, amount: Int): Future[Int] = updateAmountByID(id, amount)
 
-    def delete(id: String): Int = Await.result(deleteByID(id), Duration.Inf)
+    def delete(id: String): Future[Int] = deleteByID(id)
 
-    def getStatus(id: String): Option[String] = Await.result(getStatusByID(id), Duration.Inf)
+    def getStatus(id: String): Future[Option[String]] = getStatusByID(id)
 
     def checkNegotiationAndAccountIDExists(id: String, accountID: String): Future[Boolean] = checkByIDAndAccountID(id, accountID)
 

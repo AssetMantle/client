@@ -195,7 +195,11 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
     def getAccount(username: String): Account = Await.result(findById(username), Duration.Inf)
 
+    def getAccountAsync(username: String): Future[Account] = findById(username)
+
     def getLanguage(id: String): String = Await.result(getLanguageById(id), Duration.Inf)
+
+    def getLanguageAsync(id: String): Future[String] = getLanguageById(id)
 
     def getId(accountAddress: String): Future[String] = getIdByAddress(accountAddress)
 
@@ -215,13 +219,13 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
       }
     }
 
-    def getUserTypeOnAddress(address: String): String = Await.result(getUserTypeByAddress(address), Duration.Inf)
+    def getUserTypeOnAddress(address: String): Future[String] = getUserTypeByAddress(address)
 
     def getIDsForAddresses(addresses: Seq[String]): Future[Seq[String]] = getIDsByAddresses(addresses)
 
-    def getAddresses(ids: Seq[String]): Seq[String] = Await.result(getAddressByIds(ids), Duration.Inf)
+    def getAddresses(ids: Seq[String]): Future[Seq[String]] = getAddressByIds(ids)
 
-    def filterTraderIDs(ids: Seq[String]): Seq[String] = Await.result(filterIDsOnUserType(ids, constants.User.TRADER), Duration.Inf)
+    def filterTraderIDs(ids: Seq[String]): Future[Seq[String]] = filterIDsOnUserType(ids, constants.User.TRADER)
 
     def updateStatusUnverifiedContact(id: String): Future[Int] = updateStatusById(id, constants.Status.Account.CONTACT_UNVERIFIED)
 

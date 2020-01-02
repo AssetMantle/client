@@ -39,9 +39,7 @@ class ChangeBuyerBidController @Inject()(messagesControllerComponents: MessagesC
     implicit request =>
       views.companion.master.ChangeBuyerBid.form.bindFromRequest().fold(
         formWithErrors => {
-          Future {
-            BadRequest(views.html.component.master.changeBuyerBid(formWithErrors, requestID = formWithErrors.data(constants.FormField.REQUEST_ID.name), sellerAddress = formWithErrors.data(constants.FormField.SELLER_ADDRESS.name), bid = formWithErrors.data(constants.FormField.BID.name).toInt, pegHash = formWithErrors.data(constants.FormField.PEG_HASH.name)))
-          }
+          Future(BadRequest(views.html.component.master.changeBuyerBid(formWithErrors, requestID = formWithErrors.data(constants.FormField.REQUEST_ID.name), sellerAddress = formWithErrors.data(constants.FormField.SELLER_ADDRESS.name), bid = formWithErrors.data(constants.FormField.BID.name).toInt, pegHash = formWithErrors.data(constants.FormField.PEG_HASH.name))))
         },
         changeBuyerBidData => {
           val requestID = changeBuyerBidData.requestID match {
@@ -59,13 +57,14 @@ class ChangeBuyerBidController @Inject()(messagesControllerComponents: MessagesC
           )
           val id = masterAccounts.Service.getId(changeBuyerBidData.sellerAddress)
 
-          def insertOrUpdate(id: String) = masterTransactionNegotiationRequests.Service.insertOrUpdate(requestID, loginState.username, id, changeBuyerBidData.pegHash, changeBuyerBidData.bid)
+          def insertOrUpdate(id: String): Future[Int] = masterTransactionNegotiationRequests.Service.insertOrUpdate(requestID, loginState.username, id, changeBuyerBidData.pegHash, changeBuyerBidData.bid)
 
           (for {
             _ <- transactionProcess
             id <- id
             _ <- insertOrUpdate(id)
-          } yield withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.BUYER_BID_CHANGED)))
+            result <- withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.BUYER_BID_CHANGED)))
+          } yield result
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
@@ -80,9 +79,7 @@ class ChangeBuyerBidController @Inject()(messagesControllerComponents: MessagesC
   def blockchainChangeBuyerBid: Action[AnyContent] = Action.async { implicit request =>
     views.companion.blockchain.ChangeBuyerBid.form.bindFromRequest().fold(
       formWithErrors => {
-        Future {
-          BadRequest(views.html.component.blockchain.changeBuyerBid(formWithErrors))
-        }
+        Future(BadRequest(views.html.component.blockchain.changeBuyerBid(formWithErrors)))
       },
       changeBuyerBidData => {
         val postRequest = transactionsChangeBuyerBid.Service.post(transactionsChangeBuyerBid.Request(transactionsChangeBuyerBid.BaseReq(from = changeBuyerBidData.from, gas = changeBuyerBidData.gas.toString), to = changeBuyerBidData.to, password = changeBuyerBidData.password, bid = changeBuyerBidData.bid.toString, time = changeBuyerBidData.time.toString, pegHash = changeBuyerBidData.pegHash, mode = changeBuyerBidData.mode))

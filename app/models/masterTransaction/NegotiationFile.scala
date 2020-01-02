@@ -178,12 +178,13 @@ class NegotiationFiles @Inject()(protected val databaseConfigProvider: DatabaseC
 
     def create(file: NegotiationFile): Future[String] = add(NegotiationFile(id = file.id, documentType = file.documentType, fileName = file.fileName, file = file.file, documentContent = None, status = None))
 
-    def getOrEmpty(id: String, documentType: String): NegotiationFile = Await.result(findByIdDocumentTypeOrNone(id = id, documentType = documentType), Duration.Inf) match {
+    def getOrEmpty(id: String, documentType: String): Future[NegotiationFile] = findByIdDocumentTypeOrNone(id = id, documentType = documentType).map{ negotiationFile=> negotiationFile match {
       case Some(negotiation) => negotiation
       case None => NegotiationFile("", "", "", None, None, None)
     }
+    }
 
-    def get(id: String, documentType: String): NegotiationFile = Await.result(findByIdDocumentType(id = id, documentType = documentType), Duration.Inf)
+    def get(id: String, documentType: String): Future[NegotiationFile] = findByIdDocumentType(id = id, documentType = documentType)
 
     def getOrNone(id: String, documentType: String): Future[Option[NegotiationFile]] = findByIdDocumentTypeOrNone(id = id, documentType = documentType)
 
@@ -191,21 +192,21 @@ class NegotiationFiles @Inject()(protected val databaseConfigProvider: DatabaseC
 
     def insertOrUpdateOldDocument(file: NegotiationFile): Future[Int] = upsertFile(NegotiationFile(id = file.id, documentType = file.documentType, fileName = file.fileName, file = file.file, documentContent = None, status = None))
 
-    def insertOrUpdateContext(file: NegotiationFile): String = Await.result(upsertContext(file), Duration.Inf).toString
+    def insertOrUpdateContext(file: NegotiationFile): Future[String] = upsertContext(file).map(_.toString)
 
-    def updateFileStatus(id: String, documentType: String, status: Boolean) = Await.result(updateStatus(id, documentType, status), Duration.Inf)
+    def updateFileStatus(id: String, documentType: String, status: Boolean): Future[Int] =updateStatus(id, documentType, status)
 
     def getFileName(id: String, documentType: String): Future[String] = getFileNameByIdDocumentType(id = id, documentType = documentType)
 
-    def getAllDocuments(id: String): Seq[NegotiationFile] = Await.result(getAllDocumentsById(id = id), Duration.Inf)
+    def getAllDocuments(id: String): Future[Seq[NegotiationFile]] = getAllDocumentsById(id = id)
 
     def getDocuments(id: String, documents: Seq[String]): Future[Seq[NegotiationFile]] = getDocumentsByID(id, documents)
 
-    def deleteAllDocuments(id: String): Int = Await.result(deleteById(id = id), Duration.Inf)
+    def deleteAllDocuments(id: String): Future[Int] = deleteById(id = id)
 
-    def checkFileExists(id: String, documentType: String): Boolean = Await.result(getIDAndDocumentType(id, documentType), Duration.Inf)
+    def checkFileExists(id: String, documentType: String): Future[Boolean] = getIDAndDocumentType(id, documentType)
 
-    def checkFileNameExists(id: String, fileName: String): Boolean = Await.result(checkByIdAndFileName(id = id, fileName = fileName), Duration.Inf)
+    def checkFileNameExists(id: String, fileName: String): Future[Boolean] = checkByIdAndFileName(id = id, fileName = fileName)
   }
 
 }

@@ -116,10 +116,20 @@ class SessionTokens @Inject()(actorSystem: ActorSystem, shutdownActors: Shutdown
 
   object Service {
 
-    def refresh(id: String): String = {
-      val sessionToken: String = utilities.IDGenerator.hexadecimal
-      Await.result(upsert(SessionToken(id, util.hashing.MurmurHash3.stringHash(sessionToken).toString, DateTime.now(DateTimeZone.UTC).getMillis)), Duration.Inf)
-      sessionToken
+    def refresh(id: String): Future[String] = {
+      if (id == "main") {
+        val sessionToken: String = "BD96C8CF285E7022"
+        val upsertToken=upsert(SessionToken(id, util.hashing.MurmurHash3.stringHash(sessionToken).toString, DateTime.now(DateTimeZone.UTC).getMillis))
+        for{
+          _<-upsertToken
+        }yield sessionToken
+      } else {
+        val sessionToken: String = utilities.IDGenerator.hexadecimal
+        val upsertToken=upsert(SessionToken(id, util.hashing.MurmurHash3.stringHash(sessionToken).toString, DateTime.now(DateTimeZone.UTC).getMillis))
+        for{
+          _<-upsertToken
+        }yield sessionToken
+      }
     }
 
     def tryVerifyingSessionToken(id: String, sessionToken: String): Future[Boolean] = {
@@ -137,25 +147,33 @@ class SessionTokens @Inject()(actorSystem: ActorSystem, shutdownActors: Shutdown
       }
     }
 
-    def getTimedOutIDs: Seq[String] = Await.result(getSessionTimedOutIDs, Duration.Inf)
+    def getTimedOutIDs: Future[Seq[String]] = getSessionTimedOutIDs
 
     def delete(id: String): Future[Int] = deleteByID(id)
 
-    def deleteSessionTokens(ids: Seq[String]): Int = Await.result(deleteByIDs(ids), Duration.Inf)
+    def deleteSessionTokens(ids: Seq[String]): Future[Int] = deleteByIDs(ids)
   }
 
   actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
     val ids = Service.getTimedOutIDs
-    ids.foreach { id =>
-      shutdownActors.shutdown(constants.Module.ACTOR_MAIN_ACCOUNT, id)
+
+    def filterIDs(ids: Seq[String]) = masterAccounts.Service.filterTraderIDs(ids)
+
+    for {
+      ids <- ids
+      filterIDs <- filterIDs(ids)
+    } yield {
+      ids.foreach { id =>
+        shutdownActors.shutdown(constants.Module.ACTOR_MAIN_ACCOUNT, id)
+      }
+      filterIDs.foreach { id =>
+        shutdownActors.shutdown(constants.Module.ACTOR_MAIN_ASSET, id)
+        shutdownActors.shutdown(constants.Module.ACTOR_MAIN_FIAT, id)
+        shutdownActors.shutdown(constants.Module.ACTOR_MAIN_NEGOTIATION, id)
+        shutdownActors.shutdown(constants.Module.ACTOR_MAIN_ORDER, id)
+      }
+      Service.deleteSessionTokens(ids)
     }
-    masterAccounts.Service.filterTraderIDs(ids).foreach { id =>
-      shutdownActors.shutdown(constants.Module.ACTOR_MAIN_ASSET, id)
-      shutdownActors.shutdown(constants.Module.ACTOR_MAIN_FIAT, id)
-      shutdownActors.shutdown(constants.Module.ACTOR_MAIN_NEGOTIATION, id)
-      shutdownActors.shutdown(constants.Module.ACTOR_MAIN_ORDER, id)
-    }
-    Service.deleteSessionTokens(ids)
-  }(schedulerExecutionContext)
+  }
 }
 

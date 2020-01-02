@@ -122,17 +122,17 @@ class AccountKYCs @Inject()(protected val databaseConfigProvider: DatabaseConfig
 
     def updateOldDocument(accountKYC: AccountKYC): Future[Int] = upsert(AccountKYC(id = accountKYC.id, documentType = accountKYC.documentType, fileName = accountKYC.fileName, file = accountKYC.file))
 
-    def get(id: String, documentType: String): AccountKYC = Await.result(findByIdDocumentType(id = id, documentType = documentType), Duration.Inf)
+    def get(id: String, documentType: String): Future[AccountKYC] = findByIdDocumentType(id = id, documentType = documentType)
 
     def getFileName(id: String, documentType: String): Future[String] = getFileNameByIdDocumentType(id = id, documentType = documentType)
 
     def getAllDocuments(id: String): Future[Seq[AccountKYC]] = getAllDocumentsById(id = id)
 
-    def verifyAll(id: String): Int = Await.result(updateStatusById(id = id, status = Option(true)), Duration.Inf)
+    def verifyAll(id: String): Future[Int] =updateStatusById(id = id, status = Option(true))
 
-    def verify(id: String, documentType: String): Int = Await.result(updateStatusByIdAndDocumentType(id = id, documentType = documentType, status = Option(true)), Duration.Inf)
+    def verify(id: String, documentType: String): Future[Int] = updateStatusByIdAndDocumentType(id = id, documentType = documentType, status = Option(true))
 
-    def deleteAllDocuments(id: String): Int = Await.result(deleteById(id = id), Duration.Inf)
+    def deleteAllDocuments(id: String): Future[Int] = deleteById(id = id)
 
     def checkFileExists(id: String, documentType: String): Future[Boolean] = checkFileExistsByIdAndDocumentType(id = id, documentType = documentType)
 

@@ -42,7 +42,7 @@ object intParameters {
 class MasterTest extends Simulation {
 
   setUp(
-    For Two Users
+    //For Two Users
         masterTest.masterTestSignUp.inject(atOnceUsers(8)),
         masterTest.masterLoginAndRequestCoin.inject(nothingFor(20), atOnceUsers(8)),
         masterTest.masterLoginMainAndApproveFaucetRequest.inject(nothingFor(40), atOnceUsers(1), nothingFor(15), atOnceUsers(1), nothingFor(15), atOnceUsers(1), nothingFor(15), atOnceUsers(1), nothingFor(15), atOnceUsers(1), nothingFor(15), atOnceUsers(1), nothingFor(15), atOnceUsers(1), nothingFor(15), atOnceUsers(1)),
@@ -84,10 +84,10 @@ object masterTest {
     .feed(UsernameFeeder.usernameFeed)
     .feed(PasswordFeeder.passwordFeed)
     .exec(http("SignUp_GET")
-      .get(routes.SignUpController.signUpForm().url)
+      .get(routes.AccountController.signUpForm().url)
       .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
     .exec(http("SignUp_POST")
-      .post(routes.SignUpController.signUp().url)
+      .post(routes.AccountController.signUp().url)
       .formParamMap(Map(
         Form.USERNAME -> "${%s}".format(Test.TEST_USERNAME),
         Form.PASSWORD -> "${%s}".format(Test.TEST_PASSWORD),
@@ -98,23 +98,23 @@ object masterTest {
     .feed(UsernameFeeder.usernameFeed)
     .feed(PasswordFeeder.passwordFeed)
     .exec(http("Login_GET")
-      .get(routes.LoginController.loginForm().url)
+      .get(routes.AccountController.loginForm().url)
       .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
     .exec(http("Login_POST")
-      .post(routes.LoginController.login().url)
+      .post(routes.AccountController.login().url)
       .formParamMap(Map(
         Form.USERNAME -> "${%s}".format(Test.TEST_USERNAME),
         Form.PASSWORD -> "${%s}".format(Test.TEST_PASSWORD),
-        Form.NOTIFICATION_TOKEN -> "",
+        Form.PUSH_NOTIFICATION_TOKEN -> "",
         Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
     .pause(5)
     .feed(CouponFeeder.couponFeed)
     .exec(http("RequestCoin_GET")
-      .get(routes.SendCoinController.requestCoinsForm().url)
+      .get(routes.SendCoinController.faucetRequestForm().url)
       .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
     .pause(2)
     .exec(http("RequestCoin_POST")
-      .post(routes.SendCoinController.requestCoins().url)
+      .post(routes.SendCoinController.faucetRequest().url)
       .formParamMap(Map(
         Form.COUPON -> "${%s}".format(Test.TEST_COUPON),
         Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
@@ -126,14 +126,14 @@ object masterTest {
     .feed(RequestIDFeeder.requestIDFeed)
     .feed(GasFeeder.gasFeed)
     .exec(http("MainLogin_GET")
-      .get(routes.LoginController.loginForm().url)
+      .get(routes.AccountController.loginForm().url)
       .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
     .exec(http("MainLogin_POST")
-      .post(routes.LoginController.login().url)
+      .post(routes.AccountController.login().url)
       .formParamMap(Map(
         Form.USERNAME -> "${%s}".format(Test.TEST_MAIN_USERNAME),
         Form.PASSWORD -> "${%s}".format(Test.TEST_MAIN_PASSWORD),
-        Form.NOTIFICATION_TOKEN -> "",
+        Form.PUSH_NOTIFICATION_TOKEN -> "",
         Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
     .pause(2)
     .exec { session => session.set(Test.TEST_REQUEST_ID, getRequestIDForFaucetRequest(session(Test.TEST_ACCOUNT_ID).as[String])) }

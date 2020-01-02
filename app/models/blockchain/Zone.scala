@@ -10,7 +10,7 @@ import queries.GetZone
 import slick.jdbc.JdbcProfile
 
 import scala.concurrent.duration.{Duration, _}
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 case class Zone(id: String, address: String, dirtyBit: Boolean)
@@ -126,7 +126,7 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
 
     def refreshDirty(zoneID: String, address: String): Future[Int] = updateAddressAndDirtyBitByID(zoneID, address, dirtyBit = false)
 
-    def markDirty(zoneID: String): Int = Await.result(updateDirtyBitByID(zoneID, dirtyBit = true), Duration.Inf)
+    def markDirty(zoneID: String): Future[Int] = updateDirtyBitByID(zoneID, dirtyBit = true)
   }
 
   object Utility {
@@ -135,12 +135,12 @@ class Zones @Inject()(protected val databaseConfigProvider: DatabaseConfigProvid
       val dirtyZones = Service.getDirtyZones
       Thread.sleep(sleepTime)
 
-      def refreshDirtyZones(dirtyZones: Seq[Zone]) = {
+      def refreshDirtyZones(dirtyZones: Seq[Zone]): Future[Seq[Unit]] = {
         Future.sequence {
           dirtyZones.map { dirtyZone =>
             val response = getZone.Service.get(dirtyZone.id)
 
-            def refreshDirty(response: queries.responses.ZoneResponse.Response) = Service.refreshDirty(dirtyZone.id, response.body)
+            def refreshDirty(response: queries.responses.ZoneResponse.Response): Future[Int] = Service.refreshDirty(dirtyZone.id, response.body)
 
             (for {
               response <- response

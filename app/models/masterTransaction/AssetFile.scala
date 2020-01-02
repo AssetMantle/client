@@ -211,11 +211,11 @@ class AssetFiles @Inject()(protected val databaseConfigProvider: DatabaseConfigP
 
     def getDocuments(id: String, documents: Seq[String]): Future[Seq[AssetFile]] = getDocumentsByID(id, documents).map { documents => documents.map(_.deserialize) }
 
-    def deleteAllDocuments(id: String): Int = Await.result(deleteById(id = id), Duration.Inf)
+    def deleteAllDocuments(id: String): Future[Int] = deleteById(id = id)
 
     def checkFileExists(id: String, documentType: String): Future[Boolean] = getIDAndDocumentType(id, documentType)
 
-    def checkFileNameExists(id: String, fileName: String): Boolean = Await.result(checkByIdAndFileName(id = id, fileName = fileName), Duration.Inf)
+    def checkFileNameExists(id: String, fileName: String): Future[Boolean] = checkByIdAndFileName(id = id, fileName = fileName)
 
     def checkAllAssetFilesVerified(id: String): Future[Boolean] = {
       getStatusForAllDocumentsById(id).map { documentStatuses => if (documentStatuses.nonEmpty) documentStatuses.forall(status => status.getOrElse(false)) else false }
