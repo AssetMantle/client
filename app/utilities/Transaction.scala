@@ -24,8 +24,6 @@ class Transaction @Inject()(getTxHashResponse: GetTransactionHashResponse, getRe
 
   private val responseErrorTransactionHashNotFound: String = constants.Response.PREFIX + constants.Response.FAILURE_PREFIX + configuration.get[String]("blockchain.response.error.transactionHashNotFound")
 
-  //private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
-
   def process[T1 <: BaseTransaction[T1], T2 <: BaseRequest](entity: T1, blockchainTransactionCreate: T1 => Future[String], request: T2, action: T2 => Future[WSResponse], onSuccess: (String, BlockResponse) => Future[Unit], onFailure: (String, String) => Future[Unit], updateTransactionHash: (String, String) => Future[Int])(implicit module: String, logger: Logger): Future[String] = {
 
     val ticketID: Future[String] = if (kafkaEnabled) {
@@ -63,7 +61,7 @@ class Transaction @Inject()(getTxHashResponse: GetTransactionHashResponse, getRe
       ticketID <- ticketID
       _ <- create(ticketID)
       _ <- modeBasedAction(ticketID)
-    } yield Unit
+    } yield {}
       ).recover {
       case baseException: BaseException => logger.error(baseException.failure.message, baseException)
         for{

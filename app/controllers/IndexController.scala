@@ -1,5 +1,7 @@
 package controllers
 
+import java.nio.file.Files
+
 import akka.stream.scaladsl.Source
 import controllers.actions.WithLoginAction
 import controllers.results.WithUsernameToken
@@ -12,6 +14,7 @@ import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
 import queries.GetAccount
+import views.companion.master.FileUpload
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
@@ -82,9 +85,46 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
       }
   }
 
+  def indexNewVersion=Action{implicit request =>
+    Ok(views.html.indexV3())
+  }
+
   def testPdf()=Action{
 
     Ok(views.html.component.master.pdfViewer())
+  }
+
+  def sendPDF(name:String)=Action{
+    Ok.sendFile(utilities.FileOperations.fetchFile(path = "/home/persistence-1/commitFiles/pdf/", fileName = name))
+  }
+
+  def updatePDF()=Action(parse.multipartFormData){
+
+    implicit request =>
+      FileUpload.form.bindFromRequest.fold(
+        formWithErrors => {
+          BadRequest
+        },
+
+        fileUploadInfo => {
+          try {
+            request.body.file(constants.File.KEY_FILE) match {
+              case None => BadRequest(views.html.index(failures = Seq(constants.Response.NO_FILE)))
+              case Some(file) =>
+                try{
+                  utilities.FileOperations.deleteFile("/home/persistence-1/commitFiles/pdf/",fileUploadInfo.resumableFilename)
+                }catch{
+                  case baseException: BaseException => logger.info(baseException.failure.message)
+                }
+                utilities.FileOperations.savePartialFile(Files.readAllBytes(file.ref.path), fileUploadInfo, "/home/persistence-1/commitFiles/pdf/")
+                Ok
+            }
+          }
+          catch {
+            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+          }
+        }
+      )
   }
 
   def testFunc(username: String)={

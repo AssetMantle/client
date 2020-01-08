@@ -9,14 +9,12 @@ import io.gatling.http.Predef._
 
 class SignUpControllerTest extends Simulation {
   val scenarioBuilder: ScenarioBuilder = signUpControllerTest.signUpScenario
-  setUp(scenarioBuilder.inject(atOnceUsers(3))).protocols(http.baseUrl(Test.BASE_URL))
+  setUp(scenarioBuilder.inject(atOnceUsers(400))).protocols(http.baseUrl(Test.BASE_URL))
 }
 
 object signUpControllerTest {
 
   val signUpScenario: ScenarioBuilder = scenario("SignUp")
-    .feed(UsernameFeeder.usernameFeed)
-    .feed(PasswordFeeder.passwordFeed)
     .exec(http("SignUp_GET")
       .get(routes.AccountController.signUpForm().url)
       .check(css("legend:contains(%s)".format(constants.Form.SIGN_UP.legend)).exists)

@@ -819,6 +819,7 @@
                 var input;
                 if(domNode.tagName==='INPUT' && domNode.type==='file'){
                     input = domNode;
+                    console.log(input);
                 } else {
                     input = document.createElement('input');
                     input.setAttribute('type', 'file');
@@ -830,6 +831,7 @@
                         input.click();
                         input.style.display='none';
                     }, false);
+                    console.log(input);
                     domNode.appendChild(input);
                 }
                 var maxFiles = $.getOpt('maxFiles');

@@ -398,4 +398,8 @@ POST        /blockchain/setBuyerFeedback                                 control
 GET         /blockchain/setSellerFeedback                                controllers.SetSellerFeedbackController.blockchainSetSellerFeedbackForm
 POST        /blockchain/setSellerFeedback                                controllers.SetSellerFeedbackController.blockchainSetSellerFeedback
 
-GET         /index/testPdf                                              controllers.IndexController.testPdf()
+GET         /index/testPdf                                              controllers.IndexController.testPdf
+POST        /userUpload/pdf                                             controllers.IndexController.updatePDF
+GET         /getPDF                                                     controllers.IndexController.sendPDF(name:String)
+
+GET         /indexNew                                                   controllers.IndexController.indexNewVersion

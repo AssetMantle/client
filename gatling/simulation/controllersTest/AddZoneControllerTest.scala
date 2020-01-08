@@ -98,7 +98,7 @@ object addZoneControllerTest {
     )
     .pause(1)
     .foreach(zoneKYCs,"documentType"){
-      exec(http("Zone_KYC_update_Status"+"${documentType}")
+      exec(http("Zone_KYC_update_Status_"+"${documentType}")
         .post(routes.AddZoneController.updateZoneKYCDocumentStatus().url)
         .formParamMap(Map(
           Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN),
