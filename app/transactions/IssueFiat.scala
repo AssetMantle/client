@@ -9,8 +9,7 @@ import play.api.libs.ws.{WSClient, WSResponse}
 import play.api.{Configuration, Logger}
 import transactions.Abstract.BaseRequest
 
-import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class IssueFiat @Inject()(wsClient: WSClient)(implicit configuration: Configuration, executionContext: ExecutionContext) {
@@ -40,13 +39,11 @@ class IssueFiat @Inject()(wsClient: WSClient)(implicit configuration: Configurat
   case class Request(base_req: BaseReq, to: String, transactionID: String, transactionAmount: String, mode: String, password: String) extends BaseRequest
 
   object Service {
-    def post(request: Request): WSResponse = try {
-      Await.result(action(request), Duration.Inf)
-    } catch {
+
+    def post(request: Request): Future[WSResponse] = action(request).recover {
       case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
         throw new BaseException(constants.Response.CONNECT_EXCEPTION)
     }
-
   }
 
 }

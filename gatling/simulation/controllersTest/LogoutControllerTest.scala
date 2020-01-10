@@ -16,17 +16,17 @@ class LogoutControllerTest extends Simulation {
 object logoutControllerTest {
 
   val logoutScenario: ScenarioBuilder = scenario("Logout")
-    .feed(ReceiveNotificationsFeeder.receiveNotificationsFeed)
-
-    .exec(controllersTest.loginControllerTest.loginAfterSignUpScenario)
-
-    .exec(http("Logout_GET")
-      .get(routes.LogoutController.logoutForm().url)
+    .exec(http("Logout_Form_GET")
+      .get(routes.AccountController.logoutForm().url)
+      .check(css("legend:contains(%s)".format(constants.Form.LOGOUT.legend)).exists)
       .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
     .pause(2)
     .exec(http("Logout_POST")
-      .post(routes.LogoutController.logout().url)
+      .post(routes.AccountController.logout().url)
       .formParamMap(Map(
-        Form.RECEIVE_NOTIFICATIONS -> "${%s}".format(Test.TEST_RECEIVE_NOTIFICATIONS),
-        Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
+        Form.RECEIVE_NOTIFICATIONS -> false,
+        Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN)))
+      .check(substring("SUCCESS LOGGED_OUT").exists)
+    )
+    .pause(2)
 }

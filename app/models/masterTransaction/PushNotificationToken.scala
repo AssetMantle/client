@@ -82,12 +82,13 @@ class PushNotificationTokens @Inject()(protected val databaseConfigProvider: Dat
 
   object Service {
 
-    def update(id: String, token: String): Int = Await.result(upsert(PushNotificationToken(id, token = token)), Duration.Inf)
+    def update(id: String, token: String): Future[Int] = upsert(PushNotificationToken(id, token = token))
 
-    def getPushNotificationToken(id: String): String = Await.result(getPushNotificationTokenByID(id), Duration.Inf)
+    def getPushNotificationToken(id: String): Future[String] = getPushNotificationTokenByID(id)
 
-    def delete(id: String): Int = Await.result(deleteByID(id), Duration.Inf)
+    def delete(id: String): Future[Int] = deleteByID(id)
 
   }
+
 }
 

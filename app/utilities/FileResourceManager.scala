@@ -6,7 +6,7 @@ import models.Trait.Document
 import org.apache.commons.codec.binary.Base64
 import play.api.{Configuration, Logger}
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class FileResourceManager @Inject()()(implicit executionContext: ExecutionContext, configuration: Configuration) {
@@ -143,15 +143,21 @@ class FileResourceManager @Inject()()(implicit executionContext: ExecutionContex
     }
   }
 
-  def storeFile[T <: Document[T]](name: String, documentType: String, path: String, document: T, masterCreate: T => String): Unit = {
-    try {
-      val (fileName, encodedBase64): (String, Option[Array[Byte]]) = utilities.FileOperations.fileExtensionFromName(name) match {
+  def storeFile[T <: Document[T]](name: String, documentType: String, path: String, document: T, masterCreate: T => Future[String]): Future[Boolean] = {
+    val getFileNameAndEncodedBase64: Future[(String, Option[Array[Byte]])] = Future {
+      utilities.FileOperations.fileExtensionFromName(name) match {
         case constants.File.JPEG | constants.File.JPG | constants.File.PNG => utilities.ImageProcess.convertToThumbnail(name, path)
         case _ => (List(util.hashing.MurmurHash3.stringHash(Base64.encodeBase64String(utilities.FileOperations.convertToByteArray(utilities.FileOperations.newFile(path, name)))).toString, utilities.FileOperations.fileExtensionFromName(name)).mkString("."), None)
       }
-      masterCreate(document.updateFileName(fileName).updateFile(encodedBase64))
-      utilities.FileOperations.renameFile(path, name, fileName)
-    } catch {
+    }
+
+    def updateAndCreateFile(fileName: String, encodedBase64: Option[Array[Byte]]): Future[String] = masterCreate(document.updateFileName(fileName).updateFile(encodedBase64))
+
+    (for {
+      (fileName, encodedBase64) <- getFileNameAndEncodedBase64
+      _ <- updateAndCreateFile(fileName, encodedBase64)
+    } yield utilities.FileOperations.renameFile(path, name, fileName)
+      ).recover {
       case baseException: BaseException => logger.error(baseException.failure.message)
         utilities.FileOperations.deleteFile(path, name)
         throw new BaseException(baseException.failure)
@@ -161,16 +167,23 @@ class FileResourceManager @Inject()()(implicit executionContext: ExecutionContex
     }
   }
 
-  def updateFile[T <: Document[T]](name: String, documentType: String, path: String, oldDocumentFileName: String, document: T, updateOldDocument: T => Int): Unit = {
-    try {
-      val (fileName, encodedBase64): (String, Option[Array[Byte]]) = utilities.FileOperations.fileExtensionFromName(name) match {
+  def updateFile[T <: Document[T]](name: String, documentType: String, path: String, oldDocumentFileName: String, document: T, updateOldDocument: T => Future[Int]): Future[Boolean] = {
+    val getFileNameAndEncodedBase64: Future[(String, Option[Array[Byte]])] = Future {
+      utilities.FileOperations.fileExtensionFromName(name) match {
         case constants.File.JPEG | constants.File.JPG | constants.File.PNG => utilities.ImageProcess.convertToThumbnail(name, path)
         case _ => (List(util.hashing.MurmurHash3.stringHash(Base64.encodeBase64String(utilities.FileOperations.convertToByteArray(utilities.FileOperations.newFile(path, name)))).toString, utilities.FileOperations.fileExtensionFromName(name)).mkString("."), None)
       }
-      updateOldDocument(document.updateFileName(fileName).updateFile(encodedBase64))
+    }
+
+    def update(fileName: String, encodedBase64: Option[Array[Byte]]): Future[Int] = updateOldDocument(document.updateFileName(fileName).updateFile(encodedBase64))
+
+    (for {
+      (fileName, encodedBase64) <- getFileNameAndEncodedBase64
+      _ <- update(fileName, encodedBase64)
+    } yield {
       utilities.FileOperations.deleteFile(path, oldDocumentFileName)
       utilities.FileOperations.renameFile(path, name, fileName)
-    } catch {
+    }).recover {
       case baseException: BaseException => logger.error(baseException.failure.message)
         utilities.FileOperations.deleteFile(path, name)
         throw new BaseException(baseException.failure)

@@ -9,7 +9,7 @@ import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class SendFiatController @Inject()(messagesControllerComponents: MessagesControllerComponents, transaction: utilities.Transaction, blockchainFiats: blockchain.Fiats, blockchainOrders: blockchain.Orders, blockchainAccounts: blockchain.Accounts, withTraderLoginAction: WithTraderLoginAction, transactionsSendFiat: transactions.SendFiat, blockchainTransactionSendFiats: blockchainTransaction.SendFiats, withUsernameToken: WithUsernameToken)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
@@ -28,22 +28,23 @@ class SendFiatController @Inject()(messagesControllerComponents: MessagesControl
     implicit request =>
       views.companion.master.SendFiat.form.bindFromRequest().fold(
         formWithErrors => {
-          BadRequest(views.html.component.master.sendFiat(formWithErrors, sellerAddress = formWithErrors.data(constants.FormField.SELLER_ADDRESS.name), pegHash = formWithErrors.data(constants.FormField.PEG_HASH.name), amount = formWithErrors.data(constants.FormField.AMOUNT.name).toInt))
+          Future(BadRequest(views.html.component.master.sendFiat(formWithErrors, sellerAddress = formWithErrors.data(constants.FormField.SELLER_ADDRESS.name), pegHash = formWithErrors.data(constants.FormField.PEG_HASH.name), amount = formWithErrors.data(constants.FormField.AMOUNT.name).toInt)))
         },
         sendFiatData => {
-          try {
-            transaction.process[blockchainTransaction.SendFiat, transactionsSendFiat.Request](
-              entity = blockchainTransaction.SendFiat(from = loginState.address, to = sendFiatData.sellerAddress, amount = sendFiatData.amount, pegHash = sendFiatData.pegHash, gas = sendFiatData.gas, ticketID = "", mode = transactionMode),
-              blockchainTransactionCreate = blockchainTransactionSendFiats.Service.create,
-              request = transactionsSendFiat.Request(transactionsSendFiat.BaseReq(from = loginState.address, gas = sendFiatData.gas.toString), to = sendFiatData.sellerAddress, password = sendFiatData.password, amount = sendFiatData.amount.toString, pegHash = sendFiatData.pegHash, mode = transactionMode),
-              action = transactionsSendFiat.Service.post,
-              onSuccess = blockchainTransactionSendFiats.Utility.onSuccess,
-              onFailure = blockchainTransactionSendFiats.Utility.onFailure,
-              updateTransactionHash = blockchainTransactionSendFiats.Service.updateTransactionHash
-            )
-            withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.FIAT_SENT)))
-          }
-          catch {
+          val transactionProcess = transaction.process[blockchainTransaction.SendFiat, transactionsSendFiat.Request](
+            entity = blockchainTransaction.SendFiat(from = loginState.address, to = sendFiatData.sellerAddress, amount = sendFiatData.amount, pegHash = sendFiatData.pegHash, gas = sendFiatData.gas, ticketID = "", mode = transactionMode),
+            blockchainTransactionCreate = blockchainTransactionSendFiats.Service.create,
+            request = transactionsSendFiat.Request(transactionsSendFiat.BaseReq(from = loginState.address, gas = sendFiatData.gas.toString), to = sendFiatData.sellerAddress, password = sendFiatData.password, amount = sendFiatData.amount.toString, pegHash = sendFiatData.pegHash, mode = transactionMode),
+            action = transactionsSendFiat.Service.post,
+            onSuccess = blockchainTransactionSendFiats.Utility.onSuccess,
+            onFailure = blockchainTransactionSendFiats.Utility.onFailure,
+            updateTransactionHash = blockchainTransactionSendFiats.Service.updateTransactionHash
+          )
+          (for {
+            _ <- transactionProcess
+            result<-withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.FIAT_SENT)))
+          } yield result
+            ).recover {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
         }
@@ -54,17 +55,17 @@ class SendFiatController @Inject()(messagesControllerComponents: MessagesControl
     Ok(views.html.component.blockchain.sendFiat())
   }
 
-  def blockchainSendFiat: Action[AnyContent] = Action { implicit request =>
+  def blockchainSendFiat: Action[AnyContent] = Action.async { implicit request =>
     views.companion.blockchain.SendFiat.form.bindFromRequest().fold(
       formWithErrors => {
-        BadRequest(views.html.component.blockchain.sendFiat(formWithErrors))
+        Future(BadRequest(views.html.component.blockchain.sendFiat(formWithErrors)))
       },
       sendFiatData => {
-        try {
-          transactionsSendFiat.Service.post(transactionsSendFiat.Request(transactionsSendFiat.BaseReq(from = sendFiatData.from, gas = sendFiatData.gas.toString), to = sendFiatData.to, password = sendFiatData.password, amount = sendFiatData.amount.toString, pegHash = sendFiatData.pegHash, mode = sendFiatData.mode))
-          Ok(views.html.index(successes = Seq(constants.Response.FIAT_SENT)))
-        }
-        catch {
+        val postRequest = transactionsSendFiat.Service.post(transactionsSendFiat.Request(transactionsSendFiat.BaseReq(from = sendFiatData.from, gas = sendFiatData.gas.toString), to = sendFiatData.to, password = sendFiatData.password, amount = sendFiatData.amount.toString, pegHash = sendFiatData.pegHash, mode = sendFiatData.mode))
+        (for {
+          _ <- postRequest
+        } yield Ok(views.html.index(successes = Seq(constants.Response.FIAT_SENT)))
+          ).recover {
           case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
         }
       }

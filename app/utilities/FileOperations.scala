@@ -15,7 +15,6 @@ import views.companion.master.FileUpload.FileUploadInfo
 import scala.concurrent.ExecutionContext
 import scala.util.{Failure, Success}
 
-
 object FileOperations {
 
   private implicit val module: String = constants.Module.FILE_OPERATIONS
@@ -37,7 +36,6 @@ object FileOperations {
       } finally {
         partialFile.close()
       }
-
       if (uploadedParts.containsKey(fullFileName)) {
         val partsUploaded = uploadedParts.get(fullFileName)
         uploadedParts.put(fullFileName, partsUploaded + fileInfo)
@@ -56,29 +54,7 @@ object FileOperations {
     else ""
   }
 
-  def removeSpacesFromName(name: String)(implicit executionContext: ExecutionContext): String = {
-    try {
-      name.replaceAll("\\s", "")
-    } catch {
-      case nullPointerException: NullPointerException => logger.error(constants.Response.NULL_POINTER_EXCEPTION.message, nullPointerException)
-        throw new BaseException(constants.Response.NULL_POINTER_EXCEPTION)
-      case e: Exception => logger.error(constants.Response.GENERIC_EXCEPTION.message, e)
-        throw new BaseException(constants.Response.GENERIC_EXCEPTION)
-    }
-  }
-
   def renameFile(directory: String, currentName: String, newName: String)(implicit executionContext: ExecutionContext): Boolean = newFile(directory, currentName).renameTo(newFile(directory, newName))
-
-  def newFile(directoryName: String, fileName: String)(implicit executionContext: ExecutionContext): File = {
-    try {
-      new File(directoryName, fileName)
-    } catch {
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-      case e: Exception => logger.error(constants.Response.GENERIC_EXCEPTION.message, e)
-        throw new BaseException(constants.Response.GENERIC_EXCEPTION)
-    }
-  }
 
   def fileStreamer(file: File, directoryName: String, fileName: String)(implicit executionContext: ExecutionContext): Source[ByteString, _] = {
     val source: Source[ByteString, _] = FileIO.fromPath(file.toPath)
@@ -103,6 +79,17 @@ object FileOperations {
   }
 
   def moveFile(fileName: String, oldPath: String, newPath: String)(implicit executionContext: ExecutionContext): Boolean = newFile(directoryName = oldPath, fileName = fileName).renameTo(newFile(directoryName = newPath, fileName = fileName))
+
+  def newFile(directoryName: String, fileName: String)(implicit executionContext: ExecutionContext): File = {
+    try {
+      new File(directoryName, fileName)
+    } catch {
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+      case e: Exception => logger.error(constants.Response.GENERIC_EXCEPTION.message, e)
+        throw new BaseException(constants.Response.GENERIC_EXCEPTION)
+    }
+  }
 
   def convertToByteArray(file: File)(implicit executionContext: ExecutionContext): Array[Byte] = {
     try {
@@ -130,19 +117,7 @@ object FileOperations {
     Json.toJson(documents.map { doc =>
       DocumentBlockchainDetails(doc.documentType, hashExtractor(doc.fileName))
     }).toString()
-
   }
 
-  def hashExtractor(hashedName: String)(implicit executionContext: ExecutionContext): String = {
-    try {
-      hashedName.split("""\.""")(0)
-    }
-    catch {
-      case nullPointerException: NullPointerException => logger.error(constants.Response.NULL_POINTER_EXCEPTION.message, nullPointerException)
-        throw new BaseException(constants.Response.NULL_POINTER_EXCEPTION)
-      case e: Exception => logger.error(constants.Response.GENERIC_EXCEPTION.message, e)
-        throw new BaseException(constants.Response.GENERIC_EXCEPTION)
-    }
-  }
-
+  def hashExtractor(hashedName: String)(implicit executionContext: ExecutionContext): String = hashedName.split("""\.""")(0)
 }

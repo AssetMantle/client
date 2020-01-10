@@ -9,8 +9,7 @@ import play.api.libs.ws.{WSClient, WSResponse}
 import play.api.{Configuration, Logger}
 import transactions.Abstract.BaseRequest
 
-import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class SendCoin @Inject()(wsClient: WSClient)(implicit configuration: Configuration, executionContext: ExecutionContext) {
@@ -31,11 +30,11 @@ class SendCoin @Inject()(wsClient: WSClient)(implicit configuration: Configurati
 
   private val url = ip + ":" + port + "/" + path1
 
+  private def action(request: Request): Future[WSResponse] = wsClient.url(url + request.to + path2).post(Json.toJson(request))
+
   case class Amount(denom: String, amount: String)
 
   case class BaseReq(from: String, chain_id: String = chainID, gas: String)
-
-  case class Request(base_req: BaseReq, password: String, to: String, amount: Seq[Amount], mode: String) extends BaseRequest
 
   private implicit val baseRequestWrites: OWrites[BaseReq] = Json.writes[BaseReq]
 
@@ -43,15 +42,16 @@ class SendCoin @Inject()(wsClient: WSClient)(implicit configuration: Configurati
 
   private implicit val requestWrites: OWrites[Request] = Json.writes[Request]
 
-  private def action(request: Request): Future[WSResponse] = wsClient.url(url + request.to + path2).post(Json.toJson(request))
+  case class Request(base_req: BaseReq, password: String, to: String, amount: Seq[Amount], mode: String) extends BaseRequest
 
   object Service {
-    def post(request: Request): WSResponse = try {
-      Await.result(action(request), Duration.Inf)
-    } catch {
-      case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
+
+    def post(request: Request): Future[WSResponse] = action(request).recover {
+      case connectException: ConnectException =>
+        logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
         throw new BaseException(constants.Response.CONNECT_EXCEPTION)
     }
+
   }
 
 }

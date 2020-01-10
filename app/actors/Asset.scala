@@ -53,7 +53,7 @@ class UserAssetActor(systemUserActor: ActorRef, actorTimeout: FiniteDuration) ex
 
   private implicit val module: String = constants.Module.ACTOR_USER_ASSET
 
-  def receive = {
+  def receive: PartialFunction[Any, Unit] = {
     case assetCometMessage: blockchain.AssetCometMessage => systemUserActor ! assetCometMessage.message
     case _: ShutdownActorMessage =>
       systemUserActor ! PoisonPill

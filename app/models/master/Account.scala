@@ -149,7 +149,7 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   private def checkById(id: String): Future[Boolean] = db.run(accountTable.filter(_.id === id).exists.result)
 
-  private def deleteById(id: String)= db.run(accountTable.filter(_.id === id).delete.asTry).map {
+  private def deleteById(id: String) = db.run(accountTable.filter(_.id === id).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -179,55 +179,61 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   object Service {
 
-    def validateLoginAndGetStatus(username: String, password: String): String = Await.result(getStatusByIDAndSecretHash(username, util.hashing.MurmurHash3.stringHash(password).toString), Duration.Inf)
+    def validateLoginAndGetStatus(username: String, password: String): Future[String] = getStatusByIDAndSecretHash(username, util.hashing.MurmurHash3.stringHash(password).toString)
 
-    def validateLogin(username: String, password: String): Boolean = Await.result(validateLoginByIDAndSecretHash(id = username, secretHash = util.hashing.MurmurHash3.stringHash(password).toString), Duration.Inf)
+    def validateLogin(username: String, password: String): Future[Boolean] = validateLoginByIDAndSecretHash(id = username, secretHash = util.hashing.MurmurHash3.stringHash(password).toString)
 
-    def updatePassword(username:String, newPassword: String): Int = Await.result(updatePasswordByID(id = username, secretHash = util.hashing.MurmurHash3.stringHash(newPassword).toString), Duration.Inf)
+    def updatePassword(username: String, newPassword: String): Future[Int] = updatePasswordByID(id = username, secretHash = util.hashing.MurmurHash3.stringHash(newPassword).toString)
 
-    def checkUsernameAvailable(username: String): Boolean = !Await.result(checkById(username), Duration.Inf)
+    def checkUsernameAvailable(username: String): Future[Boolean] = checkById(username).map {
+      !_
+    }
 
-    def addLogin(username: String, password: String, accountAddress: String, language: String): String = {
-      Await.result(add(Account(username, util.hashing.MurmurHash3.stringHash(password).toString, accountAddress, language, constants.User.WITHOUT_LOGIN, constants.Status.Account.NO_CONTACT)), Duration.Inf)
-      accountAddress
+    def addLogin(username: String, password: String, accountAddress: String, language: String): Future[String] = {
+      add(Account(username, util.hashing.MurmurHash3.stringHash(password).toString, accountAddress, language, constants.User.WITHOUT_LOGIN, constants.Status.Account.NO_CONTACT)).map { _ => accountAddress }
     }
 
     def getAccount(username: String): Account = Await.result(findById(username), Duration.Inf)
 
+    def getAccountAsync(username: String): Future[Account] = findById(username)
+
     def getLanguage(id: String): String = Await.result(getLanguageById(id), Duration.Inf)
 
-    def getId(accountAddress: String): String = Await.result(getIdByAddress(accountAddress), Duration.Inf)
+    def getLanguageAsync(id: String): Future[String] = getLanguageById(id)
 
-    def getAccountByAddress(accountAddress: String): Account = Await.result(findByAddress(accountAddress), Duration.Inf)
+    def getId(accountAddress: String): Future[String] = getIdByAddress(accountAddress)
 
-    def getAddress(id: String): String = Await.result(getAddressById(id), Duration.Inf)
+    def getAccountByAddress(accountAddress: String): Future[Account] = findByAddress(accountAddress)
 
-    def updateUserType(id: String, userType: String): Int = Await.result(updateUserTypeById(id, userType), Duration.Inf)
+    def getAddress(id: String): Future[String] = getAddressById(id)
 
-    def updateUserTypeOnAddress(address: String, userType: String): Int = Await.result(updateUserTypeByAddress(address, userType), Duration.Inf)
+    def updateUserType(id: String, userType: String): Future[Int] = updateUserTypeById(id, userType)
 
-    def getUserType(id: String): String = Await.result(getUserTypeById(id), Duration.Inf)
+    def updateUserTypeOnAddress(address: String, userType: String): Future[Int] = updateUserTypeByAddress(address, userType)
 
-    def tryVerifyingUserType(id: String, userType: String): Boolean = {
-      if (Await.result(getUserTypeById(id), Duration.Inf) == userType) true
-      else throw new BaseException(constants.Response.UNAUTHORIZED)
+    def getUserType(id: String): Future[String] = getUserTypeById(id)
+
+    def tryVerifyingUserType(id: String, userType: String): Future[Boolean] = {
+      getUserTypeById(id).map { userTypeResult =>
+        if (userTypeResult == userType) true else throw new BaseException(constants.Response.UNAUTHORIZED)
+      }
     }
 
-    def getUserTypeOnAddress(address: String): String = Await.result(getUserTypeByAddress(address), Duration.Inf)
+    def getUserTypeOnAddress(address: String): Future[String] = getUserTypeByAddress(address)
 
-    def getIDsForAddresses(addresses: Seq[String]): Seq[String] = Await.result(getIDsByAddresses(addresses), Duration.Inf)
+    def getIDsForAddresses(addresses: Seq[String]): Future[Seq[String]] = getIDsByAddresses(addresses)
 
-    def getAddresses(ids: Seq[String]): Seq[String] = Await.result(getAddressByIds(ids), Duration.Inf)
+    def getAddresses(ids: Seq[String]): Future[Seq[String]] = getAddressByIds(ids)
 
-    def filterTraderIDs(ids: Seq[String]): Seq[String] = Await.result(filterIDsOnUserType(ids, constants.User.TRADER), Duration.Inf)
+    def filterTraderIDs(ids: Seq[String]): Future[Seq[String]] = filterIDsOnUserType(ids, constants.User.TRADER)
 
-    def updateStatusUnverifiedContact(id: String): Int = Await.result(updateStatusById(id, constants.Status.Account.CONTACT_UNVERIFIED), Duration.Inf)
+    def updateStatusUnverifiedContact(id: String): Future[Int] = updateStatusById(id, constants.Status.Account.CONTACT_UNVERIFIED)
 
-    def updateStatusUnverifiedMobile(id: String): Int = Await.result(updateStatusById(id, constants.Status.Account.MOBILE_NUMBER_UNVERIFIED), Duration.Inf)
+    def updateStatusUnverifiedMobile(id: String): Future[Int] = updateStatusById(id, constants.Status.Account.MOBILE_NUMBER_UNVERIFIED)
 
-    def updateStatusUnverifiedEmail(id: String): Int = Await.result(updateStatusById(id, constants.Status.Account.EMAIL_ADDRESS_UNVERIFIED), Duration.Inf)
+    def updateStatusUnverifiedEmail(id: String): Future[Int] = updateStatusById(id, constants.Status.Account.EMAIL_ADDRESS_UNVERIFIED)
 
-    def updateStatusComplete(id: String): Int = Await.result(updateStatusById(id, constants.Status.Account.COMPLETE), Duration.Inf)
+    def updateStatusComplete(id: String): Future[Int] = updateStatusById(id, constants.Status.Account.COMPLETE)
   }
 
 }

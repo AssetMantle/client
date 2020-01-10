@@ -7,10 +7,11 @@ import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.{Configuration, Logger}
 import queries.GetACL
+import queries.responses.ACLResponse.Response
 import slick.jdbc.JdbcProfile
 
-import scala.concurrent.duration.{Duration, _}
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.duration._
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 case class ACLAccount(address: String, zoneID: String, organizationID: String, aclHash: String, dirtyBit: Boolean)
@@ -24,7 +25,7 @@ class ACLAccounts @Inject()(protected val databaseConfigProvider: DatabaseConfig
 
   val db = databaseConfig.db
 
-  private val schedulerExecutionContext:ExecutionContext= actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
+  private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -111,34 +112,49 @@ class ACLAccounts @Inject()(protected val databaseConfigProvider: DatabaseConfig
 
   object Service {
 
-    def create(address: String, zoneID: String, organizationID: String, acl: ACL, dirtyBit: Boolean): String = Await.result(add(ACLAccount(address, zoneID, organizationID, util.hashing.MurmurHash3.stringHash(acl.toString).toString, dirtyBit)), Duration.Inf)
+    def create(address: String, zoneID: String, organizationID: String, acl: ACL, dirtyBit: Boolean): Future[String] = add(ACLAccount(address, zoneID, organizationID, util.hashing.MurmurHash3.stringHash(acl.toString).toString, dirtyBit))
 
-    def insertOrUpdate(address: String, zoneID: String, organizationID: String, acl: ACL, dirtyBit: Boolean): Int = Await.result(upsert(ACLAccount(address, zoneID, organizationID, util.hashing.MurmurHash3.stringHash(acl.toString).toString, dirtyBit)), Duration.Inf)
+    def insertOrUpdate(address: String, zoneID: String, organizationID: String, acl: ACL, dirtyBit: Boolean): Future[Int] = upsert(ACLAccount(address, zoneID, organizationID, util.hashing.MurmurHash3.stringHash(acl.toString).toString, dirtyBit))
 
-    def get(address: String): ACLAccount = Await.result(findByAddress(address), Duration.Inf)
+    def get(address: String): Future[ACLAccount] = findByAddress(address)
 
-    def getACLHash(address: String): String = Await.result(findACLHashByAddress(address), Duration.Inf)
+    def getACLHash(address: String): Future[String] = findACLHashByAddress(address)
 
-    def getAddressesUnderZone(zoneID: String): Seq[String] = Await.result(getAddressesByZoneID(zoneID), Duration.Inf)
+    def getAddressesUnderZone(zoneID: String): Future[Seq[String]] = getAddressesByZoneID(zoneID)
 
-    def getDirtyAddresses: Seq[String] = Await.result(getAddressesByDirtyBit(dirtyBit = true), Duration.Inf)
+    def getDirtyAddresses: Future[Seq[String]] = getAddressesByDirtyBit(dirtyBit = true)
 
-    def markDirty(address: String): Int = Await.result(updateDirtyBitByAddress(address, dirtyBit = true), Duration.Inf)
+    def markDirty(address: String): Future[Int] = updateDirtyBitByAddress(address, dirtyBit = true)
   }
 
   object Utility {
-    def dirtyEntityUpdater(): Future[Unit] = Future {
-      try {
-        val dirtyAddresses = Service.getDirtyAddresses
-        Thread.sleep(sleepTime)
-        for (dirtyAddress <- dirtyAddresses) {
-          val responseAccount = getACL.Service.get(dirtyAddress)
-          Service.insertOrUpdate(responseAccount.value.address, responseAccount.value.zoneID, responseAccount.value.organizationID, responseAccount.value.acl, dirtyBit = false)
+    def dirtyEntityUpdater(): Future[Unit] = {
+      val dirtyAddresses = Service.getDirtyAddresses
+      Thread.sleep(sleepTime)
+
+      def insertOrUpdateAll(dirtyAddresses: Seq[String]): Future[Seq[Unit]] = {
+        Future.sequence {
+          dirtyAddresses.map { dirtyAddress =>
+            val responseAccount = getACL.Service.get(dirtyAddress)
+
+            def insertOrUpdate(responseAccount: Response): Future[Int] = Service.insertOrUpdate(responseAccount.value.address, responseAccount.value.zoneID, responseAccount.value.organizationID, responseAccount.value.acl, dirtyBit = false)
+
+            for {
+              responseAccount <- responseAccount
+              _ <- insertOrUpdate(responseAccount)
+            } yield {}
+          }
         }
-      } catch {
-        case baseException: BaseException => logger.error(baseException.failure.message, baseException)
       }
-    }(schedulerExecutionContext)
+
+      (for {
+        dirtyAddresses <- dirtyAddresses
+        _ <- insertOrUpdateAll(dirtyAddresses)
+      } yield {}
+        ).recover {
+        case baseException: BaseException => logger.error(baseException.failure.message, baseException)
+      }(schedulerExecutionContext)
+    }
   }
 
   actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {

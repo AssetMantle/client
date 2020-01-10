@@ -1,7 +1,7 @@
 package utilities
 
 object Contact {
-  
+
   def getWarnings(status: String): Seq[constants.Response.Warning] = {
     status match {
       case constants.Status.Account.NO_CONTACT => Seq(constants.Response.UPDATE_CONTACT_DETAILS)

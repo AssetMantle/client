@@ -47,7 +47,7 @@ POST        /acccount/noteNewKeyDetails                                  control
 GET         /contact                                                     controllers.ContactController.contact
 
 GET         /master/notifications                                        controllers.NotificationController.notificationPage(pageNumber:Int)
-GET         /master/unreadNotificationCount                              controllers.NotificationController.unreadNotificationCount()
+GET         /master/unreadNotificationCount                              controllers.NotificationController.unreadNotificationCount
 GET         /master/markNotificationAsRead                               controllers.NotificationController.markNotificationRead(notificationID: String)
 
 GET         /master/queryConfigurationVariable:query                     controllers.ConfigurationController.queryConfigurationVariable(query: String)
@@ -269,7 +269,7 @@ GET         /master/viewPendingIssueAssetRequests                        control
 GET         /master/rejectIssueAssetRequest                              controllers.IssueAssetController.rejectIssueAssetRequestForm(requestID: String)
 POST        /master/rejectIssueAssetRequest                              controllers.IssueAssetController.rejectIssueAssetRequest
 GET         /master/viewTraderAssetDocuments                             controllers.IssueAssetController.viewAssetDocuments(id: String)
-GET         /master/updateAssetDocumentStatus                            controllers.IssueAssetController.updateAssetDocumentStatusForm(fileID: String, documentType: String)
+GET         /master/updateAssetDocumentStatus                            controllers.IssueAssetController.updateAssetDocumentStatusForm(requestID: String, documentType: String)
 POST        /master/updateAssetDocumentStatus                            controllers.IssueAssetController.updateAssetDocumentStatus
 
 GET         /master/issueAsset                                           controllers.IssueAssetController.issueAssetForm(requestID: String, accountID: String, documentHash: String, assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, takerAddress: Option[String])
@@ -327,10 +327,10 @@ POST        /master/rejectFaucetRequest                                  control
 GET         /master/sendFiat                                             controllers.SendFiatController.sendFiatForm(sellerAddress: String, pegHash: String, amount: Int)
 POST        /master/sendFiat                                             controllers.SendFiatController.sendFiat
 
-GET         /master/setBuyerFeedback                                     controllers.SetBuyerFeedbackController.setBuyerFeedbackForm(buyerAddress: String, pegHash: String)
+GET         /master/setBuyerFeedback                                     controllers.SetBuyerFeedbackController.setBuyerFeedbackForm(sellerAddress: String, pegHash: String)
 POST        /master/setBuyerFeedback                                     controllers.SetBuyerFeedbackController.setBuyerFeedback
 
-GET         /master/setSellerFeedback                                    controllers.SetSellerFeedbackController.setSellerFeedbackForm(sellerAddress: String, pegHash: String)
+GET         /master/setSellerFeedback                                    controllers.SetSellerFeedbackController.setSellerFeedbackForm(buyerAddress: String, pegHash: String)
 POST        /master/setSellerFeedback                                    controllers.SetSellerFeedbackController.setSellerFeedback
 
 GET         /wurtcb                                                      controllers.WesternUnionController.westernUnionForm

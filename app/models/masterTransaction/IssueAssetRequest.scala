@@ -2,12 +2,14 @@ package models.masterTransaction
 
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
+import models.common.Serializable
 import org.postgresql.util.PSQLException
 import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.Json
 import slick.jdbc.JdbcProfile
-import models.common.Serializable
+import slick.lifted.TableQuery
+
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
@@ -16,24 +18,17 @@ case class IssueAssetRequest(id: String, ticketID: Option[String], pegHash: Opti
 
 @Singleton
 class IssueAssetRequests @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
+  val databaseConfig = databaseConfigProvider.get[JdbcProfile]
+  val db = databaseConfig.db
+  private[models] val issueAssetRequestTable = TableQuery[IssueAssetRequestTable]
 
   private def serialize(issueAssetRequest: IssueAssetRequest): IssueAssetRequestSerialized = IssueAssetRequestSerialized(issueAssetRequest.id, issueAssetRequest.ticketID, issueAssetRequest.pegHash, issueAssetRequest.accountID, issueAssetRequest.documentHash, issueAssetRequest.assetType, issueAssetRequest.quantityUnit, issueAssetRequest.assetQuantity, issueAssetRequest.assetPrice, issueAssetRequest.takerAddress, Json.toJson(issueAssetRequest.shipmentDetails).toString, issueAssetRequest.physicalDocumentsHandledVia, issueAssetRequest.paymentTerms, issueAssetRequest.status, issueAssetRequest.comment)
-
-  case class IssueAssetRequestSerialized(id: String, ticketID: Option[String], pegHash: Option[String], accountID: String, documentHash: Option[String], assetType: String, quantityUnit: String, assetQuantity: Int, assetPrice: Int, takerAddress: Option[String], shipmentDetails: String, physicalDocumentsHandledVia: String, paymentTerms: String, status: String, comment: Option[String]){
-    def deSerialize: IssueAssetRequest = IssueAssetRequest( id, ticketID, pegHash, accountID, documentHash, assetType, quantityUnit, assetQuantity, assetPrice, takerAddress, utilities.JSON.convertJsonStringToObject[Serializable.ShipmentDetails](shipmentDetails), physicalDocumentsHandledVia, paymentTerms, status, comment)
-  }
-
-  val databaseConfig = databaseConfigProvider.get[JdbcProfile]
-
-  val db = databaseConfig.db
 
   private implicit val logger: Logger = Logger(this.getClass)
 
   private implicit val module: String = constants.Module.MASTER_TRANSACTION_ISSUE_ASSET_REQUESTS
 
   import databaseConfig.profile.api._
-
-  private[models] val issueAssetRequestTable = TableQuery[IssueAssetRequestTable]
 
   private def add(issueAssetRequest: IssueAssetRequestSerialized): Future[String] = db.run((issueAssetRequestTable returning issueAssetRequestTable.map(_.id) += issueAssetRequest).asTry).map {
     case Success(result) => result
@@ -171,6 +166,10 @@ class IssueAssetRequests @Inject()(protected val databaseConfigProvider: Databas
     }
   }
 
+  case class IssueAssetRequestSerialized(id: String, ticketID: Option[String], pegHash: Option[String], accountID: String, documentHash: Option[String], assetType: String, quantityUnit: String, assetQuantity: Int, assetPrice: Int, takerAddress: Option[String], shipmentDetails: String, physicalDocumentsHandledVia: String, paymentTerms: String, status: String, comment: Option[String]) {
+    def deSerialize: IssueAssetRequest = IssueAssetRequest(id, ticketID, pegHash, accountID, documentHash, assetType, quantityUnit, assetQuantity, assetPrice, takerAddress, utilities.JSON.convertJsonStringToObject[Serializable.ShipmentDetails](shipmentDetails), physicalDocumentsHandledVia, paymentTerms, status, comment)
+  }
+
   private[models] class IssueAssetRequestTable(tag: Tag) extends Table[IssueAssetRequestSerialized](tag, "IssueAssetRequest") {
 
     def * = (id, ticketID.?, pegHash.?, accountID, documentHash.?, assetType, quantityUnit, assetQuantity, assetPrice, takerAddress.?, shipmentDetails, physicalDocumentsHandledVia, paymentTerms, status, comment.?) <> (IssueAssetRequestSerialized.tupled, IssueAssetRequestSerialized.unapply)
@@ -209,47 +208,55 @@ class IssueAssetRequests @Inject()(protected val databaseConfigProvider: Databas
 
   object Service {
 
-    def create(id: String, ticketID: Option[String], pegHash: Option[String], accountID: String, documentHash: Option[String], assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, takerAddress: Option[String], shipmentDetails: Serializable.ShipmentDetails, physicalDocumentsHandledVia: String, paymentTerms: String, status: String): String =
-      Await.result(add(serialize(IssueAssetRequest(id = id, ticketID = ticketID, pegHash = pegHash, accountID = accountID, documentHash = documentHash, assetType = assetType, quantityUnit = quantityUnit, assetQuantity = assetQuantity, assetPrice = assetPrice, takerAddress = takerAddress, shipmentDetails = shipmentDetails, physicalDocumentsHandledVia = physicalDocumentsHandledVia, paymentTerms = paymentTerms, status = status, comment = null))), Duration.Inf)
+    def create(id: String, ticketID: Option[String], pegHash: Option[String], accountID: String, documentHash: Option[String], assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, takerAddress: Option[String], shipmentDetails: Serializable.ShipmentDetails, physicalDocumentsHandledVia: String, paymentTerms: String, status: String): Future[String] =
+      add(serialize(IssueAssetRequest(id = id, ticketID = ticketID, pegHash = pegHash, accountID = accountID, documentHash = documentHash, assetType = assetType, quantityUnit = quantityUnit, assetQuantity = assetQuantity, assetPrice = assetPrice, takerAddress = takerAddress, shipmentDetails = shipmentDetails, physicalDocumentsHandledVia = physicalDocumentsHandledVia, paymentTerms = paymentTerms, status = status, comment = null)))
 
-    def insertOrUpdate(id: String, ticketID: Option[String], pegHash: Option[String], accountID: String, documentHash: Option[String], assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, takerAddress: Option[String], shipmentDetails: Serializable.ShipmentDetails, physicalDocumentsHandledVia: String, paymentTerms: String, status: String): Int =
-      Await.result(upsert(serialize(IssueAssetRequest(id = id, ticketID = ticketID, pegHash = pegHash, accountID = accountID, documentHash = documentHash, assetType = assetType, quantityUnit = quantityUnit, assetQuantity = assetQuantity, assetPrice = assetPrice, takerAddress = takerAddress, shipmentDetails = shipmentDetails, physicalDocumentsHandledVia = physicalDocumentsHandledVia, paymentTerms = paymentTerms, status = status, comment = null))), Duration.Inf)
+    def insertOrUpdate(id: String, ticketID: Option[String], pegHash: Option[String], accountID: String, documentHash: Option[String], assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, takerAddress: Option[String], shipmentDetails: Serializable.ShipmentDetails, physicalDocumentsHandledVia: String, paymentTerms: String, status: String) =
+      upsert(serialize(IssueAssetRequest(id = id, ticketID = ticketID, pegHash = pegHash, accountID = accountID, documentHash = documentHash, assetType = assetType, quantityUnit = quantityUnit, assetQuantity = assetQuantity, assetPrice = assetPrice, takerAddress = takerAddress, shipmentDetails = shipmentDetails, physicalDocumentsHandledVia = physicalDocumentsHandledVia, paymentTerms = paymentTerms, status = status, comment = null)))
 
-    def accept(id: String, ticketID: String): Int = Await.result(updateTicketIDAndStatusByID(id, ticketID, status = constants.Status.Asset.LISTED_FOR_TRADE), Duration.Inf)
+    def accept(id: String, ticketID: String): Future[Int] = updateTicketIDAndStatusByID(id, ticketID, status = constants.Status.Asset.LISTED_FOR_TRADE)
 
-    def reject(id: String, comment: String): Int = Await.result(updateStatusAndCommentByID(id = id, status = constants.Status.Asset.REJECTED, comment = Option(comment)), Duration.Inf)
+    def reject(id: String, comment: String): Future[Int] = updateStatusAndCommentByID(id = id, status = constants.Status.Asset.REJECTED, comment = Option(comment))
 
-    def updateStatusAndComment(id: String, status: String, comment: Option[String] = None) :Int = Await.result(updateStatusAndCommentByID(id = id, status = status, comment = comment), Duration.Inf)
+    def updateStatusAndComment(id: String, status: String, comment: Option[String] = None): Future[Int] = updateStatusAndCommentByID(id = id, status = status, comment = comment)
 
-    def updateDocumentHash(id: String, documentHash: Option[String]) :Int = Await.result(updateDocumentHashByID(id = id, documentHash = documentHash), Duration.Inf)
+    def updateDocumentHash(id: String, documentHash: Option[String]): Future[Int] = updateDocumentHashByID(id = id, documentHash = documentHash)
 
-    def updateTicketID(id: String, ticketID: String) :Int = Await.result(updateTicketIDByID(id = id, ticketID = ticketID), Duration.Inf)
+    def updateTicketID(id: String, ticketID: String): Future[Int] = updateTicketIDByID(id = id, ticketID = ticketID)
 
-    def markFailed(ticketID: String) :Int = Await.result(updatePegHashAndStatusWithTicketID(ticketID = ticketID, pegHash = None, status = constants.Status.Asset.FAILED), Duration.Inf)
+    def markFailed(ticketID: String): Future[Int] = updatePegHashAndStatusWithTicketID(ticketID = ticketID, pegHash = None, status = constants.Status.Asset.FAILED)
 
-    def markListedForTrade(ticketID: String, peghash: Option[String]) :Int = Await.result(updatePegHashAndStatusWithTicketID(ticketID = ticketID, pegHash = peghash, status = constants.Status.Asset.LISTED_FOR_TRADE), Duration.Inf)
+    def markListedForTrade(ticketID: String, peghash: Option[String]): Future[Int] = updatePegHashAndStatusWithTicketID(ticketID = ticketID, pegHash = peghash, status = constants.Status.Asset.LISTED_FOR_TRADE)
 
-    def markRedeemed(peghash: Option[String]) :Int = Await.result(updateStatusByPegHash(pegHash = peghash, status = constants.Status.Asset.REDEEMED), Duration.Inf)
+    def markRedeemed(peghash: Option[String]): Future[Int] = updateStatusByPegHash(pegHash = peghash, status = constants.Status.Asset.REDEEMED)
 
-    def updateAccountIDAndMarkListedForTradeByPegHash(pegHash: Option[String], accountID: String) :Int = Await.result(updateStatusAndAccountIDByPegHash(pegHash = pegHash, accountID = accountID, status = constants.Status.Asset.LISTED_FOR_TRADE), Duration.Inf)
+    def updateAccountIDAndMarkListedForTradeByPegHash(pegHash: Option[String], accountID: String): Future[Int] = updateStatusAndAccountIDByPegHash(pegHash = pegHash, accountID = accountID, status = constants.Status.Asset.LISTED_FOR_TRADE)
 
-    def getPendingIssueAssetRequests(accountIDs: Seq[String], status: String): Seq[IssueAssetRequest] = Await.result(getIssueAssetRequestsWithStatus(accountIDs, status), Duration.Inf).map(_.deSerialize)
+    def updateAccountIDAndMarkTradeCompleted(pegHash: Option[String], accountID: String): Future[Int] = updateStatusAndAccountIDByPegHash(pegHash = pegHash, accountID = accountID, status = constants.Status.Asset.COMPLETED_TRADE)
 
-    def getTraderAssetList(accountID: String): Seq[IssueAssetRequest] = Await.result(findIssueAssetsByAccountIDAndStatus(accountID, Seq(constants.Status.Asset.INCOMPLETE_DETAILS, constants.Status.Asset.REQUESTED, constants.Status.Asset.LISTED_FOR_TRADE, constants.Status.Asset.UNDER_NEGOTIATION)), Duration.Inf).map(_.deSerialize)
+    def getPendingIssueAssetRequests(accountIDs: Seq[String], status: String): Future[Seq[IssueAssetRequest]] = getIssueAssetRequestsWithStatus(accountIDs, status).map(_.map(_.deSerialize))
 
-    def getMarketAssets(): Seq[IssueAssetRequest] = Await.result(getAssetsByStatuses(Seq(constants.Status.Asset.LISTED_FOR_TRADE, constants.Status.Asset.UNDER_NEGOTIATION)), Duration.Inf).map(_.deSerialize)
+    def getTraderAssetList(accountID: String): Future[Seq[IssueAssetRequest]] = findIssueAssetsByAccountIDAndStatus(accountID, Seq(constants.Status.Asset.INCOMPLETE_DETAILS, constants.Status.Asset.REQUESTED, constants.Status.Asset.LISTED_FOR_TRADE, constants.Status.Asset.UNDER_NEGOTIATION, constants.Status.Asset.COMPLETED_TRADE)).map(_.map(_.deSerialize))
 
-    def getIssueAssetByID(id: String): IssueAssetRequest = Await.result(findByID(id), Duration.Inf).deSerialize
+    def getMarketAssets(): Future[Seq[IssueAssetRequest]] = getAssetsByStatuses(Seq(constants.Status.Asset.LISTED_FOR_TRADE, constants.Status.Asset.UNDER_NEGOTIATION)).map(_.map(_.deSerialize))
 
-    def getIssueAssetByTicketID(ticketID: String): IssueAssetRequest = Await.result(findByTicketID(ticketID), Duration.Inf).deSerialize
+    def getIssueAssetByID(id: String): Future[IssueAssetRequest] = findByID(id).map {
+      _.deSerialize
+    }
 
-    def getAccountID(id: String): String = Await.result(getAccountIDByID(id), Duration.Inf)
+    def getIssueAssetByTicketID(ticketID: String) = findByTicketID(ticketID).map {
+      _.deSerialize
+    }
 
-    def delete(id: String): Int = Await.result(deleteByID(id), Duration.Inf)
+    def getAccountID(id: String): Future[String] = getAccountIDByID(id)
 
-    def getStatus(id: String): String = Await.result(getStatusByID(id), Duration.Inf)
+    def delete(id: String): Future[Int] = deleteByID(id)
 
-    def verifyRequestedStatus(id: String): Boolean = if (Await.result(verifyStatusByID(id, constants.Status.Asset.REQUESTED), Duration.Inf)) true else throw new BaseException(constants.Response.REQUEST_ALREADY_APPROVED_OR_REJECTED)
+    def getStatus(id: String): Future[String] = getStatusByID(id)
+
+    def verifyRequestedStatus(id: String): Future[Boolean] = verifyStatusByID(id, constants.Status.Asset.REQUESTED).map {
+      if (_) true else throw new BaseException(constants.Response.REQUEST_ALREADY_APPROVED_OR_REJECTED)
+    }
 
   }
 

@@ -8,7 +8,7 @@ import javax.imageio.ImageIO
 import org.apache.commons.codec.binary.Base64
 import play.api.Logger
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 object ImageProcess {
 

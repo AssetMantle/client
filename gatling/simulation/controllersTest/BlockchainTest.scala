@@ -25,14 +25,14 @@ object blockchainTest {
     .pause(10)
     .feed(GenesisFeeder.genesisFeed)
     .exec(http("Login_GET")
-      .get(routes.LoginController.loginForm().url)
+      .get(routes.AccountController.loginForm().url)
       .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
     .exec(http("Login_POST")
-      .post(routes.LoginController.login().url)
+      .post(routes.AccountController.login().url)
       .formParamMap(Map(
         Form.USERNAME -> "${%s}".format(Test.TEST_MAIN_USERNAME),
         Form.PASSWORD -> "${%s}".format(Test.TEST_MAIN_PASSWORD),
-        Form.NOTIFICATION_TOKEN -> "",
+        Form.PUSH_NOTIFICATION_TOKEN -> "",
         Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
     .pause(5)
 

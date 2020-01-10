@@ -7,8 +7,7 @@ import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.JdbcProfile
 
-import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 case class ACLHash(issueAsset: Boolean, issueFiat: Boolean, sendAsset: Boolean, sendFiat: Boolean, redeemAsset: Boolean, redeemFiat: Boolean, sellerExecuteOrder: Boolean, buyerExecuteOrder: Boolean, changeBuyerBid: Boolean, changeSellerBid: Boolean, confirmBuyerBid: Boolean, confirmSellerBid: Boolean, negotiation: Boolean, releaseAsset: Boolean, hash: String)
@@ -44,7 +43,7 @@ class ACLHashes @Inject()(protected val databaseConfigProvider: DatabaseConfigPr
     }
   }
 
-  private def deleteByHash(hash: String)= db.run(aclTable.filter(_.hash === hash).delete.asTry).map {
+  private def deleteByHash(hash: String): Future[Int] = db.run(aclTable.filter(_.hash === hash).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -91,14 +90,11 @@ class ACLHashes @Inject()(protected val databaseConfigProvider: DatabaseConfigPr
   }
 
   object Service {
-    def create(acl: ACL): String = Await.result(add(ACLHash(acl.issueAsset, acl.issueFiat, acl.sendAsset, acl.sendFiat, acl.redeemAsset, acl.redeemFiat, acl.sellerExecuteOrder, acl.buyerExecuteOrder, acl.changeBuyerBid, acl.changeSellerBid, acl.confirmBuyerBid, acl.confirmSellerBid, acl.negotiation, acl.releaseAsset, util.hashing.MurmurHash3.stringHash(acl.toString).toString)), Duration.Inf)
+    def create(acl: ACL): Future[String] = add(ACLHash(acl.issueAsset, acl.issueFiat, acl.sendAsset, acl.sendFiat, acl.redeemAsset, acl.redeemFiat, acl.sellerExecuteOrder, acl.buyerExecuteOrder, acl.changeBuyerBid, acl.changeSellerBid, acl.confirmBuyerBid, acl.confirmSellerBid, acl.negotiation, acl.releaseAsset, util.hashing.MurmurHash3.stringHash(acl.toString).toString))
 
-    def get(hash: String): ACLHash = Await.result(findByHash(hash), Duration.Inf)
+    def get(hash: String): Future[ACLHash] = findByHash(hash)
 
-    def getACL(hash: String): ACL = {
-      val aclHash = Await.result(findByHash(hash), Duration.Inf)
-      ACL(issueAsset = aclHash.issueAsset, issueFiat = aclHash.issueFiat, sendAsset = aclHash.sendAsset, sendFiat = aclHash.sendFiat, redeemAsset = aclHash.redeemAsset, redeemFiat = aclHash.redeemFiat, sellerExecuteOrder = aclHash.sellerExecuteOrder, buyerExecuteOrder = aclHash.buyerExecuteOrder, changeBuyerBid = aclHash.changeBuyerBid, changeSellerBid = aclHash.changeSellerBid, confirmBuyerBid = aclHash.confirmBuyerBid, confirmSellerBid = aclHash.confirmSellerBid, negotiation = aclHash.negotiation, releaseAsset = aclHash.releaseAsset)
-    }
+    def getACL(hash: String): Future[ACL] = findByHash(hash).map(aclHash => ACL(issueAsset = aclHash.issueAsset, issueFiat = aclHash.issueFiat, sendAsset = aclHash.sendAsset, sendFiat = aclHash.sendFiat, redeemAsset = aclHash.redeemAsset, redeemFiat = aclHash.redeemFiat, sellerExecuteOrder = aclHash.sellerExecuteOrder, buyerExecuteOrder = aclHash.buyerExecuteOrder, changeBuyerBid = aclHash.changeBuyerBid, changeSellerBid = aclHash.changeSellerBid, confirmBuyerBid = aclHash.confirmBuyerBid, confirmSellerBid = aclHash.confirmSellerBid, negotiation = aclHash.negotiation, releaseAsset = aclHash.releaseAsset))
   }
 
 }

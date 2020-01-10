@@ -8,7 +8,7 @@ import play.api.{Configuration, Logger}
 import slick.jdbc.JdbcProfile
 
 import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 case class TraderFeedbackHistory(address: String, buyerAddress: String, sellerAddress: String, pegHash: String, rating: String)
@@ -88,17 +88,17 @@ class TraderFeedbackHistories @Inject()(protected val databaseConfigProvider: Da
 
   object Service {
 
-    def create(address: String, buyerAddress: String, sellerAddress: String, pegHash: String, rating: String): String = Await.result(add(TraderFeedbackHistory(address, buyerAddress, sellerAddress, pegHash, rating)), Duration.Inf)
+    def create(address: String, buyerAddress: String, sellerAddress: String, pegHash: String, rating: String): Future[String] =add(TraderFeedbackHistory(address, buyerAddress, sellerAddress, pegHash, rating))
 
-    def insertOrUpdate(address: String, buyerAddress: String, sellerAddress: String, pegHash: String, rating: String): Int = Await.result(upsert(TraderFeedbackHistory(address, buyerAddress, sellerAddress, pegHash, rating)), Duration.Inf)
+    def insertOrUpdate(address: String, buyerAddress: String, sellerAddress: String, pegHash: String, rating: String): Future[Int] = upsert(TraderFeedbackHistory(address, buyerAddress, sellerAddress, pegHash, rating))
 
-    def update(address: String, buyerAddress: String, sellerAddress: String, pegHash: String, rating: String): Int = Await.result(updateTraderFeedbackHistory(TraderFeedbackHistory(address, buyerAddress, sellerAddress, pegHash, rating)), Duration.Inf)
+    def update(address: String, buyerAddress: String, sellerAddress: String, pegHash: String, rating: String): Future[Int] = updateTraderFeedbackHistory(TraderFeedbackHistory(address, buyerAddress, sellerAddress, pegHash, rating))
 
-    def get(address: String): Seq[TraderFeedbackHistory] = Await.result(findById(address), Duration.Inf)
+    def get(address: String): Future[Seq[TraderFeedbackHistory]] = findById(address)
 
-    def getNullRatingsForBuyerFeedback(buyerAddress: String): Seq[TraderFeedbackHistory] = Await.result(findBuyersByNullRating(buyerAddress), Duration.Inf)
+    def getNullRatingsForBuyerFeedback(buyerAddress: String): Future[Seq[TraderFeedbackHistory]] =findBuyersByNullRating(buyerAddress)
 
-    def getNullRatingsForSellerFeedback(sellerAddress: String): Seq[TraderFeedbackHistory] = Await.result(findSellersByNullRating(sellerAddress), Duration.Inf)
+    def getNullRatingsForSellerFeedback(sellerAddress: String): Future[Seq[TraderFeedbackHistory]] =findSellersByNullRating(sellerAddress)
   }
 
 }

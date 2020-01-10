@@ -94,13 +94,13 @@ class Notifications @Inject()(protected val databaseConfigProvider: DatabaseConf
 
   object Service {
 
-    def create(accountID: String, notificationTitle: String, notificationMessage: String): String = Await.result(add(Notification(id = utilities.IDGenerator.hexadecimal, accountID = accountID, notificationTitle = notificationTitle, notificationMessage = notificationMessage, time = new Timestamp(System.currentTimeMillis), read = false)), Duration.Inf)
+    def create(accountID: String, notificationTitle: String, notificationMessage: String): Future[String] = add(Notification(id = utilities.IDGenerator.hexadecimal, accountID = accountID, notificationTitle = notificationTitle, notificationMessage = notificationMessage, time = new Timestamp(System.currentTimeMillis), read = false))
 
-    def get(accountID: String, offset: Int, limit: Int): Seq[Notification] = Await.result(findNotificationsByAccountId(accountID = accountID, offset = offset, limit = limit), Duration.Inf)
+    def get(accountID: String, offset: Int, limit: Int): Future[Seq[Notification]] = findNotificationsByAccountId(accountID = accountID, offset = offset, limit = limit)
 
-    def markAsRead(id: String): Int = Await.result(updateReadById(id = id, status = true), Duration.Inf)
+    def markAsRead(id: String): Future[Int] = updateReadById(id = id, status = true)
 
-    def getNumberOfUnread(accountID: String): Int = Await.result(findNumberOfReadOnStatusByAccountId(accountID = accountID, status = false), Duration.Inf)
+    def getNumberOfUnread(accountID: String): Future[Int] = findNumberOfReadOnStatusByAccountId(accountID = accountID, status = false)
 
   }
 
