@@ -1,14 +1,11 @@
-html {
+html, body {
     height: 100%;
-}
-body {
-    height: 100%;
+    font-size: 0.8125rem;
     background: #f4f4f4;
 }
 
 input, select {
     width: 100%;
-    padding: 10px;
 }
 
 input:focus {
@@ -24,7 +21,7 @@ button {
     background-color:#EEF9FF;
     color: #1B7FBD;
     padding: 10px 15px;
-    border-radius: 5px;
+    border-radius: 0.25rem;
     border: none;
     cursor: pointer;
     opacity: 0.8;
