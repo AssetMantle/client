@@ -1,17 +1,38 @@
 @()(implicit messagesProvider: MessagesProvider)
 
 <div id="blockHeightBottomDivision" >
-    <div class="cmuk-card cmuk-card-default">
-    <div class="cmuk-card-header tableName">
-        <a class="backButton cmuk-float-right" onclick='back()' ><span cmuk-icon="arrow-left" title="Back"></span></a><br>
-    </div>
-    <div class="cmuk-card-body">
-        <p><span class="cmuk-text-bold">@Messages(constants.Form.BLOCK):</span> <span id="blockHeightPageHeight"></span></p>
-        <p><span class="cmuk-text-bold">@Messages(constants.Form.TIME):</span> <span id="blockHeightPageTime"></span></p>
-        <p><span class="cmuk-text-bold">@Messages(constants.Form.NUM_TXS):</span> <span id="blockHeightPageNumTxs"></span></p>
-        <p><span class="cmuk-text-bold">@Messages(constants.Form.DATA_HASH):</span> <span id="blockHeightPageDataHash"></span></p>
-        <p><span class="cmuk-text-bold">@Messages(constants.Form.EVIDENCE_HASH):</span> <span id="blockHeightPageEvidenceHash"></span></p>
-        <p><span class="cmuk-text-bold">@Messages(constants.Form.VALIDATORS_HASH):</span> <span id="blockHeightPageValidatorsHash"></span></p>
+    <a onclick='back()' ><span cmuk-icon="arrow-left" title="Back"></span>@Messages(constants.Form.BACK)</a>
+    <div class="cmuk-card cmuk-card-default cmuk-card-body">
+    <div class="cmuk-overflow-auto">
+        <table class="cmuk-table cmuk-table-divider">
+            <tbody>
+                <tr>
+                    <th>@Messages(constants.Form.BLOCK)</th>
+                    <td> <span id="blockHeightPageHeight"></span></td>
+                </tr>
+                <tr>
+                    <th>@Messages(constants.Form.TIME)</th>
+                    <td><span id="blockHeightPageTime"></span></td>
+                </tr>
+                <tr>
+                    <th>@Messages(constants.Form.NUM_TXS)</th>
+                    <td><span id="blockHeightPageNumTxs"></span></td>
+                </tr>
+                <tr>
+                    <th>@Messages(constants.Form.DATA_HASH)</th>
+                    <td><span id="blockHeightPageDataHash"></span></td>
+                </tr>
+                <tr>
+                    <th>@Messages(constants.Form.EVIDENCE_HASH)</th>
+                    <td><span id="blockHeightPageEvidenceHash"></span></td>
+                </tr>
+                <tr>
+                    <th>@Messages(constants.Form.VALIDATORS_HASH)</th>
+                    <td><span id="blockHeightPageValidatorsHash"></span></td>
+                </tr>
+
+            </tbody>
+        </table>
     </div>
     </div>
 </div>

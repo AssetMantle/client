@@ -12,6 +12,7 @@
 }
 .modalContent {
     top: 20%;
+    border-radius: 0.25rem;
     margin:auto;
     background-color: #fefefe;
     box-sizing: border-box;
@@ -24,13 +25,9 @@
 .modalBody{
     padding:20px;
 }
-.NavigationBarMenuButton{
-    display: none;
+.headerFontSize{
+    font-size: 0.81094rem !important;
 }
-.cmuk-navbar-container{
-    padding-right: 20px !important;
-}
-
 @media (max-width: 500px) {
     table thead {
         font-size: 12px;
@@ -62,7 +59,7 @@
     }
 
     .middle {
-        width: 100%;
+        width: 60%;
     }
 
     .rightSide {
@@ -334,11 +331,20 @@ dl .info::after {
 
 /* Main search field*/
 .searchForm {
+    border: 1px solid #e7eaf3;
     background: #fff;
     padding: 20px;
     justify-content: center;
     display: flex;
+    border-radius: 0.25rem;
     box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.07);
+}
+.searchForm input{
+    cursor: auto !important;
+}
+.searchForm button{
+    border-bottom-left-radius: 0px;
+    border-top-left-radius: 0px;
 }
 
 .searchForm dl {
@@ -356,16 +362,23 @@ dl .info::after {
 .sideBarOptions {
     margin-top: 20px;
 }
+.sideBarOptions ul{
+    padding: 0px !important;
+}
 .sideBarOpenButton {
     position: fixed;
     left: 0px;
     z-index:1;
     background: linear-gradient(60deg, #149f98, #102923);
     padding: 5px;
-    border-bottom-right-radius: 10px;
-    border-top-right-radius: 10px;
+    border-bottom-right-radius: 0.25rem;
+    border-top-right-radius: 0.25rem;
     color:#fff;
     background: linear-gradient(60deg, #149f98, #102923);
+}
+.sideBarOptions input
+{
+    padding: 10px;
 }
 
 .sideBarOptions li {
@@ -374,15 +387,26 @@ dl .info::after {
 
 .sideBarOptions li a {
     padding: 8px 0px 0px 20px;
+    color:#666;
     text-decoration: none;
     transition: 0.3s;
     display: inline-block;
     margin-bottom: 10px;
 }
+.cmuk-offcanvas-bar::-webkit-scrollbar{
+    width:6px;
+}
+.cmuk-offcanvas-bar:hover::-webkit-scrollbar {
+    width: 6px;
+}
+.cmuk-offcanvas-bar:hover::-webkit-scrollbar-thumb {
+    background: grey;
+    border-radius: 10px;
+}
 
-.sideBarOptions a:hover, li a:hover {
+.sideBarOptions a:hover{
     text-decoration: none;
-    color: #31353D;
+    color: #31353D !important;
 }
 
 .sideBarSearch {
@@ -456,7 +480,7 @@ dl .info::after {
 .toolTip .toolTipText {
     visibility: hidden;
     width: 140px;
-    background-color: #555;
+    background-color: #1e87f0;
     color: #fff;
     text-align: center;
     border-radius: 6px;
@@ -478,7 +502,7 @@ dl .info::after {
     margin-left: -5px;
     border-width: 5px;
     border-style: solid;
-    border-color: #555 transparent transparent transparent;
+    border-color: #1e87f0 transparent transparent transparent;
 }
 
 .toolTip:hover .toolTipText {
@@ -529,10 +553,6 @@ dl .info::after {
     stroke-width:2 !important;
     stroke:#102923 !important;
 }
-.cmuk-navbar-dropdown{
-    margin-top:0px !important;
-}
-
 .profileAcl{
     display: flex;
     flex-wrap: wrap;
@@ -540,4 +560,50 @@ dl .info::after {
 
 .profileAcl p:first-child{
     margin-top:20px;
+}
+
+/* cmuk classes*/
+
+.cmuk-margin-extra-small-right{
+    margin-right:5px !important;
+}
+.sideBar .cmuk-close{
+    color:#999 !important;
+}
+.sideBar .cmuk-offcanvas-bar{
+    overflow-x:hidden;
+    background: #f4f4f4;
+    width: 370px;
+    left: -370px;
+}
+
+.commonCheckBox{
+    display: flex;
+}
+.commonCheckBox input{
+    margin-left: 10px;
+}
+.cmuk-navbar-dropdown::before {
+    content: ' ';
+    position: absolute;
+    width: 0;
+    height: 0;
+    left: auto;
+    right: 20px;
+    top: -13%;
+    bottom: -19px;
+    border: 8px solid;
+    border-color: transparent transparent rgba(0, 0, 0, .15) transparent;
+}
+.cmuk-navbar-dropdown::after{
+    content: ' ';
+    position: absolute;
+    width: 0;
+    height: 0;
+    left:auto;
+    right: 20px;
+    top: -12%;
+    bottom: -19px;
+    border: 8px solid;
+    border-color: transparent transparent #fff transparent;
 }

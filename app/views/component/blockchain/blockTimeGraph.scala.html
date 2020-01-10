@@ -1,4 +1,7 @@
 @()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration)
+<div class="leftText">
+    <span class="headerFontSize cmuk-text-bold">@Messages(constants.Form.BLOCK_TIMES)</span>
+</div>
 <canvas id="blockTimes"></canvas>
 <script type="text/javascript" src="@routes.Assets.versioned("javascripts/Chart.min.js")"></script>
 <script type="text/javascript" src="@routes.Assets.versioned("javascripts/Chart.bundle.min.js")"></script>

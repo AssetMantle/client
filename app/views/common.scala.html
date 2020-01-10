@@ -42,14 +42,12 @@
                             case null => {
                                 <li>
                                     <a onclick="getForm(jsRoutes.controllers.AccountController.signUpForm())">
-                                        <span cmuk-icon="users"></span>
-                                        @Messages(constants.Form.SIGN_UP.legend)
+                                        <span cmuk-icon="users" class="cmuk-margin-extra-small-right"></span> @Messages(constants.Form.SIGN_UP.legend)
                                     </a>
                                 </li>
                                 <li>
                                     <a onclick="getForm(jsRoutes.controllers.AccountController.loginForm())">
-                                        <span cmuk-icon="sign-in"></span>
-                                        @Messages(constants.Form.LOGIN.legend)
+                                        <span cmuk-icon="sign-in" class="cmuk-margin-extra-small-right"></span> @Messages(constants.Form.LOGIN.legend)
                                     </a>
                                 </li>
                             }
@@ -84,13 +82,13 @@
                                         <ul class="cmuk-nav cmuk-navbar-dropdown-nav">
                                             <li>
                                                 <a href="@controllers.routes.ViewController.profile()">
-                                                    <span cmuk-icon="user"></span> &nbsp;
+                                                    <span cmuk-icon="user"></span>
                                                     @Messages(constants.Form.PROFILE)
                                                 </a>
                                             </li>
                                             <li>
                                                 <a onclick="getForm(jsRoutes.controllers.AccountController.logoutForm())">
-                                                    <span cmuk-icon="sign-out"></span> &nbsp;
+                                                    <span cmuk-icon="sign-out"></span>
                                                     @Messages(constants.Form.LOGOUT.legend)
                                                 </a>
                                             </li>
