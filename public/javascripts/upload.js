@@ -17,7 +17,7 @@ function uploadFile(uploadRoute, storeRoute, documentType, id) {
         fileType: getFileTypes(documentType),
         query: {csrfToken: $('[name="csrfToken"]').attr('value')}
     });
-    console.log(uploadRoute(documentType).url)
+
     rFile.assignBrowse(document.getElementById('browseUploadButton'));
 
     rFile.assignDrop(document.getElementById('uploadSelector'));

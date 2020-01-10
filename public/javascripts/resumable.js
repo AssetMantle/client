@@ -819,7 +819,6 @@
                 var input;
                 if(domNode.tagName==='INPUT' && domNode.type==='file'){
                     input = domNode;
-                    console.log(input);
                 } else {
                     input = document.createElement('input');
                     input.setAttribute('type', 'file');
