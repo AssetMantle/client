@@ -6,8 +6,6 @@ GET         /javascriptRoutes                                            control
 
 GET         /firebase-messaging-sw.js                                    controllers.Assets.at(path="/public/javascripts", file="firebase-messaging-sw.js")
 
-GET         /index/testActionAsync                                       controllers.IndexController.testActionAsync(username: String)
-
 GET         /blockExplorer/lastBlockHeight                               controllers.BlockExplorerController.lastBlockHeight
 GET         /blockExplorer/blockDetails                                  controllers.BlockExplorerController.blockDetails(minimumHeight: Int, maximumHeight: Int)
 GET         /blockExplorer/stakingValidators                             controllers.BlockExplorerController.stakingValidators
@@ -397,9 +395,3 @@ POST        /blockchain/setBuyerFeedback                                 control
 
 GET         /blockchain/setSellerFeedback                                controllers.SetSellerFeedbackController.blockchainSetSellerFeedbackForm
 POST        /blockchain/setSellerFeedback                                controllers.SetSellerFeedbackController.blockchainSetSellerFeedback
-
-GET         /index/testPdf                                              controllers.IndexController.testPdf
-POST        /userUpload/pdf                                             controllers.IndexController.updatePDF
-GET         /getPDF                                                     controllers.IndexController.sendPDF(name:String)
-
-GET         /indexNew                                                   controllers.IndexController.indexNewVersion

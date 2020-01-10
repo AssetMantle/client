@@ -117,19 +117,11 @@ class SessionTokens @Inject()(actorSystem: ActorSystem, shutdownActors: Shutdown
   object Service {
 
     def refresh(id: String): Future[String] = {
-      if (id == "main") {
-        val sessionToken: String = "BD96C8CF285E7022"
-        val upsertToken=upsert(SessionToken(id, util.hashing.MurmurHash3.stringHash(sessionToken).toString, DateTime.now(DateTimeZone.UTC).getMillis))
-        for{
-          _<-upsertToken
-        }yield sessionToken
-      } else {
         val sessionToken: String = utilities.IDGenerator.hexadecimal
         val upsertToken=upsert(SessionToken(id, util.hashing.MurmurHash3.stringHash(sessionToken).toString, DateTime.now(DateTimeZone.UTC).getMillis))
         for{
           _<-upsertToken
         }yield sessionToken
-      }
     }
 
     def tryVerifyingSessionToken(id: String, sessionToken: String): Future[Boolean] = {
@@ -137,7 +129,6 @@ class SessionTokens @Inject()(actorSystem: ActorSystem, shutdownActors: Shutdown
         if (token == util.hashing.MurmurHash3.stringHash(sessionToken).toString) true
         else throw new BaseException(constants.Response.INVALID_TOKEN)
       }
-
     }
 
     def tryVerifyingSessionTokenTime(id: String): Future[Boolean] = {
