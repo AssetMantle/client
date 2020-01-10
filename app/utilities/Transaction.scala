@@ -99,7 +99,7 @@ class Transaction @Inject()(getTxHashResponse: GetTransactionHashResponse, getRe
 
     def executeSuccessOrFailure(blockResponse: BlockResponse, ticketID: String): Future[Unit] = if (blockResponse.code.isEmpty) onSuccess(ticketID, blockResponse) else onFailure(ticketID, blockResponse.code.get.toString)
 
-    def responseSuccessOrFailure(ticketIDsSeq: Seq[String]) =
+    def ticketsIterator(ticketIDsSeq: Seq[String]) =
       ticketIDsSeq.foreach { ticketID =>
         val blockResponse = if (kafkaEnabled) {
           val mode = getMode(ticketID)
@@ -129,7 +129,7 @@ class Transaction @Inject()(getTxHashResponse: GetTransactionHashResponse, getRe
 
     for {
       ticketIDsSeq <- ticketIDsSeq
-    } yield responseSuccessOrFailure(ticketIDsSeq)
+    } yield ticketsIterator(ticketIDsSeq)
   }
 }
 
