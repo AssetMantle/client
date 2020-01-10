@@ -119,8 +119,8 @@ class AccountController @Inject()(
         }
 
         // Discuss loginStateVal
-        def getResult(status: String, loginStateVal: LoginState): Future[Result] = {
-          implicit val loginState = loginStateVal
+        def getResult(status: String, loginStateValue: LoginState): Future[Result] = {
+          implicit val loginState = loginStateValue
           val contactWarnings = utilities.Contact.getWarnings(status)
           loginState.userType match {
             case constants.User.GENESIS => withUsernameToken.Ok(views.html.genesisIndex(warnings = contactWarnings))
