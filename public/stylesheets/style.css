@@ -258,14 +258,65 @@ body::-webkit-scrollbar-thumb {
     padding: 30px 30px;
 }
 .modalContent {
+    word-break: break-all;
     top: 20%;
     border-radius: 0.25rem;
+    padding: 20px;
     margin:auto;
     background-color: #fefefe;
     box-sizing: border-box;
     position: relative;
-    width: 500px;
+    width: 700px;
+    min-width: 500px;
+    max-width: 1000px;
     overflow-y:auto;
     max-height: 450px;
-    max-width: calc(100% - 0.01px) !important;
+}
+dl {
+    position: relative;
+}
+
+dl .info {
+    background-color: #dadada;
+    color: #838383;
+    text-align: center;
+    border-radius: 6px;
+    position: relative;
+    top: 5px;
+    float: right;
+    font-size: smaller;
+    padding: 0;
+    display: none;
+}
+
+dl .info::after {
+    content: "";
+    position: absolute;
+    bottom: 17px;
+    left: 20px;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent transparent #dadada transparent;
+}
+.hidden{
+    display: none;
+}
+.verifyPassphrase{
+    flex-wrap: wrap;
+}
+.verifyPassphrasebutton{
+width: 114px;
+height: 38px;
+text-align: center;
+line-height: 38px;
+position: relative;
+color: rgb(33, 40, 51);
+font-size: 14px;
+float: left;
+margin-right: 10px;
+margin-bottom: 10px;
+font-weight: 600;
+background: rgb(251, 251, 251);
+border-radius: 3px;
 }

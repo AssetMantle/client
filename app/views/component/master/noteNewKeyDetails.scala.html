@@ -8,10 +8,14 @@
 @Messages(constants.Form.BLOCKCHAIN_ADDRESS): @blockchainAddress <br/>
 @Messages(constants.Form.PUBLIC_KEY): @publicKey <br/>
 <span class="title">Please backup mnemonic</span><br/>
-@Messages(constants.Form.SEED): @for((str,i)<- seed.split(" ").zipWithIndex) {
+@Messages(constants.Form.SEED):
+<div class="cmuk-flex verifyPassphrase">@for((str,i)<- seed.split(" ").zipWithIndex) {
+    <div class="verifyPassphrasebutton">
     <span>#@i</span>
-    <div>str</div>
-}   <br/>
+    <span>str</span>
+    </div>
+}
+</div><br/>
 
 @form(action = routes.AccountController.noteNewKeyDetails(name, blockchainAddress, publicKey, seed), 'onkeypress -> "submitFormOnEnter(event,this)") {
     @CSRF.formField
