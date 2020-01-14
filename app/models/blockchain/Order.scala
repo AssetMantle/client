@@ -227,7 +227,7 @@ class Orders @Inject()(shutdownActors: ShutdownActor, masterAccounts: master.Acc
             (for {
               orderResponse <- orderResponse
               negotiation <- negotiation
-              _ <- sellerOrBuyerUpsertAssetsOrFiats(orderResponse, negotiation)
+              _ <- sellerOrBuyerUpsertAssetsOrFiats(orderResponse, negotiation, dirtyOrder)
               _ <- insertOrUpdateTraderFeedbackHistories(orderResponse, negotiation)
               _ <- insertOrUpdateOrder(orderResponse)
               (buyerAddressID, sellerAddressID) <- ids(negotiation)
