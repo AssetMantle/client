@@ -393,16 +393,6 @@ dl .info::after {
     display: inline-block;
     margin-bottom: 10px;
 }
-.cmuk-offcanvas-bar::-webkit-scrollbar{
-    width:6px;
-}
-.cmuk-offcanvas-bar:hover::-webkit-scrollbar {
-    width: 6px;
-}
-.cmuk-offcanvas-bar:hover::-webkit-scrollbar-thumb {
-    background: grey;
-    border-radius: 10px;
-}
 
 .sideBarOptions a:hover{
     text-decoration: none;
@@ -593,7 +583,7 @@ dl .info::after {
     top: -13%;
     bottom: -19px;
     border: 8px solid;
-    border-color: transparent transparent rgba(0, 0, 0, .15) transparent;
+    border-color: transparent transparent #e7eaf3 transparent;
 }
 .cmuk-navbar-dropdown::after{
     content: ' ';
@@ -606,4 +596,81 @@ dl .info::after {
     bottom: -19px;
     border: 8px solid;
     border-color: transparent transparent #fff transparent;
+}
+.notification{
+    word-break: break-all;
+    border-bottom: 1px solid #9BB7C5;
+    transition: all 1s ease-in-out;
+    background: #E2ECF0;
+}
+.notification > div{
+    padding:10px 15px;
+}
+.NotificationButton{
+    border-bottom: none;
+    padding: 10px 15px;
+}
+
+.notificationDropdown .cmuk-navbar-dropdown, .profileDropdown .cmuk-navbar-dropdown {
+    padding:0px;
+    border-radius: 0.25rem;
+    top:60px !important;
+    border:1px solid #e7eaf3;
+}
+.profileDropdown li{
+    padding: 5px 20px;
+}
+.dropdownHeader p{
+    justify-content: center;
+    text-align: center;
+    margin:0px;
+    padding: 10px;
+    border-bottom: 1px solid #e7eaf3;
+}
+
+.notificationDropdown .dropdownBody{
+    padding:0px;
+    height: 400px;
+    overflow-y: scroll;
+}
+
+.notificationDropdown .cmuk-navbar-dropdown::before{
+    left: auto;
+    right: 20px;
+    top: -5%;
+    bottom: -19px;
+    border:11px solid;
+    border-color: transparent transparent #e7eaf3 transparent;
+}
+.notificationDropdown .cmuk-navbar-dropdown::after{
+    left: auto;
+    right: 22px;
+    top: -4%;
+    bottom: -19px;
+    border: 9px solid;
+    border-color: transparent transparent #fff transparent;
+}
+
+.tablePadding tr td, .tablePadding tr th{
+    padding: 5px 12px;
+}
+.tablePadding tr th{
+    font-weight:700;
+}
+.profileDocuments{
+    display: flex;
+    flex-wrap: wrap;
+}
+.document{
+    width: 100px;
+    height: 90px;
+    border: 3px solid #1e87f0;
+    text-align: center;
+    padding: 5px;
+    margin:5px;
+}
+.documentImage img{
+    width:80px;
+    height: 50px;
+    padding: 10px 0px;
 }

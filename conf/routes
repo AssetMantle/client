@@ -395,3 +395,5 @@ POST        /blockchain/setBuyerFeedback                                 control
 
 GET         /blockchain/setSellerFeedback                                controllers.SetSellerFeedbackController.blockchainSetSellerFeedbackForm
 POST        /blockchain/setSellerFeedback                                controllers.SetSellerFeedbackController.blockchainSetSellerFeedback
+
+GET         /newPage                                                     controllers.IndexController.newPage

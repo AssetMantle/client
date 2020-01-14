@@ -2,9 +2,31 @@
 @import models.master.Organization
 
 @(organization: Organization)(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
-@Messages(constants.Form.ORGANIZATION_NAME): @organization.name <br>
-@Messages(constants.Form.ORGANIZATION_ID): @organization.id <br>
-@Messages(constants.Form.ORGANIZATION_USERNAME): @organization.accountID <br>
-@Messages(constants.Form.ESTABLISHMENT_DATE): @organization.establishmentDate <br>
-@Messages(constants.Form.EMAIL): @organization.email <br>
-@Messages(constants.Form.VERIFIED_STATUS): @organization.verificationStatus <br>
+<table class="cmuk-table">
+    <tbody class="tablePadding">
+    <tr>
+        <th>@Messages(constants.Form.ORGANIZATION_NAME):</th>
+        <td>@organization.name</td>
+    </tr>
+    <tr>
+        <th>@Messages(constants.Form.ORGANIZATION_ID):</th>
+        <td> @organization.id</td>
+    </tr>
+    <tr>
+        <th>@Messages(constants.Form.ORGANIZATION_USERNAME):</th>
+        <td> @organization.accountID</td>
+    </tr>
+    <tr>
+        <th>@Messages(constants.Form.ESTABLISHMENT_DATE):</th>
+        <td> @organization.establishmentDate</td>
+    </tr>
+    <tr>
+        <th>@Messages(constants.Form.EMAIL):</th>
+        <td>@organization.email</td>
+    </tr>
+    <tr>
+        <th>@Messages(constants.Form.VERIFIED_STATUS):</th>
+        <td> @organization.verificationStatus</td>
+    </tr>
+    </tbody>
+</table>

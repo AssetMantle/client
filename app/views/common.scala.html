@@ -8,7 +8,7 @@
         <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/class.css")">
         <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/tag.css")">
         <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/css-uk/uikit.min.css")">
-        <script src="@routes.JavaScriptRoutesController.javascriptRoutes" type="text/javascript" ></script>
+        <script src="@routes.JavaScriptRoutesController.javascriptRoutes" type="text/javascript" >  </script>
         <script src="@routes.Assets.versioned("javascripts/jQuery.min.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/firebase.js")" type="text/javascript"></script>
         <script src="@routes.Assets.versioned("javascripts/cookie.js")" type="text/javascript"></script>
@@ -70,15 +70,29 @@
                                     }
                                     case _ => {}
                                 }
-                                <li>
-                                    <a onclick="getForm(jsRoutes.controllers.NotificationController.notificationPage(0))">
+                                <li class="notificationDropdown">
+                                    <a href="#" onclick="componentResource('notificationContainer', jsRoutes.controllers.NotificationController.notificationPage(0))">
                                         @Messages(constants.Form.INBOX)
-                                    <span class="cmuk-badge" id="notificationBadge">0</span>
                                     </a>
+                                    <div class="cmuk-navbar-dropdown cmuk-animation-fade">
+                                        <div class="dropdownHeader">
+                                            <p class="cmuk-text-bold">Notifications <span class="cmuk-badge" id="notificationBadge">0</span></p>
+                                        </div>
+                                        <div class="dropdownBody">
+                                        <ul id="notificationContainer" class="cmuk-nav cmuk-navbar-dropdown-nav notificationContainer">
+                                        </ul>
+                                        </div>
+                                    </div>
                                 </li>
-                                <li>
-                                    <a href="#">@loginState.username</a>
+                                <li class="profileDropdown">
+                                    <a href="#"><span cmuk-icon="user"></span><span cmuk-icon="triangle-down"></span></a>
                                     <div class="cmuk-navbar-dropdown">
+                                        <div class="dropdownHeader">
+                                            <p class="cmuk-text-bold">
+                                                @loginState.username
+                                            </p>
+                                        </div>
+                                        <div class="dropdownBody">
                                         <ul class="cmuk-nav cmuk-navbar-dropdown-nav">
                                             <li>
                                                 <a href="@controllers.routes.ViewController.profile()">
@@ -93,6 +107,7 @@
                                                 </a>
                                             </li>
                                         </ul>
+                                        </div>
                                     </div>
                                 </li>
                             }

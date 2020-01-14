@@ -1,7 +1,7 @@
 html, body {
     height: 100%;
     font-size: 0.8125rem;
-    background: #f4f4f4;
+    background: #f8f9fa;
 }
 
 input, select {
@@ -33,4 +33,19 @@ button:hover {
 }
 label{
     display: none !important;
+}
+
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+    -webkit-border-radius: 10px;
+    border-radius: 10px;
+    background: grey;
+    -webkit-box-shadow: none;
+}
+::-webkit-scrollbar-thumb:window-inactive {
+    background:grey;
 }
