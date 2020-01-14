@@ -191,6 +191,7 @@ class Orders @Inject()(shutdownActors: ShutdownActor, masterAccounts: master.Acc
               } else Future (Unit)
             }
 
+
             def insertOrUpdateTraderFeedbackHistories(orderResponse: queries.responses.OrderResponse.Response, negotiation: Negotiation): Future[Unit] = {
               if (orderResponse.value.awbProofHash != "" && orderResponse.value.fiatProofHash != "") {
                 val insertOrUpdateSellerFeedbackHistories = blockchainTraderFeedbackHistories.Service.insertOrUpdate(negotiation.sellerAddress, negotiation.buyerAddress, negotiation.sellerAddress, negotiation.assetPegHash, rating = "")

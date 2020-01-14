@@ -1,0 +1,165 @@
+@import controllers.actions.LoginState
+@import views.html.component.blockchain._
+@(failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+
+@common(Messages(constants.Form.INDEX), failures, warnings, successes, infos)(Html(""))(center)(Html(""))
+
+@center = {
+    <div class="bannerContainer">
+        <div class="cmuk-container cmuk-flex">
+            <div class="bannerText">
+                <h2>The Future of Commodity Trading is Here</h2>
+                <p>Comdex is an ecosystem with Traders, Financiers and Underwriters under one platform.</p>
+                <div class="bannerButtons cmuk-flex">
+                    <button class="cmuk-button cmuk-button-primary">SELL</button>
+                    <button class="cmuk-button cmuk-button-default">BUY</button>
+                </div>
+            </div>
+            <div class="bannerImage">
+                <img src="@routes.Assets.versioned("images/bannerImage.svg")">
+            </div>
+        </div>
+
+    </div>
+    <div cmuk-slider>
+        <div class="cmuk-container">
+            <div class="cmuk-slider-container">
+                <marquee>
+                    <ul class="cmuk-slider-items cmuk-child-width-1-5">
+                        <li>
+                            <span class="sliderItemName">WHEAT</span> <span class="sliderItemValue">$14,000 m/t</span>
+                            <span class="sliderItemPercentage">+4.5%</span>
+                        </li>
+                        <li>
+                            <span class="sliderItemName">WHEAT</span> <span class="sliderItemValue">$14,000 m/t</span>
+                            <span class="sliderItemPercentage">+4.5%</span>
+                        </li>
+                        <li>
+                            <span class="sliderItemName">WHEAT</span> <span class="sliderItemValue">$14,000 m/t</span>
+                            <span class="sliderItemPercentage">+4.5%</span>
+                        </li>
+                        <li>
+                            <span class="sliderItemName">WHEAT</span> <span class="sliderItemValue">$14,000 m/t</span>
+                            <span class="sliderItemPercentage">+4.5%</span>
+                        </li>
+                        <li>
+                            <span class="sliderItemName">WHEAT</span> <span class="sliderItemValue">$14,000 m/t</span>
+                            <span class="sliderItemPercentage">+4.5%</span>
+                        </li>
+                        <li>
+                            <span class="sliderItemName">WHEAT</span> <span class="sliderItemValue">$14,000 m/t</span>
+                            <span class="sliderItemPercentage">+4.5%</span>
+                        </li>
+                        <li>
+                            <span class="sliderItemName">WHEAT</span> <span class="sliderItemValue">$14,000 m/t</span>
+                            <span class="sliderItemPercentage">+4.5%</span>
+                        </li>
+                    </ul>
+                </marquee>
+            </div>
+        </div>
+    </div>
+
+    <div class="cmuk-container headingSection">
+        <p class="cmuk-padding-large">Lorem ipsum dolor sit amet, consectetur $2,785,511, sed do eiusmod tempor
+            incididunt
+            ut 7500 et dolore magna 34. Ut enim.</p>
+    </div>
+
+    <div class="tabsSection">
+        <div class="cmuk-container">
+            <div class="cmuk-padding-large cmuk-padding-remove-left cmuk-padding-remove-right">
+                <h2>The value of Comdex</h2>
+                <div class="tabs">
+                    <div cmuk-grid>
+                        <div class="verticalDataTabs">
+
+                            <ul class="cmuk-nav cmuk-nav-default cmuk-width-auto@@m"
+                            cmuk-switcher="connect: #component-nav; animation: cmuk-animation-fade">
+                                <li class=""><a href="#">Traders <span cmuk-icon="chevron-right"></span></a>
+                                </li>
+                                <li class=""><a href="#">Financiars <span cmuk-icon="chevron-right"></span></a></li>
+                                <li class=""><a href="#">Underwriters <span cmuk-icon="chevron-right"></span></a></li>
+                            </ul>
+
+                        </div>
+                        <div class="verticalDataTabsContent cmuk-width-expand@@m">
+
+                            <ul id="component-nav" class="cmuk-switcher">
+                                <li>
+                                    <div class="verticalDataTabsData">
+                                        <div class="cmuk-width-1-1@@s">
+                                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+                                                tempor
+                                                incididunt ut labore et dolore magna aliqua.Lorem ipsum dolor sit amet,
+                                                consectetur adipiscing elit, sed do eiusmod tempor
+                                                incididunt ut labore et dolore magna aliqua.</p>
+                                        </div>
+                                        <div class="cmuk-width-1-1@@s">
+                                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+                                                tempor
+                                                incididunt ut labore et dolore magna aliqua.Lorem ipsum dolor sit amet,
+                                                consectetur adipiscing elit, sed do eiusmod tempor
+                                                incididunt ut labore et dolore magna aliqua.</p>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="verticalDataTabsData">
+                                        <div>
+                                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+                                                tempor
+                                                sed do eiusmod tempor
+                                                incididunt ut labore et dolore magna aliqua.</p>
+                                        </div>
+                                        <div>
+                                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+                                                tempor.</p>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="verticalDataTabsData">
+                                        <div>
+                                            <p>Lorem ipsum dolor sit amet, et dolore magna aliqua.Lorem ipsum dolor sit
+                                                amet,
+                                                consectetur adipiscing elit, sed do eiusmod tempor
+                                                incididunt ut labore et dolore magna aliqua.</p>
+                                        </div>
+                                        <div>
+                                            <p>Lorem ipsum dolor sit amet sed do eiusmod tempor
+                                                incididunt ut labore et dolore magna aliqua.</p>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="contactSetion">
+        <div class="cmuk-container">
+            <div class="cmuk-padding-large cmuk-padding-remove-left cmuk-padding-remove-right">
+                <div>
+                    <div cmuk-grid class="cmuk-child-width-1-1 cmuk-child-width-1-4@@m">
+                        <h3>Contact Us</h3>
+                        <div>
+                            <input type="text" class="cmuk-input cmuk-form-width-medium " placeholder="Email">
+                        </div>
+                        <div>
+                            <input type="text" class="cmuk-input cmuk-form-width-medium " placeholder="Message">
+                        </div>
+                        <div>
+                            <input type="submit" class="cmuk-button cmuk-width-small " value="send">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+

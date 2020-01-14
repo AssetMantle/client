@@ -83,7 +83,6 @@ class AccountController @Inject()(
     )
   }
 
-
   def loginForm: Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.master.login())
   }
