@@ -2,7 +2,7 @@ package constants
 
 import java.util.Date
 
-import play.api.data.Forms.{date, number, of, text, boolean}
+import play.api.data.Forms.{boolean, date, number, of, text}
 import play.api.data.Mapping
 import play.api.data.format.Formats._
 import play.api.data.validation.Constraints
@@ -91,6 +91,7 @@ object FormField {
   val SEARCH_TX_HASH_HEIGHT = new StringFormField("SEARCH_TX_HASH_HEIGHT", 1, 1000)
   val DOCUMENT_TYPE = new StringFormField("DOCUMENT_TYPE", 2, 500)
   val FILE_ID = new StringFormField("FILE_ID", 2, 500)
+  val PASSPHRASE_ELEMENT = new StringFormField("PASSPHRASE_ELEMENT", 2, 20, RegularExpression.ALL_LETTERS)
 
   //SelectFormField
   val ASSET_TYPE = new SelectFormField("ASSET_TYPE", constants.SelectFieldOptions.ASSET_TYPES)

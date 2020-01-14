@@ -1,0 +1,10 @@
+@@@import controllers.actions.LoginState
+@import views.companion.master.VerifyPassphrase
+@import views.html.base._
+
+@(verifyOrganizationForm: Form[VerifyPassphrase.Data] = VerifyPassphrase.form, seed: String,randomSeq: Seq[Int])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@commonForm(constants.Form.VERIFY_ORGANIZATION, verifyOrganizationForm) {
+    @commonInputText(verifyOrganizationForm, constants.FormField.PASSPHRASE_ELEMENT)
+    @commonInputText(verifyOrganizationForm, constants.FormField.PASSPHRASE_ELEMENT)
+    @commonInputText(verifyOrganizationForm, constants.FormField.PASSPHRASE_ELEMENT)
+}
