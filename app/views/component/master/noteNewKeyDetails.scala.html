@@ -4,21 +4,23 @@
 
 @(noteNewKeyDetailsForm: Form[NoteNewKeyDetails.Data] = NoteNewKeyDetails.form, name: String, blockchainAddress: String, publicKey: String, seed: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 
-@Messages(constants.Form.NAME): @name <br/>
-@Messages(constants.Form.BLOCKCHAIN_ADDRESS): @blockchainAddress <br/>
-@Messages(constants.Form.PUBLIC_KEY): @publicKey <br/>
+<span>@Messages(constants.Form.NAME): @name </span><br/>
+<span>@Messages(constants.Form.BLOCKCHAIN_ADDRESS): @blockchainAddress</span><br/>
+    <span>@Messages(constants.Form.PUBLIC_KEY): @publicKey</span> <br/>
 <span class="title">Please backup mnemonic</span><br/>
 @Messages(constants.Form.SEED):
 <div class="cmuk-flex verifyPassphrase">@for((str,i)<- seed.split(" ").zipWithIndex) {
     <div class="verifyPassphrasebutton">
-    <span>#@i</span>
-    <span>str</span>
+    <span class="index">#@i</span>
+    <span>@str</span>
     </div>
 }
 </div><br/>
 
 @form(action = routes.AccountController.noteNewKeyDetails(name, blockchainAddress, publicKey, seed), 'onkeypress -> "submitFormOnEnter(event,this)") {
     @CSRF.formField
+    <div class="cmuk-flex">
     @commonCheckbox(noteNewKeyDetailsForm, constants.FormField.CONFIRM_NOTE_NEW_KEY_DETAILS)
+    </div>
     <button type="button" class="cmuk-button cmuk-button-primary" onclick="submitForm(this)">@Messages(constants.Form.NOTE_NEW_KEY_DETAILS)</button>
 }

@@ -270,7 +270,7 @@ body::-webkit-scrollbar-thumb {
     min-width: 500px;
     max-width: 1000px;
     overflow-y:auto;
-    max-height: 450px;
+    max-height: 600px;
 }
 dl {
     position: relative;
@@ -319,4 +319,14 @@ margin-bottom: 10px;
 font-weight: 600;
 background: rgb(251, 251, 251);
 border-radius: 3px;
+}
+
+
+.verifyPassphrasebutton .index{
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    color: rgb(132, 142, 156);
+    font-size: 12px;
+    line-height: 12px;
 }
