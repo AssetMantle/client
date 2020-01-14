@@ -85,9 +85,11 @@ class AccountController @Inject()(
     )
   }
 
+  def noteNewKeyDetailsView(name: String, blockchainAddress: String, publicKey: String, seed: String): Action[AnyContent] = Action { implicit request =>
+    PartialContent(views.html.component.master.noteNewKeyDetails(name = name, blockchainAddress = blockchainAddress, publicKey = publicKey, seed = seed))
+  }
+
   def verifyPassphrase: Action[AnyContent] = Action { implicit request =>
-
-
     Ok(views.html.component.master.login())
   }
 
@@ -338,8 +340,8 @@ class AccountController @Inject()(
           val seqSeed=seed.split(" ")
           val length=seqSeed.length
           val randomSeq=Seq.fill(3)(Random.nextInt(length))
-
-          Ok(views.html.indexVersion3(successes = Seq(constants.Response.SIGNED_UP)))
+         // PartialContent(views.html.component.master.verifyOrganization)
+          Ok(views.html.component.master.verifyPassphrase(views.companion.master.VerifyPassphrase.form,name,blockchainAddress,publicKey,seed,randomSeq))
         }
         else {
           BadRequest(views.html.component.master.noteNewKeyDetails(name = name, blockchainAddress = blockchainAddress, publicKey = publicKey, seed = seed))

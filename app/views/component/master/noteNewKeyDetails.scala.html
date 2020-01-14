@@ -10,7 +10,7 @@
 <span class="title">Please backup mnemonic</span><br/>
 @Messages(constants.Form.SEED): @for((str,i)<- seed.split(" ").zipWithIndex) {
     <span>#@i</span>
-    <div>str</div>
+    <div>@str</div>
 }   <br/>
 
 @form(action = routes.AccountController.noteNewKeyDetails(name, blockchainAddress, publicKey, seed), 'onkeypress -> "submitFormOnEnter(event,this)") {

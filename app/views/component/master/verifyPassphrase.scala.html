@@ -1,10 +1,11 @@
-@@@import controllers.actions.LoginState
+@import controllers.actions.LoginState
 @import views.companion.master.VerifyPassphrase
 @import views.html.base._
 
-@(verifyOrganizationForm: Form[VerifyPassphrase.Data] = VerifyPassphrase.form, seed: String,randomSeq: Seq[Int])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@(verifyOrganizationForm: Form[VerifyPassphrase.Data] = VerifyPassphrase.form,name: String, blockchainAddress: String, publicKey: String, seed: String,randomSeq: Seq[Int])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 @commonForm(constants.Form.VERIFY_ORGANIZATION, verifyOrganizationForm) {
     @commonInputText(verifyOrganizationForm, constants.FormField.PASSPHRASE_ELEMENT)
     @commonInputText(verifyOrganizationForm, constants.FormField.PASSPHRASE_ELEMENT)
     @commonInputText(verifyOrganizationForm, constants.FormField.PASSPHRASE_ELEMENT)
+    <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.AccountController.noteNewKeyDetailsView(@name,@blockchainAddress,@publicKey,@seed))">@Messages(constants.Form.BACK)</button>
 }
