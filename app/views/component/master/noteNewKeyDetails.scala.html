@@ -7,7 +7,11 @@
 @Messages(constants.Form.NAME): @name <br/>
 @Messages(constants.Form.BLOCKCHAIN_ADDRESS): @blockchainAddress <br/>
 @Messages(constants.Form.PUBLIC_KEY): @publicKey <br/>
-@Messages(constants.Form.SEED): @seed <br/>
+<span class="title">Please backup mnemonic</span><br/>
+@Messages(constants.Form.SEED): @for((str,i)<- seed.split(" ").zipWithIndex) {
+    <span>#@i</span>
+    <div>str</div>
+}   <br/>
 
 @form(action = routes.AccountController.noteNewKeyDetails(name, blockchainAddress, publicKey, seed), 'onkeypress -> "submitFormOnEnter(event,this)") {
     @CSRF.formField

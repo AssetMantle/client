@@ -15,6 +15,7 @@ import play.api.{Configuration, Logger}
 import views.companion.master.{Login, Logout, SignUp}
 
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.Random
 
 @Singleton
 class AccountController @Inject()(
@@ -74,6 +75,7 @@ class AccountController @Inject()(
           createAccount <- createAccount(addKeyResponse)
           _ <- addLogin(createAccount)
         } yield {
+          println(addKeyResponse.mnemonic)
           PartialContent(views.html.component.master.noteNewKeyDetails(name = addKeyResponse.name, blockchainAddress = addKeyResponse.address, publicKey = addKeyResponse.pubkey, seed = addKeyResponse.mnemonic))
         }).recover {
           case baseException: BaseException =>
@@ -81,6 +83,12 @@ class AccountController @Inject()(
         }
       }
     )
+  }
+
+  def verifyPassphrase: Action[AnyContent] = Action { implicit request =>
+
+
+    Ok(views.html.component.master.login())
   }
 
   def loginForm: Action[AnyContent] = Action { implicit request =>
@@ -327,7 +335,11 @@ class AccountController @Inject()(
       },
       noteNewKeyDetailsData => {
         if (noteNewKeyDetailsData.confirmNoteNewKeyDetails) {
-          Ok(views.html.index(successes = Seq(constants.Response.SIGNED_UP)))
+          val seqSeed=seed.split(" ")
+          val length=seqSeed.length
+          val randomSeq=Seq.fill(3)(Random.nextInt(length))
+
+          Ok(views.html.indexVersion3(successes = Seq(constants.Response.SIGNED_UP)))
         }
         else {
           BadRequest(views.html.component.master.noteNewKeyDetails(name = name, blockchainAddress = blockchainAddress, publicKey = publicKey, seed = seed))
