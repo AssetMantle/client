@@ -11,10 +11,11 @@ import org.postgresql.util.PSQLException
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.libs.json.{JsValue, Json}
 import play.api.{Configuration, Logger}
+import queries.responses.NegotiationResponse.Response
 import slick.jdbc.JdbcProfile
 
 import scala.concurrent.duration.{Duration, _}
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 case class Negotiation(id: String, buyerAddress: String, sellerAddress: String, assetPegHash: String, bid: String, time: String, buyerSignature: Option[String] = None, sellerSignature: Option[String] = None, buyerBlockHeight: Option[String] = None, sellerBlockHeight: Option[String] = None, buyerContractHash: Option[String] = None, sellerContractHash: Option[String] = None, dirtyBit: Boolean)
@@ -30,20 +31,16 @@ class Negotiations @Inject()(shutdownActors: ShutdownActor, masterAccounts: mast
 
   import databaseConfig.profile.api._
 
-  private val schedulerExecutionContext:ExecutionContext= actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
+  val mainNegotiationActor: ActorRef = actorSystem.actorOf(props = MainNegotiationActor.props(actorTimeout, actorSystem), name = constants.Module.ACTOR_MAIN_NEGOTIATION)
 
   private implicit val logger: Logger = Logger(this.getClass)
 
   private implicit val materializer: ActorMaterializer = ActorMaterializer()(actorSystem)
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_NEGOTIATION
-
+  private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
   private val actorTimeout = configuration.get[Int]("akka.actors.timeout").seconds
-
   private val cometActorSleepTime = configuration.get[Long]("akka.actors.cometActorSleepTime")
-
-  val mainNegotiationActor: ActorRef = actorSystem.actorOf(props = MainNegotiationActor.props(actorTimeout, actorSystem), name = constants.Module.ACTOR_MAIN_NEGOTIATION)
-
   private[models] val negotiationTable = TableQuery[NegotiationTable]
 
   private val schedulerInitialDelay = configuration.get[Int]("blockchain.kafka.transactionIterator.initialDelay").seconds
@@ -76,9 +73,9 @@ class Negotiations @Inject()(shutdownActors: ShutdownActor, masterAccounts: mast
     }
   }
 
-  private def findBuyerOrdersInZone(ids: Seq[String], addresses:Seq[String]): Future[Seq[Negotiation]] = db.run(negotiationTable.filter(_.id inSet ids).filter(_.buyerAddress inSet addresses).result)
+  private def findBuyerOrdersInZone(ids: Seq[String], addresses: Seq[String]): Future[Seq[Negotiation]] = db.run(negotiationTable.filter(_.id inSet ids).filter(_.buyerAddress inSet addresses).result)
 
-  private def findSellerOrdersInZone(ids: Seq[String], addresses:Seq[String]): Future[Seq[Negotiation]] = db.run(negotiationTable.filter(_.id inSet ids).filter(_.sellerAddress inSet addresses).result)
+  private def findSellerOrdersInZone(ids: Seq[String], addresses: Seq[String]): Future[Seq[Negotiation]] = db.run(negotiationTable.filter(_.id inSet ids).filter(_.sellerAddress inSet addresses).result)
 
   private def getIdByBuyerAddressSellerAddressAndPegHash(buyerAddress: String, sellerAddress: String, pegHash: String): Future[String] = db.run(negotiationTable.filter(_.buyerAddress === buyerAddress).filter(_.sellerAddress === sellerAddress).filter(_.assetPegHash === pegHash).map(_.id).result.head.asTry).map {
     case Success(result) => result
@@ -94,11 +91,11 @@ class Negotiations @Inject()(shutdownActors: ShutdownActor, masterAccounts: mast
 
   private def getNegotiationsByBuyerAddress(address: String): Future[Seq[Negotiation]] = db.run(negotiationTable.filter(negotiation => negotiation.buyerAddress === address).result)
 
-  private def getNegotiationsBySellerAddress(address: String): Future[Seq[Negotiation]] = db.run(negotiationTable.filter(negotiation =>  negotiation.sellerAddress === address).result)
+  private def getNegotiationsBySellerAddress(address: String): Future[Seq[Negotiation]] = db.run(negotiationTable.filter(negotiation => negotiation.sellerAddress === address).result)
 
   private def getNegotiationIDsByBuyerAddress(address: String): Future[Seq[String]] = db.run(negotiationTable.filter(negotiation => negotiation.buyerAddress === address).map(_.id).result)
 
-  private def getNegotiationIDsBySellerAddress(address: String): Future[Seq[String]] = db.run(negotiationTable.filter(negotiation =>  negotiation.sellerAddress === address).map(_.id).result)
+  private def getNegotiationIDsBySellerAddress(address: String): Future[Seq[String]] = db.run(negotiationTable.filter(negotiation => negotiation.sellerAddress === address).map(_.id).result)
 
   private def deleteNegotiationsByPegHash(pegHash: String) = db.run(negotiationTable.filter(_.assetPegHash === pegHash).delete.asTry).map {
     case Success(result) => result
@@ -174,35 +171,35 @@ class Negotiations @Inject()(shutdownActors: ShutdownActor, masterAccounts: mast
 
   object Service {
 
-    def create(id: String, buyerAddress: String, sellerAddress: String, assetPegHash: String, bid: String, time: String, buyerSignature: Option[String], sellerSignature: Option[String]): String = Await.result(add(Negotiation(id = id, buyerAddress = buyerAddress, sellerAddress = sellerAddress, assetPegHash = assetPegHash, bid = bid, time = time, buyerSignature = buyerSignature, sellerSignature = sellerSignature, dirtyBit = false)), Duration.Inf)
+    def create(id: String, buyerAddress: String, sellerAddress: String, assetPegHash: String, bid: String, time: String, buyerSignature: Option[String], sellerSignature: Option[String]): Future[String] = add(Negotiation(id = id, buyerAddress = buyerAddress, sellerAddress = sellerAddress, assetPegHash = assetPegHash, bid = bid, time = time, buyerSignature = buyerSignature, sellerSignature = sellerSignature, dirtyBit = false))
 
-    def insertOrUpdate(id: String, buyerAddress: String, sellerAddress: String, assetPegHash: String, bid: String, time: String, buyerSignature: Option[String], sellerSignature: Option[String], buyerBlockHeight: Option[String], sellerBlockHeight: Option[String], buyerContractHash: Option[String], sellerContractHash: Option[String], dirtyBit: Boolean): Int = Await.result(upsert(Negotiation(id = id, buyerAddress = buyerAddress, sellerAddress = sellerAddress, assetPegHash = assetPegHash, bid = bid, time = time, buyerSignature = buyerSignature, sellerSignature = sellerSignature, buyerBlockHeight = buyerBlockHeight, sellerBlockHeight = sellerBlockHeight, buyerContractHash = buyerContractHash, sellerContractHash = sellerContractHash, dirtyBit = dirtyBit)), Duration.Inf)
+    def insertOrUpdate(id: String, buyerAddress: String, sellerAddress: String, assetPegHash: String, bid: String, time: String, buyerSignature: Option[String], sellerSignature: Option[String], buyerBlockHeight: Option[String], sellerBlockHeight: Option[String], buyerContractHash: Option[String], sellerContractHash: Option[String], dirtyBit: Boolean): Future[Int] = upsert(Negotiation(id = id, buyerAddress = buyerAddress, sellerAddress = sellerAddress, assetPegHash = assetPegHash, bid = bid, time = time, buyerSignature = buyerSignature, sellerSignature = sellerSignature, buyerBlockHeight = buyerBlockHeight, sellerBlockHeight = sellerBlockHeight, buyerContractHash = buyerContractHash, sellerContractHash = sellerContractHash, dirtyBit = dirtyBit))
 
-    def getDirtyNegotiations: Seq[Negotiation] = Await.result(getNegotiationsByDirtyBit(dirtyBit = true), Duration.Inf)
+    def getDirtyNegotiations: Future[Seq[Negotiation]] = getNegotiationsByDirtyBit(dirtyBit = true)
 
-    def get(id: String): Negotiation = Await.result(findById(id), Duration.Inf)
+    def get(id: String): Future[Negotiation] = findById(id)
 
-    def getBuyerNegotiationsByOrderAndZone(ids:Seq[String], addresses:Seq[String]): Seq[Negotiation] = Await.result(findBuyerOrdersInZone(ids, addresses), Duration.Inf)
+    def getBuyerNegotiationsByOrderAndZone(ids: Seq[String], addresses: Seq[String]): Future[Seq[Negotiation]] = findBuyerOrdersInZone(ids, addresses)
 
-    def getSellerNegotiationsByOrderAndZone(ids:Seq[String], addresses:Seq[String]): Seq[Negotiation] = Await.result(findSellerOrdersInZone(ids, addresses), Duration.Inf)
+    def getSellerNegotiationsByOrderAndZone(ids: Seq[String], addresses: Seq[String]): Future[Seq[Negotiation]] = findSellerOrdersInZone(ids, addresses)
 
-    def markDirty(id: String): Int = Await.result(updateDirtyBitById(id, dirtyBit = true), Duration.Inf)
+    def markDirty(id: String): Future[Int] =updateDirtyBitById(id, dirtyBit = true)
 
-    def refreshDirty(id: String, bid: String, time: String, buyerSignature: Option[String], sellerSignature: Option[String], buyerBlockHeight: Option[String], sellerBlockHeight: Option[String], buyerContractHash: Option[String], sellerContractHash: Option[String]): Int = Await.result(updateNegotiationById(id = id, bid = bid, time = time, buyerSignature = buyerSignature, sellerSignature = sellerSignature, buyerBlockHeight = buyerBlockHeight, sellerBlockHeight = sellerBlockHeight, buyerContractHash = buyerContractHash, sellerContractHash = sellerContractHash, dirtyBit = false), Duration.Inf)
+    def refreshDirty(id: String, bid: String, time: String, buyerSignature: Option[String], sellerSignature: Option[String], buyerBlockHeight: Option[String], sellerBlockHeight: Option[String], buyerContractHash: Option[String], sellerContractHash: Option[String]): Future[Int] = updateNegotiationById(id = id, bid = bid, time = time, buyerSignature = buyerSignature, sellerSignature = sellerSignature, buyerBlockHeight = buyerBlockHeight, sellerBlockHeight = sellerBlockHeight, buyerContractHash = buyerContractHash, sellerContractHash = sellerContractHash, dirtyBit = false)
 
-    def getNegotiationID(buyerAddress: String, sellerAddress: String, pegHash: String): String = Await.result(getIdByBuyerAddressSellerAddressAndPegHash(buyerAddress = buyerAddress, sellerAddress = sellerAddress, pegHash = pegHash), Duration.Inf)
+    def getNegotiationID(buyerAddress: String, sellerAddress: String, pegHash: String): Future[String] = getIdByBuyerAddressSellerAddressAndPegHash(buyerAddress = buyerAddress, sellerAddress = sellerAddress, pegHash = pegHash)
 
-    def getNegotiationsForAddress(address: String): Seq[Negotiation] = Await.result(getNegotiationsByAddress(address), Duration.Inf)
+    def getNegotiationsForAddress(address: String): Future[Seq[Negotiation]] = getNegotiationsByAddress(address)
 
-    def getNegotiationsForBuyerAddress(address: String): Seq[Negotiation] = Await.result(getNegotiationsByBuyerAddress(address), Duration.Inf)
+    def getNegotiationsForBuyerAddress(address: String): Future[Seq[Negotiation]] = getNegotiationsByBuyerAddress(address)
 
-    def getNegotiationsForSellerAddress(address: String): Seq[Negotiation] = Await.result(getNegotiationsBySellerAddress(address), Duration.Inf)
+    def getNegotiationsForSellerAddress(address: String): Future[Seq[Negotiation]] = getNegotiationsBySellerAddress(address)
 
-    def getNegotiationIDsForBuyerAddress(address: String): Seq[String] = Await.result(getNegotiationIDsByBuyerAddress(address), Duration.Inf)
+    def getNegotiationIDsForBuyerAddress(address: String): Future[Seq[String]] = getNegotiationIDsByBuyerAddress(address)
 
-    def getNegotiationIDsForSellerAddress(address: String): Seq[String] = Await.result(getNegotiationIDsBySellerAddress(address), Duration.Inf)
+    def getNegotiationIDsForSellerAddress(address: String): Future[Seq[String]] = getNegotiationIDsBySellerAddress(address)
 
-    def deleteNegotiations(pegHash: String): Int = Await.result(deleteNegotiationsByPegHash(pegHash), Duration.Inf)
+    def deleteNegotiations(pegHash: String): Future[Int] = deleteNegotiationsByPegHash(pegHash)
 
     def negotiationCometSource(username: String) = {
       shutdownActors.shutdown(constants.Module.ACTOR_MAIN_NEGOTIATION, username)
@@ -214,21 +211,45 @@ class Negotiations @Inject()(shutdownActors: ShutdownActor, masterAccounts: mast
   }
 
   object Utility {
-    def dirtyEntityUpdater(): Future[Unit] = Future {
+    def dirtyEntityUpdater(): Future[Unit] = {
       val dirtyNegotiations = Service.getDirtyNegotiations
       Thread.sleep(sleepTime)
-      for (dirtyNegotiation <- dirtyNegotiations) {
-        try {
-          val negotiationResponse = getNegotiation.Service.get(dirtyNegotiation.id)
-          Service.refreshDirty(id = negotiationResponse.value.negotiationID, bid = negotiationResponse.value.bid, time = negotiationResponse.value.time, buyerSignature = negotiationResponse.value.buyerSignature, sellerSignature = negotiationResponse.value.sellerSignature, buyerBlockHeight = negotiationResponse.value.buyerBlockHeight, sellerBlockHeight = negotiationResponse.value.sellerBlockHeight, buyerContractHash = negotiationResponse.value.buyerContractHash, sellerContractHash = negotiationResponse.value.sellerContractHash)
-          mainNegotiationActor ! NegotiationCometMessage(username = masterAccounts.Service.getId(dirtyNegotiation.sellerAddress), message = Json.toJson(constants.Comet.PING))
-          mainNegotiationActor ! NegotiationCometMessage(username = masterAccounts.Service.getId(dirtyNegotiation.buyerAddress), message = Json.toJson(constants.Comet.PING))
-        }
-        catch {
-          case baseException: BaseException => logger.error(baseException.failure.message, baseException)
+
+      def refreshDirtyAndSendCometMessage(dirtyNegotiations: Seq[Negotiation]): Future[Seq[Unit]] = {
+        Future.sequence {
+          dirtyNegotiations.map { dirtyNegotiation =>
+            val negotiationResponse = getNegotiation.Service.get(dirtyNegotiation.id)
+
+            def refreshDirty(negotiationResponse: Response): Future[Int] = Service.refreshDirty(id = negotiationResponse.value.negotiationID, bid = negotiationResponse.value.bid, time = negotiationResponse.value.time, buyerSignature = negotiationResponse.value.buyerSignature, sellerSignature = negotiationResponse.value.sellerSignature, buyerBlockHeight = negotiationResponse.value.buyerBlockHeight, sellerBlockHeight = negotiationResponse.value.sellerBlockHeight, buyerContractHash = negotiationResponse.value.buyerContractHash, sellerContractHash = negotiationResponse.value.sellerContractHash)
+
+            def getIDs(dirtyNegotiation: Negotiation): Future[(String, String)] = {
+              val sellerAddressID = masterAccounts.Service.getId(dirtyNegotiation.sellerAddress)
+              val buyerAddressID = masterAccounts.Service.getId(dirtyNegotiation.buyerAddress)
+              for {
+                sellerAddressID <- sellerAddressID
+                buyerAddressID <- buyerAddressID
+              } yield (sellerAddressID, buyerAddressID)
+            }
+
+            (for {
+              negotiationResponse <- negotiationResponse
+              _ <- refreshDirty(negotiationResponse)
+              (sellerAddressID, buyerAddressID) <- getIDs(dirtyNegotiation)
+            } yield {
+              mainNegotiationActor ! NegotiationCometMessage(username = sellerAddressID, message = Json.toJson(constants.Comet.PING))
+              mainNegotiationActor ! NegotiationCometMessage(username = buyerAddressID, message = Json.toJson(constants.Comet.PING))
+            }).recover {
+              case baseException: BaseException => logger.error(baseException.failure.message, baseException)
+            }
+          }
         }
       }
-    }(schedulerExecutionContext)
+
+      (for {
+        dirtyNegotiations <- dirtyNegotiations
+        _ <- refreshDirtyAndSendCometMessage(dirtyNegotiations)
+      } yield {}) (schedulerExecutionContext)
+    }
   }
 
   actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {

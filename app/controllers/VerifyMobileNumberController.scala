@@ -5,12 +5,13 @@ import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import models.master
+import models.master.Contact
 import models.masterTransaction.SMSOTPs
 import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class VerifyMobileNumberController @Inject()(messagesControllerComponents: MessagesControllerComponents, masterAccounts: master.Accounts, smsOTPs: SMSOTPs, masterContacts: master.Contacts, withLoginAction: WithLoginAction, utilitiesNotification: utilities.Notification, withUsernameToken: WithUsernameToken)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
@@ -21,12 +22,15 @@ class VerifyMobileNumberController @Inject()(messagesControllerComponents: Messa
 
   def verifyMobileNumberForm: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      try {
-        val otp = smsOTPs.Service.sendOTP(loginState.username)
+      val otp = smsOTPs.Service.sendOTP(loginState.username)
+      def sendNotificationAndGetResult(otp:String)={
         utilitiesNotification.send(accountID = loginState.username, notification = constants.Notification.VERIFY_PHONE, otp)
         withUsernameToken.Ok(views.html.component.master.verifyMobileNumber())
       }
-      catch {
+      (for {
+        otp <- otp
+        result<-sendNotificationAndGetResult(otp)
+      } yield result).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
@@ -35,21 +39,30 @@ class VerifyMobileNumberController @Inject()(messagesControllerComponents: Messa
     implicit request =>
       views.companion.master.VerifyMobileNumber.form.bindFromRequest().fold(
         formWithErrors => {
-          BadRequest(views.html.component.master.verifyMobileNumber(formWithErrors))
+          Future (BadRequest(views.html.component.master.verifyMobileNumber(formWithErrors)))
         },
         verifyMobileNumberData => {
-          try {
-            smsOTPs.Service.verifyOTP(loginState.username, verifyMobileNumberData.otp)
-            masterContacts.Service.verifyMobileNumber(loginState.username)
-            val contact = masterContacts.Service.getContact(loginState.username).getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION))
+          val verifyOTP = smsOTPs.Service.verifyOTP(loginState.username, verifyMobileNumberData.otp)
+          val verifyMobileNumber = masterContacts.Service.verifyMobileNumber(loginState.username)
+
+          def contact: Future[Contact] = masterContacts.Service.getContact(loginState.username).map { contactVal => contactVal.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)) }
+
+          def updateStatus(contact: Contact): Future[Int] = {
             if (contact.emailAddressVerified && contact.mobileNumberVerified) {
               masterAccounts.Service.updateStatusComplete(loginState.username)
             } else {
               masterAccounts.Service.updateStatusUnverifiedEmail(loginState.username)
             }
-            withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.SUCCESS)))
           }
-          catch {
+
+          (for {
+            _ <- verifyOTP
+            _ <- verifyMobileNumber
+            contact <- contact
+            _ <- updateStatus(contact)
+            result<-withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.SUCCESS)))
+          } yield result
+            ).recover {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
         }

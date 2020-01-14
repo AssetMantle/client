@@ -27,7 +27,7 @@ class MainAccountActor @Inject()(actorTimeout: FiniteDuration, actorSystem: Acto
 
   private implicit val module: String = constants.Module.ACTOR_MAIN_ACCOUNT
 
-  def receive = {
+  def receive: PartialFunction[Any, Unit] = {
     case accountCometMessage: blockchain.AccountCometMessage =>
       actorSystem.actorSelection("/user/" + constants.Module.ACTOR_MAIN_ACCOUNT + "/" + accountCometMessage.username).resolveOne().onComplete {
         case Success(actorRef) => logger.info(module + " " + accountCometMessage.username + ": " + accountCometMessage.message)

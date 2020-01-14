@@ -7,8 +7,7 @@ import play.api.Logger
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.JdbcProfile
 
-import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Random, Success}
 
 case class SMSOTP(id: String, secretHash: String)
@@ -72,15 +71,21 @@ class SMSOTPs @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
 
   object Service {
 
-    def sendOTP(id: String): String = {
+    def sendOTP(id: String): Future[String] = {
       val otp = (Random.nextInt(899999) + 100000).toString
-      Await.result(upsert(SMSOTP(id, util.hashing.MurmurHash3.stringHash(otp).toString)), Duration.Inf)
-      otp
+      val upsertOtp = upsert(SMSOTP(id, util.hashing.MurmurHash3.stringHash(otp).toString))
+      for {
+        _ <- upsertOtp
+      } yield otp
+
     }
 
-    def verifyOTP(id: String, otp: String): Boolean = {
-      if (Await.result(findById(id), Duration.Inf).secretHash != util.hashing.MurmurHash3.stringHash(otp).toString) throw new BaseException(constants.Response.INVALID_OTP)
-      true
+    def verifyOTP(id: String, otp: String): Future[Boolean] = {
+      val smsOTP = findById(id)
+      for {
+        smsOTP <- smsOTP
+      } yield if (smsOTP.secretHash != util.hashing.MurmurHash3.stringHash(otp).toString) throw new BaseException(constants.Response.INVALID_OTP) else true
+
     }
 
   }

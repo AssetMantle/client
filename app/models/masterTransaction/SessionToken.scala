@@ -81,7 +81,7 @@ class SessionTokens @Inject()(actorSystem: ActorSystem, shutdownActors: Shutdown
   }
 
   private def getSessionTimedOutIDs: Future[Seq[String]] = db.run(sessionTokenTable.filter(_.sessionTokenTime < DateTime.now(DateTimeZone.UTC).getMillis - sessionTokenTimeout).map(_.id).result)
-  
+
   private def deleteByID(id: String) = db.run(sessionTokenTable.filter(_.id === id).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -116,41 +116,55 @@ class SessionTokens @Inject()(actorSystem: ActorSystem, shutdownActors: Shutdown
 
   object Service {
 
-    def refresh(id: String): String = {
-      val sessionToken: String = utilities.IDGenerator.hexadecimal
-      Await.result(upsert(SessionToken(id, util.hashing.MurmurHash3.stringHash(sessionToken).toString, DateTime.now(DateTimeZone.UTC).getMillis)), Duration.Inf)
-      sessionToken
+    def refresh(id: String): Future[String] = {
+        val sessionToken: String = utilities.IDGenerator.hexadecimal
+        val upsertToken=upsert(SessionToken(id, util.hashing.MurmurHash3.stringHash(sessionToken).toString, DateTime.now(DateTimeZone.UTC).getMillis))
+        for{
+          _<-upsertToken
+        }yield sessionToken
     }
 
-    def tryVerifyingSessionToken(id: String, sessionToken: String): Boolean = {
-      if (Await.result(getSessionTokenHashByID(id), Duration.Inf) == util.hashing.MurmurHash3.stringHash(sessionToken).toString) true
-      else throw new BaseException(constants.Response.INVALID_TOKEN)
+    def tryVerifyingSessionToken(id: String, sessionToken: String): Future[Boolean] = {
+      getSessionTokenHashByID(id).map { token =>
+        if (token == util.hashing.MurmurHash3.stringHash(sessionToken).toString) true
+        else throw new BaseException(constants.Response.INVALID_TOKEN)
+      }
     }
 
-    def tryVerifyingSessionTokenTime(id: String): Boolean = {
-      if (DateTime.now(DateTimeZone.UTC).getMillis - Await.result(getSessionTokenTimeByID(id), Duration.Inf) < sessionTokenTimeout) true
-      else throw new BaseException(constants.Response.TOKEN_TIMEOUT)
+    def tryVerifyingSessionTokenTime(id: String): Future[Boolean] = {
+      getSessionTokenTimeByID(id).map { sessionToken =>
+        if (DateTime.now(DateTimeZone.UTC).getMillis - sessionToken < sessionTokenTimeout) true
+        else throw new BaseException(constants.Response.TOKEN_TIMEOUT)
+      }
     }
 
-    def getTimedOutIDs: Seq[String] = Await.result(getSessionTimedOutIDs, Duration.Inf)
+    def getTimedOutIDs: Future[Seq[String]] = getSessionTimedOutIDs
 
-    def delete(id: String): Int = Await.result(deleteByID(id), Duration.Inf)
+    def delete(id: String): Future[Int] = deleteByID(id)
 
-    def deleteSessionTokens(ids: Seq[String]): Int = Await.result(deleteByIDs(ids), Duration.Inf)
+    def deleteSessionTokens(ids: Seq[String]): Future[Int] = deleteByIDs(ids)
   }
 
   actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {
     val ids = Service.getTimedOutIDs
-    ids.foreach { id =>
-      shutdownActors.shutdown(constants.Module.ACTOR_MAIN_ACCOUNT, id)
+
+    def filterIDs(ids: Seq[String]) = masterAccounts.Service.filterTraderIDs(ids)
+
+    for {
+      ids <- ids
+      filterIDs <- filterIDs(ids)
+    } yield {
+      ids.foreach { id =>
+        shutdownActors.shutdown(constants.Module.ACTOR_MAIN_ACCOUNT, id)
+      }
+      filterIDs.foreach { id =>
+        shutdownActors.shutdown(constants.Module.ACTOR_MAIN_ASSET, id)
+        shutdownActors.shutdown(constants.Module.ACTOR_MAIN_FIAT, id)
+        shutdownActors.shutdown(constants.Module.ACTOR_MAIN_NEGOTIATION, id)
+        shutdownActors.shutdown(constants.Module.ACTOR_MAIN_ORDER, id)
+      }
+      Service.deleteSessionTokens(ids)
     }
-    masterAccounts.Service.filterTraderIDs(ids).foreach { id =>
-      shutdownActors.shutdown(constants.Module.ACTOR_MAIN_ASSET, id)
-      shutdownActors.shutdown(constants.Module.ACTOR_MAIN_FIAT, id)
-      shutdownActors.shutdown(constants.Module.ACTOR_MAIN_NEGOTIATION, id)
-      shutdownActors.shutdown(constants.Module.ACTOR_MAIN_ORDER, id)
-    }
-    Service.deleteSessionTokens(ids)
-  }(schedulerExecutionContext)
+  }
 }
 

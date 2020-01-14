@@ -13,7 +13,7 @@
                 case constants.Status.Asset.INCOMPLETE_DETAILS => {
                     <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.IssueAssetController.issueAssetDetailForm('@asset.id'))">@Messages(constants.Form.ISSUE_ASSET_REQUEST.legend)</button>
                 }
-                case constants.Status.Asset.LISTED_FOR_TRADE | constants.Status.Asset.UNDER_NEGOTIATION => {
+                case constants.Status.Asset.LISTED_FOR_TRADE | constants.Status.Asset.UNDER_NEGOTIATION | constants.Status.Asset.COMPLETED_TRADE => {
                     <div class="centerText" >
                     @loginState.acl match {
                         case Some(acl) => {

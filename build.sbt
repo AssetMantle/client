@@ -50,4 +50,3 @@ libraryDependencies += "com.sksamuel.scrimage" %% "scrimage-filters" % "2.1.8"
 
 libraryDependencies += "commons-codec" % "commons-codec" % "1.11"
 
-      

@@ -10,7 +10,7 @@ import queries.GetOrganization
 import slick.jdbc.JdbcProfile
 
 import scala.concurrent.duration.{Duration, _}
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 case class Organization(id: String, address: String, dirtyBit: Boolean)
@@ -22,7 +22,7 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
 
   val db = databaseConfig.db
 
-  private val schedulerExecutionContext:ExecutionContext= actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
+  private val schedulerExecutionContext: ExecutionContext = actorSystem.dispatchers.lookup("akka.actors.scheduler-dispatcher")
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -106,31 +106,45 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
 
   object Service {
 
-    def create(id: String, address: String, dirtyBit: Boolean): String = Await.result(add(Organization(id = id, address = address, dirtyBit = dirtyBit)), Duration.Inf)
+    def create(id: String, address: String, dirtyBit: Boolean): Future[String] = add(Organization(id = id, address = address, dirtyBit = dirtyBit))
 
-    def getAddress(id: String): String = Await.result(getAddressById(id), Duration.Inf)
+    def getAddress(id: String): Future[String] = getAddressById(id)
 
-    def getID(address: String): String = Await.result(getIdByAddress(address), Duration.Inf)
+    def getID(address: String): Future[String] = getIdByAddress(address)
 
-    def getDirtyOrganizations: Seq[Organization] = Await.result(getOrganizationsByDirtyBit(dirtyBit = true), Duration.Inf)
+    def getDirtyOrganizations: Future[Seq[Organization]] = getOrganizationsByDirtyBit(dirtyBit = true)
 
-    def refreshDirty(id: String, address: String): Int = Await.result(updateAddressAndDirtyBitByID(id, address, dirtyBit = false), Duration.Inf)
+    def refreshDirty(id: String, address: String): Future[Int] = updateAddressAndDirtyBitByID(id, address, dirtyBit = false)
   }
 
   object Utility {
-    def dirtyEntityUpdater(): Future[Unit] = Future {
+    def dirtyEntityUpdater(): Future[Unit] = {
       val dirtyOrganizations = Service.getDirtyOrganizations
       Thread.sleep(sleepTime)
-      for (dirtyOrganization <- dirtyOrganizations) {
-        try {
-          val responseAddress = getOrganization.Service.get(dirtyOrganization.id)
-          Service.refreshDirty(dirtyOrganization.id, responseAddress.address)
-        }
-        catch {
-          case baseException: BaseException => logger.error(baseException.failure.message, baseException)
+
+      def refreshDirtyOrganizations(dirtyOrganizations: Seq[Organization]): Future[Seq[Any]] = {
+        Future.sequence {
+          dirtyOrganizations.map { dirtyOrganization =>
+            val responseAddress = getOrganization.Service.get(dirtyOrganization.id)
+
+            def refreshDirty(responseAddress: queries.responses.OrganizationResponse.Response): Future[Int] = Service.refreshDirty(dirtyOrganization.id, responseAddress.address)
+
+            (for {
+              responseAddress <- responseAddress
+              _ <- refreshDirty(responseAddress)
+            } yield Unit
+              ).recover {
+              case baseException: BaseException => logger.error(baseException.failure.message, baseException)
+            }
+          }
         }
       }
-    }(schedulerExecutionContext)
+
+      (for {
+        dirtyOrganizations <- dirtyOrganizations
+        _ <- refreshDirtyOrganizations(dirtyOrganizations)
+      } yield {}) (schedulerExecutionContext)
+    }
   }
 
   actorSystem.scheduler.schedule(initialDelay = schedulerInitialDelay, interval = schedulerInterval) {

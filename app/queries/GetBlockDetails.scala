@@ -8,8 +8,7 @@ import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
 import queries.responses.BlockDetailsResponse.Response
 
-import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class GetBlockDetails @Inject()()(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
@@ -28,13 +27,11 @@ class GetBlockDetails @Inject()()(implicit wsClient: WSClient, configuration: Co
 
   private val url = ip + ":" + port + "/"
 
-  private def action(minimumHeight: Int, maximumHeight: Int): Future[Response] = wsClient.url(url + minimumHeightQuery + minimumHeight.toString + maximumHeightQuery + maximumHeight.toString).get.map { response => utilities.JSON.getResponseFromJson[Response](response)}
+  private def action(minimumHeight: Int, maximumHeight: Int): Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(url + minimumHeightQuery + minimumHeight.toString + maximumHeightQuery + maximumHeight.toString).get)
 
   object Service {
 
-    def get(minimumHeight: Int, maximumHeight: Int): Response = try {
-      Await.result(action(minimumHeight = minimumHeight, maximumHeight = maximumHeight), Duration.Inf)
-    } catch {
+    def get(minimumHeight: Int, maximumHeight: Int): Future[Response] = action(minimumHeight = minimumHeight, maximumHeight = maximumHeight).recover {
       case connectException: ConnectException => logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
         throw new BaseException(constants.Response.CONNECT_EXCEPTION)
     }

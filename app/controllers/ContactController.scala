@@ -11,7 +11,7 @@ import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerC
 import play.api.{Configuration, Logger}
 import views.companion.master.UpdateContact
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class ContactController @Inject()(messagesControllerComponents: MessagesControllerComponents, masterContacts: master.Contacts, withLoginAction: WithLoginAction, masterAccounts: master.Accounts, withUsernameToken: WithUsernameToken)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
@@ -30,14 +30,19 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
     implicit request =>
       UpdateContact.form.bindFromRequest().fold(
         formWithErrors => {
-          BadRequest(views.html.component.master.updateContact(formWithErrors))
+          Future (BadRequest(views.html.component.master.updateContact(formWithErrors)))
         },
         updateContactData => {
-          try {
-            masterContacts.Service.insertOrUpdateContact(loginState.username, updateContactData.countryCode + updateContactData.mobileNumber, updateContactData.emailAddress)
-            masterAccounts.Service.updateStatusUnverifiedContact(loginState.username)
-            withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.SUCCESS)))
-          } catch {
+          val insertOrUpdateContact = masterContacts.Service.insertOrUpdateContact(loginState.username, updateContactData.countryCode + updateContactData.mobileNumber, updateContactData.emailAddress)
+
+          def updateStatusUnverifiedContact: Future[Int] = masterAccounts.Service.updateStatusUnverifiedContact(loginState.username)
+
+          (for {
+            _ <- insertOrUpdateContact
+            _ <- updateStatusUnverifiedContact
+            result<-withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.SUCCESS)))
+          } yield result
+            ).recover {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
         }
@@ -46,9 +51,11 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
 
   def contact: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      try {
-        Ok(views.html.component.master.contact(masterContacts.Service.getContact(loginState.username)))
-      } catch {
+      val contact = masterContacts.Service.getContact(loginState.username)
+      (for {
+        contact <- contact
+      } yield Ok(views.html.component.master.contact(contact))
+        ).recover {
         case _: BaseException => InternalServerError
       }
   }

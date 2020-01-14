@@ -243,6 +243,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.VerifyMobileNumberController.verifyMobileNumberForm,
 
         routes.javascript.ViewController.profile,
+
       )
     ).as("text/javascript")
   }

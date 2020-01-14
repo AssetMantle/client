@@ -35,5 +35,4 @@ class WesternUnionController @Inject()(messagesControllerComponents: MessagesCon
         case _: Exception => InternalServerError(<message status="500">FAILURE</message>).as("application/xml")
       }
   }
-
 }

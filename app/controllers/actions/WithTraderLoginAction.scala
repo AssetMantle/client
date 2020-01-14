@@ -2,29 +2,57 @@ package controllers.actions
 
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
+import models.blockchain.ACL
 import models.{blockchain, master, masterTransaction}
 import play.api.i18n.I18nSupport
 import play.api.mvc._
 import play.api.{Configuration, Logger}
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class WithTraderLoginAction @Inject()(messagesControllerComponents: MessagesControllerComponents, masterAccounts: master.Accounts, blockchainACLHashes: blockchain.ACLHashes, blockchainACLAccounts: blockchain.ACLAccounts, masterTransactionSessionTokens: masterTransaction.SessionTokens)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private implicit val module: String = constants.Module.ACTIONS_WITH_TRADER_LOGIN_ACTION
 
-  def authenticated(f: ⇒ LoginState => Request[AnyContent] => Result)(implicit logger: Logger): Action[AnyContent] = {
-    Action { implicit request ⇒
-      try {
-        val username = request.session.get(constants.Security.USERNAME).getOrElse(throw new BaseException(constants.Response.USERNAME_NOT_FOUND))
-        masterTransactionSessionTokens.Service.tryVerifyingSessionToken(username, request.session.get(constants.Security.TOKEN).getOrElse(throw new BaseException(constants.Response.TOKEN_NOT_FOUND)))
-        masterTransactionSessionTokens.Service.tryVerifyingSessionTokenTime(username)
-        masterAccounts.Service.tryVerifyingUserType(username, constants.User.TRADER)
+  def authenticated(f: ⇒ LoginState => Request[AnyContent] => Future[Result])(implicit logger: Logger): Action[AnyContent] = {
+    Action.async { implicit request ⇒
+      val username = Future(request.session.get(constants.Security.USERNAME).getOrElse(throw new BaseException(constants.Response.USERNAME_NOT_FOUND)))
+      val sessionToken = Future(request.session.get(constants.Security.TOKEN).getOrElse(throw new BaseException(constants.Response.TOKEN_NOT_FOUND)))
+
+      def verifySessionTokenAndUserType(username: String, sessionToken: String): Future[String] = {
+        val sessionTokenVerify = masterTransactionSessionTokens.Service.tryVerifyingSessionToken(username, sessionToken)
+        val tokenTimeVerify = masterTransactionSessionTokens.Service.tryVerifyingSessionTokenTime(username)
+        val verifyUserType = masterAccounts.Service.tryVerifyingUserType(username, constants.User.TRADER)
         val address = masterAccounts.Service.getAddress(username)
-        f(LoginState(username, constants.User.TRADER, address, Option(blockchainACLHashes.Service.getACL(blockchainACLAccounts.Service.getACLHash(address)))))(request)
+        for {
+          _ <- sessionTokenVerify
+          _ <- tokenTimeVerify
+          _ <- verifyUserType
+          address <- address
+        } yield address
       }
-      catch {
+
+      def getLoginState(username: String, address: String): Future[LoginState] = {
+        val aclHash = blockchainACLAccounts.Service.getACLHash(address)
+
+        def acl(aclHash: String): Future[ACL] = blockchainACLHashes.Service.getACL(aclHash)
+
+        for {
+          aclHash <- aclHash
+          acl <- acl(aclHash)
+        } yield LoginState(username, constants.User.TRADER, address, Option(acl))
+      }
+
+      def result(loginState: LoginState): Future[Result] = f(loginState)(request)
+
+      (for {
+        username <- username
+        sessionToken <- sessionToken
+        address <- verifySessionTokenAndUserType(username, sessionToken)
+        loginState <- getLoginState(username, address)
+        result <- result(loginState)
+      } yield result).recover {
         case baseException: BaseException => logger.info(baseException.failure.message, baseException)
           Results.Unauthorized(views.html.index(failures = Seq(baseException.failure)))
       }

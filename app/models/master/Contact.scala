@@ -117,20 +117,19 @@ class Contacts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   object Service {
 
-    def getContact(id: String): Option[Contact] = Await.result(findById(id), Duration.Inf)
+    def getContact(id: String): Future[Option[Contact]] = findById(id)
 
-    def insertOrUpdateContact(id: String, mobileNumber: String, emailAddress: String): Boolean = if (0 < Await.result(upsert(Contact(id, mobileNumber, mobileNumberVerified =  false, emailAddress, emailAddressVerified = false)), Duration.Inf)) true else false
+    def insertOrUpdateContact(id: String, mobileNumber: String, emailAddress: String): Future[Boolean] = upsert(Contact(id, mobileNumber, mobileNumberVerified = false, emailAddress, emailAddressVerified = false)).map { value => if (value > 0) true else false }
 
-    def verifyMobileNumber(id: String): Int = Await.result(updateMobileNumberVerificationStatusOnId(id, verificationStatus = true), Duration.Inf)
+    def verifyMobileNumber(id: String): Future[Int] = updateMobileNumberVerificationStatusOnId(id, verificationStatus = true)
 
-    def verifyEmailAddress(id: String): Int = Await.result(updateEmailVerificationStatusOnId(id, verificationStatus = true), Duration.Inf)
+    def verifyEmailAddress(id: String): Future[Int] = updateEmailVerificationStatusOnId(id, verificationStatus = true)
 
-    def getVerifiedEmailAddress(id: String): String = Await.result(getEmailAddressById(id = id, emailAddressVerified = Option(true)), Duration.Inf)
+    def getVerifiedEmailAddress(id: String): Future[String] = getEmailAddressById(id = id, emailAddressVerified = Option(true))
 
-    def getUnverifiedEmailAddress(id: String): String = Await.result(getEmailAddressById(id = id, emailAddressVerified = Option(false)), Duration.Inf)
+    def getUnverifiedEmailAddress(id: String): Future[String] = getEmailAddressById(id = id, emailAddressVerified = Option(false))
 
-    def getMobileNumber(id: String): String = Await.result(findMobileNumberById(id), Duration.Inf)
-
+    def getMobileNumber(id: String): Future[String] = findMobileNumberById(id)
   }
 
 }

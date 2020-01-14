@@ -188,52 +188,57 @@ class Traders @Inject()(protected val databaseConfigProvider: DatabaseConfigProv
 
   object Service {
 
-    def create(zoneID: String, organizationID: String, accountID: String, name: String): String = Await.result(add(Trader(utilities.IDGenerator.hexadecimal, zoneID, organizationID, accountID, name)), Duration.Inf)
+    def create(zoneID: String, organizationID: String, accountID: String, name: String): Future[String] = add(Trader(utilities.IDGenerator.hexadecimal, zoneID, organizationID, accountID, name))
 
-    def insertOrUpdate(zoneID: String, organizationID: String, accountID: String, name: String): String = {
-      val id = Await.result(getIDByAccountID(accountID), Duration.Inf).getOrElse(utilities.IDGenerator.hexadecimal)
-      Await.result(upsert(Trader(id = id, zoneID = zoneID, organizationID = organizationID, accountID = accountID, name = name)), Duration.Inf)
-      id
+    def insertOrUpdate(zoneID: String, organizationID: String, accountID: String, name: String): Future[String] = {
+
+      val id = getIDByAccountID(accountID)
+
+      def upsertTrader(id: String): Future[Int] = upsert(Trader(id = id, zoneID = zoneID, organizationID = organizationID, accountID = accountID, name = name))
+
+      for {
+        id <- id
+        _ <- upsertTrader(id.getOrElse(utilities.IDGenerator.hexadecimal))
+      } yield id.getOrElse(utilities.IDGenerator.hexadecimal)
     }
 
-    def getID(accountID: String): String = Await.result(getIDByAccountID(accountID), Duration.Inf).getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION))
+    def getID(accountID: String): Future[String] = getIDByAccountID(accountID).map { id => id.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)) }
 
-    def get(id: String): Trader = Await.result(findById(id), Duration.Inf)
+    def get(id: String): Future[Trader] = findById(id)
 
-    def getByAccountID(accountID: String): Trader = Await.result(findByAccountId(accountID), Duration.Inf)
+    def getByAccountID(accountID: String): Future[Trader] = findByAccountId(accountID)
 
-    def getZoneID(id: String): String = Await.result(getZoneIDByID(id), Duration.Inf)
+    def getZoneID(id: String): Future[String] = getZoneIDByID(id)
 
-    def getOrganizationID(id: String): String = Await.result(getOrganizationIDByID(id), Duration.Inf)
+    def getOrganizationID(id: String): Future[String] = getOrganizationIDByID(id)
 
-    def getZoneIDByAccountID(accountID: String): String = Await.result(getZoneIDOnAccountID(accountID), Duration.Inf)
+    def getZoneIDByAccountID(accountID: String): Future[String] = getZoneIDOnAccountID(accountID)
 
-    def getOrganizationIDByAccountID(accountID: String): String = Await.result(findOrganizationIDByAccountId(accountID), Duration.Inf)
+    def getOrganizationIDByAccountID(accountID: String): Future[String] = findOrganizationIDByAccountId(accountID)
 
-    def rejectTrader(id: String): Int = Await.result(updateVerificationStatusOnID(id = id, verificationStatus = Option(false)), Duration.Inf)
+    def rejectTrader(id: String): Future[Int] = updateVerificationStatusOnID(id = id, verificationStatus = Option(false))
 
-    def verifyTrader(id: String): Int = Await.result(updateVerificationStatusOnID(id = id, verificationStatus = Option(true)), Duration.Inf)
+    def verifyTrader(id: String): Future[Int] = updateVerificationStatusOnID(id = id, verificationStatus = Option(true))
 
-    def rejectTraderByAccountID(accountID: String): Int = Await.result(updateVerificationStatusOnAccountID(accountID = accountID, verificationStatus = Option(false)), Duration.Inf)
+    def rejectTraderByAccountID(accountID: String): Future[Int] = updateVerificationStatusOnAccountID(accountID = accountID, verificationStatus = Option(false))
 
-    def verifyTraderByAccountID(accountID: String): Int = Await.result(updateVerificationStatusOnAccountID(accountID = accountID, verificationStatus = Option(true)), Duration.Inf)
+    def verifyTraderByAccountID(accountID: String): Future[Int] = updateVerificationStatusOnAccountID(accountID = accountID, verificationStatus = Option(true))
 
-    def getAccountId(id: String): String = Await.result(getAccountIdById(id), Duration.Inf)
+    def getAccountId(id: String): Future[String] = getAccountIdById(id)
 
-    def getVerifyTraderRequestsForZone(zoneID: String): Seq[Trader] = Await.result(getTradersByCompletionStatusVerificationStatusAndZoneID(zoneID = zoneID, completionStatus = true, verificationStatus = null), Duration.Inf)
+    def getVerifyTraderRequestsForZone(zoneID: String): Future[Seq[Trader]] = getTradersByCompletionStatusVerificationStatusAndZoneID(zoneID = zoneID, completionStatus = true, verificationStatus = null)
 
-    def getVerifyTraderRequestsForOrganization(organizationID: String): Seq[Trader] = Await.result(getTradersByCompletedStatusVerificationStatusByOrganizationID(organizationID = organizationID, completionStatus = true, verificationStatus = null), Duration.Inf)
+    def getVerifyTraderRequestsForOrganization(organizationID: String): Future[Seq[Trader]] = getTradersByCompletedStatusVerificationStatusByOrganizationID(organizationID = organizationID, completionStatus = true, verificationStatus = null)
 
-    def getVerifiedTradersForOrganization(organizationID: String): Seq[Trader] = Await.result(getVerifiedTradersByOrganizationID(organizationID), Duration.Inf)
+    def getVerifiedTradersForOrganization(organizationID: String): Future[Seq[Trader]] = getVerifiedTradersByOrganizationID(organizationID)
 
-    def getVerificationStatus(id: String): Boolean = Await.result(getVerificationStatusById(id), Duration.Inf).getOrElse(false)
+    def getVerificationStatus(id: String): Future[Boolean] = getVerificationStatusById(id).map(_.getOrElse(false))
 
-    def markTraderFormCompleted(id: String): Int = Await.result(updateCompletionStatusOnID(id = id, completionStatus = true), Duration.Inf)
+    def markTraderFormCompleted(id: String): Future[Int] = updateCompletionStatusOnID(id = id, completionStatus = true)
 
-    def getTradersListInOrganization(organizationID: String): Seq[Trader] = Await.result(getTradersByOrganizationID(organizationID), Duration.Inf)
+    def getTradersListInOrganization(organizationID: String): Future[Seq[Trader]] = getTradersByOrganizationID(organizationID)
 
-    def verifyOrganizationTrader(traderID: String, organizationID: String): Boolean = Await.result(checkOrganizationIDTraderIDExists(traderID = traderID, organizationID = organizationID), Duration.Inf)
-
+    def verifyOrganizationTrader(traderID: String, organizationID: String): Future[Boolean] = checkOrganizationIDTraderIDExists(traderID = traderID, organizationID = organizationID)
   }
 
 }

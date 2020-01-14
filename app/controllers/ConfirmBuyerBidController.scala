@@ -4,12 +4,13 @@ import controllers.actions.WithTraderLoginAction
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
+import models.masterTransaction.{NegotiationFile, NegotiationRequest}
 import models.{blockchain, blockchainTransaction, master, masterTransaction}
 import play.api.i18n.I18nSupport
-import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc._
 import play.api.{Configuration, Logger}
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class ConfirmBuyerBidController @Inject()(messagesControllerComponents: MessagesControllerComponents,
@@ -33,9 +34,11 @@ class ConfirmBuyerBidController @Inject()(messagesControllerComponents: Messages
 
   def confirmBuyerBidDetailForm(sellerAddress: String, pegHash: String, bid: Int): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      try {
-        Ok(views.html.component.master.confirmBuyerBidDetail(views.companion.master.ConfirmBuyerBidDetail.form.fill(views.companion.master.ConfirmBuyerBidDetail.Data(masterTransactionNegotiationRequests.Service.getIDByPegHashAndBuyerAccountID(pegHash, loginState.username), sellerAddress, bid, pegHash))))
-      } catch {
+      val id = masterTransactionNegotiationRequests.Service.getIDByPegHashAndBuyerAccountID(pegHash, loginState.username)
+      (for {
+        id <- id
+      } yield Ok(views.html.component.master.confirmBuyerBidDetail(views.companion.master.ConfirmBuyerBidDetail.form.fill(views.companion.master.ConfirmBuyerBidDetail.Data(id, sellerAddress, bid, pegHash))))
+        ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
@@ -44,34 +47,49 @@ class ConfirmBuyerBidController @Inject()(messagesControllerComponents: Messages
     implicit request =>
       views.companion.master.ConfirmBuyerBidDetail.form.bindFromRequest().fold(
         formWithErrors => {
-          BadRequest(views.html.component.master.confirmBuyerBidDetail(formWithErrors))
+          Future(BadRequest(views.html.component.master.confirmBuyerBidDetail(formWithErrors)))
         },
         confirmBuyerBidData => {
-          try {
-            val requestID = confirmBuyerBidData.requestID match {
-              case Some(id) => id
-              case None => utilities.IDGenerator.requestID()
-            }
-            masterTransactionNegotiationRequests.Service.insertOrUpdate(requestID, loginState.username, masterAccounts.Service.getId(confirmBuyerBidData.sellerAddress), confirmBuyerBidData.pegHash, confirmBuyerBidData.bid)
-            withUsernameToken.PartialContent(views.html.component.master.confirmBuyerBidDocument(masterTransactionNegotiationFiles.Service.getOrNone(requestID, constants.File.BUYER_CONTRACT), requestID, constants.File.BUYER_CONTRACT))
+          val requestID = confirmBuyerBidData.requestID match {
+            case Some(id) => id
+            case None => utilities.IDGenerator.requestID()
           }
-          catch {
-            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
-          }
+          val id = masterAccounts.Service.getId(confirmBuyerBidData.sellerAddress)
+
+          def insertOrUpdate(id: String): Future[Int] = masterTransactionNegotiationRequests.Service.insertOrUpdate(requestID, loginState.username, id, confirmBuyerBidData.pegHash, confirmBuyerBidData.bid)
+
+          def negotiationFiles: Future[Option[NegotiationFile]] = masterTransactionNegotiationFiles.Service.getOrNone(requestID, constants.File.BUYER_CONTRACT)
+
+          for {
+            id <- id
+            _ <- insertOrUpdate(id)
+            negotiationFiles <- negotiationFiles
+            result <- withUsernameToken.PartialContent(views.html.component.master.confirmBuyerBidDocument(negotiationFiles, requestID, constants.File.BUYER_CONTRACT))
+          } yield result
         }
       )
   }
 
   def confirmBuyerBidForm(requestID: String): Action[AnyContent] = withTraderLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      try {
-        val negotiation = masterTransactionNegotiationRequests.Service.getNegotiationByID(requestID)
+      val negotiation = masterTransactionNegotiationRequests.Service.getNegotiationByID(requestID)
+
+      def getResult(negotiation: NegotiationRequest): Future[Result] = {
         if (negotiation.buyerAccountID == loginState.username) {
-          Ok(views.html.component.master.confirmBuyerBid(negotiation = negotiation, files = masterTransactionNegotiationFiles.Service.getConfirmBidDocuments(requestID)))
+          val confirmBidDocuments = masterTransactionNegotiationFiles.Service.getConfirmBidDocuments(requestID)
+          for {
+            confirmBidDocuments <- confirmBidDocuments
+          } yield Ok(views.html.component.master.confirmBuyerBid(negotiation = negotiation, files = confirmBidDocuments))
         } else {
-          Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
+          Future(Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED))))
         }
-      } catch {
+      }
+
+      (for {
+        negotiation <- negotiation
+        result <- getResult(negotiation)
+      } yield result
+        ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
@@ -80,38 +98,63 @@ class ConfirmBuyerBidController @Inject()(messagesControllerComponents: Messages
     implicit request =>
       views.companion.master.ConfirmBid.form.bindFromRequest().fold(
         formWithErrors => {
-          try {
-            val negotiation = masterTransactionNegotiationRequests.Service.getNegotiationByID(formWithErrors.data(constants.FormField.REQUEST_ID.name))
+          val negotiation = masterTransactionNegotiationRequests.Service.getNegotiationByID(formWithErrors.data(constants.FormField.REQUEST_ID.name))
+
+          def getResult(negotiation: NegotiationRequest): Future[Result] = {
             if (negotiation.buyerAccountID == loginState.username) {
-              BadRequest(views.html.component.master.confirmBuyerBid(formWithErrors, negotiation, masterTransactionNegotiationFiles.Service.getConfirmBidDocuments(negotiation.id)))
+              val confirmBidDocuments = masterTransactionNegotiationFiles.Service.getConfirmBidDocuments(negotiation.id)
+              for {
+                confirmBidDocuments <- confirmBidDocuments
+              } yield BadRequest(views.html.component.master.confirmBuyerBid(formWithErrors, negotiation, confirmBidDocuments))
             } else {
-              Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
+              Future(Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED))))
             }
-          }catch{
+          }
+
+          (for {
+            negotiation <- negotiation
+            result <- getResult(negotiation)
+          } yield result
+            ).recover {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
         },
         confirmBidTransaction => {
-          try {
-            val masterNegotiation = masterTransactionNegotiationRequests.Service.getNegotiationByID(confirmBidTransaction.requestID)
+          val masterNegotiation = masterTransactionNegotiationRequests.Service.getNegotiationByID(confirmBidTransaction.requestID)
+
+          def getResult(masterNegotiation: NegotiationRequest): Future[Result] = {
             if (masterNegotiation.buyerAccountID == loginState.username) {
               val sellerAddress = masterAccounts.Service.getAddress(masterNegotiation.sellerAccountID)
-              val buyerContractHash = utilities.FileOperations.combinedHash(masterTransactionNegotiationFiles.Service.getDocuments(confirmBidTransaction.requestID, Seq(constants.File.BUYER_CONTRACT)))
-              transaction.process[blockchainTransaction.ConfirmBuyerBid, transactionsConfirmBuyerBid.Request](
-                  entity = blockchainTransaction.ConfirmBuyerBid(from = loginState.address, to = sellerAddress, bid = masterNegotiation.amount, time = confirmBidTransaction.time, pegHash = masterNegotiation.pegHash, buyerContractHash = buyerContractHash, gas = confirmBidTransaction.gas, ticketID = "", mode = transactionMode),
-                  blockchainTransactionCreate = blockchainTransactionConfirmBuyerBids.Service.create,
-                  request = transactionsConfirmBuyerBid.Request(transactionsConfirmBuyerBid.BaseReq(from = loginState.address, gas = confirmBidTransaction.gas.toString), to = sellerAddress, password = confirmBidTransaction.password, bid = masterNegotiation.amount.toString, time = confirmBidTransaction.time.toString, pegHash = masterNegotiation.pegHash, buyerContractHash = buyerContractHash, mode = transactionMode),
-                  action = transactionsConfirmBuyerBid.Service.post,
-                  onSuccess = blockchainTransactionConfirmBuyerBids.Utility.onSuccess,
-                  onFailure = blockchainTransactionConfirmBuyerBids.Utility.onFailure,
-                  updateTransactionHash = blockchainTransactionConfirmBuyerBids.Service.updateTransactionHash
-                )
-              withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.BUYER_BID_CONFIRMED)))
+              val negotiationFiles = masterTransactionNegotiationFiles.Service.getDocuments(confirmBidTransaction.requestID, Seq(constants.File.BUYER_CONTRACT))
+
+              def buyerContractHash(negotiationFiles: Seq[NegotiationFile]): String = utilities.FileOperations.combinedHash(negotiationFiles)
+
+              def transactionProcess(sellerAddress: String, buyerContractHash: String): Future[String] = transaction.process[blockchainTransaction.ConfirmBuyerBid, transactionsConfirmBuyerBid.Request](
+                entity = blockchainTransaction.ConfirmBuyerBid(from = loginState.address, to = sellerAddress, bid = masterNegotiation.amount, time = confirmBidTransaction.time, pegHash = masterNegotiation.pegHash, buyerContractHash = buyerContractHash, gas = confirmBidTransaction.gas, ticketID = "", mode = transactionMode),
+                blockchainTransactionCreate = blockchainTransactionConfirmBuyerBids.Service.create,
+                request = transactionsConfirmBuyerBid.Request(transactionsConfirmBuyerBid.BaseReq(from = loginState.address, gas = confirmBidTransaction.gas.toString), to = sellerAddress, password = confirmBidTransaction.password, bid = masterNegotiation.amount.toString, time = confirmBidTransaction.time.toString, pegHash = masterNegotiation.pegHash, buyerContractHash = buyerContractHash, mode = transactionMode),
+                action = transactionsConfirmBuyerBid.Service.post,
+                onSuccess = blockchainTransactionConfirmBuyerBids.Utility.onSuccess,
+                onFailure = blockchainTransactionConfirmBuyerBids.Utility.onFailure,
+                updateTransactionHash = blockchainTransactionConfirmBuyerBids.Service.updateTransactionHash
+              )
+
+              for {
+                sellerAddress <- sellerAddress
+                negotiationFiles <- negotiationFiles
+                _ <- transactionProcess(sellerAddress, buyerContractHash(negotiationFiles))
+                result <- withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.BUYER_BID_CONFIRMED)))
+              } yield result
             } else {
-              Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED)))
+              Future(Unauthorized(views.html.index(failures = Seq(constants.Response.UNAUTHORIZED))))
             }
           }
-          catch {
+
+          (for {
+            masterNegotiation <- masterNegotiation
+            result <- getResult(masterNegotiation)
+          } yield result
+            ).recover {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
         }
@@ -122,17 +165,17 @@ class ConfirmBuyerBidController @Inject()(messagesControllerComponents: Messages
     Ok(views.html.component.blockchain.confirmBuyerBid())
   }
 
-  def blockchainConfirmBuyerBid: Action[AnyContent] = Action { implicit request =>
+  def blockchainConfirmBuyerBid: Action[AnyContent] = Action.async { implicit request =>
     views.companion.blockchain.ConfirmBuyerBid.form.bindFromRequest().fold(
       formWithErrors => {
-        BadRequest(views.html.component.blockchain.confirmBuyerBid(formWithErrors))
+        Future(BadRequest(views.html.component.blockchain.confirmBuyerBid(formWithErrors)))
       },
       confirmBuyerBidData => {
-        try {
-          transactionsConfirmBuyerBid.Service.post(transactionsConfirmBuyerBid.Request(transactionsConfirmBuyerBid.BaseReq(from = confirmBuyerBidData.from, gas = confirmBuyerBidData.gas.toString), to = confirmBuyerBidData.to, password = confirmBuyerBidData.password, bid = confirmBuyerBidData.bid.toString, time = confirmBuyerBidData.time.toString, pegHash = confirmBuyerBidData.pegHash, buyerContractHash = confirmBuyerBidData.buyerContractHash, mode = confirmBuyerBidData.mode))
-          Ok(views.html.index(successes = Seq(constants.Response.BUYER_BID_CONFIRMED)))
-        }
-        catch {
+        val postRequest = transactionsConfirmBuyerBid.Service.post(transactionsConfirmBuyerBid.Request(transactionsConfirmBuyerBid.BaseReq(from = confirmBuyerBidData.from, gas = confirmBuyerBidData.gas.toString), to = confirmBuyerBidData.to, password = confirmBuyerBidData.password, bid = confirmBuyerBidData.bid.toString, time = confirmBuyerBidData.time.toString, pegHash = confirmBuyerBidData.pegHash, buyerContractHash = confirmBuyerBidData.buyerContractHash, mode = confirmBuyerBidData.mode))
+        (for {
+          _ <- postRequest
+        } yield Ok(views.html.index(successes = Seq(constants.Response.BUYER_BID_CONFIRMED)))
+          ).recover {
           case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
         }
       }

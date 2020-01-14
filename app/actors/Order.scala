@@ -27,7 +27,7 @@ class MainOrderActor @Inject()(actorTimeout: FiniteDuration,actorSystem: ActorSy
 
   private implicit val module: String = constants.Module.ACTOR_MAIN_ORDER
 
-  def receive = {
+  def receive: PartialFunction[Any, Unit] = {
     case orderCometMessage: blockchain.OrderCometMessage =>
       actorSystem.actorSelection("/user/" + constants.Module.ACTOR_MAIN_ORDER + "/" + orderCometMessage.username).resolveOne().onComplete {
         case Success(actorRef) => logger.info(module + " " + orderCometMessage.username + ": " + orderCometMessage.message)

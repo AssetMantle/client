@@ -27,7 +27,7 @@ class MainFiatActor @Inject()(actorTimeout: FiniteDuration, actorSystem: ActorSy
 
   private implicit val module: String = constants.Module.ACTOR_MAIN_FIAT
 
-  def receive = {
+  def receive: PartialFunction[Any, Unit] = {
     case fiatCometMessage: blockchain.FiatCometMessage =>
       actorSystem.actorSelection("/user/" + constants.Module.ACTOR_MAIN_FIAT + "/" + fiatCometMessage.username).resolveOne().onComplete {
         case Success(actorRef) => logger.info(module +  " " + fiatCometMessage.username + ": " + fiatCometMessage.message)
