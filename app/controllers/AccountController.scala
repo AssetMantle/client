@@ -12,7 +12,7 @@ import play.api.i18n.I18nSupport
 import play.api.libs.ws.WSClient
 import play.api.mvc._
 import play.api.{Configuration, Logger}
-import views.companion.master.{Login, Logout, SignUp}
+import views.companion.master.{Login, Logout, SignUp, VerifyPassphrase}
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Random
@@ -85,10 +85,22 @@ class AccountController @Inject()(
     )
   }
 
-  def verifyPassphrase: Action[AnyContent] = Action { implicit request =>
+  def noteNewKeyDetailsView(name: String, blockchainAddress: String, publicKey: String, seed: String): Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.noteNewKeyDetails(name = name, blockchainAddress = blockchainAddress, publicKey = publicKey, seed = seed))
+  }
 
-
-    Ok(views.html.component.master.login())
+  def verifyPassphrase(): Action[AnyContent] = Action { implicit request =>
+    VerifyPassphrase.form.bindFromRequest().fold(
+      formWithErrors => {
+        BadRequest(views.html.component.master.verifyPassphrase(formWithErrors,name = formWithErrors.data(constants.FormField.NAME.name),blockchainAddress=formWithErrors.data(constants.FormField.BLOCKCHAIN_ADDRESS.name),publicKey=formWithErrors.data(constants.FormField.PUBLIC_KEY.name),seed=formWithErrors.data(constants.FormField.SEED.name),randomSeq=Seq(formWithErrors.data(constants.FormField.PASSPHRASE_ELEMENT_ID_1.name).toInt,formWithErrors.data(constants.FormField.PASSPHRASE_ELEMENT_ID_2.name).toInt,formWithErrors.data(constants.FormField.PASSPHRASE_ELEMENT_ID_3.name).toInt)))
+      },
+      verifyPassphraseData=> {
+        val seedSeq = verifyPassphraseData.seed.split(" ")
+        if(verifyPassphraseData.passphraseElement1 == seedSeq(verifyPassphraseData.passphraseElementID1) && verifyPassphraseData.passphraseElement2== seedSeq(verifyPassphraseData.passphraseElementID2) && verifyPassphraseData.passphraseElement3== seedSeq(verifyPassphraseData.passphraseElementID3)){
+          Ok(views.html.indexVersion3(successes = Seq(constants.Response.SIGNED_UP)))
+        }else BadRequest(views.html.component.master.verifyPassphrase(views.companion.master.VerifyPassphrase.form.fill(views.companion.master.VerifyPassphrase.Data(passphraseElement1 = verifyPassphraseData.passphraseElement1,passphraseElement2=verifyPassphraseData.passphraseElement2,passphraseElement3=verifyPassphraseData.passphraseElement3,name=verifyPassphraseData.name,blockchainAddress=verifyPassphraseData.blockchainAddress,publicKey = verifyPassphraseData.publicKey,seed=verifyPassphraseData.seed,passphraseElementID1 = verifyPassphraseData.passphraseElementID1,passphraseElementID2 =verifyPassphraseData.passphraseElementID2 ,passphraseElementID3 = verifyPassphraseData.passphraseElementID3)),verifyPassphraseData.name,verifyPassphraseData.blockchainAddress,verifyPassphraseData.publicKey,verifyPassphraseData.seed,Seq(verifyPassphraseData.passphraseElementID1,verifyPassphraseData.passphraseElementID2,verifyPassphraseData.passphraseElementID3),"Incorrect"))
+      }
+    )
   }
 
   def loginForm: Action[AnyContent] = Action { implicit request =>
@@ -319,7 +331,6 @@ class AccountController @Inject()(
     )
   }
 
-
   def checkUsernameAvailable(username: String): Action[AnyContent] = Action.async { implicit request =>
     val checkUsernameAvailable = masterAccounts.Service.checkUsernameAvailable(username)
     for {
@@ -335,11 +346,8 @@ class AccountController @Inject()(
       },
       noteNewKeyDetailsData => {
         if (noteNewKeyDetailsData.confirmNoteNewKeyDetails) {
-          val seqSeed=seed.split(" ")
-          val length=seqSeed.length
-          val randomSeq=Seq.fill(3)(Random.nextInt(length))
-
-          Ok(views.html.indexVersion3(successes = Seq(constants.Response.SIGNED_UP)))
+          val randomSeq=Random.shuffle(seed.split(" ").indices.toList).take(3)
+          PartialContent(views.html.component.master.verifyPassphrase(views.companion.master.VerifyPassphrase.form,name,blockchainAddress,publicKey,seed,randomSeq))
         }
         else {
           BadRequest(views.html.component.master.noteNewKeyDetails(name = name, blockchainAddress = blockchainAddress, publicKey = publicKey, seed = seed))

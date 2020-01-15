@@ -1,6 +1,6 @@
-@import views.html.base._
-@import views.companion.master.NoteNewKeyDetails
 @import helper._
+@import views.companion.master.NoteNewKeyDetails
+@import views.html.base._
 
 @(noteNewKeyDetailsForm: Form[NoteNewKeyDetails.Data] = NoteNewKeyDetails.form, name: String, blockchainAddress: String, publicKey: String, seed: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
 

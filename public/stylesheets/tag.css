@@ -31,6 +31,7 @@ button {
 button:hover {
     opacity: 1;
 }
+
 label{
     display: none !important;
 }

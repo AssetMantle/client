@@ -18,6 +18,7 @@ object FormField {
   val PASSWORD = new StringFormField("PASSWORD", 1, 128)
   val MOBILE_NUMBER = new StringFormField("MOBILE_NUMBER", 8, 15, RegularExpression.MOBILE_NUMBER)
   val BLOCKCHAIN_ADDRESS = new StringFormField("BLOCKCHAIN_ADDRESS", 45, 45)
+  val PUBLIC_KEY = new StringFormField("PUBLIC_KEY", 0, 100)
   val ACL_ADDRESS = new StringFormField("ACL_ADDRESS", 45, 45)
   val SELLER_ADDRESS = new StringFormField("SELLER_ADDRESS", 45, 45)
   val TO = new StringFormField("TO", 45, 45)
@@ -91,7 +92,9 @@ object FormField {
   val SEARCH_TX_HASH_HEIGHT = new StringFormField("SEARCH_TX_HASH_HEIGHT", 1, 1000)
   val DOCUMENT_TYPE = new StringFormField("DOCUMENT_TYPE", 2, 500)
   val FILE_ID = new StringFormField("FILE_ID", 2, 500)
-  val PASSPHRASE_ELEMENT = new StringFormField("PASSPHRASE_ELEMENT", 2, 20, RegularExpression.ALL_LETTERS)
+  val PASSPHRASE_ELEMENT_1 = new StringFormField("PASSPHRASE_ELEMENT_1", 2, 20, RegularExpression.ALL_LETTERS)
+  val PASSPHRASE_ELEMENT_2 = new StringFormField("PASSPHRASE_ELEMENT_2", 2, 20, RegularExpression.ALL_LETTERS)
+  val PASSPHRASE_ELEMENT_3 = new StringFormField("PASSPHRASE_ELEMENT_3", 2, 20, RegularExpression.ALL_LETTERS)
 
   //SelectFormField
   val ASSET_TYPE = new SelectFormField("ASSET_TYPE", constants.SelectFieldOptions.ASSET_TYPES)
@@ -113,6 +116,9 @@ object FormField {
   val REDEEM_AMOUNT = new IntFormField("REDEEM_AMOUNT", 0, Int.MaxValue)
   val AMOUNT = new IntFormField("AMOUNT", 0, Int.MaxValue)
   val RATING = new IntFormField("RATING", 0, 100)
+  val PASSPHRASE_ELEMENT_ID_1 = new IntFormField("PASSPHRASE_ELEMENT_ID_1",0,23)
+  val PASSPHRASE_ELEMENT_ID_2 = new IntFormField("PASSPHRASE_ELEMENT_ID_2",0,23)
+  val PASSPHRASE_ELEMENT_ID_3 = new IntFormField("PASSPHRASE_ELEMENT_ID_3",0,23)
 
   //DateFormField
   val ESTABLISHMENT_DATE = new DateFormField("ESTABLISHMENT_DATE")

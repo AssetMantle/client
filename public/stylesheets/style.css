@@ -5,6 +5,10 @@ body {
     background: #F4F7FB;
 }
 
+.passphraseMessage{
+    color : red;
+}
+
 body::-webkit-scrollbar {
     width: 10px;
 }
@@ -278,6 +282,7 @@ body::-webkit-scrollbar-thumb {
 }
 dl {
     position: relative;
+    margin: 0;
 }
 
 dl .info {

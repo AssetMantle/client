@@ -17,6 +17,7 @@ object Form {
   val CHANGE_PASSWORD = new Form("CHANGE_PASSWORD", routes.AccountController.changePassword())
   val EMAIL_OTP_FORGOT_PASSWORD = new Form("EMAIL_OTP_FORGOT_PASSWORD", routes.AccountController.emailOTPForgotPassword())
   val FORGOT_PASSWORD = new Form("FORGOT_PASSWORD", routes.AccountController.forgotPassword())
+  val VERIFY_PASSPHRASE = new Form("VERIFY_PASSPHRASE", routes.AccountController.verifyPassphrase())
 
   //AddKeyController
   val BLOCKCHAIN_ADD_KEY = new Form("BLOCKCHAIN_ADD_KEY", routes.AddKeyController.blockchainAddKey())
