@@ -299,6 +299,10 @@ dl .info::after {
     border-style: solid;
     border-color: transparent transparent #dadada transparent;
 }
+.dataContainer .cmuk-alert{
+    margin:0px;
+}
+
 .hidden{
     display: none;
 }
