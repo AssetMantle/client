@@ -1,5 +1,4 @@
 @import controllers.actions.LoginState
-@import views.html.component.blockchain._
 @(failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
 @common(Messages(constants.Form.INDEX), failures, warnings, successes, infos)(Html(""))(center)(Html(""))
@@ -19,7 +18,6 @@
                 <img src="@routes.Assets.versioned("images/bannerImage.svg")">
             </div>
         </div>
-
     </div>
     <div cmuk-slider>
         <div class="cmuk-container">
@@ -141,7 +139,8 @@
         </div>
     </div>
 
-    <div class="contactSetion">
+    <div class="contactSection">
+
         <div class="cmuk-container">
             <div class="cmuk-padding-large cmuk-padding-remove-left cmuk-padding-remove-right">
                 <div>

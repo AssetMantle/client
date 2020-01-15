@@ -2,10 +2,21 @@
 @import views.companion.master.VerifyPassphrase
 @import views.html.base._
 
-@(verifyOrganizationForm: Form[VerifyPassphrase.Data] = VerifyPassphrase.form,name: String, blockchainAddress: String, publicKey: String, seed: String,randomSeq: Seq[Int])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
-@commonForm(constants.Form.VERIFY_ORGANIZATION, verifyOrganizationForm) {
-    @commonInputText(verifyOrganizationForm, constants.FormField.PASSPHRASE_ELEMENT)
-    @commonInputText(verifyOrganizationForm, constants.FormField.PASSPHRASE_ELEMENT)
-    @commonInputText(verifyOrganizationForm, constants.FormField.PASSPHRASE_ELEMENT)
-    <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.AccountController.noteNewKeyDetailsView(@name,@blockchainAddress,@publicKey,@seed))">@Messages(constants.Form.BACK)</button>
+@(verifyPassphraseForm: Form[VerifyPassphrase.Data] = VerifyPassphrase.form,name: String, blockchainAddress: String, publicKey: String, seed: String,randomSeq: Seq[Int],message:String=null)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@commonForm(constants.Form.VERIFY_PASSPHRASE, verifyPassphraseForm) {
+    <span>#@randomSeq(0)</span>
+    @commonInputText(verifyPassphraseForm, constants.FormField.PASSPHRASE_ELEMENT_1)
+    <span>#@randomSeq(1)</span>
+    @commonInputText(verifyPassphraseForm, constants.FormField.PASSPHRASE_ELEMENT_2)
+    <span>#@randomSeq(2)</span>
+    @commonInputText(verifyPassphraseForm, constants.FormField.PASSPHRASE_ELEMENT_3)
+    @commonInputText(verifyPassphraseForm, constants.FormField.NAME,'value -> name , 'class -> "hidden")
+    @commonInputText(verifyPassphraseForm, constants.FormField.BLOCKCHAIN_ADDRESS,'value -> blockchainAddress , 'class -> "hidden")
+    @commonInputText(verifyPassphraseForm, constants.FormField.PUBLIC_KEY,'value -> publicKey , 'class -> "hidden")
+    @commonInputText(verifyPassphraseForm, constants.FormField.SEED,'value -> seed , 'class -> "hidden")
+    @commonInputInt(verifyPassphraseForm, constants.FormField.PASSPHRASE_ELEMENT_ID_1,'value -> randomSeq(0), 'class -> "hidden")
+    @commonInputInt(verifyPassphraseForm, constants.FormField.PASSPHRASE_ELEMENT_ID_2,'value -> randomSeq(1), 'class -> "hidden")
+    @commonInputInt(verifyPassphraseForm, constants.FormField.PASSPHRASE_ELEMENT_ID_3,'value -> randomSeq(2), 'class -> "hidden")
+    <span class="passphraseMessage">@message</span><br/>
+    <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.AccountController.noteNewKeyDetailsView('@name','@blockchainAddress', '@publicKey','@seed'))">@Messages(constants.Form.BACK)</button>
 }

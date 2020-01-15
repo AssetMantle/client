@@ -5,6 +5,10 @@ body {
     background: #F4F7FB;
 }
 
+.passphraseMessage{
+    color : red;
+}
+
 body::-webkit-scrollbar {
     width: 10px;
 }
@@ -62,6 +66,7 @@ body::-webkit-scrollbar-thumb {
 }
 
 .header .cmuk-navbar-nav>li>a {
+    font-family: 'Rubik', sans-serif;
     font-size: 16px;
     line-height: 130%;
     letter-spacing: 0.01em;
@@ -90,8 +95,9 @@ body::-webkit-scrollbar-thumb {
 }
 
 .bannerText h2 {
-    font-family: Oxygen;
+    font-family:  'Oxygen', sans-serif;
     line-height: 130%;
+    margin: 0px;
     font-weight: normal;
     color: #FFFFFF;
 }
@@ -114,13 +120,16 @@ body::-webkit-scrollbar-thumb {
 }
 
 .bannerText p {
+    font-family:  'Oxygen', sans-serif;
     font-size: 15px;
     line-height: 172%;
+    margin-top: 0px;
     letter-spacing: 0.01em;
     color: #627F9F;
 }
 
 .bannerButtons button {
+    font-family: 'Rubik', sans-serif;
     border-radius: 2px;
     margin-right: 20px;
     font-size: 18px;
@@ -188,11 +197,15 @@ body::-webkit-scrollbar-thumb {
     color: #FFFFFF;
 }
 
-.contactSetion {
-    background: #0862BE;
+.contactSection {
+    background-image: url('../images/contactbg.svg');
+    background-position: left;
+    background-repeat: no-repeat;
+    background-color: #0862BE;
+    background-size: contain    ;
 }
 
-.contactSetion h3 {
+.contactSection h3 {
     font-family: Oxygen;
     font-weight: bold;
     font-size: 36px;
@@ -236,319 +249,7 @@ body::-webkit-scrollbar-thumb {
     margin-top: 8px;
 }
 
-.registration {
-    height: calc(100% - 64px);
 
-}
-@media (min-width: 960px){
-    .registration .cmuk-width-3-5\@m {
-        width: 63%;
-    }
-    .registration .cmuk-width-2-5\@m {
-        width: 37%;
-    }
-}
-
-.registrationData {
-
-    background: linear-gradient(rgba(8, 33, 58, 0.97), rgba(8, 33, 58, 0.97)), url('../bgimage.png'), url('wave.svg');
-    background-position: right bottom, left top;
-
-}
-.ubo select{
-    border: 1px solid #e5e5e5 !important;
-    padding: 20px;
-}
-.ubo select option{
-    padding: 10px;
-}
-.buttonSubmit input{
-    background: #0862BE;
-    border: none;
-    border-radius: 2px;
-    font-size: 18px;
-    text-align: center;
-    letter-spacing: 0.01em;
-    text-transform: capitalize;
-    color: #FFFFFF;
-}
-.registrationForm .buttonSubmit input,
-.loginForm .buttonSubmit input {
-
-
-}
-
-.loginFormSection {
-    width: 450px;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-.loginForm {
-    margin-top: 130px;
-}
-.registrationForm {
-    background-color: #FAFBFD;
-    padding: 90px 120px;
-}
-
-
-.otpBoxes input {
-    margin-right: 20px;
-    font-size: 18px;
-    min-height: 40px;
-    text-align: center;
-    width: 40px;
-    background: #FFFFFF;
-    border: 1px solid rgba(5, 60, 117, 0.12);
-    box-sizing: border-box;
-    border-radius: 2px;
-}
-.formIcon img{
-    width: 46px;
-    margin-bottom: 30px;
-    height: 44px;
-}
-.registrationForm h2{
-    font-size: 24px;
-    line-height: 172%;
-    margin-bottom: 30px;
-    text-align: center;
-    letter-spacing: 0.01em;
-
-    color: #053C75;
-}
-.registrationForm p{
-    font-size: 16px;
-    margin-bottom: 50px;
-    line-height: 172%;
-    text-align: center;
-    letter-spacing: 0.01em;
-
-    color: #000000;
-}
-.registrationForm form{
-    margin: 40px;
-}
-form label{
-    font-size: 16px;
-    line-height: 172%;
-    letter-spacing: 0.01em;
-    color: #272829;
-}
-.onBoardSection .loginNext{
-    text-align: center;
-    padding: 0px 100px;
-}
-.onBoardSection .loginNext input{
-    width: 100%;
-}
-.onBoardSection .backButton button{
-    background: #F7F7F7;
-    border-radius: 2px;
-    border:none;
-}
-
-.registrationForm form input::placeholder, .onBoardSection form input::placeholder{
-    font-size: 16px;
-    line-height: 172%;
-    letter-spacing: 0.01em;
-    color: #848A91;
-}
-.registrationForm form input, .onBoardSection form input{
-    margin-top: 6px;
-}
-.registrationForm form input{
-    margin-bottom: 30px;
-    margin-top: 6px;
-}
-.registrationForm form .otpBoxes input{
-    margin-bottom:  0px;
-}
-.resendLinks a{
-    font-weight: bold;
-    font-size: 12px;
-    text-align: center;
-    letter-spacing: 0.01em;
-    text-decoration-line: underline;
-    color: #0862BE;
-}
-.onBoard .listThird{
-    padding-left: 50px;
-}
-
-.onBoard .listThird .listStyle{
-    margin-left: -50px;
-}
-.listStyle{
-    padding:5px 12px;
-    margin-right: 10px;
-    border-radius: 50%;
-    background: #0862BE;
-    color: #ffff;
-}
-.listStyleActive{
-    padding:5px 12px;
-    border-radius: 50%;
-    margin-right: 10px;
-    background: #3CD739;
-    color: #ffff;
-}
-.onBoard ul li{
-    margin:0px 20px 20px 0px;
-}
-.onBoard ul li a{
-    font-weight: normal;
-    font-size: 18px;
-    letter-spacing: 0.01em;
-    color: #272829;
-}
-.onBoard ul li ul{
-    margin-left: 50px;
-}
-.cmuk-switcher form{
-    max-width: 650px;
-}
-.subtabs .sublists {
-    justify-content: center;
-    margin:0px;
-}
-.subtabs .sublists li{
-    padding: 0px;
-}
-.subtabs .cmuk-subnav-pill>.cmuk-active>a{
-    color: #FFFFFF;
-}
-.subtabs .sublists li a{
-    text-transform: capitalize;
-    padding: 10px 70px;
-    border: 1px solid rgba(5, 60, 117, 0.12);
-    box-sizing: border-box;
-    border-radius: 2px;
-    font-weight: bold;
-    font-size: 16px;
-    letter-spacing: 0.01em;
-    color: #0862BE;
-}
-.js-upload button{
-    background: rgba(8, 98, 190, 0.08);
-    border: 1px dashed rgba(8, 98, 190, 0.6);
-    box-sizing: border-box;
-    border-radius: 10px;
-}
-.uboForm, .uboForm2, .yes, .no{
-    display: none;
-}
-.uboForm .buttons{
-    align-items: center;
-}
-.switch {
-    position: relative;
-    display: inline-block;
-    width: 37.76px;
-    height: 21.13px;
-}
-
-.switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-}
-
-.slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #F0F0F0;
-    -webkit-transition: .4s;
-    transition: .4s;
-}
-
-.slider:before {
-    position: absolute;
-    content: "";
-    height: 16px;
-    width: 16px;
-    left: 4px;
-    bottom: 3px;
-    background-color: #FF0E1F;
-    -webkit-transition: .4s;
-    transition: .4s;
-}
-
-input:checked+.slider {
-    background-color: rgba(60, 215, 57, 0.37);
-}
-
-/* input:focus+.slider {
-    box-shadow: 0 0 1px #2196F3;
-} */
-
-input:checked+.slider:before {
-    -webkit-transform: translateX(16px);
-    -ms-transform: translateX(16px);
-    background-color: #3CD739;
-    transform: translateX(16px);
-    left: 2px;
-}
-
-/* Rounded sliders */
-.slider.round {
-    border-radius: 47px;
-}
-
-.slider.round:before {
-    border-radius: 50%;
-}
-.declaration{
-    padding: 20px;
-    align-items: center;
-    border:1px solid rgba(243, 1, 18, 0.31);
-}
-.declaration .declarationButton{
-    margin-left: auto;
-    margin-right: 30px;
-}
-.declaration .declarationText{
-    margin-right: 160px;
-}
-.yes, .no{
-    margin-left: 10px;
-}
-.passphraseButtons button{
-    background: #F0F4FA;
-    border:none;
-    border-radius: 1.46047px;
-    font-size: 16px;
-    text-align: center;
-    letter-spacing: 0.01em;
-    color: #061728;
-}
-.onBoardSection{
-    padding-top: 40px;
-}
-.onBoardSection h2{
-    font-weight: bold;
-    font-size: 26px;
-    line-height: 172%;
-    letter-spacing: 0.01em;
-    color: #272829;
-}
-.onBoardContent .cmuk-card-default{
-    background: #FFFFFF;
-    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.15);
-    border-radius: 3px;
-
-}
-.upload{
-    align-items: center;
-}
-.upload .js-upload{
-    margin-left: auto;
-}
 .modal {
     display: none;
     position: fixed;
@@ -561,14 +262,76 @@ input:checked+.slider:before {
     padding: 30px 30px;
 }
 .modalContent {
+    word-break: break-all;
     top: 20%;
     border-radius: 0.25rem;
+    padding: 20px;
     margin:auto;
     background-color: #fefefe;
     box-sizing: border-box;
     position: relative;
-    width: 500px;
+    width: 700px;
+    min-width: 500px;
+    max-width: 1000px;
     overflow-y:auto;
-    max-height: 450px;
-    max-width: calc(100% - 0.01px) !important;
+    max-height: 600px;
+}
+dl {
+    position: relative;
+    margin: 0;
+}
+
+dl .info {
+    background-color: #dadada;
+    color: #838383;
+    text-align: center;
+    border-radius: 6px;
+    position: relative;
+    top: 5px;
+    float: right;
+    font-size: smaller;
+    padding: 0;
+    display: none;
+}
+
+dl .info::after {
+    content: "";
+    position: absolute;
+    bottom: 17px;
+    left: 20px;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent transparent #dadada transparent;
+}
+.hidden{
+    display: none;
+}
+.verifyPassphrase{
+    flex-wrap: wrap;
+}
+.verifyPassphrasebutton{
+width: 114px;
+height: 38px;
+text-align: center;
+line-height: 38px;
+position: relative;
+color: rgb(33, 40, 51);
+font-size: 14px;
+float: left;
+margin-right: 10px;
+margin-bottom: 10px;
+font-weight: 600;
+background: rgb(251, 251, 251);
+border-radius: 3px;
+}
+
+
+.verifyPassphrasebutton .index{
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    color: rgb(132, 142, 156);
+    font-size: 12px;
+    line-height: 12px;
 }

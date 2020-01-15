@@ -2,16 +2,55 @@
 @import models.master.Zone
 
 @(zone: Zone)(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
-@Messages(constants.Form.NAME): @zone.name <br>
-@Messages(constants.Form.ZONE_ID): @zone.id <br>
-@Messages(constants.Form.CURRENCY): @zone.currency <br>
-@Messages(constants.FormField.ADDRESS_LINE_1.name): @zone.address.addressLine1 <br>
-@Messages(constants.FormField.ADDRESS_LINE_2.name): @zone.address.addressLine2 <br>
-@Messages(constants.FormField.LANDMARK.name): @zone.address.landmark.getOrElse("") <br>
-@Messages(constants.FormField.CITY.name): @zone.address.city <br>
-@Messages(constants.FormField.COUNTRY.name): @zone.address.country <br>
-@Messages(constants.FormField.ZIP_CODE.name): @zone.address.zipCode <br>
-@Messages(constants.Form.PHONE): @zone.address.phone <br>
-@Messages(constants.Form.COMPLETION_STATUS): @zone.completionStatus <br>
-@Messages(constants.Form.VERIFIED_STATUS): @zone.verificationStatus.getOrElse(false) <br>
-
+<table class="cmuk-table">
+    <tbody class="tablePadding">
+        <tr>
+            <th>@Messages(constants.Form.NAME):</th>
+            <td>@zone.name</td>
+        </tr>
+        <tr>
+            <th>@Messages(constants.Form.ZONE_ID):</th>
+            <td> @zone.id</td>
+        </tr>
+        <tr>
+            <th>@Messages(constants.Form.CURRENCY):</th>
+            <td>@zone.currency</td>
+        </tr>
+        <tr>
+            <th>@Messages(constants.FormField.ADDRESS_LINE_1.name):</th>
+            <td> @zone.address.addressLine1</td>
+        </tr>
+        <tr>
+            <th>@Messages(constants.FormField.ADDRESS_LINE_2.name):</th>
+            <td> @zone.address.addressLine2</td>
+        </tr>
+        <tr>
+            <th>@Messages(constants.FormField.LANDMARK.name):</th>
+            <td> @zone.address.landmark.getOrElse("")</td>
+        </tr>
+        <tr>
+            <th>@Messages(constants.FormField.CITY.name):</th>
+            <td>  @zone.address.city</td>
+        </tr>
+        <tr>
+            <th>@Messages(constants.FormField.COUNTRY.name):</th>
+            <td>  @zone.address.country</td>
+        </tr>
+        <tr>
+            <th>@Messages(constants.FormField.ZIP_CODE.name):</th>
+            <td> @zone.address.zipCode</td>
+        </tr>
+        <tr>
+            <th>@Messages(constants.Form.PHONE):</th>
+            <td> @zone.address.phone</td>
+        </tr>
+        <tr>
+            <th>@Messages(constants.Form.COMPLETION_STATUS):</th>
+            <td>@zone.completionStatus</td>
+        </tr>
+        <tr>
+            <th>@Messages(constants.Form.VERIFIED_STATUS):</th>
+            <td> @zone.verificationStatus.getOrElse(false) </td>
+        </tr>
+    </tbody>
+</table>
