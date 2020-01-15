@@ -158,7 +158,7 @@ body::-webkit-scrollbar-thumb {
 }
 
 .tabsSection h2 {
-    font-family: Oxygen;
+    font-family:   'Oxygen', sans-serif;
     padding-bottom: 50px;
     font-weight: bold;
     font-size: 36px;
@@ -179,7 +179,8 @@ body::-webkit-scrollbar-thumb {
     margin-bottom: 2px;
 }
 
-.verticalDataTabs ul li a {
+.verticalDataTabs ul li a, .verticalDataTabsData p {
+    font-family:  'Oxygen', sans-serif;
     padding: 20px 20px;
     font-size: 18px;
     font-weight: normal;
@@ -187,7 +188,9 @@ body::-webkit-scrollbar-thumb {
     letter-spacing: 0.01em;
     color: #0862BE;
 }
-
+.verticalDataTabsData p{
+    color: #365575;
+}
 .verticalDataTabs .cmuk-nav-default>li.cmuk-active>a {
     background: #0862BE;
     color: #FFFFFF;
@@ -256,6 +259,7 @@ body::-webkit-scrollbar-thumb {
     right: 0;
     background-color: rgba(0, 0, 0, 0.4);
     padding: 30px 30px;
+    text-align: center;
 }
 .modalContent {
     word-break: break-all;
@@ -266,9 +270,9 @@ body::-webkit-scrollbar-thumb {
     background-color: #fefefe;
     box-sizing: border-box;
     position: relative;
-    width: 700px;
-    min-width: 500px;
-    max-width: 1000px;
+    max-width: 100%;
+    width: auto !important;
+    display: inline-block;
     overflow-y:auto;
     max-height: 600px;
 }
