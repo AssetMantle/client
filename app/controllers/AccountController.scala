@@ -76,7 +76,7 @@ class AccountController @Inject()(
           _ <- addLogin(createAccount)
         } yield {
           println(addKeyResponse.mnemonic)
-          PartialContent(views.html.component.master.noteNewKeyDetails(name = addKeyResponse.name, blockchainAddress = addKeyResponse.address, publicKey = addKeyResponse.pubkey, seed = addKeyResponse.mnemonic))
+          PartialContent(views.html.component.master.noteNewKeyDetails(seed = addKeyResponse.mnemonic))
         }).recover {
           case baseException: BaseException =>
             InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -85,20 +85,20 @@ class AccountController @Inject()(
     )
   }
 
-  def noteNewKeyDetailsView(name: String, blockchainAddress: String, publicKey: String, seed: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.noteNewKeyDetails(name = name, blockchainAddress = blockchainAddress, publicKey = publicKey, seed = seed))
+  def noteNewKeyDetailsView( seed: String): Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.noteNewKeyDetails( seed = seed))
   }
 
   def verifyPassphrase(): Action[AnyContent] = Action { implicit request =>
     VerifyPassphrase.form.bindFromRequest().fold(
       formWithErrors => {
-        BadRequest(views.html.component.master.verifyPassphrase(formWithErrors,name = formWithErrors.data(constants.FormField.NAME.name),blockchainAddress=formWithErrors.data(constants.FormField.BLOCKCHAIN_ADDRESS.name),publicKey=formWithErrors.data(constants.FormField.PUBLIC_KEY.name),seed=formWithErrors.data(constants.FormField.SEED.name),randomSeq=Seq(formWithErrors.data(constants.FormField.PASSPHRASE_ELEMENT_ID_1.name).toInt,formWithErrors.data(constants.FormField.PASSPHRASE_ELEMENT_ID_2.name).toInt,formWithErrors.data(constants.FormField.PASSPHRASE_ELEMENT_ID_3.name).toInt)))
+        BadRequest(views.html.component.master.verifyPassphrase(formWithErrors,seed=formWithErrors.data(constants.FormField.SEED.name),randomSeq=Seq(formWithErrors.data(constants.FormField.PASSPHRASE_ELEMENT_ID_1.name).toInt,formWithErrors.data(constants.FormField.PASSPHRASE_ELEMENT_ID_2.name).toInt,formWithErrors.data(constants.FormField.PASSPHRASE_ELEMENT_ID_3.name).toInt)))
       },
       verifyPassphraseData=> {
         val seedSeq = verifyPassphraseData.seed.split(" ")
         if(verifyPassphraseData.passphraseElement1 == seedSeq(verifyPassphraseData.passphraseElementID1) && verifyPassphraseData.passphraseElement2== seedSeq(verifyPassphraseData.passphraseElementID2) && verifyPassphraseData.passphraseElement3== seedSeq(verifyPassphraseData.passphraseElementID3)){
           Ok(views.html.indexVersion3(successes = Seq(constants.Response.SIGNED_UP)))
-        }else BadRequest(views.html.component.master.verifyPassphrase(views.companion.master.VerifyPassphrase.form.fill(views.companion.master.VerifyPassphrase.Data(passphraseElement1 = verifyPassphraseData.passphraseElement1,passphraseElement2=verifyPassphraseData.passphraseElement2,passphraseElement3=verifyPassphraseData.passphraseElement3,name=verifyPassphraseData.name,blockchainAddress=verifyPassphraseData.blockchainAddress,publicKey = verifyPassphraseData.publicKey,seed=verifyPassphraseData.seed,passphraseElementID1 = verifyPassphraseData.passphraseElementID1,passphraseElementID2 =verifyPassphraseData.passphraseElementID2 ,passphraseElementID3 = verifyPassphraseData.passphraseElementID3)),verifyPassphraseData.name,verifyPassphraseData.blockchainAddress,verifyPassphraseData.publicKey,verifyPassphraseData.seed,Seq(verifyPassphraseData.passphraseElementID1,verifyPassphraseData.passphraseElementID2,verifyPassphraseData.passphraseElementID3),"Incorrect"))
+        }else BadRequest(views.html.component.master.verifyPassphrase(views.companion.master.VerifyPassphrase.form.fill(views.companion.master.VerifyPassphrase.Data(passphraseElement1 = verifyPassphraseData.passphraseElement1,passphraseElement2=verifyPassphraseData.passphraseElement2,passphraseElement3=verifyPassphraseData.passphraseElement3,seed=verifyPassphraseData.seed,passphraseElementID1 = verifyPassphraseData.passphraseElementID1,passphraseElementID2 =verifyPassphraseData.passphraseElementID2 ,passphraseElementID3 = verifyPassphraseData.passphraseElementID3)),verifyPassphraseData.seed,Seq(verifyPassphraseData.passphraseElementID1,verifyPassphraseData.passphraseElementID2,verifyPassphraseData.passphraseElementID3),"Incorrect Input"))
       }
     )
   }
@@ -175,12 +175,12 @@ class AccountController @Inject()(
                 zone <- zone(aclAccount)
                 result <- withUsernameToken.Ok(views.html.traderIndex(totalFiat = fiatPegWallet.map(_.transactionAmount.toInt).sum, zone = zone, organization = organization, warnings = contactWarnings))
               } yield result
-            case constants.User.USER => withUsernameToken.Ok(views.html.userIndex(warnings = contactWarnings))
-            case constants.User.UNKNOWN => withUsernameToken.Ok(views.html.anonymousIndex(warnings = contactWarnings))
+            case constants.User.USER => withUsernameToken.Ok(views.html.dashboard(warnings = contactWarnings))
+            case constants.User.UNKNOWN => withUsernameToken.Ok(views.html.dashboard(warnings = contactWarnings))
             case constants.User.WITHOUT_LOGIN => val updateUserType = masterAccounts.Service.updateUserType(loginData.username, constants.User.UNKNOWN)
               for {
                 _ <- updateUserType
-                result <- withUsernameToken.Ok(views.html.anonymousIndex(warnings = contactWarnings))
+                result <- withUsernameToken.Ok(views.html.dashboard(warnings = contactWarnings))
               } yield result
           }
         }
@@ -339,18 +339,18 @@ class AccountController @Inject()(
   }
 
   //TODO Remove query parameters
-  def noteNewKeyDetails(name: String, blockchainAddress: String, publicKey: String, seed: String): Action[AnyContent] = Action { implicit request =>
+  def noteNewKeyDetails(seed: String): Action[AnyContent] = Action { implicit request =>
     views.companion.master.NoteNewKeyDetails.form.bindFromRequest().fold(
       formWithErrors => {
-        BadRequest(views.html.component.master.noteNewKeyDetails(formWithErrors, name, blockchainAddress, publicKey, seed))
+        BadRequest(views.html.component.master.noteNewKeyDetails(formWithErrors,seed))
       },
       noteNewKeyDetailsData => {
         if (noteNewKeyDetailsData.confirmNoteNewKeyDetails) {
           val randomSeq=Random.shuffle(seed.split(" ").indices.toList).take(3)
-          PartialContent(views.html.component.master.verifyPassphrase(views.companion.master.VerifyPassphrase.form,name,blockchainAddress,publicKey,seed,randomSeq))
+          PartialContent(views.html.component.master.verifyPassphrase(views.companion.master.VerifyPassphrase.form,seed,randomSeq))
         }
         else {
-          BadRequest(views.html.component.master.noteNewKeyDetails(name = name, blockchainAddress = blockchainAddress, publicKey = publicKey, seed = seed))
+          BadRequest(views.html.component.master.noteNewKeyDetails( seed = seed))
         }
       }
     )

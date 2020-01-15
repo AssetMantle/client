@@ -18,7 +18,6 @@ object FormField {
   val PASSWORD = new StringFormField("PASSWORD", 1, 128)
   val MOBILE_NUMBER = new StringFormField("MOBILE_NUMBER", 8, 15, RegularExpression.MOBILE_NUMBER)
   val BLOCKCHAIN_ADDRESS = new StringFormField("BLOCKCHAIN_ADDRESS", 45, 45)
-  val PUBLIC_KEY = new StringFormField("PUBLIC_KEY", 0, 100)
   val ACL_ADDRESS = new StringFormField("ACL_ADDRESS", 45, 45)
   val SELLER_ADDRESS = new StringFormField("SELLER_ADDRESS", 45, 45)
   val TO = new StringFormField("TO", 45, 45)
