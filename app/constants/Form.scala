@@ -137,6 +137,7 @@ object Form {
   val VERIFY_MOBILE_NUMBER = new Form("VERIFY_MOBILE_NUMBER", routes.VerifyMobileNumberController.verifyMobileNumber())
 
   val INDEX = "INDEX"
+  val DASHBOARD="DASHBOARD"
   val COMMIT = "COMMIT"
   val PROFILE = "PROFILE"
   val MARKET = "MARKET"

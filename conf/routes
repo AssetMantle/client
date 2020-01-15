@@ -42,7 +42,7 @@ GET         /account/forgotPassword                                      control
 POST        /account/forgotPassword                                      controllers.AccountController.forgotPassword
 
 GET         /account/checkUsernameAvailable                              controllers.AccountController.checkUsernameAvailable(username: String)
-POST        /acccount/noteNewKeyDetails                                  controllers.AccountController.noteNewKeyDetails(name:String,blockchainAddress:String ,publicKey:String ,seed:String)
+POST        /acccount/noteNewKeyDetails                                  controllers.AccountController.noteNewKeyDetails(seed:String)
 
 GET         /contact                                                     controllers.ContactController.contact
 
@@ -65,6 +65,11 @@ GET         /master/component/availableAssetList                         control
 GET         /master/component/availableAssetListWithLogin                controllers.ComponentViewController.availableAssetListWithLogin
 GET         /master/component/organizationViewTraderList                 controllers.ComponentViewController.organizationViewTraderList
 GET         /master/component/organizationViewTrader                     controllers.ComponentViewController.organizationViewTrader(traderID: String)
+GET         /master/component/accountDetails                             controllers.ComponentViewController.accountDetails
+GET         /master/component/transactionDetails                         controllers.ComponentViewController.transactionDetails
+GET         /master/component/tradeDetails                               controllers.ComponentViewController.tradeDetails
+GET         /master/component/subscriptionsDetails                       controllers.ComponentViewController.subscriptionsDetails
+GET         /master/component/settingsDetails                            controllers.ComponentViewController.settingsDetails
 
 GET         /master/component/releaseAssetList                           controllers.ReleaseAssetController.releaseAssetList
 GET         /master/component/buyerExecuteOrderList                      controllers.BuyerExecuteOrderController.moderatedBuyerExecuteOrderList
@@ -396,5 +401,5 @@ POST        /blockchain/setBuyerFeedback                                 control
 GET         /blockchain/setSellerFeedback                                controllers.SetSellerFeedbackController.blockchainSetSellerFeedbackForm
 POST        /blockchain/setSellerFeedback                                controllers.SetSellerFeedbackController.blockchainSetSellerFeedback
 
-GET         /account/noteNewKeyDetailsView                                    controllers.AccountController.noteNewKeyDetailsView(name:String,blockchainAddress:String ,publicKey:String ,seed:String)
+GET         /account/noteNewKeyDetailsView                                    controllers.AccountController.noteNewKeyDetailsView(seed:String)
 POST        /account/verifyPassphrase                                     controllers.AccountController.verifyPassphrase

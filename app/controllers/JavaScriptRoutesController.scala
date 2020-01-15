@@ -100,6 +100,11 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ComponentViewController.organizationViewTrader,
         routes.javascript.ComponentViewController.profileDocuments,
         routes.javascript.ComponentViewController.profilePicture,
+        routes.javascript.ComponentViewController.accountDetails,
+        routes.javascript.ComponentViewController.transactionDetails,
+        routes.javascript.ComponentViewController.tradeDetails,
+        routes.javascript.ComponentViewController.subscriptionsDetails,
+        routes.javascript.ComponentViewController.settingsDetails,
 
         routes.javascript.ConfirmBuyerBidController.confirmBuyerBidDetailForm,
         routes.javascript.ConfirmBuyerBidController.confirmBuyerBidForm,
@@ -244,6 +249,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
 
         routes.javascript.ViewController.profile,
         routes.javascript.AccountController.noteNewKeyDetailsView
+
       )
     ).as("text/javascript")
   }
