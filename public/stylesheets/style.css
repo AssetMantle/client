@@ -4,7 +4,12 @@ body {
     margin: 0;
     background: #F4F7FB;
 }
-
+.mainSection{
+    height: calc(100% - 83px);
+}
+.dataContainer, .pageContent, .middle{
+    height: 100%;
+}
 .passphraseMessage{
     color : red;
 }
@@ -407,4 +412,108 @@ border-radius: 3px;
 
 .dashboardContainer .right {
     padding: 50px 30px 30px 30px;
+    width:calc(100% - 250px);
+}
+
+.accountTabSection, .accountTabDeclaration{
+    width: 100%;
+}
+.accountTabSection .cmuk-card {
+    margin: 10px;
+}
+
+.accountTabSection .cmuk-card .cmuk-card-header{
+justify-content: space-between;
+}
+.accountTabSection .cmuk-card .cmuk-card-header h3{
+    margin:0px;
+}
+.accountOrganization{
+    width: 40%;
+}
+.accountUbo{
+    width: 60%;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 37.76px;
+    height: 21.13px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #F0F0F0;
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 4px;
+    bottom: 3px;
+    background-color: #FF0E1F;
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+
+input:checked+.slider {
+    background-color: rgba(60, 215, 57, 0.37);
+}
+
+/* input:focus+.slider {
+    box-shadow: 0 0 1px #2196F3;
+} */
+
+input:checked+.slider:before {
+    -webkit-transform: translateX(16px);
+    -ms-transform: translateX(16px);
+    background-color: #3CD739;
+    transform: translateX(16px);
+    left: 2px;
+}
+
+/* Rounded sliders */
+.slider.round {
+    border-radius: 47px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}
+.declaration .cmuk-card-body{
+    height: 200px;
+    overflow-y: scroll;
+}
+.declarationContent{
+    margin: 5px;
+    width: 50%;
+    padding: 20px;
+    align-items: center;
+    border: 1px solid rgba(5, 60, 117, 0.12);
+}
+.declarationContent .declarationButton{
+    margin-left: auto;
+    margin-right: 30px;
+}
+.declarationContent .declarationText{
+    margin-right: 160px;
+}
+.yes, .no{
+    margin-left: 10px;
 }

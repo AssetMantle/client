@@ -407,6 +407,7 @@ dl .info::after {
     display: flex;
     flex-direction: column;
     height: 100%;
+
 }
 
 .dataContainer {
