@@ -367,19 +367,23 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
       }
   }
 
-  def accountDetails=Action{
-   Ok(views.html.component.master.account())
+  def accountDetails = Action {
+    Ok(views.html.component.master.account())
   }
-  def transactionDetails=Action{
+
+  def transactionDetails = Action {
     Ok(views.html.component.master.transactions())
   }
-  def tradeDetails=Action{
+
+  def tradeDetails = Action {
     Ok(views.html.component.master.trades())
   }
-  def subscriptionsDetails=Action{
+
+  def subscriptionsDetails = Action {
     Ok(views.html.component.master.subscriptions())
   }
-  def settingsDetails=Action{
+
+  def settingsDetails = Action {
     Ok(views.html.component.master.settings())
   }
 }
