@@ -21,7 +21,7 @@ class AddKeyController @Inject()(messagesControllerComponents: MessagesControlle
         Future (BadRequest(views.html.component.blockchain.addKey(formWithErrors)))
       },
       addKeyData => {
-        val postRequest = transactionsAddKey.Service.post(transactionsAddKey.Request(addKeyData.name, addKeyData.password))
+        val postRequest = transactionsAddKey.Service.post(transactionsAddKey.Request(addKeyData.name, addKeyData.password, addKeyData.seed))
         (for {
           _ <- postRequest
         } yield Ok(views.html.index(successes = Seq(constants.Response.KEY_ADDED)))

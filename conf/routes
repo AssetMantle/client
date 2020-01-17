@@ -23,7 +23,8 @@ GET         /profile                                                     control
 GET         /profileDocuments                                            controllers.ComponentViewController.profileDocuments
 GET         /profilePicture                                              controllers.ComponentViewController.profilePicture
 
-GET         /account/signUp                                              controllers.AccountController.signUpForm
+GET         /account/noteAndVerifyMnemonic                               controllers.AccountController.noteAndVerifyMnemonic
+GET         /account/signUp                                              controllers.AccountController.signUpForm(mnemonic:String)
 POST        /account/signUp                                              controllers.AccountController.signUp
 
 GET         /account/login                                               controllers.AccountController.loginForm
@@ -42,7 +43,6 @@ GET         /account/forgotPassword                                      control
 POST        /account/forgotPassword                                      controllers.AccountController.forgotPassword
 
 GET         /account/checkUsernameAvailable                              controllers.AccountController.checkUsernameAvailable(username: String)
-POST        /acccount/noteNewKeyDetails                                  controllers.AccountController.noteNewKeyDetails(seed:String)
 
 GET         /contact                                                     controllers.ContactController.contact
 
@@ -400,6 +400,3 @@ POST        /blockchain/setBuyerFeedback                                 control
 
 GET         /blockchain/setSellerFeedback                                controllers.SetSellerFeedbackController.blockchainSetSellerFeedbackForm
 POST        /blockchain/setSellerFeedback                                controllers.SetSellerFeedbackController.blockchainSetSellerFeedback
-
-GET         /account/noteNewKeyDetailsView                                    controllers.AccountController.noteNewKeyDetailsView(seed:String)
-POST        /account/verifyPassphrase                                     controllers.AccountController.verifyPassphrase

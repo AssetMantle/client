@@ -2,7 +2,6 @@ package controllersTest
 
 import constants.{Form, Test}
 import controllers.routes
-import feeders._
 import io.gatling.core.Predef._
 import io.gatling.core.structure.ScenarioBuilder
 import io.gatling.http.Predef._
@@ -32,11 +31,11 @@ object signUpControllerTest {
       .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN))
       .check(regex("""blockchainAddress=([^&]*)""").saveAs(Test.TEST_BLOCKCHAIN_ADDRESS))
       .check(regex("""publicKey=([^&]*)""").saveAs(Test.TEST_PUBLIC_KEY))
-      .check(regex("""seed=([^"]*)""").saveAs(Test.TEST_SEED))
+      .check(regex("""seed=([^"]*)""").saveAs(Test.TEST_MNEMONIC))
     )
     .pause(1)
     .exec(http("Note_New_Key_Details")
-      .post(session=> routes.AccountController.noteNewKeyDetails(session(Test.TEST_USERNAME).as[String],session(Test.TEST_BLOCKCHAIN_ADDRESS).as[String],session(Test.TEST_PUBLIC_KEY).as[String],session(Test.TEST_SEED).as[String].replace('+',' ')).url)
+      .post(session=> routes.AccountController.noteNewKeyDetails(session(Test.TEST_USERNAME).as[String],session(Test.TEST_BLOCKCHAIN_ADDRESS).as[String],session(Test.TEST_PUBLIC_KEY).as[String],session(Test.TEST_MNEMONIC).as[String].replace('+',' ')).url)
       .formParamMap(Map(
         Form.CONFIRM_NOTE_NEW_KEY_DETAILS-> true,
         Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN)))

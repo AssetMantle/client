@@ -17,7 +17,6 @@ object Form {
   val CHANGE_PASSWORD = new Form("CHANGE_PASSWORD", routes.AccountController.changePassword())
   val EMAIL_OTP_FORGOT_PASSWORD = new Form("EMAIL_OTP_FORGOT_PASSWORD", routes.AccountController.emailOTPForgotPassword())
   val FORGOT_PASSWORD = new Form("FORGOT_PASSWORD", routes.AccountController.forgotPassword())
-  val VERIFY_PASSPHRASE = new Form("VERIFY_PASSPHRASE", routes.AccountController.verifyPassphrase())
 
   //AddKeyController
   val BLOCKCHAIN_ADD_KEY = new Form("BLOCKCHAIN_ADD_KEY", routes.AddKeyController.blockchainAddKey())
@@ -299,7 +298,7 @@ object Form {
   val BLOCKCHAIN_ADDRESS = "BLOCKCHAIN_ADDRESS"
   val PUBLIC_KEY = "PUBLIC_KEY"
   val NAME = "NAME"
-  val SEED = "SEED"
+  val MNEMONIC = "MNEMONIC"
   val PASSWORD = "PASSWORD"
   val CONFIRM_PASSWORD = "CONFIRM_PASSWORD"
   val FROM = "FROM"
@@ -376,7 +375,6 @@ object Form {
   val SWIFT_CODE = "SWIFT_CODE"
   val BANK_ADDRESS = "BANK_ADDRESS"
   val ORGANIZATION_UBO_DETAIL = "ORGANIZATION_UBO_DETAIL"
-  val NOTE_NEW_KEY_DETAILS = "NOTE_NEW_KEY_DETAILS"
 
   //MasterTransaction
   val COUPON = "COUPON"
@@ -462,4 +460,10 @@ object Form {
 
   val BILL_OF_LADING_NUMBER="BILL_OF_LADING_NUMBER"
   val COUNTRY_CODE="COUNTRY_CODE"
+
+  //Html Elements
+  val PLEASE_BACKUP_THIS_MNEMONIC="PLEASE_BACKUP_THIS_MNEMONIC"
+  val INVALID_INPUT="INVALID_INPUT"
+  val MNEMONIC_NOTED="MNEMONIC_NOTED"
+
 }

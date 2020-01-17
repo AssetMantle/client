@@ -7,7 +7,7 @@ object Test {
 
   val IMAGE_FILE_FEED="/home/persistence-1/testImages/"
   val TEST_NAME = "TEST_NAME"
-  val TEST_SEED = "TEST_SEED"
+  val TEST_MNEMONIC = "TEST_MNEMONIC"
 
   val TEST_ZONE_ID = "TEST_ZONE_ID"
   val TEST_TRADER_ID = "TEST_TRADER_ID"

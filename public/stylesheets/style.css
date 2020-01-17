@@ -5,9 +5,6 @@ body {
     background: #F4F7FB;
 }
 
-.passphraseMessage{
-    color : red;
-}
 
 body::-webkit-scrollbar {
     width: 10px;
@@ -304,13 +301,27 @@ dl .info::after {
     border-style: solid;
     border-color: transparent transparent #dadada transparent;
 }
-.hidden{
+
+.MnemonicQuiz .hidden, .hidden{
     display: none;
 }
-.verifyPassphrase{
+
+.titleMnemonic{
+    color:#2c4557;
+    margin:10px 0;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.errorMnemonicInput{
+    display: none;
+    color: red;
+}
+
+.verifyMnemonic{
     flex-wrap: wrap;
 }
-.verifyPassphrasebutton{
+.verifyMnemonicbutton{
 width: 114px;
 height: 38px;
 text-align: center;
@@ -327,7 +338,7 @@ border-radius: 3px;
 }
 
 
-.verifyPassphrasebutton .index{
+.verifyMnemonicbutton .index{
     position: absolute;
     top: 5px;
     left: 5px;

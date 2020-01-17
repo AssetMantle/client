@@ -12,10 +12,9 @@ import play.api.i18n.I18nSupport
 import play.api.libs.ws.WSClient
 import play.api.mvc._
 import play.api.{Configuration, Logger}
-import views.companion.master.{Login, Logout, SignUp, VerifyPassphrase}
+import views.companion.master.{Login, Logout, SignUp}
 
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.Random
 
 @Singleton
 class AccountController @Inject()(
@@ -39,6 +38,7 @@ class AccountController @Inject()(
                                    masterTransactionEmailOTP: masterTransaction.EmailOTPs,
                                    masterTransactionSessionTokens: masterTransaction.SessionTokens,
                                    masterTransactionPushNotificationTokens: masterTransaction.PushNotificationTokens,
+                                   queriesMnemonic: queries.GetMnemonic,
                                    transactionAddKey: transactions.AddKey,
                                    transactionForgotPassword: transactions.ForgotPassword,
                                    transactionChangePassword: transactions.ChangePassword,
@@ -54,17 +54,17 @@ class AccountController @Inject()(
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  def signUpForm: Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.signUp())
+  def signUpForm(mnemonic:String): Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.signUp(views.companion.master.SignUp.form,mnemonic))
   }
 
   def signUp: Action[AnyContent] = Action.async { implicit request =>
     SignUp.form.bindFromRequest().fold(
       formWithErrors => {
-        Future(BadRequest(views.html.component.master.signUp(formWithErrors)))
+        Future(BadRequest(views.html.component.master.signUp(formWithErrors,formWithErrors.data(constants.FormField.MNEMONIC.name))))
       },
       signUpData => {
-        val addKeyResponse = transactionAddKey.Service.post(transactionAddKey.Request(signUpData.username, signUpData.password))
+        val addKeyResponse = transactionAddKey.Service.post(transactionAddKey.Request(signUpData.username, signUpData.password, signUpData.seed))
 
         def createAccount(addKeyResponse: transactionAddKey.Response): Future[String] = blockchainAccounts.Service.create(address = addKeyResponse.address, pubkey = addKeyResponse.pubkey)
 
@@ -75,8 +75,7 @@ class AccountController @Inject()(
           createAccount <- createAccount(addKeyResponse)
           _ <- addLogin(createAccount)
         } yield {
-          println(addKeyResponse.mnemonic)
-          PartialContent(views.html.component.master.noteNewKeyDetails(seed = addKeyResponse.mnemonic))
+          Ok(views.html.indexVersion3(successes = Seq(constants.Response.SIGNED_UP)))
         }).recover {
           case baseException: BaseException =>
             InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -85,22 +84,11 @@ class AccountController @Inject()(
     )
   }
 
-  def noteNewKeyDetailsView( seed: String): Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.noteNewKeyDetails( seed = seed))
-  }
-
-  def verifyPassphrase(): Action[AnyContent] = Action { implicit request =>
-    VerifyPassphrase.form.bindFromRequest().fold(
-      formWithErrors => {
-        BadRequest(views.html.component.master.verifyPassphrase(formWithErrors,seed=formWithErrors.data(constants.FormField.SEED.name),randomSeq=Seq(formWithErrors.data(constants.FormField.PASSPHRASE_ELEMENT_ID_1.name).toInt,formWithErrors.data(constants.FormField.PASSPHRASE_ELEMENT_ID_2.name).toInt,formWithErrors.data(constants.FormField.PASSPHRASE_ELEMENT_ID_3.name).toInt)))
-      },
-      verifyPassphraseData=> {
-        val seedSeq = verifyPassphraseData.seed.split(" ")
-        if(verifyPassphraseData.passphraseElement1 == seedSeq(verifyPassphraseData.passphraseElementID1) && verifyPassphraseData.passphraseElement2== seedSeq(verifyPassphraseData.passphraseElementID2) && verifyPassphraseData.passphraseElement3== seedSeq(verifyPassphraseData.passphraseElementID3)){
-          Ok(views.html.indexVersion3(successes = Seq(constants.Response.SIGNED_UP)))
-        }else BadRequest(views.html.component.master.verifyPassphrase(views.companion.master.VerifyPassphrase.form.fill(views.companion.master.VerifyPassphrase.Data(passphraseElement1 = verifyPassphraseData.passphraseElement1,passphraseElement2=verifyPassphraseData.passphraseElement2,passphraseElement3=verifyPassphraseData.passphraseElement3,seed=verifyPassphraseData.seed,passphraseElementID1 = verifyPassphraseData.passphraseElementID1,passphraseElementID2 =verifyPassphraseData.passphraseElementID2 ,passphraseElementID3 = verifyPassphraseData.passphraseElementID3)),verifyPassphraseData.seed,Seq(verifyPassphraseData.passphraseElementID1,verifyPassphraseData.passphraseElementID2,verifyPassphraseData.passphraseElementID3),"Incorrect Input"))
-      }
-    )
+  def noteAndVerifyMnemonic: Action[AnyContent] = Action.async { implicit request =>
+    val seed=queriesMnemonic.Service.get()
+    for{
+      seed<-seed
+    }yield Ok(views.html.component.master.noteAndVerifyMnemonic( seed = seed.body))
   }
 
   def loginForm: Action[AnyContent] = Action { implicit request =>
@@ -336,23 +324,5 @@ class AccountController @Inject()(
     for {
       checkUsernameAvailable <- checkUsernameAvailable
     } yield if (checkUsernameAvailable) Ok else NoContent
-  }
-
-  //TODO Remove query parameters
-  def noteNewKeyDetails(seed: String): Action[AnyContent] = Action { implicit request =>
-    views.companion.master.NoteNewKeyDetails.form.bindFromRequest().fold(
-      formWithErrors => {
-        BadRequest(views.html.component.master.noteNewKeyDetails(formWithErrors,seed))
-      },
-      noteNewKeyDetailsData => {
-        if (noteNewKeyDetailsData.confirmNoteNewKeyDetails) {
-          val randomSeq=Random.shuffle(seed.split(" ").indices.toList).take(3)
-          PartialContent(views.html.component.master.verifyPassphrase(views.companion.master.VerifyPassphrase.form,seed,randomSeq))
-        }
-        else {
-          BadRequest(views.html.component.master.noteNewKeyDetails( seed = seed))
-        }
-      }
-    )
   }
 }

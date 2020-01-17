@@ -30,7 +30,7 @@ class AddKey @Inject()(wsClient: WSClient)(implicit configuration: Configuration
 
   private implicit val requestWrites: OWrites[Request] = Json.writes[Request]
 
-  case class Request(name: String, password: String)
+  case class Request(name: String, password: String, seed:String)
 
   private implicit val responseReads: Reads[Response] = Json.reads[Response]
 
