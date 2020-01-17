@@ -1,5 +1,5 @@
 @import controllers.actions.LoginState
-import models.master.Organization
+@import models.master.Organization
 
 @(organization: Organization)(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
 @Messages(constants.Form.ORGANIZATION_NAME): @organization.name <br>

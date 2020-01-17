@@ -1,5 +1,5 @@
 @import controllers.actions.LoginState
-import models.master.Zone
+@import models.master.Zone
 
 @(zone: Zone)(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
 @Messages(constants.Form.NAME): @zone.name <br>
