@@ -12,6 +12,6 @@ object AddKey {
     )(Data.apply)(Data.unapply)
   )
 
-  case class Data(name: String, password: String, seed:String)
+  case class Data(name: String, password: String, mnemonic:String)
 
 }

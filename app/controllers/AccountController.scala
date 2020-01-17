@@ -64,7 +64,7 @@ class AccountController @Inject()(
         Future(BadRequest(views.html.component.master.signUp(formWithErrors,formWithErrors.data(constants.FormField.MNEMONIC.name))))
       },
       signUpData => {
-        val addKeyResponse = transactionAddKey.Service.post(transactionAddKey.Request(signUpData.username, signUpData.password, signUpData.seed))
+        val addKeyResponse = transactionAddKey.Service.post(transactionAddKey.Request(signUpData.username, signUpData.password, signUpData.mnemonic))
 
         def createAccount(addKeyResponse: transactionAddKey.Response): Future[String] = blockchainAccounts.Service.create(address = addKeyResponse.address, pubkey = addKeyResponse.pubkey)
 

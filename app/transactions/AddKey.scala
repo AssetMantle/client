@@ -34,7 +34,7 @@ class AddKey @Inject()(wsClient: WSClient)(implicit configuration: Configuration
 
   private implicit val responseReads: Reads[Response] = Json.reads[Response]
 
-  case class Response(name: String, address: String, pubkey: String, mnemonic: String) extends BaseResponse
+  case class Response(name: String, address: String, pubkey: String, seed: String) extends BaseResponse
 
   object Service {
 

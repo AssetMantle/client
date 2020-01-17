@@ -14,6 +14,6 @@ object SignUp {
       constants.FormField.SIGNUP_CONFIRM_PASSWORD.name -> constants.FormField.SIGNUP_CONFIRM_PASSWORD.field
     )(Data.apply)(Data.unapply).verifying(constants.FormConstraint.signUpCheckConstraint))
 
-  case class Data(username: String, usernameAvailable: Boolean,seed:String, password: String, confirmPassword: String)
+  case class Data(username: String, usernameAvailable: Boolean,mnemonic:String, password: String, confirmPassword: String)
 
 }
