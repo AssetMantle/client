@@ -91,9 +91,6 @@ object FormField {
   val SEARCH_TX_HASH_HEIGHT = new StringFormField("SEARCH_TX_HASH_HEIGHT", 1, 1000)
   val DOCUMENT_TYPE = new StringFormField("DOCUMENT_TYPE", 2, 500)
   val FILE_ID = new StringFormField("FILE_ID", 2, 500)
-  val MNEMONIC_ELEMENT_1 = new StringFormField("MNEMONIC_ELEMENT_1", 2, 20, RegularExpression.ALL_LETTERS)
-  val MNEMONIC_ELEMENT_2 = new StringFormField("MNEMONIC_ELEMENT_2", 2, 20, RegularExpression.ALL_LETTERS)
-  val MNEMONIC_ELEMENT_3 = new StringFormField("MNEMONIC_ELEMENT_3", 2, 20, RegularExpression.ALL_LETTERS)
 
   //SelectFormField
   val ASSET_TYPE = new SelectFormField("ASSET_TYPE", constants.SelectFieldOptions.ASSET_TYPES)
@@ -115,9 +112,6 @@ object FormField {
   val REDEEM_AMOUNT = new IntFormField("REDEEM_AMOUNT", 0, Int.MaxValue)
   val AMOUNT = new IntFormField("AMOUNT", 0, Int.MaxValue)
   val RATING = new IntFormField("RATING", 0, 100)
-  val MNEMONIC_ELEMENT_ID_1 = new IntFormField("MNEMONIC_ELEMENT_ID_1",0,23)
-  val MNEMONIC_ELEMENT_ID_2 = new IntFormField("MNEMONIC_ELEMENT_ID_2",0,23)
-  val MNEMONIC_ELEMENT_ID_3 = new IntFormField("MNEMONIC_ELEMENT_ID_3",0,23)
 
   //DateFormField
   val ESTABLISHMENT_DATE = new DateFormField("ESTABLISHMENT_DATE")
