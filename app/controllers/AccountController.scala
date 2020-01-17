@@ -211,7 +211,7 @@ class AccountController @Inject()(
               shutdownActor.onLogOut(constants.Module.ACTOR_MAIN_NEGOTIATION, loginState.username)
               shutdownActor.onLogOut(constants.Module.ACTOR_MAIN_ORDER, loginState.username)
             }
-            Ok(views.html.index(successes = Seq(constants.Response.LOGGED_OUT))).withNewSession
+            Ok(views.html.indexVersion3(successes = Seq(constants.Response.LOGGED_OUT))).withNewSession
           }
 
           (for {

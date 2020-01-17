@@ -1,7 +1,20 @@
-html, body {
+html,
+body {
     height: 100%;
-    font-size: 0.8125rem;
-    background: #f8f9fa;
+    margin: 0;
+    background: #F4F7FB;
+}
+body::-webkit-scrollbar {
+    width: 10px;
+}
+
+body::-webkit-scrollbar * {
+    background: transparent;
+}
+
+body::-webkit-scrollbar-thumb {
+    background: grey !important;
+    border-radius: 6px;
 }
 
 input, select {
