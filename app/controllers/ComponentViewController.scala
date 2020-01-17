@@ -368,7 +368,6 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
   }
 
   def accountDetails=Action{
-
    Ok(views.html.component.master.account())
   }
   def transactionDetails=Action{

@@ -163,14 +163,14 @@ class Orders @Inject()(shutdownActors: ShutdownActor, masterAccounts: master.Acc
                 val sellerAccount = getAccount.Service.get(negotiation.sellerAddress)
                 val buyerAccount = getAccount.Service.get(negotiation.buyerAddress)
 
-                def upsertAccountAssets(account: queries.responses.AccountResponse.Response)= {
+                def upsertAccountAssets(account: queries.responses.AccountResponse.Response) = {
                   account.value.assetPegWallet match {
                     case Some(assets) => Future.sequence(assets.map(asset => blockchainAssets.Service.insertOrUpdate(pegHash = asset.pegHash, documentHash = asset.documentHash, assetType = asset.assetType, assetQuantity = asset.assetQuantity, quantityUnit = asset.quantityUnit, assetPrice = asset.assetPrice, ownerAddress = negotiation.sellerAddress, moderated = asset.moderated, takerAddress = if (asset.takerAddress == "") None else Option(asset.takerAddress), locked = asset.locked, dirtyBit = true)))
-                    case None => Future{}
+                    case None => Future {}
                   }
                 }
 
-                def upsertAccountFiats(account: queries.responses.AccountResponse.Response)= {
+                def upsertAccountFiats(account: queries.responses.AccountResponse.Response) = {
                   account.value.fiatPegWallet match {
                     case Some(fiats) => Future.sequence(fiats.map(fiatPeg => blockchainFiats.Service.insertOrUpdate(fiatPeg.pegHash, negotiation.sellerAddress, fiatPeg.transactionID, fiatPeg.transactionAmount, fiatPeg.redeemedAmount, dirtyBit = true)))
                     case None => Future {}
@@ -188,9 +188,8 @@ class Orders @Inject()(shutdownActors: ShutdownActor, masterAccounts: master.Acc
                   _ <- upsertAccountFiats(buyerAccount)
                   _ <- deleteFiatPegWallet
                 } yield Unit
-              } else Future (Unit)
+              } else Future(Unit)
             }
-
 
             def insertOrUpdateTraderFeedbackHistories(orderResponse: queries.responses.OrderResponse.Response, negotiation: Negotiation): Future[Unit] = {
               if (orderResponse.value.awbProofHash != "" && orderResponse.value.fiatProofHash != "") {
@@ -210,12 +209,12 @@ class Orders @Inject()(shutdownActors: ShutdownActor, masterAccounts: master.Acc
                   _ <- updateAccountIDAndMarkTradeCompletedByPegHash(id)
                   _ <- deleteNegotiations
                 } yield Unit
-              } else Future (Unit)
+              } else Future(Unit)
             }
 
             def insertOrUpdateOrder(orderResponse: queries.responses.OrderResponse.Response): Future[Int] = Service.insertOrUpdate(dirtyOrder.id, awbProofHash = if (orderResponse.value.awbProofHash == "") None else Option(orderResponse.value.awbProofHash), fiatProofHash = if (orderResponse.value.fiatProofHash == "") None else Option(orderResponse.value.fiatProofHash), dirtyBit = false)
 
-            def ids(negotiation: Negotiation): Future[(String,String)] = {
+            def ids(negotiation: Negotiation): Future[(String, String)] = {
               val buyerAddressID = masterAccounts.Service.getId(negotiation.buyerAddress)
               val sellerAddressID = masterAccounts.Service.getId(negotiation.sellerAddress)
               for {
