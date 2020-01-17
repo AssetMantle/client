@@ -7,37 +7,34 @@ import io.gatling.core.structure.ScenarioBuilder
 import io.gatling.http.Predef._
 
 class SignUpControllerTest extends Simulation {
-  val scenarioBuilder: ScenarioBuilder = signUpControllerTest.signUpScenario
-  setUp(scenarioBuilder.inject(atOnceUsers(400))).protocols(http.baseUrl(Test.BASE_URL))
+  val scenarioBuilder: ScenarioBuilder =  signUpControllerTest.signUpScenario
+  setUp(scenarioBuilder.inject(atOnceUsers(1))).protocols(http.baseUrl(Test.BASE_URL))
 }
 
 object signUpControllerTest {
 
   val signUpScenario: ScenarioBuilder = scenario("SignUp")
+    .exec(http("Verify_Mnemonic")
+        .get(routes.AccountController.noteAndVerifyMnemonic().url)
+      .check(substring("PLEASE_BACKUP_THIS_MNEMONIC").exists)
+      .check(css("[id=%s]".format("getMnemonic"), "onclick").saveAs(Form.MNEMONIC))
+    )
+    .pause(2)
     .exec(http("SignUp_GET")
-      .get(routes.AccountController.signUpForm().url)
-      .check(css("legend:contains(%s)".format(constants.Form.SIGN_UP.legend)).exists)
-      .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
+      .get(session=>routes.AccountController.signUpForm(session(Form.MNEMONIC).as[String].replaceAll("getMnemonic","").filter(p=>p.isLetter|| p==' ')).url)
+      .check(css("legend:contains(%s)".format("Sign Up")).exists)
+      .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN))
+      .check(css("[name=%s]".format(Form.MNEMONIC), "value").saveAs(Form.MNEMONIC))
+    )
     .pause(2)
     .exec(http("SignUp_POST")
       .post(routes.AccountController.signUp().url)
       .formParamMap(Map(
-        Form.USERNAME -> "${%s}".format(Test.TEST_USERNAME),
+        Form.USERNAME -> ("${%s}".format(Test.TEST_USERNAME)),
         Form.USERNAME_AVAILABLE -> true,
+        Form.MNEMONIC->"${%s}".format(Form.MNEMONIC),
         Form.PASSWORD -> "${%s}".format(Test.TEST_PASSWORD),
         Form.CONFIRM_PASSWORD -> "${%s}".format(Test.TEST_PASSWORD),
-        Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN)))
-      .check(css("div:contains(%s)".format(constants.FormField.CONFIRM_NOTE_NEW_KEY_DETAILS.name)).exists)
-      .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN))
-      .check(regex("""blockchainAddress=([^&]*)""").saveAs(Test.TEST_BLOCKCHAIN_ADDRESS))
-      .check(regex("""publicKey=([^&]*)""").saveAs(Test.TEST_PUBLIC_KEY))
-      .check(regex("""seed=([^"]*)""").saveAs(Test.TEST_MNEMONIC))
-    )
-    .pause(1)
-    .exec(http("Note_New_Key_Details")
-      .post(session=> routes.AccountController.noteNewKeyDetails(session(Test.TEST_USERNAME).as[String],session(Test.TEST_BLOCKCHAIN_ADDRESS).as[String],session(Test.TEST_PUBLIC_KEY).as[String],session(Test.TEST_MNEMONIC).as[String].replace('+',' ')).url)
-      .formParamMap(Map(
-        Form.CONFIRM_NOTE_NEW_KEY_DETAILS-> true,
         Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN)))
       .check(substring("SUCCESS SIGNED_UP").exists)
     )

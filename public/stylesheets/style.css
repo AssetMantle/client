@@ -4,7 +4,15 @@ body {
     margin: 0;
     background: #F4F7FB;
 }
-
+.mainSection{
+    height: calc(100% - 83px);
+}
+.dataContainer, .pageContent, .middle{
+    height: 100%;
+}
+.passphraseMessage{
+    color : red;
+}
 
 body::-webkit-scrollbar {
     width: 10px;
@@ -159,7 +167,7 @@ body::-webkit-scrollbar-thumb {
 }
 
 .tabsSection h2 {
-    font-family: Oxygen;
+    font-family:   'Oxygen', sans-serif;
     padding-bottom: 50px;
     font-weight: bold;
     font-size: 36px;
@@ -180,7 +188,8 @@ body::-webkit-scrollbar-thumb {
     margin-bottom: 2px;
 }
 
-.verticalDataTabs ul li a {
+.verticalDataTabs ul li a, .verticalDataTabsData p {
+    font-family:  'Oxygen', sans-serif;
     padding: 20px 20px;
     font-size: 18px;
     font-weight: normal;
@@ -188,7 +197,9 @@ body::-webkit-scrollbar-thumb {
     letter-spacing: 0.01em;
     color: #0862BE;
 }
-
+.verticalDataTabsData p{
+    color: #365575;
+}
 .verticalDataTabs .cmuk-nav-default>li.cmuk-active>a {
     background: #0862BE;
     color: #FFFFFF;
@@ -257,6 +268,7 @@ body::-webkit-scrollbar-thumb {
     right: 0;
     background-color: rgba(0, 0, 0, 0.4);
     padding: 30px 30px;
+    text-align: center;
 }
 .modalContent {
     word-break: break-all;
@@ -267,9 +279,9 @@ body::-webkit-scrollbar-thumb {
     background-color: #fefefe;
     box-sizing: border-box;
     position: relative;
-    width: 700px;
-    min-width: 500px;
-    max-width: 1000px;
+    max-width: 100%;
+    width: 600px;
+    /*display: inline-block;*/
     overflow-y:auto;
     max-height: 600px;
 }
@@ -318,8 +330,14 @@ dl .info::after {
     color: red;
 }
 
+.dataContainer .cmuk-alert{
+    margin:0px;
+}
+
+
 .verifyMnemonic{
     flex-wrap: wrap;
+    justify-content: center;
 }
 .verifyMnemonicbutton{
 width: 114px;
@@ -345,4 +363,173 @@ border-radius: 3px;
     color: rgb(132, 142, 156);
     font-size: 12px;
     line-height: 12px;
+}
+
+.dashboardContainer{
+    height: 100%;
+}
+.dashboardContainer .left{
+    background: #373E46;
+    width: 250px;
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.05);
+    padding: 50px 30px 30px 30px;
+
+}
+.dashboardContainer .left img{
+    margin-bottom: 30px;
+    margin-left: 10px;
+
+}
+.dashboardContainer .left .cmuk-nav-default{
+    margin-left: -27px;
+}
+.dashboardContainer .left .cmuk-nav-default>li{
+    padding:10px;
+    position: relative;
+}
+.dashboardContainer .left .cmuk-nav-default>li>a{
+    font-family: 'Oxygen', sans-serif;
+    position: relative;
+    font-style: normal;
+    margin-left: 30px;
+    font-weight: bold;
+    font-size: 18px;
+    line-height: 23px;
+    color: #71757A;
+}
+.dashboardContainer .left .cmuk-nav-default>li.cmuk-active>a{
+    color: #F0F0F0;
+}
+
+.dashboardContainer .left .cmuk-nav-default>li.cmuk-active::before {
+    content: ' ';
+    position: absolute;
+    width: 0;
+    height: 0;
+    left: 0px;
+    right: auto;
+    top: 15%;
+    bottom: -19px;
+    border: 20px solid;
+    border-color: transparent transparent transparent #e7eaf3;
+}
+.dashboardContainer .left .cmuk-nav-default>li.cmuk-active::after{
+    content: ' ';
+    position: absolute;
+    width: 0;
+    height: 0;
+    left: 6px;
+    right: auto;
+    top: 15%;
+    bottom: -19px;
+    border: 20px solid;
+    border-color: transparent transparent transparent #373E46;
+}
+
+.dashboardContainer .right {
+    padding: 50px 30px 30px 30px;
+    width:calc(100% - 250px);
+}
+
+.accountTabSection, .accountTabDeclaration{
+    width: 100%;
+}
+.accountTabSection .cmuk-card {
+    margin: 10px;
+}
+
+.accountTabSection .cmuk-card .cmuk-card-header{
+justify-content: space-between;
+}
+.accountTabSection .cmuk-card .cmuk-card-header h3{
+    margin:0px;
+}
+.accountOrganization{
+    width: 40%;
+}
+.accountUbo{
+    width: 60%;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 37.76px;
+    height: 21.13px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #F0F0F0;
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 4px;
+    bottom: 3px;
+    background-color: #FF0E1F;
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+
+input:checked+.slider {
+    background-color: rgba(60, 215, 57, 0.37);
+}
+
+/* input:focus+.slider {
+    box-shadow: 0 0 1px #2196F3;
+} */
+
+input:checked+.slider:before {
+    -webkit-transform: translateX(16px);
+    -ms-transform: translateX(16px);
+    background-color: #3CD739;
+    transform: translateX(16px);
+    left: 2px;
+}
+
+/* Rounded sliders */
+.slider.round {
+    border-radius: 47px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}
+.declaration .cmuk-card-body{
+    height: 200px;
+    overflow-y: scroll;
+}
+.declarationContent{
+    margin: 5px;
+    width: 50%;
+    padding: 20px;
+    align-items: center;
+    border: 1px solid rgba(5, 60, 117, 0.12);
+}
+.declarationContent .declarationButton{
+    margin-left: auto;
+    margin-right: 30px;
+}
+.declarationContent .declarationText{
+    margin-right: 160px;
+}
+.yes, .no{
+    margin-left: 10px;
 }

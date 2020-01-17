@@ -1,25 +1,32 @@
-@import controllers.actions.LoginState
+@@import controllers.actions.LoginState
 @(failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
 @common(Messages(constants.Form.DASHBOARD), failures, warnings, successes, infos)(left)(center)(Html(""))
 
 @left={
-    <div cmuk-grid>
-        <div class="cmuk-width-auto@@m">
-            <ul class="cmuk-tab-left" cmuk-tab="connect: #component-tab-left; animation: cmuk-animation-fade">
-                <li><a onclick="componentResource('centerContent', jsRoutes.controllers.ComponentViewController.accountDetails());">Account</a></li>
-                <li><a onclick="componentResource('centerContent', jsRoutes.controllers.ComponentViewController.transactionDetails());">Trades</a></li>
-                <li><a onclick="componentResource('centerContent', jsRoutes.controllers.ComponentViewController.tradeDetails());">Transactions</a></li>
-                <li><a onclick="componentResource('centerContent', jsRoutes.controllers.ComponentViewController.subscriptionsDetails());">Subscriptions</a></li>
-                <li><a onclick="componentResource('centerContent', jsRoutes.controllers.ComponentViewController.settingsDetails());">Settings</a></li>
-            </ul>
-        </div>
 
-    </div>
+
+
 }
 
 @center = {
 
-}
+    <div class="dashboardContainer cmuk-flex">
+        <div class="left">
+            <img src="@routes.Assets.versioned("images/comdex.svg")">
+            <div class="cmuk-width-auto@@m">
+                <ul class="cmuk-nav cmuk-nav-default" cmuk-switcher="animation: cmuk-animation-fade">
+                    <li><a onclick="componentResource('component-nav', jsRoutes.controllers.ComponentViewController.accountDetails());">Account</a></li>
+                    <li><a onclick="componentResource('component-nav', jsRoutes.controllers.ComponentViewController.tradeDetails());">Trades</a></li>
+                    <li><a onclick="componentResource('component-nav', jsRoutes.controllers.ComponentViewController.transactionDetails());">Transactions</a></li>
+                    <li><a onclick="componentResource('component-nav', jsRoutes.controllers.ComponentViewController.subscriptionsDetails());">Subscriptions</a></li>
+                    <li><a onclick="componentResource('component-nav', jsRoutes.controllers.ComponentViewController.settingsDetails());">Settings</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="right" id="component-nav">
 
-<script>componentResource('centerContent', jsRoutes.controllers.ComponentViewController.accountDetails())</script>
+        </div>
+    </div>
+
+}

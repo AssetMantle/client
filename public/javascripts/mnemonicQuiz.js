@@ -12,13 +12,12 @@ function getQuiz() {
     $("#verifyMnemonic").show();
 }
 
-function getMnemonic(seed) {
-    const seedElements = seed.split(" ");
-    console.log(seedElements);
+function getMnemonic(mnemonic) {
+    const mnemonicElementArray = mnemonic.split(" ");
     for (let i = 0; i < 24; i++) {
         let mnemonicElement = $("#mnemonicElement-" + i);
         if (!mnemonicElement.prop('readonly')) {
-            mnemonicElement.val(seedElements[i]).attr('readonly', true);
+            mnemonicElement.val(mnemonicElementArray[i]).attr('readonly', true);
         }
     }
     $("#getQuiz").show();
@@ -27,13 +26,13 @@ function getMnemonic(seed) {
     $("#errorMnemonicInput").hide();
 }
 
-function verifyMnemonic(seed) {
-    const seedElements = seed.split(" ");
+function verifyMnemonic(mnemonic) {
+    const mnemonicElementArray = mnemonic.split(" ");
     for (let i = 0; i < 24; i++) {
-        if ($("#mnemonicElement-" + i).val() !== seedElements[i]) {
+        if ($("#mnemonicElement-" + i).val() !== mnemonicElementArray[i]) {
             $("#errorMnemonicInput").show();
             return;
         }
     }
-    getForm(jsRoutes.controllers.AccountController.signUpForm(seed));
+    getForm(jsRoutes.controllers.AccountController.signUpForm(mnemonic));
 }

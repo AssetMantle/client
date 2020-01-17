@@ -85,10 +85,10 @@ class AccountController @Inject()(
   }
 
   def noteAndVerifyMnemonic: Action[AnyContent] = Action.async { implicit request =>
-    val seed=queriesMnemonic.Service.get()
+    val mnemonicResponse=queriesMnemonic.Service.get()
     for{
-      seed<-seed
-    }yield Ok(views.html.component.master.noteAndVerifyMnemonic( seed = seed.body))
+      mnemonicResponse<-mnemonicResponse
+    }yield Ok(views.html.component.master.noteAndVerifyMnemonic( mnemonic = mnemonicResponse.body))
   }
 
   def loginForm: Action[AnyContent] = Action { implicit request =>
