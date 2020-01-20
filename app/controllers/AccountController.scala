@@ -89,6 +89,7 @@ class AccountController @Inject()(
     for{
       mnemonicResponse<-mnemonicResponse
     }yield Ok(views.html.component.master.noteAndVerifyMnemonic( mnemonic = mnemonicResponse.body))
+
   }
 
   def loginForm: Action[AnyContent] = Action { implicit request =>
