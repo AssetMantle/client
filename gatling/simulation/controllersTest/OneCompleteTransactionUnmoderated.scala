@@ -38,7 +38,6 @@ class OneCompleteTransactionUnmoderated extends Simulation {
     .exec(SetBuyerFeedback.setBuyerFeedback)
     .exec(SetSellerFeedback.setSellerFeedback)
     .exec(RedeemAsset.redeemAsset)
-    .exec(RedeemFiat.redeemFiat)
 
   setUp(
     oneCompleteUnmoderated.inject(atOnceUsers(1))
