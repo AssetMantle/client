@@ -1,13 +1,12 @@
-$(document).ready(function() {
-    var $tabl = $('#tabledata');
-    console.log("table length",$tabl.find('tr').length);
+$(document).ready(function(){
+    var $tableMain = $('#tabledata');
     $('#tableView').click(function() {
-        var $tab = $tabl;
+        var $table = $tableMain;
         var invertedTable = [];
-        for(var i=0 ; i < $tab.find('tr:first th').length ; i++){
+        for(var i=0 ; i < $table.find('tr:first th').length ; i++){
             invertedTable.push([]);
         }
-        $tab.find('th,td').each(function(){
+        $table.find('th,td').each(function(){
             invertedTable[$(this).index()].push($(this).text());
         });
         var $newTable = $('<table class="cmuk-table cmuk-table-divider"></table>');
@@ -20,7 +19,7 @@ $(document).ready(function() {
             }
             $newTable.append($newTr);
         }
-        for(var i=0; i < invertedTable.length; i++){
+        for(var i=0 ; i < invertedTable.length ; i++){
             if(i < invertedTable[0].length ) {
                 var $newTrd = $('<tr></tr>');
                 for (var j = 0 ; j < invertedTable.length; j++) {
@@ -35,8 +34,7 @@ $(document).ready(function() {
     });
 
     $('#listView').click(function() {
-        var $table = $tabl;
-        console.log("table length",$table.find('tr').length);
+        var $table = $tableMain;
         var ul = $("<ul class=mainlist>");
         $table.find('tr').each(function(){
             var li = $("<li class=listItem>");
