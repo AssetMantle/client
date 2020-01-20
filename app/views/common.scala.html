@@ -3,6 +3,9 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>@title</title>
         <link rel="shortcut icon" type="image/png" href="@routes.Assets.versioned("images/favicon.ico")">
         <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/class.css")">
@@ -26,30 +29,29 @@
     </head>
     <body>
         @* Header *@
-        <header>
-            @* pc navbar *@
-            <div class="pcNav" cmuk-sticky="sel-target: .cmuk-navbar-container; cls-active: cmuk-navbar-sticky; bottom: #transparent-sticky-navbar">
-                <nav class="cmuk-navbar-container" cmuk-navbar="mode: click">
+        <div class="header">
+            <nav class="cmuk-navbar-container" cmuk-navbar>
 
-                    <div class="cmuk-navbar-left">
-                        <a class="cmuk-navbar-item cmuk-logo" href="@controllers.routes.IndexController.index()">
-                            <img src="@routes.Assets.versioned("images/commitLogo.png")" class="navigationBarLogo">
+                <div class="cmuk-navbar-left">
+                    <a class="cmuk-navbar-item cmuk-logo" href="@controllers.routes.IndexController.index()">
+                            <img src="@routes.Assets.versioned("images/logo.svg")" class="navigationBarLogo">
                         </a>
                     </div>
                     <div class="cmuk-navbar-right">
-                        <ul class="cmuk-navbar-nav navigationBarLinks">
+                        <ul class="cmuk-navbar-nav cmuk-visible@@m">
                         @loginState match {
                             case null => {
                                 <li>
-                                    <a onclick="getForm(jsRoutes.controllers.AccountController.signUpForm())">
-                                        <span cmuk-icon="users" class="cmuk-margin-extra-small-right"></span> @Messages(constants.Form.SIGN_UP.legend)
+                                    <a onclick="getForm(jsRoutes.controllers.AccountController.noteAndVerifyMnemonic())">
+                                        @Messages(constants.Form.SIGN_UP.legend)
                                     </a>
                                 </li>
                                 <li>
                                     <a onclick="getForm(jsRoutes.controllers.AccountController.loginForm())">
-                                        <span cmuk-icon="sign-in" class="cmuk-margin-extra-small-right"></span> @Messages(constants.Form.LOGIN.legend)
+                                        <button class="cmuk-button cmuk-button-primary">@Messages(constants.Form.LOGIN.legend)</button>
                                     </a>
                                 </li>
+                                        <a class="cmuk-navbar-toggle cmuk-hidden@@m" cmuk-toggle="target: #offcanvas-flip" cmuk-navbar-toggle-icon href="#"></a>
                             }
                             case default => {
                                 @loginState.userType match {
@@ -101,8 +103,7 @@
                     </div>
 
                 </nav>
-            </div>
-        </header>
+        </div>
 
         @* End of Header *@
 
@@ -110,7 +111,7 @@
     <div class="mainSection">
         @* Data container *@
     <div class="dataContainer">
-        <div class="centerText">
+        <div class="cmuk-text-center">
             @for(failure <- failures) {
                 <div class="cmuk-alert-danger"  onclick="getForm(@failure.action)" cmuk-alert>
                     <a class="cmuk-alert-close" cmuk-close></a>
@@ -141,7 +142,7 @@
             <div class="leftSide">
             @left
             </div>
-            <div class="middle">
+            <div class="middle" id="centerContent">
             @center
             </div>
             <div class="rightSide">
@@ -152,6 +153,7 @@
         <div class="modal" id="commonModal">
             <div class="modalContent">
                 <div class="modalBody" id="commonModalContent">
+
                 </div>
             </div>
         </div>

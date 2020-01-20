@@ -1,0 +1,17 @@
+@(mnemonic: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider)
+<div class="MnemonicQuiz">
+    <span class="titleMnemonic">@Messages(constants.Form.PLEASE_BACKUP_THIS_MNEMONIC)</span><br/>
+    <div class="cmuk-flex verifyMnemonic">@for((str, i) <- mnemonic.split(" ").zipWithIndex) {
+        <div class="verifyMnemonicbutton">
+            <input type="text" id="mnemonicElement-@i" name="mnemonicElement-@i" placeholder="Fill this..." class="cmuk-input" value="@str" readonly>
+        </div>
+    }
+    </div><br/>
+    <div id="errorMnemonicInput" class="errorMnemonicInput">
+    @Messages(constants.Form.INVALID_INPUT)
+    </div>
+    <button type="button" id="getMnemonic" class="cmuk-button cmuk-button-primary hidden" onclick="getMnemonic('@mnemonic','#getQuiz','#getMnemonic','#verifyMnemonic','#errorMnemonicInput')">@Messages(constants.Form.BACK)</button>
+    <button type="button" id="getQuiz" class="cmuk-button cmuk-button-primary" onclick="getQuiz('#getQuiz','#getMnemonic','#verifyMnemonic')">@Messages(constants.Form.MNEMONIC_NOTED)</button>
+    <button type="button" id="verifyMnemonic" class="cmuk-button cmuk-button-primary hidden" onclick="verifyMnemonic('@mnemonic','#errorMnemonicInput')">@Messages(constants.Form.VERIFY)</button>
+    <script src="@routes.Assets.versioned("javascripts/mnemonicQuiz.js")" type="text/javascript"></script>
+</div>

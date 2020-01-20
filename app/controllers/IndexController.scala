@@ -1,8 +1,5 @@
 package controllers
 
-import java.nio.file.Files
-
-import akka.stream.scaladsl.Source
 import controllers.actions.WithLoginAction
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
@@ -14,10 +11,8 @@ import play.api.i18n.I18nSupport
 import play.api.mvc.{AbstractController, Action, AnyContent, MessagesControllerComponents}
 import play.api.{Configuration, Logger}
 import queries.GetAccount
-import views.companion.master.FileUpload
 
-import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class IndexController @Inject()(messagesControllerComponents: MessagesControllerComponents, withLoginAction: WithLoginAction, masterAccounts: Accounts, blockchainAclAccounts: ACLAccounts, blockchainZones: blockchain.Zones, blockchainOrganizations: blockchain.Organizations, blockchainAssets: blockchain.Assets, blockchainFiats: blockchain.Fiats, blockchainNegotiations: blockchain.Negotiations, masterOrganizations: Organizations, masterZones: Zones, blockchainAclHashes: blockchain.ACLHashes, blockchainOrders: blockchain.Orders, getAccount: GetAccount, blockchainAccounts: blockchain.Accounts, withUsernameToken: WithUsernameToken)(implicit configuration: Configuration, executionContext: ExecutionContext) extends AbstractController(messagesControllerComponents) with I18nSupport {
@@ -71,13 +66,13 @@ class IndexController @Inject()(messagesControllerComponents: MessagesController
             (zone, organization) <- getZoneAndOrganization(aclAccount)
             result<-withUsernameToken.Ok(views.html.traderIndex(totalFiat = totalFiat.map(_.transactionAmount.toInt).sum, zone = zone, organization = organization))
           } yield result
-        case constants.User.USER => withUsernameToken.Ok(views.html.userIndex())
-        case constants.User.UNKNOWN => withUsernameToken.Ok(views.html.anonymousIndex())
+        case constants.User.USER => withUsernameToken.Ok(views.html.dashboard())
+        case constants.User.UNKNOWN => withUsernameToken.Ok(views.html.dashboard())
         case constants.User.WITHOUT_LOGIN =>
           val updateUserType = masterAccounts.Service.updateUserType(loginState.username, constants.User.UNKNOWN)
           for {
             _ <- updateUserType
-            result<-withUsernameToken.Ok(views.html.anonymousIndex())
+            result<-withUsernameToken.Ok(views.html.dashboard())
           } yield result
       }).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))

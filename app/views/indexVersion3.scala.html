@@ -1,0 +1,158 @@
+@import controllers.actions.LoginState
+@(failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+
+@common(Messages(constants.Form.INDEX), failures, warnings, successes, infos)(Html(""))(center)(Html(""))
+
+@center = {
+    <div class="bannerContainer">
+        <div class="cmuk-container cmuk-flex">
+            <div class="bannerText">
+                <h2>The Future of Commodity Trading is Here</h2>
+                <p>Comdex is an ecosystem with Traders, Financiers and Underwriters under one platform.</p>
+                <div class="bannerButtons cmuk-flex">
+                    <button class="cmuk-button cmuk-button-primary">SELL</button>
+                    <button class="cmuk-button cmuk-button-default">BUY</button>
+                </div>
+            </div>
+            <div class="bannerImage">
+                <img src="@routes.Assets.versioned("images/bannerImage.svg")">
+            </div>
+        </div>
+    </div>
+    <div cmuk-slider>
+        <div class="cmuk-container">
+            <div class="cmuk-slider-container">
+                <marquee>
+                    <ul class="cmuk-slider-items cmuk-child-width-1-5">
+                        <li>
+                            <span class="sliderItemName">WHEAT</span> <span class="sliderItemValue">$14,000 m/t</span>
+                            <span class="sliderItemPercentage">+4.5%</span>
+                        </li>
+                        <li>
+                            <span class="sliderItemName">WHEAT</span> <span class="sliderItemValue">$14,000 m/t</span>
+                            <span class="sliderItemPercentage">+4.5%</span>
+                        </li>
+                        <li>
+                            <span class="sliderItemName">WHEAT</span> <span class="sliderItemValue">$14,000 m/t</span>
+                            <span class="sliderItemPercentage">+4.5%</span>
+                        </li>
+                        <li>
+                            <span class="sliderItemName">WHEAT</span> <span class="sliderItemValue">$14,000 m/t</span>
+                            <span class="sliderItemPercentage">+4.5%</span>
+                        </li>
+                        <li>
+                            <span class="sliderItemName">WHEAT</span> <span class="sliderItemValue">$14,000 m/t</span>
+                            <span class="sliderItemPercentage">+4.5%</span>
+                        </li>
+                        <li>
+                            <span class="sliderItemName">WHEAT</span> <span class="sliderItemValue">$14,000 m/t</span>
+                            <span class="sliderItemPercentage">+4.5%</span>
+                        </li>
+                        <li>
+                            <span class="sliderItemName">WHEAT</span> <span class="sliderItemValue">$14,000 m/t</span>
+                            <span class="sliderItemPercentage">+4.5%</span>
+                        </li>
+                    </ul>
+                </marquee>
+            </div>
+        </div>
+    </div>
+
+    <div class="cmuk-container headingSection">
+        <p class="cmuk-padding-large">Lorem ipsum dolor sit amet, consectetur $2,785,511, sed do eiusmod tempor
+            incididunt
+            ut 7500 et dolore magna 34. Ut enim.</p>
+    </div>
+
+    <div class="tabsSection">
+        <div class="cmuk-container">
+            <div class="cmuk-padding-large cmuk-padding-remove-left cmuk-padding-remove-right">
+                <h2>The value of Comdex</h2>
+                <div class="tabs">
+                    <div cmuk-grid>
+                        <div class="verticalDataTabs">
+
+                            <ul class="cmuk-nav cmuk-nav-default cmuk-width-auto@@m"
+                            cmuk-switcher="connect: #component-nav; animation: cmuk-animation-fade">
+                                <li class=""><a href="#">Traders <span cmuk-icon="chevron-right"></span></a>
+                                </li>
+                                <li class=""><a href="#">Financiars <span cmuk-icon="chevron-right"></span></a></li>
+                                <li class=""><a href="#">Underwriters <span cmuk-icon="chevron-right"></span></a></li>
+                            </ul>
+
+                        </div>
+                        <div class="verticalDataTabsContent cmuk-width-expand@@m">
+
+                            <ul id="component-nav" class="cmuk-switcher">
+                                <li>
+                                    <div class="verticalDataTabsData">
+                                        <div class="cmuk-width-1-1@@s">
+                                            <p>Comdex is more than just a service with multiple products and advanced technology. It is a platform connecting all the parties of the commodity trading ecosystem.
+                                                It is a one stop shop for a company’s funding requirements connecting global partners on one single platform. These partnerships provide</p>
+                                        </div>
+                                        <div class="cmuk-width-1-1@@s">
+                                            <p>companies with access to working capital funding at a lower cost, which has been a traditional constraint for SMEs. The platform’s promise of greater transparency means processes become more streamlined and efficient which also equate to cost savings. </p>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="verticalDataTabsData">
+                                        <div>
+                                            <p>The Comdex platform provides access to a large global portfolio of potential customers to
+                                                increase their customer base. The robust KYC process and transparency
+                                                of the trades give the funders the perfect platform for verification of origin.</p>
+                                        </div>
+                                        <div>
+                                            <p>The participation of underwriters on the platform provides avenues to
+                                                mitigate risk and gives investors the ability to bring
+                                                their customers onto a trusted platform.</p>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="verticalDataTabsData">
+                                        <div>
+                                            <p>Insurance plays a significant role in risk mitigation in trade finance
+                                                and with the participation of major underwriters on the platform;
+                                                investors have the peace of mind of credit insured sales and purchases.</p>
+                                        </div>
+                                        <div>
+                                            <p>Insurance is crucial when providing trade credit solutions and securing
+                                                a credit insurance can be the difference between missing an opportunity
+                                                and gaining a lucrative deal that bolsters the bottom line.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="contactSection">
+
+        <div class="cmuk-container">
+            <div class="cmuk-padding-large cmuk-padding-remove-left cmuk-padding-remove-right">
+                <div>
+                    <div cmuk-grid class="cmuk-child-width-1-1 cmuk-child-width-1-4@@m">
+                        <h3>Contact Us</h3>
+                        <div>
+                            <input type="text" class="cmuk-input cmuk-form-width-medium " placeholder="Email">
+                        </div>
+                        <div>
+                            <input type="text" class="cmuk-input cmuk-form-width-medium " placeholder="Message">
+                        </div>
+                        <div>
+                            <input type="submit" class="cmuk-button cmuk-width-small " value="send">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+

@@ -56,7 +56,7 @@ class WithLoginAction @Inject()(messagesControllerComponents: MessagesController
         result <- result(loginState)
       } yield result).recover {
         case baseException: BaseException => logger.info(baseException.failure.message, baseException)
-          Results.Unauthorized(views.html.index()).withNewSession
+          Results.Unauthorized(views.html.indexVersion3()).withNewSession
       }
     }
   }

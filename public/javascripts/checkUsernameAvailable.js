@@ -21,11 +21,11 @@ function checkUsernameAvailable(source, resultID, usernameAvailableCheckBoxID) {
                     statusCode: {
                         200: function () {
                             usernameAvailableCheckBox[0].checked = true;
-                            result.html('available');
+                            result.html('&#10004;');
                         },
                         204: function () {
                             usernameAvailableCheckBox[0].checked = false;
-                            result.html('taken');
+                            result.html('&#10060;');
                         },
                     }
                 });

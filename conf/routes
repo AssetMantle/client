@@ -23,7 +23,8 @@ GET         /profile                                                     control
 GET         /profileDocuments                                            controllers.ComponentViewController.profileDocuments
 GET         /profilePicture                                              controllers.ComponentViewController.profilePicture
 
-GET         /account/signUp                                              controllers.AccountController.signUpForm
+GET         /account/noteAndVerifyMnemonic                               controllers.AccountController.noteAndVerifyMnemonic
+GET         /account/signUp                                              controllers.AccountController.signUpForm(mnemonic:String)
 POST        /account/signUp                                              controllers.AccountController.signUp
 
 GET         /account/login                                               controllers.AccountController.loginForm
@@ -42,7 +43,6 @@ GET         /account/forgotPassword                                      control
 POST        /account/forgotPassword                                      controllers.AccountController.forgotPassword
 
 GET         /account/checkUsernameAvailable                              controllers.AccountController.checkUsernameAvailable(username: String)
-POST        /acccount/noteNewKeyDetails                                  controllers.AccountController.noteNewKeyDetails(name:String,blockchainAddress:String ,publicKey:String ,seed:String)
 
 GET         /contact                                                     controllers.ContactController.contact
 
@@ -65,6 +65,11 @@ GET         /master/component/availableAssetList                         control
 GET         /master/component/availableAssetListWithLogin                controllers.ComponentViewController.availableAssetListWithLogin
 GET         /master/component/organizationViewTraderList                 controllers.ComponentViewController.organizationViewTraderList
 GET         /master/component/organizationViewTrader                     controllers.ComponentViewController.organizationViewTrader(traderID: String)
+GET         /master/component/accountDetails                             controllers.ComponentViewController.accountDetails
+GET         /master/component/transactionDetails                         controllers.ComponentViewController.transactionDetails
+GET         /master/component/tradeDetails                               controllers.ComponentViewController.tradeDetails
+GET         /master/component/subscriptionsDetails                       controllers.ComponentViewController.subscriptionsDetails
+GET         /master/component/settingsDetails                            controllers.ComponentViewController.settingsDetails
 
 GET         /master/component/releaseAssetList                           controllers.ReleaseAssetController.releaseAssetList
 GET         /master/component/buyerExecuteOrderList                      controllers.BuyerExecuteOrderController.moderatedBuyerExecuteOrderList

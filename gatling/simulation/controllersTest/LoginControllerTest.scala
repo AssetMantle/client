@@ -39,7 +39,7 @@ object loginControllerTest {
   val loginScenario: ScenarioBuilder = scenario("Login Before SignUp")
     .exec(http("Login_GET")
       .get(routes.AccountController.loginForm().url)
-      .check(css("legend:contains(%s)".format(constants.Form.LOGIN.legend)).exists)
+      .check(css("legend:contains(%s)".format("Login")).exists)
       .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
     .pause(2)
     .exec(http("Login_POST")

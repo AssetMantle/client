@@ -38,6 +38,7 @@ class AccountController @Inject()(
                                    masterTransactionEmailOTP: masterTransaction.EmailOTPs,
                                    masterTransactionSessionTokens: masterTransaction.SessionTokens,
                                    masterTransactionPushNotificationTokens: masterTransaction.PushNotificationTokens,
+                                   queriesMnemonic: queries.GetMnemonic,
                                    transactionAddKey: transactions.AddKey,
                                    transactionForgotPassword: transactions.ForgotPassword,
                                    transactionChangePassword: transactions.ChangePassword,
@@ -53,17 +54,17 @@ class AccountController @Inject()(
 
   private implicit val logger: Logger = Logger(this.getClass)
 
-  def signUpForm: Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.signUp())
+  def signUpForm(mnemonic:String): Action[AnyContent] = Action { implicit request =>
+    Ok(views.html.component.master.signUp(views.companion.master.SignUp.form,mnemonic))
   }
 
   def signUp: Action[AnyContent] = Action.async { implicit request =>
     SignUp.form.bindFromRequest().fold(
       formWithErrors => {
-        Future(BadRequest(views.html.component.master.signUp(formWithErrors)))
+        Future(BadRequest(views.html.component.master.signUp(formWithErrors,formWithErrors.data(constants.FormField.MNEMONIC.name))))
       },
       signUpData => {
-        val addKeyResponse = transactionAddKey.Service.post(transactionAddKey.Request(signUpData.username, signUpData.password))
+        val addKeyResponse = transactionAddKey.Service.post(transactionAddKey.Request(signUpData.username, signUpData.password, signUpData.mnemonic))
 
         def createAccount(addKeyResponse: transactionAddKey.Response): Future[String] = blockchainAccounts.Service.create(address = addKeyResponse.address, pubkey = addKeyResponse.pubkey)
 
@@ -74,7 +75,7 @@ class AccountController @Inject()(
           createAccount <- createAccount(addKeyResponse)
           _ <- addLogin(createAccount)
         } yield {
-          PartialContent(views.html.component.master.noteNewKeyDetails(name = addKeyResponse.name, blockchainAddress = addKeyResponse.address, publicKey = addKeyResponse.pubkey, seed = addKeyResponse.mnemonic))
+          Ok(views.html.indexVersion3(successes = Seq(constants.Response.SIGNED_UP)))
         }).recover {
           case baseException: BaseException =>
             InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -83,6 +84,13 @@ class AccountController @Inject()(
     )
   }
 
+  def noteAndVerifyMnemonic: Action[AnyContent] = Action.async { implicit request =>
+    val mnemonicResponse=queriesMnemonic.Service.get()
+    for{
+      mnemonicResponse<-mnemonicResponse
+    }yield Ok(views.html.component.master.noteAndVerifyMnemonic( mnemonic = mnemonicResponse.body))
+
+  }
 
   def loginForm: Action[AnyContent] = Action { implicit request =>
     Ok(views.html.component.master.login())
@@ -156,12 +164,12 @@ class AccountController @Inject()(
                 zone <- zone(aclAccount)
                 result <- withUsernameToken.Ok(views.html.traderIndex(totalFiat = fiatPegWallet.map(_.transactionAmount.toInt).sum, zone = zone, organization = organization, warnings = contactWarnings))
               } yield result
-            case constants.User.USER => withUsernameToken.Ok(views.html.userIndex(warnings = contactWarnings))
-            case constants.User.UNKNOWN => withUsernameToken.Ok(views.html.anonymousIndex(warnings = contactWarnings))
+            case constants.User.USER => withUsernameToken.Ok(views.html.dashboard(warnings = contactWarnings))
+            case constants.User.UNKNOWN => withUsernameToken.Ok(views.html.dashboard(warnings = contactWarnings))
             case constants.User.WITHOUT_LOGIN => val updateUserType = masterAccounts.Service.updateUserType(loginData.username, constants.User.UNKNOWN)
               for {
                 _ <- updateUserType
-                result <- withUsernameToken.Ok(views.html.anonymousIndex(warnings = contactWarnings))
+                result <- withUsernameToken.Ok(views.html.dashboard(warnings = contactWarnings))
               } yield result
           }
         }
@@ -204,7 +212,7 @@ class AccountController @Inject()(
               shutdownActor.onLogOut(constants.Module.ACTOR_MAIN_NEGOTIATION, loginState.username)
               shutdownActor.onLogOut(constants.Module.ACTOR_MAIN_ORDER, loginState.username)
             }
-            Ok(views.html.index(successes = Seq(constants.Response.LOGGED_OUT))).withNewSession
+            Ok(views.html.indexVersion3(successes = Seq(constants.Response.LOGGED_OUT))).withNewSession
           }
 
           (for {
@@ -312,28 +320,10 @@ class AccountController @Inject()(
     )
   }
 
-
   def checkUsernameAvailable(username: String): Action[AnyContent] = Action.async { implicit request =>
     val checkUsernameAvailable = masterAccounts.Service.checkUsernameAvailable(username)
     for {
       checkUsernameAvailable <- checkUsernameAvailable
     } yield if (checkUsernameAvailable) Ok else NoContent
-  }
-
-  //TODO Remove query parameters
-  def noteNewKeyDetails(name: String, blockchainAddress: String, publicKey: String, seed: String): Action[AnyContent] = Action { implicit request =>
-    views.companion.master.NoteNewKeyDetails.form.bindFromRequest().fold(
-      formWithErrors => {
-        BadRequest(views.html.component.master.noteNewKeyDetails(formWithErrors, name, blockchainAddress, publicKey, seed))
-      },
-      noteNewKeyDetailsData => {
-        if (noteNewKeyDetailsData.confirmNoteNewKeyDetails) {
-          Ok(views.html.index(successes = Seq(constants.Response.SIGNED_UP)))
-        }
-        else {
-          BadRequest(views.html.component.master.noteNewKeyDetails(name = name, blockchainAddress = blockchainAddress, publicKey = publicKey, seed = seed))
-        }
-      }
-    )
   }
 }
