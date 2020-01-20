@@ -8,8 +8,14 @@
         <div class="cmuk-grid-match cmuk-grid" cmuk-grid>
             <div class="cmuk-width-expand@@m">
                 <div class="cmuk-card cmuk-card-default">
-                    <div class="cmuk-card-header">
+                    <div class="cmuk-card-header cmuk-flex" style="align-items: center ; justify-content: space-between;">
+                        <div>
                         <span class="heading">@Messages(constants.Form.ORGANIZATION):</span>
+                        </div>
+                        <div>
+                            <button class="btn active" id="tableView">table</button>
+                            <button class="btn active" id="listView">list</button>
+                        </div>
                     </div>
                     <div class="cmuk-card-body">
                         <div id="organization"></div>

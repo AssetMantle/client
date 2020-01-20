@@ -416,7 +416,7 @@ dl .info::after {
 .mainSection {
     display: flex;
     flex-direction: column;
-    height: 100%;
+    height:calc(100% - 50px);
 }
 
 .dataContainer {
@@ -606,4 +606,21 @@ dl .info::after {
     bottom: -19px;
     border: 8px solid;
     border-color: transparent transparent #fff transparent;
+}
+.mainlist{
+    padding:0px;
+}
+.listItem{
+    display: inline-flex;
+    background: #cccc;
+    margin: 0;
+    margin-bottom: 10px;
+}
+.listItemchild{
+    margin: 10px;
+}
+.listItemchildhTitle{
+    font-weight: bold;
+    color: black;
+
 }
