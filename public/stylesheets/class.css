@@ -1137,10 +1137,21 @@ input:checked+.slider:before {
 .passphraseMessage{
     color : red;
 }
-
+.pushNotifications label{
+    display: none;
+}
 
 
 .dataContainer .cmuk-alert{
     margin:0px;
+}
+
+.usernameAvailibilty{
+    position: relative;
+}
+.usernameAvailibilty .result{
+    position: absolute;
+    right: -25px;
+    top: 5px;
 }
 
