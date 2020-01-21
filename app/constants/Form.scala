@@ -466,7 +466,7 @@ object Form {
   val INVALID_INPUT = "INVALID_INPUT"
   val MNEMONIC_NOTED = "MNEMONIC_NOTED"
   val EDIT= "EDIT"
-  var TABLE = "TABLE"
-  var CARD = "CARD"
+  val TABLE = "TABLE"
+  val CARD = "CARD"
 
 }

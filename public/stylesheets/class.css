@@ -22,15 +22,12 @@
     position: relative;
     max-width: 100%;
     width: 600px;
-    /*display: inline-block;*/
     overflow-y:auto;
     max-height: 600px;
 }
 .modalBody{
     padding:20px;
 }
-
-
 
 .headerFontSize{
     font-size: 0.81094rem !important;
@@ -414,16 +411,16 @@ dl .info::after {
 .mainSection {
     display: flex;
     flex-direction: column;
-    height: 100%;
+    height:calc(100% - 64px);
 
 }
-.mainSection{
-    height: calc(100% - 83px);
-}
+
 .dataContainer, .pageContent, .middle{
     height: 100%;
 }
+
 .footer {
+    display: none;
     margin-top: 20px;
     width: 100%;
     padding: 5px 0px 5px 0px;
@@ -878,10 +875,7 @@ dl .info::after {
     font-weight: bold;
     font-size: 36px;
     line-height: 153%;
-    /* identical to box height, or 55px */
-
     letter-spacing: 0.01em;
-
     color: #262525;
 }
 
@@ -924,10 +918,7 @@ dl .info::after {
     font-weight: bold;
     font-size: 36px;
     line-height: 127.5%;
-    /* identical to box height, or 46px */
-
     letter-spacing: 0.01em;
-
     color: #FAFBFD;
 }
 
@@ -937,11 +928,8 @@ dl .info::after {
     height: 40px;
     font-size: 18px;
     line-height: 172%;
-    /* identical to box height, or 31px */
-
     text-align: center;
     letter-spacing: 0.01em;
-
     color: #FFFFFF;
 }
 
@@ -1162,5 +1150,4 @@ input:checked+.slider:before {
 .listItemchildhTitle{
     font-weight: bold;
     color: black;
-
 }
