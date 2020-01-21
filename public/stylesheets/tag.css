@@ -1,7 +1,20 @@
-html, body {
+html,
+body {
     height: 100%;
-    font-size: 0.8125rem;
-    background: #f4f4f4;
+    margin: 0;
+    background: #F4F7FB;
+}
+body::-webkit-scrollbar {
+    width: 10px;
+}
+
+body::-webkit-scrollbar * {
+    background: transparent;
+}
+
+body::-webkit-scrollbar-thumb {
+    background: grey !important;
+    border-radius: 6px;
 }
 
 input, select {
@@ -31,6 +44,21 @@ button {
 button:hover {
     opacity: 1;
 }
-label{
-    display: none !important;
+
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+    -webkit-border-radius: 10px;
+    border-radius: 10px;
+    background: grey;
+    -webkit-box-shadow: none;
+}
+::-webkit-scrollbar-thumb:window-inactive {
+    background:grey;
+}
+dl{
+    text-align: left;
 }

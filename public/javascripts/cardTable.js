@@ -1,17 +1,28 @@
-$(document).ready(function(){
-    var $tableMain = $('#tabledata');
-    $('#tableView').click(function() {
-        var $table = $tableMain;
+$(document).click(function (e) {
+    $('.editbutton').each(function () {
+        const elementcontent = $(this);
+        if (elementcontent.is(e.target)) {
+            cardTable(elementcontent);
+        }
+    });
+});
+
+function cardTable(element) {
+    element.parent().find('#Edit').toggle();
+    var $table = element.parent().parent().siblings().find("table");
+    element.parent().find('#tableView').click(function() {
+        var $cardTable = $table;
         var invertedTable = [];
-        for(var i=0 ; i < $table.find('tr:first th').length ; i++){
+        for(var i=0 ; i < $cardTable.find('tr:first th').length ; i++){
             invertedTable.push([]);
         }
-        $table.find('th,td').each(function(){
+        $cardTable.find('th,td').each(function(){
             invertedTable[$(this).index()].push($(this).text());
         });
         var $newTable = $('<table class="cmuk-table cmuk-table-divider"></table>');
         var $newTr = $('<tr></tr>');
         for(var i=0 ; i < invertedTable.length ; i++){
+
             for(var j = 0 ; j < invertedTable[i].length; j++){
                 if(j == 0){
                     $newTr.append('<th>'+invertedTable[i][j]+'</th>');
@@ -32,11 +43,10 @@ $(document).ready(function(){
         }
         $(".productTable ul").replaceWith($newTable);
     });
-
-    $('#listView').click(function() {
-        var $table = $tableMain;
+    element.parent().find('#listView').click(function() {
+        var $tableCard = $table;
         var ul = $("<ul class=mainlist>");
-        $table.find('tr').each(function(){
+        $tableCard.find('tr').each(function(){
             var li = $("<li class=listItem>");
             $("td", this).each(function(){
                 var div = $("<div class=listItemchild>");
@@ -49,6 +59,7 @@ $(document).ready(function(){
             });
             ul.append(li);
         })
-        $(".productTable table").replaceWith(ul);
+        $(this).closest(".cmuk-card-header").siblings().find('table').replaceWith(ul);
     });
-});
+
+}

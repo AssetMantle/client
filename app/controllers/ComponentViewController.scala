@@ -366,4 +366,24 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
       }
   }
+
+  def accountDetails = Action {
+    Ok(views.html.component.master.account())
+  }
+
+  def transactionDetails = Action {
+    Ok(views.html.component.master.transactions())
+  }
+
+  def tradeDetails = Action {
+    Ok(views.html.component.master.trades())
+  }
+
+  def subscriptionsDetails = Action {
+    Ok(views.html.component.master.subscriptions())
+  }
+
+  def settingsDetails = Action {
+    Ok(views.html.component.master.settings())
+  }
 }

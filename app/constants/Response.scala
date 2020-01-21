@@ -107,6 +107,7 @@ object Response {
   val USERNAME_UNAVAILABLE = new Failure("USERNAME_UNAVAILABLE")
   val INVALID_USERNAME = new Failure("INVALID_USERNAME")
   val INVALID_PASSWORD = new Failure("INVALID_PASSWORD")
+  val INVALID_INPUT = new Failure("INVALID_INPUT")
   val NO_FILE = new Failure("NO_FILE")
   val PASSWORD_NOT_GIVEN = new Failure("PASSWORD_NOT_GIVEN")
   val GAS_NOT_GIVEN = new Failure("GAS_NOT_GIVEN")
@@ -114,6 +115,7 @@ object Response {
   val ALL_ASSET_FILES_NOT_VERIFIED = new Failure("ALL_KYC_FILES_NOT_VERIFIED")
   val SMS_SEND_FAILED = new Failure("SMS_SEND_FAILED")
   val SMS_SERVICE_CONNECTION_FAILURE = new Failure("SMS_SERVICE_CONNECTION_FAILURE")
+
 
   class Failure(private val response: String, private val actionController: JavaScriptReverseRoute = null) {
     val message: String = PREFIX + FAILURE_PREFIX + response

@@ -30,7 +30,7 @@ class AddKey @Inject()(wsClient: WSClient)(implicit configuration: Configuration
 
   private implicit val requestWrites: OWrites[Request] = Json.writes[Request]
 
-  case class Request(name: String, password: String)
+  case class Request(name: String, password: String, seed:String)
 
   private implicit val responseReads: Reads[Response] = Json.reads[Response]
 
@@ -42,9 +42,9 @@ class AddKey @Inject()(wsClient: WSClient)(implicit configuration: Configuration
       case connectException: ConnectException =>
         logger.error(constants.Response.CONNECT_EXCEPTION.message, connectException)
         throw new BaseException(constants.Response.CONNECT_EXCEPTION)
-      case e:Exception=> logger.error("newType of error")
-        logger.info(e.getMessage)
-        throw new BaseException(constants.Response.ALL_ASSET_FILES_NOT_VERIFIED)
+      case e:Exception=>
+        logger.error(e.getMessage)
+        throw new BaseException(constants.Response.GENERIC_EXCEPTION)
     }
   }
 

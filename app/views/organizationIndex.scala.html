@@ -12,9 +12,12 @@
                         <div>
                         <span class="heading">@Messages(constants.Form.ORGANIZATION):</span>
                         </div>
-                        <div>
-                            <button class="btn active" id="tableView">table</button>
-                            <button class="btn active" id="listView">list</button>
+                        <div class="cmuk-inline">
+                            <button class="uk-button editbutton">@Messages(constants.Form.EDIT)</button>
+                            <div id="Edit"  cmuk-dropdown="mode: click">
+                                <button class="btn active" id="tableView">@Messages(constants.Form.TABLE)</button>
+                                <button class="btn active" id="listView">@Messages(constants.Form.CARD)</button>
+                            </div>
                         </div>
                     </div>
                     <div class="cmuk-card-body">
@@ -24,8 +27,17 @@
             </div>
             <div class="cmuk-width-expand@@m">
                 <div class="cmuk-card cmuk-card-default">
-                    <div class="cmuk-card-header">
-                        <span class="heading">@Messages(constants.Form.ZONE):</span>
+                    <div class="cmuk-card-header cmuk-flex" style="align-items: center ; justify-content: space-between;">
+                        <div>
+                            <span class="heading">@Messages(constants.Form.ZONE):</span>
+                        </div>
+                        <div  class="cmuk-inline">
+                            <button class="uk-button editbutton">@Messages(constants.Form.EDIT)</button>
+                            <div id="Edit"  cmuk-dropdown="mode: click">
+                                <button class="btn active" id="tableView">@Messages(constants.Form.TABLE)</button>
+                                <button class="btn active" id="listView">@Messages(constants.Form.CARD)</button>
+                            </div>
+                        </div>
                     </div>
                     <div class="cmuk-card-body">
                         <div id="zone"></div>
@@ -36,8 +48,6 @@
     <div class="cmuk-margin-top cmuk-margin-bottom">
         <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.SetACLController.inviteTraderForm())">@Messages(constants.Form.INVITE_TRADER.legend)</button>
     </div>
-
-
         <div class="cmuk-card cmuk-card-default">
             <div class="cmuk-card-header">
                 <span class="heading">@Messages(constants.Form.TEAM)</span>

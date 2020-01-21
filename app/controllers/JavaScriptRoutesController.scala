@@ -17,7 +17,6 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.AccountController.emailOTPForgotPasswordForm,
         routes.javascript.AccountController.forgotPasswordForm,
         routes.javascript.AccountController.checkUsernameAvailable,
-        routes.javascript.AccountController.noteNewKeyDetails,
 
         routes.javascript.AddKeyController.blockchainAddKeyForm,
 
@@ -100,6 +99,11 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.ComponentViewController.organizationViewTrader,
         routes.javascript.ComponentViewController.profileDocuments,
         routes.javascript.ComponentViewController.profilePicture,
+        routes.javascript.ComponentViewController.accountDetails,
+        routes.javascript.ComponentViewController.transactionDetails,
+        routes.javascript.ComponentViewController.tradeDetails,
+        routes.javascript.ComponentViewController.subscriptionsDetails,
+        routes.javascript.ComponentViewController.settingsDetails,
 
         routes.javascript.ConfirmBuyerBidController.confirmBuyerBidDetailForm,
         routes.javascript.ConfirmBuyerBidController.confirmBuyerBidForm,
@@ -243,6 +247,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.VerifyMobileNumberController.verifyMobileNumberForm,
 
         routes.javascript.ViewController.profile,
+        routes.javascript.AccountController.noteAndVerifyMnemonic
 
       )
     ).as("text/javascript")

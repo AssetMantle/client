@@ -25,9 +25,7 @@ class GetAccount @Inject()()(implicit wsClient: WSClient, configuration: Configu
 
   private val url = ip + ":" + port + "/" + path + "/"
 
-  private def action(request: String): Future[Response] = {
-    utilities.JSON.getResponseFromJson[Response](wsClient.url(url + request).get)
-  }
+  private def action(request: String): Future[Response] = utilities.JSON.getResponseFromJson[Response](wsClient.url(url + request).get)
 
   object Service {
 
