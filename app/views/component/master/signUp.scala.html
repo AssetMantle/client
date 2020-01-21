@@ -6,9 +6,8 @@
 
 @commonForm(constants.Form.SIGN_UP, signUpForm) {
     <div class="usernameAvailibilty">
-    @commonInputText(signUpForm, constants.FormField.USERNAME, 'oninput -> """checkUsernameAvailable(this, "#checkUsernameAvailableResult", "#USERNAME_AVAILABLE")""")
-    <div id="checkUsernameAvailableResult" class="result"></div>
-    </div>
+        @commonInputText(signUpForm, constants.FormField.USERNAME, 'oninput -> """checkUsernameAvailable(this, "#checkUsernameAvailableResult", "#USERNAME_AVAILABLE")""")
+        <div id="checkUsernameAvailableResult" class="result"></div>
     </div>
     @commonInputPassword(signUpForm, constants.FormField.SIGNUP_PASSWORD)
     @commonInputPassword(signUpForm, constants.FormField.SIGNUP_CONFIRM_PASSWORD)
