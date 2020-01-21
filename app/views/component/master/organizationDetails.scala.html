@@ -1,28 +1,25 @@
 @import controllers.actions.LoginState
+@import views.html.base._
 @import models.master.Organization
 
 @(organization: Organization)(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
-<div class="cmuk-overflow-auto">
-<div class="productTable">
-<table class="cmuk-table cmuk-table-divider" id="tabledata">
-    <tbody>
-        <tr>
-            <th>@Messages(constants.Form.ORGANIZATION_NAME)</th>
-            <th>@Messages(constants.Form.ORGANIZATION_ID)</th>
-            <th>@Messages(constants.Form.ORGANIZATION_USERNAME)</th>
-            <th>@Messages(constants.Form.ESTABLISHMENT_DATE)</th>
-            <th>@Messages(constants.Form.EMAIL)</th>
-            <th>@Messages(constants.Form.VERIFIED_STATUS)</th>
-        </tr>
-        <tr>
-            <td>@organization.name</td>
-            <td>@organization.id </td>
-            <td>@organization.accountID</td>
-            <td>@organization.establishmentDate</td>
-            <td>@organization.email</td>
-            <td>@organization.verificationStatus</td>
-        </tr>
-    </tbody>
-</table>
-</div>
+<div>
+@commonTable(){
+    <tr>
+        <th>@Messages(constants.Form.ORGANIZATION_NAME)</th>
+        <th>@Messages(constants.Form.ORGANIZATION_ID)</th>
+        <th>@Messages(constants.Form.ORGANIZATION_USERNAME)</th>
+        <th>@Messages(constants.Form.ESTABLISHMENT_DATE)</th>
+        <th>@Messages(constants.Form.EMAIL)</th>
+        <th>@Messages(constants.Form.VERIFIED_STATUS)</th>
+    </tr>
+    <tr>
+        <td>@organization.name</td>
+        <td>@organization.id </td>
+        <td>@organization.accountID</td>
+        <td>@organization.establishmentDate</td>
+        <td>@organization.email</td>
+        <td>@organization.verificationStatus</td>
+    </tr>
+}
 </div>
