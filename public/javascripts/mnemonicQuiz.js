@@ -1,4 +1,4 @@
-function getQuiz() {
+function getQuiz(getQuizButton,getMnemonicButton,verifyMnemonicButton) {
     let randomArray = [];
     while (randomArray.length < 3) {
         let randomNum = Math.floor(Math.random() * 24);
@@ -7,12 +7,12 @@ function getQuiz() {
             $("#mnemonicElement-" + randomNum).attr('readonly', false).val("");
         }
     }
-    $("#getQuiz").hide();
-    $("#getMnemonic").show();
-    $("#verifyMnemonic").show();
+    $(getQuizButton).hide();
+    $(getMnemonicButton).show();
+    $(verifyMnemonicButton).show();
 }
 
-function getMnemonic(mnemonic) {
+function getMnemonic(mnemonic,getQuizButton,getMnemonicButton,verifyMnemonicButton,errorMnemonicInput) {
     const mnemonicElementArray = mnemonic.split(" ");
     for (let i = 0; i < 24; i++) {
         let mnemonicElement = $("#mnemonicElement-" + i);
@@ -20,17 +20,17 @@ function getMnemonic(mnemonic) {
             mnemonicElement.val(mnemonicElementArray[i]).attr('readonly', true);
         }
     }
-    $("#getQuiz").show();
-    $("#getMnemonic").hide();
-    $("#verifyMnemonic").hide();
-    $("#errorMnemonicInput").hide();
+    $(getQuizButton).show();
+    $(getMnemonicButton).hide();
+    $(verifyMnemonicButton).hide();
+    $(errorMnemonicInput).hide();
 }
 
-function verifyMnemonic(mnemonic) {
+function verifyMnemonic(mnemonic,errorMnemonicInput) {
     const mnemonicElementArray = mnemonic.split(" ");
     for (let i = 0; i < 24; i++) {
         if ($("#mnemonicElement-" + i).val() !== mnemonicElementArray[i]) {
-            $("#errorMnemonicInput").show();
+            $(errorMnemonicInput).show();
             return;
         }
     }

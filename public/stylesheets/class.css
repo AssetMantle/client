@@ -415,10 +415,6 @@ dl .info::after {
     display: flex;
     flex-direction: column;
     height: 100%;
-
-}
-.mainSection{
-    height: calc(100% - 83px);
 }
 .dataContainer, .pageContent, .middle{
     height: 100%;
@@ -1092,10 +1088,6 @@ input:checked+.slider {
     background-color: rgba(60, 215, 57, 0.37);
 }
 
-/* input:focus+.slider {
-    box-shadow: 0 0 1px #2196F3;
-} */
-
 input:checked+.slider:before {
     -webkit-transform: translateX(16px);
     -ms-transform: translateX(16px);
@@ -1142,16 +1134,19 @@ input:checked+.slider:before {
     margin:0px;
 }
 
-.hideLabel label{
-    display: none;
+.usernameAvailibilty{
+    position: relative;
 }
-/*#Edit{*/
-/*    display: none;*/
-/*}*/
+.usernameAvailibilty .result{
+    position: absolute;
+    right: -25px;
+    top: 5px;
+}
 
 .mainlist{
     padding:0px;
 }
+
 .listItem{
     display: inline-flex;
     background: #cccc;

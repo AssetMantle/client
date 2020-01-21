@@ -5,7 +5,11 @@
 @(signUpForm: Form[SignUp.Data] = SignUp.form, mnemonic:String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 
 @commonForm(constants.Form.SIGN_UP, signUpForm) {
+    <div class="usernameAvailibilty">
     @commonInputText(signUpForm, constants.FormField.USERNAME, 'oninput -> """checkUsernameAvailable(this, "#checkUsernameAvailableResult", "#USERNAME_AVAILABLE")""")
+    <div id="checkUsernameAvailableResult" class="result"></div>
+    </div>
+    </div>
     @commonInputPassword(signUpForm, constants.FormField.SIGNUP_PASSWORD)
     @commonInputPassword(signUpForm, constants.FormField.SIGNUP_CONFIRM_PASSWORD)
     @commonCheckbox(signUpForm, constants.FormField.USERNAME_AVAILABLE, 'containerDivClass -> "hidden")
