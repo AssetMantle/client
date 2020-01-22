@@ -138,16 +138,89 @@
 
             }
         </div>
-        <div class="pageContent">
-            <div class="leftSide">
-            @left
-            </div>
-            <div class="middle" id="centerContent">
-            @center
-            </div>
-            <div class="rightSide">
-            @right
-            </div>
+
+        <div class="pageContainer">
+        @loginState match {
+            case null => {
+                <div class="bannerContainer">
+                    <div class="cmuk-container cmuk-flex">
+                        <div class="bannerText">
+                            <h2>The Future of Commodity Trading is Here</h2>
+                            <p>Comdex is an ecosystem with Traders, Financiers and Underwriters under one platform.</p>
+                            <div class="bannerButtons cmuk-flex">
+                                <button class="cmuk-button cmuk-button-primary">SELL</button>
+                                <button class="cmuk-button cmuk-button-default">BUY</button>
+                            </div>
+                        </div>
+                        <div class="bannerImage">
+                            <img src="@routes.Assets.versioned("images/bannerImage.svg")">
+                        </div>
+                    </div>
+                </div>
+                <div cmuk-slider>
+                    <div class="cmuk-container">
+                        <div class="cmuk-slider-container">
+                            <marquee>
+                                <ul class="cmuk-slider-items cmuk-child-width-1-5">
+                                    <li>
+                                        <span class="sliderItemName">WHEAT</span> <span class="sliderItemValue">$14,000 m/t</span>
+                                        <span class="sliderItemPercentage">+4.5%</span>
+                                    </li>
+                                    <li>
+                                        <span class="sliderItemName">WHEAT</span> <span class="sliderItemValue">$14,000 m/t</span>
+                                        <span class="sliderItemPercentage">+4.5%</span>
+                                    </li>
+                                    <li>
+                                        <span class="sliderItemName">WHEAT</span> <span class="sliderItemValue">$14,000 m/t</span>
+                                        <span class="sliderItemPercentage">+4.5%</span>
+                                    </li>
+                                    <li>
+                                        <span class="sliderItemName">WHEAT</span> <span class="sliderItemValue">$14,000 m/t</span>
+                                        <span class="sliderItemPercentage">+4.5%</span>
+                                    </li>
+                                    <li>
+                                        <span class="sliderItemName">WHEAT</span> <span class="sliderItemValue">$14,000 m/t</span>
+                                        <span class="sliderItemPercentage">+4.5%</span>
+                                    </li>
+                                    <li>
+                                        <span class="sliderItemName">WHEAT</span> <span class="sliderItemValue">$14,000 m/t</span>
+                                        <span class="sliderItemPercentage">+4.5%</span>
+                                    </li>
+                                    <li>
+                                        <span class="sliderItemName">WHEAT</span> <span class="sliderItemValue">$14,000 m/t</span>
+                                        <span class="sliderItemPercentage">+4.5%</span>
+                                    </li>
+                                </ul>
+                            </marquee>
+                        </div>
+                    </div>
+                </div>
+                <div class="pageContent">
+                    <div class="leftSide">
+                    @left
+                    </div>
+                    <div class="middle" id="centerContent">
+                    @center
+                    </div>
+                    <div class="rightSide">
+                    @right
+                    </div>
+                </div>
+            }
+            case default => {
+                <div class="pageContent">
+                    <div class="leftSide">
+                    @left
+                    </div>
+                    <div class="middle" id="centerContent">
+                    @center
+                    </div>
+                    <div class="rightSide">
+                    @right
+                    </div>
+                </div>
+            }
+        }
         </div>
 
         <div class="modal" id="commonModal">
