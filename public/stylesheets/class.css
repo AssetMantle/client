@@ -415,7 +415,7 @@ dl .info::after {
 
 }
 
-.dataContainer, .pageContent, .middle{
+.pageContainer, .dataContainer, .pageContent, .middle{
     height: 100%;
 }
 
