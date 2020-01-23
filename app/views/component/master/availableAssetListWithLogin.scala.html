@@ -3,15 +3,15 @@
 @import models.masterTransaction.AssetFile
 @import models.master.Asset
 
-@(assetList: Seq[IssueAssetRequest],masterAssetList: Seq[Asset], blockchainAssetList: Seq[blockchain.Asset], assetFiles: Seq[AssetFile])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+@(assetList: Seq[IssueAssetRequest], masterAssetList: Seq[Asset], blockchainAssetList: Seq[blockchain.Asset], assetFiles: Seq[AssetFile])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
 @for(asset <- assetList) {
-    @if(blockchainAssetList.map(_.pegHash contains asset.pegHash.get)){
+    @if(blockchainAssetList.map(_.pegHash).contains(asset.pegHash.get)) {
         <div class="flexItem box firstBox lightBlue">
             <div class="leftText">
-             @for(masterAsset <- masterAssetList){
-                @if(masterAsset.pegHash== asset.pegHash.get){
-                    @views.html.component.master.assetDetail(asset, assetFiles.filter(_.id == asset.id),masterAsset.status)
+            @for(masterAsset <- masterAssetList) {
+                @if(masterAsset.pegHash == asset.pegHash.get) {
+                    @views.html.component.master.assetDetail(asset, assetFiles.filter(_.id == asset.id), masterAsset.status)
                 }
             }
             </div>
