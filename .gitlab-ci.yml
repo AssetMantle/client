@@ -51,7 +51,7 @@ before_script:
   - sudo apt-get install -y postgresql postgresql-client libpq-dev
   - ls
   - pwd
-  - cd /builds/mkoijn6/samplecicd/
+  - cd /builds/deepanshutr/commitCentral/
   - ls conf/evolutions/default/
   - sudo service postgresql start
   - sudo -u $POSTGRES_USER psql -c "alter user $POSTGRES_USER with password '$POSTGRES_PASSWORD';"
@@ -77,8 +77,8 @@ dev:
     - sbt clean dist exit
     - sbt clean dist exit
     - ls
-    - cd /builds/mkoijn6/samplecicd/target/universal/
-    - mv /builds/mkoijn6/samplecicd/target/universal/samplecicd-1.0.zip /root/
+    - cd /builds/deepanshutr/commitCentral/target/universal/
+    - mv /builds/deepanshutr/commitCentral/target/universal/samplecicd-1.0.zip /root/
     - cd /root/
     - unzip samplecicd-1.0.zip
     - cp -r /builds/mkoijn6/samplecicd/public /root/samplecicd-1.0/
