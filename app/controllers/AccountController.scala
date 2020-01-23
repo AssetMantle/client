@@ -77,8 +77,7 @@ class AccountController @Inject()(
         } yield {
           Ok(views.html.indexVersion3(successes = Seq(constants.Response.SIGNED_UP)))
         }).recover {
-          case baseException: BaseException =>
-            InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+          case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
         }
       }
     )
@@ -86,10 +85,12 @@ class AccountController @Inject()(
 
   def noteAndVerifyMnemonic: Action[AnyContent] = Action.async { implicit request =>
     val mnemonicResponse=queriesMnemonic.Service.get()
-    for{
+    (for{
       mnemonicResponse<-mnemonicResponse
     }yield Ok(views.html.component.master.noteAndVerifyMnemonic( mnemonic = mnemonicResponse.body))
-
+      ).recover{
+      case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+    }
   }
 
   def loginForm: Action[AnyContent] = Action { implicit request =>
@@ -164,8 +165,8 @@ class AccountController @Inject()(
                 zone <- zone(aclAccount)
                 result <- withUsernameToken.Ok(views.html.traderIndex(totalFiat = fiatPegWallet.map(_.transactionAmount.toInt).sum, zone = zone, organization = organization, warnings = contactWarnings))
               } yield result
-            case constants.User.USER => withUsernameToken.Ok(views.html.dashboard(warnings = contactWarnings))
-            case constants.User.UNKNOWN => withUsernameToken.Ok(views.html.dashboard(warnings = contactWarnings))
+            case constants.User.USER => withUsernameToken.Ok(views.html.userIndex(warnings = contactWarnings))
+            case constants.User.UNKNOWN => withUsernameToken.Ok(views.html.anonymousIndex(warnings = contactWarnings))
             case constants.User.WITHOUT_LOGIN => val updateUserType = masterAccounts.Service.updateUserType(loginData.username, constants.User.UNKNOWN)
               for {
                 _ <- updateUserType

@@ -29,9 +29,7 @@ object addKeyControllerTest {
         Form.NAME -> "${%s}".format(Test.TEST_NAME),
         Form.PASSWORD -> "${%s}".format(Test.TEST_PASSWORD),
         Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN)))
-        .check(bodyString.saveAs("body"))
       .check(substring("SUCCESS KEY_ADDED").exists)
     )
-    .exec{session=> println(session)
-    session}
+
 }
