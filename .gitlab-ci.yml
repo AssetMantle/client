@@ -85,7 +85,7 @@ dev:
     - scp -i $SERVER_PEM -o StrictHostKeyChecking=no -r /root/samplecicd-1.0/ $SERVER_IP_WITH_NAME:/home/ubuntu/
     - ssh -o StrictHostKeyChecking=no -i $SERVER_PEM $SERVER_IP_WITH_NAME
     - cd samplecicd-1.0/bin/
-    - ./samplecicd -Dhttp.port=31118 &
+    - ./samplecicd &
 
   only:
     - patch-1
