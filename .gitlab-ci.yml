@@ -88,4 +88,4 @@ dev:
     - ./samplecicd -Dhttp.port=31118 &
 
   only:
-    - dev
+    - patch-1
