@@ -63,3 +63,6 @@ label{
 ::-webkit-scrollbar-thumb:window-inactive {
     background:grey;
 }
+dl{
+    text-align: left;
+}

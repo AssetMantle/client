@@ -1,10 +1,25 @@
 @import controllers.actions.LoginState
+@import views.html.base._
 @import models.master.Organization
 
 @(organization: Organization)(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
-@Messages(constants.Form.ORGANIZATION_NAME): @organization.name <br>
-@Messages(constants.Form.ORGANIZATION_ID): @organization.id <br>
-@Messages(constants.Form.ORGANIZATION_USERNAME): @organization.accountID <br>
-@Messages(constants.Form.ESTABLISHMENT_DATE): @organization.establishmentDate <br>
-@Messages(constants.Form.EMAIL): @organization.email <br>
-@Messages(constants.Form.VERIFIED_STATUS): @organization.verificationStatus <br>
+<div>
+@commonTable(){
+    <tr>
+        <th>@Messages(constants.Form.ORGANIZATION_NAME)</th>
+        <th>@Messages(constants.Form.ORGANIZATION_ID)</th>
+        <th>@Messages(constants.Form.ORGANIZATION_USERNAME)</th>
+        <th>@Messages(constants.Form.ESTABLISHMENT_DATE)</th>
+        <th>@Messages(constants.Form.EMAIL)</th>
+        <th>@Messages(constants.Form.VERIFIED_STATUS)</th>
+    </tr>
+    <tr>
+        <td>@organization.name</td>
+        <td>@organization.id </td>
+        <td>@organization.accountID</td>
+        <td>@organization.establishmentDate</td>
+        <td>@organization.email</td>
+        <td>@organization.verificationStatus</td>
+    </tr>
+}
+</div>
