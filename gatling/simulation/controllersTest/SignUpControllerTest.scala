@@ -24,7 +24,7 @@ object signUpControllerTest {
     session}
     .pause(2)
     .exec(http("SignUp_GET")
-      .get(session=>routes.AccountController.signUpForm(session(Test.TEST_BLOCKCHAIN_ADDRESS).as[String].replaceAll("'","").replace("(","").replace(",","")).url)
+      .get(session=>routes.AccountController.signUpForm(session(Test.TEST_BLOCKCHAIN_ADDRESS).as[String].replaceAll("[,(']","")).url)
       .check(css("legend:contains(%s)".format("Sign Up")).exists)
       .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN))
       .check(css("[name=%s]".format(Form.MNEMONIC), "value").saveAs(Form.MNEMONIC))

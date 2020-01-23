@@ -29,7 +29,7 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
       val asset = masterTransactionIssueAssetRequests.Service.getIssueAssetByID(id)
 
       def status(pegHash:Option[String]) =pegHash match {
-        case Some(peghash) => masterAssets.Service.getStatus(peghash)
+        case Some(value) => masterAssets.Service.getStatus(value)
         case None => Future("")
       }
 
@@ -88,7 +88,6 @@ class IssueAssetController @Inject()(messagesControllerComponents: MessagesContr
 
           def getResult(asset: IssueAssetRequest): Future[Result] = {
             if (asset.physicalDocumentsHandledVia == constants.Form.COMDEX) {
-              //val updateStatusAndComment = masterTransactionIssueAssetRequests.Service.updateStatusAndComment(issueAssetRequestData.requestID, constants.Status.Asset.REQUESTED)
               val updateCompletionStatusAndComment= masterTransactionIssueAssetRequests.Service.updateCompletionStatus(issueAssetRequestData.requestID)
               for {
                 _ <- updateCompletionStatusAndComment

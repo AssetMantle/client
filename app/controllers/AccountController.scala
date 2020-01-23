@@ -127,7 +127,6 @@ class AccountController @Inject()(
           } yield utilitiesNotification.send(loginData.username, constants.Notification.LOGIN, loginData.username)
         }
 
-        // Discuss loginStateVal
         def getResult(status: String, loginStateValue: LoginState): Future[Result] = {
           implicit val loginState = loginStateValue
           val contactWarnings = utilities.Contact.getWarnings(status)

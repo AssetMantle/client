@@ -217,7 +217,6 @@ class ComponentViewController @Inject()(messagesControllerComponents: MessagesCo
 
       def masterTransactionAssets(pegHashes: Seq[String]) = masterTransactionIssueAssetRequests.Service.getAssetsByPegHashes(pegHashes)
 
-      //val masterTransactionAssets = masterTransactionIssueAssetRequests.Service.getMarketAssets()
       val allOrderIDs = blockchainOrders.Service.getAllOrderIds
 
       def blockchainAssetList(allOrderIDs: Seq[String]): Future[Seq[models.blockchain.Asset]] = blockchainAssets.Service.getAllPublic(allOrderIDs)
