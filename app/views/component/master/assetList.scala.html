@@ -16,7 +16,7 @@
                     @views.html.component.master.assetDetail(asset, assetFiles.filter(_.id == asset.id), masterAsset.status)
                     </div>
                     @masterAsset.status match {
-                        case constants.Status.Asset.LISTED_FOR_TRADE | constants.Status.Asset.UNDER_NEGOTIATION => {
+                        case constants.Status.Asset.LISTED_FOR_TRADE | constants.Status.Asset.UNDER_NEGOTIATION | constants.Status.Asset.COMPLETED_TRADE => {
                             <div class="centerText" >
                             @loginState.acl match {
                                 case Some(acl) => {
