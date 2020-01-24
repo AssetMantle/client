@@ -27,7 +27,7 @@ case class IssueAsset(from: String, to: String, documentHash: String, assetType:
 
 
 @Singleton
-class IssueAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Transaction, protected val databaseConfigProvider: DatabaseConfigProvider, getAccount: GetAccount, blockchainAssets: blockchain.Assets, transactionIssueAsset: transactions.IssueAsset, utilitiesNotification: utilities.Notification, masterAccounts: master.Accounts, masterTransactionIssueAssetRequests: masterTransaction.IssueAssetRequests, blockchainAccounts: blockchain.Accounts)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
+class IssueAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Transaction, protected val databaseConfigProvider: DatabaseConfigProvider, getAccount: GetAccount, blockchainAssets: blockchain.Assets, transactionIssueAsset: transactions.IssueAsset, utilitiesNotification: utilities.Notification, masterAccounts: master.Accounts, masterTransactionIssueAssetRequests: masterTransaction.IssueAssetRequests, masterAssets: master.Assets, blockchainAccounts: blockchain.Accounts)(implicit wsClient: WSClient, configuration: Configuration, executionContext: ExecutionContext) {
 
   private implicit val module: String = constants.Module.BLOCKCHAIN_TRANSACTION_ISSUE_ASSET
 
@@ -196,18 +196,24 @@ class IssueAssets @Inject()(actorSystem: ActorSystem, transaction: utilities.Tra
         responseAccount.value.assetPegWallet match {
           case Some(assets)=> Future.sequence{assets.map{asset=>
             val upsert=blockchainAssets.Service.insertOrUpdate(pegHash = asset.pegHash, documentHash = asset.documentHash, assetType = asset.assetType, assetPrice = asset.assetPrice, assetQuantity = asset.assetQuantity, quantityUnit = asset.quantityUnit, locked = asset.locked, moderated = asset.moderated, takerAddress = if (asset.takerAddress == "") null else Option(asset.takerAddress), ownerAddress = issueAsset.to, dirtyBit = true)
-            def markListedForTrade: Future[Any]=if (assetRequest.documentHash.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)) == asset.documentHash) {
-              masterTransactionIssueAssetRequests.Service.markListedForTrade(ticketID, Option(asset.pegHash))
+            def markListedForTradeAndUpdateStatus: Future[Any]=if (assetRequest.documentHash.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)) == asset.documentHash) {
+              val createAssetAndMarkListedForTrade=masterAssets.Service.create(asset.pegHash,status = constants.Status.Asset.LISTED_FOR_TRADE)
+              val updateVerificationStatus=masterTransactionIssueAssetRequests.Service.updatePegHashAndVerificationStatus(ticketID,asset.pegHash , true)
+              for{
+                _<-createAssetAndMarkListedForTrade
+                _<-updateVerificationStatus
+              }yield {}
             }else Future{}
             for{
               _<-upsert
-              _<-markListedForTrade
+              _<-markListedForTradeAndUpdateStatus
             }yield {}
           }
           }
           case None=> Future{}
         }
       }
+
 
       def markDirty(issueAsset: IssueAsset): Future[Int] = blockchainAccounts.Service.markDirty(issueAsset.from)
 

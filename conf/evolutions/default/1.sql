@@ -580,6 +580,13 @@ CREATE TABLE IF NOT EXISTS MASTER."OrganizationBankAccountDetail"
     PRIMARY KEY ("id")
 );
 
+CREATE TABLE IF NOT EXISTS MASTER."Asset"
+(
+    "pegHash"                     VARCHAR NOT NULL,
+    "status"                      VARCHAR NOT NULL,
+    PRIMARY KEY ("pegHash")
+);
+
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."AddTraderRequest"
 (
     "id"             VARCHAR NOT NULL,
@@ -616,7 +623,8 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."IssueAssetRequest"
     "shipmentDetails"             VARCHAR NOT NULL,
     "physicalDocumentsHandledVia" VARCHAR,
     "paymentTerms"                VARCHAR NOT NULL,
-    "status"                      VARCHAR NOT NULL,
+    "completionStatus"            BOOLEAN NOT NULL,
+    "verificationStatus"          BOOLEAN,
     "comment"                     VARCHAR,
     PRIMARY KEY ("id")
 );
@@ -798,15 +806,15 @@ ALTER TABLE MASTER_TRANSACTION."EmailOTP"
 /*Initial State*/
 
 INSERT INTO blockchain."Account_BC" ("address", "coins", "publicKey", "accountNumber", "sequence", "dirtyBit")
-VALUES ('commit17jxmr4felwgeugmeu6c4gr4vq0hmeaxlamvxjg',
+VALUES ('commit1qv7d3st9umrg3jka2nnd04rxwd83rjw8h07vc6',
         '1000',
-        'commitpub1addwnpepqty3h2wuanwkjw5g2jn6p0rwcy7j7xm985t8kg8zpkp7ay83rrz2276x7qn',
+        'commitpub1addwnpepq2yk5pt0qse3q6f45rc92skcuj55nqp8puv8vuh2xsc786jryjynku36hvc',
         '0',
         '0',
         true);
 
 INSERT INTO master."Account" ("id", "secretHash", "accountAddress", "language", "userType", "status")
-VALUES ('main', '-233904575', 'commit17jxmr4felwgeugmeu6c4gr4vq0hmeaxlamvxjg', 'en', 'GENESIS', 'NO_CONTACT');
+VALUES ('main', '711213004', 'commit1qv7d3st9umrg3jka2nnd04rxwd83rjw8h07vc6', 'en', 'GENESIS', 'NO_CONTACT');
 
 # --- !Downs
 

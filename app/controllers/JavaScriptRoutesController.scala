@@ -17,6 +17,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.AccountController.emailOTPForgotPasswordForm,
         routes.javascript.AccountController.forgotPasswordForm,
         routes.javascript.AccountController.checkUsernameAvailable,
+        routes.javascript.AccountController.noteAndVerifyMnemonic,
 
         routes.javascript.AddKeyController.blockchainAddKeyForm,
 
@@ -246,9 +247,7 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
 
         routes.javascript.VerifyMobileNumberController.verifyMobileNumberForm,
 
-        routes.javascript.ViewController.profile,
-        routes.javascript.AccountController.noteAndVerifyMnemonic
-
+        routes.javascript.ViewController.profile
       )
     ).as("text/javascript")
   }

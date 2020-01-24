@@ -57,7 +57,7 @@ object loginControllerTest {
     .feed(GenesisFeeder.genesisFeed)
     .exec(http("Login_Main_GET")
       .get(routes.AccountController.loginForm().url)
-      .check(css("legend:contains(%s)".format(constants.Form.LOGIN.legend)).exists)
+      .check(css("legend:contains(%s)".format("Login")).exists)
       .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
     .exec(http("Login_Main_POST")
       .post(routes.AccountController.login().url)
