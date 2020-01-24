@@ -78,7 +78,7 @@ class AccountController @Inject()(
           Ok(views.html.indexVersion3(successes = Seq(constants.Response.SIGNED_UP)))
         }).recover {
           case baseException: BaseException =>
-            InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+            InternalServerError(views.html.indexVersion3(failures = Seq(baseException.failure)))
         }
       }
     )
@@ -183,7 +183,7 @@ class AccountController @Inject()(
           result <- getResult(status, loginState)
         } yield result
           ).recover {
-          case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+          case baseException: BaseException => InternalServerError(views.html.indexVersion3(failures = Seq(baseException.failure)))
         }
       }
     )
@@ -219,7 +219,7 @@ class AccountController @Inject()(
             _ <- pushNotificationTokenDelete
             _ <- transactionSessionTokensDelete
           } yield shutdownActorsAndGetResult).recover {
-            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.indexVersion3(failures = Seq(baseException.failure)))
           }
         }
       )
@@ -246,17 +246,17 @@ class AccountController @Inject()(
             for {
               _ <- postRequest
               _ <- updatePassword
-              result <- withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.PASSWORD_UPDATED)))
+              result <- withUsernameToken.Ok(views.html.indexVersion3(successes = Seq(constants.Response.PASSWORD_UPDATED)))
             } yield result
           } else {
-            Future(BadRequest(views.html.index(failures = Seq(constants.Response.INVALID_PASSWORD))))
+            Future(BadRequest(views.html.indexVersion3(failures = Seq(constants.Response.INVALID_PASSWORD))))
           }
 
           (for {
             validLogin <- validLogin
             result <- updateAndGetResult(validLogin)
           } yield result).recover {
-            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.indexVersion3(failures = Seq(baseException.failure)))
           }
         }
       )
@@ -279,7 +279,7 @@ class AccountController @Inject()(
           utilitiesNotification.send(accountID = emailOTPForgotPasswordData.username, notification = constants.Notification.FORGOT_PASSWORD_OTP, otp)
           PartialContent(views.html.component.master.forgotPassword(views.companion.master.ForgotPassword.form, emailOTPForgotPasswordData.username))
         }).recover {
-          case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+          case baseException: BaseException => InternalServerError(views.html.indexVersion3(failures = Seq(baseException.failure)))
         }
       }
     )
@@ -304,9 +304,9 @@ class AccountController @Inject()(
             for {
               _ <- post
               _ <- updatePassword
-            } yield Ok(views.html.index(successes = Seq(constants.Response.PASSWORD_UPDATED)))
+            } yield Ok(views.html.indexVersion3(successes = Seq(constants.Response.PASSWORD_UPDATED)))
           } else {
-            Future(BadRequest(views.html.index(failures = Seq(constants.Response.INVALID_PASSWORD))))
+            Future(BadRequest(views.html.indexVersion3(failures = Seq(constants.Response.INVALID_PASSWORD))))
           }
         }
 
@@ -314,7 +314,7 @@ class AccountController @Inject()(
           validOTP <- validOTP
           result <- updateAndGetResult(validOTP)
         } yield result).recover {
-          case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+          case baseException: BaseException => InternalServerError(views.html.indexVersion3(failures = Seq(baseException.failure)))
         }
       }
     )
