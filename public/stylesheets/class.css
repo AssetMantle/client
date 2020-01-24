@@ -581,7 +581,7 @@ dl .info::after {
 .commonCheckBox input{
     margin-left: 10px;
 }
-.cmuk-navbar-dropdown::before {
+.userList .cmuk-navbar-dropdown::before {
     content: ' ';
     position: absolute;
     width: 0;
@@ -593,7 +593,7 @@ dl .info::after {
     border: 8px solid;
     border-color: transparent transparent #e7eaf3 transparent;
 }
-.cmuk-navbar-dropdown::after{
+.userList .cmuk-navbar-dropdown::after{
     content: ' ';
     position: absolute;
     width: 0;
@@ -640,23 +640,6 @@ dl .info::after {
     padding:0px;
     height: 400px;
     overflow-y: scroll;
-}
-
-.notificationDropdown .cmuk-navbar-dropdown::before{
-    left: auto;
-    right: 20px;
-    top: -5%;
-    bottom: -19px;
-    border:11px solid;
-    border-color: transparent transparent #e7eaf3 transparent;
-}
-.notificationDropdown .cmuk-navbar-dropdown::after{
-    left: auto;
-    right: 22px;
-    top: -4%;
-    bottom: -19px;
-    border: 9px solid;
-    border-color: transparent transparent #fff transparent;
 }
 
 .tablePadding tr td, .tablePadding tr th{
