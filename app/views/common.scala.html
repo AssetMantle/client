@@ -31,7 +31,6 @@
         @* Header *@
         <div class="header">
             <nav class="cmuk-navbar-container" cmuk-navbar>
-
                 <div class="cmuk-navbar-left">
                     <a class="cmuk-navbar-item cmuk-logo" href="@controllers.routes.IndexController.index()">
                             <img src="@routes.Assets.versioned("images/logo.svg")" class="navigationBarLogo">
@@ -72,11 +71,19 @@
                                     }
                                     case _ => {}
                                 }
-                                <li>
-                                    <a onclick="getForm(jsRoutes.controllers.NotificationController.notificationPage(0))">
+                                <li class="notificationDropdown">
+                                    <a href="#" onclick="componentResource('notificationContainer', jsRoutes.controllers.NotificationController.notificationPage(0))">
                                         @Messages(constants.Form.INBOX)
-                                    <span class="cmuk-badge" id="notificationBadge">0</span>
                                     </a>
+                                    <div class="cmuk-navbar-dropdown cmuk-animation-fade">
+                                        <div class="dropdownHeader">
+                                            <p class="cmuk-text-bold">Notifications <span class="cmuk-badge" id="notificationBadge">0</span></p>
+                                        </div>
+                                        <div class="dropdownBody">
+                                            <ul id="notificationContainer" class="cmuk-nav cmuk-navbar-dropdown-nav notificationContainer">
+                                            </ul>
+                                        </div>
+                                    </div>
                                 </li>
                                 <li>
                                     <a href="#">@loginState.username</a>
