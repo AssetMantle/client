@@ -1,6 +1,9 @@
 package utilities
 
 import play.api.routing.JavaScriptReverseRoute
+import java.security.MessageDigest
+import java.math.BigInteger
+
 
 object String {
 
@@ -18,4 +21,5 @@ object String {
 
   def nestedFormField(fieldName: String)(implicit prefix: String): String = Seq(prefix, fieldName).mkString(".")
 
+  def sha256Hash(text: String) : String = java.lang.String.format("%064x", new BigInteger(1, MessageDigest.getInstance("SHA-256").digest(text.getBytes("UTF-8"))))
 }
