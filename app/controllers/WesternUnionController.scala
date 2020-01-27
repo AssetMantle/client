@@ -14,21 +14,17 @@ class WesternUnionController @Inject()(messagesControllerComponents: MessagesCon
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
-  private val secretKey = configuration.get[String]("westernUnion.secretKey")
+  private val rtcbSecretKey = configuration.get[String]("westernUnion.rtcbSecretKey")
 
   private implicit val logger: Logger = Logger(this.getClass)
 
   private implicit val module: String = constants.Module.CONTROLLERS_WESTERN_UNION
 
-  def westernUnionForm: Action[AnyContent] = Action { implicit request =>
-    Ok(views.html.component.master.westernUnion())
-  }
-
-  def westernUnion: Action[NodeSeq] = Action.async(parse.xml) {
+  def westernUnionRTCB: Action[NodeSeq] = Action.async(parse.xml) {
     request =>
 
-      val requestBody = views.companion.master.WesternUnion.Request.fromXml(request.body)
-      val hash = secretKey + requestBody.id.trim + requestBody.reference.trim + requestBody.externalReference.trim + requestBody.invoiceNumber.trim +
+      val requestBody = views.companion.master.WesternUnionRTCB.Request.fromXml(request.body)
+      val hash = rtcbSecretKey + requestBody.id.trim + requestBody.reference.trim + requestBody.externalReference.trim + requestBody.invoiceNumber.trim +
         requestBody.buyerBusinessId.trim + requestBody.buyerFirstName.trim + requestBody.buyerLastName.trim + requestBody.createdDate.trim + requestBody.lastUpdatedDate.trim +
         requestBody.status.trim + requestBody.dealType.trim + requestBody.paymentTypeId.trim + requestBody.paidOutAmount.trim
 
@@ -52,4 +48,6 @@ class WesternUnionController @Inject()(messagesControllerComponents: MessagesCon
         </response>).as("application/xml")
       }
   }
+
+
 }

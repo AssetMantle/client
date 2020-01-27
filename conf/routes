@@ -338,8 +338,7 @@ POST        /master/setBuyerFeedback                                     control
 GET         /master/setSellerFeedback                                    controllers.SetSellerFeedbackController.setSellerFeedbackForm(buyerAddress: String, pegHash: String)
 POST        /master/setSellerFeedback                                    controllers.SetSellerFeedbackController.setSellerFeedback
 
-GET         /wurtcb                                                      controllers.WesternUnionController.westernUnionForm
-POST        /wurtcb                                                      controllers.WesternUnionController.westernUnion
+POST        /wurtcb                                                      controllers.WesternUnionController.westernUnionRTCB
 
 GET         /blockchain/addKey                                           controllers.AddKeyController.blockchainAddKeyForm
 POST        /blockchain/addKey                                           controllers.AddKeyController.blockchainAddKey

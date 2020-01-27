@@ -2,14 +2,16 @@ package views.companion.master
 
 import constants.XMLTag._
 
-object WesternUnion {
+import scala.xml.Elem
+
+object WesternUnionRTCB {
 
   case class Request(id: String, reference: String, externalReference: String, invoiceNumber: String,
                    buyerBusinessId: String, buyerFirstName: String, buyerLastName: String, createdDate: String,
                    lastUpdatedDate: String, status: String, dealType: String, paymentTypeId: String,
                    paidOutAmount: String, requestSignature: String) {
 
-    def toXml = {
+    def toXml: Elem = {
       <request>
         <id>{id}</id>
 
