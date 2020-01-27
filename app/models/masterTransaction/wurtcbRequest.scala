@@ -74,9 +74,9 @@ class WURTCBRequests @Inject()(protected val databaseConfigProvider: DatabaseCon
 
   object Service {
 
-    def create(request: String): String = Await.result(add(WURTCBRequest(utilities.IDGenerator.requestID, request)), Duration.Inf)
+    def create(request: String): Future[String] = add(WURTCBRequest(utilities.IDGenerator.requestID, request))
 
-    def get(id: String) : WURTCBRequest = Await.result(findById(id), Duration.Inf)
+    def get(id: String) : Future[WURTCBRequest] = findById(id)
   }
 
 }

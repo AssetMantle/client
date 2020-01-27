@@ -11,13 +11,13 @@ import scala.concurrent._
 
 @Singleton
 class XmlHttpRequestHandler @Inject()(
-                              env: Environment,
-                              config: Configuration,
+                              environment: Environment,
+                              configuration: Configuration,
                               sourceMapper: OptionalSourceMapper,
                               router: Provider[Router]
-                            ) extends DefaultHttpErrorHandler(env, config, sourceMapper, router) {
+                            ) extends DefaultHttpErrorHandler(environment, configuration, sourceMapper, router) {
 
-  override def onClientError(request: RequestHeader, statusCode: Int, message: String) = {
+  override def onClientError(request: RequestHeader, statusCode: Int, message: String) :Future[Result] = {
     Future.successful(
       Status(400)(<response>
 
