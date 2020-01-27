@@ -183,7 +183,7 @@ class AccountController @Inject()(
           result <- getResult(status, loginState)
         } yield result
           ).recover {
-          case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+          case baseException: BaseException => InternalServerError(views.html.indexVersion3(failures = Seq(baseException.failure)))
         }
       }
     )
@@ -219,7 +219,7 @@ class AccountController @Inject()(
             _ <- pushNotificationTokenDelete
             _ <- transactionSessionTokensDelete
           } yield shutdownActorsAndGetResult).recover {
-            case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
+            case baseException: BaseException => InternalServerError(views.html.indexVersion3(failures = Seq(baseException.failure)))
           }
         }
       )
