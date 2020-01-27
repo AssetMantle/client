@@ -1,6 +1,5 @@
 package models.master
 
-
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
 import org.postgresql.util.PSQLException

@@ -1,0 +1,91 @@
+image: openjdk:11-jdk-slim
+stages:
+  - build
+  - deploy
+
+before_script:
+  - echo $SERVER_PEM
+  - apt-get update
+  - apt-get -y install sudo
+  - apt-get -y install zip
+  - apt-get -y install curl
+  - apt-get -y install wget
+  - apt-get -y install git
+  - apt-get -y install --reinstall build-essential
+  - apt-get install openssh-client
+## install go 1.13 and install blockchain #note: bash lines should be appended before sdkman lines
+  - echo 'export GO111MODULE=on' >> ~/.bashrc
+  - echo 'export GOPATH=$HOME/go/path' >> ~/.bashrc
+  - echo 'export GOBIN=$HOME/go/bin' >> ~/.bashrc
+  - echo 'export PATH=$GOPATH:$GOBIN:$PATH' >> ~/.bashrc
+  - source ~/.bashrc
+  - cd $HOME
+  - wget https://dl.google.com/go/go1.13.5.linux-amd64.tar.gz
+  - tar -xzvf go1.13.5.linux-amd64.tar.gz
+  - mkdir -p go/path/src/github.com/commitHub/
+  - cd $HOME/go/path/src/github.com/commitHub/
+  - git clone https://github.com/commitHub/commitBlockchain.git
+  - cd $HOME/go/path/src/github.com/commitHub/commitBlockchain/
+  - ls
+  - make all
+  #run kafka
+  - ./kafkaStartup.sh &
+  #run blockchain
+  - maind init main --chain-id crust-2
+  - echo "$MAIN_PASSWORD" | maincli keys add main
+  - maind add-genesis-account main 10000000000ucommit
+  - echo "$MAIN_PASSWORD" | maind gentx --amount 100000000ucommit --name main
+  - maind collect-gentxs
+  - maind start &
+  - sleep 7
+  - maincli rest-server --laddr tcp://0.0.0.0:31118 --chain-id crust-2 &
+
+  ## installation of sbt to run comdex scala app
+  - curl -s "https://get.sdkman.io" | bash
+  - source "$HOME/.sdkman/bin/sdkman-init.sh"
+  - sdk version
+  - sdk install sbt
+  - echo 'export function cd {builtin cd "$@" && ls}' >> ~/.bashrc
+
+## postgres installation and running 0.sql
+  - sudo apt-get install -y postgresql postgresql-client libpq-dev
+  - ls
+  - pwd
+  - cd /builds/deepanshutr/commitCentral/
+  - ls conf/evolutions/default/
+  - sudo service postgresql start
+  - sudo -u $POSTGRES_USER psql -c "alter user $POSTGRES_USER with password '$POSTGRES_PASSWORD';"
+  - sudo -u $POSTGRES_USER psql -U $POSTGRES_USER -a -f "conf/evolutions/default/0.sql"
+
+
+
+build_local:
+  type: build
+  tags:
+    - linux
+  script:
+    - sbt clean dist exit
+    - sbt clean dist exit
+
+#  artifacts:
+#    paths:
+#      - build/
+
+dev:
+  stage: deploy
+  script:
+    - sbt clean dist exit
+    - sbt clean dist exit
+    - ls
+    - cd /builds/deepanshutr/commitCentral/target/universal/
+    - mv /builds/deepanshutr/commitCentral/target/universal/samplecicd-1.0.zip /root/
+    - cd /root/
+    - unzip samplecicd-1.0.zip
+    - cp -r /builds/mkoijn6/samplecicd/public /root/samplecicd-1.0/
+    - scp -i $SERVER_PEM -o StrictHostKeyChecking=no -r /root/samplecicd-1.0/ $SERVER_IP_WITH_NAME:/home/ubuntu/
+    - ssh -o StrictHostKeyChecking=no -i $SERVER_PEM $SERVER_IP_WITH_NAME
+    - cd samplecicd-1.0/bin/
+    - ./samplecicd &
+
+  only:
+    - patch-1

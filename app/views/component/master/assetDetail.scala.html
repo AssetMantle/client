@@ -1,16 +1,26 @@
 @import controllers.actions.LoginState
 @import models.common.Serializable._
-@(asset: masterTransaction.IssueAssetRequest, files: Seq[masterTransaction.AssetFile])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@(asset: masterTransaction.IssueAssetRequest, files: Seq[masterTransaction.AssetFile],status:String="")(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
 
 <div>
-    @if(asset.status != constants.Status.Asset.INCOMPLETE_DETAILS) {
-        <span class="red">@Messages(constants.Form.PEG_HASH)</span> : @asset.pegHash <br>
-    }
     <span class="red">@Messages(constants.FormField.ASSET_TYPE.name)</span> : @asset.assetType <br>
     <span class="red">@Messages(constants.FormField.QUANTITY_UNIT.name)</span> : @asset.quantityUnit <br>
     <span class="red">@Messages(constants.FormField.ASSET_QUANTITY.name)</span> : @asset.assetQuantity <br>
     <span class="red">@Messages(constants.FormField.ASSET_PRICE.name)</span> : @asset.assetPrice <br>
-    <span class="red">@Messages(constants.FormField.STATUS.name)</span> : @asset.status <br>
+    @if(status != "") {
+        <span class="red">@Messages(constants.Form.PEG_HASH)</span> : @asset.pegHash <br>
+        <span class="red">@Messages(constants.Form.STATUS)</span> : @status <br>
+    }else{
+        @if(asset.completionStatus) {
+            @if(asset.verificationStatus.isEmpty){
+                <span class="red">@Messages(constants.Form.STATUS)</span> : @Messages(constants.Status.Asset.REQUESTED) <br>
+            }else{
+                <span class="red">@Messages(constants.Form.STATUS)</span> : @Messages(constants.Status.Asset.FAILED) <br>
+            }
+        } else{
+            <span class="red">@Messages(constants.Form.STATUS)</span> : @Messages(constants.Status.Asset.INCOMPLETE_DETAILS) <br>
+        }
+    }
     <button type="button" class="cmuk-button cmuk-button-primary showHide">@Messages(constants.Form.SHOW_HIDE)</button>
 </div>
 <div class="hidden">
@@ -22,7 +32,6 @@
     }
     <span class="red">@Messages(constants.FormField.PHYSICAL_DOCUMENTS_HANDLED_VIA.name)</span> : @asset.physicalDocumentsHandledVia <br>
     <span class="red">@Messages(constants.FormField.COMDEX_PAYMENT_TERMS.name)</span> : @asset.paymentTerms <br>
-    <span class="red">@Messages(constants.FormField.STATUS.name)</span> : @asset.status <br>
     <span class="red">@Messages(constants.Form.SHIPMENT_DETAILS)</span> <br>
     <span class="red">@Messages(constants.FormField.COMMODITY_NAME.name)</span> : @asset.shipmentDetails.commodityName <br>
     <span class="red">@Messages(constants.FormField.QUALITY.name)</span> : @asset.shipmentDetails.quality <br>

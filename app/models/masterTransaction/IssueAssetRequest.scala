@@ -14,7 +14,7 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class IssueAssetRequest(id: String, ticketID: Option[String], pegHash: Option[String], accountID: String, documentHash: Option[String], assetType: String, quantityUnit: String, assetQuantity: Int, assetPrice: Int, takerAddress: Option[String], shipmentDetails: Serializable.ShipmentDetails, physicalDocumentsHandledVia: String, paymentTerms: String, status: String, comment: Option[String])
+case class IssueAssetRequest(id: String, ticketID: Option[String], pegHash: Option[String], accountID: String, documentHash: Option[String], assetType: String, quantityUnit: String, assetQuantity: Int, assetPrice: Int, takerAddress: Option[String], shipmentDetails: Serializable.ShipmentDetails, physicalDocumentsHandledVia: String, paymentTerms: String, completionStatus: Boolean, verificationStatus: Option[Boolean], comment: Option[String])
 
 @Singleton
 class IssueAssetRequests @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
@@ -22,7 +22,7 @@ class IssueAssetRequests @Inject()(protected val databaseConfigProvider: Databas
   val db = databaseConfig.db
   private[models] val issueAssetRequestTable = TableQuery[IssueAssetRequestTable]
 
-  private def serialize(issueAssetRequest: IssueAssetRequest): IssueAssetRequestSerialized = IssueAssetRequestSerialized(issueAssetRequest.id, issueAssetRequest.ticketID, issueAssetRequest.pegHash, issueAssetRequest.accountID, issueAssetRequest.documentHash, issueAssetRequest.assetType, issueAssetRequest.quantityUnit, issueAssetRequest.assetQuantity, issueAssetRequest.assetPrice, issueAssetRequest.takerAddress, Json.toJson(issueAssetRequest.shipmentDetails).toString, issueAssetRequest.physicalDocumentsHandledVia, issueAssetRequest.paymentTerms, issueAssetRequest.status, issueAssetRequest.comment)
+  private def serialize(issueAssetRequest: IssueAssetRequest): IssueAssetRequestSerialized = IssueAssetRequestSerialized(issueAssetRequest.id, issueAssetRequest.ticketID, issueAssetRequest.pegHash, issueAssetRequest.accountID, issueAssetRequest.documentHash, issueAssetRequest.assetType, issueAssetRequest.quantityUnit, issueAssetRequest.assetQuantity, issueAssetRequest.assetPrice, issueAssetRequest.takerAddress, Json.toJson(issueAssetRequest.shipmentDetails).toString, issueAssetRequest.physicalDocumentsHandledVia, issueAssetRequest.paymentTerms, issueAssetRequest.completionStatus, issueAssetRequest.verificationStatus, issueAssetRequest.comment)
 
   private implicit val logger: Logger = Logger(this.getClass)
 
@@ -62,7 +62,7 @@ class IssueAssetRequests @Inject()(protected val databaseConfigProvider: Databas
     }
   }
 
-  private def updateTicketIDAndStatusByID(id: String, ticketID: String, status: String) = db.run(issueAssetRequestTable.filter(_.id === id).map(faucet => (faucet.ticketID, faucet.status)).update((ticketID, status)).asTry).map {
+  private def updateCompletionStatusByID(id: String, completionStatus: Option[Boolean]): Future[Int] = db.run(issueAssetRequestTable.filter(_.id === id).map(issueAssetRequest => (issueAssetRequest.completionStatus.?)).update((completionStatus)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -72,7 +72,27 @@ class IssueAssetRequests @Inject()(protected val databaseConfigProvider: Databas
     }
   }
 
-  private def updateStatusAndCommentByID(id: String, status: String, comment: Option[String]) = db.run(issueAssetRequestTable.filter(_.id === id).map(issueAssetRequest => (issueAssetRequest.status, issueAssetRequest.comment.?)).update((status, comment)).asTry).map {
+  private def updateVerificationStatusByID(ticketID: String,pegHash:Option[String], verificationStatus: Option[Boolean]): Future[Int] = db.run(issueAssetRequestTable.filter(_.ticketID === ticketID).map(issueAssetRequest => (issueAssetRequest.verificationStatus.?,issueAssetRequest.pegHash?)).update((verificationStatus,pegHash)).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def updateVerificationStatusByTicketID(ticketID: String, verificationStatus: Option[Boolean]): Future[Int] = db.run(issueAssetRequestTable.filter(_.ticketID === ticketID).map(_.verificationStatus.?).update(verificationStatus ).asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
+  private def updateStatusAndCommentByID(id: String, verificationStatus: Option[Boolean], comment: Option[String]) = db.run(issueAssetRequestTable.filter(_.id === id).map(issueAssetRequest => (issueAssetRequest.verificationStatus.?, issueAssetRequest.comment.?)).update((verificationStatus, comment)).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -102,41 +122,13 @@ class IssueAssetRequests @Inject()(protected val databaseConfigProvider: Databas
     }
   }
 
-  private def updatePegHashAndStatusWithTicketID(ticketID: String, status: String, pegHash: Option[String]): Future[Int] = db.run(issueAssetRequestTable.filter(_.ticketID === ticketID).map(issueAssetRequest => (issueAssetRequest.status, issueAssetRequest.pegHash.?)).update((status, pegHash)).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
+  private def unapprovedAssets(accountID:String): Future[Seq[IssueAssetRequestSerialized]]=db.run(issueAssetRequestTable.filter(_.accountID === accountID).filter(issueAsset=>issueAsset.verificationStatus.?.isEmpty).result)
 
-  private def updateStatusByPegHash(pegHash: Option[String], status: String): Future[Int] = db.run(issueAssetRequestTable.filter(_.pegHash === pegHash).map(_.status).update(status).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
+  private def traderAssetList(accountID:String,bool:Option[Boolean])=db.run(issueAssetRequestTable.filter(_.accountID === accountID).filter(issueAsset=>issueAsset.verificationStatus.?.isEmpty || issueAsset.verificationStatus === Option(true) ).result)
 
-  private def updateStatusAndAccountIDByPegHash(pegHash: Option[String], accountID: String, status: String): Future[Int] = db.run(issueAssetRequestTable.filter(_.pegHash === pegHash).map(issueAssetRequest => (issueAssetRequest.status, issueAssetRequest.accountID)).update((status, accountID)).asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
-        throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
+  private def getIssueAssetsByAccountIds(accountIDs: Seq[String]): Future[Seq[IssueAssetRequestSerialized]]=db.run(issueAssetRequestTable.filter(_.accountID inSet accountIDs).result)
 
-  private def getIssueAssetRequestsWithStatus(accountIDs: Seq[String], status: String): Future[Seq[IssueAssetRequestSerialized]] = db.run(issueAssetRequestTable.filter(_.accountID.inSet(accountIDs)).filter(_.status === status).result)
-
-  private def getAssetsByStatuses(statuses: Seq[String]): Future[Seq[IssueAssetRequestSerialized]] = db.run(issueAssetRequestTable.filter(_.status inSet statuses).result)
-
-  private def findIssueAssetsByAccountIDAndStatus(accountID: String, statuses: Seq[String]): Future[Seq[IssueAssetRequestSerialized]] = db.run(issueAssetRequestTable.filter(_.accountID === accountID).filter(_.status inSet statuses).result)
+  private def getIssueAssetsByPegHashes(pegHashes:Seq[String]): Future[Seq[IssueAssetRequestSerialized]]=db.run(issueAssetRequestTable.filter(_.pegHash inSet pegHashes).result)
 
   private def deleteByID(id: String) = db.run(issueAssetRequestTable.filter(_.id === id).delete.asTry).map {
     case Success(result) => result
@@ -148,16 +140,6 @@ class IssueAssetRequests @Inject()(protected val databaseConfigProvider: Databas
     }
   }
 
-  private def getStatusByID(id: String): Future[String] = db.run(issueAssetRequestTable.filter(_.id === id).map(_.status).result.head.asTry).map {
-    case Success(result) => result
-    case Failure(exception) => exception match {
-      case noSuchElementException: NoSuchElementException => logger.info(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
-    }
-  }
-
-  private def verifyStatusByID(id: String, status: String): Future[Boolean] = db.run(issueAssetRequestTable.filter(_.id === id).filter(_.status === status).exists.result)
-
   private def getAccountIDByID(id: String): Future[String] = db.run(issueAssetRequestTable.filter(_.id === id).map(_.accountID).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -166,13 +148,13 @@ class IssueAssetRequests @Inject()(protected val databaseConfigProvider: Databas
     }
   }
 
-  case class IssueAssetRequestSerialized(id: String, ticketID: Option[String], pegHash: Option[String], accountID: String, documentHash: Option[String], assetType: String, quantityUnit: String, assetQuantity: Int, assetPrice: Int, takerAddress: Option[String], shipmentDetails: String, physicalDocumentsHandledVia: String, paymentTerms: String, status: String, comment: Option[String]) {
-    def deSerialize: IssueAssetRequest = IssueAssetRequest(id, ticketID, pegHash, accountID, documentHash, assetType, quantityUnit, assetQuantity, assetPrice, takerAddress, utilities.JSON.convertJsonStringToObject[Serializable.ShipmentDetails](shipmentDetails), physicalDocumentsHandledVia, paymentTerms, status, comment)
+  case class IssueAssetRequestSerialized(id: String, ticketID: Option[String], pegHash: Option[String], accountID: String, documentHash: Option[String], assetType: String, quantityUnit: String, assetQuantity: Int, assetPrice: Int, takerAddress: Option[String], shipmentDetails: String, physicalDocumentsHandledVia: String, paymentTerms: String, completionStatus: Boolean, verificationStatus:Option[Boolean], comment: Option[String]) {
+    def deSerialize: IssueAssetRequest = IssueAssetRequest(id, ticketID, pegHash, accountID, documentHash, assetType, quantityUnit, assetQuantity, assetPrice, takerAddress, utilities.JSON.convertJsonStringToObject[Serializable.ShipmentDetails](shipmentDetails), physicalDocumentsHandledVia, paymentTerms, completionStatus, verificationStatus, comment)
   }
 
   private[models] class IssueAssetRequestTable(tag: Tag) extends Table[IssueAssetRequestSerialized](tag, "IssueAssetRequest") {
 
-    def * = (id, ticketID.?, pegHash.?, accountID, documentHash.?, assetType, quantityUnit, assetQuantity, assetPrice, takerAddress.?, shipmentDetails, physicalDocumentsHandledVia, paymentTerms, status, comment.?) <> (IssueAssetRequestSerialized.tupled, IssueAssetRequestSerialized.unapply)
+    def * = (id, ticketID.?, pegHash.?, accountID, documentHash.?, assetType, quantityUnit, assetQuantity, assetPrice, takerAddress.?, shipmentDetails, physicalDocumentsHandledVia, paymentTerms, completionStatus,verificationStatus.?, comment.?) <> (IssueAssetRequestSerialized.tupled, IssueAssetRequestSerialized.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
@@ -200,7 +182,9 @@ class IssueAssetRequests @Inject()(protected val databaseConfigProvider: Databas
 
     def paymentTerms = column[String]("paymentTerms")
 
-    def status = column[String]("status")
+    def completionStatus = column[Boolean]("completionStatus")
+
+    def verificationStatus = column[Boolean]("verificationStatus")
 
     def comment = column[String]("comment")
 
@@ -208,37 +192,31 @@ class IssueAssetRequests @Inject()(protected val databaseConfigProvider: Databas
 
   object Service {
 
-    def create(id: String, ticketID: Option[String], pegHash: Option[String], accountID: String, documentHash: Option[String], assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, takerAddress: Option[String], shipmentDetails: Serializable.ShipmentDetails, physicalDocumentsHandledVia: String, paymentTerms: String, status: String): Future[String] =
-      add(serialize(IssueAssetRequest(id = id, ticketID = ticketID, pegHash = pegHash, accountID = accountID, documentHash = documentHash, assetType = assetType, quantityUnit = quantityUnit, assetQuantity = assetQuantity, assetPrice = assetPrice, takerAddress = takerAddress, shipmentDetails = shipmentDetails, physicalDocumentsHandledVia = physicalDocumentsHandledVia, paymentTerms = paymentTerms, status = status, comment = null)))
+    def create(id: String, ticketID: Option[String], pegHash: Option[String], accountID: String, documentHash: Option[String], assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, takerAddress: Option[String], shipmentDetails: Serializable.ShipmentDetails, physicalDocumentsHandledVia: String, paymentTerms: String, completionStatus: Boolean, verificationStatus: Option[Boolean]): Future[String] =
+      add(serialize(IssueAssetRequest(id = id, ticketID = ticketID, pegHash = pegHash, accountID = accountID, documentHash = documentHash, assetType = assetType, quantityUnit = quantityUnit, assetQuantity = assetQuantity, assetPrice = assetPrice, takerAddress = takerAddress, shipmentDetails = shipmentDetails, physicalDocumentsHandledVia = physicalDocumentsHandledVia, paymentTerms = paymentTerms,completionStatus = completionStatus, verificationStatus = verificationStatus, comment = null)))
 
-    def insertOrUpdate(id: String, ticketID: Option[String], pegHash: Option[String], accountID: String, documentHash: Option[String], assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, takerAddress: Option[String], shipmentDetails: Serializable.ShipmentDetails, physicalDocumentsHandledVia: String, paymentTerms: String, status: String) =
-      upsert(serialize(IssueAssetRequest(id = id, ticketID = ticketID, pegHash = pegHash, accountID = accountID, documentHash = documentHash, assetType = assetType, quantityUnit = quantityUnit, assetQuantity = assetQuantity, assetPrice = assetPrice, takerAddress = takerAddress, shipmentDetails = shipmentDetails, physicalDocumentsHandledVia = physicalDocumentsHandledVia, paymentTerms = paymentTerms, status = status, comment = null)))
+    def insertOrUpdate(id: String, ticketID: Option[String], pegHash: Option[String], accountID: String, documentHash: Option[String], assetType: String, assetPrice: Int, quantityUnit: String, assetQuantity: Int, takerAddress: Option[String], shipmentDetails: Serializable.ShipmentDetails, physicalDocumentsHandledVia: String, paymentTerms: String, completionStatus: Boolean, verificationStatus: Option[Boolean]) =
+      upsert(serialize(IssueAssetRequest(id = id, ticketID = ticketID, pegHash = pegHash, accountID = accountID, documentHash = documentHash, assetType = assetType, quantityUnit = quantityUnit, assetQuantity = assetQuantity, assetPrice = assetPrice, takerAddress = takerAddress, shipmentDetails = shipmentDetails, physicalDocumentsHandledVia = physicalDocumentsHandledVia, paymentTerms = paymentTerms, completionStatus = completionStatus, verificationStatus = verificationStatus, comment = null)))
 
-    def accept(id: String, ticketID: String): Future[Int] = updateTicketIDAndStatusByID(id, ticketID, status = constants.Status.Asset.LISTED_FOR_TRADE)
+    def reject(id: String, comment: String): Future[Int] = updateStatusAndCommentByID(id = id, verificationStatus = Option(false), comment = Option(comment))
 
-    def reject(id: String, comment: String): Future[Int] = updateStatusAndCommentByID(id = id, status = constants.Status.Asset.REJECTED, comment = Option(comment))
+    def updatePegHashAndVerificationStatus(ticketID: String, pegHash:String,verificationStatus:Boolean): Future[Int]=updateVerificationStatusByID(ticketID=ticketID,pegHash=Option(pegHash), verificationStatus=Option(verificationStatus))
 
-    def updateStatusAndComment(id: String, status: String, comment: Option[String] = None): Future[Int] = updateStatusAndCommentByID(id = id, status = status, comment = comment)
+    def updateCompletionStatus(id: String): Future[Int]= updateCompletionStatusByID(id = id, completionStatus = Option(true))
 
     def updateDocumentHash(id: String, documentHash: Option[String]): Future[Int] = updateDocumentHashByID(id = id, documentHash = documentHash)
 
     def updateTicketID(id: String, ticketID: String): Future[Int] = updateTicketIDByID(id = id, ticketID = ticketID)
 
-    def markFailed(ticketID: String): Future[Int] = updatePegHashAndStatusWithTicketID(ticketID = ticketID, pegHash = None, status = constants.Status.Asset.FAILED)
+    def markFailed(ticketID: String): Future[Int]=updateVerificationStatusByTicketID(ticketID=ticketID, verificationStatus = Option(false))
 
-    def markListedForTrade(ticketID: String, peghash: Option[String]): Future[Int] = updatePegHashAndStatusWithTicketID(ticketID = ticketID, pegHash = peghash, status = constants.Status.Asset.LISTED_FOR_TRADE)
+    def getPendingIssueAssetRequests(accountIDs: Seq[String]): Future[Seq[IssueAssetRequest]] = getIssueAssetsByAccountIds(accountIDs).map(_.filter(_.completionStatus).filter(_.verificationStatus.isEmpty).map(_.deSerialize))
 
-    def markRedeemed(peghash: Option[String]): Future[Int] = updateStatusByPegHash(pegHash = peghash, status = constants.Status.Asset.REDEEMED)
+    def getTraderAssetList(accountID: String): Future[Seq[IssueAssetRequest]] =traderAssetList(accountID,Option(false)).map(_.map(_.deSerialize))
 
-    def updateAccountIDAndMarkListedForTradeByPegHash(pegHash: Option[String], accountID: String): Future[Int] = updateStatusAndAccountIDByPegHash(pegHash = pegHash, accountID = accountID, status = constants.Status.Asset.LISTED_FOR_TRADE)
+    def getUnapprovedAssets(accountID: String): Future[Seq[IssueAssetRequest]]=unapprovedAssets(accountID).map(_.map(_.deSerialize))
 
-    def updateAccountIDAndMarkTradeCompleted(pegHash: Option[String], accountID: String): Future[Int] = updateStatusAndAccountIDByPegHash(pegHash = pegHash, accountID = accountID, status = constants.Status.Asset.COMPLETED_TRADE)
-
-    def getPendingIssueAssetRequests(accountIDs: Seq[String], status: String): Future[Seq[IssueAssetRequest]] = getIssueAssetRequestsWithStatus(accountIDs, status).map(_.map(_.deSerialize))
-
-    def getTraderAssetList(accountID: String): Future[Seq[IssueAssetRequest]] = findIssueAssetsByAccountIDAndStatus(accountID, Seq(constants.Status.Asset.INCOMPLETE_DETAILS, constants.Status.Asset.REQUESTED, constants.Status.Asset.LISTED_FOR_TRADE, constants.Status.Asset.UNDER_NEGOTIATION, constants.Status.Asset.COMPLETED_TRADE)).map(_.map(_.deSerialize))
-
-    def getMarketAssets(): Future[Seq[IssueAssetRequest]] = getAssetsByStatuses(Seq(constants.Status.Asset.LISTED_FOR_TRADE, constants.Status.Asset.UNDER_NEGOTIATION)).map(_.map(_.deSerialize))
+    def getAssetsByPegHashes(pegHashes: Seq[String]): Future[Seq[IssueAssetRequest]]= getIssueAssetsByPegHashes(pegHashes).map(_.map(_.deSerialize))
 
     def getIssueAssetByID(id: String): Future[IssueAssetRequest] = findByID(id).map {
       _.deSerialize
@@ -252,12 +230,9 @@ class IssueAssetRequests @Inject()(protected val databaseConfigProvider: Databas
 
     def delete(id: String): Future[Int] = deleteByID(id)
 
-    def getStatus(id: String): Future[String] = getStatusByID(id)
-
-    def verifyRequestedStatus(id: String): Future[Boolean] = verifyStatusByID(id, constants.Status.Asset.REQUESTED).map {
-      if (_) true else throw new BaseException(constants.Response.REQUEST_ALREADY_APPROVED_OR_REJECTED)
+    def verifyRequestedStatus(id:String): Future[Boolean]=findByID(id).map {issueAsset=>
+      if(issueAsset.completionStatus && issueAsset.verificationStatus.isEmpty) true else throw new BaseException(constants.Response.REQUEST_ALREADY_APPROVED_OR_REJECTED)
     }
-
   }
 
 }
