@@ -52,20 +52,14 @@ class WesternUnionController @Inject()(messagesControllerComponents: MessagesCon
         for {
           _ <- create
           _ <- updateIssueFiatRequestRTCBStatus
-        } yield Ok(<response>
-          <code>200</code> <status>SUCCESS</status> <message>Transaction update successful.</message>
-        </response>).as("application/xml")
+        } yield constants.Response.TRANSACTION_UPDATE_SUCCESSFUL.result
       } else {
         Future {
-          Forbidden(<response>
-            <code>403</code> <status>FORBIDDEN</status> <message>Comdex validation failure – invalid request signature</message>
-          </response>).as("application/xml")
+          constants.Response.INVALID_REQUEST_SIGNATURE.result
         }
       }
         ).recover {
-        case _: Exception => InternalServerError(<response>
-          <code>500</code> <status>INTERNAL_SERVER_ERROR</status> <message>Comdex validation failure</message>
-        </response>).as("application/xml")
+        case _: Exception => constants.Response.COMDEX_VALIDATION_FAILURE.result
       }
   }
 

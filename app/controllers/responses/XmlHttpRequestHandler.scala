@@ -1,5 +1,6 @@
 package controllers.responses
 
+import constants.Response
 import javax.inject.{Singleton, _}
 import play.api._
 import play.api.http.DefaultHttpErrorHandler
@@ -11,23 +12,17 @@ import scala.concurrent._
 
 @Singleton
 class XmlHttpRequestHandler @Inject()(
-                              environment: Environment,
-                              configuration: Configuration,
-                              sourceMapper: OptionalSourceMapper,
-                              router: Provider[Router]
-                            ) extends DefaultHttpErrorHandler(environment, configuration, sourceMapper, router) {
+                                       environment: Environment,
+                                       configuration: Configuration,
+                                       sourceMapper: OptionalSourceMapper,
+                                       router: Provider[Router]
+                                     ) extends DefaultHttpErrorHandler(environment, configuration, sourceMapper, router) {
 
-  override def onClientError(request: RequestHeader, statusCode: Int, message: String) :Future[Result] = {
+  override def onClientError(request: RequestHeader, statusCode: Int, message: String): Future[Result] = {
+    println(Response.REQUEST_NOT_WELL_FORMED)
     Future.successful(
-      Status(400)(<response>
-
-        <code>400</code>
-
-        <status>BAD_REQUEST</status>
-
-        <message>Request is not well-formed and cannot be understood.</message>
-
-      </response>)
+            Response.REQUEST_NOT_WELL_FORMED.result
     )
   }
+
 }
