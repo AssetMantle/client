@@ -672,6 +672,7 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."IssueFiatRequest"
     "transactionAmount" INT     NOT NULL,
     "gas"               INT,
     "status"            BOOLEAN,
+    "rtcbStatus"        BOOLEAN NOT NULL,
     "ticketID"          VARCHAR,
     "comment"           VARCHAR,
     PRIMARY KEY ("id")

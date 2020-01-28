@@ -287,7 +287,6 @@ GET         /master/negotiationComet                                     control
 GET         /master/orderComet                                           controllers.ComponentViewController.orderComet
 
 GET         /master/issueFiatRequest                                     controllers.IssueFiatController.issueFiatRequestForm
-POST        /master/issueFiatRequest                                     controllers.IssueFiatController.issueFiatRequest
 
 GET         /master/viewPendingIssueFiatRequests                         controllers.IssueFiatController.viewPendingIssueFiatRequests
 GET         /master/rejectIssueFiatRequest                               controllers.IssueFiatController.rejectIssueFiatRequestForm(requestID: String)
@@ -339,6 +338,7 @@ GET         /master/setSellerFeedback                                    control
 POST        /master/setSellerFeedback                                    controllers.SetSellerFeedbackController.setSellerFeedback
 
 POST        /wurtcb                                                      controllers.WesternUnionController.westernUnionRTCB
+POST        /wuRedirect                                                  controllers.WesternUnionController.westernUnionPortalRedirect
 
 GET         /blockchain/addKey                                           controllers.AddKeyController.blockchainAddKeyForm
 POST        /blockchain/addKey                                           controllers.AddKeyController.blockchainAddKey
