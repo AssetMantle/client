@@ -3,6 +3,7 @@ package constants
 
 import controllers.routes
 import play.api.routing.JavaScriptReverseRoute
+import play.api.mvc.Results
 
 
 object Response {
@@ -116,6 +117,13 @@ object Response {
   val SMS_SEND_FAILED = new Failure("SMS_SEND_FAILED")
   val SMS_SERVICE_CONNECTION_FAILURE = new Failure("SMS_SERVICE_CONNECTION_FAILURE")
 
+  //XmlResponses
+  val TRANSACTION_UPDATE_SUCCESSFUL = new XmlResponse(200,"SUCCESS","Transaction update successful.")
+
+  val REQUEST_NOT_WELL_FORMED = new XmlResponse(400, "BAD_REQUEST", "Request is not well-formed and cannot be understood.")
+  val INVALID_REQUEST_SIGNATURE = new XmlResponse(403,"FORBIDDEN","Comdex validation failure – invalid request signature")
+  val COMDEX_VALIDATION_FAILURE = new XmlResponse(500, "INTERVAL_SERVER_ERROR", "Comdex validation failure")
+
 
   class Failure(private val response: String, private val actionController: JavaScriptReverseRoute = null) {
     val message: String = PREFIX + FAILURE_PREFIX + response
@@ -135,6 +143,16 @@ object Response {
   class Info(private val response: String, private val actionController: JavaScriptReverseRoute = null) {
     val message: String = PREFIX + INFO_PREFIX + response
     val action: String = utilities.String.getJsRouteString(actionController)
+  }
+
+  class XmlResponse(code: Int, status: String, message: String) {
+     val response = <response>
+      <code>{code}</code>
+      <status>{status}</status>
+      <message>{message}</message>
+    </response>
+
+    def result = Results.Status(code)(response).as("application/xml")
   }
 
 }
