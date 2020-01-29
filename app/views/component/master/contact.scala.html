@@ -2,13 +2,12 @@
 @import models.master.Contact
 @import views.html.base._
 
-
 @(userContact: Option[Contact])(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
 
 <div class="cmuk-grid-match cmuk-grid" cmuk-grid>
     <div class="cmuk-width-2-3@@m">
     @commonCard() {
-        <h>Contact Details</h>
+        <h>@Messages(constants.View.CONTACT_DETAILS)</h>
     }{
         @userContact match {
             case Some(contact) => {

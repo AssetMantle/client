@@ -21,5 +21,6 @@ object View {
   //identification
   val ID_PROOF="ID_PROOF"
   val NOT_SPECIFIED="NOT_SPECIFIED"
+  val CONTACT_DETAILS="CONTACT_DETAILS"
   
 }
