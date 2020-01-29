@@ -819,11 +819,10 @@ dl .info:after {
   display: inline-block;
   width: 37.76px;
   height: 21.13px; }
-
-.switch input {
-  opacity: 0;
-  width: 0;
-  height: 0; }
+  .switch input {
+    opacity: 0;
+    width: 0;
+    height: 0; }
 
 .slider {
   position: absolute;
@@ -884,7 +883,7 @@ input:checked + .slider {
 
 .usernameAvailibilty {
   position: relative; }
-  .usernameAvailibilty .usernameAvailibilty .result {
+  .usernameAvailibilty .result {
     position: absolute;
     right: -25px;
     top: 5px; }
