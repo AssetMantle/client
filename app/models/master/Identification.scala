@@ -14,7 +14,7 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Identification(accountID: String, firstName: String, lastName:String,idNumber: String, idType: String, status: Option[Boolean] = None)
+case class Identification(accountID: String, firstName: String, lastName: String, idNumber: String, idType: String, status: Option[Boolean] = None)
 
 @Singleton
 class Identifications @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
@@ -74,9 +74,9 @@ class Identifications @Inject()(protected val databaseConfigProvider: DatabaseCo
 
   object Service {
 
-    def create(accountID: String, firstName: String, lastName:String, idNumber: String, idType: String, status: Option[Boolean] = None): Future[String] = add(Identification(accountID, firstName, lastName, idNumber, idType, status))
+    def create(accountID: String, firstName: String, lastName: String, idNumber: String, idType: String, status: Option[Boolean] = None): Future[String] = add(Identification(accountID, firstName, lastName, idNumber, idType, status))
 
-    def insertOrUpdate(accountID: String, firstName: String, lastName:String, idNumber: String, idType: String, status: Option[Boolean]): Future[Int] = upsert(Identification(accountID, firstName, lastName, idNumber, idType, status))
+    def insertOrUpdate(accountID: String, firstName: String, lastName: String, idNumber: String, idType: String, status: Option[Boolean]): Future[Int] = upsert(Identification(accountID, firstName, lastName, idNumber, idType, status))
 
     def getByAccountID(accountID: String): Future[Option[Identification]] = getIdentificationByAccountID(accountID)
 
