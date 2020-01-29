@@ -56,7 +56,9 @@ class ProfileController @Inject()(messagesControllerComponents: MessagesControll
           val add = masterIdentifications.Service.insertOrUpdate(loginState.username, identificationData.firstName, identificationData.lastName, identificationData.idNumber, identificationData.idType, None)
           (for {
             _ <- add
-            result <- withUsernameToken.Ok(views.html.indexVersion3(successes = Seq(constants.Response.SUCCESS)))
+            result <- withUsernameToken.Ok(views.html.component.master.profile(successes = Seq(constants.Response.IDENTIFICATION_ADDED)))
+
+              //withUsernameToken.Ok(views.html.indexVersion3(successes = Seq(constants.Response.SUCCESS)))
           } yield result
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))

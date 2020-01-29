@@ -1,8 +1,8 @@
 @import controllers.actions.LoginState
 
-@()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+@(failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
-@views.html.common(Messages(constants.Form.PROFILE))(Html(""))(center)(Html(""))
+@views.html.common(Messages(constants.Form.PROFILE), failures, warnings, successes, infos)(Html(""))(center)(Html(""))
 
 @center = {
     <div class="cmuk-container">
