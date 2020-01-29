@@ -65,19 +65,22 @@ class IssueFiatRequests @Inject()(protected val databaseConfigProvider: Database
     }
   }
 
-  private def updateRTCBStatusByTransactionID(transactionID: String, rtcbStatus:  Boolean) = db.run(issueFiatRequestTable.filter(_.transactionID === transactionID).map(_.rtcbStatus).update(rtcbStatus).asTry).map {
-    case Success(result) => result
+  private def updateRTCBStatusByTransactionID(transactionID: String, rtcbStatus: Boolean): Future[Int] = db.run(issueFiatRequestTable.filter(_.transactionID === transactionID).map(_.rtcbStatus).update(rtcbStatus).asTry).map {
+    case Success(result) => if (result > 0) {
+      result
+    } else {
+        logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, new NoSuchElementException("ID NOT FOUND, NO ROW UPDATED"))
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
         throw new BaseException(constants.Response.PSQL_EXCEPTION)
-      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
-        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
     }
   }
 
   private def getIssueFiatRequestsWithNullStatusAndTrueRTCBStatus(accountIDs: Seq[String]): Future[Seq[IssueFiatRequest]] = db.run(issueFiatRequestTable.filter(_.accountID.inSet(accountIDs)).filter(_.status.?.isEmpty).filter(_.rtcbStatus === true).result)
 
-  private def deleteByID(id: String) = db.run(issueFiatRequestTable.filter(_.id === id).delete.asTry).map {
+  private def deleteByID(id: String): Future[Int] = db.run(issueFiatRequestTable.filter(_.id === id).delete.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)

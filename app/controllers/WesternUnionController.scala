@@ -9,7 +9,7 @@ import play.api.mvc._
 import models.masterTransaction
 import play.api.{Configuration, Logger}
 import controllers.results.WithUsernameToken
-import models.master.{Contacts, Organizations, Traders}
+import models.master.{Contacts, Organization, Organizations, Traders}
 import models.masterTransaction.IssueFiatRequests
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -74,7 +74,7 @@ class WesternUnionController @Inject()(messagesControllerComponents: MessagesCon
           val traderDetails = traders.Service.getByAccountID(loginState.username)
           val emailAddress = contacts.Service.getVerifiedEmailAddress(loginState.username)
 
-          def organizationDetails(organizationID: String) = organizations.Service.get(organizationID)
+          def organizationDetails(organizationID: String): Future[Organization] = organizations.Service.get(organizationID)
 
           (for {
             _ <- create
