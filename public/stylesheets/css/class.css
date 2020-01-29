@@ -80,7 +80,8 @@
   text-transform: capitalize; }
   .header .cmuk-navbar-nav > li > a button {
     font-size: 14px;
-    text-transform: capitalize; }
+    text-transform: capitalize;
+    background: #0862BE; }
   .header .cmuk-navbar-nav > li > a .navigationBarLogo {
     max-height: 30px;
     max-width: 130px; }
@@ -285,6 +286,11 @@
   display: flex; }
   .commonCheckBox input {
     margin-left: 10px; }
+  .commonCheckBox dl {
+    display: flex; }
+
+.logoutContainer .commonCheckBox {
+  justify-content: center; }
 
 .notification {
   word-break: break-all;
@@ -881,12 +887,18 @@ input:checked + .slider {
   .declarationContent .no {
     margin-left: 10px; }
 
+.signupErrorList {
+  padding: 0px;
+  list-style: none; }
+  .signupErrorList li {
+    text-align: left; }
+
 .usernameAvailibilty {
   position: relative; }
   .usernameAvailibilty .result {
     position: absolute;
     right: -25px;
-    top: 5px; }
+    top: 30px; }
 
 .mainlist {
   padding: 0px; }
@@ -914,5 +926,8 @@ input:checked + .slider {
   background: #fff;
   color: #666;
   box-shadow: 0 5px 12px rgba(0, 0, 0, 0.15); }
+
+.hiddenLabel label {
+  display: none; }
 
 /*# sourceMappingURL=class.css.map */

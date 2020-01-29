@@ -114,6 +114,7 @@ $paragraphFontSizeSmall:12px;
     button {
       font-size: $paragraphFontSizeMedium;
       text-transform: capitalize;
+      background: $colorPrimary;
     }
 
     .navigationBarLogo {
@@ -367,6 +368,15 @@ $paragraphFontSizeSmall:12px;
   display: flex;
   input {
     margin-left: 10px;
+  }
+  dl{
+    display: flex;
+  }
+}
+
+.logoutContainer {
+  .commonCheckBox {
+    justify-content: center;
   }
 }
 
@@ -1108,12 +1118,20 @@ input:checked+.slider {
   }
 }
 
+.signupErrorList{
+  padding: 0px;
+  list-style: none;
+  li{
+    text-align: left;
+  }
+}
+
 .usernameAvailibilty {
   position: relative;
   .result {
     position: absolute;
     right: -25px;
-    top: 5px;
+    top:30px;
   }
 }
 
@@ -1146,4 +1164,7 @@ input:checked+.slider {
   background: #fff;
   color: #666;
   box-shadow: 0 5px 12px rgba(0,0,0,.15);
+}
+.hiddenLabel label{
+  display: none;
 }

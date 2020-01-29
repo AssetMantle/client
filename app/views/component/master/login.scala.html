@@ -7,7 +7,7 @@
 @commonForm(constants.Form.LOGIN, loginForm) {
     @commonInputText(loginForm, constants.FormField.USERNAME)
     @commonInputPassword(loginForm, constants.FormField.PASSWORD)
-    <div class="pushNotification">
+    <div class="pushNotification hiddenLabel">
     @commonInputText(loginForm, constants.FormField.PUSH_NOTIFICATION_TOKEN, 'class -> "hidden", 'readonly -> true)
     </div>
 }

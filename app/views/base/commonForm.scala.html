@@ -9,9 +9,9 @@
         @CSRF.formField
         @fieldset
         @if(formData.hasGlobalErrors) {
-            <ul>
+            <ul class="signupErrorList">
             @for(error <- formData.globalErrors) {
-                <li>@error.format</li>
+                <li class="error">@error.format</li>
             }
             </ul>
         }

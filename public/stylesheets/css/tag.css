@@ -38,9 +38,6 @@ button {
 button:hover {
   opacity: 1; }
 
-label {
-  display: none !important; }
-
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px; }
