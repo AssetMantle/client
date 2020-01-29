@@ -494,6 +494,16 @@ CREATE TABLE IF NOT EXISTS MASTER."Trader"
     PRIMARY KEY ("id")
 );
 
+CREATE TABLE IF NOT EXISTS MASTER."TraderNew"
+(
+    "id"                 VARCHAR NOT NULL,
+    "organizationID"     VARCHAR NOT NULL,
+    "accountID"          VARCHAR NOT NULL UNIQUE,
+    "name"               VARCHAR NOT NULL,
+    "verificationStatus" BOOLEAN,
+    PRIMARY KEY ("id")
+);
+
 CREATE TABLE IF NOT EXISTS MASTER."Account"
 (
     "id"             VARCHAR NOT NULL,

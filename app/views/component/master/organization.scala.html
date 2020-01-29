@@ -1,0 +1,31 @@
+@import controllers.actions.LoginState
+@import models.master.Organization
+@import views.html.base._
+
+@(organization: Option[Organization])(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
+
+<div class="cmuk-grid-match cmuk-grid" cmuk-grid>
+    <div class="cmuk-width-2-3@@m">
+    @commonCard() {
+        <h>Org. Details</h>
+    }{
+        @organization match {
+            case Some(org) => {
+                <p>@Messages(constants.Form.NAME): <span>@org.name</span></p>
+                <p>@Messages(constants.Form.FULL_ADDRESS): <span>@org.registeredAddress.addressLine1 @org.registeredAddress.addressLine2 @org.registeredAddress.landmark</span></p>
+                <p>@Messages(constants.Form.COUNTRY): <span>@org.registeredAddress.country</span></p>
+                <p>@Messages(constants.Form.NAME): <span>@org.registeredAddress.city</span></p>
+                <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.ContactController.updateContactForm())">@Messages(constants.Form.UPDATE_CONTACT.legend)</button>
+            }
+            case _ => {
+                <p>@Messages(constants.Form.NAME): <span>@Messages(constants.View.NOT_SPECIFIED)</span></p>
+                <p>@Messages(constants.Form.FULL_ADDRESS): <span>@Messages(constants.View.NOT_SPECIFIED)</span></p>
+                <p>@Messages(constants.Form.COUNTRY): <span>@Messages(constants.View.NOT_SPECIFIED)</span></p>
+                <p>@Messages(constants.Form.NAME): <span>@Messages(constants.View.NOT_SPECIFIED)</span></p>
+                <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.ContactController.updateContactForm())">@Messages(constants.Form.UPDATE_CONTACT.legend)</button>
+            }
+        <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.ContactController.updateContactForm())">@Messages(constants.Form.UPDATE_CONTACT.legend)</button>
+        }
+    }
+    </div>
+</div>

@@ -80,6 +80,7 @@ object Form {
 
   //ProfileController
   val IDENTIFICATION = new Form("IDENTIFICATION", routes.ProfileController.identification())
+  val ADD_TRADER_NEW = new Form("ADD_TRADER_NEW", routes.ProfileController.addTrader())
 
   //RedeemAssetController
   val REDEEM_ASSET = new Form("REDEEM_ASSET", routes.RedeemAssetController.redeemAsset())

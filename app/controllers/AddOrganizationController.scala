@@ -14,7 +14,6 @@ import play.api.i18n.{I18nSupport, Messages}
 import play.api.mvc._
 import play.api.{Configuration, Logger}
 import views.companion.master.FileUpload
-
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton

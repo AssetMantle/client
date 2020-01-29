@@ -1,0 +1,8 @@
+@import controllers.actions.LoginState
+@import views.html.base._
+@import views.companion.master.AddTraderNew
+
+@(addTraderNewForm: Form[AddTraderNew.Data] = AddTraderNew.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+@commonForm(constants.Form.ADD_TRADER_NEW, addTraderNewForm) {
+    @commonInputText(addTraderNewForm, constants.FormField.ORGANIZATION_ID)
+}
