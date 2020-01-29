@@ -1,25 +1,39 @@
 @import controllers.actions.LoginState
 @import models.master.Contact
+@import views.html.base._
+
 
 @(userContact: Option[Contact])(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
-@userContact match {
-    case Some(contact) => {
-        <p>@Messages(constants.Form.EMAIL_ADDRESS): <span>@contact.emailAddress</span>
-            @if(contact.emailAddressVerified) {
-                <span cmuk-icon="check"></span>
-            } else {
-                <span cmuk-icon="close"></span><button type="button" class="cmuk-button cmuk-button-primary cmuk-button-small" onclick="getForm(jsRoutes.controllers.VerifyEmailAddressController.verifyEmailAddressForm())">@Messages(constants.Form.VERIFY)</button>
+
+<div class="cmuk-grid-match cmuk-grid" cmuk-grid>
+    <div class="cmuk-width-2-3@@m">
+    @commonCard() {
+        <h>Contact Details</h>
+    }{
+        @userContact match {
+            case Some(contact) => {
+                <p>@Messages(constants.Form.EMAIL_ADDRESS): <span>@contact.emailAddress</span>
+                    @if(contact.emailAddressVerified) {
+                        <span >Verified</span>
+                    } else {
+                        <span >Not Verified</span><button type="button" class="cmuk-button cmuk-button-primary cmuk-button-small" onclick="getForm(jsRoutes.controllers.VerifyEmailAddressController.verifyEmailAddressForm())">@Messages(constants.Form.VERIFY)</button>
+                    }
+                </p>
+                <p>@Messages(constants.Form.MOBILE_NUMBER): <span>@contact.mobileNumber</span>
+                    @if(contact.mobileNumberVerified) {
+                        <span>Verified</span>
+                    } else {
+                        <span></span>Not Verified<button type="button" class="cmuk-button cmuk-button-primary cmuk-button-small" onclick="getForm(jsRoutes.controllers.VerifyMobileNumberController.verifyMobileNumberForm())">@Messages(constants.Form.VERIFY)</button>
+                    }
+                </p>
+                <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.ContactController.updateContactForm())">@Messages(constants.Form.UPDATE_CONTACT.legend)</button>
             }
-        </p>
-        <p>@Messages(constants.Form.MOBILE_NUMBER): <span>@contact.mobileNumber</span>
-            @if(contact.mobileNumberVerified) {
-                <span cmuk-icon="check"></span>
-            } else {
-                <span cmuk-icon="close"></span><button type="button" class="cmuk-button cmuk-button-primary cmuk-button-small" onclick="getForm(jsRoutes.controllers.VerifyMobileNumberController.verifyMobileNumberForm())">@Messages(constants.Form.VERIFY)</button>
+            case _ => {
+                <p>@Messages(constants.Form.EMAIL_ADDRESS): <span>@Messages(constants.View.NOT_SPECIFIED)</span></p>
+                <p>@Messages(constants.Form.MOBILE_NUMBER): <span>@Messages(constants.View.NOT_SPECIFIED)</span></p>
+                <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.ContactController.updateContactForm())">@Messages(constants.Form.UPDATE_CONTACT.legend)</button>
             }
-        </p>
+        }
     }
-    case _ => {
-        <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.ContactController.updateContactForm())">@Messages(constants.Form.UPDATE_CONTACT.legend)</button>
-    }
-}
+    </div>
+</div>

@@ -52,6 +52,11 @@ GET         /master/markNotificationAsRead                               control
 
 GET         /master/queryConfigurationVariable:query                     controllers.ConfigurationController.queryConfigurationVariable(query: String)
 
+GET         /master/identification                                       controllers.ProfileController.identificationForm
+POST        /master/identification                                       controllers.ProfileController.identification
+GET         /master/identificationDocument                               controllers.ProfileController.identificationDocument
+GET         /master/identificationDetails                                controllers.ProfileController.identificationDetails
+
 GET         /master/component/commonHome                                 controllers.ComponentViewController.commonHome
 GET         /master/component/genesisDetails                             controllers.ComponentViewController.genesisDetails
 GET         /master/component/zoneDetails                                controllers.ComponentViewController.zoneDetails
@@ -102,6 +107,7 @@ POST        /userUpload/file                                             control
 GET         /userUpload/storeFile                                        controllers.FileController.storeAccountKYC(name: String, documentType: String)
 GET         /userUpdate                                                  controllers.FileController.updateAccountKYCForm(documentType: String)
 GET         /userUpdate/updateFile                                       controllers.FileController.updateAccountKYC(name: String, documentType: String)
+GET         /userUpload/getFile                                          controllers.FileController.getAccountKYCFile(fileName:String, documentType: String)
 
 GET         /userUpload/zoneKYC                                          controllers.AddZoneController.userUploadZoneKYCForm(documentType: String)
 POST        /userUpload/userZoneKYCDocument                              controllers.AddZoneController.userUploadZoneKYC(documentType: String)

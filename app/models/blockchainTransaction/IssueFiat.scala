@@ -84,6 +84,8 @@ class IssueFiats @Inject()(actorSystem: ActorSystem, transaction: utilities.Tran
     }
   }
 
+  private def updateTxHashAndStatusOnTicketID(ticketID: String, txHash: Option[String], status: Option[Boolean]): Future[Int] = db.run(issueFiatTable..filter(_.ticketID === ticketID).map(x => (x.txHash.?, x.status.?)).update(txHash, status).asTry)
+
   private def updateTxHashAndStatusOnTicketID(ticketID: String, txHash: Option[String], status: Option[Boolean]): Future[Int] = db.run(issueFiatTable.filter(_.ticketID === ticketID).map(x => (x.txHash.?, x.status.?)).update(txHash, status).asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {

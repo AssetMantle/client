@@ -1151,3 +1151,7 @@ input:checked+.slider:before {
     font-weight: bold;
     color: black;
 }
+
+.errorInput{
+    border: 1px solid red !important;
+}

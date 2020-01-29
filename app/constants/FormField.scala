@@ -91,6 +91,10 @@ object FormField {
   val SEARCH_TX_HASH_HEIGHT = new StringFormField("SEARCH_TX_HASH_HEIGHT", 1, 1000)
   val DOCUMENT_TYPE = new StringFormField("DOCUMENT_TYPE", 2, 500)
   val FILE_ID = new StringFormField("FILE_ID", 2, 500)
+  val ID_NUMBER = new StringFormField("ID_NUMBER", 2, 100)
+  val ID_TYPE = new StringFormField("ID_TYPE", 2, 100)
+  val FIRST_NAME = new StringFormField("FIRST_NAME", 2, 100)
+  val LAST_NAME = new StringFormField("LAST_NAME",2,100)
 
   //SelectFormField
   val ASSET_TYPE = new SelectFormField("ASSET_TYPE", constants.SelectFieldOptions.ASSET_TYPES)

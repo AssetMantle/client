@@ -1,6 +1,8 @@
 @import helper._
 
 @(formTemplate: constants.Form, formData: Form[_])(fieldset: Html)(implicit messagesProvider: MessagesProvider, requestHeader: RequestHeader)
+
+<img src="@routes.Assets.versioned("images/icon.svg")">
 @form(action = formTemplate.route, 'onkeypress -> "submitFormOnEnter(event,this)") {
     <fieldset class="cmuk-fieldset cmuk-form-stacked">
         <legend class="cmuk-legend">

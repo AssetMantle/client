@@ -145,6 +145,12 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.FileController.updateZoneNegotiationForm,
         routes.javascript.FileController.updateZoneNegotiation,
         routes.javascript.FileController.file,
+        routes.javascript.FileController.uploadAccountKYCForm,
+        routes.javascript.FileController.uploadAccountKYC,
+        routes.javascript.FileController.storeAccountKYC,
+        routes.javascript.FileController.updateAccountKYCForm,
+        routes.javascript.FileController.updateAccountKYC,
+
 
         routes.javascript.IssueAssetController.viewPendingIssueAssetRequests,
         routes.javascript.IssueAssetController.issueAssetForm,
@@ -168,6 +174,10 @@ class JavaScriptRoutesController @Inject()(messagesControllerComponents: Message
         routes.javascript.IssueFiatController.rejectIssueFiatRequestForm,
         routes.javascript.IssueFiatController.blockchainIssueFiatForm,
         routes.javascript.IssueFiatController.rejectIssueFiatRequestForm,
+
+        routes.javascript.ProfileController.identificationDetails,
+        routes.javascript.ProfileController.identificationForm,
+        routes.javascript.ProfileController.identificationDocument,
 
         routes.javascript.NotificationController.notificationPage,
         routes.javascript.NotificationController.unreadNotificationCount,
