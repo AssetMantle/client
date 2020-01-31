@@ -930,4 +930,7 @@ input:checked + .slider {
 .hiddenLabel label {
   display: none; }
 
+.errorInput {
+  border: 1px solid red !important; }
+
 /*# sourceMappingURL=class.css.map */
