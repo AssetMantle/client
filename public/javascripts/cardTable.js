@@ -45,7 +45,7 @@ function cardTable(element) {
             }
             $newTable.append($newTrd);
         }
-        $(".productTable ul").replaceWith($newTable);
+        element.parent().parent().siblings().find(".productTable ul").replaceWith($newTable);
     });
     element.parent().find('#listView').click(function() {
         var $tableCard = $table;
