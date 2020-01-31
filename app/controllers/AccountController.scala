@@ -169,7 +169,7 @@ class AccountController @Inject()(
             case constants.User.WITHOUT_LOGIN => val updateUserType = masterAccounts.Service.updateUserType(loginData.username, constants.User.UNKNOWN)
               for {
                 _ <- updateUserType
-                result <- withUsernameToken.Ok(views.html.dashboard(warnings = contactWarnings))
+                result <- withUsernameToken.Ok(views.html.anonymousIndex(warnings = contactWarnings))
               } yield result
           }
         }

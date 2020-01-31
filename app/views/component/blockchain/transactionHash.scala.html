@@ -1,8 +1,10 @@
 @()(implicit messagesProvider: MessagesProvider)
-
+@import views.html.base._
 <div id="txHashBottomDivision">
     <a onclick='back()' ><span cmuk-icon="arrow-left" title="Back"></span>@Messages(constants.Form.BACK)</a>
-    <div class="cmuk-card cmuk-card-default cmuk-card-body">
+    @commonCard() {
+
+    }{
         <div class="cmuk-overflow-auto">
             <table class="cmuk-table cmuk-table-divider">
                 <tbody>
@@ -20,5 +22,6 @@
                 </tbody>
             </table>
         </div>
-    </div>
+    }
+
 </div>
