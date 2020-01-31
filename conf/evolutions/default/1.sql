@@ -587,6 +587,17 @@ CREATE TABLE IF NOT EXISTS MASTER."Asset"
     PRIMARY KEY ("pegHash")
 );
 
+CREATE TABLE IF NOT EXISTS MASTER."Identification"
+(
+    "accountID"              VARCHAR NOT NULL,
+    "firstName"              VARCHAR NOT NULL,
+    "lastName"               VARCHAR NOT NULL,
+    "idNumber"               VARCHAR NOT NULL,
+    "idType"                 VARCHAR NOT NULL,
+    "status"                 BOOLEAN,
+    PRIMARY KEY ("accountID")
+);
+
 CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."AddTraderRequest"
 (
     "id"             VARCHAR NOT NULL,

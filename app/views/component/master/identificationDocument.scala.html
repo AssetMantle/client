@@ -1,0 +1,29 @@
+@import controllers.actions.LoginState
+@import models.masterTransaction.NegotiationFile
+@import models.master.AccountKYC
+
+@(accountKYC: Option[AccountKYC],  documentType: String)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+
+<div class="latest_card-header latest_card-header-primary text-center">
+    <h4 class="latest_card-title">@Messages(constants.View.ID_PROOF)</h4>
+</div>
+<div class="centerText">
+    <div id="upload@documentType">
+        <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.FileController.uploadAccountKYCForm('@documentType'))">@Messages(constants.Form.UPLOAD) @Messages(documentType)</button>
+    </div>
+    @accountKYC match {
+        case Some(file) => {
+            @component.master.commonDocumentViewer(file) {
+                @routes.FileController.tradingFile(file.id, file.fileName, file.documentType)
+            } {
+                <a href="@routes.FileController.tradingFile(file.id, file.fileName, file.documentType)">@Messages(file.documentType)</a>
+            } {
+                <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.FileController.updateAccountKYCForm('@file.documentType'))">@Messages(constants.Form.UPDATE) @Messages(file.documentType)</button>
+                <script>hideElement('upload@file.documentType')</script>
+            }
+            <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.ProfileController.identificationForm())">@Messages(constants.Form.NEXT)</button>
+        }
+        case None => {}
+    }
+
+</div>
