@@ -1,0 +1,43 @@
+@import controllers.actions.LoginState
+@import models.master.Contact
+@import views.html.base._
+@import models.master.AccountKYC
+
+@import models.master.Identification
+@(accountKYC: Option[AccountKYC],identification: Option[Identification])(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
+<div>
+    @commonCard() {
+        <h>@Messages(constants.View.ID_PROOF)</h>
+    }{
+        @identification match{
+            case Some(identification)=>{
+                <p>@Messages(constants.Form.NAME): <span>@identification.firstName @identification.lastName</span></p>
+                <p>@Messages(constants.Form.ID_NUMBER): <span>@identification.idNumber</span></p>
+                <p>@Messages(constants.Form.ID_TYPE): <span>@identification.idType</span></p>
+            }
+            case None=>{
+                <p>@Messages(constants.Form.NAME): <span>@Messages(constants.View.NOT_SPECIFIED)</span></p>
+                <p>@Messages(constants.Form.ID_NUMBER): <span>@Messages(constants.View.NOT_SPECIFIED)</span></p>
+                <p>@Messages(constants.Form.ID_TYPE): <span>@Messages(constants.View.NOT_SPECIFIED)</span></p>
+            }
+        }
+
+        @accountKYC match{
+            case Some(file)=>{
+                @component.master.commonDocumentViewer(file) {
+                    @routes.FileController.getAccountKYCFile(file.fileName,file.documentType)
+                } {
+                    <a href="@routes.FileController.getAccountKYCFile(file.fileName,file.documentType)">@Messages(file.documentType)</a>
+                } {
+                    <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.ProfileController.identificationDocument())">@Messages(constants.Form.UPDATE_IDENTIFICATION) </button>
+                }
+            }
+            case None=>{
+                <div class="centerText">
+                    <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.ProfileController.identificationDocument())">@Messages(constants.Form.UPLOAD_IDENTIFICATION)</button>
+                </div>
+            }
+        }
+
+    }
+</div>

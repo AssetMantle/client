@@ -40,7 +40,7 @@ class ContactController @Inject()(messagesControllerComponents: MessagesControll
           (for {
             _ <- insertOrUpdateContact
             _ <- updateStatusUnverifiedContact
-            result<-withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.SUCCESS)))
+            result<-withUsernameToken.Ok(views.html.component.master.profile(successes = Seq(constants.Response.CONTACT_UPDATED)))
           } yield result
             ).recover {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))

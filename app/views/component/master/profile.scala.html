@@ -1,8 +1,8 @@
 @import controllers.actions.LoginState
 
-@()(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
+@(failures: Seq[constants.Response.Failure] = Seq(), warnings: Seq[constants.Response.Warning] = Seq(), successes: Seq[constants.Response.Success] = Seq(), infos: Seq[constants.Response.Info] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, configuration: play.api.Configuration, loginState: LoginState = null)
 
-@views.html.common(Messages(constants.Form.PROFILE))(Html(""))(center)(Html(""))
+@views.html.common(Messages(constants.Form.PROFILE), failures, warnings, successes, infos)(Html(""))(center)(Html(""))
 
 @center = {
     <div class="cmuk-container">
@@ -24,12 +24,21 @@
                         @Messages(constants.Form.BLOCKCHAIN_ADDRESS): <span id="blockchainAddress" class="hashCode" title="@loginState.address">@loginState.address</span>
                         <a class="toolTip"  onclick="copyToClipboard('blockchainAddress')"><span class="toolTipText" id="toolTip">Copy to clipboard</span><span class='copyIcon cmuk-icon-button' cmuk-icon="copy" onmouseout="afterCopy()"></span></a>
                     </p>
-                    <p id="profileContact"></p>
                 </div>
             </div>
         </div>
         </div>
     </div>
+    <section class="cmuk-section cmuk-section-small">
+        <div class="cmuk-container">
+        <div id="contactDetails">
+
+        </div>
+            <div id="identificationDetails">
+
+            </div>
+        </div>
+    </section>
     <section class="cmuk-section cmuk-section-small">
         <div class="cmuk-container">
             <div class="cmuk-card cmuk-card-default cmuk-card-small cmuk-card-body">
@@ -186,7 +195,9 @@
     </section >
     <script>
             componentResource('profilePhoto', jsRoutes.controllers.ComponentViewController.profilePicture());
-            componentResource('profileContact', jsRoutes.controllers.ContactController.contact());
-            componentResource('profileDocuments', jsRoutes.controllers.ComponentViewController.profileDocuments())
+            componentResource('profileDocuments', jsRoutes.controllers.ComponentViewController.profileDocuments());
+            componentResource('contactDetails', jsRoutes.controllers.ContactController.contact());
+            componentResource('identificationDetails', jsRoutes.controllers.ProfileController.identificationDetails());
+
     </script>
 }
