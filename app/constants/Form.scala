@@ -474,5 +474,6 @@ object Form {
   val EDIT = "EDIT"
   val TABLE = "TABLE"
   val CARD = "CARD"
+  val FOOTER_LOGO = "FOOTER_LOGO"
 
 }
