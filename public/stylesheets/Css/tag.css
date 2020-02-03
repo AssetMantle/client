@@ -2,79 +2,63 @@ html,
 body {
   height: 100%;
   margin: 0;
-  background: #F4F7FB;
-}
+  background: #F4F7FB; }
 
 body::-webkit-scrollbar {
-  width: 10px;
-}
+  width: 10px; }
 
 body::-webkit-scrollbar * {
-  background: transparent;
-}
+  background: transparent; }
 
 body::-webkit-scrollbar-thumb {
   background: #cccccc !important;
-  border-radius: 6px;
-}
+  border-radius: 6px; }
 
 input, select {
-  width: 100%;
-}
+  width: 100%; }
 
 input:focus {
   background-color: #ddd;
-  outline: none;
-}
+  outline: none; }
 
 input:hover {
-  cursor: pointer;
-}
+  cursor: pointer; }
 
 button {
   margin-bottom: 5px !important;
-  background-color:#EEF9FF;
+  background-color: #EEF9FF;
   color: #1B7FBD;
   padding: 10px 15px;
   border-radius: 0.25rem;
   border: none;
   cursor: pointer;
   opacity: 0.8;
-  word-break: break-all;
-}
+  word-break: break-all; }
 
 button:hover {
-  opacity: 1;
-}
+  opacity: 1; }
 
 ::-webkit-scrollbar {
   width: 6px;
-  height: 6px;
-}
+  height: 6px; }
 
 ::-webkit-scrollbar-thumb {
   -webkit-border-radius: 10px;
   border-radius: 10px;
   background: #cccccc;
-  -webkit-box-shadow: none;
-}
+  -webkit-box-shadow: none; }
 
 ::-webkit-scrollbar-thumb:window-inactive {
-  background:grey;
-}
+  background: grey; }
 
-dl{
-  text-align: left;
-}
+dl {
+  text-align: left; }
 
-form{
-  width: 500px;
-  text-align: center;
-}
+form {
+  width: 500px; }
 
-// Media Queries
 @media (max-width: 500px) {
   table thead {
-    font-size: 12px;
-  }
-}
+    font-size: 12px; } }
+
+/*# sourceMappingURL=tag.css.map */

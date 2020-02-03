@@ -2,7 +2,7 @@
 @import models.Trait.Document
 
 @(document: Document[_])(documentLink: Html = Html(""))(documentContentTop: Html = Html(""))(documentContentBottom: Html = Html(""))(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
-<div class="centerText">
+<div class="centerText documentItem">
     <div id="documentContentTop">
         @documentContentTop
     </div>

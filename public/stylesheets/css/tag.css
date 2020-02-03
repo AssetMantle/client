@@ -55,7 +55,8 @@ dl {
   text-align: left; }
 
 form {
-  width: 500px; }
+  width: 500px;
+  text-align: center; }
 
 @media (max-width: 500px) {
   table thead {
