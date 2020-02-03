@@ -15,5 +15,5 @@ dist
 /.idea/
 *.css.map
 public/stylesheets/.sass-cache*
-public/stylesheets/css/**/*.map
-public/stylesheets/css/**/*.map
+public/stylesheets/Css/**/*.map
+public/stylesheets/Css/**/*.map
