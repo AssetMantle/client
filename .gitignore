@@ -14,4 +14,4 @@ dist
 /.settings
 /.idea/
 public/stylesheets/.sass-cache*
-/*.css.map
+*.css.map
