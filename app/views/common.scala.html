@@ -29,6 +29,7 @@
 
     </head>
     <body>
+        <div class="wrapper">
         @* Header *@
         <div class="header">
             <nav class="cmuk-navbar-container" cmuk-navbar="mode: click">
@@ -252,23 +253,29 @@
         <div>@Messages(constants.Form.CONNECTION_ERROR)</div>
     </div>
 
-
-
-        @* Footer *@
-    <div class="footer">
-        <div class="container">
-            <div class="copyright float-right">
-                        &copy;
-                <script>document.write(new Date().getFullYear())</script>
-                <a href="" target="_blank">Commit</a>
-            </div>
-        </div>
     </div>
-        @* End of Footer *@
-
     </div>
 
         @* End of MainContainer *@
+
+
+        @* Footer *@
+        <div class="footer">
+            <div class="cmuk-container">
+                <div>
+                    <div class="footerLogo">
+                        <img src="@routes.Assets.versioned("images/comdex.svg")" alt = "@Messages(constants.Form.CONNECTION_ERROR)"/>
+                    </div>
+                </div>
+                <hr>
+                <div class="copyright">
+                            &copy;
+                    <script>document.write(new Date().getFullYear())</script>
+                    <a href="" target="_blank">Comdex — All Rights Reserved</a>
+                </div>
+            </div>
+        </div>
+        @* End of Footer *@
 
     <script src="@routes.Assets.versioned("javascripts/style/ajaxLoading.js")" type="text/javascript"></script>
     <script src="@routes.Assets.versioned("javascripts/style/alert.js")" type="text/javascript"></script>

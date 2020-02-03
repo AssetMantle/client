@@ -78,9 +78,17 @@ $paragraphFontSizeSmall:12px;
 .mainSection {
   display: flex;
   flex-direction: column;
-  height:calc(100% - 64px);
 }
 
+.wrapper{
+  height:auto;
+  min-height: 100%;
+  margin: 0 auto -171px;
+}
+
+.pageContainer{
+ padding-bottom: 171px;
+}
 .pageContainer,
 .dataContainer,
 .pageContent,
@@ -761,12 +769,11 @@ dl .info {
 }
 
 .footer {
-  display: none;
+  //display: none;
   margin-top: 20px;
   width: 100%;
-  padding: 5px 0px 5px 0px;
-  background: #333333;
-  text-align: center;
+  padding: 30px 0px;
+  background: #031221;
   .footer a {
     color: #149f98;
   }
