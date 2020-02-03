@@ -56,7 +56,7 @@
   display: flex;
   flex-direction: column; }
 
-.wrapper {
+.bodyContainer {
   height: auto;
   min-height: 100%;
   margin: 0 auto -171px; }
@@ -303,14 +303,13 @@
   word-break: break-all;
   border-bottom: 1px solid #053C75;
   transition: all 1s ease-in-out;
-  background: #E2ECF0; }
+  list-style: none; }
 
 .notification > div {
   padding: 10px 15px; }
 
 .NotificationButton {
-  border-bottom: none;
-  padding: 10px 15px; }
+  border-bottom: none; }
 
 .notificationDropdown .dropdownHeader p {
   justify-content: center;

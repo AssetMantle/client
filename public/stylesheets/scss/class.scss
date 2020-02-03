@@ -80,14 +80,14 @@ $paragraphFontSizeSmall:12px;
   flex-direction: column;
 }
 
-.wrapper{
+.bodyContainer{
   height:auto;
   min-height: 100%;
   margin: 0 auto -171px;
 }
 
 .pageContainer{
- padding-bottom: 171px;
+  padding-bottom: 171px;
 }
 .pageContainer,
 .dataContainer,
@@ -242,7 +242,7 @@ $paragraphFontSizeSmall:12px;
 
 .tabsSection {
   background: linear-gradient(90deg, #EBF2F9 1.96%, rgba(235, 242, 249, 0) 94.15%);
-    h2 {
+  h2 {
     font-family:$fontFamilySecondary;
     padding-bottom: 50px;
     font-weight: bold;
@@ -392,7 +392,7 @@ $paragraphFontSizeSmall:12px;
   word-break: break-all;
   border-bottom: 1px solid $colorSecondary;
   transition: all 1s ease-in-out;
-  background: #E2ECF0;
+  list-style: none;
 }
 
 .notification > div {
@@ -401,7 +401,6 @@ $paragraphFontSizeSmall:12px;
 
 .NotificationButton{
   border-bottom: none;
-  padding: 10px 15px;
 }
 
 .notificationDropdown{
@@ -735,14 +734,14 @@ dl .info {
   .sideBarOptions {
     margin-top: 20px;
     ul {
-    padding: 0px !important;
+      padding: 0px !important;
     }
     ul input {
-    padding: 10px;
+      padding: 10px;
       border: 1px solid #ddd;
     }
     ul li {
-    list-style-type: none;
+      list-style-type: none;
     }
     ul li a {
       padding: 8px 0px 0px 20px;
