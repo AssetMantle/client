@@ -3,11 +3,11 @@
 @(formTemplate: constants.Form, formData: Form[_])(fieldset: Html)(implicit messagesProvider: MessagesProvider, requestHeader: RequestHeader)
 
 @form(action = formTemplate.route, 'onkeypress -> "submitFormOnEnter(event,this)") {
-    <img src="@routes.Assets.versioned("images/icon.svg")">
     <fieldset class="cmuk-fieldset cmuk-form-stacked">
         <legend class="cmuk-legend">
         @Messages(formTemplate.legend)
         </legend>
+        <hr>
         @CSRF.formField
         @fieldset
         @if(formData.hasGlobalErrors) {

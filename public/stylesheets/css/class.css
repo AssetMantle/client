@@ -31,8 +31,7 @@
     max-height: 600px;
     display: inline-block; }
     .modal .modalContent .modalBody {
-      padding: 20px;
-      text-align: left; }
+      padding: 20px; }
 
 .centerScreen {
   display: flex;
@@ -142,6 +141,14 @@
     margin-left: auto; }
     .bannerContainer .bannerImage img {
       margin-top: -13px; }
+
+.cmuk-button-primary {
+  background-color: #0862BE !important; }
+
+.cmuk-legend {
+  font-weight: bold;
+  font-family: "Oxygen", sans-serif;
+  font-size: 18px !important; }
 
 .bannerButtons button {
   font-size: 18px;
@@ -416,7 +423,9 @@
   padding-right: 10px; }
 
 .toggleElement {
-  background-color: #149f98; }
+  text-align: center;
+  background-color: #0862BE;
+  color: #FFFFFF; }
 
 .showToggleElement {
   background-color: #149f98;
@@ -425,7 +434,7 @@
 
 .toggleElement:hover {
   cursor: pointer;
-  color: #10292e; }
+  color: #FFFFFF; }
 
 .leftText {
   text-align: left;
@@ -954,5 +963,8 @@ input:checked + .slider {
 
 .cmuk-table th, .cmuk-button {
   text-transform: capitalize !important; }
+
+select .blank {
+  color: Red; }
 
 /*# sourceMappingURL=class.css.map */

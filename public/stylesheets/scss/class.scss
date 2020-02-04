@@ -48,7 +48,6 @@ $paragraphFontSizeSmall:12px;
 
     .modalBody {
       padding: 20px;
-      text-align: left;
     }
   }
 }
@@ -194,12 +193,23 @@ $paragraphFontSizeSmall:12px;
   }
 }
 
+.cmuk-button-primary{
+  background-color: $colorPrimary !important;
+}
+
+.cmuk-legend{
+  font-weight: bold;
+  font-family: $fontFamilySecondary;
+  font-size: $headingFontSizeSmall !important;
+}
+
 .bannerButtons {
   button {
     @extend %buttonPrimary;
     font-size: $headingFontSizeSmall;
     margin-right: 20px;
   }
+
   .cmuk-button-default,
   .cmuk-button-default:focus,
   .cmuk-button-default:hover{
@@ -530,7 +540,9 @@ $paragraphFontSizeSmall:12px;
 }
 
 .toggleElement {
-  background-color: #149f98;
+  text-align: center;
+  background-color:$colorPrimary;
+  color:#FFFFFF;
 }
 
 .showToggleElement {
@@ -541,7 +553,7 @@ $paragraphFontSizeSmall:12px;
 
 .toggleElement:hover {
   cursor: pointer;
-  color: #10292e;
+  color: #FFFFFF;
 }
 
 .leftText {
@@ -1197,4 +1209,8 @@ input:checked+.slider {
 }
 .cmuk-table th, .cmuk-button{
   text-transform: capitalize !important;
+}
+
+select .blank{
+  color:Red;
 }
