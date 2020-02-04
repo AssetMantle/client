@@ -89,6 +89,8 @@ object Response {
   val INVALID_OTP = new Failure("INVALID_OTP")
   val EMAIL_ADDRESS_NOT_FOUND = new Failure("EMAIL_ADDRESS_NOT_FOUND")
   val MOBILE_NUMBER_NOT_FOUND = new Failure("MOBILE_NUMBER_NOT_FOUND")
+  val EMAIL_ADDRESS_ALREADY_IN_USE = new Failure("EMAIL_ADDRESS_ALREADY_IN_USE")
+  val MOBILE_NUMBER_ALREADY_IN_USE = new Failure("MOBILE_NUMBER_ALREADY_IN_USE")
   val CONNECT_EXCEPTION = new Failure("CONNECT_EXCEPTION")
   val EMAIL_NOT_FOUND = new Failure("EMAIL_NOT_FOUND")
   val NO_RESPONSE = new Failure("NO_RESPONSE")
@@ -116,6 +118,7 @@ object Response {
   val ALL_ASSET_FILES_NOT_VERIFIED = new Failure("ALL_KYC_FILES_NOT_VERIFIED")
   val SMS_SEND_FAILED = new Failure("SMS_SEND_FAILED")
   val SMS_SERVICE_CONNECTION_FAILURE = new Failure("SMS_SERVICE_CONNECTION_FAILURE")
+  val UNVERIFIED_IDENTIFICATION = new Failure("UNVERIFIED_IDENTIFICATION")
 
 
   class Failure(private val response: String, private val actionController: JavaScriptReverseRoute = null) {

@@ -10,7 +10,7 @@ import slick.jdbc.JdbcProfile
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class AddTraderRequest(id: String, accountID: String, traderID: String, organizationID: String)
+case class AddTraderRequest(id: String, accountID: String, traderID: String, emailAddress: String)
 
 @Singleton
 class AddTraderRequests @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
@@ -63,7 +63,7 @@ class AddTraderRequests @Inject()(protected val databaseConfigProvider: Database
 
   private[models] class AddTraderRequestTable(tag: Tag) extends Table[AddTraderRequest](tag, "AddTraderRequest") {
 
-    def * = (id, accountID, traderID, organizationID) <> (AddTraderRequest.tupled, AddTraderRequest.unapply)
+    def * = (id, accountID, traderID, emailAddress) <> (AddTraderRequest.tupled, AddTraderRequest.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
@@ -71,13 +71,13 @@ class AddTraderRequests @Inject()(protected val databaseConfigProvider: Database
 
     def traderID = column[String]("traderID")
 
-    def organizationID = column[String]("organizationID")
+    def emailAddress = column[String]("emailAddress")
 
   }
 
   object Service {
 
-    def create(accountID: String, organizationID: String): Future[String] = add(AddTraderRequest(id = utilities.IDGenerator.requestID, accountID = accountID, traderID = utilities.IDGenerator.hexadecimal, organizationID = organizationID))
+    def create(accountID: String, emailAddress: String): Future[String] = add(AddTraderRequest(id = utilities.IDGenerator.requestID, accountID = accountID, traderID = utilities.IDGenerator.hexadecimal, emailAddress = emailAddress))
 
     def get(id: String): Future[AddTraderRequest] = findById(id)
   }

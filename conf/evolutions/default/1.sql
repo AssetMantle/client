@@ -494,16 +494,6 @@ CREATE TABLE IF NOT EXISTS MASTER."Trader"
     PRIMARY KEY ("id")
 );
 
-CREATE TABLE IF NOT EXISTS MASTER."TraderNew"
-(
-    "id"                 VARCHAR NOT NULL,
-    "organizationID"     VARCHAR NOT NULL,
-    "accountID"          VARCHAR NOT NULL UNIQUE,
-    "name"               VARCHAR NOT NULL,
-    "verificationStatus" BOOLEAN,
-    PRIMARY KEY ("id")
-);
-
 CREATE TABLE IF NOT EXISTS MASTER."Account"
 (
     "id"             VARCHAR NOT NULL,
@@ -518,9 +508,9 @@ CREATE TABLE IF NOT EXISTS MASTER."Account"
 CREATE TABLE IF NOT EXISTS MASTER."Contact"
 (
     "id"                   VARCHAR NOT NULL,
-    "mobileNumber"         VARCHAR NOT NULL,
+    "mobileNumber"         VARCHAR NOT NULL UNIQUE,
     "mobileNumberVerified" BOOLEAN NOT NULL,
-    "emailAddress"         VARCHAR NOT NULL,
+    "emailAddress"         VARCHAR NOT NULL UNIQUE,
     "emailAddressVerified" BOOLEAN NOT NULL,
     PRIMARY KEY ("id")
 );
@@ -602,6 +592,7 @@ CREATE TABLE IF NOT EXISTS MASTER."Identification"
     "accountID"              VARCHAR NOT NULL,
     "firstName"              VARCHAR NOT NULL,
     "lastName"               VARCHAR NOT NULL,
+    "dateOfBirth"            DATE    NOT NULL,
     "idNumber"               VARCHAR NOT NULL,
     "idType"                 VARCHAR NOT NULL,
     "status"                 BOOLEAN,
@@ -613,7 +604,7 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."AddTraderRequest"
     "id"             VARCHAR NOT NULL,
     "accountID"      VARCHAR NOT NULL,
     "traderID"       VARCHAR NOT NULL,
-    "organizationID" VARCHAR NOT NULL,
+    "emailAddress" VARCHAR NOT NULL,
     PRIMARY KEY ("id")
 );
 
@@ -800,9 +791,7 @@ ALTER TABLE MASTER."ZoneKYC"
     ADD CONSTRAINT ZoneKYC_Zone_id FOREIGN KEY ("id") REFERENCES MASTER."Zone" ("id");
 
 ALTER TABLE MASTER_TRANSACTION."AddTraderRequest"
-    ADD CONSTRAINT AddTraderRequest_Account_accountID FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");
-ALTER TABLE MASTER_TRANSACTION."AddTraderRequest"
-    ADD CONSTRAINT AddTraderRequest_Organization_organizationID FOREIGN KEY ("organizationID") REFERENCES MASTER."Organization" ("id");
+    ADD CONSTRAINT AddTraderRequest_Account_accountID FOREIGN KEY ("accountID") REFERENCES MASTER."Organization" ("accountID");
 ALTER TABLE MASTER_TRANSACTION."FaucetRequest"
     ADD CONSTRAINT FaucetRequest_MasterAccount_AccountID FOREIGN KEY ("accountID") REFERENCES MASTER."Account" ("id");
 ALTER TABLE MASTER_TRANSACTION."IssueAssetRequest"

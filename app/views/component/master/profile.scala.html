@@ -37,6 +37,17 @@
             <div id="identificationDetails">
 
             </div>
+            <div id="organizationDetails">
+
+            </div>
+            <div id="organizationTraders">
+
+            </div>
+            @if(loginState.userType == constants.User.ORGANIZATION){
+                <div class="cmuk-margin-top cmuk-margin-bottom">
+                    <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.SetACLController.inviteTraderForm())">@Messages(constants.Form.INVITE_TRADER.legend)</button>
+                </div>
+            }
         </div>
     </section>
     <section class="cmuk-section cmuk-section-small">
@@ -184,20 +195,23 @@
                                             }
                                             case _ => {}
                                         }
-                                        </div >
-                                    </li >
-                                </ul >
-                            </div >
-                        </div >
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
             </div>
-        </div >
-    </section >
+        </div>
+    </section>
     <script>
+            @if(loginState.userType == constants.User.ORGANIZATION){
+                componentResource('organizationTraders', jsRoutes.controllers.ComponentViewController.organizationViewTraderList());
+            }
             componentResource('profilePhoto', jsRoutes.controllers.ComponentViewController.profilePicture());
             componentResource('profileDocuments', jsRoutes.controllers.ComponentViewController.profileDocuments());
             componentResource('contactDetails', jsRoutes.controllers.ContactController.contact());
             componentResource('identificationDetails', jsRoutes.controllers.ProfileController.identificationDetails());
-
+            componentResource('organizationDetails', jsRoutes.controllers.ProfileController.organizationDetails());
     </script>
 }

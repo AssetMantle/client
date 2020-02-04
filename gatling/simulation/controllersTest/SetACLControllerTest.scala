@@ -34,7 +34,7 @@ object setACLPrivileges {
 
 object setACLControllerTest {
 
-  val traderKYCs=Seq("TRADER_IDENTIFICATION","TRADER_AGREEMENT")
+  val traderKYCs=constants.File.TRADER_KYC_DOCUMENT_TYPES
 
   val addTraderRequest=scenario("AddTraderRequest")
 
@@ -49,9 +49,7 @@ object setACLControllerTest {
             .post(routes.SetACLController.addTrader().url)
             .formParamMap(Map(
               Form.CSRF_TOKEN-> "${%s}".format(Form.CSRF_TOKEN),
-              Form.ZONE_ID-> "${%s}".format(Test.TEST_ZONE_ID),
               Form.ORGANIZATION_ID -> "${%s}".format(Test.TEST_ORGANIZATION_ID),
-              Form.NAME -> "${%s}".format(Test.TEST_NAME)
             ))
       .check(substring("TRADER_KYC_FILES").exists)
     )

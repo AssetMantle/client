@@ -80,7 +80,6 @@ object Form {
 
   //ProfileController
   val IDENTIFICATION = new Form("IDENTIFICATION", routes.ProfileController.identification())
-  val ADD_TRADER_NEW = new Form("ADD_TRADER_NEW", routes.ProfileController.addTrader())
 
   //RedeemAssetController
   val REDEEM_ASSET = new Form("REDEEM_ASSET", routes.RedeemAssetController.redeemAsset())
@@ -224,6 +223,9 @@ object Form {
   val FIATS_TOTAL_VALUE = "FIATS TOTAL VALUE"
   val ID_TYPE = "ID_TYPE"
   val ID_NUMBER = "ID_NUMBER"
+  val FIRST_NAME="FIRST_NAME"
+  val LAST_NAME="LAST_NAME"
+  val DATE_OF_BIRTH="DATE_OF_BIRTH"
 
   //File Upload
   val BROWSE = "BROWSE"
@@ -381,7 +383,7 @@ object Form {
   val SWIFT_CODE = "SWIFT_CODE"
   val BANK_ADDRESS = "BANK_ADDRESS"
   val ORGANIZATION_UBO_DETAIL = "ORGANIZATION_UBO_DETAIL"
-  val FULL_ADDRESS="FULL_ADDRESS"
+  val FULL_ADDRESS = "FULL_ADDRESS"
 
   //MasterTransaction
   val COUPON = "COUPON"
@@ -405,6 +407,7 @@ object Form {
   val COMPLETION = "COMPLETION"
   val MODE = "MODE"
 
+  val CITY = "CITY"
   val COUNTRY = "COUNTRY"
   val ZIP_CODE = "ZIP_CODE"
   val REGISTERED_ADDRESS_LINE_1 = "REGISTERED_ADDRESS.ADDRESS_LINE_1"

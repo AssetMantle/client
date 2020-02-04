@@ -62,8 +62,8 @@ class VerifyEmailAddressController @Inject()(messagesControllerComponents: Messa
             _ <- updateStatus(contact)
             result<-withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.EMAIL_ADDRESS_VERIFIED)))
           } yield result
-            ).recoverWith {
-            case baseException: BaseException =>if(baseException.failure==constants.Response.INVALID_OTP) withUsernameToken.PartialContent(views.html.component.master.verifyEmailAddress(views.companion.master.VerifyEmailAddress.form.withError(constants.FormField.OTP.name,constants.Response.INVALID_OTP.message))) else Future(InternalServerError(views.html.index(failures = Seq(baseException.failure))))
+            ).recover {
+            case baseException: BaseException =>if(baseException.failure==constants.Response.INVALID_OTP) BadRequest(views.html.component.master.verifyEmailAddress(views.companion.master.VerifyEmailAddress.form.withError(constants.FormField.OTP.name,constants.Response.INVALID_OTP.message))) else InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
         }
       )

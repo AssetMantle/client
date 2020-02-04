@@ -2,7 +2,7 @@ package controllers
 
 import java.nio.file.Files
 
-import controllers.actions.{WithGenesisLoginAction, WithOrganizationLoginAction, WithUserLoginAction, WithZoneLoginAction}
+import controllers.actions.{WithGenesisLoginAction, WithLoginAction, WithOrganizationLoginAction, WithUnknownLoginAction, WithUserLoginAction, WithZoneLoginAction}
 import controllers.results.WithUsernameToken
 import exceptions.BaseException
 import javax.inject.{Inject, Singleton}
@@ -17,7 +17,7 @@ import views.companion.master.FileUpload
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class AddOrganizationController @Inject()(messagesControllerComponents: MessagesControllerComponents, withOrganizationLoginAction: WithOrganizationLoginAction, fileResourceManager: utilities.FileResourceManager, transaction: utilities.Transaction, masterOrganizationBankAccountDetails: master.OrganizationBankAccountDetails, utilitiesNotification: utilities.Notification, blockchainAccounts: blockchain.Accounts, masterOrganizationKYCs: master.OrganizationKYCs, masterTraders: master.Traders, transactionsAddOrganization: transactions.AddOrganization, blockchainOrganizations: blockchain.Organizations, masterZones: master.Zones, blockchainTransactionAddOrganizations: blockchainTransaction.AddOrganizations, masterOrganizations: master.Organizations, masterAccounts: master.Accounts, withUserLoginAction: WithUserLoginAction, withZoneLoginAction: WithZoneLoginAction, withGenesisLoginAction: WithGenesisLoginAction, withUsernameToken: WithUsernameToken)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
+class AddOrganizationController @Inject()(messagesControllerComponents: MessagesControllerComponents, withOrganizationLoginAction: WithOrganizationLoginAction, withLoginAction: WithLoginAction, fileResourceManager: utilities.FileResourceManager, transaction: utilities.Transaction, masterOrganizationBankAccountDetails: master.OrganizationBankAccountDetails, utilitiesNotification: utilities.Notification, blockchainAccounts: blockchain.Accounts, masterOrganizationKYCs: master.OrganizationKYCs, masterTraders: master.Traders, transactionsAddOrganization: transactions.AddOrganization, blockchainOrganizations: blockchain.Organizations, masterZones: master.Zones, blockchainTransactionAddOrganizations: blockchainTransaction.AddOrganizations, masterOrganizations: master.Organizations, masterAccounts: master.Accounts, withUserLoginAction: WithUserLoginAction, withZoneLoginAction: WithZoneLoginAction, withGenesisLoginAction: WithGenesisLoginAction, withUsernameToken: WithUsernameToken)(implicit executionContext: ExecutionContext, configuration: Configuration) extends AbstractController(messagesControllerComponents) with I18nSupport {
 
   private val transactionMode = configuration.get[String]("blockchain.transaction.mode")
 
@@ -60,12 +60,12 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
             if (verificationStatus) {
               val id = masterOrganizations.Service.insertOrUpdateWithoutUBOs(zoneID = addOrganizationData.zoneID, accountID = loginState.username, name = addOrganizationData.name, abbreviation = addOrganizationData.abbreviation, establishmentDate = utilities.Date.utilDateToSQLDate(addOrganizationData.establishmentDate), email = addOrganizationData.email, registeredAddress = Address(addressLine1 = addOrganizationData.registeredAddress.addressLine1, addressLine2 = addOrganizationData.registeredAddress.addressLine2, landmark = addOrganizationData.registeredAddress.landmark, city = addOrganizationData.registeredAddress.city, country = addOrganizationData.registeredAddress.country, zipCode = addOrganizationData.registeredAddress.zipCode, phone = addOrganizationData.registeredAddress.phone), postalAddress = Address(addressLine1 = addOrganizationData.postalAddress.addressLine1, addressLine2 = addOrganizationData.postalAddress.addressLine2, landmark = addOrganizationData.postalAddress.landmark, city = addOrganizationData.postalAddress.city, country = addOrganizationData.postalAddress.country, zipCode = addOrganizationData.postalAddress.zipCode, phone = addOrganizationData.postalAddress.phone))
 
-              def getUBOs(id: String): Future[UBOs] = masterOrganizations.Service.getUBOs(id)
+              def getOrganizationKYCs(id: String): Future[Seq[OrganizationKYC]] = masterOrganizationKYCs.Service.getAllDocuments(id)
 
               (for {
                 id <- id
-                ubos <- getUBOs(id)
-                result <- withUsernameToken.PartialContent(views.html.component.master.userUpdateUBOs(views.companion.master.AddUBOs.form.fill(views.companion.master.AddUBOs.Data(ubos.data.map(ubo => Option(views.companion.master.AddUBOs.UBOData(personName = ubo.personName, sharePercentage = ubo.sharePercentage, relationship = ubo.relationship, title = ubo.title)))))))
+                organizationKYCs<-getOrganizationKYCs(id)
+                result <- withUsernameToken.PartialContent(views.html.component.master.userUploadOrUpdateOrganizationKYC(organizationKYCs))
               } yield result
                 ).recoverWith {
                 case _: BaseException => withUsernameToken.PartialContent(views.html.component.master.userUpdateUBOs())
@@ -238,7 +238,7 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
     Ok(views.html.component.master.updateFile(utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.userUploadOrganizationKYC), utilities.String.getJsRouteFunction(routes.javascript.AddOrganizationController.userUpdateOrganizationKYC), documentType))
   }
 
-  def userUpdateOrganizationKYC(name: String, documentType: String): Action[AnyContent] = withUserLoginAction.authenticated { implicit loginState =>
+  def userUpdateOrganizationKYC(name: String, documentType: String): Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val organizationID = masterOrganizations.Service.getID(loginState.username)
 
@@ -271,21 +271,19 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
     implicit request =>
       val organization = masterOrganizations.Service.getByAccountID(loginState.username)
 
-      def getZoneOrganizationDetails(organization: Organization): Future[(Zone, OrganizationBankAccountDetail, Seq[OrganizationKYC])] = {
+      def getZoneOrganizationDetails(organization: Organization): Future[(Zone, Seq[OrganizationKYC])] = {
         val zone = masterZones.Service.get(organization.zoneID)
-        val organizationBankAccountDetail = masterOrganizationBankAccountDetails.Service.get(organization.id)
         val organizationKYCs = masterOrganizationKYCs.Service.getAllDocuments(organization.id)
         for {
           zone <- zone
-          organizationBankAccountDetail <- organizationBankAccountDetail
           organizationKYCs <- organizationKYCs
-        } yield (zone, organizationBankAccountDetail, organizationKYCs)
+        } yield (zone, organizationKYCs)
       }
 
       (for {
         organization <- organization
-        (zone, organizationBankAccountDetail, organizationKYCs) <- getZoneOrganizationDetails(organization)
-        result <- withUsernameToken.Ok(views.html.component.master.userReviewAddOrganizationRequest(organization = organization, zone = zone, organizationBankAccountDetail = organizationBankAccountDetail, organizationKYCs = organizationKYCs))
+        (zone, organizationKYCs) <- getZoneOrganizationDetails(organization)
+        result <- withUsernameToken.Ok(views.html.component.master.userReviewAddOrganizationRequest(organization = organization, zone = zone, organizationKYCs = organizationKYCs))
       } yield result
         ).recover {
         case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
@@ -298,21 +296,19 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
         formWithErrors => {
           val organization = masterOrganizations.Service.getByAccountID(loginState.username)
 
-          def getZoneOrganizationDetails(organization: Organization): Future[(Zone, OrganizationBankAccountDetail, Seq[OrganizationKYC])] = {
+          def getZoneOrganizationDetails(organization: Organization): Future[(Zone, Seq[OrganizationKYC])] = {
             val zone = masterZones.Service.get(organization.zoneID)
-            val organizationBankAccountDetail = masterOrganizationBankAccountDetails.Service.get(organization.id)
             val organizationKYCs = masterOrganizationKYCs.Service.getAllDocuments(organization.id)
             for {
               zone <- zone
-              organizationBankAccountDetail <- organizationBankAccountDetail
               organizationKYCs <- organizationKYCs
-            } yield (zone, organizationBankAccountDetail, organizationKYCs)
+            } yield (zone, organizationKYCs)
           }
 
           (for {
             organization <- organization
-            (zone, organizationBankAccountDetail, organizationKYCs) <- getZoneOrganizationDetails(organization)
-          } yield BadRequest(views.html.component.master.userReviewAddOrganizationRequest(formWithErrors, organization = organization, zone = zone, organizationBankAccountDetail = organizationBankAccountDetail, organizationKYCs = organizationKYCs))).recover {
+            (zone, organizationKYCs) <- getZoneOrganizationDetails(organization)
+          } yield BadRequest(views.html.component.master.userReviewAddOrganizationRequest(formWithErrors, organization = organization, zone = zone, organizationKYCs = organizationKYCs))).recover {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }
         },
@@ -331,21 +327,19 @@ class AddOrganizationController @Inject()(messagesControllerComponents: Messages
             } else {
               val organization = masterOrganizations.Service.getByAccountID(loginState.username)
 
-              def getZoneOrganizationDetails(organization: Organization): Future[(Zone, OrganizationBankAccountDetail, Seq[OrganizationKYC])] = {
+              def getZoneOrganizationDetails(organization: Organization): Future[(Zone, Seq[OrganizationKYC])] = {
                 val zone = masterZones.Service.get(organization.zoneID)
-                val organizationBankAccountDetail = masterOrganizationBankAccountDetails.Service.get(organization.id)
                 val organizationKYCs = masterOrganizationKYCs.Service.getAllDocuments(organization.id)
                 for {
                   zone <- zone
-                  organizationBankAccountDetail <- organizationBankAccountDetail
                   organizationKYCs <- organizationKYCs
-                } yield (zone, organizationBankAccountDetail, organizationKYCs)
+                } yield (zone, organizationKYCs)
               }
 
               for {
                 organization <- organization
-                (zone, organizationBankAccountDetail, organizationKYCs) <- getZoneOrganizationDetails(organization)
-              } yield BadRequest(views.html.component.master.userReviewAddOrganizationRequest(organization = organization, zone = zone, organizationBankAccountDetail = organizationBankAccountDetail, organizationKYCs = organizationKYCs))
+                (zone, organizationKYCs) <- getZoneOrganizationDetails(organization)
+              } yield BadRequest(views.html.component.master.userReviewAddOrganizationRequest(organization = organization, zone = zone, organizationKYCs = organizationKYCs))
             }
           }
 

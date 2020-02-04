@@ -12,11 +12,13 @@
         @identification match{
             case Some(identification)=>{
                 <p>@Messages(constants.Form.NAME): <span>@identification.firstName @identification.lastName</span></p>
+                <p>@Messages(constants.Form.DATE_OF_BIRTH): <span>@identification.dateOfBirth</span></p>
                 <p>@Messages(constants.Form.ID_NUMBER): <span>@identification.idNumber</span></p>
                 <p>@Messages(constants.Form.ID_TYPE): <span>@identification.idType</span></p>
             }
             case None=>{
                 <p>@Messages(constants.Form.NAME): <span>@Messages(constants.View.NOT_SPECIFIED)</span></p>
+                <p>@Messages(constants.Form.DATE_OF_BIRTH): <span>@Messages(constants.View.NOT_SPECIFIED)</span></p>
                 <p>@Messages(constants.Form.ID_NUMBER): <span>@Messages(constants.View.NOT_SPECIFIED)</span></p>
                 <p>@Messages(constants.Form.ID_TYPE): <span>@Messages(constants.View.NOT_SPECIFIED)</span></p>
             }

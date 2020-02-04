@@ -27,8 +27,8 @@ object updateContactControllerTest {
     .exec(http("UpdateContact_POST")
       .post(routes.ContactController.updateContact().url)
       .formParamMap(Map(
-        Form.EMAIL_ADDRESS -> "${%s}".format(Test.TEST_EMAIL_ADDRESS),
         Form.MOBILE_NUMBER -> "${%s}".format(Test.TEST_MOBILE_NUMBER),
+        Form.EMAIL_ADDRESS -> "${%s}".format(Test.TEST_EMAIL_ADDRESS),
         Form.COUNTRY_CODE -> "${%s}".format(Test.TEST_COUNTRY_CODE),
         Form.CSRF_TOKEN -> "${%s}".format(Form.CSRF_TOKEN))))
 }

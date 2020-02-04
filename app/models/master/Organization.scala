@@ -64,6 +64,14 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
     }
   }
 
+  private def findOrgByAccountID(accountID: String): Future[Option[OrganizationSerialized]] = db.run(organizationTable.filter(_.accountID === accountID).result.headOption.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
   private def getAccountIdById(id: String): Future[String] = db.run(organizationTable.filter(_.id === id).map(_.accountID).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
@@ -79,6 +87,15 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
         None
     }
   }
+
+  private def getNameByAccountID(accountID: String): Future[String] = db.run(organizationTable.filter(_.accountID === accountID).map(_.name).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => logger.info(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+    }
+  }
+
 
   private def getZoneIDByID(id: String): Future[String] = db.run(organizationTable.filter(_.id === id).map(_.zoneID).result.head.asTry).map {
     case Success(result) => result
@@ -216,9 +233,13 @@ class Organizations @Inject()(protected val databaseConfigProvider: DatabaseConf
 
     def getID(accountID: String): Future[String] = getIDByAccountID(accountID).map { id => id.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)) }
 
+    def nameByID(accountID:String): Future[String]= getNameByAccountID(accountID)
+
     def get(id: String): Future[Organization] = findById(id).map { organizationSerialized => organizationSerialized.deserialize }
 
     def getByAccountID(accountID: String): Future[Organization] = findByAccountID(accountID).map { organizationSerialized => organizationSerialized.deserialize }
+
+    def getOrNoneByAccountID(accountID: String) = findOrgByAccountID(accountID).map(_.map(_.deserialize))
 
     def getZoneID(id: String): Future[String] = getZoneIDByID(id)
 

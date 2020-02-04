@@ -8,24 +8,26 @@
     <div class="cmuk-width-2-3@@m">
     @commonCard() {
         <h>Org. Details</h>
-    }{
+    } {
         @organization match {
             case Some(org) => {
                 <p>@Messages(constants.Form.NAME): <span>@org.name</span></p>
-                <p>@Messages(constants.Form.FULL_ADDRESS): <span>@org.registeredAddress.addressLine1 @org.registeredAddress.addressLine2 @org.registeredAddress.landmark</span></p>
+                <p>@Messages(constants.Form.FULL_ADDRESS)
+                    : <span>@org.registeredAddress.addressLine1 @org.registeredAddress.addressLine2 @org.registeredAddress.landmark</span></p>
                 <p>@Messages(constants.Form.COUNTRY): <span>@org.registeredAddress.country</span></p>
-                <p>@Messages(constants.Form.NAME): <span>@org.registeredAddress.city</span></p>
-                <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.ContactController.updateContactForm())">@Messages(constants.Form.UPDATE_CONTACT.legend)</button>
+                <p>@Messages(constants.Form.CITY): <span>@org.registeredAddress.city</span></p>
             }
             case _ => {
                 <p>@Messages(constants.Form.NAME): <span>@Messages(constants.View.NOT_SPECIFIED)</span></p>
                 <p>@Messages(constants.Form.FULL_ADDRESS): <span>@Messages(constants.View.NOT_SPECIFIED)</span></p>
                 <p>@Messages(constants.Form.COUNTRY): <span>@Messages(constants.View.NOT_SPECIFIED)</span></p>
                 <p>@Messages(constants.Form.NAME): <span>@Messages(constants.View.NOT_SPECIFIED)</span></p>
-                <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.ContactController.updateContactForm())">@Messages(constants.Form.UPDATE_CONTACT.legend)</button>
+
             }
-        <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.ContactController.updateContactForm())">@Messages(constants.Form.UPDATE_CONTACT.legend)</button>
         }
+        @if(loginState.userType == constants.User.USER){
+        <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.SetACLController.addTraderForm())">@Messages(constants.Form.ADD_ORGANIZATION.legend)</button>
+    }
     }
     </div>
 </div>

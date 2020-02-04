@@ -98,6 +98,10 @@ class Contacts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     }
   }
 
+  private def checkEmailPresent(email:String, accountID:String): Future[Boolean] = db.run(contactTable.filterNot(_.id === accountID).filter(_.emailAddress === email).exists.result)
+
+  private def checkMobilePresent(mobileNumber:String,accountID:String): Future[Boolean] = db.run(contactTable.filterNot(_.id === accountID).filter(_.mobileNumber === mobileNumber).exists.result)
+
   private[models] class ContactTable(tag: Tag) extends Table[Contact](tag, "Contact") {
 
     def * = (id, mobileNumber, mobileNumberVerified, emailAddress, emailAddressVerified) <> (Contact.tupled, Contact.unapply)
@@ -129,6 +133,10 @@ class Contacts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     def getUnverifiedEmailAddress(id: String): Future[String] = getEmailAddressById(id = id, emailAddressVerified = Option(false))
 
     def getMobileNumber(id: String): Future[String] = findMobileNumberById(id)
+
+    def emailPresent(email:String, accountID:String): Future[Boolean]=checkEmailPresent(email,accountID)
+
+    def mobileNumberPresent(mobileNumber: String,accountID:String): Future[Boolean]= checkMobilePresent(mobileNumber,accountID)
   }
 
 }
