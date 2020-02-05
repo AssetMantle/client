@@ -245,7 +245,7 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
     def updateStatusComplete(id: String): Future[Int] = updateStatusById(id, constants.Status.Account.COMPLETE)
 
-    def getStatus(id:String): Future[String]=getStatusByID(id)
+    def getStatus(id: String): Future[String] = getStatusByID(id)
   }
 
 }

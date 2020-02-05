@@ -603,7 +603,6 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."AddTraderRequest"
 (
     "id"             VARCHAR NOT NULL,
     "accountID"      VARCHAR NOT NULL,
-    "traderID"       VARCHAR NOT NULL,
     "emailAddress" VARCHAR NOT NULL,
     PRIMARY KEY ("id")
 );

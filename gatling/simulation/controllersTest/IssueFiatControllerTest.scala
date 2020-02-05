@@ -21,7 +21,7 @@ object issueFiatControllerTest {
     .feed(TransactionAmountFeeder.transactionAmountFeed)
     .exec(http("Issue_Fiat_Request_GET")
       .get(routes.IssueFiatController.issueFiatRequestForm().url)
-      .check(css("legend:contains(%s)".format(constants.Form.ISSUE_FIAT_REQUEST.legend)).exists)
+      .check(css("legend:contains(%s)".format("Issue Fiat Request")).exists)
       .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
     .pause(2)
     .exec(http("Issue_Fiat_Request_POST")

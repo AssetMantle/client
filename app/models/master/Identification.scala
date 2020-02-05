@@ -16,7 +16,7 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class Identification(accountID: String, firstName: String, lastName: String, dateOfBirth:Date, idNumber: String, idType: String, status: Option[Boolean] = None)
+case class Identification(accountID: String, firstName: String, lastName: String, dateOfBirth: Date, idNumber: String, idType: String, status: Option[Boolean] = None)
 
 @Singleton
 class Identifications @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
@@ -79,7 +79,7 @@ class Identifications @Inject()(protected val databaseConfigProvider: DatabaseCo
 
   private[models] class IdentificationTable(tag: Tag) extends Table[Identification](tag, "Identification") {
 
-    def * = (accountID, firstName, lastName, dateOfBirth,idNumber, idType, status.?) <> (Identification.tupled, Identification.unapply)
+    def * = (accountID, firstName, lastName, dateOfBirth, idNumber, idType, status.?) <> (Identification.tupled, Identification.unapply)
 
     def accountID = column[String]("accountID", O.PrimaryKey)
 
@@ -99,15 +99,15 @@ class Identifications @Inject()(protected val databaseConfigProvider: DatabaseCo
 
   object Service {
 
-    def create(accountID: String, firstName: String, lastName: String,dateOfBirth:Date,  idNumber: String, idType: String, status: Option[Boolean] = None): Future[String] = add(Identification(accountID, firstName, lastName,dateOfBirth, idNumber, idType, status))
+    def create(accountID: String, firstName: String, lastName: String, dateOfBirth: Date, idNumber: String, idType: String, status: Option[Boolean] = None): Future[String] = add(Identification(accountID, firstName, lastName, dateOfBirth, idNumber, idType, status))
 
-    def insertOrUpdate(accountID: String, firstName: String, lastName: String, dateOfBirth:Date,idNumber: String, idType: String, status: Option[Boolean]): Future[Int] = upsert(Identification(accountID, firstName, lastName, dateOfBirth,idNumber, idType, status))
+    def insertOrUpdate(accountID: String, firstName: String, lastName: String, dateOfBirth: Date, idNumber: String, idType: String, status: Option[Boolean]): Future[Int] = upsert(Identification(accountID, firstName, lastName, dateOfBirth, idNumber, idType, status))
 
     def getOrNoneAccountID(accountID: String): Future[Option[Identification]] = getIdentificationOrNoneByAccountID(accountID)
 
-    def getName(accountID: String): Future[String]=getIdentificationByAccountID(accountID).map(id=> id.firstName+" "+id.lastName)
+    def getName(accountID: String): Future[String] = getIdentificationByAccountID(accountID).map(id => id.firstName + " " + id.lastName)
 
-    def getVerificationStatus(accountID: String): Future[Option[Boolean]]= getStatusByAccountID(accountID)
+    def getVerificationStatus(accountID: String): Future[Option[Boolean]] = getStatusByAccountID(accountID)
   }
 
 }

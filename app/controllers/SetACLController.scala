@@ -40,9 +40,9 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
           val organizationID = masterOrganizations.Service.getID(loginState.username)
           val organizationName = masterOrganizations.Service.nameByID(loginState.username)
 
-          def requestID(organizationID: String) = masterTransactionAddTraderRequests.Service.create(accountID = loginState.username, emailAddress = addTraderRequestData.emailAddress)
+          def createTraderRequest(organizationID: String) = masterTransactionAddTraderRequests.Service.create(accountID = loginState.username, emailAddress = addTraderRequestData.emailAddress)
 
-          def sendNotificationAndGetResult(requestID: String, organizationID: String, organizationName: String) = {
+          def sendNotificationAndGetResult(organizationID: String, organizationName: String) = {
             utilitiesNotification.sendTraderInvite(loginState.username, addTraderRequestData.emailAddress, organizationName, organizationID)
             withUsernameToken.Ok(views.html.index(successes = Seq(constants.Response.INVITATION_EMAIL_SENT)))
           }
@@ -50,8 +50,8 @@ class SetACLController @Inject()(messagesControllerComponents: MessagesControlle
           (for {
             organizationID <- organizationID
             organizationName <- organizationName
-            requestID <- requestID(organizationID)
-            result <- sendNotificationAndGetResult(requestID, organizationID, organizationName)
+            _ <- createTraderRequest(organizationID)
+            result <- sendNotificationAndGetResult(organizationID, organizationName)
           } yield result).recover {
             case baseException: BaseException => InternalServerError(views.html.index(failures = Seq(baseException.failure)))
           }

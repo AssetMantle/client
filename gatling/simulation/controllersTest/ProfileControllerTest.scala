@@ -19,7 +19,7 @@ object profileControllerTest {
   val addIdentification: ScenarioBuilder = scenario("AddIdentification")
     .exec(http("Add_IdentificationDocument")
         .get(routes.ProfileController.identificationDocument().url)
-      .check(substring(constants.View.ID_PROOF).exists)
+      .check(substring("ID Proof").exists)
     )
     .pause(2)
     .exec(http("AddIdentificationForm")
@@ -43,7 +43,7 @@ object profileControllerTest {
     .exec(
       http("Store_Identification")
         .get(session=>routes.FileController.storeAccountKYC(session(Test.TEST_FILE_NAME).as[String],"IDENTIFICATION").url)
-        .check(substring(constants.View.ID_PROOF).exists)
+        .check(substring("ID Proof").exists)
     )
     .pause(2)
     .feed(NameFeeder.nameFeed)

@@ -18,7 +18,7 @@ object logoutControllerTest {
   val logoutScenario: ScenarioBuilder = scenario("Logout")
     .exec(http("Logout_Form_GET")
       .get(routes.AccountController.logoutForm().url)
-      .check(css("legend:contains(%s)".format(constants.Form.LOGOUT.legend)).exists)
+      .check(css("legend:contains(%s)".format("Logout")).exists)
       .check(css("[name=%s]".format(Form.CSRF_TOKEN), "value").saveAs(Form.CSRF_TOKEN)))
     .pause(2)
     .exec(http("Logout_POST")
