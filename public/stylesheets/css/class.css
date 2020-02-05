@@ -31,7 +31,8 @@
     max-height: 600px;
     display: inline-block; }
     .modal .modalContent .modalBody {
-      padding: 20px; }
+      padding: 20px;
+      text-align: left; }
 
 .centerScreen {
   display: flex;
@@ -343,6 +344,7 @@
   display: none; }
 
 .MnemonicQuiz {
+  text-align: center;
   width: 500px; }
   .MnemonicQuiz .titleMnemonic {
     font-weight: bold; }
@@ -428,7 +430,7 @@
   color: #FFFFFF; }
 
 .showToggleElement {
-  background-color: #149f98;
+  background-color: #0862BE;
   cursor: pointer;
   color: #10292e; }
 
@@ -646,7 +648,10 @@ dl .info:after {
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08); }
 
 .cmuk-tab > .cmuk-active > a {
-  background: #149f98; }
+  background: #0862BE;
+  color: #FFFFFF !important;
+  font-weight: bold;
+  font-size: 16px; }
   .cmuk-tab > .cmuk-active > a:before {
     content: ' ';
     position: absolute;
@@ -657,7 +662,7 @@ dl .info:after {
     top: 38%;
     bottom: -19px;
     border: 8px solid;
-    border-color: transparent transparent transparent #149f98;
+    border-color: transparent transparent transparent #0862BE;
     animation-fill-mode: forwards; }
 
 .cmuk-tab > li > a {

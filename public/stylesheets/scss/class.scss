@@ -48,6 +48,7 @@ $paragraphFontSizeSmall:12px;
 
     .modalBody {
       padding: 20px;
+      text-align:left ;
     }
   }
 }
@@ -444,6 +445,7 @@ $paragraphFontSizeSmall:12px;
 }
 
 .MnemonicQuiz {
+  text-align: center;
   width: 500px;
   .titleMnemonic {
     font-weight: bold;
@@ -546,7 +548,7 @@ $paragraphFontSizeSmall:12px;
 }
 
 .showToggleElement {
-  background-color: #149f98;
+  background-color: $colorPrimary;
   cursor: pointer;
   color: #10292e;
 }
@@ -815,7 +817,10 @@ dl .info {
 }
 
 .cmuk-tab>.cmuk-active>a{
-  background: #149f98;
+  background: $colorPrimary;
+  color:#FFFFFF !important;
+  font-weight: bold;
+  font-size: $paragraphFontSizeLarge;
   &:before {
     content: ' ';
     position: absolute;
@@ -826,7 +831,7 @@ dl .info {
     top: 38%;
     bottom: -19px;
     border: 8px solid;
-    border-color: transparent transparent transparent #149f98;
+    border-color: transparent transparent transparent $colorPrimary;
     animation-fill-mode: forwards;
   }
 }

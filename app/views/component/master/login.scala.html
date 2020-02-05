@@ -3,7 +3,7 @@
 @import views.html.base._
 
 @(loginForm: Form[Login.Data] = Login.form)(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
-<div class="loginForm">
+<div class="loginForm cmuk-text-center">
 @commonForm(constants.Form.LOGIN, loginForm) {
     @commonInputText(loginForm, constants.FormField.USERNAME)
     @commonInputPassword(loginForm, constants.FormField.PASSWORD)
