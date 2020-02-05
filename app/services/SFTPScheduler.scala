@@ -69,9 +69,7 @@ class SFTPScheduler @Inject()(actorSystem: ActorSystem, wuSFTPFileTransactions: 
         val newFilePath = storagePathSFTPFiles + ftpFile._2.name
         val fileCreate = new File(newFilePath)
         fileCreate.createNewFile()
-        Source
-          .single(ftpFile._1)
-          .runWith(FileIO.toPath(fileCreate.toPath))
+        Source.single(ftpFile._1).runWith(FileIO.toPath(fileCreate.toPath))
 
         services.PGP.decryptFile(newFilePath, storagePathSFTPFiles + "tmp.csv", wuPGPPublicKeyFileLocation, comdexPGPPrivateKeyFileLocation, comdexPGPPrivateKeyPassword)
         val bufferedSource = io.Source.fromFile(storagePathSFTPFiles + "tmp.csv")
@@ -80,7 +78,6 @@ class SFTPScheduler @Inject()(actorSystem: ActorSystem, wuSFTPFileTransactions: 
           wuSFTPFileTransactions.Service.create(WUSFTPFileTransaction(payerID,invoiceNumber,customerFirstName,customerLastName,customerEmailAddress,settlementDate,clientReceivedAmount,transactionType,productType,transactionReference))
         }
         bufferedSource.close()
-
 
         Source.single(ftpFile._2).runWith(Sftp.remove(sftpSettings))
 
