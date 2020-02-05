@@ -13,3 +13,5 @@ dist
 /RUNNING_PID
 /.settings
 /.idea/
+*.css.map
+public/stylesheets/.sass-cache*

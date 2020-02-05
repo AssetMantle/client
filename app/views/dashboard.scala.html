@@ -4,12 +4,7 @@
 @common(Messages(constants.Form.DASHBOARD), failures, warnings, successes, infos)(left)(center)(Html(""))
 
 @left={
-
-}
-
-@center = {
-
-    <div class="dashboardContainer cmuk-flex">
+    <div class="dashboardContainer">
         <div class="left">
             <img src="@routes.Assets.versioned("images/comdex.svg")">
             <div class="cmuk-width-auto@@m">
@@ -22,6 +17,13 @@
                 </ul>
             </div>
         </div>
+    </div>
+}
+
+@center = {
+
+    <div class="dashboardContainer">
+
         <div class="right" id="component-nav">
 
         </div>

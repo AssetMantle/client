@@ -3,12 +3,6 @@
 @import views.html.base._
 
 @(userContact: Option[Contact])(implicit messagesProvider: MessagesProvider, loginState: LoginState = null)
-
-<div class="cmuk-grid-match cmuk-grid" cmuk-grid>
-    <div class="cmuk-width-2-3@@m">
-    @commonCard() {
-        <h>@Messages(constants.View.CONTACT_DETAILS)</h>
-    }{
         @userContact match {
             case Some(contact) => {
                 <p>@Messages(constants.Form.EMAIL_ADDRESS): <span>@contact.emailAddress</span>
@@ -33,6 +27,3 @@
                 <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.ContactController.updateContactForm())">@Messages(constants.Form.UPDATE_CONTACT.legend)</button>
             }
         }
-    }
-    </div>
-</div>

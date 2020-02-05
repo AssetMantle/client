@@ -10,8 +10,8 @@
 <div id="@Seq(file.id, file.documentType).mkString("")">
 @form(action = routes.IssueAssetController.updateAssetDocumentStatus, 'onkeypress -> "submitFormOnEnter(event,this)") {
     @CSRF.formField
-    @commonInputText(updateAssetDocumentStatusForm, constants.FormField.REQUEST_ID, 'value -> file.id, 'class -> "hidden", 'readonly -> true)
-    @commonInputText(updateAssetDocumentStatusForm, constants.FormField.DOCUMENT_TYPE, 'value -> file.documentType, 'class -> "hidden", 'readonly -> true)
+    @commonInputText(updateAssetDocumentStatusForm, constants.FormField.REQUEST_ID, 'value -> file.id, 'containerDivClass -> "hidden", 'readonly -> true)
+    @commonInputText(updateAssetDocumentStatusForm, constants.FormField.DOCUMENT_TYPE, 'value -> file.documentType, 'containerDivClass -> "hidden", 'readonly -> true)
     @commonCheckbox(updateAssetDocumentStatusForm, constants.FormField.STATUS, 'containerDivClass -> "hidden", 'id -> Seq(file.id, file.documentType, constants.FormField.STATUS.name).mkString(""))
 
     @if(updateAssetDocumentStatusForm.hasGlobalErrors) {
