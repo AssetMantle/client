@@ -10,7 +10,9 @@ import slick.jdbc.JdbcProfile
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class AddTraderRequest(id: String, accountID: String, traderID: String, emailAddress: String)
+case class requestState(email:String, name:String, status:String)
+
+case class AddTraderRequest(id: String, accountID: String, name: String, emailAddress: String)
 
 @Singleton
 class AddTraderRequests @Inject()(protected val databaseConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext) {
@@ -61,15 +63,19 @@ class AddTraderRequests @Inject()(protected val databaseConfigProvider: Database
     }
   }
 
+  private def getAllTraderRequestsByAccountID(accountID:String)=db.run(addTraderRequestTable.filter(_.accountID === accountID).result)
+
+  private def checkEmailPresent(email:String) = db.run(addTraderRequestTable.filter(_.emailAddress === email).exists.result)
+
   private[models] class AddTraderRequestTable(tag: Tag) extends Table[AddTraderRequest](tag, "AddTraderRequest") {
 
-    def * = (id, accountID, traderID, emailAddress) <> (AddTraderRequest.tupled, AddTraderRequest.unapply)
+    def * = (id, accountID, name, emailAddress) <> (AddTraderRequest.tupled, AddTraderRequest.unapply)
 
     def id = column[String]("id", O.PrimaryKey)
 
     def accountID = column[String]("accountID")
 
-    def traderID = column[String]("traderID")
+    def name = column[String]("name")
 
     def emailAddress = column[String]("emailAddress")
 
@@ -77,9 +83,13 @@ class AddTraderRequests @Inject()(protected val databaseConfigProvider: Database
 
   object Service {
 
-    def create(accountID: String, emailAddress: String): Future[String] = add(AddTraderRequest(id = utilities.IDGenerator.requestID, accountID = accountID, traderID = utilities.IDGenerator.hexadecimal, emailAddress = emailAddress))
+    def create(accountID: String,name:String, emailAddress: String): Future[String] = add(AddTraderRequest(id = utilities.IDGenerator.requestID, accountID = accountID, name = name, emailAddress = emailAddress))
 
     def get(id: String): Future[AddTraderRequest] = findById(id)
+
+    def getAllTraderRequests(accountID:String)=getAllTraderRequestsByAccountID(accountID).map(_.distinct)
+
+    def emailPresent(email:String)= checkEmailPresent(email)
   }
 
 }

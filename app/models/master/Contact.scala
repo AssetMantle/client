@@ -102,6 +102,20 @@ class Contacts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
   private def checkMobilePresent(mobileNumber:String,accountID:String): Future[Boolean] = db.run(contactTable.filterNot(_.id === accountID).filter(_.mobileNumber === mobileNumber).exists.result)
 
+  private def getAllEmailIDsForAccountIDs(accountIDs: Seq[String]) = db.run(contactTable.filter(contacts => contacts.id inSet accountIDs).map(_.emailAddress).result)
+
+  private def getAllContactsForAccountIDs(accountIDs: Seq[String]) = db.run(contactTable.filter(contacts => contacts.id inSet accountIDs).result)
+
+  private def getContactByEmailId( email: String) = db.run(contactTable.filter(_.emailAddress === email).result.head.asTry).map {
+    case Success(result) => result
+    case Failure(exception) => exception match {
+      case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
+        throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)
+      case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
+        throw new BaseException(constants.Response.PSQL_EXCEPTION)
+    }
+  }
+
   private[models] class ContactTable(tag: Tag) extends Table[Contact](tag, "Contact") {
 
     def * = (id, mobileNumber, mobileNumberVerified, emailAddress, emailAddressVerified) <> (Contact.tupled, Contact.unapply)
@@ -137,6 +151,12 @@ class Contacts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     def emailPresent(email:String, accountID:String): Future[Boolean]=checkEmailPresent(email,accountID)
 
     def mobileNumberPresent(mobileNumber: String,accountID:String): Future[Boolean]= checkMobilePresent(mobileNumber,accountID)
+
+    def getEmailIDs(accountIDs:Seq[String])=getAllEmailIDsForAccountIDs(accountIDs)
+
+    def getContacts(accountIDs:Seq[String])=getAllContactsForAccountIDs(accountIDs)
+
+    def contactByEmailId(email:String)=getContactByEmailId(email)
   }
 
 }

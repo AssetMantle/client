@@ -206,7 +206,7 @@
     </section>
     <script>
             @if(loginState.userType == constants.User.ORGANIZATION){
-                componentResource('organizationTraders', jsRoutes.controllers.ComponentViewController.organizationViewTraderList());
+                componentResource('organizationTraders', jsRoutes.controllers.ProfileController.organizationViewAllTraderList());
             }
             componentResource('profilePhoto', jsRoutes.controllers.ComponentViewController.profilePicture());
             componentResource('profileDocuments', jsRoutes.controllers.ComponentViewController.profileDocuments());

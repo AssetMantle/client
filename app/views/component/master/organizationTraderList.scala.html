@@ -1,0 +1,26 @@
+@import controllers.actions.LoginState
+@import models.masterTransaction.requestState
+@import views.html.base._
+
+@(requestStates: Seq[requestState])(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, loginState: LoginState = null)
+<div>
+    @commonTable(){
+        <tr>
+            <th>@Messages(constants.Form.NAME)</th>
+            <th>@Messages(constants.Form.EMAIL)</th>
+            <th>@Messages(constants.Form.STATUS)</th>
+        </tr>
+        @for(requestState <- requestStates) {
+            <tr>
+                <td>@requestState.name</td>
+                <td>@requestState.email </td>
+                <td>@requestState.status</td>
+            </tr>
+        }
+
+    }
+</div>
+
+
+
+

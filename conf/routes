@@ -57,6 +57,7 @@ POST        /master/identification                                       control
 GET         /master/identificationDocument                               controllers.ProfileController.identificationDocument
 GET         /master/identificationDetails                                controllers.ProfileController.identificationDetails
 GET         /master/organizationDetails                                  controllers.ProfileController.organizationDetails
+GET         /master/organizationAllTradersList                           controllers.ProfileController.organizationViewAllTraderList()
 
 GET         /master/component/commonHome                                 controllers.ComponentViewController.commonHome
 GET         /master/component/genesisDetails                             controllers.ComponentViewController.genesisDetails
