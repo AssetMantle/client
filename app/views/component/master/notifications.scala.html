@@ -1,6 +1,7 @@
 @import controllers.actions.LoginState
 
 @(notifications: Seq[models.masterTransaction.Notification] = Seq())(implicit requestHeader: RequestHeader, messagesProvider: MessagesProvider, flash: Flash, loginState: LoginState = null)
+<div id="notificationContainer" class = "notificationContainer">
     @for(notification <- notifications) {
         <li class = "notification">
             <div @if(notification.read) {
@@ -14,3 +15,4 @@
         </li>
     }
 <div class = "notification NotificationButton"> <a onclick="loadMoreNotifications()">@Messages(constants.Form.LOAD_MORE_NOTIFICATIONS)</a></div>
+</div>

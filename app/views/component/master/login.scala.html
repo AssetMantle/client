@@ -7,12 +7,13 @@
 @commonForm(constants.Form.LOGIN, loginForm) {
     @commonInputText(loginForm, constants.FormField.USERNAME)
     @commonInputPassword(loginForm, constants.FormField.PASSWORD)
-    <div class="pushNotification">
-    @commonInputText(loginForm, constants.FormField.PUSH_NOTIFICATION_TOKEN, 'class -> "hidden", 'readonly -> true)
+    <div class="pushNotification hiddenLabel">
+    @commonInputText(loginForm, constants.FormField.PUSH_NOTIFICATION_TOKEN, 'containerDivClass -> "hidden", 'readonly -> true)
     </div>
 }
-</div>
+
 <button type="button" class="cmuk-button cmuk-button-link" onclick="getForm(jsRoutes.controllers.AccountController.emailOTPForgotPasswordForm())">@Messages(constants.Form.FORGOT_PASSWORD.legend)</button>
+</div>
 <script src="@routes.Assets.versioned("javascripts/pushNotification.js")" type="text/javascript"></script>
 
 

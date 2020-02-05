@@ -26,7 +26,7 @@
 @file match {
     case Some(file) => {
         @commonForm(constants.Form.ISSUE_ASSET_INVOICE, issueAssetInvoiceForm) {
-            @commonInputText(issueAssetInvoiceForm, constants.FormField.REQUEST_ID, 'class -> "hidden")
+            @commonInputText(issueAssetInvoiceForm, constants.FormField.REQUEST_ID, 'containerDivClass -> "hidden")
             @commonInputText(issueAssetInvoiceForm, constants.FormField.INVOICE_NUMBER)
             @commonInputDate(issueAssetInvoiceForm, constants.FormField.INVOICE_DATE)
         }

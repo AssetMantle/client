@@ -6,6 +6,7 @@
 <div class="cmuk-container">
 <div class="cmuk-flex-center cmuk-child-width-auto cmuk-grid-match" cmuk-sortable="handle: .cmuk-card" cmuk-grid>
 @for(organization <- organizations) {
+    <div>
     @commonCard() {
         @organization.id
     }{
@@ -21,6 +22,7 @@
                 <div id="@organization.id" class="flexContainer scrollableThird"></div>
             </div>
     }
+    </div>
 }
  </div>
 </div>

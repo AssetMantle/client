@@ -6,6 +6,7 @@
 <div class="cmuk-container">
     <div class="cmuk-flex-center cmuk-child-width-auto cmuk-grid-match" cmuk-grid>
   @for(zone <- zones) {
+      <div>
       @commonCard() {
           @zone.id
       }{
@@ -20,6 +21,7 @@
           <div id="@zone.id" class="scrollableSecond"></div>
         </div>
       }
+      </div>
   }
   </div>
 </div>

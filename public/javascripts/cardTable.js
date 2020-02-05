@@ -2,12 +2,16 @@ $(document).click(function (e) {
     $('.editbutton').each(function () {
         const elementcontent = $(this);
         if (elementcontent.is(e.target)) {
+            $(this).find('.Editdropdown').toggle();
             cardTable(elementcontent);
         }
     });
 });
 
 function cardTable(element) {
+    $(this).find('.Editdropdown').on('focusout', function(e) {
+        $('.Editdropdown').hide();
+    });
     element.parent().find('#Edit').toggle();
     var $table = element.parent().parent().siblings().find("table");
     element.parent().find('#tableView').click(function() {
@@ -41,7 +45,7 @@ function cardTable(element) {
             }
             $newTable.append($newTrd);
         }
-        $(".productTable ul").replaceWith($newTable);
+        element.parent().parent().siblings().find(".productTable ul").replaceWith($newTable);
     });
     element.parent().find('#listView').click(function() {
         var $tableCard = $table;

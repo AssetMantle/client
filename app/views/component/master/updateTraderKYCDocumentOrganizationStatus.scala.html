@@ -10,8 +10,8 @@
 <div id="@Seq(traderKYC.id, traderKYC.documentType).mkString("")">
 @form(action = routes.SetACLController.updateTraderKYCDocumentOrganizationStatus, 'onkeypress -> "submitFormOnEnter(event,this)") {
     @CSRF.formField
-    @commonInputText(updateTraderKYCDocumentOrganizationStatusForm, constants.FormField.TRADER_ID, 'value -> traderKYC.id, 'class -> "hidden", 'readonly -> true)
-    @commonInputText(updateTraderKYCDocumentOrganizationStatusForm, constants.FormField.DOCUMENT_TYPE, 'value -> traderKYC.documentType, 'class -> "hidden", 'readonly -> true)
+    @commonInputText(updateTraderKYCDocumentOrganizationStatusForm, constants.FormField.TRADER_ID, 'value -> traderKYC.id, 'containerDivClass -> "hidden", 'readonly -> true)
+    @commonInputText(updateTraderKYCDocumentOrganizationStatusForm, constants.FormField.DOCUMENT_TYPE, 'value -> traderKYC.documentType, 'containerDivClass -> "hidden", 'readonly -> true)
     @commonCheckbox(updateTraderKYCDocumentOrganizationStatusForm, constants.FormField.STATUS, 'containerDivClass -> "hidden", 'id -> Seq(traderKYC.id, traderKYC.documentType, constants.FormField.STATUS.name).mkString(""))
 
   @if(updateTraderKYCDocumentOrganizationStatusForm.hasGlobalErrors) {
