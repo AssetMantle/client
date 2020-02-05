@@ -20,7 +20,7 @@ class ProfileController @Inject()(messagesControllerComponents: MessagesControll
 
   private implicit val module: String = constants.Module.CONTROLLERS_PROFILE
 
-  def identificationDocument = withLoginAction.authenticated { implicit loginState =>
+  def identificationDocument: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val accountKYC = masterAccountKYCs.Service.get(loginState.username, constants.File.IDENTIFICATION)
       for {
@@ -29,11 +29,11 @@ class ProfileController @Inject()(messagesControllerComponents: MessagesControll
       } yield result
   }
 
-  def identificationForm = withLoginAction.authenticated { implicit loginState =>
+  def identificationForm: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val identification = masterIdentifications.Service.getOrNoneAccountID(loginState.username)
 
-      def getResult(identification: Option[Identification]) = identification match {
+      def getResult(identification: Option[Identification]): Future[Result] = identification match {
         case Some(identification) => withUsernameToken.Ok(views.html.component.master.identification(views.companion.master.Identification.form.fill(value = views.companion.master.Identification.Data(firstName = identification.firstName, lastName = identification.lastName, dateOfBirth = identification.dateOfBirth, idNumber = identification.idNumber, idType = identification.idType))))
         case None => withUsernameToken.Ok(views.html.component.master.identification())
       }
@@ -64,7 +64,7 @@ class ProfileController @Inject()(messagesControllerComponents: MessagesControll
       )
   }
 
-  def identificationDetails = withLoginAction.authenticated { implicit loginState =>
+  def identificationDetails: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       val accountKYC = masterAccountKYCs.Service.get(loginState.username, constants.File.IDENTIFICATION)
       val identification = masterIdentifications.Service.getOrNoneAccountID(loginState.username)
@@ -74,11 +74,7 @@ class ProfileController @Inject()(messagesControllerComponents: MessagesControll
       } yield Ok(views.html.component.master.identificationDetails(accountKYC, identification))
   }
 
-  def addTraderNewForm = Action { implicit request =>
-    Ok(views.html.component.master.addTrader())
-  }
-
-  def organizationDetails = withLoginAction.authenticated { implicit loginState =>
+  def organizationDetails: Action[AnyContent] = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
       if (loginState.userType == constants.User.ZONE) Future(Ok) else {
         val identificationStatus = masterIdentifications.Service.getVerificationStatus(loginState.username).map { status => if (status.isEmpty) throw new BaseException(constants.Response.UNVERIFIED_IDENTIFICATION) else status.get }

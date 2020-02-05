@@ -66,7 +66,7 @@ class Identifications @Inject()(protected val databaseConfigProvider: DatabaseCo
     }
   }
 
-  private def getStatusByAccountID(accountID: String) = db.run(identificationTable.filter(_.accountID === accountID).map(_.status.?).result.head.asTry).map {
+  private def getStatusByAccountID(accountID: String): Future[Option[Boolean]] = db.run(identificationTable.filter(_.accountID === accountID).map(_.status.?).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case noSuchElementException: NoSuchElementException => logger.error(constants.Response.NO_SUCH_ELEMENT_EXCEPTION.message, noSuchElementException)
@@ -107,7 +107,7 @@ class Identifications @Inject()(protected val databaseConfigProvider: DatabaseCo
 
     def getName(accountID: String): Future[String]=getIdentificationByAccountID(accountID).map(id=> id.firstName+" "+id.lastName)
 
-    def getVerificationStatus(accountID: String)= getStatusByAccountID(accountID)
+    def getVerificationStatus(accountID: String): Future[Option[Boolean]]= getStatusByAccountID(accountID)
   }
 
 }

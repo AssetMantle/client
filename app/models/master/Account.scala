@@ -159,7 +159,7 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     }
   }
 
-  private def getStatusByID(id: String) = db.run(accountTable.filter(_.id === id).map(_.status).result.head.asTry).map {
+  private def getStatusByID(id: String): Future[String] = db.run(accountTable.filter(_.id === id).map(_.status).result.head.asTry).map {
     case Success(result) => result
     case Failure(exception) => exception match {
       case psqlException: PSQLException => logger.error(constants.Response.PSQL_EXCEPTION.message, psqlException)
@@ -245,7 +245,7 @@ class Accounts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
 
     def updateStatusComplete(id: String): Future[Int] = updateStatusById(id, constants.Status.Account.COMPLETE)
 
-    def getStatus(id:String)=getStatusByID(id)
+    def getStatus(id:String): Future[String]=getStatusByID(id)
   }
 
 }
