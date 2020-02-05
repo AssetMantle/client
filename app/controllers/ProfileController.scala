@@ -80,47 +80,47 @@ class ProfileController @Inject()(messagesControllerComponents: MessagesControll
 
   def organizationDetails = withLoginAction.authenticated { implicit loginState =>
     implicit request =>
-      if(loginState.userType == constants.User.ZONE) Future(Ok) else {
-      val identificationStatus = masterIdentifications.Service.getVerificationStatus(loginState.username).map { status => if (status.isEmpty) throw new BaseException(constants.Response.UNVERIFIED_IDENTIFICATION) else status.get }
-      val contact = masterContacts.Service.getContact(loginState.username).map { contact => contact.getOrElse(throw new BaseException(constants.Response.NO_SUCH_ELEMENT_EXCEPTION)) }
+      if (loginState.userType == constants.User.ZONE) Future(Ok) else {
+        val identificationStatus = masterIdentifications.Service.getVerificationStatus(loginState.username).map { status => if (status.isEmpty) throw new BaseException(constants.Response.UNVERIFIED_IDENTIFICATION) else status.get }
+        val accountStatus= masterAccounts.Service.getStatus(loginState.username)
 
-      def getResult(contact: models.master.Contact, identificationStatus: Boolean): Future[Result] = {
-        if (!contact.emailAddressVerified || !contact.mobileNumberVerified || !identificationStatus) {
-          Future(Ok)
-        } else {
-          val optionOrganizationDetail = masterOrganizations.Service.getOrNoneByAccountID(loginState.username)
+        def getResult(accountStatus: String, identificationStatus: Boolean): Future[Result] = {
+          if (accountStatus != constants.Status.Account.COMPLETE || !identificationStatus) {
+            Future(Ok)
+          } else {
+            val optionOrganizationDetail = masterOrganizations.Service.getOrNoneByAccountID(loginState.username)
 
-          def getOrganization(optionOrganizationDetail: Option[Organization]): Future[Option[Organization]] = optionOrganizationDetail match {
-            case Some(value) => Future(Option(value))
-            case None =>
-              val organizationID = masterTraders.Service.getOrganizationIDByAccountID(loginState.username)
+            def getOrganization(optionOrganizationDetail: Option[Organization]): Future[Option[Organization]] = optionOrganizationDetail match {
+              case Some(value) => Future(Option(value))
+              case None =>
+                val organizationID = masterTraders.Service.getOrganizationIDByAccountID(loginState.username)
 
-              def getOrganizationByID(organizationID: String): Future[Organization] = masterOrganizations.Service.get(organizationID)
+                def getOrganizationByID(organizationID: String): Future[Organization] = masterOrganizations.Service.get(organizationID)
 
-              (for {
-                organizationID <- organizationID
-                org <- getOrganizationByID(organizationID)
-              } yield Option(org)
-                ).recover {
-                case _: BaseException => None
-              }
+                (for {
+                  organizationID <- organizationID
+                  org <- getOrganizationByID(organizationID)
+                } yield Option(org)
+                  ).recover {
+                  case _: BaseException => None
+                }
+            }
+
+            for {
+              optionOrganizationDetail <- optionOrganizationDetail
+              organization <- getOrganization(optionOrganizationDetail)
+            } yield Ok(views.html.component.master.organization(organization))
           }
+        }
 
-          for {
-            optionOrganizationDetail <- optionOrganizationDetail
-            organization <- getOrganization(optionOrganizationDetail)
-          } yield Ok(views.html.component.master.organization(organization))
+        (for {
+          identificationStatus <- identificationStatus
+          accountStatus <- accountStatus
+          result <- getResult(accountStatus, identificationStatus)
+        } yield result
+          ).recover {
+          case _: BaseException => Ok
         }
       }
-
-      (for {
-        identificationStatus <- identificationStatus
-        contact <- contact
-        result <- getResult(contact, identificationStatus)
-      } yield result
-        ).recover {
-        case baseException: BaseException => Ok
-      }
-  }
   }
 }
