@@ -90,7 +90,6 @@ object PGP {
     while ( {
       message != null
     }) {
-      println(message.toString)
       if (message.isInstanceOf[PGPCompressedData]) {
         compressedData = message.asInstanceOf[PGPCompressedData]
         plainFact = new PGPObjectFactory(compressedData.getDataStream, new JcaKeyFingerprintCalculator)
@@ -110,7 +109,6 @@ object PGP {
     if (onePassSignatureList == null || signatureList == null) throw new PGPException("Poor PGP. Signatures not found.")
     else for (i <- 0 until onePassSignatureList.size) {
       val ops = onePassSignatureList.get(0)
-      println("verifier : " + ops.getKeyID)
       val pgpRing = new PGPPublicKeyRingCollection(PGPUtil.getDecoderStream(publicKeyIn), new JcaKeyFingerprintCalculator)
       publicKey = pgpRing.getPublicKey(ops.getKeyID)
       if (publicKey != null) {
@@ -123,9 +121,7 @@ object PGP {
             userIds.hasNext
           }) {
             val userId = userIds.next.asInstanceOf[String]
-            println(String.format("Signed by {%s}", userId))
           }
-          println("Signature verified")
         }
         else throw new SignatureException("Signature verification failed")
       }
@@ -137,5 +133,6 @@ object PGP {
       fOut.flush
       fOut.close
     }
+    privateKeyStream.close()
   }
 }

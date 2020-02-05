@@ -725,6 +725,21 @@ CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."WURTCBRequest"
     PRIMARY KEY ("id")
 );
 
+CREATE TABLE IF NOT EXISTS MASTER_TRANSACTION."WUSFTPFileTransaction"
+(
+    "payerID"      VARCHAR NOT NULL,
+    "invoiceNumber" VARCHAR NOT NULL,
+    "customerFirstName" VARCHAR NOT NULL,
+    "customerLastName" VARCHAR NOT NULL,
+    "customerEmailAddress" VARCHAR NOT NULL,
+    "settlementDate" VARCHAR NOT NULL,
+    "clientReceivedAmount" VARCHAR NOT NULL,
+    "transactionType" VARCHAR NOT NULL,
+    "productType" VARCHAR NOT NULL,
+    "transactionReference" VARCHAR NOT NULL,
+    PRIMARY KEY ("transactionReference")
+);
+
 ALTER TABLE BLOCKCHAIN."Asset_BC"
     ADD CONSTRAINT Asset_BC_Taker_Address FOREIGN KEY ("takerAddress") REFERENCES BLOCKCHAIN."Account_BC" ("address");
 ALTER TABLE BLOCKCHAIN."ACLAccount_BC"
