@@ -42,11 +42,11 @@ class WesternUnionController @Inject()(messagesControllerComponents: MessagesCon
     request =>
 
       val requestBody = views.companion.master.WesternUnionRTCB.Request.fromXml(request.body)
-      val hash = rtcbSecretKey + requestBody.id.trim + requestBody.reference.trim + requestBody.externalReference.trim + requestBody.invoiceNumber.trim +
-        requestBody.buyerBusinessId.trim + requestBody.buyerFirstName.trim + requestBody.buyerLastName.trim + requestBody.createdDate.trim + requestBody.lastUpdatedDate.trim +
-        requestBody.status.trim + requestBody.dealType.trim + requestBody.paymentTypeId.trim + requestBody.paidOutAmount.trim
+      val hash = rtcbSecretKey + requestBody.id + requestBody.reference + requestBody.externalReference + requestBody.invoiceNumber +
+        requestBody.buyerBusinessId + requestBody.buyerFirstName + requestBody.buyerLastName + requestBody.createdDate + requestBody.lastUpdatedDate +
+        requestBody.status + requestBody.dealType + requestBody.paymentTypeId + requestBody.paidOutAmount
 
-      (if (requestBody.requestSignature.trim == utilities.String.sha256Hash(hash)) {
+      (if (requestBody.requestSignature == utilities.String.sha256Hash(hash)) {
         val create = masterTransactionWURTCBRequests.Service.create((request.body \\ "request").mkString.replaceAll("[\\s\\n]+", ""))
         val updateIssueFiatRequestRTCBStatus = issueFiatRequests.Service.markRTCBReceived(requestBody.externalReference)
         for {

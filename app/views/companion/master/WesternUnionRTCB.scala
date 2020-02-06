@@ -47,11 +47,11 @@ object WesternUnionRTCB {
   object Request {
 
     def fromXml(xmlRequest: scala.xml.NodeSeq): Request = {
-      new Request((xmlRequest \ "id").text, (xmlRequest \ "reference").text, (xmlRequest \ "externalReference").text,
-        (xmlRequest \ "invoiceNumber").text, (xmlRequest \ "buyerBusinessId").text, (xmlRequest \ "buyerFirstName").text,
-        (xmlRequest \ "buyerLastName").text, (xmlRequest \ "createdDate").text, (xmlRequest \ "lastUpdatedDate").text,
-        (xmlRequest \ "status").text, (xmlRequest \ "dealType").text, (xmlRequest \ "paymentTypeId").text,
-        (xmlRequest \ "paidOutAmount").text, (xmlRequest \ "requestSignature").text)
+      new Request((xmlRequest \ "id").text.trim, (xmlRequest \ "reference").text.trim, (xmlRequest \ "externalReference").text.trim,
+        (xmlRequest \ "invoiceNumber").text.trim, (xmlRequest \ "buyerBusinessId").text.trim, (xmlRequest \ "buyerFirstName").text.trim,
+        (xmlRequest \ "buyerLastName").text.trim, (xmlRequest \ "createdDate").text.trim, (xmlRequest \ "lastUpdatedDate").text.trim,
+        (xmlRequest \ "status").text.trim, (xmlRequest \ "dealType").text.trim, (xmlRequest \ "paymentTypeId").text.trim,
+        (xmlRequest \ "paidOutAmount").text.trim, (xmlRequest \ "requestSignature").text.trim)
     }
 
   }
