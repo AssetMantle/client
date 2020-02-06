@@ -1,37 +1,14 @@
-package services
+package utilities
 
-import java.security.{NoSuchProviderException, SignatureException}
-import java.io.FileOutputStream
-import org.bouncycastle.openpgp.PGPSecretKeyRingCollection
-import org.bouncycastle.openpgp.operator.bc.BcKeyFingerprintCalculator
-import org.bouncycastle.openpgp.operator.jcajce.JcaKeyFingerprintCalculator
-import java.io.BufferedInputStream
-import java.io.FileInputStream
-import java.io.InputStream
-import java.io.File
-import org.bouncycastle.openpgp.PGPPrivateKey
-import org.bouncycastle.openpgp.PGPPublicKeyEncryptedData
-import org.bouncycastle.openpgp.PGPSecretKey
-import org.bouncycastle.openpgp.operator.bc.BcPBESecretKeyDecryptorBuilder
-import org.bouncycastle.openpgp.operator.bc.BcPGPDigestCalculatorProvider
-import org.bouncycastle.openpgp.operator.bc.BcPublicKeyDataDecryptorFactory
-import java.io.IOException
-import java.security.Security
-import org.bouncycastle.openpgp.PGPEncryptedDataList
-import org.bouncycastle.jce.provider.BouncyCastleProvider
-import org.bouncycastle.openpgp.PGPCompressedData
-import org.bouncycastle.openpgp.PGPLiteralData
-import org.bouncycastle.openpgp.PGPObjectFactory
-import org.bouncycastle.openpgp.PGPOnePassSignatureList
-import org.bouncycastle.openpgp.PGPSignatureList
-import org.bouncycastle.util.io.Streams
-import java.io.ByteArrayOutputStream
-import org.bouncycastle.openpgp.PGPException
-import org.bouncycastle.openpgp.PGPPublicKey
-import org.bouncycastle.openpgp.PGPPublicKeyRingCollection
-import org.bouncycastle.openpgp.PGPUtil
-import org.bouncycastle.openpgp.operator.jcajce.JcaPGPContentVerifierBuilderProvider
+import java.io._
+import java.security.{NoSuchProviderException, Security, SignatureException}
 import java.util.Iterator
+
+import org.bouncycastle.jce.provider.BouncyCastleProvider
+import org.bouncycastle.openpgp.operator.bc.{BcKeyFingerprintCalculator, BcPBESecretKeyDecryptorBuilder, BcPGPDigestCalculatorProvider, BcPublicKeyDataDecryptorFactory}
+import org.bouncycastle.openpgp.operator.jcajce.{JcaKeyFingerprintCalculator, JcaPGPContentVerifierBuilderProvider}
+import org.bouncycastle.openpgp._
+import org.bouncycastle.util.io.Streams
 
 object PGP {
   @throws[IOException]

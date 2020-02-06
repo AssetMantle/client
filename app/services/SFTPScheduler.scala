@@ -13,7 +13,7 @@ import scala.concurrent.{Await, ExecutionContext, Future}
 import java.nio.file.{Files, Paths}
 
 import scala.io
-import akka.NotUsed
+import akka.{Done, NotUsed}
 import akka.stream.scaladsl.Source
 import akka.stream.{ActorMaterializer, IOResult}
 import akka.stream.alpakka.ftp.{FtpCredentials, FtpFile, SftpIdentity, SftpSettings}
@@ -22,6 +22,7 @@ import models.masterTransaction.{WUSFTPFileTransaction, WUSFTPFileTransactions}
 import net.schmizz.sshj.transport.verification.PromiscuousVerifier
 import net.schmizz.sshj.DefaultConfig
 import net.schmizz.sshj.SSHClient
+import utilities.PGP
 
 @Singleton
 class SFTPScheduler @Inject()(actorSystem: ActorSystem, wuSFTPFileTransactions: WUSFTPFileTransactions)(implicit configuration: Configuration, executionContext: ExecutionContext) {
@@ -45,12 +46,9 @@ class SFTPScheduler @Inject()(actorSystem: ActorSystem, wuSFTPFileTransactions: 
   private val wuPGPPublicKeyFileLocation = configuration.get[String]("westernUnion.wuPGPPublicKeyPath")
   private val comdexPGPPrivateKeyFileLocation = configuration.get[String]("westernUnion.comdexPGPPrivateKeyPath")
   private val comdexPGPPrivateKeyPassword = configuration.get[String]("westernUnion.comdexPGPPrivateKeyPassword")
+  private val tempFileName = configuration.get[String]("westernUnion.tempFileName")
 
-  def csvReader = {
-
-  }
-
-  def scheduler = {
+  def scheduler: Future[Done] = {
     val sftpSettings = SftpSettings
       .create(InetAddress.getByName(sftpSite))
       .withPort(sftpPort)
@@ -71,8 +69,8 @@ class SFTPScheduler @Inject()(actorSystem: ActorSystem, wuSFTPFileTransactions: 
         fileCreate.createNewFile()
         Source.single(ftpFile._1).runWith(FileIO.toPath(fileCreate.toPath))
 
-        services.PGP.decryptFile(newFilePath, storagePathSFTPFiles + "tmp.csv", wuPGPPublicKeyFileLocation, comdexPGPPrivateKeyFileLocation, comdexPGPPrivateKeyPassword)
-        val bufferedSource = io.Source.fromFile(storagePathSFTPFiles + "tmp.csv")
+        PGP.decryptFile(newFilePath, storagePathSFTPFiles + tempFileName, wuPGPPublicKeyFileLocation, comdexPGPPrivateKeyFileLocation, comdexPGPPrivateKeyPassword)
+        val bufferedSource = io.Source.fromFile(storagePathSFTPFiles + tempFileName)
         for (line <- bufferedSource.getLines.drop(1)) {
           val Array(payerID,invoiceNumber,customerFirstName,customerLastName,customerEmailAddress,settlementDate,clientReceivedAmount,transactionType,productType,transactionReference) = line.split(",").map(_.trim)
           wuSFTPFileTransactions.Service.create(WUSFTPFileTransaction(payerID,invoiceNumber,customerFirstName,customerLastName,customerEmailAddress,settlementDate,clientReceivedAmount,transactionType,productType,transactionReference))
@@ -80,7 +78,6 @@ class SFTPScheduler @Inject()(actorSystem: ActorSystem, wuSFTPFileTransactions: 
         bufferedSource.close()
 
         Source.single(ftpFile._2).runWith(Sftp.remove(sftpSettings))
-
       }
   }
 
