@@ -116,6 +116,8 @@ class Contacts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     }
   }
 
+  private def getContactsByEmailAddresses(emailIDs:Seq[String])=db.run(contactTable.filter(_.emailAddress inSet emailIDs).result)
+
   private[models] class ContactTable(tag: Tag) extends Table[Contact](tag, "Contact") {
 
     def * = (id, mobileNumber, mobileNumberVerified, emailAddress, emailAddressVerified) <> (Contact.tupled, Contact.unapply)
@@ -157,6 +159,8 @@ class Contacts @Inject()(protected val databaseConfigProvider: DatabaseConfigPro
     def getContacts(accountIDs:Seq[String])=getAllContactsForAccountIDs(accountIDs)
 
     def contactByEmailId(email:String)=getContactByEmailId(email)
+
+    def getContactsByEmailID(emailAddresses:Seq[String])=getContactsByEmailAddresses(email)
   }
 
 }

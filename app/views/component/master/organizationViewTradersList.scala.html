@@ -10,9 +10,16 @@
         <span class="red">@Messages(constants.Form.TRADER_ID)</span>: @trader.id<br>
             <span class="red">@Messages(constants.Form.NAME)</span>: @trader.name<br>
             <span class="red">@Messages(constants.Form.ACCOUNT_ID)</span>: @trader.accountID<br>
-            <span class="red">@Messages(constants.Form.COMPLETION_STATUS)</span>: @trader.completionStatus<br>
+            @if(!trader.completionStatus){
+                <span class="red">@Messages(constants.Form.STATUS)</span>: @Messages(constants.Status.TraderStatus.ADD_TRADER_FORM_INCOMPLETE)<br>
+            }else{
+                @if(trader.verificationStatus.isDefined && trader.verificationStatus.get){
+                    <span class="red">@Messages(constants.Form.STATUS)</span>: @Messages(constants.Status.TraderStatus.APPROVED)<br>
+                }
+            }
+           @* <span class="red">@Messages(constants.Form.COMPLETION_STATUS)</span>: @trader.completionStatus<br>
             <span class="red">@Messages(constants.Form.VERIFIED_STATUS)</span>: @trader.verificationStatus.getOrElse(Messages(constants.Form.PENDING))<br>
-
+*@
         @if(trader.verificationStatus.getOrElse(false)) {
             <div class="centerText">
                 <button type="button" class="cmuk-button cmuk-button-primary" onclick="getForm(jsRoutes.controllers.ComponentViewController.organizationViewTrader('@trader.id'))">@Messages(constants.Form.VIEW)</button>

@@ -171,4 +171,24 @@ class ProfileController @Inject()(messagesControllerComponents: MessagesControll
       }
   }
 
+  def viewTraderRequests()=withLoginAction.authenticated{implicit loginState =>
+    implicit request =>
+    val allTraderRequests = masterTransactionAddTraderRequests.Service.getAllTraderRequests(loginState.username)
+    def getContacts(emailIDs:Seq[String]) = masterContacts.Service.getContactsByEmailID()
+    for{
+      allTraderRequests<-allTraderRequests
+      contacts<- getContacts(allTraderRequests.map(_.emailAddress))
+    }yield {
+
+      val statuses=allTraderRequests.map{traderRequest=> if(contacts.map(_.emailAddress) contains  traderRequest.emailAddress) {
+        requestState(traderRequest.emailAddress, traderRequest.name, constants.Status.TraderStatus.SIGNED_UP)
+      }
+      else {
+        requestState(traderRequest.emailAddress, traderRequest.name, constants.Status.TraderStatus.NOT_SIGNED_UP)
+      }
+      }
+      Ok(views.html.component.master.organizationTraderList(statuses))
+    }
+  }
+
 }

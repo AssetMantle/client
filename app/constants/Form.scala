@@ -143,6 +143,7 @@ object Form {
   val COMMIT = "COMMIT"
   val PROFILE = "PROFILE"
   val MARKET = "MARKET"
+  val ACCOUNT = "ACCOUNT"
   val REQUEST = "REQUEST"
   val ACCEPT_OFFER = "ACCEPT_OFFER"
   val ASSETS = "ASSETS"
